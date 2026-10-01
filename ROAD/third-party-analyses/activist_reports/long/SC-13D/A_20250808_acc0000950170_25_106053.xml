@@ -1,0 +1,646 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns:p="http://www.sec.gov/edgar/schedule13D" xmlns:p1="http://www.sec.gov/edgar/common"><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8"><link rel="stylesheet" type="text/css" href="/css/SDR_print.css"><style type="text/css">
+					.fakeTextBox {
+					border-top: 2px solid #999;
+					border-right: 1px solid #ccc;
+					border-bottom: 1px solid #ccc;
+					border-left: 2px solid #999;
+					padding: 2px;
+					_width: 800px;
+					height: auto;
+					min-width: 200px;
+					min-height: 50px;
+					word-wrap: break-word;
+					font-size: 0.9em;
+					color: blue;
+					}
+					table.tableClass { border: solid black;
+					border-top-width: 1;
+					border-right-width: 1;
+					border-bottom-width: 1;
+					border-left-width: 1;
+					table-layout:fixed;
+					}
+					table.innerTableClass { border: solid black;
+					border-top-width: 0;
+					border-right-width: 0;
+					border-bottom-width: 0;
+					border-left-width: 0;
+					table-layout:fixed;
+					}
+					th.tableClassLeft { border: solid black;
+					border-top-width: 0px;
+					border-right-width: 0px;
+					border-bottom-width: 1px;
+					border-left-width: 1px;
+					padding: 2px;
+					}
+					th.tableClassRight { border: solid black;
+					border-top-width: 0px;
+					border-right-width: 1px;
+					border-bottom-width: 1px;
+					border-left-width: 0;
+					padding: 2px;
+					}
+					th.tableClass { border: solid black;
+					border-top-width: 0px;
+					border-right-width: 1px;
+					border-bottom-width: 1px;
+					border-left-width: 1px;
+					padding: 2px;
+					}
+					td.tableClassLeft { border: solid black;
+					border-top-width: 0px;
+					border-right-width: 0px;
+					border-bottom-width: 1px;
+					border-left-width: 1px;
+					font-size: 0.9em;
+					color: blue;
+					word-wrap: break-word;
+					}
+					td.tableClassRight { border: solid black;
+					border-top-width: 0px;
+					border-right-width: 1px;
+					border-bottom-width: 1px;
+					border-left-width: 0;
+					font-size: 0.9em;
+					color: blue;
+					word-wrap: break-word;
+					}
+					td.tableClass { border: solid black;
+					border-top-width: 0px;
+					border-right-width: 1px;
+					border-bottom-width: 1px;
+					border-left-width: 1px;
+					font-size: 0.9em;
+					font-weight:bold;
+					color: black;
+					word-wrap: break-word;
+					}
+					td.tableClassNoBorder { border: solid black;
+					border-top-width: 0px;
+					border-right-width: 0px;
+					border-bottom-width: 0px;
+					border-left-width: 0px;
+					font-size: 0.9em;
+					font-weight:bold;
+					color: black;
+					word-wrap: break-word;
+					}
+
+					td.tableClassNoBorderBlue { border: solid black;
+					border-top-width: 0px;
+					border-right-width: 0px;
+					border-bottom-width: 0px;
+					border-left-width: 0px;
+					font-size: 0.9em;
+					font-weight:bold;
+					color: blue;
+					word-wrap: break-word;
+					}
+
+					td.tableClassInnerNoBorderBlue { border: solid black;
+					border-top-width: 0px;
+					border-right-width: 0px;
+					border-bottom-width: 0px;
+					border-left-width: 0px;
+					font-size: 1.4em;
+					font-weight:bold;
+					color: blue;
+					word-wrap: break-word;
+					}
+
+					td.tableClassNoBorderAlignLeft { border: solid black;
+					border-top-width: 0px;
+					border-right-width: 0px;
+					border-bottom-width: 0px;
+					border-left-width: 0px;
+					font-size: 0.9em;
+					font-weight:bold;
+					text-align: left;
+					color: black;
+					word-wrap: break-word;
+					}
+
+					td.signature {
+					padding: 4px 8px;
+					}
+
+					td.tableClassInner { border: solid black;
+					border-top-width: 0px;
+					border-right-width: 1px;
+					border-bottom-width: 1px;
+					border-left-width: 1px;
+					font-size: 1em;
+					font-weight:bold;
+					color: black;
+					word-wrap: break-word;
+					}
+
+					td.tableClassValign { border: solid black;
+					border-top-width: 0px;
+					border-right-width: 1px;
+					border-bottom-width: 1px;
+					border-left-width: 1px;
+					font-size: 0.9em;
+					font-weight:bold;
+					color: black;
+					vertical-align: middle;
+					text-align: center;
+					word-wrap: break-word;
+					}
+
+					td.tableClassValignNoBorder { border: solid black;
+					border-top-width: 0px;
+					border-right-width: 0px;
+					border-bottom-width: 0px;
+					border-left-width: 0px;
+					font-size: 0.9em;
+					font-weight:bold;
+					color: black;
+					vertical-align: middle;
+					text-align: center;
+					word-wrap: break-word;
+					}
+
+					td.tableClassValignInner { border: solid black;
+					border-top-width: 0px;
+					border-right-width: 1px;
+					border-bottom-width: 1px;
+					border-left-width: 1px;
+					font-size: 1em;
+					font-weight:bold;
+					color: black;
+					vertical-align: middle;
+					text-align: center;
+					word-wrap: break-word;
+					}
+
+					td.innerTableClassRightValign { border: solid black;
+					border-top-width: 0px;
+					border-right-width: 1px;
+					border-bottom-width: 1px;
+					border-left-width: 0;
+					font-size: 1em;
+					font-weight:bold;
+					color: black;
+					vertical-align: middle;
+					text-align: center;
+					word-wrap: break-word;
+					}
+
+					td.innerTableClassRightValignBottomLess { border: solid black;
+					border-top-width: 0px;
+					border-right-width: 1px;
+					border-bottom-width: 0px;
+					border-left-width: 0;
+					font-size: 1em;
+					font-weight:bold;
+					color: black;
+					vertical-align: middle;
+					text-align: center;
+					word-wrap: break-word;
+					}
+
+					td.tableClassInnerLeft { border: solid black;
+					border-top-width: 0px;
+					border-right-width: 0px;
+					border-bottom-width: 1px;
+					border-left-width: 1px;
+					font-size: 1em;
+					font-weight:bold;
+					color: black;
+					word-wrap: break-word;
+					}
+
+					td.tableClassInnerLeftBottomLess { border: solid black;
+					border-top-width: 0px;
+					border-right-width: 0px;
+					border-bottom-width: 0px;
+					border-left-width: 1px;
+					font-size: 1em;
+					font-weight:bold;
+					color: black;
+					word-wrap: break-word;
+					}
+
+					td.tableClassNoBorderAlignCenter { border: solid black;
+					border-top-width: 0px;
+					border-right-width: 0px;
+					border-bottom-width: 0px;
+					border-left-width: 0px;
+					font-size: 0.9em;
+					font-weight:bold;
+					color: black;
+					text-align: center;
+					word-wrap: break-word;
+					}
+
+					tr.tableClass { border: solid black;
+					border-top-width: 1px;
+					border-right-width: 1px;
+					border-bottom-width: 1px;
+					border-left-width: 1px;
+					}
+					tr.tableClassWithBg { border: solid black;
+					border-top-width: 0;
+					border-right-width: 1;
+					border-bottom-width: 1;
+					border-left-width: 0;
+					background-color: #e0e0ff
+					}
+
+					tr.tableClassWithBgBlack { border: solid black;
+					border-top-width: 0;
+					border-right-width: 1;
+					border-bottom-width: 1;
+					border-left-width: 0;
+					background-color: #D3D3D3
+					}
+
+					hr.header {
+					position: relative;
+					top: 20px;
+					border: none;
+					height: 6px;
+					background: black;
+					margin-bottom: 10px;
+					}
+
+					hr.separatorThin {
+					position: relative;
+					top: 2px;
+					border: none;
+					height: 2px;
+					background: black;
+					margin-bottom: 2px;
+					}
+
+					hr.headerThin {
+					position: relative;
+					top: 10px;
+					border: none;
+					height: 2px;
+					background: black;
+					margin-bottom: 10px;
+					}
+
+					hr.separator {
+					position: relative;
+					top: 20px;
+					border: none;
+					height: 4px;
+					background: black;
+					margin-bottom: 5px;
+					}
+
+					div.text {
+					background-color: #ffffff;
+					color: blue;
+					font-size: 1em;
+					font-weight:normal;
+					text-align:justify;
+					}
+
+
+					div.information {
+					background-color: #ffffff;
+					color: black;
+					font-size: 1em;
+					font-weight:normal;
+					text-align:justify;
+					}
+
+					#scheader {
+					font-size: 0.9em;
+					border: 0px solid #404040;
+					border-spacing: 2px;
+					}
+
+					div.largetext {
+					background-color: #ffffff;
+					color: blue;
+					font-size: 1em;
+					font-weight:normal;
+					text-align:justify;
+					white-space: pre-wrap;
+					word-break: normal;
+					}
+
+				</style></head><body lang="en-US" text="#000000" bgcolor="#ffffff"><hr class="header"><br><hr class="headerThin"><div class="contentwrapper"><table role="presentation" id="scheader"><tr><td class="tableClassNoBorderAlignCenter" style="font-size:2em;">
+						SECURITIES AND EXCHANGE COMMISSION
+						<br>
+						Washington, D.C. 20549
+					</td></tr><tr><td class="tableClassNoBorderAlignCenter"><br><br><div style="font-size:1.5em;">
+									SCHEDULE 13D
+								</div><br><div style="font-size:1.2em;">
+							Under the Securities Exchange Act of 1934
+						</div><br><div class="information" style="text-align:center; font-weight:bold;">
+									(Amendment No. <span style="color:blue;">3</span>)
+								</div><br><br></td></tr><tr><td class="center"><div class="information" style="text-align:center; font-weight:bold; color:blue;">Construction Partners, Inc.</div><div class="information" style="text-align:center; font-weight:bold;"><hr class="separatorThin">(Name of Issuer)</div><br><br></td></tr><tr><td class="center"><div class="information" style="text-align:center; font-weight:bold; color:blue;">Class A Common Stock, par value $0.001 per share</div><div class="information" style="text-align:center; font-weight:bold;"><hr class="separatorThin">(Title of Class of Securities)</div><br><br></td></tr><tr><td class="center"><div class="information" style="text-align:center; font-weight:bold; color:blue;">21044C107</div><div class="information" style="text-align:center; font-weight:bold;"><hr class="separatorThin">(CUSIP Number)</div><br><br></td></tr><tr><td class="center"><div class="information" style="text-align:center; font-weight:bold; color:blue;">Greg R. Samuel<br>2801 N. Harwood Street,
+								Suite 2300<br>Dallas,
+								TX,
+								75201<br>(214) 651-5000</div><div class="information" style="text-align:center; font-weight:bold;"><hr class="separatorThin">(Name, Address and Telephone Number of Person Authorized to
+									Receive Notices and Communications)</div></td></tr><tr><td class="center"><div class="information" style="text-align:center; font-weight:bold; color:blue;">08/06/2025</div><div class="information" style="text-align:center; font-weight:bold;"><hr class="separatorThin">(Date of Event Which Requires Filing of This Statement)</div></td></tr></table><br><br><div class="information" style="text-align:justify">
+				If the filing person has previously filed a statement on Schedule 13G to report the acquisition that is the subject of this Schedule 13D, and is filing this schedule because of §§ 240.13d-1(e), 240.13d-1(f) or 240.13d-1(g), check the following box.
+				<img src="/Images/box-unchecked.jpg" alt="Checkbox not checked"></div><br><div class="information" style="text-align:justify">
+				The information required on the remainder of this cover page shall not be deemed to be “filed” for the purpose of Section 18 of the
+				Securities Exchange Act of 1934 (“Act”) or otherwise subject to the liabilities of that section of the Act but shall be subject to all other
+				provisions of the Act (however, see the Notes).
+			</div></div><hr class="headerThin"><hr class="header"><br><br>
+  <div class="content"><div class="form1"></div></div>
+  <div class="content"><div class="form1"><table><tr><td class="center"><br><br><p><div align="center" style="font-size:1.2em;">
+									SCHEDULE 13D
+								</div></p></td></tr></table><table role="presentation" class="tableClass" id="cusipNumber"><tr class="tableClass"><td width="25%" style="font-weight:bold;">CUSIP No.</td><td width="75%"><div style="font-size:.9em; color:#000000">21044C107</div></td></tr></table><br><br><table role="presentation" class="tableClass" id="reportingPersonDetails"><tr class="tableClass"><td width="8%" class="tableClassValign">1</td><td width="92%" class="tableClass">
+					Name of reporting person
+					<br><br><div class="text">Ned N. Fleming, IV</div></td></tr><tr><td width="8%" class="tableClassValign">2</td><td width="92%" class="tableClass">Check the appropriate box if a member of a Group (See Instructions)
+					<br><br><div class="text"><img src="/Images/box-unchecked.jpg" alt="Checkbox not checked">  (a)
+						<br><img src="/Images/box-unchecked.jpg" alt="Checkbox not checked">  (b)
+					</div></td></tr><tr class="tableClassWithBgBlack"><td width="8%" class="tableClassValign">3</td><td width="92%" class="tableClass">SEC use only</td></tr><tr><td width="8%" class="tableClassValign">4</td><td width="92%" class="tableClass">
+					Source of funds (See Instructions)
+					<br><br><div class="text">OO</div></td></tr><tr><td width="8%" class="tableClassValign">5</td><td width="92%" class="tableClass">
+					Check if disclosure of legal proceedings is required pursuant to Items 2(d) or 2(e)
+					<br><br><img src="/Images/box-unchecked.jpg" alt="Checkbox not checked"></td></tr><tr><td width="8%" class="tableClassValign">6</td><td width="92%" class="tableClass">Citizenship or place of organization
+					<br><br><div class="text">
+				UNITED STATES
+			</div></td></tr><tr><td width="8%" class="tableClassValign">Number of Shares Beneficially Owned by Each Reporting Person With:</td><td width="92%" class="tableClass"><table class="innerTableClass"><tr><td width="8%" class="innerTableClassRightValign">7</td><td width="92%" class="tableClassInnerLeft">Sole Voting Power
+								<br><br><div class="text">0.00</div></td></tr><tr><td width="8%" class="innerTableClassRightValign">8</td><td width="92%" class="tableClassInnerLeft">Shared Voting Power
+								<br><br><div class="text">520,849.00</div></td></tr><tr><td width="8%" class="innerTableClassRightValign">9</td><td width="92%" class="tableClassInnerLeft">Sole Dispositive Power
+								<br><br><div class="text">368,911.00</div></td></tr><tr><td width="8%" class="innerTableClassRightValignBottomLess">10</td><td width="92%" class="tableClassInnerLeftBottomLess">Shared Dispositive Power
+								<br><br><div class="text">149,905.00</div></td></tr></table></td></tr><tr><td width="8%" class="tableClassValign">11</td><td width="92%" class="tableClass">Aggregate amount beneficially owned by each reporting person
+					<br><br><div class="text">520,849.00</div></td></tr><tr><td width="8%" class="tableClassValign">12</td><td width="92%" class="tableClass">Check if the aggregate amount in Row (11) excludes certain shares (See Instructions)
+					<br><br><img src="/Images/box-unchecked.jpg" alt="Checkbox not checked"></td></tr><tr><td width="8%" class="tableClassValign">13</td><td width="92%" class="tableClass">Percent of class represented by amount in Row (11)
+					<br><br><div class="text">1.1 % </div></td></tr><tr><td width="8%" class="tableClassValign">14</td><td width="92%" class="tableClass">Type of Reporting Person (See Instructions)
+					<br><br><div class="text">IN, HC</div></td></tr></table><br><div style="display: flex;"><div style="font-size: 0.9em; font-weight: bold; margin-right: 5px;">
+					Comment for Type of Reporting Person:
+				</div><div class="largetext" style="text-align:justify">(1)	In reference to rows 8 and 11 above, includes (i) 41,201 shares of Class A common stock, $0.001 par value per share ("Class A Common Stock"), of Construction Partners, Inc. (the "Issuer") held by Ned N. Fleming, IV, 2,033 of which are restricted shares of Class A Common Stock that are not vested or do not vest within sixty (60) days of this Schedule 13D and, as a result, Mr. Fleming has the right to vote, but not to dispose or direct the disposition of, such shares, (ii) 88,735 shares of Class A Common Stock issuable upon the conversion of 88,735 shares of Class B common stock, $0.001 par value per share ("Class B Common Stock"), of the Issuer held by Mr. Fleming, (iii) 241,008 shares of Class A Common Stock issuable upon the conversion of 241,008 shares of Class B Common Stock held by the Ned N. Fleming, IV 2013 Trust, of which Mr. Fleming serves as trustee, and, in such capacity, has the power to vote and direct the disposition of such shares, (iv) 140,572 shares of Class A Common Stock issuable upon the conversion of 140,572 shares of Class B Common Stock held by Tar Frog Investment Management, LLC ("Tar Frog"), a limited liability company for which Mr. Fleming serves as co-manager, and, in such capacity, shares the power to vote and direct the disposition of such shares, and (v) 9,333 shares of Class A Common Stock held by Tar Frog.
+
+(2)	In reference to row 9 above, includes the shares listed under romanette (i) in footnote 1 above that are vested or will vest within sixty (60) days of this Schedule 13D and the shares listed under romanettes (ii) and (iii) in footnote 1 above.
+
+(3)	In reference to row 10 above, includes the shares listed under romanettes (iv) and (v) in footnote 1 above.
+
+(4)	In reference to row 11 above, calculated based on (i) 47,551,943 shares of Class A Common Stock outstanding as of August 4, 2025, as disclosed in the Issuer's Quarterly Report on Form 10-Q for the quarter ended June 30, 2025, that was filed by the Issuer with the Securities and Exchange Commission ("SEC") on August 7, 2025 and (ii) an aggregate of 470,315 shares of Class B Common Stock beneficially owned by Mr. Fleming, which are convertible into shares of Class A Common Stock within sixty (60) days of this Schedule 13D.</div></div><table><tr><td class="center"><br><br><p><div align="center" style="font-size:1.2em;">
+									SCHEDULE 13D
+								</div></p></td></tr></table><table role="presentation" class="tableClass" id="cusipNumber"><tr class="tableClass"><td width="25%" style="font-weight:bold;">CUSIP No.</td><td width="75%"><div style="font-size:.9em; color:#000000">21044C107</div></td></tr></table><br><br><table role="presentation" class="tableClass" id="reportingPersonDetails"><tr class="tableClass"><td width="8%" class="tableClassValign">1</td><td width="92%" class="tableClass">
+					Name of reporting person
+					<br><br><div class="text">Barrett N. Bruce</div></td></tr><tr><td width="8%" class="tableClassValign">2</td><td width="92%" class="tableClass">Check the appropriate box if a member of a Group (See Instructions)
+					<br><br><div class="text"><img src="/Images/box-unchecked.jpg" alt="Checkbox not checked">  (a)
+						<br><img src="/Images/box-unchecked.jpg" alt="Checkbox not checked">  (b)
+					</div></td></tr><tr class="tableClassWithBgBlack"><td width="8%" class="tableClassValign">3</td><td width="92%" class="tableClass">SEC use only</td></tr><tr><td width="8%" class="tableClassValign">4</td><td width="92%" class="tableClass">
+					Source of funds (See Instructions)
+					<br><br><div class="text">OO</div></td></tr><tr><td width="8%" class="tableClassValign">5</td><td width="92%" class="tableClass">
+					Check if disclosure of legal proceedings is required pursuant to Items 2(d) or 2(e)
+					<br><br><img src="/Images/box-unchecked.jpg" alt="Checkbox not checked"></td></tr><tr><td width="8%" class="tableClassValign">6</td><td width="92%" class="tableClass">Citizenship or place of organization
+					<br><br><div class="text">
+				UNITED STATES
+			</div></td></tr><tr><td width="8%" class="tableClassValign">Number of Shares Beneficially Owned by Each Reporting Person With:</td><td width="92%" class="tableClass"><table class="innerTableClass"><tr><td width="8%" class="innerTableClassRightValign">7</td><td width="92%" class="tableClassInnerLeft">Sole Voting Power
+								<br><br><div class="text">0.00</div></td></tr><tr><td width="8%" class="innerTableClassRightValign">8</td><td width="92%" class="tableClassInnerLeft">Shared Voting Power
+								<br><br><div class="text">39,528.00</div></td></tr><tr><td width="8%" class="innerTableClassRightValign">9</td><td width="92%" class="tableClassInnerLeft">Sole Dispositive Power
+								<br><br><div class="text">39,528.00</div></td></tr><tr><td width="8%" class="innerTableClassRightValignBottomLess">10</td><td width="92%" class="tableClassInnerLeftBottomLess">Shared Dispositive Power
+								<br><br><div class="text">0.00</div></td></tr></table></td></tr><tr><td width="8%" class="tableClassValign">11</td><td width="92%" class="tableClass">Aggregate amount beneficially owned by each reporting person
+					<br><br><div class="text">39,528.00</div></td></tr><tr><td width="8%" class="tableClassValign">12</td><td width="92%" class="tableClass">Check if the aggregate amount in Row (11) excludes certain shares (See Instructions)
+					<br><br><img src="/Images/box-unchecked.jpg" alt="Checkbox not checked"></td></tr><tr><td width="8%" class="tableClassValign">13</td><td width="92%" class="tableClass">Percent of class represented by amount in Row (11)
+					<br><br><div class="text">0.1 % </div></td></tr><tr><td width="8%" class="tableClassValign">14</td><td width="92%" class="tableClass">Type of Reporting Person (See Instructions)
+					<br><br><div class="text">IN, HC</div></td></tr></table><br><div style="display: flex;"><div style="font-size: 0.9em; font-weight: bold; margin-right: 5px;">
+					Comment for Type of Reporting Person:
+				</div><div class="largetext" style="text-align:justify">(1)	In reference to rows 8, 9 and 11 above, includes (i) 38,991 shares of Class A Common Stock issuable upon the conversion of 38,991 shares of Class B Common Stock held by Barrett N. Bruce and (ii) 537 shares of Class A Common Stock issuable upon the conversion of 537 shares of Class B Common Stock held by a 401(k) account for the benefit of Mr. Bruce.
+
+(2)	In reference to row 11 above, calculated based on (i) 47,551,943 shares of Class A Common Stock outstanding as of August 4, 2025, as disclosed in the Issuer's Quarterly Report on Form 10-Q for the quarter ended June 30, 2025, that was filed by the Issuer with the SEC on August 7, 2025 and (ii) an aggregate of 39,528 shares of Class B Common Stock beneficially owned by Mr. Bruce, which are convertible into shares of Class A Common Stock within sixty (60) days of this Schedule 13D.</div></div><table><tr><td class="center"><br><br><p><div align="center" style="font-size:1.2em;">
+									SCHEDULE 13D
+								</div></p></td></tr></table><table role="presentation" class="tableClass" id="cusipNumber"><tr class="tableClass"><td width="25%" style="font-weight:bold;">CUSIP No.</td><td width="75%"><div style="font-size:.9em; color:#000000">21044C107</div></td></tr></table><br><br><table role="presentation" class="tableClass" id="reportingPersonDetails"><tr class="tableClass"><td width="8%" class="tableClassValign">1</td><td width="92%" class="tableClass">
+					Name of reporting person
+					<br><br><div class="text">Charles E. Owens</div></td></tr><tr><td width="8%" class="tableClassValign">2</td><td width="92%" class="tableClass">Check the appropriate box if a member of a Group (See Instructions)
+					<br><br><div class="text"><img src="/Images/box-unchecked.jpg" alt="Checkbox not checked">  (a)
+						<br><img src="/Images/box-unchecked.jpg" alt="Checkbox not checked">  (b)
+					</div></td></tr><tr class="tableClassWithBgBlack"><td width="8%" class="tableClassValign">3</td><td width="92%" class="tableClass">SEC use only</td></tr><tr><td width="8%" class="tableClassValign">4</td><td width="92%" class="tableClass">
+					Source of funds (See Instructions)
+					<br><br><div class="text">OO</div></td></tr><tr><td width="8%" class="tableClassValign">5</td><td width="92%" class="tableClass">
+					Check if disclosure of legal proceedings is required pursuant to Items 2(d) or 2(e)
+					<br><br><img src="/Images/box-unchecked.jpg" alt="Checkbox not checked"></td></tr><tr><td width="8%" class="tableClassValign">6</td><td width="92%" class="tableClass">Citizenship or place of organization
+					<br><br><div class="text">
+				UNITED STATES
+			</div></td></tr><tr><td width="8%" class="tableClassValign">Number of Shares Beneficially Owned by Each Reporting Person With:</td><td width="92%" class="tableClass"><table class="innerTableClass"><tr><td width="8%" class="innerTableClassRightValign">7</td><td width="92%" class="tableClassInnerLeft">Sole Voting Power
+								<br><br><div class="text">0.00</div></td></tr><tr><td width="8%" class="innerTableClassRightValign">8</td><td width="92%" class="tableClassInnerLeft">Shared Voting Power
+								<br><br><div class="text">1,109,679.00</div></td></tr><tr><td width="8%" class="innerTableClassRightValign">9</td><td width="92%" class="tableClassInnerLeft">Sole Dispositive Power
+								<br><br><div class="text">1,109,679.00</div></td></tr><tr><td width="8%" class="innerTableClassRightValignBottomLess">10</td><td width="92%" class="tableClassInnerLeftBottomLess">Shared Dispositive Power
+								<br><br><div class="text">0.00</div></td></tr></table></td></tr><tr><td width="8%" class="tableClassValign">11</td><td width="92%" class="tableClass">Aggregate amount beneficially owned by each reporting person
+					<br><br><div class="text">1,109,679.00</div></td></tr><tr><td width="8%" class="tableClassValign">12</td><td width="92%" class="tableClass">Check if the aggregate amount in Row (11) excludes certain shares (See Instructions)
+					<br><br><img src="/Images/box-unchecked.jpg" alt="Checkbox not checked"></td></tr><tr><td width="8%" class="tableClassValign">13</td><td width="92%" class="tableClass">Percent of class represented by amount in Row (11)
+					<br><br><div class="text">2.3 % </div></td></tr><tr><td width="8%" class="tableClassValign">14</td><td width="92%" class="tableClass">Type of Reporting Person (See Instructions)
+					<br><br><div class="text">IN, HC</div></td></tr></table><br><div style="display: flex;"><div style="font-size: 0.9em; font-weight: bold; margin-right: 5px;">
+					Comment for Type of Reporting Person:
+				</div><div class="largetext" style="text-align:justify">(1)	In reference to rows 8, 9 and 11 above, includes (i) 7,069 shares of Class A Common Stock issuable upon the conversion of 7,069 shares of Class B Common Stock held by Charles E. Owens, (ii) 102,610 shares of Class A Common Stock held by Grace Ltd. ("Grace"), a limited partnership for which Mr. Owens serves as general partner and, in such capacity, has the power to vote and direct the disposition of such shares, and (iii) 1,000,000 shares of Class A Common Stock issuable upon the conversion of 1,000,000 shares of Class B Common Stock held by Grace.
+
+(2)	In reference to row 11 above, calculated based on (i) 47,551,943 shares of Class A Common Stock outstanding as of August 4, 2025, as disclosed in the Issuer's Quarterly Report on Form 10-Q for the quarter ended June 30, 2025, that was filed by the Issuer with the SEC on August 7, 2025 and (ii) an aggregate of 1,007,069 shares of Class B Common Stock beneficially owned by Mr. Owens, which are convertible into shares of Class A Common Stock within sixty (60) days of this Schedule 13D.</div></div><table><tr><td class="center"><br><br><p><div align="center" style="font-size:1.2em;">
+									SCHEDULE 13D
+								</div></p></td></tr></table><table role="presentation" class="tableClass" id="cusipNumber"><tr class="tableClass"><td width="25%" style="font-weight:bold;">CUSIP No.</td><td width="75%"><div style="font-size:.9em; color:#000000">21044C107</div></td></tr></table><br><br><table role="presentation" class="tableClass" id="reportingPersonDetails"><tr class="tableClass"><td width="8%" class="tableClassValign">1</td><td width="92%" class="tableClass">
+					Name of reporting person
+					<br><br><div class="text">Fred J. Smith, III</div></td></tr><tr><td width="8%" class="tableClassValign">2</td><td width="92%" class="tableClass">Check the appropriate box if a member of a Group (See Instructions)
+					<br><br><div class="text"><img src="/Images/box-unchecked.jpg" alt="Checkbox not checked">  (a)
+						<br><img src="/Images/box-unchecked.jpg" alt="Checkbox not checked">  (b)
+					</div></td></tr><tr class="tableClassWithBgBlack"><td width="8%" class="tableClassValign">3</td><td width="92%" class="tableClass">SEC use only</td></tr><tr><td width="8%" class="tableClassValign">4</td><td width="92%" class="tableClass">
+					Source of funds (See Instructions)
+					<br><br><div class="text">OO</div></td></tr><tr><td width="8%" class="tableClassValign">5</td><td width="92%" class="tableClass">
+					Check if disclosure of legal proceedings is required pursuant to Items 2(d) or 2(e)
+					<br><br><img src="/Images/box-unchecked.jpg" alt="Checkbox not checked"></td></tr><tr><td width="8%" class="tableClassValign">6</td><td width="92%" class="tableClass">Citizenship or place of organization
+					<br><br><div class="text">
+				UNITED STATES
+			</div></td></tr><tr><td width="8%" class="tableClassValign">Number of Shares Beneficially Owned by Each Reporting Person With:</td><td width="92%" class="tableClass"><table class="innerTableClass"><tr><td width="8%" class="innerTableClassRightValign">7</td><td width="92%" class="tableClassInnerLeft">Sole Voting Power
+								<br><br><div class="text">0.00</div></td></tr><tr><td width="8%" class="innerTableClassRightValign">8</td><td width="92%" class="tableClassInnerLeft">Shared Voting Power
+								<br><br><div class="text">641,219.00</div></td></tr><tr><td width="8%" class="innerTableClassRightValign">9</td><td width="92%" class="tableClassInnerLeft">Sole Dispositive Power
+								<br><br><div class="text">481,577.00</div></td></tr><tr><td width="8%" class="innerTableClassRightValignBottomLess">10</td><td width="92%" class="tableClassInnerLeftBottomLess">Shared Dispositive Power
+								<br><br><div class="text">149,905.00</div></td></tr></table></td></tr><tr><td width="8%" class="tableClassValign">11</td><td width="92%" class="tableClass">Aggregate amount beneficially owned by each reporting person
+					<br><br><div class="text">641,219.00</div></td></tr><tr><td width="8%" class="tableClassValign">12</td><td width="92%" class="tableClass">Check if the aggregate amount in Row (11) excludes certain shares (See Instructions)
+					<br><br><img src="/Images/box-unchecked.jpg" alt="Checkbox not checked"></td></tr><tr><td width="8%" class="tableClassValign">13</td><td width="92%" class="tableClass">Percent of class represented by amount in Row (11)
+					<br><br><div class="text">1.3 % </div></td></tr><tr><td width="8%" class="tableClassValign">14</td><td width="92%" class="tableClass">Type of Reporting Person (See Instructions)
+					<br><br><div class="text">IN, HC</div></td></tr></table><br><div style="display: flex;"><div style="font-size: 0.9em; font-weight: bold; margin-right: 5px;">
+					Comment for Type of Reporting Person:
+				</div><div class="largetext" style="text-align:justify">(1)	In reference to rows 8 and 11 above, includes (i) 66,926 shares of Class A Common Stock held by Fred J. Smith, III, 9,737 of which are restricted shares of Class A Common Stock that are not vested or that do not vest within sixty (60) days of this Schedule 13D and, as a result, Mr. Smith has the right to vote, but not to dispose or direct the disposition of, such shares, (ii) 424,388 shares of Class A Common Stock issuable upon the conversion of 424,388 shares of Class B Common Stock held by Mr. Smith, (iii) 140,572 shares of Class A Common Stock issuable upon the conversion of 140,572 shares of Class B Common Stock held by Tar Frog, for which Mr. Smith serves as co-manager, and, in such capacity, shares the power to vote and direct the disposition of such shares, and (iv) 9,333 shares of Class A Common Stock held by Tar Frog.
+
+(2)	In reference to row 9 above, includes the shares listed under romanette (i) in footnote 1 above that are vested or will vest within sixty (60) days of this Schedule 13D and the shares listed under romanette (ii) in footnote 1 above.
+
+(3)	In reference to row 10 above, includes the shares listed under romanettes (iii) and (iv) in footnote 1 above.
+
+(4)	In reference to row 11 above, calculated based on (i) 47,551,943 shares of Class A Common Stock outstanding as of August 4, 2025, as disclosed in the Issuer's Quarterly Report on Form 10-Q for the quarter ended June 30, 2025, that was filed by the Issuer with the SEC on August 7, 2025 and (ii) an aggregate of 564,960 shares of Class B Common Stock beneficially owned by Mr. Smith, which are convertible into shares of Class A Common Stock within sixty (60) days of this Schedule 13D.
+</div></div></div><div class="form1"><table><tr><td class="center"><br><br><p><div align="center" style="font-size:1.2em;">
+									SCHEDULE 13D
+								</div></p></td></tr></table><table role="presentation" id="item1to7"><tr><td width="8%" class="tableClassValignNoBorder">Item 1.</td><td width="92%" class="tableClassNoBorder">Security and Issuer</td></tr><tr class="tableClass"><td width="8%" class="tableClassNoBorderAlignCenter">(a)</td><td width="92%" class="tableClassNoBorder">Title of Class of Securities:
+							<br><br><div class="text">Class A Common Stock, par value $0.001 per share</div></td></tr><tr class="tableClass"><td width="8%" class="tableClassNoBorderAlignCenter">(b)</td><td width="92%" class="tableClassNoBorder">Name of Issuer:
+							<br><br><div class="text">Construction Partners, Inc.</div></td></tr><tr><td width="8%" class="tableClassNoBorderAlignCenter">(c)</td><td width="92%" class="tableClassNoBorder">Address of Issuer's Principal Executive Offices:
+							<br><br><div class="text">290 Healthwest Drive, Suite 2, Dothan, 
+				ALABAMA
+			, 36303.</div></td></tr><tr><td colspan="3"><div style="display: flex;"><div style="font-size: 0.9em; font-weight: bold; margin-right: 5px;">
+									Item 1 Comment:
+								</div><div class="largetext" style="text-align:justify">The following constitutes the Schedule 13D (as previously amended, the "Schedule 13D" or the "Statement") filed by the undersigned. This Amendment No. 3 to Schedule 13D (this "Amendment") relates to shares of Class A common stock, par value $0.001 per share (the "Class A Common Stock"), of Construction Partners, Inc. (the "Issuer"). This Amendment amends the Schedule 13D previously filed with the Securities and Exchange Commission (the "SEC") by Ned N. Fleming, IV and the Ned N. Fleming, IV 2013 Trust. This Amendment is being filed to (i) remove the Ned N. Fleming, IV 2013 Trust from the Schedule 13D and (ii) add additional reporting persons to the Schedule 13D, which include Barrett N. Bruce, Charles E. Owens and Fred J. Smith, III. Except as otherwise specified in this Amendment, all previous Items are unchanged. Capitalized terms used herein which are not defined herein have the meanings given to them in the Schedule 13D previously filed with the SEC.</div></div></td></tr><tr><td width="8%" class="tableClassValignNoBorder">Item 2.</td><td width="92%" class="tableClassNoBorder">Identity and Background</td></tr><tr></tr><tr class="tableClass"><td width="8%" class="tableClassNoBorderAlignCenter">(a)</td><td width="92%" class="tableClassNoBorder"><div class="largetext">Item 2(a) of the Schedule 13D is hereby amended and restated in its entirety as follows:
+
+"This statement is jointly filed by and on behalf of each of Messrs. Bruce, Fleming, Owens and Smith (collectively referred to herein as the "Reporting Persons")."</div></td></tr><tr><td width="8%" class="tableClassNoBorderAlignCenter">(b)</td><td width="92%" class="tableClassNoBorder"><div class="largetext">Item 2(b) of the Schedule 13D is hereby amended and restated in its entirety as follows:
+
+"The address of the principal business office of Mr. Bruce is 5420 LBJ Freeway, Suite 950, Dallas, Texas 75240. The address of the principal business office of Messrs. Fleming, Owens and Smith is 290 Healthwest Drive, Suite 2, Dothan, Alabama 36303."</div></td></tr><tr><td width="8%" class="tableClassNoBorderAlignCenter">(c)</td><td width="92%" class="tableClassNoBorder"><div class="largetext">Item 2(c) of the Schedule 13D is hereby amended and restated in its entirety as follows: "The present principal occupation of Mr. Bruce is serving as the General Counsel and Chief Compliance Officer of SunTx Capital Partners, whose address is 5420 LBJ Freeway, Suite 950, Dallas, Texas 75240. The present principal occupations of each of Messrs. Fleming, Owens and Smith is serving as Senior Vice President of Strategy and Business Development, Vice Chairman of the Board of Directors, and President and Chief Executive Officer, respectively, of the Issuer, whose address is 290 Healthwest Drive, Suite 2, Dothan, Alabama 36303."</div></td></tr><tr><td width="8%" class="tableClassNoBorderAlignCenter">(d)</td><td width="92%" class="tableClassNoBorder"><div class="largetext">Item 2(d) of the Schedule 13D is hereby amended and restated in its entirety as follows: "The Reporting Persons have not, during the last five years, been convicted in a criminal proceeding (excluding traffic violations or similar misdemeanors)."</div></td></tr><tr><td width="8%" class="tableClassNoBorderAlignCenter">(e)</td><td width="92%" class="tableClassNoBorder"><div class="largetext">Item 2(e) of the Schedule 13D is hereby amended and restated in its entirety as follows: "The Reporting Persons have not, during the last five years, been a party to a civil proceeding of a judicial or administrative body of competent jurisdiction as a result of which the Reporting Persons were or are subject to a judgment, decree or final order enjoining future violations of, or prohibiting or mandating activities subject to, federal or state securities laws or finding any violation with respect to such laws."</div></td></tr><tr><td width="8%" class="tableClassNoBorderAlignCenter">(f)</td><td width="92%" class="tableClassNoBorder"><div class="largetext">Item 2(f) of the Schedule 13D is hereby amended and restated in its entirety as follows: "Each of Messrs. Bruce, Fleming, Owens and Smith is a citizen of the United States."</div></td></tr><tr><td width="8%" class="tableClassValignNoBorder">Item 3.</td><td width="92%" class="tableClassNoBorder">Source and Amount of Funds or Other Consideration</td></tr><tr><td width="8%" class="tableClassNoBorderAlignCenter"> </td><td width="92%" class="tableClassNoBorder"><div class="largetext">Item 3 is hereby amended and supplemented as follows:
+
+"Ned N. Fleming, IV
+
+On each of November 15, 2024 and December 27, 2024, Mr. Fleming surrendered 5,114 and 747 shares of Class A Common Stock, respectively, to the Issuer to satisfy tax withholding obligations upon vesting of awards previously granted under the Plan.
+
+On December 17, 2024, Mr. Fleming acquired (i) 2,374 shares of Class A Common Stock as a result of the vesting of PSUs granted pursuant to the 2021 LTIP-B Award Agreements and (ii) 689 shares of Class A Common Stock granted pursuant to the Plan, which vested immediately.
+
+On March 4, 2025, Mr. Fleming received a grant of (i) 1,000 restricted shares of Class A Common Stock and (ii) 1,000 cash-settled restricted stock units ("RSUs").
+
+Additionally, on April 14, 2025, in a series of privately negotiated transactions, Tar Frog acquired 9,333 shares of Class A Common Stock and 5,990 shares of Class B Common Stock for aggregate consideration of approximately $1.1 million.
+
+Barrett N. Bruce
+
+On each of December 7, 2022, June 22, 2023, September 29, 2023 and December 6, 2024, entities affiliated with SunTx distributed to Mr. Bruce 34,560, 691, 450 and 290 shares of Class B Common Stock, respectively, for no consideration. Additionally, on December 6, 2024, entities affiliated with SunTx distributed to a 401(k) account for the benefit of Mr. Bruce 537 shares of Class B Common Stock for no consideration.
+
+As further discussed in Item 4 below, pursuant to grants under the 2024 Plan, Mr. Bruce has received 3,000 Class B Market-Based Shares, all of which have vested, as compensation for services provided to the Issuer.
+
+Charles E. Owens
+
+Grace acquired (i) 2,424,139 shares of Class B Common Stock and (ii) a stock option to purchase 238,773 shares of Class B Common Stock, at an exercise price of $5.70 per share, prior to the Issuer's initial public offering in May 2018. On June 29, 2018, Grace exercised such stock option and purchased 238,773 shares of Class B Common Stock, 162,864 of which were subsequently surrendered to the Issuer to pay the exercise price of the stock option and to satisfy tax withholding obligations upon the exercise of the stock option.
+
+On May 8, 2020, Grace distributed, for no consideration, 1,250,048 shares of Class B Common Stock to certain of its limited partners, in amounts representing each such partner's pro rata interest in the shares of Class B Common Stock held by Grace at the time of the distribution. In connection with such distribution, certain trusts for which Mr. Owens serves as sole trustee (the "Trusts") received 625,102 shares of Class B Common Stock.
+
+On July 30, 2020, the Trusts converted 445,520 shares of Class B Common Stock to 445,520 shares of Class A Common Stock.
+
+On each of August 11, 2020 and August 12, 2020, the Trusts sold 56,955 and 50,552 shares of Class A Common Stock, respectively, in open market transactions for aggregate consideration of approximately $2.2 million. Such sales were made pursuant to a Rule 10b5-1 trading plan adopted by Mr. Owens on June 12, 2020 (the "Owens 10b5-1 Plan"). Also on August 11, 2020, the Trusts sold 179,582 shares of Class B Common Stock in a privately negotiated transaction for aggregate consideration of approximately $3.1 million.
+
+Furthermore, on each of August 14, 2020, August 17, 2020, August 18, 2020, August 19, 2020, August 20, 2020 and August 21, 2020, the Trusts sold 84,454, 52,259, 58,683, 33,538, 65,594 and 43,485 shares of Class A Common Stock, respectively, in open market transactions for aggregate consideration of approximately $6.6 million. Such sales were made pursuant to the Owens 10b5-1 Plan.
+
+In November 2021 and June 2023, entities affiliated with SunTx distributed to Mr. Owens an aggregate of 6,775 shares of Class B Common Stock for no consideration.
+
+On May 22, 2024, Grace exchanged 250,000 shares of Class B Common Stock for 250,000 newly issued shares of Class A Common Stock for no consideration.
+
+On each of December 4, 2024, December 5, 2024, December 6, 2024, December 9, 2024, December 10, 2024 and December 11, 2024, Grace sold 46,596, 23,418, 49,695, 9,717, 1,761 and 16,203 shares of Class A Common Stock, respectively, in open market transactions for aggregate consideration of approximately $14.8 million.
+
+Additionally, on December 6, 2024, entities affiliated with SunTx distributed to Mr. Owens 294 shares of Class B Common Stock for no consideration.
+
+Fred J. Smith, III
+
+Mr. Smith acquired 26,460 shares of Class B Common Stock prior to the Issuer's initial public offering in May 2018.
+
+On each of June 19, 2019, September 5, 2019, August 11, 2020, June 30, 2021 and January 14, 2022, Mr. Smith acquired 140,389, 40,000, 134,582, 10,500 and 50,000 shares of Class B Common Stock, respectively, in privately negotiated transactions for aggregate consideration of approximately $5.1 million.
+
+Prior to the Issuer's initial public offering, Mr. Smith acquired a stock option to purchase 74,592 shares of Class B Common Stock at an exercise price of $0.0357 per share. On August 30, 2019, Mr. Smith and the Issuer entered into an amendment to the stock option award agreement, and Mr. Smith exercised the stock option and purchased 74,592 shares of Class B Common Stock.
+
+As further discussed in Item 4 below, pursuant to grants under the Plan, Mr. Smith has received 164,814 restricted shares of Class A Common Stock, 97,888 of which have vested, as compensation for services provided to the Issuer. Additionally, pursuant to grants under the 2024 Plan, Mr. Smith has received 10,000 restricted shares of Class B Common Stock, all of which have vested, as compensation for services provided to the Issuer.
+
+On each of October 20, 2021, November 4, 2022, October 2, 2023, December 14, 2023, December 19, 2023, October 1, 2024, November 15, 2024 and December 27, 2024, Mr. Smith surrendered 501, 1,103, 1,730, 3,492, 776, 23,159, 9,944 and 7,493 shares of Class A Common Stock, respectively, to the Issuer to satisfy tax withholding obligations upon vesting of awards previously granted under the Plan.
+
+On May 22, 2024, Mr. Smith exchanged 28,343 shares of Class A Common Stock for 28,343 newly issued shares of Class B Common Stock for no consideration.
+
+On April 14, 2025, in a series of privately negotiated transactions, (i) Tar Frog acquired 9,333 shares of Class A Common Stock and 5,990 shares of Class B Common Stock for aggregate consideration of approximately $1.1 million and (ii) Mr. Smith exchanged 43,104 shares of Class A Common Stock for an equal number of shares of Class B Common Stock for no consideration.
+
+The information set forth in Item 4 of this Amendment is incorporated by reference in this Item 3."</div></td></tr><tr><td width="8%" class="tableClassValignNoBorder">Item 4.</td><td width="92%" class="tableClassNoBorder">Purpose of Transaction</td></tr><tr><td width="8%" class="tableClassNoBorderAlignCenter"> </td><td width="92%" class="tableClassNoBorder"><div class="largetext">Item 4 is hereby amended and supplemented as follows:
+
+"Amended and Restated Voting Agreement
+
+On August 6, 2025, the Reporting Persons entered into an amended and restated voting agreement (the "A&amp;R Voting Agreement") by and among the Reporting Persons, SunTx Capital Management Corp., a Texas corporation, and SunTx Capital II Management Corp., a Texas corporation, which replaced the previous Voting Agreement. Pursuant to the A&amp;R Voting Agreement, the Reporting Persons agreed to, at any annual or special meeting of the Issuer with respect to the election of the Board of Directors of the Issuer, vote their shares of Class A Common Stock and Class B Common Stock in favor of SunTx's recommended candidates for service on the Board of Directors of the Issuer.
+
+The foregoing description of the A&amp;R Voting Agreement does not purport to be complete and is qualified in its entirety by the full text of the A&amp;R Voting Agreement, a copy of which is attached hereto as Exhibit 99.9 and is incorporated by reference herein.
+
+Restricted Stock Award Agreements
+
+Barrett N. Bruce
+
+On October 20, 2024, Mr. Bruce received a grant of 3,000 Class B Market-Based Shares pursuant to the 2024 Plan and subject to the terms and conditions of the restricted stock award agreement by and between the Issuer and Mr. Bruce, a form of which is attached hereto as Exhibit 99.8 and is incorporated by reference herein. The Market-Based Shares vested upon the later of (i) the closing of the Acquisition, and (ii) the first date, if any, that the closing price of the Class A Common Stock on Nasdaq equals or exceeds $88.00 per share, provided that (x) such date occured on or before the fourth (4th) anniversary of the grant date and (y) Mr. Bruce was employed by, or providing services to, the Issuer on the vesting date. Such award vested in full on November 6, 2024.
+
+Ned N. Fleming, IV
+
+On December 17, 2024, Mr. Fleming acquired 689 restricted shares of Class A Common Stock granted pursuant to the Plan and subject to the terms and conditions of the restricted stock award agreement by and between the Issuer and Mr. Fleming, a form of which is attached hereto as Exhibit 99.7 and is incorporated by reference herein, which vested immediately.
+
+On March 4, 2025, Mr. Fleming received a grant of 1,000 restricted shares of Class A Common Stock pursuant to the Plan and subject to the terms and conditions of the restricted stock award agreement by and between the Issuer and Mr. Fleming, a form of which is attached hereto as Exhibit 99.7 and is incorporated by reference herein,which vest in one-fourth installments on September 30, 2025, 2026, 2027 and 2028. Also on March 4, 2025, Mr. Fleming received a grant of 1,000 cash-settled RSUs pursuant to the Plan and subject to the terms and conditions of the cash-settled restricted stock unit award agreement by and between the Issuer and Mr. Fleming, a form of which is attached hereto as Exhibit 99.2 and is incorporated by reference herein, which vest in one-fourth installments on September 30, 2025, 2026 2027 and 2028.
+
+Fred J. Smith, III
+
+On January 4, 2021, Mr. Smith received a grant of 10,000 restricted shares of Class A Common Stock pursuant to the Plan and subject to the terms and conditions of the restricted stock award agreement by and between the Issuer and Mr. Smith, a form of which is attached hereto as Exhibit 99.7 and is incorporated by reference herein, of which 2,500 shares vested immediately and 2,500 shares vested on each of January 4, 2022, 2023 and 2024.
+
+On April 15, 2021, Mr. Smith received a grant of (i) 7,333 restricted shares of Class A Common Stock, which vested in one-fourth installments on September 30, 2021, 2022, 2023 and 2024, and (ii) 100,000 restricted shares of Class A Common Stock, which vest in one-half installments on September 30, 2024 and 2025. The grants were made pursuant to the Plan and subject to the terms and conditions of the restricted stock award agreement by and between the Issuer and Mr. Smith, a form of which is attached hereto as Exhibit 99.7 and is incorporated by reference herein.
+
+On December 29, 2021, Mr. Smith received a grant of 7,666 restricted shares of Class A Common Stock pursuant to the Plan and subject to the terms and conditions of the restricted stock award agreement by and between the Issuer and Mr. Smith, a form of which is attached hereto as Exhibit 99.7 and is incorporated by reference herein, which vest in one-fourth installments on September 30, 2022, 2023, 2024 and 2025.
+
+On November 3, 2022, Mr. Smith received a grant of 8,482 restricted shares of Class A Common Stock pursuant to the Plan and subject to the terms and conditions of the restricted stock award agreement by and between the Issuer and Mr. Smith, a form of which is attached hereto as Exhibit 99.7 and is incorporated by reference herein, which vest in one-fourth installments on September 30, 2023, 2024, 2025 and 2026.
+
+On December 13, 2023, Mr. Smith received a grant of (i) 2,635 restricted shares of Class A Common Stock, which vested immediately, and (ii) 7,352 restricted shares of Class A Common Stock, which vest in one-fourth installments on September 30, 2024, 2025, 2026 and 2027. The grants were made pursuant to the Plan and subject to the terms and conditions of the restricted stock award agreement by and between the Issuer and Mr. Smith, a form of which is attached hereto as Exhibit 99.7 and is incorporated by reference herein.
+
+On October 20, 2024, Mr. Smith received a grant of 10,000 Class A Market-Based Shares and 11,000 Class B Market-Based Shares. The Market-Based Shares vested upon the later of (i) the closing of the Acquisition, and (ii) the first date, if any, that the closing price of the Class A Common Stock on Nasdaq equals or exceeds $88.00 per share, provided that (x) such date occurred on or before the fourth (4th) anniversary of the grant date and (y) Mr. Smith was employed by, or providing services to, the Issuer on the vesting date. Such award vested in full on November 6, 2024. The grants of the Class A Market-Based Shares were made pursuant to the Plan and subject to the terms and conditions of the restricted stock award agreement by and between the Issuer and Mr. Smith, a form of which is attached hereto as Exhibit 99.7 and is incorporated by reference herein. The grants of the Class B Market-Based Shares were made pursuant to the 2024 Plan and subject to the terms and conditions of the restricted stock award agreement by and between the Issuer and Mr. Smith, a form of which is attached hereto as Exhibit 99.8 and is incorporated by reference herein.
+
+On December 17, 2024, Mr. Smith received a grant of 3,594 restricted shares of Class A Common Stock pursuant to the Plan and subject to the terms and conditions of the restricted stock award agreement by and between the Issuer and Mr. Smith, a form of which is attached hereto as Exhibit 99.7 and is incorporated by reference herein, which vested immediately.
+
+On March 4, 2025, Mr. Smith received a grant of 5,252 restricted shares of Class A Common Stock pursuant to the Plan and subject to the terms and conditions of the restricted stock award agreement by and between the Issuer and Mr. Smith, a form of which is attached hereto as Exhibit 99.7 and is incorporated by reference herein, which vest in one-fourth installments on September 30, 2025, 2026, 2027 and 2028.
+
+Performance Stock Unit Award Agreements
+
+Ned N. Fleming, IV
+
+On December 13, 2023, Mr. Fleming received a grant of 3,656 target PSUs, with each unit having a notional value equivalent to one share of Class A Common Stock, pursuant to the Plan and that certain Performance Stock Unit Award and Grant Notice by and between the Issuer and Mr. Fleming (the "Fleming 2023 LTIP-B Award Agreement"). The Fleming 2023 LTIP-B Award Agreement provides for a target number of PSUs that Mr. Fleming may earn, with the preliminary number of vested PSUs to be determined based on the Issuer's actual performance compared to its targets over a three-year performance period beginning October 1, 2023 and ending September 30, 2026.
+
+On March 4, 2025, Mr. Fleming received a grant of 4,000 target PSUs, with each unit having a notional value equivalent to one share of Class A Common Stock, pursuant to the Plan and that certain Performance Stock Unit Award and Grant Notice by and between the Issuer and Mr. Fleming (the "Fleming 2025 LTIP-B Award Agreement"). The Fleming 2025 LTIP-B Award Agreement provides for a target number of PSUs that Mr. Fleming may earn, with the preliminary number of vested PSUs to be determined based on the Issuer's actual performance compared to its targets over a three-year performance period beginning October 1, 2024 and ending on September 30, 2027.
+
+Pursuant to each of the Fleming 2023 LTIP-B Award Agreement and the Fleming 2025 LTIP-B Award Agreement, fifty percent (50%) of the target PSUs (the "Fleming Revenue Target PSUs") will be eligible to vest based on the Issuer's achievement of compound aggregate revenue growth rate as it compares to the revenue growth rate target, as set forth in the applicable award agreement. The number of vested Fleming Revenue Target PSUs will be interpolated for performance between each performance level (based on whole percentages), and no Fleming Revenue Target PSUs will vest if the actual performance level is less than 89% of the revenue growth target over the performance period. The remaining fifty percent (50%) of the target PSUs (the "Fleming Adjusted EBITDA Margin Target PSUs") will be eligible to vest based on the Issuer's achievement of average Adjusted EBITDA margin as it compares to the average Adjusted EBITDA margin target, as set forth in the applicable award agreement. The number of vested Fleming Adjusted EBITDA Margin Target PSUs will be interpolated for performance between each performance level (based on whole percentages), and no Fleming Adjusted EBITDA Margin Target PSUs will vest if the actual performance level is less than 95.2% of the average Adjusted EBITDA margin target over the performance period. Following a determination of the preliminary vested PSUs, the final number of PSUs that are eligible to vest will be either increased or decreased by up to 15% based on a comparison of the Issuer's TSR over the performance period compared to that of the Russell 2000 over the same period (provided that the Issuer's TSR must be positive in order for any upward adjustment to be made).
+
+No PSUs granted pursuant to the Fleming 2023 LTIP-B Award Agreement or the Fleming 2025 LTIP-B Award Agreement have vested as of the date of this Schedule 13D.
+
+The foregoing description of the Fleming 2023 LTIP-B Award Agreement and the Fleming 2025 LTIP-B Award Agreement does not purport to be complete and is qualified in its entirety by the full text of the form of performance stock unit award agreement, a copy of which is attached hereto as Exhibit 99.5 and is incorporated by reference herein.
+
+Fred J. Smith, III
+
+On December 29, 2021, Mr. Smith received a grant of 13,750 PSUs pursuant to the Plan and subject to the terms and conditions of that certain Performance Stock Unit Award and Grant Notice by and between the Issuer and Mr. Smith, a form of which is attached hereto as Exhibit 99.4 and is incorporated by reference herein. The performance criteria for such PSUs were partially met, which resulted in the issuance of 11,859 shares of Class A Common Stock on December 13, 2023, of which 3,492 shares were subsequently surrendered to the Issuer to satisfy tax withholding obligations upon vesting of the PSUs.
+
+On December 29, 2021, Mr. Smith received a grant of 14,375 PSUs pursuant to the Plan and subject to the terms and conditions of that certain Performance Stock Unit Award and Grant Notice by and between the Issuer and Mr. Smith, a form of which is attached hereto as Exhibit 99.4 and is incorporated by reference herein. The performance criteria for such PSUs were partially met, which resulted in the issuance of 12,398 shares of Class A Common Stock on December 17, 2024, of which 7,493 shares were subsequently surrendered to the Issuer to satisfy tax withholding obligations upon vesting of the PSUs.
+
+On November 3, 2022, Mr. Smith received a grant of 15,905 target PSUs, with each unit having a notional value equivalent to one share of Class A Common Stock, pursuant to the Plan and that certain Performance Stock Unit Award and Grant Notice by and between the Issuer and Mr. Smith ("Smith 2022 LTIP-B Award Agreement"). The Smith 2022 LTIP-B Award Agreement provides for a target number of PSUs that are eligible to vest, with the preliminary number of vested PSUs to be determined based on the Issuer's actual performance compared to its targets over the three-year performance period beginning October 1, 2022 and ending September 30, 2025.
+
+On December 13, 2023, Mr. Smith received a grant of 14,700 target PSUs, with each unit having a notional value equivalent to one share of Class A Common Stock, pursuant to the Plan and that certain Performance Stock Unit Award and Grant Notice by and between the Issuer and Mr. Smith (the "Smith 2023 LTIP-B Award Agreement"). The Smith 2023 LTIP-B Award Agreement provides for a target number of PSUs that Mr. Smith may earn, with the preliminary number of vested PSUs to be determined based on the Issuer's actual performance compared to its targets over a three-year performance period beginning October 1, 2023 and ending September 30, 2026.
+
+On March 4, 2025, Mr. Smith received a grant of 14,000 target PSUs, with each unit having a notional value equivalent to one share of Class A Common Stock, pursuant to the Plan and that certain Performance Stock Unit Award and Grant Notice by and between the Issuer and Mr. Smith (the "Smith 2025 LTIP-B Award Agreement"). The Smith 2025 LTIP-B Award Agreement provides for a target number of PSUs that Mr. Smith may earn, with the preliminary number of vested PSUs to be determined based on the Issuer's actual performance compared to its targets over a three-year performance period beginning October 1, 2024 and ending on September 30, 2027.
+
+Pursuant to each of the Smith 2022 LTIP-B Award Agreement, the Smith 2023 LTIP-B Award Agreement and the Smith 2025 LTIP-B Award Agreement, fifty percent (50%) of the target PSUs (the "Smith Revenue Target PSUs") will be eligible to vest based on the Issuer's achievement of compound aggregate revenue growth rate as it compares to the revenue growth rate target, as set forth in the applicable award agreement. The number of vested Smith Revenue Target PSUs will be interpolated for performance between each performance level (based on whole percentages), and no Smith Revenue Target PSUs will vest if the actual performance level is less than 89% of the revenue growth target over the performance period. The remaining fifty percent (50%) of the target PSUs (the "Smith Adjusted EBITDA Margin Target PSUs") will be eligible to vest based on the Issuer's achievement of average Adjusted EBITDA margin as it compares to the average Adjusted EBITDA margin target, as set forth in the applicable award agreement. The number of vested Smith Adjusted EBITDA Margin Target PSUs will be interpolated for performance between each performance level (based on whole percentages), and no Smith Adjusted EBITDA Margin Target PSUs will vest if the actual performance level is less than 95.2% of the average Adjusted EBITDA margin target over the performance period. Following a determination of the preliminary vested PSUs, the final number of PSUs that are eligible to vest will be either increased or decreased by up to 15% based on a comparison of the Issuer's TSR over the performance period compared to that of the Russell 2000 over the same period (provided that the Issuer's TSR must be positive in order for any upward adjustment to be made).
+
+No PSUs granted pursuant to the Smith 2022 LTIP-B Award Agreement, the Smith 2023 LTIP-B Award Agreement or the Smith 2025 LTIP-B Award Agreement have vested as of the date of this Schedule 13D.
+
+The foregoing description of the Smith 2022 LTIP-B Award Agreement, the Smith 2023 LTIP-B Award Agreement and the Smith 2025 LTIP-B Award Agreement does not purport to be complete and is qualified in its entirety by the full text of the form of performance stock unit award agreement, a copy of which is attached hereto as Exhibit 99.5 and is incorporated by reference herein."</div></td></tr><tr><td width="8%" class="tableClassValignNoBorder">Item 5.</td><td width="92%" class="tableClassNoBorder">Interest in Securities of the Issuer</td></tr><tr><td width="8%" class="tableClassNoBorderAlignCenter">(a)</td><td width="92%" class="tableClassNoBorder"><div class="largetext">Item 5(a) is hereby amended and restated in its entirety:
+
+"The aggregate number and percentage of the class of securities identified pursuant to Item 1 beneficially owned by each Reporting Person is stated in Items 11 and 13, respectively, on the cover pages hereto. The percentage reported in Item 13 on the cover pages hereto is based (i) on 47,551,943 shares of Class A Common Stock outstanding as of August 4, 2025, as disclosed in the Quarterly Report on Form 10-Q for the quarterly period ended June 30, 2025, filed by the Issuer with the SEC on August 7, 2025 and (ii) certain shares of Class B Common Stock beneficially owned by the Reporting Persons, which are convertible into shares of Class A Common Stock within sixty (60) days of this Schedule 13D, as stated on the respective cover pages hereto.
+
+By virtue of the A&amp;R Voting Agreement described in Item 4 of this Schedule 13D and the obligations and rights thereunder, the Reporting Persons acknowledge and agree that they are acting as a "group" with SunTx and its affiliates within the meaning of Section 13(d) of the Act. Based in part on information provided by or on behalf of the Issuer, as of August 4, 2025, such a "group" would be deemed to beneficially own 8,424,724 shares of Class A Common Stock (including 8,132,755 shares of Class A Common Stock issuable upon conversion of the same number of shares of Class B Common Stock), representing 15.1% of the total number of shares of Class A Common Stock outstanding, or 61.4% of the total voting power of the Issuer, based on (i) 47,551,943 shares of Class A Common Stock outstanding (based on information made available by the Issuer) and (ii) an aggregate of 8,132,755 shares of Class A Common Stock issuable upon the conversion of Class B Common Stock. Holders of Class B Common Stock are entitled to ten (10) votes per share, compared to one (1) vote per share of Class A Common Stock, with respect to all matters on which common stockholders of the Issuer generally are entitled to vote. The Reporting Persons expressly disclaim beneficial ownership over any shares of Class B Common Stock of the Issuer that they may be deemed to beneficially own solely by reason of the A&amp;R Voting Agreement."</div></td></tr><tr><td width="8%" class="tableClassNoBorderAlignCenter">(b)</td><td width="92%" class="tableClassNoBorder"><div class="largetext">Item 5(b) is hereby amended and restated in its entirety: "Number of shares as to which each Reporting Person has:
+
+(i)      sole power to vote or to direct the vote:
+
+See Item 7 on the cover pages hereto.
+
+(ii)     shared power to vote or to direct the vote:
+
+See Item 8 on the cover pages hereto.
+
+(iii)    sole power to dispose or to direct the disposition of:
+
+See Item 9 on the cover pages hereto.
+
+(iv)    shared power to dispose or to direct the disposition of:
+
+See Item 10 on the cover pages hereto."</div></td></tr><tr><td width="8%" class="tableClassNoBorderAlignCenter">(c)</td><td width="92%" class="tableClassNoBorder"><div class="largetext">Item 5(c) is hereby amended and restated in its entirety: "There were no transactions in the shares of Class A Common Stock that were effected during the past sixty days by the Reporting Persons or since the most recent Schedule 13D filing, whichever is less."</div></td></tr><tr><td width="8%" class="tableClassNoBorderAlignCenter">(d)</td><td width="92%" class="tableClassNoBorder"><div class="largetext">Item 5(d) is hereby amended and restated in its entirety: "Not applicable." </div></td></tr><tr><td width="8%" class="tableClassNoBorderAlignCenter">(e)</td><td width="92%" class="tableClassNoBorder"><div class="largetext">Item 5(e) is hereby amended and restated in its entirety: "Not applicable."</div></td></tr><tr><td width="8%" class="tableClassValignNoBorder">Item 6.</td><td width="92%" class="tableClassNoBorder">Contracts, Arrangements, Understandings or Relationships With Respect to Securities of the Issuer</td></tr><tr><td width="8%" class="tableClassNoBorderAlignCenter"> </td><td width="92%" class="tableClassNoBorder"><div class="largetext">Item 6 is hereby amended and supplemented as follows:
+
+"The information set forth in Item 4 of this Amendment is incorporated by reference in this Item 6."</div></td></tr><tr><td width="8%" class="tableClassValignNoBorder">Item 7.</td><td width="92%" class="tableClassNoBorder">Material to be Filed as Exhibits.</td></tr><tr><td width="8%" class="tableClassNoBorderAlignCenter"> </td><td width="92%" class="tableClassNoBorder"><div class="largetext">Item 7 is hereby amended and restated in its entirety as follows:
+
+"The following exhibits are filed as exhibits hereto:
+
+99.1    Joint Filing Agreement (filed herewith).
+
+99.2    Form of Cash-Settled Restricted Stock Unit Award Agreement under the Construction Partners, Inc. 2018 Equity Incentive Plan (incorporated by reference to Exhibit 10.4E to the Annual Report on Form 10-K (File No. 001-38479) filed on November 29, 2023).
+
+99.3    Form of Restricted Stock Award under the Construction Partners, Inc. 2018 Equity Incentive Plan (incorporated by reference to Exhibit 10.9 to the Registration Statement on Form S-1 (File No. 333-224174) filed on April 6, 2018).
+
+99.4    Form of Performance Stock Unit Award Agreement under the Construction Partners, Inc. 2018 Equity Incentive Plan (Revenue Growth Rate and ROCE Vesting Criteria) (incorporated by reference to Exhibit 10.1 to the Current Report on Form 8-K (File No. 001-38479) filed on January 5, 2022).
+
+99.5    Form of Performance Stock Unit Award Agreement under the Construction Partners, Inc. 2018 Equity Incentive Plan (Revenue Growth Rate and Adjusted EBITDA Margin Vesting Criteria) (incorporated by reference to Exhibit 10.1 to the Current Report on Form 8-K (File No. 001-38479) filed on November 9, 2022).
+
+99.6    Exchange Agreement, dated May 22, 2024, by and among Construction Partners, Inc., Ned N. Fleming, III, Fred J. (Jule) Smith, III, The Fleming Family Management Trust, The Michael H. McKay Trust dated April 1, 2008, Ned N. Fleming, IV, SunTx Capital Partners II, LP, SunTx Capital Partners II Dutch Investors, LP and Grace, Ltd. (incorporated by reference to Exhibit 99.6 to Amendment No. 1 to the Schedule 13D filed by the Reporting Persons on May 24, 2024).
+
+99.7    Form of Restricted Stock Award under the Construction Partners, Inc. 2018 Equity Incentive Plan (incorporated by reference to Exhibit 99.7 to the Schedule 13D filed by the Reporting Persons on October 22, 2024).
+
+99.8    Form of Restricted Stock Award under the Construction Partners, Inc. 2024 Restricted Stock Plan (incorporated by reference to Exhibit 99.8 to the Schedule 13D filed by the Reporting Persons on October 22, 2024).
+
+99.9    Amended and Restated Voting Agreement dated August 6, 2025, by and among Barrett N. Bruce, Ned N. Fleming, IV, Charles E. Owens and Fred J. Smith, III, SunTx Capital Management Corp. and SunTx Capital II Management Corp. (filed herewith)."</div></td></tr></table><br></div><div class="form1"><table role="presentation" id="signatureInfo"><tr><td width="8%" class="tableClassValignNoBorder">    SIGNATURE</td><td width="92%" class="tableClassNoBorder"> </td></tr><tr><td width="8%" class="tableClassNoBorderAlignCenter"> </td><td width="92%" class="tableClassNoBorder"><div class="information" style="text-align:justify">
+						After reasonable inquiry and to the best of my knowledge and belief, I certify that the information set forth in this statement is true, complete and correct.
+						<br><br></div></td></tr></table><table><tr class="tableClass"><td width="50%" class="tableClassNoBorder"> </td><td width="50%" class="tableClassNoBorder"><table><tr class="tableClass"><td width="100%" class="tableClassInnerNoBorderBlue"><div class="text">Ned N. Fleming, IV</div></td></tr></table></td></tr></table><table><tr class="tableClass"><td width="50%" class="tableClassNoBorder"> </td><td width="50%" class="tableClassNoBorder"><table><tr class="tableClass"><td width="8%" class="tableClassNoBorderAlignLeft signature">Signature:</td><td width="92%" class="tableClassNoBorderBlue signature">/s/ Ned N. Fleming, IV</td></tr><tr class="tableClass"><td width="8%" class="tableClassNoBorderAlignLeft signature">Name/Title:</td><td width="92%" class="tableClassNoBorderBlue signature">Ned N. Fleming, IV</td></tr><tr class="tableClass"><td width="8%" class="tableClassNoBorderAlignLeft signature">Date:</td><td width="92%" class="tableClassNoBorderBlue signature">08/08/2025</td></tr></table></td></tr></table><table><tr class="tableClass"><td width="50%" class="tableClassNoBorder"> </td><td width="50%" class="tableClassNoBorder"><table><tr class="tableClass"><td width="100%" class="tableClassInnerNoBorderBlue"><div class="text">Barrett N. Bruce</div></td></tr></table></td></tr></table><table><tr class="tableClass"><td width="50%" class="tableClassNoBorder"> </td><td width="50%" class="tableClassNoBorder"><table><tr class="tableClass"><td width="8%" class="tableClassNoBorderAlignLeft signature">Signature:</td><td width="92%" class="tableClassNoBorderBlue signature">/s/ Barrett N. Bruce</td></tr><tr class="tableClass"><td width="8%" class="tableClassNoBorderAlignLeft signature">Name/Title:</td><td width="92%" class="tableClassNoBorderBlue signature">Barrett N. Bruce</td></tr><tr class="tableClass"><td width="8%" class="tableClassNoBorderAlignLeft signature">Date:</td><td width="92%" class="tableClassNoBorderBlue signature">08/08/2025</td></tr></table></td></tr></table><table><tr class="tableClass"><td width="50%" class="tableClassNoBorder"> </td><td width="50%" class="tableClassNoBorder"><table><tr class="tableClass"><td width="100%" class="tableClassInnerNoBorderBlue"><div class="text">Charles E. Owens</div></td></tr></table></td></tr></table><table><tr class="tableClass"><td width="50%" class="tableClassNoBorder"> </td><td width="50%" class="tableClassNoBorder"><table><tr class="tableClass"><td width="8%" class="tableClassNoBorderAlignLeft signature">Signature:</td><td width="92%" class="tableClassNoBorderBlue signature">/s/ Charles E. Owens</td></tr><tr class="tableClass"><td width="8%" class="tableClassNoBorderAlignLeft signature">Name/Title:</td><td width="92%" class="tableClassNoBorderBlue signature">Charles E. Owens</td></tr><tr class="tableClass"><td width="8%" class="tableClassNoBorderAlignLeft signature">Date:</td><td width="92%" class="tableClassNoBorderBlue signature">08/08/2025</td></tr></table></td></tr></table><table><tr class="tableClass"><td width="50%" class="tableClassNoBorder"> </td><td width="50%" class="tableClassNoBorder"><table><tr class="tableClass"><td width="100%" class="tableClassInnerNoBorderBlue"><div class="text">Fred J. Smith, III</div></td></tr></table></td></tr></table><table><tr class="tableClass"><td width="50%" class="tableClassNoBorder"> </td><td width="50%" class="tableClassNoBorder"><table><tr class="tableClass"><td width="8%" class="tableClassNoBorderAlignLeft signature">Signature:</td><td width="92%" class="tableClassNoBorderBlue signature">/s/ Fred J. Smith, III</td></tr><tr class="tableClass"><td width="8%" class="tableClassNoBorderAlignLeft signature">Name/Title:</td><td width="92%" class="tableClassNoBorderBlue signature">Fred J. Smith, III</td></tr><tr class="tableClass"><td width="8%" class="tableClassNoBorderAlignLeft signature">Date:</td><td width="92%" class="tableClassNoBorderBlue signature">08/08/2025</td></tr></table></td></tr></table></div></div>
+
+<script type="text/javascript"  src="/jGPwwufxbVNjftpB5QEsfCYc/NODizkrbDhJ6LQYuEm/Bwg0WSMB/SGRsCE5/bOyE"></script></body></html>

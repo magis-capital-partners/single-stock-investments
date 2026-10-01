@@ -1,0 +1,503 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns:p="http://www.sec.gov/edgar/schedule13D" xmlns:p1="http://www.sec.gov/edgar/common"><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8"><link rel="stylesheet" type="text/css" href="/css/SDR_print.css"><style type="text/css">
+					.fakeTextBox {
+					border-top: 2px solid #999;
+					border-right: 1px solid #ccc;
+					border-bottom: 1px solid #ccc;
+					border-left: 2px solid #999;
+					padding: 2px;
+					_width: 800px;
+					height: auto;
+					min-width: 200px;
+					min-height: 50px;
+					word-wrap: break-word;
+					font-size: 0.9em;
+					color: blue;
+					}
+					table.tableClass { border: solid black;
+					border-top-width: 1;
+					border-right-width: 1;
+					border-bottom-width: 1;
+					border-left-width: 1;
+					table-layout:fixed;
+					}
+					table.innerTableClass { border: solid black;
+					border-top-width: 0;
+					border-right-width: 0;
+					border-bottom-width: 0;
+					border-left-width: 0;
+					table-layout:fixed;
+					}
+					th.tableClassLeft { border: solid black;
+					border-top-width: 0px;
+					border-right-width: 0px;
+					border-bottom-width: 1px;
+					border-left-width: 1px;
+					padding: 2px;
+					}
+					th.tableClassRight { border: solid black;
+					border-top-width: 0px;
+					border-right-width: 1px;
+					border-bottom-width: 1px;
+					border-left-width: 0;
+					padding: 2px;
+					}
+					th.tableClass { border: solid black;
+					border-top-width: 0px;
+					border-right-width: 1px;
+					border-bottom-width: 1px;
+					border-left-width: 1px;
+					padding: 2px;
+					}
+					td.tableClassLeft { border: solid black;
+					border-top-width: 0px;
+					border-right-width: 0px;
+					border-bottom-width: 1px;
+					border-left-width: 1px;
+					font-size: 0.9em;
+					color: blue;
+					word-wrap: break-word;
+					}
+					td.tableClassRight { border: solid black;
+					border-top-width: 0px;
+					border-right-width: 1px;
+					border-bottom-width: 1px;
+					border-left-width: 0;
+					font-size: 0.9em;
+					color: blue;
+					word-wrap: break-word;
+					}
+					td.tableClass { border: solid black;
+					border-top-width: 0px;
+					border-right-width: 1px;
+					border-bottom-width: 1px;
+					border-left-width: 1px;
+					font-size: 0.9em;
+					font-weight:bold;
+					color: black;
+					word-wrap: break-word;
+					}
+					td.tableClassNoBorder { border: solid black;
+					border-top-width: 0px;
+					border-right-width: 0px;
+					border-bottom-width: 0px;
+					border-left-width: 0px;
+					font-size: 0.9em;
+					font-weight:bold;
+					color: black;
+					word-wrap: break-word;
+					}
+
+					td.tableClassNoBorderBlue { border: solid black;
+					border-top-width: 0px;
+					border-right-width: 0px;
+					border-bottom-width: 0px;
+					border-left-width: 0px;
+					font-size: 0.9em;
+					font-weight:bold;
+					color: blue;
+					word-wrap: break-word;
+					}
+
+					td.tableClassInnerNoBorderBlue { border: solid black;
+					border-top-width: 0px;
+					border-right-width: 0px;
+					border-bottom-width: 0px;
+					border-left-width: 0px;
+					font-size: 1.4em;
+					font-weight:bold;
+					color: blue;
+					word-wrap: break-word;
+					}
+
+					td.tableClassNoBorderAlignLeft { border: solid black;
+					border-top-width: 0px;
+					border-right-width: 0px;
+					border-bottom-width: 0px;
+					border-left-width: 0px;
+					font-size: 0.9em;
+					font-weight:bold;
+					text-align: left;
+					color: black;
+					word-wrap: break-word;
+					}
+
+					td.signature {
+					padding: 4px 8px;
+					}
+
+					td.tableClassInner { border: solid black;
+					border-top-width: 0px;
+					border-right-width: 1px;
+					border-bottom-width: 1px;
+					border-left-width: 1px;
+					font-size: 1em;
+					font-weight:bold;
+					color: black;
+					word-wrap: break-word;
+					}
+
+					td.tableClassValign { border: solid black;
+					border-top-width: 0px;
+					border-right-width: 1px;
+					border-bottom-width: 1px;
+					border-left-width: 1px;
+					font-size: 0.9em;
+					font-weight:bold;
+					color: black;
+					vertical-align: middle;
+					text-align: center;
+					word-wrap: break-word;
+					}
+
+					td.tableClassValignNoBorder { border: solid black;
+					border-top-width: 0px;
+					border-right-width: 0px;
+					border-bottom-width: 0px;
+					border-left-width: 0px;
+					font-size: 0.9em;
+					font-weight:bold;
+					color: black;
+					vertical-align: middle;
+					text-align: center;
+					word-wrap: break-word;
+					}
+
+					td.tableClassValignInner { border: solid black;
+					border-top-width: 0px;
+					border-right-width: 1px;
+					border-bottom-width: 1px;
+					border-left-width: 1px;
+					font-size: 1em;
+					font-weight:bold;
+					color: black;
+					vertical-align: middle;
+					text-align: center;
+					word-wrap: break-word;
+					}
+
+					td.innerTableClassRightValign { border: solid black;
+					border-top-width: 0px;
+					border-right-width: 1px;
+					border-bottom-width: 1px;
+					border-left-width: 0;
+					font-size: 1em;
+					font-weight:bold;
+					color: black;
+					vertical-align: middle;
+					text-align: center;
+					word-wrap: break-word;
+					}
+
+					td.innerTableClassRightValignBottomLess { border: solid black;
+					border-top-width: 0px;
+					border-right-width: 1px;
+					border-bottom-width: 0px;
+					border-left-width: 0;
+					font-size: 1em;
+					font-weight:bold;
+					color: black;
+					vertical-align: middle;
+					text-align: center;
+					word-wrap: break-word;
+					}
+
+					td.tableClassInnerLeft { border: solid black;
+					border-top-width: 0px;
+					border-right-width: 0px;
+					border-bottom-width: 1px;
+					border-left-width: 1px;
+					font-size: 1em;
+					font-weight:bold;
+					color: black;
+					word-wrap: break-word;
+					}
+
+					td.tableClassInnerLeftBottomLess { border: solid black;
+					border-top-width: 0px;
+					border-right-width: 0px;
+					border-bottom-width: 0px;
+					border-left-width: 1px;
+					font-size: 1em;
+					font-weight:bold;
+					color: black;
+					word-wrap: break-word;
+					}
+
+					td.tableClassNoBorderAlignCenter { border: solid black;
+					border-top-width: 0px;
+					border-right-width: 0px;
+					border-bottom-width: 0px;
+					border-left-width: 0px;
+					font-size: 0.9em;
+					font-weight:bold;
+					color: black;
+					text-align: center;
+					word-wrap: break-word;
+					}
+
+					tr.tableClass { border: solid black;
+					border-top-width: 1px;
+					border-right-width: 1px;
+					border-bottom-width: 1px;
+					border-left-width: 1px;
+					}
+					tr.tableClassWithBg { border: solid black;
+					border-top-width: 0;
+					border-right-width: 1;
+					border-bottom-width: 1;
+					border-left-width: 0;
+					background-color: #e0e0ff
+					}
+
+					tr.tableClassWithBgBlack { border: solid black;
+					border-top-width: 0;
+					border-right-width: 1;
+					border-bottom-width: 1;
+					border-left-width: 0;
+					background-color: #D3D3D3
+					}
+
+					hr.header {
+					position: relative;
+					top: 20px;
+					border: none;
+					height: 6px;
+					background: black;
+					margin-bottom: 10px;
+					}
+
+					hr.separatorThin {
+					position: relative;
+					top: 2px;
+					border: none;
+					height: 2px;
+					background: black;
+					margin-bottom: 2px;
+					}
+
+					hr.headerThin {
+					position: relative;
+					top: 10px;
+					border: none;
+					height: 2px;
+					background: black;
+					margin-bottom: 10px;
+					}
+
+					hr.separator {
+					position: relative;
+					top: 20px;
+					border: none;
+					height: 4px;
+					background: black;
+					margin-bottom: 5px;
+					}
+
+					div.text {
+					background-color: #ffffff;
+					color: blue;
+					font-size: 1em;
+					font-weight:normal;
+					text-align:justify;
+					}
+
+
+					div.information {
+					background-color: #ffffff;
+					color: black;
+					font-size: 1em;
+					font-weight:normal;
+					text-align:justify;
+					}
+
+					#scheader {
+					font-size: 0.9em;
+					border: 0px solid #404040;
+					border-spacing: 2px;
+					}
+
+					div.largetext {
+					background-color: #ffffff;
+					color: blue;
+					font-size: 1em;
+					font-weight:normal;
+					text-align:justify;
+					white-space: pre-wrap;
+					word-break: normal;
+					}
+
+				</style></head><body lang="en-US" text="#000000" bgcolor="#ffffff"><hr class="header"><br><hr class="headerThin"><div class="contentwrapper"><table role="presentation" id="scheader"><tr><td class="tableClassNoBorderAlignCenter" style="font-size:2em;">
+						SECURITIES AND EXCHANGE COMMISSION
+						<br>
+						Washington, D.C. 20549
+					</td></tr><tr><td class="tableClassNoBorderAlignCenter"><br><br><div style="font-size:1.5em;">
+									SCHEDULE 13D
+								</div><br><div style="font-size:1.2em;">
+							Under the Securities Exchange Act of 1934
+						</div><br></td></tr><tr><td class="center"><div class="information" style="text-align:center; font-weight:bold; color:blue;">Rocket Companies, Inc.</div><div class="information" style="text-align:center; font-weight:bold;"><hr class="separatorThin">(Name of Issuer)</div><br><br></td></tr><tr><td class="center"><div class="information" style="text-align:center; font-weight:bold; color:blue;">Class A common stock, $0.00001 par value</div><div class="information" style="text-align:center; font-weight:bold;"><hr class="separatorThin">(Title of Class of Securities)</div><br><br></td></tr><tr><td class="center"><div class="information" style="text-align:center; font-weight:bold; color:blue;">77311W101</div><div class="information" style="text-align:center; font-weight:bold;"><hr class="separatorThin">(CUSIP Number)</div><br><br></td></tr><tr><td class="center"><div class="information" style="text-align:center; font-weight:bold; color:blue;">Daniel Gilbert<br>1050 Woodward Avenue,
+								<br>Detroit,
+								MI,
+								48226<br>(313) 373-7990</div><div class="information" style="text-align:center; font-weight:bold;"><hr class="separatorThin">(Name, Address and Telephone Number of Person Authorized to
+									Receive Notices and Communications)</div></td></tr><tr><td class="center"><div class="information" style="text-align:center; font-weight:bold; color:blue;">06/30/2025</div><div class="information" style="text-align:center; font-weight:bold;"><hr class="separatorThin">(Date of Event Which Requires Filing of This Statement)</div></td></tr></table><br><br><div class="information" style="text-align:justify">
+				If the filing person has previously filed a statement on Schedule 13G to report the acquisition that is the subject of this Schedule 13D, and is filing this schedule because of §§ 240.13d-1(e), 240.13d-1(f) or 240.13d-1(g), check the following box.
+				<img src="/Images/box-unchecked.jpg" alt="Checkbox not checked"></div><br><div class="information" style="text-align:justify">
+				The information required on the remainder of this cover page shall not be deemed to be “filed” for the purpose of Section 18 of the
+				Securities Exchange Act of 1934 (“Act”) or otherwise subject to the liabilities of that section of the Act but shall be subject to all other
+				provisions of the Act (however, see the Notes).
+			</div></div><hr class="headerThin"><hr class="header"><br><br>
+  <div class="content"><div class="form1"></div></div>
+  <div class="content"><div class="form1"><table><tr><td class="center"><br><br><p><div align="center" style="font-size:1.2em;">
+									SCHEDULE 13D
+								</div></p></td></tr></table><table role="presentation" class="tableClass" id="cusipNumber"><tr class="tableClass"><td width="25%" style="font-weight:bold;">CUSIP No.</td><td width="75%"><div style="font-size:.9em; color:#000000">77311W101</div></td></tr></table><br><br><table role="presentation" class="tableClass" id="reportingPersonDetails"><tr class="tableClass"><td width="8%" class="tableClassValign">1</td><td width="92%" class="tableClass">
+					Name of reporting person
+					<br><br><div class="text">Daniel Gilbert</div></td></tr><tr><td width="8%" class="tableClassValign">2</td><td width="92%" class="tableClass">Check the appropriate box if a member of a Group (See Instructions)
+					<br><br><div class="text"><img src="/Images/box-unchecked.jpg" alt="Checkbox not checked">  (a)
+						<br><img src="/Images/box-checked.jpg" alt="Checkbox checked">  (b)
+					</div></td></tr><tr class="tableClassWithBgBlack"><td width="8%" class="tableClassValign">3</td><td width="92%" class="tableClass">SEC use only</td></tr><tr><td width="8%" class="tableClassValign">4</td><td width="92%" class="tableClass">
+					Source of funds (See Instructions)
+					<br><br><div class="text">OO</div></td></tr><tr><td width="8%" class="tableClassValign">5</td><td width="92%" class="tableClass">
+					Check if disclosure of legal proceedings is required pursuant to Items 2(d) or 2(e)
+					<br><br><img src="/Images/box-unchecked.jpg" alt="Checkbox not checked"></td></tr><tr><td width="8%" class="tableClassValign">6</td><td width="92%" class="tableClass">Citizenship or place of organization
+					<br><br><div class="text">
+				UNITED STATES
+			</div></td></tr><tr><td width="8%" class="tableClassValign">Number of Shares Beneficially Owned by Each Reporting Person With:</td><td width="92%" class="tableClass"><table class="innerTableClass"><tr><td width="8%" class="innerTableClassRightValign">7</td><td width="92%" class="tableClassInnerLeft">Sole Voting Power
+								<br><br><div class="text">996,832,276.00</div></td></tr><tr><td width="8%" class="innerTableClassRightValign">8</td><td width="92%" class="tableClassInnerLeft">Shared Voting Power
+								<br><br><div class="text">611,257,446.00</div></td></tr><tr><td width="8%" class="innerTableClassRightValign">9</td><td width="92%" class="tableClassInnerLeft">Sole Dispositive Power
+								<br><br><div class="text">996,832,276.00</div></td></tr><tr><td width="8%" class="innerTableClassRightValignBottomLess">10</td><td width="92%" class="tableClassInnerLeftBottomLess">Shared Dispositive Power
+								<br><br><div class="text">140,215,280.00</div></td></tr></table></td></tr><tr><td width="8%" class="tableClassValign">11</td><td width="92%" class="tableClass">Aggregate amount beneficially owned by each reporting person
+					<br><br><div class="text">1,608,089,722.00</div></td></tr><tr><td width="8%" class="tableClassValign">12</td><td width="92%" class="tableClass">Check if the aggregate amount in Row (11) excludes certain shares (See Instructions)
+					<br><br><img src="/Images/box-unchecked.jpg" alt="Checkbox not checked"></td></tr><tr><td width="8%" class="tableClassValign">13</td><td width="92%" class="tableClass">Percent of class represented by amount in Row (11)
+					<br><br><div class="text">76.45 % </div></td></tr><tr><td width="8%" class="tableClassValign">14</td><td width="92%" class="tableClass">Type of Reporting Person (See Instructions)
+					<br><br><div class="text">IN</div></td></tr></table><br><div style="display: flex;"><div style="font-size: 0.9em; font-weight: bold; margin-right: 5px;">
+					Comment for Type of Reporting Person:
+				</div><div class="largetext" style="text-align:justify">(a) On June 30, 2025, Rocket Companies, Inc. ("Rocket") completed the collapse of its "Up-C" structure (the "Up-C Collapse") pursuant to the Transaction Agreement, dated March 9, 2025, by and among Rocket, Rock Holdings Inc. ("RHI"), Eclipse Sub, Inc., Rocket GP, LLC, Daniel Gilbert and RHI II, LLC (the "Transaction Agreement"). Pursuant to the Transaction Agreement, each RHI shareholder, in consideration for its voting common shares of RHI, par value $0.001 per share (the "RHI Shares"), received for each RHI Share 56.54 newly issued shares of Rocket Class L common stock, par value $0.00001 per share (the "Class L Common Stock"), half of which are designated Class L-1 Common Stock, par value $0.00001 per share ("Class L-1 Common Stock"), and half of which are designated Class L-2 Common Stock, par value $0.00001 per share ("Class L-2 Common Stock"). Additionally, pursuant to the Transaction Agreement, Daniel Gilbert contributed and transferred to Rocket his shares of Rocket Class D common stock, par value $0.00001 per share ("Class D Common Stock") and corresponding non-voting common interest units of Rocket Limited Partnership (as successor in interest to Rocket, LLC) ("Rocket LP") and received shares of Class L Common Stock on a one-to-one basis, half of which are designated Class L-1 Common Stock and half of which are designated Class L-2 Common Stock.
+
+(b) The Reporting Person's aggregate amount of beneficially owned shares consists of (a) 498,416,138 shares of Class L-1 Common Stock and 498,416,138 shares of Class L-2 Common Stock held directly by the Reporting Person, (b) 70,107,640 shares of Class L-1 Common Stock and 70,107,640 shares of Class L-2 Common Stock held by the Daniel Gilbert Trust #1 u/a/d 8/23/16, a revocable trust for the benefit of the Reporting Person, (c) 157,027,692 shares of Class L-1 Common Stock and 157,027,693 shares of Class L-2 Common Stock held by Jennifer Gilbert, over which the Reporting Person exercises voting power pursuant to an Irrevocable Proxy and Power of Attorney described in Item 6 of this Schedule 13D and (d) 78,493,390 shares of Class L-1 Common Stock and 78,493,391 shares of Class L-2 Common Stock held by various persons, over which the Reporting Person exercises voting power pursuant to Voting Agreements described in Item 6 of this Schedule 13D.
+
+(c) Subject to certain limited exceptions as provided in Rocket's certificate of incorporation, (i) holders of Class L-1 Common Stock are prohibited from transferring or otherwise disposing of such shares prior to June 30, 2026, and (ii) holders of Class L-2 Common Stock are prohibited from transferring or otherwise disposing of such shares prior to June 30, 2027. Following June 30, 2026, each share of Class L-1 common stock (i) may be converted at any time, at the option of the holder, into one share of Rocket Class A common stock, par value $0.00001 per share ("Class A Common Stock") and (ii) will automatically convert into one share of Class A Common Stock immediately prior to any transfer of such share, except for certain permitted transfers that are described in Rocket's certificate of incorporation. Following June 30, 2027, each share of Class L-2 Common Stock (i) may be converted at any time, at the option of the holder, into one share of Class A Common Stock and (ii) will automatically convert into one share of Class A Common Stock immediately prior to any transfer of such share, except for certain permitted transfers that are described in Rocket's certificate of incorporation. In addition, upon the later to occur of (A) June 30, 2027 and (B) the date that the outstanding shares of Class L Common Stock no longer represent at least 79% of the total voting power of the issued and outstanding shares of Rocket common stock, all shares of Class L Common Stock will automatically convert to newly issued shares of Class A Common Stock.
+
+(d) References to percentage ownership of Class A Common Stock in Row 13 are based on (i) 151,272,632 shares of Class A Common Stock outstanding as of May 2, 2025, as reported by the Issuer in its publicly filed Quarterly Report on Form 10-Q for the quarter ended March 31, 2025, (ii) 1,848,879,455 shares of Class A Common Stock issuable upon conversion of shares of Class L Common Stock and (iii) 103,391,679 shares of Class A Common Stock issued to the stockholders of Redfin Corporation in connection with the acquisition of Redfin Corporation by the Issuer on July 1, 2025, as reported by the Issuer in its publicly filed Current Report on Form 8-K on July 1, 2025.</div></div><table><tr><td class="center"><br><br><p><div align="center" style="font-size:1.2em;">
+									SCHEDULE 13D
+								</div></p></td></tr></table><table role="presentation" class="tableClass" id="cusipNumber"><tr class="tableClass"><td width="25%" style="font-weight:bold;">CUSIP No.</td><td width="75%"><div style="font-size:.9em; color:#000000">77311W101</div></td></tr></table><br><br><table role="presentation" class="tableClass" id="reportingPersonDetails"><tr class="tableClass"><td width="8%" class="tableClassValign">1</td><td width="92%" class="tableClass">
+					Name of reporting person
+					<br><br><div class="text">Daniel Gilbert Trust #1 u/a/d 8/23/16</div></td></tr><tr><td width="8%" class="tableClassValign">2</td><td width="92%" class="tableClass">Check the appropriate box if a member of a Group (See Instructions)
+					<br><br><div class="text"><img src="/Images/box-unchecked.jpg" alt="Checkbox not checked">  (a)
+						<br><img src="/Images/box-checked.jpg" alt="Checkbox checked">  (b)
+					</div></td></tr><tr class="tableClassWithBgBlack"><td width="8%" class="tableClassValign">3</td><td width="92%" class="tableClass">SEC use only</td></tr><tr><td width="8%" class="tableClassValign">4</td><td width="92%" class="tableClass">
+					Source of funds (See Instructions)
+					<br><br><div class="text">OO</div></td></tr><tr><td width="8%" class="tableClassValign">5</td><td width="92%" class="tableClass">
+					Check if disclosure of legal proceedings is required pursuant to Items 2(d) or 2(e)
+					<br><br><img src="/Images/box-unchecked.jpg" alt="Checkbox not checked"></td></tr><tr><td width="8%" class="tableClassValign">6</td><td width="92%" class="tableClass">Citizenship or place of organization
+					<br><br><div class="text">
+				UNITED STATES
+			</div></td></tr><tr><td width="8%" class="tableClassValign">Number of Shares Beneficially Owned by Each Reporting Person With:</td><td width="92%" class="tableClass"><table class="innerTableClass"><tr><td width="8%" class="innerTableClassRightValign">7</td><td width="92%" class="tableClassInnerLeft">Sole Voting Power
+								<br><br><div class="text">140,215,280.00</div></td></tr><tr><td width="8%" class="innerTableClassRightValign">8</td><td width="92%" class="tableClassInnerLeft">Shared Voting Power
+								<br><br><div class="text">0.00</div></td></tr><tr><td width="8%" class="innerTableClassRightValign">9</td><td width="92%" class="tableClassInnerLeft">Sole Dispositive Power
+								<br><br><div class="text">140,215,280.00</div></td></tr><tr><td width="8%" class="innerTableClassRightValignBottomLess">10</td><td width="92%" class="tableClassInnerLeftBottomLess">Shared Dispositive Power
+								<br><br><div class="text">0.00</div></td></tr></table></td></tr><tr><td width="8%" class="tableClassValign">11</td><td width="92%" class="tableClass">Aggregate amount beneficially owned by each reporting person
+					<br><br><div class="text">140,215,280.00</div></td></tr><tr><td width="8%" class="tableClassValign">12</td><td width="92%" class="tableClass">Check if the aggregate amount in Row (11) excludes certain shares (See Instructions)
+					<br><br><img src="/Images/box-unchecked.jpg" alt="Checkbox not checked"></td></tr><tr><td width="8%" class="tableClassValign">13</td><td width="92%" class="tableClass">Percent of class represented by amount in Row (11)
+					<br><br><div class="text">6.67 % </div></td></tr><tr><td width="8%" class="tableClassValign">14</td><td width="92%" class="tableClass">Type of Reporting Person (See Instructions)
+					<br><br><div class="text">OO</div></td></tr></table><br><div style="display: flex;"><div style="font-size: 0.9em; font-weight: bold; margin-right: 5px;">
+					Comment for Type of Reporting Person:
+				</div><div class="largetext" style="text-align:justify">(a) The Reporting Person's aggregate amount of beneficially owned shares consists of 70,107,640 shares of Class L-1 Common Stock and 70,107,640 shares of Class L-2 Common Stock, which the Reporting Person received in connection with Up-C Collapse.
+
+(b) Subject to certain limited exceptions as provided in Rocket's certificate of incorporation, (i) holders of Class L-1 Common Stock are prohibited from transferring or otherwise disposing of such shares prior to June 30, 2026, and (ii) holders of Class L-2 Common Stock are prohibited from transferring or otherwise disposing of such shares prior to June 30, 2027. Following June 30, 2026, each share of Class L-1 common stock (i) may be converted at any time, at the option of the holder, into one share of Class A Common Stock and (ii) will automatically convert into one share of Class A Common Stock immediately prior to any transfer of such share, except for certain permitted transfers that are described in Rocket's certificate of incorporation. Following June 30, 2027, each share of Class L-2 Common Stock (i) may be converted at any time, at the option of the holder, into one share of Class A Common Stock and (ii) will automatically convert into one share of Rocket Class A Common Stock immediately prior to any transfer of such share, except for certain permitted transfers that are described in Rocket's certificate of incorporation. In addition, upon the later to occur of (A) June 30, 2027 and (B) the date that the outstanding shares of Class L Common Stock no longer represent at least 79% of the total voting power of the issued and outstanding shares of Rocket common stock, all shares of Class L Common Stock will automatically convert to newly issued shares of Class A Common Stock.
+
+(c) References to percentage ownership of Class A Common Stock in Row 13 are based on (i) 151,272,632 shares of Class A Common Stock outstanding as of May 2, 2025, as reported by the Issuer in its publicly filed Quarterly Report on Form 10-Q for the quarter ended March 31, 2025, (ii) 1,848,879,455 shares of Class A Common Stock issuable upon conversion of shares of Class L Common Stock and (iii) 103,391,679 shares of Class A Common Stock issued to the stockholders of Redfin Corporation in connection with the acquisition of Redfin Corporation by the Issuer on July 1, 2025, as reported by the Issuer in its publicly filed Current Report on Form 8-K on July 1, 2025.</div></div><table><tr><td class="center"><br><br><p><div align="center" style="font-size:1.2em;">
+									SCHEDULE 13D
+								</div></p></td></tr></table><table role="presentation" class="tableClass" id="cusipNumber"><tr class="tableClass"><td width="25%" style="font-weight:bold;">CUSIP No.</td><td width="75%"><div style="font-size:.9em; color:#000000">77311W101</div></td></tr></table><br><br><table role="presentation" class="tableClass" id="reportingPersonDetails"><tr class="tableClass"><td width="8%" class="tableClassValign">1</td><td width="92%" class="tableClass">
+					Name of reporting person
+					<br><br><div class="text">Jennifer Gilbert</div></td></tr><tr><td width="8%" class="tableClassValign">2</td><td width="92%" class="tableClass">Check the appropriate box if a member of a Group (See Instructions)
+					<br><br><div class="text"><img src="/Images/box-unchecked.jpg" alt="Checkbox not checked">  (a)
+						<br><img src="/Images/box-checked.jpg" alt="Checkbox checked">  (b)
+					</div></td></tr><tr class="tableClassWithBgBlack"><td width="8%" class="tableClassValign">3</td><td width="92%" class="tableClass">SEC use only</td></tr><tr><td width="8%" class="tableClassValign">4</td><td width="92%" class="tableClass">
+					Source of funds (See Instructions)
+					<br><br><div class="text">OO</div></td></tr><tr><td width="8%" class="tableClassValign">5</td><td width="92%" class="tableClass">
+					Check if disclosure of legal proceedings is required pursuant to Items 2(d) or 2(e)
+					<br><br><img src="/Images/box-unchecked.jpg" alt="Checkbox not checked"></td></tr><tr><td width="8%" class="tableClassValign">6</td><td width="92%" class="tableClass">Citizenship or place of organization
+					<br><br><div class="text">
+				UNITED STATES
+			</div></td></tr><tr><td width="8%" class="tableClassValign">Number of Shares Beneficially Owned by Each Reporting Person With:</td><td width="92%" class="tableClass"><table class="innerTableClass"><tr><td width="8%" class="innerTableClassRightValign">7</td><td width="92%" class="tableClassInnerLeft">Sole Voting Power
+								<br><br><div class="text">314,055,385.00</div></td></tr><tr><td width="8%" class="innerTableClassRightValign">8</td><td width="92%" class="tableClassInnerLeft">Shared Voting Power
+								<br><br><div class="text">0.00</div></td></tr><tr><td width="8%" class="innerTableClassRightValign">9</td><td width="92%" class="tableClassInnerLeft">Sole Dispositive Power
+								<br><br><div class="text">314,055,385.00</div></td></tr><tr><td width="8%" class="innerTableClassRightValignBottomLess">10</td><td width="92%" class="tableClassInnerLeftBottomLess">Shared Dispositive Power
+								<br><br><div class="text">0.00</div></td></tr></table></td></tr><tr><td width="8%" class="tableClassValign">11</td><td width="92%" class="tableClass">Aggregate amount beneficially owned by each reporting person
+					<br><br><div class="text">314,055,385.00</div></td></tr><tr><td width="8%" class="tableClassValign">12</td><td width="92%" class="tableClass">Check if the aggregate amount in Row (11) excludes certain shares (See Instructions)
+					<br><br><img src="/Images/box-unchecked.jpg" alt="Checkbox not checked"></td></tr><tr><td width="8%" class="tableClassValign">13</td><td width="92%" class="tableClass">Percent of class represented by amount in Row (11)
+					<br><br><div class="text">14.93 % </div></td></tr><tr><td width="8%" class="tableClassValign">14</td><td width="92%" class="tableClass">Type of Reporting Person (See Instructions)
+					<br><br><div class="text">IN</div></td></tr></table><br><div style="display: flex;"><div style="font-size: 0.9em; font-weight: bold; margin-right: 5px;">
+					Comment for Type of Reporting Person:
+				</div><div class="largetext" style="text-align:justify">(a) The Reporting Person's aggregate amount of beneficially owned shares consists of 157,027,693 shares of Class L-1 Common Stock and 157,027,693 shares of Class L-2 Common Stock, which the Reporting Person received in connection with Up-C Collapse. Daniel Gilbert exercises voting power over the shares held by the Reporting Person pursuant to a proxy and irrevocable power of attorney.
+
+(b) Subject to certain limited exceptions as provided in Rocket's certificate of incorporation, (i) holders of Class L-1 Common Stock are prohibited from transferring or otherwise disposing of such shares prior to June 30, 2026, and (ii) holders of Class L-2 Common Stock are prohibited from transferring or otherwise disposing of such shares prior to June 30, 2027. Following June 30, 2026, each share of Class L-1 common stock (i) may be converted at any time, at the option of the holder, into one share of Class A Common Stock and (ii) will automatically convert into one share of Class A Common Stock immediately prior to any transfer of such share, except for certain permitted transfers that are described in Rocket's certificate of incorporation. Following June 30, 2027, each share of Class L-2 Common Stock (i) may be converted at any time, at the option of the holder, into one share of Class A Common Stock and (ii) will automatically convert into one share of Class A Common Stock immediately prior to any transfer of such share, except for certain permitted transfers that are described in Rocket's certificate of incorporation. In addition, upon the later to occur of (A) June 30, 2027 and (B) the date that the outstanding shares of Class L Common Stock no longer represent at least 79% of the total voting power of the issued and outstanding shares of Rocket common stock, all shares of Class L Common Stock will automatically convert to newly issued shares of Class A Common Stock.
+
+(c) References to percentage ownership of Class A Common Stock in Row 13 are based on (i) 151,272,632 shares of Class A Common Stock outstanding as of May 2, 2025, as reported by the Issuer in its publicly filed Quarterly Report on Form 10-Q for the quarter ended March 31, 2025, (ii) 1,848,879,455  shares of Class A Common Stock issuable upon conversion of shares of Class L Common Stock and (iii) 103,391,679 shares of Class A Common Stock issued to the stockholders of Redfin Corporation in connection with the acquisition of Redfin Corporation by the Issuer on July 1, 2025, as reported by the Issuer in its publicly filed Current Report on Form 8-K on July 1, 2025.</div></div></div><div class="form1"><table><tr><td class="center"><br><br><p><div align="center" style="font-size:1.2em;">
+									SCHEDULE 13D
+								</div></p></td></tr></table><table role="presentation" id="item1to7"><tr><td width="8%" class="tableClassValignNoBorder">Item 1.</td><td width="92%" class="tableClassNoBorder">Security and Issuer</td></tr><tr class="tableClass"><td width="8%" class="tableClassNoBorderAlignCenter">(a)</td><td width="92%" class="tableClassNoBorder">Title of Class of Securities:
+							<br><br><div class="text">Class A common stock, $0.00001 par value</div></td></tr><tr class="tableClass"><td width="8%" class="tableClassNoBorderAlignCenter">(b)</td><td width="92%" class="tableClassNoBorder">Name of Issuer:
+							<br><br><div class="text">Rocket Companies, Inc.</div></td></tr><tr><td width="8%" class="tableClassNoBorderAlignCenter">(c)</td><td width="92%" class="tableClassNoBorder">Address of Issuer's Principal Executive Offices:
+							<br><br><div class="text">1050 Woodward Avenue, Detroit, 
+				MICHIGAN
+			, 48226.</div></td></tr><tr><td width="8%" class="tableClassValignNoBorder">Item 2.</td><td width="92%" class="tableClassNoBorder">Identity and Background</td></tr><tr></tr><tr class="tableClass"><td width="8%" class="tableClassNoBorderAlignCenter">(a)</td><td width="92%" class="tableClassNoBorder"><div class="largetext">This statement is filed jointly by the following Reporting Persons:
+
+1. Daniel Gilbert
+2. Daniel Gilbert Trust #1 u/a/d 8/23/16
+3. Jennifer Gilbert
+
+The Reporting Persons are making this single, joint filing, pursuant to a joint filing agreement in accordance with Rule 13d-1(k) of the Securities Exchange Act of 1934, as amended, which is filed as Exhibit 6 hereto.</div></td></tr><tr><td width="8%" class="tableClassNoBorderAlignCenter">(b)</td><td width="92%" class="tableClassNoBorder"><div class="largetext">The address of the principal business and principal office of each of the Reporting Persons is 1074 Woodward Avenue, Detroit, MI 48226.</div></td></tr><tr><td width="8%" class="tableClassNoBorderAlignCenter">(c)</td><td width="92%" class="tableClassNoBorder"><div class="largetext">Daniel Gilbert is the Chairman of the board of directors (the "Board") of the Issuer.
+
+Jennifer Gilbert is a member of the Board.
+
+For the above Reporting Persons, the address of the principal business and principal office at which such employment is conducted is 1074 Woodward Avenue, Detroit, MI 48226.
+
+The Daniel Gilbert Trust #1 u/a/d 8/23/16 is organized under the laws of Michigan. The trust is for the benefit of Daniel Gilbert.</div></td></tr><tr><td width="8%" class="tableClassNoBorderAlignCenter">(d)</td><td width="92%" class="tableClassNoBorder"><div class="largetext">During the past five years, none of the Reporting Persons have been convicted in a criminal proceeding (excluding traffic violations or similar misdemeanors).</div></td></tr><tr><td width="8%" class="tableClassNoBorderAlignCenter">(e)</td><td width="92%" class="tableClassNoBorder"><div class="largetext">During the past five years, none of the Reporting Persons have been a party to a civil proceeding of a judicial or administrative body of competent jurisdiction and, as a result of such proceeding, was or is subject to a judgment, decree or final order enjoining future violations of, or prohibiting or mandating activities subject to, federal or state securities laws or finding any violation with respect to such laws.</div></td></tr><tr><td width="8%" class="tableClassNoBorderAlignCenter">(f)</td><td width="92%" class="tableClassNoBorder"><div class="largetext">Each individual Reporting Person is a citizen of the United States of America. The Daniel Gilbert Trust #1 u/a/d 8/23/16 is a trust organized under the laws of Michigan.</div></td></tr><tr><td width="8%" class="tableClassValignNoBorder">Item 3.</td><td width="92%" class="tableClassNoBorder">Source and Amount of Funds or Other Consideration</td></tr><tr><td width="8%" class="tableClassNoBorderAlignCenter"> </td><td width="92%" class="tableClassNoBorder"><div class="largetext">The response to Item 4 of this Schedule 13D is incorporated herein by reference.</div></td></tr><tr><td width="8%" class="tableClassValignNoBorder">Item 4.</td><td width="92%" class="tableClassNoBorder">Purpose of Transaction</td></tr><tr><td width="8%" class="tableClassNoBorderAlignCenter"> </td><td width="92%" class="tableClassNoBorder"><div class="largetext">On June 30, 2025, Rocket completed the collapse of its "Up-C" structure pursuant to the Transaction Agreement. Pursuant to the Transaction Agreement, each RHI shareholder, in consideration for its RHI Shares received 56.54 newly issued shares of Rocket Class L Common Stock for each RHI Share, half of which are designated Class L-1 Common Stock and half of which are designated Class L-2 Common Stock. Additionally, pursuant to the Transaction Agreement, Daniel Gilbert contributed and transferred to Rocket his shares of Rocket Class D Common Stock and corresponding non-voting common interest units of Rocket LP and received shares of Class L Common Stock on a one-to-one basis, half of which are designated Class L-1 Common Stock and half of which are designated Class L-2 Common Stock. Each Reporting Person was a shareholder of RHI. As part of the Up-C collapse, each Reporting Person acquired beneficial ownership over the common stock of the Issuer reported on the cover pages of this Schedule 13D.
+
+Subject to certain limited exceptions as provided in Rocket's certificate of incorporation, (i) holders of Class L-1 Common Stock are prohibited from transferring or otherwise disposing of such shares prior to June 30, 2026, and (ii) holders of Class L-2 Common Stock are prohibited from transferring or otherwise disposing of such shares prior to June 30, 2027. Following June 30, 2026, each share of Class L-1 common stock (i) may be converted at any time, at the option of the holder, into one share of Class A Common Stock and (ii) will automatically convert into one share of Class A Common Stock immediately prior to any transfer of such share, except for certain permitted transfers that are described in Rocket's certificate of incorporation. Following June 30, 2027, each share of Class L-2 Common Stock (i) may be converted at any time, at the option of the holder, into one share of Class A Common Stock and (ii) will automatically convert into one share of Class A Common Stock immediately prior to any transfer of such share, except for certain permitted transfers that are described in Rocket's certificate of incorporation. In addition, upon the later to occur of (A) June 30, 2027 and (B) the date that the outstanding shares of Class L Common Stock no longer represent at least 79% of the total voting power of the issued and outstanding shares of Rocket common stock, all shares of Class L Common Stock will automatically convert to newly issued shares of Class A Common Stock.
+
+The Transaction Agreement is filed as Exhibit 1 hereto and is incorporated herein by reference.
+
+Following the transactions contemplated in this Schedule 13D, Daniel Gilbert, who is the Chairman of the Board, continues to hold more than a majority of the combined voting power of the outstanding capital stock of the Issuer and therefore can approve or disapprove any matter requiring a majority vote of the Issuer's stockholders. As a result, Daniel Gilbert continues to be in a position to influence the management and policies of the Issuer and to influence the outcome of corporate actions requiring stockholder approval.</div></td></tr><tr><td width="8%" class="tableClassValignNoBorder">Item 5.</td><td width="92%" class="tableClassNoBorder">Interest in Securities of the Issuer</td></tr><tr><td width="8%" class="tableClassNoBorderAlignCenter">(a)</td><td width="92%" class="tableClassNoBorder"><div class="largetext">See rows (11) and (13) of the cover pages to this Schedule 13D for the aggregate number of shares of Class A Common Stock and percentages of shares of Class A Common Stock beneficially owned by the Reporting Persons, which information is incorporated herein by reference.
+
+References to percentage ownership of Class A Common Stock in this Schedule 13D are based on (i) 151,272,632 shares of Class A Common Stock outstanding as of May 2, 2025, as reported by the Issuer in its publicly filed Quarterly Report on Form 10-Q for the quarter ended March 31, 2025, (ii) 1,848,879,455 shares of Class A Common Stock issuable upon conversion of 1,848,879,455 shares of Class L Common Stock and (iii) 103,391,679 shares of Class A Common Stock issued to the stockholders of Redfin Corporation in connection with the acquisition of Redfin Corporation by the Issuer on July 1, 2025, as reported by the Issuer in its publicly filed Current Report on Form 8-K on July 1, 2025.</div></td></tr><tr><td width="8%" class="tableClassNoBorderAlignCenter">(b)</td><td width="92%" class="tableClassNoBorder"><div class="largetext">See rows (7) through (10) and the Comments of the cover pages to this Schedule 13D for the number of shares of Class A Common Stock as to which the Reporting Persons have the sole or shared power to vote or direct the vote and sole or shared power to dispose or to direct the disposition, which information is incorporated herein by reference.</div></td></tr><tr><td width="8%" class="tableClassNoBorderAlignCenter">(c)</td><td width="92%" class="tableClassNoBorder"><div class="largetext">Except as set forth in this Schedule 13D, the Reporting Persons have not effected any transaction in the Class A Common Stock in the 60 days prior to filing this Schedule 13D.</div></td></tr><tr><td width="8%" class="tableClassNoBorderAlignCenter">(d)</td><td width="92%" class="tableClassNoBorder"><div class="largetext">Not applicable.</div></td></tr><tr><td width="8%" class="tableClassNoBorderAlignCenter">(e)</td><td width="92%" class="tableClassNoBorder"><div class="largetext">Not applicable.</div></td></tr><tr><td width="8%" class="tableClassValignNoBorder">Item 6.</td><td width="92%" class="tableClassNoBorder">Contracts, Arrangements, Understandings or Relationships With Respect to Securities of the Issuer</td></tr><tr><td width="8%" class="tableClassNoBorderAlignCenter"> </td><td width="92%" class="tableClassNoBorder"><div class="largetext">Item 4 above summarizes certain provisions of the Transaction Agreement and is incorporated herein by reference.
+
+Registration Rights Agreement
+
+Prior to the consummation of the Issuer's initial public offering on August 5, 2020, the Issuer entered into a registration rights agreement (the "Registration Rights Agreement") with RHI, Daniel Gilbert and certain of his affiliates (each, a "Registration Party"), pursuant to which each Registration Party is entitled to demand the registration of the sale of certain or all shares of Class A Common Stock that it beneficially owns. The Registration Rights Agreement was not affected by the Up-C Collapse.
+
+The Registration Rights Agreement is filed as Exhibit 2 hereto and is incorporated herein by reference.
+
+Letter Agreement
+
+On June 30, 2025, the Issuer and Daniel Gilbert entered into a letter agreement pursuant to which (i) Daniel Gilbert will retain certain information rights contained in the Exchange Agreement, dated as of August 5, 2020, by and among the Issuer, RHI, Daniel Gilbert and Holdings LP, which was retroactively terminated effective as of March 9, 2025 as part of the Up-C Collapse, and (ii) the Issuer will not amend the provisions of its certificate of incorporation renouncing corporate opportunities without prior written consent of RHI II as long as any equityholder of RHI II holds any shares of the Issuer's common stock.
+
+The Letter Agreement is filed as Exhibit 3 hereto and is incorporated herein by reference.
+
+Irrevocable Proxy and Power of Attorney
+
+On June 30, 2025, Daniel Gilbert and Jennifer Gilbert entered into an Irrevocable Proxy and Power of Attorney that grants Daniel Gilbert, and divests from Jennifer Gilbert, sole and full voting power over any shares of common stock of the Issuer for which Jennifer Gilbert has beneficial ownership within the meaning of Rule 13d-3 under the Exchange Act of 1934.
+
+The Irrevocable Proxy and Power of Attorney is filed as Exhibit 4 hereto and is incorporated herein by reference.
+
+Voting Agreements
+
+Daniel Gilbert has entered into voting agreements, each substantially in the form attached hereto as Exhibit 5 (the "Voting Agreements"), with each of William Banfield, Brian Brown, David Carroll, Jeffrey Eisenshtadt, Rob Kramer, Heather Lovier, Todd Lunsford, Richard Mandell, Jeff Morganroth, Matthew Rizik, Robert Walters, the Lindsay Gross Revocable Living Trust u/a/d 6/21/05, and the William C. Emerson Trust, who each received shares of Class L Common Stock as consideration for their RHI Shares in the Up-C Collapse. Pursuant to the Voting Agreements, each of the above Reporting Persons has agreed to vote their shares of Class L Common Stock in the same manner as Daniel Gilbert and, if requested by Daniel Gilbert, grant him a proxy over their shares of Class L Common Stock as specified in the applicable Voting Agreement.
+
+The Form of Voting Agreement is filed as Exhibit 5 hereto and is incorporated herein by reference.
+
+Except as set forth herein, none of the Reporting Persons have any contracts, arrangements, understandings or relationships (legal or otherwise) with any person with respect to any securities of the Issuer, including but not limited to any contracts, arrangements, understandings or relationships concerning the transfer or voting of such securities, finder's fees, joint ventures, loan or option arrangements, puts or calls, guarantees of profits, division of profits or losses, or the giving or withholding of proxies.</div></td></tr><tr><td width="8%" class="tableClassValignNoBorder">Item 7.</td><td width="92%" class="tableClassNoBorder">Material to be Filed as Exhibits.</td></tr><tr><td width="8%" class="tableClassNoBorderAlignCenter"> </td><td width="92%" class="tableClassNoBorder"><div class="largetext">Exhibit 1 - Transaction Agreement, dated as of March 9, 2025, by and among Rocket Companies, Inc., Rock Holdings Inc., Eclipse Sub, Inc., Rocket GP, LLC, Daniel Gilbert and RHI II, LLC.
+
+Exhibit 2 - Registration Rights Agreement, dated as of August 5, 2020, by and among Rocket Companies, Inc., Rock Holdings, Inc., Daniel Gilbert and certain other affiliates of Daniel Gilbert.
+
+Exhibit 3 - Letter Agreement, dated as of June 30, 2025, between Rocket Companies, Inc. and Daniel Gilbert.
+
+Exhibit 4 - Irrevocable Proxy and Power of Attorney, dated as of June 30, 2025, between Daniel Gilbert and Jennifer Gilbert.
+
+Exhibit 5 - Form of Voting Agreement.
+
+Exhibit 6 - Joint Filing Agreement as required by Rule 13d-1(k)(1) under the Securities Exchange Act of 1934, as amended.</div></td></tr></table><br></div><div class="form1"><table role="presentation" id="signatureInfo"><tr><td width="8%" class="tableClassValignNoBorder">    SIGNATURE</td><td width="92%" class="tableClassNoBorder"> </td></tr><tr><td width="8%" class="tableClassNoBorderAlignCenter"> </td><td width="92%" class="tableClassNoBorder"><div class="information" style="text-align:justify">
+						After reasonable inquiry and to the best of my knowledge and belief, I certify that the information set forth in this statement is true, complete and correct.
+						<br><br></div></td></tr></table><table><tr class="tableClass"><td width="50%" class="tableClassNoBorder"> </td><td width="50%" class="tableClassNoBorder"><table><tr class="tableClass"><td width="100%" class="tableClassInnerNoBorderBlue"><div class="text">Daniel Gilbert</div></td></tr></table></td></tr></table><table><tr class="tableClass"><td width="50%" class="tableClassNoBorder"> </td><td width="50%" class="tableClassNoBorder"><table><tr class="tableClass"><td width="8%" class="tableClassNoBorderAlignLeft signature">Signature:</td><td width="92%" class="tableClassNoBorderBlue signature">/s/ Daniel Gilbert</td></tr><tr class="tableClass"><td width="8%" class="tableClassNoBorderAlignLeft signature">Name/Title:</td><td width="92%" class="tableClassNoBorderBlue signature">Daniel Gilbert</td></tr><tr class="tableClass"><td width="8%" class="tableClassNoBorderAlignLeft signature">Date:</td><td width="92%" class="tableClassNoBorderBlue signature">07/08/2025</td></tr></table></td></tr></table><table><tr class="tableClass"><td width="50%" class="tableClassNoBorder"> </td><td width="50%" class="tableClassNoBorder"><table><tr class="tableClass"><td width="100%" class="tableClassInnerNoBorderBlue"><div class="text">Daniel Gilbert Trust #1 u/a/d 8/23/16</div></td></tr></table></td></tr></table><table><tr class="tableClass"><td width="50%" class="tableClassNoBorder"> </td><td width="50%" class="tableClassNoBorder"><table><tr class="tableClass"><td width="8%" class="tableClassNoBorderAlignLeft signature">Signature:</td><td width="92%" class="tableClassNoBorderBlue signature">/s/ Daniel Gilbert</td></tr><tr class="tableClass"><td width="8%" class="tableClassNoBorderAlignLeft signature">Name/Title:</td><td width="92%" class="tableClassNoBorderBlue signature">Daniel Gilbert</td></tr><tr class="tableClass"><td width="8%" class="tableClassNoBorderAlignLeft signature">Date:</td><td width="92%" class="tableClassNoBorderBlue signature">07/08/2025</td></tr></table></td></tr></table><table><tr class="tableClass"><td width="50%" class="tableClassNoBorder"> </td><td width="50%" class="tableClassNoBorder"><table><tr class="tableClass"><td width="100%" class="tableClassInnerNoBorderBlue"><div class="text">Jennifer Gilbert</div></td></tr></table></td></tr></table><table><tr class="tableClass"><td width="50%" class="tableClassNoBorder"> </td><td width="50%" class="tableClassNoBorder"><table><tr class="tableClass"><td width="8%" class="tableClassNoBorderAlignLeft signature">Signature:</td><td width="92%" class="tableClassNoBorderBlue signature">/s/ Jennifer Gilbert</td></tr><tr class="tableClass"><td width="8%" class="tableClassNoBorderAlignLeft signature">Name/Title:</td><td width="92%" class="tableClassNoBorderBlue signature">Jennifer Gilbert</td></tr><tr class="tableClass"><td width="8%" class="tableClassNoBorderAlignLeft signature">Date:</td><td width="92%" class="tableClassNoBorderBlue signature">07/08/2025</td></tr></table></td></tr></table></div></div>
+
+<script type="text/javascript"  src="/jGPwwufxbVNjftpB5QEsfCYc/NODizkrbDhJ6LQYuEm/Bwg0WSMB/SGRsCE5/bOyE"></script></body></html>
