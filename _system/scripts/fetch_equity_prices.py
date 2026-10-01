@@ -17,6 +17,7 @@ if str(SCRIPTS) not in sys.path:
 
 from darwin.prices import stooq_symbol  # noqa: E402
 from portfolio_registry import load_registry  # noqa: E402
+from stooq_csv import QUOTE_HEADER, check_stooq_csv  # noqa: E402
 
 UA = "MarvinResearch/1.0 (equity-prices)"
 STOOQ_URL = "https://stooq.com/q/l/?s={symbol}&f=sd2t2ohlcv&h&e=csv"
@@ -30,7 +31,7 @@ def fetch_stooq_close(symbol: str) -> tuple[float | None, str | None, str | None
     url = STOOQ_URL.format(symbol=symbol.lower())
     req = urllib.request.Request(url, headers={"User-Agent": UA})
     try:
-        raw = urllib.request.urlopen(req, timeout=25).read().decode("utf-8", errors="ignore")
+        raw = check_stooq_csv(urllib.request.urlopen(req, timeout=25).read(), QUOTE_HEADER)
     except Exception as exc:
         return None, None, str(exc)
     lines = [ln.strip() for ln in raw.strip().splitlines() if ln.strip()]
@@ -110,13 +111,10 @@ def fetch_price(ticker: str) -> tuple[float | None, str | None, str]:
     row = registry_row(ticker)
     market = (row or {}).get("market", "US")
     exchange = (row or {}).get("exchange", "")
-    sym = stooq_symbol(ticker, market)
-    if sym:
-        close, qd, err = fetch_stooq_close(sym)
-        if close is not None:
-            return close, qd, f"Stooq {sym.upper()} close {qd}"
+    # Yahoo first: Stooq answers scripted requests with HTML (a bot check on
+    # /q/d/l/, "page does not exist" on /q/l/), so it is the fallback now.
     ysym = yahoo_symbol_for(ticker, market, exchange)
-    close, qd, err = fetch_yahoo_close(ysym)
+    close, qd, yerr = fetch_yahoo_close(ysym)
     if close is not None:
         # Yahoo quotes London listings in GBX/pence while the valuation models
         # use GBP per share.  Normalize at the ingestion boundary so a 9,000p
@@ -125,7 +123,13 @@ def fetch_price(ticker: str) -> tuple[float | None, str | None, str]:
             close /= 100.0
             return close, qd, f"Yahoo {ysym} close {qd} (GBX converted to GBP)"
         return close, qd, f"Yahoo {ysym} close {qd}"
-    return None, None, f"fetch failed (stooq={sym}, yahoo={ysym}, err={err})"
+    sym = stooq_symbol(ticker, market)
+    serr = None
+    if sym:
+        close, qd, serr = fetch_stooq_close(sym)
+        if close is not None:
+            return close, qd, f"Stooq {sym.upper()} close {qd}"
+    return None, None, f"fetch failed (yahoo={ysym}: {yerr}; stooq={sym}: {serr})"
 
 
 def ensure_valuation_stub(ticker: str) -> dict:
