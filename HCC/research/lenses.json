@@ -1,5 +1,5 @@
 {
-  "as_of": "2026-08-08",
+  "as_of": "2026-09-30",
   "consensus": {
     "agreement_pct": 0,
     "dissents": [],
@@ -59,7 +59,7 @@
         {
           "check": "dhando_any",
           "id": "dhando_ok",
-          "met": true
+          "met": false
         },
         {
           "check": "leverage_lte",
@@ -72,7 +72,7 @@
           "met": false
         }
       ],
-      "criteria_met": 2,
+      "criteria_met": 1,
       "criteria_total": 3,
       "falsifier": "dhando -> none OR net-debt/EBITDA > 3 OR bear return < -15%",
       "horizon_yrs": 3,
@@ -87,7 +87,7 @@
         },
         {
           "name": "dhando",
-          "value": "partial"
+          "value": "pending"
         }
       ],
       "label": "Mohnish Pabrai",
@@ -110,21 +110,21 @@
         {
           "check": "moat_any",
           "id": "moat_durable",
-          "met": true
+          "met": false
         }
       ],
-      "criteria_met": 1,
+      "criteria_met": 0,
       "criteria_total": 2,
       "falsifier": "No asset intensity / pricing power (moat eroding + non-croupier)",
       "horizon_yrs": 10,
       "key_metrics": [
         {
           "name": "archetype",
-          "value": "commodity_cyclical"
+          "value": "cyclical"
         },
         {
           "name": "moat",
-          "value": "stable"
+          "value": "unproven"
         },
         {
           "name": "bull_return_pct",
@@ -135,10 +135,11 @@
       "meets_bar": false,
       "metric_count": 3,
       "persona": "stahl",
-      "relevance": 0.5,
+      "relevance": 0.0,
       "return_pct": null,
       "source": "_system/reference/investment-wisdom/stahl/",
-      "verdict": "pending"
+      "verdict": "silent",
+      "why_silent": "Universe criteria not met: hard_asset_archetype, moat_durable"
     },
     {
       "conviction": 0.0,
@@ -146,7 +147,7 @@
         {
           "check": "moat_any",
           "id": "moat_ok",
-          "met": true
+          "met": false
         },
         {
           "check": "irr_method_not",
@@ -154,14 +155,14 @@
           "met": true
         }
       ],
-      "criteria_met": 2,
+      "criteria_met": 1,
       "criteria_total": 2,
       "falsifier": "Moat eroding/unproven or irr_method pending",
       "horizon_yrs": 10,
       "key_metrics": [
         {
           "name": "moat",
-          "value": "stable"
+          "value": "unproven"
         },
         {
           "name": "base_return_pct",
@@ -176,7 +177,7 @@
       "meets_bar": false,
       "metric_count": 3,
       "persona": "munger",
-      "relevance": 1.0,
+      "relevance": 0.5,
       "return_pct": null,
       "source": "_system/reference/investment-wisdom/munger/",
       "verdict": "pending"
@@ -229,7 +230,7 @@
         {
           "check": "moat_any",
           "id": "durable_moat",
-          "met": true
+          "met": false
         },
         {
           "check": "archetype_any",
@@ -242,7 +243,7 @@
           "met": true
         }
       ],
-      "criteria_met": 2,
+      "criteria_met": 1,
       "criteria_total": 3,
       "falsifier": "Eroding moat or dhando none",
       "horizon_yrs": 10,
@@ -253,7 +254,7 @@
         },
         {
           "name": "moat",
-          "value": "stable"
+          "value": "unproven"
         },
         {
           "name": "base_return_pct",
@@ -285,7 +286,7 @@
       "key_metrics": [
         {
           "name": "payoff_lens",
-          "value": "operating"
+          "value": "pending"
         },
         {
           "name": "base_return_pct",
@@ -327,7 +328,7 @@
       "key_metrics": [
         {
           "name": "payoff_lens",
-          "value": "operating"
+          "value": "pending"
         },
         {
           "name": "base_return_pct",
@@ -354,7 +355,7 @@
         {
           "check": "archetype_any",
           "id": "capacity_sensitive",
-          "met": true
+          "met": false
         },
         {
           "check": "capex_or_reinvestment_material",
@@ -364,10 +365,10 @@
         {
           "check": "cycle_not",
           "id": "cycle_known",
-          "met": true
+          "met": false
         }
       ],
-      "criteria_met": 2,
+      "criteria_met": 0,
       "criteria_total": 3,
       "falsifier": "Supply response, reinvestment requirements, or incremental returns cannot be measured.",
       "horizon_yrs": 7,
@@ -389,10 +390,11 @@
       "meets_bar": false,
       "metric_count": 3,
       "persona": "marathon_capital_cycle",
-      "relevance": 0.5,
+      "relevance": 0.0,
       "return_pct": null,
       "source": "_system/frameworks/investment_committee_personas.md#marathon--capital-cycle",
-      "verdict": "pending"
+      "verdict": "silent",
+      "why_silent": "Universe criteria not met: capacity_sensitive, reinvestment_material, cycle_known"
     },
     {
       "conviction": 0.0,
@@ -405,7 +407,7 @@
         {
           "check": "cycle_not",
           "id": "cycle_known",
-          "met": true
+          "met": false
         },
         {
           "check": "bear_case_present",
@@ -413,7 +415,7 @@
           "met": false
         }
       ],
-      "criteria_met": 1,
+      "criteria_met": 0,
       "criteria_total": 3,
       "falsifier": "Debt maturities, refinancing exposure, liquidity, or downside recovery cannot be reconciled.",
       "horizon_yrs": 5,
@@ -435,10 +437,11 @@
       "meets_bar": false,
       "metric_count": 3,
       "persona": "marks_credit_cycle",
-      "relevance": 0.5,
+      "relevance": 0.0,
       "return_pct": null,
       "source": "_system/frameworks/investment_committee_personas.md#howard-marks--credit-cycle",
-      "verdict": "pending"
+      "verdict": "silent",
+      "why_silent": "Universe criteria not met: credit_material, cycle_known, stress_modelable"
     },
     {
       "conviction": 0.0,
@@ -456,10 +459,10 @@
         {
           "check": "dhando_any",
           "id": "downside_discount",
-          "met": true
+          "met": false
         }
       ],
-      "criteria_met": 1,
+      "criteria_met": 0,
       "criteria_total": 3,
       "falsifier": "Asset value lacks an independently evidenced realization path or is already capitalized in operating cash flow.",
       "horizon_yrs": 4,
@@ -481,10 +484,11 @@
       "meets_bar": false,
       "metric_count": 3,
       "persona": "klarman_asset_value",
-      "relevance": 0.5,
+      "relevance": 0.0,
       "return_pct": null,
       "source": "_system/frameworks/investment_committee_personas.md#klarman--catalyst-backed-asset-value",
-      "verdict": "pending"
+      "verdict": "silent",
+      "why_silent": "Universe criteria not met: asset_value, realization_path, downside_discount"
     },
     {
       "conviction": 0.0,
@@ -523,16 +527,20 @@
       "verdict": "pending"
     }
   ],
-  "shared_inputs_ref": "valuation.json@2026-08-08",
+  "shared_inputs_ref": "valuation.json@2026-09-30",
   "ticker": "HCC",
   "valuation_blend": {
     "band_pct": null,
     "blended_return_pct": null,
     "contributors": [],
     "excluded_silent": [
+      "stahl",
       "greenblatt",
       "moi",
-      "hk"
+      "hk",
+      "marathon_capital_cycle",
+      "marks_credit_cycle",
+      "klarman_asset_value"
     ],
     "low_coverage": true,
     "median_mean_flag": false,
