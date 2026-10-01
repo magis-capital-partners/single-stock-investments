@@ -81,6 +81,23 @@
     return `<span class="technical-score ${cls}">${key in fearScores ? whole(value) : score(value)}</span>`;
   }
 
+  // v3 outlook columns: rebound rank (0-100 among US stocks) and the calibrated
+  // probability of a further 15% drop within 63 sessions.
+  function renderOutlookCell(ticker, key) {
+    const outlook = (technicalsOf(ticker) || {}).outlook || {};
+    if (key === 'rebound') {
+      const value = Number((outlook.rebound || {}).score);
+      if (!Number.isFinite(value)) return '<span class="technical-score technical-neutral">—</span>';
+      const cls = value >= 80 ? 'technical-positive' : value <= 20 ? 'technical-negative' : 'technical-neutral';
+      return `<span class="technical-score ${cls}" title="Risk-adjusted rank among US stocks: expected next-month return after removing the market (beta) part. Not a forecast of beating SPY.">${Math.round(value)}</span>`;
+    }
+    const risk = outlook.risk || {};
+    const p = Number(risk.p_drop15_63d);
+    if (!Number.isFinite(p)) return '<span class="technical-score technical-neutral">—</span>';
+    const cls = p >= 0.35 ? 'fear-panic' : p >= 0.20 ? 'fear-stress' : 'technical-neutral';
+    return `<span class="technical-score ${cls}" title="Chance of falling another 15% within 63 sessions">${Math.round(p * 100)}%</span>`;
+  }
+
   function sparkline(history, escapeHtml) {
     const points = (history || [])
       .map((row) => [String(row[0] || ''), Number(row[1])])
@@ -251,6 +268,7 @@
     fearMeta,
     renderSetupCell,
     renderScoreCell,
+    renderOutlookCell,
     renderPanel,
     fundamentalTechnicalRead,
   };

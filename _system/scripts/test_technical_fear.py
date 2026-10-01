@@ -80,7 +80,9 @@ class TechnicalFearTests(unittest.TestCase):
             source="synthetic",
         )
         setup = snapshot["setup"]
-        self.assertIn(setup["phase"], {"falling_knife", "oversold_watch"})
+        # v3: a stock in panic is described by what drove the selloff; the
+        # retired "falling_knife" / "stabilizing" labels must not come back.
+        self.assertIn(setup["phase"], {"company_selloff", "market_selloff", "oversold_watch"})
         self.assertIn(setup["direction"], {"lagging_downtrend", "mixed_repair"})
         self.assertIsNotNone(setup["indicators"]["rsi_14"])
         self.assertIsNotNone(setup["indicators"]["chaikin_money_flow_20d"])
