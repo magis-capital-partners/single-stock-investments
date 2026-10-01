@@ -14,6 +14,7 @@ HERE = Path(__file__).resolve().parent
 sys.path.insert(0, str(HERE))
 import fear_vec  # noqa: E402
 import gzip  # noqa: E402
+import report_phases  # noqa: E402
 from common import BARS, INDEX_SIGNALS, RESULTS as RES, STOCK_SIGNALS, manifest  # noqa: E402
 
 with gzip.open(RES / "index_results.json.gz", "rt", encoding="utf-8") as _fh:
@@ -604,7 +605,6 @@ def build() -> str:
     rv20_auc = A["rv20"]["auc_vol21_gt_median"]
     stab_days = acc_table("phase").loc[3, ("n", "x63")] / acc_table("all").loc[0, ("n", "x63")]
     n_stockdays = int(base["x63"]["n"])
-    mac_stab = MAC["conditions"]["phase_stabilizing"]["share"]
     n_replayed = len(list(STOCK_SIGNALS.glob("*.parquet")))
     n_young = n_replayed - 1 - S["stocks"]  # minus DNP (wrong security)
     pb = acc_table("panic")
@@ -634,6 +634,7 @@ def build() -> str:
     plan = PLAN_HTML.format(
         n_stocks=len(PT), n_stockdays=f"{n_stockdays / 1e6:.1f} million",
     )
+    phases_html = report_phases.build_sections(esc, pct, num, tstat, table_html, figure, grouped_columns, legend)
 
     page = f"""<title>Fear Signal Accuracy Study</title>
 <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -656,9 +657,16 @@ def build() -> str:
   <h2>The short answer</h2>
   <p><strong>The scores measure fear accurately, but fear is a poor timing signal.</strong> When the panic score is high, the next month really is more volatile and deeper drops really are more likely. What the score does not do is tell you when to buy. Higher fear has been followed by slightly better returns on average, but the effect is tiny: the most-feared tenth of stocks beat the least-feared tenth by {pct(sp21['mean'], 1, False)} over the next month, and the score explains roughly {pct(s63['r2_implied_median'], 1, False)} of what happens next. It has also faded to nothing since 2020, and it reverses at one year.</p>
   <p><strong>The “exhaustion” half of both models has no edge.</strong> On the index, higher exhaustion readings were followed by <em>lower</em> returns, and the ladder’s top rung never fired for SPY in 33 years. On single stocks, “stabilizing” is the label on {pct(stab_days, 0, False)} of all days, and “falling knife” days did better afterwards than “stabilizing” days.</p>
-  <p><strong>Context matters more than the score.</strong> A stock that panics while the market is calm has kept underperforming. A stock that panics in a market-wide selloff has rebounded with the market. The dashboard does not distinguish the two.</p>
+  <p><strong>Context matters more than the score.</strong> A stock that panics while the market is calm has kept underperforming. A stock that panics in a market-wide selloff has rebounded with the market. The dashboard did not distinguish the two.</p>
+  <p><strong>Phases 5–7 tested fixes on a 2018–2026 holdout the design never touched.</strong> After costs, beta and a point-in-time S&amp;P 500, nothing tradable is left of panic. Two replacements did hold up:</p>
+  <ul>
+    <li>A calibrated drop-risk forecast that clearly beats panic as a risk gauge.</li>
+    <li>A risk-adjusted rank that roughly triples panic’s power on beta-adjusted returns, though it still cannot say which stock will beat SPY.</li>
+  </ul>
+  <p>The misleading labels are gone, and every signal now carries a live track record.</p>
   {scorecard}
 </section>
+{report_phases.V3_CHANGES}
 
 <section id="index">
   <h2>Index capitulation ladder</h2>
@@ -712,6 +720,8 @@ def build() -> str:
   </ol>
 </section>
 
+{phases_html}
+
 {plan}
 
 <section id="method">
@@ -722,10 +732,10 @@ def build() -> str:
     <li><strong>Outcomes.</strong> Entry at the next session’s close, because the dashboard updates overnight. Next-open and same-close entries were also computed and change nothing material. Stock averages use log returns to keep a few multi-baggers and bad prints from dominating.</li>
     <li><strong>Inference.</strong> Newey-West errors with lags equal to the horizon for overlapping windows; bootstrap by calendar month for events, because a crash month produces hundreds of simultaneous signals that are really one observation; circular-shift nulls and Benjamini-Hochberg for per-stock tests.</li>
     <li><strong>Survivorship.</strong> The universe is today’s dashboard, so companies that failed are missing. That flatters “buy the fear” results. The positive stock-level effects here are upper bounds, and the index results, which have no survivorship problem, are the cleaner test.</li>
-    <li><strong>Selection.</strong> Many names were added to the dashboard after a large move. Pre-2000 data for small and foreign listings is thinner and noisier. Excess returns are measured against SPY, not beta-adjusted.</li>
+    <li><strong>Selection.</strong> Many names were added to the dashboard after a large move. Pre-2000 data for small and foreign listings is thinner and noisier. Phase 5 repeats the key tests with beta-adjusted returns and on the point-in-time S&amp;P 500.</li>
   </ul>
 </section>
-<footer class="foot">Replay and analysis code (<code>fear_vec.py</code>, <code>index_replay.py</code>, <code>stock_stage1–4.py</code>, <code>report.py</code>) is kept with the study files and can be committed to the repository’s research folder. No ThetaData or IB Gateway access was used; all prices came from the public Yahoo endpoint the dashboard already uses.</footer>
+<footer class="foot">Code and results: <code>_system/research/technical_signal_study/</code> (replay, stages 1–4, phases 5–7, report). Production: <code>build_technical_signals.py</code> (v3), <code>technical_model_v3.json</code>, <code>build_signal_track_record.py</code>. No ThetaData or IB Gateway access was used; all prices came from the public Yahoo endpoint the dashboard already uses.</footer>
 </main>
 <div id="tip" role="tooltip" hidden></div>
 <script>{JS}</script>
@@ -735,7 +745,7 @@ def build() -> str:
 
 PLAN_HTML = """<section id="plan">
   <h2>The study plan</h2>
-  <p>Phases 1 to 4 were run for this report. Phases 5 to 7 are what it would take to make the conclusions decision-grade and keep them current.</p>
+  <p>All seven phases have been run. Phase 5’s survivorship test used the closest free substitute, a point-in-time S&amp;P 500 plus a failure bound. The loader for licensed dead-company data is ready.</p>
   <ol class="phases">
     <li><h3>Pre-register the questions</h3>
       <p>Write down what each label claims before looking at outcomes. Fix three primary endpoints:</p>
@@ -769,19 +779,19 @@ PLAN_HTML = """<section id="plan">
       <p class="status done">Done · this report</p></li>
     <li><h3>Remove survivorship and beta</h3>
       <p>Replicate the stock results on a point-in-time universe that includes delisted companies. That requires a vendor with dead-company history (CRSP, Norgate or Sharadar); Yahoo drops them. Measure excess returns against a beta-matched benchmark, and net out realistic trading costs.</p>
-      <p class="status todo">Next · needs a licensed data source</p></li>
+      <p class="status done">Done · point-in-time S&amp;P 500, failure bound, beta and costs; vendor loader ready for licensed delisted data</p></li>
     <li><h3>Track every published signal forward</h3>
       <p>Log each nightly score and ladder state as it is published, and grade it when its 21-, 63- and 252-session outcomes mature. This is the only true out-of-sample test. It also catches drift between the live job and this replay, such as missed runs, data revisions or code changes. Show the running record on the dashboard beside the signal.</p>
-      <p class="status todo">Next · small nightly job, no new data needed</p></li>
+      <p class="status done">Done · nightly ledger and grading in the technicals job, record shown on the dashboard</p></li>
     <li><h3>Recalibrate, with a holdout</h3>
-      <p>Only after phases 5–6:</p>
+      <p>Designed on 1990–2009, chosen on 2010–17, reported on 2018–26:</p>
       <ul>
         <li>Gate “stabilizing” on real stress.</li>
         <li>Shorten or drop the daily-bar dwell for the exhaustion rungs.</li>
         <li>Show market context next to each stock’s panic.</li>
         <li>Re-test any change walk-forward on a held-out period before it reaches the page.</li>
       </ul>
-      <p class="status todo">Later · decision rules below</p></li>
+      <p class="status done">Done · technical-fear-v3: descriptive labels, calibrated risk, risk-adjusted rank; ladder unchanged (no variant validated)</p></li>
   </ol>
   <h3>Decision rules</h3>
   <ul class="rules">

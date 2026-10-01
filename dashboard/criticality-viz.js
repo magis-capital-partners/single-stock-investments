@@ -543,12 +543,27 @@
     };
   }
 
+  // Only the intraday forced-flow monitor is "live". The nightly D1 seed also
+  // writes an SPY flow row from the per-stock fear model
+  // (technical_summary market_context, model "capitulation-v1"), whose states
+  // are a different vocabulary; before this guard that row was rendered here as
+  // the LIVE ladder. A live row must come from the intraday model and be fresh.
+  const LIVE_FLOW_MODEL = /^forced-flow-intraday/;
+  const LIVE_FLOW_MAX_AGE_MS = 2 * 86400000;
+
+  function isLiveFlowRow(row, now = Date.now()) {
+    if (!row || !(row.state || row.scores)) return false;
+    if (!LIVE_FLOW_MODEL.test(String(row.model_version || ''))) return false;
+    const stamp = Date.parse(String(row.as_of || row.event_time || ''));
+    return Number.isFinite(stamp) && now - stamp >= 0 && now - stamp < LIVE_FLOW_MAX_AGE_MS;
+  }
+
   // Prefer a live intraday flow snapshot if one is actually attached to the
   // criticality payload; otherwise fall back to the always-on daily model.
   // Daily is never presented as live.
   function resolveCapitulation(capitulation, payload, details) {
     const { spy } = resolveReading(payload);
-    const liveRow = spy && spy.flow && (spy.flow.state || spy.flow.scores) ? spy.flow : null;
+    const liveRow = spy && isLiveFlowRow(spy.flow) ? spy.flow : null;
     if (liveRow) {
       const market = normalizeFlowRow(liveRow);
       return {
@@ -719,7 +734,56 @@
     return `<p class="cap-provenance is-daily"><b>DAILY model (live intraday feed unavailable).</b> The same forced-flow model run on daily bars: source ${escapeHtml(String(resolved.source))}, as of ${escapeHtml(asOf)}${resolved.qualityState ? ` (${escapeHtml(String(resolved.qualityState))})` : ''}.${escapeHtml(cover)} This is not an intraday reading and is never presented as one.</p>`;
   }
 
-  function capitulationSection(resolved, escapeHtml) {
+  // What each rung has been followed by: the study's point-in-time replay of
+  // this exact ladder on SPY (1993-2026, holdout 2018-2026) next to the live
+  // record graded nightly by build_signal_track_record.py.
+  function pct(value, digits = 1, signed = true) {
+    const number = finite(value);
+    if (number == null) return '—';
+    const text = `${(number * 100).toFixed(digits)}%`;
+    return signed && number > 0 ? `+${text}` : text;
+  }
+
+  function capTrackRecord(market, trackRecord, escapeHtml) {
+    const backtest = trackRecord?.backtest?.ladder_spy;
+    if (!backtest || !backtest.full) return '';
+    const live = trackRecord?.live?.ladder_spy || {};
+    const recent = backtest.recent || {};
+    const rows = CAP_STATES.map((state, index) => {
+      const full = backtest.full[state.key] || {};
+      const hold = recent[state.key] || {};
+      const lv = live[state.key] || {};
+      const graded = finite(lv.h63?.graded) || 0;
+      return `<tr class="${index === market.stateRank ? 'is-current' : ''}">
+        <th scope="row">${escapeHtml(state.label)}</th>
+        <td>${full.n ? escapeHtml(String(full.n)) : '0'}</td>
+        <td>${full.n ? escapeHtml(pct(full.h63?.mean_return)) : '—'}</td>
+        <td>${full.n ? escapeHtml(pct(full.h63?.hit, 0, false)) : '—'}</td>
+        <td>${full.n ? escapeHtml(pct(full.p_drop5_63d, 0, false)) : '—'}</td>
+        <td>${hold.n ? escapeHtml(pct(hold.h63?.mean_return)) : '—'}</td>
+        <td>${graded ? `${escapeHtml(pct(lv.h63?.mean_return))} <small>n=${escapeHtml(String(graded))}</small>` : '<small>none graded yet</small>'}</td>
+      </tr>`;
+    }).join('');
+    const all = backtest.full.all_days || {};
+    return `<details class="cap-track" open>
+      <summary><span class="criticality-kicker">Track record</span> What each rung has been followed by</summary>
+      <div class="cap-track-wrap"><table class="cap-track-table">
+        <thead><tr><th scope="col">Rung</th><th scope="col">Days since 1993</th><th scope="col">SPY next 63 sessions</th><th scope="col">Up after 63</th><th scope="col">Fell 5%+ first</th><th scope="col">2018–2026</th><th scope="col">Live</th></tr></thead>
+        <tbody>${rows}</tbody>
+      </table></div>
+      <p class="cap-track-note">All days, 1993–2026: SPY averaged ${escapeHtml(pct(all.h63?.mean_return))} over 63 sessions and was up ${escapeHtml(pct(all.h63?.hit, 0, false))} of the time. <b>Stress</b> is the rung that has carried information: it held up out of sample (2007–2026) against days at the same drawdown. The exhaustion rungs rarely fire on daily bars and have not marked bottoms; higher exhaustion readings were followed by slightly lower returns on 22 of 24 indices. Source: point-in-time replay in <code>_system/research/technical_signal_study</code>; live rows are graded nightly.</p>
+    </details>`;
+  }
+
+  function capBreadth(marketContext, escapeHtml) {
+    const internal = marketContext?.internal || {};
+    const breadth = finite(internal.breadth_panic);
+    if (breadth == null) return '';
+    const universe = finite(internal.breadth_universe);
+    return `<p class="cap-breadth"><b>${escapeHtml((breadth * 100).toFixed(0))}%</b> of US dashboard stocks${universe ? ` (${escapeHtml(String(Math.round(universe)))})` : ''} are in panic or worse today. Context only: breadth extremes preceded strong rebounds in 1993–2006 but did not hold up in 2007–2026.</p>`;
+  }
+
+  function capitulationSection(resolved, escapeHtml, options = {}) {
     if (!resolved || !resolved.market) {
       return `<section class="cap-panel"><div class="cap-panel-head"><div>
           <span class="criticality-kicker">Forced-flow capitulation · research only</span>
@@ -749,6 +813,8 @@
         ${capConfirmations(market, escapeHtml)}
         ${capDrawdown(market, escapeHtml)}
       </div>
+      ${capBreadth(options.marketContext, escapeHtml)}
+      ${capTrackRecord(market, options.trackRecord, escapeHtml)}
       <div class="cap-sectors">
         <div class="cap-checks-head"><span class="criticality-kicker">Sector capitulation map</span>
           <strong>ranked by ladder state, then panic</strong></div>
@@ -960,7 +1026,7 @@
     return `<div class="risk-view-head"><div><span class="criticality-kicker">Systemic risk lab · research only</span><h2>Criticality &amp; forced-flow capitulation</h2>
       <p>Tracks unstable price regimes and how far into capitulation a selloff has progressed. Signals are descriptive—not automatic trade instructions.</p></div>
       <div class="risk-live-state"><span class="risk-status-dot ${status === 'operational' ? 'is-live' : ''}"></span><strong>${escapeHtml(status.replace(/_/g, ' '))}</strong><small>${escapeHtml(receivedFresh.label)}</small></div></div>
-      ${capitulationSection(resolved, escapeHtml)}
+      ${capitulationSection(resolved, escapeHtml, options)}
       ${render(payload, { ...options, open: true, expandSectors: true })}
       ${componentStack(payload, escapeHtml)}
       <div class="risk-grid">
@@ -972,12 +1038,12 @@
           <div><dt>Open alerts</dt><dd>${whole(health.alerts?.open_count)}</dd></div></dl></section>
         ${alertJournal(alerts, escapeHtml)}
       </div>
-      <section class="risk-method"><h3>Interpretation guardrails</h3><p><strong>Criticality</strong> asks whether price dynamics resemble an unstable LPPLS regime. <strong>Pressure</strong> estimates mechanical stress consistent with volatility-sensitive deleveraging. <strong>Exhaustion</strong> requires stabilization evidence and persistence, and is only a capitulation reading once the ladder has reached its stress threshold — below that the score describes ordinary bar mechanics and is shown struck through. A critical time is a probability window, not a scheduled crash; all outputs remain research-only until shadow validation establishes calibration and false-positive behavior.</p></section>`;
+      <section class="risk-method"><h3>Interpretation guardrails</h3><p><strong>Criticality</strong> asks whether price dynamics resemble an unstable LPPLS regime. <strong>Pressure</strong> estimates mechanical stress consistent with volatility-sensitive deleveraging. <strong>Exhaustion</strong> requires stabilization evidence and persistence, and is only a capitulation reading once the ladder has reached its stress threshold — below that the score describes ordinary bar mechanics and is shown struck through. A point-in-time replay back to 1962 found that the stress rung has carried information but the exhaustion rungs have not marked bottoms, so read exhaustion as a description of the latest bar, not a buy signal. A critical time is a probability window, not a scheduled crash; all outputs remain research-only until shadow validation establishes calibration and false-positive behavior.</p></section>`;
   }
 
   global.CriticalityViz = {
     directionMeta, freshness, render, renderRiskView, renderRegimeVerdict,
     resolveCapitulation, composeVerdict, composeTrustLine, capitulationSection,
-    CAP_STATES, CONFIRMATION_LABELS,
+    isLiveFlowRow, CAP_STATES, CONFIRMATION_LABELS,
   };
 })(window);

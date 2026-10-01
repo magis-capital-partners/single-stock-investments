@@ -384,6 +384,31 @@
   .cap-na { color: var(--text-muted); font: 11px 'DM Sans', sans-serif; }
   .cap-sector-note { margin-top: 7px; color: var(--text-muted); font-size: 11px; }
   .cap-empty { padding: 14px; color: var(--text-muted); font-size: 11px; text-align: center; }
+  /* Signal track record (technical-signal study, phase 6) */
+  .cap-breadth { margin-top: 10px; color: var(--text-secondary); font-size: 11px; line-height: 1.6; }
+  .cap-breadth b { color: var(--text-primary); }
+  .cap-track { margin-top: 12px; padding: 8px 10px; border: 1px solid var(--border); }
+  .cap-track summary { cursor: pointer; color: var(--text-primary); font-size: 12px; }
+  .cap-track-wrap { overflow-x: auto; margin-top: 8px; }
+  .cap-track-table { width: 100%; border-collapse: collapse; font-size: 11px; font-variant-numeric: tabular-nums; }
+  .cap-track-table th, .cap-track-table td { padding: 5px 8px; border-bottom: 1px solid var(--border); text-align: right; white-space: nowrap; }
+  .cap-track-table th[scope="row"], .cap-track-table thead th:first-child { text-align: left; }
+  .cap-track-table thead th { color: var(--text-muted); font-size: 10px; font-weight: 600; letter-spacing: .4px; text-transform: uppercase; }
+  .cap-track-table tr.is-current th, .cap-track-table tr.is-current td { color: var(--text-primary); background: rgba(59,130,246,.08); }
+  .cap-track-table small { color: var(--text-muted); }
+  .cap-track-note { margin-top: 8px; color: var(--text-muted); font-size: 11px; line-height: 1.6; }
+  .technical-outlook { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); margin: 0 0 12px; border: 1px solid var(--border); }
+  .technical-outlook > div { min-width: 0; padding: 10px 12px; border-right: 1px solid var(--border); }
+  .technical-outlook > div:last-child { border-right: 0; }
+  .technical-outlook span { display: block; color: var(--text-muted); font-size: 10px; letter-spacing: .5px; text-transform: uppercase; }
+  .technical-outlook strong { display: block; margin-top: 3px; color: var(--text-primary); font-size: 15px; }
+  .technical-outlook small { display: block; margin-top: 3px; color: var(--text-secondary); font-size: 10.5px; line-height: 1.5; }
+  .technical-record { margin: 0 0 12px; padding: 9px 12px; border-left: 2px solid var(--border-active); background: rgba(10,14,23,.6); color: var(--text-secondary); font-size: 11px; line-height: 1.6; }
+  .technical-record b { color: var(--text-primary); }
+  @media (max-width: 900px) {
+    .technical-outlook { grid-template-columns: minmax(0, 1fr); }
+    .technical-outlook > div { border-right: 0; border-bottom: 1px solid var(--border); }
+  }
   .risk-dead-note { margin-top: 8px; color: var(--text-muted); font-size: 11px; line-height: 1.6; }
   @media (max-width: 1100px) {
     .cap-ladder { grid-template-columns: repeat(2, minmax(0, 1fr)); }
@@ -1883,10 +1908,10 @@
 <script src="search-match.js"></script>
 <script src="insights-viz.js?v=20260908-aggregates-theme"></script>
 <script src="valuation-viz.js"></script>
-<script src="criticality-viz.js"></script>
+<script src="criticality-viz.js?v=20261001-signal-study"></script>
 <script src="vol-viz.js"></script>
-<script src="technical-viz.js"></script>
-<script src="technical-picture-viz.js"></script>
+<script src="technical-viz.js?v=20261001-signal-study"></script>
+<script src="technical-picture-viz.js?v=20261001-signal-study"></script>
 <script src="index-viz.js"></script>
 <script src="activist-viz.js?v=20260819-dashboard-rebuild"></script>
 <script src="short-alpha-viz.js"></script>
@@ -1988,6 +2013,8 @@ const HOLDINGS_COLUMNS = [
   { id: 'technical_trend', label: 'Panic', sort: 'technicals.capitulation.scores.panic', group: 'technical' },
   { id: 'technical_stretch', label: 'Exhaustion', sort: 'technicals.capitulation.scores.exhaustion', group: 'technical' },
   { id: 'technical_relative', label: 'Pressure', sort: 'technicals.capitulation.scores.pressure', group: 'technical' },
+  { id: 'technical_rebound', label: 'Risk-adj. rank', sort: 'technicals.outlook.rebound.score', group: 'technical' },
+  { id: 'technical_drop_risk', label: 'Drop risk', sort: 'technicals.outlook.risk.p_drop15_63d', group: 'technical' },
   { id: 'market', label: 'Market', sort: 'market', group: 'ops' },
   { id: 'sleeve', label: 'Sleeve', sort: 'classification.investment_sleeve_label', group: 'ops' },
   { id: 'value', label: 'Value range', sort: 'component_valuation.total_equity_value_per_share.base', group: 'ops' },
@@ -3279,6 +3306,13 @@ async function load() {
     } catch (_) {
       // Technicals are a supplemental overlay; the fundamental dashboard remains usable.
     }
+    try {
+      // Every published technical signal, graded as its horizons mature, next to
+      // the study's backtest expectation (build_signal_track_record.py).
+      data.signal_track_record = await fetchShardJson('data/signal_track_record.json');
+    } catch (_) {
+      data.signal_track_record = null;
+    }
   } catch {
     // Older build without shards: fall back to the monolithic payload.
     const res = await fetch('data/dashboard_data.json?' + Date.now());
@@ -3396,6 +3430,7 @@ function renderMarketRiskView() {
   const riskOptions = {
     escapeHtml,
     marketContext: data.technical_signals_ref?.market_context || {},
+    trackRecord: data.signal_track_record || null,
     capitulation: data.capitulation || null,
     volLatest: data.vol_metrics || null,
     payload: data.market_risk,
@@ -5440,6 +5475,10 @@ function renderHoldingsCell(colId, t) {
       return `<td>${window.TechnicalViz ? TechnicalViz.renderScoreCell(t, 'exhaustion') : '—'}</td>`;
     case 'technical_relative':
       return `<td>${window.TechnicalViz ? TechnicalViz.renderScoreCell(t, 'pressure') : '—'}</td>`;
+    case 'technical_rebound':
+      return `<td>${window.TechnicalViz && TechnicalViz.renderOutlookCell ? TechnicalViz.renderOutlookCell(t, 'rebound') : '—'}</td>`;
+    case 'technical_drop_risk':
+      return `<td>${window.TechnicalViz && TechnicalViz.renderOutlookCell ? TechnicalViz.renderOutlookCell(t, 'risk') : '—'}</td>`;
     case 'next_action':
       return `<td class="decision-action-cell">${renderNextActionCell(t)}</td>`;
     case 'route_method':
@@ -5812,6 +5851,7 @@ function selectTicker(ticker, opts = {}) {
     ${window.TechnicalViz ? TechnicalViz.renderPanel(t, {
       escapeHtml,
       marketContext: data.technical_signals_ref?.market_context || {},
+      trackRecord: data.signal_track_record || null,
     }) : ''}
 
     ${identityLine}

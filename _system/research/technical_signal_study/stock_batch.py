@@ -8,7 +8,6 @@ inputs are production-identical from ~1996-05 onward; earlier rows are flagged
 from __future__ import annotations
 
 import json
-import os
 import sys
 import time
 from multiprocessing import Pool
@@ -132,8 +131,9 @@ def run(symbol: str) -> tuple[str, int, float, str | None]:
         return symbol, 0, time.time() - t0, repr(exc)[:300]
 
 
-def main(workers: int = 2) -> int:
-    symbols = [s for s, m in MANIFEST.items() if m.get("kind") == "stock" and not m.get("error")]
+def main(workers: int = 2, kinds: str = "stock") -> int:
+    wanted = {k.strip() for k in kinds.split(",") if k.strip()}
+    symbols = [s for s, m in MANIFEST.items() if m.get("kind") in wanted and not m.get("error")]
     symbols.sort(key=lambda s: -MANIFEST[s].get("rows", 0))
     print(f"{len(symbols)} stocks, workers={workers}", flush=True)
     errors = {}
@@ -152,4 +152,4 @@ def main(workers: int = 2) -> int:
 
 
 if __name__ == "__main__":
-    raise SystemExit(main(int(sys.argv[1]) if len(sys.argv) > 1 else 2))
+    raise SystemExit(main(int(sys.argv[1]) if len(sys.argv) > 1 else 2, sys.argv[2] if len(sys.argv) > 2 else "stock"))
