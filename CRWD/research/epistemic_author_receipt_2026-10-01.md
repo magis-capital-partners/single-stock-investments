@@ -1,8 +1,7 @@
 # CRWD — epistemic author forecast receipt (2026-10-01)
 
 **Work ID:** `02ac4e724d95c942f9030caa`  
-**Task:** `author_forecast` / `operating_business_and_net_assets` / `owner_earnings_reinvestment_dcf`  
-**Evidence hash / input SHA:** see ticker research agent manifest and draft `author_receipt`.
+**Task:** `author_forecast` / `operating_business_and_net_assets` / `owner_earnings_reinvestment_dcf`
 
 ## Facts
 
