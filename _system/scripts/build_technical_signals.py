@@ -3,6 +3,29 @@
 
 The signal is deliberately an execution/risk overlay. It never changes valuation
 readiness, stance, or evidence status.
+
+technical-fear-v3 (2026-10) follows the point-in-time study in
+_system/research/technical_signal_study/ (results/report.html):
+
+* panic / pressure / exhaustion are unchanged. They measure how unusual a
+  selloff is for the stock, but the study found they carry almost no timing
+  information (63-session IC ~0.02, about zero since 2020).
+* setup phases are descriptive. "falling_knife" and "stabilizing" are retired:
+  "stabilizing" labelled half of all days and matched the baseline exactly,
+  and "falling knife" days did better afterwards than "stabilizing" days. A
+  stock in panic is now a market-driven or a company-specific selloff, split
+  by the beta decomposition of its 20-session move.
+* outlook.risk: calibrated next-month volatility and the probability of a
+  further 15% drop within 63 sessions. Frozen coefficients from
+  technical_model_v3.json, fit 1990-2017. Holdout 2018-2026: vol R2 0.54
+  (realized vol alone 0.47, panic alone 0.02); drop AUC 0.66 (panic 0.52).
+* outlook.rebound: a risk-adjusted rank for US stocks, from a ridge on the
+  model's own components plus market context. Holdout 2018-2026 IC with
+  next-month beta-adjusted return 0.039-0.045 (panic 0.018), and the
+  top-minus-bottom decile was ~1.4%/month on that basis before costs. It leans
+  to lower-beta names and does NOT predict raw outperformance of SPY (holdout
+  IC ~0.01, t 0.8). It is a ranking aid, not a trading system: the estimated
+  round-trip cost of trading it is about the same size.
 """
 from __future__ import annotations
 
@@ -48,8 +71,15 @@ MARKET_STRUCTURE_HISTORY_INPUT = (
     / "fundamentals"
     / "market_structure_history.json"
 )
+MODEL_CONFIG = SCRIPTS / "technical_model_v3.json"
 USER_AGENT = "Mozilla/5.0 (compatible; MagisTechnicalResearch/1.0)"
-MODEL_VERSION = "technical-fear-v2"
+MODEL_VERSION = "technical-fear-v3"
+# capitulation states that count as "in panic" for phases, breadth and outlook
+PANIC_STATES = {"panic", "capitulation_candidate", "exhaustion_emerging", "confirmed_exhaustion"}
+STATE_CODES = {
+    "normal": 0, "stress_building": 1, "panic": 2,
+    "capitulation_candidate": 3, "exhaustion_emerging": 4, "confirmed_exhaustion": 5,
+}
 TRADING_DAYS = 252
 LOOKBACK_DAYS = 365 * 5 + 30
 BENCHMARKS = {
@@ -371,11 +401,101 @@ def _atr_percent_20(rows: list[dict]) -> float | None:
     return sum(true_ranges) / len(true_ranges) / close
 
 
+# --- v3 context features --------------------------------------------------
+# Each mirrors a column of the study's point-in-time panel
+# (_system/research/technical_signal_study/phase5_panel.py); the frozen
+# outlook coefficients were fit on exactly these definitions.
+
+def _aligned_benchmark_closes(rows: list[dict], benchmark_rows: list[dict] | None) -> list[float | None]:
+    """Benchmark close on each stock date, carried forward over benchmark gaps."""
+    if not benchmark_rows:
+        return [None] * len(rows)
+    bench = {row["date"]: _finite(row.get("close")) for row in benchmark_rows}
+    out: list[float | None] = []
+    last = None
+    for row in rows:
+        value = bench.get(row["date"])
+        if value is not None and value > 0:
+            last = value
+        out.append(last)
+    return out
+
+
+def _beta_252(closes: list[float], bench: list[float | None]) -> float | None:
+    """OLS beta of daily log returns over the last 252 sessions (>= 126 pairs), clipped to [-1, 4]."""
+    pairs = []
+    start = max(1, len(closes) - 252)
+    for index in range(start, len(closes)):
+        before, after = bench[index - 1], bench[index]
+        if before and after and before > 0 and after > 0 and closes[index - 1] > 0 and closes[index] > 0:
+            pairs.append((math.log(closes[index] / closes[index - 1]), math.log(after / before)))
+    if len(pairs) < 126:
+        return None
+    stock = [p[0] for p in pairs]
+    market = [p[1] for p in pairs]
+    mean_s = statistics.fmean(stock)
+    mean_m = statistics.fmean(market)
+    cov = sum((s - mean_s) * (m - mean_m) for s, m in pairs) / (len(pairs) - 1)
+    var = sum((m - mean_m) ** 2 for m in market) / (len(pairs) - 1)
+    if var <= 1e-12:
+        return None
+    return max(-1.0, min(4.0, cov / var))
+
+
+def _log_change(values: list[float | None], window: int) -> float | None:
+    if len(values) <= window:
+        return None
+    before, after = values[-1 - window], values[-1]
+    if not before or not after or before <= 0 or after <= 0:
+        return None
+    return math.log(after / before)
+
+
+def _abdi_ranaldo_spread(rows: list[dict]) -> float | None:
+    """Abdi-Ranaldo (2017) close-high-low effective spread: 21-session mean, >= 10 obs, floored at 0."""
+    products = []
+    for prior, row in zip(rows[-22:-1], rows[-21:]):
+        try:
+            c_prev = math.log(float(prior["close"]))
+            eta_prev = (math.log(float(prior["high"])) + math.log(float(prior["low"]))) / 2.0
+            eta_now = (math.log(float(row["high"])) + math.log(float(row["low"]))) / 2.0
+        except (TypeError, ValueError, KeyError):
+            continue
+        products.append((c_prev - eta_prev) * (c_prev - eta_now))
+    if len(products) < 10:
+        return None
+    return math.sqrt(max(0.0, 4.0 * statistics.fmean(products)))
+
+
+def _log_dollar_volume_20(rows: list[dict]) -> float | None:
+    values = []
+    for row in rows[-20:]:
+        volume = _finite(row.get("volume"))
+        close = _finite(row.get("close"))
+        if volume and volume > 0 and close and close > 0:
+            values.append(volume * close)
+    if len(values) < 10:
+        return None
+    return math.log(statistics.fmean(values))
+
+
+def _selloff_type(company_20d: float | None, market_20d: float | None) -> str | None:
+    """Which part of the 20-session move dominates: market-driven or company-specific."""
+    if company_20d is None or market_20d is None:
+        return None
+    if market_20d < 0 and abs(market_20d) >= abs(company_20d):
+        return "market_driven"
+    if company_20d < 0:
+        return "company_specific"
+    return "mixed"
+
+
 def _technical_setup(
     rows: list[dict],
     *,
     relative_return_60d_pct: float | None,
     capitulation: dict,
+    selloff_type: str | None = None,
 ) -> dict:
     closes = [float(row["close"]) for row in rows]
     volumes = [_finite(row.get("volume")) for row in rows]
@@ -438,14 +558,15 @@ def _technical_setup(
         participation = "mixed"
         participation_label = "Mixed participation"
 
+    # v3: descriptive phases only. The study retired "falling_knife" and
+    # "stabilizing" -- neither sorted forward returns the way its name claimed.
     fear_state = str(capitulation.get("state") or "not_scored")
-    exhaustion = _finite((capitulation.get("scores") or {}).get("exhaustion")) or 0.0
-    if fear_state in {"panic", "capitulation_candidate"} and exhaustion < 40:
-        phase = "falling_knife"
-        phase_label = "Falling knife"
-    elif fear_state in {"exhaustion_emerging", "confirmed_exhaustion"} or exhaustion >= 40:
-        phase = "stabilizing"
-        phase_label = "Stabilizing after stress"
+    if fear_state in PANIC_STATES and selloff_type == "market_driven":
+        phase = "market_selloff"
+        phase_label = "Market-driven selloff"
+    elif fear_state in PANIC_STATES:
+        phase = "company_selloff"
+        phase_label = "Company-specific selloff"
     elif direction == "leading_uptrend":
         phase = "trend_intact"
         phase_label = "Trend intact"
@@ -475,7 +596,7 @@ def _technical_setup(
         },
         "explainers": {
             "direction": "Price versus its 50- and 200-day averages, checked against 60-day SPY-relative performance.",
-            "pressure": "RSI identifies momentum pressure; the capitulation model still requires stabilization before calling a bottom.",
+            "pressure": "RSI and the fear scores describe how stretched the selloff is; since 1962 they have predicted volatility, not the bottom.",
             "participation": "Chaikin Money Flow and relative volume show whether volume confirms accumulation or distribution.",
         },
     }
@@ -723,12 +844,17 @@ def _capitulation_snapshot(rows: list[dict], relative60_z: float | None) -> dict
     explanations = {
         "normal": "No broad technical fear condition",
         "stress_building": "Persistent weakness, but selling is not climactic",
-        "panic": "Selling pressure is extreme; exhaustion is not established",
+        "panic": "Selling pressure is extreme for this stock; expect higher volatility",
         "capitulation_candidate": "Independent price, volume/range, volatility and relative signals are extreme",
-        "exhaustion_emerging": "Climactic selling is showing early reversal evidence",
-        "confirmed_exhaustion": "Climactic selling plus multiple stabilization signals",
+        "exhaustion_emerging": "Climactic selling followed by an up-day reversal; historically not a better entry than panic itself",
+        "confirmed_exhaustion": "Climactic selling plus several reversal signals; historically not a reliable bottom signal",
     }
     return {
+        "_raw": {  # unrounded internals for the v3 outlook post-pass; stripped before publishing
+            "pressure": pressure, "panic": panic, "exhaustion": exhaustion,
+            "families": dict(families), "percentiles": dict(pct),
+            "close_location": latest["close_location"],
+        },
         "model_version": "capitulation-v1",
         "state": state,
         "interpretation": explanations[state],
@@ -807,11 +933,40 @@ def calculate_snapshot(
     )
     stretch_z = _weighted_z([(distance50_z, 0.55), (distance200_z, 0.45)])
     capitulation = _capitulation_snapshot(rows, relative60_z)
+    # v3 context: point-in-time beta and the market-vs-company split of recent moves
+    bench_closes = _aligned_benchmark_closes(rows, benchmark_rows)
+    beta = _beta_252(closes, bench_closes)
+    beta_used = beta if beta is not None else 1.0  # the study's default when beta is not estimable
+    own5, own20 = _log_change(closes, 5), _log_change(closes, 20)
+    mkt5, mkt20 = _log_change(bench_closes, 5), _log_change(bench_closes, 20)
+    market_5d = beta_used * mkt5 if mkt5 is not None else None
+    market_20d = beta_used * mkt20 if mkt20 is not None else None
+    company_5d = own5 - market_5d if own5 is not None and market_5d is not None else None
+    company_20d = own20 - market_20d if own20 is not None and market_20d is not None else None
+    selloff = _selloff_type(company_20d, market_20d)
+    spread = _abdi_ranaldo_spread(rows)
+    dollar_volume = _log_dollar_volume_20(rows)
+    ret5 = _return(closes, len(closes) - 1, 5)
+    momentum = (
+        closes[-22] / closes[-253] - 1.0 if len(closes) >= 253 and closes[-253] > 0 else None
+    )
     technical_setup = _technical_setup(
         rows,
         relative_return_60d_pct=relative60 * 100 if relative60 is not None else None,
         capitulation=capitulation,
+        selloff_type=selloff,
     )
+    raw = capitulation.get("_raw") or {}
+    model_inputs = {  # unrounded, matching the study panel; stripped before publishing
+        "panic": raw.get("panic"), "pressure": raw.get("pressure"), "exhaustion": raw.get("exhaustion"),
+        **{f"fam_{k}": v for k, v in (raw.get("families") or {}).items()},
+        **{f"pct_{k}": v for k, v in (raw.get("percentiles") or {}).items()},
+        "f_return_5d": ret5, "f_return_20d": ret20, "idio5": company_5d, "idio20": company_20d,
+        "sys5": market_5d, "sys20": market_20d, "mom_12_1": momentum, "f_rv_20d": volatility20,
+        "f_drawdown_252d": drawdown, "f_distance_50d": distance50, "f_volume_log_20d": volume_surprise,
+        "f_close_location": raw.get("close_location"), "rsi14": _rsi_14(closes), "beta": beta_used,
+        "spread": spread, "dvol": dollar_volume,
+    }
     trend_regime, stretch_regime, interpretation = _regimes(trend_z, stretch_z)
     quality = "ready" if len(rows) >= 260 else "limited" if len(rows) >= 120 else "unavailable"
     has_ohlc = all(_finite(rows[-1].get(key)) is not None for key in ("open", "high", "low", "close"))
@@ -866,7 +1021,20 @@ def calculate_snapshot(
             ),
             "drawdown_1y_pct": _round(drawdown * 100 if drawdown is not None else None, 2),
             "volume_vs_20d_log": _round(volume_surprise),
+            "return_5d_pct": _round(ret5 * 100 if ret5 is not None else None, 2),
+            "momentum_12_1_pct": _round(momentum * 100 if momentum is not None else None, 2),
         },
+        "context": {
+            "beta_252d": _round(beta, 2),
+            "market_move_5d_pct": _round(market_5d * 100 if market_5d is not None else None, 2),
+            "company_move_5d_pct": _round(company_5d * 100 if company_5d is not None else None, 2),
+            "market_move_20d_pct": _round(market_20d * 100 if market_20d is not None else None, 2),
+            "company_move_20d_pct": _round(company_20d * 100 if company_20d is not None else None, 2),
+            "selloff_type": selloff,
+            "spread_estimate_pct": _round(spread * 100 if spread is not None else None, 3),
+            "dollar_volume_20d": _round(math.exp(dollar_volume) if dollar_volume is not None else None, 0),
+        },
+        "_model_inputs": model_inputs,
         "regime": {
             "trend": trend_regime,
             "stretch": stretch_regime,
@@ -1043,6 +1211,138 @@ def _market_structure_snapshot(
     }
 
 
+def _load_model_config(path: Path | None = None) -> dict | None:
+    try:
+        return json.loads((path or MODEL_CONFIG).read_text(encoding="utf-8"))
+    except (OSError, json.JSONDecodeError):
+        return None
+
+
+def _percentile_ranks(values: list[float | None]) -> list[float | None]:
+    """pandas rank(pct=True) with average ties, minus 0.5; missing stays None."""
+    indexed = sorted((float(v), i) for i, v in enumerate(values) if _finite(v) is not None)
+    n = len(indexed)
+    out: list[float | None] = [None] * len(values)
+    k = 0
+    while k < n:
+        j = k
+        while j + 1 < n and indexed[j + 1][0] == indexed[k][0]:
+            j += 1
+        average_rank = (k + j) / 2.0 + 1.0
+        for m in range(k, j + 1):
+            out[indexed[m][1]] = average_rank / n - 0.5
+        k = j + 1
+    return out
+
+
+def _risk_features(x: dict, spy_panic: float) -> dict | None:
+    values = {
+        "log_rv20": math.log(max(x["f_rv_20d"], 0.02)) if _finite(x.get("f_rv_20d")) is not None else None,
+        "panic": x["panic"] / 100.0 if _finite(x.get("panic")) is not None else None,
+        "pressure": x["pressure"] / 100.0 if _finite(x.get("pressure")) is not None else None,
+        "vol_stress": x["fam_volatility_stress"] / 100.0 if _finite(x.get("fam_volatility_stress")) is not None else None,
+        "climax": x["fam_selling_climax"] / 100.0 if _finite(x.get("fam_selling_climax")) is not None else None,
+        "dd252": _finite(x.get("f_drawdown_252d")),
+        "beta": _finite(x.get("beta")),
+        "spy_panic": spy_panic / 100.0,
+        "beta_x_spy": x["beta"] * spy_panic / 100.0 if _finite(x.get("beta")) is not None else None,
+        "log_spread": math.log(max(x["spread"], 1e-4)) if _finite(x.get("spread")) is not None else None,
+        "dvol": x["dvol"] / 20.0 if _finite(x.get("dvol")) is not None else None,
+    }
+    return None if any(v is None for v in values.values()) else values
+
+
+def _linear(cfg: dict, features: dict) -> float:
+    return float(cfg["intercept"]) + sum(float(c) * features[k] for k, c in cfg["coef"].items())
+
+
+def apply_outlook(current: dict[str, dict], market_context: dict, config: dict | None = None) -> dict:
+    """v3 post-pass: calibrated risk for every stock, rebound score across US stocks.
+
+    Needs the whole universe at once (breadth and cross-sectional ranks), so it
+    runs after every snapshot is built. Coefficients are frozen in
+    technical_model_v3.json; see the study's phase7_stock.py.
+    """
+    config = config if config is not None else _load_model_config()
+    internal = market_context.get("internal") if isinstance(market_context.get("internal"), dict) else None
+    spy_panic = _finite(((internal or {}).get("scores") or {}).get("panic"))
+    spy_state = STATE_CODES.get(str((internal or {}).get("state") or ""))
+    # preserved / migrated snapshots (fetch failures, delisted names) are stale: never score or rank them
+    inputs = {t: row["_model_inputs"] for t, row in current.items()
+              if isinstance(row.get("_model_inputs"), dict) and not row.get("fetch_status")}
+    # the study ranked only stocks with a full 3-year percentile window (756 sessions)
+    us = sorted(t for t in inputs if current[t].get("benchmark") == "SPY"
+                and int(current[t].get("observation_count") or 0) >= 756)
+    breadth = (
+        sum(str((current[t].get("capitulation") or {}).get("state") or "") in PANIC_STATES for t in us) / len(us)
+        if us else None
+    )
+    if internal is not None:
+        internal["breadth_panic"] = _round(breadth, 4)
+        internal["breadth_universe"] = len(us)
+    meta = {"model": "outlook-v1", "config": MODEL_CONFIG.name, "breadth_panic": _round(breadth, 4),
+            "us_universe": len(us), "status": "ready",
+            "explainers": {
+                "risk": "Calibrated on 1990-2017; holdout 2018-2026 AUC 0.66 for a further 15% drop (panic alone 0.52).",
+                "rebound": ("Risk-adjusted rank among US dashboard stocks: expected next-month return after removing each "
+                            "stock's market (beta) component. Holdout 2018-2026: top tenth beat bottom tenth by ~1.4% a month on "
+                            "that basis before ~1.2% round-trip costs. It leans to lower-beta, steadier names and does not "
+                            "predict beating SPY in a rising market (raw SPY-relative IC ~0.01, not significant)."),
+                "context": "Recent moves split into the beta-explained (market) part and the rest (company).",
+            }}
+    if not config or spy_panic is None or spy_state is None or breadth is None:
+        meta["status"] = "unavailable"
+        return meta
+    meta["trained_on"] = config.get("trained_on")
+    # calibrated risk -- every stock with complete inputs
+    risk_count = 0
+    for ticker, x in inputs.items():
+        features = _risk_features(x, spy_panic)
+        if features is None:
+            continue
+        vol = math.exp(_linear(config["vol21"], features))
+        z = _linear(config["drop15_63d"], features)
+        p = 1.0 / (1.0 + math.exp(-max(-30.0, min(30.0, z))))
+        band = "low" if p < 0.10 else "normal" if p < 0.20 else "elevated" if p < 0.35 else "high"
+        current[ticker].setdefault("outlook", {})["risk"] = {
+            "expected_vol_21d_pct": _round(vol * 100, 1),
+            "p_drop15_63d": _round(p, 3),
+            "band": band,
+        }
+        risk_count += 1
+    # rebound score -- US cross-section
+    reb = config["rebound21"]
+    stock_features = reb["transform"]["stock_features"]
+    ranks = {f: _percentile_ranks([inputs[t].get(f) for t in us]) for f in stock_features}
+    sp = (spy_panic - 50.0) / 25.0
+    ss = spy_state / 5.0
+    raws = []
+    for i, _ticker in enumerate(us):
+        x = {f: (ranks[f][i] if ranks[f][i] is not None else 0.0) for f in stock_features}
+        x.update({"spy_panic": sp, "spy_state": ss, "breadth_panic": breadth,
+                  "panic_x_spy": x["panic"] * sp, "idio20_x_spy": x["idio20"] * sp, "panic_x_breadth": x["panic"] * breadth})
+        raws.append(_linear(reb, x))
+    pct = _percentile_ranks(raws)
+    for i, ticker in enumerate(us):
+        score = (pct[i] + 0.5) * 100.0 if pct[i] is not None else None
+        current[ticker].setdefault("outlook", {})["rebound"] = {
+            "score": _round(score, 1),
+            "raw": _round(raws[i], 5),
+            "universe": len(us),
+        }
+    meta["risk_scored"] = risk_count
+    meta["rebound_scored"] = len(us)
+    return meta
+
+
+def strip_private(row: dict) -> None:
+    """Drop the unrounded model inputs before a snapshot is published."""
+    row.pop("_model_inputs", None)
+    capitulation = row.get("capitulation")
+    if isinstance(capitulation, dict):
+        capitulation.pop("_raw", None)
+
+
 def build(*, limit: int = 0, workers: int = 12, tickers: set[str] | None = None) -> dict:
     prior = {}
     if OUTPUT.exists():
@@ -1169,6 +1469,9 @@ def build(*, limit: int = 0, workers: int = 12, tickers: set[str] | None = None)
             }
         except Exception as exc:
             market_context["internal_error"] = str(exc)[:240]
+    outlook_meta = apply_outlook(current, market_context)
+    for row in current.values():
+        strip_private(row)
     payload = {
         "generated_at": generated_at,
         "model_version": MODEL_VERSION,
@@ -1199,6 +1502,8 @@ def build(*, limit: int = 0, workers: int = 12, tickers: set[str] | None = None)
             },
             "stretch_weights": {"distance_50d_z": 0.55, "distance_200d_z": 0.45},
             "z_clip": 4.0,
+            "outlook": outlook_meta,
+            "study": "_system/research/technical_signal_study (point-in-time replay 1962-2026; holdout 2018-2026)",
         },
         "summary": {
             "requested": len(registry),

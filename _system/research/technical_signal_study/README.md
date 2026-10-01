@@ -46,9 +46,28 @@ The scripts call only the public Yahoo chart endpoint the dashboard already uses
 - **Exclusions:** a stock-day is dropped within ±252 sessions of a one-day move larger than 3×, which catches corrupt split adjustments. Scores are used only once a stock has a full 756-session percentile window.
 - **Inference:** Newey-West errors (lags equal to the horizon) for overlapping windows; bootstrap by calendar month for events; circular-shift nulls plus Benjamini-Hochberg for per-stock tests.
 
+## Phases 5-7
+
+```bash
+python phase5_universe.py      # point-in-time S&P 500 from Wikipedia's dated change log; fetch former members that still trade
+python stock_batch.py 2 pit_extra
+python phase5_panel.py 2       # enriched panel: point-in-time beta, residual returns, market/company split, Abdi-Ranaldo spread, membership
+python phase5_analysis.py      # beta-adjusted tests, PIT S&P 500 tests, failure bound, strategy returns after costs
+python phase7_labels.py        # label tests: train 1990-2009 / validate 2010-17 / holdout 2018-26
+python phase7_stock.py         # risk-adjusted rank and calibrated risk models; writes results/phase7_models.json
+python phase7_rebound_diagnostics.py  # what the rank does and does not predict (beta-adjusted vs raw vs SPY)
+python phase7_ladder.py        # daily-bar dwell variants and capitulation breadth (design 1962-2006, test 2007-2026)
+python expectations.py         # backtest expectations used by the live track record
+python parity_outlook.py 120   # production v3 model inputs vs the study panel (expect ~1e-7 relative error)
+```
+
+- **Survivorship-free data.** `vendor_bars.py` loads a licensed vendor's delisted histories, including CRSP-style delisting returns. `test_vendor_bars.py` checks it on a synthetic bankruptcy.
+- **Production results.** The validated changes ship as technical-fear-v3:
+  - `_system/scripts/build_technical_signals.py`, with frozen coefficients in `_system/scripts/technical_model_v3.json`;
+  - the nightly track record in `_system/scripts/build_signal_track_record.py`, with expectations in `_system/scripts/technical_signal_expectations.json`.
+- **Regenerating after a model change.** Run `phase7_stock.py`, copy `results/phase7_models.json` into `technical_model_v3.json` (a new version if the coefficients change), then run `expectations.py` and `parity_outlook.py`.
+
 ## Known limitations
 
-- **Survivorship:** the universe is today's dashboard, and Yahoo drops delisted histories, so positive "buy the fear" results are upper bounds.
-- **Beta:** excess returns are against SPY, not beta-adjusted.
-
-Both are addressed by the phase 5 work as it lands; see the report's study plan.
+- **Survivorship.** Yahoo drops delisted histories. Phase 5 uses the point-in-time S&P 500 (2007+) and bounds the missing failures, but a full replication needs vendor data (see above).
+- **Short-term data issues.** Some histories carry predecessor companies or corrupt split adjustments; these are screened as described in the report.
