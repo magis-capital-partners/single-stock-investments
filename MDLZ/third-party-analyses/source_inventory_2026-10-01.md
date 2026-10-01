@@ -1,10 +1,11 @@
 # MDLZ — Third-party source inventory
 
 **Date:** 2026-10-01
-**Sources:** 18 total (0 approved, 0 pending, 18 context)
+**Sources:** 19 total (0 approved, 0 pending, 19 context)
 
 | ID | Title | Path | Status | Use |
 |----|-------|------|--------|-----|
+| vic | 02-Mondelez_428d | `MDLZ/third-party-analyses/vic/02-Mondelez_428d.pdf` | context | Value Investors Club (licensed corpus; variant view, not base IRR) |
 | activist_long | The Carlyle Group — DEFA14A | `MDLZ/third-party-analyses/activist_reports/long/DEFA14A_20250502_acc0001103982_25_000134.htm` | context | activist/long — sec_edgar |
 | activist_long | PX14A6G · MDLZ · 2025-04-29 | `MDLZ/third-party-analyses/activist_reports/long/PX14A6G_20250429_acc0001096906_25_000621.htm` | context | activist/long — sec_edgar |
 | activist_long | The Carlyle Group — DEFA14A | `MDLZ/third-party-analyses/activist_reports/long/DEFA14A_20240429_acc0001193125_24_120654.htm` | context | activist/long — sec_edgar |
