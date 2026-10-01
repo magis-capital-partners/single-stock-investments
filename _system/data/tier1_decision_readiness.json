@@ -1,6 +1,6 @@
 {
   "schema_version": "1.0",
-  "as_of": "2026-08-18",
+  "as_of": "2026-09-29",
   "policy_id": "valuation_universe_tiers_v1",
   "policy_ref": "_system/portfolio/valuation_universe_policy.json",
   "tier_manifest_ref": "_system/data/valuation_universe_tiers.json",
@@ -28,13 +28,13 @@
     "committee_ready_count": 0,
     "research_blocked_count": 4,
     "model_deepening_required_count": 0,
-    "freshness_refresh_required_count": 0,
+    "freshness_refresh_required_count": 36,
     "readiness_state_counts": {
-      "committee_in_progress": 36,
+      "freshness_refresh_required": 36,
       "research_blocked": 4
     },
     "priority_bucket_counts": {
-      "committee_completion": 36,
+      "freshness_refresh": 36,
       "proof_completion": 4
     }
   },
@@ -56,21 +56,21 @@
       "freshness": {
         "model_as_of": {
           "date": "2026-08-31",
-          "age_days": -13,
+          "age_days": 29,
           "maximum_age_days": 365,
           "status": "current"
         },
         "latest_fact_as_of": {
           "date": "2026-07-25",
-          "age_days": 24,
+          "age_days": 66,
           "maximum_age_days": 548,
           "status": "current"
         },
         "price_as_of": {
           "date": "2026-08-31",
-          "age_days": -13,
+          "age_days": 29,
           "maximum_age_days": 7,
-          "status": "current"
+          "status": "stale"
         }
       },
       "committee": {
@@ -102,6 +102,11 @@
           "code": "stock_specific_model_required",
           "severity": "high",
           "value": "evidence_blocked"
+        },
+        {
+          "code": "price_as_of_stale",
+          "severity": "high",
+          "detail": "price_as_of is 29 days old; Tier 1 maximum is 7"
         }
       ],
       "next_action": "Complete the source-linked contract proof and resolve every failed model check before committee work.",
@@ -128,21 +133,21 @@
       "freshness": {
         "model_as_of": {
           "date": "2026-07-28",
-          "age_days": 21,
+          "age_days": 63,
           "maximum_age_days": 365,
           "status": "current"
         },
         "latest_fact_as_of": {
           "date": "2026-07-17",
-          "age_days": 32,
+          "age_days": 74,
           "maximum_age_days": 548,
           "status": "current"
         },
         "price_as_of": {
           "date": "2026-08-31",
-          "age_days": -13,
+          "age_days": 29,
           "maximum_age_days": 7,
-          "status": "current"
+          "status": "stale"
         }
       },
       "committee": {
@@ -176,6 +181,11 @@
           "code": "stock_specific_model_required",
           "severity": "high",
           "value": "evidence_blocked"
+        },
+        {
+          "code": "price_as_of_stale",
+          "severity": "high",
+          "detail": "price_as_of is 29 days old; Tier 1 maximum is 7"
         }
       ],
       "next_action": "Complete the source-linked contract proof and resolve every failed model check before committee work.",
@@ -202,21 +212,21 @@
       "freshness": {
         "model_as_of": {
           "date": "2026-07-28",
-          "age_days": 21,
+          "age_days": 63,
           "maximum_age_days": 365,
           "status": "current"
         },
         "latest_fact_as_of": {
           "date": "2026-07-25",
-          "age_days": 24,
+          "age_days": 66,
           "maximum_age_days": 548,
           "status": "current"
         },
         "price_as_of": {
           "date": "2026-08-31",
-          "age_days": -13,
+          "age_days": 29,
           "maximum_age_days": 7,
-          "status": "current"
+          "status": "stale"
         }
       },
       "committee": {
@@ -250,6 +260,11 @@
           "code": "stock_specific_model_required",
           "severity": "high",
           "value": "evidence_blocked"
+        },
+        {
+          "code": "price_as_of_stale",
+          "severity": "high",
+          "detail": "price_as_of is 29 days old; Tier 1 maximum is 7"
         }
       ],
       "next_action": "Complete the source-linked contract proof and resolve every failed model check before committee work.",
@@ -278,21 +293,21 @@
       "freshness": {
         "model_as_of": {
           "date": "2026-09-17",
-          "age_days": -30,
+          "age_days": 12,
           "maximum_age_days": 365,
           "status": "current"
         },
         "latest_fact_as_of": {
           "date": "2026-03-31",
-          "age_days": 140,
+          "age_days": 182,
           "maximum_age_days": 548,
           "status": "current"
         },
         "price_as_of": {
           "date": "2026-09-17",
-          "age_days": -30,
+          "age_days": 12,
           "maximum_age_days": 7,
-          "status": "current"
+          "status": "stale"
         }
       },
       "committee": {
@@ -326,6 +341,11 @@
           "code": "stock_specific_model_required",
           "severity": "high",
           "value": "evidence_blocked"
+        },
+        {
+          "code": "price_as_of_stale",
+          "severity": "high",
+          "detail": "price_as_of is 12 days old; Tier 1 maximum is 7"
         }
       ],
       "next_action": "Complete the source-linked contract proof and resolve every failed model check before committee work.",
@@ -352,21 +372,21 @@
       "freshness": {
         "model_as_of": {
           "date": "2026-08-04",
-          "age_days": 14,
+          "age_days": 56,
           "maximum_age_days": 365,
           "status": "current"
         },
         "latest_fact_as_of": {
           "date": "2026-03-31",
-          "age_days": 140,
+          "age_days": 182,
           "maximum_age_days": 548,
           "status": "current"
         },
         "price_as_of": {
           "date": "2026-09-01",
-          "age_days": -14,
+          "age_days": 28,
           "maximum_age_days": 7,
-          "status": "current"
+          "status": "stale"
         }
       },
       "committee": {
@@ -383,13 +403,19 @@
           "round_1/marathon_capital_cycle.json"
         ]
       },
-      "readiness_state": "committee_in_progress",
+      "readiness_state": "freshness_refresh_required",
       "priority": {
-        "rank": 70,
-        "bucket": "committee_completion"
+        "rank": 50,
+        "bucket": "freshness_refresh"
       },
-      "blockers": [],
-      "next_action": "Replace stale or unbound outputs (pre_mortem.json, evidence_tribunal.json, research_response.json) against the frozen packet; keep each rater isolated from peer votes.",
+      "blockers": [
+        {
+          "code": "price_as_of_stale",
+          "severity": "high",
+          "detail": "price_as_of is 28 days old; Tier 1 maximum is 7"
+        }
+      ],
+      "next_action": "Refresh stale or missing Tier 1 inputs: price_as_of.",
       "source_refs": {
         "tier_assignment": "_system/data/valuation_universe_tiers.json",
         "contract": "8697.T/research/valuation_contract.json",
@@ -413,21 +439,21 @@
       "freshness": {
         "model_as_of": {
           "date": "2026-07-22",
-          "age_days": 27,
+          "age_days": 69,
           "maximum_age_days": 365,
           "status": "current"
         },
         "latest_fact_as_of": {
           "date": "2025-11-28",
-          "age_days": 263,
+          "age_days": 305,
           "maximum_age_days": 548,
           "status": "current"
         },
         "price_as_of": {
           "date": "2026-08-31",
-          "age_days": -13,
+          "age_days": 29,
           "maximum_age_days": 7,
-          "status": "current"
+          "status": "stale"
         }
       },
       "committee": {
@@ -446,13 +472,19 @@
           "round_1/marathon_capital_cycle.json"
         ]
       },
-      "readiness_state": "committee_in_progress",
+      "readiness_state": "freshness_refresh_required",
       "priority": {
-        "rank": 70,
-        "bucket": "committee_completion"
+        "rank": 50,
+        "bucket": "freshness_refresh"
       },
-      "blockers": [],
-      "next_action": "Replace stale or unbound outputs (evidence_tribunal.json, research_response.json, valuation_reconciliation.json) against the frozen packet; keep each rater isolated from peer votes.",
+      "blockers": [
+        {
+          "code": "price_as_of_stale",
+          "severity": "high",
+          "detail": "price_as_of is 29 days old; Tier 1 maximum is 7"
+        }
+      ],
+      "next_action": "Refresh stale or missing Tier 1 inputs: price_as_of.",
       "source_refs": {
         "tier_assignment": "_system/data/valuation_universe_tiers.json",
         "contract": "ADBE/research/valuation_contract.json",
@@ -476,21 +508,21 @@
       "freshness": {
         "model_as_of": {
           "date": "2026-07-24",
-          "age_days": 25,
+          "age_days": 67,
           "maximum_age_days": 365,
           "status": "current"
         },
         "latest_fact_as_of": {
           "date": "2026-03-31",
-          "age_days": 140,
+          "age_days": 182,
           "maximum_age_days": 548,
           "status": "current"
         },
         "price_as_of": {
           "date": "2026-08-31",
-          "age_days": -13,
+          "age_days": 29,
           "maximum_age_days": 7,
-          "status": "current"
+          "status": "stale"
         }
       },
       "committee": {
@@ -509,13 +541,19 @@
           "round_1/marathon_capital_cycle.json"
         ]
       },
-      "readiness_state": "committee_in_progress",
+      "readiness_state": "freshness_refresh_required",
       "priority": {
-        "rank": 70,
-        "bucket": "committee_completion"
+        "rank": 50,
+        "bucket": "freshness_refresh"
       },
-      "blockers": [],
-      "next_action": "Complete the next hash-bound isolated outputs: pre_mortem.json, round_1/buffett_weschler.json, round_1/hohn.json, round_1/marathon_capital_cycle.json.",
+      "blockers": [
+        {
+          "code": "price_as_of_stale",
+          "severity": "high",
+          "detail": "price_as_of is 29 days old; Tier 1 maximum is 7"
+        }
+      ],
+      "next_action": "Refresh stale or missing Tier 1 inputs: price_as_of.",
       "source_refs": {
         "tier_assignment": "_system/data/valuation_universe_tiers.json",
         "contract": "7176.T/research/valuation_contract.json",
@@ -538,22 +576,22 @@
       "falsifier_count": 4,
       "freshness": {
         "model_as_of": {
-          "date": "2026-08-04",
-          "age_days": 14,
+          "date": "2026-07-21",
+          "age_days": 70,
           "maximum_age_days": 365,
           "status": "current"
         },
         "latest_fact_as_of": {
           "date": "2026-03-31",
-          "age_days": 140,
+          "age_days": 182,
           "maximum_age_days": 548,
           "status": "current"
         },
         "price_as_of": {
           "date": "2026-08-31",
-          "age_days": -13,
+          "age_days": 29,
           "maximum_age_days": 7,
-          "status": "current"
+          "status": "stale"
         }
       },
       "committee": {
@@ -572,13 +610,19 @@
           "round_1/marks_credit_cycle.json"
         ]
       },
-      "readiness_state": "committee_in_progress",
+      "readiness_state": "freshness_refresh_required",
       "priority": {
-        "rank": 70,
-        "bucket": "committee_completion"
+        "rank": 50,
+        "bucket": "freshness_refresh"
       },
-      "blockers": [],
-      "next_action": "Complete the next hash-bound isolated outputs: pre_mortem.json, round_1/buffett_weschler.json, round_1/hohn.json, round_1/marks_credit_cycle.json.",
+      "blockers": [
+        {
+          "code": "price_as_of_stale",
+          "severity": "high",
+          "detail": "price_as_of is 29 days old; Tier 1 maximum is 7"
+        }
+      ],
+      "next_action": "Refresh stale or missing Tier 1 inputs: price_as_of.",
       "source_refs": {
         "tier_assignment": "_system/data/valuation_universe_tiers.json",
         "contract": "AAL/research/valuation_contract.json",
@@ -602,21 +646,21 @@
       "freshness": {
         "model_as_of": {
           "date": "2026-07-24",
-          "age_days": 25,
+          "age_days": 67,
           "maximum_age_days": 365,
           "status": "current"
         },
         "latest_fact_as_of": {
           "date": "2025-12-27",
-          "age_days": 234,
+          "age_days": 276,
           "maximum_age_days": 548,
           "status": "current"
         },
         "price_as_of": {
           "date": "2026-08-31",
-          "age_days": -13,
+          "age_days": 29,
           "maximum_age_days": 7,
-          "status": "current"
+          "status": "stale"
         }
       },
       "committee": {
@@ -635,13 +679,19 @@
           "round_1/marathon_capital_cycle.json"
         ]
       },
-      "readiness_state": "committee_in_progress",
+      "readiness_state": "freshness_refresh_required",
       "priority": {
-        "rank": 70,
-        "bucket": "committee_completion"
+        "rank": 50,
+        "bucket": "freshness_refresh"
       },
-      "blockers": [],
-      "next_action": "Complete the next hash-bound isolated outputs: pre_mortem.json, round_1/buffett_weschler.json, round_1/hohn.json, round_1/marathon_capital_cycle.json.",
+      "blockers": [
+        {
+          "code": "price_as_of_stale",
+          "severity": "high",
+          "detail": "price_as_of is 29 days old; Tier 1 maximum is 7"
+        }
+      ],
+      "next_action": "Refresh stale or missing Tier 1 inputs: price_as_of.",
       "source_refs": {
         "tier_assignment": "_system/data/valuation_universe_tiers.json",
         "contract": "AMD/research/valuation_contract.json",
@@ -666,21 +716,21 @@
       "freshness": {
         "model_as_of": {
           "date": "2026-08-04",
-          "age_days": 14,
+          "age_days": 56,
           "maximum_age_days": 365,
           "status": "current"
         },
         "latest_fact_as_of": {
           "date": "2026-05-20",
-          "age_days": 90,
+          "age_days": 132,
           "maximum_age_days": 548,
           "status": "current"
         },
         "price_as_of": {
           "date": "2026-08-31",
-          "age_days": -13,
+          "age_days": 29,
           "maximum_age_days": 7,
-          "status": "current"
+          "status": "stale"
         }
       },
       "committee": {
@@ -699,13 +749,19 @@
           "round_1/marathon_capital_cycle.json"
         ]
       },
-      "readiness_state": "committee_in_progress",
+      "readiness_state": "freshness_refresh_required",
       "priority": {
-        "rank": 70,
-        "bucket": "committee_completion"
+        "rank": 50,
+        "bucket": "freshness_refresh"
       },
-      "blockers": [],
-      "next_action": "Complete the next hash-bound isolated outputs: pre_mortem.json, round_1/buffett_weschler.json, round_1/hohn.json, round_1/marathon_capital_cycle.json.",
+      "blockers": [
+        {
+          "code": "price_as_of_stale",
+          "severity": "high",
+          "detail": "price_as_of is 29 days old; Tier 1 maximum is 7"
+        }
+      ],
+      "next_action": "Refresh stale or missing Tier 1 inputs: price_as_of.",
       "source_refs": {
         "tier_assignment": "_system/data/valuation_universe_tiers.json",
         "contract": "APLD/research/valuation_contract.json",
@@ -729,21 +785,21 @@
       "freshness": {
         "model_as_of": {
           "date": "2026-07-21",
-          "age_days": 28,
+          "age_days": 70,
           "maximum_age_days": 365,
           "status": "current"
         },
         "latest_fact_as_of": {
           "date": "2025-12-31",
-          "age_days": 230,
+          "age_days": 272,
           "maximum_age_days": 548,
           "status": "current"
         },
         "price_as_of": {
           "date": "2026-08-31",
-          "age_days": -13,
+          "age_days": 29,
           "maximum_age_days": 7,
-          "status": "current"
+          "status": "stale"
         }
       },
       "committee": {
@@ -762,13 +818,19 @@
           "round_1/marks_credit_cycle.json"
         ]
       },
-      "readiness_state": "committee_in_progress",
+      "readiness_state": "freshness_refresh_required",
       "priority": {
-        "rank": 70,
-        "bucket": "committee_completion"
+        "rank": 50,
+        "bucket": "freshness_refresh"
       },
-      "blockers": [],
-      "next_action": "Complete the next hash-bound isolated outputs: pre_mortem.json, round_1/hk.json, round_1/klarman_asset_value.json, round_1/marks_credit_cycle.json.",
+      "blockers": [
+        {
+          "code": "price_as_of_stale",
+          "severity": "high",
+          "detail": "price_as_of is 29 days old; Tier 1 maximum is 7"
+        }
+      ],
+      "next_action": "Refresh stale or missing Tier 1 inputs: price_as_of.",
       "source_refs": {
         "tier_assignment": "_system/data/valuation_universe_tiers.json",
         "contract": "AZLCZ/research/valuation_contract.json",
@@ -792,21 +854,21 @@
       "freshness": {
         "model_as_of": {
           "date": "2026-07-23",
-          "age_days": 26,
+          "age_days": 68,
           "maximum_age_days": 365,
           "status": "current"
         },
         "latest_fact_as_of": {
           "date": "2026-05-14",
-          "age_days": 96,
+          "age_days": 138,
           "maximum_age_days": 548,
           "status": "current"
         },
         "price_as_of": {
           "date": "2026-08-31",
-          "age_days": -13,
+          "age_days": 29,
           "maximum_age_days": 7,
-          "status": "current"
+          "status": "stale"
         }
       },
       "committee": {
@@ -825,13 +887,19 @@
           "round_1/marks_credit_cycle.json"
         ]
       },
-      "readiness_state": "committee_in_progress",
+      "readiness_state": "freshness_refresh_required",
       "priority": {
-        "rank": 70,
-        "bucket": "committee_completion"
+        "rank": 50,
+        "bucket": "freshness_refresh"
       },
-      "blockers": [],
-      "next_action": "Complete the next hash-bound isolated outputs: pre_mortem.json, round_1/greenblatt.json, round_1/klarman_asset_value.json, round_1/marks_credit_cycle.json.",
+      "blockers": [
+        {
+          "code": "price_as_of_stale",
+          "severity": "high",
+          "detail": "price_as_of is 29 days old; Tier 1 maximum is 7"
+        }
+      ],
+      "next_action": "Refresh stale or missing Tier 1 inputs: price_as_of.",
       "source_refs": {
         "tier_assignment": "_system/data/valuation_universe_tiers.json",
         "contract": "BIIB/research/valuation_contract.json",
@@ -855,21 +923,21 @@
       "freshness": {
         "model_as_of": {
           "date": "2026-07-21",
-          "age_days": 28,
+          "age_days": 70,
           "maximum_age_days": 365,
           "status": "current"
         },
         "latest_fact_as_of": {
           "date": "2026-05-31",
-          "age_days": 79,
+          "age_days": 121,
           "maximum_age_days": 548,
           "status": "current"
         },
         "price_as_of": {
           "date": "2026-08-31",
-          "age_days": -13,
+          "age_days": 29,
           "maximum_age_days": 7,
-          "status": "current"
+          "status": "stale"
         }
       },
       "committee": {
@@ -888,13 +956,19 @@
           "round_1/marks_credit_cycle.json"
         ]
       },
-      "readiness_state": "committee_in_progress",
+      "readiness_state": "freshness_refresh_required",
       "priority": {
-        "rank": 70,
-        "bucket": "committee_completion"
+        "rank": 50,
+        "bucket": "freshness_refresh"
       },
-      "blockers": [],
-      "next_action": "Complete the next hash-bound isolated outputs: pre_mortem.json, round_1/hk.json, round_1/klarman_asset_value.json, round_1/marks_credit_cycle.json.",
+      "blockers": [
+        {
+          "code": "price_as_of_stale",
+          "severity": "high",
+          "detail": "price_as_of is 29 days old; Tier 1 maximum is 7"
+        }
+      ],
+      "next_action": "Refresh stale or missing Tier 1 inputs: price_as_of.",
       "source_refs": {
         "tier_assignment": "_system/data/valuation_universe_tiers.json",
         "contract": "BMNR/research/valuation_contract.json",
@@ -918,21 +992,21 @@
       "freshness": {
         "model_as_of": {
           "date": "2026-08-13",
-          "age_days": 5,
+          "age_days": 47,
           "maximum_age_days": 365,
           "status": "current"
         },
         "latest_fact_as_of": {
           "date": "2025-12-31",
-          "age_days": 230,
+          "age_days": 272,
           "maximum_age_days": 548,
           "status": "current"
         },
         "price_as_of": {
           "date": "2026-08-31",
-          "age_days": -13,
+          "age_days": 29,
           "maximum_age_days": 7,
-          "status": "current"
+          "status": "stale"
         }
       },
       "committee": {
@@ -951,13 +1025,19 @@
           "round_1/klarman_asset_value.json"
         ]
       },
-      "readiness_state": "committee_in_progress",
+      "readiness_state": "freshness_refresh_required",
       "priority": {
-        "rank": 70,
-        "bucket": "committee_completion"
+        "rank": 50,
+        "bucket": "freshness_refresh"
       },
-      "blockers": [],
-      "next_action": "Complete the next hash-bound isolated outputs: pre_mortem.json, round_1/marks_credit_cycle.json, round_1/buffett_weschler.json, round_1/klarman_asset_value.json.",
+      "blockers": [
+        {
+          "code": "price_as_of_stale",
+          "severity": "high",
+          "detail": "price_as_of is 29 days old; Tier 1 maximum is 7"
+        }
+      ],
+      "next_action": "Refresh stale or missing Tier 1 inputs: price_as_of.",
       "source_refs": {
         "tier_assignment": "_system/data/valuation_universe_tiers.json",
         "contract": "C/research/valuation_contract.json",
@@ -981,21 +1061,21 @@
       "freshness": {
         "model_as_of": {
           "date": "2026-07-29",
-          "age_days": 20,
+          "age_days": 62,
           "maximum_age_days": 365,
           "status": "current"
         },
         "latest_fact_as_of": {
           "date": "2026-07-24",
-          "age_days": 25,
+          "age_days": 67,
           "maximum_age_days": 548,
           "status": "current"
         },
         "price_as_of": {
           "date": "2026-08-31",
-          "age_days": -13,
+          "age_days": 29,
           "maximum_age_days": 7,
-          "status": "current"
+          "status": "stale"
         }
       },
       "committee": {
@@ -1014,13 +1094,19 @@
           "round_1/marathon_capital_cycle.json"
         ]
       },
-      "readiness_state": "committee_in_progress",
+      "readiness_state": "freshness_refresh_required",
       "priority": {
-        "rank": 70,
-        "bucket": "committee_completion"
+        "rank": 50,
+        "bucket": "freshness_refresh"
       },
-      "blockers": [],
-      "next_action": "Complete the next hash-bound isolated outputs: pre_mortem.json, round_1/buffett_weschler.json, round_1/hohn.json, round_1/marathon_capital_cycle.json.",
+      "blockers": [
+        {
+          "code": "price_as_of_stale",
+          "severity": "high",
+          "detail": "price_as_of is 29 days old; Tier 1 maximum is 7"
+        }
+      ],
+      "next_action": "Refresh stale or missing Tier 1 inputs: price_as_of.",
       "source_refs": {
         "tier_assignment": "_system/data/valuation_universe_tiers.json",
         "contract": "CNC/research/valuation_contract.json",
@@ -1045,21 +1131,21 @@
       "freshness": {
         "model_as_of": {
           "date": "2026-07-20",
-          "age_days": 29,
+          "age_days": 71,
           "maximum_age_days": 365,
           "status": "current"
         },
         "latest_fact_as_of": {
           "date": "2026-05-27",
-          "age_days": 83,
+          "age_days": 125,
           "maximum_age_days": 548,
           "status": "current"
         },
         "price_as_of": {
           "date": "2026-08-31",
-          "age_days": -13,
+          "age_days": 29,
           "maximum_age_days": 7,
-          "status": "current"
+          "status": "stale"
         }
       },
       "committee": {
@@ -1078,13 +1164,19 @@
           "round_1/marathon_capital_cycle.json"
         ]
       },
-      "readiness_state": "committee_in_progress",
+      "readiness_state": "freshness_refresh_required",
       "priority": {
-        "rank": 70,
-        "bucket": "committee_completion"
+        "rank": 50,
+        "bucket": "freshness_refresh"
       },
-      "blockers": [],
-      "next_action": "Complete the next hash-bound isolated outputs: pre_mortem.json, round_1/buffett_weschler.json, round_1/hohn.json, round_1/marathon_capital_cycle.json.",
+      "blockers": [
+        {
+          "code": "price_as_of_stale",
+          "severity": "high",
+          "detail": "price_as_of is 29 days old; Tier 1 maximum is 7"
+        }
+      ],
+      "next_action": "Refresh stale or missing Tier 1 inputs: price_as_of.",
       "source_refs": {
         "tier_assignment": "_system/data/valuation_universe_tiers.json",
         "contract": "CPRT/research/valuation_contract.json",
@@ -1108,21 +1200,21 @@
       "freshness": {
         "model_as_of": {
           "date": "2026-07-23",
-          "age_days": 26,
+          "age_days": 68,
           "maximum_age_days": 365,
           "status": "current"
         },
         "latest_fact_as_of": {
           "date": "2025-06-30",
-          "age_days": 414,
+          "age_days": 456,
           "maximum_age_days": 548,
           "status": "current"
         },
         "price_as_of": {
           "date": "2026-08-31",
-          "age_days": -13,
+          "age_days": 29,
           "maximum_age_days": 7,
-          "status": "current"
+          "status": "stale"
         }
       },
       "committee": {
@@ -1141,13 +1233,19 @@
           "round_1/marathon_capital_cycle.json"
         ]
       },
-      "readiness_state": "committee_in_progress",
+      "readiness_state": "freshness_refresh_required",
       "priority": {
-        "rank": 70,
-        "bucket": "committee_completion"
+        "rank": 50,
+        "bucket": "freshness_refresh"
       },
-      "blockers": [],
-      "next_action": "Complete the next hash-bound isolated outputs: pre_mortem.json, round_1/buffett_weschler.json, round_1/hohn.json, round_1/marathon_capital_cycle.json.",
+      "blockers": [
+        {
+          "code": "price_as_of_stale",
+          "severity": "high",
+          "detail": "price_as_of is 29 days old; Tier 1 maximum is 7"
+        }
+      ],
+      "next_action": "Refresh stale or missing Tier 1 inputs: price_as_of.",
       "source_refs": {
         "tier_assignment": "_system/data/valuation_universe_tiers.json",
         "contract": "CRML/research/valuation_contract.json",
@@ -1173,21 +1271,21 @@
       "freshness": {
         "model_as_of": {
           "date": "2026-07-21",
-          "age_days": 28,
+          "age_days": 70,
           "maximum_age_days": 365,
           "status": "current"
         },
         "latest_fact_as_of": {
           "date": "2026-03-31",
-          "age_days": 140,
+          "age_days": 182,
           "maximum_age_days": 548,
           "status": "current"
         },
         "price_as_of": {
           "date": "2026-08-31",
-          "age_days": -13,
+          "age_days": 29,
           "maximum_age_days": 7,
-          "status": "current"
+          "status": "stale"
         }
       },
       "committee": {
@@ -1206,13 +1304,19 @@
           "round_1/marathon_capital_cycle.json"
         ]
       },
-      "readiness_state": "committee_in_progress",
+      "readiness_state": "freshness_refresh_required",
       "priority": {
-        "rank": 70,
-        "bucket": "committee_completion"
+        "rank": 50,
+        "bucket": "freshness_refresh"
       },
-      "blockers": [],
-      "next_action": "Complete the next hash-bound isolated outputs: pre_mortem.json, round_1/buffett_weschler.json, round_1/hohn.json, round_1/marathon_capital_cycle.json.",
+      "blockers": [
+        {
+          "code": "price_as_of_stale",
+          "severity": "high",
+          "detail": "price_as_of is 29 days old; Tier 1 maximum is 7"
+        }
+      ],
+      "next_action": "Refresh stale or missing Tier 1 inputs: price_as_of.",
       "source_refs": {
         "tier_assignment": "_system/data/valuation_universe_tiers.json",
         "contract": "CSU/research/valuation_contract.json",
@@ -1238,21 +1342,21 @@
       "freshness": {
         "model_as_of": {
           "date": "2026-07-20",
-          "age_days": 29,
+          "age_days": 71,
           "maximum_age_days": 365,
           "status": "current"
         },
         "latest_fact_as_of": {
           "date": "2026-04-16",
-          "age_days": 124,
+          "age_days": 166,
           "maximum_age_days": 548,
           "status": "current"
         },
         "price_as_of": {
           "date": "2026-08-31",
-          "age_days": -13,
+          "age_days": 29,
           "maximum_age_days": 7,
-          "status": "current"
+          "status": "stale"
         }
       },
       "committee": {
@@ -1271,13 +1375,19 @@
           "round_1/marathon_capital_cycle.json"
         ]
       },
-      "readiness_state": "committee_in_progress",
+      "readiness_state": "freshness_refresh_required",
       "priority": {
-        "rank": 70,
-        "bucket": "committee_completion"
+        "rank": 50,
+        "bucket": "freshness_refresh"
       },
-      "blockers": [],
-      "next_action": "Complete the next hash-bound isolated outputs: pre_mortem.json, round_1/buffett_weschler.json, round_1/hohn.json, round_1/marathon_capital_cycle.json.",
+      "blockers": [
+        {
+          "code": "price_as_of_stale",
+          "severity": "high",
+          "detail": "price_as_of is 29 days old; Tier 1 maximum is 7"
+        }
+      ],
+      "next_action": "Refresh stale or missing Tier 1 inputs: price_as_of.",
       "source_refs": {
         "tier_assignment": "_system/data/valuation_universe_tiers.json",
         "contract": "DHR/research/valuation_contract.json",
@@ -1301,21 +1411,21 @@
       "freshness": {
         "model_as_of": {
           "date": "2026-07-30",
-          "age_days": 19,
+          "age_days": 61,
           "maximum_age_days": 365,
           "status": "current"
         },
         "latest_fact_as_of": {
           "date": "2026-04-24",
-          "age_days": 116,
+          "age_days": 158,
           "maximum_age_days": 548,
           "status": "current"
         },
         "price_as_of": {
           "date": "2026-08-31",
-          "age_days": -13,
+          "age_days": 29,
           "maximum_age_days": 7,
-          "status": "current"
+          "status": "stale"
         }
       },
       "committee": {
@@ -1334,13 +1444,19 @@
           "round_1/marathon_capital_cycle.json"
         ]
       },
-      "readiness_state": "committee_in_progress",
+      "readiness_state": "freshness_refresh_required",
       "priority": {
-        "rank": 70,
-        "bucket": "committee_completion"
+        "rank": 50,
+        "bucket": "freshness_refresh"
       },
-      "blockers": [],
-      "next_action": "Complete the next hash-bound isolated outputs: pre_mortem.json, round_1/buffett_weschler.json, round_1/hohn.json, round_1/marathon_capital_cycle.json.",
+      "blockers": [
+        {
+          "code": "price_as_of_stale",
+          "severity": "high",
+          "detail": "price_as_of is 29 days old; Tier 1 maximum is 7"
+        }
+      ],
+      "next_action": "Refresh stale or missing Tier 1 inputs: price_as_of.",
       "source_refs": {
         "tier_assignment": "_system/data/valuation_universe_tiers.json",
         "contract": "EFOR/research/valuation_contract.json",
@@ -1364,21 +1480,21 @@
       "freshness": {
         "model_as_of": {
           "date": "2026-07-29",
-          "age_days": 20,
+          "age_days": 62,
           "maximum_age_days": 365,
           "status": "current"
         },
         "latest_fact_as_of": {
           "date": "2026-03-31",
-          "age_days": 140,
+          "age_days": 182,
           "maximum_age_days": 548,
           "status": "current"
         },
         "price_as_of": {
           "date": "2026-08-31",
-          "age_days": -13,
+          "age_days": 29,
           "maximum_age_days": 7,
-          "status": "current"
+          "status": "stale"
         }
       },
       "committee": {
@@ -1397,13 +1513,19 @@
           "round_1/marathon_capital_cycle.json"
         ]
       },
-      "readiness_state": "committee_in_progress",
+      "readiness_state": "freshness_refresh_required",
       "priority": {
-        "rank": 70,
-        "bucket": "committee_completion"
+        "rank": 50,
+        "bucket": "freshness_refresh"
       },
-      "blockers": [],
-      "next_action": "Complete the next hash-bound isolated outputs: pre_mortem.json, round_1/buffett_weschler.json, round_1/hohn.json, round_1/marathon_capital_cycle.json.",
+      "blockers": [
+        {
+          "code": "price_as_of_stale",
+          "severity": "high",
+          "detail": "price_as_of is 29 days old; Tier 1 maximum is 7"
+        }
+      ],
+      "next_action": "Refresh stale or missing Tier 1 inputs: price_as_of.",
       "source_refs": {
         "tier_assignment": "_system/data/valuation_universe_tiers.json",
         "contract": "F/research/valuation_contract.json",
@@ -1427,21 +1549,21 @@
       "freshness": {
         "model_as_of": {
           "date": "2026-07-29",
-          "age_days": 20,
+          "age_days": 62,
           "maximum_age_days": 365,
           "status": "current"
         },
         "latest_fact_as_of": {
           "date": "2026-05-01",
-          "age_days": 109,
+          "age_days": 151,
           "maximum_age_days": 548,
           "status": "current"
         },
         "price_as_of": {
           "date": "2026-08-31",
-          "age_days": -13,
+          "age_days": 29,
           "maximum_age_days": 7,
-          "status": "current"
+          "status": "stale"
         }
       },
       "committee": {
@@ -1460,13 +1582,19 @@
           "round_1/marathon_capital_cycle.json"
         ]
       },
-      "readiness_state": "committee_in_progress",
+      "readiness_state": "freshness_refresh_required",
       "priority": {
-        "rank": 70,
-        "bucket": "committee_completion"
+        "rank": 50,
+        "bucket": "freshness_refresh"
       },
-      "blockers": [],
-      "next_action": "Complete the next hash-bound isolated outputs: pre_mortem.json, round_1/buffett_weschler.json, round_1/hohn.json, round_1/marathon_capital_cycle.json.",
+      "blockers": [
+        {
+          "code": "price_as_of_stale",
+          "severity": "high",
+          "detail": "price_as_of is 29 days old; Tier 1 maximum is 7"
+        }
+      ],
+      "next_action": "Refresh stale or missing Tier 1 inputs: price_as_of.",
       "source_refs": {
         "tier_assignment": "_system/data/valuation_universe_tiers.json",
         "contract": "FISV/research/valuation_contract.json",
@@ -1490,21 +1618,21 @@
       "freshness": {
         "model_as_of": {
           "date": "2026-07-30",
-          "age_days": 19,
+          "age_days": 61,
           "maximum_age_days": 365,
           "status": "current"
         },
         "latest_fact_as_of": {
           "date": "2026-03-31",
-          "age_days": 140,
+          "age_days": 182,
           "maximum_age_days": 548,
           "status": "current"
         },
         "price_as_of": {
           "date": "2026-08-31",
-          "age_days": -13,
+          "age_days": 29,
           "maximum_age_days": 7,
-          "status": "current"
+          "status": "stale"
         }
       },
       "committee": {
@@ -1523,13 +1651,19 @@
           "round_1/marathon_capital_cycle.json"
         ]
       },
-      "readiness_state": "committee_in_progress",
+      "readiness_state": "freshness_refresh_required",
       "priority": {
-        "rank": 70,
-        "bucket": "committee_completion"
+        "rank": 50,
+        "bucket": "freshness_refresh"
       },
-      "blockers": [],
-      "next_action": "Complete the next hash-bound isolated outputs: pre_mortem.json, round_1/buffett_weschler.json, round_1/hohn.json, round_1/marathon_capital_cycle.json.",
+      "blockers": [
+        {
+          "code": "price_as_of_stale",
+          "severity": "high",
+          "detail": "price_as_of is 29 days old; Tier 1 maximum is 7"
+        }
+      ],
+      "next_action": "Refresh stale or missing Tier 1 inputs: price_as_of.",
       "source_refs": {
         "tier_assignment": "_system/data/valuation_universe_tiers.json",
         "contract": "FOX/research/valuation_contract.json",
@@ -1553,21 +1687,21 @@
       "freshness": {
         "model_as_of": {
           "date": "2026-07-30",
-          "age_days": 19,
+          "age_days": 61,
           "maximum_age_days": 365,
           "status": "current"
         },
         "latest_fact_as_of": {
           "date": "2026-03-31",
-          "age_days": 140,
+          "age_days": 182,
           "maximum_age_days": 548,
           "status": "current"
         },
         "price_as_of": {
           "date": "2026-08-31",
-          "age_days": -13,
+          "age_days": 29,
           "maximum_age_days": 7,
-          "status": "current"
+          "status": "stale"
         }
       },
       "committee": {
@@ -1586,13 +1720,19 @@
           "round_1/marathon_capital_cycle.json"
         ]
       },
-      "readiness_state": "committee_in_progress",
+      "readiness_state": "freshness_refresh_required",
       "priority": {
-        "rank": 70,
-        "bucket": "committee_completion"
+        "rank": 50,
+        "bucket": "freshness_refresh"
       },
-      "blockers": [],
-      "next_action": "Complete the next hash-bound isolated outputs: pre_mortem.json, round_1/buffett_weschler.json, round_1/hohn.json, round_1/marathon_capital_cycle.json.",
+      "blockers": [
+        {
+          "code": "price_as_of_stale",
+          "severity": "high",
+          "detail": "price_as_of is 29 days old; Tier 1 maximum is 7"
+        }
+      ],
+      "next_action": "Refresh stale or missing Tier 1 inputs: price_as_of.",
       "source_refs": {
         "tier_assignment": "_system/data/valuation_universe_tiers.json",
         "contract": "FOXA/research/valuation_contract.json",
@@ -1618,21 +1758,21 @@
       "freshness": {
         "model_as_of": {
           "date": "2026-07-21",
-          "age_days": 28,
+          "age_days": 70,
           "maximum_age_days": 365,
           "status": "current"
         },
         "latest_fact_as_of": {
           "date": "2026-02-28",
-          "age_days": 171,
+          "age_days": 213,
           "maximum_age_days": 548,
           "status": "current"
         },
         "price_as_of": {
           "date": "2026-08-31",
-          "age_days": -13,
+          "age_days": 29,
           "maximum_age_days": 7,
-          "status": "current"
+          "status": "stale"
         }
       },
       "committee": {
@@ -1651,13 +1791,19 @@
           "round_1/marathon_capital_cycle.json"
         ]
       },
-      "readiness_state": "committee_in_progress",
+      "readiness_state": "freshness_refresh_required",
       "priority": {
-        "rank": 70,
-        "bucket": "committee_completion"
+        "rank": 50,
+        "bucket": "freshness_refresh"
       },
-      "blockers": [],
-      "next_action": "Complete the next hash-bound isolated outputs: pre_mortem.json, round_1/buffett_weschler.json, round_1/hohn.json, round_1/marathon_capital_cycle.json.",
+      "blockers": [
+        {
+          "code": "price_as_of_stale",
+          "severity": "high",
+          "detail": "price_as_of is 29 days old; Tier 1 maximum is 7"
+        }
+      ],
+      "next_action": "Refresh stale or missing Tier 1 inputs: price_as_of.",
       "source_refs": {
         "tier_assignment": "_system/data/valuation_universe_tiers.json",
         "contract": "FRMO/research/valuation_contract.json",
@@ -1681,21 +1827,21 @@
       "freshness": {
         "model_as_of": {
           "date": "2026-07-24",
-          "age_days": 25,
+          "age_days": 67,
           "maximum_age_days": 365,
           "status": "current"
         },
         "latest_fact_as_of": {
           "date": "2025-12-31",
-          "age_days": 230,
+          "age_days": 272,
           "maximum_age_days": 548,
           "status": "current"
         },
         "price_as_of": {
           "date": "2026-08-31",
-          "age_days": -13,
+          "age_days": 29,
           "maximum_age_days": 7,
-          "status": "current"
+          "status": "stale"
         }
       },
       "committee": {
@@ -1714,13 +1860,19 @@
           "round_1/marathon_capital_cycle.json"
         ]
       },
-      "readiness_state": "committee_in_progress",
+      "readiness_state": "freshness_refresh_required",
       "priority": {
-        "rank": 70,
-        "bucket": "committee_completion"
+        "rank": 50,
+        "bucket": "freshness_refresh"
       },
-      "blockers": [],
-      "next_action": "Complete the next hash-bound isolated outputs: pre_mortem.json, round_1/buffett_weschler.json, round_1/hohn.json, round_1/marathon_capital_cycle.json.",
+      "blockers": [
+        {
+          "code": "price_as_of_stale",
+          "severity": "high",
+          "detail": "price_as_of is 29 days old; Tier 1 maximum is 7"
+        }
+      ],
+      "next_action": "Refresh stale or missing Tier 1 inputs: price_as_of.",
       "source_refs": {
         "tier_assignment": "_system/data/valuation_universe_tiers.json",
         "contract": "GOOGL/research/valuation_contract.json",
@@ -1744,21 +1896,21 @@
       "freshness": {
         "model_as_of": {
           "date": "2026-07-21",
-          "age_days": 28,
+          "age_days": 70,
           "maximum_age_days": 365,
           "status": "current"
         },
         "latest_fact_as_of": {
           "date": "2026-03-31",
-          "age_days": 140,
+          "age_days": 182,
           "maximum_age_days": 548,
           "status": "current"
         },
         "price_as_of": {
           "date": "2026-08-31",
-          "age_days": -13,
+          "age_days": 29,
           "maximum_age_days": 7,
-          "status": "current"
+          "status": "stale"
         }
       },
       "committee": {
@@ -1777,13 +1929,19 @@
           "round_1/marks_credit_cycle.json"
         ]
       },
-      "readiness_state": "committee_in_progress",
+      "readiness_state": "freshness_refresh_required",
       "priority": {
-        "rank": 70,
-        "bucket": "committee_completion"
+        "rank": 50,
+        "bucket": "freshness_refresh"
       },
-      "blockers": [],
-      "next_action": "Complete the next hash-bound isolated outputs: pre_mortem.json, round_1/hk.json, round_1/klarman_asset_value.json, round_1/marks_credit_cycle.json.",
+      "blockers": [
+        {
+          "code": "price_as_of_stale",
+          "severity": "high",
+          "detail": "price_as_of is 29 days old; Tier 1 maximum is 7"
+        }
+      ],
+      "next_action": "Refresh stale or missing Tier 1 inputs: price_as_of.",
       "source_refs": {
         "tier_assignment": "_system/data/valuation_universe_tiers.json",
         "contract": "GYRO/research/valuation_contract.json",
@@ -1809,21 +1967,21 @@
       "freshness": {
         "model_as_of": {
           "date": "2026-07-20",
-          "age_days": 29,
+          "age_days": 71,
           "maximum_age_days": 365,
           "status": "current"
         },
         "latest_fact_as_of": {
           "date": "2026-07-27",
-          "age_days": 22,
+          "age_days": 64,
           "maximum_age_days": 548,
           "status": "current"
         },
         "price_as_of": {
           "date": "2026-08-31",
-          "age_days": -13,
+          "age_days": 29,
           "maximum_age_days": 7,
-          "status": "current"
+          "status": "stale"
         }
       },
       "committee": {
@@ -1842,13 +2000,19 @@
           "round_1/marathon_capital_cycle.json"
         ]
       },
-      "readiness_state": "committee_in_progress",
+      "readiness_state": "freshness_refresh_required",
       "priority": {
-        "rank": 70,
-        "bucket": "committee_completion"
+        "rank": 50,
+        "bucket": "freshness_refresh"
       },
-      "blockers": [],
-      "next_action": "Complete the next hash-bound isolated outputs: pre_mortem.json, round_1/buffett_weschler.json, round_1/hohn.json, round_1/marathon_capital_cycle.json.",
+      "blockers": [
+        {
+          "code": "price_as_of_stale",
+          "severity": "high",
+          "detail": "price_as_of is 29 days old; Tier 1 maximum is 7"
+        }
+      ],
+      "next_action": "Refresh stale or missing Tier 1 inputs: price_as_of.",
       "source_refs": {
         "tier_assignment": "_system/data/valuation_universe_tiers.json",
         "contract": "ICE/research/valuation_contract.json",
@@ -1872,21 +2036,21 @@
       "freshness": {
         "model_as_of": {
           "date": "2026-07-23",
-          "age_days": 26,
+          "age_days": 68,
           "maximum_age_days": 365,
           "status": "current"
         },
         "latest_fact_as_of": {
           "date": "2026-03-31",
-          "age_days": 140,
+          "age_days": 182,
           "maximum_age_days": 548,
           "status": "current"
         },
         "price_as_of": {
           "date": "2026-08-31",
-          "age_days": -13,
+          "age_days": 29,
           "maximum_age_days": 7,
-          "status": "current"
+          "status": "stale"
         }
       },
       "committee": {
@@ -1905,13 +2069,19 @@
           "round_1/marks_credit_cycle.json"
         ]
       },
-      "readiness_state": "committee_in_progress",
+      "readiness_state": "freshness_refresh_required",
       "priority": {
-        "rank": 70,
-        "bucket": "committee_completion"
+        "rank": 50,
+        "bucket": "freshness_refresh"
       },
-      "blockers": [],
-      "next_action": "Complete the next hash-bound isolated outputs: pre_mortem.json, round_1/hk.json, round_1/klarman_asset_value.json, round_1/marks_credit_cycle.json.",
+      "blockers": [
+        {
+          "code": "price_as_of_stale",
+          "severity": "high",
+          "detail": "price_as_of is 29 days old; Tier 1 maximum is 7"
+        }
+      ],
+      "next_action": "Refresh stale or missing Tier 1 inputs: price_as_of.",
       "source_refs": {
         "tier_assignment": "_system/data/valuation_universe_tiers.json",
         "contract": "LB/research/valuation_contract.json",
@@ -1936,21 +2106,21 @@
       "freshness": {
         "model_as_of": {
           "date": "2026-09-01",
-          "age_days": -14,
+          "age_days": 28,
           "maximum_age_days": 365,
           "status": "current"
         },
         "latest_fact_as_of": {
           "date": "2025-12-31",
-          "age_days": 230,
+          "age_days": 272,
           "maximum_age_days": 548,
           "status": "current"
         },
         "price_as_of": {
           "date": "2026-08-28",
-          "age_days": -10,
+          "age_days": 32,
           "maximum_age_days": 7,
-          "status": "current"
+          "status": "stale"
         }
       },
       "committee": {
@@ -1969,13 +2139,19 @@
           "round_1/marathon_capital_cycle.json"
         ]
       },
-      "readiness_state": "committee_in_progress",
+      "readiness_state": "freshness_refresh_required",
       "priority": {
-        "rank": 70,
-        "bucket": "committee_completion"
+        "rank": 50,
+        "bucket": "freshness_refresh"
       },
-      "blockers": [],
-      "next_action": "Complete the next hash-bound isolated outputs: pre_mortem.json, round_1/buffett_weschler.json, round_1/hohn.json, round_1/marathon_capital_cycle.json.",
+      "blockers": [
+        {
+          "code": "price_as_of_stale",
+          "severity": "high",
+          "detail": "price_as_of is 32 days old; Tier 1 maximum is 7"
+        }
+      ],
+      "next_action": "Refresh stale or missing Tier 1 inputs: price_as_of.",
       "source_refs": {
         "tier_assignment": "_system/data/valuation_universe_tiers.json",
         "contract": "LSEG/research/valuation_contract.json",
@@ -1999,21 +2175,21 @@
       "freshness": {
         "model_as_of": {
           "date": "2026-07-21",
-          "age_days": 28,
+          "age_days": 70,
           "maximum_age_days": 365,
           "status": "current"
         },
         "latest_fact_as_of": {
           "date": "2026-04-30",
-          "age_days": 110,
+          "age_days": 152,
           "maximum_age_days": 548,
           "status": "current"
         },
         "price_as_of": {
           "date": "2026-08-31",
-          "age_days": -13,
+          "age_days": 29,
           "maximum_age_days": 7,
-          "status": "current"
+          "status": "stale"
         }
       },
       "committee": {
@@ -2032,13 +2208,19 @@
           "round_1/marks_credit_cycle.json"
         ]
       },
-      "readiness_state": "committee_in_progress",
+      "readiness_state": "freshness_refresh_required",
       "priority": {
-        "rank": 70,
-        "bucket": "committee_completion"
+        "rank": 50,
+        "bucket": "freshness_refresh"
       },
-      "blockers": [],
-      "next_action": "Complete the next hash-bound isolated outputs: pre_mortem.json, round_1/hk.json, round_1/klarman_asset_value.json, round_1/marks_credit_cycle.json.",
+      "blockers": [
+        {
+          "code": "price_as_of_stale",
+          "severity": "high",
+          "detail": "price_as_of is 29 days old; Tier 1 maximum is 7"
+        }
+      ],
+      "next_action": "Refresh stale or missing Tier 1 inputs: price_as_of.",
       "source_refs": {
         "tier_assignment": "_system/data/valuation_universe_tiers.json",
         "contract": "MSB/research/valuation_contract.json",
@@ -2062,21 +2244,21 @@
       "freshness": {
         "model_as_of": {
           "date": "2026-07-21",
-          "age_days": 28,
+          "age_days": 70,
           "maximum_age_days": 365,
           "status": "current"
         },
         "latest_fact_as_of": {
           "date": "2025-12-31",
-          "age_days": 230,
+          "age_days": 272,
           "maximum_age_days": 548,
           "status": "current"
         },
         "price_as_of": {
           "date": "2026-08-31",
-          "age_days": -13,
+          "age_days": 29,
           "maximum_age_days": 7,
-          "status": "current"
+          "status": "stale"
         }
       },
       "committee": {
@@ -2095,13 +2277,19 @@
           "round_1/pabrai.json"
         ]
       },
-      "readiness_state": "committee_in_progress",
+      "readiness_state": "freshness_refresh_required",
       "priority": {
-        "rank": 70,
-        "bucket": "committee_completion"
+        "rank": 50,
+        "bucket": "freshness_refresh"
       },
-      "blockers": [],
-      "next_action": "Complete the next hash-bound isolated outputs: pre_mortem.json, round_1/marathon_capital_cycle.json, round_1/marks_credit_cycle.json, round_1/pabrai.json.",
+      "blockers": [
+        {
+          "code": "price_as_of_stale",
+          "severity": "high",
+          "detail": "price_as_of is 29 days old; Tier 1 maximum is 7"
+        }
+      ],
+      "next_action": "Refresh stale or missing Tier 1 inputs: price_as_of.",
       "source_refs": {
         "tier_assignment": "_system/data/valuation_universe_tiers.json",
         "contract": "NUE/research/valuation_contract.json",
@@ -2125,21 +2313,21 @@
       "freshness": {
         "model_as_of": {
           "date": "2026-07-21",
-          "age_days": 28,
+          "age_days": 70,
           "maximum_age_days": 365,
           "status": "current"
         },
         "latest_fact_as_of": {
           "date": "2025-12-31",
-          "age_days": 230,
+          "age_days": 272,
           "maximum_age_days": 548,
           "status": "current"
         },
         "price_as_of": {
           "date": "2026-08-31",
-          "age_days": -13,
+          "age_days": 29,
           "maximum_age_days": 7,
-          "status": "current"
+          "status": "stale"
         }
       },
       "committee": {
@@ -2158,13 +2346,19 @@
           "round_1/marathon_capital_cycle.json"
         ]
       },
-      "readiness_state": "committee_in_progress",
+      "readiness_state": "freshness_refresh_required",
       "priority": {
-        "rank": 70,
-        "bucket": "committee_completion"
+        "rank": 50,
+        "bucket": "freshness_refresh"
       },
-      "blockers": [],
-      "next_action": "Complete the next hash-bound isolated outputs: pre_mortem.json, round_1/buffett_weschler.json, round_1/hohn.json, round_1/marathon_capital_cycle.json.",
+      "blockers": [
+        {
+          "code": "price_as_of_stale",
+          "severity": "high",
+          "detail": "price_as_of is 29 days old; Tier 1 maximum is 7"
+        }
+      ],
+      "next_action": "Refresh stale or missing Tier 1 inputs: price_as_of.",
       "source_refs": {
         "tier_assignment": "_system/data/valuation_universe_tiers.json",
         "contract": "NVR/research/valuation_contract.json",
@@ -2190,21 +2384,21 @@
       "freshness": {
         "model_as_of": {
           "date": "2026-07-21",
-          "age_days": 28,
+          "age_days": 70,
           "maximum_age_days": 365,
           "status": "current"
         },
         "latest_fact_as_of": {
           "date": "2026-03-29",
-          "age_days": 142,
+          "age_days": 184,
           "maximum_age_days": 548,
           "status": "current"
         },
         "price_as_of": {
           "date": "2026-08-31",
-          "age_days": -13,
+          "age_days": 29,
           "maximum_age_days": 7,
-          "status": "current"
+          "status": "stale"
         }
       },
       "committee": {
@@ -2223,13 +2417,19 @@
           "round_1/marathon_capital_cycle.json"
         ]
       },
-      "readiness_state": "committee_in_progress",
+      "readiness_state": "freshness_refresh_required",
       "priority": {
-        "rank": 70,
-        "bucket": "committee_completion"
+        "rank": 50,
+        "bucket": "freshness_refresh"
       },
-      "blockers": [],
-      "next_action": "Complete the next hash-bound isolated outputs: pre_mortem.json, round_1/buffett_weschler.json, round_1/hohn.json, round_1/marathon_capital_cycle.json.",
+      "blockers": [
+        {
+          "code": "price_as_of_stale",
+          "severity": "high",
+          "detail": "price_as_of is 29 days old; Tier 1 maximum is 7"
+        }
+      ],
+      "next_action": "Refresh stale or missing Tier 1 inputs: price_as_of.",
       "source_refs": {
         "tier_assignment": "_system/data/valuation_universe_tiers.json",
         "contract": "QDEL/research/valuation_contract.json",
@@ -2255,21 +2455,21 @@
       "freshness": {
         "model_as_of": {
           "date": "2026-07-20",
-          "age_days": 29,
+          "age_days": 71,
           "maximum_age_days": 365,
           "status": "current"
         },
         "latest_fact_as_of": {
           "date": "2026-04-24",
-          "age_days": 116,
+          "age_days": 158,
           "maximum_age_days": 548,
           "status": "current"
         },
         "price_as_of": {
           "date": "2026-08-31",
-          "age_days": -13,
+          "age_days": 29,
           "maximum_age_days": 7,
-          "status": "current"
+          "status": "stale"
         }
       },
       "committee": {
@@ -2288,13 +2488,19 @@
           "round_1/marathon_capital_cycle.json"
         ]
       },
-      "readiness_state": "committee_in_progress",
+      "readiness_state": "freshness_refresh_required",
       "priority": {
-        "rank": 70,
-        "bucket": "committee_completion"
+        "rank": 50,
+        "bucket": "freshness_refresh"
       },
-      "blockers": [],
-      "next_action": "Complete the next hash-bound isolated outputs: pre_mortem.json, round_1/buffett_weschler.json, round_1/hohn.json, round_1/marathon_capital_cycle.json.",
+      "blockers": [
+        {
+          "code": "price_as_of_stale",
+          "severity": "high",
+          "detail": "price_as_of is 29 days old; Tier 1 maximum is 7"
+        }
+      ],
+      "next_action": "Refresh stale or missing Tier 1 inputs: price_as_of.",
       "source_refs": {
         "tier_assignment": "_system/data/valuation_universe_tiers.json",
         "contract": "SPGI/research/valuation_contract.json",
@@ -2320,21 +2526,21 @@
       "freshness": {
         "model_as_of": {
           "date": "2026-08-31",
-          "age_days": -13,
+          "age_days": 29,
           "maximum_age_days": 365,
           "status": "current"
         },
         "latest_fact_as_of": {
           "date": "2026-06-30",
-          "age_days": 49,
+          "age_days": 91,
           "maximum_age_days": 548,
           "status": "current"
         },
         "price_as_of": {
           "date": "2026-08-31",
-          "age_days": -13,
+          "age_days": 29,
           "maximum_age_days": 7,
-          "status": "current"
+          "status": "stale"
         }
       },
       "committee": {
@@ -2353,13 +2559,19 @@
           "round_1/marathon_capital_cycle.json"
         ]
       },
-      "readiness_state": "committee_in_progress",
+      "readiness_state": "freshness_refresh_required",
       "priority": {
-        "rank": 70,
-        "bucket": "committee_completion"
+        "rank": 50,
+        "bucket": "freshness_refresh"
       },
-      "blockers": [],
-      "next_action": "Complete the next hash-bound isolated outputs: pre_mortem.json, round_1/buffett_weschler.json, round_1/hohn.json, round_1/marathon_capital_cycle.json.",
+      "blockers": [
+        {
+          "code": "price_as_of_stale",
+          "severity": "high",
+          "detail": "price_as_of is 29 days old; Tier 1 maximum is 7"
+        }
+      ],
+      "next_action": "Refresh stale or missing Tier 1 inputs: price_as_of.",
       "source_refs": {
         "tier_assignment": "_system/data/valuation_universe_tiers.json",
         "contract": "TEQ.ST/research/valuation_contract.json",
@@ -2382,22 +2594,22 @@
       "falsifier_count": 14,
       "freshness": {
         "model_as_of": {
-          "date": "2026-07-24",
-          "age_days": 25,
+          "date": "2026-07-15",
+          "age_days": 76,
           "maximum_age_days": 365,
           "status": "current"
         },
         "latest_fact_as_of": {
           "date": "2026-03-31",
-          "age_days": 140,
+          "age_days": 182,
           "maximum_age_days": 548,
           "status": "current"
         },
         "price_as_of": {
           "date": "2026-08-31",
-          "age_days": -13,
+          "age_days": 29,
           "maximum_age_days": 7,
-          "status": "current"
+          "status": "stale"
         }
       },
       "committee": {
@@ -2416,13 +2628,19 @@
           "round_1/marks_credit_cycle.json"
         ]
       },
-      "readiness_state": "committee_in_progress",
+      "readiness_state": "freshness_refresh_required",
       "priority": {
-        "rank": 70,
-        "bucket": "committee_completion"
+        "rank": 50,
+        "bucket": "freshness_refresh"
       },
-      "blockers": [],
-      "next_action": "Complete the next hash-bound isolated outputs: pre_mortem.json, round_1/hk.json, round_1/klarman_asset_value.json, round_1/marks_credit_cycle.json.",
+      "blockers": [
+        {
+          "code": "price_as_of_stale",
+          "severity": "high",
+          "detail": "price_as_of is 29 days old; Tier 1 maximum is 7"
+        }
+      ],
+      "next_action": "Refresh stale or missing Tier 1 inputs: price_as_of.",
       "source_refs": {
         "tier_assignment": "_system/data/valuation_universe_tiers.json",
         "contract": "TPL/research/valuation_contract.json",
@@ -2447,21 +2665,21 @@
       "freshness": {
         "model_as_of": {
           "date": "2026-09-01",
-          "age_days": -14,
+          "age_days": 28,
           "maximum_age_days": 365,
           "status": "current"
         },
         "latest_fact_as_of": {
           "date": "2026-03-31",
-          "age_days": 140,
+          "age_days": 182,
           "maximum_age_days": 548,
           "status": "current"
         },
         "price_as_of": {
           "date": "2026-08-31",
-          "age_days": -13,
+          "age_days": 29,
           "maximum_age_days": 7,
-          "status": "current"
+          "status": "stale"
         }
       },
       "committee": {
@@ -2480,13 +2698,19 @@
           "round_1/pabrai.json"
         ]
       },
-      "readiness_state": "committee_in_progress",
+      "readiness_state": "freshness_refresh_required",
       "priority": {
-        "rank": 70,
-        "bucket": "committee_completion"
+        "rank": 50,
+        "bucket": "freshness_refresh"
       },
-      "blockers": [],
-      "next_action": "Complete the next hash-bound isolated outputs: pre_mortem.json, round_1/marathon_capital_cycle.json, round_1/marks_credit_cycle.json, round_1/pabrai.json.",
+      "blockers": [
+        {
+          "code": "price_as_of_stale",
+          "severity": "high",
+          "detail": "price_as_of is 29 days old; Tier 1 maximum is 7"
+        }
+      ],
+      "next_action": "Refresh stale or missing Tier 1 inputs: price_as_of.",
       "source_refs": {
         "tier_assignment": "_system/data/valuation_universe_tiers.json",
         "contract": "VTRS/research/valuation_contract.json",
@@ -2511,21 +2735,21 @@
       "freshness": {
         "model_as_of": {
           "date": "2026-07-24",
-          "age_days": 25,
+          "age_days": 67,
           "maximum_age_days": 365,
           "status": "current"
         },
         "latest_fact_as_of": {
           "date": "2026-03-31",
-          "age_days": 140,
+          "age_days": 182,
           "maximum_age_days": 548,
           "status": "current"
         },
         "price_as_of": {
           "date": "2026-08-31",
-          "age_days": -13,
+          "age_days": 29,
           "maximum_age_days": 7,
-          "status": "current"
+          "status": "stale"
         }
       },
       "committee": {
@@ -2544,13 +2768,19 @@
           "round_1/marks_credit_cycle.json"
         ]
       },
-      "readiness_state": "committee_in_progress",
+      "readiness_state": "freshness_refresh_required",
       "priority": {
-        "rank": 70,
-        "bucket": "committee_completion"
+        "rank": 50,
+        "bucket": "freshness_refresh"
       },
-      "blockers": [],
-      "next_action": "Complete the next hash-bound isolated outputs: pre_mortem.json, round_1/buffett_weschler.json, round_1/hohn.json, round_1/marks_credit_cycle.json.",
+      "blockers": [
+        {
+          "code": "price_as_of_stale",
+          "severity": "high",
+          "detail": "price_as_of is 29 days old; Tier 1 maximum is 7"
+        }
+      ],
+      "next_action": "Refresh stale or missing Tier 1 inputs: price_as_of.",
       "source_refs": {
         "tier_assignment": "_system/data/valuation_universe_tiers.json",
         "contract": "WBI/research/valuation_contract.json",
@@ -2574,21 +2804,21 @@
       "freshness": {
         "model_as_of": {
           "date": "2026-08-11",
-          "age_days": 7,
+          "age_days": 49,
           "maximum_age_days": 365,
           "status": "current"
         },
         "latest_fact_as_of": {
           "date": "2026-06-09",
-          "age_days": 70,
+          "age_days": 112,
           "maximum_age_days": 548,
           "status": "current"
         },
         "price_as_of": {
           "date": "2026-08-31",
-          "age_days": -13,
+          "age_days": 29,
           "maximum_age_days": 7,
-          "status": "current"
+          "status": "stale"
         }
       },
       "committee": {
@@ -2607,13 +2837,19 @@
           "round_1/marks_credit_cycle.json"
         ]
       },
-      "readiness_state": "committee_in_progress",
+      "readiness_state": "freshness_refresh_required",
       "priority": {
-        "rank": 70,
-        "bucket": "committee_completion"
+        "rank": 50,
+        "bucket": "freshness_refresh"
       },
-      "blockers": [],
-      "next_action": "Complete the next hash-bound isolated outputs: pre_mortem.json, round_1/hk.json, round_1/klarman_asset_value.json, round_1/marks_credit_cycle.json.",
+      "blockers": [
+        {
+          "code": "price_as_of_stale",
+          "severity": "high",
+          "detail": "price_as_of is 29 days old; Tier 1 maximum is 7"
+        }
+      ],
+      "next_action": "Refresh stale or missing Tier 1 inputs: price_as_of.",
       "source_refs": {
         "tier_assignment": "_system/data/valuation_universe_tiers.json",
         "contract": "WHK/research/valuation_contract.json",
