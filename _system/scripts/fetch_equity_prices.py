@@ -78,9 +78,34 @@ def registry_row(ticker: str) -> dict | None:
     return holdings.get(ticker.upper())
 
 
+# Yahoo exchange suffixes that are already in Yahoo form when they appear on a
+# registry ticker.  Anything not listed falls through to the legacy rules, and
+# the final fallback strips the suffix -- which silently swaps in whatever US
+# listing shares the base (DNP.WA, Dino Polska, became DNP, a NYSE closed-end
+# fund).  Multi-letter suffixes cannot collide with a US share class.
+YAHOO_SUFFIXES = frozenset({
+    "AS", "AT", "AX", "BA", "BR", "CN", "CO", "DE", "HE", "HK", "IR", "KL",
+    "KS", "LS", "MC", "MI", "MX", "NS", "NZ", "OL", "PA", "PR", "SA", "SI",
+    "ST", "SW", "TA", "TO", "VI", "WA",
+})
+# Single-letter suffixes look exactly like a US share class (FTC.L vs BF.B), so
+# they are only honoured on the market that owns them.
+YAHOO_SINGLE_LETTER_SUFFIXES = {"L": ("UK", "GB"), "T": ("JP",), "V": ("CA",)}
+
+
+def _yahoo_base(base: str) -> str:
+    # Share classes inside a suffixed symbol use a hyphen too (URB.A.TO -> URB-A.TO).
+    return base.replace(".", "-")
+
+
 def yahoo_symbol_for(ticker: str, market: str, exchange: str) -> str:
     t = ticker.upper()
     m = (market or "US").upper()
+    base, _, suffix = t.rpartition(".")
+    if base and (
+        suffix in YAHOO_SUFFIXES or m in YAHOO_SINGLE_LETTER_SUFFIXES.get(suffix, ())
+    ):
+        return f"{_yahoo_base(base)}.{suffix}"
     # Yahoo uses hyphen for share classes (BRK.B → BRK-B, BF.B → BF-B).
     if re.fullmatch(r"[A-Z]+\.[A-Z]", t):
         return t.replace(".", "-")
@@ -99,6 +124,9 @@ def yahoo_symbol_for(ticker: str, market: str, exchange: str) -> str:
     if m in ("UK", "GB") or t.endswith(".L"):
         base = t.replace(".L", "")
         return f"{base}.L"
+    # TSX Venture is .V on Yahoo; the substring test below would send it to .TO.
+    if exchange and exchange.upper() in ("TSXV", "TSX-V", "TSX VENTURE") and "." not in t:
+        return f"{t}.V"
     if exchange and "TSX" in exchange.upper() and ".TO" not in t:
         return f"{t}.TO"
     if exchange and exchange.upper() == "CSE" and ".CN" not in t:
