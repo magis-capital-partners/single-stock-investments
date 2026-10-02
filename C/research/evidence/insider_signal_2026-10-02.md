@@ -1,0 +1,28 @@
+# C — Insider conviction (2026-10-02)
+
+> Context only. Insider activity informs scenario confidence and stance discussion; it does not auto-inflate Lawrence base IRR. Promotion requires [HUMAN REVIEW].
+
+**ICS:** 10.0 (exceptional) · **Bull case support:** moderate
+
+| Scenario | Prior weight | Tilted weight |
+|----------|--------------|---------------|
+| Bear | 20% | 20% |
+| Base | 55% | 40% |
+| Bull | 25% | 40% |
+
+| Insider | Date | Shares | Price | Value | Contrib |
+|---------|------|--------|-------|-------|---------|
+| MOULDS JONATHAN PAUL | 2026-07-01 | 222 | $142.556 | $31647.43 | 1.414 |
+| MOULDS JONATHAN PAUL | 2026-01-02 | 230 | $118.802 | $27324.46 | 1.044 |
+| DUGAN JOHN CUNNINGHAM | 2026-07-01 | 438 | $142.556 | $62439.53 | 1.028 |
+| CITIGROUP INC | 2025-10-30 | 116002 | $26.12 | $3029972.24 | 0.991 |
+| MOULDS JONATHAN PAUL | 2026-04-01 | 244 | $110.99 | $27081.56 | 0.982 |
+
+**Routine / planned sales (context):**
+
+- Fraser Jane Nind: 67967 @ $118.04 on 2026-01-20
+- Mason Mark: 29209 @ $118.04 on 2026-01-20
+- Mason Mark: 1627 @ $114.3998 on 2026-02-20
+
+Source: `_system/reference/market-data/insider/C_transactions.csv`.
+Lawrence base IRR unchanged (`in_base_irr: False`).

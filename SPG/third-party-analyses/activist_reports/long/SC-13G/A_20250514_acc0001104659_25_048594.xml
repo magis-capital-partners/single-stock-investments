@@ -1,0 +1,558 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns:p="http://www.sec.gov/edgar/schedule13g" xmlns:p1="http://www.sec.gov/edgar/common"><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8"><link rel="stylesheet" type="text/css" href="/css/SDR_print.css"><style type="text/css">
+					.fakeTextBox {
+					border-top: 2px solid #999;
+					border-right: 1px solid #ccc;
+					border-bottom: 1px solid #ccc;
+					border-left: 2px solid #999;
+					padding: 2px;
+					_width: 800px;
+					height: auto;
+					min-width: 200px;
+					min-height: 50px;
+					word-wrap: break-word;
+					font-size: 0.9em;
+					color: blue;
+					}
+				</style><style type="text/css">
+					table.tableClass { border: solid black;
+					border-top-width: 1;
+					border-right-width: 1;
+					border-bottom-width: 1;
+					border-left-width: 1;
+					table-layout:fixed;
+					}
+					table.innerTableClass { border: solid black;
+					border-top-width: 0;
+					border-right-width: 0;
+					border-bottom-width: 0;
+					border-left-width: 0;
+					table-layout:fixed;
+					}
+					table.collapsabletableClass {
+					border-collapse:collapse;
+					border-top-width: 0;
+					border-right-width: 0;
+					border-bottom-width: 0;
+					border-left-width: 0;
+					table-layout:fixed;
+					}
+					th.tableClassLeft { border: solid black;
+					border-top-width: 0px;
+					border-right-width: 0px;
+					border-bottom-width: 1px;
+					border-left-width: 1px;
+					padding: 2px;
+					}
+					th.tableClassRight { border: solid black;
+					border-top-width: 0px;
+					border-right-width: 1px;
+					border-bottom-width: 1px;
+					border-left-width: 0;
+					padding: 2px;
+					}
+					th.tableClass { border: solid black;
+					border-top-width: 0px;
+					border-right-width: 1px;
+					border-bottom-width: 1px;
+					border-left-width: 1px;
+					padding: 2px;
+					}
+					td.tableClassLeft { border: solid black;
+					border-top-width: 0px;
+					border-right-width: 0px;
+					border-bottom-width: 1px;
+					border-left-width: 1px;
+					font-size: 0.9em;
+					color: blue;
+					word-wrap: break-word;
+					}
+					td.tableClassRight { border: solid black;
+					border-top-width: 0px;
+					border-right-width: 1px;
+					border-bottom-width: 1px;
+					border-left-width: 0;
+					font-size: 0.9em;
+					color: blue;
+					word-wrap: break-word;
+					}
+					td.tableClass { border: solid black;
+					border-top-width: 0px;
+					border-right-width: 1px;
+					border-bottom-width: 1px;
+					border-left-width: 1px;
+					font-size: 0.9em;
+					font-weight:bold;
+					color: black;
+					word-wrap: break-word;
+					}
+					td.tableClassNoBorder { border: solid black;
+					border-top-width: 0px;
+					border-right-width: 0px;
+					border-bottom-width: 0px;
+					border-left-width: 0px;
+					font-size: 0.9em;
+					font-weight:bold;
+					color: black;
+					word-wrap: break-word;
+					}
+
+					td.tableClassNoBorderBlue { border: solid black;
+					border-top-width: 0px;
+					border-right-width: 0px;
+					border-bottom-width: 0px;
+					border-left-width: 0px;
+					font-size: 0.9em;
+					font-weight:bold;
+					color: blue;
+					word-wrap: break-word;
+					}
+
+					td.tableClassInnerNoBorderBlue { border: solid black;
+					border-top-width: 0px;
+					border-right-width: 0px;
+					border-bottom-width: 0px;
+					border-left-width: 0px;
+					font-size: 1.4em;
+					font-weight:bold;
+					color: blue;
+					word-wrap: break-word;
+					}
+
+					td.tableClassNoBorderAlignLeft { border: solid black;
+					border-top-width: 0px;
+					border-right-width: 0px;
+					border-bottom-width: 0px;
+					border-left-width: 0px;
+					font-size: 0.9em;
+					font-weight:bold;
+					text-align: left;
+					color: black;
+					word-wrap: break-word;
+					}
+
+					td.signature {
+					padding: 4px 8px;
+					}
+
+					td.tableClassInner { border: solid black;
+					border-top-width: 0px;
+					border-right-width: 1px;
+					border-bottom-width: 1px;
+					border-left-width: 1px;
+					font-size: 1em;
+					font-weight:bold;
+					color: black;
+					word-wrap: break-word;
+					}
+
+					td.tableClassValign { border: solid black;
+					border-top-width: 0px;
+					border-right-width: 1px;
+					border-bottom-width: 1px;
+					border-left-width: 1px;
+					font-size: 0.9em;
+					font-weight:bold;
+					color: black;
+					vertical-align: middle;
+					text-align: center;
+					word-wrap: break-word;
+					}
+
+					td.tableClassValignNoBorder { border: solid black;
+					border-top-width: 0px;
+					border-right-width: 0px;
+					border-bottom-width: 0px;
+					border-left-width: 0px;
+					font-size: 0.9em;
+					font-weight:bold;
+					color: black;
+					vertical-align: middle;
+					text-align: center;
+					word-wrap: break-word;
+					}
+
+					td.tableClassValignInner { border: solid black;
+					border-top-width: 0px;
+					border-right-width: 1px;
+					border-bottom-width: 1px;
+					border-left-width: 1px;
+					font-size: 1em;
+					font-weight:bold;
+					color: black;
+					vertical-align: middle;
+					text-align: center;
+					word-wrap: break-word;
+					}
+
+					td.innerTableClassRightValign { border: solid black;
+					border-top-width: 0px;
+					border-right-width: 1px;
+					border-bottom-width: 1px;
+					border-left-width: 0;
+					font-size: 1em;
+					font-weight:bold;
+					color: black;
+					vertical-align: middle;
+					text-align: center;
+					word-wrap: break-word;
+					}
+
+					td.innerTableClassRightValignBottomLess { border: solid black;
+					border-top-width: 0px;
+					border-right-width: 1px;
+					border-bottom-width: 0px;
+					border-left-width: 0;
+					font-size: 1em;
+					font-weight:bold;
+					color: black;
+					vertical-align: middle;
+					text-align: center;
+					word-wrap: break-word;
+					}
+
+					td.tableClassInnerLeft { border: solid black;
+					border-top-width: 0px;
+					border-right-width: 0px;
+					border-bottom-width: 1px;
+					border-left-width: 1px;
+					font-size: 1em;
+					font-weight:bold;
+					color: black;
+					word-wrap: break-word;
+					}
+
+					td.tableClassInnerLeftBottomLess { border: solid black;
+					border-top-width: 0px;
+					border-right-width: 0px;
+					border-bottom-width: 0px;
+					border-left-width: 1px;
+					font-size: 1em;
+					font-weight:bold;
+					color: black;
+					word-wrap: break-word;
+					}
+
+					td.tableClassNoBorderAlignCenter { border: solid black;
+					border-top-width: 0px;
+					border-right-width: 0px;
+					border-bottom-width: 0px;
+					border-left-width: 0px;
+					font-size: 0.9em;
+					font-weight:bold;
+					color: black;
+					text-align: center;
+					word-wrap: break-word;
+					}
+
+					tr.tableClass { border: solid black;
+					border-top-width: 1px;
+					border-right-width: 1px;
+					border-bottom-width: 1px;
+					border-left-width: 1px;
+					}
+					tr.tableClassWithBg { border: solid black;
+					border-top-width: 0;
+					border-right-width: 1;
+					border-bottom-width: 1;
+					border-left-width: 0;
+					background-color: #e0e0ff
+					}
+
+					tr.tableClassWithBgBlack { border: solid black;
+					border-top-width: 0;
+					border-right-width: 1;
+					border-bottom-width: 1;
+					border-left-width: 0;
+					background-color: #D3D3D3
+					}
+
+					hr.header {
+					position: relative;
+					top: 20px;
+					border: none;
+					height: 6px;
+					background: black;
+					margin-bottom: 10px;
+					}
+
+					hr.separatorThin {
+					position: relative;
+					top: 2px;
+					border: none;
+					height: 2px;
+					background: black;
+					margin-bottom: 2px;
+					}
+
+					hr.headerThin {
+					position: relative;
+					top: 10px;
+					border: none;
+					height: 2px;
+					background: black;
+					margin-bottom: 10px;
+					}
+
+					hr.separator {
+					position: relative;
+					top: 20px;
+					border: none;
+					height: 4px;
+					background: black;
+					margin-bottom: 5px;
+					}
+
+					div.text {
+					background-color: #ffffff;
+					color: blue;
+					font-size: 1em;
+					font-weight:normal;
+					text-align:justify;
+					}
+
+					div.largetext {
+					background-color: #ffffff;
+					color: blue;
+					font-size: 1em;
+					font-weight:normal;
+					text-align:justify;
+					white-space: pre-wrap;
+					}
+
+
+					div.information {
+					background-color: #ffffff;
+					color: black;
+					font-size: 1em;
+					font-weight:normal;
+					text-align:justify;
+					}
+
+					#scheader {
+					font-size: 0.9em;
+					border: 0px solid #404040;
+					border-spacing: 2px;
+					}
+
+				</style></head><body lang="en-US" text="#000000" bgcolor="#ffffff"><hr class="header"><br><hr class="headerThin"><div class="contentwrapper"><table role="presentation" id="scheader"><tr><td class="tableClassNoBorderAlignCenter" style="font-size:2em;">
+						SECURITIES AND EXCHANGE COMMISSION
+						<br>
+						Washington, D.C. 20549
+					</td></tr><tr><td class="tableClassNoBorderAlignCenter"><br><br><div style="font-size:1.5em;">
+								SCHEDULE 13G
+							</div><br><br></td></tr><tr><td class="tableClassNoBorderAlignCenter"><div style="font-size:1.2em;">
+							UNDER THE SECURITIES EXCHANGE ACT OF 1934
+						</div></td></tr><tr><td class="center"><div class="information" style="text-align:center; font-weight:bold;">
+									(Amendment No. <span style="color:blue;">16</span>)
+								</div><br><br></td></tr><tr><td class="center"><div class="information" style="text-align:center; font-weight:bold; color:blue;">Simon Property Group, Inc.</div><div class="information" style="text-align:center; font-weight:bold;"><hr class="separatorThin">(Name of Issuer)</div><br><br></td></tr><tr><td class="center"><div class="information" style="text-align:center; font-weight:bold; color:blue;">Common Stock Par Value $.0001 per Share</div><div class="information" style="text-align:center; font-weight:bold;"><hr class="separatorThin">(Title of Class of Securities)</div><br><br></td></tr><tr><td class="center"><div class="information" style="text-align:center; font-weight:bold; color:blue;">828806109</div><div class="information" style="text-align:center; font-weight:bold;"><hr class="separatorThin">(CUSIP Number)</div><br><br></td></tr><tr><td class="center"><div class="information" style="text-align:center; font-weight:bold; color:blue;">03/31/2025</div><div class="information" style="text-align:center; font-weight:bold;"><hr class="separatorThin">(Date of Event Which Requires Filing of this Statement)</div></td></tr></table><br><br><table><tr><td class="label"> Check the appropriate box to designate the rule pursuant to which this Schedule is filed:</td></tr><tr><td><img src="/Images/box-unchecked.jpg" alt="Checkbox not checked">   Rule 13d-1(b)
+					</td></tr><tr><td><img src="/Images/box-unchecked.jpg" alt="Checkbox not checked">   Rule 13d-1(c)
+					</td></tr><tr><td><img src="/Images/box-checked.jpg" alt="Checkbox checked">   Rule 13d-1(d)
+					</td></tr></table></div><hr class="headerThin"><hr class="header"><br><br>
+  <div class="content"><div class="form1"></div></div>
+  <div class="content"><div class="form1"><table><tr><td class="center"><br><br><p><div align="center" style="font-size:1.2em;">
+									SCHEDULE 13G
+								</div></p></td></tr></table><table role="presentation" class="tableClass" id="cusipNumber"><tr class="tableClass"><td width="25%" style="font-weight:bold;">CUSIP No.</td><td width="75%"><div style="font-size:.9em; color:#000000">828806109</div></td></tr></table><br><br><table role="presentation" class="tableClass" id="reportingPersonDetails"><tr class="tableClass"><td width="8%" class="tableClassValign">1</td><td width="92%" class="tableClass">Names of Reporting Persons
+					<br><br><div class="text">Melvin Simon &amp; Associates, Inc.</div></td></tr><tr><td width="8%" class="tableClassValign">2</td><td width="92%" class="tableClass">Check the appropriate box if a member of a Group (see instructions)
+					<br><br><div class="text"><img src="/Images/box-checked.jpg" alt="Checkbox checked">  (a)
+						<br><img src="/Images/box-unchecked.jpg" alt="Checkbox not checked">  (b)
+					</div></td></tr><tr class="tableClassWithBgBlack"><td width="8%" class="tableClassValign">3</td><td width="92%" class="tableClass">Sec Use Only</td></tr><tr><td width="8%" class="tableClassValign">4</td><td width="92%" class="tableClass">Citizenship or Place of Organization
+					<br><br><div class="text">
+				INDIANA
+			</div></td></tr><tr><td width="8%" class="tableClassValign">Number of Shares Beneficially Owned by Each Reporting Person With:</td><td width="92%" class="tableClass"><table class="innerTableClass"><tr><td width="8%" class="innerTableClassRightValign">5</td><td width="92%" class="tableClassInnerLeft">Sole Voting Power
+								<br><br><div class="text">11,634,169.00</div></td></tr><tr><td width="8%" class="innerTableClassRightValign">6</td><td width="92%" class="tableClassInnerLeft">Shared Voting Power
+								<br><br><div class="text">889,747.00</div></td></tr><tr><td width="8%" class="innerTableClassRightValign">7</td><td width="92%" class="tableClassInnerLeft">Sole Dispositive Power
+								<br><br><div class="text">11,634,169.00</div></td></tr><tr><td width="8%" class="innerTableClassRightValignBottomLess">8</td><td width="92%" class="tableClassInnerLeftBottomLess">Shared Dispositive Power
+								<br><br><div class="text">889,747.00</div></td></tr></table></td></tr><tr><td width="8%" class="tableClassValign">9</td><td width="92%" class="tableClass">Aggregate Amount Beneficially Owned by Each Reporting Person
+					<br><br><div class="text">12,253,916.00</div></td></tr><tr><td width="8%" class="tableClassValign">10</td><td width="92%" class="tableClass">Check box if the aggregate amount in row (9) excludes certain shares (See Instructions)
+					<br><br><img src="/Images/box-checked.jpg" alt="Checkbox checked"></td></tr><tr><td width="8%" class="tableClassValign">11</td><td width="92%" class="tableClass">Percent of class represented by amount in row (9)
+					<br><br><div class="text">3.70 % </div></td></tr><tr><td width="8%" class="tableClassValign">12</td><td width="92%" class="tableClass">Type of Reporting Person (See Instructions)
+					<br><br><div class="text">CO</div></td></tr></table><br><div class="largetext"><span style="color:black;font-weight:bold;">Comment for Type of Reporting Person:</span>  *  Amounts disclosed for each reporting person in this Schedule 13G include, as appropriate:  (1) shares of Common Stock, par value $0.0001 per share ("Common") of Simon Property Group, Inc. (the "Company"); (2) shares of Class B Common Stock, par value $0.0001 per share ("Class B Common") of the Company (shares of Class B Common may convert into Common on a share-for-share basis); (3) units of partnership interest ("Units") of Simon Property Group, L.P. (the "Operating Partnership") (Units held by limited partners of the Operating Partnership are exchangeable for shares of Common on a one-to-one basis or cash, as determined by the Company); and (4) certain awards granted pursuant to the (i) Simon Property Group, L.P. 1998 Stock Incentive Plan, and (ii) Simon Property Group, L.P. 2019 Stock Incentive Plan, each, as amended (collectively, the "Stock Plan") consisting of restricted stock awards and long-term incentive plan units ("LTIP Units") (LTIP units which have satisfied all applicable performance and/or time-based vesting requirements can be converted into Units and then exchanged for shares of Common on a one-to-one basis or cash, as determined by the Company).
+
+**  All calculations of percentage ownership disclosed for each reporting person in this Schedule 13G are based upon an aggregate of 326,417,039 shares of Common and 8,000 shares of Class B Common outstanding as of March 31, 2025, as reported by the Company on Form 8-K furnished to the Securities and Exchange Commission on May 12, 2025.  In addition, all calculations of percentage ownership herein assume that all Units and fully-vested LTIP Units held by the applicable reporting person are exchanged for shares of Common, but do not give effect to the exchange of Units or fully-vested LTIP Units by other reporting persons.
+
+(1)  "MSA" means Melvin Simon &amp; Associates, an Indiana corporation.
+
+(2)  MSA is owned directly or indirectly through one or more entities by Mr. Herbert Simon (30.94%), Mr. David Simon (3.04%), and certain other shareholders.  Includes 11,634,169 shares of Common issuable upon exchange of Units owned directly by MSA and indirectly owned through an entity that MSA controls, as well as 889,747 shares of Common currently outstanding that are subject to the Amended and Restated Voting Trust (as defined in footnote 9 to this Schedule 13G), of which Mr. Herbert Simon and Mr. David Simon are the voting trustees.  The ownership percentage is based on the number of shares of Common outstanding as of March 31, 2025, plus 11,634,169 shares of Common into which the Units, beneficially owned by MSA, may be converted.
+
+(3)  Mr. Eli Simon was appointed Executive Vice President of MSA as of May 10, 2024.</div><table><tr><td class="center"><br><br><p><div align="center" style="font-size:1.2em;">
+									SCHEDULE 13G
+								</div></p></td></tr></table><table role="presentation" class="tableClass" id="cusipNumber"><tr class="tableClass"><td width="25%" style="font-weight:bold;">CUSIP No.</td><td width="75%"><div style="font-size:.9em; color:#000000">828806109</div></td></tr></table><br><br><table role="presentation" class="tableClass" id="reportingPersonDetails"><tr class="tableClass"><td width="8%" class="tableClassValign">1</td><td width="92%" class="tableClass">Names of Reporting Persons
+					<br><br><div class="text">Herbert Simon</div></td></tr><tr><td width="8%" class="tableClassValign">2</td><td width="92%" class="tableClass">Check the appropriate box if a member of a Group (see instructions)
+					<br><br><div class="text"><img src="/Images/box-checked.jpg" alt="Checkbox checked">  (a)
+						<br><img src="/Images/box-unchecked.jpg" alt="Checkbox not checked">  (b)
+					</div></td></tr><tr class="tableClassWithBgBlack"><td width="8%" class="tableClassValign">3</td><td width="92%" class="tableClass">Sec Use Only</td></tr><tr><td width="8%" class="tableClassValign">4</td><td width="92%" class="tableClass">Citizenship or Place of Organization
+					<br><br><div class="text">
+				UNITED STATES
+			</div></td></tr><tr><td width="8%" class="tableClassValign">Number of Shares Beneficially Owned by Each Reporting Person With:</td><td width="92%" class="tableClass"><table class="innerTableClass"><tr><td width="8%" class="innerTableClassRightValign">5</td><td width="92%" class="tableClassInnerLeft">Sole Voting Power
+								<br><br><div class="text">5,615,001.00</div></td></tr><tr><td width="8%" class="innerTableClassRightValign">6</td><td width="92%" class="tableClassInnerLeft">Shared Voting Power
+								<br><br><div class="text">889,747.00</div></td></tr><tr><td width="8%" class="innerTableClassRightValign">7</td><td width="92%" class="tableClassInnerLeft">Sole Dispositive Power
+								<br><br><div class="text">5,615,001.00</div></td></tr><tr><td width="8%" class="innerTableClassRightValignBottomLess">8</td><td width="92%" class="tableClassInnerLeftBottomLess">Shared Dispositive Power
+								<br><br><div class="text">889,747.00</div></td></tr></table></td></tr><tr><td width="8%" class="tableClassValign">9</td><td width="92%" class="tableClass">Aggregate Amount Beneficially Owned by Each Reporting Person
+					<br><br><div class="text">6,504,748.00</div></td></tr><tr><td width="8%" class="tableClassValign">10</td><td width="92%" class="tableClass">Check box if the aggregate amount in row (9) excludes certain shares (See Instructions)
+					<br><br><img src="/Images/box-checked.jpg" alt="Checkbox checked"></td></tr><tr><td width="8%" class="tableClassValign">11</td><td width="92%" class="tableClass">Percent of class represented by amount in row (9)
+					<br><br><div class="text">1.96 % </div></td></tr><tr><td width="8%" class="tableClassValign">12</td><td width="92%" class="tableClass">Type of Reporting Person (See Instructions)
+					<br><br><div class="text">IN</div></td></tr></table><br><div class="largetext"><span style="color:black;font-weight:bold;">Comment for Type of Reporting Person:</span>  (4)  Includes 190,925 shares of Common currently outstanding and 5,424,076 shares of Common issuable upon exchange of Units owned indirectly through trusts or other entities controlled by Mr. Herbert Simon, including 102 Units (which represents Mr. Herbert Simon's proportionate share of 204 Units owned by an entity that is owned by Mr. Herbert Simon and a third party).  Also includes 889,747 shares of Common subject to the Amended and Restated Voting Trust (as defined in footnote 9 to this Schedule 13G) of which Mr. Herbert Simon is one of two voting trustees.  Does not include shares of Common and shares issuable upon exchange of Units owned by MSA, which is 30.94% owned by trusts controlled by Mr. Herbert Simon, which are reported separately.  The ownership percentage is based on the number of shares of Common outstanding as of March 31, 2025, plus 5,432,076 shares of Common into which the Units, beneficially owned by Mr. Herbert Simon, may be converted.
+
+(5)  Mr. Herbert Simon was replaced by Mr. Eli Simon as one of the two voting trustees under the Class B Voting Trust (as defined in footnote 10 to this Schedule 13G) as of February 4, 2025.</div><table><tr><td class="center"><br><br><p><div align="center" style="font-size:1.2em;">
+									SCHEDULE 13G
+								</div></p></td></tr></table><table role="presentation" class="tableClass" id="cusipNumber"><tr class="tableClass"><td width="25%" style="font-weight:bold;">CUSIP No.</td><td width="75%"><div style="font-size:.9em; color:#000000">828806109</div></td></tr></table><br><br><table role="presentation" class="tableClass" id="reportingPersonDetails"><tr class="tableClass"><td width="8%" class="tableClassValign">1</td><td width="92%" class="tableClass">Names of Reporting Persons
+					<br><br><div class="text">David Simon</div></td></tr><tr><td width="8%" class="tableClassValign">2</td><td width="92%" class="tableClass">Check the appropriate box if a member of a Group (see instructions)
+					<br><br><div class="text"><img src="/Images/box-checked.jpg" alt="Checkbox checked">  (a)
+						<br><img src="/Images/box-unchecked.jpg" alt="Checkbox not checked">  (b)
+					</div></td></tr><tr class="tableClassWithBgBlack"><td width="8%" class="tableClassValign">3</td><td width="92%" class="tableClass">Sec Use Only</td></tr><tr><td width="8%" class="tableClassValign">4</td><td width="92%" class="tableClass">Citizenship or Place of Organization
+					<br><br><div class="text">
+				UNITED STATES
+			</div></td></tr><tr><td width="8%" class="tableClassValign">Number of Shares Beneficially Owned by Each Reporting Person With:</td><td width="92%" class="tableClass"><table class="innerTableClass"><tr><td width="8%" class="innerTableClassRightValign">5</td><td width="92%" class="tableClassInnerLeft">Sole Voting Power
+								<br><br><div class="text">10,766,136.00</div></td></tr><tr><td width="8%" class="innerTableClassRightValign">6</td><td width="92%" class="tableClassInnerLeft">Shared Voting Power
+								<br><br><div class="text">959,344.00</div></td></tr><tr><td width="8%" class="innerTableClassRightValign">7</td><td width="92%" class="tableClassInnerLeft">Sole Dispositive Power
+								<br><br><div class="text">3,847,869.00</div></td></tr><tr><td width="8%" class="innerTableClassRightValignBottomLess">8</td><td width="92%" class="tableClassInnerLeftBottomLess">Shared Dispositive Power
+								<br><br><div class="text">7,877,611.00</div></td></tr></table></td></tr><tr><td width="8%" class="tableClassValign">9</td><td width="92%" class="tableClass">Aggregate Amount Beneficially Owned by Each Reporting Person
+					<br><br><div class="text">11,725,480.00</div></td></tr><tr><td width="8%" class="tableClassValign">10</td><td width="92%" class="tableClass">Check box if the aggregate amount in row (9) excludes certain shares (See Instructions)
+					<br><br><img src="/Images/box-checked.jpg" alt="Checkbox checked"></td></tr><tr><td width="8%" class="tableClassValign">11</td><td width="92%" class="tableClass">Percent of class represented by amount in row (9)
+					<br><br><div class="text">3.49 % </div></td></tr><tr><td width="8%" class="tableClassValign">12</td><td width="92%" class="tableClass">Type of Reporting Person (See Instructions)
+					<br><br><div class="text">IN</div></td></tr></table><br><div class="largetext"><span style="color:black;font-weight:bold;">Comment for Type of Reporting Person:</span>  (6)  Reflects 804,088 Units that are owned by Mr. David Simon and 1,965,231 vested LTIP Units owned by Mr. David Simon that were received under the Stock Plan.  Also reflects 6,918,267 Units directly held by SFG Company LLC over which Mr. David Simon has sole voting power and shared dispositive power.  Also reflects (i) 8,000 shares of Class B Common (which are convertible on a one-for-one basis into shares of Common) and 373 shares of Common, which are subject to the Class B Voting Trust (as defined in footnote 10 to this Schedule 13G) of which Mr. David Simon is one of two voting trustees and (ii) 889,747 shares of Common, which are subject to the Amended and Restated Voting Trust (as defined in footnote 9 to this Schedule 13G) of which Mr. David Simon is one of two voting trustees.  The ownership percentage is based on the number of shares of Common outstanding as of March 31, 2025, plus 9,745,132 shares of Common shares into which the Units, LTIP Units, and Class B Common beneficially owned by Mr. David Simon may be converted.  Does not include any shares of Common issuable pursuant to awards under the Stock Plan that are unearned and/or will not vest within 60 days.  Does not include 760,922 Units held by a trust which Mr. David Simon does not control but of which Mr. David Simon is a beneficiary.  Does not include shares of Common and shares issuable upon exchange of Units owned by MSA, which is 3.04% owned by Mr. David Simon individually or by trusts owned or controlled by Mr. David Simon, which are reported separately.</div><table><tr><td class="center"><br><br><p><div align="center" style="font-size:1.2em;">
+									SCHEDULE 13G
+								</div></p></td></tr></table><table role="presentation" class="tableClass" id="cusipNumber"><tr class="tableClass"><td width="25%" style="font-weight:bold;">CUSIP No.</td><td width="75%"><div style="font-size:.9em; color:#000000">828806109</div></td></tr></table><br><br><table role="presentation" class="tableClass" id="reportingPersonDetails"><tr class="tableClass"><td width="8%" class="tableClassValign">1</td><td width="92%" class="tableClass">Names of Reporting Persons
+					<br><br><div class="text">Eli Simon</div></td></tr><tr><td width="8%" class="tableClassValign">2</td><td width="92%" class="tableClass">Check the appropriate box if a member of a Group (see instructions)
+					<br><br><div class="text"><img src="/Images/box-checked.jpg" alt="Checkbox checked">  (a)
+						<br><img src="/Images/box-unchecked.jpg" alt="Checkbox not checked">  (b)
+					</div></td></tr><tr class="tableClassWithBgBlack"><td width="8%" class="tableClassValign">3</td><td width="92%" class="tableClass">Sec Use Only</td></tr><tr><td width="8%" class="tableClassValign">4</td><td width="92%" class="tableClass">Citizenship or Place of Organization
+					<br><br><div class="text">
+				UNITED STATES
+			</div></td></tr><tr><td width="8%" class="tableClassValign">Number of Shares Beneficially Owned by Each Reporting Person With:</td><td width="92%" class="tableClass"><table class="innerTableClass"><tr><td width="8%" class="innerTableClassRightValign">5</td><td width="92%" class="tableClassInnerLeft">Sole Voting Power
+								<br><br><div class="text">69,236.00</div></td></tr><tr><td width="8%" class="innerTableClassRightValign">6</td><td width="92%" class="tableClassInnerLeft">Shared Voting Power
+								<br><br><div class="text">8,373.00</div></td></tr><tr><td width="8%" class="innerTableClassRightValign">7</td><td width="92%" class="tableClassInnerLeft">Sole Dispositive Power
+								<br><br><div class="text">69,236.00</div></td></tr><tr><td width="8%" class="innerTableClassRightValignBottomLess">8</td><td width="92%" class="tableClassInnerLeftBottomLess">Shared Dispositive Power
+								<br><br><div class="text">8,373.00</div></td></tr></table></td></tr><tr><td width="8%" class="tableClassValign">9</td><td width="92%" class="tableClass">Aggregate Amount Beneficially Owned by Each Reporting Person
+					<br><br><div class="text">77,609.00</div></td></tr><tr><td width="8%" class="tableClassValign">10</td><td width="92%" class="tableClass">Check box if the aggregate amount in row (9) excludes certain shares (See Instructions)
+					<br><br><img src="/Images/box-checked.jpg" alt="Checkbox checked"></td></tr><tr><td width="8%" class="tableClassValign">11</td><td width="92%" class="tableClass">Percent of class represented by amount in row (9)
+					<br><br><div class="text">0.02 % </div></td></tr><tr><td width="8%" class="tableClassValign">12</td><td width="92%" class="tableClass">Type of Reporting Person (See Instructions)
+					<br><br><div class="text">IN</div></td></tr></table><br><div class="largetext"><span style="color:black;font-weight:bold;">Comment for Type of Reporting Person:</span>  (7)  Reflects 7,615 vested LTIP Units owned by Mr. Eli Simon that were received under the Stock Plan.  Also reflects (i) 8,000 shares of Class B Common (which are convertible on a one-for-one basis into shares of Common) and 373 shares of Common, which are subject to the Class B Voting Trust (as defined in footnote 10 to this Schedule 13G) of which Mr. Eli Simon is one of two voting trustees.  The ownership percentage is based on the number of shares of Common outstanding as of March 31, 2025, plus 7,615 shares of Common shares into which the vested LTIP Units beneficially owned by Mr. Eli Simon may be converted.  Does not include any shares of Common issuable pursuant to awards under the Stock Plan that are unearned and/or will not vest within 60 days.
+
+(8)  Mr. Eli Simon replaced Mr. Herbert Simon as one of the two voting trustees under the Class B Voting Trust as of February 4, 2025.  Mr. Eli Simon was appointed Executive Vice President of MSA as of May 10, 2024.</div><table><tr><td class="center"><br><br><p><div align="center" style="font-size:1.2em;">
+									SCHEDULE 13G
+								</div></p></td></tr></table><table role="presentation" class="tableClass" id="cusipNumber"><tr class="tableClass"><td width="25%" style="font-weight:bold;">CUSIP No.</td><td width="75%"><div style="font-size:.9em; color:#000000">828806109</div></td></tr></table><br><br><table role="presentation" class="tableClass" id="reportingPersonDetails"><tr class="tableClass"><td width="8%" class="tableClassValign">1</td><td width="92%" class="tableClass">Names of Reporting Persons
+					<br><br><div class="text">Amended and Restated Voting Trust</div></td></tr><tr><td width="8%" class="tableClassValign">2</td><td width="92%" class="tableClass">Check the appropriate box if a member of a Group (see instructions)
+					<br><br><div class="text"><img src="/Images/box-checked.jpg" alt="Checkbox checked">  (a)
+						<br><img src="/Images/box-unchecked.jpg" alt="Checkbox not checked">  (b)
+					</div></td></tr><tr class="tableClassWithBgBlack"><td width="8%" class="tableClassValign">3</td><td width="92%" class="tableClass">Sec Use Only</td></tr><tr><td width="8%" class="tableClassValign">4</td><td width="92%" class="tableClass">Citizenship or Place of Organization
+					<br><br><div class="text">
+				DELAWARE
+			</div></td></tr><tr><td width="8%" class="tableClassValign">Number of Shares Beneficially Owned by Each Reporting Person With:</td><td width="92%" class="tableClass"><table class="innerTableClass"><tr><td width="8%" class="innerTableClassRightValign">5</td><td width="92%" class="tableClassInnerLeft">Sole Voting Power
+								<br><br><div class="text">0.00</div></td></tr><tr><td width="8%" class="innerTableClassRightValign">6</td><td width="92%" class="tableClassInnerLeft">Shared Voting Power
+								<br><br><div class="text">889,747.00</div></td></tr><tr><td width="8%" class="innerTableClassRightValign">7</td><td width="92%" class="tableClassInnerLeft">Sole Dispositive Power
+								<br><br><div class="text">0.00</div></td></tr><tr><td width="8%" class="innerTableClassRightValignBottomLess">8</td><td width="92%" class="tableClassInnerLeftBottomLess">Shared Dispositive Power
+								<br><br><div class="text">889,747.00</div></td></tr></table></td></tr><tr><td width="8%" class="tableClassValign">9</td><td width="92%" class="tableClass">Aggregate Amount Beneficially Owned by Each Reporting Person
+					<br><br><div class="text">889,747.00</div></td></tr><tr><td width="8%" class="tableClassValign">10</td><td width="92%" class="tableClass">Check box if the aggregate amount in row (9) excludes certain shares (See Instructions)
+					<br><br><img src="/Images/box-checked.jpg" alt="Checkbox checked"></td></tr><tr><td width="8%" class="tableClassValign">11</td><td width="92%" class="tableClass">Percent of class represented by amount in row (9)
+					<br><br><div class="text">0.27 % </div></td></tr><tr><td width="8%" class="tableClassValign">12</td><td width="92%" class="tableClass">Type of Reporting Person (See Instructions)
+					<br><br><div class="text">OO</div></td></tr></table><br><div class="largetext"><span style="color:black;font-weight:bold;">Comment for Type of Reporting Person:</span>  (9)  "Amended and Restated Voting Trust" means that certain Voting Trust formed pursuant to a Second Amended and Restated Voting Trust Agreement, Voting Agreement and Proxy entered into as of March 1, 2004 between Melvin Simon &amp; Associates, Inc., an Indiana corporation and Melvin Simon, Herbert Simon and David Simon.</div><table><tr><td class="center"><br><br><p><div align="center" style="font-size:1.2em;">
+									SCHEDULE 13G
+								</div></p></td></tr></table><table role="presentation" class="tableClass" id="cusipNumber"><tr class="tableClass"><td width="25%" style="font-weight:bold;">CUSIP No.</td><td width="75%"><div style="font-size:.9em; color:#000000">828806109</div></td></tr></table><br><br><table role="presentation" class="tableClass" id="reportingPersonDetails"><tr class="tableClass"><td width="8%" class="tableClassValign">1</td><td width="92%" class="tableClass">Names of Reporting Persons
+					<br><br><div class="text">Class B Voting Trust</div></td></tr><tr><td width="8%" class="tableClassValign">2</td><td width="92%" class="tableClass">Check the appropriate box if a member of a Group (see instructions)
+					<br><br><div class="text"><img src="/Images/box-checked.jpg" alt="Checkbox checked">  (a)
+						<br><img src="/Images/box-unchecked.jpg" alt="Checkbox not checked">  (b)
+					</div></td></tr><tr class="tableClassWithBgBlack"><td width="8%" class="tableClassValign">3</td><td width="92%" class="tableClass">Sec Use Only</td></tr><tr><td width="8%" class="tableClassValign">4</td><td width="92%" class="tableClass">Citizenship or Place of Organization
+					<br><br><div class="text">
+				DELAWARE
+			</div></td></tr><tr><td width="8%" class="tableClassValign">Number of Shares Beneficially Owned by Each Reporting Person With:</td><td width="92%" class="tableClass"><table class="innerTableClass"><tr><td width="8%" class="innerTableClassRightValign">5</td><td width="92%" class="tableClassInnerLeft">Sole Voting Power
+								<br><br><div class="text">0.00</div></td></tr><tr><td width="8%" class="innerTableClassRightValign">6</td><td width="92%" class="tableClassInnerLeft">Shared Voting Power
+								<br><br><div class="text">8,373.00</div></td></tr><tr><td width="8%" class="innerTableClassRightValign">7</td><td width="92%" class="tableClassInnerLeft">Sole Dispositive Power
+								<br><br><div class="text">0.00</div></td></tr><tr><td width="8%" class="innerTableClassRightValignBottomLess">8</td><td width="92%" class="tableClassInnerLeftBottomLess">Shared Dispositive Power
+								<br><br><div class="text">8,373.00</div></td></tr></table></td></tr><tr><td width="8%" class="tableClassValign">9</td><td width="92%" class="tableClass">Aggregate Amount Beneficially Owned by Each Reporting Person
+					<br><br><div class="text">8,373.00</div></td></tr><tr><td width="8%" class="tableClassValign">10</td><td width="92%" class="tableClass">Check box if the aggregate amount in row (9) excludes certain shares (See Instructions)
+					<br><br><img src="/Images/box-checked.jpg" alt="Checkbox checked"></td></tr><tr><td width="8%" class="tableClassValign">11</td><td width="92%" class="tableClass">Percent of class represented by amount in row (9)
+					<br><br><div class="text">0.00 % </div></td></tr><tr><td width="8%" class="tableClassValign">12</td><td width="92%" class="tableClass">Type of Reporting Person (See Instructions)
+					<br><br><div class="text">OO</div></td></tr></table><br><div class="largetext"><span style="color:black;font-weight:bold;">Comment for Type of Reporting Person:</span>  (10)  "Class B Voting Trust" means that certain Voting Trust formed pursuant to a Voting Trust Agreement, Voting Agreement and Proxy entered into as of March 1, 2004 between David Simon, Melvin Simon and Herbert Simon.
+
+(11)  Consists of 8,000 shares of Class B Common and 373 shares of Common.  The ownership percentage is based on the number of shares of Common outstanding as of December 31, 2023, plus 8,000 shares of Common into which the Class B Common, beneficially owned by the Class B Voting Trust, may be converted.
+
+(12)  Mr. Eli Simon replaced Mr. Herbert Simon as one of the two voting trustees under the Class B Voting Trust as of February 4, 2025.</div></div><div class="form1"><table><tr><td class="center"><br><br><p><div align="center" style="font-size:1.2em;">
+								SCHEDULE 13G
+							</div></p></td></tr></table><table role="presentation" id="item1to9"><tr><td width="8%" class="tableClassValignNoBorder">Item 1.</td><td width="92%" class="tableClassNoBorder"> </td></tr><tr class="tableClass"><td width="8%" class="tableClassNoBorderAlignCenter">(a)</td><td width="92%" class="tableClassNoBorder">Name of issuer:
+					<br><br><div class="text">Simon Property Group, Inc.</div></td></tr><tr><td width="8%" class="tableClassNoBorderAlignCenter">(b)</td><td width="92%" class="tableClassNoBorder">Address of issuer's principal executive offices:
+					<br><br><div class="text">225 West Washington Street Indianapolis, IN, 46204</div></td></tr><tr><td width="8%" class="tableClassValignNoBorder">Item 2.</td><td width="92%" class="tableClassNoBorder"> </td></tr><tr class="tableClass"><td width="8%" class="tableClassNoBorderAlignCenter">(a)</td><td width="92%" class="tableClassNoBorder">Name of person filing:
+					<br><br><div class="largetext">(i) Melvin Simon &amp; Associates, Inc.;
+(ii) Herbert Simon;
+(iii) David Simon;
+(iv) Eli Simon;
+(v) Amended and Restated Voting Trust; and
+(vi) Class B Voting Trust.</div></td></tr><tr><td width="8%" class="tableClassNoBorderAlignCenter">(b)</td><td width="92%" class="tableClassNoBorder">Address or principal business office or, if none, residence:
+					<br><br><div class="largetext">225 West Washington Street
+Indianapolis, IN 46204</div></td></tr><tr><td width="8%" class="tableClassNoBorderAlignCenter">(c)</td><td width="92%" class="tableClassNoBorder">Citizenship:
+					<br><br><div class="largetext">(i) MSA - Indiana
+(ii) Herbert Simon - United States
+(iii) David Simon - United States
+(iv) Eli Simon - United States
+(v) Amended and Restated Voting Trust - Delaware
+(vi) Class B Voting Trust - Delaware</div></td></tr><tr><td width="8%" class="tableClassNoBorderAlignCenter">(d)</td><td width="92%" class="tableClassNoBorder">Title of class of securities:
+					<br><br><div class="text">Common Stock Par Value $.0001 per Share</div></td></tr><tr><td width="8%" class="tableClassNoBorderAlignCenter">(e)</td><td width="92%" class="tableClassNoBorder">CUSIP No.:
+					<br><br><div class="text">828806109</div></td></tr><tr><td width="8%" class="tableClassValignNoBorder">Item 3.</td><td width="92%" class="tableClassNoBorder">If this statement is filed pursuant to §§ 240.13d-1(b) or 240.13d-2(b) or (c), check whether the person filing is a:</td></tr><tr><td width="8%" class="tableClassNoBorderAlignCenter">(a)</td><td width="92%" class="tableClassNoBorder"><img src="/Images/box-unchecked.jpg" alt="Checkbox not checked">   Broker or dealer registered under section 15 of the Act (15 U.S.C. 78o);
+					</td></tr><tr><td width="8%" class="tableClassNoBorderAlignCenter">(b)</td><td width="92%" class="tableClassNoBorder"><img src="/Images/box-unchecked.jpg" alt="Checkbox not checked">   Bank as defined in section 3(a)(6) of the Act (15 U.S.C. 78c);
+					</td></tr><tr><td width="8%" class="tableClassNoBorderAlignCenter">(c)</td><td width="92%" class="tableClassNoBorder"><img src="/Images/box-unchecked.jpg" alt="Checkbox not checked">   Insurance company as defined in section 3(a)(19) of the Act (15 U.S.C. 78c);
+					</td></tr><tr><td width="8%" class="tableClassNoBorderAlignCenter">(d)</td><td width="92%" class="tableClassNoBorder"><img src="/Images/box-unchecked.jpg" alt="Checkbox not checked">   Investment company registered under section 8 of the Investment Company Act of 1940 (15 U.S.C. 80a-8);
+					</td></tr><tr><td width="8%" class="tableClassNoBorderAlignCenter">(e)</td><td width="92%" class="tableClassNoBorder"><img src="/Images/box-unchecked.jpg" alt="Checkbox not checked">   An investment adviser in accordance with § 240.13d-1(b)(1)(ii)(E);
+					</td></tr><tr><td width="8%" class="tableClassNoBorderAlignCenter">(f)</td><td width="92%" class="tableClassNoBorder"><img src="/Images/box-unchecked.jpg" alt="Checkbox not checked">   An employee benefit plan or endowment fund in accordance with § 240.13d-1(b)(1)(ii)(F);
+					</td></tr><tr><td width="8%" class="tableClassNoBorderAlignCenter">(g)</td><td width="92%" class="tableClassNoBorder"><img src="/Images/box-unchecked.jpg" alt="Checkbox not checked">   A parent holding company or control person in accordance with § 240.13d-1(b)(1)(ii)(G);
+					</td></tr><tr><td width="8%" class="tableClassNoBorderAlignCenter">(h)</td><td width="92%" class="tableClassNoBorder"><img src="/Images/box-unchecked.jpg" alt="Checkbox not checked">   A savings associations as defined in Section 3(b) of the Federal Deposit Insurance Act (12 U.S.C. 1813);
+					</td></tr><tr><td width="8%" class="tableClassNoBorderAlignCenter">(i)</td><td width="92%" class="tableClassNoBorder"><img src="/Images/box-unchecked.jpg" alt="Checkbox not checked">   A church plan that is excluded from the definition of an investment company under section 3(c)(14) of the Investment Company Act of 1940 (15 U.S.C. 80a-3);
+					</td></tr><tr><td width="8%" class="tableClassNoBorderAlignCenter">(j)</td><td width="92%" class="tableClassNoBorder"><img src="/Images/box-unchecked.jpg" alt="Checkbox not checked">   A non-U.S. institution in accordance with § 240.13d-1(b)(1)(ii)(J). If filing as a non-U.S. institution in accordance with § 240.13d-1(b)(1)(ii)(J), 
+						<br>       please specify the type of institution:
+					</td></tr><tr><td width="8%" class="tableClassNoBorderAlignCenter">(k)</td><td width="92%" class="tableClassNoBorder"><img src="/Images/box-unchecked.jpg" alt="Checkbox not checked">   Group, in accordance with Rule 240.13d-1(b)(1)(ii)(K).
+					</td></tr><tr><td width="8%" class="tableClassNoBorderAlignCenter"> </td><td width="100%" colspan="2" class="tableClassNoBorder"><div class="largetext"></div></td></tr><tr><td width="8%" class="tableClassValignNoBorder">Item 4.</td><td width="92%" class="tableClassNoBorder">Ownership</td></tr><tr><td width="8%" class="tableClassNoBorderAlignCenter">(a)</td><td width="92%" class="tableClassNoBorder">Amount beneficially owned:
+					<br><br><div class="largetext">I. MELVIN SIMON &amp; ASSOCIATES, INC.  -    12,523,916
+II. HERBERT SIMON  -    6,504,748
+III. DAVID SIMON  -    11,725,480
+IV. ELI SIMON  -    77,609
+V. AMENDED AND RESTATED VOTING TRUST  -    889,747
+VI. CLASS B VOTING TRUST  -    8,373</div></td></tr><tr><td width="8%" class="tableClassNoBorderAlignCenter">(b)</td><td width="92%" class="tableClassNoBorder">Percent of class:
+					<br><br><div class="largetext">I. MELVIN SIMON &amp; ASSOCIATES, INC.  -    3.70
+II. HERBERT SIMON  -    1.96
+III. DAVID SIMON  -    3.49
+IV. ELI SIMON  -    0.02
+V. AMENDED AND RESTATED VOTING TRUST  -    0.27
+VI. CLASS B VOTING TRUST  -    Less than 0.01%</div></td></tr><tr><td width="8%" class="tableClassNoBorderAlignCenter">(c)</td><td width="92%" class="tableClassNoBorder">Number of shares as to which the person has:
+					<br></td></tr><tr><td width="8%" class="tableClassNoBorderAlignCenter"> </td><td width="92%" class="tableClassNoBorder">(i) Sole power to vote or to direct the vote:
+					<br><br><div class="largetext">I. MELVIN SIMON &amp; ASSOCIATES, INC.  -    11,634,169
+II. HERBERT SIMON  -    5,615,001
+III. DAVID SIMON  -    10,766,136
+IV. ELI SIMON  -    69,236
+V. AMENDED AND RESTATED VOTING TRUST  -    0
+VI. CLASS B VOTING TRUST  -    0</div><br></td></tr><tr><td width="8%" class="tableClassNoBorderAlignCenter"> </td><td width="92%" class="tableClassNoBorder">(ii) Shared power to vote or to direct the vote:
+					<br><br><div class="largetext">I. MELVIN SIMON &amp; ASSOCIATES, INC.  -    889,747
+II. HERBERT SIMON  -    889,747
+III. DAVID SIMON  -    959,344
+IV. ELI SIMON  -    8,373
+V. AMENDED AND RESTATED VOTING TRUST  -    889,747
+VI. CLASS B VOTING TRUST  -    8,373</div><br></td></tr><tr><td width="8%" class="tableClassNoBorderAlignCenter"> </td><td width="92%" class="tableClassNoBorder">(iii) Sole power to dispose or to direct the disposition of:
+					<br><br><div class="largetext">I. MELVIN SIMON &amp; ASSOCIATES, INC.  -    11,634,169
+II. HERBERT SIMON  -    5,615,001
+III. DAVID SIMON  -    3,847,869
+IV. ELI SIMON  -    69,236
+V. AMENDED AND RESTATED VOTING TRUST  -    0
+VI. CLASS B VOTING TRUST  -    0</div><br></td></tr><tr><td width="8%" class="tableClassNoBorderAlignCenter"> </td><td width="92%" class="tableClassNoBorder">(iv) Shared power to dispose or to direct the disposition of:
+					<br><br><div class="largetext">I. MELVIN SIMON &amp; ASSOCIATES, INC.  -    889,747
+II. HERBERT SIMON  -    889,747
+III. DAVID SIMON  -    7,877,611
+IV. ELI SIMON  -    8,373
+V. AMENDED AND RESTATED VOTING TRUST  -    889,747
+VI. CLASS B VOTING TRUST  -    8,373</div><br></td></tr><tr><td width="8%" class="tableClassValignNoBorder">Item 5.</td><td width="92%" class="tableClassNoBorder">Ownership of 5 Percent or Less of a Class.</td></tr><tr><td width="8%" class="tableClassNoBorderAlignCenter"> </td><td width="92%" class="tableClassNoBorder"><div class="text">
+								Not Applicable
+							</div></td></tr><tr><td width="8%" class="tableClassValignNoBorder">Item 6.</td><td width="92%" class="tableClassNoBorder">Ownership of more than 5 Percent on Behalf of Another Person.</td></tr><tr><td width="8%" class="tableClassNoBorderAlignCenter"> </td><td width="92%" class="tableClassNoBorder"><div class="text">
+							Not Applicable
+						</div></td></tr><tr><td width="8%" class="tableClassValignNoBorder">Item 7.</td><td width="92%" class="tableClassNoBorder">Identification and Classification of the Subsidiary Which Acquired the Security Being Reported on by the Parent Holding Company or Control Person.</td></tr><tr><td width="8%" class="tableClassNoBorderAlignCenter"> </td><td width="92%" class="tableClassNoBorder"><div class="text">
+								Not Applicable
+							</div></td></tr><tr><td width="8%" class="tableClassValignNoBorder">Item 8.</td><td width="92%" class="tableClassNoBorder">Identification and Classification of Members of the Group.</td></tr><tr><td width="8%" class="tableClassNoBorderAlignCenter"> </td><td width="92%" class="tableClassNoBorder"><div class="text">
+									Not Applicable
+								</div></td></tr><tr><td width="8%" class="tableClassValignNoBorder">Item 9.</td><td width="92%" class="tableClassNoBorder">Notice of Dissolution of Group.</td></tr><tr><td width="8%" class="tableClassNoBorderAlignCenter"> </td><td width="92%" class="tableClassNoBorder"><div class="text">
+									Not Applicable
+								</div></td></tr></table><br></div><div class="form1"><table role="presentation" id="certifications"><tr><td width="8%" class="tableClassValignNoBorder">Item 10.</td><td width="92%" class="tableClassNoBorder">Certifications:</td></tr><tr class="tableClass"><td width="8%" class="tableClassNoBorderAlignCenter"> </td><td width="92%" class="tableClassNoBorder"><div class="text">
+									Not Applicable
+							</div></td></tr></table><br></div><div class="form1"><table role="presentation" id="signatureInfo"><tr><td width="8%" class="tableClassValignNoBorder">    SIGNATURE</td><td width="92%" class="tableClassNoBorder"> </td></tr><tr><td width="8%" class="tableClassNoBorderAlignCenter"> </td><td width="92%" class="tableClassNoBorder"><div class="information" style="text-align:justify">
+						After reasonable inquiry and to the best of my knowledge and belief, I certify that the information set forth in this statement is true, complete and correct.
+						<br><br></div></td></tr></table><table><tr class="tableClass"><td width="50%" class="tableClassNoBorder"> </td><td width="50%" class="tableClassNoBorder"><table><tr class="tableClass"><td width="100%" class="tableClassInnerNoBorderBlue"><div class="text">Melvin Simon &amp; Associates, Inc.</div></td></tr></table></td></tr></table><table><tr class="tableClass"><td width="50%" class="tableClassNoBorder"> </td><td width="50%" class="tableClassNoBorder"><table><tr class="tableClass"><td width="8%" class="tableClassNoBorderAlignLeft signature">Signature:</td><td width="92%" class="tableClassNoBorderBlue signature">/s/ Herbert Simon</td></tr><tr class="tableClass"><td width="8%" class="tableClassNoBorderAlignLeft signature">Name/Title:</td><td width="92%" class="tableClassNoBorderBlue signature">Herbert Simon, Chairman</td></tr><tr class="tableClass"><td width="8%" class="tableClassNoBorderAlignLeft signature">Date:</td><td width="92%" class="tableClassNoBorderBlue signature">05/14/2025</td></tr></table></td></tr></table><table><tr class="tableClass"><td width="50%" class="tableClassNoBorder"> </td><td width="50%" class="tableClassNoBorder"><table><tr class="tableClass"><td width="100%" class="tableClassInnerNoBorderBlue"><div class="text">Herbert Simon</div></td></tr></table></td></tr></table><table><tr class="tableClass"><td width="50%" class="tableClassNoBorder"> </td><td width="50%" class="tableClassNoBorder"><table><tr class="tableClass"><td width="8%" class="tableClassNoBorderAlignLeft signature">Signature:</td><td width="92%" class="tableClassNoBorderBlue signature">/s/ Herbert Simon</td></tr><tr class="tableClass"><td width="8%" class="tableClassNoBorderAlignLeft signature">Name/Title:</td><td width="92%" class="tableClassNoBorderBlue signature">Herbert Simon</td></tr><tr class="tableClass"><td width="8%" class="tableClassNoBorderAlignLeft signature">Date:</td><td width="92%" class="tableClassNoBorderBlue signature">05/14/2025</td></tr></table></td></tr></table><table><tr class="tableClass"><td width="50%" class="tableClassNoBorder"> </td><td width="50%" class="tableClassNoBorder"><table><tr class="tableClass"><td width="100%" class="tableClassInnerNoBorderBlue"><div class="text">David Simon</div></td></tr></table></td></tr></table><table><tr class="tableClass"><td width="50%" class="tableClassNoBorder"> </td><td width="50%" class="tableClassNoBorder"><table><tr class="tableClass"><td width="8%" class="tableClassNoBorderAlignLeft signature">Signature:</td><td width="92%" class="tableClassNoBorderBlue signature">/s/ David Simon</td></tr><tr class="tableClass"><td width="8%" class="tableClassNoBorderAlignLeft signature">Name/Title:</td><td width="92%" class="tableClassNoBorderBlue signature">David Simon</td></tr><tr class="tableClass"><td width="8%" class="tableClassNoBorderAlignLeft signature">Date:</td><td width="92%" class="tableClassNoBorderBlue signature">05/14/2025</td></tr></table></td></tr></table><table><tr class="tableClass"><td width="50%" class="tableClassNoBorder"> </td><td width="50%" class="tableClassNoBorder"><table><tr class="tableClass"><td width="100%" class="tableClassInnerNoBorderBlue"><div class="text">Eli Simon</div></td></tr></table></td></tr></table><table><tr class="tableClass"><td width="50%" class="tableClassNoBorder"> </td><td width="50%" class="tableClassNoBorder"><table><tr class="tableClass"><td width="8%" class="tableClassNoBorderAlignLeft signature">Signature:</td><td width="92%" class="tableClassNoBorderBlue signature">/s/ Eli Simon</td></tr><tr class="tableClass"><td width="8%" class="tableClassNoBorderAlignLeft signature">Name/Title:</td><td width="92%" class="tableClassNoBorderBlue signature">Eli Simon</td></tr><tr class="tableClass"><td width="8%" class="tableClassNoBorderAlignLeft signature">Date:</td><td width="92%" class="tableClassNoBorderBlue signature">05/14/2025</td></tr></table></td></tr></table><table><tr class="tableClass"><td width="50%" class="tableClassNoBorder"> </td><td width="50%" class="tableClassNoBorder"><table><tr class="tableClass"><td width="100%" class="tableClassInnerNoBorderBlue"><div class="text">Amended and Restated Voting Trust</div></td></tr></table></td></tr></table><table><tr class="tableClass"><td width="50%" class="tableClassNoBorder"> </td><td width="50%" class="tableClassNoBorder"><table><tr class="tableClass"><td width="8%" class="tableClassNoBorderAlignLeft signature">Signature:</td><td width="92%" class="tableClassNoBorderBlue signature">/s/ Herbert Simon</td></tr><tr class="tableClass"><td width="8%" class="tableClassNoBorderAlignLeft signature">Name/Title:</td><td width="92%" class="tableClassNoBorderBlue signature">Herbert Simon, as Voting Trustee and in his individual capacity</td></tr><tr class="tableClass"><td width="8%" class="tableClassNoBorderAlignLeft signature">Date:</td><td width="92%" class="tableClassNoBorderBlue signature">05/14/2025</td></tr></table></td></tr></table><table><tr class="tableClass"><td width="50%" class="tableClassNoBorder"> </td><td width="50%" class="tableClassNoBorder"><table><tr class="tableClass"><td width="8%" class="tableClassNoBorderAlignLeft signature">Signature:</td><td width="92%" class="tableClassNoBorderBlue signature">/s/ David Simon</td></tr><tr class="tableClass"><td width="8%" class="tableClassNoBorderAlignLeft signature">Name/Title:</td><td width="92%" class="tableClassNoBorderBlue signature">David Simon, as Voting Trustee and in his individual capacity</td></tr><tr class="tableClass"><td width="8%" class="tableClassNoBorderAlignLeft signature">Date:</td><td width="92%" class="tableClassNoBorderBlue signature">05/14/2025</td></tr></table></td></tr></table><table><tr class="tableClass"><td width="50%" class="tableClassNoBorder"> </td><td width="50%" class="tableClassNoBorder"><table><tr class="tableClass"><td width="100%" class="tableClassInnerNoBorderBlue"><div class="text">Class B Voting Trust</div></td></tr></table></td></tr></table><table><tr class="tableClass"><td width="50%" class="tableClassNoBorder"> </td><td width="50%" class="tableClassNoBorder"><table><tr class="tableClass"><td width="8%" class="tableClassNoBorderAlignLeft signature">Signature:</td><td width="92%" class="tableClassNoBorderBlue signature">/s/ David Simon</td></tr><tr class="tableClass"><td width="8%" class="tableClassNoBorderAlignLeft signature">Name/Title:</td><td width="92%" class="tableClassNoBorderBlue signature">David Simon, as Voting Trustee</td></tr><tr class="tableClass"><td width="8%" class="tableClassNoBorderAlignLeft signature">Date:</td><td width="92%" class="tableClassNoBorderBlue signature">05/14/2025</td></tr></table></td></tr></table><table><tr class="tableClass"><td width="50%" class="tableClassNoBorder"> </td><td width="50%" class="tableClassNoBorder"><table><tr class="tableClass"><td width="8%" class="tableClassNoBorderAlignLeft signature">Signature:</td><td width="92%" class="tableClassNoBorderBlue signature">/s/ Eli Simon</td></tr><tr class="tableClass"><td width="8%" class="tableClassNoBorderAlignLeft signature">Name/Title:</td><td width="92%" class="tableClassNoBorderBlue signature">Eli Simon, as Voting Trustee</td></tr><tr class="tableClass"><td width="8%" class="tableClassNoBorderAlignLeft signature">Date:</td><td width="92%" class="tableClassNoBorderBlue signature">05/14/2025</td></tr></table></td></tr></table><table><tr class="tableClass" colspan="2"><td width="100%" class="tableClassNoBorder"><div class="information" style="text-align:center;font-weight:bold;">
+					 Exhibit Information
+					<br><br></div></td></tr><tr class="tableClass" colspan="2"><td width="100%" class="tableClassNoBorder"><div class="largetext">Exhibit A - Joint Filing Agreement<br><br></div></td></tr></table></div></div>
+
+<script type="text/javascript"  src="/nd7kb9mCUV/CxBaQU/3fjA/Or5XcXrmfDVmcJ7G/QCEYaQ/DBMbKw/kWDyg"></script></body></html>
