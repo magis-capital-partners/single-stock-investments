@@ -1,7 +1,7 @@
 # CSCO — Third-party source inventory
 
 **Date:** 2026-09-12
-**Sources:** 6 total (0 approved, 0 pending, 6 context)
+**Sources:** 7 total (0 approved, 0 pending, 7 context)
 
 | ID | Title | Path | Status | Use |
 |----|-------|------|--------|-----|
@@ -11,5 +11,6 @@
 | activist_long | Cisco Systems, Inc — DFAN14A (proxy solicitation) | `CSCO/third-party-analyses/activist_reports/long/DFAN14A_20230921_acc0001193125_23_239714.htm` | context | activist/long — sec_edgar |
 | activist_long | Cisco Systems, Inc — DFAN14A (proxy solicitation) | `CSCO/third-party-analyses/activist_reports/long/DFAN14A_20230921_acc0001193125_23_239723.htm` | context | activist/long — sec_edgar |
 | activist_long | Elliott Management — SC 13D/A | `CSCO/third-party-analyses/activist_reports/long/SC-13D/A_20210120_acc0001193125_21_012429.htm` | context | activist/long — sec_edgar |
+| activist_long | Elliott Management — DEFA14A | `CSCO/third-party-analyses/activist_reports/long/DEFA14A_20231128_acc0001193125_23_283824.htm` | context | activist/long — sec_edgar |
 
 Cross-check required: `CSCO/research/cross_check_third_party_2026-09-12.md`
