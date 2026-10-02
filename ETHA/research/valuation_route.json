@@ -27,7 +27,9 @@
     "greenblatt",
     "hk",
     "klarman_asset_value",
+    "lawrence",
     "marks_credit_cycle",
+    "moi",
     "pabrai",
     "stahl"
   ],
@@ -43,7 +45,16 @@
     "stock compensation or acquisitions omitted",
     "terminal value unsupported by a durable mechanism"
   ],
-  "secondary_profiles": [],
+  "secondary_profiles": [
+    {
+      "profile_id": "catalyst_asset_value",
+      "score": 2.0,
+      "reasons": [
+        "component categories=dated_payoff",
+        "existing methods=dated_payoff"
+      ]
+    }
+  ],
   "scorecard": {
     "scarce_asset_optionality": {
       "score": 0.0,
@@ -65,8 +76,11 @@
       "reasons": []
     },
     "catalyst_asset_value": {
-      "score": 0.0,
-      "reasons": []
+      "score": 2.0,
+      "reasons": [
+        "component categories=dated_payoff",
+        "existing methods=dated_payoff"
+      ]
     },
     "predictable_cash_flow": {
       "score": 0.0,
@@ -79,21 +93,39 @@
   },
   "decision_rule": "Power Zones select the fitting economic method and eligible independent reviewers; they never choose the valuation answer or capital decision.",
   "ticker": "ETHA",
-  "as_of": "2026-07-29",
+  "as_of": "2026-10-02",
   "route_source": "canonical_power_zone_router",
   "config_path": "_system/frameworks/power_zones.json",
   "config_updated": "2026-07-14",
   "classification": {
     "archetype": "compounder",
-    "moat": "unproven",
-    "dhando": "pending",
+    "moat": "n/a",
+    "dhando": "partial",
     "stance": "watch",
-    "cycle": "-",
+    "cycle": "mid",
     "moi_bucket": "pending",
-    "payoff_lens": "pending",
-    "investment_sleeve": "ls_algo_underlying"
+    "payoff_lens": "asset",
+    "investment_sleeve": "ls_algo_underlying",
+    "predictive_attribute": "wrapper_tracking_basis"
   },
-  "specialist_power_zones": [],
+  "specialist_power_zones": [
+    {
+      "persona": "lawrence",
+      "label": "Bryan Lawrence",
+      "independence_group": "quality_reinvestment",
+      "in_power_zone": true,
+      "fit": 0.667,
+      "matched": 2,
+      "known_fields": 2,
+      "matched_fields": [
+        "archetype",
+        "dhando"
+      ],
+      "excluded_by": null,
+      "match_rate": null,
+      "score": 57
+    }
+  ],
   "committee": {
     "candidate_count": 4,
     "independence_group_count": 3,
@@ -117,6 +149,6 @@
       }
     ]
   },
-  "input_hash": "78ca8143af7620cbc371d966e023f71dda4a5afc6924572816a7077c36b8c74e",
-  "generated_at": "2026-07-29T20:34:30.942866+00:00"
+  "input_hash": "e1efbac7d121b2f33520190aec890efb4d66c8de3a2bd7c3d4ff939a9ac9a2ae",
+  "generated_at": "2026-10-02T09:20:54.387295+00:00"
 }

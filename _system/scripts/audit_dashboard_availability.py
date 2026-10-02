@@ -11,7 +11,7 @@ from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[2]
 TECHNICAL_SUMMARY = ROOT / "dashboard" / "data" / "technical_summary.json"
-CURRENT_TECHNICAL_MODEL = "technical-fear-v2"
+CURRENT_TECHNICAL_MODEL = "technical-fear-v3"
 
 
 def load_json(path: Path) -> dict:

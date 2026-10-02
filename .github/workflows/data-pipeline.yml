@@ -206,6 +206,15 @@ jobs:
         run: |
           python _system/scripts/build_capitulation_daily.py \
             --check-rebuilt-since "$(cat "$RUNNER_TEMP/capitulation_started_at")"
+      # Phase 6 of _system/research/technical_signal_study: log what was just
+      # published and grade older signals whose 5/21/63-session outcomes have
+      # matured. Runs after both builders so it logs the final snapshots; its
+      # ledger lives outside dashboard/data so a rebase conflict cannot drop it.
+      - id: track_record
+        name: Log and grade published technical signals
+        if: always()
+        continue-on-error: true
+        run: python _system/scripts/build_signal_track_record.py
       - name: Commit technical snapshots
         if: always()
         uses: ./.github/actions/commit-main
@@ -222,10 +231,12 @@ jobs:
             dashboard/data/capitulation_daily.json
             dashboard/data/capitulation_daily_history.jsonl
             dashboard/data/capitulation_daily_state.json
+            dashboard/data/signal_track_record.json
+            _system/data/signal_track_record/ledger
       - name: Keep unresolved technical failures loud after preserving progress
-        if: always() && (steps.technical_health.outcome == 'failure' || steps.capitulation_rebuilt.outcome == 'failure')
+        if: always() && (steps.technical_health.outcome == 'failure' || steps.capitulation_rebuilt.outcome == 'failure' || steps.track_record.outcome == 'failure')
         run: |
-          echo "::error::Technical snapshots were preserved, but their refresh or validation remains degraded (technical_health=${{ steps.technical_health.outcome }}, capitulation_rebuilt=${{ steps.capitulation_rebuilt.outcome }})."
+          echo "::error::Technical snapshots were preserved, but their refresh or validation remains degraded (technical_health=${{ steps.technical_health.outcome }}, capitulation_rebuilt=${{ steps.capitulation_rebuilt.outcome }}, track_record=${{ steps.track_record.outcome }})."
           exit 1
 
   activist:

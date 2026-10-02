@@ -10,6 +10,7 @@ import json
 import sys
 import time
 import urllib.parse
+import urllib.error
 import urllib.request
 from concurrent.futures import ThreadPoolExecutor, as_completed
 from datetime import datetime, timezone
@@ -55,6 +56,11 @@ def fetch(symbol: str) -> pd.DataFrame:
             with urllib.request.urlopen(req, timeout=40) as response:
                 payload = json.loads(response.read())
             break
+        except urllib.error.HTTPError as exc:
+            if exc.code in (400, 404):  # unknown/delisted symbol: permanent, don't back off
+                raise RuntimeError(f"{symbol}: HTTP {exc.code}") from exc
+            last = exc
+            time.sleep(2.0 * (attempt + 1) ** 2)
         except Exception as exc:  # noqa: BLE001
             last = exc
             time.sleep(2.0 * (attempt + 1) ** 2)
