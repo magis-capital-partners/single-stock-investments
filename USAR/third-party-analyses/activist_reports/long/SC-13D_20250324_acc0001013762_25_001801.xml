@@ -1,0 +1,458 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns:p="http://www.sec.gov/edgar/schedule13D" xmlns:p1="http://www.sec.gov/edgar/common"><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8"><link rel="stylesheet" type="text/css" href="/css/SDR_print.css"><style type="text/css">
+					.fakeTextBox {
+					border-top: 2px solid #999;
+					border-right: 1px solid #ccc;
+					border-bottom: 1px solid #ccc;
+					border-left: 2px solid #999;
+					padding: 2px;
+					_width: 800px;
+					height: auto;
+					min-width: 200px;
+					min-height: 50px;
+					word-wrap: break-word;
+					font-size: 0.9em;
+					color: blue;
+					}
+					table.tableClass { border: solid black;
+					border-top-width: 1;
+					border-right-width: 1;
+					border-bottom-width: 1;
+					border-left-width: 1;
+					table-layout:fixed;
+					}
+					table.innerTableClass { border: solid black;
+					border-top-width: 0;
+					border-right-width: 0;
+					border-bottom-width: 0;
+					border-left-width: 0;
+					table-layout:fixed;
+					}
+					th.tableClassLeft { border: solid black;
+					border-top-width: 0px;
+					border-right-width: 0px;
+					border-bottom-width: 1px;
+					border-left-width: 1px;
+					padding: 2px;
+					}
+					th.tableClassRight { border: solid black;
+					border-top-width: 0px;
+					border-right-width: 1px;
+					border-bottom-width: 1px;
+					border-left-width: 0;
+					padding: 2px;
+					}
+					th.tableClass { border: solid black;
+					border-top-width: 0px;
+					border-right-width: 1px;
+					border-bottom-width: 1px;
+					border-left-width: 1px;
+					padding: 2px;
+					}
+					td.tableClassLeft { border: solid black;
+					border-top-width: 0px;
+					border-right-width: 0px;
+					border-bottom-width: 1px;
+					border-left-width: 1px;
+					font-size: 0.9em;
+					color: blue;
+					word-wrap: break-word;
+					}
+					td.tableClassRight { border: solid black;
+					border-top-width: 0px;
+					border-right-width: 1px;
+					border-bottom-width: 1px;
+					border-left-width: 0;
+					font-size: 0.9em;
+					color: blue;
+					word-wrap: break-word;
+					}
+					td.tableClass { border: solid black;
+					border-top-width: 0px;
+					border-right-width: 1px;
+					border-bottom-width: 1px;
+					border-left-width: 1px;
+					font-size: 0.9em;
+					font-weight:bold;
+					color: black;
+					word-wrap: break-word;
+					}
+					td.tableClassNoBorder { border: solid black;
+					border-top-width: 0px;
+					border-right-width: 0px;
+					border-bottom-width: 0px;
+					border-left-width: 0px;
+					font-size: 0.9em;
+					font-weight:bold;
+					color: black;
+					word-wrap: break-word;
+					}
+
+					td.tableClassNoBorderBlue { border: solid black;
+					border-top-width: 0px;
+					border-right-width: 0px;
+					border-bottom-width: 0px;
+					border-left-width: 0px;
+					font-size: 0.9em;
+					font-weight:bold;
+					color: blue;
+					word-wrap: break-word;
+					}
+
+					td.tableClassInnerNoBorderBlue { border: solid black;
+					border-top-width: 0px;
+					border-right-width: 0px;
+					border-bottom-width: 0px;
+					border-left-width: 0px;
+					font-size: 1.4em;
+					font-weight:bold;
+					color: blue;
+					word-wrap: break-word;
+					}
+
+					td.tableClassNoBorderAlignLeft { border: solid black;
+					border-top-width: 0px;
+					border-right-width: 0px;
+					border-bottom-width: 0px;
+					border-left-width: 0px;
+					font-size: 0.9em;
+					font-weight:bold;
+					text-align: left;
+					color: black;
+					word-wrap: break-word;
+					}
+
+					td.signature {
+					padding: 4px 8px;
+					}
+
+					td.tableClassInner { border: solid black;
+					border-top-width: 0px;
+					border-right-width: 1px;
+					border-bottom-width: 1px;
+					border-left-width: 1px;
+					font-size: 1em;
+					font-weight:bold;
+					color: black;
+					word-wrap: break-word;
+					}
+
+					td.tableClassValign { border: solid black;
+					border-top-width: 0px;
+					border-right-width: 1px;
+					border-bottom-width: 1px;
+					border-left-width: 1px;
+					font-size: 0.9em;
+					font-weight:bold;
+					color: black;
+					vertical-align: middle;
+					text-align: center;
+					word-wrap: break-word;
+					}
+
+					td.tableClassValignNoBorder { border: solid black;
+					border-top-width: 0px;
+					border-right-width: 0px;
+					border-bottom-width: 0px;
+					border-left-width: 0px;
+					font-size: 0.9em;
+					font-weight:bold;
+					color: black;
+					vertical-align: middle;
+					text-align: center;
+					word-wrap: break-word;
+					}
+
+					td.tableClassValignInner { border: solid black;
+					border-top-width: 0px;
+					border-right-width: 1px;
+					border-bottom-width: 1px;
+					border-left-width: 1px;
+					font-size: 1em;
+					font-weight:bold;
+					color: black;
+					vertical-align: middle;
+					text-align: center;
+					word-wrap: break-word;
+					}
+
+					td.innerTableClassRightValign { border: solid black;
+					border-top-width: 0px;
+					border-right-width: 1px;
+					border-bottom-width: 1px;
+					border-left-width: 0;
+					font-size: 1em;
+					font-weight:bold;
+					color: black;
+					vertical-align: middle;
+					text-align: center;
+					word-wrap: break-word;
+					}
+
+					td.innerTableClassRightValignBottomLess { border: solid black;
+					border-top-width: 0px;
+					border-right-width: 1px;
+					border-bottom-width: 0px;
+					border-left-width: 0;
+					font-size: 1em;
+					font-weight:bold;
+					color: black;
+					vertical-align: middle;
+					text-align: center;
+					word-wrap: break-word;
+					}
+
+					td.tableClassInnerLeft { border: solid black;
+					border-top-width: 0px;
+					border-right-width: 0px;
+					border-bottom-width: 1px;
+					border-left-width: 1px;
+					font-size: 1em;
+					font-weight:bold;
+					color: black;
+					word-wrap: break-word;
+					}
+
+					td.tableClassInnerLeftBottomLess { border: solid black;
+					border-top-width: 0px;
+					border-right-width: 0px;
+					border-bottom-width: 0px;
+					border-left-width: 1px;
+					font-size: 1em;
+					font-weight:bold;
+					color: black;
+					word-wrap: break-word;
+					}
+
+					td.tableClassNoBorderAlignCenter { border: solid black;
+					border-top-width: 0px;
+					border-right-width: 0px;
+					border-bottom-width: 0px;
+					border-left-width: 0px;
+					font-size: 0.9em;
+					font-weight:bold;
+					color: black;
+					text-align: center;
+					word-wrap: break-word;
+					}
+
+					tr.tableClass { border: solid black;
+					border-top-width: 1px;
+					border-right-width: 1px;
+					border-bottom-width: 1px;
+					border-left-width: 1px;
+					}
+					tr.tableClassWithBg { border: solid black;
+					border-top-width: 0;
+					border-right-width: 1;
+					border-bottom-width: 1;
+					border-left-width: 0;
+					background-color: #e0e0ff
+					}
+
+					tr.tableClassWithBgBlack { border: solid black;
+					border-top-width: 0;
+					border-right-width: 1;
+					border-bottom-width: 1;
+					border-left-width: 0;
+					background-color: #D3D3D3
+					}
+
+					hr.header {
+					position: relative;
+					top: 20px;
+					border: none;
+					height: 6px;
+					background: black;
+					margin-bottom: 10px;
+					}
+
+					hr.separatorThin {
+					position: relative;
+					top: 2px;
+					border: none;
+					height: 2px;
+					background: black;
+					margin-bottom: 2px;
+					}
+
+					hr.headerThin {
+					position: relative;
+					top: 10px;
+					border: none;
+					height: 2px;
+					background: black;
+					margin-bottom: 10px;
+					}
+
+					hr.separator {
+					position: relative;
+					top: 20px;
+					border: none;
+					height: 4px;
+					background: black;
+					margin-bottom: 5px;
+					}
+
+					div.text {
+					background-color: #ffffff;
+					color: blue;
+					font-size: 1em;
+					font-weight:normal;
+					text-align:justify;
+					}
+
+
+					div.information {
+					background-color: #ffffff;
+					color: black;
+					font-size: 1em;
+					font-weight:normal;
+					text-align:justify;
+					}
+
+					#scheader {
+					font-size: 0.9em;
+					border: 0px solid #404040;
+					border-spacing: 2px;
+					}
+
+					div.largetext {
+					background-color: #ffffff;
+					color: blue;
+					font-size: 1em;
+					font-weight:normal;
+					text-align:justify;
+					white-space: pre-wrap;
+					word-break: normal;
+					}
+
+				</style></head><body lang="en-US" text="#000000" bgcolor="#ffffff"><hr class="header"><br><hr class="headerThin"><div class="contentwrapper"><table role="presentation" id="scheader"><tr><td class="tableClassNoBorderAlignCenter" style="font-size:2em;">
+						SECURITIES AND EXCHANGE COMMISSION
+						<br>
+						Washington, D.C. 20549
+					</td></tr><tr><td class="tableClassNoBorderAlignCenter"><br><br><div style="font-size:1.5em;">
+									SCHEDULE 13D
+								</div><br><div style="font-size:1.2em;">
+							Under the Securities Exchange Act of 1934
+						</div><br></td></tr><tr><td class="center"><div class="information" style="text-align:center; font-weight:bold; color:blue;">USA Rare Earth, Inc.</div><div class="information" style="text-align:center; font-weight:bold;"><hr class="separatorThin">(Name of Issuer)</div><br><br></td></tr><tr><td class="center"><div class="information" style="text-align:center; font-weight:bold; color:blue;">Common Stock, par value $0.0001 per share</div><div class="information" style="text-align:center; font-weight:bold;"><hr class="separatorThin">(Title of Class of Securities)</div><br><br></td></tr><tr><td class="center"><div class="information" style="text-align:center; font-weight:bold; color:blue;">91733P107</div><div class="information" style="text-align:center; font-weight:bold;"><hr class="separatorThin">(CUSIP Number)</div><br><br></td></tr><tr><td class="center"><div class="information" style="text-align:center; font-weight:bold; color:blue;">Michael Blitzer<br>167 Madison Ave,,
+								Suite 205 #1017<br>New York,
+								NY,
+								10016<br>2123191309</div><br><br><div class="information" style="text-align:center; font-weight:bold; color:blue;">Joel Rubinstein<br>White &amp; Case LLP,
+								1221 Avenue of the Americas<br>New York,
+								NY,
+								10020<br>2128198200</div><br><br><div class="information" style="text-align:center; font-weight:bold; color:blue;">Maia Gez<br>White &amp; Case LLP,
+								1221 Avenue of the Americas<br>New York,
+								NY,
+								10020<br>2128198200</div><div class="information" style="text-align:center; font-weight:bold;"><hr class="separatorThin">(Name, Address and Telephone Number of Person Authorized to
+									Receive Notices and Communications)</div></td></tr><tr><td class="center"><div class="information" style="text-align:center; font-weight:bold; color:blue;">03/13/2025</div><div class="information" style="text-align:center; font-weight:bold;"><hr class="separatorThin">(Date of Event Which Requires Filing of This Statement)</div></td></tr></table><br><br><div class="information" style="text-align:justify">
+				If the filing person has previously filed a statement on Schedule 13G to report the acquisition that is the subject of this Schedule 13D, and is filing this schedule because of §§ 240.13d-1(e), 240.13d-1(f) or 240.13d-1(g), check the following box.
+				<img src="/Images/box-unchecked.jpg" alt="Checkbox not checked"></div><br><div class="information" style="text-align:justify">
+				The information required on the remainder of this cover page shall not be deemed to be “filed” for the purpose of Section 18 of the
+				Securities Exchange Act of 1934 (“Act”) or otherwise subject to the liabilities of that section of the Act but shall be subject to all other
+				provisions of the Act (however, see the Notes).
+			</div></div><hr class="headerThin"><hr class="header"><br><br>
+  <div class="content"><div class="form1"></div></div>
+  <div class="content"><div class="form1"><table><tr><td class="center"><br><br><p><div align="center" style="font-size:1.2em;">
+									SCHEDULE 13D
+								</div></p></td></tr></table><table role="presentation" class="tableClass" id="cusipNumber"><tr class="tableClass"><td width="25%" style="font-weight:bold;">CUSIP No.</td><td width="75%"><div style="font-size:.9em; color:#000000">91733P107</div></td></tr></table><br><br><table role="presentation" class="tableClass" id="reportingPersonDetails"><tr class="tableClass"><td width="8%" class="tableClassValign">1</td><td width="92%" class="tableClass">
+					Name of reporting person
+					<br><br><div class="text">Michael Blitzer</div></td></tr><tr><td width="8%" class="tableClassValign">2</td><td width="92%" class="tableClass">Check the appropriate box if a member of a Group (See Instructions)
+					<br><br><div class="text"><img src="/Images/box-unchecked.jpg" alt="Checkbox not checked">  (a)
+						<br><img src="/Images/box-unchecked.jpg" alt="Checkbox not checked">  (b)
+					</div></td></tr><tr class="tableClassWithBgBlack"><td width="8%" class="tableClassValign">3</td><td width="92%" class="tableClass">SEC use only</td></tr><tr><td width="8%" class="tableClassValign">4</td><td width="92%" class="tableClass">
+					Source of funds (See Instructions)
+					<br><br><div class="text">AF</div></td></tr><tr><td width="8%" class="tableClassValign">5</td><td width="92%" class="tableClass">
+					Check if disclosure of legal proceedings is required pursuant to Items 2(d) or 2(e)
+					<br><br><img src="/Images/box-unchecked.jpg" alt="Checkbox not checked"></td></tr><tr><td width="8%" class="tableClassValign">6</td><td width="92%" class="tableClass">Citizenship or place of organization
+					<br><br><div class="text">
+				UNITED STATES
+			</div></td></tr><tr><td width="8%" class="tableClassValign">Number of Shares Beneficially Owned by Each Reporting Person With:</td><td width="92%" class="tableClass"><table class="innerTableClass"><tr><td width="8%" class="innerTableClassRightValign">7</td><td width="92%" class="tableClassInnerLeft">Sole Voting Power
+								<br><br><div class="text">589,327.00</div></td></tr><tr><td width="8%" class="innerTableClassRightValign">8</td><td width="92%" class="tableClassInnerLeft">Shared Voting Power
+								<br><br><div class="text">15,444,280.00</div></td></tr><tr><td width="8%" class="innerTableClassRightValign">9</td><td width="92%" class="tableClassInnerLeft">Sole Dispositive Power
+								<br><br><div class="text">589,327.00</div></td></tr><tr><td width="8%" class="innerTableClassRightValignBottomLess">10</td><td width="92%" class="tableClassInnerLeftBottomLess">Shared Dispositive Power
+								<br><br><div class="text">15,444,280.00</div></td></tr></table></td></tr><tr><td width="8%" class="tableClassValign">11</td><td width="92%" class="tableClass">Aggregate amount beneficially owned by each reporting person
+					<br><br><div class="text">16,033,607.00</div></td></tr><tr><td width="8%" class="tableClassValign">12</td><td width="92%" class="tableClass">Check if the aggregate amount in Row (11) excludes certain shares (See Instructions)
+					<br><br><img src="/Images/box-unchecked.jpg" alt="Checkbox not checked"></td></tr><tr><td width="8%" class="tableClassValign">13</td><td width="92%" class="tableClass">Percent of class represented by amount in Row (11)
+					<br><br><div class="text">17.5 % </div></td></tr><tr><td width="8%" class="tableClassValign">14</td><td width="92%" class="tableClass">Type of Reporting Person (See Instructions)
+					<br><br><div class="text">IN</div></td></tr></table><br><table><tr><td class="center"><br><br><p><div align="center" style="font-size:1.2em;">
+									SCHEDULE 13D
+								</div></p></td></tr></table><table role="presentation" class="tableClass" id="cusipNumber"><tr class="tableClass"><td width="25%" style="font-weight:bold;">CUSIP No.</td><td width="75%"><div style="font-size:.9em; color:#000000">91733P107</div></td></tr></table><br><br><table role="presentation" class="tableClass" id="reportingPersonDetails"><tr class="tableClass"><td width="8%" class="tableClassValign">1</td><td width="92%" class="tableClass">
+					Name of reporting person
+					<br><br><div class="text">Inflection Point Holdings II LLC</div></td></tr><tr><td width="8%" class="tableClassValign">2</td><td width="92%" class="tableClass">Check the appropriate box if a member of a Group (See Instructions)
+					<br><br><div class="text"><img src="/Images/box-unchecked.jpg" alt="Checkbox not checked">  (a)
+						<br><img src="/Images/box-unchecked.jpg" alt="Checkbox not checked">  (b)
+					</div></td></tr><tr class="tableClassWithBgBlack"><td width="8%" class="tableClassValign">3</td><td width="92%" class="tableClass">SEC use only</td></tr><tr><td width="8%" class="tableClassValign">4</td><td width="92%" class="tableClass">
+					Source of funds (See Instructions)
+					<br><br><div class="text">WC</div></td></tr><tr><td width="8%" class="tableClassValign">5</td><td width="92%" class="tableClass">
+					Check if disclosure of legal proceedings is required pursuant to Items 2(d) or 2(e)
+					<br><br><img src="/Images/box-unchecked.jpg" alt="Checkbox not checked"></td></tr><tr><td width="8%" class="tableClassValign">6</td><td width="92%" class="tableClass">Citizenship or place of organization
+					<br><br><div class="text">
+				DELAWARE
+			</div></td></tr><tr><td width="8%" class="tableClassValign">Number of Shares Beneficially Owned by Each Reporting Person With:</td><td width="92%" class="tableClass"><table class="innerTableClass"><tr><td width="8%" class="innerTableClassRightValign">7</td><td width="92%" class="tableClassInnerLeft">Sole Voting Power
+								<br><br><div class="text">0.00</div></td></tr><tr><td width="8%" class="innerTableClassRightValign">8</td><td width="92%" class="tableClassInnerLeft">Shared Voting Power
+								<br><br><div class="text">12,250,000.00</div></td></tr><tr><td width="8%" class="innerTableClassRightValign">9</td><td width="92%" class="tableClassInnerLeft">Sole Dispositive Power
+								<br><br><div class="text">0.00</div></td></tr><tr><td width="8%" class="innerTableClassRightValignBottomLess">10</td><td width="92%" class="tableClassInnerLeftBottomLess">Shared Dispositive Power
+								<br><br><div class="text">12,250,000.00</div></td></tr></table></td></tr><tr><td width="8%" class="tableClassValign">11</td><td width="92%" class="tableClass">Aggregate amount beneficially owned by each reporting person
+					<br><br><div class="text">12,250,000.00</div></td></tr><tr><td width="8%" class="tableClassValign">12</td><td width="92%" class="tableClass">Check if the aggregate amount in Row (11) excludes certain shares (See Instructions)
+					<br><br><img src="/Images/box-unchecked.jpg" alt="Checkbox not checked"></td></tr><tr><td width="8%" class="tableClassValign">13</td><td width="92%" class="tableClass">Percent of class represented by amount in Row (11)
+					<br><br><div class="text">13.9 % </div></td></tr><tr><td width="8%" class="tableClassValign">14</td><td width="92%" class="tableClass">Type of Reporting Person (See Instructions)
+					<br><br><div class="text">OO</div></td></tr></table><br><div style="display: flex;"><div style="font-size: 0.9em; font-weight: bold; margin-right: 5px;">
+					Comment for Type of Reporting Person:
+				</div><div class="largetext" style="text-align:justify">Limited liability company</div></div></div><div class="form1"><table><tr><td class="center"><br><br><p><div align="center" style="font-size:1.2em;">
+									SCHEDULE 13D
+								</div></p></td></tr></table><table role="presentation" id="item1to7"><tr><td width="8%" class="tableClassValignNoBorder">Item 1.</td><td width="92%" class="tableClassNoBorder">Security and Issuer</td></tr><tr class="tableClass"><td width="8%" class="tableClassNoBorderAlignCenter">(a)</td><td width="92%" class="tableClassNoBorder">Title of Class of Securities:
+							<br><br><div class="text">Common Stock, par value $0.0001 per share</div></td></tr><tr class="tableClass"><td width="8%" class="tableClassNoBorderAlignCenter">(b)</td><td width="92%" class="tableClassNoBorder">Name of Issuer:
+							<br><br><div class="text">USA Rare Earth, Inc.</div></td></tr><tr><td width="8%" class="tableClassNoBorderAlignCenter">(c)</td><td width="92%" class="tableClassNoBorder">Address of Issuer's Principal Executive Offices:
+							<br><br><div class="text">100 W Airport Road, Stillwater, 
+				OKLAHOMA
+			, 74075.</div></td></tr><tr><td colspan="3"><div style="display: flex;"><div style="font-size: 0.9em; font-weight: bold; margin-right: 5px;">
+									Item 1 Comment:
+								</div><div class="largetext" style="text-align:justify">Explanatory Note:</div></div></td></tr><tr><td width="8%" class="tableClassValignNoBorder">Item 2.</td><td width="92%" class="tableClassNoBorder">Identity and Background</td></tr><tr></tr><tr class="tableClass"><td width="8%" class="tableClassNoBorderAlignCenter">(a)</td><td width="92%" class="tableClassNoBorder"><div class="largetext">This Schedule 13D is filed by Michael Blitzer ("Blitzer") and Inflection Point Holdings II LLC ("IPH," collectively, the "Reporting Persons").</div></td></tr><tr><td width="8%" class="tableClassNoBorderAlignCenter">(b)</td><td width="92%" class="tableClassNoBorder"><div class="largetext">The principal business address of the Reporting Persons is as follows:  167 Madison Ave, Suite 205 #1017  New York, New York 10016</div></td></tr><tr><td width="8%" class="tableClassNoBorderAlignCenter">(c)</td><td width="92%" class="tableClassNoBorder"><div class="largetext">The principal occupation of Mr. Blitzer is Chief Investment Officer of Inflection Point Fund I, LP ("IPF"). Mr. Blitzer is the sole managing member of IPH.
+
+IPH was the sponsor of USA Rare Earth, Inc. ("New USARE" or the "Issuer") (formerly Inflection Point Acquisition Corp. II or "IPXX") and its principal business was to invest in and hold securities of IPXX.</div></td></tr><tr><td width="8%" class="tableClassNoBorderAlignCenter">(d)</td><td width="92%" class="tableClassNoBorder"><div class="largetext">During the last five years, the Reporting Persons have not been convicted in a criminal proceeding (excluding traffic violations or similar misdemeanors).</div></td></tr><tr><td width="8%" class="tableClassNoBorderAlignCenter">(e)</td><td width="92%" class="tableClassNoBorder"><div class="largetext">During the last five years, the Reporting Persons have not been a party to a civil proceeding of a judicial or administrative body of competent jurisdiction and as a result of such proceeding was or is subject to a judgment, decree or final order enjoining future violations of, or prohibiting or mandating activities subject to, federal or state securities laws or finding any violation with respect to such laws.</div></td></tr><tr><td width="8%" class="tableClassNoBorderAlignCenter">(f)</td><td width="92%" class="tableClassNoBorder"><div class="largetext">See response to Item 6 on each cover page,</div></td></tr><tr><td width="8%" class="tableClassValignNoBorder">Item 3.</td><td width="92%" class="tableClassNoBorder">Source and Amount of Funds or Other Consideration</td></tr><tr><td width="8%" class="tableClassNoBorderAlignCenter"> </td><td width="92%" class="tableClassNoBorder"><div class="largetext">Common Stock of the Issuer. Prior to the Issuer's registration under Section 12(b) of the Securities Exchange Act of 1934, as amended (the "Exchange Act"), which occurred concurrently with the pricing of its initial public offering (the "IPO") on May 24, 2023, IPH held 6,325,000 Class B ordinary shares, par value $0.0001 per share (the "Class B Ordinary Shares"), previously acquired by IPH for an aggregate of $25,000 in connection with its role as sponsor of the Issuer (the "Founder Shares") using its working capital. The founder shares included an aggregate of 825,000 shares that were subject to forfeiture by IPH depending on the extent to which the underwriters' over-allotment option was exercised, so that the number of founder shares would collectively represent 20% of the Company's issued and outstanding shares upon the completion of the IPO. As a result of the underwriters' election to partially exercise their over-allotment option on May 30, 2023, 75,000 founder shares were forfeited resulting in IPH holding 6,250,000 founder shares.
+
+On November 18, 2024, pursuant to the terms of the Issuer's governing documents, IPH elected to convert 6,200,000 outstanding Class B Ordinary Shares held by it on a one-for-one basis into Class A ordinary shares, par value $0.0001 per share (the "Class A Ordinary Shares") resulting in IPH owning 6,200,000 Class A Ordinary Shares and 50,000 Class B Ordinary Shares.
+
+On March 12, 2025, the remaining 50,000 Class B Ordinary Shares converted into Class A Ordinary Shares, and immediately thereafter all 6,250,000 Class A Ordinary Shares converted into 6,250,000 shares of Common Stock of the Issuer upon the domestication of the Issuer ("Domestication") prior to the closing of the Business Combination.
+
+Warrants. On May 30, 2023, concurrently with the closing of the IPO, IPH purchased an aggregate of 6,000,000 warrants to purchase Class A Ordinary Shares of the Issuer on a one-for-one basis (the "Cayman Warrants") for an aggregate of $6,000,000 using working capital. On March 12, 2025, the Cayman Warrants converted, on a one-for-one basis, into 6,000,000 warrants to purchase shares of Common Stock (the "Domesticated Issuer Warrants"). The Domesticated Issuer Warrants are exercisable starting 30 days after the closing of the IPO.
+
+IPF. On March 13, 2025, concurrently with the closing of the Business Combination, IPF acquired an aggregate of (i) 1,504,942 shares of Series A Preferred Stock and (ii) warrants to purchase 1,689,338 shares of Common Stock, subject to adjustment, initially exercisable for $12.00 per share, subject to adjustment ("Preferred Investor Warrants"). With respect to the 1,504,942 shares of Series A Preferred Stock, such shares consisted of (i) 1,210,824 shares of Series A Preferred Stock which IPF had acquired in exchange for 1,176,470 USARE Class A-2 Convertible Preferred Units plus accrued and unpaid payment-in-kind dividends, pursuant to the terms and conditions of the Business Combination Agreement, and (ii) 294,118 shares of Series A Preferred Stock which had been acquired with the Preferred Investor Warrant for an aggregate of $3,000,000 using working capital of IPF.
+With respect to the warrants to purchase 1,689,338 shares of Common Stock, such warrants consisted of Preferred Investor Warrants exercisable for 1,395,220 shares, subject to adjustment, and the Preferred Investor Warrants for 294,118 shares of Common Stock, which were acquired for an aggregate of $3,000,000 using working capital of IPF.
+Mr. Blitzer. On March 13, 2025, concurrently with the closing of the Business Combination, Mr. Blitzer acquired an aggregate of 411,018 shares of Series A Preferred Stock and Preferred Investor Warrants exercisable for an aggregate of 178,309 shares of Common Stock. 131,048 shares of Series A Preferred Stock and a Preferred Investor Warrants exercisable for 31,250 shares of Common Stock were acquired in exchange for 122,549 Class A-2 convertible preferred units of USARE OpCo (plus accrued payment-in-kind dividends) and a warrant to purchase 31,250 Class A common units of USARE OpCo. Blitzer acquired such securities in exchange for his promise to forgive, at the closing of the Business Combination, 50% of the balance of a convertible promissory note owed by the Issuer to him (the "Convertible Promissory Note"). 131,048 shares of Series A Preferred Stock were acquired in exchange for Blitzer's forgiveness of the remaining 50% of Convertible Promissory Note. 148,922 shares of Series A Preferred Stock and a Preferred Investor Warrant to purchase 147,059 shares of Common Stock were acquired in exchange for 147,059 Class A-2 convertible preferred units of USARE OpCo (plus accrued payment-in-kind dividends) and a warrant to purchase 147,059 Class A common units of USARE OpCo, which securities of USARE OpCo were initially acquired for an aggregate of $1,500,000.
+
+Terms used in this Schedule 13D but not defined herein, or for which definitions are not otherwise incorporated by reference herein, shall have the meanings given to such terms in the Form 8-K filed with the Securities and Exchange Commission (the "SEC") on March 19, 2025.</div></td></tr><tr><td width="8%" class="tableClassValignNoBorder">Item 4.</td><td width="92%" class="tableClassNoBorder">Purpose of Transaction</td></tr><tr><td width="8%" class="tableClassNoBorderAlignCenter"> </td><td width="92%" class="tableClassNoBorder"><div class="largetext">To the extent required by Item 4, the information contained in Item 3 and Item 6 are incorporated herein by reference.
+
+The Reporting Persons do not have any present plan or proposal which would relate to or result in any of the matters set forth in subparagraphs (a) - (j) of Item 4 of Schedule 13D except as set forth herein or such as would occur upon or in connection with completion of, or following, any of the actions discussed herein.
+
+The Reporting Persons have acquired the shares reported herein for investment purposes. The Reporting Persons intend to review their investment in the Issuer on a continuing basis. Depending on various factors including, without limitation, the Issuer's financial position and investment strategy, the price levels of the Issuer's ordinary shares, conditions in the securities markets and general economic and industry conditions, the Reporting Persons and their representatives may in the future take such actions with respect to their investment in the Issuer as they deem appropriate, including, without limitation, engaging in communications with members of the Issuer's management and/or other shareholders of the Issuer from time to time with respect to potential business combination opportunities and operational, strategic, financial or governance matters, or otherwise work with management and the Issuer's board of directors to identify, evaluate, structure, negotiate, execute or otherwise facilitate a business combination and facilitate efforts to raise additional capital in connection with a business combination, purchasing additional shares and/or warrants, selling some or all of their ordinary shares and/or warrants, engaging in short selling of or any hedging or similar transaction with respect to the ordinary shares, including swaps and other derivative instruments, or changing their intention with respect to any and all matters referred to in Item 4 of Schedule 13D.
+
+Mr. Blitzer is formerly the Chief Executive Officer of the Issuer and he remains the Chairman on the Issuer. Mr. Blitzer serves on the Board of Directors of the Issuer and engages in regular communications with other members of the Board of Directors of the Issuer. Through this position, the Reporting Persons may be involved in transactions of the type described in clauses (a) through (j) of Item 4 of Schedule 13D.</div></td></tr><tr><td width="8%" class="tableClassValignNoBorder">Item 5.</td><td width="92%" class="tableClassNoBorder">Interest in Securities of the Issuer</td></tr><tr><td width="8%" class="tableClassNoBorderAlignCenter">(a)</td><td width="92%" class="tableClassNoBorder"><div class="largetext">The information set forth in rows (7) through (13) of the cover pages of this Schedule 13D is incorporated by reference into this Item 5(a).
+
+Michael Blitzer is the sole Managing Member of IPH and shares voting and investment discretion with respect to the securities held by IPH. Inflection Point Asset Management LLC and Inflection Point GP I LLC are the investment manager and general partner, respectively, of IPF. Mr. Blitzer controls each of IPF, Inflection Point Asset Management LLC and Inflection Point GP I LLC, including the exercise of voting and investment discretion over the securities held or to be held by IPF.</div></td></tr><tr><td width="8%" class="tableClassNoBorderAlignCenter">(b)</td><td width="92%" class="tableClassNoBorder"><div class="largetext">The percentage ownership for IPH was calculated based on (i) 81,952,420 shares of New USARE Common Stock as of the closing of the Business Combination, and (ii) 6,000,000 private placement warrants to purchase New USARE Common Stock, as described above. The percentage ownership for Mr. Blitzer was calculated based on (i) 81,952,420 shares of New USARE Common Stock as of the closing of the Business Combination; (ii) 6,000,000 private placement warrants to purchase New USARE Common Stock; (iii) 1,504,942 shares of Series A Preferred Stock; (iv) 411,018 shares of Series A Preferred Stock; (v) Preferred Investor Warrants to purchase 1,689,338 shares of Common Stock, subject to adjustment; and (vi) Preferred Investor Warrants exercisable for an aggregate of 178,309 shares of Common Stock, each as described above.</div></td></tr><tr><td width="8%" class="tableClassNoBorderAlignCenter">(c)</td><td width="92%" class="tableClassNoBorder"><div class="largetext">Except as set forth herein, no transactions in the Common Stock were effected by the Reporting Persons during the past 60 days.</div></td></tr><tr><td width="8%" class="tableClassNoBorderAlignCenter">(d)</td><td width="92%" class="tableClassNoBorder"><div class="largetext">Not applicable</div></td></tr><tr><td width="8%" class="tableClassNoBorderAlignCenter">(e)</td><td width="92%" class="tableClassNoBorder"><div class="largetext">Not applicable</div></td></tr><tr><td width="8%" class="tableClassValignNoBorder">Item 6.</td><td width="92%" class="tableClassNoBorder">Contracts, Arrangements, Understandings or Relationships With Respect to Securities of the Issuer</td></tr><tr><td width="8%" class="tableClassNoBorderAlignCenter"> </td><td width="92%" class="tableClassNoBorder"><div class="largetext">Registration Rights Agreement
+
+On March 13, 2025, in connection with the consummation of the transactions and as contemplated by the Business Combination Agreement, New USARE, the Sponsor, and certain other stockholders of New USARE entered into a registration rights agreement (the "Registration Rights Agreement") pursuant to which, among other things, the Sponsor, Cantor and such members of USARE and Inflection Point Fund were granted certain customary registration rights, on the terms and subject to the conditions therein, with respect to securities of New USARE that they will hold following the Business Combination. The foregoing description is qualified in its entirety by the text of the Registration Rights Agreement, which is included as an exhibit and is incorporated herein by reference.
+
+Sponsor Lock-Up Agreement
+
+At the Closing of the Business Combination, the Sponsor and New USARE entered into the Sponsor Lock-Up Agreement, pursuant to which the Sponsor and its permitted assigns agreed not to, without the prior written consent of the New USARE Board, prior to end of the "Initial Common Stock Lock-Up Period" (the date that is six months after the Closing Date), Transfer any Sponsor Lock-Up Shares. The Sponsor and its permitted assigns also agreed not to, prior to the end of the "Second Common Stock Lock-Up Period" (the date that is twelve (12) months after the Closing Date), transfer more than 50% of the Sponsor Lock-Up Shares in each case, without the prior written consent of the New USARE Board. In addition, the Sponsor agreed to not Transfer New USARE Warrants received upon conversion of its Private Placement Warrants in connection with the Domestication (or the shares of New USARE Common Stock issuable upon exercise of such warrants), prior to the date that is 30 days after the Closing Date. The Sponsor Lock-Up Agreement provides for certain permitted transfers, including but not limited to, transfers to certain affiliates or family members, transfers of shares acquired on the open market after the consummation of the Business Combination, subject to certain conditions, and the exercise of certain stock options and warrants.
+
+Terms of Series A Preferred
+
+The Series A Preferred Stock have the following terms under the Series A Preferred Stock Certificate of Designation:
+
+Dividends: The Series A Preferred Stock accrue dividends daily at the rate of 12% per annum of the Stated Value (if paid in kind), plus the amount of previously accrued dividends paid in kind, or 10% per annum of the Stated Value (if paid in cash), plus the amount of previously accrued dividends. Such dividends will compound semi-annually.
+
+Liquidation Preference: Upon any liquidation or deemed liquidation event, the holders of Series A Preferred Stock will be entitled to receive out of the available proceeds, before any distribution is made to holders of common stock or any other junior securities, an amount per share equal to the greater of (i) 100% of the Accrued Value (as defined in the Series A Preferred Stock Certificate of Designation) or (ii) such amount per share as would have been payable had all shares of Series A Preferred Stock been converted into New USARE Common Stock immediately prior to the liquidation event. Thereafter, the holders of Series A Preferred Stock will be entitled to receive their pro-rata share, of the remaining available proceeds available for distribution to stockholders, on an as-converted to common stock basis.
+
+Voting:    The Series A Preferred Stock will (i) vote together with the New USARE Common Stock as a single class, except as required by law and (ii) as noted below under "Protective Provisions". Each holder of Series A Preferred Stock shall be entitled to cast the number of votes equal to the number of whole shares of New USARE Common Stock into which the shares of Series A Preferred Stock held by such holder are convertible as of the record date for determining stockholders entitled to vote on such matter.
+
+Protective Provisions: For as long as 20% of the shares of Series A Preferred Stock issued as of the Closing are held by Inflection Point Asset Management LLC, and certain other holders of Series A Preferred Stock and their respective affiliates, New USARE shall not, without the affirmative vote or action by written consent of holders of at least a majority of the issued and outstanding shares of Series A Preferred Stock (the "Requisite Holders"), take any of the following actions: (i) liquidate, dissolve or wind up the affairs of New USARE; (ii) amend, alter, or repeal any provision of the Series A Preferred Stock Certificate of Designation or any similar document of New USARE in a manner materially adverse to the Series A Preferred Stock; (iii) create or authorize the creation of or issue any other security convertible into or exercisable for any equity security unless such security ranks junior to the Series A Preferred Stock with respect to its rights, preferences and privileges, or increase the authorized number of shares of Series A Preferred Stock; (iv) except in certain circumstances, purchase or redeem or pay any cash dividend on any capital stock ranking junior to the Series A Preferred Stock, other than stock repurchased at cost from former employees and consultants in connection with the cessation of their service or pursuant to the terms of any equity incentive plan; (v) enter into any transaction with an affiliate, other than the issuance of equity or awards to eligible participants under New USARE's incentive plan, equity plan or equity-based compensation plan or with respect to employment, consulting or award agreements with respect to executive officers of New USARE, in each case regardless of whether such person (or such person's affiliates) would be considered an affiliate of New USARE; or (vi) incur or guarantee any indebtedness, other than equipment leases or trade payables incurred in the ordinary course of business, if the aggregate indebtedness of New USARE and its subsidiaries for borrowed money following such action would exceed $5,000,000; provided, however, that the Series A Preferred Stock shall not be considered indebtedness for purposes of this calculation.</div></td></tr><tr><td width="8%" class="tableClassValignNoBorder">Item 7.</td><td width="92%" class="tableClassNoBorder">Material to be Filed as Exhibits.</td></tr><tr><td width="8%" class="tableClassNoBorderAlignCenter"> </td><td width="92%" class="tableClassNoBorder"><div class="largetext">Form of Amended and Restated Registration Rights Agreement, dated as of March 13, 2025, by and among USA Rare Earth, Inc., Inflection Point Holdings II LLC and certain other holders of USA Rare Earth, Inc. (incorporated by reference to the Current Report on Form 8-K filed with the Securities and Exchange Commission on March 19, 2025).
+
+Sponsor Lock-Up Agreement, dated as of March 13, 2025, by and between USA Rare Earth, Inc. and Inflection Point Holdings II LLC. (incorporated by reference to the Current Report on Form 8-K filed with the Securities and Exchange Commission on March 19, 2025).
+
+USA Rare Earth, Inc. Certificate of Designation of Preferences, Rights and Limitations of 12.0% Series A Cumulative Convertible Preferred Stock. (incorporated by reference to the Current Report on Form 8-K filed with the Securities and Exchange Commission on March 19, 2025).</div></td></tr></table><br></div><div class="form1"><table role="presentation" id="signatureInfo"><tr><td width="8%" class="tableClassValignNoBorder">    SIGNATURE</td><td width="92%" class="tableClassNoBorder"> </td></tr><tr><td width="8%" class="tableClassNoBorderAlignCenter"> </td><td width="92%" class="tableClassNoBorder"><div class="information" style="text-align:justify">
+						After reasonable inquiry and to the best of my knowledge and belief, I certify that the information set forth in this statement is true, complete and correct.
+						<br><br></div></td></tr></table><table><tr class="tableClass"><td width="50%" class="tableClassNoBorder"> </td><td width="50%" class="tableClassNoBorder"><table><tr class="tableClass"><td width="100%" class="tableClassInnerNoBorderBlue"><div class="text">Michael Blitzer</div></td></tr></table></td></tr></table><table><tr class="tableClass"><td width="50%" class="tableClassNoBorder"> </td><td width="50%" class="tableClassNoBorder"><table><tr class="tableClass"><td width="8%" class="tableClassNoBorderAlignLeft signature">Signature:</td><td width="92%" class="tableClassNoBorderBlue signature">/s/ Michael Blitzer</td></tr><tr class="tableClass"><td width="8%" class="tableClassNoBorderAlignLeft signature">Name/Title:</td><td width="92%" class="tableClassNoBorderBlue signature">Michael Blitzer</td></tr><tr class="tableClass"><td width="8%" class="tableClassNoBorderAlignLeft signature">Date:</td><td width="92%" class="tableClassNoBorderBlue signature">03/24/2025</td></tr></table></td></tr></table><table><tr class="tableClass"><td width="50%" class="tableClassNoBorder"> </td><td width="50%" class="tableClassNoBorder"><table><tr class="tableClass"><td width="100%" class="tableClassInnerNoBorderBlue"><div class="text">Inflection Point Holdings II LLC</div></td></tr></table></td></tr></table><table><tr class="tableClass"><td width="50%" class="tableClassNoBorder"> </td><td width="50%" class="tableClassNoBorder"><table><tr class="tableClass"><td width="8%" class="tableClassNoBorderAlignLeft signature">Signature:</td><td width="92%" class="tableClassNoBorderBlue signature">/s/ Michael Blitzer</td></tr><tr class="tableClass"><td width="8%" class="tableClassNoBorderAlignLeft signature">Name/Title:</td><td width="92%" class="tableClassNoBorderBlue signature">Michael Blitzer / Managing Member</td></tr><tr class="tableClass"><td width="8%" class="tableClassNoBorderAlignLeft signature">Date:</td><td width="92%" class="tableClassNoBorderBlue signature">03/24/2025</td></tr></table></td></tr></table></div></div>
+<script type="text/javascript"  src="/nd7kb9mCUV/CxBaQU/3fjA/Or5XcXrmfDVmcJ7G/QCEYaQ/DBMbKw/kWDyg"></script></body></html>
