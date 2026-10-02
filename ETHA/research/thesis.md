@@ -1,29 +1,30 @@
 # ETHA — Investment Thesis
 
-**Last updated:** 2026-07-20
+**Last updated:** 2026-10-02
 
 ## Classification
 
 | Field | Value |
 |-------|-------|
-| **Archetype** (Stahl) | unknown |
-| **Moat** (Munger) | unproven |
-| **Dhando** (Pabrai) | pending |
+| **Archetype** (Stahl) | optionality |
+| **Moat** (Munger) | n/a |
+| **Dhando** (Pabrai) | partial |
 | **Stance** | watch |
-| **Cycle** | - |
-| **MOI bucket** (legacy) | pending |
-| **Payoff lens** | pending |
+| **Cycle** | mid |
+| **Payoff lens** | asset |
 
 ## One-line thesis
 
-ETHA — thesis pending Marvin deep dive.
+ETHA is a passive iShares spot-ether trust: return is ether beta minus a 0.25% sponsor fee and any premium or discount to net asset value at purchase, not operating owner cash flow.
 
 ## Key questions
 
-- [ ] Read latest annual report
-- [ ] Read latest quarterly report
-- [ ] Apply `_system/frameworks/mental_models.md` Tier 1 lenses
+- [x] Read latest annual report (10-K FY2025)
+- [x] Read latest quarterly report (10-Q Q1 2026)
+- [ ] Confirm live price versus published NAV before sizing
+- [ ] Compare fee and flows to other spot ether ETPs when peer research exists
 
 ## [HUMAN REVIEW]
 
-- Onboarded 2026-07-20; awaiting deep dive.
+- Base ether growth path is [Assumption]; filings provide structure and fees only.
+- Stance is proposal only until `human_decision.json` exists.

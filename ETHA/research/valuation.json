@@ -1,14 +1,93 @@
 {
   "ticker": "ETHA",
-  "as_of": "2026-07-20",
-  "method": "price_stub",
+  "as_of": "2026-10-02",
+  "method": "yield_curve",
+  "irr_method": "yield_curve",
+  "valuation_mode": "optionality",
+  "instrument_type": "etf",
+  "lawrence_bucket": "other",
+  "payoff_lens": "asset",
+  "classification_inputs": {
+    "archetype": "optionality",
+    "moat": "n/a",
+    "dhando": "partial",
+    "cycle": "mid",
+    "payoff_lens": "asset",
+    "predictive_attribute": "wrapper_tracking_basis",
+    "investment_sleeve": "ls_algo_underlying"
+  },
   "inputs": {
     "price": 14.33,
     "price_as_of": "2026-07-20",
-    "price_source": "Yahoo ETHA close 2026-07-20"
+    "price_source": "Placeholder until marvin_cloud_refresh equity price step; prior Yahoo ETHA close 2026-07-20",
+    "nav_per_share": 15.87,
+    "nav_per_share_as_of": "2026-03-31",
+    "nav_per_share_source": "Trust net asset value $6,378,405,156 divided by 401,880,000 Shares outstanding at March 31, 2026 (10-Q filed 2026-05-07 MD&A)",
+    "trust_net_assets_m": 6378.4,
+    "trust_net_assets_source": "Net asset value $6,378,405,156 at March 31, 2026 (10-Q filed 2026-05-07)",
+    "shares_outstanding_m": 401.88,
+    "shares_source": "401,880,000 Shares at March 31, 2026 (10-Q cover; 413,520,000 at April 30, 2026)",
+    "eth_index_price_usd": 2101.84,
+    "eth_index_price_prior_usd": 2971.55,
+    "eth_index_source": "CME CF Ether-Dollar Reference Rate; Dec 31, 2025 to March 31, 2026 (10-Q MD&A)",
+    "cost_of_ether_investment_m": 10674.3,
+    "cost_of_ether_source": "Cost of investment in ether $10,674,287,156 at March 31, 2026 (10-Q balance sheet footnote)",
+    "sponsor_fee_rate_annual": 0.0025,
+    "sponsor_fee_q1_2026_m": 4.97,
+    "sponsor_fee_source": "0.25% of net asset value accrued daily; Q1 2026 fee $4,969,537 (10-Q notes)",
+    "fee_waiver_note": "0.12% effective rate on first $2.5B of assets from listing through July 23, 2025; waiver expired (10-K FY2025)",
+    "basket_size_shares": 40000,
+    "basket_source": "Creation/redemption in blocks of 40,000 Shares (10-K FY2025)",
+    "normalization_note": "No operating owner cash. Return path is look-through ether per share minus sponsor fee drag and any premium/discount to net asset value at purchase."
   },
-  "notes": "Price stub created by fetch_equity_prices.py --create-stub; replace with a real model before decision-grade.",
-  "human_review": {
+  "nav_overlay": {
+    "as_of": "2026-03-31",
+    "lookthrough_asset": "ether",
+    "nav_per_share_usd": 15.87,
+    "option_treatment": "embedded_in_segment",
+    "notes": "Trust assets are ether and cash only. Economic claim is net asset value per share, not a separate operating moat."
+  },
+  "optionality_gate": {
+    "framework": "lookthrough_digital_asset",
+    "floor_pass": true,
+    "floor_metric": "nav_per_share",
+    "floor_value": 15.87,
+    "primary_metric": "base",
+    "primary_label": "projected net asset value per share after ether path and sponsor fee",
+    "primary_return_pct": null,
+    "notes": "Stance gate follows yield-curve scenarios on net asset value per share, not a discounted cash flow on owner earnings."
+  },
+  "scenarios": {
+    "bear": {
+      "price": 14.33,
+      "payoff": 12.6,
+      "years": 7,
+      "notes": "Ether spot -3% per year [Assumption]; 0.25% sponsor fee on net asset value compounded"
+    },
+    "base": {
+      "price": 14.33,
+      "payoff": 26.7,
+      "years": 7,
+      "notes": "Ether spot +8% per year [Assumption]; 0.25% sponsor fee drag; share count held flat for illustration"
+    },
+    "bull": {
+      "price": 14.33,
+      "payoff": 50.7,
+      "years": 7,
+      "notes": "Ether spot +18% per year [Assumption]; fee drag only; sensitivity not base case"
+    }
+  },
+  "estimates": {
+    "implied_irr_base_pct": null,
+    "irr_method": "yield_curve"
+  },
+  "human_review": [
+    "Confirm live ETHA price and premium/discount to published net asset value before sizing.",
+    "Ether price path in scenarios is [Assumption]; filing path is fee and structure only.",
+    "Regulatory classification of ether remains uncertain per 10-K risk factors."
+  ],
+  "notes": "Spot ether exchange-traded fund wrapper (iShares Ethereum Trust ETF). First deep dive after SEC download manifest closed evidence gap.",
+  "human_review_flags": {
     "live_price_confirmed": false
   },
   "context_overlay": {
@@ -44,30 +123,6 @@
             "in_base_irr": false
           },
           {
-            "id": "ust_2y",
-            "label": "US Treasury 2Y yield (%)",
-            "latest": 5.004000186920166,
-            "as_of": "2026-10-01",
-            "yoy_pct": 36.0,
-            "direction": "up",
-            "good_for": "rates_regime",
-            "source": "yahoo:^FVX",
-            "stale": false,
-            "in_base_irr": false
-          },
-          {
-            "id": "dxy_broad",
-            "label": "Trade-weighted USD index (broad)",
-            "latest": 102.1520004272461,
-            "as_of": "2026-10-01",
-            "yoy_pct": 4.5,
-            "direction": "up",
-            "good_for": "dollar_regime",
-            "source": "yahoo:DX-Y.NYB",
-            "stale": false,
-            "in_base_irr": false
-          },
-          {
             "id": "vix_level",
             "label": "VIX index level",
             "latest": 16.530000686645508,
@@ -78,62 +133,14 @@
             "source": "yahoo:^VIX",
             "stale": false,
             "in_base_irr": false
-          },
-          {
-            "id": "credit_impulse_1m",
-            "label": "HYG vs TLT 1-month return spread (%)",
-            "latest": 2.24,
-            "as_of": "2026-10-01",
-            "yoy_pct": 162.7,
-            "direction": "up",
-            "good_for": "credit_impulse",
-            "source": "spread:HYG-TLT:21d",
-            "stale": false,
-            "in_base_irr": false
-          },
-          {
-            "id": "spy_20d_realized_vol",
-            "label": "SPY 20-day realized vol (annualized %)",
-            "latest": 10.42,
-            "as_of": "2026-10-01",
-            "yoy_pct": 51.9,
-            "direction": "up",
-            "good_for": "equity_vol",
-            "source": "realized_vol:SPY:20d",
-            "stale": false,
-            "in_base_irr": false
-          },
-          {
-            "id": "agi_years_ahead",
-            "label": "AGI expert-horizon years ahead (public quotes)",
-            "latest": 5.0,
-            "as_of": "2026-06-01",
-            "yoy_pct": 0.0,
-            "direction": "flat",
-            "good_for": "horizon_orientation",
-            "source": "expert_horizon:agi",
-            "stale": false,
-            "in_base_irr": false
-          },
-          {
-            "id": "robotaxi_years_ahead",
-            "label": "Robotaxi expert-horizon years ahead (public quotes)",
-            "latest": 2.0,
-            "as_of": "2026-06-01",
-            "yoy_pct": 0.0,
-            "direction": "flat",
-            "good_for": "horizon_orientation",
-            "source": "expert_horizon:robotaxi",
-            "stale": false,
-            "in_base_irr": false
           }
         ]
       }
     ]
   },
   "lens_consensus": {
-    "as_of": "2026-07-20",
-    "shared_inputs_ref": "valuation.json@2026-07-20",
+    "as_of": "2026-10-02",
+    "shared_inputs_ref": "valuation.json@2026-10-02",
     "valuation_richness": 0.0,
     "blended_return_pct": null,
     "band_pct": null,
@@ -146,6 +153,6 @@
     "top_dissents": [],
     "contributor_count": 0,
     "in_base_irr": false,
-    "disclaimer": "Advisory lens blend only. Does not replace Lawrence total-synthesis stance gate without [HUMAN REVIEW]."
+    "disclaimer": "Advisory lens blend only. Does not replace routed contract stance gate without [HUMAN REVIEW]."
   }
 }
