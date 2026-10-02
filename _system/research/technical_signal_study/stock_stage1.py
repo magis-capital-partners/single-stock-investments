@@ -19,7 +19,7 @@ HERE = Path(__file__).resolve().parent
 sys.path.insert(0, str(HERE))
 import fear_vec  # noqa: E402
 import stats_util as su  # noqa: E402
-from common import DATA, EVENTS, RESULTS as RES, STOCK_SIGNALS as SIG, THIN_PANEL, manifest  # noqa: E402
+from common import EVENTS, RESULTS as RES, STOCK_SIGNALS as SIG, THIN_PANEL, manifest  # noqa: E402
 
 MANIFEST = manifest()
 EXCLUDE = {"DNP"}  # DNP.WA resolves to the DNP Select Income Fund on Yahoo: wrong security
@@ -75,7 +75,6 @@ def ts_stats(score: np.ndarray, r: np.ndarray, h: int, rng: np.random.Generator,
 def main(limit: int = 0) -> int:
     res = RES if not limit else HERE / "results_smoke"
     res.mkdir(exist_ok=True)
-    data_out = DATA if not limit else res
     stocks = sorted((s, m) for s, m in MANIFEST.items() if m.get("kind") == "stock" and not m.get("error") and s not in EXCLUDE
                     and (SIG / m["file"]).exists())
     if limit:

@@ -1,0 +1,955 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns:p="http://www.sec.gov/edgar/schedule13g" xmlns:p1="http://www.sec.gov/edgar/common"><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8"><link rel="stylesheet" type="text/css" href="/css/SDR_print.css"><style type="text/css">
+					.fakeTextBox {
+					border-top: 2px solid #999;
+					border-right: 1px solid #ccc;
+					border-bottom: 1px solid #ccc;
+					border-left: 2px solid #999;
+					padding: 2px;
+					_width: 800px;
+					height: auto;
+					min-width: 200px;
+					min-height: 50px;
+					word-wrap: break-word;
+					font-size: 0.9em;
+					color: blue;
+					}
+				</style><style type="text/css">
+					table.tableClass { border: solid black;
+					border-top-width: 1;
+					border-right-width: 1;
+					border-bottom-width: 1;
+					border-left-width: 1;
+					table-layout:fixed;
+					}
+					table.innerTableClass { border: solid black;
+					border-top-width: 0;
+					border-right-width: 0;
+					border-bottom-width: 0;
+					border-left-width: 0;
+					table-layout:fixed;
+					}
+					table.collapsabletableClass { 
+					border-collapse:collapse; 
+					border-top-width: 0;
+					border-right-width: 0;
+					border-bottom-width: 0;
+					border-left-width: 0;
+					table-layout:fixed;
+					}
+					th.tableClassLeft { border: solid black;
+					border-top-width: 0px;
+					border-right-width: 0px;
+					border-bottom-width: 1px;
+					border-left-width: 1px;
+					padding: 2px;
+					}
+					th.tableClassRight { border: solid black;
+					border-top-width: 0px;
+					border-right-width: 1px;
+					border-bottom-width: 1px;
+					border-left-width: 0;
+					padding: 2px;
+					}
+					th.tableClass { border: solid black;
+					border-top-width: 0px;
+					border-right-width: 1px;
+					border-bottom-width: 1px;
+					border-left-width: 1px;
+					padding: 2px;
+					}
+					td.tableClassLeft { border: solid black;
+					border-top-width: 0px;
+					border-right-width: 0px;
+					border-bottom-width: 1px;
+					border-left-width: 1px;
+					font-size: 0.9em;
+					color: blue;
+					word-wrap: break-word;
+					}
+					td.tableClassRight { border: solid black;
+					border-top-width: 0px;
+					border-right-width: 1px;
+					border-bottom-width: 1px;
+					border-left-width: 0;
+					font-size: 0.9em;
+					color: blue;
+					word-wrap: break-word;
+					}
+					td.tableClass { border: solid black;
+					border-top-width: 0px;
+					border-right-width: 1px;
+					border-bottom-width: 1px;
+					border-left-width: 1px;
+					font-size: 0.9em;
+					font-weight:bold;
+					color: black;
+					word-wrap: break-word;
+					}
+					td.tableClassNoBorder { border: solid black;
+					border-top-width: 0px;
+					border-right-width: 0px;
+					border-bottom-width: 0px;
+					border-left-width: 0px;
+					font-size: 0.9em;
+					font-weight:bold;
+					color: black;
+					word-wrap: break-word;
+					}
+					
+					td.tableClassNoBorderBlue { border: solid black;
+					border-top-width: 0px;
+					border-right-width: 0px;
+					border-bottom-width: 0px;
+					border-left-width: 0px;
+					font-size: 0.9em;
+					font-weight:bold;
+					color: blue;
+					word-wrap: break-word;
+					}
+					
+					td.tableClassInnerNoBorderBlue { border: solid black;
+					border-top-width: 0px;
+					border-right-width: 0px;
+					border-bottom-width: 0px;
+					border-left-width: 0px;
+					font-size: 1.4em;
+					font-weight:bold;
+					color: blue;
+					word-wrap: break-word;
+					}
+					
+					td.tableClassNoBorderAlignLeft { border: solid black;
+					border-top-width: 0px;
+					border-right-width: 0px;
+					border-bottom-width: 0px;
+					border-left-width: 0px;
+					font-size: 0.9em;
+					font-weight:bold;
+					text-align: left;
+					color: black;
+					word-wrap: break-word;
+					}
+					
+					td.signature {
+					padding: 4px 8px;
+					}
+					
+					td.tableClassInner { border: solid black;
+					border-top-width: 0px;
+					border-right-width: 1px;
+					border-bottom-width: 1px;
+					border-left-width: 1px;
+					font-size: 1em;
+					font-weight:bold;
+					color: black;
+					word-wrap: break-word;
+					}
+					
+					td.tableClassValign { border: solid black;
+					border-top-width: 0px;
+					border-right-width: 1px;
+					border-bottom-width: 1px;
+					border-left-width: 1px;
+					font-size: 0.9em;
+					font-weight:bold;
+					color: black;
+					vertical-align: middle;
+					text-align: center;
+					word-wrap: break-word;
+					}
+					
+					td.tableClassValignNoBorder { border: solid black;
+					border-top-width: 0px;
+					border-right-width: 0px;
+					border-bottom-width: 0px;
+					border-left-width: 0px;
+					font-size: 0.9em;
+					font-weight:bold;
+					color: black;
+					vertical-align: middle;
+					text-align: center;
+					word-wrap: break-word;
+					}
+					
+					td.tableClassValignInner { border: solid black;
+					border-top-width: 0px;
+					border-right-width: 1px;
+					border-bottom-width: 1px;
+					border-left-width: 1px;
+					font-size: 1em;
+					font-weight:bold;
+					color: black;
+					vertical-align: middle;
+					text-align: center;
+					word-wrap: break-word;
+					}
+					
+					td.innerTableClassRightValign { border: solid black;
+					border-top-width: 0px;
+					border-right-width: 1px;
+					border-bottom-width: 1px;
+					border-left-width: 0;
+					font-size: 1em;
+					font-weight:bold;
+					color: black;
+					vertical-align: middle;
+					text-align: center;
+					word-wrap: break-word;
+					}
+					
+					td.innerTableClassRightValignBottomLess { border: solid black;
+					border-top-width: 0px;
+					border-right-width: 1px;
+					border-bottom-width: 0px;
+					border-left-width: 0;
+					font-size: 1em;
+					font-weight:bold;
+					color: black;
+					vertical-align: middle;
+					text-align: center;
+					word-wrap: break-word;
+					}
+					
+					td.tableClassInnerLeft { border: solid black;
+					border-top-width: 0px;
+					border-right-width: 0px;
+					border-bottom-width: 1px;
+					border-left-width: 1px;
+					font-size: 1em;
+					font-weight:bold;
+					color: black;
+					word-wrap: break-word;
+					}
+					
+					td.tableClassInnerLeftBottomLess { border: solid black;
+					border-top-width: 0px;
+					border-right-width: 0px;
+					border-bottom-width: 0px;
+					border-left-width: 1px;
+					font-size: 1em;
+					font-weight:bold;
+					color: black;
+					word-wrap: break-word;
+					}
+					
+					td.tableClassNoBorderAlignCenter { border: solid black;
+					border-top-width: 0px;
+					border-right-width: 0px;
+					border-bottom-width: 0px;
+					border-left-width: 0px;
+					font-size: 0.9em;
+					font-weight:bold;
+					color: black;
+					text-align: center;
+					word-wrap: break-word;
+					}
+					
+					tr.tableClass { border: solid black;
+					border-top-width: 1px;
+					border-right-width: 1px;
+					border-bottom-width: 1px;
+					border-left-width: 1px;
+					}
+					tr.tableClassWithBg { border: solid black;
+					border-top-width: 0;
+					border-right-width: 1;
+					border-bottom-width: 1;
+					border-left-width: 0;
+					background-color: #e0e0ff
+					}
+					
+					tr.tableClassWithBgBlack { border: solid black;
+					border-top-width: 0;
+					border-right-width: 1;
+					border-bottom-width: 1;
+					border-left-width: 0;
+					background-color: #D3D3D3
+					}
+					
+					hr.header {
+        			position: relative;
+        			top: 20px;
+        			border: none;
+        			height: 6px;
+        			background: black;
+        			margin-bottom: 10px;
+    				}
+    				
+    				hr.separatorThin {
+        			position: relative;
+        			top: 2px;
+        			border: none;
+        			height: 2px;
+        			background: black;
+        			margin-bottom: 2px;
+    				}
+					
+					hr.headerThin {
+        			position: relative;
+        			top: 10px;
+        			border: none;
+        			height: 2px;
+        			background: black;
+        			margin-bottom: 10px;
+    				}
+    				
+					hr.separator {
+        			position: relative;
+        			top: 20px;
+        			border: none;
+        			height: 4px;
+        			background: black;
+        			margin-bottom: 5px;
+    				}
+    				
+    				div.text {
+  						background-color: #ffffff;
+  						color: blue;
+  						font-size: 1em;
+  						font-weight:normal;
+  						text-align:justify;
+					}
+					
+					div.largetext {
+  						background-color: #ffffff;
+  						color: blue;
+  						font-size: 1em;
+  						font-weight:normal;
+  						text-align:justify;
+  						white-space: pre-wrap;
+					}
+					
+					
+					div.information {
+  						background-color: #ffffff;
+  						color: black;
+  						font-size: 1em;
+  						font-weight:normal;
+  						text-align:justify;
+					}
+					
+					#scheader {
+						font-size: 0.9em;
+						border: 0px solid #404040;
+						border-spacing: 2px;
+					}
+					
+				</style></head><body lang="en-US" text="#000000" bgcolor="#ffffff"><hr class="header"><br><hr class="headerThin"><div class="contentwrapper"><table role="presentation" id="scheader"><tr><td class="tableClassNoBorderAlignCenter" style="font-size:2em;">
+						SECURITIES AND EXCHANGE COMMISSION
+						<br>
+						Washington, D.C. 20549
+					</td></tr><tr><td class="tableClassNoBorderAlignCenter"><br><br><div style="font-size:1.5em;">
+									SCHEDULE 13G
+								</div><br><br></td></tr><tr><td class="tableClassNoBorderAlignCenter"><div style="font-size:1.2em;">
+							UNDER THE SECURITIES EXCHANGE ACT OF 1934
+					</div></td></tr><tr><td class="center"></td></tr><tr><td class="center"><div class="information" style="text-align:center; font-weight:bold; color:blue;">Space Exploration Technologies Corp.</div><div class="information" style="text-align:center; font-weight:bold;"><hr class="separatorThin">(Name of Issuer)</div><br><br></td></tr><tr><td class="center"><div class="information" style="text-align:center; font-weight:bold; color:blue;">Class A Common Stock, par value $0.001 per share</div><div class="information" style="text-align:center; font-weight:bold;"><hr class="separatorThin">(Title of Class of Securities)</div><br><br></td></tr><table border="1"><tr><td><div class="information" style="text-align:center; font-weight:bold; color:blue;">84615Q103</div><div class="information" style="text-align:center; font-weight:bold;"><hr class="separatorThin">(CUSIP Number)</div></td></tr><br><br></table><tr><td class="center"><div class="information" style="text-align:center; font-weight:bold; color:blue;">06/30/2026</div><div class="information" style="text-align:center; font-weight:bold;"><hr class="separatorThin">(Date of Event Which Requires Filing of this Statement)</div></td></tr></table><br><br><table><tr><td class="label"> Check the appropriate box to designate the rule pursuant to which this Schedule is filed:</td></tr><tr><td><img src="/Images/box-unchecked.jpg" alt="Checkbox not checked">   Rule 13d-1(b)
+					</td></tr><tr><td><img src="/Images/box-unchecked.jpg" alt="Checkbox not checked">   Rule 13d-1(c)
+					</td></tr><tr><td><img src="/Images/box-checked.jpg" alt="Checkbox checked">   Rule 13d-1(d)
+				</td></tr></table></div><hr class="headerThin"><hr class="header"><br><br>
+  <div style="display:none">
+			schemaVersion:
+			</div>
+<div class="content"><div class="form1"></div></div>
+
+  <div class="content"><div class="form1"><table><tr><td class="center"><br><br><p><div align="center" style="font-size:1.2em;">
+								SCHEDULE 13G
+							</div></p></td></tr></table><table role="presentation" class="tableClass" id="cusipNumber"><tr class="tableClass"><td width="7%" style="font-weight:bold;">CUSIP Number(s):</td><td width="75%"><div style="font-size:.9em; color:#000000">84615Q103</div></td></tr></table><br><br><table role="presentation" class="tableClass" id="reportingPersonDetails"><tr class="tableClass"><td width="8%" class="tableClassValign">1</td><td width="92%" class="tableClass">Names of Reporting Persons
+				<br><br><div class="text">The Founders Fund II, LP</div></td></tr><tr><td width="8%" class="tableClassValign">2</td><td width="92%" class="tableClass">Check the appropriate box if a member of a Group (see instructions)
+				<br><br><div class="text"><img src="/Images/box-unchecked.jpg" alt="Checkbox not checked">  (a)
+					<br><img src="/Images/box-checked.jpg" alt="Checkbox checked">  (b)	
+				</div></td></tr><tr class="tableClassWithBgBlack"><td width="8%" class="tableClassValign">3</td><td width="92%" class="tableClass">Sec Use Only</td></tr><tr><td width="8%" class="tableClassValign">4</td><td width="92%" class="tableClass">Citizenship or Place of Organization
+				<br><br><div class="text">
+				DELAWARE
+			</div></td></tr><tr><td width="8%" class="tableClassValign">Number of Shares Beneficially Owned by Each Reporting Person With:</td><td width="92%" class="tableClass"><table class="innerTableClass"><tr><td width="8%" class="innerTableClassRightValign">5</td><td width="92%" class="tableClassInnerLeft">Sole Voting Power
+							<br><br><div class="text">0.00</div></td></tr><tr><td width="8%" class="innerTableClassRightValign">6</td><td width="92%" class="tableClassInnerLeft">Shared Voting Power
+							<br><br><div class="text">155,393,350.00</div></td></tr><tr><td width="8%" class="innerTableClassRightValign">7</td><td width="92%" class="tableClassInnerLeft">Sole Dispositive Power
+							<br><br><div class="text">0.00</div></td></tr><tr><td width="8%" class="innerTableClassRightValignBottomLess">8</td><td width="92%" class="tableClassInnerLeftBottomLess">Shared Dispositive Power
+							<br><br><div class="text">155,393,350.00</div></td></tr></table></td></tr><tr><td width="8%" class="tableClassValign">9</td><td width="92%" class="tableClass">Aggregate Amount Beneficially Owned by Each Reporting Person
+				<br><br><div class="text">155,393,350.00</div></td></tr><tr><td width="8%" class="tableClassValign">10</td><td width="92%" class="tableClass">Check box if the aggregate amount in row (9) excludes certain shares (See Instructions)
+				<br><br><img src="/Images/box-unchecked.jpg" alt="Checkbox not checked"></td></tr><tr><td width="8%" class="tableClassValign">11</td><td width="92%" class="tableClass">Percent of class represented by amount in row (9)
+				<br><br><div class="text">2.0 % </div></td></tr><tr><td width="8%" class="tableClassValign">12</td><td width="92%" class="tableClass">Type of Reporting Person (See Instructions)
+				<br><br><div class="text">PN</div></td></tr></table><table><tr><td class="center"><br><br><p><div align="center" style="font-size:1.2em;">
+								SCHEDULE 13G
+							</div></p></td></tr></table><table role="presentation" class="tableClass" id="cusipNumber"><tr class="tableClass"><td width="7%" style="font-weight:bold;">CUSIP Number(s):</td><td width="75%"><div style="font-size:.9em; color:#000000">84615Q103</div></td></tr></table><br><br><table role="presentation" class="tableClass" id="reportingPersonDetails"><tr class="tableClass"><td width="8%" class="tableClassValign">1</td><td width="92%" class="tableClass">Names of Reporting Persons
+				<br><br><div class="text">The Founders Fund II Principals Fund, LP</div></td></tr><tr><td width="8%" class="tableClassValign">2</td><td width="92%" class="tableClass">Check the appropriate box if a member of a Group (see instructions)
+				<br><br><div class="text"><img src="/Images/box-unchecked.jpg" alt="Checkbox not checked">  (a)
+					<br><img src="/Images/box-checked.jpg" alt="Checkbox checked">  (b)	
+				</div></td></tr><tr class="tableClassWithBgBlack"><td width="8%" class="tableClassValign">3</td><td width="92%" class="tableClass">Sec Use Only</td></tr><tr><td width="8%" class="tableClassValign">4</td><td width="92%" class="tableClass">Citizenship or Place of Organization
+				<br><br><div class="text">
+				DELAWARE
+			</div></td></tr><tr><td width="8%" class="tableClassValign">Number of Shares Beneficially Owned by Each Reporting Person With:</td><td width="92%" class="tableClass"><table class="innerTableClass"><tr><td width="8%" class="innerTableClassRightValign">5</td><td width="92%" class="tableClassInnerLeft">Sole Voting Power
+							<br><br><div class="text">0.00</div></td></tr><tr><td width="8%" class="innerTableClassRightValign">6</td><td width="92%" class="tableClassInnerLeft">Shared Voting Power
+							<br><br><div class="text">11,267,600.00</div></td></tr><tr><td width="8%" class="innerTableClassRightValign">7</td><td width="92%" class="tableClassInnerLeft">Sole Dispositive Power
+							<br><br><div class="text">0.00</div></td></tr><tr><td width="8%" class="innerTableClassRightValignBottomLess">8</td><td width="92%" class="tableClassInnerLeftBottomLess">Shared Dispositive Power
+							<br><br><div class="text">11,267,600.00</div></td></tr></table></td></tr><tr><td width="8%" class="tableClassValign">9</td><td width="92%" class="tableClass">Aggregate Amount Beneficially Owned by Each Reporting Person
+				<br><br><div class="text">11,267,600.00</div></td></tr><tr><td width="8%" class="tableClassValign">10</td><td width="92%" class="tableClass">Check box if the aggregate amount in row (9) excludes certain shares (See Instructions)
+				<br><br><img src="/Images/box-unchecked.jpg" alt="Checkbox not checked"></td></tr><tr><td width="8%" class="tableClassValign">11</td><td width="92%" class="tableClass">Percent of class represented by amount in row (9)
+				<br><br><div class="text">0.1 % </div></td></tr><tr><td width="8%" class="tableClassValign">12</td><td width="92%" class="tableClass">Type of Reporting Person (See Instructions)
+				<br><br><div class="text">PN</div></td></tr></table><table><tr><td class="center"><br><br><p><div align="center" style="font-size:1.2em;">
+								SCHEDULE 13G
+							</div></p></td></tr></table><table role="presentation" class="tableClass" id="cusipNumber"><tr class="tableClass"><td width="7%" style="font-weight:bold;">CUSIP Number(s):</td><td width="75%"><div style="font-size:.9em; color:#000000">84615Q103</div></td></tr></table><br><br><table role="presentation" class="tableClass" id="reportingPersonDetails"><tr class="tableClass"><td width="8%" class="tableClassValign">1</td><td width="92%" class="tableClass">Names of Reporting Persons
+				<br><br><div class="text">The Founders Fund II Entrepreneurs Fund, LP</div></td></tr><tr><td width="8%" class="tableClassValign">2</td><td width="92%" class="tableClass">Check the appropriate box if a member of a Group (see instructions)
+				<br><br><div class="text"><img src="/Images/box-unchecked.jpg" alt="Checkbox not checked">  (a)
+					<br><img src="/Images/box-checked.jpg" alt="Checkbox checked">  (b)	
+				</div></td></tr><tr class="tableClassWithBgBlack"><td width="8%" class="tableClassValign">3</td><td width="92%" class="tableClass">Sec Use Only</td></tr><tr><td width="8%" class="tableClassValign">4</td><td width="92%" class="tableClass">Citizenship or Place of Organization
+				<br><br><div class="text">
+				DELAWARE
+			</div></td></tr><tr><td width="8%" class="tableClassValign">Number of Shares Beneficially Owned by Each Reporting Person With:</td><td width="92%" class="tableClass"><table class="innerTableClass"><tr><td width="8%" class="innerTableClassRightValign">5</td><td width="92%" class="tableClassInnerLeft">Sole Voting Power
+							<br><br><div class="text">0.00</div></td></tr><tr><td width="8%" class="innerTableClassRightValign">6</td><td width="92%" class="tableClassInnerLeft">Shared Voting Power
+							<br><br><div class="text">8,491,750.00</div></td></tr><tr><td width="8%" class="innerTableClassRightValign">7</td><td width="92%" class="tableClassInnerLeft">Sole Dispositive Power
+							<br><br><div class="text">0.00</div></td></tr><tr><td width="8%" class="innerTableClassRightValignBottomLess">8</td><td width="92%" class="tableClassInnerLeftBottomLess">Shared Dispositive Power
+							<br><br><div class="text">8,491,750.00</div></td></tr></table></td></tr><tr><td width="8%" class="tableClassValign">9</td><td width="92%" class="tableClass">Aggregate Amount Beneficially Owned by Each Reporting Person
+				<br><br><div class="text">8,491,750.00</div></td></tr><tr><td width="8%" class="tableClassValign">10</td><td width="92%" class="tableClass">Check box if the aggregate amount in row (9) excludes certain shares (See Instructions)
+				<br><br><img src="/Images/box-unchecked.jpg" alt="Checkbox not checked"></td></tr><tr><td width="8%" class="tableClassValign">11</td><td width="92%" class="tableClass">Percent of class represented by amount in row (9)
+				<br><br><div class="text">0.1 % </div></td></tr><tr><td width="8%" class="tableClassValign">12</td><td width="92%" class="tableClass">Type of Reporting Person (See Instructions)
+				<br><br><div class="text">PN</div></td></tr></table><table><tr><td class="center"><br><br><p><div align="center" style="font-size:1.2em;">
+								SCHEDULE 13G
+							</div></p></td></tr></table><table role="presentation" class="tableClass" id="cusipNumber"><tr class="tableClass"><td width="7%" style="font-weight:bold;">CUSIP Number(s):</td><td width="75%"><div style="font-size:.9em; color:#000000">84615Q103</div></td></tr></table><br><br><table role="presentation" class="tableClass" id="reportingPersonDetails"><tr class="tableClass"><td width="8%" class="tableClassValign">1</td><td width="92%" class="tableClass">Names of Reporting Persons
+				<br><br><div class="text">The Founders Fund II Management, LLC</div></td></tr><tr><td width="8%" class="tableClassValign">2</td><td width="92%" class="tableClass">Check the appropriate box if a member of a Group (see instructions)
+				<br><br><div class="text"><img src="/Images/box-unchecked.jpg" alt="Checkbox not checked">  (a)
+					<br><img src="/Images/box-checked.jpg" alt="Checkbox checked">  (b)	
+				</div></td></tr><tr class="tableClassWithBgBlack"><td width="8%" class="tableClassValign">3</td><td width="92%" class="tableClass">Sec Use Only</td></tr><tr><td width="8%" class="tableClassValign">4</td><td width="92%" class="tableClass">Citizenship or Place of Organization
+				<br><br><div class="text">
+				DELAWARE
+			</div></td></tr><tr><td width="8%" class="tableClassValign">Number of Shares Beneficially Owned by Each Reporting Person With:</td><td width="92%" class="tableClass"><table class="innerTableClass"><tr><td width="8%" class="innerTableClassRightValign">5</td><td width="92%" class="tableClassInnerLeft">Sole Voting Power
+							<br><br><div class="text">0.00</div></td></tr><tr><td width="8%" class="innerTableClassRightValign">6</td><td width="92%" class="tableClassInnerLeft">Shared Voting Power
+							<br><br><div class="text">175,152,700.00</div></td></tr><tr><td width="8%" class="innerTableClassRightValign">7</td><td width="92%" class="tableClassInnerLeft">Sole Dispositive Power
+							<br><br><div class="text">0.00</div></td></tr><tr><td width="8%" class="innerTableClassRightValignBottomLess">8</td><td width="92%" class="tableClassInnerLeftBottomLess">Shared Dispositive Power
+							<br><br><div class="text">175,152,700.00</div></td></tr></table></td></tr><tr><td width="8%" class="tableClassValign">9</td><td width="92%" class="tableClass">Aggregate Amount Beneficially Owned by Each Reporting Person
+				<br><br><div class="text">175,152,700.00</div></td></tr><tr><td width="8%" class="tableClassValign">10</td><td width="92%" class="tableClass">Check box if the aggregate amount in row (9) excludes certain shares (See Instructions)
+				<br><br><img src="/Images/box-unchecked.jpg" alt="Checkbox not checked"></td></tr><tr><td width="8%" class="tableClassValign">11</td><td width="92%" class="tableClass">Percent of class represented by amount in row (9)
+				<br><br><div class="text">2.3 % </div></td></tr><tr><td width="8%" class="tableClassValign">12</td><td width="92%" class="tableClass">Type of Reporting Person (See Instructions)
+				<br><br><div class="text">OO</div></td></tr></table><table><tr><td class="center"><br><br><p><div align="center" style="font-size:1.2em;">
+								SCHEDULE 13G
+							</div></p></td></tr></table><table role="presentation" class="tableClass" id="cusipNumber"><tr class="tableClass"><td width="7%" style="font-weight:bold;">CUSIP Number(s):</td><td width="75%"><div style="font-size:.9em; color:#000000">84615Q103</div></td></tr></table><br><br><table role="presentation" class="tableClass" id="reportingPersonDetails"><tr class="tableClass"><td width="8%" class="tableClassValign">1</td><td width="92%" class="tableClass">Names of Reporting Persons
+				<br><br><div class="text">The Founders Fund III, LP</div></td></tr><tr><td width="8%" class="tableClassValign">2</td><td width="92%" class="tableClass">Check the appropriate box if a member of a Group (see instructions)
+				<br><br><div class="text"><img src="/Images/box-unchecked.jpg" alt="Checkbox not checked">  (a)
+					<br><img src="/Images/box-checked.jpg" alt="Checkbox checked">  (b)	
+				</div></td></tr><tr class="tableClassWithBgBlack"><td width="8%" class="tableClassValign">3</td><td width="92%" class="tableClass">Sec Use Only</td></tr><tr><td width="8%" class="tableClassValign">4</td><td width="92%" class="tableClass">Citizenship or Place of Organization
+				<br><br><div class="text">
+				DELAWARE
+			</div></td></tr><tr><td width="8%" class="tableClassValign">Number of Shares Beneficially Owned by Each Reporting Person With:</td><td width="92%" class="tableClass"><table class="innerTableClass"><tr><td width="8%" class="innerTableClassRightValign">5</td><td width="92%" class="tableClassInnerLeft">Sole Voting Power
+							<br><br><div class="text">0.00</div></td></tr><tr><td width="8%" class="innerTableClassRightValign">6</td><td width="92%" class="tableClassInnerLeft">Shared Voting Power
+							<br><br><div class="text">23,177,000.00</div></td></tr><tr><td width="8%" class="innerTableClassRightValign">7</td><td width="92%" class="tableClassInnerLeft">Sole Dispositive Power
+							<br><br><div class="text">0.00</div></td></tr><tr><td width="8%" class="innerTableClassRightValignBottomLess">8</td><td width="92%" class="tableClassInnerLeftBottomLess">Shared Dispositive Power
+							<br><br><div class="text">23,177,000.00</div></td></tr></table></td></tr><tr><td width="8%" class="tableClassValign">9</td><td width="92%" class="tableClass">Aggregate Amount Beneficially Owned by Each Reporting Person
+				<br><br><div class="text">23,177,000.00</div></td></tr><tr><td width="8%" class="tableClassValign">10</td><td width="92%" class="tableClass">Check box if the aggregate amount in row (9) excludes certain shares (See Instructions)
+				<br><br><img src="/Images/box-unchecked.jpg" alt="Checkbox not checked"></td></tr><tr><td width="8%" class="tableClassValign">11</td><td width="92%" class="tableClass">Percent of class represented by amount in row (9)
+				<br><br><div class="text">0.3 % </div></td></tr><tr><td width="8%" class="tableClassValign">12</td><td width="92%" class="tableClass">Type of Reporting Person (See Instructions)
+				<br><br><div class="text">PN</div></td></tr></table><table><tr><td class="center"><br><br><p><div align="center" style="font-size:1.2em;">
+								SCHEDULE 13G
+							</div></p></td></tr></table><table role="presentation" class="tableClass" id="cusipNumber"><tr class="tableClass"><td width="7%" style="font-weight:bold;">CUSIP Number(s):</td><td width="75%"><div style="font-size:.9em; color:#000000">84615Q103</div></td></tr></table><br><br><table role="presentation" class="tableClass" id="reportingPersonDetails"><tr class="tableClass"><td width="8%" class="tableClassValign">1</td><td width="92%" class="tableClass">Names of Reporting Persons
+				<br><br><div class="text">The Founders Fund III Principals Fund, LP</div></td></tr><tr><td width="8%" class="tableClassValign">2</td><td width="92%" class="tableClass">Check the appropriate box if a member of a Group (see instructions)
+				<br><br><div class="text"><img src="/Images/box-unchecked.jpg" alt="Checkbox not checked">  (a)
+					<br><img src="/Images/box-checked.jpg" alt="Checkbox checked">  (b)	
+				</div></td></tr><tr class="tableClassWithBgBlack"><td width="8%" class="tableClassValign">3</td><td width="92%" class="tableClass">Sec Use Only</td></tr><tr><td width="8%" class="tableClassValign">4</td><td width="92%" class="tableClass">Citizenship or Place of Organization
+				<br><br><div class="text">
+				DELAWARE
+			</div></td></tr><tr><td width="8%" class="tableClassValign">Number of Shares Beneficially Owned by Each Reporting Person With:</td><td width="92%" class="tableClass"><table class="innerTableClass"><tr><td width="8%" class="innerTableClassRightValign">5</td><td width="92%" class="tableClassInnerLeft">Sole Voting Power
+							<br><br><div class="text">0.00</div></td></tr><tr><td width="8%" class="innerTableClassRightValign">6</td><td width="92%" class="tableClassInnerLeft">Shared Voting Power
+							<br><br><div class="text">12,027,900.00</div></td></tr><tr><td width="8%" class="innerTableClassRightValign">7</td><td width="92%" class="tableClassInnerLeft">Sole Dispositive Power
+							<br><br><div class="text">0.00</div></td></tr><tr><td width="8%" class="innerTableClassRightValignBottomLess">8</td><td width="92%" class="tableClassInnerLeftBottomLess">Shared Dispositive Power
+							<br><br><div class="text">12,027,900.00</div></td></tr></table></td></tr><tr><td width="8%" class="tableClassValign">9</td><td width="92%" class="tableClass">Aggregate Amount Beneficially Owned by Each Reporting Person
+				<br><br><div class="text">12,027,900.00</div></td></tr><tr><td width="8%" class="tableClassValign">10</td><td width="92%" class="tableClass">Check box if the aggregate amount in row (9) excludes certain shares (See Instructions)
+				<br><br><img src="/Images/box-unchecked.jpg" alt="Checkbox not checked"></td></tr><tr><td width="8%" class="tableClassValign">11</td><td width="92%" class="tableClass">Percent of class represented by amount in row (9)
+				<br><br><div class="text">0.2 % </div></td></tr><tr><td width="8%" class="tableClassValign">12</td><td width="92%" class="tableClass">Type of Reporting Person (See Instructions)
+				<br><br><div class="text">PN</div></td></tr></table><table><tr><td class="center"><br><br><p><div align="center" style="font-size:1.2em;">
+								SCHEDULE 13G
+							</div></p></td></tr></table><table role="presentation" class="tableClass" id="cusipNumber"><tr class="tableClass"><td width="7%" style="font-weight:bold;">CUSIP Number(s):</td><td width="75%"><div style="font-size:.9em; color:#000000">84615Q103</div></td></tr></table><br><br><table role="presentation" class="tableClass" id="reportingPersonDetails"><tr class="tableClass"><td width="8%" class="tableClassValign">1</td><td width="92%" class="tableClass">Names of Reporting Persons
+				<br><br><div class="text">The Founders Fund III Entrepreneurs Fund, LP</div></td></tr><tr><td width="8%" class="tableClassValign">2</td><td width="92%" class="tableClass">Check the appropriate box if a member of a Group (see instructions)
+				<br><br><div class="text"><img src="/Images/box-unchecked.jpg" alt="Checkbox not checked">  (a)
+					<br><img src="/Images/box-checked.jpg" alt="Checkbox checked">  (b)	
+				</div></td></tr><tr class="tableClassWithBgBlack"><td width="8%" class="tableClassValign">3</td><td width="92%" class="tableClass">Sec Use Only</td></tr><tr><td width="8%" class="tableClassValign">4</td><td width="92%" class="tableClass">Citizenship or Place of Organization
+				<br><br><div class="text">
+				DELAWARE
+			</div></td></tr><tr><td width="8%" class="tableClassValign">Number of Shares Beneficially Owned by Each Reporting Person With:</td><td width="92%" class="tableClass"><table class="innerTableClass"><tr><td width="8%" class="innerTableClassRightValign">5</td><td width="92%" class="tableClassInnerLeft">Sole Voting Power
+							<br><br><div class="text">0.00</div></td></tr><tr><td width="8%" class="innerTableClassRightValign">6</td><td width="92%" class="tableClassInnerLeft">Shared Voting Power
+							<br><br><div class="text">490,950.00</div></td></tr><tr><td width="8%" class="innerTableClassRightValign">7</td><td width="92%" class="tableClassInnerLeft">Sole Dispositive Power
+							<br><br><div class="text">0.00</div></td></tr><tr><td width="8%" class="innerTableClassRightValignBottomLess">8</td><td width="92%" class="tableClassInnerLeftBottomLess">Shared Dispositive Power
+							<br><br><div class="text">490,950.00</div></td></tr></table></td></tr><tr><td width="8%" class="tableClassValign">9</td><td width="92%" class="tableClass">Aggregate Amount Beneficially Owned by Each Reporting Person
+				<br><br><div class="text">490,950.00</div></td></tr><tr><td width="8%" class="tableClassValign">10</td><td width="92%" class="tableClass">Check box if the aggregate amount in row (9) excludes certain shares (See Instructions)
+				<br><br><img src="/Images/box-unchecked.jpg" alt="Checkbox not checked"></td></tr><tr><td width="8%" class="tableClassValign">11</td><td width="92%" class="tableClass">Percent of class represented by amount in row (9)
+				<br><br><div class="text">0.0 % </div></td></tr><tr><td width="8%" class="tableClassValign">12</td><td width="92%" class="tableClass">Type of Reporting Person (See Instructions)
+				<br><br><div class="text">PN</div></td></tr></table><table><tr><td class="center"><br><br><p><div align="center" style="font-size:1.2em;">
+								SCHEDULE 13G
+							</div></p></td></tr></table><table role="presentation" class="tableClass" id="cusipNumber"><tr class="tableClass"><td width="7%" style="font-weight:bold;">CUSIP Number(s):</td><td width="75%"><div style="font-size:.9em; color:#000000">84615Q103</div></td></tr></table><br><br><table role="presentation" class="tableClass" id="reportingPersonDetails"><tr class="tableClass"><td width="8%" class="tableClassValign">1</td><td width="92%" class="tableClass">Names of Reporting Persons
+				<br><br><div class="text">The Founders Fund III Management, LLC</div></td></tr><tr><td width="8%" class="tableClassValign">2</td><td width="92%" class="tableClass">Check the appropriate box if a member of a Group (see instructions)
+				<br><br><div class="text"><img src="/Images/box-unchecked.jpg" alt="Checkbox not checked">  (a)
+					<br><img src="/Images/box-checked.jpg" alt="Checkbox checked">  (b)	
+				</div></td></tr><tr class="tableClassWithBgBlack"><td width="8%" class="tableClassValign">3</td><td width="92%" class="tableClass">Sec Use Only</td></tr><tr><td width="8%" class="tableClassValign">4</td><td width="92%" class="tableClass">Citizenship or Place of Organization
+				<br><br><div class="text">
+				DELAWARE
+			</div></td></tr><tr><td width="8%" class="tableClassValign">Number of Shares Beneficially Owned by Each Reporting Person With:</td><td width="92%" class="tableClass"><table class="innerTableClass"><tr><td width="8%" class="innerTableClassRightValign">5</td><td width="92%" class="tableClassInnerLeft">Sole Voting Power
+							<br><br><div class="text">0.00</div></td></tr><tr><td width="8%" class="innerTableClassRightValign">6</td><td width="92%" class="tableClassInnerLeft">Shared Voting Power
+							<br><br><div class="text">35,695,850.00</div></td></tr><tr><td width="8%" class="innerTableClassRightValign">7</td><td width="92%" class="tableClassInnerLeft">Sole Dispositive Power
+							<br><br><div class="text">0.00</div></td></tr><tr><td width="8%" class="innerTableClassRightValignBottomLess">8</td><td width="92%" class="tableClassInnerLeftBottomLess">Shared Dispositive Power
+							<br><br><div class="text">35,695,850.00</div></td></tr></table></td></tr><tr><td width="8%" class="tableClassValign">9</td><td width="92%" class="tableClass">Aggregate Amount Beneficially Owned by Each Reporting Person
+				<br><br><div class="text">35,695,850.00</div></td></tr><tr><td width="8%" class="tableClassValign">10</td><td width="92%" class="tableClass">Check box if the aggregate amount in row (9) excludes certain shares (See Instructions)
+				<br><br><img src="/Images/box-unchecked.jpg" alt="Checkbox not checked"></td></tr><tr><td width="8%" class="tableClassValign">11</td><td width="92%" class="tableClass">Percent of class represented by amount in row (9)
+				<br><br><div class="text">0.5 % </div></td></tr><tr><td width="8%" class="tableClassValign">12</td><td width="92%" class="tableClass">Type of Reporting Person (See Instructions)
+				<br><br><div class="text">OO</div></td></tr></table><table><tr><td class="center"><br><br><p><div align="center" style="font-size:1.2em;">
+								SCHEDULE 13G
+							</div></p></td></tr></table><table role="presentation" class="tableClass" id="cusipNumber"><tr class="tableClass"><td width="7%" style="font-weight:bold;">CUSIP Number(s):</td><td width="75%"><div style="font-size:.9em; color:#000000">84615Q103</div></td></tr></table><br><br><table role="presentation" class="tableClass" id="reportingPersonDetails"><tr class="tableClass"><td width="8%" class="tableClassValign">1</td><td width="92%" class="tableClass">Names of Reporting Persons
+				<br><br><div class="text">The Founders Fund IV, LP</div></td></tr><tr><td width="8%" class="tableClassValign">2</td><td width="92%" class="tableClass">Check the appropriate box if a member of a Group (see instructions)
+				<br><br><div class="text"><img src="/Images/box-unchecked.jpg" alt="Checkbox not checked">  (a)
+					<br><img src="/Images/box-checked.jpg" alt="Checkbox checked">  (b)	
+				</div></td></tr><tr class="tableClassWithBgBlack"><td width="8%" class="tableClassValign">3</td><td width="92%" class="tableClass">Sec Use Only</td></tr><tr><td width="8%" class="tableClassValign">4</td><td width="92%" class="tableClass">Citizenship or Place of Organization
+				<br><br><div class="text">
+				DELAWARE
+			</div></td></tr><tr><td width="8%" class="tableClassValign">Number of Shares Beneficially Owned by Each Reporting Person With:</td><td width="92%" class="tableClass"><table class="innerTableClass"><tr><td width="8%" class="innerTableClassRightValign">5</td><td width="92%" class="tableClassInnerLeft">Sole Voting Power
+							<br><br><div class="text">0.00</div></td></tr><tr><td width="8%" class="innerTableClassRightValign">6</td><td width="92%" class="tableClassInnerLeft">Shared Voting Power
+							<br><br><div class="text">50,546,855.00</div></td></tr><tr><td width="8%" class="innerTableClassRightValign">7</td><td width="92%" class="tableClassInnerLeft">Sole Dispositive Power
+							<br><br><div class="text">0.00</div></td></tr><tr><td width="8%" class="innerTableClassRightValignBottomLess">8</td><td width="92%" class="tableClassInnerLeftBottomLess">Shared Dispositive Power
+							<br><br><div class="text">50,546,855.00</div></td></tr></table></td></tr><tr><td width="8%" class="tableClassValign">9</td><td width="92%" class="tableClass">Aggregate Amount Beneficially Owned by Each Reporting Person
+				<br><br><div class="text">50,546,855.00</div></td></tr><tr><td width="8%" class="tableClassValign">10</td><td width="92%" class="tableClass">Check box if the aggregate amount in row (9) excludes certain shares (See Instructions)
+				<br><br><img src="/Images/box-unchecked.jpg" alt="Checkbox not checked"></td></tr><tr><td width="8%" class="tableClassValign">11</td><td width="92%" class="tableClass">Percent of class represented by amount in row (9)
+				<br><br><div class="text">0.7 % </div></td></tr><tr><td width="8%" class="tableClassValign">12</td><td width="92%" class="tableClass">Type of Reporting Person (See Instructions)
+				<br><br><div class="text">PN</div></td></tr></table><table><tr><td class="center"><br><br><p><div align="center" style="font-size:1.2em;">
+								SCHEDULE 13G
+							</div></p></td></tr></table><table role="presentation" class="tableClass" id="cusipNumber"><tr class="tableClass"><td width="7%" style="font-weight:bold;">CUSIP Number(s):</td><td width="75%"><div style="font-size:.9em; color:#000000">84615Q103</div></td></tr></table><br><br><table role="presentation" class="tableClass" id="reportingPersonDetails"><tr class="tableClass"><td width="8%" class="tableClassValign">1</td><td width="92%" class="tableClass">Names of Reporting Persons
+				<br><br><div class="text">The Founders Fund IV Principals Fund, LP</div></td></tr><tr><td width="8%" class="tableClassValign">2</td><td width="92%" class="tableClass">Check the appropriate box if a member of a Group (see instructions)
+				<br><br><div class="text"><img src="/Images/box-unchecked.jpg" alt="Checkbox not checked">  (a)
+					<br><img src="/Images/box-checked.jpg" alt="Checkbox checked">  (b)	
+				</div></td></tr><tr class="tableClassWithBgBlack"><td width="8%" class="tableClassValign">3</td><td width="92%" class="tableClass">Sec Use Only</td></tr><tr><td width="8%" class="tableClassValign">4</td><td width="92%" class="tableClass">Citizenship or Place of Organization
+				<br><br><div class="text">
+				DELAWARE
+			</div></td></tr><tr><td width="8%" class="tableClassValign">Number of Shares Beneficially Owned by Each Reporting Person With:</td><td width="92%" class="tableClass"><table class="innerTableClass"><tr><td width="8%" class="innerTableClassRightValign">5</td><td width="92%" class="tableClassInnerLeft">Sole Voting Power
+							<br><br><div class="text">0.00</div></td></tr><tr><td width="8%" class="innerTableClassRightValign">6</td><td width="92%" class="tableClassInnerLeft">Shared Voting Power
+							<br><br><div class="text">23,720,115.00</div></td></tr><tr><td width="8%" class="innerTableClassRightValign">7</td><td width="92%" class="tableClassInnerLeft">Sole Dispositive Power
+							<br><br><div class="text">0.00</div></td></tr><tr><td width="8%" class="innerTableClassRightValignBottomLess">8</td><td width="92%" class="tableClassInnerLeftBottomLess">Shared Dispositive Power
+							<br><br><div class="text">23,720,115.00</div></td></tr></table></td></tr><tr><td width="8%" class="tableClassValign">9</td><td width="92%" class="tableClass">Aggregate Amount Beneficially Owned by Each Reporting Person
+				<br><br><div class="text">23,720,115.00</div></td></tr><tr><td width="8%" class="tableClassValign">10</td><td width="92%" class="tableClass">Check box if the aggregate amount in row (9) excludes certain shares (See Instructions)
+				<br><br><img src="/Images/box-unchecked.jpg" alt="Checkbox not checked"></td></tr><tr><td width="8%" class="tableClassValign">11</td><td width="92%" class="tableClass">Percent of class represented by amount in row (9)
+				<br><br><div class="text">0.3 % </div></td></tr><tr><td width="8%" class="tableClassValign">12</td><td width="92%" class="tableClass">Type of Reporting Person (See Instructions)
+				<br><br><div class="text">PN</div></td></tr></table><table><tr><td class="center"><br><br><p><div align="center" style="font-size:1.2em;">
+								SCHEDULE 13G
+							</div></p></td></tr></table><table role="presentation" class="tableClass" id="cusipNumber"><tr class="tableClass"><td width="7%" style="font-weight:bold;">CUSIP Number(s):</td><td width="75%"><div style="font-size:.9em; color:#000000">84615Q103</div></td></tr></table><br><br><table role="presentation" class="tableClass" id="reportingPersonDetails"><tr class="tableClass"><td width="8%" class="tableClassValign">1</td><td width="92%" class="tableClass">Names of Reporting Persons
+				<br><br><div class="text">The Founders Fund IV Management, LLC</div></td></tr><tr><td width="8%" class="tableClassValign">2</td><td width="92%" class="tableClass">Check the appropriate box if a member of a Group (see instructions)
+				<br><br><div class="text"><img src="/Images/box-unchecked.jpg" alt="Checkbox not checked">  (a)
+					<br><img src="/Images/box-checked.jpg" alt="Checkbox checked">  (b)	
+				</div></td></tr><tr class="tableClassWithBgBlack"><td width="8%" class="tableClassValign">3</td><td width="92%" class="tableClass">Sec Use Only</td></tr><tr><td width="8%" class="tableClassValign">4</td><td width="92%" class="tableClass">Citizenship or Place of Organization
+				<br><br><div class="text">
+				DELAWARE
+			</div></td></tr><tr><td width="8%" class="tableClassValign">Number of Shares Beneficially Owned by Each Reporting Person With:</td><td width="92%" class="tableClass"><table class="innerTableClass"><tr><td width="8%" class="innerTableClassRightValign">5</td><td width="92%" class="tableClassInnerLeft">Sole Voting Power
+							<br><br><div class="text">0.00</div></td></tr><tr><td width="8%" class="innerTableClassRightValign">6</td><td width="92%" class="tableClassInnerLeft">Shared Voting Power
+							<br><br><div class="text">74,266,970.00</div></td></tr><tr><td width="8%" class="innerTableClassRightValign">7</td><td width="92%" class="tableClassInnerLeft">Sole Dispositive Power
+							<br><br><div class="text">0.00</div></td></tr><tr><td width="8%" class="innerTableClassRightValignBottomLess">8</td><td width="92%" class="tableClassInnerLeftBottomLess">Shared Dispositive Power
+							<br><br><div class="text">74,266,970.00</div></td></tr></table></td></tr><tr><td width="8%" class="tableClassValign">9</td><td width="92%" class="tableClass">Aggregate Amount Beneficially Owned by Each Reporting Person
+				<br><br><div class="text">74,266,970.00</div></td></tr><tr><td width="8%" class="tableClassValign">10</td><td width="92%" class="tableClass">Check box if the aggregate amount in row (9) excludes certain shares (See Instructions)
+				<br><br><img src="/Images/box-unchecked.jpg" alt="Checkbox not checked"></td></tr><tr><td width="8%" class="tableClassValign">11</td><td width="92%" class="tableClass">Percent of class represented by amount in row (9)
+				<br><br><div class="text">1.0 % </div></td></tr><tr><td width="8%" class="tableClassValign">12</td><td width="92%" class="tableClass">Type of Reporting Person (See Instructions)
+				<br><br><div class="text">OO</div></td></tr></table><table><tr><td class="center"><br><br><p><div align="center" style="font-size:1.2em;">
+								SCHEDULE 13G
+							</div></p></td></tr></table><table role="presentation" class="tableClass" id="cusipNumber"><tr class="tableClass"><td width="7%" style="font-weight:bold;">CUSIP Number(s):</td><td width="75%"><div style="font-size:.9em; color:#000000">84615Q103</div></td></tr></table><br><br><table role="presentation" class="tableClass" id="reportingPersonDetails"><tr class="tableClass"><td width="8%" class="tableClassValign">1</td><td width="92%" class="tableClass">Names of Reporting Persons
+				<br><br><div class="text">The Founders Fund V, LP</div></td></tr><tr><td width="8%" class="tableClassValign">2</td><td width="92%" class="tableClass">Check the appropriate box if a member of a Group (see instructions)
+				<br><br><div class="text"><img src="/Images/box-unchecked.jpg" alt="Checkbox not checked">  (a)
+					<br><img src="/Images/box-checked.jpg" alt="Checkbox checked">  (b)	
+				</div></td></tr><tr class="tableClassWithBgBlack"><td width="8%" class="tableClassValign">3</td><td width="92%" class="tableClass">Sec Use Only</td></tr><tr><td width="8%" class="tableClassValign">4</td><td width="92%" class="tableClass">Citizenship or Place of Organization
+				<br><br><div class="text">
+				DELAWARE
+			</div></td></tr><tr><td width="8%" class="tableClassValign">Number of Shares Beneficially Owned by Each Reporting Person With:</td><td width="92%" class="tableClass"><table class="innerTableClass"><tr><td width="8%" class="innerTableClassRightValign">5</td><td width="92%" class="tableClassInnerLeft">Sole Voting Power
+							<br><br><div class="text">0.00</div></td></tr><tr><td width="8%" class="innerTableClassRightValign">6</td><td width="92%" class="tableClassInnerLeft">Shared Voting Power
+							<br><br><div class="text">14,113,325.00</div></td></tr><tr><td width="8%" class="innerTableClassRightValign">7</td><td width="92%" class="tableClassInnerLeft">Sole Dispositive Power
+							<br><br><div class="text">0.00</div></td></tr><tr><td width="8%" class="innerTableClassRightValignBottomLess">8</td><td width="92%" class="tableClassInnerLeftBottomLess">Shared Dispositive Power
+							<br><br><div class="text">14,113,325.00</div></td></tr></table></td></tr><tr><td width="8%" class="tableClassValign">9</td><td width="92%" class="tableClass">Aggregate Amount Beneficially Owned by Each Reporting Person
+				<br><br><div class="text">14,113,325.00</div></td></tr><tr><td width="8%" class="tableClassValign">10</td><td width="92%" class="tableClass">Check box if the aggregate amount in row (9) excludes certain shares (See Instructions)
+				<br><br><img src="/Images/box-unchecked.jpg" alt="Checkbox not checked"></td></tr><tr><td width="8%" class="tableClassValign">11</td><td width="92%" class="tableClass">Percent of class represented by amount in row (9)
+				<br><br><div class="text">0.2 % </div></td></tr><tr><td width="8%" class="tableClassValign">12</td><td width="92%" class="tableClass">Type of Reporting Person (See Instructions)
+				<br><br><div class="text">PN</div></td></tr></table><table><tr><td class="center"><br><br><p><div align="center" style="font-size:1.2em;">
+								SCHEDULE 13G
+							</div></p></td></tr></table><table role="presentation" class="tableClass" id="cusipNumber"><tr class="tableClass"><td width="7%" style="font-weight:bold;">CUSIP Number(s):</td><td width="75%"><div style="font-size:.9em; color:#000000">84615Q103</div></td></tr></table><br><br><table role="presentation" class="tableClass" id="reportingPersonDetails"><tr class="tableClass"><td width="8%" class="tableClassValign">1</td><td width="92%" class="tableClass">Names of Reporting Persons
+				<br><br><div class="text">The Founders Fund V Principals Fund, LP</div></td></tr><tr><td width="8%" class="tableClassValign">2</td><td width="92%" class="tableClass">Check the appropriate box if a member of a Group (see instructions)
+				<br><br><div class="text"><img src="/Images/box-unchecked.jpg" alt="Checkbox not checked">  (a)
+					<br><img src="/Images/box-checked.jpg" alt="Checkbox checked">  (b)	
+				</div></td></tr><tr class="tableClassWithBgBlack"><td width="8%" class="tableClassValign">3</td><td width="92%" class="tableClass">Sec Use Only</td></tr><tr><td width="8%" class="tableClassValign">4</td><td width="92%" class="tableClass">Citizenship or Place of Organization
+				<br><br><div class="text">
+				DELAWARE
+			</div></td></tr><tr><td width="8%" class="tableClassValign">Number of Shares Beneficially Owned by Each Reporting Person With:</td><td width="92%" class="tableClass"><table class="innerTableClass"><tr><td width="8%" class="innerTableClassRightValign">5</td><td width="92%" class="tableClassInnerLeft">Sole Voting Power
+							<br><br><div class="text">0.00</div></td></tr><tr><td width="8%" class="innerTableClassRightValign">6</td><td width="92%" class="tableClassInnerLeft">Shared Voting Power
+							<br><br><div class="text">6,425,005.00</div></td></tr><tr><td width="8%" class="innerTableClassRightValign">7</td><td width="92%" class="tableClassInnerLeft">Sole Dispositive Power
+							<br><br><div class="text">0.00</div></td></tr><tr><td width="8%" class="innerTableClassRightValignBottomLess">8</td><td width="92%" class="tableClassInnerLeftBottomLess">Shared Dispositive Power
+							<br><br><div class="text">6,425,005.00</div></td></tr></table></td></tr><tr><td width="8%" class="tableClassValign">9</td><td width="92%" class="tableClass">Aggregate Amount Beneficially Owned by Each Reporting Person
+				<br><br><div class="text">6,425,005.00</div></td></tr><tr><td width="8%" class="tableClassValign">10</td><td width="92%" class="tableClass">Check box if the aggregate amount in row (9) excludes certain shares (See Instructions)
+				<br><br><img src="/Images/box-unchecked.jpg" alt="Checkbox not checked"></td></tr><tr><td width="8%" class="tableClassValign">11</td><td width="92%" class="tableClass">Percent of class represented by amount in row (9)
+				<br><br><div class="text">0.1 % </div></td></tr><tr><td width="8%" class="tableClassValign">12</td><td width="92%" class="tableClass">Type of Reporting Person (See Instructions)
+				<br><br><div class="text">PN</div></td></tr></table><table><tr><td class="center"><br><br><p><div align="center" style="font-size:1.2em;">
+								SCHEDULE 13G
+							</div></p></td></tr></table><table role="presentation" class="tableClass" id="cusipNumber"><tr class="tableClass"><td width="7%" style="font-weight:bold;">CUSIP Number(s):</td><td width="75%"><div style="font-size:.9em; color:#000000">84615Q103</div></td></tr></table><br><br><table role="presentation" class="tableClass" id="reportingPersonDetails"><tr class="tableClass"><td width="8%" class="tableClassValign">1</td><td width="92%" class="tableClass">Names of Reporting Persons
+				<br><br><div class="text">The Founders Fund V Entrepreneurs Fund, LP</div></td></tr><tr><td width="8%" class="tableClassValign">2</td><td width="92%" class="tableClass">Check the appropriate box if a member of a Group (see instructions)
+				<br><br><div class="text"><img src="/Images/box-unchecked.jpg" alt="Checkbox not checked">  (a)
+					<br><img src="/Images/box-checked.jpg" alt="Checkbox checked">  (b)	
+				</div></td></tr><tr class="tableClassWithBgBlack"><td width="8%" class="tableClassValign">3</td><td width="92%" class="tableClass">Sec Use Only</td></tr><tr><td width="8%" class="tableClassValign">4</td><td width="92%" class="tableClass">Citizenship or Place of Organization
+				<br><br><div class="text">
+				DELAWARE
+			</div></td></tr><tr><td width="8%" class="tableClassValign">Number of Shares Beneficially Owned by Each Reporting Person With:</td><td width="92%" class="tableClass"><table class="innerTableClass"><tr><td width="8%" class="innerTableClassRightValign">5</td><td width="92%" class="tableClassInnerLeft">Sole Voting Power
+							<br><br><div class="text">0.00</div></td></tr><tr><td width="8%" class="innerTableClassRightValign">6</td><td width="92%" class="tableClassInnerLeft">Shared Voting Power
+							<br><br><div class="text">294,720.00</div></td></tr><tr><td width="8%" class="innerTableClassRightValign">7</td><td width="92%" class="tableClassInnerLeft">Sole Dispositive Power
+							<br><br><div class="text">0.00</div></td></tr><tr><td width="8%" class="innerTableClassRightValignBottomLess">8</td><td width="92%" class="tableClassInnerLeftBottomLess">Shared Dispositive Power
+							<br><br><div class="text">294,720.00</div></td></tr></table></td></tr><tr><td width="8%" class="tableClassValign">9</td><td width="92%" class="tableClass">Aggregate Amount Beneficially Owned by Each Reporting Person
+				<br><br><div class="text">294,720.00</div></td></tr><tr><td width="8%" class="tableClassValign">10</td><td width="92%" class="tableClass">Check box if the aggregate amount in row (9) excludes certain shares (See Instructions)
+				<br><br><img src="/Images/box-unchecked.jpg" alt="Checkbox not checked"></td></tr><tr><td width="8%" class="tableClassValign">11</td><td width="92%" class="tableClass">Percent of class represented by amount in row (9)
+				<br><br><div class="text">0.0 % </div></td></tr><tr><td width="8%" class="tableClassValign">12</td><td width="92%" class="tableClass">Type of Reporting Person (See Instructions)
+				<br><br><div class="text">PN</div></td></tr></table><table><tr><td class="center"><br><br><p><div align="center" style="font-size:1.2em;">
+								SCHEDULE 13G
+							</div></p></td></tr></table><table role="presentation" class="tableClass" id="cusipNumber"><tr class="tableClass"><td width="7%" style="font-weight:bold;">CUSIP Number(s):</td><td width="75%"><div style="font-size:.9em; color:#000000">84615Q103</div></td></tr></table><br><br><table role="presentation" class="tableClass" id="reportingPersonDetails"><tr class="tableClass"><td width="8%" class="tableClassValign">1</td><td width="92%" class="tableClass">Names of Reporting Persons
+				<br><br><div class="text">The Founders Fund V Management, LLC</div></td></tr><tr><td width="8%" class="tableClassValign">2</td><td width="92%" class="tableClass">Check the appropriate box if a member of a Group (see instructions)
+				<br><br><div class="text"><img src="/Images/box-unchecked.jpg" alt="Checkbox not checked">  (a)
+					<br><img src="/Images/box-checked.jpg" alt="Checkbox checked">  (b)	
+				</div></td></tr><tr class="tableClassWithBgBlack"><td width="8%" class="tableClassValign">3</td><td width="92%" class="tableClass">Sec Use Only</td></tr><tr><td width="8%" class="tableClassValign">4</td><td width="92%" class="tableClass">Citizenship or Place of Organization
+				<br><br><div class="text">
+				DELAWARE
+			</div></td></tr><tr><td width="8%" class="tableClassValign">Number of Shares Beneficially Owned by Each Reporting Person With:</td><td width="92%" class="tableClass"><table class="innerTableClass"><tr><td width="8%" class="innerTableClassRightValign">5</td><td width="92%" class="tableClassInnerLeft">Sole Voting Power
+							<br><br><div class="text">0.00</div></td></tr><tr><td width="8%" class="innerTableClassRightValign">6</td><td width="92%" class="tableClassInnerLeft">Shared Voting Power
+							<br><br><div class="text">20,833,050.00</div></td></tr><tr><td width="8%" class="innerTableClassRightValign">7</td><td width="92%" class="tableClassInnerLeft">Sole Dispositive Power
+							<br><br><div class="text">0.00</div></td></tr><tr><td width="8%" class="innerTableClassRightValignBottomLess">8</td><td width="92%" class="tableClassInnerLeftBottomLess">Shared Dispositive Power
+							<br><br><div class="text">20,833,050.00</div></td></tr></table></td></tr><tr><td width="8%" class="tableClassValign">9</td><td width="92%" class="tableClass">Aggregate Amount Beneficially Owned by Each Reporting Person
+				<br><br><div class="text">20,833,050.00</div></td></tr><tr><td width="8%" class="tableClassValign">10</td><td width="92%" class="tableClass">Check box if the aggregate amount in row (9) excludes certain shares (See Instructions)
+				<br><br><img src="/Images/box-unchecked.jpg" alt="Checkbox not checked"></td></tr><tr><td width="8%" class="tableClassValign">11</td><td width="92%" class="tableClass">Percent of class represented by amount in row (9)
+				<br><br><div class="text">0.3 % </div></td></tr><tr><td width="8%" class="tableClassValign">12</td><td width="92%" class="tableClass">Type of Reporting Person (See Instructions)
+				<br><br><div class="text">OO</div></td></tr></table><table><tr><td class="center"><br><br><p><div align="center" style="font-size:1.2em;">
+								SCHEDULE 13G
+							</div></p></td></tr></table><table role="presentation" class="tableClass" id="cusipNumber"><tr class="tableClass"><td width="7%" style="font-weight:bold;">CUSIP Number(s):</td><td width="75%"><div style="font-size:.9em; color:#000000">84615Q103</div></td></tr></table><br><br><table role="presentation" class="tableClass" id="reportingPersonDetails"><tr class="tableClass"><td width="8%" class="tableClassValign">1</td><td width="92%" class="tableClass">Names of Reporting Persons
+				<br><br><div class="text">Lembas II, LP</div></td></tr><tr><td width="8%" class="tableClassValign">2</td><td width="92%" class="tableClass">Check the appropriate box if a member of a Group (see instructions)
+				<br><br><div class="text"><img src="/Images/box-unchecked.jpg" alt="Checkbox not checked">  (a)
+					<br><img src="/Images/box-checked.jpg" alt="Checkbox checked">  (b)	
+				</div></td></tr><tr class="tableClassWithBgBlack"><td width="8%" class="tableClassValign">3</td><td width="92%" class="tableClass">Sec Use Only</td></tr><tr><td width="8%" class="tableClassValign">4</td><td width="92%" class="tableClass">Citizenship or Place of Organization
+				<br><br><div class="text">
+				DELAWARE
+			</div></td></tr><tr><td width="8%" class="tableClassValign">Number of Shares Beneficially Owned by Each Reporting Person With:</td><td width="92%" class="tableClass"><table class="innerTableClass"><tr><td width="8%" class="innerTableClassRightValign">5</td><td width="92%" class="tableClassInnerLeft">Sole Voting Power
+							<br><br><div class="text">0.00</div></td></tr><tr><td width="8%" class="innerTableClassRightValign">6</td><td width="92%" class="tableClassInnerLeft">Shared Voting Power
+							<br><br><div class="text">52,969,150.00</div></td></tr><tr><td width="8%" class="innerTableClassRightValign">7</td><td width="92%" class="tableClassInnerLeft">Sole Dispositive Power
+							<br><br><div class="text">0.00</div></td></tr><tr><td width="8%" class="innerTableClassRightValignBottomLess">8</td><td width="92%" class="tableClassInnerLeftBottomLess">Shared Dispositive Power
+							<br><br><div class="text">52,969,150.00</div></td></tr></table></td></tr><tr><td width="8%" class="tableClassValign">9</td><td width="92%" class="tableClass">Aggregate Amount Beneficially Owned by Each Reporting Person
+				<br><br><div class="text">52,969,150.00</div></td></tr><tr><td width="8%" class="tableClassValign">10</td><td width="92%" class="tableClass">Check box if the aggregate amount in row (9) excludes certain shares (See Instructions)
+				<br><br><img src="/Images/box-unchecked.jpg" alt="Checkbox not checked"></td></tr><tr><td width="8%" class="tableClassValign">11</td><td width="92%" class="tableClass">Percent of class represented by amount in row (9)
+				<br><br><div class="text">0.7 % </div></td></tr><tr><td width="8%" class="tableClassValign">12</td><td width="92%" class="tableClass">Type of Reporting Person (See Instructions)
+				<br><br><div class="text">PN</div></td></tr></table><table><tr><td class="center"><br><br><p><div align="center" style="font-size:1.2em;">
+								SCHEDULE 13G
+							</div></p></td></tr></table><table role="presentation" class="tableClass" id="cusipNumber"><tr class="tableClass"><td width="7%" style="font-weight:bold;">CUSIP Number(s):</td><td width="75%"><div style="font-size:.9em; color:#000000">84615Q103</div></td></tr></table><br><br><table role="presentation" class="tableClass" id="reportingPersonDetails"><tr class="tableClass"><td width="8%" class="tableClassValign">1</td><td width="92%" class="tableClass">Names of Reporting Persons
+				<br><br><div class="text">The Founders Fund Alpha Management, LLC</div></td></tr><tr><td width="8%" class="tableClassValign">2</td><td width="92%" class="tableClass">Check the appropriate box if a member of a Group (see instructions)
+				<br><br><div class="text"><img src="/Images/box-unchecked.jpg" alt="Checkbox not checked">  (a)
+					<br><img src="/Images/box-checked.jpg" alt="Checkbox checked">  (b)	
+				</div></td></tr><tr class="tableClassWithBgBlack"><td width="8%" class="tableClassValign">3</td><td width="92%" class="tableClass">Sec Use Only</td></tr><tr><td width="8%" class="tableClassValign">4</td><td width="92%" class="tableClass">Citizenship or Place of Organization
+				<br><br><div class="text">
+				DELAWARE
+			</div></td></tr><tr><td width="8%" class="tableClassValign">Number of Shares Beneficially Owned by Each Reporting Person With:</td><td width="92%" class="tableClass"><table class="innerTableClass"><tr><td width="8%" class="innerTableClassRightValign">5</td><td width="92%" class="tableClassInnerLeft">Sole Voting Power
+							<br><br><div class="text">0.00</div></td></tr><tr><td width="8%" class="innerTableClassRightValign">6</td><td width="92%" class="tableClassInnerLeft">Shared Voting Power
+							<br><br><div class="text">52,969,150.00</div></td></tr><tr><td width="8%" class="innerTableClassRightValign">7</td><td width="92%" class="tableClassInnerLeft">Sole Dispositive Power
+							<br><br><div class="text">0.00</div></td></tr><tr><td width="8%" class="innerTableClassRightValignBottomLess">8</td><td width="92%" class="tableClassInnerLeftBottomLess">Shared Dispositive Power
+							<br><br><div class="text">52,969,150.00</div></td></tr></table></td></tr><tr><td width="8%" class="tableClassValign">9</td><td width="92%" class="tableClass">Aggregate Amount Beneficially Owned by Each Reporting Person
+				<br><br><div class="text">52,969,150.00</div></td></tr><tr><td width="8%" class="tableClassValign">10</td><td width="92%" class="tableClass">Check box if the aggregate amount in row (9) excludes certain shares (See Instructions)
+				<br><br><img src="/Images/box-unchecked.jpg" alt="Checkbox not checked"></td></tr><tr><td width="8%" class="tableClassValign">11</td><td width="92%" class="tableClass">Percent of class represented by amount in row (9)
+				<br><br><div class="text">0.7 % </div></td></tr><tr><td width="8%" class="tableClassValign">12</td><td width="92%" class="tableClass">Type of Reporting Person (See Instructions)
+				<br><br><div class="text">OO</div></td></tr></table><table><tr><td class="center"><br><br><p><div align="center" style="font-size:1.2em;">
+								SCHEDULE 13G
+							</div></p></td></tr></table><table role="presentation" class="tableClass" id="cusipNumber"><tr class="tableClass"><td width="7%" style="font-weight:bold;">CUSIP Number(s):</td><td width="75%"><div style="font-size:.9em; color:#000000">84615Q103</div></td></tr></table><br><br><table role="presentation" class="tableClass" id="reportingPersonDetails"><tr class="tableClass"><td width="8%" class="tableClassValign">1</td><td width="92%" class="tableClass">Names of Reporting Persons
+				<br><br><div class="text">The Founders Fund Growth II, LP</div></td></tr><tr><td width="8%" class="tableClassValign">2</td><td width="92%" class="tableClass">Check the appropriate box if a member of a Group (see instructions)
+				<br><br><div class="text"><img src="/Images/box-unchecked.jpg" alt="Checkbox not checked">  (a)
+					<br><img src="/Images/box-checked.jpg" alt="Checkbox checked">  (b)	
+				</div></td></tr><tr class="tableClassWithBgBlack"><td width="8%" class="tableClassValign">3</td><td width="92%" class="tableClass">Sec Use Only</td></tr><tr><td width="8%" class="tableClassValign">4</td><td width="92%" class="tableClass">Citizenship or Place of Organization
+				<br><br><div class="text">
+				DELAWARE
+			</div></td></tr><tr><td width="8%" class="tableClassValign">Number of Shares Beneficially Owned by Each Reporting Person With:</td><td width="92%" class="tableClass"><table class="innerTableClass"><tr><td width="8%" class="innerTableClassRightValign">5</td><td width="92%" class="tableClassInnerLeft">Sole Voting Power
+							<br><br><div class="text">0.00</div></td></tr><tr><td width="8%" class="innerTableClassRightValign">6</td><td width="92%" class="tableClassInnerLeft">Shared Voting Power
+							<br><br><div class="text">22,839,450.00</div></td></tr><tr><td width="8%" class="innerTableClassRightValign">7</td><td width="92%" class="tableClassInnerLeft">Sole Dispositive Power
+							<br><br><div class="text">0.00</div></td></tr><tr><td width="8%" class="innerTableClassRightValignBottomLess">8</td><td width="92%" class="tableClassInnerLeftBottomLess">Shared Dispositive Power
+							<br><br><div class="text">22,839,450.00</div></td></tr></table></td></tr><tr><td width="8%" class="tableClassValign">9</td><td width="92%" class="tableClass">Aggregate Amount Beneficially Owned by Each Reporting Person
+				<br><br><div class="text">22,839,450.00</div></td></tr><tr><td width="8%" class="tableClassValign">10</td><td width="92%" class="tableClass">Check box if the aggregate amount in row (9) excludes certain shares (See Instructions)
+				<br><br><img src="/Images/box-unchecked.jpg" alt="Checkbox not checked"></td></tr><tr><td width="8%" class="tableClassValign">11</td><td width="92%" class="tableClass">Percent of class represented by amount in row (9)
+				<br><br><div class="text">0.3 % </div></td></tr><tr><td width="8%" class="tableClassValign">12</td><td width="92%" class="tableClass">Type of Reporting Person (See Instructions)
+				<br><br><div class="text">PN</div></td></tr></table><table><tr><td class="center"><br><br><p><div align="center" style="font-size:1.2em;">
+								SCHEDULE 13G
+							</div></p></td></tr></table><table role="presentation" class="tableClass" id="cusipNumber"><tr class="tableClass"><td width="7%" style="font-weight:bold;">CUSIP Number(s):</td><td width="75%"><div style="font-size:.9em; color:#000000">84615Q103</div></td></tr></table><br><br><table role="presentation" class="tableClass" id="reportingPersonDetails"><tr class="tableClass"><td width="8%" class="tableClassValign">1</td><td width="92%" class="tableClass">Names of Reporting Persons
+				<br><br><div class="text">The Founders Fund Growth II Management, LP</div></td></tr><tr><td width="8%" class="tableClassValign">2</td><td width="92%" class="tableClass">Check the appropriate box if a member of a Group (see instructions)
+				<br><br><div class="text"><img src="/Images/box-unchecked.jpg" alt="Checkbox not checked">  (a)
+					<br><img src="/Images/box-checked.jpg" alt="Checkbox checked">  (b)	
+				</div></td></tr><tr class="tableClassWithBgBlack"><td width="8%" class="tableClassValign">3</td><td width="92%" class="tableClass">Sec Use Only</td></tr><tr><td width="8%" class="tableClassValign">4</td><td width="92%" class="tableClass">Citizenship or Place of Organization
+				<br><br><div class="text">
+				DELAWARE
+			</div></td></tr><tr><td width="8%" class="tableClassValign">Number of Shares Beneficially Owned by Each Reporting Person With:</td><td width="92%" class="tableClass"><table class="innerTableClass"><tr><td width="8%" class="innerTableClassRightValign">5</td><td width="92%" class="tableClassInnerLeft">Sole Voting Power
+							<br><br><div class="text">0.00</div></td></tr><tr><td width="8%" class="innerTableClassRightValign">6</td><td width="92%" class="tableClassInnerLeft">Shared Voting Power
+							<br><br><div class="text">22,839,450.00</div></td></tr><tr><td width="8%" class="innerTableClassRightValign">7</td><td width="92%" class="tableClassInnerLeft">Sole Dispositive Power
+							<br><br><div class="text">0.00</div></td></tr><tr><td width="8%" class="innerTableClassRightValignBottomLess">8</td><td width="92%" class="tableClassInnerLeftBottomLess">Shared Dispositive Power
+							<br><br><div class="text">22,839,450.00</div></td></tr></table></td></tr><tr><td width="8%" class="tableClassValign">9</td><td width="92%" class="tableClass">Aggregate Amount Beneficially Owned by Each Reporting Person
+				<br><br><div class="text">22,839,450.00</div></td></tr><tr><td width="8%" class="tableClassValign">10</td><td width="92%" class="tableClass">Check box if the aggregate amount in row (9) excludes certain shares (See Instructions)
+				<br><br><img src="/Images/box-unchecked.jpg" alt="Checkbox not checked"></td></tr><tr><td width="8%" class="tableClassValign">11</td><td width="92%" class="tableClass">Percent of class represented by amount in row (9)
+				<br><br><div class="text">0.3 % </div></td></tr><tr><td width="8%" class="tableClassValign">12</td><td width="92%" class="tableClass">Type of Reporting Person (See Instructions)
+				<br><br><div class="text">PN</div></td></tr></table><table><tr><td class="center"><br><br><p><div align="center" style="font-size:1.2em;">
+								SCHEDULE 13G
+							</div></p></td></tr></table><table role="presentation" class="tableClass" id="cusipNumber"><tr class="tableClass"><td width="7%" style="font-weight:bold;">CUSIP Number(s):</td><td width="75%"><div style="font-size:.9em; color:#000000">84615Q103</div></td></tr></table><br><br><table role="presentation" class="tableClass" id="reportingPersonDetails"><tr class="tableClass"><td width="8%" class="tableClassValign">1</td><td width="92%" class="tableClass">Names of Reporting Persons
+				<br><br><div class="text">FF GP Holdings, LLC</div></td></tr><tr><td width="8%" class="tableClassValign">2</td><td width="92%" class="tableClass">Check the appropriate box if a member of a Group (see instructions)
+				<br><br><div class="text"><img src="/Images/box-unchecked.jpg" alt="Checkbox not checked">  (a)
+					<br><img src="/Images/box-checked.jpg" alt="Checkbox checked">  (b)	
+				</div></td></tr><tr class="tableClassWithBgBlack"><td width="8%" class="tableClassValign">3</td><td width="92%" class="tableClass">Sec Use Only</td></tr><tr><td width="8%" class="tableClassValign">4</td><td width="92%" class="tableClass">Citizenship or Place of Organization
+				<br><br><div class="text">
+				DELAWARE
+			</div></td></tr><tr><td width="8%" class="tableClassValign">Number of Shares Beneficially Owned by Each Reporting Person With:</td><td width="92%" class="tableClass"><table class="innerTableClass"><tr><td width="8%" class="innerTableClassRightValign">5</td><td width="92%" class="tableClassInnerLeft">Sole Voting Power
+							<br><br><div class="text">0.00</div></td></tr><tr><td width="8%" class="innerTableClassRightValign">6</td><td width="92%" class="tableClassInnerLeft">Shared Voting Power
+							<br><br><div class="text">20,381,610.00</div></td></tr><tr><td width="8%" class="innerTableClassRightValign">7</td><td width="92%" class="tableClassInnerLeft">Sole Dispositive Power
+							<br><br><div class="text">0.00</div></td></tr><tr><td width="8%" class="innerTableClassRightValignBottomLess">8</td><td width="92%" class="tableClassInnerLeftBottomLess">Shared Dispositive Power
+							<br><br><div class="text">20,381,610.00</div></td></tr></table></td></tr><tr><td width="8%" class="tableClassValign">9</td><td width="92%" class="tableClass">Aggregate Amount Beneficially Owned by Each Reporting Person
+				<br><br><div class="text">20,381,610.00</div></td></tr><tr><td width="8%" class="tableClassValign">10</td><td width="92%" class="tableClass">Check box if the aggregate amount in row (9) excludes certain shares (See Instructions)
+				<br><br><img src="/Images/box-unchecked.jpg" alt="Checkbox not checked"></td></tr><tr><td width="8%" class="tableClassValign">11</td><td width="92%" class="tableClass">Percent of class represented by amount in row (9)
+				<br><br><div class="text">0.3 % </div></td></tr><tr><td width="8%" class="tableClassValign">12</td><td width="92%" class="tableClass">Type of Reporting Person (See Instructions)
+				<br><br><div class="text">OO</div></td></tr></table><table><tr><td class="center"><br><br><p><div align="center" style="font-size:1.2em;">
+								SCHEDULE 13G
+							</div></p></td></tr></table><table role="presentation" class="tableClass" id="cusipNumber"><tr class="tableClass"><td width="7%" style="font-weight:bold;">CUSIP Number(s):</td><td width="75%"><div style="font-size:.9em; color:#000000">84615Q103</div></td></tr></table><br><br><table role="presentation" class="tableClass" id="reportingPersonDetails"><tr class="tableClass"><td width="8%" class="tableClassValign">1</td><td width="92%" class="tableClass">Names of Reporting Persons
+				<br><br><div class="text">FF Upper Tier GP, LLC</div></td></tr><tr><td width="8%" class="tableClassValign">2</td><td width="92%" class="tableClass">Check the appropriate box if a member of a Group (see instructions)
+				<br><br><div class="text"><img src="/Images/box-unchecked.jpg" alt="Checkbox not checked">  (a)
+					<br><img src="/Images/box-checked.jpg" alt="Checkbox checked">  (b)	
+				</div></td></tr><tr class="tableClassWithBgBlack"><td width="8%" class="tableClassValign">3</td><td width="92%" class="tableClass">Sec Use Only</td></tr><tr><td width="8%" class="tableClassValign">4</td><td width="92%" class="tableClass">Citizenship or Place of Organization
+				<br><br><div class="text">
+				DELAWARE
+			</div></td></tr><tr><td width="8%" class="tableClassValign">Number of Shares Beneficially Owned by Each Reporting Person With:</td><td width="92%" class="tableClass"><table class="innerTableClass"><tr><td width="8%" class="innerTableClassRightValign">5</td><td width="92%" class="tableClassInnerLeft">Sole Voting Power
+							<br><br><div class="text">0.00</div></td></tr><tr><td width="8%" class="innerTableClassRightValign">6</td><td width="92%" class="tableClassInnerLeft">Shared Voting Power
+							<br><br><div class="text">43,221,060.00</div></td></tr><tr><td width="8%" class="innerTableClassRightValign">7</td><td width="92%" class="tableClassInnerLeft">Sole Dispositive Power
+							<br><br><div class="text">0.00</div></td></tr><tr><td width="8%" class="innerTableClassRightValignBottomLess">8</td><td width="92%" class="tableClassInnerLeftBottomLess">Shared Dispositive Power
+							<br><br><div class="text">43,221,060.00</div></td></tr></table></td></tr><tr><td width="8%" class="tableClassValign">9</td><td width="92%" class="tableClass">Aggregate Amount Beneficially Owned by Each Reporting Person
+				<br><br><div class="text">43,221,060.00</div></td></tr><tr><td width="8%" class="tableClassValign">10</td><td width="92%" class="tableClass">Check box if the aggregate amount in row (9) excludes certain shares (See Instructions)
+				<br><br><img src="/Images/box-unchecked.jpg" alt="Checkbox not checked"></td></tr><tr><td width="8%" class="tableClassValign">11</td><td width="92%" class="tableClass">Percent of class represented by amount in row (9)
+				<br><br><div class="text">0.6 % </div></td></tr><tr><td width="8%" class="tableClassValign">12</td><td width="92%" class="tableClass">Type of Reporting Person (See Instructions)
+				<br><br><div class="text">OO</div></td></tr></table><table><tr><td class="center"><br><br><p><div align="center" style="font-size:1.2em;">
+								SCHEDULE 13G
+							</div></p></td></tr></table><table role="presentation" class="tableClass" id="cusipNumber"><tr class="tableClass"><td width="7%" style="font-weight:bold;">CUSIP Number(s):</td><td width="75%"><div style="font-size:.9em; color:#000000">84615Q103</div></td></tr></table><br><br><table role="presentation" class="tableClass" id="reportingPersonDetails"><tr class="tableClass"><td width="8%" class="tableClassValign">1</td><td width="92%" class="tableClass">Names of Reporting Persons
+				<br><br><div class="text">The Founders Fund Growth, LP</div></td></tr><tr><td width="8%" class="tableClassValign">2</td><td width="92%" class="tableClass">Check the appropriate box if a member of a Group (see instructions)
+				<br><br><div class="text"><img src="/Images/box-unchecked.jpg" alt="Checkbox not checked">  (a)
+					<br><img src="/Images/box-checked.jpg" alt="Checkbox checked">  (b)	
+				</div></td></tr><tr class="tableClassWithBgBlack"><td width="8%" class="tableClassValign">3</td><td width="92%" class="tableClass">Sec Use Only</td></tr><tr><td width="8%" class="tableClassValign">4</td><td width="92%" class="tableClass">Citizenship or Place of Organization
+				<br><br><div class="text">
+				DELAWARE
+			</div></td></tr><tr><td width="8%" class="tableClassValign">Number of Shares Beneficially Owned by Each Reporting Person With:</td><td width="92%" class="tableClass"><table class="innerTableClass"><tr><td width="8%" class="innerTableClassRightValign">5</td><td width="92%" class="tableClassInnerLeft">Sole Voting Power
+							<br><br><div class="text">0.00</div></td></tr><tr><td width="8%" class="innerTableClassRightValign">6</td><td width="92%" class="tableClassInnerLeft">Shared Voting Power
+							<br><br><div class="text">7,197,300.00</div></td></tr><tr><td width="8%" class="innerTableClassRightValign">7</td><td width="92%" class="tableClassInnerLeft">Sole Dispositive Power
+							<br><br><div class="text">0.00</div></td></tr><tr><td width="8%" class="innerTableClassRightValignBottomLess">8</td><td width="92%" class="tableClassInnerLeftBottomLess">Shared Dispositive Power
+							<br><br><div class="text">7,197,300.00</div></td></tr></table></td></tr><tr><td width="8%" class="tableClassValign">9</td><td width="92%" class="tableClass">Aggregate Amount Beneficially Owned by Each Reporting Person
+				<br><br><div class="text">7,197,300.00</div></td></tr><tr><td width="8%" class="tableClassValign">10</td><td width="92%" class="tableClass">Check box if the aggregate amount in row (9) excludes certain shares (See Instructions)
+				<br><br><img src="/Images/box-unchecked.jpg" alt="Checkbox not checked"></td></tr><tr><td width="8%" class="tableClassValign">11</td><td width="92%" class="tableClass">Percent of class represented by amount in row (9)
+				<br><br><div class="text">0.1 % </div></td></tr><tr><td width="8%" class="tableClassValign">12</td><td width="92%" class="tableClass">Type of Reporting Person (See Instructions)
+				<br><br><div class="text">PN</div></td></tr></table><table><tr><td class="center"><br><br><p><div align="center" style="font-size:1.2em;">
+								SCHEDULE 13G
+							</div></p></td></tr></table><table role="presentation" class="tableClass" id="cusipNumber"><tr class="tableClass"><td width="7%" style="font-weight:bold;">CUSIP Number(s):</td><td width="75%"><div style="font-size:.9em; color:#000000">84615Q103</div></td></tr></table><br><br><table role="presentation" class="tableClass" id="reportingPersonDetails"><tr class="tableClass"><td width="8%" class="tableClassValign">1</td><td width="92%" class="tableClass">Names of Reporting Persons
+				<br><br><div class="text">The Founders Fund Growth Principals Fund, LP</div></td></tr><tr><td width="8%" class="tableClassValign">2</td><td width="92%" class="tableClass">Check the appropriate box if a member of a Group (see instructions)
+				<br><br><div class="text"><img src="/Images/box-unchecked.jpg" alt="Checkbox not checked">  (a)
+					<br><img src="/Images/box-checked.jpg" alt="Checkbox checked">  (b)	
+				</div></td></tr><tr class="tableClassWithBgBlack"><td width="8%" class="tableClassValign">3</td><td width="92%" class="tableClass">Sec Use Only</td></tr><tr><td width="8%" class="tableClassValign">4</td><td width="92%" class="tableClass">Citizenship or Place of Organization
+				<br><br><div class="text">
+				DELAWARE
+			</div></td></tr><tr><td width="8%" class="tableClassValign">Number of Shares Beneficially Owned by Each Reporting Person With:</td><td width="92%" class="tableClass"><table class="innerTableClass"><tr><td width="8%" class="innerTableClassRightValign">5</td><td width="92%" class="tableClassInnerLeft">Sole Voting Power
+							<br><br><div class="text">0.00</div></td></tr><tr><td width="8%" class="innerTableClassRightValign">6</td><td width="92%" class="tableClassInnerLeft">Shared Voting Power
+							<br><br><div class="text">464,250.00</div></td></tr><tr><td width="8%" class="innerTableClassRightValign">7</td><td width="92%" class="tableClassInnerLeft">Sole Dispositive Power
+							<br><br><div class="text">0.00</div></td></tr><tr><td width="8%" class="innerTableClassRightValignBottomLess">8</td><td width="92%" class="tableClassInnerLeftBottomLess">Shared Dispositive Power
+							<br><br><div class="text">464,250.00</div></td></tr></table></td></tr><tr><td width="8%" class="tableClassValign">9</td><td width="92%" class="tableClass">Aggregate Amount Beneficially Owned by Each Reporting Person
+				<br><br><div class="text">464,250.00</div></td></tr><tr><td width="8%" class="tableClassValign">10</td><td width="92%" class="tableClass">Check box if the aggregate amount in row (9) excludes certain shares (See Instructions)
+				<br><br><img src="/Images/box-unchecked.jpg" alt="Checkbox not checked"></td></tr><tr><td width="8%" class="tableClassValign">11</td><td width="92%" class="tableClass">Percent of class represented by amount in row (9)
+				<br><br><div class="text">0.0 % </div></td></tr><tr><td width="8%" class="tableClassValign">12</td><td width="92%" class="tableClass">Type of Reporting Person (See Instructions)
+				<br><br><div class="text">PN</div></td></tr></table><table><tr><td class="center"><br><br><p><div align="center" style="font-size:1.2em;">
+								SCHEDULE 13G
+							</div></p></td></tr></table><table role="presentation" class="tableClass" id="cusipNumber"><tr class="tableClass"><td width="7%" style="font-weight:bold;">CUSIP Number(s):</td><td width="75%"><div style="font-size:.9em; color:#000000">84615Q103</div></td></tr></table><br><br><table role="presentation" class="tableClass" id="reportingPersonDetails"><tr class="tableClass"><td width="8%" class="tableClassValign">1</td><td width="92%" class="tableClass">Names of Reporting Persons
+				<br><br><div class="text">Founders SPC, LP</div></td></tr><tr><td width="8%" class="tableClassValign">2</td><td width="92%" class="tableClass">Check the appropriate box if a member of a Group (see instructions)
+				<br><br><div class="text"><img src="/Images/box-unchecked.jpg" alt="Checkbox not checked">  (a)
+					<br><img src="/Images/box-checked.jpg" alt="Checkbox checked">  (b)	
+				</div></td></tr><tr class="tableClassWithBgBlack"><td width="8%" class="tableClassValign">3</td><td width="92%" class="tableClass">Sec Use Only</td></tr><tr><td width="8%" class="tableClassValign">4</td><td width="92%" class="tableClass">Citizenship or Place of Organization
+				<br><br><div class="text">
+				DELAWARE
+			</div></td></tr><tr><td width="8%" class="tableClassValign">Number of Shares Beneficially Owned by Each Reporting Person With:</td><td width="92%" class="tableClass"><table class="innerTableClass"><tr><td width="8%" class="innerTableClassRightValign">5</td><td width="92%" class="tableClassInnerLeft">Sole Voting Power
+							<br><br><div class="text">0.00</div></td></tr><tr><td width="8%" class="innerTableClassRightValign">6</td><td width="92%" class="tableClassInnerLeft">Shared Voting Power
+							<br><br><div class="text">58,950.00</div></td></tr><tr><td width="8%" class="innerTableClassRightValign">7</td><td width="92%" class="tableClassInnerLeft">Sole Dispositive Power
+							<br><br><div class="text">0.00</div></td></tr><tr><td width="8%" class="innerTableClassRightValignBottomLess">8</td><td width="92%" class="tableClassInnerLeftBottomLess">Shared Dispositive Power
+							<br><br><div class="text">58,950.00</div></td></tr></table></td></tr><tr><td width="8%" class="tableClassValign">9</td><td width="92%" class="tableClass">Aggregate Amount Beneficially Owned by Each Reporting Person
+				<br><br><div class="text">58,950.00</div></td></tr><tr><td width="8%" class="tableClassValign">10</td><td width="92%" class="tableClass">Check box if the aggregate amount in row (9) excludes certain shares (See Instructions)
+				<br><br><img src="/Images/box-unchecked.jpg" alt="Checkbox not checked"></td></tr><tr><td width="8%" class="tableClassValign">11</td><td width="92%" class="tableClass">Percent of class represented by amount in row (9)
+				<br><br><div class="text">0.0 % </div></td></tr><tr><td width="8%" class="tableClassValign">12</td><td width="92%" class="tableClass">Type of Reporting Person (See Instructions)
+				<br><br><div class="text">PN</div></td></tr></table><table><tr><td class="center"><br><br><p><div align="center" style="font-size:1.2em;">
+								SCHEDULE 13G
+							</div></p></td></tr></table><table role="presentation" class="tableClass" id="cusipNumber"><tr class="tableClass"><td width="7%" style="font-weight:bold;">CUSIP Number(s):</td><td width="75%"><div style="font-size:.9em; color:#000000">84615Q103</div></td></tr></table><br><br><table role="presentation" class="tableClass" id="reportingPersonDetails"><tr class="tableClass"><td width="8%" class="tableClassValign">1</td><td width="92%" class="tableClass">Names of Reporting Persons
+				<br><br><div class="text">The Founders Fund Growth Management, LLC</div></td></tr><tr><td width="8%" class="tableClassValign">2</td><td width="92%" class="tableClass">Check the appropriate box if a member of a Group (see instructions)
+				<br><br><div class="text"><img src="/Images/box-unchecked.jpg" alt="Checkbox not checked">  (a)
+					<br><img src="/Images/box-checked.jpg" alt="Checkbox checked">  (b)	
+				</div></td></tr><tr class="tableClassWithBgBlack"><td width="8%" class="tableClassValign">3</td><td width="92%" class="tableClass">Sec Use Only</td></tr><tr><td width="8%" class="tableClassValign">4</td><td width="92%" class="tableClass">Citizenship or Place of Organization
+				<br><br><div class="text">
+				DELAWARE
+			</div></td></tr><tr><td width="8%" class="tableClassValign">Number of Shares Beneficially Owned by Each Reporting Person With:</td><td width="92%" class="tableClass"><table class="innerTableClass"><tr><td width="8%" class="innerTableClassRightValign">5</td><td width="92%" class="tableClassInnerLeft">Sole Voting Power
+							<br><br><div class="text">0.00</div></td></tr><tr><td width="8%" class="innerTableClassRightValign">6</td><td width="92%" class="tableClassInnerLeft">Shared Voting Power
+							<br><br><div class="text">7,720,500.00</div></td></tr><tr><td width="8%" class="innerTableClassRightValign">7</td><td width="92%" class="tableClassInnerLeft">Sole Dispositive Power
+							<br><br><div class="text">0.00</div></td></tr><tr><td width="8%" class="innerTableClassRightValignBottomLess">8</td><td width="92%" class="tableClassInnerLeftBottomLess">Shared Dispositive Power
+							<br><br><div class="text">7,720,500.00</div></td></tr></table></td></tr><tr><td width="8%" class="tableClassValign">9</td><td width="92%" class="tableClass">Aggregate Amount Beneficially Owned by Each Reporting Person
+				<br><br><div class="text">7,720,500.00</div></td></tr><tr><td width="8%" class="tableClassValign">10</td><td width="92%" class="tableClass">Check box if the aggregate amount in row (9) excludes certain shares (See Instructions)
+				<br><br><img src="/Images/box-unchecked.jpg" alt="Checkbox not checked"></td></tr><tr><td width="8%" class="tableClassValign">11</td><td width="92%" class="tableClass">Percent of class represented by amount in row (9)
+				<br><br><div class="text">0.1 % </div></td></tr><tr><td width="8%" class="tableClassValign">12</td><td width="92%" class="tableClass">Type of Reporting Person (See Instructions)
+				<br><br><div class="text">OO</div></td></tr></table><table><tr><td class="center"><br><br><p><div align="center" style="font-size:1.2em;">
+								SCHEDULE 13G
+							</div></p></td></tr></table><table role="presentation" class="tableClass" id="cusipNumber"><tr class="tableClass"><td width="7%" style="font-weight:bold;">CUSIP Number(s):</td><td width="75%"><div style="font-size:.9em; color:#000000">84615Q103</div></td></tr></table><br><br><table role="presentation" class="tableClass" id="reportingPersonDetails"><tr class="tableClass"><td width="8%" class="tableClassValign">1</td><td width="92%" class="tableClass">Names of Reporting Persons
+				<br><br><div class="text">2025-005 Investments LLC</div></td></tr><tr><td width="8%" class="tableClassValign">2</td><td width="92%" class="tableClass">Check the appropriate box if a member of a Group (see instructions)
+				<br><br><div class="text"><img src="/Images/box-unchecked.jpg" alt="Checkbox not checked">  (a)
+					<br><img src="/Images/box-checked.jpg" alt="Checkbox checked">  (b)	
+				</div></td></tr><tr class="tableClassWithBgBlack"><td width="8%" class="tableClassValign">3</td><td width="92%" class="tableClass">Sec Use Only</td></tr><tr><td width="8%" class="tableClassValign">4</td><td width="92%" class="tableClass">Citizenship or Place of Organization
+				<br><br><div class="text">
+				DELAWARE
+			</div></td></tr><tr><td width="8%" class="tableClassValign">Number of Shares Beneficially Owned by Each Reporting Person With:</td><td width="92%" class="tableClass"><table class="innerTableClass"><tr><td width="8%" class="innerTableClassRightValign">5</td><td width="92%" class="tableClassInnerLeft">Sole Voting Power
+							<br><br><div class="text">1,352,260.00</div></td></tr><tr><td width="8%" class="innerTableClassRightValign">6</td><td width="92%" class="tableClassInnerLeft">Shared Voting Power
+							<br><br><div class="text">0.00</div></td></tr><tr><td width="8%" class="innerTableClassRightValign">7</td><td width="92%" class="tableClassInnerLeft">Sole Dispositive Power
+							<br><br><div class="text">1,352,260.00</div></td></tr><tr><td width="8%" class="innerTableClassRightValignBottomLess">8</td><td width="92%" class="tableClassInnerLeftBottomLess">Shared Dispositive Power
+							<br><br><div class="text">0.00</div></td></tr></table></td></tr><tr><td width="8%" class="tableClassValign">9</td><td width="92%" class="tableClass">Aggregate Amount Beneficially Owned by Each Reporting Person
+				<br><br><div class="text">1,352,260.00</div></td></tr><tr><td width="8%" class="tableClassValign">10</td><td width="92%" class="tableClass">Check box if the aggregate amount in row (9) excludes certain shares (See Instructions)
+				<br><br><img src="/Images/box-unchecked.jpg" alt="Checkbox not checked"></td></tr><tr><td width="8%" class="tableClassValign">11</td><td width="92%" class="tableClass">Percent of class represented by amount in row (9)
+				<br><br><div class="text">0.0 % </div></td></tr><tr><td width="8%" class="tableClassValign">12</td><td width="92%" class="tableClass">Type of Reporting Person (See Instructions)
+				<br><br><div class="text">OO</div></td></tr></table><table><tr><td class="center"><br><br><p><div align="center" style="font-size:1.2em;">
+								SCHEDULE 13G
+							</div></p></td></tr></table><table role="presentation" class="tableClass" id="cusipNumber"><tr class="tableClass"><td width="7%" style="font-weight:bold;">CUSIP Number(s):</td><td width="75%"><div style="font-size:.9em; color:#000000">84615Q103</div></td></tr></table><br><br><table role="presentation" class="tableClass" id="reportingPersonDetails"><tr class="tableClass"><td width="8%" class="tableClassValign">1</td><td width="92%" class="tableClass">Names of Reporting Persons
+				<br><br><div class="text">I'll Be Seeing You LLC</div></td></tr><tr><td width="8%" class="tableClassValign">2</td><td width="92%" class="tableClass">Check the appropriate box if a member of a Group (see instructions)
+				<br><br><div class="text"><img src="/Images/box-unchecked.jpg" alt="Checkbox not checked">  (a)
+					<br><img src="/Images/box-checked.jpg" alt="Checkbox checked">  (b)	
+				</div></td></tr><tr class="tableClassWithBgBlack"><td width="8%" class="tableClassValign">3</td><td width="92%" class="tableClass">Sec Use Only</td></tr><tr><td width="8%" class="tableClassValign">4</td><td width="92%" class="tableClass">Citizenship or Place of Organization
+				<br><br><div class="text">
+				DELAWARE
+			</div></td></tr><tr><td width="8%" class="tableClassValign">Number of Shares Beneficially Owned by Each Reporting Person With:</td><td width="92%" class="tableClass"><table class="innerTableClass"><tr><td width="8%" class="innerTableClassRightValign">5</td><td width="92%" class="tableClassInnerLeft">Sole Voting Power
+							<br><br><div class="text">12,345,650.00</div></td></tr><tr><td width="8%" class="innerTableClassRightValign">6</td><td width="92%" class="tableClassInnerLeft">Shared Voting Power
+							<br><br><div class="text">0.00</div></td></tr><tr><td width="8%" class="innerTableClassRightValign">7</td><td width="92%" class="tableClassInnerLeft">Sole Dispositive Power
+							<br><br><div class="text">12,345,650.00</div></td></tr><tr><td width="8%" class="innerTableClassRightValignBottomLess">8</td><td width="92%" class="tableClassInnerLeftBottomLess">Shared Dispositive Power
+							<br><br><div class="text">0.00</div></td></tr></table></td></tr><tr><td width="8%" class="tableClassValign">9</td><td width="92%" class="tableClass">Aggregate Amount Beneficially Owned by Each Reporting Person
+				<br><br><div class="text">12,345,650.00</div></td></tr><tr><td width="8%" class="tableClassValign">10</td><td width="92%" class="tableClass">Check box if the aggregate amount in row (9) excludes certain shares (See Instructions)
+				<br><br><img src="/Images/box-unchecked.jpg" alt="Checkbox not checked"></td></tr><tr><td width="8%" class="tableClassValign">11</td><td width="92%" class="tableClass">Percent of class represented by amount in row (9)
+				<br><br><div class="text">0.2 % </div></td></tr><tr><td width="8%" class="tableClassValign">12</td><td width="92%" class="tableClass">Type of Reporting Person (See Instructions)
+				<br><br><div class="text">OO</div></td></tr></table><table><tr><td class="center"><br><br><p><div align="center" style="font-size:1.2em;">
+								SCHEDULE 13G
+							</div></p></td></tr></table><table role="presentation" class="tableClass" id="cusipNumber"><tr class="tableClass"><td width="7%" style="font-weight:bold;">CUSIP Number(s):</td><td width="75%"><div style="font-size:.9em; color:#000000">84615Q103</div></td></tr></table><br><br><table role="presentation" class="tableClass" id="reportingPersonDetails"><tr class="tableClass"><td width="8%" class="tableClassValign">1</td><td width="92%" class="tableClass">Names of Reporting Persons
+				<br><br><div class="text">Barrel Vault LLC</div></td></tr><tr><td width="8%" class="tableClassValign">2</td><td width="92%" class="tableClass">Check the appropriate box if a member of a Group (see instructions)
+				<br><br><div class="text"><img src="/Images/box-unchecked.jpg" alt="Checkbox not checked">  (a)
+					<br><img src="/Images/box-checked.jpg" alt="Checkbox checked">  (b)	
+				</div></td></tr><tr class="tableClassWithBgBlack"><td width="8%" class="tableClassValign">3</td><td width="92%" class="tableClass">Sec Use Only</td></tr><tr><td width="8%" class="tableClassValign">4</td><td width="92%" class="tableClass">Citizenship or Place of Organization
+				<br><br><div class="text">
+				DELAWARE
+			</div></td></tr><tr><td width="8%" class="tableClassValign">Number of Shares Beneficially Owned by Each Reporting Person With:</td><td width="92%" class="tableClass"><table class="innerTableClass"><tr><td width="8%" class="innerTableClassRightValign">5</td><td width="92%" class="tableClassInnerLeft">Sole Voting Power
+							<br><br><div class="text">3,748,835.00</div></td></tr><tr><td width="8%" class="innerTableClassRightValign">6</td><td width="92%" class="tableClassInnerLeft">Shared Voting Power
+							<br><br><div class="text">0.00</div></td></tr><tr><td width="8%" class="innerTableClassRightValign">7</td><td width="92%" class="tableClassInnerLeft">Sole Dispositive Power
+							<br><br><div class="text">3,748,835.00</div></td></tr><tr><td width="8%" class="innerTableClassRightValignBottomLess">8</td><td width="92%" class="tableClassInnerLeftBottomLess">Shared Dispositive Power
+							<br><br><div class="text">0.00</div></td></tr></table></td></tr><tr><td width="8%" class="tableClassValign">9</td><td width="92%" class="tableClass">Aggregate Amount Beneficially Owned by Each Reporting Person
+				<br><br><div class="text">3,748,835.00</div></td></tr><tr><td width="8%" class="tableClassValign">10</td><td width="92%" class="tableClass">Check box if the aggregate amount in row (9) excludes certain shares (See Instructions)
+				<br><br><img src="/Images/box-unchecked.jpg" alt="Checkbox not checked"></td></tr><tr><td width="8%" class="tableClassValign">11</td><td width="92%" class="tableClass">Percent of class represented by amount in row (9)
+				<br><br><div class="text">0.0 % </div></td></tr><tr><td width="8%" class="tableClassValign">12</td><td width="92%" class="tableClass">Type of Reporting Person (See Instructions)
+				<br><br><div class="text">OO</div></td></tr></table><table><tr><td class="center"><br><br><p><div align="center" style="font-size:1.2em;">
+								SCHEDULE 13G
+							</div></p></td></tr></table><table role="presentation" class="tableClass" id="cusipNumber"><tr class="tableClass"><td width="7%" style="font-weight:bold;">CUSIP Number(s):</td><td width="75%"><div style="font-size:.9em; color:#000000">84615Q103</div></td></tr></table><br><br><table role="presentation" class="tableClass" id="reportingPersonDetails"><tr class="tableClass"><td width="8%" class="tableClassValign">1</td><td width="92%" class="tableClass">Names of Reporting Persons
+				<br><br><div class="text">Peter  Thiel</div></td></tr><tr><td width="8%" class="tableClassValign">2</td><td width="92%" class="tableClass">Check the appropriate box if a member of a Group (see instructions)
+				<br><br><div class="text"><img src="/Images/box-unchecked.jpg" alt="Checkbox not checked">  (a)
+					<br><img src="/Images/box-checked.jpg" alt="Checkbox checked">  (b)	
+				</div></td></tr><tr class="tableClassWithBgBlack"><td width="8%" class="tableClassValign">3</td><td width="92%" class="tableClass">Sec Use Only</td></tr><tr><td width="8%" class="tableClassValign">4</td><td width="92%" class="tableClass">Citizenship or Place of Organization
+				<br><br><div class="text">
+				UNITED STATES
+			</div></td></tr><tr><td width="8%" class="tableClassValign">Number of Shares Beneficially Owned by Each Reporting Person With:</td><td width="92%" class="tableClass"><table class="innerTableClass"><tr><td width="8%" class="innerTableClassRightValign">5</td><td width="92%" class="tableClassInnerLeft">Sole Voting Power
+							<br><br><div class="text">17,446,745.00</div></td></tr><tr><td width="8%" class="innerTableClassRightValign">6</td><td width="92%" class="tableClassInnerLeft">Shared Voting Power
+							<br><br><div class="text">409,859,280.00</div></td></tr><tr><td width="8%" class="innerTableClassRightValign">7</td><td width="92%" class="tableClassInnerLeft">Sole Dispositive Power
+							<br><br><div class="text">17,446,745.00</div></td></tr><tr><td width="8%" class="innerTableClassRightValignBottomLess">8</td><td width="92%" class="tableClassInnerLeftBottomLess">Shared Dispositive Power
+							<br><br><div class="text">409,859,280.00</div></td></tr></table></td></tr><tr><td width="8%" class="tableClassValign">9</td><td width="92%" class="tableClass">Aggregate Amount Beneficially Owned by Each Reporting Person
+				<br><br><div class="text">427,306,025.00</div></td></tr><tr><td width="8%" class="tableClassValign">10</td><td width="92%" class="tableClass">Check box if the aggregate amount in row (9) excludes certain shares (See Instructions)
+				<br><br><img src="/Images/box-unchecked.jpg" alt="Checkbox not checked"></td></tr><tr><td width="8%" class="tableClassValign">11</td><td width="92%" class="tableClass">Percent of class represented by amount in row (9)
+				<br><br><div class="text">5.5 % </div></td></tr><tr><td width="8%" class="tableClassValign">12</td><td width="92%" class="tableClass">Type of Reporting Person (See Instructions)
+				<br><br><div class="text">IN</div></td></tr></table></div><div class="form1"><table><tr><td class="center"><br><br><p><div align="center" style="font-size:1.2em;">
+								SCHEDULE 13G
+							</div></p></td></tr></table><table role="presentation" id="item1to9"><tr><td width="8%" class="tableClassValignNoBorder">Item 1.</td><td width="92%" class="tableClassNoBorder"> </td></tr><tr class="tableClass"><td width="8%" class="tableClassNoBorderAlignCenter">(a)</td><td width="92%" class="tableClassNoBorder">Name of issuer:
+				<br><br><div class="text">Space Exploration Technologies Corp.</div></td></tr><tr><td width="8%" class="tableClassNoBorderAlignCenter">(b)</td><td width="92%" class="tableClassNoBorder">Address of issuer's principal executive offices:
+				<br><br><div class="text">1 Rocket Road, Starbase, TX, 78521.</div></td></tr><tr><td width="8%" class="tableClassValignNoBorder">Item 2.</td><td width="92%" class="tableClassNoBorder"> </td></tr><tr class="tableClass"><td width="8%" class="tableClassNoBorderAlignCenter">(a)</td><td width="92%" class="tableClassNoBorder">Name of person filing:
+				<br><br><div class="largetext">The names of the persons filing this report (collectively, the "Reporting Persons") are:
+
+The Founders Fund II, LP ("FF II")
+The Founders Fund II Principals Fund, LP ("FFP II")
+The Founders Fund II Entrepreneurs Fund, LP ("FFE II")
+The Founders Fund II Management, LLC ("FF II GP")
+
+The Founders Fund III, LP ("FF III")
+The Founders Fund III Principals Fund, LP ("FFP III")
+The Founders Fund III Entrepreneurs Fund, LP ("FFE III")
+The Founders Fund III Management, LLC ("FF III GP")
+
+The Founders Fund IV, LP ("FF IV")
+The Founders Fund IV Principals Fund, LP ("FFP IV")
+The Founders Fund IV Management, LLC ("FF IV GP")
+
+The Founders Fund V, LP ("FF V")
+The Founders Fund V Principals Fund, LP ("FFP V")
+The Founders Fund V Entrepreneurs Fund, LP ("FFE V")
+The Founders Fund V Management, LLC ("FF V GP")
+
+Lembas II, LP ("Lembas II")
+The Founders Fund Alpha Management, LLC ("FF Alpha GP")
+
+The Founders Fund Growth II, LP ("FFG II")
+The Founders Fund Growth II Management, LP ("FFG II GP")
+FF GP Holdings, LLC ("FF GP Holdings")
+FF Upper Tier GP, LLC ("FFUT GP")
+
+The Founders Fund Growth, LP ("FFG")
+The Founders Fund Growth Principals Fund, LP ("FFGP")
+Founders SPC, LP ("FSPC")
+The Founders Fund Growth Management, LLC ("FFG GP")
+
+2025-005 Investments LLC ("2025-005 Investments")
+I'll Be Seeing You LLC ("IBSY")
+Barrel Vault LLC ("BV")
+
+Peter Thiel ("Thiel")
+
+The Reporting Persons expressly disclaim status as a "group" for purposes of this Schedule 13G.
+</div></td></tr><tr><td width="8%" class="tableClassNoBorderAlignCenter">(b)</td><td width="92%" class="tableClassNoBorder">Address or principal business office or, if none, residence:
+				<br><br><div class="largetext">The address of each of FF II, FFP II, FFE II, FF II GP, FF III, FFP III, FFE III, FF III GP, FF IV, FFP IV, FF IV GP, FF V, FFP V, FFE V, FF V GP, Lembas II, FF Alpha GP, FFG II, FFG II GP, FF GP Holdings, FFUT GP, FFG, FFGP, FSPC and FFG GP is One Letterman Dr., Building D, 5th Floor, San Francisco, CA 94129.
+
+The address of each of 2025-005 Investments and IBSY is 1209 Orange Street, Wilmington, Delaware 19801.
+
+The address of each of BV and Thiel is c/o Thiel Capital LLC, 701 Brickell Avenue, Suite 2250, Miami, Florida 33131.
+
+</div></td></tr><tr><td width="8%" class="tableClassNoBorderAlignCenter">(c)</td><td width="92%" class="tableClassNoBorder">Citizenship:
+				<br><br><div class="largetext">Thiel is a United States citizen.  All of the other Reporting Persons were organized in Delaware.</div></td></tr><tr><td width="8%" class="tableClassNoBorderAlignCenter">(d)</td><td width="92%" class="tableClassNoBorder">Title of class of securities:
+				<br><br><div class="text">Class A Common Stock, par value $0.001 per share</div></td></tr><tr><td width="8%" class="tableClassNoBorderAlignCenter">(e)</td><td width="92%" class="tableClassNoBorder">CUSIP Number(s):
+				<br><br><div class="text">84615Q103</div></td></tr><tr><td width="8%" class="tableClassValignNoBorder">Item 3.</td><td width="92%" class="tableClassNoBorder">If this statement is filed pursuant to §§ 240.13d-1(b) or 240.13d-2(b) or (c), check whether the person filing is a:</td></tr><tr><td width="8%" class="tableClassNoBorderAlignCenter">(a)</td><td width="92%" class="tableClassNoBorder"><img src="/Images/box-unchecked.jpg" alt="Checkbox not checked">   Broker or dealer registered under section 15 of the Act (15 U.S.C. 78o);
+				</td></tr><tr><td width="8%" class="tableClassNoBorderAlignCenter">(b)</td><td width="92%" class="tableClassNoBorder"><img src="/Images/box-unchecked.jpg" alt="Checkbox not checked">   Bank as defined in section 3(a)(6) of the Act (15 U.S.C. 78c);
+				</td></tr><tr><td width="8%" class="tableClassNoBorderAlignCenter">(c)</td><td width="92%" class="tableClassNoBorder"><img src="/Images/box-unchecked.jpg" alt="Checkbox not checked">   Insurance company as defined in section 3(a)(19) of the Act (15 U.S.C. 78c);
+				</td></tr><tr><td width="8%" class="tableClassNoBorderAlignCenter">(d)</td><td width="92%" class="tableClassNoBorder"><img src="/Images/box-unchecked.jpg" alt="Checkbox not checked">   Investment company registered under section 8 of the Investment Company Act of 1940 (15 U.S.C. 80a-8);
+				</td></tr><tr><td width="8%" class="tableClassNoBorderAlignCenter">(e)</td><td width="92%" class="tableClassNoBorder"><img src="/Images/box-unchecked.jpg" alt="Checkbox not checked">   An investment adviser in accordance with § 240.13d-1(b)(1)(ii)(E);
+				</td></tr><tr><td width="8%" class="tableClassNoBorderAlignCenter">(f)</td><td width="92%" class="tableClassNoBorder"><img src="/Images/box-unchecked.jpg" alt="Checkbox not checked">   An employee benefit plan or endowment fund in accordance with § 240.13d-1(b)(1)(ii)(F);
+				</td></tr><tr><td width="8%" class="tableClassNoBorderAlignCenter">(g)</td><td width="92%" class="tableClassNoBorder"><img src="/Images/box-unchecked.jpg" alt="Checkbox not checked">   A parent holding company or control person in accordance with § 240.13d-1(b)(1)(ii)(G);
+				</td></tr><tr><td width="8%" class="tableClassNoBorderAlignCenter">(h)</td><td width="92%" class="tableClassNoBorder"><img src="/Images/box-unchecked.jpg" alt="Checkbox not checked">   A savings associations as defined in Section 3(b) of the Federal Deposit Insurance Act (12 U.S.C. 1813);
+				</td></tr><tr><td width="8%" class="tableClassNoBorderAlignCenter">(i)</td><td width="92%" class="tableClassNoBorder"><img src="/Images/box-unchecked.jpg" alt="Checkbox not checked">   A church plan that is excluded from the definition of an investment company under section 3(c)(14) of the Investment Company Act of 1940 (15 U.S.C. 80a-3);
+				</td></tr><tr><td width="8%" class="tableClassNoBorderAlignCenter">(j)</td><td width="92%" class="tableClassNoBorder"><img src="/Images/box-unchecked.jpg" alt="Checkbox not checked">   A non-U.S. institution in accordance with § 240.13d-1(b)(1)(ii)(J). If filing as a non-U.S. institution in accordance with § 240.13d-1(b)(1)(ii)(J), 
+					<br>       please specify the type of institution:
+				</td></tr><tr><td width="8%" class="tableClassNoBorderAlignCenter">(k)</td><td width="92%" class="tableClassNoBorder"><img src="/Images/box-unchecked.jpg" alt="Checkbox not checked">   Group, in accordance with Rule 240.13d-1(b)(1)(ii)(K).
+				</td></tr><tr><td width="8%" class="tableClassNoBorderAlignCenter"> </td><td width="100%" colspan="2" class="tableClassNoBorder"><div class="largetext"></div></td></tr><tr><td width="8%" class="tableClassValignNoBorder">Item 4.</td><td width="92%" class="tableClassNoBorder">Ownership</td></tr><tr><td width="8%" class="tableClassNoBorderAlignCenter">(a)</td><td width="92%" class="tableClassNoBorder">Amount beneficially owned:
+				<br><br><div class="largetext">Row 9 of each Reporting Person's cover page to this Schedule 13G sets forth the aggregate number of shares of Class A common stock of the Issuer beneficially owned by such Reporting Person as of June 30, 2026 and is incorporated by reference.
+
+The Reporting Persons' beneficial ownership of the Issuer's securities includes (i) 155,393,350 shares of Class A common stock directly held by FF II; (ii) 11,267,600 shares of Class A common stock directly held by FFP II; (iii) 8,491,750 shares of Class A common stock directly held by FFE II; (iv) 23,177,000 shares of Class A common stock directly held by FF III; (v) 12,027,900 shares of Class A common stock directly held by FFP III; (vi) 490,950 shares of Class A common stock directly held by FFE III; (vii) 50,546,855 shares of Class A common stock directly held by FF IV; (viii) 23,720,115 shares of Class A common stock directly held by FFP IV; (ix) 14,113,325 shares of Class A common stock directly held by FF V; (x) 6,425,005 shares of Class A common stock directly held by FFP V; (xi) 294,720 shares of Class A common stock directly held by FFE V; (xii) 52,969,150 shares of Class A common stock directly held by Lembas II; (xiii) 22,839,450 shares of Class A common stock directly held by FFG II; (xiv) 20,381,610 shares of Class A common stock directly held by FF GP Holdings; (xv) 7,197,300 shares of Class A common stock directly held by FFG; (xvi) 464,250 shares of Class A common stock directly held by FFGP; (xvii) 58,950 shares of Class A common stock directly held by FSPC; (xviii) 1,352,260 shares of Class A common stock held directly by 2025-005 Investments; (xix) 12,345,650 shares of Class A common stock held directly by IBSY; and (xx) 3,748,835 shares of Class B common stock held directly by BV (each of which is convertible to Class A common stock on a one-for-one basis).
+
+FF II GP is the general partner of FF II, FFP II and FFE II, and may be deemed to beneficially own the shares held by such entities. FF III GP is the general partner of FF III, FFP III and FFE III, and may be deemed to beneficially own the shares held by such entities. FF IV GP is the general partner of FF IV and FFP IV, and may be deemed to beneficially own the shares held by such entities. FF V GP is the general partner of FF V, FFP V and FFE V, and may be deemed to beneficially own the shares held by such entities. FF Alpha GP is the general partner of Lembas II and may be deemed to beneficially own the shares held by Lembas II. FFUT GP is the manager of FF GP Holdings and the general partner of FFG II GP, which is the general partner of FFG II, and FFUT GP may be deemed to beneficially own the shares held by FF GP Holdings and FFG II.  FFG GP is the general partner of FFG, FFGP and FSPC, and may be deemed to beneficially own the shares held by such entities.
+
+Thiel is the manager of FF II GP, FF III GP, FF IV GP, FF V GP, FF Alpha GP, FFUT GP, FFG GP and BV, and the sole beneficial owner of each of 2025-005 Investments and IBSY, and may be deemed to beneficially own the shares held by the foregoing entities.
+
+Collectively, the Reporting Persons beneficially own an aggregate of 427,306,025 shares of Class A common stock as of June 30, 2026. The Reporting Persons are under common control and, as a result, the Reporting Persons may be deemed to be members of a group. However, the Reporting Persons expressly disclaim such group membership, and this Schedule 13G shall not be deemed an admission that the Reporting Persons are members of a group for purposes of Section 13 of the Securities Exchange Act or for any other purposes.
+
+
+</div></td></tr><tr><td width="8%" class="tableClassNoBorderAlignCenter">(b)</td><td width="92%" class="tableClassNoBorder">Percent of class:
+				<br><br><div class="largetext">Row 11 of each Reporting Person's cover page to this Schedule 13G sets forth the percentages of the shares of Class A common stock of the Issuer beneficially owned by such Reporting Person as of June 30, 2026 and is incorporated by reference. These percentages are based upon 7,696,293,669 shares of Class A common stock outstanding as of July 28, 2026, as reported in the Issuer's Quarterly Report on Form 10-Q, filed with the Securities and Exchange Commission (the "SEC") on August 4, 2026.
+
+Collectively, the Reporting Persons beneficially owned 5.5% of the Issuer's outstanding Class A common stock as of June 30, 2026.</div></td></tr><tr><td width="8%" class="tableClassNoBorderAlignCenter">(c)</td><td width="92%" class="tableClassNoBorder">Number of shares as to which the person has:
+				<br></td></tr><tr><td width="8%" class="tableClassNoBorderAlignCenter"> </td><td width="92%" class="tableClassNoBorder">(i) Sole power to vote or to direct the vote:
+				<br><br><div class="largetext">Row 5 of each Reporting Person's cover page to this Schedule 13G sets forth the sole power to vote or to direct the vote of securities of the Issuer beneficially owned by such Reporting Person as of June 30, 2026 and is incorporated by reference.</div><br></td></tr><tr><td width="8%" class="tableClassNoBorderAlignCenter"> </td><td width="92%" class="tableClassNoBorder">(ii) Shared power to vote or to direct the vote:
+				<br><br><div class="largetext">Row 6 of each Reporting Person's cover page to this Schedule 13G sets forth the shared power to vote or to direct the vote of securities of the Issuer beneficially owned by such Reporting Person as of June 30, 2026 and is incorporated by reference.</div><br></td></tr><tr><td width="8%" class="tableClassNoBorderAlignCenter"> </td><td width="92%" class="tableClassNoBorder">(iii) Sole power to dispose or to direct the disposition of:
+				<br><br><div class="largetext">Row 7 of each Reporting Person's cover page to this Schedule 13G sets forth the sole power to dispose or to direct the disposition of securities of the Issuer beneficially owned by such Reporting Person as of June 30, 2026 and is incorporated by reference.</div><br></td></tr><tr><td width="8%" class="tableClassNoBorderAlignCenter"> </td><td width="92%" class="tableClassNoBorder">(iv) Shared power to dispose or to direct the disposition of:
+				<br><br><div class="largetext">Row 8 of each Reporting Person's cover page to this Schedule 13G sets forth the shared power to dispose or to direct the disposition of securities of the Issuer beneficially owned by such Reporting Person as of June 30, 2026 and is incorporated by reference.</div><br></td></tr><tr><td width="8%" class="tableClassValignNoBorder">Item 5.</td><td width="92%" class="tableClassNoBorder">Ownership of 5 Percent or Less of a Class.</td></tr><tr><td width="8%" class="tableClassNoBorderAlignCenter"> </td><td width="92%" class="tableClassNoBorder"><div class="text">
+								Not Applicable
+							</div></td></tr><tr><td width="8%" class="tableClassValignNoBorder">Item 6.</td><td width="92%" class="tableClassNoBorder">Ownership of more than 5 Percent on Behalf of Another Person.</td></tr><tr><td width="8%" class="tableClassNoBorderAlignCenter"> </td><td width="92%" class="tableClassNoBorder"><div class="text">
+							Not Applicable
+						</div></td></tr><tr><td width="8%" class="tableClassValignNoBorder">Item 7.</td><td width="92%" class="tableClassNoBorder">Identification and Classification of the Subsidiary Which Acquired the Security Being Reported on by the Parent Holding Company or Control Person.</td></tr><tr><td width="8%" class="tableClassNoBorderAlignCenter"> </td><td width="92%" class="tableClassNoBorder"><div class="text">
+								Not Applicable
+							</div></td></tr><tr><td width="8%" class="tableClassValignNoBorder">Item 8.</td><td width="92%" class="tableClassNoBorder">Identification and Classification of Members of the Group.</td></tr><tr><td width="8%" class="tableClassNoBorderAlignCenter"> </td><td width="92%" class="tableClassNoBorder"><div class="text">
+								Not Applicable
+							</div></td></tr><tr><td width="8%" class="tableClassValignNoBorder">Item 9.</td><td width="92%" class="tableClassNoBorder">Notice of Dissolution of Group.</td></tr><tr><td width="8%" class="tableClassNoBorderAlignCenter"> </td><td width="92%" class="tableClassNoBorder"><div class="text">
+								Not Applicable
+							</div></td></tr></table><br></div><div class="form1"><table role="presentation" id="certifications"><tr><td width="8%" class="tableClassValignNoBorder">Item 10.</td><td width="92%" class="tableClassNoBorder">Certifications:</td></tr><tr class="tableClass"><td width="8%" class="tableClassNoBorderAlignCenter"> </td><td width="92%" class="tableClassNoBorder"><div class="text">
+									Not Applicable
+							</div></td></tr></table><br></div><div class="form1"><table role="presentation" id="signatureInfo"><tr><td width="8%" class="tableClassValignNoBorder">    SIGNATURE</td><td width="92%" class="tableClassNoBorder"> </td></tr><tr><td width="8%" class="tableClassNoBorderAlignCenter"> </td><td width="92%" class="tableClassNoBorder"><div class="information" style="text-align:justify">
+						After reasonable inquiry and to the best of my knowledge and belief, I certify that the information set forth in this statement is true, complete and correct.
+						<br><br></div></td></tr></table><table><tr class="tableClass"><td width="50%" class="tableClassNoBorder"> </td><td width="50%" class="tableClassNoBorder"><table><tr class="tableClass"><td width="100%" class="tableClassInnerNoBorderBlue"><div class="text">The Founders Fund II, LP</div></td></tr></table></td></tr></table><table><tr class="tableClass"><td width="50%" class="tableClassNoBorder"> </td><td width="50%" class="tableClassNoBorder"><table><tr class="tableClass"><td width="8%" class="tableClassNoBorderAlignLeft signature">Signature:</td><td width="92%" class="tableClassNoBorderBlue signature">/s/ Peter Thiel</td></tr><tr class="tableClass"><td width="8%" class="tableClassNoBorderAlignLeft signature">Name/Title:</td><td width="92%" class="tableClassNoBorderBlue signature">By The Founders Fund II Management, LLC, Its General Partner, By Peter Thiel, Manager</td></tr><tr class="tableClass"><td width="8%" class="tableClassNoBorderAlignLeft signature">Date:</td><td width="92%" class="tableClassNoBorderBlue signature">08/14/2026</td></tr></table></td></tr></table><table><tr class="tableClass"><td width="50%" class="tableClassNoBorder"> </td><td width="50%" class="tableClassNoBorder"><table><tr class="tableClass"><td width="100%" class="tableClassInnerNoBorderBlue"><div class="text">The Founders Fund II Principals Fund, LP</div></td></tr></table></td></tr></table><table><tr class="tableClass"><td width="50%" class="tableClassNoBorder"> </td><td width="50%" class="tableClassNoBorder"><table><tr class="tableClass"><td width="8%" class="tableClassNoBorderAlignLeft signature">Signature:</td><td width="92%" class="tableClassNoBorderBlue signature">/s/ Peter Thiel</td></tr><tr class="tableClass"><td width="8%" class="tableClassNoBorderAlignLeft signature">Name/Title:</td><td width="92%" class="tableClassNoBorderBlue signature">By The Founders Fund II Management, LLC, Its General Partner, By Peter Thiel, Manager</td></tr><tr class="tableClass"><td width="8%" class="tableClassNoBorderAlignLeft signature">Date:</td><td width="92%" class="tableClassNoBorderBlue signature">08/14/2026</td></tr></table></td></tr></table><table><tr class="tableClass"><td width="50%" class="tableClassNoBorder"> </td><td width="50%" class="tableClassNoBorder"><table><tr class="tableClass"><td width="100%" class="tableClassInnerNoBorderBlue"><div class="text">The Founders Fund II Entrepreneurs Fund, LP</div></td></tr></table></td></tr></table><table><tr class="tableClass"><td width="50%" class="tableClassNoBorder"> </td><td width="50%" class="tableClassNoBorder"><table><tr class="tableClass"><td width="8%" class="tableClassNoBorderAlignLeft signature">Signature:</td><td width="92%" class="tableClassNoBorderBlue signature">/s/ Peter Thiel</td></tr><tr class="tableClass"><td width="8%" class="tableClassNoBorderAlignLeft signature">Name/Title:</td><td width="92%" class="tableClassNoBorderBlue signature">By The Founders Fund II Management, LLC, Its General Partner, By Peter Thiel, Manager</td></tr><tr class="tableClass"><td width="8%" class="tableClassNoBorderAlignLeft signature">Date:</td><td width="92%" class="tableClassNoBorderBlue signature">08/14/2026</td></tr></table></td></tr></table><table><tr class="tableClass"><td width="50%" class="tableClassNoBorder"> </td><td width="50%" class="tableClassNoBorder"><table><tr class="tableClass"><td width="100%" class="tableClassInnerNoBorderBlue"><div class="text">The Founders Fund II Management, LLC</div></td></tr></table></td></tr></table><table><tr class="tableClass"><td width="50%" class="tableClassNoBorder"> </td><td width="50%" class="tableClassNoBorder"><table><tr class="tableClass"><td width="8%" class="tableClassNoBorderAlignLeft signature">Signature:</td><td width="92%" class="tableClassNoBorderBlue signature">/s/ Peter Thiel</td></tr><tr class="tableClass"><td width="8%" class="tableClassNoBorderAlignLeft signature">Name/Title:</td><td width="92%" class="tableClassNoBorderBlue signature">By Peter Thiel, Manager</td></tr><tr class="tableClass"><td width="8%" class="tableClassNoBorderAlignLeft signature">Date:</td><td width="92%" class="tableClassNoBorderBlue signature">08/14/2026</td></tr></table></td></tr></table><table><tr class="tableClass"><td width="50%" class="tableClassNoBorder"> </td><td width="50%" class="tableClassNoBorder"><table><tr class="tableClass"><td width="100%" class="tableClassInnerNoBorderBlue"><div class="text">The Founders Fund III, LP</div></td></tr></table></td></tr></table><table><tr class="tableClass"><td width="50%" class="tableClassNoBorder"> </td><td width="50%" class="tableClassNoBorder"><table><tr class="tableClass"><td width="8%" class="tableClassNoBorderAlignLeft signature">Signature:</td><td width="92%" class="tableClassNoBorderBlue signature">/s/ Peter Thiel</td></tr><tr class="tableClass"><td width="8%" class="tableClassNoBorderAlignLeft signature">Name/Title:</td><td width="92%" class="tableClassNoBorderBlue signature">By The Founders Fund III Management, LLC, Its General Partner, By Peter Thiel, Manager</td></tr><tr class="tableClass"><td width="8%" class="tableClassNoBorderAlignLeft signature">Date:</td><td width="92%" class="tableClassNoBorderBlue signature">08/14/2026</td></tr></table></td></tr></table><table><tr class="tableClass"><td width="50%" class="tableClassNoBorder"> </td><td width="50%" class="tableClassNoBorder"><table><tr class="tableClass"><td width="100%" class="tableClassInnerNoBorderBlue"><div class="text">The Founders Fund III Principals Fund, LP</div></td></tr></table></td></tr></table><table><tr class="tableClass"><td width="50%" class="tableClassNoBorder"> </td><td width="50%" class="tableClassNoBorder"><table><tr class="tableClass"><td width="8%" class="tableClassNoBorderAlignLeft signature">Signature:</td><td width="92%" class="tableClassNoBorderBlue signature">/s/ Peter Thiel</td></tr><tr class="tableClass"><td width="8%" class="tableClassNoBorderAlignLeft signature">Name/Title:</td><td width="92%" class="tableClassNoBorderBlue signature">By The Founders Fund III Management, LLC, Its General Partner, By Peter Thiel, Manager</td></tr><tr class="tableClass"><td width="8%" class="tableClassNoBorderAlignLeft signature">Date:</td><td width="92%" class="tableClassNoBorderBlue signature">08/14/2026</td></tr></table></td></tr></table><table><tr class="tableClass"><td width="50%" class="tableClassNoBorder"> </td><td width="50%" class="tableClassNoBorder"><table><tr class="tableClass"><td width="100%" class="tableClassInnerNoBorderBlue"><div class="text">The Founders Fund III Entrepreneurs Fund, LP</div></td></tr></table></td></tr></table><table><tr class="tableClass"><td width="50%" class="tableClassNoBorder"> </td><td width="50%" class="tableClassNoBorder"><table><tr class="tableClass"><td width="8%" class="tableClassNoBorderAlignLeft signature">Signature:</td><td width="92%" class="tableClassNoBorderBlue signature">/s/ Peter Thiel</td></tr><tr class="tableClass"><td width="8%" class="tableClassNoBorderAlignLeft signature">Name/Title:</td><td width="92%" class="tableClassNoBorderBlue signature">By The Founders Fund III Management, LLC, Its General Partner, By Peter Thiel, Manager</td></tr><tr class="tableClass"><td width="8%" class="tableClassNoBorderAlignLeft signature">Date:</td><td width="92%" class="tableClassNoBorderBlue signature">08/14/2026</td></tr></table></td></tr></table><table><tr class="tableClass"><td width="50%" class="tableClassNoBorder"> </td><td width="50%" class="tableClassNoBorder"><table><tr class="tableClass"><td width="100%" class="tableClassInnerNoBorderBlue"><div class="text">The Founders Fund III Management, LLC</div></td></tr></table></td></tr></table><table><tr class="tableClass"><td width="50%" class="tableClassNoBorder"> </td><td width="50%" class="tableClassNoBorder"><table><tr class="tableClass"><td width="8%" class="tableClassNoBorderAlignLeft signature">Signature:</td><td width="92%" class="tableClassNoBorderBlue signature">/s/ Peter Thiel</td></tr><tr class="tableClass"><td width="8%" class="tableClassNoBorderAlignLeft signature">Name/Title:</td><td width="92%" class="tableClassNoBorderBlue signature">By Peter Thiel, Manager</td></tr><tr class="tableClass"><td width="8%" class="tableClassNoBorderAlignLeft signature">Date:</td><td width="92%" class="tableClassNoBorderBlue signature">08/14/2026</td></tr></table></td></tr></table><table><tr class="tableClass"><td width="50%" class="tableClassNoBorder"> </td><td width="50%" class="tableClassNoBorder"><table><tr class="tableClass"><td width="100%" class="tableClassInnerNoBorderBlue"><div class="text">The Founders Fund IV, LP</div></td></tr></table></td></tr></table><table><tr class="tableClass"><td width="50%" class="tableClassNoBorder"> </td><td width="50%" class="tableClassNoBorder"><table><tr class="tableClass"><td width="8%" class="tableClassNoBorderAlignLeft signature">Signature:</td><td width="92%" class="tableClassNoBorderBlue signature">/s/ Peter Thiel</td></tr><tr class="tableClass"><td width="8%" class="tableClassNoBorderAlignLeft signature">Name/Title:</td><td width="92%" class="tableClassNoBorderBlue signature">By The Founders Fund IV Management, LLC, Its General Partner, By Peter Thiel, Manager</td></tr><tr class="tableClass"><td width="8%" class="tableClassNoBorderAlignLeft signature">Date:</td><td width="92%" class="tableClassNoBorderBlue signature">08/14/2026</td></tr></table></td></tr></table><table><tr class="tableClass"><td width="50%" class="tableClassNoBorder"> </td><td width="50%" class="tableClassNoBorder"><table><tr class="tableClass"><td width="100%" class="tableClassInnerNoBorderBlue"><div class="text">The Founders Fund IV Principals Fund, LP</div></td></tr></table></td></tr></table><table><tr class="tableClass"><td width="50%" class="tableClassNoBorder"> </td><td width="50%" class="tableClassNoBorder"><table><tr class="tableClass"><td width="8%" class="tableClassNoBorderAlignLeft signature">Signature:</td><td width="92%" class="tableClassNoBorderBlue signature">/s/ Peter Thiel</td></tr><tr class="tableClass"><td width="8%" class="tableClassNoBorderAlignLeft signature">Name/Title:</td><td width="92%" class="tableClassNoBorderBlue signature">By The Founders Fund IV Management, LLC, Its General Partner, By Peter Thiel, Manager</td></tr><tr class="tableClass"><td width="8%" class="tableClassNoBorderAlignLeft signature">Date:</td><td width="92%" class="tableClassNoBorderBlue signature">08/14/2026</td></tr></table></td></tr></table><table><tr class="tableClass"><td width="50%" class="tableClassNoBorder"> </td><td width="50%" class="tableClassNoBorder"><table><tr class="tableClass"><td width="100%" class="tableClassInnerNoBorderBlue"><div class="text">The Founders Fund IV Management, LLC</div></td></tr></table></td></tr></table><table><tr class="tableClass"><td width="50%" class="tableClassNoBorder"> </td><td width="50%" class="tableClassNoBorder"><table><tr class="tableClass"><td width="8%" class="tableClassNoBorderAlignLeft signature">Signature:</td><td width="92%" class="tableClassNoBorderBlue signature">/s/ Peter Thiel</td></tr><tr class="tableClass"><td width="8%" class="tableClassNoBorderAlignLeft signature">Name/Title:</td><td width="92%" class="tableClassNoBorderBlue signature">By Peter Thiel, Manager</td></tr><tr class="tableClass"><td width="8%" class="tableClassNoBorderAlignLeft signature">Date:</td><td width="92%" class="tableClassNoBorderBlue signature">08/14/2026</td></tr></table></td></tr></table><table><tr class="tableClass"><td width="50%" class="tableClassNoBorder"> </td><td width="50%" class="tableClassNoBorder"><table><tr class="tableClass"><td width="100%" class="tableClassInnerNoBorderBlue"><div class="text">The Founders Fund V, LP</div></td></tr></table></td></tr></table><table><tr class="tableClass"><td width="50%" class="tableClassNoBorder"> </td><td width="50%" class="tableClassNoBorder"><table><tr class="tableClass"><td width="8%" class="tableClassNoBorderAlignLeft signature">Signature:</td><td width="92%" class="tableClassNoBorderBlue signature">/s/ Peter Thiel</td></tr><tr class="tableClass"><td width="8%" class="tableClassNoBorderAlignLeft signature">Name/Title:</td><td width="92%" class="tableClassNoBorderBlue signature">By The Founders Fund V Management, LLC, Its General Partner, By Peter Thiel, Manager</td></tr><tr class="tableClass"><td width="8%" class="tableClassNoBorderAlignLeft signature">Date:</td><td width="92%" class="tableClassNoBorderBlue signature">08/14/2026</td></tr></table></td></tr></table><table><tr class="tableClass"><td width="50%" class="tableClassNoBorder"> </td><td width="50%" class="tableClassNoBorder"><table><tr class="tableClass"><td width="100%" class="tableClassInnerNoBorderBlue"><div class="text">The Founders Fund V Principals Fund, LP</div></td></tr></table></td></tr></table><table><tr class="tableClass"><td width="50%" class="tableClassNoBorder"> </td><td width="50%" class="tableClassNoBorder"><table><tr class="tableClass"><td width="8%" class="tableClassNoBorderAlignLeft signature">Signature:</td><td width="92%" class="tableClassNoBorderBlue signature">/s/ Peter Thiel</td></tr><tr class="tableClass"><td width="8%" class="tableClassNoBorderAlignLeft signature">Name/Title:</td><td width="92%" class="tableClassNoBorderBlue signature">By The Founders Fund V Management, LLC, Its General Partner, By Peter Thiel, Manager</td></tr><tr class="tableClass"><td width="8%" class="tableClassNoBorderAlignLeft signature">Date:</td><td width="92%" class="tableClassNoBorderBlue signature">08/14/2026</td></tr></table></td></tr></table><table><tr class="tableClass"><td width="50%" class="tableClassNoBorder"> </td><td width="50%" class="tableClassNoBorder"><table><tr class="tableClass"><td width="100%" class="tableClassInnerNoBorderBlue"><div class="text">The Founders Fund V Entrepreneurs Fund, LP</div></td></tr></table></td></tr></table><table><tr class="tableClass"><td width="50%" class="tableClassNoBorder"> </td><td width="50%" class="tableClassNoBorder"><table><tr class="tableClass"><td width="8%" class="tableClassNoBorderAlignLeft signature">Signature:</td><td width="92%" class="tableClassNoBorderBlue signature">/s/ Peter Thiel</td></tr><tr class="tableClass"><td width="8%" class="tableClassNoBorderAlignLeft signature">Name/Title:</td><td width="92%" class="tableClassNoBorderBlue signature">By The Founders Fund V Management, LLC, Its General Partner, By Peter Thiel, Manager</td></tr><tr class="tableClass"><td width="8%" class="tableClassNoBorderAlignLeft signature">Date:</td><td width="92%" class="tableClassNoBorderBlue signature">08/14/2026</td></tr></table></td></tr></table><table><tr class="tableClass"><td width="50%" class="tableClassNoBorder"> </td><td width="50%" class="tableClassNoBorder"><table><tr class="tableClass"><td width="100%" class="tableClassInnerNoBorderBlue"><div class="text">The Founders Fund V Management, LLC</div></td></tr></table></td></tr></table><table><tr class="tableClass"><td width="50%" class="tableClassNoBorder"> </td><td width="50%" class="tableClassNoBorder"><table><tr class="tableClass"><td width="8%" class="tableClassNoBorderAlignLeft signature">Signature:</td><td width="92%" class="tableClassNoBorderBlue signature">/s/ Peter Thiel</td></tr><tr class="tableClass"><td width="8%" class="tableClassNoBorderAlignLeft signature">Name/Title:</td><td width="92%" class="tableClassNoBorderBlue signature">By Peter Thiel, Manager</td></tr><tr class="tableClass"><td width="8%" class="tableClassNoBorderAlignLeft signature">Date:</td><td width="92%" class="tableClassNoBorderBlue signature">08/14/2026</td></tr></table></td></tr></table><table><tr class="tableClass"><td width="50%" class="tableClassNoBorder"> </td><td width="50%" class="tableClassNoBorder"><table><tr class="tableClass"><td width="100%" class="tableClassInnerNoBorderBlue"><div class="text">Lembas II, LP</div></td></tr></table></td></tr></table><table><tr class="tableClass"><td width="50%" class="tableClassNoBorder"> </td><td width="50%" class="tableClassNoBorder"><table><tr class="tableClass"><td width="8%" class="tableClassNoBorderAlignLeft signature">Signature:</td><td width="92%" class="tableClassNoBorderBlue signature">/s/ Peter Thiel</td></tr><tr class="tableClass"><td width="8%" class="tableClassNoBorderAlignLeft signature">Name/Title:</td><td width="92%" class="tableClassNoBorderBlue signature">By The Founders Fund Alpha Management, LLC, Its General Partner, By Peter Thiel, Manager</td></tr><tr class="tableClass"><td width="8%" class="tableClassNoBorderAlignLeft signature">Date:</td><td width="92%" class="tableClassNoBorderBlue signature">08/14/2026</td></tr></table></td></tr></table><table><tr class="tableClass"><td width="50%" class="tableClassNoBorder"> </td><td width="50%" class="tableClassNoBorder"><table><tr class="tableClass"><td width="100%" class="tableClassInnerNoBorderBlue"><div class="text">The Founders Fund Alpha Management, LLC</div></td></tr></table></td></tr></table><table><tr class="tableClass"><td width="50%" class="tableClassNoBorder"> </td><td width="50%" class="tableClassNoBorder"><table><tr class="tableClass"><td width="8%" class="tableClassNoBorderAlignLeft signature">Signature:</td><td width="92%" class="tableClassNoBorderBlue signature">/s/ Peter Thiel</td></tr><tr class="tableClass"><td width="8%" class="tableClassNoBorderAlignLeft signature">Name/Title:</td><td width="92%" class="tableClassNoBorderBlue signature">By Peter Thiel, Manager</td></tr><tr class="tableClass"><td width="8%" class="tableClassNoBorderAlignLeft signature">Date:</td><td width="92%" class="tableClassNoBorderBlue signature">08/14/2026</td></tr></table></td></tr></table><table><tr class="tableClass"><td width="50%" class="tableClassNoBorder"> </td><td width="50%" class="tableClassNoBorder"><table><tr class="tableClass"><td width="100%" class="tableClassInnerNoBorderBlue"><div class="text">The Founders Fund Growth II, LP</div></td></tr></table></td></tr></table><table><tr class="tableClass"><td width="50%" class="tableClassNoBorder"> </td><td width="50%" class="tableClassNoBorder"><table><tr class="tableClass"><td width="8%" class="tableClassNoBorderAlignLeft signature">Signature:</td><td width="92%" class="tableClassNoBorderBlue signature">/s/ Peter Thiel</td></tr><tr class="tableClass"><td width="8%" class="tableClassNoBorderAlignLeft signature">Name/Title:</td><td width="92%" class="tableClassNoBorderBlue signature">By The Founders Fund Growth II Management, LP, Its General Partner, By FF Upper Tier GP, LLC, Its General Partner, By Peter Thiel, Manager</td></tr><tr class="tableClass"><td width="8%" class="tableClassNoBorderAlignLeft signature">Date:</td><td width="92%" class="tableClassNoBorderBlue signature">08/14/2026</td></tr></table></td></tr></table><table><tr class="tableClass"><td width="50%" class="tableClassNoBorder"> </td><td width="50%" class="tableClassNoBorder"><table><tr class="tableClass"><td width="100%" class="tableClassInnerNoBorderBlue"><div class="text">The Founders Fund Growth II Management, LP</div></td></tr></table></td></tr></table><table><tr class="tableClass"><td width="50%" class="tableClassNoBorder"> </td><td width="50%" class="tableClassNoBorder"><table><tr class="tableClass"><td width="8%" class="tableClassNoBorderAlignLeft signature">Signature:</td><td width="92%" class="tableClassNoBorderBlue signature">/s/ Peter Thiel</td></tr><tr class="tableClass"><td width="8%" class="tableClassNoBorderAlignLeft signature">Name/Title:</td><td width="92%" class="tableClassNoBorderBlue signature">By FF Upper Tier GP, LLC, Its General Partner, By Peter Thiel, Manager</td></tr><tr class="tableClass"><td width="8%" class="tableClassNoBorderAlignLeft signature">Date:</td><td width="92%" class="tableClassNoBorderBlue signature">08/14/2026</td></tr></table></td></tr></table><table><tr class="tableClass"><td width="50%" class="tableClassNoBorder"> </td><td width="50%" class="tableClassNoBorder"><table><tr class="tableClass"><td width="100%" class="tableClassInnerNoBorderBlue"><div class="text">FF GP Holdings, LLC</div></td></tr></table></td></tr></table><table><tr class="tableClass"><td width="50%" class="tableClassNoBorder"> </td><td width="50%" class="tableClassNoBorder"><table><tr class="tableClass"><td width="8%" class="tableClassNoBorderAlignLeft signature">Signature:</td><td width="92%" class="tableClassNoBorderBlue signature">/s/ Peter Thiel</td></tr><tr class="tableClass"><td width="8%" class="tableClassNoBorderAlignLeft signature">Name/Title:</td><td width="92%" class="tableClassNoBorderBlue signature">By FF Upper Tier GP, LLC, Its Manager, By Peter Thiel, Manager</td></tr><tr class="tableClass"><td width="8%" class="tableClassNoBorderAlignLeft signature">Date:</td><td width="92%" class="tableClassNoBorderBlue signature">08/14/2026</td></tr></table></td></tr></table><table><tr class="tableClass"><td width="50%" class="tableClassNoBorder"> </td><td width="50%" class="tableClassNoBorder"><table><tr class="tableClass"><td width="100%" class="tableClassInnerNoBorderBlue"><div class="text">FF Upper Tier GP, LLC</div></td></tr></table></td></tr></table><table><tr class="tableClass"><td width="50%" class="tableClassNoBorder"> </td><td width="50%" class="tableClassNoBorder"><table><tr class="tableClass"><td width="8%" class="tableClassNoBorderAlignLeft signature">Signature:</td><td width="92%" class="tableClassNoBorderBlue signature">/s/ Peter Thiel</td></tr><tr class="tableClass"><td width="8%" class="tableClassNoBorderAlignLeft signature">Name/Title:</td><td width="92%" class="tableClassNoBorderBlue signature">By Peter Thiel, Manager</td></tr><tr class="tableClass"><td width="8%" class="tableClassNoBorderAlignLeft signature">Date:</td><td width="92%" class="tableClassNoBorderBlue signature">08/14/2026</td></tr></table></td></tr></table><table><tr class="tableClass"><td width="50%" class="tableClassNoBorder"> </td><td width="50%" class="tableClassNoBorder"><table><tr class="tableClass"><td width="100%" class="tableClassInnerNoBorderBlue"><div class="text">The Founders Fund Growth, LP</div></td></tr></table></td></tr></table><table><tr class="tableClass"><td width="50%" class="tableClassNoBorder"> </td><td width="50%" class="tableClassNoBorder"><table><tr class="tableClass"><td width="8%" class="tableClassNoBorderAlignLeft signature">Signature:</td><td width="92%" class="tableClassNoBorderBlue signature">/s/ Peter Thiel</td></tr><tr class="tableClass"><td width="8%" class="tableClassNoBorderAlignLeft signature">Name/Title:</td><td width="92%" class="tableClassNoBorderBlue signature">By The Founders Fund Growth Management, LLC, Its General Partner, By Peter Thiel, Manager</td></tr><tr class="tableClass"><td width="8%" class="tableClassNoBorderAlignLeft signature">Date:</td><td width="92%" class="tableClassNoBorderBlue signature">08/14/2026</td></tr></table></td></tr></table><table><tr class="tableClass"><td width="50%" class="tableClassNoBorder"> </td><td width="50%" class="tableClassNoBorder"><table><tr class="tableClass"><td width="100%" class="tableClassInnerNoBorderBlue"><div class="text">The Founders Fund Growth Principals Fund, LP</div></td></tr></table></td></tr></table><table><tr class="tableClass"><td width="50%" class="tableClassNoBorder"> </td><td width="50%" class="tableClassNoBorder"><table><tr class="tableClass"><td width="8%" class="tableClassNoBorderAlignLeft signature">Signature:</td><td width="92%" class="tableClassNoBorderBlue signature">/s/ Peter Thiel</td></tr><tr class="tableClass"><td width="8%" class="tableClassNoBorderAlignLeft signature">Name/Title:</td><td width="92%" class="tableClassNoBorderBlue signature">By The Founders Fund Growth Management, LLC, Its General Partner, By Peter Thiel, Manager</td></tr><tr class="tableClass"><td width="8%" class="tableClassNoBorderAlignLeft signature">Date:</td><td width="92%" class="tableClassNoBorderBlue signature">08/14/2026</td></tr></table></td></tr></table><table><tr class="tableClass"><td width="50%" class="tableClassNoBorder"> </td><td width="50%" class="tableClassNoBorder"><table><tr class="tableClass"><td width="100%" class="tableClassInnerNoBorderBlue"><div class="text">Founders SPC, LP</div></td></tr></table></td></tr></table><table><tr class="tableClass"><td width="50%" class="tableClassNoBorder"> </td><td width="50%" class="tableClassNoBorder"><table><tr class="tableClass"><td width="8%" class="tableClassNoBorderAlignLeft signature">Signature:</td><td width="92%" class="tableClassNoBorderBlue signature">/s/ Peter Thiel</td></tr><tr class="tableClass"><td width="8%" class="tableClassNoBorderAlignLeft signature">Name/Title:</td><td width="92%" class="tableClassNoBorderBlue signature">By The Founders Fund Growth Management, LLC, Its General Partner, By Peter Thiel, Manager</td></tr><tr class="tableClass"><td width="8%" class="tableClassNoBorderAlignLeft signature">Date:</td><td width="92%" class="tableClassNoBorderBlue signature">08/14/2026</td></tr></table></td></tr></table><table><tr class="tableClass"><td width="50%" class="tableClassNoBorder"> </td><td width="50%" class="tableClassNoBorder"><table><tr class="tableClass"><td width="100%" class="tableClassInnerNoBorderBlue"><div class="text">The Founders Fund Growth Management, LLC</div></td></tr></table></td></tr></table><table><tr class="tableClass"><td width="50%" class="tableClassNoBorder"> </td><td width="50%" class="tableClassNoBorder"><table><tr class="tableClass"><td width="8%" class="tableClassNoBorderAlignLeft signature">Signature:</td><td width="92%" class="tableClassNoBorderBlue signature">/s/ Peter Thiel</td></tr><tr class="tableClass"><td width="8%" class="tableClassNoBorderAlignLeft signature">Name/Title:</td><td width="92%" class="tableClassNoBorderBlue signature">By Peter Thiel, Manager</td></tr><tr class="tableClass"><td width="8%" class="tableClassNoBorderAlignLeft signature">Date:</td><td width="92%" class="tableClassNoBorderBlue signature">08/14/2026</td></tr></table></td></tr></table><table><tr class="tableClass"><td width="50%" class="tableClassNoBorder"> </td><td width="50%" class="tableClassNoBorder"><table><tr class="tableClass"><td width="100%" class="tableClassInnerNoBorderBlue"><div class="text">2025-005 Investments LLC</div></td></tr></table></td></tr></table><table><tr class="tableClass"><td width="50%" class="tableClassNoBorder"> </td><td width="50%" class="tableClassNoBorder"><table><tr class="tableClass"><td width="8%" class="tableClassNoBorderAlignLeft signature">Signature:</td><td width="92%" class="tableClassNoBorderBlue signature">/s/ Peter Thiel</td></tr><tr class="tableClass"><td width="8%" class="tableClassNoBorderAlignLeft signature">Name/Title:</td><td width="92%" class="tableClassNoBorderBlue signature">By Peter Thiel, Authorized Signatory</td></tr><tr class="tableClass"><td width="8%" class="tableClassNoBorderAlignLeft signature">Date:</td><td width="92%" class="tableClassNoBorderBlue signature">08/14/2026</td></tr></table></td></tr></table><table><tr class="tableClass"><td width="50%" class="tableClassNoBorder"> </td><td width="50%" class="tableClassNoBorder"><table><tr class="tableClass"><td width="100%" class="tableClassInnerNoBorderBlue"><div class="text">I'll Be Seeing You LLC</div></td></tr></table></td></tr></table><table><tr class="tableClass"><td width="50%" class="tableClassNoBorder"> </td><td width="50%" class="tableClassNoBorder"><table><tr class="tableClass"><td width="8%" class="tableClassNoBorderAlignLeft signature">Signature:</td><td width="92%" class="tableClassNoBorderBlue signature">/s/ Peter Thiel</td></tr><tr class="tableClass"><td width="8%" class="tableClassNoBorderAlignLeft signature">Name/Title:</td><td width="92%" class="tableClassNoBorderBlue signature">By Peter Thiel, Authorized Signatory</td></tr><tr class="tableClass"><td width="8%" class="tableClassNoBorderAlignLeft signature">Date:</td><td width="92%" class="tableClassNoBorderBlue signature">08/14/2026</td></tr></table></td></tr></table><table><tr class="tableClass"><td width="50%" class="tableClassNoBorder"> </td><td width="50%" class="tableClassNoBorder"><table><tr class="tableClass"><td width="100%" class="tableClassInnerNoBorderBlue"><div class="text">Barrel Vault LLC</div></td></tr></table></td></tr></table><table><tr class="tableClass"><td width="50%" class="tableClassNoBorder"> </td><td width="50%" class="tableClassNoBorder"><table><tr class="tableClass"><td width="8%" class="tableClassNoBorderAlignLeft signature">Signature:</td><td width="92%" class="tableClassNoBorderBlue signature">/s/ Peter Thiel</td></tr><tr class="tableClass"><td width="8%" class="tableClassNoBorderAlignLeft signature">Name/Title:</td><td width="92%" class="tableClassNoBorderBlue signature">By Peter Thiel, Manager</td></tr><tr class="tableClass"><td width="8%" class="tableClassNoBorderAlignLeft signature">Date:</td><td width="92%" class="tableClassNoBorderBlue signature">08/14/2026</td></tr></table></td></tr></table><table><tr class="tableClass"><td width="50%" class="tableClassNoBorder"> </td><td width="50%" class="tableClassNoBorder"><table><tr class="tableClass"><td width="100%" class="tableClassInnerNoBorderBlue"><div class="text">Peter  Thiel</div></td></tr></table></td></tr></table><table><tr class="tableClass"><td width="50%" class="tableClassNoBorder"> </td><td width="50%" class="tableClassNoBorder"><table><tr class="tableClass"><td width="8%" class="tableClassNoBorderAlignLeft signature">Signature:</td><td width="92%" class="tableClassNoBorderBlue signature">/s/ Peter Thiel</td></tr><tr class="tableClass"><td width="8%" class="tableClassNoBorderAlignLeft signature">Name/Title:</td><td width="92%" class="tableClassNoBorderBlue signature">Peter Thiel</td></tr><tr class="tableClass"><td width="8%" class="tableClassNoBorderAlignLeft signature">Date:</td><td width="92%" class="tableClassNoBorderBlue signature">08/14/2026</td></tr></table></td></tr></table><table><tr class="tableClass" colspan="2"><td width="100%" class="tableClassNoBorder"><div class="information" style="text-align:center;font-weight:bold;">
+					 Exhibit Information
+					<br><br></div></td></tr><tr class="tableClass" colspan="2"><td width="100%" class="tableClassNoBorder"><div class="largetext">Exhibit 99.1	Joint Filing Agreement<br><br></div></td></tr></table></div></div>
+
+
+    <script type="text/javascript"  src="/nd7kb9mCUV/CxBaQU/3fjA/Or5XcXrmfDVmcJ7G/QCEYaQ/DBMbKw/kWDyg"></script></body></html>

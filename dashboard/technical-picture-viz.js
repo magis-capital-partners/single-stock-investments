@@ -28,18 +28,92 @@
     return Math.round(number).toLocaleString();
   }
 
+  // v3 phases are descriptive. Market-driven selloffs have held up better than
+  // company-specific ones; in large caps, stock-specific panics in a calm market
+  // kept underperforming. Retired v2 phases keep a neutral tone for preserved snapshots.
   function tone(value) {
     return {
-      falling_knife: 'picture-negative',
+      company_selloff: 'picture-negative',
+      market_selloff: 'picture-warning',
       lagging_downtrend: 'picture-negative',
       distribution: 'picture-negative',
       deeply_oversold: 'picture-warning',
       oversold: 'picture-warning',
-      stabilizing: 'picture-positive',
       trend_intact: 'picture-positive',
       leading_uptrend: 'picture-positive',
       accumulation: 'picture-positive',
     }[String(value || '')] || 'picture-neutral';
+  }
+
+  // finite(null) is 0 (Number(null)); missing must stay missing, not read as zero
+  function present(value) {
+    return value === null || value === undefined || value === '' ? null : finite(value);
+  }
+
+  function pctText(value, digits, signed) {
+    const number = present(value);
+    if (number == null) return '—';
+    const text = `${(number * 100).toFixed(digits == null ? 1 : digits)}%`;
+    return signed && number > 0 ? `+${text}` : text;
+  }
+
+  const RISK_BAND_LABEL = { low: 'Low', normal: 'Normal', elevated: 'Elevated', high: 'High' };
+
+  function outlookStrip(technicals, escapeHtml) {
+    const outlook = technicals.outlook || {};
+    const risk = outlook.risk || null;
+    const rebound = outlook.rebound || null;
+    const context = technicals.context || {};
+    if (!risk && !rebound) return '';
+    const beta = present(context.beta_252d);
+    const mkt = present(context.market_move_20d_pct);
+    const co = present(context.company_move_20d_pct);
+    const moveRead = mkt == null || co == null
+      ? 'Market/company split pending'
+      : `20-day move: ${mkt > 0 ? '+' : ''}${mkt.toFixed(1)}% market · ${co > 0 ? '+' : ''}${co.toFixed(1)}% company`;
+    return `<section class="technical-outlook" aria-label="Calibrated outlook">
+      <div><span>Drop risk · 63 sessions</span>
+        <strong>${risk ? escapeHtml(pctText(risk.p_drop15_63d, 0)) : '—'}${risk ? ` <small style="display:inline">${escapeHtml(RISK_BAND_LABEL[risk.band] || '')}</small>` : ''}</strong>
+        <small>Chance of falling another 15% within three months. Calibrated on 1990–2017; holdout AUC 0.66 vs 0.52 for panic alone.</small></div>
+      <div><span>Expected volatility · next month</span>
+        <strong>${risk && present(risk.expected_vol_21d_pct) != null ? `${escapeHtml(present(risk.expected_vol_21d_pct).toFixed(0))}%` : '—'}</strong>
+        <small>${escapeHtml(moveRead)}${beta == null ? '' : ` · beta ${escapeHtml(beta.toFixed(2))}`}</small></div>
+      <div><span>Risk-adjusted rank · US stocks</span>
+        <strong>${rebound && present(rebound.score) != null ? `${escapeHtml(Math.round(present(rebound.score)).toString())}<small style="display:inline"> / 100</small>` : '—'}</strong>
+        <small>${rebound ? 'Expected next-month return after removing the stock’s market (beta) part. Holdout 2018–26: top tenth beat bottom tenth ~1.4%/month on that basis, before ~1.2% costs. Leans to lower-beta names; it does not predict beating SPY in a rising market.' : 'US stocks with three years of history only.'}</small></div>
+    </section>`;
+  }
+
+  const PHASE_RECORD_LABEL = {
+    company_selloff: 'company-specific selloffs', market_selloff: 'market-driven selloffs', trend_intact: 'intact uptrends',
+    oversold_watch: 'oversold readings', indeterminate: 'no decisive setup',
+  };
+  const VERDICT_TEXT = {
+    positive: 'In this stock’s own history, high fear has reliably preceded outperformance.',
+    negative: 'In this stock’s own history, high fear has reliably preceded further underperformance.',
+    none: 'In this stock’s own history, the fear score has had no reliable link to what came next.',
+    too_short: 'This stock’s history is too short to judge the fear score on its own.',
+  };
+
+  function trackRecordLine(ticker, technicals, trackRecord, escapeHtml) {
+    if (!trackRecord) return '';
+    const phase = String((technicals.setup || {}).phase || '');
+    const full = trackRecord.backtest?.full_1990_2026?.stock_phase?.[phase];
+    const hold = trackRecord.backtest?.holdout_2018_2026?.stock_phase?.[phase];
+    const live = trackRecord.live?.stock_phase?.[phase];
+    const base = trackRecord.backtest?.full_1990_2026?.all?.all;
+    const mine = trackRecord.by_ticker?.[String(ticker.ticker || '').toUpperCase()];
+    const parts = [];
+    if (full && full.h63) {
+      parts.push(`Since 1990, US stocks in <b>${escapeHtml(PHASE_RECORD_LABEL[phase] || phase.replace(/_/g, ' '))}</b> returned ${escapeHtml(pctText(full.h63.mean_excess, 1, true))} vs SPY over the next 63 sessions (all stock-days ${escapeHtml(pctText(base?.h63?.mean_excess, 1, true))}), beat SPY ${escapeHtml(pctText(full.h63.hit, 0))} of the time, and ${escapeHtml(pctText(full.p_drop15_63d, 0))} fell another 15%.`);
+      if (hold && hold.h63) parts.push(`2018–2026: ${escapeHtml(pctText(hold.h63.mean_excess, 1, true))} vs SPY.`);
+    }
+    const graded = present(live?.h63?.graded) || 0;
+    parts.push(graded
+      ? `Live since ${escapeHtml(trackRecord.tracking?.live_since || '—')}: ${escapeHtml(pctText(live.h63.mean_excess, 1, true))} vs SPY on ${escapeHtml(String(graded))} graded signals.`
+      : `Live tracking since ${escapeHtml(trackRecord.tracking?.live_since || 'its first run')}; 63-session outcomes are graded as they mature.`);
+    if (mine) parts.push(escapeHtml(VERDICT_TEXT[mine.verdict] || ''));
+    return `<p class="technical-record"><b>Track record.</b> ${parts.join(' ')}</p>`;
   }
 
   function priceChart(history, escapeHtml) {
@@ -150,15 +224,19 @@
     };
   }
 
+  // v3 copy follows the study: the tape describes risk and context, not timing.
+  // Market-driven selloffs have held up better than company-specific ones (but
+  // with higher volatility); company-specific ones have been no better than
+  // average, and in large caps with a calm market they kept underperforming.
   function synthesis(setup, valuation, business, macro) {
-    if (valuation.tone === 'picture-negative' && setup.phase === 'falling_knife') {
-      return 'Fear is not margin of safety here: price remains above modeled value while the tape is still deteriorating. Reconcile valuation inputs and wait for stabilization.';
+    if (valuation.tone === 'picture-negative' && setup.phase === 'company_selloff') {
+      return 'Fear is not margin of safety here: price remains above modeled value during a company-specific selloff. Those have done no better than average afterwards, and in large caps with a calm market they kept underperforming. Reconcile valuation inputs before acting.';
     }
-    if (valuation.tone === 'picture-positive' && setup.phase === 'stabilizing') {
-      return 'Fundamental discount and improving tape agree. Define an entry range, then keep evidence and business-trend gates intact.';
+    if (valuation.tone === 'picture-positive' && setup.phase === 'market_selloff') {
+      return 'Fundamental discount during a market-driven selloff. Historically these have held up better than company-specific drops, but expect high volatility. Define an entry range and keep evidence gates intact.';
     }
-    if (valuation.tone === 'picture-positive' && setup.phase === 'falling_knife') {
-      return 'The valuation gap is attractive, but the stock is still a falling knife. Investigate whether the decline changes the business case before sequencing an entry.';
+    if (valuation.tone === 'picture-positive' && setup.phase === 'company_selloff') {
+      return 'The valuation gap is attractive, but the decline is company-specific. Those have done no better than average afterwards, and in large caps with a calm market they kept lagging. Establish what changed in the business before sequencing an entry.';
     }
     if (business.tone === 'picture-warning' && setup.participation === 'distribution') {
       return 'Fading business momentum and distribution reinforce one another. Elevate thesis review before treating oversold conditions as opportunity.';
@@ -289,6 +367,8 @@
       <summary>Stock setup · <span class="${fear.cls}">${escapeHtml(setup.phase_label || fear.label)}</span></summary>
       <div class="technical-panel-body">
         ${investmentPicture(ticker, setup, marketContext, escapeHtml)}
+        ${outlookStrip(technicals, escapeHtml)}
+        ${trackRecordLine(ticker, technicals, helpers.trackRecord || null, escapeHtml)}
         <section class="stock-setup">
           <div class="stock-setup-head ${fear.cls}">
             <div><span aria-hidden="true">${fear.marker}</span><strong>${escapeHtml(setup.phase_label || fear.label)}</strong></div>
