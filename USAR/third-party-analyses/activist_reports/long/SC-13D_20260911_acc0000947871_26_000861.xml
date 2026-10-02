@@ -1,0 +1,487 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns:p="http://www.sec.gov/edgar/schedule13D" xmlns:p1="http://www.sec.gov/edgar/common"><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8"><link rel="stylesheet" type="text/css" href="/css/SDR_print.css"><style type="text/css">
+					.fakeTextBox {
+					border-top: 2px solid #999;
+					border-right: 1px solid #ccc;
+					border-bottom: 1px solid #ccc;
+					border-left: 2px solid #999;
+					padding: 2px;
+					_width: 800px;
+					height: auto;
+					min-width: 200px;
+					min-height: 50px;
+					word-wrap: break-word;
+					font-size: 0.9em;
+					color: blue;
+					}
+					table.tableClass { border: solid black;
+					border-top-width: 1;
+					border-right-width: 1;
+					border-bottom-width: 1;
+					border-left-width: 1;
+					table-layout:fixed;
+					}
+					table.innerTableClass { border: solid black;
+					border-top-width: 0;
+					border-right-width: 0;
+					border-bottom-width: 0;
+					border-left-width: 0;
+					table-layout:fixed;
+					}
+					th.tableClassLeft { border: solid black;
+					border-top-width: 0px;
+					border-right-width: 0px;
+					border-bottom-width: 1px;
+					border-left-width: 1px;
+					padding: 2px;
+					}
+					th.tableClassRight { border: solid black;
+					border-top-width: 0px;
+					border-right-width: 1px;
+					border-bottom-width: 1px;
+					border-left-width: 0;
+					padding: 2px;
+					}
+					th.tableClass { border: solid black;
+					border-top-width: 0px;
+					border-right-width: 1px;
+					border-bottom-width: 1px;
+					border-left-width: 1px;
+					padding: 2px;
+					}
+					td.tableClassLeft { border: solid black;
+					border-top-width: 0px;
+					border-right-width: 0px;
+					border-bottom-width: 1px;
+					border-left-width: 1px;
+					font-size: 0.9em;
+					color: blue;
+					word-wrap: break-word;
+					}
+					td.tableClassRight { border: solid black;
+					border-top-width: 0px;
+					border-right-width: 1px;
+					border-bottom-width: 1px;
+					border-left-width: 0;
+					font-size: 0.9em;
+					color: blue;
+					word-wrap: break-word;
+					}
+					td.tableClass { border: solid black;
+					border-top-width: 0px;
+					border-right-width: 1px;
+					border-bottom-width: 1px;
+					border-left-width: 1px;
+					font-size: 0.9em;
+					font-weight:bold;
+					color: black;
+					word-wrap: break-word;
+					}
+					td.tableClassNoBorder { border: solid black;
+					border-top-width: 0px;
+					border-right-width: 0px;
+					border-bottom-width: 0px;
+					border-left-width: 0px;
+					font-size: 0.9em;
+					font-weight:bold;
+					color: black;
+					word-wrap: break-word;
+					}
+
+					td.tableClassNoBorderBlue { border: solid black;
+					border-top-width: 0px;
+					border-right-width: 0px;
+					border-bottom-width: 0px;
+					border-left-width: 0px;
+					font-size: 0.9em;
+					font-weight:bold;
+					color: blue;
+					word-wrap: break-word;
+					}
+
+					td.tableClassInnerNoBorderBlue { border: solid black;
+					border-top-width: 0px;
+					border-right-width: 0px;
+					border-bottom-width: 0px;
+					border-left-width: 0px;
+					font-size: 1.4em;
+					font-weight:bold;
+					color: blue;
+					word-wrap: break-word;
+					}
+
+					td.tableClassNoBorderAlignLeft { border: solid black;
+					border-top-width: 0px;
+					border-right-width: 0px;
+					border-bottom-width: 0px;
+					border-left-width: 0px;
+					font-size: 0.9em;
+					font-weight:bold;
+					text-align: left;
+					color: black;
+					word-wrap: break-word;
+					}
+
+					td.signature {
+					padding: 4px 8px;
+					}
+
+					td.tableClassInner { border: solid black;
+					border-top-width: 0px;
+					border-right-width: 1px;
+					border-bottom-width: 1px;
+					border-left-width: 1px;
+					font-size: 1em;
+					font-weight:bold;
+					color: black;
+					word-wrap: break-word;
+					}
+
+					td.tableClassValign { border: solid black;
+					border-top-width: 0px;
+					border-right-width: 1px;
+					border-bottom-width: 1px;
+					border-left-width: 1px;
+					font-size: 0.9em;
+					font-weight:bold;
+					color: black;
+					vertical-align: middle;
+					text-align: center;
+					word-wrap: break-word;
+					}
+
+					td.tableClassValignNoBorder { border: solid black;
+					border-top-width: 0px;
+					border-right-width: 0px;
+					border-bottom-width: 0px;
+					border-left-width: 0px;
+					font-size: 0.9em;
+					font-weight:bold;
+					color: black;
+					vertical-align: middle;
+					text-align: center;
+					word-wrap: break-word;
+					}
+
+					td.tableClassValignInner { border: solid black;
+					border-top-width: 0px;
+					border-right-width: 1px;
+					border-bottom-width: 1px;
+					border-left-width: 1px;
+					font-size: 1em;
+					font-weight:bold;
+					color: black;
+					vertical-align: middle;
+					text-align: center;
+					word-wrap: break-word;
+					}
+
+					td.innerTableClassRightValign { border: solid black;
+					border-top-width: 0px;
+					border-right-width: 1px;
+					border-bottom-width: 1px;
+					border-left-width: 0;
+					font-size: 1em;
+					font-weight:bold;
+					color: black;
+					vertical-align: middle;
+					text-align: center;
+					word-wrap: break-word;
+					}
+
+					td.innerTableClassRightValignBottomLess { border: solid black;
+					border-top-width: 0px;
+					border-right-width: 1px;
+					border-bottom-width: 0px;
+					border-left-width: 0;
+					font-size: 1em;
+					font-weight:bold;
+					color: black;
+					vertical-align: middle;
+					text-align: center;
+					word-wrap: break-word;
+					}
+
+					td.tableClassInnerLeft { border: solid black;
+					border-top-width: 0px;
+					border-right-width: 0px;
+					border-bottom-width: 1px;
+					border-left-width: 1px;
+					font-size: 1em;
+					font-weight:bold;
+					color: black;
+					word-wrap: break-word;
+					}
+
+					td.tableClassInnerLeftBottomLess { border: solid black;
+					border-top-width: 0px;
+					border-right-width: 0px;
+					border-bottom-width: 0px;
+					border-left-width: 1px;
+					font-size: 1em;
+					font-weight:bold;
+					color: black;
+					word-wrap: break-word;
+					}
+
+					td.tableClassNoBorderAlignCenter { border: solid black;
+					border-top-width: 0px;
+					border-right-width: 0px;
+					border-bottom-width: 0px;
+					border-left-width: 0px;
+					font-size: 0.9em;
+					font-weight:bold;
+					color: black;
+					text-align: center;
+					word-wrap: break-word;
+					}
+
+					tr.tableClass { border: solid black;
+					border-top-width: 1px;
+					border-right-width: 1px;
+					border-bottom-width: 1px;
+					border-left-width: 1px;
+					}
+					tr.tableClassWithBg { border: solid black;
+					border-top-width: 0;
+					border-right-width: 1;
+					border-bottom-width: 1;
+					border-left-width: 0;
+					background-color: #e0e0ff
+					}
+
+					tr.tableClassWithBgBlack { border: solid black;
+					border-top-width: 0;
+					border-right-width: 1;
+					border-bottom-width: 1;
+					border-left-width: 0;
+					background-color: #D3D3D3
+					}
+
+					hr.header {
+					position: relative;
+					top: 20px;
+					border: none;
+					height: 6px;
+					background: black;
+					margin-bottom: 10px;
+					}
+
+					hr.separatorThin {
+					position: relative;
+					top: 2px;
+					border: none;
+					height: 2px;
+					background: black;
+					margin-bottom: 2px;
+					}
+
+					hr.headerThin {
+					position: relative;
+					top: 10px;
+					border: none;
+					height: 2px;
+					background: black;
+					margin-bottom: 10px;
+					}
+
+					hr.separator {
+					position: relative;
+					top: 20px;
+					border: none;
+					height: 4px;
+					background: black;
+					margin-bottom: 5px;
+					}
+
+					div.text {
+					background-color: #ffffff;
+					color: blue;
+					font-size: 1em;
+					font-weight:normal;
+					text-align:justify;
+					}
+
+
+					div.information {
+					background-color: #ffffff;
+					color: black;
+					font-size: 1em;
+					font-weight:normal;
+					text-align:justify;
+					}
+
+					#scheader {
+					font-size: 0.9em;
+					border: 0px solid #404040;
+					border-spacing: 2px;
+					}
+
+					div.largetext {
+					background-color: #ffffff;
+					color: blue;
+					font-size: 1em;
+					font-weight:normal;
+					text-align:justify;
+					white-space: pre-wrap;
+					word-break: normal;
+					}
+
+				</style></head><body lang="en-US" text="#000000" bgcolor="#ffffff"><hr class="header"><br><hr class="headerThin"><div class="contentwrapper"><table role="presentation" id="scheader"><tr><td class="tableClassNoBorderAlignCenter" style="font-size:2em;">
+						SECURITIES AND EXCHANGE COMMISSION
+						<br>
+						Washington, D.C. 20549
+					</td></tr><tr><td class="tableClassNoBorderAlignCenter"><br><br><div style="font-size:1.5em;">
+									SCHEDULE 13D
+								</div><br><div style="font-size:1.2em;">
+							Under the Securities Exchange Act of 1934
+						</div><br></td></tr><tr><td class="center"><div class="information" style="text-align:center; font-weight:bold; color:blue;">USA Rare Earth, Inc.</div><div class="information" style="text-align:center; font-weight:bold;"><hr class="separatorThin">(Name of Issuer)</div><br><br></td></tr><tr><td class="center"><div class="information" style="text-align:center; font-weight:bold; color:blue;">Common Stock, par value $0.0001</div><div class="information" style="text-align:center; font-weight:bold;"><hr class="separatorThin">(Title of Class of Securities)</div><br><br></td></tr><table border="1"><tr><td><div class="information" style="text-align:center; font-weight:bold; color:blue;">91733P107</div><div class="information" style="text-align:center; font-weight:bold;"><hr class="separatorThin">(CUSIP Number)</div></td></tr><br><br></table><tr><td class="center"><div class="information" style="text-align:center; font-weight:bold; color:blue;">Harry Rouillard<br>Director, VB (Rare Earths) Limited,
+								1 Royal Plaza, Royal Avenue<br>St Peter Port,
+								Y7,
+								GY1 2HL<br>44-20-3530-3761</div><div class="information" style="text-align:center; font-weight:bold;"><hr class="separatorThin">(Name, Address and Telephone Number of Person Authorized to
+									Receive Notices and Communications)</div></td></tr><tr><td class="center"><div class="information" style="text-align:center; font-weight:bold; color:blue;">09/03/2026</div><div class="information" style="text-align:center; font-weight:bold;"><hr class="separatorThin">(Date of Event Which Requires Filing of This Statement)</div></td></tr></table><br><br><div class="information" style="text-align:justify">
+				If the filing person has previously filed a statement on Schedule 13G to report the acquisition that is the subject of this Schedule 13D, and is filing this schedule because of §§ 240.13d-1(e), 240.13d-1(f) or 240.13d-1(g), check the following box.
+				<img src="/Images/box-unchecked.jpg" alt="Checkbox not checked"></div><br><div class="information" style="text-align:justify">
+				The information required on the remainder of this cover page shall not be deemed to be “filed” for the purpose of Section 18 of the
+				Securities Exchange Act of 1934 (“Act”) or otherwise subject to the liabilities of that section of the Act but shall be subject to all other
+				provisions of the Act (however, see the Notes).
+			</div></div><hr class="headerThin"><hr class="header"><br><br>
+  <div style="display:none">
+			schemaVersion:
+			</div>
+<div class="content"><div class="form1"></div></div>
+  <div class="content"><div class="form1"><table><tr><td class="center"><br><br><p><div align="center" style="font-size:1.2em;">
+									SCHEDULE 13D
+								</div></p></td></tr></table><table role="presentation" class="tableClass" id="cusipNumber"><tr class="tableClass"><td width="7%" style="font-weight:bold;">CUSIP Number(s):</td><td width="75%"><div style="font-size:.9em; color:#000000">91733P107</div></td></tr></table><br><br><table role="presentation" class="tableClass" id="reportingPersonDetails"><tr class="tableClass"><td width="8%" class="tableClassValign">1</td><td width="92%" class="tableClass">
+					Name of reporting person
+					<br><br><div class="text">VB (Rare Earths) Ltd</div></td></tr><tr><td width="8%" class="tableClassValign">2</td><td width="92%" class="tableClass">Check the appropriate box if a member of a Group (See Instructions)
+				<br><br><div class="text"><img src="/Images/box-unchecked.jpg" alt="Checkbox not checked">  (a)
+					<br><img src="/Images/box-unchecked.jpg" alt="Checkbox not checked">  (b)	
+				</div></td></tr><tr class="tableClassWithBgBlack"><td width="8%" class="tableClassValign">3</td><td width="92%" class="tableClass">SEC use only</td></tr><tr><td width="8%" class="tableClassValign">4</td><td width="92%" class="tableClass">
+					Source of funds (See Instructions)
+					<br><br><div class="text">OO</div></td></tr><tr><td width="8%" class="tableClassValign">5</td><td width="92%" class="tableClass">
+					Check if disclosure of legal proceedings is required pursuant to Items 2(d) or 2(e)
+					<br><br><img src="/Images/box-unchecked.jpg" alt="Checkbox not checked"></td></tr><tr><td width="8%" class="tableClassValign">6</td><td width="92%" class="tableClass">Citizenship or place of organization
+				<br><br><div class="text">
+				GUERNSEY
+			</div></td></tr><tr><td width="8%" class="tableClassValign">Number of Shares Beneficially Owned by Each Reporting Person With:</td><td width="92%" class="tableClass"><table class="innerTableClass"><tr><td width="8%" class="innerTableClassRightValign">7</td><td width="92%" class="tableClassInnerLeft">Sole Voting Power
+							<br><br><div class="text">0.00</div></td></tr><tr><td width="8%" class="innerTableClassRightValign">8</td><td width="92%" class="tableClassInnerLeft">Shared Voting Power
+							<br><br><div class="text">29,544,227.00</div></td></tr><tr><td width="8%" class="innerTableClassRightValign">9</td><td width="92%" class="tableClassInnerLeft">Sole Dispositive Power
+							<br><br><div class="text">0.00</div></td></tr><tr><td width="8%" class="innerTableClassRightValignBottomLess">10</td><td width="92%" class="tableClassInnerLeftBottomLess">Shared Dispositive Power
+							<br><br><div class="text">29,544,227.00</div></td></tr></table></td></tr><tr><td width="8%" class="tableClassValign">11</td><td width="92%" class="tableClass">Aggregate amount beneficially owned by each reporting person
+				<br><br><div class="text">29,544,227.00</div></td></tr><tr><td width="8%" class="tableClassValign">12</td><td width="92%" class="tableClass">Check if the aggregate amount in Row (11) excludes certain shares (See Instructions)
+				<br><br><img src="/Images/box-unchecked.jpg" alt="Checkbox not checked"></td></tr><tr><td width="8%" class="tableClassValign">13</td><td width="92%" class="tableClass">Percent of class represented by amount in Row (11)
+				<br><br><div class="text">7.9 % </div></td></tr><tr><td width="8%" class="tableClassValign">14</td><td width="92%" class="tableClass">Type of Reporting Person (See Instructions)
+				<br><br><div class="text">CO</div></td></tr></table><br><div style="display: flex;"><div style="font-size: 0.9em; font-weight: bold; margin-right: 5px;">
+					Comment for Type of Reporting Person:
+				</div><div class="largetext" style="text-align:justify">ITEM 13 The percent of class was calculated based on 375,076,567 shares of common stock of USA Rare Earth, Inc. outstanding as of September 3, 2026, based on information received from the Issuer.</div></div><table><tr><td class="center"><br><br><p><div align="center" style="font-size:1.2em;">
+									SCHEDULE 13D
+								</div></p></td></tr></table><table role="presentation" class="tableClass" id="cusipNumber"><tr class="tableClass"><td width="7%" style="font-weight:bold;">CUSIP Number(s):</td><td width="75%"><div style="font-size:.9em; color:#000000">91733P107</div></td></tr></table><br><br><table role="presentation" class="tableClass" id="reportingPersonDetails"><tr class="tableClass"><td width="8%" class="tableClassValign">1</td><td width="92%" class="tableClass">
+					Name of reporting person
+					<br><br><div class="text">Vision Blue Resources Ltd</div></td></tr><tr><td width="8%" class="tableClassValign">2</td><td width="92%" class="tableClass">Check the appropriate box if a member of a Group (See Instructions)
+				<br><br><div class="text"><img src="/Images/box-unchecked.jpg" alt="Checkbox not checked">  (a)
+					<br><img src="/Images/box-unchecked.jpg" alt="Checkbox not checked">  (b)	
+				</div></td></tr><tr class="tableClassWithBgBlack"><td width="8%" class="tableClassValign">3</td><td width="92%" class="tableClass">SEC use only</td></tr><tr><td width="8%" class="tableClassValign">4</td><td width="92%" class="tableClass">
+					Source of funds (See Instructions)
+					<br><br><div class="text">OO</div></td></tr><tr><td width="8%" class="tableClassValign">5</td><td width="92%" class="tableClass">
+					Check if disclosure of legal proceedings is required pursuant to Items 2(d) or 2(e)
+					<br><br><img src="/Images/box-unchecked.jpg" alt="Checkbox not checked"></td></tr><tr><td width="8%" class="tableClassValign">6</td><td width="92%" class="tableClass">Citizenship or place of organization
+				<br><br><div class="text">
+				GUERNSEY
+			</div></td></tr><tr><td width="8%" class="tableClassValign">Number of Shares Beneficially Owned by Each Reporting Person With:</td><td width="92%" class="tableClass"><table class="innerTableClass"><tr><td width="8%" class="innerTableClassRightValign">7</td><td width="92%" class="tableClassInnerLeft">Sole Voting Power
+							<br><br><div class="text">0.00</div></td></tr><tr><td width="8%" class="innerTableClassRightValign">8</td><td width="92%" class="tableClassInnerLeft">Shared Voting Power
+							<br><br><div class="text">29,544,227.00</div></td></tr><tr><td width="8%" class="innerTableClassRightValign">9</td><td width="92%" class="tableClassInnerLeft">Sole Dispositive Power
+							<br><br><div class="text">0.00</div></td></tr><tr><td width="8%" class="innerTableClassRightValignBottomLess">10</td><td width="92%" class="tableClassInnerLeftBottomLess">Shared Dispositive Power
+							<br><br><div class="text">29,544,227.00</div></td></tr></table></td></tr><tr><td width="8%" class="tableClassValign">11</td><td width="92%" class="tableClass">Aggregate amount beneficially owned by each reporting person
+				<br><br><div class="text">29,544,227.00</div></td></tr><tr><td width="8%" class="tableClassValign">12</td><td width="92%" class="tableClass">Check if the aggregate amount in Row (11) excludes certain shares (See Instructions)
+				<br><br><img src="/Images/box-unchecked.jpg" alt="Checkbox not checked"></td></tr><tr><td width="8%" class="tableClassValign">13</td><td width="92%" class="tableClass">Percent of class represented by amount in Row (11)
+				<br><br><div class="text">7.9 % </div></td></tr><tr><td width="8%" class="tableClassValign">14</td><td width="92%" class="tableClass">Type of Reporting Person (See Instructions)
+				<br><br><div class="text">CO</div></td></tr></table><br><div style="display: flex;"><div style="font-size: 0.9em; font-weight: bold; margin-right: 5px;">
+					Comment for Type of Reporting Person:
+				</div><div class="largetext" style="text-align:justify">ITEM 13 The percent of class was calculated based on 375,076,567 shares of common stock of USA Rare Earth, Inc. outstanding as of September 3, 2026, based on information received from the Issuer.</div></div></div><div class="form1"><table><tr><td class="center"><br><br><p><div align="center" style="font-size:1.2em;">
+									SCHEDULE 13D
+								</div></p></td></tr></table><table role="presentation" id="item1to7"><tr><td width="8%" class="tableClassValignNoBorder">Item 1.</td><td width="92%" class="tableClassNoBorder">Security and Issuer</td></tr><tr class="tableClass"><td width="8%" class="tableClassNoBorderAlignCenter">(a)</td><td width="92%" class="tableClassNoBorder">Title of Class of Securities:
+							<br><br><div class="text">Common Stock, par value $0.0001</div></td></tr><tr class="tableClass"><td width="8%" class="tableClassNoBorderAlignCenter">(b)</td><td width="92%" class="tableClassNoBorder">Name of Issuer:
+							<br><br><div class="text">USA Rare Earth, Inc.</div></td></tr><tr><td width="8%" class="tableClassNoBorderAlignCenter">(c)</td><td width="92%" class="tableClassNoBorder">Address of Issuer's Principal Executive Offices:
+							<br><br><div class="text">100 W Airport Road, Stillwater, 
+				OKLAHOMA
+			, 74075.</div></td></tr><tr><td width="8%" class="tableClassValignNoBorder">Item 2.</td><td width="92%" class="tableClassNoBorder">Identity and Background</td></tr><tr></tr><tr class="tableClass"><td width="8%" class="tableClassNoBorderAlignCenter">(a)</td><td width="92%" class="tableClassNoBorder"><div class="largetext">This Schedule 13D is being filed by VB (Rare Earths) Limited ("VBRE") and Vision Blue Resources Limited ("Vision Blue") (each, a "Reporting Person" and together the "Reporting Persons").</div></td></tr><tr><td width="8%" class="tableClassNoBorderAlignCenter">(b)</td><td width="92%" class="tableClassNoBorder"><div class="largetext">The principal business address of both Reporting Persons is 1 Royal Plaza, Royal Avenue, St Peter Port, Guernsey, GY1 2HL.
+
+The name, business address and present principal occupation or employment of each director and controlling person of each Reporting Person are listed in Exhibit 99.1 hereto. The Reporting Persons have no executive officers.</div></td></tr><tr><td width="8%" class="tableClassNoBorderAlignCenter">(c)</td><td width="92%" class="tableClassNoBorder"><div class="largetext">The Reporting Persons are limited companies organized under the laws of Guernsey. Vision Blue is an investment firm that invests in strategic metals and minerals assets. Vision Blue owns substantially all of the issued and outstanding capital stock of VBRE. See Item 5(a) below for further details.</div></td></tr><tr><td width="8%" class="tableClassNoBorderAlignCenter">(d)</td><td width="92%" class="tableClassNoBorder"><div class="largetext">During the last five years, the Reporting Persons have not been convicted in a criminal proceeding (excluding traffic violations or similar misdemeanors).</div></td></tr><tr><td width="8%" class="tableClassNoBorderAlignCenter">(e)</td><td width="92%" class="tableClassNoBorder"><div class="largetext">During the last five years, the Reporting Persons have not been a party to a civil proceeding of a judicial or administrative body of competent jurisdiction and as a result of such proceeding was or is subject to a judgment, decree or final order enjoining future violations of, or prohibiting or mandating activities subject to, federal or state securities laws or finding any violation with respect to such laws.</div></td></tr><tr><td width="8%" class="tableClassNoBorderAlignCenter">(f)</td><td width="92%" class="tableClassNoBorder"><div class="largetext">The Reporting Persons are organized under the laws of Guernsey.</div></td></tr><tr><td width="8%" class="tableClassValignNoBorder">Item 3.</td><td width="92%" class="tableClassNoBorder">Source and Amount of Funds or Other Consideration</td></tr><tr><td width="8%" class="tableClassNoBorderAlignCenter"> </td><td width="92%" class="tableClassNoBorder"><div class="largetext">On September 3, 2026, pursuant to the Merger Agreement (as defined below), the Reporting Persons received 29,544,227 shares of common stock of USA Rare Earth, Inc. (the "Issuer"), par value $0.0001 (the "Common Stock") as consideration in the Merger (as defined below) described in Item 6 of this Schedule 13D. The information set forth or incorporated by reference in Item 6 of this Schedule 13D is incorporated by reference into this Item 3.</div></td></tr><tr><td width="8%" class="tableClassValignNoBorder">Item 4.</td><td width="92%" class="tableClassNoBorder">Purpose of Transaction</td></tr><tr><td width="8%" class="tableClassNoBorderAlignCenter"> </td><td width="92%" class="tableClassNoBorder"><div class="largetext">The information set forth or incorporated by reference in Item 6 of this Schedule 13D is incorporated by reference into this Item 4.
+
+The Reporting Persons intend to further assess their investment in the Issuer from time to time, on the basis of various factors, including, without limitation, the Issuer's business performance, financial condition, results of operations and prospects, general economic, market and industry conditions, as well as other developments and other investment opportunities available to the Reporting Persons and the Issuer. The Reporting Persons seek to maximize the value of their investment in the Issuer. If the Reporting Persons believe that further investment in the Issuer is attractive, the Reporting Persons may acquire (or seek to acquire) Common Stock or other securities of the Issuer. Similarly, the Reporting Persons may determine to dispose of some or all of the Common Stock currently owned by the Reporting Persons.
+
+Depending upon the foregoing factors or any other factors that the Reporting Persons may deem relevant, the Reporting Persons may acquire additional securities of the Issuer in open market transactions or privately negotiated transactions, dispose of part or all of their investment in the Issuer by sales of Common Stock from time to time in open market transactions or privately negotiated transactions, including pursuant to the Resale Registration Statement (as defined below) or pursuant to Rule 144 (which may employ trading plans pursuant to Rule 10b5-1 under the Securities Exchange Act of 1934, as amended), in extraordinary transactions such as a merger or otherwise, and/or enter into hedging or other derivative transactions with respect to securities of the Issuer that may be settled in cash or shares of Common Stock. Any acquisition or disposition of the Issuer's securities may be effected by the Reporting Persons at any time without prior notice, subject to applicable law.
+
+Other than as described in this Schedule 13D, the Reporting Persons do not have any present plans or proposals that relate to or would result in any of the actions enumerated in Item 4 of Schedule 13D. The Reporting Persons may, at any time and from time to time, review or reconsider their position, change their purpose and/or formulate such plans or proposals with respect thereto.</div></td></tr><tr><td width="8%" class="tableClassValignNoBorder">Item 5.</td><td width="92%" class="tableClassNoBorder">Interest in Securities of the Issuer</td></tr><tr><td width="8%" class="tableClassNoBorderAlignCenter">(a)</td><td width="92%" class="tableClassNoBorder"><div class="largetext">The information set forth on lines 11 and 13 of the cover pages hereto is incorporated by reference into this Item 5(a).
+
+The percent of class is calculated based on 375,076,567 ordinary shares of the Issuer outstanding as of September 3, 2026, based on information received from the Issuer.
+
+Vision Blue owns, directly, or indirectly, substantially all of the issued and outstanding capital stock of VBRE. Voting and dispositive power over securities beneficially owned by Vision Blue are vested in a board of directors consisting of five directors, including Sir Mick Davis, who is a member of the Issuer's board of directors (the "Issuer's Board"). Under the "rule of three," none of the five directors of Vision Blue are deemed to be beneficial owners of the Common Stock held by VBRE.</div></td></tr><tr><td width="8%" class="tableClassNoBorderAlignCenter">(b)</td><td width="92%" class="tableClassNoBorder"><div class="largetext">The information set forth on lines 7 through 10 of the cover pages hereto is incorporated by reference into this Item 5(b).</div></td></tr><tr><td width="8%" class="tableClassNoBorderAlignCenter">(c)</td><td width="92%" class="tableClassNoBorder"><div class="largetext">Neither of the Reporting Persons has effected any transactions in the ordinary shares of the Issuer during the past 60 days.</div></td></tr><tr><td width="8%" class="tableClassNoBorderAlignCenter">(d)</td><td width="92%" class="tableClassNoBorder"><div class="largetext">No other person is known to have the right to receive or the power to direct the receipt of dividends from, or the proceeds from the sale of, such securities.</div></td></tr><tr><td width="8%" class="tableClassNoBorderAlignCenter">(e)</td><td width="92%" class="tableClassNoBorder"><div class="largetext">Not applicable.</div></td></tr><tr><td width="8%" class="tableClassValignNoBorder">Item 6.</td><td width="92%" class="tableClassNoBorder">Contracts, Arrangements, Understandings or Relationships With Respect to Securities of the Issuer</td></tr><tr><td width="8%" class="tableClassNoBorderAlignCenter"> </td><td width="92%" class="tableClassNoBorder"><div class="largetext">Merger Agreement
+
+On April 19, 2026, the Issuer entered into a definitive Agreement and Plan of Merger (as amended by Amendment No. 1, dated July 16, 2026 ("Amendment No. 1"), and Amendment No. 2, dated September 3, 2026 ("Amendment No. 2"), and as may be further modified, amended or supplemented from time to time, the "Merger Agreement") by and among (i) the Issuer, (ii) Middlebury Merger Sub Ltd., a business company limited by shares incorporated under the laws of the British Virgin Islands and an indirect, wholly owned Subsidiary of the Issuer ("Merger Sub"), (iii) SVRE Holdings Ltd., a business company limited by shares incorporated under the laws of the British Virgin Islands ("SVRE"), and (iv) Serra Verde Rare Earths Ltd., a company incorporated and existing under the laws of the British Virgin Islands, solely in its capacity as the representative of the holders of Ordinary Shares, without par value, and Class A Ordinary Shares, without par value, of SVRE (collectively, "SVRE Shares" and such holders, the "SVRE Shareholders") (the "Seller Representative"), providing for the merger of SVRE with and into Merger Sub, with Merger Sub surviving the merger as an indirect, wholly owned subsidiary of the Issuer (the "Merger" and, together with all other transactions contemplated by the Merger Agreement, the "Transactions") subject to the terms and conditions contained therein. Each capitalized term used herein but not otherwise defined has the meaning given to it in the Merger Agreement.
+
+On September 3, 2026 (the "Closing Date"), the parties closed the Merger, and the Merger became effective at the time when the Articles of Merger were registered by the Registrar of Corporate Affairs of the British Virgin Islands (the "Effective Time"). Pursuant to the Merger Agreement, the aggregate merger consideration (the "Merger Consideration") consisted of (i) an amount of cash equal to $300,000,000 (the "Aggregate Cash Merger Consideration") and (ii) an aggregate of 126,849,307 shares of Common Stock of the Issuer (the "Aggregate Stock Merger Consideration"). The Merger Consideration was paid to, among others (a) the holders of SVRE Shares issued and outstanding immediately prior to the Effective Time, including the Reporting Persons, (b) the United States International Development Finance Corporation (the "DFC") pursuant to the cancellation and conversion of its warrants to purchase SVRE Shares, (c) OMF Fund III (F) Ltd., (d) certain SVRE Shareholders pursuant to the exercise of their warrants to purchase SVRE Shares and (e) certain current and former employees and consultants of SVRE and its subsidiaries.
+
+The foregoing description of the Merger Agreement does not purport to be complete and is qualified in its entirety by reference to the Merger Agreement, including Amendment No. 1 and Amendment No. 2, which are attached hereto as Exhibits 99.3, 99.4 and 99.5 respectively, and incorporated herein by reference.
+
+Registration Rights Agreement
+
+In connection with the closing of the Merger, the Issuer, certain SVRE Shareholders, including the Reporting Persons, OMF Fund III (F) Ltd., certain employees and consultants of SVRE and the DFC entered into a registration rights agreement (the "Registration Rights Agreement"), dated as of September 3, 2026, pursuant to which the Issuer agreed to (a) file a registration statement on Form S-3 (or Form S-1 if not eligible for Form S-3) with the Securities and Exchange Commission (the "SEC") on the first Business Day following the consummation of the Transactions for purposes of registering the resale or distribution of the Aggregate Stock Merger Consideration by the SVRE Shareholders and other recipients thereof (the "Registration Statement"), (b) use reasonable best efforts to have such Registration Statement declared effective within the time period set forth in the Registration Rights Agreement, and (c) keep the Registration Statement (or any new Registration Statement filed in connection with the Registration Rights Agreement) effective until the date that all registrable securities covered by the Registration Statement (or new Registration Statement, as applicable), subject to certain limitations, (i) have been disposed of in accordance with an effective Registration Statement relating thereto, (ii) have been sold thereunder or pursuant to Rule 144 under the Securities Act, or (iii) may be resold without volume or manner-of-sale restrictions pursuant to Rule 144. On September 4, 2026, the Registration Statement was filed by the Issuer on Form S-3 pursuant to the Registration Rights Agreement (the "Resale Registration Statement").
+
+The foregoing description of the Registration Rights Agreement contained herein does not purport to be complete and is qualified in its entirety by reference to the Registration Rights Agreement, which is attached hereto as Exhibit 99.6 and incorporated herein by reference.
+
+Lock-Up Agreement
+
+In connection with the Merger, each SVRE Shareholder entitled to receive shares of Common Stock as Merger Consideration, including the Reporting Persons, entered into a Lock-Up Agreement with the Issuer (each, a "Lock-Up Agreement"), dated as of September 3, 2026. Each Lock-Up Agreement became effective as of the Closing Date and imposes transfer restrictions on the shares of Common Stock held by the former SVRE Shareholder immediately following the closing (excluding shares acquired in the public market) (the "Lock-Up Shares") in three equal tranches: one-third of the Lock-Up Shares are not subject to any transfer restrictions from and after the closing, one-third are subject to transfer restrictions until 90 days following the closing, and the remaining one-third are subject to transfer restrictions until 180 days following the closing. The transfer restrictions will terminate with respect to all Lock-Up Shares upon the consummation of any liquidation, merger, capital stock exchange, reorganization or other similar transaction that results in all of the Issuer's stockholders having the right to exchange their shares of Common Stock for cash, securities or other property, and are subject to customary exceptions, including transfers to Affiliates and Permitted Transferees (each, as defined in the Lock-Up Agreement).
+
+The foregoing description of the Lock-Up Agreement contained herein does not purport to be complete and is qualified in its entirety by reference to the Lock-Up Agreement, which is attached hereto as Exhibit 99.7 and incorporated herein by reference.
+
+Board Appointment Agreement
+
+In connection with the Merger, the Issuer and VBRE entered into a Board Appointment Agreement, dated as of September 3, 2026 (the "Board Appointment Agreement"). Subject to the terms and conditions of the Board Appointment Agreement, VBRE has the right to designate one member to the Issuer's Board, for so long as VBRE and its affiliates beneficially own shares of the Issuer's Common Stock that represent, in the aggregate, at least 5% of the then outstanding amount of shares of the Issuer's Common Stock; provided that such director shall be reasonably acceptable to the Issuer's Nominating and Corporate Governance Committee.
+
+Sir Mick Davis was appointed to the Issuer's Board pursuant to the Board Appointment Agreement, effective as of the Closing Date. Sir Mick Davis is a director of Vision Blue, which owns substantially all of the issued and outstanding capital stock of VBRE. See Item 5(a) above for further details.
+
+The foregoing description of the Board Appointment Agreement contained herein does not purport to be complete and is qualified in its entirety by reference to the Board Appointment Agreement, which is attached hereto as Exhibit 99.8 and incorporated herein by reference.</div></td></tr><tr><td width="8%" class="tableClassValignNoBorder">Item 7.</td><td width="92%" class="tableClassNoBorder">Material to be Filed as Exhibits.</td></tr><tr><td width="8%" class="tableClassNoBorderAlignCenter"> </td><td width="92%" class="tableClassNoBorder"><div class="largetext">Exhibit      Description
+
+99.1          Directors and Controlling Persons of Reporting Persons
+
+99.2          Joint Filing Agreement, dated September 11, 2026, by and between VB (Rare Earths)
+                 Limited and Vision Blue Resources Limited.
+
+99.3          Agreement and Plan of Merger, dated April 19, 2026, by and among  USA Rare Earth, Inc.,
+                 SVRE Holdings Ltd., Middlebury Merger Sub Ltd. and Serra Verde Rare Earths Ltd., as the
+                 Seller Representative (incorporated by reference to  Exhibit 2.1 of  USA Rare Earth, Inc.'s
+                 Current Report on Form 8-K filed with the SEC on April 20, 2026 (File No. 001-41711)).
+
+99.4          Amendment No. 1, dated July 16, 2026, to the Agreement and Plan of Merger, by and
+                 among USA Rare Earth, Inc.,  SVRE Holdings Ltd.,  Middlebury Merger Sub Ltd. and Serra
+                 Verde Rare Earths Ltd., as the Seller Representative (incorporated by reference to
+                 Exhibit 2.1 of  USA Rare Earth, Inc.'s Current Report on Form 8-K filed with the SEC on
+                 July 16, 2026 (File No. 001-41711)).
+
+99.5          Amendment No. 2, dated September 3, 2026, to the Agreement and Plan of Merger, by
+                 and among USA Rare Earth, Inc.,  SVRE Holdings Ltd.,  Middlebury Merger Sub Ltd. and
+                 Serra Verde Rare Earths Ltd., as the Seller Representative (incorporated by reference to
+                 Exhibit 2.3 of  USA Rare Earth, Inc.'s Current Report on Form 8-K filed with the SEC on
+                 September 4, 2026 (File No. 001-41711)).
+
+99.6          Registration Rights Agreement, dated September 3, 2026, by and among  USA Rare Earth,
+                 Inc., Serra Verde Rare Earths Ltd., as the Seller Representative, and certain SVRE Holdings
+                 Ltd. shareholders (incorporated by reference to  Exhibit 10.1 of  USA Rare Earth, Inc.'s
+                 Current Report on Form 8-K filed with the SEC on  September 4, 2026 (File No. 001-41711)).
+
+99.7          Form of Lock-Up Agreement, by and among USA Rare Earth, Inc. and certain
+                 SVRE Holdings Ltd. shareholders (incorporated by reference to Exhibit A to Annex A of
+                 USA Rare Earth, Inc.'s Definitive Proxy Statement filed with the SEC on July 24, 2026
+                 (File No. 001-41711)).
+
+99.8          Board Appointment Agreement, dated September 3, 2026, by and among USA Rare Earth,
+                 Inc. and  VB (Rare Earths) Limited (incorporated by reference to Exhibit 10.2 of  USA Rare
+                 Earth, Inc.'s Current Report on Form 8-K filed with the SEC on  September 4, 2026
+                 (File No. 001-41711)).</div></td></tr></table><br></div><div class="form1"><table role="presentation" id="signatureInfo"><tr><td width="8%" class="tableClassValignNoBorder">    SIGNATURE</td><td width="92%" class="tableClassNoBorder"> </td></tr><tr><td width="8%" class="tableClassNoBorderAlignCenter"> </td><td width="92%" class="tableClassNoBorder"><div class="information" style="text-align:justify">
+						After reasonable inquiry and to the best of my knowledge and belief, I certify that the information set forth in this statement is true, complete and correct.
+						<br><br></div></td></tr></table><table><tr class="tableClass"><td width="50%" class="tableClassNoBorder"> </td><td width="50%" class="tableClassNoBorder"><table><tr class="tableClass"><td width="100%" class="tableClassInnerNoBorderBlue"><div class="text">VB (Rare Earths) Ltd</div></td></tr></table></td></tr></table><table><tr class="tableClass"><td width="50%" class="tableClassNoBorder"> </td><td width="50%" class="tableClassNoBorder"><table><tr class="tableClass"><td width="8%" class="tableClassNoBorderAlignLeft signature">Signature:</td><td width="92%" class="tableClassNoBorderBlue signature">/s/ Harry Rouillard</td></tr><tr class="tableClass"><td width="8%" class="tableClassNoBorderAlignLeft signature">Name/Title:</td><td width="92%" class="tableClassNoBorderBlue signature">Harry Rouillard</td></tr><tr class="tableClass"><td width="8%" class="tableClassNoBorderAlignLeft signature">Date:</td><td width="92%" class="tableClassNoBorderBlue signature">09/11/2026</td></tr></table></td></tr></table><table><tr class="tableClass"><td width="50%" class="tableClassNoBorder"> </td><td width="50%" class="tableClassNoBorder"><table><tr class="tableClass"><td width="100%" class="tableClassInnerNoBorderBlue"><div class="text">Vision Blue Resources Ltd</div></td></tr></table></td></tr></table><table><tr class="tableClass"><td width="50%" class="tableClassNoBorder"> </td><td width="50%" class="tableClassNoBorder"><table><tr class="tableClass"><td width="8%" class="tableClassNoBorderAlignLeft signature">Signature:</td><td width="92%" class="tableClassNoBorderBlue signature">/s/ Sir Mick Davis</td></tr><tr class="tableClass"><td width="8%" class="tableClassNoBorderAlignLeft signature">Name/Title:</td><td width="92%" class="tableClassNoBorderBlue signature">Sir Mick Davis</td></tr><tr class="tableClass"><td width="8%" class="tableClassNoBorderAlignLeft signature">Date:</td><td width="92%" class="tableClassNoBorderBlue signature">09/11/2026</td></tr></table></td></tr></table></div></div>
+
+<script type="text/javascript"  src="/nd7kb9mCUV/CxBaQU/3fjA/Or5XcXrmfDVmcJ7G/QCEYaQ/DBMbKw/kWDyg"></script></body></html>

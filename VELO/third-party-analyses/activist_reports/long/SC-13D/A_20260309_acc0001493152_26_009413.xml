@@ -1,0 +1,464 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns:p="http://www.sec.gov/edgar/schedule13D" xmlns:p1="http://www.sec.gov/edgar/common"><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8"><link rel="stylesheet" type="text/css" href="/css/SDR_print.css"><style type="text/css">
+					.fakeTextBox {
+					border-top: 2px solid #999;
+					border-right: 1px solid #ccc;
+					border-bottom: 1px solid #ccc;
+					border-left: 2px solid #999;
+					padding: 2px;
+					_width: 800px;
+					height: auto;
+					min-width: 200px;
+					min-height: 50px;
+					word-wrap: break-word;
+					font-size: 0.9em;
+					color: blue;
+					}
+					table.tableClass { border: solid black;
+					border-top-width: 1;
+					border-right-width: 1;
+					border-bottom-width: 1;
+					border-left-width: 1;
+					table-layout:fixed;
+					}
+					table.innerTableClass { border: solid black;
+					border-top-width: 0;
+					border-right-width: 0;
+					border-bottom-width: 0;
+					border-left-width: 0;
+					table-layout:fixed;
+					}
+					th.tableClassLeft { border: solid black;
+					border-top-width: 0px;
+					border-right-width: 0px;
+					border-bottom-width: 1px;
+					border-left-width: 1px;
+					padding: 2px;
+					}
+					th.tableClassRight { border: solid black;
+					border-top-width: 0px;
+					border-right-width: 1px;
+					border-bottom-width: 1px;
+					border-left-width: 0;
+					padding: 2px;
+					}
+					th.tableClass { border: solid black;
+					border-top-width: 0px;
+					border-right-width: 1px;
+					border-bottom-width: 1px;
+					border-left-width: 1px;
+					padding: 2px;
+					}
+					td.tableClassLeft { border: solid black;
+					border-top-width: 0px;
+					border-right-width: 0px;
+					border-bottom-width: 1px;
+					border-left-width: 1px;
+					font-size: 0.9em;
+					color: blue;
+					word-wrap: break-word;
+					}
+					td.tableClassRight { border: solid black;
+					border-top-width: 0px;
+					border-right-width: 1px;
+					border-bottom-width: 1px;
+					border-left-width: 0;
+					font-size: 0.9em;
+					color: blue;
+					word-wrap: break-word;
+					}
+					td.tableClass { border: solid black;
+					border-top-width: 0px;
+					border-right-width: 1px;
+					border-bottom-width: 1px;
+					border-left-width: 1px;
+					font-size: 0.9em;
+					font-weight:bold;
+					color: black;
+					word-wrap: break-word;
+					}
+					td.tableClassNoBorder { border: solid black;
+					border-top-width: 0px;
+					border-right-width: 0px;
+					border-bottom-width: 0px;
+					border-left-width: 0px;
+					font-size: 0.9em;
+					font-weight:bold;
+					color: black;
+					word-wrap: break-word;
+					}
+
+					td.tableClassNoBorderBlue { border: solid black;
+					border-top-width: 0px;
+					border-right-width: 0px;
+					border-bottom-width: 0px;
+					border-left-width: 0px;
+					font-size: 0.9em;
+					font-weight:bold;
+					color: blue;
+					word-wrap: break-word;
+					}
+
+					td.tableClassInnerNoBorderBlue { border: solid black;
+					border-top-width: 0px;
+					border-right-width: 0px;
+					border-bottom-width: 0px;
+					border-left-width: 0px;
+					font-size: 1.4em;
+					font-weight:bold;
+					color: blue;
+					word-wrap: break-word;
+					}
+
+					td.tableClassNoBorderAlignLeft { border: solid black;
+					border-top-width: 0px;
+					border-right-width: 0px;
+					border-bottom-width: 0px;
+					border-left-width: 0px;
+					font-size: 0.9em;
+					font-weight:bold;
+					text-align: left;
+					color: black;
+					word-wrap: break-word;
+					}
+
+					td.signature {
+					padding: 4px 8px;
+					}
+
+					td.tableClassInner { border: solid black;
+					border-top-width: 0px;
+					border-right-width: 1px;
+					border-bottom-width: 1px;
+					border-left-width: 1px;
+					font-size: 1em;
+					font-weight:bold;
+					color: black;
+					word-wrap: break-word;
+					}
+
+					td.tableClassValign { border: solid black;
+					border-top-width: 0px;
+					border-right-width: 1px;
+					border-bottom-width: 1px;
+					border-left-width: 1px;
+					font-size: 0.9em;
+					font-weight:bold;
+					color: black;
+					vertical-align: middle;
+					text-align: center;
+					word-wrap: break-word;
+					}
+
+					td.tableClassValignNoBorder { border: solid black;
+					border-top-width: 0px;
+					border-right-width: 0px;
+					border-bottom-width: 0px;
+					border-left-width: 0px;
+					font-size: 0.9em;
+					font-weight:bold;
+					color: black;
+					vertical-align: middle;
+					text-align: center;
+					word-wrap: break-word;
+					}
+
+					td.tableClassValignInner { border: solid black;
+					border-top-width: 0px;
+					border-right-width: 1px;
+					border-bottom-width: 1px;
+					border-left-width: 1px;
+					font-size: 1em;
+					font-weight:bold;
+					color: black;
+					vertical-align: middle;
+					text-align: center;
+					word-wrap: break-word;
+					}
+
+					td.innerTableClassRightValign { border: solid black;
+					border-top-width: 0px;
+					border-right-width: 1px;
+					border-bottom-width: 1px;
+					border-left-width: 0;
+					font-size: 1em;
+					font-weight:bold;
+					color: black;
+					vertical-align: middle;
+					text-align: center;
+					word-wrap: break-word;
+					}
+
+					td.innerTableClassRightValignBottomLess { border: solid black;
+					border-top-width: 0px;
+					border-right-width: 1px;
+					border-bottom-width: 0px;
+					border-left-width: 0;
+					font-size: 1em;
+					font-weight:bold;
+					color: black;
+					vertical-align: middle;
+					text-align: center;
+					word-wrap: break-word;
+					}
+
+					td.tableClassInnerLeft { border: solid black;
+					border-top-width: 0px;
+					border-right-width: 0px;
+					border-bottom-width: 1px;
+					border-left-width: 1px;
+					font-size: 1em;
+					font-weight:bold;
+					color: black;
+					word-wrap: break-word;
+					}
+
+					td.tableClassInnerLeftBottomLess { border: solid black;
+					border-top-width: 0px;
+					border-right-width: 0px;
+					border-bottom-width: 0px;
+					border-left-width: 1px;
+					font-size: 1em;
+					font-weight:bold;
+					color: black;
+					word-wrap: break-word;
+					}
+
+					td.tableClassNoBorderAlignCenter { border: solid black;
+					border-top-width: 0px;
+					border-right-width: 0px;
+					border-bottom-width: 0px;
+					border-left-width: 0px;
+					font-size: 0.9em;
+					font-weight:bold;
+					color: black;
+					text-align: center;
+					word-wrap: break-word;
+					}
+
+					tr.tableClass { border: solid black;
+					border-top-width: 1px;
+					border-right-width: 1px;
+					border-bottom-width: 1px;
+					border-left-width: 1px;
+					}
+					tr.tableClassWithBg { border: solid black;
+					border-top-width: 0;
+					border-right-width: 1;
+					border-bottom-width: 1;
+					border-left-width: 0;
+					background-color: #e0e0ff
+					}
+
+					tr.tableClassWithBgBlack { border: solid black;
+					border-top-width: 0;
+					border-right-width: 1;
+					border-bottom-width: 1;
+					border-left-width: 0;
+					background-color: #D3D3D3
+					}
+
+					hr.header {
+					position: relative;
+					top: 20px;
+					border: none;
+					height: 6px;
+					background: black;
+					margin-bottom: 10px;
+					}
+
+					hr.separatorThin {
+					position: relative;
+					top: 2px;
+					border: none;
+					height: 2px;
+					background: black;
+					margin-bottom: 2px;
+					}
+
+					hr.headerThin {
+					position: relative;
+					top: 10px;
+					border: none;
+					height: 2px;
+					background: black;
+					margin-bottom: 10px;
+					}
+
+					hr.separator {
+					position: relative;
+					top: 20px;
+					border: none;
+					height: 4px;
+					background: black;
+					margin-bottom: 5px;
+					}
+
+					div.text {
+					background-color: #ffffff;
+					color: blue;
+					font-size: 1em;
+					font-weight:normal;
+					text-align:justify;
+					}
+
+
+					div.information {
+					background-color: #ffffff;
+					color: black;
+					font-size: 1em;
+					font-weight:normal;
+					text-align:justify;
+					}
+
+					#scheader {
+					font-size: 0.9em;
+					border: 0px solid #404040;
+					border-spacing: 2px;
+					}
+
+					div.largetext {
+					background-color: #ffffff;
+					color: blue;
+					font-size: 1em;
+					font-weight:normal;
+					text-align:justify;
+					white-space: pre-wrap;
+					word-break: normal;
+					}
+
+				</style></head><body lang="en-US" text="#000000" bgcolor="#ffffff"><hr class="header"><br><hr class="headerThin"><div class="contentwrapper"><table role="presentation" id="scheader"><tr><td class="tableClassNoBorderAlignCenter" style="font-size:2em;">
+						SECURITIES AND EXCHANGE COMMISSION
+						<br>
+						Washington, D.C. 20549
+					</td></tr><tr><td class="tableClassNoBorderAlignCenter"><br><br><div style="font-size:1.5em;">
+									SCHEDULE 13D
+								</div><br><div style="font-size:1.2em;">
+							Under the Securities Exchange Act of 1934
+						</div><br><div class="information" style="text-align:center; font-weight:bold;">
+									(Amendment No. <span style="color:blue;">1</span>)
+								</div><br><br></td></tr><tr><td class="center"><div class="information" style="text-align:center; font-weight:bold; color:blue;">Velo3D, Inc.</div><div class="information" style="text-align:center; font-weight:bold;"><hr class="separatorThin">(Name of Issuer)</div><br><br></td></tr><tr><td class="center"><div class="information" style="text-align:center; font-weight:bold; color:blue;">common stock</div><div class="information" style="text-align:center; font-weight:bold;"><hr class="separatorThin">(Title of Class of Securities)</div><br><br></td></tr><tr><td class="center"><div class="information" style="text-align:center; font-weight:bold; color:blue;">92259N302</div><div class="information" style="text-align:center; font-weight:bold;"><hr class="separatorThin">(CUSIP Number)</div><br><br></td></tr><tr><td class="center"><div class="information" style="text-align:center; font-weight:bold; color:blue;">Arun Jeldi<br>c/o Arrayed Additive, Inc.,
+								6119 Guin Road<br>Indianapolis,
+								IN,
+								47254<br>(765) 299-3644</div><div class="information" style="text-align:center; font-weight:bold;"><hr class="separatorThin">(Name, Address and Telephone Number of Person Authorized to
+									Receive Notices and Communications)</div></td></tr><tr><td class="center"><div class="information" style="text-align:center; font-weight:bold; color:blue;">03/04/2026</div><div class="information" style="text-align:center; font-weight:bold;"><hr class="separatorThin">(Date of Event Which Requires Filing of This Statement)</div></td></tr></table><br><br><div class="information" style="text-align:justify">
+				If the filing person has previously filed a statement on Schedule 13G to report the acquisition that is the subject of this Schedule 13D, and is filing this schedule because of §§ 240.13d-1(e), 240.13d-1(f) or 240.13d-1(g), check the following box.
+				<img src="/Images/box-unchecked.jpg" alt="Checkbox not checked"></div><br><div class="information" style="text-align:justify">
+				The information required on the remainder of this cover page shall not be deemed to be “filed” for the purpose of Section 18 of the
+				Securities Exchange Act of 1934 (“Act”) or otherwise subject to the liabilities of that section of the Act but shall be subject to all other
+				provisions of the Act (however, see the Notes).
+			</div></div><hr class="headerThin"><hr class="header"><br><br>
+  <div class="content"><div class="form1"></div></div>
+  <div class="content"><div class="form1"><table><tr><td class="center"><br><br><p><div align="center" style="font-size:1.2em;">
+									SCHEDULE 13D
+								</div></p></td></tr></table><table role="presentation" class="tableClass" id="cusipNumber"><tr class="tableClass"><td width="25%" style="font-weight:bold;">CUSIP No.</td><td width="75%"><div style="font-size:.9em; color:#000000">92259N302</div></td></tr></table><br><br><table role="presentation" class="tableClass" id="reportingPersonDetails"><tr class="tableClass"><td width="8%" class="tableClassValign">1</td><td width="92%" class="tableClass">
+					Name of reporting person
+					<br><br><div class="text">Arun Jeldi</div></td></tr><tr><td width="8%" class="tableClassValign">2</td><td width="92%" class="tableClass">Check the appropriate box if a member of a Group (See Instructions)
+					<br><br><div class="text"><img src="/Images/box-unchecked.jpg" alt="Checkbox not checked">  (a)
+						<br><img src="/Images/box-unchecked.jpg" alt="Checkbox not checked">  (b)
+					</div></td></tr><tr class="tableClassWithBgBlack"><td width="8%" class="tableClassValign">3</td><td width="92%" class="tableClass">SEC use only</td></tr><tr><td width="8%" class="tableClassValign">4</td><td width="92%" class="tableClass">
+					Source of funds (See Instructions)
+					<br><br><div class="text">OO</div></td></tr><tr><td width="8%" class="tableClassValign">5</td><td width="92%" class="tableClass">
+					Check if disclosure of legal proceedings is required pursuant to Items 2(d) or 2(e)
+					<br><br><img src="/Images/box-unchecked.jpg" alt="Checkbox not checked"></td></tr><tr><td width="8%" class="tableClassValign">6</td><td width="92%" class="tableClass">Citizenship or place of organization
+					<br><br><div class="text">
+				UNITED STATES
+			</div></td></tr><tr><td width="8%" class="tableClassValign">Number of Shares Beneficially Owned by Each Reporting Person With:</td><td width="92%" class="tableClass"><table class="innerTableClass"><tr><td width="8%" class="innerTableClassRightValign">7</td><td width="92%" class="tableClassInnerLeft">Sole Voting Power
+								<br><br><div class="text">12,583.00</div></td></tr><tr><td width="8%" class="innerTableClassRightValign">8</td><td width="92%" class="tableClassInnerLeft">Shared Voting Power
+								<br><br><div class="text">12,737,940.00</div></td></tr><tr><td width="8%" class="innerTableClassRightValign">9</td><td width="92%" class="tableClassInnerLeft">Sole Dispositive Power
+								<br><br><div class="text">12,583.00</div></td></tr><tr><td width="8%" class="innerTableClassRightValignBottomLess">10</td><td width="92%" class="tableClassInnerLeftBottomLess">Shared Dispositive Power
+								<br><br><div class="text">12,737,940.00</div></td></tr></table></td></tr><tr><td width="8%" class="tableClassValign">11</td><td width="92%" class="tableClass">Aggregate amount beneficially owned by each reporting person
+					<br><br><div class="text">12,750,523.00</div></td></tr><tr><td width="8%" class="tableClassValign">12</td><td width="92%" class="tableClass">Check if the aggregate amount in Row (11) excludes certain shares (See Instructions)
+					<br><br><img src="/Images/box-unchecked.jpg" alt="Checkbox not checked"></td></tr><tr><td width="8%" class="tableClassValign">13</td><td width="92%" class="tableClass">Percent of class represented by amount in Row (11)
+					<br><br><div class="text">48.6 % </div></td></tr><tr><td width="8%" class="tableClassValign">14</td><td width="92%" class="tableClass">Type of Reporting Person (See Instructions)
+					<br><br><div class="text">IN</div></td></tr></table><br><div style="display: flex;"><div style="font-size: 0.9em; font-weight: bold; margin-right: 5px;">
+					Comment for Type of Reporting Person:
+				</div><div class="largetext" style="text-align:justify">(1) Consists of 12,737,940 shares of common stock held directly by Arrayed Notes Acquisition Corp. Arrayed Notes Acquisition Corp. is a wholly-owned subsidiary of Arrayed Additive, Inc. Arun Jeldi is the Chief Executive Officer and President and the sole equityholder of Arrayed Additive, Inc. and is the Chief Executive Officer of Arrayed Notes Acquisition Corp.
+
+(2) Based on 26,216,822 shares of common stock outstanding on March 4, 2026.</div></div><table><tr><td class="center"><br><br><p><div align="center" style="font-size:1.2em;">
+									SCHEDULE 13D
+								</div></p></td></tr></table><table role="presentation" class="tableClass" id="cusipNumber"><tr class="tableClass"><td width="25%" style="font-weight:bold;">CUSIP No.</td><td width="75%"><div style="font-size:.9em; color:#000000">92259N302</div></td></tr></table><br><br><table role="presentation" class="tableClass" id="reportingPersonDetails"><tr class="tableClass"><td width="8%" class="tableClassValign">1</td><td width="92%" class="tableClass">
+					Name of reporting person
+					<br><br><div class="text">Arrayed Notes Acquisition Corp.</div></td></tr><tr><td width="8%" class="tableClassValign">2</td><td width="92%" class="tableClass">Check the appropriate box if a member of a Group (See Instructions)
+					<br><br><div class="text"><img src="/Images/box-unchecked.jpg" alt="Checkbox not checked">  (a)
+						<br><img src="/Images/box-unchecked.jpg" alt="Checkbox not checked">  (b)
+					</div></td></tr><tr class="tableClassWithBgBlack"><td width="8%" class="tableClassValign">3</td><td width="92%" class="tableClass">SEC use only</td></tr><tr><td width="8%" class="tableClassValign">4</td><td width="92%" class="tableClass">
+					Source of funds (See Instructions)
+					<br><br><div class="text">OO</div></td></tr><tr><td width="8%" class="tableClassValign">5</td><td width="92%" class="tableClass">
+					Check if disclosure of legal proceedings is required pursuant to Items 2(d) or 2(e)
+					<br><br><img src="/Images/box-unchecked.jpg" alt="Checkbox not checked"></td></tr><tr><td width="8%" class="tableClassValign">6</td><td width="92%" class="tableClass">Citizenship or place of organization
+					<br><br><div class="text">
+				DELAWARE
+			</div></td></tr><tr><td width="8%" class="tableClassValign">Number of Shares Beneficially Owned by Each Reporting Person With:</td><td width="92%" class="tableClass"><table class="innerTableClass"><tr><td width="8%" class="innerTableClassRightValign">7</td><td width="92%" class="tableClassInnerLeft">Sole Voting Power
+								<br><br><div class="text">0.00</div></td></tr><tr><td width="8%" class="innerTableClassRightValign">8</td><td width="92%" class="tableClassInnerLeft">Shared Voting Power
+								<br><br><div class="text">12,737,940.00</div></td></tr><tr><td width="8%" class="innerTableClassRightValign">9</td><td width="92%" class="tableClassInnerLeft">Sole Dispositive Power
+								<br><br><div class="text">0.00</div></td></tr><tr><td width="8%" class="innerTableClassRightValignBottomLess">10</td><td width="92%" class="tableClassInnerLeftBottomLess">Shared Dispositive Power
+								<br><br><div class="text">12,737,940.00</div></td></tr></table></td></tr><tr><td width="8%" class="tableClassValign">11</td><td width="92%" class="tableClass">Aggregate amount beneficially owned by each reporting person
+					<br><br><div class="text">12,737,940.00</div></td></tr><tr><td width="8%" class="tableClassValign">12</td><td width="92%" class="tableClass">Check if the aggregate amount in Row (11) excludes certain shares (See Instructions)
+					<br><br><img src="/Images/box-unchecked.jpg" alt="Checkbox not checked"></td></tr><tr><td width="8%" class="tableClassValign">13</td><td width="92%" class="tableClass">Percent of class represented by amount in Row (11)
+					<br><br><div class="text">48.6 % </div></td></tr><tr><td width="8%" class="tableClassValign">14</td><td width="92%" class="tableClass">Type of Reporting Person (See Instructions)
+					<br><br><div class="text">CO</div></td></tr></table><br><div style="display: flex;"><div style="font-size: 0.9em; font-weight: bold; margin-right: 5px;">
+					Comment for Type of Reporting Person:
+				</div><div class="largetext" style="text-align:justify">(1) Consists of 12,737,940 shares of common stock held directly by Arrayed Notes Acquisition Corp. Arrayed Notes Acquisition Corp. is a wholly-owned subsidiary of Arrayed Additive, Inc. Arun Jeldi is the Chief Executive Officer and President and the sole equityholder of Arrayed Additive, Inc. and is the Chief Executive Officer of Arrayed Notes Acquisition Corp.
+
+(2) Based on 26,216,822 shares of common stock outstanding on March 4, 2026.</div></div><table><tr><td class="center"><br><br><p><div align="center" style="font-size:1.2em;">
+									SCHEDULE 13D
+								</div></p></td></tr></table><table role="presentation" class="tableClass" id="cusipNumber"><tr class="tableClass"><td width="25%" style="font-weight:bold;">CUSIP No.</td><td width="75%"><div style="font-size:.9em; color:#000000">92259N302</div></td></tr></table><br><br><table role="presentation" class="tableClass" id="reportingPersonDetails"><tr class="tableClass"><td width="8%" class="tableClassValign">1</td><td width="92%" class="tableClass">
+					Name of reporting person
+					<br><br><div class="text">Arrayed Additive, Inc.</div></td></tr><tr><td width="8%" class="tableClassValign">2</td><td width="92%" class="tableClass">Check the appropriate box if a member of a Group (See Instructions)
+					<br><br><div class="text"><img src="/Images/box-unchecked.jpg" alt="Checkbox not checked">  (a)
+						<br><img src="/Images/box-unchecked.jpg" alt="Checkbox not checked">  (b)
+					</div></td></tr><tr class="tableClassWithBgBlack"><td width="8%" class="tableClassValign">3</td><td width="92%" class="tableClass">SEC use only</td></tr><tr><td width="8%" class="tableClassValign">4</td><td width="92%" class="tableClass">
+					Source of funds (See Instructions)
+					<br><br><div class="text">OO</div></td></tr><tr><td width="8%" class="tableClassValign">5</td><td width="92%" class="tableClass">
+					Check if disclosure of legal proceedings is required pursuant to Items 2(d) or 2(e)
+					<br><br><img src="/Images/box-unchecked.jpg" alt="Checkbox not checked"></td></tr><tr><td width="8%" class="tableClassValign">6</td><td width="92%" class="tableClass">Citizenship or place of organization
+					<br><br><div class="text">
+				INDIANA
+			</div></td></tr><tr><td width="8%" class="tableClassValign">Number of Shares Beneficially Owned by Each Reporting Person With:</td><td width="92%" class="tableClass"><table class="innerTableClass"><tr><td width="8%" class="innerTableClassRightValign">7</td><td width="92%" class="tableClassInnerLeft">Sole Voting Power
+								<br><br><div class="text">0.00</div></td></tr><tr><td width="8%" class="innerTableClassRightValign">8</td><td width="92%" class="tableClassInnerLeft">Shared Voting Power
+								<br><br><div class="text">12,737,940.00</div></td></tr><tr><td width="8%" class="innerTableClassRightValign">9</td><td width="92%" class="tableClassInnerLeft">Sole Dispositive Power
+								<br><br><div class="text">0.00</div></td></tr><tr><td width="8%" class="innerTableClassRightValignBottomLess">10</td><td width="92%" class="tableClassInnerLeftBottomLess">Shared Dispositive Power
+								<br><br><div class="text">12,737,940.00</div></td></tr></table></td></tr><tr><td width="8%" class="tableClassValign">11</td><td width="92%" class="tableClass">Aggregate amount beneficially owned by each reporting person
+					<br><br><div class="text">12,737,940.00</div></td></tr><tr><td width="8%" class="tableClassValign">12</td><td width="92%" class="tableClass">Check if the aggregate amount in Row (11) excludes certain shares (See Instructions)
+					<br><br><img src="/Images/box-unchecked.jpg" alt="Checkbox not checked"></td></tr><tr><td width="8%" class="tableClassValign">13</td><td width="92%" class="tableClass">Percent of class represented by amount in Row (11)
+					<br><br><div class="text">48.6 % </div></td></tr><tr><td width="8%" class="tableClassValign">14</td><td width="92%" class="tableClass">Type of Reporting Person (See Instructions)
+					<br><br><div class="text">CO</div></td></tr></table><br><div style="display: flex;"><div style="font-size: 0.9em; font-weight: bold; margin-right: 5px;">
+					Comment for Type of Reporting Person:
+				</div><div class="largetext" style="text-align:justify">(1) Consists of 12,737,940 shares of common stock held directly by Arrayed Notes Acquisition Corp. Arrayed Notes Acquisition Corp. is a wholly-owned subsidiary of Arrayed Additive, Inc. Arun Jeldi is the Chief Executive Officer and President and the sole equityholder of Arrayed Additive, Inc. and is the Chief Executive Officer of Arrayed Notes Acquisition Corp.
+
+(2) Based on 26,216,822 shares of common stock outstanding on March 4, 2026.</div></div></div><div class="form1"><table><tr><td class="center"><br><br><p><div align="center" style="font-size:1.2em;">
+									SCHEDULE 13D
+								</div></p></td></tr></table><table role="presentation" id="item1to7"><tr><td width="8%" class="tableClassValignNoBorder">Item 1.</td><td width="92%" class="tableClassNoBorder">Security and Issuer</td></tr><tr class="tableClass"><td width="8%" class="tableClassNoBorderAlignCenter">(a)</td><td width="92%" class="tableClassNoBorder">Title of Class of Securities:
+							<br><br><div class="text">common stock</div></td></tr><tr class="tableClass"><td width="8%" class="tableClassNoBorderAlignCenter">(b)</td><td width="92%" class="tableClassNoBorder">Name of Issuer:
+							<br><br><div class="text">Velo3D, Inc.</div></td></tr><tr><td width="8%" class="tableClassNoBorderAlignCenter">(c)</td><td width="92%" class="tableClassNoBorder">Address of Issuer's Principal Executive Offices:
+							<br><br><div class="text">2710 Lakeview Court, Fremont, 
+				CALIFORNIA
+			, 94538.</div></td></tr><tr><td width="8%" class="tableClassValignNoBorder">Item 3.</td><td width="92%" class="tableClassNoBorder">Source and Amount of Funds or Other Consideration</td></tr><tr><td width="8%" class="tableClassNoBorderAlignCenter"> </td><td width="92%" class="tableClassNoBorder"><div class="largetext">Item 3 of the Schedule 13D is hereby supplemented by the following:
+
+On February 12, 2025, Mr. Jeldi was granted an award (the "Award") of 50,329 restricted stock units ("RSUs") (as adjusted to give effect to the Issuer's 1-for-15 reverse stock split, which was effective July 28, 2025). Each RSU represents a contingent right to receive one share of the Issuer's common stock upon settlement for no consideration. On February 15, 2026, 12,583 RSUs granted in the Award vested. The remaining 37,746 RSUs in the Award will vest in equal quarterly installments over the next three years on Feb 15, May 15, August 15, and November 15, subject to Mr. Jeldi's continued service to the Issuer on each vesting date.
+
+On March 4, 2026, Holder entered into a Convertible Promissory Note Transfer Agreement between Thieneman Properties, LLC, as transferor ("Thieneman Properties"), and Holder, as transferee, pursuant to which Thieneman Properties transferred to Holder (the "Transfer") a Senior Secured Convertible Promissory Note dated January 7, 2025 issued by Issuer in the principal amount of $5,000,000 (as amended on August 14, 2025 and March 4, 2026, the "January Note") for an aggregate purchase price of $6,390,707.73. On March 4, 2026, immediately after the Transfer was completed, the Holder delivered a Notice of Conversion to the Issuer for the conversion of $5,000,000 of principal amount of the Senior Secured Convertible Promissory Note dated January 7, 2025, together with accrued and unpaid interest thereon, into 394,517 shares of the Issuer's common stock, pursuant to the terms of the January Note.</div></td></tr><tr><td width="8%" class="tableClassValignNoBorder">Item 4.</td><td width="92%" class="tableClassNoBorder">Purpose of Transaction</td></tr><tr><td width="8%" class="tableClassNoBorderAlignCenter"> </td><td width="92%" class="tableClassNoBorder"><div class="largetext">Item 4 of the Schedule 13D is hereby amended and restated as follows:
+
+The information set forth in Item 3 of this Schedule 13D is incorporated by reference in its entirety into this Item 4. As of the date hereof, the Reporting Persons do not have a plan or proposal that relates to or would result in any of the transactions enumerated in sub items (a) through (j) of the instructions to Item 4 of this Schedule 13D, except as follows:
+
+(a) Mr. Jeldi may receive additional securities of the Issuer in connection with his compensation program. Mr. Jeldi holds certain RSUs of the Issuer, which each represents a contingent right to receive one share of the Issuer's common stock upon settlement for no consideration, subject to vesting and Mr. Jeldi's continued service to the Issuer on each vesting date.
+
+Additionally, pursuant to the Issuer's registration statement on Form S-3 (File No. 333-292698) filed with the Securities and Exchange Commission on January 13, 2026, Holder may sell up to an aggregate of 3,098,438 shares of common stock (the "Resale Shares"). The Holder may offer, sell or distribute all or a portion of its Resale Shares from time to time directly or indirectly through one or more underwriters, broker-dealers or agents, and in one or more public or private transactions, which may involve crosses or block transactions. The Resale Shares may be sold in one or more transactions at fixed prices, at prevailing market prices at the time of the sale or at negotiated prices.
+
+(g) The Holder may request that the Issuer  call a meeting of stockholders to amend the Issuer's charter to permit (i) action by written consent of holders of outstanding capital stock having not less than the minimum number of votes that would be necessary to authorize or take such action at a meeting at which all shares entitled to vote thereon were present and voted and (ii) removal of directors with or without cause, and the filling of vacancies on the board of directors, by holders of a majority of the voting power of the shares of stock issued and outstanding and entitled to vote.
+
+Notwithstanding the foregoing, the Reporting Persons reserve the right to effect any other such actions as any of them may deem necessary or appropriate in the future.
+
+Mr. Jeldi is a member of the board of directors and the Chief Executive Officer of the Issuer. As the Chief Executive Officer and a director of the Issuer, Mr. Jeldi may have influence over the corporate activities of the Issuer, including activities that may relate to the events described in clauses (a) through (j) of Item 4 of Schedule 13D.</div></td></tr><tr><td width="8%" class="tableClassValignNoBorder">Item 5.</td><td width="92%" class="tableClassNoBorder">Interest in Securities of the Issuer</td></tr><tr><td width="8%" class="tableClassNoBorderAlignCenter">(a)</td><td width="92%" class="tableClassNoBorder"><div class="largetext">The aggregate number and percentage of outstanding shares of common stock that may be deemed to be beneficially owned by each Reporting Person are set forth on row 11 and row 13 of such Reporting Person's cover page of this Schedule 13D and are incorporated herein by reference. Such percentage was calculated based on 26,216,822 shares of common stock outstanding on March 4, 2026.
+
+The Holder is the record owner of 12,737,940 shares of common stock of the Issuer (the "Holder Shares"), and Mr. Jeldi is the record owner of 12,583 shares of common stock of the Issuer. As the sole equityholder of Holder, Arrayed may be deemed to beneficially own the Holder Shares. Mr. Jeldi is the Chief Executive Officer and sole equityholder of Arrayed, and therefore, Mr. Jeldi may be deemed to beneficially own the Holder Shares.</div></td></tr><tr><td width="8%" class="tableClassNoBorderAlignCenter">(b)</td><td width="92%" class="tableClassNoBorder"><div class="largetext">For each Reporting Person, the aggregate number of shares as to which there is sole power to vote or to direct the vote, shared power to vote or to direct the vote, sole power to dispose or to direct the disposition, or shared power to dispose or to direct the disposition are set forth on rows 7 through 10 of the cover pages of this Schedule 13D and are incorporated herein by reference.
+
+Holder is a wholly owned subsidiary of Arrayed. Mr. Jeldi is the Chief Executive Officer and President and the sole equityholder of Arrayed and is the Chief Executive Officer of Holder. As the sole equityholder of Holder, Arrayed may be deemed to beneficially own the Holder Shares. Mr. Jeldi is the Chief Executive Officer and sole equityholder of Arrayed, and therefore, Mr. Jeldi may be deemed to beneficially own the Holder Shares.</div></td></tr><tr><td width="8%" class="tableClassNoBorderAlignCenter">(c)</td><td width="92%" class="tableClassNoBorder"><div class="largetext">On February 12, 2025, Mr. Jeldi was granted an award (the "Award") of 50,329 restricted stock units ("RSUs") (as adjusted to give effect to the Issuer's 1-for-15 reverse stock split, which was effective July 28, 2025). Each RSU represents a contingent right to receive one share of the Issuer's common stock upon settlement for no consideration. On February 15, 2026, 12,583 RSUs granted in the Award vested. The remaining 37,746 RSUs in the Award will vest in equal quarterly installments over the next three years on Feb 15, May 15, August 15, and November 15, subject to Mr. Jeldi's continued service to the Issuer on each vesting date.
+
+On March 4, 2026, Holder entered into a Convertible Promissory Note Transfer Agreement between Thieneman Properties, LLC, as transferor ("Thieneman Properties"), and Holder, as transferee, pursuant to which Thieneman Properties transferred to Holder (the "Transfer") a Senior Secured Convertible Promissory Note dated January 7, 2025 issued by Issuer in the principal amount of $5,000,000 (as amended on August 14, 2025 and March 4, 2026, the "January Note") for an aggregate purchase price of $6,390,707.73. On March 4, 2026, immediately after the Transfer was completed, the Holder delivered a Notice of Conversion to the Issuer for the conversion of $5,000,000 of principal amount of the Senior Secured Convertible Promissory Note dated January 7, 2025, together with accrued and unpaid interest thereon, into 394,517 shares of the Issuer's common stock, pursuant to the terms of the January Note.</div></td></tr><tr><td width="8%" class="tableClassNoBorderAlignCenter">(d)</td><td width="92%" class="tableClassNoBorder"><div class="largetext">Not applicable.</div></td></tr><tr><td width="8%" class="tableClassNoBorderAlignCenter">(e)</td><td width="92%" class="tableClassNoBorder"><div class="largetext">Not applicable.</div></td></tr><tr><td width="8%" class="tableClassValignNoBorder">Item 6.</td><td width="92%" class="tableClassNoBorder">Contracts, Arrangements, Understandings or Relationships With Respect to Securities of the Issuer</td></tr><tr><td width="8%" class="tableClassNoBorderAlignCenter"> </td><td width="92%" class="tableClassNoBorder"><div class="largetext">Item 6 of the Schedule 13D is hereby supplemented by the following:
+
+The information set forth in Item 3, 4 and 5 of this Schedule 13D is incorporated by reference into this Item 6.</div></td></tr></table><br></div><div class="form1"><table role="presentation" id="signatureInfo"><tr><td width="8%" class="tableClassValignNoBorder">    SIGNATURE</td><td width="92%" class="tableClassNoBorder"> </td></tr><tr><td width="8%" class="tableClassNoBorderAlignCenter"> </td><td width="92%" class="tableClassNoBorder"><div class="information" style="text-align:justify">
+						After reasonable inquiry and to the best of my knowledge and belief, I certify that the information set forth in this statement is true, complete and correct.
+						<br><br></div></td></tr></table><table><tr class="tableClass"><td width="50%" class="tableClassNoBorder"> </td><td width="50%" class="tableClassNoBorder"><table><tr class="tableClass"><td width="100%" class="tableClassInnerNoBorderBlue"><div class="text">Arun Jeldi</div></td></tr></table></td></tr></table><table><tr class="tableClass"><td width="50%" class="tableClassNoBorder"> </td><td width="50%" class="tableClassNoBorder"><table><tr class="tableClass"><td width="8%" class="tableClassNoBorderAlignLeft signature">Signature:</td><td width="92%" class="tableClassNoBorderBlue signature">/s/ Arun Jeldi</td></tr><tr class="tableClass"><td width="8%" class="tableClassNoBorderAlignLeft signature">Name/Title:</td><td width="92%" class="tableClassNoBorderBlue signature">Arun Jeldi</td></tr><tr class="tableClass"><td width="8%" class="tableClassNoBorderAlignLeft signature">Date:</td><td width="92%" class="tableClassNoBorderBlue signature">03/09/2026</td></tr></table></td></tr></table><table><tr class="tableClass"><td width="50%" class="tableClassNoBorder"> </td><td width="50%" class="tableClassNoBorder"><table><tr class="tableClass"><td width="100%" class="tableClassInnerNoBorderBlue"><div class="text">Arrayed Notes Acquisition Corp.</div></td></tr></table></td></tr></table><table><tr class="tableClass"><td width="50%" class="tableClassNoBorder"> </td><td width="50%" class="tableClassNoBorder"><table><tr class="tableClass"><td width="8%" class="tableClassNoBorderAlignLeft signature">Signature:</td><td width="92%" class="tableClassNoBorderBlue signature">/s/ Arun Jeldi</td></tr><tr class="tableClass"><td width="8%" class="tableClassNoBorderAlignLeft signature">Name/Title:</td><td width="92%" class="tableClassNoBorderBlue signature">Arun Jeldi, Chief Executive Officer</td></tr><tr class="tableClass"><td width="8%" class="tableClassNoBorderAlignLeft signature">Date:</td><td width="92%" class="tableClassNoBorderBlue signature">03/09/2026</td></tr></table></td></tr></table><table><tr class="tableClass"><td width="50%" class="tableClassNoBorder"> </td><td width="50%" class="tableClassNoBorder"><table><tr class="tableClass"><td width="100%" class="tableClassInnerNoBorderBlue"><div class="text">Arrayed Additive, Inc.</div></td></tr></table></td></tr></table><table><tr class="tableClass"><td width="50%" class="tableClassNoBorder"> </td><td width="50%" class="tableClassNoBorder"><table><tr class="tableClass"><td width="8%" class="tableClassNoBorderAlignLeft signature">Signature:</td><td width="92%" class="tableClassNoBorderBlue signature">/s/ Arun Jeldi</td></tr><tr class="tableClass"><td width="8%" class="tableClassNoBorderAlignLeft signature">Name/Title:</td><td width="92%" class="tableClassNoBorderBlue signature">Arun Jeldi, Chief Executive Officer</td></tr><tr class="tableClass"><td width="8%" class="tableClassNoBorderAlignLeft signature">Date:</td><td width="92%" class="tableClassNoBorderBlue signature">03/09/2026</td></tr></table></td></tr></table></div></div>
+<script type="text/javascript"  src="/nd7kb9mCUV/CxBaQU/3fjA/Or5XcXrmfDVmcJ7G/QCEYaQ/DBMbKw/kWDyg"></script></body></html>

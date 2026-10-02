@@ -1,0 +1,426 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns:p="http://www.sec.gov/edgar/schedule13D" xmlns:p1="http://www.sec.gov/edgar/common"><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8"><link rel="stylesheet" type="text/css" href="/css/SDR_print.css"><style type="text/css">
+					.fakeTextBox {
+					border-top: 2px solid #999;
+					border-right: 1px solid #ccc;
+					border-bottom: 1px solid #ccc;
+					border-left: 2px solid #999;
+					padding: 2px;
+					_width: 800px;
+					height: auto;
+					min-width: 200px;
+					min-height: 50px;
+					word-wrap: break-word;
+					font-size: 0.9em;
+					color: blue;
+					}
+					table.tableClass { border: solid black;
+					border-top-width: 1;
+					border-right-width: 1;
+					border-bottom-width: 1;
+					border-left-width: 1;
+					table-layout:fixed;
+					}
+					table.innerTableClass { border: solid black;
+					border-top-width: 0;
+					border-right-width: 0;
+					border-bottom-width: 0;
+					border-left-width: 0;
+					table-layout:fixed;
+					}
+					th.tableClassLeft { border: solid black;
+					border-top-width: 0px;
+					border-right-width: 0px;
+					border-bottom-width: 1px;
+					border-left-width: 1px;
+					padding: 2px;
+					}
+					th.tableClassRight { border: solid black;
+					border-top-width: 0px;
+					border-right-width: 1px;
+					border-bottom-width: 1px;
+					border-left-width: 0;
+					padding: 2px;
+					}
+					th.tableClass { border: solid black;
+					border-top-width: 0px;
+					border-right-width: 1px;
+					border-bottom-width: 1px;
+					border-left-width: 1px;
+					padding: 2px;
+					}
+					td.tableClassLeft { border: solid black;
+					border-top-width: 0px;
+					border-right-width: 0px;
+					border-bottom-width: 1px;
+					border-left-width: 1px;
+					font-size: 0.9em;
+					color: blue;
+					word-wrap: break-word;
+					}
+					td.tableClassRight { border: solid black;
+					border-top-width: 0px;
+					border-right-width: 1px;
+					border-bottom-width: 1px;
+					border-left-width: 0;
+					font-size: 0.9em;
+					color: blue;
+					word-wrap: break-word;
+					}
+					td.tableClass { border: solid black;
+					border-top-width: 0px;
+					border-right-width: 1px;
+					border-bottom-width: 1px;
+					border-left-width: 1px;
+					font-size: 0.9em;
+					font-weight:bold;
+					color: black;
+					word-wrap: break-word;
+					}
+					td.tableClassNoBorder { border: solid black;
+					border-top-width: 0px;
+					border-right-width: 0px;
+					border-bottom-width: 0px;
+					border-left-width: 0px;
+					font-size: 0.9em;
+					font-weight:bold;
+					color: black;
+					word-wrap: break-word;
+					}
+
+					td.tableClassNoBorderBlue { border: solid black;
+					border-top-width: 0px;
+					border-right-width: 0px;
+					border-bottom-width: 0px;
+					border-left-width: 0px;
+					font-size: 0.9em;
+					font-weight:bold;
+					color: blue;
+					word-wrap: break-word;
+					}
+
+					td.tableClassInnerNoBorderBlue { border: solid black;
+					border-top-width: 0px;
+					border-right-width: 0px;
+					border-bottom-width: 0px;
+					border-left-width: 0px;
+					font-size: 1.4em;
+					font-weight:bold;
+					color: blue;
+					word-wrap: break-word;
+					}
+
+					td.tableClassNoBorderAlignLeft { border: solid black;
+					border-top-width: 0px;
+					border-right-width: 0px;
+					border-bottom-width: 0px;
+					border-left-width: 0px;
+					font-size: 0.9em;
+					font-weight:bold;
+					text-align: left;
+					color: black;
+					word-wrap: break-word;
+					}
+
+					td.signature {
+					padding: 4px 8px;
+					}
+
+					td.tableClassInner { border: solid black;
+					border-top-width: 0px;
+					border-right-width: 1px;
+					border-bottom-width: 1px;
+					border-left-width: 1px;
+					font-size: 1em;
+					font-weight:bold;
+					color: black;
+					word-wrap: break-word;
+					}
+
+					td.tableClassValign { border: solid black;
+					border-top-width: 0px;
+					border-right-width: 1px;
+					border-bottom-width: 1px;
+					border-left-width: 1px;
+					font-size: 0.9em;
+					font-weight:bold;
+					color: black;
+					vertical-align: middle;
+					text-align: center;
+					word-wrap: break-word;
+					}
+
+					td.tableClassValignNoBorder { border: solid black;
+					border-top-width: 0px;
+					border-right-width: 0px;
+					border-bottom-width: 0px;
+					border-left-width: 0px;
+					font-size: 0.9em;
+					font-weight:bold;
+					color: black;
+					vertical-align: middle;
+					text-align: center;
+					word-wrap: break-word;
+					}
+
+					td.tableClassValignInner { border: solid black;
+					border-top-width: 0px;
+					border-right-width: 1px;
+					border-bottom-width: 1px;
+					border-left-width: 1px;
+					font-size: 1em;
+					font-weight:bold;
+					color: black;
+					vertical-align: middle;
+					text-align: center;
+					word-wrap: break-word;
+					}
+
+					td.innerTableClassRightValign { border: solid black;
+					border-top-width: 0px;
+					border-right-width: 1px;
+					border-bottom-width: 1px;
+					border-left-width: 0;
+					font-size: 1em;
+					font-weight:bold;
+					color: black;
+					vertical-align: middle;
+					text-align: center;
+					word-wrap: break-word;
+					}
+
+					td.innerTableClassRightValignBottomLess { border: solid black;
+					border-top-width: 0px;
+					border-right-width: 1px;
+					border-bottom-width: 0px;
+					border-left-width: 0;
+					font-size: 1em;
+					font-weight:bold;
+					color: black;
+					vertical-align: middle;
+					text-align: center;
+					word-wrap: break-word;
+					}
+
+					td.tableClassInnerLeft { border: solid black;
+					border-top-width: 0px;
+					border-right-width: 0px;
+					border-bottom-width: 1px;
+					border-left-width: 1px;
+					font-size: 1em;
+					font-weight:bold;
+					color: black;
+					word-wrap: break-word;
+					}
+
+					td.tableClassInnerLeftBottomLess { border: solid black;
+					border-top-width: 0px;
+					border-right-width: 0px;
+					border-bottom-width: 0px;
+					border-left-width: 1px;
+					font-size: 1em;
+					font-weight:bold;
+					color: black;
+					word-wrap: break-word;
+					}
+
+					td.tableClassNoBorderAlignCenter { border: solid black;
+					border-top-width: 0px;
+					border-right-width: 0px;
+					border-bottom-width: 0px;
+					border-left-width: 0px;
+					font-size: 0.9em;
+					font-weight:bold;
+					color: black;
+					text-align: center;
+					word-wrap: break-word;
+					}
+
+					tr.tableClass { border: solid black;
+					border-top-width: 1px;
+					border-right-width: 1px;
+					border-bottom-width: 1px;
+					border-left-width: 1px;
+					}
+					tr.tableClassWithBg { border: solid black;
+					border-top-width: 0;
+					border-right-width: 1;
+					border-bottom-width: 1;
+					border-left-width: 0;
+					background-color: #e0e0ff
+					}
+
+					tr.tableClassWithBgBlack { border: solid black;
+					border-top-width: 0;
+					border-right-width: 1;
+					border-bottom-width: 1;
+					border-left-width: 0;
+					background-color: #D3D3D3
+					}
+
+					hr.header {
+					position: relative;
+					top: 20px;
+					border: none;
+					height: 6px;
+					background: black;
+					margin-bottom: 10px;
+					}
+
+					hr.separatorThin {
+					position: relative;
+					top: 2px;
+					border: none;
+					height: 2px;
+					background: black;
+					margin-bottom: 2px;
+					}
+
+					hr.headerThin {
+					position: relative;
+					top: 10px;
+					border: none;
+					height: 2px;
+					background: black;
+					margin-bottom: 10px;
+					}
+
+					hr.separator {
+					position: relative;
+					top: 20px;
+					border: none;
+					height: 4px;
+					background: black;
+					margin-bottom: 5px;
+					}
+
+					div.text {
+					background-color: #ffffff;
+					color: blue;
+					font-size: 1em;
+					font-weight:normal;
+					text-align:justify;
+					}
+
+
+					div.information {
+					background-color: #ffffff;
+					color: black;
+					font-size: 1em;
+					font-weight:normal;
+					text-align:justify;
+					}
+
+					#scheader {
+					font-size: 0.9em;
+					border: 0px solid #404040;
+					border-spacing: 2px;
+					}
+
+					div.largetext {
+					background-color: #ffffff;
+					color: blue;
+					font-size: 1em;
+					font-weight:normal;
+					text-align:justify;
+					white-space: pre-wrap;
+					word-break: normal;
+					}
+
+				</style></head><body lang="en-US" text="#000000" bgcolor="#ffffff"><hr class="header"><br><hr class="headerThin"><div class="contentwrapper"><table role="presentation" id="scheader"><tr><td class="tableClassNoBorderAlignCenter" style="font-size:2em;">
+						SECURITIES AND EXCHANGE COMMISSION
+						<br>
+						Washington, D.C. 20549
+					</td></tr><tr><td class="tableClassNoBorderAlignCenter"><br><br><div style="font-size:1.5em;">
+									SCHEDULE 13D
+								</div><br><div style="font-size:1.2em;">
+							Under the Securities Exchange Act of 1934
+						</div><br><div class="information" style="text-align:center; font-weight:bold;">
+									(Amendment No. <span style="color:blue;">8</span>)
+								</div><br><br></td></tr><tr><td class="center"><div class="information" style="text-align:center; font-weight:bold; color:blue;">STRYKER CORP</div><div class="information" style="text-align:center; font-weight:bold;"><hr class="separatorThin">(Name of Issuer)</div><br><br></td></tr><tr><td class="center"><div class="information" style="text-align:center; font-weight:bold; color:blue;">Common Stock, $0.10 par value</div><div class="information" style="text-align:center; font-weight:bold;"><hr class="separatorThin">(Title of Class of Securities)</div><br><br></td></tr><table border="1"><tr><td><div class="information" style="text-align:center; font-weight:bold; color:blue;">863667101</div><div class="information" style="text-align:center; font-weight:bold;"><hr class="separatorThin">(CUSIP Number)</div></td></tr><br><br></table><tr><td class="center"><div class="information" style="text-align:center; font-weight:bold; color:blue;">Ronda E. Stryker<br>211 South Rose Street,
+								<br>Kalamazoo,
+								MI,
+								49071<br>(269) 553-6948</div><div class="information" style="text-align:center; font-weight:bold;"><hr class="separatorThin">(Name, Address and Telephone Number of Person Authorized to
+									Receive Notices and Communications)</div></td></tr><tr><td class="center"><div class="information" style="text-align:center; font-weight:bold; color:blue;">02/27/2026</div><div class="information" style="text-align:center; font-weight:bold;"><hr class="separatorThin">(Date of Event Which Requires Filing of This Statement)</div></td></tr></table><br><br><div class="information" style="text-align:justify">
+				If the filing person has previously filed a statement on Schedule 13G to report the acquisition that is the subject of this Schedule 13D, and is filing this schedule because of §§ 240.13d-1(e), 240.13d-1(f) or 240.13d-1(g), check the following box.
+				<img src="/Images/box-unchecked.jpg" alt="Checkbox not checked"></div><br><div class="information" style="text-align:justify">
+				The information required on the remainder of this cover page shall not be deemed to be “filed” for the purpose of Section 18 of the
+				Securities Exchange Act of 1934 (“Act”) or otherwise subject to the liabilities of that section of the Act but shall be subject to all other
+				provisions of the Act (however, see the Notes).
+			</div></div><hr class="headerThin"><hr class="header"><br><br>
+  <div style="display:none">
+			schemaVersion:
+			</div>
+<div class="content"><div class="form1"></div></div>
+  <div class="content"><div class="form1"><table><tr><td class="center"><br><br><p><div align="center" style="font-size:1.2em;">
+									SCHEDULE 13D
+								</div></p></td></tr></table><table role="presentation" class="tableClass" id="cusipNumber"><tr class="tableClass"><td width="7%" style="font-weight:bold;">CUSIP Number(s):</td><td width="75%"><div style="font-size:.9em; color:#000000">863667101</div></td></tr></table><br><br><table role="presentation" class="tableClass" id="reportingPersonDetails"><tr class="tableClass"><td width="8%" class="tableClassValign">1</td><td width="92%" class="tableClass">
+					Name of reporting person
+					<br><br><div class="text">STRYKER RONDA E</div></td></tr><tr><td width="8%" class="tableClassValign">2</td><td width="92%" class="tableClass">Check the appropriate box if a member of a Group (See Instructions)
+				<br><br><div class="text"><img src="/Images/box-unchecked.jpg" alt="Checkbox not checked">  (a)
+					<br><img src="/Images/box-checked.jpg" alt="Checkbox checked">  (b)	
+				</div></td></tr><tr class="tableClassWithBgBlack"><td width="8%" class="tableClassValign">3</td><td width="92%" class="tableClass">SEC use only</td></tr><tr><td width="8%" class="tableClassValign">4</td><td width="92%" class="tableClass">
+					Source of funds (See Instructions)
+					<br><br><div class="text">OO</div></td></tr><tr><td width="8%" class="tableClassValign">5</td><td width="92%" class="tableClass">
+					Check if disclosure of legal proceedings is required pursuant to Items 2(d) or 2(e)
+					<br><br><img src="/Images/box-unchecked.jpg" alt="Checkbox not checked"></td></tr><tr><td width="8%" class="tableClassValign">6</td><td width="92%" class="tableClass">Citizenship or place of organization
+				<br><br><div class="text">
+				UNITED STATES
+			</div></td></tr><tr><td width="8%" class="tableClassValign">Number of Shares Beneficially Owned by Each Reporting Person With:</td><td width="92%" class="tableClass"><table class="innerTableClass"><tr><td width="8%" class="innerTableClassRightValign">7</td><td width="92%" class="tableClassInnerLeft">Sole Voting Power
+							<br><br><div class="text">2,235,338.00</div></td></tr><tr><td width="8%" class="innerTableClassRightValign">8</td><td width="92%" class="tableClassInnerLeft">Shared Voting Power
+							<br><br><div class="text">12,987,993.00</div></td></tr><tr><td width="8%" class="innerTableClassRightValign">9</td><td width="92%" class="tableClassInnerLeft">Sole Dispositive Power
+							<br><br><div class="text">2,235,338.00</div></td></tr><tr><td width="8%" class="innerTableClassRightValignBottomLess">10</td><td width="92%" class="tableClassInnerLeftBottomLess">Shared Dispositive Power
+							<br><br><div class="text">12,987,993.00</div></td></tr></table></td></tr><tr><td width="8%" class="tableClassValign">11</td><td width="92%" class="tableClass">Aggregate amount beneficially owned by each reporting person
+				<br><br><div class="text">15,223,331.00</div></td></tr><tr><td width="8%" class="tableClassValign">12</td><td width="92%" class="tableClass">Check if the aggregate amount in Row (11) excludes certain shares (See Instructions)
+				<br><br><img src="/Images/box-checked.jpg" alt="Checkbox checked"></td></tr><tr><td width="8%" class="tableClassValign">13</td><td width="92%" class="tableClass">Percent of class represented by amount in Row (11)
+				<br><br><div class="text">4.0 % </div></td></tr><tr><td width="8%" class="tableClassValign">14</td><td width="92%" class="tableClass">Type of Reporting Person (See Instructions)
+				<br><br><div class="text">IN</div></td></tr></table><br></div><div class="form1"><table><tr><td class="center"><br><br><p><div align="center" style="font-size:1.2em;">
+									SCHEDULE 13D
+								</div></p></td></tr></table><table role="presentation" id="item1to7"><tr><td width="8%" class="tableClassValignNoBorder">Item 1.</td><td width="92%" class="tableClassNoBorder">Security and Issuer</td></tr><tr class="tableClass"><td width="8%" class="tableClassNoBorderAlignCenter">(a)</td><td width="92%" class="tableClassNoBorder">Title of Class of Securities:
+							<br><br><div class="text">Common Stock, $0.10 par value</div></td></tr><tr class="tableClass"><td width="8%" class="tableClassNoBorderAlignCenter">(b)</td><td width="92%" class="tableClassNoBorder">Name of Issuer:
+							<br><br><div class="text">STRYKER CORP</div></td></tr><tr><td width="8%" class="tableClassNoBorderAlignCenter">(c)</td><td width="92%" class="tableClassNoBorder">Address of Issuer's Principal Executive Offices:
+							<br><br><div class="text">1941 STRYKER WAY, PORTAGE, 
+				MICHIGAN
+			, 49002.</div></td></tr><tr><td width="8%" class="tableClassValignNoBorder">Item 2.</td><td width="92%" class="tableClassNoBorder">Identity and Background</td></tr><tr></tr><tr class="tableClass"><td width="8%" class="tableClassNoBorderAlignCenter">(a)</td><td width="92%" class="tableClassNoBorder"><div class="largetext">Ronda E. Stryker</div></td></tr><tr><td width="8%" class="tableClassNoBorderAlignCenter">(b)</td><td width="92%" class="tableClassNoBorder"><div class="largetext">c/o Greenleaf Trust, 211 South Rose Street, Kalamazoo, Michigan 49007</div></td></tr><tr><td width="8%" class="tableClassNoBorderAlignCenter">(c)</td><td width="92%" class="tableClassNoBorder"><div class="largetext">Vice Chair and a Director of Greenleaf Trust, a bank. She is also a director of the Company, the granddaughter of the founder of the Company and the daughter of a former President of the Company</div></td></tr><tr><td width="8%" class="tableClassNoBorderAlignCenter">(d)</td><td width="92%" class="tableClassNoBorder"><div class="largetext">Has not</div></td></tr><tr><td width="8%" class="tableClassNoBorderAlignCenter">(e)</td><td width="92%" class="tableClassNoBorder"><div class="largetext">Has not</div></td></tr><tr><td width="8%" class="tableClassNoBorderAlignCenter">(f)</td><td width="92%" class="tableClassNoBorder"><div class="largetext">United States citizen</div></td></tr><tr><td width="8%" class="tableClassValignNoBorder">Item 3.</td><td width="92%" class="tableClassNoBorder">Source and Amount of Funds or Other Consideration</td></tr><tr><td width="8%" class="tableClassNoBorderAlignCenter"> </td><td width="92%" class="tableClassNoBorder"><div class="largetext">This Schedule is being amended to report a change of at least 1% in the share ownership of the Company as previously reported on an amended 13D dated March 13, 2020. </div></td></tr><tr><td width="8%" class="tableClassValignNoBorder">Item 4.</td><td width="92%" class="tableClassNoBorder">Purpose of Transaction</td></tr><tr><td width="8%" class="tableClassNoBorderAlignCenter"> </td><td width="92%" class="tableClassNoBorder"><div class="largetext">Ronda E. Stryker intends to evaluate on an ongoing basis her investment in the Company
+and her options with respect to such investment.  Ronda E. Stryker and her husband may, from
+time to time, acquire additional Common Shares (1) by the exercise or additional vesting of
+options, (2) by the grant of additional options or other equity awards by the Company or (3) from
+time to time for investment purposes if market conditions are favorable, in the open market, in
+privately negotiated transactions or otherwise.  Ronda E. Stryker and her husband may also
+dispose of some or all of the Companys Common Shares that they beneficially own,
+periodically, by public or private sale (registered or unregistered and with or without the
+simultaneous sale of newly-issued Common Shares by the Company), gift, expiration of options,
+forfeiture of restricted shares or otherwise, including, without limitation, sales of Common
+Shares pursuant to Rule 144 under the Securities Act of 1933, as amended, or otherwise.
+Ronda E. Stryker and her husband reserve the right not to acquire Common Shares at any given
+time and not to dispose of all or part of Common Shares they may own at any given time if they
+determine such acquisition or disposal is not in their best interests at the time in question. </div></td></tr><tr><td width="8%" class="tableClassValignNoBorder">Item 5.</td><td width="92%" class="tableClassNoBorder">Interest in Securities of the Issuer</td></tr><tr><td width="8%" class="tableClassNoBorderAlignCenter">(a)</td><td width="92%" class="tableClassNoBorder"><div class="largetext">15,223,331 aggregate, 4%</div></td></tr><tr><td width="8%" class="tableClassNoBorderAlignCenter">(b)</td><td width="92%" class="tableClassNoBorder"><div class="largetext">Ronda E. Stryker has sole voting and investment power over 2,235,338 Common Shares reported above as beneficially owned by her and held by her either directly, in her revocable trust or subject to options exercisable by her.
+William D. Johnston is Ronda E. Stryker's husband. As a result, Ronda E. Stryker may be deemed to share voting and investment power over the Common Shares held by William D. Johnston.
+Ronda E. Stryker has a special power of appointment over the Company's Common Shares held in the LLS Subtrust and the power to change the trustee of that Subtrust. As a result, she may be deemed to share voting and dispositive power over the Common Shares held in the LLS Subtrust. The LLS Subtrust is administered by Greenleaf Trust, a nationally chartered bank marketing fiduciary services to the general public. Ronda E. Stryker is a shareholder and director of Greenleaf Trust. Ronda E. Stryker's husband, William D. Johnston, is the controlling shareholder of Greenleaf Trust.
+Greenleaf Trust holds Common Shares in its fiduciary capacity on behalf of various trust and investment management customers, some of whom have the right to receive, or the power to direct the receipt of, dividends from or the proceeds from the sale of these securities. Including the shares held in the LLS Subtrust, Greenleaf Trust has sole voting and dispositive power over 122,825 Common Shares held in accounts over which it has discretionary management power, and 16,678,829 Common Shares held in trusts over which it shares voting or dispositive power with co-trustees or beneficiaries, for a total of 16,801,654 Common Shares, or 4.4 percent of the outstanding Common Shares. Except for the Common Shares held in the LLS Subtrust, Ronda E. Stryker specifically disclaims beneficial ownership of, and this Schedule 13D does not report, shares held by Greenleaf Trust in accounts over which Ronda E. Stryker possesses neither fiduciary discretion nor powers or privileges as a beneficiary. Ronda E. Stryker also expressly disclaims status as a "group" with Greenleaf Trust or William D. Johnston for purposes of this Schedule 13D.
+Ronda E. Stryker, her husband, William D. Johnston, and their adult children are trustees of the Foundation. Decisions of the Foundation are controlled by majority vote of the trustees. As a result, Ronda E. Stryker may be deemed to share voting and investment power over the Common Shares held in the Foundation. Ronda E. Stryker expressly disclaims status as a "group" with the Foundation, William D. Johnston or their adult children who are trustees of the Foundation for purposes of this Schedule 13D.
+William D. Johnston's and Greenleaf Trust's principal business address is c/o Greenleaf Trust, 211 South Rose Street, Kalamazoo, Michigan 49007. William D. Johnston's principal occupation or employment is Chairman of Greenleaf Trust, a Michigan state chartered bank marketing fiduciary services to the general public.
+Neither William D. Johnston nor Greenleaf Trust has, during the last five years, been convicted in a criminal proceeding (excluding traffic violations or similar misdemeanors). Neither William D. Johnston nor Greenleaf Trust has, during the last five years, been a party to a civil proceeding of a judicial or administrative body of competent jurisdiction and as a result of such proceeding was or is subject to a judgment, decree or final order enjoining future violations of, or prohibiting or mandating activities subject to, federal or state securities laws or finding any violation with respect to such laws. William D. Johnston is a citizen of the United States of America.</div></td></tr><tr><td width="8%" class="tableClassNoBorderAlignCenter">(c)</td><td width="92%" class="tableClassNoBorder"><div class="largetext">The following transactions occurred in the 60 days prior to the filing of this
+amendment (1) 4,570 options were exercised on January 14, 2026; (2) a gift of 655,800 shares of
+the Company was initiated on 2/2/2026; (3) a sale of 500,000 shares of the Company was
+initiated on 2/4/2026; (4) a transfer of 42,000 shares of the Company was initiated on 2/4/2026</div></td></tr><tr><td width="8%" class="tableClassNoBorderAlignCenter">(d)</td><td width="92%" class="tableClassNoBorder"><div class="largetext">Other than (1) Greenleaf Trust, with respect to the Common Shares in the LLS
+Subtrust, (2) the Foundation and its trustees, with respect to the Common Shares held by the
+Foundation, (3) William D. Johnston with respect to the Common Shares held by him, and (4)
+the beneficiaries of the LLS Subtrust, namely Ronda E. Stryker and her issue, no person is
+known to have the right to receive, or the power to direct the receipt of, dividends from, or the
+proceeds from the sale of, the Common Shares beneficially owned by Ronda E. Stryker</div></td></tr><tr><td width="8%" class="tableClassNoBorderAlignCenter">(e)</td><td width="92%" class="tableClassNoBorder"><div class="largetext">February 28, 2026</div></td></tr><tr><td width="8%" class="tableClassValignNoBorder">Item 6.</td><td width="92%" class="tableClassNoBorder">Contracts, Arrangements, Understandings or Relationships With Respect to Securities of the Issuer</td></tr><tr><td width="8%" class="tableClassNoBorderAlignCenter"> </td><td width="92%" class="tableClassNoBorder"><div class="largetext">Other than (1) those relationships with other trustees of the Foundation and the other
+owners and directors of Greenleaf Trust, (2) Ronda E. Stryker's oversight responsibilities for the
+Foundation, which are shared with the other trustees of the Foundation, (3) Ronda E. Stryker's
+rights and privileges under the governing instrument of the LLS Subtrust, some of which are
+shared with the trustee of that Subtrust, (4) Ronda E. Stryker's rights and privileges under her
+revocable trust instrument with respect to the Common Shares held in her revocable trust, and (5)
+the option agreements between Ronda E. Stryker and the Company and the related stock option
+plan with respect to the shares underlying stock options beneficially owned by Ronda E. Stryker,
+Ronda E. Stryker does not have any contracts, arrangements, understandings or relationships
+(legal or otherwise) with any person with respect to any Common Shares or any other securities
+of the Company, including, but not limited to, transfer or voting of any of the securities, finder's
+fees, joint ventures, loan or option agreements, puts or calls, guarantees of profits or loss,
+division of profits or loss, or the giving or withholding of proxies.</div></td></tr><tr><td width="8%" class="tableClassValignNoBorder">Item 7.</td><td width="92%" class="tableClassNoBorder">Material to be Filed as Exhibits.</td></tr><tr><td width="8%" class="tableClassNoBorderAlignCenter"> </td><td width="92%" class="tableClassNoBorder"><div class="largetext">2011 Long-Term Incentive Plan (as amended and restated effective May 8, 2025), incorporated by reference to Appendix B to the Proxy Statement for the Company's 2025 Annual Meeting of Shareholders (Commission File No. 001-13149)</div></td></tr></table><br></div><div class="form1"><table role="presentation" id="signatureInfo"><tr><td width="8%" class="tableClassValignNoBorder">    SIGNATURE</td><td width="92%" class="tableClassNoBorder"> </td></tr><tr><td width="8%" class="tableClassNoBorderAlignCenter"> </td><td width="92%" class="tableClassNoBorder"><div class="information" style="text-align:justify">
+						After reasonable inquiry and to the best of my knowledge and belief, I certify that the information set forth in this statement is true, complete and correct.
+						<br><br></div></td></tr></table><table><tr class="tableClass"><td width="50%" class="tableClassNoBorder"> </td><td width="50%" class="tableClassNoBorder"><table><tr class="tableClass"><td width="100%" class="tableClassInnerNoBorderBlue"><div class="text">STRYKER RONDA E</div></td></tr></table></td></tr></table><table><tr class="tableClass"><td width="50%" class="tableClassNoBorder"> </td><td width="50%" class="tableClassNoBorder"><table><tr class="tableClass"><td width="8%" class="tableClassNoBorderAlignLeft signature">Signature:</td><td width="92%" class="tableClassNoBorderBlue signature">Ronda E Stryker</td></tr><tr class="tableClass"><td width="8%" class="tableClassNoBorderAlignLeft signature">Name/Title:</td><td width="92%" class="tableClassNoBorderBlue signature">Director</td></tr><tr class="tableClass"><td width="8%" class="tableClassNoBorderAlignLeft signature">Date:</td><td width="92%" class="tableClassNoBorderBlue signature">04/14/2026</td></tr></table></td></tr></table></div></div>
+<script type="text/javascript"  src="/nd7kb9mCUV/CxBaQU/3fjA/Or5XcXrmfDVmcJ7G/QCEYaQ/DBMbKw/kWDyg"></script></body></html>
