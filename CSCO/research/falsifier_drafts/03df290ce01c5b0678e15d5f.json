@@ -2,18 +2,18 @@
   "schema_version": "1.0",
   "draft_id": "03df290ce01c5b0678e15d5f",
   "work_id": "03df290ce01c5b0678e15d5f",
-  "input_sha": "09ad404aa47ea00ddc8173f98ceccbb20c5e4e84",
+  "input_sha": "5058b4940529583b8e0a964a2c4c95108b318453",
   "component_fingerprint": "590c7e00aeae584c85e240358f7ff1060c1c9a5202d41acb0267751703ddbf44",
   "contract_hash": "9917aa0ae7650a7f2a4739d9d78c2a7ca40b8e60202315ce54942f12f59f330b",
   "status": "awaiting_review",
   "author_receipt": {
-    "authored_at": "2026-09-27T15:50:00Z",
+    "authored_at": "2026-10-02T17:20:00Z",
     "author": "marvin-cloud-agent",
     "model_id": "composer-2.5",
-    "prompt_version": "cloud_marvin_runbook_2026-09-27",
+    "prompt_version": "cloud_marvin_runbook_2026-10-02",
     "analysis_run_id": "epistemic_author_forecast:03df290ce01c5b0678e15d5f",
-    "evidence_hash": "a5b1cea785a6be73087cd19a10ff7572dc3a91b11a0ba5510f599584975d312a", // pragma: allowlist secret,
-    "epistemic_input_sha": "09ad404aa47ea00ddc8173f98ceccbb20c5e4e84",
+    "evidence_hash": "1795bf91fc8ec96ec80ed03c011f3ef354ece792a4f86caf4fec1cd8d9ee83bf", // pragma: allowlist secret
+    "epistemic_input_sha": "5058b4940529583b8e0a964a2c4c95108b318453",
     "contract_hash": "9917aa0ae7650a7f2a4739d9d78c2a7ca40b8e60202315ce54942f12f59f330b",
     "component_fingerprint": "590c7e00aeae584c85e240358f7ff1060c1c9a5202d41acb0267751703ddbf44",
     "source_preflight": {
@@ -37,30 +37,30 @@
     "route": "quality_reinvestment",
     "named_challenge": null,
     "calibration_response": "not_applicable",
-    "calibration_note": "Epistemic loop health_state=COLLECTING; calibration_status=insufficient_outcomes; eligible_scored_outcomes=0 for owner_earnings_reinvestment_dcf. Calibration cannot change this analysis.",
+    "calibration_note": "Epistemic loop health_state=COLLECTING; calibration_status=insufficient_outcomes; eligible_scored_outcomes=1 for owner_earnings_reinvestment_dcf (below minimum 20). Calibration cannot change this analysis.",
     "epistemic_work_receipt": {
       "work_id": "03df290ce01c5b0678e15d5f",
       "task_type": "author_forecast",
       "disposition": "success",
-      "published_input_sha": "09ad404aa47ea00ddc8173f98ceccbb20c5e4e84"
+      "published_input_sha": "5058b4940529583b8e0a964a2c4c95108b318453"
     }
   },
   "review_receipt": null,
   "rejection_reasons": [],
   "spec": {
-    "spec_id": "csco-operating-owner-earnings-fy2026-v2",
-    "spec_revision": 2,
+    "spec_id": "csco-operating-owner-earnings-fy2026-v3",
+    "spec_revision": 3,
     "spec_schema_version": "3.0",
     "forecast_class": "ex_ante",
     "forecast_role": "primary",
-    "authored_at": "2026-09-27T15:50:00Z",
-    "information_cutoff_at": "2026-09-27T15:50:00Z",
-    "registered_at": "2026-09-27T15:50:00Z",
-    "registration_commit": "09ad404aa47ea00ddc8173f98ceccbb20c5e4e84",
+    "authored_at": "2026-10-02T17:20:00Z",
+    "information_cutoff_at": "2026-10-02T17:20:00Z",
+    "registered_at": "2026-10-02T17:20:00Z",
+    "registration_commit": "5058b4940529583b8e0a964a2c4c95108b318453",
     "analysis_run_id": "epistemic_author_forecast:03df290ce01c5b0678e15d5f",
     "author": "marvin-cloud-agent",
     "model_id": "composer-2.5",
-    "prompt_version": "cloud_marvin_runbook_2026-09-27",
+    "prompt_version": "cloud_marvin_runbook_2026-10-02",
     "contract_hash": "9917aa0ae7650a7f2a4739d9d78c2a7ca40b8e60202315ce54942f12f59f330b",
     "component_fingerprint": "590c7e00aeae584c85e240358f7ff1060c1c9a5202d41acb0267751703ddbf44",
     "method_id": "owner_earnings_reinvestment_dcf",
@@ -68,12 +68,12 @@
     "component_id": "operating_business_and_net_assets",
     "correlation_group": "CSCO|operating_business_and_net_assets|normalized_owner_earnings_ttm|FY2026",
     "industry": "networking_infrastructure",
-    "metric": "normalized_owner_earnings_ttm",
+    "metric": "normalized_owner_earnings",
     "comparator": "lt",
     "threshold": 13288.0,
     "threshold_basis": {
       "source_ref": "CSCO/research/valuation_contract.json#operating_business_and_net_assets.calculation_proof.traces.low.owner_earnings",
-      "rule": "Low-case trace node owner_earnings equals 13,288 USD millions (FY2025 TTM operating cash flow 14,193M minus capital spending 905M per accession 0000858877-25-000111; reconciles to normalized_owner_earnings_ttm_m_v2). Fire when FY2026 TTM normalized owner earnings at 2026-07-26 resolve below that anchor."
+      "rule": "Low-case trace node owner_earnings equals 13,288 USD millions (FY2025 operating cash flow 14,193M minus capital spending 905M per accession 0000858877-25-000111; reconciles to normalized_owner_earnings_ttm_m_v2 and the admitted contract proof)."
     },
     "unit": "USD millions",
     "measurement_period_end": "2026-07-26",
@@ -118,9 +118,9 @@
     "component_value_impact_pct": 45.1,
     "total_equity_value_impact_pct": 45.1,
     "derived_from": "Owner earnings, incremental returns, or reinvestment runway fall below the low-case bridge.",
-    "rationale": "Types the owner-earnings leg of the operating_business_and_net_assets prose falsifier. The low-case owner_earnings_reinvestment_dcf proof locks normalized owner earnings at 13,288 USD millions (FY2025 operating cash flow 14,193M minus capital spending 905M per accession 0000858877-25-000111). If trailing-twelve-month normalized owner earnings at FY2026 year-end (2026-07-26) resolve below that anchor, distributable owner cash has fallen below the low-case bridge and the bounded per-share range should compress toward the low case (31.89 USD per share vs 58.05 base). Incremental after-tax ROIC and reinvestment-rate legs remain judgment inputs without a resolvable SEC metric and are not typed here. Historical adapter replay on Q3 FY2025 (measurement end 2025-04-26) resolved 12,803 USD millions via sec_companyfacts_ttm using normalized_owner_earnings_ttm_m_v2. Target FY2026 TTM is not observable at registration (2026-09-27); FY2026 10-K is not yet in CSCO/investor-documents/DOWNLOAD_MANIFEST.json. A 34% fire probability weights interim cash softness against Cisco fiscal Q4 seasonality and historically sticky enterprise networking cash flow.",
+    "rationale": "Types the owner-earnings leg of the operating_business_and_net_assets prose falsifier. The low-case owner_earnings_reinvestment_dcf proof locks normalized owner earnings at 13,288 USD millions (FY2025 operating cash flow 14,193M minus capital spending 905M per accession 0000858877-25-000111). If trailing-twelve-month normalized owner earnings at FY2026 year-end (2026-07-26) resolve below that anchor, distributable owner cash has fallen below the low-case bridge and the bounded per-share range should compress toward the low case (31.89 USD per share vs 58.05 base). Incremental after-tax ROIC and reinvestment-rate legs remain judgment inputs without a resolvable SEC metric and are not typed here. Historical adapter replay on Q3 FY2025 (measurement end 2025-04-26) resolved 12,803 USD millions via sec_companyfacts_ttm using normalized_owner_earnings_ttm_m_v2. Target FY2026 TTM is not observable at registration (2026-10-02); FY2026 10-K is not yet in CSCO/investor-documents/DOWNLOAD_MANIFEST.json. A 34% fire probability weights interim cash softness against Cisco fiscal Q4 seasonality and historically sticky enterprise networking cash flow.",
     "untestable": false,
     "calibration_eligible": true,
-    "supersedes_spec_id": "csco-operating-owner-earnings-fy2026-v1"
+    "supersedes_spec_id": "csco-operating-owner-earnings-fy2026-v2"
   }
 }
