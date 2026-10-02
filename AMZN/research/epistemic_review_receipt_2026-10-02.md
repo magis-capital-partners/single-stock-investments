@@ -56,6 +56,10 @@
 - Normalized **$5.35/sh** and hold stance: **context only** — Lawrence path uses sustainable capex assumption, not raw TTM bridge
 - Legacy runway draft **0679c1f233147debec1dbf64** ($45B threshold): **superseded** by v2 recipe zero-threshold draft; not used to alter this review
 
+## Promotion note (post-refresh)
+
+`promote_falsifier_drafts.py` blocked append on 2026-10-02 because `valuation_contract.json` regen changed the `reinvestment_runway` component fingerprint (**f4706fca…** authored vs **58d86a58…** current). Review stands on frozen registration commit **15215c66…**; promoter may run after contract and draft fingerprints reconcile.
+
 ## [HUMAN REVIEW]
 
 - Stance and sizing remain in `human_decision.json` only
