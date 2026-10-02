@@ -18,6 +18,11 @@ from pathlib import Path
 from typing import Any
 
 ROOT = Path(__file__).resolve().parents[2]
+SCRIPTS = Path(__file__).resolve().parent
+if str(SCRIPTS) not in sys.path:
+    sys.path.insert(0, str(SCRIPTS))
+from stooq_csv import QUOTE_HEADER, StooqNotCsvError, check_stooq_csv  # noqa: E402
+
 CONFIG_NAME = "book_estimate_config.json"
 OUTPUT_NAME = "book_estimate.json"
 STOOQ_URL = "https://stooq.com/q/l/?s={symbol}&f=sd2t2ohlcv&h&e=csv"
@@ -65,6 +70,21 @@ def fetch_yahoo_close(symbol: str, on_date: str) -> tuple[float | None, str | No
         return None, f"no close on or after {on_date}"
     except (urllib.error.URLError, TimeoutError, KeyError, IndexError, json.JSONDecodeError) as exc:
         return None, str(exc)
+
+
+def fetch_yahoo_latest_close(symbol: str) -> tuple[float | None, str | None]:
+    ysym = yahoo_ticker(symbol)
+    url = f"https://query1.finance.yahoo.com/v8/finance/chart/{ysym}?range=10d&interval=1d"
+    req = urllib.request.Request(url, headers={"User-Agent": YAHOO_UA})
+    try:
+        data = json.loads(urllib.request.urlopen(req, timeout=20).read())
+        closes = data["chart"]["result"][0]["indicators"]["quote"][0]["close"]
+    except (urllib.error.URLError, TimeoutError, KeyError, IndexError, TypeError, json.JSONDecodeError) as exc:
+        return None, str(exc)
+    for close in reversed(closes or []):
+        if close is not None:
+            return float(close), None
+    return None, "no close"
 
 
 def enrich_line_for_measurement(
@@ -153,8 +173,8 @@ def fetch_stooq_close(symbol: str) -> tuple[float | None, str | None]:
     url = STOOQ_URL.format(symbol=sym.lower())
     req = urllib.request.Request(url, headers={"User-Agent": UA})
     try:
-        raw = urllib.request.urlopen(req, timeout=20).read().decode("utf-8", errors="ignore")
-    except (urllib.error.URLError, TimeoutError) as exc:
+        raw = check_stooq_csv(urllib.request.urlopen(req, timeout=20).read(), QUOTE_HEADER)
+    except (urllib.error.URLError, TimeoutError, StooqNotCsvError) as exc:
         return None, str(exc)
     lines = [ln.strip() for ln in raw.strip().splitlines() if ln.strip()]
     if len(lines) < 2:
@@ -233,10 +253,21 @@ def resolve_price(line: dict, cache: dict[str, float | None]) -> tuple[float | N
         return None, "none", "symbol missing"
     key = symbol.upper()
     if key not in cache:
-        cache[key], err = fetch_stooq_close(symbol)
+        # Yahoo first: Stooq's /q/l/ quote endpoint now answers with an HTML
+        # page, which left every listed line here frozen at its filing price.
+        price, err = fetch_yahoo_latest_close(symbol)
+        source = "yahoo"
+        if price is None:
+            price, serr = fetch_stooq_close(symbol)
+            if price is not None:
+                source, err = "stooq", None
+            else:
+                err = f"yahoo: {err}; stooq: {serr}"
+        cache[key] = price
+        cache[f"{key}__src"] = source
         if err:
             cache[f"{key}__err"] = err
-    return cache.get(key), "stooq", cache.get(f"{key}__err")
+    return cache.get(key), cache.get(f"{key}__src", "yahoo"), cache.get(f"{key}__err")
 
 
 def current_value_from_line(line: dict, current_price: float | None) -> float | None:

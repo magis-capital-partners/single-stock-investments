@@ -11,12 +11,12 @@
     "reason": "Close curated evidence gaps before committee review."
   },
   "ticker": "ETHA",
-  "as_of": "2026-07-20",
+  "as_of": "2026-10-02",
   "dates": {
-    "model_as_of": "2026-07-20",
+    "model_as_of": "2026-10-02",
     "latest_fact_as_of": null,
     "oldest_fact_as_of": null,
-    "price_as_of": "2026-07-20"
+    "price_as_of": "2026-10-01"
   },
   "legacy_audit": {
     "actionable": false,
@@ -29,18 +29,68 @@
     "formula": "((present_value_or_output + undated_distributions) / price) ** (1 / horizon_years) - 1",
     "reason_non_actionable": "This legacy calculation treated a present value as a future payoff and cannot be used as a forward return, hurdle entry price, ranking signal, or capital decision."
   },
-  "economic_ownership_map": [],
+  "economic_ownership_map": [
+    {
+      "component_id": "dated_payoff_fallback",
+      "label": "Dated payoff (fallback)",
+      "category": "dated_payoff",
+      "treatment": "additive",
+      "included_in_component_id": null,
+      "ownership_claim": "Dated payoff (fallback)",
+      "ownership_percentage": 1.0,
+      "quantity": {
+        "value": 1,
+        "unit": "per-share economic claim"
+      },
+      "method": "dated_payoff",
+      "method_version": null,
+      "method_provenance": null,
+      "comparable_ids": [],
+      "range_per_share": {
+        "low": null,
+        "base": null,
+        "high": null
+      },
+      "output_basis": "present_value_today",
+      "legacy_range_per_share": {
+        "low": 26.7,
+        "base": 26.7,
+        "high": 26.7
+      },
+      "valuation_status": "legacy_sensitivity",
+      "calculation_proof": null,
+      "evidence_tier": "model_input",
+      "evidence_level": "analyst_estimated",
+      "evidence": "scenarios.base.payoff",
+      "scenario_assumptions": null,
+      "probability_and_timing": null,
+      "tax_and_realization_adjustments": "Risk and timing are reflected in the low/base/high range.",
+      "falsifier": "Owner cash, reinvestment economics, or competitive position remains below the low-case path for two reporting periods.",
+      "overlap_key": "dated_payoff_fallback",
+      "assumption_type": "estimate"
+    }
+  ],
   "component_coverage": {
     "all_material_components_identified": false,
-    "material_component_count": 0,
-    "additive_component_count": 0,
+    "material_component_count": 1,
+    "additive_component_count": 1,
     "embedded_component_count": 0,
     "unvalued_component_count": 1,
     "double_counting_flags": []
   },
   "input_classification": {
     "facts": [],
-    "estimates": [],
+    "estimates": [
+      {
+        "component_id": "dated_payoff_fallback",
+        "label": "Dated payoff (fallback)",
+        "kind": "estimate",
+        "evidence_tier": "model_input",
+        "evidence": "scenarios.base.payoff",
+        "method": "dated_payoff",
+        "valuation_status": "legacy_sensitivity"
+      }
+    ],
     "judgments": []
   },
   "method_route": {
@@ -72,7 +122,9 @@
       "greenblatt",
       "hk",
       "klarman_asset_value",
+      "lawrence",
       "marks_credit_cycle",
+      "moi",
       "pabrai",
       "stahl"
     ],
@@ -88,7 +140,16 @@
       "stock compensation or acquisitions omitted",
       "terminal value unsupported by a durable mechanism"
     ],
-    "secondary_profiles": [],
+    "secondary_profiles": [
+      {
+        "profile_id": "catalyst_asset_value",
+        "score": 2.0,
+        "reasons": [
+          "component categories=dated_payoff",
+          "existing methods=dated_payoff"
+        ]
+      }
+    ],
     "scorecard": {
       "scarce_asset_optionality": {
         "score": 0.0,
@@ -110,8 +171,11 @@
         "reasons": []
       },
       "catalyst_asset_value": {
-        "score": 0.0,
-        "reasons": []
+        "score": 2.0,
+        "reasons": [
+          "component categories=dated_payoff",
+          "existing methods=dated_payoff"
+        ]
       },
       "predictable_cash_flow": {
         "score": 0.0,
@@ -124,21 +188,39 @@
     },
     "decision_rule": "Power Zones select the fitting economic method and eligible independent reviewers; they never choose the valuation answer or capital decision.",
     "ticker": "ETHA",
-    "as_of": "2026-07-29",
+    "as_of": "2026-10-02",
     "route_source": "canonical_power_zone_router",
     "config_path": "_system/frameworks/power_zones.json",
     "config_updated": "2026-07-14",
     "classification": {
       "archetype": "compounder",
-      "moat": "unproven",
-      "dhando": "pending",
+      "moat": "n/a",
+      "dhando": "partial",
       "stance": "watch",
-      "cycle": "-",
+      "cycle": "mid",
       "moi_bucket": "pending",
-      "payoff_lens": "pending",
-      "investment_sleeve": "ls_algo_underlying"
+      "payoff_lens": "asset",
+      "investment_sleeve": "ls_algo_underlying",
+      "predictive_attribute": "wrapper_tracking_basis"
     },
-    "specialist_power_zones": [],
+    "specialist_power_zones": [
+      {
+        "persona": "lawrence",
+        "label": "Bryan Lawrence",
+        "independence_group": "quality_reinvestment",
+        "in_power_zone": true,
+        "fit": 0.667,
+        "matched": 2,
+        "known_fields": 2,
+        "matched_fields": [
+          "archetype",
+          "dhando"
+        ],
+        "excluded_by": null,
+        "match_rate": null,
+        "score": 57
+      }
+    ],
     "committee": {
       "candidate_count": 4,
       "independence_group_count": 3,
@@ -162,16 +244,16 @@
         }
       ]
     },
-    "input_hash": "78ca8143af7620cbc371d966e023f71dda4a5afc6924572816a7077c36b8c74e",
-    "generated_at": "2026-07-29T20:34:30.942866+00:00"
+    "input_hash": "e1efbac7d121b2f33520190aec890efb4d66c8de3a2bd7c3d4ff939a9ac9a2ae",
+    "generated_at": "2026-10-02T09:20:54.387295+00:00"
   },
   "market": {
-    "price_per_share": 14.33,
+    "price_per_share": 20.37,
     "fully_diluted_shares": null,
     "market_cap_m": null,
     "enterprise_value_m": null,
-    "price_source": "Yahoo ETHA close 2026-07-20",
-    "price_as_of": "2026-07-20"
+    "price_source": "Yahoo ETHA close 2026-10-01",
+    "price_as_of": "2026-10-01"
   },
   "valuation": {
     "output_basis": "present_value_today",
@@ -204,7 +286,11 @@
       "base": 0,
       "high": 0
     },
-    "legacy_value_per_share": null,
+    "legacy_value_per_share": {
+      "low": 26.7,
+      "base": 26.7,
+      "high": 26.7
+    },
     "probability_weighted_value_per_share": null,
     "expected_distributions_per_share": 0.0,
     "forward_return_at_price_pct": {
@@ -239,17 +325,27 @@
   },
   "scenario_contract": {
     "rule": "Cases must change cited causal operating, capital, probability, timing, or financing drivers\u2014not only a terminal multiple.",
-    "top_value_drivers": [],
+    "top_value_drivers": [
+      {
+        "component_id": "dated_payoff_fallback",
+        "label": "Dated payoff (fallback)",
+        "valuation_status": "legacy_sensitivity",
+        "base_per_share": null,
+        "legacy_base_per_share": 26.7,
+        "range_width_per_share": null,
+        "scenario_assumptions": null
+      }
+    ],
     "reverse_expectations": null
   },
   "calculation_proof_summary": {
-    "component_count": 0,
+    "component_count": 1,
     "priced_component_count": 0,
     "proof_complete_pct": 0.0,
     "status_counts": {
       "bounded_estimate": 0,
       "calculated": 0,
-      "legacy_sensitivity": 0,
+      "legacy_sensitivity": 1,
       "unpriced": 0
     },
     "all_material_components_priced": false,
@@ -271,14 +367,33 @@
     "present_value_is_not_treated_as_future_payoff": true
   },
   "evidence": {
-    "unresolved_count": 1,
+    "unresolved_count": 9,
     "blockers": [
-      "A complete economic ownership map has not been supplied."
+      "complete component schedule required",
+      "dated_payoff_fallback: material component is legacy_sensitivity; a valid calculation proof is required",
+      "economic_claim.description required",
+      "economic_claim.enterprise_to_equity_reconciliation required",
+      "economic_claim.unit_count required",
+      "economic_claim.unit_label required",
+      "economic_claim.unit_source required",
+      "economic_value.schema_version 1.0 required",
+      "gaap_role required"
     ],
-    "validation_errors": []
+    "validation_errors": [
+      "complete component schedule required",
+      "economic_claim.description required",
+      "economic_claim.enterprise_to_equity_reconciliation required",
+      "economic_claim.unit_count required",
+      "economic_claim.unit_label required",
+      "economic_claim.unit_source required",
+      "economic_value.schema_version 1.0 required",
+      "gaap_role required"
+    ]
   },
   "monitoring": {
-    "falsifiers": [],
+    "falsifiers": [
+      "Owner cash, reinvestment economics, or competitive position remains below the low-case path for two reporting periods."
+    ],
     "required_refresh_triggers": [
       "new filing or material operating update",
       "capital-structure change",
@@ -287,17 +402,17 @@
     ]
   },
   "change_control": {
-    "model_hash": "d7da12688840915afcd1bdf8501c94c586847ddcf4628ef39f7bfa1b37bb586f",
+    "model_hash": "461b05d2754f80f733cc236bab4314399ed0bc48b9841d49f6a671d4268d1790",
     "method_versions": [],
     "change_log": [],
     "rule": "A source fact is locked. Every assumption change requires a reason, author, timestamp, and before/after value."
   },
   "decision_rule": "Proof status and investment readiness are separate. Every material claim must be valued exactly once by a valid calculation proof, every evidence blocker must be resolved, and the model must be stock-specific before committee review. Only a human decision can authorize capital.",
   "authority": "universal_valuation_contract",
-  "legacy_reference_present": false,
+  "legacy_reference_present": true,
   "falsifier_coverage": {
     "typed": 0,
-    "prose_only": 0,
+    "prose_only": 1,
     "untestable": 0,
     "invalid": 0,
     "unanchored": 0,

@@ -5,14 +5,17 @@ Populated by `_system/scripts/download_ira_research.py`.
 | Path | Contents |
 |------|----------|
 | `returns/{TICKER}.csv` | Monthly returns (Yahoo or synthetic) |
-| `benchmarks/spy_us.csv` | SPY daily (Stooq) |
-| `benchmarks/bnd_us.csv` | Bond ETF proxy |
+| `benchmarks/spy_us.csv` | SPY daily OHLC + Adj Close (Yahoo chart v8; was Stooq, which now serves an HTML bot check) |
+| `benchmarks/bnd_us.csv` | BND daily, same format (bond ETF proxy) |
 | `french/` | Fama-French 5-factor monthly |
 | `macro/` | FRED CPI, 10Y, VIX |
 | `commodities/` | Spot inputs (copper) via `fetch_market_inputs.py` |
 | `themes/` | Thematic indicator panels (`fetch_theme_panel.py`) + `manifest.json` |
 | `real-estate/` | Deal-implied cap rates and comps (context tier; `in_base_irr: false`) |
 | `ira_download_manifest.json` | Last download log |
+
+No CSV here may be an HTML page: `_system/scripts/check_market_data_csvs.py`
+(run by the `market-data-csvs` job in `python-tests.yml`) fails on one.
 
 See `_system/frameworks/darwin_ira_research_plan.md`.
 

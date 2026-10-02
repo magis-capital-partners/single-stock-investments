@@ -1,0 +1,163 @@
+{
+ "trained_on": "1990-2017 US dashboard stock-days (every 5th session), holdout 2018-2026 untouched",
+ "risk_features": [
+  "log_rv20",
+  "panic",
+  "pressure",
+  "vol_stress",
+  "climax",
+  "dd252",
+  "beta",
+  "spy_panic",
+  "beta_x_spy",
+  "log_spread",
+  "dvol"
+ ],
+ "vol21": {
+  "intercept": -0.33931208666973545,
+  "coef": {
+   "log_rv20": 0.6801029691820941,
+   "panic": 0.23177153506214304,
+   "pressure": -0.012345792943394131,
+   "vol_stress": -0.6687809768266213,
+   "climax": 0.12367218218434031,
+   "dd252": -0.5993679378105311,
+   "beta": 0.060446905343907176,
+   "spy_panic": 0.3512569785029052,
+   "beta_x_spy": 0.00973006547402816,
+   "log_spread": -0.0035627942417714165,
+   "dvol": -0.3175796904216804
+  },
+  "target": "log annualized realized volatility over the next 21 sessions"
+ },
+ "drop15_63d": {
+  "intercept": -0.17179202198090712,
+  "coef": {
+   "log_rv20": 1.4356022115479687,
+   "panic": -0.19114561767109836,
+   "pressure": 0.34005720115775556,
+   "vol_stress": -1.5079824362703214,
+   "climax": 0.18976510072471875,
+   "dd252": -0.9205260939054075,
+   "beta": 0.25253545566990904,
+   "spy_panic": 1.2807137618950817,
+   "beta_x_spy": -0.3811460539315475,
+   "log_spread": -0.006471882328936234,
+   "dvol": 0.17075046309981082
+  },
+  "target": "P(close falls >= 15% below the signal close within 63 sessions)"
+ },
+ "rebound21": {
+  "target": "daily cross-sectional rank of the next-21-session beta-adjusted return (US stocks)",
+  "transform": {
+   "stock_features": [
+    "panic",
+    "pressure",
+    "exhaustion",
+    "fam_price_dislocation",
+    "fam_selling_climax",
+    "fam_volatility_stress",
+    "fam_relative_path_stress",
+    "pct_return_1d_fear",
+    "pct_return_5d_fear",
+    "pct_return_20d_fear",
+    "pct_drawdown_fear",
+    "pct_distance_50d_fear",
+    "pct_volume_climax",
+    "pct_range_climax",
+    "pct_gap_fear",
+    "pct_volatility_fear",
+    "pct_vol_acceleration",
+    "pct_vcr",
+    "pct_trend_shape",
+    "pct_negative_consistency",
+    "pct_downside_share",
+    "f_return_5d",
+    "f_return_20d",
+    "idio5",
+    "idio20",
+    "sys5",
+    "sys20",
+    "mom_12_1",
+    "f_rv_20d",
+    "f_drawdown_252d",
+    "f_distance_50d",
+    "f_volume_log_20d",
+    "f_close_location",
+    "rsi14",
+    "beta",
+    "spread",
+    "dvol"
+   ],
+   "stock_feature_transform": "cross-sectional percentile rank among US stocks that day, minus 0.5; missing -> 0",
+   "market_features": {
+    "spy_panic": "(spy_panic - 50) / 25",
+    "spy_state": "state_code / 5",
+    "breadth_panic": "share of US stocks in panic-or-worse"
+   },
+   "interactions": {
+    "panic_x_spy": "panic_rank * spy_panic_scaled",
+    "idio20_x_spy": "idio20_rank * spy_panic_scaled",
+    "panic_x_breadth": "panic_rank * breadth_panic"
+   }
+  },
+  "intercept": 0.0011473108315840364,
+  "coef": {
+   "panic": 0.013786970637738705,
+   "pressure": -0.012887674383819103,
+   "exhaustion": 0.008599785156548023,
+   "fam_price_dislocation": -0.016612624749541283,
+   "fam_selling_climax": 0.0025587836280465126,
+   "fam_volatility_stress": -0.005282632075250149,
+   "fam_relative_path_stress": 0.010974057950079441,
+   "pct_return_1d_fear": 0.01859188638627529,
+   "pct_return_5d_fear": 0.007164670154452324,
+   "pct_return_20d_fear": 0.038807742297649384,
+   "pct_drawdown_fear": 0.005865664221346378,
+   "pct_distance_50d_fear": 0.05690725892782211,
+   "pct_volume_climax": -0.007093329448252916,
+   "pct_range_climax": -0.006283705122768879,
+   "pct_gap_fear": -0.00185961346141994,
+   "pct_volatility_fear": 0.003160953288897872,
+   "pct_vol_acceleration": -0.00397508405148983,
+   "pct_vcr": -0.004929311573505402,
+   "pct_trend_shape": -0.007905335165560246,
+   "pct_negative_consistency": -0.0030246619135141373,
+   "pct_downside_share": -0.0032945198472589254,
+   "f_return_5d": -0.0138790812343359,
+   "f_return_20d": 0.011734159663319588,
+   "idio5": 0.011538397520780563,
+   "idio20": 0.023543361574411392,
+   "sys5": 0.004252993501722813,
+   "sys20": -0.00434065843001008,
+   "mom_12_1": 0.004297471605241299,
+   "f_rv_20d": 0.0009686619741842151,
+   "f_drawdown_252d": 0.010236707516014576,
+   "f_distance_50d": 0.02503514289855957,
+   "f_volume_log_20d": 0.009002749808132648,
+   "f_close_location": -5.294559377944097e-05,
+   "rsi14": -0.0003431715886108577,
+   "beta": -0.0277507696300745,
+   "spread": -0.009571047499775887,
+   "dvol": -0.021084530279040337,
+   "spy_panic": 0.0001311048836214468,
+   "spy_state": -0.000653768191114068,
+   "breadth_panic": 7.10121457814239e-05,
+   "panic_x_spy": 0.0031279774848371744,
+   "idio20_x_spy": 0.004167948849499226,
+   "panic_x_breadth": 0.014140087179839611
+  },
+  "holdout_2018_2026_train_only_fit": {
+   "ic_resid21": {
+    "mean": 0.038988381419811174,
+    "t": 5.047256952137798,
+    "n": 432
+   },
+   "ic_resid63": {
+    "mean": 0.051956784668561094,
+    "t": 4.948334631297591,
+    "n": 424
+   }
+  }
+ }
+}

@@ -1,0 +1,469 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns:p="http://www.sec.gov/edgar/schedule13D" xmlns:p1="http://www.sec.gov/edgar/common"><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8"><link rel="stylesheet" type="text/css" href="/css/SDR_print.css"><style type="text/css">
+					.fakeTextBox {
+					border-top: 2px solid #999;
+					border-right: 1px solid #ccc;
+					border-bottom: 1px solid #ccc;
+					border-left: 2px solid #999;
+					padding: 2px;
+					_width: 800px;
+					height: auto;
+					min-width: 200px;
+					min-height: 50px;
+					word-wrap: break-word;
+					font-size: 0.9em;
+					color: blue;
+					}
+					table.tableClass { border: solid black;
+					border-top-width: 1;
+					border-right-width: 1;
+					border-bottom-width: 1;
+					border-left-width: 1;
+					table-layout:fixed;
+					}
+					table.innerTableClass { border: solid black;
+					border-top-width: 0;
+					border-right-width: 0;
+					border-bottom-width: 0;
+					border-left-width: 0;
+					table-layout:fixed;
+					}
+					th.tableClassLeft { border: solid black;
+					border-top-width: 0px;
+					border-right-width: 0px;
+					border-bottom-width: 1px;
+					border-left-width: 1px;
+					padding: 2px;
+					}
+					th.tableClassRight { border: solid black;
+					border-top-width: 0px;
+					border-right-width: 1px;
+					border-bottom-width: 1px;
+					border-left-width: 0;
+					padding: 2px;
+					}
+					th.tableClass { border: solid black;
+					border-top-width: 0px;
+					border-right-width: 1px;
+					border-bottom-width: 1px;
+					border-left-width: 1px;
+					padding: 2px;
+					}
+					td.tableClassLeft { border: solid black;
+					border-top-width: 0px;
+					border-right-width: 0px;
+					border-bottom-width: 1px;
+					border-left-width: 1px;
+					font-size: 0.9em;
+					color: blue;
+					word-wrap: break-word;
+					}
+					td.tableClassRight { border: solid black;
+					border-top-width: 0px;
+					border-right-width: 1px;
+					border-bottom-width: 1px;
+					border-left-width: 0;
+					font-size: 0.9em;
+					color: blue;
+					word-wrap: break-word;
+					}
+					td.tableClass { border: solid black;
+					border-top-width: 0px;
+					border-right-width: 1px;
+					border-bottom-width: 1px;
+					border-left-width: 1px;
+					font-size: 0.9em;
+					font-weight:bold;
+					color: black;
+					word-wrap: break-word;
+					}
+					td.tableClassNoBorder { border: solid black;
+					border-top-width: 0px;
+					border-right-width: 0px;
+					border-bottom-width: 0px;
+					border-left-width: 0px;
+					font-size: 0.9em;
+					font-weight:bold;
+					color: black;
+					word-wrap: break-word;
+					}
+
+					td.tableClassNoBorderBlue { border: solid black;
+					border-top-width: 0px;
+					border-right-width: 0px;
+					border-bottom-width: 0px;
+					border-left-width: 0px;
+					font-size: 0.9em;
+					font-weight:bold;
+					color: blue;
+					word-wrap: break-word;
+					}
+
+					td.tableClassInnerNoBorderBlue { border: solid black;
+					border-top-width: 0px;
+					border-right-width: 0px;
+					border-bottom-width: 0px;
+					border-left-width: 0px;
+					font-size: 1.4em;
+					font-weight:bold;
+					color: blue;
+					word-wrap: break-word;
+					}
+
+					td.tableClassNoBorderAlignLeft { border: solid black;
+					border-top-width: 0px;
+					border-right-width: 0px;
+					border-bottom-width: 0px;
+					border-left-width: 0px;
+					font-size: 0.9em;
+					font-weight:bold;
+					text-align: left;
+					color: black;
+					word-wrap: break-word;
+					}
+
+					td.signature {
+					padding: 4px 8px;
+					}
+
+					td.tableClassInner { border: solid black;
+					border-top-width: 0px;
+					border-right-width: 1px;
+					border-bottom-width: 1px;
+					border-left-width: 1px;
+					font-size: 1em;
+					font-weight:bold;
+					color: black;
+					word-wrap: break-word;
+					}
+
+					td.tableClassValign { border: solid black;
+					border-top-width: 0px;
+					border-right-width: 1px;
+					border-bottom-width: 1px;
+					border-left-width: 1px;
+					font-size: 0.9em;
+					font-weight:bold;
+					color: black;
+					vertical-align: middle;
+					text-align: center;
+					word-wrap: break-word;
+					}
+
+					td.tableClassValignNoBorder { border: solid black;
+					border-top-width: 0px;
+					border-right-width: 0px;
+					border-bottom-width: 0px;
+					border-left-width: 0px;
+					font-size: 0.9em;
+					font-weight:bold;
+					color: black;
+					vertical-align: middle;
+					text-align: center;
+					word-wrap: break-word;
+					}
+
+					td.tableClassValignInner { border: solid black;
+					border-top-width: 0px;
+					border-right-width: 1px;
+					border-bottom-width: 1px;
+					border-left-width: 1px;
+					font-size: 1em;
+					font-weight:bold;
+					color: black;
+					vertical-align: middle;
+					text-align: center;
+					word-wrap: break-word;
+					}
+
+					td.innerTableClassRightValign { border: solid black;
+					border-top-width: 0px;
+					border-right-width: 1px;
+					border-bottom-width: 1px;
+					border-left-width: 0;
+					font-size: 1em;
+					font-weight:bold;
+					color: black;
+					vertical-align: middle;
+					text-align: center;
+					word-wrap: break-word;
+					}
+
+					td.innerTableClassRightValignBottomLess { border: solid black;
+					border-top-width: 0px;
+					border-right-width: 1px;
+					border-bottom-width: 0px;
+					border-left-width: 0;
+					font-size: 1em;
+					font-weight:bold;
+					color: black;
+					vertical-align: middle;
+					text-align: center;
+					word-wrap: break-word;
+					}
+
+					td.tableClassInnerLeft { border: solid black;
+					border-top-width: 0px;
+					border-right-width: 0px;
+					border-bottom-width: 1px;
+					border-left-width: 1px;
+					font-size: 1em;
+					font-weight:bold;
+					color: black;
+					word-wrap: break-word;
+					}
+
+					td.tableClassInnerLeftBottomLess { border: solid black;
+					border-top-width: 0px;
+					border-right-width: 0px;
+					border-bottom-width: 0px;
+					border-left-width: 1px;
+					font-size: 1em;
+					font-weight:bold;
+					color: black;
+					word-wrap: break-word;
+					}
+
+					td.tableClassNoBorderAlignCenter { border: solid black;
+					border-top-width: 0px;
+					border-right-width: 0px;
+					border-bottom-width: 0px;
+					border-left-width: 0px;
+					font-size: 0.9em;
+					font-weight:bold;
+					color: black;
+					text-align: center;
+					word-wrap: break-word;
+					}
+
+					tr.tableClass { border: solid black;
+					border-top-width: 1px;
+					border-right-width: 1px;
+					border-bottom-width: 1px;
+					border-left-width: 1px;
+					}
+					tr.tableClassWithBg { border: solid black;
+					border-top-width: 0;
+					border-right-width: 1;
+					border-bottom-width: 1;
+					border-left-width: 0;
+					background-color: #e0e0ff
+					}
+
+					tr.tableClassWithBgBlack { border: solid black;
+					border-top-width: 0;
+					border-right-width: 1;
+					border-bottom-width: 1;
+					border-left-width: 0;
+					background-color: #D3D3D3
+					}
+
+					hr.header {
+					position: relative;
+					top: 20px;
+					border: none;
+					height: 6px;
+					background: black;
+					margin-bottom: 10px;
+					}
+
+					hr.separatorThin {
+					position: relative;
+					top: 2px;
+					border: none;
+					height: 2px;
+					background: black;
+					margin-bottom: 2px;
+					}
+
+					hr.headerThin {
+					position: relative;
+					top: 10px;
+					border: none;
+					height: 2px;
+					background: black;
+					margin-bottom: 10px;
+					}
+
+					hr.separator {
+					position: relative;
+					top: 20px;
+					border: none;
+					height: 4px;
+					background: black;
+					margin-bottom: 5px;
+					}
+
+					div.text {
+					background-color: #ffffff;
+					color: blue;
+					font-size: 1em;
+					font-weight:normal;
+					text-align:justify;
+					}
+
+
+					div.information {
+					background-color: #ffffff;
+					color: black;
+					font-size: 1em;
+					font-weight:normal;
+					text-align:justify;
+					}
+
+					#scheader {
+					font-size: 0.9em;
+					border: 0px solid #404040;
+					border-spacing: 2px;
+					}
+
+					div.largetext {
+					background-color: #ffffff;
+					color: blue;
+					font-size: 1em;
+					font-weight:normal;
+					text-align:justify;
+					white-space: pre-wrap;
+					word-break: normal;
+					}
+
+				</style></head><body lang="en-US" text="#000000" bgcolor="#ffffff"><hr class="header"><br><hr class="headerThin"><div class="contentwrapper"><table role="presentation" id="scheader"><tr><td class="tableClassNoBorderAlignCenter" style="font-size:2em;">
+						SECURITIES AND EXCHANGE COMMISSION
+						<br>
+						Washington, D.C. 20549
+					</td></tr><tr><td class="tableClassNoBorderAlignCenter"><br><br><div style="font-size:1.5em;">
+									SCHEDULE 13D
+								</div><br><div style="font-size:1.2em;">
+							Under the Securities Exchange Act of 1934
+						</div><br><div class="information" style="text-align:center; font-weight:bold;">
+									(Amendment No. <span style="color:blue;">3</span>)
+								</div><br><br></td></tr><tr><td class="center"><div class="information" style="text-align:center; font-weight:bold; color:blue;">Personalis, Inc.</div><div class="information" style="text-align:center; font-weight:bold;"><hr class="separatorThin">(Name of Issuer)</div><br><br></td></tr><tr><td class="center"><div class="information" style="text-align:center; font-weight:bold; color:blue;">Common Stock, $0.0001 par value</div><div class="information" style="text-align:center; font-weight:bold;"><hr class="separatorThin">(Title of Class of Securities)</div><br><br></td></tr><table border="1"><tr><td><div class="information" style="text-align:center; font-weight:bold; color:blue;">71535D106</div><div class="information" style="text-align:center; font-weight:bold;"><hr class="separatorThin">(CUSIP Number)</div></td></tr><br><br></table><tr><td class="center"><div class="information" style="text-align:center; font-weight:bold; color:blue;">Andrew Polovin<br>600 West Chicago Avenue,
+								Suite 510<br>Chicago,
+								IL,
+								60654<br>(800) 976-5448</div><div class="information" style="text-align:center; font-weight:bold;"><hr class="separatorThin">(Name, Address and Telephone Number of Person Authorized to
+									Receive Notices and Communications)</div></td></tr><tr><td class="center"><div class="information" style="text-align:center; font-weight:bold; color:blue;">07/19/2026</div><div class="information" style="text-align:center; font-weight:bold;"><hr class="separatorThin">(Date of Event Which Requires Filing of This Statement)</div></td></tr></table><br><br><div class="information" style="text-align:justify">
+				If the filing person has previously filed a statement on Schedule 13G to report the acquisition that is the subject of this Schedule 13D, and is filing this schedule because of §§ 240.13d-1(e), 240.13d-1(f) or 240.13d-1(g), check the following box.
+				<img src="/Images/box-checked.jpg" alt="Checkbox checked"></div><br><div class="information" style="text-align:justify">
+				The information required on the remainder of this cover page shall not be deemed to be “filed” for the purpose of Section 18 of the
+				Securities Exchange Act of 1934 (“Act”) or otherwise subject to the liabilities of that section of the Act but shall be subject to all other
+				provisions of the Act (however, see the Notes).
+			</div></div><hr class="headerThin"><hr class="header"><br><br>
+  <div style="display:none">
+			schemaVersion:
+			</div>
+<div class="content"><div class="form1"></div></div>
+  <div class="content"><div class="form1"><table><tr><td class="center"><br><br><p><div align="center" style="font-size:1.2em;">
+									SCHEDULE 13D
+								</div></p></td></tr></table><table role="presentation" class="tableClass" id="cusipNumber"><tr class="tableClass"><td width="7%" style="font-weight:bold;">CUSIP Number(s):</td><td width="75%"><div style="font-size:.9em; color:#000000">71535D106</div></td></tr></table><br><br><table role="presentation" class="tableClass" id="reportingPersonDetails"><tr class="tableClass"><td width="8%" class="tableClassValign">1</td><td width="92%" class="tableClass">
+					Name of reporting person
+					<br><br><div class="text">Tempus AI, Inc.</div></td></tr><tr><td width="8%" class="tableClassValign">2</td><td width="92%" class="tableClass">Check the appropriate box if a member of a Group (See Instructions)
+				<br><br><div class="text"><img src="/Images/box-unchecked.jpg" alt="Checkbox not checked">  (a)
+					<br><img src="/Images/box-unchecked.jpg" alt="Checkbox not checked">  (b)	
+				</div></td></tr><tr class="tableClassWithBgBlack"><td width="8%" class="tableClassValign">3</td><td width="92%" class="tableClass">SEC use only</td></tr><tr><td width="8%" class="tableClassValign">4</td><td width="92%" class="tableClass">
+					Source of funds (See Instructions)
+					<br><br><div class="text">WC, OO</div></td></tr><tr><td width="8%" class="tableClassValign">5</td><td width="92%" class="tableClass">
+					Check if disclosure of legal proceedings is required pursuant to Items 2(d) or 2(e)
+					<br><br><img src="/Images/box-unchecked.jpg" alt="Checkbox not checked"></td></tr><tr><td width="8%" class="tableClassValign">6</td><td width="92%" class="tableClass">Citizenship or place of organization
+				<br><br><div class="text">
+				NEVADA
+			</div></td></tr><tr><td width="8%" class="tableClassValign">Number of Shares Beneficially Owned by Each Reporting Person With:</td><td width="92%" class="tableClass"><table class="innerTableClass"><tr><td width="8%" class="innerTableClassRightValign">7</td><td width="92%" class="tableClassInnerLeft">Sole Voting Power
+							<br><br><div class="text">0.00</div></td></tr><tr><td width="8%" class="innerTableClassRightValign">8</td><td width="92%" class="tableClassInnerLeft">Shared Voting Power
+							<br><br><div class="text">13,039,067.00</div></td></tr><tr><td width="8%" class="innerTableClassRightValign">9</td><td width="92%" class="tableClassInnerLeft">Sole Dispositive Power
+							<br><br><div class="text">0.00</div></td></tr><tr><td width="8%" class="innerTableClassRightValignBottomLess">10</td><td width="92%" class="tableClassInnerLeftBottomLess">Shared Dispositive Power
+							<br><br><div class="text">13,039,067.00</div></td></tr></table></td></tr><tr><td width="8%" class="tableClassValign">11</td><td width="92%" class="tableClass">Aggregate amount beneficially owned by each reporting person
+				<br><br><div class="text">13,039,067.00</div></td></tr><tr><td width="8%" class="tableClassValign">12</td><td width="92%" class="tableClass">Check if the aggregate amount in Row (11) excludes certain shares (See Instructions)
+				<br><br><img src="/Images/box-unchecked.jpg" alt="Checkbox not checked"></td></tr><tr><td width="8%" class="tableClassValign">13</td><td width="92%" class="tableClass">Percent of class represented by amount in Row (11)
+				<br><br><div class="text">12.5 % </div></td></tr><tr><td width="8%" class="tableClassValign">14</td><td width="92%" class="tableClass">Type of Reporting Person (See Instructions)
+				<br><br><div class="text">CO</div></td></tr></table><br><table><tr><td class="center"><br><br><p><div align="center" style="font-size:1.2em;">
+									SCHEDULE 13D
+								</div></p></td></tr></table><table role="presentation" class="tableClass" id="cusipNumber"><tr class="tableClass"><td width="7%" style="font-weight:bold;">CUSIP Number(s):</td><td width="75%"><div style="font-size:.9em; color:#000000">71535D106</div></td></tr></table><br><br><table role="presentation" class="tableClass" id="reportingPersonDetails"><tr class="tableClass"><td width="8%" class="tableClassValign">1</td><td width="92%" class="tableClass">
+					Name of reporting person
+					<br><br><div class="text">Eric Lefkofsky</div></td></tr><tr><td width="8%" class="tableClassValign">2</td><td width="92%" class="tableClass">Check the appropriate box if a member of a Group (See Instructions)
+				<br><br><div class="text"><img src="/Images/box-unchecked.jpg" alt="Checkbox not checked">  (a)
+					<br><img src="/Images/box-unchecked.jpg" alt="Checkbox not checked">  (b)	
+				</div></td></tr><tr class="tableClassWithBgBlack"><td width="8%" class="tableClassValign">3</td><td width="92%" class="tableClass">SEC use only</td></tr><tr><td width="8%" class="tableClassValign">4</td><td width="92%" class="tableClass">
+					Source of funds (See Instructions)
+					<br><br><div class="text">PF, OO</div></td></tr><tr><td width="8%" class="tableClassValign">5</td><td width="92%" class="tableClass">
+					Check if disclosure of legal proceedings is required pursuant to Items 2(d) or 2(e)
+					<br><br><img src="/Images/box-unchecked.jpg" alt="Checkbox not checked"></td></tr><tr><td width="8%" class="tableClassValign">6</td><td width="92%" class="tableClass">Citizenship or place of organization
+				<br><br><div class="text">
+				UNITED STATES
+			</div></td></tr><tr><td width="8%" class="tableClassValign">Number of Shares Beneficially Owned by Each Reporting Person With:</td><td width="92%" class="tableClass"><table class="innerTableClass"><tr><td width="8%" class="innerTableClassRightValign">7</td><td width="92%" class="tableClassInnerLeft">Sole Voting Power
+							<br><br><div class="text">150,000.00</div></td></tr><tr><td width="8%" class="innerTableClassRightValign">8</td><td width="92%" class="tableClassInnerLeft">Shared Voting Power
+							<br><br><div class="text">13,039,067.00</div></td></tr><tr><td width="8%" class="innerTableClassRightValign">9</td><td width="92%" class="tableClassInnerLeft">Sole Dispositive Power
+							<br><br><div class="text">150,000.00</div></td></tr><tr><td width="8%" class="innerTableClassRightValignBottomLess">10</td><td width="92%" class="tableClassInnerLeftBottomLess">Shared Dispositive Power
+							<br><br><div class="text">13,039,067.00</div></td></tr></table></td></tr><tr><td width="8%" class="tableClassValign">11</td><td width="92%" class="tableClass">Aggregate amount beneficially owned by each reporting person
+				<br><br><div class="text">13,189,067.00</div></td></tr><tr><td width="8%" class="tableClassValign">12</td><td width="92%" class="tableClass">Check if the aggregate amount in Row (11) excludes certain shares (See Instructions)
+				<br><br><img src="/Images/box-unchecked.jpg" alt="Checkbox not checked"></td></tr><tr><td width="8%" class="tableClassValign">13</td><td width="92%" class="tableClass">Percent of class represented by amount in Row (11)
+				<br><br><div class="text">12.6 % </div></td></tr><tr><td width="8%" class="tableClassValign">14</td><td width="92%" class="tableClass">Type of Reporting Person (See Instructions)
+				<br><br><div class="text">IN</div></td></tr></table><br></div><div class="form1"><table><tr><td class="center"><br><br><p><div align="center" style="font-size:1.2em;">
+									SCHEDULE 13D
+								</div></p></td></tr></table><table role="presentation" id="item1to7"><tr><td width="8%" class="tableClassValignNoBorder">Item 1.</td><td width="92%" class="tableClassNoBorder">Security and Issuer</td></tr><tr class="tableClass"><td width="8%" class="tableClassNoBorderAlignCenter">(a)</td><td width="92%" class="tableClassNoBorder">Title of Class of Securities:
+							<br><br><div class="text">Common Stock, $0.0001 par value</div></td></tr><tr class="tableClass"><td width="8%" class="tableClassNoBorderAlignCenter">(b)</td><td width="92%" class="tableClassNoBorder">Name of Issuer:
+							<br><br><div class="text">Personalis, Inc.</div></td></tr><tr><td width="8%" class="tableClassNoBorderAlignCenter">(c)</td><td width="92%" class="tableClassNoBorder">Address of Issuer's Principal Executive Offices:
+							<br><br><div class="text">6600 Dumbarton Circle, Fremont, 
+				CALIFORNIA
+			, 94555.</div></td></tr><tr><td colspan="3"><div style="display: flex;"><div style="font-size: 0.9em; font-weight: bold; margin-right: 5px;">
+									Item 1 Comment:
+								</div><div class="largetext" style="text-align:justify">This Amendment No. 3 to Schedule 13D (this "Amendment No. 3") amends and supplements the statement on Schedule 13D originally filed with the United States Securities and Exchange Commission (the "SEC") on July 3, 2024 (as amended to date, the "Schedule 13D"), relating to the common stock, par value $0.0001 per share (the "Common Stock"), of Personalis, Inc., a Delaware corporation (the "Issuer"). Capitalized terms used herein without definition shall have the meaning set forth in the Schedule 13D.</div></div></td></tr><tr><td width="8%" class="tableClassValignNoBorder">Item 3.</td><td width="92%" class="tableClassNoBorder">Source and Amount of Funds or Other Consideration</td></tr><tr><td width="8%" class="tableClassNoBorderAlignCenter"> </td><td width="92%" class="tableClassNoBorder"><div class="largetext">Between November 18, 2025 and December 22, 2025, Tempus purchased 320,267 shares of Common Stock in a series of open-market transactions for aggregate consideration of approximately $2.74 million. Tempus funded the purchase of the shares of Common Stock using funds from its working capital.</div></td></tr><tr><td width="8%" class="tableClassValignNoBorder">Item 4.</td><td width="92%" class="tableClassNoBorder">Purpose of Transaction</td></tr><tr><td width="8%" class="tableClassNoBorderAlignCenter"> </td><td width="92%" class="tableClassNoBorder"><div class="largetext">Merger Agreement
+
+Following conclusion of confidential preliminary discussions between the Issuer and Tempus, and in response to the Issuer's request for Tempus to submit a proposal, on July 19, 2026, Tempus submitted a non-binding proposal to acquire all of the outstanding Common Stock of the Issuer. On July 20, 2026, Tempus entered into an Agreement and Plan of Merger (the "Merger Agreement") with the Issuer, Aviary Development, Inc., a Delaware corporation and a direct, wholly owned subsidiary of Tempus ("Merger Sub I") and Toucan Development, LLC, a Nevada limited liability company and a direct, wholly owned subsidiary of Tempus ("Merger Sub II" and, together with Merger Sub I, the "Merger Subs"). Pursuant to the Merger Agreement, and upon the terms and subject to the conditions therein, (a) Merger Sub I will be merged with and into the Issuer (the "First Merger"), with the Issuer surviving the First Merger as a direct, wholly owned subsidiary of Tempus (the "First Surviving Corporation"), and (b) as part of the same overall transaction, immediately after the First Merger, the First Surviving Corporation shall merge with and into Merger Sub II (the "Second Merger" and, together with the First Merger, the "Mergers"), with Merger Sub II surviving as a direct, wholly owned subsidiary of Tempus (the "Surviving Company"). The parties intend that the transaction qualify as a reorganization under Section 368(a) of the Code. Capitalized terms used in this Amendment No. 3 but not otherwise defined have the meaning set forth in the Merger Agreement.
+
+Approvals. The execution and delivery of the Merger Agreement and the consummation of the transactions contemplated thereby have been approved by each of the board of directors of Tempus and the board of directors of the Issuer (the "Issuer's Board of Directors"), and the Issuer's Board of Directors has resolved to recommend to the stockholders of the Issuer to adopt the Merger Agreement, subject to its terms and conditions.
+
+Consideration to Issuer Stockholders. At the Effective Time, each share of Common Stock issued and outstanding immediately prior to the Effective Time (other than shares of Common Stock that are owned or held in treasury by the Issuer or are owned by Tempus, the Merger Subs or their other controlled affiliates (such shares, the "Cancelled Shares") and shares of Common Stock that are outstanding immediately prior to the Effective Time and which are held by stockholders who have exercised and perfected appraisal rights for such shares in accordance with DGCL (such shares, the "Dissenting Shares")) will be automatically converted into the right to receive in accordance with, and subject to the terms, conditions and procedures set forth in the Merger Agreement, the following consideration (collectively, the "Merger Consideration"):
+
+- a number of validly issued, fully paid and nonassessable shares of Tempus Class A Common Stock equal to the Exchange Ratio (the "Stock Consideration"); provided, however, that Tempus may elect (a "Tempus Cash Election") to pay cash for up to 50% of the outstanding shares of Common Stock (which such amount may be automatically reduced to preserve the intended tax treatment of the Mergers). If Tempus makes a Tempus Cash Election, each holder will receive: (a) an amount in cash equal to the Per Share Cash Consideration of $16.25 per share, without interest (the "Cash Consideration"), for such holder's pro rata portion of the Eligible Shares subject to the Tempus Cash Election (determined by multiplying the holder's Eligible Shares by a fraction equal to the Cash Share Number divided by the total shares of Common Stock issued and outstanding (other than Cancelled Shares)), and (b) the Stock Consideration for the holder's remaining Eligible Shares; and
+
+- cash in lieu of fractional shares of Tempus Class A Common Stock in accordance with the Merger Agreement (the "Fractional Share Consideration").
+
+Pursuant to the Merger Agreement, the Exchange Ratio is determined as follows:
+
+- if the Tempus Stock Price (as defined below) is equal to or less than the Floor Price of $48.42, the Exchange Ratio will be fixed at 0.3356; and
+
+- if the Tempus Stock Price is greater than the Floor Price, the Exchange Ratio will be equal to $16.25 divided by the Tempus Stock Price.
+
+The "Tempus Stock Price" means the volume-weighted average price of Tempus Class A Common Stock on Nasdaq for the fifteen (15) consecutive trading days ending on (but not including) the last trading day prior to the Closing Date. However, if Tempus enters into or consummates a Tempus Transaction (as defined in the Merger Agreement) prior to the Closing, the Tempus Stock Price will instead be based on the per-share consideration payable in such Tempus Transaction.
+
+The shares of Tempus Class A Common Stock to be issued as Stock Consideration will be listed on The Nasdaq Global Select Market ("Nasdaq").
+
+Treatment of Issuer Equity Awards. The Merger Agreement provides that, at the Effective Time:
+
+- each In-the-Money Issuer Option (i) held by a former employee or any non-employee director (whether vested or unvested) or (ii) held by any current service provider that is vested and exercisable, in each case, that is outstanding and unexercised immediately prior to the Effective Time will be cancelled and converted into the right to receive the Stock Consideration in respect of each Net Option Share subject to such In-the-Money Issuer Option immediately prior to the Effective Time;
+
+- each other In-the-Money Issuer Option (whether vested or unvested) that is outstanding and unexercised immediately prior to the Effective Time will be assumed by Tempus and converted automatically into an option to purchase a number of shares of Tempus Class A Common Stock equal to the product obtained by multiplying (x) the number of shares subject to such In-the-Money Issuer Option immediately prior to the Effective Time, by (y) the Exchange Ratio, rounded down to the nearest whole share, with an exercise price per share of Tempus Class A Common Stock equal to (i) the per share exercise price for each share subject to the corresponding Issuer Option immediately prior to the Effective Time divided by (ii) the Exchange Ratio, rounded up to the nearest whole cent;
+
+- each Out-of-the-Money Issuer Option outstanding and unexercised immediately prior to the Effective Time (whether vested or unvested) shall be cancelled without any consideration;
+
+- each Issuer RSU (whether vested or unvested) that is held by a non-employee director of the Issuer outstanding as of immediately prior to the Effective Time will automatically accelerate to be fully vested as of immediately prior to the Effective Time and be cancelled in exchange for the Stock Consideration;
+
+- each other Issuer RSU that is outstanding immediately prior to the Effective Time will be assumed and converted automatically into a restricted stock unit with respect to a number of shares of Tempus Class A Common Stock equal to the product obtained by multiplying (i) the total number of shares of Common Stock subject to such Issuer RSU immediately prior to the Effective Time by (ii) the Exchange Ratio, rounded to the nearest whole share;
+
+- the unvested portion of each Issuer PSU that is outstanding immediately prior to the Effective Time will accelerate and vest with respect to that number of Issuer PSUs equal to (i) the total outstanding Issuer PSUs multiplied by (ii) the quotient obtained by dividing (x) the number of full calendar quarters that have elapsed from (and including) the start of the applicable measurement period through (and including) the Closing Date by (y) the number of full calendar quarters in the measurement period.  Such vested Issuer PSUs will automatically be cancelled in exchange for the Stock Consideration;
+
+- each unvested Issuer PSU that is outstanding immediately prior to the Effective Time (after giving effect to the foregoing acceleration) will be assumed and converted automatically into a restricted stock unit award with respect to a number of shares of Tempus Class A Common Stock equal to the product obtained by multiplying (i) the number of unvested Issuer PSUs by (ii) the Exchange Ratio, rounded to the nearest whole share. Following the Effective Time, the assumed PSUs shall be subject to only time-based vesting and will vest in successive, equal installments on the last day of each calendar quarter during the period beginning on (and including) the day immediately following the Closing Date and ending on the last day of the measurement period, subject to the holder's continued service through the applicable vesting date; and
+
+- (i) with respect to any offering periods in effect as of the signing of the Merger Agreement under the Issuer ESPP (the "Current ESPP Offering Periods"), no employee who is not a participant in the Issuer ESPP may become a participant in the Issuer ESPP and no participant may increase the percentage amount of his or her payroll deduction election from that in effect on the date hereof for such Current ESPP Offering Periods; (ii) subject to the consummation of the Mergers, the Issuer ESPP shall terminate effective immediately prior to the Effective Time; (iii) if the Current ESPP Offering Periods terminate prior to the Effective Time, then the Issuer ESPP shall be suspended and no new offering period shall be commenced under the Issuer ESPP prior to the termination of the Merger Agreement; and (iv) if any Current ESPP Offering Period is still in effect at the Effective Time, then the last day of such current ESPP offering period shall be accelerated to a date within ten (10) business days prior to the Closing Date.
+
+Conditions to Closing. Under the terms of the Merger Agreement, the completion of the Mergers is subject to certain customary closing conditions, including, among others: (i) the approval of the Mergers and adoption of the Merger Agreement by the affirmative vote of the holders of at least a majority of the outstanding shares of Common Stock entitled to vote thereon; (ii) the approval for listing on Nasdaq of the Tempus Class A Common Stock to be issued in the Mergers; (iii) the effectiveness of a registration statement on Form S-4 filed by Tempus registering the Tempus Class A Common Stock to be issued in connection with the Mergers; (iv) the accuracy of the parties' respective representations and warranties in the Merger Agreement, subject to specified materiality qualifications; (v) compliance by the parties with their respective covenants in the Merger Agreement required to be performed prior to the closing in all material respects; (vi) the absence of any law or order restraining, enjoining or otherwise prohibiting the consummation of the Mergers; (vii) the expiration or termination of the required waiting period applicable to the Mergers under the Hart-Scott-Rodino Antitrust Improvements Act of 1976, as amended, and the approval or issuance of any other filing or consent or the expiration or termination of any other waiting period applicable to the Mergers, in accordance with the Merger Agreement; (viii) the receipt by the Issuer of an opinion to the effect that the Mergers will qualify as a reorganization for U.S. federal income tax purposes; and (ix) the absence of an Issuer Material Adverse Effect (in the case of Tempus' obligation to close) or a Tempus Material Adverse Effect (in the case of the Issuer's obligation to close).
+
+Representations, Warranties and Covenants. The Merger Agreement includes representations, warranties and covenants of the parties customary for a transaction of this nature. From the date of the Merger Agreement until the earlier of the Effective Time and the termination of the Merger Agreement, the Issuer has agreed, subject to certain exceptions, to use reasonable best efforts to operate its business and operations in all material respects in the ordinary course and the Issuer and Tempus have each agreed to certain other interim operating covenants, as set forth more fully in the Merger Agreement.
+
+No-Solicitation. The Issuer has also agreed to customary "no-shop" restrictions on its ability to solicit alternative acquisition proposals from third parties and engage in discussions or negotiations with third parties regarding alternative acquisition proposals. Notwithstanding these restrictions, the Issuer may under certain circumstances provide, pursuant to an acceptable confidentiality agreement, information to and engage in or otherwise participate in discussions or negotiations with third parties with respect to a written alternative acquisition proposal that the Issuer's Board of Directors has determined in good faith, after consultation with its financial advisors and outside legal counsel, constitutes or could reasonably be expected to lead to a Superior Proposal and the failure to take such action would be inconsistent with fiduciary duties of the Issuer's Board of Directors under applicable law. The Merger Agreement also requires that the Issuer's Board of Directors recommend that the stockholders of the Issuer adopt the Merger Agreement (the "Issuer Board Recommendation") and not, among other things, (a) (i) withdraw or qualify (or modify in a manner adverse to Tempus), or otherwise propose to withdraw or qualify (or modify in a manner adverse to Tempus), the Issuer Board Recommendation, (ii) approve, recommend or declare advisable, or publicly propose to approve, recommend or declare advisable, any alternative acquisition proposal or (iii) fail to include the Issuer Board Recommendation in the Proxy Statement/Prospectus or the Form S-4, (any such action in (a), a "Issuer Adverse Change Recommendation"), or (b) approve, recommend or declare advisable, or propose to approve, recommend or declare advisable, or allow the Issuer to execute or enter into any Issuer Acquisition Agreement (other than an acceptable confidentiality agreement) with respect to any alternative acquisition proposal. The Issuer's Board of Directors is permitted, subject to the terms and conditions set forth in the Merger Agreement, to make an Issuer Adverse Change Recommendation in response to a Superior Proposal and/or make an Issuer Adverse Change Recommendation in response to a Change in Circumstance, subject in each case to certain notice and matching rights in favor of Tempus and payment of the termination fee described below in certain circumstances. Notwithstanding an Issuer Adverse Change Recommendation, unless the Merger Agreement is validly terminated, the Issuer is still required to convene the meeting of its stockholders to obtain the requisite stockholder approval contemplated by the Merger Agreement.
+
+Termination Rights. The Merger Agreement includes a remedy of specific performance for the Issuer and Tempus. The Merger Agreement also includes customary termination provisions for both the Issuer and Tempus and provides that, in connection with the termination of the Merger Agreement under specified circumstances, including a termination by Tempus due to an Issuer Adverse Change Recommendation, the Issuer will be required to pay to Tempus a termination fee (the "Termination Fee") of an amount in cash equal to approximately $76.8 million. The Termination Fee is also payable if: (a) the Merger Agreement is terminated in certain circumstances, (b) after the date of the Merger Agreement and prior to such termination a bona fide proposal for an alternative acquisition transaction has been publicly disclosed and not withdrawn, and (c) within twelve (12) months of such termination, the Issuer enters into a definitive agreement with respect to an alternative acquisition transaction that is subsequently consummated. Any such termination of the Merger Agreement by the Issuer is subject to certain conditions, including the Issuer's compliance with certain procedures set forth in the Merger Agreement, including in the case of an Issuer Adverse Change Recommendation, affording Tempus certain notice and match rights. The Issuer also has the right to terminate the Merger Agreement if the Tempus Stock Price (as finally determined pursuant to the Merger Agreement) is less than the Lower Floor Price of $46.00, which right is only expected to be exercisable within a two business day period preceding the day the closing would otherwise be required to occur.
+
+The Merger Agreement further provides that Tempus will be required to pay the Issuer a reverse termination fee of an amount in cash equal to approximately $76.8 million in the event the Merger Agreement is terminated under certain specified circumstances, including if the Merger Agreement is terminated by Tempus or the Issuer either (a) due to the existence of a permanent legal restraint under the HSR Act or another Antitrust Law (solely to the extent such restraint is primarily due to Tempus' breach of certain of its obligations under the Merger Agreement), or (b) due to the Effective Time not having occurred by April 20, 2027 (the "Outside Date") (provided that the Outside Date will be automatically extended for an additional six months and an additional six months thereafter pursuant to the Merger Agreement), when, at the time of termination, the applicable regulatory conditions to the Closing under the HSR Act or another Antitrust Law have not been satisfied primarily due to Tempus' breach of certain of its obligations under the Merger Agreement, and all other conditions to the Closing have been satisfied or waived.
+
+The foregoing description of the Merger Agreement does not purport to be complete and is qualified in its entirety by the full text of such agreement, which is attached as an exhibit to this Amendment No. 3 and incorporated herein by reference. The Merger Agreement is not intended to provide any other factual information about the Issuer, Tempus, Merger Sub I or Merger Sub II. In particular, the representations, warranties and covenants of each party set forth in the Merger Agreement have been made only for the purposes of, and were and are solely for the benefit of the parties to, the Merger Agreement, may be subject to limitations agreed upon by the contracting parties, including being qualified by confidential disclosure letters made for the purposes of allocating contractual risk between the parties to the Merger Agreement instead of establishing these matters as facts, and may be subject to standards of materiality applicable to the contracting parties that differ from those applicable to investors. Accordingly, the Merger Agreement is included with this filing only to provide information regarding the terms of the Merger Agreement and not to provide any other factual information regarding the parties or their respective businesses. These confidential disclosure letters contain information that modifies, qualifies and creates exceptions to the representations and warranties and certain covenants set forth in the Merger Agreement.</div></td></tr><tr><td width="8%" class="tableClassValignNoBorder">Item 5.</td><td width="92%" class="tableClassNoBorder">Interest in Securities of the Issuer</td></tr><tr><td width="8%" class="tableClassNoBorderAlignCenter">(a)</td><td width="92%" class="tableClassNoBorder"><div class="largetext">The information contained on the cover pages is incorporated by reference to this Item 5.
+
+The ownership percentage presented herein is based on 104,721,098 shares of Common Stock outstanding as of April 29, 2026 as disclosed in the Issuer's Quarterly Report on Form 10-Q as filed with the SEC on May 7, 2026.</div></td></tr><tr><td width="8%" class="tableClassNoBorderAlignCenter">(b)</td><td width="92%" class="tableClassNoBorder"><div class="largetext">The information contained on the cover pages is incorporated by reference to this Item 5.
+
+The securities reported herein represent shares of Common Stock held of record by Tempus. Mr. Lefkofsky is the controlling stockholder of Tempus and as such, may be deemed to have beneficial ownership of the securities held of record by Tempus.
+
+In addition, Mr. Lefkofsky is the record holder of 150,000 shares of Common Stock.</div></td></tr><tr><td width="8%" class="tableClassNoBorderAlignCenter">(c)</td><td width="92%" class="tableClassNoBorder"><div class="largetext">Except as described in Item 4, during the past 60 days, none of the Reporting Persons nor Related Persons has effected any transactions with respect to the Common Stock.</div></td></tr><tr><td width="8%" class="tableClassNoBorderAlignCenter">(d)</td><td width="92%" class="tableClassNoBorder"><div class="largetext">None.</div></td></tr><tr><td width="8%" class="tableClassNoBorderAlignCenter">(e)</td><td width="92%" class="tableClassNoBorder"><div class="largetext">Not applicable.</div></td></tr><tr><td width="8%" class="tableClassValignNoBorder">Item 6.</td><td width="92%" class="tableClassNoBorder">Contracts, Arrangements, Understandings or Relationships With Respect to Securities of the Issuer</td></tr><tr><td width="8%" class="tableClassNoBorderAlignCenter"> </td><td width="92%" class="tableClassNoBorder"><div class="largetext">Item 4 above summarizes certain provisions of the Merger Agreement and is incorporated herein by reference. A copy of the Merger Agreement is attached as an exhibit to this Amendment No. 3 and incorporated herein by reference.
+
+Except as set forth in the Schedule 13D, the Reporting Persons do not have any contracts, arrangements, understandings or relationships (legal or otherwise) with any person with respect to any securities of the Issuer, including but not limited to any contracts, arrangements, understandings or relationships concerning the transfer or voting of such securities, finder's fees, joint ventures, loan or option arrangements, puts or calls, guarantees of profits, division of profits or losses, or the giving or withholding of proxies.</div></td></tr><tr><td width="8%" class="tableClassValignNoBorder">Item 7.</td><td width="92%" class="tableClassNoBorder">Material to be Filed as Exhibits.</td></tr><tr><td width="8%" class="tableClassNoBorderAlignCenter"> </td><td width="92%" class="tableClassNoBorder"><div class="largetext">Exhibit 8: Agreement and Plan of Merger, dated as of July 20, 2026, by and among Tempus AI, Inc., Personalis, Inc., Aviary Development, Inc. and Toucan Development, LLC (incorporated by reference to Exhibit 2.1 to the Issuer's Current Report on Form 8-K filed with the SEC on July 20, 2026).</div></td></tr></table><br></div><div class="form1"><table role="presentation" id="signatureInfo"><tr><td width="8%" class="tableClassValignNoBorder">    SIGNATURE</td><td width="92%" class="tableClassNoBorder"> </td></tr><tr><td width="8%" class="tableClassNoBorderAlignCenter"> </td><td width="92%" class="tableClassNoBorder"><div class="information" style="text-align:justify">
+						After reasonable inquiry and to the best of my knowledge and belief, I certify that the information set forth in this statement is true, complete and correct.
+						<br><br></div></td></tr></table><table><tr class="tableClass"><td width="50%" class="tableClassNoBorder"> </td><td width="50%" class="tableClassNoBorder"><table><tr class="tableClass"><td width="100%" class="tableClassInnerNoBorderBlue"><div class="text">Tempus AI, Inc.</div></td></tr></table></td></tr></table><table><tr class="tableClass"><td width="50%" class="tableClassNoBorder"> </td><td width="50%" class="tableClassNoBorder"><table><tr class="tableClass"><td width="8%" class="tableClassNoBorderAlignLeft signature">Signature:</td><td width="92%" class="tableClassNoBorderBlue signature">/s/ Andrew Polovin</td></tr><tr class="tableClass"><td width="8%" class="tableClassNoBorderAlignLeft signature">Name/Title:</td><td width="92%" class="tableClassNoBorderBlue signature">Andrew Polovin, Chief Legal Officer</td></tr><tr class="tableClass"><td width="8%" class="tableClassNoBorderAlignLeft signature">Date:</td><td width="92%" class="tableClassNoBorderBlue signature">07/20/2026</td></tr></table></td></tr></table><table><tr class="tableClass"><td width="50%" class="tableClassNoBorder"> </td><td width="50%" class="tableClassNoBorder"><table><tr class="tableClass"><td width="100%" class="tableClassInnerNoBorderBlue"><div class="text">Eric Lefkofsky</div></td></tr></table></td></tr></table><table><tr class="tableClass"><td width="50%" class="tableClassNoBorder"> </td><td width="50%" class="tableClassNoBorder"><table><tr class="tableClass"><td width="8%" class="tableClassNoBorderAlignLeft signature">Signature:</td><td width="92%" class="tableClassNoBorderBlue signature">/s/ Eric Lefkofsky</td></tr><tr class="tableClass"><td width="8%" class="tableClassNoBorderAlignLeft signature">Name/Title:</td><td width="92%" class="tableClassNoBorderBlue signature">Eric Lefkofsky</td></tr><tr class="tableClass"><td width="8%" class="tableClassNoBorderAlignLeft signature">Date:</td><td width="92%" class="tableClassNoBorderBlue signature">07/20/2026</td></tr></table></td></tr></table></div></div>
+<script type="text/javascript"  src="/nd7kb9mCUV/CxBaQU/3fjA/Or5XcXrmfDVmcJ7G/QCEYaQ/DBMbKw/kWDyg"></script></body></html>
