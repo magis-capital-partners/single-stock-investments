@@ -1,6 +1,6 @@
 # ETHA — Investment Thesis
 
-**Last updated:** 2026-10-02
+**Last updated:** auto-sync
 
 ## Classification
 
@@ -11,7 +11,13 @@
 | **Dhando** (Pabrai) | partial |
 | **Stance** | watch |
 | **Cycle** | mid |
+| **Implied 7yr IRR** (base) | — |
+| **IRR method** | quality_reinvestment |
+| **Lawrence bucket** | other |
 | **Payoff lens** | asset |
+| **MOI bucket** | pending |
+
+**Deep dive:** `ETHA/research/deep_dive_2026-10-02.md` (auto-sync)
 
 ## One-line thesis
 

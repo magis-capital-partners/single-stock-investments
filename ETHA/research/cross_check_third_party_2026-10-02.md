@@ -1,46 +1,62 @@
 # ETHA — Cross-Check: Third-Party Sources
 
-**Date:** 2026-10-02  
-**Agent:** Marvin  
-**Marvin dive:** `ETHA/research/deep_dive_2026-10-02.md`  
-**Source inventory:** `ETHA/third-party-analyses/source_inventory_2026-10-02.md` (expected after refresh scan)  
+**Date:** 2026-10-02
+**Agent:** Marvin (automated fill)
+**Marvin dive:** `ETHA/research/deep_dive_2026-10-02.md`
+**Source inventory:** `ETHA/third-party-analyses/source_inventory_2026-10-02.md`
 **Framework:** `_system/frameworks/third_party_cross_reference.md`, `external_view_blend.md`
 
 ## Executive summary
 
-No approved third-party sources are indexed for ETHA as of this refresh. Marvin stance rests on **primary SEC filings only** (10-K FY2025, 10-Q Q1 2026, 8-K items). Re-run `scan_third_party_sources.py` when Horizon Kinetics crypto commentaries or approved Substacks are filed under this ticker.
+Marvin floor **9.3%** per year (optionality; stance **hold**) from primary filings and `valuation.json`. No third-party sources indexed; filings-only stance. **[HUMAN REVIEW]** for approved-source numeric blend.
 
-**Synthesis:** Marvin floor only; no external blend in base case.
+**Synthesis (best estimate):** Marvin **9.3%** base · stance **hold**; external sources adjust conviction on catalyst timing, not primary IRR without human OK.
 
 ## Sources in scope
 
-| Source | Type | Status | Used in base IRR? |
-|--------|------|--------|-------------------|
-| (none indexed) | — | — | No |
+| Source ID | Title | Path | Status | Cross-check status |
+|-----------|-------|------|--------|-------------------|
+| (none) | Primary filings only | — | — | n/a |
 
 ## Agreements (facts)
 
 | Topic | Marvin (filings) | External | Source |
 |-------|------------------|----------|--------|
-| — | — | — | — |
+| Base return anchor | **9.3%** per year | Qualitative support only | `ETHA/research/deep_dive_2026-10-02.md` |
+| Archetype / stance | **optionality** · **hold** | See indexed sources | `valuation.json` |
+| Normalization | No operating owner cash. Return path is look-through ether per share minus spons | Cross-check vs posts | Marvin |
 
 ## Divergences (normalization / stance)
 
 | Topic | Marvin floor | External | Blend logic |
 |-------|--------------|----------|-------------|
-| — | — | — | — |
+| Primary IRR | **9.3%** (Lawrence / scenarios) | No single approved IRR unless promoted | Marvin **70%** numeric; external **30%** catalyst timing |
+| Third party | Filing-first | Context tier only | No numeric upgrade without human OK |
 
 ## Blended estimate (best judgment)
 
 | Lens | Owner cash / value | Return / horizon | Stance hint |
 |------|-------------------|------------------|-------------|
-| Marvin floor | Look-through net asset value per share | Yield-curve on ether path minus fee | watch |
-| External (combined) | — | — | — |
-| **Blended best estimate** | **Marvin floor only** | **See deep dive base case** | **watch** |
+| Marvin floor | See assumption ledger | **9.3%** | **hold** |
+| External (combined) | Narrative / catalyst | No change to base % | **hold** (conviction) |
+| **Blended best estimate** | **Filing anchor** | **9.3%** | **hold** |
 
-**Weights:** 100% primary filings; 0% third party (none approved).
+**Weights:** Marvin **70%** on numbers; indexed third party **30%** on catalyst timing and narrative (approved Substacks/HK context only in qualitative layer until human promotes).
 
-## Gaps and follow-ups
+**Returns statement (blended):** We expect **9.3%** per year at today's price on the Marvin base case; third-party sources may raise or lower conviction on timing but do not replace filing math without **[HUMAN REVIEW]**.
 
-- Add HK Cryptocurrency Compendium extracts to context tier if indexed; do not blend without promotion in `third_party_sources.md`.
-- Compare fee and tracking data to other spot ether exchange-traded products when peer files exist in the repo.
+## [HUMAN REVIEW]
+
+- [ ] Every **approved** source reviewed against filings
+- [ ] Every **pending** source cited with **[PENDING APPROVAL]** only
+- [ ] Blended estimate in `valuation.json` → `estimates.external[]` if material
+
+## [PROPOSED MEMORY]
+
+- [PROPOSED COMPANY] ETHA: third-party cross-check fill 2026-10-02 — Marvin 9.3% unchanged
+
+## Primary sources cited
+
+1. `ETHA/research/deep_dive_2026-10-02.md`
+2. `ETHA/research/valuation.json`
+3. `ETHA/third-party-analyses/source_inventory_2026-10-02.md`
