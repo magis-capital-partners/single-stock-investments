@@ -1,14 +1,14 @@
 {
   "schema_version": "3.0",
-  "status": "decision_grade",
-  "proof_status": "decision_grade",
-  "model_level": "stock_specific",
-  "model_level_reason": "The proof-complete model uses stock-specific components and assumptions.",
+  "status": "evidence_blocked",
+  "proof_status": "evidence_blocked",
+  "model_level": "evidence_blocked",
+  "model_level_reason": "Prospective falsifier coverage is incomplete.",
   "decision_eligibility": {
-    "committee_eligible": true,
+    "committee_eligible": false,
     "capital_actionable": false,
     "capital_authority_required": "human_decision",
-    "reason": "Stock-specific proof is eligible for independent committee review."
+    "reason": "Close prospective falsifier coverage before committee review."
   },
   "ticker": "AMZN",
   "as_of": "2026-08-31",
@@ -1377,8 +1377,8 @@
                 "ref": "AMZN/research/valuation.json",
                 "locator": "inputs.price",
                 "as_of": "2026-07-25",
-                "content_sha256": "b8cf992280e2d503b8888153ce6b03f498b8cd4619c9c0845b7a995457cfeba2",
-                "source_id": "83812f6593ff625dc0681837ad21f2f7221300c6876a6dc887eda60c0a56dbce"
+                "content_sha256": "48bb99f4a7cede50c39d572b2bdcc385e74a75bc22e944e5d2171a4075dc48b1",
+                "source_id": "1a08912fed6f0d0cba8fef1117e0fc2585c6fc817ff269072c8de1a228562f78"
               },
               "rationale": null
             },
@@ -1418,8 +1418,8 @@
                 "ref": "AMZN/research/valuation.json",
                 "locator": "inputs.price",
                 "as_of": "2026-07-25",
-                "content_sha256": "b8cf992280e2d503b8888153ce6b03f498b8cd4619c9c0845b7a995457cfeba2",
-                "source_id": "83812f6593ff625dc0681837ad21f2f7221300c6876a6dc887eda60c0a56dbce"
+                "content_sha256": "48bb99f4a7cede50c39d572b2bdcc385e74a75bc22e944e5d2171a4075dc48b1",
+                "source_id": "1a08912fed6f0d0cba8fef1117e0fc2585c6fc817ff269072c8de1a228562f78"
               },
               "rationale": null
             },
@@ -1459,8 +1459,8 @@
                 "ref": "AMZN/research/valuation.json",
                 "locator": "inputs.price",
                 "as_of": "2026-07-25",
-                "content_sha256": "b8cf992280e2d503b8888153ce6b03f498b8cd4619c9c0845b7a995457cfeba2",
-                "source_id": "83812f6593ff625dc0681837ad21f2f7221300c6876a6dc887eda60c0a56dbce"
+                "content_sha256": "48bb99f4a7cede50c39d572b2bdcc385e74a75bc22e944e5d2171a4075dc48b1",
+                "source_id": "1a08912fed6f0d0cba8fef1117e0fc2585c6fc817ff269072c8de1a228562f78"
               },
               "rationale": null
             },
@@ -1496,8 +1496,8 @@
             "ref": "AMZN/research/valuation.json",
             "locator": "inputs.price",
             "as_of": "2026-07-25",
-            "content_sha256": "b8cf992280e2d503b8888153ce6b03f498b8cd4619c9c0845b7a995457cfeba2",
-            "source_id": "83812f6593ff625dc0681837ad21f2f7221300c6876a6dc887eda60c0a56dbce"
+            "content_sha256": "48bb99f4a7cede50c39d572b2bdcc385e74a75bc22e944e5d2171a4075dc48b1",
+            "source_id": "1a08912fed6f0d0cba8fef1117e0fc2585c6fc817ff269072c8de1a228562f78"
           },
           {
             "node_id": "normalized_owner_cash",
@@ -1512,7 +1512,7 @@
           "passed": true,
           "errors": []
         },
-        "proof_hash": "2c861970675adccda9194e89c3629caf5eb00cf09642f71c9d45a9be104259a9"
+        "proof_hash": "b0bb1060901c28ec297cb89a283150169d0e17726eadfbd0abefaf3caeeea1e6"
       },
       "evidence_tier": "primary_derived",
       "evidence_level": "primary_derived",
@@ -1924,7 +1924,7 @@
     },
     "all_material_components_priced": true,
     "calculation_errors": [],
-    "aggregate_proof_hash": "dc95bcd1a25921a3aa3eb2bea74606ed356a8b62c7b6b04b7500d78efebfb635"
+    "aggregate_proof_hash": "4e3b5ef6ff7b7c7110939dd838ff434bd2fb3e3b7dd68a5e45ad5f5ccae47641"
   },
   "source_lineage": [
     {
@@ -1976,8 +1976,8 @@
       "ref": "AMZN/research/valuation.json",
       "locator": "inputs.price",
       "as_of": "2026-07-25",
-      "content_sha256": "b8cf992280e2d503b8888153ce6b03f498b8cd4619c9c0845b7a995457cfeba2",
-      "source_id": "83812f6593ff625dc0681837ad21f2f7221300c6876a6dc887eda60c0a56dbce"
+      "content_sha256": "48bb99f4a7cede50c39d572b2bdcc385e74a75bc22e944e5d2171a4075dc48b1",
+      "source_id": "1a08912fed6f0d0cba8fef1117e0fc2585c6fc817ff269072c8de1a228562f78"
     },
     {
       "component_id": "cycle_reserve",
@@ -2003,8 +2003,10 @@
     "present_value_is_not_treated_as_future_payoff": true
   },
   "evidence": {
-    "unresolved_count": 0,
-    "blockers": [],
+    "unresolved_count": 1,
+    "blockers": [
+      "prospective_falsifier_gate: new/materially changed components lack eligible, source-preflighted v3 forecasts or typed v3 untestable dispositions: cycle_reserve"
+    ],
     "validation_errors": []
   },
   "monitoring": {
@@ -2022,7 +2024,7 @@
     ]
   },
   "change_control": {
-    "model_hash": "5139d060cdeb6747f63f9a460bcfe53ee1efa39bf762fe7b5d18f68694150e92",
+    "model_hash": "3d47acd98ce97a940ea2d84b4d670deda912241265897ae7039de627996f863f",
     "method_versions": [
       "midcycle_capacity_value@1.0",
       "net_asset_value@1.0",
@@ -2046,6 +2048,18 @@
     "calibration_eligible": 2,
     "diagnostic_only": 0,
     "spec_ref": "AMZN/research/falsifier_specs.json",
-    "enforcement_enabled": false
+    "enforcement_enabled": false,
+    "prospective_gate": {
+      "since": "2026-08-12",
+      "changed_components": [
+        "cycle_reserve"
+      ],
+      "covered_components": [],
+      "eligible_components": [],
+      "untestable_dispositions": [],
+      "missing_components": [
+        "cycle_reserve"
+      ]
+    }
   }
 }
