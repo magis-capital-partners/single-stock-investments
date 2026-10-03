@@ -1,10 +1,11 @@
 # PLUG — Third-party source inventory
 
 **Date:** 2026-10-03
-**Sources:** 8 total (0 approved, 0 pending, 8 context)
+**Sources:** 9 total (0 approved, 0 pending, 9 context)
 
 | ID | Title | Path | Status | Use |
 |----|-------|------|--------|-----|
+| vic | 06-Plug-Power_13b1 | `PLUG/third-party-analyses/vic/06-Plug-Power_13b1.pdf` | context | Value Investors Club (licensed corpus; variant view, not base IRR) |
 | activist_short | Dec 19, 2019 | `_system/reference/activist-reports/spruce_point/spruce_point_2019-12-19_plug-power-inc.html` | context | activist/short — publisher_site |
 | activist_long | Grove Energy Capital LLC — SC 13D/A | `PLUG/third-party-analyses/activist_reports/long/SC-13D/A_20220511_acc0001104659_22_058602.htm` | context | activist/long — sec_edgar |
 | activist_long | Grove Energy Capital LLC — SC 13D/A | `PLUG/third-party-analyses/activist_reports/long/SC-13D/A_20241106_acc0001104659_24_114776.htm` | context | activist/long — sec_edgar |
