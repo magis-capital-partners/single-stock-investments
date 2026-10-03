@@ -1,0 +1,535 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns:p="http://www.sec.gov/edgar/schedule13D" xmlns:p1="http://www.sec.gov/edgar/common"><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8"><link rel="stylesheet" type="text/css" href="/css/SDR_print.css"><style type="text/css">
+					.fakeTextBox {
+					border-top: 2px solid #999;
+					border-right: 1px solid #ccc;
+					border-bottom: 1px solid #ccc;
+					border-left: 2px solid #999;
+					padding: 2px;
+					_width: 800px;
+					height: auto;
+					min-width: 200px;
+					min-height: 50px;
+					word-wrap: break-word;
+					font-size: 0.9em;
+					color: blue;
+					}
+					table.tableClass { border: solid black;
+					border-top-width: 1;
+					border-right-width: 1;
+					border-bottom-width: 1;
+					border-left-width: 1;
+					table-layout:fixed;
+					}
+					table.innerTableClass { border: solid black;
+					border-top-width: 0;
+					border-right-width: 0;
+					border-bottom-width: 0;
+					border-left-width: 0;
+					table-layout:fixed;
+					}
+					th.tableClassLeft { border: solid black;
+					border-top-width: 0px;
+					border-right-width: 0px;
+					border-bottom-width: 1px;
+					border-left-width: 1px;
+					padding: 2px;
+					}
+					th.tableClassRight { border: solid black;
+					border-top-width: 0px;
+					border-right-width: 1px;
+					border-bottom-width: 1px;
+					border-left-width: 0;
+					padding: 2px;
+					}
+					th.tableClass { border: solid black;
+					border-top-width: 0px;
+					border-right-width: 1px;
+					border-bottom-width: 1px;
+					border-left-width: 1px;
+					padding: 2px;
+					}
+					td.tableClassLeft { border: solid black;
+					border-top-width: 0px;
+					border-right-width: 0px;
+					border-bottom-width: 1px;
+					border-left-width: 1px;
+					font-size: 0.9em;
+					color: blue;
+					word-wrap: break-word;
+					}
+					td.tableClassRight { border: solid black;
+					border-top-width: 0px;
+					border-right-width: 1px;
+					border-bottom-width: 1px;
+					border-left-width: 0;
+					font-size: 0.9em;
+					color: blue;
+					word-wrap: break-word;
+					}
+					td.tableClass { border: solid black;
+					border-top-width: 0px;
+					border-right-width: 1px;
+					border-bottom-width: 1px;
+					border-left-width: 1px;
+					font-size: 0.9em;
+					font-weight:bold;
+					color: black;
+					word-wrap: break-word;
+					}
+					td.tableClassNoBorder { border: solid black;
+					border-top-width: 0px;
+					border-right-width: 0px;
+					border-bottom-width: 0px;
+					border-left-width: 0px;
+					font-size: 0.9em;
+					font-weight:bold;
+					color: black;
+					word-wrap: break-word;
+					}
+
+					td.tableClassNoBorderBlue { border: solid black;
+					border-top-width: 0px;
+					border-right-width: 0px;
+					border-bottom-width: 0px;
+					border-left-width: 0px;
+					font-size: 0.9em;
+					font-weight:bold;
+					color: blue;
+					word-wrap: break-word;
+					}
+
+					td.tableClassInnerNoBorderBlue { border: solid black;
+					border-top-width: 0px;
+					border-right-width: 0px;
+					border-bottom-width: 0px;
+					border-left-width: 0px;
+					font-size: 1.4em;
+					font-weight:bold;
+					color: blue;
+					word-wrap: break-word;
+					}
+
+					td.tableClassNoBorderAlignLeft { border: solid black;
+					border-top-width: 0px;
+					border-right-width: 0px;
+					border-bottom-width: 0px;
+					border-left-width: 0px;
+					font-size: 0.9em;
+					font-weight:bold;
+					text-align: left;
+					color: black;
+					word-wrap: break-word;
+					}
+
+					td.signature {
+					padding: 4px 8px;
+					}
+
+					td.tableClassInner { border: solid black;
+					border-top-width: 0px;
+					border-right-width: 1px;
+					border-bottom-width: 1px;
+					border-left-width: 1px;
+					font-size: 1em;
+					font-weight:bold;
+					color: black;
+					word-wrap: break-word;
+					}
+
+					td.tableClassValign { border: solid black;
+					border-top-width: 0px;
+					border-right-width: 1px;
+					border-bottom-width: 1px;
+					border-left-width: 1px;
+					font-size: 0.9em;
+					font-weight:bold;
+					color: black;
+					vertical-align: middle;
+					text-align: center;
+					word-wrap: break-word;
+					}
+
+					td.tableClassValignNoBorder { border: solid black;
+					border-top-width: 0px;
+					border-right-width: 0px;
+					border-bottom-width: 0px;
+					border-left-width: 0px;
+					font-size: 0.9em;
+					font-weight:bold;
+					color: black;
+					vertical-align: middle;
+					text-align: center;
+					word-wrap: break-word;
+					}
+
+					td.tableClassValignInner { border: solid black;
+					border-top-width: 0px;
+					border-right-width: 1px;
+					border-bottom-width: 1px;
+					border-left-width: 1px;
+					font-size: 1em;
+					font-weight:bold;
+					color: black;
+					vertical-align: middle;
+					text-align: center;
+					word-wrap: break-word;
+					}
+
+					td.innerTableClassRightValign { border: solid black;
+					border-top-width: 0px;
+					border-right-width: 1px;
+					border-bottom-width: 1px;
+					border-left-width: 0;
+					font-size: 1em;
+					font-weight:bold;
+					color: black;
+					vertical-align: middle;
+					text-align: center;
+					word-wrap: break-word;
+					}
+
+					td.innerTableClassRightValignBottomLess { border: solid black;
+					border-top-width: 0px;
+					border-right-width: 1px;
+					border-bottom-width: 0px;
+					border-left-width: 0;
+					font-size: 1em;
+					font-weight:bold;
+					color: black;
+					vertical-align: middle;
+					text-align: center;
+					word-wrap: break-word;
+					}
+
+					td.tableClassInnerLeft { border: solid black;
+					border-top-width: 0px;
+					border-right-width: 0px;
+					border-bottom-width: 1px;
+					border-left-width: 1px;
+					font-size: 1em;
+					font-weight:bold;
+					color: black;
+					word-wrap: break-word;
+					}
+
+					td.tableClassInnerLeftBottomLess { border: solid black;
+					border-top-width: 0px;
+					border-right-width: 0px;
+					border-bottom-width: 0px;
+					border-left-width: 1px;
+					font-size: 1em;
+					font-weight:bold;
+					color: black;
+					word-wrap: break-word;
+					}
+
+					td.tableClassNoBorderAlignCenter { border: solid black;
+					border-top-width: 0px;
+					border-right-width: 0px;
+					border-bottom-width: 0px;
+					border-left-width: 0px;
+					font-size: 0.9em;
+					font-weight:bold;
+					color: black;
+					text-align: center;
+					word-wrap: break-word;
+					}
+
+					tr.tableClass { border: solid black;
+					border-top-width: 1px;
+					border-right-width: 1px;
+					border-bottom-width: 1px;
+					border-left-width: 1px;
+					}
+					tr.tableClassWithBg { border: solid black;
+					border-top-width: 0;
+					border-right-width: 1;
+					border-bottom-width: 1;
+					border-left-width: 0;
+					background-color: #e0e0ff
+					}
+
+					tr.tableClassWithBgBlack { border: solid black;
+					border-top-width: 0;
+					border-right-width: 1;
+					border-bottom-width: 1;
+					border-left-width: 0;
+					background-color: #D3D3D3
+					}
+
+					hr.header {
+					position: relative;
+					top: 20px;
+					border: none;
+					height: 6px;
+					background: black;
+					margin-bottom: 10px;
+					}
+
+					hr.separatorThin {
+					position: relative;
+					top: 2px;
+					border: none;
+					height: 2px;
+					background: black;
+					margin-bottom: 2px;
+					}
+
+					hr.headerThin {
+					position: relative;
+					top: 10px;
+					border: none;
+					height: 2px;
+					background: black;
+					margin-bottom: 10px;
+					}
+
+					hr.separator {
+					position: relative;
+					top: 20px;
+					border: none;
+					height: 4px;
+					background: black;
+					margin-bottom: 5px;
+					}
+
+					div.text {
+					background-color: #ffffff;
+					color: blue;
+					font-size: 1em;
+					font-weight:normal;
+					text-align:justify;
+					}
+
+
+					div.information {
+					background-color: #ffffff;
+					color: black;
+					font-size: 1em;
+					font-weight:normal;
+					text-align:justify;
+					}
+
+					#scheader {
+					font-size: 0.9em;
+					border: 0px solid #404040;
+					border-spacing: 2px;
+					}
+
+					div.largetext {
+					background-color: #ffffff;
+					color: blue;
+					font-size: 1em;
+					font-weight:normal;
+					text-align:justify;
+					white-space: pre-wrap;
+					word-break: normal;
+					}
+
+				</style></head><body lang="en-US" text="#000000" bgcolor="#ffffff"><hr class="header"><br><hr class="headerThin"><div class="contentwrapper"><table role="presentation" id="scheader"><tr><td class="tableClassNoBorderAlignCenter" style="font-size:2em;">
+						SECURITIES AND EXCHANGE COMMISSION
+						<br>
+						Washington, D.C. 20549
+					</td></tr><tr><td class="tableClassNoBorderAlignCenter"><br><br><div style="font-size:1.5em;">
+									SCHEDULE 13D
+								</div><br><div style="font-size:1.2em;">
+							Under the Securities Exchange Act of 1934
+						</div><br></td></tr><tr><td class="center"><div class="information" style="text-align:center; font-weight:bold; color:blue;">Anghami Inc</div><div class="information" style="text-align:center; font-weight:bold;"><hr class="separatorThin">(Name of Issuer)</div><br><br></td></tr><tr><td class="center"><div class="information" style="text-align:center; font-weight:bold; color:blue;">Ordinary Shares, par value $0.0001 per share</div><div class="information" style="text-align:center; font-weight:bold;"><hr class="separatorThin">(Title of Class of Securities)</div><br><br></td></tr><tr><td class="center"><div class="information" style="text-align:center; font-weight:bold; color:blue;">G0369L101</div><div class="information" style="text-align:center; font-weight:bold;"><hr class="separatorThin">(CUSIP Number)</div><br><br></td></tr><tr><td class="center"><div class="information" style="text-align:center; font-weight:bold; color:blue;">Benjamin R. Pedersen<br>66 Hudson Boulevard,
+								<br>New York,
+								NY,
+								10001<br>212-909-6000</div><div class="information" style="text-align:center; font-weight:bold;"><hr class="separatorThin">(Name, Address and Telephone Number of Person Authorized to
+									Receive Notices and Communications)</div></td></tr><tr><td class="center"><div class="information" style="text-align:center; font-weight:bold; color:blue;">07/23/2025</div><div class="information" style="text-align:center; font-weight:bold;"><hr class="separatorThin">(Date of Event Which Requires Filing of This Statement)</div></td></tr></table><br><br><div class="information" style="text-align:justify">
+				If the filing person has previously filed a statement on Schedule 13G to report the acquisition that is the subject of this Schedule 13D, and is filing this schedule because of §§ 240.13d-1(e), 240.13d-1(f) or 240.13d-1(g), check the following box.
+				<img src="/Images/box-unchecked.jpg" alt="Checkbox not checked"></div><br><div class="information" style="text-align:justify">
+				The information required on the remainder of this cover page shall not be deemed to be “filed” for the purpose of Section 18 of the
+				Securities Exchange Act of 1934 (“Act”) or otherwise subject to the liabilities of that section of the Act but shall be subject to all other
+				provisions of the Act (however, see the Notes).
+			</div></div><hr class="headerThin"><hr class="header"><br><br>
+  <div class="content"><div class="form1"></div></div>
+  <div class="content"><div class="form1"><table><tr><td class="center"><br><br><p><div align="center" style="font-size:1.2em;">
+									SCHEDULE 13D
+								</div></p></td></tr></table><table role="presentation" class="tableClass" id="cusipNumber"><tr class="tableClass"><td width="25%" style="font-weight:bold;">CUSIP No.</td><td width="75%"><div style="font-size:.9em; color:#000000">G0369L101</div></td></tr></table><br><br><table role="presentation" class="tableClass" id="reportingPersonDetails"><tr class="tableClass"><td width="8%" class="tableClassValign">1</td><td width="92%" class="tableClass">
+					Name of reporting person
+					<br><br><div class="text">Warner Bros. Discovery, Inc.</div></td></tr><tr><td width="8%" class="tableClassValign">2</td><td width="92%" class="tableClass">Check the appropriate box if a member of a Group (See Instructions)
+					<br><br><div class="text"><img src="/Images/box-checked.jpg" alt="Checkbox checked">  (a)
+						<br><img src="/Images/box-unchecked.jpg" alt="Checkbox not checked">  (b)
+					</div></td></tr><tr class="tableClassWithBgBlack"><td width="8%" class="tableClassValign">3</td><td width="92%" class="tableClass">SEC use only</td></tr><tr><td width="8%" class="tableClassValign">4</td><td width="92%" class="tableClass">
+					Source of funds (See Instructions)
+					<br><br><div class="text">WC</div></td></tr><tr><td width="8%" class="tableClassValign">5</td><td width="92%" class="tableClass">
+					Check if disclosure of legal proceedings is required pursuant to Items 2(d) or 2(e)
+					<br><br><img src="/Images/box-unchecked.jpg" alt="Checkbox not checked"></td></tr><tr><td width="8%" class="tableClassValign">6</td><td width="92%" class="tableClass">Citizenship or place of organization
+					<br><br><div class="text">
+				DELAWARE
+			</div></td></tr><tr><td width="8%" class="tableClassValign">Number of Shares Beneficially Owned by Each Reporting Person With:</td><td width="92%" class="tableClass"><table class="innerTableClass"><tr><td width="8%" class="innerTableClassRightValign">7</td><td width="92%" class="tableClassInnerLeft">Sole Voting Power
+								<br><br><div class="text">0.00</div></td></tr><tr><td width="8%" class="innerTableClassRightValign">8</td><td width="92%" class="tableClassInnerLeft">Shared Voting Power
+								<br><br><div class="text">72,411,753.00</div></td></tr><tr><td width="8%" class="innerTableClassRightValign">9</td><td width="92%" class="tableClassInnerLeft">Sole Dispositive Power
+								<br><br><div class="text">0.00</div></td></tr><tr><td width="8%" class="innerTableClassRightValignBottomLess">10</td><td width="92%" class="tableClassInnerLeftBottomLess">Shared Dispositive Power
+								<br><br><div class="text">72,411,753.00</div></td></tr></table></td></tr><tr><td width="8%" class="tableClassValign">11</td><td width="92%" class="tableClass">Aggregate amount beneficially owned by each reporting person
+					<br><br><div class="text">72,411,753.00</div></td></tr><tr><td width="8%" class="tableClassValign">12</td><td width="92%" class="tableClass">Check if the aggregate amount in Row (11) excludes certain shares (See Instructions)
+					<br><br><img src="/Images/box-unchecked.jpg" alt="Checkbox not checked"></td></tr><tr><td width="8%" class="tableClassValign">13</td><td width="92%" class="tableClass">Percent of class represented by amount in Row (11)
+					<br><br><div class="text">70.8 % </div></td></tr><tr><td width="8%" class="tableClassValign">14</td><td width="92%" class="tableClass">Type of Reporting Person (See Instructions)
+					<br><br><div class="text">CO</div></td></tr></table><br><div style="display: flex;"><div style="font-size: 0.9em; font-weight: bold; margin-right: 5px;">
+					Comment for Type of Reporting Person:
+				</div><div class="largetext" style="text-align:justify">The amount listed in Rows 8, 10 and 11 includes (i) 36,985,507 ordinary shares, par value $0.0001 per share (the "Ordinary Shares") of Anghami Inc., an exempted company incorporated in the Cayman Islands with limited liability (the "Issuer"), owned of record by OSN Streaming Limited ("OSN Streaming"), plus (ii) 13,426,246 Ordinary Shares issuable upon the exercise of warrants to acquire Ordinary Shares beneficially owned by the Reporting Persons, plus (iii) 22,000,000 Ordinary Shares issuable upon the conversion of a senior unsecured convertible note of the Issuer ("Note") in the amount of $12,000,000 issued to OSN Streaming on December 16, 2024 (the "Initial Note"), an additional Note in the same form as the Initial Note in the amount of $20,000,000 issued to OSN Streaming on February 7, 2025 (the "Second Note") and additional Notes in the same form as the Initial Note in the amount of $23,000,000 issued to OSN Steaming on July 25, 2025 (the "Additional Notes"), in each case, pursuant to the Note Purchase Agreement. The total number of Ordinary Shares into which the Initial Note, Second Note and the Additional Notes (collectively, the "Notes") are convertible does not include Ordinary Shares issuable upon the conversion of any paid in kind interest accruing on the outstanding principal amount of each Note for which OSN Streaming is required to give more than 60 days' notice to the Issuer.
+
+The percentage calculated in Row 13 is based on a total of 102,313,374 Ordinary Shares, which includes (i) 66,887,128 Ordinary Shares outstanding as of July 25, 2025, based upon information provided by the Issuer, plus (ii) 13,426,246 Ordinary Shares upon the exercise of warrants to acquire Ordinary Shares beneficially owned by the Reporting Persons, plus (iii) 22,000,000 Ordinary Shares issuable upon the conversion of the Notes. In accordance with SEC rules governing beneficial ownership, the calculation of the percentage ownership includes warrants and convertible notes beneficially owned by the Reporting Persons but does not include any other shares issuable upon the exercise of any other outstanding warrants or convertible notes held by other persons.
+</div></div><table><tr><td class="center"><br><br><p><div align="center" style="font-size:1.2em;">
+									SCHEDULE 13D
+								</div></p></td></tr></table><table role="presentation" class="tableClass" id="cusipNumber"><tr class="tableClass"><td width="25%" style="font-weight:bold;">CUSIP No.</td><td width="75%"><div style="font-size:.9em; color:#000000">G0369L101</div></td></tr></table><br><br><table role="presentation" class="tableClass" id="reportingPersonDetails"><tr class="tableClass"><td width="8%" class="tableClassValign">1</td><td width="92%" class="tableClass">
+					Name of reporting person
+					<br><br><div class="text">Dplay Entertainment Limited</div></td></tr><tr><td width="8%" class="tableClassValign">2</td><td width="92%" class="tableClass">Check the appropriate box if a member of a Group (See Instructions)
+					<br><br><div class="text"><img src="/Images/box-checked.jpg" alt="Checkbox checked">  (a)
+						<br><img src="/Images/box-unchecked.jpg" alt="Checkbox not checked">  (b)
+					</div></td></tr><tr class="tableClassWithBgBlack"><td width="8%" class="tableClassValign">3</td><td width="92%" class="tableClass">SEC use only</td></tr><tr><td width="8%" class="tableClassValign">4</td><td width="92%" class="tableClass">
+					Source of funds (See Instructions)
+					<br><br><div class="text">WC</div></td></tr><tr><td width="8%" class="tableClassValign">5</td><td width="92%" class="tableClass">
+					Check if disclosure of legal proceedings is required pursuant to Items 2(d) or 2(e)
+					<br><br><img src="/Images/box-unchecked.jpg" alt="Checkbox not checked"></td></tr><tr><td width="8%" class="tableClassValign">6</td><td width="92%" class="tableClass">Citizenship or place of organization
+					<br><br><div class="text">
+				UNITED KINGDOM
+			</div></td></tr><tr><td width="8%" class="tableClassValign">Number of Shares Beneficially Owned by Each Reporting Person With:</td><td width="92%" class="tableClass"><table class="innerTableClass"><tr><td width="8%" class="innerTableClassRightValign">7</td><td width="92%" class="tableClassInnerLeft">Sole Voting Power
+								<br><br><div class="text">0.00</div></td></tr><tr><td width="8%" class="innerTableClassRightValign">8</td><td width="92%" class="tableClassInnerLeft">Shared Voting Power
+								<br><br><div class="text">72,411,753.00</div></td></tr><tr><td width="8%" class="innerTableClassRightValign">9</td><td width="92%" class="tableClassInnerLeft">Sole Dispositive Power
+								<br><br><div class="text">0.00</div></td></tr><tr><td width="8%" class="innerTableClassRightValignBottomLess">10</td><td width="92%" class="tableClassInnerLeftBottomLess">Shared Dispositive Power
+								<br><br><div class="text">72,411,753.00</div></td></tr></table></td></tr><tr><td width="8%" class="tableClassValign">11</td><td width="92%" class="tableClass">Aggregate amount beneficially owned by each reporting person
+					<br><br><div class="text">72,411,753.00</div></td></tr><tr><td width="8%" class="tableClassValign">12</td><td width="92%" class="tableClass">Check if the aggregate amount in Row (11) excludes certain shares (See Instructions)
+					<br><br><img src="/Images/box-unchecked.jpg" alt="Checkbox not checked"></td></tr><tr><td width="8%" class="tableClassValign">13</td><td width="92%" class="tableClass">Percent of class represented by amount in Row (11)
+					<br><br><div class="text">70.8 % </div></td></tr><tr><td width="8%" class="tableClassValign">14</td><td width="92%" class="tableClass">Type of Reporting Person (See Instructions)
+					<br><br><div class="text">CO</div></td></tr></table><br><div style="display: flex;"><div style="font-size: 0.9em; font-weight: bold; margin-right: 5px;">
+					Comment for Type of Reporting Person:
+				</div><div class="largetext" style="text-align:justify">The amount listed in Rows 8, 10 and 11 includes (i) 36,985,507 Ordinary Shares of the Issuer owned of record by OSN Streaming, plus (ii) 13,426,246 Ordinary Shares issuable upon the exercise of warrants to acquire Ordinary Shares beneficially owned by the Reporting Persons, plus (iii) 22,000,000 Ordinary Shares issuable upon the conversion of the Notes. The total number of Ordinary Shares into which the Notes are convertible does not include Ordinary Shares issuable upon the conversion of any paid in kind interest accruing on the outstanding principal amount of each Note for which OSN Streaming is required to give more than 60 days' notice to the Issuer.
+
+The percentage calculated in Row 13 is based on a total of 102,313,374 Ordinary Shares, which includes (i) 66,887,128 Ordinary Shares outstanding as of July 25, 2025, based upon information provided by the Issuer, plus (ii) 13,426,246 Ordinary Shares upon the exercise of warrants to acquire Ordinary Shares beneficially owned by the Reporting Persons, plus (iii) 22,000,000 Ordinary Shares issuable upon the conversion of the Notes. In accordance with SEC rules governing beneficial ownership, the calculation of the percentage ownership includes warrants and convertible notes beneficially owned by the Reporting Persons but does not include any other shares issuable upon the exercise of any other outstanding warrants or convertible notes held by other persons. </div></div></div><div class="form1"><table><tr><td class="center"><br><br><p><div align="center" style="font-size:1.2em;">
+									SCHEDULE 13D
+								</div></p></td></tr></table><table role="presentation" id="item1to7"><tr><td width="8%" class="tableClassValignNoBorder">Item 1.</td><td width="92%" class="tableClassNoBorder">Security and Issuer</td></tr><tr class="tableClass"><td width="8%" class="tableClassNoBorderAlignCenter">(a)</td><td width="92%" class="tableClassNoBorder">Title of Class of Securities:
+							<br><br><div class="text">Ordinary Shares, par value $0.0001 per share</div></td></tr><tr class="tableClass"><td width="8%" class="tableClassNoBorderAlignCenter">(b)</td><td width="92%" class="tableClassNoBorder">Name of Issuer:
+							<br><br><div class="text">Anghami Inc</div></td></tr><tr><td width="8%" class="tableClassNoBorderAlignCenter">(c)</td><td width="92%" class="tableClassNoBorder">Address of Issuer's Principal Executive Offices:
+							<br><br><div class="text">16th Floor, Al-Khatem Tower, Abu Dhabi Global Market Square, Al Maryah Island, Abu Dhabi, 
+				UNITED ARAB EMIRATES
+			, 00000.</div></td></tr><tr><td width="8%" class="tableClassValignNoBorder">Item 2.</td><td width="92%" class="tableClassNoBorder">Identity and Background</td></tr><tr></tr><tr class="tableClass"><td width="8%" class="tableClassNoBorderAlignCenter">(a)</td><td width="92%" class="tableClassNoBorder"><div class="largetext">Warner Bros. Discovery, Inc., a Delaware corporation ("WBD") and Dplay Entertainment Limited, a company wholly owned by WBD and incorporated and existing under the laws of England and Wales with registered number 09615785 (the "Purchaser," and, together with WBD, the "Reporting Persons"). The names of the directors and executive officers of each Reporting Person (collectively, the "Covered Persons") are set forth on Schedule A, which is incorporated herein by reference.
+
+The agreement among the Reporting Persons relating to the joint filing of this Statement (as defined below) is filed as Exhibit 4 hereto.</div></td></tr><tr><td width="8%" class="tableClassNoBorderAlignCenter">(b)</td><td width="92%" class="tableClassNoBorder"><div class="largetext">
+The address of the principal executive offices of WBD is 230 Park Avenue South, New York, New York 10003.  The address of the principal executive offices of the Purchaser is Chiswick Park Building 2, 566 Chiswick High Road, London, England, W4 5YB.  The business address of each Covered Person is set forth on Schedule A, which is incorporated herein by reference. </div></td></tr><tr><td width="8%" class="tableClassNoBorderAlignCenter">(c)</td><td width="92%" class="tableClassNoBorder"><div class="largetext">
+WBD is a global media company.  The Purchaser is a wholly owned subsidiary of WBD whose principal business activity is the distribution of content via WBD's online platforms.  The present principal occupation of each Covered Person is set forth on Schedule A, which is incorporated herein by reference.
+
+</div></td></tr><tr><td width="8%" class="tableClassNoBorderAlignCenter">(d)</td><td width="92%" class="tableClassNoBorder"><div class="largetext">During the last five years, neither of the Reporting Persons nor, to the best of each Reporting Person's knowledge, any Covered Person has been convicted in a criminal proceeding (excluding traffic violations or similar misdemeanors).</div></td></tr><tr><td width="8%" class="tableClassNoBorderAlignCenter">(e)</td><td width="92%" class="tableClassNoBorder"><div class="largetext">
+During the last five years, neither of the Reporting Persons nor, to the best of each Reporting Person's knowledge, any Covered Person been a party to a civil proceeding of a judicial or administrative body of competent jurisdiction and as a result of such proceeding was or is subject to a judgment, decree or final order enjoining future violations of, or prohibiting or mandating activities subject to, federal or state securities laws or finding any violation with respect to such laws.
+
+</div></td></tr><tr><td width="8%" class="tableClassNoBorderAlignCenter">(f)</td><td width="92%" class="tableClassNoBorder"><div class="largetext">The citizenship of each Covered Person is set forth on Schedule A, which is incorporated herein by reference.</div></td></tr><tr><td width="8%" class="tableClassValignNoBorder">Item 3.</td><td width="92%" class="tableClassNoBorder">Source and Amount of Funds or Other Consideration</td></tr><tr><td width="8%" class="tableClassNoBorderAlignCenter"> </td><td width="92%" class="tableClassNoBorder"><div class="largetext">The information set forth or incorporated by reference in Item 6 of this Statement on Schedule 13D (this "Statement") is incorporated by reference into this Item 3.
+
+Pursuant to the SPA (as defined in Item 6 of this Statement), on July 23, 2025 (the "First Completion Date"), the Purchaser acquired 1,900,118 ordinary shares, par value $0.001 per share, of OSN Streaming Limited in exchange for $19,000,000 (the "First Completion Consideration").  The First Completion Consideration was paid with cash on hand of the Purchaser.
+</div></td></tr><tr><td width="8%" class="tableClassValignNoBorder">Item 4.</td><td width="92%" class="tableClassNoBorder">Purpose of Transaction</td></tr><tr><td width="8%" class="tableClassNoBorderAlignCenter"> </td><td width="92%" class="tableClassNoBorder"><div class="largetext">The information set forth or incorporated by reference in Item 6 of this Statement is incorporated by reference into this Item 4.
+
+Pursuant to the SPA, dated as of March 23, 2025 by and among OSN Streaming Holding, the Purchaser and the Purchaser Guarantor (in each case, as defined in Item 6 of this Statement on Schedule 13D (this "Statement")), on July 23, 2025 (the "First Completion Date"), the Purchaser completed the purchase of 1,900,118 ordinary shares of OSN Streaming (the "First Tranche Sale Shares"), cumulatively representing 11.28% of the total issued share capital of OSN Streaming, in exchange for a cash payment of $19,000,000.  Subject to the satisfaction or waiver of the conditions specified in the SPA, the Purchaser will acquire from OSN Streaming Holding an additional number of ordinary shares of OSN Streaming cumulatively representing up to 22.55% (excluding the First Tranche Sale Shares) and 33.83% (including the First Tranche Sale Shares), respectively, of the total issued share capital of OSN Streaming as of the date of the SPA.
+
+On July 23, 2025, OSN Streaming, OSN Streaming Holding and the Purchaser entered into the Shareholders' Agreement (as defined in Item 6 of this Statement) to regulate their affairs in relation to OSN Streaming and the Issuer, among other things.  Pursuant to the Shareholders' Agreement, on July 23, 2025, the Purchaser appointed: (i) two members to the board of directors of OSN Streaming; (ii) one member to the board of directors of the Issuer (the "Board"); and (iii) one observer to both the Board and the audit committee of the Issuer.
+
+Pursuant to the Shareholders' Agreement, prior to June 30, 2028 (the "Call Option Lapse Date") (and, following the Call Option Lapse Date, for so long as the Purchaser holds 15% or more, directly or indirectly, of the Ordinary Shares), the Purchaser is entitled to appoint and remove one member to the board of directors of OSN Streaming. Additionally, prior to the Call Option Lapse Date (and, following the Call Option Lapse Date, for so long as the Purchaser holds 7.5% or more, directly or indirectly, of the Ordinary Shares), the Purchaser will be entitled to appoint and remove (i) one additional member to the board of directors of OSN Streaming and (ii) one member to the board of directors of the Issuer (the "Board"). Further, prior to the Call Option Lapse Date (and, following the Call Option Lapse Date, for so long as the Purchaser holds 15% or more, directly or indirectly, of the Ordinary Shares), the Purchaser will be entitled to appoint and remove (i) one observer to attend any meeting of the Board and (iii) one additional observer to attend any meeting of the audit committee of the Issuer. The information set forth in Item 6 of this Statement is incorporated herein by reference.
+
+On July 23, 2025, OSN Streaming Holding, the Purchaser and the Purchaser Guarantor entered into the Option Agreement (as defined in Item 6 of this Statement) pursuant to which OSN Streaming Holding granted the Purchaser the Call Option, the CM Put Option and the CF Put Option (in each case, as defined in Item 6 of this Statement), subject to the terms and conditions set forth in the Option Agreement. The foregoing summary of the Option Agreement does not purport to be complete and is subject to, and qualified in its entirety by, the full text of the Option Agreement, a copy of which is filed as Exhibit 3 to this Statement.
+
+The Reporting Persons acquired beneficial ownership of the Ordinary Shares described in this Statement for investment purposes and in anticipation of a long-term strategic partnership between the Reporting Persons, OSN Streaming and the Issuer. Consistent with the Reporting Persons' investment purposes, the Reporting Persons intend to review their investment on a regular basis and, as a result thereof and, subject to the terms of the SPA and the Shareholders' Agreement, retain the right to change their investment intent, from time to time or at any time, and they may either alone or in concert with others, without the prior consent or approval of the Board (i) acquire additional Ordinary Shares or other securities or instruments of the Issuer, in any amount that the Reporting Persons may determine in their sole discretion, through open market purchases, privately negotiated transactions or otherwise, including a transaction, or a series of related transactions, as a result of which the Reporting Persons or OSN Streaming (directly or indirectly) may acquire all of the outstanding Ordinary Shares and all securities of the Issuer convertible or exchangeable into such shares not held by any of the Reporting Persons (a "Minority Buyout"), (ii) sell or otherwise dispose of all or part of the Ordinary Shares or other securities or instruments of the Issuer, in any amount that the Reporting Persons may determine in their sole discretion, if any, beneficially owned by them, in the open market, in privately negotiated transactions or otherwise, (iii) make, or in any way participate in any "solicitation" of "proxies" to vote or "consents", or seek to advise or influence any person with respect to the voting of any voting securities of the Issuer, including, without limitation, with respect to the election or removal of directors or to approve shareholder proposals with respect to the Issuer, (iv) make any public statements and/or announcement with respect to, or submit a proposal for, or offer of (with or without conditions) any extraordinary business transaction involving the Issuer or any subsidiary of the Issuer or their securities, including a carve-out of the Issuer's online streaming music service (the "Music Business Carve-Out"), or (v) enter into any discussions, arrangements or understandings with any third party (including security holders of the Issuer) with respect to any of the foregoing, including forming, joining or participating in a "group" (as defined in Section 13(d)(3) of the Act) with any third party with respect to any Ordinary Shares or otherwise in connection with any of the foregoing, in each case, in any manner permitted by applicable law, the SPA and the Shareholders' Agreement. The Reporting Persons may, from time to time or at any time, consider any such matters and may engage in communications with, without limitation, management or directors of the Issuer, OSN Streaming or its affiliates or other relevant parties, and may make suggestions concerning the Issuer's operations, prospects, business and financial strategies, strategic direction and transactions, assets and liabilities, business and financing alternatives, future plans of the Issuer and such other matters as the Reporting Persons may deem relevant to their investment in the shares. The Reporting Persons reserve the right to change their purpose and to formulate and implement plans or proposals with respect to the Issuer at any time and from time to time. Subject to applicable law and the terms of the SPA and the Shareholders' Agreement, any such action may be taken or advocated by the Reporting Persons alone or in conjunction with other shareholders, potential acquirers, financing sources and/or other third parties, and could include one or more purposes, plans or proposals that relate to or would result in any of the transactions, matters or effects enumerated in Items 4(a) through (j) of Schedule 13D. Any actions taken by the Reporting Persons shall at all times be consistent with their obligations under the SPA and Shareholders' Agreement.
+</div></td></tr><tr><td width="8%" class="tableClassValignNoBorder">Item 5.</td><td width="92%" class="tableClassNoBorder">Interest in Securities of the Issuer</td></tr><tr><td width="8%" class="tableClassNoBorderAlignCenter">(a)</td><td width="92%" class="tableClassNoBorder"><div class="largetext">The responses of the Reporting Persons to rows (11) and (13) of the cover pages of this Statement are incorporated by reference into this Item 5. The percentage of Ordinary Shares reported as beneficially owned by each Reporting Person is based on a total of 102,313,374 Ordinary Shares, which includes (i) 66,887,128 Ordinary Shares outstanding as of July 25, 2025, based upon information provided by the Issuer, plus (ii) 13,426,246 Ordinary Shares issuable upon the exercise of warrants to acquire Ordinary Shares beneficially owned by the Reporting Persons, plus (iii) 22,000,000 Ordinary Shares issuable upon the conversion of the Notes. In accordance with SEC rules governing beneficial ownership, the calculation of percentage ownership includes warrants and convertible notes beneficially owned by the Reporting Persons but does not include any other shares issuable upon the exercise of any other outstanding warrants or convertible notes held by other persons.</div></td></tr><tr><td width="8%" class="tableClassNoBorderAlignCenter">(b)</td><td width="92%" class="tableClassNoBorder"><div class="largetext">The responses of the Reporting Persons to rows (7) through (10) of the cover pages of this Statement are incorporated by reference into this Item 5. OSN Streaming is the record owner of an aggregate of (i) 36,985,507 Ordinary Shares, plus (ii) 13,426,246 Ordinary Shares underlying warrants that are exercisable at a price of $11.50 per Ordinary Share (subject to certain specified adjustments) in accordance with the terms of the Warrant, dated as of April 1, 2024, by and between OSN Streaming and the Issuer, plus (iii) 22,000,000 Ordinary Shares issuable upon the conversion of (x) the $12,000,000 aggregate principal amount of the Initial Note, (y) the $20,000,000 aggregate principal amount of the Second Note and (z) the $23,000,000 aggregate principal amount of the Additional Notes, each at a per share conversion price of $2.50. The total number of Ordinary Shares into which the Notes are convertible does not include Ordinary Shares issuable upon the conversion of any paid in kind interest accruing on the outstanding principal amount of each Note for which OSN Streaming is required to give more than 60 days' notice to the Issuer.
+
+As of the date of this Statement, (i) OSN Streaming Holding holds a number of ordinary shares of OSN Streaming cumulatively representing 88.72% of the total issued share capital of OSN Streaming and (ii) the Purchaser holds a number of ordinary shares of OSN Streaming cumulatively representing 11.28% of the total issued share capital of OSN Streaming.  Subject to the consummation of the Second Completion and the Third Completion (each as defined in Item 6 of this Statement), (a) OSN Streaming Holding will hold a number of ordinary shares of OSN Streaming cumulatively representing 66.17% of the total issued share capital of OSN Streaming as of the date of the SPA and (b) the Purchaser will hold a number of ordinary shares of OSN Streaming cumulatively representing up to 33.83% of the total issued share capital of OSN Streaming as of the date of the SPA.
+
+The Reporting Persons may be deemed to be members of a "group" with, and may be deemed to have or share indirect voting and dispositive power, over any of the Ordinary Shares held directly or beneficially owned by OSN Streaming, OSN Streaming Holding Limited, Panther Media Holding Limited, Panther Media Group Limited and Kuwait Projects Company (Holding) K.S.C.P.</div></td></tr><tr><td width="8%" class="tableClassNoBorderAlignCenter">(c)</td><td width="92%" class="tableClassNoBorder"><div class="largetext">Except as set forth in Items 3, 4 and 6, which information is incorporated by reference into this Item 5, during the 60 days preceding the date of this Statement, none of the Reporting Persons has effected any transactions of Ordinary Shares.</div></td></tr><tr><td width="8%" class="tableClassNoBorderAlignCenter">(d)</td><td width="92%" class="tableClassNoBorder"><div class="largetext">Not applicable.</div></td></tr><tr><td width="8%" class="tableClassNoBorderAlignCenter">(e)</td><td width="92%" class="tableClassNoBorder"><div class="largetext">Not applicable.</div></td></tr><tr><td width="8%" class="tableClassValignNoBorder">Item 6.</td><td width="92%" class="tableClassNoBorder">Contracts, Arrangements, Understandings or Relationships With Respect to Securities of the Issuer</td></tr><tr><td width="8%" class="tableClassNoBorderAlignCenter"> </td><td width="92%" class="tableClassNoBorder"><div class="largetext">Sale and Purchase Agreement
+
+On March 23, 2025, OSN Streaming Holding, Dplay Entertainment Limited (the "Purchaser") and Discovery Communications, LLC (the "Purchaser Guarantor") entered into an Agreement for the Sale and Purchase of Shares in OSN Streaming Limited (the "SPA"). Pursuant to the SPA and subject to the satisfaction or waiver of the terms and conditions specified therein, the Purchaser will acquire from OSN Streaming Holding a number of ordinary shares of OSN Streaming cumulatively representing up to 33.83% of the total issued share capital of OSN Streaming as of the date of the SPA (the "Share Sale"). Capitalized terms used in this sub-section of Item 6 but not defined herein have the meaning ascribed to such terms in the SPA, a copy of which is included as Exhibit 1 hereto.
+
+The Share Sale will be implemented in three tranches: (i) on July 23, 2025 (the "First Completion Date"), at the First Completion, the Purchaser acquired the First Tranche Sale Shares, consisting of 1,900,118 ordinary shares of OSN Streaming, representing 11.28% of the total issued share capital of OSN Streaming, in exchange for a cash payment of $19,000,000; (ii) at the Second Completion, the Purchaser will acquire the Second Tranche Sale Shares, consisting of 1,900,118 ordinary shares of OSN Streaming representing approximately 11.28% of the total issued share capital of OSN Streaming as of the date of the SPA, in exchange for a cash payment of $19,000,000; and (iii) at the Third Completion, the Purchaser will acquire the Third Tranche Sale Shares, consisting of 1,900,118 ordinary shares of OSN Streaming representing approximately 11.28% of the total issued share capital of OSN Streaming as of the date of the SPA, in exchange for a cash payment of $19,000,000. Following the First Completion, the Second Completion and the Third Completion, the Purchaser will hold an aggregate amount of 5,700,354 ordinary shares of OSN Streaming cumulatively representing 33.83% of the total issued share capital of OSN Streaming as of the date of the SPA. The Second Completion is expected to occur on March 31, 2026, and is conditional on the occurrence of the First Completion and the absence of any order or judgment of any Governmental Authority that makes unlawful or prohibits or restricts the transfer of the Second Tranche Sale Shares. The Third Completion is expected to occur on March 31, 2027, and is conditional on the occurrence of the Second Completion and the absence of any order or judgement of any Governmental Authority that makes unlawful or prohibits or restricts the transfer of the Third Tranche Sale Shares.
+
+The foregoing summary of the SPA does not purport to be complete and is subject to, and qualified in its entirety by, the full text of such SPA, a copy of which is included as Exhibit 1 to this Statement and incorporated herein by reference.
+
+Shareholders' Agreement
+
+On the First Completion Date (OSN Streaming, OSN Streaming Holding and the Purchaser entered into a Shareholders' Agreement to regulate their affairs in relation to OSN Streaming and the Issuer, among other things (the "Shareholders' Agreement"). Capitalized terms used in this sub-section of Item 6 but not defined herein have the meaning ascribed to such terms in the Shareholders' Agreement, a copy of which is included as Exhibit 2 hereto.
+
+Governance
+
+The Shareholders' Agreement includes certain provisions relating to the governance of OSN Streaming and the Issuer, including that, prior to the Call Option Lapse Date (and, following the Call Option Lapse Date, for so long as the Purchaser holds 15% or more, directly or indirectly, of the Ordinary Shares), the Purchaser will be entitled to appoint and remove one member to the board of directors of OSN Streaming. Additionally, prior to the Call Option Lapse Date (and, following the Call Option Lapse Date, for so long as the Purchaser holds 7.5% or more, directly or indirectly, of the Ordinary Shares), the Purchaser will be entitled to appoint and remove (i) one additional member to the board of directors of OSN Streaming and (ii) one member to the board of directors of the Issuer (the "Board"). Further, prior to the Call Option Lapse Date (and, following the Call Option Lapse Date, for so long as the Purchaser holds 15% or more, directly or indirectly, of the Ordinary Shares), the Purchaser will be entitled to appoint and remove (i) one observer to attend any meeting of the Board and (iii) one additional observer to attend any meeting of the audit committee of the Issuer. OSN Streaming Holding, for so long as it holds a majority of the Ordinary Shares, will be entitled to appoint and remove all members of the board of directors of OSN Streaming (other than those appointed or removed by the Purchaser and any other investor who holds, directly or indirectly, 15% or more of the Ordinary Shares). The Shareholders' Agreement provides for customary reserved matters relating to the conduct of business OSN Streaming or the Group (including the Issuer), in each case requiring the Purchaser's prior consent prior to the Call Option Lapse Date, and following the Call Option Lapse Date for so long as it holds 7.5% or more, directly or indirectly, of the Ordinary Shares. Such reserved matters include, among others, that (a) OSN Streaming will not (i) sell or otherwise dispose of any Ordinary Shares held by OSN Streaming, (ii) grant any options, warrants or other rights to purchase or obtain any Ordinary Shares held by OSN Streaming, (iii) create or grant any Encumbrance on any Ordinary Shares held by OSN Streaming, and (b) the Issuer will not (i) make or permit any material change in the nature or scope of its business, (ii) amend any provision of its constitutional documents, (iii) acquire any business or undertaking, or sell or otherwise dispose of the whole or any substantial part of its business, undertaking or assets, or (iv) materially amend its distribution policy or declare or make any distribution or payment of dividend outside of that policy. The foregoing reserved matters will not operate so as to restrict or prevent, among other things, (a) any matter contemplated by the Convertible Note Purchase Agreement, including a share capital increase in the Issuer, (b) effecting or implementing (or taking any steps required to so effect or implement) the Minority Buyout (if any) or the Music Business Carve-Out (if any); or (c) any transaction that involves funding from OSN Streaming Holding to the Issuer to the extent undertaken in accordance with the Shareholders' Agreement.
+
+Transfer Restrictions
+
+The Shareholders' Agreement provides that no holder of ordinary shares of OSN Streaming ("OSN Shares") is permitted to transfer its OSN Shares to an unaffiliated third party prior to the Call Option Lapse Date. From the date immediately following the Call Option Lapse Date, any holder of OSN Shares may transfer its OSN Shares to an unaffiliated third party subject to, among others, the following rights and restrictions:
+
+ROFO: Each holder of OSN Shares has a right of first offer if any other holder of OSN Shares (a "ROFO Seller") proposes to sell any OSN Shares (the "ROFO Sale Shares") owned by the ROFO Seller to any other party. Each time the ROFO Seller proposes to sell any ROFO Sale Shares, the ROFO Seller will first offer such ROFO Sale Shares to the other holders of OSN Shares in accordance with the Shareholders' Agreement.
+
+Tag-Along: Subject to certain customary exceptions, if OSN Streaming Holding or any of its affiliates (together, the "Tag Triggering Sellers") propose to sell any OSN Shares to an unaffiliated third party (the "Tag Transferee"), the Tag Triggering Sellers will procure that each of the other holders of OSN Shares have the opportunity to sell to the Tag Transferee their pro-rata portion of respective OSN Shares in accordance with the Shareholders' Agreement.
+
+Drag-Along: If OSN Streaming Holding or any of its affiliates (together, the "Drag Triggering Sellers") propose to sell any OSN Shares to an unaffiliated third party (the "Drag Transferee") which would, on its completion, result in a change of control in OSN Streaming, the Drag Triggering Sellers will have the right to require all other holders of OSN Shares to sell to the Drag Transferee all of their respective OSN Shares in accordance with the Shareholders' Agreement.
+
+Funding
+
+Prior to the Call Option Lapse Date, OSN Streaming Holding must provide additional funding required by the Issuer either itself or by arranging third party funding, provided that no Group Company (as defined in the Shareholders' Agreement) (including the Issuer) may obtain additional third party debt funding without the prior written consent of the Purchaser. Following the Call Option Lapse Date, OSN Streaming Holding may provide debt financing provided that, for so long as the Purchaser holds, directly or indirectly, 7.5% or more of the Ordinary Shares, (i) the interest rate does not exceed 12.5% per annum and (ii) the relevant Group Company has been unable to arrange equivalent debt funding from a third party provider with an interest rate of less than 12.5% per annum.
+
+The foregoing summary of the Shareholders' Agreement does not purport to be complete and is subject to, and qualified in its entirety by, the full text of such Shareholders' Agreement, a copy of which is included as Exhibit 2 to this Statement and incorporated herein by reference.
+
+Option Agreement
+
+On the First Completion Date, OSN Streaming Holding, the Purchaser and the Purchaser Guarantor entered into an option agreement pursuant to which OSN Streaming Holding granted the Purchaser certain options in respect of OSN Shares (the "Option Agreement"). Capitalized terms used in this sub-section of Item 6 but not defined herein have the meaning ascribed to such terms in the Option Agreement, a copy of which is included as Exhibit 3 hereto.
+
+Call Option
+
+Pursuant to the Option Agreement, the Purchaser has an option (the "Call Option") to purchase all of the OSN Shares owned by OSN Streaming Holding (the "Call Option Shares") at the Call Option Price at any time during the period beginning on July 1, 2027, and ending on the Call Option Lapse Date (the "Call Option Period").
+
+During the Call Option Period, the Purchaser may serve a notice (the "Call Option Price Notice") on OSN Streaming Holding notifying of its intention to deliver a notice to exercise the Call Option (the "Call Exercise Notice").  The Purchaser may specify in the Call Option Price Notice that no value is to be ascribed to the Music Business (as defined in the SPA) in connection with the exercise of the Call Option (the "Exclusion Election").
+
+Promptly following delivery of the Call Option Price Notice, OSN Streaming Holding and the Purchaser will engage in good faith discussions with a view of determining (i) the fair market value of the Issuer and its subsidiaries in accordance with the Option Agreement (with or without the Music Business, depending on whether an Exclusion Election has been made by the Purchaser in accordance with the Option Agreement) (the "Issuer Fair Market Value") and (ii) the net debt amount of OSN Streaming (the "OSN Streaming Net Debt Amount"). If no agreement is reached during the period specified in the Option Agreement, OSN Streaming Holding and the Purchaser will appoint an independent expert to determine the Issuer Fair Market Value and OSN Streaming Net Debt Amount in accordance with the Option Agreement.
+
+The Purchaser may only exercise the Call Option by serving a Call Exercise Notice on OSN Streaming Holding following determination of the Issuer Fair Market Value and OSN Streaming Net Debt Amount in accordance with the Option Agreement until the date that is 90 calendar days following such determination.
+
+Completion of the Call Option will be subject to the satisfaction or waiver (where permissible under applicable law) of the following conditions on or before the date falling 12 months from the date of the Call Exercise Notice (the "Call Option Longstop Date"): (i) OSN Streaming owning 100% of the outstanding Ordinary Shares and any securities convertible or exchangeable into Ordinary Shares of the Issuer (the "Minority Buyout Condition"), (ii) obtaining all applicable consents and approvals from any applicable Governmental Authorities and the expiration or termination of all applicable mandatory waiting periods for the purchase by the Purchaser of the Call Option Shares, and (iii) the absence of any order or judgment of any Governmental Authority that makes unlawful or prohibits or restricts the transfer of the Call Option Shares.
+
+Put Options
+
+The Option Agreement includes the following put options:
+
+CM Put Option: If the Minority Buyout Condition has not been satisfied or waived by the Call Option Longstop Date, OSN Streaming Holding and the Purchaser will discuss in good faith whether there should be a reduction to the Call Option Price. If no agreement is reached during the period specified in the Option Agreement, the Purchaser may serve a notice on OSN Streaming Holding during the period beginning on the day immediately following the end of such specified period and ending on the date that is 60 calendar days following the Call Option Longstop Date (the "CM Put Option") requiring OSN Streaming Holding to purchase all of the OSN Shares owned by the Purchaser (the "Put Option Shares") at the CM Put Option Price.
+
+CF Put Option: If the Issuer Fair Market Value determined by the independent expert is below the Call Option Floor, OSN Streaming Holding and the Purchaser will discuss in good faith to seek a reduction in the Call Option Floor. If OSN Streaming Holding does not agree to lower the Call Option Floor during the period specified in the Option Agreement, the Purchaser may serve a put option notice on OSN Streaming Holding during the period of 60 calendar days following the end of such specified period (the "CF Put Option") requiring OSN Streaming Holding to purchase all of the Put Option Shares at the CF Put Option Price.
+
+Call Option Price, CM Put Option Price and CF Put Option Price
+
+Pursuant to the Option Agreement, the Call Option Price, CM Put Option Price and CF Put Option Price are calculated as follows:
+
+"Call Option Price" will be (x) the higher of (i) the Call Option Floor and (ii) the Issuer Fair Market Value, multiplied by (y) the Relevant Proportion of OSN Streaming Holding. Where (x)(ii) applies, the product of (x) and (y) will be adjusted dollar-for-dollar by OSN Streaming Holding's Pro Rata Portion of the OSN Streaming Net Debt Amount (whether positive or negative).
+
+"CM Put Option Price" will be the higher of (i) the Put Option Floor, and (ii)(x) the Issuer Fair Market Value multiplied by (y) the Relevant Proportion of the Purchaser. The product of (ii) (x) and (y) will be adjusted dollar-for-dollar by the Purchaser's Pro Rata Portion of the OSN Streaming Net Debt Amount (whether positive or negative).
+
+"CF Put Option Price" will be (x) the Issuer Fair Market Value multiplied by (y) the Relevant Proportion of the Purchaser. The product of (x) and (y) will be adjusted dollar-for-dollar by the Purchaser's Pro Rata Portion of the OSN Streaming Net Debt Amount (whether positive or negative).
+
+For the purposes of the Option Agreement:
+
+"Call Option Floor" means USD 225 million (where an Exclusion Election has been made by the Purchaser in accordance with the Option Agreement) or USD 302 million (where no Exclusion Election has been made by the Purchaser in accordance with the Option Agreement) or such lower number as agreed by OSN Streaming Holding in accordance with the Option Agreement;
+
+"Put Option Floor" means an amount sufficient to generate an internal rate of return for the Purchaser of 15 per cent. when applied to the total investment made by the Purchaser in respect of the OSN Shares and any payment made to the Purchaser in respect of such investment from time to time (other than any amount paid to the Purchaser pursuant to a claim under the SPA), calculated in accordance with the Option Agreement;
+
+"Pro Rata Portion" means a proportion calculated by dividing (i) the number of OSN Shares owned by OSN Streaming Holding or the Purchaser (as applicable) by (ii) the total number of OSN Shares then in issue (other than those held in treasury); and
+
+"Relevant Proportion" means a proportion calculated by multiplying (i) the Pro Rata Portion of OSN Streaming Holding or the Purchaser (as applicable) by (ii) the proportion of the fully diluted share capital of the Issuer held by OSN Streaming.
+
+Music Business Carve-Out
+
+If the Purchaser makes an Exclusion Election pursuant to the Option Agreement, OSN Streaming Holding may elect to effect the Music Business Carve-Out by serving written notice to the Purchaser by no later than the date falling 20 business days following the Exclusion Election, in which case, OSN Streaming Holding and the Purchaser shall cooperate and negotiate in good faith in accordance with the key principles set forth in the Option Agreement and shall enter into definitive documentation on the Call Option Completion Date to implement the Music Business Carve-Out with effect from no later than the Call Option Completion.
+
+The foregoing summaries of the SPA, the Shareholders' Agreement and the Option Agreement do not purport to be complete and are subject to, and qualified in their entirety by, the full text of such SPA, Shareholders' Agreement and Option Agreement, as applicable, copies of which are included as Exhibit 1, Exhibit 2 and Exhibit 3, respectively, to this Statement and incorporated herein by reference.
+</div></td></tr><tr><td width="8%" class="tableClassValignNoBorder">Item 7.</td><td width="92%" class="tableClassNoBorder">Material to be Filed as Exhibits.</td></tr><tr><td width="8%" class="tableClassNoBorderAlignCenter"> </td><td width="92%" class="tableClassNoBorder"><div class="largetext">Exhibit        Description
+
+1              Agreement for the Sale and Purchase of Shares in OSN Streaming Limited, dated as of March 23, 2025, by and among OSN Streaming Holding Limited, Dplay Entertainment Limited and Discovery Communications LLC (incorporated by reference to Exhibit 11 of the Schedule 13D/A filed by OSN Streaming Limited on March 23, 2025).
+
+2                Shareholders Agreement, dated as of July 23, 2025, between OSN Streaming Limited, OSN Streaming Holding Limited and Dplay Entertainment Limited (incorporated by reference to Exhibit 12 of the Schedule 13D/A filed by OSN Streaming Limited on July 25, 2025).#
+
+3               Option Agreement for the Sale and Purchase of Shares in OSN Streaming Limited, dated as of July 23, 2025, by and among OSN Streaming Holding Limited, Dplay Entertainment Limited and Discovery Communications LLC (incorporated by reference to Exhibit 13 of the Schedule 13D/A filed by OSN Streaming Limited on July 25, 2025).#
+
+4                 Joint Filing Agreement, dated as of July 25, 2025.*
+
+* Filed herewith
+
+# Portions of this exhibit have been omitted because such portions are both not material and the Reporting Persons customarily and actually treat the redacted information as private and confidential.  The omissions have been indicated by Asterisks ("[***]").
+</div></td></tr></table><br></div><div class="form1"><table role="presentation" id="signatureInfo"><tr><td width="8%" class="tableClassValignNoBorder">    SIGNATURE</td><td width="92%" class="tableClassNoBorder"> </td></tr><tr><td width="8%" class="tableClassNoBorderAlignCenter"> </td><td width="92%" class="tableClassNoBorder"><div class="information" style="text-align:justify">
+						After reasonable inquiry and to the best of my knowledge and belief, I certify that the information set forth in this statement is true, complete and correct.
+						<br><br></div></td></tr></table><table><tr class="tableClass"><td width="50%" class="tableClassNoBorder"> </td><td width="50%" class="tableClassNoBorder"><table><tr class="tableClass"><td width="100%" class="tableClassInnerNoBorderBlue"><div class="text">Warner Bros. Discovery, Inc.</div></td></tr></table></td></tr></table><table><tr class="tableClass"><td width="50%" class="tableClassNoBorder"> </td><td width="50%" class="tableClassNoBorder"><table><tr class="tableClass"><td width="8%" class="tableClassNoBorderAlignLeft signature">Signature:</td><td width="92%" class="tableClassNoBorderBlue signature">/s/ Tara L. Smith</td></tr><tr class="tableClass"><td width="8%" class="tableClassNoBorderAlignLeft signature">Name/Title:</td><td width="92%" class="tableClassNoBorderBlue signature">Tara L. Smith/Executive Vice President and Corporate Secretary</td></tr><tr class="tableClass"><td width="8%" class="tableClassNoBorderAlignLeft signature">Date:</td><td width="92%" class="tableClassNoBorderBlue signature">07/25/2025</td></tr></table></td></tr></table><table><tr class="tableClass"><td width="50%" class="tableClassNoBorder"> </td><td width="50%" class="tableClassNoBorder"><table><tr class="tableClass"><td width="100%" class="tableClassInnerNoBorderBlue"><div class="text">Dplay Entertainment Limited</div></td></tr></table></td></tr></table><table><tr class="tableClass"><td width="50%" class="tableClassNoBorder"> </td><td width="50%" class="tableClassNoBorder"><table><tr class="tableClass"><td width="8%" class="tableClassNoBorderAlignLeft signature">Signature:</td><td width="92%" class="tableClassNoBorderBlue signature">/s/ Roanne Weekes</td></tr><tr class="tableClass"><td width="8%" class="tableClassNoBorderAlignLeft signature">Name/Title:</td><td width="92%" class="tableClassNoBorderBlue signature">Roanne Weekes/Statutory Director</td></tr><tr class="tableClass"><td width="8%" class="tableClassNoBorderAlignLeft signature">Date:</td><td width="92%" class="tableClassNoBorderBlue signature">07/25/2025</td></tr></table></td></tr></table></div></div>
+
+<script type="text/javascript"  src="/hEyxvy/tDTQ/C5W/N8y/CEN74LRlKz4/wYOaNzSVtcwhtffaf7/U3FqJk0lAg/cDg9eQ/IuTns"></script></body></html>
