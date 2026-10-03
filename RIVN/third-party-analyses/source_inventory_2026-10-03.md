@@ -1,0 +1,10 @@
+# RIVN — Third-party source inventory
+
+**Date:** 2026-10-03
+**Sources:** 1 total (0 approved, 0 pending, 1 context)
+
+| ID | Title | Path | Status | Use |
+|----|-------|------|--------|-----|
+| activist_long | Strategic Organizing Center — PX14A6G | `RIVN/third-party-analyses/activist_reports/long/PX14A6G_20220511_acc0001377739_22_000027.htm` | context | activist/long — sec_edgar |
+
+Cross-check required: `RIVN/research/cross_check_third_party_2026-10-03.md`

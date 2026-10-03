@@ -1,0 +1,457 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns:p="http://www.sec.gov/edgar/schedule13D" xmlns:p1="http://www.sec.gov/edgar/common"><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8"><link rel="stylesheet" type="text/css" href="/css/SDR_print.css"><style type="text/css">
+					.fakeTextBox {
+					border-top: 2px solid #999;
+					border-right: 1px solid #ccc;
+					border-bottom: 1px solid #ccc;
+					border-left: 2px solid #999;
+					padding: 2px;
+					_width: 800px;
+					height: auto;
+					min-width: 200px;
+					min-height: 50px;
+					word-wrap: break-word;
+					font-size: 0.9em;
+					color: blue;
+					}
+					table.tableClass { border: solid black;
+					border-top-width: 1;
+					border-right-width: 1;
+					border-bottom-width: 1;
+					border-left-width: 1;
+					table-layout:fixed;
+					}
+					table.innerTableClass { border: solid black;
+					border-top-width: 0;
+					border-right-width: 0;
+					border-bottom-width: 0;
+					border-left-width: 0;
+					table-layout:fixed;
+					}
+					th.tableClassLeft { border: solid black;
+					border-top-width: 0px;
+					border-right-width: 0px;
+					border-bottom-width: 1px;
+					border-left-width: 1px;
+					padding: 2px;
+					}
+					th.tableClassRight { border: solid black;
+					border-top-width: 0px;
+					border-right-width: 1px;
+					border-bottom-width: 1px;
+					border-left-width: 0;
+					padding: 2px;
+					}
+					th.tableClass { border: solid black;
+					border-top-width: 0px;
+					border-right-width: 1px;
+					border-bottom-width: 1px;
+					border-left-width: 1px;
+					padding: 2px;
+					}
+					td.tableClassLeft { border: solid black;
+					border-top-width: 0px;
+					border-right-width: 0px;
+					border-bottom-width: 1px;
+					border-left-width: 1px;
+					font-size: 0.9em;
+					color: blue;
+					word-wrap: break-word;
+					}
+					td.tableClassRight { border: solid black;
+					border-top-width: 0px;
+					border-right-width: 1px;
+					border-bottom-width: 1px;
+					border-left-width: 0;
+					font-size: 0.9em;
+					color: blue;
+					word-wrap: break-word;
+					}
+					td.tableClass { border: solid black;
+					border-top-width: 0px;
+					border-right-width: 1px;
+					border-bottom-width: 1px;
+					border-left-width: 1px;
+					font-size: 0.9em;
+					font-weight:bold;
+					color: black;
+					word-wrap: break-word;
+					}
+					td.tableClassNoBorder { border: solid black;
+					border-top-width: 0px;
+					border-right-width: 0px;
+					border-bottom-width: 0px;
+					border-left-width: 0px;
+					font-size: 0.9em;
+					font-weight:bold;
+					color: black;
+					word-wrap: break-word;
+					}
+
+					td.tableClassNoBorderBlue { border: solid black;
+					border-top-width: 0px;
+					border-right-width: 0px;
+					border-bottom-width: 0px;
+					border-left-width: 0px;
+					font-size: 0.9em;
+					font-weight:bold;
+					color: blue;
+					word-wrap: break-word;
+					}
+
+					td.tableClassInnerNoBorderBlue { border: solid black;
+					border-top-width: 0px;
+					border-right-width: 0px;
+					border-bottom-width: 0px;
+					border-left-width: 0px;
+					font-size: 1.4em;
+					font-weight:bold;
+					color: blue;
+					word-wrap: break-word;
+					}
+
+					td.tableClassNoBorderAlignLeft { border: solid black;
+					border-top-width: 0px;
+					border-right-width: 0px;
+					border-bottom-width: 0px;
+					border-left-width: 0px;
+					font-size: 0.9em;
+					font-weight:bold;
+					text-align: left;
+					color: black;
+					word-wrap: break-word;
+					}
+
+					td.signature {
+					padding: 4px 8px;
+					}
+
+					td.tableClassInner { border: solid black;
+					border-top-width: 0px;
+					border-right-width: 1px;
+					border-bottom-width: 1px;
+					border-left-width: 1px;
+					font-size: 1em;
+					font-weight:bold;
+					color: black;
+					word-wrap: break-word;
+					}
+
+					td.tableClassValign { border: solid black;
+					border-top-width: 0px;
+					border-right-width: 1px;
+					border-bottom-width: 1px;
+					border-left-width: 1px;
+					font-size: 0.9em;
+					font-weight:bold;
+					color: black;
+					vertical-align: middle;
+					text-align: center;
+					word-wrap: break-word;
+					}
+
+					td.tableClassValignNoBorder { border: solid black;
+					border-top-width: 0px;
+					border-right-width: 0px;
+					border-bottom-width: 0px;
+					border-left-width: 0px;
+					font-size: 0.9em;
+					font-weight:bold;
+					color: black;
+					vertical-align: middle;
+					text-align: center;
+					word-wrap: break-word;
+					}
+
+					td.tableClassValignInner { border: solid black;
+					border-top-width: 0px;
+					border-right-width: 1px;
+					border-bottom-width: 1px;
+					border-left-width: 1px;
+					font-size: 1em;
+					font-weight:bold;
+					color: black;
+					vertical-align: middle;
+					text-align: center;
+					word-wrap: break-word;
+					}
+
+					td.innerTableClassRightValign { border: solid black;
+					border-top-width: 0px;
+					border-right-width: 1px;
+					border-bottom-width: 1px;
+					border-left-width: 0;
+					font-size: 1em;
+					font-weight:bold;
+					color: black;
+					vertical-align: middle;
+					text-align: center;
+					word-wrap: break-word;
+					}
+
+					td.innerTableClassRightValignBottomLess { border: solid black;
+					border-top-width: 0px;
+					border-right-width: 1px;
+					border-bottom-width: 0px;
+					border-left-width: 0;
+					font-size: 1em;
+					font-weight:bold;
+					color: black;
+					vertical-align: middle;
+					text-align: center;
+					word-wrap: break-word;
+					}
+
+					td.tableClassInnerLeft { border: solid black;
+					border-top-width: 0px;
+					border-right-width: 0px;
+					border-bottom-width: 1px;
+					border-left-width: 1px;
+					font-size: 1em;
+					font-weight:bold;
+					color: black;
+					word-wrap: break-word;
+					}
+
+					td.tableClassInnerLeftBottomLess { border: solid black;
+					border-top-width: 0px;
+					border-right-width: 0px;
+					border-bottom-width: 0px;
+					border-left-width: 1px;
+					font-size: 1em;
+					font-weight:bold;
+					color: black;
+					word-wrap: break-word;
+					}
+
+					td.tableClassNoBorderAlignCenter { border: solid black;
+					border-top-width: 0px;
+					border-right-width: 0px;
+					border-bottom-width: 0px;
+					border-left-width: 0px;
+					font-size: 0.9em;
+					font-weight:bold;
+					color: black;
+					text-align: center;
+					word-wrap: break-word;
+					}
+
+					tr.tableClass { border: solid black;
+					border-top-width: 1px;
+					border-right-width: 1px;
+					border-bottom-width: 1px;
+					border-left-width: 1px;
+					}
+					tr.tableClassWithBg { border: solid black;
+					border-top-width: 0;
+					border-right-width: 1;
+					border-bottom-width: 1;
+					border-left-width: 0;
+					background-color: #e0e0ff
+					}
+
+					tr.tableClassWithBgBlack { border: solid black;
+					border-top-width: 0;
+					border-right-width: 1;
+					border-bottom-width: 1;
+					border-left-width: 0;
+					background-color: #D3D3D3
+					}
+
+					hr.header {
+					position: relative;
+					top: 20px;
+					border: none;
+					height: 6px;
+					background: black;
+					margin-bottom: 10px;
+					}
+
+					hr.separatorThin {
+					position: relative;
+					top: 2px;
+					border: none;
+					height: 2px;
+					background: black;
+					margin-bottom: 2px;
+					}
+
+					hr.headerThin {
+					position: relative;
+					top: 10px;
+					border: none;
+					height: 2px;
+					background: black;
+					margin-bottom: 10px;
+					}
+
+					hr.separator {
+					position: relative;
+					top: 20px;
+					border: none;
+					height: 4px;
+					background: black;
+					margin-bottom: 5px;
+					}
+
+					div.text {
+					background-color: #ffffff;
+					color: blue;
+					font-size: 1em;
+					font-weight:normal;
+					text-align:justify;
+					}
+
+
+					div.information {
+					background-color: #ffffff;
+					color: black;
+					font-size: 1em;
+					font-weight:normal;
+					text-align:justify;
+					}
+
+					#scheader {
+					font-size: 0.9em;
+					border: 0px solid #404040;
+					border-spacing: 2px;
+					}
+
+					div.largetext {
+					background-color: #ffffff;
+					color: blue;
+					font-size: 1em;
+					font-weight:normal;
+					text-align:justify;
+					white-space: pre-wrap;
+					word-break: normal;
+					}
+
+				</style></head><body lang="en-US" text="#000000" bgcolor="#ffffff"><hr class="header"><br><hr class="headerThin"><div class="contentwrapper"><table role="presentation" id="scheader"><tr><td class="tableClassNoBorderAlignCenter" style="font-size:2em;">
+						SECURITIES AND EXCHANGE COMMISSION
+						<br>
+						Washington, D.C. 20549
+					</td></tr><tr><td class="tableClassNoBorderAlignCenter"><br><br><div style="font-size:1.5em;">
+									SCHEDULE 13D
+								</div><br><div style="font-size:1.2em;">
+							Under the Securities Exchange Act of 1934
+						</div><br></td></tr><tr><td class="center"><div class="information" style="text-align:center; font-weight:bold; color:blue;">Monogram Technologies Inc.</div><div class="information" style="text-align:center; font-weight:bold;"><hr class="separatorThin">(Name of Issuer)</div><br><br></td></tr><tr><td class="center"><div class="information" style="text-align:center; font-weight:bold; color:blue;">Common Stock, par value $0.001 per share</div><div class="information" style="text-align:center; font-weight:bold;"><hr class="separatorThin">(Title of Class of Securities)</div><br><br></td></tr><tr><td class="center"><div class="information" style="text-align:center; font-weight:bold; color:blue;">609786108</div><div class="information" style="text-align:center; font-weight:bold;"><hr class="separatorThin">(CUSIP Number)</div><br><br></td></tr><tr><td class="center"><div class="information" style="text-align:center; font-weight:bold; color:blue;">Chad F. Phipps<br>Zimmer Biomet Holdings, Inc.,
+								345 East Main Street<br>Warsaw,
+								IN,
+								46580<br>(574) 373-3333</div><br><br><div class="information" style="text-align:center; font-weight:bold; color:blue;">J. Gilligan &amp; J. Bisignano<br>Hogan Lovells US LLP,
+								555 Thirteenth Street NW<br>Washington,
+								DC,
+								20004<br>(202) 637-5600</div><div class="information" style="text-align:center; font-weight:bold;"><hr class="separatorThin">(Name, Address and Telephone Number of Person Authorized to
+									Receive Notices and Communications)</div></td></tr><tr><td class="center"><div class="information" style="text-align:center; font-weight:bold; color:blue;">07/11/2025</div><div class="information" style="text-align:center; font-weight:bold;"><hr class="separatorThin">(Date of Event Which Requires Filing of This Statement)</div></td></tr></table><br><br><div class="information" style="text-align:justify">
+				If the filing person has previously filed a statement on Schedule 13G to report the acquisition that is the subject of this Schedule 13D, and is filing this schedule because of §§ 240.13d-1(e), 240.13d-1(f) or 240.13d-1(g), check the following box.
+				<img src="/Images/box-unchecked.jpg" alt="Checkbox not checked"></div><br><div class="information" style="text-align:justify">
+				The information required on the remainder of this cover page shall not be deemed to be “filed” for the purpose of Section 18 of the
+				Securities Exchange Act of 1934 (“Act”) or otherwise subject to the liabilities of that section of the Act but shall be subject to all other
+				provisions of the Act (however, see the Notes).
+			</div></div><hr class="headerThin"><hr class="header"><br><br>
+  <div class="content"><div class="form1"></div></div>
+  <div class="content"><div class="form1"><table><tr><td class="center"><br><br><p><div align="center" style="font-size:1.2em;">
+									SCHEDULE 13D
+								</div></p></td></tr></table><table role="presentation" class="tableClass" id="cusipNumber"><tr class="tableClass"><td width="25%" style="font-weight:bold;">CUSIP No.</td><td width="75%"><div style="font-size:.9em; color:#000000">609786108</div></td></tr></table><br><br><table role="presentation" class="tableClass" id="reportingPersonDetails"><tr class="tableClass"><td width="8%" class="tableClassValign">1</td><td width="92%" class="tableClass">
+					Name of reporting person
+					<br><br><div class="text">Zimmer Biomet Holdings, Inc.</div></td></tr><tr><td width="8%" class="tableClassValign">2</td><td width="92%" class="tableClass">Check the appropriate box if a member of a Group (See Instructions)
+					<br><br><div class="text"><img src="/Images/box-unchecked.jpg" alt="Checkbox not checked">  (a)
+						<br><img src="/Images/box-unchecked.jpg" alt="Checkbox not checked">  (b)
+					</div></td></tr><tr class="tableClassWithBgBlack"><td width="8%" class="tableClassValign">3</td><td width="92%" class="tableClass">SEC use only</td></tr><tr><td width="8%" class="tableClassValign">4</td><td width="92%" class="tableClass">
+					Source of funds (See Instructions)
+					<br><br><div class="text">WC</div></td></tr><tr><td width="8%" class="tableClassValign">5</td><td width="92%" class="tableClass">
+					Check if disclosure of legal proceedings is required pursuant to Items 2(d) or 2(e)
+					<br><br><img src="/Images/box-unchecked.jpg" alt="Checkbox not checked"></td></tr><tr><td width="8%" class="tableClassValign">6</td><td width="92%" class="tableClass">Citizenship or place of organization
+					<br><br><div class="text">
+				DELAWARE
+			</div></td></tr><tr><td width="8%" class="tableClassValign">Number of Shares Beneficially Owned by Each Reporting Person With:</td><td width="92%" class="tableClass"><table class="innerTableClass"><tr><td width="8%" class="innerTableClassRightValign">7</td><td width="92%" class="tableClassInnerLeft">Sole Voting Power
+								<br><br><div class="text">0.00</div></td></tr><tr><td width="8%" class="innerTableClassRightValign">8</td><td width="92%" class="tableClassInnerLeft">Shared Voting Power
+								<br><br><div class="text">9,754,256.00</div></td></tr><tr><td width="8%" class="innerTableClassRightValign">9</td><td width="92%" class="tableClassInnerLeft">Sole Dispositive Power
+								<br><br><div class="text">0.00</div></td></tr><tr><td width="8%" class="innerTableClassRightValignBottomLess">10</td><td width="92%" class="tableClassInnerLeftBottomLess">Shared Dispositive Power
+								<br><br><div class="text">0.00</div></td></tr></table></td></tr><tr><td width="8%" class="tableClassValign">11</td><td width="92%" class="tableClass">Aggregate amount beneficially owned by each reporting person
+					<br><br><div class="text">9,754,256.00</div></td></tr><tr><td width="8%" class="tableClassValign">12</td><td width="92%" class="tableClass">Check if the aggregate amount in Row (11) excludes certain shares (See Instructions)
+					<br><br><img src="/Images/box-unchecked.jpg" alt="Checkbox not checked"></td></tr><tr><td width="8%" class="tableClassValign">13</td><td width="92%" class="tableClass">Percent of class represented by amount in Row (11)
+					<br><br><div class="text">27 % </div></td></tr><tr><td width="8%" class="tableClassValign">14</td><td width="92%" class="tableClass">Type of Reporting Person (See Instructions)
+					<br><br><div class="text">CO</div></td></tr></table><br><div style="display: flex;"><div style="font-size: 0.9em; font-weight: bold; margin-right: 5px;">
+					Comment for Type of Reporting Person:
+				</div><div class="largetext" style="text-align:justify">Row 8, 10, 11 and 13. Beneficial ownership of the shares of Common Stock (as defined herein) is being reported hereunder solely because the Reporting Persons (as defined herein) entered into separate Voting Agreements (as defined herein) described in this Schedule 13D, and therefore, may be deemed to beneficially own the shares beneficially owned by such counterparties. Neither the filing of this Schedule 13D nor any of its content shall be deemed to constitute an admission by each Reporting Person that it is the beneficial owner of any shares of Common Stock for purposes of Section 13(d) of the Securities Exchange Act of 1934, as amended (the "Exchange Act") or for any other purpose, and such beneficial ownership is hereby expressly disclaimed. The calculation of beneficial ownership percentage is based on 36,159,576 shares of Common Stock reported outstanding as of July 10, 2025 (as set forth in the Merger Agreement referred to in this Schedule 13D).
+</div></div><table><tr><td class="center"><br><br><p><div align="center" style="font-size:1.2em;">
+									SCHEDULE 13D
+								</div></p></td></tr></table><table role="presentation" class="tableClass" id="cusipNumber"><tr class="tableClass"><td width="25%" style="font-weight:bold;">CUSIP No.</td><td width="75%"><div style="font-size:.9em; color:#000000">609786108</div></td></tr></table><br><br><table role="presentation" class="tableClass" id="reportingPersonDetails"><tr class="tableClass"><td width="8%" class="tableClassValign">1</td><td width="92%" class="tableClass">
+					Name of reporting person
+					<br><br><div class="text">Honey Badger Merger Sub, Inc.</div></td></tr><tr><td width="8%" class="tableClassValign">2</td><td width="92%" class="tableClass">Check the appropriate box if a member of a Group (See Instructions)
+					<br><br><div class="text"><img src="/Images/box-unchecked.jpg" alt="Checkbox not checked">  (a)
+						<br><img src="/Images/box-unchecked.jpg" alt="Checkbox not checked">  (b)
+					</div></td></tr><tr class="tableClassWithBgBlack"><td width="8%" class="tableClassValign">3</td><td width="92%" class="tableClass">SEC use only</td></tr><tr><td width="8%" class="tableClassValign">4</td><td width="92%" class="tableClass">
+					Source of funds (See Instructions)
+					<br><br><div class="text">WC</div></td></tr><tr><td width="8%" class="tableClassValign">5</td><td width="92%" class="tableClass">
+					Check if disclosure of legal proceedings is required pursuant to Items 2(d) or 2(e)
+					<br><br><img src="/Images/box-unchecked.jpg" alt="Checkbox not checked"></td></tr><tr><td width="8%" class="tableClassValign">6</td><td width="92%" class="tableClass">Citizenship or place of organization
+					<br><br><div class="text">
+				DELAWARE
+			</div></td></tr><tr><td width="8%" class="tableClassValign">Number of Shares Beneficially Owned by Each Reporting Person With:</td><td width="92%" class="tableClass"><table class="innerTableClass"><tr><td width="8%" class="innerTableClassRightValign">7</td><td width="92%" class="tableClassInnerLeft">Sole Voting Power
+								<br><br><div class="text">0.00</div></td></tr><tr><td width="8%" class="innerTableClassRightValign">8</td><td width="92%" class="tableClassInnerLeft">Shared Voting Power
+								<br><br><div class="text">9,754,256.00</div></td></tr><tr><td width="8%" class="innerTableClassRightValign">9</td><td width="92%" class="tableClassInnerLeft">Sole Dispositive Power
+								<br><br><div class="text">0.00</div></td></tr><tr><td width="8%" class="innerTableClassRightValignBottomLess">10</td><td width="92%" class="tableClassInnerLeftBottomLess">Shared Dispositive Power
+								<br><br><div class="text">0.00</div></td></tr></table></td></tr><tr><td width="8%" class="tableClassValign">11</td><td width="92%" class="tableClass">Aggregate amount beneficially owned by each reporting person
+					<br><br><div class="text">9,754,256.00</div></td></tr><tr><td width="8%" class="tableClassValign">12</td><td width="92%" class="tableClass">Check if the aggregate amount in Row (11) excludes certain shares (See Instructions)
+					<br><br><img src="/Images/box-unchecked.jpg" alt="Checkbox not checked"></td></tr><tr><td width="8%" class="tableClassValign">13</td><td width="92%" class="tableClass">Percent of class represented by amount in Row (11)
+					<br><br><div class="text">27 % </div></td></tr><tr><td width="8%" class="tableClassValign">14</td><td width="92%" class="tableClass">Type of Reporting Person (See Instructions)
+					<br><br><div class="text">CO</div></td></tr></table><br><div style="display: flex;"><div style="font-size: 0.9em; font-weight: bold; margin-right: 5px;">
+					Comment for Type of Reporting Person:
+				</div><div class="largetext" style="text-align:justify">
+Row 8, 10, 11 and 13. Beneficial ownership of the shares of Common Stock is being reported hereunder solely because the Reporting Persons entered into separate Voting Agreements as described in this Schedule 13D, and therefore, may be deemed to beneficially own the shares subject to such agreements. Neither the filing of this Schedule 13D nor any of its content shall be deemed to constitute an admission by the Reporting Persons that it is the beneficial owner of any shares of Common Stock for purposes of Section 13(d) of the Exchange Act of or for any other purpose, and such beneficial ownership is hereby expressly disclaimed. The calculation of beneficial ownership percentage is based on 36,159,576 shares of Common Stock reported outstanding as of July 10, 2025 (as set forth in the Merger Agreement referred to in this Schedule 13D).</div></div></div><div class="form1"><table><tr><td class="center"><br><br><p><div align="center" style="font-size:1.2em;">
+									SCHEDULE 13D
+								</div></p></td></tr></table><table role="presentation" id="item1to7"><tr><td width="8%" class="tableClassValignNoBorder">Item 1.</td><td width="92%" class="tableClassNoBorder">Security and Issuer</td></tr><tr class="tableClass"><td width="8%" class="tableClassNoBorderAlignCenter">(a)</td><td width="92%" class="tableClassNoBorder">Title of Class of Securities:
+							<br><br><div class="text">Common Stock, par value $0.001 per share</div></td></tr><tr class="tableClass"><td width="8%" class="tableClassNoBorderAlignCenter">(b)</td><td width="92%" class="tableClassNoBorder">Name of Issuer:
+							<br><br><div class="text">Monogram Technologies Inc.</div></td></tr><tr><td width="8%" class="tableClassNoBorderAlignCenter">(c)</td><td width="92%" class="tableClassNoBorder">Address of Issuer's Principal Executive Offices:
+							<br><br><div class="text">3919 Todd Lane, Austin, 
+				TEXAS
+			, 78744.</div></td></tr><tr><td width="8%" class="tableClassValignNoBorder">Item 2.</td><td width="92%" class="tableClassNoBorder">Identity and Background</td></tr><tr></tr><tr class="tableClass"><td width="8%" class="tableClassNoBorderAlignCenter">(a)</td><td width="92%" class="tableClassNoBorder"><div class="largetext">This Schedule 13D is being jointly filed by (collectively, the "Reporting Persons"): (i) Zimmer Biomet Holdings, Inc. ("Parent"), a Delaware corporation, and (ii) Honey Badger Merger Sub, Inc. ("Merger Sub"), a Delaware corporation and a wholly-owned subsidiary of Parent.</div></td></tr><tr><td width="8%" class="tableClassNoBorderAlignCenter">(b)</td><td width="92%" class="tableClassNoBorder"><div class="largetext">The principal address of each of the Reporting Persons is 345 East Main Street, Warsaw, Indiana 46580.</div></td></tr><tr><td width="8%" class="tableClassNoBorderAlignCenter">(c)</td><td width="92%" class="tableClassNoBorder"><div class="largetext">Parent is a global medical technology company that designs, manufactures and markets orthopedic reconstructive products; sports medicine, biologics, extremities and trauma products; craniomaxillofacial and thoracic products; surgical products; and a suite of integrated digital and robotic technologies. Merger Sub was formed solely for the purpose of effecting the transactions contemplated by the Merger Agreement (as defined herein) and has not engaged in any activities other than those incidental to its formation and the transactions contemplated by the Merger Agreement and Voting Agreements.</div></td></tr><tr><td width="8%" class="tableClassNoBorderAlignCenter">(d)</td><td width="92%" class="tableClassNoBorder"><div class="largetext">During the last five years, none of the Reporting Persons or, to the best knowledge of the Reporting Persons, any of the other persons set forth on Schedule A attached hereto, has been convicted in a criminal proceeding (excluding traffic violations or similar misdemeanors).</div></td></tr><tr><td width="8%" class="tableClassNoBorderAlignCenter">(e)</td><td width="92%" class="tableClassNoBorder"><div class="largetext">During the last five years, none of the Reporting Persons or, to the best knowledge of the Reporting Persons, any of the other persons set forth on Schedule A attached hereto, has been a party to a civil proceeding of a judicial or administrative body of competent jurisdiction and, as a result of such proceeding, was or is subject to a judgment, decree or final order enjoining future violations of, or prohibiting or mandating activities subject to, federal or state securities laws or finding any violation with respect to such laws.</div></td></tr><tr><td width="8%" class="tableClassNoBorderAlignCenter">(f)</td><td width="92%" class="tableClassNoBorder"><div class="largetext">Not applicable.
+
+Certain information regarding the directors and executive officers of each Reporting Person is set forth on Schedule A attached hereto.</div></td></tr><tr><td width="8%" class="tableClassValignNoBorder">Item 3.</td><td width="92%" class="tableClassNoBorder">Source and Amount of Funds or Other Consideration</td></tr><tr><td width="8%" class="tableClassNoBorderAlignCenter"> </td><td width="92%" class="tableClassNoBorder"><div class="largetext">The information set forth in Item 4 of this Schedule 13D is hereby incorporated by reference herein.
+
+The Voting Agreements (as defined below) were entered into among Parent, Merger Sub and the respective Stockholder (as defined in each Voting Agreement). Each Stockholder entered into a Voting Agreement as a condition and inducement to Parent's and Merger Sub's willingness to enter into the Merger Agreement described in Item 4 of this Schedule 13D (the terms of which are hereby incorporated by reference). The shares of Common Stock to which this Schedule 13D relate have not been purchased by any Reporting Person and no payments were made by or on behalf of any Reporting Person in connection with the execution of the Voting Agreements.</div></td></tr><tr><td width="8%" class="tableClassValignNoBorder">Item 4.</td><td width="92%" class="tableClassNoBorder">Purpose of Transaction</td></tr><tr><td width="8%" class="tableClassNoBorderAlignCenter"> </td><td width="92%" class="tableClassNoBorder"><div class="largetext">                The purpose of the Merger (as defined below) is for Parent, through Merger Sub, to acquire control of, and the entire equity interest in, the Company.
+
+                On July 11, 2025, the Company entered into an Agreement and Plan of Merger (the "Merger Agreement") with Parent and Merger Sub. The Board of Directors of the Company (the "Board") has unanimously approved the Merger Agreement and the transactions contemplated thereby, including the Merger.
+Effect on Capital Stock
+
+                The Merger Agreement provides that, subject to the terms and conditions set forth therein, at the effective time of the Merger (the "Effective Time"), (1) Merger Sub will be merged with and into the Company (the "Merger"), with the Company continuing as the surviving corporation and a wholly-owned subsidiary of Parent, (2) each share of Common Stock issued and outstanding immediately prior to the Effective Time (other than shares owned by (i) the Company (or held in the Company's treasury), (ii) Parent, Merger Sub or any other direct or indirect wholly-owned subsidiary of Parent or Merger Sub or (iii) stockholders who have properly exercised and perfected appraisal rights under Delaware law) will be automatically cancelled and converted into the right to receive (A) $4.04 per share in cash, without interest and subject to applicable withholding taxes (the "Cash Amount"), plus (B) one contractual contingent value right per share representing the right to receive five contingent cash payments with an aggregate maximum amount payable of $12.37 in cash, without interest and subject to applicable withholding taxes (the "CVR" and, together with the Cash Amount, the "Merger Consideration"), subject to the achievement of certain revenue and other milestones set forth in the contingent value rights agreement, to be entered into at or immediately prior to the Effective Time, between Parent and a rights agent (the "CVR Agreement"), (3) each share of 8.00% Series D Convertible Cumulative Preferred Stock, par value $0.001 per share, of the Company (the "Series D Preferred Stock") issued and outstanding immediately prior to the Effective Time (other than shares owned by (i) the Company (or held in the Company's treasury), (ii) Parent, Merger Sub or any other direct or indirect wholly-owned subsidiary of Parent or Merger Sub or (iii) stockholders who have properly exercised and perfected appraisal rights under Delaware law) will be automatically cancelled and converted into the right to receive $2.25 per share of Series D Preferred Stock, plus an amount equal to any accrued but unpaid dividends (whether or not declared), in cash, without interest and subject to applicable withholding taxes and (4) each share of Series E Redeemable Perpetual Preferred Stock, par value $0.001 per share, of the Company (the "Series E Preferred Stock" and, together with the Series D Preferred Stock, the "Preferred Stock") issued and outstanding immediately prior to the Effective Time (other than shares owned by (i) the Company (or held in the Company's treasury), (ii) Parent, Merger Sub or any other direct or indirect wholly-owned subsidiary of Parent or Merger Sub or (iii) stockholders who have properly exercised and perfected appraisal rights under Delaware law) will be automatically cancelled and converted into the right to receive $100.00 per share of Series E Preferred Stock, in cash, without interest and subject to applicable withholding taxes.
+
+Treatment of Company Options
+
+                Pursuant to the Merger Agreement, at the Effective Time, each option to purchase shares of Common Stock (each, a "Company Option") that is then outstanding and unexercised, whether or not vested and that has a per share exercise price that is less than the sum of the Cash Amount and the maximum amount payable in respect of one CVR (the sum of such amounts, the "Maximum Merger Consideration," and each such Company Option, an "In the Money Option") will be cancelled and converted into the right to receive, with respect to each share of Common Stock underlying the vested portion of such In the Money Option (i) a cash payment equal to the excess of (A) the Cash Amount over (B) the exercise price payable per share of Common Stock underlying such In the Money Option and (ii) one CVR issued pursuant to the CVR Agreement. Any In the Money Option with a per share exercise price that is equal to or greater than the Cash Amount but less than the Maximum Merger Consideration will be cancelled (and the holder will not be entitled to any payment of the Cash Amount in respect of such In the Money Option) and converted into the right to receive solely for each share of Common Stock underlying such In the Money Option, one CVR issue pursuant to the CVR Agreement (where the amount payable pursuant to the CVR Agreement, if any, will be reduced by the portion of such In the Money Option's per share exercise price that exceeds the Cash Amount). Each Company Option other than an In the Money Option that is then outstanding and unexercised, whether or not vested, will be cancelled with no consideration payable.
+
+Representations, Warranties and Covenants
+
+                The Company, Parent and Merger Sub each have made customary representations, warranties and covenants in the Merger Agreement. Among other things, the Company has agreed (1) to use commercially reasonable efforts to conduct its business in the ordinary course during the period between the execution of the Merger Agreement and earlier of the Effective Time and the termination of the Merger Agreement (the "Pre-Closing Period"), and not to take certain actions during the Pre-Closing Period without the prior written consent of Parent (which consent will not be unreasonably withheld, conditioned or delayed), (2) to call, give notice of, convene and hold a meeting of its stockholders for the purpose of voting on the adoption of the Merger Agreement and (3) subject to certain exceptions, not to (i) solicit alternative acquisition proposals from third parties or engage in, continue or otherwise participate in any discussions or negotiations regarding, or furnish non-public information to, third parties regarding alternative acquisition proposals or (ii) withdraw or withhold (or modify or qualify in a manner adverse to Parent or Merger Sub) the recommendation of the Board that the Company's stockholders adopt the Merger Agreement.
+
+Closing Conditions
+
+                Subject to certain limitations as set forth in the Merger Agreement, each of the Company, Parent and Merger Sub has agreed to use their respective reasonable best efforts to obtain all required regulatory approvals. Closing of the Merger (the "Closing") is subject to the adoption of the Merger Agreement by holders of at least a majority of the outstanding shares of Common Stock (the "Company Stockholder Approval"). The Closing is also subject to other customary conditions, including (1) the expiration or termination of the applicable waiting period under the Hart-Scott-Rodino Antitrust Improvements Act of 1976, as amended, (2) the absence of any legal restraints that have the effect of preventing the consummation of the Merger, (3) the accuracy of the representations and warranties contained in the Merger Agreement (subject to certain materiality and material adverse effect qualifications) and compliance with the covenants and agreements in the Merger Agreement in all material respects by the parties to the Merger Agreement, and (4) in the case of Parent and Merger Sub, the absence of a material adverse effect relating to the Company.
+
+Termination Rights and Fees
+
+                The Merger Agreement contains certain termination rights, including the right of either the Company or Parent to terminate the Merger Agreement if the Merger is not consummated by January 11, 2026 (subject to one extension of three months if all of the conditions to the Closing, other than the conditions related to obtaining regulatory approvals, have been satisfied). The Merger Agreement also provides for certain termination rights for each of the Company and Parent, and provides that, upon termination of the Merger Agreement under specified circumstances, including if the Company terminates the Merger Agreement to enter into a superior proposal or Parent terminates the Merger Agreement due to a change of recommendation by the Board, the Company would be required to pay to Parent a termination fee of $11,000,000.
+
+                The foregoing description of the Merger Agreement does not purport to be complete and is qualified in its entirety by the full text of the Merger Agreement, a copy of which is filed as Exhibit 1 hereto.
+
+Voting Agreement
+
+                In connection with the execution of the Merger Agreement, Parent and Merger Sub have entered into a voting agreement (each, a "Voting Agreement") with each of (1) Pro-Dex, Inc., (2) Benjamin Sexson, (3) Douglas Unis and (4) Kamran Shamaei. Each Voting Agreement provides that the signatories thereto will generally vote their shares in favor of the adoption of the Merger Agreement and against any alternative proposal. Each Voting Agreement terminates upon the earliest to occur of (i) the termination of the Merger Agreement, (ii) the Effective Time (as defined in the Merger Agreement), (iii) execution of certain amendments to the Merger Agreement that are adverse to the applicable stockholder and (iv) the mutual written consent of all of the parties thereto.
+
+                The foregoing description of the Voting Agreements does not purport to be complete and is qualified in its entirety by the full text of the Voting Agreements, a form of which is filed as Exhibit 2 hereto.
+
+                Except as set forth in this Schedule 13D and in connection with the Merger described above, Parent has no plan or proposal that relates to or would result in any of the transactions described in subparagraphs (a) through (j) of Item 4 of Schedule 13D.</div></td></tr><tr><td width="8%" class="tableClassValignNoBorder">Item 5.</td><td width="92%" class="tableClassNoBorder">Interest in Securities of the Issuer</td></tr><tr><td width="8%" class="tableClassNoBorderAlignCenter">(a)</td><td width="92%" class="tableClassNoBorder"><div class="largetext">            Beneficial ownership of the shares of Common Stock is being reported hereunder solely because the Reporting Persons may be deemed to have beneficial ownership of such shares as a result of certain provisions contained in the Voting Agreements described in this Schedule 13D. Pursuant to Rule 13d-4, neither the filing of this Schedule 13D nor any of its content shall be deemed to constitute an admission by the Reporting Persons that it is the beneficial owner of any shares of Common Stock for purposes of Section 13(d) of the Act, or for any other purpose, and such beneficial ownership and membership in any group are hereby expressly disclaimed.
+
+                Except as set forth in this Item 5, to the knowledge of the Reporting Persons, none of the persons named in Schedule A beneficially owns any shares of Common Stock.</div></td></tr><tr><td width="8%" class="tableClassNoBorderAlignCenter">(b)</td><td width="92%" class="tableClassNoBorder"><div class="largetext">            Beneficial ownership of the shares of Common Stock is being reported hereunder solely because the Reporting Persons may be deemed to have beneficial ownership of such shares as a result of certain provisions contained in the Voting Agreements described in this Schedule 13D. Pursuant to Rule 13d-4, neither the filing of this Schedule 13D nor any of its content shall be deemed to constitute an admission by the Reporting Persons that it is the beneficial owner of any shares of Common Stock for purposes of Section 13(d) of the Act, or for any other purpose, and such beneficial ownership and membership in any group are hereby expressly disclaimed.
+
+            Except as set forth in this Item 5, to the knowledge of the Reporting Persons, none of the persons named in Schedule A beneficially owns any shares of Common Stock.</div></td></tr><tr><td width="8%" class="tableClassNoBorderAlignCenter">(c)</td><td width="92%" class="tableClassNoBorder"><div class="largetext">Except as set forth in this Schedule 13D, to the knowledge of the Reporting Persons, no transactions in the class of securities reported herein have been effected during the past 60 days by the Reporting Persons or any person named in Schedule A.</div></td></tr><tr><td width="8%" class="tableClassNoBorderAlignCenter">(d)</td><td width="92%" class="tableClassNoBorder"><div class="largetext">            To the knowledge of the Reporting Persons, no person other than the applicable parties to the Voting Agreements has the right to receive or the power to direct the receipt of dividends from, or the proceeds from the sale of, the securities of the Company reported herein.</div></td></tr><tr><td width="8%" class="tableClassNoBorderAlignCenter">(e)</td><td width="92%" class="tableClassNoBorder"><div class="largetext">            Not applicable.</div></td></tr><tr><td width="8%" class="tableClassValignNoBorder">Item 6.</td><td width="92%" class="tableClassNoBorder">Contracts, Arrangements, Understandings or Relationships With Respect to Securities of the Issuer</td></tr><tr><td width="8%" class="tableClassNoBorderAlignCenter"> </td><td width="92%" class="tableClassNoBorder"><div class="largetext">            The information set forth in Items 3 and 4 of this Schedule 13D are hereby incorporated by reference herein.</div></td></tr><tr><td width="8%" class="tableClassValignNoBorder">Item 7.</td><td width="92%" class="tableClassNoBorder">Material to be Filed as Exhibits.</td></tr><tr><td width="8%" class="tableClassNoBorderAlignCenter"> </td><td width="92%" class="tableClassNoBorder"><div class="largetext">	Exhibit 1 Agreement and Plan of Merger, dated as of July 11, 2025, by and among Zimmer Biomet Holdings, Inc., Honey Badger Merger Sub, Inc. and Monogram Technologies Inc.
+
+	Exhibit 2 Form of Voting Agreement, dated as of July 11, 2025, entered into with the parties described in Item 4
+
+	Exhibit 3 Joint Filing Agreement, dated July 15, 2025 by and between the Reporting Persons</div></td></tr></table><br></div><div class="form1"><table role="presentation" id="signatureInfo"><tr><td width="8%" class="tableClassValignNoBorder">    SIGNATURE</td><td width="92%" class="tableClassNoBorder"> </td></tr><tr><td width="8%" class="tableClassNoBorderAlignCenter"> </td><td width="92%" class="tableClassNoBorder"><div class="information" style="text-align:justify">
+						After reasonable inquiry and to the best of my knowledge and belief, I certify that the information set forth in this statement is true, complete and correct.
+						<br><br></div></td></tr></table><table><tr class="tableClass"><td width="50%" class="tableClassNoBorder"> </td><td width="50%" class="tableClassNoBorder"><table><tr class="tableClass"><td width="100%" class="tableClassInnerNoBorderBlue"><div class="text">Zimmer Biomet Holdings, Inc.</div></td></tr></table></td></tr></table><table><tr class="tableClass"><td width="50%" class="tableClassNoBorder"> </td><td width="50%" class="tableClassNoBorder"><table><tr class="tableClass"><td width="8%" class="tableClassNoBorderAlignLeft signature">Signature:</td><td width="92%" class="tableClassNoBorderBlue signature">/s/ Chad F. Phipps</td></tr><tr class="tableClass"><td width="8%" class="tableClassNoBorderAlignLeft signature">Name/Title:</td><td width="92%" class="tableClassNoBorderBlue signature">Chad F. Phipps Title: Senior Vice President, General Counsel and Secretary</td></tr><tr class="tableClass"><td width="8%" class="tableClassNoBorderAlignLeft signature">Date:</td><td width="92%" class="tableClassNoBorderBlue signature">07/15/2025</td></tr></table></td></tr></table><table><tr class="tableClass"><td width="50%" class="tableClassNoBorder"> </td><td width="50%" class="tableClassNoBorder"><table><tr class="tableClass"><td width="100%" class="tableClassInnerNoBorderBlue"><div class="text">Honey Badger Merger Sub, Inc.</div></td></tr></table></td></tr></table><table><tr class="tableClass"><td width="50%" class="tableClassNoBorder"> </td><td width="50%" class="tableClassNoBorder"><table><tr class="tableClass"><td width="8%" class="tableClassNoBorderAlignLeft signature">Signature:</td><td width="92%" class="tableClassNoBorderBlue signature">/s/ Chad F. Phipps</td></tr><tr class="tableClass"><td width="8%" class="tableClassNoBorderAlignLeft signature">Name/Title:</td><td width="92%" class="tableClassNoBorderBlue signature">Name: Chad F. Phipps Title: Senior Vice President and Secretary</td></tr><tr class="tableClass"><td width="8%" class="tableClassNoBorderAlignLeft signature">Date:</td><td width="92%" class="tableClassNoBorderBlue signature">07/15/2025</td></tr></table></td></tr></table></div></div>
+
+<script type="text/javascript"  src="/hEyxvy/tDTQ/C5W/N8y/CEN74LRlKz4/wYOaNzSVtcwhtffaf7/U3FqJk0lAg/cDg9eQ/IuTns"></script></body></html>

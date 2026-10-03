@@ -1,0 +1,459 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns:p="http://www.sec.gov/edgar/schedule13D" xmlns:p1="http://www.sec.gov/edgar/common"><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8"><link rel="stylesheet" type="text/css" href="/css/SDR_print.css"><style type="text/css">
+					.fakeTextBox {
+					border-top: 2px solid #999;
+					border-right: 1px solid #ccc;
+					border-bottom: 1px solid #ccc;
+					border-left: 2px solid #999;
+					padding: 2px;
+					_width: 800px;
+					height: auto;
+					min-width: 200px;
+					min-height: 50px;
+					word-wrap: break-word;
+					font-size: 0.9em;
+					color: blue;
+					}
+					table.tableClass { border: solid black;
+					border-top-width: 1;
+					border-right-width: 1;
+					border-bottom-width: 1;
+					border-left-width: 1;
+					table-layout:fixed;
+					}
+					table.innerTableClass { border: solid black;
+					border-top-width: 0;
+					border-right-width: 0;
+					border-bottom-width: 0;
+					border-left-width: 0;
+					table-layout:fixed;
+					}
+					th.tableClassLeft { border: solid black;
+					border-top-width: 0px;
+					border-right-width: 0px;
+					border-bottom-width: 1px;
+					border-left-width: 1px;
+					padding: 2px;
+					}
+					th.tableClassRight { border: solid black;
+					border-top-width: 0px;
+					border-right-width: 1px;
+					border-bottom-width: 1px;
+					border-left-width: 0;
+					padding: 2px;
+					}
+					th.tableClass { border: solid black;
+					border-top-width: 0px;
+					border-right-width: 1px;
+					border-bottom-width: 1px;
+					border-left-width: 1px;
+					padding: 2px;
+					}
+					td.tableClassLeft { border: solid black;
+					border-top-width: 0px;
+					border-right-width: 0px;
+					border-bottom-width: 1px;
+					border-left-width: 1px;
+					font-size: 0.9em;
+					color: blue;
+					word-wrap: break-word;
+					}
+					td.tableClassRight { border: solid black;
+					border-top-width: 0px;
+					border-right-width: 1px;
+					border-bottom-width: 1px;
+					border-left-width: 0;
+					font-size: 0.9em;
+					color: blue;
+					word-wrap: break-word;
+					}
+					td.tableClass { border: solid black;
+					border-top-width: 0px;
+					border-right-width: 1px;
+					border-bottom-width: 1px;
+					border-left-width: 1px;
+					font-size: 0.9em;
+					font-weight:bold;
+					color: black;
+					word-wrap: break-word;
+					}
+					td.tableClassNoBorder { border: solid black;
+					border-top-width: 0px;
+					border-right-width: 0px;
+					border-bottom-width: 0px;
+					border-left-width: 0px;
+					font-size: 0.9em;
+					font-weight:bold;
+					color: black;
+					word-wrap: break-word;
+					}
+
+					td.tableClassNoBorderBlue { border: solid black;
+					border-top-width: 0px;
+					border-right-width: 0px;
+					border-bottom-width: 0px;
+					border-left-width: 0px;
+					font-size: 0.9em;
+					font-weight:bold;
+					color: blue;
+					word-wrap: break-word;
+					}
+
+					td.tableClassInnerNoBorderBlue { border: solid black;
+					border-top-width: 0px;
+					border-right-width: 0px;
+					border-bottom-width: 0px;
+					border-left-width: 0px;
+					font-size: 1.4em;
+					font-weight:bold;
+					color: blue;
+					word-wrap: break-word;
+					}
+
+					td.tableClassNoBorderAlignLeft { border: solid black;
+					border-top-width: 0px;
+					border-right-width: 0px;
+					border-bottom-width: 0px;
+					border-left-width: 0px;
+					font-size: 0.9em;
+					font-weight:bold;
+					text-align: left;
+					color: black;
+					word-wrap: break-word;
+					}
+
+					td.signature {
+					padding: 4px 8px;
+					}
+
+					td.tableClassInner { border: solid black;
+					border-top-width: 0px;
+					border-right-width: 1px;
+					border-bottom-width: 1px;
+					border-left-width: 1px;
+					font-size: 1em;
+					font-weight:bold;
+					color: black;
+					word-wrap: break-word;
+					}
+
+					td.tableClassValign { border: solid black;
+					border-top-width: 0px;
+					border-right-width: 1px;
+					border-bottom-width: 1px;
+					border-left-width: 1px;
+					font-size: 0.9em;
+					font-weight:bold;
+					color: black;
+					vertical-align: middle;
+					text-align: center;
+					word-wrap: break-word;
+					}
+
+					td.tableClassValignNoBorder { border: solid black;
+					border-top-width: 0px;
+					border-right-width: 0px;
+					border-bottom-width: 0px;
+					border-left-width: 0px;
+					font-size: 0.9em;
+					font-weight:bold;
+					color: black;
+					vertical-align: middle;
+					text-align: center;
+					word-wrap: break-word;
+					}
+
+					td.tableClassValignInner { border: solid black;
+					border-top-width: 0px;
+					border-right-width: 1px;
+					border-bottom-width: 1px;
+					border-left-width: 1px;
+					font-size: 1em;
+					font-weight:bold;
+					color: black;
+					vertical-align: middle;
+					text-align: center;
+					word-wrap: break-word;
+					}
+
+					td.innerTableClassRightValign { border: solid black;
+					border-top-width: 0px;
+					border-right-width: 1px;
+					border-bottom-width: 1px;
+					border-left-width: 0;
+					font-size: 1em;
+					font-weight:bold;
+					color: black;
+					vertical-align: middle;
+					text-align: center;
+					word-wrap: break-word;
+					}
+
+					td.innerTableClassRightValignBottomLess { border: solid black;
+					border-top-width: 0px;
+					border-right-width: 1px;
+					border-bottom-width: 0px;
+					border-left-width: 0;
+					font-size: 1em;
+					font-weight:bold;
+					color: black;
+					vertical-align: middle;
+					text-align: center;
+					word-wrap: break-word;
+					}
+
+					td.tableClassInnerLeft { border: solid black;
+					border-top-width: 0px;
+					border-right-width: 0px;
+					border-bottom-width: 1px;
+					border-left-width: 1px;
+					font-size: 1em;
+					font-weight:bold;
+					color: black;
+					word-wrap: break-word;
+					}
+
+					td.tableClassInnerLeftBottomLess { border: solid black;
+					border-top-width: 0px;
+					border-right-width: 0px;
+					border-bottom-width: 0px;
+					border-left-width: 1px;
+					font-size: 1em;
+					font-weight:bold;
+					color: black;
+					word-wrap: break-word;
+					}
+
+					td.tableClassNoBorderAlignCenter { border: solid black;
+					border-top-width: 0px;
+					border-right-width: 0px;
+					border-bottom-width: 0px;
+					border-left-width: 0px;
+					font-size: 0.9em;
+					font-weight:bold;
+					color: black;
+					text-align: center;
+					word-wrap: break-word;
+					}
+
+					tr.tableClass { border: solid black;
+					border-top-width: 1px;
+					border-right-width: 1px;
+					border-bottom-width: 1px;
+					border-left-width: 1px;
+					}
+					tr.tableClassWithBg { border: solid black;
+					border-top-width: 0;
+					border-right-width: 1;
+					border-bottom-width: 1;
+					border-left-width: 0;
+					background-color: #e0e0ff
+					}
+
+					tr.tableClassWithBgBlack { border: solid black;
+					border-top-width: 0;
+					border-right-width: 1;
+					border-bottom-width: 1;
+					border-left-width: 0;
+					background-color: #D3D3D3
+					}
+
+					hr.header {
+					position: relative;
+					top: 20px;
+					border: none;
+					height: 6px;
+					background: black;
+					margin-bottom: 10px;
+					}
+
+					hr.separatorThin {
+					position: relative;
+					top: 2px;
+					border: none;
+					height: 2px;
+					background: black;
+					margin-bottom: 2px;
+					}
+
+					hr.headerThin {
+					position: relative;
+					top: 10px;
+					border: none;
+					height: 2px;
+					background: black;
+					margin-bottom: 10px;
+					}
+
+					hr.separator {
+					position: relative;
+					top: 20px;
+					border: none;
+					height: 4px;
+					background: black;
+					margin-bottom: 5px;
+					}
+
+					div.text {
+					background-color: #ffffff;
+					color: blue;
+					font-size: 1em;
+					font-weight:normal;
+					text-align:justify;
+					}
+
+
+					div.information {
+					background-color: #ffffff;
+					color: black;
+					font-size: 1em;
+					font-weight:normal;
+					text-align:justify;
+					}
+
+					#scheader {
+					font-size: 0.9em;
+					border: 0px solid #404040;
+					border-spacing: 2px;
+					}
+
+					div.largetext {
+					background-color: #ffffff;
+					color: blue;
+					font-size: 1em;
+					font-weight:normal;
+					text-align:justify;
+					white-space: pre-wrap;
+					word-break: normal;
+					}
+
+				</style></head><body lang="en-US" text="#000000" bgcolor="#ffffff"><hr class="header"><br><hr class="headerThin"><div class="contentwrapper"><table role="presentation" id="scheader"><tr><td class="tableClassNoBorderAlignCenter" style="font-size:2em;">
+						SECURITIES AND EXCHANGE COMMISSION
+						<br>
+						Washington, D.C. 20549
+					</td></tr><tr><td class="tableClassNoBorderAlignCenter"><br><br><div style="font-size:1.5em;">
+									SCHEDULE 13D
+								</div><br><div style="font-size:1.2em;">
+							Under the Securities Exchange Act of 1934
+						</div><br><div class="information" style="text-align:center; font-weight:bold;">
+									(Amendment No. <span style="color:blue;">2</span>)
+								</div><br><br></td></tr><tr><td class="center"><div class="information" style="text-align:center; font-weight:bold; color:blue;">Anghami Inc.</div><div class="information" style="text-align:center; font-weight:bold;"><hr class="separatorThin">(Name of Issuer)</div><br><br></td></tr><tr><td class="center"><div class="information" style="text-align:center; font-weight:bold; color:blue;">Ordinary Shares, par value $0.001 per share</div><div class="information" style="text-align:center; font-weight:bold;"><hr class="separatorThin">(Title of Class of Securities)</div><br><br></td></tr><table border="1"><tr><td><div class="information" style="text-align:center; font-weight:bold; color:blue;">G0369L101</div><div class="information" style="text-align:center; font-weight:bold;"><hr class="separatorThin">(CUSIP Number)</div></td></tr><br><br></table><tr><td class="center"><div class="information" style="text-align:center; font-weight:bold; color:blue;">Benjamin R. Pedersen<br>66 Hudson Boulevard,
+								<br>New York,
+								NY,
+								10001<br>212-909-6000</div><div class="information" style="text-align:center; font-weight:bold;"><hr class="separatorThin">(Name, Address and Telephone Number of Person Authorized to
+									Receive Notices and Communications)</div></td></tr><tr><td class="center"><div class="information" style="text-align:center; font-weight:bold; color:blue;">06/24/2026</div><div class="information" style="text-align:center; font-weight:bold;"><hr class="separatorThin">(Date of Event Which Requires Filing of This Statement)</div></td></tr></table><br><br><div class="information" style="text-align:justify">
+				If the filing person has previously filed a statement on Schedule 13G to report the acquisition that is the subject of this Schedule 13D, and is filing this schedule because of §§ 240.13d-1(e), 240.13d-1(f) or 240.13d-1(g), check the following box.
+				<img src="/Images/box-unchecked.jpg" alt="Checkbox not checked"></div><br><div class="information" style="text-align:justify">
+				The information required on the remainder of this cover page shall not be deemed to be “filed” for the purpose of Section 18 of the
+				Securities Exchange Act of 1934 (“Act”) or otherwise subject to the liabilities of that section of the Act but shall be subject to all other
+				provisions of the Act (however, see the Notes).
+			</div></div><hr class="headerThin"><hr class="header"><br><br>
+  <div style="display:none">
+			schemaVersion:
+			</div>
+<div class="content"><div class="form1"></div></div>
+  <div class="content"><div class="form1"><table><tr><td class="center"><br><br><p><div align="center" style="font-size:1.2em;">
+									SCHEDULE 13D
+								</div></p></td></tr></table><table role="presentation" class="tableClass" id="cusipNumber"><tr class="tableClass"><td width="7%" style="font-weight:bold;">CUSIP Number(s):</td><td width="75%"><div style="font-size:.9em; color:#000000">G0369L101</div></td></tr></table><br><br><table role="presentation" class="tableClass" id="reportingPersonDetails"><tr class="tableClass"><td width="8%" class="tableClassValign">1</td><td width="92%" class="tableClass">
+					Name of reporting person
+					<br><br><div class="text">Warner Bros. Discovery, Inc.</div></td></tr><tr><td width="8%" class="tableClassValign">2</td><td width="92%" class="tableClass">Check the appropriate box if a member of a Group (See Instructions)
+				<br><br><div class="text"><img src="/Images/box-checked.jpg" alt="Checkbox checked">  (a)
+					<br><img src="/Images/box-unchecked.jpg" alt="Checkbox not checked">  (b)	
+				</div></td></tr><tr class="tableClassWithBgBlack"><td width="8%" class="tableClassValign">3</td><td width="92%" class="tableClass">SEC use only</td></tr><tr><td width="8%" class="tableClassValign">4</td><td width="92%" class="tableClass">
+					Source of funds (See Instructions)
+					<br><br><div class="text">WC</div></td></tr><tr><td width="8%" class="tableClassValign">5</td><td width="92%" class="tableClass">
+					Check if disclosure of legal proceedings is required pursuant to Items 2(d) or 2(e)
+					<br><br><img src="/Images/box-unchecked.jpg" alt="Checkbox not checked"></td></tr><tr><td width="8%" class="tableClassValign">6</td><td width="92%" class="tableClass">Citizenship or place of organization
+				<br><br><div class="text">
+				DELAWARE
+			</div></td></tr><tr><td width="8%" class="tableClassValign">Number of Shares Beneficially Owned by Each Reporting Person With:</td><td width="92%" class="tableClass"><table class="innerTableClass"><tr><td width="8%" class="innerTableClassRightValign">7</td><td width="92%" class="tableClassInnerLeft">Sole Voting Power
+							<br><br><div class="text">0.00</div></td></tr><tr><td width="8%" class="innerTableClassRightValign">8</td><td width="92%" class="tableClassInnerLeft">Shared Voting Power
+							<br><br><div class="text">7,417,345.00</div></td></tr><tr><td width="8%" class="innerTableClassRightValign">9</td><td width="92%" class="tableClassInnerLeft">Sole Dispositive Power
+							<br><br><div class="text">0.00</div></td></tr><tr><td width="8%" class="innerTableClassRightValignBottomLess">10</td><td width="92%" class="tableClassInnerLeftBottomLess">Shared Dispositive Power
+							<br><br><div class="text">7,417,345.00</div></td></tr></table></td></tr><tr><td width="8%" class="tableClassValign">11</td><td width="92%" class="tableClass">Aggregate amount beneficially owned by each reporting person
+				<br><br><div class="text">7,417,345.00</div></td></tr><tr><td width="8%" class="tableClassValign">12</td><td width="92%" class="tableClass">Check if the aggregate amount in Row (11) excludes certain shares (See Instructions)
+				<br><br><img src="/Images/box-unchecked.jpg" alt="Checkbox not checked"></td></tr><tr><td width="8%" class="tableClassValign">13</td><td width="92%" class="tableClass">Percent of class represented by amount in Row (11)
+				<br><br><div class="text">71.3 % </div></td></tr><tr><td width="8%" class="tableClassValign">14</td><td width="92%" class="tableClass">Type of Reporting Person (See Instructions)
+				<br><br><div class="text">CO</div></td></tr></table><br><div style="display: flex;"><div style="font-size: 0.9em; font-weight: bold; margin-right: 5px;">
+					Comment for Type of Reporting Person:
+				</div><div class="largetext" style="text-align:justify">The amounts listed in Rows 8, 10 and 11 include (i) 6,074,721 ordinary shares, par value $0.001 per share (the "Ordinary Shares"), of Anghami Inc., an exempted company incorporated in the Cayman Islands with limited liability (the "Issuer"), owned of record by OSN Streaming Limited ("OSN Streaming") and beneficially owned by the Reporting Persons (as defined below) plus (ii) 1,342,624 Ordinary Shares underlying warrants that are exercisable by OSN Streaming at a price of $115 per Ordinary Share (subject to certain specified adjustments) that are beneficially owned by the Reporting Persons (the "OSN Warrants").
+
+The percentage calculated in Row 13 is based on a total of 10,407,432 Ordinary Shares, which includes (i) 9,064,808 Ordinary Shares outstanding as of December 31, 2025, as reported in the Annual Report on Form 20-F filed by the Issuer on April 30, 2026 (the "Form 20-F"), plus (ii) 1,342,624 Ordinary Shares issuable upon the exercise of the OSN Warrants. In accordance with SEC rules governing beneficial ownership, the calculation of the percentage ownership includes warrants beneficially owned by the Reporting Persons but does not include any other shares issuable upon the exercise of any other outstanding warrants or convertible notes beneficially owned by other persons.</div></div><table><tr><td class="center"><br><br><p><div align="center" style="font-size:1.2em;">
+									SCHEDULE 13D
+								</div></p></td></tr></table><table role="presentation" class="tableClass" id="cusipNumber"><tr class="tableClass"><td width="7%" style="font-weight:bold;">CUSIP Number(s):</td><td width="75%"><div style="font-size:.9em; color:#000000">G0369L101</div></td></tr></table><br><br><table role="presentation" class="tableClass" id="reportingPersonDetails"><tr class="tableClass"><td width="8%" class="tableClassValign">1</td><td width="92%" class="tableClass">
+					Name of reporting person
+					<br><br><div class="text">Dplay Entertainment Limited</div></td></tr><tr><td width="8%" class="tableClassValign">2</td><td width="92%" class="tableClass">Check the appropriate box if a member of a Group (See Instructions)
+				<br><br><div class="text"><img src="/Images/box-checked.jpg" alt="Checkbox checked">  (a)
+					<br><img src="/Images/box-unchecked.jpg" alt="Checkbox not checked">  (b)	
+				</div></td></tr><tr class="tableClassWithBgBlack"><td width="8%" class="tableClassValign">3</td><td width="92%" class="tableClass">SEC use only</td></tr><tr><td width="8%" class="tableClassValign">4</td><td width="92%" class="tableClass">
+					Source of funds (See Instructions)
+					<br><br><div class="text">WC</div></td></tr><tr><td width="8%" class="tableClassValign">5</td><td width="92%" class="tableClass">
+					Check if disclosure of legal proceedings is required pursuant to Items 2(d) or 2(e)
+					<br><br><img src="/Images/box-unchecked.jpg" alt="Checkbox not checked"></td></tr><tr><td width="8%" class="tableClassValign">6</td><td width="92%" class="tableClass">Citizenship or place of organization
+				<br><br><div class="text">
+				UNITED KINGDOM
+			</div></td></tr><tr><td width="8%" class="tableClassValign">Number of Shares Beneficially Owned by Each Reporting Person With:</td><td width="92%" class="tableClass"><table class="innerTableClass"><tr><td width="8%" class="innerTableClassRightValign">7</td><td width="92%" class="tableClassInnerLeft">Sole Voting Power
+							<br><br><div class="text">0.00</div></td></tr><tr><td width="8%" class="innerTableClassRightValign">8</td><td width="92%" class="tableClassInnerLeft">Shared Voting Power
+							<br><br><div class="text">7,417,345.00</div></td></tr><tr><td width="8%" class="innerTableClassRightValign">9</td><td width="92%" class="tableClassInnerLeft">Sole Dispositive Power
+							<br><br><div class="text">0.00</div></td></tr><tr><td width="8%" class="innerTableClassRightValignBottomLess">10</td><td width="92%" class="tableClassInnerLeftBottomLess">Shared Dispositive Power
+							<br><br><div class="text">7,417,345.00</div></td></tr></table></td></tr><tr><td width="8%" class="tableClassValign">11</td><td width="92%" class="tableClass">Aggregate amount beneficially owned by each reporting person
+				<br><br><div class="text">7,417,345.00</div></td></tr><tr><td width="8%" class="tableClassValign">12</td><td width="92%" class="tableClass">Check if the aggregate amount in Row (11) excludes certain shares (See Instructions)
+				<br><br><img src="/Images/box-unchecked.jpg" alt="Checkbox not checked"></td></tr><tr><td width="8%" class="tableClassValign">13</td><td width="92%" class="tableClass">Percent of class represented by amount in Row (11)
+				<br><br><div class="text">71.3 % </div></td></tr><tr><td width="8%" class="tableClassValign">14</td><td width="92%" class="tableClass">Type of Reporting Person (See Instructions)
+				<br><br><div class="text">CO</div></td></tr></table><br><div style="display: flex;"><div style="font-size: 0.9em; font-weight: bold; margin-right: 5px;">
+					Comment for Type of Reporting Person:
+				</div><div class="largetext" style="text-align:justify">The amounts listed in Rows 8, 10 and 11 include (i) 6,074,721 Ordinary Shares owned of record by OSN Streaming and beneficially owned by the Reporting Persons plus (ii) 1,342,624 Ordinary Shares issuable upon the exercise of the OSN Warrants.
+
+The percentage calculated in Row 13 is based on a total of 10,407,432 Ordinary Shares, which includes (i) 9,064,808 Ordinary Shares outstanding as of December 31, 2025, as reported in the Form 20-F, plus (ii) 1,342,624 Ordinary Shares issuable upon the exercise of the OSN Warrants. In accordance with SEC rules governing beneficial ownership, the calculation of the percentage ownership includes warrants beneficially owned by the Reporting Persons but does not include any other shares issuable upon the exercise of any other outstanding warrants or convertible notes beneficially owned by other persons.</div></div></div><div class="form1"><table><tr><td class="center"><br><br><p><div align="center" style="font-size:1.2em;">
+									SCHEDULE 13D
+								</div></p></td></tr></table><table role="presentation" id="item1to7"><tr><td width="8%" class="tableClassValignNoBorder">Item 1.</td><td width="92%" class="tableClassNoBorder">Security and Issuer</td></tr><tr class="tableClass"><td width="8%" class="tableClassNoBorderAlignCenter">(a)</td><td width="92%" class="tableClassNoBorder">Title of Class of Securities:
+							<br><br><div class="text">Ordinary Shares, par value $0.001 per share</div></td></tr><tr class="tableClass"><td width="8%" class="tableClassNoBorderAlignCenter">(b)</td><td width="92%" class="tableClassNoBorder">Name of Issuer:
+							<br><br><div class="text">Anghami Inc.</div></td></tr><tr><td width="8%" class="tableClassNoBorderAlignCenter">(c)</td><td width="92%" class="tableClassNoBorder">Address of Issuer's Principal Executive Offices:
+							<br><br><div class="text">16th Floor, Al-Khatem Tower, Abu Dhabi Global Market Square, Al Maryah Island, Abu Dhabi, 
+				UNITED ARAB EMIRATES
+			, 00000.</div></td></tr><tr><td colspan="3"><div style="display: flex;"><div style="font-size: 0.9em; font-weight: bold; margin-right: 5px;">
+									Item 1 Comment:
+								</div><div class="largetext" style="text-align:justify">This Amendment No. 2 ("Amendment No. 2") is being filed by Warner Bros. Discovery, Inc. ("WBD") and Dplay Entertainment Limited (the "Purchaser" and, together with WBD, the "Reporting Persons") and amends the initial statement on Schedule 13D filed on July 25, 2025 (the "Original 13D," as amended by Amendment No. 1 to the Original 13D filed on December 17, 2025, the "Schedule 13D"). The information reported in the Schedule 13D remains in effect, except to the extent that it is amended, restated or superseded by information contained in this Amendment No. 2. Capitalized terms used but not defined in this Amendment No. 2 shall have the respective meanings ascribed to them in the Schedule 13D. All references to the "Statement" in the Schedule 13D and this Amendment No. 2 shall be deemed to refer to the Schedule 13D as amended and supplemented by this Amendment No. 2.</div></div></td></tr><tr><td width="8%" class="tableClassValignNoBorder">Item 2.</td><td width="92%" class="tableClassNoBorder">Identity and Background</td></tr><tr></tr><tr class="tableClass"><td width="8%" class="tableClassNoBorderAlignCenter">(a)</td><td width="92%" class="tableClassNoBorder"><div class="largetext">Item 2(a) of the Statement is hereby amended and restated in its entirety as follows:
+
+Warner Bros. Discovery, Inc., a Delaware corporation ("WBD") and Dplay Entertainment Limited, a company wholly owned by WBD and incorporated and existing under the laws of England and Wales with registered number 09615785 (the "Purchaser," and, together with WBD, the "Reporting Persons"). The names of the directors and executive officers of each Reporting Person (collectively, the "Covered Persons") are set forth on Schedule A, which is incorporated herein by reference.
+
+The agreement among the Reporting Persons relating to the joint filing of the Statement was filed as Exhibit 4 to the Original 13D and is incorporated herein by reference.
+</div></td></tr><tr><td width="8%" class="tableClassNoBorderAlignCenter">(d)</td><td width="92%" class="tableClassNoBorder"><div class="largetext">Item 2(d) of the Statement is hereby amended and restated in its entirety as follows:
+
+During the last five years, neither of the Reporting Persons nor, to the best of each Reporting Person's knowledge, any Covered Person has been convicted in a criminal proceeding (excluding traffic violations or similar misdemeanors).</div></td></tr><tr><td width="8%" class="tableClassNoBorderAlignCenter">(e)</td><td width="92%" class="tableClassNoBorder"><div class="largetext">Item 2(e) of the Statement is hereby amended and restated in its entirety as follows:
+
+During the last five years, neither of the Reporting Persons nor, to the best of each Reporting Person's knowledge, any Covered Person been a party to a civil proceeding of a judicial or administrative body of competent jurisdiction and as a result of such proceeding was or is subject to a judgment, decree or final order enjoining future violations of, or prohibiting or mandating activities subject to, federal or state securities laws or finding any violation with respect to such laws.</div></td></tr><tr><td width="8%" class="tableClassNoBorderAlignCenter">(f)</td><td width="92%" class="tableClassNoBorder"><div class="largetext">Item 2(f) of the Statement is hereby amended and restated in its entirety as follows:
+
+The citizenship of each Covered Person is set forth on Schedule A, which is incorporated herein by reference.</div></td></tr><tr><td width="8%" class="tableClassValignNoBorder">Item 4.</td><td width="92%" class="tableClassNoBorder">Purpose of Transaction</td></tr><tr><td width="8%" class="tableClassNoBorderAlignCenter"> </td><td width="92%" class="tableClassNoBorder"><div class="largetext">Item 4 of the Statement is hereby amended by adding the following to the end thereof:
+
+On June 24, 2026, OSN Streaming submitted a preliminary non-binding proposal (the "Proposal") to the Issuer's board of directors.  In the Proposal, OSN Streaming proposed to acquire all the Ordinary Shares not currently owned of record by OSN Streaming and beneficially owned by the Reporting Persons (the "Non-OSN Shares") for $3.39 per Ordinary Share in cash (the "Proposed Acquisition").
+
+The Proposal does not contemplate a financing condition for the Proposed Acquisition. The Proposal contemplates that the Proposed Acquisition would be funded with equity or other financing from OSN Streaming's shareholders, including the Reporting Persons, and their respective affiliates. Any equity or debt financing for the Proposed Acquisition contemplated by the Proposal remains subject to negotiation, and the Reporting Persons can provide no assurances that they will be able to negotiate definitive agreements with OSN Streaming related to such financing.
+
+The Proposal indicated that the Proposed Acquisition would be subject to a number of conditions, including, among others, the negotiation and execution of a definitive agreement and other related agreements mutually acceptable in form and substance to OSN Streaming and the Issuer. Neither OSN Streaming nor the Issuer is obligated to complete the Proposed Acquisition, and a binding commitment with respect to the Proposed Acquisition will result only from the execution of definitive agreements (and will then be on the terms provided in such definitive agreements), though no assurances can be given that any definitive agreements will be reached or that the Proposed Acquisition will be consummated.
+
+The Proposal may result in one or more transactions, events or actions specified in clauses (a) through (j) of Schedule 13D, including, without limitation, an acquisition of additional securities of the Issuer, an extraordinary corporate transaction (such as a merger) involving the Issuer, delisting of the Ordinary Shares from the Nasdaq Capital Market and other material changes in the Issuer's business or corporate structure. The Proposal is an expression of interest only and OSN Streaming reserves the right to modify or withdraw the Proposal at any time, with or without prior notice, and the Reporting Persons reserve the right to modify or withdraw their support of the Proposal at any time, subject to the terms of the Shareholders' Agreement. The Reporting Persons reserve the right to formulate other plans or make other proposals which could result in one or more of the transactions, events or actions specified in clauses (a) through (j) of Item 4 of Schedule 13D, and to modify or withdraw any such plans or proposals at any time, in each case, subject to the terms of the Shareholders' Agreement.
+
+The Reporting Persons and their affiliates may engage in discussions with members of management, OSN Streaming, the Issuer's board of directors and other stockholders of OSN Streaming and the Issuer and their respective representatives (including their respective professional advisors) in connection with the Proposed Acquisition. While the Proposal remains under consideration by the Issuer's board of directors, the Reporting Persons and their affiliates, including OSN Streaming, may respond to inquiries from, and participate in the negotiation of the terms of the Proposed Acquisition with, the Issuer's board of directors and its representatives. The Reporting Persons do not intend to update or provide additional disclosures regarding the Proposal or the Proposed Acquisition until a definitive agreement has been entered into, or unless disclosure is otherwise required under applicable U.S. securities laws. The Reporting Persons and their affiliates may participate in any process regarding the Issuer and/or engage in other activities, discussions and/or negotiations regarding any courses of action with respect to the Issuer, including, without limitation, submitting an indication of interest, letter of intent, term sheet, offer letter or other similar expression of interest in connection therewith, including any revisions to the Proposal or any such expression of interest; engaging advisors or other third parties; communicating with the Issuer, its subsidiaries and representatives and other third parties (including, without limitation, various advisors, industry analysts, investment and financing professionals, other shareholders of the Issuer and financing sources) and any potential co-investors; taking actions regarding prospective equity and/or debt financing for any such course of action, including, without limitation, exchanging information, negotiating terms and entering into commitment letters and related agreements and/or any other similar agreements; and preparing, revising and negotiating agreements with the Issuer, potential investors and financing sources, professional advisors and other interested parties.
+
+The foregoing description of the Proposal is a summary of the material terms of the Proposal, does not purport to be complete and is qualified in its entirety by reference to the Proposal, a copy of which is included as Exhibit 5 to this Amendment No. 2 and is incorporated herein by reference.
+</div></td></tr><tr><td width="8%" class="tableClassValignNoBorder">Item 5.</td><td width="92%" class="tableClassNoBorder">Interest in Securities of the Issuer</td></tr><tr><td width="8%" class="tableClassNoBorderAlignCenter">(a)</td><td width="92%" class="tableClassNoBorder"><div class="largetext">Item 5(a) is hereby amended and restated in its entirety as follows:
+
+The responses of the Reporting Persons to rows (11) through (13) of the cover pages of this Statement (including, but not limited to, footnotes to such information) are incorporated herein by reference. The percentage of Ordinary Shares reported as beneficially owned by each Reporting Person is based on a total of 10,407,432 Ordinary Shares, which includes (i) 9,064,808 Ordinary Shares outstanding as of December 31, 2025, as reported in the Form 20-F, plus (ii) 1,342,624 Ordinary Shares issuable upon the exercise of the OSN Warrants. In accordance with SEC rules governing beneficial ownership, the calculation of the percentage ownership includes warrants beneficially owned by the Reporting Persons but does not include any other shares issuable upon the exercise of any other outstanding warrants or convertible notes held by other persons.</div></td></tr><tr><td width="8%" class="tableClassNoBorderAlignCenter">(b)</td><td width="92%" class="tableClassNoBorder"><div class="largetext">Item 5(b) is hereby amended and restated in its entirety as follows:
+
+The responses of the Reporting Persons to rows (7) through (10) of the cover pages of this Statement (including, but not limited to, footnotes to such information) are incorporated herein by reference. The Reporting Persons beneficially own an aggregate of 7,417,345 Ordinary Shares, which includes (i) 6,074,721 Ordinary Shares owned of record by OSN Streaming and beneficially owned by the Reporting Persons plus (ii) 1,342,624 Ordinary Shares issuable upon the exercise of the OSN Warrants.
+
+As of the date of this Statement, (i) OSN Streaming Holding Limited holds a number of ordinary shares of OSN Streaming cumulatively representing 80.16% of the total issued share capital of OSN Streaming and (ii) the Purchaser holds a number of ordinary shares of OSN Streaming cumulatively representing 19.84% of the total issued share capital of OSN Streaming.  Subject to the consummation of the Third Completion (as defined in Item 6 of this Statement), (a) OSN Streaming Holding Limited will hold a number of ordinary shares of OSN Streaming cumulatively representing 70.23% of the total issued share capital of OSN Streaming and (b) the Purchaser will hold a number of ordinary shares of OSN Streaming cumulatively representing up to 29.77% of the total issued share capital of OSN Streaming.
+
+The Reporting Persons may be deemed to be members of a "group" with, and may be deemed to have or share indirect voting and dispositive power, over any of the Ordinary Shares held directly or beneficially owned by OSN Streaming, OSN Streaming Holding Limited, Panther Media Holding Limited, Panther Media Group Limited and Kuwait Projects Company (Holding) K.S.C.P
+</div></td></tr><tr><td width="8%" class="tableClassNoBorderAlignCenter">(c)</td><td width="92%" class="tableClassNoBorder"><div class="largetext">Item 5(c) is hereby amended and restated in its entirety as follows: Except as set forth in Items 3, 4 and 6, which information is incorporated herein by reference, during the 60 days preceding the date of this Statement, none of the Reporting Persons has effected any transactions of Ordinary Shares.</div></td></tr><tr><td width="8%" class="tableClassNoBorderAlignCenter">(d)</td><td width="92%" class="tableClassNoBorder"><div class="largetext">Item 5(d) is hereby amended and restated in its entirety as follows:
+
+Not applicable.</div></td></tr><tr><td width="8%" class="tableClassNoBorderAlignCenter">(e)</td><td width="92%" class="tableClassNoBorder"><div class="largetext">Item 5(e) is hereby amended and restated in its entirety as follows:
+
+Not applicable.</div></td></tr><tr><td width="8%" class="tableClassValignNoBorder">Item 6.</td><td width="92%" class="tableClassNoBorder">Contracts, Arrangements, Understandings or Relationships With Respect to Securities of the Issuer</td></tr><tr><td width="8%" class="tableClassNoBorderAlignCenter"> </td><td width="92%" class="tableClassNoBorder"><div class="largetext">Item 6 of the Statement is hereby amended by adding the following to the end thereof:
+
+The information set forth in Item 4 of Amendment No. 2 is incorporated herein by reference.</div></td></tr><tr><td width="8%" class="tableClassValignNoBorder">Item 7.</td><td width="92%" class="tableClassNoBorder">Material to be Filed as Exhibits.</td></tr><tr><td width="8%" class="tableClassNoBorderAlignCenter"> </td><td width="92%" class="tableClassNoBorder"><div class="largetext">5                    Non-Binding Proposal Letter from OSN Streaming Limited to the Board of Directors of Anghami Inc., dated June 24, 2026 (incorporated by reference to Exhibit 16 of the Schedule 13D/A filed by OSN Streaming Limited on June 26, 2026).</div></td></tr></table><br></div><div class="form1"><table role="presentation" id="signatureInfo"><tr><td width="8%" class="tableClassValignNoBorder">    SIGNATURE</td><td width="92%" class="tableClassNoBorder"> </td></tr><tr><td width="8%" class="tableClassNoBorderAlignCenter"> </td><td width="92%" class="tableClassNoBorder"><div class="information" style="text-align:justify">
+						After reasonable inquiry and to the best of my knowledge and belief, I certify that the information set forth in this statement is true, complete and correct.
+						<br><br></div></td></tr></table><table><tr class="tableClass"><td width="50%" class="tableClassNoBorder"> </td><td width="50%" class="tableClassNoBorder"><table><tr class="tableClass"><td width="100%" class="tableClassInnerNoBorderBlue"><div class="text">Warner Bros. Discovery, Inc.</div></td></tr></table></td></tr></table><table><tr class="tableClass"><td width="50%" class="tableClassNoBorder"> </td><td width="50%" class="tableClassNoBorder"><table><tr class="tableClass"><td width="8%" class="tableClassNoBorderAlignLeft signature">Signature:</td><td width="92%" class="tableClassNoBorderBlue signature">/s/ Tara L. Smith</td></tr><tr class="tableClass"><td width="8%" class="tableClassNoBorderAlignLeft signature">Name/Title:</td><td width="92%" class="tableClassNoBorderBlue signature">Tara L. Smith/Executive Vice President and Corporate Secretary</td></tr><tr class="tableClass"><td width="8%" class="tableClassNoBorderAlignLeft signature">Date:</td><td width="92%" class="tableClassNoBorderBlue signature">06/26/2026</td></tr></table></td></tr></table><table><tr class="tableClass"><td width="50%" class="tableClassNoBorder"> </td><td width="50%" class="tableClassNoBorder"><table><tr class="tableClass"><td width="100%" class="tableClassInnerNoBorderBlue"><div class="text">Dplay Entertainment Limited</div></td></tr></table></td></tr></table><table><tr class="tableClass"><td width="50%" class="tableClassNoBorder"> </td><td width="50%" class="tableClassNoBorder"><table><tr class="tableClass"><td width="8%" class="tableClassNoBorderAlignLeft signature">Signature:</td><td width="92%" class="tableClassNoBorderBlue signature">/s/ Roanne Weekes</td></tr><tr class="tableClass"><td width="8%" class="tableClassNoBorderAlignLeft signature">Name/Title:</td><td width="92%" class="tableClassNoBorderBlue signature">Roanne Weekes/Statutory Director</td></tr><tr class="tableClass"><td width="8%" class="tableClassNoBorderAlignLeft signature">Date:</td><td width="92%" class="tableClassNoBorderBlue signature">06/26/2026</td></tr></table></td></tr></table></div></div>
+
+<script type="text/javascript"  src="/hEyxvy/tDTQ/C5W/N8y/CEN74LRlKz4/wYOaNzSVtcwhtffaf7/U3FqJk0lAg/cDg9eQ/IuTns"></script></body></html>

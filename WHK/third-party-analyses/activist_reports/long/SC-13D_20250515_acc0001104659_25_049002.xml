@@ -1,0 +1,613 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns:p="http://www.sec.gov/edgar/schedule13D" xmlns:p1="http://www.sec.gov/edgar/common"><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8"><link rel="stylesheet" type="text/css" href="/css/SDR_print.css"><style type="text/css">
+					.fakeTextBox {
+					border-top: 2px solid #999;
+					border-right: 1px solid #ccc;
+					border-bottom: 1px solid #ccc;
+					border-left: 2px solid #999;
+					padding: 2px;
+					_width: 800px;
+					height: auto;
+					min-width: 200px;
+					min-height: 50px;
+					word-wrap: break-word;
+					font-size: 0.9em;
+					color: blue;
+					}
+					table.tableClass { border: solid black;
+					border-top-width: 1;
+					border-right-width: 1;
+					border-bottom-width: 1;
+					border-left-width: 1;
+					table-layout:fixed;
+					}
+					table.innerTableClass { border: solid black;
+					border-top-width: 0;
+					border-right-width: 0;
+					border-bottom-width: 0;
+					border-left-width: 0;
+					table-layout:fixed;
+					}
+					th.tableClassLeft { border: solid black;
+					border-top-width: 0px;
+					border-right-width: 0px;
+					border-bottom-width: 1px;
+					border-left-width: 1px;
+					padding: 2px;
+					}
+					th.tableClassRight { border: solid black;
+					border-top-width: 0px;
+					border-right-width: 1px;
+					border-bottom-width: 1px;
+					border-left-width: 0;
+					padding: 2px;
+					}
+					th.tableClass { border: solid black;
+					border-top-width: 0px;
+					border-right-width: 1px;
+					border-bottom-width: 1px;
+					border-left-width: 1px;
+					padding: 2px;
+					}
+					td.tableClassLeft { border: solid black;
+					border-top-width: 0px;
+					border-right-width: 0px;
+					border-bottom-width: 1px;
+					border-left-width: 1px;
+					font-size: 0.9em;
+					color: blue;
+					word-wrap: break-word;
+					}
+					td.tableClassRight { border: solid black;
+					border-top-width: 0px;
+					border-right-width: 1px;
+					border-bottom-width: 1px;
+					border-left-width: 0;
+					font-size: 0.9em;
+					color: blue;
+					word-wrap: break-word;
+					}
+					td.tableClass { border: solid black;
+					border-top-width: 0px;
+					border-right-width: 1px;
+					border-bottom-width: 1px;
+					border-left-width: 1px;
+					font-size: 0.9em;
+					font-weight:bold;
+					color: black;
+					word-wrap: break-word;
+					}
+					td.tableClassNoBorder { border: solid black;
+					border-top-width: 0px;
+					border-right-width: 0px;
+					border-bottom-width: 0px;
+					border-left-width: 0px;
+					font-size: 0.9em;
+					font-weight:bold;
+					color: black;
+					word-wrap: break-word;
+					}
+
+					td.tableClassNoBorderBlue { border: solid black;
+					border-top-width: 0px;
+					border-right-width: 0px;
+					border-bottom-width: 0px;
+					border-left-width: 0px;
+					font-size: 0.9em;
+					font-weight:bold;
+					color: blue;
+					word-wrap: break-word;
+					}
+
+					td.tableClassInnerNoBorderBlue { border: solid black;
+					border-top-width: 0px;
+					border-right-width: 0px;
+					border-bottom-width: 0px;
+					border-left-width: 0px;
+					font-size: 1.4em;
+					font-weight:bold;
+					color: blue;
+					word-wrap: break-word;
+					}
+
+					td.tableClassNoBorderAlignLeft { border: solid black;
+					border-top-width: 0px;
+					border-right-width: 0px;
+					border-bottom-width: 0px;
+					border-left-width: 0px;
+					font-size: 0.9em;
+					font-weight:bold;
+					text-align: left;
+					color: black;
+					word-wrap: break-word;
+					}
+
+					td.signature {
+					padding: 4px 8px;
+					}
+
+					td.tableClassInner { border: solid black;
+					border-top-width: 0px;
+					border-right-width: 1px;
+					border-bottom-width: 1px;
+					border-left-width: 1px;
+					font-size: 1em;
+					font-weight:bold;
+					color: black;
+					word-wrap: break-word;
+					}
+
+					td.tableClassValign { border: solid black;
+					border-top-width: 0px;
+					border-right-width: 1px;
+					border-bottom-width: 1px;
+					border-left-width: 1px;
+					font-size: 0.9em;
+					font-weight:bold;
+					color: black;
+					vertical-align: middle;
+					text-align: center;
+					word-wrap: break-word;
+					}
+
+					td.tableClassValignNoBorder { border: solid black;
+					border-top-width: 0px;
+					border-right-width: 0px;
+					border-bottom-width: 0px;
+					border-left-width: 0px;
+					font-size: 0.9em;
+					font-weight:bold;
+					color: black;
+					vertical-align: middle;
+					text-align: center;
+					word-wrap: break-word;
+					}
+
+					td.tableClassValignInner { border: solid black;
+					border-top-width: 0px;
+					border-right-width: 1px;
+					border-bottom-width: 1px;
+					border-left-width: 1px;
+					font-size: 1em;
+					font-weight:bold;
+					color: black;
+					vertical-align: middle;
+					text-align: center;
+					word-wrap: break-word;
+					}
+
+					td.innerTableClassRightValign { border: solid black;
+					border-top-width: 0px;
+					border-right-width: 1px;
+					border-bottom-width: 1px;
+					border-left-width: 0;
+					font-size: 1em;
+					font-weight:bold;
+					color: black;
+					vertical-align: middle;
+					text-align: center;
+					word-wrap: break-word;
+					}
+
+					td.innerTableClassRightValignBottomLess { border: solid black;
+					border-top-width: 0px;
+					border-right-width: 1px;
+					border-bottom-width: 0px;
+					border-left-width: 0;
+					font-size: 1em;
+					font-weight:bold;
+					color: black;
+					vertical-align: middle;
+					text-align: center;
+					word-wrap: break-word;
+					}
+
+					td.tableClassInnerLeft { border: solid black;
+					border-top-width: 0px;
+					border-right-width: 0px;
+					border-bottom-width: 1px;
+					border-left-width: 1px;
+					font-size: 1em;
+					font-weight:bold;
+					color: black;
+					word-wrap: break-word;
+					}
+
+					td.tableClassInnerLeftBottomLess { border: solid black;
+					border-top-width: 0px;
+					border-right-width: 0px;
+					border-bottom-width: 0px;
+					border-left-width: 1px;
+					font-size: 1em;
+					font-weight:bold;
+					color: black;
+					word-wrap: break-word;
+					}
+
+					td.tableClassNoBorderAlignCenter { border: solid black;
+					border-top-width: 0px;
+					border-right-width: 0px;
+					border-bottom-width: 0px;
+					border-left-width: 0px;
+					font-size: 0.9em;
+					font-weight:bold;
+					color: black;
+					text-align: center;
+					word-wrap: break-word;
+					}
+
+					tr.tableClass { border: solid black;
+					border-top-width: 1px;
+					border-right-width: 1px;
+					border-bottom-width: 1px;
+					border-left-width: 1px;
+					}
+					tr.tableClassWithBg { border: solid black;
+					border-top-width: 0;
+					border-right-width: 1;
+					border-bottom-width: 1;
+					border-left-width: 0;
+					background-color: #e0e0ff
+					}
+
+					tr.tableClassWithBgBlack { border: solid black;
+					border-top-width: 0;
+					border-right-width: 1;
+					border-bottom-width: 1;
+					border-left-width: 0;
+					background-color: #D3D3D3
+					}
+
+					hr.header {
+					position: relative;
+					top: 20px;
+					border: none;
+					height: 6px;
+					background: black;
+					margin-bottom: 10px;
+					}
+
+					hr.separatorThin {
+					position: relative;
+					top: 2px;
+					border: none;
+					height: 2px;
+					background: black;
+					margin-bottom: 2px;
+					}
+
+					hr.headerThin {
+					position: relative;
+					top: 10px;
+					border: none;
+					height: 2px;
+					background: black;
+					margin-bottom: 10px;
+					}
+
+					hr.separator {
+					position: relative;
+					top: 20px;
+					border: none;
+					height: 4px;
+					background: black;
+					margin-bottom: 5px;
+					}
+
+					div.text {
+					background-color: #ffffff;
+					color: blue;
+					font-size: 1em;
+					font-weight:normal;
+					text-align:justify;
+					}
+
+
+					div.information {
+					background-color: #ffffff;
+					color: black;
+					font-size: 1em;
+					font-weight:normal;
+					text-align:justify;
+					}
+
+					#scheader {
+					font-size: 0.9em;
+					border: 0px solid #404040;
+					border-spacing: 2px;
+					}
+
+					div.largetext {
+					background-color: #ffffff;
+					color: blue;
+					font-size: 1em;
+					font-weight:normal;
+					text-align:justify;
+					white-space: pre-wrap;
+					word-break: normal;
+					}
+
+				</style></head><body lang="en-US" text="#000000" bgcolor="#ffffff"><hr class="header"><br><hr class="headerThin"><div class="contentwrapper"><table role="presentation" id="scheader"><tr><td class="tableClassNoBorderAlignCenter" style="font-size:2em;">
+						SECURITIES AND EXCHANGE COMMISSION
+						<br>
+						Washington, D.C. 20549
+					</td></tr><tr><td class="tableClassNoBorderAlignCenter"><br><br><div style="font-size:1.5em;">
+									SCHEDULE 13D
+								</div><br><div style="font-size:1.2em;">
+							Under the Securities Exchange Act of 1934
+						</div><br></td></tr><tr><td class="center"><div class="information" style="text-align:center; font-weight:bold; color:blue;">PHX Minerals Inc.</div><div class="information" style="text-align:center; font-weight:bold;"><hr class="separatorThin">(Name of Issuer)</div><br><br></td></tr><tr><td class="center"><div class="information" style="text-align:center; font-weight:bold; color:blue;">Common Stock, par value $0.01666 per share</div><div class="information" style="text-align:center; font-weight:bold;"><hr class="separatorThin">(Title of Class of Securities)</div><br><br></td></tr><tr><td class="center"><div class="information" style="text-align:center; font-weight:bold; color:blue;">698477106</div><div class="information" style="text-align:center; font-weight:bold;"><hr class="separatorThin">(CUSIP Number)</div><br><br></td></tr><tr><td class="center"><div class="information" style="text-align:center; font-weight:bold; color:blue;">Daniel Herz<br>WhiteHawk Income Corporation,
+								2000 Market Street, Suite 910<br>Philadelphia,
+								PA,
+								19103<br>(917) 691-9676</div><br><br><div class="information" style="text-align:center; font-weight:bold; color:blue;">James R. Griffin, Esq.<br>Weil, Gotshal &amp; Manges LLP,
+								200 Crescent Ct, Suite 300<br>Dallas,
+								TX,
+								75201<br>(214) 746-7700</div><br><br><div class="information" style="text-align:center; font-weight:bold; color:blue;">Claudia Lai, Esq<br>Weil, Gotshal &amp; Manges LLP,
+								200 Crescent Ct, Suite 300<br>Dallas,
+								TX,
+								75201<br>(214) 746-7700</div><div class="information" style="text-align:center; font-weight:bold;"><hr class="separatorThin">(Name, Address and Telephone Number of Person Authorized to
+									Receive Notices and Communications)</div></td></tr><tr><td class="center"><div class="information" style="text-align:center; font-weight:bold; color:blue;">05/08/2025</div><div class="information" style="text-align:center; font-weight:bold;"><hr class="separatorThin">(Date of Event Which Requires Filing of This Statement)</div></td></tr></table><br><br><div class="information" style="text-align:justify">
+				If the filing person has previously filed a statement on Schedule 13G to report the acquisition that is the subject of this Schedule 13D, and is filing this schedule because of §§ 240.13d-1(e), 240.13d-1(f) or 240.13d-1(g), check the following box.
+				<img src="/Images/box-unchecked.jpg" alt="Checkbox not checked"></div><br><div class="information" style="text-align:justify">
+				The information required on the remainder of this cover page shall not be deemed to be “filed” for the purpose of Section 18 of the
+				Securities Exchange Act of 1934 (“Act”) or otherwise subject to the liabilities of that section of the Act but shall be subject to all other
+				provisions of the Act (however, see the Notes).
+			</div></div><hr class="headerThin"><hr class="header"><br><br>
+  <div class="content"><div class="form1"></div></div>
+  <div class="content"><div class="form1"><table><tr><td class="center"><br><br><p><div align="center" style="font-size:1.2em;">
+									SCHEDULE 13D
+								</div></p></td></tr></table><table role="presentation" class="tableClass" id="cusipNumber"><tr class="tableClass"><td width="25%" style="font-weight:bold;">CUSIP No.</td><td width="75%"><div style="font-size:.9em; color:#000000">698477106</div></td></tr></table><br><br><table role="presentation" class="tableClass" id="reportingPersonDetails"><tr class="tableClass"><td width="8%" class="tableClassValign">1</td><td width="92%" class="tableClass">
+					Name of reporting person
+					<br><br><div class="text">WhiteHawk Income Corporation</div></td></tr><tr><td width="8%" class="tableClassValign">2</td><td width="92%" class="tableClass">Check the appropriate box if a member of a Group (See Instructions)
+					<br><br><div class="text"><img src="/Images/box-unchecked.jpg" alt="Checkbox not checked">  (a)
+						<br><img src="/Images/box-checked.jpg" alt="Checkbox checked">  (b)
+					</div></td></tr><tr class="tableClassWithBgBlack"><td width="8%" class="tableClassValign">3</td><td width="92%" class="tableClass">SEC use only</td></tr><tr><td width="8%" class="tableClassValign">4</td><td width="92%" class="tableClass">
+					Source of funds (See Instructions)
+					<br><br><div class="text">OO</div></td></tr><tr><td width="8%" class="tableClassValign">5</td><td width="92%" class="tableClass">
+					Check if disclosure of legal proceedings is required pursuant to Items 2(d) or 2(e)
+					<br><br><img src="/Images/box-unchecked.jpg" alt="Checkbox not checked"></td></tr><tr><td width="8%" class="tableClassValign">6</td><td width="92%" class="tableClass">Citizenship or place of organization
+					<br><br><div class="text">
+				DELAWARE
+			</div></td></tr><tr><td width="8%" class="tableClassValign">Number of Shares Beneficially Owned by Each Reporting Person With:</td><td width="92%" class="tableClass"><table class="innerTableClass"><tr><td width="8%" class="innerTableClassRightValign">7</td><td width="92%" class="tableClassInnerLeft">Sole Voting Power
+								<br><br><div class="text">0.00</div></td></tr><tr><td width="8%" class="innerTableClassRightValign">8</td><td width="92%" class="tableClassInnerLeft">Shared Voting Power
+								<br><br><div class="text">3,817,642.00</div></td></tr><tr><td width="8%" class="innerTableClassRightValign">9</td><td width="92%" class="tableClassInnerLeft">Sole Dispositive Power
+								<br><br><div class="text">0.00</div></td></tr><tr><td width="8%" class="innerTableClassRightValignBottomLess">10</td><td width="92%" class="tableClassInnerLeftBottomLess">Shared Dispositive Power
+								<br><br><div class="text">0.00</div></td></tr></table></td></tr><tr><td width="8%" class="tableClassValign">11</td><td width="92%" class="tableClass">Aggregate amount beneficially owned by each reporting person
+					<br><br><div class="text">3,817,642.00</div></td></tr><tr><td width="8%" class="tableClassValign">12</td><td width="92%" class="tableClass">Check if the aggregate amount in Row (11) excludes certain shares (See Instructions)
+					<br><br><img src="/Images/box-checked.jpg" alt="Checkbox checked"></td></tr><tr><td width="8%" class="tableClassValign">13</td><td width="92%" class="tableClass">Percent of class represented by amount in Row (11)
+					<br><br><div class="text">10.1 % </div></td></tr><tr><td width="8%" class="tableClassValign">14</td><td width="92%" class="tableClass">Type of Reporting Person (See Instructions)
+					<br><br><div class="text">CO</div></td></tr></table><br><div style="display: flex;"><div style="font-size: 0.9em; font-weight: bold; margin-right: 5px;">
+					Comment for Type of Reporting Person:
+				</div><div class="largetext" style="text-align:justify">Rows 8, 11, 13: An aggregate of 3,817,642 shares of PHX Minerals Inc. (the "Issuer") common stock (as represented to Parent and Merger Sub by the Issuer and the Supporting Stockholders) (each, as defined below) are subject to Tender and Support Agreements dated May 8, 2025 (the "Tender and Support Agreements") entered into by WhiteHawk Acquisition, Inc. ("Parent"), a subsidiary of WhiteHawk Income Corporation ("WHIC"), WhiteHawk Merger Sub, Inc. ("Merger Sub"), a subsidiary of Parent, and each of Chad Stephens, Ralph D'Amico, Chad True, Steven Packebush, Mark Behrman, Glen Brown, John Pinkerton, and Lee Canaan (each a "Supporting Stockholder," discussed in Items 3 and 4 below) representing shares beneficially owned by the Supporting Stockholders (such shares, the "Subject Shares"). WHIC may be deemed to have beneficial ownership of the Subject Shares, which represent approximately 10.1% of the outstanding Issuer common stock based on the number of Issuer common stock outstanding as of May 8, 2025 (as represented by the Issuer in the Merger Agreement discussed in Items 3 and 4).</div></div><table><tr><td class="center"><br><br><p><div align="center" style="font-size:1.2em;">
+									SCHEDULE 13D
+								</div></p></td></tr></table><table role="presentation" class="tableClass" id="cusipNumber"><tr class="tableClass"><td width="25%" style="font-weight:bold;">CUSIP No.</td><td width="75%"><div style="font-size:.9em; color:#000000">698477106</div></td></tr></table><br><br><table role="presentation" class="tableClass" id="reportingPersonDetails"><tr class="tableClass"><td width="8%" class="tableClassValign">1</td><td width="92%" class="tableClass">
+					Name of reporting person
+					<br><br><div class="text">WhiteHawk Merger Sub, Inc.</div></td></tr><tr><td width="8%" class="tableClassValign">2</td><td width="92%" class="tableClass">Check the appropriate box if a member of a Group (See Instructions)
+					<br><br><div class="text"><img src="/Images/box-unchecked.jpg" alt="Checkbox not checked">  (a)
+						<br><img src="/Images/box-checked.jpg" alt="Checkbox checked">  (b)
+					</div></td></tr><tr class="tableClassWithBgBlack"><td width="8%" class="tableClassValign">3</td><td width="92%" class="tableClass">SEC use only</td></tr><tr><td width="8%" class="tableClassValign">4</td><td width="92%" class="tableClass">
+					Source of funds (See Instructions)
+					<br><br><div class="text">OO</div></td></tr><tr><td width="8%" class="tableClassValign">5</td><td width="92%" class="tableClass">
+					Check if disclosure of legal proceedings is required pursuant to Items 2(d) or 2(e)
+					<br><br><img src="/Images/box-unchecked.jpg" alt="Checkbox not checked"></td></tr><tr><td width="8%" class="tableClassValign">6</td><td width="92%" class="tableClass">Citizenship or place of organization
+					<br><br><div class="text">
+				DELAWARE
+			</div></td></tr><tr><td width="8%" class="tableClassValign">Number of Shares Beneficially Owned by Each Reporting Person With:</td><td width="92%" class="tableClass"><table class="innerTableClass"><tr><td width="8%" class="innerTableClassRightValign">7</td><td width="92%" class="tableClassInnerLeft">Sole Voting Power
+								<br><br><div class="text">0.00</div></td></tr><tr><td width="8%" class="innerTableClassRightValign">8</td><td width="92%" class="tableClassInnerLeft">Shared Voting Power
+								<br><br><div class="text">3,817,642.00</div></td></tr><tr><td width="8%" class="innerTableClassRightValign">9</td><td width="92%" class="tableClassInnerLeft">Sole Dispositive Power
+								<br><br><div class="text">0.00</div></td></tr><tr><td width="8%" class="innerTableClassRightValignBottomLess">10</td><td width="92%" class="tableClassInnerLeftBottomLess">Shared Dispositive Power
+								<br><br><div class="text">0.00</div></td></tr></table></td></tr><tr><td width="8%" class="tableClassValign">11</td><td width="92%" class="tableClass">Aggregate amount beneficially owned by each reporting person
+					<br><br><div class="text">3,817,642.00</div></td></tr><tr><td width="8%" class="tableClassValign">12</td><td width="92%" class="tableClass">Check if the aggregate amount in Row (11) excludes certain shares (See Instructions)
+					<br><br><img src="/Images/box-checked.jpg" alt="Checkbox checked"></td></tr><tr><td width="8%" class="tableClassValign">13</td><td width="92%" class="tableClass">Percent of class represented by amount in Row (11)
+					<br><br><div class="text">10.1 % </div></td></tr><tr><td width="8%" class="tableClassValign">14</td><td width="92%" class="tableClass">Type of Reporting Person (See Instructions)
+					<br><br><div class="text">CO</div></td></tr></table><br><div style="display: flex;"><div style="font-size: 0.9em; font-weight: bold; margin-right: 5px;">
+					Comment for Type of Reporting Person:
+				</div><div class="largetext" style="text-align:justify">Rows 8, 11, 13: An aggregate of 3,817,642 shares of PHX Minerals Inc. (the "Issuer") common stock (as represented to Parent and Merger Sub by the Issuer and the Supporting Stockholders) (each, as defined below) are subject to Tender and Support Agreements dated May 8, 2025 (the "Tender and Support Agreements") entered into by WhiteHawk Acquisition, Inc. ("Parent"), a subsidiary of WhiteHawk Income Corporation ("WHIC"), WhiteHawk Merger Sub, Inc. ("Merger Sub"), a subsidiary of Parent, and each of Chad Stephens, Ralph D'Amico, Chad True, Steven Packebush, Mark Behrman, Glen Brown, John Pinkerton, and Lee Canaan (each a "Supporting Stockholder," discussed in Items 3 and 4 below) representing shares beneficially owned by the Supporting Stockholders (such shares, the "Subject Shares"). Merger Sub may be deemed to have beneficial ownership of the Subject Shares, which represent approximately 10.1% of the outstanding Issuer common stock based on the number of Issuer common stock outstanding as of May 8, 2025 (as represented by the Issuer in the Merger Agreement discussed in Items 3 and 4).</div></div><table><tr><td class="center"><br><br><p><div align="center" style="font-size:1.2em;">
+									SCHEDULE 13D
+								</div></p></td></tr></table><table role="presentation" class="tableClass" id="cusipNumber"><tr class="tableClass"><td width="25%" style="font-weight:bold;">CUSIP No.</td><td width="75%"><div style="font-size:.9em; color:#000000">698477106</div></td></tr></table><br><br><table role="presentation" class="tableClass" id="reportingPersonDetails"><tr class="tableClass"><td width="8%" class="tableClassValign">1</td><td width="92%" class="tableClass">
+					Name of reporting person
+					<br><br><div class="text">WhiteHawk Acquisition, Inc.</div></td></tr><tr><td width="8%" class="tableClassValign">2</td><td width="92%" class="tableClass">Check the appropriate box if a member of a Group (See Instructions)
+					<br><br><div class="text"><img src="/Images/box-unchecked.jpg" alt="Checkbox not checked">  (a)
+						<br><img src="/Images/box-checked.jpg" alt="Checkbox checked">  (b)
+					</div></td></tr><tr class="tableClassWithBgBlack"><td width="8%" class="tableClassValign">3</td><td width="92%" class="tableClass">SEC use only</td></tr><tr><td width="8%" class="tableClassValign">4</td><td width="92%" class="tableClass">
+					Source of funds (See Instructions)
+					<br><br><div class="text">OO</div></td></tr><tr><td width="8%" class="tableClassValign">5</td><td width="92%" class="tableClass">
+					Check if disclosure of legal proceedings is required pursuant to Items 2(d) or 2(e)
+					<br><br><img src="/Images/box-unchecked.jpg" alt="Checkbox not checked"></td></tr><tr><td width="8%" class="tableClassValign">6</td><td width="92%" class="tableClass">Citizenship or place of organization
+					<br><br><div class="text">
+				DELAWARE
+			</div></td></tr><tr><td width="8%" class="tableClassValign">Number of Shares Beneficially Owned by Each Reporting Person With:</td><td width="92%" class="tableClass"><table class="innerTableClass"><tr><td width="8%" class="innerTableClassRightValign">7</td><td width="92%" class="tableClassInnerLeft">Sole Voting Power
+								<br><br><div class="text">0.00</div></td></tr><tr><td width="8%" class="innerTableClassRightValign">8</td><td width="92%" class="tableClassInnerLeft">Shared Voting Power
+								<br><br><div class="text">3,817,642.00</div></td></tr><tr><td width="8%" class="innerTableClassRightValign">9</td><td width="92%" class="tableClassInnerLeft">Sole Dispositive Power
+								<br><br><div class="text">0.00</div></td></tr><tr><td width="8%" class="innerTableClassRightValignBottomLess">10</td><td width="92%" class="tableClassInnerLeftBottomLess">Shared Dispositive Power
+								<br><br><div class="text">0.00</div></td></tr></table></td></tr><tr><td width="8%" class="tableClassValign">11</td><td width="92%" class="tableClass">Aggregate amount beneficially owned by each reporting person
+					<br><br><div class="text">3,817,642.00</div></td></tr><tr><td width="8%" class="tableClassValign">12</td><td width="92%" class="tableClass">Check if the aggregate amount in Row (11) excludes certain shares (See Instructions)
+					<br><br><img src="/Images/box-checked.jpg" alt="Checkbox checked"></td></tr><tr><td width="8%" class="tableClassValign">13</td><td width="92%" class="tableClass">Percent of class represented by amount in Row (11)
+					<br><br><div class="text">10.1 % </div></td></tr><tr><td width="8%" class="tableClassValign">14</td><td width="92%" class="tableClass">Type of Reporting Person (See Instructions)
+					<br><br><div class="text">CO</div></td></tr></table><br><div style="display: flex;"><div style="font-size: 0.9em; font-weight: bold; margin-right: 5px;">
+					Comment for Type of Reporting Person:
+				</div><div class="largetext" style="text-align:justify">Rows 8, 11, 13: An aggregate of 3,817,642 shares of PHX Minerals Inc. (the "Issuer") common stock (as represented to Parent and Merger Sub by the Issuer and the Supporting Stockholders) (each, as defined below) are subject to Tender and Support Agreements dated May 8, 2025 (the "Tender and Support Agreements") entered into by WhiteHawk Acquisition, Inc. ("Parent"), a subsidiary of WhiteHawk Income Corporation ("WHIC"), WhiteHawk Merger Sub, Inc. ("Merger Sub"), a subsidiary of Parent, and each of Chad Stephens, Ralph D'Amico, Chad True, Steven Packebush, Mark Behrman, Glen Brown, John Pinkerton, and Lee Canaan (each a "Supporting Stockholder," discussed in Items 3 and 4 below) representing shares beneficially owned by the Supporting Stockholders (such shares, the "Subject Shares"). Parent may be deemed to have beneficial ownership of the Subject Shares, which represent approximately 10.1% of the outstanding Issuer common stock based on the number of Issuer common stock outstanding as of May 8, 2025 (as represented by the Issuer in the Merger Agreement discussed in Items 3 and 4).</div></div><table><tr><td class="center"><br><br><p><div align="center" style="font-size:1.2em;">
+									SCHEDULE 13D
+								</div></p></td></tr></table><table role="presentation" class="tableClass" id="cusipNumber"><tr class="tableClass"><td width="25%" style="font-weight:bold;">CUSIP No.</td><td width="75%"><div style="font-size:.9em; color:#000000">698477106</div></td></tr></table><br><br><table role="presentation" class="tableClass" id="reportingPersonDetails"><tr class="tableClass"><td width="8%" class="tableClassValign">1</td><td width="92%" class="tableClass">
+					Name of reporting person
+					<br><br><div class="text">WhiteHawk - Equity Holdings, LP</div></td></tr><tr><td width="8%" class="tableClassValign">2</td><td width="92%" class="tableClass">Check the appropriate box if a member of a Group (See Instructions)
+					<br><br><div class="text"><img src="/Images/box-unchecked.jpg" alt="Checkbox not checked">  (a)
+						<br><img src="/Images/box-checked.jpg" alt="Checkbox checked">  (b)
+					</div></td></tr><tr class="tableClassWithBgBlack"><td width="8%" class="tableClassValign">3</td><td width="92%" class="tableClass">SEC use only</td></tr><tr><td width="8%" class="tableClassValign">4</td><td width="92%" class="tableClass">
+					Source of funds (See Instructions)
+					<br><br><div class="text">WC, OO</div></td></tr><tr><td width="8%" class="tableClassValign">5</td><td width="92%" class="tableClass">
+					Check if disclosure of legal proceedings is required pursuant to Items 2(d) or 2(e)
+					<br><br><img src="/Images/box-unchecked.jpg" alt="Checkbox not checked"></td></tr><tr><td width="8%" class="tableClassValign">6</td><td width="92%" class="tableClass">Citizenship or place of organization
+					<br><br><div class="text">
+				DELAWARE
+			</div></td></tr><tr><td width="8%" class="tableClassValign">Number of Shares Beneficially Owned by Each Reporting Person With:</td><td width="92%" class="tableClass"><table class="innerTableClass"><tr><td width="8%" class="innerTableClassRightValign">7</td><td width="92%" class="tableClassInnerLeft">Sole Voting Power
+								<br><br><div class="text">0.00</div></td></tr><tr><td width="8%" class="innerTableClassRightValign">8</td><td width="92%" class="tableClassInnerLeft">Shared Voting Power
+								<br><br><div class="text">946,606.00</div></td></tr><tr><td width="8%" class="innerTableClassRightValign">9</td><td width="92%" class="tableClassInnerLeft">Sole Dispositive Power
+								<br><br><div class="text">0.00</div></td></tr><tr><td width="8%" class="innerTableClassRightValignBottomLess">10</td><td width="92%" class="tableClassInnerLeftBottomLess">Shared Dispositive Power
+								<br><br><div class="text">946,606.00</div></td></tr></table></td></tr><tr><td width="8%" class="tableClassValign">11</td><td width="92%" class="tableClass">Aggregate amount beneficially owned by each reporting person
+					<br><br><div class="text">946,606.00</div></td></tr><tr><td width="8%" class="tableClassValign">12</td><td width="92%" class="tableClass">Check if the aggregate amount in Row (11) excludes certain shares (See Instructions)
+					<br><br><img src="/Images/box-checked.jpg" alt="Checkbox checked"></td></tr><tr><td width="8%" class="tableClassValign">13</td><td width="92%" class="tableClass">Percent of class represented by amount in Row (11)
+					<br><br><div class="text">2.5 % </div></td></tr><tr><td width="8%" class="tableClassValign">14</td><td width="92%" class="tableClass">Type of Reporting Person (See Instructions)
+					<br><br><div class="text">PN</div></td></tr></table><br><div style="display: flex;"><div style="font-size: 0.9em; font-weight: bold; margin-right: 5px;">
+					Comment for Type of Reporting Person:
+				</div><div class="largetext" style="text-align:justify">Rows 8, 10, 11, 13: An aggregate of 946,606 shares of PHX Minerals Inc. (the "Issuer") common stock are held by WhiteHawk - Equity Holdings, LP (such shares, the "Held Shares"). The Held Shares represent approximately 2.5% of the outstanding Issuer common stock based on the number of Issuer common stock outstanding as of May 8, 2025 (as represented by the Issuer in the Merger Agreement discussed in Items 3 and 4).</div></div><table><tr><td class="center"><br><br><p><div align="center" style="font-size:1.2em;">
+									SCHEDULE 13D
+								</div></p></td></tr></table><table role="presentation" class="tableClass" id="cusipNumber"><tr class="tableClass"><td width="25%" style="font-weight:bold;">CUSIP No.</td><td width="75%"><div style="font-size:.9em; color:#000000">698477106</div></td></tr></table><br><br><table role="presentation" class="tableClass" id="reportingPersonDetails"><tr class="tableClass"><td width="8%" class="tableClassValign">1</td><td width="92%" class="tableClass">
+					Name of reporting person
+					<br><br><div class="text">WhiteHawk - Equity Holdings GP, LLC</div></td></tr><tr><td width="8%" class="tableClassValign">2</td><td width="92%" class="tableClass">Check the appropriate box if a member of a Group (See Instructions)
+					<br><br><div class="text"><img src="/Images/box-unchecked.jpg" alt="Checkbox not checked">  (a)
+						<br><img src="/Images/box-checked.jpg" alt="Checkbox checked">  (b)
+					</div></td></tr><tr class="tableClassWithBgBlack"><td width="8%" class="tableClassValign">3</td><td width="92%" class="tableClass">SEC use only</td></tr><tr><td width="8%" class="tableClassValign">4</td><td width="92%" class="tableClass">
+					Source of funds (See Instructions)
+					<br><br><div class="text">AF</div></td></tr><tr><td width="8%" class="tableClassValign">5</td><td width="92%" class="tableClass">
+					Check if disclosure of legal proceedings is required pursuant to Items 2(d) or 2(e)
+					<br><br><img src="/Images/box-unchecked.jpg" alt="Checkbox not checked"></td></tr><tr><td width="8%" class="tableClassValign">6</td><td width="92%" class="tableClass">Citizenship or place of organization
+					<br><br><div class="text">
+				DELAWARE
+			</div></td></tr><tr><td width="8%" class="tableClassValign">Number of Shares Beneficially Owned by Each Reporting Person With:</td><td width="92%" class="tableClass"><table class="innerTableClass"><tr><td width="8%" class="innerTableClassRightValign">7</td><td width="92%" class="tableClassInnerLeft">Sole Voting Power
+								<br><br><div class="text">0.00</div></td></tr><tr><td width="8%" class="innerTableClassRightValign">8</td><td width="92%" class="tableClassInnerLeft">Shared Voting Power
+								<br><br><div class="text">946,606.00</div></td></tr><tr><td width="8%" class="innerTableClassRightValign">9</td><td width="92%" class="tableClassInnerLeft">Sole Dispositive Power
+								<br><br><div class="text">0.00</div></td></tr><tr><td width="8%" class="innerTableClassRightValignBottomLess">10</td><td width="92%" class="tableClassInnerLeftBottomLess">Shared Dispositive Power
+								<br><br><div class="text">946,606.00</div></td></tr></table></td></tr><tr><td width="8%" class="tableClassValign">11</td><td width="92%" class="tableClass">Aggregate amount beneficially owned by each reporting person
+					<br><br><div class="text">946,606.00</div></td></tr><tr><td width="8%" class="tableClassValign">12</td><td width="92%" class="tableClass">Check if the aggregate amount in Row (11) excludes certain shares (See Instructions)
+					<br><br><img src="/Images/box-checked.jpg" alt="Checkbox checked"></td></tr><tr><td width="8%" class="tableClassValign">13</td><td width="92%" class="tableClass">Percent of class represented by amount in Row (11)
+					<br><br><div class="text">2.5 % </div></td></tr><tr><td width="8%" class="tableClassValign">14</td><td width="92%" class="tableClass">Type of Reporting Person (See Instructions)
+					<br><br><div class="text">HC, OO</div></td></tr></table><br><div style="display: flex;"><div style="font-size: 0.9em; font-weight: bold; margin-right: 5px;">
+					Comment for Type of Reporting Person:
+				</div><div class="largetext" style="text-align:justify">Rows 8, 10, 11, 13: An aggregate of 946,606 shares of PHX Minerals Inc. (the "Issuer") common stock are held directly by WhiteHawk - Equity Holdings, LP (such shares, the "Held Shares"). WhiteHawk - Equity Holdings GP, LLC may be deemed to have beneficial ownership of the Held Shares, which represent approximately 2.5% of the outstanding Issuer common stock based on the number of Issuer common stock outstanding as of May 8, 2025 (as represented by the Issuer in the Merger Agreement discussed in Items 3 and 4).</div></div><table><tr><td class="center"><br><br><p><div align="center" style="font-size:1.2em;">
+									SCHEDULE 13D
+								</div></p></td></tr></table><table role="presentation" class="tableClass" id="cusipNumber"><tr class="tableClass"><td width="25%" style="font-weight:bold;">CUSIP No.</td><td width="75%"><div style="font-size:.9em; color:#000000">698477106</div></td></tr></table><br><br><table role="presentation" class="tableClass" id="reportingPersonDetails"><tr class="tableClass"><td width="8%" class="tableClassValign">1</td><td width="92%" class="tableClass">
+					Name of reporting person
+					<br><br><div class="text">WhiteHawk Energy, LLC</div></td></tr><tr><td width="8%" class="tableClassValign">2</td><td width="92%" class="tableClass">Check the appropriate box if a member of a Group (See Instructions)
+					<br><br><div class="text"><img src="/Images/box-unchecked.jpg" alt="Checkbox not checked">  (a)
+						<br><img src="/Images/box-checked.jpg" alt="Checkbox checked">  (b)
+					</div></td></tr><tr class="tableClassWithBgBlack"><td width="8%" class="tableClassValign">3</td><td width="92%" class="tableClass">SEC use only</td></tr><tr><td width="8%" class="tableClassValign">4</td><td width="92%" class="tableClass">
+					Source of funds (See Instructions)
+					<br><br><div class="text">AF</div></td></tr><tr><td width="8%" class="tableClassValign">5</td><td width="92%" class="tableClass">
+					Check if disclosure of legal proceedings is required pursuant to Items 2(d) or 2(e)
+					<br><br><img src="/Images/box-unchecked.jpg" alt="Checkbox not checked"></td></tr><tr><td width="8%" class="tableClassValign">6</td><td width="92%" class="tableClass">Citizenship or place of organization
+					<br><br><div class="text">
+				DELAWARE
+			</div></td></tr><tr><td width="8%" class="tableClassValign">Number of Shares Beneficially Owned by Each Reporting Person With:</td><td width="92%" class="tableClass"><table class="innerTableClass"><tr><td width="8%" class="innerTableClassRightValign">7</td><td width="92%" class="tableClassInnerLeft">Sole Voting Power
+								<br><br><div class="text">0.00</div></td></tr><tr><td width="8%" class="innerTableClassRightValign">8</td><td width="92%" class="tableClassInnerLeft">Shared Voting Power
+								<br><br><div class="text">946,606.00</div></td></tr><tr><td width="8%" class="innerTableClassRightValign">9</td><td width="92%" class="tableClassInnerLeft">Sole Dispositive Power
+								<br><br><div class="text">0.00</div></td></tr><tr><td width="8%" class="innerTableClassRightValignBottomLess">10</td><td width="92%" class="tableClassInnerLeftBottomLess">Shared Dispositive Power
+								<br><br><div class="text">946,606.00</div></td></tr></table></td></tr><tr><td width="8%" class="tableClassValign">11</td><td width="92%" class="tableClass">Aggregate amount beneficially owned by each reporting person
+					<br><br><div class="text">946,606.00</div></td></tr><tr><td width="8%" class="tableClassValign">12</td><td width="92%" class="tableClass">Check if the aggregate amount in Row (11) excludes certain shares (See Instructions)
+					<br><br><img src="/Images/box-checked.jpg" alt="Checkbox checked"></td></tr><tr><td width="8%" class="tableClassValign">13</td><td width="92%" class="tableClass">Percent of class represented by amount in Row (11)
+					<br><br><div class="text">2.5 % </div></td></tr><tr><td width="8%" class="tableClassValign">14</td><td width="92%" class="tableClass">Type of Reporting Person (See Instructions)
+					<br><br><div class="text">HC, OO</div></td></tr></table><br><div style="display: flex;"><div style="font-size: 0.9em; font-weight: bold; margin-right: 5px;">
+					Comment for Type of Reporting Person:
+				</div><div class="largetext" style="text-align:justify">Rows 8, 10, 11, 13: An aggregate of 946,606 shares of PHX Minerals Inc. (the "Issuer") common stock are held directly by WhiteHawk - Equity Holdings, LP (such shares, the "Held Shares"). WhiteHawk Energy, LLC may be deemed to have beneficial ownership of the Held Shares, which represent approximately 2.5% of the outstanding Issuer common stock based on the number of shares of Issuer common stock outstanding as of May 8, 2025 (as represented by the Issuer in the Merger Agreement discussed in Items 3 and 4).</div></div><table><tr><td class="center"><br><br><p><div align="center" style="font-size:1.2em;">
+									SCHEDULE 13D
+								</div></p></td></tr></table><table role="presentation" class="tableClass" id="cusipNumber"><tr class="tableClass"><td width="25%" style="font-weight:bold;">CUSIP No.</td><td width="75%"><div style="font-size:.9em; color:#000000">698477106</div></td></tr></table><br><br><table role="presentation" class="tableClass" id="reportingPersonDetails"><tr class="tableClass"><td width="8%" class="tableClassValign">1</td><td width="92%" class="tableClass">
+					Name of reporting person
+					<br><br><div class="text">Daniel Herz</div></td></tr><tr><td width="8%" class="tableClassValign">2</td><td width="92%" class="tableClass">Check the appropriate box if a member of a Group (See Instructions)
+					<br><br><div class="text"><img src="/Images/box-unchecked.jpg" alt="Checkbox not checked">  (a)
+						<br><img src="/Images/box-checked.jpg" alt="Checkbox checked">  (b)
+					</div></td></tr><tr class="tableClassWithBgBlack"><td width="8%" class="tableClassValign">3</td><td width="92%" class="tableClass">SEC use only</td></tr><tr><td width="8%" class="tableClassValign">4</td><td width="92%" class="tableClass">
+					Source of funds (See Instructions)
+					<br><br><div class="text">AF</div></td></tr><tr><td width="8%" class="tableClassValign">5</td><td width="92%" class="tableClass">
+					Check if disclosure of legal proceedings is required pursuant to Items 2(d) or 2(e)
+					<br><br><img src="/Images/box-unchecked.jpg" alt="Checkbox not checked"></td></tr><tr><td width="8%" class="tableClassValign">6</td><td width="92%" class="tableClass">Citizenship or place of organization
+					<br><br><div class="text">
+				UNITED STATES
+			</div></td></tr><tr><td width="8%" class="tableClassValign">Number of Shares Beneficially Owned by Each Reporting Person With:</td><td width="92%" class="tableClass"><table class="innerTableClass"><tr><td width="8%" class="innerTableClassRightValign">7</td><td width="92%" class="tableClassInnerLeft">Sole Voting Power
+								<br><br><div class="text">0.00</div></td></tr><tr><td width="8%" class="innerTableClassRightValign">8</td><td width="92%" class="tableClassInnerLeft">Shared Voting Power
+								<br><br><div class="text">4,764,248.00</div></td></tr><tr><td width="8%" class="innerTableClassRightValign">9</td><td width="92%" class="tableClassInnerLeft">Sole Dispositive Power
+								<br><br><div class="text">0.00</div></td></tr><tr><td width="8%" class="innerTableClassRightValignBottomLess">10</td><td width="92%" class="tableClassInnerLeftBottomLess">Shared Dispositive Power
+								<br><br><div class="text">946,606.00</div></td></tr></table></td></tr><tr><td width="8%" class="tableClassValign">11</td><td width="92%" class="tableClass">Aggregate amount beneficially owned by each reporting person
+					<br><br><div class="text">4,764,248.00</div></td></tr><tr><td width="8%" class="tableClassValign">12</td><td width="92%" class="tableClass">Check if the aggregate amount in Row (11) excludes certain shares (See Instructions)
+					<br><br><img src="/Images/box-checked.jpg" alt="Checkbox checked"></td></tr><tr><td width="8%" class="tableClassValign">13</td><td width="92%" class="tableClass">Percent of class represented by amount in Row (11)
+					<br><br><div class="text">12.6 % </div></td></tr><tr><td width="8%" class="tableClassValign">14</td><td width="92%" class="tableClass">Type of Reporting Person (See Instructions)
+					<br><br><div class="text">IN</div></td></tr></table><br><div style="display: flex;"><div style="font-size: 0.9em; font-weight: bold; margin-right: 5px;">
+					Comment for Type of Reporting Person:
+				</div><div class="largetext" style="text-align:justify">Rows 8, 10, 11, 13: An aggregate of 3,817,642 shares of PHX Minerals Inc. (the "Issuer") common stock (as represented to Parent and Merger Sub by the Issuer and the Supporting Stockholders) (each, as defined below) are subject to Tender and Support Agreements dated May 8, 2025 (the "Tender and Support Agreements") entered into by WhiteHawk Acquisition, Inc. ("Parent"), a subsidiary of WhiteHawk Income Corporation ("WHIC"), WhiteHawk Merger Sub, Inc. ("Merger Sub"), a subsidiary of Parent, and each of Chad Stephens, Ralph D'Amico, Chad True, Steven Packebush, Mark Behrman, Glen Brown, John Pinkerton, and Lee Canaan (each a "Supporting Stockholder," discussed in Items 3 and 4 below) representing shares beneficially owned by the Supporting Stockholders (such shares, the "Subject Shares"). An aggregate of 946,606 shares of Issuer common stock are held directly by WhiteHawk - Equity Holdings, LP (such shares, the "Held Shares"). Mr. Herz may be deemed to have beneficial ownership of the Subject Shares and the Held Shares, which collectively represent approximately 12.6% of the outstanding Issuer common stock based on the number of shares of Issuer common stock outstanding as of May 8, 2025 (as represented by the Issuer in the Merger Agreement discussed in Items 3 and 4).</div></div></div><div class="form1"><table><tr><td class="center"><br><br><p><div align="center" style="font-size:1.2em;">
+									SCHEDULE 13D
+								</div></p></td></tr></table><table role="presentation" id="item1to7"><tr><td width="8%" class="tableClassValignNoBorder">Item 1.</td><td width="92%" class="tableClassNoBorder">Security and Issuer</td></tr><tr class="tableClass"><td width="8%" class="tableClassNoBorderAlignCenter">(a)</td><td width="92%" class="tableClassNoBorder">Title of Class of Securities:
+							<br><br><div class="text">Common Stock, par value $0.01666 per share</div></td></tr><tr class="tableClass"><td width="8%" class="tableClassNoBorderAlignCenter">(b)</td><td width="92%" class="tableClassNoBorder">Name of Issuer:
+							<br><br><div class="text">PHX Minerals Inc.</div></td></tr><tr><td width="8%" class="tableClassNoBorderAlignCenter">(c)</td><td width="92%" class="tableClassNoBorder">Address of Issuer's Principal Executive Offices:
+							<br><br><div class="text">1320 South University Drive, Suite 720, Fort Worth, 
+				TEXAS
+			, 76107.</div></td></tr><tr><td width="8%" class="tableClassValignNoBorder">Item 2.</td><td width="92%" class="tableClassNoBorder">Identity and Background</td></tr><tr></tr><tr class="tableClass"><td width="8%" class="tableClassNoBorderAlignCenter">(a)</td><td width="92%" class="tableClassNoBorder"><div class="largetext">This statement is being filed pursuant to Rule 13d-1 under the Securities Exchange Act of 1934, as amended (the "Exchange Act"), by WhiteHawk Income Corporation, a Delaware corporation ("WHIC"), WhiteHawk Acquisition, Inc., a Delaware corporation and a subsidiary of WHIC ("Parent"), WhiteHawk Merger Sub, Inc., a Delaware Corporation and subsidiary of Parent ("Merger Sub," and together with Parent and WHIC, the "Acquisition Parties"), WhiteHawk - Equity Holdings, LP, a Delaware limited partnership ("WhiteHawk LP"), WhiteHawk - Equity Holdings GP, LLC, a Delaware limited liability company and the general partner of WhiteHawk LP ("WhiteHawk GP"), WhiteHawk Energy, LLC, a Delaware limited liability company and the sole member of WhiteHawk GP ("WhiteHawk Energy," and together with WhiteHawk LP and WhiteHawk GP, the "Holding Parties"), and Daniel Herz, the President, Chief Executive Officer and Managing Member of WhiteHawk Energy and the Chief Executive Officer of WHIC (together with the Acquisition Parties and the Holding Parties, the "Reporting Persons"). The address of the principal business and the principal office of each of the Reporting Persons is 2000 Market St, Suite 910, Philadelphia, PA 19103. WhiteHawk Energy's principal business is the acquisition of mineral and royalty interests.</div></td></tr><tr><td width="8%" class="tableClassNoBorderAlignCenter">(b)</td><td width="92%" class="tableClassNoBorder"><div class="largetext">The name, business address, present principal occupation or employment and citizenship of each director and executive officer (including a director and officer who may be a controlling person), or, in the case of a corporation, general partnership, or limited partnership, the information required by Instruction C to Item 2 of Schedule 13D, of the Reporting Persons is set forth on Exhibit 99.3 hereto.</div></td></tr><tr><td width="8%" class="tableClassNoBorderAlignCenter">(c)</td><td width="92%" class="tableClassNoBorder"><div class="largetext">See Item 2(b) above.</div></td></tr><tr><td width="8%" class="tableClassNoBorderAlignCenter">(d)</td><td width="92%" class="tableClassNoBorder"><div class="largetext">During the last five years, none of the Reporting Persons or, to the knowledge of the Reporting Persons, any of the persons listed on Exhibit 99.3 hereto have been convicted in a criminal proceeding (excluding traffic violations or similar misdemeanors) or been a party to a civil proceeding of a judicial or administrative body of competent jurisdiction and as a result of such proceeding was or is subject to a judgment, decree or final order enjoining future violations of, or prohibiting or mandating activities subject to, federal or state securities laws or finding any violation with respect to such laws.</div></td></tr><tr><td width="8%" class="tableClassNoBorderAlignCenter">(e)</td><td width="92%" class="tableClassNoBorder"><div class="largetext">See Item 2(d) above.</div></td></tr><tr><td width="8%" class="tableClassNoBorderAlignCenter">(f)</td><td width="92%" class="tableClassNoBorder"><div class="largetext">See Item 2(b) above.</div></td></tr><tr><td width="8%" class="tableClassValignNoBorder">Item 3.</td><td width="92%" class="tableClassNoBorder">Source and Amount of Funds or Other Consideration</td></tr><tr><td width="8%" class="tableClassNoBorderAlignCenter"> </td><td width="92%" class="tableClassNoBorder"><div class="largetext">The total amount of funds used in the Preceding Transactions (as defined below) was approximately $3.1 million. The sources of the funds of the Preceding Transactions is the working capital of WhiteHawk LP.
+
+The total amount of funds required by the Acquisition Parties to consummate the Offer (as defined below) and purchase all of the outstanding Shares in the Offer and provide funding in connection with the Merger (as defined below) is approximately $204.2 million, plus related fees and expenses. The Acquisition Parties expect to fund these payments using cash on hand, along with the Debt Financing and the Equity Financing (as defined in the Merger Agreement).
+
+The information set forth or incorporated by reference in Item 4 is incorporated by reference in this Item 3.</div></td></tr><tr><td width="8%" class="tableClassValignNoBorder">Item 4.</td><td width="92%" class="tableClassNoBorder">Purpose of Transaction</td></tr><tr><td width="8%" class="tableClassNoBorderAlignCenter"> </td><td width="92%" class="tableClassNoBorder"><div class="largetext">As described in Item 3 above, this statement is being filed in connection with the Merger Agreement, the Tender and Support Agreements, and the Preceding Transactions.
+
+The Preceding Transactions
+
+From April 26, 2024, through December 12, 2024, the Holding Parties, through WhiteHawk LP, engaged in a series of transactions in the Shares (the "Preceding Transactions"). Throughout the time of the Preceding Transactions, the Holding Parties believed that the securities of the Issuer represented a compelling investment opportunity, and sought to engage in discussions with the Issuer's Board of Directors (the "Board") on a value-maximizing transaction for the Issuer and its stockholders (the "Stockholders") that could result in any of the matters set forth in clauses (a)-(j) of Item 4 of Schedule 13D.
+
+The Holding Parties and their representatives and affiliates engaged in, from time to time, productive discussions with the Issuer's Board and management and their respective advisors regarding strategic opportunities to maximize stockholder value, including through corporate consolidation opportunities involving one or more of the Holding Parties and their respective affiliates (including, potentially, WHIC) that could result in any of the matters set forth in clauses (a)-(j) of Item 4 of Schedule 13D.
+
+The Merger Agreement
+
+On May 8, 2025, the Issuer entered into an Agreement and Plan of Merger (the "Merger Agreement") with Merger Sub and Parent, pursuant to which Merger Sub will conduct a cash tender offer (the "Offer") to acquire all of the issued and outstanding Shares of the Issuer, at a price per share of $4.35, in cash, net to the holder thereof, without interest and subject to applicable tax withholding (the "Offer Price").
+
+The Offer, once commenced, will initially remain open for a minimum of 20 business days, subject to certain possible extensions on the terms set forth in the Merger Agreement (as extended, the "Expiration Time"). If at the scheduled Expiration Time any of the conditions to the Offer have not been satisfied or waived, then Merger Sub may in its sole discretion, and Parent may in its sole discretion cause Merger Sub to, extend the Offer for one or more successive extension periods of up to 10 business days each (with each such period to end at 12:00 midnight (New York City time) at the end of the last business day of such period) (or any other period as may be approved in advance in writing by the Issuer) to permit the satisfaction of all Offer conditions, except that if the sole remaining unsatisfied Offer condition is the Minimum Condition (as defined below), Merger Sub shall be required to extend the Offer for no more than three occasions in consecutive periods of 10 business days each (or such other period as may be approved in advance by the parties).
+
+As promptly as practicable following, but in any event the same business day as the consummation of the Offer, Merger Sub will merge with and into the Issuer (the "Merger"), without a vote or approval of the Stockholders, pursuant to Section 251(h) of the Delaware General Corporation Law (the "DGCL") with the Issuer continuing as the surviving corporation (the "Surviving Corporation") and wholly-owned subsidiary of Parent following the effectiveness of the Merger. The date on which the closing of the Merger occurs is referred to as the "Closing Date."
+
+Merger Sub's obligation to purchase the Shares validly tendered and not validly withdrawn pursuant to the Offer is subject to the satisfaction or waiver of customary conditions, including, among others, (i) there being validly tendered and not validly withdrawn immediately prior to the Expiration Time the number of Shares that, together with any Shares held, if any, by Parent, Merger Sub, or their affiliates, represents at least a majority of all then issued and outstanding Shares plus an additional number of Shares equal to the aggregate number of Shares issuable upon the conversion, exchange or exercise of all of the Issuer's equity awards, options, warrants or other rights to acquire, or securities convertible into or exchangeable for, Shares that, in each case, are outstanding and are vested or otherwise exercisable, convertible or exchangeable at or immediately prior to the Expiration Time (the "Minimum Condition"); (ii) the absence of any law or order by a governmental entity that has jurisdiction over the parties that prohibits consummation of the Offer or the Merger or any action, inquiry, request for information or investigation pending or threatened by any governmental entity challenging or seeking to restrain, prohibit, enjoin, investigate, alter or delay the consummation of the Offer, the acquisition of the Shares by Parent or Merger Sub or the Merger; (iii) the accuracy of the representations and warranties of the Issuer contained in the Merger Agreement, subject to customary exceptions; (iv) the Issuer's compliance in all material respects with its covenants and agreements contained in the Merger Agreement; (v) the absence of any event, development or circumstance that has had or would reasonably be expected to have a material adverse effect on the Issuer; and (vi) that the Board has not withheld or withdrawn the Board's recommendation of the Offer, or otherwise approved, endorsed, adopted, recommended or otherwise declared advisable a third party acquisition proposal ("Acquisition Proposal"), as well as other customary conditions set forth in Annex A to the Merger Agreement.
+
+The respective obligations of each of Parent, Merger Sub, and the Issuer to effect the Merger are subject to the satisfaction or waiver of customary conditions, including, (i) Merger Sub having irrevocably accepted for payment all of the Shares validly tendered and not withdrawn pursuant to the Offer and consummated the Offer and (ii) no governmental entity with jurisdiction over the parties having (a) enacted, issued or promulgated any law that is in effect as of immediately prior to the Effective Time (as defined below) and has the effect of making the Merger illegal or which has the effect of prohibiting or otherwise preventing the consummation of the Merger, or (b) issued or granted any order that is in effect as of immediately prior to the Effective Time (as defined below) and has the effect of making the Merger illegal or which has the effect of prohibiting or otherwise preventing the consummation of the Merger.
+
+At the effective time of the Merger (the "Effective Time"), each Share (other than Shares (i) owned directly by the Issuer as treasury stock, Parent, Merger Sub or any of their respective affiliates which Shares will be automatically cancelled and will cease to exist, (ii) owned by any Stockholder who is entitled to demand and does properly demand the appraisal of such Shares in accordance with, and in compliance in all respects with the DGCL or (iii) that are Time-Based Restricted Shares or Performance-Based Restricted Shares, as each described below) will be automatically cancelled and converted into the right to receive an amount in cash equal to the Offer Price, without interest and subject to applicable tax withholding (the "Merger Consideration").
+
+In addition, immediately prior to the Effective Time, (i) each outstanding share of time-based restricted stock of the Issuer ("Time-Based Restricted Shares") will cease to represent a Time-Based Restricted Share and shall be cancelled and converted into a right to receive an amount in cash, without interest (a "Restricted Cash Award") equal to the sum of (A) the product of (x) the number of Shares subject to such Time-Based Restricted Share immediately prior to the Effective Time and (y) the Merger Consideration, plus (B) the accrued and unpaid dividends, as of immediately prior to the effective time of the Merger, with respect to such Time-Based Restricted Shares; (ii) each outstanding share of performance-based restricted stock of the Issuer ("Performance-Based Restricted Shares") will vest in full (assuming achievement of maximum performance), will become free of restrictions and automatically cancelled and terminated and converted into the right to receive an amount in cash (without interest) equal to the sum of (A) the Merger Consideration and (B) the accrued and unpaid dividends, as of immediately prior to the effective time of the Merger, with respect to such Performance-Based Restricted Share (the "Performance-Based Restricted Share Consideration"); and (iii) each outstanding right to receive Shares in accordance with the Issuer's Deferred Compensation Plan for Non-Employee Directors (each, a "DCP Unit") will be automatically cancelled and terminated and converted into the right to receive an amount in cash (without interest) equal to the product obtained by multiplying (A) the aggregate number of Shares subject to such DCP Unit, by (B) the Merger Consideration (the "DCP Unit Consideration"). Except as set forth in the Merger Agreement, each Restricted Cash Award shall be governed by substantially similar terms and conditions (including vesting and forfeiture terms) as were applicable to the corresponding Time-Based Restricted Shares immediately prior to the Effective Time, provided that each Restricted Cash Award shall vest and become payable upon the earlier of (X) the date the corresponding Time-Based Restricted Share would have vested pursuant to the terms thereof and (Y) 90 days following the Closing Date. Each Restricted Cash Award, less any applicable withholding taxes, will be paid as soon as reasonably practicable by the Surviving Corporation following the date such Restricted Cash Award becomes so payable (but in any event no later than three business days thereafter). The Performance-Based Restricted Share Consideration, less any applicable withholding taxes, will be paid as soon as reasonably practicable by the Surviving Corporation following the Closing Date (and in no event later than three business days thereafter). The DCP Unit Consideration will be paid as promptly as practicable by the Surviving Corporation (and in no event later than five business days) after the Closing Date, provided that if the DCP Unit Consideration constitutes nonqualified deferred compensation subject to Section 409A of the United States Internal Revenue Code of 1986, as amended (the "Code") such payment shall be made at the earliest time permitted under the applicable Issuer equity plan and deferral election form that will not trigger a tax or penalty under Section 409A of the Code.
+
+The purpose of the Offer is to acquire control of, and ultimately following the Merger, the entire equity interest in, the Issuer while allowing the Issuer's stockholders an opportunity to receive the Offer Price promptly by tendering   their Shares into the Offer. After the consummation of the Offer, Parent and Merger Sub intend to consummate the Merger as promptly as practicable, subject to the satisfaction or waiver of certain conditions as discussed in this Item 4 and the Merger Agreement.
+
+Following the Merger, the Shares will no longer be traded on the New York Stock Exchange, there will be no public market for the Shares, and registration of the Shares under the Exchange Act will be terminated.
+
+Except as set forth in this Statement and in connection with the Merger Agreement, the Reporting Persons do not have any plan or proposals that relate to or would result in any of the transactions described in Item 4 of this Schedule 13D.
+
+The Tender and Support Agreements
+
+In connection with the execution and delivery of the Merger Agreement, all of the current directors and executive officers of the Issuer (collectively, the "Supporting Stockholders"), entered into Tender and Support Agreements with Parent and Merger Sub (the "Tender and Support Agreements").
+
+Pursuant to the Tender and Support Agreements, the Supporting Stockholders have agreed, among other things, and subject to the terms thereof, to (a) tender in the Offer all Shares beneficially owned by such Supporting Stockholders (other than any restricted Shares) and not withdraw any such Shares that have been tendered (the aggregate number of such Shares representing approximately 4.2% of the outstanding Shares based on the number Shares outstanding as of May 8, 2025 as represented by the Issuer in the Merger Agreement), (b) attend any and all meetings of the holders of Shares, (c) vote, express consent or dissent, issue instructions to the record holder to vote the Subject Shares or otherwise utilize such voting power in accordance with the Tender and Support Agreements at any annual or special meeting of the Issuer as Parent or its proxy shall, in Parent's sole discretion, deem proper with respect to the Subject Shares and (d) not consent to: (i) any action, agreement or transaction that would reasonably be expected to frustrate the purposes of, impede, hinder, interfere with, nullify, prevent, delay, discourage or adversely affect, in each case in any material respect, the consummation of the Merger; (ii) any Acquisition Proposal; (iii) any merger, acquisition, sale, transfer of a material portion of the rights or other assets of the Issuer, consolidation, reorganization, recapitalization, extraordinary dividend, dissolution, liquidation or winding up of or by the Issuer, or any other extraordinary transaction involving the Issuer (other than the Merger); (iv) any action, proposal, transaction or agreement that could reasonably be expected to result in a breach, in any material respect, of any covenant, representation or warranty or any other obligation or agreement of Supporting Stockholders under the Tender and Support Agreements or the Issuer under the Merger Agreement; (v) any change in the Board; or (vi) any material change in the capitalization of the Issuer's corporate structure.
+
+Shared voting power with respect to the Shares owned by the Stockholders may be deemed to have been acquired through execution of the Tender and Support Agreements. The Reporting Persons have not expended any funds in connection with the execution of the Tender and Support Agreements.
+
+Exhibit 99.4 hereto contains the names and number of Shares beneficially held by each Supporting Stockholder (as represented to the Reporting Persons by the Issuer and the Supporting Stockholders).
+
+The foregoing descriptions of the Merger Agreement and the transactions and agreements contemplated thereunder, including the Tender and Support Agreements, do not purport to be complete and are qualified in their entirety by reference to such agreements. A copy of the Merger Agreement is filed as Exhibit 2.1 hereto. A copy of the form of Tender and Support Agreement is filed as Exhibit 2.2 hereto.
+
+The Offer has not yet commenced. The foregoing is neither an offer to purchase nor a solicitation of an offer to sell Shares, nor is it a substitute for the tender offer materials that the Acquisition Parties will file with the SEC upon commencement of the Offer. At the time the Offer is commenced, the Acquisition Parties will file tender offer materials on Schedule TO, and the Issuer will file a Solicitation/Recommendation Statement on Schedule 14D-9 with the SEC with respect to the Offer. The tender offer materials (including an Offer to Purchase, a related Letter of Transmittal and certain other tender offer documents) and the Solicitation/Recommendation Statement will contain important information. Holders of Shares are urged to read these documents when they become available because they will contain important information that holders of Issuer securities should consider before making any decision regarding tendering their securities. The Offer to Purchase, the related Letter of Transmittal and certain other tender offer documents, as well as the Solicitation/Recommendation Statement, will be made available to all holders of Shares at no expense to them. The tender offer materials and the Solicitation/Recommendation Statement will be made available for free at the SEC's web site at www.sec.gov.</div></td></tr><tr><td width="8%" class="tableClassValignNoBorder">Item 5.</td><td width="92%" class="tableClassNoBorder">Interest in Securities of the Issuer</td></tr><tr><td width="8%" class="tableClassNoBorderAlignCenter">(a)</td><td width="92%" class="tableClassNoBorder"><div class="largetext">As a result of the Preceding Transactions, WhiteHawk LP directly holds and beneficially owns 946,606 Shares (the "Held Shares"). WhiteHawk GP, as the general partner of WhiteHawk LP and pursuant to the Letter Agreement (as described in Item 6 below), retains the sole and exclusive right to manage and control any and all matters in connection with the voting and disposition of any securities held by WhiteHawk LP, and may thus be deemed to beneficially own the Held Shares. WhiteHawk Energy is the sole member of WhiteHawk GP, and may thus be deemed to beneficially own the Held Shares. Mr. Herz is the President, Chief Executive Officer and Managing Member of WhiteHawk Energy, and may be deemed to beneficially own the Held Shares.
+
+As a result of the Tender and Support Agreements, Parent, Merger Sub, and WHIC may be deemed to beneficially own 3,817,642 Shares (the "Subject Shares"). Mr. Herz is the Chief Executive Officer of WHIC, and may be deemed to beneficially own the Subject Shares.
+
+As a result of the Tender and Support Agreements and the Preceding Transactions, Mr. Herz may be deemed to have the power to vote up to an aggregate of 4,764,248 Shares (comprised of 3,817,642 Subject Shares and 946,606 Held Shares) with respect to certain matters set forth in Item 4 above, and thus, for the purpose of Rule 13d-3 promulgated under the Exchange Act, Mr. Herz may be deemed to be the beneficial owner of an aggregate of 4,764,248 Shares. All Shares that may be deemed to be beneficially owned by Mr. Herz constitute approximately 12.6% of the issued and outstanding Shares as of May 8, 2025 (as represented by the Issuer in the Merger Agreement).
+
+As a result of the Tender and Support Agreements, the Acquisition Parties may be deemed to have the power to vote up to an aggregate of 3,817,642 Shares with respect to certain matters set forth in Item 4 above, and thus, for the purpose of Rule 13d-3 promulgated under the Exchange Act, the Acquisition Parties may be deemed to be the beneficial owner of an aggregate of 3,817,642 Shares. All Shares that may be deemed to be beneficially owned by the Acquisition Parties constitute approximately 10.1% of the issued and outstanding Shares as of May 8, 2025 (as represented by the Issuer in the Merger Agreement).
+
+With respect to certain matters set forth in Item 4 above and for the purpose of Rule 13d-3 promulgated under the Exchange Act, (i) the Holding Parties may be deemed to have the power to vote up to an aggregate of 946,606 Shares as a result of the Preceding Transactions, representing approximately 2.5% of the issued and outstanding Shares as of May 8, 2025 (as represented by the Issuer in the Merger Agreement) and (ii) the Acquisition Parties may be deemed to have the power to vote up to an aggregate of 3,817,642 Shares as a result of the Tender and Support Agreements, representing approximately 10.1% of the issued and outstanding Shares as of May 8, 2025 (as represented by the Issuer in the Merger Agreement).
+
+Other than (i) those Subject Shares that may be deemed to be beneficially owned by the Acquisition Parties and Mr. Herz and (ii) those Held Shares that may be deemed to be beneficially owned by the Holding Parties and Mr. Herz, the Reporting Persons have not acquired and, for the purposes of Rule 13d-4 promulgated under the Exchange Act, do not beneficially own any Shares.
+
+By virtue of the relationship among the Reporting Persons, the Reporting Persons may be deemed to constitute a group for purposes of Rule 13d-3 promulgated under the Exchange Act. The Reporting Persons are not entitled to any rights as stockholders of the Issuer as to the Subject Shares, except as otherwise expressly provided in the Tender and Support Agreements.</div></td></tr><tr><td width="8%" class="tableClassNoBorderAlignCenter">(b)</td><td width="92%" class="tableClassNoBorder"><div class="largetext">WhiteHawk GP, as the general partner of WhiteHawk LP and pursuant to the Letter Agreement (as described in Item 6 below), has the shared power to vote and dispose of the Held Shares. WhiteHawk Energy, as sole member of WhiteHawk GP, and Mr. Herz, in his capacity as President, Chief Executive Officer and Managing Member of WhiteHawk Energy, may be deemed to have the shared power to vote and dispose of the Held Shares.
+
+As a result of the Tender and Support Agreements, WHIC, Parent, Merger Sub, and Mr. Herz in his capacity as Chief Executive Officer of WHIC may be deemed to have the shared power to vote the Subject Shares with respect to certain matters set forth in Item 4 above.</div></td></tr><tr><td width="8%" class="tableClassNoBorderAlignCenter">(c)</td><td width="92%" class="tableClassNoBorder"><div class="largetext">Except for the Merger Agreement and the Tender and Support Agreements described above, to the knowledge of the Reporting Persons, no transactions in the class of securities reported have been effected during the past 60 days by any person named in Exhibit 99.3 hereto or in this Item 5.</div></td></tr><tr><td width="8%" class="tableClassNoBorderAlignCenter">(d)</td><td width="92%" class="tableClassNoBorder"><div class="largetext">No person other than the Reporting Persons has the right to receive or the power to direct the receipt of dividends from, or the proceeds from the sale of, any of the securities of the Issuer reported on this Schedule 13D.</div></td></tr><tr><td width="8%" class="tableClassNoBorderAlignCenter">(e)</td><td width="92%" class="tableClassNoBorder"><div class="largetext">Inapplicable.</div></td></tr><tr><td width="8%" class="tableClassValignNoBorder">Item 6.</td><td width="92%" class="tableClassNoBorder">Contracts, Arrangements, Understandings or Relationships With Respect to Securities of the Issuer</td></tr><tr><td width="8%" class="tableClassNoBorderAlignCenter"> </td><td width="92%" class="tableClassNoBorder"><div class="largetext">On July 23, 2024, WhiteHawk GP entered into the Agreement of Limited Partnership of WhiteHawk - Equity Holdings, LP (the "Partnership Agreement"), pursuant to which WhiteHawk GP, as general partner of WhiteHawk LP, possesses full governance rights over WhiteHawk LP in connection with, among other things, the transfer, voting or disposition of any of the securities of the Issuer owned by WhiteHawk LP, loan or option arrangements, guarantees of profits and division of profits or loss. Pursuant to the Partnership Agreement, limited partners have made or may make contributions to WhiteHawk LP for purposes of investing in the Issuer in exchange for a number of limited partnership interests of WhiteHawk LP.
+
+On July 23, 2024, WhiteHawk GP entered into that certain letter agreement, by and between WhiteHawk GP and each limited partner of WhiteHawk LP (the "Letter Agreement," a form of which is attached as Exhibit 99.2 hereto), pursuant to which (i) WhiteHawk GP, as general partner of WhiteHawk LP, shall have the sole and exclusive right to manage and control any and all matters in connection with the voting and disposition of Shares by WhiteHawk LP and (ii) each limited partner of WhiteHawk LP and each of its controlled Affiliates (as such term is defined in the Securities Exchange Act of 1934) shall not, directly or indirectly acquire, sell, assign, transfer, encumber or otherwise dispose of, or enter into any contract, option or other arrangement or understanding or other disposition of, any Shares.
+
+Except for the Merger Agreement, the Tender and Support Agreements, the Partnership Agreement, and the Letter Agreement, to the knowledge of the Reporting Persons, there are no contracts, arrangements, understandings or relationships (legal or otherwise), including, but not limited to, transfer or voting of any of the securities, finder's fees, joint ventures, loan or option arrangements, puts or calls, guarantees of profits, division of profits or loss, or the giving or withholding of proxies, among the persons named in Item 2 or between such persons and any other person, with respect to any securities of Issuer, including any securities pledged or otherwise subject to a contingency the occurrence of which would give another person voting power or investment power over such securities.</div></td></tr><tr><td width="8%" class="tableClassValignNoBorder">Item 7.</td><td width="92%" class="tableClassNoBorder">Material to be Filed as Exhibits.</td></tr><tr><td width="8%" class="tableClassNoBorderAlignCenter"> </td><td width="92%" class="tableClassNoBorder"><div class="largetext">2.1 Agreement and Plan of Merger, dated as of May 8, 2025, by and among PHX Minerals Inc., WhiteHawk Acquisition, Inc., and WhiteHawk Merger Sub, Inc., (incorporated by reference to Exhibit 99.1 to the Current Report on Form 8-K filed by PHX Minerals Inc. with the SEC on May 12, 2025).
+
+2.2 Form of Tender and Support Agreement (incorporated by reference to Exhibit 99.3 to the Current Report on Form 8-K filed by PHX Minerals Inc. with the SEC on May 12, 2025).
+
+99.1 Joint Filing Agreement, dated as of May 15, 2025, by and among WhiteHawk Income Corporation,
+WhiteHawk Acquisition, Inc., WhiteHawk Merger Sub, Inc., WhiteHawk - Equity Holdings, LP,
+WhiteHawk - Equity Holdings GP, LLC, WhiteHawk Energy, LLC, and Daniel Herz.*
+
+99.2 Form of Letter Agreement.*
+
+99.3 Schedule of Information required by Item 2 of Schedule 13D.*
+
+99.4 Schedule of Supporting Stockholders.*
+
+* Filed herewith.</div></td></tr></table><br></div><div class="form1"><table role="presentation" id="signatureInfo"><tr><td width="8%" class="tableClassValignNoBorder">    SIGNATURE</td><td width="92%" class="tableClassNoBorder"> </td></tr><tr><td width="8%" class="tableClassNoBorderAlignCenter"> </td><td width="92%" class="tableClassNoBorder"><div class="information" style="text-align:justify">
+						After reasonable inquiry and to the best of my knowledge and belief, I certify that the information set forth in this statement is true, complete and correct.
+						<br><br></div></td></tr></table><table><tr class="tableClass"><td width="50%" class="tableClassNoBorder"> </td><td width="50%" class="tableClassNoBorder"><table><tr class="tableClass"><td width="100%" class="tableClassInnerNoBorderBlue"><div class="text">WhiteHawk Income Corporation</div></td></tr></table></td></tr></table><table><tr class="tableClass"><td width="50%" class="tableClassNoBorder"> </td><td width="50%" class="tableClassNoBorder"><table><tr class="tableClass"><td width="8%" class="tableClassNoBorderAlignLeft signature">Signature:</td><td width="92%" class="tableClassNoBorderBlue signature">/s/ Jeffrey Slotterback</td></tr><tr class="tableClass"><td width="8%" class="tableClassNoBorderAlignLeft signature">Name/Title:</td><td width="92%" class="tableClassNoBorderBlue signature">Jeffrey Slotterback / Chief Financial Officer</td></tr><tr class="tableClass"><td width="8%" class="tableClassNoBorderAlignLeft signature">Date:</td><td width="92%" class="tableClassNoBorderBlue signature">05/15/2025</td></tr></table></td></tr></table><table><tr class="tableClass"><td width="50%" class="tableClassNoBorder"> </td><td width="50%" class="tableClassNoBorder"><table><tr class="tableClass"><td width="100%" class="tableClassInnerNoBorderBlue"><div class="text">WhiteHawk Merger Sub, Inc.</div></td></tr></table></td></tr></table><table><tr class="tableClass"><td width="50%" class="tableClassNoBorder"> </td><td width="50%" class="tableClassNoBorder"><table><tr class="tableClass"><td width="8%" class="tableClassNoBorderAlignLeft signature">Signature:</td><td width="92%" class="tableClassNoBorderBlue signature">/s/ Jeffrey Slotterback</td></tr><tr class="tableClass"><td width="8%" class="tableClassNoBorderAlignLeft signature">Name/Title:</td><td width="92%" class="tableClassNoBorderBlue signature">Jeffrey Slotterback / President</td></tr><tr class="tableClass"><td width="8%" class="tableClassNoBorderAlignLeft signature">Date:</td><td width="92%" class="tableClassNoBorderBlue signature">05/15/2025</td></tr></table></td></tr></table><table><tr class="tableClass"><td width="50%" class="tableClassNoBorder"> </td><td width="50%" class="tableClassNoBorder"><table><tr class="tableClass"><td width="100%" class="tableClassInnerNoBorderBlue"><div class="text">WhiteHawk Acquisition, Inc.</div></td></tr></table></td></tr></table><table><tr class="tableClass"><td width="50%" class="tableClassNoBorder"> </td><td width="50%" class="tableClassNoBorder"><table><tr class="tableClass"><td width="8%" class="tableClassNoBorderAlignLeft signature">Signature:</td><td width="92%" class="tableClassNoBorderBlue signature">/s/ Jeffrey Slotterback</td></tr><tr class="tableClass"><td width="8%" class="tableClassNoBorderAlignLeft signature">Name/Title:</td><td width="92%" class="tableClassNoBorderBlue signature">Jeffrey Slotterback / President</td></tr><tr class="tableClass"><td width="8%" class="tableClassNoBorderAlignLeft signature">Date:</td><td width="92%" class="tableClassNoBorderBlue signature">05/15/2025</td></tr></table></td></tr></table><table><tr class="tableClass"><td width="50%" class="tableClassNoBorder"> </td><td width="50%" class="tableClassNoBorder"><table><tr class="tableClass"><td width="100%" class="tableClassInnerNoBorderBlue"><div class="text">WhiteHawk - Equity Holdings, LP</div></td></tr></table></td></tr></table><table><tr class="tableClass"><td width="50%" class="tableClassNoBorder"> </td><td width="50%" class="tableClassNoBorder"><table><tr class="tableClass"><td width="8%" class="tableClassNoBorderAlignLeft signature">Signature:</td><td width="92%" class="tableClassNoBorderBlue signature">WHITEHAWK - EQUITY HOLDINGS GP, LLC</td></tr><tr class="tableClass"><td width="8%" class="tableClassNoBorderAlignLeft signature">Name/Title:</td><td width="92%" class="tableClassNoBorderBlue signature">General Partner</td></tr><tr class="tableClass"><td width="8%" class="tableClassNoBorderAlignLeft signature">Date:</td><td width="92%" class="tableClassNoBorderBlue signature">05/15/2025</td></tr></table></td></tr></table><table><tr class="tableClass"><td width="50%" class="tableClassNoBorder"> </td><td width="50%" class="tableClassNoBorder"><table><tr class="tableClass"><td width="8%" class="tableClassNoBorderAlignLeft signature">Signature:</td><td width="92%" class="tableClassNoBorderBlue signature">WHITEHAWK ENERGY, LLC</td></tr><tr class="tableClass"><td width="8%" class="tableClassNoBorderAlignLeft signature">Name/Title:</td><td width="92%" class="tableClassNoBorderBlue signature">Sole Member</td></tr><tr class="tableClass"><td width="8%" class="tableClassNoBorderAlignLeft signature">Date:</td><td width="92%" class="tableClassNoBorderBlue signature">05/15/2025</td></tr></table></td></tr></table><table><tr class="tableClass"><td width="50%" class="tableClassNoBorder"> </td><td width="50%" class="tableClassNoBorder"><table><tr class="tableClass"><td width="8%" class="tableClassNoBorderAlignLeft signature">Signature:</td><td width="92%" class="tableClassNoBorderBlue signature">/s/ Jeffrey Slotterback</td></tr><tr class="tableClass"><td width="8%" class="tableClassNoBorderAlignLeft signature">Name/Title:</td><td width="92%" class="tableClassNoBorderBlue signature">Jeffrey Slotterback / Chief Financial Officer</td></tr><tr class="tableClass"><td width="8%" class="tableClassNoBorderAlignLeft signature">Date:</td><td width="92%" class="tableClassNoBorderBlue signature">05/15/2025</td></tr></table></td></tr></table><table><tr class="tableClass"><td width="50%" class="tableClassNoBorder"> </td><td width="50%" class="tableClassNoBorder"><table><tr class="tableClass"><td width="100%" class="tableClassInnerNoBorderBlue"><div class="text">WhiteHawk - Equity Holdings GP, LLC</div></td></tr></table></td></tr></table><table><tr class="tableClass"><td width="50%" class="tableClassNoBorder"> </td><td width="50%" class="tableClassNoBorder"><table><tr class="tableClass"><td width="8%" class="tableClassNoBorderAlignLeft signature">Signature:</td><td width="92%" class="tableClassNoBorderBlue signature">WHITEHAWK ENERGY, LLC</td></tr><tr class="tableClass"><td width="8%" class="tableClassNoBorderAlignLeft signature">Name/Title:</td><td width="92%" class="tableClassNoBorderBlue signature">Sole Member</td></tr><tr class="tableClass"><td width="8%" class="tableClassNoBorderAlignLeft signature">Date:</td><td width="92%" class="tableClassNoBorderBlue signature">05/15/2025</td></tr></table></td></tr></table><table><tr class="tableClass"><td width="50%" class="tableClassNoBorder"> </td><td width="50%" class="tableClassNoBorder"><table><tr class="tableClass"><td width="8%" class="tableClassNoBorderAlignLeft signature">Signature:</td><td width="92%" class="tableClassNoBorderBlue signature">/s/ Jeffrey Slotterback</td></tr><tr class="tableClass"><td width="8%" class="tableClassNoBorderAlignLeft signature">Name/Title:</td><td width="92%" class="tableClassNoBorderBlue signature">Jeffrey Slotterback / Chief Financial Officer</td></tr><tr class="tableClass"><td width="8%" class="tableClassNoBorderAlignLeft signature">Date:</td><td width="92%" class="tableClassNoBorderBlue signature">05/15/2025</td></tr></table></td></tr></table><table><tr class="tableClass"><td width="50%" class="tableClassNoBorder"> </td><td width="50%" class="tableClassNoBorder"><table><tr class="tableClass"><td width="100%" class="tableClassInnerNoBorderBlue"><div class="text">WhiteHawk Energy, LLC</div></td></tr></table></td></tr></table><table><tr class="tableClass"><td width="50%" class="tableClassNoBorder"> </td><td width="50%" class="tableClassNoBorder"><table><tr class="tableClass"><td width="8%" class="tableClassNoBorderAlignLeft signature">Signature:</td><td width="92%" class="tableClassNoBorderBlue signature">/s/ Jeffrey Slotterback</td></tr><tr class="tableClass"><td width="8%" class="tableClassNoBorderAlignLeft signature">Name/Title:</td><td width="92%" class="tableClassNoBorderBlue signature">Jeffrey Slotterback / Chief Financial Officer</td></tr><tr class="tableClass"><td width="8%" class="tableClassNoBorderAlignLeft signature">Date:</td><td width="92%" class="tableClassNoBorderBlue signature">05/15/2025</td></tr></table></td></tr></table><table><tr class="tableClass"><td width="50%" class="tableClassNoBorder"> </td><td width="50%" class="tableClassNoBorder"><table><tr class="tableClass"><td width="100%" class="tableClassInnerNoBorderBlue"><div class="text">Daniel Herz</div></td></tr></table></td></tr></table><table><tr class="tableClass"><td width="50%" class="tableClassNoBorder"> </td><td width="50%" class="tableClassNoBorder"><table><tr class="tableClass"><td width="8%" class="tableClassNoBorderAlignLeft signature">Signature:</td><td width="92%" class="tableClassNoBorderBlue signature">/s/ Daniel Herz</td></tr><tr class="tableClass"><td width="8%" class="tableClassNoBorderAlignLeft signature">Name/Title:</td><td width="92%" class="tableClassNoBorderBlue signature">Daniel Herz</td></tr><tr class="tableClass"><td width="8%" class="tableClassNoBorderAlignLeft signature">Date:</td><td width="92%" class="tableClassNoBorderBlue signature">05/15/2025</td></tr></table></td></tr></table></div></div>
+
+<script type="text/javascript"  src="/hEyxvy/tDTQ/C5W/N8y/CEN74LRlKz4/wYOaNzSVtcwhtffaf7/U3FqJk0lAg/cDg9eQ/IuTns"></script></body></html>

@@ -1,0 +1,521 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns:p="http://www.sec.gov/edgar/schedule13D" xmlns:p1="http://www.sec.gov/edgar/common"><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8"><link rel="stylesheet" type="text/css" href="/css/SDR_print.css"><style type="text/css">
+					.fakeTextBox {
+					border-top: 2px solid #999;
+					border-right: 1px solid #ccc;
+					border-bottom: 1px solid #ccc;
+					border-left: 2px solid #999;
+					padding: 2px;
+					_width: 800px;
+					height: auto;
+					min-width: 200px;
+					min-height: 50px;
+					word-wrap: break-word;
+					font-size: 0.9em;
+					color: blue;
+					}
+					table.tableClass { border: solid black;
+					border-top-width: 1;
+					border-right-width: 1;
+					border-bottom-width: 1;
+					border-left-width: 1;
+					table-layout:fixed;
+					}
+					table.innerTableClass { border: solid black;
+					border-top-width: 0;
+					border-right-width: 0;
+					border-bottom-width: 0;
+					border-left-width: 0;
+					table-layout:fixed;
+					}
+					th.tableClassLeft { border: solid black;
+					border-top-width: 0px;
+					border-right-width: 0px;
+					border-bottom-width: 1px;
+					border-left-width: 1px;
+					padding: 2px;
+					}
+					th.tableClassRight { border: solid black;
+					border-top-width: 0px;
+					border-right-width: 1px;
+					border-bottom-width: 1px;
+					border-left-width: 0;
+					padding: 2px;
+					}
+					th.tableClass { border: solid black;
+					border-top-width: 0px;
+					border-right-width: 1px;
+					border-bottom-width: 1px;
+					border-left-width: 1px;
+					padding: 2px;
+					}
+					td.tableClassLeft { border: solid black;
+					border-top-width: 0px;
+					border-right-width: 0px;
+					border-bottom-width: 1px;
+					border-left-width: 1px;
+					font-size: 0.9em;
+					color: blue;
+					word-wrap: break-word;
+					}
+					td.tableClassRight { border: solid black;
+					border-top-width: 0px;
+					border-right-width: 1px;
+					border-bottom-width: 1px;
+					border-left-width: 0;
+					font-size: 0.9em;
+					color: blue;
+					word-wrap: break-word;
+					}
+					td.tableClass { border: solid black;
+					border-top-width: 0px;
+					border-right-width: 1px;
+					border-bottom-width: 1px;
+					border-left-width: 1px;
+					font-size: 0.9em;
+					font-weight:bold;
+					color: black;
+					word-wrap: break-word;
+					}
+					td.tableClassNoBorder { border: solid black;
+					border-top-width: 0px;
+					border-right-width: 0px;
+					border-bottom-width: 0px;
+					border-left-width: 0px;
+					font-size: 0.9em;
+					font-weight:bold;
+					color: black;
+					word-wrap: break-word;
+					}
+
+					td.tableClassNoBorderBlue { border: solid black;
+					border-top-width: 0px;
+					border-right-width: 0px;
+					border-bottom-width: 0px;
+					border-left-width: 0px;
+					font-size: 0.9em;
+					font-weight:bold;
+					color: blue;
+					word-wrap: break-word;
+					}
+
+					td.tableClassInnerNoBorderBlue { border: solid black;
+					border-top-width: 0px;
+					border-right-width: 0px;
+					border-bottom-width: 0px;
+					border-left-width: 0px;
+					font-size: 1.4em;
+					font-weight:bold;
+					color: blue;
+					word-wrap: break-word;
+					}
+
+					td.tableClassNoBorderAlignLeft { border: solid black;
+					border-top-width: 0px;
+					border-right-width: 0px;
+					border-bottom-width: 0px;
+					border-left-width: 0px;
+					font-size: 0.9em;
+					font-weight:bold;
+					text-align: left;
+					color: black;
+					word-wrap: break-word;
+					}
+
+					td.signature {
+					padding: 4px 8px;
+					}
+
+					td.tableClassInner { border: solid black;
+					border-top-width: 0px;
+					border-right-width: 1px;
+					border-bottom-width: 1px;
+					border-left-width: 1px;
+					font-size: 1em;
+					font-weight:bold;
+					color: black;
+					word-wrap: break-word;
+					}
+
+					td.tableClassValign { border: solid black;
+					border-top-width: 0px;
+					border-right-width: 1px;
+					border-bottom-width: 1px;
+					border-left-width: 1px;
+					font-size: 0.9em;
+					font-weight:bold;
+					color: black;
+					vertical-align: middle;
+					text-align: center;
+					word-wrap: break-word;
+					}
+
+					td.tableClassValignNoBorder { border: solid black;
+					border-top-width: 0px;
+					border-right-width: 0px;
+					border-bottom-width: 0px;
+					border-left-width: 0px;
+					font-size: 0.9em;
+					font-weight:bold;
+					color: black;
+					vertical-align: middle;
+					text-align: center;
+					word-wrap: break-word;
+					}
+
+					td.tableClassValignInner { border: solid black;
+					border-top-width: 0px;
+					border-right-width: 1px;
+					border-bottom-width: 1px;
+					border-left-width: 1px;
+					font-size: 1em;
+					font-weight:bold;
+					color: black;
+					vertical-align: middle;
+					text-align: center;
+					word-wrap: break-word;
+					}
+
+					td.innerTableClassRightValign { border: solid black;
+					border-top-width: 0px;
+					border-right-width: 1px;
+					border-bottom-width: 1px;
+					border-left-width: 0;
+					font-size: 1em;
+					font-weight:bold;
+					color: black;
+					vertical-align: middle;
+					text-align: center;
+					word-wrap: break-word;
+					}
+
+					td.innerTableClassRightValignBottomLess { border: solid black;
+					border-top-width: 0px;
+					border-right-width: 1px;
+					border-bottom-width: 0px;
+					border-left-width: 0;
+					font-size: 1em;
+					font-weight:bold;
+					color: black;
+					vertical-align: middle;
+					text-align: center;
+					word-wrap: break-word;
+					}
+
+					td.tableClassInnerLeft { border: solid black;
+					border-top-width: 0px;
+					border-right-width: 0px;
+					border-bottom-width: 1px;
+					border-left-width: 1px;
+					font-size: 1em;
+					font-weight:bold;
+					color: black;
+					word-wrap: break-word;
+					}
+
+					td.tableClassInnerLeftBottomLess { border: solid black;
+					border-top-width: 0px;
+					border-right-width: 0px;
+					border-bottom-width: 0px;
+					border-left-width: 1px;
+					font-size: 1em;
+					font-weight:bold;
+					color: black;
+					word-wrap: break-word;
+					}
+
+					td.tableClassNoBorderAlignCenter { border: solid black;
+					border-top-width: 0px;
+					border-right-width: 0px;
+					border-bottom-width: 0px;
+					border-left-width: 0px;
+					font-size: 0.9em;
+					font-weight:bold;
+					color: black;
+					text-align: center;
+					word-wrap: break-word;
+					}
+
+					tr.tableClass { border: solid black;
+					border-top-width: 1px;
+					border-right-width: 1px;
+					border-bottom-width: 1px;
+					border-left-width: 1px;
+					}
+					tr.tableClassWithBg { border: solid black;
+					border-top-width: 0;
+					border-right-width: 1;
+					border-bottom-width: 1;
+					border-left-width: 0;
+					background-color: #e0e0ff
+					}
+
+					tr.tableClassWithBgBlack { border: solid black;
+					border-top-width: 0;
+					border-right-width: 1;
+					border-bottom-width: 1;
+					border-left-width: 0;
+					background-color: #D3D3D3
+					}
+
+					hr.header {
+					position: relative;
+					top: 20px;
+					border: none;
+					height: 6px;
+					background: black;
+					margin-bottom: 10px;
+					}
+
+					hr.separatorThin {
+					position: relative;
+					top: 2px;
+					border: none;
+					height: 2px;
+					background: black;
+					margin-bottom: 2px;
+					}
+
+					hr.headerThin {
+					position: relative;
+					top: 10px;
+					border: none;
+					height: 2px;
+					background: black;
+					margin-bottom: 10px;
+					}
+
+					hr.separator {
+					position: relative;
+					top: 20px;
+					border: none;
+					height: 4px;
+					background: black;
+					margin-bottom: 5px;
+					}
+
+					div.text {
+					background-color: #ffffff;
+					color: blue;
+					font-size: 1em;
+					font-weight:normal;
+					text-align:justify;
+					}
+
+
+					div.information {
+					background-color: #ffffff;
+					color: black;
+					font-size: 1em;
+					font-weight:normal;
+					text-align:justify;
+					}
+
+					#scheader {
+					font-size: 0.9em;
+					border: 0px solid #404040;
+					border-spacing: 2px;
+					}
+
+					div.largetext {
+					background-color: #ffffff;
+					color: blue;
+					font-size: 1em;
+					font-weight:normal;
+					text-align:justify;
+					white-space: pre-wrap;
+					word-break: normal;
+					}
+
+				</style></head><body lang="en-US" text="#000000" bgcolor="#ffffff"><hr class="header"><br><hr class="headerThin"><div class="contentwrapper"><table role="presentation" id="scheader"><tr><td class="tableClassNoBorderAlignCenter" style="font-size:2em;">
+						SECURITIES AND EXCHANGE COMMISSION
+						<br>
+						Washington, D.C. 20549
+					</td></tr><tr><td class="tableClassNoBorderAlignCenter"><br><br><div style="font-size:1.5em;">
+									SCHEDULE 13D
+								</div><br><div style="font-size:1.2em;">
+							Under the Securities Exchange Act of 1934
+						</div><br><div class="information" style="text-align:center; font-weight:bold;">
+									(Amendment No. <span style="color:blue;">6</span>)
+								</div><br><br></td></tr><tr><td class="center"><div class="information" style="text-align:center; font-weight:bold; color:blue;">Starz Entertainment Corp.</div><div class="information" style="text-align:center; font-weight:bold;"><hr class="separatorThin">(Name of Issuer)</div><br><br></td></tr><tr><td class="center"><div class="information" style="text-align:center; font-weight:bold; color:blue;">Common Shares, no par value.</div><div class="information" style="text-align:center; font-weight:bold;"><hr class="separatorThin">(Title of Class of Securities)</div><br><br></td></tr><tr><td class="center"><div class="information" style="text-align:center; font-weight:bold; color:blue;">855919106</div><div class="information" style="text-align:center; font-weight:bold;"><hr class="separatorThin">(CUSIP Number)</div><br><br></td></tr><tr><td class="center"><div class="information" style="text-align:center; font-weight:bold; color:blue;">Jonathan E. Levitsky<br>66 Hudson Blvd. E,
+								<br>New York,
+								NY,
+								10001<br>212-909-6000</div><div class="information" style="text-align:center; font-weight:bold;"><hr class="separatorThin">(Name, Address and Telephone Number of Person Authorized to
+									Receive Notices and Communications)</div></td></tr><tr><td class="center"><div class="information" style="text-align:center; font-weight:bold; color:blue;">05/06/2025</div><div class="information" style="text-align:center; font-weight:bold;"><hr class="separatorThin">(Date of Event Which Requires Filing of This Statement)</div></td></tr></table><br><br><div class="information" style="text-align:justify">
+				If the filing person has previously filed a statement on Schedule 13G to report the acquisition that is the subject of this Schedule 13D, and is filing this schedule because of §§ 240.13d-1(e), 240.13d-1(f) or 240.13d-1(g), check the following box.
+				<img src="/Images/box-unchecked.jpg" alt="Checkbox not checked"></div><br><div class="information" style="text-align:justify">
+				The information required on the remainder of this cover page shall not be deemed to be “filed” for the purpose of Section 18 of the
+				Securities Exchange Act of 1934 (“Act”) or otherwise subject to the liabilities of that section of the Act but shall be subject to all other
+				provisions of the Act (however, see the Notes).
+			</div></div><hr class="headerThin"><hr class="header"><br><br>
+  <div class="content"><div class="form1"></div></div>
+  <div class="content"><div class="form1"><table><tr><td class="center"><br><br><p><div align="center" style="font-size:1.2em;">
+									SCHEDULE 13D
+								</div></p></td></tr></table><table role="presentation" class="tableClass" id="cusipNumber"><tr class="tableClass"><td width="25%" style="font-weight:bold;">CUSIP No.</td><td width="75%"><div style="font-size:.9em; color:#000000">855919106</div></td></tr></table><br><br><table role="presentation" class="tableClass" id="reportingPersonDetails"><tr class="tableClass"><td width="8%" class="tableClassValign">1</td><td width="92%" class="tableClass">
+					Name of reporting person
+					<br><br><div class="text">Warner Bros. Discovery, Inc.</div></td></tr><tr><td width="8%" class="tableClassValign">2</td><td width="92%" class="tableClass">Check the appropriate box if a member of a Group (See Instructions)
+					<br><br><div class="text"><img src="/Images/box-unchecked.jpg" alt="Checkbox not checked">  (a)
+						<br><img src="/Images/box-checked.jpg" alt="Checkbox checked">  (b)
+					</div></td></tr><tr class="tableClassWithBgBlack"><td width="8%" class="tableClassValign">3</td><td width="92%" class="tableClass">SEC use only</td></tr><tr><td width="8%" class="tableClassValign">4</td><td width="92%" class="tableClass">
+					Source of funds (See Instructions)
+					<br><br><div class="text">WC</div></td></tr><tr><td width="8%" class="tableClassValign">5</td><td width="92%" class="tableClass">
+					Check if disclosure of legal proceedings is required pursuant to Items 2(d) or 2(e)
+					<br><br><img src="/Images/box-unchecked.jpg" alt="Checkbox not checked"></td></tr><tr><td width="8%" class="tableClassValign">6</td><td width="92%" class="tableClass">Citizenship or place of organization
+					<br><br><div class="text">
+				UNITED STATES
+			</div></td></tr><tr><td width="8%" class="tableClassValign">Number of Shares Beneficially Owned by Each Reporting Person With:</td><td width="92%" class="tableClass"><table class="innerTableClass"><tr><td width="8%" class="innerTableClassRightValign">7</td><td width="92%" class="tableClassInnerLeft">Sole Voting Power
+								<br><br><div class="text">0.00</div></td></tr><tr><td width="8%" class="innerTableClassRightValign">8</td><td width="92%" class="tableClassInnerLeft">Shared Voting Power
+								<br><br><div class="text">353,334.00</div></td></tr><tr><td width="8%" class="innerTableClassRightValign">9</td><td width="92%" class="tableClassInnerLeft">Sole Dispositive Power
+								<br><br><div class="text">0.00</div></td></tr><tr><td width="8%" class="innerTableClassRightValignBottomLess">10</td><td width="92%" class="tableClassInnerLeftBottomLess">Shared Dispositive Power
+								<br><br><div class="text">353,334.00</div></td></tr></table></td></tr><tr><td width="8%" class="tableClassValign">11</td><td width="92%" class="tableClass">Aggregate amount beneficially owned by each reporting person
+					<br><br><div class="text">353,334.00</div></td></tr><tr><td width="8%" class="tableClassValign">12</td><td width="92%" class="tableClass">Check if the aggregate amount in Row (11) excludes certain shares (See Instructions)
+					<br><br><img src="/Images/box-checked.jpg" alt="Checkbox checked"></td></tr><tr><td width="8%" class="tableClassValign">13</td><td width="92%" class="tableClass">Percent of class represented by amount in Row (11)
+					<br><br><div class="text">2.1 % </div></td></tr><tr><td width="8%" class="tableClassValign">14</td><td width="92%" class="tableClass">Type of Reporting Person (See Instructions)
+					<br><br><div class="text">CO</div></td></tr></table><br><div style="display: flex;"><div style="font-size: 0.9em; font-weight: bold; margin-right: 5px;">
+					Comment for Type of Reporting Person:
+				</div><div class="largetext" style="text-align:justify">All percentages are based on 16,721,810 common shares, no par value (the "Common Shares"), of Starz Entertainment Corp. (f/k/a Lions Gate Entertainment Corp.) (the "Issuer") outstanding as of May 6, 2025 following the completion of the Transactions (as defined below).
+
+The beneficial ownership information set forth above does not include any securities of the Issuer beneficially owned by certain funds affiliated with MHR Fund Management LLC ("MHR Fund Management") or their affiliates, including Mark H. Rachesky, M.D., Liberty Global Ltd. (f/k/a Liberty Global plc) ("Liberty Parent") or Liberty Global Ventures Limited (f/k/a Liberty Global Incorporated Limited) ("Liberty"). See Item 5 below.</div></div><table><tr><td class="center"><br><br><p><div align="center" style="font-size:1.2em;">
+									SCHEDULE 13D
+								</div></p></td></tr></table><table role="presentation" class="tableClass" id="cusipNumber"><tr class="tableClass"><td width="25%" style="font-weight:bold;">CUSIP No.</td><td width="75%"><div style="font-size:.9em; color:#000000">855919106</div></td></tr></table><br><br><table role="presentation" class="tableClass" id="reportingPersonDetails"><tr class="tableClass"><td width="8%" class="tableClassValign">1</td><td width="92%" class="tableClass">
+					Name of reporting person
+					<br><br><div class="text">Discovery Lightning Investments Ltd.</div></td></tr><tr><td width="8%" class="tableClassValign">2</td><td width="92%" class="tableClass">Check the appropriate box if a member of a Group (See Instructions)
+					<br><br><div class="text"><img src="/Images/box-unchecked.jpg" alt="Checkbox not checked">  (a)
+						<br><img src="/Images/box-checked.jpg" alt="Checkbox checked">  (b)
+					</div></td></tr><tr class="tableClassWithBgBlack"><td width="8%" class="tableClassValign">3</td><td width="92%" class="tableClass">SEC use only</td></tr><tr><td width="8%" class="tableClassValign">4</td><td width="92%" class="tableClass">
+					Source of funds (See Instructions)
+					<br><br><div class="text">WC</div></td></tr><tr><td width="8%" class="tableClassValign">5</td><td width="92%" class="tableClass">
+					Check if disclosure of legal proceedings is required pursuant to Items 2(d) or 2(e)
+					<br><br><img src="/Images/box-unchecked.jpg" alt="Checkbox not checked"></td></tr><tr><td width="8%" class="tableClassValign">6</td><td width="92%" class="tableClass">Citizenship or place of organization
+					<br><br><div class="text">
+				UNITED KINGDOM
+			</div></td></tr><tr><td width="8%" class="tableClassValign">Number of Shares Beneficially Owned by Each Reporting Person With:</td><td width="92%" class="tableClass"><table class="innerTableClass"><tr><td width="8%" class="innerTableClassRightValign">7</td><td width="92%" class="tableClassInnerLeft">Sole Voting Power
+								<br><br><div class="text">353,334.00</div></td></tr><tr><td width="8%" class="innerTableClassRightValign">8</td><td width="92%" class="tableClassInnerLeft">Shared Voting Power
+								<br><br><div class="text">0.00</div></td></tr><tr><td width="8%" class="innerTableClassRightValign">9</td><td width="92%" class="tableClassInnerLeft">Sole Dispositive Power
+								<br><br><div class="text">353,334.00</div></td></tr><tr><td width="8%" class="innerTableClassRightValignBottomLess">10</td><td width="92%" class="tableClassInnerLeftBottomLess">Shared Dispositive Power
+								<br><br><div class="text">0.00</div></td></tr></table></td></tr><tr><td width="8%" class="tableClassValign">11</td><td width="92%" class="tableClass">Aggregate amount beneficially owned by each reporting person
+					<br><br><div class="text">353,334.00</div></td></tr><tr><td width="8%" class="tableClassValign">12</td><td width="92%" class="tableClass">Check if the aggregate amount in Row (11) excludes certain shares (See Instructions)
+					<br><br><img src="/Images/box-checked.jpg" alt="Checkbox checked"></td></tr><tr><td width="8%" class="tableClassValign">13</td><td width="92%" class="tableClass">Percent of class represented by amount in Row (11)
+					<br><br><div class="text">2.1 % </div></td></tr><tr><td width="8%" class="tableClassValign">14</td><td width="92%" class="tableClass">Type of Reporting Person (See Instructions)
+					<br><br><div class="text">CO</div></td></tr></table><br><div style="display: flex;"><div style="font-size: 0.9em; font-weight: bold; margin-right: 5px;">
+					Comment for Type of Reporting Person:
+				</div><div class="largetext" style="text-align:justify">All percentages are based on 16,721,810 Common Shares outstanding as of May 6, 2025 following the completion of the Transactions.
+
+The beneficial ownership information set forth above does not include any securities of the Issuer beneficially owned by certain funds affiliated with MHR Fund Management or their affiliates, including Mark H. Rachesky, M.D., Liberty Parent or Liberty. See Item 5 below.</div></div></div><div class="form1"><table><tr><td class="center"><br><br><p><div align="center" style="font-size:1.2em;">
+									SCHEDULE 13D
+								</div></p></td></tr></table><table role="presentation" id="item1to7"><tr><td width="8%" class="tableClassValignNoBorder">Item 1.</td><td width="92%" class="tableClassNoBorder">Security and Issuer</td></tr><tr class="tableClass"><td width="8%" class="tableClassNoBorderAlignCenter">(a)</td><td width="92%" class="tableClassNoBorder">Title of Class of Securities:
+							<br><br><div class="text">Common Shares, no par value.</div></td></tr><tr class="tableClass"><td width="8%" class="tableClassNoBorderAlignCenter">(b)</td><td width="92%" class="tableClassNoBorder">Name of Issuer:
+							<br><br><div class="text">Starz Entertainment Corp.</div></td></tr><tr><td width="8%" class="tableClassNoBorderAlignCenter">(c)</td><td width="92%" class="tableClassNoBorder">Address of Issuer's Principal Executive Offices:
+							<br><br><div class="text">250 Howe Street, 20th Floor, Vancouver, 
+				BRITISH COLUMBIA, CANADA
+			, V6C 3R8.</div></td></tr><tr><td colspan="3"><div style="display: flex;"><div style="font-size: 0.9em; font-weight: bold; margin-right: 5px;">
+									Item 1 Comment:
+								</div><div class="largetext" style="text-align:justify">This Amendment No. 6 to Schedule 13D is being filed jointly by Warner Bros. Discovery, Inc. (f/k/a Discovery, Inc.) ("WBD") and Discovery Lightning Investments Ltd. ("DLI") (collectively, the "Reporting Persons", and each, a "Reporting Person") to amend and supplement the Schedule 13D (the "Schedule 13D") filed by the original Reporting Persons on November 20, 2015, as amended by Amendment No. 1, filed on July 1, 2016, Amendment No. 2, filed on February 10, 2017, Amendment No. 3, filed on August 30, 2019, Amendment No. 4, filed on March 26, 2020, and Amendment No. 5, filed on December 17, 2021. This Amendment No. 6 to Schedule 13D is being filed to report the acquisition of Common Shares in connection with the completion of the Transactions described in Item 4 of this Schedule 13D.</div></div></td></tr><tr><td width="8%" class="tableClassValignNoBorder">Item 2.</td><td width="92%" class="tableClassNoBorder">Identity and Background</td></tr><tr></tr><tr class="tableClass"><td width="8%" class="tableClassNoBorderAlignCenter">(a)</td><td width="92%" class="tableClassNoBorder"><div class="largetext">Warner Bros. Discovery, Inc.
+Discovery Lightning Investments Ltd.
+
+The agreement among the Reporting Persons relating to the joint filing of this Schedule 13D is filed as Exhibit 99.1 hereto.</div></td></tr><tr><td width="8%" class="tableClassNoBorderAlignCenter">(b)</td><td width="92%" class="tableClassNoBorder"><div class="largetext">The principal business address of WBD is 230 Park Avenue South, New York, New York 10003.
+The principal business address of DLI is Chiswick Park Building 2, 566 Chiswick High Road, London, United Kingdom W4 5YB.</div></td></tr><tr><td width="8%" class="tableClassNoBorderAlignCenter">(c)</td><td width="92%" class="tableClassNoBorder"><div class="largetext">WBD is a global media company, and DLI holds investments in the Issuer. Information regarding the officers and directors of WBD and DLI is set forth on Annex A hereto and is incorporated herein by reference.</div></td></tr><tr><td width="8%" class="tableClassNoBorderAlignCenter">(d)</td><td width="92%" class="tableClassNoBorder"><div class="largetext">None of the Reporting Persons has, during the last five years, been convicted in a criminal proceeding (excluding traffic violations or similar misdemeanors).</div></td></tr><tr><td width="8%" class="tableClassNoBorderAlignCenter">(e)</td><td width="92%" class="tableClassNoBorder"><div class="largetext">None of the Reporting Persons has, during the last five years, been a party to a civil proceeding of a judicial or administrative body of competent jurisdiction and as a result of such proceeding was or is subject to a judgment, decree or final order enjoining future violations of, or prohibiting or mandating activities subject to, federal or state securities laws or finding any violation with respect to such laws.</div></td></tr><tr><td width="8%" class="tableClassNoBorderAlignCenter">(f)</td><td width="92%" class="tableClassNoBorder"><div class="largetext">The jurisdiction of organization for WBD is the U.S.A.
+The jurisdiction of organization for DLI is the United Kingdom.</div></td></tr><tr><td width="8%" class="tableClassValignNoBorder">Item 3.</td><td width="92%" class="tableClassNoBorder">Source and Amount of Funds or Other Consideration</td></tr><tr><td width="8%" class="tableClassNoBorderAlignCenter"> </td><td width="92%" class="tableClassNoBorder"><div class="largetext">Item 3 is hereby amended by adding the following to the end thereof:
+
+As further described in Item 4 below, the Common Shares reported herein were issued to DLI in connection with the completion of the Transactions in exchange for their existing shares in Lions Gate Entertainment Corp. ("LGEC"). In connection with the completion of the Transactions, the Issuer changed its name from Lions Gate Entertainment Corp. to Starz Entertainment Corp.
+
+The information set forth in Item 6 of this Schedule 13D is incorporated herein by reference.</div></td></tr><tr><td width="8%" class="tableClassValignNoBorder">Item 4.</td><td width="92%" class="tableClassNoBorder">Purpose of Transaction</td></tr><tr><td width="8%" class="tableClassNoBorderAlignCenter"> </td><td width="92%" class="tableClassNoBorder"><div class="largetext">Item 4 is hereby amended to read in its entirety as follows:
+
+On May 6, 2025, the Issuer completed the separation of the businesses of Lionsgate Studios Corp. ("LG Studios"), which encompasses its motion picture and television studio operations (the "LG Studios Business"), from the other businesses of the Issuer, including the STARZ-branded premium subscription platforms (the "Starz Business"), through a series of transactions (the "Transactions") that resulted in the Reporting Persons owning shares in two separately traded public companies: (1) the Issuer, which holds, directly and through subsidiaries, the Starz Business and (2) LG Studios, which holds, directly and through subsidiaries, the LG Studios Business.
+
+In connection with the completion of the Transactions, among other things:
+-	LGEC shareholders, including DLI, first received, in exchange for each outstanding Class A voting share of LGEC, without par value ("LGEC Class A Shares"), that they held:
+
+o	One (1) LG Studios Class A voting common share, without par value ("LG Studios Class A Shares"); and
+o	One (1) LG Studios Class C preferred share, with one-half (1/2) of a vote per share, without par value ("LG Studios Class C Preferred Shares").
+
+-	LGEC shareholders, including DLI, first received, in exchange for each outstanding Class B non-voting share of LGEC, without par value ("LGEC Class B Shares"), that they held:
+
+o	One (1) LG Studios Class B non-voting common share, without par value ("LG Studios Class B Shares"); and
+o	One (1) LG Studios Class C Preferred Share.
+
+Such exchange transactions by LGEC shareholders are collectively referred to as the "Initial Share Exchange."
+
+-	LGEC changed its name to Starz Entertainment Corp. and created a new class of voting Common Shares.
+
+-	LG Studios created a new class of common shares, without par value ("LG Studios Common Shares") and LG Studios shareholders (formerly LGEC shareholders, including DLI) received, in exchange for each:
+
+o	LG Studios Class A Share they held, together with each LG Studios Class C Preferred Share they held and which was issued in exchange for an LGEC Class A Share in the Initial Share Exchange, one and twelve one-hundredths (1.12) LG Studios Common Shares and one and twelve one-hundredths (1.12) Common Shares; and
+o	LG Studios Class B Share they held, together with each LG Studios Class C Preferred Share they held and which was issued in exchange for an LGEC Class B Share in the Initial Share Exchange, one (1) LG Studios Common Share and one (1) Common Share.
+
+Such exchange transactions by LGEC shareholders are collectively referred to as the "Second Share Exchange."
+
+-	Following the Second Share Exchange, the Common Shares were consolidated on a 15-to-1 basis, such that every fifteen (15) Common Shares were consolidated into one (1) Common Share (the "Reverse Stock Split").
+
+As a result of the Transactions, DLI received 353,334 Common Shares in exchange for interests in securities of the Issuer held prior to the Transactions.
+
+The Reporting Persons acquired beneficial ownership of the Common Shares described in this Schedule 13D for investment purposes. Pursuant to the terms of the Investor Rights Agreement (as defined and described in Item 6 below) entered into in connection with the completion of the Transactions, WBD has the right to nominate a member of the board of directors of the Issuer (the "Board"). On May 6, 2025, Mr. Marc Graboff was appointed as a member of the Board as a designee of WBD pursuant to the Investor Rights Agreement. The description of the Investor Rights Agreement in Item 6 of this Schedule 13D is incorporated herein by reference.
+
+Consistent with the Reporting Persons' investment purposes, subject to the terms of the Voting Agreement (as defined and described in Item 6 below), the Reporting Persons may engage in communications with, without limitation, management of the Issuer, one or more members of the Board or other relevant parties, and may make suggestions concerning the Issuer's operations, prospects, business and financial strategies, strategic direction and transactions, assets and liabilities, business and financing alternatives, future plans of the Issuer and such other matters as the Reporting Persons may deem relevant to their investment in the Common Shares. The description of the Voting Agreement in Item 6 of this Schedule 13D is incorporated herein by reference.
+
+Subject to the terms of the Voting Agreement, depending on various factors, including but not limited to the Issuer's business, prospects, financial position and strategic direction, actions taken by the Board, other investment opportunities available to the Reporting Persons, conditions in the securities markets, and general economic and industry conditions, the Reporting Persons may take any actions with respect to their investment in the Issuer as they deem appropriate. The Reporting Persons intend to review their investment continually and evaluate on an ongoing basis various alternatives that are or may become available with respect to the Issuer and its securities. Subject to the terms of the Voting Agreement, the Reporting Persons may from time to time acquire additional equity or debt securities or other instruments of the Issuer or dispose of such equity or debt securities or other instruments in any amount that the Reporting Persons may determine in their sole discretion, through open market transactions, privately negotiated transactions or otherwise. The Reporting Persons reserve the right to change their purpose and to formulate and implement plans or proposals with respect to the Issuer at any time and from time to time. The Reporting Persons may also take steps to explore and prepare for various plans and actions, and propose transactions, before forming an intention to engage in such plans or actions or proceed with such transactions. Subject to the terms of the Voting Agreement, any such action may be taken or advocated by the Reporting Persons alone or in conjunction with other shareholders, potential acquirers, financing sources and/or other third parties, and could include one or more purposes, plans or proposals that relate to or would result in any of the transactions, matters or effects enumerated in Items 4(a) through (j) of Schedule 13D. Any actions taken by the Reporting Persons shall at all times be consistent with their obligations under the Voting Agreement.
+
+Except as set forth above, the Reporting Persons have no plans or proposals with respect to the Issuer.</div></td></tr><tr><td width="8%" class="tableClassValignNoBorder">Item 5.</td><td width="92%" class="tableClassNoBorder">Interest in Securities of the Issuer</td></tr><tr><td width="8%" class="tableClassNoBorderAlignCenter">(a)</td><td width="92%" class="tableClassNoBorder"><div class="largetext">Item 5 is hereby amended to read in its entirety as follows:
+
+The responses of each of the Reporting Persons with respect to Rows 11, 12, and 13 of the cover pages of this Schedule 13D that relate to the aggregate number and percentage of Common Shares (including but not limited to footnotes to such information) are incorporated herein by reference.
+
+The responses of each of the Reporting Persons with respect to Rows 7, 8, 9, and 10 of the cover pages of this Schedule 13D that relate to the number of Common Shares as to which each of the persons or entities referenced in Item 2 above has sole or shared power to vote or to direct the vote of and sole or shared power to dispose of or to direct the disposition of (including but not limited to footnotes to such information) are incorporated herein by reference.
+
+DLI holds 353,334 Common Shares directly. Because DLI is an indirect wholly owned subsidiary of WBD, WBD may be deemed to beneficially own the 353,334 Common Shares held directly by DLI, and share voting and investment power over such shares.
+
+DLI is required to vote the Common Shares beneficially owned by it in respect of certain matters in accordance with the Voting Agreement. See the description of the Voting Agreement in Item 6 of this Schedule 13D, which is incorporated herein by reference. DLI is also subject to restrictions on the sale of its Common Shares pursuant to the Investor Rights Agreement. See the description of the Investor Rights Agreement in Item 6 of this Schedule 13D, which is incorporated herein by reference.
+
+The beneficial ownership information set forth above does not include any securities of the Issuer beneficially owned by certain funds affiliated with MHR Fund Management or their affiliates, including Mark H. Rachesky, M.D., Liberty Parent or Liberty. As a result of the agreements described in Item 6 of this Schedule 13D, the Reporting Persons may be deemed to beneficially own and share voting power over the Common Shares owned by the funds affiliated with MHR Fund Management, Liberty and certain of their affiliates.
+
+Based on Amendment No. 31 to Schedule 13D, filed with the Securities and Exchange Commission (the "SEC") on the date hereof, by MHR Institutional Partners III LP, MHR Institutional Advisors III LLC, MHR Fund Management, MHR Holdings LLC and Mark H. Rachesky, M.D., various funds affiliated with MHR Fund Management and Mark H. Rachesky, M.D. beneficially own an aggregate of 2,524,510 Common Shares (approximately 15.1% of the total number of Common Shares outstanding).
+
+Based on Amendment No. 10 to Schedule 13D, filed with the SEC on the date hereof, by Liberty and Liberty Parent, Liberty directly owns an aggregate of 469,065 Common Shares (approximately 2.8% of the total number of Common Shares outstanding). Liberty is a wholly owned subsidiary of Liberty Parent.</div></td></tr><tr><td width="8%" class="tableClassNoBorderAlignCenter">(b)</td><td width="92%" class="tableClassNoBorder"><div class="largetext">The information provided in Item 5(a) of this Schedule 13D is incorporated herein by reference.</div></td></tr><tr><td width="8%" class="tableClassNoBorderAlignCenter">(c)</td><td width="92%" class="tableClassNoBorder"><div class="largetext">Except as otherwise set forth in this Schedule 13D, each of the Reporting Persons reports that neither it, nor to its knowledge, any other person named in Item 2 of the Schedule 13D, has effected any transactions in Common Shares during the past 60 days.</div></td></tr><tr><td width="8%" class="tableClassNoBorderAlignCenter">(d)</td><td width="92%" class="tableClassNoBorder"><div class="largetext">Not applicable.</div></td></tr><tr><td width="8%" class="tableClassNoBorderAlignCenter">(e)</td><td width="92%" class="tableClassNoBorder"><div class="largetext">Not applicable.</div></td></tr><tr><td width="8%" class="tableClassValignNoBorder">Item 6.</td><td width="92%" class="tableClassNoBorder">Contracts, Arrangements, Understandings or Relationships With Respect to Securities of the Issuer</td></tr><tr><td width="8%" class="tableClassNoBorderAlignCenter"> </td><td width="92%" class="tableClassNoBorder"><div class="largetext">Item 6 is hereby amended by adding the following to the end thereof:
+
+Investor Rights Agreement.
+
+On May 6, 2025, WBD and DLI entered into an investor rights agreement (the "Investor Rights Agreement") with the Issuer, Liberty Parent, Liberty, MHR Fund Management and affiliates of MHR Fund Management. The Investor Rights Agreement provides that (1) for so long as funds affiliated with MHR Fund Management beneficially own at least 10,000,000 Common Shares (prior to the Reverse Stock Split and as adjusted for any stock split, stock dividend, reverse stock split or similar event) in the aggregate, the Issuer will include three designees of MHR Fund Management (at least one of whom will be an independent director and will be subject to Board approval) on its slate of director nominees for election at each future annual meeting of the Issuer's shareholders, (2) for so long as funds affiliated with MHR Fund Management beneficially own at least 7,500,000, but less than 10,000,000, Common Shares (prior to the Reverse Stock Split and as adjusted for any stock split, stock dividend, reverse stock split or similar event) in the aggregate, the Issuer will include two designees of MHR Fund Management on its slate of director nominees for election at each future annual meeting of the Issuer's shareholders and (3) for so long as funds affiliated with MHR Fund Management beneficially own at least 5,000,000, but less than 7,500,000, Common Shares (prior to the Reverse Stock Split and as adjusted for any stock split, stock dividend, reverse stock split or similar event) in the aggregate, the Issuer will include one designee of MHR Fund Management on its slate of director nominees for election at each future annual meeting of the Issuer's shareholders. Mark H. Rachesky, M.D., the Chairman of the Board, and Ms. Fine count as designees of MHR Fund Management.
+
+In addition, the Investor Rights Agreement provides that (1) for so long as Liberty Parent and WBD (together with certain of their affiliates) beneficially own at least 10,000,000 Common Shares (prior to the Reverse Stock Split and as adjusted for any stock split, stock dividend, reverse stock split or similar event) in the aggregate, the Issuer will include one designee of Liberty Parent and one designee of WBD on its slate of director nominees for election at each future annual meeting of the Issuer's shareholders and (2) for so long as Liberty Parent and WBD (together with certain of their affiliates) beneficially own at least 5,000,000, but less than 10,000,000, Common Shares (prior to the Reverse Stock Split and as adjusted for any stock split, stock dividend, reverse stock split or similar event) in the aggregate, the Issuer will include one designee of Liberty Parent and WBD, collectively, on its slate of director nominees for election at each future annual meeting of the Issuer's shareholders, selected by (a) Liberty Parent, if Liberty Parent (together with certain of its affiliates) individually exceeds such 5,000,000 Common Shares threshold but WBD (together with certain of its affiliates) does not, (b) WBD, if WBD (together with certain of its affiliates) individually exceeds such 5,000,000 Common Shares threshold but Liberty Parent (together with certain of its affiliates) does not and (c) Liberty Parent and WBD, jointly, if neither Liberty Parent nor WBD (together with certain of their affiliates) individually exceeds such 5,000,000 Common Shares threshold. Mr. Graboff counts as a designee of WBD and Mr. Mann counts as a designee of Liberty Parent.
+
+Under the Investor Rights Agreement, Liberty Parent and WBD (together with certain of their affiliates) have agreed that if they sell or transfer any of their Common Shares to a shareholder or group of shareholders that beneficially own 5% or more of the Common Shares, or that would result in a person or group of persons beneficially owning 5% or more of the Common Shares, any such transferee would have to agree to the transfer and voting provisions set forth in the Investor Rights Agreement, subject to certain exceptions set forth in the Investor Rights Agreement.
+
+The Issuer has also agreed to provide Liberty Parent, WBD and MHR Fund Management with certain pre-emptive rights on Common Shares that the Issuer may issue in the future for cash consideration.
+
+Upon execution of the Investor Rights Agreement, the existing Investor Rights Agreement, dated as of November 10, 2015 and as amended from time to time, was automatically terminated and of no further force or effect.
+The foregoing description of the Investor Rights Agreement does not purport to be complete and is qualified in its entirety by reference to the full text of the Investor Rights Agreement, which is attached hereto as Exhibit 99.12 and incorporated herein by reference.
+
+Voting Agreement.
+
+On May 6, 2025, WBD and DLI entered into a voting agreement with the Issuer, Liberty Parent, Liberty, MHR Fund Management and certain affiliates of MHR Fund Management (the "Voting Agreement"). Under the Voting Agreement, Liberty Parent and WBD have agreed to vote, in any vote of the Issuer's shareholders on a merger, amalgamation, plan of arrangement, consolidation, business combination, third party tender offer, asset sale or other similar transaction involving the Issuer or any of the Issuer's subsidiaries (and any proposal relating to the issuance of capital, increase in the authorized capital or, subject to certain exceptions, any amendment to any constitutional documents in connection with any of the foregoing), all of the Common Shares beneficially owned by them (together with certain of their affiliates) in excess of 18.5% of the Issuer's outstanding voting power in the aggregate in the same proportion as the votes cast by shareholders other than Liberty Parent and WBD (together with certain of their affiliates). Although the Common Shares beneficially owned by each of DLI and Liberty will be aggregated for purposes of determining compliance with such ownership restrictions, the Reporting Persons do not have any agreement with Liberty regarding such limitation.
+
+In addition, each of Liberty Parent, WBD and MHR Fund Management (together with certain of their affiliates) has agreed that as long as any of them have the right to nominate at least one representative to the Board, each of them will vote all of Common Shares owned by them (together with certain of their affiliates) in favor of each of the other's respective director nominees, subject to certain exceptions set forth in the Voting Agreement.
+
+Under the Voting Agreement, Liberty Parent and WBD (together with certain of their affiliates) have also agreed that if they sell or transfer any of their Common Shares to a shareholder or group of shareholders that beneficially own 5% or more of the Common Shares, or that would result in a person or group of persons beneficially owning 5% or more of the Common Shares, any such transferee would have to agree to the transfer and voting provisions set forth in the Voting Agreement, subject to certain exceptions set forth in the Voting Agreement.
+
+Upon execution of the Voting Agreement, the existing Voting and Standstill Agreement, dated as of November 10, 2015 and as amended from time to time, was automatically terminated and of no further force or effect.
+The foregoing description of the Voting Agreement does not purport to be complete and is qualified in its entirety by reference to the full text of the Voting Agreement, which is attached hereto as Exhibit 99.13 and incorporated herein by reference.
+
+Registration Rights Agreement.
+
+On May 6, 2025, DLI entered into a registration rights agreements with the Issuer (the "Registration Rights Agreement"), which provides DLI (together with certain of their affiliates) with certain registration rights, subject to the terms and conditions set forth therein. Among other things, DLI will be entitled to two demand registration rights to request that the Issuer register all or a portion of its Common Shares. In addition, in the event that the Issuer proposes to register any of the Issuer's equity securities or securities convertible into or exchangeable for the Issuer's equity securities, either for the Issuer's own account or for the account of other security holders, DLI will be entitled to certain "piggyback" registration rights allowing them to include their shares in such registration, subject to customary limitations. As a result, whenever the Issuer proposes to file a registration statement under the Securities Act of 1933, as amended, other than with respect to a registration statement on Forms S-4 or S-8 or certain other exceptions, DLI will be entitled to notice of the registration and have the right, subject to certain limitations, to include their shares in the registration.
+
+The registration rights described above will terminate on the first anniversary of the date that DLI (together with certain of its affiliates) both (i) beneficially owns less than 334,436 Common Shares, subject to equitable adjustment (which amount, for the avoidance of doubt, represents approximately 2% of the Common Shares outstanding as of May 7, 2025), and (ii) ceases to have a designated representative on the Board. Liberty has entered into a similar registration rights agreement with the Issuer.
+
+Upon execution of the Registration Rights Agreement, the existing Registration Rights Agreement, dated as of November 10, 2015, was automatically terminated and of no further force or effect.
+
+The foregoing description of the Registration Rights Agreement does not purport to be complete and is qualified in its entirety by reference to the full text of the Registration Rights Agreement, which is attached hereto as Exhibit 99.14 and incorporated herein by reference.</div></td></tr><tr><td width="8%" class="tableClassValignNoBorder">Item 7.</td><td width="92%" class="tableClassNoBorder">Material to be Filed as Exhibits.</td></tr><tr><td width="8%" class="tableClassNoBorderAlignCenter"> </td><td width="92%" class="tableClassNoBorder"><div class="largetext">Item 7 is hereby amended by adding the following exhibits in appropriate numerical order.
+
+99.1.6	Joint Filing Agreement, dated as of May 8, 2025, by and between Warner Bros. Discovery, Inc. and Discovery Lightning Investments Ltd.
+99.11	Annex A, dated May 8, 2025.
+99.12	Investor Rights Agreement, dated as of May 6, 2025, by and among Starz Entertainment Corp., MHR Fund Management LLC, Liberty Global Ventures Limited, Discovery Lightning Investments Ltd., Liberty Global Ltd., Warner Bros. Discovery, Inc. and affiliates of MHR Fund Management LLC (incorporated herein by reference to Exhibit 10.13 to the Current Report on Form 8-K of the Issuer filed with the SEC on May 7, 2025).
+99.13	Voting Agreement, dated as of May 6, 2025, by and among Starz Entertainment Corp., Liberty Global Ventures Limited, Discovery Lightning Investments Ltd., MHR Fund Management LLC, Liberty Global Ltd., Warner Bros. Discovery, Inc. and affiliates of MHR Fund Management LLC (incorporated herein by reference to Exhibit 10.9 to the Current Report on Form 8-K of the Issuer filed with the SEC on May 7, 2025).
+99.14	Registration Rights Agreement, dated as of May 6, 2025, by and between Starz Entertainment Corp. and Discovery Lightning Investments Ltd. (incorporated herein by reference to Exhibit 10.11 to the Current Report on Form 8-K of the Issuer filed with the SEC on May 7, 2025).</div></td></tr></table><br></div><div class="form1"><table role="presentation" id="signatureInfo"><tr><td width="8%" class="tableClassValignNoBorder">    SIGNATURE</td><td width="92%" class="tableClassNoBorder"> </td></tr><tr><td width="8%" class="tableClassNoBorderAlignCenter"> </td><td width="92%" class="tableClassNoBorder"><div class="information" style="text-align:justify">
+						After reasonable inquiry and to the best of my knowledge and belief, I certify that the information set forth in this statement is true, complete and correct.
+						<br><br></div></td></tr></table><table><tr class="tableClass"><td width="50%" class="tableClassNoBorder"> </td><td width="50%" class="tableClassNoBorder"><table><tr class="tableClass"><td width="100%" class="tableClassInnerNoBorderBlue"><div class="text">Warner Bros. Discovery, Inc.</div></td></tr></table></td></tr></table><table><tr class="tableClass"><td width="50%" class="tableClassNoBorder"> </td><td width="50%" class="tableClassNoBorder"><table><tr class="tableClass"><td width="8%" class="tableClassNoBorderAlignLeft signature">Signature:</td><td width="92%" class="tableClassNoBorderBlue signature">/s/ Tara L. Smith</td></tr><tr class="tableClass"><td width="8%" class="tableClassNoBorderAlignLeft signature">Name/Title:</td><td width="92%" class="tableClassNoBorderBlue signature">Tara L. Smith, Executive Vice President and Corporate Secretary</td></tr><tr class="tableClass"><td width="8%" class="tableClassNoBorderAlignLeft signature">Date:</td><td width="92%" class="tableClassNoBorderBlue signature">05/08/2025</td></tr></table></td></tr></table><table><tr class="tableClass"><td width="50%" class="tableClassNoBorder"> </td><td width="50%" class="tableClassNoBorder"><table><tr class="tableClass"><td width="100%" class="tableClassInnerNoBorderBlue"><div class="text">Discovery Lightning Investments Ltd.</div></td></tr></table></td></tr></table><table><tr class="tableClass"><td width="50%" class="tableClassNoBorder"> </td><td width="50%" class="tableClassNoBorder"><table><tr class="tableClass"><td width="8%" class="tableClassNoBorderAlignLeft signature">Signature:</td><td width="92%" class="tableClassNoBorderBlue signature">*</td></tr><tr class="tableClass"><td width="8%" class="tableClassNoBorderAlignLeft signature">Name/Title:</td><td width="92%" class="tableClassNoBorderBlue signature">Roanne Weekes, Director</td></tr><tr class="tableClass"><td width="8%" class="tableClassNoBorderAlignLeft signature">Date:</td><td width="92%" class="tableClassNoBorderBlue signature">05/08/2025</td></tr></table></td></tr></table><table><tr class="tableClass" colspan="2"><td width="100%" class="tableClassNoBorder"><div style="display: flex;"><div style="font-size: 0.9em; font-weight: bold; margin-right: 5px;">
+							Comments accompanying signature:
+						</div><div class="text" style="text-align:justify;">*	The undersigned, by signing her name hereto, executes this Schedule 13D pursuant to the Limited Power of Attorney executed on behalf of Ms. Weekes and filed herewith.
+By:       /s/ Tara L. Smith
+Name: Tara L. Smith
+Title:    Attorney-in-Fact</div></div></td></tr></table></div></div>
+
+<script type="text/javascript"  src="/hEyxvy/tDTQ/C5W/N8y/CEN74LRlKz4/wYOaNzSVtcwhtffaf7/U3FqJk0lAg/cDg9eQ/IuTns"></script></body></html>

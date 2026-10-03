@@ -2,7 +2,7 @@
 
 **As of:** 2026-07-28
 
-**Price:** $249.99
+**Price:** $250.88
 
 **Decision:** watch_pending_owner_review
 
@@ -16,7 +16,7 @@
 | Capex intensity and competition reserve | midcycle_capacity_value | $-60.00 | $-20.00 | $-5.00 |
 | **Total** |  | **$35.31** | **$187.42** | **$356.24** |
 
-Base value versus price: **-25.0%**. Current or contracted operating and financial assets support approximately **$187.42** per share; the market asks investors to pay another **$62.57** for growth, inventory, projects, or scarcity.
+Base value versus price: **-25.3%**. Current or contracted operating and financial assets support approximately **$187.42** per share; the market asks investors to pay another **$63.46** for growth, inventory, projects, or scarcity.
 
 
 ## Economic value versus accounting value
@@ -55,7 +55,7 @@ A complete comparable NAV is not asserted; comparable marks are used only where 
 
 ## What the price implies
 
-At the stated terminal multiple, the price requires approximately **6.6%** constant annual owner-cash growth for seven years. Constant 7-year owner-cash growth with a 24x terminal owner-cash multiple; diagnostic, not forecast.
+At the stated terminal multiple, the price requires approximately **6.7%** constant annual owner-cash growth for seven years. Constant 7-year owner-cash growth with a 24x terminal owner-cash multiple; diagnostic, not forecast.
 
 ## Entry prices by required return
 
