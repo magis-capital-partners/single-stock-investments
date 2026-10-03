@@ -26,6 +26,14 @@ inputs:
     description: LLM usage policy consumer (research, contract backfill, or epistemic forecast)
     required: false
     default: "marvin_research"
+  existing_pr:
+    description: Open pull request number for this ticker, when one already exists
+    required: false
+    default: ""
+  existing_branch:
+    description: Head branch of that open pull request
+    required: false
+    default: ""
 
 runs:
   using: composite
@@ -101,6 +109,8 @@ runs:
         RESEARCH_EVIDENCE_MANIFEST: ${{ inputs.evidence_manifest }}
         RESEARCH_EVIDENCE_MANIFEST_JSON: ${{ inputs.evidence_manifest_json }}
         GITHUB_REPOSITORY: ${{ env.GITHUB_REPOSITORY }}
+        EXISTING_PR_NUMBER: ${{ inputs.existing_pr }}
+        EXISTING_PR_BRANCH: ${{ inputs.existing_branch }}
       run: node _system/scripts/marvin_deep_dive.mjs
 
     - name: Record research call outcome

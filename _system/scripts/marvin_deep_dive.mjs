@@ -21,6 +21,8 @@ const ticker = process.env.TICKER?.trim();
 const apiKey = process.env.CURSOR_API_KEY?.trim();
 const repo = process.env.GITHUB_REPOSITORY?.trim();
 const startingRef = process.env.CURSOR_STARTING_REF?.trim();
+const existingPr = process.env.EXISTING_PR_NUMBER?.trim();
+const existingBranch = process.env.EXISTING_PR_BRANCH?.trim();
 const pickReason = process.env.PICK_REASON?.trim() || "scheduled";
 const evidenceHash = process.env.RESEARCH_EVIDENCE_HASH?.trim();
 const evidenceManifest = process.env.RESEARCH_EVIDENCE_MANIFEST?.trim();
@@ -77,6 +79,12 @@ Evidence manifest:
 \`\`\`json
 ${evidenceManifestJson || "{}"}
 \`\`\`
+${existingBranch ? `
+**Existing pull request #${existingPr || "?"} on branch \`${existingBranch}\`.**
+This ticker already has one open pull request. Start from that branch and push
+every commit to \`${existingBranch}\`. Do not open a second pull request.
+If the platform opens one anyway, leave it; the dispatcher folds it back.
+` : ""}
 `;
 
 const repoUrl = `https://github.com/${repo}`;
@@ -84,10 +92,12 @@ const maxStartupAttempts = 3;
 const retryDelaysMs = [15_000, 45_000];
 
 console.log(`Starting Marvin deep dive for ${ticker} on ${repoUrl}...`);
-console.log(`Starting ref: ${startingRef || "(Cursor default branch)"}`);
+console.log(`Starting ref: ${existingBranch || startingRef || "(Cursor default branch)"}`);
+if (existingBranch) console.log(`Continuing PR #${existingPr} on ${existingBranch}`);
 console.log(`HK_PDFS_ROOT (cloud): ${hkPdfsRoot}`);
 console.log(`Model: ${modelId}`);
-const repoSpec = startingRef ? { url: repoUrl, startingRef } : { url: repoUrl };
+const ref = existingBranch || startingRef;
+const repoSpec = ref ? { url: repoUrl, startingRef: ref } : { url: repoUrl };
 
 for (let attempt = 1; attempt <= maxStartupAttempts; attempt += 1) {
   try {

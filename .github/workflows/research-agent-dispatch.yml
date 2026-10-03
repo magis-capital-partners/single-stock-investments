@@ -31,7 +31,7 @@ on:
         required: false
 
 permissions:
-  contents: read
+  contents: write
   pull-requests: write
 
 jobs:
@@ -46,6 +46,8 @@ jobs:
       evidence_hash: ${{ steps.select.outputs.evidence_hash }}
       primary_evidence_count: ${{ steps.select.outputs.primary_evidence_count }}
       manifest_json: ${{ steps.select.outputs.manifest_json }}
+      existing_pr: ${{ steps.select.outputs.existing_pr }}
+      existing_branch: ${{ steps.select.outputs.existing_branch }}
     steps:
       - uses: actions/checkout@v4
         with:
@@ -109,14 +111,19 @@ jobs:
           HASH=$(python -c "import json; print(json.load(open('manifest.json'))['evidence_hash'])")
           PRIMARY_COUNT=$(python -c "import json; print(json.load(open('manifest.json'))['artifact_count'])")
           MANIFEST=$(python -c "import json; print(json.dumps(json.load(open('manifest.json')), separators=(',', ':')))")
-          # Count only non-conflicting cursor PRs. Dirty/conflicted agent PRs do not
-          # represent active research capacity and must not block new admissions.
-          # GitHub may report mergeability as UNKNOWN while it recomputes a PR.
-          # Count only positively mergeable work; UNKNOWN and already-conflicted
-          # branches do not represent usable agent capacity.
-          OPEN_CURSOR_COUNT=$(gh pr list --repo "$GITHUB_REPOSITORY" --state open --limit 100 --json headRefName,mergeable,mergeStateStatus --jq '[.[] | select(.headRefName|startswith("cursor/")) | select((.mergeable == "MERGEABLE") and (.mergeStateStatus != "DIRTY"))] | length')
+          # Every open cursor/* PR counts, including dirty and draft ones.
+          # A second PR for the same ticker is what moved main under the queue.
+          gh pr list --repo "$GITHUB_REPOSITORY" --state open --limit 100 --json number,headRefName,title > open_prs.json
+          OPEN_CURSOR_COUNT=$(python _system/scripts/cursor_pr_slot.py count open_prs.json)
+          SLOT=$(python _system/scripts/cursor_pr_slot.py match "$TICKER" open_prs.json || true)
+          EXISTING_PR=""
+          EXISTING_BRANCH=""
+          if [ -n "$SLOT" ]; then
+            EXISTING_PR="${SLOT%%$'\t'*}"
+            EXISTING_BRANCH="${SLOT#*$'\t'}"
+          fi
           MAX_OPEN_CURSOR_PRS="${MAX_OPEN_CURSOR_PRS:-5}"
-          if [ "${OPEN_CURSOR_COUNT}" -ge "${MAX_OPEN_CURSOR_PRS}" ]; then
+          if [ -z "$EXISTING_PR" ] && [ "${OPEN_CURSOR_COUNT}" -ge "${MAX_OPEN_CURSOR_PRS}" ]; then
             echo "ticker=" >> "$GITHUB_OUTPUT"
             echo "reason=cursor_pr_backlog_${OPEN_CURSOR_COUNT}" >> "$GITHUB_OUTPUT"
             echo "skip=true" >> "$GITHUB_OUTPUT"
@@ -124,23 +131,14 @@ jobs:
             echo "evidence_hash=$HASH" >> "$GITHUB_OUTPUT"
             echo "primary_evidence_count=$PRIMARY_COUNT" >> "$GITHUB_OUTPUT"
             echo "manifest_json=$MANIFEST" >> "$GITHUB_OUTPUT"
+            echo "existing_pr=" >> "$GITHUB_OUTPUT"
+            echo "existing_branch=" >> "$GITHUB_OUTPUT"
             echo "### Research dispatch suppressed" >> "$GITHUB_STEP_SUMMARY"
-            echo "Open mergeable cursor/* PRs=${OPEN_CURSOR_COUNT} >= ${MAX_OPEN_CURSOR_PRS}; waiting for automerge drain." >> "$GITHUB_STEP_SUMMARY"
+            echo "Open cursor/* PRs=${OPEN_CURSOR_COUNT} >= ${MAX_OPEN_CURSOR_PRS}; waiting for automerge drain." >> "$GITHUB_STEP_SUMMARY"
             exit 0
           fi
-          ACTIVE_PR=$(gh pr list --repo "$GITHUB_REPOSITORY" --state open --json number,headRefName,title,mergeable,mergeStateStatus | TICKER="$TICKER" python -c 'import json, os, sys; ticker=os.environ["TICKER"].upper(); prs=json.load(sys.stdin); matches=[p for p in prs if p["headRefName"].startswith("cursor/") and p.get("mergeable") == "MERGEABLE" and p.get("mergeStateStatus") != "DIRTY" and (ticker in p["headRefName"].upper() or ticker in p["title"].upper())]; print(matches[0]["number"] if matches else "")')
-          if [ -n "$ACTIVE_PR" ]; then
-            echo "ticker=" >> "$GITHUB_OUTPUT"
-            echo "reason=active_cursor_pr_$ACTIVE_PR" >> "$GITHUB_OUTPUT"
-            echo "skip=true" >> "$GITHUB_OUTPUT"
-            echo "skip_reason=active_cursor_pr_$ACTIVE_PR" >> "$GITHUB_OUTPUT"
-            echo "evidence_hash=$HASH" >> "$GITHUB_OUTPUT"
-            echo "primary_evidence_count=$PRIMARY_COUNT" >> "$GITHUB_OUTPUT"
-            echo "manifest_json=$MANIFEST" >> "$GITHUB_OUTPUT"
-            echo "### Research dispatch suppressed" >> "$GITHUB_STEP_SUMMARY"
-            echo "Ticker **$TICKER** already has Cursor PR #$ACTIVE_PR open; no overlapping agent run was started." >> "$GITHUB_STEP_SUMMARY"
-            exit 0
-          fi
+          echo "existing_pr=$EXISTING_PR" >> "$GITHUB_OUTPUT"
+          echo "existing_branch=$EXISTING_BRANCH" >> "$GITHUB_OUTPUT"
           echo "ticker=$TICKER" >> "$GITHUB_OUTPUT"
           echo "reason=$PICK_REASON" >> "$GITHUB_OUTPUT"
           echo "skip=false" >> "$GITHUB_OUTPUT"
@@ -149,6 +147,9 @@ jobs:
           echo "primary_evidence_count=$PRIMARY_COUNT" >> "$GITHUB_OUTPUT"
           echo "manifest_json=$MANIFEST" >> "$GITHUB_OUTPUT"
           echo "### Research dispatch admitted" >> "$GITHUB_STEP_SUMMARY"
+          if [ -n "$EXISTING_PR" ]; then
+            echo "Ticker **$TICKER** continues open PR #${EXISTING_PR} on \`${EXISTING_BRANCH}\`." >> "$GITHUB_STEP_SUMMARY"
+          fi
           echo "Ticker **$TICKER** admitted on primary-evidence fingerprint \`$HASH\` ($PRIMARY_COUNT source record(s))." >> "$GITHUB_STEP_SUMMARY"
           cat manifest.json
 
@@ -195,6 +196,22 @@ jobs:
           evidence_manifest_json: ${{ needs.select.outputs.manifest_json }}
           force: ${{ inputs.force }}
           consumer: ${{ inputs.consumer || 'marvin_research' }}
+          existing_pr: ${{ needs.select.outputs.existing_pr }}
+          existing_branch: ${{ needs.select.outputs.existing_branch }}
+
+      - name: Fold a second ticker PR into the open one
+        if: needs.select.outputs.existing_pr != ''
+        env:
+          GH_TOKEN: ${{ github.token }}
+          TICKER: ${{ needs.select.outputs.ticker }}
+          KEEP: ${{ needs.select.outputs.existing_pr }}
+          KEEP_BRANCH: ${{ needs.select.outputs.existing_branch }}
+        run: |
+          python _system/scripts/cursor_pr_slot.py fold \
+            --repo "$GITHUB_REPOSITORY" \
+            --ticker "$TICKER" \
+            --keep "$KEEP" \
+            --keep-branch "$KEEP_BRANCH"
 
   caught-up:
     needs: select

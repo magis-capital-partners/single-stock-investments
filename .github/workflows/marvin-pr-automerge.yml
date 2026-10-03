@@ -2,8 +2,9 @@ name: Auto - Agent PR Merge
 
 # Squash-merge Cursor cloud-agent PRs (Marvin research or Investment Committee
 # task artifacts) after research-quality CI passes. Resolves shared-file
-# conflicts with main when needed, but never merges in the run that resolved
-# them.
+# conflicts with main when needed. A resolution that only touches generated
+# files is squashed in the same run, once the gated SHA's checks are green.
+# Any other resolution waits for CI on the new head.
 #
 # Consistency guardrails:
 # 1. The gate pins ONE head SHA. Provenance is read at that SHA, the Research
@@ -11,16 +12,23 @@ name: Auto - Agent PR Merge
 #    job. Nothing is read by branch name: the branch is deleted when the PR
 #    merges, and a twin run still reading it failed with HTTP 404 (AM2).
 # 2. The merge job re-verifies every check on the gated SHA
-#    (verify_pr_checks.py) and squashes with `sha=<gated SHA>`, so GitHub
-#    refuses the merge if the head moved after the gate.
-# 3. A conflict-resolver push is never merged in the same run: the new head
-#    has never been through CI (PRs #1017 and #1021 were squashed seconds after
-#    that push, with zero check runs on the merged head). The push is made with
+#    (verify_pr_checks.py). graph-invariants and market-data-csvs stay
+#    red-means-stop. The squash is pinned to a SHA, so GitHub refuses the
+#    merge if that commit is no longer the head.
+# 3. A conflict-resolver push is merged in the same run only when every
+#    conflicted path is generated (dashboard data, market-data files, the
+#    daily log, research_events.jsonl, milly_log.md) AND every check on the
+#    gated SHA is green. The squash then uses the resolution SHA. Any
+#    research or code conflict is not merged here: the push is made with
 #    GITHUB_TOKEN, which starts no pull_request workflow (#1073 sat at that
 #    new head with zero checks). repository_dispatch is an event that token
 #    may start, and it adds no Actions button, so the job dispatches Research
 #    quality for that PR and automerge retries when that run completes.
+#    PRs #1017 and #1021 were squashed seconds after a resolution that CI
+#    had never seen; that path stays closed unless the diff is generated-only.
 # 4. Squash merges are serialized across all agent PRs (agent-automerge-main).
+#    The merge job holds that lock until it squashes or hands the new head to
+#    CI, so the next PR resolves against the main this squash just updated.
 # 5. PR state is re-read before every side effect. A pull_request run and a
 #    workflow_run run fire for the same head; the second one finds the PR
 #    merged and stops quietly instead of commenting "blocked" on it.
@@ -149,6 +157,12 @@ jobs:
             echo "head_sha=$HEAD_SHA" >> "$GITHUB_OUTPUT"
             echo "is_draft=$IS_DRAFT" >> "$GITHUB_OUTPUT"
             exit 0
+          fi
+          # Promote drafts before the gate waits on CI. A draft that stays a
+          # draft never reaches the squash. The gate repeats this if it is
+          # still a draft when that job starts.
+          if [ "$IS_DRAFT" = "true" ]; then
+            gh pr ready "$PR" --repo "$REPO" || true
           fi
           echo "lane=$LANE" >> "$GITHUB_OUTPUT"
           echo "eligible=true" >> "$GITHUB_OUTPUT"
@@ -472,6 +486,11 @@ jobs:
           python _system/scripts/resolve_marvin_pr_conflicts.py "$PR" \
             --expected-sha "$GATED_SHA" --github-output "$RUNNER_TEMP/resolver.out"
           cat "$RUNNER_TEMP/resolver.out" >> "$GITHUB_OUTPUT"
+          if grep -qx "generated_only=true" "$RUNNER_TEMP/resolver.out"; then
+            echo "generated_only=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "generated_only=false" >> "$GITHUB_OUTPUT"
+          fi
           if grep -qx "pushed=false" "$RUNNER_TEMP/resolver.out" && grep -qx "head_moved=false" "$RUNNER_TEMP/resolver.out"; then
             echo "proceed=true" >> "$GITHUB_OUTPUT"
           else
@@ -482,7 +501,7 @@ jobs:
         # A push made with GITHUB_TOKEN starts no pull_request workflow
         # (#989, #1017, #1021, #1073). repository_dispatch is an event that
         # token may start, and this workflow retries when that run completes.
-        if: steps.resolve.outputs.pushed == 'true'
+        if: steps.resolve.outputs.pushed == 'true' && steps.resolve.outputs.generated_only != 'true'
         env:
           PUSHED_SHA: ${{ steps.resolve.outputs.pushed_sha }}
           RUN_URL: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
@@ -512,7 +531,7 @@ jobs:
 
       - name: Verify every check on the gated SHA is green
         id: verify
-        if: steps.state.outputs.merge == 'true' && steps.resolve.outputs.proceed == 'true'
+        if: steps.state.outputs.merge == 'true' && (steps.resolve.outputs.proceed == 'true' || steps.resolve.outputs.generated_only == 'true')
         run: |
           set -euo pipefail
           ARGS=(--repo "$REPO" --sha "$GATED_SHA" --exclude-workflow "Auto - Agent PR Merge")
@@ -530,6 +549,26 @@ jobs:
             3) echo "pending=true" >> "$GITHUB_OUTPUT" ;;
             *) exit "$CODE" ;;
           esac
+
+      - name: Dispatch CI after a blocked generated-file shortcut
+        # The resolution is already pushed. If the gated SHA is red, do not
+        # squash it, but the new head has no pull_request workflow. Start
+        # Research quality so the PR is not stuck with zero checks.
+        if: failure() && steps.resolve.outputs.pushed == 'true' && steps.resolve.outputs.generated_only == 'true'
+        env:
+          PUSHED_SHA: ${{ steps.resolve.outputs.pushed_sha }}
+          RUN_URL: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
+        run: |
+          set -euo pipefail
+          gh api --method POST "repos/${REPO}/dispatches" \
+            -f event_type=research-quality-pr \
+            -f "client_payload[pr]=${PR}" \
+            -f "client_payload[sha]=${PUSHED_SHA}" \
+            || echo "Could not re-trigger Research quality for ${PUSHED_SHA}."
+          python _system/scripts/automerge_comment.py --repo "$REPO" --pr "$PR" \
+            --headline "Automerge did not squash" \
+            --message "generated-file conflicts were resolved at ${PUSHED_SHA}, but a check on the gated commit is red, so nothing was merged." \
+            --run-url "$RUN_URL"
 
       - name: Say on the PR that checks are still pending (blocked, will retry)
         if: steps.verify.outputs.pending == 'true'
@@ -574,10 +613,21 @@ jobs:
             echo "PR #$PR is $STATE; nothing to merge."
             exit 0
           fi
-          # sha= makes GitHub refuse the merge if the head is no longer the one
-          # the gate passed.
+          # The gated SHA when this run did not push. The resolution SHA when
+          # every conflict was a generated file and the checks above passed
+          # on the gated SHA. sha= makes GitHub refuse the merge if that
+          # commit is no longer the head.
+          if [ "${{ steps.resolve.outputs.generated_only }}" = "true" ]; then
+            MERGE_SHA="${{ steps.resolve.outputs.pushed_sha }}"
+          else
+            MERGE_SHA="$GATED_SHA"
+          fi
+          if [ -z "$MERGE_SHA" ]; then
+            echo "::error::PR #$PR has no SHA to squash."
+            exit 1
+          fi
           if ! gh api --method PUT "repos/${REPO}/pulls/${PR}/merge" \
-                 -f merge_method=squash -f sha="$GATED_SHA" > "$RUNNER_TEMP/merge.json" 2> "$RUNNER_TEMP/merge.err"; then
+                 -f merge_method=squash -f sha="$MERGE_SHA" > "$RUNNER_TEMP/merge.json" 2> "$RUNNER_TEMP/merge.err"; then
             cat "$RUNNER_TEMP/merge.err" >&2
             if grep -q "Head branch was modified" "$RUNNER_TEMP/merge.err"; then
               echo "PR #$PR head moved after the gate; not merging. Its own run gates the new head."
