@@ -12,6 +12,15 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parents[2]
 JSONL = "_system/portfolio/research_events.jsonl"
 MILLY = "_system/research/milly_log.md"
+# Files that move on main all day and carry no research judgment. A conflict
+# that is only these paths can be squashed without a second CI run: the gated
+# SHA already passed, and -X theirs keeps main's copy.
+GENERATED_EXACT = {JSONL, MILLY}
+GENERATED_PREFIXES = (
+    "dashboard/data/",
+    "_system/reference/market-data/",
+    "_system/memory/daily/",
+)
 
 
 def run(cmd: list[str], *, check: bool = True) -> subprocess.CompletedProcess[str]:
@@ -199,14 +208,56 @@ def unmerged_paths() -> list[str]:
     return [line.strip() for line in proc.stdout.splitlines() if line.strip()]
 
 
-def resolve(pr_number: str, ticker: str | None = None, expected_sha: str | None = None) -> str | None:
+def is_generated_path(path: str) -> bool:
+    path = path.replace("\\", "/").lstrip("./")
+    if path in GENERATED_EXACT:
+        return True
+    return any(path.startswith(prefix) for prefix in GENERATED_PREFIXES)
+
+
+def conflicted_paths(branch_ref: str) -> list[str]:
+    """Paths that conflict between the PR tip and origin/main.
+
+    ``git merge-tree --write-tree`` exits 0 when the merge is clean and 1 when
+    it conflicts. ``--name-only`` prints the conflicted paths. A 40-hex line is
+    a tree id, not a path.
+    """
+    proc = run(
+        ["git", "merge-tree", "--write-tree", "--name-only", branch_ref, "origin/main"],
+        check=False,
+    )
+    if proc.returncode not in (0, 1):
+        detail = (proc.stderr or proc.stdout or "merge-tree failed").strip()
+        raise SystemExit(detail)
+    paths: list[str] = []
+    for line in proc.stdout.splitlines():
+        line = line.strip().replace("\\", "/")
+        if not line or re.fullmatch(r"[0-9a-f]{40}", line):
+            continue
+        if line.startswith("Auto-merging ") or line.startswith("CONFLICT "):
+            continue
+        paths.append(line)
+    return paths
+
+
+def conflicts_are_generated(paths: list[str]) -> bool:
+    return bool(paths) and all(is_generated_path(path) for path in paths)
+
+
+def resolve(
+    pr_number: str,
+    ticker: str | None = None,
+    expected_sha: str | None = None,
+    info: dict | None = None,
+) -> str | None:
     """Merge main into the PR branch and push it.
 
-    Returns the pushed head SHA, or None when there was nothing to push. The
-    caller must NOT merge in the same run: the pushed commit has never been
-    through CI, and a squash of it would land untested content on main (PRs
-    #1017 and #1021 were squashed seconds after this push, with zero check runs
-    on the merged head).
+    Returns the pushed head SHA, or None when there was nothing to push.
+    ``info["generated_only"]`` is true when every conflicted path is generated.
+    The workflow may squash that push in the same run, because the research
+    tree is unchanged and the gated SHA's checks still apply. Any other push
+    has never been through CI (PRs #1017 and #1021 were squashed seconds after
+    the push, with zero check runs on the merged head) and must wait.
 
     ``expected_sha`` is the head the caller vetted (automerge passes the gated
     SHA). The resolution is built only on that head and pushed only while the
@@ -215,6 +266,8 @@ def resolve(pr_number: str, ticker: str | None = None, expected_sha: str | None 
     ticker = ticker or infer_ticker(pr_number)
     data = gh_json(["pr", "view", pr_number, "--json", "headRefName,mergeable"])
     head_ref = data["headRefName"]
+    if info is not None:
+        info["generated_only"] = False
     if data.get("mergeable") != "CONFLICTING":
         print(f"PR #{pr_number} mergeable={data.get('mergeable')} — nothing to resolve.")
         return None
@@ -239,6 +292,10 @@ def resolve(pr_number: str, ticker: str | None = None, expected_sha: str | None 
 
     jsonl_lines = lines_for_ticker(git_show(branch_ref, JSONL) or "", ticker, kind="jsonl")
     milly_lines = lines_for_ticker(git_show(branch_ref, MILLY) or "", ticker, kind="milly")
+    generated_only = conflicts_are_generated(conflicted_paths(branch_ref))
+    if info is not None:
+        info["generated_only"] = generated_only
+    print(f"PR #{pr_number}: generated_only={str(generated_only).lower()}")
 
     run(["git", "checkout", "-B", f"conflict-fix-{pr_number}", branch_ref])
     merge = run(
@@ -274,11 +331,18 @@ def resolve(pr_number: str, ticker: str | None = None, expected_sha: str | None 
     return new_tip
 
 
-def write_github_output(path: str, pushed_sha: str | None, *, head_moved: bool = False) -> None:
+def write_github_output(
+    path: str,
+    pushed_sha: str | None,
+    *,
+    head_moved: bool = False,
+    generated_only: bool = False,
+) -> None:
     with open(path, "a", encoding="utf-8") as handle:
         handle.write(f"pushed={'true' if pushed_sha else 'false'}\n")
         handle.write(f"pushed_sha={pushed_sha or ''}\n")
         handle.write(f"head_moved={'true' if head_moved else 'false'}\n")
+        handle.write(f"generated_only={'true' if generated_only else 'false'}\n")
 
 
 def main() -> None:
@@ -296,15 +360,20 @@ def main() -> None:
         help="Only resolve and push while the PR branch is at this SHA (automerge passes the gated SHA).",
     )
     args = parser.parse_args()
+    info: dict = {}
     try:
-        pushed_sha = resolve(args.pr_number, args.ticker, args.expected_sha or None)
+        pushed_sha = resolve(args.pr_number, args.ticker, args.expected_sha or None, info)
     except HeadMoved as moved:
         print(f"PR #{args.pr_number}: {moved} Its own run gates the new head.")
         if args.github_output:
             write_github_output(args.github_output, None, head_moved=True)
         return
     if args.github_output:
-        write_github_output(args.github_output, pushed_sha)
+        write_github_output(
+            args.github_output,
+            pushed_sha,
+            generated_only=bool(info.get("generated_only")),
+        )
 
 
 if __name__ == "__main__":
