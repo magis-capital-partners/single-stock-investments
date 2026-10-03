@@ -44,7 +44,7 @@ tests daily.
 | Power Zone Universe | successful downloads; Monday fallback; authenticated API event | Canonical valuation route, contract, workbench, pricing, committee initialization (sole owner of the valuation pipeline) |
 | LS-algo Universe Intake | daily 02:45; successful downloads; dispatch | LS-algo screener onboard, evidence recovery, registry derivatives |
 | Auto - Investment Committee | committee packet/output change; 4-hourly sweep | Independent votes, conditional escalation, deterministic assembly |
-| Auto - Agent PR Merge | agent PR events (cursor/, codex/, claude/); Research quality and Python tests completions | Gate one head SHA, verify every check on it, squash with `sha=` pinned; resolve allowed conflicts but never merge the resolved head in the same run (it needs CI re-triggered, and the PR says so) |
+| Auto - Agent PR Merge | agent PR events (cursor/, codex/, claude/); Research quality and Python tests completions | Gate one head SHA, verify every check on it, squash with `sha=` pinned. A conflict resolution is squashed in that same run only when every conflicted path is generated and the gated SHA is green; any other resolution waits for CI. One merge at a time. Drafts are marked ready before the gate waits. |
 | Letter Backfill | Sunday 16:00 + manual | Two jobs: download PDFs→commit vault, then extract→rebuild insights (6h each); skips existing PDFs by size/sha |
 | Memory Digest | Sunday 14:00 | Aggregate unpromoted [PROPOSED] bullets + corrections into one pending review |
 | Deploy Dashboard | relevant push or successful upstream run | Validate and publish Pages |

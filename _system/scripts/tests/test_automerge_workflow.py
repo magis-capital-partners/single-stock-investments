@@ -28,31 +28,48 @@ def step_index(job: dict, name_fragment: str) -> int:
     return next(i for i, s in enumerate(job["steps"]) if name_fragment in str(s.get("name", "")))
 
 
-def test_the_squash_is_pinned_to_the_sha_the_gate_passed():
+def test_the_squash_is_pinned_to_one_sha():
     """PRs #1017 and #1021 were squashed at heads no gate had seen."""
     merge = load()["jobs"]["merge"]
     assert "needs.gate.outputs.head_sha" in merge["env"]["GATED_SHA"]
     assert "needs.code-gate.outputs.head_sha" in merge["env"]["GATED_SHA"]
     squash = step(merge, "Squash merge and delete branch")
-    assert '-f sha="$GATED_SHA"' in squash["run"]
+    assert '-f sha="$MERGE_SHA"' in squash["run"]
+    assert 'MERGE_SHA="$GATED_SHA"' in squash["run"]
+    assert 'steps.resolve.outputs.generated_only' in squash["run"]
+    assert 'steps.resolve.outputs.pushed_sha' in squash["run"]
     # The merge job only runs for a SHA a gate actually handed over.
     assert "needs.gate.outputs.head_sha != ''" in merge["if"]
     assert "needs.code-gate.outputs.head_sha != ''" in merge["if"]
 
 
-def test_a_resolver_push_is_never_merged_in_the_same_run():
-    """Run 35948543025 pushed a resolution at 03:07:46 and squashed it at 03:08:00."""
+def test_a_research_conflict_resolution_is_not_merged_in_the_same_run():
+    """Run 35948543025 pushed a resolution at 03:07:46 and squashed it at 03:08:00.
+
+    A generated-file resolution is the exception: the gated SHA's checks still
+    cover the research tree. A research-file conflict still waits for CI.
+    """
     merge = load()["jobs"]["merge"]
     resolve = step(merge, "Resolve merge conflicts")["run"]
     assert '--expected-sha "$GATED_SHA"' in resolve
     assert "--github-output" in resolve
-    # proceed=true only when the resolver pushed nothing and the head held.
     assert 'grep -qx "pushed=false"' in resolve and 'grep -qx "head_moved=false"' in resolve
-    assert "steps.resolve.outputs.proceed == 'true'" in step(merge, "Verify every check")["if"]
+    assert 'grep -qx "generated_only=true"' in resolve
+    verify_if = step(merge, "Verify every check")["if"]
+    assert "steps.resolve.outputs.proceed == 'true'" in verify_if
+    assert "steps.resolve.outputs.generated_only == 'true'" in verify_if
+    retrigger = step(merge, "Re-trigger Research quality")
+    assert "steps.resolve.outputs.pushed == 'true'" in retrigger["if"]
+    assert "steps.resolve.outputs.generated_only != 'true'" in retrigger["if"]
     for later in ("Ensure mergeable", "Squash merge"):
         assert step(merge, later)["if"] == "steps.verify.outputs.green == 'true'", later
     for later in ("Verify every check", "Ensure mergeable", "Squash merge"):
         assert "resolve_marvin_pr_conflicts.py" not in step(merge, later)["run"], later
+    # Red checks still stop the shortcut, and the new head is not left unchecked.
+    blocked = step(merge, "blocked generated-file shortcut")
+    assert "failure()" in blocked["if"]
+    assert "generated_only == 'true'" in blocked["if"]
+    assert "event_type=research-quality-pr" in blocked["run"]
 
 
 def test_a_resolver_push_retriggers_research_quality():
@@ -62,7 +79,7 @@ def test_a_resolver_push_retriggers_research_quality():
     fails, the note still tells a person how to re-trigger by hand."""
     merge = load()["jobs"]["merge"]
     note = step(merge, "Re-trigger Research quality")
-    assert note["if"] == "steps.resolve.outputs.pushed == 'true'"
+    assert note["if"] == "steps.resolve.outputs.pushed == 'true' && steps.resolve.outputs.generated_only != 'true'"
     assert "steps.resolve.outputs.pushed_sha" in note["env"]["PUSHED_SHA"]
     assert "event_type=research-quality-pr" in note["run"]
     assert 'client_payload[pr]=${PR}' in note["run"]
@@ -174,3 +191,15 @@ def test_code_lane_gate_pins_one_sha():
     assert script.index("SHA=$(gh pr view") < script.index("while :; do")
     assert re.search(r'echo "sha=\$SHA" >> "\$GITHUB_OUTPUT"', script)
     assert "steps.checks.outputs.sha" in code_gate["outputs"]["head_sha"]
+
+
+def test_drafts_are_marked_ready_before_the_gate_waits_on_ci():
+    resolve = step(load()["jobs"]["resolve-pr"], "Resolve PR number")
+    assert 'gh pr ready "$PR"' in resolve["run"]
+    assert resolve["run"].index('gh pr ready "$PR"') < resolve["run"].index('echo "eligible=true"')
+
+
+def test_merge_jobs_stay_serialized_on_one_lock():
+    merge = load()["jobs"]["merge"]
+    assert merge["concurrency"]["group"] == "agent-automerge-main"
+    assert merge["concurrency"]["cancel-in-progress"] is False

@@ -170,6 +170,44 @@ def test_the_workflow_learns_what_was_pushed(tmp_path, resolver, monkeypatch):
     assert "pushed=true" in lines
     assert f"pushed_sha={origin_tip}" in lines
     assert "head_moved=false" in lines
+    assert "generated_only=false" in lines
+
+
+def test_a_generated_file_conflict_is_flagged_and_keeps_main(tmp_path, resolver, monkeypatch):
+    seed = tmp_path / "seed"
+    seed.mkdir()
+    git(seed, "init", "-q", "-b", "main")
+    write(seed, "_system/memory/daily/2026-09-01.md", "# Daily log 2026-09-01\n")
+    write(seed, "_system/portfolio/research_events.jsonl", '{"ticker": "ZZZ"}\n')
+    write(seed, "_system/research/milly_log.md", "| ZZZ | ok |\n")
+    write(seed, "dashboard/data/catalog.json", "base\n")
+    write(seed, "ABC/research/note.md", "base note\n")
+    commit_all(seed, "A")
+    git(seed, "checkout", "-q", "-b", BRANCH)
+    write(seed, "dashboard/data/catalog.json", "branch catalog\n")
+    write(seed, "ABC/research/note.md", "branch note, no conflict\n")
+    branch_tip = commit_all(seed, "F")
+    git(seed, "checkout", "-q", "main")
+    write(seed, "dashboard/data/catalog.json", "main catalog\n")
+    commit_all(seed, "D")
+    origin = tmp_path / "origin.git"
+    git(tmp_path, "init", "-q", "--bare", str(origin))
+    git(seed, "push", "-q", str(origin), "main", BRANCH)
+    clone = tmp_path / "clone"
+    git(tmp_path, "clone", "-q", "--no-local", str(origin), str(clone))
+    point_resolver_at(resolver, monkeypatch, clone)
+    output = tmp_path / "github_output"
+    monkeypatch.setattr(sys, "argv", ["resolve", "1014", "--ticker", "ABC", "--github-output", str(output)])
+
+    resolver.main()
+
+    lines = output.read_text(encoding="utf-8").splitlines()
+    pushed = git(tmp_path, "--git-dir", str(origin), "rev-parse", BRANCH)
+    assert pushed != branch_tip
+    assert "generated_only=true" in lines
+    assert f"pushed_sha={pushed}" in lines
+    assert git(clone, "show", f"{pushed}:dashboard/data/catalog.json") == "main catalog"
+    assert git(clone, "show", f"{pushed}:ABC/research/note.md") == "branch note, no conflict"
 
 
 def origin_tip(tmp_path: Path) -> str:
