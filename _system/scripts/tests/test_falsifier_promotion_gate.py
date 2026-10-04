@@ -292,6 +292,22 @@ class LaneWorkflowTests(unittest.TestCase):
         self.assertTrue(any("test_falsifier_promotion_gate" in line
                             for line in self._validate_block()))
 
+    def test_nondurable_proposals_are_disposed_before_the_e7_check(self):
+        """E7 fails closed on an unrouted company observation.
+
+        Expire-human-SLA only drops overdue durable and process proposals.
+        Run 37129250839 dropped one of those and still exited 1 on the
+        undecided 2026-10-02 ETHA company observation. Deterministic
+        routing has to run first; the subset check stays in place.
+        """
+        block = "\n".join(self._validate_block())
+        dispose = block.index("--auto-dispose-nondurable")
+        expire = block.index("--expire-human-sla")
+        subset = block.index("validate_invariant_subset.py E2 E3 E4 E5 E7 E8 E9")
+        self.assertLess(dispose, expire)
+        self.assertLess(expire, subset)
+        self.assertIn("--by memory-triage-bot", block)
+
     @unittest.skipUnless(shutil.which("bash"), "bash required")
     def test_a_crashed_invariant_run_cannot_pass_on_the_checked_out_report(self):
         # graph_invariants.py exits 1 for other lanes' violations, so the lane

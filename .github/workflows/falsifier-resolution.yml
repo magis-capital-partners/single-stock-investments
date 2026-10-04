@@ -50,6 +50,14 @@ jobs:
             test_epistemic_loop_controller test_committee_forecast_loop)
           python -m unittest discover -s _system/scripts/tests -p 'test_falsifier_promotion_gate.py'
           python _system/scripts/validate_calibration_consumption.py
+          # E7 is fail-closed on this lane. Company observations and artifacts
+          # must be routed or dropped immediately; the 30-day human SLA only
+          # covers durable and process proposals. Expire alone left the
+          # 2026-10-02 ETHA company observation undecided, so the subset check
+          # exited 1 (run 37129250839) after dropping the overdue belief.
+          # Same deterministic disposition as Canonical Memory Triage. The
+          # subset check below still fails if anything E7 owns remains open.
+          python _system/scripts/build_memory_triage.py --auto-dispose-nondurable --by memory-triage-bot
           python _system/scripts/build_memory_triage.py --expire-human-sla --by memory-triage-bot
           # graph_invariants.py exits 1 on any hard violation in the repo --
           # another lane's P3, a feed's P6, a ratchet row -- none of which this
