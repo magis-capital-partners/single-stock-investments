@@ -182,14 +182,14 @@ Synced from `_system/portfolio/registry.json`. Last sync: 2026-10-04.
 | COIN | COIN/ | Coinbase | US | 2026-09-30 | 2026-10-04 | unknown | watch |
 | COLD | COLD/ | Americold Realty Trust, Inc. | US | 2026-09-30 | 2026-10-04 | unknown | watch |
 | COO | COO/ | Cooper Companies (The) | US | 2026-09-30 | 2026-10-04 | unknown | watch |
-| COP | COP/ | ConocoPhillips | US | 2026-07-29 | 2026-10-04 | unknown | watch |
-| COPX | COPX/ | COPX | US | 2026-07-29 | 2026-10-04 | unknown | watch |
-| COR | COR/ | Cencora | US | 2026-07-09 | 2026-10-04 | unknown | watch |
-| CORBF | CORBF/ | Corbus Pharmaceuticals Holdings, Inc. | US | 2026-07-29 | 2026-10-04 | unknown | watch |
-| CORZ | CORZ/ | CORZ | US | 2026-07-29 | 2026-10-04 | unknown | watch |
-| COST | COST/ | Costco | US | 2026-07-28 | 2026-10-04 | unknown | watch |
-| CPAY | CPAY/ | Corpay | US | 2026-07-29 | 2026-10-04 | unknown | watch |
-| CPNG | CPNG/ | CPNG | US | 2026-07-29 | 2026-10-04 | unknown | watch |
+| COP | COP/ | ConocoPhillips | US | 2026-10-04 | 2026-10-04 | unknown | watch |
+| COPX | COPX/ | COPX | US | 2026-10-04 | 2026-10-04 | unknown | watch |
+| COR | COR/ | Cencora | US | 2026-10-04 | 2026-10-04 | unknown | watch |
+| CORBF | CORBF/ | Corbus Pharmaceuticals Holdings, Inc. | US | 2026-10-04 | 2026-10-04 | unknown | watch |
+| CORZ | CORZ/ | CORZ | US | 2026-10-04 | 2026-10-04 | unknown | watch |
+| COST | COST/ | Costco | US | 2026-10-04 | 2026-10-04 | unknown | watch |
+| CPAY | CPAY/ | Corpay | US | 2026-10-04 | 2026-10-04 | unknown | watch |
+| CPNG | CPNG/ | CPNG | US | 2026-10-04 | 2026-10-04 | unknown | watch |
 | CPRT | CPRT/ | Copart | US | 2026-07-09 | 2026-10-04 | compounder | core |
 | CPT | CPT/ | Camden Property Trust | US | 2026-07-09 | 2026-10-04 | unknown | watch |
 | CRCL | CRCL/ | Circle Internet Group, Inc. | US | 2026-07-09 | 2026-10-04 | unknown | watch |
