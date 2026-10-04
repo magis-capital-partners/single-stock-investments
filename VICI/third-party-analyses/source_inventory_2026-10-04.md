@@ -1,0 +1,10 @@
+# VICI — Third-party source inventory
+
+**Date:** 2026-10-04
+**Sources:** 1 total (0 approved, 0 pending, 1 context)
+
+| ID | Title | Path | Status | Use |
+|----|-------|------|--------|-----|
+| activist_long | Elliott Management — SC 13G/A | `VICI/third-party-analyses/activist_reports/long/SC-13G/A_20180214_acc0000902664_18_001170.htm` | context | activist/long — sec_edgar |
+
+Cross-check required: `VICI/research/cross_check_third_party_2026-10-04.md`

@@ -1,0 +1,162 @@
+# CCL — Third-party source inventory
+
+**Date:** 2026-10-04
+**Sources:** 153 total (0 approved, 0 pending, 153 context)
+
+| ID | Title | Path | Status | Use |
+|----|-------|------|--------|-----|
+| activist_long | fare 2005 Trust No. — SC 13D/A | `CCL/third-party-analyses/activist_reports/long/SC-13D/A_20201112_acc0001193125_20_291003.htm` | context | activist/long — sec_edgar |
+| activist_long | fare 2005 Trust No. — SC 13D/A | `CCL/third-party-analyses/activist_reports/long/SC-13D/A_20201211_acc0001193125_20_315934.htm` | context | activist/long — sec_edgar |
+| activist_long | MA 1994 B SHARES, INC. — SC 13D/A | `CCL/third-party-analyses/activist_reports/long/SC-13D/A_20220301_acc0000950142_22_000854.htm` | context | activist/long — sec_edgar |
+| activist_long | MA 1994 B SHARES, INC. — SC 13D/A | `CCL/third-party-analyses/activist_reports/long/SC-13D/A_20230127_acc0000950142_23_000223.htm` | context | activist/long — sec_edgar |
+| activist_long | MA 1994 B SHARES, INC. — SC 13D/A | `CCL/third-party-analyses/activist_reports/long/SC-13D/A_20240209_acc0000950142_24_000343.htm` | context | activist/long — sec_edgar |
+| activist_long | MA 1994 B SHARES LP — SC 13D/A | `CCL/third-party-analyses/activist_reports/long/SC-13D/A_20251126_acc0000950142_25_003082.xml` | context | activist/long — sec_edgar |
+| activist_long | acc0000815097 18 000012 | `CCL/third-party-analyses/activist_reports/long/8-K_20180322_acc0000815097_18_000012.htm` | context | activist/long — local |
+| activist_long | acc0000815097 18 000014 | `CCL/third-party-analyses/activist_reports/long/8-K_20180322_acc0000815097_18_000014.htm` | context | activist/long — local |
+| activist_long | acc0001193125 18 119786 | `CCL/third-party-analyses/activist_reports/long/8-K_20180417_acc0001193125_18_119786.htm` | context | activist/long — local |
+| activist_long | acc0000815097 18 000024 | `CCL/third-party-analyses/activist_reports/long/8-K_20180625_acc0000815097_18_000024.htm` | context | activist/long — local |
+| activist_long | acc0000815097 18 000033 | `CCL/third-party-analyses/activist_reports/long/8-K_20180927_acc0000815097_18_000033.htm` | context | activist/long — local |
+| activist_long | acc0000815097 18 000039 | `CCL/third-party-analyses/activist_reports/long/8-K_20181220_acc0000815097_18_000039.htm` | context | activist/long — local |
+| activist_long | acc0001193125 19 010578 | `CCL/third-party-analyses/activist_reports/long/8-K_20190116_acc0001193125_19_010578.htm` | context | activist/long — local |
+| activist_long | acc0000815097 19 000008 | `CCL/third-party-analyses/activist_reports/long/8-K_20190326_acc0000815097_19_000008.htm` | context | activist/long — local |
+| activist_long | acc0001193125 19 113366 | `CCL/third-party-analyses/activist_reports/long/8-K_20190422_acc0001193125_19_113366.htm` | context | activist/long — local |
+| activist_long | acc0000815097 19 000014 | `CCL/third-party-analyses/activist_reports/long/8-K_20190620_acc0000815097_19_000014.htm` | context | activist/long — local |
+| activist_long | acc0001193125 19 217985 | `CCL/third-party-analyses/activist_reports/long/8-K_20190809_acc0001193125_19_217985.htm` | context | activist/long — local |
+| activist_long | acc0000815097 19 000032 | `CCL/third-party-analyses/activist_reports/long/8-K_20190926_acc0000815097_19_000032.htm` | context | activist/long — local |
+| activist_long | acc0001193125 19 275601 | `CCL/third-party-analyses/activist_reports/long/8-K_20191028_acc0001193125_19_275601.htm` | context | activist/long — local |
+| activist_long | acc0000815097 19 000039 | `CCL/third-party-analyses/activist_reports/long/8-K_20191220_acc0000815097_19_000039.htm` | context | activist/long — local |
+| activist_long | acc0001193125 20 074019 | `CCL/third-party-analyses/activist_reports/long/8-K_20200316_acc0001193125_20_074019.htm` | context | activist/long — local |
+| activist_long | acc0000815097 20 000007 | `CCL/third-party-analyses/activist_reports/long/8-K_20200319_acc0000815097_20_000007.htm` | context | activist/long — local |
+| activist_long | acc0000815097 20 000022 | `CCL/third-party-analyses/activist_reports/long/8-K_20200331_acc0000815097_20_000022.htm` | context | activist/long — local |
+| activist_long | acc0000950142 20 000946 | `CCL/third-party-analyses/activist_reports/long/8-K_20200331_acc0000950142_20_000946.htm` | context | activist/long — local |
+| activist_long | acc0000950142 20 000972 | `CCL/third-party-analyses/activist_reports/long/8-K_20200402_acc0000950142_20_000972.htm` | context | activist/long — local |
+| activist_long | acc0001193125 20 099486 | `CCL/third-party-analyses/activist_reports/long/8-K_20200406_acc0001193125_20_099486.htm` | context | activist/long — local |
+| activist_long | acc0000950142 20 001057 | `CCL/third-party-analyses/activist_reports/long/8-K_20200408_acc0000950142_20_001057.htm` | context | activist/long — local |
+| activist_long | acc0001193125 20 102063 | `CCL/third-party-analyses/activist_reports/long/8-K_20200409_acc0001193125_20_102063.htm` | context | activist/long — local |
+| activist_long | acc0000815097 20 000033 | `CCL/third-party-analyses/activist_reports/long/8-K_20200421_acc0000815097_20_000033.htm` | context | activist/long — local |
+| activist_long | acc0000815097 20 000040 | `CCL/third-party-analyses/activist_reports/long/8-K_20200618_acc0000815097_20_000040.htm` | context | activist/long — local |
+| activist_long | acc0000950142 20 001646 | `CCL/third-party-analyses/activist_reports/long/8-K_20200626_acc0000950142_20_001646.htm` | context | activist/long — local |
+| activist_long | acc0000950142 20 001664 | `CCL/third-party-analyses/activist_reports/long/8-K_20200630_acc0000950142_20_001664.htm` | context | activist/long — local |
+| activist_long | acc0000950142 20 001680 | `CCL/third-party-analyses/activist_reports/long/8-K_20200701_acc0000950142_20_001680.htm` | context | activist/long — local |
+| activist_long | acc0000815097 20 000056 | `CCL/third-party-analyses/activist_reports/long/8-K_20200710_acc0000815097_20_000056.htm` | context | activist/long — local |
+| activist_long | acc0000950142 20 001747 | `CCL/third-party-analyses/activist_reports/long/8-K_20200715_acc0000950142_20_001747.htm` | context | activist/long — local |
+| activist_long | acc0000950142 20 001764 | `CCL/third-party-analyses/activist_reports/long/8-K_20200720_acc0000950142_20_001764.htm` | context | activist/long — local |
+| activist_long | acc0000815097 20 000066 | `CCL/third-party-analyses/activist_reports/long/8-K_20200729_acc0000815097_20_000066.htm` | context | activist/long — local |
+| activist_long | acc0000950142 20 001938 | `CCL/third-party-analyses/activist_reports/long/8-K_20200807_acc0000950142_20_001938.htm` | context | activist/long — local |
+| activist_long | acc0000950142 20 002023 | `CCL/third-party-analyses/activist_reports/long/8-K_20200814_acc0000950142_20_002023.htm` | context | activist/long — local |
+| activist_long | acc0000950142 20 002029 | `CCL/third-party-analyses/activist_reports/long/8-K_20200814_acc0000950142_20_002029.htm` | context | activist/long — local |
+| activist_long | acc0000950142 20 002039 | `CCL/third-party-analyses/activist_reports/long/8-K_20200817_acc0000950142_20_002039.htm` | context | activist/long — local |
+| activist_long | acc0000950142 20 002055 | `CCL/third-party-analyses/activist_reports/long/8-K_20200818_acc0000950142_20_002055.htm` | context | activist/long — local |
+| activist_long | acc0000815097 20 000074 | `CCL/third-party-analyses/activist_reports/long/8-K_20200915_acc0000815097_20_000074.htm` | context | activist/long — local |
+| activist_long | acc0001193125 20 245754 | `CCL/third-party-analyses/activist_reports/long/8-K_20200915_acc0001193125_20_245754.htm` | context | activist/long — local |
+| activist_long | acc0000815097 20 000103 | `CCL/third-party-analyses/activist_reports/long/8-K_20201008_acc0000815097_20_000103.htm` | context | activist/long — local |
+| activist_long | acc0001104659 20 123374 | `CCL/third-party-analyses/activist_reports/long/8-K_20201110_acc0001104659_20_123374.htm` | context | activist/long — local |
+| activist_long | acc0001104659 20 124033 | `CCL/third-party-analyses/activist_reports/long/8-K_20201112_acc0001104659_20_124033.htm` | context | activist/long — local |
+| activist_long | acc0001104659 20 125251 | `CCL/third-party-analyses/activist_reports/long/8-K_20201116_acc0001104659_20_125251.htm` | context | activist/long — local |
+| activist_long | acc0001104659 20 127362 | `CCL/third-party-analyses/activist_reports/long/8-K_20201119_acc0001104659_20_127362.htm` | context | activist/long — local |
+| activist_long | acc0000950142 20 002580 | `CCL/third-party-analyses/activist_reports/long/8-K_20201120_acc0000950142_20_002580.htm` | context | activist/long — local |
+| activist_long | acc0001104659 20 128508 | `CCL/third-party-analyses/activist_reports/long/8-K_20201123_acc0001104659_20_128508.htm` | context | activist/long — local |
+| activist_long | acc0000950142 20 002625 | `CCL/third-party-analyses/activist_reports/long/8-K_20201125_acc0000950142_20_002625.htm` | context | activist/long — local |
+| activist_long | acc0000815097 20 000111 | `CCL/third-party-analyses/activist_reports/long/8-K_20201204_acc0000815097_20_000111.htm` | context | activist/long — local |
+| activist_long | acc0000815097 21 000011 | `CCL/third-party-analyses/activist_reports/long/8-K_20210106_acc0000815097_21_000011.htm` | context | activist/long — local |
+| activist_long | acc0000815097 21 000016 | `CCL/third-party-analyses/activist_reports/long/8-K_20210111_acc0000815097_21_000016.htm` | context | activist/long — local |
+| activist_long | acc0000950142 21 000468 | `CCL/third-party-analyses/activist_reports/long/8-K_20210210_acc0000950142_21_000468.htm` | context | activist/long — local |
+| activist_long | acc0000950142 21 000629 | `CCL/third-party-analyses/activist_reports/long/8-K_20210216_acc0000950142_21_000629.htm` | context | activist/long — local |
+| activist_long | acc0001104659 21 027479 | `CCL/third-party-analyses/activist_reports/long/8-K_20210224_acc0001104659_21_027479.htm` | context | activist/long — local |
+| activist_long | acc0000815097 21 000033 | `CCL/third-party-analyses/activist_reports/long/8-K_20210303_acc0000815097_21_000033.htm` | context | activist/long — local |
+| activist_long | acc0000815097 21 000050 | `CCL/third-party-analyses/activist_reports/long/8-K_20210407_acc0000815097_21_000050.htm` | context | activist/long — local |
+| activist_long | acc0001193125 21 131462 | `CCL/third-party-analyses/activist_reports/long/8-K_20210426_acc0001193125_21_131462.htm` | context | activist/long — local |
+| activist_long | acc0000815097 21 000059 | `CCL/third-party-analyses/activist_reports/long/8-K_20210513_acc0000815097_21_000059.htm` | context | activist/long — local |
+| activist_long | acc0000950142 21 001758 | `CCL/third-party-analyses/activist_reports/long/8-K_20210527_acc0000950142_21_001758.htm` | context | activist/long — local |
+| activist_long | acc0000815097 21 000070 | `CCL/third-party-analyses/activist_reports/long/8-K_20210624_acc0000815097_21_000070.htm` | context | activist/long — local |
+| activist_long | acc0001104659 21 086035 | `CCL/third-party-analyses/activist_reports/long/8-K_20210628_acc0001104659_21_086035.htm` | context | activist/long — local |
+| activist_long | acc0001104659 21 087680 | `CCL/third-party-analyses/activist_reports/long/8-K_20210630_acc0001104659_21_087680.htm` | context | activist/long — local |
+| activist_long | acc0000950142 21 002235 | `CCL/third-party-analyses/activist_reports/long/8-K_20210706_acc0000950142_21_002235.htm` | context | activist/long — local |
+| activist_long | acc0000950142 21 002387 | `CCL/third-party-analyses/activist_reports/long/8-K_20210720_acc0000950142_21_002387.htm` | context | activist/long — local |
+| activist_long | acc0000950142 21 002445 | `CCL/third-party-analyses/activist_reports/long/8-K_20210726_acc0000950142_21_002445.htm` | context | activist/long — local |
+| activist_long | acc0000815097 21 000088 | `CCL/third-party-analyses/activist_reports/long/8-K_20210924_acc0000815097_21_000088.htm` | context | activist/long — local |
+| activist_long | acc0000950142 21 003050 | `CCL/third-party-analyses/activist_reports/long/8-K_20211004_acc0000950142_21_003050.htm` | context | activist/long — local |
+| activist_long | acc0000950142 21 003100 | `CCL/third-party-analyses/activist_reports/long/8-K_20211008_acc0000950142_21_003100.htm` | context | activist/long — local |
+| activist_long | acc0000950142 21 003218 | `CCL/third-party-analyses/activist_reports/long/8-K_20211018_acc0000950142_21_003218.htm` | context | activist/long — local |
+| activist_long | acc0000950142 21 003239 | `CCL/third-party-analyses/activist_reports/long/8-K_20211020_acc0000950142_21_003239.htm` | context | activist/long — local |
+| activist_long | acc0000950142 21 003512 | `CCL/third-party-analyses/activist_reports/long/8-K_20211102_acc0000950142_21_003512.htm` | context | activist/long — local |
+| activist_long | acc0000815097 21 000105 | `CCL/third-party-analyses/activist_reports/long/8-K_20211220_acc0000815097_21_000105.htm` | context | activist/long — local |
+| activist_long | acc0000815097 22 000018 | `CCL/third-party-analyses/activist_reports/long/8-K_20220322_acc0000815097_22_000018.htm` | context | activist/long — local |
+| activist_long | acc0001104659 22 045536 | `CCL/third-party-analyses/activist_reports/long/8-K_20220413_acc0001104659_22_045536.htm` | context | activist/long — local |
+| activist_long | acc0001104659 22 051225 | `CCL/third-party-analyses/activist_reports/long/8-K_20220427_acc0001104659_22_051225.htm` | context | activist/long — local |
+| activist_long | acc0001104659 22 061290 | `CCL/third-party-analyses/activist_reports/long/8-K_20220516_acc0001104659_22_061290.htm` | context | activist/long — local |
+| activist_long | acc0000950142 22 001677 | `CCL/third-party-analyses/activist_reports/long/8-K_20220519_acc0000950142_22_001677.htm` | context | activist/long — local |
+| activist_long | acc0000950142 22 001706 | `CCL/third-party-analyses/activist_reports/long/8-K_20220525_acc0000950142_22_001706.htm` | context | activist/long — local |
+| activist_long | acc0000815097 22 000044 | `CCL/third-party-analyses/activist_reports/long/8-K_20220624_acc0000815097_22_000044.htm` | context | activist/long — local |
+| activist_long | acc0000815097 22 000047 | `CCL/third-party-analyses/activist_reports/long/8-K_20220624_acc0000815097_22_000047.htm` | context | activist/long — local |
+| activist_long | acc0000815097 22 000049 | `CCL/third-party-analyses/activist_reports/long/8-K_20220624_acc0000815097_22_000049.htm` | context | activist/long — local |
+| activist_long | acc0001104659 22 082422 | `CCL/third-party-analyses/activist_reports/long/8-K_20220725_acc0001104659_22_082422.htm` | context | activist/long — local |
+| activist_long | acc0000950142 22 002577 | `CCL/third-party-analyses/activist_reports/long/8-K_20220822_acc0000950142_22_002577.htm` | context | activist/long — local |
+| activist_long | acc0000815097 22 000071 | `CCL/third-party-analyses/activist_reports/long/8-K_20220930_acc0000815097_22_000071.htm` | context | activist/long — local |
+| activist_long | acc0000950142 22 002921 | `CCL/third-party-analyses/activist_reports/long/8-K_20221018_acc0000950142_22_002921.htm` | context | activist/long — local |
+| activist_long | acc0000950142 22 002961 | `CCL/third-party-analyses/activist_reports/long/8-K_20221025_acc0000950142_22_002961.htm` | context | activist/long — local |
+| activist_long | acc0000950142 22 003028 | `CCL/third-party-analyses/activist_reports/long/8-K_20221101_acc0000950142_22_003028.htm` | context | activist/long — local |
+| activist_long | acc0001104659 22 114257 | `CCL/third-party-analyses/activist_reports/long/8-K_20221103_acc0001104659_22_114257.htm` | context | activist/long — local |
+| activist_long | acc0001104659 22 119119 | `CCL/third-party-analyses/activist_reports/long/8-K_20221115_acc0001104659_22_119119.htm` | context | activist/long — local |
+| activist_long | acc0000950142 22 003212 | `CCL/third-party-analyses/activist_reports/long/8-K_20221118_acc0000950142_22_003212.htm` | context | activist/long — local |
+| activist_long | acc0000815097 22 000081 | `CCL/third-party-analyses/activist_reports/long/8-K_20221221_acc0000815097_22_000081.htm` | context | activist/long — local |
+| activist_long | acc0001104659 23 004597 | `CCL/third-party-analyses/activist_reports/long/8-K_20230118_acc0001104659_23_004597.htm` | context | activist/long — local |
+| activist_long | acc0000950142 23 000539 | `CCL/third-party-analyses/activist_reports/long/8-K_20230301_acc0000950142_23_000539.htm` | context | activist/long — local |
+| activist_long | acc0000815097 23 000030 | `CCL/third-party-analyses/activist_reports/long/8-K_20230327_acc0000815097_23_000030.htm` | context | activist/long — local |
+| activist_long | acc0001104659 23 043182 | `CCL/third-party-analyses/activist_reports/long/8-K_20230407_acc0001104659_23_043182.htm` | context | activist/long — local |
+| activist_long | acc0000815097 23 000037 | `CCL/third-party-analyses/activist_reports/long/8-K_20230426_acc0000815097_23_000037.htm` | context | activist/long — local |
+| activist_long | acc0000815097 23 000045 | `CCL/third-party-analyses/activist_reports/long/8-K_20230626_acc0000815097_23_000045.htm` | context | activist/long — local |
+| activist_long | acc0000950142 23 002107 | `CCL/third-party-analyses/activist_reports/long/8-K_20230731_acc0000950142_23_002107.htm` | context | activist/long — local |
+| activist_long | acc0000950142 23 002122 | `CCL/third-party-analyses/activist_reports/long/8-K_20230802_acc0000950142_23_002122.htm` | context | activist/long — local |
+| activist_long | acc0000950142 23 002171 | `CCL/third-party-analyses/activist_reports/long/8-K_20230808_acc0000950142_23_002171.htm` | context | activist/long — local |
+| activist_long | acc0000815097 23 000062 | `CCL/third-party-analyses/activist_reports/long/8-K_20230929_acc0000815097_23_000062.htm` | context | activist/long — local |
+| activist_long | acc0000815097 23 000071 | `CCL/third-party-analyses/activist_reports/long/8-K_20231221_acc0000815097_23_000071.htm` | context | activist/long — local |
+| activist_long | acc0000950142 24 000192 | `CCL/third-party-analyses/activist_reports/long/8-K_20240122_acc0000950142_24_000192.htm` | context | activist/long — local |
+| activist_long | acc0000815097 24 000016 | `CCL/third-party-analyses/activist_reports/long/8-K_20240130_acc0000815097_24_000016.htm` | context | activist/long — local |
+| activist_long | acc0000815097 24 000033 | `CCL/third-party-analyses/activist_reports/long/8-K_20240327_acc0000815097_24_000033.htm` | context | activist/long — local |
+| activist_long | acc0000815097 24 000041 | `CCL/third-party-analyses/activist_reports/long/8-K_20240410_acc0000815097_24_000041.htm` | context | activist/long — local |
+| activist_long | acc0000815097 24 000044 | `CCL/third-party-analyses/activist_reports/long/8-K_20240415_acc0000815097_24_000044.htm` | context | activist/long — local |
+| activist_long | acc0000950142 24 001153 | `CCL/third-party-analyses/activist_reports/long/8-K_20240419_acc0000950142_24_001153.htm` | context | activist/long — local |
+| activist_long | acc0000950142 24 001201 | `CCL/third-party-analyses/activist_reports/long/8-K_20240425_acc0000950142_24_001201.htm` | context | activist/long — local |
+| activist_long | acc0000815097 24 000052 | `CCL/third-party-analyses/activist_reports/long/8-K_20240625_acc0000815097_24_000052.htm` | context | activist/long — local |
+| activist_long | acc0000815097 24 000069 | `CCL/third-party-analyses/activist_reports/long/8-K_20240930_acc0000815097_24_000069.htm` | context | activist/long — local |
+| activist_long | acc0000815097 24 000078 | `CCL/third-party-analyses/activist_reports/long/8-K_20241220_acc0000815097_24_000078.htm` | context | activist/long — local |
+| activist_long | acc0001104659 25 002319 | `CCL/third-party-analyses/activist_reports/long/8-K_20250110_acc0001104659_25_002319.htm` | context | activist/long — local |
+| activist_long | acc0000950142 25 000085 | `CCL/third-party-analyses/activist_reports/long/8-K_20250113_acc0000950142_25_000085.htm` | context | activist/long — local |
+| activist_long | acc0000950142 25 000209 | `CCL/third-party-analyses/activist_reports/long/8-K_20250128_acc0000950142_25_000209.htm` | context | activist/long — local |
+| activist_long | acc0000950142 25 000210 | `CCL/third-party-analyses/activist_reports/long/8-K_20250128_acc0000950142_25_000210.htm` | context | activist/long — local |
+| activist_long | acc0000950142 25 000285 | `CCL/third-party-analyses/activist_reports/long/8-K_20250207_acc0000950142_25_000285.htm` | context | activist/long — local |
+| activist_long | acc0000950142 25 000410 | `CCL/third-party-analyses/activist_reports/long/8-K_20250218_acc0000950142_25_000410.htm` | context | activist/long — local |
+| activist_long | acc0000950142 25 000414 | `CCL/third-party-analyses/activist_reports/long/8-K_20250219_acc0000950142_25_000414.htm` | context | activist/long — local |
+| activist_long | acc0000950142 25 000567 | `CCL/third-party-analyses/activist_reports/long/8-K_20250228_acc0000950142_25_000567.htm` | context | activist/long — local |
+| activist_long | acc0000815097 25 000019 | `CCL/third-party-analyses/activist_reports/long/8-K_20250321_acc0000815097_25_000019.htm` | context | activist/long — local |
+| activist_long | acc0000815097 25 000029 | `CCL/third-party-analyses/activist_reports/long/8-K_20250418_acc0000815097_25_000029.htm` | context | activist/long — local |
+| activist_long | acc0000950142 25 001121 | `CCL/third-party-analyses/activist_reports/long/8-K_20250421_acc0000950142_25_001121.htm` | context | activist/long — local |
+| activist_long | acc0000950142 25 001321 | `CCL/third-party-analyses/activist_reports/long/8-K_20250512_acc0000950142_25_001321.htm` | context | activist/long — local |
+| activist_long | acc0000950142 25 001332 | `CCL/third-party-analyses/activist_reports/long/8-K_20250512_acc0000950142_25_001332.htm` | context | activist/long — local |
+| activist_long | acc0000950142 25 001443 | `CCL/third-party-analyses/activist_reports/long/8-K_20250521_acc0000950142_25_001443.htm` | context | activist/long — local |
+| activist_long | acc0000950142 25 001611 | `CCL/third-party-analyses/activist_reports/long/8-K_20250613_acc0000950142_25_001611.htm` | context | activist/long — local |
+| activist_long | acc0000815097 25 000047 | `CCL/third-party-analyses/activist_reports/long/8-K_20250624_acc0000815097_25_000047.htm` | context | activist/long — local |
+| activist_long | acc0000950142 25 001720 | `CCL/third-party-analyses/activist_reports/long/8-K_20250630_acc0000950142_25_001720.htm` | context | activist/long — local |
+| activist_long | acc0000950142 25 001784 | `CCL/third-party-analyses/activist_reports/long/8-K_20250701_acc0000950142_25_001784.htm` | context | activist/long — local |
+| activist_long | acc0000950142 25 001844 | `CCL/third-party-analyses/activist_reports/long/8-K_20250707_acc0000950142_25_001844.htm` | context | activist/long — local |
+| activist_long | acc0000950142 25 001845 | `CCL/third-party-analyses/activist_reports/long/8-K_20250707_acc0000950142_25_001845.htm` | context | activist/long — local |
+| activist_long | acc0000950142 25 001853 | `CCL/third-party-analyses/activist_reports/long/8-K_20250707_acc0000950142_25_001853.htm` | context | activist/long — local |
+| activist_long | acc0000950142 25 001921 | `CCL/third-party-analyses/activist_reports/long/8-K_20250716_acc0000950142_25_001921.htm` | context | activist/long — local |
+| activist_long | acc0000815097 25 000071 | `CCL/third-party-analyses/activist_reports/long/8-K_20250808_acc0000815097_25_000071.htm` | context | activist/long — local |
+| activist_long | acc0000950142 25 002224 | `CCL/third-party-analyses/activist_reports/long/8-K_20250819_acc0000950142_25_002224.htm` | context | activist/long — local |
+| activist_long | acc0000815097 25 000082 | `CCL/third-party-analyses/activist_reports/long/8-K_20250929_acc0000815097_25_000082.htm` | context | activist/long — local |
+| activist_long | acc0000950142 25 002569 | `CCL/third-party-analyses/activist_reports/long/8-K_20250930_acc0000950142_25_002569.htm` | context | activist/long — local |
+| activist_long | acc0000950142 25 002580 | `CCL/third-party-analyses/activist_reports/long/8-K_20250930_acc0000950142_25_002580.htm` | context | activist/long — local |
+| activist_long | acc0000950142 25 002811 | `CCL/third-party-analyses/activist_reports/long/8-K_20251015_acc0000950142_25_002811.htm` | context | activist/long — local |
+| activist_long | acc0001628280 25 058106 | `CCL/third-party-analyses/activist_reports/long/8-K_20251219_acc0001628280_25_058106.htm` | context | activist/long — local |
+| activist_long | acc0000950142 26 000354 | `CCL/third-party-analyses/activist_reports/long/8-K_20260212_acc0000950142_26_000354.htm` | context | activist/long — local |
+| activist_long | acc0000950142 26 000454 | `CCL/third-party-analyses/activist_reports/long/8-K_20260220_acc0000950142_26_000454.htm` | context | activist/long — local |
+| activist_long | acc0000815097 26 000034 | `CCL/third-party-analyses/activist_reports/long/8-K_20260327_acc0000815097_26_000034.htm` | context | activist/long — local |
+| activist_long | acc0000815097 26 000043 | `CCL/third-party-analyses/activist_reports/long/8-K_20260420_acc0000815097_26_000043.htm` | context | activist/long — local |
+| activist_long | acc0001104659 26 057200 | `CCL/third-party-analyses/activist_reports/long/8-K_20260507_acc0001104659_26_057200.htm` | context | activist/long — local |
+| activist_long | acc0000815097 26 000086 | `CCL/third-party-analyses/activist_reports/long/8-K_20260623_acc0000815097_26_000086.htm` | context | activist/long — local |
+| activist_long | acc0000950142 26 002267 | `CCL/third-party-analyses/activist_reports/long/8-K_20260805_acc0000950142_26_002267.htm` | context | activist/long — local |
+| activist_long | acc0000815097 26 000104 | `CCL/third-party-analyses/activist_reports/long/8-K_20260929_acc0000815097_26_000104.htm` | context | activist/long — local |
+
+Cross-check required: `CCL/research/cross_check_third_party_2026-10-04.md`

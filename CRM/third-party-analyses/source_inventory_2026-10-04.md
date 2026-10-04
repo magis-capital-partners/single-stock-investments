@@ -1,0 +1,47 @@
+# CRM — Third-party source inventory
+
+**Date:** 2026-10-04
+**Sources:** 38 total (0 approved, 0 pending, 38 context)
+
+| ID | Title | Path | Status | Use |
+|----|-------|------|--------|-----|
+| activist_long | ValueAct Capital — DEFA14A | `CRM/third-party-analyses/activist_reports/long/DEFA14A_20260505_acc0001108524_26_000093.htm` | context | activist/long — sec_edgar |
+| activist_long | ValueAct Capital — DEFA14A | `CRM/third-party-analyses/activist_reports/long/DEFA14A_20250519_acc0001108524_25_000025.htm` | context | activist/long — sec_edgar |
+| activist_long | Elliott Management — PX14A6G | `CRM/third-party-analyses/activist_reports/long/PX14A6G_20240603_acc0001096906_24_001289.htm` | context | activist/long — sec_edgar |
+| activist_long | Teleios Capital — PX14A6G | `CRM/third-party-analyses/activist_reports/long/PX14A6G_20240506_acc0001096906_24_001031.htm` | context | activist/long — sec_edgar |
+| activist_long | PX14A6G · CRM · 2024-03-28 | `CRM/third-party-analyses/activist_reports/long/PX14A6G_20240328_acc0001096906_24_000640.htm` | context | activist/long — sec_edgar |
+| activist_long | acc0001108524 23 000037 | `CRM/third-party-analyses/activist_reports/long/8-K_20230830_acc0001108524_23_000037.htm` | context | activist/long — local |
+| activist_long | acc0001108524 23 000046 | `CRM/third-party-analyses/activist_reports/long/8-K_20231129_acc0001108524_23_000046.htm` | context | activist/long — local |
+| activist_long | acc0001108524 24 000002 | `CRM/third-party-analyses/activist_reports/long/8-K_20240228_acc0001108524_24_000002.htm` | context | activist/long — local |
+| activist_long | acc0001108524 24 000007 | `CRM/third-party-analyses/activist_reports/long/8-K_20240529_acc0001108524_24_000007.htm` | context | activist/long — local |
+| activist_long | acc0001108524 24 000014 | `CRM/third-party-analyses/activist_reports/long/8-K_20240701_acc0001108524_24_000014.htm` | context | activist/long — local |
+| activist_long | acc0001108524 24 000020 | `CRM/third-party-analyses/activist_reports/long/8-K_20240828_acc0001108524_24_000020.htm` | context | activist/long — local |
+| activist_long | acc0001108524 24 000024 | `CRM/third-party-analyses/activist_reports/long/8-K_20240905_acc0001108524_24_000024.htm` | context | activist/long — local |
+| activist_long | acc0001193125 24 251243 | `CRM/third-party-analyses/activist_reports/long/8-K_20241105_acc0001193125_24_251243.htm` | context | activist/long — local |
+| activist_long | acc0001108524 24 000033 | `CRM/third-party-analyses/activist_reports/long/8-K_20241203_acc0001108524_24_000033.htm` | context | activist/long — local |
+| activist_long | acc0001108524 24 000036 | `CRM/third-party-analyses/activist_reports/long/8-K_20241210_acc0001108524_24_000036.htm` | context | activist/long — local |
+| activist_long | acc0001193125 25 020881 | `CRM/third-party-analyses/activist_reports/long/8-K_20250205_acc0001193125_25_020881.htm` | context | activist/long — local |
+| activist_long | acc0001108524 25 000002 | `CRM/third-party-analyses/activist_reports/long/8-K_20250226_acc0001108524_25_000002.htm` | context | activist/long — local |
+| activist_long | acc0001193125 25 126271 | `CRM/third-party-analyses/activist_reports/long/8-K_20250527_acc0001193125_25_126271.htm` | context | activist/long — local |
+| activist_long | acc0001108524 25 000027 | `CRM/third-party-analyses/activist_reports/long/8-K_20250528_acc0001108524_25_000027.htm` | context | activist/long — local |
+| activist_long | acc0001108524 25 000033 | `CRM/third-party-analyses/activist_reports/long/8-K_20250609_acc0001108524_25_000033.htm` | context | activist/long — local |
+| activist_long | acc0001193125 25 145772 | `CRM/third-party-analyses/activist_reports/long/8-K_20250624_acc0001193125_25_145772.htm` | context | activist/long — local |
+| activist_long | acc0001108524 25 000040 | `CRM/third-party-analyses/activist_reports/long/8-K_20250709_acc0001108524_25_000040.htm` | context | activist/long — local |
+| activist_long | acc0001108524 25 000083 | `CRM/third-party-analyses/activist_reports/long/8-K_20250903_acc0001108524_25_000083.htm` | context | activist/long — local |
+| activist_long | acc0001108524 25 000168 | `CRM/third-party-analyses/activist_reports/long/8-K_20251016_acc0001108524_25_000168.htm` | context | activist/long — local |
+| activist_long | acc0001108524 25 000207 | `CRM/third-party-analyses/activist_reports/long/8-K_20251118_acc0001108524_25_000207.htm` | context | activist/long — local |
+| activist_long | acc0001108524 25 000234 | `CRM/third-party-analyses/activist_reports/long/8-K_20251203_acc0001108524_25_000234.htm` | context | activist/long — local |
+| activist_long | acc0001108524 26 000056 | `CRM/third-party-analyses/activist_reports/long/8-K_20260225_acc0001108524_26_000056.htm` | context | activist/long — local |
+| activist_long | acc0001108524 26 000062 | `CRM/third-party-analyses/activist_reports/long/8-K_20260306_acc0001108524_26_000062.htm` | context | activist/long — local |
+| activist_long | acc0001193125 26 104282 | `CRM/third-party-analyses/activist_reports/long/8-K_20260312_acc0001193125_26_104282.htm` | context | activist/long — local |
+| activist_long | acc0001193125 26 106356 | `CRM/third-party-analyses/activist_reports/long/8-K_20260313_acc0001193125_26_106356.htm` | context | activist/long — local |
+| activist_long | acc0001193125 26 107403 | `CRM/third-party-analyses/activist_reports/long/8-K_20260316_acc0001193125_26_107403.htm` | context | activist/long — local |
+| activist_long | acc0001108524 26 000125 | `CRM/third-party-analyses/activist_reports/long/8-K_20260527_acc0001108524_26_000125.htm` | context | activist/long — local |
+| activist_long | acc0001108524 26 000131 | `CRM/third-party-analyses/activist_reports/long/8-K_20260601_acc0001108524_26_000131.htm` | context | activist/long — local |
+| activist_long | acc0001108524 26 000138 | `CRM/third-party-analyses/activist_reports/long/8-K_20260602_acc0001108524_26_000138.htm` | context | activist/long — local |
+| activist_long | acc0001108524 26 000160 | `CRM/third-party-analyses/activist_reports/long/8-K_20260805_acc0001108524_26_000160.htm` | context | activist/long — local |
+| activist_long | acc0001108524 26 000187 | `CRM/third-party-analyses/activist_reports/long/8-K_20260826_acc0001108524_26_000187.htm` | context | activist/long — local |
+| activist_long | acc0001108524 26 000197 | `CRM/third-party-analyses/activist_reports/long/8-K_20260904_acc0001108524_26_000197.htm` | context | activist/long — local |
+| activist_long | acc0001108524 26 000210 | `CRM/third-party-analyses/activist_reports/long/8-K_20260917_acc0001108524_26_000210.htm` | context | activist/long — local |
+
+Cross-check required: `CRM/research/cross_check_third_party_2026-10-04.md`
