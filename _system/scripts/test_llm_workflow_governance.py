@@ -166,7 +166,11 @@ class WorkflowGovernanceTests(unittest.TestCase):
         self.assertIn('gh pr list --repo "${{ github.repository }}"', continue_wf)
         self.assertIn('echo "max_parallel=1"', queue_wf)
         self.assertIn("cursor_pr_backlog_", dispatch)
-        self.assertIn('.mergeable == "MERGEABLE"', dispatch)
+        self.assertIn("cursor_pr_slot.py count", dispatch)
+        # PR #1112 counts every open cursor/* PR, including dirty, draft, and
+        # unknown merge states. A MERGEABLE-only count let conflicted PRs sit
+        # outside the cap. Do not put that filter back.
+        self.assertNotIn('.mergeable == "MERGEABLE"', dispatch)
         self.assertNotIn('.mergeable != "CONFLICTING"', dispatch)
         self.assertIn("ci_checkout_workspace.sh marvin-forecast main", dispatch)
 
