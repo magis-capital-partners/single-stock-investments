@@ -76,6 +76,19 @@ jobs:
       head_sha: ${{ steps.pr.outputs.head_sha }}
       is_draft: ${{ steps.pr.outputs.is_draft }}
     steps:
+      - uses: actions/checkout@v4
+        with:
+          # Lane classification ships with this workflow file. A pull_request
+          # run uses the PR's workflow, so the script has to come from that
+          # head. A workflow_run retry uses the default-branch workflow and
+          # that commit. Provenance validators stay on the base branch in the
+          # gate job, so a research diff cannot rewrite them.
+          ref: ${{ github.event.pull_request.head.sha || github.event.workflow_run.head_sha || github.sha }}
+          fetch-depth: 1
+          filter: blob:none
+          sparse-checkout: |
+            /_system/scripts/classify_agent_pr_lane.py
+          sparse-checkout-cone-mode: false
       - name: Resolve PR number and eligibility
         id: pr
         env:
@@ -87,6 +100,7 @@ jobs:
           RUN_ID: ${{ github.event.workflow_run.id }}
           RUN_TITLE: ${{ github.event.workflow_run.display_title }}
           REPO: ${{ github.repository }}
+          DEFAULT_BRANCH: ${{ github.event.repository.default_branch }}
         run: |
           set -euo pipefail
           if [ "$EVENT_NAME" = "pull_request" ]; then
@@ -141,14 +155,23 @@ jobs:
             echo "is_draft=$IS_DRAFT" >> "$GITHUB_OUTPUT"
             exit 0
           fi
-          # Two automerge lanes. cursor/* carries research/committee artifacts
-          # and goes through the provenance gate; codex/* and claude/* are
-          # code-agent PRs and gate purely on every CI check being green.
-          if [[ "$HEAD_REF" =~ ^cursor/ ]]; then
-            LANE="research"
-          elif [[ "$HEAD_REF" =~ ^(codex|claude)/ ]]; then
-            LANE="code"
-          else
+          # Two automerge lanes. A cursor/* diff that touches a ticker
+          # research tree (a deep dive, a manifest, a committee packet) stays
+          # on the provenance gate, including when the manifest is missing.
+          # A cursor/* diff that does not — workflow, script, and ledger
+          # fixes — is a code PR. codex/* and claude/* are always code.
+          # Both code lanes gate on every CI check being green.
+          gh api --paginate "repos/$REPO/pulls/$PR/files" --jq '.[].filename' > "$RUNNER_TEMP/pr-files.txt"
+          # A workflow_run retry checks out the PR head. A branch cut before
+          # this script existed will not have it; the default branch does.
+          SCRIPT=_system/scripts/classify_agent_pr_lane.py
+          if [ ! -f "$SCRIPT" ]; then
+            mkdir -p _system/scripts
+            git fetch --depth=1 origin "$DEFAULT_BRANCH"
+            git show "FETCH_HEAD:$SCRIPT" > "$SCRIPT"
+          fi
+          LANE=$(python3 "$SCRIPT" --head-ref "$HEAD_REF" --files "$RUNNER_TEMP/pr-files.txt")
+          if [ "$LANE" = "none" ]; then
             echo "PR #$PR head ref '$HEAD_REF' is not an agent branch (cursor/, codex/, claude/) — skipping automerge."
             echo "eligible=false" >> "$GITHUB_OUTPUT"
             echo "lane=none" >> "$GITHUB_OUTPUT"
