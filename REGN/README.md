@@ -1,10 +1,11 @@
-# Regeneron Pharmaceuticals (REGN)
+# REGENERON PHARMACEUTICALS, INC.  (REGN)  (CIK 0000872589) contingent / CVR candidate (REGN)
 
-**Ticker:** REGN | **Market:** US
-**Last updated:** 2026-07-10
+**Ticker:** REGN | **Market:** US  
+**Last updated:** 2026-10-05  
+**Stage:** pre-close stub (discovery)
 
-## Download
+## Next actions
 
-```powershell
-python REGN/investor-documents/download_regn_investor_docs.py
-```
+1. Pull merger 8-K / DEFM14A / CVR agreement into `investor-documents/sec/`.
+2. Fill `research/cvr_terms.json` (set `stub=false`, `terms_complete=true`).
+3. Nightly sync will sleeve onto the CVRs filter.

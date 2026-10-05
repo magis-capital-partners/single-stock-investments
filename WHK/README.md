@@ -1,10 +1,11 @@
-# WhiteHawk Minerals Corp. (WHK)
+# WhiteHawk Minerals Corp.  (WHK)  (CIK 0001921603) contingent / CVR candidate (WHK)
 
-**Ticker:** WHK | **Market:** US
-**Last updated:** 2026-07-23
+**Ticker:** WHK | **Market:** US  
+**Last updated:** 2026-10-05  
+**Stage:** pre-close stub (discovery)
 
-## Download
+## Next actions
 
-```powershell
-python WHK/investor-documents/download_whk_investor_docs.py
-```
+1. Pull merger 8-K / DEFM14A / CVR agreement into `investor-documents/sec/`.
+2. Fill `research/cvr_terms.json` (set `stub=false`, `terms_complete=true`).
+3. Nightly sync will sleeve onto the CVRs filter.
