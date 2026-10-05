@@ -1,12 +1,13 @@
 # Event triage — human review queue
 
 **Date:** 2026-10-05
-**Rows:** 5260
+**Rows:** 3123
 
 | Date | Ticker | Source | Tier | Materiality | Rules | Title |
 |------|--------|--------|------|-------------|-------|-------|
+| 2026-10-05 | UNP | news | context | 38 | rule_conflict, activist_cross_link, neutral_low_impact | Fund Update: 112,196 UNION PACIFIC (UNP) shares added to FER |
+| 2026-10-05 | AMZN | news | context | 38 | rule_conflict, activist_cross_link, neutral_low_impact | Where Will Amazon Stock Be in 5 Years as AWS, Advertising, a |
 | 2026-10-05 | PSX | news | context | 38 | rule_conflict, activist_cross_link, neutral_low_impact | Phillips 66 (PSX) Faces Bayway Strike Risk, Is The Stock Ful |
-| 2026-10-05 | MP | news | context | 38 | rule_conflict, activist_cross_link, neutral_low_impact | Thieves strike at BJP MP’s Lutyens’ Delhi bungalow - The Tri |
 | 2026-10-05 | ACHR | kpi_trend | context | 66 | rule_conflict, activist_cross_link, routine_governance_watch | Leadership / governance on watch |
 | 2026-10-05 | ARES | kpi_trend | context | 66 | rule_conflict, activist_cross_link, routine_governance_watch | Leadership / governance on watch |
 | 2026-10-05 | AVY | kpi_trend | context | 66 | rule_conflict, activist_cross_link, routine_governance_watch | Leadership / governance on watch |
@@ -54,6 +55,8 @@
 | 2026-10-05 | VMC | kpi_trend | context | 66 | rule_conflict, activist_cross_link, routine_governance_watch | Leadership / governance on watch |
 | 2026-10-05 | XYZ | kpi_trend | context | 66 | rule_conflict, activist_cross_link, routine_governance_watch | Leadership / governance on watch |
 | 2026-10-05 | YUM | kpi_trend | context | 66 | rule_conflict, activist_cross_link, routine_governance_watch | Leadership / governance on watch |
+| 2026-10-04 | FDX | news | context | 38 | rule_conflict, activist_cross_link, neutral_low_impact | FedEx (FDX) Q4 Fiscal 2026 Earnings on June 23rd - What to E |
+| 2026-10-04 | CSCO | news | context | 38 | rule_conflict, activist_cross_link, neutral_low_impact | Cisco (CSCO) Stock Surges 46% in 2026: AI Infrastructure Gro |
 | 2026-10-04 | BB | news | context | 38 | rule_conflict, activist_cross_link, neutral_low_impact | BB Stock Ticks Lower Overnight: BlackBerry Insider Sale Plan |
 | 2026-10-04 | SBUX | news | context | 38 | rule_conflict, activist_cross_link, neutral_low_impact | Starbucks Is Closing 250 Stores After Raising Guidance. What |
 | 2026-10-04 | VZ | news | context | 38 | rule_conflict, activist_cross_link, neutral_low_impact | Verizon Communications (VZ) Forms Satellite Connectivity Joi |
@@ -202,6 +205,3 @@
 | 2026-10-04 | APD | third_party | context | 25 | rule_conflict, activist_cross_link, entity_mismatch, neutral_low_impact | Mantle (+4) — DEFC14A (proxy solicitation) |
 | 2026-10-04 | APD | third_party | context | 25 | rule_conflict, activist_cross_link, entity_mismatch, neutral_low_impact | Mantle Ridge — DEFC14A (proxy solicitation) |
 | 2026-10-04 | APD | third_party | context | 25 | rule_conflict, activist_cross_link, entity_mismatch, neutral_low_impact | Mantle (+6) — DFAN14A (proxy solicitation) |
-| 2026-10-04 | ADSK | third_party | context | 25 | rule_conflict, activist_cross_link, entity_mismatch, neutral_low_impact | Starboard Value — DEFA14A |
-| 2026-10-04 | ZETA | third_party | context | 25 | rule_conflict, activist_cross_link, entity_mismatch, neutral_low_impact | HoldCo Asset Management — SC 13G/A |
-| 2026-10-04 | ZETA | third_party | context | 25 | rule_conflict, activist_cross_link, entity_mismatch, neutral_low_impact | CMS Platinum Fund, L.P. — SC 13G/A |
