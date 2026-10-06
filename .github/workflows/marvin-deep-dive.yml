@@ -61,6 +61,13 @@ jobs:
       max-parallel: ${{ fromJson(needs.batch-prepare.outputs.max_parallel) }}
       matrix:
         include: ${{ fromJson(needs.batch-prepare.outputs.jobs) }}
+    # The dispatcher needs contents: write since #1112 (its fold step merges a
+    # second ticker PR's branch through the API). A called workflow cannot hold
+    # more than its calling job grants, so the grant lives here; without it
+    # every run failed at startup from 2026-10-03 (#1118).
+    permissions:
+      contents: write
+      pull-requests: write
     uses: ./.github/workflows/research-agent-dispatch.yml
     with:
       ticker: ${{ matrix.ticker }}
