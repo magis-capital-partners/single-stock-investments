@@ -91,6 +91,12 @@ PROFILES: dict[str, list[list[str]]] = {
         ["_system/scripts/fetch_insider_transactions.py", "--offline"],
         ["_system/scripts/build_equity_model_dashboard.py"],
         ["_system/scripts/extract_equity_kpi_observations.py"],
+        # Before the KPI build: FluView drops Friday, and this nightly lane is
+        # what was leaving the respiratory panel and QDEL model on the August
+        # cache. Both scripts keep the last good file if a source is down.
+        ["_system/scripts/fetch_respiratory_panel.py"],
+        ["_system/scripts/build_qdel_respiratory_model.py"],
+        ["_system/scripts/build_fico_watch.py"],
         ["_system/scripts/build_kpi_trends.py"],
         ["_system/scripts/repair_letter_dates.py", "--apply"],
         ["_system/scripts/build_superinvestor_insights.py"],
@@ -111,6 +117,10 @@ PROFILES: dict[str, list[list[str]]] = {
         ["_system/scripts/build_dashboard_data.py"],
     ],
     "world-model-weekly": [
+        # Second writer, Sunday, in case the nightly intake-full lane misses
+        # Friday's FluView. Same two scripts as the full profile.
+        ["_system/scripts/fetch_respiratory_panel.py"],
+        ["_system/scripts/build_qdel_respiratory_model.py"],
         ["_system/scripts/fetch_theme_panel.py"],
         ["_system/scripts/fetch_crypto_panel.py"],
         ["_system/scripts/build_hk_snowball_model.py"],
@@ -122,6 +132,9 @@ PROFILES: dict[str, list[list[str]]] = {
             "--mark-auto",
             "--queue-reviews",
         ],
+        # After mark-auto, so a null actual is not left as the Sunday status,
+        # and before lint, so the ledger lint sees this file.
+        ["_system/scripts/build_fico_watch.py"],
         ["_system/scripts/lint_kpi_ledger.py"],
         ["_system/scripts/build_world_model_snapshot.py", "--skip-resolve"],
         [

@@ -355,9 +355,9 @@ def build() -> dict:
                 "gain that large 24% of the time (p=0.24)."
             ),
             "power_note": (
-                "With 9 year-over-year observations and a true R^2 near 0.15, out-of-sample "
-                "detection power is about 40%. Roughly 20-40 quarters would be needed. The binding "
-                "constraint is sample size, not model form."
+                "The original power check used 9 year-over-year observations. At a true R^2 near "
+                "0.15, out-of-sample detection power is about 40% at that sample size. Roughly "
+                "20-40 quarters would be needed. The binding constraint is sample size, not model form."
             ),
             "how_to_falsify": (
                 "Re-run this script as quarters accumulate. If a "

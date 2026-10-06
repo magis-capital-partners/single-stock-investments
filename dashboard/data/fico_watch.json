@@ -1,0 +1,475 @@
+{
+  "schema": "fico_watch.v1",
+  "generated_at": "2026-10-06T13:48:17Z",
+  "ticker": "FICO",
+  "banner": {
+    "tone": "fail",
+    "text": "FICO · Mortgage exclusivity is gone · Software is not an offset · Debt is above 3× operating income",
+    "action": "Open FICO"
+  },
+  "verdict": {
+    "tone": "fail",
+    "title": "Mortgage exclusivity is gone. Software is not an offset. Debt is above 3× operating income",
+    "detail": "These lines are the watch. A holding pill means that particular gate has not broken. It does not mean the mortgage toll is safe."
+  },
+  "freshness": {
+    "state": "current",
+    "detail": "Segment rows match 10-Q filed 2026-07-29 (period 2026-06-30). Automatic debt, cash, and revenue rows were read from the SEC companyfacts feed on this run.",
+    "pinned": {
+      "form": "10-Q",
+      "accession": "0000814547-26-000030",
+      "period_end": "2026-06-30",
+      "filed": "2026-07-29",
+      "source_path": "FICO/research/deep_dive_2026-09-29.md"
+    },
+    "latest": {
+      "form": "10-Q",
+      "accession": "0000814547-26-000030",
+      "filed": "2026-07-29",
+      "period_end": "2026-06-30"
+    },
+    "sec_error": null,
+    "reused_auto": false
+  },
+  "trust": "Debt, cash, revenue, operating income, buybacks, and interest refresh from the SEC companyfacts feed on the nightly dashboard build and again on Sunday. The Scores split, bureau share, margin, unit-price sentence, lenders, and the policy grid stay at the last filing a person read. None of these gates are in the base return.",
+  "groups": [
+    {
+      "id": "gates",
+      "label": "Lines that change the watch",
+      "rows": [
+        {
+          "id": "mortgage_exclusivity",
+          "label": "Only Classic FICO on the mortgage price grid",
+          "display": "One grid. Classic FICO and VantageScore are both allowed.",
+          "note": "The watch wanted Classic FICO alone. On September 28, 2026 the 20-point markdown on VantageScore came off, and both scores sit on one price grid. Classic FICO is still allowed, and still required when a loan is underwritten by hand.",
+          "as_of": "2026-09-28",
+          "source": "FICO/research/deep_dive_2026-09-29.md",
+          "status": "fail",
+          "pill": "Broken"
+        },
+        {
+          "id": "software_growth_pct",
+          "label": "Software revenue growth",
+          "display": "3% in fiscal 2025",
+          "note": "Watch line is 8% a year, set here so a low-single-digit software result cannot be read as a replacement for Scores. Fiscal 2025 operating income in Software fell $9.8 million.",
+          "as_of": "2025-09-30",
+          "source": "FICO/research/deep_dive_2026-09-29.md",
+          "status": "fail",
+          "pill": "Broken"
+        },
+        {
+          "id": "net_debt_to_annualized_operating_income",
+          "label": "Net debt / annualized operating income",
+          "display": "3.98×",
+          "note": "Net debt $5,333.9 million ($5,282.4 million plus $300.0 million minus $248.4 million) divided by $1,340.8 million of operating income stretched to a year. Not a company-reported EBITDA multiple.",
+          "as_of": "2026-06-30",
+          "source": "sec:companyfacts",
+          "status": "fail",
+          "pill": "Broken"
+        },
+        {
+          "id": "preferred_lender_count",
+          "label": "Large originators preferring VantageScore",
+          "display": "1 of the names we track",
+          "note": "Rocket has named VantageScore preferred. United Wholesale has not. The count fails at 3.",
+          "as_of": "2026-09-29",
+          "source": "FICO/research/deep_dive_2026-09-29.md",
+          "status": "pass",
+          "pill": "Holding"
+        },
+        {
+          "id": "bureau_revenue_share_pct",
+          "label": "Bureau share of revenue",
+          "display": "63% of the June quarter",
+          "note": "54% a year earlier and 51% for fiscal 2025. Holding means it has not crossed 70%. It is already the majority of revenue, and the same three firms own the rival score.",
+          "as_of": "2026-06-30",
+          "source": "FICO/research/deep_dive_2026-09-29.md",
+          "status": "pass",
+          "pill": "Holding"
+        },
+        {
+          "id": "scores_operating_margin_pct",
+          "label": "Scores operating margin",
+          "display": "88% in fiscal 2025",
+          "note": "Last reported Scores margin. The June quarter does not restate it. Holding means it has not fallen through 80%.",
+          "as_of": "2025-09-30",
+          "source": "FICO/research/deep_dive_2026-09-29.md",
+          "status": "pass",
+          "pill": "Holding"
+        },
+        {
+          "id": "mortgage_unit_price",
+          "label": "Mortgage origination score unit price",
+          "display": "Not disclosed",
+          "note": "The filing says the Scores increase was primarily a higher mortgage origination scores unit price. It does not give the price or the unit count. A blank here is not a pass.",
+          "as_of": "2026-06-30",
+          "source": "FICO/research/deep_dive_2026-09-29.md",
+          "status": "unchecked",
+          "pill": "Not disclosed"
+        }
+      ]
+    },
+    {
+      "id": "sec",
+      "label": "Automatic, from the SEC feed",
+      "rows": [
+        {
+          "id": "debt_noncurrent",
+          "label": "Long-term debt, excluding the portion due within a year",
+          "display": "$5,282.4 million",
+          "note": "SEC companyfacts, LongTermDebtNoncurrent.",
+          "as_of": "2026-06-30",
+          "source": "sec:companyfacts",
+          "status": "context",
+          "pill": "SEC feed"
+        },
+        {
+          "id": "debt_current",
+          "label": "Long-term debt due within a year",
+          "display": "$300.0 million",
+          "note": "SEC companyfacts, LongTermDebtCurrent. Included in the net-debt figure.",
+          "as_of": "2026-06-30",
+          "source": "sec:companyfacts",
+          "status": "context",
+          "pill": "SEC feed"
+        },
+        {
+          "id": "cash",
+          "label": "Cash",
+          "display": "$248.4 million",
+          "note": "SEC companyfacts, cash and cash equivalents.",
+          "as_of": "2026-06-30",
+          "source": "sec:companyfacts",
+          "status": "context",
+          "pill": "SEC feed"
+        },
+        {
+          "id": "operating_income",
+          "label": "Operating income used for the multiple",
+          "display": "$999.1 million",
+          "note": "272 days in the span. Stretched to a year this is $1,340.8 million. Basis: year-to-date.",
+          "as_of": "2026-06-30",
+          "source": "sec:companyfacts",
+          "status": "context",
+          "pill": "SEC feed"
+        },
+        {
+          "id": "revenue_quarter",
+          "label": "Revenue, latest quarter",
+          "display": "$674.2 million",
+          "note": "SEC companyfacts. Company total, not the Scores segment.",
+          "as_of": "2026-06-30",
+          "source": "sec:companyfacts",
+          "status": "context",
+          "pill": "SEC feed"
+        },
+        {
+          "id": "revenue_ytd",
+          "label": "Revenue, year to date",
+          "display": "$1,877.8 million",
+          "note": "SEC companyfacts. Span 272 days.",
+          "as_of": "2026-06-30",
+          "source": "sec:companyfacts",
+          "status": "context",
+          "pill": "SEC feed"
+        },
+        {
+          "id": "operating_income_quarter",
+          "label": "Operating income, latest quarter",
+          "display": "$362.6 million",
+          "note": "SEC companyfacts. Company total, not the Scores segment.",
+          "as_of": "2026-06-30",
+          "source": "sec:companyfacts",
+          "status": "context",
+          "pill": "SEC feed"
+        },
+        {
+          "id": "buybacks_ytd",
+          "label": "Stock repurchase payments, year to date",
+          "display": "$3,046.0 million",
+          "note": "SEC companyfacts. Span 272 days. This is cash spent, not a statement that the price was wise.",
+          "as_of": "2026-06-30",
+          "source": "sec:companyfacts",
+          "status": "context",
+          "pill": "SEC feed"
+        }
+      ]
+    },
+    {
+      "id": "narrative",
+      "label": "Last filing a person read",
+      "rows": [
+        {
+          "id": "scores_quarter",
+          "label": "Scores revenue, June quarter",
+          "display": "$459 million",
+          "note": "Up from $324 million. Management tied the business-to-business increase to a higher mortgage origination score unit price. The filing does not split mortgage origination scores out of that book.",
+          "as_of": "2026-06-30",
+          "source": "FICO/research/deep_dive_2026-09-29.md",
+          "status": "context",
+          "pill": "Last read"
+        },
+        {
+          "id": "scores_nine_months",
+          "label": "Scores revenue, nine months",
+          "display": "$1.24 billion",
+          "note": "Already above the full prior year. Fiscal 2025 Scores were $1.17 billion.",
+          "as_of": "2026-06-30",
+          "source": "FICO/research/deep_dive_2026-09-29.md",
+          "status": "context",
+          "pill": "Last read"
+        },
+        {
+          "id": "scores_b2b",
+          "label": "Business-to-business Scores, fiscal 2025",
+          "display": "$949 million",
+          "note": "81% of Scores that year. This is the toll the mortgage grid can contest. Fiscal 2026 split is not in the June quarterly report.",
+          "as_of": "2025-09-30",
+          "source": "FICO/research/deep_dive_2026-09-29.md",
+          "status": "context",
+          "pill": "Last read"
+        },
+        {
+          "id": "scores_b2c",
+          "label": "Direct-to-consumer Scores, fiscal 2025",
+          "display": "$220 million",
+          "note": "myFICO. The mortgage grid does not set this price.",
+          "as_of": "2025-09-30",
+          "source": "FICO/research/deep_dive_2026-09-29.md",
+          "status": "context",
+          "pill": "Last read"
+        },
+        {
+          "id": "software_revenue",
+          "label": "Software revenue, fiscal 2025",
+          "display": "$822 million",
+          "note": "Grew 3%. Software operating income fell $9.8 million. That is not an offset if Scores weaken.",
+          "as_of": "2025-09-30",
+          "source": "FICO/research/deep_dive_2026-09-29.md",
+          "status": "context",
+          "pill": "Last read"
+        },
+        {
+          "id": "interest_nine_months",
+          "label": "Interest expense, nine months",
+          "display": "$146.5 million",
+          "note": "SEC companyfacts year-to-date interest, same order of magnitude as the last human read. Up from $94 million. The quarterly report ties the increase to a higher average debt balance: notes issued in May 2025 and March 2026, and a term loan used to buy back stock.",
+          "as_of": "2026-06-30",
+          "source": "sec:companyfacts",
+          "status": "context",
+          "pill": "SEC feed"
+        }
+      ]
+    },
+    {
+      "id": "lenders",
+      "label": "Lenders",
+      "rows": [
+        {
+          "id": "rocket",
+          "label": "Rocket Mortgage",
+          "display": "Prefers VantageScore on eligible loans",
+          "note": "Rocket's figure, not ours: about $1,600 saved at closing for borrowers who saved money, after running both models on 1.4 million reports. One originator is not the industry.",
+          "as_of": "2026-09-29",
+          "source": "FICO/research/deep_dive_2026-09-29.md",
+          "status": "context",
+          "pill": "Context"
+        },
+        {
+          "id": "uwmc",
+          "label": "United Wholesale Mortgage",
+          "display": "About 25% of borrowers score better on VantageScore",
+          "note": "They said that share might reach 40% by the end of September. That is not a statement that VantageScore is the preferred score.",
+          "as_of": "2026-09-29",
+          "source": "FICO/research/deep_dive_2026-09-29.md",
+          "status": "context",
+          "pill": "Context"
+        }
+      ]
+    },
+    {
+      "id": "policy",
+      "label": "Policy",
+      "rows": [
+        {
+          "id": "single_llpa_grid",
+          "label": "FHFA mortgage price grid",
+          "display": "One grid. Classic FICO and VantageScore 4.0 are both allowed.",
+          "note": "On September 28, 2026 the 20-point markdown on VantageScore was removed. Classic FICO is still allowed. A borrower at 780 on either model can reach the same top band.",
+          "as_of": "2026-09-28",
+          "source": "FICO/research/deep_dive_2026-09-29.md",
+          "status": "context",
+          "pill": "Context"
+        },
+        {
+          "id": "manual_underwrite",
+          "label": "Loans underwritten by hand",
+          "display": "Classic FICO is still required",
+          "note": "The grid change does not remove FICO from manual underwriting.",
+          "as_of": "2026-09-28",
+          "source": "FICO/research/deep_dive_2026-09-29.md",
+          "status": "context",
+          "pill": "Context"
+        },
+        {
+          "id": "fha_10t",
+          "label": "FHA and FICO 10T",
+          "display": "Planned for January 2027",
+          "note": "A statement of intent, not revenue. 10T is not approved for delivery to Fannie Mae and Freddie Mac.",
+          "as_of": "2026-09-29",
+          "source": "FICO/research/deep_dive_2026-09-29.md",
+          "status": "context",
+          "pill": "Context"
+        }
+      ]
+    },
+    {
+      "id": "missing",
+      "label": "Not on the feed yet",
+      "rows": [
+        {
+          "id": "efx",
+          "label": "Equifax",
+          "display": "Not collected",
+          "note": "Read mortgage inquiries, any VantageScore disclosure, and mortgage-revenue growth the week Equifax reports. Do not infer those from Fair Isaac's filing.",
+          "as_of": null,
+          "source": "",
+          "status": "missing",
+          "pill": "Not collected"
+        },
+        {
+          "id": "tru",
+          "label": "TransUnion",
+          "display": "Not collected",
+          "note": "Same three items, the week TransUnion reports.",
+          "as_of": null,
+          "source": "",
+          "status": "missing",
+          "pill": "Not collected"
+        },
+        {
+          "id": "expn",
+          "label": "Experian",
+          "display": "Not collected",
+          "note": "Same three items, the week Experian reports.",
+          "as_of": null,
+          "source": "",
+          "status": "missing",
+          "pill": "Not collected"
+        },
+        {
+          "id": "mortgage_volume",
+          "label": "US mortgage origination volume",
+          "display": "Not collected",
+          "note": "Needed to separate a price cut from a smaller mortgage market. Not in the Fair Isaac filing.",
+          "as_of": null,
+          "source": "",
+          "status": "missing",
+          "pill": "Not collected"
+        }
+      ]
+    }
+  ],
+  "auto": {
+    "leverage": 3.98,
+    "leverage_as_of": "2026-06-30",
+    "leverage_note": "Net debt $5,333.9 million ($5,282.4 million plus $300.0 million minus $248.4 million) divided by $1,340.8 million of operating income stretched to a year. Not a company-reported EBITDA multiple.",
+    "interest_ytd_millions": 146.5,
+    "lines": [
+      {
+        "id": "debt_noncurrent",
+        "label": "Long-term debt, excluding the portion due within a year",
+        "display": "$5,282.4 million",
+        "as_of": "2026-06-30",
+        "note": "SEC companyfacts, LongTermDebtNoncurrent."
+      },
+      {
+        "id": "debt_current",
+        "label": "Long-term debt due within a year",
+        "display": "$300.0 million",
+        "as_of": "2026-06-30",
+        "note": "SEC companyfacts, LongTermDebtCurrent. Included in the net-debt figure."
+      },
+      {
+        "id": "cash",
+        "label": "Cash",
+        "display": "$248.4 million",
+        "as_of": "2026-06-30",
+        "note": "SEC companyfacts, cash and cash equivalents."
+      },
+      {
+        "id": "operating_income",
+        "label": "Operating income used for the multiple",
+        "display": "$999.1 million",
+        "as_of": "2026-06-30",
+        "note": "272 days in the span. Stretched to a year this is $1,340.8 million. Basis: year-to-date."
+      },
+      {
+        "id": "revenue_quarter",
+        "label": "Revenue, latest quarter",
+        "display": "$674.2 million",
+        "as_of": "2026-06-30",
+        "note": "SEC companyfacts. Company total, not the Scores segment."
+      },
+      {
+        "id": "revenue_ytd",
+        "label": "Revenue, year to date",
+        "display": "$1,877.8 million",
+        "as_of": "2026-06-30",
+        "note": "SEC companyfacts. Span 272 days."
+      },
+      {
+        "id": "operating_income_quarter",
+        "label": "Operating income, latest quarter",
+        "display": "$362.6 million",
+        "as_of": "2026-06-30",
+        "note": "SEC companyfacts. Company total, not the Scores segment."
+      },
+      {
+        "id": "buybacks_ytd",
+        "label": "Stock repurchase payments, year to date",
+        "display": "$3,046.0 million",
+        "as_of": "2026-06-30",
+        "note": "SEC companyfacts. Span 272 days. This is cash spent, not a statement that the price was wise."
+      }
+    ],
+    "checked_at": "2026-10-06T13:48:17Z"
+  },
+  "gate_status": [
+    {
+      "kpi_id": "mortgage_exclusivity",
+      "status": "fail",
+      "display": "One grid. Classic FICO and VantageScore are both allowed."
+    },
+    {
+      "kpi_id": "software_growth_pct",
+      "status": "fail",
+      "display": "3% in fiscal 2025"
+    },
+    {
+      "kpi_id": "net_debt_to_annualized_operating_income",
+      "status": "fail",
+      "display": "3.98×"
+    },
+    {
+      "kpi_id": "preferred_lender_count",
+      "status": "pass",
+      "display": "1 of the names we track"
+    },
+    {
+      "kpi_id": "bureau_revenue_share_pct",
+      "status": "pass",
+      "display": "63% of the June quarter"
+    },
+    {
+      "kpi_id": "scores_operating_margin_pct",
+      "status": "pass",
+      "display": "88% in fiscal 2025"
+    },
+    {
+      "kpi_id": "mortgage_unit_price",
+      "status": "unchecked",
+      "display": "Not disclosed"
+    }
+  ]
+}

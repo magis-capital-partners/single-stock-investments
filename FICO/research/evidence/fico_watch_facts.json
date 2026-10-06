@@ -1,0 +1,225 @@
+{
+  "schema": "fico_watch_facts.v1",
+  "pinned_filing": {
+    "form": "10-Q",
+    "accession": "0000814547-26-000030",
+    "period_end": "2026-06-30",
+    "filed": "2026-07-29",
+    "source_path": "FICO/research/deep_dive_2026-09-29.md"
+  },
+  "policy_recheck_days": 21,
+  "narrative": [
+    {
+      "id": "scores_quarter",
+      "label": "Scores revenue, June quarter",
+      "display": "$459 million",
+      "note": "Up from $324 million. Management tied the business-to-business increase to a higher mortgage origination score unit price. The filing does not split mortgage origination scores out of that book.",
+      "as_of": "2026-06-30",
+      "source": "FICO/research/deep_dive_2026-09-29.md"
+    },
+    {
+      "id": "scores_nine_months",
+      "label": "Scores revenue, nine months",
+      "display": "$1.24 billion",
+      "note": "Already above the full prior year. Fiscal 2025 Scores were $1.17 billion.",
+      "as_of": "2026-06-30",
+      "source": "FICO/research/deep_dive_2026-09-29.md"
+    },
+    {
+      "id": "scores_b2b",
+      "label": "Business-to-business Scores, fiscal 2025",
+      "display": "$949 million",
+      "note": "81% of Scores that year. This is the toll the mortgage grid can contest. Fiscal 2026 split is not in the June quarterly report.",
+      "as_of": "2025-09-30",
+      "source": "FICO/research/deep_dive_2026-09-29.md"
+    },
+    {
+      "id": "scores_b2c",
+      "label": "Direct-to-consumer Scores, fiscal 2025",
+      "display": "$220 million",
+      "note": "myFICO. The mortgage grid does not set this price.",
+      "as_of": "2025-09-30",
+      "source": "FICO/research/deep_dive_2026-09-29.md"
+    },
+    {
+      "id": "software_revenue",
+      "label": "Software revenue, fiscal 2025",
+      "display": "$822 million",
+      "note": "Grew 3%. Software operating income fell $9.8 million. That is not an offset if Scores weaken.",
+      "as_of": "2025-09-30",
+      "source": "FICO/research/deep_dive_2026-09-29.md"
+    },
+    {
+      "id": "interest_nine_months",
+      "label": "Interest expense, nine months",
+      "display": "$146 million",
+      "note": "Up from $94 million. The quarterly report ties the increase to a higher average debt balance: notes issued in May 2025 and March 2026, and a term loan used to buy back stock.",
+      "as_of": "2026-06-30",
+      "source": "FICO/research/deep_dive_2026-09-29.md",
+      "xbrl_check": "interest_ytd_millions",
+      "xbrl_expect_millions": 146
+    }
+  ],
+  "policy": [
+    {
+      "id": "single_llpa_grid",
+      "label": "FHFA mortgage price grid",
+      "display": "One grid. Classic FICO and VantageScore 4.0 are both allowed.",
+      "note": "On September 28, 2026 the 20-point markdown on VantageScore was removed. Classic FICO is still allowed. A borrower at 780 on either model can reach the same top band.",
+      "actual": 1,
+      "as_of": "2026-09-28",
+      "source": "FICO/research/deep_dive_2026-09-29.md"
+    },
+    {
+      "id": "manual_underwrite",
+      "label": "Loans underwritten by hand",
+      "display": "Classic FICO is still required",
+      "note": "The grid change does not remove FICO from manual underwriting.",
+      "as_of": "2026-09-28",
+      "source": "FICO/research/deep_dive_2026-09-29.md"
+    },
+    {
+      "id": "fha_10t",
+      "label": "FHA and FICO 10T",
+      "display": "Planned for January 2027",
+      "note": "A statement of intent, not revenue. 10T is not approved for delivery to Fannie Mae and Freddie Mac.",
+      "as_of": "2026-09-29",
+      "source": "FICO/research/deep_dive_2026-09-29.md"
+    }
+  ],
+  "lenders": [
+    {
+      "id": "rocket",
+      "label": "Rocket Mortgage",
+      "display": "Prefers VantageScore on eligible loans",
+      "note": "Rocket's figure, not ours: about $1,600 saved at closing for borrowers who saved money, after running both models on 1.4 million reports. One originator is not the industry.",
+      "as_of": "2026-09-29",
+      "source": "FICO/research/deep_dive_2026-09-29.md"
+    },
+    {
+      "id": "uwmc",
+      "label": "United Wholesale Mortgage",
+      "display": "About 25% of borrowers score better on VantageScore",
+      "note": "They said that share might reach 40% by the end of September. That is not a statement that VantageScore is the preferred score.",
+      "as_of": "2026-09-29",
+      "source": "FICO/research/deep_dive_2026-09-29.md"
+    }
+  ],
+  "missing": [
+    {
+      "id": "efx",
+      "label": "Equifax",
+      "display": "Not collected",
+      "note": "Read mortgage inquiries, any VantageScore disclosure, and mortgage-revenue growth the week Equifax reports. Do not infer those from Fair Isaac's filing."
+    },
+    {
+      "id": "tru",
+      "label": "TransUnion",
+      "display": "Not collected",
+      "note": "Same three items, the week TransUnion reports."
+    },
+    {
+      "id": "expn",
+      "label": "Experian",
+      "display": "Not collected",
+      "note": "Same three items, the week Experian reports."
+    },
+    {
+      "id": "mortgage_volume",
+      "label": "US mortgage origination volume",
+      "display": "Not collected",
+      "note": "Needed to separate a price cut from a smaller mortgage market. Not in the Fair Isaac filing."
+    }
+  ],
+  "gates": [
+    {
+      "kpi_id": "mortgage_exclusivity",
+      "label": "Only Classic FICO on the mortgage price grid",
+      "statement": "Classic FICO is the only score on the FHFA loan-level price grid.",
+      "fail_line": "Mortgage exclusivity is gone",
+      "unit": "flag",
+      "actual_from": "policy.single_llpa_grid",
+      "display": "One grid. Classic FICO and VantageScore are both allowed.",
+      "note": "The watch wanted Classic FICO alone. On September 28, 2026 the 20-point markdown on VantageScore came off, and both scores sit on one price grid. Classic FICO is still allowed, and still required when a loan is underwritten by hand.",
+      "expected": {"op": "eq", "value": 0},
+      "recheck_with_policy": true
+    },
+    {
+      "kpi_id": "software_growth_pct",
+      "label": "Software revenue growth",
+      "statement": "Software revenue growth is high enough to offset a weaker Scores franchise. The watch line is 8% a year. That line is ours, not management's target.",
+      "fail_line": "Software is not an offset",
+      "unit": "pct",
+      "actual": 3,
+      "as_of": "2025-09-30",
+      "source": "FICO/research/deep_dive_2026-09-29.md",
+      "expected": {"op": "gte", "value": 8},
+      "unread_if_newer_filing": true,
+      "display": "3% in fiscal 2025",
+      "note": "Watch line is 8% a year, set here so a low-single-digit software result cannot be read as a replacement for Scores. Fiscal 2025 operating income in Software fell $9.8 million."
+    },
+    {
+      "kpi_id": "net_debt_to_annualized_operating_income",
+      "label": "Net debt / annualized operating income",
+      "statement": "Net debt stays at or under 3 times operating income stretched to a year. This is operating income, not a company EBITDA figure.",
+      "fail_line": "Debt is above 3× operating income",
+      "unit": "multiple",
+      "actual_from": "computed.leverage",
+      "expected": {"op": "lte", "value": 3}
+    },
+    {
+      "kpi_id": "preferred_lender_count",
+      "label": "Large originators preferring VantageScore",
+      "statement": "Fewer than three large originators have named VantageScore as the preferred score. One name is an anecdote. Three is a pattern.",
+      "fail_line": "A pattern of lenders prefers the rival score",
+      "unit": "count",
+      "actual": 1,
+      "as_of": "2026-09-29",
+      "source": "FICO/research/deep_dive_2026-09-29.md",
+      "expected": {"op": "lte", "value": 2},
+      "display": "1 of the names we track",
+      "note": "Rocket has named VantageScore preferred. United Wholesale has not. The count fails at 3."
+    },
+    {
+      "kpi_id": "bureau_revenue_share_pct",
+      "label": "Bureau share of revenue",
+      "statement": "Agreements with the three bureaus stay at or under 70% of quarterly revenue. They own VantageScore and distribute FICO. A rise through 70% is the steering gate. Margin has to be read with it.",
+      "fail_line": "Bureau share is through 70% of revenue",
+      "unit": "pct",
+      "actual": 63,
+      "as_of": "2026-06-30",
+      "source": "FICO/research/deep_dive_2026-09-29.md",
+      "expected": {"op": "lte", "value": 70},
+      "unread_if_newer_filing": true,
+      "display": "63% of the June quarter",
+      "note": "54% a year earlier and 51% for fiscal 2025. Holding means it has not crossed 70%. It is already the majority of revenue, and the same three firms own the rival score."
+    },
+    {
+      "kpi_id": "scores_operating_margin_pct",
+      "label": "Scores operating margin",
+      "statement": "Scores operating income stays at or above 80% of Scores revenue. Fiscal 2025 was 88%. A step down is the price-cut signal. The June quarterly report does not restate this margin.",
+      "fail_line": "Scores margin has stepped down",
+      "unit": "pct",
+      "actual": 88,
+      "as_of": "2025-09-30",
+      "source": "FICO/research/deep_dive_2026-09-29.md",
+      "expected": {"op": "gte", "value": 80},
+      "unread_if_newer_filing": true,
+      "display": "88% in fiscal 2025",
+      "note": "Last reported Scores margin. The June quarter does not restate it. Holding means it has not fallen through 80%."
+    },
+    {
+      "kpi_id": "mortgage_unit_price",
+      "label": "Mortgage origination score unit price",
+      "statement": "The mortgage origination score unit price is disclosed.",
+      "fail_line": "Mortgage unit price is down",
+      "unit": "usd",
+      "actual": null,
+      "as_of": "2026-06-30",
+      "source": "FICO/research/deep_dive_2026-09-29.md",
+      "expected": {},
+      "display": "Not disclosed",
+      "note": "The filing says the Scores increase was primarily a higher mortgage origination scores unit price. It does not give the price or the unit count. A blank here is not a pass."
+    }
+  ]
+}

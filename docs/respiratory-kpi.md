@@ -30,7 +30,13 @@ US respiratory-virus testing volume as a tracked KPI, and why it is carried as
 The one-line `respiratory_test_volume` context row also appears in the inflection
 table below, and on QDEL's ticker detail under **KPI trend**.
 
-Refresh:
+Refresh is automatic. The nightly `full` profile in `ci_rebuild_profile.py`
+(03:00 UTC, Data Pipeline intake-full) fetches the panel, refits the model, then
+builds KPI trends, so a Friday FluView is in the next night's run. The Sunday
+`world-model-weekly` profile runs the same fetch and refit again. Both scripts
+keep the last good file if a source is down.
+
+Manual refresh, same three steps:
 
 ```bash
 python _system/scripts/fetch_respiratory_panel.py
@@ -61,12 +67,14 @@ not survive out-of-sample validation.
 
 | Specification | LOOCV RMSE |
 |---|---|
-| **`seasonal_trend_log`** (baseline, no testing term) | **$33.6M** |
-| `seasonal_trend_linear` | $37.2M |
-| `seasonal_trend_log_plus_flu` | $37.8M |
-| `seasonal_trend_log_plus_allresp` | $37.9M |
-| `trend_only` | $57.4M |
-| `naive_mean` | $62.3M |
+| **`seasonal_trend_log`** (baseline, no testing term) | **$32.3M** |
+| `seasonal_trend_log_plus_allresp` | $35.4M |
+| `seasonal_trend_log_plus_flu` | $35.4M |
+| `seasonal_trend_linear` | $41.5M |
+| `trend_only` | $54.5M |
+| `naive_mean` | $63.9M |
+
+Refit 2026-10-06, 14 quarters through 2026 Q2. Flu terms still rank worse than the baseline.
 
 Every specification carrying a flu, RSV or SARS-CoV-2 term scored **worse** than
 the same model without it.
@@ -102,9 +110,10 @@ Three findings behind that:
 log(respiratory revenue) ~ intercept + Q2 + Q3 + Q4 + linear trend
 ```
 
-Fitted trend: **−7.9% per quarter** (the COVID normalisation running off), R²
-(log) 0.94. Against the fair benchmark — same quarter last year adjusted for the
-average rate of decline — it scores **$17.6M vs $28.4M, a 38% improvement**.
+Fitted trend: **−6.9% per quarter** (the COVID normalisation running off), R²
+(log) 0.93. Against the fair benchmark — same quarter last year adjusted for the
+average rate of decline — it scores **$17.1M vs $28.4M, a 40% improvement**
+on the 10 overlapping quarters.
 
 Logs matter for more than fit: every linear specification extrapolated to
 *negative* revenue, because the 2026 readings sit far outside the calibration

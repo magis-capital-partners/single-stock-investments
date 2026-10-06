@@ -24,6 +24,7 @@ from build_qdel_respiratory_model import (  # noqa: E402
     r_squared,
     seasonal_dummies,
 )
+from fetch_respiratory_panel import epiweek_end  # noqa: E402
 
 
 class OlsTests(unittest.TestCase):
@@ -60,6 +61,16 @@ class OlsTests(unittest.TestCase):
         err = loocv_dollars(X, ly, y, log_space=True)
         self.assertIsNotNone(err)
         self.assertLess(err, 1.0)  # exact exponential -> near-zero error in dollars
+
+
+class EpiweekEndTests(unittest.TestCase):
+    def test_matches_cdc_week_ending_saturdays(self) -> None:
+        # Week 34 and week 40 of 2026 are the years the old Monday-anchor
+        # formula shifted by seven days (January 4 was a Sunday).
+        self.assertEqual(epiweek_end(202634), "2026-08-29")
+        self.assertEqual(epiweek_end(202640), "2026-10-10")
+        self.assertEqual(epiweek_end(202040), "2020-10-03")
+        self.assertEqual(epiweek_end(201940), "2019-10-05")
 
 
 class SeasonalDummyTests(unittest.TestCase):

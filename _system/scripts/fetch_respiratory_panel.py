@@ -88,12 +88,19 @@ def _http_get(url: str, timeout: int = 60, retries: int = 3) -> str | None:
 
 
 def epiweek_end(epiweek: int | str) -> str:
-    """MMWR epiweek -> ISO date of the week-ending Saturday."""
+    """MMWR epiweek -> Saturday that ends that week.
+
+    Week 1 ends on the first Saturday on or after January 4 (the week with at
+    least four days in the new year). Going back to the Monday of January 4's
+    calendar week is one week early when January 4 is a Sunday, which is what
+    shifted all of 2026 a week before the CDC week-ending dates.
+    """
     text = str(epiweek)
     year, week = int(text[:4]), int(text[4:])
-    anchor = date(year, 1, 4)
-    anchor -= timedelta(days=anchor.weekday())
-    return (anchor + timedelta(weeks=week - 1, days=5)).isoformat()
+    jan4 = date(year, 1, 4)
+    days_to_saturday = (5 - jan4.weekday()) % 7
+    week1_end = jan4 + timedelta(days=days_to_saturday)
+    return (week1_end + timedelta(weeks=week - 1)).isoformat()
 
 
 def current_epiweek_range() -> str:
@@ -231,7 +238,10 @@ def build(offline: bool = False) -> dict:
     for series_id, meta in SERIES_META.items():
         path = OUT_DIR / f"{series_id}.csv"
         cached = read_csv(path)
-        merged = {**cached, **fetched.get(series_id, {})}
+        incoming = fetched.get(series_id, {})
+        # A full-history response replaces the cache. Merging would keep the
+        # pre-fix 2026 week labels (seven days early) next to the corrected ones.
+        merged = incoming if len(incoming) >= 100 else {**cached, **incoming}
         if merged:
             write_csv(path, merged)
         if not merged:
