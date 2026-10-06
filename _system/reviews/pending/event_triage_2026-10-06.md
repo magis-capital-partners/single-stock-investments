@@ -1,19 +1,29 @@
 # Event triage — human review queue
 
 **Date:** 2026-10-06
-**Rows:** 3121
+**Rows:** 3124
 
 | Date | Ticker | Source | Tier | Materiality | Rules | Title |
 |------|--------|--------|------|-------------|-------|-------|
+| 2026-10-06 | DASH | news | context | 38 | rule_conflict, activist_cross_link, neutral_low_impact | Doordash issues today. Doordash outage impacts customers. Do |
+| 2026-10-06 | CMG | news | context | 38 | rule_conflict, activist_cross_link, neutral_low_impact | Queso and coffee? Rumors of a Chipotle-Starbucks merger boos |
+| 2026-10-06 | O | news | context | 38 | rule_conflict, activist_cross_link, neutral_low_impact | Realty Income stock heads toward November 2 results on raise |
+| 2026-10-06 | BR | news | context | 38 | rule_conflict, activist_cross_link, neutral_low_impact | Quarterly dividend brings Broadridge (BR) director awards ti |
+| 2026-10-06 | WBD | news | context | 38 | rule_conflict, activist_cross_link, neutral_low_impact | Paramount closes deal to acquire Warner Bros. Discovery - AO |
+| 2026-10-06 | GE | news | context | 38 | rule_conflict, activist_cross_link, entity_mismatch, neutral_low_impact | Is SSR Mining Set to Benefit From the Puna Operations Expans |
+| 2026-10-06 | T | news | context | 38 | rule_conflict, activist_cross_link, neutral_low_impact | AT&T (T) Forms Joint Venture to Expand U.S. Fiber Network Am |
+| 2026-10-06 | WBD | news | context | 38 | rule_conflict, activist_cross_link, neutral_low_impact | Paramount and Warner Bros. Discovery Merger Closes - Vital T |
+| 2026-10-06 | WBD | news | context | 38 | rule_conflict, activist_cross_link, neutral_low_impact | What investors need to know after the Paramount/Warner Bros. |
+| 2026-10-06 | WBD | news | context | 38 | rule_conflict, activist_cross_link, entity_mismatch, neutral_low_impact | US Supreme Court justice rejects last-gasp antitrust suit ta |
+| 2026-10-06 | UNP | news | context | 38 | rule_conflict, activist_cross_link, neutral_low_impact | Union Pacific (UNP), Why Is The Railroad Giant Drawing Fresh |
+| 2026-10-06 | CTVA | news | context | 38 | rule_conflict, activist_cross_link, neutral_low_impact | Corteva (CTVA) Completes Seed Business Spin-Off, Launches Vy |
+| 2026-10-06 | T | news | context | 38 | rule_conflict, activist_cross_link, neutral_low_impact | As Elon Musk plans to shake up mobile industry, AT&T CEO Joh |
+| 2026-10-06 | GOOGL | news | context | 38 | rule_conflict, activist_cross_link, neutral_low_impact | Nvidia, Palantir, and Alphabet Are Sending Shockwaves Throug |
+| 2026-10-05 | LDOS | news | context | 38 | rule_conflict, activist_cross_link, neutral_low_impact | Leidos (LDOS) Stock May Be A Bargain Following Raised Guidan |
 | 2026-10-05 | INTU | news | context | 38 | rule_conflict, activist_cross_link, neutral_low_impact | Stock grants converted 1-for-1 into 1,396 Intuit (INTU) shar |
 | 2026-10-05 | LDOS | news | context | 38 | rule_conflict, activist_cross_link, neutral_low_impact | Leidos (LDOS) Completes Joint Venture Transaction with Altar |
 | 2026-10-05 | CHRW | news | context | 38 | rule_conflict, activist_cross_link, neutral_low_impact | C.H. Robinson (CHRW) to Acquire RXO in $17.25-Per-Share Cash |
 | 2026-10-05 | AMZN | news | context | 38 | rule_conflict, activist_cross_link, neutral_low_impact | 1 Stat That Makes Amazon Hard to Ignore Right Now |
-| 2026-10-05 | UNP | news | context | 38 | rule_conflict, activist_cross_link, neutral_low_impact | Fund Update: 112,196 UNION PACIFIC (UNP) shares added to FER |
-| 2026-10-05 | INTU | news | context | 38 | rule_conflict, activist_cross_link, neutral_low_impact | INTU's $300B TAM Expands: Can AI Drive Its Next Growth Phase |
-| 2026-10-05 | BMY | news | context | 38 | rule_conflict, activist_cross_link, neutral_low_impact | Are Investors Undervaluing Bristol Myers Squibb (BMY) Right  |
-| 2026-10-05 | AMZN | news | context | 38 | rule_conflict, activist_cross_link, neutral_low_impact | Where Will Amazon Stock Be in 5 Years as AWS, Advertising, a |
-| 2026-10-05 | PSX | news | context | 38 | rule_conflict, activist_cross_link, neutral_low_impact | Phillips 66 (PSX) Faces Bayway Strike Risk, Is The Stock Ful |
 | 2026-10-05 | ACHR | kpi_trend | context | 66 | rule_conflict, activist_cross_link, routine_governance_watch | Leadership / governance on watch |
 | 2026-10-05 | ARES | kpi_trend | context | 66 | rule_conflict, activist_cross_link, routine_governance_watch | Leadership / governance on watch |
 | 2026-10-05 | AVY | kpi_trend | context | 66 | rule_conflict, activist_cross_link, routine_governance_watch | Leadership / governance on watch |
@@ -63,9 +73,6 @@
 | 2026-10-05 | YUM | kpi_trend | context | 66 | rule_conflict, activist_cross_link, routine_governance_watch | Leadership / governance on watch |
 | 2026-10-05 | DASH | news | context | 38 | rule_conflict, activist_cross_link, neutral_low_impact | DoorDash Inc (DASH) Insider Sell: International COO Keith Ya |
 | 2026-10-05 | DASH | news | context | 38 | rule_conflict, activist_cross_link, neutral_low_impact | DoorDash (NASDAQ:DASH) Stock: Insider Keith Yandell Sells 2, |
-| 2026-10-04 | FDX | news | context | 38 | rule_conflict, activist_cross_link, neutral_low_impact | FedEx (FDX) Q4 Fiscal 2026 Earnings on June 23rd - What to E |
-| 2026-10-04 | SBUX | news | context | 38 | rule_conflict, activist_cross_link, neutral_low_impact | Starbucks Is Closing 250 Stores After Raising Guidance. What |
-| 2026-10-04 | VZ | news | context | 38 | rule_conflict, activist_cross_link, neutral_low_impact | Verizon Communications (VZ) Forms Satellite Connectivity Joi |
 | 2026-10-04 | BUR | vic_research | context | 33 | rule_conflict, activist_cross_link, neutral_low_impact | 07-BURFORD-CAPITAL-BUR-4694552095_151e |
 | 2026-10-04 | BUR | vic_research | context | 33 | rule_conflict, activist_cross_link, neutral_low_impact | VIC PDF intake - BUR - BUR VIC PDF |
 | 2026-10-04 | TRC | vic_research | context | 33 | rule_conflict, activist_cross_link, neutral_low_impact | VIC PDF intake - TRC - TRC VIC PDF |
@@ -198,10 +205,3 @@
 | 2026-10-04 | CTAS | third_party | context | 25 | rule_conflict, activist_cross_link, neutral_low_impact | Cintas Corp — SC 13D |
 | 2026-10-04 | TPHS | third_party | context | 25 | rule_conflict, activist_cross_link, entity_mismatch, neutral_low_impact | MFP Partners, L.P. (1) — SC 13D/A |
 | 2026-10-04 | TPHS | third_party | context | 25 | rule_conflict, activist_cross_link, entity_mismatch, neutral_low_impact | Third Avenue Management LLC (01-690900) — SC 13D/A |
-| 2026-10-04 | TPHS | third_party | context | 25 | rule_conflict, activist_cross_link, neutral_low_impact | SC 13D/A · TPHS · 2019-06-13 |
-| 2026-10-04 | CSX | third_party | context | 25 | rule_conflict, activist_cross_link, neutral_low_impact | DFAN14A (proxy solicitation) · CSX · 2022-05-02 |
-| 2026-10-04 | CSX | third_party | context | 25 | rule_conflict, activist_cross_link, entity_mismatch, neutral_low_impact | Mantle Ridge — PREN14A (proxy solicitation) |
-| 2026-10-04 | LLY | third_party | context | 25 | rule_conflict, activist_cross_link, neutral_low_impact | ELI LILLY AND COMPANY — DFAN14A (proxy solicitation) |
-| 2026-10-04 | LLY | third_party | context | 25 | rule_conflict, activist_cross_link, entity_mismatch, neutral_low_impact | Bulldog Investors — SC 13D/A |
-| 2026-10-04 | CART | third_party | context | 25 | rule_conflict, activist_cross_link, entity_mismatch, neutral_low_impact | SEQUOIA CAPITAL GLOBAL GROWTH FUND II, L.P. (... — SC 13D/A |
-| 2026-10-04 | DLTR | third_party | context | 25 | rule_conflict, activist_cross_link, entity_mismatch, neutral_low_impact | Mantle Ridge — DEFA14A |
