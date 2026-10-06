@@ -651,6 +651,7 @@ Synced from `_system/portfolio/registry.json`. Last sync: 2026-10-06.
 | RL | RL/ | Ralph Lauren Corporation | US | 2026-07-10 | 2026-10-06 | unknown | watch |
 | RMBS | RMBS/ | RMBS | US | 2026-07-29 | 2026-10-06 | unknown | watch |
 | RMD | RMD/ | ResMed | US | 2026-07-10 | 2026-10-06 | unknown | watch |
+| RMS.PA | RMS.PA/ | Hermès International | EU | 2026-10-06 | 2026-10-06 | unknown | watch |
 | RMV.L | RMV.L/ | Rightmove PLC | UK | 2026-07-09 | 2026-10-06 | platform | watch |
 | ROAD | ROAD/ | Construction Partners Inc | US | 2026-09-08 | 2026-10-06 | unknown | watch |
 | ROK | ROK/ | Rockwell Automation | US | 2026-07-10 | 2026-10-06 | unknown | watch |
@@ -710,6 +711,7 @@ Synced from `_system/portfolio/registry.json`. Last sync: 2026-10-06.
 | STT | STT/ | State Street Corporation | US | 2026-07-10 | 2026-10-06 | unknown | watch |
 | STX | STX/ | Seagate Technology | US | 2026-07-28 | 2026-10-06 | unknown | watch |
 | STZ | STZ/ | Constellation Brands | US | 2026-07-09 | 2026-10-06 | unknown | watch |
+| SU.PA | SU.PA/ | Schneider Electric SE | EU | 2026-10-06 | 2026-10-06 | unknown | watch |
 | SUM | SUM/ | Summit Royalties Ltd. | CA | — | 2026-10-06 | optionality | watch |
 | SVIX | SVIX/ | SVIX | US | 2026-07-29 | 2026-10-06 | unknown | watch |
 | SW | SW/ | Smurfit Westrock | US | 2026-07-10 | 2026-10-06 | unknown | watch |
@@ -850,4 +852,4 @@ Synced from `_system/portfolio/registry.json`. Last sync: 2026-10-06.
 | ZETA | ZETA/ | ZETA | US | 2026-07-28 | 2026-10-06 | unknown | watch |
 | ZTS | ZTS/ | Zoetis | US | 2026-07-10 | 2026-10-06 | unknown | watch |
 
-**843 holdings total.** Registry: `_system/portfolio/registry.json`
+**845 holdings total.** Registry: `_system/portfolio/registry.json`

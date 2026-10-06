@@ -89,6 +89,8 @@ EXCHANGE_META = {
     "CDZI": "NASDAQ",
     "DB1.DE": "XETRA",
     "ENX.PA": "Euronext Paris",
+    "SU.PA": "Euronext Paris",
+    "RMS.PA": "Euronext Paris",
     "EVR": "CSE",
     "GPW.WA": "WSE",
     "DNP.WA": "WSE",
