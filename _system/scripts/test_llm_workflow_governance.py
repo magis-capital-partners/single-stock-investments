@@ -49,6 +49,66 @@ class WorkflowGovernanceTests(unittest.TestCase):
                     window = "\n".join(lines[index:index + 12])
                     self.assertRegex(window, r"(?m)^\s+retention-days:\s+[1-7]\s*$", path.name)
 
+    def test_dispatcher_callers_grant_what_the_dispatcher_requests(self):
+        # A called workflow cannot hold more GITHUB_TOKEN permission than the
+        # calling job grants; asking for more fails the run at startup, before
+        # any job exists for a lane receipt to see. #1112 raised the dispatcher
+        # to contents: write, and both callers failed every run from
+        # 2026-10-03 until the grant moved onto the calling jobs (#1118).
+        rank = {"none": 0, "read": 1, "write": 2}
+
+        def grants(block, indent):
+            lines = block.splitlines()
+            for index, line in enumerate(lines):
+                head = re.fullmatch(rf"{indent}permissions:\s*(\S*)\s*(#.*)?", line)
+                if not head:
+                    continue
+                if head.group(1) in ("read-all", "write-all"):
+                    return {"*": head.group(1).split("-")[0]}
+                found = {}
+                for entry in lines[index + 1:]:
+                    scope = re.fullmatch(rf"{indent}  ([a-z-]+):\s*(read|write|none)\s*(#.*)?", entry)
+                    if not scope:
+                        break
+                    found[scope.group(1)] = scope.group(2)
+                return found
+            return None
+
+        def level(granted, scope):
+            return rank[granted.get(scope, granted.get("*", "none"))]
+
+        workflows = ROOT / ".github" / "workflows"
+        head, body = (workflows / "research-agent-dispatch.yml").read_text(
+            encoding="utf-8").split("\njobs:\n", 1)
+        requested = dict(grants(head + "\n", "") or {})
+        for block in re.split(r"(?m)(?=^  [A-Za-z0-9_-]+:\s*$)", body):
+            for scope, value in (grants(block, "    ") or {}).items():
+                if rank[value] > rank.get(requested.get(scope, "none"), 0):
+                    requested[scope] = value
+        self.assertTrue(requested, "the dispatcher declares no permissions")
+
+        callers = 0
+        for path in workflows.glob("*.yml"):
+            parts = path.read_text(encoding="utf-8").split("\njobs:\n", 1)
+            if len(parts) != 2:
+                continue
+            workflow_grants = grants(parts[0] + "\n", "") or {}
+            for block in re.split(r"(?m)(?=^  [A-Za-z0-9_-]+:\s*$)", parts[1]):
+                if not re.search(r"(?m)^    uses: \./\.github/workflows/research-agent-dispatch\.yml\s*$", block):
+                    continue
+                callers += 1
+                # A job-level block replaces the workflow's grants entirely.
+                given = grants(block, "    ")
+                given = workflow_grants if given is None else given
+                for scope, wanted in requested.items():
+                    self.assertGreaterEqual(
+                        level(given, scope), rank[wanted],
+                        f"{path.name}: the job calling research-agent-dispatch.yml grants "
+                        f"{scope}: {given.get(scope, given.get('*', 'none'))}, but the "
+                        f"dispatcher requests {wanted}; the run would fail at startup",
+                    )
+        self.assertGreaterEqual(callers, 2, "expected daily-sync.yml and marvin-deep-dive.yml")
+
     def test_deprecated_wrapper_workflows_stay_removed(self):
         retired = {
             "activist-scan-sync.yml",
