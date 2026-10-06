@@ -112,3 +112,12 @@ module reads the status out of the payload and raises; there is a test for it.
 repository secrets. Until then Japan — the second-most-active activism market
 in the world — has no coverage, and that is a known, recorded gap rather than
 an assumed one.
+
+---
+
+## 6. Short-seller price history lives in `short_scorecard/`
+
+**Decision.** A publisher's post-report price record is a scorecard under
+`_system/reference/activist-reports/short_scorecard/`, not a new feed builder.
+The seed is Fugazi Research. How to append a print is that folder's `README.md`.
+The one-page brief is `SHORT_REPORT_BRIEF_TEMPLATE.md`.
