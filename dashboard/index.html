@@ -1182,22 +1182,6 @@
     margin-bottom: 12px; color: var(--text-secondary);
   }
   .liquidity-banner strong { color: var(--accent-red); }
-  .fico-banner[hidden] { display: none !important; }
-  .fico-banner {
-    margin: 12px 16px 0; padding: 14px 16px; border-radius: 10px; border: 2px solid var(--accent-red);
-    background: rgba(239, 68, 68, 0.14); display: flex; gap: 16px; align-items: center;
-    justify-content: space-between; color: var(--text-primary);
-  }
-  .fico-banner strong { display: block; font-size: 16px; line-height: 1.35; }
-  .fico-banner p { margin: 4px 0 0; color: var(--text-secondary); font-size: 13px; line-height: 1.45; max-width: 78ch; }
-  .fico-banner-pass { border-color: var(--accent-green); background: rgba(16, 185, 129, 0.12); }
-  .fico-banner-watch { border-color: var(--accent-amber); background: rgba(245, 158, 11, 0.12); }
-  .fico-open {
-    flex: 0 0 auto; background: var(--accent-red); color: #fff; border: 0; border-radius: 8px;
-    padding: 10px 14px; font-weight: 700; cursor: pointer;
-  }
-  .fico-banner-pass .fico-open { background: var(--accent-green); }
-  .fico-banner-watch .fico-open { background: var(--accent-amber); color: #1a1203; }
   .fico-watch {
     border: 2px solid var(--accent-red); border-radius: 10px; padding: 16px 16px 8px;
     margin: 0 0 16px; background: rgba(239, 68, 68, 0.08);
@@ -1224,7 +1208,6 @@
   .fico-pill-stale, .fico-pill-watch { color: var(--accent-amber); }
   .fico-pill-unchecked, .fico-pill-missing, .fico-pill-context { color: var(--text-muted); }
   @media (max-width: 720px) {
-    .fico-banner { flex-direction: column; align-items: stretch; }
     .fico-row { grid-template-columns: 1fr; }
     .fico-pill { text-align: left; }
   }
@@ -1813,7 +1796,6 @@
 
   <main id="main-content">
   <section class="summary-strip" id="summary"></section>
-  <section id="fico-watch-banner" class="fico-banner fico-banner-fail" hidden></section>
 
   <section class="portfolio-panel active" id="portfolio-panel" aria-label="IBKR portfolio"><div id="portfolio-content"></div></section>
   <section class="portfolio-panel" id="spx-0dte-panel" aria-label="SPX 0DTE strategy"><div id="spx-0dte-content"></div></section>
@@ -2592,6 +2574,46 @@ function feedStaleBadge(stamp, feed) {
   return badge ? ` ${badge}` : '';
 }
 
+function feedById(id) {
+  const rows = (data && data.feed_status && data.feed_status.surfaces) || [];
+  return rows.find((row) => row.id === id) || null;
+}
+
+function feedClockState(id) {
+  const row = feedById(id);
+  const format = window.DashboardFormat;
+  if (!row || !format) return 'missing';
+  if (row.kind === 'api') return row.status || 'api';
+  return format.feedState(row.stamp, row.max_age_hours, {
+    exists: row.exists !== false,
+    empty: row.status === 'empty',
+  });
+}
+
+function feedNotice(id) {
+  const row = feedById(id);
+  const format = window.DashboardFormat;
+  if (!row || !format) {
+    return 'Feed status is missing. <a href="#/insights/data-health">Data Health</a>';
+  }
+  const state = row.kind === 'api' ? (row.status || 'api') : feedClockState(id);
+  const cls = state === 'fresh' || state === 'empty' || state === 'api'
+    ? 'badge-ok'
+    : (state === 'stale' ? 'badge-warn' : 'badge-bad');
+  const action = row.next_action || row.healer || '';
+  return `<span class="badge ${cls}">${escapeHtml(format.feedLabel(state))}</span> ${escapeHtml(action)} <a href="#/insights/data-health">Data Health</a>`;
+}
+
+function screenUnavailable(id, missingTitle) {
+  const state = feedClockState(id);
+  const title = state === 'empty'
+    ? 'Screen is current and no rows are actionable'
+    : (state === 'stale'
+      ? 'Screen is stale'
+      : (state === 'unreadable' ? 'Screen stamp is unreadable' : missingTitle));
+  return `<div class="operator-empty"><strong>${escapeHtml(title)}</strong><span>${feedNotice(id)}</span></div>`;
+}
+
 function twoPhaseRankBadge(rank) {
   const n = Number(rank);
   if (n <= 3) return 'badge-bad';
@@ -3340,6 +3362,11 @@ async function load() {
   try {
     data = await fetchShardJson('data/core.json');
     try {
+      data.feed_status = await fetchShardJson('data/feed_status.json');
+    } catch (_) {
+      data.feed_status = null;
+    }
+    try {
       const technicalSummary = await fetchShardJson('data/technical_summary.json');
       const technicalRows = technicalSummary.by_ticker || {};
       data.tickers.forEach((ticker) => {
@@ -3381,11 +3408,14 @@ async function load() {
     });
     if (!response.ok) throw new Error(`market-risk API ${response.status}`);
     data.market_risk = await response.json();
+    data.market_risk_origin = 'api';
   } catch (_) {
     try {
       data.market_risk = await fetchShardJson('data/criticality_summary.json');
+      data.market_risk_origin = 'committed';
     } catch (_) {
       data.market_risk = null;
+      data.market_risk_origin = 'missing';
     }
   }
   try {
@@ -3489,7 +3519,13 @@ function renderMarketRiskView() {
   // The verdict line is the first thing on the page: one plain-English sentence
   // composed from the survivors, plus the trust line that says whether to
   // believe it.
-  content.innerHTML = `${CriticalityViz.renderRegimeVerdict(riskOptions)}${renderMarketFearTape()}${CriticalityViz.renderRiskView(
+  const riskOrigin = data.market_risk_origin === 'api'
+    ? 'Live /api/v1/market-risk/latest'
+    : (data.market_risk_origin === 'committed'
+      ? 'Committed market_risk_components.json fallback'
+      : 'Market risk source unavailable');
+  const riskClock = `<p class="tier-sub" style="margin:0 0 10px">${escapeHtml(riskOrigin)}. ${feedNotice('market-risk')} ${feedNotice('market-risk-components')}</p>`;
+  content.innerHTML = `${riskClock}${CriticalityViz.renderRegimeVerdict(riskOptions)}${renderMarketFearTape()}${CriticalityViz.renderRiskView(
     data.market_risk,
     data.market_risk_details || {},
     riskOptions,
@@ -3697,7 +3733,7 @@ function renderOperationalEvidenceQueue() {
       ? `<div class="operational-task-grid">${cards}</div>`
       : `<div class="summary" style="margin-top:10px">${databaseAvailable
         ? 'No due tasks returned by D1.'
-        : 'This preview is using the static queue because the live D1 task service is not connected.'} The static decision queue remains available below.</div>`}
+        : ('The live D1 task service is not connected, so this is the static queue. ' + feedNotice('valuation'))} The static decision queue remains available below.</div>`}
   </section>`;
 }
 
@@ -3759,7 +3795,9 @@ function renderActivist() {
       loadLazyFile('activist_feed').then(
         () => renderActivist(),
         () => {
-          loading.textContent = 'Activist feed unavailable · source refresh is required; Data Health owns the next action.';
+          loading.style.display = 'none';
+          content.innerHTML = `<div class="operator-empty"><strong>Activist feed unavailable</strong><span>${feedNotice('activist')}</span></div>`;
+          content.style.display = 'block';
         },
       );
     }
@@ -3767,8 +3805,9 @@ function renderActivist() {
   }
   const feed = data.activist_feed;
   if (!feed || !window.ActivistViz) {
-    loading.textContent = 'Activist feed unavailable · source refresh is required; Data Health owns the next action.';
-    content.style.display = 'none';
+    loading.style.display = 'none';
+    content.innerHTML = `<div class="operator-empty"><strong>Activist feed unavailable</strong><span>${feedNotice('activist')}</span></div>`;
+    content.style.display = 'block';
     return;
   }
   loading.style.display = 'none';
@@ -3909,6 +3948,7 @@ function renderInsights(opts = {}) {
     videoDetail,
     videoDetailLoading,
     activeSection: insightsSection,
+    feedStatus: data.feed_status || null,
     tickers: data.tickers || [],
     memory: data.research_memory || null,
     documentCatalog: data.document_catalog || null,
@@ -4495,7 +4535,7 @@ function renderDarwin() {
       ${paper.status ? ` · <span class="badge badge-purple">${escapeHtml(paper.status.replace(/_/g, ' '))}</span>` : ''}
       ${paper.legacy_quarantine ? ' · <span class="badge badge-warn">legacy NAV quarantined</span>' : ''}
     </p>
-    ${liqFallback ? `<div class="liquidity-banner"><strong>Liquidity feed missing or stale</strong> — registry membership is being used as a fallback, so liquidity buckets A/B are not enforced. Data Health owns the refresh.</div>` : ''}
+    ${liqFallback ? `<div class="liquidity-banner"><strong>Liquidity feed missing or stale</strong>. Registry membership is being used as a fallback, so liquidity buckets A/B are not enforced. ${feedNotice('darwin')}</div>` : ''}
     <div class="detail-section">
       <h3>Universe eligibility (Phase A)</h3>
       <p class="subhead" style="margin-bottom:10px">
@@ -4729,12 +4769,21 @@ function buildIdeaRows() {
   const generated = data.generated_at || data.generatedAt || null;
   const rows = [];
   const add = (row) => rows.push({ ...row, id: `${row.type}:${row.name}` });
-  for (const idea of data.watchlist || []) add({ type: 'Queue', name: idea.ticker, thesis: idea.notes || 'Research trigger not set', stage: 'intake', catalyst: idea.notes || 'Research trigger not set', owner: idea.owner || 'Research', updated: idea.added || generated, next: 'Promote to full coverage', source: 'Ideas registry' });
-  for (const idea of shortAlphaData?.ideas || []) add({ type: 'Short', name: idea.ticker, thesis: idea.thesis || idea.research?.summary || 'Short hypothesis', stage: idea.research?.status || 'hypothesis', catalyst: (idea.catalysts || [])[0] || 'Catalyst not published', owner: 'Drew', updated: idea.outcome?.latest_date || shortAlphaData.as_of, next: idea.research?.next_step || 'Refresh falsifiers', source: 'Short Alpha' });
-  for (const warrant of warrantData?.rows || []) add({ type: 'Contract', name: warrant.warrant_ticker || warrant.market?.warrant?.symbol || warrant.common_ticker, thesis: warrant.summary || warrant.thesis || 'Warrant contract review', stage: warrant.gates?.status || warrant.lifecycle || 'review', catalyst: warrant.contract_clock?.expiry ? `Expiry ${window.DashboardFormat.date(warrant.contract_clock.expiry)}` : 'Contract clock unavailable', owner: 'Research', updated: warrant.market?.warrant?.quote_date || warrantData.generated_at, next: warrant.next_action || 'Verify contract and market', source: 'Warrant contract ledger' });
-  for (const idea of (data.nol_screener?.rows || []).filter((row) => row.is_actionable)) add({ type: 'NOL', name: idea.ticker, thesis: `${idea.company || idea.ticker} tax-attribute screen`, stage: idea.usability || 'screen', catalyst: `§382 shield / price ${idea.tax_shield_pv_to_mcap_pct == null ? 'unavailable' : window.DashboardFormat.number(idea.tax_shield_pv_to_mcap_pct, { maximumFractionDigits: 2 }) + '%'}`, owner: 'Research', updated: idea.filing_as_of || generated, next: 'Verify tax-attribute ownership and deal path', source: 'SEC company facts' });
-  for (const bank of (data.advantaged_banks_screener?.rows || []).filter((row) => row.is_low_cost)) add({ type: 'Bank', name: bank.ticker, thesis: bank.company || 'Deposit franchise screen', stage: 'screen', catalyst: bank.edge_label || bank.edge_type || 'Deposit franchise', owner: 'Research', updated: bank.filing_as_of || generated, next: 'Underwrite deposit durability and valuation', source: 'SEC advantaged-bank screen' });
-  return rows.sort((a, b) => String(b.updated || '').localeCompare(String(a.updated || '')));
+  for (const idea of data.watchlist || []) add({ type: 'Queue', feedId: 'ideas-inbox', name: idea.ticker, thesis: idea.notes || 'Research trigger not set', stage: 'intake', catalyst: idea.notes || 'Research trigger not set', owner: idea.owner || 'Research', updated: idea.added || generated, next: 'Promote to full coverage', source: 'Ideas registry' });
+  for (const idea of shortAlphaData?.ideas || []) add({ type: 'Short', feedId: 'short-alpha', name: idea.ticker, thesis: idea.thesis || idea.research?.summary || 'Short hypothesis', stage: idea.research?.status || 'hypothesis', catalyst: (idea.catalysts || [])[0] || 'Catalyst not published', owner: 'Drew', updated: idea.outcome?.latest_date || shortAlphaData.as_of, next: idea.research?.next_step || 'Refresh falsifiers', source: 'Short Alpha' });
+  for (const warrant of warrantData?.rows || []) add({ type: 'Contract', feedId: 'warrants', name: warrant.warrant_ticker || warrant.market?.warrant?.symbol || warrant.common_ticker, thesis: warrant.summary || warrant.thesis || 'Warrant contract review', stage: warrant.gates?.status || warrant.lifecycle || 'review', catalyst: warrant.contract_clock?.expiry ? `Expiry ${window.DashboardFormat.date(warrant.contract_clock.expiry)}` : 'Contract clock unavailable', owner: 'Research', updated: warrant.market?.warrant?.quote_date || warrantData.generated_at, next: warrant.next_action || 'Verify contract and market', source: 'Warrant contract ledger' });
+  for (const idea of (data.nol_screener?.rows || []).filter((row) => row.is_actionable)) add({ type: 'NOL', feedId: 'nol', name: idea.ticker, thesis: `${idea.company || idea.ticker} tax-attribute screen`, stage: idea.usability || 'screen', catalyst: `§382 shield / price ${idea.tax_shield_pv_to_mcap_pct == null ? 'unavailable' : window.DashboardFormat.number(idea.tax_shield_pv_to_mcap_pct, { maximumFractionDigits: 2 }) + '%'}`, owner: 'Research', updated: idea.filing_as_of || generated, next: 'Verify tax-attribute ownership and deal path', source: 'SEC company facts' });
+  for (const bank of (data.advantaged_banks_screener?.rows || []).filter((row) => row.is_low_cost)) add({ type: 'Bank', feedId: 'banks', name: bank.ticker, thesis: bank.company || 'Deposit franchise screen', stage: 'screen', catalyst: bank.edge_label || bank.edge_type || 'Deposit franchise', owner: 'Research', updated: bank.filing_as_of || generated, next: 'Underwrite deposit durability and valuation', source: 'SEC advantaged-bank screen' });
+  for (const rock of (data.rock_aggregates_screener?.rows || []).filter((row) => row.is_pure_rock && !row.in_holdings)) add({ type: 'Aggregates', feedId: 'rock', name: rock.ticker, thesis: rock.company || 'Local quarry screen', stage: 'screen', catalyst: rock.rock_type_label || rock.rock_type || 'Aggregates', owner: 'Research', updated: rock.fiscal_year_end || generated, next: 'Underwrite freight-adjusted price per ton against the benchmark producers', source: 'SEC aggregates screen' });
+  const actionable = (row) => ['intake', 'review', 'screen', 'hypothesis'].includes(String(row.stage || '').toLowerCase());
+  const current = (row) => ['fresh', 'api', 'empty'].includes(feedClockState(row.feedId));
+  const rank = (row) => {
+    if (actionable(row) && current(row)) return 0;
+    if (actionable(row)) return 1;
+    if (current(row)) return 2;
+    return 3;
+  };
+  return rows.sort((a, b) => rank(a) - rank(b) || String(b.updated || '').localeCompare(String(a.updated || '')));
 }
 
 function renderIdeaDrawer(row) {
@@ -4772,7 +4821,11 @@ function renderIdeasIndexBody() {
   ];
   return `<div class="ideas-shell"><header class="ideas-header"><div><h2>Decision Inbox</h2><p>Every candidate has one stage, one owner, one clock, and one next action. Open a row for its evidence and source.</p></div><span class="ideas-asof">As of ${escapeHtml(window.DashboardFormat.date(data.generated_at || data.generatedAt))}</span></header>
     <div class="decision-tape" aria-label="Idea decision filters">${tape.map(([key, label, count]) => `<button type="button" data-idea-filter="${key}" class="${ideaFilter === key ? 'active' : ''}"><small>${escapeHtml(label)}</small><strong>${count}</strong></button>`).join('')}</div>
-    <section class="ideas-surface"><div class="ideas-surface-head"><strong>${rows.length} ideas in view</strong><span>Sorted by last verified · click an instrument for detail</span></div><div class="ideas-table-wrap"><table class="ideas-table"><thead><tr><th>Type</th><th>Instrument</th><th>Stage</th><th>Catalyst / expiry</th><th>Owner</th><th>Last verified</th><th>Next action</th></tr></thead><tbody>${rows.map((row) => `<tr><td><span class="idea-type">${escapeHtml(row.type)}</span></td><td><button type="button" class="idea-open" data-idea-id="${escapeHtml(row.id)}">${escapeHtml(row.name || 'Unavailable')}</button></td><td>${escapeHtml(String(row.stage || 'Unavailable').replace(/_/g, ' '))}</td><td>${escapeHtml(row.catalyst)}</td><td>${escapeHtml(row.owner)}</td><td class="numeric">${escapeHtml(window.DashboardFormat.date(row.updated))}</td><td>${escapeHtml(row.next)}</td></tr>`).join('')}</tbody></table>${rows.length ? '' : '<div class="operator-empty"><strong>No ideas match this decision state</strong><span>Choose another decision-tape segment. Source owner: Research Data Health.</span></div>'}</div></section>${renderIdeaDrawer(selected)}</div>`;
+    <section class="ideas-surface"><div class="ideas-surface-head"><strong>${rows.length} ideas in view</strong><span>Fresh actionable rows first · click an instrument for detail</span></div><div class="ideas-table-wrap"><table class="ideas-table"><thead><tr><th>Type</th><th>Instrument</th><th>Stage</th><th>Catalyst / expiry</th><th>Owner</th><th>Last verified</th><th>Next action</th></tr></thead><tbody>${rows.map((row) => {
+      const clock = feedClockState(row.feedId);
+      const clockNote = ['fresh', 'api', 'empty'].includes(clock) ? '' : ` [${window.DashboardFormat.feedLabel(clock)}]`;
+      return `<tr><td><span class="idea-type">${escapeHtml(row.type)}</span></td><td><button type="button" class="idea-open" data-idea-id="${escapeHtml(row.id)}">${escapeHtml(row.name || 'Unavailable')}</button></td><td>${escapeHtml(String(row.stage || 'Unavailable').replace(/_/g, ' '))}</td><td>${escapeHtml(row.catalyst)}</td><td>${escapeHtml(row.owner)}</td><td class="numeric">${escapeHtml(window.DashboardFormat.date(row.updated))}</td><td>${escapeHtml(row.next + clockNote)}</td></tr>`;
+    }).join('')}</tbody></table>${rows.length ? '' : '<div class="operator-empty"><strong>No ideas match this decision state</strong><span>Choose another decision-tape segment. Source owner: Research Data Health.</span></div>'}</div></section>${renderIdeaDrawer(selected)}</div>`;
 }
 
 function renderWatchlistQueueBody() {
@@ -4904,10 +4957,11 @@ function renderWatchlistNolBody() {
     ${actionableRows.length ? `<h4 style="font-size:12px;color:var(--text-muted);margin:12px 0 8px">Actionable first · ${actionableRows.length}</h4><table class="darwin-table nol-table-limited">${nolHead}<tbody>${actionableRows.map(nolRowHtml).join('')}</tbody></table>` : ''}
     ${blockedRows.length ? `<h4 style="font-size:12px;color:var(--text-muted);margin:16px 0 8px">Blocked / monitor · ${allBlockedRows.length}</h4><table class="darwin-table nol-table-limited">${nolHead}<tbody>${blockedRows.map(nolRowHtml).join('')}</tbody></table>${allBlockedRows.length > 25 ? `<button type="button" class="btn-secondary" data-nol-show-blocked>${nolShowAllBlocked ? 'Show first 25 blocked rows' : `Show all ${allBlockedRows.length} blocked rows`}</button>` : ''}` : ''}
     ${!visibleRows.length ? '<div class="operator-empty"><strong>No NOL names match this filter</strong><span>Clear “Hide fully reserved” to restore structurally blocked rows.</span></div>' : ''}`
-    : '<div class="operator-empty"><strong>NOL feed unavailable</strong><span>The SEC facts screen has not published rows. Data Health owns the next refresh.</span></div>';
+    : screenUnavailable('nol', 'NOL feed unavailable');
   return `
     <div class="watchlist-section">
       <h3>NOL carryforward screener (${nolRows.length}${nol.small_cap_count != null ? ` · ${nol.small_cap_count} small/micro` : ''}${actionableCount != null ? ` · ${actionableCount} usable after §382` : ''})</h3>
+      <p class="tier-sub" style="margin-bottom:8px">${feedNotice('nol')}</p>
       ${nolTaxReality(nol)}
       <p class="form-hint" style="margin-bottom:10px">${escapeHtml(nol.criteria || 'Deferred tax asset screen from SEC companyfacts + seed list.')}</p>
       ${nolTable}
@@ -4948,10 +5002,11 @@ function renderWatchlistBanksBody() {
       Show low-cost only
     </label>
     ${visibleBanks.length ? `<table class="darwin-table">${bankHead}<tbody>${visibleBanks.map(bankRowHtml).join('')}</tbody></table>` : '<div class="operator-empty"><strong>No banks match this filter</strong><span>Clear “Show low-cost only” to restore the full bank universe.</span></div>'}`
-    : '<div class="operator-empty"><strong>Bank screen unavailable</strong><span>The SEC facts screen has not published rows. Data Health owns the next refresh.</span></div>';
+    : screenUnavailable('banks', 'Bank screen unavailable');
   return `
     <div class="watchlist-section">
       <h3>Advantaged banks screener (${bankRows.length}${lowCostCount != null ? ` · ${lowCostCount} low-cost` : ''})</h3>
+      <p class="tier-sub" style="margin-bottom:8px">${feedNotice('banks')}</p>
       <p class="form-hint" style="margin-bottom:10px">${escapeHtml(banks.criteria || 'Competitive-franchise banks: low-cost deposits, BaaS/fintech, niche platforms. Seed list + SEC companyfacts.')}</p>
       <p class="form-hint" style="margin-bottom:10px">Framed by Moore community-bank handbook (<code>_system/reference/investment-wisdom/moore/</code>).</p>
       ${banksTable}
@@ -4993,10 +5048,11 @@ function renderWatchlistRockBody() {
       Show aggregates only (hide cement, lime, asphalt)
     </label>
     ${visible.length ? `<table class="darwin-table">${head}<tbody>${visible.map(rowHtml).join('')}</tbody></table>` : '<div class="operator-empty"><strong>No producers match this filter</strong><span>Clear “Show aggregates only” to restore cement, lime and asphalt names.</span></div>'}`
-    : '<div class="operator-empty"><strong>Aggregates screen not built</strong><span>Run: <code>python _system/scripts/build_rock_aggregates_screener.py --write</code></span></div>';
+    : screenUnavailable('rock', 'Aggregates screen not published');
   return `
     <div class="watchlist-section">
       <h3>Aggregates screener (${rockRows.length}${pureCount != null ? ` · ${pureCount} aggregates` : ''})</h3>
+      <p class="tier-sub" style="margin-bottom:8px">${feedNotice('rock')}</p>
       <p class="form-hint" style="margin-bottom:10px">${escapeHtml(rock.criteria || 'US aggregates, cement and lime producers. Seed list plus SEC companyfacts.')}</p>
       <p class="form-hint" style="margin-bottom:10px">Freight caps the economic haul radius near 25 miles, so each quarry is a local oligopoly and the thesis is price per ton compounding above cost per ton. The two metrics that decide it — freight-adjusted price per ton and cash gross profit per ton — are not in XBRL; they arrive with the aggregates unit-economics filing panel. Macro context: <code>aggregates_infrastructure</code> theme panel.</p>
       ${table}
@@ -5279,6 +5335,19 @@ function renderSummary() {
     { label: 'Tier 1 research', value: tier1, sub: 'owned or imminent decisions', cls: tier1 ? 'stage-ready' : '' },
     { label: 'Stale research', value: stale, sub: 'older than 90 days', cls: stale ? 'stage-alert' : 'stage-ready' },
   ];
+  const valuationStale = ['stale', 'missing', 'unreadable'].includes(feedClockState('valuation'));
+  const openNext = data.tickers
+    .filter((t) => {
+      const parsed = Date.parse(t.last_research || '');
+      const researchStale = !Number.isFinite(parsed) || parsed < staleCutoff;
+      return researchStale || valuationStale;
+    })
+    .sort((a, b) => String(a.last_research || '').localeCompare(String(b.last_research || '')))[0];
+  const openNextCard = openNext ? (() => {
+    const decision = decisionForRow(openNext);
+    const action = decision.next_gap_question || decision.next_action || 'Open the research file.';
+    return `<button type="button" class="summary-card decision-stage stage-alert" data-open-next="${escapeHtml(openNext.ticker)}"><div class="label">Open next</div><div class="value">${escapeHtml(openNext.display_ticker || openNext.ticker)}</div><div class="sub">${escapeHtml(action)}</div></button>`;
+  })() : '';
   const catalog = data.document_catalog?.summary;
   const health = [
     { label: 'Universe', value: Number(s.ticker_count || 0).toLocaleString(), sub: (s.markets || []).join(' · ') },
@@ -5288,6 +5357,7 @@ function renderSummary() {
     { label: 'PDF store', value: Number(catalog?.uploaded_count || 0).toLocaleString(), sub: `${Number(catalog?.pending_upload_count || 0).toLocaleString()} pending` },
   ];
   document.getElementById('summary').innerHTML = `
+    ${openNextCard}
     ${cards.map((c, index) => `
       <div class="summary-card decision-stage ${c.cls || ''}">
         <div class="label">${escapeHtml(c.label)}<span class="stage-index">0${index + 1}</span></div>
@@ -5303,7 +5373,13 @@ function renderSummary() {
           <div class="sub">${escapeHtml(c.sub)}</div>
         </div>`).join('')}</div>
     </details>`;
-  if (window.FicoWatch) FicoWatch.mountBanner(data && data.fico_watch);
+  const openNextButton = document.querySelector('#summary [data-open-next]');
+  if (openNextButton) {
+    openNextButton.addEventListener('click', () => {
+      setView('holdings', { syncHash: false });
+      selectTicker(openNextButton.dataset.openNext);
+    });
+  }
 }
 
 function filtered() {
