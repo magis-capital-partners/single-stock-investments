@@ -3795,6 +3795,9 @@ def main() -> None:
     from build_dashboard_shards import write_shards
 
     write_shards(payload, insights_doc, DATA_DIR)
+    from build_feed_status import write_feed_status
+
+    write_feed_status()
 
 
 if __name__ == "__main__":

@@ -360,9 +360,24 @@
     return `<div class="ph-scope-strip"><div class="ph-scope-name"><strong>${esc(label)}</strong><span>Selected scope · account facts above stay fixed</span></div><div class="ph-scope-metric"><span>Allocated cash</span><b>${money(cash, true)}</b></div><div class="ph-scope-metric"><span>Gross exposure</span><b>${money(gross, true)}</b></div><div class="ph-scope-metric"><span>Net exposure</span><b>${money(net, true)}</b></div><div class="ph-scope-metric"><span>Daily attributable P&L</span><b class="${pnl < 0 ? 'ph-negative' : 'ph-positive'}">${signed(pnl)}</b></div><div class="ph-scope-metric"><span>Orders / breaks / quarantine</span><b>${book?.broker_open_order_count || 0} / ${unresolved} / ${quarantined}</b></div></div>`;
   }
 
+  function portfolioClock(book) {
+    const stamp = book?.snapshot?.as_of || '';
+    const eod = isEodFeed(book);
+    const kind = !stamp ? 'No complete broker snapshot' : (eod ? 'Flex end-of-day' : 'Complete snapshot');
+    const format = window.DashboardFormat;
+    const row = typeof feedById === 'function' ? feedById('portfolio') : null;
+    const maxAge = row?.max_age_hours || 100;
+    const state = !format
+      ? (stamp ? 'fresh' : 'missing')
+      : format.feedState(stamp, maxAge, { exists: Boolean(stamp) });
+    const follow = (state === 'stale' || state === 'missing' || state === 'unreadable')
+      ? ' Next: wait for the next Flex report. This page does not read the Gateway.'
+      : '';
+    return `${kind} · ${esc(stamp || 'no timestamp')} · ${esc(book?.status || 'unknown')}${esc(follow)}`;
+  }
+
   function shellHeader(book) {
-    const asOf = book?.snapshot?.as_of || 'No complete broker snapshot';
-    return `<div class="ph-eyebrow">Private IBKR account · canonical ledger</div><div class="ph-title-row"><div><h2 class="ph-title">Portfolio book</h2><div class="ph-asof">${esc(asOf)} · ${esc(book?.status || 'unknown')}</div></div><div class="ph-scope-nav" aria-label="Portfolio scope">${['all', 'drew', 'michael'].map((scope) => `<button type="button" data-ph-scope="${scope}" class="${state.scope === scope ? 'active' : ''}">${scope === 'all' ? 'All positions' : scope[0].toUpperCase() + scope.slice(1)}</button>`).join('')}</div></div>${accountCockpit(book)}${accountFacts(book)}<div class="ph-section-nav" role="tablist">${sections.map((section) => `<button type="button" data-ph-section="${section}" class="${state.section === section ? 'active' : ''}">${section === 'margin' ? 'Margin & liquidity' : section[0].toUpperCase() + section.slice(1)}</button>`).join('')}</div>`;
+    return `<div class="ph-eyebrow">Private IBKR account · canonical ledger</div><div class="ph-title-row"><div><h2 class="ph-title">Portfolio book</h2><div class="ph-asof">${portfolioClock(book)}</div></div><div class="ph-scope-nav" aria-label="Portfolio scope">${['all', 'drew', 'michael'].map((scope) => `<button type="button" data-ph-scope="${scope}" class="${state.scope === scope ? 'active' : ''}">${scope === 'all' ? 'All positions' : scope[0].toUpperCase() + scope.slice(1)}</button>`).join('')}</div></div>${accountCockpit(book)}${accountFacts(book)}<div class="ph-section-nav" role="tablist">${sections.map((section) => `<button type="button" data-ph-section="${section}" class="${state.section === section ? 'active' : ''}">${section === 'margin' ? 'Margin & liquidity' : section[0].toUpperCase() + section.slice(1)}</button>`).join('')}</div>`;
   }
 
   function columnPicker() {
@@ -1426,10 +1441,29 @@
     return (payload?.rows || []).filter((row) => chosen === 'overview' || String(row.bucket || '').toLowerCase() === chosen);
   }
 
+  function strategyFollowup(producer, payload) {
+    const isSpx = producer === 'spx_0dte';
+    const status = String(payload?.status || 'unknown').toLowerCase();
+    const stamp = payload?.summary?.heartbeat_ts || payload?.as_of || '';
+    const feedId = isSpx ? 'spx-0dte' : 'ls-algo';
+    const row = typeof feedById === 'function' ? feedById(feedId) : null;
+    const maxAge = row?.max_age_hours || 100;
+    const format = window.DashboardFormat;
+    const state = format
+      ? format.feedState(stamp, maxAge, { exists: Boolean(stamp) })
+      : (stamp ? 'fresh' : 'missing');
+    if (status === 'stopped' || status === 'unknown' || state === 'stale' || state === 'unreadable' || state === 'missing') {
+      const owner = isSpx ? 'spx-0dte' : 'ls-algo';
+      return ` Next: ${owner} owns this snapshot. This page does not probe the Gateway.`;
+    }
+    return '';
+  }
+
   function strategyWorkbench(producer, payload) {
     const isSpx = producer === 'spx_0dte';
     const summary = payload.summary || {};
     const title = isSpx ? 'SPX 0DTE' : 'LS Algo';
+    const followup = strategyFollowup(producer, payload);
     const sectionNav = `<div class="ph-section-nav" role="navigation" aria-label="${title} sections">${strategySections.map((section) => `<button type="button" data-ph-strategy-section="${section}" class="${state.strategySection === section ? 'active' : ''}">${section === 'pnl' ? 'P&L' : section[0].toUpperCase() + section.slice(1)}</button>`).join('')}</div>`;
     const bucketNav = isSpx || state.strategySection !== 'positions' ? '' : `<div class="ph-bucket-nav" aria-label="LS Algo bucket filter">${buckets.map((bucket) => `<button type="button" data-ph-bucket="${bucket}" class="${state.strategyBucket === bucket ? 'active' : ''}">${bucket === 'all' ? 'All buckets' : bucket.toUpperCase()}</button>`).join('')}</div>`;
     let body = '';
@@ -1474,7 +1508,7 @@
     } else {
       body = `<div class="ph-grid">${panelLines('Contract', [['Producer', producer], ['Status', payload.status || 'unknown'], ['Rows', String((payload.rows || []).length)], ['Run', payload.source_run_id || 'unavailable']])}${panelLines('Reconciliation', [['Broker positions', 'canonical account feed'], ['Strategy analytics', 'producer-owned'], ['Owner allocation', 'never inferred from strategy'], ['Unlinked rows', String((payload.rows || []).filter((row) => !row.conid).length)]])}</div>`;
     }
-    return `<div class="ph-shell"><div class="ph-eyebrow">Strategies workbench · versioned producer data</div><div class="ph-title-row"><div><h2 class="ph-title">${title}</h2><div class="ph-asof">${esc(payload.as_of || 'No producer snapshot')} · ${esc(payload.status || 'unknown')}</div></div><span class="ph-strategy-badge">${isSpx ? 'LIVE MODEL' : 'LS ALGO'}</span></div>${sectionNav}${body}</div>`;
+    return `<div class="ph-shell"><div class="ph-eyebrow">Strategies workbench · versioned producer data</div><div class="ph-title-row"><div><h2 class="ph-title">${title}</h2><div class="ph-asof">${esc(payload.as_of || 'No producer snapshot')} · ${esc(payload.status || 'unknown')}${esc(followup)}</div></div><span class="ph-strategy-badge">${isSpx ? 'LIVE MODEL' : 'LS ALGO'}</span></div>${sectionNav}${body}</div>`;
   }
 
   function renderStrategy(producer) {

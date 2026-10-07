@@ -64,6 +64,30 @@
       return `<span class="badge badge-bad stale-badge" title="Expected to refresh at least every ${limit} hours; unchanged since ${day}.">STALE since ${day}</span>`;
     },
 
+    /**
+     * missing, unreadable, and stale are different. empty means the file is
+     * inside its window and published no actionable rows. Keep these strings
+     * aligned with build_feed_status.LABELS.
+     */
+    feedState(stamp, maxAgeHours, { exists = true, empty = false, now = Date.now() } = {}) {
+      if (exists === false) return 'missing';
+      const at = stampMs(stamp);
+      const limit = Number(maxAgeHours);
+      if (at == null || !Number.isFinite(limit) || limit <= 0) return 'unreadable';
+      if (now - at > limit * 3_600_000) return 'stale';
+      return empty ? 'empty' : 'fresh';
+    },
+
+    feedLabel(state) {
+      if (state === 'missing') return 'Missing file';
+      if (state === 'unreadable') return 'Unreadable stamp';
+      if (state === 'stale') return 'Stale';
+      if (state === 'fresh') return 'Fresh';
+      if (state === 'empty') return 'Current, no actionable rows';
+      if (state === 'api') return 'Live API';
+      return 'Unknown';
+    },
+
     number(value, options = {}) {
       const number = finite(value);
       return number == null ? '—' : formatter({ maximumFractionDigits: 4, ...options }).format(number);

@@ -4112,6 +4112,65 @@
       ${table}`;
   }
 
+  function feedStatusRows(status) {
+    return (status && status.surfaces) || [];
+  }
+
+  function feedStatusRow(status, id) {
+    return feedStatusRows(status).find((row) => row.id === id) || null;
+  }
+
+  function renderSectionClock(status, id, escapeHtml) {
+    const row = feedStatusRow(status, id);
+    if (!row) return '';
+    const format = global.DashboardFormat;
+    const state = row.kind === 'api' || !format
+      ? (row.status || 'api')
+      : format.feedState(row.stamp, row.max_age_hours, {
+        exists: row.exists !== false,
+        empty: row.status === 'empty',
+      });
+    const label = format ? format.feedLabel(state) : (row.label_text || state);
+    return `<p class="tier-sub">${escapeHtml(row.label)} · ${escapeHtml(label)} · as of ${escapeHtml(row.stamp || 'no stamp')} · lane ${escapeHtml(row.lane || '')}. ${escapeHtml(row.next_action || '')} <a href="#/insights/data-health">Data Health</a></p>`;
+  }
+
+  function renderDashboardFeeds(status, escapeHtml) {
+    const rows = feedStatusRows(status);
+    if (!rows.length) {
+      return '<p class="subhead">Dashboard feed status has not been published. Nightly intake writes it. This page does not dispatch refreshes.</p>';
+    }
+    const format = global.DashboardFormat;
+    return `
+      <div class="detail-section">
+        <h3>Dashboard feeds</h3>
+        <p class="tier-sub" style="margin-bottom:8px">Age, owner lane, and the next action. Refresh stays with the scheduled job.</p>
+        <table class="darwin-table" id="dashboard-feed-table">
+          <thead><tr><th>Surface</th><th>Status</th><th>As of</th><th>Owner lane</th><th>Next action</th></tr></thead>
+          <tbody>
+            ${rows.map((row) => {
+              const state = row.kind === 'api' || !format
+                ? (row.status || 'api')
+                : format.feedState(row.stamp, row.max_age_hours, {
+                  exists: row.exists !== false,
+                  empty: row.status === 'empty',
+                });
+              const label = format ? format.feedLabel(state) : (row.label_text || state);
+              const cls = state === 'fresh' || state === 'empty' || state === 'api'
+                ? 'badge-ok'
+                : (state === 'stale' ? 'badge-warn' : 'badge-bad');
+              return `<tr>
+                <td><a href="${escapeHtml(row.hash || '#/insights/data-health')}">${escapeHtml(row.label || row.id)}</a></td>
+                <td><span class="badge ${cls}">${escapeHtml(label)}</span></td>
+                <td class="mono">${escapeHtml(row.stamp || row.lane_receipt_at || 'n/a')}</td>
+                <td class="mono">${escapeHtml(row.lane || '')}</td>
+                <td class="tier-sub">${escapeHtml(row.next_action || '')}</td>
+              </tr>`;
+            }).join('')}
+          </tbody>
+        </table>
+      </div>`;
+  }
+
   function renderSourceHealth(health, escapeHtml) {
     const rows = Object.entries(health || {});
     if (!rows.length) {
@@ -5397,7 +5456,8 @@
       body = renderRespiratoryPanel(options?.respiratoryModel || null, escapeHtml)
         + renderInflections(kpiTrends, escapeHtml, { search: fundSearch, bookOnly, inflectionTier });
     } else if (activeSection === 'events') {
-      body = renderDecisionEventQueue(insights?.events || [], escapeHtml, linkHtml, ghRepo, {
+      body = renderSectionClock(options?.feedStatus, 'insights-events', escapeHtml)
+        + renderDecisionEventQueue(insights?.events || [], escapeHtml, linkHtml, ghRepo, {
         search: fundSearch,
         knownTickers,
         eventTier,
@@ -5418,9 +5478,11 @@
     } else if (activeSection === 'index_watch') {
       const indexPayload = options?.indexMembership || null;
       if (global.IndexViz && indexPayload) {
-        body = global.IndexViz.renderIndexWatch(indexPayload, { escapeHtml, linkHtml });
+        body = renderSectionClock(options?.feedStatus, 'index-watch', escapeHtml)
+          + global.IndexViz.renderIndexWatch(indexPayload, { escapeHtml, linkHtml });
       } else {
-        body = '<p class="muted">Index membership not built. Run: python _system/scripts/build_index_membership.py</p>';
+        body = renderSectionClock(options?.feedStatus, 'index-watch', escapeHtml)
+          || '<p class="muted">Index membership is not in this publish.</p>';
       }
     } else if (activeSection === 'consensus') {
       body = renderConsensus(insights?.consensus, escapeHtml, linkHtml, ghRepo, {
@@ -5540,7 +5602,8 @@
         body += renderMemoryLedger(memory, escapeHtml, linkHtml, memoryOpts);
       }
     } else {
-      body = renderSourceHealth(insights?.source_health || {}, escapeHtml)
+      body = renderDashboardFeeds(options?.feedStatus, escapeHtml)
+        + renderSourceHealth(insights?.source_health || {}, escapeHtml)
         + renderDataSourceCandidates(insights?.data_source_candidates || {}, escapeHtml);
     }
 
