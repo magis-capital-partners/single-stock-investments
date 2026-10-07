@@ -1182,22 +1182,6 @@
     margin-bottom: 12px; color: var(--text-secondary);
   }
   .liquidity-banner strong { color: var(--accent-red); }
-  .fico-banner[hidden] { display: none !important; }
-  .fico-banner {
-    margin: 12px 16px 0; padding: 14px 16px; border-radius: 10px; border: 2px solid var(--accent-red);
-    background: rgba(239, 68, 68, 0.14); display: flex; gap: 16px; align-items: center;
-    justify-content: space-between; color: var(--text-primary);
-  }
-  .fico-banner strong { display: block; font-size: 16px; line-height: 1.35; }
-  .fico-banner p { margin: 4px 0 0; color: var(--text-secondary); font-size: 13px; line-height: 1.45; max-width: 78ch; }
-  .fico-banner-pass { border-color: var(--accent-green); background: rgba(16, 185, 129, 0.12); }
-  .fico-banner-watch { border-color: var(--accent-amber); background: rgba(245, 158, 11, 0.12); }
-  .fico-open {
-    flex: 0 0 auto; background: var(--accent-red); color: #fff; border: 0; border-radius: 8px;
-    padding: 10px 14px; font-weight: 700; cursor: pointer;
-  }
-  .fico-banner-pass .fico-open { background: var(--accent-green); }
-  .fico-banner-watch .fico-open { background: var(--accent-amber); color: #1a1203; }
   .fico-watch {
     border: 2px solid var(--accent-red); border-radius: 10px; padding: 16px 16px 8px;
     margin: 0 0 16px; background: rgba(239, 68, 68, 0.08);
@@ -1224,7 +1208,6 @@
   .fico-pill-stale, .fico-pill-watch { color: var(--accent-amber); }
   .fico-pill-unchecked, .fico-pill-missing, .fico-pill-context { color: var(--text-muted); }
   @media (max-width: 720px) {
-    .fico-banner { flex-direction: column; align-items: stretch; }
     .fico-row { grid-template-columns: 1fr; }
     .fico-pill { text-align: left; }
   }
@@ -1813,7 +1796,6 @@
 
   <main id="main-content">
   <section class="summary-strip" id="summary"></section>
-  <section id="fico-watch-banner" class="fico-banner fico-banner-fail" hidden></section>
 
   <section class="portfolio-panel active" id="portfolio-panel" aria-label="IBKR portfolio"><div id="portfolio-content"></div></section>
   <section class="portfolio-panel" id="spx-0dte-panel" aria-label="SPX 0DTE strategy"><div id="spx-0dte-content"></div></section>
@@ -5398,7 +5380,6 @@ function renderSummary() {
       selectTicker(openNextButton.dataset.openNext);
     });
   }
-  if (window.FicoWatch) FicoWatch.mountBanner(data && data.fico_watch);
 }
 
 function filtered() {

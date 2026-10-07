@@ -55,36 +55,5 @@
       </section>`;
   }
 
-  function mountBanner(payload) {
-    const el = document.getElementById('fico-watch-banner');
-    if (!el) return;
-    el.hidden = false;
-    if (!payload || !payload.banner) {
-      el.className = 'fico-banner fico-banner-fail';
-      el.innerHTML = `
-        <div>
-          <strong>FICO watch is not loaded</strong>
-          <p>Do not treat Fair Isaac as monitored until dashboard/data/fico_watch.json is on this page.</p>
-        </div>`;
-      return;
-    }
-    const tone = toneClass(payload.banner.tone);
-    const detail = payload.verdict && payload.verdict.detail ? payload.verdict.detail : '';
-    el.className = 'fico-banner fico-banner-' + tone;
-    el.innerHTML = `
-      <div>
-        <strong>${esc(null, payload.banner.text)}</strong>
-        <p>${esc(null, detail)}</p>
-      </div>
-      <button type="button" class="fico-open" data-fico-open>${esc(null, payload.banner.action || 'Open FICO')}</button>`;
-  }
-
-  document.addEventListener('click', (event) => {
-    const button = event.target.closest('[data-fico-open]');
-    if (!button || typeof selectTicker !== 'function') return;
-    if (typeof setView === 'function') setView('holdings', { syncHash: false });
-    selectTicker('FICO');
-  });
-
-  window.FicoWatch = { renderDetail, mountBanner };
+  window.FicoWatch = { renderDetail };
 })();
