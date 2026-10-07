@@ -1,7 +1,7 @@
 # Event triage — human review queue
 
 **Date:** 2026-10-07
-**Rows:** 5273
+**Rows:** 3142
 
 | Date | Ticker | Source | Tier | Materiality | Rules | Title |
 |------|--------|--------|------|-------------|-------|-------|
@@ -57,6 +57,10 @@
 | 2026-10-07 | WBD | kpi_trend | context | 66 | rule_conflict, activist_cross_link, routine_governance_watch | Leadership / governance on watch |
 | 2026-10-07 | XYZ | kpi_trend | context | 66 | rule_conflict, activist_cross_link, routine_governance_watch | Leadership / governance on watch |
 | 2026-10-07 | YUM | kpi_trend | context | 66 | rule_conflict, activist_cross_link, routine_governance_watch | Leadership / governance on watch |
+| 2026-10-07 | PSA | vic_research | context | 33 | rule_conflict, activist_cross_link, neutral_low_impact | 01-Public-Storage_8bfc |
+| 2026-10-07 | PSA | third_party | context | 25 | rule_conflict, activist_cross_link, entity_mismatch, neutral_low_impact | Academic Studies Find That Retaliatory Lawsuits Against Shor |
+| 2026-10-07 | PSA | third_party | context | 25 | rule_conflict, activist_cross_link, neutral_low_impact | Public Storage — SC 13D/A |
+| 2026-10-07 | PSA | third_party | context | 25 | rule_conflict, activist_cross_link, entity_mismatch, neutral_low_impact | Tamara Hughes Gustavson — SC 13D |
 | 2026-10-06 | ZETA | kpi_trend | context | 66 | rule_conflict, activist_cross_link, routine_governance_watch | Leadership / governance on watch |
 | 2026-10-06 | ZETA | news | context | 38 | rule_conflict, activist_cross_link, neutral_low_impact | We never sell our data to other LLM's, we use it to train ou |
 | 2026-10-06 | SYK | news | context | 38 | rule_conflict, activist_cross_link, neutral_low_impact | INVESTOR ALERT: Pomerantz Law Firm Investigates Claims On Be |
@@ -109,6 +113,7 @@
 | 2026-10-04 | CSGP | vic_research | context | 33 | rule_conflict, activist_cross_link, neutral_low_impact | 09-CoStar-Group |
 | 2026-10-04 | CSGP | vic_research | context | 33 | rule_conflict, activist_cross_link, neutral_low_impact | VIC PDF intake - CSGP - CSGP VIC PDF |
 | 2026-10-04 | GOOGL | vic_research | context | 33 | rule_conflict, activist_cross_link, neutral_low_impact | VIC PDF intake - GOOGL - GOOGL VIC PDF |
+| 2026-10-04 | TMUS | vic_research | context | 33 | rule_conflict, activist_cross_link, entity_mismatch, neutral_low_impact | 13-Helios-Towers |
 | 2026-10-04 | PLUG | vic_research | context | 33 | rule_conflict, activist_cross_link, neutral_low_impact | 06-Plug-Power_13b1 |
 | 2026-10-04 | SOFI | vic_research | context | 33 | rule_conflict, activist_cross_link, neutral_low_impact | SOFI |
 | 2026-10-04 | QDEL | vic_research | context | 33 | rule_conflict, activist_cross_link, neutral_low_impact | VIC PDF intake - QDEL - QDEL VIC PDF |
@@ -200,8 +205,3 @@
 | 2026-10-04 | EA | third_party | context | 25 | rule_conflict, activist_cross_link, entity_mismatch, neutral_low_impact | DFAN14A 1 d112573ddfan14a.htm DFAN14A DFAN14A... — DFAN14A ( |
 | 2026-10-04 | EA | third_party | context | 25 | rule_conflict, activist_cross_link, entity_mismatch, neutral_low_impact | PUBLIC INVESTMENT FUND — SC 13D/A |
 | 2026-10-04 | EA | third_party | context | 25 | rule_conflict, activist_cross_link, entity_mismatch, neutral_low_impact | Pentwater Capital — SC 13G |
-| 2026-10-04 | AMZN | third_party | context | 25 | rule_conflict, activist_cross_link, entity_mismatch, neutral_low_impact | Strategic Organizing Center — DEFA14A |
-| 2026-10-04 | MCD | third_party | context | 25 | rule_conflict, activist_cross_link, entity_mismatch, neutral_low_impact | Strategic Organizing Center — DEFA14A |
-| 2026-10-04 | MCD | third_party | context | 25 | rule_conflict, activist_cross_link, entity_mismatch, neutral_low_impact | The Carlyle Group — PX14A6G |
-| 2026-10-04 | MCD | third_party | context | 25 | rule_conflict, activist_cross_link, entity_mismatch, neutral_low_impact | Icahn Enterprises — PX14A6G |
-| 2026-10-04 | MCD | third_party | context | 25 | rule_conflict, activist_cross_link, entity_mismatch, neutral_low_impact | Icahn Enterprises — DEFA14A |
