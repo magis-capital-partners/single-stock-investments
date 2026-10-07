@@ -190,14 +190,14 @@ Synced from `_system/portfolio/registry.json`. Last sync: 2026-10-07.
 | COST | COST/ | Costco | US | 2026-10-04 | 2026-10-07 | unknown | watch |
 | CPAY | CPAY/ | Corpay | US | 2026-10-04 | 2026-10-07 | unknown | watch |
 | CPNG | CPNG/ | CPNG | US | 2026-10-04 | 2026-10-07 | unknown | watch |
-| CPRT | CPRT/ | Copart | US | 2026-07-09 | 2026-10-07 | compounder | core |
-| CPT | CPT/ | Camden Property Trust | US | 2026-07-09 | 2026-10-07 | unknown | watch |
-| CRCL | CRCL/ | Circle Internet Group, Inc. | US | 2026-07-09 | 2026-10-07 | unknown | watch |
-| CRDD | CRDD/ | CRDD | US | 2026-07-29 | 2026-10-07 | unknown | watch |
-| CRDO | CRDO/ | CRDO | US | 2026-07-29 | 2026-10-07 | unknown | watch |
-| CRH | CRH/ | CRH plc | US | 2026-07-29 | 2026-10-07 | unknown | watch |
-| CRL | CRL/ | Charles River Laboratories | US | 2026-07-09 | 2026-10-07 | unknown | watch |
-| CRM | CRM/ | Salesforce | US | 2026-07-29 | 2026-10-07 | unknown | watch |
+| CPRT | CPRT/ | Copart | US | 2026-10-07 | 2026-10-07 | compounder | core |
+| CPT | CPT/ | Camden Property Trust | US | 2026-10-07 | 2026-10-07 | unknown | watch |
+| CRCL | CRCL/ | Circle Internet Group, Inc. | US | 2026-10-07 | 2026-10-07 | unknown | watch |
+| CRDD | CRDD/ | CRDD | US | 2026-10-07 | 2026-10-07 | unknown | watch |
+| CRDO | CRDO/ | CRDO | US | 2026-10-07 | 2026-10-07 | unknown | watch |
+| CRH | CRH/ | CRH plc | US | 2026-10-07 | 2026-10-07 | unknown | watch |
+| CRL | CRL/ | Charles River Laboratories | US | 2026-10-07 | 2026-10-07 | unknown | watch |
+| CRM | CRM/ | Salesforce | US | 2026-10-07 | 2026-10-07 | unknown | watch |
 | CRML | CRML/ | CRML | US | 2026-07-18 | 2026-10-07 | unknown | watch |
 | CRUS | CRUS/ | CRUS | US | 2026-07-29 | 2026-10-07 | unknown | watch |
 | CRWD | CRWD/ | CrowdStrike | US | 2026-07-29 | 2026-10-07 | unknown | watch |
