@@ -91,11 +91,14 @@ Contract v3 separates proof completeness from investment readiness. A contract m
 
 ## Short Alpha
 
-Systematic short-idea research ledger. Each filing is partitioned into five falsifiable, source-addressable claim types (identity/instrument, financial oxygen/liquidity runway, earnings quality, operating failure mode, market mechanics — borrow, days-to-cover, catalyst window) per [`short_alpha_filing_furnace.md`](_system/frameworks/short_alpha_filing_furnace.md). Build/refresh:
+Systematic short-idea book. Lenses from the short-selling library live in [`frameworks.json`](_system/research/short-alpha/frameworks.json). Names that fit live in [`candidates.json`](_system/research/short-alpha/candidates.json). Borrowed shorts live in [`ideas.json`](_system/research/short-alpha/ideas.json) and must point at a candidate. An activist-index hit, an always-review filing event, or a Fugazi scorecard row becomes a lead on the Shorts tab. It does not become a position.
+
+Each filing is partitioned into five falsifiable, source-addressable claim types (identity/instrument, financial oxygen/liquidity runway, earnings quality, operating failure mode, market mechanics: borrow, days-to-cover, catalyst window) per [`short_alpha_filing_furnace.md`](_system/frameworks/short_alpha_filing_furnace.md). Build/refresh:
 
 ```powershell
-python _system/scripts/build_short_alpha_dashboard.py   # reads short_alpha_research_queue.json → dashboard/data/short_alpha.json (--check to validate only)
+python _system/scripts/build_short_alpha_dashboard.py   # candidates + positions → dashboard/data/short_alpha.json (--check to validate only)
 python _system/scripts/refresh_short_alpha_borrow.py     # borrow / split-aware entry data → dashboard/data/short_alpha_borrow.json
+python _system/scripts/render_short_activist_registry.py # regenerate the short-firm markdown from the JSON registry
 ```
 
 Rendered via [`dashboard/short-alpha-viz.js`](dashboard/short-alpha-viz.js).

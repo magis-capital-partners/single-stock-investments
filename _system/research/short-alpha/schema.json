@@ -1,22 +1,21 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "title": "Short Alpha Ledger",
+  "$id": "short-alpha-positions",
+  "title": "Short Alpha position ledger",
+  "description": "Open shorts only. Names that fit live in candidates.json. Lenses live in frameworks.json. A position ticker must exist as a candidate.",
   "type": "object",
-  "required": ["schema_version", "as_of", "frameworks", "source_types", "ideas"],
+  "required": ["schema_version", "as_of", "ideas"],
   "properties": {
     "schema_version": {"type": "string"},
     "as_of": {"type": "string", "format": "date"},
     "currency": {"type": "string"},
-    "frameworks": {"type": "array", "items": {"type": "object", "required": ["id", "label", "question"]}},
-    "source_types": {"type": "array", "items": {"type": "object", "required": ["id", "label"]}},
     "ideas": {
       "type": "array",
       "items": {
         "type": "object",
-        "required": ["ticker", "security_name", "instrument_type", "position", "frameworks", "primary_framework", "hypothesis", "catalysts", "falsifiers", "research", "sources", "check_ins"],
+        "required": ["ticker", "position", "check_ins"],
         "properties": {
-          "ticker": {"type": "string", "pattern": "^[A-Z0-9.\\-]+$"},
-          "instrument_type": {"enum": ["operating_company", "holding_company", "leveraged_etf", "etf", "closed_end_fund", "other"]},
+          "ticker": {"type": "string"},
           "position": {
             "type": "object",
             "required": ["shares", "opened_price", "opened_date", "split_adjustment_factor"],
@@ -27,10 +26,25 @@
               "split_adjustment_factor": {"type": "number", "exclusiveMinimum": 0}
             }
           },
-          "frameworks": {"type": "array", "minItems": 1, "items": {"type": "string"}},
-          "sources": {"type": "array", "items": {"type": "object", "required": ["type", "label"]}},
-          "check_ins": {"type": "array", "minItems": 1, "items": {"type": "object", "required": ["date", "price", "hypothesis_state", "note"]}}
+          "check_ins": {
+            "type": "array",
+            "minItems": 1,
+            "items": {
+              "type": "object",
+              "required": ["date", "price", "hypothesis_state", "note"]
+            }
+          }
         }
+      }
+    }
+  },
+  "$defs": {
+    "candidate": {
+      "type": "object",
+      "required": ["ticker", "stage", "frameworks", "hypothesis", "sources"],
+      "properties": {
+        "stage": {"enum": ["lead", "researching", "ic", "live", "closed", "rejected"]},
+        "origin": {"enum": ["position", "activist_index", "filing_furnace", "browser_draft", "fugazi_scorecard"]}
       }
     }
   }

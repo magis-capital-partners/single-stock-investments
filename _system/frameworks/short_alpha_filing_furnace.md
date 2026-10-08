@@ -102,7 +102,7 @@ Use one category and zero or more tags. Categories are stable; tags can expand.
 
 ## Dashboard contract
 
-The Short Alpha tab consumes compact events, not filing prose. Each idea should show:
+The Short Alpha tab consumes compact events, not filing prose. Each name should show:
 
 - latest strengthening and weakening events;
 - unresolved contradictions;
@@ -110,6 +110,8 @@ The Short Alpha tab consumes compact events, not filing prose. Each idea should 
 - research and IC gate;
 - next catalyst date;
 - baseline-vs-actual price and thesis state.
+
+Machine path: `{TICKER}/research/evidence/short_furnace_events.json` with an `events` array in the record shape above. The compiler attaches those events on each build. Tags in the always-review set (going concern, restatement, material weakness, auditor change, related party, investigation, litigation) can open a new lead. They do not open a position, and they do not overwrite a rejected, live, closed, or researching row.
 
 ## Guardrails
 

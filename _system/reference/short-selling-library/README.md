@@ -22,8 +22,10 @@ When an authorized ebook/PDF is supplied, store it in the private research vault
 | `public/sec_financial_reporting_manual_2026.pdf` | https://www.sec.gov/files/cf-frm.pdf | Filing and disclosure requirements; treat as non-authoritative staff guidance where the SEC says so. |
 | `public/sec_short_sale_position_transaction_reporting_2014.pdf` | https://www.sec.gov/files/short-sale-position-and-transaction-reporting0.pdf | Market structure, short-position data, reporting limitations, and policy background. |
 | `public/nber_w9466_efficiency_and_the_bear.pdf` | https://www.nber.org/system/files/working_papers/w9466/w9466.pdf | Short-sale constraints, market efficiency, volatility, and skew. |
-| `public/nber_w20282_shorting_premium.pdf` | https://www.nber.org/papers/w20282.pdf | Borrow fees, anomaly interaction, and the shorting risk premium. |
+| `public/nber_w20282_shorting_premium.pdf` | https://www.nber.org/system/files/working_papers/w20282/w20282.pdf | Borrow fees, anomaly interaction, and the shorting risk premium. |
 | `public/nber_w16335_short_selling_market_quality.pdf` | https://www.nber.org/system/files/working_papers/w16335/w16335.pdf | Experimental evidence on lending supply, prices, and market quality. |
+
+These five files are the local copies. The Shorts tab encodes this reading list as trackable lenses in `_system/research/short-alpha/frameworks.json`.
 
 Public availability does not erase copyright. Preserve attribution and do not redistribute outside the terms of the source.
 

@@ -3587,7 +3587,11 @@ def build_research_memory() -> dict | None:
 
 
 def build_short_alpha() -> dict | None:
-    """Compile the separately loaded Short Alpha hypothesis ledger."""
+    """Compile frameworks, candidate leads, and the open short book.
+
+    The compiler also upserts new activist-index leads and writes the day's
+    short scan. It does not contact the IB Gateway.
+    """
     script = ROOT / "_system" / "scripts" / "build_short_alpha_dashboard.py"
     path = DATA_DIR / "short_alpha.json"
     if script.exists():

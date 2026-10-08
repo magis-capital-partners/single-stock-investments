@@ -20,6 +20,47 @@ def tickers() -> list[str]:
     return []
 
 
+def is_feed_short(report: dict) -> bool:
+    """Short reports that belong on the Shorts tab as leads, not passive noise."""
+    return (
+        report.get("side") == "short"
+        and report.get("include_in_feed", True)
+        and report.get("triage_verdict") != "auto_passive"
+    )
+
+
+def company_names() -> dict[str, str]:
+    reg = ROOT / "_system" / "portfolio" / "registry.json"
+    if not reg.exists():
+        return {}
+    data = json.loads(reg.read_text(encoding="utf-8"))
+    holdings = data.get("holdings") or {}
+    if not isinstance(holdings, dict):
+        return {}
+    return {
+        str(ticker): str((row or {}).get("company") or ticker)
+        for ticker, row in holdings.items()
+        if ticker
+    }
+
+
+def collect_feed_shorts() -> dict[str, list[dict]]:
+    """Ticker -> feed-eligible short reports already indexed on disk."""
+    found: dict[str, list[dict]] = {}
+    for ticker in tickers():
+        path = ROOT / ticker / "third-party-analyses" / "activist_reports_index.json"
+        if not path.exists():
+            continue
+        try:
+            reports = json.loads(path.read_text(encoding="utf-8")).get("reports") or []
+        except (OSError, json.JSONDecodeError):
+            continue
+        shorts = [row for row in reports if isinstance(row, dict) and is_feed_short(row)]
+        if shorts:
+            found[ticker] = shorts
+    return found
+
+
 def activist_status(ticker: str) -> dict:
     index_path = ROOT / ticker / "third-party-analyses" / "activist_reports_index.json"
     long_n = short_n = feed_short = 0
@@ -30,11 +71,7 @@ def activist_status(ticker: str) -> dict:
         reports = data.get("reports") or []
         long_n = sum(1 for r in reports if r.get("side") == "long")
         short_n = sum(1 for r in reports if r.get("side") == "short")
-        feed_short = sum(
-            1
-            for r in reports
-            if r.get("side") == "short" and r.get("include_in_feed", True) and r.get("triage_verdict") != "auto_passive"
-        )
+        feed_short = sum(1 for r in reports if is_feed_short(r))
         latest = max((r.get("report_date") or "" for r in reports), default="")
         indexed_md = {
             str(r.get("local_file") or "").replace("\\", "/")
@@ -83,17 +120,14 @@ def activist_status(ticker: str) -> dict:
     }
 
 
-def main() -> None:
-    parser = argparse.ArgumentParser()
-    parser.add_argument("--date", default=date.today().isoformat())
-    args = parser.parse_args()
-
+def write_scan(when: str | None = None) -> Path:
+    when = when or date.today().isoformat()
     rows = [activist_status(t) for t in tickers()]
-    out = ROOT / "_system" / "research" / f"short_scan_{args.date}.md"
+    out = ROOT / "_system" / "research" / f"short_scan_{when}.md"
     lines = [
         "# Portfolio activist scan (long + short)",
         "",
-        f"**Date:** {args.date}  ",
+        f"**Date:** {when}  ",
         f"**Agent:** `short_scan_batch.py`  ",
         f"**Registry:** `_system/frameworks/activist_firm_registry.json`",
         "",
@@ -131,6 +165,14 @@ def main() -> None:
     out.parent.mkdir(parents=True, exist_ok=True)
     out.write_text("\n".join(lines) + "\n", encoding="utf-8")
     print(f"Wrote {out.relative_to(ROOT)} ({len(rows)} rows, {len(gap_lines)} gaps)")
+    return out
+
+
+def main() -> None:
+    parser = argparse.ArgumentParser()
+    parser.add_argument("--date", default=date.today().isoformat())
+    args = parser.parse_args()
+    write_scan(args.date)
 
 
 if __name__ == "__main__":

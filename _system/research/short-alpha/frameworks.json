@@ -1,0 +1,275 @@
+{
+  "schema_version": "1.1",
+  "source": "_system/reference/short-selling-library/README.md",
+  "groups": [
+    {
+      "id": "business_failure",
+      "label": "Business failure",
+      "reading": "Staley, The Art of Short Selling; Fearon, Dead Companies Walking"
+    },
+    {
+      "id": "accounting_quality",
+      "label": "Accounting quality",
+      "reading": "Schilit, Financial Shenanigans; O'glove, Quality of Earnings; SEC Financial Reporting Manual"
+    },
+    {
+      "id": "capital_structure",
+      "label": "Capital structure",
+      "reading": "Staley; Richard, Confidence Game"
+    },
+    {
+      "id": "people_and_control",
+      "label": "People and control",
+      "reading": "Staley; McLean and Elkind, The Smartest Guys in the Room"
+    },
+    {
+      "id": "tradability",
+      "label": "Tradability and instrument",
+      "reading": "Regulation SHO; NBER w9466, w20282, w16335, and w10659; AQR; Investor.gov leveraged-ETF bulletin"
+    }
+  ],
+  "source_types": [
+    {"id": "filing", "label": "Company filing"},
+    {"id": "activist_short_report", "label": "Activist short report"},
+    {"id": "substack", "label": "Substack / independent research"},
+    {"id": "hedge_fund_letter", "label": "Hedge fund letter"},
+    {"id": "transcript", "label": "Transcript / management"},
+    {"id": "news", "label": "News / regulatory release"},
+    {"id": "internal_analysis", "label": "Internal analysis"},
+    {"id": "instrument_document", "label": "Prospectus / instrument document"},
+    {"id": "filing_furnace", "label": "Filing furnace event"}
+  ],
+  "frameworks": [
+    {
+      "id": "cycle_mean_reversion",
+      "label": "Cycle / mean reversion",
+      "group": "business_failure",
+      "kind": "judgment",
+      "empty_label": "Unscored",
+      "question": "Are peak earnings, utilization, demand, or valuation being mistaken for a durable level?",
+      "source_note": "Fearon: a cycle peak is not a dead company. Separate the two before sizing a short."
+    },
+    {
+      "id": "supply_side",
+      "label": "Supply side",
+      "group": "business_failure",
+      "kind": "judgment",
+      "empty_label": "Unscored",
+      "question": "Is capacity, competition, inventory, or substitution likely to outrun demand?",
+      "source_note": "Staley field cases and Fearon competitive decay."
+    },
+    {
+      "id": "margin_contraction",
+      "label": "Margin contraction",
+      "group": "business_failure",
+      "kind": "judgment",
+      "empty_label": "Unscored",
+      "question": "Are price, mix, utilization, labor, or input costs structurally compressing margins?",
+      "source_note": "Staley balance-sheet deterioration; furnace operating-failure tags."
+    },
+    {
+      "id": "secular_obsolescence",
+      "label": "Secular obsolescence",
+      "group": "business_failure",
+      "kind": "judgment",
+      "empty_label": "Unscored",
+      "question": "Is the product, distribution, or cost position dying, as distinct from a down cycle?",
+      "source_note": "Fearon, Dead Companies Walking. A cyclical peak uses Cycle / mean reversion instead."
+    },
+    {
+      "id": "fad_single_product",
+      "label": "Fad / single product",
+      "group": "business_failure",
+      "kind": "judgment",
+      "empty_label": "Unscored",
+      "question": "Is the equity a story tied to one product, one customer program, or one narrative?",
+      "source_note": "Staley story stocks and Fearon fads."
+    },
+    {
+      "id": "regulatory",
+      "label": "Regulatory",
+      "group": "business_failure",
+      "kind": "judgment",
+      "empty_label": "Unscored",
+      "question": "Can a license, rule, investigation, contract regime, or compliance burden impair the equity?",
+      "source_note": "Richard, Confidence Game, plus furnace governance/legal tags for license, investigation, and litigation."
+    },
+    {
+      "id": "accounting",
+      "label": "Accounting",
+      "group": "accounting_quality",
+      "kind": "judgment",
+      "empty_label": "Unscored",
+      "question": "Do recognition, capitalization, reserves, non-GAAP adjustments, or working capital obscure economics?",
+      "source_note": "Parent lens. Score a child when the filing shows which game it is."
+    },
+    {
+      "id": "revenue_recognition",
+      "label": "Revenue recognition",
+      "group": "accounting_quality",
+      "kind": "screen",
+      "parent": "accounting",
+      "empty_label": "Unscored",
+      "question": "Is revenue recorded too soon, or recorded when cash and the customer relationship do not support it?",
+      "source_note": "Schilit earnings shenanigans; furnace tag revenue_recognition."
+    },
+    {
+      "id": "earnings_vs_cash",
+      "label": "Earnings versus cash",
+      "group": "accounting_quality",
+      "kind": "screen",
+      "parent": "accounting",
+      "empty_label": "Unscored",
+      "question": "Are reported earnings running ahead of cash from operations?",
+      "source_note": "Schilit cash-flow shenanigans; O'glove reported versus economic earnings."
+    },
+    {
+      "id": "working_capital",
+      "label": "Working capital",
+      "group": "accounting_quality",
+      "kind": "screen",
+      "parent": "accounting",
+      "empty_label": "Unscored",
+      "question": "Are receivables or inventory growing faster than sales in a way that pulls earnings forward?",
+      "source_note": "O'glove; Staley receivable and inventory signals."
+    },
+    {
+      "id": "capitalization_reserves",
+      "label": "Capitalization and reserves",
+      "group": "accounting_quality",
+      "kind": "screen",
+      "parent": "accounting",
+      "empty_label": "Unscored",
+      "question": "Are costs being capitalized, or reserves released, so that today's profit is borrowed from a later period?",
+      "source_note": "Schilit and O'glove. Furnace tags capitalization and reserve_release."
+    },
+    {
+      "id": "acquisition_nongaap_kpi",
+      "label": "Acquisitions and adjusted metrics",
+      "group": "accounting_quality",
+      "kind": "screen",
+      "parent": "accounting",
+      "empty_label": "Unscored",
+      "question": "Do acquisition accounting, non-GAAP add-backs, or a company-defined KPI hide the cash economics?",
+      "source_note": "Schilit acquisition accounting and key-metric shenanigans. Furnace tags non_gaap and acquisition_accounting."
+    },
+    {
+      "id": "reporting_integrity",
+      "label": "Reporting integrity",
+      "group": "accounting_quality",
+      "kind": "screen",
+      "parent": "accounting",
+      "empty_label": "Unscored",
+      "question": "Has the company restated, changed auditors, reported a material weakness, or filed late?",
+      "source_note": "SEC AAER and Financial Reporting Manual. Furnace tags restatement, material_weakness, auditor_change. Always human-reviewed."
+    },
+    {
+      "id": "cash_burn",
+      "label": "Cash burn",
+      "group": "capital_structure",
+      "kind": "judgment",
+      "empty_label": "Unscored",
+      "question": "Does recurring cash consumption force debt, dilution, or a strategic retreat?",
+      "source_note": "Furnace financial oxygen: going concern and cash runway."
+    },
+    {
+      "id": "leverage_refinancing",
+      "label": "Leverage / refinancing",
+      "group": "capital_structure",
+      "kind": "judgment",
+      "empty_label": "Unscored",
+      "question": "Can debt service, covenants, or refinancing transfer value away from common equity?",
+      "source_note": "Richard, Confidence Game. Furnace tags covenant_pressure, refinancing, financing_gap."
+    },
+    {
+      "id": "dilution_financing",
+      "label": "Dilution / financing",
+      "group": "capital_structure",
+      "kind": "judgment",
+      "empty_label": "Unscored",
+      "question": "Will ATMs, warrants, converts, or stock compensation impair per-share value?",
+      "source_note": "Furnace tags serial_equity_issuance and warrant_overhang."
+    },
+    {
+      "id": "off_balance_sheet",
+      "label": "Off balance sheet",
+      "group": "capital_structure",
+      "kind": "judgment",
+      "empty_label": "Unscored",
+      "question": "Do guarantees, variable-interest entities, swaps, or earnouts move obligations off the common equity?",
+      "source_note": "McLean and Elkind; Richard credit forensics."
+    },
+    {
+      "id": "governance_related_party",
+      "label": "Governance / related party",
+      "group": "people_and_control",
+      "kind": "judgment",
+      "empty_label": "Unscored",
+      "question": "Can control, incentives, or related-party transactions create an adverse payoff asymmetry?",
+      "source_note": "McLean and Elkind. Furnace tags related_party, controlling_holder, compensation, executive_exit."
+    },
+    {
+      "id": "promotion_insider_selling",
+      "label": "Promotion and insider selling",
+      "group": "people_and_control",
+      "kind": "judgment",
+      "empty_label": "Unscored",
+      "question": "Is promotional guidance meeting a rise in insider or sponsor supply of stock?",
+      "source_note": "Staley management and promotion cases. A Form 4 citation is required before this lens is scored."
+    },
+    {
+      "id": "fraud_bad_actors",
+      "label": "Fraud / bad actors",
+      "group": "people_and_control",
+      "kind": "judgment",
+      "empty_label": "Unscored",
+      "question": "Is there sourced evidence of promotion, self-dealing, misrepresentation, or enforcement risk?",
+      "source_note": "Conclusion tag only. A publisher report cannot set it. Requires a regulator, a court, an admitted restatement, or an evidence-backed analyst determination."
+    },
+    {
+      "id": "structural_decay",
+      "label": "Structural / path decay",
+      "group": "tradability",
+      "kind": "judgment",
+      "empty_label": "Unscored",
+      "question": "Does the security wrapper create compounding, roll, fee, swap, or tracking drag independent of the issuer?",
+      "source_note": "Investor.gov leveraged and inverse ETF bulletin. Furnace tags daily_reset, tracking_risk, swap_exposure. ECHX stays in the ls-algo book."
+    },
+    {
+      "id": "borrow_and_carry",
+      "label": "Borrow and carry",
+      "group": "tradability",
+      "kind": "gate",
+      "empty_label": "Pending",
+      "question": "Does the borrow fee, utilization, or recall risk consume the fundamental edge?",
+      "source_note": "Regulation SHO and NBER w20282 shorting premium. A missing fee is pending, never zero."
+    },
+    {
+      "id": "crowding_squeeze",
+      "label": "Crowding and squeeze",
+      "group": "tradability",
+      "kind": "gate",
+      "empty_label": "Unscored",
+      "question": "Can days-to-cover, a crowded short, or an options squeeze force an exit before the catalyst?",
+      "source_note": "NBER w9466 and w16335. FINRA days-to-cover is context, including the biotech factor file. It is not a reason to short."
+    },
+    {
+      "id": "path_and_timing",
+      "label": "Path and timing",
+      "group": "tradability",
+      "kind": "gate",
+      "empty_label": "Unscored",
+      "question": "Is there a catalyst window inside the period we can afford to be early?",
+      "source_note": "Richard, Confidence Game. A right fundamental view without a catalyst stays a candidate."
+    },
+    {
+      "id": "issuer_retaliation",
+      "label": "Issuer retaliation",
+      "group": "tradability",
+      "kind": "gate",
+      "empty_label": "Unscored",
+      "question": "Is the company fighting short sellers through litigation, a squeeze, or a disclosure campaign?",
+      "source_note": "NBER w10659, Go Down Fighting. A risk flag, not a signal to press the short."
+    }
+  ]
+}

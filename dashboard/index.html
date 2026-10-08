@@ -1944,7 +1944,7 @@
 <script src="fico-watch-viz.js?v=20261006-fico-watch-2"></script>
 <script src="index-viz.js"></script>
 <script src="activist-viz.js?v=20260819-dashboard-rebuild"></script>
-<script src="short-alpha-viz.js"></script>
+<script src="short-alpha-viz.js?v=20261007-frameworks"></script>
 <script src="warrant-viz.js"></script>
 <script src="sleeve-viz.js"></script>
 <script src="ui-format.js?v=20260819-currency"></script>
@@ -4770,7 +4770,10 @@ function buildIdeaRows() {
   const rows = [];
   const add = (row) => rows.push({ ...row, id: `${row.type}:${row.name}` });
   for (const idea of data.watchlist || []) add({ type: 'Queue', feedId: 'ideas-inbox', name: idea.ticker, thesis: idea.notes || 'Research trigger not set', stage: 'intake', catalyst: idea.notes || 'Research trigger not set', owner: idea.owner || 'Research', updated: idea.added || generated, next: 'Promote to full coverage', source: 'Ideas registry' });
-  for (const idea of shortAlphaData?.ideas || []) add({ type: 'Short', feedId: 'short-alpha', name: idea.ticker, thesis: idea.thesis || idea.research?.summary || 'Short hypothesis', stage: idea.research?.status || 'hypothesis', catalyst: (idea.catalysts || [])[0] || 'Catalyst not published', owner: 'Drew', updated: idea.outcome?.latest_date || shortAlphaData.as_of, next: idea.research?.next_step || 'Refresh falsifiers', source: 'Short Alpha' });
+  const shortPositions = shortAlphaData?.positions || shortAlphaData?.ideas || [];
+  for (const idea of shortPositions) add({ type: 'Short', feedId: 'short-alpha', name: idea.ticker, thesis: idea.hypothesis || idea.thesis || idea.research?.summary || 'Short hypothesis', stage: idea.stage || idea.research?.status || 'hypothesis', catalyst: (idea.catalysts || [])[0] || 'Catalyst not published', owner: 'Drew', updated: idea.outcome?.latest_date || shortAlphaData.as_of, next: idea.research?.next_step || 'Refresh falsifiers', source: 'Short Alpha' });
+  const shortLeads = (shortAlphaData?.candidates || []).filter((row) => row.stage === 'lead').length;
+  if (shortLeads) add({ type: 'Short', feedId: 'short-alpha', name: 'Short leads', thesis: `${shortLeads} names are tracked on the Shorts tab as leads. A lead is not a position.`, stage: 'lead', catalyst: 'Belief, variant, catalyst, and falsifier', owner: 'Drew', updated: shortAlphaData.as_of, next: 'Open the Shorts tab and promote or reject each lead', source: 'Short Alpha' });
   for (const warrant of warrantData?.rows || []) add({ type: 'Contract', feedId: 'warrants', name: warrant.warrant_ticker || warrant.market?.warrant?.symbol || warrant.common_ticker, thesis: warrant.summary || warrant.thesis || 'Warrant contract review', stage: warrant.gates?.status || warrant.lifecycle || 'review', catalyst: warrant.contract_clock?.expiry ? `Expiry ${window.DashboardFormat.date(warrant.contract_clock.expiry)}` : 'Contract clock unavailable', owner: 'Research', updated: warrant.market?.warrant?.quote_date || warrantData.generated_at, next: warrant.next_action || 'Verify contract and market', source: 'Warrant contract ledger' });
   for (const idea of (data.nol_screener?.rows || []).filter((row) => row.is_actionable)) add({ type: 'NOL', feedId: 'nol', name: idea.ticker, thesis: `${idea.company || idea.ticker} tax-attribute screen`, stage: idea.usability || 'screen', catalyst: `§382 shield / price ${idea.tax_shield_pv_to_mcap_pct == null ? 'unavailable' : window.DashboardFormat.number(idea.tax_shield_pv_to_mcap_pct, { maximumFractionDigits: 2 }) + '%'}`, owner: 'Research', updated: idea.filing_as_of || generated, next: 'Verify tax-attribute ownership and deal path', source: 'SEC company facts' });
   for (const bank of (data.advantaged_banks_screener?.rows || []).filter((row) => row.is_low_cost)) add({ type: 'Bank', feedId: 'banks', name: bank.ticker, thesis: bank.company || 'Deposit franchise screen', stage: 'screen', catalyst: bank.edge_label || bank.edge_type || 'Deposit franchise', owner: 'Research', updated: bank.filing_as_of || generated, next: 'Underwrite deposit durability and valuation', source: 'SEC advantaged-bank screen' });
