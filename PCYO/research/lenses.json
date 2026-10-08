@@ -4,6 +4,7 @@
     "agreement_pct": 0,
     "dissents": [],
     "lawrence_divergence": false,
+    "portfolio_bar_pct": 15.0,
     "stance": "pending"
   },
   "lenses": [
@@ -182,12 +183,12 @@
       "verdict": "pending"
     },
     {
-      "conviction": 0.0,
+      "conviction": 0.152,
       "criteria_audit": [
         {
           "check": "fcf_yield_percentile_gte",
           "id": "earnings_yield_high",
-          "met": false
+          "met": true
         },
         {
           "check": "base_irr_percentile_gte",
@@ -195,7 +196,7 @@
           "met": false
         }
       ],
-      "criteria_met": 0,
+      "criteria_met": 1,
       "criteria_total": 2,
       "falsifier": "FCF yield below universe median OR base IRR below median",
       "horizon_yrs": 3,
@@ -217,11 +218,10 @@
       "meets_bar": false,
       "metric_count": 3,
       "persona": "greenblatt",
-      "relevance": 0.0,
-      "return_pct": null,
+      "relevance": 0.5,
+      "return_pct": 11.96,
       "source": "_system/reference/investment-wisdom/greenblatt/",
-      "verdict": "silent",
-      "why_silent": "Universe criteria not met: earnings_yield_high, quality_proxy"
+      "verdict": "watch"
     },
     {
       "conviction": 0.0,
@@ -525,17 +525,27 @@
   "shared_inputs_ref": "valuation.json@2026-06-03",
   "ticker": "PCYO",
   "valuation_blend": {
-    "band_pct": null,
-    "blended_return_pct": null,
-    "contributors": [],
+    "band_pct": [
+      11.96,
+      11.96
+    ],
+    "blended_return_pct": 11.96,
+    "contributors": [
+      {
+        "label": "Joel Greenblatt",
+        "persona": "greenblatt",
+        "relevance": 0.5,
+        "return_pct": 11.96,
+        "verdict": "watch"
+      }
+    ],
     "excluded_silent": [
-      "greenblatt",
       "moi"
     ],
     "low_coverage": true,
     "median_mean_flag": false,
     "unit": "expected_annual_return_at_price",
-    "weighted_median_pct": null
+    "weighted_median_pct": 11.96
   },
   "valuation_richness": 0.0
 }
