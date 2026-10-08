@@ -1,10 +1,13 @@
 {
-  "schema_version": "2.0",
+  "schema_version": "3.0",
   "ticker": "319A.T",
-  "updated_at": "2026-10-05T15:50:29.756730Z",
+  "updated_at": "2026-10-08T09:34:07Z",
   "method_id": "owner_earnings_reinvestment_dcf",
+  "method_profile": "quality_reinvestment",
+  "route_status": "routed",
   "ready_count": 0,
-  "task_count": 5,
+  "task_count": 6,
+  "terminal_count": 0,
   "tasks": [
     {
       "id": "method_input:owner_earnings_reinvestment_dcf:normalized_owner_earnings_m",
@@ -113,6 +116,23 @@
       "last_attempt_at": null,
       "next_attempt_at": null,
       "last_error": "normalized_owner_earnings_m: missing locked fact; shares_outstanding: missing locked fact; cash_m: missing locked fact; debt_m: missing locked fact",
+      "evidence_refs": []
+    },
+    {
+      "id": "contract_blocker:f43037c7757f",
+      "priority": "critical",
+      "field_id": null,
+      "method_id": null,
+      "question": "operating_business_fallback: material component is legacy_sensitivity; a valid calculation proof is required",
+      "evidence_required": "operating_business_fallback: material component is legacy_sensitivity; a valid calculation proof is required",
+      "acceptance_test": "The blocker is absent after rebuilding the universal valuation contract.",
+      "collector": "sec_primary_documents",
+      "status": "retry_scheduled",
+      "attempts": 1,
+      "max_attempts": 5,
+      "last_attempt_at": "2026-10-08T09:33:54Z",
+      "next_attempt_at": "2026-10-08T10:33:54Z",
+      "last_error": "Valuation contract rebuild already recorded this blocker; collection has not cleared it.",
       "evidence_refs": []
     }
   ]
