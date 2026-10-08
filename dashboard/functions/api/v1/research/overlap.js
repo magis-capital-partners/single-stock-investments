@@ -1,9 +1,9 @@
-import { failure, json, requestId, requireDatabase } from "../../_lib/http.js";
-import { privateJson, requirePortfolioViewer } from "../../_lib/auth.js";
-import { loadBook } from "../../_lib/sleeves.js";
-import { baseMarketValue, loadPortfolio } from "../../_lib/portfolio.js";
-import { evaluateOverlap } from "../../_lib/overlap_map.js";
-import holdings from "../../../data/overlap_holdings.json" with { type: "json" };
+import { failure, json, requestId, requireDatabase } from "../../../_lib/http.js";
+import { privateJson, requirePortfolioViewer } from "../../../_lib/auth.js";
+import { loadBook } from "../../../_lib/sleeves.js";
+import { baseMarketValue, loadPortfolio } from "../../../_lib/portfolio.js";
+import { evaluateOverlap } from "../../../_lib/overlap_map.js";
+import holdings from "../../../../data/overlap_holdings.json" with { type: "json" };
 
 const SCOPES = new Set(["universe", "owned", "michael", "drew"]);
 
