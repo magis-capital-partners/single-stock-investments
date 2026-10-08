@@ -392,5 +392,63 @@
     return payload;
   }
 
-  global.SleeveViz = { render, attach, load };
+  function renderTimeAverage(panel) {
+    if (!panel) return '';
+    if (panel.error) {
+      return `<section class="tag-growth"><h3>Time-average growth of the current mix</h3><p class="tag-note">${esc(panel.error)}</p></section>`;
+    }
+    const head = panel.headline;
+    const note = panel.annotation || {};
+    const why = (note.reasons || []).map((reason) => ({
+      hedged: 'The book is hedged, so there is no single scale.',
+      low_coverage: 'Eligible stocks are under half of NAV.',
+      short_window: head && head.sessions ? `The shared window is ${head.sessions} sessions, short of a full year.` : 'The shared window is short of a full year.',
+      long_characteristic_time: 'The characteristic time is longer than three years.',
+      zero_growth: 'Growth of the fully invested mix is about zero.',
+      straddles: "The drift band straddles today's scale.",
+    }[reason] || reason)).join(' ');
+    const status = note.status === 'past_peak' ? 'past the peak' : (note.status === 'room' ? 'room' : 'unidentified');
+    const scale = note.show_scale && note.l_opt != null
+      ? `${status}. Peak scale ${Number(note.l_opt).toFixed(2)}×${note.upper_bound ? ', an upper bound' : ''}.`
+      : `${status}. ${why} Peak scale stays off this panel.`;
+    if (!head) {
+      return `<section class="tag-growth"><p class="tag-kicker">Michael's sleeve only</p><h3>Time-average growth of the current mix</h3><p class="tag-note">${esc(scale)}</p></section>`;
+    }
+    const gap = head.empirical_gap;
+    const drag = head.ito_drag;
+    const disagree = Number.isFinite(gap) && Number.isFinite(drag) && Math.abs(gap - drag) > Math.max(0.005, Math.abs(drag) * 0.25);
+    const line = panel.lineage || {};
+    const omitted = (panel.omitted || []).slice(0, 12).map((row) => `${esc(row.ticker)} (${esc(row.reason)})`).join(', ');
+    const rows = (panel.names || []).map((row) => {
+      const label = row.show_scale && row.l_opt != null
+        ? `${row.status === 'past_peak' ? 'past the peak' : 'room'} · ${Number(row.l_opt).toFixed(2)}×${row.upper_bound ? ' upper bound' : ''}`
+        : 'unidentified';
+      return `<tr><td>${esc(row.ticker)}</td><td class="num">${pct(row.weight, 1).replace('+', '')}</td><td class="num">${pctPlain(row.drag)}</td><td class="num">${pctPlain(row.growth)}</td><td>${esc(label)}</td></tr>`;
+    }).join('');
+    return `<section class="tag-growth">
+      <p class="tag-kicker">Michael's sleeve only · research</p>
+      <h3>Time-average growth of the current mix</h3>
+      <p class="tag-note">This is a daily-rebalanced hypothetical of today's stock weights. It is not the account value above it.</p>
+      <div class="tag-grid">
+        <div><span>Itô drag</span><strong>${pctPlain(head.ito_drag)}</strong></div>
+        <div><span>Empirical growth</span><strong>${pctPlain(head.empirical_growth)}</strong></div>
+        <div><span>Average of many paths</span><strong>${pctPlain(head.empirical_ensemble)}</strong></div>
+        <div><span>Empirical gap</span><strong>${pctPlain(gap)}</strong></div>
+      </div>
+      <p class="tag-note">${esc(scale)} Net stock weight ${pctPlain(head.l_now, 1)}. Gross ${pctPlain(head.gross, 1)}. Eligible coverage ${pctPlain(head.coverage, 1)}.${disagree ? ' The empirical gap and the Itô drag disagree. Both are shown.' : ''}</p>
+      <details>
+        <summary>Lineage</summary>
+        <p class="tag-note">${esc(line.paper || '')}. Equations ${esc((line.equations || []).join(', '))}. ${esc(line.riskless_series || 'DGS3MO')} as of ${esc(line.riskless_as_of || '—')}. Window ${esc(line.window_start || '—')} to ${esc(line.window_end || '—')} (${line.sessions || 0} sessions). ${esc(line.cash_earns || '')}${omitted ? ` Left out: ${omitted}.` : ''}</p>
+      </details>
+      <div class="tag-table-wrap"><table><thead><tr><th>Name</th><th class="num">Weight</th><th class="num">Itô drag</th><th class="num">Growth</th><th>Status</th></tr></thead><tbody>${rows}</tbody></table></div>
+    </section>`;
+  }
+
+  function pctPlain(value, digits) {
+    const n = Number(value);
+    if (!Number.isFinite(n)) return '—';
+    return `${(n * 100).toFixed(digits == null ? 1 : digits)}%`;
+  }
+
+  global.SleeveViz = { render, attach, load, renderTimeAverage };
 })(window);

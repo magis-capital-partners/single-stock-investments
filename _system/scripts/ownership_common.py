@@ -144,6 +144,9 @@ def parse_13f_info_table_xml(xml_bytes: bytes) -> list[dict]:
             if key == "votingAuthority":
                 for sub in child:
                     row[f"voting_{_local(sub.tag)}"] = (sub.text or "").strip()
+            elif key == "shrsOrPrnAmt":
+                for sub in child:
+                    row[_local(sub.tag)] = (sub.text or "").strip()
             else:
                 row[key] = (child.text or "").strip()
         if row.get("cusip") or row.get("nameOfIssuer"):

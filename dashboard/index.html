@@ -1351,6 +1351,10 @@
   }
   .holdings-view { display: flex; flex-direction: column; flex: 1; min-height: 0; }
   .holdings-view.hidden { display: none; }
+  .overlap-panel { margin: 0 16px 12px; padding: 12px 14px; border: 1px solid var(--line, #d7d2c8); border-radius: 8px; }
+  .overlap-scopes { display: flex; gap: 6px; flex-wrap: wrap; margin: 8px 0; }
+  .overlap-table { width: 100%; border-collapse: collapse; font-size: 13px; margin: 6px 0 14px; }
+  .overlap-table th, .overlap-table td { text-align: left; padding: 4px 8px 4px 0; vertical-align: top; }
   .onboard-badge { font-size: 10px; margin-left: 6px; color: var(--accent-amber); }
   .total-return-panel .tr-grid {
     display: grid;
@@ -1818,6 +1822,8 @@
     </details>
   </div>
 
+  <section class="overlap-panel" id="overlap-panel"></section>
+
   <div class="main detail-closed" id="main-grid">
     <div class="table-wrap">
       <table>
@@ -1942,6 +1948,7 @@
 <script src="technical-viz.js?v=20261001-signal-study"></script>
 <script src="technical-picture-viz.js?v=20261001-signal-study"></script>
 <script src="fico-watch-viz.js?v=20261006-fico-watch-2"></script>
+<script src="overlap-viz.js?v=20261007-overlap"></script>
 <script src="index-viz.js"></script>
 <script src="activist-viz.js?v=20260819-dashboard-rebuild"></script>
 <script src="short-alpha-viz.js?v=20261007-frameworks"></script>
@@ -3657,6 +3664,7 @@ function setView(view, opts = {}) {
     if (active) link.setAttribute('aria-current', 'page'); else link.removeAttribute('aria-current');
   });
   document.getElementById('holdings-view').classList.toggle('hidden', view !== 'holdings');
+  if (view === 'holdings' && window.OverlapViz) OverlapViz.mount();
   document.getElementById('portfolio-panel')?.classList.toggle('active', view === 'portfolio');
   document.getElementById('spx-0dte-panel')?.classList.toggle('active', view === 'spx-0dte');
   document.getElementById('letf-panel')?.classList.toggle('active', view === 'letf');
@@ -5975,6 +5983,8 @@ function selectTicker(ticker, opts = {}) {
       ${renderTwoPhaseHeaderChip(t)}
     </div>
 
+    ${window.OverlapViz ? OverlapViz.renderTicker(t.display_ticker || t.ticker, escapeHtml) : ''}
+
     ${window.FicoWatch && t.ticker === 'FICO' ? FicoWatch.renderDetail(data.fico_watch, escapeHtml) : ''}
 
     ${window.ValuationViz ? ValuationViz.renderDecisionStrip(t, valuationHelpers()) : ''}
@@ -6066,6 +6076,7 @@ function selectTicker(ticker, opts = {}) {
           </li>`).join('')}
       </ul>
     </details>` : ''}`;
+  if (window.OverlapViz) OverlapViz.fillTicker(t.display_ticker || t.ticker);
   if (hasModel && typeof EquityModelViz !== 'undefined') {
     EquityModelViz.afterRender(modelBundle);
   }

@@ -30,6 +30,7 @@ LIST_URL = f"{API_BASE}/documents.json"
 
 # ticker -> default EDINET code (extend as needed)
 EDINET_CODES: dict[str, str] = {
+    "319A.T": "E40269",
     "7176.T": "E31267",
 }
 

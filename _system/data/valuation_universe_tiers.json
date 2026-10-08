@@ -10,23 +10,23 @@
     "automated_and_generic_models": "screening only; never authorize capital"
   },
   "summary": {
-    "security_count": 845,
+    "security_count": 846,
     "tier_counts": {
       "tier_1": 40,
       "tier_2": 12,
-      "tier_3": 793
+      "tier_3": 794
     },
     "owner_override_count": 0,
-    "automatic_assignment_count": 845
+    "automatic_assignment_count": 846
   },
   "source_health": {
     "status": "healthy",
     "sources": {
       "classifications": {
         "required": false,
-        "files_seen": 1,
-        "valid_files": 1,
-        "record_count": 13,
+        "files_seen": 2,
+        "valid_files": 2,
+        "record_count": 14,
         "missing_files": [],
         "invalid_files": []
       },
@@ -107,6 +107,41 @@
   "assignments": {
     "0388.HK": {
       "ticker": "0388.HK",
+      "tier": 3,
+      "tier_id": "tier_3",
+      "label": "Broad screening universe",
+      "research_depth": "automated screening and lightweight monitoring only",
+      "actionability_cap": "screening_only",
+      "assignment_source": "automatic",
+      "automatic_tier": 3,
+      "override_reason": null,
+      "review_by": null,
+      "review_overdue": false,
+      "assignment_reasons": [
+        {
+          "qualifying_tier": 3,
+          "code": "research_universe_member",
+          "detail": "Registry membership establishes research coverage only; it is not evidence of ownership.",
+          "source_ref": "_system/portfolio/registry.json"
+        }
+      ],
+      "promotion_gates": [
+        "Promote to Tier 2 when a curated follow-up, watchlist entry, priority stance, or proposed target allocation appears.",
+        "Promote to Tier 1 only through a Tier 1 qualifying signal or documented owner override."
+      ],
+      "demotion_conditions": [
+        "Remove from the valuation universe only through an explicit universe-governance change; absence of a model is not a deletion signal."
+      ],
+      "workflow_policy": {
+        "committee_auto_start": false,
+        "committee_requires_stock_specific_model": true,
+        "automated_screen_can_authorize_capital": false,
+        "generic_screen_can_authorize_capital": false,
+        "capital_authority": "human_decision_only"
+      }
+    },
+    "319A.T": {
+      "ticker": "319A.T",
       "tier": 3,
       "tier_id": "tier_3",
       "label": "Broad screening universe",

@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Michael · time-average growth preview</title>
+<style>
+  :root {
+    --bg: #0a0e17; --card: #151d2e; --line: #1e2d46; --text: #e8ecf4;
+    --muted: #8896ae; --dim: #566580; --amber: #f59e0b; --green: #10b981; --red: #ef4444; --cyan: #06b6d4;
+  }
+  * { box-sizing: border-box; }
+  body { margin: 0; background: var(--bg); color: var(--text); font: 15px/1.45 "Segoe UI", sans-serif; }
+  main { max-width: 980px; margin: 0 auto; padding: 28px 20px 64px; }
+  .kicker { color: var(--cyan); font: 600 11px/1 ui-monospace, monospace; letter-spacing: .08em; text-transform: uppercase; }
+  h1 { font-size: 28px; margin: 8px 0 4px; }
+  .sub { color: var(--muted); margin: 0 0 18px; }
+  .banner { border: 1px solid rgba(245,158,11,.45); background: rgba(245,158,11,.08); border-radius: 10px; padding: 12px 14px; color: #f6d48a; margin-bottom: 16px; }
+  .grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; margin: 14px 0 18px; }
+  .card { background: var(--card); border: 1px solid var(--line); border-radius: 10px; padding: 12px 14px; }
+  .card span { display: block; color: var(--dim); font: 600 10px/1 ui-monospace, monospace; letter-spacing: .06em; text-transform: uppercase; margin-bottom: 6px; }
+  .card strong { font: 650 22px/1.1 ui-monospace, monospace; }
+  .wait strong { color: var(--amber); }
+  .bad strong { color: var(--red); }
+  .ok strong { color: var(--green); }
+  section { background: var(--card); border: 1px solid var(--line); border-radius: 12px; padding: 16px 16px 8px; margin-top: 14px; }
+  h2 { font-size: 16px; margin: 0 0 6px; }
+  p { color: var(--muted); margin: 0 0 12px; }
+  table { width: 100%; border-collapse: collapse; font-size: 13px; }
+  th { text-align: left; color: var(--dim); font-size: 10px; letter-spacing: .05em; text-transform: uppercase; padding: 8px 6px; border-bottom: 1px solid var(--line); }
+  td { padding: 7px 6px; border-bottom: 1px solid #162033; }
+  .num { text-align: right; font-family: ui-monospace, monospace; }
+  th.num { text-align: right; }
+  .dim { color: var(--muted); }
+  @media (max-width: 800px) { .grid { grid-template-columns: 1fr 1fr; } }
+</style>
+</head>
+<body>
+<main>
+  <div class="kicker">Proposed · Michael sleeve only · not a valuation</div>
+  <h1>Time-average growth of the current mix</h1>
+  <p class="sub">Sleeve dated 2026-10-07. NAV $10,090,780. This is a daily-rebalanced hypothetical of today's stock weights. It is not broker net-liquidation value, and it is not a target weight.</p>
+  <div class="banner">Local preview. Research only. An optimal scale above 1× is an upper bound: the formula charges borrowing at the Treasury bill and charges nothing to trade. Drift from one year of prices is noisy, so the scale is withheld unless the whole error band agrees.</div>
+  <div class="grid">
+    <div class="card"><span>Itô drag at today's scale</span><strong>3.5%</strong></div>
+    <div class="card"><span>Empirical growth</span><strong>30.5%</strong></div>
+    <div class="card"><span>Average of many paths</span><strong>34.0%</strong></div>
+    <div class="card wait"><span>Scale vs the peak</span><strong>unidentified</strong></div>
+  </div>
+  <section>
+    <h2>The book</h2>
+    <p>The common window is 195 sessions, short of a full year, so the scale is withheld. Net stock weight of names in the mix is 97.7% of NAV. Omitted names are 0.7% of NAV. Common window 2025-10-07 to 2026-10-06 (195 sessions). 3-month bill 4.21% as of 2026-10-06, continuously compounded in the formula. Model growth at today's scale 30.5%. Peak scale, the critical scale, and the characteristic time stay off this panel until the window is a full year and the drift band agrees.</p>
+  </section>
+  <section>
+    <h2>Names in the mix</h2>
+    <p>Each row is that name alone, at its current fraction of NAV, with the rest of wealth in the Treasury bill. Drag is the gap between the average of many paths and the growth of one reinvested path.</p>
+    <table>
+      <thead><tr><th>Name</th><th>Side</th><th class="num">Weight</th><th class="num">Itô drag</th><th class="num">Growth</th><th class="num">Volatility</th></tr></thead>
+      <tbody>
+        <tr><td>GTX</td><td class='dim'>long</td><td class='num'>42.5%</td><td class='num'>2.1%</td><td class='num'>33.6%</td><td class='num dim'>48%</td></tr><tr><td>JPM</td><td class='dim'>long</td><td class='num'>25.2%</td><td class='num'>0.2%</td><td class='num'>5.7%</td><td class='num dim'>22%</td></tr><tr><td>HEI-A</td><td class='dim'>long</td><td class='num'>7.5%</td><td class='num'>0.0%</td><td class='num'>3.1%</td><td class='num dim'>29%</td></tr><tr><td>CSU</td><td class='dim'>long</td><td class='num'>6.2%</td><td class='num'>0.0%</td><td class='num'>2.3%</td><td class='num dim'>49%</td></tr><tr><td>QDEL</td><td class='dim'>long</td><td class='num'>3.7%</td><td class='num'>0.1%</td><td class='num'>2.2%</td><td class='num dim'>92%</td></tr><tr><td>MCO</td><td class='dim'>long</td><td class='num'>2.8%</td><td class='num'>0.0%</td><td class='num'>3.9%</td><td class='num dim'>28%</td></tr><tr><td>TBBK</td><td class='dim'>long</td><td class='num'>1.9%</td><td class='num'>0.0%</td><td class='num'>3.3%</td><td class='num dim'>50%</td></tr><tr><td>POST</td><td class='dim'>long</td><td class='num'>1.8%</td><td class='num'>0.0%</td><td class='num'>3.4%</td><td class='num dim'>32%</td></tr><tr><td>SHC</td><td class='dim'>long</td><td class='num'>1.8%</td><td class='num'>0.0%</td><td class='num'>4.3%</td><td class='num dim'>29%</td></tr><tr><td>MCHB</td><td class='dim'>long</td><td class='num'>1.1%</td><td class='num'>0.0%</td><td class='num'>4.4%</td><td class='num dim'>28%</td></tr><tr><td>COLD</td><td class='dim'>long</td><td class='num'>0.6%</td><td class='num'>0.0%</td><td class='num'>4.2%</td><td class='num dim'>44%</td></tr><tr><td>FTRE</td><td class='dim'>long</td><td class='num'>0.5%</td><td class='num'>0.0%</td><td class='num'>4.6%</td><td class='num dim'>72%</td></tr><tr><td>ASPN</td><td class='dim'>short</td><td class='num'>-0.3%</td><td class='num'>0.0%</td><td class='num'>4.1%</td><td class='num dim'>105%</td></tr><tr><td>3905.T</td><td class='dim'>long</td><td class='num'>0.3%</td><td class='num'>0.0%</td><td class='num'>4.3%</td><td class='num dim'>118%</td></tr><tr><td>TOI</td><td class='dim'>long</td><td class='num'>0.3%</td><td class='num'>0.0%</td><td class='num'>3.9%</td><td class='num dim'>47%</td></tr><tr><td>GPGI</td><td class='dim'>long</td><td class='num'>0.3%</td><td class='num'>0.0%</td><td class='num'>4.0%</td><td class='num dim'>63%</td></tr><tr><td>CORBF</td><td class='dim'>long</td><td class='num'>0.3%</td><td class='num'>0.0%</td><td class='num'>4.4%</td><td class='num dim'>127%</td></tr><tr><td>FIHO12</td><td class='dim'>long</td><td class='num'>0.3%</td><td class='num'>0.0%</td><td class='num'>4.1%</td><td class='num dim'>24%</td></tr><tr><td>WEST</td><td class='dim'>short</td><td class='num'>-0.2%</td><td class='num'>0.0%</td><td class='num'>3.9%</td><td class='num dim'>65%</td></tr><tr><td>BRBR</td><td class='dim'>long</td><td class='num'>0.2%</td><td class='num'>0.0%</td><td class='num'>3.8%</td><td class='num dim'>76%</td></tr><tr><td>BUR</td><td class='dim'>long</td><td class='num'>0.2%</td><td class='num'>0.0%</td><td class='num'>4.0%</td><td class='num dim'>81%</td></tr><tr><td>LMN</td><td class='dim'>long</td><td class='num'>0.1%</td><td class='num'>0.0%</td><td class='num'>4.0%</td><td class='num dim'>58%</td></tr><tr><td>GS</td><td class='dim'>long</td><td class='num'>0.1%</td><td class='num'>0.0%</td><td class='num'>4.1%</td><td class='num dim'>32%</td></tr><tr><td>FNMAP</td><td class='dim'>long</td><td class='num'>0.1%</td><td class='num'>0.0%</td><td class='num'>4.0%</td><td class='num dim'>58%</td></tr><tr><td>INV</td><td class='dim'>long</td><td class='num'>0.1%</td><td class='num'>0.0%</td><td class='num'>4.0%</td><td class='num dim'>172%</td></tr><tr><td>FMCCK</td><td class='dim'>long</td><td class='num'>0.0%</td><td class='num'>0.0%</td><td class='num'>4.1%</td><td class='num dim'>41%</td></tr><tr><td>WATR</td><td class='dim'>long</td><td class='num'>0.0%</td><td class='num'>0.0%</td><td class='num'>4.1%</td><td class='num dim'>99%</td></tr><tr><td>FMCCL</td><td class='dim'>long</td><td class='num'>0.0%</td><td class='num'>0.0%</td><td class='num'>4.1%</td><td class='num dim'>40%</td></tr><tr><td>FNMAO</td><td class='dim'>long</td><td class='num'>0.0%</td><td class='num'>0.0%</td><td class='num'>4.1%</td><td class='num dim'>48%</td></tr><tr><td>HL</td><td class='dim'>long</td><td class='num'>0.0%</td><td class='num'>0.0%</td><td class='num'>4.1%</td><td class='num dim'>74%</td></tr><tr><td>FLUX</td><td class='dim'>short</td><td class='num'>-0.0%</td><td class='num'>0.0%</td><td class='num'>4.2%</td><td class='num dim'>126%</td></tr><tr><td>GDRZF</td><td class='dim'>long</td><td class='num'>0.0%</td><td class='num'>0.0%</td><td class='num'>4.2%</td><td class='num dim'>94%</td></tr><tr><td>EFOR</td><td class='dim'>short</td><td class='num'>-0.0%</td><td class='num'>0.0%</td><td class='num'>4.1%</td><td class='num dim'>94%</td></tr><tr><td>ECHO</td><td class='dim'>long</td><td class='num'>0.0%</td><td class='num'>0.0%</td><td class='num'>4.1%</td><td class='num dim'>52%</td></tr><tr><td>XTIA</td><td class='dim'>short</td><td class='num'>-0.0%</td><td class='num'>0.0%</td><td class='num'>4.1%</td><td class='num dim'>89%</td></tr><tr><td>B</td><td class='dim'>long</td><td class='num'>0.0%</td><td class='num'>0.0%</td><td class='num'>4.1%</td><td class='num dim'>48%</td></tr><tr><td>CHTR</td><td class='dim'>short</td><td class='num'>-0.0%</td><td class='num'>0.0%</td><td class='num'>4.1%</td><td class='num dim'>54%</td></tr>
+      </tbody>
+    </table>
+  </section>
+  <section>
+    <h2>Left out</h2>
+    <p>Rights, warrants, escrows, and names without two years of dollar prices. Their market value still sits in NAV, so the mix is not the whole sleeve.</p>
+    <table>
+      <thead><tr><th>Name</th><th class="num">Weight</th><th>Reason</th></tr></thead>
+      <tbody>
+        <tr><td>MEHCQ.ESC</td><td class='num'>0.65%</td><td class='dim'>escrow stub</td></tr><tr><td>EQPT</td><td class='num'>-0.09%</td><td class='dim'>no 2-year price history (EQPT: 178 sessions)</td></tr><tr><td>CSU.DB</td><td class='num'>0.08%</td><td class='dim'>debenture</td></tr><tr><td>FLXN.CVR</td><td class='num'>0.07%</td><td class='dim'>contingent value right</td></tr><tr><td>JL80</td><td class='num'>0.04%</td><td class='dim'>not a common-stock listing</td></tr><tr><td>AXTQ</td><td class='num'>-0.02%</td><td class='dim'>no 2-year price history (AXTQ: 36 sessions)</td></tr><tr><td>MRTX.CVR</td><td class='num'>0.02%</td><td class='dim'>contingent value right</td></tr><tr><td>SKHQ</td><td class='num'>-0.01%</td><td class='dim'>no 2-year price history (SKHQ: 25 sessions)</td></tr><tr><td>COHQ</td><td class='num'>-0.01%</td><td class='dim'>no 2-year price history (COHQ: 36 sessions)</td></tr><tr><td>ECHX</td><td class='num'>-0.01%</td><td class='dim'>no 2-year price history (ECHX: 203 sessions)</td></tr><tr><td>MACK</td><td class='num'>0.00%</td><td class='dim'>market value under $500</td></tr><tr><td>NAN</td><td class='num'>0.00%</td><td class='dim'>market value under $500</td></tr><tr><td>ABMD.CVR</td><td class='num'>0.00%</td><td class='dim'>contingent value right</td></tr><tr><td>GKTX.PS1</td><td class='num'>0.00%</td><td class='dim'>preferred stub</td></tr><tr><td>GKTX.PS2</td><td class='num'>0.00%</td><td class='dim'>preferred stub</td></tr><tr><td>GKTX.PS3</td><td class='num'>0.00%</td><td class='dim'>preferred stub</td></tr><tr><td>PRVL.CVR</td><td class='num'>0.00%</td><td class='dim'>contingent value right</td></tr><tr><td>CSU.WTS</td><td class='num'>0.00%</td><td class='dim'>warrant</td></tr><tr><td>AKUS.CNT</td><td class='num'>0.00%</td><td class='dim'>zero-value contingent</td></tr><tr><td>BFFI.ESC</td><td class='num'>0.00%</td><td class='dim'>escrow stub</td></tr><tr><td>LENS.MRG</td><td class='num'>0.00%</td><td class='dim'>merger stub</td></tr>
+      </tbody>
+    </table>
+  </section>
+</main>
+</body>
+</html>

@@ -28,6 +28,7 @@
     // Guarded order desk. `orderRequests` is the owner's recent tickets from the
     // command channel; `activeRequest` is the one being worked right now.
     orderRequests: null, activeRequestId: null, orderPollTimer: null,
+    timeAverage: null,
     // Ticket poll bookkeeping: whether an open ticket wants polling, when the
     // current fast window began, and whether the bound paused it.
     orderPollWanted: false, orderPollStartedAt: null, orderPollPaused: false,
@@ -418,7 +419,8 @@
     const filterLabels = { all: 'All', equity: 'Stocks & ETFs', option: 'Options', long: 'Long', short: 'Short', unallocated: 'Unallocated' };
     const sortHead = (label, key) => `<button type="button" data-ph-sort="${key}" class="ph-sort ${state.sortKey === key ? 'active' : ''}">${label}${state.sortKey === key ? `<span>${state.sortDirection === 'asc' ? '↑' : '↓'}</span>` : ''}</button>`;
     const selected = (book.positions || []).find((row) => positionKey(row) === state.selectedPositionKey);
-    return `<div class="ph-toolbar ph-positions-toolbar"><div><strong>${rows.length}</strong> canonical instruments <span class="ph-dim">· no row truncation</span></div><div class="ph-view-actions"><label class="ph-search-wrap"><span>/</span><input class="ph-search" data-ph-search value="${esc(state.query)}" placeholder="Search the book" aria-label="Filter positions"></label><button type="button" class="ph-density" data-ph-columns>Columns & views</button><button type="button" class="ph-density" data-ph-density title="Toggle row density">${state.density === 'compact' ? 'Comfortable rows' : 'Compact rows'}</button></div></div>${columnPicker()}<div class="ph-filter-row">${Object.entries(filterLabels).map(([key, label]) => `<button type="button" data-ph-filter="${key}" class="${state.positionFilter === key ? 'active' : ''}">${label}</button>`).join('')}${state.savedViews.map((view) => `<button type="button" data-ph-load-view="${esc(view.name)}" class="ph-saved-view">${esc(view.name)}</button>`).join('')}</div><div class="ph-table-wrap"><table class="ph-table ${state.density === 'compact' ? 'compact' : ''}"><thead><tr>${COLUMN_DEFS.filter((column) => columnVisible(column.key)).map((column) => `<th>${column.sort ? sortHead(column.label, column.sort) : column.key === 'instrument' ? sortHead(column.label, 'symbol') : esc(column.label)}</th>`).join('')}</tr></thead><tbody>${rows.map((row) => {
+    const growth = timeAverageBlock();
+    return `${growth}<div class="ph-toolbar ph-positions-toolbar"><div><strong>${rows.length}</strong> canonical instruments <span class="ph-dim">· no row truncation</span></div><div class="ph-view-actions"><label class="ph-search-wrap"><span>/</span><input class="ph-search" data-ph-search value="${esc(state.query)}" placeholder="Search the book" aria-label="Filter positions"></label><button type="button" class="ph-density" data-ph-columns>Columns & views</button><button type="button" class="ph-density" data-ph-density title="Toggle row density">${state.density === 'compact' ? 'Comfortable rows' : 'Compact rows'}</button></div></div>${columnPicker()}<div class="ph-filter-row">${Object.entries(filterLabels).map(([key, label]) => `<button type="button" data-ph-filter="${key}" class="${state.positionFilter === key ? 'active' : ''}">${label}</button>`).join('')}${state.savedViews.map((view) => `<button type="button" data-ph-load-view="${esc(view.name)}" class="ph-saved-view">${esc(view.name)}</button>`).join('')}</div><div class="ph-table-wrap"><table class="ph-table ${state.density === 'compact' ? 'compact' : ''}"><thead><tr>${COLUMN_DEFS.filter((column) => columnVisible(column.key)).map((column) => `<th>${column.sort ? sortHead(column.label, column.sort) : column.key === 'instrument' ? sortHead(column.label, 'symbol') : esc(column.label)}</th>`).join('')}</tr></thead><tbody>${rows.map((row) => {
       const allocation = (row.allocations || []).map((a) => `${a.owner}/${a.strategy}${a.bucket ? `/${a.bucket}` : ''}`).join(', ') || 'unallocated';
       const scopeDaily = scopedValue(row, 'daily_pnl_decimal');
       const cells = {
@@ -450,6 +452,13 @@
     const baseCurrency = row.base_currency || state.book?.snapshot?.base_currency || 'USD';
     const fx = row.fx_rate_to_base_decimal == null ? 'Not required / unavailable' : `${quantity(row.fx_rate_to_base_decimal)} ${baseCurrency} per ${nativeCurrency}`;
     return `<aside class="ph-drawer" aria-label="Position detail"><div class="ph-drawer-head"><div><div class="ph-kicker">Position detail</div><h3>${esc(row.local_symbol || row.symbol)}</h3><div class="ph-dim">${esc(row.description || '')} · conId ${row.conid}</div></div><button type="button" data-ph-close-drawer>Close</button></div><div class="ph-drawer-grid">${[['Quantity', `${quantity(row.quantity_decimal)} ${row.quantity_unit || 'shares'}`], [`Average cost · ${nativeCurrency}`, money(row.average_cost_native_decimal ?? row.average_cost_decimal, false, nativeCurrency)], [`Mark · ${nativeCurrency}`, money(row.mark_native_decimal ?? row.mark_decimal, false, nativeCurrency)], [`Market value · ${nativeCurrency}`, money(row.market_value_native_decimal, false, nativeCurrency)], [`Market value · ${baseCurrency}`, money(row.market_value_base_decimal ?? row.market_value_decimal, false, baseCurrency)], ['FX translation', fx], [`Daily P&L · ${baseCurrency}`, signed(row.daily_pnl_base_decimal ?? row.daily_pnl_decimal, baseCurrency)], [`Unrealized · ${baseCurrency}`, signed(row.unrealized_pnl_base_decimal ?? row.unrealized_pnl_decimal, baseCurrency)], ['FX source / as of', `${row.fx_source || 'Not required'} · ${row.fx_as_of || row.as_of}`], ['Quality', row.quality], ['Source', row.source], ['As of', row.as_of]].map(([k, v]) => `<div><span>${esc(k)}</span><b>${esc(v)}</b></div>`).join('')}</div><h4>Allocation lots</h4><div class="ph-table-wrap"><table class="ph-table"><thead><tr><th>Owner</th><th>Strategy</th><th>Bucket</th><th>Qty</th><th>Confidence</th></tr></thead><tbody>${lots.map((lot) => `<tr><td>${esc(lot.owner)}</td><td>${esc(lot.strategy)}</td><td>${esc(lot.bucket || '—')}</td><td>${quantity(lot.quantity_decimal)}</td><td>${esc(lot.confidence)}</td></tr>`).join('')}</tbody></table>${lots.length ? '' : '<div class="ph-empty"><div><b>Quarantined / unallocated</b>This broker quantity has no approved owner or strategy lot.</div></div>'}</div><div class="ph-drawer-links"><button type="button" data-ph-linked-symbol="${esc(row.symbol)}">Open ${esc(row.symbol)} research</button>${related.map((candidate) => `<button type="button" data-ph-open-row="${esc(positionKey(candidate))}">Linked ${esc(candidate.local_symbol || candidate.symbol)} ${candidate.sec_type}</button>`).join('')}</div>${orders.length ? `<h4>Working orders</h4><ul>${orders.map((order) => `<li>${esc(order.action)} ${quantity(order.total_quantity_decimal)} @ ${money(order.limit_price_decimal)} · ${esc(order.ownership)}</li>`).join('')}</ul>` : ''}</aside>`;
+  }
+
+  function timeAverageBlock() {
+    if (state.scope !== 'michael') return '';
+    const panel = state.timeAverage;
+    if (!panel || !window.SleeveViz || typeof SleeveViz.renderTimeAverage !== 'function') return '';
+    return SleeveViz.renderTimeAverage(panel);
   }
 
   function lineageDrawer() {
@@ -1430,6 +1439,11 @@
       state.allBook = allBookIndex == null ? state.book : responses[allBookIndex];
       if (performanceIndex != null) state.accountPerformance = responses[performanceIndex];
       state.book = await overlayDrewSleeve(state.book);
+      state.timeAverage = null;
+      if (state.scope === 'michael') {
+        try { state.timeAverage = await getJson('/api/v1/sleeves/time-average'); }
+        catch (error) { state.timeAverage = { error: error.message }; }
+      }
     }
     catch (error) { state.book = { status: 'unknown', reason: error.message, positions: [], account_values: [], reconciliation_breaks: [] }; }
     await loadActiveSectionData();

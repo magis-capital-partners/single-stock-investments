@@ -14,6 +14,7 @@ US_CONFIG_PATH = ROOT / "_system" / "scripts" / "us_ticker_config.json"
 
 EXCHANGE_META = {
     "8697.T": "TSE",
+    "319A.T": "TSE",
     "3905.T": "TSE",
     "7176.T": "TSE",
     "AMZN": "NASDAQ",
