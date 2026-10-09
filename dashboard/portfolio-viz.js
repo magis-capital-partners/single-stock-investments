@@ -3,6 +3,7 @@
 
   const COLUMN_DEFS = [
     { key: 'instrument', label: 'Instrument', required: true },
+    { key: 'weight', label: 'Weight', sort: 'weight' },
     { key: 'allocation', label: 'Allocation' },
     { key: 'identity', label: 'ConId / model' },
     { key: 'sec_type', label: 'Type' },
@@ -15,9 +16,13 @@
     { key: 'currency', label: 'Currency' },
     { key: 'quality', label: 'Quality' },
   ];
-  const DEFAULT_COLUMNS = COLUMN_DEFS.map((column) => column.key);
+  const DEFAULT_COLUMNS = COLUMN_DEFS.map((column) => column.key).filter((key) => key !== 'weight');
+  // Michael's book reads as a holdings list: name, weight, size, P&L. The
+  // ledger columns (conId, model, allocation, quality) stay one click away.
+  const MICHAEL_COLUMNS = ['instrument', 'weight', 'quantity_decimal', 'mark_decimal', 'market_value_decimal', 'daily_pnl_decimal', 'unrealized_pnl_decimal'];
   const VIEW_STORAGE = 'portfolio-saved-views';
   const COLUMN_STORAGE = 'portfolio-visible-columns';
+  const MICHAEL_COLUMN_STORAGE = 'portfolio-visible-columns-michael';
 
   const state = {
     scope: 'all', section: 'positions', strategySection: 'overview', strategyBucket: 'all', book: null, allBook: null,
@@ -28,7 +33,7 @@
     // Guarded order desk. `orderRequests` is the owner's recent tickets from the
     // command channel; `activeRequest` is the one being worked right now.
     orderRequests: null, activeRequestId: null, orderPollTimer: null,
-    timeAverage: null,
+    timeAverage: null, tailRisk: null, holderOverlap: null,
     // Ticket poll bookkeeping: whether an open ticket wants polling, when the
     // current fast window began, and whether the bound paused it.
     orderPollWanted: false, orderPollStartedAt: null, orderPollPaused: false,
@@ -37,7 +42,7 @@
     // because a hand-typed option id is something nobody can check.
     contractDraft: { sec_type: 'STK', symbol: '', conid: null, identity: null },
     contractSuggestions: [], contractChain: null, contractLookup: null, lookupPollTimer: null,
-    visibleColumns: loadColumns(), savedViews: loadViews(),
+    columnSets: { default: loadColumns(COLUMN_STORAGE, DEFAULT_COLUMNS), michael: loadColumns(MICHAEL_COLUMN_STORAGE, MICHAEL_COLUMNS) }, savedViews: loadViews(),
   };
   const sections = ['positions', 'risk', 'margin', 'performance', 'orders', 'reconciliation'];
   const strategySections = ['overview', 'positions', 'pnl', 'margin', 'risk', 'orders', 'reconciliation'];
@@ -51,7 +56,10 @@
   const pct = (value, digits = 1) => { const n = num(value); return n == null ? '—' : `${(n * 100).toFixed(digits)}%`; };
   const valueMap = (book) => Object.fromEntries((book?.account_values || []).map((row) => [row.tag, row.value_decimal]));
   const positionKey = (row) => `${row.account_alias || ''}:${row.conid}:${row.model_code || ''}`;
-  const columnVisible = (key) => state.visibleColumns.includes(key);
+  const columnSetKey = () => (state.scope === 'michael' ? 'michael' : 'default');
+  const getColumns = () => state.columnSets[columnSetKey()];
+  const setColumns = (list) => { state.columnSets[columnSetKey()] = list; };
+  const columnVisible = (key) => getColumns().includes(key);
   const BASE_FIELD = {
     market_value_decimal: 'market_value_base_decimal',
     daily_pnl_decimal: 'daily_pnl_base_decimal',
@@ -164,17 +172,17 @@
     return `${signed(value, baseCurrencyOf(row))}${percentText}`;
   }
 
-  function loadColumns() {
+  function loadColumns(storageKey, fallback) {
     try {
-      const stored = JSON.parse(localStorage.getItem(COLUMN_STORAGE) || 'null');
+      const stored = JSON.parse(localStorage.getItem(storageKey) || 'null');
       if (Array.isArray(stored) && stored.includes('instrument')) return stored.filter((key) => COLUMN_DEFS.some((column) => column.key === key));
     } catch (_) { /* ignore */ }
-    return DEFAULT_COLUMNS.slice();
+    return fallback.slice();
   }
   function loadViews() {
     try { return JSON.parse(localStorage.getItem(VIEW_STORAGE) || '[]'); } catch (_) { return []; }
   }
-  function persistViews() { localStorage.setItem(VIEW_STORAGE, JSON.stringify(state.savedViews)); localStorage.setItem(COLUMN_STORAGE, JSON.stringify(state.visibleColumns)); }
+  function persistViews() { localStorage.setItem(VIEW_STORAGE, JSON.stringify(state.savedViews)); localStorage.setItem(COLUMN_STORAGE, JSON.stringify(state.columnSets.default)); localStorage.setItem(MICHAEL_COLUMN_STORAGE, JSON.stringify(state.columnSets.michael)); }
 
   async function getJson(url) {
     const response = await fetch(url, { credentials: 'same-origin', cache: 'no-store', headers: { accept: 'application/json' } });
@@ -404,6 +412,7 @@
     // being silently mixed in at a fabricated size.
     const sortable = (row) => {
       if (state.sortKey === 'symbol') return String(row.local_symbol || row.symbol || '');
+      if (state.sortKey === 'weight') return scopedValue(row, 'market_value_decimal');
       if (BASE_FIELD[state.sortKey]) return scopedValue(row, state.sortKey);
       return num(row[state.sortKey]);
     };
@@ -419,12 +428,23 @@
     const filterLabels = { all: 'All', equity: 'Stocks & ETFs', option: 'Options', long: 'Long', short: 'Short', unallocated: 'Unallocated' };
     const sortHead = (label, key) => `<button type="button" data-ph-sort="${key}" class="ph-sort ${state.sortKey === key ? 'active' : ''}">${label}${state.sortKey === key ? `<span>${state.sortDirection === 'asc' ? '↑' : '↓'}</span>` : ''}</button>`;
     const selected = (book.positions || []).find((row) => positionKey(row) === state.selectedPositionKey);
-    const growth = timeAverageBlock();
-    return `${growth}<div class="ph-toolbar ph-positions-toolbar"><div><strong>${rows.length}</strong> canonical instruments <span class="ph-dim">· no row truncation</span></div><div class="ph-view-actions"><label class="ph-search-wrap"><span>/</span><input class="ph-search" data-ph-search value="${esc(state.query)}" placeholder="Search the book" aria-label="Filter positions"></label><button type="button" class="ph-density" data-ph-columns>Columns & views</button><button type="button" class="ph-density" data-ph-density title="Toggle row density">${state.density === 'compact' ? 'Comfortable rows' : 'Compact rows'}</button></div></div>${columnPicker()}<div class="ph-filter-row">${Object.entries(filterLabels).map(([key, label]) => `<button type="button" data-ph-filter="${key}" class="${state.positionFilter === key ? 'active' : ''}">${label}</button>`).join('')}${state.savedViews.map((view) => `<button type="button" data-ph-load-view="${esc(view.name)}" class="ph-saved-view">${esc(view.name)}</button>`).join('')}</div><div class="ph-table-wrap"><table class="ph-table ${state.density === 'compact' ? 'compact' : ''}"><thead><tr>${COLUMN_DEFS.filter((column) => columnVisible(column.key)).map((column) => `<th>${column.sort ? sortHead(column.label, column.sort) : column.key === 'instrument' ? sortHead(column.label, 'symbol') : esc(column.label)}</th>`).join('')}</tr></thead><tbody>${rows.map((row) => {
+    // Weight is this row's base market value over the gross base value of the
+    // whole scope, signed, so a short reads as a negative share of the book.
+    const scopeGross = (book.positions || []).reduce((sum, row) => sum + Math.abs(scopedValue(row, 'market_value_decimal') || 0), 0);
+    const maxWeight = (book.positions || []).reduce((top, row) => Math.max(top, Math.abs(scopedValue(row, 'market_value_decimal') || 0) / (scopeGross || 1)), 0.01);
+    const weightCell = (row) => {
+      const value = scopedValue(row, 'market_value_decimal');
+      if (value == null || !scopeGross) return '<td>—</td>';
+      const share = value / scopeGross;
+      return `<td><span class="ph-weight">${pct(share, 1)}</span><span class="ph-weight-bar${share < 0 ? ' ph-weight-short' : ''}"><i style="width:${Math.max(2, Math.abs(share) / maxWeight * 100).toFixed(1)}%"></i></span></td>`;
+    };
+    const analysis = state.scope === 'michael' ? `${holderOverlapLine()}${timeAverageBlock()}${tailRiskBlock()}` : '';
+    return `<div class="ph-toolbar ph-positions-toolbar"><div><strong>${rows.length}</strong> positions${rows.length === (book.positions || []).length ? '' : ` <span class="ph-dim">of ${(book.positions || []).length}</span>`}</div><div class="ph-view-actions"><label class="ph-search-wrap"><span>/</span><input class="ph-search" data-ph-search value="${esc(state.query)}" placeholder="Search the book" aria-label="Filter positions"></label><button type="button" class="ph-density" data-ph-columns>Columns & views</button><button type="button" class="ph-density" data-ph-density title="Toggle row density">${state.density === 'compact' ? 'Comfortable rows' : 'Compact rows'}</button></div></div>${columnPicker()}<div class="ph-filter-row">${Object.entries(filterLabels).map(([key, label]) => `<button type="button" data-ph-filter="${key}" class="${state.positionFilter === key ? 'active' : ''}">${label}</button>`).join('')}${state.savedViews.map((view) => `<button type="button" data-ph-load-view="${esc(view.name)}" class="ph-saved-view">${esc(view.name)}</button>`).join('')}</div><div class="ph-table-wrap"><table class="ph-table ${state.density === 'compact' ? 'compact' : ''}"><thead><tr>${COLUMN_DEFS.filter((column) => columnVisible(column.key)).map((column) => `<th>${column.sort ? sortHead(column.label, column.sort) : column.key === 'instrument' ? sortHead(column.label, 'symbol') : esc(column.label)}</th>`).join('')}</tr></thead><tbody>${rows.map((row) => {
       const allocation = (row.allocations || []).map((a) => `${a.owner}/${a.strategy}${a.bucket ? `/${a.bucket}` : ''}`).join(', ') || 'unallocated';
       const scopeDaily = scopedValue(row, 'daily_pnl_decimal');
       const cells = {
         instrument: `<td><button type="button" class="ph-symbol-link" data-ph-open-row="${esc(positionKey(row))}"><span class="ph-symbol">${esc(row.local_symbol || row.symbol)}</span></button><br><span class="ph-dim">${esc(row.description || row.symbol)}</span></td>`,
+        weight: weightCell(row),
         allocation: `<td>${esc(allocation)}</td>`,
         identity: `<td>${row.conid}<br><span class="ph-dim">${esc(row.model_code || 'default')}</span></td>`,
         sec_type: `<td>${esc(row.sec_type)}</td>`,
@@ -440,7 +460,7 @@
       return `<tr class="${positionKey(row) === state.selectedPositionKey ? 'ph-row-open' : ''}">${COLUMN_DEFS.filter((column) => columnVisible(column.key)).map((column) => cells[column.key]).join('')}</tr>`;
     }).join('')}</tbody></table>${rows.length ? '' : (book.allocation_status === 'upstream_absent' && book.broker_position_count > 0
       ? emptyState('upstream_absent', 'Owner allocation has not published', `${book.broker_position_count} broker positions exist, but the owner projection is absent. This is an allocation-pipeline issue, not a flat book.`, 'allocation_projection.v1', 'Publish the policy allocation projection, then refresh this page.')
-      : emptyState('true_zero', 'No positions in this scope', 'Broker truth remains visible in All; strategy exclusions and other ownership are itemized in Reconciliation.', 'IBKR positions + allocation ledger', 'Open Reconciliation to review every exclusion.'))}</div>${positionDrawer(selected)}${lineageDrawer()}`;
+      : emptyState('true_zero', 'No positions in this scope', 'Broker truth remains visible in All; strategy exclusions and other ownership are itemized in Reconciliation.', 'IBKR positions + allocation ledger', 'Open Reconciliation to review every exclusion.'))}</div>${analysis}${positionDrawer(selected)}${lineageDrawer()}`;
   }
 
   function positionDrawer(row) {
@@ -457,8 +477,21 @@
   function timeAverageBlock() {
     if (state.scope !== 'michael') return '';
     const panel = state.timeAverage;
-    if (!panel || !window.SleeveViz || typeof SleeveViz.renderTimeAverage !== 'function') return '';
-    return SleeveViz.renderTimeAverage(panel);
+    if (!panel || !window.SleeveViz || typeof window.SleeveViz.renderTimeAverage !== 'function') return '';
+    return window.SleeveViz.renderTimeAverage(panel);
+  }
+
+  function tailRiskBlock() {
+    if (state.scope !== 'michael') return '';
+    const panel = state.tailRisk;
+    if (!panel || !window.SleeveViz || typeof window.SleeveViz.renderTailRisk !== 'function') return '';
+    return window.SleeveViz.renderTailRisk(panel);
+  }
+
+  function holderOverlapLine() {
+    if (state.scope !== 'michael' || !window.OverlapViz || typeof window.OverlapViz.bookLine !== 'function') return '';
+    const text = window.OverlapViz.bookLine(state.holderOverlap);
+    return text ? `<p class="ph-holder-line">${esc(text)}</p>` : '';
   }
 
   function lineageDrawer() {
@@ -542,7 +575,7 @@
     }).join('');
     return `<div class="ph-grid">${panelLines('Live P&L', [['Daily', 'IBKR reset-series'], ['Unrealized', 'Broker-reported'], ['Realized', 'Execution/Flex reconcile']])}${panelLines('Completed sessions', [['Flex versions', String(state.performance?.completed_sessions?.length || 0)], ['Session P&L', 'Immutable Flex lineage'], ['Restatements', 'Separate series'], ['Legacy pnl_today', 'Never used as daily']])}${panelLines('NAV history', [['Daily observations', String(navDays)], ['First', navFrom || 'None'], ['Last', navTo || 'None'], ['Max drawdown · all history', state.performance?.max_drawdown == null ? 'Unavailable' : pct(state.performance.max_drawdown)]])}</div>
       <section class="ph-panel ph-section-block"><h3>Rolling performance</h3>
-        <p>NAV growth, not investor return: NetLiquidation moves with deposits and withdrawals as well as with P&amp;L, and is not cash-flow adjusted. Volatility is annualised from daily closes; Calmar is CAGR over the worst drawdown in the window.</p>
+        <p>NAV growth, not investor return: NetLiquidation moves with deposits and withdrawals as well as with P&amp;L, and is not cash-flow adjusted. Volatility is annualised from daily closes with the square root of 252; Calmar is CAGR over the worst drawdown in the window. ${esc(state.performance?.scaling?.plain_english || state.performance?.scaling?.null_reason || '')}</p>
         <div class="ph-table-wrap"><table class="ph-table ph-table--compact"><thead><tr><th>Window</th><th>NAV CAGR</th><th>Volatility · ann.</th><th>Max drawdown</th><th>Calmar</th><th>Period</th></tr></thead><tbody>${rollingRows}</tbody></table></div>
       </section>
       <section class="ph-panel ph-chart-panel"><div class="ph-chart-head"><span>Net liquidation value</span><button type="button" class="ph-density" data-ph-lineage="NAV history" data-ph-source="IBKR NetLiquidation" data-ph-detail="${esc(state.performance?.lineage?.rolling?.note || 'Broker-reported NAV')}">Lineage</button></div>${portfolioSparkline(state.performance?.nav_series)}</section>${lineageDrawer()}`;
@@ -1351,21 +1384,21 @@
     root.querySelector('[data-ph-columns]')?.addEventListener('click', () => { state.showColumns = !state.showColumns; renderPortfolio(); });
     root.querySelectorAll('[data-ph-column]').forEach((input) => input.addEventListener('change', () => {
       const key = input.dataset.phColumn;
-      if (input.checked && !state.visibleColumns.includes(key)) state.visibleColumns.push(key);
-      if (!input.checked) state.visibleColumns = state.visibleColumns.filter((item) => item !== key);
+      if (input.checked && !getColumns().includes(key)) setColumns([...getColumns(), key]);
+      if (!input.checked) setColumns(getColumns().filter((item) => item !== key));
       persistViews(); renderPortfolio();
     }));
     root.querySelector('[data-ph-view-name]')?.addEventListener('input', (event) => { state.savedViewName = event.target.value; });
     root.querySelector('[data-ph-save-view]')?.addEventListener('click', () => {
       const name = state.savedViewName.trim();
       if (!name) return;
-      state.savedViews = [...state.savedViews.filter((view) => view.name !== name), { name, columns: state.visibleColumns.slice(), filter: state.positionFilter, sortKey: state.sortKey, sortDirection: state.sortDirection, density: state.density }];
+      state.savedViews = [...state.savedViews.filter((view) => view.name !== name), { name, columns: getColumns().slice(), filter: state.positionFilter, sortKey: state.sortKey, sortDirection: state.sortDirection, density: state.density }];
       persistViews(); renderPortfolio();
     });
     root.querySelectorAll('[data-ph-load-view]').forEach((button) => button.addEventListener('click', () => {
       const view = state.savedViews.find((item) => item.name === button.dataset.phLoadView);
       if (!view) return;
-      state.visibleColumns = view.columns.slice(); state.positionFilter = view.filter; state.sortKey = view.sortKey; state.sortDirection = view.sortDirection; state.density = view.density;
+      setColumns(view.columns.slice()); state.positionFilter = view.filter; state.sortKey = view.sortKey; state.sortDirection = view.sortDirection; state.density = view.density;
       persistViews(); renderPortfolio();
     }));
   }
@@ -1440,9 +1473,17 @@
       if (performanceIndex != null) state.accountPerformance = responses[performanceIndex];
       state.book = await overlayDrewSleeve(state.book);
       state.timeAverage = null;
+      state.tailRisk = null;
+      state.holderOverlap = null;
       if (state.scope === 'michael') {
-        try { state.timeAverage = await getJson('/api/v1/sleeves/time-average'); }
-        catch (error) { state.timeAverage = { error: error.message }; }
+        const [growth, tail, overlap] = await Promise.all([
+          getJson('/api/v1/sleeves/time-average').catch((error) => ({ error: error.message })),
+          getJson('/api/v1/sleeves/tail-risk').catch((error) => ({ error: error.message })),
+          getJson('/api/v1/research/overlap?scope=michael').catch((error) => ({ error: error.message })),
+        ]);
+        state.timeAverage = growth;
+        state.tailRisk = tail;
+        state.holderOverlap = overlap;
       }
     }
     catch (error) { state.book = { status: 'unknown', reason: error.message, positions: [], account_values: [], reconciliation_breaks: [] }; }
