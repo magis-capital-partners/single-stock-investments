@@ -446,6 +446,7 @@
   .technical-metric-value { margin-top: 2px; font: 700 12px 'JetBrains Mono', monospace; }
   .technical-foot { display: flex; justify-content: space-between; gap: 12px; margin-top: 10px; color: var(--text-secondary); font-size: 10px; }
   .technical-policy { margin-top: 9px; padding-top: 8px; border-top: 1px dashed var(--border); color: var(--text-muted); font-size: 9px; }
+  .technical-volume-residual { margin: 8px 0 0; color: var(--text-secondary); font-size: 12px; line-height: 1.45; }
   .investment-picture { margin-bottom: 12px; border: 1px solid rgba(125, 139, 166, .4); background: #0b111e; }
   .investment-picture-head { display: grid; grid-template-columns: minmax(150px, .55fr) minmax(260px, 1.45fr); gap: 18px; align-items: start; padding: 12px 14px; border-bottom: 1px solid var(--border); }
   .investment-picture-head > div { display: grid; gap: 3px; }
@@ -1565,6 +1566,18 @@
   .vol-tile-z { display: block; margin-top: 4px; color: var(--text-muted); font: 10px 'JetBrains Mono', monospace; }
   .vol-basis, .vol-lag { display: block; margin-top: 4px; color: var(--text-muted); font-size: 11px; line-height: 1.5; }
   .vol-lag { color: var(--warning); }
+  .vol-residual-card { margin-top: 10px; }
+  .vol-residual-figures { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 8px; margin-top: 8px; }
+  .vol-residual-figures div { min-width: 0; padding: 10px; border: 1px solid var(--border); background: rgba(7,11,19,.76); }
+  .vol-residual-figures span { display: block; color: var(--text-muted); font-size: 9px; font-weight: 800; letter-spacing: .65px; text-transform: uppercase; }
+  .vol-residual-figures strong { display: block; margin-top: 4px; color: var(--text-primary); font: 600 21px 'JetBrains Mono', monospace; line-height: 1.15; }
+  .vol-residual-figures small { display: block; margin-top: 3px; color: var(--text-secondary); font-size: 11px; line-height: 1.4; }
+  .vol-residual-strip { display: block; width: 100%; height: 72px; margin-top: 8px; }
+  .vol-residual-strip line { stroke: #3d4a60; stroke-width: 1; }
+  .vol-residual-strip polyline { fill: none; stroke: #9aa6b8; stroke-width: 1.5; }
+  .vol-residual-caption, .vol-residual-footnote, .vol-residual-missing, .vol-residual-stale { margin: 8px 0 0; color: var(--text-secondary); font-size: 11px; line-height: 1.6; }
+  .vol-residual-disclosure { margin-top: 8px; color: var(--text-muted); font-size: 11px; line-height: 1.55; }
+  .vol-residual-disclosure summary { cursor: pointer; color: var(--text-secondary); }
   .vol-na { color: var(--warning); font-size: 11px; }
   .vol-fresh { font: 10px 'JetBrains Mono', monospace; }
   .vol-spark { display: block; width: 100%; height: 26px; margin-top: 7px; }
@@ -1955,8 +1968,8 @@
 <script src="insights-viz.js?v=20260908-aggregates-theme"></script>
 <script src="valuation-viz.js"></script>
 <script src="criticality-viz.js?v=20261001-signal-study"></script>
-<script src="vol-viz.js"></script>
-<script src="technical-viz.js?v=20261001-signal-study"></script>
+<script src="vol-viz.js?v=20261009-volume-residual"></script>
+<script src="technical-viz.js?v=20261009-volume-residual"></script>
 <script src="technical-picture-viz.js?v=20261001-signal-study"></script>
 <script src="fico-watch-viz.js?v=20261006-fico-watch-2"></script>
 <script src="overlap-viz.js?v=20261008-overlap-line"></script>
@@ -3493,6 +3506,8 @@ async function load() {
   // state rather than taking the risk page down.
   try { data.vol_metrics = await fetchShardJson('data/vol_metrics_latest.json'); }
   catch (_) { data.vol_metrics = null; }
+  try { data.vol_volume_residual = await fetchShardJson('data/vol_volume_residual.json'); }
+  catch (_) { data.vol_volume_residual = null; }
   try { data.criticality_error_diagram = await fetchShardJson('data/criticality_error_diagram.json'); }
   catch (_) { data.criticality_error_diagram = null; }
   // No row cap. fetchJsonlTail downloads the WHOLE file and then slices, so
@@ -3570,7 +3585,7 @@ function renderMarketRiskView() {
       data.vol_metrics || null,
       data.vol_metrics_history || [],
       data.spx_surface || null,
-      { escapeHtml, surfaceHistory: data.spx_surface_history || [] },
+      { escapeHtml, surfaceHistory: data.spx_surface_history || [], residual: data.vol_volume_residual || null },
     )
     : '';
   const riskOptions = {

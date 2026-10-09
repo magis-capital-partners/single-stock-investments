@@ -38,6 +38,8 @@ import statistics
 import sys
 import urllib.parse
 import urllib.request
+
+import volume_residual
 from collections import deque
 from concurrent.futures import ThreadPoolExecutor, as_completed
 from datetime import datetime, timedelta, timezone
@@ -1053,6 +1055,7 @@ def calculate_snapshot(
         },
         "setup": technical_setup,
         "capitulation": capitulation,
+        "volume_residual": volume_residual.latest_point(rows),
         "history": [[row["date"], _round(row["close"], 4)] for row in rows[-260:]],
     }
 

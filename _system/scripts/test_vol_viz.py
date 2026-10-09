@@ -413,6 +413,52 @@ check('event labels stay inside the viewBox',
   labels.length ? 'span ' + Math.min(...labels.map((l) => l.left)).toFixed(0)
     + ' to ' + Math.max(...labels.map((l) => l.right)).toFixed(0) + ' of 0-1000' : 'no labels');
 
+function residualFragment(source) {
+  const start = source.indexOf('vol-residual-card');
+  const heat = source.indexOf('vol-heat-card');
+  if (start < 0) return '';
+  return source.slice(start, heat < 0 ? source.length : heat);
+}
+function bannedHits(source) {
+  const text = String(source).replace(/not a forecast/gi, '').toLowerCase();
+  return ['forecast', 'buy', 'sell', 'target weight', 'fair value', 'irr'].filter((word) => text.includes(word));
+}
+const residual = {
+  caption: 'These are daily bars. It is not a forecast.',
+  latest: {
+    calendar_vol: 16.2,
+    volume_time_vol: 14.1,
+    gap: 2.1,
+    quota: 1000000,
+    mean_daily_volume: 900000,
+    buckets_in_window: 20,
+    oversized_share: 0.05,
+    withheld_reason: null,
+    daily_abs_autocorr: 0.21,
+    bucket_abs_autocorr: 0.11,
+    clustering_sentence: 'Absolute moves are still clumped after the equal-volume packing.',
+  },
+  history: Array.from({ length: 30 }, (_, index) => ({ gap: index - 10 })),
+};
+const withResidual = VolViz.renderVolPanel(latest, history, surface, {
+  escapeHtml, surfaceHistory, residual,
+});
+const card = residualFragment(withResidual);
+const cardHits = bannedHits(card);
+check('missing residual leaves the heatmap in place',
+  html.includes('The volume residual is not loaded.') && html.includes('vol-heat-card'),
+  html.includes('vol-heat-card') ? 'heatmap still drawn' : 'heatmap missing');
+check('residual card sits above the heatmap',
+  withResidual.indexOf('vol-residual-card') >= 0
+    && withResidual.indexOf('vol-residual-card') < withResidual.indexOf('vol-heat-card'),
+  'card then heatmap');
+check('residual card names daily bars and is not a forecast',
+  card.includes('daily bars') && card.includes('not a forecast'),
+  card.includes('vol-residual-caption') ? 'caption rendered' : 'caption missing');
+check('residual card copy stays descriptive',
+  cardHits.length === 0 && !card.includes('vol-p3') && !card.includes('#e66767'),
+  cardHits.join(', ') || 'clean');
+
 process.stdout.write(JSON.stringify({ results, html_len: html.length }));
 """
 
