@@ -171,6 +171,14 @@
   .route-method-cell .method-label { color: var(--text-muted); font-size: 10px; margin-top: 3px; }
   .special-situation-cell { min-width: 118px; }
   .special-situation-line { display: flex; align-items: center; gap: 6px; white-space: nowrap; }
+  a.special-situation-line { color: inherit; text-decoration: none; }
+  a.special-situation-line:hover { text-decoration: underline; }
+  .situations-panel { padding: 20px 24px 40px; display: none; flex: 1; overflow: auto; }
+  .situations-panel.active { display: block; }
+  .situation-detail td { color: var(--text-secondary); line-height: 1.5; }
+  .situation-detail p { margin: 0 0 6px; }
+  .situation-gates, .situation-discovery { margin-top: 16px; }
+  .ideas-table tr.is-focus { background: rgba(6,182,212,.12); }
   .context-cell { min-width: 155px; max-width: 210px; }
   .context-cell .context-sleeve {
     color: var(--text-secondary); font-size: 10px; line-height: 1.3; margin-top: 4px;
@@ -1707,7 +1715,7 @@
     .toolbar { padding: 10px 12px; }
     .search { max-width: none; min-width: 0; width: 100%; }
     .table-wrap { padding-left: 12px; padding-right: 12px; }
-    .darwin-panel,.insights-panel,.activist-panel,.watchlist-panel,.valuation-panel,.risk-panel { padding: 14px 12px 28px; }
+    .darwin-panel,.insights-panel,.activist-panel,.watchlist-panel,.situations-panel,.valuation-panel,.risk-panel { padding: 14px 12px 28px; }
     .risk-view-head { display: block; } .risk-live-state { margin-top: 10px; }
     .risk-grid { grid-template-columns: 1fr; }
     .risk-data-stack > header { display: block; } .risk-coverage { margin-top: 8px; text-align: left; }
@@ -1790,7 +1798,7 @@
     <a class="view-tab" data-view="watchlist" data-ideas-group="inbox" data-watchlist-route="all" href="#/ideas/all">Inbox</a>
     <a class="view-tab" data-view="watchlist" data-ideas-group="screens" data-watchlist-route="nol" href="#/ideas/nol">Screens</a>
     <a class="view-tab" data-view="short-alpha" href="#/ideas/short-alpha">Shorts</a>
-    <a class="view-tab" data-view="warrants" href="#/ideas/warrants">Contracts</a>
+    <a class="view-tab" data-view="situations" href="#/ideas/situations">Special Situations</a>
   </nav>
   <nav class="view-tabs workspace-subnav" id="insights-subnav" aria-label="Insights" hidden>
     <a class="view-tab" data-view="insights" href="#/insights/overview">Signals &amp; Synthesis</a>
@@ -1878,6 +1886,11 @@
     <div id="warrants-content" style="display:none"></div>
   </section>
 
+  <section class="situations-panel" id="situations-panel">
+    <div class="loading" id="situations-loading">Loading special situations…</div>
+    <div id="situations-content" style="display:none"></div>
+  </section>
+
   <section class="insights-panel" id="insights-panel">
     <div class="loading" id="insights-loading">Loading insights…</div>
     <div id="insights-content" style="display:none"></div>
@@ -1953,6 +1966,7 @@
 <script src="activist-viz.js?v=20260819-dashboard-rebuild"></script>
 <script src="short-alpha-viz.js?v=20261007-frameworks"></script>
 <script src="warrant-viz.js"></script>
+<script src="special-situations-viz.js?v=20261008-situations"></script>
 <script src="sleeve-viz.js"></script>
 <script src="ui-format.js?v=20260819-currency"></script>
 <script src="portfolio-viz.js?v=20260819-dashboard-rebuild"></script>
@@ -2023,6 +2037,8 @@ let data = null;
 let shortAlphaData = null;
 let shortAlphaPromise = null;
 let warrantData = null;
+let situationData = null;
+let situationPromise = null;
 let warrantPromise = null;
 let operationalSummary = null;
 let operationalTasks = [];
@@ -2246,6 +2262,21 @@ const MEMORY_TYPE_KEY = 'ssp_memory_type_v1';
 const BIOTECH_SCOPE_KEY = 'ssp_biotech_scope_v1';
 const WATCHLIST_VIEW_KEY = 'ssp_watchlist_view_v1';
 const WATCHLIST_VIEWS = new Set(['all', 'queue', 'nol', 'banks', 'rock']);
+const SITUATION_LANE_IDS = {
+  spinoffs: 'spinoffs',
+  mergers: 'mergers',
+  warrants: 'warrants',
+  restructurings: 'restructurings',
+  'forced-sellers': 'forced_sellers',
+};
+const SITUATION_LANE_SLUG = {
+  all: '',
+  spinoffs: 'spinoffs',
+  mergers: 'mergers',
+  warrants: 'warrants',
+  restructurings: 'restructurings',
+  forced_sellers: 'forced-sellers',
+};
 
 function defaultWatchlistView() {
   try {
@@ -2260,6 +2291,9 @@ function defaultWatchlistView() {
 }
 
 let watchlistViewMode = 'all';
+let situationLane = 'all';
+let situationFocus = '';
+let situationGatesOpen = false;
 let ideaFilter = new URL(window.location.href).searchParams.get('ideaFilter') || 'all';
 let selectedIdeaId = new URL(window.location.href).searchParams.get('idea') || null;
 let nolShowAllBlocked = new URL(window.location.href).searchParams.get('nolBlocked') === 'all';
@@ -2319,7 +2353,22 @@ function parseRouteFromHashString(hash) {
   }
   const researchMatch = /^#\/research\/(coverage|valuation)(?:\/([^/?#]+))?$/i.exec(hash || '');
   if (researchMatch) return { view: researchMatch[1].toLowerCase() === 'valuation' ? 'valuation' : 'holdings', ticker: researchMatch[2] ? decodeURIComponent(researchMatch[2]).toUpperCase() : null, watchlistSub: null };
-  const ideasMatch = /^#\/ideas\/(all|queue|nol|banks|rock|short-alpha|warrants)$/i.exec(hash || '');
+  if (/^#\/(?:ideas\/)?warrants$/i.test(hash || '')) {
+    return { view: 'situations', ticker: null, watchlistSub: null, situationLane: 'warrants', situationFocus: '', situationGatesOpen: true };
+  }
+  const situationsMatch = /^#\/ideas\/situations(?:\/(spinoffs|mergers|warrants|restructurings|forced-sellers))?(?:\/([^/?#]+))?$/i.exec(hash || '');
+  if (situationsMatch) {
+    const slug = (situationsMatch[1] || '').toLowerCase();
+    return {
+      view: 'situations',
+      ticker: null,
+      watchlistSub: null,
+      situationLane: SITUATION_LANE_IDS[slug] || 'all',
+      situationFocus: situationsMatch[2] ? decodeURIComponent(situationsMatch[2]) : '',
+      situationGatesOpen: false,
+    };
+  }
+  const ideasMatch = /^#\/ideas\/(all|queue|nol|banks|rock|short-alpha)$/i.exec(hash || '');
   if (ideasMatch) {
     const sub = ideasMatch[1].toLowerCase();
     return { view: sub === 'short-alpha' || sub === 'warrants' ? sub : 'watchlist', ticker: null, watchlistSub: sub };
@@ -2360,7 +2409,7 @@ function parseRouteFromHashString(hash) {
       watchlistSub: null,
     };
   }
-  const viewMatch = /^#\/(risk|short-alpha|warrants|insights|activist|darwin)$/i.exec(hash || '');
+  const viewMatch = /^#\/(risk|short-alpha|insights|activist|darwin)$/i.exec(hash || '');
   if (viewMatch) return { view: viewMatch[1].toLowerCase(), ticker: null, watchlistSub: null };
   return null;
 }
@@ -2391,8 +2440,12 @@ function syncRouteHash() {
   } else if (activeView === 'watchlist') {
     const sub = WATCHLIST_VIEWS.has(watchlistViewMode) ? watchlistViewMode : defaultWatchlistView();
     setAppHash(`#/ideas/${sub}`);
-  } else if (activeView === 'short-alpha' || activeView === 'warrants') {
+  } else if (activeView === 'short-alpha') {
     setAppHash(`#/ideas/${activeView}`);
+  } else if (activeView === 'situations') {
+    const slug = SITUATION_LANE_SLUG[situationLane] || '';
+    const focus = situationFocus ? `/${encodeURIComponent(situationFocus)}` : '';
+    setAppHash(`#/ideas/situations${slug ? `/${slug}` : ''}${focus}`);
   } else if (activeView === 'activist') {
     setAppHash('#/insights/activism');
   } else if (activeView === 'insights') {
@@ -2413,6 +2466,11 @@ function applyRouteFromHash() {
   if (route.view === 'watchlist' && route.watchlistSub && WATCHLIST_VIEWS.has(route.watchlistSub)) {
     watchlistViewMode = route.watchlistSub === 'queue' ? 'all' : route.watchlistSub;
     try { localStorage.setItem(WATCHLIST_VIEW_KEY, watchlistViewMode); } catch (_) { /* ignore */ }
+  }
+  if (route.view === 'situations') {
+    situationLane = route.situationLane || 'all';
+    situationFocus = route.situationFocus || '';
+    if (route.situationGatesOpen) situationGatesOpen = true;
   }
   if (route.view === 'portfolio' && window.PortfolioViz) PortfolioViz.setRoute(route.scope || 'all', route.section || 'positions');
   if ((route.view === 'spx-0dte' || route.view === 'letf') && window.PortfolioViz) PortfolioViz.setStrategyRoute(route.strategySection || 'overview');
@@ -2841,7 +2899,8 @@ function renderSpecialSituationCell(t) {
     const stage = t.cvr.stage === 'pre_close' ? 'Pre-close'
       : (t.cvr.stage === 'post_close' ? 'Post-close' : (t.cvr.stage_label || t.cvr.stage || 'CVR'));
     const max = t.cvr.max_payout_usd == null ? '' : ` · max ${fmtUsd(t.cvr.max_payout_usd)}`;
-    lines.push(`<div class="special-situation-line"><span class="badge badge-cvr">CVR</span><span class="mono" style="font-size:10px">${escapeHtml(stage)}${escapeHtml(max)}</span></div>`);
+    const focus = encodeURIComponent(t.ticker || '');
+    lines.push(`<a class="special-situation-line" href="#/ideas/situations/mergers/${focus}"><span class="badge badge-cvr">CVR</span><span class="mono" style="font-size:10px">${escapeHtml(stage)}${escapeHtml(max)}</span></a>`);
   }
   if (t.fund_nav) {
     const discount = fundNavDisplayDiscount(t);
@@ -3590,6 +3649,70 @@ async function loadWarrants() {
   return warrantPromise;
 }
 
+async function loadSituations() {
+  if (situationData) return situationData;
+  if (!situationPromise) {
+    situationPromise = fetch('data/special_situations.json?' + Date.now())
+      .then(response => {
+        if (!response.ok) throw new Error(`Special situations data ${response.status}`);
+        return response.json();
+      })
+      .then(value => { situationData = value; return value; })
+      .catch(error => {
+        situationData = { rows: [], discovery: [], history: [], lanes: [], error: error.message };
+        return situationData;
+      })
+      .finally(() => { situationPromise = null; });
+  }
+  return situationPromise;
+}
+
+function renderSituations() {
+  const loading = document.getElementById('situations-loading');
+  const content = document.getElementById('situations-content');
+  if (!loading || !content) return;
+  if (!situationData) {
+    loading.style.display = 'block';
+    content.style.display = 'none';
+    loadSituations().then(() => renderSituations());
+    return;
+  }
+  loading.style.display = 'none';
+  content.style.display = 'block';
+  if (!window.SpecialSituationsViz) {
+    content.innerHTML = '<div class="operator-empty"><strong>Special situations view is unavailable.</strong></div>';
+    return;
+  }
+  const paint = () => renderSituations();
+  content.innerHTML = SpecialSituationsViz.render(situationData, {
+    lane: situationLane,
+    focus: situationFocus,
+    gatesOpen: situationGatesOpen,
+  });
+  SpecialSituationsViz.attach(content, situationData, {
+    onLane: (lane) => {
+      situationLane = lane || 'all';
+      situationFocus = '';
+      syncRouteHash();
+      renderSituations();
+    },
+    onChange: paint,
+  });
+  const host = content.querySelector('[data-situation-gates-host]');
+  if (host) {
+    const paintGates = () => {
+      if (!warrantData || !window.WarrantViz) {
+        host.innerHTML = '<p class="form-hint">Warrant contracts are still loading.</p>';
+        return;
+      }
+      host.innerHTML = WarrantViz.render(warrantData);
+      WarrantViz.attach(host, warrantData, paintGates);
+    };
+    if (!warrantData) loadWarrants().then(paintGates);
+    else paintGates();
+  }
+}
+
 function renderWarrants() {
   const loading = document.getElementById('warrants-loading');
   const content = document.getElementById('warrants-content');
@@ -3648,7 +3771,7 @@ function setView(view, opts = {}) {
   activeView = view;
   const parentView = ['spx-0dte', 'letf', 'darwin'].includes(view) ? 'strategies'
     : ['holdings', 'valuation'].includes(view) ? 'research'
-      : ['watchlist', 'short-alpha', 'warrants'].includes(view) ? 'ideas'
+      : ['watchlist', 'short-alpha', 'warrants', 'situations'].includes(view) ? 'ideas'
         : ['insights', 'activist'].includes(view) ? 'insights'
           : view === 'risk' ? 'market-risk' : 'portfolio';
   document.querySelectorAll('#view-tabs .view-tab').forEach(b => {
@@ -3679,6 +3802,8 @@ function setView(view, opts = {}) {
   if (shortAlphaPanel) shortAlphaPanel.classList.toggle('active', view === 'short-alpha');
   const warrantsPanel = document.getElementById('warrants-panel');
   if (warrantsPanel) warrantsPanel.classList.toggle('active', view === 'warrants');
+  const situationsPanel = document.getElementById('situations-panel');
+  if (situationsPanel) situationsPanel.classList.toggle('active', view === 'situations');
   const drewPanel = document.getElementById('drew-panel');
   if (drewPanel) drewPanel.classList.toggle('active', view === 'drew');
   const michaelPanel = document.getElementById('michael-panel');
@@ -3690,6 +3815,7 @@ function setView(view, opts = {}) {
   if (view === 'valuation') renderValuationQueue();
   if (view === 'short-alpha') renderShortAlpha();
   if (view === 'warrants') renderWarrants();
+  if (view === 'situations') renderSituations();
   if (view === 'watchlist') renderWatchlistTab();
   // Lazy-loaded tabs fetch their shards on first open.
   if (view === 'insights') renderInsights();
@@ -4776,17 +4902,17 @@ function setIdeaUrlState(updates) {
 function buildIdeaRows() {
   const generated = data.generated_at || data.generatedAt || null;
   const rows = [];
-  const add = (row) => rows.push({ ...row, id: `${row.type}:${row.name}` });
-  for (const idea of data.watchlist || []) add({ type: 'Queue', feedId: 'ideas-inbox', name: idea.ticker, thesis: idea.notes || 'Research trigger not set', stage: 'intake', catalyst: idea.notes || 'Research trigger not set', owner: idea.owner || 'Research', updated: idea.added || generated, next: 'Promote to full coverage', source: 'Ideas registry' });
+  const add = (row) => rows.push({ ...row, desk: row.desk || 'research', id: `${row.desk || 'research'}:${row.type}:${row.name}` });
+  for (const idea of data.watchlist || []) add({ type: 'Queue', desk: 'research', feedId: 'ideas-inbox', name: idea.ticker, thesis: idea.notes || 'Research trigger not set', stage: 'intake', catalyst: idea.notes || 'Research trigger not set', owner: idea.owner || 'Research', updated: idea.added || generated, next: 'Promote to full coverage', source: 'Ideas registry' });
   const shortPositions = shortAlphaData?.positions || shortAlphaData?.ideas || [];
-  for (const idea of shortPositions) add({ type: 'Short', feedId: 'short-alpha', name: idea.ticker, thesis: idea.hypothesis || idea.thesis || idea.research?.summary || 'Short hypothesis', stage: idea.stage || idea.research?.status || 'hypothesis', catalyst: (idea.catalysts || [])[0] || 'Catalyst not published', owner: 'Drew', updated: idea.outcome?.latest_date || shortAlphaData.as_of, next: idea.research?.next_step || 'Refresh falsifiers', source: 'Short Alpha' });
+  for (const idea of shortPositions) add({ type: 'Short', desk: 'short', feedId: 'short-alpha', name: idea.ticker, thesis: idea.hypothesis || idea.thesis || idea.research?.summary || 'Short hypothesis', stage: idea.stage || idea.research?.status || 'hypothesis', catalyst: (idea.catalysts || [])[0] || 'Catalyst not published', owner: 'Drew', updated: idea.outcome?.latest_date || shortAlphaData.as_of, next: idea.research?.next_step || 'Refresh falsifiers', source: 'Short Alpha' });
   const shortLeads = (shortAlphaData?.candidates || []).filter((row) => row.stage === 'lead').length;
-  if (shortLeads) add({ type: 'Short', feedId: 'short-alpha', name: 'Short leads', thesis: `${shortLeads} names are tracked on the Shorts tab as leads. A lead is not a position.`, stage: 'lead', catalyst: 'Belief, variant, catalyst, and falsifier', owner: 'Drew', updated: shortAlphaData.as_of, next: 'Open the Shorts tab and promote or reject each lead', source: 'Short Alpha' });
-  for (const warrant of warrantData?.rows || []) add({ type: 'Contract', feedId: 'warrants', name: warrant.warrant_ticker || warrant.market?.warrant?.symbol || warrant.common_ticker, thesis: warrant.summary || warrant.thesis || 'Warrant contract review', stage: warrant.gates?.status || warrant.lifecycle || 'review', catalyst: warrant.contract_clock?.expiry ? `Expiry ${window.DashboardFormat.date(warrant.contract_clock.expiry)}` : 'Contract clock unavailable', owner: 'Research', updated: warrant.market?.warrant?.quote_date || warrantData.generated_at, next: warrant.next_action || 'Verify contract and market', source: 'Warrant contract ledger' });
-  for (const idea of (data.nol_screener?.rows || []).filter((row) => row.is_actionable)) add({ type: 'NOL', feedId: 'nol', name: idea.ticker, thesis: `${idea.company || idea.ticker} tax-attribute screen`, stage: idea.usability || 'screen', catalyst: `§382 shield / price ${idea.tax_shield_pv_to_mcap_pct == null ? 'unavailable' : window.DashboardFormat.number(idea.tax_shield_pv_to_mcap_pct, { maximumFractionDigits: 2 }) + '%'}`, owner: 'Research', updated: idea.filing_as_of || generated, next: 'Verify tax-attribute ownership and deal path', source: 'SEC company facts' });
-  for (const bank of (data.advantaged_banks_screener?.rows || []).filter((row) => row.is_low_cost)) add({ type: 'Bank', feedId: 'banks', name: bank.ticker, thesis: bank.company || 'Deposit franchise screen', stage: 'screen', catalyst: bank.edge_label || bank.edge_type || 'Deposit franchise', owner: 'Research', updated: bank.filing_as_of || generated, next: 'Underwrite deposit durability and valuation', source: 'SEC advantaged-bank screen' });
-  for (const rock of (data.rock_aggregates_screener?.rows || []).filter((row) => row.is_pure_rock && !row.in_holdings)) add({ type: 'Aggregates', feedId: 'rock', name: rock.ticker, thesis: rock.company || 'Local quarry screen', stage: 'screen', catalyst: rock.rock_type_label || rock.rock_type || 'Aggregates', owner: 'Research', updated: rock.fiscal_year_end || generated, next: 'Underwrite freight-adjusted price per ton against the benchmark producers', source: 'SEC aggregates screen' });
-  const actionable = (row) => ['intake', 'review', 'screen', 'hypothesis'].includes(String(row.stage || '').toLowerCase());
+  if (shortLeads) add({ type: 'Short', desk: 'short', feedId: 'short-alpha', name: 'Short leads', thesis: `${shortLeads} names are tracked on the Shorts tab as leads. A lead is not a position.`, stage: 'lead', catalyst: 'Belief, variant, catalyst, and falsifier', owner: 'Drew', updated: shortAlphaData.as_of, next: 'Open the Shorts tab and promote or reject each lead', source: 'Short Alpha' });
+  for (const situation of (situationData?.rows || []).filter((row) => row.inbox)) add({ type: 'Situation', desk: 'special_situations', feedId: 'special-situations', name: situation.ticker, thesis: situation.what, stage: 'open', catalyst: situation.ends_label || 'End date not stated', owner: 'Research', updated: situation.as_of || situationData.generated_at, next: situation.next || 'Open the situation', source: situation.evidence_label || 'Special situations' });
+  for (const idea of (data.nol_screener?.rows || []).filter((row) => row.is_actionable)) add({ type: 'NOL', desk: 'screens', feedId: 'nol', name: idea.ticker, thesis: `${idea.company || idea.ticker} tax-attribute screen`, stage: idea.usability || 'screen', catalyst: `§382 shield / price ${idea.tax_shield_pv_to_mcap_pct == null ? 'unavailable' : window.DashboardFormat.number(idea.tax_shield_pv_to_mcap_pct, { maximumFractionDigits: 2 }) + '%'}`, owner: 'Research', updated: idea.filing_as_of || generated, next: 'Verify tax-attribute ownership and deal path', source: 'SEC company facts' });
+  for (const bank of (data.advantaged_banks_screener?.rows || []).filter((row) => row.is_low_cost)) add({ type: 'Bank', desk: 'screens', feedId: 'banks', name: bank.ticker, thesis: bank.company || 'Deposit franchise screen', stage: 'screen', catalyst: bank.edge_label || bank.edge_type || 'Deposit franchise', owner: 'Research', updated: bank.filing_as_of || generated, next: 'Underwrite deposit durability and valuation', source: 'SEC advantaged-bank screen' });
+  for (const rock of (data.rock_aggregates_screener?.rows || []).filter((row) => row.is_pure_rock && !row.in_holdings)) add({ type: 'Aggregates', desk: 'screens', feedId: 'rock', name: rock.ticker, thesis: rock.company || 'Local quarry screen', stage: 'screen', catalyst: rock.rock_type_label || rock.rock_type || 'Aggregates', owner: 'Research', updated: rock.fiscal_year_end || generated, next: 'Underwrite freight-adjusted price per ton against the benchmark producers', source: 'SEC aggregates screen' });
+  const actionable = (row) => ['intake', 'review', 'screen', 'hypothesis', 'open'].includes(String(row.stage || '').toLowerCase());
   const current = (row) => ['fresh', 'api', 'empty'].includes(feedClockState(row.feedId));
   const rank = (row) => {
     if (actionable(row) && current(row)) return 0;
@@ -4802,6 +4928,7 @@ function renderIdeaDrawer(row) {
   return `<aside class="idea-drawer" role="dialog" aria-modal="true" aria-label="Idea detail">
     <div class="idea-drawer-head"><div><span class="idea-type">${escapeHtml(row.type)}</span><h3>${escapeHtml(row.name)}</h3></div><button type="button" data-close-idea>Close</button></div>
     <dl>
+      <div><dt>Desk</dt><dd>${escapeHtml(row.desk === 'special_situations' ? 'Special situations' : row.desk === 'screens' ? 'Screens' : row.desk === 'short' ? 'Shorts' : 'Research')}</dd></div>
       <div><dt>Thesis / evidence</dt><dd>${escapeHtml(row.thesis)}</dd></div>
       <div><dt>Stage</dt><dd>${escapeHtml(String(row.stage).replace(/_/g, ' '))}</dd></div>
       <div><dt>Catalyst / deadline</dt><dd>${escapeHtml(row.catalyst)}</dd></div>
@@ -4819,8 +4946,8 @@ function renderIdeasIndexBody() {
   const stale = (row) => { const time = new Date(row.updated).getTime(); return Number.isFinite(time) && now - time > 90 * 86400000; };
   const buckets = {
     all: allRows,
-    decision: allRows.filter((row) => ['intake', 'review', 'screen', 'hypothesis'].includes(String(row.stage).toLowerCase())),
-    catalyst: allRows.filter((row) => ['Short', 'Contract'].includes(row.type)),
+    decision: allRows.filter((row) => ['intake', 'review', 'screen', 'hypothesis', 'open'].includes(String(row.stage).toLowerCase())),
+    catalyst: allRows.filter((row) => row.desk === 'special_situations' || row.type === 'Short'),
     stale: allRows.filter(stale),
   };
   if (!Object.hasOwn(buckets, ideaFilter)) ideaFilter = 'all';
@@ -4832,10 +4959,11 @@ function renderIdeasIndexBody() {
   ];
   return `<div class="ideas-shell"><header class="ideas-header"><div><h2>Decision Inbox</h2><p>Every candidate has one stage, one owner, one clock, and one next action. Open a row for its evidence and source.</p></div><span class="ideas-asof">As of ${escapeHtml(window.DashboardFormat.date(data.generated_at || data.generatedAt))}</span></header>
     <div class="decision-tape" aria-label="Idea decision filters">${tape.map(([key, label, count]) => `<button type="button" data-idea-filter="${key}" class="${ideaFilter === key ? 'active' : ''}"><small>${escapeHtml(label)}</small><strong>${count}</strong></button>`).join('')}</div>
-    <section class="ideas-surface"><div class="ideas-surface-head"><strong>${rows.length} ideas in view</strong><span>Fresh actionable rows first · click an instrument for detail</span></div><div class="ideas-table-wrap"><table class="ideas-table"><thead><tr><th>Type</th><th>Instrument</th><th>Stage</th><th>Catalyst / expiry</th><th>Owner</th><th>Last verified</th><th>Next action</th></tr></thead><tbody>${rows.map((row) => {
+    <section class="ideas-surface"><div class="ideas-surface-head"><strong>${rows.length} ideas in view</strong><span>Fresh actionable rows first · click an instrument for detail</span></div><div class="ideas-table-wrap"><table class="ideas-table"><thead><tr><th>Desk</th><th>Type</th><th>Instrument</th><th>Stage</th><th>Catalyst / expiry</th><th>Owner</th><th>Last verified</th><th>Next action</th></tr></thead><tbody>${rows.map((row) => {
       const clock = feedClockState(row.feedId);
       const clockNote = ['fresh', 'api', 'empty'].includes(clock) ? '' : ` [${window.DashboardFormat.feedLabel(clock)}]`;
-      return `<tr><td><span class="idea-type">${escapeHtml(row.type)}</span></td><td><button type="button" class="idea-open" data-idea-id="${escapeHtml(row.id)}">${escapeHtml(row.name || 'Unavailable')}</button></td><td>${escapeHtml(String(row.stage || 'Unavailable').replace(/_/g, ' '))}</td><td>${escapeHtml(row.catalyst)}</td><td>${escapeHtml(row.owner)}</td><td class="numeric">${escapeHtml(window.DashboardFormat.date(row.updated))}</td><td>${escapeHtml(row.next + clockNote)}</td></tr>`;
+      const desk = row.desk === 'special_situations' ? 'Special situations' : row.desk === 'screens' ? 'Screens' : row.desk === 'short' ? 'Shorts' : 'Research';
+      return `<tr><td><span class="idea-type">${escapeHtml(desk)}</span></td><td><span class="idea-type">${escapeHtml(row.type)}</span></td><td><button type="button" class="idea-open" data-idea-id="${escapeHtml(row.id)}">${escapeHtml(row.name || 'Unavailable')}</button></td><td>${escapeHtml(String(row.stage || 'Unavailable').replace(/_/g, ' '))}</td><td>${escapeHtml(row.catalyst)}</td><td>${escapeHtml(row.owner)}</td><td class="numeric">${escapeHtml(window.DashboardFormat.date(row.updated))}</td><td>${escapeHtml(row.next + clockNote)}</td></tr>`;
     }).join('')}</tbody></table>${rows.length ? '' : '<div class="operator-empty"><strong>No ideas match this decision state</strong><span>Choose another decision-tape segment. Source owner: Research Data Health.</span></div>'}</div></section>${renderIdeaDrawer(selected)}</div>`;
 }
 
@@ -5081,11 +5209,11 @@ function renderWatchlistTab() {
     watchlistViewMode = defaultWatchlistView();
   }
 
-  if (watchlistViewMode === 'all' && (!shortAlphaData || !warrantData)) {
+  if (watchlistViewMode === 'all' && (!shortAlphaData || !situationData)) {
     loading.style.display = 'block';
     loading.textContent = 'Loading the unified ideas index…';
     content.style.display = 'none';
-    Promise.allSettled([loadShortAlpha(), loadWarrants()]).then(() => renderWatchlistTab());
+    Promise.allSettled([loadShortAlpha(), loadSituations()]).then(() => renderWatchlistTab());
     return;
   }
 
@@ -6342,6 +6470,10 @@ document.querySelectorAll('#view-tabs .view-tab, .workspace-subnav .view-tab').f
     event.preventDefault();
     if (link.dataset.watchlistRoute) watchlistViewMode = link.dataset.watchlistRoute;
     if (link.getAttribute('href') === '#/ideas/all') watchlistViewMode = 'all';
+    if (link.getAttribute('href') === '#/ideas/situations') {
+      situationLane = 'all';
+      situationFocus = '';
+    }
     if (link.getAttribute('href') === '#/insights/data-health') insightsSection = 'sources';
     if (link.getAttribute('href') === '#/insights/overview') insightsSection = 'events';
     if (link.getAttribute('href') === '#/strategies/darwin/overview') darwinViewMode = 'overview';

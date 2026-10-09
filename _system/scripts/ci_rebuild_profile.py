@@ -203,6 +203,7 @@ def expand_steps(steps: list[list[str]]) -> list[list[str]]:
             # series (BKSY.W) fail intake-full, drive and world-model for 13
             # days (2026-09-10..22).
             out.append(["_system/scripts/check_warrant_universe.py", "--warn-only"])
+            out.append(["_system/scripts/build_special_situations.py"])
         out.append(step)
     return out
 
