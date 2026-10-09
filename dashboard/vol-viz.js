@@ -575,6 +575,14 @@
     </article>`;
   }
 
+  function scalingNote(volLatest, escapeHtml) {
+    const scaling = volLatest?.scaling;
+    if (!scaling) return '';
+    const text = scaling.available ? scaling.plain_english : scaling.null_reason;
+    if (!text) return '';
+    return `<p class="vol-note">${escapeHtml(text)}</p>`;
+  }
+
   function regimeTiles(volLatest, history, escapeHtml) {
     const metrics = volLatest?.metrics || {};
     const regime = volLatest?.regime || {};
@@ -849,6 +857,7 @@
       ${feedBanners(volLatest, escapeHtml)}
 
       ${volLatest ? regimeTiles(volLatest, history, escapeHtml) : ''}
+      ${scalingNote(volLatest, escapeHtml)}
 
       <section class="risk-card vol-heat-card">
         <header class="vol-card-head"><div><h3>Z-score history · ${escapeHtml(String(METRIC_ORDER.length))} metrics × ${escapeHtml(String(heatWindow.length))} sessions</h3>

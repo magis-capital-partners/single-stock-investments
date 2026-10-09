@@ -28,6 +28,13 @@ def test_milestones_half_time_low_value():
     assert abs(stops[1.0]["pct_of_terminal"] - 100.0) < 1e-6
 
 
+def test_short_btc_series_has_no_log_periodic_fit():
+    out = hk._btc_criticality([(date(2020, 1, 1), 100.0)] * 10)
+    assert out["status"] == "unavailable"
+    assert out["in_base_irr"] is False
+    assert out["research_only"] is True
+
+
 def test_power_law_fit_recovers_t6():
     origin = date(2011, 1, 1)
     A_true, k_true = 2.5, 6.0

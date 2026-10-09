@@ -897,6 +897,95 @@ def attach_zscores(rows: list) -> None:
             row[f"{key}_pct1y"] = _round(pct[index], 2)
 
 
+SCALING_HORIZON = 20
+SCALING_MIN_SAMPLES = 40
+SCALING_HURST_BAND = 0.1
+
+
+def scaling_gap_from_rows(rows: list, *, key: str = SPX_KEY, subject: str = "SPX") -> dict:
+    """Hurst exponent of overlapping horizon log moves versus one-session moves.
+
+    Matches ``scalingGap`` in ``dashboard/functions/_lib/performance.js``.
+    Brownian motion is 0.5. A gap is only a label on the annualized number.
+    """
+    logs: list[float | None] = []
+    previous: float | None = None
+    for row in rows:
+        close = _finite(row.get(key))
+        if previous is not None and close is not None and previous > 0 and close > 0:
+            logs.append(math.log(close / previous))
+        else:
+            logs.append(None)
+        previous = close if close is not None and close > 0 else None
+    one_day = [value for value in logs if value is not None]
+    horizon_samples: list[float] = []
+    for index in range(SCALING_HORIZON, len(logs) + 1):
+        window = logs[index - SCALING_HORIZON : index]
+        if any(value is None for value in window):
+            continue
+        horizon_samples.append(sum(value for value in window if value is not None))
+    base = {
+        "available": False,
+        "subject": subject,
+        "horizon_sessions": SCALING_HORIZON,
+        "hurst_band": SCALING_HURST_BAND,
+        "rule": (
+            "Hurst exponent from log(sigma_20 / sigma_1) / log(20), using the "
+            "sample standard deviation of overlapping 20-session log moves. "
+            "Near the square root of time when the exponent is within 0.1 of 0.5."
+        ),
+    }
+    if len(one_day) < 2 or len(horizon_samples) < SCALING_MIN_SAMPLES:
+        base["null_reason"] = (
+            f"needs {SCALING_HORIZON + SCALING_MIN_SAMPLES} daily closes "
+            "for a 20-session scaling check"
+        )
+        return base
+    sigma1 = statistics.stdev(one_day)
+    sigma_h = statistics.stdev(horizon_samples)
+    if not sigma1 > 0:
+        base["null_reason"] = "daily log changes have no variation, so there is no scaling exponent"
+        return base
+    brownian = math.sqrt(SCALING_HORIZON)
+    ratio = sigma_h / sigma1
+    hurst = math.log(ratio) / math.log(SCALING_HORIZON) if ratio > 0 else 0.0
+    if hurst > 0.5 + SCALING_HURST_BAND:
+        label = "faster_than_square_root"
+        plain = (
+            f"20-session {subject} moves are larger than the square root of time "
+            f"(scaling exponent {hurst:.2f}). Annualized volatility understates "
+            "how large multi-week moves have been."
+        )
+    elif hurst < 0.5 - SCALING_HURST_BAND:
+        label = "slower_than_square_root"
+        plain = (
+            f"20-session {subject} moves are smaller than the square root of time "
+            f"(scaling exponent {hurst:.2f}). Annualized volatility overstates "
+            "how large multi-week moves have been."
+        )
+    else:
+        label = "near_square_root"
+        plain = (
+            f"20-session {subject} moves are close to the square root of time. "
+            "The annualized realized-vol figure is a fair summary of this sample."
+        )
+    return {
+        **base,
+        "available": True,
+        "null_reason": None,
+        "one_day_stdev": round(sigma1, 6),
+        "horizon_stdev": round(sigma_h, 6),
+        "realized_ratio": round(ratio, 4),
+        "brownian_ratio": round(brownian, 4),
+        "hurst": round(hurst, 4),
+        "relative_gap": round(ratio / brownian - 1.0, 4),
+        "label": label,
+        "plain_english": plain,
+        "daily_log_changes": len(one_day),
+        "horizon_samples": len(horizon_samples),
+    }
+
+
 def term_state(slope_vix_3m, dead_band: float = TERM_DEAD_BAND) -> str:
     """Near/far ratio -> regime label. Below 1 is contango, above is stress."""
     slope = _finite(slope_vix_3m)
@@ -1124,6 +1213,7 @@ def build_latest(
             "iv_rv_spread": latest.get("iv_rv_spread"),
             "spx_rv20": latest.get("spx_rv20"),
         },
+        "scaling": scaling_gap_from_rows(rows),
         "spx_0dte": spx_0dte,
         "forward_conditioning": {
             **build_forward_conditioning(rows),

@@ -593,5 +593,25 @@ class InteriorGapDetectionTests(unittest.TestCase):
         self.assertNotIn("vix3m", latest["coverage"]["metrics_with_gaps"])
 
 
+class ScalingGapTests(unittest.TestCase):
+    def test_persistent_blocks_scale_faster_than_square_root(self):
+        rows = []
+        price = 100.0
+        for index in range(400):
+            block = 0.01 if (index // 20) % 2 == 0 else -0.01
+            price *= math.exp(block)
+            rows.append({"spx_close": price})
+        gap = bvm.scaling_gap_from_rows(rows)
+        self.assertTrue(gap["available"])
+        self.assertEqual(gap["label"], "faster_than_square_root")
+        self.assertGreater(gap["hurst"], 0.75)
+
+    def test_short_history_stays_unavailable(self):
+        rows = [{"spx_close": 100.0 + index} for index in range(10)]
+        gap = bvm.scaling_gap_from_rows(rows)
+        self.assertFalse(gap["available"])
+        self.assertIn("20-session", gap["null_reason"])
+
+
 if __name__ == "__main__":
     unittest.main(verbosity=2)

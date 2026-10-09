@@ -10,6 +10,8 @@ from typing import Any
 ROOT = Path(__file__).resolve().parents[2]
 CLASSES_PATH = ROOT / "_system" / "reference" / "world_model" / "predictability_classes.json"
 DARWIN_OBS = ROOT / "dashboard" / "data" / "darwin_observatory.json"
+CRITICALITY_SUMMARY = ROOT / "dashboard" / "data" / "criticality_summary.json"
+ERROR_DIAGRAM = ROOT / "dashboard" / "data" / "criticality_error_diagram.json"
 
 _CLASS_DOC: dict | None = None
 
@@ -114,6 +116,68 @@ def darwin_regime_stress(obs: dict | None = None) -> dict:
     }
 
 
+def _load_json(path: Path) -> dict:
+    if not path.exists():
+        return {}
+    try:
+        return json.loads(path.read_text(encoding="utf-8"))
+    except (OSError, json.JSONDecodeError):
+        return {}
+
+
+def criticality_market_path(
+    summary: dict | None = None,
+    diagram: dict | None = None,
+) -> dict:
+    """Whether the live SPY ensemble may cap market-path language.
+
+    The numeric cutoff comes from the error diagram. A missing diagram, or a
+    diagram that found no separating threshold, leaves the cap off.
+    """
+    if summary is None:
+        summary = _load_json(CRITICALITY_SUMMARY)
+    if diagram is None:
+        diagram = _load_json(ERROR_DIAGRAM)
+    selection = diagram.get("selection") or {}
+    spy = (summary.get("by_symbol") or {}).get("SPY") or {}
+    confidence = spy.get("confidence") or {}
+    positive = confidence.get("positive")
+    negative = confidence.get("negative")
+    dominant = None
+    if positive is not None or negative is not None:
+        dominant = max(float(positive or 0), float(negative or 0))
+    dispersion = (spy.get("critical_time") or {}).get("dispersion")
+    concentration = (
+        None if dispersion is None
+        else max(0.0, min(100.0, 100.0 - 3.0 * float(dispersion)))
+    )
+    threshold = selection.get("confidence_threshold")
+    min_concentration = float(selection.get("min_concentration") or 25)
+    enabled = bool(selection.get("demotion_enabled")) and threshold is not None
+    ready = str(spy.get("quality_state") or spy.get("status") or "") in {"ready", "limited"}
+    demote = bool(
+        enabled
+        and ready
+        and dominant is not None
+        and float(dominant) >= float(threshold)
+        and concentration is not None
+        and concentration >= min_concentration
+    )
+    return {
+        "available": bool(selection) and bool(spy),
+        "demote": demote,
+        "demotion_enabled": enabled,
+        "dominant_confidence": dominant,
+        "threshold": threshold,
+        "concentration": None if concentration is None else round(concentration, 2),
+        "min_concentration": min_concentration,
+        "direction": spy.get("direction"),
+        "as_of": spy.get("as_of"),
+        "plain_english": selection.get("plain_english"),
+        "tail_label": (spy.get("tail") or {}).get("label"),
+    }
+
+
 def annotate_kpi_row(row: dict, kpi: dict | None = None) -> dict:
     src = kpi or row
     out = dict(row)
@@ -131,12 +195,14 @@ def build_claim_boundaries(
     industry: list[dict],
     kpi_rows: list[dict],
     darwin: dict | None = None,
+    criticality: dict | None = None,
 ) -> dict:
     doc = load_classes()
     defaults = doc.get("defaults") or {}
     thesis_ceiling = str(defaults.get("kpi_with_prediction_role") or "P3_oriented")
     dwin = darwin if darwin is not None else darwin_regime_stress()
-    market_path = "P1_ecology" if dwin.get("stress") else thesis_ceiling
+    crit = criticality if criticality is not None else criticality_market_path()
+    market_path = "P1_ecology" if (dwin.get("stress") or crit.get("demote")) else thesis_ceiling
     claim_ceiling = min_class(thesis_ceiling, market_path)
 
     demotions: list[dict] = []
@@ -151,6 +217,15 @@ def build_claim_boundaries(
             "artifact": "darwin_observatory",
             "predictability_class": "P1_ecology",
             "reason": f"Darwin regime={dwin.get('regime_label')} caps market-path language at P1",
+        })
+    if crit.get("demote"):
+        demotions.append({
+            "artifact": "criticality:SPY",
+            "predictability_class": "P1_ecology",
+            "reason": (
+                f"SPY ensemble confidence {crit.get('dominant_confidence')} "
+                f">= {crit.get('threshold')} with a concentrated critical-time window"
+            ),
         })
 
     goodhart = []
@@ -174,11 +249,19 @@ def build_claim_boundaries(
         if n.get("formation_tag")
     ]
 
+    caps = []
+    if dwin.get("available"):
+        caps.append(f"Darwin {dwin.get('regime_label')}")
+    else:
+        caps.append("Darwin unavailable")
+    if crit.get("demote"):
+        caps.append(
+            f"SPY criticality {crit.get('dominant_confidence')} >= {crit.get('threshold')}"
+        )
     reason = (
         f"Thesis hygiene may use {short_label(thesis_ceiling)}; "
-        f"market-path language capped at {short_label(market_path)}"
-        + (f" (Darwin {dwin.get('regime_label')})" if dwin.get("available") else " (Darwin unavailable)")
-        + ". Steady means gates held, not path certainty."
+        f"market-path language capped at {short_label(market_path)} "
+        f"({'; '.join(caps)}). Steady means gates held, not path certainty."
     )
 
     return {
@@ -187,12 +270,14 @@ def build_claim_boundaries(
         "market_path_ceiling": market_path,
         "reason": reason,
         "darwin": dwin,
+        "criticality": crit,
         "demotions": demotions,
         "goodhart_watch": goodhart[:40],
         "formation_tags": formation,
         "engines": [
             {"id": "world_model", "role": "thesis foresight hygiene"},
             {"id": "darwin", "role": "regime / ecology engine"},
+            {"id": "criticality", "role": "LPPLS market-path cap when the error diagram allows it"},
             {"id": "house_valuation", "role": "Power Zone + contract + IC + human (P4 only)"},
             {"id": "legacy_lawrence", "role": "reference / specialist only"},
             {"id": "santa_fe", "role": "wisdom library — claim bans, no KPIs"},

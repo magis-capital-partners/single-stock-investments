@@ -156,12 +156,64 @@ def test_predictability_classes_and_ceiling():
             "predictability_class": "P3_oriented",
         }],
         darwin=stressed,
+        criticality={"demote": False, "available": False},
     )
     assert bounds["market_path_ceiling"] == "P1_ecology"
     assert bounds["claim_ceiling"] == "P1_ecology"
     assert bounds["thesis_hygiene_ceiling"] == "P3_oriented"
     assert any(d["artifact"].startswith("expert_horizon:") for d in bounds["demotions"])
     assert pred.find_banned_phrases("This is a complexity IRR fantasy") == ["complexity irr"]
+
+    calm_bounds = pred.build_claim_boundaries(
+        cards=[],
+        horizons=[],
+        industry=[],
+        kpi_rows=[],
+        darwin=calm,
+        criticality={
+            "demote": True,
+            "available": True,
+            "dominant_confidence": 42,
+            "threshold": 20,
+        },
+    )
+    assert calm_bounds["market_path_ceiling"] == "P1_ecology"
+    assert calm_bounds["thesis_hygiene_ceiling"] == "P3_oriented"
+    assert any(row["artifact"] == "criticality:SPY" for row in calm_bounds["demotions"])
+
+    quiet = pred.build_claim_boundaries(
+        cards=[],
+        horizons=[],
+        industry=[],
+        kpi_rows=[],
+        darwin=calm,
+        criticality={"demote": False, "available": True, "demotion_enabled": False},
+    )
+    assert quiet["market_path_ceiling"] == "P3_oriented"
+
+
+def test_criticality_gate_follows_the_error_diagram():
+    import predictability as pred  # noqa: WPS433
+
+    summary = {"by_symbol": {"SPY": {
+        "quality_state": "ready",
+        "direction": "positive_bubble",
+        "confidence": {"positive": 40, "negative": 5},
+        "critical_time": {"dispersion": 10},
+    }}}
+    diagram = {"selection": {
+        "demotion_enabled": True,
+        "confidence_threshold": 20,
+        "min_concentration": 25,
+        "plain_english": "threshold 20",
+    }}
+    gate = pred.criticality_market_path(summary, diagram)
+    assert gate["demote"] is True
+    summary["by_symbol"]["SPY"]["critical_time"]["dispersion"] = 40
+    assert pred.criticality_market_path(summary, diagram)["demote"] is False
+    summary["by_symbol"]["SPY"]["critical_time"]["dispersion"] = 10
+    diagram["selection"]["demotion_enabled"] = False
+    assert pred.criticality_market_path(summary, diagram)["demote"] is False
 
 
 def test_kpi_history_zscore_from_theme_csv():
