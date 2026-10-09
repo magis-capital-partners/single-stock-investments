@@ -3,21 +3,72 @@
   "classification": {
     "archetype": "compounder"
   },
-  "evidence_citations": [],
-  "filing_digest": "CRH/research/evidence/filing_digest_2026-08-06.md",
-  "generated_at": "2026-10-07T10:43:23+00:00",
+  "evidence_citations": [
+    "CRH/third-party-analyses/source_inventory_2026-07-10.md",
+    "investor-documents/sec-edgar/10-K_20260218_rpt20251231_acc0001628280_26_009043.htm",
+    "investor-documents/sec-edgar/10-Q_20260430_rpt20260331_acc0001628280_26_028556.htm",
+    "investor-documents/sec-edgar/10-K_20250226_rpt20241231_acc0001628280_25_008179.htm",
+    "CRH/research/evidence/filing_digest_2026-08-06.md"
+  ],
+  "filing_digest": "CRH/research/evidence/filing_digest_2026-10-08.md",
+  "generated_at": "2026-10-08T18:12:12+00:00",
   "irr_label": "",
-  "key_assumptions": [],
+  "key_assumptions": [
+    {
+      "input": "Price today",
+      "source": "Yahoo CRH close 2026-10-06",
+      "value": "**$83.8**"
+    },
+    {
+      "input": "Normalized owner earnings",
+      "source": "us-gaap:NetCashProvidedByUsedInOperatingActivities; accession 0001628280-26-009043; form 10-K",
+      "value": "**$2,912M**"
+    },
+    {
+      "input": "Cash",
+      "source": "us-gaap:CashAndCashEquivalentsAtCarryingValue; accession 0001628280-26-028556; form 10-Q",
+      "value": "**$3,240M**"
+    },
+    {
+      "input": "Debt",
+      "source": "us-gaap:LongTermDebtNoncurrent; accession 0001628280-26-028556; form 10-Q",
+      "value": "**$16,071M**"
+    },
+    {
+      "input": "Diluted shares",
+      "source": "dei:EntityCommonStockSharesOutstanding; accession 0001628280-26-028556; form 10-Q",
+      "value": "**668.2M**"
+    },
+    {
+      "input": "Reinvestment rate",
+      "source": "Versioned initial bounds; refresh from the issuer reinvestment ledger.",
+      "value": "**35.0%**"
+    },
+    {
+      "input": "Incremental after-tax ROIC",
+      "source": "Conservative bounded starting cases pending a longer primary-source capital bridge.",
+      "value": "**18.0%**"
+    },
+    {
+      "input": "Discount rate",
+      "source": "Approved risk bounds for the automated first pass.",
+      "value": "**10.0%**"
+    }
+  ],
   "last_verified": {
-    "deep_dive": null,
+    "deep_dive": "2026-10-06",
     "human_approved": null,
     "valuation_as_of": "2026-07-29"
   },
-  "open_questions": [],
+  "open_questions": [
+    "Stock-specific reinvestment and incremental ROIC not yet bridged from 10-K capex tables.",
+    "Independent review of falsifier draft `CRH/research/falsifier_drafts/0c6457af11f4a63293a9b6da.json`.",
+    "Approve or reject third-party sources before blending external views."
+  ],
   "scenarios": {},
   "schema_version": "1.0",
   "stance": null,
-  "thesis": "",
+  "thesis": "CRH plc is a global building materials company (aggregates, cement, asphalt, and building products) listed on the NYSE with an Irish parent and primary U.S. operating footprint. **[Fact]** FY2025 consolidated revenue was **$37.45 billion** per `investor-documents/sec-edgar/10-K_20260218_rpt20251231_acc0001628280_26_009043.htm`. **[Fact]** FY2025 net income attributable to shareholders was **$3.75 billion** (diluted EPS **$5.51**) on the same filing. **[Fact]** The group reports through an Americas division (materials and building solutions) and an International division (international solutions), per segment disclosures in the FY2025 10-K and the October 2025 prospectus supplement (`424B5_20251007_rpt_acc0001193125_25_233453.htm`).",
   "ticker": "CRH",
-  "why_market_wrong": ""
+  "why_market_wrong": "The stock may trade as a passive infrastructure beneficiary while owner cash is already capital-intensive and levered. **[Inference]** FY2025 operating cash flow was **$5.62 billion** against capital spending of **$2.71 billion**, yet long-term debt on the March 2026 balance sheet was **$16.07 billion** per `10-Q_20260430_rpt20260331_acc0001628280_26_028556.htm`, so equity holders may underweight refinancing and integration risk from serial acquisitions. **[Inference]** Proof-first owner-earnings math at **$99.95** per share (July 2026 price in `valuation.json`) implies mid-single-digit negative annual returns on the automated base bridge even as reported earnings grow, suggesting the market prices reinvestment quality above what the conservative template captures. **[Inference]** Q1 2026 trailing normalized owner earnings (**$2.99 billion**) sit only modestly above the low-case anchor (**$2.91 billion**), while Q3 2025 trailing owner earnings (**$2.61 billion**) were below that anchor, so cyclical seasonality may be misread as steady compounder growth."
 }

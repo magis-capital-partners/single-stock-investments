@@ -184,8 +184,8 @@
     },
     {
       "id": "warrants",
-      "label": "Contracts",
-      "hash": "#/ideas/warrants",
+      "label": "Warrant contracts",
+      "hash": "#/ideas/situations/warrants",
       "kind": "file",
       "api": null,
       "artifact": "dashboard/data/warrants.json",
@@ -199,6 +199,24 @@
       "lane_receipt_at": "2026-09-28T21:06:56Z",
       "healer": "python _system/scripts/refresh_warrant_universe.py --refresh-market --capture-cohort && python _system/scripts/build_warrant_dashboard.py (data-pipeline nightly + Monday discovery)",
       "next_action": "python _system/scripts/refresh_warrant_universe.py --refresh-market --capture-cohort && python _system/scripts/build_warrant_dashboard.py (data-pipeline nightly + Monday discovery)"
+    },
+    {
+      "id": "special-situations",
+      "label": "Special Situations",
+      "hash": "#/ideas/situations",
+      "kind": "file",
+      "api": null,
+      "artifact": "dashboard/data/special_situations.json",
+      "stamp_field": "generated_at",
+      "stamp": "2026-10-08T21:59:21Z",
+      "max_age_hours": 54.0,
+      "exists": true,
+      "status": "fresh",
+      "label_text": "Fresh",
+      "lane": "data-pipeline-intake-full",
+      "lane_receipt_at": "2026-10-07T10:47:48Z",
+      "healer": "python _system/scripts/build_special_situations.py",
+      "next_action": "python _system/scripts/build_special_situations.py"
     },
     {
       "id": "nol",
