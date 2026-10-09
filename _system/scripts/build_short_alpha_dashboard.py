@@ -23,6 +23,8 @@ QUEUE = ROOT / "_system" / "data" / "short_alpha_research_queue.json"
 OUTPUT = ROOT / "dashboard" / "data" / "short_alpha.json"
 BORROW = ROOT / "dashboard" / "data" / "short_alpha_borrow.json"
 CROWDING = ROOT / "_system" / "reference" / "market-data" / "ownership" / "biotech_short_interest.json"
+SCREEN = ROOT / "dashboard" / "data" / "short_quant_screen.json"
+SCREEN_ROWS = 25
 FUGAZI = ROOT / "_system" / "reference" / "activist-reports" / "short_scorecard" / "Fugazi_Research.csv"
 EXCLUDED_TICKERS = {"ECHX"}  # Managed in the ls-algo universe, not this book.
 REVIEWED_ON = "2026-10-07"
@@ -474,6 +476,33 @@ def _effective_frameworks(candidate: dict, hits: list[dict]) -> list[str]:
     return ordered
 
 
+def load_screen(path: Path = SCREEN) -> dict | None:
+    """The quant screen, or None when it has not been built on this checkout."""
+    if not path.exists():
+        return None
+    try:
+        return _read_json(path)
+    except LedgerError:
+        return None
+
+
+def _screen_payload(screen: dict | None, tracked: set[str]) -> dict | None:
+    """Top untracked screen rows plus the method, for the Shorts tab."""
+    if not screen:
+        return None
+    rows = [row for row in screen.get("rows") or [] if row.get("score") is not None and str(row.get("ticker")).upper() not in tracked]
+    rows.sort(key=lambda row: (-float(row["score"]), str(row["ticker"])))
+    methodology = screen.get("methodology") or {}
+    return {
+        "generated_at": screen.get("generated_at"),
+        "universe_count": screen.get("universe_count"),
+        "scored_count": screen.get("scored_count"),
+        "methodology": {key: methodology.get(key) for key in ("composite", "minimum_evidence", "reading")},
+        "signals": methodology.get("signals") or {},
+        "rows": rows[:SCREEN_ROWS],
+    }
+
+
 def build(
     positions: list | None = None,
     candidates: list | None = None,
@@ -481,6 +510,7 @@ def build(
     borrow_rows: dict | None = None,
     crowding_rows: dict | None = None,
     furnace_by_ticker: dict | None = None,
+    screen: dict | None = None,
 ) -> dict:
     position_doc = _read_json(POSITIONS) if positions is None else {"ideas": positions}
     candidate_doc = _read_json(CANDIDATES) if candidates is None else {"candidates": candidates, "as_of": REVIEWED_ON}
@@ -496,6 +526,13 @@ def build(
     crowding_rows = crowding_rows or {}
 
     by_candidate = {str(row["ticker"]).upper(): row for row in candidate_rows}
+    if screen is None:
+        screen = load_screen()
+    screen_by_ticker = {
+        str(row.get("ticker")).upper(): {key: value for key, value in row.items() if key not in {"company", "tracked"}}
+        for row in (screen or {}).get("rows") or []
+        if row.get("ticker")
+    }
     position_by_ticker = {
         str(row["ticker"]).upper(): row
         for row in position_rows
@@ -536,6 +573,7 @@ def build(
         else:
             candidate["crowding"] = None
         candidate["gate_hits"] = _gate_hits(borrow, candidate.get("crowding"), candidate.get("gates") or {})
+        candidate["quant"] = screen_by_ticker.get(ticker)
         position = position_by_ticker.get(ticker)
         candidate["has_position"] = position is not None
         if position is not None:
@@ -578,8 +616,9 @@ def build(
         if names == 0:
             unscored.append(framework_id)
 
+    quant_screen = _screen_payload(screen, set(by_candidate))
     return {
-        "schema_version": "1.1",
+        "schema_version": "1.2",
         "generated_at": date.today().isoformat(),
         "as_of": candidate_doc.get("as_of") or position_doc.get("as_of"),
         "currency": position_doc.get("currency", "USD"),
@@ -598,7 +637,9 @@ def build(
         "candidates": compiled_candidates,
         "positions": compiled_positions,
         "ideas": compiled_positions,
+        "quant_screen": quant_screen,
         "methodology": {
+            "quant": "The quant screen scores SEC fundamentals, the tape, crowding and insider sales against the lens catalog. A score is a reason to open a file, not a thesis.",
             "entry_price": "Opened price is adjusted by the cumulative split factor so it stays comparable to the current share basis.",
             "borrow": "Borrow is supplied by the IBKR refresh feed. Unavailable is not a zero rate.",
             "leads": "An activist-index hit, an always-review filing event, or a Fugazi scorecard row creates a lead. It does not create a position and does not overwrite a rejected, live, closed, or researching row.",

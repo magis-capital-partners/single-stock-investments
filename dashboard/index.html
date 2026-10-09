@@ -10,9 +10,9 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600;700&family=DM+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
 <link href="insights-events.css" rel="stylesheet">
-<link href="short-alpha.css" rel="stylesheet">
+<link href="short-alpha.css?v=20261008-quant-screen" rel="stylesheet">
 <link href="warrants.css" rel="stylesheet">
-<link href="portfolio.css?v=20260819-dashboard-rebuild" rel="stylesheet">
+<link href="portfolio.css?v=20261008-michael-tail" rel="stylesheet">
 <link href="ideas.css?v=20260819-decision-workspace" rel="stylesheet">
 <style>
   :root {
@@ -1359,10 +1359,7 @@
   }
   .holdings-view { display: flex; flex-direction: column; flex: 1; min-height: 0; }
   .holdings-view.hidden { display: none; }
-  .overlap-panel { margin: 0 16px 12px; padding: 12px 14px; border: 1px solid var(--line, #d7d2c8); border-radius: 8px; }
-  .overlap-scopes { display: flex; gap: 6px; flex-wrap: wrap; margin: 8px 0; }
-  .overlap-table { width: 100%; border-collapse: collapse; font-size: 13px; margin: 6px 0 14px; }
-  .overlap-table th, .overlap-table td { text-align: left; padding: 4px 8px 4px 0; vertical-align: top; }
+  .overlap-name-line { margin: 8px 0 0; color: var(--text-secondary); font-size: 13px; }
   .onboard-badge { font-size: 10px; margin-left: 6px; color: var(--accent-amber); }
   .total-return-panel .tr-grid {
     display: grid;
@@ -1462,6 +1459,9 @@
   .risk-card, .risk-method { min-width: 0; padding: 13px; border: 1px solid var(--border); background: rgba(10,14,23,.66); }
   .risk-card h3, .risk-method h3 { margin-bottom: 9px; color: var(--text-primary); font-size: 13px; letter-spacing: .55px; text-transform: uppercase; }
   .risk-card p, .risk-method p { margin-top: 7px; color: var(--text-secondary); font-size: 11px; line-height: 1.65; }
+  .risk-method summary, .risk-fold > summary { cursor: pointer; color: var(--text-muted); font-size: 11px; letter-spacing: .4px; text-transform: uppercase; }
+  .risk-fold { margin: 12px 0; padding: 10px 13px; border: 1px solid var(--border); background: rgba(10,14,23,.66); }
+  .risk-fold[open] > summary { margin-bottom: 10px; }
   .risk-history header { display: flex; justify-content: space-between; gap: 12px; }
   .risk-legend { display: flex; gap: 12px; font-size: 9px; text-transform: uppercase; }
   .risk-history-chart { display: block; width: 100%; height: 180px; }
@@ -1830,8 +1830,6 @@
     </details>
   </div>
 
-  <section class="overlap-panel" id="overlap-panel"></section>
-
   <div class="main detail-closed" id="main-grid">
     <div class="table-wrap">
       <table>
@@ -1961,15 +1959,15 @@
 <script src="technical-viz.js?v=20261001-signal-study"></script>
 <script src="technical-picture-viz.js?v=20261001-signal-study"></script>
 <script src="fico-watch-viz.js?v=20261006-fico-watch-2"></script>
-<script src="overlap-viz.js?v=20261007-overlap"></script>
+<script src="overlap-viz.js?v=20261008-overlap-line"></script>
 <script src="index-viz.js"></script>
 <script src="activist-viz.js?v=20260819-dashboard-rebuild"></script>
-<script src="short-alpha-viz.js?v=20261007-frameworks"></script>
+<script src="short-alpha-viz.js?v=20261008-quant-screen"></script>
 <script src="warrant-viz.js"></script>
 <script src="special-situations-viz.js?v=20261008-situations"></script>
-<script src="sleeve-viz.js"></script>
+<script src="sleeve-viz.js?v=20261008-michael-tail"></script>
 <script src="ui-format.js?v=20260819-currency"></script>
-<script src="portfolio-viz.js?v=20260819-dashboard-rebuild"></script>
+<script src="portfolio-viz.js?v=20261008-michael-tail"></script>
 <script src="oauth.js"></script>
 <script>
 const GH_REPO = 'magis-capital-partners/single-stock-investments';
@@ -3495,6 +3493,8 @@ async function load() {
   // state rather than taking the risk page down.
   try { data.vol_metrics = await fetchShardJson('data/vol_metrics_latest.json'); }
   catch (_) { data.vol_metrics = null; }
+  try { data.criticality_error_diagram = await fetchShardJson('data/criticality_error_diagram.json'); }
+  catch (_) { data.criticality_error_diagram = null; }
   // No row cap. fetchJsonlTail downloads the WHOLE file and then slices, so
   // the 250-row limit that used to sit here bought nothing: the 1.8MB transfer
   // happened either way and 1,278 of the 1,528 sessions were parsed off the
@@ -3515,18 +3515,18 @@ async function load() {
   try { data.fico_watch = await fetchShardJson('data/fico_watch.json'); }
   catch (_) { data.fico_watch = null; }
   try {
-    const [historyResponse, alertsResponse, healthResponse] = await Promise.all([
+    // No alerts fetch: the journal it fed was removed from the page, and the
+    // capitulation ladder already shows the live state it recorded.
+    const [historyResponse, healthResponse] = await Promise.all([
       fetch('/api/v1/market-risk/history?symbol=SPY&limit=250', { headers: { accept: 'application/json' } }),
-      fetch('/api/v1/market-risk/alerts?open=false&limit=100', { headers: { accept: 'application/json' } }),
       fetch('/api/v1/market-risk/health', { headers: { accept: 'application/json' } }),
     ]);
     data.market_risk_details = {
       history: historyResponse.ok ? await historyResponse.json() : { criticality: [], flow: [] },
-      alerts: alertsResponse.ok ? await alertsResponse.json() : { items: [] },
       health: healthResponse.ok ? await healthResponse.json() : { status: 'static_fallback' },
     };
   } catch (_) {
-    data.market_risk_details = { history: { criticality: [], flow: [] }, alerts: { items: [] }, health: { status: 'static_fallback' } };
+    data.market_risk_details = { history: { criticality: [], flow: [] }, health: { status: 'static_fallback' } };
   }
   void loadOperationalData();
   document.getElementById('meta-updated').textContent =
@@ -3579,6 +3579,7 @@ function renderMarketRiskView() {
     trackRecord: data.signal_track_record || null,
     capitulation: data.capitulation || null,
     volLatest: data.vol_metrics || null,
+    errorDiagram: data.criticality_error_diagram || null,
     payload: data.market_risk,
     details: data.market_risk_details || {},
   };
@@ -3591,7 +3592,7 @@ function renderMarketRiskView() {
       ? 'Committed market_risk_components.json fallback'
       : 'Market risk source unavailable');
   const riskClock = `<p class="tier-sub" style="margin:0 0 10px">${escapeHtml(riskOrigin)}. ${feedNotice('market-risk')} ${feedNotice('market-risk-components')}</p>`;
-  content.innerHTML = `${riskClock}${CriticalityViz.renderRegimeVerdict(riskOptions)}${renderMarketFearTape()}${CriticalityViz.renderRiskView(
+  content.innerHTML = `${riskClock}${CriticalityViz.renderRegimeVerdict(riskOptions)}${CriticalityViz.renderRiskView(
     data.market_risk,
     data.market_risk_details || {},
     riskOptions,
@@ -3787,7 +3788,6 @@ function setView(view, opts = {}) {
     if (active) link.setAttribute('aria-current', 'page'); else link.removeAttribute('aria-current');
   });
   document.getElementById('holdings-view').classList.toggle('hidden', view !== 'holdings');
-  if (view === 'holdings' && window.OverlapViz) OverlapViz.mount();
   document.getElementById('portfolio-panel')?.classList.toggle('active', view === 'portfolio');
   document.getElementById('spx-0dte-panel')?.classList.toggle('active', view === 'spx-0dte');
   document.getElementById('letf-panel')?.classList.toggle('active', view === 'letf');
@@ -5405,33 +5405,6 @@ async function submitCloudOnboard() {
   } catch (e) {
     status.textContent = `Dispatch failed: ${e.message}`;
   }
-}
-
-function renderMarketFearTape() {
-  const context = data?.technical_signals_ref?.market_context || {};
-  const internal = context.internal || {};
-  const cnn = context.cnn_reference || {
-    label: 'CNN Fear & Greed',
-    url: 'https://www.cnn.com/markets/fear-and-greed',
-  };
-  const panic = Number(internal.scores?.panic);
-  const meta = window.TechnicalViz
-    ? TechnicalViz.fearMeta(internal.state)
-    : { label: internal.state || 'awaiting refresh', cls: 'fear-normal', marker: '○' };
-  return `<div class="market-fear-tape">
-    <div>
-      <div class="market-fear-kicker">Market context · separate from stock scores</div>
-      <div class="market-fear-reading ${meta.cls}">
-        <strong>${Number.isFinite(panic) ? Math.round(panic) : '—'}</strong>
-        <span>${escapeHtml(meta.label)}</span>
-      </div>
-    </div>
-    <div class="market-fear-note">${escapeHtml(internal.interpretation || 'The next technical refresh will calculate a free SPY-based market fear reading.')} ${internal.as_of ? `As of ${escapeHtml(internal.as_of)}.` : ''}</div>
-    <div class="market-fear-links">
-      <span>Internal: SPY price tape</span>
-      <a href="${escapeHtml(cnn.url)}" target="_blank" rel="noopener">${escapeHtml(cnn.label)} ↗</a>
-    </div>
-  </div>`;
 }
 
 function renderSummary() {

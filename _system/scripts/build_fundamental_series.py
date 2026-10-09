@@ -144,11 +144,84 @@ def duration_days(start: str | None, end: str | None) -> int | None:
     return (d1 - d0).days
 
 
-def series_for_tag(gaap: dict, tag: str, *, is_flow: bool) -> dict[str, dict]:
-    """Extract one us-gaap tag into period -> point dict."""
+# Duration classes for flow facts, in days. Filers report Q1 as a quarter and
+# then six-, nine- and twelve-month cumulative figures, so Q2, Q3 and Q4 only
+# exist as differences between consecutive cumulative facts.
+DURATION_CLASSES = (("q", 70, 100), ("h", 160, 200), ("n", 250, 290), ("y", 340, 380))
+PRIOR_CLASS = {"h": "q", "n": "h", "y": "n"}
+# Per-share figures are not additive across periods (the share count moves),
+# so they are never derived by subtraction.
+NON_ADDITIVE_METRICS = {"eps_basic"}
+
+
+def _duration_class(days: int | None) -> str | None:
+    if days is None:
+        return None
+    for name, low, high in DURATION_CLASSES:
+        if low <= days <= high:
+            return name
+    return None
+
+
+def _one_quarter_before(end: str, candidates: dict[str, dict]) -> dict | None:
+    """The cumulative fact whose period ends about one quarter before ``end``."""
+    try:
+        anchor = datetime.strptime(end, "%Y-%m-%d")
+    except ValueError:
+        return None
+    best = None
+    best_gap = None
+    for period, point in candidates.items():
+        try:
+            gap = (anchor - datetime.strptime(period, "%Y-%m-%d")).days
+        except ValueError:
+            continue
+        if 75 <= gap <= 105 and (best_gap is None or abs(gap - 91) < abs(best_gap - 91)):
+            best, best_gap = point, gap
+    return best
+
+
+def derive_quarters(classes: dict[str, dict[str, dict]], *, additive: bool = True) -> dict[str, dict]:
+    """Quarterly points: reported quarters plus YTD differences for the rest.
+
+    Q2 = six-month minus Q1, Q3 = nine-month minus six-month, Q4 = annual
+    minus nine-month. A derived point carries ``derived: "ytd_difference"``
+    and the two filings it came from. A reported quarter always wins.
+    """
+    quarters = dict(classes.get("q") or {})
+    if not additive:
+        return quarters
+    for longer in ("h", "n", "y"):
+        for end, point in (classes.get(longer) or {}).items():
+            if end in quarters:
+                continue
+            prior = _one_quarter_before(end, classes.get(PRIOR_CLASS[longer]) or {})
+            if prior is None:
+                continue
+            quarters[end] = {
+                "period": end,
+                "value": float(point["value"]) - float(prior["value"]),
+                "fy": point.get("fy"),
+                "fp": point.get("fp"),
+                "form": point.get("form"),
+                "filed": max(str(point.get("filed") or ""), str(prior.get("filed") or "")),
+                "tag": point.get("tag"),
+                "derived": "ytd_difference",
+                "from_periods": [prior["period"], end],
+            }
+    return quarters
+
+
+def series_for_tag(gaap: dict, tag: str, *, is_flow: bool, additive: bool = True) -> dict[str, dict]:
+    """Extract one us-gaap tag into period -> point dict.
+
+    Balance metrics keep instant values. Flow metrics keep every duration
+    class and are reduced to quarters by ``derive_quarters``.
+    """
     node = gaap.get(tag)
     if not node:
         return {}
+    classes: dict[str, dict[str, dict]] = {name: {} for name, _, _ in DURATION_CLASSES}
     by_period: dict[str, dict] = {}
     for unit_vals in (node.get("units") or {}).values():
         for fact in unit_vals:
@@ -161,14 +234,16 @@ def series_for_tag(gaap: dict, tag: str, *, is_flow: bool) -> dict[str, dict]:
             val = fact.get("val")
             if val is None:
                 continue
+            bucket = by_period
             if is_flow:
-                days = duration_days(fact.get("start"), fact.get("end"))
-                if days is None or not (70 <= days <= 100):
+                klass = _duration_class(duration_days(fact.get("start"), fact.get("end")))
+                if klass is None:
                     continue
+                bucket = classes[klass]
             filed = str(fact.get("filed") or "")
-            prev = by_period.get(end)
+            prev = bucket.get(end)
             if prev is None or filed > prev["filed"]:
-                by_period[end] = {
+                bucket[end] = {
                     "period": end,
                     "value": float(val),
                     "fy": fact.get("fy"),
@@ -177,6 +252,8 @@ def series_for_tag(gaap: dict, tag: str, *, is_flow: bool) -> dict[str, dict]:
                     "filed": filed,
                     "tag": tag,
                 }
+    if is_flow:
+        return derive_quarters(classes, additive=additive)
     return by_period
 
 
@@ -194,7 +271,7 @@ def extract_metric_series(facts: dict, metric: str) -> list[dict]:
     best: dict[str, dict] = {}
     best_latest = ""
     for tag in METRIC_TAGS[metric]:
-        by_period = series_for_tag(gaap, tag, is_flow=is_flow)
+        by_period = series_for_tag(gaap, tag, is_flow=is_flow, additive=metric not in NON_ADDITIVE_METRICS)
         if not by_period:
             continue
         latest = max(by_period)

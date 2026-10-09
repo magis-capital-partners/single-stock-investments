@@ -257,6 +257,7 @@
 .ph-feed-state.stale { color: #f0b657; }
 .ph-feed-state.stale i { background: #f0b657; box-shadow: 0 0 0 3px rgba(240,182,87,.16); }
 
+.ph-holder-line { margin: 0 0 12px; color: var(--text-secondary, #b7c0ce); font-size: 14px; line-height: 1.45; }
 .tag-growth { margin: 0 0 16px; padding: 15px; border: 1px solid var(--border); background: #0d1422; }
 .tag-growth h3 { margin: 4px 0 8px; font-size: 16px; }
 .tag-kicker { margin: 0; color: #06b6d4; font: 600 11px/1 ui-monospace, monospace; letter-spacing: .06em; text-transform: uppercase; }
@@ -272,3 +273,26 @@
 .tag-growth th, .tag-growth td { padding: 6px 8px; border-bottom: 1px solid var(--border); text-align: left; }
 .tag-growth .num { text-align: right; font-family: ui-monospace, monospace; }
 @media (max-width: 800px) { .tag-grid { grid-template-columns: 1fr 1fr; } }
+
+/* Michael's holdings: weight share with a bar. */
+.ph-weight { display: inline-block; min-width: 46px; text-align: right; }
+.ph-weight-bar { display: inline-block; vertical-align: middle; width: 54px; height: 3px; margin-left: 8px; background: rgba(136,150,174,.18); border-radius: 99px; overflow: hidden; }
+.ph-weight-bar i { display: block; height: 100%; background: var(--accent-cyan, #06b6d4); border-radius: 99px; }
+.ph-weight-bar.ph-weight-short i { background: var(--accent-amber, #f59e0b); }
+
+/* One number, one clause, one comparison: the drag and tail panels. */
+.tag-growth { margin: 16px 0; }
+.tag-headline { display: grid; grid-template-columns: auto 1fr; gap: 10px 22px; align-items: start; margin: 8px 0 10px; }
+.tag-big strong { display: block; font: 700 34px/1 ui-monospace, monospace; letter-spacing: -.02em; }
+.tag-big span { display: block; margin-top: 6px; color: #687990; font: 600 10px/1 ui-monospace, monospace; letter-spacing: .05em; text-transform: uppercase; }
+.tag-lead { margin: 4px 0 6px; font-size: 15px; line-height: 1.4; }
+.tag-compare { margin: 0; color: var(--text-secondary, #b7c0ce); font-size: 13px; line-height: 1.45; }
+.tag-bar { display: block; width: 100%; max-width: 220px; height: 6px; background: rgba(136,150,174,.16); border-radius: 99px; overflow: hidden; }
+.tag-bar i { display: block; height: 100%; background: var(--accent-cyan, #06b6d4); border-radius: 99px; }
+.tag-bar-neg i { background: var(--accent-amber, #f59e0b); }
+.tag-bar-tail i { background: #ef6a6a; }
+.tag-bar-cell { width: 240px; }
+.tag-facts div { padding: 10px 12px; }
+.tag-facts small { display: block; margin-top: 6px; color: var(--text-muted, #8896ae); font-size: 11px; line-height: 1.4; }
+.tag-tail .tag-big strong { color: #ef6a6a; }
+@media (max-width: 800px) { .tag-headline { grid-template-columns: 1fr; } .tag-bar-cell { width: 120px; } }

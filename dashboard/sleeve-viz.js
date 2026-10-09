@@ -392,55 +392,78 @@
     return payload;
   }
 
-  function renderTimeAverage(panel) {
-    if (!panel) return '';
-    if (panel.error) {
-      return `<section class="tag-growth"><h3>Time-average growth of the current mix</h3><p class="tag-note">${esc(panel.error)}</p></section>`;
-    }
-    const head = panel.headline;
-    const note = panel.annotation || {};
-    const why = (note.reasons || []).map((reason) => ({
+  function reasonSentence(reason, head) {
+    return {
       hedged: 'The book is hedged, so there is no single scale.',
       low_coverage: 'Eligible stocks are under half of NAV.',
       short_window: head && head.sessions ? `The shared window is ${head.sessions} sessions, short of a full year.` : 'The shared window is short of a full year.',
       long_characteristic_time: 'The characteristic time is longer than three years.',
       zero_growth: 'Growth of the fully invested mix is about zero.',
       straddles: "The drift band straddles today's scale.",
-    }[reason] || reason)).join(' ');
-    const status = note.status === 'past_peak' ? 'past the peak' : (note.status === 'room' ? 'room' : 'unidentified');
-    const scale = note.show_scale && note.l_opt != null
-      ? `${status}. Peak scale ${Number(note.l_opt).toFixed(2)}×${note.upper_bound ? ', an upper bound' : ''}.`
-      : `${status}. ${why} Peak scale stays off this panel.`;
-    if (!head) {
-      return `<section class="tag-growth"><p class="tag-kicker">Michael's sleeve only</p><h3>Time-average growth of the current mix</h3><p class="tag-note">${esc(scale)}</p></section>`;
+      noah_concentration: 'Five sessions hold more than half of the squared daily moves.',
+    }[reason] || reason;
+  }
+  function capFirst(text) { return text ? text[0].toUpperCase() + text.slice(1) : ''; }
+  function points(value) {
+    const n = Number(value);
+    return Number.isFinite(n) ? (n * 100).toFixed(1) : '—';
+  }
+  function barCell(share, max, cls) {
+    const n = Number(share);
+    if (!Number.isFinite(n) || !(max > 0)) return '<span class="tag-bar"></span>';
+    const width = Math.max(1, Math.min(100, (Math.abs(n) / max) * 100));
+    return `<span class="tag-bar${n < 0 ? ' tag-bar-neg' : ''}${cls ? ` ${cls}` : ''}"><i style="width:${width.toFixed(1)}%"></i></span>`;
+  }
+  function omittedText(panel) {
+    return (panel.omitted || []).slice(0, 14).map((row) => `${esc(row.ticker)} (${esc(String(row.reason).replace(/_/g, ' '))})`).join(', ');
+  }
+
+  // One number: the Itô drag. One clause under it: the name doing the work.
+  // One comparison line. The reason the scale is withheld is the subtitle.
+  // Everything else lives in the closed lineage disclosure.
+  function renderTimeAverage(panel) {
+    if (!panel) return '';
+    const kicker = `<p class="tag-kicker">Time-average growth · Michael's sleeve · research</p>`;
+    if (panel.error) {
+      return `<section class="tag-growth">${kicker}<p class="tag-note">${esc(panel.error)}</p></section>`;
     }
+    const head = panel.headline;
+    const note = panel.annotation || {};
+    const status = note.status === 'past_peak' ? 'past the peak' : (note.status === 'room' ? 'room' : 'unidentified');
+    const why = (note.reasons || []).map((reason) => reasonSentence(reason, head)).join(' ');
+    const subtitle = note.show_scale && note.l_opt != null
+      ? `${capFirst(status)}. Peak scale ${Number(note.l_opt).toFixed(2)}×${note.upper_bound ? ', an upper bound' : ''}.`
+      : `${capFirst(status)}. ${why}`;
+    if (!head) {
+      return `<section class="tag-growth">${kicker}<h3>Itô drag</h3><p class="tag-note">${esc(subtitle)} No shared window yet.</p></section>`;
+    }
+    const names = panel.names || [];
+    const top = names.find((row) => row.drag_points != null);
+    const lead = top ? `${esc(top.ticker)} is ${points(top.drag_points)} of those ${points(head.ito_drag)} points.` : '';
     const gap = head.empirical_gap;
     const drag = head.ito_drag;
     const disagree = Number.isFinite(gap) && Number.isFinite(drag) && Math.abs(gap - drag) > Math.max(0.005, Math.abs(drag) * 0.25);
+    const compare = `Empirical growth ${pctPlain(head.empirical_growth)} · average of many paths ${pctPlain(head.empirical_ensemble)}.${disagree ? ` The gap between them, ${pctPlain(gap)}, is not the drag. Both are shown.` : ''}`;
     const line = panel.lineage || {};
-    const omitted = (panel.omitted || []).slice(0, 12).map((row) => `${esc(row.ticker)} (${esc(row.reason)})`).join(', ');
-    const rows = (panel.names || []).map((row) => {
+    const maxShare = Math.max(...names.map((row) => Math.abs(Number(row.drag_share) || 0)), 0.01);
+    const rows = names.map((row) => {
       const label = row.show_scale && row.l_opt != null
         ? `${row.status === 'past_peak' ? 'past the peak' : 'room'} · ${Number(row.l_opt).toFixed(2)}×${row.upper_bound ? ' upper bound' : ''}`
         : 'unidentified';
-      return `<tr><td>${esc(row.ticker)}</td><td class="num">${pct(row.weight, 1).replace('+', '')}</td><td class="num">${pctPlain(row.drag)}</td><td class="num">${pctPlain(row.growth)}</td><td>${esc(label)}</td></tr>`;
+      return `<tr><td>${esc(row.ticker)}</td><td class="num">${pct(row.weight, 1).replace('+', '')}</td><td class="tag-bar-cell">${barCell(row.drag_share, maxShare)}</td><td class="num">${row.drag_points == null ? '—' : points(row.drag_points)}</td>${note.show_scale ? `<td>${esc(label)}</td>` : ''}</tr>`;
     }).join('');
     return `<section class="tag-growth">
-      <p class="tag-kicker">Michael's sleeve only · research</p>
-      <h3>Time-average growth of the current mix</h3>
-      <p class="tag-note">This is a daily-rebalanced hypothetical of today's stock weights. It is not the account value above it.</p>
-      <div class="tag-grid">
-        <div><span>Itô drag</span><strong>${pctPlain(head.ito_drag)}</strong></div>
-        <div><span>Empirical growth</span><strong>${pctPlain(head.empirical_growth)}</strong></div>
-        <div><span>Average of many paths</span><strong>${pctPlain(head.empirical_ensemble)}</strong></div>
-        <div><span>Empirical gap</span><strong>${pctPlain(gap)}</strong></div>
+      ${kicker}
+      <div class="tag-headline">
+        <div class="tag-big"><strong>${pctPlain(head.ito_drag)}</strong><span>Itô drag</span></div>
+        <div><p class="tag-lead">${lead}</p><p class="tag-compare">${compare}</p></div>
       </div>
-      <p class="tag-note">${esc(scale)} Net stock weight ${pctPlain(head.l_now, 1)}. Gross ${pctPlain(head.gross, 1)}. Eligible coverage ${pctPlain(head.coverage, 1)}.${disagree ? ' The empirical gap and the Itô drag disagree. Both are shown.' : ''}</p>
+      <p class="tag-note">${esc(subtitle)}</p>
+      <div class="tag-table-wrap"><table><thead><tr><th>Name</th><th class="num">Weight</th><th>Share of the drag</th><th class="num">Points</th>${note.show_scale ? '<th>Status</th>' : ''}</tr></thead><tbody>${rows}</tbody></table></div>
       <details>
         <summary>Lineage</summary>
-        <p class="tag-note">${esc(line.paper || '')}. Equations ${esc((line.equations || []).join(', '))}. ${esc(line.riskless_series || 'DGS3MO')} as of ${esc(line.riskless_as_of || '—')}. Window ${esc(line.window_start || '—')} to ${esc(line.window_end || '—')} (${line.sessions || 0} sessions). ${esc(line.cash_earns || '')}${omitted ? ` Left out: ${omitted}.` : ''}</p>
+        <p class="tag-note">${esc(line.paper || '')}. Equations ${esc((line.equations || []).join(', '))}. A daily-rebalanced hypothetical of today's stock weights, not the account value above it. ${esc(line.riskless_series || 'DGS3MO')} as of ${esc(line.riskless_as_of || '—')}. Window ${esc(line.window_start || '—')} to ${esc(line.window_end || '—')} (${line.sessions || 0} sessions). Net stock weight ${pctPlain(head.l_now, 1)}, gross ${pctPlain(head.gross, 1)}, eligible coverage ${pctPlain(head.coverage, 1)}. ${esc(line.cash_earns || '')}${omittedText(panel) ? ` Left out: ${omittedText(panel)}.` : ''}</p>
       </details>
-      <div class="tag-table-wrap"><table><thead><tr><th>Name</th><th class="num">Weight</th><th class="num">Itô drag</th><th class="num">Growth</th><th>Status</th></tr></thead><tbody>${rows}</tbody></table></div>
     </section>`;
   }
 
@@ -450,5 +473,64 @@
     return `${(n * 100).toFixed(digits == null ? 1 : digits)}%`;
   }
 
-  global.SleeveViz = { render, attach, load, renderTimeAverage };
+  // Fat tails on the same mix. The headline is the year in twenty when the
+  // book's own days are replayed; the Gaussian and a fitted Student t sit
+  // beside it so the reader sees what the bell curve would have said.
+  function renderTailRisk(panel) {
+    if (!panel) return '';
+    const kicker = `<p class="tag-kicker">Tail risk · same mix · research</p>`;
+    if (panel.error) {
+      return `<section class="tag-growth tag-tail">${kicker}<p class="tag-note">${esc(panel.error)}</p></section>`;
+    }
+    const book = panel.book;
+    const sim = panel.simulation;
+    const win = panel.window || {};
+    if (!book || !sim) {
+      const reason = panel.reason === 'short_window'
+        ? `The shared window is ${win.sessions || 0} sessions. Sixty is the floor.`
+        : 'No eligible stock has a full year of history in the parameter file.';
+      return `<section class="tag-growth tag-tail">${kicker}<h3>Fat tails</h3><p class="tag-note">${esc(reason)}${omittedText(panel) ? ` Left out: ${omittedText(panel)}.` : ''}</p></section>`;
+    }
+    const boot = sim.models.bootstrap;
+    const gauss = sim.models.gaussian;
+    const stud = sim.models.student;
+    const hill = book.hill_left;
+    const conc = panel.concentration || {};
+    const names = panel.names || [];
+    const maxHit = Math.max(...names.map((row) => Math.abs(Number(row.book_hit_worst_day) || 0)), 0.001);
+    const rows = names.map((row) => `<tr>
+      <td>${esc(row.ticker)}</td>
+      <td class="num">${pct(row.weight, 1).replace('+', '')}</td>
+      <td class="num">${pctPlain(row.worst_day && row.worst_day.r)}</td>
+      <td class="tag-bar-cell">${barCell(row.book_hit_worst_day, maxHit, 'tag-bar-tail')}</td>
+      <td class="num">${pctPlain(row.book_hit_worst_day)}</td>
+      <td class="num">${row.hill_left ? `${Number(row.hill_left.alpha).toFixed(1)}` : '—'}</td>
+      <td class="num">${row.excess_kurtosis == null ? '—' : Number(row.excess_kurtosis).toFixed(1)}</td>
+    </tr>`).join('');
+    const lead = `Replaying the book's own days in blocks, one year in twenty ends ${pctPlain(boot.terminal.p05)} or worse. A Gaussian with the same volatility says ${pctPlain(gauss.terminal.p05)}; a Student t with tail ${Number(sim.student_nu).toFixed(1)} says ${pctPlain(stud.terminal.p05)}.`;
+    const dd = (model, level) => pctPlain(model.drawdown_probability && model.drawdown_probability[String(level)], 0);
+    const line = panel.lineage || {};
+    return `<section class="tag-growth tag-tail">
+      ${kicker}
+      <div class="tag-headline">
+        <div class="tag-big"><strong>${pctPlain(boot.terminal.p05)}</strong><span>Worst year in twenty · replayed days</span></div>
+        <div><p class="tag-lead">${lead}</p>
+        <p class="tag-compare">Median year ${pctPlain(boot.terminal.p50)} at the bill. Mean of the worst 5% of years ${pctPlain(boot.terminal.expected_shortfall_05)}.</p></div>
+      </div>
+      <div class="tag-grid tag-facts">
+        <div><span>Tail exponent</span><strong>${hill ? `${Number(hill.alpha).toFixed(1)} ± ${Number(hill.se).toFixed(1)}` : '—'}</strong><small>${hill ? `${hill.k} loss days. ${esc(hill.reading || '')}` : 'Too few loss days.'}</small></div>
+        <div><span>Noah share</span><strong>${pctPlain(book.noah_share, 0)}</strong><small>${book.noah_days} days hold this much of the squared moves. The largest single day holds ${pctPlain(book.max_to_sum, 0)}.</small></div>
+        <div><span>Excess kurtosis</span><strong>${book.excess_kurtosis == null ? '—' : Number(book.excess_kurtosis).toFixed(1)}</strong><small>Daily log returns. A Gaussian sits at 0.</small></div>
+        <div><span>30% drawdown within a year</span><strong>${dd(boot, 0.3)}</strong><small>Replayed days. Gaussian ${dd(gauss, 0.3)}, Student t ${dd(stud, 0.3)}.</small></div>
+      </div>
+      <p class="tag-note">${conc.ticker ? `${esc(conc.ticker)} is ${pctPlain(conc.weight, 1)} of the book. Halved, it takes ${pctPlain(conc.book_hit_if_halved, 1)} of NAV. Its worst day in the window, ${pctPlain(conc.worst_day && conc.worst_day.r)} on ${esc((conc.worst_day && conc.worst_day.date) || '—')}, is ${pctPlain(conc.book_hit_worst_day)} of the book. ` : ''}Worst day of the mix ${pctPlain(book.worst_day && book.worst_day.r)} on ${esc((book.worst_day && book.worst_day.date) || '—')}; deepest drawdown ${pctPlain(book.max_drawdown)}; realized volatility ${pctPlain(book.annual_sigma)} over ${win.sessions || 0} sessions.</p>
+      <div class="tag-table-wrap"><table><thead><tr><th>Name</th><th class="num">Weight</th><th class="num">Worst day</th><th>Hit to the book</th><th class="num">Hit</th><th class="num">Tail α</th><th class="num">Kurtosis</th></tr></thead><tbody>${rows}</tbody></table></div>
+      <details>
+        <summary>Lineage</summary>
+        <p class="tag-note">${(line.sources || []).map((source) => esc(source)).join(' ')} ${esc(line.drift || '')} ${esc(line.hedged_note || '')} ${sim.paths} paths of ${sim.horizon} sessions, stationary block bootstrap with mean block ${sim.block_mean_length}, seed ${sim.seed}. Student t degrees of freedom ${Number(sim.student_nu).toFixed(2)} from ${esc(String(sim.student_nu_source).replace(/_/g, ' '))}. Window ${esc(win.start || '—')} to ${esc(win.end || '—')} (${win.sessions || 0} sessions), eligible coverage ${pctPlain(win.coverage, 1)}.${omittedText(panel) ? ` Left out: ${omittedText(panel)}.` : ''}</p>
+      </details>
+    </section>`;
+  }
+
+  global.SleeveViz = { render, attach, load, renderTimeAverage, renderTailRisk };
 })(window);

@@ -246,3 +246,27 @@
 .short-name-detail { margin-top: 10px; padding: 12px; border: 1px solid var(--border); border-radius: 8px; background: var(--bg-card); }
 .short-name-detail h3 { margin: 0 0 6px; font-size: 14px; }
 .short-name-detail > p { margin: 0 0 10px; color: var(--text-secondary); font-size: 12px; }
+
+/* Quant screen: score badge, three small bars, signal list. */
+.short-score { display: inline-block; min-width: 30px; padding: 2px 6px; border-radius: 4px; font: 700 11px 'JetBrains Mono', monospace; text-align: center; background: var(--bg-card-hover); color: var(--text-muted); }
+.short-score.is-high { background: var(--short-copper-soft); color: var(--short-copper); }
+.short-score.is-mid { color: var(--text-primary); }
+.short-score.is-empty { opacity: .55; }
+.short-mini-bars { display: inline-flex; flex-direction: column; gap: 2px; width: 90px; vertical-align: middle; }
+.short-mini-bars i { display: block; height: 3px; border-radius: 99px; background: var(--short-copper); }
+.short-mini-bars i.is-tape { background: var(--accent-cyan, #06b6d4); }
+.short-mini-bars i.is-risk { background: var(--accent-amber, #f59e0b); }
+.short-screen td:nth-child(6) { max-width: 240px; font-size: 11px; color: var(--text-secondary); }
+.short-track { padding: 3px 8px; border: 1px solid var(--border); border-radius: 4px; background: transparent; color: var(--text-secondary); font: 600 10px 'JetBrains Mono', monospace; cursor: pointer; }
+.short-track:hover { border-color: var(--short-copper); color: var(--short-copper); }
+.short-quant-card { grid-column: 1 / -1; }
+.short-quant-head { margin: 0 0 8px; color: var(--text-secondary); font-size: 12px; }
+.short-quant-groups { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 12px; }
+.short-quant-groups h5 { margin: 0 0 6px; color: var(--text-muted); font: 600 10px 'JetBrains Mono', monospace; text-transform: uppercase; }
+.short-signal-list { list-style: none; margin: 0; padding: 0; }
+.short-signal-list li { display: grid; grid-template-columns: 1fr; gap: 2px; padding: 5px 0; border-top: 1px solid var(--border); font-size: 11px; }
+.short-signal-list li b { font-weight: 600; text-transform: capitalize; }
+.short-signal-list li i { display: block; height: 3px; max-width: 160px; border-radius: 99px; background: var(--text-muted); }
+.short-signal-list li.is-hot i { background: var(--short-copper); }
+.short-signal-list li span { color: var(--text-secondary); }
+.short-signal-list li small { color: var(--text-muted); font-size: 10px; }
