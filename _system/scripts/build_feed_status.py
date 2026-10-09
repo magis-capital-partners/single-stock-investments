@@ -168,11 +168,21 @@ SURFACES: list[dict] = [
     },
     {
         "id": "warrants",
-        "label": "Contracts",
-        "hash": "#/ideas/warrants",
+        "label": "Warrant contracts",
+        "hash": "#/ideas/situations/warrants",
         "lane": "data-pipeline-warrant-discover",
         "kind": "file",
         "data_feed": "warrant_monitor",
+    },
+    {
+        "id": "special-situations",
+        "label": "Special Situations",
+        "hash": "#/ideas/situations",
+        "lane": "data-pipeline-intake-full",
+        "kind": "file",
+        "path": "dashboard/data/special_situations.json",
+        "stamp_fields": ["generated_at"],
+        "healer": "python _system/scripts/build_special_situations.py",
     },
     {
         "id": "nol",

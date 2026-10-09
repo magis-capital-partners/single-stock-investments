@@ -504,6 +504,7 @@
 
     return `<div class="index-watch-panel" data-show-style="${showStyleSubset ? '1' : '0'}">
       <p class="muted" style="margin-bottom:8px">${escapeHtml(caption)}</p>
+      <p class="muted" style="margin-bottom:8px"><a href="#/ideas/situations/forced-sellers">Index deletes and dividend cuts sit with the other forced sellers.</a></p>
       <p style="margin-bottom:8px">${stats}</p>
       <h3 style="margin:12px 0 4px;font-size:13px;text-transform:uppercase;letter-spacing:0.04em;color:var(--text-secondary)">Reconstitution calendar</h3>
       ${renderCalendarStrip(calendar, escapeHtml)}
