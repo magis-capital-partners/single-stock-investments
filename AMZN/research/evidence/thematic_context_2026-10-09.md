@@ -5,20 +5,20 @@
 | Indicator | Latest | As of | YoY | Direction | In base IRR? |
 |-----------|--------|-------|-----|-----------|--------------|
 | Hyperscaler capex guide (USD bn, latest) | 467.3 | 2026-10-09 | n/a | flat | no (context) |
-| Henry Hub natural gas spot (USD/MMBtu) | 3.2179999351501465 | 2026-10-09 | -1.6% | down | no (context) |
+| Henry Hub natural gas spot (USD/MMBtu) | 3.2039999961853027 | 2026-10-09 | -2.0% | down | no (context) |
 | US avg electricity price (cents/kWh) | 0.196 (stale) | 2026-08-01 | +3.2% | up | no (context) |
-| WTI crude (USD/bbl) | 91.8499984741211 | 2026-10-09 | +49.3% | up | no (context) |
+| WTI crude (USD/bbl) | 91.66000366210938 | 2026-10-09 | +49.0% | up | no (context) |
 | Permian crude / oil-gas activity proxy | 107.1306 (stale) | 2026-08-01 | +9.2% | up | no (context) |
 | TPL water segment revenue (USD m, FY) | 307.5 | 2026-06-01 | n/a | flat | no (context) |
-| US Treasury 10Y yield (%) | 5.252999782562256 | 2026-10-09 | +26.6% | up | no (context) |
-| US Treasury 2Y yield (%) | 5.0279998779296875 | 2026-10-09 | +34.4% | up | no (context) |
-| High-yield OAS credit spread (%) | 0.11 | 2026-10-09 | +83.3% | up | no (context) |
-| High-yield OAS credit spread (%) | 0.11 | 2026-10-09 | +83.3% | up | no (context) |
-| US Treasury 10Y yield (%) | 5.252999782562256 | 2026-10-09 | +26.6% | up | no (context) |
-| US Treasury 2Y yield (%) | 5.0279998779296875 | 2026-10-09 | +34.4% | up | no (context) |
-| Trade-weighted USD index (broad) | 102.24500274658203 | 2026-10-09 | +2.7% | up | no (context) |
-| VIX index level | 14.829999923706055 | 2026-10-09 | -9.7% | down | no (context) |
-| HYG vs TLT 1-month return spread (%) | 1.82 | 2026-10-09 | +1720.0% | up | no (context) |
+| US Treasury 10Y yield (%) | 5.24399995803833 | 2026-10-09 | +26.4% | up | no (context) |
+| US Treasury 2Y yield (%) | 5.020999908447266 | 2026-10-09 | +34.2% | up | no (context) |
+| High-yield OAS credit spread (%) | 0.1 | 2026-10-09 | +66.7% | up | no (context) |
+| High-yield OAS credit spread (%) | 0.1 | 2026-10-09 | +66.7% | up | no (context) |
+| US Treasury 10Y yield (%) | 5.24399995803833 | 2026-10-09 | +26.4% | up | no (context) |
+| US Treasury 2Y yield (%) | 5.020999908447266 | 2026-10-09 | +34.2% | up | no (context) |
+| Trade-weighted USD index (broad) | 102.23100280761719 | 2026-10-09 | +2.7% | up | no (context) |
+| VIX index level | 14.84000015258789 | 2026-10-09 | -9.7% | down | no (context) |
+| HYG vs TLT 1-month return spread (%) | 1.7 | 2026-10-09 | +1600.0% | up | no (context) |
 | SPY 20-day realized vol (annualized %) | 9.81 | 2026-10-09 | +65.2% | up | no (context) |
 | AGI expert-horizon years ahead (public quotes) | 5.0 | 2026-06-01 | +0.0% | flat | no (context) |
 | Robotaxi expert-horizon years ahead (public quotes) | 2.0 | 2026-06-01 | +0.0% | flat | no (context) |

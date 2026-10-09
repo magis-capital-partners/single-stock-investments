@@ -3,8 +3,8 @@
 **Work ID:** `019de6b6bba30e2236e36604`  
 **Task:** `author_forecast` for `cycle_reserve`  
 **Draft:** `AMZN/research/falsifier_drafts/019de6b6bba30e2236e36604.json`  
-**Evidence hash:** `8c6f057cb634ec474e26dffff3a613b3d0a7f97554458e5b537e4e24f34bf5cf` <!-- pragma: allowlist secret -->  
-**Input SHA:** `dd3a8f3c977262a314e1f50703a7981b7917ce00` <!-- pragma: allowlist secret -->
+**Evidence hash:** `2b355985cfe9bcbae053fa16abeeb0eadbda9eed5330a4cec52f99313b609132` <!-- pragma: allowlist secret -->  
+**Input SHA:** `400490464c74935044ba4aeb2198b1bfc4759bfb` <!-- pragma: allowlist secret -->
 
 ## Epistemic loop status
 
