@@ -41,13 +41,13 @@ No approved third-party research sources are in `_system/frameworks/third_party_
 
 | Lens | Owner cash / value | Return / horizon | Stance hint |
 |------|-------------------|------------------|-------------|
-| Marvin floor | **$0.80/sh** owner cash; component base ~**$20.98/sh** at prior price stub | Lawrence base **30.6%** per year (7-year model); contract legacy audit ~**9.9%** at **$10.82** | watch |
+| Marvin floor | **$0.80/sh** owner cash; component base ~**$21/sh** | Synthesis **30.1%** per year (7-year model); contract **evidence_blocked** | watch |
 | External (combined) | — | — | — |
-| **Blended best estimate** | **$0.80/sh** owner cash | **30.6%** Lawrence base (no approved external inputs) | **watch** |
+| **Blended best estimate** | **$0.80/sh** owner cash | **30.1%** synthesis base (no approved external inputs) | **watch** |
 
 **Weights:** 100% Marvin primary.
 
-**Returns statement (blended):** With no approved third-party inputs, the blended best estimate equals Marvin Lawrence base **30.6%** per year over seven years at the modeled price, subject to moat and owner-cash verification **[HUMAN REVIEW]**.
+**Returns statement (blended):** With no approved third-party inputs, the blended best estimate equals Marvin synthesis **30.1%** per year over seven years at the modeled price, subject to moat and owner-cash verification **[HUMAN REVIEW]**.
 
 ## [HUMAN REVIEW]
 
