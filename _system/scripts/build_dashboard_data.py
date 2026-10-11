@@ -3783,8 +3783,17 @@ def main() -> None:
         )
     # Same prior, shard-reconstructed when the monolith is absent.
     payload = merge_sparse_payload(payload, {"tickers": list(prior_by_ticker.values())})
-    OUTPUT.write_text(json.dumps(payload, separators=(",", ":")), encoding="utf-8")
     write_oauth_config()
+    from build_dashboard_shards import release_standalone_embeds, write_shards
+
+    # Shards and core refs are built from the full objects. The monolith then
+    # drops those objects: they already live in their own files, and keeping
+    # them here is what pushed dashboard_data.json over GitHub's 100MB limit.
+    write_shards(payload, insights_doc, DATA_DIR)
+    released = release_standalone_embeds(payload)
+    if released:
+        print(f"Left standalone embeds out of the monolith: {', '.join(released)}")
+    OUTPUT.write_text(json.dumps(payload, separators=(",", ":")), encoding="utf-8")
     print(f"Wrote {OUTPUT} ({payload['summary']['ticker_count']} tickers)")
     if UNRESOLVED_UNITS:
         # Not fatal: these render as bare numbers, which is honest. It is still a
@@ -3796,9 +3805,6 @@ def main() -> None:
         )
         for ticker, reason in sorted(UNRESOLVED_UNITS.items())[:20]:
             print(f"  {ticker}: {reason}", file=sys.stderr)
-    from build_dashboard_shards import write_shards
-
-    write_shards(payload, insights_doc, DATA_DIR)
     from build_feed_status import write_feed_status
 
     write_feed_status()
