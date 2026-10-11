@@ -198,13 +198,13 @@ Synced from `_system/portfolio/registry.json`. Last sync: 2026-10-11.
 | CRDO | CRDO/ | CRDO | US | 2026-10-07 | 2026-10-11 | unknown | watch |
 | CRH | CRH/ | CRH plc | US | 2026-10-07 | 2026-10-11 | unknown | watch |
 | CRL | CRL/ | Charles River Laboratories | US | 2026-10-07 | 2026-10-11 | unknown | watch |
-| CRM | CRM/ | Salesforce | US | 2026-10-07 | 2026-10-11 | unknown | watch |
-| CRML | CRML/ | CRML | US | 2026-07-18 | 2026-10-11 | unknown | watch |
-| CRUS | CRUS/ | CRUS | US | 2026-07-29 | 2026-10-11 | unknown | watch |
-| CRWD | CRWD/ | CrowdStrike | US | 2026-07-29 | 2026-10-11 | unknown | watch |
-| CRWV | CRWV/ | CoreWeave, Inc. | US | 2026-07-18 | 2026-10-11 | unknown | watch |
-| CSCO | CSCO/ | Cisco | US | 2026-07-29 | 2026-10-11 | unknown | watch |
-| CSGP | CSGP/ | CoStar Group | US | 2026-07-09 | 2026-10-11 | platform | watch |
+| CRM | CRM/ | Salesforce | US | 2026-10-11 | 2026-10-11 | unknown | watch |
+| CRML | CRML/ | CRML | US | 2026-10-11 | 2026-10-11 | unknown | watch |
+| CRUS | CRUS/ | CRUS | US | 2026-10-11 | 2026-10-11 | unknown | watch |
+| CRWD | CRWD/ | CrowdStrike | US | 2026-10-11 | 2026-10-11 | unknown | watch |
+| CRWV | CRWV/ | CoreWeave, Inc. | US | 2026-10-11 | 2026-10-11 | unknown | watch |
+| CSCO | CSCO/ | Cisco | US | 2026-10-11 | 2026-10-11 | unknown | watch |
+| CSGP | CSGP/ | CoStar Group | US | 2026-10-11 | 2026-10-11 | platform | watch |
 | CSU | CSU/ | Constellation Software | CA | 2026-07-09 | 2026-10-11 | compounder | core |
 | CSU.DB | CSU.DB/ | Constellation Software Inc. (Series 1 Debentures) | CA | — | 2026-10-11 | unknown | watch |
 | CSX | CSX/ | CSX Corporation | US | 2026-07-29 | 2026-10-11 | unknown | watch |
