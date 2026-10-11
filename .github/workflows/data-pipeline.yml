@@ -115,11 +115,18 @@ jobs:
           sparse-checkout-cone-mode: false
           fetch-depth: 1
       - name: Checkout workspace (full)
+        id: checkout_full
         run: bash _system/scripts/ci_checkout_workspace.sh full
       - uses: actions/setup-python@v5
         with:
           python-version: "3.12"
       - name: Nightly intake-full rebuild
+        id: intake_rebuild
+        # The loud step below still fails the job. continue-on-error only lets
+        # a named source failure commit the steps that finished before
+        # dashboard assembly. A validation failure (dashboard_written=true)
+        # is not committed.
+        continue-on-error: true
         uses: ./.github/actions/rebuild-data
         env:
           OAUTH_CLIENT_ID: ${{ vars.OAUTH_CLIENT_ID }}
@@ -129,9 +136,29 @@ jobs:
           profile: full
           validate: "true"
       - name: Commit artifacts
+        if: steps.checkout_full.outcome == 'success' && steps.intake_rebuild.outcome == 'success'
         uses: ./.github/actions/commit-main
         with:
           message: "chore: nightly intake-full $(date -u +%Y-%m-%d)"
+      - name: Commit partial progress
+        if: steps.checkout_full.outcome == 'success' && steps.intake_rebuild.outcome == 'failure' && steps.intake_rebuild.outputs.dashboard_written != 'true'
+        uses: ./.github/actions/commit-main
+        with:
+          message: "chore: intake-full partial progress after ${{ steps.intake_rebuild.outputs.failed_source }} failed"
+      - name: Report intake-full failure
+        if: steps.intake_rebuild.outcome == 'failure'
+        run: |
+          set -euo pipefail
+          SOURCE="${{ steps.intake_rebuild.outputs.failed_source }}"
+          WRITTEN="${{ steps.intake_rebuild.outputs.dashboard_written }}"
+          if [ -n "$SOURCE" ]; then
+            echo "::error::Nightly intake-full failed on source ${SOURCE}. Earlier steps were committed when dashboard assembly had not started."
+          elif [ "$WRITTEN" = "true" ]; then
+            echo "::error::Nightly intake-full failed during dashboard validation. The rebuilt dashboard was not committed. See the Validate dashboard JSON step."
+          else
+            echo "::error::Nightly intake-full failed before dashboard assembly, and no source name was recorded. See the rebuild log. Nothing new was committed."
+          fi
+          exit 1
 
   technicals:
     needs: decide

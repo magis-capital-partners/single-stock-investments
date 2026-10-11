@@ -198,7 +198,10 @@ jobs:
     needs: resolve-pr
     if: needs.resolve-pr.outputs.eligible == 'true' && needs.resolve-pr.outputs.lane == 'research'
     runs-on: ubuntu-latest
-    timeout-minutes: 55
+    # One full Research quality window, plus one rerun when the latest run
+    # was cancelled (superseded, or a job timeout reported as cancelled).
+    # AMZN PR #1144, run 37996092550, 2026-10-09.
+    timeout-minutes: 200
     concurrency:
       # Do not cancel. A pull_request run and the workflow_run retry share this
       # group; cancelling the first left PR #1022 green on Research quality
@@ -323,8 +326,10 @@ jobs:
             --repo "$REPO" \
             --sha "${{ steps.head.outputs.sha }}" \
             --workflow "Research quality" \
-            --timeout-seconds 2700 \
-            --poll-seconds 15
+            --timeout-seconds 5400 \
+            --poll-seconds 15 \
+            --rerun-on-cancelled \
+            --pr "$PR"
 
       - name: Hand the gated SHA to the merge job
         id: validated
@@ -348,7 +353,9 @@ jobs:
     needs: resolve-pr
     if: needs.resolve-pr.outputs.eligible == 'true' && needs.resolve-pr.outputs.lane == 'code'
     runs-on: ubuntu-latest
-    timeout-minutes: 55
+    # fact-ledger-currency may spend most of its 90 minutes in a full checkout.
+    # 55 minutes was ending the gate while that check was still running.
+    timeout-minutes: 130
     concurrency:
       group: agent-automerge-gate-${{ needs.resolve-pr.outputs.number }}
       cancel-in-progress: false
@@ -373,7 +380,7 @@ jobs:
           set -euo pipefail
           # Jobs belonging to this workflow must not gate themselves.
           OWN='^(resolve-pr|gate|code-gate|merge|notify|Resolve PR number and eligibility)$'
-          DEADLINE=$(( $(date +%s) + 2700 ))
+          DEADLINE=$(( $(date +%s) + 7200 ))
           # Checks take a minute or two to register. Until this grace period is
           # up, "zero checks" means "not reported yet"; after it, it means the
           # repo's path filters genuinely select nothing for this change (a
@@ -394,18 +401,48 @@ jobs:
               echo "Head moved from $SHA to ${STATE#* }; the new head is gated by its own run."
               exit 0
             fi
-            RUNS=$(gh api --paginate "repos/$REPO/commits/$SHA/check-runs" --jq '.check_runs[] | [.name, .status, (.conclusion // "pending")] | @tsv')
-            TOTAL=0; PENDING=0; FAILED=""
-            while IFS=$'	' read -r NAME STATUS CONCLUSION; do
-              [ -z "$NAME" ] && continue
+            RUNS=$(gh api --paginate "repos/$REPO/commits/$SHA/check-runs" --jq '.check_runs[] | [.name, .status, (.conclusion // "pending"), (.started_at // ""), (.id|tostring)] | @tsv')
+            # Latest run of each check name. An older cancelled run (superseded
+            # by cancel-in-progress, or a job timeout GitHub reports as
+            # cancelled) must not fail the merge while a newer run is in
+            # progress or has passed. A cancelled latest run is waited on, not
+            # failed immediately. A real failure still fails immediately.
+            # An empty associative array is "unbound" under set -u, and the
+            # first polls often have zero checks. Track names in an indexed array.
+            CHECK_NAMES=()
+            unset LATEST_KEY LATEST_STATUS LATEST_CONCLUSION
+            declare -A LATEST_KEY LATEST_STATUS LATEST_CONCLUSION
+            while IFS=$'	' read -r NAME STATUS CONCLUSION STARTED ID; do
+              [ -z "${NAME:-}" ] && continue
               if echo "$NAME" | grep -qE "$OWN"; then continue; fi
-              TOTAL=$((TOTAL+1))
-              if [ "$STATUS" != "completed" ]; then PENDING=$((PENDING+1)); continue; fi
-              case "$CONCLUSION" in
-                success|neutral|skipped) ;;
-                *) FAILED="$FAILED $NAME($CONCLUSION)" ;;
-              esac
+              KEY=$(printf '%s|%020d' "$STARTED" "${ID:-0}")
+              if [ -z "${LATEST_KEY[$NAME]+x}" ]; then
+                CHECK_NAMES+=("$NAME")
+              fi
+              PREV="${LATEST_KEY[$NAME]:-}"
+              if [ -z "$PREV" ] || [[ "$KEY" > "$PREV" ]]; then
+                LATEST_KEY[$NAME]="$KEY"
+                LATEST_STATUS[$NAME]="$STATUS"
+                LATEST_CONCLUSION[$NAME]="$CONCLUSION"
+              fi
             done <<< "$RUNS"
+            TOTAL=0; PENDING=0; FAILED=""; CANCELLED=""
+            if [ "${#CHECK_NAMES[@]}" -gt 0 ]; then
+              for NAME in "${CHECK_NAMES[@]}"; do
+                TOTAL=$((TOTAL+1))
+                STATUS="${LATEST_STATUS[$NAME]}"
+                CONCLUSION="${LATEST_CONCLUSION[$NAME]}"
+                if [ "$STATUS" != "completed" ]; then PENDING=$((PENDING+1)); continue; fi
+                case "$CONCLUSION" in
+                  success|neutral|skipped) ;;
+                  cancelled)
+                    CANCELLED="$CANCELLED $NAME"
+                    PENDING=$((PENDING+1))
+                    ;;
+                  *) FAILED="$FAILED $NAME($CONCLUSION)" ;;
+                esac
+              done
+            fi
             if [ -n "$FAILED" ]; then
               echo "::error::PR #$PR blocked: failing checks:$FAILED"
               exit 1
@@ -421,7 +458,11 @@ jobs:
               exit 0
             fi
             if [ "$(date +%s)" -ge "$DEADLINE" ]; then
-              echo "::error::PR #$PR blocked: checks still pending after 45m (total=$TOTAL pending=$PENDING)."
+              if [ -n "$CANCELLED" ]; then
+                echo "::error::PR #$PR blocked: latest check run still cancelled after 120m:$CANCELLED. A superseded run is re-checked against this SHA; no passing successor arrived."
+              else
+                echo "::error::PR #$PR blocked: checks still pending after 120m (total=$TOTAL pending=$PENDING)."
+              fi
               exit 1
             fi
             echo "checks total=$TOTAL pending=$PENDING — waiting..."

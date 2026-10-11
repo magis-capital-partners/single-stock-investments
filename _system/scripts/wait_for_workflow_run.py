@@ -80,16 +80,40 @@ def list_workflow_runs(repo: str, workflow: str, sha: str, token: str) -> list[d
     ]
 
 
+def _run_sort_key(run: dict[str, Any]) -> tuple:
+    return (
+        str(run.get("created_at") or ""),
+        str(run.get("updated_at") or ""),
+        int(run.get("run_number") or 0),
+        int(run.get("id") or 0),
+    )
+
+
+def newest_run(runs: list[dict[str, Any]]) -> dict[str, Any]:
+    """Newest by created_at. The list API is newest-first, but a merged
+    head_sha query plus a title search is not."""
+    return max(runs, key=_run_sort_key)
+
+
 def evaluate_runs(
     runs: list[dict[str, Any]],
     *,
     allow_skipped: bool,
 ) -> str:
-    """Return 'success', 'failure', 'pending', or 'absent'."""
+    """Return 'success', 'failure', 'pending', 'superseded', or 'absent'.
+
+    A cancelled run is not a failed test. Research quality cancels the older
+    run when a newer one for the same PR starts, and a job that hits its
+    timeout is also reported as cancelled (AMZN PR #1144, run 37996092550,
+    fact-ledger checkout, 2026-10-09). The caller waits for or starts the
+    current run. A real failure still fails immediately.
+    """
     if not runs:
         return "absent"
-    # Prefer the newest run (API returns newest first).
-    run = runs[0]
+    # Judge the latest run only. An older cancelled run must not hide a newer
+    # in-progress or successful one, and an older success must not excuse a
+    # newer failure.
+    run = newest_run(runs)
     status = (run.get("status") or "").lower()
     conclusion = (run.get("conclusion") or "").lower()
     if status != "completed":
@@ -98,9 +122,39 @@ def evaluate_runs(
         return "success"
     if allow_skipped and conclusion in TERMINAL_SKIP:
         return "success"
+    if conclusion == "cancelled":
+        return "superseded"
     if conclusion in TERMINAL_FAIL or conclusion in TERMINAL_SKIP:
         return "failure"
     return "pending"
+
+
+def dispatch_research_quality(repo: str, sha: str, pr: str, token: str) -> None:
+    """Start Research quality for this PR commit.
+
+    repository_dispatch runs the workflow file on the default branch and checks
+    out the sha in the payload. GITHUB_TOKEN may start this event. It may not
+    start a pull_request run.
+    """
+    body = json.dumps(
+        {
+            "event_type": "research-quality-pr",
+            "client_payload": {"pr": pr, "sha": sha},
+        }
+    )
+    env = os.environ.copy()
+    env["GH_TOKEN"] = token
+    env["GITHUB_TOKEN"] = token
+    proc = subprocess.run(
+        ["gh", "api", "--method", "POST", f"repos/{repo}/dispatches", "--input", "-"],
+        input=body,
+        capture_output=True,
+        text=True,
+        env=env,
+        check=False,
+    )
+    if proc.returncode != 0:
+        raise RuntimeError((proc.stderr or proc.stdout or "dispatch failed").strip())
 
 
 def wait_for_workflow(
@@ -115,24 +169,70 @@ def wait_for_workflow(
     sleep_fn=time.sleep,
     now_fn=time.time,
     list_fn=list_workflow_runs,
+    rerun_fn=None,
+    max_reruns: int = 1,
 ) -> int:
     deadline = now_fn() + timeout_seconds
     last_state = "absent"
+    ignored: set[Any] = set()
+    # An older success must not excuse a newer cancelled run. Once the latest
+    # run is cancelled, only a run started after it counts.
+    floor: tuple | None = None
+    reruns = 0
     while now_fn() < deadline:
         runs = list_fn(repo, workflow, sha, token)
-        state = evaluate_runs(runs, allow_skipped=allow_skipped)
+        fresh = [
+            run for run in runs
+            if run.get("id") not in ignored
+            and (floor is None or _run_sort_key(run) > floor)
+        ]
+        state = evaluate_runs(fresh, allow_skipped=allow_skipped)
         last_state = state
         if state == "success":
             print(f"OK: workflow '{workflow}' on {sha[:12]} concluded successfully.")
             return 0
         if state == "failure":
-            run = runs[0]
+            run = newest_run(fresh)
             print(
                 f"FAIL: workflow '{workflow}' on {sha[:12]} concluded "
                 f"{run.get('conclusion')} ({run.get('html_url')})",
                 file=sys.stderr,
             )
             return 1
+        if state == "superseded":
+            run = newest_run(fresh)
+            floor = _run_sort_key(run)
+            ignored.add(run.get("id"))
+            url = run.get("html_url") or run.get("id")
+            if rerun_fn is not None and reruns < max_reruns:
+                reruns += 1
+                # The cancelled run already used the clock (AMZN PR #1144
+                # waited out a 30-minute checkout, then the job was cancelled).
+                # The fresh check gets one full window. max_reruns bounds it.
+                deadline = now_fn() + timeout_seconds
+                print(
+                    f"workflow '{workflow}' on {sha[:12]} was cancelled "
+                    f"({url}). Waiting for the latest run on this commit, "
+                    f"and starting a fresh check (rerun {reruns}/{max_reruns})."
+                )
+                try:
+                    rerun_fn()
+                except RuntimeError as exc:
+                    print(f"::warning::could not start a fresh check: {exc}", file=sys.stderr)
+            elif rerun_fn is not None:
+                print(
+                    f"FAIL: workflow '{workflow}' on {sha[:12]} was cancelled "
+                    f"again after {reruns} fresh check(s) ({url})",
+                    file=sys.stderr,
+                )
+                return 1
+            else:
+                print(
+                    f"workflow '{workflow}' on {sha[:12]} was cancelled ({url}). "
+                    "Waiting for a newer run on this commit."
+                )
+            sleep_fn(poll_seconds)
+            continue
         print(f"waiting: workflow '{workflow}' on {sha[:12]} state={state}")
         sleep_fn(poll_seconds)
     print(
@@ -156,6 +256,12 @@ def main(argv: list[str] | None = None) -> int:
         help="Treat skipped/neutral conclusions as success",
     )
     parser.add_argument(
+        "--rerun-on-cancelled",
+        action="store_true",
+        help="If the latest run for this SHA was cancelled, dispatch a fresh Research quality run and wait for it",
+    )
+    parser.add_argument("--pr", default="", help="PR number, required with --rerun-on-cancelled")
+    parser.add_argument(
         "--token",
         default=os.environ.get("GH_TOKEN") or os.environ.get("GITHUB_TOKEN") or "",
     )
@@ -163,6 +269,13 @@ def main(argv: list[str] | None = None) -> int:
     if not args.token:
         print("FAIL: GH_TOKEN / GITHUB_TOKEN required", file=sys.stderr)
         return 2
+    if args.rerun_on_cancelled and not args.pr:
+        print("FAIL: --pr is required with --rerun-on-cancelled", file=sys.stderr)
+        return 2
+    rerun_fn = None
+    if args.rerun_on_cancelled:
+        def rerun_fn() -> None:
+            dispatch_research_quality(args.repo, args.sha, args.pr, args.token)
     try:
         return wait_for_workflow(
             repo=args.repo,
@@ -172,6 +285,7 @@ def main(argv: list[str] | None = None) -> int:
             timeout_seconds=args.timeout_seconds,
             poll_seconds=args.poll_seconds,
             allow_skipped=args.allow_skipped,
+            rerun_fn=rerun_fn,
         )
     except RuntimeError as exc:
         print(f"FAIL: {exc}", file=sys.stderr)
