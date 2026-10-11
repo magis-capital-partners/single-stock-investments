@@ -2,10 +2,13 @@
 """Unit tests for wait_for_workflow_run (no live GitHub calls)."""
 from __future__ import annotations
 
+import sys
 import unittest
+from pathlib import Path
 from unittest.mock import patch
 
-import wait_for_workflow_run as wait
+sys.path.insert(0, str(Path(__file__).resolve().parent))
+import wait_for_workflow_run as wait  # noqa: E402
 
 
 class EvaluateRunsTests(unittest.TestCase):
@@ -28,6 +31,20 @@ class EvaluateRunsTests(unittest.TestCase):
         runs = [{"status": "completed", "conclusion": "skipped"}]
         self.assertEqual(wait.evaluate_runs(runs, allow_skipped=False), "failure")
         self.assertEqual(wait.evaluate_runs(runs, allow_skipped=True), "success")
+
+    def test_a_newer_cancel_is_superseded_and_an_older_success_does_not_count(self):
+        runs = [
+            {"id": 1, "status": "completed", "conclusion": "success", "created_at": "2026-10-09T20:00:00Z"},
+            {"id": 2, "status": "completed", "conclusion": "cancelled", "created_at": "2026-10-09T21:00:00Z"},
+        ]
+        self.assertEqual(wait.evaluate_runs(runs, allow_skipped=False), "superseded")
+
+    def test_a_newer_success_beats_an_older_cancel(self):
+        runs = [
+            {"id": 1, "status": "completed", "conclusion": "cancelled", "created_at": "2026-10-09T20:00:00Z"},
+            {"id": 2, "status": "completed", "conclusion": "success", "created_at": "2026-10-09T21:00:00Z"},
+        ]
+        self.assertEqual(wait.evaluate_runs(runs, allow_skipped=False), "success")
 
 
 class WaitLoopTests(unittest.TestCase):
@@ -106,6 +123,122 @@ class WaitLoopTests(unittest.TestCase):
                 list_fn=lambda *_a, **_k: [],
             )
         self.assertEqual(rc, 1)
+
+
+def _clock():
+    clock = {"t": 0.0}
+
+    def now():
+        return clock["t"]
+
+    def sleep(seconds):
+        clock["t"] += seconds
+
+    return now, sleep
+
+
+class CancelledRunTests(unittest.TestCase):
+    def test_one_rerun_then_the_newer_run_must_succeed(self):
+        cancelled = {
+            "id": 1, "status": "completed", "conclusion": "cancelled",
+            "created_at": "2026-10-09T21:53:00Z", "html_url": "u1",
+        }
+        pending = {
+            "id": 2, "status": "in_progress", "conclusion": None,
+            "created_at": "2026-10-09T22:24:00Z", "html_url": "u2",
+        }
+        success = {
+            "id": 2, "status": "completed", "conclusion": "success",
+            "created_at": "2026-10-09T22:24:00Z", "html_url": "u2",
+        }
+        states = [[cancelled], [cancelled], [pending], [success]]
+        calls: list[str] = []
+        now, sleep = _clock()
+
+        rc = wait.wait_for_workflow(
+            repo="o/r", workflow="Research quality", sha="abc123456789", token="t",
+            timeout_seconds=60, poll_seconds=5, allow_skipped=False,
+            sleep_fn=sleep, now_fn=now, list_fn=lambda *_a, **_k: states.pop(0),
+            rerun_fn=lambda: calls.append("rerun"),
+        )
+        self.assertEqual(rc, 0)
+        self.assertEqual(calls, ["rerun"])
+
+    def test_a_real_failure_does_not_rerun(self):
+        runs = [{
+            "id": 1, "status": "completed", "conclusion": "failure",
+            "html_url": "u", "created_at": "2026-10-09T21:00:00Z",
+        }]
+        calls: list[str] = []
+        rc = wait.wait_for_workflow(
+            repo="o/r", workflow="Research quality", sha="abc123456789", token="t",
+            timeout_seconds=60, poll_seconds=5, allow_skipped=False,
+            sleep_fn=lambda _s: None, now_fn=lambda: 0.0,
+            list_fn=lambda *_a, **_k: runs,
+            rerun_fn=lambda: calls.append("rerun"),
+        )
+        self.assertEqual(rc, 1)
+        self.assertEqual(calls, [])
+
+    def test_a_second_cancel_after_the_rerun_fails(self):
+        first = {
+            "id": 1, "status": "completed", "conclusion": "cancelled",
+            "created_at": "2026-10-09T21:00:00Z", "html_url": "u1",
+        }
+        second = {
+            "id": 2, "status": "completed", "conclusion": "cancelled",
+            "created_at": "2026-10-09T22:00:00Z", "html_url": "u2",
+        }
+        states = [[first], [second]]
+        calls: list[str] = []
+        now, sleep = _clock()
+        rc = wait.wait_for_workflow(
+            repo="o/r", workflow="Research quality", sha="abc123456789", token="t",
+            timeout_seconds=60, poll_seconds=5, allow_skipped=False,
+            sleep_fn=sleep, now_fn=now, list_fn=lambda *_a, **_k: states.pop(0),
+            rerun_fn=lambda: calls.append("rerun"),
+        )
+        self.assertEqual(rc, 1)
+        self.assertEqual(calls, ["rerun"])
+
+    def test_an_older_success_does_not_excuse_a_newer_cancel(self):
+        older = {
+            "id": 1, "status": "completed", "conclusion": "success",
+            "created_at": "2026-10-09T20:00:00Z",
+        }
+        newer = {
+            "id": 2, "status": "completed", "conclusion": "cancelled",
+            "created_at": "2026-10-09T21:00:00Z", "html_url": "u",
+        }
+        calls: list[str] = []
+        now, sleep = _clock()
+        rc = wait.wait_for_workflow(
+            repo="o/r", workflow="Research quality", sha="abc123456789", token="t",
+            timeout_seconds=10, poll_seconds=5, allow_skipped=False,
+            sleep_fn=sleep, now_fn=now,
+            list_fn=lambda *_a, **_k: [older, newer],
+            rerun_fn=lambda: calls.append("rerun"),
+        )
+        self.assertEqual(rc, 1)
+        self.assertEqual(calls, ["rerun"])
+
+    def test_without_a_rerun_hook_a_later_success_still_counts(self):
+        old = {
+            "id": 1, "status": "completed", "conclusion": "cancelled",
+            "created_at": "2026-10-09T21:00:00Z", "html_url": "u",
+        }
+        new = {
+            "id": 2, "status": "completed", "conclusion": "success",
+            "created_at": "2026-10-09T22:00:00Z",
+        }
+        states = [[old], [new]]
+        now, sleep = _clock()
+        rc = wait.wait_for_workflow(
+            repo="o/r", workflow="Research quality", sha="abc123456789", token="t",
+            timeout_seconds=60, poll_seconds=5, allow_skipped=False,
+            sleep_fn=sleep, now_fn=now, list_fn=lambda *_a, **_k: states.pop(0),
+        )
+        self.assertEqual(rc, 0)
 
 
 class DispatchTitleTests(unittest.TestCase):

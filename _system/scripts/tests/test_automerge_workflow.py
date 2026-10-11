@@ -135,7 +135,13 @@ def test_provenance_is_read_at_the_pinned_sha_not_the_branch_name():
     assert "steps.head.outputs.sha" in provenance["env"]["SHA"]
     wait = step(gate, "Wait for Research quality")
     assert "steps.head.outputs.sha" in wait["run"]
+    assert "--rerun-on-cancelled" in wait["run"]
+    assert '--pr "$PR"' in wait["run"]
     assert "steps.validated.outputs.sha" in gate["outputs"]["head_sha"]
+    code = step(load()["jobs"]["code-gate"], "Wait for every check")["run"]
+    assert "cancelled)" in code
+    assert "latest check run still cancelled" in code
+    assert '*) FAILED="$FAILED $NAME($CONCLUSION)"' in code
 
 
 def test_pr_state_is_rechecked_before_every_side_effect():
