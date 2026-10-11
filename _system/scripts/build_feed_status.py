@@ -26,6 +26,7 @@ FEED_LANES = {
     "vol_metrics": "data-pipeline-technicals",
     "spx_surface": "data-pipeline-technicals",
     "warrant_monitor": "data-pipeline-warrant-discover",
+    "separations": "data-pipeline-separation-discover",
     "market_risk_components_committed": "market-risk",
     "podcast_catalog": "podcasts",
     "capitulation_daily": "data-pipeline-technicals",
@@ -173,6 +174,14 @@ SURFACES: list[dict] = [
         "lane": "data-pipeline-warrant-discover",
         "kind": "file",
         "data_feed": "warrant_monitor",
+    },
+    {
+        "id": "separations",
+        "label": "Separations",
+        "hash": "#/ideas/situations/split-offs",
+        "lane": "data-pipeline-separation-discover",
+        "kind": "file",
+        "data_feed": "separations",
     },
     {
         "id": "special-situations",

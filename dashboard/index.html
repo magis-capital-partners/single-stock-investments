@@ -13,7 +13,7 @@
 <link href="short-alpha.css?v=20261008-quant-screen" rel="stylesheet">
 <link href="warrants.css" rel="stylesheet">
 <link href="portfolio.css?v=20261008-michael-tail" rel="stylesheet">
-<link href="ideas.css?v=20260819-decision-workspace" rel="stylesheet">
+<link href="ideas.css?v=20261011-separations" rel="stylesheet">
 <style>
   :root {
     --bg-primary: #0a0e17;
@@ -1977,7 +1977,8 @@
 <script src="activist-viz.js?v=20260819-dashboard-rebuild"></script>
 <script src="short-alpha-viz.js?v=20261008-quant-screen"></script>
 <script src="warrant-viz.js"></script>
-<script src="special-situations-viz.js?v=20261008-situations"></script>
+<script src="special-situations-viz.js?v=20261011-separations"></script>
+<script src="separations-viz.js?v=20261011-separations"></script>
 <script src="sleeve-viz.js?v=20261008-michael-tail"></script>
 <script src="ui-format.js?v=20260819-currency"></script>
 <script src="portfolio-viz.js?v=20261008-michael-tail"></script>
@@ -2275,6 +2276,7 @@ const WATCHLIST_VIEW_KEY = 'ssp_watchlist_view_v1';
 const WATCHLIST_VIEWS = new Set(['all', 'queue', 'nol', 'banks', 'rock']);
 const SITUATION_LANE_IDS = {
   spinoffs: 'spinoffs',
+  'split-offs': 'split_offs',
   mergers: 'mergers',
   warrants: 'warrants',
   restructurings: 'restructurings',
@@ -2283,6 +2285,7 @@ const SITUATION_LANE_IDS = {
 const SITUATION_LANE_SLUG = {
   all: '',
   spinoffs: 'spinoffs',
+  split_offs: 'split-offs',
   mergers: 'mergers',
   warrants: 'warrants',
   restructurings: 'restructurings',
@@ -2367,7 +2370,7 @@ function parseRouteFromHashString(hash) {
   if (/^#\/(?:ideas\/)?warrants$/i.test(hash || '')) {
     return { view: 'situations', ticker: null, watchlistSub: null, situationLane: 'warrants', situationFocus: '', situationGatesOpen: true };
   }
-  const situationsMatch = /^#\/ideas\/situations(?:\/(spinoffs|mergers|warrants|restructurings|forced-sellers))?(?:\/([^/?#]+))?$/i.exec(hash || '');
+  const situationsMatch = /^#\/ideas\/situations(?:\/(spinoffs|split-offs|mergers|warrants|restructurings|forced-sellers))?(?:\/([^/?#]+))?$/i.exec(hash || '');
   if (situationsMatch) {
     const slug = (situationsMatch[1] || '').toLowerCase();
     return {
@@ -3678,9 +3681,27 @@ async function loadSituations() {
         situationData = { rows: [], discovery: [], history: [], lanes: [], error: error.message };
         return situationData;
       })
+      .then(value => loadSeparations().then((separations) => {
+        if (separations && typeof separations === 'object') {
+          value.separations = separations;
+          if (!value.caption && separations.caption) value.caption = separations.caption;
+        }
+        return value;
+      }))
       .finally(() => { situationPromise = null; });
   }
   return situationPromise;
+}
+
+// `dashboard/data/separations.json` (schema: _system/data/separations/README.md,
+// "Dashboard payload"). Optional: the desk rows already carry their spread and
+// flow via special_situations.json, so a missing or malformed file is an empty
+// state, never an error. Resolves to null when absent.
+function loadSeparations() {
+  return fetch('data/separations.json?' + Date.now())
+    .then(response => (response.ok ? response.json() : null))
+    .then(doc => (doc && typeof doc === 'object' && !Array.isArray(doc) && Array.isArray(doc.rows) ? doc : null))
+    .catch(() => null);
 }
 
 function renderSituations() {
@@ -5674,7 +5695,7 @@ function filtered() {
 function renderHoldingsCell(colId, t) {
   switch (colId) {
     case 'ticker':
-      return `<td class="mono ticker-cell">${escapeHtml(t.display_ticker || t.ticker)}${t.quote_ticker && t.quote_ticker !== (t.display_ticker || t.ticker) ? `<span class="irr-sub" title="Quote symbol"> ${escapeHtml(t.quote_ticker)}</span>` : ''}${t.equity_model?.ready ? ` <span class="badge badge-ok" title="Earnings model ${t.equity_model.production_spec || 'v5'} ready">M</span>` : ''}${t.onboard?.phase && t.onboard.phase !== 'complete' ? `<span class="onboard-badge">${t.onboard.phase}</span>` : ''}<button type="button" class="sleeve-jump" data-sleeve-jump="drew" data-ticker="${escapeHtml(t.ticker)}" title="Note on Drew tab">D</button><button type="button" class="sleeve-jump" data-sleeve-jump="michael" data-ticker="${escapeHtml(t.ticker)}" title="Note on Michael tab">M</button></td>`;
+      return `<td class="mono ticker-cell">${escapeHtml(t.display_ticker || t.ticker)}${t.quote_ticker && t.quote_ticker !== (t.display_ticker || t.ticker) ? `<span class="irr-sub" title="Quote symbol"> ${escapeHtml(t.quote_ticker)}</span>` : ''}${t.equity_model?.ready ? ` <span class="badge badge-ok" title="Earnings model ${t.equity_model.production_spec || 'v5'} ready">M</span>` : ''}${t.onboard?.phase && t.onboard.phase !== 'complete' ? `<span class="onboard-badge">${t.onboard.phase}</span>` : ''}${window.SeparationsViz && t.separation?.odd_lot?.eligible_owners?.length ? ` ${SeparationsViz.renderOddLotBadge(t.separation, { escapeHtml })}` : ''}<button type="button" class="sleeve-jump" data-sleeve-jump="drew" data-ticker="${escapeHtml(t.ticker)}" title="Note on Drew tab">D</button><button type="button" class="sleeve-jump" data-sleeve-jump="michael" data-ticker="${escapeHtml(t.ticker)}" title="Note on Michael tab">M</button></td>`;
     case 'company':
       return `<td class="company-cell" title="${escapeHtml(t.company)}">${escapeHtml(t.company)}</td>`;
     case 'market':
@@ -6116,6 +6137,7 @@ function selectTicker(ticker, opts = {}) {
     ${lensChips || ''}
     ${renderFundNavPanel(t)}
     ${renderCvrPanel(t)}
+    ${window.SeparationsViz && t.separation ? SeparationsViz.renderTickerCard(t.separation, { escapeHtml }) : ''}
 
     ${renderValuationWorkbench(t)}
     ${window.ValuationViz ? ValuationViz.renderPropertiesPanel(t, valuationHelpers()) : ''}

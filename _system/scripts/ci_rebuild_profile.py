@@ -276,6 +276,14 @@ def expand_steps(steps: list[list[str]]) -> list[list[str]]:
             # series (BKSY.W) fail intake-full, drive and world-model for 13
             # days (2026-09-10..22).
             out.append(["_system/scripts/check_warrant_universe.py", "--warn-only"])
+            # Separations: the register is append-only and owned by the
+            # separation-discover job (Monday, strict check). This lane only
+            # re-models flows and rebuilds dashboard/data/separations.json,
+            # which the Special Situations desk reads, so the check is
+            # warn-only here for the same reason as the warrant check above.
+            out.append(["_system/scripts/build_separation_flows.py"])
+            out.append(["_system/scripts/build_separations_dashboard.py"])
+            out.append(["_system/scripts/check_separation_universe.py", "--warn-only"])
             out.append(["_system/scripts/build_special_situations.py"])
         out.append(step)
     return out

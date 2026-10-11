@@ -145,8 +145,40 @@ def load_recon_watch() -> dict[str, list[dict]]:
     return by
 
 
-def report_tier_boost(rows: list[dict] | None) -> tuple[float, str | None]:
-    """Return (priority boost 0..0.25, best tier label)."""
+RECON_WATCH_GRACE_DAYS = 14
+
+
+def recon_watch_row_is_live(row: dict, today: date | None, grace_days: int = RECON_WATCH_GRACE_DAYS) -> bool:
+    """A recon-report row stops acting once its effective date is more than
+    ``grace_days`` in the past. Rows without an effective date, or calls without
+    ``today``, cannot expire and stay live."""
+    if today is None:
+        return True
+    eff = parse_date(row.get("effective"))
+    if eff is None:
+        return True
+    return (today - eff).days <= grace_days
+
+
+def live_recon_watch_rows(
+    rows: list[dict] | None, today: date | None, grace_days: int = RECON_WATCH_GRACE_DAYS
+) -> list[dict]:
+    return [r for r in (rows or []) if recon_watch_row_is_live(r, today, grace_days)]
+
+
+def report_tier_boost(
+    rows: list[dict] | None,
+    today: date | None = None,
+    *,
+    grace_days: int = RECON_WATCH_GRACE_DAYS,
+) -> tuple[float, str | None]:
+    """Return (priority boost 0..0.25, best tier label) over the *live* rows.
+
+    A row whose ``effective`` date is more than ``grace_days`` in the past
+    contributes nothing; when no row is live the result is ``(0.0, None)``.
+    Without ``today`` every row counts (legacy behaviour).
+    """
+    rows = live_recon_watch_rows(rows, today, grace_days)
     if not rows:
         return 0.0, None
     order = {"announced": 0.25, "provisional": 0.18, "rumor": 0.08}
@@ -1305,7 +1337,26 @@ def priority_score(
     return round(score, 4), round(shock, 3) if shock is not None else None
 
 
-def next_calendar_for_indices(calendar: dict, index_ids: list[str], today: date) -> dict | None:
+def next_calendar_for_indices(
+    calendar: dict,
+    index_ids: list[str],
+    today: date,
+    prefer_indices: list[str] | None = None,
+) -> dict | None:
+    """Next calendar event for a ticker.
+
+    When ``prefer_indices`` is given (the index of the ticker's watch
+    scorecard), the event is the next one for *those* indices; the
+    all-``index_ids`` search is only the fallback when none is scheduled.
+    """
+    if prefer_indices:
+        preferred = _next_calendar_event(calendar, list(prefer_indices), today)
+        if preferred is not None:
+            return preferred
+    return _next_calendar_event(calendar, index_ids, today)
+
+
+def _next_calendar_event(calendar: dict, index_ids: list[str], today: date) -> dict | None:
     best = None
     best_days = None
     for ev in calendar.get("events") or []:
@@ -1513,6 +1564,9 @@ def build_for_ticker(
                 continue
             sc["report_tier"] = tier
             sc["report_source"] = rw.get("source_url") or rw.get("source")
+            if not recon_watch_row_is_live(rw, today):
+                # Past its effective date: keep the annotation, stop steering status.
+                continue
             if tier in {"announced", "provisional"} and sc.get("status") in {
                 "n_a",
                 "banding_hold",
@@ -1568,10 +1622,6 @@ def build_for_ticker(
                 if conf == "provider_confirmed" or sc.get("confidence") != "provider_confirmed":
                     sc["confidence"] = conf
 
-    index_ids = [sc["index"] for sc in scorecards if sc.get("index") != "_security"]
-    next_ev = next_calendar_for_indices(calendar, index_ids, today)
-    days_out = next_ev.get("days_out") if next_ev else None
-
     watch_sc = None
     for pref_st in (
         "deletion_risk",
@@ -1585,6 +1635,16 @@ def build_for_ticker(
                 break
         if watch_sc:
             break
+
+    # The calendar event shown is the next one for the WATCH index (the
+    # scorecard the badge/probability come from); only a ticker with no watch
+    # scorecard falls back to the soonest event across all its indices.
+    index_ids = [sc["index"] for sc in scorecards if sc.get("index") != "_security"]
+    watch_index = watch_sc.get("index") if watch_sc else None
+    prefer = [watch_index] if watch_index and watch_index != "_security" else None
+    next_ev = next_calendar_for_indices(calendar, index_ids, today, prefer_indices=prefer)
+    days_out = next_ev.get("days_out") if next_ev else None
+
     if watch_sc is None and scorecards:
         watch_sc = scorecards[0]
     # inclusion_probability_band treats committee/banding as candidate-like
@@ -1614,7 +1674,8 @@ def build_for_ticker(
                 sc["status"] = "deletion_risk"
                 sc["gating_check"] = sc.get("gating_check") or "corporate_action_news"
 
-    boost, report_tier = report_tier_boost(rw_rows)
+    # Expired recon rows (effective > RECON_WATCH_GRACE_DAYS ago) stop boosting.
+    boost, report_tier = report_tier_boost(rw_rows, today)
     # Priority score recomputed after float_impact attach in build(); fallback here.
     pscore, shock = priority_score(
         scorecards, mi, days_out, rules, confirmed_soon, report_boost=boost

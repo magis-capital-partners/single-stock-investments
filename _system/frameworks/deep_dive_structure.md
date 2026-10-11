@@ -31,14 +31,14 @@
 |---|---------|----------|
 | 1 | Header links | date, prior dive, `valuation.json`, evidence digest, third-party index, **`adversarial_{date}.md` (Milly, required)** |
 | 2 | **What this business is** | ≤5 sentences — **company overview starts here** |
-| 3 | **Why the market might be wrong** | Q5 in prose — predictive attribute; inefficiency; catalyst when `asset`/`event` |
+| 3 | **Why the market might be wrong** | Q5 in prose — predictive attribute; inefficiency; catalyst when `asset`/`event`. When `valuation.json` has a `separation` block: `#### Who must sell` table (seller class, shares or % float, window, source, confidence; `special_situation_lens.md` § Separations; lint error if absent) |
 | 4 | **Executive summary** | 120–180 words; **one** base IRR % — **no formulas** |
 | 5 | **Primary sources reviewed** | Inventory table only (10-K, 10-Q, IR, approved/pending third party) |
 | 6 | **Business & moat** | Stahl, mental models, Hohn mechanics — **no IRR, no valuation tables** |
 | 7 | **Approved Substack** | Only if ticker in `approved_substacks.md` |
 | 8 | **Blended estimate** | Only if approved/pending external view cited |
 | 9 | **Payoff & return** | Gates, dhando, stance — **points to Valuation & IRR** |
-| 10 | **Risks & inversion** | Primary risk + ≤3 bullets + **lens failure mode** if non-`operating` payoff lens |
+| 10 | **Risks & inversion** | Primary risk + ≤3 bullets + **lens failure mode** if non-`operating` payoff lens. When `separation` is set, the lens failure mode names a separation mode: orphan window mistaken for value; forced seller already done; stub re-rated on the parent's old multiple |
 | 11 | **Valuation & IRR (assumption ledger)** | **End of analysis** — ledger + segment build (if any) + IRR arithmetic + **current book estimate** when `book_estimate_config.json` exists |
 | 12 | Footer | Classification, Terms, [HUMAN REVIEW], [PROPOSED MEMORY] |
 

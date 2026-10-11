@@ -1,9 +1,11 @@
 #!/usr/bin/env python3
 """Join the special-situations book into one dashboard feed.
 
-Greenblatt workouts (spinoffs, merger securities, warrants and rights,
-restructurings) plus the Manual of Ideas forced-seller set (index
-deletes and dividend cuts). A row is ranked only when a holder is forced
+Greenblatt workouts (spinoffs, split-off exchange offers, merger securities,
+warrants and rights, restructurings) plus the Manual of Ideas forced-seller
+set (index deletes, dividend cuts, and modelled separation selling from
+dashboard/data/separations.json). Register-backed separations rank; a
+headline alone stays in discovery. A row is ranked only when a holder is forced
 to sell, or the security is too odd for the usual buyer. Unverified SEC
 text matches stay in discovery.
 
@@ -26,12 +28,14 @@ ACTIVIST_PATH = ROOT / "dashboard" / "data" / "activist_feed.json"
 INDEX_PATH = ROOT / "dashboard" / "data" / "index_membership.json"
 NOL_PATH = ROOT / "dashboard" / "data" / "nol_382_facts.json"
 CVR_PATH = ROOT / "_system" / "reference" / "cvr" / "cvr_universe.json"
+SEPARATIONS_PATH = ROOT / "dashboard" / "data" / "separations.json"
 
 SCHEMA = "special_situations.v1"
 MIN_NEWS_CONFIDENCE = 0.8
 
 LANES = [
     {"id": "spinoffs", "label": "Spinoffs", "source": "Greenblatt"},
+    {"id": "split_offs", "label": "Split-offs and exchange offers", "source": "Greenblatt"},
     {"id": "mergers", "label": "Merger securities", "source": "Greenblatt"},
     {"id": "warrants", "label": "Warrants and rights", "source": "Greenblatt"},
     {"id": "restructurings", "label": "Restructurings", "source": "Greenblatt"},
@@ -74,7 +78,15 @@ DIVIDEND_CUT = re.compile(
     re.I,
 )
 DIVIDEND_CUT_OPINION = re.compile(r"\b(cut risk|risk of)\b", re.I)
-SPIN_WORD = re.compile(r"spin[\s-]?off|spinoff|\bspin\b", re.I)
+# An explicit separation cue. A bare "spin" admitted "GEV dips" headlines.
+SPIN_WORD = re.compile(
+    r"spin[\s-]?offs?\b|spinoffs?\b|spun[\s-]off|\bseparation of\b|\bdistribution of shares\b|"
+    r"\bsplit[\s-]off\b|\bexchange offer\b",
+    re.I,
+)
+SPIN_COMPLETED = re.compile(
+    r"\bcomplet|\bpost[\s-]?(?:spin|separation)|\bafter the (?:spin|separation)|\bsince the spin", re.I
+)
 
 
 def _load(path: Path) -> dict:
@@ -174,7 +186,134 @@ def _text(item: dict) -> str:
     return f"{item.get('title') or ''} {item.get('summary') or ''}"
 
 
-def spinoff_rows(news: dict) -> list[dict]:
+def _separation_rows(separations: dict) -> list[dict]:
+    return [r for r in (separations.get("rows") or []) if isinstance(r, dict)]
+
+
+def _separation_tickers(separations: dict) -> set[str]:
+    out: set[str] = set()
+    for row in _separation_rows(separations):
+        for key in ("parent_ticker", "spinco_ticker"):
+            if row.get(key):
+                out.add(str(row[key]).upper())
+    return out
+
+
+def _compact_flow(row: dict, side: str) -> dict | None:
+    flow = ((row.get("flows") or {}).get(side)) or None
+    if not flow or flow.get("status") != "ok":
+        return None
+    return {
+        "pct_of_float_base": flow.get("pct_of_float_base"),
+        "pct_of_adv_days": flow.get("pct_of_adv_days"),
+        "window_start": flow.get("window_start"),
+        "window_end": flow.get("window_end"),
+        "confidence": "estimate",
+        "legs": flow.get("legs") or [],
+    }
+
+
+def _separation_desk_row(row: dict, *, lane: str) -> dict:
+    """One desk row from a separations.json row (register-backed)."""
+    gates = row.get("gates") or {}
+    ranked = gates.get("status") == "ranked" and row.get("lifecycle") != "closed"
+    book = "history" if row.get("lifecycle") == "closed" else ("ranked" if ranked else "discovery")
+    spread = row.get("spread") if ranked else None
+    missing = list((gates.get("terms") or {}).get("missing") or []) + list(
+        (gates.get("identity") or {}).get("missing") or []
+    )
+    what = f"{row.get('kind_label') or row.get('kind')}: {row.get('spinco_name') or row.get('spinco_ticker') or 'SpinCo'}."
+    summary = row.get("terms_summary")
+    if summary and summary != "Terms are not extracted.":
+        what = f"{what} {summary}"
+    elif not ranked:
+        what = f"{what} Terms are not extracted."
+    source = (row.get("sources") or [{}])[0] or {}
+    out = _row(
+        lane=lane,
+        book=book,
+        ticker=str(row.get("parent_ticker") or ""),
+        company=str(row.get("spinco_name") or ""),
+        what=what,
+        ends=row.get("ends"),
+        ends_label=str(row.get("ends_label") or "Not stated"),
+        evidence_url=source.get("url"),
+        evidence_label=str(source.get("form") or "SEC"),
+        evidence_kind="filing" if source else "screen",
+        source_feed="separations",
+        as_of=str((row.get("dates") or {}).get("filed") or source.get("filed") or "") or None,
+        next_action=str(row.get("next") or "Read the filing."),
+        extra_id=str(row.get("separation_id")),
+    )
+    out["separation_id"] = row.get("separation_id")
+    out["spinco_ticker"] = row.get("spinco_ticker")
+    out["terms_summary"] = summary
+    out["spread"] = spread
+    out["flow"] = _compact_flow(row, "spinco")
+    out["missing_terms"] = missing
+    if spread and spread.get("annualized_spread_pct") is not None:
+        out["annualized_spread"] = (
+            f"{spread['annualized_spread_pct']:.1f}% annualized on the odd-lot gain of "
+            f"{spread['odd_lot_payoff_per_99']['gain_pct']:.2f}% ({str(spread['basis']).replace('_', ' ')})"
+        )
+    return out
+
+
+SPLIT_LANE_KINDS = {"split_off", "clean_up_spin", "retained_stake_sale", "carve_out_ipo"}
+
+
+def separation_event_rows(separations: dict) -> list[dict]:
+    """Unreviewed EDGAR hits (Form 10, exchange-offer prospectus) as discovery rows."""
+    rows = []
+    registered = _separation_tickers(separations)
+    for ev in separations.get("discovery_events") or []:
+        if not isinstance(ev, dict):
+            continue
+        ticker = str(ev.get("ticker") or "").upper()
+        if ticker and ticker in registered:
+            continue
+        lane = "spinoffs" if ev.get("kind_hint") == "spin_off" else "split_offs"
+        form = str(ev.get("form") or "SEC")
+        rows.append(
+            _row(
+                lane=lane,
+                book="discovery",
+                ticker=ticker or "Unresolved",
+                company=str(ev.get("entity_name") or ""),
+                what=f"{form} filing matched {str(ev.get('kind_hint') or 'separation').replace('_', '-')} language. Identity and terms are not verified.",
+                ends=None,
+                ends_label="Terms unknown",
+                evidence_url=ev.get("url"),
+                evidence_label=form,
+                evidence_kind="filing",
+                source_feed="separation_events",
+                as_of=ev.get("filed"),
+                next_action="Read the filing. Link it to a register record with the parent, the ratio or the formula, and the dates.",
+                extra_id=str(ev.get("event_id") or ev.get("accession") or ""),
+            )
+        )
+    return rows
+SPIN_LANE_KINDS = {"spin_off", "reverse_morris_trust"}
+
+
+def split_off_rows(separations: dict) -> list[dict]:
+    rows = []
+    for row in _separation_rows(separations):
+        if row.get("kind") not in SPLIT_LANE_KINDS:
+            continue
+        rows.append(_separation_desk_row(row, lane="split_offs"))
+    return rows
+
+
+def spinoff_rows(news: dict, separations: dict | None = None) -> list[dict]:
+    """Register-backed spins rank; headlines stay in discovery unless the ticker is registered."""
+    separations = separations or {}
+    rows = []
+    registered = _separation_tickers(separations)
+    for row in _separation_rows(separations):
+        if row.get("kind") not in SPIN_LANE_KINDS:
+            continue
+        rows.append(_separation_desk_row(row, lane="spinoffs"))
     grouped: dict[str, list[dict]] = {}
     for item in _news_items(news):
         if item.get("category") != "spinoff" or not _confident(item):
@@ -182,22 +321,21 @@ def spinoff_rows(news: dict) -> list[dict]:
         if not SPIN_WORD.search(_text(item)):
             continue
         ticker = _ticker_of(item)
-        if not ticker:
+        if not ticker or ticker.upper() in registered:
             continue
         grouped.setdefault(ticker, []).append(item)
-    rows = []
     for ticker, items in grouped.items():
         items.sort(key=lambda item: str(item.get("published_utc") or ""), reverse=True)
         latest = items[0]
         title = str(latest.get("title") or "Spinoff")
-        completed = bool(re.search(r"\bcomplet", title, re.I))
+        completed = bool(SPIN_COMPLETED.search(title))
         rows.append(
             _row(
                 lane="spinoffs",
-                book="ranked",
+                book="discovery",
                 ticker=ticker,
                 company=str(latest.get("company") or ticker),
-                what=title,
+                what=f"{title} Terms are not extracted.",
                 ends=None,
                 ends_label=(
                     "Orphan window after the distribution"
@@ -209,7 +347,7 @@ def spinoff_rows(news: dict) -> list[dict]:
                 evidence_kind="news",
                 source_feed="portfolio_news",
                 as_of=str(latest.get("published_utc") or "")[:10] or None,
-                next_action="Name the parent, the spun company, the ratio, and who must sell.",
+                next_action="Find the Form 10. Name the parent, the spun company, the ratio, and who must sell.",
                 headline_count=len(items),
                 extra_id=ticker,
             )
@@ -617,6 +755,43 @@ def index_delete_rows(index_doc: dict) -> list[dict]:
     return rows
 
 
+def separation_forced_seller_rows(separations: dict) -> list[dict]:
+    """Modelled separation selling (dated window, % of float, days of volume)."""
+    rows = []
+    for item in separations.get("forced_seller_rows") or []:
+        if not isinstance(item, dict) or not item.get("ticker"):
+            continue
+        start, end = item.get("window_start"), item.get("window_end")
+        row = _row(
+            lane="forced_sellers",
+            book="ranked",
+            ticker=str(item["ticker"]),
+            company=str(item.get("ticker")),
+            what=str(item.get("what") or "Modelled separation selling"),
+            ends=end,
+            ends_label=(
+                f"Selling window {start or '?'} to {end or '?'}" if (start or end) else "Window not dated"
+            ),
+            evidence_url=item.get("evidence_url"),
+            evidence_label="Separation filing",
+            evidence_kind="filing" if item.get("evidence_url") else "screen",
+            source_feed="separations",
+            as_of=item.get("as_of"),
+            next_action="A modelled flow is a timing input, not a value. Confirm float and volume before leaning on the window.",
+            extra_id=f"{item.get('separation_id')}|{item.get('side')}",
+        )
+        row["separation_id"] = item.get("separation_id")
+        row["flow"] = {
+            "pct_of_float_base": item.get("pct_of_float_base"),
+            "pct_of_adv_days": item.get("pct_of_adv_days"),
+            "window_start": start,
+            "window_end": end,
+            "confidence": item.get("confidence") or "estimate",
+        }
+        rows.append(row)
+    return rows
+
+
 def nol_rows(nol: dict, live_tickers: set[str]) -> list[dict]:
     rows = []
     for item in nol.get("rows") or []:
@@ -683,9 +858,11 @@ def build_book(
     index_doc: dict | None = None,
     cvr: dict | None = None,
     nol: dict | None = None,
+    separations: dict | None = None,
     generated_at: str | None = None,
 ) -> dict:
     news = news or {}
+    separations = separations or {}
     warrants = warrants or {}
     activist = activist or {}
     index_doc = index_doc or {}
@@ -694,8 +871,11 @@ def build_book(
     cvr_ranked, cvr_discovery = cvr_rows(cvr)
     warrant_ranked, warrant_discovery, history = warrant_rows(warrants)
     restructuring_news = restructuring_news_rows(news)
+    separation_spins = spinoff_rows(news, separations)
+    separation_splits = split_off_rows(separations)
     ranked = [
-        *spinoff_rows(news),
+        *[r for r in separation_spins if r["book"] == "ranked"],
+        *[r for r in separation_splits if r["book"] == "ranked"],
         *merger_news_rows(news),
         *cvr_ranked,
         *tender_rows(activist),
@@ -704,6 +884,7 @@ def build_book(
         *restructuring_news,
         *dividend_cut_rows(news),
         *index_delete_rows(index_doc),
+        *separation_forced_seller_rows(separations),
     ]
     live = {
         row["ticker"]
@@ -712,7 +893,14 @@ def build_book(
     }
     ranked.extend(nol_rows(nol, live))
     ranked.sort(key=_sort_key)
-    discovery = [*cvr_discovery, *warrant_discovery]
+    discovery = [
+        *[r for r in separation_spins if r["book"] == "discovery"],
+        *[r for r in separation_splits if r["book"] == "discovery"],
+        *separation_event_rows(separations),
+        *cvr_discovery,
+        *warrant_discovery,
+    ]
+    history.extend(r for r in separation_spins + separation_splits if r["book"] == "history")
     discovery.sort(key=_sort_key)
     history.sort(key=_sort_key)
 
@@ -733,6 +921,7 @@ def build_book(
             "and the situation has a date when it ends. Spinoffs, merger securities, warrants, "
             "and restructurings follow Greenblatt. Forced sellers follow the Manual of Ideas."
         ),
+        "caption": separations.get("caption"),
         "lanes": LANES,
         "counts": {
             "ranked": counts(ranked),
@@ -746,7 +935,7 @@ def build_book(
 
 
 def sources_present() -> list[Path]:
-    required = [NEWS_PATH, WARRANTS_PATH, ACTIVIST_PATH, INDEX_PATH, CVR_PATH]
+    required = [NEWS_PATH, WARRANTS_PATH, ACTIVIST_PATH, INDEX_PATH, CVR_PATH, SEPARATIONS_PATH]
     return [path for path in required if not path.is_file()]
 
 
@@ -762,6 +951,7 @@ def write_book(path: Path | None = None) -> Path | None:
         index_doc=_load(INDEX_PATH),
         cvr=_load(CVR_PATH),
         nol=_load(NOL_PATH),
+        separations=_load(SEPARATIONS_PATH),
     )
     target = path or OUT_PATH
     target.parent.mkdir(parents=True, exist_ok=True)
