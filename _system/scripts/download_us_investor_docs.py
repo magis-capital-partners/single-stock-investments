@@ -35,6 +35,18 @@ FORM_LIMITS = [
     ("8-K", 25),
 ]
 
+# Separation terms live in forms the default list never pulls (Form 10
+# information statements, exchange-offer tender documents, 424B3
+# prospectuses). Only tickers registered as a parent or a SpinCo in
+# _system/data/separations/separation_registry.jsonl get them; everyone
+# else keeps FORM_LIMITS unchanged.
+SEPARATION_FORM_LIMITS = [
+    ("10-12B", 2),
+    ("10-12B/A", 2),
+    ("SC TO-I", 3),
+    ("424B3", 3),
+]
+
 Q4_FEEDS = [
     "/feed/FinancialReport.svc/GetFinancialReportList?LanguageId=1&PageSize=-1",
     "/feed/Event.svc/GetEventList?LanguageId=1&PageSize=-1",
@@ -145,8 +157,41 @@ def download_8k_exhibits(
     return out
 
 
-def download_sec(cik: str, sec_dir: Path, log_file: Path, meta: dict | None = None) -> list[dict]:
+def separation_tickers() -> set[str]:
+    """Tickers that are a parent or SpinCo in the separation register (empty on any failure)."""
+    try:
+        sys.path.insert(0, str(Path(__file__).resolve().parent))
+        from separation_common import latest_registry, tickers_of
+
+        out: set[str] = set()
+        for record in latest_registry():
+            out.update(tickers_of(record))
+        return out
+    except Exception:  # noqa: BLE001 - the register is optional for the downloader
+        return set()
+
+
+def form_limits_for(ticker: str | None, registered: set[str] | None = None) -> list[tuple[str, int]]:
+    """FORM_LIMITS, plus SEPARATION_FORM_LIMITS when ``ticker`` is in the separation register."""
+    limits = list(FORM_LIMITS)
+    if not ticker:
+        return limits
+    registered = separation_tickers() if registered is None else registered
+    if ticker.upper() in registered:
+        present = {form for form, _ in limits}
+        limits.extend((form, limit) for form, limit in SEPARATION_FORM_LIMITS if form not in present)
+    return limits
+
+
+def download_sec(
+    cik: str,
+    sec_dir: Path,
+    log_file: Path,
+    meta: dict | None = None,
+    form_limits: list[tuple[str, int]] | None = None,
+) -> list[dict]:
     meta = meta or {}
+    form_limits = form_limits if form_limits is not None else list(FORM_LIMITS)
     cik_path = str(int(cik))
     cik_padded = f"{int(cik):010d}"
     url = f"https://data.sec.gov/submissions/CIK{cik_padded}.json"
@@ -178,7 +223,7 @@ def download_sec(cik: str, sec_dir: Path, log_file: Path, meta: dict | None = No
             if len(picked) >= limit:
                 break
     else:
-        for form, limit in FORM_LIMITS:
+        for form, limit in form_limits:
             cnt = 0
             for row in rows:
                 if row["form"] != form or row["filingDate"] < min_date:
@@ -343,7 +388,10 @@ def run_ticker(ticker: str, config: dict) -> None:
             log(log_file, f"CIK fallback: {ticker} -> {cik} via SEC ticker-CIK map")
     if cik:
         try:
-            manifest = download_sec(str(cik), sec_dir, log_file, meta)
+            form_limits = form_limits_for(ticker)
+            if len(form_limits) > len(FORM_LIMITS):
+                log(log_file, f"Separation register lists {ticker}: also pulling {', '.join(f for f, _ in SEPARATION_FORM_LIMITS)}")
+            manifest = download_sec(str(cik), sec_dir, log_file, meta, form_limits=form_limits)
             log(log_file, f"SEC filings downloaded: {len(manifest)}")
         except Exception as e:
             log(log_file, f"SEC FAIL -> {e}")

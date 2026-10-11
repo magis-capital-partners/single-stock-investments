@@ -105,6 +105,16 @@
       "subject_regex": "^chore: warrant weekly discovery"
     },
     {
+      "name": "data-pipeline-separation-discover",
+      "workflow_file": "data-pipeline.yml",
+      "job": "separation-discover",
+      "cadence_cron": [
+        "0 15 * * 1"
+      ],
+      "freshness_hours": 342,
+      "subject_regex": "^chore: separation weekly discovery"
+    },
+    {
       "name": "data-pipeline-world-model",
       "workflow_file": "data-pipeline.yml",
       "job": "world-model",
@@ -568,6 +578,24 @@
         }
       }
     },
+    "separations": {
+      "path": "dashboard/data/separations.json",
+      "stamp_field": "generated_at",
+      "max_age_hours": 100,
+      "healer": "python _system/scripts/build_separation_flows.py && python _system/scripts/build_separations_dashboard.py (data-pipeline nightly + Monday separation-discover; repository_dispatch heal-separations)",
+      "assert_fields": {
+        "health.status": {
+          "not_in": [
+            "unhealthy"
+          ],
+          "why": "repeated EDGAR discovery failures and a register that stops moving must be loud; a spread without a filed formula is a headline"
+        },
+        "health.structural_errors": {
+          "max_count": 0,
+          "why": "separation identity, immutable registry versions, and the identity/terms gate ordering must remain structurally valid"
+        }
+      }
+    },
     "capitulation_daily": {
       "path": "dashboard/data/capitulation_daily.json",
       "stamp_field": "generated_at",
@@ -601,7 +629,8 @@
         "holding_co",
         "optionality",
         "turnaround",
-        "infrastructure"
+        "infrastructure",
+        "special_situation"
       ],
       "payoff_lens": [
         "operating",
