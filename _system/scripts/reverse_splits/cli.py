@@ -3,7 +3,9 @@
     python -m _system.scripts.reverse_splits.cli <command> [options]
 
 Collectors (``seed``, ``clocks``, ``prices``, ``finra``, ``fundamentals``) write
-the local SQLite database; ``export-ledger`` / ``import-ledger`` move rows
+the local SQLite database; ``databento-pull`` fetches licensed venue files into
+``local/raw/databento`` and ``detect-splits`` reads them into a local report;
+``export-ledger`` / ``import-ledger`` move rows
 between it and the committed JSONL ledger; ``build-dashboard`` and ``check``
 read the ledger alone. ``--since-days`` scopes the EDGAR and price collectors
 to a recent window so the weekly job does not re-scan five years.
@@ -62,6 +64,17 @@ def build_parser() -> argparse.ArgumentParser:
     p_px.add_argument("--since-days", type=int, default=None, help="Only events dated in the last N days")
 
     sub.add_parser("finra", help="Ingest FINRA short interest files from local/raw/finra")
+
+    p_dbn = sub.add_parser("databento-pull", help="Fetch Databento venue daily bars, definitions and status into local/raw/databento (DATABENTO_API_KEY; refuses any request quoted above --max-cost)")
+    p_dbn.add_argument("--start", type=date.fromisoformat, default=None, help="Default 2018-05-01, where the venue datasets begin")
+    p_dbn.add_argument("--end", type=date.fromisoformat, default=None, help="Exclusive; default today")
+    p_dbn.add_argument("--schemas", default="ohlcv-1d,definition,status")
+    p_dbn.add_argument("--datasets", default="XNAS.ITCH,XNYS.PILLAR,XASE.PILLAR", help="Daily-bar venues")
+    p_dbn.add_argument("--max-cost", type=float, default=0.0, help="Highest acceptable quote per request, USD")
+
+    p_det = sub.add_parser("detect-splits", help="Detect reverse splits in the Databento bars and reconcile them with the ledger (local report)")
+    p_det.add_argument("--datasets", default="XNAS.ITCH,XNYS.PILLAR,XASE.PILLAR")
+    p_det.add_argument("--reuse-scan", action="store_true", help="Reuse the last bar scan; redo merge, classification and reconciliation")
 
     p_borrow = sub.add_parser("borrow-csv", help="Import a Client Portal Short-Securities Availability CSV")
     p_borrow.add_argument("csv", type=Path)
@@ -169,6 +182,22 @@ def main(argv: list[str] | None = None) -> int:
         from .ingest_finra import ingest_finra
 
         print(ingest_finra(cfg))
+        return 0
+
+    if args.cmd == "databento-pull":
+        from .databento_bars import FIRST_DAY, pull
+
+        print(pull(cfg, start=args.start or FIRST_DAY, end=args.end, schemas=tuple(args.schemas.split(",")),
+                   datasets=tuple(args.datasets.split(",")), max_cost=args.max_cost))
+        return 0
+
+    if args.cmd == "detect-splits":
+        import json
+
+        from .split_detector import detect
+
+        summary = detect(cfg, datasets=tuple(args.datasets.split(",")), reuse_scan=args.reuse_scan)
+        print(json.dumps({k: v for k, v in summary.items() if k != "by_year"}, indent=1, default=str))
         return 0
 
     if args.cmd == "borrow-csv":
