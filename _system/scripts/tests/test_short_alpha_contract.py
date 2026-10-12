@@ -333,6 +333,55 @@ def test_fraction_column_and_legacy_format(tmp_path: Path) -> None:
         borrow.detect_columns(["Symbol", "Description"])
 
 
+def test_public_ftp_file_parses_with_eastern_clock_and_floor(tmp_path: Path) -> None:
+    sample = FIXTURES / "ibkr_public_ftp_usa_sample.txt"
+    assert borrow.is_public_ftp_file(sample)
+    assert not borrow.is_public_ftp_file(FIXTURES / "ibkr_client_portal_borrow_sample.csv")
+    rows, meta = borrow.parse_borrow_file(sample)
+    assert meta["source"] == borrow.SOURCE_PUBLIC_FTP and meta["declared"] == 4
+    by = {row["ticker"]: row for row in rows}
+    assert by["ASPN"] == {"ticker": "ASPN", "rate_pct": 0.25, "available": 10000000, "as_of": "2026-10-12T19:25:13Z", "at_least": True}
+    assert by["WEST"]["rate_pct"] == 12.5 and by["WEST"]["available"] == 45000 and "at_least" not in by["WEST"]
+    assert by["EQPT"]["rate_pct"] is None and by["EQPT"]["available"] == 0, "NA is pending, never zero"
+    payload = borrow.build_payload(rows, {"ASPN", "WEST", "EQPT"}, meta["source"], sample.name, now="2026-10-12T19:30:00+00:00")
+    assert payload["source"] == "ibkr_public_ftp"
+    assert payload["rates"]["ASPN"]["source"] == "IBKR public short-stock availability file"
+    assert set(payload["rates"]) == {"ASPN", "WEST"}
+    assert payload["availability"]["ASPN"] == {"shares": 10000000, "as_of": "2026-10-12T19:25:13Z", "status": "available",
+                                              "source": "IBKR public short-stock availability file", "at_least": True}
+    assert payload["availability"]["EQPT"]["status"] == "none_reported"
+    crlf = tmp_path / "usa.txt"
+    crlf.write_bytes(sample.read_bytes().replace(b"\r\n", b"\n").replace(b"\n", b"\r\n"))
+    assert borrow.parse_borrow_file(crlf)[0] == rows, "the FTP serves CRLF"
+    january = tmp_path / "january.txt"
+    january.write_text(sample.read_text(encoding="utf-8").replace("2026.10.12", "2026.01.12"), encoding="utf-8")
+    assert borrow.parse_borrow_file(january)[0][0]["as_of"] == "2026-01-12T20:25:13Z", "EST outside daylight time"
+
+
+def test_truncated_public_ftp_file_is_refused(tmp_path: Path) -> None:
+    lines = (FIXTURES / "ibkr_public_ftp_usa_sample.txt").read_text(encoding="utf-8").splitlines()
+    truncated = tmp_path / "truncated.txt"
+    truncated.write_text("\n".join(lines[:4]) + "\n", encoding="utf-8")
+    with pytest.raises(borrow.BorrowCsvError, match="truncated"):
+        borrow.parse_borrow_file(truncated)
+    miscounted = tmp_path / "miscounted.txt"
+    miscounted.write_text("\n".join(lines[:-1] + ["#EOF|5"]) + "\n", encoding="utf-8")
+    with pytest.raises(borrow.BorrowCsvError, match="#EOF declares 5"):
+        borrow.parse_borrow_file(miscounted)
+
+
+def test_borrow_cli_reads_the_public_ftp_file(tmp_path: Path) -> None:
+    out = tmp_path / "short_alpha_borrow.json"
+    proc = subprocess.run(
+        [sys.executable, str(SCRIPTS / "refresh_short_alpha_borrow.py"), "--input", str(FIXTURES / "ibkr_public_ftp_usa_sample.txt"), "--output", str(out), "--all"],
+        cwd=ROOT, capture_output=True, text=True, check=False, encoding="utf-8",
+    )
+    assert proc.returncode == 0, proc.stderr
+    doc = json.loads(out.read_text(encoding="utf-8"))
+    assert doc["source"] == "ibkr_public_ftp" and doc["input"] == "ibkr_public_ftp_usa_sample.txt"
+    assert doc["rates"]["NOTUS"]["rate_pct"] == 5.0 and doc["availability"]["ASPN"]["at_least"] is True
+
+
 def test_borrow_cli_writes_rates_and_availability_without_a_broker_api(tmp_path: Path) -> None:
     out = tmp_path / "short_alpha_borrow.json"
     proc = subprocess.run(

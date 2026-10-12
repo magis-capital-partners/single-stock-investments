@@ -3,20 +3,50 @@
 The original package also snapshotted shortable shares over a live broker
 session. That path was deleted in the SSI migration: the NY4 Gateway carries
 the live SPX executor and this repository never talks to it
-(``CLAUDE.md``, IB Gateway rules). Borrow enters only as a CSV export from the
-IBKR Client Portal Short-Securities Availability page, with the export's own
-timestamp when it carries one.
+(``CLAUDE.md``, IB Gateway rules). Borrow enters only as a file: a CSV export
+from the IBKR Client Portal Short-Securities Availability page, with the
+export's own timestamp when it carries one, or IBKR's public short-stock file
+(``usa.txt``), parsed by SSI's ``refresh_short_alpha_borrow`` so both desks
+read one number.
 """
 
 from __future__ import annotations
 
 import csv
+import sys
 from datetime import datetime, timezone
 from pathlib import Path
 
-from .config import Config, load_config
+from .config import SCRIPTS_DIR, Config, load_config
 from .db import init_db
 from .utils import normalize_ticker
+
+
+def _ssi_borrow():
+    if str(SCRIPTS_DIR) not in sys.path:
+        sys.path.insert(0, str(SCRIPTS_DIR))
+    import refresh_short_alpha_borrow  # noqa: PLC0415
+
+    return refresh_short_alpha_borrow
+
+
+def import_ibkr_public_ftp(path: Path, cfg: Config | None = None) -> int:
+    """Import IBKR's public ``usa.txt``: one snapshot row per symbol at the
+    file's own ``#BOF`` time. A ``>10000000`` floor is stored as 10000000 and
+    marked in ``notes``; an ``NA`` fee stays NULL."""
+    rows, meta = _ssi_borrow().parse_public_ftp(path)
+    return persist_snapshots([
+        {
+            "asof_ts": row["as_of"],
+            "ticker": normalize_ticker(row["ticker"]),
+            "shortable_shares": row["available"],
+            "fee_rate": row["rate_pct"] / 100.0 if row["rate_pct"] is not None else None,
+            "source": meta["source"],
+            "notes": Path(path).name + (" available_at_least" if row.get("at_least") else ""),
+        }
+        for row in rows
+        if normalize_ticker(row["ticker"])
+    ], cfg)
 
 
 def persist_snapshots(rows: list[dict], cfg: Config | None = None) -> int:
@@ -52,7 +82,10 @@ def import_ibkr_slb_csv(path: Path, cfg: Config | None = None) -> int:
     Percent quotes are divided by 100; a decimal fraction needs a column
     labelled ``fraction`` or ``decimal``. Without a supplied timestamp the
     import time describes a current snapshot, never a historical locate.
+    IBKR's public ``usa.txt`` is detected and handed to ``import_ibkr_public_ftp``.
     """
+    if _ssi_borrow().is_public_ftp_file(path):
+        return import_ibkr_public_ftp(path, cfg)
     cfg = cfg or load_config()
     conn = init_db(cfg.db_path)
     asof = datetime.now(timezone.utc).isoformat()

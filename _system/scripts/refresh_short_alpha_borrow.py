@@ -1,12 +1,23 @@
 #!/usr/bin/env python3
-"""Refresh Short Alpha borrow from an IBKR CSV. File in, file out.
+"""Refresh Short Alpha borrow from an IBKR borrow file. File in, file out.
 
-Two inputs are accepted and detected from the header, case-insensitively:
+Three inputs are accepted and detected from the file itself:
 
 * the simple normalized export ``symbol,borrow_rate_pct,as_of`` (unchanged);
 * the IBKR Client Portal Short-Securities-Availability (SLB) CSV, with any of
   ``symbol``/``ticker``, ``fee``/``borrow_rate``/``rate``/``indicative fee``,
-  ``available``/``shortable``/``quantity`` and ``asof_ts``/``timestamp``/``as_of``.
+  ``available``/``shortable``/``quantity`` and ``asof_ts``/``timestamp``/``as_of``
+  (headers matched case-insensitively);
+* IBKR's public short-stock availability file, ``usa.txt`` on
+  ``ftp2.interactivebrokers.com`` (user ``shortstock``, empty password; no
+  account), pipe-delimited between ``#BOF|YYYY.MM.DD|HH:MM:SS`` and
+  ``#EOF|<records>``. It is the same SLB inventory the Portal shows, refreshed
+  intraday. ``#BOF`` is US/Eastern and becomes every row's UTC ``as_of``;
+  ``FEERATE`` is percent per year; ``AVAILABLE`` of ``>10000000`` is a floor,
+  kept as 10000000 with ``at_least``. A record count that disagrees with
+  ``#EOF`` is a truncated download and is refused. Fetch it with
+  ``curl --user shortstock: -o usa.txt ftp://ftp2.interactivebrokers.com/usa.txt``
+  (``usa.txt.md5`` is the MD5 of the file with LF line endings).
 
 Rate convention (the rsdb ``ibkr_borrow.py`` CSV importer, kept identical so
 the two desks read one number): the Portal quotes percent even below 1.5%, so a
@@ -19,9 +30,9 @@ The export can contain any universe; this writer retains the Short Alpha
 tickers (candidates plus the open book), so new names are picked up on the
 next refresh without a code change. Missing names are pending, never zero.
 
-This script never contacts the IB Gateway, TWS, or any API socket. Broker truth
-arrives as a file the human downloaded from the Client Portal (CLAUDE.md rules
-9 and 10).
+This script never contacts the IB Gateway, TWS, or any API socket, and it
+downloads nothing. Borrow arrives as a file: a Client Portal export or the
+public FTP file (CLAUDE.md rules 9 and 10).
 """
 from __future__ import annotations
 
@@ -31,6 +42,7 @@ import json
 import re
 from datetime import datetime, timezone
 from pathlib import Path
+from zoneinfo import ZoneInfo
 
 ROOT = Path(__file__).resolve().parents[2]
 LEDGER_DIR = ROOT / "_system" / "research" / "short-alpha"
@@ -40,6 +52,13 @@ OUTPUT = ROOT / "dashboard" / "data" / "short_alpha_borrow.json"
 EXCLUDED = {"ECHX"}
 SOURCE_CLIENT_PORTAL = "ibkr_client_portal_csv"
 SOURCE_NORMALIZED = "ibkr_normalized_csv"
+SOURCE_PUBLIC_FTP = "ibkr_public_ftp"
+SOURCE_LABELS = {
+    SOURCE_CLIENT_PORTAL: "IBKR Client Portal availability CSV",
+    SOURCE_NORMALIZED: "IBKR borrow export",
+    SOURCE_PUBLIC_FTP: "IBKR public short-stock availability file",
+}
+FTP_CLOCK = ZoneInfo("America/New_York")
 
 SYMBOL_KEYS = ("symbol", "ticker", "underlying")
 LEGACY_RATE_KEY = "borrow_rate_pct"
@@ -139,6 +158,56 @@ def parse_borrow_csv(path: Path, imported_at: str | None = None) -> tuple[list[d
     return rows, columns
 
 
+def is_public_ftp_file(path: Path) -> bool:
+    with Path(path).open(encoding="utf-8-sig", errors="replace") as handle:
+        return handle.readline().startswith("#BOF|")
+
+
+def parse_public_ftp(path: Path) -> tuple[list[dict], dict]:
+    """Rows of ``{ticker, rate_pct, available, as_of}`` (plus ``at_least`` on a
+    floored availability) from IBKR's public ``usa.txt``."""
+    as_of = None
+    header: list[str] | None = None
+    declared: int | None = None
+    rows: list[dict] = []
+    with Path(path).open(encoding="utf-8-sig", newline="") as handle:
+        for line in handle:
+            line = line.rstrip("\r\n")
+            if line.startswith("#BOF|"):
+                day, clock = line.split("|")[1:3]
+                stamp = datetime.strptime(f"{day} {clock}", "%Y.%m.%d %H:%M:%S").replace(tzinfo=FTP_CLOCK)
+                as_of = stamp.astimezone(timezone.utc).isoformat().replace("+00:00", "Z")
+            elif line.startswith("#SYM|"):
+                header = line[1:].rstrip("|").split("|")
+            elif line.startswith("#EOF|"):
+                declared = int(line.split("|")[1])
+            elif line and header:
+                record = dict(zip(header, line.rstrip("|").split("|")))
+                ticker = str(record.get("SYM") or "").upper().strip()
+                if not ticker:
+                    continue
+                shares = str(record.get("AVAILABLE") or "").strip()
+                available = _number(shares.lstrip(">"))
+                row = {
+                    "ticker": ticker,
+                    "rate_pct": _number(record.get("FEERATE")),
+                    "available": int(available) if available is not None else None,
+                    "as_of": as_of,
+                }
+                if shares.startswith(">"):
+                    row["at_least"] = True
+                rows.append(row)
+    if as_of is None or header is None:
+        raise BorrowCsvError(f"{path} has no #BOF/#SYM header; not an IBKR short-stock file")
+    if declared is None or declared != len(rows):
+        raise BorrowCsvError(f"{path}: {len(rows)} records but #EOF declares {declared}; the download is truncated")
+    return rows, {"source": SOURCE_PUBLIC_FTP, "as_of": as_of, "declared": declared}
+
+
+def parse_borrow_file(path: Path) -> tuple[list[dict], dict]:
+    return parse_public_ftp(path) if is_public_ftp_file(path) else parse_borrow_csv(path)
+
+
 def ledger_tickers() -> set[str]:
     tickers: set[str] = set()
     for path, key in ((POSITIONS, "ideas"), (CANDIDATES, "candidates")):
@@ -151,7 +220,7 @@ def ledger_tickers() -> set[str]:
 
 def build_payload(rows: list[dict], tickers: set[str] | None, source: str, input_name: str, now: str | None = None) -> dict:
     now = now or datetime.now(timezone.utc).isoformat()
-    label = "IBKR Client Portal availability CSV" if source == SOURCE_CLIENT_PORTAL else "IBKR borrow export"
+    label = SOURCE_LABELS.get(source, SOURCE_LABELS[SOURCE_NORMALIZED])
     rates: dict[str, dict] = {}
     availability: dict[str, dict] = {}
     for row in rows:
@@ -163,6 +232,8 @@ def build_payload(rows: list[dict], tickers: set[str] | None, source: str, input
         if row.get("available") is not None:
             shares = int(row["available"])
             availability[ticker] = {"shares": shares, "as_of": row.get("as_of"), "status": "available" if shares > 0 else "none_reported", "source": label}
+            if row.get("at_least"):
+                availability[ticker]["at_least"] = True
     return {
         "schema_version": "1.1",
         "provider": "IBKR",
@@ -180,17 +251,17 @@ def build_payload(rows: list[dict], tickers: set[str] | None, source: str, input
 
 def main() -> None:
     parser = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
-    parser.add_argument("--input", required=True, type=Path, help="IBKR Client Portal availability CSV or normalized borrow CSV")
+    parser.add_argument("--input", required=True, type=Path, help="IBKR public usa.txt, Client Portal availability CSV, or normalized borrow CSV")
     parser.add_argument("--output", type=Path, default=OUTPUT, help=f"Default {OUTPUT.relative_to(ROOT).as_posix()}")
     parser.add_argument("--all", action="store_true", help="Keep every symbol instead of only the Short Alpha ledger")
     args = parser.parse_args()
-    rows, columns = parse_borrow_csv(args.input)
+    rows, columns = parse_borrow_file(args.input)
     payload = build_payload(rows, None if args.all else ledger_tickers(), columns["source"], args.input.name)
     args.output.parent.mkdir(parents=True, exist_ok=True)
     args.output.write_text(json.dumps(payload, indent=2) + "\n", encoding="utf-8")
     print(
         f"Wrote {args.output} ({len(payload['rates'])} rates, {len(payload['availability'])} availability rows "
-        f"from {len(rows)} CSV rows; source {columns['source']})"
+        f"from {len(rows)} input rows; source {columns['source']})"
     )
 
 
