@@ -124,10 +124,10 @@ Separately, a hazard, now removed: the old repo's local copy had `src/rsdb/ibkr_
 ### Phase 2: remove survivorship and extend history
 
 - Discovery from SEC quarterly indexes and full-text search (2001 onward), independent of today's ticker map, cross-checked against Massive's splits endpoint (records from 1978; SSI already has `POLYGON_API_KEY`, but the free tier returns 2 years, so confirm the plan first). Item 5.03 8-Ks exist from mid-2004.
-- A 20-event delisted-price pilot (retired tickers, sub-$1, repeat splitters, ticker changes) on two vendors before any annual purchase. The same pilot measures the survivorship gap directly.
-- Extend to 2015-2020 under the same definitions; go earlier only if prices, identity and fundamentals hold up.
+- Pull Databento daily bars, `status` and monthly `definition` snapshots for 2018-05 onward (free; see "The free route"). Run the price-jump detector over every session and reconcile it against EDGAR and the ledger. Each event is matched, ledger-only (detector work), or detector-only (a discovery gap to verify against the filing). Ticker changes on the split date join through the definitions, not the symbol.
+- Discover 2005-2018 from EDGAR under the same definitions. Price it only if a licence is ever approved; until then those years count as discovered, not tradable.
 
-**Done when:** a coverage table by year, venue and issuer status, with the survivor-only share of the 2021-2026 sample stated as a number.
+**Done when:** a coverage table by year, venue and issuer status for 2018-05 onward, with the ledger's coverage of detected listed splits and the delisted share both stated as numbers.
 
 ### Phase 3: borrow evidence
 
