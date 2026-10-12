@@ -84,6 +84,7 @@ P3_LANE_HEALERS = {
     "data-pipeline-technicals": {"event_type": "heal-technicals"},
     "data-pipeline-warrant-discover": {"event_type": "heal-warrants"},
     "data-pipeline-separation-discover": {"event_type": "heal-separations"},
+    "data-pipeline-reverse-splits": {"event_type": "heal-reverse-splits"},
     "podcasts": {"workflow": "podcast-refresh.yml",
                  "fields": {"backfill": "false", "whisper_batch": "0"}},
     "ls-algo": {"event_type": "sync-ls-algo-universe"},
@@ -106,6 +107,10 @@ P6_FEED_LANES = {
     "spx_surface": "data-pipeline-technicals",
     "warrant_monitor": "data-pipeline-warrant-discover",
     "separations": "data-pipeline-separation-discover",
+    "desk_briefs": "data-pipeline-intake-full",
+    "reverse_splits": "data-pipeline-reverse-splits",
+    "short_alpha": "data-pipeline-intake-full",
+    "special_situations": "data-pipeline-intake-full",
     "market_risk_components_committed": "market-risk",
     "podcast_catalog": "podcasts",
     # Rebuilt by forced-flow-daily and by the technicals job; only the latter

@@ -88,6 +88,7 @@ jobs:
           filter: blob:none
           sparse-checkout: |
             /_system/scripts/classify_agent_pr_lane.py
+            /_system/scripts/check_contributor_paths.py
           sparse-checkout-cone-mode: false
       - name: Resolve PR number and eligibility
         id: pr
@@ -165,14 +166,16 @@ jobs:
           # A workflow_run retry checks out the PR head. A branch cut before
           # this script existed will not have it; the default branch does.
           SCRIPT=_system/scripts/classify_agent_pr_lane.py
-          if [ ! -f "$SCRIPT" ]; then
+          GUARD=_system/scripts/check_contributor_paths.py
+          if [ ! -f "$SCRIPT" ] || [ ! -f "$GUARD" ]; then
             mkdir -p _system/scripts
             git fetch --depth=1 origin "$DEFAULT_BRANCH"
-            git show "FETCH_HEAD:$SCRIPT" > "$SCRIPT"
+            [ -f "$SCRIPT" ] || git show "FETCH_HEAD:$SCRIPT" > "$SCRIPT"
+            [ -f "$GUARD" ] || git show "FETCH_HEAD:$GUARD" > "$GUARD" || true
           fi
           LANE=$(python3 "$SCRIPT" --head-ref "$HEAD_REF" --files "$RUNNER_TEMP/pr-files.txt")
           if [ "$LANE" = "none" ]; then
-            echo "PR #$PR head ref '$HEAD_REF' is not an agent branch (cursor/, codex/, claude/) — skipping automerge."
+            echo "PR #$PR head ref '$HEAD_REF' is not an agent branch (cursor/, codex/, claude/, grok/) — skipping automerge."
             echo "eligible=false" >> "$GITHUB_OUTPUT"
             echo "lane=none" >> "$GITHUB_OUTPUT"
             echo "number=$PR" >> "$GITHUB_OUTPUT"
@@ -351,7 +354,7 @@ jobs:
     # head SHA must complete green. Nothing here bypasses a red check — a
     # failing CI keeps the PR open and the notify job says so on the PR.
     needs: resolve-pr
-    if: needs.resolve-pr.outputs.eligible == 'true' && needs.resolve-pr.outputs.lane == 'code'
+    if: needs.resolve-pr.outputs.eligible == 'true' && (needs.resolve-pr.outputs.lane == 'code' || needs.resolve-pr.outputs.lane == 'data')
     runs-on: ubuntu-latest
     # fact-ledger-currency may spend most of its 90 minutes in a full checkout.
     # 55 minutes was ending the gate while that check was still running.
@@ -469,13 +472,71 @@ jobs:
             sleep 20
           done
 
+  data-guard:
+    # Desk-bot data PRs (grok/<desk>/<date>-<slug>): every changed path must
+    # be on the bot data allowlist, and the per-path validators must pass on
+    # the PR head. Code from a bot never reaches here; the classifier makes it
+    # a code PR that a human reviews. docs/WRITE_MAP.md is the prose copy.
+    needs: resolve-pr
+    if: needs.resolve-pr.outputs.eligible == 'true' && needs.resolve-pr.outputs.lane == 'data'
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    outputs:
+      head_sha: ${{ steps.guard.outputs.sha }}
+    env:
+      GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      REPO: ${{ github.repository }}
+      PR: ${{ needs.resolve-pr.outputs.number }}
+      HEAD_REF: ${{ needs.resolve-pr.outputs.head_ref }}
+      HEAD_SHA: ${{ needs.resolve-pr.outputs.head_sha }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          # Validators come from the base branch so a data diff cannot rewrite them.
+          ref: ${{ github.event.repository.default_branch }}
+          fetch-depth: 1
+          filter: blob:none
+          sparse-checkout: |
+            /_system/scripts/
+            /_system/graph/
+          sparse-checkout-cone-mode: false
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Install validator dependencies
+        run: python -m pip install --disable-pip-version-check --quiet "jsonschema==4.26.0"
+      - name: Path guard
+        id: guard
+        run: |
+          set -euo pipefail
+          gh api --paginate "repos/$REPO/pulls/$PR/files" --jq '.[].filename' > "$RUNNER_TEMP/pr-files.txt"
+          python _system/scripts/check_contributor_paths.py --head-ref "$HEAD_REF" --files "$RUNNER_TEMP/pr-files.txt"
+          echo "sha=$HEAD_SHA" >> "$GITHUB_OUTPUT"
+      - name: Fetch the PR head data paths
+        run: |
+          set -euo pipefail
+          git fetch --depth=1 origin "$HEAD_SHA"
+          # Data files the validators read, taken from the PR head.
+          git -c core.sparseCheckout=false checkout "$HEAD_SHA" --             _system/data/desk_briefs _system/data/separations _system/research/short-alpha             _system/memory-hub _system/portfolio/registry.json SOURCES.md _system/sources.json 2>/dev/null || true
+      - name: Validate what the PR touched
+        run: |
+          set -euo pipefail
+          FILES="$RUNNER_TEMP/pr-files.txt"
+          if grep -q '^_system/data/desk_briefs/' "$FILES"; then python _system/scripts/check_desk_briefs.py; fi
+          if grep -q '^_system/data/separations/' "$FILES"; then python _system/scripts/check_separation_universe.py --strict; fi
+          if grep -q '^_system/research/short-alpha/' "$FILES"; then python _system/scripts/build_short_alpha_dashboard.py --check; fi
+          if grep -Eq '^(SOURCES.md|_system/sources.json)$' "$FILES"; then python _system/scripts/validate_sources.py; fi
+          echo "data guard passed for PR #$PR at $HEAD_SHA"
+
   merge:
-    needs: [resolve-pr, gate, code-gate]
+    needs: [resolve-pr, gate, code-gate, data-guard]
     # Exactly one lane gate runs per PR; merge only the SHA that gate passed.
+    # A data PR needs both the data guard and every CI check green.
     if: >-
       !cancelled() &&
       ((needs.gate.result == 'success' && needs.gate.outputs.head_sha != '') ||
-       (needs.code-gate.result == 'success' && needs.code-gate.outputs.head_sha != ''))
+       (needs.code-gate.result == 'success' && needs.code-gate.outputs.head_sha != '' &&
+        (needs.resolve-pr.outputs.lane != 'data' || needs.data-guard.result == 'success')))
     runs-on: ubuntu-latest
     timeout-minutes: 30
     # Serialize squash merges across all agent PRs to avoid main-tip races.
@@ -720,11 +781,11 @@ jobs:
     # for days because their Research quality CI was red and nothing said so.
     # Post (or update) one marker comment on the PR whenever a lane gate or
     # the merge fails, so the blocking reason is visible on the PR itself.
-    needs: [resolve-pr, gate, code-gate, merge]
+    needs: [resolve-pr, gate, code-gate, data-guard, merge]
     if: >-
       !cancelled() &&
       needs.resolve-pr.outputs.eligible == 'true' &&
-      (needs.gate.result == 'failure' || needs.code-gate.result == 'failure' || needs.merge.result == 'failure')
+      (needs.gate.result == 'failure' || needs.code-gate.result == 'failure' || needs.data-guard.result == 'failure' || needs.merge.result == 'failure')
     runs-on: ubuntu-latest
     timeout-minutes: 5
     steps:
@@ -748,6 +809,7 @@ jobs:
           PR: ${{ needs.resolve-pr.outputs.number }}
           LANE: ${{ needs.resolve-pr.outputs.lane }}
           MERGE: ${{ needs.merge.result }}
+          DATA_GUARD: ${{ needs.data-guard.result }}
           RUN_URL: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
         run: |
           set -euo pipefail
@@ -755,6 +817,8 @@ jobs:
             REASON="the merge step failed (a check on the gated commit is red, a conflict with main, or the squash was rejected)"
           elif [ "$LANE" = "research" ]; then
             REASON="the research gate failed: provenance validation or the Research quality workflow is red"
+          elif [ "$LANE" = "data" ] && [ "${DATA_GUARD:-}" = "failure" ]; then
+            REASON="the data guard failed: a path outside the bot data allowlist (docs/WRITE_MAP.md) or a data validator is red"
           else
             REASON="one or more CI checks on the head commit failed or never completed"
           fi

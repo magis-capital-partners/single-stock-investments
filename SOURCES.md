@@ -18,6 +18,8 @@ The machine-readable index is `_system/sources.json`. Check it with `python _sys
 8. Email is read-only. Use it only to cross-reference universe names. Label each item as a newsletter or a letter with its date, and treat it as a lead until a filing confirms it. Never surface personal brokerage mail, and do not store email content in this repo.
 9. Bots write only inside `_system/memory-hub/research-equity/`. Append at most three `[PROPOSED]` lessons per session. Never edit `_system/memory/MEMORY.md`. Never create a new hub without Drew's approval. Never write the `borrow-etf`, `diamond-creek`, or `spx-0dte` hubs.
 
+Rule 9 is about notes and lessons. Structured data drops go by pull request, not into the hub: desk briefs under `_system/data/desk_briefs/` (see "Desk briefs" below), separation registry seeds with accessions, and VIC PDFs through Drive. The write map is `_system/proposals/one_hub_for_humans_and_bots_2026-10-11.md`.
+
 ## Dashboard data
 
 Files live in `dashboard/data/`. Read the build date before the contents.
@@ -31,6 +33,9 @@ Files live in `dashboard/data/`. Read the build date before the contents.
 | `activist_feed.json` | `generated_at` | Activist filings and triage counts. Desk: Activism. |
 | `index_membership.json` | `generated` | Index membership and scorecards. This file stamps the build in `generated`, and the membership date in `as_of`. |
 | `fico_watch.json` | `generated_at` | FICO watch page. The file is not always present. When it is absent, skip it. Desk: Fundamental Analyst. |
+| `special_situations.json` | `generated_at` | Ranked special situations, discovery list, history, by lane. Desk: Special Situations. |
+| `separations.json` | `generated_at` | Split-offs and spin-offs: filed terms, spread, who-must-sell flows, odd-lot alerts, discovery events. Desk: Special Situations; the forced_seller_rows also feed the Technical Analyst. |
+| `desk_briefs.json` | `generated_at` | The latest desk brief per desk, joined for the Inbox. Built from `_system/data/desk_briefs/`. |
 
 These files are generated. A bot reads them. A correction goes out as a pull request from a cloud agent or the GitHub connector.
 
@@ -87,35 +92,51 @@ Shared notes live in `_system/memory-hub/research-equity/`.
 | File | Role |
 | --- | --- |
 | `README.md` | Writing rules for the hub. |
-| `GRAPH.md` | Shell until Drew copies his local graph. |
-| `CONTEXT.md` | Shell until Drew copies his local context. One desk line may be added per session after that copy. |
-| `daily/YYYY-MM-DD.md` | Up to three `[PROPOSED]` lessons per session. Each lesson uses Evidence, Seen, Harmful, Scope, and Review after. |
+| `GRAPH.md` | Copy of the mesh root graph (nodes, edges, hard laws). Cross-repo; only the `research-equity` hub lives in this repo. |
+| `CONTEXT.md` | Drew's research-equity context, copied in on 2026-10-12. Desk lines sit under the `## Desk` heading at the end; a bot may add one desk line per session. |
+| `MEMORY.md` | Approved cross-repo invariants. Drew promotes. Bots never edit it. |
+| `bridges.md` | Path contracts between this repo and the research vault. |
+| `daily/YYYY-MM-DD.md` | Up to three `[PROPOSED]` lessons per session. Each lesson uses Evidence, Seen, Harmful, Scope, and Review after. Drew's local notes from 2026-07-23 to 2026-10-08 are in. |
 
-Drew's local copy at `C:\Users\drewg\Projects\.agent-memory\hubs\research-equity\` is not reachable from the cloud. Copy that content in. Do not invent it.
+Drew's local copy at `C:\Users\drewg\Projects\.agent-memory\hubs\research-equity\` is not reachable from the cloud. Its content was copied into this repo on 2026-10-12, and the repo copy is now the one bots read and write. Do not invent content that is not there.
 
 Bots write only inside `research-equity`. Never edit `_system/memory/MEMORY.md`. Never create a new hub without Drew's approval. Never write the `borrow-etf`, `diamond-creek`, or `spx-0dte` hubs.
+
+## Desk briefs
+
+Ranked desk output is a data drop, not a note. One JSON file per desk per day at `_system/data/desk_briefs/<desk>/<YYYY-MM-DD>.json`, validated by `_system/data/desk_briefs/schema.json` and `python _system/scripts/check_desk_briefs.py`, joined into `dashboard/data/desk_briefs.json` by `python _system/scripts/build_desk_briefs.py`, shown on the dashboard Inbox. The contract is `_system/data/desk_briefs/README.md`; the desk mandates are `_system/agents/DESKS.md`.
+
+| Rule | Detail |
+| --- | --- |
+| Desks | `special_situations`, `activism`, `fundamentals`, `nol_tax_assets`, `tape_index`, `stahl`, `short_selling`. |
+| Items | At most 12, best first. Every item has a ticker from `_system/portfolio/registry.json` (or the literal `unresolved`), a headline of at most 160 characters, one number, evidence with the accession or URL, and a confidence of `filing`, `provider`, `news`, or `web`. |
+| Inputs | `inputs_read` records every file read with the stamp it carried, so a brief built on stale data says so. |
+| Push | A pull request on a `grok/<desk>/<YYYY-MM-DD>-<slug>` branch that touches only the brief and, if needed, the hub daily note. The check must pass. |
+| Authority | `research_only: true`, `in_base_irr: false`, `authority: "none"`. No position, no size, no stance, no fraud tag. |
 
 ## Room and desks
 
 Grok Bot group room: Magis Capital Partners. Room id `7ad6d9cb-85bd-4f2c-b887-1bf4bf59b107`.
 
-Desks: Fundamental Analyst, Special Situations, Activism, NOL and Tax Assets, Technical Analyst, Murray Stahl.
+Desks: Fundamental Analyst, Special Situations, Activism, NOL and Tax Assets, Technical Analyst, Murray Stahl. A seventh desk, Short Selling, files desk briefs (`_system/agents/DESKS.md`); whether it posts in the room is part of the pending access decisions below.
 
-Weekday digests go out around 8:10-8:14 AM ET. Say nothing when nothing is new. Ranked hits only. Stubs go to Special Situations.
+Weekday digests go out around 8:10-8:14 AM ET. Say nothing when nothing is new. Ranked hits only. Stubs go to Special Situations. A room post is one line per hit that points at the desk brief; the brief is the record.
 
 ## How to push
 
 | Kind of change | Where it goes |
 | --- | --- |
 | Code and repo data | A pull request from a cloud agent or the GitHub connector. |
+| Desk briefs | `_system/data/desk_briefs/<desk>/<YYYY-MM-DD>.json` by pull request on a `grok/<desk>/<YYYY-MM-DD>-<slug>` branch; `check_desk_briefs.py` must pass. |
 | Documents | Shared Drive `Admin/Intake/...`, using `drive_intake_drop.py` for VIC. The 14:00 UTC Drive Intake Sync imports them. |
 | Notes and lessons | The `research-equity` hub only, within the writing rules above. |
 | Anything outbound to a person | Needs Drew's approval before it is sent. |
 
 ## Pending access decisions
 
-- [ ] Grant Michael's accounts access to the repo and Drive folders.
-- [ ] Decide read vs write on the memory hub for Michael's bots.
+- [x] Repo access: `mcricenti` holds `maintain` on this repository since 2026-10-12. Changes land by pull request (`CONTRIBUTING.md`, `docs/WRITE_MAP.md`).
+- [ ] Share the Drive folders (Books, short-selling-library, Admin/Intake) with Michael's Google accounts.
+- [x] Memory hub: write, by pull request on a `grok/<desk>/<date>-<slug>` branch into `_system/memory-hub/research-equity/`; the automerge data lane merges it when the path guard and validators pass.
 - [ ] Confirm whether Michael's bots join the Magis room.
 
 ## Left out on purpose

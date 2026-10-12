@@ -19,7 +19,7 @@
   },
   "local_memory_hub": {
     "path": "C:\\Users\\drewg\\Projects\\.agent-memory\\hubs\\research-equity\\",
-    "status": "Not reachable from the cloud. This repo is seeded with structure only. Drew copies his existing local content in. Do not invent graph nodes, context, or lessons."
+    "status": "Not reachable from the cloud. Its content was copied into _system/memory-hub/research-equity/ on 2026-10-12 (CONTEXT.md, MEMORY.md, bridges.md, daily/ through 2026-10-08, and the mesh-root GRAPH.md). The repo copy is the one bots read and write; the local path is Drew's cross-repo mesh. Do not invent graph nodes, context, or lessons."
   },
   "room": {
     "name": "Magis Capital Partners",
@@ -36,8 +36,7 @@
     "digest": "Weekday digests around 8:10-8:14 AM ET."
   },
   "pending_access": [
-    "Grant Michael's accounts access to the repo and Drive folders.",
-    "Decide read vs write on the memory hub for Michael's bots.",
+    "Share the Drive folders (Books, short-selling-library, Admin/Intake) with Michael's Google accounts.",
     "Confirm whether Michael's bots join the Magis room."
   ],
   "do_not_write": [
@@ -131,6 +130,71 @@
       "owner_desk": "Magis Capital Partners / Fundamental Analyst",
       "mode": "read",
       "push": "The data pipeline writes this file when the watch is built. A correction is a pull request from a cloud agent or the GitHub connector."
+    },
+    {
+      "id": "dashboard-special-situations",
+      "type": "repo file",
+      "location": "dashboard/data/special_situations.json",
+      "repo_path": "dashboard/data/special_situations.json",
+      "path_kind": "file",
+      "freshness_field": "generated_at",
+      "purpose": "Ranked special situations, discovery list, and history by lane (spinoffs, split_offs, mergers, warrants, restructurings, forced_sellers). Read generated_at before the rows.",
+      "owner_desk": "Magis Capital Partners / Special Situations",
+      "mode": "read",
+      "push": "The data pipeline writes this file. A correction is a pull request from a cloud agent or the GitHub connector."
+    },
+    {
+      "id": "dashboard-separations",
+      "type": "repo file",
+      "location": "dashboard/data/separations.json",
+      "repo_path": "dashboard/data/separations.json",
+      "path_kind": "file",
+      "freshness_field": "generated_at",
+      "purpose": "Split-offs and spin-offs: filed terms, spread, who-must-sell flows, odd_lot_alerts, discovery_events. Read generated_at before the rows. Contract: _system/data/separations/README.md.",
+      "owner_desk": "Magis Capital Partners / Special Situations",
+      "mode": "read",
+      "push": "The data pipeline writes this file. A registry seed with filing accessions is a pull request; run check_separation_universe.py first.",
+      "helper_repo_paths": [
+        "_system/data/separations/README.md",
+        "_system/scripts/check_separation_universe.py"
+      ]
+    },
+    {
+      "id": "dashboard-desk-briefs",
+      "type": "repo file",
+      "location": "dashboard/data/desk_briefs.json",
+      "repo_path": "dashboard/data/desk_briefs.json",
+      "path_kind": "file",
+      "freshness_field": "generated_at",
+      "purpose": "The latest desk brief per desk, joined for the dashboard Inbox, with per-desk age, stale flag, and the age of every input at read time. Built by build_desk_briefs.py from _system/data/desk_briefs/.",
+      "owner_desk": "Magis Capital Partners / all desks",
+      "mode": "read",
+      "push": "Generated. Do not edit; file a desk brief instead (see desk-briefs)."
+    },
+    {
+      "id": "desk-briefs",
+      "type": "repo file",
+      "location": "_system/data/desk_briefs/",
+      "repo_path": "_system/data/desk_briefs",
+      "path_kind": "directory",
+      "purpose": "Ranked desk output, one JSON file per desk per day at <desk>/<YYYY-MM-DD>.json. Desks: special_situations, activism, fundamentals, nol_tax_assets, tape_index, stahl, short_selling. At most 12 items; every ticker from the registry or the literal unresolved; one_number required; evidence with accession or URL; confidence filing, provider, news, or web; inputs_read carries each file's stamp. research_only true, in_base_irr false, authority none.",
+      "owner_desk": "Magis Capital Partners / all desks",
+      "mode": "read-write",
+      "push": "A pull request on a grok/<desk>/<YYYY-MM-DD>-<slug> branch that touches only the brief and, if needed, the hub daily note. python _system/scripts/check_desk_briefs.py must pass. Contract: _system/data/desk_briefs/README.md. Mandates: _system/agents/DESKS.md.",
+      "constraints": [
+        "One file per desk per day; a correction is a new file on a later date, never an edit to a merged one.",
+        "At most 12 items, best first; a headline of at most 160 characters; one_number on every item.",
+        "Every ticker is in _system/portfolio/registry.json holdings or watchlist, or is the literal unresolved.",
+        "No position, no size, no stance, no price target, no fraud tag.",
+        "The chat room gets a one-line pointer; the brief is the record."
+      ],
+      "helper_repo_paths": [
+        "_system/data/desk_briefs/README.md",
+        "_system/data/desk_briefs/schema.json",
+        "_system/scripts/check_desk_briefs.py",
+        "_system/scripts/build_desk_briefs.py",
+        "_system/agents/DESKS.md"
+      ]
     },
     {
       "id": "portfolio-registry",
@@ -314,11 +378,11 @@
       "repo_path": "_system/memory-hub/research-equity",
       "path_kind": "directory",
       "local_path": "C:\\Users\\drewg\\Projects\\.agent-memory\\hubs\\research-equity\\",
-      "purpose": "Shared research-equity memory. Seeded with structure only until Drew copies his local hub in.",
+      "purpose": "Shared research-equity memory. Drew's local hub was copied in on 2026-10-12: CONTEXT.md (desk lines under the Desk heading), MEMORY.md (human promote only), bridges.md, daily/ notes through 2026-10-08, and the mesh-root GRAPH.md. Ranked desk output goes to desk-briefs, not here.",
       "owner_desk": "Magis Capital Partners / all desks",
       "mode": "append",
-      "push": "Append at most three [PROPOSED] lessons per session to daily/YYYY-MM-DD.md. Each lesson uses Evidence, Seen, Harmful, Scope, and Review after. Add at most one desk line to CONTEXT.md. Never edit _system/memory/MEMORY.md.",
-      "notes": "Drew's local copy is not reachable from the cloud. Do not invent content. Never create a new hub without Drew's approval. Never write the borrow-etf, diamond-creek, or spx-0dte hubs.",
+      "push": "Append at most three [PROPOSED] lessons per session to daily/YYYY-MM-DD.md. Each lesson uses Evidence, Seen, Harmful, Scope, and Review after. Add at most one desk line under the Desk heading of CONTEXT.md. Never edit _system/memory/MEMORY.md or the hub MEMORY.md.",
+      "notes": "Drew's local copy is not reachable from the cloud; the repo copy is the one bots read and write. Do not invent content that is not there. Never create a new hub without Drew's approval. Never write the borrow-etf, diamond-creek, or spx-0dte hubs.",
       "constraints": [
         "Bots write only inside this directory.",
         "Append at most three [PROPOSED] lessons per session.",
@@ -333,7 +397,10 @@
         "_system/memory-hub/research-equity/README.md",
         "_system/memory-hub/research-equity/GRAPH.md",
         "_system/memory-hub/research-equity/CONTEXT.md",
-        "_system/memory-hub/research-equity/daily/README.md"
+        "_system/memory-hub/research-equity/MEMORY.md",
+        "_system/memory-hub/research-equity/bridges.md",
+        "_system/memory-hub/research-equity/daily/README.md",
+        "_system/agents/DESKS.md"
       ],
       "helper_repo_dirs": [
         "_system/memory-hub/research-equity/daily"

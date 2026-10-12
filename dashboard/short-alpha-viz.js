@@ -64,6 +64,85 @@
     if (!source.ref) return '';
     return REPO_BASE + String(source.ref).split('/').map(encodeURIComponent).join('/');
   }
+  // Entry contract (Michael's Short-Selling desk, _system/research/short-alpha/README.md):
+  // category, source, tags, summary, note_ref and the six rsdb lens reviews.
+  const CATEGORY_LABELS = {
+    accounting: 'Accounting',
+    'shitco-concept': 'Shitco / concept',
+    'supply-side': 'Supply-side / competition',
+    'share-supply': 'Share supply',
+    'reverse-split': 'Reverse split',
+    'activist-short': 'Activist short',
+    'borrow-squeeze': 'Borrow / squeeze risk',
+    playbook: 'Playbook',
+  };
+  const LENS_STATUS_LABELS = { unreviewed: 'Unreviewed', unresolved: 'Unresolved', supported: 'Supported', contradicted: 'Contradicted' };
+  const VAULT_PREFIX = 'research-vault/';
+  const SSI_PATH = /^(?!\/)(?!.*(?:^|\/)\.\.(?:\/|$))[A-Za-z0-9_][A-Za-z0-9_./-]*$/;
+  function categoryLabel(id) { return CATEGORY_LABELS[id] || String(id || '').replace(/-/g, ' '); }
+  function noteRefHtml(ref) {
+    const text = String(ref || '').trim();
+    if (!text) return '';
+    if (text.startsWith(VAULT_PREFIX)) {
+      return `<span class="short-note-ref is-vault" title="Narrative lives in the private research vault; it is not in this repository">${esc(text)}</span>`;
+    }
+    if (SSI_PATH.test(text)) {
+      const href = REPO_BASE + text.split('/').map(encodeURIComponent).join('/');
+      return `<a class="short-note-ref" href="${esc(href)}" target="_blank" rel="noopener">${esc(text)}</a>`;
+    }
+    return `<span class="short-note-ref">${esc(text)}</span>`;
+  }
+  function lensStatus(review) {
+    const status = String((review || {}).status || '');
+    return LENS_STATUS_LABELS[status] ? status : 'unreviewed';
+  }
+  function lensStrip(reviews) {
+    if (!Array.isArray(reviews) || !reviews.length) return '';
+    const recorded = reviews.filter(review => lensStatus(review) !== 'unreviewed').length;
+    const cells = reviews.map(review => {
+      const status = lensStatus(review);
+      const name = String(review.lens_id || 'lens').replace(/_/g, ' ');
+      const when = review.reviewed_at ? ` · ${review.reviewed_at}` : '';
+      return `<i class="is-${status}" title="${esc(`${name}: ${LENS_STATUS_LABELS[status]}${when}`)}"></i>`;
+    }).join('');
+    return `<span class="short-lens-strip" role="img" aria-label="${recorded} of ${reviews.length} lens reviews recorded" title="${recorded} of ${reviews.length} lens reviews recorded">${cells}</span>`;
+  }
+  function entryMeta(row) {
+    const bits = [];
+    if (row.category) bits.push(`<span class="short-chip is-category" title="Category">${esc(categoryLabel(row.category))}</span>`);
+    if (row.source) bits.push(`<span class="short-chip is-source" title="Filed by">${esc(row.source)}</span>`);
+    for (const tag of row.tags || []) bits.push(`<span class="short-chip is-tag">#${esc(tag)}</span>`);
+    return bits.length ? `<div class="short-meta">${bits.join('')}</div>` : '';
+  }
+  function entryCard(row) {
+    const has = row.category || row.source || row.added_on || row.updated_on || (row.tags || []).length || row.note_ref;
+    if (!has) return '';
+    const rows = [
+      row.category ? `<dt>Category</dt><dd>${esc(categoryLabel(row.category))}</dd>` : '',
+      row.source ? `<dt>Source</dt><dd>${esc(row.source)}</dd>` : '',
+      row.added_on || row.updated_on ? `<dt>Dates</dt><dd>added ${esc(row.added_on || '—')} · updated ${esc(row.updated_on || '—')}</dd>` : '',
+      (row.tags || []).length ? `<dt>Tags</dt><dd>${(row.tags || []).map(tag => `<span class="short-chip is-tag">#${esc(tag)}</span>`).join(' ')}</dd>` : '',
+      row.note_ref ? `<dt>Note</dt><dd>${noteRefHtml(row.note_ref)}</dd>` : '',
+    ].join('');
+    return `<div class="short-detail-card short-entry-card"><h4>Entry</h4><dl>${rows}</dl></div>`;
+  }
+  function lensTable(reviews) {
+    if (!Array.isArray(reviews) || !reviews.length) return '';
+    const body = reviews.map(review => {
+      const status = lensStatus(review);
+      const evidence = (review.supporting_evidence || []).length + (review.contradictory_evidence || []).length;
+      return `<tr>
+        <td>${esc(String(review.lens_id || '').replace(/_/g, ' '))}</td>
+        <td><span class="short-lens-status is-${status}">${esc(LENS_STATUS_LABELS[status])}</span></td>
+        <td>${esc(review.mechanism || '—')}</td>
+        <td>${esc(review.falsifier || '—')}</td>
+        <td>${esc(review.reviewed_at || review.known_at || '—')}${evidence ? ` · ${evidence} items` : ''}</td>
+      </tr>`;
+    }).join('');
+    return `<div class="short-detail-card short-lens-card"><h4>Lens reviews ${lensStrip(reviews)}</h4>
+      <table class="short-lens-table"><thead><tr><th>Lens</th><th>Status</th><th>Mechanism</th><th>Falsifier</th><th>Reviewed</th></tr></thead><tbody>${body}</tbody></table>
+      <p class="form-hint">Six dated reviews from the reverse-split process. A blank review is unreviewed, never supported.</p></div>`;
+  }
   function matchesFramework(candidate, frameworkId, frameworks) {
     if (!frameworkId || frameworkId === 'all') return true;
     const ids = new Set([...(candidate.effective_frameworks || candidate.frameworks || []), ...(candidate.gate_hits || [])]);
@@ -111,7 +190,8 @@
     }).join('');
   }
   function scoreOf(row) {
-    const n = Number(row && row.quant && row.quant.score);
+    // `quant` is null for a name outside the screen universe; Number(null) is 0, so test the object first.
+    const n = row && row.quant ? Number(row.quant.score) : NaN;
     return Number.isFinite(n) ? n : null;
   }
   function byScore(left, right) {
@@ -123,7 +203,7 @@
     return b - a;
   }
   function scoreBadge(quant) {
-    const n = Number(quant && quant.score);
+    const n = quant ? Number(quant.score) : NaN;
     if (!Number.isFinite(n)) return `<span class="short-score is-empty" title="${esc(quant ? `${quant.evidence_count || 0} fundamental signals; three are needed` : 'Not in the screen universe')}">—</span>`;
     const tier = n >= 40 ? 'high' : (n >= 25 ? 'mid' : 'low');
     const title = `decay ${fmtShare(quant.decay)} · tape ${fmtShare(quant.tape)} · risk ${fmtShare(quant.risk)} · ${quant.evidence_count} signals`;
@@ -201,8 +281,8 @@
       const dtcTitle = row.crowding?.settlement_ymd ? `FINRA ${row.crowding.settlement_ymd}, context tier` : 'No days-to-cover observation';
       return `<tr class="${selected === row.ticker ? 'is-selected' : ''}" data-short-select="${esc(row.ticker)}" tabindex="0">
         <td class="short-symbol">${esc(row.ticker)}</td>
-        <td>${esc(row.security_name || '')}</td>
-        <td><span class="short-stage" data-stage="${esc(row.stage || '')}">${esc(row.stage || '—')}</span></td>
+        <td>${esc(row.security_name || '')}${row.summary ? `<small class="short-summary" title="${esc(row.summary)}">${esc(row.summary)}</small>` : ''}${entryMeta(row)}</td>
+        <td><span class="short-stage" data-stage="${esc(row.stage || '')}">${esc(row.stage || '—')}</span>${lensStrip(row.lens_reviews)}</td>
         <td class="num">${scoreBadge(row.quant)}</td>
         <td>${tags}</td>
         <td>${esc(sourceLabel(row, sourceTypes))}</td>
@@ -234,14 +314,18 @@
     const hypothesis = String(candidate.hypothesis || '').trim();
     return `<section class="short-name-detail">
       <h3>${esc(candidate.ticker)} · ${esc(candidate.security_name || '')}</h3>
+      ${entryMeta(candidate)}
       <p>${hypothesis ? esc(hypothesis) : 'Lead only. A publisher hit or filing event is not a thesis. Write the market belief, the variant view, one catalyst, and one falsifier before promoting it.'}</p>
+      ${candidate.summary ? `<p class="short-entry-summary">${esc(candidate.summary)}</p>` : ''}
       ${candidate.research?.review_note ? `<p class="form-hint">${esc(candidate.research.review_note)}</p>` : ''}
       <div class="short-detail-grid">
         <div class="short-detail-card"><h4>Lenses</h4><ul>${lenses}</ul></div>
         <div class="short-detail-card"><h4>What should break</h4><ul>${list(candidate.catalysts)}</ul></div>
         <div class="short-detail-card"><h4>What proves us wrong</h4><ul>${list(candidate.falsifiers)}</ul></div>
+        ${entryCard(candidate)}
       </div>
       <div class="short-sources">${sources || '<span class="form-hint">No sources linked.</span>'}</div>
+      ${lensTable(candidate.lens_reviews)}
       ${quantCard(candidate.quant, payload, maps)}
       ${furnace ? `<div class="short-detail-card"><h4>Filing events</h4><ul>${furnace}</ul></div>` : ''}
     </section>`;
@@ -315,7 +399,7 @@
     const saved = read(FILTER_KEY, { query: '', framework: 'all', stage: 'all' });
     const selected = read(SELECTED_KEY, '');
     const candidates = getCandidates(payload).filter(row => {
-      const hay = `${row.ticker} ${row.security_name} ${row.hypothesis} ${row.origin || ''}`.toLowerCase();
+      const hay = `${row.ticker} ${row.security_name} ${row.hypothesis} ${row.origin || ''} ${row.category || ''} ${row.source || ''} ${(row.tags || []).join(' ')} ${row.summary || ''}`.toLowerCase();
       const stageOk = saved.stage === 'all' || row.stage === saved.stage;
       return (!saved.query || hay.includes(saved.query.toLowerCase()))
         && stageOk
@@ -358,7 +442,34 @@
     <section class="short-section"><h3 class="short-section-title">Open book <span>${positions.length}</span></h3>
       <div class="short-alpha-book">${positions.length ? positions.map(row => renderPosition(row, maps)).join('') : '<div class="short-alpha-empty">No borrowed shorts in this partition.</div>'}</div>
     </section>
-    <p class="short-alpha-note">${esc(payload.methodology?.excluded || '')} ${esc(payload.methodology?.leads || '')} ${esc(payload.methodology?.quant || '')}</p>`;
+    <section class="short-section short-reverse-splits" data-short-reverse-splits hidden>
+      <h3 class="short-section-title">Reverse splits</h3>
+      <div data-short-reverse-splits-body></div>
+    </section>
+    <p class="short-alpha-note">${esc(payload.methodology?.excluded || '')} ${esc(payload.methodology?.leads || '')} ${esc(payload.methodology?.quant || '')} ${esc(payload.methodology?.desk_notes || '')}</p>`;
+  }
+  // The Reverse splits sub-section is filled by index.html from data/reverse_splits.json
+  // through window.ReverseSplitsViz.render(doc) (dashboard/reverse-splits-viz.js). The
+  // section stays hidden when the file is absent or the renderer is not loaded.
+  function mountReverseSplits(container, doc) {
+    const section = container && container.querySelector('[data-short-reverse-splits]');
+    if (!section) return false;
+    const body = section.querySelector('[data-short-reverse-splits-body]');
+    const viz = global.ReverseSplitsViz;
+    if (!doc || typeof doc !== 'object' || !viz || typeof viz.render !== 'function') {
+      section.hidden = true;
+      if (body) body.innerHTML = '';
+      return false;
+    }
+    let html = '';
+    try { html = String(viz.render(doc) || ''); } catch (error) { html = `<div class="short-alpha-empty">Reverse splits view failed: ${esc(error && error.message)}</div>`; }
+    if (!html.trim()) { section.hidden = true; return false; }
+    if (body) body.innerHTML = html;
+    section.hidden = false;
+    if (typeof viz.attach === 'function') {
+      try { viz.attach(body || section, doc); } catch (_) { /* optional */ }
+    }
+    return true;
   }
   function mergedExport(payload) {
     const out = clone(payload);
@@ -510,5 +621,5 @@
       rerender();
     }));
   }
-  global.ShortAlphaViz = { render, attach, getCandidates, getPositions };
+  global.ShortAlphaViz = { render, attach, getCandidates, getPositions, mountReverseSplits, lensStrip, noteRefHtml, entryMeta };
 })(window);
