@@ -162,7 +162,10 @@ def test_committed_seed_brief_passes_the_checker():
     for path, stamp in stamps.items():
         doc = json.loads((ROOT / path).read_text(encoding="utf-8"))
         field = doc.get("generated_at") or (doc.get("meta") or {}).get("updated")
-        assert field == stamp, (path, field, stamp)
+        # The brief records the build it read. CI rebuilds these files nightly,
+        # so the committed file may be newer than the brief, never older.
+        assert field is not None, path
+        assert str(stamp) <= str(field), (path, field, stamp)
 
 
 def test_unknown_ticker_is_rejected_and_unresolved_is_allowed(root: Path):
