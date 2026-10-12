@@ -144,6 +144,45 @@ divides percent quotes by 100). There is no broker connection anywhere in the
 package; the original tool's live snapshot path was deleted (it used the SPX
 executor's client id). See `CLAUDE.md`, IB Gateway rules.
 
+## Databento venue files and the split detector (local)
+
+`databento-pull` fetches Databento's venue datasets (`XNAS.ITCH`, `XNYS.PILLAR`,
+`XASE.PILLAR`; they begin 2018-05-01) into `local/raw/databento/`: quarterly
+all-symbol daily bars, monthly `definition` snapshots (issue type and listing
+venue) and quarterly `status` (Reg SHO 201 state and halts). It needs
+`DATABENTO_API_KEY`. Every request is priced first with `metadata.get_cost`
+and refused above `--max-cost` (default $0.00, which the current plan quotes
+for all of these). Reruns skip complete files. Venue files carry every
+instrument that traded, including names that later delisted, at printed
+prices. The data is licensed to us and SSI is public, so the files stay under
+the gitignored `local/`; only derived event facts may enter the ledger.
+
+`detect-splits` reads those files and finds reverse splits in printed prices:
+a session that opens (or closes) at least 1.8x the prior close, within 30% of
+a common ratio (15% for 1:2 and 1:3), with the median share volume of the
+next five sessions at most 0.8x (0.6x for 1:2 and 1:3) of the five before.
+A news move of the same size comes with rising volume and fails the rule.
+Detections of one symbol within ten days are one event (a venue with no print
+on the split day sees the jump at its next print), dated by the earliest
+session. Events are classified with the definitions: only common, ordinary and
+ADS shares listed on Nasdaq, NYSE or NYSE American count, and exchange test
+symbols (`ZJZZT` and friends) never do. An event is `corroborated` when the
+listing exchange saw it or at least two venues did. A lone print on a venue that
+is not the listing market is weak evidence: on 2026-10-12, 10 of 20 such events
+in a random sample were confirmed by an SEC filing, against 30 of 40
+corroborated ones. Count only corroborated events. Calibration: the same
+filing search confirmed 14 of 15 events the ledger already had. The result is reconciled against `events.jsonl` (same ticker, ex dates
+within five days) and written to `local/reports/split_detections.csv` and
+`local/reports/split_detection_reconciliation.json`:
+
+- `matched`: in the ledger and in prices.
+- `detector_only`: a discovery gap. Verify it against the filing before it
+  enters the ledger.
+- `ledger_only`: detector work, such as a ticker renamed since the split (the ledger keeps today's ticker; the venue file has the one in use then), an OTC
+  name, or a first session below the jump threshold.
+
+The ratio is inferred from prices and labelled so; the filing's ratio wins.
+
 ## Dashboard payload (`dashboard/data/reverse_splits.json`)
 
 Built from the JSONL alone (CI has no SQLite). Schema `reverse_splits.v1`:

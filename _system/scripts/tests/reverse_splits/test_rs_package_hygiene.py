@@ -24,9 +24,11 @@ LIGHT_MODULES = (
     "reverse_splits.enrich_edgar_fast", "reverse_splits.ingest_prices", "reverse_splits.ingest_finra",
     "reverse_splits.borrow", "reverse_splits.snapshot_export", "reverse_splits.classify_exchanges",
     "reverse_splits.rerun_sources", "reverse_splits.serve", "reverse_splits.cli",
+    "reverse_splits.databento_bars", "reverse_splits.split_detector",
     "build_reverse_splits_dashboard", "check_reverse_splits",
 )
-BLOCKED = ("pandas", "yfinance", "requests", "bs4", "lxml", "dateutil", "tqdm", "exchange_calendars", "matplotlib", "openpyxl")
+BLOCKED = ("pandas", "yfinance", "requests", "bs4", "lxml", "dateutil", "tqdm", "exchange_calendars", "matplotlib", "openpyxl",
+           "databento")
 
 
 def test_no_broker_client_anywhere_in_the_package():

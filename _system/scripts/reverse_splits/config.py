@@ -37,6 +37,7 @@ _PATH_DEFAULTS = {
     "edgar_cache": "local/raw/edgar",
     "finra_dir": "local/raw/finra",
     "ibkr_dir": "local/raw/ibkr",
+    "databento_dir": "local/raw/databento",
     "reports_dir": "local/reports",
     "public_dir": "local/reports/public",
 }
@@ -84,6 +85,11 @@ class Config:
     @property
     def ibkr_dir(self) -> Path:
         return self._path("ibkr_dir")
+
+    @property
+    def databento_dir(self) -> Path:
+        """Licensed Databento files. Local only: SSI is public."""
+        return self._path("databento_dir")
 
     @property
     def reports_dir(self) -> Path:
