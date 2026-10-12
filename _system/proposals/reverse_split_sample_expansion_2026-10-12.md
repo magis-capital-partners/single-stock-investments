@@ -14,6 +14,36 @@
 
 Capacity is not the problem: removing `max_names` and cash limits adds 4 completed-split trades and 9 verified trades.
 
+## The free route: Databento (verified 2026-10-12)
+
+Drew's existing Databento plan prices everything the study needs at **$0.00**, from 2018-05-01. `metadata.get_cost` quoted each request before any download:
+
+| Need | Databento dataset and schema | Billable size, 2018-05 to 2026-10 | Cost |
+|---|---|---:|---:|
+| Daily bars, every instrument including later-delisted ones | `XNAS.ITCH`, `XNYS.PILLAR`, `XASE.PILLAR` `ohlcv-1d`, `ALL_SYMBOLS` | 1,089 + 806 + 605 MB | $0 |
+| Short-sale restriction and halts | `XNAS.ITCH` `status` (`is_short_sell_restricted`, halt and pause actions) | 3,685 MB | $0 |
+| Official open/close and auction prints | `statistics` | 2,917 MB | $0 |
+| Security master (issue type, listing venue, symbol per day) | `definition` | 4.8 MB a day | $0 |
+| Execution realism for event windows | `trades`, `mbp-1`, `tbbo`, `ohlcv-1m` | per window | $0 to cents |
+
+Venue data is raw and unadjusted, which is what the book needs: printed prices, with no vendor adjustment to reverse. Delisted reverse splitters resolve; NKLA, GOEV, RIDE, EXPR and WE all map to instrument ids over their split windows. The key lives in `quant/DC-Execution/.env`; SSI's GitHub has no Databento secret, so this is a local workbench step, like prices today. Raw Databento data stays in the gitignored `local/` tree. It is licensed to us, and SSI is public. Only derived event facts (dates, ratios, identifiers) enter the ledger.
+
+**Pilot, Q1 2025** (16.7 MB, one venue, all symbols). Reverse splits were detected from raw bars: an open at an integer multiple of the prior close, within 30%, with share volume contracting. They were then filtered with the definition snapshot to common, ordinary and ADS shares listed on Nasdaq, NYSE or NYSE American.
+
+- The ledger has 28 events in the quarter, 20 of them listed. The detector found 14 of the 28.
+- The detector found **60 listed equity reverse splits the ledger does not have at any date**, among them MULN 1:60, TNXP 1:100, GSAT 1:15, WKHS 1:12, KPTI 1:15, OTLY 1:20 (an ADS ratio change), and XTIA's own 1:250 on 2025-01-10.
+- Only 3 of the 60 stopped trading inside the quarter. **The larger gap is discovery coverage, not survivorship**: the EDGAR-phrase plus Yahoo seed misses most live splitters too.
+- Read at face value, the ledger holds about a quarter of listed reverse splits. A full 2018-05 to 2026-10 pass would put the effective-split universe in the low thousands, against 475 today. This is a one-quarter extrapolation; the full pass replaces it with a count.
+- The 14 ledger events the detector missed are the work list for the detector: ticker changes on the split date, OTC names absent from the Nasdaq venue, and a first-day open that fell below 1.8x.
+
+**Before 2018-05** nothing free covers delisted prices. EDGAR still dates and sizes events for free back to 2001, so 2005-2018 can be discovered now and priced later if it is ever worth a licence.
+
+**Borrow history is the one thing no free source provides.** IBKR's FTP serves only the current file. iBorrowDesk refuses scripted requests (empty reply; HTTP 403 on the site), and getting around that is not an option. QuantConnect lists an IBKR-style daily short-availability dataset from 2018-01, but its docs show neither the price nor whether the data can be exported. The free substitute has three parts:
+
+1. Archive IBKR's public file daily from now. The importers read it as of PR #1158.
+2. Fit a cross-sectional fee model on today's 20,238-name file, using inputs that exist historically: price, market value, FINRA short interest over float, SEC fails-to-deliver, and threshold-list membership. Refit it as the forward archive grows.
+3. Report strict-borrow results only for the forward cohort. Historical books stay conditional on modelled fees, labelled as such.
+
 ## Where the trades go (measured 2026-10-12)
 
 Reproduced exactly against the old repo's DB (1.78M price rows, read-only copy) with SSI's package code. Event-level counts are from `summarize_unconstrained` (`run_book.py:295-313`), which writes `backtest.json` but not `book_runs.jsonl`.
@@ -63,9 +93,9 @@ Separately, a hazard, now removed: the old repo's local copy had `src/rsdb/ibkr_
 | 1 | Fix the announce date and add post-split entry cohorts (ex close, ex + 1, ex + 5) | Completed listed splits: 128 → about 446-451 eligible, all already priced | Code only | 1 |
 | 2 | Finish the filing backlog (19,311 hits pending in `expansion_v2`) and adjudicate | Verified: 216 parsed leads → up to 1,447 scheduled actions across 1,388 issuers, before eligibility | Code, SEC requests | 0-1 |
 | 3 | Replace the $1 floor with feasibility checks (FINRA 4210 $2.50/share minimum, spread, size) | 75 → up to 136 verified eligible; 128 → up to 431 completed | Code only | 1 |
-| 4 | Discovery independent of today's tickers, plus delisted prices | Unknown; measured in the pilot by diffing a vendor split list for 2021-2026 against our 475 | $199-630/yr | 2 |
-| 5 | Extend history to 2015 (then 2005 if comparable) | Several hundred listed events (Nasdaq alone processed 94 reverse splits in 2020 and 196 in 2022); the pilot's count replaces this guess | Same vendor | 2 |
-| 6 | SSR as delayed entry or worse fill, derived from unadjusted bars | +21 verified | Code only | 1 |
+| 4 | Discovery from raw Databento bars and definitions, independent of today's tickers, with delisted prices | Q1 2025 pilot: 60 listed splits missing from the ledger vs 20 present; the full pass counts 2018-05 onward | $0 (Databento) | 1-2 |
+| 5 | Extend history: 2018-05 priced for free; 2005-2018 discovered from EDGAR, priced only under a licence | 3.4 more priced years; earlier years wait | $0, then a licence | 2 |
+| 6 | SSR from Databento `status` (`is_short_sell_restricted`), as delayed entry or worse fill | +21 verified; the proxy becomes a record | $0 | 1 |
 | 7 | Refresh prices past 2026-10-08; map CIK to the current ticker | +20; +17 | Code only | 0 |
 | 8 | Drop the placeholder splits | +8 completed, and correct prices for 10 tickers | Code only | 0 |
 | 9 | Borrow history | Makes strict nonzero: forward from 2026-10-12 for free; back to 2018-04 with a paid licence | $0, or a licence | 3 |
@@ -114,6 +144,8 @@ Fetch the companyfacts cache into SSI's workbench and score every verified lead,
 
 | Need | Source | History | Cost | Caveat |
 |---|---|---|---|---|
+| Prices incl. delisted, SSR, halts, quotes, security master; split detection | Databento venue datasets (existing plan) | 2018-05 | $0 (quoted) | Licensed data: raw stays in `local/`; key in `quant/DC-Execution/.env` |
+| Borrow, forward | IBKR public `usa.txt` | From 2026-10-12 | Free | Current file only; archive it daily |
 | Events | SEC full-text search; quarterly indexes | 2001; 1994 | Free | About 10 requests a second per IP; use the shared limiter at 4 |
 | Events, cross-check | Massive (Polygon) splits | 1978 | $29-199/mo; key exists | Delisted coverage not stated in the docs |
 | Events, Nasdaq | Nasdaq Daily List | 1998-99 | Paid | Nasdaq only |
@@ -137,8 +169,8 @@ Not used: ThetaData (the seat rule in `~/.claude/CLAUDE.md`; its docs show stock
 ## Decisions needed
 
 1. **Where `expansion_v2` lands.** Bring it into SSI now (recommended), or finish it in the old copy first and port once. Either way, commit it somewhere backed up today.
-2. **The delisted-price pilot.** Approve a 20-event pilot on EODHD and Norgate, and check which Massive plan the existing key is on.
-3. **Historical borrow.** Price QuantRocket's licence, or run forward-only.
+2. **Prices: Databento, $0.** The Q1 2025 pilot is done. Approve the full local pull (about 2.5 GB of daily bars across three venues, plus `status` and monthly `definition` snapshots) into `_system/data/reverse_splits/local/raw/databento/`. No vendor purchase is needed for 2018 onward. EODHD and Norgate remain options only for pre-2018 prices.
+3. **Historical borrow.** No free source exists. Run the daily archive plus a fitted fee model (free), price QuantRocket's licence, or check QuantConnect's dataset terms.
 4. **The daily borrow lane.** Commit the filtered daily rows to SSI (small; IBKR's redistribution terms for the public file are unstated), or keep raw files in the private research vault.
 5. **Post-split entry cohorts.** These are a strategy change, so Michael decides whether they become RSI cohorts.
 6. **The old copy's Gateway borrow path.** Done 2026-10-12: the old repo's local branch `realism-book` commit `3ab0ec9` removes the TWS/Gateway snapshot functions, the `[ibkr]` block with `client_id = 17`, the `ib_insync` dependency and the instructions that described it. The CSV importer and sizing cap stay; its 86 tests pass. The GitHub copy is archived, so this commit is local only.
