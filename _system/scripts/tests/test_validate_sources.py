@@ -104,6 +104,22 @@ def _by_id(payload: dict) -> dict:
     return {item["id"]: item for item in payload["sources"]}
 
 
+def _briefing_text() -> str:
+    """SOURCES.md is outside the default _system sparse set, so fall back to git."""
+    path = ROOT / "SOURCES.md"
+    if path.is_file():
+        return path.read_text(encoding="utf-8")
+    result = subprocess.run(
+        ["git", "show", "HEAD:SOURCES.md"],
+        cwd=ROOT,
+        capture_output=True,
+        text=True,
+        check=False,
+    )
+    assert result.returncode == 0, result.stderr
+    return result.stdout
+
+
 def test_committed_index_and_briefing_match_the_contract():
     failures = sources.validate_index(ROOT / "_system" / "sources.json", ROOT)
     assert failures == [], failures
@@ -118,7 +134,7 @@ def test_committed_index_and_briefing_match_the_contract():
     assert rows["email-drewgoldman01"]["mode"] == "read"
     assert rows["email-magis"]["connector"] == "magis"
     assert "personal brokerage mail" in rows["email-drewgoldman01"]["never_surface"]
-    briefing = (ROOT / "SOURCES.md").read_text(encoding="utf-8")
+    briefing = _briefing_text()
     missing = [phrase for phrase in BRIEFING_PHRASES if phrase not in briefing]
     assert missing == [], missing
 

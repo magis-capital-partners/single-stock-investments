@@ -24,6 +24,7 @@ on:
       - "dashboard/data/criticality_summary.json"
       - "ops-watchdog/**"
       - "AMZN/investor-documents/download_amzn_investor_docs.py"
+      - "SOURCES.md"
   push:
     branches: [main]
     paths:
@@ -35,6 +36,7 @@ on:
       - "dashboard/data/criticality_summary.json"
       - "ops-watchdog/**"
       - "AMZN/investor-documents/download_amzn_investor_docs.py"
+      - "SOURCES.md"
   # Bot pushes (GITHUB_TOKEN) start no workflow, so main is also tested daily.
   schedule:
     - cron: "23 5 * * *"
@@ -122,8 +124,8 @@ jobs:
           # What the suites read: _system without the reference corpus (its
           # top-level registries stay), the workflows some tests parse, the D1
           # migrations, edge functions and oauth proxy, the ops-watchdog worker
-          # config, one criticality summary, and one ticker download script for
-          # the payload-path test.
+          # config, one criticality summary, one ticker download script for
+          # the payload-path test, and SOURCES.md for the source-index contract.
           sparse-checkout: |
             /_system/
             !/_system/reference/*/
@@ -134,6 +136,7 @@ jobs:
             /dashboard/data/criticality_summary.json
             /ops-watchdog/
             /AMZN/investor-documents/download_amzn_investor_docs.py
+            /SOURCES.md
           sparse-checkout-cone-mode: false
       - uses: actions/setup-python@v5
         with:
