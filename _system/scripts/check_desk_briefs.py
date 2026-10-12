@@ -26,8 +26,8 @@ from pathlib import Path
 
 try:
     from jsonschema import Draft202012Validator
-except ImportError as exc:  # pragma: no cover - CI installs jsonschema==4.26.0
-    raise SystemExit("check_desk_briefs.py needs the jsonschema package (pip install jsonschema)") from exc
+except ImportError:  # the rebuild lane may lack jsonschema; main() degrades in --warn-only
+    Draft202012Validator = None  # type: ignore[assignment]
 
 ROOT = Path(__file__).resolve().parents[2]
 BRIEFS_DIR = ROOT / "_system" / "data" / "desk_briefs"
@@ -277,6 +277,10 @@ def main(argv: list[str] | None = None) -> int:
     parser.add_argument("--root", type=Path, default=ROOT)
     parser.add_argument("--today", type=date.fromisoformat, default=None, help="override today's date (tests)")
     args = parser.parse_args(argv)
+    if Draft202012Validator is None:
+        print("check_desk_briefs.py: jsonschema is not installed; briefs were not validated"
+              " (pip install jsonschema). Exiting 0 under --warn-only, 1 otherwise.")
+        return 0 if args.warn_only else 1
     report = check_all(
         paths=args.paths or None,
         briefs_dir=args.briefs_dir,

@@ -67,7 +67,7 @@ BRIEFING_PHRASES = (
     "14:00 UTC",
     "- [x] Repo access: `mcricenti` holds `maintain` on this repository since 2026-10-12.",
     "- [x] Memory hub: write, by pull request on a `grok/<desk>/<date>-<slug>` branch into `_system/memory-hub/research-equity/`",
-    "- [ ] Confirm whether Michael's bots join the Magis room.",
+    "- [x] Michael's bots join the Magis room (decided 2026-10-12).",
     "index_membership.json",
     "fico_watch.json",
     "You Can Be A Stock Market Genius",

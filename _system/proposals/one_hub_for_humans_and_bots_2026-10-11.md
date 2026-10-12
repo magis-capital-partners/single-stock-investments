@@ -197,3 +197,16 @@ Human gates on beliefs, capital and approvals; the provenance manifest on resear
 | 5. Privacy | Not changed. | Decision 1 stands open; nothing was made private and no quantities moved to D1. |
 
 Verification at merge time: 1,076 tests across `_system/trading`, `_system/scripts/tests` and the explicit list, plus 124 reverse-split tests; graph invariants P3 (31 lanes) and P6 (13 feeds) green; `validate_sources.py` valid.
+
+## Decisions taken (2026-10-12)
+
+Drew asked for the open decisions to be taken rather than parked.
+
+1. **Visibility.** SSI stays public (Actions minutes). Short-idea narratives go to the private vault (`research-vault/short-research/`); SSI holds the structured row and the pointer. The short position ledger stays where it is: its history is already public, and a history scrub is a separate, deliberate step.
+2. **Reverse-split strategy decisions** belong to Michael (`_system/data/reverse_splits/decisions.jsonl`).
+3. **Bot identities.** One fine-grained token per bot per owner, named after the bot; each owner creates their own.
+4. **Magis room.** Michael's bots join. Same posting rules as Drew's desks; the desk brief is the record.
+5. **Drive sharing.** Drew is sharing the folders with Michael's accounts himself.
+6. **Side repos.** All three archived: `Special-Situations`, `Short-Selling`, and `reverse-split-short-research` (its last rerun outputs were pushed first and its README points at the hub package).
+7. **Dead queues.** `short_alpha_research_queue.json` and `vicki_dispatch_queue.json` retired (no consumer, no workflow). `cvr_agent_queue.json` kept: `cvr_common.py` maintains it and the Special Situations desk now reads it.
+8. **Greenblatt.** Text extracted from the Magis library copy on Drive into the private vault under `investment-wisdom/greenblatt/`; SSI carries only the catalogue pointer.
