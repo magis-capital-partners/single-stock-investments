@@ -71,6 +71,8 @@ https://single-stock-investments-2wt.pages.dev/
 
 ## Agents
 
+How any person or bot gets a change in: [`CONTRIBUTING.md`](CONTRIBUTING.md). Who may write what: [`docs/WRITE_MAP.md`](docs/WRITE_MAP.md). Where the shared data lives: [`SOURCES.md`](SOURCES.md). Desk mandates for the Grok bots: [`_system/agents/DESKS.md`](_system/agents/DESKS.md).
+
 - [`_system/agents/MARVIN.md`](_system/agents/MARVIN.md) — research + downloads
 - [`_system/agents/VICKI.md`](_system/agents/VICKI.md) — browser / IR harvest
 - [`_system/agents/MILLY.md`](_system/agents/MILLY.md) — adversarial reviewer that stress-tests Marvin's deep dives against primary filings and bear cases; re-passes via `milly_repass.py`
@@ -177,7 +179,6 @@ The Actions tab is intentionally automatic: repository workflows do not expose m
 |----------|---------|--------------|
 | [`data-pipeline.yml`](.github/workflows/data-pipeline.yml) | Separate schedules | Intake, activist, light/full downloads, Drive, and news in bounded jobs |
 | [`daily-sync.yml`](.github/workflows/daily-sync.yml) | Successful download stage | Admit at most one evidence-changed research company |
-| [`darwin-refresh.yml`](.github/workflows/darwin-refresh.yml) | Weekly + relevant push paths | Full Darwin rebuild → **chains Deploy Dashboard** |
 | [`dashboard-pages.yml`](.github/workflows/dashboard-pages.yml) | Relevant push + successful upstream run | Deploy committed dashboard data to Cloudflare Pages + D1 |
 | [`deploy-oauth-proxy.yml`](.github/workflows/deploy-oauth-proxy.yml) | OAuth proxy path change | Deploy the Cloudflare Worker when credentials exist |
 | [`ls-algo-universe.yml`](.github/workflows/ls-algo-universe.yml) | Weekly + LS-algo gap queue | Onboard a bounded batch deterministically, then rebuild registry derivatives |
@@ -185,10 +186,8 @@ The Actions tab is intentionally automatic: repository workflows do not expose m
 | [`research-agent-dispatch.yml`](.github/workflows/research-agent-dispatch.yml) | Reusable only | Build a manifest, gate duplicates/budgets, and dispatch the research agent |
 | [`power-zone-universe.yml`](.github/workflows/power-zone-universe.yml) | Successful downloads + weekly fallback | Route every company → contract → Power Zone pricing → committee packet |
 | [`investment-committee.yml`](.github/workflows/investment-committee.yml) | Committee packet/task change | Automatically advance independent votes and deterministic assembly |
-| [`vicki-ir-harvest.yml`](.github/workflows/vicki-ir-harvest.yml) | IR recovery queue change | Repair an IR adapter only after deterministic failure |
 | [`research-quality.yml`](.github/workflows/research-quality.yml) | PRs touching `**/research/**` | Lint dives + verify cloud prompt sync |
 | [`llm-governance.yml`](.github/workflows/llm-governance.yml) | Agent/workflow PRs + main | Enforce token policy, evidence gates, call budgets, lockfiles, and deprecations |
-| [`ci-autofix.yml`](.github/workflows/ci-autofix.yml) | Failed workflow run | Notify by default; agent only for repeated narrow code/test/schema signatures |
 
 See [`_system/reference/ci-workflows.md`](_system/reference/ci-workflows.md) for composite actions (hidden from sidebar) and orchestration diagram.
 

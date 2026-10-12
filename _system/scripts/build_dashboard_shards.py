@@ -258,6 +258,8 @@ def build_core_payload(payload: dict) -> dict:
         "activist_feed": "data/activist_feed.json",
         "darwin_bundle": "data/darwin_bundle.json",
         "separations": "data/separations.json",
+        "desk_briefs": "data/desk_briefs.json",
+        "reverse_splits": "data/reverse_splits.json",
     }
     doc_catalog = payload.get("document_catalog")
     if isinstance(doc_catalog, dict):

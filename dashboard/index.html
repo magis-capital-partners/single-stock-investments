@@ -10,7 +10,7 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600;700&family=DM+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
 <link href="insights-events.css" rel="stylesheet">
-<link href="short-alpha.css?v=20261008-quant-screen" rel="stylesheet">
+<link href="short-alpha.css?v=20261012-rs" rel="stylesheet">
 <link href="warrants.css" rel="stylesheet">
 <link href="portfolio.css?v=20261008-michael-tail" rel="stylesheet">
 <link href="ideas.css?v=20261011-separations" rel="stylesheet">
@@ -1975,10 +1975,12 @@
 <script src="overlap-viz.js?v=20261008-overlap-line"></script>
 <script src="index-viz.js"></script>
 <script src="activist-viz.js?v=20260819-dashboard-rebuild"></script>
-<script src="short-alpha-viz.js?v=20261008-quant-screen"></script>
+<script src="short-alpha-viz.js?v=20261012-rs"></script>
+<script src="reverse-splits-viz.js?v=20261012-rs"></script>
 <script src="warrant-viz.js"></script>
 <script src="special-situations-viz.js?v=20261011-separations"></script>
 <script src="separations-viz.js?v=20261011-separations"></script>
+<script src="desk-briefs-viz.js?v=20261012-desk-briefs"></script>
 <script src="sleeve-viz.js?v=20261008-michael-tail"></script>
 <script src="ui-format.js?v=20260819-currency"></script>
 <script src="portfolio-viz.js?v=20261008-michael-tail"></script>
@@ -3652,6 +3654,37 @@ function renderShortAlpha() {
   const rerender = () => renderShortAlpha();
   content.innerHTML = ShortAlphaViz.render(shortAlphaData);
   ShortAlphaViz.attach(content, shortAlphaData, rerender);
+  mountReverseSplitsSection(content);
+}
+
+// `dashboard/data/reverse_splits.json` (reverse-splits lane; Phase 3 of
+// _system/proposals/one_hub_for_humans_and_bots_2026-10-11.md). Optional: the
+// Shorts tab shows its "Reverse splits" sub-section only when the file exists
+// and reverse-splits-viz.js is loaded, so a 404 is an empty state, never an
+// error. Resolves to null when absent. Same shape as loadSituations().
+let reverseSplitsData;
+let reverseSplitsPromise = null;
+function loadReverseSplits() {
+  if (reverseSplitsData !== undefined) return Promise.resolve(reverseSplitsData);
+  if (!reverseSplitsPromise) {
+    reverseSplitsPromise = fetch('data/reverse_splits.json?' + Date.now())
+      .then(response => (response.ok ? response.json() : null))
+      .then(doc => (doc && typeof doc === 'object' && !Array.isArray(doc) ? doc : null))
+      .catch(() => null)
+      .then(value => { reverseSplitsData = value; return value; })
+      .finally(() => { reverseSplitsPromise = null; });
+  }
+  return reverseSplitsPromise;
+}
+
+function mountReverseSplitsSection(content) {
+  if (!content || !window.ShortAlphaViz || typeof ShortAlphaViz.mountReverseSplits !== 'function') return;
+  loadReverseSplits().then(doc => {
+    // The placeholder is re-created on every Shorts re-render; mount into the current one.
+    if (doc && window.ReverseSplitsViz && content.isConnected && content.querySelector('[data-short-reverse-splits]')) {
+      ShortAlphaViz.mountReverseSplits(content, doc);
+    }
+  });
 }
 
 async function loadWarrants() {
@@ -4935,6 +4968,45 @@ function setIdeaUrlState(updates) {
   window.history.replaceState(null, '', `${url.pathname}${url.search}${url.hash}`);
 }
 
+// Desk briefs (`dashboard/data/desk_briefs.json`, contract `_system/data/desk_briefs/README.md`).
+// Lazy-loaded for the Inbox the way loadSituations() loads the desk: cache-busted fetch, and a
+// missing or malformed file is an empty state, never an error. Rendered by desk-briefs-viz.js.
+let deskBriefsData = null;
+let deskBriefsPromise = null;
+function loadDeskBriefs() {
+  if (deskBriefsData) return Promise.resolve(deskBriefsData);
+  if (!deskBriefsPromise) {
+    deskBriefsPromise = fetch('data/desk_briefs.json?' + Date.now())
+      .then(response => {
+        if (!response.ok) throw new Error(`Desk briefs data ${response.status}`);
+        return response.json();
+      })
+      .then(value => (value && typeof value === 'object' && !Array.isArray(value) && Array.isArray(value.desks)
+        ? value
+        : { desks: [], desks_without_brief: [], error: 'Desk briefs payload malformed' }))
+      .catch(error => ({ desks: [], desks_without_brief: [], error: error.message }))
+      .then(value => { deskBriefsData = value; return value; })
+      .finally(() => { deskBriefsPromise = null; });
+  }
+  return deskBriefsPromise;
+}
+
+function renderDeskBriefsBlock() {
+  if (!window.DeskBriefsViz) return '';
+  if (!deskBriefsData) {
+    loadDeskBriefs().then(() => { if (activeView === 'watchlist' && watchlistViewMode === 'all') renderWatchlistTab(); });
+    return '<section class="desk-briefs" data-desk-briefs aria-label="Desk briefs"><div class="ideas-surface-head desk-briefs-head"><div><strong>Desk briefs</strong> <span>Loading…</span></div></div></section>';
+  }
+  return DeskBriefsViz.render(deskBriefsData);
+}
+
+function attachDeskBriefs(content) {
+  if (!window.DeskBriefsViz || !deskBriefsData) return;
+  const host = content.querySelector('[data-desk-briefs]');
+  if (!host) return;
+  DeskBriefsViz.attach(host, deskBriefsData, { onChange: () => renderWatchlistTab() });
+}
+
 function buildIdeaRows() {
   const generated = data.generated_at || data.generatedAt || null;
   const rows = [];
@@ -5000,7 +5072,7 @@ function renderIdeasIndexBody() {
       const clockNote = ['fresh', 'api', 'empty'].includes(clock) ? '' : ` [${window.DashboardFormat.feedLabel(clock)}]`;
       const desk = row.desk === 'special_situations' ? 'Special situations' : row.desk === 'screens' ? 'Screens' : row.desk === 'short' ? 'Shorts' : 'Research';
       return `<tr><td><span class="idea-type">${escapeHtml(desk)}</span></td><td><span class="idea-type">${escapeHtml(row.type)}</span></td><td><button type="button" class="idea-open" data-idea-id="${escapeHtml(row.id)}">${escapeHtml(row.name || 'Unavailable')}</button></td><td>${escapeHtml(String(row.stage || 'Unavailable').replace(/_/g, ' '))}</td><td>${escapeHtml(row.catalyst)}</td><td>${escapeHtml(row.owner)}</td><td class="numeric">${escapeHtml(window.DashboardFormat.date(row.updated))}</td><td>${escapeHtml(row.next + clockNote)}</td></tr>`;
-    }).join('')}</tbody></table>${rows.length ? '' : '<div class="operator-empty"><strong>No ideas match this decision state</strong><span>Choose another decision-tape segment. Source owner: Research Data Health.</span></div>'}</div></section>${renderIdeaDrawer(selected)}</div>`;
+    }).join('')}</tbody></table>${rows.length ? '' : '<div class="operator-empty"><strong>No ideas match this decision state</strong><span>Choose another decision-tape segment. Source owner: Research Data Health.</span></div>'}</div></section>${renderDeskBriefsBlock()}${renderIdeaDrawer(selected)}</div>`;
 }
 
 function renderWatchlistQueueBody() {
@@ -5283,6 +5355,7 @@ function renderWatchlistTab() {
     setIdeaUrlState({ idea: null });
     renderWatchlistTab();
   });
+  if (watchlistViewMode === 'all') attachDeskBriefs(content);
   content.querySelectorAll('[data-nol-blocker]').forEach((button) => button.addEventListener('click', () => {
     nolBlockerFilter = button.dataset.nolBlocker;
     setIdeaUrlState({ nolBlocker: nolBlockerFilter });

@@ -284,7 +284,13 @@ def expand_steps(steps: list[list[str]]) -> list[list[str]]:
             out.append(["_system/scripts/build_separation_flows.py"])
             out.append(["_system/scripts/build_separations_dashboard.py"])
             out.append(["_system/scripts/check_separation_universe.py", "--warn-only"])
+            out.append(["_system/scripts/build_reverse_splits_dashboard.py"])
+            out.append(["_system/scripts/check_reverse_splits.py", "--warn-only"])
             out.append(["_system/scripts/build_special_situations.py"])
+            # Desk briefs arrive by PR; the nightly rebuild only re-validates and
+            # re-joins them so the Inbox shows the latest file per desk.
+            out.append(["_system/scripts/check_desk_briefs.py", "--warn-only"])
+            out.append(["_system/scripts/build_desk_briefs.py"])
         out.append(step)
     return out
 

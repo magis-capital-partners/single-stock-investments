@@ -4,11 +4,19 @@
 Positions stay in ideas.json and must point at a candidate. Activist-index
 hits and always-review filing events become leads. A new lead never overwrites
 a rejected, live, closed, or researching row.
+
+Candidate rows follow Michael's Short-Selling entry contract
+(_system/research/short-alpha/schema.json $defs.candidate, README.md next to
+it): optional source, added_on/updated_on, tags, summary, note_ref, category
+and lens_reviews. --check enforces the rules the schema cannot (date order,
+desk_note required fields, framework ids) and CATEGORY_LENSES turns a
+category into effective frameworks.
 """
 from __future__ import annotations
 
 import argparse
 import json
+import re
 import sys
 from collections import Counter
 from datetime import date
@@ -68,7 +76,50 @@ FURNACE_TAG_MAP = {
     "daily_reset": "structural_decay",
     "tracking_risk": "structural_decay",
     "swap_exposure": "structural_decay",
+    "reverse_split": "reverse_split_impairment",
 }
+
+# Michael's Short-Selling entry contract (schema.json $defs.candidate). The
+# enums below mirror the schema; test_short_alpha_contract.py keeps them equal.
+ORIGINS = {
+    "position", "activist_index", "filing_furnace", "browser_draft", "fugazi_scorecard",
+    "desk_note", "reverse_split_research",
+}
+CATEGORIES = (
+    "accounting", "shitco-concept", "supply-side", "share-supply",
+    "reverse-split", "activist-short", "borrow-squeeze", "playbook",
+)
+# Category -> lenses a row inherits when it names a category. The map is the
+# one in _system/proposals/one_hub_for_humans_and_bots_2026-10-11.md and
+# _system/research/short-alpha/README.md. Empty lists are deliberate:
+# activist-short is an origin (activist_index), playbook is not a lens.
+CATEGORY_LENSES: dict[str, list[str]] = {
+    "accounting": ["accounting", "revenue_recognition", "earnings_vs_cash", "working_capital"],
+    "shitco-concept": ["promotion_insider_selling", "fad_single_product"],
+    "supply-side": ["supply_side", "margin_contraction", "cycle_mean_reversion"],
+    "share-supply": ["dilution_financing", "share_supply"],
+    "reverse-split": ["reverse_split_impairment"],
+    "activist-short": [],
+    "borrow-squeeze": ["borrow_and_carry", "crowding_squeeze"],
+    "playbook": [],
+}
+# Lenses a category points at but which only a human conclusion may set. The
+# category map never applies them (frameworks.json: "a publisher report cannot
+# set it"); they are listed so the README and the code agree.
+CATEGORY_CONCLUSION_ONLY: dict[str, list[str]] = {"shitco-concept": ["fraud_bad_actors"]}
+LENS_REVIEW_STATUSES = {"unreviewed", "unresolved", "supported", "contradicted"}
+# A desk note is a bot's or an author's idea entry: unattributable rows and
+# rows without a narrative pointer are refused rather than rendered.
+DESK_NOTE_REQUIRED = ("source", "category", "added_on", "updated_on", "summary", "tags", "note_ref")
+TICKER_RE = re.compile(r"^[A-Z]{1,5}(?:[.-][A-Z]{1,2})?$")
+TAG_RE = re.compile(r"^[a-z0-9]+(?:-[a-z0-9]+)*$")
+YMD_RE = re.compile(r"^\d{4}-\d{2}-\d{2}$")
+VAULT_NOTE_RE = re.compile(
+    r"^research-vault/short-research/[A-Z]{1,5}(?:[.-][A-Z]{1,2})?/\d{4}-\d{2}-\d{2}-[a-z0-9]+(?:-[a-z0-9]+)*\.md$"
+)
+SSI_PATH_RE = re.compile(r"^(?!research-vault/)(?!/)(?!.*(?:^|/)\.\.(?:/|$))[A-Za-z0-9_][A-Za-z0-9_./-]*$")
+SUMMARY_MAX = 400
+SOURCE_MAX = 80
 
 
 class LedgerError(ValueError):
@@ -353,14 +404,89 @@ def _validate_catalog(catalog: dict) -> None:
     ids = _framework_ids(catalog)
     if not ids or len(ids) != len(set(ids)):
         raise LedgerError("Framework ids must be present and unique")
-    parents = {row.get("id") for row in catalog.get("frameworks") or []}
+    source_ids = [str(row.get("id") or "") for row in catalog.get("source_types") or []]
+    if not source_ids or len(source_ids) != len(set(source_ids)):
+        raise LedgerError("Source-type ids must be present and unique")
+    group_ids = {str(row.get("id") or "") for row in catalog.get("groups") or []}
+    parents = set(ids)
     for row in catalog.get("frameworks") or []:
         parent = row.get("parent")
         if parent and parent not in parents:
             raise LedgerError(f"{row.get('id')}: unknown parent {parent}")
-    source_ids = [str(row.get("id") or "") for row in catalog.get("source_types") or []]
-    if not source_ids or len(source_ids) != len(set(source_ids)):
-        raise LedgerError("Source-type ids must be present and unique")
+        if str(row.get("kind") or "") not in {"judgment", "screen", "gate"}:
+            raise LedgerError(f"{row.get('id')}: kind must be judgment, screen, or gate")
+        if row.get("group") not in group_ids:
+            raise LedgerError(f"{row.get('id')}: unknown group {row.get('group')}")
+        unknown = sorted(set(row.get("source_types") or []) - set(source_ids))
+        if unknown:
+            raise LedgerError(f"{row.get('id')}: unknown source types {unknown}")
+    for category, lenses in CATEGORY_LENSES.items():
+        missing = sorted(set(lenses) - parents)
+        if missing:
+            raise LedgerError(f"CATEGORY_LENSES[{category}] names unknown frameworks {missing}")
+
+
+def _check_ymd(ticker: str, key: str, value) -> None:
+    if not isinstance(value, str) or not YMD_RE.match(value):
+        raise LedgerError(f"{ticker}: {key} must be a YYYY-MM-DD date, got {value!r}")
+    try:
+        date.fromisoformat(value)
+    except ValueError as exc:
+        raise LedgerError(f"{ticker}: {key} is not a real date ({value})") from exc
+
+
+def _validate_candidate_contract(candidate: dict) -> None:
+    """Michael's entry contract on one row: attribution, dates, tags, note pointer, lens reviews."""
+    ticker = str(candidate.get("ticker") or "")
+    if not TICKER_RE.match(ticker):
+        raise LedgerError(f"Candidate ticker fails the schema pattern: {ticker or '<blank>'}")
+    origin = candidate.get("origin")
+    if origin is not None and origin not in ORIGINS:
+        raise LedgerError(f"{ticker}: unknown origin {origin}")
+    if "category" in candidate and candidate["category"] not in CATEGORIES:
+        raise LedgerError(f"{ticker}: unknown category {candidate['category']!r}")
+    if "source" in candidate:
+        source = candidate["source"]
+        if not isinstance(source, str) or not source.strip() or len(source) > SOURCE_MAX:
+            raise LedgerError(f"{ticker}: source must be a non-empty string of at most {SOURCE_MAX} characters")
+    if "summary" in candidate:
+        summary = candidate["summary"]
+        if not isinstance(summary, str) or len(summary) > SUMMARY_MAX:
+            raise LedgerError(f"{ticker}: summary must be a string of at most {SUMMARY_MAX} characters")
+    if "tags" in candidate:
+        tags = candidate["tags"]
+        if not isinstance(tags, list) or any(not isinstance(tag, str) or not TAG_RE.match(tag) for tag in tags):
+            raise LedgerError(f"{ticker}: tags must be lowercase kebab-case strings")
+        if len(set(tags)) != len(tags):
+            raise LedgerError(f"{ticker}: tags must be unique")
+    for key in ("added_on", "updated_on"):
+        if key in candidate:
+            _check_ymd(ticker, key, candidate[key])
+    if "added_on" in candidate and "updated_on" in candidate and candidate["updated_on"] < candidate["added_on"]:
+        raise LedgerError(f"{ticker}: updated_on must be on or after added_on")
+    if "note_ref" in candidate:
+        ref = candidate["note_ref"]
+        if not isinstance(ref, str) or not (VAULT_NOTE_RE.match(ref) or SSI_PATH_RE.match(ref)):
+            raise LedgerError(
+                f"{ticker}: note_ref must be research-vault/short-research/{{TICKER}}/{{date}}-{{slug}}.md "
+                f"or a repository-relative path, got {ref!r}"
+            )
+    reviews = candidate.get("lens_reviews")
+    if reviews is not None:
+        if not isinstance(reviews, list):
+            raise LedgerError(f"{ticker}: lens_reviews must be a list")
+        seen: set[str] = set()
+        for review in reviews:
+            lens_id = str((review or {}).get("lens_id") or "") if isinstance(review, dict) else ""
+            if not lens_id or lens_id in seen:
+                raise LedgerError(f"{ticker}: lens_reviews need unique lens_id values")
+            seen.add(lens_id)
+            if review.get("status") not in LENS_REVIEW_STATUSES:
+                raise LedgerError(f"{ticker}: lens review {lens_id} has status {review.get('status')!r}")
+    if origin == "desk_note":
+        missing = [key for key in DESK_NOTE_REQUIRED if not candidate.get(key)]
+        if missing:
+            raise LedgerError(f"{ticker}: a desk_note row requires {missing}")
 
 
 def _validate_bundle(positions: list, candidates: list, catalog: dict) -> None:
@@ -373,6 +499,7 @@ def _validate_bundle(positions: list, candidates: list, catalog: dict) -> None:
         if not ticker or ticker in by_ticker:
             raise LedgerError(f"Candidate ticker must be present and unique: {ticker or '<blank>'}")
         by_ticker[ticker] = candidate
+        _validate_candidate_contract(candidate)
         tags = list(candidate.get("frameworks") or [])
         unknown = sorted(set(tags) - framework_ids)
         if unknown:
@@ -463,8 +590,12 @@ def _gate_hits(borrow: dict, crowding: dict | None, gates: dict) -> list[str]:
 
 
 def _effective_frameworks(candidate: dict, hits: list[dict]) -> list[str]:
+    """Explicit frameworks, then the lenses the category implies, then furnace hits."""
     ordered: list[str] = []
     for tag in list(candidate.get("frameworks") or []):
+        if tag not in ordered:
+            ordered.append(tag)
+    for tag in CATEGORY_LENSES.get(str(candidate.get("category") or ""), []):
         if tag not in ordered:
             ordered.append(tag)
     for hit in hits:
@@ -627,6 +758,8 @@ def build(
             "candidate_count": len(compiled_candidates),
             "lead_count": sum(1 for row in compiled_candidates if row.get("stage") == "lead"),
             "research_complete_count": complete,
+            "origin_counts": dict(sorted(Counter(str(row.get("origin") or "") for row in compiled_candidates).items())),
+            "category_counts": dict(sorted(Counter(str(row["category"]) for row in compiled_candidates if row.get("category")).items())),
             "framework_counts": {key: coverage[key]["names"] for key in sorted(coverage)},
             "framework_coverage": coverage,
             "unscored_frameworks": unscored,
@@ -645,7 +778,10 @@ def build(
             "leads": "An activist-index hit, an always-review filing event, or a Fugazi scorecard row creates a lead. It does not create a position and does not overwrite a rejected, live, closed, or researching row.",
             "crowding": "Days to cover is FINRA context from the biotech short-interest file when that symbol is present. It is not a reason to short.",
             "excluded": "ECHX is managed in the ls-algo universe and is omitted from this book.",
+            "desk_notes": "A desk_note row is a bot's or an author's idea entry: it names its source, category, dates and tags here, and its narrative lives in the private research vault behind note_ref. The category adds lenses; it never adds the fraud tag.",
+            "reverse_splits": "A reverse_split_research row is a discovery lead from the reverse-split engine with its six dated lens reviews carried as lens_reviews. Impairment is not reviewed until a lens review says so.",
         },
+        "category_lenses": CATEGORY_LENSES,
     }
 
 
