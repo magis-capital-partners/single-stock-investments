@@ -1,5 +1,6 @@
 """Economic invariants and information cutoffs in the research upgrade."""
 from datetime import date, timedelta
+from pathlib import Path
 from types import SimpleNamespace
 import json
 
@@ -194,6 +195,22 @@ def test_borrow_csv_retains_source_time_and_low_percentage_fees(tmp_path):
     assert row["fee_rate"] == pytest.approx(.012)
     assert row["source"] == "ibkr_csv"
     conn.close()
+
+
+def test_borrow_csv_command_reads_the_public_ftp_file(tmp_path):
+    from reverse_splits.borrow import import_ibkr_slb_csv
+    from reverse_splits.db import init_db
+    cfg = scratch_config(tmp_path)
+    cfg.raw["paths"]["db_path"] = "test.db"
+    sample = Path(__file__).resolve().parents[1] / "fixtures" / "ibkr_public_ftp_usa_sample.txt"
+    assert import_ibkr_slb_csv(sample, cfg) == 4
+    conn = init_db(cfg.db_path)
+    rows = {r["ticker"]: r for r in conn.execute("SELECT * FROM borrow_snapshots")}
+    conn.close()
+    assert rows["ASPN"]["asof_ts"] == "2026-10-12T19:25:13Z" and rows["ASPN"]["source"] == "ibkr_public_ftp"
+    assert rows["ASPN"]["fee_rate"] == pytest.approx(.0025) and rows["ASPN"]["shortable_shares"] == 10000000
+    assert rows["ASPN"]["notes"].endswith("available_at_least")
+    assert rows["EQPT"]["fee_rate"] is None and rows["EQPT"]["shortable_shares"] == 0
 
 
 def test_new_scenario_and_evidence_persist_for_reproduction(tmp_path):

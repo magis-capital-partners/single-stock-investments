@@ -140,7 +140,11 @@ check only.
 
 Borrow evidence: `borrow-csv path/to/export.csv` imports a Client Portal
 Short-Securities Availability export (keeps the export's own timestamp,
-divides percent quotes by 100). There is no broker connection anywhere in the
+divides percent quotes by 100). The same command reads IBKR's public
+`usa.txt` (`ftp2.interactivebrokers.com`, user `shortstock`), one snapshot row
+per symbol at the file's `#BOF` time, through SSI's
+`refresh_short_alpha_borrow.parse_public_ftp`. One file is one point in time;
+it is not a historical locate. There is no broker connection anywhere in the
 package; the original tool's live snapshot path was deleted (it used the SPX
 executor's client id). See `CLAUDE.md`, IB Gateway rules.
 

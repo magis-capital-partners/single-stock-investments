@@ -9,7 +9,7 @@ Three files, one contract, one compiler.
 | `frameworks.json` | The lens catalog: groups, source types, judgment lenses, screens and gates. The Shorts tab's framework board. | Humans, with `_system/frameworks/framework_governance.md`. |
 | `schema.json` | The JSON Schema for `ideas.json` and, under `$defs`, the candidate contract. | Humans. |
 
-`python _system/scripts/build_short_alpha_dashboard.py --check` validates the three files together and prints the summary without writing. The full build writes `dashboard/data/short_alpha.json`, which the Shorts tab reads. Borrow arrives through `refresh_short_alpha_borrow.py --input <Client Portal CSV>` and never through the Gateway.
+`python _system/scripts/build_short_alpha_dashboard.py --check` validates the three files together and prints the summary without writing. The full build writes `dashboard/data/short_alpha.json`, which the Shorts tab reads. Borrow arrives through `refresh_short_alpha_borrow.py --input <file>` and never through the Gateway. The file is IBKR's public short-stock availability file (`curl --user shortstock: -o usa.txt ftp://ftp2.interactivebrokers.com/usa.txt`; no account, refreshed intraday) or a Client Portal availability CSV. The writer keeps the ledger's names in `dashboard/data/short_alpha_borrow.json`, each stamped with the file's own time. A name missing from the file stays pending, never zero.
 
 ## The entry contract (adopted from Michael's Short-Selling desk)
 
