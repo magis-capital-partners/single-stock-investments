@@ -36,8 +36,7 @@
     "digest": "Weekday digests around 8:10-8:14 AM ET."
   },
   "pending_access": [
-    "Share the Drive folders (Books, short-selling-library, Admin/Intake) with Michael's Google accounts.",
-    "Confirm whether Michael's bots join the Magis room."
+    "Drew is sharing the Drive folders (Books, short-selling-library, Admin/Intake) with Michael's Google accounts."
   ],
   "do_not_write": [
     "_system/memory/MEMORY.md",
@@ -455,6 +454,30 @@
         "Treat it as a lead until a filing confirms it.",
         "Do not store email content in this repo."
       ]
+    },
+    {
+      "id": "dashboard-reverse-splits",
+      "type": "repo file",
+      "location": "dashboard/data/reverse_splits.json",
+      "repo_path": "dashboard/data/reverse_splits.json",
+      "path_kind": "file",
+      "freshness_field": "generated_at",
+      "purpose": "Reverse-split event ledger view: recent announcements, upcoming effective dates, repeat splitters, the RSI-1.0 process rules and honest limits. A reverse split is a discovery event, not a finding.",
+      "owner_desk": "Short Selling",
+      "mode": "read",
+      "push": "The Monday reverse-splits job and the nightly rebuild write this file from _system/data/reverse_splits/. A correction to the ledger is a pull request; the SQLite and caches stay local."
+    },
+    {
+      "id": "dashboard-short-alpha",
+      "type": "repo file",
+      "location": "dashboard/data/short_alpha.json",
+      "repo_path": "dashboard/data/short_alpha.json",
+      "path_kind": "file",
+      "freshness_field": "generated_at",
+      "purpose": "Short Alpha ledger view: candidates (leads, researching, live) with lenses, categories, lens reviews, borrow and crowding context. Rows with origin desk_note come from desk bots.",
+      "owner_desk": "Short Selling",
+      "mode": "read",
+      "push": "A new idea is a candidates.json row (origin desk_note) plus a note in the private research vault, by pull request on a grok/short_selling branch; the nightly rebuild validates the ledger and writes this file."
     }
   ]
 }

@@ -27,7 +27,6 @@ LEDGER = ROOT / "_system" / "research" / "short-alpha"
 POSITIONS = LEDGER / "ideas.json"
 CANDIDATES = LEDGER / "candidates.json"
 CATALOG = LEDGER / "frameworks.json"
-QUEUE = ROOT / "_system" / "data" / "short_alpha_research_queue.json"
 OUTPUT = ROOT / "dashboard" / "data" / "short_alpha.json"
 BORROW = ROOT / "dashboard" / "data" / "short_alpha_borrow.json"
 CROWDING = ROOT / "_system" / "reference" / "market-data" / "ownership" / "biotech_short_interest.json"
@@ -381,19 +380,6 @@ def init_candidates() -> None:
         "currency": raw.get("currency", "USD"),
         "ideas": slim,
     })
-    if QUEUE.exists():
-        queue = _read_json(QUEUE)
-        notes = list(queue.get("notes") or [])
-        review = (
-            "2026-10-07: open book reviewed against local research files. "
-            "Price check-ins stay on the 2026-08-04 baseline because no fresh quote file was loaded. "
-            "Borrow stays pending: no IBKR CSV, and this refresh does not contact the Gateway."
-        )
-        if review not in notes:
-            notes.append(review)
-        queue["reviewed_on"] = REVIEWED_ON
-        queue["notes"] = notes
-        _write_json(QUEUE, queue)
 
 
 def _framework_ids(catalog: dict) -> list[str]:

@@ -33,6 +33,8 @@ Files live in `dashboard/data/`. Read the build date before the contents.
 | `activist_feed.json` | `generated_at` | Activist filings and triage counts. Desk: Activism. |
 | `index_membership.json` | `generated` | Index membership and scorecards. This file stamps the build in `generated`, and the membership date in `as_of`. |
 | `fico_watch.json` | `generated_at` | FICO watch page. The file is not always present. When it is absent, skip it. Desk: Fundamental Analyst. |
+| `short_alpha.json` | `generated_at` | Short Alpha ledger view: candidates with lenses, categories and lens reviews. Desk: Short Selling. |
+| `reverse_splits.json` | `generated_at` | Reverse-split ledger view: recent announcements, upcoming effective dates, repeat splitters. Desk: Short Selling. |
 | `special_situations.json` | `generated_at` | Ranked special situations, discovery list, history, by lane. Desk: Special Situations. |
 | `separations.json` | `generated_at` | Split-offs and spin-offs: filed terms, spread, who-must-sell flows, odd-lot alerts, discovery events. Desk: Special Situations; the forced_seller_rows also feed the Technical Analyst. |
 | `desk_briefs.json` | `generated_at` | The latest desk brief per desk, joined for the Inbox. Built from `_system/data/desk_briefs/`. |
@@ -135,9 +137,9 @@ Weekday digests go out around 8:10-8:14 AM ET. Say nothing when nothing is new. 
 ## Pending access decisions
 
 - [x] Repo access: `mcricenti` holds `maintain` on this repository since 2026-10-12. Changes land by pull request (`CONTRIBUTING.md`, `docs/WRITE_MAP.md`).
-- [ ] Share the Drive folders (Books, short-selling-library, Admin/Intake) with Michael's Google accounts.
+- [ ] Drew is sharing the Drive folders (Books, short-selling-library, Admin/Intake) with Michael's Google accounts.
 - [x] Memory hub: write, by pull request on a `grok/<desk>/<date>-<slug>` branch into `_system/memory-hub/research-equity/`; the automerge data lane merges it when the path guard and validators pass.
-- [ ] Confirm whether Michael's bots join the Magis room.
+- [x] Michael's bots join the Magis room (decided 2026-10-12). Same posting rules as Drew's desks: ticker plus one number, ranked hits only, silence when nothing is new; the desk brief in this repo is the record, the room post is a pointer.
 
 ## Left out on purpose
 

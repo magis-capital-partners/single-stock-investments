@@ -966,7 +966,10 @@ jobs:
     needs: decide
     if: needs.decide.outputs.reverse_splits == 'true'
     runs-on: ubuntu-latest
-    timeout-minutes: 45
+    # Step timeouts below bound each network stage; a hung collector must not
+    # take the commit step with it (a 2026-10-12 local dry run hung on a
+    # SQLite lock for 30 minutes with nothing in the log).
+    timeout-minutes: 60
     concurrency:
       # Per-job queue - see the concurrency note at the top of this file.
       group: data-commit-main-${{ github.job }}
@@ -991,19 +994,22 @@ jobs:
         # The SQLite is a local artifact; the JSONL ledger under
         # _system/data/reverse_splits/ is the truth. A clean clone imports it
         # first, so the scoped collectors below only add to it.
-        run: python -m _system.scripts.reverse_splits.cli import-ledger
+        timeout-minutes: 10
+        run: python -u -m _system.scripts.reverse_splits.cli import-ledger
       - name: Discover and date recent reverse splits (fail-soft)
         # Scoped to the last three weeks: without --since-days the seed would
         # wipe the imported announcements because edgar_hits is not in the
         # ledger. EDGAR and Yahoo failures leave the ledger unchanged.
         continue-on-error: true
+        timeout-minutes: 30
         run: |
-          python -m _system.scripts.reverse_splits.cli seed --since-days 21
-          python -m _system.scripts.reverse_splits.cli classify-exchanges
-          python -m _system.scripts.reverse_splits.cli clocks --since-days 21
+          python -u -m _system.scripts.reverse_splits.cli seed --since-days 21
+          python -u -m _system.scripts.reverse_splits.cli classify-exchanges
+          python -u -m _system.scripts.reverse_splits.cli clocks --since-days 21
       - name: Export the ledger and build the dashboard feed
+        timeout-minutes: 10
         run: |
-          python -m _system.scripts.reverse_splits.cli export-ledger
+          python -u -m _system.scripts.reverse_splits.cli export-ledger
           python _system/scripts/build_reverse_splits_dashboard.py
       - id: reverse_split_health
         name: Validate reverse-split health after writing the truthful snapshot
