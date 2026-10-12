@@ -30,4 +30,4 @@ Run `node dashboard/preview/spa-harness.mjs <scratch-directory>` to regenerate t
 
 ![Data Health](hub-renders/data-health.png)
 
-Validation retains the known main timer-test failure as a disclosed finding. P3 and P6 pass; the sparse source checkout has E5 omissions and the full source checkout has the pre-existing E7 finding. Regenerated graph reports and baselines stay outside git. Authenticated hosted rendering is covered only by the deployment workflow evidence in its separate record.
+Validation retains the known main timer-test failure as a disclosed finding. P3 and P6 pass; the sparse source checkout has E5 omissions and the full source checkout has the pre-existing E7 finding. Regenerated graph reports and baselines stay outside git. Authenticated hosted rendering was not verified. The separate deployment record proves that Pages published the checked commit; it does not prove a render behind Access.
