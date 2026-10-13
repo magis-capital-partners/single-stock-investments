@@ -483,7 +483,7 @@ def test_shorts_tab_renders_entry_fields_and_lens_strip(tmp_path: Path) -> None:
 @pytest.mark.skipif(not INDEX.exists(), reason="dashboard/index.html absent (sparse checkout)")
 def test_index_wires_the_reverse_splits_sub_section() -> None:
     text = INDEX.read_text(encoding="utf-8")
-    assert '<script src="reverse-splits-viz.js?v=20261012-rs"></script>' in text
+    assert '<script src="reverse-splits-viz.js?v=20261013-clean"></script>' in text
     assert "data/reverse_splits.json" in text
     assert "window.ReverseSplitsViz &&" in text
     assert "ShortAlphaViz.mountReverseSplits(content, doc)" in text

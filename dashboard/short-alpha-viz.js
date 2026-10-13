@@ -506,7 +506,7 @@
       return false;
     }
     let html = '';
-    try { html = String(viz.render(doc) || ''); } catch (error) { html = `<div class="short-alpha-empty">Reverse splits view failed: ${esc(error && error.message)}</div>`; }
+    try { html = String(viz.render(doc, { hideTitle: true }) || ''); } catch (error) { html = `<div class="short-alpha-empty">Reverse splits view failed: ${esc(error && error.message)}</div>`; }
     if (!html.trim()) { section.hidden = true; return false; }
     if (body) body.innerHTML = html;
     section.hidden = false;
