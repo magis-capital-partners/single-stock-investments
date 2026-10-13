@@ -22,6 +22,22 @@ from .controls import attach_matches
 from .db import init_db
 
 
+_SSR_CACHE: dict = {}
+
+
+def load_ssr_flags(db_path) -> frozenset:
+    """Restricted (ticker, day) pairs from ``ssr_flags``; cached per file state."""
+    from pathlib import Path
+
+    path = Path(db_path)
+    key = (str(path), path.stat().st_mtime if path.exists() else None)
+    if key not in _SSR_CACHE:
+        conn = init_db(path)
+        _SSR_CACHE[key] = frozenset((r[0], r[1]) for r in conn.execute("SELECT ticker, date FROM ssr_flags"))
+        conn.close()
+    return _SSR_CACHE[key]
+
+
 def settings_from_config(cfg: Config, **overrides) -> Settings:
     execution = cfg.section("execution")
     backtest = cfg.section("backtest")
@@ -43,8 +59,11 @@ def settings_from_config(cfg: Config, **overrides) -> Settings:
         jump_window=int(execution.get("jump_window_sessions", 3)),
         cohorts=None,
         outcomes=None,
+        ssr_policy=str(execution.get("ssr_policy", "ignore")),
     )
     values.update(overrides)
+    if values["ssr_policy"] != "ignore" and values.get("ssr_flags") is None:
+        values["ssr_flags"] = load_ssr_flags(cfg.db_path)
     for key in ("cohorts", "outcomes"):
         raw = values.get(key)
         if isinstance(raw, str):
@@ -216,6 +235,8 @@ def _book_dict(label: str, settings: Settings, taken, skipped, equity, funnel) -
         "require_filing_text": settings.require_filing_text,
         "cohorts": list(settings.cohorts) if settings.cohorts else None,
         "outcomes": list(settings.outcomes) if settings.outcomes else None,
+        "ssr_policy": settings.ssr_policy,
+        "ssr_flag_days": len(settings.ssr_flags or ()),
     }
     return {
         "id": label,
@@ -243,6 +264,7 @@ def _funnel_order() -> list[str]:
         "no_signal_date",
         "no_entry_bar",
         "ambiguous_print",
+        "ssr_restricted",
         "no_exit_bar",
         "below_min_price",
         "bad_fill",

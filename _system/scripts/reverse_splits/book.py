@@ -62,6 +62,27 @@ class Settings:
     jump_window: int = 3
     cohorts: tuple[str, ...] | None = None
     outcomes: tuple[str, ...] | None = None
+    # Reg SHO Rule 201. "ignore" (the default) applies nothing; "exclude" drops
+    # an entry whose bar opens restricted; "delay" moves it to the next
+    # unrestricted session, at most ssr_max_delay sessions later. A short may
+    # still fill above the national best bid while restricted, so "exclude" is
+    # the conservative reading and "delay" the faithful one for an open order.
+    ssr_policy: str = "ignore"
+    ssr_flags: frozenset | None = None
+    ssr_max_delay: int = 2
+
+
+def ssr_entry(ticker: str, dates: list, idx: int, settings: Settings) -> int | None:
+    """The entry index after Rule 201, or None when the policy drops it."""
+    if settings.ssr_policy == "ignore" or not settings.ssr_flags:
+        return idx
+    delayed = 0
+    while (ticker, str(dates[idx])[:10]) in settings.ssr_flags:
+        if settings.ssr_policy != "delay" or delayed >= settings.ssr_max_delay or idx + 1 >= len(dates):
+            return None
+        idx += 1
+        delayed += 1
+    return idx
 
 
 @dataclass
@@ -212,6 +233,10 @@ def build_candidates(
             continue
         if any(sp.status == "ambiguous" and dates[idx] < sp.ex_date for sp in series.splits):
             funnel["ambiguous_print"] += 1
+            continue
+        idx = ssr_entry(ticker, dates, idx, settings)
+        if idx is None:
+            funnel["ssr_restricted"] += 1
             continue
 
         exit_i = horizon_index(idx, settings.horizon, len(dates))
