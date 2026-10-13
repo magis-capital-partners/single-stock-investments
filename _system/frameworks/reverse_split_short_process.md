@@ -78,6 +78,23 @@ The spread assumption alone can change the apparent edge substantially. Peer and
 
 ## Validation before any deployment
 
+### Intraday research overlay adopted October 13, 2026
+
+The separate `reverse_split_intraday.v1` protocol in
+`_system/data/reverse_splits/forward_protocol.json` begins new-event validation
+October 14. Its primary hold is next-session open to same-session close, with
+the existing historical fundamental screen fixed. Compare zero and one
+overnight descriptively; do not select a winning holding period after seeing
+the validation returns. A prospective trade requires a fresh approved locate,
+annual rate <=50%, expected total cost <=1%, dated quotes, security identity,
+margin and thesis. A current public rate archive supports sensitivities only.
+
+Every attempted entry, failed gate, partial cover, fee change and loan return
+must remain in the record. A split-adjusted quantity is not proof of broker
+cash-in-lieu settlement. An absent OTC price is not a zero-price liquidation.
+The first intraday research review is at 100 completed events / 60 issuers;
+this is a separate evidence review and does not approve live deployment.
+
 1. Freeze this version before collecting future outcomes; log every lead, pass and review, including missing data and unavailable borrow.
 2. Repair event-to-filing links and complete the publication-time lead ledger, including abandoned proposals and unscored names; keep a security master and terminal outcomes.
 3. Import genuine historical borrow evidence with as-of timestamps, fee units and execution permission; a current availability export cannot prove borrow existed five years ago.

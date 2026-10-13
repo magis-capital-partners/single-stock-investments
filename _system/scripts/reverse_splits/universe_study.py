@@ -11,6 +11,7 @@ import bisect
 import hashlib
 import json
 import math
+import os
 import sqlite3
 import shutil
 from collections import Counter, defaultdict
@@ -29,9 +30,11 @@ from .ledger import load_jsonl, read_json, write_json, write_retained_jsonl
 from .replay import replay
 from .rerun import eligible_score, metrics
 from .run_book import load_frames
+from .strategy_research import apply_reviews, freeze_facts, one_day_study, matched_controls, exit_audit, borrow_and_forward
+from .borrow_research import freeze_current_rates, attach_post_evidence
 
-VERSION = "reverse_split_universe.v3"
-HORIZONS = (5, 10, 20)
+VERSION = "reverse_split_universe.v4"
+HORIZONS = (1, 5, 10, 20)
 OFFSETS = (0, 1, 5)
 VERIFIED = {"primary_schedule_matched", "structured_corporate_action"}
 
@@ -323,7 +326,7 @@ def trading_calendar(start, cutoff):
     import exchange_calendars as xc
 
     cal = xc.get_calendar("XNYS", start=start, end=cutoff)
-    return [str(d)[:10] for d in cal.sessions_in_range(start, cutoff)]
+    return [str(d)[:10] for d in cal.sessions if start <= str(d)[:10] <= cutoff]
 
 
 def price_frames(cfg, db_path=None):
@@ -415,6 +418,8 @@ def event_outcomes(
     actions = defaultdict(list)
     unknown_actions = defaultdict(list)
     for e in events:
+        if e.get("action_review", {}).get("decision") == "not_corporate_action":
+            continue
         table = actions if e["verification"] in VERIFIED else unknown_actions
         table[e.get("database_ticker", e["ticker"])].append(e)
     for e in extra_actions:
@@ -435,7 +440,7 @@ def event_outcomes(
                     anchor + offset + horizon - (1 if entry_point == "open" else 0),
                 )
                 cohort = (
-                    f"ex_close_h{horizon}"
+                    (f"ex_close_h{horizon}" if offset == 0 else f"ex_plus_{offset}_close_h{horizon}")
                     if entry_point == "close"
                     else f"ex_plus_{offset}_h{horizon}"
                 )
@@ -448,7 +453,9 @@ def event_outcomes(
                     "reason": None,
                     "gross_short_return": None,
                 }
-                if exit_i >= len(calendar):
+                if e.get("action_review", {}).get("decision") == "not_corporate_action":
+                    row["reason"] = "adjudicated_not_corporate_action"
+                elif exit_i >= len(calendar):
                     row["reason"] = "holding_period_not_yet_complete"
                 elif frame is None:
                     row["reason"] = "nominal_price_history_unavailable"
@@ -605,6 +612,17 @@ def account_cases():
                         "stage": stage,
                     }
                 )
+    for execution in ("one_day_budget", "quotes"):
+        cases.append({"id": "post_split_fundamental_60_h1_" + execution,
+                      "selector": "fundamental_60", "horizon_sessions": 1,
+                      "fee_annual": 1.0, "execution": execution,
+                      "account": "conservative", "stage": "post_split_1",
+                      **({"borrow_policy": "strict"} if execution == "quotes" else {})})
+    for selector in ("event_only", "fundamental_60"):
+        for fee in (1.0, 3.0):
+            cases.append({"id":f"post_split_{selector}_h2_fee{int(fee*100)}", "selector":selector,
+                          "horizon_sessions":2, "fee_annual":fee, "execution":"base", "stage":"post_split_1",
+                          "hold_label":"next-session open through following session close; one overnight"})
     return cases
 
 
@@ -644,6 +662,8 @@ def post_split_leads(events, frames, calendar, bridge, *, extra_actions=()):
     """A distinct exploratory next-session cohort, known before its entry."""
     known, unknown = defaultdict(list), defaultdict(list)
     for e in events:
+        if e.get("action_review", {}).get("decision") == "not_corporate_action":
+            continue
         (known if e["verification"] in VERIFIED else unknown)[
             e.get("database_ticker", e["ticker"])
         ].append(e)
@@ -694,7 +714,7 @@ def post_split_leads(events, frames, calendar, bridge, *, extra_actions=()):
             if d > last or blocked and d >= blocked:
                 break
             values = [f.open[j], f.high[j], f.low[j], f.close[j]]
-            if not all(math.isfinite(v) and v > 0 for v in values):
+            if not any(math.isfinite(v) and v > 0 for v in (f.open[j], f.close[j])):
                 continue
             marks[d] = dict(zip(("open", "high", "low", "close"), values))
             marks[d].update(
@@ -703,7 +723,7 @@ def post_split_leads(events, frames, calendar, bridge, *, extra_actions=()):
                     float(a["ratio"]) for a in known[ticker] if day < a["ex_date"] <= d
                 ),
             )
-        if day not in marks:
+        if day not in marks or not math.isfinite(marks[day]['open']) or marks[day]['open']<=0:
             reasons["post_split_invalid_entry_price"] += 1
             continue
         score = bridge.score(ticker, e.get("cik") or "", day)
@@ -723,7 +743,7 @@ def post_split_leads(events, frames, calendar, bridge, *, extra_actions=()):
                         for a in known[ticker]
                         if f.dates[ix - 1] < a["ex_date"] <= day
                     )
-                    for k in ("high", "low")
+                    for k in ("high", "low", "close")
                 },
                 "announced_ex_date": None,
                 "announcement_category": "post_split_1",
@@ -736,20 +756,38 @@ def post_split_leads(events, frames, calendar, bridge, *, extra_actions=()):
     return leads, dict(reasons)
 
 
-def run(cfg, *, start="2018-05-01", cutoff=None):
+def run(cfg, *, start="2018-05-01", cutoff=None, frozen_from=None):
     cutoff = cutoff or date.today().isoformat()
     if start > cutoff:
         raise ValueError("Study start follows cutoff")
-    conn = connect(cfg)
+    snapshot_parent = Path(frozen_from).resolve() if frozen_from else None
+    parent_manifest = read_json(snapshot_parent / 'manifest.json') if snapshot_parent else {}
+    if snapshot_parent:
+        if not snapshot_parent.is_relative_to((location(cfg)/'runs').resolve()) or not parent_manifest or not (snapshot_parent/'summary.json').exists():
+            raise ValueError('Reuse requires a completed local immutable study')
+        for filename,key in (('input.sqlite','input_sha256'),('prices.sqlite','prices_sha256')):
+            if digest(snapshot_parent/filename)!=parent_manifest[key]:
+                raise ValueError('Frozen input checksum mismatch: '+filename)
+        conn=sqlite3.connect((snapshot_parent/'input.sqlite').as_uri()+'?mode=ro&immutable=1',uri=True)
+        conn.row_factory=sqlite3.Row
+    else:
+        conn = connect(cfg)
     stamp = datetime.now(timezone.utc).strftime("%Y%m%dT%H%M%S%fZ")
     root = location(cfg) / "runs" / stamp
     root.mkdir(parents=True)
+    previous_pointer = read_json(location(cfg) / "latest_run.json", {})
+    previous = location(cfg) / previous_pointer.get("path", "missing")
     code = [
         {"path": p.name, "sha256": digest(p)}
         for p in sorted(Path(__file__).parent.glob("*.py"))
     ]
     try:
         spec = specification()
+        protocol = read_json(cfg.ledger_dir / "forward_protocol.json")
+        reviews = read_json(cfg.ledger_dir / "action_reviews.json", {})
+        write_json(root / "forward_protocol.json", protocol)
+        write_json(root / "action_reviews.json", reviews)
+        spec["execution"]["one_day_budget"] = {**spec["execution"]["base"], "maximum_cost_fraction": protocol["maximum_expected_cost_fraction"]}
         spec.update(
             version=VERSION,
             start=start,
@@ -760,28 +798,31 @@ def run(cfg, *, start="2018-05-01", cutoff=None):
                 "horizon_sessions": HORIZONS,
                 "ex_close": True,
             },
-            forward_validation_starts=(
-                date.fromisoformat(cutoff) + timedelta(days=1)
-            ).isoformat(),
+            forward_validation_starts=protocol["validation_starts"],
             observation_window_calendar_days=180,
             ssr_policy="delay up to two sessions when observed restricted; unknown state is conditional",
         )
         write_json(root / "plan.json", spec)
         frozen_reports = {}
         for name in ("split_detections.csv", "split_detection_reconciliation.json"):
-            source = cfg.reports_dir / name
+            source = (snapshot_parent or cfg.reports_dir) / name
             target = root / name
             if source.exists():
                 shutil.copy2(source, target)
                 frozen_reports[name] = digest(target)
-        with sqlite3.connect(root / "input.sqlite") as target:
-            conn.backup(target)
+        if snapshot_parent:
+            os.link(snapshot_parent/'input.sqlite',root/'input.sqlite')
+            os.link(snapshot_parent/'prices.sqlite',root/'prices.sqlite')
+        else:
+            with sqlite3.connect(root / "input.sqlite") as target:
+                conn.backup(target)
         conn.close()
-        conn = sqlite3.connect((root / "input.sqlite").as_uri() + "?mode=ro", uri=True)
+        conn = sqlite3.connect((root / "input.sqlite").as_uri() + "?mode=ro&immutable=1", uri=True)
         conn.row_factory = sqlite3.Row
-        with sqlite3.connect(cfg.db_path.as_uri() + "?mode=ro", uri=True) as prices:
-            with sqlite3.connect(root / "prices.sqlite") as target:
-                prices.backup(target)
+        if not snapshot_parent:
+            with sqlite3.connect(cfg.db_path.as_uri() + "?mode=ro", uri=True) as prices:
+                with sqlite3.connect(root / "prices.sqlite") as target:
+                    prices.backup(target)
         disclosures = [
             dict(r)
             for r in conn.execute(
@@ -819,6 +860,7 @@ def run(cfg, *, start="2018-05-01", cutoff=None):
         frames, nominal, flags = price_frames(cfg, root / "prices.sqlite")
         nominal.update(apply_imports(conn, events, frames))
         events = [e for e in events if start <= e["ex_date"] <= cutoff]
+        apply_reviews(conn, events, reviews)
         with sqlite3.connect(
             (root / "prices.sqlite").as_uri() + "?mode=ro", uri=True
         ) as prices:
@@ -859,7 +901,7 @@ def run(cfg, *, start="2018-05-01", cutoff=None):
             events,
             frames,
             calendar,
-            offsets=(0,),
+            offsets=(0, 1),
             entry_point="close",
             extra_actions=extra_actions,
         )
@@ -870,11 +912,27 @@ def run(cfg, *, start="2018-05-01", cutoff=None):
             flush=True,
         )
         bridge = FundamentalBridge(cfg)
+        if snapshot_parent:
+            bridge.cache=snapshot_parent/'companyfacts'
         facts = root / "companyfacts"
-        facts.mkdir()
-        for p in bridge.cache.glob("CIK*.json"):
-            shutil.copy2(p, facts / p.name)
-        bridge.cache = facts
+        fact_storage = freeze_facts(cfg, bridge, facts)
+        print(f"Frozen companyfacts: {fact_storage}", flush=True)
+        # Reuse computed financial scores only when both facts and every score
+        # producer match the completed snapshot. No prices/returns select them.
+        if snapshot_parent and parent_manifest.get('fundamentals',{}).get('links')==bridge.manifest().get('links') and next((r['sha256'] for r in parent_manifest['code'] if r['path']=='fundamentals.py'),None)==digest(Path(__file__).parent/'fundamentals.py'):
+            from .fundamentals import cik_id
+            cache_rows=load_jsonl(snapshot_parent/'lead_audit.jsonl')
+            for row in cache_rows:
+                score=row.get('fundamental')
+                if score and score.get('ticker') and score.get('as_of'):
+                    bridge.scores[score['ticker'],cik_id(score['cik']),score['as_of']]=score
+            del cache_rows
+            for case_id in ('post_split_event_only_h1_fee100','post_split_event_only_h5_fee100','post_split_fundamental_60_h5_fee100'):
+                for row in read_json(snapshot_parent/(case_id+'.json'),{}).get('positions',[]):
+                    score=row.get('score')
+                    if score and score.get('ticker') and score.get('as_of'):
+                        bridge.scores[score['ticker'],cik_id(score['cik']),score['as_of']]=score
+            print(f"Reused {len(bridge.scores):,} identical-source financial scores",flush=True)
         # Legacy histories are fallback scenarios, not printed-venue evidence.
         legacy = load_frames(conn)
         legacy.update(frames)
@@ -889,7 +947,7 @@ def run(cfg, *, start="2018-05-01", cutoff=None):
         ]
         blocked = defaultdict(list)
         for e in events:
-            if e["verification"] not in VERIFIED:
+            if e["verification"] not in VERIFIED and e.get("action_review", {}).get("decision") != "not_corporate_action":
                 blocked[e.get("database_ticker", e["ticker"])].append(e["ex_date"])
         leads, audit, announcement_calendar = prepare(
             cfg,
@@ -909,6 +967,30 @@ def run(cfg, *, start="2018-05-01", cutoff=None):
         )
         announcement_count = len(leads)
         leads.extend(post)
+        fee_records = evidence(conn, "borrow_fee")
+        securities = evidence(conn, "security")
+        for lead in leads:
+            matches = [s for s in securities if s["verified"] and s["ticker"] == lead["ticker"] and str(s["cik"]).lstrip("0") == str(lead["cik"]).lstrip("0") and s["valid_from"] <= lead["entry_date"] and (not s["valid_to"] or lead["entry_date"] <= s["valid_to"])]
+            lead["dated_security"] = matches[0] if len(matches) == 1 else None
+            lead["borrow_fees"] = [r for r in fee_records if len(matches) == 1 and r["security_id"] == matches[0]["security_id"] and r["ticker"] == lead["ticker"] and r["evidence_class"] == "broker_statement"]
+            share_actions={}
+            for action in known_actions+extra_actions:
+                if action['ticker']==lead['ticker'] and lead['entry_date']<action['ex_date']<=cutoff:
+                    share_actions[action['ex_date'],action['ratio']]={'ex_date':action['ex_date'],'ratio':action['ratio'],'source_url':action.get('source_url')}
+            lead['share_actions']=[share_actions[k] for k in sorted(share_actions)]
+        attach_post_evidence(conn, post, events, calendar)
+        current_quotes, current_rates, current_cases = freeze_current_rates(cfg, root, observed, post)
+        for lead in leads:
+            lead['current_borrow_indication']=current_quotes.get(lead['ticker'])
+        spec['cases'].extend(current_cases)
+        spec['current_borrow_rate_inputs']=current_rates
+        for case in spec['cases']:
+            if case.get('borrow_policy')=='strict' and case['stage']=='post_split_1' and case['horizon_sessions']==1:
+                case['maximum_borrow_annual_fraction']=protocol['maximum_borrow_annual_fraction']
+                spec['execution']['quotes']['maximum_cost_fraction']=protocol['maximum_expected_cost_fraction']
+        # Rate formulas are fixed in code. Freeze their current source values
+        # before any account replay; they never depend on historical profits.
+        write_json(root / 'plan.json', spec)
         print(
             f"Prepared {len(leads):,} announcement disclosures; replaying fixed cases",
             flush=True,
@@ -933,10 +1015,13 @@ def run(cfg, *, start="2018-05-01", cutoff=None):
                     case_reasons[reason] += 1
                     continue
                 lead = delayed
+                if case["horizon_sessions"] <= 2 and "original_entry_date" in lead:
+                    case_reasons["one_day_SSR_skip_no_delayed_entry"] += 1
+                    continue
                 if case.get("borrow_policy") == "strict":
-                    item = next(a for a in audit if a["id"] == lead["id"])
+                    item = next((a for a in audit if a["id"] == lead["id"]), {})
                     if (
-                        not item.get("all_gates", {}).get("dated_security")
+                        not (item.get("all_gates", {}).get("dated_security") or lead.get("dated_security"))
                         or not lead.get("dated_margin")
                         or not lead.get("dated_thesis")
                         or lead["ssr_entry_status"] is not False
@@ -996,7 +1081,7 @@ def run(cfg, *, start="2018-05-01", cutoff=None):
             "detector_reports": frozen_reports,
             "ledger_sources": [
                 {"path": name, "sha256": digest(cfg.ledger_dir / name)}
-                for name in ("events.jsonl", "book_runs.jsonl")
+                for name in ("events.jsonl", "book_runs.jsonl", "action_reviews.json", "forward_protocol.json")
                 if (cfg.ledger_dir / name).exists()
             ],
             "venue_files": [
@@ -1008,6 +1093,11 @@ def run(cfg, *, start="2018-05-01", cutoff=None):
                 {"name": p.name, "sha256": digest(p)}
                 for p in sorted(bridge.cache.glob("CIK*.json"))
             ],
+            "fact_storage": fact_storage,
+            "snapshot_parent":snapshot_parent.name if snapshot_parent else None,
+            "research_documents": [{"name": name, "sha256": digest(root / name)} for name in ("action_reviews.json", "forward_protocol.json")],
+            "plan_sha256":digest(root/'plan.json'),
+            "current_borrow_sha256":digest(root/'current_borrow.jsonl') if (root/'current_borrow.jsonl').exists() else None,
         }
         if any(digest(Path(__file__).parent / r["path"]) != r["sha256"] for r in code):
             raise ValueError(
@@ -1048,6 +1138,13 @@ def run(cfg, *, start="2018-05-01", cutoff=None):
         counts["last_nominal_observation"] = max(
             (d for f in frames.values() for d in f.dates), default=None
         )
+        print("Comparing fixed one-day cohorts and matched controls", flush=True)
+        one_day = one_day_study(observed, post, calendar, flags, frames, bridge, protocol, root)
+        controls = matched_controls(post, events, frames, bridge, protocol, root, flags)
+        published_id=read_json(cfg.ledger_dir/'expansion_summary.json',{}).get('run_id')
+        audit_baseline=location(cfg)/'runs'/published_id if published_id else previous
+        reconciled = exit_audit(root, audit_baseline, events, frames, reviews, conn)
+        borrowing, forward = borrow_and_forward(conn, protocol, cutoff)
         summary = {
             "schema_version": VERSION,
             "run_id": stamp,
@@ -1057,6 +1154,12 @@ def run(cfg, *, start="2018-05-01", cutoff=None):
             "counts": counts,
             "event_study": outcome_summaries(observed),
             "accounts": results,
+            "one_day": one_day,
+            "matched_controls": controls,
+            "exit_reconciliation": reconciled,
+            "borrow_economics": borrowing,
+            "current_borrow_sensitivities": current_rates,
+            "forward_validation": forward,
             "by_year": dict(Counter(e["ex_date"][:4] for e in events)),
             "by_market": dict(Counter(e["exchange_class"] for e in events)),
             "by_security_type": dict(
@@ -1131,6 +1234,9 @@ def publish(cfg):
         "version": summary["baseline"].get("version"),
         "preserved": summary["baseline"].get("preserved", []),
     }
+    for name in ("action_reviews.json", "forward_protocol.json"):
+        if (root / name).exists() and digest(root / name) != digest(cfg.ledger_dir / name):
+            raise ValueError("Research document changed after the frozen run: " + name)
     write_json(cfg.ledger_dir / "expansion_summary.json", public)
     outcomes = load_jsonl(root / "event_outcomes.jsonl")
     public_events = [
@@ -1198,6 +1304,8 @@ def publish(cfg):
     finally:
         conn.close()
     names = (
+        "action_reviews.json",
+        "forward_protocol.json",
         "expansion_summary.json",
         "expansion_events.jsonl",
         "expansion_disclosures.jsonl",

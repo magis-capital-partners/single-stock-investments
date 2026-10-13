@@ -360,13 +360,14 @@
     const percent = n => isNum(n) ? `${(Number(n)*100).toFixed(1)}%` : '—';
     const cohortName = key => {
       const h = String(key).match(/_h(\d+)$/);
-      const first = key.startsWith('ex_close') ? 'Split-day close' : key.startsWith('ex_plus_0') ? 'Split-day open' : key.startsWith('ex_plus_1') ? 'Next-session open' : 'Five sessions later';
+      const first = key.startsWith('ex_close') ? 'Split-day close (overnight)' : key.includes('_close_') ? 'Next-session close (overnight)' : key.startsWith('ex_plus_0') ? 'Split-day open' : key.startsWith('ex_plus_1') ? 'Next-session open' : 'Five sessions later';
       return `${first} · ${h ? h[1] : '—'} sessions`;
     };
-    const caseName = c => `${c.stage === 'post_split_1' ? 'Next session' : c.stage === 'authorization_or_proposal' ? 'Proposal / authorization' : c.stage === 'unscheduled_board_action' ? 'Board action' : 'Scheduled split'} · ${c.selector === 'fundamental_60' ? 'score ≥60' : 'all eligible'} · ${c.horizon_sessions} sessions · ${Math.round(c.fee_annual*100)}% annual fee${c.borrow_policy === 'strict' ? ' · dated execution evidence' : c.execution === 'economic' ? ' · cost-budget check' : ''}`;
+    const caseName = c => `${c.stage === 'post_split_1' ? 'Next session' : c.stage === 'authorization_or_proposal' ? 'Proposal / authorization' : c.stage === 'unscheduled_board_action' ? 'Board action' : 'Scheduled split'} · ${c.selector === 'fundamental_60' ? 'score ≥60' : 'all eligible'} · ${c.horizon_sessions} sessions · ${c.rate_basis || `${Math.round(c.fee_annual*100)}% annual fee`}${c.borrow_policy === 'strict' ? ' · dated execution evidence' : c.execution === 'economic' ? ' · cost-budget check' : ''}`;
     const price = (study.event_study || []).filter(r => r.tier === 'verified_actions').map(r => `<tr>
       <td>${esc(cohortName(r.cohort))}</td><td class="mono">${fmtInt(r.events)}</td><td class="mono">${fmtInt(r.issuers)}</td>
-      <td class="mono">${esc(percent(r.median_gross_short_return))}</td><td class="mono">${esc(percent(r.positive_share))}</td></tr>`).join('');
+      <td class="mono">${esc(percent(r.mean_gross_short_return))}</td><td class="mono">${esc(percent(r.median_gross_short_return))}</td>
+      <td class="mono">${esc(percent(r.positive_share))}</td><td class="mono">${esc(percent(r.issuer_interval && r.issuer_interval.low))} to ${esc(percent(r.issuer_interval && r.issuer_interval.high))}</td></tr>`).join('');
     const accounts = (study.accounts || []).map(r => `<tr><td>${esc(caseName(r.case))}</td><td class="mono">${fmtInt(r.eligible_episodes)}</td>
       <td class="mono">${fmtInt(r.metrics.taken)}</td><td class="mono">${fmtInt(r.metrics.unique_issuers)}</td>
       <td class="mono">${r.status === 'evidence_unavailable' ? '—' : esc(fmtMoney(r.metrics.net))}</td><td class="mono">${fmtInt(r.metrics.unresolved)}</td><td>${esc(r.status)}</td></tr>`).join('');
@@ -377,9 +378,10 @@
       ${study.full_universe_complete ? 'Coverage reconciled for the declared universe.' : 'Coverage remains partial; unresolved identities and missing histories remain in the catalogue.'}</p>
       <table class="insights-table"><thead><tr><th>Coverage</th><th>Count</th></tr></thead><tbody>${rows}</tbody></table>
       <p class="muted">Event counts, filing disclosures and portfolio trades have different denominators. Repeated entry settings do not create additional independent events.</p>
+      ${renderOneDay(doc)}
       ${renderUniverse(doc.expansion_catalogue || [])}
       <details open><summary>Observed prices around verified actions</summary>
-      <table class="insights-table"><thead><tr><th>Entry / hold cohort</th><th>Events</th><th>Issuer keys</th><th>Median gross short return</th><th>Positive paths</th></tr></thead><tbody>${price || '<tr><td colspan="5">Complete verified price paths unavailable.</td></tr>'}</tbody></table>
+      <div style="overflow:auto"><table class="insights-table"><thead><tr><th>Entry / hold cohort</th><th>Events</th><th>Issuer keys</th><th>Mean gross</th><th>Median gross</th><th>Positive paths</th><th>Issuer 95% interval</th></tr></thead><tbody>${price || '<tr><td colspan="7">Complete verified price paths unavailable.</td></tr>'}</tbody></table></div>
       <p class="muted">Gross price behavior before fills, borrow, commissions and margin. Missing exits are unavailable, never zero returns.</p></details>
       <details><summary>Declared announcement and next-session account scenarios</summary>
       <table class="insights-table"><thead><tr><th>Declared scenario</th><th>Eligible episodes</th><th>Trades</th><th>Issuers</th><th>Marked net P&amp;L</th><th>Unresolved positions</th><th>Status</th></tr></thead><tbody>${accounts}</tbody></table>
@@ -390,17 +392,63 @@
       <p class="muted">Run ${esc(study.run_id)} · built ${esc(String(study.built_at || '').slice(0,19))} UTC · forward validation starts ${esc(study.forward_validation_starts || '—')}.</p></section>`;
   }
 
+  function renderOneDay(doc) {
+    const study=doc.expansion, day=study.one_day;
+    if (!day) return '';
+    const p=day.primary || {}, pct=n=>isNum(n) ? `${Number(n)>=0 ? '+' : ''}${(Number(n)*100).toFixed(2)}%` : '—';
+    const interval=s=>s && isNum(s.low) && isNum(s.high) ? `${pct(s.low)} to ${pct(s.high)}` : 'Unavailable';
+    const rows=[['All verified actions with both benchmarks',p],['Known before entry; SSR not observed',day.available_before_entry_and_SSR_not_observed],['Same eligibility + fixed fundamental score ≥60',day.fundamental_60_fixed],['Fundamental screen + prior cost / capacity screen',day.cost_capacity_subset],['Current available rate ≤50% · retrospective illustration',study.current_borrow_sensitivities && study.current_borrow_sensitivities.current_cap50_gross]]
+      .map(([name,s])=>`<tr><td>${esc(name)}</td><td class="mono">${fmtInt(s && s.events)}</td><td class="mono">${fmtInt(s && s.issuers)}</td><td class="mono">${esc(pct(s && s.mean))}</td><td class="mono">${esc(pct(s && s.median))}</td><td class="mono">${esc(pct(s && s.positive_share))}</td><td class="mono">${esc(interval(s && s.issuer_interval))}</td></tr>`).join('');
+    const annual=(day.by_year || []).map(s=>`<tr><td>${esc(s.year)}</td><td>${fmtInt(s.events)}</td><td>${esc(pct(s.mean))}</td><td>${esc(pct(s.positive_share))}</td></tr>`).join('');
+    const accounts=(study.accounts || []).filter(r=>r.case.stage==='post_split_1' && r.case.horizon_sessions===1).map(r=>{
+      const m=r.metrics,k=m.costs || {}, cost=(k.spread_cost || 0)+(k.slippage_cost || 0)+(k.borrow || 0)+(k.commission || 0);
+      const prefix=r.case.selector==='fundamental_60' ? 'Score ≥60' : 'All eligible';
+      const name=r.case.borrow_policy==='strict' ? 'Dated execution evidence required · 50% rate cap' : r.case.current_rate_cap!=null ? `${prefix} · current per-name rate ≤50% · 1% cost limit · illustration` : r.case.rate_basis ? `${prefix} · ${r.case.rate_basis}` : r.case.execution==='one_day_budget' ? 'Score ≥60 · conservative sizing · 1% cost limit' : `${prefix} · ${Math.round(r.case.fee_annual*100)}% annual borrowing assumption`;
+      return `<tr><td>${esc(name)}</td><td>${fmtInt(m.taken)}</td><td>${r.status==='evidence_unavailable' ? '—' : esc(fmtMoney(k.raw_price_pnl))}</td><td>${r.status==='evidence_unavailable' ? '—' : esc(fmtMoney(cost))}</td><td>${r.status==='evidence_unavailable' ? '—' : esc(fmtMoney(m.net))}</td><td>${fmtInt(m.unresolved)}</td><td>${esc(r.status.replaceAll('_',' '))}</td></tr>`;
+    }).join('');
+    const controls=study.matched_controls || {}, excess=controls.excess_gross || {};
+    const audit=study.exit_reconciliation || {}, borrow=study.borrow_economics || {};
+    const gaps=Object.entries(audit.by_category || {}).map(([reason,n])=>`<li>${esc(reason.replaceAll('_',' '))}: ${fmtInt(n)} paths</li>`).join('');
+    const paths=(audit.paths || []).map(r=>`<tr><td class="mono">${esc(r.ticker)}<br><small>CIK ${esc(r.cik)}</small></td><td>${esc(r.entry_date)}</td><td>${esc(r.planned_exit || 'Pending')}</td><td>${esc(r.category.replaceAll('_',' '))}</td><td>${r.exit_price_observation ? 'Close observed' : 'Close unavailable'}</td><td>${(r.subsequent_verified_actions || []).map(a=>`${esc(a.date)} · ${esc(fmtRatio(a.ratio))}`).join('<br>') || 'None verified through cutoff'}</td><td><details><summary>${fmtInt(r.cases.length)} case quantities</summary>${r.cases.map(c=>`<p>${esc(c.case.replaceAll('_',' '))}<br>Earlier residual ${esc(c.old_remaining_shares)} → revised ${esc(c.new_remaining_shares == null ? 'Not taken' : Number(c.new_remaining_shares).toPrecision(5))}; share factor ${esc(c.new_share_factor)}; modeled last cover ${esc(c.new_cover_date || 'Unavailable')}. ${esc(c.status && c.status.replaceAll('_',' '))}</p>`).join('')}</details></td><td>${(r.evidence || []).map(e=>link(e.source_url,'Primary filing')).join(' · ') || 'Further evidence needed'}</td></tr>`).join('');
+    const current=study.current_borrow_sensitivities || {}, rateRows=(current.populations || []).map(r=>`<tr><td>${esc(r.population.replaceAll('_',' '))}</td><td>${fmtInt(r.quoted_available_names)} / ${fmtInt(r.target_names)}</td><td>${esc(pct(r.median_annual_fraction))}</td><td>${esc(pct(r.mean_annual_fraction))}</td><td>${esc(pct(r.p90_annual_fraction))}</td><td>${fmtInt(r.missing_names)}</td></tr>`).join('');
+    const overnight=(study.event_study || []).filter(r=>r.tier==='verified_actions' && ['ex_close_h1','ex_plus_1_close_h1'].includes(r.cohort)).map(r=>`<tr><td>${r.cohort==='ex_close_h1' ? 'Split-day close → next-session close' : 'Next-session close → following close'}</td><td>${fmtInt(r.events)}</td><td>${esc(pct(r.mean_gross_short_return))}</td><td>${esc(pct(r.positive_share))}</td><td>${esc(interval(r.issuer_interval))}</td></tr>`).join('');
+    const forward=doc.forward_status || {}, validation=forward.validation || study.forward_validation || {}, protocol=validation.protocol || {};
+    const pending=(forward.registry || []).map(r=>`<tr><td>${link(r.source_url,r.ticker || `CIK ${r.cik}`)}</td><td>${esc(r.ex_date)}</td><td>${esc(r.next_session || 'Outside calendar')}</td><td>${esc(String(r.status || '').replaceAll('_',' '))}</td></tr>`).join('');
+    return `<div style="border-top:2px solid currentColor;padding-top:12px;margin:16px 0">
+      <h3>One-day gross shorting · next session open → close</h3>
+      <p style="font-size:26px;margin:8px 0"><strong>${esc(pct(p.mean))}</strong> <span style="font-size:14px">average gross return · ${fmtInt(p.events)} events · ${fmtInt(p.issuers)} issuers</span></p>
+      <p>${isNum(p.mean) && p.mean>0 ? 'The observed one-day gross price return is positive.' : 'The observed one-day gross price return is not positive.'} This is before trading costs and borrowing. It does not establish an executable net profit.</p>
+      <p class="muted">Short at the official opening benchmark in the session after the split; cover at that session’s official closing benchmark. Gross return = 1 − closing price / opening price. Equal weight per event; one session includes both entry and exit. Overnight holds are separate cohorts below.</p>
+      <p>Issuer 95% interval: <strong>${esc(interval(p.issuer_interval))}</strong>. Year 95% interval: ${esc(interval(p.year_interval))}. These intervals describe the observed sample; missing OTC histories and security selection still limit representativeness.</p>
+      <div style="overflow:auto"><table class="insights-table"><thead><tr><th>One-day sample</th><th>Events</th><th>Issuers</th><th>Mean gross</th><th>Median gross</th><th>Positive paths</th><th>Issuer 95% interval</th></tr></thead><tbody>${rows}</tbody></table></div>
+      <p class="muted">The fundamental threshold stays at 60 with at least three observed signals and a latest period no older than 200 days. Observed SSR causes a skipped one-day entry; unknown status remains conditional. ${esc(day.cost_screen_basis)}</p>
+      <details><summary>Zero to one overnight: compare the price patterns</summary><table class="insights-table"><thead><tr><th>One overnight</th><th>Events</th><th>Mean gross</th><th>Positive paths</th><th>Issuer 95% interval</th></tr></thead><tbody>${overnight}</tbody></table><p class="muted">The headline holds zero overnights. Closing-to-closing results above hold one overnight. An overnight can accrue several calendar days of borrowing across weekends; the account scenarios also show next-session open through the following close.</p></details>
+      <details><summary>One-day gross and results after modeled costs</summary><div style="overflow:auto"><table class="insights-table"><thead><tr><th>Scenario</th><th>Trades</th><th>Gross price P&amp;L</th><th>Modeled costs</th><th>Net P&amp;L</th><th>Residuals</th><th>Status</th></tr></thead><tbody>${accounts}</tbody></table></div>
+      <p class="muted">Hypothetical $50k account. Costs include spread, slippage, commission and at least one borrowing day on rounded collateral. Historical approved borrowing and actual fills are incomplete. Smaller sizing stress-tests a +200% price move, triple fees and a seven-day exit delay; it does not guarantee those limits.</p></details>
+      ${(study.accounts || []).some(r=>r.case.id==='post_split_fundamental_60_h1_one_day_budget' && r.metrics.taken===0) ? '<p><strong>The conservative 1% cost version admits no trades in this $50k model.</strong> The 0.5% loss budget under a +200% squeeze limits a position to roughly $125; a $2 round-trip minimum commission already exceeds 1%. Positive gross returns do not resolve this sizing constraint. The prior cost / capacity sample above uses a larger notional envelope and is a descriptive screen.</p>' : ''}
+      <details><summary>Year by year: concentration and stability</summary><table class="insights-table"><thead><tr><th>Year</th><th>Events</th><th>Mean gross</th><th>Positive paths</th></tr></thead><tbody>${annual}</tbody></table></details>
+      <details open><summary>Does the split add information beyond financial weakness?</summary><p>${fmtInt(excess.events)} matched split events · ${fmtInt(excess.issuers)} issuers. Average split-event gross: <strong>${esc(pct(controls.subject_gross && controls.subject_gross.mean))}</strong>; weak-company controls: <strong>${esc(pct(controls.control_gross && controls.control_gross.mean))}</strong>; excess: <strong>${esc(pct(excess.mean))}</strong> (${esc(interval(excess.issuer_interval))}).</p>
+      <p class="muted">${esc(controls.matching)} ${esc(controls.universe)} ${esc(controls.limitations)}</p></details>
+      <details><summary>Exit reconciliation: ${fmtInt(audit.audited_paths)} earlier residual paths</summary><ul class="rs-limits">${gaps}</ul><div style="overflow:auto"><table class="insights-table"><thead><tr><th>Name / issuer</th><th>Entry</th><th>Planned exit</th><th>Finding</th><th>Planned exit data</th><th>Known share adjustments through cutoff</th><th>Quantity / cover audit</th><th>Evidence</th></tr></thead><tbody>${paths}</tbody></table></div>
+      <p class="muted">${esc(audit.policy)} Baseline run ${esc(audit.baseline_run_id)}. ACON’s April 8 detection was rejected using its quarterly filing and venue evidence; DBGI’s OTC transition leaves missing prices visible.</p></details>
+      <details open><summary>Current IBKR rates and borrowing sensitivity</summary><p>Public inventory timestamp: ${esc(current.as_of || 'Unavailable')}. ${fmtInt(borrow.dated_fee_records)} historical fee records · ${fmtInt(borrow.approved_locates)} approved locates · ${fmtInt(borrow.loan_event_records)} loan events.</p><table class="insights-table"><thead><tr><th>Current population</th><th>Available quotes / names</th><th>Median annual rate</th><th>Mean annual rate</th><th>90th percentile</th><th>Missing</th></tr></thead><tbody>${rateRows}</tbody></table><p>${esc(current.assumption)}</p><p class="muted">${esc(borrow.basis)} The public inventory archive records quantity and indicative fee vintages. It is not approval to short. <a href="https://www.interactivebrokers.com/en/pricing/short-sale-cost.php" target="_blank" rel="noopener">IBKR short-sale cost conventions</a>.</p></details>
+      <details open><summary>Frozen validation · ${esc(protocol.version)} · starts ${esc(protocol.validation_starts)}</summary><p><strong>${fmtInt(validation.completed && validation.completed.events)} completed new-cohort results</strong>. ${fmtInt((forward.registry || []).length)} provisional scheduled-disclosure candidates enrolled for review; these are not verified trades.</p>
+      <p>${esc(protocol.entry)} ${esc(protocol.exit)}</p><p>Annual borrowing cap ${esc(pct(protocol.maximum_borrow_annual_fraction))}; total expected cost limit ${esc(pct(protocol.maximum_expected_cost_fraction))} of notional; prior ADV participation ${esc(pct(protocol.maximum_prior_ADV_participation))}; position cap ${esc(pct(protocol.maximum_position_fraction))}; ${fmtInt(protocol.maximum_names)} simultaneous names. ${esc(protocol.approval)}</p>
+      <p class="muted">${esc(protocol.review)} ${esc(forward.limits || '')}</p><details><summary>Enrolled disclosures awaiting evidence</summary><div style="overflow:auto"><table class="insights-table"><thead><tr><th>Name</th><th>Disclosed date</th><th>Next session</th><th>Evidence status</th></tr></thead><tbody>${pending || '<tr><td colspan="4">No candidates enrolled yet.</td></tr>'}</tbody></table></div></details></details>
+    </div>`;
+  }
+
   function universeRows(rows) {
-    return rows.map(r => `<tr><td class="mono">${link(r.source_url,r.ticker)}${r.new_ticker && r.new_ticker !== r.ticker ? ` → ${esc(r.new_ticker)}` : ''}</td>
+    return rows.map(r => `<tr><td class="mono">${link(r.action_review && r.action_review.source_url || r.source_url,r.ticker)}${r.new_ticker && r.new_ticker !== r.ticker ? ` → ${esc(r.new_ticker)}` : ''}</td>
       <td>${esc(r.company || '—')}</td><td class="mono">${esc(r.ex_date)}</td><td>${esc(fmtRatio(r.ratio))}</td>
-      <td>${esc(r.exchange_class)}</td><td>${esc(String(r.verification || '').replaceAll('_',' '))}</td>
+      <td>${esc(r.exchange_class)}</td><td>${esc(r.action_review && r.action_review.decision==='not_corporate_action' ? 'Rejected price-jump candidate' : String(r.verification || '').replaceAll('_',' '))}</td>
       <td>${esc(String(r.price_path || '').replaceAll('_',' '))}</td></tr>`).join('') || '<tr><td colspan="7">No names match these filters.</td></tr>';
   }
   function renderUniverse(rows) {
     return `<details data-rs-universe><summary>Browse the expanded universe (${fmtInt(rows.length)} events and candidates)</summary>
       <div style="display:flex;flex-wrap:wrap;gap:8px;margin:8px 0"><input type="search" data-rs-query aria-label="Search reverse-split names" placeholder="Search ticker, company or CIK">
       <select data-rs-market aria-label="Filter market"><option value="">All markets</option><option value="listed">Listed</option><option value="otc">OTC</option><option value="unknown">Unclassified</option></select>
-      <select data-rs-evidence aria-label="Filter evidence"><option value="">All evidence</option><option value="verified">Action corroborated</option><option value="review">Needs action review</option><option value="priced">Complete five-session price path</option><option value="missing">Missing five-session price path</option></select></div>
+      <select data-rs-evidence aria-label="Filter evidence"><option value="">All evidence</option><option value="verified">Action corroborated</option><option value="review">Needs action review</option><option value="rejected">Rejected detection</option><option value="priced">Complete five-session price path</option><option value="missing">Missing five-session price path</option></select></div>
       <p data-rs-result-count class="muted">Showing ${Math.min(75,rows.length)} of ${fmtInt(rows.length)} events</p>
       <div style="overflow:auto"><table class="insights-table"><thead><tr><th>Ticker</th><th>Company</th><th>Action date</th><th>Ratio</th><th>Market</th><th>Action evidence</th><th>Next-session / five-session prices</th></tr></thead><tbody data-rs-rows>${universeRows(rows.slice(0,75))}</tbody></table></div>
       <button type="button" data-rs-previous disabled>Previous</button> <button type="button" data-rs-next ${rows.length <= 75 ? 'disabled' : ''}>Next</button>
@@ -419,9 +467,10 @@
       const filtered=rows.filter(r => {
         const verified=['primary_schedule_matched','structured_corporate_action'].includes(r.verification);
         const priced=r.price_path==='observed_price_path';
+        const rejected=r.action_review && r.action_review.decision==='not_corporate_action';
         return (!q || [r.ticker,r.new_ticker,r.company,r.cik].some(v => String(v || '').toLowerCase().includes(q))) &&
           (!market.value || r.exchange_class===market.value) &&
-          (!evidence.value || (evidence.value==='verified' && verified) || (evidence.value==='review' && !verified) ||
+          (!evidence.value || (evidence.value==='verified' && verified) || (evidence.value==='review' && !verified && !rejected) || (evidence.value==='rejected' && rejected) ||
            (evidence.value==='priced' && priced) || (evidence.value==='missing' && !priced));
       });
       page=Math.max(0,Math.min(page,Math.ceil(filtered.length/75)-1));

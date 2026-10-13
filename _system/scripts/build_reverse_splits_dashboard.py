@@ -563,7 +563,8 @@ def build(*, today: date | None = None, ledger_dir: Path | None = None) -> dict:
         "repeat_splitters": repeat_splitters(distinct, announcements),
         "book": book_section(runs),
         "expansion": read_json(paths["manifest"].parent / "expansion_summary.json", None),
-        "expansion_catalogue": [{**{k:r.get(k) for k in ('event_id','ticker','new_ticker','cik','company','ex_date','ratio','exchange_class','verification','source_url')},
+        "forward_status": read_json(paths["manifest"].parent / "forward_status.json", None),
+        "expansion_catalogue": [{**{k:r.get(k) for k in ('event_id','ticker','new_ticker','cik','company','ex_date','ratio','exchange_class','verification','source_url','action_review')},
                                   'price_path':next((o.get('status') if not o.get('reason') else o['reason'] for o in r.get('outcomes',[]) if o.get('cohort')=='ex_plus_1_h5'),'unavailable')}
                                  for r in sorted(load_jsonl(paths['manifest'].parent/'expansion_events.jsonl'),key=lambda r:(r['ex_date'],r['ticker']),reverse=True)],
         "process": process_section(),

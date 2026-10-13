@@ -458,6 +458,88 @@ empty.
 
 ## Honest limits
 
+### One-session research and the October 14 validation cohort
+
+The v4 study adds a primary benchmark: short at the official opening auction
+of the session after a verified split and cover at that session's official
+closing auction. It holds zero overnights. Gross return is `1 - close/open`,
+with equal weight per event. Split-day open/close, closing-to-closing overnight
+benchmarks and longer holds are shown separately. Account cases retain capital,
+liquidity, spread, commission, collateral fees and unresolved obligations.
+
+The historical financial screen remains score >=60, three numeric signals,
+an operating-company profile and latest-period age <=200 days. A one-day entry
+is skipped when observed SSR would delay it. Unknown SSR remains conditional.
+Missing exit prices do not exclude an otherwise observable opening entry from
+the account replay; the obligation remains open. Only complete benchmark pairs
+enter the descriptive gross-return denominator.
+
+`action_reviews.json` preserves ACON's rejected April 8, 2025 price-jump
+candidate with the archived primary-source hash. It was a lone non-listing-venue
+print; the June quarterly report identifies January and March splits. The
+rejection corrects share/price reconciliation and never creates an earlier
+entry signal. DBGI's issuer filing establishes the December 18, 2024 Nasdaq
+suspension and expected OTC quotation; it supplies neither an OTC exit price
+nor an end to the borrowing obligation. The exit audit retains every residual
+path from the earlier published run and classifies remaining evidence gaps.
+
+Current IBKR public inventory is archived with its timestamp, checksum and
+quantity/rate indications. The dashboard reports median, mean and 90th
+percentile annual rates for the current archive, priced one-day names and
+financially screened names. These determine flat-rate sensitivities before
+account replay. A separate illustration applies per-name current rates <=50%
+and the 1% expected-cost screen to historical prices. **That illustration uses
+current availability and is not a tradable historical selection rule.** Missing
+quotes are not zero fees; public inventory is never an approved locate.
+
+No private IBKR statement connection or Flex token is configured in this
+research session. The import templates accept `borrow_fee` (dated broker annual
+rates), `loan_event` (recall, return or buy-in records), `action_review` and
+`forward_observation` in addition to prices, quotes, margin and actual locates.
+Broker-statement rates replace scenario rates on their effective dates when a
+verified dated security identity joins them. Unsupplied dates stay assumptions.
+The minimum intraday borrowing charge is one calendar day. A missing prior
+close uses an explicitly recorded entry-price collateral proxy, not NaN or a
+zero fee. Actual loan termination requires broker evidence.
+
+`forward_protocol.json` freezes the initial paper version before October 14:
+next-session open to same close, unchanged fundamental screen, approved locate,
+fresh quote, dated margin/security/thesis, <=50% annual borrowing rate and <=1%
+estimated total cost. Sizing uses <=0.1% of prior ADV, <=2.5% of equity, three
+names and a 0.5% name-loss budget under a +200% price stress, triple fees and
+seven calendar days of exit delay. These are research budgets, not guaranteed
+loss limits. One overnight is a comparator rather than the frozen primary rule.
+
+Controls use different weak issuers, same current SIC division, score within
+15, prior price within factor 2 and prior dollar volume within factor 3. Choose
+up to three by pre-entry distance, never by subsequent return. The current
+historical control pool is partial and event-derived. Its +/-30-day action
+exclusion is retrospective, so excess return is diagnostic rather than causal.
+
+The registry retains provisional future disclosures and first-recorded times.
+They need action, identity and execution verification before becoming eligible
+paper trades. The first result review needs at least 100 completed events and
+60 issuers with cost/exit evidence; neither threshold guarantees a representative
+sample. There are no completed new-cohort outcomes before October 14.
+
+```powershell
+python -m _system.scripts.reverse_splits.cli expand templates
+python -m _system.scripts.reverse_splits.cli expand import --kind borrow_fee --input path/to/dated_fees.csv
+python -m _system.scripts.reverse_splits.cli expand import --kind loan_event --input path/to/loan_returns.csv
+python -m _system.scripts.reverse_splits.cli expand forward --end YYYY-MM-DD
+python -m _system.scripts.reverse_splits.cli expand study --start 2018-05-01 --end YYYY-MM-DD
+python -m _system.scripts.reverse_splits.cli expand publish
+python _system/scripts/build_reverse_splits_dashboard.py
+```
+
+The forward collector uses SEC public sources and IBKR public FTP. It never
+connects to ThetaData or the IB Gateway, places orders or purchases data. A
+weekday 17:30 Eastern thread follow-up checks meaningful changes; absent
+licensed price updates and broker records, it reports evidence gaps rather
+than invented paper fills. Full immutable history snapshots are manual because
+disk space is limited. Repeated companyfacts use hash-checked hardlinks only
+from a completed immutable snapshot; mutable databases are separately frozen.
+
 - Historical approved locates are not supplied by the public availability
   file. The strict book needs a dated approval reference, quantity and fee,
   plus the other execution evidence.

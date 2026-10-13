@@ -125,7 +125,7 @@ def build_parser() -> argparse.ArgumentParser:
     sub.add_parser("build-dashboard", help="Build dashboard/data/reverse_splits.json from the ledger")
 
     p_expand = sub.add_parser("expand", help="Resume the full-universe evidence collection and publish versioned research")
-    p_expand.add_argument("step", choices=("all", "bootstrap", "discover", "discover-ads", "filings", "reclassify", "fundamentals", "otc", "reference", "study", "publish", "templates", "import"))
+    p_expand.add_argument("step", choices=("all", "bootstrap", "discover", "discover-ads", "filings", "reclassify", "fundamentals", "otc", "reference", "study", "publish", "templates", "import", "forward"))
     p_expand.add_argument("--legacy-root", type=Path)
     p_expand.add_argument("--start", default="2018-05-01", type=date.fromisoformat)
     p_expand.add_argument("--end", default=date.today(), type=date.fromisoformat)
@@ -135,6 +135,7 @@ def build_parser() -> argparse.ArgumentParser:
     p_expand.add_argument("--limit", type=int)
     p_expand.add_argument("--kind")
     p_expand.add_argument("--input", type=Path)
+    p_expand.add_argument("--replay-from", type=Path, help="Reuse checksum-verified inputs from a completed local study")
 
     p_check = sub.add_parser("check", help="Structural and health checks on the ledger and dashboard feed")
     p_check.add_argument("--strict", action="store_true")
@@ -176,6 +177,9 @@ def main(argv: list[str] | None = None) -> int:
             _scripts_on_path()
             import build_reverse_splits_dashboard as builder
             builder.main([])
+        elif args.step == "forward":
+            from .strategy_research import refresh_forward
+            result = refresh_forward(cfg, cutoff=args.end.isoformat(), offline=args.offline)
         elif args.step == "bootstrap":
             if not args.legacy_root:
                 raise ValueError("bootstrap requires --legacy-root")
@@ -200,7 +204,7 @@ def main(argv: list[str] | None = None) -> int:
             result=collect(cfg,args.start,args.end,offline=args.offline)
         elif args.step == "study":
             from .universe_study import run
-            result = run(cfg, start=args.start.isoformat(), cutoff=args.end.isoformat())
+            result = run(cfg, start=args.start.isoformat(), cutoff=args.end.isoformat(), frozen_from=args.replay_from)
         elif args.step == "publish":
             from .universe_study import publish
             result = publish(cfg)

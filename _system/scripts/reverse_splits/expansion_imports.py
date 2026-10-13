@@ -14,6 +14,10 @@ from pathlib import Path
 from .expansion import connect, digest, export_coverage, job, utcnow
 
 TEMPLATES = {
+    "action_review": ["event_id", "ticker", "ex_date", "decision", "available_at", "reason", "source_sha256", "source_url"],
+    "borrow_fee": ["security_id", "ticker", "date", "fee_annual_fraction", "available_at", "evidence_class", "source_url"],
+    "loan_event": ["security_id", "ticker", "timestamp", "event", "shares", "loan_reference", "source_url"],
+    "forward_observation": ["event_id", "security_id", "ticker", "date", "available_at", "entry_fill", "exit_fill", "shares", "borrow_paid", "commission_paid", "locate_reference", "source_url"],
     "security": [
         "security_id",
         "cik",
@@ -150,7 +154,25 @@ def validate(kind, row):
     for key in ("date", "valid_from", "ex_date", "period"):
         if key in r:
             r[key] = date.fromisoformat(r[key]).isoformat()
-    if kind == "security":
+    if kind == "action_review":
+        if r["decision"] not in {"not_corporate_action", "unresolved"} or not r["reason"] or len(r["source_sha256"]) != 64:
+            raise ValueError("Action review requires decision, rationale and archived source hash")
+    elif kind == "borrow_fee":
+        r["fee_annual_fraction"] = number(r["fee_annual_fraction"], minimum=0)
+        if r["evidence_class"] not in {"broker_statement", "broker_quote", "public_indication"}:
+            raise ValueError("Identify the dated borrowing evidence class")
+    elif kind == "loan_event":
+        r["shares"] = number(r["shares"], minimum=0)
+        if r["event"] not in {"recall", "return", "buy_in", "fee_change"} or not r["loan_reference"]:
+            raise ValueError("Loan event requires a recognized event and broker loan reference")
+    elif kind == "forward_observation":
+        for key in ("entry_fill", "exit_fill"):
+            r[key] = number(r[key], minimum=1e-12)
+        for key in ("shares", "borrow_paid", "commission_paid"):
+            r[key] = number(r[key], minimum=0)
+        if r["date"] < "2026-10-14" or not r["locate_reference"] or not r["event_id"]:
+            raise ValueError("Forward fills require a new-cohort date, event identity and locate reference")
+    elif kind == "security":
         if r["valid_to"]:
             r["valid_to"] = date.fromisoformat(r["valid_to"]).isoformat()
             if r["valid_to"] < r["valid_from"]:
@@ -260,12 +282,12 @@ def import_evidence(cfg, kind, path):
                     or r.get("valid_from")
                 )
                 identity = (
-                    r.get("security_id")
+                    r.get("event_id") or r.get("security_id")
                     or r.get("cik")
                     or r.get("accession")
                     or "owner"
                 )
-                key = f"{identity}/{r.get('ticker', '')}/{r.get('metric', '')}/{r.get('period', '')}/{r.get('session_point', '')}"
+                key = f"{identity}/{r.get('ticker', '')}/{r.get('metric', '')}/{r.get('period', '')}/{r.get('session_point', '')}/{r.get('date', '')}/{r.get('loan_reference', '')}"
                 # Immutable evidence vintages: amendments require another time.
                 old = conn.execute(
                     "SELECT data_json FROM evidence_imports WHERE kind=? AND key=? AND available_at=?",
