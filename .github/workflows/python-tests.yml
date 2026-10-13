@@ -105,6 +105,30 @@ jobs:
           python -m pip install --disable-pip-version-check --quiet "ruff==0.16.0"
           python _system/scripts/check_undefined_names.py _system/scripts _system/trading
 
+  hub-payloads:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.pull_request.head.sha || github.sha }}
+          fetch-depth: 1
+          filter: blob:none
+          sparse-checkout: |
+            /_system/scripts/check_hub_payloads.py
+            /dashboard/data/core.json
+            /dashboard/data/desk_briefs.json
+            /dashboard/data/reverse_splits.json
+            /dashboard/data/short_alpha.json
+            /dashboard/data/special_situations.json
+            /dashboard/data/separations.json
+          sparse-checkout-cone-mode: false
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Committed hub shards reconcile
+        run: python _system/scripts/check_hub_payloads.py
+
   market-data-csvs:
     # The unit-test checkout leaves out the reference corpus, so the CSVs
     # themselves are checked here: Stooq's HTML bot check sat in
