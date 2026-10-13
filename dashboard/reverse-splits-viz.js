@@ -43,6 +43,16 @@
   };
   const CLASS_LABEL = { listed: 'Listed', otc: 'OTC', unknown: 'Unknown' };
   const COHORT_LABEL = { first: 'First', second: 'Second', third_plus: 'Third+' };
+  const SOURCE_LABEL = {
+    databento_price_jump: 'Databento price jump',
+    yfinance: 'yfinance seed',
+    edgar_search: 'EDGAR',
+  };
+  const EX_STATUS_LABEL = { scheduled: 'scheduled', effective: 'effective', cancelled: 'cancelled' };
+  const RATIO_FLAG_LABEL = {
+    extreme: 'Worse than 1-for-500: verify against the filing text before using it.',
+    disagrees_with_announced: 'Differs by more than 10% from the ratio parsed from the announcement: verify against the filing text.',
+  };
   const RULE_LABEL = {
     score_floor: 'Fundamental score floor (0-100)',
     fundamental_max_age_days: 'Latest period age, max days',
@@ -134,7 +144,8 @@
 .rs-panel .rs-counts{display:flex;flex-wrap:wrap;gap:14px;font-size:12px}
 </style>`;
 
-  function renderHead(doc) {
+  /** `opts.hideTitle` drops the panel's own h2 when the host section already titles it. */
+  function renderHead(doc, opts) {
     const health = doc.health || {};
     const status = health.status || 'unknown';
     const problems = [...(health.structural_errors || []), ...(health.problems || [])];
@@ -142,7 +153,7 @@
     const ledger = doc.ledger || {};
     const stamp = ledger.exported_at ? `ledger exported ${String(ledger.exported_at).slice(0, 10)}` : 'ledger stamp missing';
     return `<div class="rs-head">
-      <h2>Reverse splits</h2>
+      ${opts && opts.hideTitle ? '' : '<h2>Reverse splits</h2>'}
       ${badge('badge-purple', 'research only', 'authority: none; not in base IRR')}
       ${healthBadge}
       <span class="muted mono">as of ${esc(doc.as_of || '—')} · ${esc(stamp)}</span>
@@ -150,23 +161,39 @@
     <p class="subhead">${esc(doc.definition || '')}</p>`;
   }
 
+  function coverageNames(doc) {
+    const cov = doc.coverage || {};
+    const names = { listed: 'listed', otc: 'OTC', unknown: 'unclassified' };
+    return (cov.skewed_classes || []).map((k) => names[k] || String(k)).join(' and ');
+  }
+
   function renderTiles(doc) {
     const c = doc.counts || {};
     const book = doc.book || {};
-    const latest = book.latest_run || null;
+    // Headline the predeclared baseline, not whichever scenario was persisted last.
+    const headline = book.headline_run || book.latest_run || null;
     const dec = doc.decisions_summary || {};
+    const span = c.first_ex_date && c.last_ex_date ? `ex dates ${String(c.first_ex_date).slice(0, 4)}-${String(c.last_ex_date).slice(0, 4)}` : 'events with an ex date';
+    const partial = coverageNames(doc);
+    const recent90 = isNum(c.announcement_issuers_last_90_days) ? `announcements · ${fmtInt(c.announcement_issuers_last_90_days)} issuers` : 'announcements';
     const tiles = [
-      { n: c.events, label: 'Completed splits', note: 'events with an ex date' },
+      { n: c.events, label: 'Completed splits', note: partial ? `${span} · ${partial} partial` : span, title: (doc.coverage && doc.coverage.note) || '' },
       { n: c.announcements, label: 'Announcements', note: doc.ledger && doc.ledger.announcements_since ? `since ${doc.ledger.announcements_since}` : 'phrase hits that did not print' },
-      { n: c.announcements_last_90_days, label: 'Last 90 days', note: 'announcements' },
-      { n: (doc.upcoming_effective || []).length, label: 'Upcoming ex dates', note: 'known or announced' },
-      { n: c.repeat_issuers, label: 'Repeat issuers', note: 'second or later split' },
+      { n: c.announcements_last_90_days, label: 'Last 90 days', note: recent90 },
+      { n: isNum(c.upcoming_effective) ? c.upcoming_effective : (doc.upcoming_effective || []).length, label: 'Upcoming ex dates', note: 'known or announced' },
+      { n: c.repeat_issuers, label: 'Repeat issuers', note: c.duplicate_event_rows ? `second or later split · ${fmtInt(c.duplicate_event_rows)} duplicate rows merged` : 'second or later split' },
       { n: dec.count, label: 'Decisions', note: dec.latest_at ? `latest ${String(dec.latest_at).slice(0, 10)}` : 'append-only journal' },
     ];
-    const html = tiles.map((t) => `<div class="rs-tile"><strong>${fmtInt(t.n)}</strong><small>${esc(t.label)}</small><em>${esc(t.note)}</em></div>`).join('');
-    const bookTile = latest
-      ? `<div class="rs-tile" title="${esc(latest.label || '')}"><strong>${esc(fmtMoney(latest.net_pnl))}</strong><small>Latest book run</small><em>${esc(latest.label || '—')} · ${fmtInt(latest.taken)} trades</em></div>`
-      : `<div class="rs-tile"><strong>—</strong><small>Latest book run</small><em>no persisted runs</em></div>`;
+    const html = tiles.map((t) => `<div class="rs-tile"${t.title ? ` title="${esc(t.title)}"` : ''}><strong>${fmtInt(t.n)}</strong><small>${esc(t.label)}</small><em>${esc(t.note)}</em></div>`).join('');
+    let bookTile = '<div class="rs-tile"><strong>—</strong><small>Latest book run</small><em>no persisted runs</em></div>';
+    if (headline) {
+      const tag = headline.superseded ? 'superseded' : headline.baseline ? 'baseline' : 'latest';
+      const range = Array.isArray(book.batch_net_range) && book.batch_net_range.length === 2
+        ? `Scenarios that traded in this batch: ${fmtMoney(book.batch_net_range[0])} to ${fmtMoney(book.batch_net_range[1])}.`
+        : '';
+      const tip = [headline.label || '', headline.superseded || '', range].filter(Boolean).join(' ');
+      bookTile = `<div class="rs-tile" title="${esc(tip)}"><strong>${esc(fmtMoney(headline.net_pnl))}</strong><small>Latest book run</small><em>${esc(tag)} · ${esc(headline.label || '—')} · ${fmtInt(headline.taken)} trades</em></div>`;
+    }
     return `<div class="rs-tiles">${html}${bookTile}</div>`;
   }
 
@@ -177,7 +204,13 @@
       if (!rows.length) return '';
       return `<span><strong>${esc(title)}:</strong> ${rows.map(([k, v]) => `${esc(label(map || {}, k, k))} ${fmtInt(v)}`).join(' · ')}</span>`;
     };
+    const statuses = Object.entries(c.events_by_status || {}).map(([k, v]) => `${k.replaceAll('_', ' ')} ${fmtInt(v)}`).join(' · ');
+    const review = isNum(c.events_needs_review)
+      ? `<span title="${esc(`Rows with needs_review = 1: found in printed prices or an EDGAR search and not yet confirmed by a person. Status: ${statuses || 'not reported'}`)}"><strong>Needs review:</strong> ${fmtInt(c.events_needs_review)} of ${fmtInt(c.events)}</span>`
+      : '';
     return `<div class="rs-counts">
+      ${part('Source', c.events_by_source, SOURCE_LABEL)}
+      ${review}
       ${part('Cohort', c.by_cohort, COHORT_LABEL)}
       ${part('Exchange', c.by_exchange_class, CLASS_LABEL)}
       ${part('Announcement outcome', c.announcements_by_outcome, OUTCOME_LABEL)}
@@ -203,47 +236,82 @@
     </section>`;
   }
 
+  /** An announced-only row with neither a ratio nor an ex date is a phrase hit, not a schedule. */
+  function isPhraseHit(r) {
+    if (typeof r.phrase_hit === 'boolean') return r.phrase_hit;
+    return (r.outcome || 'announced_only') === 'announced_only' && !isNum(r.ratio) && !r.announced_ex_date;
+  }
+  /** A date before the as-of date reads as effective, never as scheduled. */
+  function exDateCell(r, asOf) {
+    if (!r.announced_ex_date) return '—';
+    let status = r.ex_date_status;
+    if (!status) status = r.outcome === 'cancelled' ? 'cancelled' : (asOf && String(r.announced_ex_date) < String(asOf) ? 'effective' : 'scheduled');
+    const before = r.ex_date_before_filing ? ' title="This date precedes the filing: the filing reports a split already in effect, or quotes an older one."' : '';
+    return `<span${before}>${esc(r.announced_ex_date)}</span> <span class="muted">${esc(label(EX_STATUS_LABEL, status, ''))}</span>`;
+  }
+
   function renderRecent(doc, opts) {
     const rows = doc.recent_announcements || [];
+    const c = doc.counts || {};
     const max = opts.maxRecent == null ? 25 : opts.maxRecent;
     if (!rows.length) return '<section><h3>Recent announcements</h3><p class="muted">No 8-K/6-K reverse-split filings in the last 90 days of the ledger.</p></section>';
-    const line = (r) => `<tr>
+    const line = (r) => {
+      const phrase = isPhraseHit(r);
+      const outcome = phrase
+        ? badge('badge-muted', 'Phrase hit', 'Reverse-split words in an 8-K/6-K with no ratio and no ex date parsed: not a schedule.')
+        : badge(OUTCOME_BADGE[r.outcome] || 'badge-purple', label(OUTCOME_LABEL, r.outcome, 'announced'));
+      const filings = isNum(r.filings_in_window) && Number(r.filings_in_window) > 1 ? ` · ${fmtInt(r.filings_in_window)} filings in 90 days` : '';
+      return `<tr>
         <td class="mono">${esc(r.announce_date || '—')}</td>
         <td class="mono">${link(r.url, r.ticker || '—')}</td>
         <td>${esc(r.company || '—')}</td>
         <td>${esc(label(CLASS_LABEL, r.exchange_class))}</td>
         <td class="mono">${esc(fmtRatio(r.ratio))}</td>
-        <td class="mono">${esc(r.announced_ex_date || '—')}</td>
-        <td>${badge(OUTCOME_BADGE[r.outcome] || 'badge-purple', label(OUTCOME_LABEL, r.outcome, 'announced'))}</td>
-        <td class="muted">${esc(label(QUALITY_LABEL, r.date_quality, '—'))}${r.form ? ` · ${esc(r.form)}` : ''}</td>
+        <td class="mono">${exDateCell(r, doc.as_of)}</td>
+        <td>${outcome}</td>
+        <td class="muted">${esc(label(QUALITY_LABEL, r.date_quality, '—'))}${r.form ? ` · ${esc(r.form)}` : ''}${esc(filings)}</td>
       </tr>`;
-    const head = '<thead><tr><th>Filed</th><th>Ticker</th><th>Company</th><th>Exchange</th><th>Ratio</th><th>Scheduled</th><th>Outcome</th><th>Evidence</th></tr></thead>';
+    };
+    const head = '<thead><tr><th>Filed</th><th>Ticker</th><th>Company</th><th>Exchange</th><th>Ratio</th><th>Ex date</th><th>Outcome</th><th>Evidence</th></tr></thead>';
     const shown = rows.slice(0, max).map(line).join('');
     const rest = rows.slice(max);
+    const total = isNum(c.announcements_last_90_days) ? Number(c.announcements_last_90_days) : null;
+    const issuers = isNum(c.announcement_issuers_last_90_days) ? ` from ${fmtInt(c.announcement_issuers_last_90_days)} issuers` : '';
+    const perIssuer = rows.some((r) => r.filings_in_window != null) ? ', one row per issuer' : ', newest first';
+    const scope = total == null
+      ? `showing newest ${fmtInt(rows.length)}${perIssuer}`
+      : `${fmtInt(total)} filings${issuers} in 90 days · showing newest ${fmtInt(rows.length)}${perIssuer}`;
     const more = rest.length
-      ? `<details style="margin-top:6px"><summary style="cursor:pointer;font-size:12px">${rest.length} more in the last 90 days</summary><table class="insights-table" style="margin-top:6px">${head}<tbody>${rest.map(line).join('')}</tbody></table></details>`
+      ? `<details style="margin-top:6px"><summary style="cursor:pointer;font-size:12px">${fmtInt(rest.length)} more of the newest ${fmtInt(rows.length)}</summary><table class="insights-table" style="margin-top:6px">${head}<tbody>${rest.map(line).join('')}</tbody></table></details>`
       : '';
-    return `<section><h3>Recent announcements <span class="muted" style="font-weight:normal;text-transform:none;letter-spacing:0">(${rows.length} in 90 days, newest first)</span></h3>
+    return `<section><h3>Recent announcements <span class="muted" style="font-weight:normal;text-transform:none;letter-spacing:0">(${esc(scope)})</span></h3>
       <table class="insights-table">${head}<tbody>${shown}</tbody></table>${more}
-      <p class="muted" style="margin-top:4px;font-size:11px">Outcome comes from the parsed filing where text was read: <em>Mention</em> is reverse-split language without an action, <em>Cancelled</em> an abandonment. Phrase hits and accept-clock rows have not been read.</p>
+      <p class="muted" style="margin-top:4px;font-size:11px">Outcome comes from the parsed filing where text was read: <em>Mention</em> is reverse-split language without an action, <em>Cancelled</em> an abandonment, <em>Phrase hit</em> an announced-only row with no ratio and no ex date. An ex date before the as-of date reads as effective. Accept-clock rows have not been read.</p>
     </section>`;
   }
 
   function renderRepeat(doc) {
     const rows = doc.repeat_splitters || [];
     if (!rows.length) return '';
-    const body = rows.map((r) => `<tr>
+    const merged = rows.reduce((n, r) => n + (isNum(r.duplicates_merged) ? Number(r.duplicates_merged) : 0), 0);
+    const body = rows.map((r) => {
+      const company = r.cik_source === 'announcement_ticker'
+        ? `<span title="Issuer matched by ticker to the announcement ledger; the event row carries no CIK.">${esc(r.company || '—')}*</span>`
+        : esc(r.company || '—');
+      const flag = r.ratio_flag ? ` ${badge('badge-warn', 'verify', RATIO_FLAG_LABEL[r.ratio_flag] || String(r.ratio_flag))}` : '';
+      return `<tr>
         <td class="mono">${link(r.url, r.ticker || '—')}</td>
-        <td>${esc(r.company || '—')}</td>
+        <td>${company}</td>
         <td class="mono">${fmtInt(r.prior_rs_count)}</td>
         <td>${esc(label(COHORT_LABEL, r.cohort))}</td>
         <td class="mono">${esc(r.last_ex_date || '—')}</td>
-        <td class="mono">${esc(fmtRatio(r.last_ratio))}</td>
+        <td class="mono">${esc(fmtRatio(r.last_ratio))}${flag}</td>
         <td>${esc(label(CLASS_LABEL, r.exchange_class))}</td>
-      </tr>`).join('');
+      </tr>`;
+    }).join('');
     return `<section><h3>Repeat splitters</h3>
-      <table class="insights-table"><thead><tr><th>Ticker</th><th>Company</th><th>Prior splits</th><th>Cohort</th><th>Last ex date</th><th>Last ratio</th><th>Exchange</th></tr></thead><tbody>${body}</tbody></table>
-      <p class="muted" style="margin-top:4px;font-size:11px">Prior count is by CIK where known, else by ticker; a ticker reused by another issuer can inflate it. Most recent first, capped at ${rows.length}.</p>
+      <table class="insights-table"><thead><tr><th>Ticker</th><th>Company</th><th>Prior splits</th><th>Cohort</th><th>Last ex date</th><th>Last ratio</th><th>Exchange (current)</th></tr></thead><tbody>${body}</tbody></table>
+      <p class="muted" style="margin-top:4px;font-size:11px">Prior count is by CIK where known, else by ticker; a ticker reused by another issuer can inflate it. The same split recorded twice (same issuer, ratio within 10%, ex dates within ten days) counts once${merged ? `; ${fmtInt(merged)} such row${merged === 1 ? '' : 's'} merged here` : ''}. Exchange is today's SEC listing, not the listing on the ex date. <em>verify</em> marks a ratio worse than 1-for-500 or one that disagrees with the announcement. Most recent first, capped at ${rows.length}.</p>
     </section>`;
   }
 
@@ -251,8 +319,13 @@
     const book = doc.book || {};
     const batch = book.latest_batch || [];
     if (!batch.length) return '<section><h3>Book</h3><p class="muted">No persisted book runs in the ledger.</p></section>';
+    const tag = (r) => {
+      if (r.superseded) return ` ${badge('badge-bad', 'superseded', r.superseded)}`;
+      if (r.baseline) return ` ${badge('badge-ok', 'baseline', 'The predeclared comparator the tile headlines.')}`;
+      return '';
+    };
     const body = batch.map((r) => `<tr>
-        <td>${esc(r.label || '—')}</td>
+        <td>${esc(r.label || '—')}${tag(r)}</td>
         <td class="mono">${fmtInt(r.taken)}</td>
         <td class="mono">${esc(fmtMoney(r.net_pnl))}</td>
         <td class="mono">${esc(fmtMoney(r.gross_after_fills))}</td>
@@ -297,8 +370,9 @@
 
   /**
    * Full panel. `doc` is the parsed reverse_splits.json; `opts.maxRecent`
-   * caps the visible recent-announcement rows (the rest fold into a details).
-   * Returns HTML; the caller mounts it.
+   * caps the visible recent-announcement rows (the rest fold into a details);
+   * `opts.hideTitle` omits the panel's own "Reverse splits" h2 for a host
+   * section that already titles it. Returns HTML; the caller mounts it.
    */
   function render(doc, options) {
     const opts = options || {};
@@ -309,7 +383,7 @@
       return `${STYLE}<div class="rs-panel"><p class="muted">Unexpected reverse-split schema ${esc(doc.schema_version)}; expected reverse_splits.v1.</p></div>`;
     }
     return `${STYLE}<div class="rs-panel" data-schema="${esc(doc.schema_version || '')}">
-      ${renderHead(doc)}
+      ${renderHead(doc, opts)}
       ${renderTiles(doc)}
       ${renderCounts(doc)}
       ${renderUpcoming(doc)}
@@ -329,5 +403,6 @@
     OUTCOME_LABEL,
     CLASS_LABEL,
     COHORT_LABEL,
+    SOURCE_LABEL,
   };
 })(window);
