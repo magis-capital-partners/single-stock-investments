@@ -11,11 +11,11 @@ re_pass: false
 
 # CRWD — Adversarial review
 
-**Date:** 2026-09-12  
+**Date:** 2026-10-12  
 **Agent:** Milly (batch pass)  
-**Dive reviewed:** `CRWD/research/deep_dive_2026-09-12.md`  
+**Dive reviewed:** `CRWD/research/deep_dive_2026-10-12.md`  
 **Valuation reviewed:** `CRWD/research/valuation.json`  
-**Filings used:** `CRWD/research/evidence/filing_facts_2026-09-12.json`
+**Filings used:** `CRWD/research/evidence/filing_facts_2026-10-12.json`
 
 **Goal:** Truth-seeking QA. Not bearish for its own sake.
 
