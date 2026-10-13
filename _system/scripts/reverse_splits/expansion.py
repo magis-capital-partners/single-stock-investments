@@ -385,6 +385,14 @@ class SecArchive:
         with lock:
             return self._get(url)
 
+    def archived(self, url):
+        path = self.root / (hashlib.sha256(url.encode()).hexdigest() + ".gz")
+        with self.db_lock:
+            row = self.conn.execute(
+                "SELECT status FROM collection_sources WHERE url=?", (url,)
+            ).fetchone()
+        return bool(row and row["status"] == "archived" and path.exists())
+
     def _get(self, url):
         parsed = urlparse(url)
         if parsed.scheme != "https" or parsed.hostname not in {
@@ -489,7 +497,7 @@ class SecArchive:
             return self._primary_parts(hit)
 
     def _primary_parts(self, hit):
-        """Use the official submissions index for oversized complete filings."""
+        """Resolve the primary document and linked exhibits from official filings."""
         cik = str(int(hit["cik"]))
         acc = str(hit["accession"]).replace("-", "")
         if cik not in self.submission_indexes:
@@ -725,17 +733,32 @@ def process_hit(cfg, conn, archive, hit, *, persist=True):
     url = f"https://www.sec.gov/Archives/edgar/data/{cik}/{acc}/{acc[:10]}-{acc[10:12]}-{acc[12:]}.txt"
     legacy = cfg.edgar_cache / cik.zfill(10) / (acc + ".txt")
     evidence = []
+    primary_parts = None
+    if (
+        hit["form"] in {"DEF 14A", "PRE 14A", "DEFA14A", "DEF 14C", "PRE 14C"}
+        and not archive.archived(url)
+    ):
+        try:
+            primary_parts = archive.primary_parts(hit)
+        except SourceUnavailable:
+            # A missing primary mapping can still be resolved by the complete
+            # filing. Denials remain subject to the archive's stop condition.
+            pass
     try:
-        raw = archive.get(url)
-        parts = filing_parts(raw)
-        evidence = [
-            {
-                "url": url,
-                "sha256": hashlib.sha256(raw).hexdigest(),
-                "raw_complete": True,
-            }
-        ]
-        review = "automated_requires_adjudication"
+        if primary_parts is not None:
+            parts, evidence = primary_parts
+            review = "primary_and_linked_exhibits_requires_adjudication"
+        else:
+            raw = archive.get(url)
+            parts = filing_parts(raw)
+            evidence = [
+                {
+                    "url": url,
+                    "sha256": hashlib.sha256(raw).hexdigest(),
+                    "raw_complete": True,
+                }
+            ]
+            review = "automated_requires_adjudication"
     except SourceUnavailable:
         if legacy.exists():
             text = legacy.read_text(encoding="utf-8", errors="replace")
