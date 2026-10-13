@@ -41,6 +41,81 @@ The Shorts → Reverse splits panel has a separate expanded study. It covers
 The saved 118 book runs and Michael's decisions remain the frozen comparison.
 `full_universe_complete` stays false while source or identity gaps remain.
 
+### Published snapshot: 2026-10-13
+
+Run `20261013T202808739318Z` covers events from 2018-05-01 through
+2026-10-13, with complete daily price history available through 2026-10-12.
+
+| Measure | Count |
+|---|---:|
+| Discovered filing accessions, 2005 onward | 128,077 |
+| Parsed filing disclosures | 60,618 |
+| Catalogue events and candidates | 7,069 |
+| Distinct issuer keys in the catalogue | 4,978 |
+| Verified actions: structured notices or matched primary schedules | 3,619 |
+| Verified next-session / five-session entry and exit benchmarks | 665 |
+| Distinct issuer keys with those benchmarks | 541 |
+| Fixed account scenarios | 34 |
+
+The 665 count establishes two benchmark prices, not an uninterrupted,
+executable trading path. Unresolved issuer keys use the historical symbol;
+identity review can join aliases later. The catalogue is approximately three
+times the existing 2,330-row event ledger, with its provisional rows labeled.
+
+All filing accessions inside the priced collection window were attempted;
+two remain unavailable. Another 67,457 earlier accessions remain discovery
+metadata awaiting text processing and licensed prices. The full-market price
+scan retains unmatched candidates; its reconciled window is 2018-05-15 through
+2026-10-05 because the detector requires surrounding sessions.
+
+Nominal prices cover 2,736 symbols and 1,057,110 daily rows. Official auction
+benchmarks come from 105 venue files, with 1,993,744 valid observations. SEC
+fundamental sources were requested for 3,239 issuer IDs; 32 source files were
+unavailable. Historical OTC prices, terminal obligations and dated security
+identity remain incomplete. The optional Massive cross-check has no local
+key and contributes no actions.
+
+For example, the next-session fundamental-score-60 case with a five-session
+hold and assumed 100% annual borrow fees has 91 modeled entries across 89
+issuer keys, including two unresolved positions. The strict evidence case
+has zero trades because its required dated execution evidence is unavailable.
+These are conditional research results, not demonstrated tradable profits.
+
+The latest public borrow archive contains 4,599 inventory indications as of
+2026-10-13 20:28:29 UTC. It supplies no approved locates. The daily archive
+workflow builds future evidence; it cannot reconstruct historical approvals.
+
+### How to read the expanded backtest
+
+1. **Find the names.** Search filings and official OTC action notices, and scan
+   historical exchange prices for split-like jumps. This includes names that
+   later stopped trading. Unmatched price detections remain searchable candidates.
+2. **Identify what happened.** Distinguish permission to split, a board decision,
+   a scheduled split, a historical mention and a cancellation. Repeated filings
+   are grouped provisionally; they do not automatically become extra trades.
+3. **Confirm the action.** A filing's schedule alone does not prove completion.
+   Confirmed actions, provisional schedules and unresolved candidates have
+   separate counts. Security class and ticker history still need review.
+4. **Measure the price move.** Compare official auction prices at the split-day
+   open or close, the next session, or five sessions later, with closes after
+   5, 10 or 20 sessions. This answers how prices moved before trading costs.
+5. **Apply the trading rules.** The separate account replay considers score,
+   available history, share quantity, liquidity, margin, spread and capital.
+   Sub-$1 stocks are included when the modeled economics allow them.
+6. **Charge costs and handle restrictions.** Conditional cases assume 100% or
+   300% annual borrow fees, plus spread and commissions. Observed short-sale
+   restrictions can delay entry. Unknown evidence remains labeled unknown.
+7. **Keep unfinished trades visible.** Missing prices or incomplete covers do
+   not create a winning exit. Residual positions and their liabilities remain
+   in the account. A strict case requires actual dated execution evidence.
+8. **Report the denominator.** Read discovered events, confirmed actions,
+   benchmarked events, modeled trades and distinct issuers separately. Running
+   several settings on the same company does not increase independent evidence.
+
+The fee rates are assumptions used for sensitivity analysis. Today's public
+borrow file cannot tell us whether a stock was borrowable years ago. The
+expanded results are exploratory research, not demonstrated executable returns.
+
 The committed files are:
 
 | File | Purpose |
@@ -67,6 +142,10 @@ bounded clauses around split language, including exhibits. Unless a sourced
 public release timestamp is supplied, the filing becomes usable at midnight
 after its filing day. This prevents a later disclosure from moving a trade
 back in time.
+Cached complete submission files are retained. For uncached proxies and
+information statements, collection resolves the official primary document
+and relevant linked exhibits; this is labeled separately from a complete
+submission archive, and unlinked exhibits remain an evidence gap.
 
 An optional `reference` collector cross-checks Massive's structured reverse
 split endpoint inside its documented two-year Basic window. It uses an
@@ -107,6 +186,8 @@ SQLite inputs, companyfacts, code hashes and source hashes under
 individual price-derived returns remain local. Public feeds contain metadata
 and aggregate research. Forward validation starts the day after the frozen
 cutoff; the existing history is exploratory.
+Older immutable content shards can remain alongside the current version;
+the `.parts.json` index selects the active rows and checks their hashes.
 
 ### Run or resume the expansion
 
