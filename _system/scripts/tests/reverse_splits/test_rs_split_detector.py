@@ -122,6 +122,10 @@ def test_reconcile_marks_matches_and_lists_unmatched_ledger_events():
     assert [d["status"] for d in dets] == ["matched", "detector_only"]
     assert dets[0]["ledger_matches"] == [{"ticker": "AAA", "ex_date": "2025-01-13", "ratio": 0.1}]
     assert [e["ticker"] for e in ledger_only] == ["CCC", "BBB"]
+    renamed, still_missing = sd.reconcile([{"symbol": "SLRX", "day": date(2022, 10, 17)}],
+                                          [{"ticker": "DCOY", "ex_date": "2022-10-17"}], date(2022, 1, 1), date(2023, 1, 1),
+                                          aliases={("DCOY", "2022-10-17"): "SLRX"})
+    assert renamed[0]["status"] == "matched" and still_missing == [], "a ledger ticker renamed since the split matches its old symbol"
 
 
 # --- the pull --------------------------------------------------------------------

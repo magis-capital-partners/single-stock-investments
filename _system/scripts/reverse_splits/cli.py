@@ -76,6 +76,14 @@ def build_parser() -> argparse.ArgumentParser:
     p_det.add_argument("--datasets", default="XNAS.ITCH,XNYS.PILLAR,XASE.PILLAR")
     p_det.add_argument("--reuse-scan", action="store_true", help="Reuse the last bar scan; redo merge, classification and reconciliation")
 
+    p_chk = sub.add_parser("check-filings", help="Confirm corroborated detector-only splits against SEC filings and join renamed ledger tickers (EDGAR full-text search; cached)")
+    p_chk.add_argument("--limit", type=int, default=None)
+
+    p_impd = sub.add_parser("import-detections", help="Add corroborated detector-only splits to the ledger as review-needed rows (via SQLite and export-ledger)")
+    p_impd.add_argument("--no-ratios", action="store_true", help="Skip fetching each confirming filing's ratio")
+
+    sub.add_parser("databento-prices", help="Load printed Databento bars and Rule 201 state for every listed ledger event into the local SQLite")
+
     p_borrow = sub.add_parser("borrow-csv", help="Import a Client Portal Short-Securities Availability CSV")
     p_borrow.add_argument("csv", type=Path)
 
@@ -198,6 +206,32 @@ def main(argv: list[str] | None = None) -> int:
 
         summary = detect(cfg, datasets=tuple(args.datasets.split(",")), reuse_scan=args.reuse_scan)
         print(json.dumps({k: v for k, v in summary.items() if k != "by_year"}, indent=1, default=str))
+        return 0
+
+    if args.cmd == "check-filings":
+        from .filing_check import run_checks
+
+        run_checks(cfg, log=lambda s: print(s, flush=True), limit=args.limit)
+        return 0
+
+    if args.cmd == "import-detections":
+        from .import_detections import append_detections
+
+        append_detections(cfg, cfg.ledger_dir, cfg.reports_dir / "ledger_work", fetch_ratios=not args.no_ratios,
+                          log=lambda s: print(s, flush=True))
+        return 0
+
+    if args.cmd == "databento-prices":
+        import json
+
+        from .databento_prices import load_prices, load_ssr
+
+        events = [json.loads(line) for line in (cfg.ledger_dir / "events.jsonl").read_text(encoding="utf-8").splitlines() if line.strip()]
+        joins_path = cfg.reports_dir / "rename_joins.json"
+        joins = json.loads(joins_path.read_text(encoding="utf-8")) if joins_path.exists() else []
+        log = lambda s: print(s, flush=True)  # noqa: E731
+        print(load_prices(cfg, cfg.db_path, events, joins, log=log))
+        print(load_ssr(cfg, cfg.db_path, events, joins, log=log))
         return 0
 
     if args.cmd == "borrow-csv":

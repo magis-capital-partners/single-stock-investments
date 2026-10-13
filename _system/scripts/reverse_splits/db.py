@@ -84,6 +84,15 @@ CREATE TABLE IF NOT EXISTS prices_daily (
 
 CREATE INDEX IF NOT EXISTS idx_prices_date ON prices_daily(date);
 
+-- Reg SHO Rule 201 state at the open, per (ticker, day): rows exist only for
+-- restricted days (databento_prices.load_ssr).
+CREATE TABLE IF NOT EXISTS ssr_flags (
+    ticker TEXT NOT NULL,
+    date TEXT NOT NULL,
+    source TEXT,
+    PRIMARY KEY (ticker, date)
+);
+
 CREATE TABLE IF NOT EXISTS finra_short_interest (
     ticker TEXT NOT NULL,
     settlement_date TEXT NOT NULL,

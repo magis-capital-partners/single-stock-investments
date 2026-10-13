@@ -150,10 +150,12 @@ def _as_date(value) -> date | None:
         return None
 
 
-def reconcile(detections: list[dict], ledger: list[dict], start: date, end: date) -> tuple[list[dict], list[dict]]:
+def reconcile(detections: list[dict], ledger: list[dict], start: date, end: date,
+              aliases: dict | None = None) -> tuple[list[dict], list[dict]]:
     """Mark each detection matched/detector_only and list ledger events in the
     window that no detection matches. Same normalized ticker, ex dates within
-    ``MATCH_DAYS`` calendar days."""
+    ``MATCH_DAYS`` calendar days. ``aliases`` maps a ledger (ticker, ex_date)
+    to the symbol it traded under then (``filing_check`` rename joins)."""
     by_symbol: dict[str, list[dict]] = {}
     for det in detections:
         by_symbol.setdefault(normalize_symbol(det["symbol"]), []).append(det)
@@ -162,7 +164,11 @@ def reconcile(detections: list[dict], ledger: list[dict], start: date, end: date
         ex = _as_date(event.get("ex_date"))
         if ex is None or not (start <= ex < end):
             continue
-        hits = [d for d in by_symbol.get(normalize_symbol(event.get("ticker")), []) if abs((d["day"] - ex).days) <= MATCH_DAYS]
+        symbols = {normalize_symbol(event.get("ticker"))}
+        alias = (aliases or {}).get((event.get("ticker"), str(ex)))
+        if alias:
+            symbols.add(normalize_symbol(alias))
+        hits = [d for s in symbols for d in by_symbol.get(s, []) if abs((d["day"] - ex).days) <= MATCH_DAYS]
         for d in hits:
             d.setdefault("ledger_matches", []).append({"ticker": event.get("ticker"), "ex_date": str(ex), "ratio": event.get("ratio")})
         if not hits:
@@ -185,7 +191,7 @@ def _symbol_spans(path: Path):
 
 
 def load_bars(path: Path):
-    """Daily bars with symbols: day, symbol, open, close, volume."""
+    """Daily bars with symbols: day, symbol, open, high, low, close, volume."""
     import databento as db
 
     if not path.exists() or path.stat().st_size == 0:
@@ -194,7 +200,7 @@ def load_bars(path: Path):
     frame["day"] = frame["ts_event"].dt.date
     frame = frame.merge(_symbol_spans(path), on="instrument_id", how="inner")
     frame = frame[(frame["day"] >= frame["d0"]) & (frame["day"] < frame["d1"])]
-    return frame[["day", "symbol", "open", "close", "volume"]]
+    return frame[["day", "symbol", "open", "high", "low", "close", "volume"]]
 
 
 def _scan_frame(frame, keep_from: date, keep_to: date, dataset: str) -> list[dict]:
@@ -296,7 +302,10 @@ def _finish(cfg: Config, datasets, detections, last_seen, first_day, last_day) -
     # missing from the definitions (a renamed ticker, say) is not miscounted as
     # undetected; the listed-equity filter applies to the counts afterwards.
     in_window = [d for d in merged if window[0] <= d["day"] < window[1]]
-    in_window, ledger_only = reconcile(in_window, ledger, *window)
+    joins_path = cfg.reports_dir / "rename_joins.json"
+    aliases = {(j["ticker"], j["ex_date"]): j["filing_time_symbol"]
+               for j in json.loads(joins_path.read_text(encoding="utf-8"))} if joins_path.exists() else {}
+    in_window, ledger_only = reconcile(in_window, ledger, *window, aliases=aliases)
     listed = [d for d in in_window if d["listed_equity"]]
     summary = _summarize(listed, ledger_only, ledger, window, merged)
     summary["ledger_matched_by_unclassified"] = sum(1 for d in in_window if d["status"] == "matched" and not d["listed_equity"])

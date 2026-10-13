@@ -187,6 +187,63 @@ within five days) and written to `local/reports/split_detections.csv` and
 
 The ratio is inferred from prices and labelled so; the filing's ratio wins.
 
+### Filing checks, the rename join, and adding detections to the ledger
+
+`check-filings` asks EDGAR full-text search, for every corroborated
+detector-only event, for a filing between 200 days before and 45 days after
+the detected session that says reverse stock split, reverse split, reverse
+share split, share consolidation or ADS ratio, together with the ticker.
+EDGAR display names carry an issuer's *current* tickers, so there are two
+ways to match:
+
+- `display_ticker`: the issuer lists the ticker today.
+- `ticker_text`: the issuer's own filings (8-K, 6-K, 10-Q/K, 20-F, proxies;
+  never a prospectus) carry the ticker in their text. This is how a renamed or
+  delisted company is found. It is weaker, needs two filings from a company
+  showing another live ticker, and is skipped for tickers under three letters.
+
+`check-filings` also runs the rename join. Every listed ledger event the
+detector missed is matched to a detection within five days, with the same
+ratio, whose issuer has the ledger event's CIK. Results are cached in
+`reports/filing_checks.json` and `reports/rename_joins.json`.
+
+`import-detections` adds the corroborated detector-only events to the ledger:
+it imports the ledger into a scratch SQLite, upserts the rows, recomputes
+cohorts per issuer (touching only rows that change) and writes the ledger with
+`export_ledger`. Each row is `source = databento_price_jump` with
+`needs_review = 1`, and its `status` and `confidence` are:
+
+| `status` | Meaning | `confidence` |
+|---|---|---|
+| `filing_ratio` | Issuer confirmed, and the filing's own ratio agrees with the printed jump within 35% | 0.5 |
+| `filing_confirmed` | Issuer confirmed, ratio inferred from prices | 0.4 |
+| `filing_not_found` | No filing found | 0.3 |
+
+A detection the rename join tied to an existing event, or one within ten days
+of a ledger event with the same CIK, is that event and is skipped. Price data
+never enters the ledger.
+
+### Databento prices and Rule 201 in the book
+
+`databento-prices` loads printed bars into `prices_daily` for every listed
+ledger event (ex date -120 to +60 days). OHLC comes from the highest-volume
+venue among XNAS, XNYS and XASE; volume is the sum of the three, which is less
+than consolidated volume. A renamed ticker is priced under the symbol it
+carried at the split. `ssr_flags` holds every (ticker, day) restricted at the
+open: the last explicit Y/N in Nasdaq's `status` feed at or before 09:30 New
+York time.
+
+`[execution] ssr_policy` sets how the book treats a restricted entry bar:
+
+- `ignore` (the default): existing books are unchanged.
+- `exclude`: the entry is dropped (funnel stage `ssr_restricted`).
+- `delay`: the entry moves to the next unrestricted session, at most two
+  sessions later.
+
+A short may still fill above the national best bid while restricted, so
+`exclude` is the conservative reading and `delay` the faithful one for an
+order at the open.
+
 ## Dashboard payload (`dashboard/data/reverse_splits.json`)
 
 Built from the JSONL alone (CI has no SQLite). Schema `reverse_splits.v1`:
