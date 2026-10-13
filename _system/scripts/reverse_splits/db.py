@@ -278,6 +278,7 @@ def migrate(conn: sqlite3.Connection) -> None:
 
 def init_db(db_path: Path) -> sqlite3.Connection:
     conn = connect(db_path)
+    conn.execute('PRAGMA busy_timeout=30000')
     conn.executescript(SCHEMA)
     migrate(conn)
     return conn

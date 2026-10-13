@@ -58,6 +58,11 @@ class Config:
         return self._path("data_dir")
 
     @property
+    def local_dir(self) -> Path:
+        """Ignored, reproducible research workbench; never truncate the ledger."""
+        return self.db_path.parent
+
+    @property
     def ledger_dir(self) -> Path:
         """Where the committed JSONL ledger lives (beside ``config.toml``)."""
         return self._path("ledger_dir")

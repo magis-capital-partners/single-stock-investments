@@ -33,6 +33,7 @@ from reverse_splits.ledger import (  # noqa: E402
     load_jsonl,
     parse_stamp,
     read_json,
+    sha256_file,
     verify_decision_chain,
 )
 from reverse_splits.utils import parse_date  # noqa: E402
@@ -140,6 +141,33 @@ def structural_errors(ledger_dir: Path | None = None) -> list[str]:
             errors.append(f"{prefix}: source manifest {digest[:12]} missing from book_source_manifests.jsonl")
 
     errors.extend(verify_decision_chain(decisions))
+    summary = read_json(paths['manifest'].parent / 'expansion_summary.json',None)
+    if summary is not None:
+        expanded_path=paths['manifest'].parent/'expansion_events.jsonl'
+        try:
+            expanded=load_jsonl(expanded_path)
+            ids=[r.get('event_id') for r in expanded]
+            if len(set(ids))!=len(ids) or any(not i for i in ids):
+                errors.append('expansion: event identities missing or duplicated')
+            if len(expanded)!=summary.get('counts',{}).get('discovered_events'):
+                errors.append('expansion: catalogue count differs from summary')
+            if summary.get('counts',{}).get('complete_verified_price_paths',0)>summary.get('counts',{}).get('verified_actions',0):
+                errors.append('expansion: complete paths exceed verified actions')
+            accounts=summary.get('accounts',[])
+            if len({r['case']['id'] for r in accounts})!=len(accounts):
+                errors.append('expansion: repeated scenario identity')
+            if any('gross_short_return' in o for r in expanded for o in r.get('outcomes',[])):
+                errors.append('expansion: individual licensed price returns must remain local')
+            root=paths['manifest'].parent.resolve()
+            manifest=read_json(root/'expansion_manifest.json',{})
+            if manifest.get('run_id')!=summary.get('run_id'):
+                errors.append('expansion: publication manifest does not identify the summary run')
+            for part in manifest.get('files',[]):
+                target=(root/part['path']).resolve()
+                if not target.is_relative_to(root) or sha256_file(target)!=part['sha256']:
+                    errors.append('expansion: publication source missing or changed: '+part['path'])
+        except (ValueError,KeyError,TypeError) as exc:
+            errors.append('expansion: invalid derived ledger: '+str(exc))
     return errors
 
 
@@ -207,7 +235,7 @@ def main(argv: list[str] | None = None) -> int:
     for problem in report["problems"]:
         print(f"WARN  {problem}")
     paths = ledger_paths(args.ledger_dir)
-    counts = {name: sum(1 for _ in open(paths[name], encoding="utf-8")) if paths[name].exists() else 0 for name in ("events", "announcements", "decisions")}
+    counts = {name: len(load_jsonl(paths[name])) for name in ("events", "announcements", "decisions")}
     print(
         f"reverse_splits: status={report['status']} structural_errors={len(report['structural_errors'])} "
         f"events={counts['events']} announcements={counts['announcements']} decisions={counts['decisions']} "

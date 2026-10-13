@@ -228,8 +228,8 @@ def run_checks(cfg, log=print, limit: int | None = None, workers: int = 3) -> di
                     fs.save()
                     log(f"{i}/{len(todo)} checked: {dict(counts)} ({sum(p.requests for p in pool)} requests)")
         recon = json.loads((reports / "split_detection_reconciliation.json").read_text(encoding="utf-8"))
-        ledger = {(e["ticker"], str(e["ex_date"])[:10]): e for e in
-                  (json.loads(line) for line in (cfg.ledger_dir / "events.jsonl").read_text(encoding="utf-8").splitlines() if line.strip())}
+        from .ledger import load_jsonl
+        ledger = {(e['ticker'],str(e['ex_date'])[:10]):e for e in load_jsonl(cfg.ledger_dir/'events.jsonl')}
         listed = [r for r in detections if r["listed_equity"] == "True"]
         for event in recon.get("ledger_only_events") or []:
             full = ledger.get((event["ticker"], str(event["ex_date"])[:10])) or {}

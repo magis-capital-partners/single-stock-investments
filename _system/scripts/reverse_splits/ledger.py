@@ -36,7 +36,7 @@ FILES = (
     "book_source_manifests",
     "decisions",
 )
-# Nothing over this enters git; larger files are capped to a recent window.
+# Nothing over this enters git; larger histories are losslessly sharded.
 MAX_FILE_BYTES = 10 * 1024 * 1024
 CAP_YEARS = 3
 
@@ -117,6 +117,29 @@ def write_json(path: Path, value, *, sort_keys: bool = False) -> None:
 
 def load_jsonl(path: Path) -> list[dict]:
     """Rows of a JSONL file; raises ``ValueError`` naming the bad line."""
+    path = Path(path)
+    index = path.with_suffix(".parts.json")
+    if index.exists():
+        manifest = json.loads(index.read_text(encoding="utf-8"))
+        rows, seen = [], set()
+        for part in manifest["files"]:
+            target = (path.parent / part["path"]).resolve()
+            if not target.is_relative_to(path.parent.resolve()) or target in seen:
+                raise ValueError(f"{index.name}: invalid or repeated shard path")
+            seen.add(target)
+            if sha256_file(target) != part["sha256"]:
+                raise ValueError(f"{index.name}: missing or changed shard {part['path']}")
+            batch = _load_jsonl_file(target)
+            if len(batch) != part["rows"]:
+                raise ValueError(f"{index.name}: shard row count differs")
+            rows.extend(batch)
+        if len(rows) != manifest["rows"]:
+            raise ValueError(f"{index.name}: total row count differs")
+        return rows
+    return _load_jsonl_file(path)
+
+
+def _load_jsonl_file(path: Path) -> list[dict]:
     rows: list[dict] = []
     path = Path(path)
     if not path.exists():
@@ -133,6 +156,44 @@ def load_jsonl(path: Path) -> list[dict]:
             raise ValueError(f"{path.name}:{line_number}: row must be an object")
         rows.append(value)
     return rows
+
+
+def write_retained_jsonl(path: Path, rows: Iterable[dict], *, sparse=False, max_bytes=MAX_FILE_BYTES) -> dict:
+    """Keep every row, partitioned by year and size; index is the commit point."""
+    path, rows = Path(path), list(rows)
+    size = sum(len(dumps_row(r, sparse=sparse).encode("utf-8")) + 1 for r in rows)
+    index = path.with_suffix(".parts.json")
+    if size <= max_bytes and not index.exists():
+        n, length = write_jsonl(path, rows, sparse=sparse)
+        return {"rows": n, "bytes": length, "sha256": sha256_file(path)}
+    buckets = {}
+    for row in rows:
+        stamp = next((str(row[k]) for k in ("ex_date", "filed_at", "announce_date", "settlement_date", "available_at", "created_at") if row.get(k)), "undated")
+        year = stamp[:4] if stamp[:4].isdigit() else "undated"
+        buckets.setdefault(year, []).append(row)
+    parts = []
+    for year, batch in sorted(buckets.items()):
+        chunk, length, sequence = [], 0, 1
+        def flush():
+            payload = "\n".join(dumps_row(r, sparse=sparse) for r in chunk)
+            fingerprint = hashlib.sha256(payload.encode("utf-8")).hexdigest()[:12]
+            target = path.parent / path.stem / f"{year}-{sequence:04d}-{fingerprint}.jsonl"
+            n, b = write_jsonl(target, chunk, sparse=sparse)
+            parts.append({"path": target.relative_to(path.parent).as_posix(), "rows": n, "bytes": b, "sha256": sha256_file(target)})
+        for row in batch:
+            item_size = len(dumps_row(row, sparse=sparse).encode("utf-8")) + 1
+            if item_size > max_bytes:
+                raise ValueError(f"{path.name}: one row exceeds the shard size limit")
+            if chunk and length + item_size > max_bytes:
+                flush()
+                chunk, length, sequence = [], 0, sequence + 1
+            chunk.append(row)
+            length += item_size
+        if chunk:
+            flush()
+    manifest = {"schema_version": "jsonl_parts.v1", "rows": len(rows), "files": parts, "history_truncated": False}
+    write_json(index, manifest, sort_keys=True)
+    return {"rows": len(rows), "bytes": size, "sha256": sha256_file(index), "index": index.name, "parts": parts, "history_truncated": False}
 
 
 def dumps_row(row: dict, *, sparse: bool = False) -> str:

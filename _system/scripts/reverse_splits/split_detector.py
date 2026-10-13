@@ -296,7 +296,8 @@ def _finish(cfg: Config, datasets, detections, last_seen, first_day, last_day) -
         det["last_bar"] = seen
         det["stopped_trading"] = bool(seen and last_day and (last_day - seen).days > STOPPED_TRADING_DAYS)
         det["corroborated"] = is_corroborated(det)
-    ledger = [json.loads(line) for line in (cfg.ledger_dir / "events.jsonl").read_text(encoding="utf-8").splitlines() if line.strip()]
+    from .ledger import load_jsonl
+    ledger = load_jsonl(cfg.ledger_dir/'events.jsonl')
     window = (first_day + timedelta(days=14), last_day - timedelta(days=7)) if first_day else (date.min, date.min)
     # Reconcile against every detection, so a ledger event whose symbol is
     # missing from the definitions (a renamed ticker, say) is not miscounted as

@@ -60,7 +60,7 @@ def calendar_for(frames,cutoff):
     return [str(d)[:10] for d in cal.sessions_in_range(first,cutoff)]
 
 
-def prepare_leads(events,verified,frames,calendar,bridge,cfg,corrections=None):
+def prepare_leads(events,verified,frames,calendar,bridge,cfg,corrections=None,*,min_price=1.0):
     splitmap=load_splits(events)
     for action in (corrections or {}).get('actions',[]):
         ticker=action['ticker'];existing=splitmap.setdefault(ticker,[])
@@ -116,7 +116,7 @@ def prepare_leads(events,verified,frames,calendar,bridge,cfg,corrections=None):
         if ix is None:reason="no_observed_entry_quote"
         elif f.dates[ix]!=expected_day:reason="missing_first_eligible_session_quote"
         elif ix in series.ambiguous:reason="ambiguous_nominal_price_at_entry"
-        elif f.open[ix]<1:reason="below_one_dollar"
+        elif f.open[ix]<min_price:reason="below_one_dollar"
         prior_volume=[v for v in f.volume[max(0,(ix or 0)-20):(ix or 0)] if v>0]
         if not reason and len(prior_volume)<20:reason="fewer_than_20_prior_volume_sessions"
         if not reason:

@@ -177,7 +177,7 @@
     const partial = coverageNames(doc);
     const recent90 = isNum(c.announcement_issuers_last_90_days) ? `announcements · ${fmtInt(c.announcement_issuers_last_90_days)} issuers` : 'announcements';
     const tiles = [
-      { n: c.events, label: 'Completed splits', note: partial ? `${span} · ${partial} partial` : span, title: (doc.coverage && doc.coverage.note) || '' },
+      { n: c.events, label: 'Split events and candidates', note: partial ? `${span} · ${partial} partial` : span, title: (doc.coverage && doc.coverage.note) || 'Includes events requiring source review' },
       { n: c.announcements, label: 'Announcements', note: doc.ledger && doc.ledger.announcements_since ? `since ${doc.ledger.announcements_since}` : 'phrase hits that did not print' },
       { n: c.announcements_last_90_days, label: 'Last 90 days', note: recent90 },
       { n: isNum(c.upcoming_effective) ? c.upcoming_effective : (doc.upcoming_effective || []).length, label: 'Upcoming ex dates', note: 'known or announced' },
@@ -342,6 +342,98 @@
     </section>`;
   }
 
+  function renderExpansion(doc) {
+    const study = doc.expansion;
+    if (!study || !study.counts) return '';
+    const c = study.counts;
+    const rows = [
+      ['Catalogued events and candidates', c.discovered_events],
+      ['Actions matched to primary schedules or structured records', c.verified_actions],
+      ['Verified actions with next-session entry and five-session exit prices', c.complete_verified_price_paths],
+      ['Processed filing disclosures', c.processed_disclosures],
+      ['Prepared announcement disclosures', c.prepared_disclosures],
+      ['Prepared disclosures with historical fundamental score ≥60', c.prepared_fundamental_60],
+      ['Prepared next-session events', c.prepared_post_split_events],
+      ['Next-session events with historical fundamental score ≥60', c.post_split_fundamental_60],
+      ['Prepared disclosures below $1', c.sub_dollar_prepared],
+    ].map(([name,n]) => `<tr><td>${esc(name)}</td><td class="mono">${fmtInt(n)}</td></tr>`).join('');
+    const percent = n => isNum(n) ? `${(Number(n)*100).toFixed(1)}%` : '—';
+    const cohortName = key => {
+      const h = String(key).match(/_h(\d+)$/);
+      const first = key.startsWith('ex_close') ? 'Split-day close' : key.startsWith('ex_plus_0') ? 'Split-day open' : key.startsWith('ex_plus_1') ? 'Next-session open' : 'Five sessions later';
+      return `${first} · ${h ? h[1] : '—'} sessions`;
+    };
+    const caseName = c => `${c.stage === 'post_split_1' ? 'Next session' : c.stage === 'authorization_or_proposal' ? 'Proposal / authorization' : c.stage === 'unscheduled_board_action' ? 'Board action' : 'Scheduled split'} · ${c.selector === 'fundamental_60' ? 'score ≥60' : 'all eligible'} · ${c.horizon_sessions} sessions · ${Math.round(c.fee_annual*100)}% annual fee${c.borrow_policy === 'strict' ? ' · dated execution evidence' : c.execution === 'economic' ? ' · cost-budget check' : ''}`;
+    const price = (study.event_study || []).filter(r => r.tier === 'verified_actions').map(r => `<tr>
+      <td>${esc(cohortName(r.cohort))}</td><td class="mono">${fmtInt(r.events)}</td><td class="mono">${fmtInt(r.issuers)}</td>
+      <td class="mono">${esc(percent(r.median_gross_short_return))}</td><td class="mono">${esc(percent(r.positive_share))}</td></tr>`).join('');
+    const accounts = (study.accounts || []).map(r => `<tr><td>${esc(caseName(r.case))}</td><td class="mono">${fmtInt(r.eligible_episodes)}</td>
+      <td class="mono">${fmtInt(r.metrics.taken)}</td><td class="mono">${fmtInt(r.metrics.unique_issuers)}</td>
+      <td class="mono">${r.status === 'evidence_unavailable' ? '—' : esc(fmtMoney(r.metrics.net))}</td><td class="mono">${fmtInt(r.metrics.unresolved)}</td><td>${esc(r.status)}</td></tr>`).join('');
+    const gaps = Object.entries(study.announcement_exclusions || {}).sort((a,b) => b[1]-a[1]).slice(0,12)
+      .map(([name,n]) => `<li>${esc(name.replaceAll('_',' '))}: ${fmtInt(n)}</li>`).join('');
+    return `<section><h3>Expanded reverse-split study</h3>
+      <p class="subhead">${esc(study.start)} through ${esc(study.cutoff)} · ${fmtInt(c.unique_issuer_keys)} issuer or unresolved security keys.
+      ${study.full_universe_complete ? 'Coverage reconciled for the declared universe.' : 'Coverage remains partial; unresolved identities and missing histories remain in the catalogue.'}</p>
+      <table class="insights-table"><thead><tr><th>Coverage</th><th>Count</th></tr></thead><tbody>${rows}</tbody></table>
+      <p class="muted">Event counts, filing disclosures and portfolio trades have different denominators. Repeated entry settings do not create additional independent events.</p>
+      ${renderUniverse(doc.expansion_catalogue || [])}
+      <details open><summary>Observed prices around verified actions</summary>
+      <table class="insights-table"><thead><tr><th>Entry / hold cohort</th><th>Events</th><th>Issuer keys</th><th>Median gross short return</th><th>Positive paths</th></tr></thead><tbody>${price || '<tr><td colspan="5">Complete verified price paths unavailable.</td></tr>'}</tbody></table>
+      <p class="muted">Gross price behavior before fills, borrow, commissions and margin. Missing exits are unavailable, never zero returns.</p></details>
+      <details><summary>Declared announcement and next-session account scenarios</summary>
+      <table class="insights-table"><thead><tr><th>Declared scenario</th><th>Eligible episodes</th><th>Trades</th><th>Issuers</th><th>Marked net P&amp;L</th><th>Unresolved positions</th><th>Status</th></tr></thead><tbody>${accounts}</tbody></table>
+      <p class="muted">Conditional models on one hypothetical $50k account. Unresolved liabilities prevent a realized-profit claim. Strict cases require dated evidence; public availability indications are not approved locates.</p></details>
+      <details><summary>Missing evidence and exclusions</summary><ul class="rs-limits">${gaps}</ul>
+      <p class="muted">${fmtInt(study.collection && study.collection.pending_accessions)} discovered filing accessions await full-text processing. Earlier unpriced history is an inventory, not a trade sample.</p>
+      <ul class="rs-limits">${(study.limits || []).map(l => `<li>${esc(l)}</li>`).join('')}</ul></details>
+      <p class="muted">Run ${esc(study.run_id)} · built ${esc(String(study.built_at || '').slice(0,19))} UTC · forward validation starts ${esc(study.forward_validation_starts || '—')}.</p></section>`;
+  }
+
+  function universeRows(rows) {
+    return rows.map(r => `<tr><td class="mono">${link(r.source_url,r.ticker)}${r.new_ticker && r.new_ticker !== r.ticker ? ` → ${esc(r.new_ticker)}` : ''}</td>
+      <td>${esc(r.company || '—')}</td><td class="mono">${esc(r.ex_date)}</td><td>${esc(fmtRatio(r.ratio))}</td>
+      <td>${esc(r.exchange_class)}</td><td>${esc(String(r.verification || '').replaceAll('_',' '))}</td>
+      <td>${esc(String(r.price_path || '').replaceAll('_',' '))}</td></tr>`).join('') || '<tr><td colspan="7">No names match these filters.</td></tr>';
+  }
+  function renderUniverse(rows) {
+    return `<details data-rs-universe><summary>Browse the expanded universe (${fmtInt(rows.length)} events and candidates)</summary>
+      <div style="display:flex;flex-wrap:wrap;gap:8px;margin:8px 0"><input type="search" data-rs-query aria-label="Search reverse-split names" placeholder="Search ticker, company or CIK">
+      <select data-rs-market aria-label="Filter market"><option value="">All markets</option><option value="listed">Listed</option><option value="otc">OTC</option><option value="unknown">Unclassified</option></select>
+      <select data-rs-evidence aria-label="Filter evidence"><option value="">All evidence</option><option value="verified">Action corroborated</option><option value="review">Needs action review</option><option value="priced">Complete five-session price path</option><option value="missing">Missing five-session price path</option></select></div>
+      <p data-rs-result-count class="muted">Showing ${Math.min(75,rows.length)} of ${fmtInt(rows.length)} events</p>
+      <div style="overflow:auto"><table class="insights-table"><thead><tr><th>Ticker</th><th>Company</th><th>Action date</th><th>Ratio</th><th>Market</th><th>Action evidence</th><th>Next-session / five-session prices</th></tr></thead><tbody data-rs-rows>${universeRows(rows.slice(0,75))}</tbody></table></div>
+      <button type="button" data-rs-previous disabled>Previous</button> <button type="button" data-rs-next ${rows.length <= 75 ? 'disabled' : ''}>Next</button>
+      <p class="muted">Each row is an action or candidate, not necessarily an independent company or a feasible short.</p></details>`;
+  }
+  function attach(container,doc) {
+    const panel=container.querySelector('[data-rs-universe]');
+    if (!panel) return;
+    const rows=doc.expansion_catalogue || [];
+    let page=0;
+    const input=panel.querySelector('[data-rs-query]'), market=panel.querySelector('[data-rs-market]'), evidence=panel.querySelector('[data-rs-evidence]');
+    const previous=panel.querySelector('[data-rs-previous]'), next=panel.querySelector('[data-rs-next]');
+    function update(reset) {
+      if (reset) page=0;
+      const q=input.value.trim().toLowerCase();
+      const filtered=rows.filter(r => {
+        const verified=['primary_schedule_matched','structured_corporate_action'].includes(r.verification);
+        const priced=r.price_path==='observed_price_path';
+        return (!q || [r.ticker,r.new_ticker,r.company,r.cik].some(v => String(v || '').toLowerCase().includes(q))) &&
+          (!market.value || r.exchange_class===market.value) &&
+          (!evidence.value || (evidence.value==='verified' && verified) || (evidence.value==='review' && !verified) ||
+           (evidence.value==='priced' && priced) || (evidence.value==='missing' && !priced));
+      });
+      page=Math.max(0,Math.min(page,Math.ceil(filtered.length/75)-1));
+      panel.querySelector('[data-rs-rows]').innerHTML=universeRows(filtered.slice(page*75,(page+1)*75));
+      panel.querySelector('[data-rs-result-count]').textContent=`Showing ${filtered.length ? page*75+1 : 0}–${Math.min((page+1)*75,filtered.length)} of ${filtered.length.toLocaleString('en-US')} events`;
+      previous.disabled=page===0; next.disabled=(page+1)*75>=filtered.length;
+    }
+    input.addEventListener('input',()=>update(true));market.addEventListener('change',()=>update(true));evidence.addEventListener('change',()=>update(true));
+    previous.addEventListener('click',()=>{page--;update(false);});next.addEventListener('click',()=>{page++;update(false);});
+    update(true);
+  }
+
   function renderProcess(doc) {
     const p = doc.process || {};
     const rules = p.rules || {};
@@ -386,6 +478,7 @@
       ${renderHead(doc, opts)}
       ${renderTiles(doc)}
       ${renderCounts(doc)}
+      ${renderExpansion(doc)}
       ${renderUpcoming(doc)}
       ${renderRecent(doc, opts)}
       ${renderRepeat(doc)}
@@ -398,6 +491,7 @@
 
   global.ReverseSplitsViz = {
     render,
+    attach,
     fmtRatio,
     fmtMoney,
     OUTCOME_LABEL,

@@ -1,7 +1,7 @@
 # Reverse-split research data
 
-Reverse splits over about five years, US listed and OTC: completed events with
-an ex date, the 8-K/6-K phrase hits that never printed, FINRA positioning
+US listed and OTC reverse-split research: completed events and candidates with
+an ex date, filing disclosures, FINRA positioning
 context, the persisted shared-capital book runs and the append-only RSI-1.0
 decision journal. Proposal:
 `_system/proposals/one_hub_for_humans_and_bots_2026-10-11.md` (Phase 3).
@@ -13,8 +13,9 @@ This directory separates the **committed ledger** (JSONL beside this file) from
 **local build artifacts** (`local/`, ignored by git: the 260 MB SQLite, raw
 EDGAR and companyfacts caches, price history, reports). The ledger is what a
 clean clone has; `import_ledger` rebuilds SQLite from it and `export_ledger`
-writes it back. Nothing over 10 MB enters git; a file that would is capped to
-the last three years and the cap is recorded in `ledger_manifest.json`.
+writes it back. Files over 10 MB are divided into immutable year shards with
+a checksum index (`name.parts.json`). Readers use `load_jsonl` to verify and
+combine the shards. No old years are removed to meet the size limit.
 
 | File | Content | Rows (2026-10-11) | Mutability |
 |---|---|---:|---|
@@ -33,7 +34,122 @@ Not exported (reproducible from public sources or too large): `prices_daily`
 `book_trades`, `book_equity`, `issuers` (names travel on the rows), `filings`,
 `borrow_snapshots`, `backtest_*`.
 
-## Schemas
+## Expanded universe experiment (v3)
+
+The Shorts → Reverse splits panel has a separate expanded study. It covers
+2018-05-01 onward for prices and supports SEC discovery from 2005 onward.
+The saved 118 book runs and Michael's decisions remain the frozen comparison.
+`full_universe_complete` stays false while source or identity gaps remain.
+
+The committed files are:
+
+| File | Purpose |
+|---|---|
+| `expansion_summary.json` | Coverage funnel, source gaps, aggregate event returns and every declared account scenario |
+| `expansion_events.jsonl` or `.parts.json` | Event identities, exact action dates/ratios, sources, verification tiers and missing price-path reasons |
+| `expansion_disclosures.jsonl` or `.parts.json` | Filing accessions, availability clock, lifecycle stage, ratio and schedule |
+| `expansion_discovery.jsonl` or `.parts.json` | All discovered filing-hit identities, including the earlier unpriced inventory; restored on a clean checkout |
+| `expansion_episodes.jsonl` or `.parts.json` | Provisional links among repeated disclosures; different schedules or known ratios remain separate |
+| `expansion_manifest.json` | Checksums linking one published snapshot to its immutable local input manifest |
+| `borrow_history/` | Timestamped public IBKR inventory/fee indications; never approved locates |
+
+Discovery uses three sources independent of today's live ticker list:
+all-symbol venue histories (including securities that stopped trading), SEC
+full-text windows and quarterly filing inventories, and FINRA's public OTC
+Daily List. Every search page is exhausted or recorded as incomplete; large
+result windows subdivide. Unknown OTC ratios, unresolved CIKs and security
+classes remain candidates. A filing schedule alone is not proof that the
+action happened. A price jump alone is not a verified corporate action.
+
+Filings are classified as proposal/authorization, board action, scheduled
+action, historical reference, cancellation or unresolved. The parser examines
+bounded clauses around split language, including exhibits. Unless a sourced
+public release timestamp is supplied, the filing becomes usable at midnight
+after its filing day. This prevents a later disclosure from moving a trade
+back in time.
+
+An optional `reference` collector cross-checks Massive's structured reverse
+split endpoint inside its documented two-year Basic window. It uses an
+existing `MASSIVE_API_KEY` or `POLYGON_API_KEY`, records access gaps, and never
+buys or upgrades a subscription. Older history needs an entitlement decision.
+See [Massive's split coverage](https://massive.com/knowledge-base/article/does-massive-support-normal-and-reverse-splits).
+
+The broad event study compares official listing-venue auction entry prices
+with closes after
+5, 10 and 20 trading sessions. Entry cohorts are split-day open, split-day
+close, the next session and five sessions later. Known subsequent splits
+change the share quantity; unverified actions block the path. Missing exits
+stay unavailable. Returns are gross price behavior, with no assumption of
+borrow or executable fills. Each cohort reports distinct events and issuer
+keys, plus uncertainty clustered by issuer and calendar year.
+
+The account study uses one hypothetical $50,000 account, the existing
+fundamental score floor of 60 and minimum three observed signals. Scheduled,
+authorization and board disclosures and next-session entries have separate
+declared cases. Sub-$1 prices remain in scope; margin per share, integer
+quantity, participation, spread, fees, commissions, economic cost budgets and
+conservative stress sizing determine whether a modeled trade fits. Observed
+short-sale restrictions delay entry at most two sessions. Missing status
+remains unknown. Repeated settings do not increase the independent sample.
+Partial covers and missing terminal prices remain residual liabilities.
+
+Companyfacts are filtered by historical filing availability before the SSI
+extractor runs. Missing/custom/foreign financial facts remain unscored.
+Strict execution requires dated security identity, thesis, house margin,
+known unrestricted status, fresh quotes and an approved locate with a
+reference. Public inventory indications satisfy none of the locate-approval
+requirement. Conditional fee scenarios use fixed 100% and 300% annual fee
+assumptions; annualized performance claims are withheld.
+
+Each local run writes its plan before calculating returns, then freezes both
+SQLite inputs, companyfacts, code hashes and source hashes under
+`local/expansion/expansion_v2/runs/<run-id>/`. Licensed bars, quotes and
+individual price-derived returns remain local. Public feeds contain metadata
+and aggregate research. Forward validation starts the day after the frozen
+cutoff; the existing history is exploratory.
+
+### Run or resume the expansion
+
+Install `_system/scripts/requirements-reverse-splits.txt` and import the ledger.
+Fetch licensed venue files separately with `databento-pull --max-cost 0`;
+every new request is quoted before download. The expansion command never
+logs into a broker or ThetaData.
+
+```powershell
+python -m _system.scripts.reverse_splits.cli import-ledger
+python -m _system.scripts.reverse_splits.cli expand all --discovery-start 2005-01-01 --start 2018-05-01 --end 2026-10-13
+```
+
+Collection is resumable. Individual steps are `discover`, `discover-ads`, `filings`,
+`reclassify`, `fundamentals`, `otc`, `study` and `publish`. `--offline` uses
+archived sources and records missing sources. `--pilot` / `--limit` can bound
+a collection run; its incomplete coverage is still reported. A denied SEC
+request stops that collector; it never changes identity to bypass a denial.
+All SEC collectors share one four-requests-per-second budget.
+
+Existing local research can be migrated once with
+`expand bootstrap --legacy-root <archived-research-directory>`. This makes a
+consistent SQLite snapshot and retains immutable caches without modifying
+the old workbench. CSV evidence templates come from `expand templates`;
+`expand import --kind <kind> --input <file.csv>` accepts sourced dated
+security, action, nominal price, quote, borrow approval, margin, fact, thesis,
+decision, holdings and NAV records. Historical evidence vintages cannot be
+silently overwritten. Fact and whole-portfolio imports remain review inputs;
+the published experiment is the isolated sleeve, not total SSI performance.
+
+The weekday `Reverse-split borrow indications` workflow archives the public
+IBKR file before the open, validates its checksum and record count, and
+retains the file's actual timestamp. It never backdates availability and
+never contacts TWS or an IB Gateway. Historical borrow, OTC price histories,
+cash-in-lieu, dividends and terminal obligations still need sourced evidence.
+
+Official auction prices come from the venue `statistics` files, obtained with
+`databento-pull --schemas statistics --max-cost 0`. Daily UTC OHLCV alone does
+not establish an official open or close. The benchmark follows the listing
+venue in dated definitions; missing auction prices remain missing.
+See [Databento's statistics definition](https://databento.com/docs/schemas-and-data-formats/statistics).
+
+## Original ledger schemas
 
 ### Event row
 
@@ -261,8 +377,9 @@ empty.
 
 ## Honest limits
 
-- Historical locates are not in this database. The strict book is empty until
-  timestamped pre-order availability and fee are imported.
+- Historical approved locates are not supplied by the public availability
+  file. The strict book needs a dated approval reference, quantity and fee,
+  plus the other execution evidence.
 - Assumed fees are flat annual rates, not the fee the street quoted that day.
 - A phrase hit in an 8-K is not an announcement until the filing text is
   parsed (`date_quality: filing_text`). Most announcement rows are accept-clock

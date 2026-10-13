@@ -16,12 +16,24 @@ def replay(leads, calendar, spec, case, borrows=None, *, constrain_exits=True):
         entries[lead["entry_date"]].append(lead)
     opened, positions, rejections, covers, equity = [], [], [], [], []
     realized = 0.0
-    def comm(q):
-        return max(spec["commission"]["minimum_per_side"], q * spec["commission"]["per_share_per_side"])
+    def comm(q, price):
+        charge = max(spec["commission"]["minimum_per_side"], q * spec["commission"]["per_share_per_side"])
+        cap = spec["commission"].get("maximum_trade_fraction")
+        return min(charge, q * price * cap) if cap is not None else charge
+    def spread_for(prior, reference):
+        minimum = cost["spread_floor"]
+        if cost.get("sub_dollar_floor") is not None and reference < 1:
+            minimum = cost["sub_dollar_floor"]
+        return full_spread(prior.get("high"),prior.get("low"),minimum,cost["range_fraction"])
     def value():
         return initial + realized + sum(p["remaining"] * (p["entry_fill"]/p["factor"]-p["mark"]) for p in opened)
+    def requirement(q, price, evidence=None, *, initial=False):
+        base=maintenance(q,price,account['house_margin'])
+        if evidence:
+            base=max(base,q*evidence['minimum_per_share'],q*price*evidence['initial_fraction' if initial else 'maintenance_fraction'])
+        return base
     def margin():
-        return sum(maintenance(p["remaining"],p["mark"],account["house_margin"]) for p in opened)
+        return sum(requirement(p["remaining"],p["mark"],p.get('dated_margin')) for p in opened)
     def borrow_fee(p, days):
         nonlocal realized
         fee=rounded_collateral(p["remaining"],p["mark"])*p["rate"]*days/spec["borrow_collateral"]["day_basis"]
@@ -62,10 +74,20 @@ def replay(leads, calendar, spec, case, borrows=None, *, constrain_exits=True):
                 return
             reference=row["open" if at_open else "close"]
             prior=p["prior_row"]
-            spread=full_spread(prior.get("high"),prior.get("low"),cost["spread_floor"],cost["range_fraction"])
+            spread=spread_for(prior,reference)
+            quote = row.get('quote_close' if not at_open else 'quote_open')
+            if cost.get('quote_required') and not quote:
+                p['blocked_cover_days']+=1
+                return
+            if quote and cost.get('use_quotes'):
+                q=floor(min(q,quote['ask_size']))
+                if q<=0:
+                    p['blocked_cover_days']+=1
+                    return
+                spread = 2 * (quote['ask']-reference)
             before_slip=reference+spread/2
             fill=before_slip*(1+cost["extra_slippage_bps_per_side"]/10000)
-            commission=comm(q)
+            commission=comm(q,fill)
             if p["borrow"]==0:borrow_fee(p,1)
             gross=q*(p["entry_fill"]/p["factor"]-fill)
             realized+=gross-commission
@@ -100,19 +122,40 @@ def replay(leads, calendar, spec, case, borrows=None, *, constrain_exits=True):
                 else:rate=float(locate[2])
             row=lead["rows"][day]
             prior=lead["prior_row"]
-            spread=full_spread(prior.get("high"),prior.get("low"),cost["spread_floor"],cost["range_fraction"])
+            spread=spread_for(prior,row['open'])
+            quote = row.get('quote_open')
+            if cost.get('quote_required') and not quote and not reason:
+                reason='historical_entry_quote_unavailable'
+            if quote and cost.get('use_quotes'):
+                spread = 2 * (row['open']-quote['bid'])
             before_slip=row["open"]-spread/2
             fill=before_slip*(1-cost["extra_slippage_bps_per_side"]/10000)
             if not reason and (fill<=0 or row["volume"]<=0):reason="no_executable_entry_proxy"
             eq=value()
             if not reason:
-                unit_margin=max(.5*fill,maintenance(1,row["open"],account["house_margin"]))
+                unit_margin=max(.5*fill,requirement(1,row["open"],lead.get('dated_margin'),initial=True))
                 available=max(0,eq*(1-account["buffer_fraction"])-margin()-spec["commission"]["minimum_per_side"])
                 size=min(account["target_notional"]/fill,max(0,eq)*account["position_fraction"]/fill,
                          account["max_participation"]*lead["adv"],
                          available/(unit_margin+max(0,row["open"]-fill)+spec["commission"]["per_share_per_side"]))
                 if locate:size=min(size,float(locate[1]))
                 size=floor(max(0,size))
+                if quote and cost.get('use_quotes'):
+                    size=min(size,floor(quote['bid_size']))
+                stress = account.get('stress_adverse_fraction')
+                if stress is not None:
+                    stressed_price = row['open']*(1+stress)
+                    stress_unit = max(0,stressed_price-fill) + rounded_collateral(1,stressed_price)*rate*account.get('stress_fee_multiple',3)*account.get('stress_calendar_days',7)/360
+                    if stress_unit:
+                        size=min(size,floor(max(0,eq)*account['name_loss_fraction']/stress_unit))
+                    stressed_reserved=sum(requirement(p['remaining'],p['mark']*(1+stress),p.get('dated_margin'))+p['remaining']*p['mark']*stress for p in opened)
+                    stressed_unit=requirement(1,stressed_price,lead.get('dated_margin'),initial=True)+max(0,stressed_price-fill)
+                    size=min(size,floor(max(0,eq*(1-account['buffer_fraction'])-stressed_reserved)/stressed_unit))
+                if cost.get('maximum_cost_fraction') is not None:
+                    days=case['horizon_sessions']*7/5+2
+                    cost_fraction=(spread+2*fill*cost['extra_slippage_bps_per_side']/10000+2*comm(max(1,size),fill)/max(1,size)+rounded_collateral(1,row['open'])*rate*days/360)/fill
+                    if cost_fraction>cost['maximum_cost_fraction']:
+                        reason='cost_budget_exceeded'
                 if size*fill<100:reason="margin_liquidity_or_minimum_size"
             if reason:
                 rejections.append({"id":lead["id"],"ticker":lead["ticker"],"entry_date":day,"reason":reason});continue
@@ -125,10 +168,10 @@ def replay(leads, calendar, spec, case, borrows=None, *, constrain_exits=True):
                 earlier=[d for d in calendar[i:] if d<scheduled]
                 planned=earlier[-1] if earlier else None
             p={"id":lead["id"],"ticker":lead["ticker"],"cik":lead["cik"],"entry_date":day,
-               "announcement_category":lead.get('announcement_category','fixture'),
+               "announcement_category":lead.get('announcement_category','fixture'),"dated_margin":lead.get('dated_margin'),
                "entry_calendar_index":i,"planned_exit":planned,"entry_shares":size,"remaining":float(size),
                "entry_price":row["open"],"entry_fill":fill,"factor":1.0,"mark":row["open"],"mark_date":day,
-               "rate":rate,"borrow":0.0,"fee_until":day,"entry_commission":comm(size),"exit_commission":0.0,
+               "rate":rate,"borrow":0.0,"fee_until":day,"entry_commission":comm(size,fill),"exit_commission":0.0,
                "locate_reference":locate[3]['reference'] if locate else None,
                "spread_cost":size*spread/2,"slippage_cost":size*(before_slip-fill),
                "gross_closed":0.0,"raw_closed":0.0,"pending":None,"status":"open","last_cover_date":None,
