@@ -197,9 +197,30 @@ def catalogue(cfg, disclosures, start, cutoff, *, detector_report=None, detector
         else:
             old = distinct[key]
             sources = sorted(set(old["sources"] + [row.get("source")]))
-            if row["verification"] in VERIFIED and old["verification"] not in VERIFIED:
+            rank = {
+                "candidate_requires_verification": 0,
+                "vendor_action_only": 1,
+                "primary_schedule_only": 2,
+                "primary_schedule_matched": 3,
+                "structured_corporate_action": 3,
+            }
+            corroborated_jump = any(
+                r.get("source") == "full_market_price_jump_candidate"
+                and r.get("price_jump_corroborated")
+                for r in (old, row)
+            )
+            primary = next(
+                (r for r in (old, row) if r["verification"] == "primary_schedule_only"),
+                None,
+            )
+            if rank.get(row["verification"], 0) > rank.get(old["verification"], 0):
                 row["available_at"] = old.get("available_at") or row.get("available_at")
                 distinct[key] = row
+            if corroborated_jump and primary and distinct[key]["verification"] not in VERIFIED:
+                # This key requires the same resolved issuer, ticker, exact
+                # date and ratio. A weak jump or conflicting CIK cannot qualify.
+                distinct[key] = {**primary, "verification": "primary_schedule_matched",
+                                 "price_jump_corroborated": True}
             distinct[key]["sources"] = sources
     return sorted(distinct.values(), key=lambda r: (r["ex_date"], r["event_id"]))
 
