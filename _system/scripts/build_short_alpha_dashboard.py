@@ -30,12 +30,34 @@ CATALOG = LEDGER / "frameworks.json"
 OUTPUT = ROOT / "dashboard" / "data" / "short_alpha.json"
 BORROW = ROOT / "dashboard" / "data" / "short_alpha_borrow.json"
 CROWDING = ROOT / "_system" / "reference" / "market-data" / "ownership" / "biotech_short_interest.json"
+# FINRA short interest via Yahoo (fetch_float_adv.py, the daily technicals job): the
+# broad days-to-cover source. The biotech file is the fallback for symbols it lacks.
+FLOAT_ADV = ROOT / "_system" / "reference" / "market-data" / "fundamentals" / "index_float_adv.json"
 SCREEN = ROOT / "dashboard" / "data" / "short_quant_screen.json"
 SCREEN_ROWS = 25
 FUGAZI = ROOT / "_system" / "reference" / "activist-reports" / "short_scorecard" / "Fugazi_Research.csv"
+# Leads a human or an audit dropped, with the reason, so discovery never re-adds
+# them: {"excluded": {TICKER: {"reason", "decided_on", "source_urls"?}}}. With
+# source_urls only those reports are excluded (a misattribution); without, the
+# ticker is (an OTC-only listing, an ETP, a split that never happened).
+EXCLUDED_LEADS = LEDGER / "excluded_leads.json"
+SECURITY_MASTER = ROOT / "_system" / "reference" / "securities" / "security_master.json"
 EXCLUDED_TICKERS = {"ECHX"}  # Managed in the ls-algo universe, not this book.
 REVIEWED_ON = "2026-10-07"
 LIVE_STAGES = {"live", "closed", "researching", "ic"}
+# Auto-created leads that nobody has worked on are refreshed from discovery on
+# every sync (and dropped when discovery no longer produces them). A row with a
+# source, summary, category, tags, note, hypothesis or frameworks is curated and
+# never touched.
+AUTO_LEAD_ORIGINS = {"activist_index", "fugazi_scorecard"}
+CURATED_FIELDS = ("source", "summary", "category", "tags", "note_ref", "hypothesis", "lens_reviews", "frameworks")
+# Gates fire on readings that matter, not on the mere presence of data. A quoted
+# fee is context; a fee that can consume a short's edge, or no shares to borrow,
+# is a gate. Days to cover or short interest at crowded levels is a squeeze risk.
+HTB_FEE_PCT = 10.0
+CROWDED_DAYS_TO_COVER = 5.0
+CROWDED_SHORT_FLOAT = 0.20
+_TITLE_TAIL = re.compile(r"\s*(?:Published\s+\d+\s+\w+\s+ago|Download\s+(?:the\s+)?PDF|Read\s+(?:the\s+)?(?:full\s+)?(?:report|more)|Continue\s+reading)\b.*$", re.I | re.S)
 ALWAYS_REVIEW_TAGS = {
     "going_concern",
     "restatement",
@@ -186,8 +208,43 @@ def load_furnace_events(ticker: str) -> list[dict]:
     return [row for row in events if isinstance(row, dict)] if isinstance(events, list) else []
 
 
-def upsert_leads(existing: list[dict], incoming: list[dict]) -> tuple[list[dict], list[str]]:
+def load_excluded_leads(path: Path | None = None) -> dict[str, dict]:
+    path = EXCLUDED_LEADS if path is None else path
+    if not path.exists():
+        return {}
+    doc = json.loads(path.read_text(encoding="utf-8"))
+    return {str(k).upper(): (v or {}) for k, v in (doc.get("excluded") or {}).items()}
+
+
+def apply_exclusions(lead: dict, excluded: dict[str, dict]) -> dict | None:
+    """The lead without its excluded reports, or None when nothing is left or
+    the whole ticker is excluded."""
+    rule = excluded.get(str(lead.get("ticker") or "").upper())
+    if rule is None:
+        return lead
+    urls = set(rule.get("source_urls") or [])
+    if not urls:
+        return None
+    kept = [s for s in lead.get("sources") or [] if s.get("url") not in urls]
+    if not kept:
+        return None
+    copy = json.loads(json.dumps(lead))
+    copy["sources"] = kept
+    return copy
+
+
+def is_curated(row: dict) -> bool:
+    """Has a human (or an audit) worked on this row? Then discovery never touches it."""
+    if str(row.get("origin") or "") not in AUTO_LEAD_ORIGINS or row.get("stage") != "lead":
+        return True
+    if any(row.get(field) for field in CURATED_FIELDS):
+        return True
+    return str((row.get("research") or {}).get("status") or "lead") != "lead"
+
+
+def upsert_leads(existing: list[dict], incoming: list[dict], excluded: dict[str, dict] | None = None) -> tuple[list[dict], list[str]]:
     """Append tickers that are not already tracked. Never replace an existing row."""
+    excluded = load_excluded_leads() if excluded is None else excluded
     seen = {str(row.get("ticker") or "").upper() for row in existing}
     added_rows: list[dict] = []
     added_ids: list[str] = []
@@ -195,12 +252,45 @@ def upsert_leads(existing: list[dict], incoming: list[dict]) -> tuple[list[dict]
         ticker = str(row.get("ticker") or "").upper()
         if not ticker or ticker in seen or ticker in EXCLUDED_TICKERS:
             continue
+        row = apply_exclusions(row, excluded)
+        if row is None:
+            continue
         copy = json.loads(json.dumps(row))
         copy["ticker"] = ticker
         added_rows.append(copy)
         added_ids.append(ticker)
         seen.add(ticker)
     return existing + added_rows, added_ids
+
+
+def refresh_auto_leads(existing: list[dict], incoming: list[dict], excluded: dict[str, dict] | None = None) -> tuple[list[dict], list[str], list[str]]:
+    """Rebuild uncurated auto leads from today's discovery. A lead whose reports
+    were re-attributed or excluded since it was created disappears; one whose
+    sources or name improved is updated. Curated rows are returned untouched.
+    Returns (rows, refreshed tickers, dropped tickers)."""
+    excluded = load_excluded_leads() if excluded is None else excluded
+    fresh = {}
+    for lead in incoming:
+        lead = apply_exclusions(lead, excluded)
+        if lead is not None:
+            fresh.setdefault(str(lead.get("ticker") or "").upper(), lead)
+    rows, refreshed, dropped = [], [], []
+    for row in existing:
+        ticker = str(row.get("ticker") or "").upper()
+        if is_curated(row):
+            rows.append(row)
+            continue
+        lead = fresh.get(ticker)
+        if lead is None or lead.get("origin") != row.get("origin"):
+            dropped.append(ticker)
+            continue
+        if lead.get("sources") != row.get("sources") or lead.get("security_name") != row.get("security_name"):
+            row = json.loads(json.dumps(row))
+            row["sources"] = lead.get("sources") or []
+            row["security_name"] = lead.get("security_name") or row.get("security_name") or ticker
+            refreshed.append(ticker)
+        rows.append(row)
+    return rows, refreshed, dropped
 
 
 def _blank_research(next_step: str) -> dict:
@@ -228,15 +318,34 @@ def _lead_shell(ticker: str, company: str, origin: str, sources: list[dict], fra
     }
 
 
+def clean_title(title: str, firm: str = "", day: str = "") -> str:
+    """A report title without scraped card text, bylines or a repeated date."""
+    text = _TITLE_TAIL.sub("", re.sub(r"\s+", " ", str(title or ""))).strip(" -·|")
+    if not text or text.lower() in {firm.lower(), day.lower()}:
+        return ""
+    if re.fullmatch(r"(?:[A-Z][a-z]{2,8}\.? \d{1,2},? \d{4}|\d{4}-\d{2}-\d{2})", text):
+        return ""
+    if len(text) > 160:
+        text = text[:160].rsplit(" ", 1)[0] + "…"
+    return text
+
+
 def lead_from_reports(ticker: str, company: str, reports: list[dict]) -> dict:
     sources: list[dict] = []
     ordered = sorted(reports, key=lambda row: str(row.get("report_date") or ""), reverse=True)
+    seen_urls: set[str] = set()
     for report in ordered:
-        bits = [str(report.get("firm_name") or report.get("firm_id") or "Short report")]
-        if report.get("report_date"):
-            bits.append(str(report["report_date"]))
-        title = str(report.get("title") or "")
-        if title and title not in bits:
+        url = str(report.get("source_url") or "").split("?utm_")[0]
+        if url and url in seen_urls:
+            continue
+        seen_urls.add(url)
+        firm = str(report.get("firm_name") or report.get("firm_id") or "Short report")
+        day = str(report.get("report_date") or "")
+        if day and report.get("date_precision") == "year":
+            day = day[:4]
+        bits = [firm] + ([day] if day else [])
+        title = clean_title(report.get("title") or "", firm, day)
+        if title:
             bits.append(title)
         source = {
             "type": "activist_short_report",
@@ -244,8 +353,8 @@ def lead_from_reports(ticker: str, company: str, reports: list[dict]) -> dict:
             "firm_id": report.get("firm_id") or "",
             "report_date": report.get("report_date") or "",
         }
-        if report.get("source_url"):
-            source["url"] = report["source_url"]
+        if url:
+            source["url"] = url
         if report.get("local_file"):
             source["ref"] = str(report["local_file"]).replace("\\", "/")
         sources.append(source)
@@ -276,25 +385,42 @@ def lead_from_furnace(ticker: str, company: str, events: list[dict]) -> dict | N
     return _lead_shell(ticker, company, "filing_furnace", sources, frameworks)
 
 
+def _fugazi_title(url: str) -> str:
+    """The post slug as a title: /p/sharplink-gaming-sbet-ethereum-dream -> Sharplink gaming sbet ethereum dream."""
+    slug = str(url or "").rstrip("/").rsplit("/", 1)[-1]
+    words = [w for w in re.split(r"[-_]+", slug) if w]
+    return " ".join(words).capitalize() if words else ""
+
+
 def leads_from_fugazi_rows(rows: list[dict]) -> list[dict]:
-    """One lead per ticker. A publisher scorecard is a lead, not a thesis."""
+    """One lead per tradable symbol. A publisher scorecard is a lead, not a thesis.
+    A scorecard row whose company now quotes under another symbol is keyed on
+    that symbol (borrow, screen and crowding all look it up), and the label keeps
+    the scorecard ticker."""
     grouped: dict[str, list[dict]] = {}
     for row in rows:
-        ticker = str(row.get("ticker") or "").upper().strip()
+        listed = str(row.get("ticker") or "").upper().strip()
+        quote = str(row.get("quote_symbol") or "").upper().strip()
+        ticker = quote or listed
         if not ticker:
             continue
         grouped.setdefault(ticker, []).append(row)
     leads: list[dict] = []
     for ticker, reports in sorted(grouped.items()):
         reports.sort(key=lambda item: str(item.get("report_date") or ""))
-        company = str(reports[-1].get("target") or ticker)
+        company = re.sub(r"\s*\([^)]*\)\s*$", "", str(reports[-1].get("target") or ticker)).strip() or ticker
         sources = []
         for report in reversed(reports):
-            quote = str(report.get("quote_symbol") or "").upper()
-            label = f"Fugazi Research · {report.get('report_date') or 'undated'}"
-            if quote and quote != ticker:
-                label += f" · quotes as {quote}"
-            source = {"type": "activist_short_report", "label": label, "firm_id": "fugazi"}
+            listed = str(report.get("ticker") or "").upper()
+            bits = ["Fugazi Research", str(report.get("report_date") or "undated")]
+            title = _fugazi_title(report.get("report_url"))
+            if title:
+                bits.append(title)
+            label = " · ".join(bits)
+            if listed and listed != ticker:
+                label += f" (scorecard ticker {listed})"
+            source = {"type": "activist_short_report", "label": label, "firm_id": "fugazi",
+                      "report_date": report.get("report_date") or ""}
             if report.get("report_url"):
                 source["url"] = report["report_url"]
             sources.append(source)
@@ -311,16 +437,35 @@ def discover_fugazi_leads() -> list[dict]:
         return leads_from_fugazi_rows(list(csv.DictReader(handle)))
 
 
+def master_names(path: Path | None = None) -> dict[str, str]:
+    """Ticker -> company name from the committed security master."""
+    path = SECURITY_MASTER if path is None else path
+    if not path.exists():
+        return {}
+    doc = json.loads(path.read_text(encoding="utf-8"))
+    return {str(t).upper(): str(row.get("name")) for t, row in doc.items() if isinstance(row, dict) and row.get("name")}
+
+
+def company_name(ticker: str, *sources: dict) -> str:
+    """The first real name for a ticker: a name equal to the ticker is no name."""
+    for names in sources:
+        name = str((names or {}).get(ticker) or "").strip()
+        if name and name.upper() != ticker.upper():
+            return name
+    return ticker
+
+
 def discover_leads() -> list[dict]:
     scan = _scan()
     names = scan.company_names()
+    master = master_names()
     incoming: list[dict] = []
     for ticker, reports in sorted(scan.collect_feed_shorts().items()):
-        incoming.append(lead_from_reports(ticker, names.get(ticker, ticker), reports))
+        incoming.append(lead_from_reports(ticker, company_name(ticker, names, master), reports))
     for ticker in sorted(names):
         if ticker in EXCLUDED_TICKERS:
             continue
-        lead = lead_from_furnace(ticker, names.get(ticker, ticker), load_furnace_events(ticker))
+        lead = lead_from_furnace(ticker, company_name(ticker, names, master), load_furnace_events(ticker))
         if lead:
             incoming.append(lead)
     incoming.extend(discover_fugazi_leads())
@@ -342,9 +487,7 @@ def init_candidates() -> None:
         research = dict(idea.get("research") or {})
         research["reviewed_on"] = REVIEWED_ON
         research["review_note"] = (
-            "Reviewed 2026-10-07. Borrow is still pending: no IBKR export was loaded, "
-            "and this refresh does not contact the Gateway. The price baseline remains "
-            "the 2026-08-04 check-in."
+            "Reviewed 2026-10-07. The price baseline remains the 2026-08-04 check-in."
         )
         candidate = {
             "ticker": ticker,
@@ -533,30 +676,60 @@ def _validate_bundle(positions: list, candidates: list, catalog: dict) -> None:
                 raise LedgerError(f"{ticker}: check-in prices must be positive")
 
 
+_TRACKED: set[str] | None = None
+
+
+def _tracked_files() -> set[str] | None:
+    """Every path committed at HEAD, so a sparse or partial checkout (CI builds in
+    one) reads the same as a full one. None when git is unavailable."""
+    global _TRACKED
+    if _TRACKED is None:
+        import subprocess
+
+        try:
+            out = subprocess.run(["git", "-C", str(ROOT), "ls-files", "-z"], capture_output=True, check=True)
+            _TRACKED = {p for p in out.stdout.decode("utf-8", "replace").split("\0") if p}
+        except (OSError, subprocess.CalledProcessError):
+            _TRACKED = set()
+    return _TRACKED or None
+
+
+def _present(rel: str) -> bool:
+    tracked = _tracked_files()
+    return rel in tracked if tracked is not None else (ROOT / rel).exists()
+
+
 def _artifact_status(candidate: dict) -> dict:
     ticker = str(candidate["ticker"])
-    research_dir = ROOT / ticker / "research"
-    deep_dives = sorted(research_dir.glob("deep_dive_*.md")) if research_dir.is_dir() else []
+    tracked = _tracked_files()
+    prefix = f"{ticker}/research/"
+    if tracked is not None:
+        deep_dives = sorted(p for p in tracked if p.startswith(prefix + "deep_dive_") and p.endswith(".md") and "/" not in p[len(prefix):])
+        folder = any(p.startswith(f"{ticker}/") for p in tracked)
+    else:
+        research_dir = ROOT / ticker / "research"
+        deep_dives = sorted(p.relative_to(ROOT).as_posix() for p in research_dir.glob("deep_dive_*.md")) if research_dir.is_dir() else []
+        folder = (ROOT / ticker).is_dir()
     source_refs = [row.get("ref") for row in candidate.get("sources") or [] if row.get("ref")]
-    missing_refs = [str(ref) for ref in source_refs if not (ROOT / str(ref)).exists()]
+    missing_refs = [str(ref) for ref in source_refs if not _present(str(ref))]
     research = candidate.get("research") or {}
-    valuation = research_dir / "valuation.json"
-    workbench = research_dir / "valuation_workbench.json"
-    dossier = research_dir / "dossier.json"
+    valuation = _present(prefix + "valuation.json")
+    workbench = _present(prefix + "valuation_workbench.json")
+    dossier = _present(prefix + "dossier.json")
     score = 0
     score += 25 if deep_dives else 0
-    score += 20 if valuation.exists() else 0
-    score += 15 if workbench.exists() else 0
-    score += 15 if dossier.exists() else 0
+    score += 20 if valuation else 0
+    score += 15 if workbench else 0
+    score += 15 if dossier else 0
     score += 15 if len(source_refs) >= 3 and not missing_refs else 0
     score += 10 if str(research.get("ic") or "").lower() in {"ready", "complete", "approved"} else 0
     return {
-        "ticker_folder": (ROOT / ticker).is_dir(),
+        "ticker_folder": folder,
         "deep_dive_count": len(deep_dives),
-        "latest_deep_dive": deep_dives[-1].relative_to(ROOT).as_posix() if deep_dives else None,
-        "valuation_present": valuation.exists(),
-        "workbench_present": workbench.exists(),
-        "dossier_present": dossier.exists(),
+        "latest_deep_dive": deep_dives[-1] if deep_dives else None,
+        "valuation_present": valuation,
+        "workbench_present": workbench,
+        "dossier_present": dossier,
         "missing_source_refs": missing_refs,
         "completion_pct": score,
     }
@@ -564,15 +737,69 @@ def _artifact_status(candidate: dict) -> dict:
 
 def _gate_hits(borrow: dict, crowding: dict | None, gates: dict) -> list[str]:
     hits: list[str] = []
-    if borrow.get("status") == "available" and borrow.get("rate_pct") is not None:
+    rate = borrow.get("rate_pct")
+    if borrow.get("status") == "none_available" or (borrow.get("status") == "available" and rate is not None and float(rate) >= HTB_FEE_PCT):
         hits.append("borrow_and_carry")
-    if crowding and crowding.get("days_to_cover") is not None:
+    if crowding and (float(crowding.get("days_to_cover") or 0) >= CROWDED_DAYS_TO_COVER
+                     or float(crowding.get("short_percent_float") or 0) >= CROWDED_SHORT_FLOAT):
         hits.append("crowding_squeeze")
     if str((gates or {}).get("path_and_timing") or "unscored") not in {"", "unscored"}:
         hits.append("path_and_timing")
     if str((gates or {}).get("issuer_retaliation") or "unscored") not in {"", "unscored"}:
         hits.append("issuer_retaliation")
     return hits
+
+
+def borrow_reading(ticker: str, rates: dict, borrow_doc: dict) -> dict:
+    """One name's borrow: a quoted fee (with shares available when the file
+    has them), none available, not in the file, or pending a refresh."""
+    rate = rates.get(ticker)
+    avail = (borrow_doc.get("availability") or {}).get(ticker)
+    if rate or avail:
+        out = dict(rate or {"status": "available", "source": avail.get("source"), "as_of": avail.get("as_of")})
+        if avail:
+            out["shares"] = avail.get("shares")
+            if avail.get("at_least"):
+                out["at_least"] = True
+            if avail.get("status") == "none_reported" or not avail.get("shares"):
+                out["status"] = "none_available"
+        return out
+    if ticker in set(borrow_doc.get("checked") or []):
+        return {
+            "status": "not_in_file",
+            "source": "IBKR public short-stock availability file",
+            "as_of": borrow_doc.get("as_of"),
+            "message": "Not in IBKR's short-stock file: no lendable shares at IBKR, or not a US listing it lends.",
+        }
+    return {"status": "pending", "source": "IBKR borrow feed", "message": "Added after the last IBKR borrow refresh."}
+
+
+def crowding_reading(ticker: str, float_rows: dict, biotech_rows: dict) -> dict | None:
+    """FINRA short interest via the float file, else the biotech file."""
+    row = float_rows.get(ticker)
+    if isinstance(row, dict) and row.get("days_to_cover") is not None:
+        return {
+            "days_to_cover": row.get("days_to_cover"),
+            "short_percent_float": row.get("short_percent_float"),
+            "settlement_ymd": row.get("short_interest_date"),
+            "source": "finra_short_interest_via_yahoo",
+            "tier": "context",
+        }
+    row = biotech_rows.get(ticker)
+    if isinstance(row, dict) and row.get("days_to_cover") is not None:
+        return {
+            "days_to_cover": row.get("days_to_cover"),
+            "settlement_ymd": row.get("settlement_ymd"),
+            "source": "finra_biweekly",
+            "tier": "context",
+        }
+    return None
+
+
+def _borrow_file_time(borrow_doc: dict, rates: dict) -> str | None:
+    """When IBKR's file was read: the rows' own stamp, else the refresh time."""
+    stamps = sorted({str(r.get("as_of")) for r in rates.values() if isinstance(r, dict) and r.get("as_of")})
+    return stamps[-1] if stamps else (borrow_doc.get("as_of") or None)
 
 
 def _effective_frameworks(candidate: dict, hits: list[dict]) -> list[str]:
@@ -628,6 +855,7 @@ def build(
     crowding_rows: dict | None = None,
     furnace_by_ticker: dict | None = None,
     screen: dict | None = None,
+    float_rows: dict | None = None,
 ) -> dict:
     position_doc = _read_json(POSITIONS) if positions is None else {"ideas": positions}
     candidate_doc = _read_json(CANDIDATES) if candidates is None else {"candidates": candidates, "as_of": REVIEWED_ON}
@@ -636,8 +864,13 @@ def build(
     candidate_rows = list(candidate_doc.get("candidates") or [])
     _validate_bundle(position_rows, candidate_rows, catalog_doc)
 
+    borrow_doc: dict = {}
     if borrow_rows is None:
-        borrow_rows = _read_json(BORROW).get("rates") or {} if BORROW.exists() else {}
+        borrow_doc = _read_json(BORROW) if BORROW.exists() else {}
+        borrow_rows = borrow_doc.get("rates") or {}
+    if float_rows is None and crowding_rows is None and FLOAT_ADV.exists():
+        float_rows = _read_json(FLOAT_ADV).get("by_ticker") or {}
+    float_rows = float_rows or {}
     if crowding_rows is None and CROWDING.exists():
         crowding_rows = _read_json(CROWDING).get("by_ticker") or {}
     crowding_rows = crowding_rows or {}
@@ -673,22 +906,9 @@ def build(
         candidate["furnace_hits"] = hits
         candidate["effective_frameworks"] = _effective_frameworks(candidate, hits)
         candidate["artifact_status"] = _artifact_status(candidate)
-        borrow = borrow_rows.get(ticker) or {
-            "status": "pending",
-            "source": "IBKR borrow feed",
-            "message": "Awaiting the next IBKR borrow refresh.",
-        }
+        borrow = borrow_reading(ticker, borrow_rows, borrow_doc)
         candidate["borrow"] = borrow
-        crowding = crowding_rows.get(ticker)
-        if isinstance(crowding, dict) and crowding.get("days_to_cover") is not None:
-            candidate["crowding"] = {
-                "days_to_cover": crowding.get("days_to_cover"),
-                "settlement_ymd": crowding.get("settlement_ymd"),
-                "source": "finra_biweekly",
-                "tier": "context",
-            }
-        else:
-            candidate["crowding"] = None
+        candidate["crowding"] = crowding_reading(ticker, float_rows, crowding_rows)
         candidate["gate_hits"] = _gate_hits(borrow, candidate.get("crowding"), candidate.get("gates") or {})
         candidate["quant"] = screen_by_ticker.get(ticker)
         position = position_by_ticker.get(ticker)
@@ -709,7 +929,8 @@ def build(
                 "check_in_count": len(check_ins),
             }
             merged["borrow"] = borrow
-            if merged["artifact_status"]["completion_pct"] >= 85:
+            merged["position_status"] = "closed" if candidate.get("stage") == "closed" else "open"
+            if merged["position_status"] == "open" and merged["artifact_status"]["completion_pct"] >= 85:
                 complete += 1
             compiled_positions.append(merged)
         scored = set(candidate["effective_frameworks"]) | set(candidate["gate_hits"])
@@ -734,13 +955,17 @@ def build(
             unscored.append(framework_id)
 
     quant_screen = _screen_payload(screen, set(by_candidate))
+    open_positions = [row for row in compiled_positions if row.get("position_status") == "open"]
+    statuses = Counter(str((row.get("borrow") or {}).get("status")) for row in compiled_candidates)
+    settlements = Counter((row.get("crowding") or {}).get("settlement_ymd") for row in compiled_candidates if row.get("crowding"))
     return {
         "schema_version": "1.2",
         "generated_at": date.today().isoformat(),
         "as_of": candidate_doc.get("as_of") or position_doc.get("as_of"),
         "currency": position_doc.get("currency", "USD"),
         "summary": {
-            "position_count": len(compiled_positions),
+            "position_count": len(open_positions),
+            "closed_position_count": len(compiled_positions) - len(open_positions),
             "candidate_count": len(compiled_candidates),
             "lead_count": sum(1 for row in compiled_candidates if row.get("stage") == "lead"),
             "research_complete_count": complete,
@@ -757,13 +982,30 @@ def build(
         "positions": compiled_positions,
         "ideas": compiled_positions,
         "quant_screen": quant_screen,
+        "borrow_meta": {
+            "source": borrow_doc.get("source") or "",
+            "label": next((r.get("source") for r in borrow_rows.values() if isinstance(r, dict) and r.get("source")), ""),
+            "as_of": _borrow_file_time(borrow_doc, borrow_rows),
+            "quoted": statuses.get("available", 0) + statuses.get("none_available", 0),
+            "hard_to_borrow": sum(1 for row in compiled_candidates if "borrow_and_carry" in row.get("gate_hits", [])),
+            "not_in_file": statuses.get("not_in_file", 0),
+            "pending": statuses.get("pending", 0),
+            "htb_fee_pct": HTB_FEE_PCT,
+        },
+        "crowding_meta": {
+            "source": "FINRA short interest via Yahoo (index_float_adv.json); biotech short-interest file as fallback",
+            "settlement": settlements.most_common(1)[0][0] if settlements else None,
+            "covered": sum(settlements.values()),
+            "crowded_days_to_cover": CROWDED_DAYS_TO_COVER,
+            "crowded_short_float": CROWDED_SHORT_FLOAT,
+        },
         "methodology": {
             "quant": "The quant screen scores SEC fundamentals, the tape, crowding and insider sales against the lens catalog. A score is a reason to open a file, not a thesis.",
             "entry_price": "Opened price is adjusted by the cumulative split factor so it stays comparable to the current share basis.",
-            "borrow": "Borrow is supplied by the IBKR refresh feed. Unavailable is not a zero rate.",
-            "leads": "An activist-index hit, an always-review filing event, or a Fugazi scorecard row creates a lead. It does not create a position and does not overwrite a rejected, live, closed, or researching row.",
-            "crowding": "Days to cover is FINRA context from the biotech short-interest file when that symbol is present. It is not a reason to short.",
-            "excluded": "ECHX is managed in the ls-algo universe and is omitted from this book.",
+            "borrow": "Borrow is IBKR's public short-stock file (fee in % a year, shares available), read on the date shown. A reading is not a locate. A name the file does not list has no IBKR lendable shares or is not a US listing IBKR lends; a name added after the last refresh is pending. Missing is never a zero fee. The borrow gate fires at a fee of 10% or more or with no shares available.",
+            "leads": "An activist report attributed to the ticker, an always-review filing event, a Fugazi scorecard row, or the reverse-split engine creates a lead. A lead is not a thesis, never creates a position, and never overwrites a curated row. Uncurated activist and Fugazi leads are rebuilt from discovery on every sync, so a report re-attributed or excluded later drops out.",
+            "crowding": "Days to cover and short interest as a share of float are FINRA short-interest readings (via Yahoo, settlement date shown), with the biotech short-interest file as a fallback. They are context, not a reason to short; the squeeze gate fires at 5 or more days to cover or 20% or more of float.",
+            "excluded": "ECHX is managed in the ls-algo universe and is omitted from this book. Leads dropped by a human or an audit are listed with their reason in excluded_leads.json and are never re-added.",
             "desk_notes": "A desk_note row is a bot's or an author's idea entry: it names its source, category, dates and tags here, and its narrative lives in the private research vault behind note_ref. The category adds lenses; it never adds the fraud tag.",
             "reverse_splits": "A reverse_split_research row is a discovery lead from the reverse-split engine with its six dated lens reviews carried as lens_reviews. Impairment is not reviewed until a lens review says so.",
         },
@@ -773,11 +1015,16 @@ def build(
 
 def sync_leads() -> list[str]:
     doc = _read_json(CANDIDATES)
-    merged, added = upsert_leads(list(doc.get("candidates") or []), discover_leads())
-    if added:
+    incoming = discover_leads()
+    excluded = load_excluded_leads()
+    rows, refreshed, dropped = refresh_auto_leads(list(doc.get("candidates") or []), incoming, excluded)
+    merged, added = upsert_leads(rows, incoming, excluded)
+    if added or refreshed or dropped:
         doc["candidates"] = merged
         doc["as_of"] = date.today().isoformat()
         _write_json(CANDIDATES, doc)
+    if refreshed or dropped:
+        print(f"Refreshed {len(refreshed)} auto leads, dropped {len(dropped)}: {', '.join(dropped) or '-'}")
     return added
 
 

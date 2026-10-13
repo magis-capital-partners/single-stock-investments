@@ -292,7 +292,8 @@ def test_live_export_is_already_imported() -> None:
         pytest.skip(f"rsdb export moved to {queue.get('as_of')}; run import_reverse_split_queue.py")
     _, report = rsq.import_queue(queue, json.loads(json.dumps(CANDIDATES)), CATALOG)
     assert report["imported"] == []
-    assert len(report["skipped_existing"]) == report["export_rows"] == 119
+    # Rows retired or renamed after review (excluded_leads.json) are skipped, not re-imported.
+    assert len(report["skipped_existing"]) + len(report["skipped_excluded"]) == report["export_rows"] == 119
 
 
 # --- borrow CSV -------------------------------------------------------------

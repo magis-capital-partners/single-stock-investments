@@ -118,19 +118,22 @@ def lead_from_queue_row(row: dict, as_of: str, known_frameworks: set[str], names
     return lead, dropped
 
 
-def import_queue(queue: dict, doc: dict, catalog: dict) -> tuple[dict, dict]:
-    """Merge the export into the ledger document. Returns the new document and a report."""
+def import_queue(queue: dict, doc: dict, catalog: dict, excluded: dict | None = None) -> tuple[dict, dict]:
+    """Merge the export into the ledger document. Returns the new document and a report.
+    A ticker in excluded_leads.json (retired after review, or renamed) is never re-imported."""
     as_of = str(queue.get("as_of") or "")
     if not ledger.YMD_RE.match(as_of):
         raise ledger.LedgerError(f"Queue export as_of must be YYYY-MM-DD, got {as_of!r}")
     known = set(ledger._framework_ids(catalog))
     names = company_names()
+    excluded = ledger.load_excluded_leads() if excluded is None else excluded
     existing = list(doc.get("candidates") or [])
     seen = {str(row.get("ticker") or "").upper() for row in existing}
     report = {
         "export_rows": 0,
         "imported": [],
         "skipped_existing": [],
+        "skipped_excluded": [],
         "skipped_ticker_pattern": [],
         "dropped_frameworks": {},
     }
@@ -145,6 +148,9 @@ def import_queue(queue: dict, doc: dict, catalog: dict) -> tuple[dict, dict]:
             continue
         if ticker in seen or ticker in ledger.EXCLUDED_TICKERS:
             report["skipped_existing"].append(ticker)
+            continue
+        if ticker in excluded and not (excluded[ticker] or {}).get("source_urls"):
+            report["skipped_excluded"].append(ticker)
             continue
         lead, dropped = lead_from_queue_row(row, as_of, known, names)
         if dropped:
