@@ -160,6 +160,57 @@ def test_sic_profiles_switch_lenses_off() -> None:
     assert trust["score"] is None and trust["profile"] == "fund_or_trust"
 
 
+def test_only_banks_thrifts_insurers_and_lenders_lose_the_cash_lenses() -> None:
+    # Depository institutions and insurers keep the exemption at both ends of their ranges.
+    for sic in (6020, 6021, 6035, 6099, 6311, 6324, 6331, 6411):
+        assert screen.profile_for(sic) == "financial", sic
+    # Credit institutions: a lender's operating cash flow is its loan book.
+    for sic in (6111, 6141, 6162, 6163):
+        assert screen.profile_for(sic) == "lender", sic
+    # Finance services (miners, crypto treasuries), brokers, exchanges, asset managers, royalty traders.
+    for sic in (6000, 6199, 6200, 6211, 6282, 6792, 6795, 6799):
+        assert screen.profile_for(sic) == "operating", sic
+    # A WULF-shaped miner (SIC 6199) is now read with the cash-burn, accrual and leverage lenses.
+    miner = screen.score_ticker("WULF", fundamentals=burning_company(), tech=tape(-20.0, -35.0), flt=None, finra=None, as_of=AS_OF, sic={"sic": 6199, "description": "Finance Services"})
+    assert miner["profile"] == "operating" and miner["profile_note"] is None
+    for lens in ("cash_burn", "accrual_ratio", "leverage"):
+        assert lens in miner["signals"]["fundamental"], lens
+    assert miner["signals"]["fundamental"]["cash_burn"]["score"] == 1.0
+    # A bank holding company that EDGAR files under 6199 is still a bank, and says why.
+    sofi = screen.score_ticker("SOFI", fundamentals=burning_company(), tech=tape(-20.0, -35.0), flt=None, finra=None, as_of=AS_OF, sic={"sic": 6199, "description": "Finance Services"})
+    assert sofi["profile"] == "financial" and "cash_burn" not in sofi["signals"]["fundamental"]
+    assert sofi["profile_note"].startswith("Bank holding company") and "6199" in sofi["profile_note"]
+    lender = screen.score_ticker("LEND", fundamentals=burning_company(), tech=tape(-20.0, -35.0), flt=None, finra=None, as_of=AS_OF, sic={"sic": 6163, "description": "Loan Brokers"})
+    assert lender["profile"] == "lender" and "leverage" not in lender["signals"]["fundamental"]
+    assert lender["profile_note"].startswith("Lender")
+    assert "Bank or insurer" not in screen.PROFILE_RULES["financial"]["reason"]
+
+
+def test_company_name_never_falls_back_to_the_ticker() -> None:
+    titles = ({"QS": "QuantumScape Corp"}, {1083301: "TERAWULF INC."})
+    doc = {"ticker": "WULF", "cik": "0001083301", "metrics": {}}
+    # core.json stores the ticker as the company: the SEC title by CIK wins.
+    assert screen.company_name("WULF", core_name="WULF", doc=doc, sec_titles=titles, finra=None) == "TERAWULF INC."
+    # A real core.json name is kept.
+    assert screen.company_name("WULF", core_name="TeraWulf Inc.", doc=doc, sec_titles=titles, finra=None) == "TeraWulf Inc."
+    # A fundamentals entity name beats the SEC cache; the SEC cache by ticker covers a missing CIK.
+    assert screen.company_name("WULF", core_name="", doc={**doc, "entity_name": "TeraWulf (entity)"}, sec_titles=titles, finra=None) == "TeraWulf (entity)"
+    assert screen.company_name("QS", core_name="qs", doc=None, sec_titles=titles, finra=None) == "QuantumScape Corp"
+    # FINRA is the last resort, and a FINRA name equal to the ticker is still no name.
+    assert screen.company_name("ZZZ", core_name="ZZZ", doc=None, sec_titles=titles, finra={"issue_name": "Zed Co Common Stock"}) == "Zed Co Common Stock"
+    assert screen.company_name("ZZZ", core_name="ZZZ", doc=None, sec_titles=None, finra={"issue_name": "ZZZ"}) == ""
+
+
+def test_sec_titles_load_from_the_company_tickers_cache(tmp_path, monkeypatch) -> None:
+    cache = tmp_path / "sec_company_tickers_cache.json"
+    cache.write_text('{"0": {"cik_str": 1083301, "ticker": "WULF", "title": "TERAWULF INC."}, "1": {"cik_str": "bad", "ticker": "X"}}', encoding="utf-8")
+    monkeypatch.setattr(screen, "SEC_TITLES", cache)
+    by_ticker, by_cik = screen.load_sec_titles()
+    assert by_ticker == {"WULF": "TERAWULF INC."} and by_cik == {1083301: "TERAWULF INC."}
+    monkeypatch.setattr(screen, "SEC_TITLES", tmp_path / "missing.json")
+    assert screen.load_sec_titles() == ({}, {})
+
+
 def test_a_name_with_no_revenue_and_no_burn_is_not_scored() -> None:
     shell = {"ticker": "SHEL", "metrics": {
         "net_income": quarterly([1] * 9), "cfo": quarterly([2] * 9), "cash": quarterly([50] * 9),

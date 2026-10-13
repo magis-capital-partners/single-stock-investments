@@ -271,12 +271,16 @@ def refresh_lane(root: Path, lane: dict, api, runs: list[dict],
 
 
 def build(root: Path = ROOT, repository: str | None = None, api=None,
-          now: datetime | None = None) -> dict:
+          now: datetime | None = None, lane_name: str | None = None) -> dict:
     config = lr.load_config(root)
+    lanes = [lane for lane in lr.declared_lanes(config) if lane.get("workflow_file")]
+    if lane_name is not None:
+        lanes = [lane for lane in lanes if lane["name"] == lane_name]
+        if not lanes:
+            raise ValueError(f"Unknown workflow lane: {lane_name}")
     repository = repository or os.environ.get("GITHUB_REPOSITORY") or ""
     api = api or GhApi(repository)
     now = now or datetime.now(timezone.utc)
-    lanes = [lane for lane in lr.declared_lanes(config) if lane.get("workflow_file")]
     by_workflow: dict[str, list[dict]] = {}
     for lane in lanes:
         by_workflow.setdefault(lane["workflow_file"], []).append(lane)
@@ -317,8 +321,12 @@ def main() -> int:
     parser = argparse.ArgumentParser(description=__doc__.splitlines()[0])
     parser.add_argument("--root", type=Path, default=ROOT)
     parser.add_argument("--repository")
+    parser.add_argument("--lane", help="Refresh only this declared workflow lane")
     args = parser.parse_args()
-    result = build(args.root, args.repository)
+    try:
+        result = build(args.root, args.repository, lane_name=args.lane)
+    except ValueError as exc:
+        parser.error(str(exc))
     print(json.dumps(result, indent=2, ensure_ascii=True))
     return 0
 

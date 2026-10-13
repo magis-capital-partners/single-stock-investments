@@ -7,11 +7,25 @@ packet, so a research diff that forgot those artifacts still fails closed.
 A cursor branch that does not touch ticker research is a code change and
 must pass every CI check. ``_system/research`` is the control plane, not a
 ticker packet. codex and claude branches are always code.
+
+A grok branch (``grok/<desk>/<yyyy-mm-dd>-<slug>``) is a desk bot. When every
+changed path is on the bot data allowlist it is a ``data`` PR: the data guard
+and every CI check must pass. Any other path makes it a ``code`` PR, which a
+human reviews. ``check_contributor_paths.py`` owns the allowlist.
 """
 from __future__ import annotations
 
 import argparse
+import sys
 from pathlib import Path
+
+sys.path.insert(0, str(Path(__file__).resolve().parent))
+
+try:
+    from check_contributor_paths import classify_branch, is_allowlisted
+except ImportError:  # an old branch head without the guard: grok PRs are code
+    classify_branch = None  # type: ignore[assignment]
+    is_allowlisted = None  # type: ignore[assignment]
 
 
 def is_ticker_research(path: str) -> bool:
@@ -28,6 +42,16 @@ def classify(head_ref: str, files: list[str]) -> str:
             return "research"
         return "code"
     if head_ref.startswith(("codex/", "claude/")):
+        return "code"
+    if head_ref.startswith("grok/"):
+        if (
+            classify_branch is not None
+            and is_allowlisted is not None
+            and classify_branch(head_ref) == "grok"
+            and files
+            and all(is_allowlisted(f) for f in files)
+        ):
+            return "data"
         return "code"
     return "none"
 

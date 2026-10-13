@@ -95,7 +95,7 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument(
         "--scan-ssi",
         action="store_true",
-        help="also scan active SSI code/config for unsafe Gateway IDs and calls",
+        help="also scan SSI code/config (fails if the scanner module is absent)",
     )
     parser.add_argument(
         "--scan-root",
@@ -129,10 +129,21 @@ def main() -> int:
     print(f"OK {raw['registry_version']} sha256:{digest}")
 
     if args.scan_ssi:
-        from _system.scripts.scan_ib_gateway_clients import (  # noqa: PLC0415
-            format_violations,
-            scan_paths,
-        )
+        try:
+            from _system.scripts.scan_ib_gateway_clients import (  # noqa: PLC0415
+                format_violations,
+                scan_paths,
+            )
+        except ModuleNotFoundError as exc:
+            if exc.name != "_system.scripts.scan_ib_gateway_clients":
+                raise
+            print(
+                "ERROR SSI Gateway code scan unavailable: "
+                "scan_ib_gateway_clients.py is absent. Registry validation passed, "
+                "but no SSI code scan was performed.",
+                file=sys.stderr,
+            )
+            return 1
 
         roots = tuple(args.scan_root or (REPO_ROOT / "_system" / "trading",))
         violations = scan_paths(roots, registry=raw)

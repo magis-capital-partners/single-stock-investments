@@ -39,12 +39,70 @@
     }
   },
   "$defs": {
+    "candidate_ledger": {
+      "description": "Shape of candidates.json. Rules JSON Schema cannot express (updated_on >= added_on, desk_note required fields, framework ids against frameworks.json) live in build_short_alpha_dashboard.py --check. See README.md in this directory.",
+      "type": "object",
+      "required": ["schema_version", "as_of", "candidates"],
+      "properties": {
+        "schema_version": {"type": "string"},
+        "as_of": {"$ref": "#/$defs/ymd"},
+        "candidates": {"type": "array", "items": {"$ref": "#/$defs/candidate"}}
+      }
+    },
+    "ymd": {"type": "string", "format": "date", "pattern": "^\\d{4}-\\d{2}-\\d{2}$"},
     "candidate": {
       "type": "object",
       "required": ["ticker", "stage", "frameworks", "hypothesis", "sources"],
       "properties": {
+        "ticker": {"type": "string", "pattern": "^[A-Z]{1,5}(?:[.-][A-Z]{1,2})?$"},
         "stage": {"enum": ["lead", "researching", "ic", "live", "closed", "rejected"]},
-        "origin": {"enum": ["position", "activist_index", "filing_furnace", "browser_draft", "fugazi_scorecard"]}
+        "origin": {"enum": ["position", "activist_index", "filing_furnace", "browser_draft", "fugazi_scorecard", "desk_note", "reverse_split_research"]},
+        "frameworks": {"type": "array", "items": {"type": "string"}},
+        "hypothesis": {"type": "string"},
+        "sources": {"type": "array", "items": {"type": "object"}},
+        "source": {
+          "description": "Who filed the row: a bot id or an author name. Stable string, not an email address.",
+          "type": "string", "minLength": 1, "maxLength": 80
+        },
+        "added_on": {"$ref": "#/$defs/ymd", "description": "Set once, when the row is created."},
+        "updated_on": {"$ref": "#/$defs/ymd", "description": "Moved on every material edit; must be on or after added_on."},
+        "tags": {
+          "type": "array", "uniqueItems": true,
+          "items": {"type": "string", "pattern": "^[a-z0-9]+(?:-[a-z0-9]+)*$"}
+        },
+        "summary": {"type": "string", "maxLength": 400},
+        "note_ref": {
+          "description": "Where the narrative lives. Either a private-vault pointer research-vault/short-research/{TICKER}/{YYYY-MM-DD}-{slug}.md or a repository-relative SSI path (no leading slash, no '..').",
+          "type": "string",
+          "anyOf": [
+            {"pattern": "^research-vault/short-research/[A-Z]{1,5}(?:[.-][A-Z]{1,2})?/\\d{4}-\\d{2}-\\d{2}-[a-z0-9]+(?:-[a-z0-9]+)*\\.md$"},
+            {"pattern": "^(?!research-vault/)(?!/)(?!.*(?:^|/)\\.\\.(?:/|$))[A-Za-z0-9_][A-Za-z0-9_./-]*$"}
+          ]
+        },
+        "category": {
+          "description": "Michael's Short-Selling taxonomy. The category->lens map is CATEGORY_LENSES in build_short_alpha_dashboard.py and the table in README.md.",
+          "enum": ["accounting", "shitco-concept", "supply-side", "share-supply", "reverse-split", "activist-short", "borrow-squeeze", "playbook"]
+        },
+        "lens_reviews": {
+          "description": "The six dated analyst lens reviews from the reverse-split research process (rsdb). Carried verbatim; a blank review is 'unreviewed', never 'supported'.",
+          "type": "array",
+          "items": {"$ref": "#/$defs/lens_review"}
+        }
+      }
+    },
+    "lens_review": {
+      "type": "object",
+      "required": ["lens_id", "status"],
+      "properties": {
+        "lens_id": {"type": "string", "pattern": "^[a-z][a-z0-9_]*$"},
+        "frameworks": {"type": "array", "items": {"type": "string"}},
+        "status": {"enum": ["unreviewed", "unresolved", "supported", "contradicted"]},
+        "known_at": {"type": ["string", "null"]},
+        "mechanism": {"type": "string"},
+        "supporting_evidence": {"type": "array"},
+        "contradictory_evidence": {"type": "array"},
+        "falsifier": {"type": "string"},
+        "reviewed_at": {"type": ["string", "null"]}
       }
     }
   }

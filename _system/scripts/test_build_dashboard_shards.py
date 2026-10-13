@@ -130,6 +130,35 @@ class SlimTickerRowTests(unittest.TestCase):
             "A new boot-time decision field was added without updating the core slim contract",
         )
 
+    def test_next_calendar_event_stays_off_the_core_row(self):
+        slim = bds.slim_ticker_row({
+            "ticker": "T",
+            "index_membership": {
+                "status": "in",
+                "next_calendar_event": {"date": "2026-11-01", "name": "rebalance"},
+            },
+        })
+        self.assertEqual(slim["index_membership"]["status"], "in")
+        self.assertNotIn("next_calendar_event", slim["index_membership"])
+
+    def test_release_standalone_embeds_drops_the_monolith_blobs(self):
+        payload = {
+            "document_catalog": {"generated_at": "t", "documents": [{}, {}]},
+            "kpi_trends": {"generated_at": "t", "inflection_count": 3},
+            "activist_feed": {"generated_at": "t"},
+            "darwin": {"a": 1},
+            "tickers": [],
+        }
+        removed = bds.release_standalone_embeds(payload)
+        self.assertIn("document_catalog", removed)
+        self.assertNotIn("document_catalog", payload)
+        self.assertNotIn("kpi_trends", payload)
+        self.assertNotIn("activist_feed", payload)
+        self.assertNotIn("darwin", payload)
+        self.assertEqual(payload["document_catalog_ref"]["document_count"], 2)
+        self.assertEqual(payload["kpi_trends_ref"]["inflection_count"], 3)
+        self.assertEqual(payload["darwin_ref"]["path"], "dashboard/data/darwin_bundle.json")
+
     def test_two_phase_watch_stays_off_core_rows(self):
         row = {"ticker": "INV", "two_phase_watch": {"as_of": "2026-08-26", "hits": [{}] * 8}}
         slim = bds.slim_ticker_row(row)

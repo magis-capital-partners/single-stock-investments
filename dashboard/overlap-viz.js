@@ -37,7 +37,10 @@
     const slot = document.getElementById("overlap-ticker");
     if (!slot || slot.dataset.ticker !== ticker) return;
     if (!universe) {
-      ensureUniverse().then(() => {
+      ensureUniverse().then((payload) => {
+        // A 404 or failed request settles to null. Retrying that cached
+        // resolved promise recursively starves the page's event loop.
+        if (!payload) return;
         if (document.getElementById("overlap-ticker")?.dataset.ticker === ticker) fillTicker(ticker);
       });
       return;

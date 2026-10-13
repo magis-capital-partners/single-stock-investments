@@ -1,0 +1,117 @@
+# GPN — Third-party source inventory
+
+**Date:** 2026-10-10
+**Sources:** 108 total (0 approved, 0 pending, 108 context)
+
+| ID | Title | Path | Status | Use |
+|----|-------|------|--------|-----|
+| activist_long | GTCR W Aggregator LP — SC 13G | `GPN/third-party-analyses/activist_reports/long/SC-13G_20260112_acc0001193125_26_010788.xml` | context | activist/long — sec_edgar |
+| activist_long | acc0001123360 18 000003 | `GPN/third-party-analyses/activist_reports/long/8-K_20180215_acc0001123360_18_000003.htm` | context | activist/long — local |
+| activist_long | acc0001123360 18 000009 | `GPN/third-party-analyses/activist_reports/long/8-K_20180320_acc0001123360_18_000009.htm` | context | activist/long — local |
+| activist_long | acc0001123360 18 000013 | `GPN/third-party-analyses/activist_reports/long/8-K_20180503_acc0001123360_18_000013.htm` | context | activist/long — local |
+| activist_long | acc0001123360 18 000018 | `GPN/third-party-analyses/activist_reports/long/8-K_20180503_acc0001123360_18_000018.htm` | context | activist/long — local |
+| activist_long | acc0001123360 18 000020 | `GPN/third-party-analyses/activist_reports/long/8-K_20180621_acc0001123360_18_000020.htm` | context | activist/long — local |
+| activist_long | acc0001123360 18 000024 | `GPN/third-party-analyses/activist_reports/long/8-K_20180802_acc0001123360_18_000024.htm` | context | activist/long — local |
+| activist_long | acc0001123360 18 000028 | `GPN/third-party-analyses/activist_reports/long/8-K_20180830_acc0001123360_18_000028.htm` | context | activist/long — local |
+| activist_long | acc0001123360 18 000030 | `GPN/third-party-analyses/activist_reports/long/8-K_20180907_acc0001123360_18_000030.htm` | context | activist/long — local |
+| activist_long | acc0001123360 18 000032 | `GPN/third-party-analyses/activist_reports/long/8-K_20181016_acc0001123360_18_000032.htm` | context | activist/long — local |
+| activist_long | acc0001123360 18 000034 | `GPN/third-party-analyses/activist_reports/long/8-K_20181024_acc0001123360_18_000034.htm` | context | activist/long — local |
+| activist_long | acc0001123360 18 000036 | `GPN/third-party-analyses/activist_reports/long/8-K_20181026_acc0001123360_18_000036.htm` | context | activist/long — local |
+| activist_long | acc0001123360 18 000040 | `GPN/third-party-analyses/activist_reports/long/8-K_20181030_acc0001123360_18_000040.htm` | context | activist/long — local |
+| activist_long | acc0001123360 19 000003 | `GPN/third-party-analyses/activist_reports/long/8-K_20190213_acc0001123360_19_000003.htm` | context | activist/long — local |
+| activist_long | acc0001123360 19 000010 | `GPN/third-party-analyses/activist_reports/long/8-K_20190426_acc0001123360_19_000010.htm` | context | activist/long — local |
+| activist_long | acc0001123360 19 000014 | `GPN/third-party-analyses/activist_reports/long/8-K_20190502_acc0001123360_19_000014.htm` | context | activist/long — local |
+| activist_long | acc0001193125 19 157733 | `GPN/third-party-analyses/activist_reports/long/8-K_20190528_acc0001193125_19_157733.htm` | context | activist/long — local |
+| activist_long | acc0001193125 19 162970 | `GPN/third-party-analyses/activist_reports/long/8-K_20190531_acc0001193125_19_162970.htm` | context | activist/long — local |
+| activist_long | acc0001193125 19 194150 | `GPN/third-party-analyses/activist_reports/long/8-K_20190716_acc0001193125_19_194150.htm` | context | activist/long — local |
+| activist_long | acc0001123360 19 000020 | `GPN/third-party-analyses/activist_reports/long/8-K_20190730_acc0001123360_19_000020.htm` | context | activist/long — local |
+| activist_long | acc0001193125 19 209837 | `GPN/third-party-analyses/activist_reports/long/8-K_20190801_acc0001193125_19_209837.htm` | context | activist/long — local |
+| activist_long | acc0001193125 19 218033 | `GPN/third-party-analyses/activist_reports/long/8-K_20190809_acc0001193125_19_218033.htm` | context | activist/long — local |
+| activist_long | acc0001193125 19 221255 | `GPN/third-party-analyses/activist_reports/long/8-K_20190814_acc0001193125_19_221255.htm` | context | activist/long — local |
+| activist_long | acc0001193125 19 225341 | `GPN/third-party-analyses/activist_reports/long/8-K_20190820_acc0001193125_19_225341.htm` | context | activist/long — local |
+| activist_long | acc0001193125 19 234186 | `GPN/third-party-analyses/activist_reports/long/8-K_20190829_acc0001193125_19_234186.htm` | context | activist/long — local |
+| activist_long | acc0001193125 19 250768 | `GPN/third-party-analyses/activist_reports/long/8-K_20190920_acc0001193125_19_250768.htm` | context | activist/long — local |
+| activist_long | acc0001123360 19 000032 | `GPN/third-party-analyses/activist_reports/long/8-K_20191031_acc0001123360_19_000032.htm` | context | activist/long — local |
+| activist_long | acc0001123360 20 000002 | `GPN/third-party-analyses/activist_reports/long/8-K_20200115_acc0001123360_20_000002.htm` | context | activist/long — local |
+| activist_long | acc0001123360 20 000005 | `GPN/third-party-analyses/activist_reports/long/8-K_20200212_acc0001123360_20_000005.htm` | context | activist/long — local |
+| activist_long | acc0001123360 20 000011 | `GPN/third-party-analyses/activist_reports/long/8-K_20200406_acc0001123360_20_000011.htm` | context | activist/long — local |
+| activist_long | acc0001123360 20 000013 | `GPN/third-party-analyses/activist_reports/long/8-K_20200501_acc0001123360_20_000013.htm` | context | activist/long — local |
+| activist_long | acc0001123360 20 000018 | `GPN/third-party-analyses/activist_reports/long/8-K_20200506_acc0001123360_20_000018.htm` | context | activist/long — local |
+| activist_long | acc0001193125 20 136667 | `GPN/third-party-analyses/activist_reports/long/8-K_20200508_acc0001193125_20_136667.htm` | context | activist/long — local |
+| activist_long | acc0001193125 20 144027 | `GPN/third-party-analyses/activist_reports/long/8-K_20200515_acc0001193125_20_144027.htm` | context | activist/long — local |
+| activist_long | acc0001123360 20 000026 | `GPN/third-party-analyses/activist_reports/long/8-K_20200803_acc0001123360_20_000026.htm` | context | activist/long — local |
+| activist_long | acc0001123360 20 000032 | `GPN/third-party-analyses/activist_reports/long/8-K_20201029_acc0001123360_20_000032.htm` | context | activist/long — local |
+| activist_long | acc0001123360 21 000003 | `GPN/third-party-analyses/activist_reports/long/8-K_20210208_acc0001123360_21_000003.htm` | context | activist/long — local |
+| activist_long | acc0001123360 21 000006 | `GPN/third-party-analyses/activist_reports/long/8-K_20210210_acc0001123360_21_000006.htm` | context | activist/long — local |
+| activist_long | acc0001193125 21 050791 | `GPN/third-party-analyses/activist_reports/long/8-K_20210222_acc0001193125_21_050791.htm` | context | activist/long — local |
+| activist_long | acc0001193125 21 060407 | `GPN/third-party-analyses/activist_reports/long/8-K_20210226_acc0001193125_21_060407.htm` | context | activist/long — local |
+| activist_long | acc0001123360 21 000014 | `GPN/third-party-analyses/activist_reports/long/8-K_20210430_acc0001123360_21_000014.htm` | context | activist/long — local |
+| activist_long | acc0001123360 21 000016 | `GPN/third-party-analyses/activist_reports/long/8-K_20210504_acc0001123360_21_000016.htm` | context | activist/long — local |
+| activist_long | acc0001123360 21 000024 | `GPN/third-party-analyses/activist_reports/long/8-K_20210802_acc0001123360_21_000024.htm` | context | activist/long — local |
+| activist_long | acc0001123360 21 000030 | `GPN/third-party-analyses/activist_reports/long/8-K_20211102_acc0001123360_21_000030.htm` | context | activist/long — local |
+| activist_long | acc0001193125 21 332001 | `GPN/third-party-analyses/activist_reports/long/8-K_20211117_acc0001193125_21_332001.htm` | context | activist/long — local |
+| activist_long | acc0001193125 21 336859 | `GPN/third-party-analyses/activist_reports/long/8-K_20211122_acc0001193125_21_336859.htm` | context | activist/long — local |
+| activist_long | acc0001123360 21 000034 | `GPN/third-party-analyses/activist_reports/long/8-K_20211203_acc0001123360_21_000034.htm` | context | activist/long — local |
+| activist_long | acc0001123360 22 000003 | `GPN/third-party-analyses/activist_reports/long/8-K_20220210_acc0001123360_22_000003.htm` | context | activist/long — local |
+| activist_long | acc0001123360 22 000011 | `GPN/third-party-analyses/activist_reports/long/8-K_20220502_acc0001123360_22_000011.htm` | context | activist/long — local |
+| activist_long | acc0001193125 22 138701 | `GPN/third-party-analyses/activist_reports/long/8-K_20220503_acc0001193125_22_138701.htm` | context | activist/long — local |
+| activist_long | acc0001193125 22 166232 | `GPN/third-party-analyses/activist_reports/long/8-K_20220602_acc0001193125_22_166232.htm` | context | activist/long — local |
+| activist_long | acc0001123360 22 000019 | `GPN/third-party-analyses/activist_reports/long/8-K_20220801_acc0001123360_22_000019.htm` | context | activist/long — local |
+| activist_long | acc0001193125 22 207780 | `GPN/third-party-analyses/activist_reports/long/8-K_20220801_acc0001193125_22_207780.htm` | context | activist/long — local |
+| activist_long | acc0001193125 22 209347 | `GPN/third-party-analyses/activist_reports/long/8-K_20220802_acc0001193125_22_209347.htm` | context | activist/long — local |
+| activist_long | acc0001193125 22 215725 | `GPN/third-party-analyses/activist_reports/long/8-K_20220809_acc0001193125_22_215725.htm` | context | activist/long — local |
+| activist_long | acc0001193125 22 217362 | `GPN/third-party-analyses/activist_reports/long/8-K_20220810_acc0001193125_22_217362.htm` | context | activist/long — local |
+| activist_long | acc0001193125 22 226539 | `GPN/third-party-analyses/activist_reports/long/8-K_20220822_acc0001193125_22_226539.htm` | context | activist/long — local |
+| activist_long | acc0001193125 22 230545 | `GPN/third-party-analyses/activist_reports/long/8-K_20220826_acc0001193125_22_230545.htm` | context | activist/long — local |
+| activist_long | acc0001123360 22 000026 | `GPN/third-party-analyses/activist_reports/long/8-K_20221028_acc0001123360_22_000026.htm` | context | activist/long — local |
+| activist_long | acc0001123360 22 000028 | `GPN/third-party-analyses/activist_reports/long/8-K_20221031_acc0001123360_22_000028.htm` | context | activist/long — local |
+| activist_long | acc0001123360 23 000006 | `GPN/third-party-analyses/activist_reports/long/8-K_20230210_acc0001123360_23_000006.htm` | context | activist/long — local |
+| activist_long | acc0001123360 23 000012 | `GPN/third-party-analyses/activist_reports/long/8-K_20230221_acc0001123360_23_000012.htm` | context | activist/long — local |
+| activist_long | acc0001193125 23 066190 | `GPN/third-party-analyses/activist_reports/long/8-K_20230309_acc0001193125_23_066190.htm` | context | activist/long — local |
+| activist_long | acc0001193125 23 073873 | `GPN/third-party-analyses/activist_reports/long/8-K_20230317_acc0001193125_23_073873.htm` | context | activist/long — local |
+| activist_long | acc0001123360 23 000017 | `GPN/third-party-analyses/activist_reports/long/8-K_20230501_acc0001123360_23_000017.htm` | context | activist/long — local |
+| activist_long | acc0001193125 23 128698 | `GPN/third-party-analyses/activist_reports/long/8-K_20230501_acc0001193125_23_128698.htm` | context | activist/long — local |
+| activist_long | acc0001193125 23 132459 | `GPN/third-party-analyses/activist_reports/long/8-K_20230502_acc0001193125_23_132459.htm` | context | activist/long — local |
+| activist_long | acc0001123360 23 000026 | `GPN/third-party-analyses/activist_reports/long/8-K_20230801_acc0001123360_23_000026.htm` | context | activist/long — local |
+| activist_long | acc0001123360 23 000035 | `GPN/third-party-analyses/activist_reports/long/8-K_20231027_acc0001123360_23_000035.htm` | context | activist/long — local |
+| activist_long | acc0001123360 23 000037 | `GPN/third-party-analyses/activist_reports/long/8-K_20231031_acc0001123360_23_000037.htm` | context | activist/long — local |
+| activist_long | acc0001123360 23 000042 | `GPN/third-party-analyses/activist_reports/long/8-K_20231108_acc0001123360_23_000042.htm` | context | activist/long — local |
+| activist_long | acc0001123360 24 000002 | `GPN/third-party-analyses/activist_reports/long/8-K_20240214_acc0001123360_24_000002.htm` | context | activist/long — local |
+| activist_long | acc0001104659 24 025199 | `GPN/third-party-analyses/activist_reports/long/8-K_20240220_acc0001104659_24_025199.htm` | context | activist/long — local |
+| activist_long | acc0001104659 24 025742 | `GPN/third-party-analyses/activist_reports/long/8-K_20240221_acc0001104659_24_025742.htm` | context | activist/long — local |
+| activist_long | acc0001104659 24 027012 | `GPN/third-party-analyses/activist_reports/long/8-K_20240223_acc0001104659_24_027012.htm` | context | activist/long — local |
+| activist_long | acc0001123360 24 000008 | `GPN/third-party-analyses/activist_reports/long/8-K_20240429_acc0001123360_24_000008.htm` | context | activist/long — local |
+| activist_long | acc0001123360 24 000012 | `GPN/third-party-analyses/activist_reports/long/8-K_20240501_acc0001123360_24_000012.htm` | context | activist/long — local |
+| activist_long | acc0001123360 24 000021 | `GPN/third-party-analyses/activist_reports/long/8-K_20240806_acc0001123360_24_000021.htm` | context | activist/long — local |
+| activist_long | acc0001123360 24 000024 | `GPN/third-party-analyses/activist_reports/long/8-K_20240807_acc0001123360_24_000024.htm` | context | activist/long — local |
+| activist_long | acc0001123360 24 000033 | `GPN/third-party-analyses/activist_reports/long/8-K_20241030_acc0001123360_24_000033.htm` | context | activist/long — local |
+| activist_long | acc0001123360 25 000004 | `GPN/third-party-analyses/activist_reports/long/8-K_20250213_acc0001123360_25_000004.htm` | context | activist/long — local |
+| activist_long | acc0001123360 25 000007 | `GPN/third-party-analyses/activist_reports/long/8-K_20250214_acc0001123360_25_000007.htm` | context | activist/long — local |
+| activist_long | acc0001123360 25 000014 | `GPN/third-party-analyses/activist_reports/long/8-K_20250307_acc0001123360_25_000014.htm` | context | activist/long — local |
+| activist_long | acc0001104659 25 035771 | `GPN/third-party-analyses/activist_reports/long/8-K_20250417_acc0001104659_25_035771.htm` | context | activist/long — local |
+| activist_long | acc0001104659 25 036553 | `GPN/third-party-analyses/activist_reports/long/8-K_20250421_acc0001104659_25_036553.htm` | context | activist/long — local |
+| activist_long | acc0001123360 25 000022 | `GPN/third-party-analyses/activist_reports/long/8-K_20250428_acc0001123360_25_000022.htm` | context | activist/long — local |
+| activist_long | acc0001123360 25 000028 | `GPN/third-party-analyses/activist_reports/long/8-K_20250506_acc0001123360_25_000028.htm` | context | activist/long — local |
+| activist_long | acc0001104659 25 050050 | `GPN/third-party-analyses/activist_reports/long/8-K_20250516_acc0001104659_25_050050.htm` | context | activist/long — local |
+| activist_long | acc0001104659 25 069140 | `GPN/third-party-analyses/activist_reports/long/8-K_20250721_acc0001104659_25_069140.htm` | context | activist/long — local |
+| activist_long | acc0001123360 25 000038 | `GPN/third-party-analyses/activist_reports/long/8-K_20250806_acc0001123360_25_000038.htm` | context | activist/long — local |
+| activist_long | acc0001123360 25 000043 | `GPN/third-party-analyses/activist_reports/long/8-K_20250807_acc0001123360_25_000043.htm` | context | activist/long — local |
+| activist_long | acc0001104659 25 094138 | `GPN/third-party-analyses/activist_reports/long/8-K_20250929_acc0001104659_25_094138.htm` | context | activist/long — local |
+| activist_long | acc0001123360 25 000075 | `GPN/third-party-analyses/activist_reports/long/8-K_20251104_acc0001123360_25_000075.htm` | context | activist/long — local |
+| activist_long | acc0001123360 25 000080 | `GPN/third-party-analyses/activist_reports/long/8-K_20251104_acc0001123360_25_000080.htm` | context | activist/long — local |
+| activist_long | acc0001123360 25 000082 | `GPN/third-party-analyses/activist_reports/long/8-K_20251105_acc0001123360_25_000082.htm` | context | activist/long — local |
+| activist_long | acc0001104659 25 109725 | `GPN/third-party-analyses/activist_reports/long/8-K_20251112_acc0001104659_25_109725.htm` | context | activist/long — local |
+| activist_long | acc0001104659 25 112631 | `GPN/third-party-analyses/activist_reports/long/8-K_20251114_acc0001104659_25_112631.htm` | context | activist/long — local |
+| activist_long | acc0001104659 26 002705 | `GPN/third-party-analyses/activist_reports/long/8-K_20260112_acc0001104659_26_002705.htm` | context | activist/long — local |
+| activist_long | acc0001104659 26 003734 | `GPN/third-party-analyses/activist_reports/long/8-K_20260114_acc0001104659_26_003734.htm` | context | activist/long — local |
+| activist_long | acc0001123360 26 000004 | `GPN/third-party-analyses/activist_reports/long/8-K_20260218_acc0001123360_26_000004.htm` | context | activist/long — local |
+| activist_long | acc0001104659 26 017297 | `GPN/third-party-analyses/activist_reports/long/8-K_20260219_acc0001104659_26_017297.htm` | context | activist/long — local |
+| activist_long | acc0001123360 26 000040 | `GPN/third-party-analyses/activist_reports/long/8-K_20260305_acc0001123360_26_000040.htm` | context | activist/long — local |
+| activist_long | acc0001104659 26 026460 | `GPN/third-party-analyses/activist_reports/long/8-K_20260311_acc0001104659_26_026460.htm` | context | activist/long — local |
+| activist_long | acc0001104659 26 027067 | `GPN/third-party-analyses/activist_reports/long/8-K_20260312_acc0001104659_26_027067.htm` | context | activist/long — local |
+| activist_long | acc0001104659 26 054479 | `GPN/third-party-analyses/activist_reports/long/8-K_20260504_acc0001104659_26_054479.htm` | context | activist/long — local |
+| activist_long | acc0001123360 26 000070 | `GPN/third-party-analyses/activist_reports/long/8-K_20260506_acc0001123360_26_000070.htm` | context | activist/long — local |
+| activist_long | acc0001104659 26 056781 | `GPN/third-party-analyses/activist_reports/long/8-K_20260507_acc0001104659_26_056781.htm` | context | activist/long — local |
+| activist_long | acc0001123360 26 000082 | `GPN/third-party-analyses/activist_reports/long/8-K_20260805_acc0001123360_26_000082.htm` | context | activist/long — local |
+
+Cross-check required: `GPN/research/cross_check_third_party_2026-10-10.md`

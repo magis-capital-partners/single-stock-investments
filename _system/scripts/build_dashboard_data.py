@@ -3036,6 +3036,7 @@ def build_ticker_row(
     row["kpi_trends"] = kpi_trends_for_ticker(ticker)
     row["power_zones"] = power_zones_for_ticker(ticker)
     row["index_membership"] = index_membership_for_ticker(ticker)
+    row["separation"] = separation_for_ticker(ticker)
     row["fund_nav"] = fund_nav_summary(ticker_dir, meta)
     if row["fund_nav"] and classification.get("instrument_type") in ("—", "-", None, ""):
         classification["instrument_type"] = row["fund_nav"].get("instrument_type") or "—"
@@ -3083,6 +3084,32 @@ def index_membership_for_ticker(ticker: str) -> dict | None:
         "confirmed_events": (entry.get("confirmed_events") or [])[:5],
         "scorecards": (entry.get("scorecards") or [])[:12],
         "inputs_missing": entry.get("inputs_missing") or [],
+    }
+
+
+_SEPARATIONS_CACHE: dict | None = None
+
+
+def load_separations() -> dict | None:
+    """dashboard/data/separations.json (separations lane); None when absent."""
+    global _SEPARATIONS_CACHE
+    if _SEPARATIONS_CACHE is None:
+        _SEPARATIONS_CACHE = _load_json(DATA_DIR / "separations.json") or {}
+    return _SEPARATIONS_CACHE or None
+
+
+def separation_for_ticker(ticker: str) -> dict | None:
+    """Per-ticker separation roles and odd-lot flag (schema: _system/data/separations/README.md)."""
+    doc = load_separations()
+    entry = ((doc or {}).get("ticker_attach") or {}).get(ticker)
+    if not entry or not entry.get("roles"):
+        return None
+    return {
+        "roles": entry.get("roles") or [],
+        "odd_lot": entry.get("odd_lot") or {"eligible_owners": [], "expiration": None},
+        "research_only": True,
+        "in_base_irr": False,
+        "authority": "none",
     }
 
 
@@ -3783,8 +3810,17 @@ def main() -> None:
         )
     # Same prior, shard-reconstructed when the monolith is absent.
     payload = merge_sparse_payload(payload, {"tickers": list(prior_by_ticker.values())})
-    OUTPUT.write_text(json.dumps(payload, separators=(",", ":")), encoding="utf-8")
     write_oauth_config()
+    from build_dashboard_shards import release_standalone_embeds, write_shards
+
+    # Shards and core refs are built from the full objects. The monolith then
+    # drops those objects: they already live in their own files, and keeping
+    # them here is what pushed dashboard_data.json over GitHub's 100MB limit.
+    write_shards(payload, insights_doc, DATA_DIR)
+    released = release_standalone_embeds(payload)
+    if released:
+        print(f"Left standalone embeds out of the monolith: {', '.join(released)}")
+    OUTPUT.write_text(json.dumps(payload, separators=(",", ":")), encoding="utf-8")
     print(f"Wrote {OUTPUT} ({payload['summary']['ticker_count']} tickers)")
     if UNRESOLVED_UNITS:
         # Not fatal: these render as bare numbers, which is honest. It is still a
@@ -3796,9 +3832,6 @@ def main() -> None:
         )
         for ticker, reason in sorted(UNRESOLVED_UNITS.items())[:20]:
             print(f"  {ticker}: {reason}", file=sys.stderr)
-    from build_dashboard_shards import write_shards
-
-    write_shards(payload, insights_doc, DATA_DIR)
     from build_feed_status import write_feed_status
 
     write_feed_status()

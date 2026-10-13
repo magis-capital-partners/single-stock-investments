@@ -1,0 +1,483 @@
+{
+  "schema": "sources.v1",
+  "description": "Source index for Magis Capital Partners bots, including Michael's Grok bots. The GitHub repository is the source of truth.",
+  "github_repo": "magis-capital-partners/single-stock-investments",
+  "ground_rules": [
+    "Before using a dashboard data file, read its build date first. Use generated_at when the file has that field, and build_time when the file has that field.",
+    "Read _system/portfolio/registry.json fresh. Do not hardcode tickers.",
+    "Report ranked hits only.",
+    "Stubs go to the Special Situations desk.",
+    "Say nothing when nothing is new.",
+    "Never post Drew's personal trades or private correspondence.",
+    "Outbound messages to people need Drew's approval.",
+    "Email is read-only. Use it only to cross-reference universe names. Label each item as a newsletter or a letter with its date, and treat it as a lead until a filing confirms it. Never surface personal brokerage mail, and do not store email content in this repo.",
+    "Bots write only inside _system/memory-hub/research-equity/. Append at most three [PROPOSED] lessons per session. Never edit _system/memory/MEMORY.md. Never create a new hub without Drew's approval. Never write the borrow-etf, diamond-creek, or spx-0dte hubs."
+  ],
+  "local_worktree": {
+    "path": "C:\\Users\\drewg\\.codex\\worktrees\\energy-btc-model\\single-stock-investments",
+    "status": "Can be stale. The GitHub repository is the source of truth."
+  },
+  "local_memory_hub": {
+    "path": "C:\\Users\\drewg\\Projects\\.agent-memory\\hubs\\research-equity\\",
+    "status": "Not reachable from the cloud. Its content was copied into _system/memory-hub/research-equity/ on 2026-10-12 (CONTEXT.md, MEMORY.md, bridges.md, daily/ through 2026-10-08, and the mesh-root GRAPH.md). The repo copy is the one bots read and write; the local path is Drew's cross-repo mesh. Do not invent graph nodes, context, or lessons."
+  },
+  "room": {
+    "name": "Magis Capital Partners",
+    "id": "7ad6d9cb-85bd-4f2c-b887-1bf4bf59b107",
+    "platform": "Grok Bot group",
+    "desks": [
+      "Fundamental Analyst",
+      "Special Situations",
+      "Activism",
+      "NOL and Tax Assets",
+      "Technical Analyst",
+      "Murray Stahl"
+    ],
+    "digest": "Weekday digests around 8:10-8:14 AM ET."
+  },
+  "pending_access": [
+    "Drew is sharing the Drive folders (Books, short-selling-library, Admin/Intake) with Michael's Google accounts."
+  ],
+  "do_not_write": [
+    "_system/memory/MEMORY.md",
+    "borrow-etf",
+    "diamond-creek",
+    "spx-0dte"
+  ],
+  "sources": [
+    {
+      "id": "dashboard-kpi-trends",
+      "type": "repo file",
+      "location": "dashboard/data/kpi_trends.json",
+      "repo_path": "dashboard/data/kpi_trends.json",
+      "path_kind": "file",
+      "freshness_field": "generated_at",
+      "purpose": "KPI trend series. Read generated_at before the series.",
+      "owner_desk": "Magis Capital Partners / all desks",
+      "mode": "read",
+      "push": "The data pipeline writes this file. A correction is a pull request from a cloud agent or the GitHub connector."
+    },
+    {
+      "id": "dashboard-portfolio-news",
+      "type": "repo file",
+      "location": "dashboard/data/portfolio_news.json",
+      "repo_path": "dashboard/data/portfolio_news.json",
+      "path_kind": "file",
+      "freshness_field": "build_time",
+      "purpose": "Portfolio news. The file build date is build_time. Each item has published_utc, confidence, category, and tickers.",
+      "owner_desk": "Magis Capital Partners / all desks",
+      "mode": "read",
+      "push": "The data pipeline writes this file. A correction is a pull request from a cloud agent or the GitHub connector."
+    },
+    {
+      "id": "dashboard-document-catalog",
+      "type": "repo file",
+      "location": "dashboard/data/document_catalog.json",
+      "repo_path": "dashboard/data/document_catalog.json",
+      "path_kind": "file",
+      "freshness_field": "generated_at",
+      "purpose": "Document index. Entries are in documents. The catalog build time is generated_at. folder_index_generated_at is an older folder-index stamp.",
+      "owner_desk": "Magis Capital Partners / all desks",
+      "mode": "read",
+      "push": "The data pipeline writes this file. A correction is a pull request from a cloud agent or the GitHub connector."
+    },
+    {
+      "id": "dashboard-warrants",
+      "type": "repo file",
+      "location": "dashboard/data/warrants.json",
+      "repo_path": "dashboard/data/warrants.json",
+      "path_kind": "file",
+      "freshness_field": "generated_at",
+      "purpose": "Warrant alerts and filing events. Read generated_at before the events.",
+      "owner_desk": "Magis Capital Partners / all desks",
+      "mode": "read",
+      "push": "The data pipeline writes this file. A correction is a pull request from a cloud agent or the GitHub connector."
+    },
+    {
+      "id": "dashboard-activist-feed",
+      "type": "repo file",
+      "location": "dashboard/data/activist_feed.json",
+      "repo_path": "dashboard/data/activist_feed.json",
+      "path_kind": "file",
+      "freshness_field": "generated_at",
+      "purpose": "Activist filings and triage counts. Read generated_at before the feed.",
+      "owner_desk": "Magis Capital Partners / Activism",
+      "mode": "read",
+      "push": "The data pipeline writes this file. A correction is a pull request from a cloud agent or the GitHub connector."
+    },
+    {
+      "id": "dashboard-index-membership",
+      "type": "repo file",
+      "location": "dashboard/data/index_membership.json",
+      "repo_path": "dashboard/data/index_membership.json",
+      "path_kind": "file",
+      "freshness_field": "generated",
+      "purpose": "Index membership and scorecards. The build stamp is generated. The membership date is as_of.",
+      "owner_desk": "Magis Capital Partners / all desks",
+      "mode": "read",
+      "push": "The data pipeline writes this file. A correction is a pull request from a cloud agent or the GitHub connector."
+    },
+    {
+      "id": "dashboard-fico-watch",
+      "type": "repo file",
+      "location": "dashboard/data/fico_watch.json",
+      "repo_path": "dashboard/data/fico_watch.json",
+      "path_kind": "file",
+      "optional_path": true,
+      "freshness_field": "generated_at",
+      "purpose": "FICO watch page. The file is not always present. When it is present, read generated_at first. When it is absent, skip it.",
+      "owner_desk": "Magis Capital Partners / Fundamental Analyst",
+      "mode": "read",
+      "push": "The data pipeline writes this file when the watch is built. A correction is a pull request from a cloud agent or the GitHub connector."
+    },
+    {
+      "id": "dashboard-special-situations",
+      "type": "repo file",
+      "location": "dashboard/data/special_situations.json",
+      "repo_path": "dashboard/data/special_situations.json",
+      "path_kind": "file",
+      "freshness_field": "generated_at",
+      "purpose": "Ranked special situations, discovery list, and history by lane (spinoffs, split_offs, mergers, warrants, restructurings, forced_sellers). Read generated_at before the rows.",
+      "owner_desk": "Magis Capital Partners / Special Situations",
+      "mode": "read",
+      "push": "The data pipeline writes this file. A correction is a pull request from a cloud agent or the GitHub connector."
+    },
+    {
+      "id": "dashboard-separations",
+      "type": "repo file",
+      "location": "dashboard/data/separations.json",
+      "repo_path": "dashboard/data/separations.json",
+      "path_kind": "file",
+      "freshness_field": "generated_at",
+      "purpose": "Split-offs and spin-offs: filed terms, spread, who-must-sell flows, odd_lot_alerts, discovery_events. Read generated_at before the rows. Contract: _system/data/separations/README.md.",
+      "owner_desk": "Magis Capital Partners / Special Situations",
+      "mode": "read",
+      "push": "The data pipeline writes this file. A registry seed with filing accessions is a pull request; run check_separation_universe.py first.",
+      "helper_repo_paths": [
+        "_system/data/separations/README.md",
+        "_system/scripts/check_separation_universe.py"
+      ]
+    },
+    {
+      "id": "dashboard-desk-briefs",
+      "type": "repo file",
+      "location": "dashboard/data/desk_briefs.json",
+      "repo_path": "dashboard/data/desk_briefs.json",
+      "path_kind": "file",
+      "freshness_field": "generated_at",
+      "purpose": "The latest desk brief per desk, joined for the dashboard Inbox, with per-desk age, stale flag, and the age of every input at read time. Built by build_desk_briefs.py from _system/data/desk_briefs/.",
+      "owner_desk": "Magis Capital Partners / all desks",
+      "mode": "read",
+      "push": "Generated. Do not edit; file a desk brief instead (see desk-briefs)."
+    },
+    {
+      "id": "desk-briefs",
+      "type": "repo file",
+      "location": "_system/data/desk_briefs/",
+      "repo_path": "_system/data/desk_briefs",
+      "path_kind": "directory",
+      "purpose": "Ranked desk output, one JSON file per desk per day at <desk>/<YYYY-MM-DD>.json. Desks: special_situations, activism, fundamentals, nol_tax_assets, tape_index, stahl, short_selling. At most 12 items; every ticker from the registry or the literal unresolved; one_number required; evidence with accession or URL; confidence filing, provider, news, or web; inputs_read carries each file's stamp. research_only true, in_base_irr false, authority none.",
+      "owner_desk": "Magis Capital Partners / all desks",
+      "mode": "read-write",
+      "push": "A pull request on a grok/<desk>/<YYYY-MM-DD>-<slug> branch that touches only the brief and, if needed, the hub daily note. python _system/scripts/check_desk_briefs.py must pass. Contract: _system/data/desk_briefs/README.md. Mandates: _system/agents/DESKS.md.",
+      "constraints": [
+        "One file per desk per day; a correction is a new file on a later date, never an edit to a merged one.",
+        "At most 12 items, best first; a headline of at most 160 characters; one_number on every item.",
+        "Every ticker is in _system/portfolio/registry.json holdings or watchlist, or is the literal unresolved.",
+        "No position, no size, no stance, no price target, no fraud tag.",
+        "The chat room gets a one-line pointer; the brief is the record."
+      ],
+      "helper_repo_paths": [
+        "_system/data/desk_briefs/README.md",
+        "_system/data/desk_briefs/schema.json",
+        "_system/scripts/check_desk_briefs.py",
+        "_system/scripts/build_desk_briefs.py",
+        "_system/agents/DESKS.md"
+      ]
+    },
+    {
+      "id": "portfolio-registry",
+      "type": "repo file",
+      "location": "_system/portfolio/registry.json",
+      "repo_path": "_system/portfolio/registry.json",
+      "path_kind": "file",
+      "freshness_field": "meta.updated",
+      "purpose": "The portfolio book. Read it fresh on every run. Do not hardcode tickers from a previous run.",
+      "owner_desk": "Magis Capital Partners / all desks",
+      "mode": "read-write",
+      "push": "A registry change is a pull request from a cloud agent or the GitHub connector."
+    },
+    {
+      "id": "short-selling-library",
+      "type": "repo file",
+      "location": "_system/reference/short-selling-library/",
+      "repo_path": "_system/reference/short-selling-library",
+      "path_kind": "directory",
+      "purpose": "Short-selling reference library. The README catalogues books. Book scans are not committed. Public papers sit under public/.",
+      "owner_desk": "Magis Capital Partners / all desks",
+      "mode": "read-write",
+      "push": "A catalogue change is a pull request. Do not commit a book scan.",
+      "helper_repo_paths": [
+        "_system/reference/short-selling-library/README.md"
+      ]
+    },
+    {
+      "id": "drive-books",
+      "type": "Drive folder",
+      "location": "Research Sources/Books",
+      "drive_path": "Research Sources/Books",
+      "drive_id": "1q0B2FkNPF2onYEv9MBh6VJoDR6rqtBxQ",
+      "parent_drive_id": "1yK75I60EbARPMyP6ibSggJ1-VLxtYXwU",
+      "parent_title": "Research Sources",
+      "purpose": "Books folder. Read it. Do not upload new files here from a bot.",
+      "owner_desk": "Magis Capital Partners / all desks",
+      "mode": "read",
+      "push": "New documents go to Shared Drive Admin/Intake, not into this folder."
+    },
+    {
+      "id": "drive-books-value-investing",
+      "type": "Drive folder",
+      "location": "Research Sources/Books/Value Investing",
+      "drive_path": "Research Sources/Books/Value Investing",
+      "drive_id": "1BDzwtkgAHsKOda2NtxlHEwc37cEjTwD7",
+      "parent_drive_id": "1q0B2FkNPF2onYEv9MBh6VJoDR6rqtBxQ",
+      "parent_title": "Books",
+      "resolved_by": "name",
+      "notes": "The briefing said to find this folder by name. Resolved on 2026-10-12 as the child of Books titled Value Investing.",
+      "purpose": "Value Investing books under Books.",
+      "owner_desk": "Magis Capital Partners / all desks",
+      "mode": "read",
+      "push": "New documents go to Shared Drive Admin/Intake, not into this folder."
+    },
+    {
+      "id": "drive-books-accounting",
+      "type": "Drive folder",
+      "location": "Research Sources/Books/Accounting",
+      "drive_path": "Research Sources/Books/Accounting",
+      "drive_id": "1tL89aD9SDliM3BDCaQDJHU0CJ_YR0kgS",
+      "parent_drive_id": "1q0B2FkNPF2onYEv9MBh6VJoDR6rqtBxQ",
+      "parent_title": "Books",
+      "purpose": "Accounting books under Books.",
+      "owner_desk": "Magis Capital Partners / all desks",
+      "mode": "read",
+      "push": "New documents go to Shared Drive Admin/Intake, not into this folder."
+    },
+    {
+      "id": "drive-books-trading-markets",
+      "type": "Drive folder",
+      "location": "Research Sources/Books/Trading & Markets",
+      "drive_path": "Research Sources/Books/Trading & Markets",
+      "drive_id": "1hsvaElY-UaFW0fGygv2685Bb9HJqatTS",
+      "parent_drive_id": "1q0B2FkNPF2onYEv9MBh6VJoDR6rqtBxQ",
+      "parent_title": "Books",
+      "purpose": "Trading & Markets books under Books.",
+      "owner_desk": "Magis Capital Partners / all desks",
+      "mode": "read",
+      "push": "New documents go to Shared Drive Admin/Intake, not into this folder."
+    },
+    {
+      "id": "drive-investment-wisdom-accounting",
+      "type": "Drive folder",
+      "location": "Research Sources/Investment Wisdom/Accounting",
+      "drive_path": "Research Sources/Investment Wisdom/Accounting",
+      "drive_id": "1m5c1VcKkGzy2rEp3V6GWAORQspMJHkjm",
+      "parent_drive_id": "1zjhPYsBH9eoV36wm8G_9X5vGt1YY_9Ql",
+      "parent_title": "Investment Wisdom",
+      "notes": "Near-duplicate of Books/Accounting. This copy sits under Investment Wisdom.",
+      "purpose": "Near-duplicate Accounting folder under Investment Wisdom.",
+      "owner_desk": "Magis Capital Partners / all desks",
+      "mode": "read",
+      "push": "New documents go to Shared Drive Admin/Intake, not into this folder."
+    },
+    {
+      "id": "drive-short-selling-papers",
+      "type": "Drive folder",
+      "location": "reference/short-selling-library/public",
+      "drive_path": "reference/short-selling-library/public",
+      "drive_id": "1VLD6d4PpNWRagijg0ibsSeU5g3fMoNBz",
+      "parent_drive_id": "1cHaPQfoJVCJKslWtKxplrYloteokdC4S",
+      "parent_title": "short-selling-library",
+      "notes": "The briefing calls this the short-selling library papers folder. The Drive title of this id is public.",
+      "purpose": "Public short-selling papers on Drive.",
+      "owner_desk": "Magis Capital Partners / all desks",
+      "mode": "read",
+      "push": "New documents go to Shared Drive Admin/Intake, not into this folder."
+    },
+    {
+      "id": "drive-special-situations-checklist",
+      "type": "Drive file",
+      "location": "Research Sources/Books/Value Investing/Joel Greenblatt/Joel Greenblatt - You Can Be A Stock Market Genius.pdf",
+      "drive_path": "Research Sources/Books/Value Investing/Joel Greenblatt/Joel Greenblatt - You Can Be A Stock Market Genius.pdf",
+      "drive_id": "1LwfqcmaUU7X8uCMsoteeF8nRFt9mDNRe",
+      "parent_drive_id": "1yZoPBLNJG2YXptUaInHDHHKePNXDIKg1",
+      "parent_title": "Joel Greenblatt",
+      "notes": "The briefing calls this the special-situations checklist book. The Drive title is Joel Greenblatt - You Can Be A Stock Market Genius.pdf.",
+      "purpose": "Special-situations checklist book for the Special Situations desk.",
+      "owner_desk": "Magis Capital Partners / Special Situations",
+      "mode": "read",
+      "push": "Do not copy this file into the repo. Read it from Drive."
+    },
+    {
+      "id": "drive-admin-intake-vic",
+      "type": "Drive folder",
+      "location": "Admin/Intake/VIC/{TICKER}/",
+      "drive_path": "Admin/Intake",
+      "drive_id": "1OBaWt7SF-OME8hmXkl7tzdFLAfjBrp_C",
+      "parent_drive_id": "1LRc4HnEoXolUgma_cLh4rwHMpTuKJrt-",
+      "parent_title": "Admin",
+      "notes": "Drive title of the folder id is Intake. VIC files go in VIC/{TICKER}/ under that folder. The ticker folder must already exist in the repo.",
+      "purpose": "Drop folder for VIC PDFs. The daily Drive Intake Sync imports them.",
+      "owner_desk": "Magis Capital Partners / all desks",
+      "mode": "read-write",
+      "push": "Drop a PDF with python _system/scripts/drive_intake_drop.py --kind VIC --ticker TICKER path/to/writeup.pdf. The Data Pipeline job drive runs daily at 14:00 UTC.",
+      "helper_repo_paths": [
+        "_system/scripts/drive_intake_drop.py",
+        "_system/agents/GROK.md",
+        ".github/workflows/data-pipeline.yml",
+        "_system/reference/document-store/google_drive_config.json"
+      ]
+    },
+    {
+      "id": "drive-manager-letters",
+      "type": "Drive folder",
+      "location": "Search Drive by name for manager letters. The repo Drive map uses Letters/{year and quarter}.",
+      "drive_id_policy": "search_by_name",
+      "purpose": "Manager letters on Drive. Search by name. No single folder id is indexed here.",
+      "owner_desk": "Magis Capital Partners / all desks",
+      "mode": "read",
+      "push": "Do not invent a folder id. A new letter follows the resource intake route, not a bot upload into an unlisted folder.",
+      "helper_repo_paths": [
+        "_system/reference/document-store/google_drive_config.json"
+      ]
+    },
+    {
+      "id": "drive-short-thesis-pitches",
+      "type": "Drive folder",
+      "location": "Search Drive by name for short-thesis pitch folders.",
+      "drive_id_policy": "search_by_name",
+      "purpose": "Short-thesis pitch folders on Drive. Search by name. No folder id is indexed here.",
+      "owner_desk": "Magis Capital Partners / all desks",
+      "mode": "read",
+      "push": "Do not invent a folder id. Search by name."
+    },
+    {
+      "id": "drive-conference-decks",
+      "type": "Drive folder",
+      "location": "Search Drive by name for conference decks.",
+      "drive_id_policy": "search_by_name",
+      "purpose": "Conference decks on Drive. Search by name. No folder id is indexed here.",
+      "owner_desk": "Magis Capital Partners / all desks",
+      "mode": "read",
+      "push": "Do not invent a folder id. Search by name."
+    },
+    {
+      "id": "memory-hub-research-equity",
+      "type": "memory hub",
+      "location": "_system/memory-hub/research-equity/",
+      "repo_path": "_system/memory-hub/research-equity",
+      "path_kind": "directory",
+      "local_path": "C:\\Users\\drewg\\Projects\\.agent-memory\\hubs\\research-equity\\",
+      "purpose": "Shared research-equity memory. Drew's local hub was copied in on 2026-10-12: CONTEXT.md (desk lines under the Desk heading), MEMORY.md (human promote only), bridges.md, daily/ notes through 2026-10-08, and the mesh-root GRAPH.md. Ranked desk output goes to desk-briefs, not here.",
+      "owner_desk": "Magis Capital Partners / all desks",
+      "mode": "append",
+      "push": "Append at most three [PROPOSED] lessons per session to daily/YYYY-MM-DD.md. Each lesson uses Evidence, Seen, Harmful, Scope, and Review after. Add at most one desk line under the Desk heading of CONTEXT.md. Never edit _system/memory/MEMORY.md or the hub MEMORY.md.",
+      "notes": "Drew's local copy is not reachable from the cloud; the repo copy is the one bots read and write. Do not invent content that is not there. Never create a new hub without Drew's approval. Never write the borrow-etf, diamond-creek, or spx-0dte hubs.",
+      "constraints": [
+        "Bots write only inside this directory.",
+        "Append at most three [PROPOSED] lessons per session.",
+        "Lesson fields are Evidence, Seen, Harmful, Scope, and Review after.",
+        "At most one desk line may be added to CONTEXT.md per session.",
+        "Never edit MEMORY.md.",
+        "Never create a new hub without Drew's approval.",
+        "Never write the borrow-etf, diamond-creek, or spx-0dte hubs."
+      ],
+      "helper_repo_paths": [
+        "_system/memory-hub/README.md",
+        "_system/memory-hub/research-equity/README.md",
+        "_system/memory-hub/research-equity/GRAPH.md",
+        "_system/memory-hub/research-equity/CONTEXT.md",
+        "_system/memory-hub/research-equity/MEMORY.md",
+        "_system/memory-hub/research-equity/bridges.md",
+        "_system/memory-hub/research-equity/daily/README.md",
+        "_system/agents/DESKS.md"
+      ],
+      "helper_repo_dirs": [
+        "_system/memory-hub/research-equity/daily"
+      ]
+    },
+    {
+      "id": "email-drewgoldman01",
+      "type": "email label",
+      "location": "drewgoldman01@gmail.com",
+      "account": "drewgoldman01@gmail.com",
+      "connector": "default",
+      "labels": [
+        "MOI Global",
+        "KEDM Lite",
+        "Base Hit",
+        "GitHub pipeline alerts"
+      ],
+      "purpose": "Default mailbox for newsletters and GitHub pipeline alerts. Read-only cross-reference of universe names.",
+      "owner_desk": "Magis Capital Partners / all desks",
+      "mode": "read",
+      "push": "Do not write. Do not store email content in this repo.",
+      "constraints": [
+        "Read-only.",
+        "Use messages only to cross-reference universe names.",
+        "Label each item as a newsletter or a letter with its date.",
+        "Treat it as a lead until a filing confirms it.",
+        "Do not store email content in this repo."
+      ],
+      "never_surface": [
+        "personal brokerage mail"
+      ]
+    },
+    {
+      "id": "email-magis",
+      "type": "email label",
+      "location": "drew@magiscapitalpartners.com",
+      "account": "drew@magiscapitalpartners.com",
+      "connector": "magis",
+      "labels": [
+        "prime-broker cap intro",
+        "manager letters",
+        "Friday Furnace"
+      ],
+      "purpose": "Magis mailbox. Read-only cross-reference of universe names from prime-broker cap intro notes, manager letters, and Friday Furnace.",
+      "owner_desk": "Magis Capital Partners / all desks",
+      "mode": "read",
+      "push": "Do not write. Do not store email content in this repo.",
+      "constraints": [
+        "Read-only.",
+        "Use messages only to cross-reference universe names.",
+        "Label each item as a newsletter or a letter with its date.",
+        "Treat it as a lead until a filing confirms it.",
+        "Do not store email content in this repo."
+      ]
+    },
+    {
+      "id": "dashboard-reverse-splits",
+      "type": "repo file",
+      "location": "dashboard/data/reverse_splits.json",
+      "repo_path": "dashboard/data/reverse_splits.json",
+      "path_kind": "file",
+      "freshness_field": "generated_at",
+      "purpose": "Reverse-split event ledger view: recent announcements, upcoming effective dates, repeat splitters, the RSI-1.0 process rules and honest limits. A reverse split is a discovery event, not a finding.",
+      "owner_desk": "Short Selling",
+      "mode": "read",
+      "push": "The Monday reverse-splits job and the nightly rebuild write this file from _system/data/reverse_splits/. A correction to the ledger is a pull request; the SQLite and caches stay local."
+    },
+    {
+      "id": "dashboard-short-alpha",
+      "type": "repo file",
+      "location": "dashboard/data/short_alpha.json",
+      "repo_path": "dashboard/data/short_alpha.json",
+      "path_kind": "file",
+      "freshness_field": "generated_at",
+      "purpose": "Short Alpha ledger view: candidates (leads, researching, live) with lenses, categories, lens reviews, borrow and crowding context. Rows with origin desk_note come from desk bots.",
+      "owner_desk": "Short Selling",
+      "mode": "read",
+      "push": "A new idea is a candidates.json row (origin desk_note) plus a note in the private research vault, by pull request on a grok/short_selling branch; the nightly rebuild validates the ledger and writes this file. Borrow comes from dashboard/data/short_alpha_borrow.json, written by refresh_short_alpha_borrow.py from IBKR's public usa.txt or a Client Portal CSV; each rate carries the file's own as_of."
+    }
+  ]
+}

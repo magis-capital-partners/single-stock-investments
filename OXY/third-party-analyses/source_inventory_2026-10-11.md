@@ -1,0 +1,177 @@
+# OXY — Third-party source inventory
+
+**Date:** 2026-10-11
+**Sources:** 168 total (0 approved, 0 pending, 168 context)
+
+| ID | Title | Path | Status | Use |
+|----|-------|------|--------|-----|
+| activist_long | OXY USA Inc — SC 13D/A | `OXY/third-party-analyses/activist_reports/long/SC-13D/A_20260205_acc0001140361_26_003920.xml` | context | activist/long — sec_edgar |
+| activist_long | OXY USA Inc — SC 13D/A | `OXY/third-party-analyses/activist_reports/long/SC-13D/A_20260121_acc0001140361_26_001917.xml` | context | activist/long — sec_edgar |
+| activist_long | OXY USA Inc. — SC 13D/A | `OXY/third-party-analyses/activist_reports/long/SC-13D/A_20240814_acc0001140361_24_037383.htm` | context | activist/long — sec_edgar |
+| activist_long | OXY USA Inc. — SC 13D/A | `OXY/third-party-analyses/activist_reports/long/SC-13D/A_20230914_acc0001140361_23_043973.htm` | context | activist/long — sec_edgar |
+| activist_long | OLCV Net Power, LLC — SC 13D | `OXY/third-party-analyses/activist_reports/long/SC-13D_20230620_acc0001140361_23_030516.htm` | context | activist/long — sec_edgar |
+| activist_long | OXY USA Inc. — SC 13D/A | `OXY/third-party-analyses/activist_reports/long/SC-13D/A_20220726_acc0001140361_22_026893.htm` | context | activist/long — sec_edgar |
+| activist_long | Icahn (+7) — SC 13D/A | `OXY/third-party-analyses/activist_reports/long/SC-13D/A_20220302_acc0001539497_22_000554.htm` | context | activist/long — sec_edgar |
+| activist_long | OXY USA Inc. — SC 13D/A | `OXY/third-party-analyses/activist_reports/long/SC-13D/A_20211220_acc0001140361_21_042466.htm` | context | activist/long — sec_edgar |
+| activist_long | Icahn (+7) — SC 13D/A | `OXY/third-party-analyses/activist_reports/long/SC-13D/A_20210806_acc0000921669_21_000115.htm` | context | activist/long — sec_edgar |
+| activist_long | Icahn (+7) — SC 13D/A | `OXY/third-party-analyses/activist_reports/long/SC-13D/A_20210429_acc0000921669_21_000086.htm` | context | activist/long — sec_edgar |
+| activist_long | Icahn (+7) — SC 13D/A | `OXY/third-party-analyses/activist_reports/long/SC-13D/A_20210407_acc0000921669_21_000062.htm` | context | activist/long — sec_edgar |
+| activist_long | Icahn (+7) — SC 13D/A | `OXY/third-party-analyses/activist_reports/long/SC-13D/A_20210402_acc0000921669_21_000058.htm` | context | activist/long — sec_edgar |
+| activist_long | Oxy USA Inc. — SC 13D/A | `OXY/third-party-analyses/activist_reports/long/SC-13D/A_20210402_acc0001140361_21_011430.htm` | context | activist/long — sec_edgar |
+| activist_long | Icahn Enterprises — SC 13D/A | `OXY/third-party-analyses/activist_reports/long/SC-13D/A_20210312_acc0000921669_21_000038.htm` | context | activist/long — sec_edgar |
+| activist_long | Icahn (+7) — SC 13D/A | `OXY/third-party-analyses/activist_reports/long/SC-13D/A_20201001_acc0000928464_20_000057.htm` | context | activist/long — sec_edgar |
+| activist_long | Oxy USA Inc. — SC 13D/A | `OXY/third-party-analyses/activist_reports/long/SC-13D/A_20200917_acc0001140361_20_020660.htm` | context | activist/long — sec_edgar |
+| activist_long | Icahn (+7) — SC 13D/A | `OXY/third-party-analyses/activist_reports/long/SC-13D/A_20200805_acc0000928464_20_000030.htm` | context | activist/long — sec_edgar |
+| activist_long | Icahn Enterprises — SC 13D/A | `OXY/third-party-analyses/activist_reports/long/SC-13D/A_20200325_acc0001104659_20_038352.htm` | context | activist/long — sec_edgar |
+| activist_long | Icahn Enterprises — DEFA14A | `OXY/third-party-analyses/activist_reports/long/DEFA14A_20200325_acc0001140361_20_006854.htm` | context | activist/long — sec_edgar |
+| activist_long | Icahn (+7) — DFAN14A (proxy solicitation) | `OXY/third-party-analyses/activist_reports/long/DFAN14A_20200312_acc0000928464_20_000012.htm` | context | activist/long — sec_edgar |
+| activist_long | Icahn (+7) — SC 13D | `OXY/third-party-analyses/activist_reports/long/SC-13D_20200312_acc0000928464_20_000010.htm` | context | activist/long — sec_edgar |
+| activist_long | Icahn Enterprises — DFAN14A (proxy solicitation) | `OXY/third-party-analyses/activist_reports/long/DFAN14A_20200212_acc0000928464_20_000003.htm` | context | activist/long — sec_edgar |
+| activist_long | Oxy USA Inc. — SC 13D/A | `OXY/third-party-analyses/activist_reports/long/SC-13D/A_20200107_acc0001140361_20_000345.htm` | context | activist/long — sec_edgar |
+| activist_long | Icahn Enterprises — DFAN14A (proxy solicitation) | `OXY/third-party-analyses/activist_reports/long/DFAN14A_20191108_acc0000928464_19_000091.htm` | context | activist/long — sec_edgar |
+| activist_long | Icahn Enterprises — DFAN14A (proxy solicitation) | `OXY/third-party-analyses/activist_reports/long/DFAN14A_20190829_acc0000928464_19_000081.htm` | context | activist/long — sec_edgar |
+| activist_long | Oxy USA Inc. — SC 13D | `OXY/third-party-analyses/activist_reports/long/SC-13D_20190819_acc0000950157_19_000901.htm` | context | activist/long — sec_edgar |
+| activist_long | Icahn Enterprises — DFAN14A (proxy solicitation) | `OXY/third-party-analyses/activist_reports/long/DFAN14A_20190813_acc0000928464_19_000073.htm` | context | activist/long — sec_edgar |
+| activist_long | Icahn Enterprises — DFAN14A (proxy solicitation) | `OXY/third-party-analyses/activist_reports/long/DFAN14A_20190725_acc0000928464_19_000055.htm` | context | activist/long — sec_edgar |
+| activist_long | Icahn Enterprises — DEFA14A | `OXY/third-party-analyses/activist_reports/long/DEFA14A_20190722_acc0000950157_19_000778.htm` | context | activist/long — sec_edgar |
+| activist_long | Icahn Enterprises — DFAN14A (proxy solicitation) | `OXY/third-party-analyses/activist_reports/long/DFAN14A_20190722_acc0001034563_19_000011.htm` | context | activist/long — sec_edgar |
+| activist_long | Icahn Enterprises — DEFC14A (proxy solicitation) | `OXY/third-party-analyses/activist_reports/long/DEFC14A_20190722_acc0001140361_19_013234.htm` | context | activist/long — sec_edgar |
+| activist_long | Icahn (+7) — DEFC14A (proxy solicitation) | `OXY/third-party-analyses/activist_reports/long/DEFC14A_20190718_acc0001144204_19_035084.htm` | context | activist/long — sec_edgar |
+| activist_long | Icahn Enterprises — PREC14A (proxy solicitation) | `OXY/third-party-analyses/activist_reports/long/PREC14A_20190702_acc0001140361_19_012312.htm` | context | activist/long — sec_edgar |
+| activist_long | Icahn (+7) — PREC14A (proxy solicitation) | `OXY/third-party-analyses/activist_reports/long/PREC14A_20190626_acc0001144204_19_032488.htm` | context | activist/long — sec_edgar |
+| activist_long | acc0001140361 22 008070 | `OXY/third-party-analyses/activist_reports/long/8-K_20220307_acc0001140361_22_008070.htm` | context | activist/long — local |
+| activist_long | acc0001140361 21 004140 | `OXY/third-party-analyses/activist_reports/long/8-K_20210210_acc0001140361_21_004140.htm` | context | activist/long — local |
+| activist_long | acc0001140361 20 006849 | `OXY/third-party-analyses/activist_reports/long/8-K_20200325_acc0001140361_20_006849.htm` | context | activist/long — local |
+| activist_long | acc0001104659 18 009023 | `OXY/third-party-analyses/activist_reports/long/8-K_20180213_acc0001104659_18_009023.htm` | context | activist/long — local |
+| activist_long | acc0001193125 18 069020 | `OXY/third-party-analyses/activist_reports/long/8-K_20180302_acc0001193125_18_069020.htm` | context | activist/long — local |
+| activist_long | acc0001104659 18 031309 | `OXY/third-party-analyses/activist_reports/long/8-K_20180508_acc0001104659_18_031309.htm` | context | activist/long — local |
+| activist_long | acc0001193125 18 159309 | `OXY/third-party-analyses/activist_reports/long/8-K_20180510_acc0001193125_18_159309.htm` | context | activist/long — local |
+| activist_long | acc0001104659 18 050512 | `OXY/third-party-analyses/activist_reports/long/8-K_20180808_acc0001104659_18_050512.htm` | context | activist/long — local |
+| activist_long | acc0001104659 18 065986 | `OXY/third-party-analyses/activist_reports/long/8-K_20181105_acc0001104659_18_065986.htm` | context | activist/long — local |
+| activist_long | acc0001193125 19 003760 | `OXY/third-party-analyses/activist_reports/long/8-K_20190107_acc0001193125_19_003760.htm` | context | activist/long — local |
+| activist_long | acc0001104659 19 007510 | `OXY/third-party-analyses/activist_reports/long/8-K_20190212_acc0001104659_19_007510.htm` | context | activist/long — local |
+| activist_long | acc0000950157 19 000473 | `OXY/third-party-analyses/activist_reports/long/8-K_20190424_acc0000950157_19_000473.htm` | context | activist/long — local |
+| activist_long | acc0000950157 19 000529 | `OXY/third-party-analyses/activist_reports/long/8-K_20190503_acc0000950157_19_000529.htm` | context | activist/long — local |
+| activist_long | acc0000950157 19 000537 | `OXY/third-party-analyses/activist_reports/long/8-K_20190506_acc0000950157_19_000537.htm` | context | activist/long — local |
+| activist_long | acc0001104659 19 026944 | `OXY/third-party-analyses/activist_reports/long/8-K_20190506_acc0001104659_19_026944.htm` | context | activist/long — local |
+| activist_long | acc0000950157 19 000572 | `OXY/third-party-analyses/activist_reports/long/8-K_20190510_acc0000950157_19_000572.htm` | context | activist/long — local |
+| activist_long | acc0001104659 19 028664 | `OXY/third-party-analyses/activist_reports/long/8-K_20190510_acc0001104659_19_028664.htm` | context | activist/long — local |
+| activist_long | acc0001140361 19 012908 | `OXY/third-party-analyses/activist_reports/long/8-K_20190715_acc0001140361_19_012908.htm` | context | activist/long — local |
+| activist_long | acc0001104659 19 043003 | `OXY/third-party-analyses/activist_reports/long/8-K_20190731_acc0001104659_19_043003.htm` | context | activist/long — local |
+| activist_long | acc0001140361 19 013932 | `OXY/third-party-analyses/activist_reports/long/8-K_20190801_acc0001140361_19_013932.htm` | context | activist/long — local |
+| activist_long | acc0000950157 19 000836 | `OXY/third-party-analyses/activist_reports/long/8-K_20190805_acc0000950157_19_000836.htm` | context | activist/long — local |
+| activist_long | acc0000950157 19 000864 | `OXY/third-party-analyses/activist_reports/long/8-K_20190808_acc0000950157_19_000864.htm` | context | activist/long — local |
+| activist_long | acc0001140361 19 014611 | `OXY/third-party-analyses/activist_reports/long/8-K_20190808_acc0001140361_19_014611.htm` | context | activist/long — local |
+| activist_long | acc0001140361 19 014971 | `OXY/third-party-analyses/activist_reports/long/8-K_20190813_acc0001140361_19_014971.htm` | context | activist/long — local |
+| activist_long | acc0001140361 19 015828 | `OXY/third-party-analyses/activist_reports/long/8-K_20190830_acc0001140361_19_015828.htm` | context | activist/long — local |
+| activist_long | acc0001140361 19 016945 | `OXY/third-party-analyses/activist_reports/long/8-K_20190919_acc0001140361_19_016945.htm` | context | activist/long — local |
+| activist_long | acc0001140361 19 016990 | `OXY/third-party-analyses/activist_reports/long/8-K_20190919_acc0001140361_19_016990.htm` | context | activist/long — local |
+| activist_long | acc0001140361 19 018395 | `OXY/third-party-analyses/activist_reports/long/8-K_20191015_acc0001140361_19_018395.htm` | context | activist/long — local |
+| activist_long | acc0001104659 19 059568 | `OXY/third-party-analyses/activist_reports/long/8-K_20191104_acc0001104659_19_059568.htm` | context | activist/long — local |
+| activist_long | acc0001140361 20 000411 | `OXY/third-party-analyses/activist_reports/long/8-K_20200107_acc0001140361_20_000411.htm` | context | activist/long — local |
+| activist_long | acc0001140361 20 002770 | `OXY/third-party-analyses/activist_reports/long/8-K_20200211_acc0001140361_20_002770.htm` | context | activist/long — local |
+| activist_long | acc0001104659 20 026174 | `OXY/third-party-analyses/activist_reports/long/8-K_20200227_acc0001104659_20_026174.htm` | context | activist/long — local |
+| activist_long | acc0001140361 20 005683 | `OXY/third-party-analyses/activist_reports/long/8-K_20200313_acc0001140361_20_005683.htm` | context | activist/long — local |
+| activist_long | acc0001140361 20 006632 | `OXY/third-party-analyses/activist_reports/long/8-K_20200324_acc0001140361_20_006632.htm` | context | activist/long — local |
+| activist_long | acc0001140361 20 007832 | `OXY/third-party-analyses/activist_reports/long/8-K_20200402_acc0001140361_20_007832.htm` | context | activist/long — local |
+| activist_long | acc0001140361 20 007995 | `OXY/third-party-analyses/activist_reports/long/8-K_20200403_acc0001140361_20_007995.htm` | context | activist/long — local |
+| activist_long | acc0001140361 20 008878 | `OXY/third-party-analyses/activist_reports/long/8-K_20200415_acc0001140361_20_008878.htm` | context | activist/long — local |
+| activist_long | acc0000797468 20 000008 | `OXY/third-party-analyses/activist_reports/long/8-K_20200505_acc0000797468_20_000008.htm` | context | activist/long — local |
+| activist_long | acc0001140361 20 012186 | `OXY/third-party-analyses/activist_reports/long/8-K_20200521_acc0001140361_20_012186.htm` | context | activist/long — local |
+| activist_long | acc0001140361 20 012988 | `OXY/third-party-analyses/activist_reports/long/8-K_20200603_acc0001140361_20_012988.htm` | context | activist/long — local |
+| activist_long | acc0001140361 20 014675 | `OXY/third-party-analyses/activist_reports/long/8-K_20200625_acc0001140361_20_014675.htm` | context | activist/long — local |
+| activist_long | acc0001140361 20 015887 | `OXY/third-party-analyses/activist_reports/long/8-K_20200713_acc0001140361_20_015887.htm` | context | activist/long — local |
+| activist_long | acc0001140361 20 016017 | `OXY/third-party-analyses/activist_reports/long/8-K_20200715_acc0001140361_20_016017.htm` | context | activist/long — local |
+| activist_long | acc0001140361 20 016673 | `OXY/third-party-analyses/activist_reports/long/8-K_20200727_acc0001140361_20_016673.htm` | context | activist/long — local |
+| activist_long | acc0001140361 20 017176 | `OXY/third-party-analyses/activist_reports/long/8-K_20200731_acc0001140361_20_017176.htm` | context | activist/long — local |
+| activist_long | acc0001140361 20 017320 | `OXY/third-party-analyses/activist_reports/long/8-K_20200803_acc0001140361_20_017320.htm` | context | activist/long — local |
+| activist_long | acc0000797468 20 000026 | `OXY/third-party-analyses/activist_reports/long/8-K_20200810_acc0000797468_20_000026.htm` | context | activist/long — local |
+| activist_long | acc0001140361 20 018270 | `OXY/third-party-analyses/activist_reports/long/8-K_20200813_acc0001140361_20_018270.htm` | context | activist/long — local |
+| activist_long | acc0001140361 20 018915 | `OXY/third-party-analyses/activist_reports/long/8-K_20200824_acc0001140361_20_018915.htm` | context | activist/long — local |
+| activist_long | acc0001140361 20 019096 | `OXY/third-party-analyses/activist_reports/long/8-K_20200826_acc0001140361_20_019096.htm` | context | activist/long — local |
+| activist_long | acc0001140361 20 020924 | `OXY/third-party-analyses/activist_reports/long/8-K_20200921_acc0001140361_20_020924.htm` | context | activist/long — local |
+| activist_long | acc0000797468 20 000032 | `OXY/third-party-analyses/activist_reports/long/8-K_20201109_acc0000797468_20_000032.htm` | context | activist/long — local |
+| activist_long | acc0001140361 20 027553 | `OXY/third-party-analyses/activist_reports/long/8-K_20201207_acc0001140361_20_027553.htm` | context | activist/long — local |
+| activist_long | acc0001140361 20 027684 | `OXY/third-party-analyses/activist_reports/long/8-K_20201208_acc0001140361_20_027684.htm` | context | activist/long — local |
+| activist_long | acc0001140361 20 029193 | `OXY/third-party-analyses/activist_reports/long/8-K_20201222_acc0001140361_20_029193.htm` | context | activist/long — local |
+| activist_long | acc0001140361 21 004400 | `OXY/third-party-analyses/activist_reports/long/8-K_20210211_acc0001140361_21_004400.htm` | context | activist/long — local |
+| activist_long | acc0000797468 21 000005 | `OXY/third-party-analyses/activist_reports/long/8-K_20210222_acc0000797468_21_000005.htm` | context | activist/long — local |
+| activist_long | acc0000797468 21 000016 | `OXY/third-party-analyses/activist_reports/long/8-K_20210510_acc0000797468_21_000016.htm` | context | activist/long — local |
+| activist_long | acc0001140361 21 016664 | `OXY/third-party-analyses/activist_reports/long/8-K_20210510_acc0001140361_21_016664.htm` | context | activist/long — local |
+| activist_long | acc0001140361 21 022638 | `OXY/third-party-analyses/activist_reports/long/8-K_20210629_acc0001140361_21_022638.htm` | context | activist/long — local |
+| activist_long | acc0001140361 21 024443 | `OXY/third-party-analyses/activist_reports/long/8-K_20210715_acc0001140361_21_024443.htm` | context | activist/long — local |
+| activist_long | acc0000797468 21 000027 | `OXY/third-party-analyses/activist_reports/long/8-K_20210803_acc0000797468_21_000027.htm` | context | activist/long — local |
+| activist_long | acc0001140361 21 030620 | `OXY/third-party-analyses/activist_reports/long/8-K_20210908_acc0001140361_21_030620.htm` | context | activist/long — local |
+| activist_long | acc0001140361 21 031831 | `OXY/third-party-analyses/activist_reports/long/8-K_20210920_acc0001140361_21_031831.htm` | context | activist/long — local |
+| activist_long | acc0000797468 21 000035 | `OXY/third-party-analyses/activist_reports/long/8-K_20211104_acc0000797468_21_000035.htm` | context | activist/long — local |
+| activist_long | acc0001140361 21 040049 | `OXY/third-party-analyses/activist_reports/long/8-K_20211202_acc0001140361_21_040049.htm` | context | activist/long — local |
+| activist_long | acc0000950157 21 001251 | `OXY/third-party-analyses/activist_reports/long/8-K_20211213_acc0000950157_21_001251.htm` | context | activist/long — local |
+| activist_long | acc0000797468 22 000007 | `OXY/third-party-analyses/activist_reports/long/8-K_20220224_acc0000797468_22_000007.htm` | context | activist/long — local |
+| activist_long | acc0001140361 22 006945 | `OXY/third-party-analyses/activist_reports/long/8-K_20220228_acc0001140361_22_006945.htm` | context | activist/long — local |
+| activist_long | acc0001140361 22 010740 | `OXY/third-party-analyses/activist_reports/long/8-K_20220323_acc0001140361_22_010740.htm` | context | activist/long — local |
+| activist_long | acc0000797468 22 000017 | `OXY/third-party-analyses/activist_reports/long/8-K_20220510_acc0000797468_22_000017.htm` | context | activist/long — local |
+| activist_long | acc0001140361 22 018654 | `OXY/third-party-analyses/activist_reports/long/8-K_20220511_acc0001140361_22_018654.htm` | context | activist/long — local |
+| activist_long | acc0001140361 22 019251 | `OXY/third-party-analyses/activist_reports/long/8-K_20220516_acc0001140361_22_019251.htm` | context | activist/long — local |
+| activist_long | acc0000797468 22 000029 | `OXY/third-party-analyses/activist_reports/long/8-K_20220802_acc0000797468_22_000029.htm` | context | activist/long — local |
+| activist_long | acc0001140361 22 035495 | `OXY/third-party-analyses/activist_reports/long/8-K_20220930_acc0001140361_22_035495.htm` | context | activist/long — local |
+| activist_long | acc0000797468 22 000035 | `OXY/third-party-analyses/activist_reports/long/8-K_20221108_acc0000797468_22_000035.htm` | context | activist/long — local |
+| activist_long | acc0001140361 23 000463 | `OXY/third-party-analyses/activist_reports/long/8-K_20230104_acc0001140361_23_000463.htm` | context | activist/long — local |
+| activist_long | acc0001140361 23 002320 | `OXY/third-party-analyses/activist_reports/long/8-K_20230120_acc0001140361_23_002320.htm` | context | activist/long — local |
+| activist_long | acc0000797468 23 000005 | `OXY/third-party-analyses/activist_reports/long/8-K_20230222_acc0000797468_23_000005.htm` | context | activist/long — local |
+| activist_long | acc0000797468 23 000009 | `OXY/third-party-analyses/activist_reports/long/8-K_20230227_acc0000797468_23_000009.htm` | context | activist/long — local |
+| activist_long | acc0000797468 23 000030 | `OXY/third-party-analyses/activist_reports/long/8-K_20230509_acc0000797468_23_000030.htm` | context | activist/long — local |
+| activist_long | acc0000797468 23 000053 | `OXY/third-party-analyses/activist_reports/long/8-K_20230511_acc0000797468_23_000053.htm` | context | activist/long — local |
+| activist_long | acc0000797468 23 000074 | `OXY/third-party-analyses/activist_reports/long/8-K_20230802_acc0000797468_23_000074.htm` | context | activist/long — local |
+| activist_long | acc0000797468 23 000078 | `OXY/third-party-analyses/activist_reports/long/8-K_20230809_acc0000797468_23_000078.htm` | context | activist/long — local |
+| activist_long | acc0000797468 23 000086 | `OXY/third-party-analyses/activist_reports/long/8-K_20231010_acc0000797468_23_000086.htm` | context | activist/long — local |
+| activist_long | acc0000797468 23 000091 | `OXY/third-party-analyses/activist_reports/long/8-K_20231107_acc0000797468_23_000091.htm` | context | activist/long — local |
+| activist_long | acc0001140361 23 057344 | `OXY/third-party-analyses/activist_reports/long/8-K_20231212_acc0001140361_23_057344.htm` | context | activist/long — local |
+| activist_long | acc0000950157 23 001280 | `OXY/third-party-analyses/activist_reports/long/8-K_20231228_acc0000950157_23_001280.htm` | context | activist/long — local |
+| activist_long | acc0000797468 24 000003 | `OXY/third-party-analyses/activist_reports/long/8-K_20240110_acc0000797468_24_000003.htm` | context | activist/long — local |
+| activist_long | acc0000797468 24 000005 | `OXY/third-party-analyses/activist_reports/long/8-K_20240122_acc0000797468_24_000005.htm` | context | activist/long — local |
+| activist_long | acc0000950157 24 000113 | `OXY/third-party-analyses/activist_reports/long/8-K_20240205_acc0000950157_24_000113.htm` | context | activist/long — local |
+| activist_long | acc0000797468 24 000033 | `OXY/third-party-analyses/activist_reports/long/8-K_20240214_acc0000797468_24_000033.htm` | context | activist/long — local |
+| activist_long | acc0000797468 24 000083 | `OXY/third-party-analyses/activist_reports/long/8-K_20240410_acc0000797468_24_000083.htm` | context | activist/long — local |
+| activist_long | acc0000797468 24 000089 | `OXY/third-party-analyses/activist_reports/long/8-K_20240506_acc0000797468_24_000089.htm` | context | activist/long — local |
+| activist_long | acc0000797468 24 000093 | `OXY/third-party-analyses/activist_reports/long/8-K_20240507_acc0000797468_24_000093.htm` | context | activist/long — local |
+| activist_long | acc0000797468 24 000121 | `OXY/third-party-analyses/activist_reports/long/8-K_20240710_acc0000797468_24_000121.htm` | context | activist/long — local |
+| activist_long | acc0000797468 24 000125 | `OXY/third-party-analyses/activist_reports/long/8-K_20240719_acc0000797468_24_000125.htm` | context | activist/long — local |
+| activist_long | acc0000950157 24 001005 | `OXY/third-party-analyses/activist_reports/long/8-K_20240719_acc0000950157_24_001005.htm` | context | activist/long — local |
+| activist_long | acc0000950157 24 001028 | `OXY/third-party-analyses/activist_reports/long/8-K_20240726_acc0000950157_24_001028.htm` | context | activist/long — local |
+| activist_long | acc0000797468 24 000130 | `OXY/third-party-analyses/activist_reports/long/8-K_20240801_acc0000797468_24_000130.htm` | context | activist/long — local |
+| activist_long | acc0001140361 24 035206 | `OXY/third-party-analyses/activist_reports/long/8-K_20240801_acc0001140361_24_035206.htm` | context | activist/long — local |
+| activist_long | acc0000950157 24 001041 | `OXY/third-party-analyses/activist_reports/long/8-K_20240802_acc0000950157_24_001041.htm` | context | activist/long — local |
+| activist_long | acc0000797468 24 000134 | `OXY/third-party-analyses/activist_reports/long/8-K_20240807_acc0000797468_24_000134.htm` | context | activist/long — local |
+| activist_long | acc0000797468 24 000142 | `OXY/third-party-analyses/activist_reports/long/8-K_20240812_acc0000797468_24_000142.htm` | context | activist/long — local |
+| activist_long | acc0001140361 24 037330 | `OXY/third-party-analyses/activist_reports/long/8-K_20240814_acc0001140361_24_037330.htm` | context | activist/long — local |
+| activist_long | acc0000797468 24 000158 | `OXY/third-party-analyses/activist_reports/long/8-K_20241009_acc0000797468_24_000158.htm` | context | activist/long — local |
+| activist_long | acc0001140361 24 044281 | `OXY/third-party-analyses/activist_reports/long/8-K_20241025_acc0001140361_24_044281.htm` | context | activist/long — local |
+| activist_long | acc0000797468 24 000163 | `OXY/third-party-analyses/activist_reports/long/8-K_20241112_acc0000797468_24_000163.htm` | context | activist/long — local |
+| activist_long | acc0001140361 24 046226 | `OXY/third-party-analyses/activist_reports/long/8-K_20241112_acc0001140361_24_046226.htm` | context | activist/long — local |
+| activist_long | acc0000797468 25 000003 | `OXY/third-party-analyses/activist_reports/long/8-K_20250110_acc0000797468_25_000003.htm` | context | activist/long — local |
+| activist_long | acc0000797468 25 000028 | `OXY/third-party-analyses/activist_reports/long/8-K_20250218_acc0000797468_25_000028.htm` | context | activist/long — local |
+| activist_long | acc0001140361 25 006670 | `OXY/third-party-analyses/activist_reports/long/8-K_20250303_acc0001140361_25_006670.htm` | context | activist/long — local |
+| activist_long | acc0000797468 25 000067 | `OXY/third-party-analyses/activist_reports/long/8-K_20250409_acc0000797468_25_000067.htm` | context | activist/long — local |
+| activist_long | acc0000797468 25 000072 | `OXY/third-party-analyses/activist_reports/long/8-K_20250506_acc0000797468_25_000072.htm` | context | activist/long — local |
+| activist_long | acc0000797468 25 000075 | `OXY/third-party-analyses/activist_reports/long/8-K_20250507_acc0000797468_25_000075.htm` | context | activist/long — local |
+| activist_long | acc0000797468 25 000101 | `OXY/third-party-analyses/activist_reports/long/8-K_20250714_acc0000797468_25_000101.htm` | context | activist/long — local |
+| activist_long | acc0001628280 25 036189 | `OXY/third-party-analyses/activist_reports/long/8-K_20250728_acc0001628280_25_036189.htm` | context | activist/long — local |
+| activist_long | acc0001628280 25 036241 | `OXY/third-party-analyses/activist_reports/long/8-K_20250728_acc0001628280_25_036241.htm` | context | activist/long — local |
+| activist_long | acc0000797468 25 000109 | `OXY/third-party-analyses/activist_reports/long/8-K_20250806_acc0000797468_25_000109.htm` | context | activist/long — local |
+| activist_long | acc0001140361 25 037058 | `OXY/third-party-analyses/activist_reports/long/8-K_20251002_acc0001140361_25_037058.htm` | context | activist/long — local |
+| activist_long | acc0001140361 25 037234 | `OXY/third-party-analyses/activist_reports/long/8-K_20251003_acc0001140361_25_037234.htm` | context | activist/long — local |
+| activist_long | acc0001140361 25 037245 | `OXY/third-party-analyses/activist_reports/long/8-K_20251003_acc0001140361_25_037245.htm` | context | activist/long — local |
+| activist_long | acc0001628280 25 044718 | `OXY/third-party-analyses/activist_reports/long/8-K_20251010_acc0001628280_25_044718.htm` | context | activist/long — local |
+| activist_long | acc0001628280 25 051056 | `OXY/third-party-analyses/activist_reports/long/8-K_20251110_acc0001628280_25_051056.htm` | context | activist/long — local |
+| activist_long | acc0001628280 26 000153 | `OXY/third-party-analyses/activist_reports/long/8-K_20260102_acc0001628280_26_000153.htm` | context | activist/long — local |
+| activist_long | acc0001628280 26 002483 | `OXY/third-party-analyses/activist_reports/long/8-K_20260120_acc0001628280_26_002483.htm` | context | activist/long — local |
+| activist_long | acc0001628280 26 009054 | `OXY/third-party-analyses/activist_reports/long/8-K_20260218_acc0001628280_26_009054.htm` | context | activist/long — local |
+| activist_long | acc0000950157 26 000166 | `OXY/third-party-analyses/activist_reports/long/8-K_20260219_acc0000950157_26_000166.htm` | context | activist/long — local |
+| activist_long | acc0000950157 26 000265 | `OXY/third-party-analyses/activist_reports/long/8-K_20260309_acc0000950157_26_000265.htm` | context | activist/long — local |
+| activist_long | acc0001628280 26 024581 | `OXY/third-party-analyses/activist_reports/long/8-K_20260410_acc0001628280_26_024581.htm` | context | activist/long — local |
+| activist_long | acc0000950157 26 000569 | `OXY/third-party-analyses/activist_reports/long/8-K_20260504_acc0000950157_26_000569.htm` | context | activist/long — local |
+| activist_long | acc0001628280 26 030567 | `OXY/third-party-analyses/activist_reports/long/8-K_20260505_acc0001628280_26_030567.htm` | context | activist/long — local |
+| activist_long | acc0001628280 26 047886 | `OXY/third-party-analyses/activist_reports/long/8-K_20260710_acc0001628280_26_047886.htm` | context | activist/long — local |
+| activist_long | acc0001628280 26 053377 | `OXY/third-party-analyses/activist_reports/long/8-K_20260805_acc0001628280_26_053377.htm` | context | activist/long — local |
+
+Cross-check required: `OXY/research/cross_check_third_party_2026-10-11.md`

@@ -75,6 +75,22 @@ CATALYST_PATH = re.compile(r"#### Catalyst path", re.IGNORECASE)
 LENS_FAILURE = re.compile(r"\*\*Lens failure mode:\*\*", re.IGNORECASE)
 PAYOFF_LENS = re.compile(r"\*\*Payoff lens\*\*", re.IGNORECASE)
 
+# Separations (special_situation_lens.md § Separations)
+SPECIAL_SITUATION = re.compile(r"\*\*Archetype\*\*.*special_situation", re.IGNORECASE)
+WHO_MUST_SELL = re.compile(r"#### Who must sell", re.IGNORECASE)
+# "annualized spread of 14%" / "a 14% annualised exchange spread": the phrase and a
+# percent on the same line. A spread without a filed formula is a headline.
+ANNUALIZED_SPREAD = re.compile(
+    r"(?:-?\d+(?:\.\d+)?\s*%[^\n]{0,60}?annuali[sz]ed\s.{0,20}?spread"
+    r"|annuali[sz]ed\s.{0,20}?spread[^\n]{0,120}?-?\d+(?:\.\d+)?\s*%)",
+    re.IGNORECASE,
+)
+SPREAD_BASIS_FILED = frozenset({"filing_formula", "final_filed"})
+# Dives dated on or after this day fail on a missing event_window_end; earlier
+# event-lens dives (AES, GDRZF, HE, PCH, QDEL, STHO, XTIA) predate the field and warn.
+EVENT_WINDOW_END_ERROR_FROM = "2026-10-11"
+DIVE_DATE = re.compile(r"deep_dive_(\d{4}-\d{2}-\d{2})")
+
 EM_DASH = "\u2014"  # —
 EXEC_SUMMARY_MAX_WORDS = 220
 EM_DASH_MAX = 1
@@ -109,11 +125,26 @@ def ticker_from_dive_path(path: Path) -> str | None:
     return None
 
 
-def load_valuation(ticker: str) -> dict:
-    val_path = ROOT / ticker / "research" / "valuation.json"
+def load_valuation(ticker: str, research_dir: Path | None = None) -> dict:
+    val_path = (research_dir / "valuation.json") if research_dir else (
+        ROOT / ticker / "research" / "valuation.json"
+    )
     if not val_path.exists():
         return {}
-    return json.loads(val_path.read_text(encoding="utf-8"))
+    try:
+        return json.loads(val_path.read_text(encoding="utf-8"))
+    except json.JSONDecodeError:
+        return {}
+
+
+def dive_date(path: Path) -> str | None:
+    m = DIVE_DATE.search(path.name)
+    return m.group(1) if m else None
+
+
+def separation_block(val: dict) -> dict:
+    sep = val.get("separation") if isinstance(val, dict) else None
+    return sep if isinstance(sep, dict) and sep else {}
 
 
 def registry_flags(ticker: str) -> dict:
@@ -316,11 +347,68 @@ def lint_crypto_nav_discount(rel: Path, text: str, val: dict, ticker: str) -> li
     return errors
 
 
+def lint_separation(
+    rel: Path, path: Path, text: str, val: dict
+) -> tuple[list[str], list[str]]:
+    """special_situation_lens.md § Separations: a dated end, the Who-must-sell table,
+    no spread without a filed formula, and a catalyst path for special_situation."""
+    errors: list[str] = []
+    warnings: list[str] = []
+    ci = val.get("classification_inputs") if isinstance(val, dict) else None
+    ci = ci if isinstance(ci, dict) else {}
+    sep = separation_block(val)
+    body = body_before_classification(text)
+
+    # (a) payoff_lens: event needs a dated end in either location
+    if str(ci.get("payoff_lens") or "").lower() == "event":
+        if not (ci.get("event_window_end") or sep.get("event_window_end")):
+            msg = (
+                f"{rel}: event lens without a dated end — set "
+                "classification_inputs.event_window_end or separation.event_window_end "
+                "(special_situation_lens.md)"
+            )
+            dated = dive_date(path)
+            if dated and dated < EVENT_WINDOW_END_ERROR_FROM:
+                warnings.append(msg)
+            else:
+                errors.append(msg)
+
+    # (b) a separation block needs the Who-must-sell table
+    if sep and not WHO_MUST_SELL.search(text):
+        errors.append(
+            f"{rel}: separation block — missing #### Who must sell table under "
+            "Why the market might be wrong (special_situation_lens.md § Separations)"
+        )
+
+    # (c) an annualized spread in prose needs a filed formula behind it
+    if ANNUALIZED_SPREAD.search(body):
+        basis = str(sep.get("spread_basis") or "").lower()
+        if basis not in SPREAD_BASIS_FILED:
+            errors.append(
+                f"{rel}: spread without a filed formula — annualized spread in prose "
+                "requires separation.spread_basis in {filing_formula, final_filed} "
+                "(special_situation_lens.md § Separations)"
+            )
+
+    # (d) archetype special_situation needs a dated catalyst path (holding_co style)
+    is_special = bool(SPECIAL_SITUATION.search(text)) or (
+        str(ci.get("archetype") or "").lower() == "special_situation"
+    )
+    if is_special and not CATALYST_PATH.search(text):
+        errors.append(
+            f"{rel}: special_situation — missing #### Catalyst path (dated events)"
+        )
+    return errors, warnings
+
+
 def lint_file(path: Path, *, legacy: bool, strict: bool) -> tuple[list[str], list[str]]:
     text = path.read_text(encoding="utf-8", errors="ignore")
     errors: list[str] = []
     warnings: list[str] = []
-    rel = path.relative_to(ROOT)
+    try:
+        rel = path.relative_to(ROOT)
+    except ValueError:
+        rel = path
 
     for pattern, name in REQUIRED_SECTIONS:
         if legacy and name in (
@@ -412,7 +500,7 @@ def lint_file(path: Path, *, legacy: bool, strict: bool) -> tuple[list[str], lis
 
     if BARE_UPLIFT_PCT.search(text):
         has_bottom_up = BOTTOM_UP_UPLIFT.search(text)
-        val = load_valuation(ticker) if ticker else {}
+        val = load_valuation(ticker, path.parent) if ticker else {}
         sotp = ((val.get("scenarios") or {}).get("base") or {}).get("sotp_build") or {}
         ledger = sotp.get("assumption_ledger") or {}
         ia = ledger.get("investment_a_lookthrough") or {}
@@ -445,9 +533,12 @@ def lint_file(path: Path, *, legacy: bool, strict: bool) -> tuple[list[str], lis
 
     ticker = ticker_from_dive_path(path)
     if ticker and not legacy:
-        val = load_valuation(ticker)
+        val = load_valuation(ticker, path.parent)
         errors.extend(lint_shadow_fund_nav(rel, text, val))
         errors.extend(lint_crypto_nav_discount(rel, text, val, ticker))
+        sep_errors, sep_warnings = lint_separation(rel, path, text, val)
+        errors.extend(sep_errors)
+        warnings.extend(sep_warnings)
         overlay = val.get("valuation_overlay")
         if overlay == "segment_cashflow":
             if not SEGMENT_MAP.search(text):
