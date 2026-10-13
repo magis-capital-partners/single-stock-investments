@@ -442,7 +442,7 @@ class SecArchive:
             ):
                 raise SourceUnavailable("Empty or denied content")
             temp = path.with_suffix(".tmp")
-            temp.write_bytes(gzip.compress(raw, mtime=0))
+            temp.write_bytes(gzip.compress(raw, compresslevel=3, mtime=0))
             temp.replace(path)
             with self.db_lock:
                 self.conn.execute(

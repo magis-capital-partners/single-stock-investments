@@ -87,6 +87,11 @@ def expansion_windows(cfg, *, start='2018-05-01',cutoff=None):
     windows=event_windows(events,joins)
     for w in windows:
         w['hi']+=timedelta(days=120)
+    from .detector_catalogue import candidates
+    for row in candidates(cfg, start, cutoff):
+        ex=date.fromisoformat(row['ex_date'])
+        windows.append({'ticker':row['ticker'],'norm':normalize_symbol(row['ticker']),
+                        'lo':ex-timedelta(days=120),'hi':ex+timedelta(days=180)})
     conn=connect(cfg)
     try:
         for r in conn.execute('SELECT ticker,filed_at,scheduled FROM disclosures WHERE eligible=1 AND ticker IS NOT NULL AND filed_at BETWEEN ? AND ?',(start,cutoff)):

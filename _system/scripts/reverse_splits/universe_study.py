@@ -45,7 +45,7 @@ def issuer(row):
     )
 
 
-def catalogue(cfg, disclosures, start, cutoff):
+def catalogue(cfg, disclosures, start, cutoff, *, detector_report=None, detector_coverage=None):
     schedules = defaultdict(list)
     for row in disclosures:
         if (
@@ -134,6 +134,9 @@ def catalogue(cfg, disclosures, start, cutoff):
         for r in read_json(location(cfg) / "reference_actions/actions.json", [])
         if start <= r["ex_date"] <= cutoff
     )
+    from .detector_catalogue import candidates
+
+    rows.extend(candidates(cfg, start, cutoff, report=detector_report, coverage=detector_coverage))
     present = {(str(r.get("cik") or "").lstrip("0"), r["ex_date"]) for r in rows}
     for d in disclosures:
         ex = d.get("scheduled")
@@ -743,6 +746,13 @@ def run(cfg, *, start="2018-05-01", cutoff=None):
             ssr_policy="delay up to two sessions when observed restricted; unknown state is conditional",
         )
         write_json(root / "plan.json", spec)
+        frozen_reports = {}
+        for name in ("split_detections.csv", "split_detection_reconciliation.json"):
+            source = cfg.reports_dir / name
+            target = root / name
+            if source.exists():
+                shutil.copy2(source, target)
+                frozen_reports[name] = digest(target)
         with sqlite3.connect(root / "input.sqlite") as target:
             conn.backup(target)
         conn.close()
@@ -780,7 +790,11 @@ def run(cfg, *, start="2018-05-01", cutoff=None):
                 )
             ],
         }
-        events = catalogue(cfg, disclosures, start, cutoff)
+        events = catalogue(
+            cfg, disclosures, start, cutoff,
+            detector_report=root / "split_detections.csv",
+            detector_coverage=root / "split_detection_reconciliation.json",
+        )
         frames, nominal, flags = price_frames(cfg, root / "prices.sqlite")
         nominal.update(apply_imports(conn, events, frames))
         events = [e for e in events if start <= e["ex_date"] <= cutoff]
@@ -958,6 +972,7 @@ def run(cfg, *, start="2018-05-01", cutoff=None):
             "input_sha256": digest(root / "input.sqlite"),
             "prices_sha256": digest(root / "prices.sqlite"),
             "code": code,
+            "detector_reports": frozen_reports,
             "ledger_sources": [
                 {"path": name, "sha256": digest(cfg.ledger_dir / name)}
                 for name in ("events.jsonl", "book_runs.jsonl")
