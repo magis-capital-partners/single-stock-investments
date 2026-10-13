@@ -1,0 +1,72 @@
+# Reverse-split short research configuration (package: _system/scripts/reverse_splits).
+#
+# Relative paths resolve against this file's directory. Everything under
+# local/ is a build artifact and is ignored by git; the JSONL ledger beside
+# this file is the committed truth (see README.md).
+
+[paths]
+data_dir = "."
+ledger_dir = "."
+db_path = "local/reverse_splits.db"
+decisions_db = "local/strategy_decisions.sqlite"
+raw_dir = "local/raw"
+edgar_cache = "local/raw/edgar"
+finra_dir = "local/raw/finra"
+ibkr_dir = "local/raw/ibkr"
+databento_dir = "local/raw/databento"
+reports_dir = "local/reports"
+public_dir = "local/reports/public"
+
+[edgar]
+# SEC requires a descriptive User-Agent with a contact address.
+user_agent = "MagisCapitalResearch/0.2 (reverse-split research; contact: drewgoldman01@gmail.com)"
+request_delay_seconds = 0.2
+lookback_days = 365
+lookahead_days = 30
+
+[universe]
+years_back = 5
+exchanges_listed = ["NYSE", "NASDAQ", "AMEX", "NYSEARCA", "BATS"]
+include_otc = true
+
+[prices]
+pre_event_days = 120
+post_event_days = 60
+
+[backtest]
+max_book_usd = 50000
+max_participation = 0.25
+default_notional_per_trade = 5000
+fee_scenarios_annual = [0.0, 0.20, 0.50, 1.00]
+horizons_days = [1, 5, 10, 20]
+
+# There is deliberately no broker section. The live broker snapshot path was
+# deleted in the SSI migration; borrow evidence enters only through
+# `borrow-csv` (Client Portal Short-Securities Availability export).
+
+[execution]
+# Printed price floor. Sub-dollar names are dropped rather than shorted.
+min_price = 1.0
+spread_floor_usd = 0.01
+spread_range_fraction = 0.25
+force_cover_before_ex = true
+max_names = 10
+entry_signal = "announce"
+listed_only = true
+# strict: no point-in-time locate means no trade.
+# assumed_fee: explicit scenario, labeled as such on every row.
+borrow_policy = "assumed_fee"
+assumed_fee_annual = 1.0
+horizon_days = 5
+jump_window_sessions = 3
+require_filing_text = false
+
+[controls]
+sample_size = 80
+price_caliper = 1.5
+volume_caliper = 3.0
+
+[fundamentals]
+# Read-only bridge to this repository's SEC quarterly extractor and Short Alpha
+# thresholds; resolved relative to this file (../../.. is the repo root).
+ssi_root = "../../.."

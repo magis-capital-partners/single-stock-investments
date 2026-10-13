@@ -24,6 +24,7 @@ MENTAL_MODELS = re.compile(r"### Mental models\b", re.I)
 LOOKTHROUGH = re.compile(r"#### Look-through snapshot", re.I)
 SOTP_NAV = re.compile(r"#### (Sum-of-parts or NAV|Sum-of-the-parts)", re.I)
 CATALYST = re.compile(r"#### Catalyst path", re.I)
+WHO_MUST_SELL = re.compile(r"#### Who must sell", re.I)
 SEGMENT_MAP = re.compile(r"#### Segment map", re.I)
 HK_BLOCK = re.compile(r"#### HK (commentary|cross-reference|scan)", re.I)
 VALUATION_SECTION = re.compile(r"## Valuation & IRR", re.I)
@@ -150,16 +151,21 @@ def score_dive(path: Path, *, archetype_strict: bool = False) -> DepthResult:
             break
 
     clf = load_classification(ticker) if ticker else {}
-    archetype = (clf.get("archetype") or "").strip().lower()
 
     val: dict = {}
     if ticker:
-        vp = ROOT / ticker / "research" / "valuation.json"
+        # The dive's own research dir (== ROOT/{ticker}/research in the repo; temp fixtures elsewhere)
+        vp = path.parent / "valuation.json"
         if vp.exists():
             try:
                 val = json.loads(vp.read_text(encoding="utf-8"))
             except json.JSONDecodeError:
                 val = {}
+
+    archetype = (clf.get("archetype") or "").strip().lower()
+    if not archetype:
+        ci = val.get("classification_inputs") if isinstance(val, dict) else None
+        archetype = str((ci or {}).get("archetype") or "").strip().lower()
 
     criteria: list[CriterionScore] = []
 
@@ -349,6 +355,13 @@ def score_dive(path: Path, *, archetype_strict: bool = False) -> DepthResult:
             arch_errors.append("holding_co: missing SOTP/NAV build section")
         if not CATALYST.search(text):
             arch_warns.append("holding_co: missing #### Catalyst path")
+
+    # special_situation_lens.md § Separations
+    if archetype == "special_situation" and not CATALYST.search(text):
+        arch_errors.append("special_situation: missing #### Catalyst path")
+    sep = val.get("separation") if isinstance(val, dict) else None
+    if isinstance(sep, dict) and sep and not WHO_MUST_SELL.search(text):
+        arch_errors.append("separation: missing #### Who must sell table")
 
     overlay = val.get("valuation_overlay") or ""
     nav = val.get("nav_overlay") is not None

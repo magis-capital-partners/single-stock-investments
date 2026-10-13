@@ -506,7 +506,13 @@ jobs:
     # go straight to main.
     if: needs.changes.outputs.fact_currency == 'true'
     runs-on: ubuntu-latest
-    timeout-minutes: 30
+    # Full-tree checkout of this repo is about 200k files. 30 minutes cancelled
+    # this job during "Checkout workspace (full)" on AMZN PR #1144
+    # (run 37996092550, 2026-10-09). GitHub reports a job timeout as cancelled,
+    # and the automerge gate treated that as a failed Research quality check.
+    # Match graph-invariants at 90. The checkout step's own limit fails a hang
+    # as a step failure instead of cancelling the whole job.
+    timeout-minutes: 90
     steps:
       - uses: jlumbroso/free-disk-space@54081f138730dfa15788a46383842cd2f914a1be # v1.3.1
         with:
@@ -528,6 +534,10 @@ jobs:
         # Full tree: the scan resolves each row's `source.ref` to the evidence file
         # it names (`{TICKER}/research/evidence/sec_companyfacts.json`), so a sparse
         # profile would turn real rows into silent "locator does not resolve".
+        # The 2026-10-09 run was still inside this step at the old 30-minute
+        # job limit (~28 minutes elapsed). 45 leaves room without waiting out
+        # the whole 90-minute job on a hung checkout.
+        timeout-minutes: 45
         run: bash _system/scripts/ci_checkout_workspace.sh full "$CHECKOUT_SHA"
       - uses: actions/setup-python@v5
         with:

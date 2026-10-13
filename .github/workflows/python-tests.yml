@@ -24,6 +24,24 @@ on:
       - "dashboard/data/criticality_summary.json"
       - "ops-watchdog/**"
       - "AMZN/investor-documents/download_amzn_investor_docs.py"
+      - "SOURCES.md"
+      - ".gitignore"
+      - "CONTRIBUTING.md"
+      - "docs/WRITE_MAP.md"
+      - "dashboard/index.html"
+      - "dashboard/index-viz.js"
+      - "dashboard/special-situations-viz.js"
+      - "dashboard/separations-viz.js"
+      - "dashboard/desk-briefs-viz.js"
+      - "dashboard/overlap-viz.js"
+      - "dashboard/short-alpha-viz.js"
+      - "dashboard/reverse-splits-viz.js"
+      - "dashboard/ideas.css"
+      - "dashboard/short-alpha.css"
+      - "dashboard/data/separations.json"
+      - "dashboard/data/special_situations.json"
+      - "dashboard/data/desk_briefs.json"
+      - "dashboard/data/short_alpha.json"
   push:
     branches: [main]
     paths:
@@ -35,6 +53,24 @@ on:
       - "dashboard/data/criticality_summary.json"
       - "ops-watchdog/**"
       - "AMZN/investor-documents/download_amzn_investor_docs.py"
+      - "SOURCES.md"
+      - ".gitignore"
+      - "CONTRIBUTING.md"
+      - "docs/WRITE_MAP.md"
+      - "dashboard/index.html"
+      - "dashboard/index-viz.js"
+      - "dashboard/special-situations-viz.js"
+      - "dashboard/separations-viz.js"
+      - "dashboard/desk-briefs-viz.js"
+      - "dashboard/overlap-viz.js"
+      - "dashboard/short-alpha-viz.js"
+      - "dashboard/reverse-splits-viz.js"
+      - "dashboard/ideas.css"
+      - "dashboard/short-alpha.css"
+      - "dashboard/data/separations.json"
+      - "dashboard/data/special_situations.json"
+      - "dashboard/data/desk_briefs.json"
+      - "dashboard/data/short_alpha.json"
   # Bot pushes (GITHUB_TOKEN) start no workflow, so main is also tested daily.
   schedule:
     - cron: "23 5 * * *"
@@ -70,6 +106,30 @@ jobs:
           set -euo pipefail
           python -m pip install --disable-pip-version-check --quiet "ruff==0.16.0"
           python _system/scripts/check_undefined_names.py _system/scripts _system/trading
+
+  hub-payloads:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.pull_request.head.sha || github.sha }}
+          fetch-depth: 1
+          filter: blob:none
+          sparse-checkout: |
+            /_system/scripts/check_hub_payloads.py
+            /dashboard/data/core.json
+            /dashboard/data/desk_briefs.json
+            /dashboard/data/reverse_splits.json
+            /dashboard/data/short_alpha.json
+            /dashboard/data/special_situations.json
+            /dashboard/data/separations.json
+          sparse-checkout-cone-mode: false
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Committed hub shards reconcile
+        run: python _system/scripts/check_hub_payloads.py
 
   market-data-csvs:
     # The unit-test checkout leaves out the reference corpus, so the CSVs
@@ -110,6 +170,19 @@ jobs:
         _system/scripts/test_build_lane_receipts.py
         _system/scripts/test_supervisor_workflows.py
         _system/scripts/test_fetch_video_transcript.py
+        _system/scripts/test_wait_for_workflow_run.py
+        _system/scripts/test_check_media_analysis_freshness.py
+        _system/scripts/test_build_dashboard_shards.py
+        _system/scripts/test_special_situations.py
+        _system/scripts/test_split_off_terms.py
+        _system/scripts/test_separation_flow_impact.py
+        _system/scripts/test_separation_wiring.py
+        _system/scripts/test_separation_falsifier_adapter.py
+        _system/scripts/test_lint_deep_dive_separation.py
+        _system/scripts/test_separations_ui.py
+        _system/scripts/test_cvr_discovery.py
+        _system/scripts/test_generalized_valuation_system.py
+        _system/scripts/test_activist_attribution.py
     steps:
       - uses: actions/checkout@v4
         with:
@@ -119,8 +192,8 @@ jobs:
           # What the suites read: _system without the reference corpus (its
           # top-level registries stay), the workflows some tests parse, the D1
           # migrations, edge functions and oauth proxy, the ops-watchdog worker
-          # config, one criticality summary, and one ticker download script for
-          # the payload-path test.
+          # config, one criticality summary, one ticker download script for
+          # the payload-path test, and SOURCES.md for the source-index contract.
           sparse-checkout: |
             /_system/
             !/_system/reference/*/
@@ -131,10 +204,34 @@ jobs:
             /dashboard/data/criticality_summary.json
             /ops-watchdog/
             /AMZN/investor-documents/download_amzn_investor_docs.py
+            /SOURCES.md
+            /.gitignore
+            /CONTRIBUTING.md
+            /docs/WRITE_MAP.md
+            /dashboard/index.html
+            /dashboard/index-viz.js
+            /dashboard/special-situations-viz.js
+            /dashboard/separations-viz.js
+            /dashboard/desk-briefs-viz.js
+            /dashboard/overlap-viz.js
+            /dashboard/short-alpha-viz.js
+            /dashboard/reverse-splits-viz.js
+            /dashboard/ideas.css
+            /dashboard/short-alpha.css
+            /dashboard/data/separations.json
+            /dashboard/data/special_situations.json
+            /dashboard/data/desk_briefs.json
+            /dashboard/data/short_alpha.json
           sparse-checkout-cone-mode: false
       - uses: actions/setup-python@v5
         with:
           python-version: "3.12"
+      - name: Set up the Node runtime for UI suites
+        uses: actions/setup-node@v4
+        with:
+          node-version: "24"
+      - name: Show the UI test runtime
+        run: node --version
       - name: Install test dependencies
         # Deliberately not the trading requirements files: those pull in
         # ib_async / ib_insync, and the tests are written for their absence

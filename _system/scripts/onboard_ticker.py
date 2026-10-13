@@ -236,12 +236,75 @@ def scaffold_folder(ticker: str, company: str, market: str, ir_url: str = "") ->
     return scaffold_us(ticker, company)
 
 
-def write_thesis(ticker: str, company: str, classification: dict) -> None:
+def separation_link(parent: str | None, separation_id: str | None) -> tuple[dict, list[str]]:
+    """Registry fields for a SpinCo onboarded off a separation, plus warnings.
+
+    The id is checked against the separation register through
+    ``separation_common``; a missing or empty register warns and never fails,
+    because the SpinCo is usually onboarded the day it lists, before the
+    register row has its final terms.
+    """
+    fields: dict = {}
+    warnings: list[str] = []
+    if not parent and not separation_id:
+        return fields, warnings
+    if parent:
+        fields["parent_ticker"] = parent.strip().upper()
+    if separation_id:
+        fields["separation_id"] = separation_id.strip()
+    try:
+        from separation_common import latest_registry
+
+        records = latest_registry()
+    except Exception as exc:  # noqa: BLE001 - the register is advisory here
+        warnings.append(f"separation register unreadable ({exc}); linkage recorded unverified")
+        return fields, warnings
+    if not records:
+        warnings.append("separation register is empty; linkage recorded unverified")
+        return fields, warnings
+    if separation_id:
+        match = next((r for r in records if str(r.get("separation_id")) == fields["separation_id"]), None)
+        if match is None:
+            warnings.append(f"separation_id {fields['separation_id']} is not in the separation register")
+        else:
+            registered_parent = str(match.get("parent_ticker") or "").upper()
+            if parent and registered_parent and registered_parent != fields["parent_ticker"]:
+                warnings.append(
+                    f"--parent {fields['parent_ticker']} disagrees with the register "
+                    f"({registered_parent}) for {fields['separation_id']}"
+                )
+            if not parent and registered_parent:
+                fields["parent_ticker"] = registered_parent
+            if match.get("kind"):
+                fields["separation_kind"] = str(match["kind"])
+    elif parent:
+        if not any(str(r.get("parent_ticker") or "").upper() == fields["parent_ticker"] for r in records):
+            warnings.append(
+                f"no separation in the register has parent {fields['parent_ticker']}; "
+                "pass --separation-id once it exists"
+            )
+    return fields, warnings
+
+
+def write_thesis(ticker: str, company: str, classification: dict, separation: dict | None = None) -> None:
     today = datetime.now(timezone.utc).strftime("%Y-%m-%d")
     path = ROOT / ticker / "research" / "thesis.md"
     path.parent.mkdir(parents=True, exist_ok=True)
     pred = classification.get("predictive_attribute")
     pred_row = f"| **Predictive attribute** | {pred} |\n" if pred else ""
+    separation = separation or {}
+    sep_row = ""
+    sep_note = ""
+    if separation:
+        parent = separation.get("parent_ticker") or "unknown parent"
+        sep_id = separation.get("separation_id") or "separation id pending"
+        kind = separation.get("separation_kind") or "separation"
+        sep_row = f"| **Separation** | SpinCo of {parent} ({kind}, {sep_id}) |\n"
+        sep_note = (
+            f"{company} was separated from {parent} ({kind}, `{sep_id}`). Orphan-window supply is a "
+            f"timing input, not value: see `_system/frameworks/special_situation_lens.md` "
+            f"§ Separations and `_system/data/separations/`.\n\n"
+        )
     path.write_text(
         f"# {ticker} — Investment Thesis\n\n"
         f"**Last updated:** {today}\n\n"
@@ -254,8 +317,9 @@ def write_thesis(ticker: str, company: str, classification: dict) -> None:
         f"| **Cycle** | {classification.get('cycle', '-')} |\n"
         f"| **MOI bucket** (legacy) | {classification.get('moi_bucket', 'pending')} |\n"
         f"| **Payoff lens** | {classification.get('payoff_lens', 'pending')} |\n"
-        f"{pred_row}\n"
+        f"{pred_row}{sep_row}\n"
         f"## One-line thesis\n\n"
+        f"{sep_note}"
         f"{company} — thesis pending Marvin deep dive.\n\n"
         f"## Key questions\n\n"
         f"- [ ] Read latest annual report\n"
@@ -433,6 +497,15 @@ def onboard(args: argparse.Namespace) -> int:
         download.setdefault("options", {})["download_8k_exhibits"] = True
 
     classification = {**DEFAULT_CLASSIFICATION}
+    separation, sep_warnings = separation_link(
+        getattr(args, "parent", None), getattr(args, "separation_id", None)
+    )
+    for warning in sep_warnings:
+        log(f"WARN separation: {warning}")
+    if separation:
+        # A newly listed SpinCo is an event payoff until its own operating
+        # contract is locked; the separation trigger routes the lens.
+        classification["payoff_lens"] = "event"
     if args.from_watchlist and ticker in (reg.get("watchlist") or {}):
         remove_from_watchlist(reg, ticker)
 
@@ -444,6 +517,10 @@ def onboard(args: argparse.Namespace) -> int:
         "download": download,
         "classification": classification,
     }
+    if separation.get("parent_ticker"):
+        entry["parent_ticker"] = separation["parent_ticker"]
+    if separation.get("separation_id"):
+        entry["separation_id"] = separation["separation_id"]
 
     if args.dry_run:
         log(json.dumps(entry, indent=2))
@@ -457,7 +534,7 @@ def onboard(args: argparse.Namespace) -> int:
     ir_roots = parse_ir_urls(args.ir_url)
     ticker_dir = scaffold_folder(ticker, company, market, ir_roots[0] if ir_roots else "")
     write_status(ticker_dir, "scaffold")
-    write_thesis(ticker, company, classification)
+    write_thesis(ticker, company, classification, separation)
 
     run_cmd(
         [PY, str(SCRIPTS / "scan_third_party_sources.py"), ticker, "--with-hk", "--date", today],
@@ -533,6 +610,10 @@ def main() -> None:
     parser.add_argument("--notes", default="", help="Watchlist notes")
     parser.add_argument("--from-watchlist", action="store_true")
     parser.add_argument("--watchlist-only", action="store_true", help="Add to watchlist without onboarding")
+    parser.add_argument("--parent", default=None, metavar="TICKER",
+                        help="Parent ticker when onboarding a newly listed SpinCo (sets payoff_lens: event)")
+    parser.add_argument("--separation-id", default=None, metavar="ID",
+                        help="separation_id in _system/data/separations/separation_registry.jsonl")
     parser.add_argument("--download-8k-exhibits", action="store_true")
     parser.add_argument("--skip-download", action="store_true")
     parser.add_argument("--skip-indexes", action="store_true", help="Skip INDEX.csv rebuild (batch drivers)")

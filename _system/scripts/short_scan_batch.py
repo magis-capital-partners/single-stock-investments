@@ -20,13 +20,44 @@ def tickers() -> list[str]:
     return []
 
 
+# Sources whose ticker comes from matching a page's title/URL, not from a
+# CIK or a human: these rows must carry verified, strong evidence before they
+# become Shorts-tab leads. Mirrors activist_common.PUBLISHER_SOURCES.
+MATCHED_SOURCES = frozenset({"publisher_site", "press_wire", "local"})
+# Verified evidence that names the issuer: market notation ("NASDAQ: HSIC",
+# "(EOSE)"), the company name, or the exact upper-case symbol in the
+# document's title/lead (verify_activist_reports matches case-sensitively and
+# never accepts word tickers such as OPEN or FAST bare). A single brand word
+# ("company_brand") is weak: that is how Spruce Point's American Battery
+# Metals report was "verified" for five unrelated "American" issuers.
+STRONG_EVIDENCE = frozenset({"ticker_explicit", "company_name", "ticker_compact", "ticker_symbol"})
+
+
+def has_strong_target_evidence(report: dict) -> bool:
+    """True when a matched (non-SEC) row is verified on evidence that names the issuer."""
+    if report.get("target_verified") is not True:
+        return False
+    evidence = report.get("target_match_evidence") or report.get("body_match_reason") or ""
+    return evidence in STRONG_EVIDENCE
+
+
 def is_feed_short(report: dict) -> bool:
-    """Short reports that belong on the Shorts tab as leads, not passive noise."""
-    return (
+    """Short reports that belong on the Shorts tab as leads, not passive noise.
+
+    Publisher, wire and local rows also need target_verified on strong
+    evidence. A row that was never body-verified (OPEN, FAST and PONY's
+    Viceroy/Scorpion rows) or was verified only by one brand word (the AEP,
+    BAC, HST, LRCX rows) stays in the index but is not a lead.
+    """
+    if not (
         report.get("side") == "short"
         and report.get("include_in_feed", True)
         and report.get("triage_verdict") != "auto_passive"
-    )
+    ):
+        return False
+    if report.get("source") in MATCHED_SOURCES:
+        return has_strong_target_evidence(report)
+    return True
 
 
 def company_names() -> dict[str, str]:
@@ -128,8 +159,8 @@ def write_scan(when: str | None = None) -> Path:
         "# Portfolio activist scan (long + short)",
         "",
         f"**Date:** {when}  ",
-        f"**Agent:** `short_scan_batch.py`  ",
-        f"**Registry:** `_system/frameworks/activist_firm_registry.json`",
+        "**Agent:** `short_scan_batch.py`  ",
+        "**Registry:** `_system/frameworks/activist_firm_registry.json`",
         "",
         "**Method:** `activist_reports_index.json` + local `short_reports/` markdown cache.",
         "",

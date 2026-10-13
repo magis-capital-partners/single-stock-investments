@@ -122,7 +122,8 @@ jobs:
         run: |
           python -m pytest -q \
             _system/scripts/test_research_watchdog.py \
-            _system/scripts/test_build_research_scope.py
+            _system/scripts/test_build_research_scope.py \
+            _system/scripts/test_check_media_analysis_freshness.py
 
       # Proves the entry points still run end to end on a machine with no
       # broker data at all - the state CI is always in. A crash here is a real
@@ -147,6 +148,10 @@ jobs:
           python _system/scripts/build_research_scope.py --latest-run /nonexistent
 
       - name: Media analysis has not stalled
+        # Four days, on purpose. Podcast and video analysis run on the
+        # workstation scheduled task "SSI Podcast Analysis"
+        # (analysis_supervisor.ps1), not in this job. A red result names the
+        # stale lane, the day the analysed count last moved, and that task.
         env:
           PYTHONIOENCODING: utf-8
         run: python _system/scripts/check_media_analysis_freshness.py

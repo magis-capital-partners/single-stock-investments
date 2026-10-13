@@ -67,6 +67,12 @@ governance test's retired list rejects the first three if they reappear.
 |---|---|
 | Darwin Portfolio Refresh (`darwin-refresh.yml`) | Disabled since 2026-08-23 after failing every run from 2026-08-11; its ticker payload is rebuilt nightly by Data Pipeline intake-full |
 | YouTube Research Refresh (`youtube-refresh.yml`) | Needed a self-hosted runner, which on a public repo would run fork PRs on the workstation; the lane runs as a local scheduled task (`youtube_lane.py`) |
+
+## Media analysis is not CI
+
+Podcast and video analysis do not run in GitHub Actions. They run on the workstation scheduled task **SSI Podcast Analysis** (`analysis_supervisor.ps1` via `install_local_lane_tasks.ps1`). That one task drains both `analyze_podcast_batch.py` and `analyze_video_batch.py` against a local model (`lms ps`). The YouTube catalog is the same machine's `youtube_lane.py` task, which is why the workflow above was retired.
+
+Research Watchdog only checks freshness. `check_media_analysis_freshness.py` fails when an analysed count has not moved for 4 days while a backlog remains. The failure names the lane (podcasts or videos), the day the count last moved, and the workstation task to check. CI cannot restart that task.
 | Auto - IR Recovery (`vicki-ir-harvest.yml`) | Every run failed (last 2026-06-17), and nothing had written its trigger queue since 2026-06-11 |
 | Auto - CI Repair (`ci-autofix.yml`) | Removed with the repository-health supervisor rework |
 

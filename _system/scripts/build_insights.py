@@ -1445,6 +1445,72 @@ def from_news(doc: dict) -> list[dict]:
     return out[:120]
 
 
+def index_event_float_pct(row: dict, ev: dict) -> float | None:
+    """``pct_of_float_base`` of the float-impact event matching ``ev``.
+
+    ``row["float_impact"]`` (see ``index_flow_impact.attach_float_impact``) holds
+    ``events`` (one per index event, each with ``primary_index``, ``action``,
+    ``event_source`` and the stacked ``pct_of_float_base``) plus the ``primary``
+    display event. Prefer the confirmed event on the same index and action,
+    then any event on that index, then ``primary`` when it is for that index.
+    Returns None when no number exists for this event.
+    """
+    fi = row.get("float_impact") or {}
+    index_id = ev.get("index")
+    action = (ev.get("action") or "").lower()
+    candidates = [
+        e
+        for e in (fi.get("events") or [])
+        if isinstance(e, dict)
+        and e.get("primary_index") == index_id
+        and e.get("status") != "n_a"
+        and isinstance(e.get("pct_of_float_base"), (int, float))
+    ]
+    primary = fi.get("primary") or {}
+    if (
+        isinstance(primary, dict)
+        and primary.get("primary_index") == index_id
+        and primary.get("status") != "n_a"
+        and isinstance(primary.get("pct_of_float_base"), (int, float))
+    ):
+        candidates.append(primary)
+    if not candidates:
+        return None
+
+    def _rank(e: dict) -> tuple:
+        same_action = 0 if (e.get("action") or "").lower() == action else 1
+        confirmed = 0 if e.get("event_source") != "candidate" else 1
+        return (same_action, confirmed)
+
+    candidates.sort(key=_rank)
+    return float(candidates[0]["pct_of_float_base"])
+
+
+def index_event_direction(row: dict, ev: dict) -> tuple[str, float | None]:
+    """Direction of an index event by its modelled net forced flow.
+
+    Horizon Kinetics: a Russell 2000 -> Russell 1000 graduation is net SELLING
+    (the R2000 weight lost dwarfs the R1000 weight gained), so ``action`` alone
+    cannot carry the sign. Use the float-impact stack when present:
+    negative ``pct_of_float_base`` -> bearish, positive -> bullish, zero ->
+    neutral. Only when no float-impact number exists fall back to
+    add -> bullish / delete -> bearish.
+    """
+    pct = index_event_float_pct(row, ev)
+    if pct is not None:
+        if pct < 0:
+            return "bearish", pct
+        if pct > 0:
+            return "bullish", pct
+        return "neutral", pct
+    action = (ev.get("action") or "change").lower()
+    if action == "add":
+        return "bullish", None
+    if action == "delete":
+        return "bearish", None
+    return "neutral", None
+
+
 def from_index_membership(doc: dict) -> list[dict]:
     """Surface quality-gated index events from index_membership.json into the events feed."""
     out: list[dict] = []
@@ -1455,6 +1521,12 @@ def from_index_membership(doc: dict) -> list[dict]:
             action = ev.get("action") or "change"
             index_id = ev.get("index") or "index"
             title = ev.get("title") or f"{ticker} {action} {index_id}"
+            direction, float_pct = index_event_direction(row, ev)
+            flow_note = (
+                f"; modelled net flow {float_pct:+.2f}% of float"
+                if float_pct is not None
+                else ""
+            )
             out.append(
                 insight_record(
                     source="index_membership",
@@ -1462,8 +1534,9 @@ def from_index_membership(doc: dict) -> list[dict]:
                     scope="ticker",
                     ref=str(ticker).upper(),
                     title=title,
-                    claim=f"{action} {index_id}; effective {ev.get('effective') or 'TBD'} ({ev.get('confidence')})",
-                    direction="bullish" if action == "add" else ("bearish" if action == "delete" else "neutral"),
+                    claim=f"{action} {index_id}; effective {ev.get('effective') or 'TBD'} ({ev.get('confidence')}){flow_note}",
+                    direction=direction,
+                    float_pct_of_float_base=float_pct,
                     evidence_ref=ev.get("source_url"),
                     evidence_url=ev.get("source_url"),
                     evidence_label="index_notice",
