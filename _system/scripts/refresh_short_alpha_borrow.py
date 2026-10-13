@@ -242,9 +242,14 @@ def build_payload(rows: list[dict], tickers: set[str] | None, source: str, input
         "as_of": now,
         "rates": rates,
         "availability": availability,
+        # The ledger names this file was checked against: one absent from rates
+        # and availability is not in IBKR's file (no lendable shares there), as
+        # opposed to a name added after this refresh, which is still pending.
+        "checked": sorted(tickers) if tickers is not None else [],
         "note": (
-            "Missing names are pending a valid IBKR borrow observation, not a zero fee. "
-            "Availability is a reading on a date, not a locate. Rates are percent per year."
+            "A checked name missing from the file has no IBKR lendable shares or is not a US listing IBKR lends; "
+            "a name added later is pending. Neither is a zero fee. Availability is a reading on a date, not a locate. "
+            "Rates are percent per year."
         ),
     }
 

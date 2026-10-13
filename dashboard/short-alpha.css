@@ -236,8 +236,13 @@
 .short-names { width: 100%; border-collapse: collapse; font-size: 12px; }
 .short-names th, .short-names td { padding: 8px 10px; border-bottom: 1px solid var(--border); vertical-align: top; text-align: left; }
 .short-names th { color: var(--text-muted); font: 600 10px 'JetBrains Mono', monospace; text-transform: uppercase; background: var(--bg-card); }
-.short-names td.num, .short-names th:nth-last-child(-n+2) { text-align: right; font-variant-numeric: tabular-nums; }
-.short-names td:nth-child(6) { max-width: 280px; }
+.short-names td.num, .short-names:not(.short-screen) th:nth-last-child(-n+2) { text-align: right; font-variant-numeric: tabular-nums; }
+.short-names:not(.short-screen) td:nth-child(6) { max-width: 280px; }
+.short-borrow.is-htb { color: var(--short-copper); font-weight: 600; }
+.short-borrow.is-none, .short-borrow.is-pending { color: var(--text-muted); }
+.short-stale-checkin { margin: 0 0 10px; padding: 6px 10px; border-left: 2px solid var(--short-copper); color: var(--text-secondary); font-size: 12px; }
+.short-closed-title { margin: 14px 0 6px; color: var(--text-muted); font: 600 11px 'JetBrains Mono', monospace; text-transform: uppercase; }
+.short-alpha-book.is-closed { opacity: .72; }
 .short-names tr:hover, .short-names tr.is-selected { background: var(--bg-card-hover); }
 .short-names tr.is-selected { outline: 1px solid var(--short-copper); }
 .short-stage { display: inline-block; padding: 2px 6px; border-radius: 999px; border: 1px solid var(--border); font: 600 10px 'JetBrains Mono', monospace; text-transform: uppercase; }

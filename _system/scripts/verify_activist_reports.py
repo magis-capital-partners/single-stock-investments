@@ -4,7 +4,18 @@
 Publisher-site and local rows are matched to tickers from title/URL only at
 ingest time, which produces false positives. This pass reads the actual
 document (HTML directly, PDFs via the extracted _text/*.txt sidecar) and
-records whether the ticker or a distinctive company token appears in the body:
+records whether the ticker or the company appears in what the document says
+it is about: the page <title>/og:title plus the first ~2 KB of body text.
+The whole body is NOT used: Spruce Point pages list other reports' company
+names in a sidebar, and any long report names competitors, so whole-body
+matching "verified" Spruce Point's American Battery Metals report for five
+unrelated "American" issuers. A company_brand hit verifies only because the
+brand rule itself is now strict (activist_common.company_brand_phrase /
+company_brand_token): the first two significant name words, or a leading
+word that is not an ordinary word ("costar", "seagate"), never a lone
+"american" or "research". Brand evidence keeps a report in the index (the
+cleanup step drops unverified publisher rows); it does not make a Shorts lead,
+which needs stronger evidence (short_scan_batch.is_feed_short).
 
   body_verified: true / false, or absent when no text is available
   body_match_reason / body_hits: diagnostics for review
@@ -33,6 +44,20 @@ from sec_filer_parse import strip_html
 
 ROOT = Path(__file__).resolve().parents[2]
 TEXT_LIMIT = 200_000
+# How much leading body text counts as "what the document is about".
+VERIFY_BODY_CHARS = 2_000
+# Reasons that never verify. A strict company_brand match does (see above).
+NON_VERIFYING_REASONS = frozenset({"no_match"})
+
+_TITLE_RE = re.compile(r"<title[^>]*>(.*?)</title>", re.I | re.S)
+_OG_TITLE_RES = (
+    re.compile(r"<meta[^>]+property=[\"']og:title[\"'][^>]+content=[\"']([^\"']*)", re.I),
+    re.compile(r"<meta[^>]+content=[\"']([^\"']*)[\"'][^>]+property=[\"']og:title", re.I),
+)
+_BODY_RE = re.compile(r"<body[^>]*>(.*)", re.I | re.S)
+_NON_CONTENT_RE = re.compile(
+    r"<(script|style|noscript|svg|nav|aside|footer)\b[^>]*>.*?</\1\s*>", re.I | re.S
+)
 
 
 def _read_text(path: Path, limit: int = TEXT_LIMIT) -> str:
@@ -70,6 +95,40 @@ def load_body_text(report: dict) -> str | None:
     return None
 
 
+def html_verification_text(raw: str) -> str:
+    """<title> + og:title + the first VERIFY_BODY_CHARS of visible body text."""
+    parts: list[str] = []
+    title = _TITLE_RE.search(raw)
+    if title:
+        parts.append(strip_html(title.group(1)))
+    for pattern in _OG_TITLE_RES:
+        og = pattern.search(raw)
+        if og:
+            parts.append(strip_html(og.group(1)))
+            break
+    body_m = _BODY_RE.search(raw)
+    body = body_m.group(1) if body_m else raw
+    body = strip_html(_NON_CONTENT_RE.sub(" ", body))
+    parts.append(body[:VERIFY_BODY_CHARS])
+    return " \n ".join(p for p in parts if p)
+
+
+def load_verification_text(report: dict) -> str | None:
+    """The part of a document that says what it is about, or None when unavailable."""
+    ref, is_pdf, exists = resolve_report_file(report)
+    if not ref or not exists:
+        return None
+    path = ROOT / ref
+    if path.suffix.lower() in (".html", ".htm"):
+        raw = _read_text(path)
+        return html_verification_text(raw) if raw else None
+    text = load_body_text(report)
+    if text is None:
+        return None
+    # PDF sidecars and markdown: the cover page / opening carries the subject.
+    return text[:VERIFY_BODY_CHARS]
+
+
 def _count_hits(text: str, meta: dict) -> int:
     hay = text.lower()
     hits = len(re.findall(rf"\b{re.escape(meta['ticker'].lower())}\b", hay))
@@ -83,7 +142,7 @@ def verify_report(report: dict, meta: dict) -> bool:
     """Update body verification fields on the report in place. Returns True if changed."""
     if report.get("source") == "sec_edgar":
         return False
-    text = load_body_text(report)
+    text = load_verification_text(report)
     if text is None:
         # No document body available: leave any prior verdict untouched.
         changed = report.get("body_match_reason") != "no_text" and "body_verified" not in report
@@ -91,7 +150,7 @@ def verify_report(report: dict, meta: dict) -> bool:
             report["body_match_reason"] = "no_text"
         return changed
     matched, confidence, reason = match_report_to_ticker(text, meta)
-    if reason.startswith("alias:"):
+    if reason.startswith("alias:") or reason in NON_VERIFYING_REASONS:
         matched = False
     hits = _count_hits(text, meta)
     updates = {

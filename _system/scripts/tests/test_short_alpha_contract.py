@@ -292,7 +292,8 @@ def test_live_export_is_already_imported() -> None:
         pytest.skip(f"rsdb export moved to {queue.get('as_of')}; run import_reverse_split_queue.py")
     _, report = rsq.import_queue(queue, json.loads(json.dumps(CANDIDATES)), CATALOG)
     assert report["imported"] == []
-    assert len(report["skipped_existing"]) == report["export_rows"] == 119
+    # Rows retired or renamed after review (excluded_leads.json) are skipped, not re-imported.
+    assert len(report["skipped_existing"]) + len(report["skipped_excluded"]) == report["export_rows"] == 119
 
 
 # --- borrow CSV -------------------------------------------------------------
@@ -482,7 +483,7 @@ def test_shorts_tab_renders_entry_fields_and_lens_strip(tmp_path: Path) -> None:
 @pytest.mark.skipif(not INDEX.exists(), reason="dashboard/index.html absent (sparse checkout)")
 def test_index_wires_the_reverse_splits_sub_section() -> None:
     text = INDEX.read_text(encoding="utf-8")
-    assert '<script src="reverse-splits-viz.js?v=20261012-rs"></script>' in text
+    assert '<script src="reverse-splits-viz.js?v=20261013-clean"></script>' in text
     assert "data/reverse_splits.json" in text
     assert "window.ReverseSplitsViz &&" in text
     assert "ShortAlphaViz.mountReverseSplits(content, doc)" in text

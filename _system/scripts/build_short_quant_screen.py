@@ -28,7 +28,6 @@ import csv
 import json
 import math
 import sys
-from collections import defaultdict
 from datetime import date, datetime, timedelta
 from pathlib import Path
 
@@ -39,6 +38,7 @@ TECHNICAL = ROOT / "dashboard" / "data" / "technical_signals.json"
 FINRA_DIR = ROOT / "_system" / "reference" / "market-data" / "ownership" / "short_interest"
 INSIDER_DIR = ROOT / "_system" / "reference" / "market-data" / "insider"
 CORE = ROOT / "dashboard" / "data" / "core.json"
+SEC_TITLES = ROOT / "_system" / "data" / "sec_company_tickers_cache.json"
 CANDIDATES = ROOT / "_system" / "research" / "short-alpha" / "candidates.json"
 OUTPUT = ROOT / "dashboard" / "data" / "short_quant_screen.json"
 
@@ -89,25 +89,60 @@ SIC_USER_AGENT = "single-stock-investments research pipeline (contact: dag5wd@vi
 SIC_REQUEST_DELAY_S = 0.15
 
 # What the SIC code says about which lenses apply. A bank's operating cash
-# flow is loan growth, not burn; a REIT is levered by construction; a trust or
-# blank check is not an operating company at all.
+# flow is loan and deposit growth, not burn, and an insurer's is premium float;
+# a REIT is levered by construction; a trust or blank check is not an operating
+# company at all.
+#
+# Only depository institutions (6020-6099) and insurers (6311-6411) are
+# "financial", and credit institutions (6111-6163) are "lenders". Everything
+# else under 6000-6799 -- finance services 6199 (bitcoin miners such as WULF,
+# IREN, CIFR, RIOT and the crypto treasuries file there), brokers 6211, asset
+# managers 6282 -- burns cash, accrues and borrows like an operating company
+# and keeps every lens.
+#
+# A lender's operating cash flow is its loan book: with every lens on, the
+# committed inputs scored as of 2026-10-08 put SOFI first (CFO -$8.5B of
+# originations against +$636M of profit) and RKT, UPST and FIGR in the top 20
+# on that artifact alone.
+BANK_SIC = (6020, 6099)
+LENDER_SIC = (6111, 6163)
+INSURER_SIC = (6311, 6411)
+_LENS_OFF = frozenset({"accrual_ratio", "profit_without_cash", "cash_burn", "leverage"})
 PROFILE_RULES = {
     "fund_or_trust": {"skip": True, "reason": "Not an operating company: trust, fund, or blank check."},
-    "financial": {"disable": {"accrual_ratio", "profit_without_cash", "cash_burn", "leverage"}, "reason": "Bank or insurer: cash flow, accrual and leverage lenses do not apply."},
+    "financial": {
+        "disable": _LENS_OFF,
+        "reason": "Bank, thrift or insurer: deposits, loans and premium float run through operating cash flow and the balance sheet, so the cash-burn, accrual and leverage lenses are off.",
+    },
+    "lender": {
+        "disable": _LENS_OFF,
+        "reason": "Lender: loan originations and sales run through operating cash flow and debt funds the book, so the cash-burn, accrual and leverage lenses are off.",
+    },
     "real_estate": {"disable": {"leverage"}, "reason": "REIT: leverage is structural, so that lens is off."},
     "operating": {"disable": set(), "reason": None},
 }
+# Issuers whose EDGAR SIC (6199, finance services) misdescribes the business.
+PROFILE_OVERRIDES = {
+    "AXP": ("financial", "Bank holding company (American Express National Bank) that EDGAR files under SIC 6199."),
+    "SOFI": ("financial", "Bank holding company (SoFi Bank, N.A.) that EDGAR files under SIC 6199."),
+    "SYF": ("financial", "Bank holding company (Synchrony Bank) that EDGAR files under SIC 6199."),
+    "UPST": ("lender", "Lending marketplace that buys and holds loans; EDGAR files it under SIC 6199."),
+}
 
 
-def profile_for(sic: int | None) -> str:
+def profile_for(sic: int | None, ticker: str | None = None) -> str:
+    if ticker and str(ticker).upper() in PROFILE_OVERRIDES:
+        return PROFILE_OVERRIDES[str(ticker).upper()][0]
     if sic is None:
         return "operating"
     if sic in {6221, 6770} or 6720 <= sic <= 6729:
         return "fund_or_trust"
     if sic == 6798:
         return "real_estate"
-    if 6000 <= sic <= 6499 or 6700 <= sic <= 6799:
+    if BANK_SIC[0] <= sic <= BANK_SIC[1] or INSURER_SIC[0] <= sic <= INSURER_SIC[1]:
         return "financial"
+    if LENDER_SIC[0] <= sic <= LENDER_SIC[1]:
+        return "lender"
     return "operating"
 
 
@@ -416,6 +451,47 @@ def load_names() -> dict[str, str]:
     return {str(row.get("ticker")).upper(): str(row.get("company") or "") for row in core.get("tickers") or [] if row.get("ticker")}
 
 
+def load_sec_titles() -> tuple[dict[str, str], dict[int, str]]:
+    """(ticker -> title, cik -> title) from the committed SEC company_tickers cache."""
+    doc = _read_json(SEC_TITLES, {}) or {}
+    rows = doc.values() if isinstance(doc, dict) else doc if isinstance(doc, list) else []
+    by_ticker: dict[str, str] = {}
+    by_cik: dict[int, str] = {}
+    for row in rows:
+        if not isinstance(row, dict) or not row.get("title"):
+            continue
+        if row.get("ticker"):
+            by_ticker.setdefault(str(row["ticker"]).upper(), str(row["title"]))
+        try:
+            by_cik.setdefault(int(row.get("cik_str")), str(row["title"]))
+        except (TypeError, ValueError):
+            pass
+    return by_ticker, by_cik
+
+
+def company_name(ticker: str, *, core_name: str | None, doc: dict | None, sec_titles: tuple[dict, dict] | None, finra: dict | None) -> str:
+    """First real name: core.json, the fundamentals entity name, SEC by CIK then ticker, FINRA.
+
+    core.json often stores the ticker itself as the company (WULF, IREN, AI),
+    so a name equal to the ticker counts as missing, not as a name.
+    """
+    by_ticker, by_cik = sec_titles or ({}, {})
+    doc = doc or {}
+    cik_text = str(doc.get("cik") or "").strip()
+    sec_by_cik = by_cik.get(int(cik_text)) if cik_text.isdigit() else None
+    for name in (
+        core_name,
+        doc.get("entity_name") or doc.get("entityName") or doc.get("company"),
+        sec_by_cik,
+        by_ticker.get(ticker.upper()),
+        (finra or {}).get("issue_name"),
+    ):
+        text = str(name or "").strip()
+        if text and text.upper() != ticker.upper():
+            return text
+    return ""
+
+
 def round_signals(signals: dict) -> dict:
     out = {}
     for key, row in signals.items():
@@ -427,8 +503,10 @@ def round_signals(signals: dict) -> dict:
 
 
 def score_ticker(ticker: str, *, fundamentals: dict | None, tech: dict | None, flt: dict | None, finra: dict | None, as_of: date, sic: dict | None = None) -> dict:
-    profile = profile_for((sic or {}).get("sic"))
+    profile = profile_for((sic or {}).get("sic"), ticker)
     rule = PROFILE_RULES[profile]
+    override = PROFILE_OVERRIDES.get(ticker.upper())
+    reason = f"{override[1]} {rule.get('reason') or ''}".strip() if override else rule.get("reason")
     fund, facts = fundamental_signals(fundamentals, as_of) if fundamentals else ({}, {"latest_period": None, "stale": None})
     for key in rule.get("disable", set()):
         fund.pop(key, None)
@@ -451,7 +529,7 @@ def score_ticker(ticker: str, *, fundamentals: dict | None, tech: dict | None, f
         "profile": profile,
         "sic": (sic or {}).get("sic"),
         "sic_description": (sic or {}).get("description"),
-        "profile_note": rule.get("reason") if (rule.get("skip") or rule.get("disable")) else (None if operating else "No revenue and no operating burn on file, so the lenses have nothing to read."),
+        "profile_note": reason if (rule.get("skip") or rule.get("disable")) else (None if operating else "No revenue and no operating burn on file, so the lenses have nothing to read."),
         "implied_frameworks": implied_frameworks(fund, tape, risk),
         "signals": {"fundamental": round_signals(fund), "tape": round_signals(tape), "risk": round_signals(risk)},
         "facts": {**{k: (round(v, 4) if isinstance(v, float) else v) for k, v in facts.items()}, "price": price, "market_cap": market_cap, "adv_dollar": tape_facts.get("adv_dollar")},
@@ -464,6 +542,7 @@ def build(as_of: date | None = None, *, limit: int = TOP_ROWS, fetch_sic: bool =
     float_rows = (_read_json(FLOAT_ADV, {}) or {}).get("by_ticker") or {}
     finra = load_finra()
     names = load_names()
+    sec_titles = load_sec_titles()
     tracked = {str(row.get("ticker")).upper() for row in (_read_json(CANDIDATES, {}) or {}).get("candidates") or []}
     fundamentals_files = {p.stem.upper(): p for p in FUNDAMENTALS.glob("*.json") if not p.name.startswith("_") and p.name != FLOAT_ADV.name} if FUNDAMENTALS.is_dir() else {}
 
@@ -481,7 +560,7 @@ def build(as_of: date | None = None, *, limit: int = TOP_ROWS, fetch_sic: bool =
             as_of=as_of,
             sic=sic_map.get(ticker),
         )
-        row["company"] = names.get(ticker) or (finra.get(ticker) or {}).get("issue_name") or ""
+        row["company"] = company_name(ticker, core_name=names.get(ticker), doc=docs.get(ticker), sec_titles=sec_titles, finra=finra.get(ticker))
         row["tracked"] = ticker in tracked
         rows.append(row)
 
@@ -508,7 +587,7 @@ def build(as_of: date | None = None, *, limit: int = TOP_ROWS, fetch_sic: bool =
         "methodology": {
             "composite": "100 x (0.65 x decay + 0.20 x tape) x (1 - 0.5 x risk). Decay is the weighted mean of the fundamental signals present; tape is whether the trend has broken; risk is the mean of crowding, illiquidity, volatility and a parabolic tape.",
             "minimum_evidence": f"A name needs at least {MIN_FUNDAMENTAL_SIGNALS} fundamental signals to score. Missing is not clean.",
-            "profiles": "By SIC code: banks and insurers lose the cash-flow, accrual and leverage lenses; REITs lose leverage; trusts, funds and blank checks are not scored. A name with no revenue and no operating burn is not scored.",
+            "profiles": "By SIC code: banks, thrifts (6020-6099), insurers (6311-6411) and lenders (6111-6163) lose the cash-burn, accrual and leverage lenses; REITs lose leverage; trusts, funds and blank checks are not scored. Other finance codes (finance services 6199, where bitcoin miners and crypto treasuries file, brokers, asset managers) keep every lens, except named bank holding companies and lenders filed under 6199. A name with no revenue and no operating burn is not scored.",
             "reading": "A score is a reason to open a file. The hypothesis, catalyst and falsifier still have to be written before a name is more than a lead.",
             "thresholds": THRESHOLDS,
             "signals": {

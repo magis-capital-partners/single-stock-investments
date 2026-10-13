@@ -3,7 +3,7 @@ from __future__ import annotations
 
 import json
 import re
-from datetime import date, datetime, timezone
+from datetime import datetime, timezone
 from functools import lru_cache
 from pathlib import Path
 
@@ -312,6 +312,88 @@ GENERIC_COMPANY_TOKENS = frozenset(
         "foods",
         "software",
         "platforms",
+        # Ordinary English words that lead real issuer names. Each one put a
+        # report about a different company into a holding's index: Spruce
+        # Point's American Battery Metals report under AEP/AIG/AMT/AWK/AXP,
+        # Healthcare Trust of America under BAC/GEHC/HCA, Hims & Hers *Health*
+        # under CVS, e.l.f. *Beauty* under ULTA, LuxUrban *Hotels* under HST,
+        # every bleeckerstreetresearch.com/*research*/ URL under LRCX, a
+        # Grizzly post on *public* companies under PEG/PSA, Trian's General
+        # Catalyst releases under GD/GIS/GM, Morgan *Stanley* under SWK.
+        "american",
+        "america",
+        "general",
+        "public",
+        "health",
+        "healthcare",
+        "beauty",
+        "hotels",
+        "research",
+        "storage",
+        "service",
+        "water",
+        "works",
+        "express",
+        "tower",
+        "stanley",
+    }
+)
+
+# Leading issuer-name tokens that are dictionary words, place names or common
+# personal names. Unlike GENERIC_COMPANY_TOKENS they are not industry nouns, but
+# they are just as unsafe as single-token evidence: "Target", "Oracle",
+# "Progressive" and "Southern" all occur in prose about other companies. They
+# may still lead a two-word brand phrase ("morgan stanley", "general dynamics").
+# There is no dictionary on the box, so this list is curated from the first
+# tokens of the portfolio registry's company names (2026-10-12).
+COMMON_ENGLISH_BRAND_TOKENS = frozenset(
+    {
+        "abacus", "advanced", "aerospace", "alphabet", "amazon", "analog", "apollo",
+        "applied", "archer", "arthur", "associates", "automatic", "beaver", "booking",
+        "boston", "brasil", "bristol", "builders", "bullish", "cadence", "cardinal",
+        "caribbean", "carnival", "carrier", "castle", "cattle", "central", "charles",
+        "charter", "church", "cincinnati", "circle", "citizens", "coherent", "comfort",
+        "connectivity", "consensus", "consolidated", "constellation", "construction",
+        "cooper", "credit", "deutsche", "diagnostics", "dollar", "dominion", "dynamics",
+        "edison", "edwards", "electronic", "electronics", "emerson", "enterprise",
+        "equity", "everest", "evolution", "evolve", "exchanges", "expand", "federal",
+        "fidelity", "franklin", "freight", "galaxy", "garden", "generation", "genuine",
+        "gladstone", "hanover", "hartford", "hawaiian", "heritage", "horizon", "hughes",
+        "huntington", "illinois", "income", "indemnity", "indian", "indiana",
+        "inflection", "instruments", "interactive", "intercontinental", "intuitive",
+        "invitation", "jacobs", "johnson", "kinder", "laboratories", "lauren",
+        "liberty", "london", "malaysia", "marathon", "martin", "mechanics", "mellon",
+        "merger", "metallurgical", "monster", "morgan", "mosaic", "mountain", "nation",
+        "national", "natural", "northern", "norwegian", "occidental", "offshore",
+        "oncology", "oracle", "pacific", "packaging", "paramount", "parker",
+        "payments", "pharmaceutical", "philip", "philippine", "phillips", "pinnacle",
+        "polska", "prevail", "principal", "products", "progressive", "property",
+        "prudential", "raymond", "regency", "regions", "republic", "reserve",
+        "resorts", "robinson", "snowflake", "southern", "southwest", "stores",
+        "street", "summit", "target", "travelers", "trinity", "triple", "united",
+        "universal", "vertex", "vulcan", "warner", "warrior", "warsaw", "waters",
+        "western", "williams", "willis", "worldwide",
+    }
+)
+
+# Tickers that are English words. A bare token is never evidence for these —
+# "Open Letter", "fast-growing", "One-Trick Pony", "slide deck" — even in
+# upper case (PDF covers and card headings are often all caps). They need
+# explicit notation: $OPEN, (OPEN), (Nasdaq: OPEN). Union of the 2026-10-12
+# activist audit list and the 4+ letter words in letter_matching.COMMON_WORDS.
+COMMON_WORD_TICKERS = frozenset(
+    {
+        "OPEN", "FAST", "PONY", "DECK", "PLUG", "REAL", "LOVE", "CASH", "SAFE", "BEST",
+        "LIFE", "HOME", "PLAY", "WELL", "GOLD", "MAIN", "LAND", "ROAD", "SNAP", "CARE",
+        "FORM", "TRUE", "EDIT", "BOOM", "NICE",
+        "META", "SNOW", "GOOD", "CORE", "PEAK", "EDGE", "FLOW", "GROW", "HOPE", "PURE",
+        "RISE", "STAR", "WAVE", "WISE", "WORK", "FUND", "GAIN", "RATE", "RISK", "TERM",
+        "DATA", "TECH", "BANK", "DEBT", "COST", "SAGA", "ALSO", "PLUS",
+        # Word tickers in the portfolio registry (2026-10-12).
+        "BALL", "BULL", "CART", "COIN", "COLD", "DASH", "DELL", "ECHO", "ERIE",
+        "FANG", "FLEX", "FLUX", "GILD", "GRAB", "HOOD", "KEEL", "KEYS", "LITE", "LULU",
+        "ONTO", "OUST", "POET", "POST", "PURR", "RIOT", "SHOP", "SPOT", "VALE", "VELO",
+        "WEST", "ZETA",
     }
 )
 
@@ -341,14 +423,176 @@ def _matches_company_phrase(text: str, company: str) -> bool:
     company_words = _normalized_words(company)
     if not company_words:
         return False
-    hay = f" {' '.join(_normalized_words(text))} "
+    if len(company_words) == 1 and is_weak_brand_token(company_words[0]):
+        # A one-word registry name that is an ordinary word ("Target") is no
+        # more specific than the word itself.
+        return False
+    words = _normalized_words(text)
+    hay = f" {' '.join(words)} "
     phrases = [" ".join(company_words)]
     core_words = list(company_words)
     while core_words and core_words[-1] in LEGAL_ENTITY_SUFFIX_TOKENS:
         core_words.pop()
     if len(core_words) >= 2:
         phrases.append(" ".join(core_words))
-    return any(f" {phrase} " in hay for phrase in phrases)
+    if any(f" {phrase} " in hay for phrase in phrases):
+        return True
+    # A one-word registry name written as two words: "Supermicro" vs
+    # Hindenburg's "Super Micro Computer Inc.".
+    if len(core_words) == 1 and len(core_words[0]) >= 8:
+        target = core_words[0]
+        return any(a + b == target for a, b in zip(words, words[1:]))
+    return False
+
+
+def is_weak_brand_token(token: str) -> bool:
+    """True for a name token that is never sufficient evidence on its own."""
+    token = (token or "").lower()
+    return token in GENERIC_COMPANY_TOKENS or token in COMMON_ENGLISH_BRAND_TOKENS
+
+
+_PHRASE_FILLER_TOKENS = frozenset({"the", "of", "and", "a", "an", "de", "du", "la", "le"})
+
+
+def _company_has_name(meta: dict) -> bool:
+    """False when the registry stores no real name: company == ticker ("OPEN", "PONY").
+
+    Case-sensitive on purpose: "Uber" is a name, "UBER" would be the symbol.
+    """
+    company = (meta.get("company") or "").strip()
+    ticker = (meta.get("ticker") or "").strip()
+    if not company:
+        return False
+    return company not in {ticker, ticker.replace(".", "-"), ticker.replace("-", ".")}
+
+
+def company_brand_phrase(company: str) -> str | None:
+    """The issuer's first two significant name words as a normalized phrase.
+
+    "American Electric Power" -> "american electric", "Lam Research" ->
+    "lam research", "Host Hotels & Resorts" -> "host hotels", "Bank of
+    America" -> "bank of america". None when the name has fewer than two
+    significant words before its legal suffix, or the phrase is too short to
+    be distinctive ("e.l.f." -> "e l").
+    """
+    words = _normalized_words(company)
+    while words and words[0] == "the":
+        words.pop(0)
+    out: list[str] = []
+    significant = 0
+    for word in words:
+        if word in LEGAL_ENTITY_SUFFIX_TOKENS:
+            break
+        out.append(word)
+        if word not in _PHRASE_FILLER_TOKENS:
+            significant += 1
+        if significant == 2:
+            break
+    if significant < 2:
+        return None
+    phrase = " ".join(out)
+    if len(phrase.replace(" ", "")) < 6:
+        return None
+    return phrase
+
+
+def company_brand_token(company: str) -> str | None:
+    """A single leading name token distinctive enough to stand alone.
+
+    Only the FIRST significant word qualifies (the old rule skipped ahead to
+    any 6+ letter word, which turned "M&F Bancorp Optus merger" into
+    "merger"), and only when it is not an ordinary word: "costar",
+    "solventum", "fastenal" qualify; "american", "target", "research" do not.
+    """
+    words = _normalized_words(company)
+    while words and words[0] in _PHRASE_FILLER_TOKENS:
+        words.pop(0)
+    if not words:
+        return None
+    token = words[0]
+    if len(token) < 6 or token in LEGAL_ENTITY_SUFFIX_TOKENS or is_weak_brand_token(token):
+        return None
+    return token
+
+
+def _contains_phrase(text: str, phrase: str) -> bool:
+    hay = f" {' '.join(_normalized_words(text))} "
+    return f" {phrase} " in hay
+
+
+_EXCHANGE_PREFIX = (
+    r"(?i:nyse(?:\s+american|\s+arca|\s+mkt)?|nasdaq(?:gs|gm|cm)?|amex|"
+    r"otc(?:qx|qb|mkts|\s+markets|\s+pink)?|tsxv?|cse|lse|asx|hkex|sgx)"
+)
+
+
+def _ticker_regex_body(ticker: str) -> str:
+    """Escaped ticker, case-sensitive upper case for word tickers, else (?i:)."""
+    escaped = re.escape(ticker.upper())
+    if ticker.upper() in COMMON_WORD_TICKERS:
+        return escaped
+    return f"(?i:{escaped})"
+
+
+def ticker_explicit_match(text: str, ticker: str) -> bool:
+    """Ticker written in market notation: $OPEN, (Nasdaq: OPEN), symbol: OPEN, (OPEN).
+
+    Case-insensitive for ordinary tickers; upper case only for COMMON_WORD_TICKERS,
+    so "nasdaq - open to ..." prose cannot pass as notation. The bare
+    parenthesised form "(LRCX)" is accepted only for 4+ character tickers: "(ED)",
+    "(ICE)" and "(SEC)" are acronym definitions in ordinary prose.
+    """
+    if not text or not ticker:
+        return False
+    body = _ticker_regex_body(ticker)
+    end = r"(?![A-Za-z0-9])"
+    patterns = [
+        rf"(?<![A-Za-z0-9])\${body}{end}",
+        rf"\b{_EXCHANGE_PREFIX}\s*[:\-]\s*{body}{end}",
+        rf"\b(?i:ticker|symbol)\s*[:\-]\s*{body}{end}",
+    ]
+    if len(re.sub(r"[^A-Za-z0-9]", "", ticker)) >= 4:
+        patterns.append(rf"\(\s*{re.escape(ticker.upper())}\s*\)")
+    return any(re.search(pattern, text) for pattern in patterns)
+
+
+_URL_RE = re.compile(r"https?://[^\s\"'<>]+", re.I)
+
+
+def ticker_token_match(text: str, ticker: str) -> bool:
+    """Bare ticker evidence: an UPPER-CASE token in the original text, or a URL path token.
+
+    Lower-case prose never counts ("open", "fast-growing", "deck"), and word
+    tickers (COMMON_WORD_TICKERS) never count bare at all — even all-caps
+    headings say "OPEN LETTER". Tickers under 4 characters need notation.
+    """
+    if not text or not ticker:
+        return False
+    upper = ticker.upper()
+    compact = re.sub(r"[.\-]", "", upper)
+    if len(compact) < 4 or upper in COMMON_WORD_TICKERS or compact in COMMON_WORD_TICKERS:
+        return False
+    for candidate in {upper, compact}:
+        if re.search(rf"(?<![A-Za-z0-9$]){re.escape(candidate)}(?![A-Za-z0-9])", text):
+            return True
+    # URL slugs are lower-cased by convention ("/research/smci-short/"); an
+    # exact path token equal to the ticker is still a deliberate reference.
+    lowered = {upper.lower(), compact.lower()}
+    for url in _URL_RE.findall(text):
+        path = _url_path(url)
+        tokens = set(re.split(r"[^a-z0-9]+", path.lower()))
+        if tokens & lowered:
+            return True
+    return False
+
+
+def _url_path(url: str) -> str:
+    from urllib.parse import urlparse
+
+    try:
+        return urlparse(url).path or ""
+    except ValueError:
+        return ""
 
 
 def _distinctive_aliases(company: str, ticker: str) -> set[str]:
@@ -419,7 +663,20 @@ def save_ticker_index(ticker: str, index: dict) -> Path:
     return path
 
 
+# Rows from these sources are one document per URL. Keying them on the file
+# name too meant a re-fetch under a new (fetch-dated) name was a new row.
+URL_KEYED_SOURCES = frozenset({"publisher_site", "press_wire"})
+
+
+def _normalized_source_url(url: str) -> str:
+    return (url or "").strip().rstrip("/").lower()
+
+
 def report_key(entry: dict) -> str:
+    if entry.get("source") in URL_KEYED_SOURCES and entry.get("source_url"):
+        return "|".join(
+            ["url", entry.get("firm_id") or "", _normalized_source_url(entry["source_url"])]
+        )
     return "|".join(
         [
             entry.get("firm_id") or "",
@@ -576,7 +833,13 @@ def upsert_report(index: dict, entry: dict) -> bool:
                 return False
     for i, existing in enumerate(reports):
         if report_key(existing) == key:
-            merged = {**existing, **entry}
+            if entry.get("source") in URL_KEYED_SOURCES:
+                # A re-fetch that learned less (no date this time) must not
+                # erase what an earlier run recorded.
+                incoming = {k: v for k, v in entry.items() if v is not None or k not in existing}
+            else:
+                incoming = entry
+            merged = {**existing, **incoming}
             if merged != existing:
                 reports[i] = merged
                 return True
@@ -600,9 +863,12 @@ def firm_name(firm_id: str) -> str:
 
 
 def match_report_to_ticker(text: str, meta: dict, *, min_confidence: float = 0.0) -> tuple[bool, float, str]:
-    hay = (text or "").lower()
-    ticker = meta["ticker"].lower()
-    company = (meta.get("company") or "").lower()
+    raw = text or ""
+    hay = raw.lower()
+    ticker = meta["ticker"].upper()
+    # A registry row whose "company" is just the ticker (OPEN, PONY) has no
+    # name to match; only ticker notation can place a report there.
+    company = (meta.get("company") or "").lower() if _company_has_name(meta) else ""
 
     # Resolve the issuer name before ticker symbols.  Short symbols such as A,
     # T, ON, IT, ED, and MAR are ordinary prose/month tokens and are never
@@ -610,32 +876,33 @@ def match_report_to_ticker(text: str, meta: dict, *, min_confidence: float = 0.0
     if company and len(company) >= 6 and _matches_company_phrase(hay, company):
         return True, 0.98, "company_name"
 
-    # Lead brand token from the company name (e.g. "costar" from "CoStar Group").
-    # Treated as company evidence (not a weak alias) so open letters titled
-    # "…Letter to CoStar Board" survive publisher_match_allowed.
+    # Brand evidence short of the full name: the first two significant name
+    # words as a phrase ("lam research", "host hotels", "general dynamics"), or
+    # a single leading token that is not an ordinary word ("costar" from
+    # "CoStar Group"), so open letters titled "...Letter to CoStar Board"
+    # survive publisher_match_allowed. A lone dictionary word ("american",
+    # "research", "public") never does.
     if company:
-        for token in re.split(r"[\s,./]+", company):
-            token_l = token.strip().lower()
-            if len(token_l) < 6 or token_l in GENERIC_COMPANY_TOKENS:
-                continue
-            if re.search(rf"\b{re.escape(token_l)}\b", hay, re.I):
-                return True, 0.95, "company_brand"
-            break
+        phrase = company_brand_phrase(company)
+        if phrase and _contains_phrase(hay, phrase):
+            return True, 0.95, "company_brand"
+        token = company_brand_token(company)
+        if token and re.search(rf"(?<![a-z0-9]){re.escape(token)}(?![a-z0-9])", hay):
+            return True, 0.95, "company_brand"
 
-    explicit_patterns = (
-        rf"\${re.escape(ticker)}\b",
-        rf"\b(?:nyse|nasdaq|amex|tsx|lse|asx)\s*[:\-]\s*{re.escape(ticker)}\b",
-        rf"\b(?:ticker|symbol)\s*[:\-]\s*{re.escape(ticker)}\b",
-    )
-    if any(re.search(pattern, hay, re.I) for pattern in explicit_patterns):
+    if ticker_explicit_match(raw, ticker):
         return True, 0.99, "ticker_explicit"
 
-    if len(ticker) >= 4 and re.search(rf"\b{re.escape(ticker)}\b", hay, re.I):
+    # Bare symbols are matched on the ORIGINAL text, upper case only; the old
+    # case-insensitive \bopen\b put Viceroy's Abaxx report ("Open Interest")
+    # under OPEN and its sibling ("fast-growing") under FAST.
+    if ticker_token_match(raw, ticker):
+        compact = re.sub(r"[.\-]", "", ticker)
+        if compact != ticker and not re.search(
+            rf"(?<![A-Za-z0-9$]){re.escape(ticker)}(?![A-Za-z0-9])", raw
+        ):
+            return True, 0.98, "ticker_compact"
         return True, 0.94, "ticker_symbol"
-
-    ticker_compact = re.sub(r"[.\-]", "", ticker)
-    if len(ticker_compact) >= 4 and re.search(rf"\b{re.escape(ticker_compact)}\b", hay, re.I):
-        return True, 0.98, "ticker_compact"
 
     for alias in meta.get("aliases") or []:
         alias_l = str(alias).strip().lower()
@@ -652,37 +919,66 @@ def text_matches_ticker(text: str, meta: dict) -> bool:
     return matched and confidence >= 0.9
 
 
+_PAGE_EXTENSIONS_RE = re.compile(r"\.(?:pdf|html?|aspx?|php|jsp)$", re.I)
+
+
+def _slug_tokens(url: str) -> set[str]:
+    """Last URL path segment as tokens: extension dropped, digits-only tokens dropped.
+
+    Two-letter tokens are kept: Bleecker Street's NextNav and LL Flooring
+    reports live at /research/nn and /research/ll, and WD-40's at
+    /research/wd-40. Dropping tokens under 3 characters left those slugs
+    empty, and an empty slug was read as "no mismatch".
+    """
+    slug = _url_path(url).strip("/").split("/")[-1].lower()
+    slug = _PAGE_EXTENSIONS_RE.sub("", slug)
+    return {t for t in re.split(r"[^a-z0-9]+", slug) if len(t) >= 2 and not t.isdigit()}
+
+
 def url_target_mismatch(url: str, title: str, meta: dict) -> bool:
     """True when URL/title clearly names a different company (site false-positive guard)."""
-    from urllib.parse import urlparse
-
-    blob = f"{url} {title}".lower()
-    ticker = meta["ticker"].lower()
-    company = (meta.get("company") or "").lower()
-    if len(ticker) >= 4 and re.search(rf"\b{re.escape(ticker)}\b", blob, re.I):
+    raw_blob = f"{url} {title}"
+    blob = raw_blob.lower()
+    ticker = meta["ticker"].upper()
+    company = (meta.get("company") or "").lower() if _company_has_name(meta) else ""
+    # Same evidence rules as match_report_to_ticker: an upper-case or
+    # notated ticker, the issuer's name, or its two-word brand phrase.
+    if ticker_explicit_match(raw_blob, ticker) or ticker_token_match(raw_blob, ticker):
         return False
     if company and len(company) >= 6 and _matches_company_phrase(blob, company):
         return False
+    phrase = company_brand_phrase(company) if company else None
+    if phrase and _contains_phrase(blob, phrase):
+        return False
 
-    slug = urlparse(url or "").path.strip("/").split("/")[-1].lower()
+    slug = _url_path(url or "").strip("/").split("/")[-1].lower()
     if not slug or re.fullmatch(r"[\d-]+", slug):
         return False
-    slug_tokens = {t for t in re.split(r"[-_]+", slug) if len(t) >= 3}
-    ours = {ticker.replace(".", "")}
-    ours.update(
-        t.lower()
-        for t in re.split(r"[\s,./]+", company)
-        if len(t) >= 4 and t.lower() not in GENERIC_COMPANY_TOKENS
-    )
-    overlap = slug_tokens & ours
-    distinctive_overlap = {t for t in overlap if t not in GENERIC_COMPANY_TOKENS and len(t) >= 4}
-    if slug_tokens and not distinctive_overlap:
-        return True
-    return False
+    slug_tokens = _slug_tokens(url or "")
+    if not slug_tokens:
+        return False
+    ticker_token = re.sub(r"[.\-]", "", ticker).lower()
+    ours: set[str] = set()
+    if ticker not in COMMON_WORD_TICKERS:
+        ours.add(ticker_token)
+    if company:
+        ours.update(
+            t
+            for t in _normalized_words(company)
+            if len(t) >= 4 and t not in LEGAL_ENTITY_SUFFIX_TOKENS and not is_weak_brand_token(t)
+        )
+    # "QS1.pdf" is Scorpion's QuantumScape report: a symbol with a sequence
+    # number still names the symbol.
+    candidates = slug_tokens | {re.sub(r"\d+$", "", t) for t in slug_tokens}
+    if candidates & ours:
+        return False
+    return True
 
 
 def safe_report_filename(firm_id: str, report_date: str, suffix: str, ext: str = ".pdf") -> str:
-    date_part = (report_date or date.today().isoformat())[:10]
+    # No date means "undated", never today's date: a fetch-dated name changes
+    # every run and duplicates the file and its index row.
+    date_part = (report_date or "undated")[:10]
     stem = re.sub(r"[^a-zA-Z0-9._-]+", "-", f"{firm_id}_{date_part}_{suffix}").strip("-")
     return f"{stem}{ext}"
 

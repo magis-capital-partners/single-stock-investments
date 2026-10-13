@@ -150,10 +150,11 @@
     return (frameworks || []).some(row => row.parent === frameworkId && ids.has(row.id));
   }
   function sourceLabel(candidate, sourceTypes) {
-    const first = (candidate.sources || [])[0];
-    if (!first) return candidate.origin || '—';
+    const all = candidate.sources || [];
+    const first = all[0];
+    if (!first) return candidate.origin === 'reverse_split_research' ? 'Reverse-split engine lead' : (candidate.origin || '—');
     const kind = sourceTypes[first.type]?.label || first.type || 'Source';
-    return `${kind}: ${first.label || candidate.origin || '—'}`;
+    return `${kind}: ${first.label || candidate.origin || '—'}${all.length > 1 ? ` (+${all.length - 1} more)` : ''}`;
   }
   function frameworkOptions(payload, selected) {
     const groups = payload.groups || [];
@@ -202,6 +203,30 @@
     if (b == null) return -1;
     return b - a;
   }
+  // The live book first, then names under research, then leads; within a stage by score.
+  const STAGE_RANK = { live: 0, ic: 1, researching: 2, lead: 3, closed: 4, rejected: 5 };
+  function byStageThenScore(left, right) {
+    const a = STAGE_RANK[left.stage] ?? 9;
+    const b = STAGE_RANK[right.stage] ?? 9;
+    return a !== b ? a - b : byScore(left, right);
+  }
+  // Borrow as the payload states it: a fee, no shares, not in IBKR's file, or pending a refresh.
+  function borrowCell(borrow, htbPct) {
+    const b = borrow || {};
+    const when = b.as_of ? ` · ${String(b.as_of).slice(0, 16).replace('T', ' ')} UTC` : '';
+    if (b.status === 'not_in_file') return { text: 'Not in file', cls: 'is-none', title: `${b.message || "Not in IBKR's short-stock file"}${when}` };
+    if (b.status === 'none_available') return { text: 'None', cls: 'is-none', title: `IBKR quotes no shares available${when}` };
+    if (b.rate_pct == null) return { text: 'Pending', cls: 'is-pending', title: b.message || 'Awaiting the next IBKR borrow refresh' };
+    const fee = Number(b.rate_pct);
+    const shares = b.shares != null ? `${b.at_least ? '>' : ''}${Number(b.shares).toLocaleString()} shares available` : 'availability not quoted';
+    return { text: `${fee.toFixed(fee < 10 ? 2 : 0)}%`, cls: fee >= (htbPct || 10) ? 'is-htb' : '', title: `${fee}% a year · ${shares}${when} · a reading, not a locate` };
+  }
+  function dtcCell(crowding) {
+    const c = crowding || {};
+    if (c.days_to_cover == null) return { text: '—', title: 'No short-interest observation' };
+    const share = c.short_percent_float != null ? ` · ${(Number(c.short_percent_float) * 100).toFixed(1)}% of float short` : '';
+    return { text: `${Number(c.days_to_cover).toFixed(1)}d`, title: `FINRA short interest, settlement ${c.settlement_ymd || '—'}${share} · context, not a reason to short` };
+  }
   function scoreBadge(quant) {
     const n = quant ? Number(quant.score) : NaN;
     if (!Number.isFinite(n)) return `<span class="short-score is-empty" title="${esc(quant ? `${quant.evidence_count || 0} fundamental signals; three are needed` : 'Not in the screen universe')}">—</span>`;
@@ -224,6 +249,7 @@
     if (key === 'crowding') return `${(n * 100).toFixed(1)}% of float${row.days_to_cover != null ? `, ${Number(row.days_to_cover).toFixed(1)}d to cover` : ''}`;
     if (key === 'leverage') return `debt ${(n * 100).toFixed(0)}% of assets`;
     if (key === 'insider_selling') return row.basis === 'market_cap' ? `${(n * 100).toFixed(2)}% of cap sold net` : `$${(Number(row.net_usd || 0) / 1e6).toFixed(1)}M sold net`;
+    if (key === 'margin_trend') return `${n > 0 ? '+' : ''}${(n * 100).toFixed(1)} pp`;
     return `${n > 0 ? '+' : ''}${(n * 100).toFixed(1)}%`;
   }
   function quantCard(quant, payload, maps) {
@@ -274,11 +300,11 @@
     const sourceTypes = sourceTypeMap(payload);
     const maps = frameworkMap(payload);
     if (!candidates.length) return '<div class="short-alpha-empty">No names match this partition.</div>';
-    const body = candidates.slice().sort(byScore).map(row => {
-      const tags = (row.effective_frameworks || row.frameworks || []).map(id => esc(maps[id]?.label || id)).join(', ') || 'Unscored';
-      const borrow = row.borrow?.rate_pct == null ? (row.has_position ? 'Pending' : '—') : `${Number(row.borrow.rate_pct).toFixed(1)}%`;
-      const dtc = row.crowding?.days_to_cover == null ? '—' : `${Number(row.crowding.days_to_cover).toFixed(1)}d`;
-      const dtcTitle = row.crowding?.settlement_ymd ? `FINRA ${row.crowding.settlement_ymd}, context tier` : 'No days-to-cover observation';
+    const htb = payload.borrow_meta?.htb_fee_pct;
+    const body = candidates.slice().sort(byStageThenScore).map(row => {
+      const tags = (row.effective_frameworks || row.frameworks || []).map(id => esc(maps[id]?.label || id)).join(', ') || '<span class="form-hint">No lens yet</span>';
+      const borrowView = borrowCell(row.borrow, htb);
+      const dtcView = dtcCell(row.crowding);
       return `<tr class="${selected === row.ticker ? 'is-selected' : ''}" data-short-select="${esc(row.ticker)}" tabindex="0">
         <td class="short-symbol">${esc(row.ticker)}</td>
         <td>${esc(row.security_name || '')}${row.summary ? `<small class="short-summary" title="${esc(row.summary)}">${esc(row.summary)}</small>` : ''}${entryMeta(row)}</td>
@@ -287,8 +313,8 @@
         <td>${tags}</td>
         <td>${esc(sourceLabel(row, sourceTypes))}</td>
         <td>${esc(row.research?.next_step || '—')}</td>
-        <td class="num">${esc(borrow)}</td>
-        <td class="num" title="${esc(dtcTitle)}">${esc(dtc)}</td>
+        <td class="num short-borrow ${borrowView.cls}" title="${esc(borrowView.title)}">${esc(borrowView.text)}</td>
+        <td class="num" title="${esc(dtcView.title)}">${esc(dtcView.text)}</td>
       </tr>`;
     }).join('');
     return `<div class="short-names-wrap"><table class="short-names">
@@ -309,7 +335,7 @@
     const lenses = (candidate.effective_frameworks || []).map(id => {
       const row = maps[id];
       return `<li><strong>${esc(row?.label || id)}</strong> ${esc(row?.question || '')}</li>`;
-    }).join('') || '<li>Unscored. No lens has been written for this name.</li>';
+    }).join('') || '<li>No lens yet. No lens has been written for this name.</li>';
     const furnace = (candidate.furnace_hits || []).map(hit => `<li>${esc(hit.short_impact || 'event')} · ${esc(hit.tag)} · ${esc(hit.claim || 'Filing event')}</li>`).join('');
     const hypothesis = String(candidate.hypothesis || '').trim();
     return `<section class="short-name-detail">
@@ -360,17 +386,24 @@
     }).join('');
     const latest = (idea.check_ins || [])[idea.check_ins.length - 1] || {};
     const opened = idea.position?.opened_date || idea.position?.baseline_date || '—';
-    const borrow = idea.borrow?.rate_pct == null ? '—' : `${Number(idea.borrow.rate_pct).toFixed(1)}%`;
-    const dtc = idea.crowding?.days_to_cover == null ? '—' : `${Number(idea.crowding.days_to_cover).toFixed(1)}d`;
+    const borrowView = borrowCell(idea.borrow, maps.payload?.borrow_meta?.htb_fee_pct);
+    const dtcView = dtcCell(idea.crowding);
+    const ageDays = outcome.latest_date ? Math.floor((Date.now() - Date.parse(outcome.latest_date)) / 86400000) : null;
+    const stale = idea.position_status !== 'closed' && ageDays != null && ageDays > 30
+      ? `<p class="short-stale-checkin">No check-in since ${esc(outcome.latest_date)} (${ageDays} days): the observed price below is the last recorded one, not today's.</p>` : '';
+    const closedNote = idea.position_status === 'closed'
+      ? `<p class="short-stale-checkin">Closed: ${esc(idea.research?.review_note || 'no longer a live short.')}</p>` : '';
     return `<details class="short-alpha-row" data-short-ticker="${esc(idea.ticker)}">
       <summary>
         <div class="short-name"><span class="short-symbol">${esc(idea.ticker)}</span><span class="short-security"><strong>${esc(idea.security_name)}</strong><small>${esc(String(idea.instrument_type || '').replace(/_/g, ' '))}${idea.underlying ? ` · underlying ${esc(idea.underlying)}` : ''}</small></span></div>
         <div class="short-frameworks">${tags}</div>
         <div class="short-metric">$${price(idea.position?.split_adjusted_open_price || idea.position?.opened_price)}<small>split-adjusted entry</small></div>
-        <div class="short-metric">${borrow}<small>borrow · ${esc(idea.borrow?.status || 'pending')}</small></div>
-        <div class="short-metric">${dtc}<small>${completion}% research</small></div>
+        <div class="short-metric" title="${esc(borrowView.title)}">${esc(borrowView.text)}<small>borrow</small></div>
+        <div class="short-metric" title="${esc(dtcView.title)}">${esc(dtcView.text)}<small>days to cover</small></div>
+        <div class="short-metric">${completion}%<small>research</small></div>
       </summary>
       <div class="short-alpha-detail">
+        ${closedNote}${stale}
         <div class="short-hypothesis-flow">
           <div class="short-flow-block"><h4>Hypothesis · ${esc(opened)}</h4><p>${esc(idea.hypothesis || 'No hypothesis recorded.')}</p></div>
           <div class="short-flow-arrow" aria-hidden="true">→</div>
@@ -405,15 +438,25 @@
         && stageOk
         && matchesFramework(row, saved.framework, payload.frameworks);
     });
-    const positions = getPositions(payload).filter(row => {
+    const allPositions = getPositions(payload).filter(row => {
       const hay = `${row.ticker} ${row.security_name} ${row.hypothesis}`.toLowerCase();
       const stageOk = saved.stage === 'all' || row.stage === saved.stage;
       return (!saved.query || hay.includes(saved.query.toLowerCase()))
         && stageOk
         && matchesFramework(row, saved.framework, payload.frameworks);
     });
+    const positions = allPositions.filter(row => row.position_status !== 'closed');
+    const closedPositions = allPositions.filter(row => row.position_status === 'closed');
     const selectedRow = getCandidates(payload).find(row => row.ticker === selected) || null;
     const summary = payload.summary || {};
+    const bm = payload.borrow_meta || {};
+    const cm = payload.crowding_meta || {};
+    const borrowNote = bm.as_of
+      ? `Borrow: IBKR's public short-stock file, read ${String(bm.as_of).slice(0, 16).replace('T', ' ')} UTC; ${bm.quoted ?? '—'} of ${summary.candidate_count ?? candidates.length} names quoted, ${bm.not_in_file ?? 0} not in the file, ${bm.pending ?? 0} pending. Fee is % a year; a reading is not a locate; ${bm.htb_fee_pct ?? 10}% or more is marked hard to borrow.`
+      : 'Borrow: no IBKR file has been loaded yet.';
+    const crowdNote = cm.settlement
+      ? ` Days to cover: FINRA short interest settled ${cm.settlement}, ${cm.covered ?? 0} names. Context, not a reason to short.`
+      : '';
     const stages = ['all', 'lead', 'researching', 'ic', 'live', 'closed', 'rejected'];
     return `<div class="short-alpha-header">
       <div><div class="short-alpha-kicker">Short Alpha</div><h2>Frameworks, names that fit, and the open book</h2><p>Every lens from the short library, every name that fits one, and the positions we have actually borrowed. A publisher hit is a lead. It is not a thesis.</p></div>
@@ -422,7 +465,7 @@
     <div class="short-alpha-summary">
       <div class="short-alpha-stat"><span>Names</span><strong>${summary.candidate_count ?? candidates.length}</strong><small>${summary.lead_count ?? 0} leads</small></div>
       <div class="short-alpha-stat"><span>Open book</span><strong>${summary.position_count ?? positions.length}</strong><small>borrowed shorts</small></div>
-      <div class="short-alpha-stat"><span>Research complete</span><strong>${summary.research_complete_count ?? 0}/${summary.position_count ?? positions.length}</strong><small>artifact gate, not an IC decision</small></div>
+      <div class="short-alpha-stat"><span>Research complete</span><strong>${summary.research_complete_count ?? 0}/${summary.position_count ?? positions.length}</strong><small>open positions; artifact gate, not an IC decision</small></div>
       <div class="short-alpha-stat"><span>Quant screen</span><strong>${payload.quant_screen ? (payload.quant_screen.scored_count ?? '—') : '—'}</strong><small>${payload.quant_screen ? `scored of ${payload.quant_screen.universe_count ?? '—'} names` : 'not built on this checkout'}</small></div>
     </div>
     <section class="short-section"><h3 class="short-section-title">Frameworks</h3>${renderFrameworkBoard(payload, saved.framework)}</section>
@@ -433,20 +476,21 @@
       <div class="short-alpha-actions"><button type="button" data-short-export>Export ledger</button><button type="button" data-short-reset title="Remove browser-only drafts and check-ins">Reset browser drafts</button></div>
     </div>
     ${renderAddForm(payload)}
-    <section class="short-section"><h3 class="short-section-title">Names that fit <span>${candidates.length}</span></h3>
-      <p class="short-alpha-note">Days to cover is FINRA context when the biotech file has the symbol. It is not a reason to short. Borrow stays pending until an IBKR export arrives. Missing is never zero.</p>
+    <section class="short-section"><h3 class="short-section-title">Names tracked <span>${candidates.length}</span></h3>
+      <p class="short-alpha-note">${esc(borrowNote)}${esc(crowdNote)} Missing is never zero.</p>
       ${renderNames(candidates, payload, selected)}
       ${renderDetail(selectedRow && candidates.some(row => row.ticker === selectedRow.ticker) ? selectedRow : null, payload)}
     </section>
     ${renderScreen(payload, selected)}
     <section class="short-section"><h3 class="short-section-title">Open book <span>${positions.length}</span></h3>
       <div class="short-alpha-book">${positions.length ? positions.map(row => renderPosition(row, maps)).join('') : '<div class="short-alpha-empty">No borrowed shorts in this partition.</div>'}</div>
+      ${closedPositions.length ? `<h4 class="short-closed-title">Closed <span>${closedPositions.length}</span></h4><div class="short-alpha-book is-closed">${closedPositions.map(row => renderPosition(row, maps)).join('')}</div>` : ''}
     </section>
     <section class="short-section short-reverse-splits" data-short-reverse-splits hidden>
       <h3 class="short-section-title">Reverse splits</h3>
       <div data-short-reverse-splits-body></div>
     </section>
-    <p class="short-alpha-note">${esc(payload.methodology?.excluded || '')} ${esc(payload.methodology?.leads || '')} ${esc(payload.methodology?.quant || '')} ${esc(payload.methodology?.desk_notes || '')}</p>`;
+    <p class="short-alpha-note">${['borrow', 'crowding', 'leads', 'reverse_splits', 'quant', 'excluded', 'desk_notes'].map(key => esc(payload.methodology?.[key] || '')).filter(Boolean).join(' ')}</p>`;
   }
   // The Reverse splits sub-section is filled by index.html from data/reverse_splits.json
   // through window.ReverseSplitsViz.render(doc) (dashboard/reverse-splits-viz.js). The
@@ -462,7 +506,7 @@
       return false;
     }
     let html = '';
-    try { html = String(viz.render(doc) || ''); } catch (error) { html = `<div class="short-alpha-empty">Reverse splits view failed: ${esc(error && error.message)}</div>`; }
+    try { html = String(viz.render(doc, { hideTitle: true }) || ''); } catch (error) { html = `<div class="short-alpha-empty">Reverse splits view failed: ${esc(error && error.message)}</div>`; }
     if (!html.trim()) { section.hidden = true; return false; }
     if (body) body.innerHTML = html;
     section.hidden = false;

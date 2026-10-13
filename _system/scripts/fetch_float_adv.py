@@ -32,6 +32,9 @@ HISTORY_OUT = (
     / "market_structure_history.json"
 )
 REGISTRY = ROOT / "_system" / "portfolio" / "registry.json"
+# Short Alpha names (leads and the open book) get days to cover and short
+# interest too; most are not portfolio holdings.
+SHORT_ALPHA = ROOT / "_system" / "research" / "short-alpha" / "candidates.json"
 MEMBERSHIP = ROOT / "dashboard" / "data" / "index_membership.json"
 SEC_TICKERS = ROOT / "_system" / "reference" / "securities" / "sec_company_tickers.json"
 # Browser-like UA required for Yahoo crumb + quoteSummary (v10 returns 401 otherwise)
@@ -322,10 +325,17 @@ def priority_tickers(
         for r in (mem.get("portfolio_summary") or {}).get("predictor_watch") or []:
             if r.get("ticker"):
                 cand_first.append(str(r["ticker"]))
+    shorts: list[str] = []
+    if SHORT_ALPHA.exists():
+        try:
+            rows = json.loads(SHORT_ALPHA.read_text(encoding="utf-8")).get("candidates") or []
+            shorts = [str(r["ticker"]) for r in rows if r.get("ticker") and r.get("stage") not in {"rejected", "closed"}]
+        except (OSError, json.JSONDecodeError):
+            shorts = []
     # Dedupe preserve order
     seen = set()
     ordered = []
-    lead = cand_first + event_first if only_candidates else event_first + cand_first + holdings
+    lead = cand_first + event_first if only_candidates else event_first + cand_first + holdings + shorts
     for t in lead:
         tu = str(t).upper()
         if tu in seen:

@@ -5,6 +5,7 @@ import re
 import time
 import urllib.request
 import xml.etree.ElementTree as ET
+from html import unescape as html_unescape
 from html.parser import HTMLParser
 from pathlib import Path
 from urllib.parse import urljoin, urlparse
@@ -17,19 +18,36 @@ CACHE_DIR = Path(__file__).resolve().parents[1] / "data" / "activist_site_cache"
 
 
 class LinkParser(HTMLParser):
+    """Collect (href, anchor text) pairs.
+
+    Text is collected only between <a> and </a>. Without handle_endtag every
+    text node after a link was glued onto it until the next <a>, so a card's
+    date line and summary became part of the headline: Viceroy's Abaxx post
+    read "...Plumbing Factory Published 6 days ago ... Open Interest is
+    incentivized", which matched OPEN, and a Nevro card's "One-Trick Pony"
+    landed on the QuantumScape PDF link and matched PONY.
+    """
+
     def __init__(self) -> None:
         super().__init__()
         self.links: list[tuple[str, str]] = []
+        self._in_anchor = False
 
     def handle_starttag(self, tag: str, attrs) -> None:
         if tag.lower() != "a":
             return
         href = dict(attrs).get("href")
+        # An <a> inside an unclosed <a> implicitly closes the first one.
+        self._in_anchor = bool(href)
         if href:
             self.links.append((href, ""))
 
+    def handle_endtag(self, tag: str) -> None:
+        if tag.lower() == "a":
+            self._in_anchor = False
+
     def handle_data(self, data: str) -> None:
-        if self.links:
+        if self._in_anchor and self.links:
             href, text = self.links[-1]
             self.links[-1] = (href, text + data)
 
@@ -63,7 +81,11 @@ def parse_rss(xml_text: str, base_url: str) -> list[dict]:
     for item in items:
         title = (item.findtext("title") or "").strip()
         link = (item.findtext("link") or "").strip()
-        pub = (item.findtext("pubDate") or item.findtext("{http://purl.org/dc/elements/1.1/}date") or "")[:16]
+        # Keep the whole RFC 822 stamp ("Mon, 06 Oct 2025 14:00:00 +0000").
+        # Cutting it to 16 characters left "Mon, 06 Oct 2025", a day-month-year
+        # order no date regex accepted, so every RSS row fell through to a
+        # synthesized YYYY-01-01.
+        pub = (item.findtext("pubDate") or item.findtext("{http://purl.org/dc/elements/1.1/}date") or "").strip()
         if not link:
             continue
         out.append({"url": urljoin(base_url, link), "title": title or link, "published": pub})
@@ -74,17 +96,86 @@ def parse_html_links(base_url: str, html: str) -> list[dict]:
     parser = LinkParser()
     parser.feed(html)
     out: list[dict] = []
-    seen: set[str] = set()
+    by_url: dict[str, dict] = {}
     for href, text in parser.links:
         full = urljoin(base_url, href)
-        if full in seen:
-            continue
-        seen.add(full)
         title = re.sub(r"\s+", " ", text).strip()
-        if not title:
-            title = Path(urlparse(full).path).name.replace("-", " ")
-        out.append({"url": full, "title": title, "published": ""})
+        existing = by_url.get(full)
+        if existing is not None:
+            # Cards often link the same URL twice: a thumbnail <a> with no
+            # text, then the headline. Keep the first position, take the
+            # first anchor that actually has text.
+            if not existing["_text"] and title:
+                existing["title"] = title
+                existing["_text"] = True
+            continue
+        item = {
+            "url": full,
+            "title": title or Path(urlparse(full).path).name.replace("-", " "),
+            "published": "",
+            "_text": bool(title),
+        }
+        by_url[full] = item
+        out.append(item)
+    for item in out:
+        item.pop("_text", None)
     return out
+
+
+_POSITION_RE = re.compile(r"\bPosition:\s*(Long|Short)\b")
+
+
+def parse_position_marker(html_or_text: str) -> str | None:
+    """'long' / 'short' when a page declares "Position: Long|Short", else None.
+
+    Spruce Point labels each research page (and each card on /research/)
+    with its side. It is mostly short, but not always: the Henry Schein and
+    Zoom pages say "Position: Long". The first marker wins, which on a
+    report page is the page's own Research Overview block.
+    """
+    if not html_or_text:
+        return None
+    text = re.sub(r"<[^>]+>", " ", html_or_text)
+    match = _POSITION_RE.search(re.sub(r"\s+", " ", text))
+    return match.group(1).lower() if match else None
+
+
+_SPRUCE_CARD_SPLIT_RE = re.compile(r'role="listitem"', re.I)
+
+
+def spruce_card_details(base_url: str, html: str) -> dict[str, dict]:
+    """Per-report details from sprucepointcap.com/research/ cards, keyed by URL.
+
+    Each card carries the date, the exchange:symbol designation and the
+    position next to the report link; none of that is inside an <a>, so
+    LinkParser alone cannot see it.
+    """
+    details: dict[str, dict] = {}
+    for chunk in _SPRUCE_CARD_SPLIT_RE.split(html or "")[1:]:
+        href = re.search(r'href="(/research/[^"#?]+)"', chunk)
+        if not href:
+            continue
+        url = urljoin(base_url, href.group(1))
+        info: dict = {}
+        position = parse_position_marker(chunk)
+        if position:
+            info["position"] = position
+        date_m = re.search(r'class="research-date"[^>]*>\s*([^<]+?)\s*<', chunk)
+        if date_m:
+            info["published"] = html_unescape(date_m.group(1))
+        designation = re.search(
+            r'class="stock-designation"[^>]*>\s*<div>\s*([A-Za-z .]+?)\s*:?\s*</div>\s*'
+            r'<div[^>]*>\s*([A-Za-z0-9.\-]+)\s*</div>',
+            chunk,
+        )
+        if designation:
+            info["ticker_hint"] = f"{designation.group(1).rstrip(':').strip()}: {designation.group(2).upper()}"
+        heading = re.search(r'<h3[^>]*>\s*([^<]+?)\s*</h3>', chunk)
+        if heading:
+            info["heading"] = html_unescape(heading.group(1))
+        if info and url not in details:
+            details[url] = info
+    return details
 
 
 NAV_CHROME = frozenset(
@@ -282,8 +373,22 @@ def fetch_spruce_point(firm: dict) -> list[dict]:
     domain = (firm.get("domains") or ["sprucepointcap.com"])[0]
     for path in ("/research/", "/reports/", "/"):
         try:
-            html = fetch_text(f"https://{domain}{path}")
-            links = parse_html_links(f"https://{domain}{path}", html)
+            page = f"https://{domain}{path}"
+            html = fetch_text(page)
+            links = parse_html_links(page, html)
+            cards = spruce_card_details(page, html)
+            for link in links:
+                card = cards.get(link["url"])
+                if not card:
+                    continue
+                if card.get("heading"):
+                    link["title"] = card["heading"]
+                if card.get("published") and not link.get("published"):
+                    link["published"] = card["published"]
+                if card.get("position"):
+                    link["position"] = card["position"]
+                if card.get("ticker_hint"):
+                    link["ticker_hint"] = card["ticker_hint"]
             hits = [i for i in links if likely_report(i["url"], i["title"], domain) or i["url"].lower().endswith(".pdf")]
             if hits:
                 return hits
