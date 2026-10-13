@@ -359,11 +359,16 @@ class VerifyTests(unittest.TestCase):
         self.assertFalse(report["body_verified"])
         self.assertFalse(report["target_verified"])
 
-    def test_brand_word_alone_does_not_verify(self) -> None:
+    def test_a_distinctive_brand_in_the_title_verifies_and_keeps_the_row(self) -> None:
+        # Open letters name the company, not the ticker. The strict brand rule
+        # ("costar", "seagate"; never "american") verifies them so the cleanup
+        # step keeps them; a brand-only row still never becomes a Shorts lead.
         html = "<html><head><title>Letter to the CoStar board</title></head><body>CoStar</body></html>"
         report = self._verify(html, meta("CSGP", "CoStar Group"))
         self.assertEqual(report["body_match_reason"], "company_brand")
-        self.assertFalse(report["target_verified"])
+        self.assertTrue(report["target_verified"])
+        self.assertFalse(is_feed_short({"side": "short", "source": "publisher_site", "include_in_feed": True,
+                                        "match_reason": "company_brand", **report}))
 
     def test_title_and_lead_verify(self) -> None:
         html = (

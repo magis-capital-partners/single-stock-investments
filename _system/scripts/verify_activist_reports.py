@@ -9,7 +9,13 @@ it is about: the page <title>/og:title plus the first ~2 KB of body text.
 The whole body is NOT used: Spruce Point pages list other reports' company
 names in a sidebar, and any long report names competitors, so whole-body
 matching "verified" Spruce Point's American Battery Metals report for five
-unrelated "American" issuers. A company_brand hit alone does not verify.
+unrelated "American" issuers. A company_brand hit verifies only because the
+brand rule itself is now strict (activist_common.company_brand_phrase /
+company_brand_token): the first two significant name words, or a leading
+word that is not an ordinary word ("costar", "seagate"), never a lone
+"american" or "research". Brand evidence keeps a report in the index (the
+cleanup step drops unverified publisher rows); it does not make a Shorts lead,
+which needs stronger evidence (short_scan_batch.is_feed_short).
 
   body_verified: true / false, or absent when no text is available
   body_match_reason / body_hits: diagnostics for review
@@ -40,8 +46,8 @@ ROOT = Path(__file__).resolve().parents[2]
 TEXT_LIMIT = 200_000
 # How much leading body text counts as "what the document is about".
 VERIFY_BODY_CHARS = 2_000
-# Matches that only show the document mentions a brand word, not the issuer.
-NON_VERIFYING_REASONS = frozenset({"company_brand", "no_match"})
+# Reasons that never verify. A strict company_brand match does (see above).
+NON_VERIFYING_REASONS = frozenset({"no_match"})
 
 _TITLE_RE = re.compile(r"<title[^>]*>(.*?)</title>", re.I | re.S)
 _OG_TITLE_RES = (
