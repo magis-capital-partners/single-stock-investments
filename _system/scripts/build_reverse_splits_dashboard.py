@@ -37,6 +37,31 @@ MAX_RECENT = 100
 MAX_UPCOMING = 50
 MAX_REPEAT = 50
 
+# Two event rows for one issuer are the same split recorded twice when their
+# ratios agree within this fraction and their ex dates within this many days
+# (ALM 2025-07-07/08, CENN 2023-12-01/08, VJET/VTAK 2026-10-05 under one CIK).
+DUPLICATE_RATIO_TOLERANCE = 0.10
+DUPLICATE_WINDOW_DAYS = 10
+# Which twin survives: parsed filing text first, then the source closest to EDGAR.
+SOURCE_RANK = {"edgar_search": 0, "databento_price_jump": 1, "yfinance": 2}
+# Ratios below this (worse than 1-for-500) are printed but flagged for a filing check.
+EXTREME_RATIO = 0.002
+# Upcoming dates come only from filings that schedule an action.
+NOT_SCHEDULED_OUTCOMES = {"mention", "cancelled"}
+# The predeclared comparator the book is read against; the highest run id is
+# whichever scenario happened to be persisted last, not the headline.
+BASELINE_RUN_LABEL = "assumed_100_h5_effective"
+SUPERSEDED_RUNS = {
+    "fundamental_60": "Predates the 2026-10-11 filing and corporate-action audit, which removed three of its four leads; an input-error exhibit, not a result.",
+}
+# Letter-skew guard. Across SEC company_tickers (10,445 symbols, 2026-10-12)
+# 27.6% start A-D; a class whose events are mostly A-D is a truncated seed,
+# not a census of that class.
+REFERENCE_A_TO_D_SHARE = 0.28
+COVERAGE_SKEW_SHARE = 0.5
+COVERAGE_MIN_EVENTS = 20
+CLASS_NAMES = {"listed": "Listed", "otc": "OTC", "unknown": "Unclassified"}
+
 CAPTION = (
     "A reverse split is a discovery event, not a thesis. Fundamental impairment, valuation, "
     "a dated catalyst and a feasible borrow are separate propositions, and the historical "
@@ -74,12 +99,132 @@ def _issuer_key(row: dict) -> str:
     return f"cik:{cik}" if cik else f"ticker:{row.get('ticker')}"
 
 
+def _float(value) -> float | None:
+    try:
+        number = float(value)
+    except (TypeError, ValueError):
+        return None
+    return number if number > 0 else None
+
+
+def _same_ratio(a, b) -> bool:
+    x, y = _float(a), _float(b)
+    return x is not None and y is not None and abs(x - y) <= DUPLICATE_RATIO_TOLERANCE * max(x, y)
+
+
+def _days_apart(a, b) -> int | None:
+    try:
+        return abs((date.fromisoformat(str(a)[:10]) - date.fromisoformat(str(b)[:10])).days)
+    except ValueError:
+        return None
+
+
+def _current_tickers(announcements: list[dict]) -> dict[str, str]:
+    """Issuer key -> the ticker on its newest filing (the SEC map's current symbol)."""
+    newest: dict[str, tuple[str, str]] = {}
+    for r in announcements:
+        key, stamp = _issuer_key(r), str(r.get("announce_date") or "")
+        if r.get("ticker") and (key not in newest or stamp > newest[key][0]):
+            newest[key] = (stamp, str(r["ticker"]))
+    return {key: ticker for key, (_, ticker) in newest.items()}
+
+
+def distinct_events(events: list[dict], current: dict[str, str] | None = None) -> tuple[list[dict], int]:
+    """Collapse the same split recorded twice; return (events, rows merged away).
+
+    Two rows for one issuer (CIK, else ticker) are one split when the ratios
+    agree within 10% and the ex dates fall within ten days. The survivor is the
+    filing-text row, then the EDGAR row, then the issuer's current ticker, then
+    the earlier date; fields the survivor lacks are filled from its twin, and
+    ``merged`` lists the twins so nothing disappears silently.
+    """
+    current = current or {}
+    groups: dict[str, list[dict]] = defaultdict(list)
+    for r in events:
+        groups[_issuer_key(r)].append(r)
+
+    def rank(r: dict, key: str) -> tuple:
+        return (
+            r.get("date_quality") != "filing_text",
+            SOURCE_RANK.get(str(r.get("source")), len(SOURCE_RANK)),
+            r.get("ticker") != current.get(key, r.get("ticker")),
+            str(r.get("ex_date") or ""),
+        )
+
+    out: list[dict] = []
+    merged_rows = 0
+    for key, rows in groups.items():
+        rows = sorted(rows, key=lambda r: str(r.get("ex_date") or ""))
+        clusters: list[list[dict]] = []
+        for r in rows:
+            last = clusters[-1][0] if clusters else None
+            gap = _days_apart(last.get("ex_date"), r.get("ex_date")) if last else None
+            if last and gap is not None and gap <= DUPLICATE_WINDOW_DAYS and _same_ratio(last.get("ratio"), r.get("ratio")):
+                clusters[-1].append(r)
+            else:
+                clusters.append([r])
+        for cluster in clusters:
+            best = min(cluster, key=lambda r: rank(r, key))
+            row = dict(best)
+            twins = [r for r in cluster if r is not best]
+            for twin in twins:
+                for field in ("cik", "company", "exchange", "announce_date", "announced_ratio"):
+                    if row.get(field) in (None, "") and twin.get(field) not in (None, ""):
+                        row[field] = twin[field]
+                if row.get("exchange_class") in (None, "unknown") and twin.get("exchange_class") not in (None, "unknown"):
+                    row["exchange_class"] = twin["exchange_class"]
+            if twins:
+                row["merged"] = [{"ticker": t.get("ticker"), "ex_date": t.get("ex_date"), "source": t.get("source")} for t in twins]
+                merged_rows += len(twins)
+            out.append(row)
+    out.sort(key=lambda r: (str(r.get("ex_date") or ""), str(r.get("ticker") or "")))
+    return out, merged_rows
+
+
+def _ratio_flag(row: dict) -> str | None:
+    ratio = _float(row.get("ratio"))
+    if ratio is not None and ratio < EXTREME_RATIO:
+        return "extreme"
+    if row.get("announced_ratio") is not None and not _same_ratio(row.get("ratio"), row.get("announced_ratio")):
+        return "disagrees_with_announced"
+    return None
+
+
+def _in_window(row: dict, since: str, until: str) -> bool:
+    stamp = str(row.get("announce_date") or "")
+    return since <= stamp <= until
+
+
 def recent_announcements(announcements: list[dict], today: date) -> list[dict]:
+    """Newest filing per issuer over the last 90 days, capped at MAX_RECENT.
+
+    Repeat filers (NXXT x3, SXTC x2 in one week) collapse to their latest
+    filing; ``filings_in_window`` keeps the count. ``phrase_hit`` marks an
+    announced-only row with neither a ratio nor an ex date: reverse-split words
+    in a filing, not a schedule. ``ex_date_status`` reads a date before the
+    as-of date as effective, never as scheduled.
+    """
     since = (today - timedelta(days=RECENT_DAYS)).isoformat()
-    rows = [r for r in announcements if str(r.get("announce_date") or "") >= since and str(r.get("announce_date") or "") <= today.isoformat()]
-    rows.sort(key=lambda r: (str(r.get("announce_date")), str(r.get("ticker"))), reverse=True)
+    rows = [r for r in announcements if _in_window(r, since, today.isoformat())]
+    rows.sort(key=lambda r: (str(r.get("announce_date")), str(r.get("accept_time") or ""), str(r.get("ticker"))), reverse=True)
+    per_issuer = Counter(_issuer_key(r) for r in rows)
+    newest: list[dict] = []
+    seen: set[str] = set()
+    for r in rows:
+        key = _issuer_key(r)
+        if key not in seen:
+            seen.add(key)
+            newest.append(r)
     out = []
-    for r in rows[:MAX_RECENT]:
+    for r in newest[:MAX_RECENT]:
+        outcome = r.get("outcome") or "announced_only"
+        ex_date = r.get("announced_ex_date")
+        if not ex_date:
+            ex_status = None
+        elif outcome == "cancelled":
+            ex_status = "cancelled"
+        else:
+            ex_status = "scheduled" if str(ex_date) >= today.isoformat() else "effective"
         out.append(
             {
                 "ticker": r.get("ticker"),
@@ -88,9 +233,13 @@ def recent_announcements(announcements: list[dict], today: date) -> list[dict]:
                 "exchange_class": r.get("exchange_class"),
                 "announce_date": r.get("announce_date"),
                 "first_proxy_date": r.get("first_proxy_date"),
-                "announced_ex_date": r.get("announced_ex_date"),
+                "announced_ex_date": ex_date,
+                "ex_date_status": ex_status,
+                "ex_date_before_filing": bool(ex_date and str(ex_date) < str(r.get("announce_date") or "")),
                 "ratio": r.get("announced_ratio"),
-                "outcome": r.get("outcome") or "announced_only",
+                "outcome": outcome,
+                "phrase_hit": outcome == "announced_only" and r.get("announced_ratio") is None and not ex_date,
+                "filings_in_window": per_issuer[_issuer_key(r)],
                 "date_quality": r.get("date_quality"),
                 "source": r.get("source"),
                 "confidence": r.get("confidence"),
@@ -102,8 +251,12 @@ def recent_announcements(announcements: list[dict], today: date) -> list[dict]:
     return out
 
 
-def upcoming_effective(events: list[dict], announcements: list[dict], today: date) -> list[dict]:
-    """Known or announced ex dates on or after today: events first, then parsed schedules."""
+def upcoming_effective(events: list[dict], announcements: list[dict], today: date, *, cap: int | None = MAX_UPCOMING) -> list[dict]:
+    """Known or announced ex dates on or after today: events first, then parsed schedules.
+
+    A ``mention`` (reverse-split language without an action) or a cancellation
+    schedules nothing, so neither is upcoming even when the text carries a date.
+    """
     cutoff = today.isoformat()
     out = []
     for r in events:
@@ -127,7 +280,7 @@ def upcoming_effective(events: list[dict], announcements: list[dict], today: dat
             )
     for r in announcements:
         scheduled = str(r.get("announced_ex_date") or "")
-        if scheduled >= cutoff and (r.get("outcome") or "announced_only") != "cancelled":
+        if scheduled >= cutoff and (r.get("outcome") or "announced_only") not in NOT_SCHEDULED_OUTCOMES:
             out.append(
                 {
                     "ticker": r.get("ticker"),
@@ -147,42 +300,120 @@ def upcoming_effective(events: list[dict], announcements: list[dict], today: dat
                 }
             )
     out.sort(key=lambda r: (str(r["ex_date"]), str(r["ticker"])))
-    return out[:MAX_UPCOMING]
+    return out if cap is None else out[:cap]
 
 
-def repeat_splitters(events: list[dict]) -> list[dict]:
+def _cohort(prior: int) -> str:
+    return "first" if prior == 0 else "second" if prior == 1 else "third_plus"
+
+
+def _repeat_groups(distinct: list[dict]) -> dict[str, list[dict]]:
     groups: dict[str, list[dict]] = defaultdict(list)
-    for r in events:
-        if r.get("cohort") in {"second", "third_plus"}:
-            groups[_issuer_key(r)].append(r)
+    for r in distinct:
+        groups[_issuer_key(r)].append(r)
+    return {key: rows for key, rows in groups.items() if len(rows) >= 2}
+
+
+def _issuer_by_ticker(announcements: list[dict]) -> dict[str, tuple[str, str | None]]:
+    """ticker -> (cik, company) where the announcement ledger maps it to exactly one CIK."""
+    seen: dict[str, dict[str, str | None]] = defaultdict(dict)
+    for r in announcements:
+        if r.get("ticker") and r.get("cik"):
+            seen[str(r["ticker"])].setdefault(str(r["cik"]), r.get("company"))
+    return {ticker: next(iter(ciks.items())) for ticker, ciks in seen.items() if len(ciks) == 1}
+
+
+def repeat_splitters(distinct: list[dict], announcements: list[dict] | None = None) -> list[dict]:
+    """Issuers with two or more distinct splits, counted after duplicate rows merge.
+
+    ``prior_rs_count`` and ``cohort`` are recomputed from the distinct events, so
+    a split recorded twice no longer promotes its issuer a cohort. An issuer
+    with no CIK on the event is matched by ticker to the announcement ledger
+    only when that ticker maps to one CIK, and says so in ``cik_source``.
+    """
+    by_ticker = _issuer_by_ticker(announcements or [])
     out = []
-    for rows in groups.values():
-        latest = max(rows, key=lambda r: str(r.get("ex_date") or ""))
+    for rows in _repeat_groups(distinct).values():
+        rows = sorted(rows, key=lambda r: str(r.get("ex_date") or ""))
+        latest = rows[-1]
+        prior = len(rows) - 1
+        cik, company, cik_source = latest.get("cik"), latest.get("company"), "event" if latest.get("cik") else None
+        if not cik and str(latest.get("ticker")) in by_ticker:
+            cik, matched_company = by_ticker[str(latest.get("ticker"))]
+            company = company or matched_company
+            cik_source = "announcement_ticker"
         out.append(
             {
                 "ticker": latest.get("ticker"),
-                "cik": latest.get("cik"),
-                "company": latest.get("company"),
+                "cik": cik,
+                "cik_source": cik_source,
+                "company": company,
                 "exchange_class": latest.get("exchange_class"),
-                "prior_rs_count": max(int(r.get("prior_rs_count") or 0) for r in rows),
-                "cohort": latest.get("cohort"),
+                "prior_rs_count": prior,
+                "cohort": _cohort(prior),
                 "last_ex_date": latest.get("ex_date"),
                 "last_ratio": latest.get("ratio"),
-                "url": _sec_url(latest.get("cik"), None),
+                "last_source": latest.get("source"),
+                "ratio_flag": _ratio_flag(latest),
+                "duplicates_merged": sum(len(r.get("merged") or []) for r in rows),
+                "url": _sec_url(cik, None),
             }
         )
     out.sort(key=lambda r: (str(r["last_ex_date"]), str(r["ticker"])), reverse=True)
     return out[:MAX_REPEAT]
 
 
+def coverage(events: list[dict]) -> dict:
+    """Share of events whose ticker starts A-D, per exchange class.
+
+    The yfinance seed stopped after the letter D, so a class fed only by it
+    reads as a census when it is a quarter of the alphabet. Listed events also
+    come from Databento printed prices across every letter; OTC and unknown
+    rows do not.
+    """
+    share: dict[str, float | None] = {}
+    sizes: dict[str, int] = {}
+    for cls in ("listed", "otc", "unknown"):
+        rows = [r for r in events if r.get("exchange_class") == cls]
+        sizes[cls] = len(rows)
+        early = sum(1 for r in rows if str(r.get("ticker") or "")[:1].upper() in "ABCD")
+        share[cls] = round(early / len(rows), 3) if rows else None
+    skewed = [cls for cls in share if share[cls] is not None and sizes[cls] >= COVERAGE_MIN_EVENTS and share[cls] > COVERAGE_SKEW_SHARE]
+    sources = Counter(str(r.get("source") or "unknown") for r in events if r.get("exchange_class") in skewed)
+    note = None
+    if skewed:
+        words = [CLASS_NAMES[c] if c == "otc" else CLASS_NAMES[c].lower() for c in skewed]
+        names = " and ".join(words)
+        names = names[:1].upper() + names[1:]
+        shares = ", ".join(f"{word} {share[c]:.0%}" for word, c in zip(words, skewed))
+        origin = ""
+        if sources and sources.get("yfinance", 0) * 2 > sum(sources.values()):
+            origin = " They come mostly from the yfinance seed, which stops after the letter D."
+        note = (
+            f"{names} events are mostly tickers starting A-D ({shares}, against about {REFERENCE_A_TO_D_SHARE:.0%} "
+            f"of SEC-registered tickers).{origin} Read those counts as coverage, not a census."
+        )
+    return {
+        "a_to_d_share": share,
+        "events_by_class": sizes,
+        "skewed_classes": skewed,
+        "skewed_sources": dict(sources),
+        "reference_a_to_d_share": REFERENCE_A_TO_D_SHARE,
+        "note": note,
+    }
+
+
 def _run_summary(run: dict) -> dict:
     analysis = run.get("analysis") or {}
     waterfall = analysis.get("waterfall") or {}
     funnel = {str(s.get("stage")): s.get("n") for s in run.get("funnel") or []}
+    label = run.get("label")
     return {
         "id": run.get("id"),
         "created_at": run.get("created_at"),
-        "label": run.get("label"),
+        "label": label,
+        "baseline": label == BASELINE_RUN_LABEL,
+        "superseded": SUPERSEDED_RUNS.get(str(label)),
         "taken": funnel.get("taken"),
         "net_pnl": waterfall.get("net"),
         "gross_after_fills": waterfall.get("gross_after_fills"),
@@ -198,14 +429,28 @@ def _run_summary(run: dict) -> dict:
 
 
 def book_section(runs: list[dict]) -> dict:
+    """The latest persisted batch, headlined by its predeclared baseline.
+
+    ``latest_run`` stays the highest id (the last scenario persisted), which is
+    an accident of write order; ``headline_run`` is the batch's
+    ``assumed_100_h5_effective`` comparator, or the latest run when a batch
+    has no baseline. Superseded scenarios carry the reason in ``superseded``.
+    """
     if not runs:
-        return {"latest_run": None, "latest_batch": [], "run_count": 0, "honest_limits": HONEST_LIMITS, **RESEARCH_ONLY}
+        return {"latest_run": None, "headline_run": None, "baseline_label": BASELINE_RUN_LABEL, "latest_batch": [], "run_count": 0, "honest_limits": HONEST_LIMITS, **RESEARCH_ONLY}
     latest = max(runs, key=lambda r: int(r.get("id") or 0))
     batch = [r for r in runs if r.get("created_at") == latest.get("created_at")]
     batch.sort(key=lambda r: int(r.get("id") or 0))
+    baseline = next((r for r in reversed(batch) if r.get("label") == BASELINE_RUN_LABEL), None)
+    # Range over scenarios that traded and still stand: an empty strict book is not a result.
+    summaries = [_run_summary(r) for r in batch]
+    nets = [s["net_pnl"] for s in summaries if not s["superseded"] and s["taken"] and isinstance(s["net_pnl"], (int, float))]
     return {
         "latest_run": _run_summary(latest),
-        "latest_batch": [_run_summary(r) for r in batch],
+        "headline_run": _run_summary(baseline or latest),
+        "baseline_label": BASELINE_RUN_LABEL,
+        "batch_net_range": [min(nets), max(nets)] if nets else None,
+        "latest_batch": summaries,
         "run_count": len(runs),
         "first_created_at": min(str(r.get("created_at") or "") for r in runs) or None,
         "note": "Persisted run statistics from the local book; per-trade ledgers and equity curves are local artifacts and are not in the feed.",
@@ -255,6 +500,14 @@ def build(*, today: date | None = None, ledger_dir: Path | None = None) -> dict:
     report = health(today, ledger_dir=ledger_dir, check_dashboard=False)
     chain_errors = [e for e in report["structural_errors"] if e.startswith("decisions[")]
 
+    current = _current_tickers(announcements)
+    distinct, merged_rows = distinct_events(events, current)
+    since = (today - timedelta(days=RECENT_DAYS)).isoformat()
+    window = [r for r in announcements if _in_window(r, since, today.isoformat())]
+    upcoming_all = upcoming_effective(events, announcements, today, cap=None)
+    ex_dates = sorted(str(r.get("ex_date")) for r in events if r.get("ex_date"))
+    cover = coverage(events)
+
     by_year: Counter = Counter(str(r.get("ex_date") or "")[:4] for r in events if r.get("ex_date"))
     counts = {
         "events": len(events),
@@ -264,21 +517,36 @@ def build(*, today: date | None = None, ledger_dir: Path | None = None) -> dict:
         "by_year": dict(sorted(by_year.items())),
         "announcements_by_outcome": dict(Counter(str(r.get("outcome") or "announced_only") for r in announcements)),
         "announcements_by_exchange_class": {k: sum(1 for r in announcements if r.get("exchange_class") == k) for k in ("listed", "otc", "unknown")},
-        "announcements_last_90_days": sum(1 for r in announcements if str(r.get("announce_date") or "") >= (today - timedelta(days=RECENT_DAYS)).isoformat()),
+        "announcements_last_90_days": len(window),
+        "announcement_issuers_last_90_days": len({_issuer_key(r) for r in window}),
         "events_with_filing_text": sum(1 for r in events if r.get("date_quality") == "filing_text"),
-        "repeat_issuers": len({_issuer_key(r) for r in events if r.get("cohort") in {"second", "third_plus"}}),
+        "repeat_issuers": len(_repeat_groups(distinct)),
+        # Additive: where the completed events came from and how many still need a filing check.
+        "events_distinct": len(distinct),
+        "duplicate_event_rows": merged_rows,
+        "events_by_source": dict(Counter(str(r.get("source") or "unknown") for r in events).most_common()),
+        "events_by_status": dict(Counter(str(r.get("status") or "unknown") for r in events).most_common()),
+        "events_needs_review": sum(1 for r in events if r.get("needs_review")),
+        "first_ex_date": ex_dates[0] if ex_dates else None,
+        "last_ex_date": ex_dates[-1] if ex_dates else None,
+        "upcoming_effective": len(upcoming_all),
     }
+    span = f"with ex dates {ex_dates[0][:4]}-{ex_dates[-1][:4]}" if ex_dates else "with no completed events yet"
+    definition = (
+        f"Reverse splits {span}, US listed and OTC: completed events with an ex date, "
+        "8-K/6-K phrase hits that never printed, the persisted shared-capital book, and the RSI-1.0 "
+        "paper process with its append-only decision journal."
+    )
+    if cover["note"]:
+        definition = f"{definition} {cover['note']}"
     caps = (manifest.get("caps") or {}) if manifest else {}
     return {
         "schema_version": SCHEMA_VERSION,
         "generated_at": utc_now(),
         "as_of": today.isoformat(),
         "caption": CAPTION,
-        "definition": (
-            "Reverse splits over about five years, US listed and OTC: completed events with an ex date, "
-            "8-K/6-K phrase hits that never printed, the persisted shared-capital book, and the RSI-1.0 "
-            "paper process with its append-only decision journal."
-        ),
+        "definition": definition,
+        "coverage": cover,
         **RESEARCH_ONLY,
         "ledger": {
             "exported_at": manifest.get("exported_at"),
@@ -290,8 +558,8 @@ def build(*, today: date | None = None, ledger_dir: Path | None = None) -> dict:
         },
         "counts": counts,
         "recent_announcements": recent_announcements(announcements, today),
-        "upcoming_effective": upcoming_effective(events, announcements, today),
-        "repeat_splitters": repeat_splitters(events),
+        "upcoming_effective": upcoming_all[:MAX_UPCOMING],
+        "repeat_splitters": repeat_splitters(distinct, announcements),
         "book": book_section(runs),
         "process": process_section(),
         "decisions_summary": decisions_summary(decisions, chain_errors),
