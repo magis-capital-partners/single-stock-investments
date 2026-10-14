@@ -269,6 +269,34 @@ reports signed mean, median and 90th-percentile changes, including price
 improvements. This measures background market movement without our orders;
 it cannot establish causal market impact or actual broker fill delays.
 
+`capital_risk` adds returns on gross exposure and required margin for the
+price cohorts, individual cost components and execution scenarios. The
+main house assumption is 100%, with 50% and 200% sensitivities. Initial and
+FINRA per-share maintenance floors remain in all sensitivities. Encumbered
+short proceeds are not required equity. Summed entry capital is reused over
+the historical dates: P&L divided by it is a weighted capital return, not
+an annual portfolio result. Simultaneous entry margin and $50k account
+drawdown are shown separately. Historical broker margin schedules remain
+unknown; these calculations cannot establish a broker-approved margin rate.
+
+Tail statistics show worst losses, empirical 95% loss percentiles and the
+average worst 5% of observations. 99% estimates are withheld below 100
+observations. Listing-venue `ohlcv-1m` bars restrict the adverse-price
+diagnostics to the regular session. Full entry/exit minute highs are bounds;
+interior-minute highs omit the ambiguous boundary minutes. These are marks,
+not covers. Missing intraday paths remain missing.
+
+Explicit stress cases raise prices by 25%, 50%, 100%, 200% and 500%. The
+combined stress also raises house margin to 200%, triples the original
+case's annual borrowing assumption, holds seven calendar days and assumes
+a 5% adverse cover cost. Borrow accrues on rounded collateral at the
+stressed price for the whole delay. Results show loss on gross and original
+margin, stressed margin demand and a conservative loss-plus-margin reserve.
+The three-largest-position basket is hypothetical; it does not claim the
+positions historically overlapped. No stress probability or finite maximum
+short loss is asserted. Add `--intraday` to collect missing minute bars;
+that collection uses its own `--max-cost` reservation budget.
+
 With a Databento key supplied securely in the process environment:
 
 ```powershell

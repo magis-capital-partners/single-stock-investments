@@ -87,7 +87,7 @@ def targets(source):
         if key not in rows or rows[key]["date"] != p["entry_date"]:
             key += "/account/" + p["entry_date"]
             add(key, p["ticker"], p["entry_date"], p["id"], str(p["cik"]))
-        rows[key]["account"] = {k: p[k] for k in ("entry_shares", "raw_price_pnl", "spread_cost", "slippage_cost", "borrow", "commission", "net_pnl", "last_cover_date", "partial_covers")}
+        rows[key]["account"] = {k: p[k] for k in ("entry_shares", "raw_price_pnl", "spread_cost", "slippage_cost", "borrow", "commission", "net_pnl", "last_cover_date", "partial_covers", "rate")}
     conn.close()
     return list(rows.values()), case
 
@@ -328,6 +328,7 @@ def combine_routes(rows, measured, routed):
 
 
 def latency_study(rows, measured, states):
+    from .capital_risk import margin
     result = []
     for mode in ('mbp-10', 'routed-mbp-10'):
         for offset in (1, 30):
@@ -356,12 +357,14 @@ def latency_study(rows, measured, states):
                         exclusions['insufficient_baseline_or_delayed_depth'] += 1
                         continue
                     entry, exit_, later_entry, later_exit = fills
-                    moves.append({'fraction': (entry-later_entry+later_exit-exit_)/entry,
-                                  'dollars': q*(entry-later_entry+later_exit-exit_)})
+                    change = entry-later_entry+later_exit-exit_
+                    moves.append({'fraction': change/books[0]['mid'], 'margin_fraction':q*change/margin(q,books[0]['mid']),
+                                  'dollars': q*change})
                 if moves:
                     result.append({'execution_mode': mode, 'entry_seconds_after_open': offset,
                                    'delay_milliseconds': milliseconds, 'pairs': len(moves),
                                    'additional_round_trip_cost': distribution(r['fraction'] for r in moves),
+                                   'additional_round_trip_cost_on_margin': distribution(r['margin_fraction'] for r in moves),
                                    'aggregate_additional_usd': sum(r['dollars'] for r in moves),
                                    'adverse_share': sum(r['fraction'] > 0 for r in moves) / len(moves),
                                    'exclusions': dict(exclusions)})
@@ -505,6 +508,7 @@ def main(argv=None):
     parser.add_argument('--workers', type=int, default=8)
     parser.add_argument('--offline', action='store_true')
     parser.add_argument('--routing', action='store_true', help='Also collect listing + Arca + EDGX depth for original entries')
+    parser.add_argument('--intraday', action='store_true', help='Also collect regular-session minute bars for tail diagnostics')
     parser.add_argument('--publish', action='store_true')
     args = parser.parse_args(argv)
     cfg = load_config()
@@ -546,15 +550,26 @@ def main(argv=None):
         collection += [{**i, 'file': 'routing/' + i['file']} if i.get('file') else i for i in route_collection]
     states = trading_states(cfg, root, rows)
     summary = analyze(root, rows, measured, case, collection, states)
+    from .capital_risk import build_capital_risk, intraday_requests
+    intraday_root = root / 'intraday'
+    if args.intraday and not args.offline:
+        intraday_root.mkdir(exist_ok=True)
+        bar_requests = intraday_requests(rows)
+        write_json(intraday_root / 'requests.json', bar_requests)
+        collect(intraday_root, bar_requests, budget=args.max_cost, workers=args.workers)
+    summary['capital_risk'] = build_capital_risk(cfg, root, rows, measured, states, summary)
+    write_json(root / 'summary.json', summary)
     manifest = {"source_run": source.name, "source_manifest_sha256": digest(source / 'manifest.json'),
                "account_source_sha256": digest(source / 'post_split_fundamental_60_h1_current_mean.json'),
                "source_code_sha256": digest(Path(__file__)), "targets_sha256": digest(root / 'targets.local.json'),
                "collection_sha256": digest(root / 'collection.json'), "summary_sha256": digest(root / 'summary.json')}
-    manifest['source_code'] = [{'path': p.name, 'sha256': digest(p)} for p in (Path(__file__), Path(__file__).with_name('databento_bars.py'))]
+    manifest['source_code'] = [{'path': p.name, 'sha256': digest(p)} for p in (Path(__file__), Path(__file__).with_name('databento_bars.py'), Path(__file__).with_name('capital_risk.py'), Path(__file__).with_name('realism.py'))]
     if route_collection:
         manifest['routing_collection_sha256'] = digest(routing_root / 'collection.json')
         manifest['routing_targets_sha256'] = digest(routing_root / 'targets.local.json')
     manifest['trading_status_sha256'] = digest(root / 'trading_status.local.json')
+    if (intraday_root / 'collection.json').exists():
+        manifest['intraday_collection_sha256'] = digest(intraday_root / 'collection.json')
     write_json(root / 'manifest.json', manifest)
     if args.publish:
         write_json(cfg.ledger_dir / 'execution_research.json', summary)
