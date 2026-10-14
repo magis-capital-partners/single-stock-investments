@@ -16,6 +16,7 @@ import math
 import sys
 import time
 from copy import deepcopy
+from collections import OrderedDict
 from datetime import date, datetime, timezone
 from pathlib import Path
 
@@ -66,6 +67,7 @@ class FundamentalBridge:
         self.frameworks = read_json(self.root / "_system/research/short-alpha/frameworks.json")
         self.ledger = read_json(self.root / "_system/research/short-alpha/candidates.json")
         self.docs, self.scores = {}, {}
+        self.raw_docs = OrderedDict()
         self.sic = read_json(self.root / "_system/reference/market-data/fundamentals/_sic_map.json")
 
     def manifest(self):
@@ -93,7 +95,14 @@ class FundamentalBridge:
         if key in self.docs:
             return self.docs[key]
         raw_path = self.cache / f"CIK{int(cik):010d}.json" if cik_id(cik).isdigit() else None
-        raw = read_json(raw_path) if raw_path and raw_path.exists() else None
+        raw = None
+        if raw_path and raw_path.exists():
+            cache_key=str(raw_path)
+            if cache_key not in self.raw_docs:
+                self.raw_docs[cache_key]=read_json(raw_path)
+                if len(self.raw_docs)>4:self.raw_docs.popitem(last=False)
+            self.raw_docs.move_to_end(cache_key)
+            raw=self.raw_docs[cache_key]
         source = "raw_companyfacts" if raw else "ssi_latest_revision_cache"
         provenance = []
         if raw and self.extractor:

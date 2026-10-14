@@ -8,8 +8,8 @@ too large for git (``prices_daily``, ``edgar_hits``, ``control_prices``,
 ``book_trades``, ``book_equity``, ``issuers``) are not exported; issuer names
 travel denormalised on the event and announcement rows.
 
-A file that would exceed ``MAX_FILE_BYTES`` is capped to rows dated within
-``CAP_YEARS`` years and the cap is recorded in the manifest.
+A file that would exceed ``MAX_FILE_BYTES`` is divided into immutable year
+shards with a checked index. Every historical row is retained.
 
     python -m _system.scripts.reverse_splits.export_ledger [--db PATH] [--out DIR]
 """
@@ -39,8 +39,8 @@ from .ledger import (
     verify_decision_chain,
     write_json,
     write_jsonl,
+    write_retained_jsonl,
 )
-from .utils import years_ago
 
 
 def _connect_ro(path: Path) -> sqlite3.Connection:
@@ -161,16 +161,6 @@ def _decision_rows(path: Path | None) -> list[dict]:
     return out
 
 
-def _cap(rows: list[dict], field: str, *, cap_bytes: int, cap_years: int, today: date | None = None, sparse: bool = False) -> tuple[list[dict], str | None]:
-    """Keep rows dated within ``cap_years`` when the serialised file exceeds ``cap_bytes``."""
-    size = sum(len(dumps_row(r, sparse=sparse).encode("utf-8")) + 1 for r in rows)
-    if size <= cap_bytes:
-        return rows, None
-    since = years_ago(cap_years, today).isoformat()
-    kept = [r for r in rows if str(r.get(field) or "") >= since]
-    return kept, since
-
-
 def export_ledger(
     db_path: Path,
     ledger_dir: Path,
@@ -192,30 +182,29 @@ def export_ledger(
     decisions = _decision_rows(decisions_db)
     chain_errors = verify_decision_chain(decisions)
 
-    announcements, ann_since = _cap(announcements, "announce_date", cap_bytes=cap_bytes, cap_years=cap_years, today=today, sparse=True)
-    finra, finra_since = _cap(finra, "settlement_date", cap_bytes=cap_bytes, cap_years=cap_years, today=today, sparse=True)
+    ann_since = finra_since = None
 
     written = {
-        "events": write_jsonl(paths["events"], events),
-        "announcements": write_jsonl(paths["announcements"], announcements, sparse=True),
-        "finra_short_interest": write_jsonl(paths["finra_short_interest"], finra, sparse=True),
-        "book_runs": write_jsonl(paths["book_runs"], book_runs),
-        "book_source_manifests": write_jsonl(paths["book_source_manifests"], manifests),
-        "decisions": write_jsonl(paths["decisions"], decisions),
+        "events": write_retained_jsonl(paths["events"], events, max_bytes=cap_bytes),
+        "announcements": write_retained_jsonl(paths["announcements"], announcements, sparse=True, max_bytes=cap_bytes),
+        "finra_short_interest": write_retained_jsonl(paths["finra_short_interest"], finra, sparse=True, max_bytes=cap_bytes),
+        "book_runs": write_retained_jsonl(paths["book_runs"], book_runs, max_bytes=cap_bytes),
+        "book_source_manifests": write_retained_jsonl(paths["book_source_manifests"], manifests, max_bytes=cap_bytes),
+        "decisions": write_retained_jsonl(paths["decisions"], decisions, max_bytes=cap_bytes),
     }
     manifest = {
         "schema_version": SCHEMA_VERSION,
         "exported_at": utc_now(),
         "source_db": Path(db_path).name,
         "files": {
-            name: {"rows": rows, "bytes": size, "sha256": sha256_file(paths[name])}
-            for name, (rows, size) in written.items()
+            name: info for name, info in written.items()
         },
         "caps": {
             "max_file_bytes": cap_bytes,
             "cap_years": cap_years,
             "announcements_since": ann_since,
             "finra_since": finra_since,
+            "history_truncated": False,
         },
         "decisions_chain_valid": not chain_errors,
         "decisions_chain_errors": chain_errors,

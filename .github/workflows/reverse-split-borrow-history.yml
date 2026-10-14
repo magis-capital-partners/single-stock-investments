@@ -1,0 +1,40 @@
+name: Reverse-split borrow indications
+on:
+  workflow_dispatch:
+  schedule:
+    # Before the US open in both Eastern standard and daylight time.
+    - cron: "0 13 * * 1-5"
+permissions:
+  contents: write
+concurrency:
+  group: reverse-split-borrow-history
+  cancel-in-progress: false
+jobs:
+  archive:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: main
+          fetch-depth: 1
+          sparse-checkout: |
+            /_system/scripts/
+            /_system/data/reverse_splits/
+            /_system/research/short-alpha/
+          sparse-checkout-cone-mode: false
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Archive timestamped public availability and fee indications
+        run: python -m _system.scripts.reverse_splits.borrow_archive
+      - name: Save the derived archive
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add _system/data/reverse_splits/borrow_history
+          if ! git diff --cached --quiet; then
+            git commit -m "chore: archive reverse-split borrow indications"
+            git pull --rebase origin main
+            git push origin HEAD:main
+          fi

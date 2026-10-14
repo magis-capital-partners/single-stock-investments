@@ -1,7 +1,7 @@
 # Reverse-split backtests: why n is small and how to raise it
 
 **Date:** 2026-10-12
-**Status:** proposal. Nothing here has been collected, bought or rerun. This file authorizes no data purchase and no provider contact.
+**Status:** implemented in SSI on 2026-10-13 under Drew's instruction to implement, commit and push to main. The original measurements and proposed phases below are retained as the dated rationale. See the implementation snapshot in `_system/data/reverse_splits/README.md` and the published `expansion_summary.json` for current counts and gaps. No paid data purchase was made.
 **Readers:** Drew; Michael (owns reverse-split strategy decisions and `_system/data/reverse_splits/decisions.jsonl`).
 **Builds on:** `reverse-split-short-research/docs/DATA_EXPANSION_PLAN.md` (2026-10-11). Its rules stand: keep sub-$1 names in scope through specific feasibility checks, adjudicate episodes, preserve the frozen v1 result, and never lower a threshold to reach a count. This file adds what that plan did not have: the measured funnel, five defects, the data sources with prices, and an order of work that lands in SSI.
 
@@ -131,7 +131,7 @@ Separately, a hazard, now removed: the old repo's local copy had `src/rsdb/ibkr_
 
 ### Phase 3: borrow evidence
 
-- **Forward, free, starting now.** A daily lane that pulls IBKR's public `usa.txt` (`ftp2.interactivebrokers.com`, user `shortstock`; ftp3 does not answer from the workstation), checks the MD5 and `#EOF` count, and stores the rows for tickers with a reverse-split event or announcement in the past year plus the Short Alpha ledger. Both importers read the file as of 2026-10-12. From the first run, the strict book has a real locate and fee for every new event.
+- **Forward, free, starting now.** A daily lane that pulls IBKR's public `usa.txt` (`ftp2.interactivebrokers.com`, user `shortstock`; ftp3 does not answer from the workstation), checks the MD5 and `#EOF` count, and stores the rows for reverse-split names plus the Short Alpha ledger. Both importers read the file as of 2026-10-12. This is a timestamped inventory and fee indication. It is not an approved locate; strict execution still requires separate approval evidence.
 - **Historical.** QuantRocket's IBKR borrow-fee and shortable-share history from 2018-04-16 is the closest match to the live source (paid; price behind a login; no redistribution). iBorrowDesk's JSON has daily IBKR history from about 2017, but it is unofficial, has no published terms, and may drop delisted names. Use it for nothing without a decision. Before 2018, only proxies exist: SEC fails-to-deliver (2004+), Nasdaq threshold lists (2005+), and the FINRA short interest already in the ledger. They are covariates, never fees.
 
 **Done when:** strict and assumed-fee books run on the same events, with strict n reported for 2018+ and forward cohorts.

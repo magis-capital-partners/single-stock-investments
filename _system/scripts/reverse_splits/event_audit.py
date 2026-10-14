@@ -21,7 +21,8 @@ def ratio(text):
         den+=part
     return 1/den if den>1 else None
 
-def audit_clause(text,filed,original_date=None):
+def audit_clause(text,filed,original_date=None,*,marker=REVERSE):
+    REVERSE=marker
     t=re.sub(r'\s+',' ',text or '').strip()
     dates=[]
     def add(day,kind,quote):

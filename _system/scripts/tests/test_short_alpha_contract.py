@@ -13,6 +13,7 @@ reverse-splits placeholder.
 from __future__ import annotations
 
 import json
+import re
 import shutil
 import subprocess
 import sys
@@ -483,7 +484,10 @@ def test_shorts_tab_renders_entry_fields_and_lens_strip(tmp_path: Path) -> None:
 @pytest.mark.skipif(not INDEX.exists(), reason="dashboard/index.html absent (sparse checkout)")
 def test_index_wires_the_reverse_splits_sub_section() -> None:
     text = INDEX.read_text(encoding="utf-8")
-    assert '<script src="reverse-splits-viz.js?v=20261013-clean"></script>' in text
+    # The cache-bust token changes with the renderer. The contract is that
+    # index.html loads this file once, with a version query, and mounts it.
+    tags = re.findall(r'<script src="(reverse-splits-viz\.js\?v=[^"]+)"></script>', text)
+    assert len(tags) == 1, tags
     assert "data/reverse_splits.json" in text
     assert "window.ReverseSplitsViz &&" in text
     assert "ShortAlphaViz.mountReverseSplits(content, doc)" in text
