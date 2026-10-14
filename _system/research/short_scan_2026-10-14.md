@@ -86,7 +86,7 @@
 | ASTS | indexed | L36/S0 | 2026-06-23 | 36 long, 0 short indexed; 0 short feed-eligible |
 | ASX.AX | no_hit | — | — | No activist index hits |
 | ATO | no_hit | — | — | No activist index hits |
-| AVAV | indexed | L2/S0 | 2026-06-24 | 2 long, 0 short indexed; 0 short feed-eligible |
+| AVAV | indexed | L3/S0 | 2026-06-24 | 3 long, 0 short indexed; 0 short feed-eligible |
 | AVB | no_hit | — | — | No activist index hits |
 | AVGO | no_hit | — | — | No activist index hits |
 | AVY | indexed | L8/S1 | 2025-04-04 | 8 long, 1 short indexed; 1 short feed-eligible |
@@ -105,21 +105,21 @@
 | BAX | indexed | L2/S0 | 2019-05-17 | 2 long, 0 short indexed; 0 short feed-eligible |
 | BB | indexed | L7/S0 | 2026-05-06 | 7 long, 0 short indexed; 0 short feed-eligible |
 | BBAI | indexed | L28/S0 | 2025-04-10 | 28 long, 0 short indexed; 0 short feed-eligible |
-| BBY | indexed | L4/S0 | 2026-06-02 | 4 long, 0 short indexed; 0 short feed-eligible |
+| BBY | indexed | L5/S0 | 2026-06-02 | 5 long, 0 short indexed; 0 short feed-eligible |
 | BDX | no_hit | — | — | No activist index hits |
 | BE | indexed | L14/S0 | 2026-02-17 | 14 long, 0 short indexed; 0 short feed-eligible |
 | BEN | indexed | L113/S0 | 2026-10-02 | 113 long, 0 short indexed; 0 short feed-eligible |
 | BF.B | indexed | L4/S0 | 2026-06-03 | 4 long, 0 short indexed; 0 short feed-eligible |
 | BG | indexed | L2/S1 | 2026-03-25 | 2 long, 1 short indexed; 1 short feed-eligible |
 | BIDU | indexed | L6/S0 | 2024-09-27 | 6 long, 0 short indexed; 0 short feed-eligible |
-| BIIB | indexed | L8/S0 | 2026-05-14 | 8 long, 0 short indexed; 0 short feed-eligible |
+| BIIB | indexed | L9/S0 | 2026-05-14 | 9 long, 0 short indexed; 0 short feed-eligible |
 | BKNG | indexed | L2/S0 | 2020-04-07 | 2 long, 0 short indexed; 0 short feed-eligible |
 | BKR | indexed | L16/S0 | 2022-05-09 | 16 long, 0 short indexed; 0 short feed-eligible |
 | BKRB | indexed | L33/S0 | 2026-07-15 | 33 long, 0 short indexed; 0 short feed-eligible |
 | BLDR | no_hit | — | — | No activist index hits |
 | BLK | indexed | L5/S0 | 2026-07-29 | 5 long, 0 short indexed; 0 short feed-eligible |
 | BLSH | indexed | L3/S0 | 2026-02-09 | 3 long, 0 short indexed; 0 short feed-eligible |
-| BMNR | indexed | L7/S0 | 2026-03-20 | 7 long, 0 short indexed; 0 short feed-eligible |
+| BMNR | indexed | L8/S0 | 2026-03-20 | 8 long, 0 short indexed; 0 short feed-eligible |
 | BMY | indexed | L15/S0 | 2026-04-17 | 15 long, 0 short indexed; 0 short feed-eligible |
 | BMYS.KL | no_hit | — | — | No activist index hits |
 | BN | indexed | L134/S0 | 2026-07-23 | 134 long, 0 short indexed; 0 short feed-eligible |
@@ -135,7 +135,7 @@
 | BSX | no_hit | — | — | No activist index hits |
 | BTDR | indexed | L18/S0 | 2026-06-30 | 18 long, 0 short indexed; 0 short feed-eligible |
 | BULL | no_hit | — | — | No activist index hits |
-| BUR | indexed | L0/S1 | 2019-08-01 | 0 long, 1 short indexed; 1 short feed-eligible |
+| BUR | indexed | L0/S1 | 2019-08-07 | 0 long, 1 short indexed; 1 short feed-eligible |
 | BVERS | no_hit | — | — | No activist index hits |
 | BWEL | no_hit | — | — | No activist index hits |
 | BX | indexed | L3/S0 | 2024-05-21 | 3 long, 0 short indexed; 0 short feed-eligible |
@@ -164,10 +164,10 @@
 | CHD | indexed | L0/S1 | 2019-09-05 | 0 long, 1 short indexed; 1 short feed-eligible |
 | CHNL | no_hit | — | — | No activist index hits |
 | CHRW | indexed | L1/S0 | 2022-02-28 | 1 long, 0 short indexed; 0 short feed-eligible |
-| CHTR | indexed | L39/S0 | 2026-09-30 | 39 long, 0 short indexed; 0 short feed-eligible |
+| CHTR | indexed | L40/S0 | 2026-09-30 | 40 long, 0 short indexed; 0 short feed-eligible |
 | CI | no_hit | — | — | No activist index hits |
 | CIEN | no_hit | — | — | No activist index hits |
-| CIFR | indexed | L27/S0 | 2026-10-07 | 27 long, 0 short indexed; 0 short feed-eligible |
+| CIFR | indexed | L28/S0 | 2026-10-07 | 28 long, 0 short indexed; 0 short feed-eligible |
 | CINF | no_hit | — | — | No activist index hits |
 | CKX | indexed | L3/S0 | 2022-09-13 | 3 long, 0 short indexed; 0 short feed-eligible |
 | CL | indexed | L1/S0 | 2025-04-24 | 1 long, 0 short indexed; 0 short feed-eligible |
@@ -185,13 +185,13 @@
 | COF | indexed | L1/S0 | 2024-04-08 | 1 long, 0 short indexed; 0 short feed-eligible |
 | COHR | indexed | L9/S0 | 2026-02-11 | 9 long, 0 short indexed; 0 short feed-eligible |
 | COIN | no_hit | — | — | No activist index hits |
-| COLD | indexed | L2/S0 | 2026-04-30 | 2 long, 0 short indexed; 0 short feed-eligible |
+| COLD | indexed | L3/S0 | 2026-04-30 | 3 long, 0 short indexed; 0 short feed-eligible |
 | COO | no_hit | — | — | No activist index hits |
 | COP | indexed | L11/S0 | 2024-04-17 | 11 long, 0 short indexed; 0 short feed-eligible |
 | COPX | no_hit | — | — | No activist index hits |
 | COR | indexed | L17/S0 | 2025-06-09 | 17 long, 0 short indexed; 0 short feed-eligible |
 | CORBF | no_hit | — | — | No activist index hits |
-| CORZ | indexed | L38/S0 | 2026-08-14 | 38 long, 0 short indexed; 0 short feed-eligible |
+| CORZ | indexed | L39/S0 | 2026-08-14 | 39 long, 0 short indexed; 0 short feed-eligible |
 | COST | indexed | L1/S0 | 2024-01-17 | 1 long, 0 short indexed; 0 short feed-eligible |
 | CPAY | no_hit | — | — | No activist index hits |
 | CPNG | no_hit | — | — | No activist index hits |
@@ -418,7 +418,7 @@
 | INTU | indexed | L1/S1 | 2024-09-20 | 1 long, 1 short indexed; 1 short feed-eligible |
 | INV | indexed | L13/S0 | 2026-05-05 | 13 long, 0 short indexed; 0 short feed-eligible |
 | INVH | indexed | L4/S0 | 2020-02-14 | 4 long, 0 short indexed; 0 short feed-eligible |
-| IONQ | indexed | L4/S1 | 2026-04-01 | 4 long, 1 short indexed; 0 short feed-eligible |
+| IONQ | indexed | L4/S0 | 2026-04-01 | 4 long, 0 short indexed; 0 short feed-eligible |
 | IP | indexed | L2/S0 | 2021-05-21 | 2 long, 0 short indexed; 0 short feed-eligible |
 | IPCXR | no_hit | — | — | No activist index hits |
 | IQV | indexed | L6/S0 | 2019-08-13 | 6 long, 0 short indexed; 0 short feed-eligible |
@@ -621,7 +621,7 @@
 | PRVL.CVR | no_hit | — | — | No activist index hits |
 | PSA | indexed | L8/S0 | 2022-07-21 | 8 long, 0 short indexed; 0 short feed-eligible |
 | PSE | no_hit | — | — | No activist index hits |
-| PSH | indexed | L11/S0 | 2026-02-11 | 11 long, 0 short indexed; 0 short feed-eligible |
+| PSH | indexed | L10/S0 | 2026-01-01 | 10 long, 0 short indexed; 0 short feed-eligible |
 | PSK.TO | no_hit | — | — | No activist index hits |
 | PSKY | indexed | L40/S0 | 2026-10-08 | 40 long, 0 short indexed; 0 short feed-eligible |
 | PSX | indexed | L79/S0 | 2026-04-03 | 79 long, 0 short indexed; 0 short feed-eligible |
@@ -635,10 +635,10 @@
 | QDEL | indexed | L8/S0 | 2024-11-21 | 8 long, 0 short indexed; 0 short feed-eligible |
 | QNT | no_hit | — | — | No activist index hits |
 | QQQ | no_hit | — | — | No activist index hits |
-| QS | indexed | L11/S1 | 2025-03-07 | 11 long, 1 short indexed; 0 short feed-eligible |
+| QS | indexed | L11/S0 | 2025-03-07 | 11 long, 0 short indexed; 0 short feed-eligible |
 | QUBT | indexed | L10/S0 | 2026-05-28 | 10 long, 0 short indexed; 0 short feed-eligible |
 | RBLX | no_hit | — | — | No activist index hits |
-| RCAT | indexed | L5/S1 | 2025-01-01 | 5 long, 1 short indexed; 1 short feed-eligible |
+| RCAT | indexed | L5/S1 | 2025-10-10 | 5 long, 1 short indexed; 1 short feed-eligible |
 | RCL | no_hit | — | — | No activist index hits |
 | RDDT | indexed | L5/S0 | 2026-05-06 | 5 long, 0 short indexed; 0 short feed-eligible |
 | RDW | indexed | L41/S0 | 2026-05-20 | 41 long, 0 short indexed; 0 short feed-eligible |
@@ -651,7 +651,7 @@
 | RIOT | indexed | L27/S0 | 2025-08-18 | 27 long, 0 short indexed; 0 short feed-eligible |
 | RIVN | indexed | L1/S0 | 2022-05-11 | 1 long, 0 short indexed; 0 short feed-eligible |
 | RJF | no_hit | — | — | No activist index hits |
-| RKLB | indexed | L23/S11 | 2026-03-30 | 23 long, 11 short indexed; 10 short feed-eligible |
+| RKLB | indexed | L23/S10 | 2026-03-30 | 23 long, 10 short indexed; 10 short feed-eligible |
 | RKT | indexed | L9/S0 | 2025-10-15 | 9 long, 0 short indexed; 0 short feed-eligible |
 | RL | no_hit | — | — | No activist index hits |
 | RMBS | no_hit | — | — | No activist index hits |
@@ -697,7 +697,7 @@
 | SOC | indexed | L21/S0 | 2026-08-14 | 21 long, 0 short indexed; 0 short feed-eligible |
 | SOEZ | no_hit | — | — | No activist index hits |
 | SOFI | indexed | L10/S0 | 2022-08-17 | 10 long, 0 short indexed; 0 short feed-eligible |
-| SOLV | indexed | L3/S0 | 2026-04-30 | 3 long, 0 short indexed; 0 short feed-eligible |
+| SOLV | no_hit | — | — | No activist index hits |
 | SOUN | indexed | L8/S0 | 2023-07-25 | 8 long, 0 short indexed; 0 short feed-eligible |
 | SOXX | no_hit | — | — | No activist index hits |
 | SPCX | no_hit | — | — | No activist index hits |
@@ -784,7 +784,7 @@
 | UNH | indexed | L2/S0 | 2021-01-15 | 2 long, 0 short indexed; 0 short feed-eligible |
 | UNP | indexed | L1/S0 | 2021-03-25 | 1 long, 0 short indexed; 0 short feed-eligible |
 | UPS | no_hit | — | — | No activist index hits |
-| UPST | indexed | L4/S11 | 2025-02-14 | 4 long, 11 short indexed; 10 short feed-eligible |
+| UPST | indexed | L4/S10 | 2025-02-14 | 4 long, 10 short indexed; 10 short feed-eligible |
 | URA | no_hit | — | — | No activist index hits |
 | URB.A.TO | no_hit | — | — | No activist index hits |
 | URI | no_hit | — | — | No activist index hits |
