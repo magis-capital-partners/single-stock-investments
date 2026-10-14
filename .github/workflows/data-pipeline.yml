@@ -4,7 +4,7 @@ name: Data Pipeline
 
 on:
   repository_dispatch:
-    types: [heal-technicals, heal-warrants]
+    types: [heal-technicals, heal-warrants, heal-separations, heal-reverse-splits]
   schedule:
     - cron: "0 3 * * *"     # nightly intake-full
     - cron: "15 2 * * 1-5"  # weekday technical fear/capitulation refresh
@@ -13,7 +13,7 @@ on:
     - cron: "0 10 * * 0,3"  # full document harvest twice weekly
     - cron: "0 14 * * *"    # drive intake (daily)
     - cron: "30 */6 * * *"  # portfolio news
-    - cron: "0 15 * * 1"    # CVR discovery (SEC + inbox) Mondays
+    - cron: "0 15 * * 1"    # CVR + warrant + separation discovery Mondays
     - cron: "0 16 * * 0"    # World Model weekly (Sunday UTC: themes + KPI ledgers + strip)
 
 # Concurrency: each job below takes its own queue (data-commit-main-<job>)
@@ -44,6 +44,8 @@ jobs:
       news: ${{ steps.pick.outputs.news }}
       cvr_discover: ${{ steps.pick.outputs.cvr_discover }}
       warrant_discover: ${{ steps.pick.outputs.warrant_discover }}
+      separation_discover: ${{ steps.pick.outputs.separation_discover }}
+      reverse_splits: ${{ steps.pick.outputs.reverse_splits }}
       world_model: ${{ steps.pick.outputs.world_model }}
       technicals: ${{ steps.pick.outputs.technicals }}
     steps:
@@ -54,11 +56,13 @@ jobs:
           EVENT_ACTION: ${{ github.event.action }}
         run: |
           set -euo pipefail
-          intake_full=false; activist=false; downloads=false; drive=false; news=false; cvr_discover=false; warrant_discover=false; world_model=false; technicals=false; download_mode=light
+          intake_full=false; activist=false; downloads=false; drive=false; news=false; cvr_discover=false; warrant_discover=false; separation_discover=false; reverse_splits=false; world_model=false; technicals=false; download_mode=light
           if [ "$EVENT_NAME" = "repository_dispatch" ]; then SCHEDULE="dispatch:$EVENT_ACTION"; fi
           case "$SCHEDULE" in
             "dispatch:heal-technicals") technicals=true ;;
             "dispatch:heal-warrants") warrant_discover=true ;;
+            "dispatch:heal-separations") separation_discover=true ;;
+            "dispatch:heal-reverse-splits") reverse_splits=true ;;
             "0 3 * * *") intake_full=true ;;
             "15 2 * * 1-5") technicals=true ;;
             "0 6 * * *") activist=true ;;
@@ -66,7 +70,7 @@ jobs:
             "0 10 * * 0,3") downloads=true; download_mode=full ;;
             "0 14 * * *") drive=true ;;
             "30 */6 * * *") news=true ;;
-            "0 15 * * 1") cvr_discover=true; warrant_discover=true ;;
+            "0 15 * * 1") cvr_discover=true; warrant_discover=true; separation_discover=true; reverse_splits=true ;;
             "0 16 * * 0") world_model=true ;;
             *) echo "::error::Unrecognized schedule='$SCHEDULE'"; exit 1 ;;
           esac
@@ -79,10 +83,12 @@ jobs:
             echo "news=$news"
             echo "cvr_discover=$cvr_discover"
             echo "warrant_discover=$warrant_discover"
+            echo "separation_discover=$separation_discover"
+            echo "reverse_splits=$reverse_splits"
             echo "world_model=$world_model"
             echo "technicals=$technicals"
           } >> "$GITHUB_OUTPUT"
-          echo "Selected: intake_full=$intake_full technicals=$technicals activist=$activist downloads=$downloads($download_mode) drive=$drive news=$news cvr_discover=$cvr_discover world_model=$world_model"
+          echo "Selected: intake_full=$intake_full technicals=$technicals activist=$activist downloads=$downloads($download_mode) drive=$drive news=$news cvr_discover=$cvr_discover warrant_discover=$warrant_discover separation_discover=$separation_discover reverse_splits=$reverse_splits world_model=$world_model"
 
   intake-full:
     needs: decide
@@ -115,11 +121,18 @@ jobs:
           sparse-checkout-cone-mode: false
           fetch-depth: 1
       - name: Checkout workspace (full)
+        id: checkout_full
         run: bash _system/scripts/ci_checkout_workspace.sh full
       - uses: actions/setup-python@v5
         with:
           python-version: "3.12"
       - name: Nightly intake-full rebuild
+        id: intake_rebuild
+        # The loud step below still fails the job. continue-on-error only lets
+        # a named source failure commit the steps that finished before
+        # dashboard assembly. A validation failure (dashboard_written=true)
+        # is not committed.
+        continue-on-error: true
         uses: ./.github/actions/rebuild-data
         env:
           OAUTH_CLIENT_ID: ${{ vars.OAUTH_CLIENT_ID }}
@@ -129,9 +142,29 @@ jobs:
           profile: full
           validate: "true"
       - name: Commit artifacts
+        if: steps.checkout_full.outcome == 'success' && steps.intake_rebuild.outcome == 'success'
         uses: ./.github/actions/commit-main
         with:
           message: "chore: nightly intake-full $(date -u +%Y-%m-%d)"
+      - name: Commit partial progress
+        if: steps.checkout_full.outcome == 'success' && steps.intake_rebuild.outcome == 'failure' && steps.intake_rebuild.outputs.dashboard_written != 'true'
+        uses: ./.github/actions/commit-main
+        with:
+          message: "chore: intake-full partial progress after ${{ steps.intake_rebuild.outputs.failed_source }} failed"
+      - name: Report intake-full failure
+        if: steps.intake_rebuild.outcome == 'failure'
+        run: |
+          set -euo pipefail
+          SOURCE="${{ steps.intake_rebuild.outputs.failed_source }}"
+          WRITTEN="${{ steps.intake_rebuild.outputs.dashboard_written }}"
+          if [ -n "$SOURCE" ]; then
+            echo "::error::Nightly intake-full failed on source ${SOURCE}. Earlier steps were committed when dashboard assembly had not started."
+          elif [ "$WRITTEN" = "true" ]; then
+            echo "::error::Nightly intake-full failed during dashboard validation. The rebuilt dashboard was not committed. See the Validate dashboard JSON step."
+          else
+            echo "::error::Nightly intake-full failed before dashboard assembly, and no source name was recorded. See the rebuild log. Nothing new was committed."
+          fi
+          exit 1
 
   technicals:
     needs: decide
@@ -233,6 +266,7 @@ jobs:
             dashboard/data/capitulation_daily_state.json
             dashboard/data/signal_track_record.json
             _system/data/signal_track_record/ledger
+            _system/reference/market-data/fundamentals/index_float_adv.json
       - name: Keep unresolved technical failures loud after preserving progress
         if: always() && (steps.technical_health.outcome == 'failure' || steps.capitulation_rebuilt.outcome == 'failure' || steps.track_record.outcome == 'failure')
         run: |
@@ -875,6 +909,128 @@ jobs:
           echo "::error::Warrant snapshot was preserved, but strict health remains degraded."
           exit 1
 
+  separation-discover:
+    needs: decide
+    if: needs.decide.outputs.separation_discover == 'true'
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    concurrency:
+      # Per-job queue - see the concurrency note at the top of this file.
+      group: data-commit-main-${{ github.job }}
+      cancel-in-progress: false
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          sparse-checkout: |
+            _system/scripts/ci_checkout_workspace.sh
+            _system/scripts/ci_resolve_checkout_ref.sh
+            _system/scripts/ci_sparse_checkout_paths.py
+          sparse-checkout-cone-mode: false
+          fetch-depth: 1
+      - name: Checkout separation workspace
+        run: bash _system/scripts/ci_checkout_workspace.sh minimal
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Discover, model flows, and resolve separations
+        # EDGAR full-text discovery is fail-soft (exit 0 on EDGAR failure;
+        # discovery_state.json tracks the streak). The register and the flow,
+        # cohort and outcome files are append-only, so a failed run can only
+        # leave them unchanged, never rewrite a published row.
+        run: |
+          python _system/scripts/refresh_separation_universe.py             --discover             --discover-days 14             --discover-limit 25
+          python _system/scripts/build_separation_flows.py
+          python _system/scripts/resolve_separation_outcomes.py
+          python _system/scripts/build_separations_dashboard.py
+      - id: separation_health
+        name: Validate separation health after writing the truthful snapshot
+        continue-on-error: true
+        run: |
+          set -euo pipefail
+          python _system/scripts/check_separation_universe.py --strict
+      - name: Commit separation artifacts
+        if: always()
+        uses: ./.github/actions/commit-main
+        with:
+          message: "chore: separation weekly discovery $(date -u +%Y-%m-%d)"
+          git_add: >-
+            _system/data/separations/
+            dashboard/data/separations.json
+      - name: Keep unresolved source failures loud after preserving progress
+        if: steps.separation_health.outcome == 'failure'
+        run: |
+          echo "::error::Separation snapshot was preserved, but strict health remains degraded."
+          exit 1
+
+  reverse-splits:
+    needs: decide
+    if: needs.decide.outputs.reverse_splits == 'true'
+    runs-on: ubuntu-latest
+    # Step timeouts below bound each network stage; a hung collector must not
+    # take the commit step with it (a 2026-10-12 local dry run hung on a
+    # SQLite lock for 30 minutes with nothing in the log).
+    timeout-minutes: 60
+    concurrency:
+      # Per-job queue - see the concurrency note at the top of this file.
+      group: data-commit-main-${{ github.job }}
+      cancel-in-progress: false
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          sparse-checkout: |
+            _system/scripts/ci_checkout_workspace.sh
+            _system/scripts/ci_resolve_checkout_ref.sh
+            _system/scripts/ci_sparse_checkout_paths.py
+          sparse-checkout-cone-mode: false
+          fetch-depth: 1
+      - name: Checkout reverse-split workspace
+        run: bash _system/scripts/ci_checkout_workspace.sh minimal
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Install collectors
+        run: python -m pip install --disable-pip-version-check --quiet requests yfinance beautifulsoup4 lxml
+      - name: Rebuild the local database from the committed ledger
+        # The SQLite is a local artifact; the JSONL ledger under
+        # _system/data/reverse_splits/ is the truth. A clean clone imports it
+        # first, so the scoped collectors below only add to it.
+        timeout-minutes: 10
+        run: python -u -m _system.scripts.reverse_splits.cli import-ledger
+      - name: Discover and date recent reverse splits (fail-soft)
+        # Scoped to the last three weeks: without --since-days the seed would
+        # wipe the imported announcements because edgar_hits is not in the
+        # ledger. EDGAR and Yahoo failures leave the ledger unchanged.
+        continue-on-error: true
+        timeout-minutes: 30
+        run: |
+          python -u -m _system.scripts.reverse_splits.cli seed --since-days 21
+          python -u -m _system.scripts.reverse_splits.cli classify-exchanges
+          python -u -m _system.scripts.reverse_splits.cli clocks --since-days 21
+      - name: Export the ledger and build the dashboard feed
+        timeout-minutes: 10
+        run: |
+          python -u -m _system.scripts.reverse_splits.cli export-ledger
+          python _system/scripts/build_reverse_splits_dashboard.py
+      - id: reverse_split_health
+        name: Validate reverse-split health after writing the truthful snapshot
+        continue-on-error: true
+        run: |
+          set -euo pipefail
+          python _system/scripts/check_reverse_splits.py --strict
+      - name: Commit reverse-split artifacts
+        if: always()
+        uses: ./.github/actions/commit-main
+        with:
+          message: "chore: reverse-split weekly discovery $(date -u +%Y-%m-%d)"
+          git_add: >-
+            _system/data/reverse_splits/
+            dashboard/data/reverse_splits.json
+      - name: Keep unresolved source failures loud after preserving progress
+        if: steps.reverse_split_health.outcome == 'failure'
+        run: |
+          echo "::error::Reverse-split snapshot was preserved, but strict health remains degraded."
+          exit 1
+
   world-model:
     needs: decide
     if: needs.decide.outputs.world_model == 'true'
@@ -912,7 +1068,7 @@ jobs:
           message: "chore: world-model weekly $(date -u +%Y-%m-%d)"
 
   pipeline-summary:
-    needs: [decide, intake-full, technicals, activist, downloads, drive, news, cvr-discover, warrant-discover, world-model]
+    needs: [decide, intake-full, technicals, activist, downloads, drive, news, cvr-discover, warrant-discover, separation-discover, reverse-splits, world-model]
     if: always()
     runs-on: ubuntu-latest
     timeout-minutes: 5
@@ -928,5 +1084,7 @@ jobs:
           echo "news=${{ needs.decide.outputs.news }} result=${{ needs.news.result }}"
           echo "cvr_discover=${{ needs.decide.outputs.cvr_discover }} result=${{ needs.cvr-discover.result }}"
           echo "warrant_discover=${{ needs.decide.outputs.warrant_discover }} result=${{ needs.warrant-discover.result }}"
+          echo "separation_discover=${{ needs.decide.outputs.separation_discover }} result=${{ needs.separation-discover.result }}"
+          echo "reverse_splits=${{ needs.decide.outputs.reverse_splits }} result=${{ needs.reverse-splits.result }}"
           echo "world_model=${{ needs.decide.outputs.world_model }} result=${{ needs.world-model.result }}"
           echo "Deploy Dashboard chains via workflow_run on successful commits."

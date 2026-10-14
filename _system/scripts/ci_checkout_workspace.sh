@@ -69,11 +69,40 @@ apply_sparse_paths() {
   rm -f "$paths_file"
 }
 
+# The bootstrap checkout is sparse (three scripts). `sparse-checkout disable`
+# can fail, and its error used to be discarded. A later checkout of a different
+# commit then keeps only those bootstrap files: graph-invariants could not
+# import test_graph_build on a pull_request run (2026-10-14, run 38570621487)
+# while the same job on a branch checkout still saw the tree. After the
+# requested commit is checked out, materialize HEAD if that happened.
+ensure_full_worktree() {
+  if [ -f _system/scripts/graph_invariants.py ]; then
+    return 0
+  fi
+  echo "Full checkout left the worktree sparse; materializing HEAD." >&2
+  git config core.sparseCheckout false || true
+  if git config --get core.sparseCheckoutCone >/dev/null 2>&1; then
+    git config --unset core.sparseCheckoutCone || true
+  fi
+  rm -f "$(git rev-parse --git-path info/sparse-checkout)"
+  local skipped
+  skipped=$(git ls-files -v | awk '/^S/ {print substr($0, 3)}')
+  if [ -n "$skipped" ]; then
+    printf '%s\n' "$skipped" | git update-index --no-skip-worktree --stdin
+  fi
+  git checkout -f HEAD
+  if [ ! -f _system/scripts/graph_invariants.py ]; then
+    echo "Full checkout did not materialize _system/scripts/graph_invariants.py" >&2
+    exit 1
+  fi
+}
+
 case "$PROFILE" in
   full|history)
     git sparse-checkout disable 2>/dev/null || true
     fetch_ref
     checkout_ref
+    ensure_full_worktree
     ;;
   minimal|marvin-agent)
     git sparse-checkout init --no-cone

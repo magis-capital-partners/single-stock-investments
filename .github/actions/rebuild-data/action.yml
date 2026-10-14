@@ -10,6 +10,14 @@ inputs:
     required: false
     default: "false"
 
+outputs:
+  failed_source:
+    description: Script that failed. Empty when the profile step itself succeeded.
+    value: ${{ steps.profile.outputs.failed_source }}
+  dashboard_written:
+    description: true once dashboard assembly has started. Do not commit a failed rebuild after this.
+    value: ${{ steps.profile.outputs.dashboard_written }}
+
 runs:
   using: composite
   steps:
@@ -55,6 +63,7 @@ runs:
         echo "GOOGLE_APPLICATION_CREDENTIALS=$RUNNER_TEMP/google-service-account.json" >> "$GITHUB_ENV"
 
     - name: Rebuild profile
+      id: profile
       if: inputs.profile != 'none'
       shell: bash
       env:

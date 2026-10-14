@@ -39,7 +39,7 @@ def bars(count: int = 90, *, selloff: bool = False) -> list[dict]:
 class FlowStressTest(unittest.TestCase):
     def test_snapshot_has_bounded_scores_and_provenance(self):
         result = calculate_flow_snapshot("SPY", bars())
-        self.assertEqual(result["model_version"], "forced-flow-intraday-v1")
+        self.assertEqual(result["model_version"], "forced-flow-intraday-v2")
         self.assertEqual(result["entitlement_mode"], "live")
         self.assertEqual(result["quality_state"], "ready")
         for value in result["scores"].values():

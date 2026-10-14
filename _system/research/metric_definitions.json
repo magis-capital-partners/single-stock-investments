@@ -1,6 +1,6 @@
 {
   "schema_version": "1.0",
-  "updated": "2026-09-01",
+  "updated": "2026-10-11",
   "definitions": {
     "cash_and_equivalents_usd": {
       "version": "1.0",
@@ -237,6 +237,48 @@
       ],
       "formula": "observed issuer owner-cash bridge / registered low-case floor * 100",
       "requires_fiscal_period_identity": true
+    },
+    "separation_completed": {
+      "version": "1.0",
+      "observation_type": "instant",
+      "duration_basis": "event",
+      "canonical_unit": "indicator",
+      "source_adapters": [
+        "separation_register"
+      ],
+      "formula": "1 if the latest register version known by as_of has status completed with its end date (settlement, expiration, distribution) on or before measurement_period_end; 0 once measurement_period_end has passed without completion; blocked (target_date_not_reached) before then",
+      "source_files": [
+        "_system/data/separations/separation_registry.jsonl",
+        "_system/data/separations/separation_amendments.jsonl"
+      ],
+      "spec_fields": [
+        "separation_id"
+      ],
+      "accepted_forms": [
+        "SC TO-I",
+        "SC TO-I/A",
+        "10-12B",
+        "424B3",
+        "8-K"
+      ],
+      "requires_fiscal_period_identity": false
+    },
+    "separation_flow_window_elapsed": {
+      "version": "1.0",
+      "observation_type": "instant",
+      "duration_basis": "event",
+      "canonical_unit": "indicator",
+      "source_adapters": [
+        "separation_register"
+      ],
+      "formula": "1 if as_of > window_end of the latest run_date flow row for separation_id (optionally filtered by observation_plan.side), else 0; blocked when no flow row or no window_end exists",
+      "source_files": [
+        "_system/data/separations/separation_flows.jsonl"
+      ],
+      "spec_fields": [
+        "separation_id"
+      ],
+      "requires_fiscal_period_identity": false
     }
   }
 }

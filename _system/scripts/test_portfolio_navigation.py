@@ -61,7 +61,9 @@ def test_currency_and_ideas_workspaces_expose_explicit_decision_semantics() -> N
     assert "Avg cost · native" in javascript
     assert "Market value · base" in javascript
     assert "fx_rate_to_base_decimal" in javascript
-    assert ">Inbox<" in html and ">Screens<" in html and ">Contracts<" in html
+    assert ">Inbox<" in html and ">Screens<" in html and ">Special Situations<" in html
+    assert 'href="#/ideas/situations"' in html
+    assert 'href="#/ideas/warrants"' not in html
     assert "Decision Inbox" in html
     assert "methodology collapsed" in html
     assert ".decision-tape" in ideas_css

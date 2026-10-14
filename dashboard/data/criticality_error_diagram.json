@@ -1,0 +1,309 @@
+{
+  "schema_version": 1,
+  "generated_at": "2026-10-09T03:02:55.336308+00:00",
+  "model_version": "lppls-error-diagram-v1",
+  "source": "_system/reference/market-data/benchmarks/spy_us.csv",
+  "price_field": "Close",
+  "sample_step_sessions": 10,
+  "min_history_sessions": 750,
+  "research_only": true,
+  "in_base_irr": false,
+  "authority": "none",
+  "sample_count": 773,
+  "sample_first": "1996-01-17",
+  "sample_last": "2026-09-23",
+  "min_concentration": 25.0,
+  "lead_sessions": 120,
+  "calm_sessions": 60,
+  "curve": [
+    {
+      "threshold": 5,
+      "time_in_alarm": 0.2354,
+      "miss_rate": 0.2,
+      "crashes_tested": 10,
+      "crashes_caught": 8,
+      "crashes_missed": 2,
+      "calm_tested": 6,
+      "calm_false_alarms": 6,
+      "alarm_samples": 182,
+      "sample_count": 773
+    },
+    {
+      "threshold": 10,
+      "time_in_alarm": 0.1953,
+      "miss_rate": 0.2,
+      "crashes_tested": 10,
+      "crashes_caught": 8,
+      "crashes_missed": 2,
+      "calm_tested": 6,
+      "calm_false_alarms": 6,
+      "alarm_samples": 151,
+      "sample_count": 773
+    },
+    {
+      "threshold": 15,
+      "time_in_alarm": 0.1475,
+      "miss_rate": 0.2,
+      "crashes_tested": 10,
+      "crashes_caught": 8,
+      "crashes_missed": 2,
+      "calm_tested": 6,
+      "calm_false_alarms": 2,
+      "alarm_samples": 114,
+      "sample_count": 773
+    },
+    {
+      "threshold": 20,
+      "time_in_alarm": 0.1177,
+      "miss_rate": 0.3,
+      "crashes_tested": 10,
+      "crashes_caught": 7,
+      "crashes_missed": 3,
+      "calm_tested": 6,
+      "calm_false_alarms": 2,
+      "alarm_samples": 91,
+      "sample_count": 773
+    },
+    {
+      "threshold": 25,
+      "time_in_alarm": 0.075,
+      "miss_rate": 0.4,
+      "crashes_tested": 10,
+      "crashes_caught": 6,
+      "crashes_missed": 4,
+      "calm_tested": 6,
+      "calm_false_alarms": 1,
+      "alarm_samples": 58,
+      "sample_count": 773
+    },
+    {
+      "threshold": 30,
+      "time_in_alarm": 0.0595,
+      "miss_rate": 0.4,
+      "crashes_tested": 10,
+      "crashes_caught": 6,
+      "crashes_missed": 4,
+      "calm_tested": 6,
+      "calm_false_alarms": 1,
+      "alarm_samples": 46,
+      "sample_count": 773
+    },
+    {
+      "threshold": 40,
+      "time_in_alarm": 0.0349,
+      "miss_rate": 0.5,
+      "crashes_tested": 10,
+      "crashes_caught": 5,
+      "crashes_missed": 5,
+      "calm_tested": 6,
+      "calm_false_alarms": 1,
+      "alarm_samples": 27,
+      "sample_count": 773
+    },
+    {
+      "threshold": 50,
+      "time_in_alarm": 0.0155,
+      "miss_rate": 0.7,
+      "crashes_tested": 10,
+      "crashes_caught": 3,
+      "crashes_missed": 7,
+      "calm_tested": 6,
+      "calm_false_alarms": 0,
+      "alarm_samples": 12,
+      "sample_count": 773
+    },
+    {
+      "threshold": 60,
+      "time_in_alarm": 0.0078,
+      "miss_rate": 0.9,
+      "crashes_tested": 10,
+      "crashes_caught": 1,
+      "crashes_missed": 9,
+      "calm_tested": 6,
+      "calm_false_alarms": 0,
+      "alarm_samples": 6,
+      "sample_count": 773
+    },
+    {
+      "threshold": 70,
+      "time_in_alarm": 0.0078,
+      "miss_rate": 0.9,
+      "crashes_tested": 10,
+      "crashes_caught": 1,
+      "crashes_missed": 9,
+      "calm_tested": 6,
+      "calm_false_alarms": 0,
+      "alarm_samples": 6,
+      "sample_count": 773
+    },
+    {
+      "threshold": 80,
+      "time_in_alarm": 0.0039,
+      "miss_rate": 0.9,
+      "crashes_tested": 10,
+      "crashes_caught": 1,
+      "crashes_missed": 9,
+      "calm_tested": 6,
+      "calm_false_alarms": 0,
+      "alarm_samples": 3,
+      "sample_count": 773
+    }
+  ],
+  "selection": {
+    "demotion_enabled": true,
+    "confidence_threshold": 40,
+    "min_concentration": 25.0,
+    "miss_rate": 0.5,
+    "time_in_alarm": 0.0349,
+    "crashes_tested": 10,
+    "crashes_caught": 5,
+    "rule": "Lowest time-in-alarm among thresholds that miss at most half of tested crashes, alarm on at most a quarter of sample dates, and rest on at least five crashes. Ties take the higher threshold. Not chosen by profit.",
+    "plain_english": "Positive-bubble confidence of 40 or higher, with a concentrated critical-time window, caught 5 of 10 tested crashes and was in alarm on 3.5% of sample dates. The same level caps market-path language when either bubble direction is that strong."
+  },
+  "events": [
+    {
+      "id": "1987-10",
+      "kind": "crash",
+      "label": "October 1987",
+      "peak_date": "1987-10-16",
+      "status": "untested",
+      "samples_in_window": 0
+    },
+    {
+      "id": "1998-08",
+      "kind": "crash",
+      "label": "August 1998",
+      "peak_date": "1998-07-17",
+      "status": "caught",
+      "samples_in_window": 12
+    },
+    {
+      "id": "2000-03",
+      "kind": "crash",
+      "label": "2000-2002",
+      "peak_date": "2000-03-24",
+      "status": "missed",
+      "samples_in_window": 12
+    },
+    {
+      "id": "2007-10",
+      "kind": "crash",
+      "label": "2008-2009",
+      "peak_date": "2007-10-09",
+      "status": "missed",
+      "samples_in_window": 12
+    },
+    {
+      "id": "2010-05",
+      "kind": "crash",
+      "label": "May 2010",
+      "peak_date": "2010-05-06",
+      "status": "missed",
+      "samples_in_window": 12
+    },
+    {
+      "id": "2011-08",
+      "kind": "crash",
+      "label": "August 2011",
+      "peak_date": "2011-04-29",
+      "status": "caught",
+      "samples_in_window": 12
+    },
+    {
+      "id": "2015-08",
+      "kind": "crash",
+      "label": "August 2015",
+      "peak_date": "2015-08-21",
+      "status": "missed",
+      "samples_in_window": 12
+    },
+    {
+      "id": "2018-02",
+      "kind": "crash",
+      "label": "February 2018",
+      "peak_date": "2018-01-26",
+      "status": "caught",
+      "samples_in_window": 12
+    },
+    {
+      "id": "2020-03",
+      "kind": "crash",
+      "label": "March 2020",
+      "peak_date": "2020-02-19",
+      "status": "caught",
+      "samples_in_window": 12
+    },
+    {
+      "id": "2022-01",
+      "kind": "crash",
+      "label": "2022 drawdown",
+      "peak_date": "2022-01-03",
+      "status": "missed",
+      "samples_in_window": 12
+    },
+    {
+      "id": "2024-08",
+      "kind": "crash",
+      "label": "August 5 2024",
+      "peak_date": "2024-07-16",
+      "status": "caught",
+      "samples_in_window": 12
+    },
+    {
+      "id": "calm-1995",
+      "kind": "calm",
+      "label": "Mid-1995 calm",
+      "peak_date": "1995-06-30",
+      "status": "untested",
+      "samples_in_window": 0
+    },
+    {
+      "id": "calm-2004",
+      "kind": "calm",
+      "label": "Mid-2004 calm",
+      "peak_date": "2004-06-30",
+      "status": "quiet",
+      "samples_in_window": 6
+    },
+    {
+      "id": "calm-2006",
+      "kind": "calm",
+      "label": "Mid-2006 calm",
+      "peak_date": "2006-06-30",
+      "status": "quiet",
+      "samples_in_window": 6
+    },
+    {
+      "id": "calm-2013",
+      "kind": "calm",
+      "label": "Mid-2013 calm",
+      "peak_date": "2013-06-28",
+      "status": "false_alarm",
+      "samples_in_window": 6
+    },
+    {
+      "id": "calm-2017",
+      "kind": "calm",
+      "label": "Mid-2017 calm",
+      "peak_date": "2017-06-30",
+      "status": "quiet",
+      "samples_in_window": 6
+    },
+    {
+      "id": "calm-2019",
+      "kind": "calm",
+      "label": "Mid-2019 calm",
+      "peak_date": "2019-06-28",
+      "status": "quiet",
+      "samples_in_window": 6
+    },
+    {
+      "id": "calm-2023",
+      "kind": "calm",
+      "label": "Mid-2023 calm",
+      "peak_date": "2023-06-30",
+      "status": "quiet",
+      "samples_in_window": 6
+    }
+  ]
+}

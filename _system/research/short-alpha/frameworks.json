@@ -1,5 +1,5 @@
 {
-  "schema_version": "1.1",
+  "schema_version": "1.2",
   "source": "_system/reference/short-selling-library/README.md",
   "groups": [
     {
@@ -37,7 +37,8 @@
     {"id": "news", "label": "News / regulatory release"},
     {"id": "internal_analysis", "label": "Internal analysis"},
     {"id": "instrument_document", "label": "Prospectus / instrument document"},
-    {"id": "filing_furnace", "label": "Filing furnace event"}
+    {"id": "filing_furnace", "label": "Filing furnace event"},
+    {"id": "provider", "label": "Data provider / exchange or index notice"}
   ],
   "frameworks": [
     {
@@ -191,6 +192,15 @@
       "source_note": "Furnace tags serial_equity_issuance and warrant_overhang."
     },
     {
+      "id": "reverse_split_impairment",
+      "label": "Reverse-split impairment",
+      "group": "capital_structure",
+      "kind": "judgment",
+      "empty_label": "Unscored",
+      "question": "Is the reverse split repairing a listing deficiency while the funding problem persists? Which RSI-1.0 gates are supported?",
+      "source_note": "_system/frameworks/reverse_split_short_process.md (RSI-1.0 rules, gates, sizing, stress, honest limits). Furnace tags reverse_split and delisting. A split is a capital-structure event, not a thesis: the six dated lens reviews decide whether impairment is supported."
+    },
+    {
       "id": "off_balance_sheet",
       "label": "Off balance sheet",
       "group": "capital_structure",
@@ -252,6 +262,16 @@
       "empty_label": "Unscored",
       "question": "Can days-to-cover, a crowded short, or an options squeeze force an exit before the catalyst?",
       "source_note": "NBER w9466 and w16335. FINRA days-to-cover is context, including the biotech factor file. It is not a reason to short."
+    },
+    {
+      "id": "share_supply",
+      "label": "Share supply",
+      "group": "tradability",
+      "kind": "gate",
+      "empty_label": "Unscored",
+      "question": "Which pipes can add stock: lockups, ATMs, converts, insider selling, index deletions, separations?",
+      "source_note": "Michael's share-supply category. Sourced from filings (S-3 and ATM capacity, 424B, lockup terms, Form 4) or a provider notice (index deletions, the separations lane). A pipe that can add stock is a timing gate, not a thesis.",
+      "source_types": ["filing", "provider"]
     },
     {
       "id": "path_and_timing",

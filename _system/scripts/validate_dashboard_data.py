@@ -84,6 +84,32 @@ TICKER_SHARD_MAX_MB = 2.0
 EXTREME_PUBLISHED_IRR_PCT = 25.0
 
 
+# Standalone files. Embedding them is what pushed the gitignored monolith
+# over GitHub's 100MB limit and failed intake-full after a finished rebuild
+# (2026-10-09, 2026-10-10, 2026-10-11).
+STANDALONE_EMBED_KEYS = (
+    "kpi_trends",
+    "activist_feed",
+    "document_catalog",
+    "darwin",
+    "darwin_accounts",
+    "darwin_serving",
+)
+
+
+def standalone_embed_errors(payload: dict) -> list[str]:
+    if not isinstance(payload, dict):
+        return []
+    errors = []
+    for key in STANDALONE_EMBED_KEYS:
+        if payload.get(key):
+            errors.append(
+                f"dashboard_data.json must not embed {key}; "
+                "that payload already has its own file and the monolith is at GitHub's 100MB limit"
+            )
+    return errors
+
+
 def pages_deploy_only() -> bool:
     """True when CI is publishing committed dashboard/ without a data rebuild."""
     return os.environ.get("CI_PAGES_DEPLOY_ONLY", "").lower() in {"1", "true", "yes"}
@@ -284,6 +310,7 @@ def main() -> int:
         errors.append(
             "dashboard_data.json must not embed insights; load dashboard/data/insights/ shards separately"
         )
+    errors.extend(standalone_embed_errors(payload))
     if payload.get("research_memory"):
         errors.append(
             "dashboard_data.json must not embed research_memory; load dashboard/data/research_memory.json separately"

@@ -98,6 +98,83 @@ export function rollingStats(daily, window) {
   };
 }
 
+const SCALING_HORIZON = 20;
+const SCALING_MIN_SAMPLES = 40;
+const SCALING_HURST_BAND = 0.1;
+
+function sampleStdev(values) {
+  if (values.length < 2) return null;
+  const center = values.reduce((sum, value) => sum + value, 0) / values.length;
+  const square = values.reduce((sum, value) => sum + (value - center) ** 2, 0);
+  return Math.sqrt(square / (values.length - 1));
+}
+
+/**
+ * Compare 20-session log-move size with the square root of time.
+ * Hurst = log(sigma_20 / sigma_1) / log(20). Brownian motion is 0.5.
+ */
+export function scalingGap(daily, subject = "NAV") {
+  const base = {
+    available: false,
+    subject,
+    horizon_sessions: SCALING_HORIZON,
+    hurst_band: SCALING_HURST_BAND,
+    rule: "Hurst exponent from log(sigma_20 / sigma_1) / log(20), using the sample standard deviation of overlapping 20-session log moves. Near the square root of time when the exponent is within 0.1 of 0.5.",
+  };
+  const logs = [];
+  for (let index = 1; index < (daily || []).length; index += 1) {
+    const previous = Number(daily[index - 1]?.value);
+    const current = Number(daily[index]?.value);
+    if (previous > 0 && current > 0) logs.push(Math.log(current / previous));
+    else logs.push(null);
+  }
+  const oneDay = logs.filter((value) => value != null);
+  const horizon = [];
+  for (let index = SCALING_HORIZON; index <= logs.length; index += 1) {
+    const window = logs.slice(index - SCALING_HORIZON, index);
+    if (window.some((value) => value == null)) continue;
+    horizon.push(window.reduce((sum, value) => sum + value, 0));
+  }
+  if (oneDay.length < 2 || horizon.length < SCALING_MIN_SAMPLES) {
+    return {
+      ...base,
+      null_reason: `needs ${SCALING_HORIZON + SCALING_MIN_SAMPLES} daily closes for a 20-session scaling check`,
+    };
+  }
+  const sigma1 = sampleStdev(oneDay);
+  const sigmaH = sampleStdev(horizon);
+  if (!(sigma1 > 0) || sigmaH == null) {
+    return { ...base, null_reason: "daily log changes have no variation, so there is no scaling exponent" };
+  }
+  const brownian = Math.sqrt(SCALING_HORIZON);
+  const ratio = sigmaH / sigma1;
+  const hurst = ratio > 0 ? Math.log(ratio) / Math.log(SCALING_HORIZON) : 0;
+  let label = "near_square_root";
+  if (hurst > 0.5 + SCALING_HURST_BAND) label = "faster_than_square_root";
+  else if (hurst < 0.5 - SCALING_HURST_BAND) label = "slower_than_square_root";
+  const hurstText = hurst.toFixed(2);
+  const plain = {
+    near_square_root: `20-session ${subject} moves are close to the square root of time. The annualized volatility figure is a fair summary of this sample.`,
+    faster_than_square_root: `20-session ${subject} moves are larger than the square root of time (scaling exponent ${hurstText}). Annualized volatility understates how large multi-week moves have been.`,
+    slower_than_square_root: `20-session ${subject} moves are smaller than the square root of time (scaling exponent ${hurstText}). Annualized volatility overstates how large multi-week moves have been.`,
+  }[label];
+  return {
+    ...base,
+    available: true,
+    null_reason: null,
+    one_day_stdev: sigma1,
+    horizon_stdev: sigmaH,
+    realized_ratio: ratio,
+    brownian_ratio: brownian,
+    hurst,
+    relative_gap: ratio / brownian - 1,
+    label,
+    plain_english: plain,
+    daily_log_changes: oneDay.length,
+    horizon_samples: horizon.length,
+  };
+}
+
 function annualisedVolatility(returns) {
   if (returns.length < 2) return null;
   const mean = returns.reduce((sum, value) => sum + value, 0) / returns.length;

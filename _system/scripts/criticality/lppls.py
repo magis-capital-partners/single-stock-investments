@@ -233,6 +233,69 @@ def _percentile(values: Iterable[float], percentile: float) -> float | None:
     return float(np.percentile(np.asarray(items, dtype=float), percentile))
 
 
+def classify_tail(
+    prices: Sequence[float],
+    *,
+    direction: str,
+    qualified_count: int,
+) -> dict:
+    """Say whether the latest daily move sits inside the historical tail.
+
+    The 1st and 99th percentiles of earlier log returns are the historical
+    tail. A qualified log-periodic fit is reported beside that, because a
+    power-law day and a critical-regime day are different objects.
+    """
+    values = [float(value) for value in prices if math.isfinite(value) and value > 0]
+    unavailable = {
+        "kind": "unavailable",
+        "label": "Not enough history to place the latest move in the tail.",
+        "latest_log_return": None,
+        "percentile_low": None,
+        "percentile_high": None,
+        "outside_tail": None,
+        "qualified_log_periodic": qualified_count > 0 and direction in {
+            "positive_bubble",
+            "negative_bubble",
+        },
+    }
+    if len(values) < 62:
+        return unavailable
+    log_returns = [
+        math.log(values[index] / values[index - 1])
+        for index in range(1, len(values))
+    ]
+    latest = log_returns[-1]
+    history = np.asarray(log_returns[:-1], dtype=float)
+    low = float(np.percentile(history, 1))
+    high = float(np.percentile(history, 99))
+    outside = bool(latest < low or latest > high)
+    qualified = qualified_count > 0 and direction in {"positive_bubble", "negative_bubble"}
+    if outside and qualified:
+        kind = "beyond_tail_with_log_periodic"
+        label = (
+            "The latest daily move is outside the historical tail, and the "
+            "ensemble has a qualified log-periodic fit."
+        )
+    elif outside:
+        kind = "beyond_tail"
+        label = (
+            "The latest daily move is outside the historical tail, without a "
+            "qualified log-periodic fit."
+        )
+    else:
+        kind = "inside_historical_tail"
+        label = "The latest daily move is inside the historical tail."
+    return {
+        "kind": kind,
+        "label": label,
+        "latest_log_return": round(latest, 6),
+        "percentile_low": round(low, 6),
+        "percentile_high": round(high, 6),
+        "outside_tail": outside,
+        "qualified_log_periodic": qualified,
+    }
+
+
 def fit_ensemble(
     prices: Sequence[float],
     *,
@@ -283,6 +346,11 @@ def fit_ensemble(
         if dispersion is not None else 0.0
     )
     criticality_score = dominant_confidence * (0.65 + 0.35 * concentration / 100.0)
+    tail = classify_tail(
+        values,
+        direction=direction,
+        qualified_count=len(qualified),
+    )
     return {
         "model_version": MODEL_VERSION,
         "direction": direction,
@@ -319,4 +387,5 @@ def fit_ensemble(
             "The critical-time range describes regime instability, not a promised "
             "crash or reversal date."
         ),
+        "tail": tail,
     }

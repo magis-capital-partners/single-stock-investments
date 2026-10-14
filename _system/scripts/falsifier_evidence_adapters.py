@@ -16,7 +16,8 @@ from falsifier_specs import forecast_dates, is_v3_spec, parse_due, read_json
 ROOT = Path(__file__).resolve().parents[2]
 DEFINITIONS_REL = Path("_system/research/metric_definitions.json")
 ISSUER_ADAPTERS_REL = Path("_system/research/issuer_kpi_adapters.json")
-BASE_SUPPORTED_ADAPTERS = {"fact_ledger", "sec_companyfacts", "sec_companyfacts_ttm"}
+BASE_SUPPORTED_ADAPTERS = {"fact_ledger", "sec_companyfacts", "sec_companyfacts_ttm", "separation_register"}
+SEPARATIONS_REL = Path("_system/data/separations")
 
 
 def metric_definitions(root: Path = ROOT) -> dict:
@@ -363,6 +364,118 @@ def _resolve_ledger(ticker: str, spec: dict, root: Path, today: date,
     }
 
 
+def _separation_rows(root: Path, name: str) -> list[dict]:
+    """Rows of one separations JSONL file under ``root``; [] when absent or unreadable."""
+    try:
+        from separation_common import load_jsonl
+    except ImportError:  # pragma: no cover - the module ships beside this one
+        return []
+    try:
+        return load_jsonl(root / SEPARATIONS_REL / name)
+    except ValueError:
+        return []
+
+
+def _separation_id(spec: dict, plan: dict) -> str:
+    for candidate in (spec.get("separation_id"), plan.get("separation_id"), spec.get("source_hint")):
+        text = str(candidate or "")
+        if text.startswith("sep:"):
+            return text
+    return ""
+
+
+def _resolve_separation_register(ticker: str, spec: dict, root: Path, today: date,
+                                 definition: dict, plan: dict) -> dict:
+    """Typed separation falsifiers read off the append-only register.
+
+    ``separation_completed``: 1 when the register's latest version known by
+    ``today`` says ``completed`` with its end date (settlement, expiration,
+    distribution) on or before the spec's measurement date, 0 once that date
+    has passed without completion. Before the date, with no completion, the
+    outcome is not observable yet and the adapter blocks rather than guesses.
+
+    ``separation_flow_window_elapsed``: 1 when ``today`` is past ``window_end``
+    of the latest flow row for the separation (optionally one ``side``), else 0.
+    Flows are point in time, so the newest ``run_date`` is the model's current
+    view and nothing is re-estimated here.
+    """
+    adapter = "separation_register"
+    separation_id = _separation_id(spec, plan)
+    if not separation_id:
+        return _empty("separation_id_missing", adapter)
+    metric_id = str(plan.get("metric_definition_id") or "")
+    unit = definition.get("canonical_unit") or "indicator"
+    today_text = today.isoformat()
+
+    if metric_id == "separation_completed":
+        from separation_common import end_date, latest_registry
+
+        rows = _separation_rows(root, "separation_registry.jsonl") + _separation_rows(root, "separation_amendments.jsonl")
+        known = [row for row in rows if str(row.get("separation_id")) == separation_id
+                 and str(row.get("recorded_at") or "")[:10] <= today_text]
+        if not known:
+            if any(str(row.get("separation_id")) == separation_id for row in rows):
+                return _empty("register_version_recorded_after_as_of", adapter, separation_id=separation_id)
+            return _empty("separation_not_in_register", adapter, separation_id=separation_id)
+        record = latest_registry(known)[0]
+        measurement, _observable, _deadline = forecast_dates(spec)
+        if measurement is None:
+            return _empty("measurement_period_missing", adapter)
+        completed = str(record.get("status") or "") == "completed"
+        completion = end_date(record) or str(record.get("recorded_at") or "")[:10] if completed else None
+        if completed and completion and completion <= measurement.isoformat():
+            value, as_of = 1, completion
+        elif today >= measurement:
+            value, as_of = 0, measurement.isoformat()
+        else:
+            return _empty("target_date_not_reached", adapter, separation_id=separation_id,
+                          status=record.get("status"), target_date=measurement.isoformat())
+        return {
+            "value": value,
+            "unit": unit,
+            "as_of": as_of,
+            "evidence_ref": f"{SEPARATIONS_REL.as_posix()}/separation_registry.jsonl#{separation_id}@v{record.get('version')}",
+            "adapter": adapter,
+            "blocker_reason": None,
+            "raw_observation": {
+                "separation_id": separation_id, "version": record.get("version"),
+                "status": record.get("status"), "lifecycle": record.get("lifecycle"),
+                "end_date": end_date(record), "target_date": measurement.isoformat(),
+            },
+        }
+
+    if metric_id == "separation_flow_window_elapsed":
+        flows = [row for row in _separation_rows(root, "separation_flows.jsonl")
+                 if str(row.get("separation_id")) == separation_id
+                 and str(row.get("run_date") or "")[:10] <= today_text]
+        side = str(plan.get("side") or spec.get("side") or "").lower()
+        if side:
+            flows = [row for row in flows if str(row.get("side") or "").lower() == side]
+        if not flows:
+            return _empty("flow_rows_absent", adapter, separation_id=separation_id, side=side or None)
+        latest = max(flows, key=lambda row: (str(row.get("run_date") or ""), str(row.get("flow_id") or "")))
+        window_end = parse_due(latest.get("window_end"))
+        if window_end is None:
+            return _empty("window_end_missing", adapter, separation_id=separation_id,
+                          flow_id=latest.get("flow_id"), flow_status=latest.get("status"))
+        return {
+            "value": 1 if today > window_end else 0,
+            "unit": unit,
+            "as_of": today_text,
+            "evidence_ref": f"{SEPARATIONS_REL.as_posix()}/separation_flows.jsonl#{latest.get('flow_id')}",
+            "adapter": adapter,
+            "blocker_reason": None,
+            "raw_observation": {
+                "separation_id": separation_id, "flow_id": latest.get("flow_id"),
+                "run_date": latest.get("run_date"), "side": latest.get("side"),
+                "window_start": latest.get("window_start"), "window_end": window_end.isoformat(),
+                "flow_status": latest.get("status"),
+            },
+        }
+
+    return _empty(f"metric_not_supported_by_adapter:{metric_id}", adapter)
+
+
 def _resolve_issuer_bridge(ticker: str, spec: dict, root: Path, today: date,
                            adapter: str, plan: dict) -> dict:
     """Normalize one issuer's cash bridge to a 100% registered low-case floor.
@@ -443,6 +556,8 @@ def resolve_spec(ticker: str, spec: dict, root: Path, today: date) -> dict:
         return _resolve_issuer_bridge(ticker, spec, root, today, adapter, plan)
     if adapter == "fact_ledger":
         return _resolve_ledger(ticker, spec, root, today, plan)
+    if adapter == "separation_register":
+        return _resolve_separation_register(ticker, spec, root, today, definition, plan)
     if adapter == "sec_companyfacts_ttm":
         return _resolve_owner_earnings_ttm(ticker, spec, root, today, definition, plan)
     return _resolve_companyfacts(ticker, spec, root, today, definition, plan)

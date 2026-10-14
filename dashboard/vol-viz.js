@@ -575,6 +575,14 @@
     </article>`;
   }
 
+  function scalingNote(volLatest, escapeHtml) {
+    const scaling = volLatest?.scaling;
+    if (!scaling) return '';
+    const text = scaling.available ? scaling.plain_english : scaling.null_reason;
+    if (!text) return '';
+    return `<p class="vol-note">${escapeHtml(text)}</p>`;
+  }
+
   function regimeTiles(volLatest, history, escapeHtml) {
     const metrics = volLatest?.metrics || {};
     const regime = volLatest?.regime || {};
@@ -813,6 +821,100 @@
     return `${darkBanner}${lagBanner}`;
   }
 
+  function residualStrip(history) {
+    const rows = (Array.isArray(history) ? history : []).slice(-120);
+    const gaps = rows.map((row) => finite(row && row.gap));
+    if (gaps.filter((value) => value != null).length < 2) return '';
+    const finiteGaps = gaps.filter((value) => value != null);
+    const low = Math.min(0, ...finiteGaps);
+    const high = Math.max(0, ...finiteGaps);
+    const span = high - low || 1;
+    const width = 640;
+    const height = 72;
+    const pad = 6;
+    const yOf = (value) => pad + (1 - (value - low) / span) * (height - pad * 2);
+    const xOf = (index) => pad + (rows.length === 1 ? 0 : (index / (rows.length - 1)) * (width - pad * 2));
+    const segments = [];
+    let current = [];
+    gaps.forEach((value, index) => {
+      if (value == null) {
+        if (current.length) segments.push(current);
+        current = [];
+        return;
+      }
+      current.push(`${xOf(index).toFixed(1)},${yOf(value).toFixed(1)}`);
+    });
+    if (current.length) segments.push(current);
+    const zero = yOf(0).toFixed(1);
+    const lines = segments
+      .filter((segment) => segment.length > 1)
+      .map((segment) => `<polyline points="${segment.join(' ')}"></polyline>`)
+      .join('');
+    return `<svg class="vol-residual-strip" viewBox="0 0 ${width} ${height}" role="img" aria-label="Gap over the last ${rows.length} sessions">
+      <line x1="${pad}" y1="${zero}" x2="${width - pad}" y2="${zero}"></line>
+      ${lines}
+    </svg>`;
+  }
+
+  function residualCard(residual, volLatest, escapeHtml) {
+    if (!residual || !residual.latest) {
+      return `<section class="risk-card vol-residual-card">
+        <header class="vol-card-head"><div><h3>Volume residual</h3></div></header>
+        <p class="vol-residual-missing">The volume residual is not loaded.</p>
+      </section>`;
+    }
+    const latest = residual.latest;
+    const withheld = latest.withheld_reason ? String(latest.withheld_reason) : '';
+    const gapKnown = finite(latest.gap) != null && !withheld;
+    const figure = (label, value, note) => `<div>
+      <span>${escapeHtml(label)}</span>
+      <strong>${escapeHtml(value)}</strong>
+      <small>${escapeHtml(note)}</small>
+    </div>`;
+    const calendar = figure('Calendar-time', num(latest.calendar_vol, 1), 'annualized, vol points');
+    const volumeTime = figure(
+      'Volume-time',
+      gapKnown ? num(latest.volume_time_vol, 1) : '—',
+      gapKnown ? 'annualized, vol points' : withheld,
+    );
+    const gap = figure(
+      'Gap',
+      gapKnown ? num(latest.gap, 1) : '—',
+      gapKnown ? 'calendar minus volume-time' : withheld,
+    );
+    const spx = finite(volLatest && volLatest.regime && volLatest.regime.spx_rv20);
+    const footnote = gapKnown && spx != null
+      ? `<p class="vol-residual-footnote">SPX 20-day realized is ${escapeHtml(num(spx, 1))}. That is the index. The gap above is SPY against itself.</p>`
+      : '';
+    const stale = residual.stale
+      ? '<p class="vol-residual-stale">This residual was not refreshed.</p>'
+      : '';
+    const dailyCorr = finite(latest.daily_abs_autocorr);
+    const bucketCorr = finite(latest.bucket_abs_autocorr);
+    const corrLine = dailyCorr == null && bucketCorr == null
+      ? ''
+      : `<p>Lag-1 correlation of absolute daily returns ${escapeHtml(dailyCorr == null ? '—' : dailyCorr.toFixed(2))}. Lag-1 correlation of absolute bucket returns ${escapeHtml(bucketCorr == null ? '—' : bucketCorr.toFixed(2))}.</p>`;
+    const clustering = latest.clustering_sentence
+      ? `<p>${escapeHtml(latest.clustering_sentence)}</p>`
+      : '';
+    const oversized = finite(latest.oversized_share);
+    return `<section class="risk-card vol-residual-card">
+      <header class="vol-card-head"><div><h3>Volume residual · SPY</h3>
+        <p>Annualized, in vol points. The strip is the level of the gap over the last 120 sessions.</p></div></header>
+      ${stale}
+      <div class="vol-residual-figures">${calendar}${volumeTime}${gap}</div>
+      ${residualStrip(residual.history)}
+      <p class="vol-residual-caption">${escapeHtml(residual.caption || '')}</p>
+      ${footnote}
+      <details class="vol-residual-disclosure">
+        <summary>How the clock was set</summary>
+        <p>Quota ${escapeHtml(latest.quota == null ? '—' : Math.round(latest.quota).toLocaleString('en-US'))} shares. Mean daily volume used for the year count ${escapeHtml(latest.mean_daily_volume == null ? '—' : Math.round(latest.mean_daily_volume).toLocaleString('en-US'))} shares. Single oversized days are ${escapeHtml(oversized == null ? '—' : `${(oversized * 100).toFixed(0)}%`)} of the last ${escapeHtml(String(latest.buckets_in_window || 0))} buckets.</p>
+        ${corrLine}
+        ${clustering}
+      </details>
+    </section>`;
+  }
+
   function renderVolPanel(volLatest, volHistory, surfaceLatest, options = {}) {
     const escapeHtml = options.escapeHtml || escapeFallback;
     const history = Array.isArray(volHistory) ? volHistory : [];
@@ -849,6 +951,9 @@
       ${feedBanners(volLatest, escapeHtml)}
 
       ${volLatest ? regimeTiles(volLatest, history, escapeHtml) : ''}
+      ${scalingNote(volLatest, escapeHtml)}
+
+      ${residualCard(options.residual, volLatest, escapeHtml)}
 
       <section class="risk-card vol-heat-card">
         <header class="vol-card-head"><div><h3>Z-score history · ${escapeHtml(String(METRIC_ORDER.length))} metrics × ${escapeHtml(String(heatWindow.length))} sessions</h3>

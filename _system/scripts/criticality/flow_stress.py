@@ -2,11 +2,10 @@
 from __future__ import annotations
 
 import math
-import statistics
 from datetime import datetime, timezone
 from typing import Sequence
 
-FLOW_MODEL_VERSION = "forced-flow-intraday-v1"
+FLOW_MODEL_VERSION = "forced-flow-intraday-v2"
 MINUTES_PER_YEAR = 252 * 390
 STATE_RANK = {
     "normal": 0,
@@ -64,12 +63,19 @@ def _clip(value: float, low: float = 0.0, high: float = 100.0) -> float:
     return max(low, min(high, value))
 
 
-def _z_score(current: float, history: Sequence[float]) -> float:
+def _percentile_rank(current: float, history: Sequence[float]) -> float | None:
+    """Trailing percentile of current against earlier observations, 0-100.
+
+    Fewer than 10 earlier bars returns None, and the caller treats that as a
+    neutral score of 50. A z-score of 0 used to do the same job and then
+    understated a clustered extreme once the window was full of one regime.
+    """
     clean = [value for value in history if math.isfinite(value)]
-    if len(clean) < 10:
-        return 0.0
-    spread = statistics.stdev(clean)
-    return (current - statistics.mean(clean)) / spread if spread > 1e-12 else 0.0
+    if len(clean) < 10 or not math.isfinite(current):
+        return None
+    below = sum(value < current for value in clean)
+    equal = sum(value == current for value in clean)
+    return 100.0 * (below + 0.5 * equal) / len(clean)
 
 
 def _weighted(values: Sequence[tuple[float | None, float]]) -> float:
@@ -164,10 +170,10 @@ def calculate_flow_snapshot(
         sum(value < 0 for value in returns[-15:]) / len(returns[-15:])
         if returns[-15:] else 0.0
     )
-    volume_z = _z_score(volumes[-1], volumes[-61:-1])
-    range_z = _z_score(ranges[-1], ranges[-61:-1])
-    volume_score = _clip(50.0 + 15.0 * volume_z)
-    range_score = _clip(50.0 + 15.0 * range_z)
+    volume_pct = _percentile_rank(volumes[-1], volumes[-61:-1])
+    range_pct = _percentile_rank(ranges[-1], ranges[-61:-1])
+    volume_score = 50.0 if volume_pct is None else _clip(volume_pct)
+    range_score = 50.0 if range_pct is None else _clip(range_pct)
     return_score = (
         _clip(50.0 + 15.0 * return_stress_z)
         if return_stress_z is not None else None
@@ -271,8 +277,8 @@ def calculate_flow_snapshot(
             ),
             "downside_variance_share_15m": round(downside_share, 3),
             "negative_interval_share_15m": round(negative_share, 3),
-            "volume_z": round(volume_z, 3),
-            "range_z": round(range_z, 3),
+            "volume_percentile": None if volume_pct is None else round(volume_pct, 1),
+            "range_percentile": None if range_pct is None else round(range_pct, 1),
             "close_location": round(close_location, 3),
         },
         "vol_target": {

@@ -1,0 +1,141 @@
+# RDW — Third-party source inventory
+
+**Date:** 2026-10-10
+**Sources:** 132 total (0 approved, 0 pending, 132 context)
+
+| ID | Title | Path | Status | Use |
+|----|-------|------|--------|-----|
+| activist_long | Crescent Park Management, L.P. — SC 13D/A | `RDW/third-party-analyses/activist_reports/long/SC-13D/A_20210330_acc0000935836_21_000287.htm` | context | activist/long — sec_edgar |
+| activist_long | Genesis Park II LP — SC 13D/A | `RDW/third-party-analyses/activist_reports/long/SC-13D/A_20210330_acc0001193125_21_098701.htm` | context | activist/long — sec_edgar |
+| activist_long | Crescent Park Management, L.P. — SC 13D/A | `RDW/third-party-analyses/activist_reports/long/SC-13D/A_20210412_acc0000935836_21_000314.htm` | context | activist/long — sec_edgar |
+| activist_long | Crescent Park Management, L.P. — SC 13D/A | `RDW/third-party-analyses/activist_reports/long/SC-13D/A_20210909_acc0000935836_21_000507.htm` | context | activist/long — sec_edgar |
+| activist_long | Genesis Park II LP — SC 13D/A | `RDW/third-party-analyses/activist_reports/long/SC-13D/A_20210913_acc0001193125_21_270367.htm` | context | activist/long — sec_edgar |
+| activist_long | Genesis Park II LP — SC 13D/A | `RDW/third-party-analyses/activist_reports/long/SC-13D/A_20220608_acc0000899140_22_000557.htm` | context | activist/long — sec_edgar |
+| activist_long | AE Red Holdings, LLC — SC 13D/A | `RDW/third-party-analyses/activist_reports/long/SC-13D/A_20221005_acc0001104659_22_106037.htm` | context | activist/long — sec_edgar |
+| activist_long | AE Red Holdings, LLC — SC 13D/A | `RDW/third-party-analyses/activist_reports/long/SC-13D/A_20221110_acc0001104659_22_116598.htm` | context | activist/long — sec_edgar |
+| activist_long | Bain Capital Credit Member, LLC — SC 13D/A | `RDW/third-party-analyses/activist_reports/long/SC-13D/A_20221205_acc0000950103_22_020772.htm` | context | activist/long — sec_edgar |
+| activist_long | AE Red Holdings, LLC — SC 13D/A | `RDW/third-party-analyses/activist_reports/long/SC-13D/A_20230523_acc0001104659_23_063650.htm` | context | activist/long — sec_edgar |
+| activist_long | AE Red Holdings, LLC — SC 13D/A | `RDW/third-party-analyses/activist_reports/long/SC-13D/A_20230901_acc0001104659_23_097816.htm` | context | activist/long — sec_edgar |
+| activist_long | Crescent Park Management, L.P. — SC 13D | `RDW/third-party-analyses/activist_reports/long/SC-13D_20201204_acc0000935836_20_000678.htm` | context | activist/long — sec_edgar |
+| activist_long | Genesis Park II LP — SC 13D | `RDW/third-party-analyses/activist_reports/long/SC-13D_20201208_acc0001193125_20_312867.htm` | context | activist/long — sec_edgar |
+| activist_long | AE Red Holdings, LLC — SC 13D | `RDW/third-party-analyses/activist_reports/long/SC-13D_20210914_acc0001104659_21_115571.htm` | context | activist/long — sec_edgar |
+| activist_long | Bain Capital Credit Member, LLC — SC 13D | `RDW/third-party-analyses/activist_reports/long/SC-13D_20221110_acc0000950103_22_019514.htm` | context | activist/long — sec_edgar |
+| activist_long | Genesis Park II LP — SC 13G | `RDW/third-party-analyses/activist_reports/long/SC-13G_20240801_acc0000899140_24_000791.htm` | context | activist/long — sec_edgar |
+| activist_long | AE Red Holdings, LLC — SC 13D/A | `RDW/third-party-analyses/activist_reports/long/SC-13D/A_20260520_acc0001104659_26_064511.xml` | context | activist/long — sec_edgar |
+| activist_long | AE RED HOLDINGS, LLC — SC 13D/A | `RDW/third-party-analyses/activist_reports/long/SC-13D/A_20260424_acc0001104659_26_048565.xml` | context | activist/long — sec_edgar |
+| activist_long | AE RED HOLDINGS, LLC — SC 13D/A | `RDW/third-party-analyses/activist_reports/long/SC-13D/A_20260422_acc0001104659_26_046813.xml` | context | activist/long — sec_edgar |
+| activist_long | AE RED HOLDINGS, LLC — SC 13D/A | `RDW/third-party-analyses/activist_reports/long/SC-13D/A_20260420_acc0001104659_26_045481.xml` | context | activist/long — sec_edgar |
+| activist_long | AE RED HOLDINGS, LLC — SC 13D/A | `RDW/third-party-analyses/activist_reports/long/SC-13D/A_20260415_acc0001104659_26_043791.xml` | context | activist/long — sec_edgar |
+| activist_long | AE RED HOLDINGS, LLC — SC 13D/A | `RDW/third-party-analyses/activist_reports/long/SC-13D/A_20260326_acc0001104659_26_035178.xml` | context | activist/long — sec_edgar |
+| activist_long | AE RED HOLDINGS, LLC — SC 13D/A | `RDW/third-party-analyses/activist_reports/long/SC-13D/A_20260303_acc0001104659_26_022834.xml` | context | activist/long — sec_edgar |
+| activist_long | AE RED HOLDINGS, LLC — SC 13D/A | `RDW/third-party-analyses/activist_reports/long/SC-13D/A_20260204_acc0001104659_26_010306.xml` | context | activist/long — sec_edgar |
+| activist_long | AE RED HOLDINGS, LLC — SC 13D/A | `RDW/third-party-analyses/activist_reports/long/SC-13D/A_20260130_acc0001104659_26_008631.xml` | context | activist/long — sec_edgar |
+| activist_long | AE RED HOLDINGS, LLC — SC 13D/A | `RDW/third-party-analyses/activist_reports/long/SC-13D/A_20260116_acc0001104659_26_004599.xml` | context | activist/long — sec_edgar |
+| activist_long | AE RED HOLDINGS, LLC — SC 13D/A | `RDW/third-party-analyses/activist_reports/long/SC-13D/A_20260113_acc0001104659_26_003324.xml` | context | activist/long — sec_edgar |
+| activist_long | AE RED HOLDINGS, LLC — SC 13D/A | `RDW/third-party-analyses/activist_reports/long/SC-13D/A_20260109_acc0001104659_26_002488.xml` | context | activist/long — sec_edgar |
+| activist_long | AE RED HOLDINGS, LLC — SC 13D/A | `RDW/third-party-analyses/activist_reports/long/SC-13D/A_20251110_acc0001104659_25_109131.xml` | context | activist/long — sec_edgar |
+| activist_long | BAIN CAPITAL CREDIT MEMBER, LLC — SC 13D/A | `RDW/third-party-analyses/activist_reports/long/SC-13D/A_20251009_acc0000950103_25_013045.xml` | context | activist/long — sec_edgar |
+| activist_long | Bain Capital Credit Member, LLC — SC 13D/A | `RDW/third-party-analyses/activist_reports/long/SC-13D/A_20250919_acc0000950103_25_011901.xml` | context | activist/long — sec_edgar |
+| activist_long | Bain Capital Credit Member, LLC — SC 13D/A | `RDW/third-party-analyses/activist_reports/long/SC-13D/A_20250721_acc0000950103_25_009068.xml` | context | activist/long — sec_edgar |
+| activist_long | Bain Capital Credit Member, LLC — SC 13D/A | `RDW/third-party-analyses/activist_reports/long/SC-13D/A_20250623_acc0000950103_25_007720.xml` | context | activist/long — sec_edgar |
+| activist_long | Bain Capital Credit Member, LLC — SC 13D/A | `RDW/third-party-analyses/activist_reports/long/SC-13D/A_20250617_acc0000950103_25_007545.xml` | context | activist/long — sec_edgar |
+| activist_long | AE Red Holdings, LLC — SC 13D/A | `RDW/third-party-analyses/activist_reports/long/SC-13D/A_20250617_acc0000950170_25_087522.xml` | context | activist/long — sec_edgar |
+| activist_long | Bain Capital Credit Member, LLC — SC 13D/A | `RDW/third-party-analyses/activist_reports/long/SC-13D/A_20250610_acc0000950103_25_007238.xml` | context | activist/long — sec_edgar |
+| activist_long | AE Red Holdings, LLC — SC 13D/A | `RDW/third-party-analyses/activist_reports/long/SC-13D/A_20250610_acc0000950170_25_084557.xml` | context | activist/long — sec_edgar |
+| activist_long | AE RED HOLDINGS, LLC — SC 13D/A | `RDW/third-party-analyses/activist_reports/long/SC-13D/A_20250605_acc0001104659_25_056827.xml` | context | activist/long — sec_edgar |
+| activist_long | Bain Capital Credit Member, LLC — SC 13D/A | `RDW/third-party-analyses/activist_reports/long/SC-13D/A_20250122_acc0000950103_25_000781.xml` | context | activist/long — sec_edgar |
+| activist_long | AE RED HOLDINGS, LLC — SC 13D/A | `RDW/third-party-analyses/activist_reports/long/SC-13D/A_20250122_acc0000950170_25_007811.xml` | context | activist/long — sec_edgar |
+| activist_long | acc0001193125 20 304464 | `RDW/third-party-analyses/activist_reports/long/8-K_20201127_acc0001193125_20_304464.htm` | context | activist/long — local |
+| activist_long | acc0001193125 20 309592 | `RDW/third-party-analyses/activist_reports/long/8-K_20201203_acc0001193125_20_309592.htm` | context | activist/long — local |
+| activist_long | acc0001193125 21 007900 | `RDW/third-party-analyses/activist_reports/long/8-K_20210113_acc0001193125_21_007900.htm` | context | activist/long — local |
+| activist_long | acc0001193125 21 093279 | `RDW/third-party-analyses/activist_reports/long/8-K_20210325_acc0001193125_21_093279.htm` | context | activist/long — local |
+| activist_long | acc0001193125 21 148103 | `RDW/third-party-analyses/activist_reports/long/8-K_20210503_acc0001193125_21_148103.htm` | context | activist/long — local |
+| activist_long | acc0001193125 21 256428 | `RDW/third-party-analyses/activist_reports/long/8-K_20210825_acc0001193125_21_256428.htm` | context | activist/long — local |
+| activist_long | acc0001193125 21 263391 | `RDW/third-party-analyses/activist_reports/long/8-K_20210901_acc0001193125_21_263391.htm` | context | activist/long — local |
+| activist_long | acc0001104659 21 114349 | `RDW/third-party-analyses/activist_reports/long/8-K_20210910_acc0001104659_21_114349.htm` | context | activist/long — local |
+| activist_long | acc0001104659 21 137218 | `RDW/third-party-analyses/activist_reports/long/8-K_20211112_acc0001104659_21_137218.htm` | context | activist/long — local |
+| activist_long | acc0001819810 21 000006 | `RDW/third-party-analyses/activist_reports/long/8-K_20211203_acc0001819810_21_000006.htm` | context | activist/long — local |
+| activist_long | acc0001819810 22 000003 | `RDW/third-party-analyses/activist_reports/long/8-K_20220203_acc0001819810_22_000003.htm` | context | activist/long — local |
+| activist_long | acc0001104659 22 019416 | `RDW/third-party-analyses/activist_reports/long/8-K_20220210_acc0001104659_22_019416.htm` | context | activist/long — local |
+| activist_long | acc0001819810 22 000005 | `RDW/third-party-analyses/activist_reports/long/8-K_20220330_acc0001819810_22_000005.htm` | context | activist/long — local |
+| activist_long | acc0001819810 22 000009 | `RDW/third-party-analyses/activist_reports/long/8-K_20220330_acc0001819810_22_000009.htm` | context | activist/long — local |
+| activist_long | acc0001819810 22 000014 | `RDW/third-party-analyses/activist_reports/long/8-K_20220331_acc0001819810_22_000014.htm` | context | activist/long — local |
+| activist_long | acc0001819810 22 000029 | `RDW/third-party-analyses/activist_reports/long/8-K_20220415_acc0001819810_22_000029.htm` | context | activist/long — local |
+| activist_long | acc0001819810 22 000035 | `RDW/third-party-analyses/activist_reports/long/8-K_20220512_acc0001819810_22_000035.htm` | context | activist/long — local |
+| activist_long | acc0001819810 22 000057 | `RDW/third-party-analyses/activist_reports/long/8-K_20220525_acc0001819810_22_000057.htm` | context | activist/long — local |
+| activist_long | acc0001819810 22 000074 | `RDW/third-party-analyses/activist_reports/long/8-K_20220601_acc0001819810_22_000074.htm` | context | activist/long — local |
+| activist_long | acc0001819810 22 000084 | `RDW/third-party-analyses/activist_reports/long/8-K_20220616_acc0001819810_22_000084.htm` | context | activist/long — local |
+| activist_long | acc0001819810 22 000100 | `RDW/third-party-analyses/activist_reports/long/8-K_20220810_acc0001819810_22_000100.htm` | context | activist/long — local |
+| activist_long | acc0001104659 22 089053 | `RDW/third-party-analyses/activist_reports/long/8-K_20220811_acc0001104659_22_089053.htm` | context | activist/long — local |
+| activist_long | acc0001819810 22 000102 | `RDW/third-party-analyses/activist_reports/long/8-K_20220812_acc0001819810_22_000102.htm` | context | activist/long — local |
+| activist_long | acc0001819810 22 000116 | `RDW/third-party-analyses/activist_reports/long/8-K_20220829_acc0001819810_22_000116.htm` | context | activist/long — local |
+| activist_long | acc0001819810 22 000127 | `RDW/third-party-analyses/activist_reports/long/8-K_20221004_acc0001819810_22_000127.htm` | context | activist/long — local |
+| activist_long | acc0001819810 22 000129 | `RDW/third-party-analyses/activist_reports/long/8-K_20221007_acc0001819810_22_000129.htm` | context | activist/long — local |
+| activist_long | acc0001819810 22 000131 | `RDW/third-party-analyses/activist_reports/long/8-K_20221102_acc0001819810_22_000131.htm` | context | activist/long — local |
+| activist_long | acc0001819810 22 000133 | `RDW/third-party-analyses/activist_reports/long/8-K_20221108_acc0001819810_22_000133.htm` | context | activist/long — local |
+| activist_long | acc0001819810 22 000161 | `RDW/third-party-analyses/activist_reports/long/8-K_20221121_acc0001819810_22_000161.htm` | context | activist/long — local |
+| activist_long | acc0001819810 22 000171 | `RDW/third-party-analyses/activist_reports/long/8-K_20221208_acc0001819810_22_000171.htm` | context | activist/long — local |
+| activist_long | acc0001819810 23 000002 | `RDW/third-party-analyses/activist_reports/long/8-K_20230109_acc0001819810_23_000002.htm` | context | activist/long — local |
+| activist_long | acc0001819810 23 000015 | `RDW/third-party-analyses/activist_reports/long/8-K_20230329_acc0001819810_23_000015.htm` | context | activist/long — local |
+| activist_long | acc0001819810 23 000032 | `RDW/third-party-analyses/activist_reports/long/8-K_20230509_acc0001819810_23_000032.htm` | context | activist/long — local |
+| activist_long | acc0001819810 23 000061 | `RDW/third-party-analyses/activist_reports/long/8-K_20230601_acc0001819810_23_000061.htm` | context | activist/long — local |
+| activist_long | acc0001819810 23 000066 | `RDW/third-party-analyses/activist_reports/long/8-K_20230607_acc0001819810_23_000066.htm` | context | activist/long — local |
+| activist_long | acc0001819810 23 000076 | `RDW/third-party-analyses/activist_reports/long/8-K_20230620_acc0001819810_23_000076.htm` | context | activist/long — local |
+| activist_long | acc0001819810 23 000079 | `RDW/third-party-analyses/activist_reports/long/8-K_20230623_acc0001819810_23_000079.htm` | context | activist/long — local |
+| activist_long | acc0001819810 23 000090 | `RDW/third-party-analyses/activist_reports/long/8-K_20230807_acc0001819810_23_000090.htm` | context | activist/long — local |
+| activist_long | acc0001819810 23 000097 | `RDW/third-party-analyses/activist_reports/long/8-K_20231101_acc0001819810_23_000097.htm` | context | activist/long — local |
+| activist_long | acc0001819810 23 000110 | `RDW/third-party-analyses/activist_reports/long/8-K_20231106_acc0001819810_23_000110.htm` | context | activist/long — local |
+| activist_long | acc0001819810 23 000126 | `RDW/third-party-analyses/activist_reports/long/8-K_20231227_acc0001819810_23_000126.htm` | context | activist/long — local |
+| activist_long | acc0001819810 24 000004 | `RDW/third-party-analyses/activist_reports/long/8-K_20240105_acc0001819810_24_000004.htm` | context | activist/long — local |
+| activist_long | acc0001819810 24 000017 | `RDW/third-party-analyses/activist_reports/long/8-K_20240314_acc0001819810_24_000017.htm` | context | activist/long — local |
+| activist_long | acc0001819810 24 000028 | `RDW/third-party-analyses/activist_reports/long/8-K_20240329_acc0001819810_24_000028.htm` | context | activist/long — local |
+| activist_long | acc0001819810 24 000038 | `RDW/third-party-analyses/activist_reports/long/8-K_20240508_acc0001819810_24_000038.htm` | context | activist/long — local |
+| activist_long | acc0001819810 24 000045 | `RDW/third-party-analyses/activist_reports/long/8-K_20240524_acc0001819810_24_000045.htm` | context | activist/long — local |
+| activist_long | acc0001819810 24 000058 | `RDW/third-party-analyses/activist_reports/long/8-K_20240613_acc0001819810_24_000058.htm` | context | activist/long — local |
+| activist_long | acc0001819810 24 000062 | `RDW/third-party-analyses/activist_reports/long/8-K_20240620_acc0001819810_24_000062.htm` | context | activist/long — local |
+| activist_long | acc0001819810 24 000089 | `RDW/third-party-analyses/activist_reports/long/8-K_20240807_acc0001819810_24_000089.htm` | context | activist/long — local |
+| activist_long | acc0001819810 24 000094 | `RDW/third-party-analyses/activist_reports/long/8-K_20240814_acc0001819810_24_000094.htm` | context | activist/long — local |
+| activist_long | acc0001819810 24 000097 | `RDW/third-party-analyses/activist_reports/long/8-K_20240829_acc0001819810_24_000097.htm` | context | activist/long — local |
+| activist_long | acc0001819810 24 000111 | `RDW/third-party-analyses/activist_reports/long/8-K_20241106_acc0001819810_24_000111.htm` | context | activist/long — local |
+| activist_long | acc0001819810 25 000016 | `RDW/third-party-analyses/activist_reports/long/8-K_20250121_acc0001819810_25_000016.htm` | context | activist/long — local |
+| activist_long | acc0001819810 25 000024 | `RDW/third-party-analyses/activist_reports/long/8-K_20250121_acc0001819810_25_000024.htm` | context | activist/long — local |
+| activist_long | acc0001819810 25 000031 | `RDW/third-party-analyses/activist_reports/long/8-K_20250127_acc0001819810_25_000031.htm` | context | activist/long — local |
+| activist_long | acc0001819810 25 000038 | `RDW/third-party-analyses/activist_reports/long/8-K_20250218_acc0001819810_25_000038.htm` | context | activist/long — local |
+| activist_long | acc0001819810 25 000043 | `RDW/third-party-analyses/activist_reports/long/8-K_20250220_acc0001819810_25_000043.htm` | context | activist/long — local |
+| activist_long | acc0001819810 25 000050 | `RDW/third-party-analyses/activist_reports/long/8-K_20250310_acc0001819810_25_000050.htm` | context | activist/long — local |
+| activist_long | acc0001819810 25 000061 | `RDW/third-party-analyses/activist_reports/long/8-K_20250311_acc0001819810_25_000061.htm` | context | activist/long — local |
+| activist_long | acc0001819810 25 000066 | `RDW/third-party-analyses/activist_reports/long/8-K_20250313_acc0001819810_25_000066.htm` | context | activist/long — local |
+| activist_long | acc0001819810 25 000076 | `RDW/third-party-analyses/activist_reports/long/8-K_20250319_acc0001819810_25_000076.htm` | context | activist/long — local |
+| activist_long | acc0001819810 25 000090 | `RDW/third-party-analyses/activist_reports/long/8-K_20250321_acc0001819810_25_000090.htm` | context | activist/long — local |
+| activist_long | acc0001819810 25 000094 | `RDW/third-party-analyses/activist_reports/long/8-K_20250326_acc0001819810_25_000094.htm` | context | activist/long — local |
+| activist_long | acc0001819810 25 000100 | `RDW/third-party-analyses/activist_reports/long/8-K_20250402_acc0001819810_25_000100.htm` | context | activist/long — local |
+| activist_long | acc0001819810 25 000108 | `RDW/third-party-analyses/activist_reports/long/8-K_20250403_acc0001819810_25_000108.htm` | context | activist/long — local |
+| activist_long | acc0001819810 25 000118 | `RDW/third-party-analyses/activist_reports/long/8-K_20250409_acc0001819810_25_000118.htm` | context | activist/long — local |
+| activist_long | acc0001819810 25 000122 | `RDW/third-party-analyses/activist_reports/long/8-K_20250410_acc0001819810_25_000122.htm` | context | activist/long — local |
+| activist_long | acc0001819810 25 000133 | `RDW/third-party-analyses/activist_reports/long/8-K_20250512_acc0001819810_25_000133.htm` | context | activist/long — local |
+| activist_long | acc0001819810 25 000140 | `RDW/third-party-analyses/activist_reports/long/8-K_20250521_acc0001819810_25_000140.htm` | context | activist/long — local |
+| activist_long | acc0001819810 25 000157 | `RDW/third-party-analyses/activist_reports/long/8-K_20250609_acc0001819810_25_000157.htm` | context | activist/long — local |
+| activist_long | acc0001819810 25 000163 | `RDW/third-party-analyses/activist_reports/long/8-K_20250613_acc0001819810_25_000163.htm` | context | activist/long — local |
+| activist_long | acc0001819810 25 000168 | `RDW/third-party-analyses/activist_reports/long/8-K_20250618_acc0001819810_25_000168.htm` | context | activist/long — local |
+| activist_long | acc0001819810 25 000172 | `RDW/third-party-analyses/activist_reports/long/8-K_20250702_acc0001819810_25_000172.htm` | context | activist/long — local |
+| activist_long | acc0001819810 25 000192 | `RDW/third-party-analyses/activist_reports/long/8-K_20250715_acc0001819810_25_000192.htm` | context | activist/long — local |
+| activist_long | acc0001819810 25 000212 | `RDW/third-party-analyses/activist_reports/long/8-K_20250806_acc0001819810_25_000212.htm` | context | activist/long — local |
+| activist_long | acc0001819810 25 000226 | `RDW/third-party-analyses/activist_reports/long/8-K_20250917_acc0001819810_25_000226.htm` | context | activist/long — local |
+| activist_long | acc0001819810 25 000229 | `RDW/third-party-analyses/activist_reports/long/8-K_20251007_acc0001819810_25_000229.htm` | context | activist/long — local |
+| activist_long | acc0001819810 25 000231 | `RDW/third-party-analyses/activist_reports/long/8-K_20251008_acc0001819810_25_000231.htm` | context | activist/long — local |
+| activist_long | acc0001819810 25 000244 | `RDW/third-party-analyses/activist_reports/long/8-K_20251105_acc0001819810_25_000244.htm` | context | activist/long — local |
+| activist_long | acc0001819810 25 000251 | `RDW/third-party-analyses/activist_reports/long/8-K_20251110_acc0001819810_25_000251.htm` | context | activist/long — local |
+| activist_long | acc0001819810 25 000253 | `RDW/third-party-analyses/activist_reports/long/8-K_20251110_acc0001819810_25_000253.htm` | context | activist/long — local |
+| activist_long | acc0001819810 26 000014 | `RDW/third-party-analyses/activist_reports/long/8-K_20260217_acc0001819810_26_000014.htm` | context | activist/long — local |
+| activist_long | acc0001819810 26 000017 | `RDW/third-party-analyses/activist_reports/long/8-K_20260225_acc0001819810_26_000017.htm` | context | activist/long — local |
+| activist_long | acc0001819810 26 000038 | `RDW/third-party-analyses/activist_reports/long/8-K_20260317_acc0001819810_26_000038.htm` | context | activist/long — local |
+| activist_long | acc0001819810 26 000054 | `RDW/third-party-analyses/activist_reports/long/8-K_20260505_acc0001819810_26_000054.htm` | context | activist/long — local |
+| activist_long | acc0001819810 26 000060 | `RDW/third-party-analyses/activist_reports/long/8-K_20260506_acc0001819810_26_000060.htm` | context | activist/long — local |
+| activist_long | acc0001819810 26 000065 | `RDW/third-party-analyses/activist_reports/long/8-K_20260520_acc0001819810_26_000065.htm` | context | activist/long — local |
+| activist_long | acc0001819810 26 000078 | `RDW/third-party-analyses/activist_reports/long/8-K_20260609_acc0001819810_26_000078.htm` | context | activist/long — local |
+| activist_long | acc0001819810 26 000081 | `RDW/third-party-analyses/activist_reports/long/8-K_20260618_acc0001819810_26_000081.htm` | context | activist/long — local |
+| activist_long | acc0001819810 26 000084 | `RDW/third-party-analyses/activist_reports/long/8-K_20260701_acc0001819810_26_000084.htm` | context | activist/long — local |
+| activist_long | acc0001819810 26 000104 | `RDW/third-party-analyses/activist_reports/long/8-K_20260714_acc0001819810_26_000104.htm` | context | activist/long — local |
+| activist_long | acc0001819810 26 000121 | `RDW/third-party-analyses/activist_reports/long/8-K_20260805_acc0001819810_26_000121.htm` | context | activist/long — local |
+
+Cross-check required: `RDW/research/cross_check_third_party_2026-10-10.md`

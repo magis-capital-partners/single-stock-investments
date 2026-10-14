@@ -1,7 +1,7 @@
 import assert from "node:assert/strict";
 import test from "node:test";
 
-import { ROLLING_WINDOWS, dailyCloses, rollingStats } from "../functions/_lib/performance.js";
+import { ROLLING_WINDOWS, dailyCloses, rollingStats, scalingGap } from "../functions/_lib/performance.js";
 
 const day = (date, value) => ({ as_of: `${date}T20:00:00Z`, nav_decimal: String(value) });
 
@@ -119,4 +119,37 @@ test("only the requested window is measured, not all of history", () => {
 
 test("the window set is 1, 2, 3, 5 and 10 years", () => {
   assert.deepEqual(ROLLING_WINDOWS.map((window) => window.years), [1, 2, 3, 5, 10]);
+});
+
+test("a short NAV path withholds the scaling exponent", () => {
+  const gap = scalingGap(syntheticDaily(30, 1_000_000, 0.001), "NAV");
+  assert.equal(gap.available, false);
+  assert.match(gap.null_reason, /20-session scaling check/);
+});
+
+test("persistent blocks scale faster than the square root of time", () => {
+  const daily = [];
+  let value = 100;
+  for (let index = 0; index < 400; index += 1) {
+    const block = Math.floor(index / 20) % 2 === 0 ? 0.01 : -0.01;
+    value *= Math.exp(block);
+    daily.push({ date: `2020-01-${String((index % 28) + 1).padStart(2, "0")}`, value });
+  }
+  const gap = scalingGap(daily, "NAV");
+  assert.equal(gap.available, true);
+  assert.equal(gap.label, "faster_than_square_root");
+  assert.ok(gap.hurst > 0.75, `expected persistent scaling, got ${gap.hurst}`);
+});
+
+test("alternating daily moves scale slower than the square root of time", () => {
+  const daily = [];
+  let value = 100;
+  for (let index = 0; index < 400; index += 1) {
+    value *= Math.exp(index % 2 === 0 ? 0.01 : -0.01);
+    daily.push({ date: `2020-01-${String((index % 28) + 1).padStart(2, "0")}`, value });
+  }
+  const gap = scalingGap(daily, "NAV");
+  assert.equal(gap.available, true);
+  assert.equal(gap.label, "slower_than_square_root");
+  assert.ok(gap.hurst < 0.2, `expected Hurst near 0, got ${gap.hurst}`);
 });

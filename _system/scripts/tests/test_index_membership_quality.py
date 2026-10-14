@@ -13,10 +13,12 @@ from build_index_membership import (  # noqa: E402
     collapse_style_announcements,
     finalize_scorecard,
     is_quality_gated_news,
+    next_calendar_for_indices,
     parse_effective_from_title,
     report_tier_boost,
     scorecard_russell,
 )
+from datetime import date  # noqa: E402
 from index_event_extract import extract_index_events  # noqa: E402
 
 
@@ -217,6 +219,83 @@ class TestReconWatchBoost(unittest.TestCase):
         self.assertEqual(tier_r, "rumor")
         self.assertGreater(boost_p, boost_r)
         self.assertGreater(boost_p, 0)
+
+    # The June 2026 APLD Russell 1000 add (effective 2026-06-26) kept adding its
+    # 0.25 "announced" boost months after the recon had completed.
+    APLD_ROW = {
+        "ticker": "APLD",
+        "index": "russell_1000",
+        "action": "add",
+        "confidence": "announced",
+        "as_of": "2026-06-06",
+        "effective": "2026-06-26",
+    }
+
+    def test_boost_live_through_effective_plus_grace(self):
+        boost, tier = report_tier_boost([self.APLD_ROW], date(2026, 6, 20))
+        self.assertEqual((boost, tier), (0.25, "announced"))
+        # exactly 14 days after effective is still live
+        boost, tier = report_tier_boost([self.APLD_ROW], date(2026, 7, 10))
+        self.assertEqual((boost, tier), (0.25, "announced"))
+
+    def test_boost_expires_after_grace(self):
+        boost, tier = report_tier_boost([self.APLD_ROW], date(2026, 7, 11))
+        self.assertEqual(boost, 0.0)
+        self.assertIsNone(tier)
+        boost, tier = report_tier_boost([self.APLD_ROW], date(2026, 10, 11))
+        self.assertEqual((boost, tier), (0.0, None))
+
+    def test_expired_row_does_not_shadow_live_lower_tier(self):
+        live_rumor = {"confidence": "rumor", "index": "sp400", "action": "add", "effective": "2026-12-19"}
+        boost, tier = report_tier_boost([self.APLD_ROW, live_rumor], date(2026, 10, 11))
+        self.assertEqual(tier, "rumor")
+        self.assertAlmostEqual(boost, 0.08)
+
+    def test_row_without_effective_or_today_never_expires(self):
+        undated = {"confidence": "provisional", "index": "russell_2000", "action": "add"}
+        self.assertEqual(report_tier_boost([undated], date(2030, 1, 1))[1], "provisional")
+        # legacy call without today: everything counts
+        self.assertEqual(report_tier_boost([self.APLD_ROW])[1], "announced")
+
+
+class TestWatchIndexCalendar(unittest.TestCase):
+    """The calendar event shown must belong to the watch scorecard's index."""
+
+    CAL = {
+        "events": [
+            {"id": "russell_annual_2026", "indices": ["russell_1000", "russell_2000"], "effective": "2026-06-26"},
+            {"id": "russell_semi_2026", "indices": ["russell_1000", "russell_2000"], "effective": "2026-12-11"},
+            {"id": "sp_share_update_2026q4", "indices": ["sp500", "sp400", "sp600"], "effective": "2026-12-19"},
+            {"id": "msci_nov_2026", "indices": ["msci_usa", "msci_acwi"], "effective": "2026-11-30"},
+        ]
+    }
+    ALL_IDS = ["sp500", "sp400", "sp600", "russell_1000", "russell_2000", "msci_usa", "msci_acwi"]
+    TODAY = date(2026, 10, 9)
+
+    def test_no_preference_keeps_soonest_across_all(self):
+        ev = next_calendar_for_indices(self.CAL, self.ALL_IDS, self.TODAY)
+        self.assertEqual(ev["id"], "msci_nov_2026")
+        self.assertEqual(ev["days_out"], 52)
+
+    def test_sp400_candidate_sees_sp_share_update(self):
+        # APLD: S&P 400 inclusion_candidate must not display the MSCI review
+        ev = next_calendar_for_indices(self.CAL, self.ALL_IDS, self.TODAY, prefer_indices=["sp400"])
+        self.assertEqual(ev["id"], "sp_share_update_2026q4")
+        self.assertEqual(ev["days_out"], 71)
+
+    def test_russell_candidate_sees_russell_semi(self):
+        # LB: Russell 1000 inclusion_candidate
+        ev = next_calendar_for_indices(self.CAL, self.ALL_IDS, self.TODAY, prefer_indices=["russell_1000"])
+        self.assertEqual(ev["id"], "russell_semi_2026")
+
+    def test_preferred_index_without_event_falls_back(self):
+        ev = next_calendar_for_indices(self.CAL, self.ALL_IDS, self.TODAY, prefer_indices=["djia"])
+        self.assertEqual(ev["id"], "msci_nov_2026")
+
+    def test_empty_preference_is_legacy(self):
+        a = next_calendar_for_indices(self.CAL, self.ALL_IDS, self.TODAY, prefer_indices=None)
+        b = next_calendar_for_indices(self.CAL, self.ALL_IDS, self.TODAY, prefer_indices=[])
+        self.assertEqual(a["id"], b["id"], "msci_nov_2026")
 
 
 class TestFloorNoCandidate(unittest.TestCase):

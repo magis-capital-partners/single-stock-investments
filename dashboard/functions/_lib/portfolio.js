@@ -1,5 +1,6 @@
 import { requireDatabase } from "./http.js";
 import { normalizeMatches, rememberContracts } from "./contracts.js";
+import { drewSymbolsFromSleeveRows, lsUniverseSymbols, michaelResidualPositions } from "./owner_residual.js";
 
 const DECIMAL = /^-?[0-9]+(?:\.[0-9]+)?$/;
 const OWNERS = new Set(["all", "drew", "michael", "unallocated"]);
@@ -328,6 +329,20 @@ export async function storeFlexEod(env, payload, bytes) {
   return { duplicate: false, restatement: Boolean(primary), restates_source_run_id: primary?.source_run_id || null, object_key: objectKey };
 }
 
+async function sleeveOwnerRows(db) {
+  try {
+    const payload = await db.prepare(
+      "SELECT owner, ticker, sec_type, classifier_reason FROM sleeve_positions WHERE owner IN ('drew', 'michael')",
+    ).all();
+    if (Array.isArray(payload)) return payload;
+    return payload?.results || [];
+  } catch (_) {
+    // Drew's sleeve table is optional for this fallback. LS Algo and SPX 0DTE
+    // still drop out; a missing sleeve record must not blank Michael's book.
+    return [];
+  }
+}
+
 export function ownerScope(url) {
   const owner = new URL(url).searchParams.get("owner") || "all";
   if (!OWNERS.has(owner)) throw new TypeError("Invalid owner scope");
@@ -373,7 +388,7 @@ export async function loadPortfolio(env, owner = "all", { now = Date.now() } = {
       WHERE p.account_alias=? AND p.source_run_id=?
       ORDER BY p.as_of DESC LIMIT 1`).bind(run.account_alias, run.source_run_id),
   ]);
-  const positions = [];
+  let positions = [];
   const keyed = new Map();
   for (const row of rows.results || []) {
     const key = `${row.account_alias}:${row.conid}:${row.model_code}`;
@@ -389,7 +404,21 @@ export async function loadPortfolio(env, owner = "all", { now = Date.now() } = {
   const brokerPositionCount = Number(brokerPositions.results?.[0]?.count || 0);
   const allocationRow = allocationStatus.results?.[0] || null;
   const allocationCount = Number(allocationRow?.allocation_count || 0);
-  const allocationState = brokerPositionCount === 0 ? "not_applicable" : allocationCount > 0 ? "complete" : "upstream_absent";
+  let allocationState = brokerPositionCount === 0 ? "not_applicable" : allocationCount > 0 ? "complete" : "upstream_absent";
+  // The owner filter above is `a.owner = michael`. With no projection the join
+  // matches nothing, so Michael renders as an empty book while the broker
+  // count stays positive. His book is the residual of that broker book.
+  // A published projection (allocationState complete) is left untouched.
+  if (owner === "michael" && allocationState === "upstream_absent") {
+    const brokerRows = await db.prepare(
+      "SELECT * FROM portfolio_positions WHERE source_run_id=? ORDER BY symbol, conid, model_code",
+    ).bind(run.source_run_id).all();
+    const drewSymbols = drewSymbolsFromSleeveRows(await sleeveOwnerRows(db));
+    positions = michaelResidualPositions(brokerRows?.results || [], {
+      lsSymbols: lsUniverseSymbols(), drewSymbols,
+    });
+    allocationState = "residual_fallback";
+  }
   return {
     schema_version: "portfolio_read_model.v1",
     // "complete" describes the snapshot's contents, not its age. With the
@@ -401,7 +430,11 @@ export async function loadPortfolio(env, owner = "all", { now = Date.now() } = {
     account_values: values.results || [], positions, cash_events: cash.results || [],
     broker_position_count: brokerPositionCount, owner_position_count: positions.length,
     allocation_status: allocationState,
-    allocation_reason: allocationState === "upstream_absent" ? "Broker positions exist, but no allocation projection has been published." : null,
+    allocation_reason: allocationState === "upstream_absent"
+      ? "Broker positions exist, but no allocation projection has been published."
+      : allocationState === "residual_fallback"
+        ? "Owner projection is absent. Michael is the broker book minus LS Algo, SPX 0DTE, and Drew."
+        : null,
     allocation_projection_as_of: allocationRow?.as_of || null,
     broker_open_order_count: Number(openOrders.results?.[0]?.count || 0), reconciliation_breaks: breaks.results || [],
   };

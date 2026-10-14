@@ -79,7 +79,11 @@ python _system/scripts/analyze_podcast_batch.py --model qwen-gpu --hours 8
 ```
 
 Needs a local model served on an OpenAI-compatible endpoint (`llm_local.py`);
-there is no hosted LLM transport in this repo. Claims are verified against the
+there is no hosted LLM transport in this repo. CI does not run this analyser.
+The workstation scheduled task **SSI Podcast Analysis** (`analysis_supervisor.ps1`,
+installed by `install_local_lane_tasks.ps1`) runs it, and the same task drains
+video analysis. Research Watchdog only notices when the analysed count stops
+moving (`check_media_analysis_freshness.py`, 4 days). Claims are verified against the
 transcript in code, so a quote the model invented is dropped rather than
 believed — but verification cannot catch a *real* quote filed under the wrong
 company, which is why attribution goes through the security master.

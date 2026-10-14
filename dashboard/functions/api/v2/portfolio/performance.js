@@ -1,7 +1,7 @@
 import { failure, json, requestId, requireDatabase } from "../../../_lib/http.js";
 import { requirePortfolioViewer } from "../../../_lib/auth.js";
 import { ownerScope } from "../../../_lib/portfolio.js";
-import { ROLLING_WINDOWS, dailyCloses, rollingStats } from "../../../_lib/performance.js";
+import { ROLLING_WINDOWS, dailyCloses, rollingStats, scalingGap } from "../../../_lib/performance.js";
 
 export async function onRequestGet(context) {
   const id = requestId(context.request);
@@ -26,6 +26,11 @@ export async function onRequestGet(context) {
     });
     const daily = dailyCloses(series);
     const windows = ROLLING_WINDOWS.map((window) => rollingStats(daily, window));
+    const scaling = owner === "all" ? scalingGap(daily, "NAV") : {
+      available: false,
+      subject: "NAV",
+      null_reason: "owner NAV requires complete allocation and cash history",
+    };
     return json({
       schema_version: "portfolio_performance.v1", scope: owner,
       nav_series: owner === "all" ? series : [], max_drawdown: owner === "all" && series.length ? maxDrawdown : null,
@@ -38,6 +43,7 @@ export async function onRequestGet(context) {
         label: window.label, years: window.years, available: false,
         null_reason: "owner NAV requires complete allocation and cash history",
       })),
+      scaling,
       nav_daily_observations: daily.length,
       nav_first_at: daily.length ? daily[0].date : null,
       nav_last_at: daily.length ? daily[daily.length - 1].date : null,

@@ -105,6 +105,16 @@
       "subject_regex": "^chore: warrant weekly discovery"
     },
     {
+      "name": "data-pipeline-separation-discover",
+      "workflow_file": "data-pipeline.yml",
+      "job": "separation-discover",
+      "cadence_cron": [
+        "0 15 * * 1"
+      ],
+      "freshness_hours": 342,
+      "subject_regex": "^chore: separation weekly discovery"
+    },
+    {
       "name": "data-pipeline-world-model",
       "workflow_file": "data-pipeline.yml",
       "job": "world-model",
@@ -300,6 +310,26 @@
         "23 5 * * *"
       ],
       "freshness_hours": 54
+    },
+    {
+      "name": "data-pipeline-reverse-splits",
+      "workflow_file": "data-pipeline.yml",
+      "job": "reverse-splits",
+      "cadence_cron": [
+        "0 15 * * 1"
+      ],
+      "freshness_hours": 342,
+      "subject_regex": "^chore: reverse-split weekly discovery"
+    },
+    {
+      "name": "reverse-split-borrow-history",
+      "workflow_file": "reverse-split-borrow-history.yml",
+      "job": "archive",
+      "cadence_cron": [
+        "0 13 * * 1-5"
+      ],
+      "freshness_hours": 102,
+      "subject_regex": "^chore: archive reverse-split borrow indications"
     }
   ],
   "unmonitored_workflows": {},
@@ -568,6 +598,24 @@
         }
       }
     },
+    "separations": {
+      "path": "dashboard/data/separations.json",
+      "stamp_field": "generated_at",
+      "max_age_hours": 100,
+      "healer": "python _system/scripts/build_separation_flows.py && python _system/scripts/build_separations_dashboard.py (data-pipeline nightly + Monday separation-discover; repository_dispatch heal-separations)",
+      "assert_fields": {
+        "health.status": {
+          "not_in": [
+            "unhealthy"
+          ],
+          "why": "repeated EDGAR discovery failures and a register that stops moving must be loud; a spread without a filed formula is a headline"
+        },
+        "health.structural_errors": {
+          "max_count": 0,
+          "why": "separation identity, immutable registry versions, and the identity/terms gate ordering must remain structurally valid"
+        }
+      }
+    },
     "capitulation_daily": {
       "path": "dashboard/data/capitulation_daily.json",
       "stamp_field": "generated_at",
@@ -580,6 +628,66 @@
             "unavailable"
           ],
           "why": "'unavailable' means no symbol could be fetched and 'stale' means the market (SPY) row is a preserved copy after a fetch failure; either way the ladder is not today's. 'lagging' (Yahoo behind the expected NYSE session) and 'limited' are deliberately NOT violations: they clear on their own, and flagging them would only make the healer dispatch against a vendor delay."
+        }
+      }
+    },
+    "desk_briefs": {
+      "path": "dashboard/data/desk_briefs.json",
+      "stamp_field": "generated_at",
+      "max_age_hours": 100,
+      "healer": "python _system/scripts/check_desk_briefs.py --warn-only && python _system/scripts/build_desk_briefs.py (data-pipeline nightly intake-full; briefs arrive by grok/<desk>/<date>-<slug> PR and the automerge data-guard)",
+      "assert_fields": {
+        "health.status": {
+          "not_in": [
+            "unhealthy"
+          ],
+          "why": "an invalid desk brief must be loud; degraded (a stale desk) is allowed"
+        },
+        "health.structural_errors": {
+          "max_count": 0,
+          "why": "every Inbox desk card passed check_desk_briefs.py"
+        }
+      }
+    },
+    "short_alpha": {
+      "path": "dashboard/data/short_alpha.json",
+      "stamp_field": "generated_at",
+      "max_age_hours": 100,
+      "healer": "python _system/scripts/build_short_alpha_dashboard.py (build_dashboard_data.build_short_alpha inside data-pipeline intake-full, check=True; --check also runs in the automerge data-guard for PRs touching _system/research/short-alpha/)",
+      "assert_fields": {
+        "schema_version": {
+          "equals": "1.2",
+          "why": "the Shorts tab reads the 1.2 contract (categories, lens reviews, note_ref); an older payload means the builder did not run"
+        }
+      }
+    },
+    "special_situations": {
+      "path": "dashboard/data/special_situations.json",
+      "stamp_field": "generated_at",
+      "max_age_hours": 100,
+      "healer": "python _system/scripts/build_special_situations.py (ci_rebuild_profile intake-full step after build_separations_dashboard.py)",
+      "assert_fields": {
+        "schema_version": {
+          "equals": "special_situations.v1",
+          "why": "the desk payload contract; a missing or foreign version means a sparse checkout replaced the book"
+        }
+      }
+    },
+    "reverse_splits": {
+      "path": "dashboard/data/reverse_splits.json",
+      "stamp_field": "generated_at",
+      "max_age_hours": 100,
+      "healer": "python _system/scripts/build_reverse_splits_dashboard.py (data-pipeline nightly intake-full rebuild + Monday reverse-splits job; repository_dispatch heal-reverse-splits)",
+      "assert_fields": {
+        "health.status": {
+          "not_in": [
+            "unhealthy"
+          ],
+          "why": "a ledger that stops moving or a broken decisions hash chain must be loud; a reverse split is a discovery event, not a finding"
+        },
+        "health.structural_errors": {
+          "max_count": 0,
+          "why": "duplicate event keys, enum violations and chain breaks are structural, not freshness"
         }
       }
     }
@@ -601,7 +709,8 @@
         "holding_co",
         "optionality",
         "turnaround",
-        "infrastructure"
+        "infrastructure",
+        "special_situation"
       ],
       "payoff_lens": [
         "operating",

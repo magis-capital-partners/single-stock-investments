@@ -10,6 +10,8 @@ import JSON from ``dashboard/data``, one directory above ``dashboard/functions``
   ``../../../../data/overlap_holdings.json``
 - ``functions/api/v1/sleeves/time-average.js`` imports
   ``../../../../data/time_average_growth_params.json``
+- ``functions/_lib/owner_residual.js`` imports
+  ``../../data/etf_ls_universe.json``
 
 From the repo those paths land on ``dashboard/data/<file>``, which is where
 the builders write them and where Node resolves them for the function tests.
@@ -27,6 +29,7 @@ ROOT = Path(__file__).resolve().parents[2]
 FUNCTION_JSON = (
     "overlap_holdings.json",
     "time_average_growth_params.json",
+    "etf_ls_universe.json",
 )
 IMPORT_RE = re.compile(r"""from\s+["'](\.[^"']+)["']""")
 

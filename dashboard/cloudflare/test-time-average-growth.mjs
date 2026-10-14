@@ -7,6 +7,7 @@ import {
   evaluateSleeve,
   itoDrag,
   leverageObjects,
+  noahShare,
 } from "../functions/_lib/time_average_growth.js";
 
 const figures = JSON.parse(readFileSync(
@@ -119,6 +120,19 @@ test("options stay out of the mix and are named as omitted", () => {
   assert.equal(panel.names.length, 1);
   assert.equal(panel.omitted[0].reason, "not_stock");
   assert.ok(panel.headline.coverage < 1);
+});
+
+test("five days that hold most of the squared moves hide the scale", () => {
+  const quiet = path(252, 0.0002, 0.0001);
+  const dominated = quiet.map((row, index) => (
+    index >= 247 ? { ...row, r: -0.25 } : row
+  ));
+  assert.ok(noahShare(dominated.map((row) => row.r)) > 0.5);
+  assert.ok(noahShare(quiet.map((row) => row.r)) < 0.5);
+  const panel = book(dominated, 0.04, { marketValue: 800, nav: 1000 });
+  assert.equal(panel.annotation.show_scale, false);
+  assert.ok(panel.annotation.reasons.includes("noah_concentration"));
+  assert.ok(panel.headline.noah_share > 0.5);
 });
 
 test("the panel copy does not use sizing or valuation language", () => {

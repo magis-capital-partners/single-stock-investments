@@ -232,6 +232,11 @@ def slim_ticker_row(row: dict) -> dict:
         if isinstance(compact.get("confirmed_events"), list):
             compact["confirmed_events"] = compact["confirmed_events"][:3]
         compact.pop("inputs_missing", None)
+        # The holdings cell does not read this. The index page loads
+        # index_membership.json. Leaving it on every core row pushed core.json
+        # through the 6.0 MB boot budget (6.01-6.02 MB on the 2026-10-09..11
+        # intake-full rebuilds).
+        compact.pop("next_calendar_event", None)
         slim["index_membership"] = compact
     slim["detail_shard"] = f"data/tickers/{shard_filename(row.get('ticker', ''))}"
     return slim
@@ -252,6 +257,9 @@ def build_core_payload(payload: dict) -> dict:
         "index_membership": "data/index_membership.json",
         "activist_feed": "data/activist_feed.json",
         "darwin_bundle": "data/darwin_bundle.json",
+        "separations": "data/separations.json",
+        "desk_briefs": "data/desk_briefs.json",
+        "reverse_splits": "data/reverse_splits.json",
     }
     doc_catalog = payload.get("document_catalog")
     if isinstance(doc_catalog, dict):
@@ -319,6 +327,64 @@ def write_insights_shards(insights_doc: dict | None, data_dir: Path) -> int:
         (insights_dir / f"{name}.json").write_text(_dump(shard), encoding="utf-8")
         count += 1
     return count
+
+
+# These already have their own files. Embedding them in dashboard_data.json
+# pushed that gitignored monolith through GitHub's 100MB hard limit
+# (100.4-100.5MB on 2026-10-09, 10-10, and 10-11) and failed intake-full after
+# the rebuild had otherwise finished. core.json already omits them.
+STANDALONE_EMBED_KEYS = (
+    "kpi_trends",
+    "activist_feed",
+    "document_catalog",
+    "darwin",
+    "darwin_accounts",
+    "darwin_serving",
+)
+
+
+def release_standalone_embeds(payload: dict) -> list[str]:
+    """Replace bulky standalone blobs with path refs. Mutates payload.
+
+    Call after write_shards, which still needs the full objects to build
+    core refs and darwin_bundle.json.
+    """
+    removed: list[str] = []
+    catalog = payload.get("document_catalog")
+    if isinstance(catalog, dict):
+        payload["document_catalog_ref"] = {
+            "path": "dashboard/data/document_catalog.json",
+            "generated_at": catalog.get("generated_at"),
+            "document_count": len(catalog.get("documents") or []),
+        }
+        payload.pop("document_catalog", None)
+        removed.append("document_catalog")
+    kpi = payload.get("kpi_trends")
+    if isinstance(kpi, dict):
+        payload.setdefault(
+            "kpi_trends_ref",
+            {
+                "path": "dashboard/data/kpi_trends.json",
+                "generated_at": kpi.get("generated_at"),
+                "inflection_count": kpi.get("inflection_count", 0),
+            },
+        )
+        payload.pop("kpi_trends", None)
+        removed.append("kpi_trends")
+    feed = payload.get("activist_feed")
+    if isinstance(feed, dict):
+        payload["activist_feed_ref"] = {
+            "path": "dashboard/data/activist_feed.json",
+            "generated_at": feed.get("generated_at"),
+        }
+        payload.pop("activist_feed", None)
+        removed.append("activist_feed")
+    if any(key in payload for key in ("darwin", "darwin_accounts", "darwin_serving")):
+        payload["darwin_ref"] = {"path": "dashboard/data/darwin_bundle.json"}
+        for key in ("darwin", "darwin_accounts", "darwin_serving"):
+            if payload.pop(key, None) is not None:
+                removed.append(key)
+    return removed
 
 
 def write_darwin_bundle(payload: dict, data_dir: Path) -> None:

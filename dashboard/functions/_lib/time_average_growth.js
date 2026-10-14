@@ -63,17 +63,36 @@ function sessionsBetween(older, newer) {
   return Math.round((right - left) / 86400000);
 }
 
+/** Share of summed squared log returns held by the five largest daily moves. */
+export const NOAH_DAYS = 5;
+export const NOAH_SHARE_LIMIT = 0.5;
+
+export function noahShare(simpleReturns) {
+  const squares = [];
+  for (const value of simpleReturns) {
+    if (!(value > -0.999)) continue;
+    const logReturn = Math.log1p(value);
+    squares.push(logReturn * logReturn);
+  }
+  if (squares.length < NOAH_DAYS) return null;
+  const total = squares.reduce((sum, value) => sum + value, 0);
+  if (!(total > 0)) return 0;
+  const top = squares.slice().sort((left, right) => right - left).slice(0, NOAH_DAYS);
+  return top.reduce((sum, value) => sum + value, 0) / total;
+}
+
 /**
  * Status of the scale annotation. The numbers themselves are computed either way.
  * `showScale` is true only for past_peak and room.
  */
-export function annotationStatus({ lOptLow, lOptHigh, lNow, tC, n, hedged, lowCoverage }) {
+export function annotationStatus({ lOptLow, lOptHigh, lNow, tC, n, hedged, lowCoverage, noah = false }) {
   const reasons = [];
   if (hedged) reasons.push("hedged");
   if (lowCoverage) reasons.push("low_coverage");
   if (!(n >= TRADING_DAYS)) reasons.push("short_window");
   if (!Number.isFinite(tC)) reasons.push("zero_growth");
   else if (tC > 3) reasons.push("long_characteristic_time");
+  if (noah) reasons.push("noah_concentration");
   if (!reasons.length) {
     if (lOptHigh < lNow) return { status: "past_peak", reasons: [], showScale: true };
     if (lOptLow > lNow) return { status: "room", reasons: [], showScale: true };
@@ -130,6 +149,7 @@ function nameRow(ticker, weight, returns, riskless) {
   const variance = asset.sigma ** 2;
   const low = objects ? (objects.lOpt * variance - se) / variance : null;
   const high = objects ? (objects.lOpt * variance + se) / variance : null;
+  const share = noahShare(assetOnly);
   const call = annotationStatus({
     lOptLow: low,
     lOptHigh: high,
@@ -138,6 +158,7 @@ function nameRow(ticker, weight, returns, riskless) {
     n: asset.n,
     hedged: false,
     lowCoverage: false,
+    noah: share != null && share > NOAH_SHARE_LIMIT,
   });
   return {
     ticker,
@@ -153,12 +174,13 @@ function nameRow(ticker, weight, returns, riskless) {
 }
 
 /**
- * Build the panel from a sleeve book and a parameter file.
- * Weights are signed market value over NAV. The fully invested mix is those
- * weights scaled to 1. Cash and omitted value earn the riskless rate in the
- * hypothetical only.
+ * Which positions enter the hypothetical, and at what weight.
+ *
+ * Shared by the time-average panel and the tail panel so both describe the
+ * same book: the same names left out for the same reasons, the same shared
+ * window of dates. Weights are signed market value over NAV.
  */
-export function evaluateSleeve({ nav, asOf = null, positions = [], params = {} }) {
+export function selectBook({ nav, positions = [], params = {} }) {
   const riskless = Number(params.riskless?.continuous);
   const symbols = params.symbols || {};
   const wealth = Number(nav);
@@ -206,8 +228,47 @@ export function evaluateSleeve({ nav, asOf = null, positions = [], params = {} }
   const coverage = included.reduce((sum, row) => sum + Math.abs(row.marketValue), 0) / (wealth || 1);
   const dates = aligned(included.map((row) => row.map));
   const rfDaily = Number.isFinite(riskless) ? dailyRiskless(riskless) : null;
+  return { riskless, wealth, omitted, included, lNow, gross, coverage, dates, rfDaily };
+}
+
+/**
+ * Each name's share of the book's variance, Euler style: w_i Cov(r_i, R) over
+ * Var(R), where R is the stock part of the book's daily simple return. The
+ * shares sum to one, so a name's share of the Itô drag is the same number.
+ * A hedge that offsets the book takes a negative share.
+ */
+export function varianceShares(included, dates) {
+  if (!included.length || dates.length < 2) return new Map();
+  const book = dates.map((date) => included.reduce((sum, row) => sum + row.weight * row.map.get(date), 0));
+  const bookMean = mean(book);
+  let total = 0;
+  const raw = included.map((row) => {
+    const own = dates.map((date) => row.map.get(date));
+    const ownMean = mean(own);
+    let cov = 0;
+    for (let index = 0; index < dates.length; index += 1) {
+      cov += (own[index] - ownMean) * (book[index] - bookMean);
+    }
+    const contribution = row.weight * cov / (dates.length - 1);
+    total += contribution;
+    return [row.ticker, contribution];
+  });
+  if (!(Math.abs(total) > 0)) return new Map();
+  return new Map(raw.map(([ticker, contribution]) => [ticker, contribution / total]));
+}
+
+/**
+ * Build the panel from a sleeve book and a parameter file.
+ * Weights are signed market value over NAV. The fully invested mix is those
+ * weights scaled to 1. Cash and omitted value earn the riskless rate in the
+ * hypothetical only.
+ */
+export function evaluateSleeve({ nav, asOf = null, positions = [], params = {} }) {
+  const { riskless, wealth, omitted, included, lNow, gross, coverage, dates, rfDaily } = selectBook({ nav, positions, params });
+  const shares = varianceShares(included, dates);
   const names = included
     .map((row) => nameRow(row.ticker, row.weight, row.returns, riskless))
+    .map((row) => ({ ...row, drag_share: shares.has(row.ticker) ? shares.get(row.ticker) : null }))
     .sort((left, right) => Math.abs(right.weight) - Math.abs(left.weight));
   const empty = {
     ...SCHEMA_FLAGS,
@@ -278,6 +339,7 @@ export function evaluateSleeve({ nav, asOf = null, positions = [], params = {} }
   const lOptHigh = (muExcess + se) / variance;
   const hedged = Math.abs(lNow) < 0.05 && gross > 0.3;
   const lowCoverage = coverage < 0.5;
+  const share = noahShare(fullSimple);
   const call = annotationStatus({
     lOptLow,
     lOptHigh,
@@ -286,7 +348,12 @@ export function evaluateSleeve({ nav, asOf = null, positions = [], params = {} }
     n: full.n,
     hedged,
     lowCoverage,
+    noah: share != null && share > NOAH_SHARE_LIMIT,
   });
+  const bookDrag = itoDrag(lNow, full.sigma);
+  const attributed = names
+    .map((row) => ({ ...row, drag_points: row.drag_share == null ? null : row.drag_share * bookDrag }))
+    .sort((left, right) => (right.drag_points ?? -Infinity) - (left.drag_points ?? -Infinity));
   return {
     ...SCHEMA_FLAGS,
     schema_version: 1,
@@ -294,7 +361,7 @@ export function evaluateSleeve({ nav, asOf = null, positions = [], params = {} }
     as_of: asOf,
     nav: wealth,
     headline: {
-      ito_drag: itoDrag(lNow, full.sigma),
+      ito_drag: bookDrag,
       empirical_growth: book.growth,
       empirical_ensemble: book.ensemble,
       empirical_gap: book.ensemble - book.growth,
@@ -304,6 +371,8 @@ export function evaluateSleeve({ nav, asOf = null, positions = [], params = {} }
       sessions: full.n,
       window_start: dates[0] || null,
       window_end: dates.at(-1) || null,
+      noah_share: share,
+      noah_days: NOAH_DAYS,
     },
     annotation: {
       status: call.status,
@@ -314,7 +383,7 @@ export function evaluateSleeve({ nav, asOf = null, positions = [], params = {} }
       t_c: call.showScale ? objects.tC : null,
       upper_bound: call.showScale && objects.lOpt > 1,
     },
-    names,
+    names: attributed,
     omitted: omitted.sort((left, right) => Math.abs(right.weight) - Math.abs(left.weight)),
     lineage: lineage(params, dates[0], dates.at(-1), dates.length),
   };

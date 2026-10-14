@@ -451,6 +451,40 @@ def _append_forward_points(path: list[dict], fan: dict, *, premium_multiple: flo
     return out
 
 
+def _btc_criticality(series: list) -> dict:
+    """Log-periodic ensemble on the same closes as the power-law demand path."""
+    prices = []
+    for _day, price in series:
+        try:
+            value = float(price)
+        except (TypeError, ValueError):
+            continue
+        if value > 0:
+            prices.append(value)
+    base = {
+        "research_only": True,
+        "in_base_irr": False,
+        "authority": "none",
+        "claim": (
+            "Log-periodic ensemble on the same spot series as the power-law demand path. "
+            "A smooth power law and a log-periodic acceleration are different descriptions."
+        ),
+    }
+    if len(prices) < 120:
+        return {**base, "status": "unavailable", "reason": "fewer than 120 positive closes"}
+    try:
+        from criticality.lppls import fit_ensemble
+    except ImportError as exc:
+        return {**base, "status": "unavailable", "reason": f"lppls import failed: {exc}"}
+    try:
+        ensemble = fit_ensemble(prices)
+    except Exception as exc:  # noqa: BLE001 - the demand file still has to publish
+        return {**base, "status": "unavailable", "reason": str(exc)[:240]}
+    ensemble.pop("fits", None)
+    ensemble.pop("errors", None)
+    return {**base, **ensemble}
+
+
 def build(*, as_of: date | None = None) -> Path:
     btc = _read_csv(CRYPTO_DIR / "btc_spot_usd.csv")
     # Merge committed pre-Yahoo seed even if fetch has not re-run yet
@@ -678,6 +712,7 @@ def build(*, as_of: date | None = None) -> Path:
             "latest": round(hash_eh[-1][1], 4) if hash_eh else None,
             "as_of": hash_eh[-1][0].isoformat() if hash_eh else None,
         },
+        "criticality": _btc_criticality(fit_series),
         "dial": {
             "label": label,
             "spot_vs_model_pct": residual_pct,

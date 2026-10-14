@@ -11,7 +11,9 @@ import time
 from datetime import datetime, timezone
 from pathlib import Path
 
+import httplib2
 from google.oauth2 import service_account
+from google_auth_httplib2 import AuthorizedHttp
 from googleapiclient.errors import HttpError
 from googleapiclient.discovery import build
 from googleapiclient.http import MediaFileUpload
@@ -22,6 +24,20 @@ SCOPES = ["https://www.googleapis.com/auth/drive"]
 FOLDER_MIME = "application/vnd.google-apps.folder"
 _THREAD_LOCAL = threading.local()
 TRANSIENT_DRIVE_STATUS = {429, 500, 502, 503, 504}
+# One Drive request. The 2026-10-08 intake-full died here on
+# TimeoutError: The read operation timed out, with no retry, while uploading
+# new PDFs. A hung read must not hold the nightly job.
+DRIVE_HTTP_TIMEOUT_SEC = 120
+UPLOAD_ATTEMPTS = 4
+
+
+def transient_drive_failure(exc: BaseException) -> bool:
+    """HTTP 429/5xx and socket read timeouts. Not a missing file or a 404."""
+    if isinstance(exc, HttpError):
+        return getattr(getattr(exc, "resp", None), "status", None) in TRANSIENT_DRIVE_STATUS
+    if isinstance(exc, (TimeoutError, ConnectionError)):
+        return True
+    return isinstance(exc, OSError) and "timed out" in str(exc).lower()
 
 
 def execute_with_retry(request, *, label: str, attempts: int = 5):
@@ -29,12 +45,14 @@ def execute_with_retry(request, *, label: str, attempts: int = 5):
     for attempt in range(1, attempts + 1):
         try:
             return request.execute()
-        except HttpError as exc:
-            if exc.resp.status not in TRANSIENT_DRIVE_STATUS or attempt == attempts:
+        except Exception as exc:
+            if not transient_drive_failure(exc) or attempt == attempts:
                 raise
             delay = min(30, 2 ** (attempt - 1))
+            status = getattr(getattr(exc, "resp", None), "status", None)
+            detail = f"HTTP {status}" if status else type(exc).__name__
             print(
-                f"Transient Drive HTTP {exc.resp.status} during {label}; "
+                f"Transient Drive {detail} during {label}; "
                 f"retrying in {delay}s ({attempt}/{attempts})...",
                 flush=True,
             )
@@ -64,7 +82,8 @@ def drive_service():
     if not creds_path:
         raise SystemExit("Set GOOGLE_APPLICATION_CREDENTIALS to a service-account JSON file with access to the Shared Drive.")
     creds = service_account.Credentials.from_service_account_file(creds_path, scopes=SCOPES)
-    return build("drive", "v3", credentials=creds, cache_discovery=False)
+    authed = AuthorizedHttp(creds, http=httplib2.Http(timeout=DRIVE_HTTP_TIMEOUT_SEC))
+    return build("drive", "v3", http=authed, cache_discovery=False)
 
 
 def thread_drive_service():
@@ -358,13 +377,41 @@ def created_file_body(doc: dict, folder_id: str) -> tuple[dict, MediaFileUpload]
 
 
 def create_pdf_file(service, doc: dict, folder_id: str) -> dict:
-    body, media = created_file_body(doc, folder_id)
-    return service.files().create(
-        body=body,
-        media_body=media,
-        fields="id,name,size,mimeType,webViewLink,webContentLink,appProperties,parents",
-        supportsAllDrives=True,
-    ).execute()
+    """Upload one PDF. Each attempt builds a new resumable request.
+
+    A failed chunked upload cannot be retried on the same request object, which
+    is why execute_with_retry alone did not cover the 2026-10-08 read timeout.
+    """
+    label = doc.get("local_pdf_path") or doc.get("document_id") or "pdf"
+    last: BaseException | None = None
+    for attempt in range(1, UPLOAD_ATTEMPTS + 1):
+        body, media = created_file_body(doc, folder_id)
+        request = service.files().create(
+            body=body,
+            media_body=media,
+            fields="id,name,size,mimeType,webViewLink,webContentLink,appProperties,parents",
+            supportsAllDrives=True,
+        )
+        try:
+            return execute_with_retry(request, label=f"upload {label}", attempts=1)
+        except Exception as exc:
+            last = exc
+            if not transient_drive_failure(exc) or attempt == UPLOAD_ATTEMPTS:
+                raise SystemExit(
+                    f"Google Drive upload failed for {label} "
+                    f"(source sync_pdf_store_google_drive.py): {type(exc).__name__}: {exc}"
+                ) from exc
+            delay = min(30, 2 ** (attempt - 1))
+            print(
+                f"Transient Drive error uploading {label} ({type(exc).__name__}: {exc}); "
+                f"retrying in {delay}s ({attempt}/{UPLOAD_ATTEMPTS})...",
+                flush=True,
+            )
+            time.sleep(delay)
+    raise SystemExit(
+        f"Google Drive upload failed for {label} "
+        f"(source sync_pdf_store_google_drive.py): {last}"
+    )
 
 
 def apply_existing_file(doc: dict, file: dict, status: str = "linked_existing") -> dict:
@@ -471,7 +518,19 @@ def sync_docs_parallel(
         future_to_doc = {executor.submit(upload_file_worker, doc): doc for doc in upload_queue}
         for future in concurrent.futures.as_completed(future_to_doc):
             doc = future_to_doc[future]
-            created = future.result()
+            try:
+                created = future.result()
+            except BaseException as exc:
+                # Keep links already applied. The next nightly run resumes from
+                # the registry instead of re-uploading the batch that succeeded.
+                save_registry(registry)
+                path = doc.get("local_pdf_path") or doc.get("document_id")
+                print(
+                    f"::error::Google Drive PDF upload failed for {path} "
+                    f"(source sync_pdf_store_google_drive.py): {exc}",
+                    flush=True,
+                )
+                raise
             apply_created_file(doc, created)
             if index:
                 index.add(created)
