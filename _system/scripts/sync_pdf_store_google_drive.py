@@ -18,45 +18,18 @@ from googleapiclient.errors import HttpError
 from googleapiclient.discovery import build
 from googleapiclient.http import MediaFileUpload
 
+from drive_api_retry import drive_retry_delay, execute_with_retry, transient_drive_failure
+
 ROOT = Path(__file__).resolve().parents[2]
 REGISTRY_PATH = ROOT / "dashboard" / "data" / "document_registry.json"
 SCOPES = ["https://www.googleapis.com/auth/drive"]
 FOLDER_MIME = "application/vnd.google-apps.folder"
 _THREAD_LOCAL = threading.local()
-TRANSIENT_DRIVE_STATUS = {429, 500, 502, 503, 504}
 # One Drive request. The 2026-10-08 intake-full died here on
 # TimeoutError: The read operation timed out, with no retry, while uploading
 # new PDFs. A hung read must not hold the nightly job.
 DRIVE_HTTP_TIMEOUT_SEC = 120
 UPLOAD_ATTEMPTS = 4
-
-
-def transient_drive_failure(exc: BaseException) -> bool:
-    """HTTP 429/5xx and socket read timeouts. Not a missing file or a 404."""
-    if isinstance(exc, HttpError):
-        return getattr(getattr(exc, "resp", None), "status", None) in TRANSIENT_DRIVE_STATUS
-    if isinstance(exc, (TimeoutError, ConnectionError)):
-        return True
-    return isinstance(exc, OSError) and "timed out" in str(exc).lower()
-
-
-def execute_with_retry(request, *, label: str, attempts: int = 5):
-    """Retry only transient Drive API failures with bounded exponential backoff."""
-    for attempt in range(1, attempts + 1):
-        try:
-            return request.execute()
-        except Exception as exc:
-            if not transient_drive_failure(exc) or attempt == attempts:
-                raise
-            delay = min(30, 2 ** (attempt - 1))
-            status = getattr(getattr(exc, "resp", None), "status", None)
-            detail = f"HTTP {status}" if status else type(exc).__name__
-            print(
-                f"Transient Drive {detail} during {label}; "
-                f"retrying in {delay}s ({attempt}/{attempts})...",
-                flush=True,
-            )
-            time.sleep(delay)
 
 
 def now_iso() -> str:
@@ -401,7 +374,7 @@ def create_pdf_file(service, doc: dict, folder_id: str) -> dict:
                     f"Google Drive upload failed for {label} "
                     f"(source sync_pdf_store_google_drive.py): {type(exc).__name__}: {exc}"
                 ) from exc
-            delay = min(30, 2 ** (attempt - 1))
+            delay = drive_retry_delay(exc, attempt)
             print(
                 f"Transient Drive error uploading {label} ({type(exc).__name__}: {exc}); "
                 f"retrying in {delay}s ({attempt}/{UPLOAD_ATTEMPTS})...",

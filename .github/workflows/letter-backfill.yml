@@ -223,6 +223,9 @@ jobs:
           python _system/scripts/calibrate_letter_dates.py --gold
           python -m unittest _system/scripts/test_letter_date_parser.py _system/scripts/test_fund_registry_date.py
 
+      - name: Drive rate-limit retry gate
+        run: python -m unittest _system/scripts/tests/test_drive_api_retry.py
+
       - name: Configure Google credentials
         env:
           GOOGLE_APPLICATION_CREDENTIALS_JSON: ${{ secrets.GOOGLE_APPLICATION_CREDENTIALS_JSON }}
