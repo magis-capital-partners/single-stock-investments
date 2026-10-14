@@ -179,6 +179,15 @@
     ).join('');
   }
 
+  function volumeResidualLine(ticker, technicals, escapeHtml) {
+    const point = technicals && technicals.volume_residual;
+    if (!point || point.withheld_reason || !Number.isFinite(Number(point.gap))) return '';
+    const fmt = (value) => Number(value).toFixed(1);
+    const name = String(ticker || technicals.ticker || '').trim();
+    const text = `${name}: calendar ${fmt(point.calendar_vol)}, equal-volume ${fmt(point.volume_time_vol)}, gap ${fmt(point.gap)}. Daily bars, not a tick clock, and not a forecast.`;
+    return `<p class="technical-volume-residual">${escapeHtml(text)}</p>`;
+  }
+
   function renderPanel(ticker, helpers) {
     const { escapeHtml } = helpers;
     const technicals = technicalsOf(ticker);
@@ -252,6 +261,7 @@
           ${metric('60-day relative', measures.relative_return_60d_pct, '%')}
           ${metric('1-year drawdown', measures.drawdown_1y_pct, '%')}
         </div>
+        ${volumeResidualLine(ticker, technicals, escapeHtml)}
         <div class="technical-foot">
           <span>${escapeHtml(technicals.data_grade_reason || regime.interpretation || 'No unusual technical condition')}</span>
           <span class="mono">${escapeHtml(technicals.as_of || '—')} · ${escapeHtml(technicals.source || 'source pending')} · benchmark ${escapeHtml(technicals.benchmark || '—')}</span>

@@ -104,6 +104,7 @@ if str(SCRIPTS) not in sys.path:
     sys.path.insert(0, str(SCRIPTS))
 
 from build_technical_signals import _request  # noqa: E402
+import volume_residual  # noqa: E402
 
 SCHEMA_VERSION = 1
 MODEL_VERSION = "vol-metrics-v2"
@@ -419,6 +420,80 @@ def _fetch_yahoo_close_series(symbol: str, start: datetime, end: datetime) -> di
     if not series:
         raise ValueError(f"Yahoo returned no usable closes for {symbol}")
     return series
+
+
+def fetch_spy_bars() -> list[dict]:
+    """SPY adjusted close and share volume for the volume clock.
+
+    One extra chart request. It does not change the index realized-vol series.
+    """
+    end = datetime.now(timezone.utc)
+    start = end - timedelta(days=LOOKBACK_DAYS)
+    encoded = urllib.parse.quote("SPY", safe="")
+    url = (
+        "https://query1.finance.yahoo.com/v8/finance/chart/"
+        + encoded
+        + "?"
+        + urllib.parse.urlencode(
+            {
+                "period1": int(start.timestamp()),
+                "period2": int(end.timestamp()) + 86400,
+                "interval": "1d",
+                "events": "div,splits",
+            }
+        )
+    )
+    payload = json.loads(_request(url))
+    result = (payload.get("chart") or {}).get("result") or []
+    if not result:
+        raise ValueError("Yahoo returned no result for SPY")
+    result = result[0]
+    timestamps = result.get("timestamp") or []
+    quote = ((result.get("indicators") or {}).get("quote") or [{}])[0]
+    closes = quote.get("close") or []
+    volumes = quote.get("volume") or []
+    adjusted = (((result.get("indicators") or {}).get("adjclose") or [{}])[0]).get("adjclose") or []
+    bars = []
+    for index, timestamp in enumerate(timestamps):
+        raw_close = _finite(closes[index] if index < len(closes) else None)
+        price = _finite(adjusted[index] if index < len(adjusted) else None) or raw_close
+        if price is None or price <= 0:
+            continue
+        bars.append(
+            {
+                "date": datetime.fromtimestamp(timestamp, tz=timezone.utc).strftime("%Y-%m-%d"),
+                "adj_close": price,
+                "volume": _finite(volumes[index] if index < len(volumes) else None),
+            }
+        )
+    if len(bars) < RV_WINDOW + 1:
+        raise ValueError("Yahoo returned too few SPY bars for the volume clock")
+    return bars
+
+
+RESIDUAL_NAME = "vol_volume_residual.json"
+
+
+def write_volume_residual(output_dir: Path, bars: list[dict]) -> dict:
+    document = volume_residual.market_document(bars)
+    _write_text_atomic(output_dir / RESIDUAL_NAME, _dump(document) + "\n")
+    return document
+
+
+def stamp_volume_residual_stale(output_dir: Path, reason: str) -> None:
+    """Keep the previous residual file and mark the card stale. Never touch VIX history."""
+    path = output_dir / RESIDUAL_NAME
+    if not path.exists():
+        return
+    try:
+        document = json.loads(path.read_text(encoding="utf-8"))
+    except (OSError, json.JSONDecodeError):
+        return
+    if not isinstance(document, dict):
+        return
+    document["stale"] = True
+    document["stale_reason"] = str(reason)[:240]
+    _write_text_atomic(path, _dump(document) + "\n")
 
 
 def _parse_daily_date(value: str) -> str | None:
@@ -1330,8 +1405,20 @@ def main() -> int:
         help="Compute and print the summary without writing any file",
     )
     args = parser.parse_args()
-    result = build(output_dir=Path(args.output_dir), dry_run=args.dry_run)
-    print(json.dumps(summarize(result), sort_keys=True))
+    output_dir = Path(args.output_dir)
+    result = build(output_dir=output_dir, dry_run=args.dry_run)
+    summary = summarize(result)
+    if args.dry_run:
+        summary["volume_residual"] = "dry_run"
+    else:
+        try:
+            document = write_volume_residual(output_dir, fetch_spy_bars())
+            latest = document.get("latest") or {}
+            summary["volume_residual"] = latest.get("withheld_reason") or "printed"
+        except Exception as exc:  # noqa: BLE001 - a failed SPY fetch must not blank the VIX history
+            stamp_volume_residual_stale(output_dir, str(exc))
+            summary["volume_residual"] = "stale"
+    print(json.dumps(summary, sort_keys=True))
     # A stale build must alert the scheduled lane and prevent its commit step
     # from laundering old columns behind a fresh generated_at timestamp.
     return 0 if result["latest"]["quality_state"] == "ready" else 1

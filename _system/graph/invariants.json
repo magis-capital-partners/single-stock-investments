@@ -1,8 +1,8 @@
 {
- "run_date": "2026-10-08",
- "git_head": "45cf0f11a048f6363fee0415d501105b7ee726fe",
- "nodes": 8619,
- "edges": 7829,
+ "run_date": "2026-10-14",
+ "git_head": "a77e6b45e8a174c159bba0578319a6b5caa5e93c",
+ "nodes": 8660,
+ "edges": 7853,
  "exit_code": 0,
  "ratchet": {
   "armed": [
@@ -65,7 +65,7 @@
    "count": 0,
    "delta": "0",
    "status": "OK",
-   "note": "29 job-anchored lanes wired",
+   "note": "32 job-anchored lanes wired",
    "violations": [],
    "violations_total": 0,
    "waived": []
@@ -89,7 +89,7 @@
    "count": 23,
    "delta": "0",
    "status": "VIOLATIONS",
-   "note": "26/49 validators referenced by CI",
+   "note": "32/55 validators referenced by CI",
    "violations": [
     "audit_dashboard_availability.py",
     "audit_document_registry.py",
@@ -122,7 +122,7 @@
    "count": 0,
    "delta": "0",
    "status": "OK",
-   "note": "8/8 feeds fresh (capitulation_daily 8h, criticality_summary 8h, market_risk_components_committed 15h, podcast_catalog 21h, spx_surface 8h, technical_summary 8h, vol_metrics 8h, warrant_monitor 2h)",
+   "note": "13/13 feeds fresh (capitulation_daily 7h, criticality_summary 7h, desk_briefs 2h, market_risk_components_committed 14h, podcast_catalog 5h, reverse_splits 2h, separations 2h, short_alpha 15h, special_situations 2h, spx_surface 7h, technical_summary 7h, vol_metrics 7h, warrant_monitor 2h)",
    "violations": [],
    "violations_total": 0,
    "waived": []
@@ -143,14 +143,16 @@
    "id": "P8",
    "severity": "report",
    "base_severity": "report",
-   "count": 1,
-   "delta": "-2",
+   "count": 3,
+   "delta": "+1",
    "status": "VIOLATIONS",
-   "note": "28 lanes fresh; stale lanes alert through the repository-health supervisor, never through this gate",
+   "note": "29 lanes fresh; stale lanes alert through the repository-health supervisor, never through this gate",
    "violations": [
-    "research-quality-main: last work-done receipt 21.1h old (window 18h)"
+    "research-quality-main: last work-done receipt 18.6h old (window 18h)",
+    "research-watchdog: last work-done receipt 117.3h old (window 54h)",
+    "reverse-split-borrow-history: no work-done receipt"
    ],
-   "violations_total": 1,
+   "violations_total": 3,
    "waived": []
   },
   {
@@ -205,7 +207,7 @@
    "count": 0,
    "delta": "0",
    "status": "OK",
-   "note": "8 outcomes",
+   "note": "12 outcomes",
    "violations": [],
    "violations_total": 0,
    "waived": []
@@ -240,8 +242,8 @@
    "id": "E6",
    "severity": "report",
    "base_severity": "report",
-   "count": 241,
-   "delta": "-2",
+   "count": 243,
+   "delta": "0",
    "status": "VIOLATIONS",
    "note": "",
    "violations": [
@@ -266,7 +268,7 @@
     "2026-05-21 For exchanges, analyze **handled volume** alongside market share ? share loss an",
     "2026-05-21 Invest only in simple, understandable businesses with durable economics and hone"
    ],
-   "violations_total": 241,
+   "violations_total": 243,
    "waived": []
   },
   {
@@ -300,7 +302,7 @@
    "count": 0,
    "delta": "0",
    "status": "OK",
-   "note": "8 outcomes, 1 calibration eligible",
+   "note": "12 outcomes, 1 calibration eligible",
    "violations": [],
    "violations_total": 0,
    "waived": []
@@ -395,10 +397,10 @@
    "id": "L4",
    "severity": "report",
    "base_severity": "report",
-   "count": 32,
+   "count": 30,
    "delta": "0",
    "status": "VIOLATIONS",
-   "note": "20 non-canonical criteria values, 10 non-canonical data values (47 ticker-field hits), 2 lenses narrower than their zone",
+   "note": "18 non-canonical criteria values, 10 non-canonical data values (47 ticker-field hits), 2 lenses narrower than their zone",
    "violations": [
     "criteria: personas.json:marathon_capital_cycle:capacity_sensitive archetype 'commodity_cyclical' not canonical",
     "criteria: power_zones.json:zone:pabrai archetype 'commodity_cyclical' not canonical",
@@ -407,21 +409,21 @@
     "criteria: power_zones.json:zone:marks_credit_cycle archetype 'bank' not canonical",
     "criteria: power_zones.json:zone:marks_credit_cycle archetype 'insurer' not canonical",
     "criteria: power_zones.json:zone:marks_credit_cycle archetype 'commodity_cyclical' not canonical",
-    "criteria: power_zones.json:zone:klarman_asset_value archetype 'special_situation' not canonical",
     "criteria: power_zones.json:profile:capital_cycle archetype 'commodity_cyclical' not canonical",
     "criteria: power_zones.json:profile:capital_cycle archetype 'cyclical' not canonical",
     "criteria: power_zones.json:profile:credit_and_normalized_returns archetype 'bank' not canonical",
     "criteria: power_zones.json:profile:credit_and_normalized_returns archetype 'insurer' not canonical",
     "criteria: power_zones.json:profile:credit_and_normalized_returns archetype 'leveraged_equity' not canonical",
-    "criteria: power_zones.json:profile:catalyst_asset_value archetype 'special_situation' not canonical",
     "criteria: power_zones.json:profile:predictable_cash_flow archetype 'regulated_utility' not canonical",
     "criteria: power_zones.json:profile:predictable_cash_flow archetype 'utility' not canonical",
     "criteria: power_zones.json:profile:predictable_cash_flow archetype 'mature_cash_generator' not canonical",
     "criteria: power_zones.json:profile:binary_milestone archetype 'biotech' not canonical",
     "criteria: power_zones.json:profile:binary_milestone archetype 'pre_profit' not canonical",
-    "criteria: power_zones.json:profile:binary_milestone archetype 'exploration' not canonical"
+    "criteria: power_zones.json:profile:binary_milestone archetype 'exploration' not canonical",
+    "data: archetype value 'biotech' not canonical",
+    "data: archetype value 'capital_cycle' not canonical"
    ],
-   "violations_total": 32,
+   "violations_total": 30,
    "waived": []
   },
   {

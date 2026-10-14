@@ -10,7 +10,7 @@ Replace the old single **thesis status** (intact / weakening / strengthening / u
 
 | Field | Lens | Values | Question answered |
 |-------|------|--------|-------------------|
-| **Archetype** | Stahl | `croupier`, `compounder`, `serial_acquirer`, `platform`, `holding_co`, `optionality`, `turnaround`, `infrastructure` | What *is* this business in the pecuniary economy? |
+| **Archetype** | Stahl | `croupier`, `compounder`, `serial_acquirer`, `platform`, `holding_co`, `optionality`, `turnaround`, `infrastructure`, `special_situation` | What *is* this business in the pecuniary economy? |
 | **Moat** | Munger | `widening`, `stable`, `eroding`, `unproven`, `n/a` | Is competitive advantage durable? |
 | **Dhando** | Pabrai | `full`, `partial`, `none`, `pending` | Heads I win, tails I don't lose much? |
 | **Stance** | Human (IC recommends) | `core`, `accumulate`, `hold`, `watch`, `trim`, `exit` | What do we *do* with capital? Only `human_decision.json` is actionable |
@@ -36,6 +36,7 @@ Read `{TICKER}/research/valuation.json` **before** opening optional frameworks. 
 | `classification_inputs.payoff_lens: operating` | `hohn_business_analysis.md`; Lawrence path | `marvin_valuation.py` via cloud refresh |
 | `payoff_lens: asset` or `valuation_mode: optionality` | `optionality_valuation.md` (incl. mechanical refresh §) | `marvin_cloud_refresh.py` |
 | `payoff_lens: event` | `special_situation_lens.md` | cloud refresh |
+| `separation` block present (parent, SpinCo, or stub role) | `special_situation_lens.md` § Separations | `build_separations_dashboard.py` inside cloud refresh |
 | `payoff_lens: levered` | `equity_stub_valuation.md` | cloud refresh |
 | `segment_build` or `valuation_overlay: segment_cashflow` | `segment_cashflow_valuation.md` | cloud refresh |
 | `ai_overlay` (keys present) | `ai_infrastructure_valuation.md` | cloud refresh |

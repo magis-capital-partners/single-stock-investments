@@ -112,7 +112,8 @@ def parse_flex_xml(xml: bytes | str, *, account_alias: str, source_run_id: str |
     # all of them together decide a dd/MM vs MM/dd question none can alone.
     date_values: list[object] = [statement.get(key) for key in ("fromDate", "toDate", "periodEnd", "whenGenerated")]
     for tag, keys in (("EquitySummaryByReportDateInBase", ("reportDate",)), ("ChangeInNAV", ("fromDate", "toDate")),
-                      ("OpenPosition", ("reportDate",)), ("CashTransaction", ("reportDate", "settleDate"))):
+                      ("OpenPosition", ("reportDate",)), ("CashTransaction", ("reportDate", "settleDate")),
+                      ("CorporateAction", ("reportDate", "dateTime"))):
         for element in root.iter(tag):
             date_values.extend(element.attrib.get(key) for key in keys)
     date_order = slash_date_order(date_values)
@@ -163,6 +164,23 @@ def parse_flex_xml(xml: bytes | str, *, account_alias: str, source_run_id: str |
             "symbol": row.get("symbol"), "conid": int(_pick(row, "conid", "conId") or 0) or None,
             "description": row.get("description"),
         })
+    # Corporate actions (spin-off receipts, exchange-offer acceptances, mergers,
+    # splits) are the only broker record of a separation landing in the book:
+    # a SpinCo line appears with no Trade row, and the parent's share count
+    # falls with no sale. Empty when the Flex query has no such section.
+    corporate_actions = []
+    for row in _rows(root, "CorporateAction"):
+        corporate_actions.append({
+            "action_id": _pick(row, "actionID", "actionId", "transactionID", "transactionId"),
+            "type": _pick(row, "type", "code"),
+            "description": _pick(row, "actionDescription", "description"),
+            "symbol": _pick(row, "symbol", "underlyingSymbol"),
+            "conid": int(_pick(row, "conid", "conId") or 0) or None,
+            "quantity": row.get("quantity"),
+            "amount": _pick(row, "amount", "proceeds"),
+            "value": row.get("value"),
+            "date": _pick(row, "dateTime", "reportDate"),
+        })
     nav_rows = [{
         "currency": row.get("currency"),
         "net_liquidation": _pick(row, "total", "endingValue", "netLiquidation"),
@@ -179,7 +197,7 @@ def parse_flex_xml(xml: bytes | str, *, account_alias: str, source_run_id: str |
         "account_alias": account_alias, "session_date": session_date, "as_of": now,
         "session_date_raw": raw_session_date, "date_order": date_order,
         "positions": positions, "trades": trades, "cash_transactions": cash, "nav_rows": nav_rows,
-        "equity_summaries": equity_summaries,
+        "corporate_actions": corporate_actions, "equity_summaries": equity_summaries,
     }
 
 

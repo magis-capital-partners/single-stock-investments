@@ -10,10 +10,10 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600;700&family=DM+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
 <link href="insights-events.css" rel="stylesheet">
-<link href="short-alpha.css?v=20261008-quant-screen" rel="stylesheet">
+<link href="short-alpha.css?v=20261013-clean" rel="stylesheet">
 <link href="warrants.css" rel="stylesheet">
 <link href="portfolio.css?v=20261008-michael-tail" rel="stylesheet">
-<link href="ideas.css?v=20260819-decision-workspace" rel="stylesheet">
+<link href="ideas.css?v=20261011-separations" rel="stylesheet">
 <style>
   :root {
     --bg-primary: #0a0e17;
@@ -446,6 +446,7 @@
   .technical-metric-value { margin-top: 2px; font: 700 12px 'JetBrains Mono', monospace; }
   .technical-foot { display: flex; justify-content: space-between; gap: 12px; margin-top: 10px; color: var(--text-secondary); font-size: 10px; }
   .technical-policy { margin-top: 9px; padding-top: 8px; border-top: 1px dashed var(--border); color: var(--text-muted); font-size: 9px; }
+  .technical-volume-residual { margin: 8px 0 0; color: var(--text-secondary); font-size: 12px; line-height: 1.45; }
   .investment-picture { margin-bottom: 12px; border: 1px solid rgba(125, 139, 166, .4); background: #0b111e; }
   .investment-picture-head { display: grid; grid-template-columns: minmax(150px, .55fr) minmax(260px, 1.45fr); gap: 18px; align-items: start; padding: 12px 14px; border-bottom: 1px solid var(--border); }
   .investment-picture-head > div { display: grid; gap: 3px; }
@@ -1565,6 +1566,18 @@
   .vol-tile-z { display: block; margin-top: 4px; color: var(--text-muted); font: 10px 'JetBrains Mono', monospace; }
   .vol-basis, .vol-lag { display: block; margin-top: 4px; color: var(--text-muted); font-size: 11px; line-height: 1.5; }
   .vol-lag { color: var(--warning); }
+  .vol-residual-card { margin-top: 10px; }
+  .vol-residual-figures { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 8px; margin-top: 8px; }
+  .vol-residual-figures div { min-width: 0; padding: 10px; border: 1px solid var(--border); background: rgba(7,11,19,.76); }
+  .vol-residual-figures span { display: block; color: var(--text-muted); font-size: 9px; font-weight: 800; letter-spacing: .65px; text-transform: uppercase; }
+  .vol-residual-figures strong { display: block; margin-top: 4px; color: var(--text-primary); font: 600 21px 'JetBrains Mono', monospace; line-height: 1.15; }
+  .vol-residual-figures small { display: block; margin-top: 3px; color: var(--text-secondary); font-size: 11px; line-height: 1.4; }
+  .vol-residual-strip { display: block; width: 100%; height: 72px; margin-top: 8px; }
+  .vol-residual-strip line { stroke: #3d4a60; stroke-width: 1; }
+  .vol-residual-strip polyline { fill: none; stroke: #9aa6b8; stroke-width: 1.5; }
+  .vol-residual-caption, .vol-residual-footnote, .vol-residual-missing, .vol-residual-stale { margin: 8px 0 0; color: var(--text-secondary); font-size: 11px; line-height: 1.6; }
+  .vol-residual-disclosure { margin-top: 8px; color: var(--text-muted); font-size: 11px; line-height: 1.55; }
+  .vol-residual-disclosure summary { cursor: pointer; color: var(--text-secondary); }
   .vol-na { color: var(--warning); font-size: 11px; }
   .vol-fresh { font: 10px 'JetBrains Mono', monospace; }
   .vol-spark { display: block; width: 100%; height: 26px; margin-top: 7px; }
@@ -1955,16 +1968,19 @@
 <script src="insights-viz.js?v=20260908-aggregates-theme"></script>
 <script src="valuation-viz.js"></script>
 <script src="criticality-viz.js?v=20261001-signal-study"></script>
-<script src="vol-viz.js"></script>
-<script src="technical-viz.js?v=20261001-signal-study"></script>
+<script src="vol-viz.js?v=20261009-volume-residual"></script>
+<script src="technical-viz.js?v=20261009-volume-residual"></script>
 <script src="technical-picture-viz.js?v=20261001-signal-study"></script>
 <script src="fico-watch-viz.js?v=20261006-fico-watch-2"></script>
 <script src="overlap-viz.js?v=20261008-overlap-line"></script>
 <script src="index-viz.js"></script>
 <script src="activist-viz.js?v=20260819-dashboard-rebuild"></script>
-<script src="short-alpha-viz.js?v=20261008-quant-screen"></script>
+<script src="short-alpha-viz.js?v=20261013-clean"></script>
+<script src="reverse-splits-viz.js?v=20261014-capital-tail"></script>
 <script src="warrant-viz.js"></script>
-<script src="special-situations-viz.js?v=20261008-situations"></script>
+<script src="special-situations-viz.js?v=20261011-separations"></script>
+<script src="separations-viz.js?v=20261011-separations"></script>
+<script src="desk-briefs-viz.js?v=20261012-desk-briefs"></script>
 <script src="sleeve-viz.js?v=20261008-michael-tail"></script>
 <script src="ui-format.js?v=20260819-currency"></script>
 <script src="portfolio-viz.js?v=20261008-michael-tail"></script>
@@ -2262,6 +2278,7 @@ const WATCHLIST_VIEW_KEY = 'ssp_watchlist_view_v1';
 const WATCHLIST_VIEWS = new Set(['all', 'queue', 'nol', 'banks', 'rock']);
 const SITUATION_LANE_IDS = {
   spinoffs: 'spinoffs',
+  'split-offs': 'split_offs',
   mergers: 'mergers',
   warrants: 'warrants',
   restructurings: 'restructurings',
@@ -2270,6 +2287,7 @@ const SITUATION_LANE_IDS = {
 const SITUATION_LANE_SLUG = {
   all: '',
   spinoffs: 'spinoffs',
+  split_offs: 'split-offs',
   mergers: 'mergers',
   warrants: 'warrants',
   restructurings: 'restructurings',
@@ -2354,7 +2372,7 @@ function parseRouteFromHashString(hash) {
   if (/^#\/(?:ideas\/)?warrants$/i.test(hash || '')) {
     return { view: 'situations', ticker: null, watchlistSub: null, situationLane: 'warrants', situationFocus: '', situationGatesOpen: true };
   }
-  const situationsMatch = /^#\/ideas\/situations(?:\/(spinoffs|mergers|warrants|restructurings|forced-sellers))?(?:\/([^/?#]+))?$/i.exec(hash || '');
+  const situationsMatch = /^#\/ideas\/situations(?:\/(spinoffs|split-offs|mergers|warrants|restructurings|forced-sellers))?(?:\/([^/?#]+))?$/i.exec(hash || '');
   if (situationsMatch) {
     const slug = (situationsMatch[1] || '').toLowerCase();
     return {
@@ -3493,6 +3511,8 @@ async function load() {
   // state rather than taking the risk page down.
   try { data.vol_metrics = await fetchShardJson('data/vol_metrics_latest.json'); }
   catch (_) { data.vol_metrics = null; }
+  try { data.vol_volume_residual = await fetchShardJson('data/vol_volume_residual.json'); }
+  catch (_) { data.vol_volume_residual = null; }
   try { data.criticality_error_diagram = await fetchShardJson('data/criticality_error_diagram.json'); }
   catch (_) { data.criticality_error_diagram = null; }
   // No row cap. fetchJsonlTail downloads the WHOLE file and then slices, so
@@ -3570,7 +3590,7 @@ function renderMarketRiskView() {
       data.vol_metrics || null,
       data.vol_metrics_history || [],
       data.spx_surface || null,
-      { escapeHtml, surfaceHistory: data.spx_surface_history || [] },
+      { escapeHtml, surfaceHistory: data.spx_surface_history || [], residual: data.vol_volume_residual || null },
     )
     : '';
   const riskOptions = {
@@ -3634,6 +3654,37 @@ function renderShortAlpha() {
   const rerender = () => renderShortAlpha();
   content.innerHTML = ShortAlphaViz.render(shortAlphaData);
   ShortAlphaViz.attach(content, shortAlphaData, rerender);
+  mountReverseSplitsSection(content);
+}
+
+// `dashboard/data/reverse_splits.json` (reverse-splits lane; Phase 3 of
+// _system/proposals/one_hub_for_humans_and_bots_2026-10-11.md). Optional: the
+// Shorts tab shows its "Reverse splits" sub-section only when the file exists
+// and reverse-splits-viz.js is loaded, so a 404 is an empty state, never an
+// error. Resolves to null when absent. Same shape as loadSituations().
+let reverseSplitsData;
+let reverseSplitsPromise = null;
+function loadReverseSplits() {
+  if (reverseSplitsData !== undefined) return Promise.resolve(reverseSplitsData);
+  if (!reverseSplitsPromise) {
+    reverseSplitsPromise = fetch('data/reverse_splits.json?' + Date.now())
+      .then(response => (response.ok ? response.json() : null))
+      .then(doc => (doc && typeof doc === 'object' && !Array.isArray(doc) ? doc : null))
+      .catch(() => null)
+      .then(value => { reverseSplitsData = value; return value; })
+      .finally(() => { reverseSplitsPromise = null; });
+  }
+  return reverseSplitsPromise;
+}
+
+function mountReverseSplitsSection(content) {
+  if (!content || !window.ShortAlphaViz || typeof ShortAlphaViz.mountReverseSplits !== 'function') return;
+  loadReverseSplits().then(doc => {
+    // The placeholder is re-created on every Shorts re-render; mount into the current one.
+    if (doc && window.ReverseSplitsViz && content.isConnected && content.querySelector('[data-short-reverse-splits]')) {
+      ShortAlphaViz.mountReverseSplits(content, doc);
+    }
+  });
 }
 
 async function loadWarrants() {
@@ -3663,9 +3714,27 @@ async function loadSituations() {
         situationData = { rows: [], discovery: [], history: [], lanes: [], error: error.message };
         return situationData;
       })
+      .then(value => loadSeparations().then((separations) => {
+        if (separations && typeof separations === 'object') {
+          value.separations = separations;
+          if (!value.caption && separations.caption) value.caption = separations.caption;
+        }
+        return value;
+      }))
       .finally(() => { situationPromise = null; });
   }
   return situationPromise;
+}
+
+// `dashboard/data/separations.json` (schema: _system/data/separations/README.md,
+// "Dashboard payload"). Optional: the desk rows already carry their spread and
+// flow via special_situations.json, so a missing or malformed file is an empty
+// state, never an error. Resolves to null when absent.
+function loadSeparations() {
+  return fetch('data/separations.json?' + Date.now())
+    .then(response => (response.ok ? response.json() : null))
+    .then(doc => (doc && typeof doc === 'object' && !Array.isArray(doc) && Array.isArray(doc.rows) ? doc : null))
+    .catch(() => null);
 }
 
 function renderSituations() {
@@ -4899,6 +4968,45 @@ function setIdeaUrlState(updates) {
   window.history.replaceState(null, '', `${url.pathname}${url.search}${url.hash}`);
 }
 
+// Desk briefs (`dashboard/data/desk_briefs.json`, contract `_system/data/desk_briefs/README.md`).
+// Lazy-loaded for the Inbox the way loadSituations() loads the desk: cache-busted fetch, and a
+// missing or malformed file is an empty state, never an error. Rendered by desk-briefs-viz.js.
+let deskBriefsData = null;
+let deskBriefsPromise = null;
+function loadDeskBriefs() {
+  if (deskBriefsData) return Promise.resolve(deskBriefsData);
+  if (!deskBriefsPromise) {
+    deskBriefsPromise = fetch('data/desk_briefs.json?' + Date.now())
+      .then(response => {
+        if (!response.ok) throw new Error(`Desk briefs data ${response.status}`);
+        return response.json();
+      })
+      .then(value => (value && typeof value === 'object' && !Array.isArray(value) && Array.isArray(value.desks)
+        ? value
+        : { desks: [], desks_without_brief: [], error: 'Desk briefs payload malformed' }))
+      .catch(error => ({ desks: [], desks_without_brief: [], error: error.message }))
+      .then(value => { deskBriefsData = value; return value; })
+      .finally(() => { deskBriefsPromise = null; });
+  }
+  return deskBriefsPromise;
+}
+
+function renderDeskBriefsBlock() {
+  if (!window.DeskBriefsViz) return '';
+  if (!deskBriefsData) {
+    loadDeskBriefs().then(() => { if (activeView === 'watchlist' && watchlistViewMode === 'all') renderWatchlistTab(); });
+    return '<section class="desk-briefs" data-desk-briefs aria-label="Desk briefs"><div class="ideas-surface-head desk-briefs-head"><div><strong>Desk briefs</strong> <span>Loading…</span></div></div></section>';
+  }
+  return DeskBriefsViz.render(deskBriefsData);
+}
+
+function attachDeskBriefs(content) {
+  if (!window.DeskBriefsViz || !deskBriefsData) return;
+  const host = content.querySelector('[data-desk-briefs]');
+  if (!host) return;
+  DeskBriefsViz.attach(host, deskBriefsData, { onChange: () => renderWatchlistTab() });
+}
+
 function buildIdeaRows() {
   const generated = data.generated_at || data.generatedAt || null;
   const rows = [];
@@ -4964,7 +5072,7 @@ function renderIdeasIndexBody() {
       const clockNote = ['fresh', 'api', 'empty'].includes(clock) ? '' : ` [${window.DashboardFormat.feedLabel(clock)}]`;
       const desk = row.desk === 'special_situations' ? 'Special situations' : row.desk === 'screens' ? 'Screens' : row.desk === 'short' ? 'Shorts' : 'Research';
       return `<tr><td><span class="idea-type">${escapeHtml(desk)}</span></td><td><span class="idea-type">${escapeHtml(row.type)}</span></td><td><button type="button" class="idea-open" data-idea-id="${escapeHtml(row.id)}">${escapeHtml(row.name || 'Unavailable')}</button></td><td>${escapeHtml(String(row.stage || 'Unavailable').replace(/_/g, ' '))}</td><td>${escapeHtml(row.catalyst)}</td><td>${escapeHtml(row.owner)}</td><td class="numeric">${escapeHtml(window.DashboardFormat.date(row.updated))}</td><td>${escapeHtml(row.next + clockNote)}</td></tr>`;
-    }).join('')}</tbody></table>${rows.length ? '' : '<div class="operator-empty"><strong>No ideas match this decision state</strong><span>Choose another decision-tape segment. Source owner: Research Data Health.</span></div>'}</div></section>${renderIdeaDrawer(selected)}</div>`;
+    }).join('')}</tbody></table>${rows.length ? '' : '<div class="operator-empty"><strong>No ideas match this decision state</strong><span>Choose another decision-tape segment. Source owner: Research Data Health.</span></div>'}</div></section>${renderDeskBriefsBlock()}${renderIdeaDrawer(selected)}</div>`;
 }
 
 function renderWatchlistQueueBody() {
@@ -5247,6 +5355,7 @@ function renderWatchlistTab() {
     setIdeaUrlState({ idea: null });
     renderWatchlistTab();
   });
+  if (watchlistViewMode === 'all') attachDeskBriefs(content);
   content.querySelectorAll('[data-nol-blocker]').forEach((button) => button.addEventListener('click', () => {
     nolBlockerFilter = button.dataset.nolBlocker;
     setIdeaUrlState({ nolBlocker: nolBlockerFilter });
@@ -5659,7 +5768,7 @@ function filtered() {
 function renderHoldingsCell(colId, t) {
   switch (colId) {
     case 'ticker':
-      return `<td class="mono ticker-cell">${escapeHtml(t.display_ticker || t.ticker)}${t.quote_ticker && t.quote_ticker !== (t.display_ticker || t.ticker) ? `<span class="irr-sub" title="Quote symbol"> ${escapeHtml(t.quote_ticker)}</span>` : ''}${t.equity_model?.ready ? ` <span class="badge badge-ok" title="Earnings model ${t.equity_model.production_spec || 'v5'} ready">M</span>` : ''}${t.onboard?.phase && t.onboard.phase !== 'complete' ? `<span class="onboard-badge">${t.onboard.phase}</span>` : ''}<button type="button" class="sleeve-jump" data-sleeve-jump="drew" data-ticker="${escapeHtml(t.ticker)}" title="Note on Drew tab">D</button><button type="button" class="sleeve-jump" data-sleeve-jump="michael" data-ticker="${escapeHtml(t.ticker)}" title="Note on Michael tab">M</button></td>`;
+      return `<td class="mono ticker-cell">${escapeHtml(t.display_ticker || t.ticker)}${t.quote_ticker && t.quote_ticker !== (t.display_ticker || t.ticker) ? `<span class="irr-sub" title="Quote symbol"> ${escapeHtml(t.quote_ticker)}</span>` : ''}${t.equity_model?.ready ? ` <span class="badge badge-ok" title="Earnings model ${t.equity_model.production_spec || 'v5'} ready">M</span>` : ''}${t.onboard?.phase && t.onboard.phase !== 'complete' ? `<span class="onboard-badge">${t.onboard.phase}</span>` : ''}${window.SeparationsViz && t.separation?.odd_lot?.eligible_owners?.length ? ` ${SeparationsViz.renderOddLotBadge(t.separation, { escapeHtml })}` : ''}<button type="button" class="sleeve-jump" data-sleeve-jump="drew" data-ticker="${escapeHtml(t.ticker)}" title="Note on Drew tab">D</button><button type="button" class="sleeve-jump" data-sleeve-jump="michael" data-ticker="${escapeHtml(t.ticker)}" title="Note on Michael tab">M</button></td>`;
     case 'company':
       return `<td class="company-cell" title="${escapeHtml(t.company)}">${escapeHtml(t.company)}</td>`;
     case 'market':
@@ -6101,6 +6210,7 @@ function selectTicker(ticker, opts = {}) {
     ${lensChips || ''}
     ${renderFundNavPanel(t)}
     ${renderCvrPanel(t)}
+    ${window.SeparationsViz && t.separation ? SeparationsViz.renderTickerCard(t.separation, { escapeHtml }) : ''}
 
     ${renderValuationWorkbench(t)}
     ${window.ValuationViz ? ValuationViz.renderPropertiesPanel(t, valuationHelpers()) : ''}

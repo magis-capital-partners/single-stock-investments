@@ -1,0 +1,225 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/magis-capital-partners/single-stock-investments/blob/main/_system/data/desk_briefs/schema.json",
+  "title": "Desk brief",
+  "description": "One ranked brief from one Magis desk bot for one day. Proposal: _system/proposals/one_hub_for_humans_and_bots_2026-10-11.md, 'Desk brief contract'. Validated by _system/scripts/check_desk_briefs.py, which also checks what a schema cannot: the ticker is in the registry, as_of matches the file name, inputs_read paths exist.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version",
+    "desk",
+    "as_of",
+    "author",
+    "owner",
+    "inputs_read",
+    "items",
+    "screens_empty",
+    "research_only",
+    "in_base_irr",
+    "authority"
+  ],
+  "properties": {
+    "schema_version": {
+      "const": "desk_briefs.v1"
+    },
+    "desk": {
+      "description": "The desk id. Also the directory the file lives in.",
+      "enum": [
+        "special_situations",
+        "activism",
+        "fundamentals",
+        "nol_tax_assets",
+        "tape_index",
+        "stahl",
+        "short_selling"
+      ]
+    },
+    "as_of": {
+      "description": "The brief date (UTC). Must equal the file name stem.",
+      "type": "string",
+      "format": "date",
+      "pattern": "^\\d{4}-\\d{2}-\\d{2}$"
+    },
+    "author": {
+      "description": "The bot id that wrote the brief, e.g. grok-michael-special-situations or claude-drew-special-situations.",
+      "type": "string",
+      "minLength": 3,
+      "maxLength": 80,
+      "pattern": "^[a-z0-9][a-z0-9._-]*$"
+    },
+    "owner": {
+      "description": "Whose bot filed it; whose queue it lands in.",
+      "enum": [
+        "drew",
+        "michael"
+      ]
+    },
+    "inputs_read": {
+      "description": "Every repo file the bot read, with the stamp it carried (generated_at, build_time, generated, meta.updated or as_of). A brief built on stale data says so here.",
+      "type": "array",
+      "minItems": 1,
+      "maxItems": 40,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "path",
+          "generated_at"
+        ],
+        "properties": {
+          "path": {
+            "description": "Repo-relative path with forward slashes.",
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 300,
+            "pattern": "^(?![/\\\\])(?!.*(^|/)\\.\\.(/|$))[^\\\\]+$"
+          },
+          "generated_at": {
+            "description": "The file's own stamp as read. Null only when the file carries none.",
+            "type": [
+              "string",
+              "null"
+            ],
+            "maxLength": 40
+          }
+        }
+      }
+    },
+    "items": {
+      "description": "Ranked hits, best first. At most 12 (the prompts already cap at 12).",
+      "type": "array",
+      "maxItems": 12,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "ticker",
+          "headline",
+          "one_number",
+          "evidence",
+          "confidence"
+        ],
+        "properties": {
+          "ticker": {
+            "description": "A ticker in _system/portfolio/registry.json holdings or watchlist, or the literal 'unresolved'.",
+            "type": "string",
+            "pattern": "^(unresolved|[A-Z0-9][A-Z0-9.\\-]{0,15})$"
+          },
+          "headline": {
+            "description": "One sentence. A headline is never a term.",
+            "type": "string",
+            "minLength": 8,
+            "maxLength": 160
+          },
+          "one_number": {
+            "description": "The one number that matters, with its unit (Magis room convention).",
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 80
+          },
+          "lane": {
+            "description": "The desk's own screen or lane id, e.g. split_offs, 13d, guidance_break.",
+            "type": [
+              "string",
+              "null"
+            ],
+            "pattern": "^[a-z0-9_]+$",
+            "maxLength": 40
+          },
+          "evidence": {
+            "type": "array",
+            "minItems": 1,
+            "maxItems": 8,
+            "items": {
+              "type": "object",
+              "additionalProperties": false,
+              "required": [
+                "kind",
+                "ref"
+              ],
+              "properties": {
+                "kind": {
+                  "enum": [
+                    "filing",
+                    "provider",
+                    "news",
+                    "web",
+                    "dashboard"
+                  ]
+                },
+                "ref": {
+                  "description": "Form and accession for a filing; repo path for a dashboard file; provider and stamp for a quote; outlet and date for news.",
+                  "type": "string",
+                  "minLength": 2,
+                  "maxLength": 200
+                },
+                "url": {
+                  "type": [
+                    "string",
+                    "null"
+                  ],
+                  "pattern": "^https?://",
+                  "maxLength": 2000
+                }
+              }
+            }
+          },
+          "confidence": {
+            "description": "The weakest source behind one_number. 'filing' needs a filing in evidence; 'provider' needs a filing, provider or dashboard entry.",
+            "enum": [
+              "filing",
+              "provider",
+              "news",
+              "web"
+            ]
+          },
+          "next": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "maxLength": 300
+          },
+          "handoff": {
+            "description": "Another desk that owns the full brief, or null.",
+            "enum": [
+              null,
+              "special_situations",
+              "activism",
+              "fundamentals",
+              "nol_tax_assets",
+              "tape_index",
+              "stahl",
+              "short_selling"
+            ]
+          }
+        }
+      }
+    },
+    "screens_empty": {
+      "description": "Screens the desk ran that returned nothing this run.",
+      "type": "array",
+      "maxItems": 40,
+      "uniqueItems": true,
+      "items": {
+        "type": "string",
+        "pattern": "^[a-z0-9_]+$",
+        "maxLength": 60
+      }
+    },
+    "notes": {
+      "description": "Optional run notes: what was closed, unread or skipped (e.g. 'Drive closed; Greenblatt unread this run').",
+      "type": "string",
+      "maxLength": 600
+    },
+    "research_only": {
+      "const": true
+    },
+    "in_base_irr": {
+      "const": false
+    },
+    "authority": {
+      "const": "none"
+    }
+  }
+}

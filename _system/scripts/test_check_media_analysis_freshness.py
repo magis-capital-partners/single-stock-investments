@@ -56,6 +56,10 @@ class StallTests(unittest.TestCase):
         self.assertEqual(len(problems), 1, problems)
         self.assertIn("stuck at 413 for 14 days", problems[0])
         self.assertIn("3809 unanalysed", problems[0])
+        self.assertIn("last moved 2026-09-11", problems[0])
+        self.assertIn("SSI Podcast Analysis", problems[0])
+        self.assertIn("lane is stale", problems[0])
+        self.assertEqual(chk.STALL_DAYS, 4)
 
     def test_a_lane_that_is_merely_slow_resets_its_own_clock(self):
         """23 items on a bad day is a slow lane, not a stopped one."""
@@ -132,6 +136,8 @@ class ReceiptTests(unittest.TestCase):
         )
         self.assertEqual(len(problems), 1, problems)
         self.assertIn("since 2026-09-14", problems[0])
+        self.assertIn("SSI Podcast Analysis", problems[0])
+        self.assertIn("media-analysis lane is stale", problems[0])
         self.assertEqual(nxt["absent_since"], "2026-09-14")
 
     def test_a_moving_count_keeps_a_missing_receipt_quiet(self):

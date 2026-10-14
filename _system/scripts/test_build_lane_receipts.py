@@ -147,6 +147,38 @@ class ReceiptTests(unittest.TestCase):
         self.assertTrue(receipt["history_complete"])
         self.assertEqual(receipt["latest"]["outcome"], "failure")
 
+    def test_scoped_refresh_preserves_other_receipts_and_skips_other_workflows(self):
+        self.configure([
+            {"name": "reverse-splits", "workflow_file": "dp.yml", "job": "splits",
+             "freshness_hours": 342},
+            {"name": "news", "workflow_file": "dp.yml", "job": "news",
+             "freshness_hours": 54},
+            {"name": "other", "workflow_file": "other.yml", "job": "other",
+             "freshness_hours": 54},
+        ])
+        news_path = self.root / "_system/data/lane_receipts/news.json"
+        news_path.parent.mkdir(parents=True)
+        news_path.write_text("existing receipt\n", encoding="utf-8")
+        fake = FakeGh({"dp.yml": [run(20, "2026-09-24T18:00:00Z", [
+            job(201, "splits", "success", "2026-09-24T18:20:00Z"),
+            job(202, "news", "success", "2026-09-24T18:21:00Z"),
+        ])]})
+        with mock.patch.object(builder.subprocess, "run", fake):
+            result = builder.build(self.root, REPO, now=NOW, lane_name="reverse-splits")
+        self.assertEqual(result["written"], ["reverse-splits"])
+        self.assertEqual(self.receipt("reverse-splits")["run_id"], 20)
+        self.assertEqual(news_path.read_text(encoding="utf-8"), "existing receipt\n")
+        self.assertFalse((news_path.parent / "other.json").exists())
+        self.assertFalse(any("other.yml" in arg for call in fake.calls for arg in call))
+
+    def test_unknown_scoped_lane_fails_before_any_api_call(self):
+        self.configure([{"name": "news", "workflow_file": "dp.yml", "job": "news"}])
+        fake = FakeGh({})
+        with mock.patch.object(builder.subprocess, "run", fake):
+            with self.assertRaisesRegex(ValueError, "Unknown workflow lane: typo"):
+                builder.build(self.root, REPO, now=NOW, lane_name="typo")
+        self.assertEqual(fake.calls, [])
+
     def test_a_timed_out_job_is_a_failure_not_a_cancel(self):
         self.configure([{"name": "news", "workflow_file": "dp.yml", "job": "news",
                          "freshness_hours": 18}])
