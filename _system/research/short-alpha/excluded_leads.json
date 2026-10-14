@@ -1,0 +1,204 @@
+{
+  "schema_version": "1.0",
+  "note": "Leads dropped by a human or an audit. With source_urls only those reports are excluded for the ticker; without, the ticker is. build_short_alpha_dashboard.py never re-adds an excluded lead.",
+  "excluded": {
+    "ABXXF": {
+      "reason": "Abaxx Technologies trades on the TSX (ABXX) and US OTC (ABXXF) only: not a US exchange listing.",
+      "decided_on": "2026-10-12",
+      "by": "claude-shorts-audit"
+    },
+    "ADN": {
+      "reason": "Expert Market name; no public quote and effectively unborrowable. Keep it on the scorecard (outcome record) but drop the Shorts lead.",
+      "decided_on": "2026-10-12",
+      "by": "claude-shorts-audit"
+    },
+    "ADNH": {
+      "reason": "Advent Technologies quotes on the Expert Market (ADNH) after its delisting: no public quote, no listed borrow.",
+      "decided_on": "2026-10-12",
+      "by": "claude-shorts-audit"
+    },
+    "AEP": {
+      "reason": "Report is about another company: ticker_mismatch; duplicate_report_across_tickers; label_no_title_date_repeated",
+      "decided_on": "2026-10-12",
+      "by": "claude-shorts-audit",
+      "source_urls": [
+        "https://sprucepointcap.com/research/american-battery-metals-corp-comstock-mining-inc"
+      ]
+    },
+    "AIG": {
+      "reason": "Misattributed or non-short report: ticker_mismatch; duplicate_report_across_tickers; label_no_title_date_repeated",
+      "decided_on": "2026-10-12",
+      "by": "claude-shorts-audit",
+      "source_urls": [
+        "https://sprucepointcap.com/research/american-battery-metals-corp-comstock-mining-inc"
+      ]
+    },
+    "AMT": {
+      "reason": "Misattributed or non-short report: ticker_mismatch; duplicate_report_across_tickers; label_no_title_date_repeated",
+      "decided_on": "2026-10-12",
+      "by": "claude-shorts-audit",
+      "source_urls": [
+        "https://sprucepointcap.com/research/american-battery-metals-corp-comstock-mining-inc"
+      ]
+    },
+    "AWK": {
+      "reason": "Misattributed or non-short report: ticker_mismatch; duplicate_report_across_tickers; label_no_title_date_repeated",
+      "decided_on": "2026-10-12",
+      "by": "claude-shorts-audit",
+      "source_urls": [
+        "https://sprucepointcap.com/research/american-battery-metals-corp-comstock-mining-inc"
+      ]
+    },
+    "AXP": {
+      "reason": "Misattributed or non-short report: ticker_mismatch; duplicate_report_across_tickers; label_no_title_date_repeated",
+      "decided_on": "2026-10-12",
+      "by": "claude-shorts-audit",
+      "source_urls": [
+        "https://sprucepointcap.com/research/american-battery-metals-corp-comstock-mining-inc"
+      ]
+    },
+    "BAC": {
+      "reason": "Misattributed or non-short report: ticker_mismatch; subject_no_longer_trades; duplicate_report_across_tickers; label_no_title_date_repeated",
+      "decided_on": "2026-10-12",
+      "by": "claude-shorts-audit",
+      "source_urls": [
+        "https://sprucepointcap.com/research/healthcare-trust-of-america-inc"
+      ]
+    },
+    "BREA": {
+      "reason": "Trades as SLMT now; the lead is keyed on the tradable symbol. Registrant name is still Brera Holdings PLC on EDGAR; the tradable symbol is SLMT.",
+      "decided_on": "2026-10-12",
+      "by": "claude-shorts-audit"
+    },
+    "BTC": {
+      "reason": "Not a reverse-split impairment candidate: an ETP's split says nothing about operating impairment. If kept anywhere, instrument_type should be 'etp' and category not 'reverse-split'. | instrument_misclassified: Grayscale Bitcoin Mini Trust ETF is an exchange-traded product (Databento security_type Q, listed ARCX), not an operating company; fails RSI-1.0 impairment admission ('operating-company profile'); rsdb itself profiles it fund_or_trust and leaves it unscored; security_name_m",
+      "decided_on": "2026-10-12",
+      "by": "claude-shorts-audit"
+    },
+    "CVS": {
+      "reason": "Misattributed or non-short report: ticker_mismatch; duplicate_report_across_tickers; label_no_title_date_repeated",
+      "decided_on": "2026-10-12",
+      "by": "claude-shorts-audit",
+      "source_urls": [
+        "https://sprucepointcap.com/research/hims-hers-health-inc"
+      ]
+    },
+    "DTCK": {
+      "reason": "Trades as DTCKF now; the lead is keyed on the tradable symbol. OTC-only after Nasdaq delisting; borrow is unlikely. Consider remove rather than retarget.",
+      "decided_on": "2026-10-12",
+      "by": "claude-shorts-audit"
+    },
+    "DTCKF": {
+      "reason": "Davis Commodities trades OTC only (DTCKF) since its Nasdaq delisting: not a US exchange listing.",
+      "decided_on": "2026-10-12",
+      "by": "claude-shorts-audit"
+    },
+    "FAST": {
+      "reason": "Report is about another company: ticker_mismatch; label_boilerplate_scraped; duplicate_company_across_tickers",
+      "decided_on": "2026-10-12",
+      "by": "claude-shorts-audit",
+      "source_urls": [
+        "https://viceroyresearch.org/publications/osc-and-ciro"
+      ]
+    },
+    "GEHC": {
+      "reason": "Report is about another company: ticker_mismatch; duplicate_report_across_tickers; label_no_title_date_repeated",
+      "decided_on": "2026-10-12",
+      "by": "claude-shorts-audit",
+      "source_urls": [
+        "https://sprucepointcap.com/research/healthcare-trust-of-america-inc",
+        "https://sprucepointcap.com/research/prestige-consumer-healthcare-inc"
+      ]
+    },
+    "HCA": {
+      "reason": "Misattributed or non-short report: ticker_mismatch; duplicate_report_across_tickers; label_no_title_date_repeated",
+      "decided_on": "2026-10-12",
+      "by": "claude-shorts-audit",
+      "source_urls": [
+        "https://sprucepointcap.com/research/healthcare-trust-of-america-inc",
+        "https://sprucepointcap.com/research/prestige-consumer-healthcare-inc"
+      ]
+    },
+    "HSIC": {
+      "reason": "Misattributed or non-short report: wrong_side_long_report; label_no_title_date_repeated",
+      "decided_on": "2026-10-12",
+      "by": "claude-shorts-audit",
+      "source_urls": [
+        "https://sprucepointcap.com/research/henry-schein-inc"
+      ]
+    },
+    "HST": {
+      "reason": "Misattributed or non-short report: ticker_mismatch; subject_no_longer_trades; duplicate_source_x8; label_boilerplate; missing_report_date",
+      "decided_on": "2026-10-12",
+      "by": "claude-shorts-audit",
+      "source_urls": [
+        "https://bleeckerstreetresearch.com/research/luxurban-hotels-luxh-the-bed-sheets-should-be-made-out-of-red-flags"
+      ]
+    },
+    "LRCX": {
+      "reason": "Report is about another company: ticker_mismatch; duplicate_source_x8; label_boilerplate; missing_report_date; label_no_title_date_repeated",
+      "decided_on": "2026-10-12",
+      "by": "claude-shorts-audit",
+      "source_urls": [
+        "https://bleeckerstreetresearch.com/research/ll",
+        "https://bleeckerstreetresearch.com/research/nn",
+        "https://sprucepointcap.com/research/wd-40"
+      ]
+    },
+    "OPEN": {
+      "reason": "Report is about another company: ticker_mismatch; security_name_missing; label_boilerplate_scraped; duplicate_company_across_tickers",
+      "decided_on": "2026-10-12",
+      "by": "claude-shorts-audit",
+      "source_urls": [
+        "https://viceroyresearch.org/publications/liquidity-explosion-at-the-plumbing-factory"
+      ]
+    },
+    "PEG": {
+      "reason": "Misattributed or non-short report: ticker_mismatch; not_a_company_report; placeholder_date; duplicate_report_across_tickers",
+      "decided_on": "2026-10-12",
+      "by": "claude-shorts-audit",
+      "source_urls": [
+        "https://grizzlyreports.com/academic-studies-find-that-public-companies-stocks-perform-worse-if-they-sued-short-sellers-after-critical-publications/"
+      ]
+    },
+    "PONY": {
+      "reason": "Report is about another company: ticker_mismatch; title_url_mismatch; placeholder_date; security_name_missing",
+      "decided_on": "2026-10-12",
+      "by": "claude-shorts-audit",
+      "source_urls": [
+        "https://scorpioncapital.s3.us-east-2.amazonaws.com/reports/QS1.pdf"
+      ]
+    },
+    "PSA": {
+      "reason": "Misattributed or non-short report: ticker_mismatch; not_a_company_report; placeholder_date; duplicate_report_across_tickers",
+      "decided_on": "2026-10-12",
+      "by": "claude-shorts-audit",
+      "source_urls": [
+        "https://grizzlyreports.com/academic-studies-find-that-public-companies-stocks-perform-worse-if-they-sued-short-sellers-after-critical-publications/"
+      ]
+    },
+    "SLQT": {
+      "reason": "Uncertainty: medium. The stated basis never happened; re-admit as a fresh lead only if the board effects the split after the shareholder vote (that would then be a real discovery event). | reverse_split_never_happened: no SelectQuote reverse split exists in events.jsonl, the detector report, or EDGAR; rsdb basis entry 2023-03-08 rests on 8-K phrase hits (2023-03-02/03-07) that never became a split; the 2025-02-28 hits are warrant-form anti-dilution boilerplate; only live item is a pro",
+      "decided_on": "2026-10-12",
+      "by": "claude-shorts-audit"
+    },
+    "TELA": {
+      "reason": "Re-open if the board later uses the authority. Uncertainty: low on the facts, medium on whether the desk wants authorization-only leads kept. | reverse_split_not_effected: stockholders approved a 1:5-1:15 range on 2026-10-08 but the company states it does not intend to effect the split after regaining Nasdaq bid-price compliance; rsdb basis entry 2026-09-21 rests on the 2026-09-18 8-K (deficiency/proposal), not on an effected split; no TELA",
+      "decided_on": "2026-10-12",
+      "by": "claude-shorts-audit"
+    },
+    "ULTA": {
+      "reason": "Report is about another company: ticker_mismatch; label_no_title_date_repeated",
+      "decided_on": "2026-10-12",
+      "by": "claude-shorts-audit",
+      "source_urls": [
+        "https://sprucepointcap.com/research/e-l-f-beauty"
+      ]
+    },
+    "VTAK": {
+      "reason": "Renamed Flyte Aviation, Inc. (VJET) with its 1-for-10 split on 2026-10-05; the lead is tracked as VJET.",
+      "decided_on": "2026-10-12",
+      "by": "claude-shorts-audit"
+    }
+  }
+}

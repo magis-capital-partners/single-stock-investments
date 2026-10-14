@@ -1,0 +1,126 @@
+{
+  "schema_version": "1.0",
+  "draft_id": "0c6457af11f4a63293a9b6da",
+  "work_id": "0c6457af11f4a63293a9b6da",
+  "input_sha": "572896eb0b467719699e9bcafb7564cbf39a454b",  // pragma: allowlist secret
+  "component_fingerprint": "bec50643c728d39be77d8deeccb51f780006382bbed0c4787ea24ef3ad3e4353",  // pragma: allowlist secret
+  "contract_hash": "cede8cb42fa5a67ee4e5c63011d4de1bcdf0f025986fba494cfa97e99806c707",  // pragma: allowlist secret
+  "status": "awaiting_review",
+  "author_receipt": {
+    "authored_at": "2026-10-08T00:45:00Z",
+    "author": "marvin-cloud-agent",
+    "model_id": "composer-2.5",
+    "prompt_version": "cloud_marvin_runbook_2026-10-08",
+    "analysis_run_id": "epistemic_author_forecast:0c6457af11f4a63293a9b6da",
+    "evidence_hash": "fe55176ec6ca1728564108460f5b02bad9f92a73bfe5faf17aaf435a623e6190",  // pragma: allowlist secret
+    "epistemic_input_sha": "572896eb0b467719699e9bcafb7564cbf39a454b",
+    "contract_hash": "cede8cb42fa5a67ee4e5c63011d4de1bcdf0f025986fba494cfa97e99806c707",  // pragma: allowlist secret
+    "component_fingerprint": "bec50643c728d39be77d8deeccb51f780006382bbed0c4787ea24ef3ad3e4353",  // pragma: allowlist secret
+    "source_preflight": {
+      "ok": true,
+      "reason": "source_preflight_passed",
+      "metric_definition_id": "normalized_owner_earnings_ttm_m_v2",
+      "adapter": "sec_companyfacts_ttm"
+    },
+    "historical_replay": {
+      "value": 2605.0,
+      "unit": "USD millions",
+      "as_of": "2025-09-30",
+      "evidence_ref": "CRH/research/evidence/sec_companyfacts.json#normalized_owner_earnings_ttm_m@2025-09-30",
+      "adapter": "sec_companyfacts_ttm",
+      "blocker_reason": null,
+      "replay_measurement_period_end": "2025-09-30",
+      "replay_fiscal_period": "Q3",
+      "replay_fiscal_year": 2025
+    },
+    "calibration_release_hash": null,
+    "route": "quality_reinvestment",
+    "named_challenge": null,
+    "calibration_response": "not_applicable",
+    "calibration_note": "Epistemic loop health_state=COLLECTING; calibration_status=insufficient_outcomes; release_hash=null. Calibration cannot change this analysis.",
+    "epistemic_work_receipt": {
+      "work_id": "0c6457af11f4a63293a9b6da",
+      "task_type": "author_forecast",
+      "disposition": "success",
+      "published_input_sha": "572896eb0b467719699e9bcafb7564cbf39a454b"
+    }
+  },
+  "review_receipt": null,
+  "rejection_reasons": [],
+  "spec": {
+    "spec_id": "crh-operating-owner-earnings-2026q3-v1",
+    "spec_revision": 1,
+    "spec_schema_version": "3.0",
+    "forecast_class": "ex_ante",
+    "forecast_role": "primary",
+    "authored_at": "2026-10-08T00:45:00Z",
+    "information_cutoff_at": "2026-10-08T00:45:00Z",
+    "registered_at": "2026-10-08T00:45:00Z",
+    "registration_commit": "pending",
+    "analysis_run_id": "epistemic_author_forecast:0c6457af11f4a63293a9b6da",
+    "author": "marvin-cloud-agent",
+    "model_id": "composer-2.5",
+    "prompt_version": "cloud_marvin_runbook_2026-10-08",
+    "contract_hash": "cede8cb42fa5a67ee4e5c63011d4de1bcdf0f025986fba494cfa97e99806c707",  // pragma: allowlist secret
+    "component_fingerprint": "bec50643c728d39be77d8deeccb51f780006382bbed0c4787ea24ef3ad3e4353",  // pragma: allowlist secret
+    "method_id": "owner_earnings_reinvestment_dcf",
+    "power_zone": "quality_reinvestment",
+    "component_id": "operating_business_and_net_assets",
+    "correlation_group": "CRH|operating_business_and_net_assets|normalized_owner_earnings_ttm|2026Q3",
+    "industry": "construction_materials_aggregates",
+    "metric": "normalized_owner_earnings_ttm",
+    "comparator": "lt",
+    "threshold": 2912.0,
+    "threshold_basis": {
+      "source_ref": "CRH/research/valuation_contract.json#operating_business_and_net_assets.calculation_proof.traces.low.owner_earnings",
+      "rule": "Low-case trace node owner_earnings equals 2,912 USD millions: FY2025 operating cash flow of 5,625M minus capital spending of 2,713M per CRH/research/valuation_fact_ledger.json normalized_owner_earnings_m and CRH/investor-documents/sec-edgar/10-K_20260218_rpt20251231_acc0001628280_26_009043.htm."
+    },
+    "unit": "USD millions",
+    "measurement_period_end": "2026-09-30",
+    "observable_after": "2026-11-05",
+    "resolution_deadline": "2026-12-31",
+    "source_hint": "normalized_owner_earnings_ttm_m_v2",
+    "observation_plan": {
+      "metric_definition_id": "normalized_owner_earnings_ttm_m_v2",
+      "metric_definition_version": "1.0",
+      "source_adapter": "sec_companyfacts_ttm",
+      "fiscal_period": "Q3",
+      "fiscal_year": 2026,
+      "observation_type": "duration",
+      "duration_basis": "TTM",
+      "canonical_unit": "USD millions",
+      "source_unit": "USD",
+      "accepted_forms": [
+        "10-Q",
+        "10-K"
+      ],
+      "end_date_tolerance_days": 7,
+      "expected_publication_date": "2026-11-05",
+      "maximum_source_lag_days": 45,
+      "outcome_unavailable_at_registration": true,
+      "historical_replay": {
+        "status": "passed",
+        "evidence_ref": "CRH/research/evidence/sec_companyfacts.json#normalized_owner_earnings_ttm_m@2025-09-30",
+        "replay_measurement_period_end": "2025-09-30",
+        "replay_fiscal_period": "Q3",
+        "replay_fiscal_year": 2025,
+        "replay_value": 2605.0,
+        "replay_as_of": "2025-09-30"
+      }
+    },
+    "review": {
+      "status": "pending",
+      "reviewer": null,
+      "reviewed_at": null
+    },
+    "probability_fires": 0.34,
+    "severity": 4,
+    "component_value_impact_pct": 56.5,
+    "total_equity_value_impact_pct": 56.5,
+    "derived_from": "Owner earnings, incremental returns, or reinvestment runway fall below the low-case bridge.",
+    "rationale": "Types the owner-earnings leg of the operating_business_and_net_assets prose falsifier for CRH plc (26.05 USD per share low / 59.87 base / 128.63 high on the automated owner-earnings reinvestment template). The low-case owner_earnings_reinvestment_dcf proof trace locks normalized owner earnings at 2,912 USD millions (FY2025 operating cash flow of 5,625M minus capital spending of 2,713M per CRH/research/valuation_fact_ledger.json and CRH/investor-documents/sec-edgar/10-K_20260218_rpt20251231_acc0001628280_26_009043.htm). If trailing-twelve-month normalized owner earnings at 2026-09-30 resolve below that anchor, distributable owner cash has fallen below the low-case bridge and bounded per-share value should compress toward the low case. Incremental after-tax ROIC and reinvestment-rate legs remain judgment inputs without a resolvable SEC metric and are not typed here. Historical adapter replay on Q3 FY2025 (measurement end 2025-09-30, filed 2025-11-05 per CRH/investor-documents/DOWNLOAD_MANIFEST.json) resolved 2,605 USD millions via sec_companyfacts_ttm, already below the 2,912M anchor. Interim Q1 FY2026 TTM at 2026-03-31 resolved 2,999 USD millions, above the anchor. Target Q3 FY2026 TTM is not observable at registration (2026-10-08). A 34% fire probability weights cyclical construction demand and seasonal cash generation against the prior-year Q3 replay below the low-case owner-earnings anchor.",
+    "untestable": false,
+    "calibration_eligible": true,
+    "supersedes_spec_id": null
+  }
+}

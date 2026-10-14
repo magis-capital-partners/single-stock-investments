@@ -1,0 +1,44 @@
+name: Main push guard
+
+# Detect, do not block. A free-plan organization cannot add the GitHub Actions
+# app as a bypass actor on a "require pull request" rule, and that rule without
+# the bypass would reject every scheduled lane's commit-main push. So main stays
+# pushable, and this workflow opens (or updates) one issue whenever a push to
+# main comes from anyone other than Drew or the repository's own Actions. The
+# write map (docs/WRITE_MAP.md) says bots and Michael land changes by pull
+# request; this is the audit trail for the times they did not.
+
+on:
+  push:
+    branches: [main]
+
+permissions:
+  contents: read
+  issues: write
+
+jobs:
+  guard:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    # Direct pushes by the two allowed actors are the normal case; skip them
+    # cheaply so this job does not run its body on every CI commit.
+    if: github.actor != 'GoldmanDrew' && github.actor != 'github-actions[bot]'
+    steps:
+      - name: Open or update the direct-push issue
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          REPO: ${{ github.repository }}
+          ACTOR: ${{ github.actor }}
+          SHA: ${{ github.sha }}
+          RUN_URL: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
+        run: |
+          set -euo pipefail
+          TITLE="Direct push to main outside the write map"
+          BODY="\`$ACTOR\` pushed \`$SHA\` to \`main\` without a pull request. docs/WRITE_MAP.md says people and bots land changes by pull request on their branch prefix (\`grok/<desk>/<date>-<slug>\` for desk bots). If this was a bot, rotate its token scope to pull requests and re-land the change by PR. Run: $RUN_URL"
+          EXISTING=$(gh issue list --repo "$REPO" --state open --search "\"$TITLE\" in:title" --json number --jq '.[0].number // empty')
+          if [ -n "$EXISTING" ]; then
+            gh issue comment "$EXISTING" --repo "$REPO" --body "$BODY"
+          else
+            gh issue create --repo "$REPO" --title "$TITLE" --body "$BODY" --label "governance" || \
+            gh issue create --repo "$REPO" --title "$TITLE" --body "$BODY"
+          fi

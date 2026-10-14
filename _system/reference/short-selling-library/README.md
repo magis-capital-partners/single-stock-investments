@@ -29,6 +29,22 @@ These five files are the local copies. The Shorts tab encodes this reading list 
 
 Public availability does not erase copyright. Preserve attribution and do not redistribute outside the terms of the source.
 
+## Playbooks (process notes)
+
+Michael's Short-Selling desk kept `type: playbook` entries beside its ideas. Process pages land here; framework content lands in `_system/frameworks/short_alpha_filing_furnace.md`. The entry contract they serve is in `_system/research/short-alpha/README.md`; the blank is `_system/templates/short_entry_template.md`.
+
+| Local file | Adapted from | Use |
+|---|---|---|
+| `playbooks/framing_a_short.md` | Michael's Short-Selling desk playbook "Framing a short before it is a position", 2026-01-06 | What a note must contain before anyone treats it as a live idea: one arguable claim, an honest category, evidence read versus needed, the falsifier first, tradability as its own point, a truthful stage. |
+
+## Paper notes (summaries in our words)
+
+Michael's `type: paper` entries become original summaries with a citation and a link to the public version. No abstract, table or equation is copied. File one when a result changes how we screen, not to store an abstract.
+
+| Local file | Paper | Use |
+|---|---|---|
+| `public/notes/dechow_hutton_meulbroek_sloan_2001.md` | Dechow, Hutton, Meulbroek and Sloan, "Short-sellers, fundamental analysis, and stock returns," *JFE* 61 (2001), DOI 10.1016/S0304-405X(01)00056-3 | Short interest clusters where price has run ahead of fundamentals and those names underperform afterward; a reason to do the fundamental work and to start price-versus-fundamentals ideas in the accounting lenses. |
+
 ## Live official references
 
 - SEC Regulation SHO overview: https://www.sec.gov/investor/pubs/regsho.htm
@@ -40,8 +56,10 @@ Public availability does not erase copyright. Preserve attribution and do not re
 
 ## Reading-to-workflow map
 
-1. **Idea formation:** Staley/Fearon → define the market belief, variant view, catalyst, and falsifier.
-2. **Accounting:** Schilit/O'glove + SEC FRM/AAER → reconcile revenue, working capital, capitalization, reserves, acquisitions, and non-GAAP claims.
-3. **Tradability:** Regulation SHO + NBER/AQR → borrow, utilization, fee, recall, crowding, squeeze, and options alternatives.
-4. **Instrument:** Investor.gov bulletin → daily reset, swaps, tracking, liquidity, and path dependence for ECHX-like products.
-5. **Memory:** write a dated baseline and every later check-in to the Short Alpha ledger; never rewrite the original hypothesis after seeing the outcome.
+1. **Framing:** `playbooks/framing_a_short.md` → one arguable claim, an honest category, evidence read versus needed, the falsifier before the argument, tradability as its own point. The note is written from `_system/templates/short_entry_template.md`; the row goes to `candidates.json`.
+2. **Idea formation:** Staley/Fearon → define the market belief, variant view, catalyst, and falsifier.
+3. **Accounting:** Schilit/O'glove + SEC FRM/AAER + `public/notes/dechow_hutton_meulbroek_sloan_2001.md` → reconcile revenue, working capital, capitalization, reserves, acquisitions, and non-GAAP claims; start a price-versus-fundamentals idea in the accounting lenses before any story category.
+4. **Share supply and reverse splits:** the `share_supply` gate (lockups, ATMs, converts, insider selling, index deletions, separations) and the `reverse_split_impairment` lens with `_system/frameworks/reverse_split_short_process.md` → a pipe that can add stock is a timing gate; a reverse split is a capital-structure event, not a thesis.
+5. **Tradability:** Regulation SHO + NBER/AQR → borrow, utilization, fee, recall, crowding, squeeze, and options alternatives. Borrow arrives as a Client Portal CSV through `refresh_short_alpha_borrow.py`, never through the Gateway.
+6. **Instrument:** Investor.gov bulletin → daily reset, swaps, tracking, liquidity, and path dependence for ECHX-like products.
+7. **Memory:** write a dated baseline and every later check-in to the Short Alpha ledger; never rewrite the original hypothesis after seeing the outcome. Move `updated_on` on every material edit of a row or its note.

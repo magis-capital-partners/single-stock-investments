@@ -12,7 +12,18 @@ doubled repo size and CI conflict surface. Removed: the `docs/` tree,
 `_system/scripts/sync_pages_docs.py`, the per-script `docs/data` writers in
 `build_insights.py` / `build_index_membership.py` /
 `refresh_valuation_dashboard_rows.py` / `portfolio_news_common.py`, and the
-`docs/` mirroring in `ci_push_main.sh`. This folder now holds only this log.
+`docs/` mirroring in `ci_push_main.sh`. This folder retains research
+documentation and the write contract.
+
+### Remaining mirror removed October 12 2026
+
+The old `docs/index.html`, copied visualization scripts, stylesheet and OAuth
+copies remained after the sync writer was retired. They could show a different
+dashboard from the canonical `dashboard/` app. The remaining UI copies and
+`.nojekyll` were removed, along with the dead `pages-sync` target and the stale
+sync call in `event-triage`. Research Markdown, `WRITE_MAP.md` and the document
+inventory are retained. Cloudflare Pages builds from `dashboard/`; another
+serving tree would add an unused writer and another source of stale views.
 
 ## Darwin taxable track (2026-07-20)
 

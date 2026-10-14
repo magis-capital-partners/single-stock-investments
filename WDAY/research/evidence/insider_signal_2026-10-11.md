@@ -1,0 +1,24 @@
+# WDAY — Insider conviction (2026-10-11)
+
+> Context only. Insider activity informs scenario confidence and stance discussion; it does not auto-inflate Lawrence base IRR. Promotion requires [HUMAN REVIEW].
+
+**ICS:** 0.22 (negligible) · **Bull case support:** none
+
+| Scenario | Prior weight | Tilted weight |
+|----------|--------------|---------------|
+| Bear | 20% | 28% |
+| Base | 55% | 47% |
+| Bull | 25% | 25% |
+
+| Insider | Date | Shares | Price | Value | Contrib |
+|---------|------|--------|-------|-------|---------|
+| YANG JERRY | 2026-06-16 | 3116 | $126.77 | $395015.32 | 1.194 |
+
+**Routine / planned sales (context):**
+
+- BHUSRI ANEEL: 7852 @ $205.79 on 2026-01-05
+- BHUSRI ANEEL: 8501 @ $135.4 on 2026-07-05
+- BHUSRI ANEEL: 16470 @ $132.26 on 2026-04-05
+
+Source: `_system/reference/market-data/insider/WDAY_transactions.csv`.
+Lawrence base IRR unchanged (`in_base_irr: False`).

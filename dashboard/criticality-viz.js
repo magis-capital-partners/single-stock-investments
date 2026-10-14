@@ -118,14 +118,14 @@
         <small>${asOf ? `as of ${escapeHtml(String(asOf).slice(0, 10))}` : 'awaiting first refresh'} · <b class="${fresh.cls}">${escapeHtml(fresh.label)}</b></small></summary>
       <div class="criticality-body">
         <div class="criticality-headline"><div><span class="criticality-kicker">SPY ensemble · research only</span>
-          <h3 class="${direction.cls}">${escapeHtml(direction.label)}</h3><p>${escapeHtml(spy.interpretation || 'No LPPLS snapshot is available yet.')}</p></div>
+          <h3 class="${direction.cls}">${escapeHtml(direction.label)}</h3><p>${escapeHtml(spy.interpretation || 'No LPPLS snapshot is available yet.')}${spy.tail && spy.tail.label ? ` ${escapeHtml(spy.tail.label)}` : ''}</p></div>
           <div class="criticality-window"><span>Critical-time ensemble</span><strong>${escapeHtml(criticalWindow(spy))}</strong>
           <small>${whole(spy.qualified_count)} qualified of ${whole(spy.attempted_count)} attempted fits · ${escapeHtml(quality(spy))}</small></div></div>
         <div class="criticality-rail criticality-rail-single" aria-label="Criticality buildup">
           ${rail('Criticality buildup', spy.score, `${whole(confidence.positive)} positive · ${whole(confidence.negative)} negative confidence`, direction.cls)}
         </div>
         <details class="criticality-sectors" ${options.expandSectors ? 'open' : ''}><summary>Sector heatmap · ${sectors.length} available</summary>${sectorRows(sectors, escapeHtml)}</details>
-        <p class="criticality-policy">${escapeHtml(spy.policy || 'Critical time describes regime instability, not a promised crash or reversal date.')} No model output has trading authority.</p>
+        <p class="criticality-policy">${escapeHtml(spy.policy || 'Critical time describes regime instability, not a promised crash or reversal date.')} ${escapeHtml((options.errorDiagram && options.errorDiagram.selection && options.errorDiagram.selection.plain_english) || '')} No model output has trading authority.</p>
       </div></details>`;
   }
 
@@ -953,72 +953,18 @@
     </section>`;
   }
 
-  // The journal fetched `open=false&limit=100` and rendered the first 12 rows
-  // in arrival order with no timestamps at all, so every visible entry read
-  // "SYMBOL - RESOLVED - CRITICAL" and an episode from March was indis-
-  // tinguishable from one that fired an hour ago. Worse, the four OPEN alerts
-  // - the only ones that can still matter - were shuffled in among resolved
-  // ones with identical styling. Open first, newest first, always dated.
-  function alertAge(iso, now = new Date()) {
-    if (!iso) return null;
-    const then = new Date(iso);
-    if (Number.isNaN(then.getTime())) return null;
-    const minutes = Math.max(0, Math.round((now - then) / 60000));
-    if (minutes < 60) return `${minutes}m ago`;
-    if (minutes < 1440) return `${Math.round(minutes / 60)}h ago`;
-    return `${Math.round(minutes / 1440)}d ago`;
-  }
-
-  function alertDuration(alert) {
-    const from = alert.opened_at || alert.fired_at || alert.created_at || alert.as_of;
-    const to = alert.resolved_at || alert.closed_at;
-    if (!from || !to) return null;
-    const a = new Date(from);
-    const b = new Date(to);
-    if (Number.isNaN(a.getTime()) || Number.isNaN(b.getTime())) return null;
-    const minutes = Math.max(0, Math.round((b - a) / 60000));
-    return minutes < 60 ? `${minutes}m` : `${(minutes / 60).toFixed(1)}h`;
-  }
-
-  function alertJournal(alerts, escapeHtml) {
-    if (!alerts.length) {
-      return `<section class="risk-card"><h3>Alert journal</h3>
-        <div class="risk-empty">No alert episodes recorded. Alerts come from the Databento flow monitor, a local scheduled task that runs outside CI—if that task is not running, this journal stays empty even during market stress.</div></section>`;
-    }
-    const stamp = (alert) => alert.opened_at || alert.fired_at || alert.created_at || alert.as_of || '';
-    const isOpen = (alert) => !(alert.resolved_at || alert.closed_at)
-      && String(alert.status || '').toLowerCase() !== 'resolved';
-    const ordered = alerts.slice().sort((a, b) => {
-      if (isOpen(a) !== isOpen(b)) return isOpen(a) ? -1 : 1;
-      return String(stamp(b)).localeCompare(String(stamp(a)));
-    });
-    const open = ordered.filter(isOpen);
-    const undated = ordered.filter((alert) => !stamp(alert)).length;
-
-    return `<section class="risk-card"><header class="risk-alert-head"><h3>Alert journal</h3>
-        <span class="risk-alert-count ${open.length ? 'is-open' : ''}">${open.length} open · ${ordered.length - open.length} resolved</span></header>
-      ${undated ? `<p class="risk-alert-note">${escapeHtml(String(undated))} of ${escapeHtml(String(ordered.length))} episodes carry no timestamp from the monitor, so they cannot be placed in time and sort last.</p>` : ''}
-      <div class="risk-alerts">${ordered.slice(0, 12).map((alert) => {
-        const when = stamp(alert);
-        const age = alertAge(when);
-        const held = alertDuration(alert);
-        const openNow = isOpen(alert);
-        return `<article class="${openNow ? 'is-open' : 'is-resolved'}">
-          <strong>${escapeHtml(alert.symbol || '—')} · ${escapeHtml(String(openNow ? 'open' : (alert.state || 'resolved')).replace(/_/g, ' '))}</strong>
-          <span class="risk-severity risk-severity-${escapeHtml(alert.severity || 'unknown')}">${escapeHtml(alert.severity || 'unknown')}</span>
-          <time class="risk-alert-when">${when ? `${escapeHtml(String(when).replace('T', ' ').slice(0, 16))}${age ? ` · ${escapeHtml(age)}` : ''}` : 'no timestamp recorded'}${held ? ` · held ${escapeHtml(held)}` : ''}</time>
-          <small>${escapeHtml((alert.reason_codes || []).join(' · '))}</small>
-        </article>`;
-      }).join('')}</div>
-      ${ordered.length > 12 ? `<p class="risk-alert-note">Showing the 12 most recent of ${escapeHtml(String(ordered.length))} fetched episodes.</p>` : ''}
-    </section>`;
+  function componentSummary(payload) {
+    const all = (payload && payload.components) || [];
+    if (!all.length) return 'awaiting the first ingest';
+    const counts = all.reduce((memo, item) => { const state = componentQuality(item).state; memo[state] = (memo[state] || 0) + 1; return memo; }, {});
+    return [['ready', 'current'], ['delayed', 'delayed'], ['lagging', 'lagging'], ['stale', 'stale'], ['unavailable', 'not connected']]
+      .filter(([key]) => counts[key]).map(([key, label]) => `${counts[key]} ${label}`).join(' · ');
   }
 
   function renderRiskView(payload, details = {}, options = {}) {
     const escapeHtml = options.escapeHtml || escapeFallback;
     const health = details.health || {};
     const ingest = health.latest_ingest || {};
-    const alerts = details.alerts?.items || [];
     const status = health.status || 'static_fallback';
     const receivedFresh = freshness(ingest.received_at);
     const resolved = options.resolvedCapitulation
@@ -1028,17 +974,14 @@
       <div class="risk-live-state"><span class="risk-status-dot ${status === 'operational' ? 'is-live' : ''}"></span><strong>${escapeHtml(status.replace(/_/g, ' '))}</strong><small>${escapeHtml(receivedFresh.label)}</small></div></div>
       ${capitulationSection(resolved, escapeHtml, options)}
       ${render(payload, { ...options, open: true, expandSectors: true })}
-      ${componentStack(payload, escapeHtml)}
-      <div class="risk-grid">
-        <section class="risk-card risk-history"><header><h3>SPY criticality history</h3><div class="risk-legend"><span class="criticality-positive">LPPLS criticality score · 0–100</span></div></header>${historyChart(details, resolveReading(payload).spy, escapeHtml)}</section>
-        <section class="risk-card"><h3>Feed health</h3><dl class="risk-health">
+      <section class="risk-card risk-history"><header><h3>SPY criticality history</h3><div class="risk-legend"><span class="criticality-positive">LPPLS criticality score · 0–100</span></div></header>${historyChart(details, resolveReading(payload).spy, escapeHtml)}</section>
+      <details class="risk-fold"><summary>Mechanical-flow inputs · ${escapeHtml(componentSummary(payload))}</summary>${componentStack(payload, escapeHtml)}</details>
+      <details class="risk-method"><summary>How to read this page · feed health</summary>
+        <dl class="risk-health">
           <div><dt>Last signed ingest</dt><dd>${escapeHtml(ingest.received_at ? String(ingest.received_at).replace('T', ' ').slice(0, 19) + ' UTC' : 'Awaiting first live snapshot')}</dd></div>
           <div><dt>Latest flow</dt><dd>${escapeHtml(health.snapshots?.latest_flow_at || '—')}</dd></div>
-          <div><dt>Stored snapshots</dt><dd>${whole(health.snapshots?.criticality_count)} criticality · ${whole(health.snapshots?.flow_count)} flow · ${whole(health.snapshots?.component_count)} components</dd></div>
-          <div><dt>Open alerts</dt><dd>${whole(health.alerts?.open_count)}</dd></div></dl></section>
-        ${alertJournal(alerts, escapeHtml)}
-      </div>
-      <section class="risk-method"><h3>Interpretation guardrails</h3><p><strong>Criticality</strong> asks whether price dynamics resemble an unstable LPPLS regime. <strong>Pressure</strong> estimates mechanical stress consistent with volatility-sensitive deleveraging. <strong>Exhaustion</strong> requires stabilization evidence and persistence, and is only a capitulation reading once the ladder has reached its stress threshold — below that the score describes ordinary bar mechanics and is shown struck through. A point-in-time replay back to 1962 found that the stress rung has carried information but the exhaustion rungs have not marked bottoms, so read exhaustion as a description of the latest bar, not a buy signal. A critical time is a probability window, not a scheduled crash; all outputs remain research-only until shadow validation establishes calibration and false-positive behavior.</p></section>`;
+          <div><dt>Stored snapshots</dt><dd>${whole(health.snapshots?.criticality_count)} criticality · ${whole(health.snapshots?.flow_count)} flow · ${whole(health.snapshots?.component_count)} components</dd></div></dl>
+        <p><strong>Criticality</strong> asks whether price dynamics resemble an unstable LPPLS regime. <strong>Pressure</strong> estimates mechanical stress consistent with volatility-sensitive deleveraging. <strong>Exhaustion</strong> requires stabilization evidence and persistence, and is only a capitulation reading once the ladder has reached its stress threshold — below that the score describes ordinary bar mechanics and is shown struck through. A point-in-time replay back to 1962 found that the stress rung has carried information but the exhaustion rungs have not marked bottoms, so read exhaustion as a description of the latest bar, not a buy signal. A critical time is a probability window, not a scheduled crash; all outputs remain research-only until shadow validation establishes calibration and false-positive behavior.</p></details>`;
   }
 
   global.CriticalityViz = {

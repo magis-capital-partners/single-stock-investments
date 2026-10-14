@@ -238,11 +238,18 @@
       </tr>`;
   }
 
+  const MERGER_FORMS = new Set(['SC TO-T', 'SC TO-T/A', 'SC TO-C', 'SC TO-I', 'SC TO-I/A', 'DEFM14A', 'PREM14A', 'S-4', 'S-4/A', '425']);
+
+  function isMergerPaper(row) {
+    const form = String(row?.form || '').toUpperCase();
+    return row?.filing_class === 'tender_offer' || MERGER_FORMS.has(form);
+  }
+
   function renderFeed(feed, state) {
     const q = (state.search || '').trim().toLowerCase();
     const tier = state.tier || 'signal';
     const view = state.view || 'active';
-    let rows = Array.isArray(feed) ? feed.slice() : [];
+    let rows = (Array.isArray(feed) ? feed.slice() : []).filter(row => !isMergerPaper(row));
     if (view === 'short') {
       rows = rows.filter(r => r.report_kind === 'short_report' && !r.needs_filer_review);
     } else if (view === 'ownership') {
@@ -418,6 +425,7 @@
     return `
       <h2 style="margin-bottom:8px">Activist reports</h2>
       <div class="subhead">Materiality-ranked activist filings and short reports · signal tier shown by default</div>
+      <p class="tier-sub">Tender offers, merger proxies, and S-4s are on <a href="#/ideas/situations/mergers">Special Situations</a>.</p>
       ${renderSummary(feedDoc.summary)}
       ${renderFilters(state)}
       ${(state.view || 'active') === 'discovery'

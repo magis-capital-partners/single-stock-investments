@@ -2628,6 +2628,26 @@
     </div>`;
   }
 
+  function hkCriticalityCard(crit, escapeHtml) {
+    if (!crit) return '';
+    const confidence = crit.confidence || {};
+    const positive = Number(confidence.positive);
+    const negative = Number(confidence.negative);
+    const dominant = Math.max(
+      Number.isFinite(positive) ? positive : 0,
+      Number.isFinite(negative) ? negative : 0,
+    );
+    const direction = String(crit.direction || crit.status || 'unavailable').replace(/_/g, ' ');
+    const detail = crit.tail && crit.tail.label
+      ? crit.tail.label
+      : (crit.reason || crit.claim || '');
+    return `<div class="hk-metric">
+      <span class="hk-metric-label">Log-periodic</span>
+      <span class="hk-metric-value">${escapeHtml(direction)}</span>
+      <span class="hk-metric-sub">${Number.isFinite(dominant) && crit.confidence ? `${Math.round(dominant)} confidence. ` : ''}${escapeHtml(detail)}</span>
+    </div>`;
+  }
+
   function renderHkSnowballPanel(doc, escapeHtml) {
     if (!doc || !doc.demand) {
       return `<details class="wm-panel hk-snowball">
@@ -2692,6 +2712,7 @@
           <span class="hk-metric-value">${escapeHtml(hkFmtUsd(mixed2032.all_in_usd || supply.halving_2032_cost_usd))}</span>
           <span class="hk-metric-sub">SOTA+ROIC ${escapeHtml(hkFmtUsd(bands.sota_roic_usd))} · ${escapeHtml(daysToHalving)} to 2028</span>
         </div>
+        ${hkCriticalityCard(doc.criticality, escapeHtml)}
       </div>
       <div class="hk-snowball-grid">
         <div class="hk-snowball-card" data-hk-chart-root>

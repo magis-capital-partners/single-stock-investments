@@ -1,0 +1,126 @@
+{
+  "schema_version": "1.0",
+  "draft_id": "019de6b6bba30e2236e36604",
+  "work_id": "019de6b6bba30e2236e36604",
+  "input_sha": "400490464c74935044ba4aeb2198b1bfc4759bfb", // pragma: allowlist secret
+  "component_fingerprint": "b38aa63b8013cf54f7f55d68e82396d679cc4fbfc116d552eec1dedc49876e67", // pragma: allowlist secret
+  "contract_hash": "80430ebd2662d3a7c87cf0668d83cc103a1b54693acfc3695dcd324d2998bd76", // pragma: allowlist secret
+  "status": "awaiting_review",
+  "author_receipt": {
+    "authored_at": "2026-10-09T21:45:00+00:00",
+    "author": "marvin-cloud-agent",
+    "model_id": "composer-2.5",
+    "prompt_version": "cloud_marvin_runbook_2026-10-09",
+    "analysis_run_id": "epistemic_author_forecast:019de6b6bba30e2236e36604",
+    "evidence_hash": "2b355985cfe9bcbae053fa16abeeb0eadbda9eed5330a4cec52f99313b609132", // pragma: allowlist secret
+    "epistemic_input_sha": "400490464c74935044ba4aeb2198b1bfc4759bfb", // pragma: allowlist secret
+    "contract_hash": "80430ebd2662d3a7c87cf0668d83cc103a1b54693acfc3695dcd324d2998bd76", // pragma: allowlist secret
+    "component_fingerprint": "b38aa63b8013cf54f7f55d68e82396d679cc4fbfc116d552eec1dedc49876e67", // pragma: allowlist secret
+    "source_preflight": {
+      "ok": true,
+      "reason": "source_preflight_passed",
+      "metric_definition_id": "normalized_owner_earnings_ttm_m_v2",
+      "adapter": "sec_companyfacts_ttm"
+    },
+    "historical_replay": {
+      "value": 10560.0,
+      "unit": "USD millions",
+      "as_of": "2025-09-30",
+      "evidence_ref": "AMZN/research/evidence/sec_companyfacts.json#normalized_owner_earnings_ttm_m@2025-09-30",
+      "adapter": "sec_companyfacts_ttm",
+      "blocker_reason": null,
+      "replay_measurement_period_end": "2025-09-30",
+      "replay_fiscal_period": "Q3",
+      "replay_fiscal_year": 2025
+    },
+    "calibration_release_hash": null,
+    "route": "capital_cycle",
+    "named_challenge": null,
+    "calibration_response": "not_applicable",
+    "calibration_note": "Epistemic loop health_state=COLLECTING; calibration global_status=insufficient_outcomes; release_hash is null; capital_cycle route has no eligible scored outcomes in calibration_brief. Calibration cannot change this analysis.",
+    "epistemic_work_receipt": {
+      "work_id": "019de6b6bba30e2236e36604",
+      "task_type": "author_forecast",
+      "disposition": "success",
+      "published_input_sha": "400490464c74935044ba4aeb2198b1bfc4759bfb" // pragma: allowlist secret
+    }
+  },
+  "review_receipt": null,
+  "rejection_reasons": [],
+  "spec": {
+    "spec_id": "amzn-cycle-reserve-owner-earnings-2026q3-v2",
+    "spec_revision": 2,
+    "spec_schema_version": "3.0",
+    "forecast_class": "ex_ante",
+    "forecast_role": "primary",
+    "authored_at": "2026-10-09T21:45:00+00:00",
+    "information_cutoff_at": "2026-10-09T21:45:00+00:00",
+    "registered_at": "2026-10-09T21:45:00+00:00",
+    "registration_commit": "400490464c74935044ba4aeb2198b1bfc4759bfb", // pragma: allowlist secret
+    "analysis_run_id": "epistemic_author_forecast:019de6b6bba30e2236e36604",
+    "author": "marvin-cloud-agent",
+    "model_id": "composer-2.5",
+    "prompt_version": "cloud_marvin_runbook_2026-10-09",
+    "contract_hash": "80430ebd2662d3a7c87cf0668d83cc103a1b54693acfc3695dcd324d2998bd76", // pragma: allowlist secret
+    "component_fingerprint": "b38aa63b8013cf54f7f55d68e82396d679cc4fbfc116d552eec1dedc49876e67", // pragma: allowlist secret
+    "method_id": "midcycle_capacity_value",
+    "power_zone": "capital_cycle",
+    "component_id": "cycle_reserve",
+    "correlation_group": "AMZN|normalized_owner_earnings_ttm_m_v2|2026Q3",
+    "industry": "internet_retail_and_cloud",
+    "metric": "normalized_owner_earnings_ttm_m_v2",
+    "comparator": "lt",
+    "threshold": -10000.0,
+    "threshold_basis": {
+      "source_ref": "AMZN/research/valuation_contract.json#cycle_reserve",
+      "rule": "Fire if Q3 2026 TTM reported owner earnings (operating cash flow less capital expenditures per normalized_owner_earnings_ttm_m_v2) fall below negative 10,000 USD millions. That is roughly 7.5 billion USD worse than the latest known Q1 2026 TTM observation and supports moving the capex-intensity reserve from the negative 20 dollars per share base toward the negative 60 dollars per share low case."
+    },
+    "unit": "USD millions",
+    "measurement_period_end": "2026-09-30",
+    "observable_after": "2026-10-31",
+    "resolution_deadline": "2027-01-31",
+    "source_hint": "normalized_owner_earnings_ttm_m_v2",
+    "observation_plan": {
+      "metric_definition_id": "normalized_owner_earnings_ttm_m_v2",
+      "metric_definition_version": "1.0",
+      "source_adapter": "sec_companyfacts_ttm",
+      "fiscal_period": "Q3",
+      "fiscal_year": 2026,
+      "observation_type": "duration",
+      "duration_basis": "TTM",
+      "canonical_unit": "USD millions",
+      "source_unit": "USD",
+      "accepted_forms": [
+        "10-Q",
+        "10-K"
+      ],
+      "end_date_tolerance_days": 7,
+      "expected_publication_date": "2026-10-31",
+      "maximum_source_lag_days": 45,
+      "outcome_unavailable_at_registration": true,
+      "historical_replay": {
+        "status": "passed",
+        "evidence_ref": "AMZN/research/evidence/sec_companyfacts.json#normalized_owner_earnings_ttm_m@2025-09-30",
+        "replay_measurement_period_end": "2025-09-30",
+        "replay_fiscal_period": "Q3",
+        "replay_fiscal_year": 2025,
+        "replay_value": 10560.0,
+        "replay_as_of": "2025-09-30"
+      }
+    },
+    "review": {
+      "status": "pending",
+      "reviewer": null,
+      "reviewed_at": null
+    },
+    "probability_fires": 0.35,
+    "severity": 4,
+    "component_value_impact_pct": 200.0,
+    "total_equity_value_impact_pct": 21.34,
+    "derived_from": "Primary evidence shows owner cash or capital structure materially worse than low case.",
+    "rationale": "Types the reported-cash leg of the cycle_reserve prose falsifier for the capital-cycle reserve (negative 60 dollars per share low / negative 20 base / negative 5 high). **[Fact]** The midcycle_capacity_value proof prices prolonged AI capital spending and retail competition as a per-share reserve, not as a separate SEC line item. **[Fact]** Q3 2025 TTM normalized owner earnings replay at 10,560 USD millions via sec_companyfacts_ttm (TTM operating cash flow less TTM capital expenditures). **[Fact]** Q1 2026 TTM normalized owner earnings resolve to negative 2,472 USD millions on the same recipe (AMZN/investor-documents/sec-edgar/10-Q_20260430_rpt20260331_acc0001018724_26_000014.htm; verified with resolve_spec on 2026-10-09). **[Inference]** A Q3 2026 TTM outcome below negative 10,000 USD millions would signal further deterioration beyond the already-negative Q1 2026 trough, supporting movement of the reserve from the negative 20 dollars per share base toward the negative 60 dollars per share low case. **[Inference]** A 35 percent fire probability sits between the reinvestment_runway zero threshold (55 percent; already breached at cutoff) and the core_engine negative 25 billion USD tail (20 percent), preserving monotonic severity on nested thresholds. Target Q3 2026 TTM is not observable at registration. Shares correlation group AMZN|normalized_owner_earnings_ttm_m_v2|2026Q3 with core_engine and reinvestment_runway because one filing resolves all three nested tests.",
+    "untestable": false,
+    "calibration_eligible": true,
+    "supersedes_spec_id": "amzn-cycle-reserve-owner-earnings-2026q3-v1"
+  }
+}

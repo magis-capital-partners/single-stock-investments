@@ -10,7 +10,7 @@ SCRIPTS = ROOT / "_system" / "scripts"
 if str(SCRIPTS) not in sys.path:
     sys.path.insert(0, str(SCRIPTS))
 
-from criticality.lppls import fit_ensemble, fit_lppls
+from criticality.lppls import classify_tail, fit_ensemble, fit_lppls
 
 
 def synthetic_lppls(
@@ -63,6 +63,17 @@ class LpplsTest(unittest.TestCase):
             self.assertLessEqual(value, 100)
         self.assertIn("critical_time", result)
         self.assertIn("policy", result)
+
+    def test_latest_crash_day_is_outside_the_historical_tail(self):
+        prices = [100.0 * (1.001 ** index) for index in range(80)]
+        quiet = classify_tail(prices, direction="none", qualified_count=0)
+        self.assertEqual(quiet["kind"], "inside_historical_tail")
+        shock = prices + [prices[-1] * 0.6]
+        outside = classify_tail(shock, direction="none", qualified_count=0)
+        self.assertEqual(outside["kind"], "beyond_tail")
+        tagged = classify_tail(shock, direction="positive_bubble", qualified_count=3)
+        self.assertEqual(tagged["kind"], "beyond_tail_with_log_periodic")
+        self.assertIn("tail", fit_ensemble(prices, horizons=(60,), nested_fractions=(1.0,), max_nfev=40))
 
     def test_invalid_prices_fail_loudly(self):
         with self.assertRaises(ValueError):

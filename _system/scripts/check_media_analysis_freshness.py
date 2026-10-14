@@ -38,6 +38,7 @@ from __future__ import annotations
 
 import argparse
 import json
+import os
 import sys
 from datetime import date, datetime, timezone
 from pathlib import Path
@@ -57,6 +58,24 @@ STALL_DAYS = 4
 SOURCES = {
     "podcasts": "transcript_count",
     "videos": "items",
+}
+
+# Neither analyser runs in CI. Both are workstation scheduled tasks. The
+# Research Watchdog only notices that the analysed count stopped moving.
+# See install_local_lane_tasks.ps1 and analysis_supervisor.ps1.
+LANE_CHECK = {
+    "podcasts": (
+        "podcast analysis",
+        "This lane does not run in CI. On the workstation, check scheduled task "
+        "'SSI Podcast Analysis' (analysis_supervisor.ps1 runs analyze_podcast_batch.py) "
+        "and `lms ps` for the local model. Last-result and the task log are on that machine.",
+    ),
+    "videos": (
+        "video analysis",
+        "This lane does not run in CI. On the workstation, the same scheduled task "
+        "'SSI Podcast Analysis' drains videos (analyze_video_batch.py), and "
+        "youtube_lane.py publishes the catalog. Last-result and the task log are on that machine.",
+    ),
 }
 
 
@@ -139,10 +158,11 @@ def evaluate(
         except ValueError:
             continue
         if stalled >= stall_days:
+            lane, where = LANE_CHECK.get(name, (name, "Check the workstation analyser; it does not run in CI."))
             problems.append(
-                f"{name}: analysed stuck at {analysed} for {stalled} days "
-                f"with {backlog} unanalysed of {corpus} - the analysis lane is "
-                "not running (check the SSI Podcast Analysis task and `lms ps`)"
+                f"{name}: {lane} lane is stale. analysed stuck at {analysed} "
+                f"for {stalled} days (last moved {last_change}) "
+                f"with {backlog} unanalysed of {corpus}. {where}"
             )
 
     return problems, {"updated_at": datetime.now(timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ"),
@@ -199,9 +219,11 @@ def evaluate_receipt(
     if stalled < stall_days:
         return [], nxt
     return [
-        f"media-analysis: no ready model receipt since {absent_since} "
-        f"({stalled} days) and the analysed count is stuck - the local "
-        "analyser is not reporting (SSI Podcast Analysis / lms)"
+        f"media-analysis lane is stale: no ready model receipt since {absent_since} "
+        f"({stalled} days; last ready probe none) and the analysed count is stuck. "
+        "Podcast and video analysis run on the workstation, not in CI. "
+        "Check scheduled task 'SSI Podcast Analysis' (analysis_supervisor.ps1, `lms ps`) "
+        "and youtube_lane.py. See _system/scripts/install_local_lane_tasks.ps1."
     ], nxt
 
 
@@ -267,6 +289,10 @@ def main() -> int:
             print(f"{name}: analysed {shown} of {corpus if corpus is not None else '?'}")
         for msg in problems:
             print(f"WARN: {msg}")
+            # The Actions log otherwise shows only "exit code 1". Name the lane,
+            # when it last moved, and the workstation task to check.
+            if os.environ.get("GITHUB_ACTIONS") == "true":
+                print(f"::error title=Media analysis lane stale::{msg}")
         if not problems:
             print("OK: media analysis has moved within the stall window")
     return 1 if problems else 0

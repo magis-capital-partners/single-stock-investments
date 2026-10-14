@@ -104,6 +104,7 @@ if str(SCRIPTS) not in sys.path:
     sys.path.insert(0, str(SCRIPTS))
 
 from build_technical_signals import _request  # noqa: E402
+import volume_residual  # noqa: E402
 
 SCHEMA_VERSION = 1
 MODEL_VERSION = "vol-metrics-v2"
@@ -419,6 +420,80 @@ def _fetch_yahoo_close_series(symbol: str, start: datetime, end: datetime) -> di
     if not series:
         raise ValueError(f"Yahoo returned no usable closes for {symbol}")
     return series
+
+
+def fetch_spy_bars() -> list[dict]:
+    """SPY adjusted close and share volume for the volume clock.
+
+    One extra chart request. It does not change the index realized-vol series.
+    """
+    end = datetime.now(timezone.utc)
+    start = end - timedelta(days=LOOKBACK_DAYS)
+    encoded = urllib.parse.quote("SPY", safe="")
+    url = (
+        "https://query1.finance.yahoo.com/v8/finance/chart/"
+        + encoded
+        + "?"
+        + urllib.parse.urlencode(
+            {
+                "period1": int(start.timestamp()),
+                "period2": int(end.timestamp()) + 86400,
+                "interval": "1d",
+                "events": "div,splits",
+            }
+        )
+    )
+    payload = json.loads(_request(url))
+    result = (payload.get("chart") or {}).get("result") or []
+    if not result:
+        raise ValueError("Yahoo returned no result for SPY")
+    result = result[0]
+    timestamps = result.get("timestamp") or []
+    quote = ((result.get("indicators") or {}).get("quote") or [{}])[0]
+    closes = quote.get("close") or []
+    volumes = quote.get("volume") or []
+    adjusted = (((result.get("indicators") or {}).get("adjclose") or [{}])[0]).get("adjclose") or []
+    bars = []
+    for index, timestamp in enumerate(timestamps):
+        raw_close = _finite(closes[index] if index < len(closes) else None)
+        price = _finite(adjusted[index] if index < len(adjusted) else None) or raw_close
+        if price is None or price <= 0:
+            continue
+        bars.append(
+            {
+                "date": datetime.fromtimestamp(timestamp, tz=timezone.utc).strftime("%Y-%m-%d"),
+                "adj_close": price,
+                "volume": _finite(volumes[index] if index < len(volumes) else None),
+            }
+        )
+    if len(bars) < RV_WINDOW + 1:
+        raise ValueError("Yahoo returned too few SPY bars for the volume clock")
+    return bars
+
+
+RESIDUAL_NAME = "vol_volume_residual.json"
+
+
+def write_volume_residual(output_dir: Path, bars: list[dict]) -> dict:
+    document = volume_residual.market_document(bars)
+    _write_text_atomic(output_dir / RESIDUAL_NAME, _dump(document) + "\n")
+    return document
+
+
+def stamp_volume_residual_stale(output_dir: Path, reason: str) -> None:
+    """Keep the previous residual file and mark the card stale. Never touch VIX history."""
+    path = output_dir / RESIDUAL_NAME
+    if not path.exists():
+        return
+    try:
+        document = json.loads(path.read_text(encoding="utf-8"))
+    except (OSError, json.JSONDecodeError):
+        return
+    if not isinstance(document, dict):
+        return
+    document["stale"] = True
+    document["stale_reason"] = str(reason)[:240]
+    _write_text_atomic(path, _dump(document) + "\n")
 
 
 def _parse_daily_date(value: str) -> str | None:
@@ -897,6 +972,95 @@ def attach_zscores(rows: list) -> None:
             row[f"{key}_pct1y"] = _round(pct[index], 2)
 
 
+SCALING_HORIZON = 20
+SCALING_MIN_SAMPLES = 40
+SCALING_HURST_BAND = 0.1
+
+
+def scaling_gap_from_rows(rows: list, *, key: str = SPX_KEY, subject: str = "SPX") -> dict:
+    """Hurst exponent of overlapping horizon log moves versus one-session moves.
+
+    Matches ``scalingGap`` in ``dashboard/functions/_lib/performance.js``.
+    Brownian motion is 0.5. A gap is only a label on the annualized number.
+    """
+    logs: list[float | None] = []
+    previous: float | None = None
+    for row in rows:
+        close = _finite(row.get(key))
+        if previous is not None and close is not None and previous > 0 and close > 0:
+            logs.append(math.log(close / previous))
+        else:
+            logs.append(None)
+        previous = close if close is not None and close > 0 else None
+    one_day = [value for value in logs if value is not None]
+    horizon_samples: list[float] = []
+    for index in range(SCALING_HORIZON, len(logs) + 1):
+        window = logs[index - SCALING_HORIZON : index]
+        if any(value is None for value in window):
+            continue
+        horizon_samples.append(sum(value for value in window if value is not None))
+    base = {
+        "available": False,
+        "subject": subject,
+        "horizon_sessions": SCALING_HORIZON,
+        "hurst_band": SCALING_HURST_BAND,
+        "rule": (
+            "Hurst exponent from log(sigma_20 / sigma_1) / log(20), using the "
+            "sample standard deviation of overlapping 20-session log moves. "
+            "Near the square root of time when the exponent is within 0.1 of 0.5."
+        ),
+    }
+    if len(one_day) < 2 or len(horizon_samples) < SCALING_MIN_SAMPLES:
+        base["null_reason"] = (
+            f"needs {SCALING_HORIZON + SCALING_MIN_SAMPLES} daily closes "
+            "for a 20-session scaling check"
+        )
+        return base
+    sigma1 = statistics.stdev(one_day)
+    sigma_h = statistics.stdev(horizon_samples)
+    if not sigma1 > 0:
+        base["null_reason"] = "daily log changes have no variation, so there is no scaling exponent"
+        return base
+    brownian = math.sqrt(SCALING_HORIZON)
+    ratio = sigma_h / sigma1
+    hurst = math.log(ratio) / math.log(SCALING_HORIZON) if ratio > 0 else 0.0
+    if hurst > 0.5 + SCALING_HURST_BAND:
+        label = "faster_than_square_root"
+        plain = (
+            f"20-session {subject} moves are larger than the square root of time "
+            f"(scaling exponent {hurst:.2f}). Annualized volatility understates "
+            "how large multi-week moves have been."
+        )
+    elif hurst < 0.5 - SCALING_HURST_BAND:
+        label = "slower_than_square_root"
+        plain = (
+            f"20-session {subject} moves are smaller than the square root of time "
+            f"(scaling exponent {hurst:.2f}). Annualized volatility overstates "
+            "how large multi-week moves have been."
+        )
+    else:
+        label = "near_square_root"
+        plain = (
+            f"20-session {subject} moves are close to the square root of time. "
+            "The annualized realized-vol figure is a fair summary of this sample."
+        )
+    return {
+        **base,
+        "available": True,
+        "null_reason": None,
+        "one_day_stdev": round(sigma1, 6),
+        "horizon_stdev": round(sigma_h, 6),
+        "realized_ratio": round(ratio, 4),
+        "brownian_ratio": round(brownian, 4),
+        "hurst": round(hurst, 4),
+        "relative_gap": round(ratio / brownian - 1.0, 4),
+        "label": label,
+        "plain_english": plain,
+        "daily_log_changes": len(one_day),
+        "horizon_samples": len(horizon_samples),
+    }
+
+
 def term_state(slope_vix_3m, dead_band: float = TERM_DEAD_BAND) -> str:
     """Near/far ratio -> regime label. Below 1 is contango, above is stress."""
     slope = _finite(slope_vix_3m)
@@ -1124,6 +1288,7 @@ def build_latest(
             "iv_rv_spread": latest.get("iv_rv_spread"),
             "spx_rv20": latest.get("spx_rv20"),
         },
+        "scaling": scaling_gap_from_rows(rows),
         "spx_0dte": spx_0dte,
         "forward_conditioning": {
             **build_forward_conditioning(rows),
@@ -1240,8 +1405,20 @@ def main() -> int:
         help="Compute and print the summary without writing any file",
     )
     args = parser.parse_args()
-    result = build(output_dir=Path(args.output_dir), dry_run=args.dry_run)
-    print(json.dumps(summarize(result), sort_keys=True))
+    output_dir = Path(args.output_dir)
+    result = build(output_dir=output_dir, dry_run=args.dry_run)
+    summary = summarize(result)
+    if args.dry_run:
+        summary["volume_residual"] = "dry_run"
+    else:
+        try:
+            document = write_volume_residual(output_dir, fetch_spy_bars())
+            latest = document.get("latest") or {}
+            summary["volume_residual"] = latest.get("withheld_reason") or "printed"
+        except Exception as exc:  # noqa: BLE001 - a failed SPY fetch must not blank the VIX history
+            stamp_volume_residual_stale(output_dir, str(exc))
+            summary["volume_residual"] = "stale"
+    print(json.dumps(summary, sort_keys=True))
     # A stale build must alert the scheduled lane and prevent its commit step
     # from laundering old columns behind a fresh generated_at timestamp.
     return 0 if result["latest"]["quality_state"] == "ready" else 1

@@ -297,6 +297,36 @@ class GeneralizedValuationSystemTests(unittest.TestCase):
         self.assertIn("marks_credit_cycle:capital_cycle", result["persona_power_zones"])
         self.assertEqual(result["persona_power_zones"]["marks_credit_cycle:capital_cycle"]["calibration_use"], "descriptive")
 
+    def test_separation_trigger_routes_parent_and_spinco_to_catalyst_profile(self):
+        for role in ("parent", "spinco"):
+            with self.subTest(role=role):
+                result = route_valuation({"separation": {"role": role, "separation_id": "sep:test"}})
+                self.assertEqual(result["profile_id"], "catalyst_asset_value")
+                self.assertIn(f"separation.role={role}", result["reasons"])
+                self.assertEqual(result["primary_methods"], ["probability_weighted_catalyst_nav"])
+
+    def test_separation_hint_weighs_like_an_archetype_and_breaks_ties(self):
+        # A compounder archetype alone routes to quality_reinvestment; the same
+        # archetype plus a parent-side separation ties at 6 each, and the
+        # separation trigger takes the tie even though quality_reinvestment
+        # sits earlier in PROFILE_ORDER.
+        data = {"classification_inputs": {"archetype": "compounder"}, "separation": {"role": "parent"}}
+        result = route_valuation(data)
+        card = result["scorecard"]
+        self.assertEqual(card["catalyst_asset_value"]["score"], card["quality_reinvestment"]["score"])
+        self.assertEqual(result["profile_id"], "catalyst_asset_value")
+        # An explicit reviewed profile still outranks the trigger.
+        explicit = route_valuation(dict(data), explicit_profile="quality_reinvestment")
+        self.assertEqual(explicit["profile_id"], "quality_reinvestment")
+
+    def test_levered_spinco_and_other_roles_get_no_separation_hint(self):
+        for block in ({"role": "spinco", "levered": True}, {"role": "stub"}, {"role": ""}, "sep:not-a-dict", None):
+            with self.subTest(block=block):
+                result = route_valuation({"separation": block})
+                self.assertEqual(result["profile_id"], "quality_reinvestment")
+                self.assertEqual(result["status"], "default_needs_review")
+                self.assertFalse(any(r.startswith("separation.role=") for r in result["scorecard"]["catalyst_asset_value"]["reasons"]))
+
 
 if __name__ == "__main__":
     unittest.main()

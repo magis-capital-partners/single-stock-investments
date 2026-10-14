@@ -467,7 +467,6 @@ activist-triage-check:
 
 event-triage:
 	$(PYTHON) $(SCRIPTS)/event_triage.py --date $(DATE)
-	$(PYTHON) $(SCRIPTS)/sync_pages_docs.py
 	@echo OK: event-triage
 
 event-triage-check:
@@ -533,9 +532,6 @@ transcript-sync:
 	$(PYTHON) $(SCRIPTS)/transcript_gap_report.py
 	@echo OK: transcript-sync
 
-pages-sync:
-	$(PYTHON) $(SCRIPTS)/sync_pages_docs.py
-	@echo OK: pages-sync (dashboard/ copied to docs/ for GitHub Pages)
 
 vault-check:
 	PYTHONPATH=$(SCRIPTS) $(PYTHON) $(SCRIPTS)/test_vault_paths.py

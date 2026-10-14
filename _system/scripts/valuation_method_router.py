@@ -128,10 +128,35 @@ def _tokens(data: dict) -> tuple[set[str], set[str]]:
     return categories, {token for token in methods.replace("-", "_").split() if token}
 
 
+ARCHETYPE_WEIGHT = 6
+SEPARATION_PROFILE = "catalyst_asset_value"
+SEPARATION_ROLES = {"parent", "spinco"}
+
+
+def _separation_role(data: dict) -> str | None:
+    """Role from the ``separation`` trigger block, or None when no hint applies.
+
+    ``parent`` before completion and ``spinco`` in the orphan window are event
+    payoffs, so they tie-break toward the catalyst profile. A SpinCo carrying
+    distribution-funded debt (``levered: true``) returns None: the levered lens
+    owns that case and the router must not pull it back to catalyst NAV.
+    """
+    block = data.get("separation")
+    if not isinstance(block, dict):
+        return None
+    role = str(block.get("role") or "").lower()
+    if role not in SEPARATION_ROLES:
+        return None
+    if role == "spinco" and block.get("levered"):
+        return None
+    return role
+
+
 def route_valuation(data: dict, explicit_profile: str | None = None) -> dict:
     classification = data.get("classification_inputs") or {}
     archetype = str(classification.get("archetype") or "").lower()
     sleeve = str(classification.get("investment_sleeve") or "").lower()
+    separation_role = _separation_role(data)
     categories, method_words = _tokens(data)
     raw_methods = " ".join(method_words)
     scores: dict[str, float] = defaultdict(float)
@@ -140,8 +165,14 @@ def route_valuation(data: dict, explicit_profile: str | None = None) -> dict:
     for profile_id in PROFILE_ORDER:
         profile = PROFILES[profile_id]
         if archetype and archetype in profile["archetypes"]:
-            scores[profile_id] += 6
+            scores[profile_id] += ARCHETYPE_WEIGHT
             reasons[profile_id].append(f"archetype={archetype}")
+        if separation_role and profile_id == SEPARATION_PROFILE:
+            # Same weight as an archetype match, so the separation trigger wins
+            # a tie against the operating default without overriding an
+            # explicit reviewed profile.
+            scores[profile_id] += ARCHETYPE_WEIGHT
+            reasons[profile_id].append(f"separation.role={separation_role}")
         matches = sorted(categories & profile["categories"])
         if matches:
             scores[profile_id] += min(3, len(matches))
@@ -156,7 +187,14 @@ def route_valuation(data: dict, explicit_profile: str | None = None) -> dict:
         if explicit == profile_id:
             scores[profile_id] += 10
             reasons[profile_id].append("explicit reviewed profile")
-    ranked = sorted(PROFILE_ORDER, key=lambda pid: (-scores[pid], PROFILE_ORDER.index(pid)))
+    # Ties fall to PROFILE_ORDER, which puts the operating default ahead of the
+    # catalyst profile. A separation trigger is a dated event, so on an equal
+    # score it takes the tie; it never outscores an explicit reviewed profile.
+    def rank_key(pid: str) -> tuple[float, int, int]:
+        tie_break = 0 if (separation_role and pid == SEPARATION_PROFILE) else 1
+        return (-scores[pid], tie_break, PROFILE_ORDER.index(pid))
+
+    ranked = sorted(PROFILE_ORDER, key=rank_key)
     primary_id = ranked[0] if scores[ranked[0]] > 0 else "quality_reinvestment"
     primary = PROFILES[primary_id]
     secondary_profiles = [pid for pid in ranked[1:] if scores[pid] > 0][:2]

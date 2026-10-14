@@ -91,6 +91,7 @@ Legacy `moi_bucket` values map 1:1 → `payoff_lens` (see `moi_lens.md`).
 |------|---------|-----|
 | Special situation inefficiency list | `event` lens | `special_situation_lens.md` |
 | Spinoff / simplification | Conglomerate, BN, SPGI | Stahl spinoffs PDF |
+| Separations: split-off terms, spin-off orphan window, who-must-sell flow | `valuation.json` `separation` block, or `payoff_lens: event` with a parent or SpinCo role | `special_situation_lens.md` § Separations; `split_off_terms.py`, `separation_flow_impact.py`, `build_separations_dashboard.py` |
 | Persona-lens consensus | every ticker with `valuation.json` | `persona_lens_consensus.md`; `persona_lens.py` + `build_insights.py` |
 
 ---

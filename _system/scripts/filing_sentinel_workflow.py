@@ -54,6 +54,9 @@ SECTION_PATTERNS: dict[str, tuple[str, ...]] = {
     "transaction": (
         r"strategic review", r"asset sale", r"wind down", r"exchange offer",
         r"merger agreement", r"financing agreement",
+        # Separations (split-offs, spin-offs, retained stakes): the terms the
+        # separation register needs are announced in exactly these phrases.
+        r"spin-off|spinoff|split-off|exchange offer|distribution ratio|retained (?:stake|interest)|Form 10",
     ),
     "identity_instrument": (
         r"reverse stock split", r"ticker symbol", r"convertible", r"warrant",
