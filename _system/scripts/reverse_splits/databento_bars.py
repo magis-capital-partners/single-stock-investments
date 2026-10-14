@@ -23,6 +23,7 @@ Layout::
 from __future__ import annotations
 
 import json
+import math
 import os
 from datetime import date, datetime, timedelta, timezone
 from pathlib import Path
@@ -82,12 +83,18 @@ def client_from_env():
     return db.Historical(key)
 
 
-def fetch(client, path: Path, max_cost: float = 0.0, **request) -> dict:
+def fetch(client, path: Path, max_cost: float = 0.0, *, quoted_cost: float | None = None, **request) -> dict:
     """Download one request to ``path`` unless it is already complete. The quote
     is checked first; a file is written under ``.part`` and renamed when done."""
     if is_complete(path):
-        return json.loads(_sidecar(path, "ok").read_text(encoding="utf-8"))
-    quote = float(client.metadata.get_cost(**request))
+        saved = json.loads(_sidecar(path, "ok").read_text(encoding="utf-8"))
+        if saved.get("request") == {k: str(v) for k, v in request.items()}:
+            return saved
+    # A collector may pass the quote it just obtained for this exact request.
+    # This avoids a duplicate metadata call while retaining the cost gate.
+    quote = float(client.metadata.get_cost(**request) if quoted_cost is None else quoted_cost)
+    if not math.isfinite(quote) or quote < 0:
+        raise CostRefused('Databento returned an invalid cost quote')
     if quote > max_cost:
         raise CostRefused(f"Databento quotes ${quote:.2f} (> ${max_cost:.2f}) for {request}")
     path.parent.mkdir(parents=True, exist_ok=True)
@@ -116,9 +123,16 @@ def resolve_symbology(client, path: Path, dataset: str, start: date, end: date) 
 
     ids = sorted(int(x) for x in np.unique(db.DBNStore.from_file(str(path)).to_ndarray()["instrument_id"]))
     intervals: dict[str, list] = {}
-    for i in range(0, len(ids), RESOLVE_BATCH):
+    # Instrument IDs are dataset-wide. Reuse the already resolved all-symbol
+    # daily-bar intervals for the same period; resolve only genuinely new IDs.
+    sibling=path.parent.parent/'ohlcv-1d'/_sidecar(path,'symbology').name
+    if path.parent.name!='ohlcv-1d' and sibling.exists():
+        saved=json.loads(sibling.read_text(encoding='utf-8'))
+        intervals.update({str(i):saved[str(i)] for i in ids if str(i) in saved})
+    remaining=[i for i in ids if str(i) not in intervals]
+    for i in range(0, len(remaining), RESOLVE_BATCH):
         res = client.symbology.resolve(
-            dataset=dataset, symbols=[str(x) for x in ids[i:i + RESOLVE_BATCH]],
+            dataset=dataset, symbols=[str(x) for x in remaining[i:i + RESOLVE_BATCH]],
             stype_in="instrument_id", stype_out="raw_symbol",
             start_date=start.isoformat(), end_date=end.isoformat(),
         )
@@ -170,15 +184,19 @@ def pull(cfg: Config | None = None, start: date = FIRST_DAY, end: date | None = 
     end = end or date.today()
     client = client or client_from_env()
     summary = {"files": 0, "skipped": 0, "bytes": 0, "quoted_usd": 0.0}
+    import threading
+    from concurrent.futures import ThreadPoolExecutor
+    summary_lock=threading.Lock()
 
     def one(path, sym_range, **request):
         done = is_complete(path)
         record = fetch(client, path, max_cost, **request)
         if sym_range and path.stat().st_size:
             resolve_symbology(client, path, request["dataset"], *sym_range)
-        summary["skipped" if done else "files"] += 1
-        summary["bytes"] += int(record.get("bytes") or 0)
-        summary["quoted_usd"] += float(record.get("quoted_usd") or 0.0)
+        with summary_lock:
+            summary["skipped" if done else "files"] += 1
+            summary["bytes"] += int(record.get("bytes") or 0)
+            summary["quoted_usd"] += float(record.get("quoted_usd") or 0.0)
         log(f"{'have' if done else 'got '} {path.relative_to(cfg.databento_dir).as_posix()} "
             f"{int(record.get('bytes') or 0) / 1e6:.1f} MB")
 
@@ -212,4 +230,13 @@ def pull(cfg: Config | None = None, start: date = FIRST_DAY, end: date | None = 
             drop_if_stale(path, hi)
             one(path, (lo, hi), dataset=STATUS_DATASET,
                 schema="status", symbols="ALL_SYMBOLS", start=lo.isoformat(), end=hi.isoformat())
+    if 'statistics' in schemas:
+        def statistics_venue(dataset):
+            stop=min(end,available_end(client,dataset,'statistics'))
+            for label,lo,hi in quarters(start,stop):
+                path=file_path(cfg,dataset,'statistics',label)
+                drop_if_stale(path,hi)
+                one(path,(lo,hi),dataset=dataset,schema='statistics',symbols='ALL_SYMBOLS',start=lo.isoformat(),end=hi.isoformat())
+        with ThreadPoolExecutor(max_workers=3) as pool:
+            list(pool.map(statistics_venue,datasets))
     return summary

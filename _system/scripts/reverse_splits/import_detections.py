@@ -161,7 +161,8 @@ def append_detections(cfg, ledger_dir: Path, work_dir: Path, fetch_ratios: bool 
                   if r["listed_equity"] == "True" and r["corroborated"] == "True" and r["status"] == "detector_only"]
     checks = json.loads((reports / "filing_checks.json").read_text(encoding="utf-8"))
     joins = json.loads((reports / "rename_joins.json").read_text(encoding="utf-8")) if (reports / "rename_joins.json").exists() else []
-    ledger = [json.loads(line) for line in (ledger_dir / "events.jsonl").read_text(encoding="utf-8").splitlines() if line.strip()]
+    from .ledger import load_jsonl
+    ledger = load_jsonl(ledger_dir/'events.jsonl')
     ratios: dict[str, float | None] = {}
     if fetch_ratios:
         edgar = cfg.raw.get("edgar") or {}

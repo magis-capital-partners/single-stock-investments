@@ -124,6 +124,19 @@ def build_parser() -> argparse.ArgumentParser:
 
     sub.add_parser("build-dashboard", help="Build dashboard/data/reverse_splits.json from the ledger")
 
+    p_expand = sub.add_parser("expand", help="Resume the full-universe evidence collection and publish versioned research")
+    p_expand.add_argument("step", choices=("all", "bootstrap", "discover", "discover-ads", "filings", "reclassify", "fundamentals", "otc", "reference", "study", "publish", "templates", "import", "forward"))
+    p_expand.add_argument("--legacy-root", type=Path)
+    p_expand.add_argument("--start", default="2018-05-01", type=date.fromisoformat)
+    p_expand.add_argument("--end", default=date.today(), type=date.fromisoformat)
+    p_expand.add_argument('--discovery-start',default=date(2005,1,1),type=date.fromisoformat)
+    p_expand.add_argument("--offline", action="store_true")
+    p_expand.add_argument("--pilot", action="store_true")
+    p_expand.add_argument("--limit", type=int)
+    p_expand.add_argument("--kind")
+    p_expand.add_argument("--input", type=Path)
+    p_expand.add_argument("--replay-from", type=Path, help="Reuse checksum-verified inputs from a completed local study")
+
     p_check = sub.add_parser("check", help="Structural and health checks on the ledger and dashboard feed")
     p_check.add_argument("--strict", action="store_true")
     p_check.add_argument("--warn-only", action="store_true")
@@ -133,6 +146,80 @@ def build_parser() -> argparse.ArgumentParser:
 def main(argv: list[str] | None = None) -> int:
     args = build_parser().parse_args(argv)
     cfg = load_config(args.config)
+
+    if args.cmd == "expand":
+        from .expansion import bootstrap, collect_filings, discover_history, export_coverage, reclassify_cached
+        if args.step=='all':
+            from .expansion_replay import refresh_fundamentals
+            from .otc_daily import collect
+            from .universe_study import run, publish
+            from .databento_prices import load_prices,load_ssr,expansion_windows
+            from .ledger import load_jsonl,read_json
+            result={}
+            result['discovery']=discover_history(cfg,args.discovery_start.isoformat(),args.end.isoformat(),offline=args.offline)
+            result['ads_discovery']=discover_history(cfg,args.discovery_start.isoformat(),args.end.isoformat(),offline=args.offline,
+                                                    query='"ADS ratio" OR "depositary share ratio"',forms=('6-K','6-K/A'),job_kind='search_ads')
+            result['filings']=collect_filings(cfg,offline=args.offline,pilot=args.pilot,limit=args.limit,start=args.start.isoformat(),end=args.end.isoformat())
+            result['reclassification']=reclassify_cached(cfg)
+            result['fundamentals']=refresh_fundamentals(cfg,offline=args.offline)
+            result['otc']=collect(cfg,args.start,args.end,offline=args.offline)
+            from .reference_actions import collect as reference_collect
+            result['reference']=reference_collect(cfg,args.start,args.end,offline=args.offline)
+            events=load_jsonl(cfg.ledger_dir/'events.jsonl')
+            joins=read_json(cfg.reports_dir/'rename_joins.json',[])
+            windows=expansion_windows(cfg,start=args.start.isoformat(),cutoff=args.end.isoformat())
+            result['prices']=load_prices(cfg,cfg.db_path,events,joins,windows_override=windows)
+            result['status']=load_ssr(cfg,cfg.db_path,events,joins,windows_override=windows)
+            from .official_prices import load_official
+            result['official_prices']=load_official(cfg,windows)
+            result['study']=run(cfg,start=args.start.isoformat(),cutoff=args.end.isoformat())
+            result['publish']=publish(cfg)
+            _scripts_on_path()
+            import build_reverse_splits_dashboard as builder
+            builder.main([])
+        elif args.step == "forward":
+            from .strategy_research import refresh_forward
+            result = refresh_forward(cfg, cutoff=args.end.isoformat(), offline=args.offline)
+        elif args.step == "bootstrap":
+            if not args.legacy_root:
+                raise ValueError("bootstrap requires --legacy-root")
+            result = bootstrap(cfg, args.legacy_root)
+        elif args.step == "discover":
+            result = discover_history(cfg, args.start.isoformat(), args.end.isoformat(), offline=args.offline)
+        elif args.step=='discover-ads':
+            result=discover_history(cfg,args.start.isoformat(),args.end.isoformat(),offline=args.offline,
+                                    query='"ADS ratio" OR "depositary share ratio"',forms=('6-K','6-K/A'),job_kind='search_ads')
+        elif args.step == "filings":
+            result = collect_filings(cfg, offline=args.offline, pilot=args.pilot, limit=args.limit,start=args.start.isoformat(),end=args.end.isoformat())
+        elif args.step=='reclassify':
+            result = reclassify_cached(cfg)
+        elif args.step == "fundamentals":
+            from .expansion_replay import refresh_fundamentals
+            result = refresh_fundamentals(cfg, offline=args.offline)
+        elif args.step == "otc":
+            from .otc_daily import collect
+            result = collect(cfg, args.start, args.end, offline=args.offline)
+        elif args.step=='reference':
+            from .reference_actions import collect
+            result=collect(cfg,args.start,args.end,offline=args.offline)
+        elif args.step == "study":
+            from .universe_study import run
+            result = run(cfg, start=args.start.isoformat(), cutoff=args.end.isoformat(), frozen_from=args.replay_from)
+        elif args.step == "publish":
+            from .universe_study import publish
+            result = publish(cfg)
+        elif args.step == "templates":
+            from .expansion_imports import write_templates
+            result = str(write_templates(cfg))
+        elif args.step == "import":
+            from .expansion_imports import import_evidence
+            if not args.kind or not args.input:
+                raise ValueError("import requires --kind and --input")
+            result = import_evidence(cfg, args.kind, args.input)
+        else:
+            result = export_coverage(cfg)
+        print(result)
+        return 0
 
     from .db import init_db
 
@@ -226,7 +313,8 @@ def main(argv: list[str] | None = None) -> int:
 
         from .databento_prices import load_prices, load_ssr
 
-        events = [json.loads(line) for line in (cfg.ledger_dir / "events.jsonl").read_text(encoding="utf-8").splitlines() if line.strip()]
+        from .ledger import load_jsonl
+        events = load_jsonl(cfg.ledger_dir/'events.jsonl')
         joins_path = cfg.reports_dir / "rename_joins.json"
         joins = json.loads(joins_path.read_text(encoding="utf-8")) if joins_path.exists() else []
         log = lambda s: print(s, flush=True)  # noqa: E731

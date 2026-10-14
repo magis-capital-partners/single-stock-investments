@@ -186,16 +186,18 @@ def test_import_is_idempotent_and_re_export_is_byte_stable(exported, tmp_path):
         assert ledger_paths(again)[name].read_bytes() == ledger_paths(out)[name].read_bytes(), name
 
 
-def test_oversized_files_are_capped_to_three_years_and_say_so(tmp_path):
+def test_oversized_files_retain_older_history_in_shards(tmp_path):
     src, dec = tmp_path / "src.db", tmp_path / "dec.sqlite"
     seed_source(src, dec)
-    manifest = export_ledger(src, tmp_path / "ledger", dec, cap_bytes=1, today=date(2026, 10, 11))
-    assert manifest["caps"]["announcements_since"] == "2023-10-11"
-    assert manifest["caps"]["finra_since"] == "2023-10-11"
+    manifest = export_ledger(src, tmp_path / "ledger", dec, cap_bytes=1024, today=date(2026, 10, 11))
+    assert manifest["caps"]["announcements_since"] is None
+    assert manifest["caps"]["finra_since"] is None
+    assert manifest["caps"]["history_truncated"] is False
     rows = load_jsonl(ledger_paths(tmp_path / "ledger")["announcements"])
-    assert [r["ticker"] for r in rows] == ["DDD", "CCC"]  # EEE (2023-01-10) dropped
-    assert manifest["files"]["announcements"]["rows"] == 2
-    assert manifest["files"]["finra_short_interest"]["rows"] == 2  # the 2023-01-15 EEE row dropped
+    assert sorted(r["ticker"] for r in rows) == ["CCC", "DDD", "EEE"]
+    assert manifest["files"]["announcements"]["rows"] == 3
+    assert manifest["files"]["finra_short_interest"]["rows"] == 3
+    assert all(p["bytes"] <= 1024 for f in manifest["files"].values() for p in f.get("parts", []))
 
 
 def test_notes_round_trip_in_the_collectors_field_order():
