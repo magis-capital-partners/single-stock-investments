@@ -4,13 +4,13 @@
 
 | Indicator | Latest | As of | YoY | Direction | In base IRR? |
 |-----------|--------|-------|-----|-----------|--------------|
-| High-yield OAS credit spread (%) | -0.06 | 2026-10-14 | +89.5% | up | no (context) |
-| US Treasury 10Y yield (%) | 5.261000156402588 | 2026-10-14 | +30.8% | up | no (context) |
-| US Treasury 2Y yield (%) | 5.077000141143799 | 2026-10-14 | +40.9% | up | no (context) |
-| Trade-weighted USD index (broad) | 102.86399841308594 | 2026-10-14 | +3.9% | up | no (context) |
-| VIX index level | 15.869999885559082 | 2026-10-14 | -23.7% | down | no (context) |
-| HYG vs TLT 1-month return spread (%) | 1.18 | 2026-10-14 | +174.7% | up | no (context) |
-| SPY 20-day realized vol (annualized %) | 9.84 | 2026-10-14 | -21.1% | down | no (context) |
+| High-yield OAS credit spread (%) | -0.22 | 2026-10-14 | +61.4% | up | no (context) |
+| US Treasury 10Y yield (%) | 5.249000072479248 | 2026-10-14 | +30.5% | up | no (context) |
+| US Treasury 2Y yield (%) | 5.059000015258789 | 2026-10-14 | +40.4% | up | no (context) |
+| Trade-weighted USD index (broad) | 102.88999938964844 | 2026-10-14 | +3.9% | up | no (context) |
+| VIX index level | 15.90999984741211 | 2026-10-14 | -23.5% | down | no (context) |
+| HYG vs TLT 1-month return spread (%) | 0.9 | 2026-10-14 | +157.0% | up | no (context) |
+| SPY 20-day realized vol (annualized %) | 9.99 | 2026-10-14 | -19.9% | down | no (context) |
 | AGI expert-horizon years ahead (public quotes) | 5.0 | 2026-06-01 | +0.0% | flat | no (context) |
 | Robotaxi expert-horizon years ahead (public quotes) | 2.0 | 2026-06-01 | +0.0% | flat | no (context) |
 | PPI: crushed and broken limestone mining (index) | 528.827 | 2026-08-01 | +6.1% | up | no (context) |
@@ -31,11 +31,11 @@
 | US highway and street construction spending (USD m, SAAR) | 152213.0 | 2026-08-01 | +4.6% | up | no (context) |
 | US manufacturing construction spending (USD m, SAAR) | 170701.0 | 2026-08-01 | -19.2% | down | no (context) |
 | US power construction spending (USD m, SAAR) | 185973.0 | 2026-08-01 | +8.5% | up | no (context) |
-| US 30-year fixed mortgage rate (%) | 7.28 | 2026-10-01 | +14.8% | up | no (context) |
-| US Treasury 10Y yield (%) | 5.265999794006348 | 2026-10-14 | +30.9% | up | no (context) |
-| US construction employment (thousands) | 8359.0 (stale) | 2026-08-01 | +1.5% | up | no (context) |
-| US heavy and civil engineering construction employment (thousands) | 1210.8 (stale) | 2026-08-01 | +2.3% | up | no (context) |
-| US retail diesel price (USD/gal) | 6.382 | 2026-09-28 | +70.0% | up | no (context) |
+| US 30-year fixed mortgage rate (%) | 7.4 | 2026-10-08 | +17.5% | up | no (context) |
+| US Treasury 10Y yield (%) | 5.249000072479248 | 2026-10-14 | +30.5% | up | no (context) |
+| US construction employment (thousands) | 8364.0 | 2026-09-01 | +1.3% | up | no (context) |
+| US heavy and civil engineering construction employment (thousands) | 1210.8 | 2026-09-01 | +2.2% | up | no (context) |
+| US retail diesel price (USD/gal) | 6.179 | 2026-10-12 | +68.6% | up | no (context) |
 | VMC aggregates cash gross profit per ton (USD) | 11.33 | 2025-12-31 | +19.8% | up | no (context) |
 | VMC freight-adjusted aggregates price per ton (USD) | 21.98 | 2025-12-31 | n/a | flat | no (context) |
 | VMC aggregates shipments (million tons, FY) | 226.8 | 2025-12-31 | n/a | flat | no (context) |
