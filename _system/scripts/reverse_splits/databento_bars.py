@@ -23,6 +23,7 @@ Layout::
 from __future__ import annotations
 
 import json
+import math
 import os
 from datetime import date, datetime, timedelta, timezone
 from pathlib import Path
@@ -82,14 +83,18 @@ def client_from_env():
     return db.Historical(key)
 
 
-def fetch(client, path: Path, max_cost: float = 0.0, **request) -> dict:
+def fetch(client, path: Path, max_cost: float = 0.0, *, quoted_cost: float | None = None, **request) -> dict:
     """Download one request to ``path`` unless it is already complete. The quote
     is checked first; a file is written under ``.part`` and renamed when done."""
     if is_complete(path):
         saved = json.loads(_sidecar(path, "ok").read_text(encoding="utf-8"))
-        if saved.get("request") == request:
+        if saved.get("request") == {k: str(v) for k, v in request.items()}:
             return saved
-    quote = float(client.metadata.get_cost(**request))
+    # A collector may pass the quote it just obtained for this exact request.
+    # This avoids a duplicate metadata call while retaining the cost gate.
+    quote = float(client.metadata.get_cost(**request) if quoted_cost is None else quoted_cost)
+    if not math.isfinite(quote) or quote < 0:
+        raise CostRefused('Databento returned an invalid cost quote')
     if quote > max_cost:
         raise CostRefused(f"Databento quotes ${quote:.2f} (> ${max_cost:.2f}) for {request}")
     path.parent.mkdir(parents=True, exist_ok=True)

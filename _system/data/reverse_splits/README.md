@@ -232,6 +232,57 @@ See [Databento's statistics definition](https://databento.com/docs/schemas-and-d
 
 ## Original ledger schemas
 
+### Historical execution evidence
+
+`execution_research.json` contains aggregate costs measured from Databento's
+historical quotes for the published 671 one-day price events, plus MBP-10
+depth for the original 35 account entries. Licensed books, individual results,
+historical symbols, source hashes and request/cost receipts remain in
+`local/execution_research/`. The original frozen experiments stay intact.
+
+The dashboard's execution section supersedes the daily-range spread proxy as
+an execution estimate. The proxy remains explicitly labeled as an uncalibrated
+stress scenario. Quoted spread, displayed depth, price changes relative to
+auction benchmarks, commissions, assumed borrowing and additional latency/
+impact sensitivities are reported separately.
+
+Measurements use entry at 1 and 30 seconds after the scheduled open and cover
+one second before the scheduled close, including early closes. Timestamp and
+book-gap flags are rejected; MBP books require completed events. Account
+comparisons require affirmative cached Nasdaq trading status at both times
+and unrestricted SSR at entry. Quotes alone do not establish an approved
+locate or a broker fill. The multi-venue sensitivity combines the listing
+venue, NYSE Arca and Cboe EDGX where available, falling back to one valid
+venue when necessary. It must not be described as full NBBO.
+
+The original entries and share quantities remain fixed in this comparison.
+The previous daily-volume cap delayed six partial covers; the new study
+estimates full same-session covers only where displayed depth supports the
+quantity. Missing exit books or insufficient depth remain disclosed. This
+comparison does not replay whole-account selection or margin after changing
+the fills. Additional 0/5/10/25 basis points per side are explicitly unmeasured
+latency/impact sensitivities.
+
+The latency diagnostic compares quantity-adjusted quoted execution prices
+at the decision time and 10/100/500 milliseconds later on both legs. It
+reports signed mean, median and 90th-percentile changes, including price
+improvements. This measures background market movement without our orders;
+it cannot establish causal market impact or actual broker fill delays.
+
+With a Databento key supplied securely in the process environment:
+
+```powershell
+python -m _system.scripts.reverse_splits.execution_research --source-run _system/data/reverse_splits/local/expansion/expansion_v2/runs/20261013T224003582762Z --offline --publish
+python _system/scripts/build_reverse_splits_dashboard.py
+```
+
+Omit `--offline` to download missing windows; each request is priced first.
+`--max-cost` defaults to zero and caps new quoted-cost reservations per
+collection. `--routing` also collects the two additional venues, with its
+own collection budget. Metadata requests are limited to six per second.
+Completed files are checksum-verified and reused. Raw market data is never
+published.
+
 ### Event row
 
 ```json
