@@ -104,16 +104,21 @@ def live_cost_path(
     append_naive_double: bool = False,
 ) -> list[dict]:
     """Cost path. Prefer time-varying J/TH; constant efficiency is the test fallback."""
-    jth_map = {d: v for d, v in (jth_series or [])}
-    kwh_map = {d: v for d, v in (kwh_series or [])}
+    jth_points = sorted(jth_series or [])
+    kwh_points = sorted(kwh_series or [])
+    ji = ki = 0
     last_jth = efficiency_j_th
     last_kwh = electricity_usd_kwh
     out: list[dict] = []
-    for d, h in hash_eh:
-        if d in jth_map:
-            last_jth = jth_map[d]
-        if d in kwh_map:
-            last_kwh = kwh_map[d]
+    for d, h in sorted(hash_eh):
+        while ji < len(jth_points) and jth_points[ji][0] <= d:
+            last_jth = jth_points[ji][1]
+            ji += 1
+        while ki < len(kwh_points) and kwh_points[ki][0] <= d:
+            last_kwh = kwh_points[ki][1]
+            ki += 1
+        if (jth_points and ji == 0) or (kwh_points and ki == 0):
+            continue
         jth = last_jth
         kwh = last_kwh
         cost = all_in_cost_usd(
@@ -501,6 +506,11 @@ def build(*, as_of: date | None = None) -> Path:
     sota_roic_series = _read_csv(CRYPTO_DIR / "btc_sota_roic_cost_usd.csv")
     sota_cash_series = _read_csv(CRYPTO_DIR / "btc_sota_cash_cost_usd.csv")
     sota_jth_series = _read_csv(CRYPTO_DIR / "btc_sota_jth.csv")
+    as_of = as_of or (btc[-1][0] if btc else date.today())
+    btc, amzn, hash_eh, fleet_jth_series, all_in_series, elec_series, sota_roic_series, sota_cash_series, sota_jth_series = (
+        [(d, v) for d, v in rows if d <= as_of] for rows in
+        (btc, amzn, hash_eh, fleet_jth_series, all_in_series, elec_series, sota_roic_series, sota_cash_series, sota_jth_series)
+    )
     snow = load_snowball_cfg()
     electricity_usd_kwh = float(snow.get("electricity_usd_kwh") or DEFAULT_KWH)
     power_share = float(snow.get("power_share") or POWER_SHARE)
