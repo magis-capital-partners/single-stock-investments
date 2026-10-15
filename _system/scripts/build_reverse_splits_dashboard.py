@@ -22,6 +22,8 @@ from pathlib import Path
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 
 from check_reverse_splits import DASHBOARD_PATH, health  # noqa: E402
+from reverse_splits.config import DATA_DIR  # noqa: E402
+from reverse_splits.net_edge_evidence import digest, prospective_status  # noqa: E402
 from reverse_splits.ledger import (  # noqa: E402
     latest_manifest,
     ledger_paths,
@@ -38,6 +40,14 @@ RECENT_DAYS = 90
 MAX_RECENT = 100
 MAX_UPCOMING = 50
 MAX_REPEAT = 50
+
+
+def edge_v3_reference(ledger_dir):
+    source = ledger_dir / "net_edge_research_v3.json"
+    if not source.exists(): return None
+    doc = read_json(source)
+    return {"schema_version": doc["schema_version"], "version": doc["version"],
+            "summary_url": "data/shorts_net_edge_v3.json", "summary_sha256": digest(source)}
 
 # Two event rows for one issuer are the same split recorded twice when their
 # ratios agree within this fraction and their ex dates within this many days
@@ -570,6 +580,9 @@ def build(*, today: date | None = None, ledger_dir: Path | None = None) -> dict:
         "portfolio_research_manifest": read_json(paths["manifest"].parent / "portfolio_research_manifest.json", None),
         "net_edge_research": read_json(paths["manifest"].parent / "net_edge_research.json", None),
         "net_edge_manifest": read_json(paths["manifest"].parent / "net_edge_manifest.json", None),
+        "net_edge_research_v3": edge_v3_reference(paths["manifest"].parent),
+        "net_edge_manifest_v3": read_json(paths["manifest"].parent / "net_edge_manifest_v3.json", None),
+        "net_edge_prospective_v3": prospective_status(paths["manifest"].parent),
         "forward_status": read_json(paths["manifest"].parent / "forward_status.json", None),
         "expansion_catalogue": [{**{k:r.get(k) for k in ('event_id','ticker','new_ticker','cik','company','ex_date','ratio','exchange_class','verification','source_url','action_review')},
                                   'price_path':next((o.get('status') if not o.get('reason') else o['reason'] for o in r.get('outcomes',[]) if o.get('cohort')=='ex_plus_1_h5'),'unavailable')}
@@ -607,6 +620,13 @@ def main(argv: list[str] | None = None) -> int:
     payload = build(ledger_dir=args.ledger_dir)
     target = args.out or DASHBOARD_PATH
     write_json(target, payload)
+    import shutil
+    audit_source = (args.ledger_dir or DATA_DIR) / "net_edge_audits_v3"
+    if audit_source.exists():
+        shutil.copytree(audit_source, target.parent / "net_edge_audits_v3", dirs_exist_ok=True)
+    summary_source = (args.ledger_dir or DATA_DIR) / "net_edge_research_v3.json"
+    if summary_source.exists():
+        shutil.copyfile(summary_source, target.parent / "shorts_net_edge_v3.json")
     write_portfolio_csv(payload,target.with_name('reverse_splits_portfolios.csv'))
     c = payload["counts"]
     print(
