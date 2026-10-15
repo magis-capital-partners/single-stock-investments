@@ -1,0 +1,69 @@
+# RSI-3.0 inputs and reproduction
+
+Research only. The published dashboard uses a frozen 2026-10-13 source run. It does not connect to a broker or ThetaData. Account sizes, fees and fallback APRs are sensitivity assumptions; edit `net_edge_profiles.json` before rerunning for an intended account. Every profile retains explicit risk budgets.
+
+From the repository root:
+
+```powershell
+$env:PYTHONPATH = "_system/scripts"
+python -m reverse_splits.net_edge_study --source-root PATH_TO_REVERSE_SPLITS_DATA --publish
+python _system/scripts/build_reverse_splits_dashboard.py
+```
+
+The source root must contain the existing frozen `local/expansion/expansion_v2/runs/20261013T224003582762Z/` manifest, event shards and nominal `prices.sqlite`; cached SEC companyfacts; the RSI-2.0 snapshots; and both the primary and repair folders of `local/portfolio_research/20261013T224003582762Z__portfolio_v1/`. The study checks event shard hashes, reads SQLite immutable/read-only, and hashes the original books/points/status inputs and borrow vintages. `--prepare-only` extracts source-rated snapshots without portfolio runs. `--fetch-missing --fetch-limit 20` tries a bounded batch of missing companyfacts in the original sample, rejects identity mismatches and stops on denial/rate limiting. It never opens a market-data terminal. Fetch results are retained in ignored `local/net_edge_v3/sec_downloads.json`.
+
+The full local event catalogue and blinded review queue retain missing/unverified names. Published source copies are `net_edge_research_v3.json`, `net_edge_manifest_v3.json` and `net_edge_audits_v3/*.json`. The dashboard builder copies the derived summary and audits and embeds a small hashed summary reference; it does not rerun historical prices in CI. Audit hashes detect stale deployment mixtures. Raw market observations and private broker evidence are not published.
+
+Settlement dates exclude the bank-only Columbus/Veterans holidays, following [FINRA's settlement schedule](https://www.finra.org/rules-guidance/key-topics/margin-accounts/margin-extension-holiday-schedule). Friday stays open when Veterans Day falls on Saturday ([DTCC 19155-23](https://www.dtcc.com/Globals/PDFs/2023/October/11/19155-23)). Settlement remained open on the Bush/Carter mourning dates ([OCC 44143](https://infomemo.theocc.com/infomemos?number=44143), [DTCC 0275](https://www.dtcc.com/-/media/Files/pdf/2024/12/30/0275.pdf)); the trading and settlement calendars therefore differ in both directions. Cost plans do not assume an emergency exchange closure before its announcement became available. Broker-specific settlement failures or other exceptional terms require actual charge records; the default is a regular-way settlement scenario.
+
+## Import contracts
+
+Use JSONL for nested reviews/financing; flat evidence also supports CSV. A whole batch validates before append, and exact duplicates are idempotent. Records require issuer/event identity, original source availability (`known_at`), `source_url` and a precise `locator`. Source date-only fields become usable on the following Eastern calendar day. Creation/ingestion time is separate and must not be backdated.
+
+```powershell
+python -m reverse_splits.net_edge_evidence import --kind facts --input financial_overrides.jsonl
+python -m reverse_splits.net_edge_evidence import --kind reviews --input blinded_reviews.jsonl
+python -m reverse_splits.net_edge_evidence import --kind capitalization --input financing.jsonl
+python -m reverse_splits.net_edge_evidence import --kind borrow --input borrow_history.jsonl
+python -m reverse_splits.net_edge_evidence import --kind executions --input execution_evidence.jsonl
+python -m reverse_splits.net_edge_evidence import --kind cashflows --input cash_adjustments.jsonl
+```
+
+Inputs append under ignored `local/edge_inputs/`; rerun the study after import. An import validates structure and availability, not the truth of a citation or the completeness of a research review.
+
+| Kind | Additional required fields / meaning |
+|---|---|
+| `facts` | `issuer` (`cik/123`), `metric` from `ALIASES` in `net_edge_evidence.py`, numeric `value`, `unit`, period `end`, fiscal `start` for flows; optional accession. A source-cited override fills an observed amount, never a guessed zero. |
+| `reviews` | `event_id`, aware `review_created_at`, `review_mode` (`prospective` or `blinded_historical_reconstruction`), `outcome_blinded=true` for reconstructions, `selected_mechanisms`, `frameworks`. Each framework row needs framework key, status (`supported`, `contradicted`, `unresolved`, `not_applicable`), source availability, citation, mechanism, contrary evidence and falsifier. Use the exact 27 keys in `net_edge.FRAMEWORKS`. Optional reasoned `conviction_rating` is 0–100, separate from numerical deterioration. |
+| Review identity/profile | `identity_reconciled=true`, a dated cited `identity` object, `operating_profile="operating"`, dated cited `profile`. Dated cited `valuation` and `catalyst` objects remain independent required propositions. `vetoes` require cited dates and one of `HARD_VETOES`. |
+| `capitalization` | `event_id`, positive `shares_before` and `common_equity_value_before`, `basis="same_split_basis_claims_and_proceeds_reconciled"`, `scenarios` whose probabilities sum to one. Each has `probability`, nonnegative `incremental_shares`, and `net_proceeds_to_common`; reconcile mutually exclusive claims and proceeds in the source locator. A no-issuance case is explicit, not inferred from a split. |
+| `borrow` | `issuer`, aware `known_at`, `kind` (`indication`, `approval`, `accrual`, `recall`). Rates use annual fractions: 0.50 = 50%. Non-recalls require `annual_rate`, nonnegative `shares`. Approval additionally requires `approved=true`, positive shares and broker `reference`. Accrual requires `value_date`; optional `fee_per_share` overrides modeled daily collateral charges. Public FTP rows remain indications. A recall invalidates older indications and produces a next-open conditional cover. |
+| `executions` quotes/trades | `issuer`, aware `known_at`, UTC epoch `timestamp`. Quotes require `kind="quote"`, `bid`, `ask`, `nbbo_verified=true` and trading status. Trades require `kind="trade"`, `price`, `size`, `aggressor`, `regular_trade`. SSR replay is an explicit queue/timeout scenario; quote files alone do not establish fills. |
+| `executions` fills | `kind="fill"`, `event_id`, `issuer`, `phase` (`entry`, `cover`), `policy_hash` from `StudyPolicy.fingerprint()`, positive nominal `shares` and nominal `price`, `observed=true`, `compliance_verified=true`, `order_reference`, UTC epoch `timestamp`, original aware `known_at`. Reports bind to an actual policy and day; a future cover report never gates entry. |
+| `cashflows` | `event_id`, `kind` (`dividend`, `fractional_settlement_adjustment`), payment `value_date`, signed `cost_per_entry_share`, `basis="incremental_to_continuous_split_adjusted_liability"`. Supply `entitlement_date` when a dividend is paid after cover; it determines whether the held position incurred the liability. A positive amount is a cost; a credit is negative. Reconcile incremental adjustments to the continuous split-adjusted benchmark to avoid double counting. |
+
+The complete-evidence case remains excluded until its required review, financing, announcement indication, fresh entry approval and observed entry evidence exist. A cover without observed evidence leaves performance unresolved. Numerical-screen scenarios explicitly assume borrowing and execution access and use conditional daily-bar returns.
+
+## Prospective archive
+
+The weekday public disclosure/borrow workflow collects recent discovery records, public availability and actual archive times. It freezes explicit abstentions when there is no verified announcement snapshot/model output. Source or approval failure stops the job; an incomplete archive is not called a complete universe. A filing first archived after its scheduled entry is historical backfill, not a prospective prediction. Cancelled and unpriced discoveries remain observations.
+
+```powershell
+python -m reverse_splits.net_edge_evidence capture
+python -m reverse_splits.net_edge_evidence freeze --input frozen_forecasts.jsonl
+python -m reverse_splits.net_edge_evidence outcomes --input observed_outcomes.jsonl
+```
+
+A frozen forecast needs `event_id`, `known_at`, `entry_at`, the full `policy`, `input_hashes`, and `forecast` with status `estimated` or `abstain`. An estimate additionally includes the frozen announcement `snapshot`, `code_sha256`, and gross forecast fields. Run `freeze` before entry, after the source was available; records are hash-chained and cannot be replaced under the same event/policy. This command archives supplied model output; it does not generate an estimate from a discovery phrase hit.
+
+An outcome references `forecast_sha256`, has aware `exit_at`, finite `gross_return` and `net_return`, and dated source evidence. It appends separately and cannot rewrite the forecast. `prospective_status()` reports frozen estimates, abstentions, evaluated forecasts and gross calibration. All older calibration remains diagnostic. The archived abstention denominator must be retained when assessing prospective selection.
+
+## Checks
+
+```powershell
+python -m pytest -q _system/scripts/tests/reverse_splits
+python -m ruff check --select F821 _system/scripts/reverse_splits/net_edge_v3.py _system/scripts/reverse_splits/net_edge_evidence.py _system/scripts/reverse_splits/net_edge_study.py
+node --check dashboard/shorts-edge-v3-viz.js
+```
+
+Tests cover source-time leakage, fiscal/YTD reconciliation, missing financial values, financing proceeds, framework contradictions/N/A, locate versus indication, settlement/weekend carry, nominal rounding and quantities, whole-share joint cost sizing, SSR queue/price tests, unresolved admitted liabilities, observed fills, funding failure and immutable prospective archives.

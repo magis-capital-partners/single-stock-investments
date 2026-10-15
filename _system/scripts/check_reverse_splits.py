@@ -168,6 +168,35 @@ def structural_errors(ledger_dir: Path | None = None) -> list[str]:
                     errors.append('expansion: publication source missing or changed: '+part['path'])
         except (ValueError,KeyError,TypeError) as exc:
             errors.append('expansion: invalid derived ledger: '+str(exc))
+    errors.extend(edge_v3_errors(paths["manifest"].parent))
+    return errors
+
+
+def edge_v3_errors(root: Path) -> list[str]:
+    """Optional research publication must bind summary and policy audits."""
+    manifest_path = root / "net_edge_manifest_v3.json"
+    if not manifest_path.exists(): return []
+    errors = []
+    try:
+        manifest = read_json(manifest_path)
+        summary_path = root / "net_edge_research_v3.json"
+        if sha256_file(summary_path) != manifest["summary_sha256"]:
+            errors.append("RSI-3.0: summary hash mismatch")
+        summary = read_json(summary_path)
+        if summary.get("schema_version") != "shorts_net_edge.v3" or not summary.get("research_only") or summary.get("authority") != "none":
+            errors.append("RSI-3.0: invalid research contract")
+        ids = [r["id"] for r in summary["cases"]]
+        if len(ids) != len(set(ids)) or summary["primary_case"] not in ids:
+            errors.append("RSI-3.0: case identifiers do not reconcile")
+        for row in summary["cases"]:
+            if not row["performance_valid"] and (row["net_pnl"] is not None or row["ending_equity"] is not None):
+                errors.append("RSI-3.0: invalid scenario reports performance")
+        for group, spec in summary["audit_files"].items():
+            target = root / "net_edge_audits_v3" / (group+".json")
+            if spec["url"] != "data/net_edge_audits_v3/"+group+".json" or not target.resolve().is_relative_to(root.resolve()) or sha256_file(target) != spec["sha256"]:
+                errors.append("RSI-3.0: policy audit hash mismatch")
+    except (OSError, ValueError, KeyError, TypeError) as exc:
+        errors.append(f"RSI-3.0: publication incomplete: {exc}")
     return errors
 
 
