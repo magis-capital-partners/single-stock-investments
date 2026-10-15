@@ -13,6 +13,7 @@ Research only. ``authority: none``; no output changes an IRR or a position.
 from __future__ import annotations
 
 import argparse
+import csv
 import sys
 from collections import Counter, defaultdict
 from datetime import date, timedelta
@@ -82,7 +83,7 @@ HONEST_LIMITS = [
     "Current SEC exchange maps and Yahoo history are not a contemporaneous security master; delisted names and failed exit paths are censored, not zero returns.",
     "FINRA short interest is positioning context, not shares that can be sold; the synthetic rows carry average volume only.",
     "Prices, EDGAR phrase hits, control samples and per-trade ledgers are local build artifacts; this feed carries counts, dates and persisted run statistics only.",
-    "The decision journal records reviews and passes, not fills: no Sharpe, time-weighted return or closed-trade result exists until paper fills and daily equity are collected.",
+    "The decision journal records reviews and passes without confirmed fills. Portfolio CAGR and risk ratios here are conditional research; paper and broker performance require actual fills and equity records.",
 ]
 
 
@@ -565,6 +566,8 @@ def build(*, today: date | None = None, ledger_dir: Path | None = None) -> dict:
         "expansion": read_json(paths["manifest"].parent / "expansion_summary.json", None),
         "execution_research": read_json(paths["manifest"].parent / "execution_research.json", None),
         "execution_research_manifest": read_json(paths["manifest"].parent / "execution_research_manifest.json", None),
+        "portfolio_research": read_json(paths["manifest"].parent / "portfolio_research.json", None),
+        "portfolio_research_manifest": read_json(paths["manifest"].parent / "portfolio_research_manifest.json", None),
         "forward_status": read_json(paths["manifest"].parent / "forward_status.json", None),
         "expansion_catalogue": [{**{k:r.get(k) for k in ('event_id','ticker','new_ticker','cik','company','ex_date','ratio','exchange_class','verification','source_url','action_review')},
                                   'price_path':next((o.get('status') if not o.get('reason') else o['reason'] for o in r.get('outcomes',[]) if o.get('cohort')=='ex_plus_1_h5'),'unavailable')}
@@ -575,6 +578,25 @@ def build(*, today: date | None = None, ledger_dir: Path | None = None) -> dict:
     }
 
 
+def write_portfolio_csv(payload: dict, target: Path) -> None:
+    """Export aggregate scenario metrics; omit dated market/trade observations."""
+    cases=(payload.get('portfolio_research') or {}).get('cases',[])
+    if not cases:return
+    def flatten(value, prefix='', result=None):
+        result={} if result is None else result
+        for key,item in value.items():
+            name=prefix+key
+            if isinstance(item,dict):flatten(item,name+'.',result)
+            elif not isinstance(item,(list,tuple)):result[name]=item
+        return result
+    rows=[flatten(case) for case in cases]
+    columns=list(dict.fromkeys(key for row in rows for key in row))
+    target.parent.mkdir(parents=True,exist_ok=True)
+    with target.open('w',encoding='utf-8',newline='') as handle:
+        writer=csv.DictWriter(handle,fieldnames=columns,lineterminator='\n')
+        writer.writeheader();writer.writerows(rows)
+
+
 def main(argv: list[str] | None = None) -> int:
     parser = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
     parser.add_argument("--ledger-dir", type=Path, default=None)
@@ -583,6 +605,7 @@ def main(argv: list[str] | None = None) -> int:
     payload = build(ledger_dir=args.ledger_dir)
     target = args.out or DASHBOARD_PATH
     write_json(target, payload)
+    write_portfolio_csv(payload,target.with_name('reverse_splits_portfolios.csv'))
     c = payload["counts"]
     print(
         f"Wrote {target} events={c['events']} announcements={c['announcements']} "

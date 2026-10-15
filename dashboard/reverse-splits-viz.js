@@ -409,7 +409,7 @@
     const capacity=(e.populations || []).filter(r=>r.schema==='mbp-10').flatMap(r=>(r.capacity || []).map(c=>`<tr><td>${fmtInt(r.entry_seconds_after_open)} sec</td><td>${money(c.notional_usd)}</td><td>${fmtInt(c.both_sides_fit)} / ${fmtInt(r.paired_quotes)}</td><td>${fmtInt(c.insufficient_entry_depth)}</td><td>${fmtInt(c.insufficient_exit_depth)}</td></tr>`)).join('');
     const bps=n=>isNum(n) ? `${(Number(n)*10000).toFixed(1)} bp` : '—';
     const latency=(e.latency_quote_changes || []).map(r=>`<tr><td>${r.execution_mode==='routed-mbp-10' ? 'Listing + Arca + EDGX' : 'Listing venue'}</td><td>${fmtInt(r.entry_seconds_after_open)} sec</td><td>${fmtInt(r.delay_milliseconds)} ms</td><td>${fmtInt(r.pairs)}</td><td>${esc(bps(r.additional_round_trip_cost.mean))}</td><td>${esc(bps(r.additional_round_trip_cost_on_margin && r.additional_round_trip_cost_on_margin.mean))}</td><td>${esc(bps(r.additional_round_trip_cost.median))}</td><td>${esc(bps(r.additional_round_trip_cost.p90))}</td></tr>`).join('');
-    return `<section style="border:1px solid currentColor;padding:12px;margin:16px 0"><h3>Execution costs from historical quotes</h3>
+    return `<section style="border:1px solid currentColor;padding:12px;margin:16px 0"><h3>Earlier quote study · listing venue and initial three-venue comparison</h3>
       <p><strong>The previous daily-range spread estimate is uncalibrated.</strong> The measurements below use Databento’s historical bid, ask and displayed order-book depth. Short at the quoted bid; cover at the quoted ask.</p>
       <p>Entry is measured 1 or 30 seconds after the scheduled open. Cover is measured one second before the scheduled close, including early closes. These are continuous-trading scenarios. Auction participation requires its own fill evidence.</p>
       <div style="overflow:auto"><table class="insights-table"><thead><tr><th>Quote sample</th><th>Entry after open</th><th>Paired quotes / targets</th><th>Median cost / gross</th><th>Mean cost / gross</th><th>Mean cost / margin</th><th>90th percentile / gross</th></tr></thead><tbody>${quoteRows}</tbody></table></div>
@@ -471,7 +471,12 @@
     const current=study.current_borrow_sensitivities || {}, rateRows=(current.populations || []).map(r=>`<tr><td>${esc(r.population.replaceAll('_',' '))}</td><td>${fmtInt(r.quoted_available_names)} / ${fmtInt(r.target_names)}</td><td>${esc(pct(r.median_annual_fraction))}</td><td>${esc(pct(r.mean_annual_fraction))}</td><td>${esc(pct(r.p90_annual_fraction))}</td><td>${fmtInt(r.missing_names)}</td></tr>`).join('');
     const overnight=(study.event_study || []).filter(r=>r.tier==='verified_actions' && ['ex_close_h1','ex_plus_1_close_h1'].includes(r.cohort)).map(r=>`<tr><td>${r.cohort==='ex_close_h1' ? 'Split-day close → next-session close' : 'Next-session close → following close'}</td><td>${fmtInt(r.events)}</td><td>${esc(pct(r.mean_gross_short_return))}</td><td>${esc(pct(expandedMargin[r.cohort] && expandedMargin[r.cohort].mean))}</td><td>${esc(pct(r.positive_share))}</td><td>${esc(interval(r.issuer_interval))}</td></tr>`).join('');
     const forward=doc.forward_status || {}, validation=forward.validation || study.forward_validation || {}, protocol=validation.protocol || {};
-    const pending=(forward.registry || []).map(r=>`<tr><td>${link(r.source_url,r.ticker || `CIK ${r.cik}`)}</td><td>${esc(r.ex_date)}</td><td>${esc(r.next_session || 'Outside calendar')}</td><td>${esc(String(r.status || '').replaceAll('_',' '))}</td></tr>`).join('');
+    const pending=(forward.registry || []).map(r=>{
+      const review=r.source_review, indication=r.public_borrow_indication;
+      const reviewed=review ? `<p class="muted">${esc(review.summary)}</p>` : '';
+      const quoted=indication ? `<p class="muted">Current public indication: ${esc(pct(indication.fee_annual_fraction))} annual · ${fmtInt(indication.available_shares)} shares · ${esc(indication.as_of)}. Not an approved locate.</p>` : '';
+      return `<tr><td>${link(r.source_url,r.ticker || `CIK ${r.cik}`)}</td><td>${esc(r.ex_date)}</td><td>${esc(r.next_session || 'Outside calendar')}</td><td>${esc(String(r.status || '').replaceAll('_',' '))}${reviewed}${quoted}</td></tr>`;
+    }).join('');
     return `<div style="border-top:2px solid currentColor;padding-top:12px;margin:16px 0">
       <h3>One-day gross shorting · next session open → close</h3>
       <p style="font-size:26px;margin:8px 0"><strong>${esc(pct(p.mean))}</strong> <span style="font-size:14px">average gross return · ${fmtInt(p.events)} events · ${fmtInt(p.issuers)} issuers</span></p>
@@ -479,6 +484,7 @@
       <p>${isNum(p.mean) && p.mean>0 ? 'The observed one-day gross price return is positive.' : 'The observed one-day gross price return is not positive.'} This is before trading costs and borrowing. It does not establish an executable net profit.</p>
       <p class="muted">Short at the official opening benchmark in the session after the split; cover at that session’s official closing benchmark. Gross return = 1 − closing price / opening price. Equal weight per event; one session includes both entry and exit. Overnight holds are separate cohorts below.</p>
       <p>Issuer 95% interval: <strong>${esc(interval(p.issuer_interval))}</strong>. Year 95% interval: ${esc(interval(p.year_interval))}. These intervals describe the observed sample; missing OTC histories and security selection still limit representativeness.</p>
+      ${global.ReverseSplitsPortfolioViz ? global.ReverseSplitsPortfolioViz.render(doc) : ''}
       ${renderExecutionResearch(doc)}
       <div style="overflow:auto"><table class="insights-table"><thead><tr><th>One-day sample</th><th>Events</th><th>Issuers</th><th>Mean / gross</th><th>Mean / margin</th><th>Median / gross</th><th>Positive paths</th><th>Issuer 95% interval / gross</th></tr></thead><tbody>${rows}</tbody></table></div>
       <p class="muted">The fundamental threshold stays at 60 with at least three observed signals and a latest period no older than 200 days. Observed SSR causes a skipped one-day entry; unknown status remains conditional. ${esc(day.cost_screen_basis)}</p>
