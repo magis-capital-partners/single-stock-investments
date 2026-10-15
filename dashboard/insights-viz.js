@@ -2731,12 +2731,14 @@
       <p class="tier-sub" style="margin-top:10px">${escapeHtml(doc.disclaimer || 'Context only. Not a trade signal. Not in base IRR.')}</p>
     </details>`;
   }
-  function renderWorldModelStrip(worldModel, escapeHtml, hkSnowball) {
+  function renderWorldModelStrip(worldModel, escapeHtml, hkSnowball, energyModel, energyBridge, energyRefresh) {
+    const energyPanel = typeof EnergyModelViz !== 'undefined' ? EnergyModelViz.render(energyModel, energyBridge, energyRefresh) : '';
     const strip = worldModel && worldModel.strip;
     if (!strip) {
       return `<div class="detail-section world-model-strip">
         <h3>World Model</h3>
         <p class="tier-sub">No snapshot yet. Run: python _system/scripts/build_world_model_snapshot.py</p>
+        ${energyPanel}
         ${renderHkSnowballPanel(hkSnowball, escapeHtml)}
       </div>`;
     }
@@ -2990,6 +2992,7 @@
           ${stance ? `<p class="wm-stance">${escapeHtml(stance)}</p>` : ''}
         </div>
 
+        ${energyPanel}
         ${renderHkSnowballPanel(hkSnowball, escapeHtml)}
 
         ${attentionTable}
@@ -5372,6 +5375,9 @@
       portfolioMacroRegime = null,
       worldModel = null,
       hkSnowball = null,
+      energyModel = null,
+      energyBridge = null,
+      energyRefresh = null,
       tickerSourceFilter = 'ownership',
       podcastShowId = 'all',
       podcastFlagFilter = 'all',
@@ -5575,7 +5581,7 @@
         pdfTimeMode,
       });
     } else if (activeSection === 'tickers') {
-      body = renderWorldModelStrip(worldModel, escapeHtml, hkSnowball)
+      body = renderWorldModelStrip(worldModel, escapeHtml, hkSnowball, energyModel, energyBridge, energyRefresh)
         + renderPortfolioMacroStrip(portfolioMacroRegime, escapeHtml, linkHtml, portfolioMacro)
         + renderTickerEssentials(tickers, escapeHtml, linkHtml, {
           search: fundSearch,
