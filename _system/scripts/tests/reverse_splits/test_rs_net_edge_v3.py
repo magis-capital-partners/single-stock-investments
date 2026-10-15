@@ -68,6 +68,24 @@ def test_friday_return_settlement_bills_weekend_and_daily_rate_changes():
     assert loan["fraction"] == pytest.approx(3*(.5+1+.5)/360/2)
 
 
+def test_bank_holidays_are_not_exchange_settlement_days():
+    from reverse_splits.net_edge_v3 import settlement_day
+    days = ["2026-10-08", "2026-10-09", "2026-10-12", "2026-10-13", "2026-10-14"]
+    loan = loan_schedule("2026-10-08", "2026-10-09", 10., .5, days)
+    assert loan["billed_calendar_days"] == 4 and loan["exit_settlement"] == "2026-10-13"
+    assert str(settlement_day("2026-11-10", ["2026-11-10", "2026-11-11", "2026-11-12"])) == "2026-11-12"
+    # When Veterans Day falls on Saturday, Friday is a normal settlement day.
+    assert str(settlement_day("2023-11-08", ["2023-11-08", "2023-11-09", "2023-11-10", "2023-11-13"])) == "2023-11-10"
+    assert str(settlement_day("2025-01-08", ["2025-01-08", "2025-01-10", "2025-01-13"])) == "2025-01-09"
+
+
+def test_future_emergency_closure_is_not_known_by_an_earlier_cost_plan():
+    from reverse_splits.net_edge_v3 import planning_sessions
+    calendar = ("2025-01-08", "2025-01-10", "2025-01-13")
+    assert "2025-01-09" in planning_sessions(calendar, "2024-12-20T12:00:00+00:00")
+    assert "2025-01-09" not in planning_sessions(calendar, "2025-01-02T12:00:00+00:00")
+
+
 def test_intraday_and_explicit_preborrow_minimum_are_distinct():
     assert loan_schedule("2026-10-15", "2026-10-15", 2., .5, SESSIONS)["fraction"] == 0
     billed = loan_schedule("2026-10-15", "2026-10-15", 2., .5, SESSIONS, minimum_days=1, preborrow_fee_per_share=.01)
@@ -109,6 +127,15 @@ def test_future_restated_companyfacts_and_mixed_currency_are_excluded():
     assert len({r["unit"] for r in metrics["revenues"]}) == 1
     assert currency in {"USD", "EUR"}
     assert all(r["val"] != 1000 for r in metrics["revenues"])
+
+
+def test_utc_date_rollover_does_not_expose_a_later_eastern_filing():
+    from reverse_splits.net_edge_clock import available
+    cutoff = datetime.fromisoformat("2026-10-15T02:00:00+00:00")  # Oct 14, 10pm Eastern
+    assert not available({"known_at": "2026-10-14"}, cutoff)
+    assert available({"known_at": "2026-10-13"}, cutoff)
+    raw = {"facts": {"us-gaap": {"Revenues": {"units": {"USD": [fact(99, "2026-01-01", "2026-06-30", "2026-10-14")]}}}}}
+    assert monetary_facts(raw, cutoff.isoformat())[0]["revenues"] == []
 
 
 def test_missing_debt_stays_unknown_and_ifrs_ratios_need_no_fx_conversion():

@@ -18,7 +18,8 @@ from datetime import date, datetime, timedelta, timezone
 from pathlib import Path
 
 from .ledger import load_jsonl, read_json, write_json
-from .net_edge import FRAMEWORKS, available, moment
+from .net_edge import FRAMEWORKS, moment
+from .net_edge_clock import available, market_date
 
 ALIASES = {
     "revenues": ["RevenueFromContractWithCustomerExcludingAssessedTax", "Revenues", "SalesRevenueNet", "RevenueFromContractWithCustomerIncludingAssessedTax", "Revenue"],
@@ -50,6 +51,7 @@ def days(start, end):
 def monetary_facts(raw, cutoff, overrides=()):
     """Known filings only, one currency across metrics; no implicit FX mixing."""
     candidates = {key: [] for key in ALIASES}
+    cutoff_day = market_date(cutoff)
     for namespace in ("us-gaap", "ifrs-full", "dei"):
         for metric, aliases in ALIASES.items():
             for rank, tag in enumerate(aliases):
@@ -59,8 +61,8 @@ def monetary_facts(raw, cutoff, overrides=()):
                     if metric != "shares" and (len(unit) != 3 or not unit.isupper()): continue
                     for row in rows:
                         value = row.get("val")
-                        if (row.get("form") not in FORMS or not row.get("filed") or row["filed"][:10] >= cutoff[:10]
-                                or not row.get("end") or row["end"] > cutoff[:10]
+                        if (row.get("form") not in FORMS or not row.get("filed") or row["filed"][:10] >= cutoff_day
+                                or not row.get("end") or row["end"] > cutoff_day
                                 or not isinstance(value, (int, float)) or not math.isfinite(value)):
                             continue
                         if metric in FLOWS and not row.get("start"): continue
@@ -128,7 +130,7 @@ def filing_rating(raw, cutoff, screen, *, overrides=(), expected_cik=None):
     metrics, currency = monetary_facts(raw, cutoff, overrides)
     anchors = sorted({r["end"] for k in FLOWS for r in metrics[k]}, reverse=True)
     anchor = anchors[0] if anchors else max((r["end"] for rows in metrics.values() for r in rows), default=None)
-    if anchor is None or not 0 <= days(anchor, cutoff[:10]) <= 200:
+    if anchor is None or not 0 <= days(anchor, market_date(cutoff)) <= 200:
         return {"score": None, "status": "stale_or_missing_period", "period": anchor, "currency": currency, "signals": {}, "evidence": []}
     flows, prior = {}, {}
     evidence = []
@@ -195,7 +197,7 @@ def capitalization(record, cutoff):
     if not scenarios or abs(sum(r.get("probability", 0) for r in scenarios)-1) > 1e-8:
         raise ValueError("Capitalization scenarios must sum to one")
     old, equity = record.get("shares_before"), record.get("common_equity_value_before")
-    if not isinstance(old, (int, float)) or old <= 0 or not isinstance(equity, (int, float)) or equity <= 0:
+    if not isinstance(old, (int, float)) or not math.isfinite(old) or old <= 0 or not isinstance(equity, (int, float)) or not math.isfinite(equity) or equity <= 0:
         raise ValueError("Positive common-equity value and reconciled shares are required")
     values = []
     for row in scenarios:

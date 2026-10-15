@@ -25,7 +25,7 @@ from .net_edge_evidence import (capitalization, digest, fetch_missing_companyfac
                                 filing_rating, prospective_status, validate_import)
 from .net_edge_v3 import (VERSION, Account, StudyPolicy, assessment, calibration,
                           calendar_mark, commission, daily_exit, dated_borrow,
-                          loan_schedule, maintenance_per_share, payoff_forecast,
+                          loan_schedule, maintenance_per_share, payoff_forecast, planning_sessions,
                           size_position, ssr_limit_fill)
 
 RUN_ID = "20261013T224003582762Z"
@@ -220,7 +220,7 @@ def build_snapshots(events, store, source, output, evidence):
 
 
 def source_available(record, cutoff):
-    from .net_edge import available
+    from .net_edge_clock import available
     return bool(record.get("source_url") and record.get("locator") and available(record, cutoff))
 
 
@@ -399,7 +399,7 @@ def simulate(candidates, policy, account, sessions, store, evidence, *, variant)
                 reason = "known_borrow_recall"
             result = {"shares": 0, "reason": reason} if reason else size_position(f, candidate["curve"], o["entry_price"], day, rate, sessions, policy, account,
                 equity=nav, adv=o.get("prior_adv"), inventory=min(approval["shares"], entry_fill["shares"]) if variant == "strict" and approval and entry_fill else approval.get("shares") if approval else None,
-                used_margin=used_margin, used_stress=used_stress, rating=s.get("conviction_rating") if variant == "strict" and s.get("conviction_rating") is not None else s["screen_rating"], mode="net_edge" if variant in {"net_edge", "strict"} else "baseline", carry_cache=candidate.setdefault("carry_cache", {}))
+                used_margin=used_margin, used_stress=used_stress, rating=s.get("conviction_rating") if variant == "strict" and s.get("conviction_rating") is not None else s["screen_rating"], mode="net_edge" if variant in {"net_edge", "strict"} else "baseline", carry_cache=candidate.setdefault("carry_cache", {}), calendar_asof=entry_clock.isoformat())
             reason = result["reason"]
             journal.append({"key": s["key"], "ticker": s["ticker"], "date": day, **result})
             if not result["shares"]:
@@ -525,13 +525,13 @@ def main(argv=None):
     source = args.source_root.resolve()
     settings = read_json(args.profiles or destination/"net_edge_profiles.json")
     policy = StudyPolicy(**settings["policy"])
-    code_hashes = {name: digest(Path(__file__).with_name(name)) for name in ("net_edge_study.py", "net_edge_v3.py", "net_edge_evidence.py")}
+    code_hashes = {name: digest(Path(__file__).with_name(name)) for name in ("net_edge_study.py", "net_edge_v3.py", "net_edge_evidence.py", "net_edge_clock.py")}
     accounts = {r["id"]: Account(**r["account"]) for r in settings["accounts"]}
     events, frozen = collect_catalogue(source)
     # Exchange calendars are already a local research dependency; this import
     # makes no data-provider call.
     from .universe_study import trading_calendar
-    sessions = trading_calendar("2018-03-01", "2027-02-01")
+    sessions = tuple(trading_calendar("2018-03-01", "2027-02-01"))
     store = PriceStore(frozen/"prices.sqlite", events)
     evidence = read_evidence(destination/"local/edge_inputs")
     evidence["borrow"] += public_borrow_history(source, events)
@@ -550,6 +550,8 @@ def main(argv=None):
         return snapshots
     old = read_json(source/"local/net_edge_v2/snapshots.json")
     costs = cost_observations(source, old)
+    announcement_curves = {k: cost_curve(s, costs, policy) for k, s in snapshots.items() if s["screen_rating"] is not None}
+    entry_curves = {}
     cases, primary_names, validation, path_coverage, audit_files = [], [], {}, [], {}
     for entry in ("announcement_next_open", "post_split_next_open"):
         for hold in (1, 5, 10, 20):
@@ -559,9 +561,11 @@ def main(argv=None):
                 donors = donor_rows(snapshots, outcomes, p)
                 forecasts = {k: payoff_forecast(s, donors, p) for k, s in snapshots.items()}
                 for k, f in forecasts.items():
-                    s, planned = snapshots[k], entry_day(snapshots[k], p, sessions)
-                    if f["status"] != "estimated" or not s.get("price") or not planned: continue
-                    curve = cost_curve(s, costs, p)
+                    s = snapshots[k]
+                    if f["status"] != "estimated" or not s.get("price"): continue
+                    planned = entry_day(s, p, planning_sessions(sessions, s["known_at"]))
+                    if not planned: continue
+                    curve = announcement_curves[k]
                     rate = (s["announcement_borrow"] or {}).get("annual_rate", p.assumed_annual_borrow)
                     adv = s["prior_dollar_adv"]/s["price"] if s.get("prior_dollar_adv") else None
                     carry_cache = {}
@@ -571,7 +575,13 @@ def main(argv=None):
                 write_json(output/(f"frozen_forecasts_{entry}_{hold}_{'bracket' if bracket else 'time'}.json"), forecasts)
                 # Re-price execution costs using information available at entry;
                 # the thesis and training cutoff remain frozen at announcement.
-                curves = {k: cost_curve({**s, "price": outcomes[k].get("entry_price") or s["price"]}, costs, policy) for k, s in snapshots.items()}
+                curves = {}
+                for k, s in snapshots.items():
+                    if forecasts[k]["status"] != "estimated": curves[k] = []; continue
+                    cache_key = entry, k
+                    if cache_key not in entry_curves:
+                        entry_curves[cache_key] = cost_curve({**s, "price": outcomes[k].get("entry_price") or s["price"]}, costs, policy)
+                    curves[k] = entry_curves[cache_key]
                 candidates = [{"snapshot": s, "outcome": outcomes[k], "forecast": forecasts[k], "curve": curves[k]} for k, s in snapshots.items()]
                 group = f"{entry}_{hold}_{'bracket' if bracket else 'time'}"
                 audit = {"policy": group, "forecasts": {k: {field: value for field, value in f.items()
@@ -645,6 +655,7 @@ def main(argv=None):
                    "Source prices are verified nominal venue observations; missing bars remain unresolved in coverage, never silently converted into winning returns.",
                    "The bootstrap does not establish the probability of rare squeezes; separate +200% name and sleeve stress limits remain binding."],
         "sources": [{"title": "SEC Rule 201 execution guidance", "url": "https://www.sec.gov/rules-regulations/staff-guidance/trading-markets-frequently-asked-questions-7"},
+                    {"title": "FINRA settlement holidays", "url": "https://www.finra.org/rules-guidance/key-topics/margin-accounts/margin-extension-holiday-schedule"},
                     {"title": "IBKR daily borrow calculation", "url": "https://www.ibkrguides.com/reportingreference/reportguide/borrowfeedetails_default.htm"}]}
     write_json(output/"summary.json", publication)
     manifest = {"schema_version": "shorts_edge_manifest.v3", "summary_sha256": digest(output/"summary.json"),

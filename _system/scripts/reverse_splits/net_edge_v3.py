@@ -10,15 +10,61 @@ import json
 import math
 from dataclasses import asdict, dataclass
 from datetime import date, datetime, timedelta, timezone
+from functools import lru_cache
 from statistics import mean
 
 import numpy as np
 
-from .net_edge import FRAMEWORKS, available, distribution, moment, settlement_day
+from .net_edge import FRAMEWORKS, distribution, moment
+from .net_edge_clock import available
 
 VERSION = "RSI-3.0"
 HARD_VETOES = {"identity_mismatch", "instrument_ineligible", "borrow_unavailable",
                "unfunded_stress", "thesis_falsified"}
+
+
+@lru_cache(maxsize=16)
+def settlement_calendar(sessions):
+    """US equity settlement differs from exchange opening dates.
+
+    FINRA's holiday schedule excludes Columbus/Veterans Day. DTCC operated
+    normally on the 2018 and 2025 national days of mourning. A Saturday
+    Veterans Day does not close Friday (DTCC notice 19155-23).
+    """
+    holidays = set()
+    for year in {int(s[:4]) for s in sessions}:
+        october = date(year, 10, 1)
+        holidays.add((october+timedelta(days=(7-october.weekday()) % 7+7)).isoformat())
+        veterans = date(year, 11, 11)
+        holidays.add((veterans+timedelta(days=1 if veterans.weekday() == 6 else 0)).isoformat())
+    extra = {d for d in ("2018-12-05", "2025-01-09") if sessions[0] <= d <= sessions[-1]}
+    return tuple(sorted((set(sessions) | extra)-holidays))
+
+
+def settlement_day(trade_day, sessions):
+    calendar = settlement_calendar(tuple(sessions))
+    lag = 1 if trade_day >= "2024-05-28" else 2
+    index = bisect.bisect_right(calendar, trade_day)+lag-1
+    if index >= len(calendar): raise ValueError("Settlement calendar does not cover the loan")
+    return date.fromisoformat(calendar[index])
+
+
+@lru_cache(maxsize=4096)
+def _planning_sessions(sessions, known_at):
+    """Do not project a later emergency market closure into an earlier plan.
+
+    Conservative next-day availability for the public closure announcements.
+    Realized trading paths still follow the actual exchange calendar.
+    """
+    if not known_at: return sessions
+    cutoff = moment(known_at)
+    closures = {"2018-12-05": "2018-12-03T00:00:00+00:00", "2025-01-09": "2024-12-31T00:00:00+00:00"}
+    extra = {d for d, available_at in closures.items() if sessions[0] <= d <= sessions[-1] and cutoff < moment(available_at)}
+    return tuple(sorted(set(sessions) | extra)) if extra else sessions
+
+
+def planning_sessions(sessions, known_at):
+    return _planning_sessions(tuple(sessions), known_at)
 
 
 @dataclass(frozen=True)
@@ -223,7 +269,7 @@ def prior_issuers(snapshot, donors, policy):
         value += .2 * abs(math.log(row["ratio"] / snapshot["ratio"]))
         common = row.get("framework_features", {}).keys() & snapshot.get("framework_features", {}).keys()
         if common:
-            value += mean(abs(row["framework_features"][k] - snapshot["framework_features"][k]) for k in common)
+            value += math.fsum(abs(row["framework_features"][k] - snapshot["framework_features"][k]) for k in common)/len(common)
         if row.get("dilution") is not None and snapshot.get("dilution") is not None:
             value += abs(row["dilution"] - snapshot["dilution"])
         return value, row["issuer"]
@@ -248,6 +294,7 @@ def payoff_forecast(snapshot, donors, policy):
             "gross_lower_bound": float(np.quantile(boot, 1-policy.confidence)) * shrink,
             "gross_upper_bound": float(np.quantile(boot, policy.confidence)) * shrink,
             "confidence": policy.confidence, "shrinkage": shrink,
+            "known_at": snapshot["known_at"],
             "gross": distribution(returns.tolist()), "gross_scenarios": returns.tolist(),
             "holding_scenarios": [{k: d[k] for k in ("hold_sessions", "collateral_factors", "rate_factors") if k in d} for d in selected],
             "expected_hold_sessions": mean(d["hold_sessions"] for d in selected),
@@ -266,7 +313,7 @@ def cost_at(curve, notional):
 
 def size_position(forecast, curve, price, entry_day, rate, sessions, policy, account, *,
                   equity=None, adv=None, inventory=None, used_margin=0., used_stress=0.,
-                  rating=100., mode="net_edge", carry_cache=None):
+                  rating=100., mode="net_edge", carry_cache=None, calendar_asof=None):
     """Search costs at each feasible size; a tiny order cannot veto a larger one."""
     nav = account.equity if equity is None else equity
     if forecast.get("status") != "estimated":
@@ -284,6 +331,7 @@ def size_position(forecast, curve, price, entry_day, rate, sessions, policy, acc
     if maximum * price < policy.minimum_notional:
         return {"shares": 0, "reason": "minimum_order_or_capacity"}
     cache = carry_cache if carry_cache is not None else {}
+    sessions = planning_sessions(sessions, calendar_asof or forecast.get("known_at"))
     shock = 1+account.squeeze_increase
     cache_key = entry_day, price, rate, shock
     if cache_key not in cache:
@@ -301,6 +349,15 @@ def size_position(forecast, curve, price, entry_day, rate, sessions, policy, acc
     # Calculate the broker fee on nominal cover shares after known splits.
     # Vectorization preserves commission minima/caps without a nested size loop.
     candidates = list(candidates)
+    if mode == "baseline":
+        candidates.reverse()  # Largest feasible order is the exact baseline objective.
+    elif forecast["gross_lower_bound"] <= 0:
+        # Nonnegative costs cannot rescue a nonpositive gross lower bound.
+        # Within a cost bucket, dollar lower-bound edge decreases with size;
+        # evaluate its first whole-share order for an exact rejected-trial audit.
+        minimum = max(1, math.ceil(policy.minimum_notional/price))
+        candidates = sorted({minimum, *[math.floor(r["notional"]/price)+1 for r in curve
+                                         if minimum <= math.floor(r["notional"]/price)+1 <= maximum]})
     durations = forecast["holding_scenarios"]
     entry_index = sessions.index(entry_day)
     factors = np.array([math.prod(r["ratio"] for r in forecast.get("known_splits", [])
@@ -348,6 +405,7 @@ def size_position(forecast, curve, price, entry_day, rate, sessions, policy, acc
                      "margin": q*maintenance_per_share(price), "reason": "included"}
         if best is None or dollars*(lower if mode == "net_edge" else 1) > best["notional"]*(best["net_lower_bound"] if mode == "net_edge" else 1):
             best = candidate
+        if mode == "baseline": break
     result = best or {**(trial or {}), "shares": 0, "reason": "edge_uncertain_or_nonpositive" if "edge_uncertain_or_nonpositive" in failures else sorted(failures)[0] if failures else "minimum_order_or_capacity",
                       "failed_constraints": sorted(failures)}
     q = result.get("shares") or result.get("trial_shares")
