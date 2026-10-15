@@ -11,11 +11,10 @@ import math
 import sqlite3
 from collections import Counter
 from dataclasses import asdict, replace
-from datetime import datetime, timezone
+from datetime import date, datetime, timezone
 from pathlib import Path
 
 import numpy as np
-import pandas as pd
 
 from .capital_risk import margin
 from .config import load_config
@@ -89,7 +88,7 @@ def snapshots(cfg, rows, events, source, reviews):
                              "WHERE ticker=? AND p.date<? AND v.nominal=1 AND p.close>0 ORDER BY p.date DESC LIMIT 1",
                              (row["ticker"], asof)).fetchone()
         price = prior[1] / event["ratio"] if prior and event.get("ratio", 0) > 0 else None
-        if prior and (pd.Timestamp(asof) - pd.Timestamp(prior[0])).days > 10:
+        if prior and (date.fromisoformat(asof) - date.fromisoformat(prior[0])).days > 10:
             price = None
         liquidity = conn.execute("SELECT p.close*p.volume FROM prices_daily p JOIN price_provenance v USING(ticker,date) "
                                  "WHERE ticker=? AND p.date<? AND v.nominal=1 AND p.close>0 AND p.volume>=0 "
@@ -136,9 +135,9 @@ def snapshots(cfg, rows, events, source, reviews):
 
 def exit_point(row, path, points, policy):
     entry = points[row["key"]]["1/entry"]
-    first = pd.Timestamp(entry["fill_at"]).timestamp()
-    close = pd.Timestamp(points[row["key"]]["1/close"]["decision_at"]).timestamp()
-    deadline = min(close, pd.Timestamp(entry["decision_at"]).timestamp() + policy.max_minutes * 60)
+    first = moment(entry["fill_at"]).timestamp()
+    close = moment(points[row["key"]]["1/close"]["decision_at"]).timestamp()
+    deadline = min(close, moment(entry["decision_at"]).timestamp() + policy.max_minutes * 60)
     ref = entry["reference_mid"]
     trigger = ((path["mid"] <= ref * (1 - policy.profit_take)) | (path["mid"] >= ref * (1 + policy.stop_loss)))
     hits = np.flatnonzero((path["ts"] > first) & (path["ts"] <= deadline) & trigger & policy.use_bracket)
@@ -167,8 +166,8 @@ def outcomes(rows, books, points, index, minute, status, root, policies):
         mid = entry["reference_mid"]
         entrybook = books.get(row["key"], {}).get("1/entry")
         decisionbook = books.get(row["key"], {}).get("1/decision")
-        stamp = pd.Timestamp(entry["fill_at"]).timestamp()
-        decision_stamp = pd.Timestamp(entry["decision_at"]).timestamp()
+        stamp = moment(entry["fill_at"]).timestamp()
+        decision_stamp = moment(entry["decision_at"]).timestamp()
         hist = path["status_history"]
         blocked = any(status_at(hist, "is_trading", t) == "N" or status_at(hist, "is_short_sell_restricted", t) == "Y"
                       for t in (stamp, decision_stamp))
