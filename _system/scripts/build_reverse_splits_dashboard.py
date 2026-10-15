@@ -568,6 +568,8 @@ def build(*, today: date | None = None, ledger_dir: Path | None = None) -> dict:
         "execution_research_manifest": read_json(paths["manifest"].parent / "execution_research_manifest.json", None),
         "portfolio_research": read_json(paths["manifest"].parent / "portfolio_research.json", None),
         "portfolio_research_manifest": read_json(paths["manifest"].parent / "portfolio_research_manifest.json", None),
+        "net_edge_research": read_json(paths["manifest"].parent / "net_edge_research.json", None),
+        "net_edge_manifest": read_json(paths["manifest"].parent / "net_edge_manifest.json", None),
         "forward_status": read_json(paths["manifest"].parent / "forward_status.json", None),
         "expansion_catalogue": [{**{k:r.get(k) for k in ('event_id','ticker','new_ticker','cik','company','ex_date','ratio','exchange_class','verification','source_url','action_review')},
                                   'price_path':next((o.get('status') if not o.get('reason') else o['reason'] for o in r.get('outcomes',[]) if o.get('cohort')=='ex_plus_1_h5'),'unavailable')}
