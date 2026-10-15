@@ -97,6 +97,28 @@ fell from ~3.0 to ~0.55 episodes/hour — a 5.5× collapse measured across the
 checkpoints either side of `llama-server` starting on 2026-08-26. The analyser
 now waits for the daemon to be idle by default.
 
+## Mac Mini always-on lane
+
+For the Apple Silicon Mac Mini, do **not** run the Windows PowerShell supervisors.
+Install one sequenced LaunchAgent that keeps Whisper, YouTube captions, and the
+qwen analysis draining without overlapping the heavy phases:
+
+```bash
+# On the Mac Mini, from a checkout of this repo:
+bash _system/scripts/install_mac_media_lane.sh
+# Optional: RESEARCH_VAULT_ROOT=/path/to/research-vault bash _system/scripts/install_mac_media_lane.sh
+
+python _system/scripts/media_lane_supervisor.py --status
+# Logs: ~/Projects/ssi-local-lanes/tmp/media_lane_supervisor.log
+# Unload: bash _system/scripts/install_mac_media_lane.sh --unload
+```
+
+Defaults chosen so the Mini stays usable: `nice 15`, Whisper threads capped at 4,
+pause below ~2.5 GB reclaimable memory, launchd soft RSS 8 GiB, YouTube Whisper
+off by default (captions only; podcast Whisper owns the CPU). Same models as the
+Windows lane: Whisper `distil-large-v3`, analysis `qwen-gpu` / `qwen/qwen3.5-9b`
+via LM Studio (`llm_local.py` discovers the Mac `llama-server` port).
+
 ## Config
 
 - `_system/reference/podcasts/show_registry.json`
