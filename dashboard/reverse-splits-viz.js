@@ -471,7 +471,12 @@
     const current=study.current_borrow_sensitivities || {}, rateRows=(current.populations || []).map(r=>`<tr><td>${esc(r.population.replaceAll('_',' '))}</td><td>${fmtInt(r.quoted_available_names)} / ${fmtInt(r.target_names)}</td><td>${esc(pct(r.median_annual_fraction))}</td><td>${esc(pct(r.mean_annual_fraction))}</td><td>${esc(pct(r.p90_annual_fraction))}</td><td>${fmtInt(r.missing_names)}</td></tr>`).join('');
     const overnight=(study.event_study || []).filter(r=>r.tier==='verified_actions' && ['ex_close_h1','ex_plus_1_close_h1'].includes(r.cohort)).map(r=>`<tr><td>${r.cohort==='ex_close_h1' ? 'Split-day close → next-session close' : 'Next-session close → following close'}</td><td>${fmtInt(r.events)}</td><td>${esc(pct(r.mean_gross_short_return))}</td><td>${esc(pct(expandedMargin[r.cohort] && expandedMargin[r.cohort].mean))}</td><td>${esc(pct(r.positive_share))}</td><td>${esc(interval(r.issuer_interval))}</td></tr>`).join('');
     const forward=doc.forward_status || {}, validation=forward.validation || study.forward_validation || {}, protocol=validation.protocol || {};
-    const pending=(forward.registry || []).map(r=>`<tr><td>${link(r.source_url,r.ticker || `CIK ${r.cik}`)}</td><td>${esc(r.ex_date)}</td><td>${esc(r.next_session || 'Outside calendar')}</td><td>${esc(String(r.status || '').replaceAll('_',' '))}</td></tr>`).join('');
+    const pending=(forward.registry || []).map(r=>{
+      const review=r.source_review, indication=r.public_borrow_indication;
+      const reviewed=review ? `<p class="muted">${esc(review.summary)}</p>` : '';
+      const quoted=indication ? `<p class="muted">Current public indication: ${esc(pct(indication.fee_annual_fraction))} annual · ${fmtInt(indication.available_shares)} shares · ${esc(indication.as_of)}. Not an approved locate.</p>` : '';
+      return `<tr><td>${link(r.source_url,r.ticker || `CIK ${r.cik}`)}</td><td>${esc(r.ex_date)}</td><td>${esc(r.next_session || 'Outside calendar')}</td><td>${esc(String(r.status || '').replaceAll('_',' '))}${reviewed}${quoted}</td></tr>`;
+    }).join('');
     return `<div style="border-top:2px solid currentColor;padding-top:12px;margin:16px 0">
       <h3>One-day gross shorting · next session open → close</h3>
       <p style="font-size:26px;margin:8px 0"><strong>${esc(pct(p.mean))}</strong> <span style="font-size:14px">average gross return · ${fmtInt(p.events)} events · ${fmtInt(p.issuers)} issuers</span></p>
