@@ -161,12 +161,8 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 20
     env:
-      # Tests that fail on main for reasons outside this workflow. They are
-      # deselected from the gate and run separately below, which says so when
-      # one starts passing. Owners: the D1/portfolio-hub and deploy lanes.
-      #   timer expectation (5min) vs portfolio-hub-publisher.timer (1h)
-      KNOWN_FAILURES: >-
-        _system/scripts/tests/test_d1_read_efficiency.py::test_hot_routes_do_not_scan_full_history
+      # Empty after the publisher cadence assertion was reconciled with main.
+      KNOWN_FAILURES: ""
       # Suites that live beside the scripts rather than under tests/. Missing
       # files are skipped, so a list entry can land before its file does.
       EXTRA_TEST_FILES: >-
