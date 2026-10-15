@@ -213,7 +213,7 @@ def write_amzn_weekly(offline: bool = False) -> Path:
 
 
 def fetch_blockchain_hashrate() -> tuple[list[tuple[str, float]], str | None]:
-    """Full-history network hashrate from blockchain.info (TH/s â†’ EH/s)."""
+    """Full-history network hashrate from blockchain.info (TH/s to EH/s)."""
     data = _get_json(f"{BLOCKCHAIN_CHARTS}/hash-rate?timespan=all&format=json")
     if not data or not isinstance(data, dict):
         return [], "network"
@@ -562,7 +562,7 @@ def build(theme_filter: str | None = None, offline: bool = False) -> dict:
     try:
         amzn_path = write_amzn_weekly(offline=offline)
         manifest["amzn_weekly_path"] = str(amzn_path.relative_to(ROOT)).replace("\\", "/")
-    except Exception as exc:  # noqa: BLE001 â€” companion series must not fail crypto panel
+    except Exception as exc:  # noqa: BLE001 - companion series must not fail crypto panel
         manifest["amzn_weekly_error"] = str(exc)
     try:
         import btc_cost_of_production as cop  # noqa: WPS433

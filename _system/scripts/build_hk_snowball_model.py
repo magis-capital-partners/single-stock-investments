@@ -630,6 +630,10 @@ def build(*, as_of: date | None = None) -> Path:
         source=cost_source,
     )
     supply["scenarios"] = fan
+    supply["energy_overlay"] = {
+        "file": "energy_btc_bridge.json", "optional": True, "in_base_irr": False,
+        "note": "Separate conditional mining-cost sensitivity on the World Model tab."
+    }
     supply["bands"] = {
         "electricity_only_usd": round(elec_series[-1][1], 2) if elec_series else None,
         "all_in_usd": round(current_all_in, 2),
