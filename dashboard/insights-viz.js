@@ -2567,8 +2567,9 @@
     const residualTxt = residual != null && Number.isFinite(Number(residual))
       ? `${Number(residual) > 0 ? '+' : ''}${Number(residual).toFixed(0)}% vs model`
       : '';
-    const floorNow = floorSeries.length ? floorSeries[floorSeries.length - 1].v : supply.halving_2028_cost_usd;
-    const premNow = premSeries.length ? premSeries[premSeries.length - 1].v : supply.halving_2028_premium_band_usd;
+    // Current callouts use the dated snapshot rather than a forward chart point.
+    const floorNow = (supply.bands || {}).all_in_usd || supply.as_of_cost_usd;
+    const premNow = (supply.bands || {}).premium_usd || (floorNow ? floorNow * 1.75 : null);
     const modelNow = demand.model_price_as_of;
 
     const rail = `<aside class="hk-callout-rail" aria-label="Key levels">
