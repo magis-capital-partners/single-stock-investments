@@ -61,7 +61,7 @@
       <details><summary>Year-by-year account results</summary><div class="rsp-scroll"><table class="insights-table"><thead><tr><th>Year</th><th>Trades</th><th>Net</th><th>Account return</th><th>Net / gross</th><th>Net / margin</th><th>Ending account</th></tr></thead><tbody>${annual}</tbody></table></div><p class="muted">* Partial calendar year. Account returns include idle days. Gross and margin returns divide annual profit by summed entry capital, which is reused.</p></details>`;
   }
 
-  function render(doc) {
+  function renderDetailed(doc) {
     const data=doc.portfolio_research;
     if(!data)return '';
     current=data;
@@ -87,9 +87,52 @@
       <details><summary>History coverage and calculation definitions</summary><p>${esc(data.history.older_history_status)}</p><p>Quote recovery added ${count(recovery.recovered_quote_pairs || 0)} events from ${count(recovery.dated_identity_candidates || 0)} candidates with dated identities. The expanded comparison has ${count(data.expanded_sample?.events)} events; it uses quote midpoint pairs and remains separate from the original auction sample.</p><div class="rsp-scroll"><table class="insights-table"><thead><tr><th>Event year</th><th>Verified actions</th><th>Priced benchmark</th><th>Unpriced benchmark</th><th>Original entry-year sample</th><th>Recovered entry-year events</th></tr></thead><tbody>${historyRows}</tbody></table></div><p class="muted">Verification counts use the reverse-split event year; the last two columns use the trade entry year.</p><div class="rsp-scroll"><table class="insights-table"><thead><tr><th>Exchange class</th><th>Verified actions</th><th>Priced benchmark</th><th>Unpriced benchmark</th></tr></thead><tbody>${exchangeRows}</tbody></table></div><p>Price-event coverage is incomplete even within 2018–2026. Earlier missing names remain coverage gaps. This study does not represent a complete reverse-split census.</p><dl>${Object.entries(data.definitions).map(([k,v])=>`<dt><strong>${esc(k)}</strong></dt><dd>${esc(v)}</dd>`).join('')}</dl><ul>${data.limits.map(s=>`<li>${esc(s)}</li>`).join('')}</ul><p class="muted">Historical quote requests: ${count(data.collection.requests)} · quoted data cost $${Number(data.collection.quoted_usd).toFixed(4)} · licensed books and individual trade records remain local.</p></details></section>`;
   }
 
+  const signedPct = value => num(value) ? `${Number(value)>0 ? '+' : ''}${pct(value)}` : '—';
+  const tone = value => num(value) ? (Number(value)<0 ? 'is-negative' : 'is-positive') : '';
+  const period = data => `${data.history.priced_start} → ${data.history.end}`;
+  const primaryCase = data => data.cases.find(r=>r.case.id===data.protocol.primary_case) || data.cases[0];
+
+  function teaser(doc) {
+    const data=doc?.portfolio_research;
+    if(!data?.cases?.length)return '';
+    const primary=primaryCase(data),sample=data.full_sample_cost_outcomes;
+    return `<aside class="rsp-teaser" aria-label="Reverse-split backtest results"><div><p class="rsp-kicker">Reverse-split backtest · ${count(data.sample.events)} events</p><h2>See what survives trading costs.</h2><p>${esc(period(data))} · same-day holds · conditional research</p></div><dl><div><dt>All events · average net ROG</dt><dd class="${tone(sample.gross_returns.mean)}">${signedPct(sample.gross_returns.mean)}</dd></div><div><dt>Filtered account · CAGR</dt><dd>${signedPct(primary.portfolio.cagr)}</dd></div></dl><a class="rsp-action" href="#/ideas/short-alpha/backtest">Open backtest results <span aria-hidden="true">↗</span></a></aside>`;
+  }
+
+  function render(doc) {
+    const data=doc?.portfolio_research;
+    if(!data?.cases?.length)return '';
+    current=data;
+    const primary=primaryCase(data),p=primary.portfolio,c=primary.capital,sample=data.full_sample_cost_outcomes;
+    const stop=data.cases.find(r=>r.case.id==='all_stop5');
+    const shock=(primary.squeeze_stresses || []).find(r=>r.rise===5);
+    const fullMean=sample.gross_returns.mean;
+    const conclusion=num(fullMean) ? (fullMean<0 ? 'Trading every event loses after costs.' : 'Trading every event has a positive modeled net return.') : 'Net returns are not available for every event.';
+    const metrics=[['Net return on gross',signedPct(c.rog)],['Net return on margin',signedPct(c.rom)],['Sharpe · 0% risk-free',ratio(p.sharpe_rf0)],['Sortino · zero target',ratio(p.sortino_rf0)],['Maximum closing drawdown',pct(p.max_drawdown)],['Calmar · full period',ratio(p.calmar_full_period)]];
+    const comparisons=data.cases.filter(r=>['all_close','all_stop5','all_stop10','all_stop20','all_time15','all_time60'].includes(r.case.id)).map(r=>`<tr${r.case.id===primary.case.id ? ' class="is-primary"' : ''}><th scope="row"><button type="button" data-case="${esc(r.case.id)}" onclick="ReverseSplitsPortfolioViz.explore(this.dataset.case)">${esc(rules[r.case.rule])}</button>${r.case.id===primary.case.id ? '<small>Primary case</small>' : ''}</th><td data-label="CAGR">${signedPct(r.portfolio.cagr)}</td><td data-label="Net ROG">${signedPct(r.capital.rog)}</td><td data-label="Net ROM">${signedPct(r.capital.rom)}</td><td data-label="Drawdown">${pct(r.portfolio.max_drawdown)}</td><td data-label="Worst 5% loss">${pct(r.tail.gross.loss_es_95)}</td></tr>`).join('');
+    return `<section class="rsp-overview" aria-labelledby="rsp-results-title"><header class="rsp-results-head"><div><p class="rsp-kicker">Same-day shorting · ${esc(period(data))}</p><h2 id="rsp-results-title" tabindex="-1">Reverse-split backtest</h2><p>${count(data.sample.events)} priced events · ${count(data.sample.issuers)} issuer keys · ${count(data.expanded_sample?.events)} including recovered quote events</p></div><span class="rsp-research-label">Conditional research</span></header>
+      <div class="rsp-verdict"><h3>${esc(conclusion)}</h3><p>The filtered account models ${cash(p.net_pnl)} net ${p.net_pnl<0 ? 'loss' : 'profit'} across ${count(primary.trades)} trades. Historical approved borrowing and broker fills are unverified.</p></div>
+      <dl class="rsp-result-ledger"><div><dt>Price pattern · before costs</dt><dd>${signedPct(sample.auction_price_benchmark?.gross?.mean)}<p>Mean auction price return · ${count(data.sample.events)} events. Continuous-entry net results use different prices.</p></dd></div><div><dt>All events · after costs</dt><dd class="${tone(fullMean)}">${signedPct(fullMean)}<p>Average net ROG · hypothetical $500 per event. Net ROM ${signedPct(sample.margin_returns.mean)}. Ignores account admission rules.</p></dd></div><div><dt>Filtered account · annual growth</dt><dd>${signedPct(p.cagr)} <span>CAGR</span><p>${cash(data.protocol.initial_equity)} → ${cash(p.ending_equity)} · ${count(primary.trades)} modeled trades, including idle days.</p></dd></div></dl>
+      <div class="rsp-account"><div>${curve(primary)}</div><div><h3>Primary account · hold to close</h3><dl class="rsp-account-metrics">${metrics.map(([label,value])=>`<div><dt>${esc(label)}</dt><dd>${value}</dd></div>`).join('')}</dl></div></div>
+      <p class="rsp-definition"><strong>ROG</strong> = profit ÷ summed opening gross exposure. <strong>ROM</strong> = profit ÷ summed entry margin. Both reuse capital; <strong>CAGR</strong> measures annual growth of the whole account.</p>
+      <p class="rsp-assumptions">${pct(primary.case.fraction)} equity cap per name · 0.1% of verified prior venue volume · up to ${count(data.protocol.maximum_names)} names · same-day borrowing: ${count(primary.case.borrow_days)} billed days · cash interest: 0%. Historical locates and house margins remain assumptions.</p>
+      <div class="rsp-risk-note"><strong>Stops can fill beyond their trigger.</strong><p>${stop ? `The 5% stop's worst modeled trade lost ${pct(Math.abs(stop.tail.gross.worst_return))} on gross. ` : ''}${shock ? `A +500% correlated squeeze stress loses ${pct(shock.loss_on_entry_equity)} of account equity. ` : ''}The stress has no assigned probability; short losses have no finite maximum.</p></div>
+      <section class="rsp-exit-comparison" aria-labelledby="rsp-exits-title"><div class="rsp-section-heading"><div><h3 id="rsp-exits-title">Does an earlier exit help?</h3><p>Same admissions and account limits · ${count(primary.trades)} trades in the primary case. Select an exit to inspect all its metrics.</p></div><a href="data/reverse_splits_portfolios.csv" download>Download ${count(data.cases.length)} scenarios (CSV)</a></div><div class="rsp-scroll"><table class="rsp-compare"><caption class="rsp-sr-only">Filtered account comparisons. Worst 5% loss is the average loss in the worst 5% of trades, on gross exposure.</caption><thead><tr><th scope="col">Exit rule</th><th scope="col">CAGR</th><th scope="col">Net ROG</th><th scope="col">Net ROM</th><th scope="col">Drawdown</th><th scope="col">Worst 5% loss</th></tr></thead><tbody>${comparisons}</tbody></table></div><p class="rsp-assumptions">These are historical comparisons, not a parameter selection or an untouched validation sample. The fundamental-screened account has ${count(data.cases.find(r=>r.case.id==='fundamental_close')?.trades)} trades.</p></section>
+      <details id="rsp-advanced" class="rsp-fold"><summary>Explore all ${count(data.cases.length)} scenarios and detailed evidence <small>Borrowing, sizing, margin, costs, annual results, uncertainty and tail stresses</small></summary>${renderDetailed(doc)}</details>
+    </section>`;
+  }
+
   function select(id) {
     const row=current && current.cases.find(r=>r.case.id===id),target=document.getElementById('rs-portfolio-selected');
     if(row && target)target.innerHTML=selected(row);
   }
-  global.ReverseSplitsPortfolioViz={render,select};
+  function explore(id) {
+    const details=document.getElementById('rsp-advanced');
+    if(!details)return;
+    details.open=true;
+    const control=details.querySelector('select');
+    if(control){control.value=id;select(id);control.focus({preventScroll:true});}
+    document.getElementById('rs-portfolio-selected')?.scrollIntoView({block:'start'});
+  }
+  global.ReverseSplitsPortfolioViz={render,select,teaser,explore};
 })(window);
