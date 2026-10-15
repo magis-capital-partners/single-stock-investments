@@ -484,7 +484,6 @@
       <p>${isNum(p.mean) && p.mean>0 ? 'The observed one-day gross price return is positive.' : 'The observed one-day gross price return is not positive.'} This is before trading costs and borrowing. It does not establish an executable net profit.</p>
       <p class="muted">Short at the official opening benchmark in the session after the split; cover at that session’s official closing benchmark. Gross return = 1 − closing price / opening price. Equal weight per event; one session includes both entry and exit. Overnight holds are separate cohorts below.</p>
       <p>Issuer 95% interval: <strong>${esc(interval(p.issuer_interval))}</strong>. Year 95% interval: ${esc(interval(p.year_interval))}. These intervals describe the observed sample; missing OTC histories and security selection still limit representativeness.</p>
-      ${global.ReverseSplitsPortfolioViz ? global.ReverseSplitsPortfolioViz.render(doc) : ''}
       ${renderExecutionResearch(doc)}
       <div style="overflow:auto"><table class="insights-table"><thead><tr><th>One-day sample</th><th>Events</th><th>Issuers</th><th>Mean / gross</th><th>Mean / margin</th><th>Median / gross</th><th>Positive paths</th><th>Issuer 95% interval / gross</th></tr></thead><tbody>${rows}</tbody></table></div>
       <p class="muted">The fundamental threshold stays at 60 with at least three observed signals and a latest period no older than 200 days. Observed SSR causes a skipped one-day entry; unknown status remains conditional. ${esc(day.cost_screen_basis)}</p>
@@ -582,6 +581,12 @@
    * `opts.hideTitle` omits the panel's own "Reverse splits" h2 for a host
    * section that already titles it. Returns HTML; the caller mounts it.
    */
+  function renderForwardSummary(doc) {
+    const forward=doc.forward_status || {}, validation=forward.validation || {}, protocol=validation.protocol || {};
+    const rows=(forward.registry || []).map(r=>`<tr><th scope="row">${link(r.source_url,r.ticker || `CIK ${r.cik}`)}</th><td>${esc(r.ex_date)}</td><td>${esc(r.next_session || 'Requires calendar review')}</td><td>${esc(String(r.status || '').replaceAll('_',' '))}${r.source_review ? `<p class="muted">${esc(r.source_review.summary)}</p>` : ''}${r.public_borrow_indication ? `<p class="muted">Current public indication: ${fmtNum(100*r.public_borrow_indication.fee_annual_fraction)}% annual · ${fmtInt(r.public_borrow_indication.available_shares)} shares · ${esc(r.public_borrow_indication.as_of)}. Not an approved locate.</p>` : ''}</td></tr>`).join('');
+    return `<p>Frozen rules start ${esc(protocol.validation_starts || '—')}. ${fmtInt((forward.registry || []).length)} provisional disclosure records remain subject to review; enrollment is not a trade.</p><p>${esc(protocol.entry || '')} ${esc(protocol.exit || '')}</p><p class="muted">${esc(protocol.approval || '')} ${esc(protocol.review || '')}</p><div class="rsp-scroll"><table class="insights-table"><thead><tr><th scope="col">Name</th><th scope="col">Disclosed date</th><th scope="col">Next session</th><th scope="col">Evidence status</th></tr></thead><tbody>${rows || '<tr><td colspan="4">No provisional disclosures enrolled.</td></tr>'}</tbody></table></div>`;
+  }
+
   function render(doc, options) {
     const opts = options || {};
     if (!doc || typeof doc !== 'object') {
@@ -589,6 +594,15 @@
     }
     if (doc.schema_version && doc.schema_version !== 'reverse_splits.v1') {
       return `${STYLE}<div class="rs-panel"><p class="muted">Unexpected reverse-split schema ${esc(doc.schema_version)}; expected reverse_splits.v1.</p></div>`;
+    }
+    if(doc.portfolio_research && global.ReverseSplitsPortfolioViz){
+      const completed=doc.forward_status?.validation?.completed?.events;
+      return `${STYLE}<div class="rs-panel" data-schema="${esc(doc.schema_version || '')}">
+        ${global.ReverseSplitsPortfolioViz.render(doc)}
+        <details class="rsp-fold"><summary>Forward validation · ${fmtInt(completed)} completed observations<small>Frozen rules, new disclosures and missing broker evidence</small></summary>${renderForwardSummary(doc)}</details>
+        <details class="rsp-fold"><summary>Event registry and upcoming actions<small>Filing sources, inventory coverage, scheduled actions and repeat splitters</small></summary>${renderHead(doc,opts)}${renderTiles(doc)}${renderCounts(doc)}${renderUpcoming(doc)}${renderRecent(doc,opts)}${renderRepeat(doc)}</details>
+        <details class="rsp-fold"><summary>Earlier studies, methods and unresolved exits<small>Original price benchmarks, cost studies, controls, books and process rules</small></summary>${renderExpansion(doc)}${renderBook(doc)}${renderProcess(doc)}${renderLimits(doc)}<p class="subhead">${esc(doc.caption || '')}</p></details>
+      </div>`;
     }
     return `${STYLE}<div class="rs-panel" data-schema="${esc(doc.schema_version || '')}">
       ${renderHead(doc, opts)}
