@@ -504,7 +504,7 @@
   function mountReverseSplits(container, doc) {
     const teaser=container && container.querySelector('[data-short-backtest-teaser]');
     if(teaser){
-      const html=global.ReverseSplitsPortfolioViz?.teaser(doc);
+      const html=global.ShortsNetEdgeViz?.teaser(doc) || global.ReverseSplitsPortfolioViz?.teaser(doc);
       teaser.innerHTML=html || '<p class="rsp-feed-status">Backtest summary unavailable. <a href="#/ideas/short-alpha/backtest">Open the backtest view</a> for its data status.</p>';
       // Older ledgers without portfolio results retain their original mount.
       if(html || !doc)return Boolean(html);
