@@ -1062,6 +1062,22 @@ def compute_valuation(data: dict) -> dict:
         data.setdefault("ai_overlay", {})["status"] = "missing — run ai_infrastructure_valuation.md"
 
     data["as_of"] = data.get("as_of") or str(date.today())
+    # Canonical agent-facing returns block: percent_per_year, explicit unit.
+    _implied = data.get("implied_return") or {}
+    _results = data.get("results") or {}
+    _scenarios = {
+        _name: _row["return_pct"]
+        for _name, _row in _results.items()
+        if isinstance(_row, dict) and isinstance(_row.get("return_pct"), (int, float))
+    }
+    data["schema_version"] = "magis.valuation.v2"
+    data["returns"] = {
+        "base_irr_pct": _implied.get("base_pct", (_results.get("base") or {}).get("return_pct") if isinstance(_results.get("base"), dict) else None),
+        "unit": "percent_per_year",
+        "label": _implied.get("label"),
+        "display": _implied.get("display"),
+        "scenarios_pct": _scenarios,
+    }
     return data
 
 

@@ -1,0 +1,166 @@
+{
+  "schema_version": "magis.agent_shard.v2",
+  "ticker": "9984.T",
+  "company": "SoftBank Group Corp.",
+  "book": "holdings",
+  "shard_status": "built",
+  "as_of": "2026-07-24",
+  "registry": {
+    "market": "JP",
+    "exchange": "TSE",
+    "sleeve": null,
+    "moat": "unproven",
+    "dhando": "pending",
+    "payoff_lens": "pending"
+  },
+  "returns": {
+    "base_irr_pct": 0.8,
+    "unit": "percent_per_year",
+    "label": "7yr IRR",
+    "display": "0.8% (base)",
+    "scenarios_pct": {
+      "base": 0.8,
+      "bear": -3.6,
+      "bull": 5.4
+    }
+  },
+  "thesis_summary": {
+    "thesis": "SoftBank Group Corp. (9984.T) is a **pure holding company** listed on the Tokyo Stock Exchange. **[Fact]** It does not run a standalone operating business at the parent; economics flow through four reportable segments: **holdco investments** (listed and private stakes, including Alibaba marks), **SoftBank Vision Funds (SVF)**, **SoftBank Corp.** (Japanese telecom, majority-owned subsidiary), and **Arm Holdings** (semiconductor IP, listed stake). **[Fact]** FY2025 (ended 2025-03-31) consolidated parent owners equity was **¥11,561,541 million** on **1,452.982 million** average shares, or **¥7,957** book value per share. **[Fact]** Parent net profit was **¥1,153,332 million**, but holdco investment profit alone was **¥3,413,821 million**, driven largely by Alibaba fair-value marks rather than recurring cash. Return to shareholders today is mostly dividends (**¥44** per share full year FY2025) plus mark-driven equity, not steady parent-level free cash flow.",
+    "why_market_wrong": "The stock at **¥5,918** (Yahoo Finance, 2026-07-24) trades at a deep discount to both consolidated book (**¥7,957** per share) and our proof-backed component base of **¥9,432** per share. **[Inference]** Generalists anchor on volatile investment gains, Vision Fund losses, and headline leverage from **asset-backed financing** (Arm margin **¥1,258.5 billion**, Alibaba forward **¥997.8 billion**, SoftBank Corp margin **¥796 billion** as of FY2025) rather than look-through asset value. **[Inference]** The market may be over-discounting Arm royalties, SoftBank Corp dividend upstream, and eventual Alibaba monetization while under-weighting the OpenAI commitment (up to **$30 billion** net) and financing unwind risk. Mispricing is **asset-lens**: value sits in stakes and catalyst exits, not in normalized owner cash at spot.",
+    "stance": "watch",
+    "archetype": "holding_co",
+    "base_irr_pct": 0.8,
+    "base_irr_unit": "percent_per_year",
+    "scenarios": {
+      "base": 0.8,
+      "bear": -3.6,
+      "bull": 5.4
+    },
+    "key_assumptions": [
+      {
+        "input": "Price today",
+        "source": "Yahoo 9984.T close 2026-07-23",
+        "value": "**$5918.0**"
+      },
+      {
+        "input": "Starting free cash flow per share",
+        "source": "FY2025 dividend 44.0 yen/sh plus conservative recurring investment income; excludes one-time Alibaba mark gains",
+        "value": "**$250.0**"
+      },
+      {
+        "input": "Growth in years 1 through 5",
+        "source": "Dividend plus modest recurring investment income",
+        "value": "**2.0%** per year"
+      },
+      {
+        "input": "Growth in years 6 through 7",
+        "source": "Scenario base",
+        "value": "**2.0%** per year"
+      },
+      {
+        "input": "Selling multiple in year 10",
+        "source": "Scenario base",
+        "value": "**15 times cash flow**"
+      },
+      {
+        "input": "Time horizon",
+        "source": "7-year owner-cash model",
+        "value": "**7 years**"
+      }
+    ],
+    "open_questions": [
+      "Confirm live TSE quote before sizing (Yahoo **¥5,918**, 2026-07-24).",
+      "Reconcile component uplift (**+¥2,000/sh**) to latest listed stake prices and segment fair values.",
+      "Review asset-backed financing terms (Arm, Alibaba forward, SoftBank Corp margin) for covenant and collateral triggers.",
+      "OpenAI **$30B** net commitment: funding source and impact on parent liquidity.",
+      "Promote any third-party source via `_system/frameworks/third_party_sources.md` before base IRR blend.",
+      "Milly adversarial pass pending (`adversarial_2026-07-24.md`)."
+    ]
+  },
+  "truncation": {
+    "key_assumptions": {
+      "shown": 6,
+      "total": 6
+    },
+    "open_questions": {
+      "shown": 6,
+      "total": 6
+    },
+    "kpi_series": {
+      "shown": 1,
+      "total": 1
+    },
+    "documents": {
+      "shown": 2,
+      "note": "capped at 15 most recent in builder"
+    }
+  },
+  "kpi_series": [
+    {
+      "metric": "news_flow",
+      "label": "News flow",
+      "direction": "decelerating",
+      "signal_tier": "emerging",
+      "latest": null,
+      "growth_latest": -1.0,
+      "strength": 2.0,
+      "period": "2026-09-01",
+      "human_summary": "News flow growth slowed: +1 to -1 per period (one quarter so far — not confirmed)"
+    }
+  ],
+  "recent_news": [
+    {
+      "title": "SoftBank (9984 JT) is seeking USD 100bln from Gulf investors to expand AI bet and CEO Son held talks with senior figures in the UAE in recent weeks, according to FT - Newsquawk",
+      "published_utc": "2026-10-09T04:55:00+00:00",
+      "category": "management",
+      "confidence": 0.88,
+      "url": "https://news.google.com/rss/articles/CBMipAJBVV95cUxNMTJnZHMzSzR0bWl0djZLc0xRV3ZOVDhDNnFiTy1Xb0xrVWJfb1RmSlV3RmJpVGxrS3VqVElkVVVnRlZSeUtmUThCeXZiU0pKOXYwNUtQbm9sNEtpSGpLbjVuZlcybE1qUzJmY2JtQ3F1blFNN0l1TEtKcDRHclhoNjZHdFNjaURDdkkzSDlYNDBCWFF3YVFLTUwzWmI5c3NLUUhzNVJfYlFRTVlMUEI4dXU4MThEOEZTazZMTHoyZGV6VDlCeHNTQ1hab0ZtZ0dmbHhUNHJ6RlJZZDduN3NWM0lQd0ZwUjliODluWS0zWHNPNk5zLTZGazBRVGRHVjcyb0ZVSGhhejhrU2lmTWxrY1lYaFA2RnNmcGtUaWt2NGt0RTNy?oc=5",
+      "linked_filing": null
+    }
+  ],
+  "documents": [
+    {
+      "document_id": "sha256:110387dc3ea04269de50e888d328286dc510553ca55ea62e9df097e1b08517b0",
+      "title": "annual report fy2025 en",
+      "source_type": "pdf",
+      "local_pdf_path": "9984.T/01_Official/IR/annual_report_fy2025_en.pdf",
+      "text_extract_path": null,
+      "drive_web_view_link": "https://drive.google.com/file/d/1tYu5rP84EKXLUdmpzelRyfg7TtwGoKyz/view?usp=drivesdk",
+      "modified_at": "2026-10-16T16:36:41Z"
+    },
+    {
+      "document_id": "sha256:fc7a87b835179741dd669f7848b3e38648421dc16b41458acb51b2c13e7a149f",
+      "title": "financial report q4fy2024 ja",
+      "source_type": "pdf",
+      "local_pdf_path": "9984.T/01_Official/IR/financial_report_q4fy2024_ja.pdf",
+      "text_extract_path": null,
+      "drive_web_view_link": "https://drive.google.com/file/d/12Y-sNYayf8KvtbG8M3SXbaSSnZfO0Uin/view?usp=drivesdk",
+      "modified_at": "2026-10-16T16:36:41Z"
+    }
+  ],
+  "l2_pointers": {
+    "valuation_json": "9984.T/research/valuation.json",
+    "thesis_card_json": "9984.T/research/thesis_card.json",
+    "filing_digest_md": "9984.T/research/evidence/filing_digest.md",
+    "insider_signal_md": null,
+    "thematic_context_md": "9984.T/research/evidence/thematic_context.md",
+    "source_inventory_json": "9984.T/third-party-analyses/source_inventory.json",
+    "full_ui_shard_json": "dashboard/data/tickers/9984.T.json",
+    "latest_json": "9984.T/research/latest.json",
+    "context_pack_md": "dashboard/data/context_packs/9984.T.md"
+  },
+  "generated_at": "2026-10-16T20:26:21Z",
+  "_envelope": {
+    "schema_version": "magis.feed.v2",
+    "feed_id": "agent-shard-9984.t",
+    "generated_at": "2026-10-16T20:26:21Z",
+    "as_of": "2026-07-24",
+    "content_sha256": "sha256:2762c78cc21c744b854ab4c189e5a21d622fe50e6daaf146484cb5b54337294c",
+    "row_count": 2,
+    "upstream_inputs": [],
+    "health": {
+      "status": "healthy",
+      "structural_errors": 0
+    }
+  }
+}

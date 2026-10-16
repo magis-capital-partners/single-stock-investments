@@ -1,0 +1,17 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "magis.context_pack.v1",
+  "title": "Magis agent context pack manifest",
+  "type": "object",
+  "required": ["schema_version", "ticker", "task", "token_budget", "token_estimate", "included", "excluded"],
+  "properties": {
+    "schema_version": {"const": "magis.context_pack.v1"},
+    "ticker": {"type": "string", "minLength": 1},
+    "task": {"type": "string", "enum": ["deep-dive", "cross-check", "triage", "general"]},
+    "token_budget": {"type": "integer", "minimum": 500},
+    "token_estimate": {"type": "integer", "minimum": 0},
+    "included": {"type": "array", "items": {"type": "string"}},
+    "excluded": {"type": "array", "items": {"type": "string"}},
+    "truncated": {"type": "boolean"}
+  }
+}

@@ -5,10 +5,14 @@ from __future__ import annotations
 import argparse
 import json
 import re
+import sys
 from datetime import date
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[2]
+if str(Path(__file__).resolve().parent) not in sys.path:
+    sys.path.insert(0, str(Path(__file__).resolve().parent))
+from atomic_io import write_json_if_changed, write_text_if_changed  # noqa: E402
 TODAY = date.today().isoformat()
 
 MGMT_PATH = re.compile(
@@ -148,9 +152,13 @@ def build_ticker(ticker: str) -> int:
             lines.append(f"- {c['excerpt'][:300]}")
             lines.append("")
 
-    (evidence / f"management_digest_{TODAY}.md").write_text("\n".join(lines) + "\n", encoding="utf-8")
+    write_text_if_changed(evidence / "management_digest.md", "\n".join(lines) + "\n")
     facts = {"ticker": ticker, "as_of": TODAY, "document_count": len(docs), "claims": all_claims}
-    (evidence / f"management_facts_{TODAY}.json").write_text(json.dumps(facts, indent=2), encoding="utf-8")
+    write_json_if_changed(evidence / "management_facts.json", facts)
+    for old in evidence.glob("management_digest_*.md"):
+        old.unlink(missing_ok=True)
+    for old in evidence.glob("management_facts_*.json"):
+        old.unlink(missing_ok=True)
     print(f"OK {ticker}: docs={len(docs)} claims={len(all_claims)}")
     return 0
 

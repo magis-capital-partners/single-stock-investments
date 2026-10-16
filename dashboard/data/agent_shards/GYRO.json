@@ -1,0 +1,143 @@
+{
+  "schema_version": "magis.agent_shard.v2",
+  "ticker": "GYRO",
+  "company": "Gyrodyne, LLC",
+  "book": "holdings",
+  "shard_status": "built",
+  "as_of": "2026-07-21",
+  "registry": {
+    "market": "US",
+    "exchange": "Nasdaq Capital Market",
+    "sleeve": "real_assets_liquidation",
+    "moat": "n/a",
+    "dhando": "partial",
+    "payoff_lens": "asset"
+  },
+  "returns": {
+    "base_irr_pct": 33.4,
+    "unit": "percent_per_year",
+    "label": "annualized return",
+    "display": "33.4% (base)",
+    "scenarios_pct": {
+      "base": 33.4,
+      "bear": 13.5,
+      "bull": 41.0
+    }
+  },
+  "thesis_summary": {
+    "thesis": "Gyrodyne, LLC owns two real estate properties left over from a much larger portfolio it has been selling off for two decades. **[Fact]** One is Flowerfield, an industrial park and vacant land in St. James, New York (Suffolk County, Long Island). **[Fact]** The other is Cortlandt Manor, a set of medical office buildings and vacant land in Westchester County. **[Fact]** The company is not trying to grow. It is trying to get government approval to subdivide and improve these properties, sell them for the highest price it can, pay off its debts, and then dissolve and send shareholders the cash. **[Fact]** It reports its books on a \"liquidation basis\" of accounting, which means the balance sheet already shows management's best estimate of what everything is worth in cash, not the price originally paid for it decades ago. **[Fact]**",
+    "why_market_wrong": "The company itself discloses, every quarter, its own best estimate of the total cash left for shareholders once the properties are sold and debts are paid: about $11.79 per share as of March 31, 2026. **[Fact]** The stock trades around $5.80, roughly half that estimate. **[Inference]** This is a small, thinly traded stock (about 2.2 million shares total, often only a few thousand shares change hands a day) with an unresolved lawsuit over one of its two properties, so index funds, brokers, and most individual investors cannot or will not hold it, even though the company tells shareholders almost exactly what it expects to distribute and roughly when.",
+    "stance": "hold",
+    "archetype": "optionality",
+    "base_irr_pct": 33.4,
+    "base_irr_unit": "percent_per_year",
+    "scenarios": {
+      "base": 33.4,
+      "bear": 13.5,
+      "bull": 41.0
+    },
+    "key_assumptions": [
+      {
+        "input": "Price today",
+        "source": "Yahoo Finance GYRO close 2026-07-16 (last session on or before as_of; thin volume ~2,000 shares)",
+        "value": "**$5.8**"
+      },
+      {
+        "input": "Payoff price (Year 2.46)",
+        "source": "Sum of parts / catalyst path in IRR steps",
+        "value": "**$11.79**"
+      },
+      {
+        "input": "Horizon (years)",
+        "source": "Model choice in valuation.json (not company guidance)",
+        "value": "**2.46**"
+      },
+      {
+        "input": "Operating / distribution path uplift",
+        "source": "[Assumption], see scenario notes in valuation.json",
+        "value": "**+$3.0/sh**"
+      },
+      {
+        "input": "Catalyst or terminal re-rate uplift",
+        "source": "[Assumption], see scenario notes in valuation.json",
+        "value": "**+$2.99/sh**"
+      }
+    ],
+    "open_questions": [
+      "Confirm whether the Article 78 appeal (Incorporated Village of Head of the Harbor v. Town of Smithtown, et al.) has been decided since the 10-Q filed 2026-05-13. As of that filing it remained pending.",
+      "Confirm current status of the B2K site-plan submission with the Town of Smithtown; company expected approval in the third quarter of 2026.",
+      "Mechanical stance tool proposes \"accumulate\" (base return above 20%, partial dhando, floor passes); Marvin recommends holding at \"hold\" pending human sign-off given thin daily volume (about 2,000-6,000 shares) and the unresolved litigation described above.",
+      "Verify whether any interim or special distribution has been declared since 2026-03-31.",
+      "Confirm the exact composition of the $10,790,194 total loans payable; filings disclose three separate facilities (an original bank line at 3.85%, a 2021 mortgage loan with Rialto Capital at 3.75% maturing October 2026 with an extension option, and a 2023 mortgage loan with LLYR Resources refinanced in January 2026 at 15%) but the pieces identified in the text extract do not fully reconcile to the balance-sheet total; worth a line-item confirmation against the debt footnote table."
+    ]
+  },
+  "truncation": {
+    "key_assumptions": {
+      "shown": 5,
+      "total": 5
+    },
+    "open_questions": {
+      "shown": 5,
+      "total": 5
+    },
+    "kpi_series": {
+      "shown": 2,
+      "total": 2
+    },
+    "documents": {
+      "shown": 0,
+      "note": "capped at 15 most recent in builder"
+    }
+  },
+  "kpi_series": [
+    {
+      "metric": "cash",
+      "label": "Cash",
+      "direction": "decelerating",
+      "signal_tier": "emerging",
+      "latest": 4529597.0,
+      "growth_latest": -0.2322,
+      "strength": 8.257,
+      "period": "2026-06-30",
+      "human_summary": "Cash growth slowed: +46% → -23% YoY (one quarter so far — not confirmed)"
+    },
+    {
+      "metric": "long_term_debt",
+      "label": "Long-term debt",
+      "direction": "steady",
+      "signal_tier": "steady",
+      "latest": 10712950.0,
+      "growth_latest": -0.0212,
+      "strength": 0.013,
+      "period": "2026-06-30",
+      "human_summary": "Long-term debt growth is steady around -2.1% YoY (recent periods)"
+    }
+  ],
+  "recent_news": [],
+  "documents": [],
+  "l2_pointers": {
+    "valuation_json": "GYRO/research/valuation.json",
+    "thesis_card_json": "GYRO/research/thesis_card.json",
+    "filing_digest_md": "GYRO/research/evidence/filing_digest.md",
+    "insider_signal_md": "GYRO/research/evidence/insider_signal.md",
+    "thematic_context_md": "GYRO/research/evidence/thematic_context.md",
+    "source_inventory_json": "GYRO/third-party-analyses/source_inventory.json",
+    "full_ui_shard_json": "dashboard/data/tickers/GYRO.json",
+    "latest_json": "GYRO/research/latest.json",
+    "context_pack_md": "dashboard/data/context_packs/GYRO.md"
+  },
+  "generated_at": "2026-10-16T20:26:21Z",
+  "_envelope": {
+    "schema_version": "magis.feed.v2",
+    "feed_id": "agent-shard-gyro",
+    "generated_at": "2026-10-16T20:26:21Z",
+    "as_of": "2026-07-21",
+    "content_sha256": "sha256:f0ab1029f10ba45e8b7f41ae21feaf07f2af8aed3f5796adc7edcb5b7c237d2b",
+    "row_count": 2,
+    "upstream_inputs": [],
+    "health": {
+      "status": "healthy",
+      "structural_errors": 0
+    }
+  }
+}

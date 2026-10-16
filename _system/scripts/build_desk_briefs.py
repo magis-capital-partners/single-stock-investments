@@ -32,6 +32,7 @@ from check_desk_briefs import (  # noqa: E402
     SCHEMA_PATH,
     check_all,
 )
+from atomic_io import attach_envelope  # noqa: E402
 
 SCHEMA_VERSION = "desk_briefs.v1"
 DASHBOARD_PATH = ROOT / "dashboard" / "data" / "desk_briefs.json"
@@ -193,7 +194,7 @@ def build(
         "by_desk": dict(Counter(item["desk"] for item in items_flat)),
         "by_owner": dict(Counter(item["owner"] for item in items_flat)),
     }
-    return {
+    out = {
         "schema_version": SCHEMA_VERSION,
         "generated_at": stamp(now),
         "caption": CAPTION,
@@ -212,6 +213,14 @@ def build(
         },
         **RESEARCH_ONLY,
     }
+    return attach_envelope(
+        out,
+        feed_id="dashboard-desk-briefs",
+        as_of=now.date().isoformat(),
+        row_count=len(items_flat),
+        health_status=status,
+        structural_errors=len(structural_errors),
+    )
 
 
 def main(argv: list[str] | None = None) -> int:

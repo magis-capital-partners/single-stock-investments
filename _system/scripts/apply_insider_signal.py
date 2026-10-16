@@ -33,6 +33,7 @@ from insider_signal_common import (  # noqa: E402
     write_transactions_csv,
 )
 from insider_signal_common import CONFIG_PATH  # noqa: E402
+from atomic_io import write_json_if_changed, write_text_if_changed  # noqa: E402
 
 
 def registry_us_tickers() -> list[str]:
@@ -56,7 +57,7 @@ def preserved_human_flags(existing: dict) -> dict:
 def write_snippet(ticker: str, signal: dict) -> Path:
     research = ROOT / ticker / "research" / "evidence"
     research.mkdir(parents=True, exist_ok=True)
-    path = research / f"insider_signal_{TODAY}.md"
+    path = research / "insider_signal.md"
     tilt = signal.get("scenario_confidence", {}).get("tilted") or {}
     lines = [
         f"# {ticker} — Insider conviction ({signal.get('as_of', TODAY)})",
@@ -104,7 +105,7 @@ def write_snippet(ticker: str, signal: dict) -> Path:
         f"Lawrence base IRR unchanged (`in_base_irr: {signal.get('in_base_irr', False)}`).",
         "",
     ]
-    path.write_text("\n".join(lines), encoding="utf-8")
+    write_text_if_changed(path, "\n".join(lines))
     return path
 
 
@@ -141,7 +142,7 @@ def apply_ticker(ticker: str, *, refetch: bool = False) -> str:
     if flags["promote_bull_weight"]:
         signal["promote_bull_weight"] = True
     val["insider_signal"] = signal
-    vp.write_text(json.dumps(val, indent=2) + "\n", encoding="utf-8")
+    write_json_if_changed(vp, val)
     snippet = write_snippet(tk, signal)
     return (
         f"OK {tk}: ICS {signal['ics']} ({signal['band']}), "
