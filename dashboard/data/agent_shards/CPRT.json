@@ -1,10 +1,10 @@
 {
-  "schema_version": "magis.agent_shard.v1",
-  "generated_at": "2026-10-16T17:58:36Z",
-  "as_of": "2026-07-20",
+  "schema_version": "magis.agent_shard.v2",
   "ticker": "CPRT",
   "company": "Copart",
   "book": "holdings",
+  "shard_status": "built",
+  "as_of": "2026-07-20",
   "registry": {
     "market": "US",
     "exchange": "NASDAQ",
@@ -13,12 +13,20 @@
     "dhando": "full",
     "payoff_lens": null
   },
+  "returns": {
+    "base_irr_pct": null,
+    "unit": "percent_per_year",
+    "label": null,
+    "display": null,
+    "scenarios_pct": {}
+  },
   "thesis_summary": {
     "thesis": "Copart operates a global salvage-vehicle auction platform: insurers assign total-loss vehicles; Copart stores them at yard networks and sells them via online bidding (VB3). **[Fact]** Revenue comes from seller fees, buyer fees, and ancillary services on units processed, plus interest on buyer float balances. **[Fact]** Q3 FY2026 (Apr 2026) revenue was $1.24 billion (+2.1% YoY) with diluted EPS $0.43; international growth offset US units down 4%. FY2025 operating income was $1.70 billion on ~$3.97 billion GAAP revenue. The model is capital-light after land is in place with minimal leverage.",
     "why_market_wrong": "No dated payoff, but two parallel mispricing reads: (1) **transitory US volume** softness while international mix grows; (2) **GAAP book understates owned yard land** carried at decades-old historical cost while recent Copart purchases trade at **$150K–$800K+ per acre** depending on market. **[Inference]** At ~$33 the stock prices mid-cycle cash flow, not the embedded real-estate optionality Copart deliberately bought (>90% owned acreage per ESG letter).",
     "stance": "core",
     "archetype": "compounder",
     "base_irr_pct": null,
+    "base_irr_unit": "percent_per_year",
     "scenarios": {},
     "key_assumptions": [
       {
@@ -59,6 +67,24 @@
       "Close registry gap to 281 facilities (international scrape)",
       "Override watch → **core** documented: quality + dhando full despite <15% IRR at de-rated price"
     ]
+  },
+  "truncation": {
+    "key_assumptions": {
+      "shown": 6,
+      "total": 6
+    },
+    "open_questions": {
+      "shown": 5,
+      "total": 5
+    },
+    "kpi_series": {
+      "shown": 12,
+      "total": 15
+    },
+    "documents": {
+      "shown": 2,
+      "note": "capped at 15 most recent in builder"
+    }
   },
   "kpi_series": [
     {
@@ -203,7 +229,7 @@
       "local_pdf_path": "CPRT/third-party-analyses/vic/vic_pdf_2026-06-18_cprt-vic-pdf_13a4abec83.pdf",
       "text_extract_path": "CPRT/third-party-analyses/vic/vic_pdf_2026-06-18_cprt-vic-pdf_13a4abec83.md",
       "drive_web_view_link": "https://drive.google.com/file/d/1ElOSlWdqrhF8eiEpRog2uF3dj1PnZHAO/view?usp=drivesdk",
-      "modified_at": "2026-10-16T14:36:36Z"
+      "modified_at": "2026-10-16T16:38:29Z"
     },
     {
       "document_id": "sha256:ae1d091c00148726a78c3a3e8477d748e600abf3d29ed476cf9f9982d5ae8be8",
@@ -212,7 +238,7 @@
       "local_pdf_path": "CPRT/third-party-analyses/vic/04_CPRT_COPART_INC_8114.pdf",
       "text_extract_path": null,
       "drive_web_view_link": "https://drive.google.com/file/d/1g-Z7Z5a0BpEE9d0EnzhGumLdNIF8sYC1/view?usp=drivesdk",
-      "modified_at": "2026-10-16T14:36:36Z"
+      "modified_at": "2026-10-16T16:38:29Z"
     }
   ],
   "l2_pointers": {
@@ -222,14 +248,17 @@
     "insider_signal_md": "CPRT/research/evidence/insider_signal.md",
     "thematic_context_md": "CPRT/research/evidence/thematic_context.md",
     "source_inventory_json": "CPRT/third-party-analyses/source_inventory.json",
-    "full_ui_shard_json": "dashboard/data/tickers/CPRT.json"
+    "full_ui_shard_json": "dashboard/data/tickers/CPRT.json",
+    "latest_json": "CPRT/research/latest.json",
+    "context_pack_md": "dashboard/data/context_packs/CPRT.md"
   },
+  "generated_at": "2026-10-16T20:26:21Z",
   "_envelope": {
     "schema_version": "magis.feed.v2",
     "feed_id": "agent-shard-cprt",
-    "generated_at": "2026-10-16T17:58:36Z",
+    "generated_at": "2026-10-16T20:26:21Z",
     "as_of": "2026-07-20",
-    "content_sha256": "sha256:3cfb219d388fcfd6aa0f114a5be7dc09112d92dece009530e5aa3b547b8d1482",
+    "content_sha256": "sha256:6c5a9c5a05d6247c3ea07ca2864cc7bc33783175cde20844d9ee3bdac10b109f",
     "row_count": 12,
     "upstream_inputs": [],
     "health": {

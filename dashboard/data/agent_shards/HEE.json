@@ -1,10 +1,10 @@
 {
-  "schema_version": "magis.agent_shard.v1",
-  "generated_at": "2026-10-16T17:58:36Z",
-  "as_of": "2026-06-11",
+  "schema_version": "magis.agent_shard.v2",
   "ticker": "HEE",
   "company": "Hellenic Exchanges - Athens Stock Exchange S.A.",
   "book": "holdings",
+  "shard_status": "built",
+  "as_of": "2026-06-11",
   "registry": {
     "market": "EU",
     "exchange": "ATHEX",
@@ -13,12 +13,24 @@
     "dhando": "pending",
     "payoff_lens": "pending"
   },
+  "returns": {
+    "base_irr_pct": 10.86,
+    "unit": "percent_per_year",
+    "label": "7yr IRR (total synthesis)",
+    "display": "10.86% (total synthesis)",
+    "scenarios_pct": {
+      "base": 10.0,
+      "bear": 2.8,
+      "bull": 15.2
+    }
+  },
   "thesis_summary": {
     "thesis": "Hellenic Exchanges–Athens Stock Exchange S.A. (ATHEX Group) is Greece's capital markets infrastructure operator. **[Fact]** The Group runs the Athens Stock Exchange, post-trading clearing and settlement (ATHEXCLEAR), and the central securities depository (ATHEXCSD), earning fees on trading, clearing, listings, market data, and technology services without taking directional market risk on customer positions. **[Fact]** FY2025 consolidated turnover was **€86.3 million** (+58.9% versus €54.3 million in FY2024), EBITDA **€42.2 million**, and net earnings after tax **€31.6 million** (`investor-documents/ir-athex/annual_report_2025.pdf`, Board report). **[Fact]** Weighted average shares were **57,850,000**; earnings per share **€0.622** (`annual_report_2025.pdf`, note 5.39). **[Fact]** In November 2025 Euronext completed a tender offer and holds **74.25%** of voting rights; a new board was constituted in January 2026.",
     "why_market_wrong": "FY2025 was an exceptional volume year (+58.9% turnover) ahead of Greece's FTSE Russell upgrade from Advanced Emerging Market to **Developed Market** status effective **21 September 2026**. **[Inference]** Screens and passive models may still treat ATHEX as a small emerging-market venue, while filings show developed-market preparation and Euronext integration already priced into activity. **[Inference]** The market may also capitalize FY2025 peak cash flows; our base case normalizes owner cash below the FY2025 spot of **€0.87** per share from operating activities minus capital spending. **Predictive attribute:** FTSE developed-market reclassification (dated Sept 2026) plus Euronext liquidity cross-listing synergy; partially offset because Euronext already controls the float.",
     "stance": "watch",
     "archetype": "croupier",
     "base_irr_pct": 10.86,
+    "base_irr_unit": "percent_per_year",
     "scenarios": {
       "base": 10.0,
       "bear": 2.8,
@@ -68,18 +80,27 @@
       "Listing symbol **EXAE** on ATHEX; folder ticker **HEE** per Royalty King screen."
     ]
   },
+  "truncation": {
+    "key_assumptions": {
+      "shown": 7,
+      "total": 7
+    },
+    "open_questions": {
+      "shown": 4,
+      "total": 4
+    },
+    "kpi_series": {
+      "shown": 0,
+      "total": 0
+    },
+    "documents": {
+      "shown": 2,
+      "note": "capped at 15 most recent in builder"
+    }
+  },
   "kpi_series": [],
   "recent_news": [],
   "documents": [
-    {
-      "document_id": "sha256:1039e10561947b0635920343bb1280bf660bf151ec7e2df349a7a44747095b12",
-      "title": "annual report 2024",
-      "source_type": "company_document",
-      "local_pdf_path": "HEE/investor-documents/ir-athex/annual_report_2024.pdf",
-      "text_extract_path": null,
-      "drive_web_view_link": "https://drive.google.com/file/d/1n30KgksAfvoNIEUaLNG30GMxbyPLajan/view?usp=drivesdk",
-      "modified_at": "2026-10-16T14:36:17Z"
-    },
     {
       "document_id": "sha256:d47d7c6180c9947d92f73cec0f5cef26597d9a3d15bf8b3ae9ba357d1a4e9cd8",
       "title": "annual report 2025",
@@ -87,7 +108,16 @@
       "local_pdf_path": "HEE/investor-documents/ir-athex/annual_report_2025.pdf",
       "text_extract_path": null,
       "drive_web_view_link": "https://drive.google.com/file/d/1RDaM8Wl5HPc1af4Kwz_dlaG_ogfHxufO/view?usp=drivesdk",
-      "modified_at": "2026-10-16T14:36:17Z"
+      "modified_at": "2026-10-16T16:39:51Z"
+    },
+    {
+      "document_id": "sha256:1039e10561947b0635920343bb1280bf660bf151ec7e2df349a7a44747095b12",
+      "title": "annual report 2024",
+      "source_type": "company_document",
+      "local_pdf_path": "HEE/investor-documents/ir-athex/annual_report_2024.pdf",
+      "text_extract_path": null,
+      "drive_web_view_link": "https://drive.google.com/file/d/1n30KgksAfvoNIEUaLNG30GMxbyPLajan/view?usp=drivesdk",
+      "modified_at": "2026-10-16T16:39:50Z"
     }
   ],
   "l2_pointers": {
@@ -97,14 +127,17 @@
     "insider_signal_md": null,
     "thematic_context_md": "HEE/research/evidence/thematic_context.md",
     "source_inventory_json": "HEE/third-party-analyses/source_inventory.json",
-    "full_ui_shard_json": "dashboard/data/tickers/HEE.json"
+    "full_ui_shard_json": "dashboard/data/tickers/HEE.json",
+    "latest_json": "HEE/research/latest.json",
+    "context_pack_md": "dashboard/data/context_packs/HEE.md"
   },
+  "generated_at": "2026-10-16T20:26:21Z",
   "_envelope": {
     "schema_version": "magis.feed.v2",
     "feed_id": "agent-shard-hee",
-    "generated_at": "2026-10-16T17:58:36Z",
+    "generated_at": "2026-10-16T20:26:21Z",
     "as_of": "2026-06-11",
-    "content_sha256": "sha256:00efd52d5747bd7209818ae575e6ff83108278e9831d21687806f50334bc8401",
+    "content_sha256": "sha256:6bd23305309d202ca07b5659219757fde8bc466de06e888c46f90e4fc291c203",
     "row_count": 0,
     "upstream_inputs": [],
     "health": {

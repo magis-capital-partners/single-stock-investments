@@ -1,10 +1,10 @@
 {
-  "schema_version": "magis.agent_shard.v1",
-  "generated_at": "2026-10-16T16:19:47Z",
-  "as_of": "2026-07-24",
+  "schema_version": "magis.agent_shard.v2",
   "ticker": "GOOGL",
   "company": "Alphabet Inc.",
   "book": "holdings",
+  "shard_status": "built",
+  "as_of": "2026-07-24",
   "registry": {
     "market": "US",
     "exchange": "NASDAQ",
@@ -13,12 +13,24 @@
     "dhando": "partial",
     "payoff_lens": null
   },
+  "returns": {
+    "base_irr_pct": 0.12,
+    "unit": "percent_per_year",
+    "label": "7yr IRR (total synthesis)",
+    "display": "0.12% (total synthesis)",
+    "scenarios_pct": {
+      "base": 0.5,
+      "bear": -7.7,
+      "bull": 4.4
+    }
+  },
   "thesis_summary": {
     "thesis": "Alphabet Inc. owns Google (Search, YouTube, Android, Chrome) and Google Cloud. **[Fact]** Advertisers and enterprises pay for ad auctions, cloud compute, and subscriptions; consumers use free products that drive query volume and data. **[Fact]** FY2025 revenue was **$402.8B** (+15%); Q1 2026 revenue **$109.9B** (+22%). **[Fact]** Reportable segments are **Google Services**, **Google Cloud**, and **Other Bets** (Waymo, etc.), plus **Alphabet-level activities** (centralized AI R&D). **[Fact]** FY2025 consolidated operating cash flow **$125.3B**, capital spending **$52.5B**, owner free cash flow **~$72.8B**; management guides **$180-190B** capital spending in 2026. **[Inference]** Owner economics depend on Cloud return on invested capital versus the capital spending step-up and whether Search monetization holds as interfaces shift to AI.",
     "why_market_wrong": "There is **no clear dated mispricing signal** (predictive attribute: **none**). **[Inference]** At **~$386**, the stock prices Cloud AI optionality and Search resilience together. **[Inference]** A single consolidated free cash flow growth rate hides **divergent segment economics**: Services throws off most cash today while Cloud and Alphabet-level spend absorb the 2026 capital guide. **[Inference]** Proof-first component math sums to **~$348 per share** base economic value versus **~$386** price, implying the market embeds higher Cloud multiples or faster capex normalization than the bounded proof schedule.",
     "stance": "hold",
     "archetype": "compounder",
     "base_irr_pct": 0.12,
+    "base_irr_unit": "percent_per_year",
     "scenarios": {
       "base": 0.5,
       "bear": -7.7,
@@ -71,6 +83,24 @@
       "Promote AI inflection or third-party views into base case only after human OK.",
       "Stance and sizing require `human_decision.json`."
     ]
+  },
+  "truncation": {
+    "key_assumptions": {
+      "shown": 8,
+      "total": 8
+    },
+    "open_questions": {
+      "shown": 3,
+      "total": 3
+    },
+    "kpi_series": {
+      "shown": 12,
+      "total": 15
+    },
+    "documents": {
+      "shown": 1,
+      "note": "capped at 15 most recent in builder"
+    }
   },
   "kpi_series": [
     {
@@ -280,7 +310,7 @@
       "local_pdf_path": "GOOGL/third-party-analyses/vic/vic_pdf_2026-06-18_googl-vic-pdf_6482670561.pdf",
       "text_extract_path": "GOOGL/third-party-analyses/vic/vic_pdf_2026-06-18_googl-vic-pdf_6482670561.md",
       "drive_web_view_link": "https://drive.google.com/file/d/1A8mVybpRjwNvRI-00Ip-jKMFOEMlBwW7/view?usp=drivesdk",
-      "modified_at": "2026-10-16T14:36:09Z"
+      "modified_at": "2026-10-16T16:39:43Z"
     }
   ],
   "l2_pointers": {
@@ -290,14 +320,17 @@
     "insider_signal_md": "GOOGL/research/evidence/insider_signal.md",
     "thematic_context_md": "GOOGL/research/evidence/thematic_context.md",
     "source_inventory_json": "GOOGL/third-party-analyses/source_inventory.json",
-    "full_ui_shard_json": "dashboard/data/tickers/GOOGL.json"
+    "full_ui_shard_json": "dashboard/data/tickers/GOOGL.json",
+    "latest_json": "GOOGL/research/latest.json",
+    "context_pack_md": "dashboard/data/context_packs/GOOGL.md"
   },
+  "generated_at": "2026-10-16T20:26:21Z",
   "_envelope": {
     "schema_version": "magis.feed.v2",
     "feed_id": "agent-shard-googl",
-    "generated_at": "2026-10-16T16:19:47Z",
+    "generated_at": "2026-10-16T20:26:21Z",
     "as_of": "2026-07-24",
-    "content_sha256": "sha256:ad385ee5499569491a46f8ddca1cb845e5675806c10d0cfc38a892cb0c43b644",
+    "content_sha256": "sha256:6a5b5e312404d1f27c338d1381c0825d6fe0c2332681aa4a6b366fdca521426a",
     "row_count": 20,
     "upstream_inputs": [],
     "health": {

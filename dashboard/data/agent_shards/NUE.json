@@ -1,10 +1,10 @@
 {
-  "schema_version": "magis.agent_shard.v1",
-  "generated_at": "2026-10-16T17:58:36Z",
-  "as_of": "2026-07-21",
+  "schema_version": "magis.agent_shard.v2",
   "ticker": "NUE",
   "company": "Nucor",
   "book": "holdings",
+  "shard_status": "built",
+  "as_of": "2026-07-21",
   "registry": {
     "market": "US",
     "exchange": "—",
@@ -13,12 +13,24 @@
     "dhando": "pending",
     "payoff_lens": "pending"
   },
+  "returns": {
+    "base_irr_pct": -3.56,
+    "unit": "percent_per_year",
+    "label": "component base",
+    "display": "-3.56%",
+    "scenarios_pct": {
+      "base": -23.8,
+      "bear": -0.8,
+      "bull": -0.8
+    }
+  },
   "thesis_summary": {
     "thesis": "Nucor Corporation is the largest steel producer in the United States by tonnage, built almost entirely on electric-arc-furnace (EAF) mini-mills fed by scrap and direct-reduced iron. **[Fact]** The company reports three operating segments: steel mills (sheet, plate, bar, and structural products), steel products (joist, deck, rebar fabrication, towers, and other downstream businesses), and raw materials (scrap yards, DRI, and brokerage). **[Fact]** FY2025 pretax segment earnings were **$2.383 billion** for mills, **$1.229 billion** for products, and **$153 million** for raw materials, with corporate eliminations of **$1.197 billion**. **[Fact]** Steel-mill shipments were **25.271 million tons** at **83%** capacity utilization. **[Fact]** Nucor is also in the late stages of a multi-year capital program, including a West Virginia sheet mill targeted at roughly **3 million tons** of annual capacity for about **$3.65 billion** net of state incentives. **[Fact]**",
     "why_market_wrong": "We do not see a durable mispricing signal at today's price. **[Inference]** Nucor's cost position, balance-sheet strength, and project pipeline may justify a premium to our through-cycle component base of about **$179 per share** versus a price near **$231**. **[Inference]** The market may be capitalizing mid-cycle spreads and successful project completion, while our base case normalizes 2025 peak mill utilization and keeps an explicit supply-response reserve. **[Inference]** If projects earn above their cost of capital and industry supply discipline holds, the bull component schedule (**~$334 per share**) could prove conservative; if imports and new domestic capacity depress spreads, the low case (**~$68 per share**) is the relevant stress path.",
     "stance": "watch",
     "archetype": "capital_cycle",
     "base_irr_pct": -3.56,
+    "base_irr_unit": "percent_per_year",
     "scenarios": {
       "base": -23.8,
       "bear": -0.8,
@@ -65,6 +77,24 @@
       "Confirm post-refresh 10-K extract matches locked FY2025 facts in `evidence_reconciliation_2026-07-15.json`.",
       "Product-level capacity/import map remains a bounded stress reserve, not a full industry database."
     ]
+  },
+  "truncation": {
+    "key_assumptions": {
+      "shown": 7,
+      "total": 7
+    },
+    "open_questions": {
+      "shown": 2,
+      "total": 2
+    },
+    "kpi_series": {
+      "shown": 12,
+      "total": 12
+    },
+    "documents": {
+      "shown": 0,
+      "note": "capped at 15 most recent in builder"
+    }
   },
   "kpi_series": [
     {
@@ -218,6 +248,14 @@
       "linked_filing": null
     },
     {
+      "title": "How Earnings Guidance At Nucor (NUE) Has Changed Its Investment Story - Simply Wall Street",
+      "published_utc": "2026-09-27T07:00:00+00:00",
+      "category": "guidance",
+      "confidence": 0.88,
+      "url": "https://news.google.com/rss/articles/CBMivwFBVV95cUxOYk9qMk9jeGVhclh1NXVfYVdfRDVybGE0Ml9wZjJXMFFSa0lnbGY3aEdFUGFxTWVlU0RkZHZ3XzE5QnJaVC1TbV9jWlRxMU1uSkFlRmZGaVlVVzM0alBoaXprUDJEWGxaOUpQamgxZW5GN09abHFScnhkdThDX2JYUmJLX0ZXYXpaZUpyaUEwdWZ0ZUxFcGlVbjJ1Y05iby1sckpDU0Z1N3dDSWpyUWRRR0I0b2VLaW1EN3RDaHM0d9IBxAFBVV95cUxOSGhlOU85OXVza0NJLTRIN2RtY0NEZEt5M1NaVXoxWXVCMWlXT3ltWjlPRU94WC1rYXhKS3pnaXYyZExrcWZVampZUzBLUFcxWFF5bUUxVTlZdEVQeHFNN3BxTXVJZjBZRFZQNmJJdnhMOGtHNlZMTW1SRjFRelpFcXZKd0FxVW5sY0xWdFF0NFJnaUtwTGdVVXZpMlY1VXJnV3g3RFJObHUtaFlGVGZ3ZEVHeE8ydHN3dFJkdTJDNm5neDQ2?oc=5",
+      "linked_filing": null
+    },
+    {
       "title": "Nucor Projects Higher Q3 Earnings on Improved Steel Pricing",
       "published_utc": "2026-09-21T13:26:00+00:00",
       "category": "guidance",
@@ -250,15 +288,18 @@
     "insider_signal_md": "NUE/research/evidence/insider_signal.md",
     "thematic_context_md": "NUE/research/evidence/thematic_context.md",
     "source_inventory_json": "NUE/third-party-analyses/source_inventory.json",
-    "full_ui_shard_json": "dashboard/data/tickers/NUE.json"
+    "full_ui_shard_json": "dashboard/data/tickers/NUE.json",
+    "latest_json": "NUE/research/latest.json",
+    "context_pack_md": "dashboard/data/context_packs/NUE.md"
   },
+  "generated_at": "2026-10-16T20:26:21Z",
   "_envelope": {
     "schema_version": "magis.feed.v2",
     "feed_id": "agent-shard-nue",
-    "generated_at": "2026-10-16T17:58:36Z",
+    "generated_at": "2026-10-16T20:26:21Z",
     "as_of": "2026-07-21",
-    "content_sha256": "sha256:616b67ea2f4902b6fd04ae70856369ab4b62045e9844a9950954852151f1bade",
-    "row_count": 17,
+    "content_sha256": "sha256:62fec20dded49d438e5eeaf5b0ebbcd3622ca7a24c80155b1263cc2da6ec81e3",
+    "row_count": 18,
     "upstream_inputs": [],
     "health": {
       "status": "healthy",

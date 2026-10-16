@@ -1,10 +1,10 @@
 {
-  "schema_version": "magis.agent_shard.v1",
-  "generated_at": "2026-10-16T17:58:36Z",
-  "as_of": "2026-07-20",
+  "schema_version": "magis.agent_shard.v2",
   "ticker": "SPGI",
   "company": "S&P Global",
   "book": "holdings",
+  "shard_status": "built",
+  "as_of": "2026-07-20",
   "registry": {
     "market": "US",
     "exchange": "NYSE",
@@ -13,12 +13,20 @@
     "dhando": "partial",
     "payoff_lens": null
   },
+  "returns": {
+    "base_irr_pct": null,
+    "unit": "percent_per_year",
+    "label": null,
+    "display": null,
+    "scenarios_pct": {}
+  },
   "thesis_summary": {
     "thesis": "S&P Global sells financial intelligence: credit ratings on debt issuance, index licensing tied to benchmark AUM, Market Intelligence data subscriptions, Platts commodity benchmarks, and Mobility analytics (spin planned mid-2026). **[Fact]** Customers pay transaction fees when markets issue debt, recurring subscriptions for data, and AUM-linked index fees. **[Fact]** FY2025 revenue was **$15,336M** with operating income **$6,478M** and net income **$4,471M** (`investor-documents/sec-edgar/10-K_20260211_rpt20251231_acc0000064040_26_000013.htm`). **[Fact]** Q1 2026 revenue was **$4,171M** (+10% vs **$3,777M**) with GAAP diluted EPS **$4.69** vs **$3.54** and operating income **$2,002M** vs **$1,578M** (`investor-documents/sec-edgar/10-Q_20260428_rpt20260331_acc0000064040_26_000024.htm`). The business earns toll-like fees with minimal principal risk on core operations.",
     "why_market_wrong": "No clear mispricing signal or dated payoff. **[Inference]** Quality compounders rarely trade to a 15% IRR; the market prices covenant-required ratings and S&P 500 index entrenchment at a premium. **[Inference]** May 2026 Market Intelligence leadership transition may create temporary concern, but 2026 guidance was reiterated per prior 8-K. Return is franchise earnings at price unless an issuance drought forces a cyclical re-rating.",
     "stance": "hold",
     "archetype": "compounder",
     "base_irr_pct": null,
+    "base_irr_unit": "percent_per_year",
     "scenarios": {},
     "key_assumptions": [
       {
@@ -63,6 +71,24 @@
       "Track billed issuance and index AUM monthly",
       "Confirm live price (~$411 May 27, 2026)"
     ]
+  },
+  "truncation": {
+    "key_assumptions": {
+      "shown": 7,
+      "total": 7
+    },
+    "open_questions": {
+      "shown": 4,
+      "total": 4
+    },
+    "kpi_series": {
+      "shown": 12,
+      "total": 12
+    },
+    "documents": {
+      "shown": 15,
+      "note": "capped at 15 most recent in builder"
+    }
   },
   "kpi_series": [
     {
@@ -210,13 +236,85 @@
   ],
   "documents": [
     {
+      "document_id": "sha256:0a522553309ed121cc6fc0d3c501655c5c45ace0b24d3b4e0345267a6fdd66b4",
+      "title": "new s p global 2q 2023 earnings call slides 7 27 2023",
+      "source_type": "company_document",
+      "local_pdf_path": "SPGI/investor-documents/ir-spgi/new-s-p-global-2q-2023-earnings-call-slides-7-27-2023.pdf",
+      "text_extract_path": null,
+      "drive_web_view_link": "https://drive.google.com/file/d/1sgJb0xDCFhqrqb3xVnvd3OlwMEMCw3w1/view?usp=drivesdk",
+      "modified_at": "2026-10-16T16:41:40Z"
+    },
+    {
+      "document_id": "sha256:220ff9b7156154488d2f3f3d6dde13030aabe09dff3806147e7be1a4ce18e793",
+      "title": "vic pdf 2026 06 20 spgi vic pdf 1c94c5f203",
+      "source_type": "vic_research",
+      "local_pdf_path": "SPGI/third-party-analyses/vic/vic_pdf_2026-06-20_spgi-vic-pdf_1c94c5f203.pdf",
+      "text_extract_path": "SPGI/third-party-analyses/vic/vic_pdf_2026-06-20_spgi-vic-pdf_1c94c5f203.md",
+      "drive_web_view_link": "https://drive.google.com/file/d/1g9D4oiwW-dK9f1SnX4xSnSrKbg7p4D08/view?usp=drivesdk",
+      "modified_at": "2026-10-16T16:41:40Z"
+    },
+    {
+      "document_id": "sha256:3456135dbf3bf3674d123d22918a55b40415558a078a8a9a46d41346a30dc028",
+      "title": "s p global 1q 2024 earnings supplemental disclosure 4 25 2024",
+      "source_type": "company_document",
+      "local_pdf_path": "SPGI/investor-documents/ir-spgi/s-p-global-1q-2024-earnings-supplemental-disclosure-4-25-2024.pdf",
+      "text_extract_path": null,
+      "drive_web_view_link": "https://drive.google.com/file/d/1a_B__uE-n1dqZ5R3CUakO6rkxMRcalKT/view?usp=drivesdk",
+      "modified_at": "2026-10-16T16:41:40Z"
+    },
+    {
+      "document_id": "sha256:60880a82870ccc5f04d3a725ac6f96fedc98721c1f71b2dcec9a03c74aec363d",
+      "title": "10 SP Global",
+      "source_type": "vic_research",
+      "local_pdf_path": "SPGI/third-party-analyses/vic/10-SP-Global.pdf",
+      "text_extract_path": null,
+      "drive_web_view_link": "https://drive.google.com/file/d/1ZTqLHSst0VaEJaonbLyPCd-y-x6Jkzw-/view?usp=drivesdk",
+      "modified_at": "2026-10-16T16:41:40Z"
+    },
+    {
+      "document_id": "sha256:a64f27d67f3e5c5c408fd4b103269e9d2713ec0937396ac630f6e5b28982c614",
+      "title": "ihs markit ltd 2021 proxy statement",
+      "source_type": "company_document",
+      "local_pdf_path": "SPGI/investor-documents/ir-spgi/ihs-markit-ltd-2021-proxy-statement.pdf",
+      "text_extract_path": null,
+      "drive_web_view_link": "https://drive.google.com/file/d/15EGEbAeZ83Cl3cMnlJE4sgua4qHr6FGH/view?usp=drivesdk",
+      "modified_at": "2026-10-16T16:41:40Z"
+    },
+    {
+      "document_id": "sha256:c4e01252de773afdea855af1e3c8f4abc8e958cbec2ae0008812b40c2088b523",
+      "title": "SPGI   MBGL",
+      "source_type": "vic_research",
+      "local_pdf_path": "SPGI/third-party-analyses/vic/SPGI - MBGL.pdf",
+      "text_extract_path": null,
+      "drive_web_view_link": "https://drive.google.com/file/d/1hKZ9wDpKVFNc0ViDZHZifAmoTe4oUjGD/view?usp=drivesdk",
+      "modified_at": "2026-10-16T16:41:40Z"
+    },
+    {
+      "document_id": "sha256:c99bf6ca5afcfaacb2e80d267e5c7c7e2a7af205e51dc09a041bcb25f6be08d5",
+      "title": "s p global 1q 2024 earnings call slides 4 25 2024r",
+      "source_type": "company_document",
+      "local_pdf_path": "SPGI/investor-documents/ir-spgi/s-p-global-1q-2024-earnings-call-slides-4-25-2024r.pdf",
+      "text_extract_path": null,
+      "drive_web_view_link": "https://drive.google.com/file/d/1Ct1H46LASEIz6wu4Fp8GadsXEzrXkFRI/view?usp=drivesdk",
+      "modified_at": "2026-10-16T16:41:40Z"
+    },
+    {
+      "document_id": "sha256:eb3360fc9f9f3cd808e4d9d97ebaeebc2bddc85432cb7b53f13fc4ba3abd867b",
+      "title": "sp global 1q 2024 earnings release exhibits 4 25 2024",
+      "source_type": "company_document",
+      "local_pdf_path": "SPGI/investor-documents/ir-spgi/sp-global-1q-2024-earnings-release-exhibits-4-25-2024.pdf",
+      "text_extract_path": null,
+      "drive_web_view_link": "https://drive.google.com/file/d/1ZvnVKuxys7MkKpsHSZx_6kcagg5O4Zo8/view?usp=drivesdk",
+      "modified_at": "2026-10-16T16:41:40Z"
+    },
+    {
       "document_id": "sha256:00869bb2c525030df0337b9b0d0ba3af32deb3ca8f838016687154845d42bfa4",
       "title": "Slides S P Global at Stifel Cross Sector Insight Conference 6 11 2018  15 pages",
       "source_type": "company_document",
       "local_pdf_path": "SPGI/investor-documents/ir-spgi/Slides-S-P-Global-at-Stifel-Cross-Sector-Insight-Conference-6-11-2018-_15-pages_.pdf",
       "text_extract_path": null,
       "drive_web_view_link": "https://drive.google.com/file/d/16mucTxlqmNF5raUi0Ly3ZwI1673SiyVY/view?usp=drivesdk",
-      "modified_at": "2026-10-16T14:35:05Z"
+      "modified_at": "2026-10-16T16:41:39Z"
     },
     {
       "document_id": "sha256:03d225a213300cfefba7481dcd332c55527d76a05c12ab7c4cfe4f225936fc63",
@@ -225,7 +323,7 @@
       "local_pdf_path": "SPGI/investor-documents/ir-spgi/Slides-S-P-Global-Presentation-at-William-Blair-Conference-6-5-2019-_11-pages_.pdf",
       "text_extract_path": null,
       "drive_web_view_link": "https://drive.google.com/file/d/173UO8X2E0sZKFSF-MRxRAzqlJPjLW6U3/view?usp=drivesdk",
-      "modified_at": "2026-10-16T14:35:05Z"
+      "modified_at": "2026-10-16T16:41:39Z"
     },
     {
       "document_id": "sha256:05057bb3afc39a43db5f03b8d54d656612ed1884894ef31fd19636798476dbcd",
@@ -234,7 +332,7 @@
       "local_pdf_path": "SPGI/investor-documents/ir-spgi/Slides-William-Blair-Growth-Stock-Conference-2014.pdf",
       "text_extract_path": null,
       "drive_web_view_link": "https://drive.google.com/file/d/1OIlYoKaJBVFfqB8AAt98DgsZyW4pOFUB/view?usp=drivesdk",
-      "modified_at": "2026-10-16T14:35:05Z"
+      "modified_at": "2026-10-16T16:41:39Z"
     },
     {
       "document_id": "sha256:0553ccbad46aaa9423f3a5a5597943c8dc3cc4543dff97ac5cf242db9ecffe2a",
@@ -243,7 +341,7 @@
       "local_pdf_path": "SPGI/investor-documents/ir-spgi/Slides-S-P-Global-at-Raymond-James-3-5-2018-_14-pages_.pdf",
       "text_extract_path": null,
       "drive_web_view_link": "https://drive.google.com/file/d/16vN7ioLUp7iwa_gHgiRjw1ORixU2CyN6/view?usp=drivesdk",
-      "modified_at": "2026-10-16T14:35:05Z"
+      "modified_at": "2026-10-16T16:41:39Z"
     },
     {
       "document_id": "sha256:061c4d38db25622db776f324b4c7523507bb619909102a1438c6b544cf284275",
@@ -252,16 +350,7 @@
       "local_pdf_path": "SPGI/investor-documents/ir-spgi/Summary-of-Voting-Results-2015-Annual-Meeting.pdf",
       "text_extract_path": null,
       "drive_web_view_link": "https://drive.google.com/file/d/1NIqDB-EBpWcLzZ0q9KBjxz0Gz2boTniD/view?usp=drivesdk",
-      "modified_at": "2026-10-16T14:35:05Z"
-    },
-    {
-      "document_id": "sha256:0a522553309ed121cc6fc0d3c501655c5c45ace0b24d3b4e0345267a6fdd66b4",
-      "title": "new s p global 2q 2023 earnings call slides 7 27 2023",
-      "source_type": "company_document",
-      "local_pdf_path": "SPGI/investor-documents/ir-spgi/new-s-p-global-2q-2023-earnings-call-slides-7-27-2023.pdf",
-      "text_extract_path": null,
-      "drive_web_view_link": "https://drive.google.com/file/d/1sgJb0xDCFhqrqb3xVnvd3OlwMEMCw3w1/view?usp=drivesdk",
-      "modified_at": "2026-10-16T14:35:05Z"
+      "modified_at": "2026-10-16T16:41:39Z"
     },
     {
       "document_id": "sha256:0cb750008d34424d123e12fb43c07b64409a42112fd28dbac88260ef27ee6c6a",
@@ -270,7 +359,7 @@
       "local_pdf_path": "SPGI/investor-documents/ir-spgi/Slides-_printer-friendly_-Lazard-Capital-Markets-Annual-Technology-Media-Conference.pdf",
       "text_extract_path": null,
       "drive_web_view_link": "https://drive.google.com/file/d/1wdUj-7ok0H_VeZIGaf6woeapjJbTBYtF/view?usp=drivesdk",
-      "modified_at": "2026-10-16T14:35:05Z"
+      "modified_at": "2026-10-16T16:41:39Z"
     },
     {
       "document_id": "sha256:0cdc2e596e7fdce994b046f89e19ecccb42f9f1ada550ba3026505cc8c3af2d7",
@@ -279,70 +368,7 @@
       "local_pdf_path": "SPGI/investor-documents/ir-spgi/Slides-_printer-friendly_-MHP-at-Goldman-Sachs-Communacopia-Conference.pdf",
       "text_extract_path": null,
       "drive_web_view_link": "https://drive.google.com/file/d/1zxk9mrYlKuTPk3y9NRz9RMSAp6DnIzq9/view?usp=drivesdk",
-      "modified_at": "2026-10-16T14:35:05Z"
-    },
-    {
-      "document_id": "sha256:12e55d7112e851d3afc9a31e75fb58ee3e1a12d607b29db27655087e1358acef",
-      "title": "Slides  printer friendly  3rd Quarter 2009 MHP Earnings",
-      "source_type": "company_document",
-      "local_pdf_path": "SPGI/investor-documents/ir-spgi/Slides-_printer-friendly_-3rd-Quarter-2009-MHP-Earnings.pdf",
-      "text_extract_path": null,
-      "drive_web_view_link": "https://drive.google.com/file/d/1dWzslbEOePYgpHs-E_FLrtYBBMnaGkAW/view?usp=drivesdk",
-      "modified_at": "2026-10-16T14:35:05Z"
-    },
-    {
-      "document_id": "sha256:1615578e18705a17bb5cb4b376f2cd2372a73cedb89ed5652481031293086af4",
-      "title": "Slides  printer friendly  NAA Mid Year Media Review",
-      "source_type": "company_document",
-      "local_pdf_path": "SPGI/investor-documents/ir-spgi/Slides-_printer-friendly_-NAA-Mid-Year-Media-Review.pdf",
-      "text_extract_path": null,
-      "drive_web_view_link": "https://drive.google.com/file/d/1MCN8n3i852TmFJ4Nh_ulwMnoIvpFwciG/view?usp=drivesdk",
-      "modified_at": "2026-10-16T14:35:05Z"
-    },
-    {
-      "document_id": "sha256:16841ea49fe51cbb976136c6200ad4f92230dcba8ed7c4713a56bb0e50b2f6a1",
-      "title": "Slides S P Global at Barclays Americas Select 5 17 2017  13 pages",
-      "source_type": "company_document",
-      "local_pdf_path": "SPGI/investor-documents/ir-spgi/Slides-S-P-Global-at-Barclays-Americas-Select-5-17-2017-_13-pages_.pdf",
-      "text_extract_path": null,
-      "drive_web_view_link": "https://drive.google.com/file/d/1tnzVbos0RqdyGcMU1k7TuN1O6TugaICZ/view?usp=drivesdk",
-      "modified_at": "2026-10-16T14:35:05Z"
-    },
-    {
-      "document_id": "sha256:175b98cf9841c7d8d17b78e2db0ce4f9ad002c7d0987caf6775ac3ffef1c6151",
-      "title": "Slides  printer friendly  2nd Quarter 2009 MHP Earnings",
-      "source_type": "company_document",
-      "local_pdf_path": "SPGI/investor-documents/ir-spgi/Slides-_printer-friendly_-2nd-Quarter-2009-MHP-Earnings.pdf",
-      "text_extract_path": null,
-      "drive_web_view_link": "https://drive.google.com/file/d/1toTSW1FWOHiJGMOM-omeLIKIXS74BTWJ/view?usp=drivesdk",
-      "modified_at": "2026-10-16T14:35:05Z"
-    },
-    {
-      "document_id": "sha256:1950ede215d9c2901fa194bbd2ed7aae6da213762f9bbcc281c59915ea9c8436",
-      "title": "Slides S P Global at Barclays Global Financial Services Conference 9 14 2018  14 pages",
-      "source_type": "company_document",
-      "local_pdf_path": "SPGI/investor-documents/ir-spgi/Slides-S-P-Global-at-Barclays-Global-Financial-Services-Conference-9-14-2018-_14-pages_.pdf",
-      "text_extract_path": null,
-      "drive_web_view_link": "https://drive.google.com/file/d/14_9dgHRIMsFI4_T9YWmpEHLIljb8JccY/view?usp=drivesdk",
-      "modified_at": "2026-10-16T14:35:05Z"
-    },
-    {
-      "document_id": "sha256:1a4c7157c45ab0e318062b46bdf08b7142c17ef2ccd3e2c22f0c7ef420146f77",
-      "title": "Slides  printer friendly  Citigroup 17th Annual Entertainment Media and Telecommunications Conference",
-      "source_type": "company_document",
-      "local_pdf_path": "SPGI/investor-documents/ir-spgi/Slides-_printer-friendly_-Citigroup-17th-Annual-Entertainment-Media-and-Telecommunications-Conference.pdf",
-      "text_extract_path": null,
-      "drive_web_view_link": "https://drive.google.com/file/d/1TzjOH4vTdpqhiJwGrHi4EJU25qF0MyBS/view?usp=drivesdk",
-      "modified_at": "2026-10-16T14:35:05Z"
-    },
-    {
-      "document_id": "sha256:1c30b14954ce17a20cb705cfeac877a8718cffaa96cb34e3508ade2802fc943d",
-      "title": "Slides UBS Best of Americas 2015 Conference",
-      "source_type": "company_document",
-      "local_pdf_path": "SPGI/investor-documents/ir-spgi/Slides-UBS-Best-of-Americas-2015-Conference.pdf",
-      "text_extract_path": null,
-      "drive_web_view_link": "https://drive.google.com/file/d/1nt1Zf7R0U_BtNdiPwkvzpDVwooySvudc/view?usp=drivesdk",
-      "modified_at": "2026-10-16T14:35:05Z"
+      "modified_at": "2026-10-16T16:41:39Z"
     }
   ],
   "l2_pointers": {
@@ -352,14 +378,17 @@
     "insider_signal_md": "SPGI/research/evidence/insider_signal.md",
     "thematic_context_md": "SPGI/research/evidence/thematic_context.md",
     "source_inventory_json": "SPGI/third-party-analyses/source_inventory.json",
-    "full_ui_shard_json": "dashboard/data/tickers/SPGI.json"
+    "full_ui_shard_json": "dashboard/data/tickers/SPGI.json",
+    "latest_json": "SPGI/research/latest.json",
+    "context_pack_md": "dashboard/data/context_packs/SPGI.md"
   },
+  "generated_at": "2026-10-16T20:26:21Z",
   "_envelope": {
     "schema_version": "magis.feed.v2",
     "feed_id": "agent-shard-spgi",
-    "generated_at": "2026-10-16T17:58:36Z",
+    "generated_at": "2026-10-16T20:26:21Z",
     "as_of": "2026-07-20",
-    "content_sha256": "sha256:2be41510c0642f02c94d548464d747e960a284d66274f0db24b8068a29160a24",
+    "content_sha256": "sha256:a83245b74d52b306011b406e2516e7a16a92ebff54baf21374b0112d7f3906b9",
     "row_count": 13,
     "upstream_inputs": [],
     "health": {

@@ -1,10 +1,10 @@
 {
-  "schema_version": "magis.agent_shard.v1",
-  "generated_at": "2026-10-16T16:19:47Z",
-  "as_of": "2026-05-26",
+  "schema_version": "magis.agent_shard.v2",
   "ticker": "SJT",
   "company": "San Juan Basin Royalty Trust",
   "book": "holdings",
+  "shard_status": "built",
+  "as_of": "2026-05-26",
   "registry": {
     "market": "US",
     "exchange": "NYSE",
@@ -13,12 +13,24 @@
     "dhando": "partial",
     "payoff_lens": null
   },
+  "returns": {
+    "base_irr_pct": 5.8,
+    "unit": "percent_per_year",
+    "label": "annualized return",
+    "display": "5.8% (base)",
+    "scenarios_pct": {
+      "base": 5.8,
+      "bear": -7.0,
+      "bull": 19.4
+    }
+  },
   "thesis_summary": {
     "thesis": "San Juan Basin Royalty Trust holds a roughly 75% net-overriding royalty interest in Hilcorp-operated natural gas properties in northwestern New Mexico. **[Fact]** The Trust has no employees and no control over drilling or costs; Argent Trust Company administers distributions. **[Fact]** FY2025 royalty income from Hilcorp was **$0** and **no distributions** were made to unit holders (`SJT/investor-documents/sec-edgar/10-K_20260327_rpt20251231_acc0001193125_26_128710.htm`). **[Fact]** Excess production costs were **$6,186,819 gross ($4,640,114 net to the Trust)** as of March 31, 2026 after Q1 recovery of **$1,688,787 net** (`SJT/investor-documents/sec-edgar/10-Q_20260514_rpt20260331_acc0001193125_26_223189.htm`). **[Fact]** Cash reserves were **$14,380**; line of credit utilization **$750,514**; **46,608,796** units outstanding. **[Fact]** In each month from **May 2024 through March 2026**, the Trust received no royalty income (10-Q Note 4).",
     "why_market_wrong": "The market may treat San Juan as a broken income trust heading for wind-down, missing the Horizon Kinetics equity yield curve lens on a transitory NPI deficit. **[Inference]** Net excess production costs fell from **$6,328,902** at December 31, 2025 to **$4,640,115** at March 31, 2026, roughly **$1.69 million** recovered in one quarter, but Hilcorp's 2025 capex overspend slowed the path versus HK's May/June 2025 reinstatement estimate. **[Inference]** Royalty trusts sit outside yield screens and index mandates, creating a market-structure discount. If distributions resume, cumulative payoff may exceed what a zero-yield price embeds; timing and going-concern risk are worse than HK assumed.",
     "stance": "watch",
     "archetype": "optionality",
     "base_irr_pct": 5.8,
+    "base_irr_unit": "percent_per_year",
     "scenarios": {
       "base": 5.8,
       "bear": -7.0,
@@ -57,6 +69,24 @@
       "Update dhando if distributions resume"
     ]
   },
+  "truncation": {
+    "key_assumptions": {
+      "shown": 5,
+      "total": 5
+    },
+    "open_questions": {
+      "shown": 3,
+      "total": 3
+    },
+    "kpi_series": {
+      "shown": 0,
+      "total": 0
+    },
+    "documents": {
+      "shown": 1,
+      "note": "capped at 15 most recent in builder"
+    }
+  },
   "kpi_series": [],
   "recent_news": [],
   "documents": [
@@ -67,7 +97,7 @@
       "local_pdf_path": "SJT/third-party-analyses/vic/vic_pdf_2026-06-20_sjt-vic-pdf_50747d33bc.pdf",
       "text_extract_path": "SJT/third-party-analyses/vic/vic_pdf_2026-06-20_sjt-vic-pdf_50747d33bc.md",
       "drive_web_view_link": "https://drive.google.com/file/d/19J9OM160s68AY32hk0zNVQYz9EtlVUKo/view?usp=drivesdk",
-      "modified_at": "2026-10-16T14:34:58Z"
+      "modified_at": "2026-10-16T16:41:29Z"
     }
   ],
   "l2_pointers": {
@@ -77,14 +107,17 @@
     "insider_signal_md": null,
     "thematic_context_md": "SJT/research/evidence/thematic_context.md",
     "source_inventory_json": "SJT/third-party-analyses/source_inventory.json",
-    "full_ui_shard_json": "dashboard/data/tickers/SJT.json"
+    "full_ui_shard_json": "dashboard/data/tickers/SJT.json",
+    "latest_json": "SJT/research/latest.json",
+    "context_pack_md": "dashboard/data/context_packs/SJT.md"
   },
+  "generated_at": "2026-10-16T20:26:21Z",
   "_envelope": {
     "schema_version": "magis.feed.v2",
     "feed_id": "agent-shard-sjt",
-    "generated_at": "2026-10-16T16:19:47Z",
+    "generated_at": "2026-10-16T20:26:21Z",
     "as_of": "2026-05-26",
-    "content_sha256": "sha256:cefddf363b1feb2ef308746bbe7200371e59044a98c3827dda7767d92d6f1c3a",
+    "content_sha256": "sha256:0b2649e40b85d858508199e772269311cb0a69b6932d7e9adf19633d0c4c2c50",
     "row_count": 0,
     "upstream_inputs": [],
     "health": {

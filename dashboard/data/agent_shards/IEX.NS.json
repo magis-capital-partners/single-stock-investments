@@ -1,10 +1,10 @@
 {
-  "schema_version": "magis.agent_shard.v1",
-  "generated_at": "2026-10-16T17:58:36Z",
-  "as_of": "2026-06-04",
+  "schema_version": "magis.agent_shard.v2",
   "ticker": "IEX.NS",
   "company": "Indian Energy Exchange Limited",
   "book": "holdings",
+  "shard_status": "built",
+  "as_of": "2026-06-04",
   "registry": {
     "market": "IN",
     "exchange": "NSE",
@@ -13,12 +13,24 @@
     "dhando": "pending",
     "payoff_lens": "pending"
   },
+  "returns": {
+    "base_irr_pct": 9.74,
+    "unit": "percent_per_year",
+    "label": "7yr IRR (total synthesis)",
+    "display": "9.74% (total synthesis)",
+    "scenarios_pct": {
+      "base": 8.8,
+      "bear": 2.1,
+      "bull": 13.2
+    }
+  },
   "thesis_summary": {
     "thesis": "Indian Energy Exchange Limited operates India's leading power market platform: spot and term electricity, renewable energy certificates (RECs), and gas, under Central Electricity Regulatory Commission oversight. **[Fact]** The company earns transaction and membership fees on matched volume; it does not take directional power risk. **[Fact]** FY2024 consolidated revenue was **₹350.8 crore** (+16% year on year per annual report cover charts), consolidated profit after tax about **₹302.5 crore**, and earnings per share about **₹3.38** (`official-reports/annual-reports/annual_report_fy_2023_24_bse.pdf`). **[Fact]** At **₹124.07** per share (Yahoo Finance, 2026-06-04), the stock trades near **39 times** our **₹3.2** per share owner-cash starting point.",
     "why_market_wrong": "There is no dated structural discount. **[Inference]** Investors may capitalize India's short-term power-market growth and high returns on equity as if they persist at the current earnings multiple without regulatory or competitive pushback. **[Inference]** Our base return uses FY2024 owner cash per share with a small haircut, not a forward run rate from the Q4 FY25 investor deck until the FY2025 annual is on disk. Return is franchise earnings power at price, not a timed mispricing with a known catalyst date.",
     "stance": "watch",
     "archetype": "croupier",
     "base_irr_pct": 9.74,
+    "base_irr_unit": "percent_per_year",
     "scenarios": {
       "base": 8.8,
       "bear": 2.1,
@@ -68,6 +80,24 @@
       "Confirm FY2024 cash flow statement and dividend policy in annual PDF when text extract is available."
     ]
   },
+  "truncation": {
+    "key_assumptions": {
+      "shown": 7,
+      "total": 7
+    },
+    "open_questions": {
+      "shown": 4,
+      "total": 4
+    },
+    "kpi_series": {
+      "shown": 0,
+      "total": 0
+    },
+    "documents": {
+      "shown": 3,
+      "note": "capped at 15 most recent in builder"
+    }
+  },
   "kpi_series": [],
   "recent_news": [],
   "documents": [
@@ -78,7 +108,7 @@
       "local_pdf_path": "IEX.NS/third-party-analyses/vic/vic_pdf_2026-06-18_iex-ns-vic-pdf_55f529a09b.pdf",
       "text_extract_path": "IEX.NS/third-party-analyses/vic/vic_pdf_2026-06-18_iex-ns-vic-pdf_55f529a09b.md",
       "drive_web_view_link": "https://drive.google.com/file/d/1jH5mwDqZKqMxpzwUMCzerP1GZz1aAtpE/view?usp=drivesdk",
-      "modified_at": "2026-10-16T14:34:51Z"
+      "modified_at": "2026-10-16T16:40:13Z"
     },
     {
       "document_id": "sha256:7e957e950e01cbccabb1199724e1134ee375dffb28327b0df1a4347f1975a22c",
@@ -87,7 +117,7 @@
       "local_pdf_path": "IEX.NS/official-reports/annual-reports/annual_report_fy_2023_24_bse.pdf",
       "text_extract_path": null,
       "drive_web_view_link": "https://drive.google.com/file/d/1qCt0j2eBF7cFMrF9I-ltgNMurppaCkLM/view?usp=drivesdk",
-      "modified_at": "2026-10-16T14:34:51Z"
+      "modified_at": "2026-10-16T16:40:13Z"
     },
     {
       "document_id": "sha256:bb125732a31e49035f3428b732c181f50d4711c74bfeb7bd78a02f497cee6327",
@@ -96,7 +126,7 @@
       "local_pdf_path": "IEX.NS/presentations-and-media/investor_presentation_q4_fy25_bse.pdf",
       "text_extract_path": null,
       "drive_web_view_link": "https://drive.google.com/file/d/1WlIunxqz_b5TDntWAsq84C5v-PNWN1WI/view?usp=drivesdk",
-      "modified_at": "2026-10-16T14:34:51Z"
+      "modified_at": "2026-10-16T16:40:13Z"
     }
   ],
   "l2_pointers": {
@@ -106,14 +136,17 @@
     "insider_signal_md": null,
     "thematic_context_md": "IEX.NS/research/evidence/thematic_context.md",
     "source_inventory_json": "IEX.NS/third-party-analyses/source_inventory.json",
-    "full_ui_shard_json": "dashboard/data/tickers/IEX.NS.json"
+    "full_ui_shard_json": "dashboard/data/tickers/IEX.NS.json",
+    "latest_json": "IEX.NS/research/latest.json",
+    "context_pack_md": "dashboard/data/context_packs/IEX.NS.md"
   },
+  "generated_at": "2026-10-16T20:26:21Z",
   "_envelope": {
     "schema_version": "magis.feed.v2",
     "feed_id": "agent-shard-iex.ns",
-    "generated_at": "2026-10-16T17:58:36Z",
+    "generated_at": "2026-10-16T20:26:21Z",
     "as_of": "2026-06-04",
-    "content_sha256": "sha256:7adaa0956a6453b1f5815875ea526dbeae678ca78475066f00588cf85d44035e",
+    "content_sha256": "sha256:aed2217cbcea7ac198be0ec7333afc207ca4969a48230266242f415b257fbb64",
     "row_count": 0,
     "upstream_inputs": [],
     "health": {

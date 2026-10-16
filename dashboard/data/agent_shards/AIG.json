@@ -1,10 +1,10 @@
 {
-  "schema_version": "magis.agent_shard.v1",
-  "generated_at": "2026-10-16T17:58:36Z",
-  "as_of": "2026-07-21",
+  "schema_version": "magis.agent_shard.v2",
   "ticker": "AIG",
   "company": "American International Group",
   "book": "holdings",
+  "shard_status": "built",
+  "as_of": "2026-07-21",
   "registry": {
     "market": "US",
     "exchange": "—",
@@ -13,12 +13,24 @@
     "dhando": "pending",
     "payoff_lens": "pending"
   },
+  "returns": {
+    "base_irr_pct": 11.5,
+    "unit": "percent_per_year",
+    "label": "7yr IRR (total synthesis)",
+    "display": "11.5% (total synthesis)",
+    "scenarios_pct": {
+      "base": 10.6,
+      "bear": 6.5,
+      "bull": 14.6
+    }
+  },
   "thesis_summary": {
     "thesis": "American International Group, Inc. (NYSE: **AIG**) is a global property-casualty insurer focused on General Insurance after the 2022 Corebridge Financial separation. **[Fact]** FY2025 net income attributable to AIG common shareholders was **$3.1 billion** and book value per share was **$76.44** (adjusted book value **$78.02** excluding Investments AOCI). **[Fact]** Adjusted after-tax income, the company's normalized earnings measure excluding investment marks, Fortitude Re noise, and Corebridge fair-value swings, was **$4.0 billion**, or about **$7.09 per diluted share** on **570.4 million** weighted average diluted shares. **[Fact]** General Insurance delivered **$2.3 billion** of underwriting income in FY2025 (combined ratio **90.1%**), supplemented by **$3.4 billion** of segment net investment income. **[Inference]** AIG is a post-turnaround compounder: it underwrites commercial and personal risk where multinational expertise creates pricing power, invests float at higher yields, and returns excess capital through aggressive repurchases (shares outstanding fell from **688.8M** in 2023 to **538.2M** at December 31, 2025).",
     "why_market_wrong": "There is **no classic dated mispricing signal** (HK predictive attribute: **none**). **[Inference]** Generalists may anchor on GAAP net income volatility from realized investment gains and Corebridge mark-to-market moves, understating repeatable owner cash versus adjusted after-tax income of **$7.09 per share**. **[Fact]** The stock trades near **1.0 times** adjusted book value (**$78.02**), embedding continued combined ratio discipline and buybacks. **[Fact]** North America Commercial and International Commercial combined ratios were **86.8%** and **86.9%** in FY2025, while Global Personal was **99.0%** near breakeven. **[Inference]** The market may underweight the capital-return engine (share count down **22%** in two years) or overweight catastrophe tail risk without recognizing the **$920M** FY2025 cat charges already absorbed in results. Return here is **normalized owner cash at price**, not a simple price-to-book trade.",
     "stance": "watch",
     "archetype": "compounder",
     "base_irr_pct": 11.5,
+    "base_irr_unit": "percent_per_year",
     "scenarios": {
       "base": 10.6,
       "bear": 6.5,
@@ -62,6 +74,24 @@
       "Global Personal wildfire exposure and Fortitude runoff remain judgment bands",
       "No approved third-party sources in base IRR"
     ]
+  },
+  "truncation": {
+    "key_assumptions": {
+      "shown": 6,
+      "total": 6
+    },
+    "open_questions": {
+      "shown": 4,
+      "total": 4
+    },
+    "kpi_series": {
+      "shown": 11,
+      "total": 11
+    },
+    "documents": {
+      "shown": 0,
+      "note": "capped at 15 most recent in builder"
+    }
   },
   "kpi_series": [
     {
@@ -186,16 +216,7 @@
       "human_summary": "Peer Relative growth (-0.1% YoY) is trailing sleeve peers (peer median ~+7.7%). One quarter so far — not confirmed."
     }
   ],
-  "recent_news": [
-    {
-      "title": "American International Group (AIG) Names Sierra Signorelli CEO As Jon Hancock Retires - Yahoo Finance",
-      "published_utc": "2026-09-22T07:00:00+00:00",
-      "category": "management",
-      "confidence": 0.88,
-      "url": "https://news.google.com/rss/articles/CBMipgFBVV95cUxQeVJhZWpEeXJTMF9fWnU5U0d3MGEzTGFOTEd4ZWlneHlSTTJpZEVwQXNNQWRNbWkwbDNEa2tVTmZFX016UW5GUFNWcW0ySU9OVTNWcmxrSGlWRDZoeXI3d2dOcm5FdFJlWlJXYS1kOHV3ZUhPUnEybElDUjRSUjlta1YtSEthYXljMU9JWWtyMkYwcnhVY1VYaG9aek9kM2ZsWTJTNDdB?oc=5",
-      "linked_filing": null
-    }
-  ],
+  "recent_news": [],
   "documents": [],
   "l2_pointers": {
     "valuation_json": "AIG/research/valuation.json",
@@ -204,15 +225,18 @@
     "insider_signal_md": "AIG/research/evidence/insider_signal.md",
     "thematic_context_md": "AIG/research/evidence/thematic_context.md",
     "source_inventory_json": "AIG/third-party-analyses/source_inventory.json",
-    "full_ui_shard_json": "dashboard/data/tickers/AIG.json"
+    "full_ui_shard_json": "dashboard/data/tickers/AIG.json",
+    "latest_json": "AIG/research/latest.json",
+    "context_pack_md": "dashboard/data/context_packs/AIG.md"
   },
+  "generated_at": "2026-10-16T20:26:21Z",
   "_envelope": {
     "schema_version": "magis.feed.v2",
     "feed_id": "agent-shard-aig",
-    "generated_at": "2026-10-16T17:58:36Z",
+    "generated_at": "2026-10-16T20:26:21Z",
     "as_of": "2026-07-21",
-    "content_sha256": "sha256:67faa07d50fe66766c4d346d2619ed55d289d637dc19c544102b91340dd29532",
-    "row_count": 12,
+    "content_sha256": "sha256:48ca9d65577923034648efb4348d90abdd8853a6e369edeeb124501de3d68aac",
+    "row_count": 11,
     "upstream_inputs": [],
     "health": {
       "status": "healthy",

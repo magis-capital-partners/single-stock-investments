@@ -1,10 +1,10 @@
 {
-  "schema_version": "magis.agent_shard.v1",
-  "generated_at": "2026-10-16T17:58:36Z",
-  "as_of": "2026-07-24",
+  "schema_version": "magis.agent_shard.v2",
   "ticker": "9984.T",
   "company": "SoftBank Group Corp.",
   "book": "holdings",
+  "shard_status": "built",
+  "as_of": "2026-07-24",
   "registry": {
     "market": "JP",
     "exchange": "TSE",
@@ -13,12 +13,24 @@
     "dhando": "pending",
     "payoff_lens": "pending"
   },
+  "returns": {
+    "base_irr_pct": 0.8,
+    "unit": "percent_per_year",
+    "label": "7yr IRR",
+    "display": "0.8% (base)",
+    "scenarios_pct": {
+      "base": 0.8,
+      "bear": -3.6,
+      "bull": 5.4
+    }
+  },
   "thesis_summary": {
     "thesis": "SoftBank Group Corp. (9984.T) is a **pure holding company** listed on the Tokyo Stock Exchange. **[Fact]** It does not run a standalone operating business at the parent; economics flow through four reportable segments: **holdco investments** (listed and private stakes, including Alibaba marks), **SoftBank Vision Funds (SVF)**, **SoftBank Corp.** (Japanese telecom, majority-owned subsidiary), and **Arm Holdings** (semiconductor IP, listed stake). **[Fact]** FY2025 (ended 2025-03-31) consolidated parent owners equity was **¥11,561,541 million** on **1,452.982 million** average shares, or **¥7,957** book value per share. **[Fact]** Parent net profit was **¥1,153,332 million**, but holdco investment profit alone was **¥3,413,821 million**, driven largely by Alibaba fair-value marks rather than recurring cash. Return to shareholders today is mostly dividends (**¥44** per share full year FY2025) plus mark-driven equity, not steady parent-level free cash flow.",
     "why_market_wrong": "The stock at **¥5,918** (Yahoo Finance, 2026-07-24) trades at a deep discount to both consolidated book (**¥7,957** per share) and our proof-backed component base of **¥9,432** per share. **[Inference]** Generalists anchor on volatile investment gains, Vision Fund losses, and headline leverage from **asset-backed financing** (Arm margin **¥1,258.5 billion**, Alibaba forward **¥997.8 billion**, SoftBank Corp margin **¥796 billion** as of FY2025) rather than look-through asset value. **[Inference]** The market may be over-discounting Arm royalties, SoftBank Corp dividend upstream, and eventual Alibaba monetization while under-weighting the OpenAI commitment (up to **$30 billion** net) and financing unwind risk. Mispricing is **asset-lens**: value sits in stakes and catalyst exits, not in normalized owner cash at spot.",
     "stance": "watch",
     "archetype": "holding_co",
     "base_irr_pct": 0.8,
+    "base_irr_unit": "percent_per_year",
     "scenarios": {
       "base": 0.8,
       "bear": -3.6,
@@ -65,6 +77,24 @@
       "Milly adversarial pass pending (`adversarial_2026-07-24.md`)."
     ]
   },
+  "truncation": {
+    "key_assumptions": {
+      "shown": 6,
+      "total": 6
+    },
+    "open_questions": {
+      "shown": 6,
+      "total": 6
+    },
+    "kpi_series": {
+      "shown": 1,
+      "total": 1
+    },
+    "documents": {
+      "shown": 2,
+      "note": "capped at 15 most recent in builder"
+    }
+  },
   "kpi_series": [
     {
       "metric": "news_flow",
@@ -96,7 +126,7 @@
       "local_pdf_path": "9984.T/01_Official/IR/annual_report_fy2025_en.pdf",
       "text_extract_path": null,
       "drive_web_view_link": "https://drive.google.com/file/d/1tYu5rP84EKXLUdmpzelRyfg7TtwGoKyz/view?usp=drivesdk",
-      "modified_at": "2026-10-16T14:34:57Z"
+      "modified_at": "2026-10-16T16:36:41Z"
     },
     {
       "document_id": "sha256:fc7a87b835179741dd669f7848b3e38648421dc16b41458acb51b2c13e7a149f",
@@ -105,7 +135,7 @@
       "local_pdf_path": "9984.T/01_Official/IR/financial_report_q4fy2024_ja.pdf",
       "text_extract_path": null,
       "drive_web_view_link": "https://drive.google.com/file/d/12Y-sNYayf8KvtbG8M3SXbaSSnZfO0Uin/view?usp=drivesdk",
-      "modified_at": "2026-10-16T14:34:57Z"
+      "modified_at": "2026-10-16T16:36:41Z"
     }
   ],
   "l2_pointers": {
@@ -115,14 +145,17 @@
     "insider_signal_md": null,
     "thematic_context_md": "9984.T/research/evidence/thematic_context.md",
     "source_inventory_json": "9984.T/third-party-analyses/source_inventory.json",
-    "full_ui_shard_json": "dashboard/data/tickers/9984.T.json"
+    "full_ui_shard_json": "dashboard/data/tickers/9984.T.json",
+    "latest_json": "9984.T/research/latest.json",
+    "context_pack_md": "dashboard/data/context_packs/9984.T.md"
   },
+  "generated_at": "2026-10-16T20:26:21Z",
   "_envelope": {
     "schema_version": "magis.feed.v2",
     "feed_id": "agent-shard-9984.t",
-    "generated_at": "2026-10-16T17:58:36Z",
+    "generated_at": "2026-10-16T20:26:21Z",
     "as_of": "2026-07-24",
-    "content_sha256": "sha256:34331fd4c9d408fa83dab037263819be81bc377cb73ba3d071b5f57296f539a2",
+    "content_sha256": "sha256:2762c78cc21c744b854ab4c189e5a21d622fe50e6daaf146484cb5b54337294c",
     "row_count": 2,
     "upstream_inputs": [],
     "health": {

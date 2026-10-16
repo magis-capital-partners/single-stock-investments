@@ -1,0 +1,25 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "magis.thesis_card.v2",
+  "title": "Magis thesis_card.json",
+  "type": "object",
+  "required": ["ticker", "schema_version", "returns"],
+  "properties": {
+    "ticker": {"type": "string", "minLength": 1},
+    "schema_version": {"const": "2.0"},
+    "base_irr_pct": {"type": ["number", "null"]},
+    "base_irr_unit": {"const": "percent_per_year"},
+    "returns": {
+      "type": "object",
+      "required": ["base_irr_pct", "unit"],
+      "properties": {
+        "base_irr_pct": {"type": ["number", "null"]},
+        "unit": {"const": "percent_per_year"},
+        "label": {"type": ["string", "null"]},
+        "display": {"type": ["string", "null"]},
+        "scenarios_pct": {"type": "object"}
+      }
+    },
+    "filing_digest": {"type": ["string", "null"]}
+  }
+}

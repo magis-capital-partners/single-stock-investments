@@ -1,10 +1,10 @@
 {
-  "schema_version": "magis.agent_shard.v1",
-  "generated_at": "2026-10-16T17:58:36Z",
-  "as_of": "2026-06-11",
+  "schema_version": "magis.agent_shard.v2",
   "ticker": "KRP",
   "company": "Kimbell Royalty Partners LP",
   "book": "holdings",
+  "shard_status": "built",
+  "as_of": "2026-06-11",
   "registry": {
     "market": "US",
     "exchange": "NYSE",
@@ -13,12 +13,24 @@
     "dhando": "pending",
     "payoff_lens": "pending"
   },
+  "returns": {
+    "base_irr_pct": 12.6,
+    "unit": "percent_per_year",
+    "label": "7yr IRR",
+    "display": "12.6% (base)",
+    "scenarios_pct": {
+      "base": 12.6,
+      "bear": 6.0,
+      "bull": 17.7
+    }
+  },
   "thesis_summary": {
     "thesis": "Kimbell Royalty Partners, LP is a Fort Worth-based publicly traded partnership that owns mineral and overriding royalty interests across U.S. oil and gas basins and pays monthly cash distributions to common unitholders. **[Fact]** The partnership elects to be taxed as a corporation for U.S. federal income tax purposes (`10-K_20260226`, Overview). **[Fact]** As an owner of non-cost-bearing interests, KRP receives a share of production revenues net of post-production costs and taxes but does not fund drilling, lease operating expense, or plugging and abandonment (`same 10-K`). **[Fact]** As of February 20, 2026, **93,396,488** common units were outstanding (`same 10-K`). **[Fact]** FY2025 total revenues were **$333.8 million**, operating income **$132.8 million**, and net income per common unit **$0.62** (`same 10-K`, consolidated statements). **[Fact]** FY2025 cash distributions paid to common unitholders totaled **$149.4 million**, or about **$1.60** per unit (`same 10-K`, cash flow statement).",
     "why_market_wrong": "Yield-oriented investors may treat KRP as a simple bond proxy and miss the embedded acreage option on **~12.3 million gross mineral acres** and **~4.7 million gross ORRI acres**, with more than half of aggregate acreage in the Permian and Mid-Continent. **[Inference]** Screeners that rank on trailing GAAP earnings rather than cash distributions understate owner yield because depreciation and acquisition accounting suppress net income per unit relative to cash paid. **[Inference]** The partnership's **$441.5 million** revolver balance and Apollo-affiliated preferred equity may be priced as permanent leverage overhang rather than as financing for accretive acquisitions that expand the royalty footprint. **[Inference]** Q1 2026 revenue and earnings softness may be extrapolated as structural when FY2025 production still rose to **25,760 Boe/d** (`10-K_20260226`).",
     "stance": "watch",
     "archetype": "optionality",
     "base_irr_pct": 12.6,
+    "base_irr_unit": "percent_per_year",
     "scenarios": {
       "base": 12.6,
       "bear": 6.0,
@@ -66,6 +78,24 @@
       "Review Apollo preferred terms and revolver amortization vs distribution policy.",
       "CIK **1657788** added to `us_ticker_config.json` during this dive (was null at onboard)."
     ]
+  },
+  "truncation": {
+    "key_assumptions": {
+      "shown": 7,
+      "total": 7
+    },
+    "open_questions": {
+      "shown": 3,
+      "total": 3
+    },
+    "kpi_series": {
+      "shown": 12,
+      "total": 13
+    },
+    "documents": {
+      "shown": 1,
+      "note": "capped at 15 most recent in builder"
+    }
   },
   "kpi_series": [
     {
@@ -210,7 +240,7 @@
       "local_pdf_path": "KRP/third-party-analyses/vic/vic_pdf_2026-06-18_krp-vic-pdf_0a8d39bb78.pdf",
       "text_extract_path": "KRP/third-party-analyses/vic/vic_pdf_2026-06-18_krp-vic-pdf_0a8d39bb78.md",
       "drive_web_view_link": "https://drive.google.com/file/d/1NdOBF6yuMrAOLnNmKdz33RMgBpYS9Pad/view?usp=drivesdk",
-      "modified_at": "2026-10-16T14:34:58Z"
+      "modified_at": "2026-10-16T16:40:21Z"
     }
   ],
   "l2_pointers": {
@@ -220,14 +250,17 @@
     "insider_signal_md": "KRP/research/evidence/insider_signal.md",
     "thematic_context_md": "KRP/research/evidence/thematic_context.md",
     "source_inventory_json": "KRP/third-party-analyses/source_inventory.json",
-    "full_ui_shard_json": "dashboard/data/tickers/KRP.json"
+    "full_ui_shard_json": "dashboard/data/tickers/KRP.json",
+    "latest_json": "KRP/research/latest.json",
+    "context_pack_md": "dashboard/data/context_packs/KRP.md"
   },
+  "generated_at": "2026-10-16T20:26:21Z",
   "_envelope": {
     "schema_version": "magis.feed.v2",
     "feed_id": "agent-shard-krp",
-    "generated_at": "2026-10-16T17:58:36Z",
+    "generated_at": "2026-10-16T20:26:21Z",
     "as_of": "2026-06-11",
-    "content_sha256": "sha256:e109b2f171b2ca72aa0675689d1715a39ab3ccf6a5114f315d3bf765dd08d40e",
+    "content_sha256": "sha256:679daee746a666611b7b8fe1ea86ddc311302f97f251f68394884d200cb80650",
     "row_count": 12,
     "upstream_inputs": [],
     "health": {

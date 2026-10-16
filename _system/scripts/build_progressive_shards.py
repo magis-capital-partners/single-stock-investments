@@ -375,6 +375,8 @@ def build_all(target_tickers: list[str] | None = None, *, build_all_shards: bool
                     "stance": stance if stance != "watch" else None,
                     "archetype": archetype if archetype != "unknown" else None,
                     "base_irr_pct": summary_row.get("base_irr_pct"),
+                    "base_irr_unit": "percent_per_year",
+                    "shard_status": "built" if should_build_shard else "not_built",
                     "as_of": val.get("as_of"),
                     "has_card": True if (card or card_path.is_file()) else None,
                     "has_digest": True if digest_file.is_file() else None,
@@ -386,12 +388,12 @@ def build_all(target_tickers: list[str] | None = None, *, build_all_shards: bool
 
         if should_build_shard:
             shard_payload: dict[str, Any] = {
-                "schema_version": "magis.agent_shard.v1",
-                "generated_at": ts,
-                "as_of": val.get("as_of") or ts[:10],
+                "schema_version": "magis.agent_shard.v2",
                 "ticker": ticker,
                 "company": summary_row["company"],
                 "book": "holdings" if is_holding else ("watchlist" if is_watchlist else "research"),
+                "shard_status": "built",
+                "as_of": val.get("as_of") or ts[:10],
                 "registry": {
                     "market": reg_entry.get("market"),
                     "exchange": reg_entry.get("exchange"),
@@ -400,15 +402,29 @@ def build_all(target_tickers: list[str] | None = None, *, build_all_shards: bool
                     "dhando": reg_cls.get("dhando"),
                     "payoff_lens": reg_cls.get("payoff_lens"),
                 },
+                "returns": {
+                    "base_irr_pct": base_irr,
+                    "unit": "percent_per_year",
+                    "label": card.get("irr_label") or implied.get("label"),
+                    "display": implied.get("display"),
+                    "scenarios_pct": card.get("scenarios") or {},
+                },
                 "thesis_summary": {
                     "thesis": card.get("thesis") or "",
                     "why_market_wrong": card.get("why_market_wrong") or "",
                     "stance": stance,
                     "archetype": archetype,
                     "base_irr_pct": base_irr,
+                    "base_irr_unit": "percent_per_year",
                     "scenarios": card.get("scenarios") or {},
                     "key_assumptions": (card.get("key_assumptions") or [])[:8],
                     "open_questions": (card.get("open_questions") or [])[:6],
+                },
+                "truncation": {
+                    "key_assumptions": {"shown": min(len(card.get("key_assumptions") or []), 8), "total": len(card.get("key_assumptions") or [])},
+                    "open_questions": {"shown": min(len(card.get("open_questions") or []), 6), "total": len(card.get("open_questions") or [])},
+                    "kpi_series": {"shown": min(len(kpi_by_ticker.get(ticker) or []), 12), "total": len(kpi_by_ticker.get(ticker) or [])},
+                    "documents": {"shown": len(docs_by_ticker.get(ticker) or []), "note": "capped at 15 most recent in builder"},
                 },
                 "kpi_series": (kpi_by_ticker.get(ticker) or [])[:12],
                 "recent_news": news_by_ticker.get(ticker) or [],
@@ -433,8 +449,12 @@ def build_all(target_tickers: list[str] | None = None, *, build_all_shards: bool
                         else None
                     ),
                     "full_ui_shard_json": ui_shard_rel if (ROOT / ui_shard_rel).is_file() else None,
+                    "latest_json": f"{ticker}/research/latest.json",
+                    "context_pack_md": f"dashboard/data/context_packs/{ticker}.md",
                 },
             }
+            # Volatile stamp last: stable prefix stays prompt-cache friendly.
+            shard_payload["generated_at"] = ts
             attach_envelope(
                 shard_payload,
                 feed_id=f"agent-shard-{ticker.lower()}",
@@ -497,10 +517,15 @@ def build_all(target_tickers: list[str] | None = None, *, build_all_shards: bool
                 "tickers": len(manifest_rows),
                 "with_valuation": sum(1 for r in manifest_rows if r.get("as_of") or r.get("base_irr_pct") is not None),
                 "with_digest": sum(1 for r in manifest_rows if r.get("has_digest")),
+                "registry_universe": len(all_universe_tickers),
+                "tickers_without_shard": max(0, len(all_universe_tickers) - shards_written),
+                "shard_status_note": "Active-book tickers have built shards; other tickers resolve via {TICKER}/research/latest.json and thesis_card.json on demand.",
             },
             "path_templates": {
                 "agent_shard": "dashboard/data/agent_shards/{TICKER}.json",
                 "thesis_card": "{TICKER}/research/thesis_card.json",
+                "latest": "{TICKER}/research/latest.json",
+                "context_pack": "dashboard/data/context_packs/{TICKER}.md",
                 "full_ui_shard": "dashboard/data/tickers/{TICKER}.json",
                 "filing_digest": "{TICKER}/research/evidence/filing_digest.md",
             },

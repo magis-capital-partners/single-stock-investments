@@ -1,10 +1,10 @@
 {
-  "schema_version": "magis.agent_shard.v1",
-  "generated_at": "2026-10-16T17:58:36Z",
-  "as_of": "2026-06-11",
+  "schema_version": "magis.agent_shard.v2",
   "ticker": "NDAQ",
   "company": "Nasdaq Inc.",
   "book": "holdings",
+  "shard_status": "built",
+  "as_of": "2026-06-11",
   "registry": {
     "market": "US",
     "exchange": "NASDAQ",
@@ -13,12 +13,24 @@
     "dhando": "pending",
     "payoff_lens": "pending"
   },
+  "returns": {
+    "base_irr_pct": 9.26,
+    "unit": "percent_per_year",
+    "label": "7yr IRR (total synthesis)",
+    "display": "9.26% (total synthesis)",
+    "scenarios_pct": {
+      "base": 8.8,
+      "bear": 1.2,
+      "bull": 12.9
+    }
+  },
   "thesis_summary": {
     "thesis": "Nasdaq Inc. operates global market infrastructure: the Nasdaq Stock Market and other exchanges, clearing and transaction services, index licensing, market data, and financial-technology software for anti-financial crime, regulatory reporting, and capital-markets workflows. **[Fact]** Customers pay listing, transaction, subscription, and SaaS fees; Nasdaq does not take directional market risk on customer positions. **[Fact]** FY2025 net revenues less transaction-based expenses were **$5,249 million**, operating income **$2,331 million**, and net income **$1,788 million** (`investor-documents/sec-edgar/10-K_20260212_rpt20251231_acc0001628280_26_007703.htm`). **[Fact]** Q1 2026 net revenues less transaction-based expenses were **$1,407 million** (+14% versus **$1,237 million** in Q1 2025); operating income **$657 million** (+20%); net income **$519 million** (`investor-documents/sec-edgar/10-Q_20260424_rpt20260331_acc0001628280_26_027105.htm`). Adena Friedman is Chair and CEO.",
     "why_market_wrong": "There is no dated payoff or structural discount here. **[Inference]** Q1 2026 operating income reflects record U.S. cash-equity and equity-derivative volumes plus a **$89 million** net gain on divestitures; the market may treat that pace as permanent. **[Inference]** Our base return uses FY2025 owner cash per share (**$3.44**), not the Q1 2026 earnings run rate. Return is franchise earnings power at price, not a mispricing signal with a known catalyst date.",
     "stance": "watch",
     "archetype": "croupier",
     "base_irr_pct": 9.26,
+    "base_irr_unit": "percent_per_year",
     "scenarios": {
       "base": 8.8,
       "bear": 1.2,
@@ -67,6 +79,24 @@
       "Q1 2026 **$89M** net gain on divestitures excluded from normalized owner cash; confirm in subsequent 10-Q footnotes.",
       "FY2026 proxy and full SEC download pending; re-run after `marvin_cloud_refresh.py`."
     ]
+  },
+  "truncation": {
+    "key_assumptions": {
+      "shown": 7,
+      "total": 7
+    },
+    "open_questions": {
+      "shown": 4,
+      "total": 4
+    },
+    "kpi_series": {
+      "shown": 12,
+      "total": 15
+    },
+    "documents": {
+      "shown": 1,
+      "note": "capped at 15 most recent in builder"
+    }
   },
   "kpi_series": [
     {
@@ -211,7 +241,7 @@
       "local_pdf_path": "NDAQ/third-party-analyses/vic/vic_pdf_2026-06-18_ndaq-vic-pdf_493e818442.pdf",
       "text_extract_path": "NDAQ/third-party-analyses/vic/vic_pdf_2026-06-18_ndaq-vic-pdf_493e818442.md",
       "drive_web_view_link": "https://drive.google.com/file/d/1G1ofL7x48IhWSKGceQXIrV4jCYad6DcD/view?usp=drivesdk",
-      "modified_at": "2026-10-16T14:35:21Z"
+      "modified_at": "2026-10-16T16:40:47Z"
     }
   ],
   "l2_pointers": {
@@ -221,14 +251,17 @@
     "insider_signal_md": "NDAQ/research/evidence/insider_signal.md",
     "thematic_context_md": "NDAQ/research/evidence/thematic_context.md",
     "source_inventory_json": "NDAQ/third-party-analyses/source_inventory.json",
-    "full_ui_shard_json": "dashboard/data/tickers/NDAQ.json"
+    "full_ui_shard_json": "dashboard/data/tickers/NDAQ.json",
+    "latest_json": "NDAQ/research/latest.json",
+    "context_pack_md": "dashboard/data/context_packs/NDAQ.md"
   },
+  "generated_at": "2026-10-16T20:26:21Z",
   "_envelope": {
     "schema_version": "magis.feed.v2",
     "feed_id": "agent-shard-ndaq",
-    "generated_at": "2026-10-16T17:58:36Z",
+    "generated_at": "2026-10-16T20:26:21Z",
     "as_of": "2026-06-11",
-    "content_sha256": "sha256:2d0b6b68d5d4e7da6425c815049942ca9446d0cb3ae2220020daf5d20f3b80e7",
+    "content_sha256": "sha256:9cb922992a91f63c6094208f9ca20b3fa0eba99d99ec3f4aa9ae8c33f147690c",
     "row_count": 12,
     "upstream_inputs": [],
     "health": {

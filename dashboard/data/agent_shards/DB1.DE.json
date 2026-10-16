@@ -1,10 +1,10 @@
 {
-  "schema_version": "magis.agent_shard.v1",
-  "generated_at": "2026-10-16T17:58:36Z",
-  "as_of": "2026-06-11",
+  "schema_version": "magis.agent_shard.v2",
   "ticker": "DB1.DE",
   "company": "Deutsche Boerse AG",
   "book": "holdings",
+  "shard_status": "built",
+  "as_of": "2026-06-11",
   "registry": {
     "market": "EU",
     "exchange": "XETRA",
@@ -13,12 +13,24 @@
     "dhando": "pending",
     "payoff_lens": "pending"
   },
+  "returns": {
+    "base_irr_pct": 14.48,
+    "unit": "percent_per_year",
+    "label": "7yr IRR (total synthesis)",
+    "display": "14.48% (total synthesis)",
+    "scenarios_pct": {
+      "base": 13.4,
+      "bear": 7.9,
+      "bull": 17.5
+    }
+  },
   "thesis_summary": {
     "thesis": "Deutsche Börse Group is a leading European market infrastructure operator spanning exchanges, clearing, custody, fund distribution, indices, and buy-side software. **[Fact]** Four segments cover the transaction value chain: Investment Management Solutions (SimCorp, ISS STOXX indices and ESG data), Trading & Clearing (Eurex derivatives, Xetra cash equities, commodities, FX and digital assets), Fund Services (Clearstream fund connectivity), and Securities Services (custody, settlement, fund processing). **[Fact]** FY2025 net revenue was **€6,026 million** (+3% versus **€5,829 million** in 2024); net revenue excluding treasury result was **€5,189 million** (+9%). EBITDA was **€3,512 million** and EBITDA excluding treasury result **€2,675 million** (+14%). Net profit attributable to shareholders was **€1,995 million**; diluted earnings per share **€10.90** and cash earnings per share **€11.65** (`investor-documents/ir-db1/annual_report_2025.pdf`, Results of operations). **[Fact]** Q1 2026 net revenue excluding treasury result was **€1,434 million** (+12% versus **€1,277 million**); EBITDA excluding treasury result **€683 million** (+18%); net profit attributable to Deutsche Börse AG shareholders **€585 million** (+11%) (`investor-documents/ir-db1/quarterly_statement_q1_2026.pdf`). The company earns toll-like fees on trading, clearing, data, and fund workflows with minimal balance-sheet principal risk on core operations.",
     "why_market_wrong": "No dated structural discount or yield-curve setup. **[Inference]** Q1 2026 acceleration (+12% net revenue ex treasury, +18% EBITDA ex treasury) reflects elevated volatility in rates, commodities, and equities; the market may treat that pace as durable. **[Inference]** Declining treasury result (net interest from clearing cash) masks operating strength: total net revenue grew only 9% in Q1 2026 while operating segments grew faster. We normalize on FY2025 owner cash flow, not Q1 2026 peak volumes. **Predictive attribute:** none (franchise earnings at price, not market-structure exclusion).",
     "stance": "watch",
     "archetype": "croupier",
     "base_irr_pct": 14.48,
+    "base_irr_unit": "percent_per_year",
     "scenarios": {
       "base": 13.4,
       "bear": 7.9,
@@ -67,6 +79,24 @@
       "Allfunds closing timeline and ISS STOXX litigation outcome may change treasury and segment mix."
     ]
   },
+  "truncation": {
+    "key_assumptions": {
+      "shown": 7,
+      "total": 7
+    },
+    "open_questions": {
+      "shown": 3,
+      "total": 3
+    },
+    "kpi_series": {
+      "shown": 1,
+      "total": 1
+    },
+    "documents": {
+      "shown": 3,
+      "note": "capped at 15 most recent in builder"
+    }
+  },
   "kpi_series": [
     {
       "metric": "news_flow",
@@ -98,7 +128,7 @@
       "local_pdf_path": "DB1.DE/investor-documents/ir-db1/annual_report_2024.pdf",
       "text_extract_path": null,
       "drive_web_view_link": "https://drive.google.com/file/d/1JT5fC_hAgxf3lor_4w7nBCpgN6SPCMRA/view?usp=drivesdk",
-      "modified_at": "2026-10-16T14:35:02Z"
+      "modified_at": "2026-10-16T16:38:40Z"
     },
     {
       "document_id": "sha256:bfb663d82ce1d089a2dc66a4168ed3e31ba1e69c238a7134f7963bf0a162f750",
@@ -107,7 +137,7 @@
       "local_pdf_path": "DB1.DE/investor-documents/ir-db1/quarterly_statement_q1_2026.pdf",
       "text_extract_path": null,
       "drive_web_view_link": "https://drive.google.com/file/d/1Fwjf_gBwebGU7e38pZuqCiIcrxsGbgB4/view?usp=drivesdk",
-      "modified_at": "2026-10-16T14:35:02Z"
+      "modified_at": "2026-10-16T16:38:40Z"
     },
     {
       "document_id": "sha256:f44fdffd49269cb96e42885fa01b523fd57d5d08f7584311a59520e674383876",
@@ -116,7 +146,7 @@
       "local_pdf_path": "DB1.DE/investor-documents/ir-db1/annual_report_2025.pdf",
       "text_extract_path": null,
       "drive_web_view_link": "https://drive.google.com/file/d/1E-ENaeobQ_ELlrrnFZ695poIF9GBTpXg/view?usp=drivesdk",
-      "modified_at": "2026-10-16T14:35:02Z"
+      "modified_at": "2026-10-16T16:38:40Z"
     }
   ],
   "l2_pointers": {
@@ -126,14 +156,17 @@
     "insider_signal_md": null,
     "thematic_context_md": "DB1.DE/research/evidence/thematic_context.md",
     "source_inventory_json": "DB1.DE/third-party-analyses/source_inventory.json",
-    "full_ui_shard_json": "dashboard/data/tickers/DB1.DE.json"
+    "full_ui_shard_json": "dashboard/data/tickers/DB1.DE.json",
+    "latest_json": "DB1.DE/research/latest.json",
+    "context_pack_md": "dashboard/data/context_packs/DB1.DE.md"
   },
+  "generated_at": "2026-10-16T20:26:21Z",
   "_envelope": {
     "schema_version": "magis.feed.v2",
     "feed_id": "agent-shard-db1.de",
-    "generated_at": "2026-10-16T17:58:36Z",
+    "generated_at": "2026-10-16T20:26:21Z",
     "as_of": "2026-06-11",
-    "content_sha256": "sha256:f333f4e2c0d8bb3613e8435331d08a7f9f914483d136cf8386721a666e474562",
+    "content_sha256": "sha256:dc46b820a1541c3762069d54ad209c0d56165c5366d66255c2adc75d8ef9cfde",
     "row_count": 2,
     "upstream_inputs": [],
     "health": {

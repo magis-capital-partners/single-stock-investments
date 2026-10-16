@@ -1,10 +1,10 @@
 {
-  "schema_version": "magis.agent_shard.v1",
-  "generated_at": "2026-10-16T17:58:36Z",
-  "as_of": "2026-09-01",
+  "schema_version": "magis.agent_shard.v2",
   "ticker": "VTRS",
   "company": "Viatris Inc",
   "book": "holdings",
+  "shard_status": "built",
+  "as_of": "2026-09-01",
   "registry": {
     "market": "US",
     "exchange": "NASDAQ",
@@ -13,12 +13,24 @@
     "dhando": "partial",
     "payoff_lens": "operating"
   },
+  "returns": {
+    "base_irr_pct": 13.11,
+    "unit": "percent_per_year",
+    "label": "7yr IRR (total synthesis)",
+    "display": "13.11% (total synthesis)",
+    "scenarios_pct": {
+      "base": 12.7,
+      "bear": 4.7,
+      "bull": 15.7
+    }
+  },
   "thesis_summary": {
     "thesis": "Viatris Inc is a global generic and branded pharmaceuticals company formed from the 2020 combination of Mylan and Pfizer's Upjohn business. **[Fact]** The company sells off-patent medicines, complex generics, and established brands across four geographic segments: Developed Markets, Greater China, Japan / Australia / New Zealand, and Emerging Markets (`investor-documents/sec-edgar/10-K_20260226_rpt20251231_acc0001792044_26_000013.htm`). **[Fact]** FY2025 net revenues were about **$14.3 billion**, down from **$14.7 billion** in FY2024 and **$15.4 billion** in FY2023 (XBRL `Revenues` tag, same 10-K). **[Fact]** The company is mid-way through an enterprise-wide strategic review (EWSR) that sold non-core assets (including India API operations and biosimilars contributed to Biocon Biologics) and targets **$600 to $700 million** of annual cost savings to improve operating cash flow once fully implemented (10-K MD&A). **[Fact]** About **1.15 billion** shares were outstanding at year-end 2025; long-term debt was about **$12.5 billion** non-current plus **$1.9 billion** current portion.",
     "why_market_wrong": "The stock may trade as a melting ice cube of legacy Mylan leverage while understating durable generic cash generation after portfolio pruning. **[Inference]** GAAP earnings in FY2025 and Q1 2026 are distorted by large gains on divestitures (Q1 2026 diluted EPS **$2.55** vs **$0.15** in the current quarter per `10-Q_20260507`), so screens on trailing P/E mislead. **[Inference]** Operating cash flow near **$2.3 billion** is more stable than reported net income (**$163 million** to common in FY2025 per `filing_facts_2026-06-02.json`). **[Inference]** Complexity and litigation overhang (opioid, antitrust history in filings) keep generalists away, creating a **complexity discount** rather than a pure earnings discount. **[Inference]** David Rosen (Rubric Capital, approved Sohn 2026 panel) argues **residual-volatility** deep value: few buyers when stocks fall, plus underpriced **Idorsia** Phase III assets (**selatogrel**, **cenerimod**) with readouts in roughly six to nine months (`2026-05-27_Sohn_Digging_Deeper_VTRS_excerpt.md`). Filings confirm the collaboration and asset names (`DEF 14A_20241025`); Rosen's mix splits and \"double in 12 months\" are not verified here.",
     "stance": "watch",
     "archetype": "turnaround",
     "base_irr_pct": 13.11,
+    "base_irr_unit": "percent_per_year",
     "scenarios": {
       "base": 12.7,
       "bear": 4.7,
@@ -66,6 +78,24 @@
       "~~Approve Sohn Rosen excerpt~~ **Done 2026-06-02** (`sohn_rosen_vtrs`).",
       "IR PDF harvest via Vicki if investor.viatris.com blocks static scrape."
     ]
+  },
+  "truncation": {
+    "key_assumptions": {
+      "shown": 7,
+      "total": 7
+    },
+    "open_questions": {
+      "shown": 3,
+      "total": 3
+    },
+    "kpi_series": {
+      "shown": 12,
+      "total": 13
+    },
+    "documents": {
+      "shown": 1,
+      "note": "capped at 15 most recent in builder"
+    }
   },
   "kpi_series": [
     {
@@ -219,7 +249,7 @@
       "local_pdf_path": "VTRS/third-party-analyses/vic/vic_pdf_2026-06-20_vtrs-vic-pdf_24b1ce7c49.pdf",
       "text_extract_path": "VTRS/third-party-analyses/vic/vic_pdf_2026-06-20_vtrs-vic-pdf_24b1ce7c49.md",
       "drive_web_view_link": "https://drive.google.com/file/d/1Y0XZKjLCTGfggLmUZYgca8KvygISEXu2/view?usp=drivesdk",
-      "modified_at": "2026-10-16T14:35:21Z"
+      "modified_at": "2026-10-16T16:41:55Z"
     }
   ],
   "l2_pointers": {
@@ -229,14 +259,17 @@
     "insider_signal_md": "VTRS/research/evidence/insider_signal.md",
     "thematic_context_md": "VTRS/research/evidence/thematic_context.md",
     "source_inventory_json": "VTRS/third-party-analyses/source_inventory.json",
-    "full_ui_shard_json": "dashboard/data/tickers/VTRS.json"
+    "full_ui_shard_json": "dashboard/data/tickers/VTRS.json",
+    "latest_json": "VTRS/research/latest.json",
+    "context_pack_md": "dashboard/data/context_packs/VTRS.md"
   },
+  "generated_at": "2026-10-16T20:26:21Z",
   "_envelope": {
     "schema_version": "magis.feed.v2",
     "feed_id": "agent-shard-vtrs",
-    "generated_at": "2026-10-16T17:58:36Z",
+    "generated_at": "2026-10-16T20:26:21Z",
     "as_of": "2026-09-01",
-    "content_sha256": "sha256:87a94972397b7ad4bc9383acf765d542ad3b326be151325d5057a15005cc0eb3",
+    "content_sha256": "sha256:adc9105b1a2d1bf01dfb778e2bc4ff4f5895b79af85b79d3d919edd5411db78b",
     "row_count": 13,
     "upstream_inputs": [],
     "health": {

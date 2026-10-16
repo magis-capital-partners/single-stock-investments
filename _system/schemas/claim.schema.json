@@ -1,0 +1,18 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "magis.claim.v1",
+  "title": "Magis unified claim row (claims.jsonl)",
+  "type": "object",
+  "required": ["claim_id", "ticker", "statement", "claim_type", "status", "source_path"],
+  "properties": {
+    "claim_id": {"type": "string", "minLength": 8},
+    "ticker": {"type": "string"},
+    "statement": {"type": "string", "minLength": 1},
+    "claim_type": {"type": "string", "enum": ["fact", "inference", "opinion"]},
+    "status": {"type": "string", "enum": ["approved", "verified", "pending", "assumption"]},
+    "source_path": {"type": "string", "minLength": 1},
+    "source_locator": {"type": ["string", "null"]},
+    "as_of": {"type": ["string", "null"]},
+    "confidence": {"type": ["string", "number", "null"]}
+  }
+}

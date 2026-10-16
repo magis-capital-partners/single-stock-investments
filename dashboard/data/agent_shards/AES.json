@@ -1,10 +1,10 @@
 {
-  "schema_version": "magis.agent_shard.v1",
-  "generated_at": "2026-10-16T17:58:36Z",
-  "as_of": "2026-07-21",
+  "schema_version": "magis.agent_shard.v2",
   "ticker": "AES",
   "company": "AES Corporation",
   "book": "holdings",
+  "shard_status": "built",
+  "as_of": "2026-07-21",
   "registry": {
     "market": "US",
     "exchange": "—",
@@ -13,12 +13,24 @@
     "dhando": "pending",
     "payoff_lens": "pending"
   },
+  "returns": {
+    "base_irr_pct": 2.5,
+    "unit": "percent_per_year",
+    "label": "annualized return",
+    "display": "2.5% (base)",
+    "scenarios_pct": {
+      "base": 2.5,
+      "bear": -1.3,
+      "bull": 3.7
+    }
+  },
   "thesis_summary": {
     "thesis": "The AES Corporation is a global power company that builds, owns, and operates generation assets and two U.S. regulated utilities. **[Fact]** It reports four strategic units: Renewables, Utilities (AES Indiana and AES Ohio), Energy Infrastructure, and New Energy Technologies (`AES/investor-documents/sec-edgar/10-K_20260302_rpt20251231_acc0000874761_26_000063.htm`). **[Fact]** FY2025 consolidated revenue was about **$12.2 billion** and segment Adjusted EBITDA totaled about **$2.9 billion**. **[Fact]** AES signed **4.0 gigawatts** of new renewables contracts in 2025 and ended the year with a **12.0 gigawatt** contracted backlog not yet in operation. **[Fact]** On **March 1, 2026**, AES agreed to be acquired for **$15.00 per share** in cash by a buyer group led by Global Infrastructure Partners and EQT Infrastructure VI (`AES/investor-documents/sec-edgar/8-K_20260302_rpt20260301_acc0001193125_26_084157.htm`).",
     "why_market_wrong": "The stock now trades primarily as a **merger arbitrage** spread to **$15.00**, not as a standalone renewables compounder. **[Inference]** Short-horizon holders may overweight regulatory delay risk (Ohio PUCO, FERC, CFIUS, and foreign approvals named in the merger filing) and underweight the board's unanimous recommendation plus committed equity financing not conditioned on debt markets. **[Inference]** Pre-deal investors who owned AES for dividend growth may exit into a take-private, creating transient selling unrelated to deal break probability. **[Opinion]** The edge, if any, is timing and spread discipline, not a hidden standalone re-rating while the merger is pending.",
     "stance": "watch",
     "archetype": "infrastructure",
     "base_irr_pct": 2.5,
+    "base_irr_unit": "percent_per_year",
     "scenarios": {
       "base": 2.5,
       "bear": -1.3,
@@ -56,6 +68,24 @@
       "Standalone valuation if deal breaks: size normalized owner cash after **$5.9 billion** FY2025 capex.",
       "Vote outcome and any intervening superior proposal (no go-shop identified in initial merger filing)."
     ]
+  },
+  "truncation": {
+    "key_assumptions": {
+      "shown": 5,
+      "total": 5
+    },
+    "open_questions": {
+      "shown": 3,
+      "total": 3
+    },
+    "kpi_series": {
+      "shown": 12,
+      "total": 12
+    },
+    "documents": {
+      "shown": 0,
+      "note": "capped at 15 most recent in builder"
+    }
   },
   "kpi_series": [
     {
@@ -200,14 +230,17 @@
     "insider_signal_md": "AES/research/evidence/insider_signal.md",
     "thematic_context_md": "AES/research/evidence/thematic_context.md",
     "source_inventory_json": "AES/third-party-analyses/source_inventory.json",
-    "full_ui_shard_json": "dashboard/data/tickers/AES.json"
+    "full_ui_shard_json": "dashboard/data/tickers/AES.json",
+    "latest_json": "AES/research/latest.json",
+    "context_pack_md": "dashboard/data/context_packs/AES.md"
   },
+  "generated_at": "2026-10-16T20:26:21Z",
   "_envelope": {
     "schema_version": "magis.feed.v2",
     "feed_id": "agent-shard-aes",
-    "generated_at": "2026-10-16T17:58:36Z",
+    "generated_at": "2026-10-16T20:26:21Z",
     "as_of": "2026-07-21",
-    "content_sha256": "sha256:75b57596c4511983af1c5600d700e95721dad3e5aaefbde74db2f0e014d839e5",
+    "content_sha256": "sha256:29d3b1df699bd117e472eb1a5915d7b67eb76af8802f6aa750dd573c2f89d4c5",
     "row_count": 12,
     "upstream_inputs": [],
     "health": {

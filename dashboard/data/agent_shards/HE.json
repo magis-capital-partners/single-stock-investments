@@ -1,10 +1,10 @@
 {
-  "schema_version": "magis.agent_shard.v1",
-  "generated_at": "2026-10-16T17:58:36Z",
-  "as_of": "2026-06-03",
+  "schema_version": "magis.agent_shard.v2",
   "ticker": "HE",
   "company": "Hawaiian Electric Industries",
   "book": "holdings",
+  "shard_status": "built",
+  "as_of": "2026-06-03",
   "registry": {
     "market": "US",
     "exchange": "NYSE",
@@ -13,12 +13,24 @@
     "dhando": "pending",
     "payoff_lens": "pending"
   },
+  "returns": {
+    "base_irr_pct": 12.05,
+    "unit": "percent_per_year",
+    "label": "7yr IRR (total synthesis)",
+    "display": "12.05% (total synthesis)",
+    "scenarios_pct": {
+      "base": 13.0,
+      "bear": 5.2,
+      "bull": 16.5
+    }
+  },
   "thesis_summary": {
     "thesis": "Hawaiian Electric Industries is the parent of Hawaii's regulated electric utility and related businesses serving most of the state. **[Fact]** Consolidated revenues were about **$3.09 billion** in fiscal 2025 (`investor-documents/sec-edgar/10-K_20260227_rpt20251231_acc0000354707_26_000008.htm`). **[Fact]** The company reports an **Electric Utility** segment plus **All Other** activities. **[Fact]** Earnings and cash flow are set largely by the Hawaii Public Utilities Commission through allowed returns on rate-base capital, not by open-market pricing alone. **[Fact]** The common dividend has been suspended since the August 2023 Maui wildfires while the company funds legal and restoration obligations. **[Fact]** HE completed the sale of its **90.1%** stake in American Savings Bank at the end of calendar 2024 and is now essentially a pure-play utility (**[Inference]** from Horizon Kinetics Q1 2025 commentary, context tier).",
     "why_market_wrong": "The stock still trades like a distressed credit event at roughly **$13** per share (Stooq, 2026-06-03), down sharply from pre-fire levels. **[Inference]** Index and income funds that sort on dividend yield never see the name, which creates a **predictive attribute** (Horizon Kinetics equity yield curve): the payoff is known in direction (regulated recovery, dividend reinstatement, credit repair) but mis-timed for twelve-month holders. **[Inference]** The market may be anchoring on trough GAAP earnings (**$0.71** diluted EPS in FY2025 per 10-K XBRL) instead of mid-cycle owner cash once wildfire payments normalize. **[Opinion]** Patience is the edge; precision on timing and residual liability is not.",
     "stance": "watch",
     "archetype": "infrastructure",
     "base_irr_pct": 12.05,
+    "base_irr_unit": "percent_per_year",
     "scenarios": {
       "base": 13.0,
       "bear": 5.2,
@@ -68,6 +80,24 @@
       "Governance** post-Maui: review DEF 14A compensation and board changes."
     ]
   },
+  "truncation": {
+    "key_assumptions": {
+      "shown": 7,
+      "total": 7
+    },
+    "open_questions": {
+      "shown": 4,
+      "total": 4
+    },
+    "kpi_series": {
+      "shown": 2,
+      "total": 2
+    },
+    "documents": {
+      "shown": 3,
+      "note": "capped at 15 most recent in builder"
+    }
+  },
   "kpi_series": [
     {
       "metric": "news_flow",
@@ -101,7 +131,7 @@
       "local_pdf_path": "HE/investor-documents/ir-he/Hawaiian-Electric-Industries-Inc-Proxy.pdf",
       "text_extract_path": null,
       "drive_web_view_link": "https://drive.google.com/file/d/1d2MSB8uVuLcKzGmKLXR6tvgJUCQ6zEUD/view?usp=drivesdk",
-      "modified_at": "2026-10-16T14:36:17Z"
+      "modified_at": "2026-10-16T16:39:50Z"
     },
     {
       "document_id": "sha256:a1ce0e1048506d87a95bf273becd9628308de092738cf3524e76574ee023e918",
@@ -110,7 +140,7 @@
       "local_pdf_path": "HE/investor-documents/ir-he/Hawaiian-Electric-Industries-Annual-Report.pdf",
       "text_extract_path": null,
       "drive_web_view_link": "https://drive.google.com/file/d/1XouKhJLo6-ng-6E9sBW9uhU6vIEj3Ie9/view?usp=drivesdk",
-      "modified_at": "2026-10-16T14:36:17Z"
+      "modified_at": "2026-10-16T16:39:50Z"
     },
     {
       "document_id": "sha256:cd11673fc4555d8d2ea0b17a4cbfa2354106d87602e286cd8cb0e16746d1518c",
@@ -119,7 +149,7 @@
       "local_pdf_path": "HE/third-party-analyses/vic/vic_pdf_2026-06-18_he-vic-pdf_20647bd384.pdf",
       "text_extract_path": "HE/third-party-analyses/vic/vic_pdf_2026-06-18_he-vic-pdf_20647bd384.md",
       "drive_web_view_link": "https://drive.google.com/file/d/1DyQ5zRF_FwX9tXmO1QLw-J_k8KqfwDt7/view?usp=drivesdk",
-      "modified_at": "2026-10-16T14:36:17Z"
+      "modified_at": "2026-10-16T16:39:50Z"
     }
   ],
   "l2_pointers": {
@@ -129,14 +159,17 @@
     "insider_signal_md": null,
     "thematic_context_md": "HE/research/evidence/thematic_context.md",
     "source_inventory_json": "HE/third-party-analyses/source_inventory.json",
-    "full_ui_shard_json": "dashboard/data/tickers/HE.json"
+    "full_ui_shard_json": "dashboard/data/tickers/HE.json",
+    "latest_json": "HE/research/latest.json",
+    "context_pack_md": "dashboard/data/context_packs/HE.md"
   },
+  "generated_at": "2026-10-16T20:26:21Z",
   "_envelope": {
     "schema_version": "magis.feed.v2",
     "feed_id": "agent-shard-he",
-    "generated_at": "2026-10-16T17:58:36Z",
+    "generated_at": "2026-10-16T20:26:21Z",
     "as_of": "2026-06-03",
-    "content_sha256": "sha256:cefdcbb033244ed01b0184ba5069f577ec7b253e3db40335e65014f4bf11fd94",
+    "content_sha256": "sha256:b7bac19f56cf4d5c27de8e2e60e0bf61e5dcc669ccc35187b7c3d3e52299b42b",
     "row_count": 2,
     "upstream_inputs": [],
     "health": {
