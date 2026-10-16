@@ -24,11 +24,11 @@ on:
       - "_system/scripts/tests/test_agent_data_architecture.py"
       - "AGENT_INDEX.md"
       - "llms.txt"
-  workflow_dispatch:
 
 jobs:
   agent-data:
     runs-on: ubuntu-latest
+    timeout-minutes: 30
     steps:
       - uses: actions/checkout@v4
         with:
