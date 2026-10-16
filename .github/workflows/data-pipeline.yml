@@ -12,7 +12,7 @@ on:
     - cron: "17 2 * * 1-5"  # weekday technical fear/capitulation refresh
     - cron: "11 6 * * *"     # activist scan
     - cron: "23 12 * * 1,2,4,5,6" # light portfolio refresh
-    - cron: "19 10 * * 0,3"  # full document harvest twice weekly
+    - cron: "23 10 * * 0,3"  # full document harvest twice weekly
     - cron: "41 14 * * *"    # drive intake (daily)
     - cron: "47 */6 * * *"  # portfolio news
     - cron: "13 15 * * 1"    # CVR + warrant + separation discovery Mondays
@@ -69,7 +69,7 @@ jobs:
             "17 2 * * 1-5") technicals=true ;;
             "11 6 * * *") activist=true ;;
             "23 12 * * 1,2,4,5,6") downloads=true; download_mode=light ;;
-            "19 10 * * 0,3") downloads=true; download_mode=full ;;
+            "23 10 * * 0,3") downloads=true; download_mode=full ;;
             "41 14 * * *") drive=true ;;
             "47 */6 * * *") news=true ;;
             "13 15 * * 1") cvr_discover=true; warrant_discover=true; separation_discover=true; reverse_splits=true ;;
