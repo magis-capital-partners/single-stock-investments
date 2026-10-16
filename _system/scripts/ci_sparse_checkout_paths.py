@@ -5,8 +5,7 @@ Profiles:
   news         — portfolio news ingest (holdings news JSON only)
   marvin-pick  — marvin_pick_ticker metadata (holdings research md/json)
   two-phase-watch — INV Accelsius cooling watch (eight ticker trees + INV shard)
-  darwin       — Darwin refresh: no per-ticker trees (base paths only)
-  dashboard    — deploy rebuild checkout (base paths only; alias of darwin)
+  dashboard    — deploy rebuild checkout (base paths only)
 
 Base paths (_system, .github, dashboard) are always set by
 ci_checkout_workspace.sh; this script only emits extra ticker paths.
@@ -22,8 +21,8 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parents[2]
 REGISTRY_PATH = ROOT / "_system" / "portfolio" / "registry.json"
 
-# Soft cap for darwin/dashboard (must stay tiny — SPX-scale explosion caused 5h checkouts).
-DARWIN_PATH_CAP = 200
+# Soft cap for the dashboard profile (must stay tiny — SPX-scale explosion caused 5h checkouts).
+BASE_PROFILE_PATH_CAP = 200
 
 
 def load_holdings() -> list[str]:
@@ -83,8 +82,8 @@ def paths_for_profile(profile: str) -> list[str]:
             f"{ticker}/investor-documents/TRANSCRIPT_MANIFEST.json",
         ]
 
-    if profile in {"darwin", "dashboard"}:
-        # Darwin + pages rebuild read market-data / portfolio / dashboard under
+    if profile == "dashboard":
+        # The pages rebuild reads market-data / portfolio / dashboard under
         # _system and dashboard/ (already in base sparse set). No ticker trees.
         return []
 
@@ -107,10 +106,10 @@ def main() -> None:
             seen.add(path)
             out.append(path)
 
-    if profile in {"darwin", "dashboard"} and len(out) > DARWIN_PATH_CAP:
+    if profile == "dashboard" and len(out) > BASE_PROFILE_PATH_CAP:
         raise SystemExit(
             f"ERROR: sparse profile {profile!r} has {len(out)} paths "
-            f"(cap {DARWIN_PATH_CAP}). Refusing SPX-scale checkout explosion."
+            f"(cap {BASE_PROFILE_PATH_CAP}). Refusing SPX-scale checkout explosion."
         )
 
     if count_only:

@@ -313,7 +313,7 @@ allowed to speak.*
 ### Pipeline order of operations
 
 - After an SEC download for scaffolded names, rebuild `INDEX.csv` **before** `build_filing_evidence` — a stale INDEX yields `docs=0` with no error. — `_system/memory/daily/2026-07-28.md` `[active 2026-08-09 · agent]`
-- CI roles: the Data Pipeline workflow is the scheduled writer, Darwin is manual-only, and deploy is deploy-only — it runs after upstream commits land and never rebuilds. — `_system/memory/daily/2026-07-12.md` `[active 2026-08-09 · agent]`
+- CI roles: the Data Pipeline workflow is the scheduled writer, Darwin was retired in 2026-10 (the tab is now the Darwin Covered Call signal), and deploy is deploy-only — it runs after upstream commits land and never rebuilds. — `_system/memory/daily/2026-07-12.md` `[active 2026-08-09 · agent]`
 
 ---
 
