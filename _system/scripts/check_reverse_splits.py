@@ -174,6 +174,11 @@ def structural_errors(ledger_dir: Path | None = None) -> list[str]:
         errors.extend(audit_publication(paths["manifest"].parent))
     except (ValueError, KeyError, TypeError, OSError) as exc:
         errors.append("Free evidence publication is invalid: " + str(exc))
+    try:
+        from reverse_splits.calmar_validation import audit_publication as audit_calmar
+        errors.extend(audit_calmar(paths["manifest"].parent))
+    except (ValueError, KeyError, TypeError, OSError) as exc:
+        errors.append("Calmar publication is invalid: " + str(exc))
     return errors
 
 
