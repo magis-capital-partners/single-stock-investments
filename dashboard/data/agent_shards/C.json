@@ -1,10 +1,10 @@
 {
-  "schema_version": "magis.agent_shard.v1",
-  "generated_at": "2026-10-16T17:58:36Z",
-  "as_of": "2026-08-13",
+  "schema_version": "magis.agent_shard.v2",
   "ticker": "C",
   "company": "Citigroup",
   "book": "holdings",
+  "shard_status": "built",
+  "as_of": "2026-08-13",
   "registry": {
     "market": "US",
     "exchange": "—",
@@ -13,12 +13,20 @@
     "dhando": "pending",
     "payoff_lens": "pending"
   },
+  "returns": {
+    "base_irr_pct": null,
+    "unit": "percent_per_year",
+    "label": null,
+    "display": null,
+    "scenarios_pct": {}
+  },
   "thesis_summary": {
     "thesis": "Citigroup Inc. (NYSE: C) is a global systemically important bank with five operating businesses: Services, Markets, Banking, US Personal Banking, and Wealth. **[Fact]** FY2025 revenues were **$85.2 billion**, up **6%** reported, with net income **$14.3 billion** (**$6.99** per share). **[Fact]** Tangible common equity was **$169.6 billion** at December 31, 2025 (**$97.06** tangible book value per share on **1,747.5 million** common shares). **[Fact]** Return on tangible common equity was **7.7%** ( **8.8%** excluding a Russia-related notable item). **[Inference]** Owner economics are a regulated balance-sheet claim: tangible capital, normalized franchise returns, bounded excess-capital release, and explicit stress reserves, not industrial free cash flow.",
     "why_market_wrong": "The market may be paying **~1.4 times** tangible book for a bank still spending **~$3.3 billion** annually on transformation while RoTCE sits below a **~10%** cost-of-equity hurdle. **[Inference]** Simplification, exit of non-core consumer franchises, and record Services revenue could lift normalized returns, but CET1 headroom above **11.6%** regulatory minimum is not freely distributable until stress buffers, RWA growth, and transformation costs fade. **[Inference]** Partial dhando exists at tangible book; upside requires proof that franchise normalization and capital release exceed credit-cycle and regulatory reserves.",
     "stance": "watch",
     "archetype": "compounder",
     "base_irr_pct": null,
+    "base_irr_unit": "percent_per_year",
     "scenarios": {},
     "key_assumptions": [
       {
@@ -52,6 +60,24 @@
       "Promote any third-party Citigroup research before base IRR use",
       "Confirm distributable-capital release timing versus management CET1 buffers"
     ]
+  },
+  "truncation": {
+    "key_assumptions": {
+      "shown": 5,
+      "total": 5
+    },
+    "open_questions": {
+      "shown": 3,
+      "total": 3
+    },
+    "kpi_series": {
+      "shown": 8,
+      "total": 8
+    },
+    "documents": {
+      "shown": 4,
+      "note": "capped at 15 most recent in builder"
+    }
   },
   "kpi_series": [
     {
@@ -185,7 +211,7 @@
       "local_pdf_path": "C/investor-documents/ir-c/2026presoqtr2rslt.pdf",
       "text_extract_path": null,
       "drive_web_view_link": "https://drive.google.com/file/d/1AV99Fa-X_z_hax3K1PbAnasrCiDGu2rO/view?usp=drivesdk",
-      "modified_at": "2026-10-16T14:36:09Z"
+      "modified_at": "2026-10-16T16:37:59Z"
     },
     {
       "document_id": "sha256:4c7fc799bced4a9f86bcb6487fea0698cb56f9ec39b0836b76f722dd417ea9b2",
@@ -194,7 +220,7 @@
       "local_pdf_path": "C/investor-documents/ir-c/2026psqtr2-transcript.pdf",
       "text_extract_path": null,
       "drive_web_view_link": "https://drive.google.com/file/d/1RyGeE7HeB-BCqhomw1H8chaDpUjtZSI7/view?usp=drivesdk",
-      "modified_at": "2026-10-16T14:36:09Z"
+      "modified_at": "2026-10-16T16:37:59Z"
     },
     {
       "document_id": "sha256:65a4a775e86b481c539d1a270faed945c4e88dc7436be21f96462858f2a75c65",
@@ -203,7 +229,7 @@
       "local_pdf_path": "C/investor-documents/ir-c/2026prqtr2rslt.pdf",
       "text_extract_path": null,
       "drive_web_view_link": "https://drive.google.com/file/d/1_gisdWr0uKyIJRaeIb3WSHF0kC_D8Orv/view?usp=drivesdk",
-      "modified_at": "2026-10-16T14:36:09Z"
+      "modified_at": "2026-10-16T16:37:59Z"
     },
     {
       "document_id": "sha256:ddff03f8269be9709b8121b5f1aedfaff3b568da218429650d61d84836cdd026",
@@ -212,7 +238,7 @@
       "local_pdf_path": "C/investor-documents/ir-c/2026fsqtr2rslt.pdf",
       "text_extract_path": null,
       "drive_web_view_link": "https://drive.google.com/file/d/1ZqRYcAfIBNoaRza15Ejglc-eQxFhL7mc/view?usp=drivesdk",
-      "modified_at": "2026-10-16T14:36:09Z"
+      "modified_at": "2026-10-16T16:37:58Z"
     }
   ],
   "l2_pointers": {
@@ -222,14 +248,17 @@
     "insider_signal_md": "C/research/evidence/insider_signal.md",
     "thematic_context_md": "C/research/evidence/thematic_context.md",
     "source_inventory_json": "C/third-party-analyses/source_inventory.json",
-    "full_ui_shard_json": "dashboard/data/tickers/C.json"
+    "full_ui_shard_json": "dashboard/data/tickers/C.json",
+    "latest_json": "C/research/latest.json",
+    "context_pack_md": "dashboard/data/context_packs/C.md"
   },
+  "generated_at": "2026-10-16T20:26:21Z",
   "_envelope": {
     "schema_version": "magis.feed.v2",
     "feed_id": "agent-shard-c",
-    "generated_at": "2026-10-16T17:58:36Z",
+    "generated_at": "2026-10-16T20:26:21Z",
     "as_of": "2026-08-13",
-    "content_sha256": "sha256:37a0c8ee490c28256eb7be109e5bf67cd182e6ae2fc8fdfea4289fe71f6fef06",
+    "content_sha256": "sha256:e285cc34e43aa0ed3223c76eb8ae2d5b452a1af5ab9ad4588d0cc0c593c4cd78",
     "row_count": 12,
     "upstream_inputs": [],
     "health": {

@@ -1,10 +1,10 @@
 {
-  "schema_version": "magis.agent_shard.v1",
-  "generated_at": "2026-10-16T17:58:36Z",
-  "as_of": "2026-06-08",
+  "schema_version": "magis.agent_shard.v2",
   "ticker": "MSTR",
   "company": "MicroStrategy Incorporated",
   "book": "holdings",
+  "shard_status": "built",
+  "as_of": "2026-06-08",
   "registry": {
     "market": "US",
     "exchange": "NASDAQ",
@@ -13,12 +13,24 @@
     "dhando": "pending",
     "payoff_lens": "pending"
   },
+  "returns": {
+    "base_irr_pct": 4.2,
+    "unit": "percent_per_year",
+    "label": "annualized return",
+    "display": "4.2% (base)",
+    "scenarios_pct": {
+      "base": 4.2,
+      "bear": -6.7,
+      "bull": 11.8
+    }
+  },
   "thesis_summary": {
     "thesis": "Strategy Inc. (NASDAQ: MSTR; formerly MicroStrategy) is a public bitcoin treasury vehicle wrapped around a legacy enterprise analytics software franchise. **[Fact]** FY2025 revenue was **$463.5 million**, mostly subscription and support for Strategy One / cloud analytics. **[Fact]** The balance sheet is dominated by bitcoin: **672,500 BTC** at fair value **$58.9 billion** at December 31, 2025, rising to **762,099 BTC** (**$64.0 billion** fair value) at March 31, 2026 per the Q1 10-Q. **[Fact]** The company funds purchases with convertible notes, preferred stock (STRK, STRF, STRD, STRC), and common equity ATM programs; long-term debt was **~$8.2 billion** and temporary equity (preferred) **~$9.0 billion** at Q1 2026. Operating cash flow from software was **$67.2 million** in FY2025 while GAAP net income swung on **$5.4 billion** of unrealized BTC marks.",
     "why_market_wrong": "The market prices MSTR as a levered call on bitcoin with an embedded software annuity, not as a normalized software compounder. **[Inference]** At roughly **$390** per share (placeholder until market refresh), the stock embeds a large premium to filing look-through net asset value (~**$110** per share of GAAP equity at Q1 2026, or ~**$150** per share on a simplified BTC-minus-debt bridge). Mispricing debates are about **mNAV premium persistence**, dilution from the capital-markets flywheel, and whether spot bitcoin ETFs arbitrage away the equity wrapper. There is no dated equity yield curve; the predictive attribute is **levered digital-asset accumulation** rather than a passive royalty trust.",
     "stance": "watch",
     "archetype": "optionality",
     "base_irr_pct": 4.2,
+    "base_irr_unit": "percent_per_year",
     "scenarios": {
       "base": 4.2,
       "bear": -6.7,
@@ -62,6 +74,24 @@
       "mNAV premium and base payoff **$520/sh** are **[Assumption]**; stress dilution from outstanding converts (conversion ratios in 10-Q debt note).",
       "No approved third-party sources in base IRR."
     ]
+  },
+  "truncation": {
+    "key_assumptions": {
+      "shown": 6,
+      "total": 6
+    },
+    "open_questions": {
+      "shown": 4,
+      "total": 4
+    },
+    "kpi_series": {
+      "shown": 12,
+      "total": 16
+    },
+    "documents": {
+      "shown": 15,
+      "note": "capped at 15 most recent in builder"
+    }
   },
   "kpi_series": [
     {
@@ -200,13 +230,85 @@
   "recent_news": [],
   "documents": [
     {
+      "document_id": "sha256:016768251aae62660bc5047c7ed9cc33f6ccf472344027d1ce24c427b83bec9a",
+      "title": "strategy corporate governance compensation committee charter 04 2026",
+      "source_type": "company_document",
+      "local_pdf_path": "MSTR/investor-documents/ir-mstr/strategy-corporate-governance_compensation-committee-charter_04-2026.pdf",
+      "text_extract_path": null,
+      "drive_web_view_link": "https://drive.google.com/file/d/1R88WY8GOmx6a33Qie7EDbzLVtTloDKLG/view?usp=drivesdk",
+      "modified_at": "2026-10-16T16:40:45Z"
+    },
+    {
       "document_id": "sha256:35e40ee1faa055989a0e7a37d9a6076f908038d0f64747283d99a2f78aad01d7",
       "title": "vic pdf 2026 06 18 mstr vic pdf 0c74eb038c",
       "source_type": "vic_research",
       "local_pdf_path": "MSTR/third-party-analyses/vic/vic_pdf_2026-06-18_mstr-vic-pdf_0c74eb038c.pdf",
       "text_extract_path": "MSTR/third-party-analyses/vic/vic_pdf_2026-06-18_mstr-vic-pdf_0c74eb038c.md",
       "drive_web_view_link": "https://drive.google.com/file/d/1QgAKnJ7vy3nzg37fI29_4SPDvw9mSYKx/view?usp=drivesdk",
-      "modified_at": "2026-10-16T14:35:19Z"
+      "modified_at": "2026-10-16T16:40:45Z"
+    },
+    {
+      "document_id": "sha256:600650dc97e6b9c8e8237002211696d79d05ee55f40b2ba04240e55c5faba7ce",
+      "title": "strategy corporate code of conduct",
+      "source_type": "company_document",
+      "local_pdf_path": "MSTR/investor-documents/ir-mstr/strategy-corporate-code-of-conduct.pdf",
+      "text_extract_path": null,
+      "drive_web_view_link": "https://drive.google.com/file/d/11eQVwDjCPOHsMuhRjX6ENDguAHP8gyzR/view?usp=drivesdk",
+      "modified_at": "2026-10-16T16:40:45Z"
+    },
+    {
+      "document_id": "sha256:a96a6cf00e2a815bc899332aec10b0a166c92fbe8dff458bd2b08d5b5bfa3970",
+      "title": "strategy announces fourth quarter 2024 financial results presentation",
+      "source_type": "company_document",
+      "local_pdf_path": "MSTR/investor-documents/ir-mstr/strategy-announces-fourth-quarter-2024-financial-results-presentation.pdf",
+      "text_extract_path": null,
+      "drive_web_view_link": "https://drive.google.com/file/d/1LcRerJK1nSLrv2BMEgZJlKO4Q_ulbe3V/view?usp=drivesdk",
+      "modified_at": "2026-10-16T16:40:45Z"
+    },
+    {
+      "document_id": "sha256:b3760a09cf08095fcbdca195363ed7b02cd65dcb814b71b98772ced94601cd8a",
+      "title": "strategy q4 2025 financial results",
+      "source_type": "company_document",
+      "local_pdf_path": "MSTR/investor-documents/ir-mstr/strategy-q4-2025-financial-results.pdf",
+      "text_extract_path": null,
+      "drive_web_view_link": "https://drive.google.com/file/d/1RZm4A8YXVgB0789ymrST1NvBAOMez633/view?usp=drivesdk",
+      "modified_at": "2026-10-16T16:40:45Z"
+    },
+    {
+      "document_id": "sha256:bcc692c0c750b6a857e933eb1a867234cac0facda4b04c588d776283e2b24db6",
+      "title": "q2 2025 strategy earnings presentation",
+      "source_type": "company_document",
+      "local_pdf_path": "MSTR/investor-documents/ir-mstr/q2-2025-strategy-earnings-presentation.pdf",
+      "text_extract_path": null,
+      "drive_web_view_link": "https://drive.google.com/file/d/1kzsMxl4oDBzaFB1Z18rD6PbRQOiYgvCX/view?usp=drivesdk",
+      "modified_at": "2026-10-16T16:40:45Z"
+    },
+    {
+      "document_id": "sha256:d3e60e005438d0385e17139df9c57c8512e6268f353f45878380ef64d586386b",
+      "title": "strategy corporate governance nominating committee charter 04 2026",
+      "source_type": "company_document",
+      "local_pdf_path": "MSTR/investor-documents/ir-mstr/strategy-corporate-governance_nominating-committee-charter_04-2026.pdf",
+      "text_extract_path": null,
+      "drive_web_view_link": "https://drive.google.com/file/d/1-HRTj8B21An0kaK7Yruh1mI1RASgk-eu/view?usp=drivesdk",
+      "modified_at": "2026-10-16T16:40:45Z"
+    },
+    {
+      "document_id": "sha256:e80ee3188d270cce9fcf208b3183d4b256903873a84f07c4b785f4304e251ae2",
+      "title": "q3 2025 strategy earnings presentation",
+      "source_type": "company_document",
+      "local_pdf_path": "MSTR/investor-documents/ir-mstr/q3-2025-strategy-earnings-presentation.pdf",
+      "text_extract_path": null,
+      "drive_web_view_link": "https://drive.google.com/file/d/1IO99P0q8TvpRy0XuT6AhfE7e8FY-oQYz/view?usp=drivesdk",
+      "modified_at": "2026-10-16T16:40:45Z"
+    },
+    {
+      "document_id": "sha256:f3c4b3ed6daaf97e64cc8fed75725bd373061b1b79241e0676a1b3ff8c99a91d",
+      "title": "strategy q1 2026 financial results",
+      "source_type": "company_document",
+      "local_pdf_path": "MSTR/investor-documents/ir-mstr/strategy-q1-2026-financial-results.pdf",
+      "text_extract_path": null,
+      "drive_web_view_link": "https://drive.google.com/file/d/1byh6NhW3bZ2im8lljnl4aGwSziMsyln5/view?usp=drivesdk",
+      "modified_at": "2026-10-16T16:40:45Z"
     },
     {
       "document_id": "sha256:00faa707eb5a921b493aeb602920c4032d3143c5a4ffe1915c233d97da0254b5",
@@ -215,16 +317,7 @@
       "local_pdf_path": "MSTR/investor-documents/ir-mstr/form-144_05-28-2026.pdf",
       "text_extract_path": null,
       "drive_web_view_link": "https://drive.google.com/file/d/1wIbIrU_PKFucvjSr-yBoyZRBV_lMWEQE/view?usp=drivesdk",
-      "modified_at": "2026-10-16T14:35:18Z"
-    },
-    {
-      "document_id": "sha256:016768251aae62660bc5047c7ed9cc33f6ccf472344027d1ce24c427b83bec9a",
-      "title": "strategy corporate governance compensation committee charter 04 2026",
-      "source_type": "company_document",
-      "local_pdf_path": "MSTR/investor-documents/ir-mstr/strategy-corporate-governance_compensation-committee-charter_04-2026.pdf",
-      "text_extract_path": null,
-      "drive_web_view_link": "https://drive.google.com/file/d/1R88WY8GOmx6a33Qie7EDbzLVtTloDKLG/view?usp=drivesdk",
-      "modified_at": "2026-10-16T14:35:18Z"
+      "modified_at": "2026-10-16T16:40:44Z"
     },
     {
       "document_id": "sha256:05d8c89eb348ced7b7d40818d2f55669acbfb25b20812d96f8334241ad0d3d66",
@@ -233,7 +326,7 @@
       "local_pdf_path": "MSTR/investor-documents/ir-mstr/form-4_06-02-2026_filing-2.pdf",
       "text_extract_path": null,
       "drive_web_view_link": "https://drive.google.com/file/d/11nIALpioZ3mQe5EgL-Ed6TN9LbBoiRPz/view?usp=drivesdk",
-      "modified_at": "2026-10-16T14:35:18Z"
+      "modified_at": "2026-10-16T16:40:44Z"
     },
     {
       "document_id": "sha256:06183165d4db9939551a77c030dc73598743020f314bfc649f304dc5f4a127dd",
@@ -242,7 +335,7 @@
       "local_pdf_path": "MSTR/investor-documents/ir-mstr/form-424B2_03-23-2026_strategy-base-prospectus.pdf",
       "text_extract_path": null,
       "drive_web_view_link": "https://drive.google.com/file/d/1i4e0Pya4CB--FFZye3cvhs_GZ-i7P7Dp/view?usp=drivesdk",
-      "modified_at": "2026-10-16T14:35:18Z"
+      "modified_at": "2026-10-16T16:40:44Z"
     },
     {
       "document_id": "sha256:0e901cc96e17f8f1cc73fa0972aba3bfe0749d1ffd26d7d2bb5be880661eb0f6",
@@ -251,7 +344,7 @@
       "local_pdf_path": "MSTR/investor-documents/ir-mstr/form-4_06-02-2026_filing-5.pdf",
       "text_extract_path": null,
       "drive_web_view_link": "https://drive.google.com/file/d/1ciV0XJo5h38BSzlQaQneEYNFzfsAiJy7/view?usp=drivesdk",
-      "modified_at": "2026-10-16T14:35:18Z"
+      "modified_at": "2026-10-16T16:40:44Z"
     },
     {
       "document_id": "sha256:12ce963feb05e05727277f86f583f261633d59bcf9c85aee28138acd84780f4b",
@@ -260,7 +353,7 @@
       "local_pdf_path": "MSTR/investor-documents/ir-mstr/8937_Combined_and_Signed_Final.pdf",
       "text_extract_path": null,
       "drive_web_view_link": "https://drive.google.com/file/d/1Ws8MkWnBe-l1nHLYRbZvv6HPaU0v1uzL/view?usp=drivesdk",
-      "modified_at": "2026-10-16T14:35:18Z"
+      "modified_at": "2026-10-16T16:40:44Z"
     },
     {
       "document_id": "sha256:149cda8b1960d96f2626b2970911b277d4d73775ec597387d40c86aed39f7e3e",
@@ -269,70 +362,7 @@
       "local_pdf_path": "MSTR/investor-documents/ir-mstr/microstrategy-q4-2023-earnings-presentation.pdf",
       "text_extract_path": null,
       "drive_web_view_link": "https://drive.google.com/file/d/10gwA9gV99K2lD4I0E_2NUF8j1UvcMDAp/view?usp=drivesdk",
-      "modified_at": "2026-10-16T14:35:18Z"
-    },
-    {
-      "document_id": "sha256:154982f606456084f896505aaafab742b6834a6df98be24843d55a4d26bf7a96",
-      "title": "form defa 14a 06 04 2026",
-      "source_type": "company_document",
-      "local_pdf_path": "MSTR/investor-documents/ir-mstr/form-defa-14a_06-04-2026.pdf",
-      "text_extract_path": null,
-      "drive_web_view_link": "https://drive.google.com/file/d/1tuOl_C9-a0J8ys2UVHAd4bOgmCNNEp1L/view?usp=drivesdk",
-      "modified_at": "2026-10-16T14:35:18Z"
-    },
-    {
-      "document_id": "sha256:18e6212955d9b5e6618974ec8bdceb1d010731475112eb2198fc7d510bb15c3f",
-      "title": "form 424B5 11 04 2025 strk annex",
-      "source_type": "company_document",
-      "local_pdf_path": "MSTR/investor-documents/ir-mstr/form-424B5_11-04-2025_strk-annex.pdf",
-      "text_extract_path": null,
-      "drive_web_view_link": "https://drive.google.com/file/d/1hBgu_SORNTaAoX6XZLpQPr_-xJkJCMze/view?usp=drivesdk",
-      "modified_at": "2026-10-16T14:35:18Z"
-    },
-    {
-      "document_id": "sha256:1e39cc156a2664fbbc3174d6cfc414c2fd5b38fd3e33c2ee04d0f5ee225e6393",
-      "title": "form 424B3 05 06 2026",
-      "source_type": "company_document",
-      "local_pdf_path": "MSTR/investor-documents/ir-mstr/form-424B3_05-06-2026.pdf",
-      "text_extract_path": null,
-      "drive_web_view_link": "https://drive.google.com/file/d/19eQWhzTEMKZlwmL0jqfHxVinEQXBbpt0/view?usp=drivesdk",
-      "modified_at": "2026-10-16T14:35:18Z"
-    },
-    {
-      "document_id": "sha256:2bd7b2b94c50718ce709036dae6e4f09d5a0bb50465c708e849f60eab9dd7e06",
-      "title": "irs form 8937 12 2025",
-      "source_type": "company_document",
-      "local_pdf_path": "MSTR/investor-documents/ir-mstr/irs-form-8937_12-2025.pdf",
-      "text_extract_path": null,
-      "drive_web_view_link": "https://drive.google.com/file/d/1-NpLHSup1c5A2clSvVZptUVmVvRdGi4q/view?usp=drivesdk",
-      "modified_at": "2026-10-16T14:35:18Z"
-    },
-    {
-      "document_id": "sha256:3161fd6cf74200a5282c96f1368a433d943b636967ddeef6b62296fb9c522a35",
-      "title": "form 8 k filing 2 06 15 2026",
-      "source_type": "company_document",
-      "local_pdf_path": "MSTR/investor-documents/ir-mstr/form-8-k-filing-2_06-15-2026.pdf",
-      "text_extract_path": null,
-      "drive_web_view_link": "https://drive.google.com/file/d/1uAkXTJiB4PShnldvXMTXb5eu0qTT1FPk/view?usp=drivesdk",
-      "modified_at": "2026-10-16T14:35:18Z"
-    },
-    {
-      "document_id": "sha256:3635f1ceda2ef9f5befc5dca4ebab553d2a115191a7e14c2e1ba94aecfc8d9ec",
-      "title": "form defa 14a 05 27 2026",
-      "source_type": "company_document",
-      "local_pdf_path": "MSTR/investor-documents/ir-mstr/form-defa-14a_05-27-2026.pdf",
-      "text_extract_path": null,
-      "drive_web_view_link": "https://drive.google.com/file/d/1nCXGHNVdvAh_aCgeLc0LI9gRGQt-07s6/view?usp=drivesdk",
-      "modified_at": "2026-10-16T14:35:18Z"
-    },
-    {
-      "document_id": "sha256:3d5f59a1f0587b27e9af9b0019e9b635bae3ad8f22f007d97f84e877d8fdeb4b",
-      "title": "q1 2025 strategy earnings presentation",
-      "source_type": "company_document",
-      "local_pdf_path": "MSTR/investor-documents/ir-mstr/q1-2025-strategy-earnings-presentation.pdf",
-      "text_extract_path": null,
-      "drive_web_view_link": "https://drive.google.com/file/d/1g8WXsjkJXA3wXqRZaFbBbCBgTQz4tkJS/view?usp=drivesdk",
-      "modified_at": "2026-10-16T14:35:18Z"
+      "modified_at": "2026-10-16T16:40:44Z"
     }
   ],
   "l2_pointers": {
@@ -342,14 +372,17 @@
     "insider_signal_md": "MSTR/research/evidence/insider_signal.md",
     "thematic_context_md": "MSTR/research/evidence/thematic_context.md",
     "source_inventory_json": "MSTR/third-party-analyses/source_inventory.json",
-    "full_ui_shard_json": "dashboard/data/tickers/MSTR.json"
+    "full_ui_shard_json": "dashboard/data/tickers/MSTR.json",
+    "latest_json": "MSTR/research/latest.json",
+    "context_pack_md": "dashboard/data/context_packs/MSTR.md"
   },
+  "generated_at": "2026-10-16T20:26:21Z",
   "_envelope": {
     "schema_version": "magis.feed.v2",
     "feed_id": "agent-shard-mstr",
-    "generated_at": "2026-10-16T17:58:36Z",
+    "generated_at": "2026-10-16T20:26:21Z",
     "as_of": "2026-06-08",
-    "content_sha256": "sha256:862b728bec13fdd14c071c06023f7c17afff92be1efbc83c553492511900e4ac",
+    "content_sha256": "sha256:a2545b70c99dab2dcc5abd6aa5717b3d51b3dac81517552a28836d9b7ed191ef",
     "row_count": 12,
     "upstream_inputs": [],
     "health": {

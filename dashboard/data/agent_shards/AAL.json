@@ -1,10 +1,10 @@
 {
-  "schema_version": "magis.agent_shard.v1",
-  "generated_at": "2026-10-16T17:58:36Z",
-  "as_of": "2026-07-21",
+  "schema_version": "magis.agent_shard.v2",
   "ticker": "AAL",
   "company": "AAL",
   "book": "holdings",
+  "shard_status": "built",
+  "as_of": "2026-07-21",
   "registry": {
     "market": "US",
     "exchange": "—",
@@ -13,12 +13,24 @@
     "dhando": "pending",
     "payoff_lens": "pending"
   },
+  "returns": {
+    "base_irr_pct": 32.04,
+    "unit": "percent_per_year",
+    "label": "7yr IRR (total synthesis)",
+    "display": "32.04% (total synthesis)",
+    "scenarios_pct": {
+      "base": 30.5,
+      "bear": 18.5,
+      "bull": 38.7
+    }
+  },
   "thesis_summary": {
     "thesis": "American Airlines Group is the holding company for American Airlines, a major U.S. network carrier operating a hub-and-spoke domestic and international passenger and cargo network. **[Fact]** Shares trade on Nasdaq (AAL). **[Fact]** FY2025 total operating revenue was **$54.6 billion**, operating income **$1.5 billion**, and net income **$111 million** (diluted earnings **$0.17** per share) per `investor-documents/sec-edgar/10-K_20260218_rpt20251231_acc0000006201_26_000014.htm`. **[Fact]** FY2025 cash from operations was **$3.1 billion** while capital spending was **$3.8 billion**, and total debt and finance lease obligations were approximately **$29.0 billion** against cash of **$902 million** at year-end 2025.",
     "why_market_wrong": "The stock may trade as a distressed equity stub on a highly levered network, while normalized demand and loyalty economics still generate substantial operating cash flow. **[Inference]** FY2025 operating income fell to **$1.5 billion** from **$2.6 billion** in FY2024, so generalists may extrapolate margin compression without crediting ongoing debt paydown from **$3.1 billion** of operating cash flow. **[Inference]** The AAdvantage loyalty program and co-brand partnerships produce high-margin cash that is not separately capitalized on the balance sheet; the market may overweight GAAP net income (**$111 million**) versus mid-cycle owner cash per share near **$4.70** from operating cash flow. **[Inference]** Proof-first component math at base case sums to about **−$9.79** per share of filing-locked economic value versus a price near **$15**, suggesting the market prices deleveraging and cycle recovery beyond what the conservative component schedule captures today.",
     "stance": "watch",
     "archetype": "capital_cycle",
     "base_irr_pct": 32.04,
+    "base_irr_unit": "percent_per_year",
     "scenarios": {
       "base": 30.5,
       "bear": 18.5,
@@ -62,6 +74,24 @@
       "Live price and final base IRR after mechanical refresh.",
       "Confirm zero_value_policy outcome `liquidation_shortfall` for committee review."
     ]
+  },
+  "truncation": {
+    "key_assumptions": {
+      "shown": 6,
+      "total": 6
+    },
+    "open_questions": {
+      "shown": 4,
+      "total": 4
+    },
+    "kpi_series": {
+      "shown": 12,
+      "total": 16
+    },
+    "documents": {
+      "shown": 0,
+      "note": "capped at 15 most recent in builder"
+    }
   },
   "kpi_series": [
     {
@@ -206,14 +236,17 @@
     "insider_signal_md": "AAL/research/evidence/insider_signal.md",
     "thematic_context_md": "AAL/research/evidence/thematic_context.md",
     "source_inventory_json": "AAL/third-party-analyses/source_inventory.json",
-    "full_ui_shard_json": "dashboard/data/tickers/AAL.json"
+    "full_ui_shard_json": "dashboard/data/tickers/AAL.json",
+    "latest_json": "AAL/research/latest.json",
+    "context_pack_md": "dashboard/data/context_packs/AAL.md"
   },
+  "generated_at": "2026-10-16T20:26:21Z",
   "_envelope": {
     "schema_version": "magis.feed.v2",
     "feed_id": "agent-shard-aal",
-    "generated_at": "2026-10-16T17:58:36Z",
+    "generated_at": "2026-10-16T20:26:21Z",
     "as_of": "2026-07-21",
-    "content_sha256": "sha256:461565721c8dd49fde2af7e5006cf59debb9adc9621c409e91d62c9f617045bd",
+    "content_sha256": "sha256:be99a739c361e791f2674fc8b2ca29445fda3a5361721e6b2e2b29e2af6400d9",
     "row_count": 12,
     "upstream_inputs": [],
     "health": {

@@ -1,10 +1,10 @@
 {
-  "schema_version": "magis.agent_shard.v1",
-  "generated_at": "2026-10-16T16:19:47Z",
-  "as_of": "2026-07-20",
+  "schema_version": "magis.agent_shard.v2",
   "ticker": "CEE",
   "company": "The Central and Eastern Europe Fund, Inc.",
   "book": "holdings",
+  "shard_status": "built",
+  "as_of": "2026-07-20",
   "registry": {
     "market": "US",
     "exchange": "NYSE",
@@ -13,12 +13,20 @@
     "dhando": "partial",
     "payoff_lens": "asset"
   },
+  "returns": {
+    "base_irr_pct": null,
+    "unit": "percent_per_year",
+    "label": null,
+    "display": null,
+    "scenarios_pct": {}
+  },
   "thesis_summary": {
     "thesis": "The Central and Eastern Europe Fund is a New York–listed closed-end fund run by DWS. It owns a portfolio of mostly Polish and Hungarian equities (banks, energy, insurers, retailers) plus a frozen Russian equity sleeve. Since 14 March 2022 the fund has carried those Russian holdings at zero under sanctions and capital controls, even though the share counts are still disclosed. The publicly reported net asset value therefore describes only the liquid book. The share price usually tracks that reported figure closely.",
     "why_market_wrong": "The interesting mispricing is not the thin discount to reported net asset value. It is that reported net asset value itself may understate economic ownership by writing the entire Russian book to zero. The predictive attribute is a Level-3 / sanctions zero mark: local Moscow prices still exist for many names, but a United States fund cannot freely realize them. If any path to recovery, private sale, or eventual unblocking opens, that sleeve is a free (or cheap) option on top of a solvent Central European equity portfolio. Buybacks when the fund trades below reported net asset value are a secondary catalyst, not the main edge.",
     "stance": "watch",
     "archetype": "holding_co",
     "base_irr_pct": null,
+    "base_irr_unit": "percent_per_year",
     "scenarios": {},
     "key_assumptions": [
       {
@@ -69,6 +77,24 @@
       "Confirm whether any further private sales of non-sanctioned receipts occurred after PH3."
     ]
   },
+  "truncation": {
+    "key_assumptions": {
+      "shown": 8,
+      "total": 8
+    },
+    "open_questions": {
+      "shown": 4,
+      "total": 4
+    },
+    "kpi_series": {
+      "shown": 0,
+      "total": 0
+    },
+    "documents": {
+      "shown": 2,
+      "note": "capped at 15 most recent in builder"
+    }
+  },
   "kpi_series": [],
   "recent_news": [],
   "documents": [
@@ -79,7 +105,7 @@
       "local_pdf_path": "CEE/investor-documents/CEE-PH3.pdf",
       "text_extract_path": null,
       "drive_web_view_link": "https://drive.google.com/file/d/1Tjxj7_09jnTXt0Jw0C0jf7pO4zltNKcW/view?usp=drivesdk",
-      "modified_at": "2026-10-16T14:36:18Z"
+      "modified_at": "2026-10-16T16:38:08Z"
     },
     {
       "document_id": "sha256:df0a659fef81eaf40afcca38e14ad62a321bce3d97e7440c37617f1e1a4fd478",
@@ -88,7 +114,7 @@
       "local_pdf_path": "CEE/third-party-analyses/vic/CEE - VTY.L - 05-Vistry.pdf",
       "text_extract_path": null,
       "drive_web_view_link": "https://drive.google.com/file/d/1-238IiGrxn4TFJT4qpvFYS97Wm9FHv92/view?usp=drivesdk",
-      "modified_at": "2026-10-16T14:36:18Z"
+      "modified_at": "2026-10-16T16:38:08Z"
     }
   ],
   "l2_pointers": {
@@ -98,14 +124,17 @@
     "insider_signal_md": "CEE/research/evidence/insider_signal.md",
     "thematic_context_md": "CEE/research/evidence/thematic_context.md",
     "source_inventory_json": "CEE/third-party-analyses/source_inventory.json",
-    "full_ui_shard_json": "dashboard/data/tickers/CEE.json"
+    "full_ui_shard_json": "dashboard/data/tickers/CEE.json",
+    "latest_json": "CEE/research/latest.json",
+    "context_pack_md": "dashboard/data/context_packs/CEE.md"
   },
+  "generated_at": "2026-10-16T20:26:21Z",
   "_envelope": {
     "schema_version": "magis.feed.v2",
     "feed_id": "agent-shard-cee",
-    "generated_at": "2026-10-16T16:19:47Z",
+    "generated_at": "2026-10-16T20:26:21Z",
     "as_of": "2026-07-20",
-    "content_sha256": "sha256:15b61f66b0ea109e243d582be6b298cdfbdce0625d9ad05c88b61323b02f1194",
+    "content_sha256": "sha256:283ebe01ad95a803e8593008663d6fd04d0f8719bcd30ce5be8cbecb4eeb67db",
     "row_count": 0,
     "upstream_inputs": [],
     "health": {

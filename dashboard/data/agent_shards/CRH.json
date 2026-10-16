@@ -1,10 +1,10 @@
 {
-  "schema_version": "magis.agent_shard.v1",
-  "generated_at": "2026-10-16T17:58:36Z",
-  "as_of": "2026-07-29",
+  "schema_version": "magis.agent_shard.v2",
   "ticker": "CRH",
   "company": "CRH plc",
   "book": "holdings",
+  "shard_status": "built",
+  "as_of": "2026-07-29",
   "registry": {
     "market": "US",
     "exchange": "—",
@@ -13,12 +13,20 @@
     "dhando": "pending",
     "payoff_lens": "pending"
   },
+  "returns": {
+    "base_irr_pct": null,
+    "unit": "percent_per_year",
+    "label": null,
+    "display": null,
+    "scenarios_pct": {}
+  },
   "thesis_summary": {
     "thesis": "CRH plc is a global building materials company (aggregates, cement, asphalt, and building products) listed on the NYSE with an Irish parent and primary U.S. operating footprint. **[Fact]** FY2025 consolidated revenue was **$37.45 billion** per `investor-documents/sec-edgar/10-K_20260218_rpt20251231_acc0001628280_26_009043.htm`. **[Fact]** FY2025 net income attributable to shareholders was **$3.75 billion** (diluted EPS **$5.51**) on the same filing. **[Fact]** The group reports through an Americas division (materials and building solutions) and an International division (international solutions), per segment disclosures in the FY2025 10-K and the October 2025 prospectus supplement (`424B5_20251007_rpt_acc0001193125_25_233453.htm`).",
     "why_market_wrong": "The stock may trade as a passive infrastructure beneficiary while owner cash is already capital-intensive and levered. **[Inference]** FY2025 operating cash flow was **$5.62 billion** against capital spending of **$2.71 billion**, yet long-term debt on the March 2026 balance sheet was **$16.07 billion** per `10-Q_20260430_rpt20260331_acc0001628280_26_028556.htm`, so equity holders may underweight refinancing and integration risk from serial acquisitions. **[Inference]** Proof-first owner-earnings math at **$99.95** per share (July 2026 price in `valuation.json`) implies mid-single-digit negative annual returns on the automated base bridge even as reported earnings grow, suggesting the market prices reinvestment quality above what the conservative template captures. **[Inference]** Q1 2026 trailing normalized owner earnings (**$2.99 billion**) sit only modestly above the low-case anchor (**$2.91 billion**), while Q3 2025 trailing owner earnings (**$2.61 billion**) were below that anchor, so cyclical seasonality may be misread as steady compounder growth.",
     "stance": "watch",
     "archetype": "compounder",
     "base_irr_pct": null,
+    "base_irr_unit": "percent_per_year",
     "scenarios": {},
     "key_assumptions": [
       {
@@ -67,6 +75,24 @@
       "Independent review of falsifier draft `CRH/research/falsifier_drafts/0c6457af11f4a63293a9b6da.json`.",
       "Approve or reject third-party sources before blending external views."
     ]
+  },
+  "truncation": {
+    "key_assumptions": {
+      "shown": 8,
+      "total": 8
+    },
+    "open_questions": {
+      "shown": 3,
+      "total": 3
+    },
+    "kpi_series": {
+      "shown": 12,
+      "total": 12
+    },
+    "documents": {
+      "shown": 0,
+      "note": "capped at 15 most recent in builder"
+    }
   },
   "kpi_series": [
     {
@@ -211,14 +237,17 @@
     "insider_signal_md": "CRH/research/evidence/insider_signal.md",
     "thematic_context_md": "CRH/research/evidence/thematic_context.md",
     "source_inventory_json": "CRH/third-party-analyses/source_inventory.json",
-    "full_ui_shard_json": "dashboard/data/tickers/CRH.json"
+    "full_ui_shard_json": "dashboard/data/tickers/CRH.json",
+    "latest_json": "CRH/research/latest.json",
+    "context_pack_md": "dashboard/data/context_packs/CRH.md"
   },
+  "generated_at": "2026-10-16T20:26:21Z",
   "_envelope": {
     "schema_version": "magis.feed.v2",
     "feed_id": "agent-shard-crh",
-    "generated_at": "2026-10-16T17:58:36Z",
+    "generated_at": "2026-10-16T20:26:21Z",
     "as_of": "2026-07-29",
-    "content_sha256": "sha256:168aeb905175e8bb605467cf874220d8301387a9abb6e2128325e391105ba0a6",
+    "content_sha256": "sha256:56934cf14b0d211f62a60018a01683336ae3d787635baa39df94b526c7e5fe19",
     "row_count": 12,
     "upstream_inputs": [],
     "health": {

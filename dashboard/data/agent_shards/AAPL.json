@@ -1,10 +1,10 @@
 {
-  "schema_version": "magis.agent_shard.v1",
-  "generated_at": "2026-10-16T17:58:36Z",
-  "as_of": "2026-07-22",
+  "schema_version": "magis.agent_shard.v2",
   "ticker": "AAPL",
   "company": "Apple Inc.",
   "book": "holdings",
+  "shard_status": "built",
+  "as_of": "2026-07-22",
   "registry": {
     "market": "US",
     "exchange": "—",
@@ -13,12 +13,24 @@
     "dhando": "pending",
     "payoff_lens": "pending"
   },
+  "returns": {
+    "base_irr_pct": 0.77,
+    "unit": "percent_per_year",
+    "label": "7yr IRR (total synthesis)",
+    "display": "0.77% (total synthesis)",
+    "scenarios_pct": {
+      "base": -0.1,
+      "bear": -5.6,
+      "bull": 4.0
+    }
+  },
   "thesis_summary": {
     "thesis": "Apple Inc. designs, manufactures, and sells consumer hardware (iPhone, Mac, iPad, Wearables) and monetizes a global installed base through Services (App Store, iCloud, Apple Music, Apple Pay, advertising, and warranty). **[Fact]** Shares trade on Nasdaq (AAPL). **[Fact]** FY2025 consolidated net sales were **$307.0 billion**, operating income **$133.1 billion**, and net income **$112.0 billion** (diluted earnings **$7.46** per share) per `AAPL/investor-documents/sec-edgar/10-K_20251031_rpt20250927_acc0000320193_25_000079.htm`. **[Fact]** FY2025 cash from operations was **$111.5 billion**, capital spending **$12.7 billion**, and free cash flow about **$98.8 billion** on roughly **15.0 billion** diluted shares.",
     "why_market_wrong": "The stock may trade as a perpetual quality compounder while hardware cycles and regulatory risk compress normalized free cash flow multiples. **[Inference]** Disaggregated Services net sales reached **$109.2 billion** in FY2025 (up from **$96.2 billion** in FY2024), yet generalists may still anchor on iPhone unit headlines rather than high-margin recurring revenue. **[Inference]** Proof-first component math at base case sums to about **$187** per share of filing-locked economic value versus a price near **$327**, suggesting the market prices ecosystem durability, buybacks, and Apple Intelligence optionality beyond what the conservative component schedule captures today. **[Inference]** Cash and marketable securities of **$132.4 billion** against **$90.7 billion** of debt provide a net liquidity cushion that is easy to overlook when focusing on headline price-to-earnings alone.",
     "stance": "watch",
     "archetype": "compounder",
     "base_irr_pct": 0.77,
+    "base_irr_unit": "percent_per_year",
     "scenarios": {
       "base": -0.1,
       "bear": -5.6,
@@ -61,6 +73,24 @@
       "China and antitrust reserve band (**−$45 to −$8/sh**) pending regulatory outcomes.",
       "Live price and final base IRR after mechanical refresh."
     ]
+  },
+  "truncation": {
+    "key_assumptions": {
+      "shown": 6,
+      "total": 6
+    },
+    "open_questions": {
+      "shown": 3,
+      "total": 3
+    },
+    "kpi_series": {
+      "shown": 12,
+      "total": 13
+    },
+    "documents": {
+      "shown": 15,
+      "note": "capped at 15 most recent in builder"
+    }
   },
   "kpi_series": [
     {
@@ -208,67 +238,13 @@
   ],
   "documents": [
     {
-      "document_id": "sha256:039f634214265f74b42bbbc64810481e0d5b4a85a03d42b8510b67964ac8c618",
-      "title": "FY20 Q4 Consolidated Financial Statements",
-      "source_type": "company_document",
-      "local_pdf_path": "AAPL/investor-documents/ir-aapl/FY20_Q4_Consolidated_Financial_Statements.pdf",
-      "text_extract_path": null,
-      "drive_web_view_link": "https://drive.google.com/file/d/13omYspi6eaBpOb_Moe0rJSQlHmALPjpS/view?usp=drivesdk",
-      "modified_at": "2026-10-16T14:35:00Z"
-    },
-    {
-      "document_id": "sha256:052e16e1d17f9670bbe9d90e3dd2c252d0d924509ffd5d049a2f79d2131d4765",
-      "title": "Q3FY18DataSummary",
-      "source_type": "company_document",
-      "local_pdf_path": "AAPL/investor-documents/ir-aapl/Q3FY18DataSummary.pdf",
-      "text_extract_path": null,
-      "drive_web_view_link": "https://drive.google.com/file/d/1sfdtbnpDiqFXSd4XCZqiPmPqbFMdMwle/view?usp=drivesdk",
-      "modified_at": "2026-10-16T14:35:00Z"
-    },
-    {
       "document_id": "sha256:05956a7e56ef31dba7b4c34ab4e9a52af05d32aea4d21dd0699287960faa97da",
       "title": "q3fy16consolidated financial statements",
       "source_type": "company_document",
       "local_pdf_path": "AAPL/investor-documents/ir-aapl/q3fy16consolidated-financial-statements.pdf",
       "text_extract_path": null,
       "drive_web_view_link": "https://drive.google.com/file/d/1JLLAEPAEKxL7N4UBOoXzwRWqNX1pldoa/view?usp=drivesdk",
-      "modified_at": "2026-10-16T14:35:00Z"
-    },
-    {
-      "document_id": "sha256:064d69f6e833cc3fe938305eb1731583c99a65e32caae246b737e32e4531278d",
-      "title": "Q4FY17DataSummary",
-      "source_type": "company_document",
-      "local_pdf_path": "AAPL/investor-documents/ir-aapl/Q4FY17DataSummary.pdf",
-      "text_extract_path": null,
-      "drive_web_view_link": "https://drive.google.com/file/d/1YRyB_3FeAMPH5SCZVYACWC3H93ESB_0V/view?usp=drivesdk",
-      "modified_at": "2026-10-16T14:35:00Z"
-    },
-    {
-      "document_id": "sha256:0c79ba01dfc71ff103c974e578522e1788939fa84b1202ca06042f941e45bcbe",
-      "title": "10Q Q3FY17",
-      "source_type": "company_document",
-      "local_pdf_path": "AAPL/investor-documents/ir-aapl/10Q_Q3FY17.pdf",
-      "text_extract_path": null,
-      "drive_web_view_link": "https://drive.google.com/file/d/13R14Lx2and6-BZa_u0zmoX6UccTQutyd/view?usp=drivesdk",
-      "modified_at": "2026-10-16T14:35:00Z"
-    },
-    {
-      "document_id": "sha256:0e581dbee4def6badde0a107e6562558c14b953bc224ce48693886679d52ea17",
-      "title": "10Q Q3 2025 as filed",
-      "source_type": "company_document",
-      "local_pdf_path": "AAPL/investor-documents/ir-aapl/10Q-Q3-2025-as-filed.pdf",
-      "text_extract_path": null,
-      "drive_web_view_link": "https://drive.google.com/file/d/1h7yB-3QfnG5VHDcI0zlDnaBNlUboUF4K/view?usp=drivesdk",
-      "modified_at": "2026-10-16T14:35:00Z"
-    },
-    {
-      "document_id": "sha256:0e9f9b71a895bae2679ae98bf2117228d076070b2d8f90098590ba2cb5ebe1aa",
-      "title": "FY20 Q3 Consolidated Financial Statements",
-      "source_type": "company_document",
-      "local_pdf_path": "AAPL/investor-documents/ir-aapl/FY20-Q3_Consolidated_Financial_Statements.pdf",
-      "text_extract_path": null,
-      "drive_web_view_link": "https://drive.google.com/file/d/1527DNimhE1s3XVYxZz26CKvACwzS-40k/view?usp=drivesdk",
-      "modified_at": "2026-10-16T14:35:00Z"
+      "modified_at": "2026-10-16T16:36:45Z"
     },
     {
       "document_id": "sha256:0fa0d16b53db1238f284e71d1348882454da0ba45ad927218bbe2ea0227843ff",
@@ -277,52 +253,7 @@
       "local_pdf_path": "AAPL/investor-documents/ir-aapl/q3fy16datasum.pdf",
       "text_extract_path": null,
       "drive_web_view_link": "https://drive.google.com/file/d/1Tj9MHQtXVaUWNMyDnRfzmb6GM4Qa09cu/view?usp=drivesdk",
-      "modified_at": "2026-10-16T14:35:00Z"
-    },
-    {
-      "document_id": "sha256:128518b9fabf6ce059c98f6b45f15122aa8a721ef44fc9fd8e6f755c565b15ff",
-      "title": "FY22 Q2 Consolidated Financial Statements",
-      "source_type": "company_document",
-      "local_pdf_path": "AAPL/investor-documents/ir-aapl/FY22_Q2_Consolidated_Financial_Statements.pdf",
-      "text_extract_path": null,
-      "drive_web_view_link": "https://drive.google.com/file/d/15YR9NW5tdZBaiIN5UX116QyWSVqUgwtC/view?usp=drivesdk",
-      "modified_at": "2026-10-16T14:35:00Z"
-    },
-    {
-      "document_id": "sha256:12d4ad77554b43d04c6c700a70e8e3a6cc7a75c7bf62a347754e54fcd5172cd7",
-      "title": "FY21 Q3 Consolidated Financial Statements",
-      "source_type": "company_document",
-      "local_pdf_path": "AAPL/investor-documents/ir-aapl/FY21_Q3_Consolidated_Financial_Statements.pdf",
-      "text_extract_path": null,
-      "drive_web_view_link": "https://drive.google.com/file/d/1e4UFkxtDkt_2CQStpEuMVqhZZRCVZtl2/view?usp=drivesdk",
-      "modified_at": "2026-10-16T14:35:00Z"
-    },
-    {
-      "document_id": "sha256:17eefca21ca8078f88df71f7c132679ac57cad56ca6829a5d134422eaac72170",
-      "title": "10Q q2fy16",
-      "source_type": "company_document",
-      "local_pdf_path": "AAPL/investor-documents/ir-aapl/10Q_q2fy16.pdf",
-      "text_extract_path": null,
-      "drive_web_view_link": "https://drive.google.com/file/d/1TqUS5ySsslokiN2L4ck5hSsaX6mYCLt3/view?usp=drivesdk",
-      "modified_at": "2026-10-16T14:35:00Z"
-    },
-    {
-      "document_id": "sha256:19fe6ef8359aa55b7f0609dbbc772f1d4a572b045cd2510413cfcb7384cbd21e",
-      "title": "FY24 Q2 Consolidated Financial Statements",
-      "source_type": "company_document",
-      "local_pdf_path": "AAPL/investor-documents/ir-aapl/FY24_Q2_Consolidated_Financial_Statements.pdf",
-      "text_extract_path": null,
-      "drive_web_view_link": "https://drive.google.com/file/d/1Hh6lezyayC3X2oagFsHr_vZs4vIBXZTY/view?usp=drivesdk",
-      "modified_at": "2026-10-16T14:35:00Z"
-    },
-    {
-      "document_id": "sha256:1ab47a60815822e4291fed0f5d431f80fe50d057990abddaee5cd17719f528c4",
-      "title": "10K Q4FY18",
-      "source_type": "company_document",
-      "local_pdf_path": "AAPL/investor-documents/ir-aapl/10K_Q4FY18.pdf",
-      "text_extract_path": null,
-      "drive_web_view_link": "https://drive.google.com/file/d/1x82lTIZ06ZdRcdD7qoN2j1Nny9jeMJZx/view?usp=drivesdk",
-      "modified_at": "2026-10-16T14:35:00Z"
+      "modified_at": "2026-10-16T16:36:45Z"
     },
     {
       "document_id": "sha256:1d0f179933d76b7731c12feebd10802c454ffdd525fdc887f82a7220107efab3",
@@ -331,16 +262,115 @@
       "local_pdf_path": "AAPL/investor-documents/ir-aapl/_10-Q-Q3-2023-As-Filed.pdf",
       "text_extract_path": null,
       "drive_web_view_link": "https://drive.google.com/file/d/1cal-tA9VqvyKTA9j-K9-wYD4xLqYjkNc/view?usp=drivesdk",
-      "modified_at": "2026-10-16T14:35:00Z"
+      "modified_at": "2026-10-16T16:36:45Z"
     },
     {
-      "document_id": "sha256:1dba06445eb49b146c91486fd64af351be7b911b47a145ffc79f875465ec8bec",
-      "title": "Proxy Statement 2025",
+      "document_id": "sha256:291213d11def266a5582af8d00b6f5242ac1391b42a42fe0285b9ed130d15fae",
+      "title": "10 Q Q3 2022  As Filed",
       "source_type": "company_document",
-      "local_pdf_path": "AAPL/investor-documents/ir-aapl/Proxy_Statement_2025.pdf",
+      "local_pdf_path": "AAPL/investor-documents/ir-aapl/_10-Q-Q3-2022-_As-Filed_.pdf",
       "text_extract_path": null,
-      "drive_web_view_link": "https://drive.google.com/file/d/10SPMgUX2X5LUxxXd3F11bLsDzsLOFC94/view?usp=drivesdk",
-      "modified_at": "2026-10-16T14:35:00Z"
+      "drive_web_view_link": "https://drive.google.com/file/d/1arFFpu_nlB5YC8FcCqX1VkD1mrZxDKhD/view?usp=drivesdk",
+      "modified_at": "2026-10-16T16:36:45Z"
+    },
+    {
+      "document_id": "sha256:36b2b0d7cc7e343b773c608890cb90235f785e1aed25a4bcd263e325823a3c56",
+      "title": "q2fy16datasum",
+      "source_type": "company_document",
+      "local_pdf_path": "AAPL/investor-documents/ir-aapl/q2fy16datasum.pdf",
+      "text_extract_path": null,
+      "drive_web_view_link": "https://drive.google.com/file/d/1PTTmfSrLzkhlPnN0ir-thqxYbmB0b99h/view?usp=drivesdk",
+      "modified_at": "2026-10-16T16:36:45Z"
+    },
+    {
+      "document_id": "sha256:38a05c08c507c6798f8594737e935a3aec94ee4af67cd883d89ad4149b917140",
+      "title": "10 Q Q3 2021  As Filed",
+      "source_type": "company_document",
+      "local_pdf_path": "AAPL/investor-documents/ir-aapl/_10-Q-Q3-2021-_As-Filed_.pdf",
+      "text_extract_path": null,
+      "drive_web_view_link": "https://drive.google.com/file/d/1qlIQs-P-7-NmPWosLs4A0PIi6VFEXTWK/view?usp=drivesdk",
+      "modified_at": "2026-10-16T16:36:45Z"
+    },
+    {
+      "document_id": "sha256:71397d62c023612560cac94841ad7328af76be4aeea637de32e0a733712ad91e",
+      "title": "q1fy16supplementalmaterial",
+      "source_type": "company_document",
+      "local_pdf_path": "AAPL/investor-documents/ir-aapl/q1fy16supplementalmaterial.pdf",
+      "text_extract_path": null,
+      "drive_web_view_link": "https://drive.google.com/file/d/1DFbkG16Q5yY61SMA2k9ht9ekI0ryxmiK/view?usp=drivesdk",
+      "modified_at": "2026-10-16T16:36:45Z"
+    },
+    {
+      "document_id": "sha256:ab07fe4da40f533e4be528538f1aaed3ee3cd99bbff6bc833fc8953a9f16eb18",
+      "title": "q1fy16datasum",
+      "source_type": "company_document",
+      "local_pdf_path": "AAPL/investor-documents/ir-aapl/q1fy16datasum.pdf",
+      "text_extract_path": null,
+      "drive_web_view_link": "https://drive.google.com/file/d/1uSnnkgUKbLbjMBrv7ql8IjE3jqyHALeQ/view?usp=drivesdk",
+      "modified_at": "2026-10-16T16:36:45Z"
+    },
+    {
+      "document_id": "sha256:d65c0203458ef4ddd5d80f55e6c65a99280c7439b792be3b592459f4abaf7da7",
+      "title": "10 Q Q3 2024 As Filed",
+      "source_type": "company_document",
+      "local_pdf_path": "AAPL/investor-documents/ir-aapl/_10-Q-Q3-2024-As-Filed.pdf",
+      "text_extract_path": null,
+      "drive_web_view_link": "https://drive.google.com/file/d/1KEmpV-VDksg5bUdt0Oqw3YWMuKKkL3gi/view?usp=drivesdk",
+      "modified_at": "2026-10-16T16:36:45Z"
+    },
+    {
+      "document_id": "sha256:039f634214265f74b42bbbc64810481e0d5b4a85a03d42b8510b67964ac8c618",
+      "title": "FY20 Q4 Consolidated Financial Statements",
+      "source_type": "company_document",
+      "local_pdf_path": "AAPL/investor-documents/ir-aapl/FY20_Q4_Consolidated_Financial_Statements.pdf",
+      "text_extract_path": null,
+      "drive_web_view_link": "https://drive.google.com/file/d/13omYspi6eaBpOb_Moe0rJSQlHmALPjpS/view?usp=drivesdk",
+      "modified_at": "2026-10-16T16:36:44Z"
+    },
+    {
+      "document_id": "sha256:052e16e1d17f9670bbe9d90e3dd2c252d0d924509ffd5d049a2f79d2131d4765",
+      "title": "Q3FY18DataSummary",
+      "source_type": "company_document",
+      "local_pdf_path": "AAPL/investor-documents/ir-aapl/Q3FY18DataSummary.pdf",
+      "text_extract_path": null,
+      "drive_web_view_link": "https://drive.google.com/file/d/1sfdtbnpDiqFXSd4XCZqiPmPqbFMdMwle/view?usp=drivesdk",
+      "modified_at": "2026-10-16T16:36:44Z"
+    },
+    {
+      "document_id": "sha256:064d69f6e833cc3fe938305eb1731583c99a65e32caae246b737e32e4531278d",
+      "title": "Q4FY17DataSummary",
+      "source_type": "company_document",
+      "local_pdf_path": "AAPL/investor-documents/ir-aapl/Q4FY17DataSummary.pdf",
+      "text_extract_path": null,
+      "drive_web_view_link": "https://drive.google.com/file/d/1YRyB_3FeAMPH5SCZVYACWC3H93ESB_0V/view?usp=drivesdk",
+      "modified_at": "2026-10-16T16:36:44Z"
+    },
+    {
+      "document_id": "sha256:0c79ba01dfc71ff103c974e578522e1788939fa84b1202ca06042f941e45bcbe",
+      "title": "10Q Q3FY17",
+      "source_type": "company_document",
+      "local_pdf_path": "AAPL/investor-documents/ir-aapl/10Q_Q3FY17.pdf",
+      "text_extract_path": null,
+      "drive_web_view_link": "https://drive.google.com/file/d/13R14Lx2and6-BZa_u0zmoX6UccTQutyd/view?usp=drivesdk",
+      "modified_at": "2026-10-16T16:36:44Z"
+    },
+    {
+      "document_id": "sha256:0e581dbee4def6badde0a107e6562558c14b953bc224ce48693886679d52ea17",
+      "title": "10Q Q3 2025 as filed",
+      "source_type": "company_document",
+      "local_pdf_path": "AAPL/investor-documents/ir-aapl/10Q-Q3-2025-as-filed.pdf",
+      "text_extract_path": null,
+      "drive_web_view_link": "https://drive.google.com/file/d/1h7yB-3QfnG5VHDcI0zlDnaBNlUboUF4K/view?usp=drivesdk",
+      "modified_at": "2026-10-16T16:36:44Z"
+    },
+    {
+      "document_id": "sha256:0e9f9b71a895bae2679ae98bf2117228d076070b2d8f90098590ba2cb5ebe1aa",
+      "title": "FY20 Q3 Consolidated Financial Statements",
+      "source_type": "company_document",
+      "local_pdf_path": "AAPL/investor-documents/ir-aapl/FY20-Q3_Consolidated_Financial_Statements.pdf",
+      "text_extract_path": null,
+      "drive_web_view_link": "https://drive.google.com/file/d/1527DNimhE1s3XVYxZz26CKvACwzS-40k/view?usp=drivesdk",
+      "modified_at": "2026-10-16T16:36:44Z"
     }
   ],
   "l2_pointers": {
@@ -350,14 +380,17 @@
     "insider_signal_md": "AAPL/research/evidence/insider_signal.md",
     "thematic_context_md": "AAPL/research/evidence/thematic_context.md",
     "source_inventory_json": "AAPL/third-party-analyses/source_inventory.json",
-    "full_ui_shard_json": "dashboard/data/tickers/AAPL.json"
+    "full_ui_shard_json": "dashboard/data/tickers/AAPL.json",
+    "latest_json": "AAPL/research/latest.json",
+    "context_pack_md": "dashboard/data/context_packs/AAPL.md"
   },
+  "generated_at": "2026-10-16T20:26:21Z",
   "_envelope": {
     "schema_version": "magis.feed.v2",
     "feed_id": "agent-shard-aapl",
-    "generated_at": "2026-10-16T17:58:36Z",
+    "generated_at": "2026-10-16T20:26:21Z",
     "as_of": "2026-07-22",
-    "content_sha256": "sha256:bfb872cf5cb7b67dd0082b0c27c5b60ec337f88c1767d0d161c293aed008623f",
+    "content_sha256": "sha256:4ad6a313c4421ffc44338a8560c29ba762db2461fd6533fdaf962dc98631a4f7",
     "row_count": 13,
     "upstream_inputs": [],
     "health": {

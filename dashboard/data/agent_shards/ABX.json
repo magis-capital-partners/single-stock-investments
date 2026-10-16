@@ -1,10 +1,10 @@
 {
-  "schema_version": "magis.agent_shard.v1",
-  "generated_at": "2026-10-16T17:58:36Z",
-  "as_of": "2026-08-04",
+  "schema_version": "magis.agent_shard.v2",
   "ticker": "ABX",
   "company": "Abacus Life Inc.",
   "book": "holdings",
+  "shard_status": "built",
+  "as_of": "2026-08-04",
   "registry": {
     "market": "US",
     "exchange": "NASDAQ",
@@ -13,12 +13,24 @@
     "dhando": "pending",
     "payoff_lens": "pending"
   },
+  "returns": {
+    "base_irr_pct": -2.24,
+    "unit": "percent_per_year",
+    "label": "7yr IRR (total synthesis)",
+    "display": "-2.24% (total synthesis)",
+    "scenarios_pct": {
+      "base": -3.3,
+      "bear": -13.1,
+      "bull": 3.0
+    }
+  },
   "thesis_summary": {
     "thesis": "Abacus Global Management (NYSE: ABX; notes: ABXL) is an alternative-asset and life-settlement platform. **[Fact]** The company originates and brokers purchases of life insurance policies between policy sellers and institutional buyers, services those policies until mortality, and earns spread plus fees. **[Fact]** It also runs asset-management sleeves (including free-cash-flow-themed strategies via FCF Advisors, acquired December 2024) and a small technology services line (Abacus Intel mortality verification, launched late 2024). **[Fact]** Revenue is reported in three segments: Life Solutions, Asset Management, and Technology Services. **[Fact]** The company renamed from Abacus Life, Inc. in February 2025 and lists on the NYSE with 9.875% senior notes due 2028 (ABXL).",
     "why_market_wrong": "Life-settlement economics are opaque: GAAP net income can look modest while adjusted earnings and policy-portfolio marks tell a stronger story. **[Inference]** FY2025 revenue rose to $235 million (+110% year over year) and adjusted EBITDA reached $133 million, yet FY2025 cash from operations was only $26 million because policy purchases and working capital absorb cash before mortality payoffs arrive. **[Inference]** The stock near $9.25 (~2.2 times GAAP book) may screen expensive on trailing GAAP free cash flow while underpricing a rollup that doubled revenue through Carlisle and FCF Advisors. **[Inference]** Complexity (fair-value policy portfolio, securitized funding, dual equity/note structure) may keep generalist investors away even when servicing fees and securitization are repeatable.",
     "stance": "watch",
     "archetype": "platform",
     "base_irr_pct": -2.24,
+    "base_irr_unit": "percent_per_year",
     "scenarios": {
       "base": -3.3,
       "bear": -13.1,
@@ -67,6 +79,24 @@
       "Whether adjusted EBITDA should ever inform owner-cash normalization for stance gate",
       "Dividend sustainability at $0.20/sh vs. lumpy GAAP cash flow"
     ]
+  },
+  "truncation": {
+    "key_assumptions": {
+      "shown": 7,
+      "total": 7
+    },
+    "open_questions": {
+      "shown": 4,
+      "total": 4
+    },
+    "kpi_series": {
+      "shown": 12,
+      "total": 13
+    },
+    "documents": {
+      "shown": 7,
+      "note": "capped at 15 most recent in builder"
+    }
   },
   "kpi_series": [
     {
@@ -205,13 +235,22 @@
   "recent_news": [],
   "documents": [
     {
+      "document_id": "sha256:79c8db16629eb352e3a9a3dc138747bb59163659594a5b47838c91be7393a623",
+      "title": "vic pdf 2026 06 18 abx vic pdf 7abf4305b3",
+      "source_type": "vic_research",
+      "local_pdf_path": "ABX/third-party-analyses/vic/vic_pdf_2026-06-18_abx-vic-pdf_7abf4305b3.pdf",
+      "text_extract_path": "ABX/third-party-analyses/vic/vic_pdf_2026-06-18_abx-vic-pdf_7abf4305b3.md",
+      "drive_web_view_link": "https://drive.google.com/file/d/13Zt9wGD8B8s8-FjOqGcRl2eiBWL40sAY/view?usp=drivesdk",
+      "modified_at": "2026-10-16T16:36:48Z"
+    },
+    {
       "document_id": "sha256:3dff4cf1ffbfe70ebf7756336bd2a56c07d5c26e2b0d1f55666ce48dc8d7bbcb",
       "title": "Abacus Global Management   Public Investor Presentation Q2 2025",
       "source_type": "company_document",
       "local_pdf_path": "ABX/investor-documents/ir-abx/Abacus_Global_Management_-_Public_Investor_Presentation_Q2_2025.pdf",
       "text_extract_path": null,
       "drive_web_view_link": "https://drive.google.com/file/d/1URnaIcD84YyzUPCuxXOx9mkpl8nTh4te/view?usp=drivesdk",
-      "modified_at": "2026-10-16T14:35:04Z"
+      "modified_at": "2026-10-16T16:36:47Z"
     },
     {
       "document_id": "sha256:6946d5dcc0fa5d8da79476f82bc545c280441f6a8c26b8dda4eca09ae9a8d993",
@@ -220,7 +259,7 @@
       "local_pdf_path": "ABX/investor-documents/ir-abx/Abacus_Global_Management__28ABL_29_-_Investor_Presentation_Q3_2025.pdf",
       "text_extract_path": null,
       "drive_web_view_link": "https://drive.google.com/file/d/1FR-SZ9fF20QGB_oyItaRTSHFk1k4hcaf/view?usp=drivesdk",
-      "modified_at": "2026-10-16T14:35:04Z"
+      "modified_at": "2026-10-16T16:36:47Z"
     },
     {
       "document_id": "sha256:729112880a953116a4e6f3a7925bfbf77730daa0a919bb4f1509038bcf866c56",
@@ -229,16 +268,7 @@
       "local_pdf_path": "ABX/investor-documents/ir-abx/Abacus_Global_Management_-_Public_Investor_Presentation_Q4_2724.pdf",
       "text_extract_path": null,
       "drive_web_view_link": "https://drive.google.com/file/d/1OvmARa7LfP6YUFc5csklRSTcma6dRhLZ/view?usp=drivesdk",
-      "modified_at": "2026-10-16T14:35:04Z"
-    },
-    {
-      "document_id": "sha256:79c8db16629eb352e3a9a3dc138747bb59163659594a5b47838c91be7393a623",
-      "title": "vic pdf 2026 06 18 abx vic pdf 7abf4305b3",
-      "source_type": "vic_research",
-      "local_pdf_path": "ABX/third-party-analyses/vic/vic_pdf_2026-06-18_abx-vic-pdf_7abf4305b3.pdf",
-      "text_extract_path": "ABX/third-party-analyses/vic/vic_pdf_2026-06-18_abx-vic-pdf_7abf4305b3.md",
-      "drive_web_view_link": "https://drive.google.com/file/d/13Zt9wGD8B8s8-FjOqGcRl2eiBWL40sAY/view?usp=drivesdk",
-      "modified_at": "2026-10-16T14:35:04Z"
+      "modified_at": "2026-10-16T16:36:47Z"
     },
     {
       "document_id": "sha256:943cf9dce8d4fe2c97ce7cadb0e5f2885e276669216636ca0cd760ea72d19b89",
@@ -247,7 +277,7 @@
       "local_pdf_path": "ABX/investor-documents/ir-abx/Abacus_Global_Management__28ABX_29_-_Investor_Presentation_Q4__26_FY_2025.pdf",
       "text_extract_path": null,
       "drive_web_view_link": "https://drive.google.com/file/d/1-6yy0qqL4ZBhEHJB85uzSkTDjbgaJyYb/view?usp=drivesdk",
-      "modified_at": "2026-10-16T14:35:04Z"
+      "modified_at": "2026-10-16T16:36:47Z"
     },
     {
       "document_id": "sha256:b67b1b75f6ee5c6e61be545fa076d2f32e6d6763d5dc8009cf0b28c0cfc18932",
@@ -256,7 +286,7 @@
       "local_pdf_path": "ABX/investor-documents/ir-abx/Abacus_Global_Management_-_Public_Investor_Presentation_Q1_2025.pdf",
       "text_extract_path": null,
       "drive_web_view_link": "https://drive.google.com/file/d/1EpZJDPs-fE-8ADJkbvDI_j6uRYdDvlVB/view?usp=drivesdk",
-      "modified_at": "2026-10-16T14:35:04Z"
+      "modified_at": "2026-10-16T16:36:47Z"
     },
     {
       "document_id": "sha256:d519f3ac59b145cb4c57ab427c84bac35399e8d52446414da1b5a60c5d89888e",
@@ -265,7 +295,7 @@
       "local_pdf_path": "ABX/investor-documents/ir-abx/Abacus_Global_Management__28ABX_29_-_Investor_Presentation_Q1_2026.pdf",
       "text_extract_path": null,
       "drive_web_view_link": "https://drive.google.com/file/d/1DXClgLl6t5EkIDzyyoTPL8ZLDnjX15ac/view?usp=drivesdk",
-      "modified_at": "2026-10-16T14:35:04Z"
+      "modified_at": "2026-10-16T16:36:47Z"
     }
   ],
   "l2_pointers": {
@@ -275,14 +305,17 @@
     "insider_signal_md": "ABX/research/evidence/insider_signal.md",
     "thematic_context_md": "ABX/research/evidence/thematic_context.md",
     "source_inventory_json": "ABX/third-party-analyses/source_inventory.json",
-    "full_ui_shard_json": "dashboard/data/tickers/ABX.json"
+    "full_ui_shard_json": "dashboard/data/tickers/ABX.json",
+    "latest_json": "ABX/research/latest.json",
+    "context_pack_md": "dashboard/data/context_packs/ABX.md"
   },
+  "generated_at": "2026-10-16T20:26:21Z",
   "_envelope": {
     "schema_version": "magis.feed.v2",
     "feed_id": "agent-shard-abx",
-    "generated_at": "2026-10-16T17:58:36Z",
+    "generated_at": "2026-10-16T20:26:21Z",
     "as_of": "2026-08-04",
-    "content_sha256": "sha256:37af07e8f38a36290efe29a20ea342627f7eac6384ef6c8deebded45f730fd49",
+    "content_sha256": "sha256:a3bca753543e788ae08331fd7cd328360cceed6caefec361e1474a601f2e3dff",
     "row_count": 12,
     "upstream_inputs": [],
     "health": {

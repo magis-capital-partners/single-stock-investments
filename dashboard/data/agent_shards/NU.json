@@ -1,10 +1,10 @@
 {
-  "schema_version": "magis.agent_shard.v1",
-  "generated_at": "2026-10-16T17:58:36Z",
-  "as_of": "2026-07-28",
+  "schema_version": "magis.agent_shard.v2",
   "ticker": "NU",
   "company": "NU",
   "book": "holdings",
+  "shard_status": "built",
+  "as_of": "2026-07-28",
   "registry": {
     "market": "US",
     "exchange": "—",
@@ -13,12 +13,24 @@
     "dhando": "pending",
     "payoff_lens": "pending"
   },
+  "returns": {
+    "base_irr_pct": 16.06,
+    "unit": "percent_per_year",
+    "label": "7yr IRR (total synthesis)",
+    "display": "16.06% (total synthesis)",
+    "scenarios_pct": {
+      "base": 14.1,
+      "bear": 2.1,
+      "bull": 23.6
+    }
+  },
   "thesis_summary": {
     "thesis": "Nu Holdings Ltd. (ticker **NU**) is a Cayman holding company for a digital money platform operating mainly in **Brazil, Mexico, and Colombia**. **[Fact]** As of December 31, 2025 it served **131 million** customers with credit and prepaid cards, demand deposits and Money Boxes, Pix payments, personal and SME loans, investments, and insurance distribution. **[Fact]** FY2025 total revenue was **US$15.8 billion** (+37%) and net income attributable to the parent was **US$2.87 billion** (+45%). **[Fact]** Customers fund the balance sheet with **US$41.9 billion** of deposits, mostly payable on demand, while an interest-earning credit book and card receivables drive net interest and fee income. Nu presents results in U.S. dollars under IFRS and files a Form 20-F.",
     "why_market_wrong": "**[Inference]** At about **US$14.68** per share, the market may treat Nu as a generic high-growth fintech priced for perfect credit outcomes, or conversely as a bank forever capped by Brazil rates, without separating the **deposit franchise** (hard to copy) from **credit origination** (increasingly contested by Mercado Pago and, later, Sea Monee). **[Inference]** Unit economics in the FY2025 20-F (ARPAC **US$13.3**, cost to serve **US$0.8**, Brazil funding near **81% of CDI**) support a durable compounding engine even if credit growth cools from last year’s pace. **[Inference]** US national-bank optionality (OCC preliminary conditional approval January 2026) is easy to overpay for and easy to ignore; we leave it mostly outside base owner cash.",
     "stance": "watch",
     "archetype": "compounder",
     "base_irr_pct": 16.06,
+    "base_irr_unit": "percent_per_year",
     "scenarios": {
       "base": 14.1,
       "bear": 2.1,
@@ -62,6 +74,24 @@
       "Capital decision only via `human_decision.json` / IC. This file proposes **watch** (MS is OW/Top Pick; we do not auto-adopt)."
     ]
   },
+  "truncation": {
+    "key_assumptions": {
+      "shown": 6,
+      "total": 6
+    },
+    "open_questions": {
+      "shown": 3,
+      "total": 3
+    },
+    "kpi_series": {
+      "shown": 1,
+      "total": 1
+    },
+    "documents": {
+      "shown": 6,
+      "note": "capped at 15 most recent in builder"
+    }
+  },
   "kpi_series": [
     {
       "metric": "news_flow",
@@ -84,16 +114,7 @@
       "local_pdf_path": "NU/third-party-analyses/vic/NU - 05-NU-Holdings-NU-0632644321.pdf",
       "text_extract_path": null,
       "drive_web_view_link": "https://drive.google.com/file/d/18DtppQYRqSqTwcVj2ah0iVczrvrLHawz/view?usp=drivesdk",
-      "modified_at": "2026-10-16T14:35:24Z"
-    },
-    {
-      "document_id": "sha256:df14910f50ea2b68974ac3bf6de0d7a41e52314da2ec4b9223918bf8044076e1",
-      "title": "MS US Expansion, Opportunities and Challenges",
-      "source_type": "company_document",
-      "local_pdf_path": "NU/investor-documents/research-notes/MS US Expansion, Opportunities and Challenges.pdf",
-      "text_extract_path": null,
-      "drive_web_view_link": "https://drive.google.com/file/d/1KGfdwz-_oq1OUjCJ6dZOanV6g2Husc2k/view?usp=drivesdk",
-      "modified_at": "2026-10-16T14:35:24Z"
+      "modified_at": "2026-10-16T16:40:50Z"
     },
     {
       "document_id": "sha256:73c339c5474c341ab2b4be1008f2e83292f3b70c2cb0ec40135cfc2c0c7a9d5b",
@@ -102,7 +123,7 @@
       "local_pdf_path": "NU/investor-documents/research-notes/MS Digital Banks, From Niche to Mainstream.pdf",
       "text_extract_path": null,
       "drive_web_view_link": "https://drive.google.com/file/d/1hCzRfWU3CJ7_jTDCMU2ZTsjvcOO3AyJA/view?usp=drivesdk",
-      "modified_at": "2026-10-16T14:35:23Z"
+      "modified_at": "2026-10-16T16:40:50Z"
     },
     {
       "document_id": "sha256:7f97f69680bfe3a62b474d4037dae24fd04dfb86e074a5b6954e76ebdc75d5e6",
@@ -111,7 +132,7 @@
       "local_pdf_path": "NU/investor-documents/research-notes/MS More Growth Levers, Better Tools, Same Discipline.pdf",
       "text_extract_path": null,
       "drive_web_view_link": "https://drive.google.com/file/d/1COnfjvuMVnhAF_AINhkkPP8-rQMxI3HG/view?usp=drivesdk",
-      "modified_at": "2026-10-16T14:35:23Z"
+      "modified_at": "2026-10-16T16:40:50Z"
     },
     {
       "document_id": "sha256:d54ae62625923b5f1f4eed95fc104bd017e7bd7e9b9b3f1b2d94c87b2ae05ab8",
@@ -120,7 +141,16 @@
       "local_pdf_path": "NU/investor-documents/research-notes/MS The Path to $100 Billion.pdf",
       "text_extract_path": null,
       "drive_web_view_link": "https://drive.google.com/file/d/1RcLF40Hvk9b2Bu5d2RVR6Nz5zALiYuJF/view?usp=drivesdk",
-      "modified_at": "2026-10-16T14:35:23Z"
+      "modified_at": "2026-10-16T16:40:50Z"
+    },
+    {
+      "document_id": "sha256:df14910f50ea2b68974ac3bf6de0d7a41e52314da2ec4b9223918bf8044076e1",
+      "title": "MS US Expansion, Opportunities and Challenges",
+      "source_type": "company_document",
+      "local_pdf_path": "NU/investor-documents/research-notes/MS US Expansion, Opportunities and Challenges.pdf",
+      "text_extract_path": null,
+      "drive_web_view_link": "https://drive.google.com/file/d/1KGfdwz-_oq1OUjCJ6dZOanV6g2Husc2k/view?usp=drivesdk",
+      "modified_at": "2026-10-16T16:40:50Z"
     },
     {
       "document_id": "sha256:f6553db7a17a6a83d0ab30a141be73299ebb0c79c36fc895a498d67698273e56",
@@ -129,7 +159,7 @@
       "local_pdf_path": "NU/investor-documents/research-notes/MS The Rise (and Rise) of Nubank.pdf",
       "text_extract_path": null,
       "drive_web_view_link": "https://drive.google.com/file/d/10LQlGF57UxKS9TyvlJqUbSBlUBYs_y5x/view?usp=drivesdk",
-      "modified_at": "2026-10-16T14:35:23Z"
+      "modified_at": "2026-10-16T16:40:50Z"
     }
   ],
   "l2_pointers": {
@@ -139,14 +169,17 @@
     "insider_signal_md": "NU/research/evidence/insider_signal.md",
     "thematic_context_md": "NU/research/evidence/thematic_context.md",
     "source_inventory_json": "NU/third-party-analyses/source_inventory.json",
-    "full_ui_shard_json": "dashboard/data/tickers/NU.json"
+    "full_ui_shard_json": "dashboard/data/tickers/NU.json",
+    "latest_json": "NU/research/latest.json",
+    "context_pack_md": "dashboard/data/context_packs/NU.md"
   },
+  "generated_at": "2026-10-16T20:26:21Z",
   "_envelope": {
     "schema_version": "magis.feed.v2",
     "feed_id": "agent-shard-nu",
-    "generated_at": "2026-10-16T17:58:36Z",
+    "generated_at": "2026-10-16T20:26:21Z",
     "as_of": "2026-07-28",
-    "content_sha256": "sha256:5c51028b77e3563ff57ef5b1a20ae072b2997f72a5613e0958fd29273593065c",
+    "content_sha256": "sha256:88e6c7fa66db450c65f0e0ce4c7f53cbb095e6d5a6e476581c351940754122b4",
     "row_count": 1,
     "upstream_inputs": [],
     "health": {

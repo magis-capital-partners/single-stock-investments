@@ -1,0 +1,24 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "magis.valuation.v2",
+  "title": "Magis valuation.json",
+  "type": "object",
+  "required": ["ticker", "schema_version", "returns"],
+  "properties": {
+    "ticker": {"type": "string", "minLength": 1},
+    "schema_version": {"const": "magis.valuation.v2"},
+    "as_of": {"type": ["string", "null"]},
+    "method": {"type": ["string", "null"]},
+    "returns": {
+      "type": "object",
+      "required": ["base_irr_pct", "unit"],
+      "properties": {
+        "base_irr_pct": {"type": ["number", "null"]},
+        "unit": {"const": "percent_per_year"},
+        "label": {"type": ["string", "null"]},
+        "display": {"type": ["string", "null"]},
+        "scenarios_pct": {"type": "object"}
+      }
+    }
+  }
+}

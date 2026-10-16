@@ -362,8 +362,32 @@ def main() -> int:
         optional=True,
     )
     ok &= run_script(
+        "normalize return units (canonical returns)",
+        "normalize_return_units.py",
+        [ticker],
+        optional=True,
+    )
+    ok &= run_script(
+        "ticker latest pointer",
+        "build_ticker_latest.py",
+        [ticker],
+        optional=True,
+    )
+    ok &= run_script(
         "progressive L0/L1 shards",
         "build_progressive_shards.py",
+        [ticker],
+        optional=True,
+    )
+    ok &= run_script(
+        "agent context pack",
+        "build_agent_context.py",
+        [ticker],
+        optional=True,
+    )
+    ok &= run_script(
+        "agent data lint",
+        "lint_agent_data.py",
         [ticker],
         optional=True,
     )

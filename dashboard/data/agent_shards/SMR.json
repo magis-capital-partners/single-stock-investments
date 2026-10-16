@@ -1,10 +1,10 @@
 {
-  "schema_version": "magis.agent_shard.v1",
-  "generated_at": "2026-10-16T17:58:36Z",
-  "as_of": "2026-06-08",
+  "schema_version": "magis.agent_shard.v2",
   "ticker": "SMR",
   "company": "NuScale Power Corporation",
   "book": "holdings",
+  "shard_status": "built",
+  "as_of": "2026-06-08",
   "registry": {
     "market": "US",
     "exchange": "NYSE",
@@ -13,12 +13,24 @@
     "dhando": "pending",
     "payoff_lens": "pending"
   },
+  "returns": {
+    "base_irr_pct": 2.2,
+    "unit": "percent_per_year",
+    "label": "annualized return",
+    "display": "2.2% (base)",
+    "scenarios_pct": {
+      "base": 2.2,
+      "bear": -12.3,
+      "bull": 15.8
+    }
+  },
   "thesis_summary": {
     "thesis": "NuScale Power develops small modular reactor (SMR) nuclear technology and licenses its NuScale Power Module design. **[Fact]** The company has **one** operating segment (10-K FY2025). **[Fact]** FY2025 revenue was **$23.9 million**, up from **$4.2 million** in FY2024, primarily from related-party engineering services to Fluor (**76.0%** of revenue in 2025). **[Fact]** Operating loss was approximately **$690 million** and cash was **$836 million** at December 31, 2025 (`investor-documents/sec-edgar/10-K_20260226_rpt20251231_acc0001822966_26_000018.htm`). **[Fact]** Class A shares outstanding were approximately **318.5 million** at year-end. **[Fact]** The company is pre-revenue on reactor electricity sales; it earns licensing and engineering fees while pursuing deployment partnerships.",
     "why_market_wrong": "The market may treat SMR as a proven nuclear utility rather than a pre-deployment licensor with concentrated customer risk. **[Inference]** Positive GAAP net income (**$356 million**) reflects warrant and derivative accounting, not sustainable owner cash. **[Inference]** ENTRA1's non-binding **72 NPM** agreement and Romania's Doicesti approval are milestones, not contracted reactor cash flows yet. **[Inference]** **$339 million** of contractual obligations due in 2026, including **$260 million** PMA milestone contribution, may require dilution if not funded by partners.",
     "stance": "watch",
     "archetype": "optionality",
     "base_irr_pct": 2.2,
+    "base_irr_unit": "percent_per_year",
     "scenarios": {
       "base": 2.2,
       "bear": -12.3,
@@ -71,6 +83,24 @@
       "[ ] Confirm live price (placeholder $15)",
       "[ ] Milly adversarial pass"
     ]
+  },
+  "truncation": {
+    "key_assumptions": {
+      "shown": 8,
+      "total": 8
+    },
+    "open_questions": {
+      "shown": 3,
+      "total": 3
+    },
+    "kpi_series": {
+      "shown": 12,
+      "total": 19
+    },
+    "documents": {
+      "shown": 4,
+      "note": "capped at 15 most recent in builder"
+    }
   },
   "kpi_series": [
     {
@@ -215,7 +245,7 @@
       "local_pdf_path": "SMR/investor-documents/ir-smr/SMR-1Q26-Presentation.pdf",
       "text_extract_path": null,
       "drive_web_view_link": "https://drive.google.com/file/d/1DDfsE8yd-hehJ79ZgHQMVD4Uth-wvPwu/view?usp=drivesdk",
-      "modified_at": "2026-10-16T14:34:59Z"
+      "modified_at": "2026-10-16T16:41:30Z"
     },
     {
       "document_id": "sha256:9e26187d63e399a50271fd1160c612247f3a0522bf90c25c6d3feb3c1049128d",
@@ -224,7 +254,7 @@
       "local_pdf_path": "SMR/investor-documents/ir-smr/SMR-1Q26-Transcript.pdf",
       "text_extract_path": null,
       "drive_web_view_link": "https://drive.google.com/file/d/1y65yVpUZ7ub_z46BQ_rqmbKYddsHR_dB/view?usp=drivesdk",
-      "modified_at": "2026-10-16T14:34:59Z"
+      "modified_at": "2026-10-16T16:41:30Z"
     },
     {
       "document_id": "sha256:a5592b6dbf1ec3a8eb285331811245bc6af9bace5fe6234400eba3e08d615a8c",
@@ -233,7 +263,7 @@
       "local_pdf_path": "SMR/third-party-analyses/vic/vic_pdf_2026-06-20_smr-vic-pdf_70460a40b7.pdf",
       "text_extract_path": "SMR/third-party-analyses/vic/vic_pdf_2026-06-20_smr-vic-pdf_70460a40b7.md",
       "drive_web_view_link": "https://drive.google.com/file/d/1HZl_aUYByPUKLO54e-NR-pLeszqQF1Rk/view?usp=drivesdk",
-      "modified_at": "2026-10-16T14:34:59Z"
+      "modified_at": "2026-10-16T16:41:30Z"
     },
     {
       "document_id": "sha256:d4975879a281aaadb79a886331138bffaea59ea4a0cc673379348c9a868e35c2",
@@ -242,7 +272,7 @@
       "local_pdf_path": "SMR/investor-documents/ir-smr/Investor-Presentation.pdf",
       "text_extract_path": null,
       "drive_web_view_link": "https://drive.google.com/file/d/15dRup8nsHxOLjNSz3uehLRNg2vDdY0tW/view?usp=drivesdk",
-      "modified_at": "2026-10-16T14:34:59Z"
+      "modified_at": "2026-10-16T16:41:30Z"
     }
   ],
   "l2_pointers": {
@@ -252,14 +282,17 @@
     "insider_signal_md": "SMR/research/evidence/insider_signal.md",
     "thematic_context_md": "SMR/research/evidence/thematic_context.md",
     "source_inventory_json": "SMR/third-party-analyses/source_inventory.json",
-    "full_ui_shard_json": "dashboard/data/tickers/SMR.json"
+    "full_ui_shard_json": "dashboard/data/tickers/SMR.json",
+    "latest_json": "SMR/research/latest.json",
+    "context_pack_md": "dashboard/data/context_packs/SMR.md"
   },
+  "generated_at": "2026-10-16T20:26:21Z",
   "_envelope": {
     "schema_version": "magis.feed.v2",
     "feed_id": "agent-shard-smr",
-    "generated_at": "2026-10-16T17:58:36Z",
+    "generated_at": "2026-10-16T20:26:21Z",
     "as_of": "2026-06-08",
-    "content_sha256": "sha256:ddf1a795c8abbbe75ef36dd32df6f8c4b83ff13d12355d86da8c36b6bbe343b8",
+    "content_sha256": "sha256:6b4e308abf79ac69d1557434347e8937e1966f00d38b2c8de89e284c74581e42",
     "row_count": 12,
     "upstream_inputs": [],
     "health": {

@@ -1,10 +1,10 @@
 {
-  "schema_version": "magis.agent_shard.v1",
-  "generated_at": "2026-10-16T17:58:36Z",
-  "as_of": "2026-06-03",
+  "schema_version": "magis.agent_shard.v2",
   "ticker": "CBOE",
   "company": "Cboe Global Markets",
   "book": "holdings",
+  "shard_status": "built",
+  "as_of": "2026-06-03",
   "registry": {
     "market": "US",
     "exchange": "CBOE",
@@ -13,12 +13,24 @@
     "dhando": "pending",
     "payoff_lens": "pending"
   },
+  "returns": {
+    "base_irr_pct": 13.42,
+    "unit": "percent_per_year",
+    "label": "7yr IRR (total synthesis)",
+    "display": "13.42% (total synthesis)",
+    "scenarios_pct": {
+      "base": 13.2,
+      "bear": 7.2,
+      "bull": 16.3
+    }
+  },
   "thesis_summary": {
     "thesis": "Cboe Global Markets operates exchange, clearing, and market-data infrastructure across options, equities, futures, and foreign exchange. **[Fact]** Customers pay transaction, clearing, listing, and subscription fees; the company does not take principal market risk. **[Fact]** FY2025 total revenues were **$4,714.2 million** (+15% versus **$4,094.5 million** in FY2024); operating income **$1,467.1 million**; net income **$1,100.0 million** (`investor-documents/sec-edgar/10-K_20260220_rpt20251231_acc0001628280_26_010013.htm`). **[Fact]** Q1 2026 net revenues were **$1,272.8 million** (+6% versus **$1,195.0 million** in Q1 2025); net income **$385.7 million** (`investor-documents/sec-edgar/10-Q_20260501_rpt20260331_acc0001628280_26_029112.htm`). The franchise is anchored in proprietary index options (SPX, VIX) and a multi-venue U.S. equities stack (BZX, BYX, EDGA, EDGX) plus European and Asia-Pacific derivatives.",
     "why_market_wrong": "There is no dated payoff or structural discount. **[Inference]** FY2025 and Q1 2026 benefited from elevated volatility and index trading; the stock at **~$285** embeds a premium multiple on strong recent cash flow. **[Inference]** Our base return uses FY2025 free cash flow per share (**$16.00**), not a peak run rate from Q1 2026 alone. Return is franchise earnings power at price, not a mispricing with a known catalyst date.",
     "stance": "watch",
     "archetype": "croupier",
     "base_irr_pct": 13.42,
+    "base_irr_unit": "percent_per_year",
     "scenarios": {
       "base": 13.2,
       "bear": 7.2,
@@ -66,6 +78,24 @@
       "No third-party sources indexed; stance rests on filings only.",
       "Entry band **$250–255** for ~15% base annual return is model-derived, not human-approved."
     ]
+  },
+  "truncation": {
+    "key_assumptions": {
+      "shown": 7,
+      "total": 7
+    },
+    "open_questions": {
+      "shown": 3,
+      "total": 3
+    },
+    "kpi_series": {
+      "shown": 12,
+      "total": 14
+    },
+    "documents": {
+      "shown": 15,
+      "note": "capped at 15 most recent in builder"
+    }
   },
   "kpi_series": [
     {
@@ -210,25 +240,7 @@
       "local_pdf_path": "CBOE/investor-documents/ir-cboe/4q21-cboe-ER.pdf",
       "text_extract_path": null,
       "drive_web_view_link": "https://drive.google.com/file/d/1afiTOUEs-fMG3LousH2pRv0851CleMIK/view?usp=drivesdk",
-      "modified_at": "2026-10-16T14:36:14Z"
-    },
-    {
-      "document_id": "sha256:08e9a35342765801b643c72ef4095f15f5ec58cae8ee98082c9e0bd0bf0f0a55",
-      "title": "3q22 cboe ea",
-      "source_type": "company_document",
-      "local_pdf_path": "CBOE/investor-documents/ir-cboe/3q22-cboe-ea.pdf",
-      "text_extract_path": null,
-      "drive_web_view_link": "https://drive.google.com/file/d/1vK4Wz4iJo3tpji6O8Psr7o69jwVErXES/view?usp=drivesdk",
-      "modified_at": "2026-10-16T14:36:14Z"
-    },
-    {
-      "document_id": "sha256:0a02b3209b592f907ffb70c75d75b337553a0d5879d6c9a45bfee5e7afe516cf",
-      "title": "3q22 earnings prese",
-      "source_type": "company_document",
-      "local_pdf_path": "CBOE/investor-documents/ir-cboe/3q22-earnings-prese.pdf",
-      "text_extract_path": null,
-      "drive_web_view_link": "https://drive.google.com/file/d/1nbmLFTcvwETQyKhMZLGSoppitmXsNnRN/view?usp=drivesdk",
-      "modified_at": "2026-10-16T14:36:14Z"
+      "modified_at": "2026-10-16T16:38:05Z"
     },
     {
       "document_id": "sha256:0ae5176fbbda9a19d12f7c4d31052a591cb62e515b9018a08551ac6610081f5e",
@@ -237,7 +249,7 @@
       "local_pdf_path": "CBOE/investor-documents/ir-cboe/q3-2019-news.pdf",
       "text_extract_path": null,
       "drive_web_view_link": "https://drive.google.com/file/d/1xzf9WVNI700xBGkUWyljpFqiKT8pATQM/view?usp=drivesdk",
-      "modified_at": "2026-10-16T14:36:14Z"
+      "modified_at": "2026-10-16T16:38:05Z"
     },
     {
       "document_id": "sha256:0eaac88be4ca0028c6f8d532b8e3b092a6c7138ecdd98ce1ec3adb1d00b8ddb5",
@@ -246,7 +258,7 @@
       "local_pdf_path": "CBOE/investor-documents/ir-cboe/cboe-holdings-prepared-remarks-2q14-final-6.pdf",
       "text_extract_path": null,
       "drive_web_view_link": "https://drive.google.com/file/d/1IZ5awdaRts6E6yjSGvGYpdsu3B3t_XPl/view?usp=drivesdk",
-      "modified_at": "2026-10-16T14:36:14Z"
+      "modified_at": "2026-10-16T16:38:05Z"
     },
     {
       "document_id": "sha256:0fb78eb47d9c0b853817b2ee4c403f90e444a19c30708610ee98376e880de926",
@@ -255,7 +267,7 @@
       "local_pdf_path": "CBOE/investor-documents/ir-cboe/q1-22-prese.pdf",
       "text_extract_path": null,
       "drive_web_view_link": "https://drive.google.com/file/d/1ZG2CeP5N9fGVISO_4irepRpZPHmQ-l76/view?usp=drivesdk",
-      "modified_at": "2026-10-16T14:36:14Z"
+      "modified_at": "2026-10-16T16:38:05Z"
     },
     {
       "document_id": "sha256:111b1f97cb84bc047787d943ed6b776e3bff99e52678633d446b2162fac48ada",
@@ -264,16 +276,7 @@
       "local_pdf_path": "CBOE/investor-documents/ir-cboe/q3-21-prese.pdf",
       "text_extract_path": null,
       "drive_web_view_link": "https://drive.google.com/file/d/10379pmRsPNtC0B1IAsnfmzIah5UoQ_oh/view?usp=drivesdk",
-      "modified_at": "2026-10-16T14:36:14Z"
-    },
-    {
-      "document_id": "sha256:15789cbd98b7f78c8849e47430031226bef0c580ae406e9329715ddfe30450cd",
-      "title": "3Q25 Cboe Earnings Slides Final",
-      "source_type": "company_document",
-      "local_pdf_path": "CBOE/investor-documents/ir-cboe/3Q25-Cboe-Earnings-Slides-Final.pdf",
-      "text_extract_path": null,
-      "drive_web_view_link": "https://drive.google.com/file/d/1RLLy16BBpgdqB_kaJaefOFT1bUNtkpgh/view?usp=drivesdk",
-      "modified_at": "2026-10-16T14:36:14Z"
+      "modified_at": "2026-10-16T16:38:05Z"
     },
     {
       "document_id": "sha256:1632405c0ff5437aaec70fe94426b3e4bdb25c934a4ccee8cc4c21fec45afa89",
@@ -282,7 +285,7 @@
       "local_pdf_path": "CBOE/investor-documents/ir-cboe/q3-2018-earnings-release.pdf",
       "text_extract_path": null,
       "drive_web_view_link": "https://drive.google.com/file/d/1LQi-2Cqlu_jFrFT7zFtptppYoKIxCxWc/view?usp=drivesdk",
-      "modified_at": "2026-10-16T14:36:14Z"
+      "modified_at": "2026-10-16T16:38:05Z"
     },
     {
       "document_id": "sha256:1695d10b0b531228a2ded8ba45b0f19b17973ec0b0791e7d44b24786e3641cda",
@@ -291,7 +294,7 @@
       "local_pdf_path": "CBOE/investor-documents/ir-cboe/cboe-holdings-prepared-remarks-q4-15-earnings-call-5.pdf",
       "text_extract_path": null,
       "drive_web_view_link": "https://drive.google.com/file/d/1qSQq_lvd19ImRpKvV58VWgLtTrNI5W1q/view?usp=drivesdk",
-      "modified_at": "2026-10-16T14:36:14Z"
+      "modified_at": "2026-10-16T16:38:05Z"
     },
     {
       "document_id": "sha256:1b48a735b8ebc1a18fb3b86c401ea5afa6f27a10623c2f3b3b8d4b8606ece3c1",
@@ -300,16 +303,7 @@
       "local_pdf_path": "CBOE/investor-documents/ir-cboe/q1-22-press-re.pdf",
       "text_extract_path": null,
       "drive_web_view_link": "https://drive.google.com/file/d/1-ft0fOsiPk1TJ6VMM6yeqEYmnrLiBLdM/view?usp=drivesdk",
-      "modified_at": "2026-10-16T14:36:14Z"
-    },
-    {
-      "document_id": "sha256:1f65229088e9add93535a08ab3929ec784b9945a850c9dbb474b6fd5235d836b",
-      "title": "3q22 earnings call",
-      "source_type": "company_document",
-      "local_pdf_path": "CBOE/investor-documents/ir-cboe/3q22-earnings-call.pdf",
-      "text_extract_path": null,
-      "drive_web_view_link": "https://drive.google.com/file/d/1OQb7UQ2yJdk2XrzBTCp_vroIbdqm7YXq/view?usp=drivesdk",
-      "modified_at": "2026-10-16T14:36:14Z"
+      "modified_at": "2026-10-16T16:38:05Z"
     },
     {
       "document_id": "sha256:1f88ea64b0f512c8337faa58736fa2219f8fe7589c949c60a727a0d2739c4473",
@@ -318,7 +312,7 @@
       "local_pdf_path": "CBOE/investor-documents/ir-cboe/q2-17-prepared-re.pdf",
       "text_extract_path": null,
       "drive_web_view_link": "https://drive.google.com/file/d/19BI_ToOk1toDi8JJdMU1Yj-F8Arz8rxj/view?usp=drivesdk",
-      "modified_at": "2026-10-16T14:36:14Z"
+      "modified_at": "2026-10-16T16:38:05Z"
     },
     {
       "document_id": "sha256:1fd8abc777dd7dcac807f32513fa6d36e4a4a19323ad7b843fd8c090050a5af9",
@@ -327,16 +321,52 @@
       "local_pdf_path": "CBOE/third-party-analyses/vic/CBOE - 163570.pdf",
       "text_extract_path": null,
       "drive_web_view_link": "https://drive.google.com/file/d/1qbaFkCQ8-yPOE0FB1OBQ27kYOweEoVrl/view?usp=drivesdk",
-      "modified_at": "2026-10-16T14:36:14Z"
+      "modified_at": "2026-10-16T16:38:05Z"
     },
     {
-      "document_id": "sha256:20e9007debad1d89ce0dd49ebd6670a8f11ac4a1d234e5899db7bce71322f01f",
-      "title": "3q 19 presentation",
+      "document_id": "sha256:21460787af2595e6e42a1c9a9868a0bbf39e6248287d81a9bd2f68de7c70e116",
+      "title": "cboe bats final conference call transcript",
       "source_type": "company_document",
-      "local_pdf_path": "CBOE/investor-documents/ir-cboe/3q-19-presentation.pdf",
+      "local_pdf_path": "CBOE/investor-documents/ir-cboe/cboe-bats-final-conference-call-transcript.pdf",
       "text_extract_path": null,
-      "drive_web_view_link": "https://drive.google.com/file/d/17YA5TE545Yx1SbRdTtKLmoVVhAH1lSjj/view?usp=drivesdk",
-      "modified_at": "2026-10-16T14:36:14Z"
+      "drive_web_view_link": "https://drive.google.com/file/d/1m956difGVBcd31uooxvrNRXylfhnxYZM/view?usp=drivesdk",
+      "modified_at": "2026-10-16T16:38:05Z"
+    },
+    {
+      "document_id": "sha256:22e0ae83934518b499bb009f2a46dd342418602030818fcb07c0ce9431af84d8",
+      "title": "CBOE   09 Cboe a3dc",
+      "source_type": "vic_research",
+      "local_pdf_path": "CBOE/third-party-analyses/vic/CBOE - 09-Cboe_a3dc.pdf",
+      "text_extract_path": null,
+      "drive_web_view_link": "https://drive.google.com/file/d/1dU60t4B41xPBaBf7Sc9LShNDMfE6Tlso/view?usp=drivesdk",
+      "modified_at": "2026-10-16T16:38:05Z"
+    },
+    {
+      "document_id": "sha256:2369990c80323fde0fe3f8d65b276b0a7b274443ac64e95f057c17329700fe99",
+      "title": "q1 18 earnings release 04may2018",
+      "source_type": "company_document",
+      "local_pdf_path": "CBOE/investor-documents/ir-cboe/q1-18-earnings-release-04may2018.pdf",
+      "text_extract_path": null,
+      "drive_web_view_link": "https://drive.google.com/file/d/1jkcCw-YbdflOBA5yPpXS0Y1DSjOxIy-J/view?usp=drivesdk",
+      "modified_at": "2026-10-16T16:38:05Z"
+    },
+    {
+      "document_id": "sha256:2562ee09af29af9eb8b8765a3a02828de9b59d83659b1268f24ea39ba17dd1e4",
+      "title": "4q 19 presentation",
+      "source_type": "company_document",
+      "local_pdf_path": "CBOE/investor-documents/ir-cboe/4q-19-presentation.pdf",
+      "text_extract_path": null,
+      "drive_web_view_link": "https://drive.google.com/file/d/1hQQFfan29q7m9EO9A9AptrZDD4hM0WbP/view?usp=drivesdk",
+      "modified_at": "2026-10-16T16:38:05Z"
+    },
+    {
+      "document_id": "sha256:25e5b3457a97668d3ffcf8c668bb34d210dff8c11b997998408748eec8f085f0",
+      "title": "q4 17 news",
+      "source_type": "company_document",
+      "local_pdf_path": "CBOE/investor-documents/ir-cboe/q4-17-news.pdf",
+      "text_extract_path": null,
+      "drive_web_view_link": "https://drive.google.com/file/d/1VAK2LeTyYiNDObUfsHCAb-5BqmBuYvq-/view?usp=drivesdk",
+      "modified_at": "2026-10-16T16:38:05Z"
     }
   ],
   "l2_pointers": {
@@ -346,14 +376,17 @@
     "insider_signal_md": "CBOE/research/evidence/insider_signal.md",
     "thematic_context_md": "CBOE/research/evidence/thematic_context.md",
     "source_inventory_json": "CBOE/third-party-analyses/source_inventory.json",
-    "full_ui_shard_json": "dashboard/data/tickers/CBOE.json"
+    "full_ui_shard_json": "dashboard/data/tickers/CBOE.json",
+    "latest_json": "CBOE/research/latest.json",
+    "context_pack_md": "dashboard/data/context_packs/CBOE.md"
   },
+  "generated_at": "2026-10-16T20:26:21Z",
   "_envelope": {
     "schema_version": "magis.feed.v2",
     "feed_id": "agent-shard-cboe",
-    "generated_at": "2026-10-16T17:58:36Z",
+    "generated_at": "2026-10-16T20:26:21Z",
     "as_of": "2026-06-03",
-    "content_sha256": "sha256:888697d9e2a0538735d58e50a2d56b4f7611544f467dc02b8cdd3b7c08a446be",
+    "content_sha256": "sha256:607db7b562cf5ecc059ae6d0e2df6f5dacac59395b72ca45ddf2f931ec57b25d",
     "row_count": 12,
     "upstream_inputs": [],
     "health": {

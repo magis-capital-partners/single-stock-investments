@@ -1,10 +1,10 @@
 {
-  "schema_version": "magis.agent_shard.v1",
-  "generated_at": "2026-10-16T17:58:36Z",
-  "as_of": "2026-06-03",
+  "schema_version": "magis.agent_shard.v2",
   "ticker": "CME",
   "company": "CME Group Inc.",
   "book": "holdings",
+  "shard_status": "built",
+  "as_of": "2026-06-03",
   "registry": {
     "market": "US",
     "exchange": "CME",
@@ -13,12 +13,24 @@
     "dhando": "pending",
     "payoff_lens": "pending"
   },
+  "returns": {
+    "base_irr_pct": 12.01,
+    "unit": "percent_per_year",
+    "label": "7yr IRR (total synthesis)",
+    "display": "12.01% (total synthesis)",
+    "scenarios_pct": {
+      "base": 11.2,
+      "bear": 4.8,
+      "bull": 15.3
+    }
+  },
   "thesis_summary": {
     "thesis": "CME Group is the world's largest listed derivatives marketplace: futures and options on interest rates, equity indexes, foreign exchange, energy, metals, and agricultural products, plus clearing, market data, and collateral services. **[Fact]** Customers pay transaction, clearing, and market-data fees; CME does not take directional market risk on customer positions. **[Fact]** FY2025 total revenues were **$6,520.6 million**, operating income **$4,229.5 million**, and net income **$4,072.2 million** (`investor-documents/sec-edgar/10-K_20260226_rpt20251231_acc0001156375_26_000009.htm`). **[Fact]** Q1 2026 revenues were **$1,880.1 million** with operating income **$1,309.7 million** and net income **$1,154.3 million** (`investor-documents/sec-edgar/10-Q_20260424_rpt20260331_acc0001156375_26_000020.htm`). Terry Duffy is Chairman and CEO.",
     "why_market_wrong": "There is no dated payoff or structural discount here. **[Inference]** Q1 2026 operating margin is far above a typical mid-cycle year because rates and volatility lifted interest-rate and equity-index volumes; the market may treat that run rate as permanent. **[Inference]** Our base return uses FY2025 owner cash per share (**$11.40**), not the Q1 2026 earnings pace. Return is franchise earnings power at price, not a mispricing signal with a known catalyst date.",
     "stance": "watch",
     "archetype": "croupier",
     "base_irr_pct": 12.01,
+    "base_irr_unit": "percent_per_year",
     "scenarios": {
       "base": 11.2,
       "bear": 4.8,
@@ -66,6 +78,24 @@
       "Entry band **$210–220** for ~15% base return is illustrative pending human price confirmation.",
       "Confirm FY2025 capital spending line in 10-K cash flow statement for FCF tie-out."
     ]
+  },
+  "truncation": {
+    "key_assumptions": {
+      "shown": 7,
+      "total": 7
+    },
+    "open_questions": {
+      "shown": 3,
+      "total": 3
+    },
+    "kpi_series": {
+      "shown": 12,
+      "total": 12
+    },
+    "documents": {
+      "shown": 0,
+      "note": "capped at 15 most recent in builder"
+    }
   },
   "kpi_series": [
     {
@@ -203,6 +233,14 @@
   ],
   "recent_news": [
     {
+      "title": "Zacks Industry Outlook Highlights S&P Global, CME, Intercontinental Exchange, Nasdaq and Cboe Global Markets",
+      "published_utc": "2026-10-16T12:00:00+00:00",
+      "category": "guidance",
+      "confidence": 0.88,
+      "url": "https://www.zacks.com/stock/news/3009861/zacks-industry-outlook-highlights-s-p-global-cme-intercontinental-exchange-nasdaq-and-cboe-global-markets?cid=CS-ZC-FT-press_releases-3009861",
+      "linked_filing": null
+    },
+    {
       "title": "Marex announces changes to Group Board",
       "published_utc": "2026-10-07T11:00:00+00:00",
       "category": "management",
@@ -235,15 +273,18 @@
     "insider_signal_md": "CME/research/evidence/insider_signal.md",
     "thematic_context_md": "CME/research/evidence/thematic_context.md",
     "source_inventory_json": "CME/third-party-analyses/source_inventory.json",
-    "full_ui_shard_json": "dashboard/data/tickers/CME.json"
+    "full_ui_shard_json": "dashboard/data/tickers/CME.json",
+    "latest_json": "CME/research/latest.json",
+    "context_pack_md": "dashboard/data/context_packs/CME.md"
   },
+  "generated_at": "2026-10-16T20:26:21Z",
   "_envelope": {
     "schema_version": "magis.feed.v2",
     "feed_id": "agent-shard-cme",
-    "generated_at": "2026-10-16T17:58:36Z",
+    "generated_at": "2026-10-16T20:26:21Z",
     "as_of": "2026-06-03",
-    "content_sha256": "sha256:d9d0fec0eb967f94a64009bb56955a0103e5ce633743c5fb4dd83c33c5bd47b7",
-    "row_count": 15,
+    "content_sha256": "sha256:28f618f9d8c1e2c53b0cd89d6a78fd6c4d449d360cdeb53544bf91a706cc8568",
+    "row_count": 16,
     "upstream_inputs": [],
     "health": {
       "status": "healthy",

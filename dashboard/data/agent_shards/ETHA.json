@@ -1,10 +1,10 @@
 {
-  "schema_version": "magis.agent_shard.v1",
-  "generated_at": "2026-10-16T17:58:36Z",
-  "as_of": "2026-10-02",
+  "schema_version": "magis.agent_shard.v2",
   "ticker": "ETHA",
   "company": "ETHA",
   "book": "holdings",
+  "shard_status": "built",
+  "as_of": "2026-10-02",
   "registry": {
     "market": "US",
     "exchange": "—",
@@ -13,12 +13,24 @@
     "dhando": "pending",
     "payoff_lens": "pending"
   },
+  "returns": {
+    "base_irr_pct": 3.9,
+    "unit": "percent_per_year",
+    "label": "annualized return",
+    "display": "3.9% (base)",
+    "scenarios_pct": {
+      "base": 3.9,
+      "bear": -6.6,
+      "bull": 19.8
+    }
+  },
   "thesis_summary": {
     "thesis": "iShares Ethereum Trust ETF (NASDAQ: **ETHA**) is a passive Delaware statutory trust sponsored by iShares Delaware Trust Sponsor LLC (BlackRock affiliate). **[Fact]** The trust holds **ether and cash only** and seeks to reflect the price of ether **before** trust expenses and liabilities. **[Fact]** Shares trade on NASDAQ; authorized participants create and redeem **40,000-share baskets** against cash and ether via prime execution and custodial arrangements. **[Fact]** The trust seeded on **May 21, 2024** and began operations on **June 24, 2024** when seed proceeds purchased roughly **3,031 ether**. **[Fact]** At **March 31, 2026**, net asset value was **$6.38 billion** on **401.88 million** shares (about **$15.87** net asset value per share), down from **$10.30 billion** and **458.72 million** shares at **December 31, 2025**, after ether fell **29%** in the quarter and redemptions exceeded creations.",
     "why_market_wrong": "**Predictive attribute:** **wrapper tracking basis** (exchange-traded share price versus net asset value, fee drag, and after-hours ether moves versus NASDAQ session).",
     "stance": "watch",
     "archetype": "optionality",
     "base_irr_pct": 3.9,
+    "base_irr_unit": "percent_per_year",
     "scenarios": {
       "base": 3.9,
       "bear": -6.6,
@@ -67,6 +79,24 @@
       "Power Zone route still lists quality_reinvestment; economic reality is passive asset wrapper."
     ]
   },
+  "truncation": {
+    "key_assumptions": {
+      "shown": 7,
+      "total": 7
+    },
+    "open_questions": {
+      "shown": 3,
+      "total": 3
+    },
+    "kpi_series": {
+      "shown": 1,
+      "total": 1
+    },
+    "documents": {
+      "shown": 0,
+      "note": "capped at 15 most recent in builder"
+    }
+  },
   "kpi_series": [
     {
       "metric": "news_flow",
@@ -89,14 +119,17 @@
     "insider_signal_md": null,
     "thematic_context_md": "ETHA/research/evidence/thematic_context.md",
     "source_inventory_json": "ETHA/third-party-analyses/source_inventory.json",
-    "full_ui_shard_json": "dashboard/data/tickers/ETHA.json"
+    "full_ui_shard_json": "dashboard/data/tickers/ETHA.json",
+    "latest_json": "ETHA/research/latest.json",
+    "context_pack_md": "dashboard/data/context_packs/ETHA.md"
   },
+  "generated_at": "2026-10-16T20:26:21Z",
   "_envelope": {
     "schema_version": "magis.feed.v2",
     "feed_id": "agent-shard-etha",
-    "generated_at": "2026-10-16T17:58:36Z",
+    "generated_at": "2026-10-16T20:26:21Z",
     "as_of": "2026-10-02",
-    "content_sha256": "sha256:b016348a5c1e287ccf2a51631a16666af1f0beed267e175c8fc4932dd0c3be28",
+    "content_sha256": "sha256:a35667a9ece3037f7426b6dc9209e3ecbd54755e4eddfced809dff5528d68dad",
     "row_count": 1,
     "upstream_inputs": [],
     "health": {

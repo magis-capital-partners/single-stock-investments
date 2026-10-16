@@ -113,7 +113,7 @@ def test_l1_agent_shards_and_canonical_evidence() -> None:
         shard_path = ROOT / "dashboard" / "data" / "agent_shards" / f"{ticker}.json"
         assert shard_path.is_file(), f"Missing L1 agent shard for {ticker}"
         shard = json.loads(shard_path.read_text(encoding="utf-8"))
-        assert shard.get("schema_version") == "magis.agent_shard.v1"
+        assert shard.get("schema_version") == "magis.agent_shard.v2"
         assert shard.get("ticker") == ticker
         assert "_envelope" in shard
         assert "thesis_summary" in shard

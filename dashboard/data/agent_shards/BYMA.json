@@ -1,10 +1,10 @@
 {
-  "schema_version": "magis.agent_shard.v1",
-  "generated_at": "2026-10-16T17:58:36Z",
-  "as_of": "2026-06-11",
+  "schema_version": "magis.agent_shard.v2",
   "ticker": "BYMA",
   "company": "Bolsas y Mercados Argentinos S.A.",
   "book": "holdings",
+  "shard_status": "built",
+  "as_of": "2026-06-11",
   "registry": {
     "market": "EU",
     "exchange": "BYMA",
@@ -13,12 +13,24 @@
     "dhando": "pending",
     "payoff_lens": "pending"
   },
+  "returns": {
+    "base_irr_pct": 25.2,
+    "unit": "percent_per_year",
+    "label": "7yr IRR (total synthesis)",
+    "display": "25.2% (total synthesis)",
+    "scenarios_pct": {
+      "base": 24.2,
+      "bear": 16.3,
+      "bull": 30.0
+    }
+  },
   "thesis_summary": {
     "thesis": "Bolsas y Mercados Argentinos S.A. (BYMA) is Argentina's integrated capital-markets infrastructure company. **[Fact]** It operates the stock exchange (trading, clearing, and central counterparty), owns **99.97%** of central securities depository Caja de Valores S.A., and runs education subsidiary Instituto Argentino de Mercado de Capitales (IAMC). **[Fact]** The group reports under IAS 29 hyperinflation accounting; FY2025 consolidated service revenues were **ARS 76,394 million** and income from transaction rights **ARS 180,381 million** (amounts in thousands of constant pesos, `investor-documents/official-reports/BYMA-Financial_Statements_2025-12-31.pdf`). **[Fact]** FY2025 operating income was **ARS 220,086 million** and net income attributable to shareholders **ARS 172,419 million**; diluted earnings per share **ARS 28.31** on **6,089,555 thousand** weighted average shares. **[Fact]** Q1 2026 press release (May 8, 2026) shows inflation-adjusted revenues up **24%** year-over-year and operating margin excluding financial income at a record **71.6%** (`investor-documents/presentations-and-media/BYMA-Press_Release_1Q26.pdf`). BYMA is a toll collector on Argentine securities activity (Stahl croupier): fees on custody, trading, and clearing without principal market risk.",
     "why_market_wrong": "The stock at **~ARS 296** trades near **10 times** FY2025 earnings and **~9 times** normalized owner cash per share, despite LTM EBITDA margin near **76%** and operating margin near **69%** (`BYMA-Press_Release_4Q25.pdf`). **[Inference]** Local investors may discount Argentine listed infrastructure for currency and policy risk even when volume and fee yield are rising. **[Inference]** Our base return uses mid-cycle owner cash (**ARS 33** per share) after hair-cutting peak operating cash flow, not the full **140%** fourth-quarter 2025 average daily traded value surge. The mispricing, if any, is jurisdiction and cycle timing, not hidden asset value.",
     "stance": "watch",
     "archetype": "croupier",
     "base_irr_pct": 25.2,
+    "base_irr_unit": "percent_per_year",
     "scenarios": {
       "base": 24.2,
       "bear": 16.3,
@@ -68,6 +80,24 @@
       "[ ] Dedicated IR download script (`uk_ir`) still missing; Vicki optional for transcript harvest"
     ]
   },
+  "truncation": {
+    "key_assumptions": {
+      "shown": 7,
+      "total": 7
+    },
+    "open_questions": {
+      "shown": 4,
+      "total": 4
+    },
+    "kpi_series": {
+      "shown": 0,
+      "total": 0
+    },
+    "documents": {
+      "shown": 6,
+      "note": "capped at 15 most recent in builder"
+    }
+  },
   "kpi_series": [],
   "recent_news": [],
   "documents": [
@@ -78,7 +108,7 @@
       "local_pdf_path": "BYMA/investor-documents/official-reports/BYMA-Financial_Statements_2024-12-31.pdf",
       "text_extract_path": null,
       "drive_web_view_link": "https://drive.google.com/file/d/1zDwlzAwqOpegf2Ske2Q4z33YRp1-ccXv/view?usp=drivesdk",
-      "modified_at": "2026-10-16T14:36:09Z"
+      "modified_at": "2026-10-16T16:37:58Z"
     },
     {
       "document_id": "sha256:3ba89b6a70618bf60d13c93f30a31632b3f5c853c3087d6c3e648a7f6f6fe2be",
@@ -87,7 +117,7 @@
       "local_pdf_path": "BYMA/investor-documents/presentations-and-media/BYMA-Press_Release_1Q26.pdf",
       "text_extract_path": null,
       "drive_web_view_link": "https://drive.google.com/file/d/1x-TJBxEHEPHJIej_KrkCZh-4tzF9250d/view?usp=drivesdk",
-      "modified_at": "2026-10-16T14:36:09Z"
+      "modified_at": "2026-10-16T16:37:58Z"
     },
     {
       "document_id": "sha256:8133c149ebd2c1b2e2df8f704fad3530fae4bdbc8c255a683551197d652c4b94",
@@ -96,7 +126,7 @@
       "local_pdf_path": "BYMA/investor-documents/official-reports/BYMA-Financial_Statements_2025-12-31.pdf",
       "text_extract_path": null,
       "drive_web_view_link": "https://drive.google.com/file/d/1JYA0Ih5NqXFFTFpwx98CN61op6WJVl1H/view?usp=drivesdk",
-      "modified_at": "2026-10-16T14:36:09Z"
+      "modified_at": "2026-10-16T16:37:58Z"
     },
     {
       "document_id": "sha256:e4a0990a34c3d198793fc7087fdc8b167966714a49455c4fdd4f50980ea78f79",
@@ -105,7 +135,7 @@
       "local_pdf_path": "BYMA/investor-documents/presentations-and-media/BYMA-Press_Release_4Q25.pdf",
       "text_extract_path": null,
       "drive_web_view_link": "https://drive.google.com/file/d/1zP4kM8694uuCyyn8OhwNCl1_tmMlUNHj/view?usp=drivesdk",
-      "modified_at": "2026-10-16T14:36:09Z"
+      "modified_at": "2026-10-16T16:37:58Z"
     },
     {
       "document_id": "sha256:ead50219ad28d6fe5fb1343e05da39a6adcf7a15f09795d665e156da727a05a5",
@@ -114,7 +144,7 @@
       "local_pdf_path": "BYMA/investor-documents/official-reports/BYMA-Annual_Report_2024.pdf",
       "text_extract_path": null,
       "drive_web_view_link": "https://drive.google.com/file/d/1NXrAY60OSxw3MhcCzgqOcVzaVhfnig7s/view?usp=drivesdk",
-      "modified_at": "2026-10-16T14:36:09Z"
+      "modified_at": "2026-10-16T16:37:58Z"
     },
     {
       "document_id": "sha256:f9c9a0e689b74e219a0c7c852e05384e3debc3eb027288543fd6838d80790a50",
@@ -123,7 +153,7 @@
       "local_pdf_path": "BYMA/investor-documents/official-reports/BYMA-Financial_Statements_2026-03-31.pdf",
       "text_extract_path": null,
       "drive_web_view_link": "https://drive.google.com/file/d/1v0y2ItlnCO2FwLPhQZFgccpSWVgKWfrs/view?usp=drivesdk",
-      "modified_at": "2026-10-16T14:36:09Z"
+      "modified_at": "2026-10-16T16:37:58Z"
     }
   ],
   "l2_pointers": {
@@ -133,14 +163,17 @@
     "insider_signal_md": null,
     "thematic_context_md": "BYMA/research/evidence/thematic_context.md",
     "source_inventory_json": "BYMA/third-party-analyses/source_inventory.json",
-    "full_ui_shard_json": "dashboard/data/tickers/BYMA.json"
+    "full_ui_shard_json": "dashboard/data/tickers/BYMA.json",
+    "latest_json": "BYMA/research/latest.json",
+    "context_pack_md": "dashboard/data/context_packs/BYMA.md"
   },
+  "generated_at": "2026-10-16T20:26:21Z",
   "_envelope": {
     "schema_version": "magis.feed.v2",
     "feed_id": "agent-shard-byma",
-    "generated_at": "2026-10-16T17:58:36Z",
+    "generated_at": "2026-10-16T20:26:21Z",
     "as_of": "2026-06-11",
-    "content_sha256": "sha256:c2e21341207077c0c7e2962c909bc57fbbbec8cff260f74eebaffb5376da950d",
+    "content_sha256": "sha256:020c0c091818df04430b031e4059a55552d9cf3fc303f69bf7b0933c6d1b8c05",
     "row_count": 0,
     "upstream_inputs": [],
     "health": {

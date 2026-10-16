@@ -1,10 +1,10 @@
 {
-  "schema_version": "magis.agent_shard.v1",
-  "generated_at": "2026-10-16T17:58:36Z",
-  "as_of": "2026-07-10",
+  "schema_version": "magis.agent_shard.v2",
   "ticker": "AWK",
   "company": "American Water Works",
   "book": "holdings",
+  "shard_status": "built",
+  "as_of": "2026-07-10",
   "registry": {
     "market": "US",
     "exchange": "—",
@@ -13,12 +13,24 @@
     "dhando": "pending",
     "payoff_lens": "pending"
   },
+  "returns": {
+    "base_irr_pct": 7.3,
+    "unit": "percent_per_year",
+    "label": "7yr IRR (total synthesis)",
+    "display": "7.3% (total synthesis)",
+    "scenarios_pct": {
+      "base": 7.1,
+      "bear": 3.6,
+      "bull": 9.4
+    }
+  },
   "thesis_summary": {
     "thesis": "American Water Works is the largest investor-owned water and wastewater utility in the United States. **[Fact]** The company serves about **3.6 million** active customers across **14 states** through regulated local monopoly franchises (`investor-documents/sec-edgar/10-K_20260218_rpt20251231_acc0001410636_26_000034.htm`). **[Fact]** FY2025 consolidated operating revenue was **$5.14 billion** (up **9.7%** versus **$4.68 billion** in FY2024). **[Fact]** The **Regulated Businesses** segment contributed **$4.72 billion** (**92%** of revenue); **Market-Based Businesses** contributed **$417 million** (**8%**). **[Fact]** FY2025 diluted earnings per share were **$5.69** on net income of **$1.11 billion**; operating cash flow was **$2.06 billion** while capital spending was **$3.13 billion**. **[Inference]** Owner economics are set by state public utility commissions through allowed returns on rate-base investment, not open-market water pricing.",
     "why_market_wrong": "There is **no classic dated mispricing signal** (HK predictive attribute: **none**). **[Inference]** Generalists may treat AWK as a bond-proxy utility and anchor on dividend yield (~2.2% at ~$130) while underweighting rate-base growth funded by heavy capital spending that eventually flows into earnings. **[Fact]** In October 2025 the company announced a **stock-for-stock merger with Essential Utilities**; shareholders approved the deal on **February 10, 2026**, with expected close by **Q1 2027** pending regulatory approvals (`DEF 14A_20260324...htm`). **[Inference]** The market may be pricing merger completion risk and integration uncertainty rather than standalone regulated earnings power. **[Inference]** Bears may focus on negative GAAP free cash flow (capex exceeds operating cash flow) without crediting regulatory recovery of growth investment through infrastructure surcharges and general rate cases.",
     "stance": "watch",
     "archetype": "infrastructure",
     "base_irr_pct": 7.3,
+    "base_irr_unit": "percent_per_year",
     "scenarios": {
       "base": 7.1,
       "bear": 3.6,
@@ -61,6 +73,24 @@
       "Confirm maintenance capex proxy (depreciation vs company guidance) for owner cash",
       "Pending regulatory approvals for merger and July 2026 rate case (~$179M requested)"
     ]
+  },
+  "truncation": {
+    "key_assumptions": {
+      "shown": 6,
+      "total": 6
+    },
+    "open_questions": {
+      "shown": 3,
+      "total": 3
+    },
+    "kpi_series": {
+      "shown": 12,
+      "total": 12
+    },
+    "documents": {
+      "shown": 0,
+      "note": "capped at 15 most recent in builder"
+    }
   },
   "kpi_series": [
     {
@@ -207,7 +237,7 @@
     },
     {
       "title": "After markets close Oct. 28, American Water plans to release its 2027 earnings outlook. - Stock Titan",
-      "published_utc": "2026-10-06T17:21:00+00:00",
+      "published_utc": "2026-10-06T07:00:00+00:00",
       "category": "guidance",
       "confidence": 0.83,
       "url": "https://news.google.com/rss/articles/CBMivgFBVV95cUxPUENwQW5CRHFiNEt5c2ZZWk4temVtaTBOQVlkTDJGdFhPWUYtMUdYOTZCYmY4NDlVcDYyc01fWFRlU2lWV1UzQUZGSkpEYWZrUE9TWXFjNTllOGRxZzB5S0M2Njk0SDFlTGtXNmlVeWhNbDN4WkNXMzU0dmdqV1hSUmIwWUhhbHVQQzdxWlpPbENDc0hhVkZ5cjk3MFlCam5uazBVYktxdVI1cWZqYTBXWGNSZGYtWWRDZUZWTWtB?oc=5",
@@ -222,14 +252,17 @@
     "insider_signal_md": "AWK/research/evidence/insider_signal.md",
     "thematic_context_md": "AWK/research/evidence/thematic_context.md",
     "source_inventory_json": "AWK/third-party-analyses/source_inventory.json",
-    "full_ui_shard_json": "dashboard/data/tickers/AWK.json"
+    "full_ui_shard_json": "dashboard/data/tickers/AWK.json",
+    "latest_json": "AWK/research/latest.json",
+    "context_pack_md": "dashboard/data/context_packs/AWK.md"
   },
+  "generated_at": "2026-10-16T20:26:21Z",
   "_envelope": {
     "schema_version": "magis.feed.v2",
     "feed_id": "agent-shard-awk",
-    "generated_at": "2026-10-16T17:58:36Z",
+    "generated_at": "2026-10-16T20:26:21Z",
     "as_of": "2026-07-10",
-    "content_sha256": "sha256:cc6f5a85f68511a05f952c844f047eb27eb64787f7b73ca83471ef9cb4a74a11",
+    "content_sha256": "sha256:b06bcec7e0e6985b0ed4683e05b5ed2387e631293da990309675239366f3ffc2",
     "row_count": 14,
     "upstream_inputs": [],
     "health": {
