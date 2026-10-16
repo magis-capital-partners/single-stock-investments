@@ -1,4 +1,4 @@
-# TPL — Insider conviction (2026-10-15)
+# TPL — Insider conviction (2026-10-16)
 
 > Context only. Insider activity informs scenario confidence and stance discussion; it does not auto-inflate Lawrence base IRR. Promotion requires [HUMAN REVIEW].
 
@@ -13,10 +13,10 @@
 | Insider | Date | Shares | Price | Value | Contrib |
 |---------|------|--------|-------|-------|---------|
 | EPPS DONNA E | 2026-02-25 | 895 | $510.45 | $456852.75 | 2.337 |
-| HORIZON KINETICS ASSET MANAGEMENT LLC | 2026-07-17 | 1 | $420.15 | $420.15 | 0.481 |
 | DOYLE PETER | 2026-06-15 | 4 | $381.95 | $1527.8 | 0.478 |
-| HORIZON KINETICS ASSET MANAGEMENT LLC | 2026-07-16 | 1 | $416.05 | $416.05 | 0.477 |
+| HORIZON KINETICS ASSET MANAGEMENT LLC | 2026-07-17 | 1 | $420.15 | $420.15 | 0.477 |
 | HORIZON KINETICS ASSET MANAGEMENT LLC | 2026-04-08 | 3 | $449.0 | $1347.0 | 0.475 |
+| HORIZON KINETICS ASSET MANAGEMENT LLC | 2026-07-16 | 1 | $416.05 | $416.05 | 0.473 |
 
 **Routine / planned sales (context):**
 
