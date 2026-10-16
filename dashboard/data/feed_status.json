@@ -1,6 +1,6 @@
 {
   "schema_version": "1",
-  "generated_at": "2026-10-16T12:30:56Z",
+  "generated_at": "2026-10-16T13:41:37Z",
   "surfaces": [
     {
       "id": "portfolio",
@@ -16,7 +16,7 @@
       "status": "api",
       "label_text": "Live API",
       "lane": "deploy",
-      "lane_receipt_at": "2026-10-16T07:31:15Z",
+      "lane_receipt_at": "2026-10-16T13:00:48Z",
       "healer": "Wait for the next Flex report. This page does not read the Gateway.",
       "next_action": "Wait for the next Flex report. This page does not read the Gateway."
     },
@@ -36,7 +36,7 @@
       "lane": "data-pipeline-technicals",
       "lane_receipt_at": "2026-10-15T07:44:34Z",
       "healer": "When the snapshot is stopped, unknown, or older than its cadence, spx-0dte owns the next action. This page does not probe the Gateway.",
-      "next_action": "When the snapshot is stopped, unknown, or older than its cadence, spx-0dte owns the next action. This page does not probe the Gateway."
+      "next_action": "When the snapshot is stopped, unknown, or older than its cadence, spx-0dte owns the next action. This page does not probe the Gateway. A lane-failure issue is open."
     },
     {
       "id": "spx-surface",
@@ -54,7 +54,7 @@
       "lane": "data-pipeline-technicals",
       "lane_receipt_at": "2026-10-15T07:44:34Z",
       "healer": "python _system/scripts/build_spx_surface.py (data-pipeline technicals lane, cron 15 2 * * 1-5)",
-      "next_action": "python _system/scripts/build_spx_surface.py (data-pipeline technicals lane, cron 15 2 * * 1-5)"
+      "next_action": "python _system/scripts/build_spx_surface.py (data-pipeline technicals lane, cron 15 2 * * 1-5) A lane-failure issue is open."
     },
     {
       "id": "ls-algo",
@@ -88,7 +88,7 @@
       "status": "stale",
       "label_text": "Stale",
       "lane": "data-pipeline-intake-full",
-      "lane_receipt_at": "2026-10-15T09:19:34Z",
+      "lane_receipt_at": "2026-10-16T09:19:12Z",
       "healer": "The Darwin paper book is rebuilt by build_darwin_portfolio.py and republished with nightly intake. This page does not dispatch that job.",
       "next_action": "The Darwin paper book is rebuilt by build_darwin_portfolio.py and republished with nightly intake. This page does not dispatch that job."
     },
@@ -100,13 +100,13 @@
       "api": null,
       "artifact": "dashboard/data/core.json",
       "stamp_field": "generated_at",
-      "stamp": "2026-10-16T12:29:45Z",
+      "stamp": "2026-10-16T13:40:05Z",
       "max_age_hours": 54.0,
       "exists": true,
       "status": "fresh",
       "label_text": "Fresh",
       "lane": "data-pipeline-intake-full",
-      "lane_receipt_at": "2026-10-15T09:19:34Z",
+      "lane_receipt_at": "2026-10-16T09:19:12Z",
       "healer": "Nightly intake republishes this surface. This page does not dispatch that job.",
       "next_action": "Nightly intake republishes this surface. This page does not dispatch that job."
     },
@@ -126,7 +126,7 @@
       "lane": "data-pipeline-technicals",
       "lane_receipt_at": "2026-10-15T07:44:34Z",
       "healer": "python _system/scripts/build_technical_signals.py (data-pipeline lane, cron 15 2 * * 1-5)",
-      "next_action": "python _system/scripts/build_technical_signals.py (data-pipeline lane, cron 15 2 * * 1-5)"
+      "next_action": "python _system/scripts/build_technical_signals.py (data-pipeline lane, cron 15 2 * * 1-5) A lane-failure issue is open."
     },
     {
       "id": "valuation",
@@ -136,7 +136,7 @@
       "api": null,
       "artifact": "dashboard/data/core.json",
       "stamp_field": "generated_at",
-      "stamp": "2026-10-16T12:29:45Z",
+      "stamp": "2026-10-16T13:40:05Z",
       "max_age_hours": 56.0,
       "exists": true,
       "status": "fresh",
@@ -154,13 +154,13 @@
       "api": null,
       "artifact": "dashboard/data/core.json",
       "stamp_field": "generated_at",
-      "stamp": "2026-10-16T12:29:45Z",
+      "stamp": "2026-10-16T13:40:05Z",
       "max_age_hours": 54.0,
       "exists": true,
       "status": "fresh",
       "label_text": "Fresh",
       "lane": "data-pipeline-intake-full",
-      "lane_receipt_at": "2026-10-15T09:19:34Z",
+      "lane_receipt_at": "2026-10-16T09:19:12Z",
       "healer": "Nightly intake republishes this surface. This page does not dispatch that job.",
       "next_action": "Nightly intake republishes this surface. This page does not dispatch that job."
     },
@@ -178,7 +178,7 @@
       "status": "fresh",
       "label_text": "Fresh",
       "lane": "data-pipeline-intake-full",
-      "lane_receipt_at": "2026-10-15T09:19:34Z",
+      "lane_receipt_at": "2026-10-16T09:19:12Z",
       "healer": "python _system/scripts/build_short_alpha_dashboard.py (build_dashboard_data.build_short_alpha inside data-pipeline intake-full, check=True; --check also runs in the automerge data-guard for PRs touching _system/research/short-alpha/)",
       "next_action": "python _system/scripts/build_short_alpha_dashboard.py (build_dashboard_data.build_short_alpha inside data-pipeline intake-full, check=True; --check also runs in the automerge data-guard for PRs touching _system/research/short-alpha/)"
     },
@@ -214,7 +214,7 @@
       "status": "fresh",
       "label_text": "Fresh",
       "lane": "data-pipeline-intake-full",
-      "lane_receipt_at": "2026-10-15T09:19:34Z",
+      "lane_receipt_at": "2026-10-16T09:19:12Z",
       "healer": "python _system/scripts/check_desk_briefs.py --warn-only && python _system/scripts/build_desk_briefs.py (data-pipeline nightly intake-full; briefs arrive by grok/<desk>/<date>-<slug> PR and the automerge data-guard)",
       "next_action": "python _system/scripts/check_desk_briefs.py --warn-only && python _system/scripts/build_desk_briefs.py (data-pipeline nightly intake-full; briefs arrive by grok/<desk>/<date>-<slug> PR and the automerge data-guard)"
     },
@@ -268,7 +268,7 @@
       "status": "fresh",
       "label_text": "Fresh",
       "lane": "data-pipeline-intake-full",
-      "lane_receipt_at": "2026-10-15T09:19:34Z",
+      "lane_receipt_at": "2026-10-16T09:19:12Z",
       "healer": "python _system/scripts/build_special_situations.py (ci_rebuild_profile intake-full step after build_separations_dashboard.py)",
       "next_action": "python _system/scripts/build_special_situations.py (ci_rebuild_profile intake-full step after build_separations_dashboard.py)"
     },
@@ -280,13 +280,13 @@
       "api": null,
       "artifact": "dashboard/data/core.json",
       "stamp_field": "generated_at",
-      "stamp": "2026-10-16T12:29:45Z",
+      "stamp": "2026-10-16T13:40:05Z",
       "max_age_hours": 54.0,
       "exists": true,
       "status": "fresh",
       "label_text": "Fresh",
       "lane": "data-pipeline-intake-full",
-      "lane_receipt_at": "2026-10-15T09:19:34Z",
+      "lane_receipt_at": "2026-10-16T09:19:12Z",
       "healer": "Nightly intake republishes this surface. This page does not dispatch that job.",
       "next_action": "Nightly intake republishes this surface. This page does not dispatch that job."
     },
@@ -298,13 +298,13 @@
       "api": null,
       "artifact": "dashboard/data/core.json",
       "stamp_field": "generated_at",
-      "stamp": "2026-10-16T12:29:45Z",
+      "stamp": "2026-10-16T13:40:05Z",
       "max_age_hours": 54.0,
       "exists": true,
       "status": "fresh",
       "label_text": "Fresh",
       "lane": "data-pipeline-intake-full",
-      "lane_receipt_at": "2026-10-15T09:19:34Z",
+      "lane_receipt_at": "2026-10-16T09:19:12Z",
       "healer": "Nightly intake republishes this surface. This page does not dispatch that job.",
       "next_action": "Nightly intake republishes this surface. This page does not dispatch that job."
     },
@@ -316,13 +316,13 @@
       "api": null,
       "artifact": "dashboard/data/core.json",
       "stamp_field": "generated_at",
-      "stamp": "2026-10-16T12:29:45Z",
+      "stamp": "2026-10-16T13:40:05Z",
       "max_age_hours": 54.0,
       "exists": true,
       "status": "fresh",
       "label_text": "Fresh",
       "lane": "data-pipeline-intake-full",
-      "lane_receipt_at": "2026-10-15T09:19:34Z",
+      "lane_receipt_at": "2026-10-16T09:19:12Z",
       "healer": "Nightly intake republishes this surface. This page does not dispatch that job.",
       "next_action": "Nightly intake republishes this surface. This page does not dispatch that job."
     },
@@ -340,7 +340,7 @@
       "status": "fresh",
       "label_text": "Fresh",
       "lane": "data-pipeline-intake-full",
-      "lane_receipt_at": "2026-10-15T09:19:34Z",
+      "lane_receipt_at": "2026-10-16T09:19:12Z",
       "healer": "Nightly intake republishes this surface. This page does not dispatch that job.",
       "next_action": "Nightly intake republishes this surface. This page does not dispatch that job."
     },
@@ -358,7 +358,7 @@
       "status": "stale",
       "label_text": "Stale",
       "lane": "data-pipeline-activist",
-      "lane_receipt_at": "2026-10-14T13:02:57Z",
+      "lane_receipt_at": "2026-10-16T12:31:46Z",
       "healer": "The activist scan is the 06:00 UTC data-pipeline job. This page does not dispatch that job.",
       "next_action": "The activist scan is the 06:00 UTC data-pipeline job. This page does not dispatch that job. A lane-failure issue is open."
     },
@@ -376,7 +376,7 @@
       "status": "fresh",
       "label_text": "Fresh",
       "lane": "data-pipeline-intake-full",
-      "lane_receipt_at": "2026-10-15T09:19:34Z",
+      "lane_receipt_at": "2026-10-16T09:19:12Z",
       "healer": "This table is written with the dashboard build. It does not dispatch refreshes.",
       "next_action": "This table is written with the dashboard build. It does not dispatch refreshes."
     },
@@ -430,7 +430,7 @@
       "status": "fresh",
       "label_text": "Fresh",
       "lane": "data-pipeline-intake-full",
-      "lane_receipt_at": "2026-10-15T09:19:34Z",
+      "lane_receipt_at": "2026-10-16T09:19:12Z",
       "healer": "Nightly intake republishes this surface. This page does not dispatch that job.",
       "next_action": "Nightly intake republishes this surface. This page does not dispatch that job."
     },
@@ -448,7 +448,7 @@
       "status": "fresh",
       "label_text": "Fresh",
       "lane": "data-pipeline-intake-full",
-      "lane_receipt_at": "2026-10-15T09:19:34Z",
+      "lane_receipt_at": "2026-10-16T09:19:12Z",
       "healer": "Nightly intake republishes this surface. This page does not dispatch that job.",
       "next_action": "Nightly intake republishes this surface. This page does not dispatch that job."
     },
@@ -460,13 +460,13 @@
       "api": null,
       "artifact": "dashboard/data/index_membership.json",
       "stamp_field": "generated",
-      "stamp": "2026-10-16T12:25:48Z",
+      "stamp": "2026-10-16T13:38:46Z",
       "max_age_hours": 54.0,
       "exists": true,
       "status": "fresh",
       "label_text": "Fresh",
       "lane": "data-pipeline-intake-full",
-      "lane_receipt_at": "2026-10-15T09:19:34Z",
+      "lane_receipt_at": "2026-10-16T09:19:12Z",
       "healer": "Index membership is rebuilt by nightly intake (insights, activist, and full profiles). This page does not run that job.",
       "next_action": "Index membership is rebuilt by nightly intake (insights, activist, and full profiles). This page does not run that job."
     },
@@ -484,7 +484,7 @@
       "status": "fresh",
       "label_text": "Fresh",
       "lane": "data-pipeline-intake-full",
-      "lane_receipt_at": "2026-10-15T09:19:34Z",
+      "lane_receipt_at": "2026-10-16T09:19:12Z",
       "healer": "Nightly intake republishes this surface. This page does not dispatch that job.",
       "next_action": "Nightly intake republishes this surface. This page does not dispatch that job."
     },
@@ -502,7 +502,7 @@
       "status": "fresh",
       "label_text": "Fresh",
       "lane": "data-pipeline-intake-full",
-      "lane_receipt_at": "2026-10-15T09:19:34Z",
+      "lane_receipt_at": "2026-10-16T09:19:12Z",
       "healer": "Nightly intake republishes this surface. This page does not dispatch that job.",
       "next_action": "Nightly intake republishes this surface. This page does not dispatch that job."
     },
@@ -514,13 +514,13 @@
       "api": null,
       "artifact": "dashboard/data/document_catalog.json",
       "stamp_field": "generated_at",
-      "stamp": "2026-10-16T12:27:24Z",
+      "stamp": "2026-10-16T13:39:07Z",
       "max_age_hours": 54.0,
       "exists": true,
       "status": "fresh",
       "label_text": "Fresh",
       "lane": "data-pipeline-intake-full",
-      "lane_receipt_at": "2026-10-15T09:19:34Z",
+      "lane_receipt_at": "2026-10-16T09:19:12Z",
       "healer": "Nightly intake republishes this surface. This page does not dispatch that job.",
       "next_action": "Nightly intake republishes this surface. This page does not dispatch that job."
     },
@@ -538,7 +538,7 @@
       "status": "fresh",
       "label_text": "Fresh",
       "lane": "data-pipeline-intake-full",
-      "lane_receipt_at": "2026-10-15T09:19:34Z",
+      "lane_receipt_at": "2026-10-16T09:19:12Z",
       "healer": "Nightly intake republishes this surface. This page does not dispatch that job.",
       "next_action": "Nightly intake republishes this surface. This page does not dispatch that job."
     },
@@ -594,7 +594,7 @@
       "lane": "data-pipeline-technicals",
       "lane_receipt_at": "2026-10-15T07:44:34Z",
       "healer": "python _system/scripts/build_criticality_signals.py --workers 4 (data-pipeline lane, cron 15 2 * * 1-5)",
-      "next_action": "python _system/scripts/build_criticality_signals.py --workers 4 (data-pipeline lane, cron 15 2 * * 1-5)"
+      "next_action": "python _system/scripts/build_criticality_signals.py --workers 4 (data-pipeline lane, cron 15 2 * * 1-5) A lane-failure issue is open."
     },
     {
       "id": "vol-metrics",
@@ -612,7 +612,7 @@
       "lane": "data-pipeline-technicals",
       "lane_receipt_at": "2026-10-15T07:44:34Z",
       "healer": "python _system/scripts/build_vol_metrics.py (self-healing composite sources; data-pipeline technicals lane, cron 15 2 * * 1-5)",
-      "next_action": "python _system/scripts/build_vol_metrics.py (self-healing composite sources; data-pipeline technicals lane, cron 15 2 * * 1-5)"
+      "next_action": "python _system/scripts/build_vol_metrics.py (self-healing composite sources; data-pipeline technicals lane, cron 15 2 * * 1-5) A lane-failure issue is open."
     },
     {
       "id": "capitulation",
@@ -630,7 +630,7 @@
       "lane": "data-pipeline-technicals",
       "lane_receipt_at": "2026-10-15T07:44:34Z",
       "healer": "python _system/scripts/build_capitulation_daily.py --workers 6 (forced-flow-daily weekdays 22:00 UTC; data-pipeline technicals lane, heal-technicals)",
-      "next_action": "python _system/scripts/build_capitulation_daily.py --workers 6 (forced-flow-daily weekdays 22:00 UTC; data-pipeline technicals lane, heal-technicals)"
+      "next_action": "python _system/scripts/build_capitulation_daily.py --workers 6 (forced-flow-daily weekdays 22:00 UTC; data-pipeline technicals lane, heal-technicals) A lane-failure issue is open."
     }
   ]
 }
