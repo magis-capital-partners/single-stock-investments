@@ -65,3 +65,38 @@ const data = {schema_version:'shorts_net_edge.v3',policy:{entry:'announcement_ne
     result = subprocess.run(["node", "-e", script, str(root/"dashboard/shorts-edge-v3-viz.js")],
                             cwd=root, text=True, capture_output=True, timeout=20)
     assert result.returncode == 0, result.stdout+result.stderr
+
+
+def test_calmar_research_distinguishes_sparse_winners_and_rejects_mixed_models():
+    root = Path(__file__).resolve().parents[4]
+    script = r'''
+const assert=require('node:assert/strict'),fs=require('node:fs'),vm=require('node:vm'),crypto=require('node:crypto');
+const hash=x=>crypto.createHash('sha256').update(JSON.stringify(x)).digest('hex');
+const mounts=new Map(),document={getElementById:id=>{if(!mounts.has(id))mounts.set(id,{innerHTML:''});return mounts.get(id)}};
+const group='announcement_next_open_5_bracket',audit={outcomes:{},forecasts:{},accounts:{capital50k:{}}};
+const policy={entry:'post_split_next_open',sessions:5,bracket:false,fundamental_floor:80};
+const row=(id,trades,calmar)=>({id,trades,calmar,issuers:trades,variant:'net_edge',policy,net_pnl:100,cagr:.01,max_drawdown:.05});
+let study={schema_version:'shorts_calmar_research.v1',authority:'none',data_cost_usd:0,production_policy_changed:false,
+ plan:{bindings:{research_summary_sha256:'a'.repeat(64)},primary_account:{account:{equity:50000}},policy_groups_detail:[{assumed_annual_borrow:.5}],qualification:{minimum_trades:30,minimum_issuers:20,minimum_active_years:3}},
+ cases:[row('sparse',1,2),row('qualified',40,.2)],qualified_ranked_ids:['qualified'],ranked_ids:['sparse','qualified'],coverage:{trials:640},
+ validation:{paper_candidate:null,cases:{qualified:{passes_declared_robustness_checks:false,robustness_failures:['double_borrow_not_positive'],cost_scenarios:{double_borrow:{trades:30,net_pnl:-10,calmar:-.1}},separate_periods:[]}}}};
+const fetch=async url=>({ok:true,arrayBuffer:async()=>new TextEncoder().encode(JSON.stringify(url.startsWith('data/shorts_calmar')?study:audit)).buffer});
+const ctx={window:{crypto:crypto.webcrypto},document,fetch,setTimeout,TextDecoder,URL};vm.createContext(ctx);vm.runInContext(fs.readFileSync(process.argv[1],'utf8'),ctx);
+const api=ctx.window.ShortsEdgeV3Viz;
+const data={schema_version:'shorts_net_edge.v3',policy:{entry:'announcement_next_open',sessions:5,bracket:true},coverage:{},accounts:[{id:'capital50k',account:{equity:50000}}],cases:[{group,account_id:'capital50k',variant:'net_edge',costs:{},skipped:{}}],names:[],validation:{[group]:{}},audit_files:{[group]:{url:'data/net_edge_audits_v3/'+group+'.json',sha256:hash(audit)}},ssr:{counts:{},limit_replay:{}},sources:[],definitions:{},limits:[],calmar_research_ref:{url:'data/shorts_calmar_research.json',sha256:hash(study),base_summary_sha256:'a'.repeat(64)}};
+(async()=>{
+ api.render(data);api.openCalmarResearch();await new Promise(r=>setTimeout(r,80));
+ let html=mounts.get('sev-calmar-research').innerHTML;
+ assert.match(html,/640 tested combinations/);assert.match(html,/No tested finalist cleared every robustness screen/);
+ assert.match(html,/at least|At least/);assert.match(html,/one or two trades/);assert.match(html,/100% annual borrow/);
+ assert.match(html,/separate research runs/);assert.equal(data.policy.sessions,5);
+ study={...study,data_cost_usd:100};api.render(data);api.openCalmarResearch();await new Promise(r=>setTimeout(r,80));
+ assert.match(mounts.get('sev-calmar-research').innerHTML,/could not be verified/);
+ study={...study,data_cost_usd:0,plan:{...study.plan,bindings:{research_summary_sha256:'b'.repeat(64)}}};
+ data.calmar_research_ref.sha256=hash(study);api.render(data);api.openCalmarResearch();await new Promise(r=>setTimeout(r,80));
+ assert.match(mounts.get('sev-calmar-research').innerHTML,/could not be verified/);
+})().catch(e=>{console.error(e);process.exitCode=1});
+'''
+    result = subprocess.run(["node", "-e", script, str(root/"dashboard/shorts-edge-v3-viz.js")],
+                            cwd=root, text=True, capture_output=True, timeout=20)
+    assert result.returncode == 0, result.stdout+result.stderr

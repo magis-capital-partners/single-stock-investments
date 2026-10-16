@@ -54,6 +54,10 @@ def edge_v3_reference(ledger_dir):
         borrow = ledger_dir / "free_borrow_evidence.json"
         if borrow.exists():
             reference["free_evidence_ref"]["borrow_ref"] = {"url": "data/shorts_free_borrow.json", "sha256": digest(borrow)}
+    calmar = ledger_dir / "calmar_research.json"
+    if calmar.exists():
+        reference["calmar_research_ref"] = {"url": "data/shorts_calmar_research.json", "sha256": digest(calmar),
+                                            "base_summary_sha256": digest(source)}
     return reference
 
 # Two event rows for one issuer are the same split recorded twice when their
@@ -634,6 +638,9 @@ def main(argv: list[str] | None = None) -> int:
     summary_source = (args.ledger_dir or DATA_DIR) / "net_edge_research_v3.json"
     if summary_source.exists():
         shutil.copyfile(summary_source, target.parent / "shorts_net_edge_v3.json")
+    calmar_source = (args.ledger_dir or DATA_DIR) / "calmar_research.json"
+    if calmar_source.exists():
+        shutil.copyfile(calmar_source, target.parent / "shorts_calmar_research.json")
     free_source = (args.ledger_dir or DATA_DIR) / "free_evidence.json"
     if free_source.exists():
         shutil.copyfile(free_source, target.parent / "shorts_free_evidence.json")

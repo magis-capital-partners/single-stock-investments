@@ -343,15 +343,18 @@ def recalled_outcome(candidate, records):
     return candidate
 
 
-def simulate(candidates, policy, account, sessions, store, evidence, *, variant):
+def simulate(candidates, policy, account, sessions, store, evidence, *, variant,
+             keep_daily=False, start_day="2018-05-01", end_day="2026-10-13", entry_end_day=None):
     by_day, positions, pending, ledger, journal, daily = defaultdict(list), [], [], [], [], []
     for c in candidates:
         if c["outcome"].get("entry_day"): by_day[c["outcome"]["entry_day"]].append(c)
     cash, skipped = account.equity, Counter()
     breaches, worst_margin, nav_high, maximum_dd = 0, 0., account.equity, 0.
     unresolved, observed_fills = set(), 0
-    calendar = [d for d in sessions if "2018-05-01" <= d <= "2026-10-13"]
-    old_day = "2018-04-30"
+    calendar = [d for d in sessions if start_day <= d <= end_day]
+    if not calendar:
+        raise ValueError("Simulation window contains no trading sessions")
+    old_day = (datetime.fromisoformat(calendar[0])-timedelta(days=1)).date().isoformat()
     for day in calendar:
         # Return-settlement fees can accrue after the position itself is covered.
         charges = sum(r["amount"] for r in pending if old_day < r["date"] <= day)
@@ -367,7 +370,8 @@ def simulate(candidates, policy, account, sessions, store, evidence, *, variant)
             return p["shares"]*factor*maintenance_per_share(mark/factor)
         used_margin = sum(margin(p, p["last_mark"]) for p in positions)
         used_stress = sum(p["shares"]*p["last_mark"]*p["size"]["stress_fraction"] for p in positions)
-        day_entries = sorted(by_day.get(day, []), key=lambda c: (-(c["forecast"].get("gross_lower_bound") or -1), c["snapshot"]["key"]))
+        day_entries = sorted(by_day.get(day, []) if not entry_end_day or day <= entry_end_day else [],
+                             key=lambda c: (-(c["forecast"].get("gross_lower_bound") or -1), c["snapshot"]["key"]))
         for candidate in day_entries:
             s, o, f = candidate["snapshot"], candidate["outcome"], candidate["forecast"]
             reason = None
@@ -464,7 +468,7 @@ def simulate(candidates, policy, account, sessions, store, evidence, *, variant)
     # Include already-incurred return-settlement liabilities after the sample end.
     ending = daily[-1]["equity"]-sum(r["amount"] for r in pending)
     valid = not unresolved and not positions and breaches == 0
-    return {"variant": variant, "trades": len(ledger), "net_pnl": ending-account.equity if valid else None, "ending_equity": ending if valid else None,
+    result = {"variant": variant, "trades": len(ledger), "net_pnl": ending-account.equity if valid else None, "ending_equity": ending if valid else None,
             "conditional_marked_pnl": ending-account.equity, "performance_valid": valid,
             "unresolved_admitted_names": len(unresolved), "max_drawdown": maximum_dd if valid else None, "margin_stress_breaches": breaches,
             "maximum_joint_high_margin_ratio": worst_margin, "funding_valid": breaches == 0,
@@ -473,6 +477,10 @@ def simulate(candidates, policy, account, sessions, store, evidence, *, variant)
             "observed_fills": observed_fills, "dividend_history_complete": False,
             "equity_curve": [r for i, r in enumerate(daily) if i % 21 == 0 or i == len(daily)-1],
             "journal": journal, "trade_ledger": ledger}
+    if keep_daily:
+        # Reserve incurred post-cover settlement charges at the window end.
+        result["daily_equity_curve"] = [*daily[:-1], {**daily[-1], "equity": ending}]
+    return result
 
 
 def observed_fill(records, event_id, policy, phase, day, decision=None):
