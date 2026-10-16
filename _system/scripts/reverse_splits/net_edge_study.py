@@ -299,7 +299,9 @@ def public_borrow_history(source, events):
 
 
 def realized_loan(candidate, q, rate, sessions, store, evidence, policy):
+    from .net_edge_v3 import issuer_borrow
     s, o = candidate["snapshot"], candidate["outcome"]
+    evidence = issuer_borrow(evidence, s["issuer"])
     schedule = loan_schedule(o["entry_day"], o["exit_day"], o["entry_price"], rate, sessions,
                              minimum_days=policy.minimum_billed_days, basis=policy.borrow_basis,
                              preborrow_fee_per_share=policy.preborrow_fee_per_share)
@@ -325,7 +327,9 @@ def realized_loan(candidate, q, rate, sessions, store, evidence, policy):
 
 def recalled_outcome(candidate, records):
     """Realized recall exit at the next available session open, never a signal."""
+    from .net_edge_v3 import issuer_borrow
     s, o = candidate["snapshot"], candidate["outcome"]
+    records = issuer_borrow(records, s["issuer"])
     for r in sorted((r for r in records if r.get("kind") == "recall" and r["issuer"] == s["issuer"]), key=lambda r: r["known_at"]):
         stamp = moment(r["known_at"])
         entry = moment(clock(o["entry_day"], 9))+timedelta(minutes=30)
@@ -345,6 +349,7 @@ def recalled_outcome(candidate, records):
 
 def simulate(candidates, policy, account, sessions, store, evidence, *, variant,
              keep_daily=False, start_day="2018-05-01", end_day="2026-10-13", entry_end_day=None):
+    from .net_edge_v3 import issuer_borrow
     by_day, positions, pending, ledger, journal, daily = defaultdict(list), [], [], [], [], []
     for c in candidates:
         if c["outcome"].get("entry_day"): by_day[c["outcome"]["entry_day"]].append(c)
@@ -399,11 +404,11 @@ def simulate(candidates, policy, account, sessions, store, evidence, *, variant,
                 elif not entry_fill: reason = "entry_execution_evidence_missing"
             if not reason and indicative and indicative["shares"] <= 0: reason = "dated_borrow_unavailable"
             if not reason and not approval and any(r.get("kind") == "recall" and r["issuer"] == s["issuer"] and moment(r["known_at"]) <= entry_clock
-                and (not indicative or moment(r["known_at"]) >= moment(indicative["known_at"])) for r in evidence["borrow"]):
+                and (not indicative or moment(r["known_at"]) >= moment(indicative["known_at"])) for r in issuer_borrow(evidence["borrow"], s["issuer"])):
                 reason = "known_borrow_recall"
             result = {"shares": 0, "reason": reason} if reason else size_position(f, candidate["curve"], o["entry_price"], day, rate, sessions, policy, account,
                 equity=nav, adv=o.get("prior_adv"), inventory=min(approval["shares"], entry_fill["shares"]) if variant == "strict" and approval and entry_fill else approval.get("shares") if approval else None,
-                used_margin=used_margin, used_stress=used_stress, rating=s.get("conviction_rating") if variant == "strict" and s.get("conviction_rating") is not None else s["screen_rating"], mode="net_edge" if variant in {"net_edge", "strict"} else "baseline", carry_cache=candidate.setdefault("carry_cache", {}), calendar_asof=entry_clock.isoformat())
+                used_margin=used_margin, used_stress=used_stress, rating=s.get("conviction_rating") if variant == "strict" and s.get("conviction_rating") is not None else s.get("sizing_rating", s["screen_rating"]), mode="net_edge" if variant in {"net_edge", "strict"} else "baseline", carry_cache=candidate.setdefault("carry_cache", {}), calendar_asof=entry_clock.isoformat())
             reason = result["reason"]
             journal.append({"key": s["key"], "ticker": s["ticker"], "date": day, **result})
             if not result["shares"]:
