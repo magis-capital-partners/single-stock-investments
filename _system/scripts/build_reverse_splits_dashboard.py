@@ -58,6 +58,10 @@ def edge_v3_reference(ledger_dir):
     if calmar.exists():
         reference["calmar_research_ref"] = {"url": "data/shorts_calmar_research.json", "sha256": digest(calmar),
                                             "base_summary_sha256": digest(source)}
+    expanded = ledger_dir / "coverage_research.json"
+    if expanded.exists():
+        reference["coverage_research_ref"] = {"url": "data/shorts_coverage_research.json", "sha256": digest(expanded),
+                                               "base_summary_sha256": digest(source)}
     return reference
 
 # Two event rows for one issuer are the same split recorded twice when their
@@ -641,6 +645,11 @@ def main(argv: list[str] | None = None) -> int:
     calmar_source = (args.ledger_dir or DATA_DIR) / "calmar_research.json"
     if calmar_source.exists():
         shutil.copyfile(calmar_source, target.parent / "shorts_calmar_research.json")
+    coverage_source = (args.ledger_dir or DATA_DIR) / "coverage_research.json"
+    if coverage_source.exists():
+        shutil.copyfile(coverage_source, target.parent / "shorts_coverage_research.json")
+        for folder in ("packets", "audits"):
+            shutil.copytree(coverage_source.parent / ("coverage_"+folder), target.parent / ("shorts_coverage_"+folder), dirs_exist_ok=True)
     free_source = (args.ledger_dir or DATA_DIR) / "free_evidence.json"
     if free_source.exists():
         shutil.copyfile(free_source, target.parent / "shorts_free_evidence.json")
