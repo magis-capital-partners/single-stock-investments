@@ -683,6 +683,29 @@
       data-select-ticker="${escapeHtml(ticker)}" title="${escapeHtml(title)}">${escapeHtml(ticker)}</button>`;
   }
 
+  function markVerifiedQuotes(text, claims, escapeHtml) {
+    let html = escapeHtml(text || '');
+    (claims || []).forEach(c => {
+      const quote = c && c.quote ? String(c.quote).trim() : '';
+      if (quote.length < 12 || c.quote_verified === false) return;
+      const words = quote.split(/\s+/).filter(Boolean).map(word =>
+        escapeHtml(word).replace(/[.*+?^${}()|[\]\\]/g, '\\$&'));
+      if (words.length < 3) return;
+      html = html.replace(new RegExp(words.join('\\s+')), match =>
+        `<mark class="verified-quote">${match}</mark>`);
+    });
+    return html;
+  }
+
+  function renderTranscriptBlock(text, claims, escapeHtml, truncated) {
+    if (!text) return '';
+    return `
+      <h4 class="video-detail-head">TRANSCRIPT</h4>
+      <div class="video-transcript" style="max-height:28em;overflow:auto;white-space:pre-wrap;font-size:12px;line-height:1.45">${markVerifiedQuotes(text, claims, escapeHtml)}</div>
+      ${truncated ? '<p class="tier-sub">Opening only — the rest of the transcript was too long for this page.</p>' : ''}
+      <p class="tier-sub">Highlighted spans are quotes checked against this transcript.</p>`;
+  }
+
   function renderVideoDetail(row, escapeHtml, linkHtml, ghRepo, opts = {}) {
     if (!row) return '';
     const detail = opts.detail || null;
@@ -714,6 +737,7 @@
       description: "The channel's own description",
       claim: 'One verified claim; no summary was produced',
       transcript: 'Transcript opening — this video has not been analysed',
+      empty: 'Analysis finished with no thesis and no claims',
     }[v.summary_source] || '';
 
     return `
@@ -766,6 +790,8 @@
                 </article>`).join('')}
             </section>`).join('')}
         </div>` : ''}
+
+        ${renderTranscriptBlock(v.transcript, claims, escapeHtml, v.transcript_truncated)}
 
         ${numbers.length ? `
         <h4 class="video-detail-head">FIGURES CITED</h4>
@@ -854,6 +880,14 @@
     const claims = (Array.isArray(merged.claims) ? merged.claims : [])
       .filter(c => c && String(c.claim || '').trim());
     const analysis = merged.analysis || null;
+    const analysed = Boolean(analysis);
+    // The model's thesis is the summary. The extractive line is what the page
+    // used before analysis existed, and it stays only until that pass runs.
+    const lead = thesis
+      || (analysed ? 'Analyzed. No investable claims were extracted.' : summary);
+    const leadNote = thesis
+      ? 'Model summary'
+      : (analysed ? 'Analysis finished with no thesis and no claims' : (summary ? 'Automatic extract from the transcript' : ''));
     const verifiedRate = analysis && typeof analysis.quote_verified_rate === 'number'
       ? Math.round(analysis.quote_verified_rate * 100)
       : null;
@@ -874,7 +908,11 @@
         ${personas.length ? `<p class="tier-sub">Personas: ${escapeHtml(personas.join(', '))}</p>` : ''}
         ${themes ? `<div style="margin:8px 0"><strong>Themes:</strong> ${themes}</div>` : ''}
         ${loading ? '<p class="tier-sub">Loading summary and highlights…</p>' : ''}
-        ${summary ? `<p style="font-size:13px;line-height:1.5;margin:10px 0">${escapeHtml(summary)}</p>` : ''}
+        ${lead ? `
+        <div class="video-thesis">
+          <p>${escapeHtml(lead)}</p>
+          ${leadNote ? `<span class="video-thesis-src">${escapeHtml(leadNote)}</span>` : ''}
+        </div>` : ''}
         ${tickers.length ? `
         <div style="margin:10px 0">
           <strong>Tickers</strong>
@@ -886,10 +924,6 @@
         <h4 style="margin-top:14px;font-size:12px;color:var(--text-muted)">TICKER COMMENTARY</h4>
         <ul class="dev-list">${positions.map(p => `<li style="font-size:12px"><span class="mono">${escapeHtml(p.ticker)}</span>${p.commentary ? ` — ${escapeHtml(String(p.commentary).slice(0, 200))}` : ''}</li>`).join('')}</ul>
         ` : ''}
-        ${thesis ? `
-        <h4 style="margin-top:14px;font-size:12px;color:var(--text-muted)">THESIS</h4>
-        <p style="font-size:13px;line-height:1.5;margin:6px 0">${escapeHtml(thesis)}</p>
-        ` : ''}
         ${claims.length ? `
         <h4 style="margin-top:14px;font-size:12px;color:var(--text-muted)">CLAIMS${
           verifiedRate === null ? '' : ` · ${verifiedRate}% QUOTE-VERIFIED`}</h4>
@@ -900,10 +934,11 @@
             ${c.quote && c.quote_verified ? `<div class="tier-sub" style="margin-top:3px;font-style:italic">&ldquo;${escapeHtml(String(c.quote).slice(0, 300))}&rdquo;</div>` : ''}
           </li>`).join('')}</ul>
         ` : ''}
-        ${highlights.length ? `
+        ${renderTranscriptBlock(merged.transcript, claims, escapeHtml, merged.transcript_truncated)}
+        ${!analysed && highlights.length ? `
         <h4 style="margin-top:14px;font-size:12px;color:var(--text-muted)">HIGHLIGHTS</h4>
         <ul class="dev-list">${highlights.map(p => `<li style="font-size:13px;line-height:1.45">${escapeHtml(p)}</li>`).join('')}</ul>
-        ` : (!loading && merged.highlight_count ? `<p class="tier-sub">${merged.highlight_count} highlight(s) — open transcript for detail</p>` : '')}
+        ` : (!analysed && !loading && merged.highlight_count ? `<p class="tier-sub">${merged.highlight_count} highlight(s) — open transcript for detail</p>` : '')}
         <p class="tier-sub" style="margin-top:12px">${[transcriptLink, episodeLink].filter(Boolean).join(' · ') || '—'}</p>
       </div>`;
   }

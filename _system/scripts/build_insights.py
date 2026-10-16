@@ -1239,7 +1239,7 @@ def from_valuation_context(ticker: str, val: dict) -> list[dict]:
 
 def from_third_party(ticker_dir: Path, ticker: str) -> list[dict]:
     out: list[dict] = []
-    inv_path = ticker_dir / "third-party-analyses" / "source_inventory_2026-06-07.json"
+    inv_path = ticker_dir / "third-party-analyses" / "source_inventory.json"
     if not inv_path.exists():
         invs = sorted(ticker_dir.glob("third-party-analyses/source_inventory_*.json"), reverse=True)
         inv_path = invs[0] if invs else None
@@ -3369,7 +3369,9 @@ def third_party_inventory_count() -> int:
     count = 0
     for ticker_dir in ROOT.iterdir():
         if ticker_dir.is_dir() and not ticker_dir.name.startswith((".", "_")):
-            if list(ticker_dir.glob("third-party-analyses/source_inventory_*.json")):
+            if (ticker_dir / "third-party-analyses" / "source_inventory.json").is_file() or list(
+                ticker_dir.glob("third-party-analyses/source_inventory_*.json")
+            ):
                 count += 1
     return count
 

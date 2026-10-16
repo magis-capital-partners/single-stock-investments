@@ -31,6 +31,7 @@ SCRIPT_DIR = Path(__file__).resolve().parent
 if str(SCRIPT_DIR) not in sys.path:
     sys.path.insert(0, str(SCRIPT_DIR))
 
+from atomic_io import write_json_if_changed, write_text_if_changed  # noqa: E402
 from decision_authority import resolve_authority  # noqa: E402
 
 ROOT = SCRIPT_DIR.parents[1]
@@ -60,6 +61,9 @@ MONITORING_CADENCE = {
 
 def _latest_json(dirpath: Path, stem: str) -> tuple[Path | None, dict | None]:
     files = sorted(dirpath.glob(f"{stem}_*.json"), reverse=True)
+    canonical = dirpath / f"{stem}.json"
+    if canonical.is_file():
+        files.append(canonical)
     for path in files:
         try:
             return path, json.loads(path.read_text(encoding="utf-8"))
@@ -558,7 +562,10 @@ def pattern_gap_sections(evidence_dir: Path) -> list[str]:
         ("insider_signal", "Insider (Form 4) signal"),
         ("thematic_context", "Thematic context sweep"),
     ):
-        files = sorted(evidence_dir.glob(f"{stem}_*.md"), reverse=True)
+        canonical = evidence_dir / f"{stem}.md"
+        files = ([canonical] if canonical.is_file() else []) + sorted(
+            evidence_dir.glob(f"{stem}_*.md"), reverse=True
+        )
         if files:
             newest = files[0]
             proxies.append((label, newest))
@@ -953,10 +960,20 @@ def write_report(ticker_dir: Path, as_of: str) -> tuple[Path, Path] | None:
     if built is None:
         return None
     text, gate = built
-    report_path = ticker_dir / "research" / f"ssi_report_{as_of}.md"
-    gate_path = ticker_dir / "research" / "evidence" / f"ssi_report_gate_{as_of}.json"
-    report_path.write_text(text, encoding="utf-8")
-    gate_path.write_text(json.dumps(gate, indent=2) + "\n", encoding="utf-8")
+    research_dir = ticker_dir / "research"
+    evidence_dir = research_dir / "evidence"
+    write_text_if_changed(research_dir / "ssi_report.md", text)
+    write_json_if_changed(evidence_dir / "ssi_report_gate.json", gate)
+    report_path = research_dir / f"ssi_report_{as_of}.md"
+    gate_path = evidence_dir / f"ssi_report_gate_{as_of}.json"
+    write_text_if_changed(report_path, text)
+    write_json_if_changed(gate_path, gate)
+    for old in research_dir.glob("ssi_report_*.md"):
+        if old != report_path:
+            old.unlink(missing_ok=True)
+    for old in evidence_dir.glob("ssi_report_gate_*.json"):
+        if old != gate_path:
+            old.unlink(missing_ok=True)
     return report_path, gate_path
 
 
@@ -971,7 +988,11 @@ def main(argv: list[str] | None = None) -> int:
         ticker_dirs = [ROOT / t for t in args.tickers]
     else:
         ticker_dirs = sorted(
-            {p.parents[2] for p in ROOT.glob("*/research/evidence/ssi_verified_claims_*.json")}
+            {
+                p.parents[2]
+                for pat in ("*/research/evidence/ssi_verified_claims_*.json", "*/research/evidence/ssi_verified_claims.json")
+                for p in ROOT.glob(pat)
+            }
         )
 
     failures = 0

@@ -169,6 +169,16 @@ def structural_errors(ledger_dir: Path | None = None) -> list[str]:
         except (ValueError,KeyError,TypeError) as exc:
             errors.append('expansion: invalid derived ledger: '+str(exc))
     errors.extend(edge_v3_errors(paths["manifest"].parent))
+    try:
+        from reverse_splits.free_evidence import audit_publication
+        errors.extend(audit_publication(paths["manifest"].parent))
+    except (ValueError, KeyError, TypeError, OSError) as exc:
+        errors.append("Free evidence publication is invalid: " + str(exc))
+    try:
+        from reverse_splits.calmar_validation import audit_publication as audit_calmar
+        errors.extend(audit_calmar(paths["manifest"].parent))
+    except (ValueError, KeyError, TypeError, OSError) as exc:
+        errors.append("Calmar publication is invalid: " + str(exc))
     return errors
 
 

@@ -67,3 +67,44 @@ node --check dashboard/shorts-edge-v3-viz.js
 ```
 
 Tests cover source-time leakage, fiscal/YTD reconciliation, missing financial values, financing proceeds, framework contradictions/N/A, locate versus indication, settlement/weekend carry, nominal rounding and quantities, whole-share joint cost sizing, SSR queue/price tests, unresolved admitted liabilities, observed fills, funding failure and immutable prospective archives.
+
+## Free public evidence backfill
+
+The free collector uses cached SEC financials and issuer-bound filings, and optionally downloads only public SEC resources. It has no credentials, paid feed endpoints, model API calls, subscriptions or free trials. A shared rate limiter caps traffic at two requests per second across four workers; a request budget bounds each run. Access denial/rate limiting stops new requests to that host. Cached responses bind URL and SHA256; reruns reuse them.
+
+```powershell
+python -m _system.scripts.reverse_splits.free_evidence --source-root PATH_TO_REVERSE_SPLITS_DATA --fetch --max-requests 3000 --publish
+python -m _system.scripts.reverse_splits.free_borrow_history --fetch --max-requests 350 --publish
+python _system/scripts/build_reverse_splits_dashboard.py
+```
+
+Omit `--fetch` for an entirely local run. The source root is the same frozen run and cache described above. Collection processes the complete original 691-event cohort. A 30-event pilot is selected by the smallest SHA256 event identities, independently of ratings and outcomes. All 27 framework routes receive an explicit assessment; cash-runway and reported margin deterioration can be supported by financial facts, while other unresolved judgments remain unresolved. Keyword passages route research and never establish fraud, completed issuance, fully diluted capitalization or full conviction. Current issuer metadata is not used as an historical operating-profile determination.
+
+`free_evidence.json` and `free_packets/` publish the derived evidence. Raw responses and the network audit stay in ignored `local/free_evidence/`. Original source availability, later reconstruction time and content hashes are separate. SEC acceptance clocks take precedence; an unclocked filing waits until the following Eastern date. Future filings and future amendments cannot enter a packet. The input to assessment contains no subsequent prices, returns, realized charges or donor forecasts. The backfill does not change the frozen strategy's returns or promote incomplete research into strict eligibility.
+
+Exact SEC metadata can recover a same-day financial disclosure that the date-only screen excluded. It must have been accepted at least one minute before the announcement cutoff; later amendments and unclocked records remain excluded. Each refinement retains the original accession, financial fact, exact availability bound, metadata URL and metadata hash. Packet creation time records the actual reconstruction, separately from the historical source clock.
+
+The dashboard links financial facts, financing passages, all framework routes and filing citations for each original-cohort event. It also solves for the annual borrowing fee that consumes the frozen announcement plan's expected edge at its proposed size, and the analogous threshold using the model's lower-bound edge. Fee sensitivities hold the size fixed and retain expected billed calendar days, settlement, commission and slippage assumptions. These are cost ceilings, not quotes, approvals, or overrides of margin/thesis/stress constraints. Zero modeled billing days is reported explicitly. The ceiling is suppressed when a fixed pre-borrow charge has not been separated.
+
+The public borrow archive continues to capture actual current observations. Its first saved vintages are in October 2026. [IBorrowDesk's FAQ](https://www.iborrowdesk.com/faq) limits free history to one year and places older history/CSV exports behind paid access. Its freely accessible chart was verified in the browser with the 1Y range selected and the paid ranges disabled. The collector uses only the chart's unauthenticated public ticker response, excludes records older than the free window, and never requests login, paid history or CSV exports. Raw responses remain local. Completed daily records wait until the following Eastern date; only a prior record within 24 hours of the announcement becomes a displayed rate proxy. An incomplete current day is excluded.
+
+These proxies remain outside strict evidence: symbol links and the provider's current CUSIP do not reconcile historical security identity, indicated inventory is not an account approval, and quoted rates are not actual charges. The dashboard shows the constant-rate cost sensitivity at the frozen announcement size without resizing positions or rewriting portfolio returns. Free source gaps remain explicit. Future fee observations never enter an earlier prediction, and account approvals or historical fills are never inferred from advertised shares.
+
+## Calmar parameter research
+
+`calmar_research` performs an offline search using the frozen snapshots, price database and hash-checked cost inputs. No provider requests or broker connections are made. Its plan is saved before the first new trial. The fixed $50,000 account uses the original commission, risk limits, 50% fallback annual borrow, 90% uncertainty setting and prior-issuer rules. The 640 trials vary two entry timings; 1/5/10/20-session holds; time exits or 5/10/20% profit targets paired with 10/20/30% stops; 40/60/80/90 financial-rating floors; and fundamental-only versus net-edge selection. Account size and borrowing rates are not optimized as sources of alpha.
+
+```powershell
+python -m _system.scripts.reverse_splits.calmar_research --source-root PATH_TO_REVERSE_SPLITS_DATA
+python -m _system.scripts.reverse_splits.calmar_validation --source-root PATH_TO_REVERSE_SPLITS_DATA --publish
+python -m _system.scripts.reverse_splits.calmar_extension --source-root PATH_TO_REVERSE_SPLITS_DATA --workers 2 --publish
+python _system/scripts/build_reverse_splits_dashboard.py
+```
+
+Calmar uses calendar-time CAGR divided by the absolute maximum daily drawdown over the complete May 2018–October 2026 interval, including idle capital. Incurred settlement charges after the final trading date are reserved in the terminal account value. Cash/no-trade and zero-drawdown paths receive no ratio, rather than an infinite score. Unresolved liabilities and funding breaches prevent ranking. A sample-qualified row needs at least 30 closed trades, 20 issuers and three active entry years; this is an evidence minimum, not statistical confidence. Raw sparse winners remain visible separately. All 32 applicable original $50,000 comparison cases must reproduce before the search completes.
+
+Validation examines the top ten sample-qualified results, the two raw leaders, a sample-qualified net-edge leader when available, and the frozen default. It tests doubled/sixfold borrow, doubled slippage, minimum-one-day borrowing charges, other account sizes, and three separate periods starting flat. Earlier periods stop new entries before their final maximum holding window, independently of later realized outcomes. Adjacent parameter settings, calendar-year results and the trailing three years remain available in the complete result artifact. Only a candidate passing the declared sample, recent-return, neighborhood, cost and separate-period checks is labelled a paper research candidate. The production policy is never changed automatically.
+
+After inspection of the first grid, a separately timestamped extension tests 1% and 2% per-name squeeze-loss budgets alongside the original 0.5%, keeping the aggregate sleeve budget at 2%, commissions, confidence and fallback borrow fixed. The 1,920 parameter sets are replayed over both the full history and a fresh-cash trailing-three-year window: 3,840 account replays. The extension's adaptive context is explicit. It ranks the periods separately and checks leaders from each. These larger per-name budgets change concentration and fee efficiency without increasing the total allowed modeled squeeze loss. The dashboard loads the full research only when its Calmar button is opened.
+
+All history was already explored. These diagnostics are not an untouched holdout or prospective success, and optimization adds multiple-testing risk. Historical borrow approval, complete underwriting and execution evidence remain separate requirements. Calmar's definition follows [PerformanceAnalytics](https://search.r-project.org/CRAN/refmans/PerformanceAnalytics/html/CalmarRatio.html); research validation and overfitting concerns are discussed in [CFA Institute's Investment Model Validation](https://rpc.cfainstitute.org/-/media/documents/article/rf-brief/investment-model-validation.pdf).

@@ -47,7 +47,7 @@ def render_cross_check(ticker: str, inv: dict, out_date: str) -> str:
         f"**Date:** {out_date}",
         f"**Agent:** Marvin",
         f"**Marvin dive:** `{dive}`",
-        f"**Source inventory:** `{ticker}/third-party-analyses/source_inventory_{out_date}.md`",
+        f"**Source inventory:** `{ticker}/third-party-analyses/source_inventory.md`",
         "**Framework:** `_system/frameworks/third_party_cross_reference.md`, `external_view_blend.md`",
         STUB_MARKER,
         "",
@@ -133,7 +133,7 @@ def render_cross_check(ticker: str, inv: dict, out_date: str) -> str:
             "## Primary sources cited",
             "",
             f"1. `{dive}`",
-            f"2. `{ticker}/third-party-analyses/source_inventory_{out_date}.md`",
+            f"2. `{ticker}/third-party-analyses/source_inventory.md`",
         ]
     )
     for i, s in enumerate(sources[:15], start=3):
