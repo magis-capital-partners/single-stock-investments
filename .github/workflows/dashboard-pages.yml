@@ -80,7 +80,7 @@ jobs:
   # Zone / LS-algo runs whose main job was skipped and which committed
   # nothing. See _system/scripts/workflow_run_deploy_gate.py.
   deploy-gate:
-    if: github.event_name == 'workflow_run' || github.event_name == 'schedule'
+    if: github.event_name == 'workflow_run' || github.event_name == 'schedule' || github.event_name == 'push'
     runs-on: ubuntu-latest
     timeout-minutes: 5
     outputs:
@@ -246,7 +246,6 @@ jobs:
       needs.oauth-secrets.result == 'success' &&
       (needs.oauth-proxy.result == 'success' || needs.oauth-proxy.result == 'skipped') &&
       (
-        github.event_name == 'push' ||
         github.event_name == 'workflow_dispatch' ||
         needs.deploy-gate.outputs.should_deploy == 'true'
       )

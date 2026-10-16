@@ -3541,6 +3541,14 @@ async function load() {
     }
   }
   try {
+    const quoteResponse = await fetch('/api/v1/quotes?symbols=SPY,QQQ', {
+      headers: { accept: 'application/json' },
+    });
+    data.quotes = quoteResponse.ok ? await quoteResponse.json() : null;
+  } catch (_) {
+    data.quotes = null;
+  }
+  try {
     const componentFallback = await fetchShardJson('data/market_risk_components.json');
     if (data.market_risk && !(data.market_risk.components || []).length) {
       data.market_risk.components = componentFallback.components || [];
@@ -3652,7 +3660,11 @@ function renderMarketRiskView() {
       ? 'Committed market_risk_components.json fallback'
       : 'Market risk source unavailable');
   const riskClock = `<p class="tier-sub" style="margin:0 0 10px">${escapeHtml(riskOrigin)}. ${feedNotice('market-risk')} ${feedNotice('market-risk-components')}</p>`;
-  content.innerHTML = `${riskClock}${CriticalityViz.renderRegimeVerdict(riskOptions)}${CriticalityViz.renderRiskView(
+  const quoteRows = (data.quotes?.quotes || []).filter(q => q.price != null);
+  const quotesLine = quoteRows.length
+    ? `<p class="tier-sub" style="margin:0 0 10px">${quoteRows.map(q => `${escapeHtml(q.symbol)} ${Number(q.price).toLocaleString(undefined, { maximumFractionDigits: 2 })}${q.change_pct != null ? ` (${q.change_pct >= 0 ? '+' : ''}${q.change_pct}%)` : ''}${q.stale ? ' · stale' : ''} · as of ${escapeHtml(String(q.as_of || '').slice(0, 16).replace('T', ' '))}`).join(' &nbsp; ')}</p>`
+    : '';
+  content.innerHTML = `${riskClock}${quotesLine}${CriticalityViz.renderRegimeVerdict(riskOptions)}${CriticalityViz.renderRiskView(
     data.market_risk,
     data.market_risk_details || {},
     riskOptions,
