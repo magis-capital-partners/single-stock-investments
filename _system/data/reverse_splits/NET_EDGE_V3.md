@@ -67,3 +67,25 @@ node --check dashboard/shorts-edge-v3-viz.js
 ```
 
 Tests cover source-time leakage, fiscal/YTD reconciliation, missing financial values, financing proceeds, framework contradictions/N/A, locate versus indication, settlement/weekend carry, nominal rounding and quantities, whole-share joint cost sizing, SSR queue/price tests, unresolved admitted liabilities, observed fills, funding failure and immutable prospective archives.
+
+## Free public evidence backfill
+
+The free collector uses cached SEC financials and issuer-bound filings, and optionally downloads only public SEC resources. It has no credentials, paid feed endpoints, model API calls, subscriptions or free trials. A shared rate limiter caps traffic at two requests per second across four workers; a request budget bounds each run. Access denial/rate limiting stops new requests to that host. Cached responses bind URL and SHA256; reruns reuse them.
+
+```powershell
+python -m _system.scripts.reverse_splits.free_evidence --source-root PATH_TO_REVERSE_SPLITS_DATA --fetch --max-requests 3000 --publish
+python -m _system.scripts.reverse_splits.free_borrow_history --fetch --max-requests 350 --publish
+python _system/scripts/build_reverse_splits_dashboard.py
+```
+
+Omit `--fetch` for an entirely local run. The source root is the same frozen run and cache described above. Collection processes the complete original 691-event cohort. A 30-event pilot is selected by the smallest SHA256 event identities, independently of ratings and outcomes. All 27 framework routes receive an explicit assessment; cash-runway and reported margin deterioration can be supported by financial facts, while other unresolved judgments remain unresolved. Keyword passages route research and never establish fraud, completed issuance, fully diluted capitalization or full conviction. Current issuer metadata is not used as an historical operating-profile determination.
+
+`free_evidence.json` and `free_packets/` publish the derived evidence. Raw responses and the network audit stay in ignored `local/free_evidence/`. Original source availability, later reconstruction time and content hashes are separate. SEC acceptance clocks take precedence; an unclocked filing waits until the following Eastern date. Future filings and future amendments cannot enter a packet. The input to assessment contains no subsequent prices, returns, realized charges or donor forecasts. The backfill does not change the frozen strategy's returns or promote incomplete research into strict eligibility.
+
+Exact SEC metadata can recover a same-day financial disclosure that the date-only screen excluded. It must have been accepted at least one minute before the announcement cutoff; later amendments and unclocked records remain excluded. Each refinement retains the original accession, financial fact, exact availability bound, metadata URL and metadata hash. Packet creation time records the actual reconstruction, separately from the historical source clock.
+
+The dashboard links financial facts, financing passages, all framework routes and filing citations for each original-cohort event. It also solves for the annual borrowing fee that consumes the frozen announcement plan's expected edge at its proposed size, and the analogous threshold using the model's lower-bound edge. Fee sensitivities hold the size fixed and retain expected billed calendar days, settlement, commission and slippage assumptions. These are cost ceilings, not quotes, approvals, or overrides of margin/thesis/stress constraints. Zero modeled billing days is reported explicitly. The ceiling is suppressed when a fixed pre-borrow charge has not been separated.
+
+The public borrow archive continues to capture actual current observations. Its first saved vintages are in October 2026. [IBorrowDesk's FAQ](https://www.iborrowdesk.com/faq) limits free history to one year and places older history/CSV exports behind paid access. Its freely accessible chart was verified in the browser with the 1Y range selected and the paid ranges disabled. The collector uses only the chart's unauthenticated public ticker response, excludes records older than the free window, and never requests login, paid history or CSV exports. Raw responses remain local. Completed daily records wait until the following Eastern date; only a prior record within 24 hours of the announcement becomes a displayed rate proxy. An incomplete current day is excluded.
+
+These proxies remain outside strict evidence: symbol links and the provider's current CUSIP do not reconcile historical security identity, indicated inventory is not an account approval, and quoted rates are not actual charges. The dashboard shows the constant-rate cost sensitivity at the frozen announcement size without resizing positions or rewriting portfolio returns. Free source gaps remain explicit. Future fee observations never enter an earlier prediction, and account approvals or historical fills are never inferred from advertised shares.

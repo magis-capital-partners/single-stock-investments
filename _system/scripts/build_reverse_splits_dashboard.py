@@ -46,8 +46,15 @@ def edge_v3_reference(ledger_dir):
     source = ledger_dir / "net_edge_research_v3.json"
     if not source.exists(): return None
     doc = read_json(source)
-    return {"schema_version": doc["schema_version"], "version": doc["version"],
-            "summary_url": "data/shorts_net_edge_v3.json", "summary_sha256": digest(source)}
+    reference = {"schema_version": doc["schema_version"], "version": doc["version"],
+                 "summary_url": "data/shorts_net_edge_v3.json", "summary_sha256": digest(source)}
+    free = ledger_dir / "free_evidence.json"
+    if free.exists():
+        reference["free_evidence_ref"] = {"url": "data/shorts_free_evidence.json", "sha256": digest(free)}
+        borrow = ledger_dir / "free_borrow_evidence.json"
+        if borrow.exists():
+            reference["free_evidence_ref"]["borrow_ref"] = {"url": "data/shorts_free_borrow.json", "sha256": digest(borrow)}
+    return reference
 
 # Two event rows for one issuer are the same split recorded twice when their
 # ratios agree within this fraction and their ex dates within this many days
@@ -578,11 +585,6 @@ def build(*, today: date | None = None, ledger_dir: Path | None = None) -> dict:
         "execution_research_manifest": read_json(paths["manifest"].parent / "execution_research_manifest.json", None),
         "portfolio_research": read_json(paths["manifest"].parent / "portfolio_research.json", None),
         "portfolio_research_manifest": read_json(paths["manifest"].parent / "portfolio_research_manifest.json", None),
-        "net_edge_research": read_json(paths["manifest"].parent / "net_edge_research.json", None),
-        "net_edge_manifest": read_json(paths["manifest"].parent / "net_edge_manifest.json", None),
-        "net_edge_research_v3": edge_v3_reference(paths["manifest"].parent),
-        "net_edge_manifest_v3": read_json(paths["manifest"].parent / "net_edge_manifest_v3.json", None),
-        "net_edge_prospective_v3": prospective_status(paths["manifest"].parent),
         "forward_status": read_json(paths["manifest"].parent / "forward_status.json", None),
         "expansion_catalogue": [{**{k:r.get(k) for k in ('event_id','ticker','new_ticker','cik','company','ex_date','ratio','exchange_class','verification','source_url','action_review')},
                                   'price_path':next((o.get('status') if not o.get('reason') else o['reason'] for o in r.get('outcomes',[]) if o.get('cohort')=='ex_plus_1_h5'),'unavailable')}
@@ -590,6 +592,11 @@ def build(*, today: date | None = None, ledger_dir: Path | None = None) -> dict:
         "process": process_section(),
         "decisions_summary": decisions_summary(decisions, chain_errors),
         "health": {"status": report["status"], "structural_errors": report["structural_errors"], "problems": report["problems"]},
+        "net_edge_research": read_json(paths["manifest"].parent / "net_edge_research.json", None),
+        "net_edge_manifest": read_json(paths["manifest"].parent / "net_edge_manifest.json", None),
+        "net_edge_research_v3": edge_v3_reference(paths["manifest"].parent),
+        "net_edge_manifest_v3": read_json(paths["manifest"].parent / "net_edge_manifest_v3.json", None),
+        "net_edge_prospective_v3": prospective_status(paths["manifest"].parent),
     }
 
 
@@ -627,6 +634,13 @@ def main(argv: list[str] | None = None) -> int:
     summary_source = (args.ledger_dir or DATA_DIR) / "net_edge_research_v3.json"
     if summary_source.exists():
         shutil.copyfile(summary_source, target.parent / "shorts_net_edge_v3.json")
+    free_source = (args.ledger_dir or DATA_DIR) / "free_evidence.json"
+    if free_source.exists():
+        shutil.copyfile(free_source, target.parent / "shorts_free_evidence.json")
+        shutil.copytree(free_source.parent / "free_packets", target.parent / "free_short_packets", dirs_exist_ok=True)
+        borrow_source = free_source.parent / "free_borrow_evidence.json"
+        if borrow_source.exists():
+            shutil.copyfile(borrow_source, target.parent / "shorts_free_borrow.json")
     write_portfolio_csv(payload,target.with_name('reverse_splits_portfolios.csv'))
     c = payload["counts"]
     print(
