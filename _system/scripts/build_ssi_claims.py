@@ -44,6 +44,8 @@ SCRIPT_DIR = Path(__file__).resolve().parent
 if str(SCRIPT_DIR) not in sys.path:
     sys.path.insert(0, str(SCRIPT_DIR))
 
+from atomic_io import write_json_if_changed  # noqa: E402
+
 ROOT = SCRIPT_DIR.parents[1]
 
 SCHEMA_VERSION = "1.0"
@@ -390,6 +392,9 @@ def sentinel_claims(pack: dict) -> tuple[list[dict], dict]:
 
 def _latest_json(evidence_dir: Path, stem: str) -> dict | None:
     files = sorted(evidence_dir.glob(f"{stem}_*.json"), reverse=True)
+    canonical = evidence_dir / f"{stem}.json"
+    if canonical.is_file():
+        files.append(canonical)
     for path in files:
         try:
             return json.loads(path.read_text(encoding="utf-8"))
@@ -826,8 +831,14 @@ def write_claims(ticker_dir: Path, as_of: str) -> Path | None:
     result = build_claims(ticker_dir, as_of)
     if result is None:
         return None
-    out = ticker_dir / "research" / "evidence" / f"ssi_claims_{as_of}.json"
-    out.write_text(json.dumps(result, indent=2) + "\n", encoding="utf-8")
+    evidence_dir = ticker_dir / "research" / "evidence"
+    canonical = evidence_dir / "ssi_claims.json"
+    write_json_if_changed(canonical, result)
+    out = evidence_dir / f"ssi_claims_{as_of}.json"
+    write_json_if_changed(out, result)
+    for old in evidence_dir.glob("ssi_claims_*.json"):
+        if old != out:
+            old.unlink(missing_ok=True)
     return out
 
 
@@ -842,7 +853,11 @@ def main(argv: list[str] | None = None) -> int:
         ticker_dirs = [ROOT / t for t in args.tickers]
     else:
         ticker_dirs = sorted(
-            {p.parents[2] for p in ROOT.glob("*/research/evidence/ssi_evidence_pack_*.json")}
+            {
+                p.parents[2]
+                for pat in ("*/research/evidence/ssi_evidence_pack_*.json", "*/research/evidence/ssi_evidence_pack.json")
+                for p in ROOT.glob(pat)
+            }
         )
 
     failures = 0

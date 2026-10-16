@@ -61,8 +61,8 @@ def check_ticker(ticker: str, *, strict: bool) -> list[str]:
         return errors
 
     tp = ROOT / ticker / "third-party-analyses"
-    if not list(tp.glob("source_inventory_*.md")):
-        errors.append(f"{ticker}: missing source_inventory_*.md — run scan_third_party_sources.py")
+    if not (tp / "source_inventory.md").is_file() and not list(tp.glob("source_inventory_*.md")):
+        errors.append(f"{ticker}: missing source_inventory.md — run scan_third_party_sources.py")
 
     for s in inv.get("sources", []):
         if s.get("status") == "approved" and not source_covered(

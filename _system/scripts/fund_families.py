@@ -186,10 +186,10 @@ def propose_fund_families(letters: list[dict], *, as_of: str) -> list[dict]:
 
 
 def write_family_proposals(proposals: list[dict], *, as_of: str) -> Path | None:
+    from atomic_io import write_superseded_review_md
+
     if not proposals:
         return None
-    REVIEWS_PENDING.mkdir(parents=True, exist_ok=True)
-    path = REVIEWS_PENDING / f"fund_family_proposals_{as_of}.md"
     lines = [
         f"# Fund family proposals ({as_of})",
         "",
@@ -219,5 +219,4 @@ def write_family_proposals(proposals: list[dict], *, as_of: str) -> Path | None:
         )
         lines.append("```")
         lines.append("")
-    path.write_text("\n".join(lines), encoding="utf-8")
-    return path
+    return write_superseded_review_md(REVIEWS_PENDING, "fund_family_proposals", as_of, "\n".join(lines), keep_latest=2)

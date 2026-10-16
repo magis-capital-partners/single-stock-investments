@@ -1,7 +1,7 @@
 {
   "ticker": "TEQ.ST",
   "as_of": "2026-08-31",
-  "schema_version": "3.0",
+  "schema_version": "magis.valuation.v2",
   "method": "issuer_specific_filing_reconciled",
   "classification_inputs": {
     "archetype": "compounder",
@@ -142,7 +142,7 @@
             },
             {
               "id": "growth_y1_5",
-              "label": "Existing-portfolio cash-flow growth in years 1\u20135",
+              "label": "Existing-portfolio cash-flow growth in years 1–5",
               "kind": "judgment",
               "values": {
                 "low": -0.02,
@@ -158,7 +158,7 @@
             },
             {
               "id": "growth_y6_7",
-              "label": "Existing-portfolio cash-flow growth in years 6\u20137",
+              "label": "Existing-portfolio cash-flow growth in years 6–7",
               "kind": "judgment",
               "values": {
                 "low": 0.0,
@@ -268,7 +268,7 @@
             },
             {
               "id": "growth_factor_y1_5",
-              "label": "Growth factor in years 1\u20135",
+              "label": "Growth factor in years 1–5",
               "op": "add",
               "args": [
                 1,
@@ -278,7 +278,7 @@
             },
             {
               "id": "growth_factor_y6_7",
-              "label": "Growth factor in years 6\u20137",
+              "label": "Growth factor in years 6–7",
               "op": "add",
               "args": [
                 1,
@@ -358,7 +358,7 @@
             },
             {
               "id": "explicit_cash_flow_pv",
-              "label": "Present value of years 1\u20136 enterprise cash flow",
+              "label": "Present value of years 1–6 enterprise cash flow",
               "op": "present_value",
               "args": [
                 "fcff_per_share_y1",
@@ -416,7 +416,7 @@
           }
         },
         "evidence_tier": "primary_derived",
-        "evidence": "TEQ.ST/official-reports/interim-reports/2026/2026-07-18 - Interim Report April - June 2026 - Teqnion AB.pdf, pages 15\u201318 and 24; independently reconciled in TEQ.ST/research/evidence_reconciliation_2026-08-31.json.",
+        "evidence": "TEQ.ST/official-reports/interim-reports/2026/2026-07-18 - Interim Report April - June 2026 - Teqnion AB.pdf, pages 15–18 and 24; independently reconciled in TEQ.ST/research/evidence_reconciliation_2026-08-31.json.",
         "cross_check": "R12 enterprise cash flow reconciles from CFO less capex plus after-tax cash financing cost; acquisition cash outlays and benefits from future deals are excluded together.",
         "assumption_summary": "Low/base/high vary starting normalization, existing-portfolio growth, discount rate, and year-7 exit multiple.",
         "falsifier": "R12 cash flow falls below 85% of the 2026-Q2 run rate without a temporary working-capital explanation, organic decline persists, or EBITA margin falls below 9%.",
@@ -526,7 +526,7 @@
               "unit": "SEK_m",
               "source": {
                 "ref": "TEQ.ST/official-reports/interim-reports/2026/2026-07-18 - Interim Report April - June 2026 - Teqnion AB.pdf",
-                "locator": "pages 16\u201317: non-controlling interests 1.4 MSEK",
+                "locator": "pages 16–17: non-controlling interests 1.4 MSEK",
                 "as_of": "2026-06-30"
               },
               "locked": true
@@ -598,7 +598,7 @@
           }
         },
         "evidence_tier": "primary_derived",
-        "evidence": "TEQ.ST/official-reports/interim-reports/2026/2026-07-18 - Interim Report April - June 2026 - Teqnion AB.pdf, pages 16\u201317 and 21; independently reconciled in TEQ.ST/research/evidence_reconciliation_2026-08-31.json.",
+        "evidence": "TEQ.ST/official-reports/interim-reports/2026/2026-07-18 - Interim Report April - June 2026 - Teqnion AB.pdf, pages 16–17 and 21; independently reconciled in TEQ.ST/research/evidence_reconciliation_2026-08-31.json.",
         "cross_check": "All bank debt, leases, fair-valued acquisition-payment liabilities, cash, and minority interest are included once; unused credit is not an asset.",
         "assumption_summary": "The latest reported balances are deducted at 100% of carrying value in every case.",
         "falsifier": "Net debt/EBITDA approaches the 2.5x guardrail, acquisition-payment liabilities rise faster than acquired cash earnings, or material dilution is issued below intrinsic value.",
@@ -621,7 +621,7 @@
     "filing_digest": "TEQ.ST/research/evidence_reconciliation_2026-08-31.json",
     "evidence_citations": [
       "TEQ.ST/official-reports/interim-reports/2026/2026-07-18 - Interim Report April - June 2026 - Teqnion AB.pdf",
-      "TEQ.ST/official-reports/annual-reports/2026-03-21 - \u00c5rsredovisning 2025.pdf",
+      "TEQ.ST/official-reports/annual-reports/2026-03-21 - Årsredovisning 2025.pdf",
       "TEQ.ST/research/evidence_reconciliation_2026-08-31.json"
     ],
     "last_verified": {
@@ -639,7 +639,7 @@
       },
       {
         "input": "Base existing-portfolio growth",
-        "value": "5% years 1\u20135; 3% years 6\u20137",
+        "value": "5% years 1–5; 3% years 6–7",
         "source": "Scenario judgment; future M&A excluded"
       },
       {
@@ -650,7 +650,7 @@
       {
         "input": "Net financing claims",
         "value": "728.7 MSEK",
-        "source": "TEQ.ST/official-reports/interim-reports/2026/2026-07-18 - Interim Report April - June 2026 - Teqnion AB.pdf, pages 16\u201317 and 21"
+        "source": "TEQ.ST/official-reports/interim-reports/2026/2026-07-18 - Interim Report April - June 2026 - Teqnion AB.pdf, pages 16–17 and 21"
       }
     ],
     "scenarios": {
@@ -673,7 +673,7 @@
     ]
   },
   "context_overlay": {
-    "as_of": "2026-10-14",
+    "as_of": "2026-10-16",
     "disclaimer": "Context only. Tailwinds inform stance and overlay sizing; they do not auto-inflate Lawrence base IRR. Promotion to base case requires [HUMAN REVIEW].",
     "themes": [
       {
@@ -683,9 +683,9 @@
           {
             "id": "hy_oas",
             "label": "High-yield OAS credit spread (%)",
-            "latest": -0.06,
-            "as_of": "2026-10-14",
-            "yoy_pct": 89.5,
+            "latest": -0.47,
+            "as_of": "2026-10-16",
+            "yoy_pct": 52.5,
             "direction": "up",
             "good_for": "risk_regime",
             "source": "spread:HYG-LQD:21d (HYG-LQD 1m spread proxy, not OAS)",
@@ -695,9 +695,9 @@
           {
             "id": "ust_10y",
             "label": "US Treasury 10Y yield (%)",
-            "latest": 5.261000156402588,
-            "as_of": "2026-10-14",
-            "yoy_pct": 30.8,
+            "latest": 5.129000186920166,
+            "as_of": "2026-10-16",
+            "yoy_pct": 29.0,
             "direction": "up",
             "good_for": "rates_regime",
             "source": "yahoo:^TNX",
@@ -707,9 +707,9 @@
           {
             "id": "ust_2y",
             "label": "US Treasury 2Y yield (%)",
-            "latest": 5.077000141143799,
-            "as_of": "2026-10-14",
-            "yoy_pct": 40.9,
+            "latest": 4.931000232696533,
+            "as_of": "2026-10-16",
+            "yoy_pct": 38.9,
             "direction": "up",
             "good_for": "rates_regime",
             "source": "yahoo:^FVX",
@@ -719,9 +719,9 @@
           {
             "id": "dxy_broad",
             "label": "Trade-weighted USD index (broad)",
-            "latest": 102.86399841308594,
-            "as_of": "2026-10-14",
-            "yoy_pct": 3.9,
+            "latest": 101.9209976196289,
+            "as_of": "2026-10-16",
+            "yoy_pct": 3.6,
             "direction": "up",
             "good_for": "dollar_regime",
             "source": "yahoo:DX-Y.NYB",
@@ -731,9 +731,9 @@
           {
             "id": "vix_level",
             "label": "VIX index level",
-            "latest": 15.869999885559082,
-            "as_of": "2026-10-14",
-            "yoy_pct": -23.7,
+            "latest": 17.239999771118164,
+            "as_of": "2026-10-16",
+            "yoy_pct": -31.9,
             "direction": "down",
             "good_for": "vol_regime",
             "source": "yahoo:^VIX",
@@ -743,9 +743,9 @@
           {
             "id": "credit_impulse_1m",
             "label": "HYG vs TLT 1-month return spread (%)",
-            "latest": 1.18,
-            "as_of": "2026-10-14",
-            "yoy_pct": 174.7,
+            "latest": 0.17,
+            "as_of": "2026-10-16",
+            "yoy_pct": 108.4,
             "direction": "up",
             "good_for": "credit_impulse",
             "source": "spread:HYG-TLT:21d",
@@ -755,9 +755,9 @@
           {
             "id": "spy_20d_realized_vol",
             "label": "SPY 20-day realized vol (annualized %)",
-            "latest": 9.84,
-            "as_of": "2026-10-14",
-            "yoy_pct": -21.1,
+            "latest": 9.72,
+            "as_of": "2026-10-16",
+            "yoy_pct": -23.3,
             "direction": "down",
             "good_for": "equity_vol",
             "source": "realized_vol:SPY:20d",
@@ -824,5 +824,12 @@
   },
   "human_review": {
     "live_price_confirmed": false
+  },
+  "returns": {
+    "base_irr_pct": null,
+    "unit": "percent_per_year",
+    "label": null,
+    "display": null,
+    "scenarios_pct": {}
   }
 }

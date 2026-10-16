@@ -1,7 +1,7 @@
 {
   "ticker": "CSX",
   "as_of": "2026-08-10",
-  "schema_version": "3.0",
+  "schema_version": "magis.valuation.v2",
   "method": "proof_first_automated",
   "classification_inputs": {
     "archetype": "compounder"
@@ -473,7 +473,7 @@
     "registry_version": "1.0"
   },
   "context_overlay": {
-    "as_of": "2026-10-14",
+    "as_of": "2026-10-16",
     "disclaimer": "Context only. Tailwinds inform stance and overlay sizing; they do not auto-inflate Lawrence base IRR. Promotion to base case requires [HUMAN REVIEW].",
     "themes": [
       {
@@ -483,9 +483,9 @@
           {
             "id": "hy_oas",
             "label": "High-yield OAS credit spread (%)",
-            "latest": -0.06,
-            "as_of": "2026-10-14",
-            "yoy_pct": 89.5,
+            "latest": -0.47,
+            "as_of": "2026-10-16",
+            "yoy_pct": 52.5,
             "direction": "up",
             "good_for": "risk_regime",
             "source": "spread:HYG-LQD:21d (HYG-LQD 1m spread proxy, not OAS)",
@@ -495,9 +495,9 @@
           {
             "id": "ust_10y",
             "label": "US Treasury 10Y yield (%)",
-            "latest": 5.261000156402588,
-            "as_of": "2026-10-14",
-            "yoy_pct": 30.8,
+            "latest": 5.129000186920166,
+            "as_of": "2026-10-16",
+            "yoy_pct": 29.0,
             "direction": "up",
             "good_for": "rates_regime",
             "source": "yahoo:^TNX",
@@ -507,9 +507,9 @@
           {
             "id": "ust_2y",
             "label": "US Treasury 2Y yield (%)",
-            "latest": 5.077000141143799,
-            "as_of": "2026-10-14",
-            "yoy_pct": 40.9,
+            "latest": 4.931000232696533,
+            "as_of": "2026-10-16",
+            "yoy_pct": 38.9,
             "direction": "up",
             "good_for": "rates_regime",
             "source": "yahoo:^FVX",
@@ -519,9 +519,9 @@
           {
             "id": "dxy_broad",
             "label": "Trade-weighted USD index (broad)",
-            "latest": 102.86399841308594,
-            "as_of": "2026-10-14",
-            "yoy_pct": 3.9,
+            "latest": 101.9209976196289,
+            "as_of": "2026-10-16",
+            "yoy_pct": 3.6,
             "direction": "up",
             "good_for": "dollar_regime",
             "source": "yahoo:DX-Y.NYB",
@@ -531,9 +531,9 @@
           {
             "id": "vix_level",
             "label": "VIX index level",
-            "latest": 15.869999885559082,
-            "as_of": "2026-10-14",
-            "yoy_pct": -23.7,
+            "latest": 17.239999771118164,
+            "as_of": "2026-10-16",
+            "yoy_pct": -31.9,
             "direction": "down",
             "good_for": "vol_regime",
             "source": "yahoo:^VIX",
@@ -543,9 +543,9 @@
           {
             "id": "credit_impulse_1m",
             "label": "HYG vs TLT 1-month return spread (%)",
-            "latest": 1.18,
-            "as_of": "2026-10-14",
-            "yoy_pct": 174.7,
+            "latest": 0.17,
+            "as_of": "2026-10-16",
+            "yoy_pct": 108.4,
             "direction": "up",
             "good_for": "credit_impulse",
             "source": "spread:HYG-TLT:21d",
@@ -555,9 +555,9 @@
           {
             "id": "spy_20d_realized_vol",
             "label": "SPY 20-day realized vol (annualized %)",
-            "latest": 9.84,
-            "as_of": "2026-10-14",
-            "yoy_pct": -21.1,
+            "latest": 9.72,
+            "as_of": "2026-10-16",
+            "yoy_pct": -23.3,
             "direction": "down",
             "good_for": "equity_vol",
             "source": "realized_vol:SPY:20d",
@@ -593,7 +593,7 @@
     ]
   },
   "insider_signal": {
-    "as_of": "2026-10-14",
+    "as_of": "2026-10-16",
     "disclaimer": "Context only. Insider activity informs scenario confidence and stance discussion; it does not auto-inflate Lawrence base IRR. Promotion requires [HUMAN REVIEW].",
     "in_base_irr": false,
     "window_days": 365,
@@ -726,7 +726,7 @@
       "question": "Material options after scan?",
       "answer": "No",
       "treatment": "n/a",
-      "evidence": "Operating compounder / croupier \u2014 Lawrence full cash-flow path sufficient"
+      "evidence": "Operating compounder / croupier — Lawrence full cash-flow path sufficient"
     }
   ],
   "human_review": {
@@ -1079,8 +1079,8 @@
                 "value": 0.024,
                 "unit": "ratio",
                 "operation": "multiply",
-                "formula": "reinvestment \u00d7 incremental_roic",
-                "substituted_formula": "0.2 \u00d7 0.12",
+                "formula": "reinvestment × incremental_roic",
+                "substituted_formula": "0.2 × 0.12",
                 "dependencies": [
                   "reinvestment",
                   "incremental_roic"
@@ -1121,8 +1121,8 @@
                 "value": 1752.064,
                 "unit": "USD millions",
                 "operation": "multiply",
-                "formula": "owner_earnings \u00d7 growth_factor",
-                "substituted_formula": "1711 \u00d7 1.024",
+                "formula": "owner_earnings × growth_factor",
+                "substituted_formula": "1711 × 1.024",
                 "dependencies": [
                   "owner_earnings",
                   "growth_factor"
@@ -1135,8 +1135,8 @@
                 "value": 1401.6512,
                 "unit": "USD millions",
                 "operation": "multiply",
-                "formula": "owner_earnings_y1 \u00d7 distribution_rate",
-                "substituted_formula": "1752.064 \u00d7 0.8",
+                "formula": "owner_earnings_y1 × distribution_rate",
+                "substituted_formula": "1752.064 × 0.8",
                 "dependencies": [
                   "owner_earnings_y1",
                   "distribution_rate"
@@ -1149,8 +1149,8 @@
                 "value": 1794.113536,
                 "unit": "USD millions",
                 "operation": "multiply",
-                "formula": "owner_earnings_y1 \u00d7 growth_factor",
-                "substituted_formula": "1752.064 \u00d7 1.024",
+                "formula": "owner_earnings_y1 × growth_factor",
+                "substituted_formula": "1752.064 × 1.024",
                 "dependencies": [
                   "owner_earnings_y1",
                   "growth_factor"
@@ -1163,8 +1163,8 @@
                 "value": 1435.2908288,
                 "unit": "USD millions",
                 "operation": "multiply",
-                "formula": "owner_earnings_y2 \u00d7 distribution_rate",
-                "substituted_formula": "1794.1135 \u00d7 0.8",
+                "formula": "owner_earnings_y2 × distribution_rate",
+                "substituted_formula": "1794.1135 × 0.8",
                 "dependencies": [
                   "owner_earnings_y2",
                   "distribution_rate"
@@ -1177,8 +1177,8 @@
                 "value": 1837.17226086,
                 "unit": "USD millions",
                 "operation": "multiply",
-                "formula": "owner_earnings_y2 \u00d7 growth_factor",
-                "substituted_formula": "1794.1135 \u00d7 1.024",
+                "formula": "owner_earnings_y2 × growth_factor",
+                "substituted_formula": "1794.1135 × 1.024",
                 "dependencies": [
                   "owner_earnings_y2",
                   "growth_factor"
@@ -1191,8 +1191,8 @@
                 "value": 1469.73780869,
                 "unit": "USD millions",
                 "operation": "multiply",
-                "formula": "owner_earnings_y3 \u00d7 distribution_rate",
-                "substituted_formula": "1837.1723 \u00d7 0.8",
+                "formula": "owner_earnings_y3 × distribution_rate",
+                "substituted_formula": "1837.1723 × 0.8",
                 "dependencies": [
                   "owner_earnings_y3",
                   "distribution_rate"
@@ -1205,8 +1205,8 @@
                 "value": 1881.26439512,
                 "unit": "USD millions",
                 "operation": "multiply",
-                "formula": "owner_earnings_y3 \u00d7 growth_factor",
-                "substituted_formula": "1837.1723 \u00d7 1.024",
+                "formula": "owner_earnings_y3 × growth_factor",
+                "substituted_formula": "1837.1723 × 1.024",
                 "dependencies": [
                   "owner_earnings_y3",
                   "growth_factor"
@@ -1219,8 +1219,8 @@
                 "value": 1505.0115161,
                 "unit": "USD millions",
                 "operation": "multiply",
-                "formula": "owner_earnings_y4 \u00d7 distribution_rate",
-                "substituted_formula": "1881.2644 \u00d7 0.8",
+                "formula": "owner_earnings_y4 × distribution_rate",
+                "substituted_formula": "1881.2644 × 0.8",
                 "dependencies": [
                   "owner_earnings_y4",
                   "distribution_rate"
@@ -1233,8 +1233,8 @@
                 "value": 1926.41474061,
                 "unit": "USD millions",
                 "operation": "multiply",
-                "formula": "owner_earnings_y4 \u00d7 growth_factor",
-                "substituted_formula": "1881.2644 \u00d7 1.024",
+                "formula": "owner_earnings_y4 × growth_factor",
+                "substituted_formula": "1881.2644 × 1.024",
                 "dependencies": [
                   "owner_earnings_y4",
                   "growth_factor"
@@ -1247,8 +1247,8 @@
                 "value": 1541.13179249,
                 "unit": "USD millions",
                 "operation": "multiply",
-                "formula": "owner_earnings_y5 \u00d7 distribution_rate",
-                "substituted_formula": "1926.4147 \u00d7 0.8",
+                "formula": "owner_earnings_y5 × distribution_rate",
+                "substituted_formula": "1926.4147 × 0.8",
                 "dependencies": [
                   "owner_earnings_y5",
                   "distribution_rate"
@@ -1261,8 +1261,8 @@
                 "value": 1972.64869438,
                 "unit": "USD millions",
                 "operation": "multiply",
-                "formula": "owner_earnings_y5 \u00d7 growth_factor",
-                "substituted_formula": "1926.4147 \u00d7 1.024",
+                "formula": "owner_earnings_y5 × growth_factor",
+                "substituted_formula": "1926.4147 × 1.024",
                 "dependencies": [
                   "owner_earnings_y5",
                   "growth_factor"
@@ -1275,8 +1275,8 @@
                 "value": 1578.11895551,
                 "unit": "USD millions",
                 "operation": "multiply",
-                "formula": "owner_earnings_y6 \u00d7 distribution_rate",
-                "substituted_formula": "1972.6487 \u00d7 0.8",
+                "formula": "owner_earnings_y6 × distribution_rate",
+                "substituted_formula": "1972.6487 × 0.8",
                 "dependencies": [
                   "owner_earnings_y6",
                   "distribution_rate"
@@ -1289,8 +1289,8 @@
                 "value": 2019.99226305,
                 "unit": "USD millions",
                 "operation": "multiply",
-                "formula": "owner_earnings_y6 \u00d7 growth_factor",
-                "substituted_formula": "1972.6487 \u00d7 1.024",
+                "formula": "owner_earnings_y6 × growth_factor",
+                "substituted_formula": "1972.6487 × 1.024",
                 "dependencies": [
                   "owner_earnings_y6",
                   "growth_factor"
@@ -1303,8 +1303,8 @@
                 "value": 1615.99381044,
                 "unit": "USD millions",
                 "operation": "multiply",
-                "formula": "owner_earnings_y7 \u00d7 distribution_rate",
-                "substituted_formula": "2019.9923 \u00d7 0.8",
+                "formula": "owner_earnings_y7 × distribution_rate",
+                "substituted_formula": "2019.9923 × 0.8",
                 "dependencies": [
                   "owner_earnings_y7",
                   "distribution_rate"
@@ -1344,8 +1344,8 @@
                 "value": 24239.90715657,
                 "unit": "USD millions",
                 "operation": "multiply",
-                "formula": "owner_earnings_y7 \u00d7 terminal_multiple",
-                "substituted_formula": "2019.9923 \u00d7 12",
+                "formula": "owner_earnings_y7 × terminal_multiple",
+                "substituted_formula": "2019.9923 × 12",
                 "dependencies": [
                   "owner_earnings_y7",
                   "terminal_multiple"
@@ -1415,8 +1415,8 @@
                 "value": -0.047951,
                 "unit": "USD per share",
                 "operation": "divide",
-                "formula": "equity_value \u00f7 shares_m",
-                "substituted_formula": "-88.828027 \u00f7 1852.4749",
+                "formula": "equity_value ÷ shares_m",
+                "substituted_formula": "-88.828027 ÷ 1852.4749",
                 "dependencies": [
                   "equity_value",
                   "shares_m"
@@ -1527,8 +1527,8 @@
                 "value": 0.063,
                 "unit": "ratio",
                 "operation": "multiply",
-                "formula": "reinvestment \u00d7 incremental_roic",
-                "substituted_formula": "0.35 \u00d7 0.18",
+                "formula": "reinvestment × incremental_roic",
+                "substituted_formula": "0.35 × 0.18",
                 "dependencies": [
                   "reinvestment",
                   "incremental_roic"
@@ -1569,8 +1569,8 @@
                 "value": 1818.793,
                 "unit": "USD millions",
                 "operation": "multiply",
-                "formula": "owner_earnings \u00d7 growth_factor",
-                "substituted_formula": "1711 \u00d7 1.063",
+                "formula": "owner_earnings × growth_factor",
+                "substituted_formula": "1711 × 1.063",
                 "dependencies": [
                   "owner_earnings",
                   "growth_factor"
@@ -1583,8 +1583,8 @@
                 "value": 1182.21545,
                 "unit": "USD millions",
                 "operation": "multiply",
-                "formula": "owner_earnings_y1 \u00d7 distribution_rate",
-                "substituted_formula": "1818.793 \u00d7 0.65",
+                "formula": "owner_earnings_y1 × distribution_rate",
+                "substituted_formula": "1818.793 × 0.65",
                 "dependencies": [
                   "owner_earnings_y1",
                   "distribution_rate"
@@ -1597,8 +1597,8 @@
                 "value": 1933.376959,
                 "unit": "USD millions",
                 "operation": "multiply",
-                "formula": "owner_earnings_y1 \u00d7 growth_factor",
-                "substituted_formula": "1818.793 \u00d7 1.063",
+                "formula": "owner_earnings_y1 × growth_factor",
+                "substituted_formula": "1818.793 × 1.063",
                 "dependencies": [
                   "owner_earnings_y1",
                   "growth_factor"
@@ -1611,8 +1611,8 @@
                 "value": 1256.69502335,
                 "unit": "USD millions",
                 "operation": "multiply",
-                "formula": "owner_earnings_y2 \u00d7 distribution_rate",
-                "substituted_formula": "1933.377 \u00d7 0.65",
+                "formula": "owner_earnings_y2 × distribution_rate",
+                "substituted_formula": "1933.377 × 0.65",
                 "dependencies": [
                   "owner_earnings_y2",
                   "distribution_rate"
@@ -1625,8 +1625,8 @@
                 "value": 2055.17970742,
                 "unit": "USD millions",
                 "operation": "multiply",
-                "formula": "owner_earnings_y2 \u00d7 growth_factor",
-                "substituted_formula": "1933.377 \u00d7 1.063",
+                "formula": "owner_earnings_y2 × growth_factor",
+                "substituted_formula": "1933.377 × 1.063",
                 "dependencies": [
                   "owner_earnings_y2",
                   "growth_factor"
@@ -1639,8 +1639,8 @@
                 "value": 1335.86680982,
                 "unit": "USD millions",
                 "operation": "multiply",
-                "formula": "owner_earnings_y3 \u00d7 distribution_rate",
-                "substituted_formula": "2055.1797 \u00d7 0.65",
+                "formula": "owner_earnings_y3 × distribution_rate",
+                "substituted_formula": "2055.1797 × 0.65",
                 "dependencies": [
                   "owner_earnings_y3",
                   "distribution_rate"
@@ -1653,8 +1653,8 @@
                 "value": 2184.65602898,
                 "unit": "USD millions",
                 "operation": "multiply",
-                "formula": "owner_earnings_y3 \u00d7 growth_factor",
-                "substituted_formula": "2055.1797 \u00d7 1.063",
+                "formula": "owner_earnings_y3 × growth_factor",
+                "substituted_formula": "2055.1797 × 1.063",
                 "dependencies": [
                   "owner_earnings_y3",
                   "growth_factor"
@@ -1667,8 +1667,8 @@
                 "value": 1420.02641884,
                 "unit": "USD millions",
                 "operation": "multiply",
-                "formula": "owner_earnings_y4 \u00d7 distribution_rate",
-                "substituted_formula": "2184.656 \u00d7 0.65",
+                "formula": "owner_earnings_y4 × distribution_rate",
+                "substituted_formula": "2184.656 × 0.65",
                 "dependencies": [
                   "owner_earnings_y4",
                   "distribution_rate"
@@ -1681,8 +1681,8 @@
                 "value": 2322.28935881,
                 "unit": "USD millions",
                 "operation": "multiply",
-                "formula": "owner_earnings_y4 \u00d7 growth_factor",
-                "substituted_formula": "2184.656 \u00d7 1.063",
+                "formula": "owner_earnings_y4 × growth_factor",
+                "substituted_formula": "2184.656 × 1.063",
                 "dependencies": [
                   "owner_earnings_y4",
                   "growth_factor"
@@ -1695,8 +1695,8 @@
                 "value": 1509.48808323,
                 "unit": "USD millions",
                 "operation": "multiply",
-                "formula": "owner_earnings_y5 \u00d7 distribution_rate",
-                "substituted_formula": "2322.2894 \u00d7 0.65",
+                "formula": "owner_earnings_y5 × distribution_rate",
+                "substituted_formula": "2322.2894 × 0.65",
                 "dependencies": [
                   "owner_earnings_y5",
                   "distribution_rate"
@@ -1709,8 +1709,8 @@
                 "value": 2468.59358842,
                 "unit": "USD millions",
                 "operation": "multiply",
-                "formula": "owner_earnings_y5 \u00d7 growth_factor",
-                "substituted_formula": "2322.2894 \u00d7 1.063",
+                "formula": "owner_earnings_y5 × growth_factor",
+                "substituted_formula": "2322.2894 × 1.063",
                 "dependencies": [
                   "owner_earnings_y5",
                   "growth_factor"
@@ -1723,8 +1723,8 @@
                 "value": 1604.58583247,
                 "unit": "USD millions",
                 "operation": "multiply",
-                "formula": "owner_earnings_y6 \u00d7 distribution_rate",
-                "substituted_formula": "2468.5936 \u00d7 0.65",
+                "formula": "owner_earnings_y6 × distribution_rate",
+                "substituted_formula": "2468.5936 × 0.65",
                 "dependencies": [
                   "owner_earnings_y6",
                   "distribution_rate"
@@ -1737,8 +1737,8 @@
                 "value": 2624.11498449,
                 "unit": "USD millions",
                 "operation": "multiply",
-                "formula": "owner_earnings_y6 \u00d7 growth_factor",
-                "substituted_formula": "2468.5936 \u00d7 1.063",
+                "formula": "owner_earnings_y6 × growth_factor",
+                "substituted_formula": "2468.5936 × 1.063",
                 "dependencies": [
                   "owner_earnings_y6",
                   "growth_factor"
@@ -1751,8 +1751,8 @@
                 "value": 1705.67473992,
                 "unit": "USD millions",
                 "operation": "multiply",
-                "formula": "owner_earnings_y7 \u00d7 distribution_rate",
-                "substituted_formula": "2624.115 \u00d7 0.65",
+                "formula": "owner_earnings_y7 × distribution_rate",
+                "substituted_formula": "2624.115 × 0.65",
                 "dependencies": [
                   "owner_earnings_y7",
                   "distribution_rate"
@@ -1792,8 +1792,8 @@
                 "value": 47234.06972074,
                 "unit": "USD millions",
                 "operation": "multiply",
-                "formula": "owner_earnings_y7 \u00d7 terminal_multiple",
-                "substituted_formula": "2624.115 \u00d7 18",
+                "formula": "owner_earnings_y7 × terminal_multiple",
+                "substituted_formula": "2624.115 × 18",
                 "dependencies": [
                   "owner_earnings_y7",
                   "terminal_multiple"
@@ -1863,8 +1863,8 @@
                 "value": 7.11844094,
                 "unit": "USD per share",
                 "operation": "divide",
-                "formula": "equity_value \u00f7 shares_m",
-                "substituted_formula": "13186.733 \u00f7 1852.4749",
+                "formula": "equity_value ÷ shares_m",
+                "substituted_formula": "13186.733 ÷ 1852.4749",
                 "dependencies": [
                   "equity_value",
                   "shares_m"
@@ -1975,8 +1975,8 @@
                 "value": 0.125,
                 "unit": "ratio",
                 "operation": "multiply",
-                "formula": "reinvestment \u00d7 incremental_roic",
-                "substituted_formula": "0.5 \u00d7 0.25",
+                "formula": "reinvestment × incremental_roic",
+                "substituted_formula": "0.5 × 0.25",
                 "dependencies": [
                   "reinvestment",
                   "incremental_roic"
@@ -2017,8 +2017,8 @@
                 "value": 1924.875,
                 "unit": "USD millions",
                 "operation": "multiply",
-                "formula": "owner_earnings \u00d7 growth_factor",
-                "substituted_formula": "1711 \u00d7 1.125",
+                "formula": "owner_earnings × growth_factor",
+                "substituted_formula": "1711 × 1.125",
                 "dependencies": [
                   "owner_earnings",
                   "growth_factor"
@@ -2031,8 +2031,8 @@
                 "value": 962.4375,
                 "unit": "USD millions",
                 "operation": "multiply",
-                "formula": "owner_earnings_y1 \u00d7 distribution_rate",
-                "substituted_formula": "1924.875 \u00d7 0.5",
+                "formula": "owner_earnings_y1 × distribution_rate",
+                "substituted_formula": "1924.875 × 0.5",
                 "dependencies": [
                   "owner_earnings_y1",
                   "distribution_rate"
@@ -2045,8 +2045,8 @@
                 "value": 2165.484375,
                 "unit": "USD millions",
                 "operation": "multiply",
-                "formula": "owner_earnings_y1 \u00d7 growth_factor",
-                "substituted_formula": "1924.875 \u00d7 1.125",
+                "formula": "owner_earnings_y1 × growth_factor",
+                "substituted_formula": "1924.875 × 1.125",
                 "dependencies": [
                   "owner_earnings_y1",
                   "growth_factor"
@@ -2059,8 +2059,8 @@
                 "value": 1082.7421875,
                 "unit": "USD millions",
                 "operation": "multiply",
-                "formula": "owner_earnings_y2 \u00d7 distribution_rate",
-                "substituted_formula": "2165.4844 \u00d7 0.5",
+                "formula": "owner_earnings_y2 × distribution_rate",
+                "substituted_formula": "2165.4844 × 0.5",
                 "dependencies": [
                   "owner_earnings_y2",
                   "distribution_rate"
@@ -2073,8 +2073,8 @@
                 "value": 2436.16992188,
                 "unit": "USD millions",
                 "operation": "multiply",
-                "formula": "owner_earnings_y2 \u00d7 growth_factor",
-                "substituted_formula": "2165.4844 \u00d7 1.125",
+                "formula": "owner_earnings_y2 × growth_factor",
+                "substituted_formula": "2165.4844 × 1.125",
                 "dependencies": [
                   "owner_earnings_y2",
                   "growth_factor"
@@ -2087,8 +2087,8 @@
                 "value": 1218.08496094,
                 "unit": "USD millions",
                 "operation": "multiply",
-                "formula": "owner_earnings_y3 \u00d7 distribution_rate",
-                "substituted_formula": "2436.1699 \u00d7 0.5",
+                "formula": "owner_earnings_y3 × distribution_rate",
+                "substituted_formula": "2436.1699 × 0.5",
                 "dependencies": [
                   "owner_earnings_y3",
                   "distribution_rate"
@@ -2101,8 +2101,8 @@
                 "value": 2740.69116211,
                 "unit": "USD millions",
                 "operation": "multiply",
-                "formula": "owner_earnings_y3 \u00d7 growth_factor",
-                "substituted_formula": "2436.1699 \u00d7 1.125",
+                "formula": "owner_earnings_y3 × growth_factor",
+                "substituted_formula": "2436.1699 × 1.125",
                 "dependencies": [
                   "owner_earnings_y3",
                   "growth_factor"
@@ -2115,8 +2115,8 @@
                 "value": 1370.34558105,
                 "unit": "USD millions",
                 "operation": "multiply",
-                "formula": "owner_earnings_y4 \u00d7 distribution_rate",
-                "substituted_formula": "2740.6912 \u00d7 0.5",
+                "formula": "owner_earnings_y4 × distribution_rate",
+                "substituted_formula": "2740.6912 × 0.5",
                 "dependencies": [
                   "owner_earnings_y4",
                   "distribution_rate"
@@ -2129,8 +2129,8 @@
                 "value": 3083.27755737,
                 "unit": "USD millions",
                 "operation": "multiply",
-                "formula": "owner_earnings_y4 \u00d7 growth_factor",
-                "substituted_formula": "2740.6912 \u00d7 1.125",
+                "formula": "owner_earnings_y4 × growth_factor",
+                "substituted_formula": "2740.6912 × 1.125",
                 "dependencies": [
                   "owner_earnings_y4",
                   "growth_factor"
@@ -2143,8 +2143,8 @@
                 "value": 1541.63877869,
                 "unit": "USD millions",
                 "operation": "multiply",
-                "formula": "owner_earnings_y5 \u00d7 distribution_rate",
-                "substituted_formula": "3083.2776 \u00d7 0.5",
+                "formula": "owner_earnings_y5 × distribution_rate",
+                "substituted_formula": "3083.2776 × 0.5",
                 "dependencies": [
                   "owner_earnings_y5",
                   "distribution_rate"
@@ -2157,8 +2157,8 @@
                 "value": 3468.68725204,
                 "unit": "USD millions",
                 "operation": "multiply",
-                "formula": "owner_earnings_y5 \u00d7 growth_factor",
-                "substituted_formula": "3083.2776 \u00d7 1.125",
+                "formula": "owner_earnings_y5 × growth_factor",
+                "substituted_formula": "3083.2776 × 1.125",
                 "dependencies": [
                   "owner_earnings_y5",
                   "growth_factor"
@@ -2171,8 +2171,8 @@
                 "value": 1734.34362602,
                 "unit": "USD millions",
                 "operation": "multiply",
-                "formula": "owner_earnings_y6 \u00d7 distribution_rate",
-                "substituted_formula": "3468.6873 \u00d7 0.5",
+                "formula": "owner_earnings_y6 × distribution_rate",
+                "substituted_formula": "3468.6873 × 0.5",
                 "dependencies": [
                   "owner_earnings_y6",
                   "distribution_rate"
@@ -2185,8 +2185,8 @@
                 "value": 3902.27315855,
                 "unit": "USD millions",
                 "operation": "multiply",
-                "formula": "owner_earnings_y6 \u00d7 growth_factor",
-                "substituted_formula": "3468.6873 \u00d7 1.125",
+                "formula": "owner_earnings_y6 × growth_factor",
+                "substituted_formula": "3468.6873 × 1.125",
                 "dependencies": [
                   "owner_earnings_y6",
                   "growth_factor"
@@ -2199,8 +2199,8 @@
                 "value": 1951.13657928,
                 "unit": "USD millions",
                 "operation": "multiply",
-                "formula": "owner_earnings_y7 \u00d7 distribution_rate",
-                "substituted_formula": "3902.2732 \u00d7 0.5",
+                "formula": "owner_earnings_y7 × distribution_rate",
+                "substituted_formula": "3902.2732 × 0.5",
                 "dependencies": [
                   "owner_earnings_y7",
                   "distribution_rate"
@@ -2240,8 +2240,8 @@
                 "value": 93654.55580521,
                 "unit": "USD millions",
                 "operation": "multiply",
-                "formula": "owner_earnings_y7 \u00d7 terminal_multiple",
-                "substituted_formula": "3902.2732 \u00d7 24",
+                "formula": "owner_earnings_y7 × terminal_multiple",
+                "substituted_formula": "3902.2732 × 24",
                 "dependencies": [
                   "owner_earnings_y7",
                   "terminal_multiple"
@@ -2311,8 +2311,8 @@
                 "value": 21.69224765,
                 "unit": "USD per share",
                 "operation": "divide",
-                "formula": "equity_value \u00f7 shares_m",
-                "substituted_formula": "40184.345 \u00f7 1852.4749",
+                "formula": "equity_value ÷ shares_m",
+                "substituted_formula": "40184.345 ÷ 1852.4749",
                 "dependencies": [
                   "equity_value",
                   "shares_m"
@@ -2527,7 +2527,7 @@
       "interpretation": "value_per_share is withheld while any material additive component is unpriced; priced_components_per_share is the raw additive sum (may be negative). When complete, value_per_share applies a 0 floor (limited liability)."
     },
     "scenario_contract": {
-      "rule": "Cases must change cited causal operating, capital, probability, timing, or financing drivers\u2014not only a terminal multiple.",
+      "rule": "Cases must change cited causal operating, capital, probability, timing, or financing drivers—not only a terminal multiple.",
       "top_value_drivers": [
         {
           "component_id": "operating_business_and_net_assets",
@@ -2632,5 +2632,12 @@
   "synthesis": {
     "status": "incomplete",
     "reason": "no numeric paths"
+  },
+  "returns": {
+    "base_irr_pct": null,
+    "unit": "percent_per_year",
+    "label": "pending",
+    "display": "pending",
+    "scenarios_pct": {}
   }
 }

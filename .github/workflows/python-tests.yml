@@ -22,8 +22,21 @@ on:
       - "dashboard/functions/**"
       - "dashboard/oauth-proxy/**"
       - "dashboard/data/criticality_summary.json"
+      - "dashboard/data/portfolio_summary.json"
+      - "dashboard/data/research_manifest.json"
+      - "dashboard/data/kpi_summary.json"
+      - "dashboard/data/document_catalog_summary.json"
+      - "dashboard/data/agent_shards/**"
       - "ops-watchdog/**"
       - "AMZN/investor-documents/download_amzn_investor_docs.py"
+      - "TPL/research/evidence/thematic_context.md"
+      - "TPL/research/evidence/insider_signal.md"
+      - "TPL/research/evidence/filing_digest.md"
+      - "TPL/third-party-analyses/source_inventory.json"
+      - "GOOGL/research/evidence/thematic_context.md"
+      - "GOOGL/research/evidence/insider_signal.md"
+      - "GOOGL/research/evidence/filing_digest.md"
+      - "GOOGL/third-party-analyses/source_inventory.json"
       - "SOURCES.md"
       - ".gitignore"
       - "CONTRIBUTING.md"
@@ -36,6 +49,8 @@ on:
       - "dashboard/overlap-viz.js"
       - "dashboard/short-alpha-viz.js"
       - "dashboard/reverse-splits-viz.js"
+      - "dashboard/shorts-edge-v3-viz.js"
+      - "dashboard/shorts-edge-v3.css"
       - "dashboard/reverse-splits-portfolio-viz.js"
       - "dashboard/reverse-splits-portfolio.css"
       - "dashboard/ideas.css"
@@ -53,8 +68,21 @@ on:
       - "dashboard/functions/**"
       - "dashboard/oauth-proxy/**"
       - "dashboard/data/criticality_summary.json"
+      - "dashboard/data/portfolio_summary.json"
+      - "dashboard/data/research_manifest.json"
+      - "dashboard/data/kpi_summary.json"
+      - "dashboard/data/document_catalog_summary.json"
+      - "dashboard/data/agent_shards/**"
       - "ops-watchdog/**"
       - "AMZN/investor-documents/download_amzn_investor_docs.py"
+      - "TPL/research/evidence/thematic_context.md"
+      - "TPL/research/evidence/insider_signal.md"
+      - "TPL/research/evidence/filing_digest.md"
+      - "TPL/third-party-analyses/source_inventory.json"
+      - "GOOGL/research/evidence/thematic_context.md"
+      - "GOOGL/research/evidence/insider_signal.md"
+      - "GOOGL/research/evidence/filing_digest.md"
+      - "GOOGL/third-party-analyses/source_inventory.json"
       - "SOURCES.md"
       - ".gitignore"
       - "CONTRIBUTING.md"
@@ -67,6 +95,8 @@ on:
       - "dashboard/overlap-viz.js"
       - "dashboard/short-alpha-viz.js"
       - "dashboard/reverse-splits-viz.js"
+      - "dashboard/shorts-edge-v3-viz.js"
+      - "dashboard/shorts-edge-v3.css"
       - "dashboard/reverse-splits-portfolio-viz.js"
       - "dashboard/reverse-splits-portfolio.css"
       - "dashboard/ideas.css"
@@ -192,8 +222,11 @@ jobs:
           # What the suites read: _system without the reference corpus (its
           # top-level registries stay), the workflows some tests parse, the D1
           # migrations, edge functions and oauth proxy, the ops-watchdog worker
-          # config, one criticality summary, one ticker download script for
-          # the payload-path test, and SOURCES.md for the source-index contract.
+          # config, one criticality summary, the L0 summary feeds and L1 agent
+          # shards (the FTS5 ticker query is built from those shards), the
+          # TPL/GOOGL canonical evidence files the architecture test opens,
+          # one ticker download script for the payload-path test, and
+          # SOURCES.md for the source-index contract.
           sparse-checkout: |
             /_system/
             !/_system/reference/*/
@@ -204,8 +237,21 @@ jobs:
             /dashboard/functions/
             /dashboard/oauth-proxy/
             /dashboard/data/criticality_summary.json
+            /dashboard/data/portfolio_summary.json
+            /dashboard/data/research_manifest.json
+            /dashboard/data/kpi_summary.json
+            /dashboard/data/document_catalog_summary.json
+            /dashboard/data/agent_shards/
             /ops-watchdog/
             /AMZN/investor-documents/download_amzn_investor_docs.py
+            /TPL/research/evidence/thematic_context.md
+            /TPL/research/evidence/insider_signal.md
+            /TPL/research/evidence/filing_digest.md
+            /TPL/third-party-analyses/source_inventory.json
+            /GOOGL/research/evidence/thematic_context.md
+            /GOOGL/research/evidence/insider_signal.md
+            /GOOGL/research/evidence/filing_digest.md
+            /GOOGL/third-party-analyses/source_inventory.json
             /SOURCES.md
             /.gitignore
             /CONTRIBUTING.md
@@ -218,6 +264,8 @@ jobs:
             /dashboard/overlap-viz.js
             /dashboard/short-alpha-viz.js
             /dashboard/reverse-splits-viz.js
+            /dashboard/shorts-edge-v3-viz.js
+            /dashboard/shorts-edge-v3.css
             /dashboard/ideas.css
             /dashboard/short-alpha.css
             /dashboard/data/separations.json

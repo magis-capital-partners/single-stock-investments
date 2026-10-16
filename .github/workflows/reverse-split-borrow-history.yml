@@ -12,7 +12,7 @@ concurrency:
 jobs:
   archive:
     runs-on: ubuntu-latest
-    timeout-minutes: 10
+    timeout-minutes: 30
     steps:
       - uses: actions/checkout@v4
         with:
@@ -22,17 +22,45 @@ jobs:
             /_system/scripts/
             /_system/data/reverse_splits/
             /_system/research/short-alpha/
+            /_system/frameworks/
+            /dashboard/data/reverse_splits.json
+            /dashboard/data/net_edge_audits_v3/
+            /dashboard/data/shorts_net_edge_v3.json
+            /dashboard/data/shorts_free_evidence.json
+            /dashboard/data/shorts_free_borrow.json
+            /dashboard/data/shorts_calmar_research.json
+            /dashboard/data/free_short_packets/
           sparse-checkout-cone-mode: false
       - uses: actions/setup-python@v5
         with:
           python-version: "3.12"
+      - name: Install public disclosure collectors and exchange calendar
+        run: pip install requests yfinance beautifulsoup4 lxml exchange-calendars==4.13.2
+      - name: Rebuild the ledger and discover recent public disclosures
+        timeout-minutes: 15
+        run: |
+          python -m _system.scripts.reverse_splits.cli import-ledger
+          python -m _system.scripts.reverse_splits.cli seed --since-days 3 --max-tickers 50
+          python -m _system.scripts.reverse_splits.cli clocks --since-days 3 --text-limit 100
+          python -m _system.scripts.reverse_splits.cli export-ledger
       - name: Archive timestamped public availability and fee indications
         run: python -m _system.scripts.reverse_splits.borrow_archive
+      - name: Freeze discovery observations and explicit prospective abstentions
+        run: python -m _system.scripts.reverse_splits.net_edge_evidence capture
+      - name: Refresh the dashboard evidence and prospective counts
+        run: python _system/scripts/build_reverse_splits_dashboard.py
       - name: Save the derived archive
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add _system/data/reverse_splits/borrow_history
+          git add _system/data/reverse_splits/borrow_history _system/data/reverse_splits/edge_observations _system/data/reverse_splits/edge_prospective _system/data/reverse_splits/announcements* _system/data/reverse_splits/events* _system/data/reverse_splits/ledger_manifest.json
+          git add dashboard/data/reverse_splits.json
+          git add dashboard/data/net_edge_audits_v3 dashboard/data/shorts_net_edge_v3.json
+          if [ -f dashboard/data/shorts_calmar_research.json ]; then git add dashboard/data/shorts_calmar_research.json; fi
+          if [ -f dashboard/data/shorts_free_evidence.json ]; then
+            git add dashboard/data/shorts_free_evidence.json dashboard/data/free_short_packets
+            if [ -f dashboard/data/shorts_free_borrow.json ]; then git add dashboard/data/shorts_free_borrow.json; fi
+          fi
           if ! git diff --cached --quiet; then
             git commit -m "chore: archive reverse-split borrow indications"
             git pull --rebase origin main
