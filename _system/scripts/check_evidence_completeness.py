@@ -41,10 +41,12 @@ def check(ticker: str, *, dive_date: str | None = None, strict: bool = False) ->
     cfg = val.get("evidence_refresh") or {}
 
     evidence = research / "evidence"
-    if not list(evidence.glob("filing_digest_*.md")):
+    if not (evidence / "filing_digest.md").is_file() and not list(evidence.glob("filing_digest_*.md")):
         errs.append("missing filing_digest")
 
     facts = sorted(evidence.glob("filing_facts_*.json"))
+    if not facts and (evidence / "filing_facts.json").is_file():
+        facts = [evidence / "filing_facts.json"]
     if facts:
         data = json.loads(facts[-1].read_text(encoding="utf-8"))
         if not (data.get("metrics") or data.get("claims")):

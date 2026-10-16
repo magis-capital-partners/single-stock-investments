@@ -299,18 +299,20 @@ def collect_third_party_sources(ticker: str) -> dict:
 
 
 def write_inventory(ticker: str, out_date: str | None = None) -> tuple[Path, Path]:
-    out_date = out_date or date.today().isoformat()
+    from atomic_io import write_json_if_changed, write_text_if_changed
+
+    effective_date = out_date or date.today().isoformat()
     result = collect_third_party_sources(ticker)
     tp = ROOT / ticker / "third-party-analyses"
     tp.mkdir(parents=True, exist_ok=True)
-    json_path = tp / f"source_inventory_{out_date}.json"
-    md_path = tp / f"source_inventory_{out_date}.md"
-    json_path.write_text(json.dumps(result, indent=2) + "\n", encoding="utf-8")
+    canonical_json = tp / "source_inventory.json"
+    canonical_md = tp / "source_inventory.md"
+    write_json_if_changed(canonical_json, result)
 
     lines = [
         f"# {ticker} — Third-party source inventory",
         "",
-        f"**Date:** {out_date}",
+        f"**Date:** {effective_date}",
         f"**Sources:** {result['source_count']} total "
         f"({result['approved_count']} approved, {result['pending_count']} pending, "
         f"{result['context_count']} context)",
@@ -327,15 +329,27 @@ def write_inventory(ticker: str, out_date: str | None = None) -> tuple[Path, Pat
         lines.append("| (none) | — | — | — | Primary filings only |")
     lines.append("")
     lines.append(
-        f"Cross-check required: `{ticker}/research/cross_check_third_party_{out_date}.md`"
+        f"Cross-check required: `{ticker}/research/cross_check_third_party_{effective_date}.md`"
     )
-    md_path.write_text("\n".join(lines) + "\n", encoding="utf-8")
-    return json_path, md_path
+    md_text = "\n".join(lines) + "\n"
+    write_text_if_changed(canonical_md, md_text)
+    if out_date:
+        dated_json = tp / f"source_inventory_{out_date}.json"
+        dated_md = tp / f"source_inventory_{out_date}.md"
+        write_json_if_changed(dated_json, result)
+        write_text_if_changed(dated_md, md_text)
+        return dated_json, dated_md
+    return canonical_json, canonical_md
 
 
 def load_latest_inventory(ticker: str) -> dict | None:
     tp = ROOT / ticker / "third-party-analyses"
-    inv = sorted(tp.glob("source_inventory_*.json")) if tp.is_dir() else []
+    if not tp.is_dir():
+        return None
+    canonical = tp / "source_inventory.json"
+    if canonical.is_file():
+        return json.loads(canonical.read_text(encoding="utf-8"))
+    inv = sorted(tp.glob("source_inventory_*.json"))
     if not inv:
         return None
     return json.loads(inv[-1].read_text(encoding="utf-8"))

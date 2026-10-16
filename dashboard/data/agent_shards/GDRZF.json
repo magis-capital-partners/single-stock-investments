@@ -1,0 +1,315 @@
+{
+  "schema_version": "magis.agent_shard.v1",
+  "generated_at": "2026-10-16T16:19:47Z",
+  "as_of": "2026-07-21",
+  "ticker": "GDRZF",
+  "company": "Gold Reserve Ltd.",
+  "book": "holdings",
+  "registry": {
+    "market": "US",
+    "exchange": "OTC",
+    "sleeve": null,
+    "moat": "unproven",
+    "dhando": "partial",
+    "payoff_lens": "event"
+  },
+  "thesis_summary": {
+    "thesis": "Gold Reserve Ltd. is a Bermuda company (continued from Alberta in September 2024) that no longer operates a mine. **[Fact]** Its economic identity is a **judgment-and-claim vehicle**: collect unpaid amounts under a 2014 ICSID award and 2016 Venezuela settlement, participate as a creditor/bidder in the Delaware forced sale of PDV Holding (CITGO’s parent stack), and prosecute a 2025 arbitration over revoked Siembra Minera mining rights. **[Fact]** Shares trade as **GDRZF** (OTCQX) and **GRZ.V** (TSXV). **[Fact]** The company deregistered from the SEC on 30 January 2025, so U.S. EDGAR is no longer the primary reporting channel. **[Fact]**",
+    "why_market_wrong": "The quote may treat GDRZF as a thin OTC mining stub and miss a **dated legal-process payoff** with a soft cash floor. **[Inference]** Predictive attribute: **complexity discount** (multi-jurisdiction enforcement, OFAC, creditor waterfalls, CVR/bonus leakage). **[Inference]** Catalyst path: Amber Energy SPA sale order entered 29 November 2025; closing still needs licenses and surviving appeals. **[Inference]**",
+    "stance": "watch",
+    "archetype": "optionality",
+    "base_irr_pct": 11.3,
+    "scenarios": {
+      "base": 11.3,
+      "bear": -14.0,
+      "bull": 34.7
+    },
+    "key_assumptions": [
+      {
+        "input": "Price today",
+        "source": "Yahoo Finance GDRZF last 2026-07-17",
+        "value": "**$4.56**"
+      },
+      {
+        "input": "Shares outstanding",
+        "source": "Aggregator (ADVFN) **[HUMAN REVIEW]** vs H1 2025 ~113M",
+        "value": "**147,869,033**"
+      },
+      {
+        "input": "Soft cash floor",
+        "source": "Proof: ~$100M cash / 147.9M shares **[Assumption]**",
+        "value": "**~$0.68** per share"
+      },
+      {
+        "input": "Unpaid award face",
+        "source": "H1 2025 interim Note 5 (secondary) **[HUMAN REVIEW]**",
+        "value": "**~$1.18 billion**"
+      },
+      {
+        "input": "CVR leakage",
+        "source": "Company Note 5",
+        "value": "**5.466%** of Proceeds"
+      },
+      {
+        "input": "Bonus plan leakage",
+        "source": "Company Note 5",
+        "value": "**1.28%** of first $200M + **6.4%** after"
+      },
+      {
+        "input": "Horizon",
+        "source": "CITGO closing + distribution lag **[Assumption]**",
+        "value": "**4 years**"
+      },
+      {
+        "input": "Base payoff per share",
+        "source": "Risked net recovery + residual cash **[Assumption]**",
+        "value": "**$7.00**"
+      }
+    ],
+    "open_questions": [
+      "Pull SEDAR/TSXV H1 2025, YE 2025, and latest interim into `GDRZF/investor-documents/` and replace secondary cash/share figures.",
+      "Confirm Final Priority Order: Gold Reserve attached claim amount and rank.",
+      "Track Amber closing / OFAC / appeals after the 29 Nov 2025 Sale Order.",
+      "Revisit stance if verified net recovery path supports ≥15% per year with bounded bear."
+    ]
+  },
+  "kpi_series": [
+    {
+      "metric": "burn_rate",
+      "label": "Burn Rate",
+      "direction": "steady",
+      "signal_tier": "steady",
+      "latest": 3124577.0,
+      "growth_latest": 1.607,
+      "strength": 1.78,
+      "period": "2024-09-30",
+      "human_summary": "Cash burn growth move looks extreme (+41% → +161% YoY). Large percentages usually mean a thin or sign-changing base. Treat cautiously (recent periods)."
+    },
+    {
+      "metric": "cash",
+      "label": "Cash",
+      "direction": "steady",
+      "signal_tier": "steady",
+      "latest": 8748403.0,
+      "growth_latest": -0.1798,
+      "strength": 16.01,
+      "period": "2024-09-30",
+      "human_summary": "Cash growth is steady around -18% YoY (recent periods)"
+    },
+    {
+      "metric": "cfo",
+      "label": "Operating cash flow",
+      "direction": "steady",
+      "signal_tier": "steady",
+      "latest": -3124577.0,
+      "growth_latest": -1.607,
+      "strength": 3.218,
+      "period": "2024-09-30",
+      "human_summary": "Cash from operations growth move looks extreme (-41% → -161% YoY). Large percentages usually mean a thin or sign-changing base. Treat cautiously (recent periods)."
+    },
+    {
+      "metric": "eps_basic",
+      "label": "EPS (basic)",
+      "direction": "steady",
+      "signal_tier": "steady",
+      "latest": 0.02,
+      "growth_latest": -0.5,
+      "strength": null,
+      "period": "2019-09-30",
+      "human_summary": "EPS flipped from loss to profit, so the YoY path (-106% → -50% YoY) is hard to read. Treat as noisy (recent periods)."
+    },
+    {
+      "metric": "net_income",
+      "label": "Net income",
+      "direction": "steady",
+      "signal_tier": "steady",
+      "latest": -3145554.0,
+      "growth_latest": 0.8295,
+      "strength": null,
+      "period": "2024-09-30",
+      "human_summary": "Net income growth move looks extreme (-196% → +83% YoY). Large percentages usually mean a thin or sign-changing base. Treat cautiously (recent periods)."
+    },
+    {
+      "metric": "stockholders_equity",
+      "label": "Stockholders' equity",
+      "direction": "steady",
+      "signal_tier": "steady",
+      "latest": 70322972.0,
+      "growth_latest": 1.2947,
+      "strength": 7.293,
+      "period": "2024-09-30",
+      "human_summary": "Stockholders' equity growth is steady around +129% YoY (recent periods)"
+    },
+    {
+      "metric": "total_assets",
+      "label": "Total assets",
+      "direction": "steady",
+      "signal_tier": "steady",
+      "latest": 83365396.0,
+      "growth_latest": 1.0129,
+      "strength": 8.677,
+      "period": "2024-09-30",
+      "human_summary": "Total assets growth is steady around +101% YoY (recent periods)"
+    }
+  ],
+  "recent_news": [],
+  "documents": [
+    {
+      "document_id": "sha256:0b77bd5627b3aeaa2a69a888f993398dae4ac34d123e6cc43036fbc930b51b82",
+      "title": "f8937",
+      "source_type": "company_document",
+      "local_pdf_path": "GDRZF/investor-documents/ir-gdrzf/f8937.pdf",
+      "text_extract_path": null,
+      "drive_web_view_link": "https://drive.google.com/file/d/1jmFvVfk1VfA-3r7P3VX8pnKmPKyPBSr9/view?usp=drivesdk",
+      "modified_at": "2026-10-16T14:36:02Z"
+    },
+    {
+      "document_id": "sha256:271788dfe25680277e0c8815f79d6a940968a2a7e508d1f1803a9633e4ea72ac",
+      "title": "20251120 2543 Ltr from Special Master to Judge Stark re Joint Status Report re Nov 18 Order",
+      "source_type": "company_document",
+      "local_pdf_path": "GDRZF/investor-documents/ir-gdrzf/20251120-2543-Ltr-from-Special-Master-to-Judge-Stark-re-Joint-Status-Report-re-Nov-18-Order.pdf",
+      "text_extract_path": null,
+      "drive_web_view_link": "https://drive.google.com/file/d/1c0gp_9txekwqUECrZtLWa6avneXanxrw/view?usp=drivesdk",
+      "modified_at": "2026-10-16T14:36:02Z"
+    },
+    {
+      "document_id": "sha256:28a293844a7197c9724fbcb631659a5b1321c25c406e1212ec33b4fb54cb1d9d",
+      "title": "2025 10 28 Gold Reserve Mandamus Petition redacted",
+      "source_type": "company_document",
+      "local_pdf_path": "GDRZF/investor-documents/ir-gdrzf/2025-10-28-Gold-Reserve-Mandamus-Petition-redacted.pdf",
+      "text_extract_path": null,
+      "drive_web_view_link": "https://drive.google.com/file/d/1tLe90rOS_cRmUi38iC4pmuBKdQo7NPlg/view?usp=drivesdk",
+      "modified_at": "2026-10-16T14:36:02Z"
+    },
+    {
+      "document_id": "sha256:29d18fa02b1cbf847974417318cb985b51e7a4c7ae148960d13a03706e83be93",
+      "title": "2025 11 29 2556 Crystallex International Corporation v ORDER I APPROVING STOCK PURCHASE AGREEMENT II",
+      "source_type": "company_document",
+      "local_pdf_path": "GDRZF/investor-documents/ir-gdrzf/2025-11-29-2556-Crystallex-International-Corporation-v-ORDER-I-APPROVING-STOCK-PURCHASE-AGREEMENT-II.pdf",
+      "text_extract_path": null,
+      "drive_web_view_link": "https://drive.google.com/file/d/1FxHcU7m0jVVnbdC0AKrRcb6yBk7MPIex/view?usp=drivesdk",
+      "modified_at": "2026-10-16T14:36:02Z"
+    },
+    {
+      "document_id": "sha256:37c6eb20b3b8e63167ac09ffec402720af6a89df6d10d91eb1dc179fec6d9578",
+      "title": "US DIS NYSD 1 19cv10023 d14002676e39895 OPINION AND ORDER For all of the above reasons Def",
+      "source_type": "company_document",
+      "local_pdf_path": "GDRZF/investor-documents/ir-gdrzf/US_DIS_NYSD_1_19cv10023_d14002676e39895_OPINION_AND_ORDER_For_all_of_the_above_reasons_Def.pdf",
+      "text_extract_path": null,
+      "drive_web_view_link": "https://drive.google.com/file/d/1iL0dKeSrs9ZA_CuIC-8rGGcd3JF7wuwG/view?usp=drivesdk",
+      "modified_at": "2026-10-16T14:36:02Z"
+    },
+    {
+      "document_id": "sha256:3e23269b912b3977e285b58985a964ea996085b9a188421940d3970ac2514f89",
+      "title": "GR Vz 2025.03.05 Arb II Final Draft RFA  330pm ET",
+      "source_type": "company_document",
+      "local_pdf_path": "GDRZF/investor-documents/ir-gdrzf/GR_Vz_2025.03.05_Arb_II_Final_Draft_RFA__330pm_ET_.pdf",
+      "text_extract_path": null,
+      "drive_web_view_link": "https://drive.google.com/file/d/12Wl95jMY6wabtETgHhiY1JIUFG1QqifH/view?usp=drivesdk",
+      "modified_at": "2026-10-16T14:36:02Z"
+    },
+    {
+      "document_id": "sha256:4308bbbf14843f53ae93df52494ba7cedf7e56159ac1d68078d793a590619a7c",
+      "title": "NI43101",
+      "source_type": "company_document",
+      "local_pdf_path": "GDRZF/investor-documents/ir-gdrzf/NI43101.pdf",
+      "text_extract_path": null,
+      "drive_web_view_link": "https://drive.google.com/file/d/1Xt3ZUD3o13g58KjmrFQFKN9fdJF9gUtv/view?usp=drivesdk",
+      "modified_at": "2026-10-16T14:36:02Z"
+    },
+    {
+      "document_id": "sha256:65a5e77e23f89b2d7dc767bc2a6d2bcb03522ab373b0f4bf918956ef336b071c",
+      "title": "GRL 2025 Tax Notice final",
+      "source_type": "company_document",
+      "local_pdf_path": "GDRZF/investor-documents/ir-gdrzf/GRL_2025_Tax_Notice-final.pdf",
+      "text_extract_path": null,
+      "drive_web_view_link": "https://drive.google.com/file/d/1LnPqekwb9E23iCYvEu-L4VEJ77TMNpQW/view?usp=drivesdk",
+      "modified_at": "2026-10-16T14:36:02Z"
+    },
+    {
+      "document_id": "sha256:9a4d1f66ae4b80620237672ad2af9ced34ac66dc34da23f12a271cd7360c0faf",
+      "title": "Aco CC 81rda CC 83o ac CC A7a CC 83o de reconhecimento en  28with header 29",
+      "source_type": "company_document",
+      "local_pdf_path": "GDRZF/investor-documents/ir-gdrzf/Aco_CC_81rda_CC_83o_ac_CC_A7a_CC_83o_de_reconhecimento_en__28with_header_29.pdf",
+      "text_extract_path": null,
+      "drive_web_view_link": "https://drive.google.com/file/d/1b1tw5AWlzOWH9TjEJGKOQjICs-9L81nm/view?usp=drivesdk",
+      "modified_at": "2026-10-16T14:36:02Z"
+    },
+    {
+      "document_id": "sha256:a004f6a60efb22ada398c51f1bb4768d7b7c8f08b7f038259491ef58285562de",
+      "title": "2025 09 10 2224 Crystallex International Corporation v Order on Sale Hearing Procedures Signed by Ju",
+      "source_type": "company_document",
+      "local_pdf_path": "GDRZF/investor-documents/ir-gdrzf/2025-09-10-2224-Crystallex-International-Corporation-v-Order-on-Sale-Hearing-Procedures-Signed-by-Ju.pdf",
+      "text_extract_path": null,
+      "drive_web_view_link": "https://drive.google.com/file/d/1uNGeJKcmAA2XLvuSXinPM6LjLMwFwZMT/view?usp=drivesdk",
+      "modified_at": "2026-10-16T14:36:02Z"
+    },
+    {
+      "document_id": "sha256:b38c3fa9da07edd2e9807ed391c19b63cef549b6b9e1781ac73edbb5585e330d",
+      "title": "Revised Proposed Sale Order filed October 20 2025",
+      "source_type": "company_document",
+      "local_pdf_path": "GDRZF/investor-documents/ir-gdrzf/Revised-Proposed-Sale-Order-filed-October-20-2025.pdf",
+      "text_extract_path": null,
+      "drive_web_view_link": "https://drive.google.com/file/d/1HYIOHjL8MihwTfdDUNPRJzuXeLPWLOpl/view?usp=drivesdk",
+      "modified_at": "2026-10-16T14:36:02Z"
+    },
+    {
+      "document_id": "sha256:bd6f1919fe82118e8b226893616cf7a9d2c0134603de39901bc28ef94231da34",
+      "title": "Transcripts of Ex Parte Meetings of the Court 2023 2024",
+      "source_type": "company_document",
+      "local_pdf_path": "GDRZF/investor-documents/ir-gdrzf/Transcripts-of-Ex-Parte-Meetings-of-the-Court-2023-2024.pdf",
+      "text_extract_path": null,
+      "drive_web_view_link": "https://drive.google.com/file/d/1jTmDruA48tFUeVIlnhVZGWqudoQLWnQj/view?usp=drivesdk",
+      "modified_at": "2026-10-16T14:36:02Z"
+    },
+    {
+      "document_id": "sha256:d0c7def2bce57a6d46328ef79b000b6b1bdafc4c192cb968be68b0cf54cbb31f",
+      "title": "20251023 2485 Letter from K Mangan to Judge Stark re renewed request for stay",
+      "source_type": "company_document",
+      "local_pdf_path": "GDRZF/investor-documents/ir-gdrzf/20251023-2485-Letter-from-K-Mangan-to-Judge-Stark-re-renewed-request-for-stay.pdf",
+      "text_extract_path": null,
+      "drive_web_view_link": "https://drive.google.com/file/d/1nqzqhO-PpVDLZdNmQaKHDnn6qk_unF5c/view?usp=drivesdk",
+      "modified_at": "2026-10-16T14:36:02Z"
+    },
+    {
+      "document_id": "sha256:dbeda94812c75df13c208ae0d0cf1cb2d8de534309d11f1d46b9c397771c407d",
+      "title": "Crystallex 2404 Dial in Information 1020 and 1021 Hearing",
+      "source_type": "company_document",
+      "local_pdf_path": "GDRZF/investor-documents/ir-gdrzf/Crystallex-2404-Dial-in-Information-1020-and-1021-Hearing.pdf",
+      "text_extract_path": null,
+      "drive_web_view_link": "https://drive.google.com/file/d/1ArSPZEzfMjpFtI3EtnmOIbp4ZYZwA2CK/view?usp=drivesdk",
+      "modified_at": "2026-10-16T14:36:02Z"
+    },
+    {
+      "document_id": "sha256:ecda1eac419c2e724fbbf6470f0359e62f46b370d32984879986abb32a500fba",
+      "title": "2020s litigation 394 2020s 20250905 letter to Judge Failla re TSA",
+      "source_type": "company_document",
+      "local_pdf_path": "GDRZF/investor-documents/ir-gdrzf/2020s-litigation_394_2020s-20250905-letter-to-Judge-Failla-re-TSA.pdf",
+      "text_extract_path": null,
+      "drive_web_view_link": "https://drive.google.com/file/d/1PaeLaHFjcJag8k38RXrMjtPIxg-dHCOr/view?usp=drivesdk",
+      "modified_at": "2026-10-16T14:36:02Z"
+    }
+  ],
+  "l2_pointers": {
+    "valuation_json": "GDRZF/research/valuation.json",
+    "thesis_card_json": "GDRZF/research/thesis_card.json",
+    "filing_digest_md": "GDRZF/research/evidence/filing_digest_2026-08-06.md",
+    "insider_signal_md": null,
+    "thematic_context_md": null,
+    "source_inventory_json": null,
+    "full_ui_shard_json": "dashboard/data/tickers/GDRZF.json"
+  },
+  "_envelope": {
+    "schema_version": "magis.feed.v2",
+    "feed_id": "agent-shard-gdrzf",
+    "generated_at": "2026-10-16T16:19:47Z",
+    "as_of": "2026-07-21",
+    "content_sha256": "sha256:c519f2de51df0728797eb8d5959ac7c2dd802f41f93fc7722bf52415ba677122",
+    "row_count": 7,
+    "upstream_inputs": [],
+    "health": {
+      "status": "healthy",
+      "structural_errors": 0
+    }
+  }
+}

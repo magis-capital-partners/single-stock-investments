@@ -560,8 +560,24 @@ def build_ticker(ticker: str) -> int:
             else:
                 lines.append("- *(no keyword hits; see cached full text in `research/evidence/_text/` if tier=full)*")
 
-    digest_path = evidence_dir / f"filing_digest_{TODAY}.md"
-    digest_path.write_text("\n".join(lines) + "\n", encoding="utf-8")
+    try:
+        import sys
+
+        scripts = Path(__file__).resolve().parent
+        if str(scripts) not in sys.path:
+            sys.path.insert(0, str(scripts))
+        from atomic_io import write_text_if_changed
+
+        digest_text = "\n".join(lines) + "\n"
+        canonical_digest = evidence_dir / "filing_digest.md"
+        changed = write_text_if_changed(canonical_digest, digest_text)
+        dated_digests = sorted(evidence_dir.glob("filing_digest_*.md"))
+        if changed or not dated_digests:
+            digest_path = evidence_dir / f"filing_digest_{TODAY}.md"
+            write_text_if_changed(digest_path, digest_text)
+    except Exception:
+        digest_path = evidence_dir / f"filing_digest_{TODAY}.md"
+        digest_path.write_text("\n".join(lines) + "\n", encoding="utf-8")
 
     try:
         import sys

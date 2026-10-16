@@ -1,0 +1,383 @@
+{
+  "schema_version": "magis.agent_shard.v1",
+  "generated_at": "2026-10-16T16:19:47Z",
+  "as_of": "2026-06-03",
+  "ticker": "BKRB",
+  "company": "Berkshire Hathaway Inc. (Class B)",
+  "book": "holdings",
+  "registry": {
+    "market": "US",
+    "exchange": "NYSE",
+    "sleeve": "holding_conglomerates",
+    "moat": "unproven",
+    "dhando": "pending",
+    "payoff_lens": "pending"
+  },
+  "thesis_summary": {
+    "thesis": "Berkshire Hathaway is a diversified holding company built around insurance float, wholly owned operating subsidiaries, and a large listed-equity portfolio managed from Omaha. **[Fact]** Reportable activities include property/casualty insurance (GEICO, Berkshire Hathaway Reinsurance, Berkshire Hathaway Primary), BNSF railroad, Berkshire Hathaway Energy, and a broad manufacturing/service/retailing group (Precision Castparts, Marmon, Lubrizol, Fruit of the Loom, Berkshire Hathaway Automotive, Pilot, and others) per `investor-documents/sec-edgar/10-K_20260302_rpt20251231_acc0001193125_26_083899.htm` Item 1. **[Fact]** Class B shares trade on the NYSE as **BRK.B**; each B share carries 1/1,500 the economic rights of Class A. **[Fact]** FY2025 after-tax **operating earnings** were **$44.5 billion**; GAAP **net earnings** were **$67.0 billion**, reflecting investment gains separate from operating results (`investor-documents/sec-edgar/8-K_20260302_rpt20260228_acc0001193125_26_085801.htm` Exhibit 99.1). **[Fact]** Insurance float was about **$176 billion** at December 31, 2025.",
+    "why_market_wrong": "The market may anchor on headline GAAP net earnings volatility from mark-to-market equities and miss the steadier **operating earnings** stream Buffett highlights. **[Inference]** At roughly **$475** per B share the stock trades a few percent **below** December 2025 book (~**$520** per B), which can look cheap on book while still offering only mid-single-digit returns on normalized operating power. **[Inference]** Succession, cash pile deployment, and Apple concentration are well debated; the inefficiency here is mild (wide coverage, liquid mega-cap) unless operating earnings re-accelerate or buybacks tighten the share count faster than modeled.",
+    "stance": "watch",
+    "archetype": "holding_co",
+    "base_irr_pct": 6.02,
+    "scenarios": {
+      "base": 6.1,
+      "bear": 2.2,
+      "bull": 8.5
+    },
+    "key_assumptions": [
+      {
+        "input": "Price today",
+        "source": "Stooq BRK-B.US close 2026-06-03 (portfolio folder BKRB; NYSE symbol BRK.B)",
+        "value": "**$475.37**"
+      },
+      {
+        "input": "GAAP book per share",
+        "source": "GAAP book; not fair-value floor",
+        "value": "**$519.98**"
+      },
+      {
+        "input": "Starting free cash flow per share",
+        "source": "normalization",
+        "value": "**$20.62**"
+      },
+      {
+        "input": "Growth in years 1 through 5",
+        "source": "Mid-single-digit growth on $20.62 operating earnings; exit 18x year-10 earnings power",
+        "value": "**5.0%** per year"
+      },
+      {
+        "input": "Growth in years 6 through 7",
+        "source": "Scenario base",
+        "value": "**4.0%** per year"
+      },
+      {
+        "input": "Selling multiple in year 10",
+        "source": "Scenario base",
+        "value": "**18 times cash flow**"
+      },
+      {
+        "input": "Time horizon",
+        "source": "7-year owner-cash model",
+        "value": "**7 years**"
+      }
+    ],
+    "open_questions": [
+      "Confirm use of **BRK.B** price feed for folder symbol **BKRB** in dashboard/registry.",
+      "Succession and Apple stake sizing for overlay refresh if human wants SOTP in base IRR.",
+      "No third-party sources in base return."
+    ]
+  },
+  "kpi_series": [
+    {
+      "metric": "cash",
+      "label": "Cash",
+      "direction": "steady",
+      "signal_tier": "steady",
+      "latest": 31583000000.0,
+      "growth_latest": 0.126,
+      "strength": 5.206,
+      "period": "2017-12-31",
+      "human_summary": "Cash growth is steady around +13% YoY (recent periods)"
+    },
+    {
+      "metric": "cfo",
+      "label": "Operating cash flow",
+      "direction": "steady",
+      "signal_tier": "steady",
+      "latest": 11215000000.0,
+      "growth_latest": 0.112,
+      "strength": 0.858,
+      "period": "2026-06-30",
+      "human_summary": "Cash from operations growth is steady around +11% YoY (recent periods)"
+    },
+    {
+      "metric": "cfo_margin",
+      "label": "Cash conversion (CFO/revenue)",
+      "direction": "steady",
+      "signal_tier": "steady",
+      "latest": 0.11015833726229766,
+      "growth_latest": 0.0105,
+      "strength": 0.542,
+      "period": "2026-06-30",
+      "human_summary": "Cash conversion growth is steady around +1.1% YoY (recent periods)"
+    },
+    {
+      "metric": "eps_basic",
+      "label": "EPS (basic)",
+      "direction": "steady",
+      "signal_tier": "steady",
+      "latest": 3035.0,
+      "growth_latest": 0.1008,
+      "strength": 0.789,
+      "period": "2013-12-31",
+      "human_summary": "EPS growth is steady around +10% YoY (recent periods)"
+    },
+    {
+      "metric": "net_income",
+      "label": "Net income",
+      "direction": "accelerating",
+      "signal_tier": "emerging",
+      "latest": 25667000000.0,
+      "growth_latest": 1.0749,
+      "strength": 1.895,
+      "period": "2026-06-30",
+      "human_summary": "Net income growth sped up: +120% → +107% YoY (one quarter so far — not confirmed)"
+    },
+    {
+      "metric": "operating_income",
+      "label": "Operating income",
+      "direction": "steady",
+      "signal_tier": "steady",
+      "latest": 5885000000.0,
+      "growth_latest": 0.3566,
+      "strength": null,
+      "period": "2013-03-31",
+      "human_summary": "Operating income growth is steady around +36% YoY (recent periods)"
+    },
+    {
+      "metric": "revenues",
+      "label": "Revenue",
+      "direction": "steady",
+      "signal_tier": "steady",
+      "latest": 101808000000.0,
+      "growth_latest": 0.1004,
+      "strength": 0.76,
+      "period": "2026-06-30",
+      "human_summary": "Revenue growth is steady around +10% YoY (recent periods)"
+    },
+    {
+      "metric": "stockholders_equity",
+      "label": "Stockholders' equity",
+      "direction": "steady",
+      "signal_tier": "steady",
+      "latest": 747910000000.0,
+      "growth_latest": 0.1196,
+      "strength": 0.043,
+      "period": "2026-06-30",
+      "human_summary": "Stockholders' equity growth is steady around +12% YoY (recent periods)"
+    },
+    {
+      "metric": "total_assets",
+      "label": "Total assets",
+      "direction": "steady",
+      "signal_tier": "steady",
+      "latest": 1263071000000.0,
+      "growth_latest": 0.0851,
+      "strength": 0.223,
+      "period": "2026-06-30",
+      "human_summary": "Total assets growth is steady around +8.5% YoY (recent periods)"
+    },
+    {
+      "metric": "growth_regime.net_income",
+      "label": "Growth regime upshift",
+      "direction": "upshift",
+      "signal_tier": "confirmed",
+      "latest": 25667000000.0,
+      "growth_latest": 1.0749,
+      "strength": 1.108,
+      "period": "2026-06-30",
+      "human_summary": "Net income growth has stayed above this company's normal ~-52% YoY (latest +107%). Two quarters."
+    },
+    {
+      "metric": "news_flow",
+      "label": "News flow",
+      "direction": "decelerating",
+      "signal_tier": "emerging",
+      "latest": null,
+      "growth_latest": 1.0,
+      "strength": 1.5,
+      "period": "2026-09-01",
+      "human_summary": "News flow growth move looks extreme (+4 to +1 per period). Large percentages usually mean a thin or sign-changing base. Treat cautiously (one quarter so far — not confirmed)."
+    }
+  ],
+  "recent_news": [
+    {
+      "title": "Greg Abel Is Reshaping Berkshire's Portfolio. Here's Who's In and Who's Out.",
+      "published_utc": "2026-10-13T08:30:00+00:00",
+      "category": "management",
+      "confidence": 0.83,
+      "url": "https://www.fool.com/investing/2026/10/13/greg-abel-reshaping-berkshire-hathaway-portfolio/?source=iedfolrf0000001",
+      "linked_filing": null
+    },
+    {
+      "title": "Warren Buffett's Berkshire Compounded at 19.7% a Year for 61 Years, a 6,099,294% Cumulative Gain. Can Investors Still Learn From That Playbook Today?",
+      "published_utc": "2026-10-06T12:15:00+00:00",
+      "category": "management",
+      "confidence": 0.83,
+      "url": "https://www.fool.com/investing/2026/10/06/warren-buffetts-berkshire-compounded-at-197-a-year/?source=iedfolrf0000001",
+      "linked_filing": null
+    },
+    {
+      "title": "Berkshire vs. Occidental: Who Actually Won the $10 Billion Chemicals Deal?",
+      "published_utc": "2026-10-05T12:15:00+00:00",
+      "category": "m_and_a",
+      "confidence": 0.83,
+      "url": "https://www.fool.com/investing/2026/10/05/berkshire-vs-occidental-who-actually-won-the-10-bi/?source=iedfolrf0000001",
+      "linked_filing": null
+    },
+    {
+      "title": "Warren Buffett Just Stepped Down as Berkshire's Chairman After Delivering a 19.7% Annual Return Over 61 Years. Should Shareholders Be Concerned?",
+      "published_utc": "2026-10-01T18:15:00+00:00",
+      "category": "management",
+      "confidence": 0.83,
+      "url": "https://www.fool.com/investing/2026/10/01/warren-buffett-just-stepped-down-as-berkshires-cha/?source=iedfolrf0000001",
+      "linked_filing": null
+    },
+    {
+      "title": "Berkshire After Buffett: Can It Continue to Endure and Compound?",
+      "published_utc": "2026-09-21T17:11:00+00:00",
+      "category": "management",
+      "confidence": 0.83,
+      "url": "https://www.zacks.com/stock/news/2993176/berkshire-after-buffett-can-it-continue-to-endure-and-compound?cid=CS-ZC-FT-analyst_blog|quick_take-2993176",
+      "linked_filing": null
+    },
+    {
+      "title": "Warren Buffett Is No Longer Berkshire's Chairman. Here’s Why I'm Buying the Stock Anyway.",
+      "published_utc": "2026-09-19T17:02:01+00:00",
+      "category": "management",
+      "confidence": 0.83,
+      "url": "https://www.fool.com/investing/2026/09/19/warren-buffett-is-no-longer-berkshire-s-chairman-here-s-why-i-m-buying-the-stock-anyway/?source=iedfolrf0000001",
+      "linked_filing": null
+    },
+    {
+      "title": "Buffett Steps Down as Berkshire Enters a New Era",
+      "published_utc": "2026-09-18T15:14:00+00:00",
+      "category": "management",
+      "confidence": 0.83,
+      "url": "https://www.zacks.com/stock/news/2992136/buffett-steps-down-as-berkshire-enters-a-new-era?cid=CS-ZC-FT-economic_highlights-2992136",
+      "linked_filing": null
+    }
+  ],
+  "documents": [
+    {
+      "document_id": "sha256:08fc4d07873ae6eaebde01e0fbde6aadc9f5b991d84c4fa38ecb38348703c22a",
+      "title": "vic pdf 2026 06 18 bkrb vic pdf 471d2ac04e",
+      "source_type": "vic_research",
+      "local_pdf_path": "BKRB/third-party-analyses/vic/vic_pdf_2026-06-18_bkrb-vic-pdf_471d2ac04e.pdf",
+      "text_extract_path": "BKRB/third-party-analyses/vic/vic_pdf_2026-06-18_bkrb-vic-pdf_471d2ac04e.md",
+      "drive_web_view_link": "https://drive.google.com/file/d/1lbU7Mg0Y85ZVHx9DZScghbFJxjW7vypx/view?usp=drivesdk",
+      "modified_at": "2026-10-16T14:36:00Z"
+    },
+    {
+      "document_id": "sha256:2a9e0a7f7832ec46c0c56637db35c7c80c3e2418aa37570c4b7657a826953baa",
+      "title": "Semper Augustus 2018 addicted to loans second great pivot at berkshire",
+      "source_type": "company_document",
+      "local_pdf_path": "BKRB/investor-documents/research-notes/Semper_Augustus_2018_addicted-to-loans-second-great-pivot-at-berkshire.pdf",
+      "text_extract_path": null,
+      "drive_web_view_link": "https://drive.google.com/file/d/1tkoSKek4l_ydYe_OPswlxtkQXjv-aCpd/view?usp=drivesdk",
+      "modified_at": "2026-10-16T14:36:00Z"
+    },
+    {
+      "document_id": "sha256:31060a2805d3c3c7418a9428d0f726a0c2ded08f37886719e2ffaec02851b780",
+      "title": "Semper Augustus 2022 crazy train berkshire getting better all the time",
+      "source_type": "company_document",
+      "local_pdf_path": "BKRB/investor-documents/research-notes/Semper_Augustus_2022_crazy-train-berkshire-getting-better-all-the-time.pdf",
+      "text_extract_path": null,
+      "drive_web_view_link": "https://drive.google.com/file/d/1rdXIaaM4N7ZuvR37BvJUxMZ9VDiMxdBY/view?usp=drivesdk",
+      "modified_at": "2026-10-16T14:36:00Z"
+    },
+    {
+      "document_id": "sha256:32e4befedd0d215cae6007c5815113268bd8f8a5aaa7327448e5981fc6716236",
+      "title": "Semper Augustus 2021 brown sugar berkshire charlie is my darling",
+      "source_type": "company_document",
+      "local_pdf_path": "BKRB/investor-documents/research-notes/Semper_Augustus_2021_brown-sugar-berkshire-charlie-is-my-darling.pdf",
+      "text_extract_path": null,
+      "drive_web_view_link": "https://drive.google.com/file/d/1qnA6k8KusO1pgwYS3mPHZHA_M8KxVEw1/view?usp=drivesdk",
+      "modified_at": "2026-10-16T14:36:00Z"
+    },
+    {
+      "document_id": "sha256:50fb00f1ef9b649d2c4b91ff5058dae494fafb4f0fa45e75fbd554ff1de0eada",
+      "title": "Semper Augustus 2019 money for nothing berkshire fumblerooskie",
+      "source_type": "company_document",
+      "local_pdf_path": "BKRB/investor-documents/research-notes/Semper_Augustus_2019_money-for-nothing-berkshire-fumblerooskie.pdf",
+      "text_extract_path": null,
+      "drive_web_view_link": "https://drive.google.com/file/d/1nyMlu51bIHpw9XoTxgXXdujGl0NJEXlr/view?usp=drivesdk",
+      "modified_at": "2026-10-16T14:36:00Z"
+    },
+    {
+      "document_id": "sha256:625e98674167411926b56a4e775bc1ba68b0c3653f886bb0745f380631baf51a",
+      "title": "Semper Augustus 2023 dirty deeds done dirt cheap berkshire flag half staff",
+      "source_type": "company_document",
+      "local_pdf_path": "BKRB/investor-documents/research-notes/Semper_Augustus_2023_dirty-deeds-done-dirt-cheap-berkshire-flag-half-staff.pdf",
+      "text_extract_path": null,
+      "drive_web_view_link": "https://drive.google.com/file/d/1-6eL15cYPuo_HCCBPobZHYWQQCQCo71r/view?usp=drivesdk",
+      "modified_at": "2026-10-16T14:36:00Z"
+    },
+    {
+      "document_id": "sha256:ac4eafaec32eff3fff7c9a1ba8a7c40d3a417b1d5f6332bef258f84b32388ed1",
+      "title": "Semper Augustus 2020 point of no return berkshire goat goes full repo",
+      "source_type": "company_document",
+      "local_pdf_path": "BKRB/investor-documents/research-notes/Semper_Augustus_2020_point-of-no-return-berkshire-goat-goes-full-repo.pdf",
+      "text_extract_path": null,
+      "drive_web_view_link": "https://drive.google.com/file/d/1-dBHeW6Uzdl5bZfqRCXCJoyuxffcBip7/view?usp=drivesdk",
+      "modified_at": "2026-10-16T14:36:00Z"
+    },
+    {
+      "document_id": "sha256:ae0dc69a97b7e3af8ad86d42c4b6b807eabe2e412b434cb30572658928ed1925",
+      "title": "Semper Augustus 2024 wont get fooled again berkshire getting in tune",
+      "source_type": "company_document",
+      "local_pdf_path": "BKRB/investor-documents/research-notes/Semper_Augustus_2024_wont-get-fooled-again-berkshire-getting-in-tune.pdf",
+      "text_extract_path": null,
+      "drive_web_view_link": "https://drive.google.com/file/d/1frblR5Hieas3x3J7VO44FnQxka8-CGmN/view?usp=drivesdk",
+      "modified_at": "2026-10-16T14:36:00Z"
+    },
+    {
+      "document_id": "sha256:e662ef800795609126a252fe2a4aafa92d2513c387d250fbec4db2a06f044779",
+      "title": "Semper Augustus 2025 both sides now berkshire going out on top",
+      "source_type": "company_document",
+      "local_pdf_path": "BKRB/investor-documents/research-notes/Semper_Augustus_2025_both-sides-now-berkshire-going-out-on-top.pdf",
+      "text_extract_path": null,
+      "drive_web_view_link": "https://drive.google.com/file/d/1wOb4chsTy1aKKOlDTarCT3VETmYIXxG8/view?usp=drivesdk",
+      "modified_at": "2026-10-16T14:36:00Z"
+    },
+    {
+      "document_id": "sha256:097541f8549c1578a59ff3ec562122a7b6d99df58248c05974a7ec281b161a8c",
+      "title": "Semper Augustus 2017 double double berkshire charmed by tax deed",
+      "source_type": "company_document",
+      "local_pdf_path": "BKRB/investor-documents/research-notes/Semper_Augustus_2017_double-double-berkshire-charmed-by-tax-deed.pdf",
+      "text_extract_path": null,
+      "drive_web_view_link": "https://drive.google.com/file/d/12z_16qNrwxieILgisKhZVPZMmkkKKuHi/view?usp=drivesdk",
+      "modified_at": "2026-10-16T14:35:59Z"
+    },
+    {
+      "document_id": "sha256:6f4568055adec070577de91daba04db8adbe1caeb029d487a279797d4fb56327",
+      "title": "Semper Augustus 2016 sympathy for the dog brief berkshire redux",
+      "source_type": "company_document",
+      "local_pdf_path": "BKRB/investor-documents/research-notes/Semper_Augustus_2016_sympathy-for-the-dog-brief-berkshire-redux.pdf",
+      "text_extract_path": null,
+      "drive_web_view_link": "https://drive.google.com/file/d/1504LxeSJDnU2wSZ58WkErOsIuoFAUYV8/view?usp=drivesdk",
+      "modified_at": "2026-10-16T14:35:59Z"
+    },
+    {
+      "document_id": "sha256:f2ff29b8f6074d9c5c1fe894e52b5392481b6b3cb85c814f00a4b4eaf8669041",
+      "title": "Semper Augustus 2015 party like 1999 deep dive into berkshire hathaway",
+      "source_type": "company_document",
+      "local_pdf_path": "BKRB/investor-documents/research-notes/Semper_Augustus_2015_party-like-1999-deep-dive-into-berkshire-hathaway.pdf",
+      "text_extract_path": null,
+      "drive_web_view_link": "https://drive.google.com/file/d/14Xz_0xfWkqd-Wh60KpYv6fKSWgzbTbXq/view?usp=drivesdk",
+      "modified_at": "2026-10-16T14:35:59Z"
+    }
+  ],
+  "l2_pointers": {
+    "valuation_json": "BKRB/research/valuation.json",
+    "thesis_card_json": "BKRB/research/thesis_card.json",
+    "filing_digest_md": "BKRB/research/evidence/filing_digest_2026-08-06.md",
+    "insider_signal_md": null,
+    "thematic_context_md": null,
+    "source_inventory_json": null,
+    "full_ui_shard_json": "dashboard/data/tickers/BKRB.json"
+  },
+  "_envelope": {
+    "schema_version": "magis.feed.v2",
+    "feed_id": "agent-shard-bkrb",
+    "generated_at": "2026-10-16T16:19:47Z",
+    "as_of": "2026-06-03",
+    "content_sha256": "sha256:78007024d6b343ecfd08f6697dd62a03a82607cedec0067ae25894372b40bf7a",
+    "row_count": 18,
+    "upstream_inputs": [],
+    "health": {
+      "status": "healthy",
+      "structural_errors": 0
+    }
+  }
+}

@@ -362,6 +362,12 @@ def main() -> int:
         optional=True,
     )
     ok &= run_script(
+        "progressive L0/L1 shards",
+        "build_progressive_shards.py",
+        [ticker],
+        optional=True,
+    )
+    ok &= run_script(
         "persona lenses",
         "persona_lens.py",
         [ticker],

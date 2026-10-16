@@ -23,6 +23,9 @@ from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[2]
 SCRIPTS = Path(__file__).resolve().parent
+sys.path.insert(0, str(SCRIPTS))
+from atomic_io import write_json_if_changed, write_text_if_changed  # noqa: E402
+
 THEMES_MANIFEST = ROOT / "_system" / "reference" / "market-data" / "themes" / "manifest.json"
 HOLDINGS_THEMES = ROOT / "_system" / "portfolio" / "holdings_themes.json"
 PEERS_MANIFEST = ROOT / "_system" / "reference" / "market-data" / "peers" / "manifest.json"
@@ -130,7 +133,7 @@ def arrow(direction: str | None) -> str:
 def write_snippet(ticker: str, overlay: dict) -> Path:
     research = ROOT / ticker / "research" / "evidence"
     research.mkdir(parents=True, exist_ok=True)
-    path = research / f"thematic_context_{TODAY}.md"
+    path = research / "thematic_context.md"
     lines = [
         f"# {ticker} - Thematic context ({overlay['as_of']})",
         "",
@@ -149,7 +152,7 @@ def write_snippet(ticker: str, overlay: dict) -> Path:
                 f"| {ind['label']} | {latest}{stale} | {ind.get('as_of') or 'n/a'} | {yoy} | {arrow(ind.get('direction'))} | {base} |"
             )
     lines += ["", f"Source panels: `_system/reference/market-data/themes/manifest.json`.", ""]
-    path.write_text("\n".join(lines), encoding="utf-8")
+    write_text_if_changed(path, "\n".join(lines))
     return path
 
 
@@ -163,7 +166,7 @@ def apply_ticker(ticker: str, theme_ids: list[str], manifest: dict) -> str:
     if overlay is None:
         return f"skip {ticker} (no theme data in manifest)"
     val["context_overlay"] = overlay
-    vp.write_text(json.dumps(val, indent=2) + "\n", encoding="utf-8")
+    write_json_if_changed(vp, val)
     snippet = write_snippet(ticker, overlay)
     n = sum(len(t["indicators"]) for t in overlay["themes"])
     return f"OK {ticker}: {n} indicator(s) across {len(overlay['themes'])} theme(s) -> {snippet.relative_to(ROOT)}"

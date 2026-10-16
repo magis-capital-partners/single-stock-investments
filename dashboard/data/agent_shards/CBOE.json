@@ -1,0 +1,364 @@
+{
+  "schema_version": "magis.agent_shard.v1",
+  "generated_at": "2026-10-16T16:19:47Z",
+  "as_of": "2026-06-03",
+  "ticker": "CBOE",
+  "company": "Cboe Global Markets",
+  "book": "holdings",
+  "registry": {
+    "market": "US",
+    "exchange": "CBOE",
+    "sleeve": "exchanges_markets",
+    "moat": "unproven",
+    "dhando": "pending",
+    "payoff_lens": "pending"
+  },
+  "thesis_summary": {
+    "thesis": "Cboe Global Markets operates exchange, clearing, and market-data infrastructure across options, equities, futures, and foreign exchange. **[Fact]** Customers pay transaction, clearing, listing, and subscription fees; the company does not take principal market risk. **[Fact]** FY2025 total revenues were **$4,714.2 million** (+15% versus **$4,094.5 million** in FY2024); operating income **$1,467.1 million**; net income **$1,100.0 million** (`investor-documents/sec-edgar/10-K_20260220_rpt20251231_acc0001628280_26_010013.htm`). **[Fact]** Q1 2026 net revenues were **$1,272.8 million** (+6% versus **$1,195.0 million** in Q1 2025); net income **$385.7 million** (`investor-documents/sec-edgar/10-Q_20260501_rpt20260331_acc0001628280_26_029112.htm`). The franchise is anchored in proprietary index options (SPX, VIX) and a multi-venue U.S. equities stack (BZX, BYX, EDGA, EDGX) plus European and Asia-Pacific derivatives.",
+    "why_market_wrong": "There is no dated payoff or structural discount. **[Inference]** FY2025 and Q1 2026 benefited from elevated volatility and index trading; the stock at **~$285** embeds a premium multiple on strong recent cash flow. **[Inference]** Our base return uses FY2025 free cash flow per share (**$16.00**), not a peak run rate from Q1 2026 alone. Return is franchise earnings power at price, not a mispricing with a known catalyst date.",
+    "stance": "watch",
+    "archetype": "croupier",
+    "base_irr_pct": 13.42,
+    "scenarios": {
+      "base": 13.2,
+      "bear": 7.2,
+      "bull": 16.3
+    },
+    "key_assumptions": [
+      {
+        "input": "Price today",
+        "source": "Stooq CBOE.US close 2026-06-03",
+        "value": "**$285.23**"
+      },
+      {
+        "input": "Starting free cash flow per share",
+        "source": "FY2025 OCF $1,752.6M minus capex $71.0M divided by ~105.1M diluted shares",
+        "value": "**$16.0**"
+      },
+      {
+        "input": "Cycle adjustment (starting cash)",
+        "source": "FY2025 mid-cycle base; Q1 2026 net revenues $1,272.8M (+6% YoY) above trend but not inflated into starting cash flow",
+        "value": "**mid**"
+      },
+      {
+        "input": "Growth in years 1 through 5",
+        "source": "Mid-cycle FCF growth; Data Vantage mix shift; exit ~20x cash flow",
+        "value": "**6.0%** per year"
+      },
+      {
+        "input": "Growth in years 6 through 7",
+        "source": "Scenario base",
+        "value": "**5.0%** per year"
+      },
+      {
+        "input": "Selling multiple in year 10",
+        "source": "Scenario base",
+        "value": "**20 times cash flow**"
+      },
+      {
+        "input": "Time horizon",
+        "source": "7-year owner-cash model",
+        "value": "**7 years**"
+      }
+    ],
+    "open_questions": [
+      "First Marvin deep dive; batch onboard 2026-06-03.",
+      "No third-party sources indexed; stance rests on filings only.",
+      "Entry band **$250–255** for ~15% base annual return is model-derived, not human-approved."
+    ]
+  },
+  "kpi_series": [
+    {
+      "metric": "cash",
+      "label": "Cash",
+      "direction": "steady",
+      "signal_tier": "steady",
+      "latest": 2276200000.0,
+      "growth_latest": 0.8118,
+      "strength": null,
+      "period": "2026-06-30",
+      "human_summary": "Cash growth is steady around +81% YoY (recent periods)"
+    },
+    {
+      "metric": "cfo",
+      "label": "Operating cash flow",
+      "direction": "steady",
+      "signal_tier": "steady",
+      "latest": -503200000.0,
+      "growth_latest": -2.5079,
+      "strength": 0.159,
+      "period": "2026-06-30",
+      "human_summary": "Cash from operations flipped from profit to loss, so the YoY path (+115% → -251% YoY) is hard to read. Treat as noisy (recent periods)."
+    },
+    {
+      "metric": "cfo_margin",
+      "label": "Cash conversion (CFO/revenue)",
+      "direction": "steady",
+      "signal_tier": "steady",
+      "latest": -0.3487662877737732,
+      "growth_latest": -2.2265,
+      "strength": 0.291,
+      "period": "2026-06-30",
+      "human_summary": "Cash conversion flipped from profit to loss, so the YoY path (+102% → -223% YoY) is hard to read. Treat as noisy (recent periods)."
+    },
+    {
+      "metric": "eps_basic",
+      "label": "EPS (basic)",
+      "direction": "steady",
+      "signal_tier": "steady",
+      "latest": 3.36,
+      "growth_latest": 0.5067,
+      "strength": 0.162,
+      "period": "2026-06-30",
+      "human_summary": "EPS growth is steady around +51% YoY (recent periods)"
+    },
+    {
+      "metric": "long_term_debt",
+      "label": "Long-term debt",
+      "direction": "decelerating",
+      "signal_tier": "confirmed",
+      "latest": 794200000.0,
+      "growth_latest": -0.4492,
+      "strength": 15.017,
+      "period": "2026-06-30",
+      "human_summary": "Long-term debt growth slowed: -45% → -45% YoY (two quarters) Trailing-twelve-month growth agrees."
+    },
+    {
+      "metric": "net_income",
+      "label": "Net income",
+      "direction": "steady",
+      "signal_tier": "steady",
+      "latest": 353100000.0,
+      "growth_latest": 0.5019,
+      "strength": null,
+      "period": "2026-06-30",
+      "human_summary": "Net income growth is steady around +50% YoY (recent periods)"
+    },
+    {
+      "metric": "op_margin",
+      "label": "Operating margin",
+      "direction": "steady",
+      "signal_tier": "steady",
+      "latest": 0.3299140560022179,
+      "growth_latest": 0.1417,
+      "strength": null,
+      "period": "2026-06-30",
+      "human_summary": "Operating margin growth is steady around +14% YoY (recent periods)"
+    },
+    {
+      "metric": "operating_income",
+      "label": "Operating income",
+      "direction": "accelerating",
+      "signal_tier": "emerging",
+      "latest": 476000000.0,
+      "growth_latest": 0.4037,
+      "strength": 1.02,
+      "period": "2026-06-30",
+      "human_summary": "Operating income growth sped up: +43% → +40% YoY (one quarter so far — not confirmed)"
+    },
+    {
+      "metric": "revenues",
+      "label": "Revenue",
+      "direction": "steady",
+      "signal_tier": "steady",
+      "latest": 1442800000.0,
+      "growth_latest": 0.2295,
+      "strength": 0.123,
+      "period": "2026-06-30",
+      "human_summary": "Revenue growth is steady around +23% YoY (recent periods)"
+    },
+    {
+      "metric": "stockholders_equity",
+      "label": "Stockholders' equity",
+      "direction": "steady",
+      "signal_tier": "steady",
+      "latest": 5625800000.0,
+      "growth_latest": 0.2059,
+      "strength": 0.177,
+      "period": "2026-06-30",
+      "human_summary": "Stockholders' equity growth is steady around +21% YoY (recent periods)"
+    },
+    {
+      "metric": "total_assets",
+      "label": "Total assets",
+      "direction": "steady",
+      "signal_tier": "steady",
+      "latest": 10609300000.0,
+      "growth_latest": 0.1725,
+      "strength": null,
+      "period": "2026-06-30",
+      "human_summary": "Total assets growth is steady around +17% YoY (recent periods)"
+    },
+    {
+      "metric": "growth_regime.cfo",
+      "label": "Growth regime softening",
+      "direction": "downshift",
+      "signal_tier": "emerging",
+      "latest": -503200000.0,
+      "growth_latest": -2.5079,
+      "strength": 1.295,
+      "period": "2026-06-30",
+      "human_summary": "Cash from operations flipped from profit to loss. Versus this company's normal ~-13% YoY, the latest print (-251%) looks extreme because the base flipped sign. Treat as noisy (one quarter so far — not confirmed)."
+    }
+  ],
+  "recent_news": [],
+  "documents": [
+    {
+      "document_id": "sha256:026b242581c202fa51cf5d418a9a9d9b011583cc7cc75f52e1290d468d6eb4c1",
+      "title": "4q21 cboe ER",
+      "source_type": "company_document",
+      "local_pdf_path": "CBOE/investor-documents/ir-cboe/4q21-cboe-ER.pdf",
+      "text_extract_path": null,
+      "drive_web_view_link": "https://drive.google.com/file/d/1afiTOUEs-fMG3LousH2pRv0851CleMIK/view?usp=drivesdk",
+      "modified_at": "2026-10-16T14:36:14Z"
+    },
+    {
+      "document_id": "sha256:08e9a35342765801b643c72ef4095f15f5ec58cae8ee98082c9e0bd0bf0f0a55",
+      "title": "3q22 cboe ea",
+      "source_type": "company_document",
+      "local_pdf_path": "CBOE/investor-documents/ir-cboe/3q22-cboe-ea.pdf",
+      "text_extract_path": null,
+      "drive_web_view_link": "https://drive.google.com/file/d/1vK4Wz4iJo3tpji6O8Psr7o69jwVErXES/view?usp=drivesdk",
+      "modified_at": "2026-10-16T14:36:14Z"
+    },
+    {
+      "document_id": "sha256:0a02b3209b592f907ffb70c75d75b337553a0d5879d6c9a45bfee5e7afe516cf",
+      "title": "3q22 earnings prese",
+      "source_type": "company_document",
+      "local_pdf_path": "CBOE/investor-documents/ir-cboe/3q22-earnings-prese.pdf",
+      "text_extract_path": null,
+      "drive_web_view_link": "https://drive.google.com/file/d/1nbmLFTcvwETQyKhMZLGSoppitmXsNnRN/view?usp=drivesdk",
+      "modified_at": "2026-10-16T14:36:14Z"
+    },
+    {
+      "document_id": "sha256:0ae5176fbbda9a19d12f7c4d31052a591cb62e515b9018a08551ac6610081f5e",
+      "title": "q3 2019 news",
+      "source_type": "company_document",
+      "local_pdf_path": "CBOE/investor-documents/ir-cboe/q3-2019-news.pdf",
+      "text_extract_path": null,
+      "drive_web_view_link": "https://drive.google.com/file/d/1xzf9WVNI700xBGkUWyljpFqiKT8pATQM/view?usp=drivesdk",
+      "modified_at": "2026-10-16T14:36:14Z"
+    },
+    {
+      "document_id": "sha256:0eaac88be4ca0028c6f8d532b8e3b092a6c7138ecdd98ce1ec3adb1d00b8ddb5",
+      "title": "cboe holdings prepared remarks 2q14 final 6",
+      "source_type": "company_document",
+      "local_pdf_path": "CBOE/investor-documents/ir-cboe/cboe-holdings-prepared-remarks-2q14-final-6.pdf",
+      "text_extract_path": null,
+      "drive_web_view_link": "https://drive.google.com/file/d/1IZ5awdaRts6E6yjSGvGYpdsu3B3t_XPl/view?usp=drivesdk",
+      "modified_at": "2026-10-16T14:36:14Z"
+    },
+    {
+      "document_id": "sha256:0fb78eb47d9c0b853817b2ee4c403f90e444a19c30708610ee98376e880de926",
+      "title": "q1 22 prese",
+      "source_type": "company_document",
+      "local_pdf_path": "CBOE/investor-documents/ir-cboe/q1-22-prese.pdf",
+      "text_extract_path": null,
+      "drive_web_view_link": "https://drive.google.com/file/d/1ZG2CeP5N9fGVISO_4irepRpZPHmQ-l76/view?usp=drivesdk",
+      "modified_at": "2026-10-16T14:36:14Z"
+    },
+    {
+      "document_id": "sha256:111b1f97cb84bc047787d943ed6b776e3bff99e52678633d446b2162fac48ada",
+      "title": "q3 21 prese",
+      "source_type": "company_document",
+      "local_pdf_path": "CBOE/investor-documents/ir-cboe/q3-21-prese.pdf",
+      "text_extract_path": null,
+      "drive_web_view_link": "https://drive.google.com/file/d/10379pmRsPNtC0B1IAsnfmzIah5UoQ_oh/view?usp=drivesdk",
+      "modified_at": "2026-10-16T14:36:14Z"
+    },
+    {
+      "document_id": "sha256:15789cbd98b7f78c8849e47430031226bef0c580ae406e9329715ddfe30450cd",
+      "title": "3Q25 Cboe Earnings Slides Final",
+      "source_type": "company_document",
+      "local_pdf_path": "CBOE/investor-documents/ir-cboe/3Q25-Cboe-Earnings-Slides-Final.pdf",
+      "text_extract_path": null,
+      "drive_web_view_link": "https://drive.google.com/file/d/1RLLy16BBpgdqB_kaJaefOFT1bUNtkpgh/view?usp=drivesdk",
+      "modified_at": "2026-10-16T14:36:14Z"
+    },
+    {
+      "document_id": "sha256:1632405c0ff5437aaec70fe94426b3e4bdb25c934a4ccee8cc4c21fec45afa89",
+      "title": "q3 2018 earnings release",
+      "source_type": "company_document",
+      "local_pdf_path": "CBOE/investor-documents/ir-cboe/q3-2018-earnings-release.pdf",
+      "text_extract_path": null,
+      "drive_web_view_link": "https://drive.google.com/file/d/1LQi-2Cqlu_jFrFT7zFtptppYoKIxCxWc/view?usp=drivesdk",
+      "modified_at": "2026-10-16T14:36:14Z"
+    },
+    {
+      "document_id": "sha256:1695d10b0b531228a2ded8ba45b0f19b17973ec0b0791e7d44b24786e3641cda",
+      "title": "cboe holdings prepared remarks q4 15 earnings call 5",
+      "source_type": "company_document",
+      "local_pdf_path": "CBOE/investor-documents/ir-cboe/cboe-holdings-prepared-remarks-q4-15-earnings-call-5.pdf",
+      "text_extract_path": null,
+      "drive_web_view_link": "https://drive.google.com/file/d/1qSQq_lvd19ImRpKvV58VWgLtTrNI5W1q/view?usp=drivesdk",
+      "modified_at": "2026-10-16T14:36:14Z"
+    },
+    {
+      "document_id": "sha256:1b48a735b8ebc1a18fb3b86c401ea5afa6f27a10623c2f3b3b8d4b8606ece3c1",
+      "title": "q1 22 press re",
+      "source_type": "company_document",
+      "local_pdf_path": "CBOE/investor-documents/ir-cboe/q1-22-press-re.pdf",
+      "text_extract_path": null,
+      "drive_web_view_link": "https://drive.google.com/file/d/1-ft0fOsiPk1TJ6VMM6yeqEYmnrLiBLdM/view?usp=drivesdk",
+      "modified_at": "2026-10-16T14:36:14Z"
+    },
+    {
+      "document_id": "sha256:1f65229088e9add93535a08ab3929ec784b9945a850c9dbb474b6fd5235d836b",
+      "title": "3q22 earnings call",
+      "source_type": "company_document",
+      "local_pdf_path": "CBOE/investor-documents/ir-cboe/3q22-earnings-call.pdf",
+      "text_extract_path": null,
+      "drive_web_view_link": "https://drive.google.com/file/d/1OQb7UQ2yJdk2XrzBTCp_vroIbdqm7YXq/view?usp=drivesdk",
+      "modified_at": "2026-10-16T14:36:14Z"
+    },
+    {
+      "document_id": "sha256:1f88ea64b0f512c8337faa58736fa2219f8fe7589c949c60a727a0d2739c4473",
+      "title": "q2 17 prepared re",
+      "source_type": "company_document",
+      "local_pdf_path": "CBOE/investor-documents/ir-cboe/q2-17-prepared-re.pdf",
+      "text_extract_path": null,
+      "drive_web_view_link": "https://drive.google.com/file/d/19BI_ToOk1toDi8JJdMU1Yj-F8Arz8rxj/view?usp=drivesdk",
+      "modified_at": "2026-10-16T14:36:14Z"
+    },
+    {
+      "document_id": "sha256:1fd8abc777dd7dcac807f32513fa6d36e4a4a19323ad7b843fd8c090050a5af9",
+      "title": "CBOE   163570",
+      "source_type": "vic_research",
+      "local_pdf_path": "CBOE/third-party-analyses/vic/CBOE - 163570.pdf",
+      "text_extract_path": null,
+      "drive_web_view_link": "https://drive.google.com/file/d/1qbaFkCQ8-yPOE0FB1OBQ27kYOweEoVrl/view?usp=drivesdk",
+      "modified_at": "2026-10-16T14:36:14Z"
+    },
+    {
+      "document_id": "sha256:20e9007debad1d89ce0dd49ebd6670a8f11ac4a1d234e5899db7bce71322f01f",
+      "title": "3q 19 presentation",
+      "source_type": "company_document",
+      "local_pdf_path": "CBOE/investor-documents/ir-cboe/3q-19-presentation.pdf",
+      "text_extract_path": null,
+      "drive_web_view_link": "https://drive.google.com/file/d/17YA5TE545Yx1SbRdTtKLmoVVhAH1lSjj/view?usp=drivesdk",
+      "modified_at": "2026-10-16T14:36:14Z"
+    }
+  ],
+  "l2_pointers": {
+    "valuation_json": "CBOE/research/valuation.json",
+    "thesis_card_json": "CBOE/research/thesis_card.json",
+    "filing_digest_md": "CBOE/research/evidence/filing_digest_2026-08-06.md",
+    "insider_signal_md": null,
+    "thematic_context_md": null,
+    "source_inventory_json": null,
+    "full_ui_shard_json": "dashboard/data/tickers/CBOE.json"
+  },
+  "_envelope": {
+    "schema_version": "magis.feed.v2",
+    "feed_id": "agent-shard-cboe",
+    "generated_at": "2026-10-16T16:19:47Z",
+    "as_of": "2026-06-03",
+    "content_sha256": "sha256:9afa1e463b8c44ea318f6e8568e2fa7b98122f9859c8de20cd63b3f2218cc25e",
+    "row_count": 12,
+    "upstream_inputs": [],
+    "health": {
+      "status": "healthy",
+      "structural_errors": 0
+    }
+  }
+}

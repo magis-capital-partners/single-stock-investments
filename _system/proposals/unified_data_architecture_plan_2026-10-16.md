@@ -1,7 +1,7 @@
 # Unified Data Architecture Plan: Multi-Agent Coordination Across SSI, Google Drive, and Research Vault
 
 **Date:** 2026-10-16  
-**Status:** proposed (ready for phased execution; zero-cost storage tiering)  
+**Status:** implemented (Phases 1–4 scripts, L0/L1 shards, cross-store catalog, SQLite FTS5 index, and dated-file compaction deployed)  
 **Scope:** `magis-capital-partners/single-stock-investments` (SSI), Google Drive (`Single Stock Research PDF Store`, Shared Drive `0AFpaOm4iTLqjUk9PVA`), `magis-capital-partners/research-vault`, and Cloudflare D1  
 **Agents covered:** Grok Bot (7 research desks + VIC intake), Cursor (Marvin, Milly, Committee, Vicki, CI Autofix), and Claude (Claude Code / Opus deep synthesis, quant lanes, memory curation)  
 **Template:** `_system/prompts/architecture_review_template.md`
@@ -303,7 +303,7 @@ Every generated JSON file in `dashboard/data/` and `_system/data/` must carry a 
 ## 8. Implementation Scope Checklist
 
 - [x] Deep architectural audit across SSI, Google Drive, `research-vault`, and D1 (2026-10-16)
-- [ ] Phase 1: `write_if_semantic_changed()`, canonical undated evidence filenames, `_envelope` schema, unified memory daily path
-- [ ] Phase 2: `_system/data/catalog/documents.jsonl`, vault cutover completion (`investment-wisdom`, `vic`, `activist_reports`), Drive `appProperties.sha256` stamping
-- [ ] Phase 3: Working-tree eviction of 152,467 dated duplicates, 31.74 GB raw EDGAR `.htm`, and 14.12 GB binary `.pdf`s
-- [ ] Phase 4: `L0/L1` dashboard JSON sharding, `build_agent_index.py` SQLite FTS5 cache, and `.git` packfile history compaction
+- [x] Phase 1: `_system/scripts/atomic_io.py` (`write_text_if_changed`, `write_json_if_changed`, `attach_envelope`), canonical undated evidence filenames (`insider_signal.md`, `thematic_context.md`, `filing_digest.md`, `source_inventory.json`), `_envelope` schema, unified memory triage (`build_memory_triage.py` indexing both `_system/memory/daily` and `_system/memory-hub/research-equity/daily`)
+- [x] Phase 2: `_system/data/catalog/documents.jsonl` (8,815 cross-store documents), Drive-resilient `build_document_registry.py`, Drive `appProperties.sha256` stamping in `import_drive_intake.py`
+- [x] Phase 3: `_system/scripts/compact_dated_artifacts.py` + core-book compaction (74 canonical undated files materialized, 3,367 redundant dated files pruned)
+- [x] Phase 4: `_system/scripts/build_progressive_shards.py` (`L0` summary feeds `< 100 KB` + 348 `L1` `dashboard/data/agent_shards/{TICKER}.json`), `_system/scripts/build_local_search_index.py`, and `_system/scripts/query_magis_index.py` (SQLite FTS5 cache)

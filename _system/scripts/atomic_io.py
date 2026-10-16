@@ -1,0 +1,165 @@
+#!/usr/bin/env python3
+"""Content-hash gated atomic file I/O and standardized feed envelope helpers.
+
+Prevents no-op git churn when daily scheduled pipelines regenerate JSON or
+Markdown artifacts whose semantic content has not changed since the previous
+build, and attaches the standardized ``_envelope`` metadata block to dashboard
+and system feeds.
+"""
+from __future__ import annotations
+
+import hashlib
+import json
+import re
+import tempfile
+from datetime import datetime, timezone
+from pathlib import Path
+from typing import Any
+
+DEFAULT_VOLATILE_JSON_KEYS: frozenset[str] = frozenset(
+    {
+        "generated_at",
+        "build_time",
+        "generated",
+        "built_at",
+        "scan_date",
+        "checked_at",
+        "imported_at",
+        "_envelope",
+    }
+)
+
+_VOLATILE_MD_PATTERNS: tuple[tuple[re.Pattern[str], str], ...] = (
+    (re.compile(r"^(\*\*(?:Generated|Date|Scan date|Updated):\*\*)\s*\S+.*$", re.MULTILINE), r"\1 <DATE>"),
+    (re.compile(r"^(#\s+[^\n]+?\()\d{4}-\d{2}-\d{2}(\)\s*)$", re.MULTILINE), r"\1<DATE>\2"),
+    (re.compile(r"^(#\s+[^\n]+?(?:—|--|-)\s*)\d{4}-\d{2}-\d{2}(\s*)$", re.MULTILINE), r"\1<DATE>\2"),
+    (
+        re.compile(
+            r"(cross_check_third_party_|filing_digest_|insider_signal_|thematic_context_|source_inventory_)\d{4}-\d{2}-\d{2}"
+        ),
+        r"\1<DATE>",
+    ),
+)
+
+
+def now_iso() -> str:
+    return datetime.now(timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ")
+
+
+def normalize_semantic_text(text: str) -> str:
+    norm = text.replace("\r\n", "\n").strip()
+    for pattern, repl in _VOLATILE_MD_PATTERNS:
+        norm = pattern.sub(repl, norm)
+    return norm
+
+
+def semantic_text_sha256(text: str) -> str:
+    normalized = normalize_semantic_text(text)
+    return hashlib.sha256(normalized.encode("utf-8")).hexdigest()
+
+
+def _strip_volatile_json(value: Any, ignore_keys: frozenset[str]) -> Any:
+    if isinstance(value, dict):
+        return {
+            str(k): _strip_volatile_json(v, ignore_keys)
+            for k, v in sorted(value.items(), key=lambda item: str(item[0]))
+            if str(k) not in ignore_keys
+        }
+    if isinstance(value, list):
+        return [_strip_volatile_json(item, ignore_keys) for item in value]
+    return value
+
+
+def semantic_json_sha256(payload: Any, ignore_keys: set[str] | frozenset[str] | None = None) -> str:
+    keys = DEFAULT_VOLATILE_JSON_KEYS if ignore_keys is None else frozenset(ignore_keys)
+    cleaned = _strip_volatile_json(payload, keys)
+    canonical = json.dumps(cleaned, sort_keys=True, separators=(",", ":"), ensure_ascii=False)
+    return hashlib.sha256(canonical.encode("utf-8")).hexdigest()
+
+
+def _atomic_write_text(path: Path, text: str) -> None:
+    path.parent.mkdir(parents=True, exist_ok=True)
+    with tempfile.NamedTemporaryFile(
+        "w",
+        encoding="utf-8",
+        dir=str(path.parent),
+        delete=False,
+        newline="\n",
+    ) as handle:
+        handle.write(text)
+        tmp = Path(handle.name)
+    tmp.replace(path)
+
+
+def write_text_if_changed(path: Path, content: str) -> bool:
+    """Write ``content`` to ``path`` only if its semantic hash changed."""
+    final_text = content if content.endswith("\n") else content + "\n"
+    if path.exists():
+        try:
+            existing = path.read_text(encoding="utf-8", errors="ignore")
+            if semantic_text_sha256(existing) == semantic_text_sha256(final_text):
+                return False
+        except OSError:
+            pass
+    _atomic_write_text(path, final_text)
+    return True
+
+
+def write_json_if_changed(
+    path: Path,
+    payload: Any,
+    *,
+    indent: int | None = 2,
+    sort_keys: bool = False,
+    ignore_keys: set[str] | frozenset[str] | None = None,
+) -> bool:
+    """Write JSON ``payload`` to ``path`` only if its semantic hash changed."""
+    new_hash = semantic_json_sha256(payload, ignore_keys=ignore_keys)
+    if path.exists():
+        try:
+            existing = json.loads(path.read_text(encoding="utf-8"))
+            if semantic_json_sha256(existing, ignore_keys=ignore_keys) == new_hash:
+                return False
+        except (OSError, json.JSONDecodeError):
+            pass
+    text = json.dumps(payload, indent=indent, sort_keys=sort_keys, ensure_ascii=False) + "\n"
+    _atomic_write_text(path, text)
+    return True
+
+
+def attach_envelope(
+    payload: dict[str, Any],
+    *,
+    feed_id: str,
+    as_of: str | None = None,
+    row_count: int | None = None,
+    upstream_inputs: list[dict[str, Any]] | None = None,
+    health_status: str = "healthy",
+    structural_errors: int = 0,
+) -> dict[str, Any]:
+    """Attach a standardized ``_envelope`` block while keeping legacy stamps."""
+    gen = (
+        payload.get("generated_at")
+        or payload.get("build_time")
+        or payload.get("generated")
+        or payload.get("built_at")
+        or now_iso()
+    )
+    if "generated_at" not in payload:
+        payload["generated_at"] = gen
+    resolved_as_of = as_of or payload.get("as_of") or str(gen)[:10]
+    digest = semantic_json_sha256(payload)
+    payload["_envelope"] = {
+        "schema_version": "magis.feed.v2",
+        "feed_id": feed_id,
+        "generated_at": gen,
+        "as_of": resolved_as_of,
+        "content_sha256": f"sha256:{digest}",
+        "row_count": row_count if row_count is not None else 0,
+        "upstream_inputs": list(upstream_inputs or []),
+        "health": {
+            "status": health_status,
+            "structural_errors": int(structural_errors),
+        },
+    }
+    return payload

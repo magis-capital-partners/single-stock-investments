@@ -144,6 +144,8 @@ def build_card(ticker: str) -> dict | None:
         classification["lawrence_bucket"] = valuation["lawrence_bucket"]
 
     digest = latest_dated(research / "evidence", DIGEST_RE)
+    if digest is None and (research / "evidence" / "filing_digest.md").is_file():
+        digest = (str(valuation.get("as_of") or ""), research / "evidence" / "filing_digest.md")
     scenarios = {
         name: (results.get(name) or {}).get("return_pct")
         for name in ("bear", "base", "bull")
