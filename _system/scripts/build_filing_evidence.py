@@ -575,6 +575,9 @@ def build_ticker(ticker: str) -> int:
         if changed or not dated_digests:
             digest_path = evidence_dir / f"filing_digest_{TODAY}.md"
             write_text_if_changed(digest_path, digest_text)
+            for old_d in dated_digests:
+                if old_d != digest_path:
+                    old_d.unlink(missing_ok=True)
     except Exception:
         digest_path = evidence_dir / f"filing_digest_{TODAY}.md"
         digest_path.write_text("\n".join(lines) + "\n", encoding="utf-8")

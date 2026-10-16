@@ -31,11 +31,12 @@ DEFAULT_VOLATILE_JSON_KEYS: frozenset[str] = frozenset(
 
 _VOLATILE_MD_PATTERNS: tuple[tuple[re.Pattern[str], str], ...] = (
     (re.compile(r"^(\*\*(?:Generated|Date|Scan date|Updated):\*\*)\s*\S+.*$", re.MULTILINE), r"\1 <DATE>"),
+    (re.compile(r"^(Build:\s*)\S+(\s*·.*)$", re.MULTILINE), r"\1<DATE>\2"),
     (re.compile(r"^(#\s+[^\n]+?\()\d{4}-\d{2}-\d{2}(\)\s*)$", re.MULTILINE), r"\1<DATE>\2"),
     (re.compile(r"^(#\s+[^\n]+?(?:—|--|-)\s*)\d{4}-\d{2}-\d{2}(\s*)$", re.MULTILINE), r"\1<DATE>\2"),
     (
         re.compile(
-            r"(cross_check_third_party_|filing_digest_|insider_signal_|thematic_context_|source_inventory_)\d{4}-\d{2}-\d{2}"
+            r"(cross_check_third_party_|filing_digest_|insider_signal_|thematic_context_|source_inventory_|world_model_review_[A-Za-z0-9.\-]+_|world_model_promote_[A-Za-z0-9.\-]+_|activist_reconcile_|management_digest_|ssi_report_)\d{4}-\d{2}-\d{2}"
         ),
         r"\1<DATE>",
     ),
@@ -70,9 +71,17 @@ def _strip_volatile_json(value: Any, ignore_keys: frozenset[str]) -> Any:
     return value
 
 
-def semantic_json_sha256(payload: Any, ignore_keys: set[str] | frozenset[str] | None = None) -> str:
-    keys = DEFAULT_VOLATILE_JSON_KEYS if ignore_keys is None else frozenset(ignore_keys)
-    cleaned = _strip_volatile_json(payload, keys)
+def semantic_json_sha256(
+    payload: Any,
+    ignore_keys: set[str] | frozenset[str] | tuple[str, ...] | None = None,
+    volatile_keys: set[str] | frozenset[str] | tuple[str, ...] | None = None,
+) -> str:
+    keys = set(DEFAULT_VOLATILE_JSON_KEYS)
+    if ignore_keys is not None:
+        keys.update(ignore_keys)
+    if volatile_keys is not None:
+        keys.update(volatile_keys)
+    cleaned = _strip_volatile_json(payload, frozenset(keys))
     canonical = json.dumps(cleaned, sort_keys=True, separators=(",", ":"), ensure_ascii=False)
     return hashlib.sha256(canonical.encode("utf-8")).hexdigest()
 
@@ -111,20 +120,54 @@ def write_json_if_changed(
     *,
     indent: int | None = 2,
     sort_keys: bool = False,
-    ignore_keys: set[str] | frozenset[str] | None = None,
+    ignore_keys: set[str] | frozenset[str] | tuple[str, ...] | None = None,
+    volatile_keys: set[str] | frozenset[str] | tuple[str, ...] | None = None,
 ) -> bool:
     """Write JSON ``payload`` to ``path`` only if its semantic hash changed."""
-    new_hash = semantic_json_sha256(payload, ignore_keys=ignore_keys)
+    new_hash = semantic_json_sha256(payload, ignore_keys=ignore_keys, volatile_keys=volatile_keys)
     if path.exists():
         try:
             existing = json.loads(path.read_text(encoding="utf-8"))
-            if semantic_json_sha256(existing, ignore_keys=ignore_keys) == new_hash:
+            if semantic_json_sha256(existing, ignore_keys=ignore_keys, volatile_keys=volatile_keys) == new_hash:
                 return False
         except (OSError, json.JSONDecodeError):
             pass
     text = json.dumps(payload, indent=indent, sort_keys=sort_keys, ensure_ascii=False) + "\n"
     _atomic_write_text(path, text)
     return True
+
+
+def write_superseded_review_md(
+    pending_dir: Path,
+    prefix: str,
+    date_str: str,
+    content: str,
+    *,
+    keep_latest: int = 2,
+) -> Path:
+    """Write a dated review markdown file only when semantically changed, and cap older copies."""
+    pending_dir.mkdir(parents=True, exist_ok=True)
+    out = pending_dir / f"{prefix}_{date_str}.md"
+    final_text = content if content.endswith("\n") else content + "\n"
+    new_hash = semantic_text_sha256(final_text)
+    existing = sorted(pending_dir.glob(f"{prefix}_*.md"))
+    if existing and not out.exists():
+        prev = existing[-1]
+        try:
+            if semantic_text_sha256(prev.read_text(encoding="utf-8", errors="ignore")) == new_hash:
+                if keep_latest > 0 and len(existing) > keep_latest:
+                    for old_p in existing[:-keep_latest]:
+                        old_p.unlink(missing_ok=True)
+                return prev
+        except OSError:
+            pass
+    write_text_if_changed(out, final_text)
+    all_files = sorted(pending_dir.glob(f"{prefix}_*.md"))
+    if keep_latest > 0 and len(all_files) > keep_latest:
+        for old_p in all_files[:-keep_latest]:
+            if old_p != out:
+                old_p.unlink(missing_ok=True)
+    return out
 
 
 def attach_envelope(

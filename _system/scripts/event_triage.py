@@ -533,11 +533,11 @@ def triage_events(events: list[dict], *, activist_tickers: set[str] | None = Non
 
 
 def write_triage_queue(events: list[dict], scan_date: str) -> Path | None:
+    from atomic_io import write_superseded_review_md
+
     human = [e for e in events if e.get("triage_verdict") == "human_review"]
     if not human:
         return None
-    PENDING_DIR.mkdir(parents=True, exist_ok=True)
-    out = PENDING_DIR / f"event_triage_{scan_date}.md"
     lines = [
         "# Event triage — human review queue",
         "",
@@ -554,8 +554,7 @@ def write_triage_queue(events: list[dict], scan_date: str) -> Path | None:
             f"{row.get('tier') or '—'} | {row.get('materiality') or '—'} | {rules_text} | "
             f"{str(row.get('title') or '')[:60]} |"
         )
-    out.write_text("\n".join(lines) + "\n", encoding="utf-8")
-    return out
+    return write_superseded_review_md(PENDING_DIR, "event_triage", scan_date, "\n".join(lines) + "\n", keep_latest=2)
 
 
 def main() -> int:

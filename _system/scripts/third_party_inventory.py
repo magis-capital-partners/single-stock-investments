@@ -333,12 +333,6 @@ def write_inventory(ticker: str, out_date: str | None = None) -> tuple[Path, Pat
     )
     md_text = "\n".join(lines) + "\n"
     write_text_if_changed(canonical_md, md_text)
-    if out_date:
-        dated_json = tp / f"source_inventory_{out_date}.json"
-        dated_md = tp / f"source_inventory_{out_date}.md"
-        write_json_if_changed(dated_json, result)
-        write_text_if_changed(dated_md, md_text)
-        return dated_json, dated_md
     return canonical_json, canonical_md
 
 

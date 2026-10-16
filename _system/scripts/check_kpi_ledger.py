@@ -19,6 +19,7 @@ from datetime import date
 from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parent))
+from atomic_io import semantic_text_sha256, write_text_if_changed  # noqa: E402
 import world_model_common as wm  # noqa: E402
 
 REVIEWS = wm.ROOT / "_system" / "reviews" / "pending"
@@ -57,7 +58,22 @@ def queue_fail_reviews(ticker: str, ledger: dict) -> Path | None:
         f"`world_model_promote_{ticker}_{today}.md`",
         "",
     ]
-    path.write_text("\n".join(lines) + "\n", encoding="utf-8")
+    body = "\n".join(lines) + "\n"
+    new_sem = semantic_text_sha256(body)
+    existing = sorted(REVIEWS.glob(f"world_model_review_{ticker}_*.md"))
+    for prev in reversed(existing):
+        try:
+            if semantic_text_sha256(prev.read_text(encoding="utf-8", errors="ignore")) == new_sem:
+                for extra in existing:
+                    if extra != prev:
+                        extra.unlink(missing_ok=True)
+                return prev
+        except OSError:
+            continue
+    write_text_if_changed(path, body)
+    for prev in existing:
+        if prev != path:
+            prev.unlink(missing_ok=True)
     return path
 
 

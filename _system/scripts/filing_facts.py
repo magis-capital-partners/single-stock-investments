@@ -545,16 +545,21 @@ def build_filing_facts(ticker: str, evidence_dir: Path, source_path: Path | None
 
 
 def write_filing_facts_json(ticker_dir: Path, as_of: str) -> Path | None:
+    from atomic_io import write_json_if_changed
+
     evidence_dir = ticker_dir / "research" / "evidence"
     src = latest_full_text_path(evidence_dir)
     facts = build_filing_facts(ticker_dir.name, evidence_dir, src)
     facts["as_of"] = as_of
+    canonical = evidence_dir / "filing_facts.json"
     out = evidence_dir / f"filing_facts_{as_of}.json"
     if not evidence_dir.exists():
         return None
     evidence_dir.mkdir(parents=True, exist_ok=True)
     if not facts.get("metrics"):
         candidates = [out] if out.exists() else []
+        if canonical.exists():
+            candidates.append(canonical)
         candidates.extend(sorted(evidence_dir.glob("filing_facts_*.json"), reverse=True))
         for p in candidates:
             if not p.exists():
@@ -568,5 +573,12 @@ def write_filing_facts_json(ticker_dir: Path, as_of: str) -> Path | None:
                 if p != out:
                     facts["metrics_preserved_from"] = p.name
                 break
-    out.write_text(json.dumps(facts, indent=2) + "\n", encoding="utf-8")
-    return out
+    changed = write_json_if_changed(canonical, facts)
+    existing_dated = sorted(evidence_dir.glob("filing_facts_*.json"))
+    if changed or not existing_dated or out.exists():
+        write_json_if_changed(out, facts)
+        for old_p in existing_dated:
+            if old_p != out:
+                old_p.unlink(missing_ok=True)
+        return out
+    return existing_dated[-1]

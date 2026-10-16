@@ -21,6 +21,7 @@ ROOT = Path(__file__).resolve().parents[2]
 SCRIPTS = ROOT / "_system" / "scripts"
 sys.path.insert(0, str(SCRIPTS))
 
+from atomic_io import write_json_if_changed, write_text_if_changed  # noqa: E402
 from build_power_zone_pricing import build_contract_pricing  # noqa: E402
 from build_valuation_universe_tiers import (  # noqa: E402
     OUTPUT_REL as VALUATION_TIERS_REL,
@@ -113,8 +114,7 @@ def stage_universe_tiers(as_of: str, dry_run: bool) -> tuple[dict, dict]:
             errors.append("valuation universe tier validation did not pass")
         if not dry_run and not errors:
             path = ROOT / VALUATION_TIERS_REL
-            path.parent.mkdir(parents=True, exist_ok=True)
-            path.write_text(render_valuation_universe_tiers(manifest), encoding="utf-8")
+            write_text_if_changed(path, render_valuation_universe_tiers(manifest))
         result = {
             "status": "ready" if not errors else "failed",
             "summary": manifest.get("summary") or {},
@@ -145,8 +145,7 @@ def stage_tier1_readiness(as_of: str, dry_run: bool) -> dict:
             errors.append("Tier 1 decision-readiness validation did not pass")
         if not dry_run and not errors:
             path = ROOT / TIER1_READINESS_REL
-            path.parent.mkdir(parents=True, exist_ok=True)
-            path.write_text(render_tier1_decision_readiness(payload), encoding="utf-8")
+            write_text_if_changed(path, render_tier1_decision_readiness(payload))
         return {
             "status": "ready" if not errors else "failed",
             "summary": payload.get("summary") or {},
@@ -608,9 +607,16 @@ def write_summary(as_of: str, scope: str, tickers: list[str], stages: dict, dry_
     if explicit:
         slug = "-".join(tickers).lower()[:80] or "none"
         path = runs / f"power_zone_security_run_{as_of}_{slug}.json"
+        write_json_if_changed(path, summary)
+        for old in runs.glob(f"power_zone_security_run_*_{slug}.json"):
+            if old != path:
+                old.unlink(missing_ok=True)
     else:
         path = runs / f"power_zone_universe_run_{as_of}.json"
-    write_json(path, summary)
+        write_json_if_changed(path, summary)
+        for old in runs.glob("power_zone_universe_run_*.json"):
+            if old != path:
+                old.unlink(missing_ok=True)
     return path
 
 

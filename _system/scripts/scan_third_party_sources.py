@@ -2,8 +2,8 @@
 """Scan all third-party sources for a ticker (HK, Substacks, PDFs, pending, shorts).
 
 Outputs:
-  {TICKER}/third-party-analyses/source_inventory_{date}.json
-  {TICKER}/third-party-analyses/source_inventory_{date}.md
+  {TICKER}/third-party-analyses/source_inventory.json
+  {TICKER}/third-party-analyses/source_inventory.md
 
 Usage:
   python _system/scripts/scan_third_party_sources.py GOOGL

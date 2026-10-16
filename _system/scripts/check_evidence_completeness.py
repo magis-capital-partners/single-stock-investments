@@ -59,6 +59,8 @@ def check(ticker: str, *, dive_date: str | None = None, strict: bool = False) ->
                 errs.append("filing_facts only evidence_refresh_seed — re-parse latest annual PDF")
 
     mgmt = list(evidence.glob("management_facts_*.json"))
+    if (evidence / "management_facts.json").is_file():
+        mgmt.append(evidence / "management_facts.json")
     tx = list((td / "investor-documents" / "transcripts").glob("*")) if (td / "investor-documents" / "transcripts").exists() else []
     if tx and not mgmt:
         errs.append("transcripts present but no management_facts")

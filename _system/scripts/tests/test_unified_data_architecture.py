@@ -171,3 +171,50 @@ def test_local_fts5_search_index_queries() -> None:
     hits = result.get("hits") or []
     assert len(hits) >= 1
     assert hits[0]["ticker"] == "TPL"
+
+
+def test_write_superseded_review_md_dedupes_and_caps(tmp_path: Path) -> None:
+    pending = tmp_path / "_system" / "reviews" / "pending"
+    p1 = atomic_io.write_superseded_review_md(
+        pending, "event_triage", "2026-10-01", "# Event triage — 2026-10-01\n\n**Date:** 2026-10-01\n\nRow A\n", keep_latest=2
+    )
+    assert p1.name == "event_triage_2026-10-01.md"
+    # Identical semantic content on next day returns previous file without creating a new one
+    p2 = atomic_io.write_superseded_review_md(
+        pending, "event_triage", "2026-10-02", "# Event triage — 2026-10-02\n\n**Date:** 2026-10-02\n\nRow A\n", keep_latest=2
+    )
+    assert p2 == p1
+    assert not (pending / "event_triage_2026-10-02.md").exists()
+    # Changed content on day 3 and day 4 caps at keep_latest=2
+    atomic_io.write_superseded_review_md(
+        pending, "event_triage", "2026-10-03", "# Event triage — 2026-10-03\n\nRow B\n", keep_latest=2
+    )
+    atomic_io.write_superseded_review_md(
+        pending, "event_triage", "2026-10-04", "# Event triage — 2026-10-04\n\nRow C\n", keep_latest=2
+    )
+    files = sorted(p.name for p in pending.glob("event_triage_*.md"))
+    assert files == ["event_triage_2026-10-03.md", "event_triage_2026-10-04.md"]
+
+
+def test_guard_staged_changes_drops_redundant_dated_file(tmp_path: Path) -> None:
+    import subprocess
+
+    subprocess.run(["git", "init", "-q"], cwd=str(tmp_path), check=True)
+    subprocess.run(["git", "config", "user.email", "test@example.com"], cwd=str(tmp_path), check=True)
+    subprocess.run(["git", "config", "user.name", "test"], cwd=str(tmp_path), check=True)
+    tp = tmp_path / "SYNTH" / "third-party-analyses"
+    tp.mkdir(parents=True)
+    f1 = tp / "source_inventory_2026-10-01.md"
+    f1.write_text("# Source inventory — SYNTH\n\n**Date:** 2026-10-01\n\nZero sources.\n", encoding="utf-8")
+    subprocess.run(["git", "add", "-A"], cwd=str(tmp_path), check=True)
+    subprocess.run(["git", "commit", "-q", "-m", "base"], cwd=str(tmp_path), check=True)
+
+    f2 = tp / "source_inventory_2026-10-02.md"
+    f2.write_text("# Source inventory — SYNTH\n\n**Date:** 2026-10-02\n\nZero sources.\n", encoding="utf-8")
+    subprocess.run(["git", "add", "-A"], cwd=str(tmp_path), check=True)
+
+    res = compact_dated_artifacts.guard_staged_changes(tmp_path)
+    assert res["canonicalized"] == 1
+    assert res["dropped_redundant"] == 1
+    assert (tp / "source_inventory.md").is_file()
+    assert not f2.exists()
