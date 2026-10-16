@@ -1,8 +1,10 @@
 from __future__ import annotations
 
+import copy
 import json
 import re
 import sys
+import tempfile
 import unittest
 from pathlib import Path
 
@@ -29,6 +31,43 @@ def _cv() -> dict:
         "review_status": "committee_open",
         "review_open_count": 3,
     }
+
+
+class PublicationGuardTests(unittest.TestCase):
+    def test_direct_shard_writer_rejects_sparse_collapse_before_any_write(self):
+        rows = [
+            {
+                "ticker": f"T{i}", "pdf_count": 10, "readme": True,
+                "research_dir": True, "sec_filings": 20,
+                "dossier": {"status": "reviewed"},
+                "valuation_decision": {"status": "decision_grade"},
+            }
+            for i in range(60)
+        ]
+        healthy = {"tickers": rows, "summary": {"ticker_count": 60, "total_pdfs": 600}}
+        for field in ("infra", "research", "valuation"):
+            with self.subTest(field=field), tempfile.TemporaryDirectory() as folder:
+                data_dir = Path(folder)
+                bds.write_shards(healthy, None, data_dir)
+                before = {p.relative_to(data_dir): p.read_bytes() for p in data_dir.rglob("*.json")}
+                thinned = copy.deepcopy(healthy)
+                if field == "infra":
+                    for row in thinned["tickers"]:
+                        row.update(pdf_count=0, readme=False, sec_filings=0)
+                    thinned["summary"]["total_pdfs"] = 7
+                elif field == "research":
+                    for row in thinned["tickers"]:
+                        row["dossier"] = None
+                else:
+                    for row in thinned["tickers"]:
+                        row["valuation_decision"] = {"status": "missing"}
+                # An ignored monolith may already contain the new, broken build.
+                (data_dir / "dashboard_data.json").write_text(json.dumps(thinned), encoding="utf-8")
+                with self.assertRaises(SystemExit):
+                    bds.write_shards(thinned, {"record_count": 0}, data_dir)
+                after = {p.relative_to(data_dir): p.read_bytes() for p in data_dir.rglob("*.json")
+                         if p.name != "dashboard_data.json"}
+                self.assertEqual(before, after)
 
 
 class SlimComponentValuationTests(unittest.TestCase):
