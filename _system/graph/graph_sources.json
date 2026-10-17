@@ -235,6 +235,19 @@
       "subject_regex": "^chore\\(risk\\)"
     },
     {
+      "name": "darwin-covered-call",
+      "workflow_file": "darwin-covered-call.yml",
+      "job": "signal",
+      "cadence_cron": [
+        "37 14 * * 1-5",
+        "7 17 * * 1-5",
+        "52 19 * * 1-5",
+        "47 21 * * 1-5"
+      ],
+      "freshness_hours": 80,
+      "subject_regex": "^chore\\(darwin-cc\\)"
+    },
+    {
       "name": "forced-flow",
       "workflow_file": "forced-flow-daily.yml",
       "job": "refresh",
