@@ -34,6 +34,9 @@ performance rather than being discarded.
    same fresh-period and matched fiscal TTM rules. New contexts supplement gaps;
    they do not replace an already available canonical raw fact with a weaker alias.
    Every financial fact retains its period, filing/public clock, accession and source.
+   A submission accepted before its official SEC filing day is held until the
+   following Eastern calendar day; the earlier acceptance timestamp is retained
+   separately. Cached financing passages inherit that rechecked public clock.
 6. Supplemental prices require three overlapping original nominal closes in
    each split segment, median discrepancy at most 2%, and 90th percentile at
    most 5%. Unmatched or conflicting segments stay out of the main replay.
@@ -85,6 +88,13 @@ counts are published. The existing strict gate retains all these requirements.
 
 From the repository root, with `SOURCE` pointing to the original frozen data:
 
+This replay also needs the existing ignored RSI-3 frozen snapshots at
+`local/net_edge_v3/frozen_snapshots.json`, matching `net_edge_manifest_v3.json`,
+and RSI-4's `local/coverage_v4/inputs.json` plus its hash-bound `price_cache`.
+Keep these local inputs when moving checkouts. They are prerequisites, not
+downloaded by the replay. [COVERAGE_V4.md](COVERAGE_V4.md) describes acquiring
+the earlier public inputs; no new parameter search is required here.
+
 ```powershell
 python -m _system.scripts.reverse_splits.clean_data_sources --source-root SOURCE --fetch --maximum 5000
 python -m _system.scripts.reverse_splits.clean_data_research --source-root SOURCE --publish
@@ -100,3 +110,57 @@ LF checkout rules preserve those hashes on Windows.
 
 The SEC documents its [Company Facts and submissions APIs](https://www.sec.gov/search-filings/edgar-application-programming-interfaces)
 and [free EDGAR access and cumulative CIK index](https://www.sec.gov/search-filings/edgar-search-assistance/accessing-edgar-data).
+
+## Validated run — October 17, 2026
+
+The fixed fundamentals-only comparison produces:
+
+| Data stage | Recent closed trades | Full-history closed trades |
+| --- | ---: | ---: |
+| Original frozen data | 46 | 83 |
+| Scope and duplicates | 46 | 83 |
+| Validated prices | 42 | 71 |
+| Reported financial repairs | 42 | 71 |
+| Verified historical identities and actions | **49** | **89** |
+
+The final clean rows cover 45 recent companies and 81 full-history companies;
+all admitted positions have resolved modeled exits. The recent decision funnel
+is 556 scored events, minus 112 missing entry prices, 282 below the financial
+floor and 113 sizing exclusions, leaving 49 trades. The enlarged denominator
+means the final missing-price count includes newly scorable events. Within the
+original cohort, price validation alone resolves 18 full-history and four recent
+entry-price exclusions. Recovered price days can displace older observations in
+the lookback window while still lacking accepted volume. Their unknown volume
+cannot increase capacity, so admissions can also fall during a price repair.
+
+Across the catalogue, 1,140 records now have reported financial scores, versus
+847 originally. There are 1,126 scored decisions in the full-history entry
+window and 556 recently. Source work confirms 412 previously absent CIK links,
+1,062 dated identity records in total and 385 primary scheduled-action records.
+The extractor accepts 28,021 facts from 1,274 filings across 516 issuers.
+Nominal-price validation retains 36,689 bars across 570 symbols. These are
+coverage counts, not independent trades or completed underwriting.
+
+The separate public-volume sensitivity gives 71 recent / 119 full-history closed
+trades, with 72 / 120 admissions and one unresolved position in each replay.
+Its performance is suppressed. These counts are not clean recovery and are not
+included in the 49 / 89 result.
+
+The bounded acquisition log records 6,991 free SEC requests: 6,803 downloads,
+134 not-found responses and 54 unavailable responses. The final snapshot has
+4,681 accepted filing documents and 2,907 uncached source requests still pending.
+All 7,069 catalogue records remain in 48 source-cited queue parts. Full
+underwriting, reconciled financing, actual locates and observed fills remain
+zero, and the strict recent case remains zero. Historical broker exports are
+unavailable. No source passage is treated as a completed assessment.
+
+The next price-repair targets are 48 recent / 144 full-history records already
+scoring at least 60 whose first recorded exclusion is a missing entry price.
+The next sizing targets need verified volume units and full-market volume:
+112 of 113 recent sizing exclusions have a recorded volume cap below $100
+(165 of 175 over full history). These are data priorities, not promised trades;
+other gates can remain after a single repair. The $100 / 0.1% policy stays fixed.
+
+Validation: 1,024 broader repository tests passed with six skipped; the final
+reverse-split suite passed 323 tests. Source and implementation hashes, queue
+counts, decision funnels and every trade-count transition reconcile.

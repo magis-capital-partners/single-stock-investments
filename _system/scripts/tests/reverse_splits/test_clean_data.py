@@ -1,9 +1,10 @@
 """Point-in-time and identity regressions for clean-data coverage recovery."""
 import hashlib
+import json
 
 from _system.scripts.reverse_splits.clean_data_facts import numeric, standard_facts
 from _system.scripts.reverse_splits.clean_data_sources import company_key, identity_from_filing, index_candidates, issuer_from_finra_name
-from _system.scripts.reverse_splits.clean_data_research import CleanStore, repaired_events
+from _system.scripts.reverse_splits.clean_data_research import CleanStore, price_event_universe, repaired_events
 
 
 def document(symbol="OLD", title="Common Stock", known="2023-10-01T13:00:00+00:00", facts=""):
@@ -115,6 +116,13 @@ def test_late_primary_filing_cannot_unlock_an_earlier_entry():
     assert outcome["x"]["status"] == "no_future_entry_in_sample"
 
 
+def test_ticker_repair_removes_stale_split_even_for_discarded_duplicate():
+    stale = event("NEW", cik="1234", issuer="cik/1234")
+    canonical = {**stale, "event_id": "canonical", "ticker": "OLD"}
+    sources = {"identities": {stale["event_id"]: {"ticker": "OLD"}}, "actions": {}}
+    assert price_event_universe([stale], [canonical], sources) == [canonical]
+
+
 def test_sec_later_filing_day_clamps_acceptance_clock(tmp_path):
     from _system.scripts.reverse_splits.clean_data_sources import primary_document
     path = tmp_path/"filing.txt"
@@ -140,3 +148,26 @@ def test_primary_clean_store_never_imports_proxy_volume(tmp_path):
     proxy = CleanStore(path, [], bars, volume_proxy=True)
     assert proxy.prices("OLD")["2023-10-02"]["volume"] == 100000
     clean.connection.close(); proxy.connection.close()
+
+
+def test_offline_workers_preserve_fact_clocks_when_resuming_cache(tmp_path):
+    from _system.scripts.reverse_splits.clean_data_research import filing_fact_index
+    from _system.scripts.reverse_splits.clean_data_sources import primary_document
+    path = tmp_path/"filing.txt"
+    path.write_text(
+        '<ACCEPTANCE-DATETIME>20231002090000\nACCESSION NUMBER: 0000001234-23-000001\n'
+        'CONFORMED SUBMISSION TYPE: 10-Q\nFILED AS OF DATE: 20231002\n'
+        +document(facts=fact("us-gaap:Assets", "100")+"<p>Convertible notes require reconciliation.</p>")["text"], encoding="utf-8")
+    primary = primary_document(path, "1234")
+    sources = {"documents": {"1234/000000123423000001": {k: v for k, v in primary.items() if k != "text"}}}
+    first, _, coverage = filing_fact_index(sources, tmp_path)
+    cache_path = tmp_path/"filing_terms"/(primary["source_sha256"]+".json")
+    cached = json.loads(cache_path.read_text(encoding="utf-8"))
+    cached["terms"][0]["known_at"] = "2023-09-01T13:00:00+00:00"
+    cache_path.write_text(json.dumps(cached), encoding="utf-8")
+    resumed, documents, _ = filing_fact_index(sources, tmp_path)
+    assert coverage["reported_facts"] == 1
+    assert first == resumed
+    assert first["1234"][0]["known_at"] == "2023-10-02T13:01:00+00:00"
+    assert first["1234"][0]["filed"] == "2023-10-02"
+    assert documents["1234"][0]["terms"][0]["known_at"] == primary["known_at"]

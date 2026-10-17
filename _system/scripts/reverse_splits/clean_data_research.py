@@ -13,9 +13,10 @@ import math
 import re
 import shutil
 from collections import Counter, OrderedDict, defaultdict
-from concurrent.futures import ThreadPoolExecutor
+from concurrent.futures import ProcessPoolExecutor
 from dataclasses import asdict
 from datetime import datetime, timedelta, timezone
+from itertools import repeat
 from pathlib import Path
 
 from .calmar_research import END, START, bind_inputs, path_metrics
@@ -100,7 +101,8 @@ def validated_price_overlay(source, destination, events):
         path = destination/"local/coverage_v4/price_cache"/(sha(chart_url(ticker).encode())+".raw")
         if not path.exists(): continue
         meta, raw = read_json(path.with_suffix(".json")), path.read_bytes()
-        if meta.get("url") != chart_url(ticker) or meta.get("sha256") != sha(raw): raise ValueError("Chart provenance mismatch")
+        raw_sha = sha(raw)
+        if meta.get("url") != chart_url(ticker) or meta.get("sha256") != raw_sha: raise ValueError("Chart provenance mismatch")
         bars, _, _ = parse_chart(raw, ticker)
         original = base.prices(ticker)
         groups = defaultdict(list)
@@ -119,7 +121,7 @@ def validated_price_overlay(source, destination, events):
                 row = bars[day]
                 kept[day] = {**row, **{k: row[k]*factor for k in ("open", "high", "low", "close")},
                              "volume": None, "proxy_volume": row["volume"]/factor if row.get("volume") is not None else None,
-                             "nominal_units": "overlap_validated", "source_url": chart_url(ticker), "source_sha256": sha(raw)}
+                             "nominal_units": "overlap_validated", "source_url": chart_url(ticker), "source_sha256": raw_sha}
             accepted += len(days)
         if kept:
             # Retain only the event windows already declared by the RSI-4
@@ -128,7 +130,7 @@ def validated_price_overlay(source, destination, events):
             overlay[ticker] = {d: r for d, r in kept.items() if d in windows}
             chart_actions[ticker] = inputs.get("chart_actions", {}).get(ticker, [])
         audits.append({"ticker": ticker, "validated_bars": accepted, "rejected_or_unmatched_bars": rejected,
-                       "retained_bars": len(overlay.get(ticker, {})), "source_url": chart_url(ticker), "source_sha256": sha(raw)})
+                       "retained_bars": len(overlay.get(ticker, {})), "source_url": chart_url(ticker), "source_sha256": raw_sha})
         if index % 250 == 0: print(f"Validate nominal prices {index+1}/{len(inputs['price_status'])}", flush=True)
     base.connection.close()
     return overlay, chart_actions, audits
@@ -160,48 +162,64 @@ class CleanStore(PriceStore):
         return self.cache[ticker]
 
 
+def price_event_universe(original, events, sources=None):
+    """A corrected ticker/ratio must replace its old split-adjustment record."""
+    replaced = {e["event_id"] for e in events}
+    if sources:
+        # A corrected duplicate can be absent from the cleaned event list.
+        # Its stale symbol must still leave the corporate-action stream.
+        replaced.update(sources["identities"])
+        replaced.update(k for k, row in sources["actions"].items() if row.get("status") == "confirmed_primary_scheduled_action")
+    return [e for e in original if e["event_id"] not in replaced]+events
+
+
+def _extract_filing(item, cache_root):
+    key, meta = item
+    cik = key.split("/")[0]
+    path = Path(meta["path"])
+    if digest(path) != meta["source_sha256"]: raise ValueError("Primary filing changed")
+    document = primary_document(path, cik)
+    if not document: raise ValueError("Primary filing lost its identity/clock")
+    parser_hash = FACT_PARSER_HASH
+    cache_path = Path(cache_root)/"extracted_facts"/(meta["source_sha256"]+".json")
+    cached = read_json(cache_path, {})
+    if (cached.get("schema_version") == "clean_facts_cache.v2" and cached.get("parser_sha256") == parser_hash and cached.get("cik") == cik
+            and cached.get("source_clock") == document["known_at"] and cached.get("filed_at") == document["filed_at"]):
+        facts = cached["facts"]
+    else:
+        facts = standard_facts(document, cik)
+        write_public_json(cache_path, {"schema_version": "clean_facts_cache.v2", "parser_sha256": parser_hash, "cik": cik,
+                                       "source_clock": document["known_at"], "filed_at": document["filed_at"], "facts": facts})
+    facts = copy.deepcopy(facts)
+    for row in facts:
+        # Separate SEC acceptance from the conservative public-use time.
+        row["known_at"] = (moment(row["known_at"])+timedelta(minutes=1)).isoformat()
+        validate_import(row, "facts")
+    term_path = Path(cache_root)/"filing_terms"/(meta["source_sha256"]+".json")
+    term_hash = TERM_PARSER_HASH
+    cached_terms = read_json(term_path, {})
+    if cached_terms.get("parser_sha256") == term_hash:
+        terms = cached_terms["terms"]
+    else:
+        terms, seen = [], Counter()
+        for filename, _, body in document_bodies(document["text"], prose=True):
+            for term in extract_terms({**document, "text": body}):
+                if seen[term["category"]] >= 2: continue
+                seen[term["category"]] += 1
+                terms.append({**term, "locator": "document="+filename+"; "+term["locator"]})
+        write_public_json(term_path, {"parser_sha256": term_hash, "terms": terms})
+    # A clock rule can become more conservative while the filing bytes and
+    # passage parser stay unchanged. Rebind cached passages to this checked clock.
+    terms = [{**term, "known_at": document["known_at"]} for term in terms]
+    return cik, facts, {**meta, "known_at": document["known_at"], "filed_at": document["filed_at"], "terms": terms}
+
+
 def filing_fact_index(sources, cache_root):
     rows, by_cik, documents = [], defaultdict(list), defaultdict(list)
-    def extract(item):
-        key, meta = item
-        cik = key.split("/")[0]
-        path = Path(meta["path"])
-        if digest(path) != meta["source_sha256"]: raise ValueError("Primary filing changed")
-        document = primary_document(path, cik)
-        if not document: raise ValueError("Primary filing lost its identity/clock")
-        parser_hash = FACT_PARSER_HASH
-        cache_path = Path(cache_root)/"extracted_facts"/(meta["source_sha256"]+".json")
-        cached = read_json(cache_path, {})
-        if (cached.get("schema_version") == "clean_facts_cache.v2" and cached.get("parser_sha256") == parser_hash and cached.get("cik") == cik
-                and cached.get("source_clock") == document["known_at"] and cached.get("filed_at") == document["filed_at"]):
-            facts = cached["facts"]
-        else:
-            facts = standard_facts(document, cik)
-            write_public_json(cache_path, {"schema_version": "clean_facts_cache.v2", "parser_sha256": parser_hash, "cik": cik,
-                                           "source_clock": document["known_at"], "filed_at": document["filed_at"], "facts": facts})
-        facts = copy.deepcopy(facts)
-        for row in facts:
-            # Separate SEC acceptance from the conservative public-use time.
-            row["known_at"] = (moment(row["known_at"])+timedelta(minutes=1)).isoformat()
-            validate_import(row, "facts")
-        term_path = Path(cache_root)/"filing_terms"/(meta["source_sha256"]+".json")
-        term_hash = TERM_PARSER_HASH
-        cached_terms = read_json(term_path, {})
-        if cached_terms.get("parser_sha256") == term_hash:
-            terms = cached_terms["terms"]
-        else:
-            terms, seen = [], Counter()
-            for filename, _, body in document_bodies(document["text"], prose=True):
-                for term in extract_terms({**document, "text": body}):
-                    if seen[term["category"]] >= 2: continue
-                    seen[term["category"]] += 1
-                    terms.append({**term, "locator": "document="+filename+"; "+term["locator"]})
-            write_public_json(term_path, {"parser_sha256": term_hash, "terms": terms})
-        return cik, facts, {**meta, "known_at": document["known_at"], "filed_at": document["filed_at"], "terms": terms}
     # Independent, offline files only. Executor.map preserves source order;
     # public request pacing is unaffected by these local extraction workers.
-    with ThreadPoolExecutor(max_workers=4) as pool:
-        for index, (cik, facts, document) in enumerate(pool.map(extract, sources["documents"].items())):
+    with ProcessPoolExecutor(max_workers=4) as pool:
+        for index, (cik, facts, document) in enumerate(pool.map(_extract_filing, sources["documents"].items(), repeat(cache_root))):
             rows += facts
             by_cik[cik] += facts
             documents[cik].append(document)
@@ -438,7 +456,7 @@ def run(args):
             store = PriceStore(frozen/"prices.sqlite", original)
         else:
             if stage == "scope_and_duplicates": store = PriceStore(frozen/"prices.sqlite", original)
-            else: store = CleanStore(frozen/"prices.sqlite", original+events, overlay, chart_actions, volume_proxy=stage == "volume_proxy_sensitivity")
+            else: store = CleanStore(frozen/"prices.sqlite", price_event_universe(original, events, sources if repaired else None), overlay, chart_actions, volume_proxy=stage == "volume_proxy_sensitivity")
             snapshots, _, _ = build_snapshots(events, store, source, output, evidence)
             if stage in {"scope_and_duplicates", "validated_prices"}:
                 # Retain the frozen scores/reviews exactly for existing records.
