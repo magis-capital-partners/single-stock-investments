@@ -1,0 +1,38 @@
+name: Agent index
+
+# Builds the disposable SQLite hybrid search index and publishes it as an
+# artifact so Grok Bot, Muse, and fresh cloud agents start with search
+# working instead of rebuilding from the tree. The committed manifest at
+# _system/data/agent_index_manifest.json records the input hashes this
+# artifact was built from; verify before trusting a downloaded index.
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - "_system/data/claims.jsonl"
+      - "_system/data/chunks.jsonl"
+      - "_system/data/catalog/documents.jsonl"
+      - "_system/scripts/agent_search.py"
+      - "_system/scripts/build_claim_store.py"
+      - "_system/scripts/build_chunk_store.py"
+
+jobs:
+  build-index:
+    runs-on: ubuntu-latest
+    # Full-tree checkout plus filing-text indexing. Other full-tree jobs use 90.
+    timeout-minutes: 90
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Build hybrid search index
+        run: python _system/scripts/agent_search.py --build --include-filing-text
+      - name: Upload prebuilt index
+        uses: actions/upload-artifact@v4
+        with:
+          name: agent-search-index
+          path: _system/cache/agent_search.sqlite
+          # Governance allows 1-7 days. Seven is the longest the index can be kept.
+          retention-days: 7

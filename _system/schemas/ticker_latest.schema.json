@@ -1,0 +1,15 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "magis.ticker_latest.v1",
+  "title": "Magis per-ticker canonical latest pointer",
+  "type": "object",
+  "required": ["schema_version", "ticker", "artifacts"],
+  "properties": {
+    "schema_version": {"const": "magis.ticker_latest.v1"},
+    "ticker": {"type": "string", "minLength": 1},
+    "artifacts": {
+      "type": "object",
+      "description": "Each present artifact has path, sha256, bytes; dated artifacts also carry date."
+    }
+  }
+}

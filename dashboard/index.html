@@ -10,11 +10,14 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600;700&family=DM+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
 <link href="insights-events.css" rel="stylesheet">
-<link href="short-alpha.css?v=20261013-clean" rel="stylesheet">
-<link href="reverse-splits-portfolio.css?v=20261014-portfolio" rel="stylesheet">
+<link href="short-alpha.css?v=20261015-results" rel="stylesheet">
+<link href="reverse-splits-portfolio.css?v=20261015-results" rel="stylesheet">
+<link href="shorts-net-edge.css?v=20261015-v2" rel="stylesheet">
+<link href="shorts-edge-v3.css?v=20261015-v3" rel="stylesheet">
 <link href="warrants.css" rel="stylesheet">
 <link href="portfolio.css?v=20261008-michael-tail" rel="stylesheet">
 <link href="ideas.css?v=20261011-separations" rel="stylesheet">
+<link href="energy-model.css?v=20261015-energy" rel="stylesheet">
 <style>
   :root {
     --bg-primary: #0a0e17;
@@ -1966,7 +1969,8 @@
 <script src="darwin-viz.js"></script>
 <script src="equity-model-viz.js"></script>
 <script src="search-match.js"></script>
-<script src="insights-viz.js?v=20260908-aggregates-theme"></script>
+<script src="energy-model-viz.js?v=20261015-energy"></script>
+<script src="insights-viz.js?v=20261015-energy"></script>
 <script src="valuation-viz.js"></script>
 <script src="criticality-viz.js?v=20261001-signal-study"></script>
 <script src="vol-viz.js?v=20261009-volume-residual"></script>
@@ -1976,9 +1980,11 @@
 <script src="overlap-viz.js?v=20261008-overlap-line"></script>
 <script src="index-viz.js"></script>
 <script src="activist-viz.js?v=20260819-dashboard-rebuild"></script>
-<script src="short-alpha-viz.js?v=20261013-clean"></script>
-<script src="reverse-splits-portfolio-viz.js?v=20261014-portfolio"></script>
-<script src="reverse-splits-viz.js?v=20261014-portfolio"></script>
+<script src="short-alpha-viz.js?v=20261015-net-edge-v2"></script>
+<script src="reverse-splits-portfolio-viz.js?v=20261015-results"></script>
+<script src="shorts-net-edge-viz.js?v=20261015-v2"></script>
+<script src="shorts-edge-v3-viz.js?v=20261016-v4"></script>
+<script src="reverse-splits-viz.js?v=20261015-net-edge-v3"></script>
 <script src="warrant-viz.js"></script>
 <script src="special-situations-viz.js?v=20261011-separations"></script>
 <script src="separations-viz.js?v=20261011-separations"></script>
@@ -2052,6 +2058,7 @@ function readLocalJson(key, fallback) {
 let data = null;
 let shortAlphaData = null;
 let shortAlphaPromise = null;
+let shortAlphaSection = 'ideas';
 let warrantData = null;
 let situationData = null;
 let situationPromise = null;
@@ -2386,6 +2393,8 @@ function parseRouteFromHashString(hash) {
       situationGatesOpen: false,
     };
   }
+  const shortBacktestMatch = /^#\/ideas\/short-alpha\/backtest$/i.test(hash || '');
+  if (shortBacktestMatch) return { view:'short-alpha', shortAlphaSection:'backtest', ticker:null, watchlistSub:null };
   const ideasMatch = /^#\/ideas\/(all|queue|nol|banks|rock|short-alpha)$/i.exec(hash || '');
   if (ideasMatch) {
     const sub = ideasMatch[1].toLowerCase();
@@ -2459,7 +2468,7 @@ function syncRouteHash() {
     const sub = WATCHLIST_VIEWS.has(watchlistViewMode) ? watchlistViewMode : defaultWatchlistView();
     setAppHash(`#/ideas/${sub}`);
   } else if (activeView === 'short-alpha') {
-    setAppHash(`#/ideas/${activeView}`);
+    setAppHash(`#/ideas/${activeView}${shortAlphaSection==='backtest' ? '/backtest' : ''}`);
   } else if (activeView === 'situations') {
     const slug = SITUATION_LANE_SLUG[situationLane] || '';
     const focus = situationFocus ? `/${encodeURIComponent(situationFocus)}` : '';
@@ -2489,6 +2498,11 @@ function applyRouteFromHash() {
     situationLane = route.situationLane || 'all';
     situationFocus = route.situationFocus || '';
     if (route.situationGatesOpen) situationGatesOpen = true;
+  }
+  if (route.view === 'short-alpha') {
+    const section=route.shortAlphaSection || 'ideas';
+    if(section!==shortAlphaSection)document.getElementById('short-alpha-panel')?.scrollTo({top:0});
+    shortAlphaSection=section;
   }
   if (route.view === 'portfolio' && window.PortfolioViz) PortfolioViz.setRoute(route.scope || 'all', route.section || 'positions');
   if ((route.view === 'spx-0dte' || route.view === 'letf') && window.PortfolioViz) PortfolioViz.setStrategyRoute(route.strategySection || 'overview');
@@ -3333,6 +3347,29 @@ function loadInsightsShard(name) {
   });
 }
 
+async function loadEnergyFiles() {
+  if (loadedShards.has('file:energy')) return;
+  if (!shardPromises['file:energy']) {
+    shardPromises['file:energy'] = Promise.allSettled([
+      fetchShardJson('data/energy_model.json'), fetchShardJson('data/energy_btc_bridge.json'),
+      fetchShardJson('data/energy_refresh_status.json')
+    ]).then(([energy, bridge, refresh]) => {
+      data.energy_model = energy.status === 'fulfilled' ? energy.value : null;
+      data.energy_btc_bridge = bridge.status === 'fulfilled' ? bridge.value : null;
+      data.energy_refresh_status = refresh.status === 'fulfilled' ? refresh.value : null;
+      loadedShards.add('file:energy');
+    });
+  }
+  return shardPromises['file:energy'];
+}
+
+window.addEventListener('energy-model-retry', async () => {
+  delete shardPromises['file:energy'];
+  loadedShards.delete('file:energy');
+  await loadEnergyFiles();
+  renderInsights();
+});
+
 function loadLazyFile(key) {
   const loaders = {
     research_memory: () => loadShardOnce('file:research_memory', 'data/research_memory.json', (doc) => { data.research_memory = doc; }),
@@ -3340,6 +3377,7 @@ function loadLazyFile(key) {
     kpi_trends: () => loadShardOnce('file:kpi_trends', 'data/kpi_trends.json', (doc) => { data.kpi_trends = doc; }),
     technical_signals: () => loadShardOnce('file:technical_signals', 'data/technical_signals.json', (doc) => { data.technical_signals = doc; }),
     world_model: () => loadShardOnce('file:world_model', 'data/world_model.json', (doc) => { data.world_model = doc; }),
+    energy: loadEnergyFiles,
     hk_snowball: () => loadShardOnce('file:hk_snowball', 'data/hk_snowball_model.json', (doc) => { data.hk_snowball_model = doc; }),
     respiratory_model: () => loadShardOnce('file:respiratory_model', 'data/respiratory_model.json', (doc) => { data.respiratory_model = doc; }),
     document_catalog: () => loadShardOnce('file:document_catalog', 'data/document_catalog.json', (doc) => { data.document_catalog = doc; }),
@@ -3371,7 +3409,7 @@ const INSIGHTS_SECTION_FILES = {
   index_watch: ['index_membership'],
   documents: ['document_catalog'],
   memory: ['research_memory'],
-  tickers: ['world_model', 'hk_snowball'],
+  tickers: ['world_model', 'hk_snowball', 'energy'],
 };
 
 function insightsSectionReady(section) {
@@ -3639,6 +3677,13 @@ function renderShortAlpha() {
   const loading = document.getElementById('short-alpha-loading');
   const content = document.getElementById('short-alpha-content');
   if (!loading || !content) return;
+  if (shortAlphaSection==='backtest' && window.ShortAlphaViz) {
+    loading.style.display='none';
+    content.style.display='block';
+    content.innerHTML=ShortAlphaViz.renderBacktest();
+    mountReverseSplitsSection(content);
+    return;
+  }
   if (!shortAlphaData) {
     loading.style.display = 'block';
     content.style.display = 'none';
@@ -3683,7 +3728,8 @@ function mountReverseSplitsSection(content) {
   if (!content || !window.ShortAlphaViz || typeof ShortAlphaViz.mountReverseSplits !== 'function') return;
   loadReverseSplits().then(doc => {
     // The placeholder is re-created on every Shorts re-render; mount into the current one.
-    if (doc && window.ReverseSplitsViz && content.isConnected && content.querySelector('[data-short-reverse-splits]')) {
+    if (!window.ReverseSplitsViz && doc) doc=null;
+    if (content.isConnected && content.querySelector('[data-short-reverse-splits], [data-short-backtest-teaser]')) {
       ShortAlphaViz.mountReverseSplits(content, doc);
     }
   });
@@ -4163,6 +4209,9 @@ function renderInsights(opts = {}) {
     portfolioMacroRegime: data.portfolio_macro_regime || null,
     worldModel: data.world_model || null,
     hkSnowball: data.hk_snowball_model || null,
+    energyModel: data.energy_model || null,
+    energyBridge: data.energy_btc_bridge || null,
+    energyRefresh: data.energy_refresh_status || null,
     tickerSourceFilter: insightsTickerSourceFilter,
     tickerViewMode: insightsTickerViewMode,
     tickerSortMode: insightsTickerSortMode,
@@ -4188,6 +4237,7 @@ function renderInsights(opts = {}) {
     biotechSearch,
     biotechShowLimit,
   });
+  if (window.EnergyModelViz) EnergyModelViz.bind(content);
   if (window.IndexViz && IndexViz.bindIndexWatchToggles && data.index_membership) {
     IndexViz.bindIndexWatchToggles(content, data.index_membership, {
       escapeHtml,

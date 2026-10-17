@@ -188,7 +188,7 @@ def test_hot_routes_do_not_scan_full_history():
     timer = (
         ROOT / "_system/trading/portfolio_hub/deploy/portfolio-hub-publisher.timer"
     ).read_text(encoding="utf-8")
-    assert "OnUnitActiveSec=5min" in timer
+    assert "OnUnitActiveSec=1h" in timer
     assert "OnUnitActiveSec=30s" not in timer
 
 

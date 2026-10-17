@@ -398,8 +398,30 @@ def write_darwin_bundle(payload: dict, data_dir: Path) -> None:
 
 
 def write_shards(payload: dict, insights_doc: dict | None, data_dir: Path) -> dict:
-    core = build_core_payload(payload)
+    # Direct callers can bypass build_dashboard_data.main(), and its monolith
+    # may already have been replaced. Compare against the still-published
+    # shards before writing or pruning any asset.
     core_path = data_dir / "core.json"
+    if core_path.exists():
+        from build_dashboard_data import (  # late import: the builder uses this writer
+            refuse_infra_collapse,
+            refuse_research_collapse,
+            refuse_valuation_collapse,
+        )
+
+        prior = json.loads(core_path.read_text(encoding="utf-8"))
+        prior_rows = {
+            str(row["ticker"]): dict(row)
+            for row in prior.get("tickers") or [] if row.get("ticker")
+        }
+        for ticker, row in prior_rows.items():
+            path = data_dir / "tickers" / shard_filename(ticker)
+            if path.exists():
+                row.update(json.loads(path.read_text(encoding="utf-8")))
+        refuse_infra_collapse(payload, prior_rows)
+        refuse_research_collapse(payload, prior_rows)
+        refuse_valuation_collapse(payload, prior_rows)
+    core = build_core_payload(payload)
     core_path.write_text(_dump(core), encoding="utf-8")
     write_darwin_bundle(payload, data_dir)
     ticker_count = write_ticker_shards(payload, data_dir)

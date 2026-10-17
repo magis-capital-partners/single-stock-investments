@@ -65,6 +65,8 @@ if hasattr(sys.stdout, "reconfigure"):
 
 ROOT = Path(__file__).resolve().parents[2]
 DAILY = ROOT / "_system" / "memory" / "daily"
+_DEFAULT_DAILY = DAILY
+HUB_DAILY = ROOT / "_system" / "memory-hub" / "research-equity" / "daily"
 MEMORY = ROOT / "_system" / "memory" / "MEMORY.md"
 LEDGER = ROOT / "_system" / "memory" / "triage_ledger.json"
 DEFAULT_OUT = ROOT / "_system" / "reviews" / "pending" / "memory_triage.md"
@@ -380,7 +382,7 @@ def record(ledger: dict, item: dict, decision: str, reason: str, by: str,
         "excerpt": " ".join(item["body"])[:160],
         "kind": proposal_kind(item),
         "reason_code": reason_code or "manual_disposition",
-        "source_ref": f"_system/memory/daily/{item['file']}",
+        "source_ref": item.get("source_ref") or f"_system/memory/daily/{item['file']}",
     }
     if decision == "routed":
         entry["destination"] = destination or route_destination(item, entry["kind"])
@@ -567,7 +569,21 @@ def collect(since: str | None) -> tuple[list[dict], int]:
         day = DATED.search(path.name)
         if since and day and day.group(1) < since:
             continue
-        items.extend(parse_file(path))
+        parsed = parse_file(path)
+        for p in parsed:
+            p.setdefault("source_ref", f"_system/memory/daily/{path.name}")
+        items.extend(parsed)
+    if DAILY == _DEFAULT_DAILY and HUB_DAILY.is_dir():
+        for path in sorted(HUB_DAILY.glob("*.md")):
+            day = DATED.search(path.name)
+            if not day:
+                continue
+            if since and day.group(1) < since:
+                continue
+            parsed = parse_file(path)
+            for p in parsed:
+                p["source_ref"] = f"_system/memory-hub/research-equity/daily/{path.name}"
+            items.extend(parsed)
     return dedupe(items)
 
 

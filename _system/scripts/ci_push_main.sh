@@ -329,6 +329,9 @@ ci_push_main() {
   # A self-refresh updates this tracked helper in the worktree. Stage it so a
   # later rebase always starts from a clean tree.
   git diff --quiet -- _system/scripts/ci_push_main.sh || git add _system/scripts/ci_push_main.sh
+  if [ -f _system/scripts/compact_dated_artifacts.py ]; then
+    "$PYTHON" _system/scripts/compact_dated_artifacts.py --guard-staged || true
+  fi
   if git diff --staged --quiet; then
     echo "No staged changes to commit."
     exit 0

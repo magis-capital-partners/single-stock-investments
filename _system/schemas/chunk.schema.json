@@ -1,0 +1,16 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "magis.chunk.v1",
+  "title": "Magis text chunk row (chunks.jsonl)",
+  "type": "object",
+  "required": ["chunk_id", "ticker", "kind", "source_path", "text"],
+  "properties": {
+    "chunk_id": {"type": "string", "minLength": 8},
+    "ticker": {"type": "string"},
+    "kind": {"type": "string", "enum": ["deep_dive", "filing_digest", "memory", "thesis"]},
+    "source_path": {"type": "string", "minLength": 1},
+    "section": {"type": ["string", "null"]},
+    "text": {"type": "string", "minLength": 1},
+    "token_estimate": {"type": "integer", "minimum": 1}
+  }
+}
