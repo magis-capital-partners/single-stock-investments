@@ -1,0 +1,82 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<!--
+  Always-on podcast + YouTube media lane for the Mac Mini.
+
+  Installed by _system/scripts/install_mac_media_lane.sh into
+  ~/Library/LaunchAgents/. Do not load this template path directly — the
+  installer rewrites REPO_ROOT / PYTHON placeholders for the local checkout.
+
+  Resource posture:
+    * ProcessType Background + Nice 15 so interactive apps win the CPU
+    * Soft memory cap (8 GiB) so a runaway Whisper load cannot pin the Mini
+    * KeepAlive restarts after a crash; the Python supervisor itself loops
+      forever and sequences Whisper → YouTube → analysis so they never overlap
+-->
+<plist version="1.0">
+<dict>
+  <key>Label</key>
+  <string>com.magis.ssi.media-lane</string>
+
+  <key>ProgramArguments</key>
+  <array>
+    <string>__PYTHON__</string>
+    <string>-u</string>
+    <string>__REPO_ROOT__/_system/scripts/media_lane_supervisor.py</string>
+  </array>
+
+  <key>WorkingDirectory</key>
+  <string>__REPO_ROOT__</string>
+
+  <key>EnvironmentVariables</key>
+  <dict>
+    <key>PYTHONUNBUFFERED</key>
+    <string>1</string>
+    <key>WHISPER_MODEL</key>
+    <string>distil-large-v3</string>
+    <key>WHISPER_THREADS</key>
+    <string>4</string>
+    <key>MEDIA_LANE_MEMORY_FLOOR_MB</key>
+    <string>2500</string>
+    <key>MEDIA_LANE_ANALYSIS_MODEL</key>
+    <string>qwen-gpu</string>
+    <key>MEDIA_LANE_MODEL_PATH</key>
+    <string>qwen/qwen3.5-9b</string>
+    <key>MEDIA_LANE_IDLE_MINS</key>
+    <string>30</string>
+    <key>MEDIA_LANE_YT_WHISPER</key>
+    <string>0</string>
+    <key>LOCAL_LLM_BASE</key>
+    <string>http://localhost:1234/v1</string>
+    <key>PATH</key>
+    <string>/opt/homebrew/bin:/usr/local/bin:/usr/bin:/bin</string>
+  </dict>
+
+  <key>RunAtLoad</key>
+  <true/>
+
+  <key>KeepAlive</key>
+  <true/>
+
+  <key>Nice</key>
+  <integer>15</integer>
+
+  <key>ProcessType</key>
+  <string>Background</string>
+
+  <key>SoftResourceLimits</key>
+  <dict>
+    <!-- 8 GiB soft RSS target; the supervisor also pauses below 2.5 GiB free -->
+    <key>ResidentSize</key>
+    <integer>8589934592</integer>
+  </dict>
+
+  <key>StandardOutPath</key>
+  <string>__REPO_ROOT__/tmp/media_lane_launchd.out.log</string>
+  <key>StandardErrorPath</key>
+  <string>__REPO_ROOT__/tmp/media_lane_launchd.err.log</string>
+
+  <key>ThrottleInterval</key>
+  <integer>120</integer>
+</dict>
+</plist>
