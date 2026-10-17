@@ -22,6 +22,8 @@ from pathlib import Path
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 
 from check_reverse_splits import DASHBOARD_PATH, health  # noqa: E402
+from reverse_splits.config import DATA_DIR  # noqa: E402
+from reverse_splits.net_edge_evidence import digest, prospective_status  # noqa: E402
 from reverse_splits.ledger import (  # noqa: E402
     latest_manifest,
     ledger_paths,
@@ -38,6 +40,29 @@ RECENT_DAYS = 90
 MAX_RECENT = 100
 MAX_UPCOMING = 50
 MAX_REPEAT = 50
+
+
+def edge_v3_reference(ledger_dir):
+    source = ledger_dir / "net_edge_research_v3.json"
+    if not source.exists(): return None
+    doc = read_json(source)
+    reference = {"schema_version": doc["schema_version"], "version": doc["version"],
+                 "summary_url": "data/shorts_net_edge_v3.json", "summary_sha256": digest(source)}
+    free = ledger_dir / "free_evidence.json"
+    if free.exists():
+        reference["free_evidence_ref"] = {"url": "data/shorts_free_evidence.json", "sha256": digest(free)}
+        borrow = ledger_dir / "free_borrow_evidence.json"
+        if borrow.exists():
+            reference["free_evidence_ref"]["borrow_ref"] = {"url": "data/shorts_free_borrow.json", "sha256": digest(borrow)}
+    calmar = ledger_dir / "calmar_research.json"
+    if calmar.exists():
+        reference["calmar_research_ref"] = {"url": "data/shorts_calmar_research.json", "sha256": digest(calmar),
+                                            "base_summary_sha256": digest(source)}
+    expanded = ledger_dir / "coverage_research.json"
+    if expanded.exists():
+        reference["coverage_research_ref"] = {"url": "data/shorts_coverage_research.json", "sha256": digest(expanded),
+                                               "base_summary_sha256": digest(source)}
+    return reference
 
 # Two event rows for one issuer are the same split recorded twice when their
 # ratios agree within this fraction and their ex dates within this many days
@@ -575,6 +600,11 @@ def build(*, today: date | None = None, ledger_dir: Path | None = None) -> dict:
         "process": process_section(),
         "decisions_summary": decisions_summary(decisions, chain_errors),
         "health": {"status": report["status"], "structural_errors": report["structural_errors"], "problems": report["problems"]},
+        "net_edge_research": read_json(paths["manifest"].parent / "net_edge_research.json", None),
+        "net_edge_manifest": read_json(paths["manifest"].parent / "net_edge_manifest.json", None),
+        "net_edge_research_v3": edge_v3_reference(paths["manifest"].parent),
+        "net_edge_manifest_v3": read_json(paths["manifest"].parent / "net_edge_manifest_v3.json", None),
+        "net_edge_prospective_v3": prospective_status(paths["manifest"].parent),
     }
 
 
@@ -605,6 +635,28 @@ def main(argv: list[str] | None = None) -> int:
     payload = build(ledger_dir=args.ledger_dir)
     target = args.out or DASHBOARD_PATH
     write_json(target, payload)
+    import shutil
+    audit_source = (args.ledger_dir or DATA_DIR) / "net_edge_audits_v3"
+    if audit_source.exists():
+        shutil.copytree(audit_source, target.parent / "net_edge_audits_v3", dirs_exist_ok=True)
+    summary_source = (args.ledger_dir or DATA_DIR) / "net_edge_research_v3.json"
+    if summary_source.exists():
+        shutil.copyfile(summary_source, target.parent / "shorts_net_edge_v3.json")
+    calmar_source = (args.ledger_dir or DATA_DIR) / "calmar_research.json"
+    if calmar_source.exists():
+        shutil.copyfile(calmar_source, target.parent / "shorts_calmar_research.json")
+    coverage_source = (args.ledger_dir or DATA_DIR) / "coverage_research.json"
+    if coverage_source.exists():
+        shutil.copyfile(coverage_source, target.parent / "shorts_coverage_research.json")
+        for folder in ("packets", "audits"):
+            shutil.copytree(coverage_source.parent / ("coverage_"+folder), target.parent / ("shorts_coverage_"+folder), dirs_exist_ok=True)
+    free_source = (args.ledger_dir or DATA_DIR) / "free_evidence.json"
+    if free_source.exists():
+        shutil.copyfile(free_source, target.parent / "shorts_free_evidence.json")
+        shutil.copytree(free_source.parent / "free_packets", target.parent / "free_short_packets", dirs_exist_ok=True)
+        borrow_source = free_source.parent / "free_borrow_evidence.json"
+        if borrow_source.exists():
+            shutil.copyfile(borrow_source, target.parent / "shorts_free_borrow.json")
     write_portfolio_csv(payload,target.with_name('reverse_splits_portfolios.csv'))
     c = payload["counts"]
     print(

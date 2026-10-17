@@ -9,9 +9,18 @@ import os
 import re
 from datetime import datetime, timezone
 from pathlib import Path
+import sys
 
 ROOT = Path(__file__).resolve().parents[2]
+SCRIPTS = Path(__file__).resolve().parent
+if str(SCRIPTS) not in sys.path:
+    sys.path.insert(0, str(SCRIPTS))
+
+from atomic_io import attach_envelope, write_json_if_changed, write_text_if_changed  # noqa: E402
+from vault_paths import research_vault_root  # noqa: E402
+
 OUTPUT = ROOT / "dashboard" / "data" / "document_registry.json"
+CATALOG_JSONL = ROOT / "_system" / "data" / "catalog" / "documents.jsonl"
 CONFIG_PATH = ROOT / "_system" / "reference" / "document-store" / "google_drive_config.json"
 DEFAULT_LETTERS_DRIVE_FOLDER_ID = "0AFpaOm4iTLqjUk9PVA"
 DEFAULT_GENERAL_DRIVE_FOLDER_ID = "0AFpaOm4iTLqjUk9PVA"
@@ -173,6 +182,47 @@ def title_for(path: Path) -> str:
     return path.stem.replace("_", " ").replace("-", " ").strip()
 
 
+def infer_ticker_for_path(path_rel: str | None) -> str | None:
+    if not path_rel:
+        return None
+    parts = [p for p in str(path_rel).replace("\\", "/").split("/") if p]
+    if not parts:
+        return None
+    if parts[0] not in SKIP_TICKER_DIRS and not parts[0].startswith((".", "_")):
+        return parts[0].upper()
+    if parts[:3] in (
+        ["_system", "reference", "vic-research"],
+        ["_system", "reference", "sumzero-research"],
+    ) and len(parts) >= 4 and not parts[3].startswith("_"):
+        return parts[3].upper()
+    return None
+
+
+def stores_for_doc(doc: dict) -> list[str]:
+    stores: list[str] = []
+    local_p = str(doc.get("local_pdf_path") or "")
+    text_p = str(doc.get("text_extract_path") or "")
+    if local_p and (ROOT / local_p).is_file():
+        stores.append("ssi")
+    if doc.get("drive_file_id") or doc.get("drive_web_view_link"):
+        stores.append("drive")
+    vault = research_vault_root()
+    if any(
+        p.startswith(
+            (
+                "_system/reference/superinvestor-letters",
+                "_system/reference/investment-wisdom",
+                "_system/reference/sumzero-research",
+                "_system/reference/vic-research",
+            )
+        )
+        for p in (local_p, text_p)
+        if p
+    ) or (vault is not None and doc.get("vault_extract_path")):
+        stores.append("vault")
+    return stores or ["ssi"]
+
+
 def existing_by_sha(existing: dict) -> dict[str, dict]:
     return {d.get("sha256"): d for d in existing.get("documents") or [] if d.get("sha256")}
 
@@ -266,8 +316,24 @@ def build() -> dict:
         }
         docs.append(doc)
         current_by_sha[digest] = doc
+
+    # Preserve Drive-backed entries whose local binary PDF is not checked out on disk.
+    for sha, prior in sorted(existing_sha.items()):
+        if sha in seen_sha:
+            continue
+        if prior.get("drive_file_id") or prior.get("drive_web_view_link"):
+            preserved = dict(prior)
+            preserved.setdefault("document_id", f"sha256:{sha}")
+            docs.append(preserved)
+            seen_sha.add(sha)
+            current_by_sha[sha] = preserved
+
+    for doc in docs:
+        doc["ticker"] = doc.get("ticker") or infer_ticker_for_path(doc.get("local_pdf_path"))
+        doc["stores"] = stores_for_doc(doc)
+
     uploaded = sum(1 for d in docs if d.get("drive_web_view_link"))
-    return {
+    payload = {
         "generated_at": now_iso(),
         "schema_version": 1,
         "config": {
@@ -288,15 +354,45 @@ def build() -> dict:
         },
         "documents": docs,
     }
+    return attach_envelope(
+        payload,
+        feed_id="dashboard-document-registry",
+        row_count=len(docs),
+    )
+
+
+def write_catalog_jsonl(payload: dict) -> Path:
+    CATALOG_JSONL.parent.mkdir(parents=True, exist_ok=True)
+    lines: list[str] = []
+    for doc in sorted(payload.get("documents") or [], key=lambda d: str(d.get("sha256") or "")):
+        row = {
+            "document_id": doc.get("document_id"),
+            "sha256": doc.get("sha256"),
+            "title": doc.get("title"),
+            "ticker": doc.get("ticker") or infer_ticker_for_path(doc.get("local_pdf_path")),
+            "source_type": doc.get("source_type"),
+            "stores": doc.get("stores") or stores_for_doc(doc),
+            "ssi_pdf_path": doc.get("local_pdf_path"),
+            "text_extract_path": doc.get("text_extract_path"),
+            "drive_file_id": doc.get("drive_file_id"),
+            "drive_folder_path": doc.get("drive_folder_path"),
+            "drive_web_view_link": doc.get("drive_web_view_link"),
+            "size_bytes": doc.get("size_bytes"),
+            "modified_at": doc.get("modified_at"),
+        }
+        lines.append(json.dumps(row, sort_keys=True, separators=(",", ":"), ensure_ascii=False))
+    write_text_if_changed(CATALOG_JSONL, "\n".join(lines) + ("\n" if lines else ""))
+    return CATALOG_JSONL
 
 
 def main() -> None:
     OUTPUT.parent.mkdir(parents=True, exist_ok=True)
     payload = build()
-    OUTPUT.write_text(json.dumps(payload, indent=2, sort_keys=True) + "\n", encoding="utf-8")
+    write_json_if_changed(OUTPUT, payload, indent=2, sort_keys=True)
+    jsonl_path = write_catalog_jsonl(payload)
     s = payload["summary"]
     print(
-        f"Wrote {OUTPUT.relative_to(ROOT)} "
+        f"Wrote {OUTPUT.relative_to(ROOT)} and {jsonl_path.relative_to(ROOT)} "
         f"({s['document_count']} PDFs, {s['uploaded_count']} uploaded, {s['pending_upload_count']} pending)"
     )
 

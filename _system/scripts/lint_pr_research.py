@@ -38,8 +38,8 @@ SCRIPTS = Path(__file__).resolve().parent
 PY = sys.executable
 TICKER_RE = re.compile(r"^([^/]+)/research/")
 
-MECHANICAL_EVIDENCE = re.compile(r"^[^/]+/research/evidence/thematic_context_\d{4}-\d{2}-\d{2}\.md$")
-MECHANICAL_INSIDER = re.compile(r"^[^/]+/research/evidence/insider_signal_\d{4}-\d{2}-\d{2}\.md$")
+MECHANICAL_EVIDENCE = re.compile(r"^[^/]+/research/evidence/thematic_context(?:_\d{4}-\d{2}-\d{2})?\.md$")
+MECHANICAL_INSIDER = re.compile(r"^[^/]+/research/evidence/insider_signal(?:_\d{4}-\d{2}-\d{2})?\.md$")
 MECHANICAL_MI = re.compile(r"^[^/]+/research/market_inputs\.json$")
 # What lint_deep_dive.py and lint_adversarial.py --consistency-only compare.
 CONSISTENCY_SURFACE = re.compile(

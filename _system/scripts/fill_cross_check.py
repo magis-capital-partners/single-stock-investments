@@ -82,7 +82,7 @@ def fill_cross_check(ticker: str, out_date: str) -> str:
         f"**Date:** {out_date}",
         "**Agent:** Marvin (automated fill)",
         f"**Marvin dive:** `{dive}`",
-        f"**Source inventory:** `{ticker}/third-party-analyses/source_inventory_{out_date}.md`",
+        f"**Source inventory:** `{ticker}/third-party-analyses/source_inventory.md`",
         "**Framework:** `_system/frameworks/third_party_cross_reference.md`, `external_view_blend.md`",
         "",
         "## Executive summary",
@@ -170,7 +170,7 @@ def fill_cross_check(ticker: str, out_date: str) -> str:
         "",
         f"1. `{dive}`",
         f"2. `{ticker}/research/valuation.json`",
-        f"3. `{ticker}/third-party-analyses/source_inventory_{out_date}.md`",
+        f"3. `{ticker}/third-party-analyses/source_inventory.md`",
         "",
     ]
     return "\n".join(lines)

@@ -22,8 +22,24 @@ on:
       - "dashboard/functions/**"
       - "dashboard/oauth-proxy/**"
       - "dashboard/data/criticality_summary.json"
+      - "dashboard/data/portfolio_summary.json"
+      - "dashboard/data/research_manifest.json"
+      - "dashboard/data/kpi_summary.json"
+      - "dashboard/data/document_catalog_summary.json"
+      - "dashboard/data/agent_shards/**"
+      - "*/research/thesis_card.json"
+      - "*/research/latest.json"
+      - "GOOGL/research/valuation.json"
       - "ops-watchdog/**"
       - "AMZN/investor-documents/download_amzn_investor_docs.py"
+      - "TPL/research/evidence/thematic_context.md"
+      - "TPL/research/evidence/insider_signal.md"
+      - "TPL/research/evidence/filing_digest.md"
+      - "TPL/third-party-analyses/source_inventory.json"
+      - "GOOGL/research/evidence/thematic_context.md"
+      - "GOOGL/research/evidence/insider_signal.md"
+      - "GOOGL/research/evidence/filing_digest.md"
+      - "GOOGL/third-party-analyses/source_inventory.json"
       - "SOURCES.md"
       - ".gitignore"
       - "CONTRIBUTING.md"
@@ -36,6 +52,9 @@ on:
       - "dashboard/overlap-viz.js"
       - "dashboard/short-alpha-viz.js"
       - "dashboard/reverse-splits-viz.js"
+      - "dashboard/shorts-edge-v3-viz.js"
+      - "dashboard/shorts-coverage-viz.js"
+      - "dashboard/shorts-edge-v3.css"
       - "dashboard/reverse-splits-portfolio-viz.js"
       - "dashboard/reverse-splits-portfolio.css"
       - "dashboard/ideas.css"
@@ -53,8 +72,24 @@ on:
       - "dashboard/functions/**"
       - "dashboard/oauth-proxy/**"
       - "dashboard/data/criticality_summary.json"
+      - "dashboard/data/portfolio_summary.json"
+      - "dashboard/data/research_manifest.json"
+      - "dashboard/data/kpi_summary.json"
+      - "dashboard/data/document_catalog_summary.json"
+      - "dashboard/data/agent_shards/**"
+      - "*/research/thesis_card.json"
+      - "*/research/latest.json"
+      - "GOOGL/research/valuation.json"
       - "ops-watchdog/**"
       - "AMZN/investor-documents/download_amzn_investor_docs.py"
+      - "TPL/research/evidence/thematic_context.md"
+      - "TPL/research/evidence/insider_signal.md"
+      - "TPL/research/evidence/filing_digest.md"
+      - "TPL/third-party-analyses/source_inventory.json"
+      - "GOOGL/research/evidence/thematic_context.md"
+      - "GOOGL/research/evidence/insider_signal.md"
+      - "GOOGL/research/evidence/filing_digest.md"
+      - "GOOGL/third-party-analyses/source_inventory.json"
       - "SOURCES.md"
       - ".gitignore"
       - "CONTRIBUTING.md"
@@ -67,6 +102,9 @@ on:
       - "dashboard/overlap-viz.js"
       - "dashboard/short-alpha-viz.js"
       - "dashboard/reverse-splits-viz.js"
+      - "dashboard/shorts-edge-v3-viz.js"
+      - "dashboard/shorts-coverage-viz.js"
+      - "dashboard/shorts-edge-v3.css"
       - "dashboard/reverse-splits-portfolio-viz.js"
       - "dashboard/reverse-splits-portfolio.css"
       - "dashboard/ideas.css"
@@ -161,12 +199,8 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 20
     env:
-      # Tests that fail on main for reasons outside this workflow. They are
-      # deselected from the gate and run separately below, which says so when
-      # one starts passing. Owners: the D1/portfolio-hub and deploy lanes.
-      #   timer expectation (5min) vs portfolio-hub-publisher.timer (1h)
-      KNOWN_FAILURES: >-
-        _system/scripts/tests/test_d1_read_efficiency.py::test_hot_routes_do_not_scan_full_history
+      # Empty after the publisher cadence assertion was reconciled with main.
+      KNOWN_FAILURES: ""
       # Suites that live beside the scripts rather than under tests/. Missing
       # files are skipped, so a list entry can land before its file does.
       EXTRA_TEST_FILES: >-
@@ -196,18 +230,41 @@ jobs:
           # What the suites read: _system without the reference corpus (its
           # top-level registries stay), the workflows some tests parse, the D1
           # migrations, edge functions and oauth proxy, the ops-watchdog worker
-          # config, one criticality summary, one ticker download script for
-          # the payload-path test, and SOURCES.md for the source-index contract.
+          # config, one criticality summary, the L0 summary feeds and L1 agent
+          # shards (the FTS5 ticker query is built from those shards), every
+          # thesis card and latest.json (claim rebuild and the 10-ticker
+          # golden eval), GOOGL/research/valuation.json (get_valuation), the
+          # TPL/GOOGL canonical evidence files the architecture test opens,
+          # one ticker download script for the payload-path test, and
+          # SOURCES.md for the source-index contract.
           sparse-checkout: |
             /_system/
             !/_system/reference/*/
+            /_system/reference/energy/
+            /_system/reference/market-data/energy/
             /.github/
             /dashboard/cloudflare/
             /dashboard/functions/
             /dashboard/oauth-proxy/
             /dashboard/data/criticality_summary.json
+            /dashboard/data/portfolio_summary.json
+            /dashboard/data/research_manifest.json
+            /dashboard/data/kpi_summary.json
+            /dashboard/data/document_catalog_summary.json
+            /dashboard/data/agent_shards/
+            /*/research/thesis_card.json
+            /*/research/latest.json
+            /GOOGL/research/valuation.json
             /ops-watchdog/
             /AMZN/investor-documents/download_amzn_investor_docs.py
+            /TPL/research/evidence/thematic_context.md
+            /TPL/research/evidence/insider_signal.md
+            /TPL/research/evidence/filing_digest.md
+            /TPL/third-party-analyses/source_inventory.json
+            /GOOGL/research/evidence/thematic_context.md
+            /GOOGL/research/evidence/insider_signal.md
+            /GOOGL/research/evidence/filing_digest.md
+            /GOOGL/third-party-analyses/source_inventory.json
             /SOURCES.md
             /.gitignore
             /CONTRIBUTING.md
@@ -220,6 +277,9 @@ jobs:
             /dashboard/overlap-viz.js
             /dashboard/short-alpha-viz.js
             /dashboard/reverse-splits-viz.js
+            /dashboard/shorts-edge-v3-viz.js
+            /dashboard/shorts-coverage-viz.js
+            /dashboard/shorts-edge-v3.css
             /dashboard/ideas.css
             /dashboard/short-alpha.css
             /dashboard/data/separations.json
@@ -237,13 +297,14 @@ jobs:
       - name: Show the UI test runtime
         run: node --version
       - name: Install test dependencies
-        # Deliberately not the trading requirements files: those pull in
-        # ib_async / ib_insync, and the tests are written for their absence
-        # (the bridge imports them lazily and the tests stub them).
+        # Avoid the full trading requirements: these tests keep ib_async /
+        # ib_insync absent, but the offline reverse-split replay imports these
+        # research libraries directly.
         run: |
           python -m pip install --disable-pip-version-check --quiet \
             "pytest==9.1.1" "PyYAML==6.0.3" "jsonschema==4.26.0" "numpy==2.3.3" "scipy==1.16.2" \
-            "ruff==0.16.0"
+            "ruff==0.16.0" "pandas==3.0.3" "requests==2.34.2" \
+            "beautifulsoup4==4.15.0" "lxml==6.1.1"
       - name: Trading and script test suites
         run: |
           set -euo pipefail

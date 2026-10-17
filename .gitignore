@@ -32,6 +32,9 @@ tmp/
 # Workspace graph database - derived projection, rebuilt by graph_build.py;
 # the committed artifact is _system/graph/INVARIANTS.md, never the db.
 _system/graph/graph.db
+_system/cache/
+*.sqlite
+*.sqlite3
 
 # Local credentials - never commit service-account keys or OAuth tokens.
 _secrets/
@@ -132,3 +135,9 @@ _system/reviews/WATCHDOG.md
 # IR PDFs (investor-documents/ir-*) are deliberately NOT ignored -- IR sites
 # rotate and 404, so those are not reliably re-fetchable.
 */investor-documents/sec-edgar/
+
+# Reproducible energy vintages and duplicate model snapshots stay local.
+/_system/reference/market-data/energy/vintages/
+/_system/reference/market-data/energy/snapshots/
+/_system/reference/energy/assets/vintages/
+/_system/reference/energy/assets/local/

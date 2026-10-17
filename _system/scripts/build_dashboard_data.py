@@ -1899,15 +1899,32 @@ def latest_ssi_report(ticker_dir: Path) -> dict | None:
         "path": rel,
         "url": github_blob_url(rel),
     }
-    if report_date:
-        gate_path = research / "evidence" / f"ssi_report_gate_{report_date}.json"
+    evidence_dir = research / "evidence"
+    gate_candidates = (
+        [evidence_dir / f"ssi_report_gate_{report_date}.json", evidence_dir / "ssi_report_gate.json"]
+        if report_date
+        else [evidence_dir / "ssi_report_gate.json"] + sorted(evidence_dir.glob("ssi_report_gate_*.json"), reverse=True)
+    )
+    for gate_path in gate_candidates:
+        if not gate_path.is_file():
+            continue
         try:
             gate = json.loads(gate_path.read_text(encoding="utf-8"))
             block["gate_result"] = gate.get("result")
             block["gate_summary"] = gate.get("summary")
+            if not block.get("date") and gate.get("as_of"):
+                block["date"] = gate.get("as_of")
+            break
         except (OSError, json.JSONDecodeError):
             pass
-        verified_path = research / "evidence" / f"ssi_verified_claims_{report_date}.json"
+    verified_candidates = (
+        [evidence_dir / f"ssi_verified_claims_{report_date}.json", evidence_dir / "ssi_verified_claims.json"]
+        if report_date
+        else [evidence_dir / "ssi_verified_claims.json"] + sorted(evidence_dir.glob("ssi_verified_claims_*.json"), reverse=True)
+    )
+    for verified_path in verified_candidates:
+        if not verified_path.is_file():
+            continue
         try:
             verified = json.loads(verified_path.read_text(encoding="utf-8"))
             block["verified_claims"] = verified.get("verified_count")
@@ -1915,6 +1932,9 @@ def latest_ssi_report(ticker_dir: Path) -> dict | None:
             block["severity5"] = sum(
                 1 for c in verified.get("verified_claims", []) if c.get("severity") == 5
             )
+            if not block.get("date") and verified.get("as_of"):
+                block["date"] = verified.get("as_of")
+            break
         except (OSError, json.JSONDecodeError):
             pass
     return block

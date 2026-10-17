@@ -1,0 +1,130 @@
+{
+  "schema_version": "magis.agent_shard.v2",
+  "ticker": "HNFSA",
+  "company": "Hanover Foods Corporation",
+  "book": "holdings",
+  "shard_status": "built",
+  "as_of": "2026-07-21",
+  "registry": {
+    "market": "OTC",
+    "exchange": "OTC Pink",
+    "sleeve": "real_assets_land",
+    "moat": "unproven",
+    "dhando": "partial",
+    "payoff_lens": "asset"
+  },
+  "returns": {
+    "base_irr_pct": 3.9,
+    "unit": "percent_per_year",
+    "label": "annualized return",
+    "display": "3.9% (base)",
+    "scenarios_pct": {
+      "base": 3.9,
+      "bear": -1.9,
+      "bull": 6.9
+    }
+  },
+  "thesis_summary": {
+    "thesis": "Hanover Foods Corporation is a family-controlled U.S. food processor founded in 1924 and headquartered in Hanover, Pennsylvania. **[Fact]** The company cans and freezes vegetables, beans, soups, entrees, mushrooms, and related private-label products for retail and food-service customers under brands including Hanover, Myers, Bon Ton, and Aunt Kitty's. **[Fact]** As of the last SEC annual report (fiscal year ended May 30, 2004), the company operated **15 plants** across Pennsylvania, Maryland, Delaware, New Jersey, and Guatemala, with **2,205** employees. **[Fact]** Class A common stock (OTC Pink: HNFSA) is the publicly quoted line; Class B voting stock and related trusts remain controlled by the Warehime family. **[Fact]** The company deregistered from regular SEC reporting after a December 2004 odd-lot tender offer; no EDGAR filings appear after January 2005.",
+    "why_market_wrong": "The market may treat HNFSA as an illiquid OTC stub with no story, missing a **book-discount land-and-plant sleeve** on a still-operating regional processor. **[Inference]** At an indicative **~$55** Class A quote versus aggregator-reported GAAP book of **~$87.62** per share, the stock trades near **0.63×** stated book equity. **[Inference]** Predictive attribute: **holdco / family-control discount** plus **market structure discount** (OTC Pink, no current SEC or OTC Markets financial PDFs indexed, thin volume). **[Inference]** Owned plants and land are likely carried at historical cost, so economic asset value may exceed GAAP book, but that uplift is **not** in our base case without filed marks. **[Inference]** Proof-first component math sums to **~$61.24/sh** base economic value versus **~$55** price, but book and debt remain aggregator **[Assumption]** inputs.",
+    "stance": "watch",
+    "archetype": "optionality",
+    "base_irr_pct": 3.9,
+    "base_irr_unit": "percent_per_year",
+    "scenarios": {
+      "base": 3.9,
+      "bear": -1.9,
+      "bull": 6.9
+    },
+    "key_assumptions": [
+      {
+        "input": "Price today",
+        "source": "Yahoo HNFSA close 2026-07-20",
+        "value": "**$50.0**"
+      },
+      {
+        "input": "GAAP book per share",
+        "source": "Filing equity ÷ shares",
+        "value": "**$87.62**"
+      },
+      {
+        "input": "Payoff price (Year 7)",
+        "source": "Sum of parts / catalyst path in IRR steps",
+        "value": "**$72.0**"
+      },
+      {
+        "input": "Horizon (years)",
+        "source": "Model choice in valuation.json (not company guidance)",
+        "value": "**7**"
+      },
+      {
+        "input": "Leverage and staleness haircut uplift",
+        "source": "Debt ~$62M [Assumption]; embedded in $72 payoff not separate floor",
+        "value": "**+$15.62/sh**"
+      },
+      {
+        "input": "Plant / land remark (overlay only) uplift",
+        "source": "[Assumption] nav_floor; not in Lawrence base payoff",
+        "value": "**+$12.0/sh**"
+      },
+      {
+        "input": "Family liquidity catalyst (overlay only) uplift",
+        "source": "P=15% per SC 13E3 precedent",
+        "value": "**+$3.75/sh**"
+      }
+    ],
+    "open_questions": [
+      "Verify Class A price, share count, book, and debt against a current shareholder report (not aggregator).",
+      "Obtain PP&E / land breakout and any appraisal-style marks before promoting overlay uplift.",
+      "Reconcile **287,996** filed Class A shares vs **~1.21M** implied for book math.",
+      "Vicki shopbot brief if OTC disclosure page remains empty.",
+      "Appraisal-style **$300+** book per share claims remain **falsifier ceiling** only without evidence."
+    ]
+  },
+  "truncation": {
+    "key_assumptions": {
+      "shown": 7,
+      "total": 7
+    },
+    "open_questions": {
+      "shown": 5,
+      "total": 5
+    },
+    "kpi_series": {
+      "shown": 0,
+      "total": 0
+    },
+    "documents": {
+      "shown": 0,
+      "note": "capped at 15 most recent in builder"
+    }
+  },
+  "kpi_series": [],
+  "recent_news": [],
+  "documents": [],
+  "l2_pointers": {
+    "valuation_json": "HNFSA/research/valuation.json",
+    "thesis_card_json": "HNFSA/research/thesis_card.json",
+    "filing_digest_md": "HNFSA/research/evidence/filing_digest.md",
+    "insider_signal_md": null,
+    "thematic_context_md": "HNFSA/research/evidence/thematic_context.md",
+    "source_inventory_json": "HNFSA/third-party-analyses/source_inventory.json",
+    "full_ui_shard_json": "dashboard/data/tickers/HNFSA.json",
+    "latest_json": "HNFSA/research/latest.json",
+    "context_pack_md": "dashboard/data/context_packs/HNFSA.md"
+  },
+  "generated_at": "2026-10-16T20:26:21Z",
+  "_envelope": {
+    "schema_version": "magis.feed.v2",
+    "feed_id": "agent-shard-hnfsa",
+    "generated_at": "2026-10-16T20:26:21Z",
+    "as_of": "2026-07-21",
+    "content_sha256": "sha256:fca06ca84229879a2e4bf6c93fb7bfd0461bbc1d79db33c3a94ec535159a8637",
+    "row_count": 0,
+    "upstream_inputs": [],
+    "health": {
+      "status": "healthy",
+      "structural_errors": 0
+    }
+  }
+}

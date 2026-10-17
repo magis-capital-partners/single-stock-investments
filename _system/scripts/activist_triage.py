@@ -386,10 +386,10 @@ def triage_ticker(
 
 
 def write_triage_queue(all_human: list[dict], scan_date: str) -> Path | None:
+    from atomic_io import write_superseded_review_md
+
     if not all_human:
         return None
-    PENDING_DIR.mkdir(parents=True, exist_ok=True)
-    out = PENDING_DIR / f"activist_triage_{scan_date}.md"
     lines = [
         "# Activist triage — human review queue",
         "",
@@ -415,12 +415,11 @@ def write_triage_queue(all_human: list[dict], scan_date: str) -> Path | None:
     lines.extend(
         [
             "",
-            f"Reconcile in `{{TICKER}}/research/activist_reconcile_{scan_date}.md`.",
+            "Reconcile in `{TICKER}/research/activist_reconcile.md`.",
             "",
         ]
     )
-    out.write_text("\n".join(lines), encoding="utf-8")
-    return out
+    return write_superseded_review_md(PENDING_DIR, "activist_triage", scan_date, "\n".join(lines), keep_latest=2)
 
 
 def triage_portfolio(
