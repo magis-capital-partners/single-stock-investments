@@ -26,9 +26,10 @@ def dated_md_sort_key(path: Path) -> tuple[datetime, datetime]:
 
 def latest_dated_md(research: Path, prefix: str) -> Path | None:
     files = list(research.glob(f"{prefix}_*.md"))
-    if not files:
-        return None
-    return max(files, key=dated_md_sort_key)
+    if files:
+        return max(files, key=dated_md_sort_key)
+    canonical = research / f"{prefix}.md"
+    return canonical if canonical.is_file() else None
 
 
 def dated_md_label(path: Path) -> str:

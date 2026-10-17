@@ -58,6 +58,7 @@ SCRIPT_DIR = Path(__file__).resolve().parent
 if str(SCRIPT_DIR) not in sys.path:
     sys.path.insert(0, str(SCRIPT_DIR))
 
+from atomic_io import write_json_if_changed  # noqa: E402
 from build_ssi_evidence_pack import (  # noqa: E402
     canonical_hash,
     discover_filings,
@@ -77,7 +78,10 @@ IX_LINE_RE = re.compile(r"^([A-Za-z][A-Za-z0-9]*(?:\.[A-Za-z0-9]+)*):\s*(.+)$")
 
 def _latest_json_path(evidence_dir: Path, stem: str) -> Path | None:
     files = sorted(evidence_dir.glob(f"{stem}_*.json"), reverse=True)
-    return files[0] if files else None
+    if files:
+        return files[0]
+    canonical = evidence_dir / f"{stem}.json"
+    return canonical if canonical.is_file() else None
 
 
 def _load(path: Path) -> dict | None:
@@ -226,6 +230,9 @@ def compact_claims_file(claims_path: Path, claims_doc: dict, as_of: str) -> bool
         "Re-run build_ssi_claims.py to rebuild this array."
     )
     claims_path.write_text(json.dumps(compacted, indent=2) + "\n", encoding="utf-8")
+    canonical_claims = claims_path.parent / "ssi_claims.json"
+    if canonical_claims != claims_path and canonical_claims.is_file():
+        write_json_if_changed(canonical_claims, compacted)
     return True
 
 
@@ -460,10 +467,18 @@ def write_verification(ticker_dir: Path, as_of: str, compact: bool = True) -> tu
         return None
     evidence_dir = ticker_dir / "research" / "evidence"
     snapshot = result.pop("time_zero")
+    write_json_if_changed(evidence_dir / "ssi_verified_claims.json", result)
+    write_json_if_changed(evidence_dir / "ssi_time_zero.json", snapshot)
     verified_out = evidence_dir / f"ssi_verified_claims_{as_of}.json"
     snapshot_out = evidence_dir / f"ssi_time_zero_{as_of}.json"
-    verified_out.write_text(json.dumps(result, indent=2) + "\n", encoding="utf-8")
-    snapshot_out.write_text(json.dumps(snapshot, indent=2) + "\n", encoding="utf-8")
+    write_json_if_changed(verified_out, result)
+    write_json_if_changed(snapshot_out, snapshot)
+    for old in evidence_dir.glob("ssi_verified_claims_*.json"):
+        if old != verified_out:
+            old.unlink(missing_ok=True)
+    for old in evidence_dir.glob("ssi_time_zero_*.json"):
+        if old != snapshot_out:
+            old.unlink(missing_ok=True)
     return verified_out, snapshot_out
 
 
@@ -481,7 +496,11 @@ def main(argv: list[str] | None = None) -> int:
         ticker_dirs = [ROOT / t for t in args.tickers]
     else:
         ticker_dirs = sorted(
-            {p.parents[2] for p in ROOT.glob("*/research/evidence/ssi_claims_*.json")}
+            {
+                p.parents[2]
+                for pat in ("*/research/evidence/ssi_claims_*.json", "*/research/evidence/ssi_claims.json")
+                for p in ROOT.glob(pat)
+            }
         )
 
     failures = 0

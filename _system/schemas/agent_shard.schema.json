@@ -1,0 +1,24 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "magis.agent_shard.v2",
+  "title": "Magis L1 agent shard",
+  "type": "object",
+  "required": ["schema_version", "ticker", "company", "thesis_summary", "returns", "l2_pointers"],
+  "properties": {
+    "schema_version": {"const": "magis.agent_shard.v2"},
+    "ticker": {"type": "string", "minLength": 1},
+    "company": {"type": "string"},
+    "shard_status": {"type": "string", "enum": ["built", "not_built"]},
+    "returns": {
+      "type": "object",
+      "required": ["base_irr_pct", "unit"],
+      "properties": {
+        "base_irr_pct": {"type": ["number", "null"]},
+        "unit": {"const": "percent_per_year"}
+      }
+    },
+    "thesis_summary": {"type": "object"},
+    "l2_pointers": {"type": "object"},
+    "truncation": {"type": "object"}
+  }
+}

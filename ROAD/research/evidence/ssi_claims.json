@@ -1,0 +1,132 @@
+{
+  "schema_version": "1.0",
+  "ticker": "ROAD",
+  "as_of": "2026-09-08",
+  "pack_hash": "77851e53d5e060f5a13cc72323767b7ef30c9b95c983b9cf779460f6cafe5436",
+  "pack_as_of": "2026-09-08",
+  "claim_count": 215,
+  "severity_histogram": {
+    "1": 0,
+    "2": 137,
+    "3": 44,
+    "4": 30,
+    "5": 4
+  },
+  "concept_tier_histogram": {
+    "primary": 25,
+    "secondary": 125,
+    "footnote_detail": 61
+  },
+  "management_ledger": {
+    "as_of": "2026-09-08",
+    "pack_hash": "77851e53d5e060f5a13cc72323767b7ef30c9b95c983b9cf779460f6cafe5436",
+    "promise_count": 2,
+    "statement_count": 0,
+    "resolved_count": 0,
+    "hit_rate": null,
+    "unresolvable_count": 0,
+    "observed_buybacks": {
+      "window": "latest_fy",
+      "value": 23542000,
+      "periods": [
+        "2025-09-30"
+      ],
+      "tag": "us-gaap:PaymentsForRepurchaseOfCommonStock",
+      "accn": "0001628280-25-053871"
+    },
+    "rows": [
+      {
+        "promise": "On April 12, 2024, the Company's Board of Directors authorized a stock repurchase program under which up to $ 40.0 million is available to purchase shares of the Company's outstanding Class A common stock through September 30, 2025. Shares ",
+        "metric": "buyback_authorization",
+        "promised_value": 40000000.0,
+        "date_made": "2024-08-09",
+        "due": null,
+        "source_ref": {
+          "source_path": "ROAD/research/evidence/_text/10-Q_20240809_rpt20240630_acc0001718227_24_000061.htm.txt",
+          "source_sha256": "0a8c74babec0caddd99b7dd4af4854293b132d482d43b75a29f4df543d748bce",
+          "line": 967
+        },
+        "realized_value": null,
+        "delta": null,
+        "status": "open_authorization"
+      },
+      {
+        "promise": "seasonality and growth of our business, with our cash requirements increasing in periods of growth. Additional cash requirements resulting from our growth include the costs of additional personnel, production and distribution facilities, en",
+        "metric": "buyback_authorization",
+        "promised_value": 50000000.0,
+        "date_made": "2026-08-07",
+        "due": null,
+        "source_ref": {
+          "source_path": "ROAD/research/evidence/_text/10-Q_20260807_rpt20260630_acc0001628280_26_054661.htm.txt",
+          "source_sha256": "1a6ab2df3b27b07ad2fcd398d1c82fa0e45055b949b98fc648bc7bd8f6e47879",
+          "line": 1558
+        },
+        "realized_value": null,
+        "delta": null,
+        "status": "open_authorization"
+      }
+    ]
+  },
+  "spawner": {
+    "pack_hash": "77851e53d5e060f5a13cc72323767b7ef30c9b95c983b9cf779460f6cafe5436",
+    "components": {
+      "buyback_trajectory": {
+        "share_count_change_1y_pct": -51.39,
+        "share_count_cagr_pct": -22.8,
+        "years_observed": 4,
+        "read": "shrinking",
+        "evidence_ref": {
+          "tag": "us-gaap:CommonStockSharesOutstanding",
+          "first": {
+            "end": "2017-09-30",
+            "accn": "0001718227-18-000014"
+          },
+          "last": {
+            "end": "2019-09-30",
+            "accn": "0001718227-20-000093"
+          }
+        }
+      },
+      "capex_intensity": {
+        "capex_to_ocf": 0.473,
+        "capex_to_ocf_median": 0.622,
+        "years_observed": 9,
+        "period_end": "2025-09-30",
+        "read": "balanced",
+        "negative_ocf_years": 0,
+        "evidence_ref": {
+          "capex_tag": "us-gaap:PaymentsToAcquirePropertyPlantAndEquipment",
+          "ocf_tag": "us-gaap:NetCashProvidedByUsedInOperatingActivities"
+        }
+      },
+      "shareholder_returns": {
+        "buybacks_3y": [
+          139000,
+          11312000,
+          23542000
+        ],
+        "dividends_3y": [
+          31293000,
+          0
+        ],
+        "total_payout_ratio_latest": 0.231,
+        "evidence_ref": {
+          "buybacks_tag": "us-gaap:PaymentsForRepurchaseOfCommonStock",
+          "dividends_tag": "us-gaap:PaymentsOfDividendsCommonStock"
+        }
+      }
+    },
+    "abstentions": [
+      "small_bet_discipline:requires_segment_history",
+      "kill_discipline:requires_segment_history"
+    ],
+    "basis": "xbrl_series"
+  },
+  "dropped_modalities": {
+    "unrouted_delta_rows": 78,
+    "market_mechanics": "requires borrow/days-to-cover feed (see refresh_short_alpha_borrow.py)"
+  },
+  "claims_compacted": true,
+  "claims_verified_into": "ssi_verified_claims_2026-09-08.json",
+  "claims_compaction_note": "Claim bodies live in ssi_verified_claims (superset: adds `verification`). Re-run build_ssi_claims.py to rebuild this array."
+}

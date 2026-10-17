@@ -47,6 +47,14 @@ runs:
       shell: bash
       run: pip install -r _system/scripts/requirements.txt
 
+    - name: Install optional energy workbook reader
+      if: inputs.profile == 'world-model-weekly'
+      shell: bash
+      run: |
+        if ! pip install -r _system/scripts/requirements-energy.txt; then
+          echo "::warning::Energy workbook reader unavailable; cached project data will be retained."
+        fi
+
     - name: Configure Google credentials
       if: >
         inputs.profile == 'intake-full' ||

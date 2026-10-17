@@ -123,8 +123,9 @@ PROFILES: dict[str, list[list[str]]] = {
         ["_system/scripts/fetch_respiratory_panel.py"],
         ["_system/scripts/build_qdel_respiratory_model.py"],
         ["_system/scripts/fetch_theme_panel.py"],
-        ["_system/scripts/fetch_crypto_panel.py"],
+        ["_system/scripts/fetch_crypto_panel.py", "--skip-snowball"],
         ["_system/scripts/build_hk_snowball_model.py"],
+        ["_system/scripts/refresh_energy_model.py", "--optional"],
         ["_system/scripts/scaffold_industry_kpi_ledgers.py", "--write"],
         ["_system/scripts/resolve_linkages.py", "--update-ledgers"],
         [
@@ -137,7 +138,7 @@ PROFILES: dict[str, list[list[str]]] = {
         # and before lint, so the ledger lint sees this file.
         ["_system/scripts/build_fico_watch.py"],
         ["_system/scripts/lint_kpi_ledger.py"],
-        ["_system/scripts/build_world_model_snapshot.py", "--skip-resolve"],
+        ["_system/scripts/build_world_model_snapshot.py", "--skip-resolve", "--skip-snowball"],
         [
             "_system/scripts/apply_world_model_context.py",
             "--all",

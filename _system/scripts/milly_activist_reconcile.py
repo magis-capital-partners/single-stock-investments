@@ -18,6 +18,7 @@ from activist_common import (
     portfolio_tickers,
     save_ticker_index,
 )
+from atomic_io import write_text_if_changed
 from milly_short_claim_check import check_short_claims
 
 ROOT = Path(__file__).resolve().parents[2]
@@ -129,7 +130,7 @@ def reconcile_ticker(ticker: str, scan_date: str, *, write: bool = True) -> dict
     if write and pending:
         save_ticker_index(ticker, index)
 
-    out_path = ROOT / ticker / "research" / f"activist_reconcile_{scan_date}.md"
+    out_path = ROOT / ticker / "research" / "activist_reconcile.md"
     lines = [
         f"# {ticker} — Activist reconciliation (Milly mechanical)",
         "",
@@ -174,8 +175,9 @@ def reconcile_ticker(ticker: str, scan_date: str, *, write: bool = True) -> dict
         ]
     )
     if write and rows:
-        out_path.parent.mkdir(parents=True, exist_ok=True)
-        out_path.write_text("\n".join(lines), encoding="utf-8")
+        write_text_if_changed(out_path, "\n".join(lines))
+        for old in (ROOT / ticker / "research").glob("activist_reconcile_*.md"):
+            old.unlink(missing_ok=True)
 
     return {
         "ticker": ticker,

@@ -70,10 +70,10 @@ def scan_ticker(ticker: str) -> list[dict]:
 
 
 def write_queue(rows: list[dict], scan_date: str) -> Path | None:
+    from atomic_io import write_superseded_review_md
+
     if not rows:
         return None
-    PENDING.mkdir(parents=True, exist_ok=True)
-    out = PENDING / f"filing_insights_{scan_date}.md"
     lines = [
         "# Filing insights — human review queue",
         "",
@@ -91,11 +91,12 @@ def write_queue(rows: list[dict], scan_date: str) -> Path | None:
             f"| {row['ticker']} | {row['label']} | {ch_text} | "
             f"{row.get('parser_confidence') or '—'} | {flags or '—'} | {row.get('reason')} |"
         )
-    out.write_text("\n".join(lines) + "\n", encoding="utf-8")
-    return out
+    return write_superseded_review_md(PENDING, "filing_insights", scan_date, "\n".join(lines) + "\n", keep_latest=2)
 
 
 def main() -> int:
+    from atomic_io import write_json_if_changed
+
     parser = argparse.ArgumentParser()
     parser.add_argument("--date", default=date.today().isoformat())
     args = parser.parse_args()
@@ -104,19 +105,18 @@ def main() -> int:
         all_rows.extend(scan_ticker(ticker))
     path = write_queue(all_rows, args.date)
     print(f"Filing auto-resolve: {len(all_rows)} need human review -> {path or '(none)'}")
-    summary = ROOT / "_system" / "research" / f"filing_insights_summary_{args.date}.json"
-    summary.write_text(
-        json.dumps(
-            {
-                "generated_at": datetime.now(timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ"),
-                "human_count": len(all_rows),
-                "queue_path": str(path.relative_to(ROOT)) if path else None,
-            },
-            indent=2,
-        )
-        + "\n",
-        encoding="utf-8",
+    summary = ROOT / "_system" / "research" / "filing_insights_summary.json"
+    write_json_if_changed(
+        summary,
+        {
+            "generated_at": datetime.now(timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ"),
+            "human_count": len(all_rows),
+            "queue_path": str(path.relative_to(ROOT)) if path else None,
+        },
+        volatile_keys=("queue_path",),
     )
+    for old_s in (ROOT / "_system" / "research").glob("filing_insights_summary_*.json"):
+        old_s.unlink(missing_ok=True)
     return 0
 
 

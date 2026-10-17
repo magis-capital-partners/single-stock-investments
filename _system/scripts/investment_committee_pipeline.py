@@ -290,7 +290,9 @@ def discover_evidence(ticker: str) -> list[Path]:
         latest(research, "*evidence_reconciliation*.json"),
         latest(research, "*evidence_reconciliation*.md"),
         research / "committee_gap_carryforward.json",
+        research / "evidence" / "filing_facts.json",
         latest(research / "evidence", "filing_facts_*.json"),
+        research / "evidence" / "management_facts.json",
         latest(research / "evidence", "management_facts_*.json"),
         ROOT / "_system" / "research" / "calibration_brief.json",
     ]

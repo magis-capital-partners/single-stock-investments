@@ -20,6 +20,8 @@ import urllib.request
 from datetime import date, datetime, timezone
 from pathlib import Path
 
+from atomic_io import write_json_if_changed
+from build_ssi_evidence_pack import has_unchanged_ssi_chain
 from power_zone_router import build_route
 from calculation_proof import evaluate_calculation_proof
 from marvin_valuation import compute_component_valuation
@@ -41,8 +43,11 @@ def read_json(path: Path, default=None):
 
 
 def write_json(path: Path, value: dict) -> None:
-    path.parent.mkdir(parents=True, exist_ok=True)
-    path.write_text(json.dumps(value, indent=2, sort_keys=False) + "\n", encoding="utf-8")
+    write_json_if_changed(
+        path,
+        value,
+        volatile_keys=("as_of", "updated_at", "at", "stdout", "stderr", "last_attempt_at", "next_attempt_at"),
+    )
 
 
 def now() -> str:
@@ -1490,19 +1495,26 @@ def run_ticker(ticker: str, as_of: str, collect: bool, full_rerun: bool) -> dict
     state["stages"]["decision_contract"] = {"status": "complete" if decision["returncode"] == 0 else "failed", "at": now(), "result": decision}
 
     # SSI Perplexity-grade chain (Phases 1-4): deterministic, additive-only
-    # artifacts; safe to run on every readiness pass. Requires _text extracts
-    # (created by build_filing_evidence above when --collect ran).
+    # artifacts; skip when pack_hash is unchanged unless full_rerun is requested.
     ssi_results = []
-    for script in ("build_ssi_evidence_pack.py", "build_ssi_claims.py",
-                   "verify_ssi_claims.py", "build_ssi_report.py"):
-        ssi_results.append(run_command([str(SCRIPTS / script), ticker, "--date", as_of]))
-        if ssi_results[-1]["returncode"]:
-            break
-    state["stages"]["ssi_report"] = {
-        "status": "complete" if not any(r["returncode"] for r in ssi_results) else "partial",
-        "at": now(),
-        "results": ssi_results,
-    }
+    if not full_rerun and has_unchanged_ssi_chain(ROOT / ticker, as_of):
+        state["stages"]["ssi_report"] = {
+            "status": "complete",
+            "at": now(),
+            "results": [],
+            "skipped": "unchanged_pack_hash",
+        }
+    else:
+        for script in ("build_ssi_evidence_pack.py", "build_ssi_claims.py",
+                       "verify_ssi_claims.py", "build_ssi_report.py"):
+            ssi_results.append(run_command([str(SCRIPTS / script), ticker, "--date", as_of]))
+            if ssi_results[-1]["returncode"]:
+                break
+        state["stages"]["ssi_report"] = {
+            "status": "complete" if not any(r["returncode"] for r in ssi_results) else "partial",
+            "at": now(),
+            "results": ssi_results,
+        }
     write_json(state_path, state)
     return {"ticker": ticker, "status": state["status"], "method": identity["primary_method"], "ready": plan["ready_count"], "tasks": plan["task_count"]}
 

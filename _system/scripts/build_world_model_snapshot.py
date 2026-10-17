@@ -404,6 +404,7 @@ def build_strip(
 def main() -> int:
     ap = argparse.ArgumentParser(description=__doc__)
     ap.add_argument("--month", help="YYYY-MM snapshot month (default: current)")
+    ap.add_argument("--skip-snowball", action="store_true", help="Reuse the BTC companion already built by the caller")
     ap.add_argument(
         "--skip-resolve",
         action="store_true",
@@ -491,6 +492,8 @@ def main() -> int:
         f"cards={strip['counts']['prediction_cards']} "
         f"superorgs={strip['counts']['superorgs']}"
     )
+    if args.skip_snowball:
+        return 0
     # Best-effort HK snowball companion JSON (uses crypto CSVs if present)
     try:
         from build_hk_snowball_model import build as build_snowball  # noqa: WPS433

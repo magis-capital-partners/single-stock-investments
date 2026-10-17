@@ -241,6 +241,7 @@ def move_drive_file_to_ticker(
     ticker: str,
     dry_run: bool,
     existing_folders: dict[tuple[str, str], str],
+    sha256: str | None = None,
 ) -> dict:
     """Ensure Admin/Intake/{Kind}/{TICKER}/ and move/rename the Drive file there."""
     filename = item.get("name") or "document.pdf"
@@ -262,11 +263,18 @@ def move_drive_file_to_ticker(
     body: dict = {}
     if new_name != filename:
         body["name"] = new_name
+    if sha256:
+        body["appProperties"] = {
+            "sha256": sha256,
+            "document_id": f"sha256:{sha256}",
+            "ticker": ticker,
+            "source_type": intake_kind,
+        }
     kwargs = {
         "fileId": item["id"],
         "addParents": folder_id,
         "supportsAllDrives": True,
-        "fields": "id,name,parents,webViewLink",
+        "fields": "id,name,parents,webViewLink,appProperties",
     }
     if parents:
         kwargs["removeParents"] = ",".join(parents)
@@ -497,6 +505,7 @@ def import_intake(
                 ticker=parsed["ticker"],
                 dry_run=False,
                 existing_folders=existing_folders,
+                sha256=digest,
             )
             parsed["drive_moved_to"] = move_info.get("drive_moved_to")
         except Exception as exc:  # noqa: BLE001

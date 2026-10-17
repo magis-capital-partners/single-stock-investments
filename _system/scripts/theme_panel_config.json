@@ -16,8 +16,8 @@
       "description": "Demand chain behind land/surface/water optionality (TPL water, LB easements, WBI infra, APLD hosting, AZLCZ Southwest renewable). Hyperscaler capex is the upstream pulse; power and gas prices and Permian activity are the midstream signals.",
       "series": [
         {"id": "hyperscaler_capex_ttm_usd_bn", "label": "Hyperscaler capex guide (USD bn, latest)", "source": "repo_valuation", "good_for": "land_power_demand", "note": "Derived from ai_overlay in GOOGL/AMZN/META/MSFT valuation.json; filing-cited"},
-        {"id": "henry_hub_gas", "label": "Henry Hub natural gas spot (USD/MMBtu)", "source": "fred", "fred_id": "DHHNGSP", "good_for": "power_cost", "fallback": {"source": "yahoo_daily", "yahoo_symbol": "NG=F", "note": "NYMEX natural gas front-month when FRED DHHNGSP unavailable"}},
-        {"id": "electricity_price_us", "label": "US avg electricity price (cents/kWh)", "source": "fred", "fred_id": "APU000072610", "good_for": "power_cost", "staleness_max_days": 60},
+        {"id": "henry_hub_gas", "label": "Natural gas (USD/MMBtu; spot or futures fallback)", "source": "fred", "fred_id": "DHHNGSP", "good_for": "power_cost", "fallback": {"source": "yahoo_daily", "yahoo_symbol": "NG=F", "note": "NYMEX natural gas front-month when FRED DHHNGSP unavailable"}},
+        {"id": "electricity_price_us", "label": "US urban residential electricity price (USD/kWh)", "source": "fred", "fred_id": "APU000072610", "good_for": "power_cost", "staleness_max_days": 60},
         {"id": "wti_crude", "label": "WTI crude (USD/bbl)", "source": "fred", "fred_id": "DCOILWTICO", "good_for": "permian_cashflow", "fallback": {"source": "yahoo_daily", "yahoo_symbol": "CL=F", "note": "WTI front-month futures when FRED unavailable"}},
         {"id": "permian_crude_production_mbbl_d", "label": "Permian crude / oil-gas activity proxy", "source": "eia", "eia_route": "petroleum/crd/crpdn", "eia_facets": {"duoarea": "RTPP", "product": "EPC0", "process": "FPF"}, "good_for": "permian_volume", "optional": true, "staleness_max_days": 60, "note": "EIA Permian when EIA_API_KEY set; else FRED oil/gas extraction IP proxy", "fallback": {"source": "fred", "fred_id": "IPN213111S", "note": "US oil and gas extraction industrial production index (not kbbl/d)"}},
         {"id": "tpl_water_revenue_m", "label": "TPL water segment revenue (USD m, FY)", "source": "filing_panel", "panel": "tpl_operating_panel.csv", "metric": "water_revenue_m", "good_for": "water_infra_proof", "optional": true, "staleness_max_days": 400},
@@ -122,8 +122,8 @@
       "description": "BTC price and power cost for miner / hosting cash; overlaps AI when sites re-purpose power.",
       "series": [
         {"id": "btc_usd", "label": "Bitcoin spot (USD)", "source": "yahoo_daily", "yahoo_symbol": "BTC-USD", "good_for": "miner_revenue"},
-        {"id": "henry_hub_gas", "label": "Henry Hub natural gas spot (USD/MMBtu)", "source": "fred", "fred_id": "DHHNGSP", "good_for": "power_cost", "fallback": {"source": "yahoo_daily", "yahoo_symbol": "NG=F"}},
-        {"id": "electricity_price_us", "label": "US avg electricity price (cents/kWh)", "source": "fred", "fred_id": "APU000072610", "good_for": "power_cost", "staleness_max_days": 60},
+        {"id": "henry_hub_gas", "label": "Natural gas (USD/MMBtu; spot or futures fallback)", "source": "fred", "fred_id": "DHHNGSP", "good_for": "power_cost", "fallback": {"source": "yahoo_daily", "yahoo_symbol": "NG=F"}},
+        {"id": "electricity_price_us", "label": "US urban residential electricity price (USD/kWh)", "source": "fred", "fred_id": "APU000072610", "good_for": "power_cost", "staleness_max_days": 60},
         {"id": "hyperscaler_capex_ttm_usd_bn", "label": "Hyperscaler capex guide (USD bn, latest)", "source": "repo_valuation", "good_for": "site_repurpose_demand"}
       ]
     },
@@ -132,7 +132,7 @@
       "description": "Volume x commodity price for royalty trusts and mineral interests.",
       "series": [
         {"id": "wti_crude", "label": "WTI crude (USD/bbl)", "source": "fred", "fred_id": "DCOILWTICO", "good_for": "royalty_price", "fallback": {"source": "yahoo_daily", "yahoo_symbol": "CL=F"}},
-        {"id": "henry_hub_gas", "label": "Henry Hub natural gas spot (USD/MMBtu)", "source": "fred", "fred_id": "DHHNGSP", "good_for": "gas_royalty_price", "fallback": {"source": "yahoo_daily", "yahoo_symbol": "NG=F"}},
+        {"id": "henry_hub_gas", "label": "Natural gas (USD/MMBtu; spot or futures fallback)", "source": "fred", "fred_id": "DHHNGSP", "good_for": "gas_royalty_price", "fallback": {"source": "yahoo_daily", "yahoo_symbol": "NG=F"}},
         {"id": "permian_crude_production_mbbl_d", "label": "Permian crude / oil-gas activity proxy", "source": "eia", "eia_route": "petroleum/crd/crpdn", "eia_facets": {"duoarea": "RTPP", "product": "EPC0", "process": "FPF"}, "good_for": "royalty_volume", "optional": true, "staleness_max_days": 60, "fallback": {"source": "fred", "fred_id": "IPN213111S", "note": "US oil and gas extraction IP proxy"}}
       ]
     },
@@ -151,7 +151,7 @@
       "series": [
         {"id": "ura_etf", "label": "URA uranium miners ETF (USD)", "source": "yahoo_daily", "yahoo_symbol": "URA", "good_for": "uranium_sentiment"},
         {"id": "hyperscaler_capex_ttm_usd_bn", "label": "Hyperscaler capex guide (USD bn, latest)", "source": "repo_valuation", "good_for": "firm_power_demand"},
-        {"id": "electricity_price_us", "label": "US avg electricity price (cents/kWh)", "source": "fred", "fred_id": "APU000072610", "good_for": "power_price", "staleness_max_days": 60},
+        {"id": "electricity_price_us", "label": "US urban residential electricity price (USD/kWh)", "source": "fred", "fred_id": "APU000072610", "good_for": "power_price", "staleness_max_days": 60},
         {"id": "agi_years_ahead", "label": "AGI expert-horizon years ahead (public quotes)", "source": "expert_horizon", "domain": "agi", "good_for": "horizon_orientation", "staleness_max_days": 180, "optional": true}
       ]
     },

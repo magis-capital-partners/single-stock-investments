@@ -24,6 +24,7 @@ SCRIPTS = Path(__file__).resolve().parent
 if str(SCRIPTS) not in sys.path:
     sys.path.insert(0, str(SCRIPTS))
 
+from atomic_io import write_json_if_changed, write_text_if_changed  # noqa: E402
 from fetch_equity_prices import fetch_price, yahoo_symbol_for  # noqa: E402
 from portfolio_registry import load_registry  # noqa: E402
 
@@ -295,10 +296,14 @@ def build_panel(ticker: str, as_of: str | None = None, *, merge: bool = True) ->
     shares = inputs.get("shares_outstanding")
     market_cap_m = round(float(price) * float(shares) / 1_000_000, 2) if price and shares else None
     as_of = as_of or date.today().isoformat()
-    chart_rel = f"{t}/research/charts/total_return_{as_of}.svg"
+    chart_rel = f"{t}/research/charts/total_return.svg"
     chart_path = ROOT / chart_rel
-    chart_path.parent.mkdir(parents=True, exist_ok=True)
-    chart_path.write_text(svg_chart(dates, price_idx, total_idx, ticker=t, contributions=wealth["cash_by_type"]), encoding="utf-8")
+    write_text_if_changed(
+        chart_path,
+        svg_chart(dates, price_idx, total_idx, ticker=t, contributions=wealth["cash_by_type"]),
+    )
+    for old_svg in chart_path.parent.glob("total_return_*.svg"):
+        old_svg.unlink(missing_ok=True)
     cumulative_cash = round(sum(wealth["cash_by_type"].values()), 4)
     panel = {
         "schema_version": "3.0", "ticker": t, "as_of": as_of, "status": status, "error": error,
@@ -319,10 +324,10 @@ def build_panel(ticker: str, as_of: str | None = None, *, merge: bool = True) ->
         "market_cap_m": market_cap_m, "shares_outstanding": shares, "price_for_market_cap": price, "chart": chart_rel,
     }
     panel_path = research / "total_return_panel.json"
-    panel_path.write_text(json.dumps(panel, indent=2) + "\n", encoding="utf-8")
+    write_json_if_changed(panel_path, panel)
     if merge:
         val["total_return_panel"] = {**panel, "panel_json": f"{t}/research/total_return_panel.json"}
-        vpath.write_text(json.dumps(val, indent=2) + "\n", encoding="utf-8")
+        write_json_if_changed(vpath, val)
     print(f"{'OK' if status == 'complete' else 'WARN'} {t}: {status}; total={total_ann}; events={panel['event_count']}")
     return status == "complete"
 
