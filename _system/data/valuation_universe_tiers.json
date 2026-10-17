@@ -1,6 +1,6 @@
 {
   "schema_version": "1.0",
-  "as_of": "2026-10-16",
+  "as_of": "2026-10-17",
   "policy_id": "valuation_universe_tiers_v1",
   "policy_ref": "_system/portfolio/valuation_universe_policy.json",
   "universe_semantics": {
@@ -10,14 +10,14 @@
     "automated_and_generic_models": "screening only; never authorize capital"
   },
   "summary": {
-    "security_count": 846,
+    "security_count": 853,
     "tier_counts": {
       "tier_1": 40,
       "tier_2": 12,
-      "tier_3": 794
+      "tier_3": 801
     },
     "owner_override_count": 0,
-    "automatic_assignment_count": 846
+    "automatic_assignment_count": 853
   },
   "source_health": {
     "status": "healthy",
@@ -82,15 +82,15 @@
         "required": true,
         "files_seen": 1,
         "valid_files": 1,
-        "record_count": 846,
+        "record_count": 853,
         "missing_files": [],
         "invalid_files": []
       },
       "target_weights": {
         "required": false,
-        "files_seen": 3,
-        "valid_files": 3,
-        "record_count": 13,
+        "files_seen": 0,
+        "valid_files": 0,
+        "record_count": 0,
         "missing_files": [],
         "invalid_files": []
       },
@@ -1202,6 +1202,41 @@
         "capital_authority": "human_decision_only"
       }
     },
+    "AENA.MC": {
+      "ticker": "AENA.MC",
+      "tier": 3,
+      "tier_id": "tier_3",
+      "label": "Broad screening universe",
+      "research_depth": "automated screening and lightweight monitoring only",
+      "actionability_cap": "screening_only",
+      "assignment_source": "automatic",
+      "automatic_tier": 3,
+      "override_reason": null,
+      "review_by": null,
+      "review_overdue": false,
+      "assignment_reasons": [
+        {
+          "qualifying_tier": 3,
+          "code": "research_universe_member",
+          "detail": "Registry membership establishes research coverage only; it is not evidence of ownership.",
+          "source_ref": "_system/portfolio/registry.json"
+        }
+      ],
+      "promotion_gates": [
+        "Promote to Tier 2 when a curated follow-up, watchlist entry, priority stance, or proposed target allocation appears.",
+        "Promote to Tier 1 only through a Tier 1 qualifying signal or documented owner override."
+      ],
+      "demotion_conditions": [
+        "Remove from the valuation universe only through an explicit universe-governance change; absence of a model is not a deletion signal."
+      ],
+      "workflow_policy": {
+        "committee_auto_start": false,
+        "committee_requires_stock_specific_model": true,
+        "automated_screen_can_authorize_capital": false,
+        "generic_screen_can_authorize_capital": false,
+        "capital_authority": "human_decision_only"
+      }
+    },
     "AEP": {
       "ticker": "AEP",
       "tier": 3,
@@ -1393,6 +1428,41 @@
     },
     "AIG": {
       "ticker": "AIG",
+      "tier": 3,
+      "tier_id": "tier_3",
+      "label": "Broad screening universe",
+      "research_depth": "automated screening and lightweight monitoring only",
+      "actionability_cap": "screening_only",
+      "assignment_source": "automatic",
+      "automatic_tier": 3,
+      "override_reason": null,
+      "review_by": null,
+      "review_overdue": false,
+      "assignment_reasons": [
+        {
+          "qualifying_tier": 3,
+          "code": "research_universe_member",
+          "detail": "Registry membership establishes research coverage only; it is not evidence of ownership.",
+          "source_ref": "_system/portfolio/registry.json"
+        }
+      ],
+      "promotion_gates": [
+        "Promote to Tier 2 when a curated follow-up, watchlist entry, priority stance, or proposed target allocation appears.",
+        "Promote to Tier 1 only through a Tier 1 qualifying signal or documented owner override."
+      ],
+      "demotion_conditions": [
+        "Remove from the valuation universe only through an explicit universe-governance change; absence of a model is not a deletion signal."
+      ],
+      "workflow_policy": {
+        "committee_auto_start": false,
+        "committee_requires_stock_specific_model": true,
+        "automated_screen_can_authorize_capital": false,
+        "generic_screen_can_authorize_capital": false,
+        "capital_authority": "human_decision_only"
+      }
+    },
+    "AIR.PA": {
+      "ticker": "AIR.PA",
       "tier": 3,
       "tier_id": "tier_3",
       "label": "Broad screening universe",
@@ -4299,12 +4369,6 @@
         },
         {
           "qualifying_tier": 2,
-          "code": "proposed_target_allocation",
-          "detail": "Positive allocation in a proposed, not-yet-approved target-weight plan.",
-          "source_ref": "_system/portfolio/ira_target_weights.json"
-        },
-        {
-          "qualifying_tier": 2,
           "code": "valuation_followup",
           "detail": "The curated valuation follow-up ledger includes this security.",
           "source_ref": "_system/reference/valuation_followups.json"
@@ -6046,6 +6110,41 @@
         "capital_authority": "human_decision_only"
       }
     },
+    "CLNX.MC": {
+      "ticker": "CLNX.MC",
+      "tier": 3,
+      "tier_id": "tier_3",
+      "label": "Broad screening universe",
+      "research_depth": "automated screening and lightweight monitoring only",
+      "actionability_cap": "screening_only",
+      "assignment_source": "automatic",
+      "automatic_tier": 3,
+      "override_reason": null,
+      "review_by": null,
+      "review_overdue": false,
+      "assignment_reasons": [
+        {
+          "qualifying_tier": 3,
+          "code": "research_universe_member",
+          "detail": "Registry membership establishes research coverage only; it is not evidence of ownership.",
+          "source_ref": "_system/portfolio/registry.json"
+        }
+      ],
+      "promotion_gates": [
+        "Promote to Tier 2 when a curated follow-up, watchlist entry, priority stance, or proposed target allocation appears.",
+        "Promote to Tier 1 only through a Tier 1 qualifying signal or documented owner override."
+      ],
+      "demotion_conditions": [
+        "Remove from the valuation universe only through an explicit universe-governance change; absence of a model is not a deletion signal."
+      ],
+      "workflow_policy": {
+        "committee_auto_start": false,
+        "committee_requires_stock_specific_model": true,
+        "automated_screen_can_authorize_capital": false,
+        "generic_screen_can_authorize_capital": false,
+        "capital_authority": "human_decision_only"
+      }
+    },
     "CLS": {
       "ticker": "CLS",
       "tier": 3,
@@ -6404,6 +6503,41 @@
       ],
       "workflow_policy": {
         "committee_auto_start": true,
+        "committee_requires_stock_specific_model": true,
+        "automated_screen_can_authorize_capital": false,
+        "generic_screen_can_authorize_capital": false,
+        "capital_authority": "human_decision_only"
+      }
+    },
+    "CNI": {
+      "ticker": "CNI",
+      "tier": 3,
+      "tier_id": "tier_3",
+      "label": "Broad screening universe",
+      "research_depth": "automated screening and lightweight monitoring only",
+      "actionability_cap": "screening_only",
+      "assignment_source": "automatic",
+      "automatic_tier": 3,
+      "override_reason": null,
+      "review_by": null,
+      "review_overdue": false,
+      "assignment_reasons": [
+        {
+          "qualifying_tier": 3,
+          "code": "research_universe_member",
+          "detail": "Registry membership establishes research coverage only; it is not evidence of ownership.",
+          "source_ref": "_system/portfolio/registry.json"
+        }
+      ],
+      "promotion_gates": [
+        "Promote to Tier 2 when a curated follow-up, watchlist entry, priority stance, or proposed target allocation appears.",
+        "Promote to Tier 1 only through a Tier 1 qualifying signal or documented owner override."
+      ],
+      "demotion_conditions": [
+        "Remove from the valuation universe only through an explicit universe-governance change; absence of a model is not a deletion signal."
+      ],
+      "workflow_policy": {
+        "committee_auto_start": false,
         "committee_requires_stock_specific_model": true,
         "automated_screen_can_authorize_capital": false,
         "generic_screen_can_authorize_capital": false,
@@ -6830,6 +6964,41 @@
         "capital_authority": "human_decision_only"
       }
     },
+    "CP": {
+      "ticker": "CP",
+      "tier": 3,
+      "tier_id": "tier_3",
+      "label": "Broad screening universe",
+      "research_depth": "automated screening and lightweight monitoring only",
+      "actionability_cap": "screening_only",
+      "assignment_source": "automatic",
+      "automatic_tier": 3,
+      "override_reason": null,
+      "review_by": null,
+      "review_overdue": false,
+      "assignment_reasons": [
+        {
+          "qualifying_tier": 3,
+          "code": "research_universe_member",
+          "detail": "Registry membership establishes research coverage only; it is not evidence of ownership.",
+          "source_ref": "_system/portfolio/registry.json"
+        }
+      ],
+      "promotion_gates": [
+        "Promote to Tier 2 when a curated follow-up, watchlist entry, priority stance, or proposed target allocation appears.",
+        "Promote to Tier 1 only through a Tier 1 qualifying signal or documented owner override."
+      ],
+      "demotion_conditions": [
+        "Remove from the valuation universe only through an explicit universe-governance change; absence of a model is not a deletion signal."
+      ],
+      "workflow_policy": {
+        "committee_auto_start": false,
+        "committee_requires_stock_specific_model": true,
+        "automated_screen_can_authorize_capital": false,
+        "generic_screen_can_authorize_capital": false,
+        "capital_authority": "human_decision_only"
+      }
+    },
     "CPAY": {
       "ticker": "CPAY",
       "tier": 3,
@@ -6936,18 +7105,6 @@
           "code": "priority_classification",
           "detail": "Portfolio classification stance is core.",
           "source_ref": "_system/portfolio/classification.json"
-        },
-        {
-          "qualifying_tier": 2,
-          "code": "proposed_target_allocation",
-          "detail": "Positive allocation in a proposed, not-yet-approved target-weight plan.",
-          "source_ref": "_system/portfolio/ira_target_weights.json"
-        },
-        {
-          "qualifying_tier": 2,
-          "code": "proposed_target_allocation",
-          "detail": "Positive allocation in a proposed, not-yet-approved target-weight plan.",
-          "source_ref": "_system/portfolio/taxable_target_weights.json"
         },
         {
           "qualifying_tier": 2,
@@ -7490,12 +7647,6 @@
           "code": "priority_classification",
           "detail": "Portfolio classification stance is core.",
           "source_ref": "_system/portfolio/classification.json"
-        },
-        {
-          "qualifying_tier": 2,
-          "code": "proposed_target_allocation",
-          "detail": "Positive allocation in a proposed, not-yet-approved target-weight plan.",
-          "source_ref": "_system/portfolio/ira_target_weights.json"
         },
         {
           "qualifying_tier": 2,
@@ -8269,18 +8420,6 @@
           "code": "priority_classification",
           "detail": "Portfolio classification stance is hold.",
           "source_ref": "_system/portfolio/classification.json"
-        },
-        {
-          "qualifying_tier": 2,
-          "code": "proposed_target_allocation",
-          "detail": "Positive allocation in a proposed, not-yet-approved target-weight plan.",
-          "source_ref": "_system/portfolio/ira_target_weights.json"
-        },
-        {
-          "qualifying_tier": 2,
-          "code": "proposed_target_allocation",
-          "detail": "Positive allocation in a proposed, not-yet-approved target-weight plan.",
-          "source_ref": "_system/portfolio/taxable_target_weights.json"
         },
         {
           "qualifying_tier": 2,
@@ -10867,6 +11006,41 @@
         "capital_authority": "human_decision_only"
       }
     },
+    "FER": {
+      "ticker": "FER",
+      "tier": 3,
+      "tier_id": "tier_3",
+      "label": "Broad screening universe",
+      "research_depth": "automated screening and lightweight monitoring only",
+      "actionability_cap": "screening_only",
+      "assignment_source": "automatic",
+      "automatic_tier": 3,
+      "override_reason": null,
+      "review_by": null,
+      "review_overdue": false,
+      "assignment_reasons": [
+        {
+          "qualifying_tier": 3,
+          "code": "research_universe_member",
+          "detail": "Registry membership establishes research coverage only; it is not evidence of ownership.",
+          "source_ref": "_system/portfolio/registry.json"
+        }
+      ],
+      "promotion_gates": [
+        "Promote to Tier 2 when a curated follow-up, watchlist entry, priority stance, or proposed target allocation appears.",
+        "Promote to Tier 1 only through a Tier 1 qualifying signal or documented owner override."
+      ],
+      "demotion_conditions": [
+        "Remove from the valuation universe only through an explicit universe-governance change; absence of a model is not a deletion signal."
+      ],
+      "workflow_policy": {
+        "committee_auto_start": false,
+        "committee_requires_stock_specific_model": true,
+        "automated_screen_can_authorize_capital": false,
+        "generic_screen_can_authorize_capital": false,
+        "capital_authority": "human_decision_only"
+      }
+    },
     "FFIV": {
       "ticker": "FFIV",
       "tier": 3,
@@ -11763,12 +11937,6 @@
           "code": "priority_classification",
           "detail": "Portfolio classification stance is hold.",
           "source_ref": "_system/portfolio/classification.json"
-        },
-        {
-          "qualifying_tier": 2,
-          "code": "proposed_target_allocation",
-          "detail": "Positive allocation in a proposed, not-yet-approved target-weight plan.",
-          "source_ref": "_system/portfolio/ira_target_weights.json"
         },
         {
           "qualifying_tier": 2,
@@ -14667,18 +14835,6 @@
           "code": "priority_classification",
           "detail": "Portfolio classification stance is hold.",
           "source_ref": "_system/portfolio/classification.json"
-        },
-        {
-          "qualifying_tier": 2,
-          "code": "proposed_target_allocation",
-          "detail": "Positive allocation in a proposed, not-yet-approved target-weight plan.",
-          "source_ref": "_system/portfolio/ira_target_weights.json"
-        },
-        {
-          "qualifying_tier": 2,
-          "code": "proposed_target_allocation",
-          "detail": "Positive allocation in a proposed, not-yet-approved target-weight plan.",
-          "source_ref": "_system/portfolio/taxable_target_weights.json"
         },
         {
           "qualifying_tier": 2,
@@ -22769,12 +22925,6 @@
         },
         {
           "qualifying_tier": 2,
-          "code": "proposed_target_allocation",
-          "detail": "Positive allocation in a proposed, not-yet-approved target-weight plan.",
-          "source_ref": "_system/portfolio/ira_target_weights.json"
-        },
-        {
-          "qualifying_tier": 2,
           "code": "valuation_followup",
           "detail": "The curated valuation follow-up ledger includes this security.",
           "source_ref": "_system/reference/valuation_followups.json"
@@ -24077,6 +24227,41 @@
         "capital_authority": "human_decision_only"
       }
     },
+    "SAF.PA": {
+      "ticker": "SAF.PA",
+      "tier": 3,
+      "tier_id": "tier_3",
+      "label": "Broad screening universe",
+      "research_depth": "automated screening and lightweight monitoring only",
+      "actionability_cap": "screening_only",
+      "assignment_source": "automatic",
+      "automatic_tier": 3,
+      "override_reason": null,
+      "review_by": null,
+      "review_overdue": false,
+      "assignment_reasons": [
+        {
+          "qualifying_tier": 3,
+          "code": "research_universe_member",
+          "detail": "Registry membership establishes research coverage only; it is not evidence of ownership.",
+          "source_ref": "_system/portfolio/registry.json"
+        }
+      ],
+      "promotion_gates": [
+        "Promote to Tier 2 when a curated follow-up, watchlist entry, priority stance, or proposed target allocation appears.",
+        "Promote to Tier 1 only through a Tier 1 qualifying signal or documented owner override."
+      ],
+      "demotion_conditions": [
+        "Remove from the valuation universe only through an explicit universe-governance change; absence of a model is not a deletion signal."
+      ],
+      "workflow_policy": {
+        "committee_auto_start": false,
+        "committee_requires_stock_specific_model": true,
+        "automated_screen_can_authorize_capital": false,
+        "generic_screen_can_authorize_capital": false,
+        "capital_authority": "human_decision_only"
+      }
+    },
     "SATS": {
       "ticker": "SATS",
       "tier": 3,
@@ -25274,18 +25459,6 @@
           "code": "priority_classification",
           "detail": "Portfolio classification stance is hold.",
           "source_ref": "_system/portfolio/classification.json"
-        },
-        {
-          "qualifying_tier": 2,
-          "code": "proposed_target_allocation",
-          "detail": "Positive allocation in a proposed, not-yet-approved target-weight plan.",
-          "source_ref": "_system/portfolio/ira_target_weights.json"
-        },
-        {
-          "qualifying_tier": 2,
-          "code": "proposed_target_allocation",
-          "detail": "Positive allocation in a proposed, not-yet-approved target-weight plan.",
-          "source_ref": "_system/portfolio/taxable_target_weights.json"
         },
         {
           "qualifying_tier": 2,
@@ -26521,12 +26694,6 @@
           "code": "priority_classification",
           "detail": "Portfolio classification stance is hold.",
           "source_ref": "_system/portfolio/classification.json"
-        },
-        {
-          "qualifying_tier": 2,
-          "code": "proposed_target_allocation",
-          "detail": "Positive allocation in a proposed, not-yet-approved target-weight plan.",
-          "source_ref": "_system/portfolio/ira_target_weights.json"
         },
         {
           "qualifying_tier": 2,
