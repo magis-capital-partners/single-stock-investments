@@ -73,25 +73,34 @@ test("INV two-phase watch: a weekly watch three weeks old is badged in the secti
   assert.doesNotMatch(context.renderTwoPhaseHeaderChip(inv("2026-09-20")), /STALE since/);
 });
 
-test("Darwin: a paper book from before the refresh was disabled is badged in the subhead", () => {
-  const content = { innerHTML: "", style: {} };
-  const loading = { textContent: "", style: {} };
-  const darwinViz = {
-    destroyCharts() {}, mountCharts() {}, renderExplanation: () => "", renderPerfTable: () => "", renderChartsHtml: () => "",
-  };
+test("Darwin Covered Call: a signal that stopped refreshing is badged in the subhead", () => {
+  const content = { innerHTML: "", style: {}, querySelector: () => null };
+  const loading = { textContent: "", innerHTML: "", style: {} };
+  const signal = (generatedAt) => ({
+    generated_at: generatedAt, trading_date: generatedAt.slice(0, 10),
+    universe: { count: 503, scored: 498, missing: [] }, score_histogram: { 4: 12, 3: 60, 2: 150 },
+    top: [{ symbol: "KO", tenor: "7d", delta: 0.2, expiry: "2026-09-02", dte: 7, strike: 70, otm_pct: 2.1,
+            premium_pct: 0.35, score: 4, conditions: ["low_beta"], ev_bp: 17.4, ev_annual_pct: 9.1, cell_t: 3.8 }],
+    names: [], method: { conditions: {}, validation: {} },
+  });
   const render = (generatedAt) => {
-    const context = indexFunctions(["STANCE_BADGE", "DARWIN_METHOD_LABELS", "escapeHtml", "linkHtml", "feedStaleBadge", "fmtUsd", "renderDarwin"], {
-      data: { darwin: { generated_at: generatedAt, tier: 1, phase: "paper", weights: [] } },
-      activeDarwinAccount: "roth", activeView: "darwin", loadedShards: new Set(["file:darwin_bundle"]),
-      DarwinViz: darwinViz, requestAnimationFrame: () => 0, applyDarwinView: () => {}, loadLazyFile: () => Promise.resolve(),
+    const page = loadScripts(["ui-format.js", "darwin-cc-viz.js"], { clock: new FakeClock(NOW) });
+    const context = vm.createContext({
+      window: page.window, document: page.document,
+      data: { darwin_cc: signal(generatedAt) }, activeView: "darwin", loadedShards: new Set(["file:darwin_cc"]),
+      loadLazyFile: () => Promise.resolve(), feedNotice: () => "",
     });
-    context.window.DarwinViz = darwinViz;
+    context.Date = vm.runInNewContext("Date");
+    context.Date.now = () => NOW;
+    vm.runInContext(["escapeHtml", "feedStaleBadge", "renderDarwin"].map(extract).join("\n"), context);
     context.document.getElementById = (id) => (id === "darwin-content" ? content : loading);
     context.renderDarwin();
     return content.innerHTML;
   };
-  assert.match(render("2026-08-19T13:32:10Z"), /2026-08-19T13:32:10Z <span class="badge badge-bad stale-badge"[^>]*>STALE since 2026-08-19<\/span> · phase/);
-  assert.doesNotMatch(render("2026-09-24T01:25:00Z"), /STALE since/, "last night's weekday refresh is on time");
+  const stale = render("2026-09-18T20:47:00Z");
+  assert.match(stale, /built 2026-09-18T20:47:00Z <span class="badge badge-bad stale-badge"[^>]*>STALE since 2026-09-18<\/span>/);
+  assert.match(stale, /<strong>KO<\/strong>/, "the ranked call is rendered");
+  assert.doesNotMatch(render("2026-09-24T20:47:00Z"), /STALE since/, "last night's after-close run is on time");
 });
 
 test("index.html's inline scripts still compile", () => {

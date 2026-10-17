@@ -1,7 +1,7 @@
 """Portfolio macro regime panel for Insights (one strip, not per-ticker spam).
 
-Builds a single `portfolio_macro_regime` object from the themes manifest + Darwin
-regime label, with signed interpretation (risk_on / risk_off / neutral) so rising
+Builds a single `portfolio_macro_regime` object from the themes manifest + the rule-based
+macro regime label, with signed interpretation (risk_on / risk_off / neutral) so rising
 yields or credit spreads are never auto-labeled bullish.
 """
 from __future__ import annotations
@@ -112,10 +112,10 @@ def format_value(series_id: str, latest) -> str | None:
     return f"{v:.2f}"
 
 
-def darwin_regime_label() -> dict:
-    """Best-effort Darwin regime; never raises."""
+def macro_regime_state() -> dict:
+    """Best-effort macro regime (marketdata.regime: VIX, 10Y, CPI); never raises."""
     try:
-        from darwin.regime import latest_macro_state
+        from marketdata.regime import latest_macro_state
 
         state = latest_macro_state()
         return {
@@ -203,19 +203,19 @@ def build_series_rows(manifest: dict, *, limit: int = 5) -> list[dict]:
 def build_portfolio_macro_regime(manifest: dict | None = None) -> dict:
     """Single portfolio-scoped macro object for the Insights strip."""
     doc = manifest if manifest is not None else load_manifest()
-    darwin = darwin_regime_label()
+    macro = macro_regime_state()
     series = build_series_rows(doc, limit=5)
-    as_of = doc.get("as_of") or darwin.get("as_of_month")
+    as_of = doc.get("as_of") or macro.get("as_of_month")
     if series:
         dates = [s.get("as_of") for s in series if s.get("as_of")]
         if dates:
             as_of = max(dates)
-    label = darwin.get("label") or "calm"
+    label = macro.get("label") or "calm"
     return {
         "label": label,
         "as_of": as_of,
         "summary": regime_summary(label, series),
-        "darwin": darwin,
+        "macro": macro,
         "series": series,
         "theme_id": "macro_regime",
     }

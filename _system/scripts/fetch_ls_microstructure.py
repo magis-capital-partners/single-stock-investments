@@ -39,7 +39,7 @@ def adv_usd_20d(ticker: str) -> float | None:
         return None
     try:
         sys.path.insert(0, str(SCRIPTS))
-        from darwin.prices import fetch_yahoo_monthly  # noqa: WPS433
+        from marketdata.prices import fetch_yahoo_monthly  # noqa: WPS433
 
         dates, rets, _ = fetch_yahoo_monthly(ticker, months=3)
         if not dates:

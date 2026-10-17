@@ -18,9 +18,10 @@ The gate is now content-addressed:
   that prefix (actions/cache returns the most recently created match) and
   compares. "Deployed once" is not "deployed now": a revert to content that
   was synced last week differs from the last deploy, so it deploys again.
-* ``decide`` turns that into a verdict. Pushes and manual dispatches always
-  deploy. A workflow_run deploys only when the fingerprint differs from the
-  last deployed one. The daily schedule -- the recovery path after the 00:00
+* ``decide`` turns that into a verdict. Manual dispatches always deploy.
+  Pushes and workflow_runs deploy only when the fingerprint differs from the
+  last deployed one: every automerge squash is a push, and most change no
+  deploy input. The daily schedule -- the recovery path after the 00:00
   UTC quota reset -- also deploys when that day's D1 retention has not run.
   Neither retries on the day a D1 stage was deferred for these inputs: the
   budget is spent until 00:00 UTC.
@@ -63,7 +64,7 @@ DEPLOY_INPUTS = (
     ".github/actions/publish-dashboard",
 )
 
-ALWAYS_DEPLOY_EVENTS = {"push", "workflow_dispatch"}
+ALWAYS_DEPLOY_EVENTS = {"workflow_dispatch"}
 
 
 def object_ids(rev: str = "HEAD", paths: tuple[str, ...] = DEPLOY_INPUTS, cwd: Path | None = None) -> dict[str, str]:
@@ -128,7 +129,7 @@ def decide(
         return True, "the site has these inputs but D1 is not yet synced for them"
     if event == "schedule" and not pruned_today:
         return True, "inputs unchanged, but today's D1 retention has not run"
-    if event in {"workflow_run", "schedule"}:
+    if event in {"workflow_run", "schedule", "push"}:
         return False, "deploy inputs unchanged: the last deploy shipped and synced exactly these"
     return True, f"unrecognized event {event!r}; deploying to be safe"
 

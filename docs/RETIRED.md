@@ -25,6 +25,38 @@ sync call in `event-triage`. Research Markdown, `WRITE_MAP.md` and the document
 inventory are retained. Cloudflare Pages builds from `dashboard/`; another
 serving tree would add an unused writer and another source of stale views.
 
+## Darwin allocator (2026-10-16)
+
+The Darwin tab showed an IRR-driven Roth IRA paper book (`build_darwin_portfolio.py`,
+`_system/scripts/darwin/`, `dashboard/data/darwin_*`). Its refresh workflow had been
+dead since 2026-08-23, every name in its universe had failed research eligibility,
+and the book held 100% cash. The tab now shows the **Darwin Covered Call** signal
+(`build_darwin_covered_call.py`, `darwin-covered-call.yml`).
+
+Removed: the `darwin/` package's allocator modules (features, policies, genetic,
+PPO, encoder, ensemble, paper portfolio, observatory, point-in-time backtests, the
+synthetic covered-call overlay and options cache), the `build_darwin_*` and
+`check_darwin_pit.py` scripts, the Darwin mandates, the paper books' event and
+adaptation logs, the IRA/Roth/taxable target weights,
+`research_events.jsonl` (only Darwin read it), the regime briefs, the
+`darwin` / `darwin-full` rebuild profiles and checkout profile, and the Darwin
+framework notes and investor-letter copies.
+
+Left in place, frozen: `_system/portfolio/paper/roth.json` and `taxable.json`.
+Nothing writes them any more, but `build_valuation_universe_tiers.py` reads their
+positions as the only Tier 1 signal (13 names on 2026-10-16), and Tier 1 is what
+`run_security_decision_pipeline.py` and the Tier 1 readiness queue act on.
+Deleting them would empty Tier 1. Move those names to explicit `overrides` in
+`valuation_universe_policy.json` (or another position source) before removing them.
+
+Kept and moved to `_system/scripts/marketdata/`: price fetchers, symbol mapping,
+external-repo paths, the returns importer, S&P 500 membership, the macro regime
+(used by the Insights macro strip), valuation-history archiving (used by
+`marvin_valuation.py`), and the ls-algo universe and S&P refresh scripts. The
+mass onboarder became `_system/scripts/sp500_mass_onboard.py`. The World Model's
+market-path cap now reads VIX and its term structure from `vol_metrics_latest.json`
+instead of the frozen Darwin observatory.
+
 ## Darwin taxable track (2026-07-20)
 
 `darwin_portfolio_taxable.json` and `darwin_backtest_report_taxable.md` were

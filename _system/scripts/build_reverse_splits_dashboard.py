@@ -62,6 +62,10 @@ def edge_v3_reference(ledger_dir):
     if expanded.exists():
         reference["coverage_research_ref"] = {"url": "data/shorts_coverage_research.json", "sha256": digest(expanded),
                                                "base_summary_sha256": digest(source)}
+    clean = ledger_dir / "clean_data_research.json"
+    if clean.exists() and read_json(clean).get("source_collection_complete") is True:
+        reference["clean_data_research_ref"] = {"url": "data/shorts_clean_data_research.json", "sha256": digest(clean),
+                                                 "base_summary_sha256": digest(source)}
     return reference
 
 # Two event rows for one issuer are the same split recorded twice when their
@@ -650,6 +654,11 @@ def main(argv: list[str] | None = None) -> int:
         shutil.copyfile(coverage_source, target.parent / "shorts_coverage_research.json")
         for folder in ("packets", "audits"):
             shutil.copytree(coverage_source.parent / ("coverage_"+folder), target.parent / ("shorts_coverage_"+folder), dirs_exist_ok=True)
+    clean_source = (args.ledger_dir or DATA_DIR) / "clean_data_research.json"
+    if clean_source.exists() and read_json(clean_source).get("source_collection_complete") is True:
+        shutil.copyfile(clean_source, target.parent / "shorts_clean_data_research.json")
+        shutil.copyfile(clean_source.with_name("clean_data_changes.json"), target.parent / "shorts_clean_data_changes.json")
+        shutil.copytree(clean_source.parent / "clean_data_queue", target.parent / "shorts_clean_data_queue", dirs_exist_ok=True)
     free_source = (args.ledger_dir or DATA_DIR) / "free_evidence.json"
     if free_source.exists():
         shutil.copyfile(free_source, target.parent / "shorts_free_evidence.json")

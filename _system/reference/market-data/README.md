@@ -1,4 +1,4 @@
-# Market data for Darwin IRA backtests
+# Reference market data
 
 Populated by `_system/scripts/download_ira_research.py`.
 
@@ -17,7 +17,7 @@ Populated by `_system/scripts/download_ira_research.py`.
 No CSV here may be an HTML page: `_system/scripts/check_market_data_csvs.py`
 (run by the `market-data-csvs` job in `python-tests.yml`) fails on one.
 
-See `_system/frameworks/darwin_ira_research_plan.md`.
+Shared loaders live in `_system/scripts/marketdata/` (prices, symbols, S&P 500 membership, macro regime).
 
 ## Thematic context panels (`themes/`)
 
