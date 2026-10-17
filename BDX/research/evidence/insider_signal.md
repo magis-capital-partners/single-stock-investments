@@ -1,18 +1,18 @@
-# BDX — Insider conviction (2026-10-15)
+# BDX — Insider conviction (2026-10-17)
 
 > Context only. Insider activity informs scenario confidence and stance discussion; it does not auto-inflate Lawrence base IRR. Promotion requires [HUMAN REVIEW].
 
-**ICS:** 7.05 (strong) · **Bull case support:** moderate
+**ICS:** 6.98 (strong) · **Bull case support:** moderate
 
 | Scenario | Prior weight | Tilted weight |
 |----------|--------------|---------------|
 | Bear | 20% | 20% |
-| Base | 55% | 47% |
-| Bull | 25% | 33% |
+| Base | 55% | 48% |
+| Bull | 25% | 32% |
 
 | Insider | Date | Shares | Price | Value | Contrib |
 |---------|------|--------|-------|-------|---------|
-| Polen Thomas E Jr | 2026-08-13 | 43278 | $167.25 | $7238245.5 | 3.491 |
+| Polen Thomas E Jr | 2026-08-13 | 43278 | $167.25 | $7238245.5 | 3.433 |
 | Garrison Michael David | 2026-01-15 | 3054 | $167.91 | $512797.14 | 1.967 |
 | Polen Thomas E Jr | 2026-06-01 | 20209 | $126.16 | $2549567.44 | 1.674 |
 

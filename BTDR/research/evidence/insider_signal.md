@@ -1,8 +1,8 @@
-# BTDR — Insider conviction (2026-10-15)
+# BTDR — Insider conviction (2026-10-17)
 
 > Context only. Insider activity informs scenario confidence and stance discussion; it does not auto-inflate Lawrence base IRR. Promotion requires [HUMAN REVIEW].
 
-**ICS:** 1.38 (negligible) · **Bull case support:** none
+**ICS:** 1.36 (negligible) · **Bull case support:** none
 
 | Scenario | Prior weight | Tilted weight |
 |----------|--------------|---------------|
@@ -12,7 +12,7 @@
 
 | Insider | Date | Shares | Price | Value | Contrib |
 |---------|------|--------|-------|-------|---------|
-| Potter Michael G | 2026-08-12 | 25000 | $9.04 | $226000.0 | 1.2 |
+| Potter Michael G | 2026-08-12 | 25000 | $9.04 | $226000.0 | 1.18 |
 
 Source: `_system/reference/market-data/insider/BTDR_transactions.csv`.
 Lawrence base IRR unchanged (`in_base_irr: False`).

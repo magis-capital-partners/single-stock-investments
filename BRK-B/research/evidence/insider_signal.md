@@ -1,8 +1,8 @@
-# BRK-B — Insider conviction (2026-10-15)
+# BRK-B — Insider conviction (2026-10-17)
 
 > Context only. Insider activity informs scenario confidence and stance discussion; it does not auto-inflate Lawrence base IRR. Promotion requires [HUMAN REVIEW].
 
-**ICS:** 7.57 (strong) · **Bull case support:** moderate
+**ICS:** 7.48 (strong) · **Bull case support:** moderate
 
 | Scenario | Prior weight | Tilted weight |
 |----------|--------------|---------------|
@@ -12,10 +12,10 @@
 
 | Insider | Date | Shares | Price | Value | Contrib |
 |---------|------|--------|-------|-------|---------|
-| O'Sullivan Michael J. | 2026-08-12 | 400 | $512.52 | $205008.0 | 2.401 |
+| O'Sullivan Michael J. | 2026-08-12 | 400 | $512.52 | $205008.0 | 2.361 |
 | O'Sullivan Michael J. | 2026-05-06 | 483 | $467.13 | $225623.79 | 1.574 |
-| O'Sullivan Michael J. | 2026-08-12 | 45 | $510.64 | $22978.8 | 1.414 |
-| O'Sullivan Michael J. | 2026-08-12 | 43 | $513.61 | $22085.23 | 1.288 |
+| O'Sullivan Michael J. | 2026-08-12 | 45 | $510.64 | $22978.8 | 1.39 |
+| O'Sullivan Michael J. | 2026-08-12 | 43 | $513.61 | $22085.23 | 1.266 |
 | O'Sullivan Michael J. | 2026-05-06 | 53 | $470.22 | $24921.66 | 0.911 |
 
 **Routine / planned sales (context):**

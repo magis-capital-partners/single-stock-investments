@@ -1,4 +1,4 @@
-# EXE — Insider conviction (2026-10-15)
+# EXE — Insider conviction (2026-10-17)
 
 > Context only. Insider activity informs scenario confidence and stance discussion; it does not auto-inflate Lawrence base IRR. Promotion requires [HUMAN REVIEW].
 
@@ -22,7 +22,7 @@
 
 - Raiford Brittany: 170 @ $107.02 on 2026-03-15
 - Raiford Brittany: 485 @ $108.06 on 2026-02-20
-- Raiford Brittany: 511 @ $103.17 on 2025-10-15
+- Viets Joshua J.: 3728 @ $107.02 on 2026-03-15
 
 Source: `_system/reference/market-data/insider/EXE_transactions.csv`.
 Lawrence base IRR unchanged (`in_base_irr: False`).

@@ -1,4 +1,4 @@
-# MU — Insider conviction (2026-10-15)
+# MU — Insider conviction (2026-10-17)
 
 > Context only. Insider activity informs scenario confidence and stance discussion; it does not auto-inflate Lawrence base IRR. Promotion requires [HUMAN REVIEW].
 
@@ -19,8 +19,8 @@
 **Routine / planned sales (context):**
 
 - Murphy Mark J.: 35000 @ $0.0 on 2025-12-24
-- Murphy Mark J.: 2795 @ $187.06 on 2025-10-15
-- Murphy Mark J.: 2795 @ $187.06 on 2025-10-15
+- Murphy Mark J.: 3820 @ $221.64 on 2025-10-30
+- Murphy Mark J.: 5100 @ $222.96 on 2025-10-30
 
 Source: `_system/reference/market-data/insider/MU_transactions.csv`.
 Lawrence base IRR unchanged (`in_base_irr: False`).
