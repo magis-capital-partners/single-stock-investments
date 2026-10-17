@@ -38,7 +38,7 @@ Changed artifact: `CSCO/investor-documents/DOWNLOAD_MANIFEST.json` (admitted sha
 
 ## Input digest rebinding
 
-Prior author pass (v3) used an earlier input digest with **unchanged** component fingerprint and frozen low/base/high proof. This pass rebinds to the admitted work item digest in the manifest without changing threshold, timing, or probability.
+Prior author pass (v3) used an earlier input digest with **unchanged** component fingerprint and frozen low/base/high proof. This pass rebinds to the admitted work item digest and evidence gate hash recorded in `CSCO/research/agent_run_state.json` without changing threshold, timing, or probability.
 
 ## Mechanical checks (2026-10-17)
 
