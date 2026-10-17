@@ -1,4 +1,4 @@
-# ANET — Insider conviction (2026-10-15)
+# ANET — Insider conviction (2026-10-17)
 
 > Context only. Insider activity informs scenario confidence and stance discussion; it does not auto-inflate Lawrence base IRR. Promotion requires [HUMAN REVIEW].
 
@@ -12,9 +12,9 @@
 
 | Insider | Date | Shares | Price | Value | Contrib |
 |---------|------|--------|-------|-------|---------|
-| Duda Kenneth | 2026-09-21 | 17333 | $14.1463 | $245197.82 | 2.76 |
-| Duda Kenneth | 2026-08-20 | 13334 | $15.2769 | $203702.18 | 2.077 |
-| Duda Kenneth | 2026-07-20 | 17333 | $15.2769 | $264794.51 | 1.645 |
+| Duda Kenneth | 2026-09-21 | 17333 | $14.1463 | $245197.82 | 2.715 |
+| Duda Kenneth | 2026-08-20 | 13334 | $15.2769 | $203702.18 | 2.043 |
+| Duda Kenneth | 2026-07-20 | 17333 | $15.2769 | $264794.51 | 1.618 |
 | Duda Kenneth | 2026-05-18 | 32000 | $15.2625 | $488400.0 | 1.549 |
 | Duda Kenneth | 2026-04-17 | 32000 | $15.2625 | $488400.0 | 1.549 |
 

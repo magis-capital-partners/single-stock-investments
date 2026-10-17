@@ -1,4 +1,4 @@
-# TRV — Insider conviction (2026-10-15)
+# TRV — Insider conviction (2026-10-17)
 
 > Context only. Insider activity informs scenario confidence and stance discussion; it does not auto-inflate Lawrence base IRR. Promotion requires [HUMAN REVIEW].
 
@@ -13,9 +13,9 @@
 | Insider | Date | Shares | Price | Value | Contrib |
 |---------|------|--------|-------|-------|---------|
 | Schnitzer Alan D | 2026-02-04 | 216246 | $126.18 | $27285920.28 | 1.946 |
-| Kurtzman Diane | 2026-07-24 | 4164 | $132.58 | $552063.12 | 1.686 |
-| Munson Paul E. | 2026-07-22 | 1525 | $126.18 | $192424.5 | 1.622 |
-| Rowland David Donnay | 2026-07-22 | 5000 | $132.58 | $662900.0 | 1.578 |
+| Kurtzman Diane | 2026-07-24 | 4164 | $132.58 | $552063.12 | 1.658 |
+| Munson Paul E. | 2026-07-22 | 1525 | $126.18 | $192424.5 | 1.596 |
+| Rowland David Donnay | 2026-07-22 | 5000 | $132.58 | $662900.0 | 1.552 |
 | Munson Paul E. | 2026-02-25 | 2800 | $126.18 | $353304.0 | 1.549 |
 
 **Routine / planned sales (context):**

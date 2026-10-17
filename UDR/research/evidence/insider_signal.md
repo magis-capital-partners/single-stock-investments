@@ -1,8 +1,8 @@
-# UDR — Insider conviction (2026-10-15)
+# UDR — Insider conviction (2026-10-17)
 
 > Context only. Insider activity informs scenario confidence and stance discussion; it does not auto-inflate Lawrence base IRR. Promotion requires [HUMAN REVIEW].
 
-**ICS:** 3.13 (weak) · **Bull case support:** none
+**ICS:** 3.14 (weak) · **Bull case support:** none
 
 | Scenario | Prior weight | Tilted weight |
 |----------|--------------|---------------|

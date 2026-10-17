@@ -213,7 +213,10 @@ def run(args):
         sample_qualified=len(qualified), positive_qualified=sum(r["calmar"] > 0 for r in qualified),
         recent_sample_qualified=len(recent_qualified), recent_positive_qualified=sum(r["calmar"] > 0 for r in recent_qualified))
     write_json(output/"extended_summary.json", original)
-    if args.publish: write_json(root/"calmar_research.json", original)
+    if args.publish:
+        # The expanded matrix exceeds the Pages 20 MiB staging limit when
+        # pretty-printed. Compact serialization retains every result and hash.
+        (root/"calmar_research.json").write_text(json.dumps(original, ensure_ascii=False, separators=(",", ":"))+"\n", encoding="utf-8")
     print("EXTENSION COMPLETE", original["coverage"], "full", passing[:1], "recent", recent_passing[:1], flush=True)
     return original
 
