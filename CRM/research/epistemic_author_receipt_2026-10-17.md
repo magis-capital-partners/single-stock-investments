@@ -43,10 +43,10 @@ Routed memory observation (proposed lead only, verified against filings): daily 
 ## Draft
 
 - **Path:** `CRM/research/falsifier_drafts/01d9e3c381ada1ca50dc1fe5.json`
-- **Spec ID:** `crm-operating-business-oe-2026q3-v9` (revision 9; supersedes v8)
+- **Spec ID:** `crm-operating-business-oe-2026q3-v10` (revision 10; supersedes v9)
 - **Status:** `awaiting_review`
 - **Comparator:** normalized owner earnings TTM **below 14,402 USD millions** at Q3 FY2027
 
 ## Disposition
 
-`success` — v9 draft frozen on admitted evidence packet; canonical `falsifier_specs.json` not edited; independent review required before promotion.
+`success` — v10 draft re-frozen on authorized evidence packet (`13d443e9…`, input SHA `b9bc7c98…`); canonical `falsifier_specs.json` not edited; independent review required before promotion.
