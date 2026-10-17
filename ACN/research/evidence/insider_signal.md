@@ -1,4 +1,4 @@
-# ACN — Insider conviction (2026-10-15)
+# ACN — Insider conviction (2026-10-17)
 
 > Context only. Insider activity informs scenario confidence and stance discussion; it does not auto-inflate Lawrence base IRR. Promotion requires [HUMAN REVIEW].
 
@@ -12,11 +12,11 @@
 
 | Insider | Date | Shares | Price | Value | Contrib |
 |---------|------|--------|-------|-------|---------|
-| Sweet Julie Spellman | 2026-10-05 | 197 | $196.755 | $38760.74 | 2.675 |
-| Sweet Julie Spellman | 2026-09-05 | 205 | $189.095 | $38764.47 | 2.096 |
-| Park Angie Y | 2026-10-05 | 140 | $196.755 | $27545.7 | 1.947 |
-| Sharma Manish | 2026-10-05 | 93 | $196.755 | $18298.22 | 1.928 |
-| Unruch Joel | 2026-10-05 | 140 | $196.755 | $27545.7 | 1.887 |
+| Sweet Julie Spellman | 2026-10-05 | 197 | $196.755 | $38760.74 | 2.63 |
+| Sweet Julie Spellman | 2026-09-05 | 205 | $189.095 | $38764.47 | 2.061 |
+| Park Angie Y | 2026-10-05 | 140 | $196.755 | $27545.7 | 1.915 |
+| Sharma Manish | 2026-10-05 | 93 | $196.755 | $18298.22 | 1.896 |
+| Unruch Joel | 2026-10-05 | 140 | $196.755 | $27545.7 | 1.856 |
 
 **Routine / planned sales (context):**
 

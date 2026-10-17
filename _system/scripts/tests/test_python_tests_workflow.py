@@ -86,6 +86,23 @@ def test_unified_architecture_reads_are_in_the_unit_test_checkout():
     assert not missing, f"unit-tests sparse-checkout misses {missing}"
 
 
+# test_agent_data_architecture.py rebuilds claims from every thesis card and
+# picks its 10 golden tickers from thesis cards plus latest.json. get_valuation
+# reads GOOGL/research/valuation.json. None of those are under /_system/.
+AGENT_DATA_SPARSE = (
+    "*/research/thesis_card.json",
+    "*/research/latest.json",
+    "GOOGL/research/valuation.json",
+)
+
+
+def test_agent_data_reads_are_in_the_unit_test_checkout():
+    """Claim rebuild and the golden eval saw an empty sparse tree."""
+    entries = sparse_entries()
+    missing = [path for path in AGENT_DATA_SPARSE if path not in entries]
+    assert not missing, f"unit-tests sparse-checkout misses {missing}"
+
+
 def test_a_known_failure_that_starts_passing_is_reported_even_beside_one_that_still_fails(tmp_path):
     """Run together, the still-failing test made pytest exit 1 and hid the
     fixed one (main fixed test_deploy_defers_... while test_hot_routes_... still

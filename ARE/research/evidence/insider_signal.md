@@ -1,4 +1,4 @@
-# ARE — Insider conviction (2026-10-15)
+# ARE — Insider conviction (2026-10-17)
 
 > Context only. Insider activity informs scenario confidence and stance discussion; it does not auto-inflate Lawrence base IRR. Promotion requires [HUMAN REVIEW].
 
@@ -12,10 +12,10 @@
 
 | Insider | Date | Shares | Price | Value | Contrib |
 |---------|------|--------|-------|-------|---------|
-| MARCUS JOEL S | 2026-09-11 | 5000 | $49.68 | $248400.0 | 2.9 |
+| MARCUS JOEL S | 2026-09-11 | 5000 | $49.68 | $248400.0 | 2.852 |
 | MARCUS JOEL S | 2026-02-12 | 17300 | $53.74 | $929702.0 | 2.022 |
-| MARCUS JOEL S | 2026-08-17 | 5000 | $46.28 | $231400.0 | 1.864 |
 | MARCUS JOEL S | 2026-02-12 | 7700 | $54.31 | $418187.0 | 1.862 |
+| MARCUS JOEL S | 2026-08-17 | 5000 | $46.28 | $231400.0 | 1.833 |
 | MARCUS JOEL S | 2026-05-06 | 3989 | $45.99 | $183454.11 | 1.301 |
 
 **Routine / planned sales (context):**

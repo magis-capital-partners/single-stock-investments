@@ -1,4 +1,4 @@
-# BE — Insider conviction (2026-10-15)
+# BE — Insider conviction (2026-10-17)
 
 > Context only. Insider activity informs scenario confidence and stance discussion; it does not auto-inflate Lawrence base IRR. Promotion requires [HUMAN REVIEW].
 
@@ -12,9 +12,9 @@
 
 | Insider | Date | Shares | Price | Value | Contrib |
 |---------|------|--------|-------|-------|---------|
-| Sridhar KR | 2026-09-01 | 9688 | $30.96 | $299940.48 | 1.792 |
-| WARNER CYNTHIA J | 2026-09-30 | 83 | $276.98 | $22989.34 | 1.422 |
-| IMMELT JEFFREY R | 2026-09-30 | 81 | $276.98 | $22435.38 | 1.349 |
+| Sridhar KR | 2026-09-01 | 9688 | $30.96 | $299940.48 | 1.762 |
+| WARNER CYNTHIA J | 2026-09-30 | 83 | $276.98 | $22989.34 | 1.398 |
+| IMMELT JEFFREY R | 2026-09-30 | 81 | $276.98 | $22435.38 | 1.326 |
 | SODERBERG SHAWN MARIE | 2025-11-05 | 36666 | $30.89 | $1132612.74 | 1.143 |
 | SODERBERG SHAWN MARIE | 2026-02-25 | 20000 | $30.96 | $619200.0 | 1.066 |
 

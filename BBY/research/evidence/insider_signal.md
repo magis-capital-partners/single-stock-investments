@@ -1,8 +1,8 @@
-# BBY — Insider conviction (2026-10-15)
+# BBY — Insider conviction (2026-10-17)
 
 > Context only. Insider activity informs scenario confidence and stance discussion; it does not auto-inflate Lawrence base IRR. Promotion requires [HUMAN REVIEW].
 
-**ICS:** 2.04 (weak) · **Bull case support:** none
+**ICS:** 1.99 (negligible) · **Bull case support:** none
 
 | Scenario | Prior weight | Tilted weight |
 |----------|--------------|---------------|
@@ -12,7 +12,7 @@
 
 | Insider | Date | Shares | Price | Value | Contrib |
 |---------|------|--------|-------|-------|---------|
-| Scarlett Kathleen | 2026-09-23 | 96166 | $70.5 | $6779703.0 | 2.774 |
+| Scarlett Kathleen | 2026-09-23 | 96166 | $70.5 | $6779703.0 | 2.728 |
 
 **Routine / planned sales (context):**
 

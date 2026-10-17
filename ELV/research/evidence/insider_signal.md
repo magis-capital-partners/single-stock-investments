@@ -1,8 +1,8 @@
-# ELV — Insider conviction (2026-10-15)
+# ELV — Insider conviction (2026-10-17)
 
 > Context only. Insider activity informs scenario confidence and stance discussion; it does not auto-inflate Lawrence base IRR. Promotion requires [HUMAN REVIEW].
 
-**ICS:** 8.26 (exceptional) · **Bull case support:** moderate
+**ICS:** 8.19 (exceptional) · **Bull case support:** moderate
 
 | Scenario | Prior weight | Tilted weight |
 |----------|--------------|---------------|
@@ -13,10 +13,10 @@
 | Insider | Date | Shares | Price | Value | Contrib |
 |---------|------|--------|-------|-------|---------|
 | COLLIS STEVEN H | 2026-03-05 | 3000 | $289.84 | $869520.0 | 1.721 |
-| PERU RAMIRO G | 2026-07-17 | 1000 | $366.05 | $366050.0 | 1.675 |
+| PERU RAMIRO G | 2026-07-17 | 1000 | $366.05 | $366050.0 | 1.647 |
 | Penczek Ronald W | 2026-05-19 | 877 | $311.48 | $273167.96 | 1.288 |
-| BOUDREAUX GAIL | 2026-07-17 | 2045 | $368.25 | $753071.25 | 1.209 |
 | Penczek Ronald W | 2026-05-19 | 654 | $271.27 | $177410.58 | 1.205 |
+| BOUDREAUX GAIL | 2026-07-17 | 2045 | $368.25 | $753071.25 | 1.189 |
 
 **Routine / planned sales (context):**
 

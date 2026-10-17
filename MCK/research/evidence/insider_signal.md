@@ -1,8 +1,8 @@
-# MCK — Insider conviction (2026-10-15)
+# MCK — Insider conviction (2026-10-17)
 
 > Context only. Insider activity informs scenario confidence and stance discussion; it does not auto-inflate Lawrence base IRR. Promotion requires [HUMAN REVIEW].
 
-**ICS:** 6.04 (strong) · **Bull case support:** moderate
+**ICS:** 5.92 (moderate) · **Bull case support:** moderate
 
 | Scenario | Prior weight | Tilted weight |
 |----------|--------------|---------------|
@@ -12,9 +12,9 @@
 
 | Insider | Date | Shares | Price | Value | Contrib |
 |---------|------|--------|-------|-------|---------|
-| Wilson-Thompson Kathleen | 2026-07-22 | 277 | $814.04 | $225489.08 | 2.138 |
-| Martinez Maria | 2026-07-22 | 277 | $814.04 | $225489.08 | 2.138 |
-| Caruso Dominic J | 2026-07-22 | 277 | $814.04 | $225489.08 | 1.976 |
+| Wilson-Thompson Kathleen | 2026-07-22 | 277 | $814.04 | $225489.08 | 2.102 |
+| Martinez Maria | 2026-07-22 | 277 | $814.04 | $225489.08 | 2.102 |
+| Caruso Dominic J | 2026-07-22 | 277 | $814.04 | $225489.08 | 1.943 |
 
 **Routine / planned sales (context):**
 

@@ -1,4 +1,4 @@
-# JNJ — Insider conviction (2026-10-15)
+# JNJ — Insider conviction (2026-10-17)
 
 > Context only. Insider activity informs scenario confidence and stance discussion; it does not auto-inflate Lawrence base IRR. Promotion requires [HUMAN REVIEW].
 
@@ -16,7 +16,7 @@
 | Schmid Timothy | 2026-02-18 | 13625 | $115.67 | $1576003.75 | 1.854 |
 | Schmid Timothy | 2026-02-18 | 8998 | $129.51 | $1165330.98 | 1.777 |
 | MORIKIS JOHN G | 2025-11-26 | 1250 | $206.15 | $257687.5 | 1.694 |
-| Broadhurst Vanessa | 2026-07-20 | 11129 | $129.51 | $1441316.79 | 1.554 |
+| REED JOHN C | 2026-02-17 | 21721 | $157.92 | $3430180.32 | 1.549 |
 
 **Routine / planned sales (context):**
 
