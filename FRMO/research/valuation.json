@@ -180,7 +180,7 @@
             "miax_price_today": null,
             "miax_price_year5": 60.0,
             "direct_incremental_m": 5.69,
-            "direct_incremental_note": "326690 \u00d7 (60 \u2212 42.60) at measurement date; recalc on refresh",
+            "direct_incremental_note": "326690 × (60 − 42.60) at measurement date; recalc on refresh",
             "fund_miax_shares_assumed": 380000,
             "fund_incremental_m": 3.26,
             "exchange_rerate_m": 16.43,
@@ -492,13 +492,13 @@
     "weight_audit": {
       "flags": [
         "Third-party numeric path proxies bull scenario (instrumentalist); HK cross-check says no base IRR upgrade. Prefer qualitative pp only until approved blend.",
-        "Qualitative \u00b1pp stack may overlap numeric paths (moat/dhando); cap \u00b13pp and require source for each row."
+        "Qualitative ±pp stack may overlap numeric paths (moat/dhando); cap ±3pp and require source for each row."
       ],
       "deutsch_checks": {
         "hard_to_vary": false,
         "falsifiable": true,
         "not_instrumentalist": false,
-        "reach": "Weights encode evidence tier (A primary \u2192 D external), not fitted to hit a target IRR"
+        "reach": "Weights encode evidence tier (A primary → D external), not fitted to hit a target IRR"
       }
     },
     "notes": "Capstone IRR combining filings, segments, overlays, third-party, qualitative"
@@ -507,7 +507,7 @@
     "synthesis_in_dive": false
   },
   "context_overlay": {
-    "as_of": "2026-10-14",
+    "as_of": "2026-10-17",
     "disclaimer": "Context only. Tailwinds inform stance and overlay sizing; they do not auto-inflate Lawrence base IRR. Promotion to base case requires [HUMAN REVIEW].",
     "themes": [
       {
@@ -517,9 +517,9 @@
           {
             "id": "hy_oas",
             "label": "High-yield OAS credit spread (%)",
-            "latest": -0.06,
-            "as_of": "2026-10-14",
-            "yoy_pct": 89.5,
+            "latest": -0.69,
+            "as_of": "2026-10-16",
+            "yoy_pct": 30.3,
             "direction": "up",
             "good_for": "risk_regime",
             "source": "spread:HYG-LQD:21d (HYG-LQD 1m spread proxy, not OAS)",
@@ -529,9 +529,9 @@
           {
             "id": "ust_10y",
             "label": "US Treasury 10Y yield (%)",
-            "latest": 5.261000156402588,
-            "as_of": "2026-10-14",
-            "yoy_pct": 30.8,
+            "latest": 5.0980000495910645,
+            "as_of": "2026-10-16",
+            "yoy_pct": 28.2,
             "direction": "up",
             "good_for": "rates_regime",
             "source": "yahoo:^TNX",
@@ -541,9 +541,9 @@
           {
             "id": "ust_2y",
             "label": "US Treasury 2Y yield (%)",
-            "latest": 5.077000141143799,
-            "as_of": "2026-10-14",
-            "yoy_pct": 40.9,
+            "latest": 4.89900016784668,
+            "as_of": "2026-10-16",
+            "yoy_pct": 38.0,
             "direction": "up",
             "good_for": "rates_regime",
             "source": "yahoo:^FVX",
@@ -553,9 +553,9 @@
           {
             "id": "dxy_broad",
             "label": "Trade-weighted USD index (broad)",
-            "latest": 102.86399841308594,
-            "as_of": "2026-10-14",
-            "yoy_pct": 3.9,
+            "latest": 101.83999633789062,
+            "as_of": "2026-10-16",
+            "yoy_pct": 3.5,
             "direction": "up",
             "good_for": "dollar_regime",
             "source": "yahoo:DX-Y.NYB",
@@ -565,9 +565,9 @@
           {
             "id": "vix_level",
             "label": "VIX index level",
-            "latest": 15.869999885559082,
-            "as_of": "2026-10-14",
-            "yoy_pct": -23.7,
+            "latest": 19.989999771118164,
+            "as_of": "2026-10-16",
+            "yoy_pct": -21.0,
             "direction": "down",
             "good_for": "vol_regime",
             "source": "yahoo:^VIX",
@@ -577,9 +577,9 @@
           {
             "id": "credit_impulse_1m",
             "label": "HYG vs TLT 1-month return spread (%)",
-            "latest": 1.18,
-            "as_of": "2026-10-14",
-            "yoy_pct": 174.7,
+            "latest": -0.25,
+            "as_of": "2026-10-16",
+            "yoy_pct": 87.6,
             "direction": "up",
             "good_for": "credit_impulse",
             "source": "spread:HYG-TLT:21d",
@@ -589,9 +589,9 @@
           {
             "id": "spy_20d_realized_vol",
             "label": "SPY 20-day realized vol (annualized %)",
-            "latest": 9.84,
-            "as_of": "2026-10-14",
-            "yoy_pct": -21.1,
+            "latest": 10.2,
+            "as_of": "2026-10-16",
+            "yoy_pct": -19.6,
             "direction": "down",
             "good_for": "equity_vol",
             "source": "realized_vol:SPY:20d",
@@ -2212,8 +2212,8 @@
                 "value": 183.227512,
                 "unit": "USD_m",
                 "operation": "multiply",
-                "formula": "investment_a_m \u00d7 economic_realization_pct",
-                "substituted_formula": "308.984 \u00d7 0.593",
+                "formula": "investment_a_m × economic_realization_pct",
+                "substituted_formula": "308.984 × 0.593",
                 "dependencies": [
                   "investment_a_m",
                   "economic_realization_pct"
@@ -2226,8 +2226,8 @@
                 "value": 4.16210671,
                 "unit": "USD_per_share",
                 "operation": "divide",
-                "formula": "risked_m \u00f7 shares_m",
-                "substituted_formula": "183.22751 \u00f7 44.022781",
+                "formula": "risked_m ÷ shares_m",
+                "substituted_formula": "183.22751 ÷ 44.022781",
                 "dependencies": [
                   "risked_m",
                   "shares_m"
@@ -2281,8 +2281,8 @@
                 "value": 236.063776,
                 "unit": "USD_m",
                 "operation": "multiply",
-                "formula": "investment_a_m \u00d7 economic_realization_pct",
-                "substituted_formula": "308.984 \u00d7 0.764",
+                "formula": "investment_a_m × economic_realization_pct",
+                "substituted_formula": "308.984 × 0.764",
                 "dependencies": [
                   "investment_a_m",
                   "economic_realization_pct"
@@ -2295,8 +2295,8 @@
                 "value": 5.36230948,
                 "unit": "USD_per_share",
                 "operation": "divide",
-                "formula": "risked_m \u00f7 shares_m",
-                "substituted_formula": "236.06378 \u00f7 44.022781",
+                "formula": "risked_m ÷ shares_m",
+                "substituted_formula": "236.06378 ÷ 44.022781",
                 "dependencies": [
                   "risked_m",
                   "shares_m"
@@ -2350,8 +2350,8 @@
                 "value": 300.641432,
                 "unit": "USD_m",
                 "operation": "multiply",
-                "formula": "investment_a_m \u00d7 economic_realization_pct",
-                "substituted_formula": "308.984 \u00d7 0.973",
+                "formula": "investment_a_m × economic_realization_pct",
+                "substituted_formula": "308.984 × 0.973",
                 "dependencies": [
                   "investment_a_m",
                   "economic_realization_pct"
@@ -2364,8 +2364,8 @@
                 "value": 6.82922399,
                 "unit": "USD_per_share",
                 "operation": "divide",
-                "formula": "risked_m \u00f7 shares_m",
-                "substituted_formula": "300.64143 \u00f7 44.022781",
+                "formula": "risked_m ÷ shares_m",
+                "substituted_formula": "300.64143 ÷ 44.022781",
                 "dependencies": [
                   "risked_m",
                   "shares_m"
@@ -2506,8 +2506,8 @@
                 "value": 23.768541,
                 "unit": "USD_m",
                 "operation": "multiply",
-                "formula": "filed_bundle_m \u00d7 catalyst_realization_pct",
-                "substituted_formula": "57.831 \u00d7 0.411",
+                "formula": "filed_bundle_m × catalyst_realization_pct",
+                "substituted_formula": "57.831 × 0.411",
                 "dependencies": [
                   "filed_bundle_m",
                   "catalyst_realization_pct"
@@ -2520,8 +2520,8 @@
                 "value": 0.53991457,
                 "unit": "USD_per_share",
                 "operation": "divide",
-                "formula": "risked_m \u00f7 shares_m",
-                "substituted_formula": "23.768541 \u00f7 44.022781",
+                "formula": "risked_m ÷ shares_m",
+                "substituted_formula": "23.768541 ÷ 44.022781",
                 "dependencies": [
                   "risked_m",
                   "shares_m"
@@ -2575,8 +2575,8 @@
                 "value": 41.406996,
                 "unit": "USD_m",
                 "operation": "multiply",
-                "formula": "filed_bundle_m \u00d7 catalyst_realization_pct",
-                "substituted_formula": "57.831 \u00d7 0.716",
+                "formula": "filed_bundle_m × catalyst_realization_pct",
+                "substituted_formula": "57.831 × 0.716",
                 "dependencies": [
                   "filed_bundle_m",
                   "catalyst_realization_pct"
@@ -2589,8 +2589,8 @@
                 "value": 0.94058111,
                 "unit": "USD_per_share",
                 "operation": "divide",
-                "formula": "risked_m \u00f7 shares_m",
-                "substituted_formula": "41.406996 \u00f7 44.022781",
+                "formula": "risked_m ÷ shares_m",
+                "substituted_formula": "41.406996 ÷ 44.022781",
                 "dependencies": [
                   "risked_m",
                   "shares_m"
@@ -2644,8 +2644,8 @@
                 "value": 70.900806,
                 "unit": "USD_m",
                 "operation": "multiply",
-                "formula": "filed_bundle_m \u00d7 catalyst_realization_pct",
-                "substituted_formula": "57.831 \u00d7 1.226",
+                "formula": "filed_bundle_m × catalyst_realization_pct",
+                "substituted_formula": "57.831 × 1.226",
                 "dependencies": [
                   "filed_bundle_m",
                   "catalyst_realization_pct"
@@ -2658,8 +2658,8 @@
                 "value": 1.61054809,
                 "unit": "USD_per_share",
                 "operation": "divide",
-                "formula": "risked_m \u00f7 shares_m",
-                "substituted_formula": "70.900806 \u00f7 44.022781",
+                "formula": "risked_m ÷ shares_m",
+                "substituted_formula": "70.900806 ÷ 44.022781",
                 "dependencies": [
                   "risked_m",
                   "shares_m"
@@ -2856,8 +2856,8 @@
                 "value": 0.0,
                 "unit": "USD_m",
                 "operation": "multiply",
-                "formula": "liquid_m \u00d7 attributable_liquid_pct",
-                "substituted_formula": "56.501 \u00d7 0",
+                "formula": "liquid_m × attributable_liquid_pct",
+                "substituted_formula": "56.501 × 0",
                 "dependencies": [
                   "liquid_m",
                   "attributable_liquid_pct"
@@ -2870,8 +2870,8 @@
                 "value": 0.0,
                 "unit": "USD_per_share",
                 "operation": "divide",
-                "formula": "attributable_m \u00f7 shares_m",
-                "substituted_formula": "0 \u00f7 44.022781",
+                "formula": "attributable_m ÷ shares_m",
+                "substituted_formula": "0 ÷ 44.022781",
                 "dependencies": [
                   "attributable_m",
                   "shares_m"
@@ -2954,8 +2954,8 @@
                 "value": 14.972765,
                 "unit": "USD_m",
                 "operation": "multiply",
-                "formula": "liquid_m \u00d7 attributable_liquid_pct",
-                "substituted_formula": "56.501 \u00d7 0.265",
+                "formula": "liquid_m × attributable_liquid_pct",
+                "substituted_formula": "56.501 × 0.265",
                 "dependencies": [
                   "liquid_m",
                   "attributable_liquid_pct"
@@ -2968,8 +2968,8 @@
                 "value": 0.34011402,
                 "unit": "USD_per_share",
                 "operation": "divide",
-                "formula": "attributable_m \u00f7 shares_m",
-                "substituted_formula": "14.972765 \u00f7 44.022781",
+                "formula": "attributable_m ÷ shares_m",
+                "substituted_formula": "14.972765 ÷ 44.022781",
                 "dependencies": [
                   "attributable_m",
                   "shares_m"
@@ -3052,8 +3052,8 @@
                 "value": 29.493522,
                 "unit": "USD_m",
                 "operation": "multiply",
-                "formula": "liquid_m \u00d7 attributable_liquid_pct",
-                "substituted_formula": "56.501 \u00d7 0.522",
+                "formula": "liquid_m × attributable_liquid_pct",
+                "substituted_formula": "56.501 × 0.522",
                 "dependencies": [
                   "liquid_m",
                   "attributable_liquid_pct"
@@ -3066,8 +3066,8 @@
                 "value": 0.66996045,
                 "unit": "USD_per_share",
                 "operation": "divide",
-                "formula": "attributable_m \u00f7 shares_m",
-                "substituted_formula": "29.493522 \u00f7 44.022781",
+                "formula": "attributable_m ÷ shares_m",
+                "substituted_formula": "29.493522 ÷ 44.022781",
                 "dependencies": [
                   "attributable_m",
                   "shares_m"
@@ -3203,8 +3203,8 @@
                 "value": -1.34021519,
                 "unit": "USD_per_share",
                 "operation": "divide",
-                "formula": "reserve_m \u00f7 shares_m",
-                "substituted_formula": "-59 \u00f7 44.022781",
+                "formula": "reserve_m ÷ shares_m",
+                "substituted_formula": "-59 ÷ 44.022781",
                 "dependencies": [
                   "reserve_m",
                   "shares_m"
@@ -3243,8 +3243,8 @@
                 "value": -0.60000753,
                 "unit": "USD_per_share",
                 "operation": "divide",
-                "formula": "reserve_m \u00f7 shares_m",
-                "substituted_formula": "-26.414 \u00f7 44.022781",
+                "formula": "reserve_m ÷ shares_m",
+                "substituted_formula": "-26.414 ÷ 44.022781",
                 "dependencies": [
                   "reserve_m",
                   "shares_m"
@@ -3283,8 +3283,8 @@
                 "value": -0.06996378,
                 "unit": "USD_per_share",
                 "operation": "divide",
-                "formula": "reserve_m \u00f7 shares_m",
-                "substituted_formula": "-3.08 \u00f7 44.022781",
+                "formula": "reserve_m ÷ shares_m",
+                "substituted_formula": "-3.08 ÷ 44.022781",
                 "dependencies": [
                   "reserve_m",
                   "shares_m"
@@ -3513,7 +3513,7 @@
       "interpretation": "value_per_share is withheld while any material additive component is unpriced; priced_components_per_share is not a complete security value."
     },
     "scenario_contract": {
-      "rule": "Cases must change cited causal operating, capital, probability, timing, or financing drivers\u2014not only a terminal multiple.",
+      "rule": "Cases must change cited causal operating, capital, probability, timing, or financing drivers—not only a terminal multiple.",
       "top_value_drivers": [
         {
           "component_id": "core_engine",
@@ -3811,5 +3811,17 @@
       "post_halving_subsidy_schedule",
       "hauck_cost_floor_not_in_lawrence_base"
     ]
+  },
+  "schema_version": "magis.valuation.v2",
+  "returns": {
+    "base_irr_pct": 21.9,
+    "unit": "percent_per_year",
+    "label": "annualized return",
+    "display": "21.9% (base)",
+    "scenarios_pct": {
+      "bear": 7.2,
+      "base": 21.9,
+      "bull": 30.1
+    }
   }
 }

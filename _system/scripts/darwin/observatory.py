@@ -88,11 +88,14 @@ def write_regime_brief(observatory: dict, rows: list[dict]) -> Path:
         if qpath.exists():
             lines.append(f"- **{r['ticker']}**: see `{qpath.relative_to(ROOT)}`")
     lines.append("")
-    path.write_text("\n".join(lines) + "\n", encoding="utf-8")
-    return path
+    from atomic_io import write_superseded_review_md
+
+    return write_superseded_review_md(REGIME_BRIEF_DIR, "darwin_regime_brief", day, "\n".join(lines) + "\n", keep_latest=2)
 
 
 def save_observatory(payload: dict) -> Path:
+    from atomic_io import write_json_if_changed
+
     DATA_DIR.mkdir(parents=True, exist_ok=True)
-    OBSERVATORY_PATH.write_text(json.dumps(payload, indent=2) + "\n", encoding="utf-8")
+    write_json_if_changed(OBSERVATORY_PATH, payload)
     return OBSERVATORY_PATH

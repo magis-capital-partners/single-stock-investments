@@ -235,10 +235,20 @@ def seed_filing_facts_from_inputs(ticker: str, val: dict, as_of: str) -> None:
         "metrics": metrics,
         "parser": parser,
     }
-    out.write_text(json.dumps(payload, indent=2) + "\n", encoding="utf-8")
+    from atomic_io import write_json_if_changed
+
+    canonical = evidence / "filing_facts.json"
+    changed = write_json_if_changed(canonical, payload)
+    existing_dated = sorted(evidence.glob("filing_facts_*.json"))
+    if changed or not existing_dated or out.exists():
+        write_json_if_changed(out, payload)
+        for old_p in existing_dated:
+            if old_p != out:
+                old_p.unlink(missing_ok=True)
 
 
 def refresh_ticker(ticker: str) -> bool:
+    from atomic_io import write_json_if_changed
     from valuation_synthesis import post_optionality_valuation_pass
 
     ticker = ticker.upper()
@@ -260,7 +270,7 @@ def refresh_ticker(ticker: str) -> bool:
     if cfg.get("seed_filing_facts", True):
         seed_filing_facts_from_inputs(ticker, val, TODAY)
     post_optionality_valuation_pass(val)
-    val_path.write_text(json.dumps(val, indent=2) + "\n", encoding="utf-8")
+    write_json_if_changed(val_path, val)
     og = val.get("optionality_gate") or {}
     print(
         f"OK {ticker} optionality refresh as_of={TODAY} "

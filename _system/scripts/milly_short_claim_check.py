@@ -24,7 +24,7 @@ def _filing_text(ticker: str, limit: int = 120_000) -> str:
     if not evidence.is_dir():
         return ""
     chunks: list[str] = []
-    for pattern in ("filing_digest_*.md", "_text/*.txt"):
+    for pattern in ("filing_digest.md", "filing_digest_*.md", "_text/*.txt"):
         for path in sorted(evidence.glob(pattern), reverse=True):
             try:
                 chunks.append(path.read_text(encoding="utf-8", errors="ignore")[: limit // 3])

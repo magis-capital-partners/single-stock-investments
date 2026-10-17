@@ -1,0 +1,276 @@
+{
+  "schema_version": "magis.agent_shard.v2",
+  "ticker": "CSCO",
+  "company": "Cisco",
+  "book": "holdings",
+  "shard_status": "built",
+  "as_of": "2026-07-29",
+  "registry": {
+    "market": "US",
+    "exchange": "—",
+    "sleeve": "ls_algo_underlying",
+    "moat": "unproven",
+    "dhando": "pending",
+    "payoff_lens": "pending"
+  },
+  "returns": {
+    "base_irr_pct": null,
+    "unit": "percent_per_year",
+    "label": null,
+    "display": null,
+    "scenarios_pct": {}
+  },
+  "thesis_summary": {
+    "thesis": "Cisco Systems (NASDAQ: CSCO) sells networking hardware, security software, collaboration tools, and observability platforms to enterprises, service providers, and governments worldwide. **[Fact]** FY2025 consolidated revenue was **$56.7 billion** with three reportable geographic segments (Americas, EMEA, APJC). **[Fact]** The company generates **$14.2 billion** of cash from operations and returns most of it through dividends and buybacks while maintaining a capital-light model (capital spending roughly **6%** of operating cash flow). **[Inference]** After the Splunk acquisition, a growing share of revenue is recurring software and subscription, but the equity still behaves like a mature infrastructure compounder priced for AI-era networking growth.",
+    "why_market_wrong": "The market may be paying for AI networking, security cross-sell, and Splunk subscription mix while our proof uses **screening-grade** reinvestment bounds that are not yet stock-specific. **[Inference]** At **$110.70**, the quote sits near the contract high-case intrinsic value (**$111.25**) but **91% above** the base present value (**$58.05**), so the inefficiency is not a hidden discount but a **growth-and-quality premium** that our automated template does not underwrite. **[Inference]** Predictive attribute: **none** for a dated payoff; return is earnings power and franchise quality at price until reinvestment assumptions are refreshed from primary-source capital bridges.",
+    "stance": "watch",
+    "archetype": "compounder",
+    "base_irr_pct": null,
+    "base_irr_unit": "percent_per_year",
+    "scenarios": {},
+    "key_assumptions": [
+      {
+        "input": "Price today",
+        "source": "Yahoo CSCO close 2026-10-09",
+        "value": "**$118.39**"
+      },
+      {
+        "input": "Normalized owner earnings",
+        "source": "us-gaap:NetCashProvidedByUsedInOperatingActivities; accession 0000858877-25-000111; form 10-K",
+        "value": "**$13,288M**"
+      },
+      {
+        "input": "Cash",
+        "source": "us-gaap:CashCashEquivalentsRestrictedCashAndRestrictedCashEquivalents; accession 0000858877-26-000078; form 10-Q",
+        "value": "**$7,083M**"
+      },
+      {
+        "input": "Debt",
+        "source": "us-gaap:LongTermDebtNoncurrent; accession 0000858877-26-000078; form 10-Q",
+        "value": "**$19,371M**"
+      },
+      {
+        "input": "Diluted shares",
+        "source": "dei:EntityCommonStockSharesOutstanding; accession 0000858877-26-000078; form 10-Q",
+        "value": "**3941.4M**"
+      },
+      {
+        "input": "Reinvestment rate",
+        "source": "Versioned initial bounds; refresh from the issuer reinvestment ledger.",
+        "value": "**35.0%**"
+      },
+      {
+        "input": "Incremental after-tax ROIC",
+        "source": "Conservative bounded starting cases pending a longer primary-source capital bridge.",
+        "value": "**18.0%**"
+      },
+      {
+        "input": "Discount rate",
+        "source": "Approved risk bounds for the automated first pass.",
+        "value": "**10.0%**"
+      }
+    ],
+    "open_questions": [
+      "Upgrade model from screening_grade to stock_specific: refresh reinvestment rate and incremental return on capital from primary-source capital bridge.",
+      "Review epistemic falsifier draft `03df290ce01c5b0678e15d5f.json` before promoting owner-earnings normalization.",
+      "No approved third-party sources in base case; activist filings are context only.",
+      "Stance and sizing require `human_decision.json`."
+    ]
+  },
+  "truncation": {
+    "key_assumptions": {
+      "shown": 8,
+      "total": 8
+    },
+    "open_questions": {
+      "shown": 4,
+      "total": 4
+    },
+    "kpi_series": {
+      "shown": 12,
+      "total": 16
+    },
+    "documents": {
+      "shown": 0,
+      "note": "capped at 15 most recent in builder"
+    }
+  },
+  "kpi_series": [
+    {
+      "metric": "cash",
+      "label": "Cash",
+      "direction": "steady",
+      "signal_tier": "steady",
+      "latest": 7218000000.0,
+      "growth_latest": -0.1352,
+      "strength": 0.021,
+      "period": "2026-07-25",
+      "human_summary": "Cash growth is steady around -14% YoY (recent periods)"
+    },
+    {
+      "metric": "cfo",
+      "label": "Operating cash flow",
+      "direction": "steady",
+      "signal_tier": "steady",
+      "latest": 5386000000.0,
+      "growth_latest": 0.2721,
+      "strength": 0.261,
+      "period": "2026-07-25",
+      "human_summary": "Cash from operations growth is steady around +27% YoY (recent periods)"
+    },
+    {
+      "metric": "cfo_margin",
+      "label": "Cash conversion (CFO/revenue)",
+      "direction": "steady",
+      "signal_tier": "steady",
+      "latest": 0.31219568745652676,
+      "growth_latest": 0.0819,
+      "strength": 0.054,
+      "period": "2026-07-25",
+      "human_summary": "Cash conversion growth is steady around +8.2% YoY (recent periods)"
+    },
+    {
+      "metric": "eps_basic",
+      "label": "EPS (basic)",
+      "direction": "steady",
+      "signal_tier": "steady",
+      "latest": 0.85,
+      "growth_latest": 0.3492,
+      "strength": null,
+      "period": "2026-04-25",
+      "human_summary": "EPS growth is steady around +35% YoY (recent periods)"
+    },
+    {
+      "metric": "long_term_debt",
+      "label": "Long-term debt",
+      "direction": "decelerating",
+      "signal_tier": "confirmed",
+      "latest": 19372000000.0,
+      "growth_latest": -0.1526,
+      "strength": 8.04,
+      "period": "2026-07-25",
+      "human_summary": "Long-term debt growth slowed: -15% → -15% YoY (two quarters) Trailing-twelve-month growth agrees."
+    },
+    {
+      "metric": "net_income",
+      "label": "Net income",
+      "direction": "steady",
+      "signal_tier": "steady",
+      "latest": 3859000000.0,
+      "growth_latest": 0.5133,
+      "strength": 0.25,
+      "period": "2026-07-25",
+      "human_summary": "Net income growth is steady around +51% YoY (recent periods)"
+    },
+    {
+      "metric": "op_margin",
+      "label": "Operating margin",
+      "direction": "steady",
+      "signal_tier": "steady",
+      "latest": 0.24715974959424994,
+      "growth_latest": 0.1748,
+      "strength": null,
+      "period": "2026-07-25",
+      "human_summary": "Operating margin growth is steady around +17% YoY (recent periods)"
+    },
+    {
+      "metric": "operating_income",
+      "label": "Operating income",
+      "direction": "steady",
+      "signal_tier": "steady",
+      "latest": 4264000000.0,
+      "growth_latest": 0.3813,
+      "strength": null,
+      "period": "2026-07-25",
+      "human_summary": "Operating income growth is steady around +38% YoY (recent periods)"
+    },
+    {
+      "metric": "revenues",
+      "label": "Revenue",
+      "direction": "steady",
+      "signal_tier": "steady",
+      "latest": 17252000000.0,
+      "growth_latest": 0.1758,
+      "strength": 0.75,
+      "period": "2026-07-25",
+      "human_summary": "Revenue growth is steady around +18% YoY (recent periods)"
+    },
+    {
+      "metric": "stockholders_equity",
+      "label": "Stockholders' equity",
+      "direction": "steady",
+      "signal_tier": "steady",
+      "latest": 50285000000.0,
+      "growth_latest": 0.0735,
+      "strength": 0.517,
+      "period": "2026-07-25",
+      "human_summary": "Stockholders' equity growth is steady around +7.3% YoY (recent periods)"
+    },
+    {
+      "metric": "total_assets",
+      "label": "Total assets",
+      "direction": "accelerating",
+      "signal_tier": "confirmed",
+      "latest": 129637000000.0,
+      "growth_latest": 0.0601,
+      "strength": 1.057,
+      "period": "2026-07-25",
+      "human_summary": "Total assets growth sped up: +4.8% → +6.0% YoY (two quarters)"
+    },
+    {
+      "metric": "growth_regime.eps_basic",
+      "label": "Growth regime upshift",
+      "direction": "upshift",
+      "signal_tier": "confirmed",
+      "latest": 0.85,
+      "growth_latest": 0.3492,
+      "strength": 1.666,
+      "period": "2026-04-25",
+      "human_summary": "EPS growth has stayed above this company's normal ~-0.6% YoY (latest +35%). Two quarters."
+    }
+  ],
+  "recent_news": [
+    {
+      "title": "Not Nvidia. Not Cisco. This Is the AI Networking Stock Quietly Wiring Every Data Center",
+      "published_utc": "2026-10-15T23:15:00+00:00",
+      "category": "guidance",
+      "confidence": 0.83,
+      "url": "https://www.fool.com/investing/2026/10/15/not-nvidia-not-cisco-this-is-the-ai-networking-sto/?source=iedfolrf0000001",
+      "linked_filing": null
+    },
+    {
+      "title": "Cisco Systems Falls 3.9% as Recent Insider Selling and Profit-Taking Weigh on Shares | CSCO Stock News - Quiver Quantitative",
+      "published_utc": "2026-09-22T07:00:00+00:00",
+      "category": "insider_block",
+      "confidence": 0.88,
+      "url": "https://news.google.com/rss/articles/CBMiuwFBVV95cUxQSll0cTlhbk9uV0dCZ3hKdFhUVXpoRDI1R0V0TkNUR1pQZFV4RU94SVp5N0J2SFRmY1FWYzc3Mjd0eFl2a28tNURMNUNiX0NVemNPREczd1BWcmlid2NQZTUtQjZpZ1IwUGFhRDVoWFlVMFRTVllqVWU2TV9YYjVHQ3NTZmwwUnpZX2ZadlVRc1ZYUk92cHpJbTVsT3B2TEppVFNTUTQ2QllNc1QwZ0NId3pBOUNjVkh0SWI0?oc=5",
+      "linked_filing": null
+    }
+  ],
+  "documents": [],
+  "l2_pointers": {
+    "valuation_json": "CSCO/research/valuation.json",
+    "thesis_card_json": "CSCO/research/thesis_card.json",
+    "filing_digest_md": "CSCO/research/evidence/filing_digest.md",
+    "insider_signal_md": "CSCO/research/evidence/insider_signal.md",
+    "thematic_context_md": "CSCO/research/evidence/thematic_context.md",
+    "source_inventory_json": "CSCO/third-party-analyses/source_inventory.json",
+    "full_ui_shard_json": "dashboard/data/tickers/CSCO.json",
+    "latest_json": "CSCO/research/latest.json",
+    "context_pack_md": "dashboard/data/context_packs/CSCO.md"
+  },
+  "generated_at": "2026-10-16T20:26:21Z",
+  "_envelope": {
+    "schema_version": "magis.feed.v2",
+    "feed_id": "agent-shard-csco",
+    "generated_at": "2026-10-16T20:26:21Z",
+    "as_of": "2026-07-29",
+    "content_sha256": "sha256:3e97dd9248536139d1c41b6b6748587bbd4a9f023541041fa1086bfdef5688bb",
+    "row_count": 14,
+    "upstream_inputs": [],
+    "health": {
+      "status": "healthy",
+      "structural_errors": 0
+    }
+  }
+}

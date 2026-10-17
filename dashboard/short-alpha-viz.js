@@ -458,7 +458,7 @@
       ? ` Days to cover: FINRA short interest settled ${cm.settlement}, ${cm.covered ?? 0} names. Context, not a reason to short.`
       : '';
     const stages = ['all', 'lead', 'researching', 'ic', 'live', 'closed', 'rejected'];
-    return `<div class="short-alpha-header">
+    return `${navigation('ideas')}<div data-short-backtest-teaser class="short-backtest-teaser-slot"><a class="rsp-action" href="#/ideas/short-alpha/backtest">Open reverse-split backtest</a></div><div class="short-alpha-header">
       <div><div class="short-alpha-kicker">Short Alpha</div><h2>Frameworks, names that fit, and the open book</h2><p>Every lens from the short library, every name that fits one, and the positions we have actually borrowed. A publisher hit is a lead. It is not a thesis.</p></div>
       <div class="short-alpha-rail"><span>Framework</span><i></i><span>Name</span><i></i><span>Position</span></div>
     </div>
@@ -492,23 +492,40 @@
     </section>
     <p class="short-alpha-note">${['borrow', 'crowding', 'leads', 'reverse_splits', 'quant', 'excluded', 'desk_notes'].map(key => esc(payload.methodology?.[key] || '')).filter(Boolean).join(' ')}</p>`;
   }
+  function navigation(section) {
+    return `<nav class="short-view-nav" aria-label="Shorts research"><a href="#/ideas/short-alpha"${section==='ideas' ? ' aria-current="page"' : ''}>Short ideas</a><a href="#/ideas/short-alpha/backtest"${section==='backtest' ? ' aria-current="page"' : ''}>Reverse-split backtest</a></nav>`;
+  }
+  function renderBacktest() {
+    return `${navigation('backtest')}<section class="short-section short-reverse-splits" data-short-reverse-splits><div class="rsp-feed-status" data-short-reverse-status role="status">Loading reverse-split results…</div><div data-short-reverse-splits-body></div></section>`;
+  }
   // The Reverse splits sub-section is filled by index.html from data/reverse_splits.json
   // through window.ReverseSplitsViz.render(doc) (dashboard/reverse-splits-viz.js). The
   // section stays hidden when the file is absent or the renderer is not loaded.
   function mountReverseSplits(container, doc) {
+    const teaser=container && container.querySelector('[data-short-backtest-teaser]');
+    if(teaser){
+      const html=global.ShortsNetEdgeViz?.teaser(doc) || global.ReverseSplitsPortfolioViz?.teaser(doc);
+      teaser.innerHTML=html || '<p class="rsp-feed-status">Backtest summary unavailable. <a href="#/ideas/short-alpha/backtest">Open the backtest view</a> for its data status.</p>';
+      // Older ledgers without portfolio results retain their original mount.
+      if(html || !doc)return Boolean(html);
+    }
     const section = container && container.querySelector('[data-short-reverse-splits]');
     if (!section) return false;
     const body = section.querySelector('[data-short-reverse-splits-body]');
     const viz = global.ReverseSplitsViz;
     if (!doc || typeof doc !== 'object' || !viz || typeof viz.render !== 'function') {
-      section.hidden = true;
+      section.hidden = false;
       if (body) body.innerHTML = '';
+      const status=section.querySelector('[data-short-reverse-status]');
+      if(status)status.textContent='Backtest results are unavailable. Reload the page to retry, or return to Short ideas.';
       return false;
     }
     let html = '';
     try { html = String(viz.render(doc, { hideTitle: true }) || ''); } catch (error) { html = `<div class="short-alpha-empty">Reverse splits view failed: ${esc(error && error.message)}</div>`; }
     if (!html.trim()) { section.hidden = true; return false; }
     if (body) body.innerHTML = html;
+    const status=section.querySelector('[data-short-reverse-status]');
+    if(status){status.textContent='';status.hidden=true;}
     section.hidden = false;
     if (typeof viz.attach === 'function') {
       try { viz.attach(body || section, doc); } catch (_) { /* optional */ }
@@ -665,5 +682,5 @@
       rerender();
     }));
   }
-  global.ShortAlphaViz = { render, attach, getCandidates, getPositions, mountReverseSplits, lensStrip, noteRefHtml, entryMeta };
+  global.ShortAlphaViz = { render, renderBacktest, attach, getCandidates, getPositions, mountReverseSplits, lensStrip, noteRefHtml, entryMeta };
 })(window);

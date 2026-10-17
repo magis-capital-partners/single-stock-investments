@@ -41,10 +41,12 @@ def check(ticker: str, *, dive_date: str | None = None, strict: bool = False) ->
     cfg = val.get("evidence_refresh") or {}
 
     evidence = research / "evidence"
-    if not list(evidence.glob("filing_digest_*.md")):
+    if not (evidence / "filing_digest.md").is_file() and not list(evidence.glob("filing_digest_*.md")):
         errs.append("missing filing_digest")
 
     facts = sorted(evidence.glob("filing_facts_*.json"))
+    if not facts and (evidence / "filing_facts.json").is_file():
+        facts = [evidence / "filing_facts.json"]
     if facts:
         data = json.loads(facts[-1].read_text(encoding="utf-8"))
         if not (data.get("metrics") or data.get("claims")):
@@ -57,6 +59,8 @@ def check(ticker: str, *, dive_date: str | None = None, strict: bool = False) ->
                 errs.append("filing_facts only evidence_refresh_seed — re-parse latest annual PDF")
 
     mgmt = list(evidence.glob("management_facts_*.json"))
+    if (evidence / "management_facts.json").is_file():
+        mgmt.append(evidence / "management_facts.json")
     tx = list((td / "investor-documents" / "transcripts").glob("*")) if (td / "investor-documents" / "transcripts").exists() else []
     if tx and not mgmt:
         errs.append("transcripts present but no management_facts")

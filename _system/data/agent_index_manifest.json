@@ -1,0 +1,93 @@
+{
+  "schema_version": "magis.agent_index_manifest.v1",
+  "description": "Versioned pointer to the disposable SQLite hybrid search index and every committed agent store it is built from.",
+  "index": {
+    "sqlite_path": "_system/cache/agent_search.sqlite",
+    "gitignored": true,
+    "rebuild_command": "python _system/scripts/agent_search.py --build --include-filing-text",
+    "ci_artifact": "agent-search-index (see .github/workflows/agent-index.yml)",
+    "engine": "SQLite FTS5 BM25 reranked by 256-dim hashing-embedding cosine (0.6/0.4 hybrid)"
+  },
+  "stores": [
+    {
+      "path": "_system/data/claims.jsonl",
+      "present": true,
+      "sha256": "sha256:64edfc02406397c635ef6698866e6ff86d1d61feefb7d7efd7c65b67d743e82a",
+      "bytes": 9563650,
+      "rows": 24552
+    },
+    {
+      "path": "_system/data/chunks.jsonl",
+      "present": true,
+      "sha256": "sha256:ca788b7e4589059fd85a0e2483f52ae52291ebc2082244072f5b0eacd66da0f8",
+      "bytes": 28727642,
+      "rows": 18303
+    },
+    {
+      "path": "_system/data/catalog/documents.jsonl",
+      "present": true,
+      "sha256": "sha256:2c2f5a60e8fb5b55fe99146e9f4844b610db77dc1d6757e817e2e7c370919106",
+      "bytes": 5983501,
+      "rows": 8815
+    },
+    {
+      "path": "dashboard/data/portfolio_summary.json",
+      "present": true,
+      "sha256": "sha256:ecb2fbd20b000298e1998d0100a2d1ba5ba108324f2294159d0c2bba6440b992",
+      "bytes": 62108
+    },
+    {
+      "path": "dashboard/data/research_manifest.json",
+      "present": true,
+      "sha256": "sha256:ec0af6d3e9a6e3f373d4e7cf97ab7020d6814a970e473fa73f2414f141c13851",
+      "bytes": 102397
+    }
+  ],
+  "counts": {
+    "agent_shards": 348,
+    "context_packs": 348,
+    "schemas": 8
+  },
+  "entry_points": [
+    "AGENT_INDEX.md",
+    "llms.txt",
+    "_system/scripts/agent_mcp_server.py"
+  ],
+  "legacy_monoliths_do_not_load": [
+    {
+      "path": "dashboard/data/kpi_trends.json",
+      "use_instead": "dashboard/data/kpi_summary.json + L1 shard kpi_series"
+    },
+    {
+      "path": "dashboard/data/document_registry.json",
+      "use_instead": "_system/data/catalog/documents.jsonl (cross-store catalog)"
+    },
+    {
+      "path": "dashboard/data/document_catalog.json",
+      "use_instead": "dashboard/data/document_catalog_summary.json + catalog JSONL"
+    },
+    {
+      "path": "dashboard/data/research_memory.json",
+      "use_instead": "_system/data/claims.jsonl + _system/data/memory_index.json"
+    },
+    {
+      "path": "_system/memory/MEMORY.md",
+      "use_instead": "_system/data/memory_index.json (load one shard, not the whole file)"
+    }
+  ],
+  "canonical_returns_note": "valuation.json returns block (percent_per_year) is canonical; legacy results/implied_return/results_lawrence_legacy fields are reference-only for older consumers.",
+  "generated_at": "2026-10-16T20:28:32Z",
+  "_envelope": {
+    "schema_version": "magis.feed.v2",
+    "feed_id": "agent-index-manifest",
+    "generated_at": "2026-10-16T20:28:32Z",
+    "as_of": "2026-10-16",
+    "content_sha256": "sha256:08d847cdd3afbb822dd14172660768c4544c09ff7461412c1bd3b95822951daf",
+    "row_count": 51670,
+    "upstream_inputs": [],
+    "health": {
+      "status": "healthy",
+      "structural_errors": 0
+    }
+  }
+}

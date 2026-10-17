@@ -98,6 +98,8 @@ def assess(ticker: str, as_of: str, run_gate: bool = True) -> dict:
     row["gated_comparisons"] = gated
 
     verified = sorted(evidence.glob("ssi_verified_claims_*.json"), reverse=True)
+    if (evidence / "ssi_verified_claims.json").is_file():
+        verified.append(evidence / "ssi_verified_claims.json")
     row["claims"] = bool(verified)
     if verified:
         try:
@@ -111,11 +113,17 @@ def assess(ticker: str, as_of: str, run_gate: bool = True) -> dict:
             pass
 
     reports = sorted(research.glob("ssi_report_*.md"), reverse=True) if research.is_dir() else []
+    if (research / "ssi_report.md").is_file():
+        reports.append(research / "ssi_report.md")
     row["report"] = bool(reports)
     if reports:
         row["report_path"] = str(reports[0].relative_to(ROOT)).replace("\\", "/")
-        stamp = reports[0].stem.replace("ssi_report_", "")
-        gate_path = evidence / f"ssi_report_gate_{stamp}.json"
+        stamp = reports[0].stem.replace("ssi_report_", "") if reports[0].name != "ssi_report.md" else ""
+        gate_path = (
+            evidence / f"ssi_report_gate_{stamp}.json"
+            if stamp and (evidence / f"ssi_report_gate_{stamp}.json").is_file()
+            else evidence / "ssi_report_gate.json"
+        )
         try:
             gate = json.loads(gate_path.read_text(encoding="utf-8"))
             row["gate_result"] = gate.get("result")

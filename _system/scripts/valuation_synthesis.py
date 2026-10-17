@@ -383,6 +383,9 @@ def _load_inventory(ticker: str) -> dict | None:
     tp = ROOT / ticker / "third-party-analyses"
     if not tp.is_dir():
         return None
+    canonical = tp / "source_inventory.json"
+    if canonical.is_file():
+        return json.loads(canonical.read_text(encoding="utf-8"))
     files = sorted(tp.glob("source_inventory_*.json"), reverse=True)
     if not files:
         return None

@@ -6,10 +6,14 @@ the mandate; the prompts (`_system/prompts/grok_scan_agents.md`,
 `_system/memory-hub/research-equity/CONTEXT.md` are the one-line summaries. Proposal:
 `_system/proposals/one_hub_for_humans_and_bots_2026-10-11.md`.
 
-Shared rules. Read a file's stamp (`generated_at`, `build_time`, `generated`, `as_of`,
+Shared rules. Read a file's stamp (`_envelope.generated_at`, `generated_at`, `build_time`, `generated`, `as_of`,
 `meta.updated`) before its contents, and record it in `inputs_read`. Read
-`_system/portfolio/registry.json` fresh; never hardcode tickers. Dashboard first, then the
-filing the row points at, then the web to fill a name or an exhibit, labelled as web. A
+`_system/portfolio/registry.json` or `dashboard/data/portfolio_summary.json` fresh; never hardcode tickers.
+Use **Progressive Disclosure (`L0 -> L1 -> L2`)** so context windows stay clean:
+- **L0 Summary Feeds (< 100 KB):** Start with `dashboard/data/portfolio_summary.json`, `dashboard/data/research_manifest.json`, `dashboard/data/kpi_summary.json` (instead of loading the 7 MB `kpi_trends.json` monolith), and `dashboard/data/document_catalog_summary.json`.
+- **L1 Per-Ticker Agent Shards (10–35 KB):** Open `dashboard/data/agent_shards/{TICKER}.json` and `{TICKER}/research/thesis_card.json` only for candidate tickers identified at L0.
+- **L2 Primary Evidence (on demand):** Open canonical undated evidence files (`{TICKER}/research/evidence/filing_digest.md`, `insider_signal.md`, `thematic_context.md`, `{TICKER}/third-party-analyses/source_inventory.json`), `_system/data/catalog/documents.jsonl` (or `python _system/scripts/query_magis_index.py`), and `{TICKER}/_text/*.txt` only when verifying a specific number or filing citation.
+Dashboard first, then the filing the row points at, then the web to fill a name or an exhibit, labelled as web. A
 headline is never a term. Ranked hits only, at most twelve, best first; say nothing when
 nothing is new. Fact and inference stay separate. No price target, no stance, no position,
 no base IRR, no fraud tag. `owner` names whose queue a brief lands in; either owner's bot

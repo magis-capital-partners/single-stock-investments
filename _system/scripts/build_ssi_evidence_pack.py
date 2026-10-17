@@ -52,6 +52,7 @@ SCRIPT_DIR = Path(__file__).resolve().parent
 if str(SCRIPT_DIR) not in sys.path:
     sys.path.insert(0, str(SCRIPT_DIR))
 
+from atomic_io import write_json_if_changed  # noqa: E402
 from filing_facts import IX_LINE, parse_ix_fact_lines_indexed  # noqa: E402
 
 ROOT = SCRIPT_DIR.parents[1]
@@ -764,13 +765,46 @@ def build_evidence_pack(ticker_dir: Path, as_of: str) -> dict:
     return pack
 
 
+def has_unchanged_ssi_chain(ticker_dir: Path, as_of: str) -> bool:
+    """Return True if an SSI chain already exists for the current pack_hash."""
+    evidence_dir = ticker_dir / "research" / "evidence"
+    research_dir = ticker_dir / "research"
+    if not evidence_dir.is_dir():
+        return False
+    canonical_pack = evidence_dir / "ssi_evidence_pack.json"
+    existing_packs = ([canonical_pack] if canonical_pack.is_file() else []) + sorted(
+        evidence_dir.glob("ssi_evidence_pack_*.json"), reverse=True
+    )
+    if not existing_packs:
+        return False
+    try:
+        prev_pack = json.loads(existing_packs[0].read_text(encoding="utf-8"))
+    except (OSError, json.JSONDecodeError):
+        return False
+    current_pack = build_evidence_pack(ticker_dir, as_of)
+    if prev_pack.get("pack_hash") != current_pack.get("pack_hash"):
+        return False
+    has_report = (research_dir / "ssi_report.md").is_file() or bool(
+        list(research_dir.glob("ssi_report_*.md"))
+    )
+    has_gate = (evidence_dir / "ssi_report_gate.json").is_file() or bool(
+        list(evidence_dir.glob("ssi_report_gate_*.json"))
+    )
+    return has_report and has_gate
+
+
 def write_evidence_pack(ticker_dir: Path, as_of: str) -> Path | None:
     evidence_dir = ticker_dir / "research" / "evidence"
     if not evidence_dir.is_dir():
         return None
     pack = build_evidence_pack(ticker_dir, as_of)
+    canonical = evidence_dir / "ssi_evidence_pack.json"
+    write_json_if_changed(canonical, pack)
     out = evidence_dir / f"ssi_evidence_pack_{as_of}.json"
-    out.write_text(json.dumps(pack, indent=2) + "\n", encoding="utf-8")
+    write_json_if_changed(out, pack)
+    for old in evidence_dir.glob("ssi_evidence_pack_*.json"):
+        if old != out:
+            old.unlink(missing_ok=True)
     return out
 
 
