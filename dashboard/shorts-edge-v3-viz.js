@@ -34,6 +34,7 @@
       <div id="sev-results">${results()}</div>
       <div id="sev-calmar-research" aria-live="polite">${doc.calmar_research_ref ? '<button class="rsp-action" onclick="ShortsEdgeV3Viz.openCalmarResearch()">Open Calmar parameter search</button><p class="sne-note">Compare return against drawdown across the parameter and sizing research.</p>' : ''}</div>
       <div id="sev-coverage-research" aria-live="polite">${doc.coverage_research_ref ? '<button class="rsp-action" onclick="ShortsEdgeV3Viz.openCoverageResearch()">Open expanded backtest · RSI-4</button><p class="sne-note">Recovered data, documented assumptions and an explanation of every excluded name.</p>' : ''}</div>
+      <div id="sev-clean-data-research" aria-live="polite">${doc.clean_data_research_ref ? '<button class="rsp-action" onclick="ShortsEdgeV3Viz.openCleanDataResearch()">Open clean-data recovery · original rules</button><p class="sne-note">Measure which data repairs change the original 46-trade result, and inspect the remaining work queue.</p>' : ''}</div>
       <section class="sne-audit" aria-labelledby="sev-audit-title"><h3 id="sev-audit-title">Decision audit for the selected policy</h3><p class="sne-note">The numerical rating measures deterioration. Full conviction also needs the dated framework, valuation, catalyst and financing review. Rejected sizes show the best evaluated trial; they are not positions.</p><div class="sne-controls"><label>Find a name<input type="search" placeholder="Ticker" aria-label="Find a ticker in RSI-3.0" oninput="ShortsEdgeV3Viz.change('query',this.value)"></label><label>Show<select onchange="ShortsEdgeV3Viz.change('show',this.value)"><option value="all">All dated records</option><option value="forecast">Forecast available</option><option value="included">Included positions</option><option value="excluded">Excluded positions</option>${doc.free_evidence_ref ? '<option value="free">Original 691 · free evidence</option><option value="free_borrow">Prior-day borrow proxy</option>' : ''}</select></label></div><div id="sev-names" aria-live="polite"><p>Loading selected decision audit…</p></div><div id="sev-detail" aria-live="polite"></div></section>
       <details class="sne-method"><summary>Execution evidence, SSR and the prospective test</summary><p>${num(doc.ssr.counts.ssr_requires_limit)} sampled entries were SSR-restricted; ${num(doc.ssr.counts.halt || 0)} were halted. SSR requires a separate limit-order replay. ${esc(doc.ssr.rule)}</p><p>${Object.entries(doc.ssr.limit_replay).map(([k, v]) => `${num(v)} ${esc(label(k))}`).join(' · ')}</p><p>Historical calibration is diagnostic. The prospective policy starts ${esc(doc.policy.prospective_start)}. Forecasts and abstentions are archived before their scheduled entry; later outcomes are separate. Previously explored history is never relabelled an untouched test.</p><p>${num(doc.prospective?.estimates || 0)} archived prospective estimates · ${num(doc.prospective?.abstentions || 0)} explicit abstentions · ${num(doc.prospective?.evaluated_estimates || 0)} evaluated estimates.</p><div id="sev-calibration">${calibration()}</div></details>
       <details class="sne-method"><summary>Method, account assumptions and remaining data work</summary><dl>${Object.entries(doc.definitions).map(([k, v]) => `<dt>${esc(label(k))}</dt><dd>${esc(v)}</dd>`).join('')}</dl><ul>${doc.limits.map(s => `<li>${esc(s)}</li>`).join('')}</ul><p>Required inputs: cited as-filed financial overrides; blinded reviews of all 27 framework routes; dated capitalization scenarios; historical borrow indications and inventory; fresh entry approvals; daily loan charges and recalls; policy-bound execution reports or verified NBBO and eligible trade prints; dividends and fractional split settlements.</p><p>${doc.sources.map(s => `<a href="${safeUrl(s.url)}" target="_blank" rel="noopener">${esc(s.title)}</a>`).join(' · ')}</p></details>
@@ -53,7 +54,7 @@
       }
       const summary = JSON.parse(new TextDecoder().decode(bytes));
       if (summary.schema_version !== 'shorts_net_edge.v3' || !summary.cases) throw new Error('Invalid summary');
-      mount.innerHTML = render({...summary, prospective: reference.prospective || summary.prospective, free_evidence_ref: reference.free_evidence_ref, calmar_research_ref: reference.calmar_research_ref, coverage_research_ref: reference.coverage_research_ref});
+      mount.innerHTML = render({...summary, prospective: reference.prospective || summary.prospective, free_evidence_ref: reference.free_evidence_ref, calmar_research_ref: reference.calmar_research_ref, coverage_research_ref: reference.coverage_research_ref, clean_data_research_ref: reference.clean_data_research_ref});
     } catch { mount.innerHTML = '<p class="sne-empty">RSI-3.0 could not be loaded. Reload to retry; no stale model results are shown.</p>'; }
   }
   function results() {
@@ -246,5 +247,14 @@
     if (global.ShortsCoverageViz) global.ShortsCoverageViz.open(data.coverage_research_ref);
     else document.getElementById('sev-coverage-research').innerHTML = '<p>The expanded backtest could not be loaded.</p>';
   }
-  global.ShortsEdgeV3Viz = {render, change, inspect, page, openCalmarResearch, openCoverageResearch};
+  async function openCleanDataResearch() {
+    if (!data?.clean_data_research_ref) return;
+    if (!global.ShortsCleanDataViz) await new Promise((resolve, reject) => {
+      const script = document.createElement('script'); script.src = 'shorts-clean-data-viz.js';
+      script.onload = resolve; script.onerror = reject; document.head.appendChild(script);
+    }).catch(() => {});
+    if (global.ShortsCleanDataViz) global.ShortsCleanDataViz.open(data.clean_data_research_ref);
+    else document.getElementById('sev-clean-data-research').innerHTML = '<p>The clean-data comparison could not be loaded.</p>';
+  }
+  global.ShortsEdgeV3Viz = {render, change, inspect, page, openCalmarResearch, openCoverageResearch, openCleanDataResearch};
 })(window);

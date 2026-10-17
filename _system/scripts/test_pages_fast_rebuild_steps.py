@@ -32,13 +32,15 @@ class InsightsRebuildStepsTests(unittest.TestCase):
         text = REBUILD.read_text(encoding="utf-8")
         self.assertIn('"pages-fast": "insights"', text)
 
-    def test_darwin_fast_not_a_profile(self) -> None:
-        text = REBUILD.read_text(encoding="utf-8")
-        self.assertIn('"pages-fast": "insights"', text)
-        self.assertNotRegex(text, r'(?m)^\s*"darwin-fast"\s*:')
-        # Rejection path remains in resolve_profile
-        self.assertIn("darwin-fast", text)
-        self.assertIn("profile 'darwin-fast' was removed", text)
+    def test_retired_darwin_profiles_fail_loudly(self) -> None:
+        import ci_rebuild_profile as rebuild
+
+        for name in ("darwin", "darwin-full", "darwin-fast"):
+            self.assertNotIn(name, rebuild.PROFILES)
+            self.assertNotIn(name, rebuild.ALIASES)
+            with self.assertRaises(SystemExit) as caught:
+                rebuild.resolve_profile(name)
+            self.assertIn("removed with the Darwin allocator", str(caught.exception))
 
     def test_full_profile_skips_drive_steps_without_google_credentials(self) -> None:
         env = os.environ.copy()

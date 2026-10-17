@@ -1,0 +1,1087 @@
+{
+ "schema": "darwin_cc_lookup.v1",
+ "built": "2026-10-16",
+ "what": "Average net result to a stock holder of selling one covered call, by tenor bucket, call delta and the stock's condition score. Net = premium received (mid minus a quarter of the quoted spread, less $0.65/contract) minus intrinsic owed at expiry, as basis points of the stock price. Calls whose window contained an earnings report are excluded (earnings is a veto, not a cell).",
+ "sample": {
+  "calls": 698668,
+  "names": 708,
+  "months": 128,
+  "period": "2016-01..2026-08",
+  "universe": "point-in-time S&P 500 members",
+  "quotes": "ThetaData end-of-day chains (research pull; raw quotes are not published)"
+ },
+ "conditions": {
+  "low_beta": "252-day beta below tonight's median across the universe",
+  "rich_call_skew": "25-delta call IV minus ATM IV (~30-day expiry) above median",
+  "iv_above_forecast": "the call's IV divided by the technical-fear-v3 21-day vol forecast, above median",
+  "near_52w_high": "distance below the 52-week high smaller than median"
+ },
+ "tenor_buckets_days": {
+  "7d": [
+   4,
+   10
+  ],
+  "14d": [
+   11,
+   17
+  ],
+  "21d": [
+   18,
+   24
+  ],
+  "35d": [
+   30,
+   38
+  ],
+  "42d": [
+   39,
+   46
+  ]
+ },
+ "delta_targets": [
+  0.1,
+  0.2,
+  0.3,
+  0.4,
+  0.5
+ ],
+ "validation": {
+  "method": "walk-forward: cell averages from years before Y applied to year Y, 2019-2026, earnings windows excluded",
+  "deciles_expected_bp": [
+   -64.98,
+   -35.22,
+   -22.53,
+   -13.5,
+   -7.53,
+   -2.96,
+   0.64,
+   3.09,
+   5.44,
+   11.57
+  ],
+  "deciles_realized_bp": [
+   -47.23,
+   -24.88,
+   -14.77,
+   -4.66,
+   -0.27,
+   0.7,
+   -0.2,
+   7.51,
+   2.21,
+   8.53
+  ],
+  "score4_weekly_2week_20_30d": {
+   "realized_bp": 17.4,
+   "t": 3.78
+  },
+  "score3_weekly_2week_20_30d": {
+   "realized_bp": 8.7,
+   "t": 1.87
+  },
+  "unconditional_35d_30d_bp": -26.4,
+  "note": "Conditions were chosen after seeing 2016-2026 (signs held in both halves); the walk-forward check uses only prior-year cell averages. Expect roughly half the in-sample edge."
+ },
+ "cells": [
+  {
+   "tenor": "14d",
+   "delta": 0.1,
+   "score": 0,
+   "ev_bp": -3.3,
+   "t": -0.6,
+   "months": 128
+  },
+  {
+   "tenor": "14d",
+   "delta": 0.1,
+   "score": 1,
+   "ev_bp": -8.15,
+   "t": -1.42,
+   "months": 128
+  },
+  {
+   "tenor": "14d",
+   "delta": 0.1,
+   "score": 2,
+   "ev_bp": 3.19,
+   "t": 1.1,
+   "months": 127
+  },
+  {
+   "tenor": "14d",
+   "delta": 0.1,
+   "score": 3,
+   "ev_bp": 2.38,
+   "t": 0.84,
+   "months": 128
+  },
+  {
+   "tenor": "14d",
+   "delta": 0.1,
+   "score": 4,
+   "ev_bp": 10.38,
+   "t": 4.9,
+   "months": 123
+  },
+  {
+   "tenor": "14d",
+   "delta": 0.2,
+   "score": 0,
+   "ev_bp": -11.41,
+   "t": -1.07,
+   "months": 128
+  },
+  {
+   "tenor": "14d",
+   "delta": 0.2,
+   "score": 1,
+   "ev_bp": -4.59,
+   "t": -0.56,
+   "months": 128
+  },
+  {
+   "tenor": "14d",
+   "delta": 0.2,
+   "score": 2,
+   "ev_bp": -0.43,
+   "t": -0.08,
+   "months": 128
+  },
+  {
+   "tenor": "14d",
+   "delta": 0.2,
+   "score": 3,
+   "ev_bp": 4.97,
+   "t": 1.0,
+   "months": 128
+  },
+  {
+   "tenor": "14d",
+   "delta": 0.2,
+   "score": 4,
+   "ev_bp": 13.96,
+   "t": 2.56,
+   "months": 125
+  },
+  {
+   "tenor": "14d",
+   "delta": 0.3,
+   "score": 0,
+   "ev_bp": -18.64,
+   "t": -1.17,
+   "months": 128
+  },
+  {
+   "tenor": "14d",
+   "delta": 0.3,
+   "score": 1,
+   "ev_bp": -4.39,
+   "t": -0.39,
+   "months": 128
+  },
+  {
+   "tenor": "14d",
+   "delta": 0.3,
+   "score": 2,
+   "ev_bp": -3.35,
+   "t": -0.44,
+   "months": 128
+  },
+  {
+   "tenor": "14d",
+   "delta": 0.3,
+   "score": 3,
+   "ev_bp": 4.25,
+   "t": 0.6,
+   "months": 128
+  },
+  {
+   "tenor": "14d",
+   "delta": 0.3,
+   "score": 4,
+   "ev_bp": 16.7,
+   "t": 2.05,
+   "months": 124
+  },
+  {
+   "tenor": "14d",
+   "delta": 0.4,
+   "score": 0,
+   "ev_bp": -29.46,
+   "t": -1.35,
+   "months": 128
+  },
+  {
+   "tenor": "14d",
+   "delta": 0.4,
+   "score": 1,
+   "ev_bp": -5.85,
+   "t": -0.4,
+   "months": 128
+  },
+  {
+   "tenor": "14d",
+   "delta": 0.4,
+   "score": 2,
+   "ev_bp": -6.18,
+   "t": -0.59,
+   "months": 128
+  },
+  {
+   "tenor": "14d",
+   "delta": 0.4,
+   "score": 3,
+   "ev_bp": 1.36,
+   "t": 0.14,
+   "months": 128
+  },
+  {
+   "tenor": "14d",
+   "delta": 0.4,
+   "score": 4,
+   "ev_bp": 17.13,
+   "t": 1.65,
+   "months": 125
+  },
+  {
+   "tenor": "14d",
+   "delta": 0.5,
+   "score": 0,
+   "ev_bp": -34.2,
+   "t": -1.3,
+   "months": 128
+  },
+  {
+   "tenor": "14d",
+   "delta": 0.5,
+   "score": 1,
+   "ev_bp": -10.83,
+   "t": -0.56,
+   "months": 128
+  },
+  {
+   "tenor": "14d",
+   "delta": 0.5,
+   "score": 2,
+   "ev_bp": -7.4,
+   "t": -0.55,
+   "months": 128
+  },
+  {
+   "tenor": "14d",
+   "delta": 0.5,
+   "score": 3,
+   "ev_bp": -4.33,
+   "t": -0.36,
+   "months": 128
+  },
+  {
+   "tenor": "14d",
+   "delta": 0.5,
+   "score": 4,
+   "ev_bp": 17.37,
+   "t": 1.45,
+   "months": 124
+  },
+  {
+   "tenor": "21d",
+   "delta": 0.1,
+   "score": 0,
+   "ev_bp": -32.58,
+   "t": -1.92,
+   "months": 126
+  },
+  {
+   "tenor": "21d",
+   "delta": 0.1,
+   "score": 1,
+   "ev_bp": -11.33,
+   "t": -1.2,
+   "months": 128
+  },
+  {
+   "tenor": "21d",
+   "delta": 0.1,
+   "score": 2,
+   "ev_bp": -8.51,
+   "t": -0.98,
+   "months": 126
+  },
+  {
+   "tenor": "21d",
+   "delta": 0.1,
+   "score": 3,
+   "ev_bp": 3.0,
+   "t": 0.71,
+   "months": 128
+  },
+  {
+   "tenor": "21d",
+   "delta": 0.1,
+   "score": 4,
+   "ev_bp": 14.83,
+   "t": 5.74,
+   "months": 115
+  },
+  {
+   "tenor": "21d",
+   "delta": 0.2,
+   "score": 0,
+   "ev_bp": -48.72,
+   "t": -2.13,
+   "months": 126
+  },
+  {
+   "tenor": "21d",
+   "delta": 0.2,
+   "score": 1,
+   "ev_bp": -16.83,
+   "t": -1.2,
+   "months": 128
+  },
+  {
+   "tenor": "21d",
+   "delta": 0.2,
+   "score": 2,
+   "ev_bp": -10.81,
+   "t": -0.81,
+   "months": 128
+  },
+  {
+   "tenor": "21d",
+   "delta": 0.2,
+   "score": 3,
+   "ev_bp": 2.43,
+   "t": 0.35,
+   "months": 128
+  },
+  {
+   "tenor": "21d",
+   "delta": 0.2,
+   "score": 4,
+   "ev_bp": 21.57,
+   "t": 4.18,
+   "months": 125
+  },
+  {
+   "tenor": "21d",
+   "delta": 0.3,
+   "score": 0,
+   "ev_bp": -55.64,
+   "t": -1.97,
+   "months": 126
+  },
+  {
+   "tenor": "21d",
+   "delta": 0.3,
+   "score": 1,
+   "ev_bp": -23.84,
+   "t": -1.24,
+   "months": 128
+  },
+  {
+   "tenor": "21d",
+   "delta": 0.3,
+   "score": 2,
+   "ev_bp": -12.53,
+   "t": -0.86,
+   "months": 128
+  },
+  {
+   "tenor": "21d",
+   "delta": 0.3,
+   "score": 3,
+   "ev_bp": 2.53,
+   "t": 0.3,
+   "months": 128
+  },
+  {
+   "tenor": "21d",
+   "delta": 0.3,
+   "score": 4,
+   "ev_bp": 17.73,
+   "t": 2.1,
+   "months": 124
+  },
+  {
+   "tenor": "21d",
+   "delta": 0.4,
+   "score": 0,
+   "ev_bp": -69.9,
+   "t": -2.06,
+   "months": 126
+  },
+  {
+   "tenor": "21d",
+   "delta": 0.4,
+   "score": 1,
+   "ev_bp": -27.72,
+   "t": -1.17,
+   "months": 128
+  },
+  {
+   "tenor": "21d",
+   "delta": 0.4,
+   "score": 2,
+   "ev_bp": -18.9,
+   "t": -1.1,
+   "months": 128
+  },
+  {
+   "tenor": "21d",
+   "delta": 0.4,
+   "score": 3,
+   "ev_bp": -1.68,
+   "t": -0.14,
+   "months": 128
+  },
+  {
+   "tenor": "21d",
+   "delta": 0.4,
+   "score": 4,
+   "ev_bp": 18.0,
+   "t": 1.6,
+   "months": 126
+  },
+  {
+   "tenor": "21d",
+   "delta": 0.5,
+   "score": 0,
+   "ev_bp": -70.29,
+   "t": -1.75,
+   "months": 126
+  },
+  {
+   "tenor": "21d",
+   "delta": 0.5,
+   "score": 1,
+   "ev_bp": -40.8,
+   "t": -1.42,
+   "months": 127
+  },
+  {
+   "tenor": "21d",
+   "delta": 0.5,
+   "score": 2,
+   "ev_bp": -24.44,
+   "t": -1.19,
+   "months": 128
+  },
+  {
+   "tenor": "21d",
+   "delta": 0.5,
+   "score": 3,
+   "ev_bp": -5.99,
+   "t": -0.39,
+   "months": 128
+  },
+  {
+   "tenor": "21d",
+   "delta": 0.5,
+   "score": 4,
+   "ev_bp": 7.84,
+   "t": 0.57,
+   "months": 125
+  },
+  {
+   "tenor": "35d",
+   "delta": 0.1,
+   "score": 0,
+   "ev_bp": -13.21,
+   "t": -1.21,
+   "months": 125
+  },
+  {
+   "tenor": "35d",
+   "delta": 0.1,
+   "score": 1,
+   "ev_bp": -6.27,
+   "t": -1.12,
+   "months": 128
+  },
+  {
+   "tenor": "35d",
+   "delta": 0.1,
+   "score": 2,
+   "ev_bp": 3.27,
+   "t": 0.84,
+   "months": 128
+  },
+  {
+   "tenor": "35d",
+   "delta": 0.1,
+   "score": 3,
+   "ev_bp": 3.38,
+   "t": 0.67,
+   "months": 128
+  },
+  {
+   "tenor": "35d",
+   "delta": 0.1,
+   "score": 4,
+   "ev_bp": 19.44,
+   "t": 5.58,
+   "months": 123
+  },
+  {
+   "tenor": "35d",
+   "delta": 0.2,
+   "score": 0,
+   "ev_bp": -38.71,
+   "t": -1.96,
+   "months": 126
+  },
+  {
+   "tenor": "35d",
+   "delta": 0.2,
+   "score": 1,
+   "ev_bp": -13.59,
+   "t": -1.38,
+   "months": 128
+  },
+  {
+   "tenor": "35d",
+   "delta": 0.2,
+   "score": 2,
+   "ev_bp": -7.02,
+   "t": -0.85,
+   "months": 128
+  },
+  {
+   "tenor": "35d",
+   "delta": 0.2,
+   "score": 3,
+   "ev_bp": 1.63,
+   "t": 0.21,
+   "months": 128
+  },
+  {
+   "tenor": "35d",
+   "delta": 0.2,
+   "score": 4,
+   "ev_bp": 34.96,
+   "t": 7.11,
+   "months": 121
+  },
+  {
+   "tenor": "35d",
+   "delta": 0.3,
+   "score": 0,
+   "ev_bp": -57.39,
+   "t": -2.15,
+   "months": 126
+  },
+  {
+   "tenor": "35d",
+   "delta": 0.3,
+   "score": 1,
+   "ev_bp": -18.6,
+   "t": -1.27,
+   "months": 128
+  },
+  {
+   "tenor": "35d",
+   "delta": 0.3,
+   "score": 2,
+   "ev_bp": -18.98,
+   "t": -1.54,
+   "months": 128
+  },
+  {
+   "tenor": "35d",
+   "delta": 0.3,
+   "score": 3,
+   "ev_bp": -13.65,
+   "t": -1.03,
+   "months": 128
+  },
+  {
+   "tenor": "35d",
+   "delta": 0.3,
+   "score": 4,
+   "ev_bp": 21.75,
+   "t": 1.62,
+   "months": 119
+  },
+  {
+   "tenor": "35d",
+   "delta": 0.4,
+   "score": 0,
+   "ev_bp": -68.7,
+   "t": -2.01,
+   "months": 126
+  },
+  {
+   "tenor": "35d",
+   "delta": 0.4,
+   "score": 1,
+   "ev_bp": -26.65,
+   "t": -1.38,
+   "months": 128
+  },
+  {
+   "tenor": "35d",
+   "delta": 0.4,
+   "score": 2,
+   "ev_bp": -25.64,
+   "t": -1.61,
+   "months": 127
+  },
+  {
+   "tenor": "35d",
+   "delta": 0.4,
+   "score": 3,
+   "ev_bp": -22.18,
+   "t": -1.37,
+   "months": 128
+  },
+  {
+   "tenor": "35d",
+   "delta": 0.4,
+   "score": 4,
+   "ev_bp": 31.28,
+   "t": 2.14,
+   "months": 120
+  },
+  {
+   "tenor": "35d",
+   "delta": 0.5,
+   "score": 0,
+   "ev_bp": -62.31,
+   "t": -1.65,
+   "months": 125
+  },
+  {
+   "tenor": "35d",
+   "delta": 0.5,
+   "score": 1,
+   "ev_bp": -45.05,
+   "t": -1.83,
+   "months": 128
+  },
+  {
+   "tenor": "35d",
+   "delta": 0.5,
+   "score": 2,
+   "ev_bp": -41.11,
+   "t": -2.0,
+   "months": 128
+  },
+  {
+   "tenor": "35d",
+   "delta": 0.5,
+   "score": 3,
+   "ev_bp": -19.22,
+   "t": -0.98,
+   "months": 127
+  },
+  {
+   "tenor": "35d",
+   "delta": 0.5,
+   "score": 4,
+   "ev_bp": 24.16,
+   "t": 1.22,
+   "months": 120
+  },
+  {
+   "tenor": "42d",
+   "delta": 0.1,
+   "score": 0,
+   "ev_bp": -42.71,
+   "t": -2.21,
+   "months": 118
+  },
+  {
+   "tenor": "42d",
+   "delta": 0.1,
+   "score": 1,
+   "ev_bp": -14.56,
+   "t": -1.48,
+   "months": 126
+  },
+  {
+   "tenor": "42d",
+   "delta": 0.1,
+   "score": 2,
+   "ev_bp": 5.0,
+   "t": 0.97,
+   "months": 126
+  },
+  {
+   "tenor": "42d",
+   "delta": 0.1,
+   "score": 3,
+   "ev_bp": 5.18,
+   "t": 0.97,
+   "months": 125
+  },
+  {
+   "tenor": "42d",
+   "delta": 0.1,
+   "score": 4,
+   "ev_bp": 12.72,
+   "t": 1.86,
+   "months": 104
+  },
+  {
+   "tenor": "42d",
+   "delta": 0.2,
+   "score": 0,
+   "ev_bp": -54.04,
+   "t": -1.95,
+   "months": 123
+  },
+  {
+   "tenor": "42d",
+   "delta": 0.2,
+   "score": 1,
+   "ev_bp": -25.38,
+   "t": -1.9,
+   "months": 127
+  },
+  {
+   "tenor": "42d",
+   "delta": 0.2,
+   "score": 2,
+   "ev_bp": -12.68,
+   "t": -1.09,
+   "months": 126
+  },
+  {
+   "tenor": "42d",
+   "delta": 0.2,
+   "score": 3,
+   "ev_bp": -1.93,
+   "t": -0.22,
+   "months": 128
+  },
+  {
+   "tenor": "42d",
+   "delta": 0.2,
+   "score": 4,
+   "ev_bp": 12.21,
+   "t": 0.72,
+   "months": 107
+  },
+  {
+   "tenor": "42d",
+   "delta": 0.3,
+   "score": 0,
+   "ev_bp": -61.42,
+   "t": -1.81,
+   "months": 123
+  },
+  {
+   "tenor": "42d",
+   "delta": 0.3,
+   "score": 1,
+   "ev_bp": -41.33,
+   "t": -2.2,
+   "months": 127
+  },
+  {
+   "tenor": "42d",
+   "delta": 0.3,
+   "score": 2,
+   "ev_bp": -22.95,
+   "t": -1.5,
+   "months": 126
+  },
+  {
+   "tenor": "42d",
+   "delta": 0.3,
+   "score": 3,
+   "ev_bp": -16.43,
+   "t": -1.13,
+   "months": 128
+  },
+  {
+   "tenor": "42d",
+   "delta": 0.3,
+   "score": 4,
+   "ev_bp": 5.61,
+   "t": 0.34,
+   "months": 106
+  },
+  {
+   "tenor": "42d",
+   "delta": 0.4,
+   "score": 0,
+   "ev_bp": -71.07,
+   "t": -1.71,
+   "months": 123
+  },
+  {
+   "tenor": "42d",
+   "delta": 0.4,
+   "score": 1,
+   "ev_bp": -62.51,
+   "t": -2.54,
+   "months": 127
+  },
+  {
+   "tenor": "42d",
+   "delta": 0.4,
+   "score": 2,
+   "ev_bp": -40.41,
+   "t": -1.93,
+   "months": 126
+  },
+  {
+   "tenor": "42d",
+   "delta": 0.4,
+   "score": 3,
+   "ev_bp": -28.46,
+   "t": -1.47,
+   "months": 128
+  },
+  {
+   "tenor": "42d",
+   "delta": 0.4,
+   "score": 4,
+   "ev_bp": -9.03,
+   "t": -0.38,
+   "months": 109
+  },
+  {
+   "tenor": "42d",
+   "delta": 0.5,
+   "score": 0,
+   "ev_bp": -85.91,
+   "t": -1.76,
+   "months": 122
+  },
+  {
+   "tenor": "42d",
+   "delta": 0.5,
+   "score": 1,
+   "ev_bp": -86.76,
+   "t": -2.83,
+   "months": 127
+  },
+  {
+   "tenor": "42d",
+   "delta": 0.5,
+   "score": 2,
+   "ev_bp": -56.8,
+   "t": -2.22,
+   "months": 126
+  },
+  {
+   "tenor": "42d",
+   "delta": 0.5,
+   "score": 3,
+   "ev_bp": -26.24,
+   "t": -1.18,
+   "months": 128
+  },
+  {
+   "tenor": "42d",
+   "delta": 0.5,
+   "score": 4,
+   "ev_bp": 5.28,
+   "t": 0.22,
+   "months": 113
+  },
+  {
+   "tenor": "7d",
+   "delta": 0.1,
+   "score": 0,
+   "ev_bp": -2.58,
+   "t": -0.6,
+   "months": 128
+  },
+  {
+   "tenor": "7d",
+   "delta": 0.1,
+   "score": 1,
+   "ev_bp": 0.5,
+   "t": 0.17,
+   "months": 128
+  },
+  {
+   "tenor": "7d",
+   "delta": 0.1,
+   "score": 2,
+   "ev_bp": 4.1,
+   "t": 2.72,
+   "months": 128
+  },
+  {
+   "tenor": "7d",
+   "delta": 0.1,
+   "score": 3,
+   "ev_bp": 3.98,
+   "t": 2.72,
+   "months": 128
+  },
+  {
+   "tenor": "7d",
+   "delta": 0.1,
+   "score": 4,
+   "ev_bp": 6.52,
+   "t": 4.32,
+   "months": 127
+  },
+  {
+   "tenor": "7d",
+   "delta": 0.2,
+   "score": 0,
+   "ev_bp": -1.19,
+   "t": -0.2,
+   "months": 128
+  },
+  {
+   "tenor": "7d",
+   "delta": 0.2,
+   "score": 1,
+   "ev_bp": 2.53,
+   "t": 0.54,
+   "months": 128
+  },
+  {
+   "tenor": "7d",
+   "delta": 0.2,
+   "score": 2,
+   "ev_bp": 6.63,
+   "t": 2.35,
+   "months": 128
+  },
+  {
+   "tenor": "7d",
+   "delta": 0.2,
+   "score": 3,
+   "ev_bp": 6.23,
+   "t": 2.5,
+   "months": 128
+  },
+  {
+   "tenor": "7d",
+   "delta": 0.2,
+   "score": 4,
+   "ev_bp": 13.58,
+   "t": 5.19,
+   "months": 123
+  },
+  {
+   "tenor": "7d",
+   "delta": 0.3,
+   "score": 0,
+   "ev_bp": -5.48,
+   "t": -0.6,
+   "months": 128
+  },
+  {
+   "tenor": "7d",
+   "delta": 0.3,
+   "score": 1,
+   "ev_bp": 2.31,
+   "t": 0.34,
+   "months": 128
+  },
+  {
+   "tenor": "7d",
+   "delta": 0.3,
+   "score": 2,
+   "ev_bp": 6.16,
+   "t": 1.36,
+   "months": 128
+  },
+  {
+   "tenor": "7d",
+   "delta": 0.3,
+   "score": 3,
+   "ev_bp": 7.34,
+   "t": 1.88,
+   "months": 128
+  },
+  {
+   "tenor": "7d",
+   "delta": 0.3,
+   "score": 4,
+   "ev_bp": 15.1,
+   "t": 2.97,
+   "months": 125
+  },
+  {
+   "tenor": "7d",
+   "delta": 0.4,
+   "score": 0,
+   "ev_bp": -2.48,
+   "t": -0.2,
+   "months": 128
+  },
+  {
+   "tenor": "7d",
+   "delta": 0.4,
+   "score": 1,
+   "ev_bp": 3.37,
+   "t": 0.35,
+   "months": 128
+  },
+  {
+   "tenor": "7d",
+   "delta": 0.4,
+   "score": 2,
+   "ev_bp": 5.89,
+   "t": 0.88,
+   "months": 128
+  },
+  {
+   "tenor": "7d",
+   "delta": 0.4,
+   "score": 3,
+   "ev_bp": 8.06,
+   "t": 1.42,
+   "months": 128
+  },
+  {
+   "tenor": "7d",
+   "delta": 0.4,
+   "score": 4,
+   "ev_bp": 16.42,
+   "t": 2.49,
+   "months": 124
+  },
+  {
+   "tenor": "7d",
+   "delta": 0.5,
+   "score": 0,
+   "ev_bp": -6.32,
+   "t": -0.4,
+   "months": 128
+  },
+  {
+   "tenor": "7d",
+   "delta": 0.5,
+   "score": 1,
+   "ev_bp": 6.91,
+   "t": 0.56,
+   "months": 128
+  },
+  {
+   "tenor": "7d",
+   "delta": 0.5,
+   "score": 2,
+   "ev_bp": 5.21,
+   "t": 0.56,
+   "months": 128
+  },
+  {
+   "tenor": "7d",
+   "delta": 0.5,
+   "score": 3,
+   "ev_bp": 8.68,
+   "t": 1.18,
+   "months": 128
+  },
+  {
+   "tenor": "7d",
+   "delta": 0.5,
+   "score": 4,
+   "ev_bp": 16.93,
+   "t": 2.1,
+   "months": 124
+  }
+ ]
+}

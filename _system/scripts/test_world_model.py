@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import sys
+from datetime import date
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[2]
@@ -138,12 +139,22 @@ def test_predictability_classes_and_ceiling():
     assert pred.infer_gameability("asx200_20d_realized_vol") == "high"
     assert pred.min_class("P3_oriented", "P1_ecology") == "P1_ecology"
 
-    calm = pred.darwin_regime_stress({"regime": {"label": "calm", "research": "calm", "macro": "calm"}})
-    assert calm["stress"] is False
-    stressed = pred.darwin_regime_stress(
-        {"regime": {"label": "stressed", "research": "stress", "macro": "calm"}}
-    )
+    day = date(2026, 10, 16)
+
+    def vol(vix, term, as_of="2026-10-15"):
+        return pred.vol_regime_stress({"as_of": as_of, "regime": {"vix": vix, "term_state": term}}, today=day)
+
+    calm = vol(16.5, "contango")
+    assert calm["available"] is True and calm["stress"] is False and calm["regime_label"] == "calm"
+    stressed = vol(31.0, "contango")
     assert stressed["stress"] is True
+    inverted = vol(19.0, "backwardation")
+    assert inverted["stress"] is True, "an inverted VIX curve is stress even below the VIX threshold"
+    assert pred.vol_regime_stress({}, today=day)["available"] is False
+    frozen = vol(16.5, "contango", as_of="2026-09-30")
+    assert frozen["available"] is False and frozen["regime_label"] == "stale", "a frozen feed must not read calm"
+    assert vol(16.5, "contango", as_of=None)["regime_label"] == "stale"
+    assert vol(16.5, "contango", as_of="2026-10-12")["available"] is True, "a long weekend is not stale"
     bounds = pred.build_claim_boundaries(
         cards=[{"theme_id": "x", "predictability_class": "P3_oriented"}],
         horizons=[{"domain": "agi"}],
@@ -155,7 +166,7 @@ def test_predictability_classes_and_ceiling():
             "gameability": "high",
             "predictability_class": "P3_oriented",
         }],
-        darwin=stressed,
+        regime=stressed,
         criticality={"demote": False, "available": False},
     )
     assert bounds["market_path_ceiling"] == "P1_ecology"
@@ -169,7 +180,7 @@ def test_predictability_classes_and_ceiling():
         horizons=[],
         industry=[],
         kpi_rows=[],
-        darwin=calm,
+        regime=calm,
         criticality={
             "demote": True,
             "available": True,
@@ -186,7 +197,7 @@ def test_predictability_classes_and_ceiling():
         horizons=[],
         industry=[],
         kpi_rows=[],
-        darwin=calm,
+        regime=calm,
         criticality={"demote": False, "available": True, "demotion_enabled": False},
     )
     assert quiet["market_path_ceiling"] == "P3_oriented"

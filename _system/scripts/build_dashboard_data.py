@@ -317,8 +317,8 @@ def infra_restore_allowed(tickers: list[str]) -> bool:
     """Only a lane that opts in AND has the ticker research trees may restore.
 
     The restore refills infra/valuation columns from the prior, which is what
-    the clobber guard inspects. Run on a checkout with no ticker trees (Darwin,
-    pages), it made a rebuild that had emptied every research-derived field --
+    the clobber guard inspects. Run on a checkout with no ticker trees (pages,
+    dashboard), it made a rebuild that had emptied every research-derived field --
     deep_dive, dossier, pricing_analysis, human_review, lenses, onboard, ... --
     pass the guard, and write_shards would publish that for every ticker. So:
     an explicit DASHBOARD_PRESERVE_DOCUMENT_REGISTRY=1 (set by the ls-algo
@@ -371,7 +371,7 @@ def ticker_dirs_present(tickers: list[str]) -> int:
 
 
 def workspace_is_sparse(tickers: list[str]) -> bool:
-    """True when most holding folders are missing (pages/darwin sparse checkout)."""
+    """True when most holding folders are missing (pages/dashboard sparse checkout)."""
     if not tickers:
         return False
     present = ticker_dirs_present(tickers)
@@ -3482,62 +3482,6 @@ def _load_json(path: Path) -> dict | None:
         return None
 
 
-def load_darwin_portfolio() -> dict | None:
-    return _load_json(DATA_DIR / "darwin_portfolio.json") or _load_json(
-        DATA_DIR / "darwin_portfolio_roth.json"
-    )
-
-
-def load_darwin_serving() -> dict | None:
-    return _load_json(DATA_DIR / "darwin_serving.json")
-
-
-def load_darwin_bundle() -> dict:
-    """Prefer L4 serving; fallback to per-account portfolio files."""
-    serving = load_darwin_serving()
-    if serving and serving.get("accounts"):
-        bundle = {
-            "serving": serving,
-            "default_account": serving.get("default_account", "roth"),
-        }
-        for aid, row in serving["accounts"].items():
-            if row.get("portfolio"):
-                bundle[aid] = row["portfolio"]
-            if row.get("paper"):
-                bundle[f"paper_{aid}"] = {
-                    "last_mark": row["paper"],
-                    "inception_date": row.get("paper_inception"),
-                }
-        return bundle
-    bundle: dict = {"default_account": "roth", "account_scope": "ira_only"}
-    for aid in ("roth",):
-        p = _load_json(DATA_DIR / f"darwin_portfolio_{aid}.json")
-        if p:
-            bundle[aid] = p
-    roth = bundle.get("roth") or load_darwin_portfolio()
-    if roth:
-        bundle["roth"] = roth
-    return bundle
-
-
-def build_darwin_if_missing() -> dict | None:
-    """Run Darwin pipeline when portfolio JSON absent (e.g. fresh clone)."""
-    if (DATA_DIR / "darwin_serving.json").exists() or (DATA_DIR / "darwin_portfolio_roth.json").exists():
-        return load_darwin_bundle()
-    script = ROOT / "_system" / "scripts" / "build_darwin_portfolio.py"
-    if not script.exists():
-        return None
-    import subprocess
-
-    subprocess.run(
-        [sys.executable, str(script), "--fast"],
-        cwd=str(ROOT),
-        check=False,
-        timeout=600,
-    )
-    return load_darwin_bundle()
-
-
 def build_nol_screener() -> dict | None:
     """Always rebuild NOL screener so SEC filings and prices stay fresh."""
     path = DATA_DIR / "nol_screener.json"
@@ -3775,14 +3719,6 @@ def main() -> None:
     power_zones = load_power_zones()
     if power_zones:
         payload["power_zones"] = power_zones
-    bundle = load_darwin_bundle() or build_darwin_if_missing() or {}
-    serving = bundle.get("serving") or load_darwin_serving()
-    if serving:
-        payload["darwin_serving"] = serving
-    if bundle.get("roth"):
-        payload["darwin"] = bundle["roth"]
-    if bundle:
-        payload["darwin_accounts"] = bundle
     nol = build_nol_screener()
     if nol:
         payload["nol_screener"] = nol
