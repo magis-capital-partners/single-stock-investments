@@ -3,7 +3,7 @@ description: Run build_dashboard_data pipeline by profile (same job, shared work
 
 inputs:
   profile:
-    description: full|intake-full|activist|darwin|darwin-full|insights|pages-fast|minimal|none
+    description: full|intake-full|activist|insights|pages-fast|minimal|none
     required: true
   validate:
     description: Run validate_dashboard_data.py
@@ -25,15 +25,13 @@ runs:
       if: env.RESEARCH_VAULT_CLONE_TOKEN != '' && inputs.profile != 'none'
       uses: ./.github/actions/checkout-vault
 
-    - name: Install Darwin dependencies
-      # Full profiles run the Power Zone decision pipeline; Darwin profiles
-      # need numpy for the downstream allocation engine.
+    - name: Install rebuild dependencies
+      # Full profiles run the Power Zone decision pipeline, which needs numpy.
       if: >
-        contains(inputs.profile, 'darwin') ||
         inputs.profile == 'full' ||
         inputs.profile == 'intake-full'
       shell: bash
-      run: pip install -r _system/scripts/requirements-darwin.txt
+      run: pip install -r _system/scripts/requirements-rebuild.txt
 
     - name: Install base dependencies
       if: >
@@ -42,8 +40,7 @@ runs:
         inputs.profile == 'activist' ||
         inputs.profile == 'pages-fast' ||
         inputs.profile == 'insights' ||
-        inputs.profile == 'minimal' ||
-        contains(inputs.profile, 'darwin')
+        inputs.profile == 'minimal'
       shell: bash
       run: pip install -r _system/scripts/requirements.txt
 

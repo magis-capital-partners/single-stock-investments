@@ -223,17 +223,6 @@ QUEUE_TYPES: tuple[QueueType, ...] = (
         rationale="Digest of a rolling 30-day feed window; at 30 days a newer digest covers the same window.",
     ),
     QueueType(
-        id="darwin_regime_brief",
-        label="Darwin regime brief",
-        pattern=rf"^darwin_regime_brief_{DATE_RE}\.md$",
-        disposition=SUPERSEDED,
-        requires="Nothing once a newer brief exists; the brief states the regime as of its date.",
-        source="_system/scripts/darwin/observatory.py",
-        expire_after_days=14,
-        keep_latest=2,
-        rationale="States the CURRENT regime. A stale regime label is not reviewable, it is wrong.",
-    ),
-    QueueType(
         id="transcript_coverage",
         label="Transcript coverage report",
         pattern=rf"^transcript_coverage_{DATE_RE}\.md$",

@@ -144,7 +144,7 @@ def daily_refresh(holdings: dict, *, build_indexes: bool = True) -> None:
                 f"{ticker} market inputs",
             )
 
-    run([PY, "-m", "darwin.import_external_data"], "Sync etf-dashboard external data", cwd=SCRIPTS)
+    run([PY, "-m", "marketdata.import_external_data"], "Sync etf-dashboard external data", cwd=SCRIPTS)
     run([PY, str(SCRIPTS / "extract_theme_facts.py")], "Extract filing theme panels")
     run([PY, str(SCRIPTS / "fetch_theme_panel.py")], "Thematic indicator panels")
     run([PY, str(SCRIPTS / "apply_context_overlay.py")], "Apply thematic context overlay")
