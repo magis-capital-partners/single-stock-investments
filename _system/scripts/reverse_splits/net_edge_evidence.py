@@ -73,9 +73,10 @@ def monetary_facts(raw, cutoff, overrides=()):
         metric = row.get("metric")
         if metric not in candidates or not source_record(row, cutoff): continue
         candidates[metric].append({"val": row["value"], "start": row.get("start"), "end": row["end"],
-                                   "filed": row["known_at"][:10], "known_at": row["known_at"], "unit": row["unit"],
+                                   "filed": row.get("filed") or row["known_at"][:10], "known_at": row["known_at"], "unit": row["unit"],
                                    "tag": row["locator"], "rank": -1, "accn": row.get("accession"),
-                                   "source_url": row["source_url"], "source": "cited_filing_override"})
+                                   "source_url": row["source_url"], "source": "cited_filing_override",
+                                   **({"source_sha256": row["source_sha256"]} if row.get("source_sha256") else {})})
     currencies = Counter()
     for metric, rows in candidates.items():
         if metric != "shares" and rows:

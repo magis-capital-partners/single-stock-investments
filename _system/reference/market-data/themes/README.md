@@ -13,7 +13,7 @@ Broadly-ingested macro / industry context that explains *why* holdings' optional
 ## Pipeline (daily order)
 
 ```bash
-python -m darwin.import_external_data          # from _system/scripts; sync etf-dashboard
+python -m marketdata.import_external_data      # from _system/scripts; sync etf-dashboard
 python _system/scripts/extract_theme_facts.py
 python _system/scripts/fetch_theme_panel.py
 python _system/scripts/apply_context_overlay.py
