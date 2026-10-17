@@ -33,6 +33,7 @@ from pathlib import Path
 import requests
 import concurrent.futures.thread as cf_thread
 
+from atomic_io import semantic_text_sha256, write_json_if_changed, write_text_if_changed
 from portfolio_news_common import (
     FEED_MIN_CONFIDENCE,
     NEGATIVE_PATTERNS,
@@ -885,32 +886,25 @@ def persist(
             key=lambda r: parse_published_iso(r.get("published_utc")) or "",
             reverse=True,
         )
-        index_path.write_text(
-            json.dumps(
-                {
-                    "updated": datetime.now(UTC).isoformat(),
-                    "ticker": ticker,
-                    "company": configs[ticker].company if ticker in configs else ticker,
-                    "items": merged_rows[:200],
-                },
-                indent=2,
-            )
-            + "\n",
-            encoding="utf-8",
-        )
-
-    NEWS_SEEN_PATH.parent.mkdir(parents=True, exist_ok=True)
-    NEWS_SEEN_PATH.write_text(
-        json.dumps(
+        write_json_if_changed(
+            index_path,
             {
                 "updated": datetime.now(UTC).isoformat(),
-                "ids": sorted(seen_ids)[-5000:],
-                "urls": sorted(seen_urls)[-5000:],
+                "ticker": ticker,
+                "company": configs[ticker].company if ticker in configs else ticker,
+                "items": merged_rows[:200],
             },
-            indent=2,
+            volatile_keys=("updated",),
         )
-        + "\n",
-        encoding="utf-8",
+
+    write_json_if_changed(
+        NEWS_SEEN_PATH,
+        {
+            "updated": datetime.now(UTC).isoformat(),
+            "ids": sorted(seen_ids)[-5000:],
+            "urls": sorted(seen_urls)[-5000:],
+        },
+        volatile_keys=("updated",),
     )
 
 
@@ -947,7 +941,19 @@ def write_review_markdown(items: list[NewsItem]) -> Path:
                 f"{it.publisher or 'unknown'} · [{it.title}]({it.url})"
             )
     lines.extend(["", "---", "", "[HUMAN REVIEW] Triage false positives before acting on headlines.", ""])
-    path.write_text("\n".join(lines), encoding="utf-8")
+    body = "\n".join(lines)
+    new_sem = semantic_text_sha256(body)
+    existing = sorted(REVIEWS_DIR.glob("news_*.md"))
+    for prev in reversed(existing):
+        try:
+            if semantic_text_sha256(prev.read_text(encoding="utf-8", errors="ignore")) == new_sem:
+                return prev
+        except OSError:
+            continue
+    write_text_if_changed(path, body)
+    all_news_md = sorted(REVIEWS_DIR.glob("news_*.md"))
+    for stale in all_news_md[:-3]:
+        stale.unlink(missing_ok=True)
     return path
 
 

@@ -26,7 +26,7 @@
   // How old each feed may get before the page says so. Each is the producer's
   // own cadence plus a grace period, so a feed that is merely between runs
   // stays quiet and one that has stopped does not.
-  //   darwin           weekday refresh (darwin-refresh.yml, 01:20 UTC Mon-Fri) + a weekend
+  //   darwin           covered-call signal, several runs each weekday (darwin-covered-call.yml) + a weekend
   //   activist         daily scan (data-pipeline.yml, 06:00 UTC) + a day
   //   two_phase_watch  weekly (two-phase-watch.yml, Sunday 17:00 UTC) + three days,
   //                    matching two_phase_watch.py's own >10-day stale rule

@@ -322,8 +322,9 @@ def write_ic_queue_review(as_of: str, gates: dict, dry_run: bool) -> Path | None
     reviews = ROOT / "_system" / "reviews" / "pending"
     path = reviews / f"ls_algo_ic_queue_{as_of}.md"
     if not dry_run:
-        reviews.mkdir(parents=True, exist_ok=True)
-        path.write_text("\n".join(lines), encoding="utf-8")
+        from atomic_io import write_superseded_review_md
+
+        path = write_superseded_review_md(reviews, "ls_algo_ic_queue", as_of, "\n".join(lines), keep_latest=2)
     return path
 
 

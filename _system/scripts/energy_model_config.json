@@ -1,0 +1,396 @@
+{
+  "schema_version": "1.0",
+  "model_version": "1.0.0",
+  "in_base_irr": false,
+  "forecast_end": "2032-12",
+  "history_start": "2010-01",
+  "max_source_age_days": 120,
+  "gas_heat_content_btu_cf": 1037,
+  "reference": {
+    "id": "eia_steo_2026_10",
+    "published_at": "2026-10-06",
+    "source_url": "https://www.eia.gov/outlooks/steo/tables/pdf/5atab.pdf",
+    "label": "EIA October 2026 STEO, Table 5a",
+    "status": "published_forecast",
+    "quarterly": {
+      "2026-Q3": {
+        "dry_production": 113.6,
+        "pipeline_imports": 7.6,
+        "lng_imports": 0,
+        "pipeline_exports": 10.1,
+        "lng_exports": 17.0,
+        "residential": 3.4,
+        "commercial": 4.9,
+        "industrial": 22.5,
+        "power_burn": 47.4,
+        "other_consumption": 9.5,
+        "supplemental_supply": 0.3
+      },
+      "2026-Q4": {
+        "dry_production": 113.8,
+        "pipeline_imports": 8.0,
+        "lng_imports": 0.1,
+        "pipeline_exports": 10.4,
+        "lng_exports": 18.2,
+        "residential": 15.8,
+        "commercial": 11.4,
+        "industrial": 24.8,
+        "power_burn": 33.6,
+        "other_consumption": 9.8,
+        "supplemental_supply": 0.3
+      },
+      "2027-Q1": {
+        "dry_production": 114.5,
+        "pipeline_imports": 8.8,
+        "lng_imports": 0.1,
+        "pipeline_exports": 10.6,
+        "lng_exports": 18.7,
+        "residential": 23.9,
+        "commercial": 15.2,
+        "industrial": 26,
+        "power_burn": 32.9,
+        "other_consumption": 10.3,
+        "supplemental_supply": 0.3
+      },
+      "2027-Q2": {
+        "dry_production": 115.7,
+        "pipeline_imports": 7.4,
+        "lng_imports": 0,
+        "pipeline_exports": 10.2,
+        "lng_exports": 18.6,
+        "residential": 7.3,
+        "commercial": 6.9,
+        "industrial": 23.4,
+        "power_burn": 34.2,
+        "other_consumption": 9.3,
+        "supplemental_supply": 0.3
+      },
+      "2027-Q3": {
+        "dry_production": 116.4,
+        "pipeline_imports": 7.7,
+        "lng_imports": 0,
+        "pipeline_exports": 10.5,
+        "lng_exports": 17.6,
+        "residential": 3.6,
+        "commercial": 5.3,
+        "industrial": 23.2,
+        "power_burn": 47,
+        "other_consumption": 9.7,
+        "supplemental_supply": 0.3
+      },
+      "2027-Q4": {
+        "dry_production": 117.8,
+        "pipeline_imports": 8,
+        "lng_imports": 0.1,
+        "pipeline_exports": 10.8,
+        "lng_exports": 19.6,
+        "residential": 15.8,
+        "commercial": 12,
+        "industrial": 25.3,
+        "power_burn": 34,
+        "other_consumption": 10.1,
+        "supplemental_supply": 0.3
+      }
+    },
+    "annual_2027": {
+      "dry_production": 116.1,
+      "pipeline_imports": 8,
+      "lng_imports": 0.1,
+      "pipeline_exports": 10.5,
+      "lng_exports": 18.6,
+      "residential": 12.6,
+      "commercial": 9.8,
+      "industrial": 24.5,
+      "power_burn": 37.1,
+      "other_consumption": 9.8,
+      "supplemental_supply": 0.3
+    },
+    "henry_hub_usd_mmbtu": {
+      "2026": 3.48,
+      "2027": 3.16
+    },
+    "note": "Quarterly published rates are disaggregated with historical month shares. Other consumption sums lease/plant fuel, pipeline/distribution and vehicle use. Beyond 2027 all paths are analyst scenarios; refresh this reviewed reference when a newer STEO is assessed.",
+    "reviewed_at": "2026-10-15",
+    "price_source_url": "https://www.eia.gov/outlooks/steo/tables/pdf/2tab.pdf",
+    "release_source_url": "https://www.eia.gov/outlooks/steo/pdf/steo_full.pdf",
+    "supply_source_sha256": "46fb2eea176a85ebc0b7a1fdbacc6667cf531e40997457b5a8cdf136f8fd231a",
+    "prices_source_sha256": "abb88242710b6418ee486b537d4e1345a1b3cb985e9d2ad3be464db644ffcfd2"
+  },
+  "storage": {
+    "working_capacity_bcf": 4683,
+    "capacity_2030_bcf": 4795,
+    "operating_minimum_bcf": 500,
+    "max_injection_bcf_day": 25,
+    "max_withdrawal_bcf_day": 45,
+    "status": "scenario_assumption",
+    "source_url": "https://www.eia.gov/naturalgas/storagecapacity/",
+    "note": "Capacity anchors reproduce the letter's disclosed working-capacity assumptions; minimum and flow limits are analyst stress parameters, not national engineering limits."
+  },
+  "scenarios": [
+    {
+      "id": "reference",
+      "label": "Public reference",
+      "description": "Published near-term outlook; analyst extension after 2027.",
+      "status": "published_forecast_then_assumption",
+      "terminal_2030": {
+        "dry_production": 129,
+        "lng_exports": 29,
+        "power_burn": 41,
+        "industrial": 26,
+        "pipeline_imports": 8.5,
+        "pipeline_exports": 11.2,
+        "residential": 12.8,
+        "commercial": 10.2
+      },
+      "gas_price": {
+        "2027": 3.16,
+        "2030": 4.5,
+        "2032": 5.0,
+        "2026": 3.48
+      },
+      "post2030_production_growth": 0.01,
+      "post2030_demand_growth": 0.015,
+      "winter_demand_pct": 0,
+      "summer_power_pct": 0,
+      "supply_disruption_pct": 0,
+      "project_delay_months": 0,
+      "project_utilization": 0.9
+    },
+    {
+      "id": "letter",
+      "label": "Scarcity hypothesis",
+      "description": "Tests a 132 Bcf/day production ceiling and 35.7 LNG exports at December 2030; these quantities and prices are scenario assumptions.",
+      "status": "analyst_hypothesis",
+      "terminal_2030": {
+        "dry_production": 132,
+        "lng_exports": 35.7,
+        "power_burn": 41.2,
+        "industrial": 28,
+        "pipeline_imports": 8.5,
+        "pipeline_exports": 11.2,
+        "residential": 14.0,
+        "commercial": 11.2
+      },
+      "gas_price": {
+        "2027": 3.28,
+        "2030": 8.0,
+        "2032": 10.0
+      },
+      "post2030_production_growth": -0.015,
+      "post2030_demand_growth": 0.02,
+      "winter_demand_pct": 0,
+      "summer_power_pct": 0,
+      "supply_disruption_pct": 0,
+      "project_delay_months": 0,
+      "project_utilization": 0.95
+    },
+    {
+      "id": "relief",
+      "label": "Supply and demand relief",
+      "description": "Higher deliverable supply, delayed demand, more Canadian imports and slower gas generation growth.",
+      "status": "analyst_assumption",
+      "terminal_2030": {
+        "dry_production": 137,
+        "lng_exports": 25,
+        "power_burn": 38.5,
+        "industrial": 25.5,
+        "pipeline_imports": 10,
+        "pipeline_exports": 11,
+        "residential": 12.4,
+        "commercial": 9.8
+      },
+      "gas_price": {
+        "2027": 3.28,
+        "2030": 3.0,
+        "2032": 3.2
+      },
+      "post2030_production_growth": 0.015,
+      "post2030_demand_growth": 0.01,
+      "winter_demand_pct": 0,
+      "summer_power_pct": 0,
+      "supply_disruption_pct": 0,
+      "project_delay_months": 12,
+      "project_utilization": 0.8
+    },
+    {
+      "id": "stress",
+      "label": "Tight supply and weather",
+      "description": "Slower supply, cold winters and hot summers. A conditional stress, not a probability forecast.",
+      "status": "analyst_assumption",
+      "terminal_2030": {
+        "dry_production": 124,
+        "lng_exports": 33,
+        "power_burn": 43,
+        "industrial": 27,
+        "pipeline_imports": 8.2,
+        "pipeline_exports": 11.5,
+        "residential": 13.5,
+        "commercial": 10.8
+      },
+      "gas_price": {
+        "2027": 4.5,
+        "2030": 10.0,
+        "2032": 12.0
+      },
+      "post2030_production_growth": -0.02,
+      "post2030_demand_growth": 0.02,
+      "winter_demand_pct": 12,
+      "summer_power_pct": 10,
+      "supply_disruption_pct": 2,
+      "project_delay_months": 0,
+      "project_utilization": 0.95
+    }
+  ],
+  "power_regions": [
+    {
+      "id": "ercot",
+      "label": "Texas / ERCOT",
+      "heat_rate_mmbtu_mwh": 7.3,
+      "gas_basis_usd_mmbtu": -0.4,
+      "nonfuel_usd_mwh": 18,
+      "gas_pass_through": 0.85,
+      "delivery_usd_kwh": 0.007,
+      "scarcity_usd_mwh": 0,
+      "source_url": "https://www.ercot.com/gridinfo/load/forecast/index.html",
+      "status": "analyst_assumption"
+    },
+    {
+      "id": "pjm",
+      "label": "PJM",
+      "heat_rate_mmbtu_mwh": 7.5,
+      "gas_basis_usd_mmbtu": 0.1,
+      "nonfuel_usd_mwh": 22,
+      "gas_pass_through": 0.7,
+      "delivery_usd_kwh": 0.009,
+      "scarcity_usd_mwh": 0,
+      "source_url": "https://www.pjm.com/planning/resource-adequacy-planning/load-forecast-dev-process",
+      "status": "analyst_assumption"
+    },
+    {
+      "id": "other_us",
+      "label": "Other US",
+      "heat_rate_mmbtu_mwh": 7.8,
+      "gas_basis_usd_mmbtu": 0.25,
+      "nonfuel_usd_mwh": 20,
+      "gas_pass_through": 0.5,
+      "delivery_usd_kwh": 0.008,
+      "scarcity_usd_mwh": 0,
+      "source_url": "https://www.eia.gov/electricity/data/eia923/index.php",
+      "status": "analyst_assumption"
+    },
+    {
+      "id": "global_other",
+      "label": "Other countries / unknown",
+      "heat_rate_mmbtu_mwh": 0,
+      "gas_basis_usd_mmbtu": 0,
+      "nonfuel_usd_mwh": 50,
+      "gas_pass_through": 0,
+      "delivery_usd_kwh": 0,
+      "scarcity_usd_mwh": 0,
+      "source_url": "https://ccaf.io/cbnsi/cbeci/mining_map/methodology",
+      "status": "unknown_exposure_scenario"
+    }
+  ],
+  "miner_cohorts": [
+    {
+      "id": "texas_merchant",
+      "label": "Texas exposed power",
+      "region": "ercot",
+      "hash_share": 0.18,
+      "efficiency_factor": 1.0,
+      "fixed_share": 0.25,
+      "fixed_usd_kwh": 0.05,
+      "contract_end": "2028-12",
+      "availability": 0.95,
+      "curtailment_credit_usd_kwh": 0,
+      "status": "illustrative_cohort"
+    },
+    {
+      "id": "pjm_contract",
+      "label": "PJM contracted power",
+      "region": "pjm",
+      "hash_share": 0.1,
+      "efficiency_factor": 1.05,
+      "fixed_share": 0.8,
+      "fixed_usd_kwh": 0.05,
+      "contract_end": "2029-12",
+      "availability": 0.95,
+      "curtailment_credit_usd_kwh": 0,
+      "status": "illustrative_cohort"
+    },
+    {
+      "id": "us_other",
+      "label": "Other US power",
+      "region": "other_us",
+      "hash_share": 0.12,
+      "efficiency_factor": 0.95,
+      "fixed_share": 0.6,
+      "fixed_usd_kwh": 0.05,
+      "contract_end": "2028-12",
+      "availability": 0.95,
+      "curtailment_credit_usd_kwh": 0,
+      "status": "illustrative_cohort"
+    },
+    {
+      "id": "rest_world",
+      "label": "Rest of world / unknown",
+      "region": "global_other",
+      "hash_share": 0.6,
+      "efficiency_factor": 1.0,
+      "fixed_share": 1.0,
+      "fixed_usd_kwh": 0.05,
+      "contract_end": "2035-12",
+      "availability": 0.95,
+      "curtailment_credit_usd_kwh": 0,
+      "status": "unknown_exposure_scenario"
+    }
+  ],
+  "btc": {
+    "baseline_usd_kwh": 0.05,
+    "baseline_power_share": 0.6,
+    "nonpower_opex_share": 0.5,
+    "annual_efficiency_improvement": 0.04,
+    "annual_hash_growth": 0.03,
+    "annual_nonpower_inflation": 0.02,
+    "hardware_return_pct": 0,
+    "max_crypto_age_days": 14,
+    "note": "Cohort weights, tariffs, growth and accounting split are sensitivity assumptions. They are not measured contracts or a global miner survey. Other cost is calibrated as a daily residual from the legacy model."
+  },
+  "assumptions": [
+    {
+      "id": "supply",
+      "label": "Production beyond 2027",
+      "status": "scenario_assumption",
+      "unit": "Bcf/day",
+      "note": "Terminal 2030 supply paths are hypotheses. No independently audited well inventory ceiling is claimed."
+    },
+    {
+      "id": "gas_price",
+      "label": "Gas prices after published outlook",
+      "status": "scenario_assumption",
+      "unit": "USD/MMBtu",
+      "note": "Explicit analyst price paths, not a licensed futures curve or a solved equilibrium forecast."
+    },
+    {
+      "id": "contracts",
+      "label": "Miner geography and contracts",
+      "status": "scenario_assumption",
+      "unit": "share / USD/kWh",
+      "note": "Illustrative cohorts; verified contract coverage is zero until individual filings are normalized."
+    },
+    {
+      "id": "storage",
+      "label": "Storage operating limits",
+      "status": "scenario_assumption",
+      "unit": "Bcf and Bcf/day",
+      "note": "Screening constraints; national aggregates cannot establish site-level deliverability."
+    },
+    {
+      "id": "weather",
+      "label": "Weather effects",
+      "status": "scenario_assumption",
+      "unit": "percent demand",
+      "note": "Seasonal stress percentages; no claim to a calibrated weather forecast."
+    }
+  ]
+}

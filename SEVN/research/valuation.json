@@ -65,7 +65,7 @@
     }
   },
   "context_overlay": {
-    "as_of": "2026-10-14",
+    "as_of": "2026-10-17",
     "disclaimer": "Context only. Tailwinds inform stance and overlay sizing; they do not auto-inflate Lawrence base IRR. Promotion to base case requires [HUMAN REVIEW].",
     "themes": [
       {
@@ -75,9 +75,9 @@
           {
             "id": "hy_oas",
             "label": "High-yield OAS credit spread (%)",
-            "latest": -0.06,
-            "as_of": "2026-10-14",
-            "yoy_pct": 89.5,
+            "latest": -0.69,
+            "as_of": "2026-10-16",
+            "yoy_pct": 30.3,
             "direction": "up",
             "good_for": "risk_regime",
             "source": "spread:HYG-LQD:21d (HYG-LQD 1m spread proxy, not OAS)",
@@ -87,9 +87,9 @@
           {
             "id": "ust_10y",
             "label": "US Treasury 10Y yield (%)",
-            "latest": 5.261000156402588,
-            "as_of": "2026-10-14",
-            "yoy_pct": 30.8,
+            "latest": 5.0980000495910645,
+            "as_of": "2026-10-16",
+            "yoy_pct": 28.2,
             "direction": "up",
             "good_for": "rates_regime",
             "source": "yahoo:^TNX",
@@ -99,9 +99,9 @@
           {
             "id": "ust_2y",
             "label": "US Treasury 2Y yield (%)",
-            "latest": 5.077000141143799,
-            "as_of": "2026-10-14",
-            "yoy_pct": 40.9,
+            "latest": 4.89900016784668,
+            "as_of": "2026-10-16",
+            "yoy_pct": 38.0,
             "direction": "up",
             "good_for": "rates_regime",
             "source": "yahoo:^FVX",
@@ -111,9 +111,9 @@
           {
             "id": "dxy_broad",
             "label": "Trade-weighted USD index (broad)",
-            "latest": 102.86399841308594,
-            "as_of": "2026-10-14",
-            "yoy_pct": 3.9,
+            "latest": 101.83999633789062,
+            "as_of": "2026-10-16",
+            "yoy_pct": 3.5,
             "direction": "up",
             "good_for": "dollar_regime",
             "source": "yahoo:DX-Y.NYB",
@@ -123,9 +123,9 @@
           {
             "id": "vix_level",
             "label": "VIX index level",
-            "latest": 15.869999885559082,
-            "as_of": "2026-10-14",
-            "yoy_pct": -23.7,
+            "latest": 19.989999771118164,
+            "as_of": "2026-10-16",
+            "yoy_pct": -21.0,
             "direction": "down",
             "good_for": "vol_regime",
             "source": "yahoo:^VIX",
@@ -135,9 +135,9 @@
           {
             "id": "credit_impulse_1m",
             "label": "HYG vs TLT 1-month return spread (%)",
-            "latest": 1.18,
-            "as_of": "2026-10-14",
-            "yoy_pct": 174.7,
+            "latest": -0.25,
+            "as_of": "2026-10-16",
+            "yoy_pct": 87.6,
             "direction": "up",
             "good_for": "credit_impulse",
             "source": "spread:HYG-TLT:21d",
@@ -147,9 +147,9 @@
           {
             "id": "spy_20d_realized_vol",
             "label": "SPY 20-day realized vol (annualized %)",
-            "latest": 9.84,
-            "as_of": "2026-10-14",
-            "yoy_pct": -21.1,
+            "latest": 10.2,
+            "as_of": "2026-10-16",
+            "yoy_pct": -19.6,
             "direction": "down",
             "good_for": "equity_vol",
             "source": "realized_vol:SPY:20d",
@@ -221,7 +221,7 @@
   },
   "stance_proposal": {
     "suggested": "watch",
-    "irr_band": "15\u201320%",
+    "irr_band": "15–20%",
     "gates": {
       "moat_ok": false,
       "dhando_ok": true
@@ -434,8 +434,8 @@
                 "value": 12.49961,
                 "unit": "USD_per_share",
                 "operation": "multiply",
-                "formula": "adjusted_book_per_share \u00d7 mark_to_market_multiplier",
-                "substituted_formula": "14.9 \u00d7 0.8389",
+                "formula": "adjusted_book_per_share × mark_to_market_multiplier",
+                "substituted_formula": "14.9 × 0.8389",
                 "dependencies": [
                   "adjusted_book_per_share",
                   "mark_to_market_multiplier"
@@ -474,8 +474,8 @@
                 "value": 14.9,
                 "unit": "USD_per_share",
                 "operation": "multiply",
-                "formula": "adjusted_book_per_share \u00d7 mark_to_market_multiplier",
-                "substituted_formula": "14.9 \u00d7 1",
+                "formula": "adjusted_book_per_share × mark_to_market_multiplier",
+                "substituted_formula": "14.9 × 1",
                 "dependencies": [
                   "adjusted_book_per_share",
                   "mark_to_market_multiplier"
@@ -514,8 +514,8 @@
                 "value": 16.01005,
                 "unit": "USD_per_share",
                 "operation": "multiply",
-                "formula": "adjusted_book_per_share \u00d7 mark_to_market_multiplier",
-                "substituted_formula": "14.9 \u00d7 1.0745",
+                "formula": "adjusted_book_per_share × mark_to_market_multiplier",
+                "substituted_formula": "14.9 × 1.0745",
                 "dependencies": [
                   "adjusted_book_per_share",
                   "mark_to_market_multiplier"
@@ -650,8 +650,8 @@
                 "value": 0.22061427,
                 "unit": "USD_per_share",
                 "operation": "divide",
-                "formula": "management_fees_m \u00f7 shares_m",
-                "substituted_formula": "4.985 \u00f7 22.596",
+                "formula": "management_fees_m ÷ shares_m",
+                "substituted_formula": "4.985 ÷ 22.596",
                 "dependencies": [
                   "management_fees_m",
                   "shares_m"
@@ -664,8 +664,8 @@
                 "value": 2.49955966,
                 "unit": "USD_per_share",
                 "operation": "multiply",
-                "formula": "annual_fee_per_share \u00d7 fee_capitalization_years",
-                "substituted_formula": "0.22061427 \u00d7 11.33",
+                "formula": "annual_fee_per_share × fee_capitalization_years",
+                "substituted_formula": "0.22061427 × 11.33",
                 "dependencies": [
                   "annual_fee_per_share",
                   "fee_capitalization_years"
@@ -732,8 +732,8 @@
                 "value": 0.22061427,
                 "unit": "USD_per_share",
                 "operation": "divide",
-                "formula": "management_fees_m \u00f7 shares_m",
-                "substituted_formula": "4.985 \u00f7 22.596",
+                "formula": "management_fees_m ÷ shares_m",
+                "substituted_formula": "4.985 ÷ 22.596",
                 "dependencies": [
                   "management_fees_m",
                   "shares_m"
@@ -746,8 +746,8 @@
                 "value": 1.50017702,
                 "unit": "USD_per_share",
                 "operation": "multiply",
-                "formula": "annual_fee_per_share \u00d7 fee_capitalization_years",
-                "substituted_formula": "0.22061427 \u00d7 6.8",
+                "formula": "annual_fee_per_share × fee_capitalization_years",
+                "substituted_formula": "0.22061427 × 6.8",
                 "dependencies": [
                   "annual_fee_per_share",
                   "fee_capitalization_years"
@@ -814,8 +814,8 @@
                 "value": 0.22061427,
                 "unit": "USD_per_share",
                 "operation": "divide",
-                "formula": "management_fees_m \u00f7 shares_m",
-                "substituted_formula": "4.985 \u00f7 22.596",
+                "formula": "management_fees_m ÷ shares_m",
+                "substituted_formula": "4.985 ÷ 22.596",
                 "dependencies": [
                   "management_fees_m",
                   "shares_m"
@@ -828,8 +828,8 @@
                 "value": 0.80082979,
                 "unit": "USD_per_share",
                 "operation": "multiply",
-                "formula": "annual_fee_per_share \u00d7 fee_capitalization_years",
-                "substituted_formula": "0.22061427 \u00d7 3.63",
+                "formula": "annual_fee_per_share × fee_capitalization_years",
+                "substituted_formula": "0.22061427 × 3.63",
                 "dependencies": [
                   "annual_fee_per_share",
                   "fee_capitalization_years"
@@ -998,8 +998,8 @@
                 "value": 10.088,
                 "unit": "USD_m",
                 "operation": "multiply",
-                "formula": "total_commitments_m \u00d7 acl_pct",
-                "substituted_formula": "776 \u00d7 0.013",
+                "formula": "total_commitments_m × acl_pct",
+                "substituted_formula": "776 × 0.013",
                 "dependencies": [
                   "total_commitments_m",
                   "acl_pct"
@@ -1012,8 +1012,8 @@
                 "value": 0.4464507,
                 "unit": "USD_per_share",
                 "operation": "divide",
-                "formula": "acl_m \u00f7 shares_m",
-                "substituted_formula": "10.088 \u00f7 22.596",
+                "formula": "acl_m ÷ shares_m",
+                "substituted_formula": "10.088 ÷ 22.596",
                 "dependencies": [
                   "acl_m",
                   "shares_m"
@@ -1026,8 +1026,8 @@
                 "value": 3.0001487,
                 "unit": "USD_per_share",
                 "operation": "multiply",
-                "formula": "acl_per_share \u00d7 stress_reserve_multiple",
-                "substituted_formula": "0.4464507 \u00d7 6.72",
+                "formula": "acl_per_share × stress_reserve_multiple",
+                "substituted_formula": "0.4464507 × 6.72",
                 "dependencies": [
                   "acl_per_share",
                   "stress_reserve_multiple"
@@ -1109,8 +1109,8 @@
                 "value": 10.088,
                 "unit": "USD_m",
                 "operation": "multiply",
-                "formula": "total_commitments_m \u00d7 acl_pct",
-                "substituted_formula": "776 \u00d7 0.013",
+                "formula": "total_commitments_m × acl_pct",
+                "substituted_formula": "776 × 0.013",
                 "dependencies": [
                   "total_commitments_m",
                   "acl_pct"
@@ -1123,8 +1123,8 @@
                 "value": 0.4464507,
                 "unit": "USD_per_share",
                 "operation": "divide",
-                "formula": "acl_m \u00f7 shares_m",
-                "substituted_formula": "10.088 \u00f7 22.596",
+                "formula": "acl_m ÷ shares_m",
+                "substituted_formula": "10.088 ÷ 22.596",
                 "dependencies": [
                   "acl_m",
                   "shares_m"
@@ -1137,8 +1137,8 @@
                 "value": 1.50007435,
                 "unit": "USD_per_share",
                 "operation": "multiply",
-                "formula": "acl_per_share \u00d7 stress_reserve_multiple",
-                "substituted_formula": "0.4464507 \u00d7 3.36",
+                "formula": "acl_per_share × stress_reserve_multiple",
+                "substituted_formula": "0.4464507 × 3.36",
                 "dependencies": [
                   "acl_per_share",
                   "stress_reserve_multiple"
@@ -1220,8 +1220,8 @@
                 "value": 10.088,
                 "unit": "USD_m",
                 "operation": "multiply",
-                "formula": "total_commitments_m \u00d7 acl_pct",
-                "substituted_formula": "776 \u00d7 0.013",
+                "formula": "total_commitments_m × acl_pct",
+                "substituted_formula": "776 × 0.013",
                 "dependencies": [
                   "total_commitments_m",
                   "acl_pct"
@@ -1234,8 +1234,8 @@
                 "value": 0.4464507,
                 "unit": "USD_per_share",
                 "operation": "divide",
-                "formula": "acl_m \u00f7 shares_m",
-                "substituted_formula": "10.088 \u00f7 22.596",
+                "formula": "acl_m ÷ shares_m",
+                "substituted_formula": "10.088 ÷ 22.596",
                 "dependencies": [
                   "acl_m",
                   "shares_m"
@@ -1248,8 +1248,8 @@
                 "value": 0.50002478,
                 "unit": "USD_per_share",
                 "operation": "multiply",
-                "formula": "acl_per_share \u00d7 stress_reserve_multiple",
-                "substituted_formula": "0.4464507 \u00d7 1.12",
+                "formula": "acl_per_share × stress_reserve_multiple",
+                "substituted_formula": "0.4464507 × 1.12",
                 "dependencies": [
                   "acl_per_share",
                   "stress_reserve_multiple"
@@ -1342,7 +1342,7 @@
         "calculation_proof": null,
         "evidence_tier": "filing",
         "evidence_level": "primary_verified",
-        "evidence": "Q1 2026 DE $0.24/sh (temp dilution); Q4 2025 was $0.28/sh. Embedded in how the market capitalizes book \u2014 treated as embedded so not double-counted with book equity.",
+        "evidence": "Q1 2026 DE $0.24/sh (temp dilution); Q4 2025 was $0.28/sh. Embedded in how the market capitalizes book — treated as embedded so not double-counted with book equity.",
         "scenario_assumptions": "Earnings power is the cross-check for the book multiple, not a second stack.",
         "probability_and_timing": null,
         "tax_and_realization_adjustments": "Marks, ACL, and leverage are inside book.",
@@ -1366,7 +1366,7 @@
           "label": "Distributable-earnings franchise (embedded in book multiple)",
           "kind": "fact",
           "evidence_tier": "filing",
-          "evidence": "Q1 2026 DE $0.24/sh (temp dilution); Q4 2025 was $0.28/sh. Embedded in how the market capitalizes book \u2014 treated as embedded so not double-counted with book equity.",
+          "evidence": "Q1 2026 DE $0.24/sh (temp dilution); Q4 2025 was $0.28/sh. Embedded in how the market capitalizes book — treated as embedded so not double-counted with book equity.",
           "method": "owner_cash_dcf",
           "valuation_status": "legacy_sensitivity"
         }
@@ -1548,7 +1548,7 @@
       "interpretation": "value_per_share is withheld while any material additive component is unpriced; priced_components_per_share is not a complete security value."
     },
     "scenario_contract": {
-      "rule": "Cases must change cited causal operating, capital, probability, timing, or financing drivers\u2014not only a terminal multiple.",
+      "rule": "Cases must change cited causal operating, capital, probability, timing, or financing drivers—not only a terminal multiple.",
       "top_value_drivers": [
         {
           "component_id": "tangible_loan_book_equity",
@@ -1742,7 +1742,7 @@
         "hard_to_vary": true,
         "falsifiable": true,
         "not_instrumentalist": true,
-        "reach": "Weights encode evidence tier (A primary \u2192 D external), not fitted to hit a target IRR"
+        "reach": "Weights encode evidence tier (A primary → D external), not fitted to hit a target IRR"
       },
       "qualitative_audit": {
         "flags": [],
@@ -1857,7 +1857,7 @@
           "base": 0.0,
           "high": 0.0,
           "evidence_tier": "filing",
-          "evidence": "Q1 2026 DE $0.24/sh (temp dilution); Q4 2025 was $0.28/sh. Embedded in how the market capitalizes book \u2014 treated as embedded so not double-counted with book equity.",
+          "evidence": "Q1 2026 DE $0.24/sh (temp dilution); Q4 2025 was $0.28/sh. Embedded in how the market capitalizes book — treated as embedded so not double-counted with book equity.",
           "assumption_summary": "Earnings power is the cross-check for the book multiple, not a second stack.",
           "cross_check": "Range must reconcile to primary filings and realization path before IC approval.",
           "falsifier": "Dividend cut and DE permanently below coverage invalidate income-capitalization cross-checks."
@@ -2153,7 +2153,7 @@
       }
     ],
     "wisdom_applied": [
-      "Stahl/HK: price-to-book discounts in levered credit vehicles can overshoot when credit is actually clean \u2014 verify the loan book, don't average the sector.",
+      "Stahl/HK: price-to-book discounts in levered credit vehicles can overshoot when credit is actually clean — verify the loan book, don't average the sector.",
       "Munger: fee structure and incentives are part of the intrinsic claim."
     ],
     "limitations": [
@@ -2497,7 +2497,7 @@
         "valuation_status": null,
         "calculation_proof": null,
         "evidence_tier": "filing",
-        "evidence": "Q1 2026 DE $0.24/sh (temp dilution); Q4 2025 was $0.28/sh. Embedded in how the market capitalizes book \u2014 treated as embedded so not double-counted with book equity.",
+        "evidence": "Q1 2026 DE $0.24/sh (temp dilution); Q4 2025 was $0.28/sh. Embedded in how the market capitalizes book — treated as embedded so not double-counted with book equity.",
         "cross_check": "Range must reconcile to primary filings and realization path before IC approval.",
         "driver_model_type": null,
         "driver_model": null,
@@ -2689,7 +2689,7 @@
         },
         "method": "owner_cash_dcf",
         "evidence_tier": "filing",
-        "evidence": "Q1 2026 DE $0.24/sh (temp dilution); Q4 2025 was $0.28/sh. Embedded in how the market capitalizes book \u2014 treated as embedded so not double-counted with book equity.",
+        "evidence": "Q1 2026 DE $0.24/sh (temp dilution); Q4 2025 was $0.28/sh. Embedded in how the market capitalizes book — treated as embedded so not double-counted with book equity.",
         "comparable_role": "not_applicable",
         "comparable_ids": [],
         "adjustment": "Marks, ACL, and leverage are inside book.",
@@ -2706,7 +2706,7 @@
       }
     ],
     "wisdom_applied": [
-      "Stahl/HK: price-to-book discounts in levered credit vehicles can overshoot when credit is actually clean \u2014 verify the loan book, don't average the sector.",
+      "Stahl/HK: price-to-book discounts in levered credit vehicles can overshoot when credit is actually clean — verify the loan book, don't average the sector.",
       "Munger: fee structure and incentives are part of the intrinsic claim."
     ],
     "limitations": [
@@ -2829,7 +2829,7 @@
   },
   "approved_stance": "watch",
   "insider_signal": {
-    "as_of": "2026-10-14",
+    "as_of": "2026-10-17",
     "disclaimer": "Context only. Insider activity informs scenario confidence and stance discussion; it does not auto-inflate Lawrence base IRR. Promotion requires [HUMAN REVIEW].",
     "in_base_irr": false,
     "window_days": 365,
@@ -2926,7 +2926,7 @@
       "question": "Material options after scan?",
       "answer": "No",
       "treatment": "n/a",
-      "evidence": "Operating compounder / croupier \u2014 Lawrence full cash-flow path sufficient"
+      "evidence": "Operating compounder / croupier — Lawrence full cash-flow path sufficient"
     }
   ],
   "human_review": {
@@ -3032,5 +3032,17 @@
     "contributor_count": 11,
     "in_base_irr": false,
     "disclaimer": "Advisory lens blend only. Does not replace Lawrence total-synthesis stance gate without [HUMAN REVIEW]."
+  },
+  "schema_version": "magis.valuation.v2",
+  "returns": {
+    "base_irr_pct": 17.65,
+    "unit": "percent_per_year",
+    "label": "7yr IRR (total synthesis)",
+    "display": "17.65% (total synthesis)",
+    "scenarios_pct": {
+      "bear": 5.0,
+      "base": 16.2,
+      "bull": 23.2
+    }
   }
 }

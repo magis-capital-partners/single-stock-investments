@@ -53,7 +53,7 @@ def read_csv_series(path: Path) -> list[tuple[str, float]]:
 def write_csv(path: Path, rows: list[tuple[str, float]]) -> None:
     path.parent.mkdir(parents=True, exist_ok=True)
     with path.open("w", encoding="utf-8", newline="") as f:
-        w = csv.writer(f)
+        w = csv.writer(f, lineterminator='\n')
         w.writerow(["date", "value"])
         for d, v in sorted(rows):
             w.writerow([d, v])
@@ -213,7 +213,7 @@ def write_amzn_weekly(offline: bool = False) -> Path:
 
 
 def fetch_blockchain_hashrate() -> tuple[list[tuple[str, float]], str | None]:
-    """Full-history network hashrate from blockchain.info (TH/s → EH/s)."""
+    """Full-history network hashrate from blockchain.info (TH/s to EH/s)."""
     data = _get_json(f"{BLOCKCHAIN_CHARTS}/hash-rate?timespan=all&format=json")
     if not data or not isinstance(data, dict):
         return [], "network"
@@ -357,7 +357,7 @@ def compute_hashprice(
 ) -> float:
     if hash_eh <= 0:
         return 0.0
-    ph = hash_eh * 1e6
+    ph = hash_eh * 1000.0  # 1 EH/s = 1,000 PH/s
     blocks_per_day = 144.0
     daily_revenue = blocks_per_day * (subsidy_btc * btc_price + fee_usd_per_block)
     return round(daily_revenue / ph, 6)
@@ -365,10 +365,44 @@ def compute_hashprice(
 
 def compute_breakeven_kwh(hashprice_ph_day: float, efficiency_j_th: float) -> float:
     hashprice_th_day = hashprice_ph_day / 1000.0
-    kwh_per_th_day = (efficiency_j_th / 1000.0) * 24.0 / 1000.0
+    kwh_per_th_day = efficiency_j_th * 24.0 / 1000.0
     if kwh_per_th_day <= 0:
         return 0.0
     return round(hashprice_th_day / kwh_per_th_day, 4)
+
+
+def migrate_hashprice_units() -> None:
+    """One-time migration of this repository's pre-v2 mislabelled $/TH cache.
+
+    The old breakeven formula's matching conversion error canceled out, so its
+    historical output is already $/kWh and must not be rescaled.
+    """
+    marker = CRYPTO_DIR / 'derived_units.json'
+    if marker.exists() and json.loads(marker.read_text(encoding='utf-8')).get('hashprice_version') == 2:
+        return
+    path = CRYPTO_DIR / 'btc_hashprice_usd_ph_day.csv'
+    original = CRYPTO_DIR / 'btc_hashprice_pre_v2_usd_th_day.csv'
+    if path.exists() and not original.exists():
+        original.write_bytes(path.read_bytes())
+    # Read the immutable pre-migration copy on retries after interrupted writes.
+    rows = read_csv_series(original)
+    if rows:
+        write_csv(path, [(d, round(v * 1000, 6)) for d, v in rows])
+    manifest_path = CRYPTO_DIR / 'manifest.json'
+    if manifest_path.exists():
+        manifest = json.loads(manifest_path.read_text(encoding='utf-8'))
+        if manifest.get('hashprice_units_version') != 2:
+            for theme in manifest.get('themes', {}).values():
+                item = theme.get('series', {}).get('btc_hashprice_usd_ph_day')
+                if item:
+                    for key in ('latest', 'prior_year'):
+                        if isinstance(item.get(key), (int, float)):
+                            item[key] = round(item[key] * 1000, 6)
+            manifest['hashprice_units_version'] = 2
+            manifest_path.write_text(json.dumps(manifest, indent=2) + '\n', encoding='utf-8')
+    CRYPTO_DIR.mkdir(parents=True, exist_ok=True)
+    marker.write_text(json.dumps({'hashprice_version': 2, 'unit': 'USD/PH/day',
+                                 'migration': 'Pre-v2 repository $/TH values multiplied by 1000; breakeven values unchanged.'}, indent=2) + '\n', encoding='utf-8')
 
 
 def process_series(spec: dict, ctx: dict, offline: bool) -> dict:
@@ -492,9 +526,11 @@ def process_series(spec: dict, ctx: dict, offline: bool) -> dict:
 
 
 def build(theme_filter: str | None = None, offline: bool = False) -> dict:
+    migrate_hashprice_units()
     cfg = load_config()
     ctx: dict = {"block_subsidy_btc": cfg.get("block_subsidy_btc", 3.125)}
     manifest: dict = {
+        "hashprice_units_version": 2,
         "generated_at": datetime.now(timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ"),
         "as_of": TODAY,
         "staleness_max_days": cfg.get("staleness_max_days", 7),
@@ -526,7 +562,7 @@ def build(theme_filter: str | None = None, offline: bool = False) -> dict:
     try:
         amzn_path = write_amzn_weekly(offline=offline)
         manifest["amzn_weekly_path"] = str(amzn_path.relative_to(ROOT)).replace("\\", "/")
-    except Exception as exc:  # noqa: BLE001 — companion series must not fail crypto panel
+    except Exception as exc:  # noqa: BLE001 - companion series must not fail crypto panel
         manifest["amzn_weekly_error"] = str(exc)
     try:
         import btc_cost_of_production as cop  # noqa: WPS433

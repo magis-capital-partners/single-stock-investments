@@ -38,8 +38,13 @@ Files live in `dashboard/data/`. Read the build date before the contents.
 | `special_situations.json` | `generated_at` | Ranked special situations, discovery list, history, by lane. Desk: Special Situations. |
 | `separations.json` | `generated_at` | Split-offs and spin-offs: filed terms, spread, who-must-sell flows, odd-lot alerts, discovery events. Desk: Special Situations; the forced_seller_rows also feed the Technical Analyst. |
 | `desk_briefs.json` | `generated_at` | The latest desk brief per desk, joined for the Inbox. Built from `_system/data/desk_briefs/`. |
+| `portfolio_summary.json` | `generated_at` (`_envelope.generated_at`) | **L0 summary (< 100 KB)** of active/classified portfolio tickers with stance, archetype, `base_irr_pct`, and `_envelope` freshness. Read this before opening L1 shards. |
+| `research_manifest.json` | `generated_at` (`_envelope.generated_at`) | **L0 research index (< 100 KB)** mapping each active ticker to its L1 `agent_shard`, `thesis_card`, canonical `filing_digest`, and semantic evidence hash. |
+| `kpi_summary.json` | `generated_at` (`_envelope.generated_at`) | **L0 KPI inflection summary (< 100 KB)** extracted from `kpi_trends.json` so desk bots avoid loading the 7 MB monolith. |
+| `document_catalog_summary.json` | `generated_at` (`_envelope.generated_at`) | **L0 document summary (< 100 KB)** across SSI, Google Drive, and `research-vault`. Full line-oriented catalog lives at `_system/data/catalog/documents.jsonl`. |
+| `agent_shards/{TICKER}.json` | `generated_at` (`_envelope.generated_at`) | **L1 per-ticker agent shard (10-35 KB)** combining registry metadata, `thesis_summary`, top KPIs, recent high-confidence news, documents, and L2 file pointers. |
 
-These files are generated. A bot reads them. A correction goes out as a pull request from a cloud agent or the GitHub connector.
+These files are generated. A bot reads them using **Progressive Disclosure (`L0 -> L1 -> L2`)**: start with the L0 summary files (`portfolio_summary.json`, `research_manifest.json`, `kpi_summary.json`), open `dashboard/data/agent_shards/{TICKER}.json` or `{TICKER}/research/thesis_card.json` (L1) only for candidate tickers, and open `{TICKER}/research/evidence/filing_digest.md`, `insider_signal.md`, `thematic_context.md`, or `_text/*.txt` (L2) only when verifying specific numbers. A correction goes out as a pull request from a cloud agent or the GitHub connector.
 
 ## Portfolio registry
 

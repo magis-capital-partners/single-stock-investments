@@ -5,16 +5,18 @@ name: Data Pipeline
 on:
   repository_dispatch:
     types: [heal-technicals, heal-warrants, heal-separations, heal-reverse-splits]
+  # Off the hour and off :30: top-of-hour crons queue for hours on GitHub's
+  # scheduler. Odd minutes keep the same cadence and the same ET windows.
   schedule:
-    - cron: "0 3 * * *"     # nightly intake-full
-    - cron: "15 2 * * 1-5"  # weekday technical fear/capitulation refresh
-    - cron: "0 6 * * *"     # activist scan
-    - cron: "0 12 * * 1,2,4,5,6" # light portfolio refresh
-    - cron: "0 10 * * 0,3"  # full document harvest twice weekly
-    - cron: "0 14 * * *"    # drive intake (daily)
-    - cron: "30 */6 * * *"  # portfolio news
-    - cron: "0 15 * * 1"    # CVR + warrant + separation discovery Mondays
-    - cron: "0 16 * * 0"    # World Model weekly (Sunday UTC: themes + KPI ledgers + strip)
+    - cron: "7 3 * * *"     # nightly intake-full
+    - cron: "17 2 * * 1-5"  # weekday technical fear/capitulation refresh
+    - cron: "11 6 * * *"     # activist scan
+    - cron: "23 12 * * 1,2,4,5,6" # light portfolio refresh
+    - cron: "23 10 * * 0,3"  # full document harvest twice weekly
+    - cron: "41 14 * * *"    # drive intake (daily)
+    - cron: "47 */6 * * *"  # portfolio news
+    - cron: "13 15 * * 1"    # CVR + warrant + separation discovery Mondays
+    - cron: "43 16 * * 0"    # World Model weekly (Sunday UTC: themes + KPI ledgers + strip)
 
 # Concurrency: each job below takes its own queue (data-commit-main-<job>)
 # rather than one shared "data-commit-main" group. GitHub Actions keeps at most
@@ -63,15 +65,15 @@ jobs:
             "dispatch:heal-warrants") warrant_discover=true ;;
             "dispatch:heal-separations") separation_discover=true ;;
             "dispatch:heal-reverse-splits") reverse_splits=true ;;
-            "0 3 * * *") intake_full=true ;;
-            "15 2 * * 1-5") technicals=true ;;
-            "0 6 * * *") activist=true ;;
-            "0 12 * * 1,2,4,5,6") downloads=true; download_mode=light ;;
-            "0 10 * * 0,3") downloads=true; download_mode=full ;;
-            "0 14 * * *") drive=true ;;
-            "30 */6 * * *") news=true ;;
-            "0 15 * * 1") cvr_discover=true; warrant_discover=true; separation_discover=true; reverse_splits=true ;;
-            "0 16 * * 0") world_model=true ;;
+            "7 3 * * *") intake_full=true ;;
+            "17 2 * * 1-5") technicals=true ;;
+            "11 6 * * *") activist=true ;;
+            "23 12 * * 1,2,4,5,6") downloads=true; download_mode=light ;;
+            "23 10 * * 0,3") downloads=true; download_mode=full ;;
+            "41 14 * * *") drive=true ;;
+            "47 */6 * * *") news=true ;;
+            "13 15 * * 1") cvr_discover=true; warrant_discover=true; separation_discover=true; reverse_splits=true ;;
+            "43 16 * * 0") world_model=true ;;
             *) echo "::error::Unrecognized schedule='$SCHEDULE'"; exit 1 ;;
           esac
           {
@@ -742,17 +744,26 @@ jobs:
           python-version: "3.12"
       - name: Install dependencies
         run: pip install -r _system/scripts/requirements-news.txt
+      # Duplicate-run guard: a run GitHub started hours late can land within
+      # half a cadence of the run that just built the feed. Re-ingesting the
+      # same window over every holding costs up to 45 minutes and finds
+      # almost nothing (the ingester deduplicates on news_seen.json). Fails
+      # open: an unreadable feed runs the ingest.
+      - id: preflight
+        name: Skip a duplicate news ingest
+        run: python _system/scripts/pipeline_preflight.py news --feed dashboard/data/portfolio_news.json
       # The ingester exits 1 AFTER writing its partial feed when under half the
       # holdings were refreshed (or the `timeout` backstop fires). The step
       # continues so that feed is still committed; the last step turns red.
       - id: ingest
         name: Ingest portfolio news
+        if: steps.preflight.outputs.changed == 'true'
         continue-on-error: true
         working-directory: _system/scripts
         run: timeout --kill-after=60s 55m python ingest_portfolio_news.py
       - name: Commit news artifacts
         run: |
-          git add dashboard/data/portfolio_news.json _system/data/news_seen.json _system/reviews/pending/news_*.md
+          git add -A -- dashboard/data/portfolio_news.json _system/data/news_seen.json '_system/reviews/pending/news_*.md' 2>/dev/null || true
           git add '*/research/news/news_index.json' 2>/dev/null || true
           bash _system/scripts/ci_push_main.sh "chore: refresh portfolio news $(date -u +%Y-%m-%d)"
       - name: Keep a mostly-failed news run red after committing its partial feed
@@ -1054,7 +1065,7 @@ jobs:
       - uses: actions/setup-python@v5
         with:
           python-version: "3.12"
-      - name: World Model monthly rebuild
+      - name: World Model weekly rebuild
         uses: ./.github/actions/rebuild-data
         env:
           OAUTH_CLIENT_ID: ${{ vars.OAUTH_CLIENT_ID }}
