@@ -824,7 +824,18 @@
   .nav-badge { padding: 1px 4px; border: 1px solid rgba(245,158,11,.42); color: var(--accent-amber); font: 700 7px 'JetBrains Mono', monospace; letter-spacing: .08em; }
   #tbody tr, tr[data-ticker], tr[data-activist-report], thead th[data-sort] { cursor: pointer; }
   #darwin-content,#insights-content,#activist-content,#watchlist-content,#valuation-content,#risk-content { max-width: 1680px; margin: 0 auto; }
-  .darwin-workbench-nav { margin: -2px 0 18px; padding: 0; background: transparent; }
+  .dcc-cards { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 8px; margin: 14px 0 18px; }
+  @media (max-width: 760px) { .dcc-cards { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+  .dcc-scroll { overflow-x: auto; }
+  .dcc-chip { display: inline-block; margin: 1px 4px 1px 0; padding: 1px 7px; border: 1px solid var(--border); border-radius: 999px; font-size: 11px; white-space: nowrap; }
+  .dcc-muted { color: var(--text-muted); }
+  .dcc-pos { color: var(--positive); } .dcc-neg { color: var(--negative); }
+  .dcc-text { max-width: 78ch; font-size: 13px; line-height: 1.55; }
+  .dcc-list { margin: 6px 0 10px 18px; font-size: 13px; line-height: 1.55; }
+  .dcc-filters { display: flex; flex-wrap: wrap; gap: 10px 16px; align-items: center; margin: 8px 0 10px; font-size: 12px; }
+  .dcc-filters label { display: inline-flex; gap: 6px; align-items: center; }
+  .dcc-two { display: grid; grid-template-columns: 1fr 1fr; gap: 24px; }
+  @media (max-width: 980px) { .dcc-two { grid-template-columns: 1fr; } }
   .operator-empty { display: grid; gap: 5px; min-height: 100px; place-items: center; align-content: center; padding: 20px; border: 1px dashed var(--border); color: var(--text-muted); text-align: center; }
   .operator-empty strong { color: var(--text-secondary); font-size: 13px; }
   .operator-empty span { max-width: 620px; font-size: 11px; line-height: 1.5; }
@@ -1180,8 +1191,6 @@
   .wm-spark { color: var(--text-secondary); }
   .wm-table { max-width: 100%; margin-top: 6px; }
 
-  .darwin-charts { display: grid; grid-template-columns: 1fr; gap: 16px; margin-bottom: 20px; }
-  @media (min-width: 900px) { .darwin-charts.split { grid-template-columns: 1fr 1fr; } }
 
   .main.model-expanded { grid-template-columns: 1fr minmax(440px, 44vw); }
   .main.model-expanded .detail {
@@ -1805,7 +1814,7 @@
   <nav class="view-tabs workspace-subnav" id="strategies-subnav" aria-label="Strategies" hidden>
     <a class="view-tab" data-view="spx-0dte" href="#/strategies/spx-0dte/overview">SPX 0DTE</a>
     <a class="view-tab" data-view="letf" href="#/strategies/ls-algo/overview">LS Algo</a>
-    <a class="view-tab" data-view="darwin" href="#/strategies/darwin/overview">Darwin <span class="nav-badge">PAPER</span></a>
+    <a class="view-tab" data-view="darwin" href="#/strategies/darwin/overview">Darwin CC <span class="nav-badge">SIGNAL</span></a>
   </nav>
   <nav class="view-tabs workspace-subnav" id="research-subnav" aria-label="Research" hidden>
     <a class="view-tab" data-view="holdings" href="#/research/coverage">Coverage</a>
@@ -1864,10 +1873,7 @@
   </div>
 
   <section class="darwin-panel" id="darwin-panel">
-    <p class="subhead" id="darwin-account-badge" style="margin-bottom:12px">
-      <span class="badge badge-purple">Roth IRA</span> paper book · Darwin is IRA-only (taxable track retired)
-    </p>
-    <div class="loading" id="darwin-loading">Loading Darwin portfolio…</div>
+    <div class="loading" id="darwin-loading">Loading the covered-call signal…</div>
     <div id="darwin-content" style="display:none"></div>
   </section>
 
@@ -1966,7 +1972,7 @@
 </div>
 
 <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
-<script src="darwin-viz.js"></script>
+<script src="darwin-cc-viz.js"></script>
 <script src="equity-model-viz.js"></script>
 <script src="search-match.js"></script>
 <script src="energy-model-viz.js?v=20261015-energy"></script>
@@ -2174,7 +2180,6 @@ function syncHoldingsQuery() {
 }
 let activeView = 'portfolio';
 let valuationOpenEvidenceTab = false;
-let activeDarwinAccount = 'roth';
 let expandedPersona = null;
 let activeInsightFilter = 'letters';
 let insightsQuarter = 'latest';
@@ -2269,8 +2274,6 @@ let consensusViewMode = (() => {
 })();
 let consensusSelectedTicker = null;
 let consensusFundId = null;
-let darwinEquityChart = null;
-let darwinHoldingsChart = null;
 let darwinViewMode = 'overview';
 
 const ROUTE_STORAGE_KEY = 'ssp_dashboard_route_v1';
@@ -2524,22 +2527,6 @@ function applyRouteFromHash() {
   }
   return false;
 }
-
-const DARWIN_METHOD_LABELS = {
-  ira_marvin: 'Legacy IRA Marvin',
-  research_committee: 'IRA Research Committee',
-  equal_weight: 'Equal weight',
-  irr_ranked: 'IRR ranked',
-  risk_parity_vol: 'Risk parity',
-  genetic: 'Genetic',
-  ppo: 'PPO',
-  ensemble: 'Ensemble',
-  champion: 'Champion (live)',
-  spy: 'SPY',
-  covered_call: 'Covered call (sim)',
-  xyld: 'XYLD (ETF proxy)',
-  bxm: 'BXM (ETF proxy)',
-};
 
 const CHART_COLORS = [
   '#3b82f6', '#06b6d4', '#10b981', '#8b5cf6', '#f59e0b', '#ef4444',
@@ -3383,11 +3370,7 @@ function loadLazyFile(key) {
     document_catalog: () => loadShardOnce('file:document_catalog', 'data/document_catalog.json', (doc) => { data.document_catalog = doc; }),
     activist_feed: () => loadShardOnce('file:activist_feed', 'data/activist_feed.json', (doc) => { data.activist_feed = doc; }),
     activist_discovery: () => loadShardOnce('file:activist_discovery', 'data/activist_filer_discovery.json', (doc) => { data.activist_discovery = doc; }),
-    darwin_bundle: () => loadShardOnce('file:darwin_bundle', 'data/darwin_bundle.json', (doc) => {
-      if (doc.darwin) data.darwin = doc.darwin;
-      if (doc.darwin_accounts) data.darwin_accounts = doc.darwin_accounts;
-      if (doc.darwin_serving) data.darwin_serving = doc.darwin_serving;
-    }),
+    darwin_cc: () => loadShardOnce('file:darwin_cc', 'data/darwin_cc.json', (doc) => { data.darwin_cc = doc; }),
   };
   return loaders[key] ? loaders[key]() : Promise.resolve();
 }
@@ -3515,8 +3498,8 @@ async function load() {
     const res = await fetch('data/dashboard_data.json?' + Date.now());
     data = await res.json();
     data.tickers.forEach((t) => { t.__detail = true; });
-    ['kpi_trends', 'document_catalog', 'activist_feed', 'darwin', 'darwin_accounts', 'darwin_serving']
-      .forEach((k) => { if (data[k] != null) loadedShards.add(`file:${k === 'darwin' || k === 'darwin_accounts' || k === 'darwin_serving' ? 'darwin_bundle' : k}`); });
+    ['kpi_trends', 'document_catalog', 'activist_feed']
+      .forEach((k) => { if (data[k] != null) loadedShards.add(`file:${k}`); });
     try {
       data.insights = data.insights || {};
       await loadInsightsSection(insightsSection);
@@ -3539,6 +3522,14 @@ async function load() {
       data.market_risk = null;
       data.market_risk_origin = 'missing';
     }
+  }
+  try {
+    const quoteResponse = await fetch('/api/v1/quotes?symbols=SPY,QQQ', {
+      headers: { accept: 'application/json' },
+    });
+    data.quotes = quoteResponse.ok ? await quoteResponse.json() : null;
+  } catch (_) {
+    data.quotes = null;
   }
   try {
     const componentFallback = await fetchShardJson('data/market_risk_components.json');
@@ -3609,12 +3600,6 @@ async function load() {
   else if (activeView === 'watchlist') renderWatchlistTab();
 }
 
-function setDarwinAccount(_aid) {
-  // IRA-only: production track is always Roth.
-  activeDarwinAccount = 'roth';
-  renderDarwin();
-}
-
 function renderMarketRiskView() {
   const loading = document.getElementById('risk-loading');
   const content = document.getElementById('risk-content');
@@ -3652,7 +3637,11 @@ function renderMarketRiskView() {
       ? 'Committed market_risk_components.json fallback'
       : 'Market risk source unavailable');
   const riskClock = `<p class="tier-sub" style="margin:0 0 10px">${escapeHtml(riskOrigin)}. ${feedNotice('market-risk')} ${feedNotice('market-risk-components')}</p>`;
-  content.innerHTML = `${riskClock}${CriticalityViz.renderRegimeVerdict(riskOptions)}${CriticalityViz.renderRiskView(
+  const quoteRows = (data.quotes?.quotes || []).filter(q => q.price != null);
+  const quotesLine = quoteRows.length
+    ? `<p class="tier-sub" style="margin:0 0 10px">${quoteRows.map(q => `${escapeHtml(q.symbol)} ${Number(q.price).toLocaleString(undefined, { maximumFractionDigits: 2 })}${q.change_pct != null ? ` (${q.change_pct >= 0 ? '+' : ''}${q.change_pct}%)` : ''}${q.stale ? ' · stale' : ''} · as of ${escapeHtml(String(q.as_of || '').slice(0, 16).replace('T', ' '))}`).join(' &nbsp; ')}</p>`
+    : '';
+  content.innerHTML = `${riskClock}${quotesLine}${CriticalityViz.renderRegimeVerdict(riskOptions)}${CriticalityViz.renderRiskView(
     data.market_risk,
     data.market_risk_details || {},
     riskOptions,
@@ -4697,300 +4686,34 @@ function renderInsights(opts = {}) {
 }
 
 function renderDarwin() {
-  if (window.DarwinViz) DarwinViz.destroyCharts();
   const loading = document.getElementById('darwin-loading');
   const content = document.getElementById('darwin-content');
-  if (!data.darwin_serving && !data.darwin_accounts && !data.darwin
-      && !loadedShards.has('file:darwin_bundle')) {
-    loading.textContent = 'Loading Darwin portfolio…';
+  if (!data.darwin_cc && !loadedShards.has('file:darwin_cc')) {
+    loading.textContent = 'Loading the covered-call signal…';
     loading.style.display = '';
     content.style.display = 'none';
     if (activeView === 'darwin') {
-      loadLazyFile('darwin_bundle').then(
+      loadLazyFile('darwin_cc').then(
         () => renderDarwin(),
         () => {
-          loading.textContent = 'Darwin paper portfolio unavailable · the scheduled strategy build has not published a serving artifact.';
+          loading.innerHTML = `Covered-call signal unavailable · the Darwin Covered Call workflow has not published data/darwin_cc.json. ${feedNotice('darwin')}`;
         },
       );
     }
     return;
   }
-  const serving = data.darwin_serving || {};
-  const bundle = data.darwin_accounts || {};
-  const acctRow = (serving.accounts || {})[activeDarwinAccount] || {};
-  const d = acctRow.portfolio || bundle[activeDarwinAccount] || data.darwin;
-  const paper = acctRow.paper
-    ? { last_mark: acctRow.paper, inception_date: acctRow.paper_inception, status: acctRow.paper_status, legacy_quarantine: acctRow.paper_legacy_quarantine }
-    : (bundle['paper_' + activeDarwinAccount] || {});
-  if (!d) {
-    loading.textContent = 'Darwin paper portfolio unavailable · the scheduled strategy build has not published a serving artifact.';
+  const doc = data.darwin_cc;
+  if (!doc || !window.DarwinCCViz) {
+    loading.innerHTML = `Covered-call signal unavailable. ${feedNotice('darwin')}`;
+    loading.style.display = '';
     content.style.display = 'none';
     return;
   }
   loading.style.display = 'none';
   content.style.display = 'block';
-  const champ = d.benchmarks?.champion || {};
-  const paperMark = paper.last_mark || d.paper_portfolio?.last_mark || {};
-  const btInception = paper.backtest_at_inception || d.paper_portfolio?.backtest_at_inception || {};
-  const acctLabel = 'Roth IRA';
-  const spy = d.benchmarks?.spy || {};
-  const ccBench = d.benchmarks?.covered_call || {};
-  const ccCfg = d.covered_call || {};
-  const proxyKey = (ccCfg.etf_proxy_ticker || '').toLowerCase();
-  const proxyBench = proxyKey ? (d.benchmarks?.[proxyKey] || {}) : {};
-  const regime = typeof d.regime === 'object' ? d.regime : { label: d.regime };
-  const macro = regime.macro_detail || {};
-  const conflicts = d.conflicts || [];
-  const reviews = d.human_review || [];
-  const turnoverOk = (d.turnover_used_pct ?? 0) <= (d.turnover_budget_pct ?? 15);
-  const excessVsSpy = champ.cumulative_return != null && spy.cumulative_return != null
-    ? ((champ.cumulative_return - spy.cumulative_return) * 100).toFixed(1) : null;
-  const excessCcVsSpy = ccBench.cumulative_return != null && spy.cumulative_return != null && !ccBench.error
-    ? ((ccBench.cumulative_return - spy.cumulative_return) * 100).toFixed(1) : null;
-  const univSpec = d.universe_spec || d.mandate?.universe || '—';
-  const univSpecEff = d.universe_spec_effective || univSpec;
-  const univCount = d.universe_count != null ? d.universe_count : (d.weights || []).length;
-  const univEx = d.universe_exclusions || {};
-  const univBy = univEx.by_reason || {};
-  const univSamples = univEx.samples || {};
-  const liqFallback = !!univEx.liquidity_fallback;
-  const coverageOk = univEx.coverage_gate_ok !== false;
-  const fmtPct = (v) => v != null && !Number.isNaN(v) ? (v * 100).toFixed(1) + '%' : '—';
-  const fmtSharpe = (v) => v != null ? v : '—';
-  const strategyRows = [
-    { key: 'champion', label: 'Champion (long-only)', b: champ },
-    { key: 'covered_call', label: 'Covered call (sim)', b: ccBench },
-    { key: 'spy', label: 'SPY', b: spy },
-  ];
-  if (proxyKey && proxyBench && !proxyBench.error) {
-    strategyRows.push({ key: proxyKey, label: proxyKey.toUpperCase() + ' (ETF proxy)', b: proxyBench });
-  }
-  const exclusionRows = [
-    { key: 'not_in_sp500', label: 'Not in S&P 500' },
-    { key: 'adr_otc', label: 'ADR / OTC' },
-    { key: 'liquidity_miss', label: 'Liquidity miss (bucket C/D)' },
-    { key: 'no_options', label: 'No options flag' },
-    { key: 'returns_missing', label: 'Missing returns CSV' },
-    { key: 'research_eligibility_miss', label: 'Deep-dive research gate' },
-  ];
-  content.innerHTML = `
-    <h2 style="font-size:18px;margin-bottom:6px">Darwin · ${escapeHtml(acctLabel)} paper book</h2>
-    <p class="subhead" style="margin-bottom:14px">
-      Tier ${escapeHtml(String(d.tier ?? '0'))} · ${escapeHtml(d.generated_at || '')}${feedStaleBadge(d.generated_at, 'darwin')} · phase ${escapeHtml(d.phase || '—')}
-      · <span class="badge badge-purple">${escapeHtml(d.account_profile || activeDarwinAccount)}</span>
-      · policy <span class="mono">${escapeHtml(d.policy_id || '—')}</span>
-      · universe <span class="mono">${escapeHtml(univSpec)}</span>${univSpecEff && univSpecEff !== univSpec ? ` → <span class="mono">${escapeHtml(univSpecEff)}</span>` : ''}${univCount != null ? ` · ${univCount} eligible` : ''}
-      ${liqFallback ? ' · <span class="badge badge-warn">liquidity fallback</span>' : ''}
-      ${!coverageOk ? ' · <span class="badge badge-warn">coverage gate</span>' : ' · <span class="badge badge-ok">coverage ≥20</span>'}
-      ${d.exploration?.enabled ? ' · <span class="badge badge-purple">exploration</span>' : ''}
-      ${d.benchmarks?.ml_selected === false && !d.exploration?.enabled ? ' · <span class="badge badge-warn">ML gated</span>' : ''}
-      ${d.pit?.audit_pass === false ? ' · <span class="badge badge-warn">PIT leak</span>' : (d.pit?.audit_pass ? ' · <span class="badge badge-ok">PIT ok</span>' : '')}
-      ${d.pit?.ml_oos_eligible ? ' · <span class="badge badge-ok">OOS ML</span>' : ''}
-      ${d.policy_detail?.ensemble ? ' · <span class="badge badge-ok">ensemble</span>' : ''}
-      ${paper.status ? ` · <span class="badge badge-purple">${escapeHtml(paper.status.replace(/_/g, ' '))}</span>` : ''}
-      ${paper.legacy_quarantine ? ' · <span class="badge badge-warn">legacy NAV quarantined</span>' : ''}
-    </p>
-    ${liqFallback ? `<div class="liquidity-banner"><strong>Liquidity feed missing or stale</strong>. Registry membership is being used as a fallback, so liquidity buckets A/B are not enforced. ${feedNotice('darwin')}</div>` : ''}
-    <div class="detail-section">
-      <h3>Universe eligibility (Phase A)</h3>
-      <p class="subhead" style="margin-bottom:10px">
-        Eligible ${univEx.eligible_count ?? univCount ?? '—'}
-        · with returns ${univEx.eligible_with_returns ?? '—'}
-        · excluded total ${univEx.excluded_total ?? '—'}
-        · liquidity as-of ${escapeHtml((univEx.liquidity && univEx.liquidity.as_of) || (d.liquidity && d.liquidity.as_of) || '—')}
-        · SPX ${escapeHtml((d.sp500 && d.sp500.as_of) || '—')} (${(d.sp500 && d.sp500.count) || '—'} names)
-      </p>
-      <table class="darwin-table">
-        <thead><tr><th>Reason</th><th>Count</th><th>Sample</th></tr></thead>
-        <tbody>${exclusionRows.map(row => {
-          const n = univBy[row.key];
-          if (n == null) return '';
-          const sample = (univSamples[row.key] || []).slice(0, 8).join(', ') || '—';
-          return `<tr><td>${escapeHtml(row.label)}</td><td class="mono">${n}</td><td class="mono" style="font-size:11px">${escapeHtml(sample)}</td></tr>`;
-        }).join('')}</tbody>
-      </table>
-    </div>
-    ${conflicts.length ? `<div class="conflict-banner"><strong>Decision-authority conflicts — review before trade</strong><ul style="margin-top:8px;padding-left:18px">${conflicts.map(c => `<li>${escapeHtml(c.ticker)}: ${escapeHtml(c.reason || '')} (${c.weight_pct || '?'}%)</li>`).join('')}</ul></div>` : ''}
-    ${reviews.filter(r => r.severity === 'warn').length ? `<div class="conflict-banner" style="border-color:rgba(245,158,11,0.4);background:rgba(245,158,11,0.08)"><strong>Warnings</strong><ul style="margin-top:8px;padding-left:18px">${reviews.filter(r => r.severity === 'warn').map(r => `<li>${escapeHtml(r.ticker)}: ${escapeHtml(r.reason)}</li>`).join('')}</ul></div>` : ''}
-    <div class="detail-section">
-      <h3>Backtest vs paper (live tracking)</h3>
-      <table class="darwin-table">
-        <thead><tr><th>Track</th><th>Cumulative</th><th>Sharpe</th><th>Note</th></tr></thead>
-        <tbody>
-          <tr><td class="mono">In-sample backtest</td><td>${champ.cumulative_return != null ? (champ.cumulative_return*100).toFixed(1)+'%' : '—'}</td><td>${champ.sharpe_annualized ?? '—'}</td><td>Walk-forward sim on monthly returns</td></tr>
-          <tr style="background:var(--bg-card)"><td class="mono">Paper book</td><td>${paperMark.cumulative_return_pct != null ? paperMark.cumulative_return_pct+'%' : '0%'}</td><td>—</td><td>Since ${escapeHtml(paper.inception_date || paperMark.date || 'inception')} · NAV ${paperMark.nav_usd == null ? '—' : fmtUsd(paperMark.nav_usd, 0)}</td></tr>
-          <tr><td class="mono">Backtest at paper start</td><td>${btInception.cumulative_return_pct != null ? btInception.cumulative_return_pct+'%' : '—'}</td><td>${btInception.sharpe_annualized ?? '—'}</td><td>Reference when paper opened</td></tr>
-        </tbody>
-      </table>
-      <p class="subhead" style="margin-top:8px">Paper NAV is event-sourced from immutable monthly return periods. Weight changes apply at the next scheduled strategy refresh.</p>
-    </div>
-    ${d.portfolio_explanation && window.DarwinViz ? DarwinViz.renderExplanation(d.portfolio_explanation, escapeHtml) : ''}
-    ${d.visualization && window.DarwinViz ? DarwinViz.renderPerfTable(d.visualization, escapeHtml) : ''}
-    ${d.visualization && window.DarwinViz ? DarwinViz.renderChartsHtml() : ''}
-    <div class="darwin-grid">
-      <div class="summary-card"><div class="label">Regime</div><div class="value" style="font-size:16px">${escapeHtml(regime.label || '—')}</div><div class="sub">research ${escapeHtml(regime.research || '—')} · macro ${escapeHtml(regime.macro || '—')}</div></div>
-      <div class="summary-card"><div class="label">Turnover</div><div class="value" style="font-size:16px;color:${turnoverOk ? 'var(--accent-green)' : 'var(--accent-amber)'}">${d.turnover_used_pct ?? '—'}%</div><div class="sub">budget ${d.turnover_budget_pct ?? 15}% · ${escapeHtml(d.rebalance_frequency || '')}</div></div>
-      <div class="summary-card"><div class="label">Sharpe (prod)</div><div class="value" style="font-size:16px">${champ.sharpe_annualized ?? '—'}</div><div class="sub">vs SPY ${spy.sharpe_annualized ?? '—'}${!ccBench.error && ccBench.sharpe_annualized != null ? ' · vs CC ' + ccBench.sharpe_annualized : ''}</div></div>
-      <div class="summary-card"><div class="label">Sharpe (PIT OOS)</div><div class="value" style="font-size:16px">${d.pit?.oos_sharpe_genetic ?? '—'}</div><div class="sub">genetic · ${d.pit?.oos_periods ?? '—'} periods</div></div>
-      <div class="summary-card"><div class="label">Cumulative</div><div class="value" style="font-size:16px">${champ.cumulative_return != null ? (champ.cumulative_return * 100).toFixed(1) + '%' : '—'}</div><div class="sub">${excessVsSpy != null ? 'excess vs SPY ' + excessVsSpy + 'pp' : 'log compounding'}${excessCcVsSpy != null ? ' · CC excess ' + excessCcVsSpy + 'pp' : ''}</div></div>
-      <div class="summary-card"><div class="label">Macro</div><div class="value" style="font-size:14px">VIX ${macro.vix ?? '—'}</div><div class="sub">10Y ${macro.yield_10y ?? '—'}% · ${macro.as_of_month || 'n/a'}</div></div>
-      <div class="summary-card"><div class="label">Evolution</div><div class="value" style="font-size:14px">${d.policy_detail?.population_loaded ?? 0} seeds</div><div class="sub">${(d.price_panel?.months || 0)} mo history</div></div>
-      <div class="summary-card"><div class="label">Cash reserve</div><div class="value" style="font-size:16px">${d.cash_weight_pct != null ? d.cash_weight_pct + '%' : '0%'}</div><div class="sub">unallocated when research caps limit exposure</div></div>
-    </div>
-    <div class="detail-section">
-      <h3>Target weights (Investment Committee + Darwin)</h3>
-      <table class="darwin-table">
-        <thead><tr><th>Ticker</th><th>Weight</th><th>Δ vs last</th><th>Stance</th><th>IRR</th><th>Trade?</th></tr></thead>
-        <tbody>${(d.weights || []).map(w => `<tr>
-          <td class="mono ticker-cell">${escapeHtml(w.ticker)}</td>
-          <td class="mono">${w.weight_pct}%</td>
-          <td class="mono">${w.delta >= 0 ? '+' : ''}${(w.delta * 100).toFixed(1)}%</td>
-          <td><span class="badge ${STANCE_BADGE[w.stance] || 'badge-warn'}">${escapeHtml(w.stance || '—')}</span></td>
-          <td class="mono">${w.irr_base_pct != null ? w.irr_base_pct + '%' : '—'}</td>
-          <td>${w.trade_suggested ? '<span class="badge badge-warn">review</span>' : '—'}</td>
-        </tr>`).join('')}</tbody>
-      </table>
-    </div>
-    ${d.policy_detail?.ensemble ? `<div class="detail-section"><h3>Ensemble blend</h3><table class="darwin-table"><thead><tr><th>Policy</th><th>Blend weight</th><th>Score</th></tr></thead><tbody>${d.policy_detail.ensemble.map(e => `<tr><td class="mono">${escapeHtml(e.policy)}</td><td>${(e.weight_in_ensemble * 100).toFixed(0)}%</td><td>${e.score}</td></tr>`).join('')}</tbody></table></div>` : ''}
-    ${d.pit_status ? `<div class="detail-section"><h3>PIT discipline</h3><p class="subhead">Audit ${d.pit_status.audit_pass ? 'pass' : 'fail'} · leakage ${d.pit_status.leakage_count ?? 0} · track <span class="mono">darwin_pit_status_history.jsonl</span></p></div>` : ''}
-    ${d.observatory ? `<div class="detail-section"><h3>Market observatory</h3>
-      <p class="subhead">Regime ${escapeHtml((d.observatory.regime || {}).label || '—')} · stale research ${((d.observatory.research_stress || {}).stale_research_pct || 0) * 100}% · falsifiers ${(d.observatory.research_stress || {}).falsifier_count_total ?? 0}</p>
-      ${(d.observatory.magis_risk_book || {}).gross_exposure_pct_nav != null ? `<p class="subhead">MAGIS book: gross ${d.observatory.magis_risk_book.gross_exposure_pct_nav}% NAV · net ${d.observatory.magis_risk_book.net_exposure_pct_nav}% · breaches ${d.observatory.magis_risk_book.breach_count ?? 0}</p>` : '<p class="subhead">Link ls-algo risk dashboard via DARWIN_LS_ALGO_ROOT</p>'}
-      ${d.regime_brief ? `<p class="subhead">Brief: <span class="mono">${escapeHtml(d.regime_brief)}</span></p>` : ''}
-    </div>` : ''}
-    ${d.bias_scan && (d.bias_scan.flags || []).length ? `<div class="detail-section"><h3>Bias scan</h3>
-      <p class="subhead">${d.bias_scan.flag_count} flags · pass ${d.bias_scan.pass ? 'yes' : 'no'}</p>
-      <ul class="dev-list">${(d.bias_scan.flags || []).slice(0, 12).map(f => `<li><span class="mono">${escapeHtml(f.ticker)}</span> · ${escapeHtml(f.bias)} (${escapeHtml(f.severity)})</li>`).join('')}</ul>
-    </div>` : ''}
-    ${d.stress_simulation ? `<div class="detail-section"><h3>Stress simulation</h3>
-      ${d.stress_simulation.error ? `<p class="subhead">${escapeHtml(d.stress_simulation.error)} (${d.stress_simulation.months ?? 0} mo history — need longer panel)</p>` : `<p class="subhead">Bootstrap ${d.stress_simulation.n_paths} paths · p10 ${(d.stress_simulation.p10_cumulative * 100).toFixed(1)}% · p50 ${(d.stress_simulation.p50_cumulative * 100).toFixed(1)}% · p90 ${(d.stress_simulation.p90_cumulative * 100).toFixed(1)}%</p>`}
-    </div>` : ''}
-    <div class="detail-section">
-      <h3>Benchmarks (in-sample production sim)</h3>
-      <table class="darwin-table">
-        <thead><tr><th>Policy</th><th>Sharpe</th><th>Cum ret</th><th>Turnover</th></tr></thead>
-        <tbody>${['research_committee','ira_marvin','equal_weight','irr_ranked','champion','spy'].concat(d.tier === 0 ? [] : ['risk_parity_vol','genetic','ppo','ensemble']).concat((!ccBench.error && ccBench.periods) ? ['covered_call'] : []).concat((proxyKey && proxyBench && !proxyBench.error) ? [proxyKey] : []).map(k => {
-          const b = d.benchmarks?.[k] || {};
-          if (b.error) return '';
-          const hi = k === (d.policy_id === 'ensemble' ? 'ensemble' : d.policy_id) || k === 'champion';
-          const label = (window.DarwinViz && DarwinViz.labels && DarwinViz.labels[k]) || DARWIN_METHOD_LABELS[k] || k;
-          return `<tr style="${hi ? 'background:var(--bg-card)' : ''}"><td class="mono">${escapeHtml(label)}${hi ? ' ★' : ''}</td><td>${b.sharpe_annualized ?? '—'}</td><td>${b.cumulative_return != null ? (b.cumulative_return*100).toFixed(1)+'%' : '—'}</td><td>${b.avg_turnover_one_way != null ? (b.avg_turnover_one_way*100).toFixed(1)+'%' : '—'}</td></tr>`;
-        }).join('')}</tbody>
-      </table>
-    </div>
-    <div class="detail-section">
-      <h3>Covered-call strategy (S&amp;P liquidity book)</h3>
-      <p class="subhead" style="margin-bottom:10px">
-        Allocation universe is registry holdings that are also in the S&amp;P 500 (liquidity / SPY-comparable screen from the Darwin AI Ventures meeting).
-        The covered-call track is a <strong>synthetic</strong> monthly buy-write overlay on champion weights (premium + upside cap × coverage).
-        It is <strong>not</strong> the proprietary Darwin AI Ventures neural-network model.
-        Short-dated call writing is researched here inside an IRA (no capital-gains drag inside the account).
-      </p>
-      <table class="darwin-table" style="margin-bottom:12px">
-        <thead><tr><th>Param</th><th>Value</th></tr></thead>
-        <tbody>
-          <tr><td>Mode</td><td class="mono">${escapeHtml(ccCfg.mode || '—')}</td></tr>
-          <tr><td>Premium yield (annual)</td><td class="mono">${ccCfg.premium_yield_annual_pct != null ? ccCfg.premium_yield_annual_pct + '%' : '—'}</td></tr>
-          <tr><td>Upside cap (monthly)</td><td class="mono">${ccCfg.upside_cap_monthly_pct != null ? ccCfg.upside_cap_monthly_pct + '%' : '—'}</td></tr>
-          <tr><td>Coverage fraction</td><td class="mono">${ccCfg.coverage_fraction != null ? (ccCfg.coverage_fraction * 100).toFixed(0) + '%' : '—'}</td></tr>
-          <tr><td>Tenor / OTM</td><td class="mono">${ccCfg.tenor_days != null ? ccCfg.tenor_days + 'd' : '—'} / ${ccCfg.otm_pct != null ? ccCfg.otm_pct + '%' : '—'}</td></tr>
-          <tr><td>Bid-ask haircut / assignment</td><td class="mono">${ccCfg.bid_ask_haircut != null ? (ccCfg.bid_ask_haircut * 100).toFixed(0) + '%' : '—'} / ${ccCfg.assignment_bps != null ? ccCfg.assignment_bps + ' bps' : '—'}</td></tr>
-          <tr><td>Coverage (base → effective)</td><td class="mono">${ccCfg.coverage_fraction != null ? (ccCfg.coverage_fraction * 100).toFixed(0) + '%' : '—'}${ccCfg.coverage_fraction_effective != null ? ' → ' + (ccCfg.coverage_fraction_effective * 100).toFixed(0) + '%' : ''}${ccCfg.regime_coverage_mult != null ? ' (regime ×' + ccCfg.regime_coverage_mult + ')' : ''}</td></tr>
-          <tr><td>ETF proxy</td><td class="mono">${escapeHtml(ccCfg.etf_proxy_ticker || '—')}${proxyBench.error ? ' (returns missing)' : ''}</td></tr>
-          <tr><td>OOS dual-score gate</td><td class="mono">${escapeHtml((ccCfg.oos_gate && ccCfg.oos_gate.reason) || '—')}${ccCfg.oos_gate && ccCfg.oos_gate.passed ? ' ✓' : ''}</td></tr>
-          <tr><td>Options cache IV hits</td><td class="mono">${(ccCfg.options_cache && ccCfg.options_cache.iv_hit) != null ? ccCfg.options_cache.iv_hit + '/' + (ccCfg.options_cache.requested || '—') : '—'}</td></tr>
-          <tr><td>S&amp;P constituents as-of</td><td class="mono">${escapeHtml((d.sp500 && d.sp500.as_of) || '—')}</td></tr>
-        </tbody>
-      </table>
-      <h4 style="font-size:14px;margin:12px 0 6px">Stress cases (synthetic payoff shape)</h4>
-      <table class="darwin-table" style="margin-bottom:12px">
-        <thead><tr><th>Case</th><th>Stock</th><th>CC</th><th>Lag vs stock</th></tr></thead>
-        <tbody>${Object.entries(ccCfg.stress_cases || {}).map(([k, v]) => `<tr>
-          <td class="mono">${escapeHtml(k)}</td>
-          <td>${fmtPct(v.stock_ret)}</td>
-          <td>${fmtPct(v.cc_ret)}</td>
-          <td>${fmtPct(v.lag_vs_stock)}</td>
-        </tr>`).join('') || '<tr><td colspan="4">Not published · required fields: stock return, covered-call return, and lag vs stock · owner: Darwin model</td></tr>'}</tbody>
-      </table>
-      ${(d.cc_scenarios) ? `<h4 style="font-size:14px;margin:12px 0 6px">CC concentration scenario (max ${d.cc_scenarios.cc_concentrated_max_names || 8})</h4>
-      <p class="subhead" style="margin-bottom:8px">${escapeHtml(d.cc_scenarios.human_approve_note || '')} · production ${d.cc_scenarios.scenario_vs_production?.production_names ?? '—'} names · scenario ${d.cc_scenarios.scenario_vs_production?.scenario_names ?? '—'}</p>
-      <table class="darwin-table" style="margin-bottom:12px">
-        <thead><tr><th>Ticker</th><th>Scenario weight</th></tr></thead>
-        <tbody>${(d.cc_scenarios.scenario_cc_weights || []).slice(0, 10).map(w => `<tr>
-          <td class="mono">${escapeHtml(w.ticker)}</td><td class="mono">${w.weight_pct}%</td>
-        </tr>`).join('') || '<tr><td colspan="2">No concentrated scenario weights published · owner: Darwin model governance</td></tr>'}</tbody>
-      </table>` : ''}
-      <h4 style="font-size:14px;margin:12px 0 6px">Strategy comparison</h4>
-      <table class="darwin-table" style="margin-bottom:12px">
-        <thead><tr><th>Track</th><th>Cum ret</th><th>Ann vol</th><th>Max DD</th><th>Sharpe</th><th>Excess vs SPY</th></tr></thead>
-        <tbody>${strategyRows.map(row => {
-          const b = row.b || {};
-          if (b.error) return `<tr><td class="mono">${escapeHtml(row.label)}</td><td colspan="5">${escapeHtml(b.error)}</td></tr>`;
-          const xs = b.cumulative_return != null && spy.cumulative_return != null
-            ? ((b.cumulative_return - spy.cumulative_return) * 100).toFixed(1) + 'pp' : '—';
-          return `<tr style="${row.key === 'covered_call' || row.key === 'champion' ? 'background:var(--bg-card)' : ''}">
-            <td class="mono">${escapeHtml(row.label)}</td>
-            <td>${fmtPct(b.cumulative_return)}</td>
-            <td>${fmtPct(b.volatility_annualized)}</td>
-            <td>${fmtPct(b.max_drawdown_pct)}</td>
-            <td>${fmtSharpe(b.sharpe_annualized)}</td>
-            <td>${row.key === 'spy' ? '—' : xs}</td>
-          </tr>`;
-        }).join('')}</tbody>
-      </table>
-      <h4 style="font-size:14px;margin:12px 0 6px">Eligible book (target weights on S&amp;P names)</h4>
-      <table class="darwin-table">
-        <thead><tr><th>Ticker</th><th>Weight</th><th>Stance</th><th>IRR</th></tr></thead>
-        <tbody>${(d.weights || []).map(w => `<tr>
-          <td class="mono ticker-cell">${escapeHtml(w.ticker)}</td>
-          <td class="mono">${w.weight_pct}%</td>
-          <td><span class="badge ${STANCE_BADGE[w.stance] || 'badge-warn'}">${escapeHtml(w.stance || '—')}</span></td>
-          <td class="mono">${w.irr_base_pct != null ? w.irr_base_pct + '%' : '—'}</td>
-        </tr>`).join('') || '<tr><td colspan="4">No S&amp;P-overlap weights</td></tr>'}</tbody>
-      </table>
-      <p class="subhead" style="margin-top:8px">${escapeHtml(ccCfg.disclaimer || 'Synthetic covered-call overlay for research.')}</p>
-    </div>
-    <div class="detail-section">
-      <h3>Factor attribution</h3>
-      ${(d.attribution || []).length ? `<ul class="dev-list">${d.attribution.slice(0, 8).map(a => `<li><div class="dev-label">${escapeHtml(a.factor)}</div><div class="dev-date mono">shap ${a.shap}</div></li>`).join('')}</ul>` : '<div class="operator-empty"><strong>Factor attribution not published</strong><span>Required: factor, contribution, model version, and as-of period · owner: Darwin model governance.</span></div>'}
-    </div>
-    <div class="detail-section">
-      <h3>Evolution lineage</h3>
-      ${(d.lineage || d.evolution_log || []).length ? `<ul class="dev-list">${(d.lineage || d.evolution_log || []).map(e => `<li><div class="dev-date">${escapeHtml(e.date || e.ts || '')}</div><div class="dev-label">${escapeHtml(e.note || e.event || '')} ${e.regime ? '· ' + escapeHtml(e.regime) : ''}</div></li>`).join('')}</ul>` : '<div class="operator-empty"><strong>No model history published</strong><span>Required: version, decision, rationale, approver, and effective date · owner: Darwin model governance.</span></div>'}
-    </div>
-    <p class="form-hint" style="margin-top:16px">${escapeHtml(d.disclaimer || '')}</p>
-  `;
-  applyDarwinView(content);
-  if (d.visualization && window.DarwinViz) {
-    requestAnimationFrame(() => DarwinViz.mountCharts(d.visualization, d.policy_id || 'champion'));
-  }
-}
-
-function applyDarwinView(content) {
-  const tabs = [
-    ['overview', 'Overview'], ['portfolio', 'Portfolio'], ['performance', 'Performance'],
-    ['risk', 'Risk'], ['model-governance', 'Model Governance'], ['history', 'History'],
-  ];
-  content.insertAdjacentHTML('afterbegin', `<nav class="view-tabs darwin-workbench-nav" aria-label="Darwin sections">${tabs.map(([id, label]) => `<button type="button" class="view-tab${darwinViewMode === id ? ' active' : ''}" data-darwin-view="${id}">${label}</button>`).join('')}</nav>`);
-  const groupForTitle = (title) => {
-    const value = title.toLowerCase();
-    if (/evolution|lineage|history|rebalance/.test(value)) return 'history';
-    if (/pit|ensemble|simulation|model|champion|benchmark/.test(value)) return 'model-governance';
-    if (/stress|risk|factor|drawdown|correlation|covered.call/.test(value)) return 'risk';
-    if (/paper|performance|nav|return/.test(value)) return 'performance';
-    if (/weight|holding|portfolio|universe|eligible|trade|turnover/.test(value)) return 'portfolio';
-    return 'overview';
-  };
-  content.querySelectorAll('.detail-section').forEach((section) => {
-    const group = groupForTitle(section.querySelector('h2,h3,h4')?.textContent || '');
-    section.dataset.darwinGroup = group;
-    section.hidden = group !== darwinViewMode;
-  });
-  content.querySelectorAll('[data-darwin-view]').forEach((button) => button.addEventListener('click', () => {
-    darwinViewMode = button.dataset.darwinView;
-    syncRouteHash();
-    renderDarwin();
-  }));
+  const helpers = { escapeHtml, staleBadge: (stamp) => feedStaleBadge(stamp, 'darwin') };
+  content.innerHTML = window.DarwinCCViz.render(doc, helpers);
+  window.DarwinCCViz.bind(content, doc, helpers);
 }
 
 function setWatchlistView(sub, opts = {}) {

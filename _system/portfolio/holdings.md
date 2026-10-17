@@ -35,12 +35,14 @@ Synced from `_system/portfolio/registry.json`. Last sync: 2026-10-17.
 | ADSK | ADSK/ | Autodesk | US | 2026-07-29 | 2026-10-17 | unknown | watch |
 | AEE | AEE/ | Ameren | US | 2026-07-29 | 2026-10-17 | unknown | watch |
 | AEHR | AEHR/ | AEHR | US | 2026-07-29 | 2026-10-17 | unknown | watch |
+| AENA.MC | AENA.MC/ | Aena S.M.E., S.A. | EU | — | 2026-10-15 | unknown | watch |
 | AEP | AEP/ | American Electric Power | US | 2026-07-29 | 2026-10-17 | unknown | watch |
 | AES | AES/ | AES Corporation | US | 2026-07-29 | 2026-10-17 | unknown | watch |
 | AFL | AFL/ | Aflac | US | 2026-07-29 | 2026-10-17 | unknown | watch |
 | AFRM | AFRM/ | AFRM | US | 2026-07-29 | 2026-10-17 | unknown | watch |
 | AI | AI/ | AI | US | 2026-07-29 | 2026-10-17 | unknown | watch |
 | AIG | AIG/ | American International Group | US | 2026-08-02 | 2026-10-17 | unknown | watch |
+| AIR.PA | AIR.PA/ | Airbus SE | EU | — | 2026-10-15 | unknown | watch |
 | AIZ | AIZ/ | Assurant | US | 2026-08-02 | 2026-10-17 | unknown | watch |
 | AJG | AJG/ | Arthur J. Gallagher & Co. | US | 2026-08-02 | 2026-10-17 | unknown | watch |
 | AKAM | AKAM/ | Akamai Technologies | US | 2026-08-02 | 2026-10-17 | unknown | watch |
@@ -167,6 +169,7 @@ Synced from `_system/portfolio/registry.json`. Last sync: 2026-10-17.
 | CINF | CINF/ | Cincinnati Financial | US | 2026-09-23 | 2026-10-17 | unknown | watch |
 | CKX | CKX/ | CKX Lands, Inc. | US | 2026-09-23 | 2026-10-17 | optionality | watch |
 | CL | CL/ | Colgate-Palmolive | US | 2026-09-23 | 2026-10-17 | unknown | watch |
+| CLNX.MC | CLNX.MC/ | Cellnex Telecom, S.A. | EU | — | 2026-10-15 | unknown | watch |
 | CLS | CLS/ | CLS | US | 2026-09-27 | 2026-10-17 | unknown | watch |
 | CLSK | CLSK/ | CleanSpark, Inc. | US | 2026-09-27 | 2026-10-17 | optionality | watch |
 | CLX | CLX/ | Clorox | US | 2026-09-27 | 2026-10-17 | unknown | watch |
@@ -177,6 +180,7 @@ Synced from `_system/portfolio/registry.json`. Last sync: 2026-10-17.
 | CMS | CMS/ | CMS Energy | US | 2026-09-27 | 2026-10-17 | unknown | watch |
 | CMSG | CMSG/ | Consensus Mining & Seigniorage Corp | US | 2026-09-30 | 2026-10-17 | optionality | watch |
 | CNC | CNC/ | Centene Corporation | US | 2026-09-30 | 2026-10-17 | unknown | watch |
+| CNI | CNI/ | Canadian National Railway Company | US | — | 2026-10-15 | unknown | watch |
 | CNP | CNP/ | CenterPoint Energy | US | 2026-09-30 | 2026-10-17 | unknown | watch |
 | COF | COF/ | Capital One | US | 2026-09-30 | 2026-10-17 | unknown | watch |
 | COHR | COHR/ | Coherent Corp. | US | 2026-09-30 | 2026-10-17 | unknown | watch |
@@ -189,6 +193,7 @@ Synced from `_system/portfolio/registry.json`. Last sync: 2026-10-17.
 | CORBF | CORBF/ | Corbus Pharmaceuticals Holdings, Inc. | US | 2026-10-04 | 2026-10-17 | unknown | watch |
 | CORZ | CORZ/ | CORZ | US | 2026-10-04 | 2026-10-17 | unknown | watch |
 | COST | COST/ | Costco | US | 2026-10-04 | 2026-10-17 | unknown | watch |
+| CP | CP/ | Canadian Pacific Kansas City Limited | US | — | 2026-10-15 | unknown | watch |
 | CPAY | CPAY/ | Corpay | US | 2026-10-04 | 2026-10-17 | unknown | watch |
 | CPNG | CPNG/ | CPNG | US | 2026-10-04 | 2026-10-17 | unknown | watch |
 | CPRT | CPRT/ | Copart | US | 2026-10-07 | 2026-10-17 | compounder | core |
@@ -299,6 +304,7 @@ Synced from `_system/portfolio/registry.json`. Last sync: 2026-10-17.
 | FDX | FDX/ | FedEx | US | 2026-07-29 | 2026-10-17 | unknown | watch |
 | FDXF | FDXF/ | FedEx Freight | US | 2026-07-29 | 2026-10-17 | unknown | watch |
 | FE | FE/ | FirstEnergy | US | 2026-07-29 | 2026-10-17 | unknown | watch |
+| FER | FER/ | Ferrovial N.V. | US | — | 2026-10-15 | unknown | watch |
 | FFIV | FFIV/ | F5, Inc. | US | 2026-07-29 | 2026-10-17 | unknown | watch |
 | FICO | FICO/ | Fair Isaac | US | 2026-07-29 | 2026-10-17 | unknown | watch |
 | FIG | FIG/ | FIG | US | 2026-07-29 | 2026-10-17 | unknown | watch |
@@ -665,6 +671,7 @@ Synced from `_system/portfolio/registry.json`. Last sync: 2026-10-17.
 | RVTY | RVTY/ | Revvity | US | 2026-07-10 | 2026-10-17 | unknown | watch |
 | RYN | RYN/ | Rayonier, Inc. | US | 2026-07-09 | 2026-10-17 | optionality | watch |
 | S68.SI | S68.SI/ | Singapore Exchange Limited | EU | 2026-07-09 | 2026-10-17 | unknown | watch |
+| SAF.PA | SAF.PA/ | Safran SA | EU | — | 2026-10-15 | unknown | watch |
 | SATS | SATS/ | SATS | US | 2026-07-29 | 2026-10-17 | unknown | watch |
 | SBAC | SBAC/ | SBA Communications | US | 2026-07-10 | 2026-10-17 | unknown | watch |
 | SBET | SBET/ | Sharplink, Inc. | US | 2026-07-29 | 2026-10-17 | unknown | watch |

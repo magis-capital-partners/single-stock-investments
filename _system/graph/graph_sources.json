@@ -27,7 +27,7 @@
       "workflow_file": "data-pipeline.yml",
       "job": "intake-full",
       "cadence_cron": [
-        "0 3 * * *"
+        "7 3 * * *"
       ],
       "freshness_hours": 54,
       "subject_regex": "^chore: nightly intake-full"
@@ -37,7 +37,7 @@
       "workflow_file": "data-pipeline.yml",
       "job": "technicals",
       "cadence_cron": [
-        "15 2 * * 1-5"
+        "17 2 * * 1-5"
       ],
       "freshness_hours": 102,
       "subject_regex": "^chore: refresh technical fear signals"
@@ -47,7 +47,7 @@
       "workflow_file": "data-pipeline.yml",
       "job": "activist",
       "cadence_cron": [
-        "0 6 * * *"
+        "11 6 * * *"
       ],
       "freshness_hours": 54,
       "subject_regex": "^chore: activist scan sync"
@@ -57,8 +57,8 @@
       "workflow_file": "data-pipeline.yml",
       "job": "downloads",
       "cadence_cron": [
-        "0 12 * * 1,2,4,5,6",
-        "0 10 * * 0,3"
+        "23 12 * * 1,2,4,5,6",
+        "23 10 * * 0,3"
       ],
       "freshness_hours": 56,
       "subject_regex": "^chore: daily download sync"
@@ -69,7 +69,7 @@
       "job": "drive",
       "work_step": "Import Drive intake PDFs",
       "cadence_cron": [
-        "0 14 * * *"
+        "41 14 * * *"
       ],
       "freshness_hours": 54,
       "subject_regex": "^chore: (sync Drive intake documents|update Drive intake triage)"
@@ -79,7 +79,7 @@
       "workflow_file": "data-pipeline.yml",
       "job": "news",
       "cadence_cron": [
-        "30 */6 * * *"
+        "47 */6 * * *"
       ],
       "freshness_hours": 18,
       "subject_regex": "^chore: refresh portfolio news"
@@ -89,7 +89,7 @@
       "workflow_file": "data-pipeline.yml",
       "job": "cvr-discover",
       "cadence_cron": [
-        "0 15 * * 1"
+        "13 15 * * 1"
       ],
       "freshness_hours": 342,
       "subject_regex": "^chore: CVR weekly discovery"
@@ -99,7 +99,7 @@
       "workflow_file": "data-pipeline.yml",
       "job": "warrant-discover",
       "cadence_cron": [
-        "0 15 * * 1"
+        "13 15 * * 1"
       ],
       "freshness_hours": 342,
       "subject_regex": "^chore: warrant weekly discovery"
@@ -109,7 +109,7 @@
       "workflow_file": "data-pipeline.yml",
       "job": "separation-discover",
       "cadence_cron": [
-        "0 15 * * 1"
+        "13 15 * * 1"
       ],
       "freshness_hours": 342,
       "subject_regex": "^chore: separation weekly discovery"
@@ -119,7 +119,7 @@
       "workflow_file": "data-pipeline.yml",
       "job": "world-model",
       "cadence_cron": [
-        "0 16 * * 0"
+        "43 16 * * 0"
       ],
       "freshness_hours": 342,
       "subject_regex": "^chore: world-model weekly"
@@ -235,6 +235,19 @@
       "subject_regex": "^chore\\(risk\\)"
     },
     {
+      "name": "darwin-covered-call",
+      "workflow_file": "darwin-covered-call.yml",
+      "job": "signal",
+      "cadence_cron": [
+        "37 14 * * 1-5",
+        "7 17 * * 1-5",
+        "52 19 * * 1-5",
+        "47 21 * * 1-5"
+      ],
+      "freshness_hours": 80,
+      "subject_regex": "^chore\\(darwin-cc\\)"
+    },
+    {
       "name": "forced-flow",
       "workflow_file": "forced-flow-daily.yml",
       "job": "refresh",
@@ -316,7 +329,7 @@
       "workflow_file": "data-pipeline.yml",
       "job": "reverse-splits",
       "cadence_cron": [
-        "0 15 * * 1"
+        "13 15 * * 1"
       ],
       "freshness_hours": 342,
       "subject_regex": "^chore: reverse-split weekly discovery"
