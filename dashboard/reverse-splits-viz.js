@@ -409,7 +409,7 @@
     const capacity=(e.populations || []).filter(r=>r.schema==='mbp-10').flatMap(r=>(r.capacity || []).map(c=>`<tr><td>${fmtInt(r.entry_seconds_after_open)} sec</td><td>${money(c.notional_usd)}</td><td>${fmtInt(c.both_sides_fit)} / ${fmtInt(r.paired_quotes)}</td><td>${fmtInt(c.insufficient_entry_depth)}</td><td>${fmtInt(c.insufficient_exit_depth)}</td></tr>`)).join('');
     const bps=n=>isNum(n) ? `${(Number(n)*10000).toFixed(1)} bp` : '—';
     const latency=(e.latency_quote_changes || []).map(r=>`<tr><td>${r.execution_mode==='routed-mbp-10' ? 'Listing + Arca + EDGX' : 'Listing venue'}</td><td>${fmtInt(r.entry_seconds_after_open)} sec</td><td>${fmtInt(r.delay_milliseconds)} ms</td><td>${fmtInt(r.pairs)}</td><td>${esc(bps(r.additional_round_trip_cost.mean))}</td><td>${esc(bps(r.additional_round_trip_cost_on_margin && r.additional_round_trip_cost_on_margin.mean))}</td><td>${esc(bps(r.additional_round_trip_cost.median))}</td><td>${esc(bps(r.additional_round_trip_cost.p90))}</td></tr>`).join('');
-    return `<section style="border:1px solid currentColor;padding:12px;margin:16px 0"><h3>Execution costs from historical quotes</h3>
+    return `<section style="border:1px solid currentColor;padding:12px;margin:16px 0"><h3>Earlier quote study · listing venue and initial three-venue comparison</h3>
       <p><strong>The previous daily-range spread estimate is uncalibrated.</strong> The measurements below use Databento’s historical bid, ask and displayed order-book depth. Short at the quoted bid; cover at the quoted ask.</p>
       <p>Entry is measured 1 or 30 seconds after the scheduled open. Cover is measured one second before the scheduled close, including early closes. These are continuous-trading scenarios. Auction participation requires its own fill evidence.</p>
       <div style="overflow:auto"><table class="insights-table"><thead><tr><th>Quote sample</th><th>Entry after open</th><th>Paired quotes / targets</th><th>Median cost / gross</th><th>Mean cost / gross</th><th>Mean cost / margin</th><th>90th percentile / gross</th></tr></thead><tbody>${quoteRows}</tbody></table></div>
@@ -471,7 +471,12 @@
     const current=study.current_borrow_sensitivities || {}, rateRows=(current.populations || []).map(r=>`<tr><td>${esc(r.population.replaceAll('_',' '))}</td><td>${fmtInt(r.quoted_available_names)} / ${fmtInt(r.target_names)}</td><td>${esc(pct(r.median_annual_fraction))}</td><td>${esc(pct(r.mean_annual_fraction))}</td><td>${esc(pct(r.p90_annual_fraction))}</td><td>${fmtInt(r.missing_names)}</td></tr>`).join('');
     const overnight=(study.event_study || []).filter(r=>r.tier==='verified_actions' && ['ex_close_h1','ex_plus_1_close_h1'].includes(r.cohort)).map(r=>`<tr><td>${r.cohort==='ex_close_h1' ? 'Split-day close → next-session close' : 'Next-session close → following close'}</td><td>${fmtInt(r.events)}</td><td>${esc(pct(r.mean_gross_short_return))}</td><td>${esc(pct(expandedMargin[r.cohort] && expandedMargin[r.cohort].mean))}</td><td>${esc(pct(r.positive_share))}</td><td>${esc(interval(r.issuer_interval))}</td></tr>`).join('');
     const forward=doc.forward_status || {}, validation=forward.validation || study.forward_validation || {}, protocol=validation.protocol || {};
-    const pending=(forward.registry || []).map(r=>`<tr><td>${link(r.source_url,r.ticker || `CIK ${r.cik}`)}</td><td>${esc(r.ex_date)}</td><td>${esc(r.next_session || 'Outside calendar')}</td><td>${esc(String(r.status || '').replaceAll('_',' '))}</td></tr>`).join('');
+    const pending=(forward.registry || []).map(r=>{
+      const review=r.source_review, indication=r.public_borrow_indication;
+      const reviewed=review ? `<p class="muted">${esc(review.summary)}</p>` : '';
+      const quoted=indication ? `<p class="muted">Current public indication: ${esc(pct(indication.fee_annual_fraction))} annual · ${fmtInt(indication.available_shares)} shares · ${esc(indication.as_of)}. Not an approved locate.</p>` : '';
+      return `<tr><td>${link(r.source_url,r.ticker || `CIK ${r.cik}`)}</td><td>${esc(r.ex_date)}</td><td>${esc(r.next_session || 'Outside calendar')}</td><td>${esc(String(r.status || '').replaceAll('_',' '))}${reviewed}${quoted}</td></tr>`;
+    }).join('');
     return `<div style="border-top:2px solid currentColor;padding-top:12px;margin:16px 0">
       <h3>One-day gross shorting · next session open → close</h3>
       <p style="font-size:26px;margin:8px 0"><strong>${esc(pct(p.mean))}</strong> <span style="font-size:14px">average gross return · ${fmtInt(p.events)} events · ${fmtInt(p.issuers)} issuers</span></p>
@@ -576,6 +581,12 @@
    * `opts.hideTitle` omits the panel's own "Reverse splits" h2 for a host
    * section that already titles it. Returns HTML; the caller mounts it.
    */
+  function renderForwardSummary(doc) {
+    const forward=doc.forward_status || {}, validation=forward.validation || {}, protocol=validation.protocol || {};
+    const rows=(forward.registry || []).map(r=>`<tr><th scope="row">${link(r.source_url,r.ticker || `CIK ${r.cik}`)}</th><td>${esc(r.ex_date)}</td><td>${esc(r.next_session || 'Requires calendar review')}</td><td>${esc(String(r.status || '').replaceAll('_',' '))}${r.source_review ? `<p class="muted">${esc(r.source_review.summary)}</p>` : ''}${r.public_borrow_indication ? `<p class="muted">Current public indication: ${fmtNum(100*r.public_borrow_indication.fee_annual_fraction)}% annual · ${fmtInt(r.public_borrow_indication.available_shares)} shares · ${esc(r.public_borrow_indication.as_of)}. Not an approved locate.</p>` : ''}</td></tr>`).join('');
+    return `<p>Frozen rules start ${esc(protocol.validation_starts || '—')}. ${fmtInt((forward.registry || []).length)} provisional disclosure records remain subject to review; enrollment is not a trade.</p><p>${esc(protocol.entry || '')} ${esc(protocol.exit || '')}</p><p class="muted">${esc(protocol.approval || '')} ${esc(protocol.review || '')}</p><div class="rsp-scroll"><table class="insights-table"><thead><tr><th scope="col">Name</th><th scope="col">Disclosed date</th><th scope="col">Next session</th><th scope="col">Evidence status</th></tr></thead><tbody>${rows || '<tr><td colspan="4">No provisional disclosures enrolled.</td></tr>'}</tbody></table></div>`;
+  }
+
   function render(doc, options) {
     const opts = options || {};
     if (!doc || typeof doc !== 'object') {
@@ -583,6 +594,15 @@
     }
     if (doc.schema_version && doc.schema_version !== 'reverse_splits.v1') {
       return `${STYLE}<div class="rs-panel"><p class="muted">Unexpected reverse-split schema ${esc(doc.schema_version)}; expected reverse_splits.v1.</p></div>`;
+    }
+    if(doc.portfolio_research && global.ReverseSplitsPortfolioViz){
+      const completed=doc.forward_status?.validation?.completed?.events;
+      return `${STYLE}<div class="rs-panel" data-schema="${esc(doc.schema_version || '')}">
+        ${doc.net_edge_research_v3 && global.ShortsEdgeV3Viz ? `${global.ShortsEdgeV3Viz.render({...doc.net_edge_research_v3,prospective:doc.net_edge_prospective_v3 || doc.net_edge_research_v3.prospective})}<details class="rsp-fold"><summary>RSI-2.0 · intraday edge study<small>Prior research version</small></summary>${global.ShortsNetEdgeViz ? global.ShortsNetEdgeViz.render(doc.net_edge_research) : ''}</details><details class="rsp-fold"><summary>RSI-1.0 · original shorts backtest<small>Existing account results and execution research</small></summary>${global.ReverseSplitsPortfolioViz.render(doc)}</details>` : doc.net_edge_research && global.ShortsNetEdgeViz ? `${global.ShortsNetEdgeViz.render(doc.net_edge_research)}<details class="rsp-fold"><summary>RSI-1.0 · original shorts backtest<small>Existing account results and execution research</small></summary>${global.ReverseSplitsPortfolioViz.render(doc)}</details>` : global.ReverseSplitsPortfolioViz.render(doc)}
+        <details class="rsp-fold"><summary>Forward validation · ${fmtInt(completed)} completed observations<small>Frozen rules, new disclosures and missing broker evidence</small></summary>${renderForwardSummary(doc)}</details>
+        <details class="rsp-fold"><summary>Event registry and upcoming actions<small>Filing sources, inventory coverage, scheduled actions and repeat splitters</small></summary>${renderHead(doc,opts)}${renderTiles(doc)}${renderCounts(doc)}${renderUpcoming(doc)}${renderRecent(doc,opts)}${renderRepeat(doc)}</details>
+        <details class="rsp-fold"><summary>Earlier studies, methods and unresolved exits<small>Original price benchmarks, cost studies, controls, books and process rules</small></summary>${renderExpansion(doc)}${renderBook(doc)}${renderProcess(doc)}${renderLimits(doc)}<p class="subhead">${esc(doc.caption || '')}</p></details>
+      </div>`;
     }
     return `${STYLE}<div class="rs-panel" data-schema="${esc(doc.schema_version || '')}">
       ${renderHead(doc, opts)}

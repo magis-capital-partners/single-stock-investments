@@ -15,6 +15,7 @@ from __future__ import annotations
 import argparse
 import json
 import re
+import sys
 from datetime import datetime, timezone
 from pathlib import Path
 
@@ -143,22 +144,37 @@ def build_card(ticker: str) -> dict | None:
     if valuation.get("lawrence_bucket"):
         classification["lawrence_bucket"] = valuation["lawrence_bucket"]
 
-    digest = latest_dated(research / "evidence", DIGEST_RE)
+    digest = None
+    canonical_digest = research / "evidence" / "filing_digest.md"
+    if canonical_digest.is_file():
+        digest = (str(valuation.get("as_of") or ""), canonical_digest)
+    else:
+        digest = latest_dated(research / "evidence", DIGEST_RE)
     scenarios = {
         name: (results.get(name) or {}).get("return_pct")
         for name in ("bear", "base", "bull")
         if isinstance(results.get(name), dict)
     }
 
+    base_irr = implied.get("base_pct", (results.get("base") or {}).get("return_pct"))
+    returns = {
+        "base_irr_pct": base_irr,
+        "unit": "percent_per_year",
+        "label": implied.get("label", ""),
+        "display": implied.get("display") or (f"{base_irr}%" if base_irr is not None else None),
+        "scenarios_pct": scenarios,
+    }
     return {
-        "schema_version": "1.0",
+        "schema_version": "2.0",
         "ticker": ticker,
         "generated_at": datetime.now(timezone.utc).isoformat(timespec="seconds"),
         "thesis": first_paragraph(section_text(markdown, "## What this business is")),
         "why_market_wrong": first_paragraph(section_text(markdown, "## Why the market might be wrong")),
         "stance": valuation.get("approved_stance") or (valuation.get("stance_proposal") or {}).get("stance"),
         "classification": classification,
-        "base_irr_pct": implied.get("base_pct", (results.get("base") or {}).get("return_pct")),
+        "base_irr_pct": base_irr,
+        "base_irr_unit": "percent_per_year",
+        "returns": returns,
         "irr_label": implied.get("label", ""),
         "scenarios": scenarios,
         "key_assumptions": parse_assumption_ledger(markdown),
@@ -190,8 +206,15 @@ def write_card(ticker: str) -> bool:
         print(f"SKIP {ticker}: no valuation.json or deep dive")
         return False
     out = ROOT / ticker / "research" / "thesis_card.json"
-    out.write_text(json.dumps(card, indent=2, sort_keys=True) + "\n", encoding="utf-8")
-    print(f"Wrote {out.relative_to(ROOT).as_posix()}")
+    sys.path.insert(0, str(ROOT / "_system" / "scripts"))
+    try:
+        from atomic_io import write_json_if_changed
+
+        changed = write_json_if_changed(out, card, sort_keys=True)
+    except ImportError:
+        out.write_text(json.dumps(card, indent=2, sort_keys=True) + "\n", encoding="utf-8")
+        changed = True
+    print(f"{'Wrote' if changed else 'Unchanged'} {out.relative_to(ROOT).as_posix()}")
     return True
 
 

@@ -1,0 +1,10 @@
+# Magis single-stock-investments: agent entry map
+# Read AGENT_INDEX.md for the full ladder. Summary:
+# L0: dashboard/data/portfolio_summary.json, dashboard/data/research_manifest.json, dashboard/data/kpi_summary.json
+# L1: dashboard/data/agent_shards/{TICKER}.json
+# Pack: dashboard/data/context_packs/{TICKER}.md
+# Latest: {TICKER}/research/latest.json (only source for current artifacts)
+# Claims: _system/data/claims.jsonl ; Chunks: _system/data/chunks.jsonl
+# Schemas: _system/schemas/ ; Search: _system/scripts/agent_search.py
+# MCP: _system/scripts/agent_mcp_server.py (get_ticker, get_valuation, get_claims, search, get_context_pack, get_portfolio_summary)
+# Returns unit: percent_per_year everywhere. Never rescale base_irr_pct.

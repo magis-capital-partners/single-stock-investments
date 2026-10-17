@@ -257,8 +257,8 @@ def _entry_from_seed(seed: dict, *, dry_run: bool = False) -> dict | None:
 
 
 def write_digest_markdown(rows: list[dict], scan_date: str) -> Path:
-    PENDING_DIR.mkdir(parents=True, exist_ok=True)
-    out = PENDING_DIR / f"activist_press_digest_{scan_date}.md"
+    from atomic_io import write_superseded_review_md
+
     lines = [
         "# Activist press / letter digest",
         "",
@@ -288,8 +288,7 @@ def write_digest_markdown(rows: list[dict], scan_date: str) -> Path:
             "",
         ]
     )
-    out.write_text("\n".join(lines), encoding="utf-8")
-    return out
+    return write_superseded_review_md(PENDING_DIR, "activist_press_digest", scan_date, "\n".join(lines), keep_latest=2)
 
 
 

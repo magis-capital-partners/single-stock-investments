@@ -46,13 +46,13 @@
     "book_per_share": 12.7,
     "shares_outstanding": 1126284,
     "copperwood_royalty_est_usd": 7700000,
-    "normalization_note": "SSI mineral-floor + free-option. At $55, ~4.3\u00d7 book \u2014 option yield falls vs $27 entry.",
-    "copper_spot_usd_per_lb": 6.674,
-    "copper_spot_as_of": "2026-10-14",
+    "normalization_note": "SSI mineral-floor + free-option. At $55, ~4.3× book — option yield falls vs $27 entry.",
+    "copper_spot_usd_per_lb": 6.531,
+    "copper_spot_as_of": "2026-10-16",
     "copper_spot_source": "https://query1.finance.yahoo.com/v8/finance/chart/HG=F",
     "copperwood_royalty_est_usd_ssi_ref": 7700000.0,
-    "copperwood_royalty_est_usd_at_spot": 12847450.0,
-    "copperwood_royalty_note": "SSI ~$7.7M/yr @ $4.0/lb scaled linearly to spot $6.674/lb [Assumption]",
+    "copperwood_royalty_est_usd_at_spot": 12572175.0,
+    "copperwood_royalty_note": "SSI ~$7.7M/yr @ $4.0/lb scaled linearly to spot $6.531/lb [Assumption]",
     "lease_income_annual_usd": 365000.0,
     "lease_income_source": "FY2024 annual; H1 2025 semi-annual trend",
     "distribution_history": [
@@ -81,7 +81,7 @@
     "incumbent_sleeve": false,
     "notes": "Economic floor ~$20.73/sh (not GAAP book); spot copper $6.3375/unit; option yield ~18.26%",
     "overlay_nav_per_share": 22.53,
-    "copperwood_option_yield_pct": 19.23,
+    "copperwood_option_yield_pct": 18.81,
     "overlay_implied_return_pct": -11.75
   },
   "scenarios": {
@@ -230,14 +230,14 @@
       "question": "Transitory distribution / legal recovery?",
       "answer": "No",
       "treatment": "n/a",
-      "evidence": "\u2014"
+      "evidence": "—"
     },
     {
       "q": 7,
       "question": "Embedded product option in revenue?",
       "answer": "No",
       "treatment": "n/a",
-      "evidence": "\u2014"
+      "evidence": "—"
     }
   ],
   "nav_overlay": {
@@ -434,7 +434,7 @@
         "hard_to_vary": false,
         "falsifiable": true,
         "not_instrumentalist": false,
-        "reach": "Weights encode evidence tier (A primary \u2192 D external), not fitted to hit a target IRR"
+        "reach": "Weights encode evidence tier (A primary → D external), not fitted to hit a target IRR"
       },
       "qualitative_audit": {
         "flags": [],
@@ -450,15 +450,15 @@
   },
   "market_inputs": {
     "copper": {
-      "spot": 6.674,
-      "as_of": "2026-10-14",
+      "spot": 6.531,
+      "as_of": "2026-10-16",
       "source": "https://query1.finance.yahoo.com/v8/finance/chart/HG=F",
-      "fetched_at": "2026-10-14T15:05:47Z",
+      "fetched_at": "2026-10-17T15:35:47Z",
       "stooq_symbol": "hg.f"
     },
     "scenario_grid": {
       "bear": {
-        "copper_usd_per_lb": 4.81,
+        "copper_usd_per_lb": 4.7,
         "label": "trough (~28% below spot)"
       },
       "base": {
@@ -466,12 +466,12 @@
         "label": "spot at compute"
       },
       "bull": {
-        "copper_usd_per_lb": 7.21,
+        "copper_usd_per_lb": 7.05,
         "label": "cycle high (~8% above spot)"
       }
     }
   },
-  "market_inputs_as_of": "2026-10-14",
+  "market_inputs_as_of": "2026-10-17",
   "overlay_options": {
     "lawrence_base": "lease_income_only_zero_production_royalty",
     "overlay_base_payoff_7yr": 24.73,
@@ -487,7 +487,7 @@
     }
   },
   "context_overlay": {
-    "as_of": "2026-10-14",
+    "as_of": "2026-10-17",
     "disclaimer": "Context only. Tailwinds inform stance and overlay sizing; they do not auto-inflate Lawrence base IRR. Promotion to base case requires [HUMAN REVIEW].",
     "themes": [
       {
@@ -497,9 +497,9 @@
           {
             "id": "hy_oas",
             "label": "High-yield OAS credit spread (%)",
-            "latest": -0.06,
-            "as_of": "2026-10-14",
-            "yoy_pct": 89.5,
+            "latest": -0.69,
+            "as_of": "2026-10-16",
+            "yoy_pct": 30.3,
             "direction": "up",
             "good_for": "risk_regime",
             "source": "spread:HYG-LQD:21d (HYG-LQD 1m spread proxy, not OAS)",
@@ -509,9 +509,9 @@
           {
             "id": "ust_10y",
             "label": "US Treasury 10Y yield (%)",
-            "latest": 5.261000156402588,
-            "as_of": "2026-10-14",
-            "yoy_pct": 30.8,
+            "latest": 5.0980000495910645,
+            "as_of": "2026-10-16",
+            "yoy_pct": 28.2,
             "direction": "up",
             "good_for": "rates_regime",
             "source": "yahoo:^TNX",
@@ -521,9 +521,9 @@
           {
             "id": "ust_2y",
             "label": "US Treasury 2Y yield (%)",
-            "latest": 5.077000141143799,
-            "as_of": "2026-10-14",
-            "yoy_pct": 40.9,
+            "latest": 4.89900016784668,
+            "as_of": "2026-10-16",
+            "yoy_pct": 38.0,
             "direction": "up",
             "good_for": "rates_regime",
             "source": "yahoo:^FVX",
@@ -533,9 +533,9 @@
           {
             "id": "dxy_broad",
             "label": "Trade-weighted USD index (broad)",
-            "latest": 102.86399841308594,
-            "as_of": "2026-10-14",
-            "yoy_pct": 3.9,
+            "latest": 101.83999633789062,
+            "as_of": "2026-10-16",
+            "yoy_pct": 3.5,
             "direction": "up",
             "good_for": "dollar_regime",
             "source": "yahoo:DX-Y.NYB",
@@ -545,9 +545,9 @@
           {
             "id": "vix_level",
             "label": "VIX index level",
-            "latest": 15.869999885559082,
-            "as_of": "2026-10-14",
-            "yoy_pct": -23.7,
+            "latest": 19.989999771118164,
+            "as_of": "2026-10-16",
+            "yoy_pct": -21.0,
             "direction": "down",
             "good_for": "vol_regime",
             "source": "yahoo:^VIX",
@@ -557,9 +557,9 @@
           {
             "id": "credit_impulse_1m",
             "label": "HYG vs TLT 1-month return spread (%)",
-            "latest": 1.18,
-            "as_of": "2026-10-14",
-            "yoy_pct": 174.7,
+            "latest": -0.25,
+            "as_of": "2026-10-16",
+            "yoy_pct": 87.6,
             "direction": "up",
             "good_for": "credit_impulse",
             "source": "spread:HYG-TLT:21d",
@@ -569,9 +569,9 @@
           {
             "id": "spy_20d_realized_vol",
             "label": "SPY 20-day realized vol (annualized %)",
-            "latest": 9.84,
-            "as_of": "2026-10-14",
-            "yoy_pct": -21.1,
+            "latest": 10.2,
+            "as_of": "2026-10-16",
+            "yoy_pct": -19.6,
             "direction": "down",
             "good_for": "equity_vol",
             "source": "realized_vol:SPY:20d",
@@ -2238,8 +2238,8 @@
                 "value": 0.32407457,
                 "unit": "USD_per_share",
                 "operation": "divide",
-                "formula": "lease_income_annual \u00f7 shares",
-                "substituted_formula": "365000 \u00f7 1126284",
+                "formula": "lease_income_annual ÷ shares",
+                "substituted_formula": "365000 ÷ 1126284",
                 "dependencies": [
                   "lease_income_annual",
                   "shares"
@@ -2252,8 +2252,8 @@
                 "value": 17.60000364,
                 "unit": "USD_per_share",
                 "operation": "multiply",
-                "formula": "lease_income_per_share \u00d7 capitalization_multiple",
-                "substituted_formula": "0.32407457 \u00d7 54.3085",
+                "formula": "lease_income_per_share × capitalization_multiple",
+                "substituted_formula": "0.32407457 × 54.3085",
                 "dependencies": [
                   "lease_income_per_share",
                   "capitalization_multiple"
@@ -2307,8 +2307,8 @@
                 "value": 0.32407457,
                 "unit": "USD_per_share",
                 "operation": "divide",
-                "formula": "lease_income_annual \u00f7 shares",
-                "substituted_formula": "365000 \u00f7 1126284",
+                "formula": "lease_income_annual ÷ shares",
+                "substituted_formula": "365000 ÷ 1126284",
                 "dependencies": [
                   "lease_income_annual",
                   "shares"
@@ -2321,8 +2321,8 @@
                 "value": 27.49999556,
                 "unit": "USD_per_share",
                 "operation": "multiply",
-                "formula": "lease_income_per_share \u00d7 capitalization_multiple",
-                "substituted_formula": "0.32407457 \u00d7 84.857",
+                "formula": "lease_income_per_share × capitalization_multiple",
+                "substituted_formula": "0.32407457 × 84.857",
                 "dependencies": [
                   "lease_income_per_share",
                   "capitalization_multiple"
@@ -2376,8 +2376,8 @@
                 "value": 0.32407457,
                 "unit": "USD_per_share",
                 "operation": "divide",
-                "formula": "lease_income_annual \u00f7 shares",
-                "substituted_formula": "365000 \u00f7 1126284",
+                "formula": "lease_income_annual ÷ shares",
+                "substituted_formula": "365000 ÷ 1126284",
                 "dependencies": [
                   "lease_income_annual",
                   "shares"
@@ -2390,8 +2390,8 @@
                 "value": 38.49999378,
                 "unit": "USD_per_share",
                 "operation": "multiply",
-                "formula": "lease_income_per_share \u00d7 capitalization_multiple",
-                "substituted_formula": "0.32407457 \u00d7 118.7998",
+                "formula": "lease_income_per_share × capitalization_multiple",
+                "substituted_formula": "0.32407457 × 118.7998",
                 "dependencies": [
                   "lease_income_per_share",
                   "capitalization_multiple"
@@ -2550,8 +2550,8 @@
                 "value": 3.85,
                 "unit": "USD_m",
                 "operation": "multiply",
-                "formula": "ssi_royalty_ref_m \u00d7 copper_price_scale",
-                "substituted_formula": "7.7 \u00d7 0.5",
+                "formula": "ssi_royalty_ref_m × copper_price_scale",
+                "substituted_formula": "7.7 × 0.5",
                 "dependencies": [
                   "ssi_royalty_ref_m",
                   "copper_price_scale"
@@ -2564,8 +2564,8 @@
                 "value": 0.0,
                 "unit": "USD_m",
                 "operation": "multiply",
-                "formula": "spot_royalty_m \u00d7 success_probability",
-                "substituted_formula": "3.85 \u00d7 0",
+                "formula": "spot_royalty_m × success_probability",
+                "substituted_formula": "3.85 × 0",
                 "dependencies": [
                   "spot_royalty_m",
                   "success_probability"
@@ -2592,8 +2592,8 @@
                 "value": 0.0,
                 "unit": "USD_per_share",
                 "operation": "divide",
-                "formula": "total_option_m \u00f7 shares_m",
-                "substituted_formula": "0 \u00f7 1.126284",
+                "formula": "total_option_m ÷ shares_m",
+                "substituted_formula": "0 ÷ 1.126284",
                 "dependencies": [
                   "total_option_m",
                   "shares_m"
@@ -2665,8 +2665,8 @@
                 "value": 12.5939275,
                 "unit": "USD_m",
                 "operation": "multiply",
-                "formula": "ssi_royalty_ref_m \u00d7 copper_price_scale",
-                "substituted_formula": "7.7 \u00d7 1.635575",
+                "formula": "ssi_royalty_ref_m × copper_price_scale",
+                "substituted_formula": "7.7 × 1.635575",
                 "dependencies": [
                   "ssi_royalty_ref_m",
                   "copper_price_scale"
@@ -2679,8 +2679,8 @@
                 "value": 4.40787462,
                 "unit": "USD_m",
                 "operation": "multiply",
-                "formula": "spot_royalty_m \u00d7 success_probability",
-                "substituted_formula": "12.593927 \u00d7 0.35",
+                "formula": "spot_royalty_m × success_probability",
+                "substituted_formula": "12.593927 × 0.35",
                 "dependencies": [
                   "spot_royalty_m",
                   "success_probability"
@@ -2707,8 +2707,8 @@
                 "value": 9.90000002,
                 "unit": "USD_per_share",
                 "operation": "divide",
-                "formula": "total_option_m \u00f7 shares_m",
-                "substituted_formula": "11.150212 \u00f7 1.126284",
+                "formula": "total_option_m ÷ shares_m",
+                "substituted_formula": "11.150212 ÷ 1.126284",
                 "dependencies": [
                   "total_option_m",
                   "shares_m"
@@ -2780,8 +2780,8 @@
                 "value": 15.4,
                 "unit": "USD_m",
                 "operation": "multiply",
-                "formula": "ssi_royalty_ref_m \u00d7 copper_price_scale",
-                "substituted_formula": "7.7 \u00d7 2",
+                "formula": "ssi_royalty_ref_m × copper_price_scale",
+                "substituted_formula": "7.7 × 2",
                 "dependencies": [
                   "ssi_royalty_ref_m",
                   "copper_price_scale"
@@ -2794,8 +2794,8 @@
                 "value": 10.01,
                 "unit": "USD_m",
                 "operation": "multiply",
-                "formula": "spot_royalty_m \u00d7 success_probability",
-                "substituted_formula": "15.4 \u00d7 0.65",
+                "formula": "spot_royalty_m × success_probability",
+                "substituted_formula": "15.4 × 0.65",
                 "dependencies": [
                   "spot_royalty_m",
                   "success_probability"
@@ -2822,8 +2822,8 @@
                 "value": 26.39653942,
                 "unit": "USD_per_share",
                 "operation": "divide",
-                "formula": "total_option_m \u00f7 shares_m",
-                "substituted_formula": "29.73 \u00f7 1.126284",
+                "formula": "total_option_m ÷ shares_m",
+                "substituted_formula": "29.73 ÷ 1.126284",
                 "dependencies": [
                   "total_option_m",
                   "shares_m"
@@ -2972,8 +2972,8 @@
                 "value": 12.69662004,
                 "unit": "USD_per_share",
                 "operation": "divide",
-                "formula": "shareholders_equity_m \u00f7 shares_m",
-                "substituted_formula": "14.3 \u00f7 1.126284",
+                "formula": "shareholders_equity_m ÷ shares_m",
+                "substituted_formula": "14.3 ÷ 1.126284",
                 "dependencies": [
                   "shareholders_equity_m",
                   "shares_m"
@@ -2986,8 +2986,8 @@
                 "value": 1.64999941,
                 "unit": "USD_per_share",
                 "operation": "multiply",
-                "formula": "equity_per_share \u00d7 equity_claim_fraction",
-                "substituted_formula": "12.69662 \u00d7 0.1299558",
+                "formula": "equity_per_share × equity_claim_fraction",
+                "substituted_formula": "12.69662 × 0.1299558",
                 "dependencies": [
                   "equity_per_share",
                   "equity_claim_fraction"
@@ -3041,8 +3041,8 @@
                 "value": 12.69662004,
                 "unit": "USD_per_share",
                 "operation": "divide",
-                "formula": "shareholders_equity_m \u00f7 shares_m",
-                "substituted_formula": "14.3 \u00f7 1.126284",
+                "formula": "shareholders_equity_m ÷ shares_m",
+                "substituted_formula": "14.3 ÷ 1.126284",
                 "dependencies": [
                   "shareholders_equity_m",
                   "shares_m"
@@ -3055,8 +3055,8 @@
                 "value": 6.6000002,
                 "unit": "USD_per_share",
                 "operation": "multiply",
-                "formula": "equity_per_share \u00d7 equity_claim_fraction",
-                "substituted_formula": "12.69662 \u00d7 0.5198234",
+                "formula": "equity_per_share × equity_claim_fraction",
+                "substituted_formula": "12.69662 × 0.5198234",
                 "dependencies": [
                   "equity_per_share",
                   "equity_claim_fraction"
@@ -3110,8 +3110,8 @@
                 "value": 12.69662004,
                 "unit": "USD_per_share",
                 "operation": "divide",
-                "formula": "shareholders_equity_m \u00f7 shares_m",
-                "substituted_formula": "14.3 \u00f7 1.126284",
+                "formula": "shareholders_equity_m ÷ shares_m",
+                "substituted_formula": "14.3 ÷ 1.126284",
                 "dependencies": [
                   "shareholders_equity_m",
                   "shares_m"
@@ -3124,8 +3124,8 @@
                 "value": 10.9999999,
                 "unit": "USD_per_share",
                 "operation": "multiply",
-                "formula": "equity_per_share \u00d7 equity_claim_fraction",
-                "substituted_formula": "12.69662 \u00d7 0.8663723",
+                "formula": "equity_per_share × equity_claim_fraction",
+                "substituted_formula": "12.69662 × 0.8663723",
                 "dependencies": [
                   "equity_per_share",
                   "equity_claim_fraction"
@@ -3268,8 +3268,8 @@
                 "value": 0.14206008,
                 "unit": "USD_per_share",
                 "operation": "divide",
-                "formula": "operating_burn_annual \u00f7 shares",
-                "substituted_formula": "160000 \u00f7 1126284",
+                "formula": "operating_burn_annual ÷ shares",
+                "substituted_formula": "160000 ÷ 1126284",
                 "dependencies": [
                   "operating_burn_annual",
                   "shares"
@@ -3282,8 +3282,8 @@
                 "value": 16.49999467,
                 "unit": "USD_per_share",
                 "operation": "multiply",
-                "formula": "burn_per_share \u00d7 reserve_multiple",
-                "substituted_formula": "0.14206008 \u00d7 116.148",
+                "formula": "burn_per_share × reserve_multiple",
+                "substituted_formula": "0.14206008 × 116.148",
                 "dependencies": [
                   "burn_per_share",
                   "reserve_multiple"
@@ -3350,8 +3350,8 @@
                 "value": 0.14206008,
                 "unit": "USD_per_share",
                 "operation": "divide",
-                "formula": "operating_burn_annual \u00f7 shares",
-                "substituted_formula": "160000 \u00f7 1126284",
+                "formula": "operating_burn_annual ÷ shares",
+                "substituted_formula": "160000 ÷ 1126284",
                 "dependencies": [
                   "operating_burn_annual",
                   "shares"
@@ -3364,8 +3364,8 @@
                 "value": 8.24999734,
                 "unit": "USD_per_share",
                 "operation": "multiply",
-                "formula": "burn_per_share \u00d7 reserve_multiple",
-                "substituted_formula": "0.14206008 \u00d7 58.074",
+                "formula": "burn_per_share × reserve_multiple",
+                "substituted_formula": "0.14206008 × 58.074",
                 "dependencies": [
                   "burn_per_share",
                   "reserve_multiple"
@@ -3432,8 +3432,8 @@
                 "value": 0.14206008,
                 "unit": "USD_per_share",
                 "operation": "divide",
-                "formula": "operating_burn_annual \u00f7 shares",
-                "substituted_formula": "160000 \u00f7 1126284",
+                "formula": "operating_burn_annual ÷ shares",
+                "substituted_formula": "160000 ÷ 1126284",
                 "dependencies": [
                   "operating_burn_annual",
                   "shares"
@@ -3446,8 +3446,8 @@
                 "value": 2.19999929,
                 "unit": "USD_per_share",
                 "operation": "multiply",
-                "formula": "burn_per_share \u00d7 reserve_multiple",
-                "substituted_formula": "0.14206008 \u00d7 15.4864",
+                "formula": "burn_per_share × reserve_multiple",
+                "substituted_formula": "0.14206008 × 15.4864",
                 "dependencies": [
                   "burn_per_share",
                   "reserve_multiple"
@@ -3701,7 +3701,7 @@
       "interpretation": "value_per_share is withheld while any material additive component is unpriced; priced_components_per_share is not a complete security value."
     },
     "scenario_contract": {
-      "rule": "Cases must change cited causal operating, capital, probability, timing, or financing drivers\u2014not only a terminal multiple.",
+      "rule": "Cases must change cited causal operating, capital, probability, timing, or financing drivers—not only a terminal multiple.",
       "top_value_drivers": [
         {
           "component_id": "asset_option_inventory",
@@ -3871,5 +3871,17 @@
   },
   "human_review": {
     "live_price_confirmed": false
+  },
+  "schema_version": "magis.valuation.v2",
+  "returns": {
+    "base_irr_pct": -7.46,
+    "unit": "percent_per_year",
+    "label": "7yr IRR (total synthesis)",
+    "display": "-7.46% (total synthesis)",
+    "scenarios_pct": {
+      "bear": -18.64,
+      "base": -9.28,
+      "bull": 2.39
+    }
   }
 }

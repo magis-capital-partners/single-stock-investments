@@ -104,9 +104,12 @@ def filing_digest_path(ticker: str) -> str | None:
     if not ev.exists():
         return None
     digs = sorted(ev.glob("filing_digest_*.md"))
-    if not digs:
-        return None
-    return str(digs[-1].relative_to(ROOT)).replace("\\", "/")
+    if digs:
+        return str(digs[-1].relative_to(ROOT)).replace("\\", "/")
+    canonical = ev / "filing_digest.md"
+    if canonical.is_file():
+        return str(canonical.relative_to(ROOT)).replace("\\", "/")
+    return None
 
 
 def scan_pending_third_party(ticker: str) -> list[dict]:

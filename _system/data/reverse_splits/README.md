@@ -311,6 +311,106 @@ own collection budget. Metadata requests are limited to six per second.
 Completed files are checksum-verified and reused. Raw market data is never
 published.
 
+### Full-sample costs, stops and funded portfolios
+
+`portfolio_protocol.json` declares the account, comparison rules and scenario
+matrix before calculating results. `portfolio_research.json` and its manifest
+publish aggregate model results. The dashboard builder also exports all scalar scenario metrics to `dashboard/data/reverse_splits_portfolios.csv` (returns are fractions, dollars are USD). Licensed books, quote paths, individual
+outcomes and daily account records remain in ignored `local/portfolio_research/`.
+The original frozen studies and forward-validation protocol are preserved.
+
+The primary account starts with $50,000 on 2018-05-01 and ends 2026-10-13.
+It compounds sizes up to 2.5% of opening equity, admits at most three issuers,
+requires $100 minimum notional, caps shares at 0.1% of prior split-adjusted
+venue ADV and reserves 40% of opening equity beyond its entry-margin budget. The ADV proxy uses the preceding 20 exchange sessions; unknown volume adds no verified capacity, producing a conservative lower bound rather than assuming unknown returns are zero.
+Admission ranking uses prior dollar volume. It never screens on the future
+exit book, realized return or full-day volume. Margin requirements retain
+initial and FINRA per-share floors and exclude encumbered short-sale proceeds.
+
+Full-session one-second BBO observations combine up to 15 distinct exchange
+feeds where their dated histories are available. These are not consolidated
+NBBO. Fresh mutually consistent venue states are combined; stale conflicting
+states are omitted. Midpoint stops at 5%, 10%
+and 20% are monitored after entry; covers use a subsequent quote after a
+100ms modeled response. Other cases cover after 15 or 60 minutes or before
+the scheduled close, including early closes. Event-level depth is requested
+at entry and close and for thinner risk exits. One-second top snapshots
+remain where adequate or when deeper books are unavailable; subsecond moves
+between sampled observations remain unknown. Missing venue books can
+contribute their valid sampled top quote without duplicating the same venue.
+Unchanged valid BBO states persist within a complete session until updated or invalidated; absent interval records do not expire resting quotes. Bad timestamps, crossed books and provider book-gap flags reset validity and are rejected. The 30-second event-book lookup is separate from full-session BBO state.
+
+Cached national trading/SSR transitions gate entries. A restriction that
+activates during the entry delay can prevent a fill. A stop during a halt
+queues until a subsequent tradable quote where observed. Missing or
+insufficient-depth covers are estimated and counted, never removed from the
+results. Quotes during known nontrading states are excluded from cost calibration; intraday marks fall back to completed trade prices. Same-session completion of those estimates remains a conditional
+assumption; delayed-exit and correlated squeeze stresses show additional
+capital demands without assuming a stop can fill at its threshold.
+
+For missing execution costs, match the entry price, prior dollar ADV, order
+size, prior volatility, year and listing venue, together with entry timing and exit rule. Use
+one nearest observation from each of up to 40 other issuers. The base is
+the arithmetic mean of paired spread/depth costs; paired empirical cost
+percentiles provide sensitivities. Donor dates and feature scaling use past
+observations where at least 20 other issuers exist. During warmup, retrospective
+issuer holdouts are labeled and permitted only for conditional cost accounting;
+they cannot admit a trade through the expected-cost screen. Validation reports
+entry half-spread errors and separate round-trip cost forecast errors by exit rule, including past-only comparisons and warmup counts. Measured pairs require sufficient observed depth; they do not identify missing liquidity or historical broker fills.
+
+Every original price event gets standardized $125/$500/$1,250 target-exposure
+outcomes, with at least one whole share, separately from account admissions.
+Those hypothetical outcomes assume borrowing and complete covers and ignore
+SSR/capital admission restrictions. The account replays separately compare
+known-before-entry events, the unchanged fundamental score >=60 screen,
+cost limits, fixed sizing and 2.5%/5%/10% equity caps per name, margin, residual execution cost, borrowing assumptions,
+early and recent periods. Current-rate exclusions are retrospective illustrations.
+
+Ordinary matched same-day settlement is modeled with zero billed borrowing
+days and no separate pre-borrow charge. One-billed-day rates are sensitivities,
+not historical invoices or an overnight price strategy. Commissions retain
+the disclosed fixed per-share/minimum/cap assumptions; dated broker invoices,
+historical house margins, approved locates and all other broker charges remain
+unavailable. Cash interest is zero.
+
+CAGR uses funded account equity and calendar elapsed years. Sharpe and Sortino
+use all exchange sessions, including idle sessions; the main risk-free/target
+rate is zero. A constant 4% Sharpe alternative is explicitly hypothetical.
+Full-period Calmar and trailing 36-month Calmar each use matching CAGR and
+drawdown windows. Also report serial-dependence sensitivity, volatility,
+profit factor, expectancy, win rate, daily/trade loss tails, intraday marked
+drawdowns, margin usage, turnover, exposure and year-by-year results. ROG and
+ROM divide P&L by summed entry exposure/equity requirements; they are not
+annualized portfolio growth. Year-block uncertainty is conditional on the
+modeled account and observed history, not independent future evidence. Intraday marks include the immediate post-fill spread and fully costed closing equity. Margin breaches are reported without assuming a successful forced liquidation; such cases are unconstrained conditional paths.
+
+A recovery pass checks incomplete auctions with a unique dated security
+identity. Only observed entry/exit quote pairs enter the separately labeled
+expanded comparison; the original 671-event definition remains fixed.
+Unresolved identities and unpriced events remain coverage gaps. Authenticated
+dataset metadata confirms that the configured venue history starts in May
+2018; the user has no older Massive Advanced, TAQ or CRSP entitlement. No
+pre-2018 returns are invented, and the sample is not a complete split census.
+
+With the existing Databento key supplied securely in the process environment:
+
+```powershell
+python -m _system.scripts.reverse_splits.portfolio_data --stage access
+python -m _system.scripts.reverse_splits.portfolio_data --stage sessions --max-cost 5
+python -m _system.scripts.reverse_splits.portfolio_data --stage supplemental --max-cost 5
+python -m _system.scripts.reverse_splits.portfolio_data --stage paths
+python -m _system.scripts.reverse_splits.portfolio_data --stage depth --max-cost 5
+python -m _system.scripts.reverse_splits.portfolio_data --stage books
+python -m _system.scripts.reverse_splits.portfolio_repair --max-cost 5
+python -m _system.scripts.reverse_splits.portfolio_research --publish
+python _system/scripts/build_reverse_splits_dashboard.py
+```
+
+Collections reuse checksum-verified caches and quote each new request.
+The cumulative research-download budget is $5 across session/supplement/depth/recovery
+collections; metadata is free. No Theta terminal, IB Gateway, order API,
+subscription upgrade or paid-data automation is involved.
+
 ### Event row
 
 ```json

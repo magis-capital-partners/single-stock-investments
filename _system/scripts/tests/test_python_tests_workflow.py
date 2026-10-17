@@ -50,6 +50,59 @@ def test_every_file_the_suites_read_triggers_the_workflow():
         assert not missing, f"{event} paths miss {missing}"
 
 
+# test_unified_data_architecture.py reads these committed files. The unit-tests
+# job is a non-cone sparse checkout, so a path that is not listed is absent on
+# CI even when it exists on main. The FTS5 query is kind=ticker and is filled
+# from dashboard/data/agent_shards/, which is why the directory is required.
+UNIFIED_ARCHITECTURE_READS = (
+    "dashboard/data/portfolio_summary.json",
+    "dashboard/data/research_manifest.json",
+    "dashboard/data/kpi_summary.json",
+    "dashboard/data/document_catalog_summary.json",
+    "dashboard/data/agent_shards/TPL.json",
+    "dashboard/data/agent_shards/GOOGL.json",
+    "TPL/research/evidence/thematic_context.md",
+    "TPL/research/evidence/insider_signal.md",
+    "TPL/research/evidence/filing_digest.md",
+    "TPL/third-party-analyses/source_inventory.json",
+    "GOOGL/research/evidence/thematic_context.md",
+    "GOOGL/research/evidence/insider_signal.md",
+    "GOOGL/research/evidence/filing_digest.md",
+    "GOOGL/third-party-analyses/source_inventory.json",
+)
+
+
+def _sparse_has(path: str, entries: list[str]) -> bool:
+    for entry in entries:
+        if entry == path or path.startswith(entry.rstrip("/") + "/"):
+            return True
+    return False
+
+
+def test_unified_architecture_reads_are_in_the_unit_test_checkout():
+    """L0 summaries, agent shards, and TPL/GOOGL evidence were omitted."""
+    entries = sparse_entries()
+    missing = [path for path in UNIFIED_ARCHITECTURE_READS if not _sparse_has(path, entries)]
+    assert not missing, f"unit-tests sparse-checkout misses {missing}"
+
+
+# test_agent_data_architecture.py rebuilds claims from every thesis card and
+# picks its 10 golden tickers from thesis cards plus latest.json. get_valuation
+# reads GOOGL/research/valuation.json. None of those are under /_system/.
+AGENT_DATA_SPARSE = (
+    "*/research/thesis_card.json",
+    "*/research/latest.json",
+    "GOOGL/research/valuation.json",
+)
+
+
+def test_agent_data_reads_are_in_the_unit_test_checkout():
+    """Claim rebuild and the golden eval saw an empty sparse tree."""
+    entries = sparse_entries()
+    missing = [path for path in AGENT_DATA_SPARSE if path not in entries]
+    assert not missing, f"unit-tests sparse-checkout misses {missing}"
+
+
 def test_a_known_failure_that_starts_passing_is_reported_even_beside_one_that_still_fails(tmp_path):
     """Run together, the still-failing test made pytest exit 1 and hid the
     fixed one (main fixed test_deploy_defers_... while test_hot_routes_... still

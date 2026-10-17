@@ -13,6 +13,7 @@ import subprocess
 from datetime import date, datetime, timedelta, timezone
 from pathlib import Path
 
+from atomic_io import write_json_if_changed
 from falsifier_specs import (calibration_eligibility, forecast_dates, read_json,
                              spec_payload_hash)
 from resolve_falsifiers import load_outcomes
@@ -388,13 +389,18 @@ def build(root: Path = ROOT, today: date | None = None, write: bool = True) -> d
                                 "new_framework", "disputed_ground_truth"],
     }
     if write:
-        for relative, payload in ((QUEUE_REL, queue), (STATUS_REL, status)):
-            path = root / relative
-            path.parent.mkdir(parents=True, exist_ok=True)
-            path.write_text(json.dumps(payload, indent=2) + "\n", encoding="utf-8")
         authoring = {**queue, "items": [item for item in items if item["task_type"] in
                                         {"author_forecast", "review_forecast", "publish_forecast"}]}
-        (root / AUTHORING_VIEW_REL).write_text(json.dumps(authoring, indent=2) + "\n", encoding="utf-8")
+        for relative, payload in (
+            (QUEUE_REL, queue),
+            (STATUS_REL, status),
+            (AUTHORING_VIEW_REL, authoring),
+        ):
+            write_json_if_changed(
+                root / relative,
+                payload,
+                volatile_keys=("as_of", "input_sha"),
+            )
         receipt = {
             "schema_version": "1.0", "run_type": "epistemic_loop_controller",
             "run_date": today.isoformat(), "input_sha": head, "output_sha": head,
@@ -402,9 +408,16 @@ def build(root: Path = ROOT, today: date | None = None, write: bool = True) -> d
             "counts": {"work_items": len(items), "authoring_items": len(authoring["items"])},
             "outputs": [str(QUEUE_REL).replace("\\", "/"), str(STATUS_REL).replace("\\", "/")],
         }
-        receipt_path = root / RUNS_REL / f"run_{today.isoformat()}_{head[:12]}.json"
-        receipt_path.parent.mkdir(parents=True, exist_ok=True)
-        receipt_path.write_text(json.dumps(receipt, indent=2) + "\n", encoding="utf-8")
+        runs_dir = root / RUNS_REL
+        receipt_path = runs_dir / "run_latest.json"
+        write_json_if_changed(
+            receipt_path,
+            receipt,
+            volatile_keys=("run_date", "input_sha", "output_sha"),
+        )
+        for old_receipt in runs_dir.glob("run_*.json"):
+            if old_receipt != receipt_path:
+                old_receipt.unlink(missing_ok=True)
     return {"queue": queue, "status": status}
 
 

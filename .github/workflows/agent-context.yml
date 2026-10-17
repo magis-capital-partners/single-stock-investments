@@ -1,0 +1,45 @@
+name: Agent context
+
+# Reader-side regression for the agent data layer: schemas validate, return
+# units agree, latest.json pointers resolve, and the golden eval answers
+# 30/30 with zero stale reads. Catches the failure mode where a generator
+# change silently makes Grok Bot, Muse, or Cursor read stale or
+# mis-scaled context.
+
+on:
+  pull_request:
+    branches: [main]
+    paths:
+      - "_system/schemas/**"
+      - "_system/scripts/agent_*.py"
+      - "_system/scripts/build_agent_context.py"
+      - "_system/scripts/build_claim_store.py"
+      - "_system/scripts/build_chunk_store.py"
+      - "_system/scripts/build_ticker_latest.py"
+      - "_system/scripts/build_thesis_card.py"
+      - "_system/scripts/build_progressive_shards.py"
+      - "_system/scripts/lint_agent_data.py"
+      - "_system/scripts/normalize_return_units.py"
+      - "_system/scripts/run_agent_eval.py"
+      - "_system/scripts/tests/test_agent_data_architecture.py"
+      - "AGENT_INDEX.md"
+      - "llms.txt"
+
+jobs:
+  agent-data:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          sparse-checkout: |
+            _system
+            dashboard/data
+          sparse-checkout-cone-mode: false
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Install test deps
+        run: pip install pytest jsonschema
+      - name: Agent data architecture tests
+        run: python -m pytest _system/scripts/tests/test_agent_data_architecture.py _system/scripts/tests/test_unified_data_architecture.py -q

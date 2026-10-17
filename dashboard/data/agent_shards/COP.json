@@ -1,0 +1,246 @@
+{
+  "schema_version": "magis.agent_shard.v2",
+  "ticker": "COP",
+  "company": "ConocoPhillips",
+  "book": "holdings",
+  "shard_status": "built",
+  "as_of": "2026-08-13",
+  "registry": {
+    "market": "US",
+    "exchange": "—",
+    "sleeve": null,
+    "moat": "unproven",
+    "dhando": "pending",
+    "payoff_lens": "pending"
+  },
+  "returns": {
+    "base_irr_pct": null,
+    "unit": "percent_per_year",
+    "label": null,
+    "display": null,
+    "scenarios_pct": {}
+  },
+  "thesis_summary": {
+    "thesis": "ConocoPhillips (NYSE: COP) is one of the largest independent exploration and production companies worldwide. **[Fact]** FY2025 total company production averaged **2,375 thousand barrels of oil equivalent per day**, with operations across Alaska, the Lower 48 United States, Canada, Europe/Middle East/North Africa, and Asia Pacific. **[Fact]** FY2025 sales and other operating revenues were **$58.9 billion** and cash from operations **$19.8 billion**. **[Fact]** The company closed its **Marathon Oil** acquisition in 2024, expanding Lower 48 scale and reserve base. **[Inference]** Owner economics are commodity-linked but management emphasizes returns on capital, buybacks, and a variable dividend rather than volume-at-any-cost growth.",
+    "why_market_wrong": "The market may be treating COP as a pure commodity beta while underweighting **post-Marathon scale**, **$39 billion of cumulative buybacks since 2016**, and a balance sheet where total debt is **~$23.3 billion** on the Q1 2026 10-Q, not a stale **2021 LongTermDebt** tag that blocked the universal contract. **[Inference]** Contract backfill refreshes debt to current filings, which modestly lowers per-share value versus the error-state contract but clears the evidence blocker. **[Inference]** At **$124.52**, the automated owner-earnings reinvestment model prices the stock near component fair value on conservative reinvestment assumptions, so the mispricing angle is **capital return quality at a full price**, not a hidden asset discount.",
+    "stance": "watch",
+    "archetype": "compounder",
+    "base_irr_pct": null,
+    "base_irr_unit": "percent_per_year",
+    "scenarios": {},
+    "key_assumptions": [
+      {
+        "input": "Price today",
+        "source": "Yahoo COP close 2026-08-13",
+        "value": "**$124.52**"
+      },
+      {
+        "input": "Normalized owner earnings",
+        "source": "us-gaap:NetCashProvidedByUsedInOperatingActivities; accession 0001163165-26-000009; form 10-K",
+        "value": "**$9,637M**"
+      },
+      {
+        "input": "Cash",
+        "source": "us-gaap:CashCashEquivalentsRestrictedCashAndRestrictedCashEquivalents; accession 0001163165-26-000018; form 10-Q",
+        "value": "**$6,246M**"
+      },
+      {
+        "input": "Debt",
+        "source": "us-gaap:LongTermDebtAndCapitalLeaseObligations; accession 0001163165-26-000018; form 10-Q + us-gaap:DebtCurrent; accession 0001163165-26-000018; form 10-Q",
+        "value": "**$23,327M**"
+      },
+      {
+        "input": "Diluted shares",
+        "source": "dei:EntityCommonStockSharesOutstanding; accession 0001163165-26-000018; form 10-Q",
+        "value": "**1218.3M**"
+      },
+      {
+        "input": "Reinvestment rate",
+        "source": "Versioned initial bounds; refresh from the issuer reinvestment ledger.",
+        "value": "**35.0%**"
+      },
+      {
+        "input": "Incremental after-tax ROIC",
+        "source": "Conservative bounded starting cases pending a longer primary-source capital bridge.",
+        "value": "**18.0%**"
+      },
+      {
+        "input": "Discount rate",
+        "source": "Approved risk bounds for the automated first pass.",
+        "value": "**10.0%**"
+      }
+    ],
+    "open_questions": [
+      "[ ] Confirm archetype: E&P commodity cyclical vs quality_reinvestment compounder route",
+      "[ ] Refresh capital spending tag (latest companyfacts capex is 2022; owner earnings normalization may be stale)",
+      "[ ] Promote stance only after human decision on commodity cycle view",
+      "[ ] Third-party cross-check remains Marvin floor only until approved sources indexed"
+    ]
+  },
+  "truncation": {
+    "key_assumptions": {
+      "shown": 8,
+      "total": 8
+    },
+    "open_questions": {
+      "shown": 4,
+      "total": 4
+    },
+    "kpi_series": {
+      "shown": 10,
+      "total": 10
+    },
+    "documents": {
+      "shown": 0,
+      "note": "capped at 15 most recent in builder"
+    }
+  },
+  "kpi_series": [
+    {
+      "metric": "cash",
+      "label": "Cash",
+      "direction": "accelerating",
+      "signal_tier": "emerging",
+      "latest": 6574000000.0,
+      "growth_latest": 0.3414,
+      "strength": 1.648,
+      "period": "2026-06-30",
+      "human_summary": "Cash growth sped up: -6.9% → +34% YoY (one quarter so far — not confirmed)"
+    },
+    {
+      "metric": "cfo",
+      "label": "Operating cash flow",
+      "direction": "steady",
+      "signal_tier": "steady",
+      "latest": 7434000000.0,
+      "growth_latest": 1.1331,
+      "strength": null,
+      "period": "2026-06-30",
+      "human_summary": "Cash from operations growth is steady around +113% YoY (recent periods)"
+    },
+    {
+      "metric": "cfo_margin",
+      "label": "Cash conversion (CFO/revenue)",
+      "direction": "accelerating",
+      "signal_tier": "emerging",
+      "latest": 0.3879755753875059,
+      "growth_latest": 0.559,
+      "strength": 1.627,
+      "period": "2026-06-30",
+      "human_summary": "Cash conversion growth sped up: -26% → +56% YoY (one quarter so far — not confirmed)"
+    },
+    {
+      "metric": "eps_basic",
+      "label": "EPS (basic)",
+      "direction": "steady",
+      "signal_tier": "steady",
+      "latest": 3.23,
+      "growth_latest": 1.0705,
+      "strength": 0.039,
+      "period": "2026-06-30",
+      "human_summary": "EPS growth is steady around +107% YoY (recent periods)"
+    },
+    {
+      "metric": "long_term_debt",
+      "label": "Long-term debt",
+      "direction": "steady",
+      "signal_tier": "steady",
+      "latest": 22797000000.0,
+      "growth_latest": 0.2109,
+      "strength": null,
+      "period": "2021-09-30",
+      "human_summary": "Long-term debt growth is steady around +21% YoY (recent periods)"
+    },
+    {
+      "metric": "net_income",
+      "label": "Net income",
+      "direction": "steady",
+      "signal_tier": "steady",
+      "latest": 3931000000.0,
+      "growth_latest": 0.9944,
+      "strength": null,
+      "period": "2026-06-30",
+      "human_summary": "Net income growth is steady around +99% YoY (recent periods)"
+    },
+    {
+      "metric": "revenues",
+      "label": "Revenue",
+      "direction": "steady",
+      "signal_tier": "steady",
+      "latest": 19161000000.0,
+      "growth_latest": 0.3683,
+      "strength": null,
+      "period": "2026-06-30",
+      "human_summary": "Revenue growth is steady around +37% YoY (recent periods)"
+    },
+    {
+      "metric": "stockholders_equity",
+      "label": "Stockholders' equity",
+      "direction": "steady",
+      "signal_tier": "steady",
+      "latest": 65349000000.0,
+      "growth_latest": -0.0034,
+      "strength": null,
+      "period": "2026-06-30",
+      "human_summary": "Stockholders' equity growth is steady around -0.3% YoY (recent periods)"
+    },
+    {
+      "metric": "total_assets",
+      "label": "Total assets",
+      "direction": "steady",
+      "signal_tier": "steady",
+      "latest": 124261000000.0,
+      "growth_latest": 0.0136,
+      "strength": null,
+      "period": "2026-06-30",
+      "human_summary": "Total assets growth is steady around +1.4% YoY (recent periods)"
+    },
+    {
+      "metric": "news_flow",
+      "label": "News flow",
+      "direction": "decelerating",
+      "signal_tier": "emerging",
+      "latest": null,
+      "growth_latest": -4.0,
+      "strength": 2.667,
+      "period": "2026-09-01",
+      "human_summary": "News flow growth move looks extreme (+4 to -4 per period). Large percentages usually mean a thin or sign-changing base. Treat cautiously (one quarter so far — not confirmed)."
+    }
+  ],
+  "recent_news": [
+    {
+      "title": "COP or WHD: Which Is the Better Value Stock Right Now?",
+      "published_utc": "2026-10-07T14:40:05+00:00",
+      "category": "guidance",
+      "confidence": 0.88,
+      "url": "https://www.zacks.com/stock/news/3001925/cop-or-whd-which-is-the-better-value-stock-right-now?cid=CS-ZC-FT-fundamental_analysis|yseop_template_3-3001925",
+      "linked_filing": null
+    }
+  ],
+  "documents": [],
+  "l2_pointers": {
+    "valuation_json": "COP/research/valuation.json",
+    "thesis_card_json": "COP/research/thesis_card.json",
+    "filing_digest_md": "COP/research/evidence/filing_digest.md",
+    "insider_signal_md": "COP/research/evidence/insider_signal.md",
+    "thematic_context_md": "COP/research/evidence/thematic_context.md",
+    "source_inventory_json": "COP/third-party-analyses/source_inventory.json",
+    "full_ui_shard_json": "dashboard/data/tickers/COP.json",
+    "latest_json": "COP/research/latest.json",
+    "context_pack_md": "dashboard/data/context_packs/COP.md"
+  },
+  "generated_at": "2026-10-16T20:26:21Z",
+  "_envelope": {
+    "schema_version": "magis.feed.v2",
+    "feed_id": "agent-shard-cop",
+    "generated_at": "2026-10-16T20:26:21Z",
+    "as_of": "2026-08-13",
+    "content_sha256": "sha256:79aa7621a2c09a8b847a8230d4907f1f4d296dbe9f45db0cac067115ba77b649",
+    "row_count": 11,
+    "upstream_inputs": [],
+    "health": {
+      "status": "healthy",
+      "structural_errors": 0
+    }
+  }
+}
