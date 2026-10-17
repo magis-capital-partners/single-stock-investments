@@ -1,64 +1,76 @@
 # Event triage — human review queue
 
-**Date:** 2026-10-15
-**Rows:** 5452
+**Date:** 2026-10-17
+**Rows:** 5139
 
 | Date | Ticker | Source | Tier | Materiality | Rules | Title |
 |------|--------|--------|------|-------------|-------|-------|
+| 2026-10-17 | ACHR | kpi_trend | context | 66 | rule_conflict, activist_cross_link, routine_governance_watch | Leadership / governance on watch |
+| 2026-10-17 | ARES | kpi_trend | context | 66 | rule_conflict, activist_cross_link, routine_governance_watch | Leadership / governance on watch |
+| 2026-10-17 | AVY | kpi_trend | context | 66 | rule_conflict, activist_cross_link, routine_governance_watch | Leadership / governance on watch |
+| 2026-10-17 | AXON | kpi_trend | context | 66 | rule_conflict, activist_cross_link, routine_governance_watch | Leadership / governance on watch |
+| 2026-10-17 | BB | kpi_trend | context | 66 | rule_conflict, activist_cross_link, routine_governance_watch | Leadership / governance on watch |
+| 2026-10-17 | BEN | kpi_trend | context | 66 | rule_conflict, activist_cross_link, routine_governance_watch | Leadership / governance on watch |
+| 2026-10-17 | BMY | kpi_trend | context | 66 | rule_conflict, activist_cross_link, routine_governance_watch | Leadership / governance on watch |
+| 2026-10-17 | BNY | kpi_trend | context | 66 | rule_conflict, activist_cross_link, routine_governance_watch | Leadership / governance on watch |
+| 2026-10-17 | CHRW | kpi_trend | context | 66 | rule_conflict, activist_cross_link, routine_governance_watch | Leadership / governance on watch |
+| 2026-10-17 | CIFR | kpi_trend | context | 66 | rule_conflict, activist_cross_link, routine_governance_watch | Leadership / governance on watch |
+| 2026-10-17 | CORZ | kpi_trend | context | 66 | rule_conflict, activist_cross_link, routine_governance_watch | Leadership / governance on watch |
+| 2026-10-17 | CRM | kpi_trend | context | 66 | rule_conflict, activist_cross_link, routine_governance_watch | Leadership / governance on watch |
+| 2026-10-17 | CSCO | kpi_trend | context | 66 | rule_conflict, activist_cross_link, routine_governance_watch | Leadership / governance on watch |
+| 2026-10-17 | CVNA | kpi_trend | context | 66 | rule_conflict, activist_cross_link, routine_governance_watch | Leadership / governance on watch |
+| 2026-10-17 | DASH | kpi_trend | context | 66 | rule_conflict, activist_cross_link, routine_governance_watch | Leadership / governance on watch |
+| 2026-10-17 | DIS | kpi_trend | context | 66 | rule_conflict, activist_cross_link, routine_governance_watch | Leadership / governance on watch |
+| 2026-10-17 | EA | kpi_trend | context | 66 | rule_conflict, activist_cross_link, routine_governance_watch | Leadership / governance on watch |
+| 2026-10-17 | EOSE | kpi_trend | context | 66 | rule_conflict, activist_cross_link, routine_governance_watch | Leadership / governance on watch |
+| 2026-10-17 | FOX | kpi_trend | context | 66 | rule_conflict, activist_cross_link, routine_governance_watch | Leadership / governance on watch |
+| 2026-10-17 | FOXA | kpi_trend | context | 66 | rule_conflict, activist_cross_link, routine_governance_watch | Leadership / governance on watch |
+| 2026-10-17 | GNRC | kpi_trend | context | 66 | rule_conflict, activist_cross_link, routine_governance_watch | Leadership / governance on watch |
+| 2026-10-17 | GOOG | kpi_trend | context | 66 | rule_conflict, activist_cross_link, routine_governance_watch | Leadership / governance on watch |
+| 2026-10-17 | HIMS | kpi_trend | context | 66 | rule_conflict, activist_cross_link, routine_governance_watch | Leadership / governance on watch |
+| 2026-10-17 | HON | kpi_trend | context | 66 | rule_conflict, activist_cross_link, routine_governance_watch | Leadership / governance on watch |
+| 2026-10-17 | INCY | kpi_trend | context | 66 | rule_conflict, activist_cross_link, routine_governance_watch | Leadership / governance on watch |
+| 2026-10-17 | INTU | kpi_trend | context | 66 | rule_conflict, activist_cross_link, routine_governance_watch | Leadership / governance on watch |
+| 2026-10-17 | IVZ | kpi_trend | context | 66 | rule_conflict, activist_cross_link, routine_governance_watch | Leadership / governance on watch |
+| 2026-10-17 | KR | kpi_trend | context | 66 | rule_conflict, activist_cross_link, routine_governance_watch | Leadership / governance on watch |
+| 2026-10-17 | MS | kpi_trend | context | 66 | rule_conflict, activist_cross_link, routine_governance_watch | Leadership / governance on watch |
+| 2026-10-17 | STX | kpi_trend | context | 66 | rule_conflict, activist_cross_link, routine_governance_watch | Leadership / governance on watch |
+| 2026-10-17 | TFC | kpi_trend | context | 66 | rule_conflict, activist_cross_link, routine_governance_watch | Leadership / governance on watch |
+| 2026-10-17 | TGT | kpi_trend | context | 66 | rule_conflict, activist_cross_link, routine_governance_watch | Leadership / governance on watch |
+| 2026-10-17 | VEEV | kpi_trend | context | 66 | rule_conflict, activist_cross_link, routine_governance_watch | Leadership / governance on watch |
+| 2026-10-17 | WBD | kpi_trend | context | 66 | rule_conflict, activist_cross_link, routine_governance_watch | Leadership / governance on watch |
+| 2026-10-17 | YUM | kpi_trend | context | 66 | rule_conflict, activist_cross_link, routine_governance_watch | Leadership / governance on watch |
+| 2026-10-16 | T | news | context | 38 | rule_conflict, activist_cross_link, neutral_low_impact | AT&T (T) Announces Retirement of Global Marketing Officer Lo |
+| 2026-10-16 | WMT | news | context | 38 | rule_conflict, activist_cross_link, neutral_low_impact | Insider Selling: Walmart (NASDAQ:WMT) CEO Sells 13,125 Share |
+| 2026-10-16 | QCOM | news | context | 38 | rule_conflict, activist_cross_link, neutral_low_impact | CFO converts stock units at Qualcomm (QCOM); 3,267 shares ar |
+| 2026-10-16 | PSX | news | context | 38 | rule_conflict, activist_cross_link, neutral_low_impact | Phillips 66 (PSX) Declares $1.33 Quarterly Dividend; 1.8% Yi |
+| 2026-10-16 | GE | news | context | 38 | rule_conflict, activist_cross_link, neutral_low_impact | Vaso Stock Surges 149% in a Year: What's Behind the Rally? |
+| 2026-10-16 | PSX | news | context | 38 | rule_conflict, activist_cross_link, neutral_low_impact | Phillips 66 (PSX) Raises Quarterly Dividend by 4.7%, Yieldin |
+| 2026-10-16 | CRM | news | context | 38 | rule_conflict, activist_cross_link, neutral_low_impact | Strong 2027 Guidance and Generative AI Drive Salesforce’s (C |
+| 2026-10-16 | UNP | news | context | 38 | rule_conflict, activist_cross_link, neutral_low_impact | Union Pacific Stock (UNP) Dips on News the CFO Is Stepping D |
+| 2026-10-16 | PSX | news | context | 38 | rule_conflict, activist_cross_link, neutral_low_impact | Phillips 66 (PSX) Raises Quarterly Dividend to $1.33, Reflec |
+| 2026-10-16 | LUV | news | context | 38 | rule_conflict, activist_cross_link, neutral_low_impact | Southwest Airlines Q3 setup: Guidance faces earnings-revisio |
+| 2026-10-16 | UNP | news | context | 38 | rule_conflict, activist_cross_link, neutral_low_impact | Union Pacific (UNP) CFO Jennifer Hamann to Retire in Early 2 |
+| 2026-10-16 | PSX | news | context | 38 | rule_conflict, activist_cross_link, neutral_low_impact | Phillips 66 Announces Increase in Quarterly Dividend - Yahoo |
+| 2026-10-16 | TFC | news | context | 38 | rule_conflict, activist_cross_link, neutral_low_impact | TFC Q3 Earnings Miss Estimates as Securities Losses, Higher  |
+| 2026-10-16 | UNP | news | context | 38 | rule_conflict, activist_cross_link, neutral_low_impact | Union Pacific (UNP) CFO Jennifer Hamann to Retire in Early 2 |
+| 2026-10-16 | BNY | news | context | 38 | rule_conflict, activist_cross_link, neutral_low_impact | BNY Q3 Earnings Call Highlights Raised Outlook and AI Push |
+| 2026-10-16 | SCHW | news | context | 38 | rule_conflict, activist_cross_link, neutral_low_impact | Charles Schwab (SCHW) CEO says seeing record levels of inter |
+| 2026-10-16 | SBUX | news | context | 38 | rule_conflict, activist_cross_link, neutral_low_impact | Starbucks Stock Gains 15% YTD: Can Its Turnaround Drive More |
+| 2026-10-16 | OXY | news | context | 38 | rule_conflict, activist_cross_link, neutral_low_impact | Are Investors Undervaluing Occidental Petroleum (OXY) Right  |
+| 2026-10-16 | TFC | news | context | 38 | rule_conflict, activist_cross_link, neutral_low_impact | Truist Financial Corporation (TFC) Q3 Earnings and Revenues  |
+| 2026-10-16 | TFC | news | context | 38 | rule_conflict, activist_cross_link, neutral_low_impact | Truist Financial Corporation (TFC) Q3 Earnings and Revenues  |
+| 2026-10-16 | GOOGL | news | context | 38 | rule_conflict, activist_cross_link, neutral_low_impact | This Dividend King Is Getting In on the AI Energy Boom With  |
+| 2026-10-16 | MSFT | news | context | 38 | rule_conflict, activist_cross_link, neutral_low_impact | Microsoft CEO Satya Nadella Just Shared Bad News for Nvidia  |
+| 2026-10-16 | MSFT | news | context | 38 | rule_conflict, activist_cross_link, neutral_low_impact | Microsoft CEO Satya Nadella Just Shared Bad News for Nvidia  |
+| 2026-10-16 | UNP | news | context | 38 | rule_conflict, activist_cross_link, neutral_low_impact | Union Pacific Corporation $UNP Stock Acquired by Community F |
+| 2026-10-16 | SYY | news | context | 38 | rule_conflict, activist_cross_link, neutral_low_impact | Key facts: Sysco (SYY) Ends LA Strike Deal; Honors Grid Dyna |
+| 2026-10-16 | FAST | news | context | 38 | rule_conflict, activist_cross_link, neutral_low_impact | Fastenal (FAST) Q3 Results Highlight Margin Power Behind A 3 |
+| 2026-10-16 | SYY | news | context | 38 | rule_conflict, activist_cross_link, neutral_low_impact | Sysco Reaches Agreement with Teamsters Locals 630 and 848 to |
+| 2026-10-16 | SYY | news | context | 38 | rule_conflict, activist_cross_link, neutral_low_impact | Sysco Reaches Agreement with Teamsters Locals 630 and 848 to |
+| 2026-10-16 | VEEV | news | context | 38 | rule_conflict, activist_cross_link, neutral_low_impact | Veeva Systems (VEEV) Insider Sale: SVP, Gen. Counsel, Secret |
+| 2026-10-15 | DLTR | kpi_trend | context | 66 | rule_conflict, activist_cross_link, routine_governance_watch | Leadership / governance on watch |
 | 2026-10-15 | GE | kpi_trend | context | 66 | rule_conflict, activist_cross_link, routine_governance_watch | Leadership / governance on watch |
-| 2026-10-15 | O | news | context | 38 | rule_conflict, activist_cross_link, neutral_low_impact | Realty Income (O) Could Be 11% Undervalued Following Raised  |
-| 2026-10-15 | GE | news | context | 38 | rule_conflict, activist_cross_link, neutral_low_impact | Boeing's Secret Weapon Isn't on the Factory Floor -- It's in |
-| 2026-10-15 | ACHR | kpi_trend | context | 66 | rule_conflict, activist_cross_link, routine_governance_watch | Leadership / governance on watch |
-| 2026-10-15 | ARES | kpi_trend | context | 66 | rule_conflict, activist_cross_link, routine_governance_watch | Leadership / governance on watch |
-| 2026-10-15 | AVY | kpi_trend | context | 66 | rule_conflict, activist_cross_link, routine_governance_watch | Leadership / governance on watch |
-| 2026-10-15 | AXON | kpi_trend | context | 66 | rule_conflict, activist_cross_link, routine_governance_watch | Leadership / governance on watch |
-| 2026-10-15 | BB | kpi_trend | context | 66 | rule_conflict, activist_cross_link, routine_governance_watch | Leadership / governance on watch |
-| 2026-10-15 | BEN | kpi_trend | context | 66 | rule_conflict, activist_cross_link, routine_governance_watch | Leadership / governance on watch |
-| 2026-10-15 | BMY | kpi_trend | context | 66 | rule_conflict, activist_cross_link, routine_governance_watch | Leadership / governance on watch |
-| 2026-10-15 | BNY | kpi_trend | context | 66 | rule_conflict, activist_cross_link, routine_governance_watch | Leadership / governance on watch |
-| 2026-10-15 | CHRW | kpi_trend | context | 66 | rule_conflict, activist_cross_link, routine_governance_watch | Leadership / governance on watch |
-| 2026-10-15 | CIFR | kpi_trend | context | 66 | rule_conflict, activist_cross_link, routine_governance_watch | Leadership / governance on watch |
-| 2026-10-15 | CORZ | kpi_trend | context | 66 | rule_conflict, activist_cross_link, routine_governance_watch | Leadership / governance on watch |
-| 2026-10-15 | CSCO | kpi_trend | context | 66 | rule_conflict, activist_cross_link, routine_governance_watch | Leadership / governance on watch |
-| 2026-10-15 | CVNA | kpi_trend | context | 66 | rule_conflict, activist_cross_link, routine_governance_watch | Leadership / governance on watch |
-| 2026-10-15 | DIS | kpi_trend | context | 66 | rule_conflict, activist_cross_link, routine_governance_watch | Leadership / governance on watch |
-| 2026-10-15 | EA | kpi_trend | context | 66 | rule_conflict, activist_cross_link, routine_governance_watch | Leadership / governance on watch |
-| 2026-10-15 | EXP | kpi_trend | context | 66 | rule_conflict, activist_cross_link, routine_governance_watch | Leadership / governance on watch |
-| 2026-10-15 | FLEX | kpi_trend | context | 66 | rule_conflict, activist_cross_link, routine_governance_watch | Leadership / governance on watch |
-| 2026-10-15 | FOX | kpi_trend | context | 66 | rule_conflict, activist_cross_link, routine_governance_watch | Leadership / governance on watch |
-| 2026-10-15 | FOXA | kpi_trend | context | 66 | rule_conflict, activist_cross_link, routine_governance_watch | Leadership / governance on watch |
-| 2026-10-15 | GNRC | kpi_trend | context | 66 | rule_conflict, activist_cross_link, routine_governance_watch | Leadership / governance on watch |
-| 2026-10-15 | GOOG | kpi_trend | context | 66 | rule_conflict, activist_cross_link, routine_governance_watch | Leadership / governance on watch |
-| 2026-10-15 | HIMS | kpi_trend | context | 66 | rule_conflict, activist_cross_link, routine_governance_watch | Leadership / governance on watch |
-| 2026-10-15 | HON | kpi_trend | context | 66 | rule_conflict, activist_cross_link, routine_governance_watch | Leadership / governance on watch |
-| 2026-10-15 | INCY | kpi_trend | context | 66 | rule_conflict, activist_cross_link, routine_governance_watch | Leadership / governance on watch |
-| 2026-10-15 | INTU | kpi_trend | context | 66 | rule_conflict, activist_cross_link, routine_governance_watch | Leadership / governance on watch |
-| 2026-10-15 | IVZ | kpi_trend | context | 66 | rule_conflict, activist_cross_link, routine_governance_watch | Leadership / governance on watch |
-| 2026-10-15 | KHC | kpi_trend | context | 66 | rule_conflict, activist_cross_link, routine_governance_watch | Leadership / governance on watch |
-| 2026-10-15 | KR | kpi_trend | context | 66 | rule_conflict, activist_cross_link, routine_governance_watch | Leadership / governance on watch |
-| 2026-10-15 | SCHW | kpi_trend | context | 66 | rule_conflict, activist_cross_link, routine_governance_watch | Leadership / governance on watch |
-| 2026-10-15 | SMCI | kpi_trend | context | 66 | rule_conflict, activist_cross_link, routine_governance_watch | Leadership / governance on watch |
-| 2026-10-15 | TFC | kpi_trend | context | 66 | rule_conflict, activist_cross_link, routine_governance_watch | Leadership / governance on watch |
-| 2026-10-15 | TGT | kpi_trend | context | 66 | rule_conflict, activist_cross_link, routine_governance_watch | Leadership / governance on watch |
-| 2026-10-15 | VEEV | kpi_trend | context | 66 | rule_conflict, activist_cross_link, routine_governance_watch | Leadership / governance on watch |
-| 2026-10-15 | WBD | kpi_trend | context | 66 | rule_conflict, activist_cross_link, routine_governance_watch | Leadership / governance on watch |
-| 2026-10-15 | WMT | kpi_trend | context | 66 | rule_conflict, activist_cross_link, routine_governance_watch | Leadership / governance on watch |
-| 2026-10-15 | YUM | kpi_trend | context | 66 | rule_conflict, activist_cross_link, routine_governance_watch | Leadership / governance on watch |
-| 2026-10-14 | MSFT | news | context | 38 | rule_conflict, activist_cross_link, neutral_low_impact | Microsoft (MSFT) CFO sells 7,305 shares under a trading plan |
-| 2026-10-14 | DASH | news | context | 38 | rule_conflict, activist_cross_link, neutral_low_impact | DoorDash (NASDAQ:DASH) CFO Ravi Inukonda Sells 1,017 Shares  |
-| 2026-10-14 | DLTR | news | context | 38 | rule_conflict, activist_cross_link, neutral_low_impact | Dollar Tree Rises After Q2 Beat and Higher Full-Year EPS Out |
-| 2026-10-14 | MSFT | news | context | 38 | rule_conflict, activist_cross_link, neutral_low_impact | Microsoft Just Unveiled a Brand-New AI Chip. Could It Be the |
-| 2026-10-14 | DASH | news | context | 38 | rule_conflict, activist_cross_link, neutral_low_impact | At $195 a share, DoorDash (DASH) CFO sells 1,017 shares alon |
-| 2026-10-14 | VZ | news | context | 38 | rule_conflict, activist_cross_link, neutral_low_impact | Verizon Communications (NYSE:VZ) CEO Sells $47,223.00 in Sto |
-| 2026-10-14 | AOS | news | context | 38 | rule_conflict, activist_cross_link, neutral_low_impact | A. O. Smith Rewards Shareholders With 6% Hike in Dividend |
-| 2026-10-14 | MP | news | context | 38 | rule_conflict, activist_cross_link, neutral_low_impact | WATCH: Prep Sports Plus - MP gets homecoming win over FM , s |
-| 2026-10-14 | MS | news | context | 38 | rule_conflict, activist_cross_link, neutral_low_impact | Morgan Stanley (MS) CFO expects NII to expand over the next  |
-| 2026-10-14 | QDEL | news | context | 38 | rule_conflict, activist_cross_link, neutral_low_impact | Reasons to Add QuidelOrtho Stock to Your Portfolio for Now |
-| 2026-10-14 | FAST | news | context | 38 | rule_conflict, activist_cross_link, neutral_low_impact | Fastenal Q3 Earnings Beat on Expense Leverage, Sales Miss Es |
-| 2026-10-14 | KR | news | context | 38 | rule_conflict, activist_cross_link, neutral_low_impact | Kroger (KR) Stock Looks Fairly Valued As Merger Lawsuit Ques |
-| 2026-10-14 | O | news | context | 38 | rule_conflict, activist_cross_link, neutral_low_impact | One of The S&P 500's Top-Yielding Dividend Stocks Just Hiked |
-| 2026-10-14 | XOM | news | context | 38 | rule_conflict, activist_cross_link, neutral_low_impact | ExxonMobil (XOM): Can Its Chemical Recovery Survive a Smalle |
-| 2026-10-11 | T | kpi_trend | context | 66 | rule_conflict, activist_cross_link, routine_governance_watch | Leadership / governance on watch |
 | 2026-10-11 | BUR | vic_research | context | 33 | rule_conflict, activist_cross_link, neutral_low_impact | 07-BURFORD-CAPITAL-BUR-4694552095_151e |
 | 2026-10-11 | BUR | vic_research | context | 33 | rule_conflict, activist_cross_link, neutral_low_impact | VIC PDF intake - BUR - BUR VIC PDF |
 | 2026-10-11 | TRC | vic_research | context | 33 | rule_conflict, activist_cross_link, neutral_low_impact | VIC PDF intake - TRC - TRC VIC PDF |
@@ -193,15 +205,3 @@
 | 2026-10-11 | GYRO | third_party | context | 25 | rule_conflict, activist_cross_link, entity_mismatch, neutral_low_impact | GAMCO (+6) — SC 13D/A |
 | 2026-10-11 | CTAS | third_party | context | 25 | rule_conflict, activist_cross_link, neutral_low_impact | DFAN14A (proxy solicitation) · CTAS · 2025-12-22 |
 | 2026-10-11 | CTAS | third_party | context | 25 | rule_conflict, activist_cross_link, entity_mismatch, neutral_low_impact | Summer Hill Partners, LLLP – 27-0228576 — SC 13D/A |
-| 2026-10-11 | CTAS | third_party | context | 25 | rule_conflict, activist_cross_link, neutral_low_impact | Cintas Corp — SC 13D |
-| 2026-10-11 | TPHS | third_party | context | 25 | rule_conflict, activist_cross_link, entity_mismatch, neutral_low_impact | MFP Partners, L.P. (1) — SC 13D/A |
-| 2026-10-11 | TPHS | third_party | context | 25 | rule_conflict, activist_cross_link, entity_mismatch, neutral_low_impact | Third Avenue Management LLC (01-690900) — SC 13D/A |
-| 2026-10-11 | TPHS | third_party | context | 25 | rule_conflict, activist_cross_link, neutral_low_impact | SC 13D/A · TPHS · 2019-06-13 |
-| 2026-10-11 | CSX | third_party | context | 25 | rule_conflict, activist_cross_link, neutral_low_impact | DFAN14A (proxy solicitation) · CSX · 2022-05-02 |
-| 2026-10-11 | CSX | third_party | context | 25 | rule_conflict, activist_cross_link, entity_mismatch, neutral_low_impact | Mantle Ridge — PREN14A (proxy solicitation) |
-| 2026-10-11 | LLY | third_party | context | 25 | rule_conflict, activist_cross_link, neutral_low_impact | ELI LILLY AND COMPANY — DFAN14A (proxy solicitation) |
-| 2026-10-11 | LLY | third_party | context | 25 | rule_conflict, activist_cross_link, entity_mismatch, neutral_low_impact | Bulldog Investors — SC 13D/A |
-| 2026-10-11 | CART | third_party | context | 25 | rule_conflict, activist_cross_link, entity_mismatch, neutral_low_impact | SEQUOIA CAPITAL GLOBAL GROWTH FUND II, L.P. (... — SC 13D/A |
-| 2026-10-11 | DLTR | third_party | context | 25 | rule_conflict, activist_cross_link, entity_mismatch, neutral_low_impact | Mantle Ridge — DEFA14A |
-| 2026-10-11 | DLTR | third_party | context | 25 | rule_conflict, activist_cross_link, entity_mismatch, neutral_low_impact | Pershing Square — DEFA14A |
-| 2026-10-11 | ROL | third_party | context | 25 | rule_conflict, activist_cross_link, neutral_low_impact | R. Randall Rollins Voting Trust U/A dated Aug... — SC 13D/A |
