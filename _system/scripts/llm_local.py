@@ -55,6 +55,14 @@ class LocalLLMUnavailable(RuntimeError):
     """The server is not reachable, or has no model loaded."""
 
 
+def _parse_llama_cmdline(cmdline: str) -> tuple[str, str] | None:
+    port = re.search(r"--port\s+(\d+)", cmdline or "")
+    if not port:
+        return None
+    key = re.search(r"--api-key\s+(\S+)", cmdline or "")
+    return f"http://127.0.0.1:{port.group(1)}/v1", (key.group(1) if key else "")
+
+
 def discover() -> tuple[str, str] | None:
     """Find LM Studio's llama-server by inspecting its command line.
 
@@ -65,22 +73,34 @@ def discover() -> tuple[str, str] | None:
 
     The user-facing server on :1234 is stable and needs no key, but it has to be
     switched on in LM Studio; this makes the batch work either way.
+
+    Windows uses Win32_Process; macOS/Linux parse ``ps`` for ``llama-server``.
     """
-    if os.name != "nt":
-        return None
+    if os.name == "nt":
+        try:
+            out = subprocess.run(
+                ["powershell", "-NoProfile", "-Command",
+                 "(Get-CimInstance Win32_Process -Filter \"Name='llama-server.exe'\").CommandLine"],
+                capture_output=True, text=True, timeout=60,
+            ).stdout
+        except (OSError, subprocess.SubprocessError):
+            return None
+        return _parse_llama_cmdline(out or "")
+
     try:
         out = subprocess.run(
-            ["powershell", "-NoProfile", "-Command",
-             "(Get-CimInstance Win32_Process -Filter \"Name='llama-server.exe'\").CommandLine"],
-            capture_output=True, text=True, timeout=60,
+            ["ps", "-ax", "-o", "command="],
+            capture_output=True, text=True, timeout=30,
         ).stdout
     except (OSError, subprocess.SubprocessError):
         return None
-    port = re.search(r"--port\s+(\d+)", out or "")
-    if not port:
-        return None
-    key = re.search(r"--api-key\s+(\S+)", out or "")
-    return f"http://127.0.0.1:{port.group(1)}/v1", (key.group(1) if key else "")
+    for line in (out or "").splitlines():
+        if "llama-server" not in line:
+            continue
+        found = _parse_llama_cmdline(line)
+        if found:
+            return found
+    return None
 
 
 def _headers() -> dict:

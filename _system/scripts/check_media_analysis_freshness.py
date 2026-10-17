@@ -223,7 +223,9 @@ def evaluate_receipt(
         f"({stalled} days; last ready probe none) and the analysed count is stuck. "
         "Podcast and video analysis run on the workstation, not in CI. "
         "Check scheduled task 'SSI Podcast Analysis' (analysis_supervisor.ps1, `lms ps`) "
-        "and youtube_lane.py. See _system/scripts/install_local_lane_tasks.ps1."
+        "or Mac Mini LaunchAgent com.magis.ssi.media-lane "
+        "(media_lane_supervisor.py / install_mac_media_lane.sh) and youtube_lane.py. "
+        "See _system/scripts/install_local_lane_tasks.ps1."
     ], nxt
 
 
