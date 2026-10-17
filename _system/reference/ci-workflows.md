@@ -93,9 +93,9 @@ Research Watchdog only checks freshness. `check_media_analysis_freshness.py` fai
 | `full` / `history` | full tree | operations that genuinely need the corpus |
 | `minimal` / `marvin-agent` | `_system`, `.github` | agents and utilities |
 | `news` / `marvin-pick` | base plus holdings research metadata | news and evidence selection |
-| `darwin` / `dashboard` | base only; zero ticker trees | dashboard rebuild (no workflow uses `darwin` since darwin-refresh.yml was deleted) |
+| `dashboard` | base only; zero ticker trees | dashboard rebuild (the `darwin` alias was removed with the Darwin allocator, 2026-10) |
 | `pages` | `_system`, `.github`, `dashboard` | deploy-only |
 
-Sparse ticker paths are applied once with `git sparse-checkout set --stdin`. Darwin/dashboard profiles have a hard cap of 200 extra paths.
+Sparse ticker paths are applied once with `git sparse-checkout set --stdin`. The dashboard profile has a hard cap of 200 extra paths.
 
 For a pull_request run, `ci_resolve_checkout_ref.sh` resolves `refs/pull/N/head`, not the head branch, which automerge deletes on merge.

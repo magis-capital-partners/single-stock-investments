@@ -91,9 +91,6 @@ STANDALONE_EMBED_KEYS = (
     "kpi_trends",
     "activist_feed",
     "document_catalog",
-    "darwin",
-    "darwin_accounts",
-    "darwin_serving",
 )
 
 

@@ -251,7 +251,7 @@ def main() -> int:
     if ticker_has_theme_tag(ticker):
         run(
             "etf-dashboard sync",
-            [PY, "-m", "darwin.import_external_data"],
+            [PY, "-m", "marketdata.import_external_data"],
             optional=True,
             cwd=SCRIPTS,
         )

@@ -29,7 +29,7 @@ PY = sys.executable
 
 def load_sp500_rows() -> list[dict]:
     if not SP500_PATH.exists():
-        subprocess.run([PY, str(SCRIPTS / "darwin" / "refresh_sp500_constituents.py")], cwd=ROOT, check=True)
+        subprocess.run([PY, str(SCRIPTS / "marketdata" / "refresh_sp500_constituents.py")], cwd=ROOT, check=True)
     data = json.loads(SP500_PATH.read_text(encoding="utf-8"))
     if data.get("rows"):
         return data["rows"]

@@ -29,15 +29,13 @@ Static portfolio dashboard (etf-dashboard styling) in [`dashboard/`](dashboard/)
 
 **Equity model viz:** Click a ticker with an **M** badge (pilot `7176.T`) to view earnings model charts in the detail panel. Rebuild: `python _system/scripts/build_dashboard_data.py` (includes model ingest). Spec: [`_system/prompts/dashboard_equity_model_viz.md`](_system/prompts/dashboard_equity_model_viz.md). **v2 upgrade (R², PM diagnostics):** [`_system/prompts/equity_model_v2_pm_diagnostics.md`](_system/prompts/equity_model_v2_pm_diagnostics.md).
 
-**Darwin IRA:** [Research download plan](_system/frameworks/darwin_ira_research_plan.md) · copy PDF: `_system/scripts/copy_darwin_investor_pdf.ps1`
-
-**Darwin tab (phases 0–4):** [Adaptive portfolio layer](_system/frameworks/darwin_portfolio_tab_proposal.md) · [Source alignment](_system/frameworks/darwin_source_alignment.md) — Holdings | **Darwin** on the dashboard. Rebuild:
+**Darwin Covered Call tab** (`#/strategies/darwin`): which calls on S&P 500 stocks are worth selling against shares already held. Built from Cboe delayed chains several times each weekday by `darwin-covered-call.yml` (`_system/scripts/build_darwin_covered_call.py`); the historical evidence behind the score is in [`_system/data/darwin_cc/`](_system/data/darwin_cc/README.md). Local run:
 
 ```powershell
-pip install -r _system/scripts/requirements-darwin.txt
-python3 _system/scripts/build_darwin_portfolio.py --download
-python3 _system/scripts/build_dashboard_data.py
+python _system/scripts/build_darwin_covered_call.py
 ```
+
+The earlier Darwin allocator (IRR-driven Roth paper book) was retired in 2026-10; see [`docs/RETIRED.md`](docs/RETIRED.md).
 
 Use `--fast` for CI-speed training. Reference PDFs: [`_system/reference/quant-evolution/`](_system/reference/quant-evolution/).
 
@@ -107,12 +105,12 @@ Rendered via [`dashboard/short-alpha-viz.js`](dashboard/short-alpha-viz.js).
 
 ## LS-Algo systematic flows
 
-Nightly Power Zone valuation pipeline for the Darwin portfolio's systematic/volatility-flow ("LS-Algo") sleeve: build power zones → route method → valuation workbench → entry pricing from dated future economics, when available → gated IC review for stock-specific eligible models only → dashboard refresh.
+Nightly Power Zone valuation pipeline for the systematic/volatility-flow ("LS-Algo") sleeve: build power zones → route method → valuation workbench → entry pricing from dated future economics, when available → gated IC review for stock-specific eligible models only → dashboard refresh.
 
 ```powershell
-python _system/scripts/darwin/run_ls_algo_equity_onboard_all.py   # onboard new underlyings
-python _system/scripts/darwin/build_ls_algo_underlying_gap.py     # find coverage gaps
-python _system/scripts/darwin/run_ls_algo_valuation_pipeline.py   # nightly valuation run (wired into ci_rebuild_profile.py --full)
+python _system/scripts/marketdata/run_ls_algo_equity_onboard_all.py   # onboard new underlyings
+python _system/scripts/marketdata/build_ls_algo_underlying_gap.py     # find coverage gaps
+python _system/scripts/marketdata/run_ls_algo_valuation_pipeline.py   # nightly valuation run (ls-algo-universe.yml)
 ```
 
 Plan: [`ls_algo_power_zone_valuation_plan_2026-07-17.md`](_system/proposals/ls_algo_power_zone_valuation_plan_2026-07-17.md). Scheduled via [`ls-algo-universe.yml`](.github/workflows/ls-algo-universe.yml).

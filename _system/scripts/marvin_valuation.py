@@ -1166,17 +1166,9 @@ def main() -> None:
         if ticker_name:
             sys.path.insert(0, str(ROOT / "_system" / "scripts"))
             try:
-                from darwin.pit import archive_valuation_on_write
-                from darwin.research_events import append_event
+                from marketdata.valuation_history import archive_valuation_on_write
 
                 archive_valuation_on_write(path.parent.parent, computed)
-                if computed.get("as_of"):
-                    append_event(
-                        ticker_name,
-                        "valuation_refresh",
-                        str(computed["as_of"])[:10],
-                        path.relative_to(ROOT).as_posix(),
-                    )
             except ImportError:
                 pass
 

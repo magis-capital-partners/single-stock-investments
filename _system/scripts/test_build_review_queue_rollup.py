@@ -128,7 +128,6 @@ class ClassifyTests(unittest.TestCase):
             "AAPL_cross_check_HK_2026-06-01.md": "cross_check",
             "3905.T_deep_dive_2026-05-21.md": "deep_dive",
             "news_2026-06-15.md": "portfolio_news",
-            "darwin_regime_brief_2026-08-07.md": "darwin_regime_brief",
             "transcript_coverage_2026-08-06.md": "transcript_coverage",
             "ls_algo_ic_queue_2026-08-09.md": "ls_algo_ic_queue",
             "fund_family_proposals_2026-08-09.md": "fund_family_proposals",
@@ -300,7 +299,7 @@ class ExpiryTests(unittest.TestCase):
         self.assertEqual([r.get("expired", False) for r in rows], [False, False, True, True])
 
     def test_newest_never_expires_even_when_ancient(self):
-        rows = self.items("darwin_regime_brief", ["2026-01-01"])
+        rows = self.items("portfolio_news", ["2026-01-01"])
         rollup.mark_expiry(rows)
         self.assertFalse(rows[0].get("expired"))
 

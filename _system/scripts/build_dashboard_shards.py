@@ -52,9 +52,6 @@ CORE_EXCLUDED_TOP_LEVEL = (
     "kpi_trends",
     "document_catalog",
     "activist_feed",
-    "darwin",
-    "darwin_accounts",
-    "darwin_serving",
 )
 
 # Compact insight item fields kept in slim essential_insights entries.
@@ -256,7 +253,6 @@ def build_core_payload(payload: dict) -> dict:
         "research_memory": "data/research_memory.json",
         "index_membership": "data/index_membership.json",
         "activist_feed": "data/activist_feed.json",
-        "darwin_bundle": "data/darwin_bundle.json",
         "separations": "data/separations.json",
         "desk_briefs": "data/desk_briefs.json",
         "reverse_splits": "data/reverse_splits.json",
@@ -337,9 +333,6 @@ STANDALONE_EMBED_KEYS = (
     "kpi_trends",
     "activist_feed",
     "document_catalog",
-    "darwin",
-    "darwin_accounts",
-    "darwin_serving",
 )
 
 
@@ -347,7 +340,7 @@ def release_standalone_embeds(payload: dict) -> list[str]:
     """Replace bulky standalone blobs with path refs. Mutates payload.
 
     Call after write_shards, which still needs the full objects to build
-    core refs and darwin_bundle.json.
+    core refs.
     """
     removed: list[str] = []
     catalog = payload.get("document_catalog")
@@ -379,22 +372,7 @@ def release_standalone_embeds(payload: dict) -> list[str]:
         }
         payload.pop("activist_feed", None)
         removed.append("activist_feed")
-    if any(key in payload for key in ("darwin", "darwin_accounts", "darwin_serving")):
-        payload["darwin_ref"] = {"path": "dashboard/data/darwin_bundle.json"}
-        for key in ("darwin", "darwin_accounts", "darwin_serving"):
-            if payload.pop(key, None) is not None:
-                removed.append(key)
     return removed
-
-
-def write_darwin_bundle(payload: dict, data_dir: Path) -> None:
-    bundle = {
-        k: payload[k]
-        for k in ("darwin", "darwin_accounts", "darwin_serving")
-        if payload.get(k) is not None
-    }
-    if bundle:
-        (data_dir / "darwin_bundle.json").write_text(_dump(bundle), encoding="utf-8")
 
 
 def write_shards(payload: dict, insights_doc: dict | None, data_dir: Path) -> dict:
@@ -423,7 +401,6 @@ def write_shards(payload: dict, insights_doc: dict | None, data_dir: Path) -> di
         refuse_valuation_collapse(payload, prior_rows)
     core = build_core_payload(payload)
     core_path.write_text(_dump(core), encoding="utf-8")
-    write_darwin_bundle(payload, data_dir)
     ticker_count = write_ticker_shards(payload, data_dir)
     insight_count = write_insights_shards(insights_doc, data_dir)
     core_mb = core_path.stat().st_size / 1e6
