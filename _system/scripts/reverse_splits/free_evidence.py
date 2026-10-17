@@ -78,7 +78,8 @@ def validate_url(url):
 
 class FreeClient:
     """An explicit $0 data budget: an allowlist, cached GETs and bounded traffic."""
-    def __init__(self, root, user_agent, *, maximum=1200, delay=.5, validator=validate_url):
+    def __init__(self, root, user_agent, *, maximum=1200, delay=.5, validator=validate_url,
+                 max_bytes=30*1024*1024):
         self.root = Path(root)
         self.user_agent = user_agent
         self.maximum = maximum
@@ -89,6 +90,9 @@ class FreeClient:
         self.last = 0.
         self.lock = threading.Lock()
         self.validator = validator
+        if not isinstance(max_bytes, int) or not 0 < max_bytes <= 128*1024*1024:
+            raise ValueError("Public response size must be bounded at 128 MiB or less")
+        self.max_bytes = max_bytes
         self.opener = urllib.request.build_opener(PublicOnlyRedirect(validator))
 
     def get(self, url):
@@ -112,8 +116,8 @@ class FreeClient:
         try:
             req = urllib.request.Request(url, headers={"User-Agent": self.user_agent})
             with self.opener.open(req, timeout=30) as response:
-                raw = response.read(30*1024*1024+1)
-            if len(raw) > 30*1024*1024:
+                raw = response.read(self.max_bytes+1)
+            if len(raw) > self.max_bytes:
                 raise ValueError("Public response exceeded the bounded size")
             if b"access denied" in raw[:3000].lower() or b"undeclared automated" in raw[:3000].lower():
                 self.blocked.add(host)
