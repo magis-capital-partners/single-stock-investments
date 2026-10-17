@@ -12,7 +12,7 @@ DATE ?= $(shell date +%Y-%m-%d)
 TICKER ?=
 DATE ?= $(shell date +%Y-%m-%d)
 
-.PHONY: research-check research-check-all depth-check depth-audit evidence milly-repass book-estimate book-estimate-all holdco-uplift short-scan activist-scan activist-scan-all activist-triage activist-triage-check activist-feed activist-feed-check activist-registry-audit filing-resolve filing-sentinel-gold-check filing-sentinel-workflow-check filing-sentinel-mine filing-sentinel-batch filing-sentinel-raw-batch filing-sentinel-packets event-triage event-triage-check hk-scan hk-cross-check-all hk-extract-refresh third-party-scan-all cross-check-all transcript-sync batch-refresh evidence-check darwin-pit-check darwin-build darwin-roth darwin-ira darwin-pit-audit darwin-sync-external darwin-explore darwin-sp500-refresh persona-lens persona-insights persona-check document-registry document-catalog-search document-sync-drive document-sync-drive-letters document-sync-drive-general document-drive-plan document-drive-migrate document-drive-cleanup document-drive-audit research-memory specialist-13f-ingest tracked-funds-13f-ingest reddit-ingest biotech-quant-lib biotech-spend biotech-insider biotech-insider-fetch biotech-issuer-mcap biotech-short biotech-clinical biotech-paper biotech-composite biotech-validate sumzero-index letter-import-drive letter-extract-text letter-backfill letter-rebuild letter-repair-dates letter-date-check vault-setup vault-check podcasts-refresh podcasts-backfill podcasts-check warrant-refresh warrant-discover warrant-check
+.PHONY: research-check research-check-all depth-check depth-audit evidence milly-repass book-estimate book-estimate-all holdco-uplift short-scan activist-scan activist-scan-all activist-triage activist-triage-check activist-feed activist-feed-check activist-registry-audit filing-resolve filing-sentinel-gold-check filing-sentinel-workflow-check filing-sentinel-mine filing-sentinel-batch filing-sentinel-raw-batch filing-sentinel-packets event-triage event-triage-check hk-scan hk-cross-check-all hk-extract-refresh third-party-scan-all cross-check-all transcript-sync batch-refresh evidence-check sp500-refresh sp500-liquidity sync-external-data darwin-cc persona-lens persona-insights persona-check document-registry document-catalog-search document-sync-drive document-sync-drive-letters document-sync-drive-general document-drive-plan document-drive-migrate document-drive-cleanup document-drive-audit research-memory specialist-13f-ingest tracked-funds-13f-ingest reddit-ingest biotech-quant-lib biotech-spend biotech-insider biotech-insider-fetch biotech-issuer-mcap biotech-short biotech-clinical biotech-paper biotech-composite biotech-validate sumzero-index letter-import-drive letter-extract-text letter-backfill letter-rebuild letter-repair-dates letter-date-check vault-setup vault-check podcasts-refresh podcasts-backfill podcasts-check warrant-refresh warrant-discover warrant-check
 
 warrant-refresh:
 	$(PYTHON) $(SCRIPTS)/refresh_warrant_universe.py --refresh-market --capture-cohort
@@ -291,51 +291,25 @@ persona-check:
 	$(PYTHON) $(SCRIPTS)/lint_persona_lens.py --portfolio
 	@echo OK: persona-check
 
-darwin-sp500-refresh:
-	$(PYTHON) $(SCRIPTS)/darwin/refresh_sp500_constituents.py
-	$(PYTHON) $(SCRIPTS)/darwin/refresh_sp500_enriched.py
-	$(PYTHON) $(SCRIPTS)/darwin/refresh_sp500_liquidity.py
+sp500-refresh:
+	$(PYTHON) $(SCRIPTS)/marketdata/refresh_sp500_constituents.py
+	$(PYTHON) $(SCRIPTS)/marketdata/refresh_sp500_enriched.py
+	$(PYTHON) $(SCRIPTS)/marketdata/refresh_sp500_liquidity.py
 
-darwin-sp500-liquidity:
-	$(PYTHON) $(SCRIPTS)/darwin/refresh_sp500_liquidity.py
+sp500-liquidity:
+	$(PYTHON) $(SCRIPTS)/marketdata/refresh_sp500_liquidity.py
 
-darwin-options-cache:
-	$(PYTHON) $(SCRIPTS)/darwin/refresh_darwin_options_cache.py --import-etf-only
+sync-external-data:
+	cd $(SCRIPTS) && $(PYTHON) -m marketdata.import_external_data
 
-darwin-options-cache-live:
-	$(PYTHON) $(SCRIPTS)/darwin/refresh_darwin_options_cache.py --from-weights
-
-darwin-cc-test:
-	$(PYTHON) $(SCRIPTS)/darwin/test_covered_call_bcd.py
+darwin-cc:
+	$(PYTHON) $(SCRIPTS)/build_darwin_covered_call.py
 
 sp500-onboard-batch:
 	$(PYTHON) $(SCRIPTS)/bulk_sp500_onboard.py --batch-size $(or $(BATCH),8) --offset $(or $(OFFSET),0) --trigger-deep-dive --git-commit --git-push
 
 sp500-onboard-loop:
 	$(PYTHON) $(SCRIPTS)/bulk_sp500_onboard.py --batch-size $(or $(BATCH),8) --offset 0 --sleep 0.5 --trigger-deep-dive --git-commit --git-push --loop-until-done
-
-darwin-build:
-	$(PYTHON) $(SCRIPTS)/build_darwin_portfolio.py --fast --account all
-	$(PYTHON) $(SCRIPTS)/build_dashboard_data.py
-
-darwin-roth:
-	$(PYTHON) $(SCRIPTS)/build_darwin_portfolio.py --fast --account roth
-
-darwin-ira: darwin-roth
-
-darwin-sync-external:
-	$(PYTHON) $(SCRIPTS)/build_darwin_portfolio.py --sync-external
-
-darwin-explore:
-	$(PYTHON) $(SCRIPTS)/build_darwin_portfolio.py --fast
-	$(PYTHON) $(SCRIPTS)/build_dashboard_data.py
-
-darwin-pit-audit:
-	$(PYTHON) $(SCRIPTS)/build_darwin_portfolio.py --pit-audit --fast
-
-darwin-pit-check:
-	$(PYTHON) $(SCRIPTS)/build_darwin_portfolio.py --fast
-	$(PYTHON) $(SCRIPTS)/check_darwin_pit.py
 
 research-check:
 ifndef TICKER

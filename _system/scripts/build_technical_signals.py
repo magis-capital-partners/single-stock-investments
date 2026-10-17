@@ -50,7 +50,7 @@ SCRIPTS = Path(__file__).resolve().parent
 if str(SCRIPTS) not in sys.path:
     sys.path.insert(0, str(SCRIPTS))
 
-from darwin.prices import stooq_symbol  # noqa: E402
+from marketdata.prices import stooq_symbol  # noqa: E402
 from fetch_equity_prices import yahoo_symbol_for  # noqa: E402
 from portfolio_registry import load_registry  # noqa: E402
 from stooq_csv import DAILY_HEADER, check_stooq_csv  # noqa: E402

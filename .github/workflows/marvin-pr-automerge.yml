@@ -41,9 +41,12 @@ on:
     branches: [main]
   # Research quality gates research PRs. Python tests is the other check most
   # agent PRs run; when it finishes after the merge job gave up waiting on it,
-  # its completion is the retry.
+  # its completion is the retry. The code gate is a short one-shot assessor
+  # (below), so every workflow that can gate a code PR is listed here: a
+  # completion re-invokes the gate instead of a runner sleeping until the
+  # checks finish.
   workflow_run:
-    workflows: ["Research quality", "Python tests"]
+    workflows: ["Research quality", "Python tests", "CI bootstrap smoke", "LLM Workflow Governance", "Energy model tests", "Filing Sentinel gold set", "Agent context"]
     types: [completed]
 
 permissions:
@@ -356,15 +359,21 @@ jobs:
     needs: resolve-pr
     if: needs.resolve-pr.outputs.eligible == 'true' && (needs.resolve-pr.outputs.lane == 'code' || needs.resolve-pr.outputs.lane == 'data')
     runs-on: ubuntu-latest
-    # fact-ledger-currency may spend most of its 90 minutes in a full checkout.
-    # 55 minutes was ending the gate while that check was still running.
-    timeout-minutes: 130
+    # One-shot assessor, not a waiter: it polls for at most 15 minutes (the
+    # window in which check runs register after a push), then reports
+    # `pending` and exits. The workflow_run triggers above re-invoke it when
+    # the outstanding checks complete, so no runner sleeps for two hours
+    # holding a slot while CI runs elsewhere.
+    timeout-minutes: 20
     concurrency:
       group: agent-automerge-gate-${{ needs.resolve-pr.outputs.number }}
+      # Never cancel the twin run (PR #1022): a workflow_run retry that
+      # cancelled the in-progress gate left nothing queued behind it.
       cancel-in-progress: false
     outputs:
       # Empty unless every check passed on this exact SHA.
       head_sha: ${{ steps.checks.outputs.sha }}
+      pending: ${{ steps.checks.outputs.pending }}
     steps:
       - name: Mark draft PR ready
         if: needs.resolve-pr.outputs.is_draft == 'true'
@@ -383,7 +392,7 @@ jobs:
           set -euo pipefail
           # Jobs belonging to this workflow must not gate themselves.
           OWN='^(resolve-pr|gate|code-gate|merge|notify|Resolve PR number and eligibility)$'
-          DEADLINE=$(( $(date +%s) + 7200 ))
+          DEADLINE=$(( $(date +%s) + 900 ))
           # Checks take a minute or two to register. Until this grace period is
           # up, "zero checks" means "not reported yet"; after it, it means the
           # repo's path filters genuinely select nothing for this change (a
@@ -461,12 +470,16 @@ jobs:
               exit 0
             fi
             if [ "$(date +%s)" -ge "$DEADLINE" ]; then
+              # Not a failure: checks are still running. Report pending and
+              # stop; a workflow_run completion re-invokes this gate. The
+              # merge job only runs when head_sha is set, so nothing merges.
               if [ -n "$CANCELLED" ]; then
-                echo "::error::PR #$PR blocked: latest check run still cancelled after 120m:$CANCELLED. A superseded run is re-checked against this SHA; no passing successor arrived."
+                echo "::warning::PR #$PR latest check run still cancelled after the assessment window:$CANCELLED. A superseded run is re-checked against this SHA; no passing successor arrived yet."
               else
-                echo "::error::PR #$PR blocked: checks still pending after 120m (total=$TOTAL pending=$PENDING)."
+                echo "::warning::PR #$PR checks still pending after the assessment window (total=$TOTAL pending=$PENDING); automerge re-runs when they complete."
               fi
-              exit 1
+              echo "pending=true" >> "$GITHUB_OUTPUT"
+              exit 0
             fi
             echo "checks total=$TOTAL pending=$PENDING — waiting..."
             sleep 20

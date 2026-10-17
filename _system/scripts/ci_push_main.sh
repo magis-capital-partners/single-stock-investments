@@ -115,9 +115,10 @@ run_builder() {
       git add -- ':(glob)*/INDEX.csv' ;;
     portfolio) "$PYTHON" _system/scripts/sync_portfolio_from_registry.py &&
       git add _system/portfolio/holdings.md _system/portfolio/classification.json _system/portfolio/us_ticker_config.json ;;
-    research_events) (cd _system/scripts && "$PYTHON" -c "from darwin.research_events import rebuild_events_log; rebuild_events_log()") &&
-      git add _system/portfolio/research_events.jsonl ;;
-    external_sync) (cd _system/scripts && "$PYTHON" -m darwin.import_external_data) || true
+    # Retired with the Darwin allocator (2026-10): a branch that still touches the log
+    # resolves to main's deletion.
+    research_events) git rm -q --ignore-unmatch _system/portfolio/research_events.jsonl ;;
+    external_sync) (cd _system/scripts && "$PYTHON" -m marketdata.import_external_data) || true
       git add _system/reference/market-data/external/sync_report.json 2>/dev/null || true ;;
     insights) "$PYTHON" _system/scripts/build_insights.py &&
       git add dashboard/data/insights.json _system/reference/data-sources/insights_record_archive.json ;;

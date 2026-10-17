@@ -92,6 +92,13 @@ EXCHANGE_META = {
     "ENX.PA": "Euronext Paris",
     "SU.PA": "Euronext Paris",
     "RMS.PA": "Euronext Paris",
+    "SAF.PA": "Euronext Paris",
+    "AIR.PA": "Euronext Paris",
+    "AENA.MC": "BME Madrid",
+    "CLNX.MC": "BME Madrid",
+    "CP": "NYSE",
+    "CNI": "NYSE",
+    "FER": "NASDAQ",
     "EVR": "CSE",
     "GPW.WA": "WSE",
     "DNP.WA": "WSE",
@@ -159,7 +166,7 @@ def infer_market_from_ticker(ticker: str) -> str | None:
         return "CA"
     if ticker.endswith(".HK"):
         return "EU"
-    if ticker.endswith((".DE", ".PA", ".WA", ".SA", ".MX", ".KL", ".SI", ".AS", ".SW")):
+    if ticker.endswith((".DE", ".PA", ".WA", ".SA", ".MX", ".KL", ".SI", ".AS", ".SW", ".MC")):
         return "EU"
     if ticker.endswith(".L"):
         return "UK"

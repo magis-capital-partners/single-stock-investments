@@ -152,7 +152,6 @@ REVIEW_SUPERSEDED_FAMILIES: tuple[tuple[re.Pattern[str], int], ...] = (
     (re.compile(r"^(activist_triage)_(\d{4}-\d{2}-\d{2})\.md$"), 2),
     (re.compile(r"^(filing_insights)_(\d{4}-\d{2}-\d{2})\.md$"), 2),
     (re.compile(r"^(activist_press_digest)_(\d{4}-\d{2}-\d{2})\.md$"), 2),
-    (re.compile(r"^(darwin_regime_brief)_(\d{4}-\d{2}-\d{2})\.md$"), 2),
     (re.compile(r"^(transcript_coverage)_(\d{4}-\d{2}-\d{2})\.md$"), 2),
     (re.compile(r"^(world_model_review_[A-Za-z0-9.\-]+)_(\d{4}-\d{2}-\d{2})\.md$"), 1),
 )

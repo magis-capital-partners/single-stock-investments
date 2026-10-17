@@ -240,6 +240,32 @@ jobs:
           script: |
             // A scheduled run tests main HEAD exactly like a push does.
             const isPush = context.eventName === 'push' || context.eventName === 'schedule';
+            // Unchanged-HEAD exit: a scheduled run whose commit already has a
+            // successful Research quality run has nothing new to judge. Keep
+            // the 6-hour cadence for detection latency; skip the duplicate
+            // work. Fail open: any lookup error runs the full suite.
+            if (context.eventName === 'schedule') {
+              const log = typeof core.info === 'function' ? core.info.bind(core) : () => {};
+              try {
+                const prior = await github.paginate(github.rest.actions.listWorkflowRuns, {
+                  owner: context.repo.owner,
+                  repo: context.repo.repo,
+                  workflow_id: 'research-quality.yml',
+                  status: 'success',
+                  per_page: 50,
+                });
+                const tested = prior.some(run => run.head_sha === context.sha && run.id !== context.runId);
+                if (tested) {
+                  log(`HEAD ${context.sha} already has a successful Research quality run; skipping.`);
+                  for (const key of ['prompt_sync', 'research_lint', 'dashboard_integrity', 'ssi_pipeline', 'fact_currency', 'graph_invariants']) {
+                    core.setOutput(key, 'false');
+                  }
+                  return;
+                }
+              } catch (error) {
+                log(`unchanged-HEAD lookup failed (${error.message}); running the full suite.`);
+              }
+            }
             const prNumber = context.payload.pull_request
               ? context.payload.pull_request.number
               : (context.payload.client_payload && context.payload.client_payload.pr);

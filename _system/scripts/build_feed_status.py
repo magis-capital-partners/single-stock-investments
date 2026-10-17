@@ -107,16 +107,16 @@ SURFACES: list[dict] = [
     },
     {
         "id": "darwin",
-        "label": "Darwin",
+        "label": "Darwin Covered Call",
         "hash": "#/strategies/darwin/overview",
-        "lane": "data-pipeline-intake-full",
+        "lane": "darwin-covered-call",
         "kind": "file",
-        "path": "dashboard/data/darwin_bundle.json",
-        "stamp_fields": ["darwin.generated_at", "darwin_serving.generated_at"],
+        "path": "dashboard/data/darwin_cc.json",
+        "stamp_fields": ["generated_at"],
         "max_age_hours": 96,
         "healer": (
-            "The Darwin paper book is rebuilt by build_darwin_portfolio.py and "
-            "republished with nightly intake. This page does not dispatch that job."
+            "darwin-covered-call.yml rebuilds the signal from Cboe delayed chains several times "
+            "each weekday (build_darwin_covered_call.py). This page does not dispatch that job."
         ),
     },
     {

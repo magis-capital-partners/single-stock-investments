@@ -89,7 +89,7 @@ def _sync_external() -> None:
     """Best-effort etf-dashboard sync before reading local paths."""
     try:
         sys.path.insert(0, str(SCRIPTS))
-        from darwin.import_external_data import sync_external_market_data  # noqa: WPS433
+        from marketdata.import_external_data import sync_external_market_data  # noqa: WPS433
 
         sync_external_market_data()
     except Exception:
@@ -99,7 +99,7 @@ def _sync_external() -> None:
 def _etf_metrics_path() -> Path | None:
     try:
         sys.path.insert(0, str(SCRIPTS))
-        from darwin.external_sources import etf_data_path  # noqa: WPS433
+        from marketdata.external_sources import etf_data_path  # noqa: WPS433
 
         p = etf_data_path("etf_metrics_daily.csv")
         if p:
@@ -118,7 +118,7 @@ def _etf_metrics_path() -> Path | None:
 def _external_json(name: str) -> Path | None:
     try:
         sys.path.insert(0, str(SCRIPTS))
-        from darwin.external_sources import etf_data_path  # noqa: WPS433
+        from marketdata.external_sources import etf_data_path  # noqa: WPS433
 
         p = etf_data_path(name)
         if p:
