@@ -5,12 +5,11 @@ Profiles (aliases in parentheses):
   minimal              — build_dashboard_data only
   insights (pages-fast)— letters/index/insights/research_memory + dashboard
   activist             — activist feed + document registry slice
-  darwin (darwin-full) — IRA tier download + Darwin portfolio + dashboard
   full (intake-full)    — nightly full rebuild (documents, KPI, insights, memory);
                           valuation lives in Power Zone Universe, activist in the
                           dedicated Data Pipeline job
 
-Removed: darwin-fast (use insights or darwin).
+Removed: darwin, darwin-full, darwin-fast (the Darwin allocator was retired in 2026-10).
 """
 from __future__ import annotations
 
@@ -23,9 +22,10 @@ from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[2]
 
+RETIRED_PROFILES = frozenset({"darwin", "darwin-full", "darwin-fast"})
+
 ALIASES = {
     "pages-fast": "insights",
-    "darwin-full": "darwin",
     "intake-full": "full",
     "world-model-monthly": "world-model-weekly",
 }
@@ -71,12 +71,6 @@ PROFILES: dict[str, list[list[str]]] = {
         ["_system/scripts/auto_resolve_filing_events.py"],
         ["_system/scripts/build_letter_drive_links.py"],
         ["_system/scripts/build_index_membership.py"],
-        ["_system/scripts/build_dashboard_data.py"],
-    ],
-    "darwin": [
-        ["_system/scripts/download_ira_research.py", "--tier", "A"],
-        ["_system/scripts/download_ira_research.py", "--tier", "B"],
-        ["_system/scripts/build_darwin_portfolio.py"],
         ["_system/scripts/build_dashboard_data.py"],
     ],
     "full": [
@@ -156,9 +150,10 @@ def resolve_profile(name: str) -> str:
     key = name.strip()
     if key == "none":
         raise SystemExit("profile 'none' means skip rebuild; do not invoke this script")
-    if key == "darwin-fast":
+    if key in RETIRED_PROFILES:
         raise SystemExit(
-            "profile 'darwin-fast' was removed; use 'darwin' (full Darwin) or 'insights' (pages)"
+            f"profile '{key}' was removed with the Darwin allocator (2026-10); "
+            "the Darwin Covered Call page is built by darwin-covered-call.yml"
         )
     return ALIASES.get(key, key)
 

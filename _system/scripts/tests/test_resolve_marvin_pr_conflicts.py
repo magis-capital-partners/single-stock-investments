@@ -210,6 +210,44 @@ def test_a_generated_file_conflict_is_flagged_and_keeps_main(tmp_path, resolver,
     assert git(clone, "show", f"{pushed}:ABC/research/note.md") == "branch note, no conflict"
 
 
+def test_a_generated_file_main_retired_stays_deleted(tmp_path, resolver, monkeypatch):
+    # The Darwin removal (2026-10) deleted research_events.jsonl and the
+    # dashboard/data/darwin_* files on main. A deep-dive PR that still appends
+    # to them hits modify/delete, which used to abort the resolver for good.
+    seed = tmp_path / "seed"
+    seed.mkdir()
+    git(seed, "init", "-q", "-b", "main")
+    write(seed, "_system/memory/daily/2026-09-01.md", "# Daily log 2026-09-01\n")
+    write(seed, "_system/portfolio/research_events.jsonl", '{"ticker": "ZZZ"}\n')
+    write(seed, "_system/research/milly_log.md", "| ZZZ | ok |\n")
+    write(seed, "dashboard/data/darwin_features.json", "base\n")
+    write(seed, "ABC/research/note.md", "base note\n")
+    commit_all(seed, "A")
+    git(seed, "checkout", "-q", "-b", BRANCH)
+    write(seed, "_system/portfolio/research_events.jsonl", '{"ticker": "ZZZ"}\n{"ticker": "ABC"}\n')
+    write(seed, "dashboard/data/darwin_features.json", "branch rebuild\n")
+    write(seed, "ABC/research/note.md", "branch note\n")
+    branch_tip = commit_all(seed, "F")
+    git(seed, "checkout", "-q", "main")
+    (seed / "_system/portfolio/research_events.jsonl").unlink()
+    (seed / "dashboard/data/darwin_features.json").unlink()
+    commit_all(seed, "D: retire Darwin")
+    origin = tmp_path / "origin.git"
+    git(tmp_path, "init", "-q", "--bare", str(origin))
+    git(seed, "push", "-q", str(origin), "main", BRANCH)
+    clone = tmp_path / "clone"
+    git(tmp_path, "clone", "-q", "--no-local", str(origin), str(clone))
+    point_resolver_at(resolver, monkeypatch, clone)
+
+    pushed = resolver.resolve("1014", "ABC")
+
+    assert pushed and pushed != branch_tip
+    tree = git(clone, "ls-tree", "-r", "--name-only", pushed).splitlines()
+    assert "_system/portfolio/research_events.jsonl" not in tree, "the ABC row must not resurrect the file"
+    assert "dashboard/data/darwin_features.json" not in tree
+    assert git(clone, "show", f"{pushed}:ABC/research/note.md") == "branch note"
+
+
 def origin_tip(tmp_path: Path) -> str:
     return git(tmp_path, "--git-dir", str(tmp_path / "origin.git"), "rev-parse", BRANCH)
 

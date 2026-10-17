@@ -143,8 +143,8 @@ def fetch_yahoo_daily_csv(symbol: str, dest: Path) -> tuple[bool, str]:
 def download_ticker_returns(ticker: str, market: str) -> tuple[bool, str]:
     """Yahoo monthly returns via existing price helper."""
     sys.path.insert(0, str(ROOT / "_system" / "scripts"))
-    from darwin.prices import fetch_yahoo_monthly  # noqa: E402
-    from darwin.symbols import yahoo_for_ticker  # noqa: E402
+    from marketdata.prices import fetch_yahoo_monthly  # noqa: E402
+    from marketdata.symbols import yahoo_for_ticker  # noqa: E402
 
     ysym = yahoo_for_ticker(ticker, market)
     dates, rets, src = fetch_yahoo_monthly(ysym, months=120)

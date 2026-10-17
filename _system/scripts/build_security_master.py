@@ -127,7 +127,7 @@ def company_name_before(text: str, span_start: int) -> str:
 STRONG_HARVEST_RULES = {"dollar", "paren_exch", "exch_prefix", "dotted"}
 ALLOWED_DOTTED_SUFFIXES = {
     "HK", "T", "TO", "L", "LS", "AX", "DE", "PA", "AS", "MI", "ST", "HE",
-    "OL", "CO", "WA", "SA", "MX", "NS", "KL", "SI", "BK", "TW", "KS",
+    "OL", "CO", "WA", "SA", "MX", "MC", "NS", "KL", "SI", "BK", "TW", "KS",
 }
 
 MANUAL_SECURITY_METADATA: dict[str, dict] = {

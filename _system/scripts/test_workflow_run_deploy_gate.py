@@ -30,10 +30,16 @@ def _git(repo: Path, *args: str) -> str:
 
 
 class DecideTests(unittest.TestCase):
-    def test_push_and_dispatch_always_deploy(self) -> None:
-        for event in ("push", "workflow_dispatch"):
-            deploy, _ = gate.decide(event, shipped=True, synced=True, deferred_today=True, pruned_today=True)
-            self.assertTrue(deploy, event)
+    def test_dispatch_always_deploys_and_push_is_fingerprinted(self) -> None:
+        deploy, _ = gate.decide("workflow_dispatch", shipped=True, synced=True, deferred_today=True, pruned_today=True)
+        self.assertTrue(deploy)
+        # An automerge squash is a push; one that changed no deploy input
+        # must not redeploy what the last deploy shipped and synced.
+        deploy, reason = gate.decide("push", shipped=True, synced=True, deferred_today=False, pruned_today=False)
+        self.assertFalse(deploy)
+        self.assertIn("unchanged", reason)
+        deploy, _ = gate.decide("push", shipped=False, synced=False, deferred_today=False, pruned_today=False)
+        self.assertTrue(deploy)
 
     def test_upstream_run_with_unchanged_inputs_does_not_deploy(self) -> None:
         # A Power Zone / LS-algo run whose main job was skipped commits nothing,

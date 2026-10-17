@@ -2785,7 +2785,7 @@
     const ceilingShort = wmClassShort(claimCeiling);
     const counts = strip.counts || {};
     const historySeries = strip.history_series || {};
-    const darwin = bounds.darwin || {};
+    const regime = bounds.regime || {};
     const demotions = bounds.demotions || [];
     const isHorizonDemotion = (d) => {
       const art = String(d.artifact || '');
@@ -2801,7 +2801,7 @@
     const engines = bounds.engines || [];
     const enginesTooltip = engines.length
       ? engines.map(e => `${e.id || ''}: ${e.role || ''}`).join(' · ')
-      : 'World Model / Darwin / house valuation / Lawrence / Santa Fe stay separate languages';
+      : 'World Model / market regime / house valuation / Lawrence / Santa Fe stay separate languages';
     const claimHygieneSummary = (() => {
       const bits = [`${goodhartFails.length} GH fails`];
       if (horizonDemotions.length) bits.push('horizons P0');
@@ -3056,7 +3056,7 @@
 
         <details class="wm-panel">
           <summary>Claim hygiene <span class="tier-sub">(${escapeHtml(claimHygieneSummary)})</span></summary>
-          <p class="tier-sub wm-claim-line">Darwin: <strong>${escapeHtml(String(darwin.regime_label || 'n/a'))}</strong>${darwin.stress ? ' (stress)' : ''} · Thesis ${escapeHtml(wmClassShort(bounds.thesis_hygiene_ceiling || 'P3_oriented'))} · Path ${escapeHtml(wmClassShort(bounds.market_path_ceiling || claimCeiling))}</p>
+          <p class="tier-sub wm-claim-line">Regime: <strong>${escapeHtml(String(regime.regime_label || 'n/a'))}</strong>${regime.stress ? ' (stress)' : ''} · Thesis ${escapeHtml(wmClassShort(bounds.thesis_hygiene_ceiling || 'P3_oriented'))} · Path ${escapeHtml(wmClassShort(bounds.market_path_ceiling || claimCeiling))}</p>
           ${horizonDemotions.length ? `<p class="tier-sub wm-claim-line">Horizons already P0 (see Expert horizons) — demotion rows suppressed</p>` : ''}
           ${demotionRows ? `<table class="darwin-table wm-table">
             <thead><tr><th>Demotion</th><th>Class</th><th>Why</th></tr></thead>

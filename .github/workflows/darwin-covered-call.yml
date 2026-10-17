@@ -1,0 +1,64 @@
+name: Darwin Covered Call
+on:
+  # No workflow_dispatch: test_llm_workflow_governance.py bans a manual run.
+  #
+  # Four weekday runs, written in UTC (GitHub ignores any timezone key) and kept
+  # off the quarter-hour, where scheduled runs are dropped and delayed:
+  #   14:37  10:37 EDT /  9:37 EST   after the open settles
+  #   17:07  13:07 EDT / 12:07 EST   midday
+  #   19:52  15:52 EDT / 14:52 EST   into the close
+  #   21:47  17:47 EDT / 16:47 EST   after the close in both, the day's settled quotes
+  # Scheduled runs here start late (up to several hours), so treat the
+  # intraday runs as "refreshed during the day", not as a timetable.
+  schedule:
+    - cron: "37 14 * * 1-5"
+    - cron: "7 17 * * 1-5"
+    - cron: "52 19 * * 1-5"
+    - cron: "47 21 * * 1-5"
+permissions:
+  contents: write
+concurrency:
+  group: darwin-covered-call
+  cancel-in-progress: false
+jobs:
+  signal:
+    runs-on: ubuntu-latest
+    timeout-minutes: 40
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: main
+          fetch-depth: 1
+          sparse-checkout: |
+            /_system/scripts/build_darwin_covered_call.py
+            /_system/data/darwin_cc/
+            /_system/reference/market-data/index/sp500_constituents.json
+            /dashboard/data/technical_signals.json
+            /dashboard/data/darwin_cc.json
+          sparse-checkout-cone-mode: false
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Build the covered-call signal from Cboe delayed chains
+        # ~500 chains at 3 parallel requests with Cboe's rate limit took 11 minutes locally.
+        timeout-minutes: 28
+        run: python _system/scripts/build_darwin_covered_call.py
+      - name: Publish the signal
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add dashboard/data/darwin_cc.json
+          if git diff --cached --quiet; then
+            echo "No change to publish."
+            exit 0
+          fi
+          git commit -m "chore(darwin-cc): refresh covered-call signal"
+          for attempt in 1 2 3; do
+            if git pull --rebase origin main && git push origin HEAD:main; then
+              exit 0
+            fi
+            git rebase --abort 2>/dev/null || true
+            sleep $((attempt * 15))
+          done
+          echo "Could not push the refreshed signal after three attempts." >&2
+          exit 1

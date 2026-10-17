@@ -4,26 +4,23 @@ from __future__ import annotations
 
 import json
 import re
+from datetime import date, datetime, timezone
 from pathlib import Path
 from typing import Any
 
 ROOT = Path(__file__).resolve().parents[2]
 CLASSES_PATH = ROOT / "_system" / "reference" / "world_model" / "predictability_classes.json"
-DARWIN_OBS = ROOT / "dashboard" / "data" / "darwin_observatory.json"
+VOL_METRICS = ROOT / "dashboard" / "data" / "vol_metrics_latest.json"
+# VIX at or above this is "stressed" (the threshold the retired Darwin macro regime used).
+VIX_STRESS = 28.0
+VIX_ADAPTING = 22.0
+# The vol metrics are nightly; a long weekend plus a holiday is four days old.
+# Older than this the regime reads "stale", never "calm".
+VOL_REGIME_MAX_AGE_DAYS = 5
 CRITICALITY_SUMMARY = ROOT / "dashboard" / "data" / "criticality_summary.json"
 ERROR_DIAGRAM = ROOT / "dashboard" / "data" / "criticality_error_diagram.json"
 
 _CLASS_DOC: dict | None = None
-
-STRESS_LABELS = frozenset({
-    "stress",
-    "stressed",
-    "complex",
-    "crisis",
-    "turbulent",
-    "high_stress",
-})
-
 
 def load_classes() -> dict:
     global _CLASS_DOC
@@ -85,34 +82,42 @@ def class_for_horizon() -> str:
     return str((doc.get("defaults") or {}).get("expert_horizon_dates") or "P0_ill_defined")
 
 
-def darwin_regime_stress(obs: dict | None = None) -> dict:
-    """Return Darwin regime signal for Magis market-path demotion."""
-    if obs is None:
-        if not DARWIN_OBS.exists():
-            return {
-                "available": False,
-                "stress": False,
-                "regime_label": None,
-                "path": str(DARWIN_OBS.relative_to(ROOT)).replace("\\", "/"),
-            }
-        try:
-            obs = json.loads(DARWIN_OBS.read_text(encoding="utf-8"))
-        except (OSError, json.JSONDecodeError):
-            obs = {}
-    regime = (obs or {}).get("regime") or {}
-    labels = [
-        str(regime.get("label") or "").lower(),
-        str(regime.get("research") or "").lower(),
-        str(regime.get("macro") or "").lower(),
-    ]
-    stress = any(lab in STRESS_LABELS for lab in labels if lab)
+def vol_regime_stress(doc: dict | None = None, *, today: date | None = None) -> dict:
+    """Market regime for the market-path cap, from the nightly vol metrics (build_vol_metrics.py).
+
+    Stressed when VIX is at or above VIX_STRESS or the VIX/VIX3M term structure is in
+    backwardation. Replaces the Darwin observatory regime, retired with the allocator in 2026-10.
+    A document without an ``as_of``, or older than VOL_REGIME_MAX_AGE_DAYS, is unavailable
+    and labelled "stale": a frozen feed must not keep reporting calm.
+    """
+    path = str(VOL_METRICS.relative_to(ROOT)).replace("\\", "/")
+    if doc is None:
+        doc = _load_json(VOL_METRICS)
+    regime = (doc or {}).get("regime") or {}
+    vix = regime.get("vix")
+    term = str(regime.get("term_state") or "").lower() or None
+    if vix is None and term is None:
+        return {"available": False, "stress": False, "regime_label": None, "path": path}
+    as_of = (doc or {}).get("as_of")
+    try:
+        age = ((today or datetime.now(timezone.utc).date()) - date.fromisoformat(str(as_of)[:10])).days
+    except ValueError:
+        age = None
+    if age is None or age > VOL_REGIME_MAX_AGE_DAYS:
+        return {"available": False, "stress": False, "regime_label": "stale", "vix": vix,
+                "term_state": term, "as_of": as_of, "age_days": age, "path": path}
+    stress = (vix is not None and float(vix) >= VIX_STRESS) or term == "backwardation"
+    label = "stressed" if stress else ("adapting" if vix is not None and float(vix) >= VIX_ADAPTING else "calm")
     return {
-        "available": bool(obs),
-        "stress": stress,
-        "regime_label": regime.get("label") or labels[0] or None,
-        "research": regime.get("research"),
-        "macro": regime.get("macro"),
-        "path": str(DARWIN_OBS.relative_to(ROOT)).replace("\\", "/"),
+        "available": True,
+        "stress": bool(stress),
+        "regime_label": label,
+        "vix": vix,
+        "vix_pct1y": regime.get("vix_pct1y"),
+        "term_state": term,
+        "as_of": as_of,
+        "age_days": age,
+        "path": path,
     }
 
 
@@ -194,15 +199,15 @@ def build_claim_boundaries(
     horizons: list[dict],
     industry: list[dict],
     kpi_rows: list[dict],
-    darwin: dict | None = None,
+    regime: dict | None = None,
     criticality: dict | None = None,
 ) -> dict:
     doc = load_classes()
     defaults = doc.get("defaults") or {}
     thesis_ceiling = str(defaults.get("kpi_with_prediction_role") or "P3_oriented")
-    dwin = darwin if darwin is not None else darwin_regime_stress()
+    reg = regime if regime is not None else vol_regime_stress()
     crit = criticality if criticality is not None else criticality_market_path()
-    market_path = "P1_ecology" if (dwin.get("stress") or crit.get("demote")) else thesis_ceiling
+    market_path = "P1_ecology" if (reg.get("stress") or crit.get("demote")) else thesis_ceiling
     claim_ceiling = min_class(thesis_ceiling, market_path)
 
     demotions: list[dict] = []
@@ -212,11 +217,12 @@ def build_claim_boundaries(
             "predictability_class": class_for_horizon(),
             "reason": "Arrival-date quotes are observations, not Magis forecasts",
         })
-    if dwin.get("stress"):
+    if reg.get("stress"):
         demotions.append({
-            "artifact": "darwin_observatory",
+            "artifact": "vol_metrics:regime",
             "predictability_class": "P1_ecology",
-            "reason": f"Darwin regime={dwin.get('regime_label')} caps market-path language at P1",
+            "reason": (f"Market regime {reg.get('regime_label')} (VIX {reg.get('vix')}, "
+                       f"term {reg.get('term_state')}) caps market-path language at P1"),
         })
     if crit.get("demote"):
         demotions.append({
@@ -250,10 +256,10 @@ def build_claim_boundaries(
     ]
 
     caps = []
-    if dwin.get("available"):
-        caps.append(f"Darwin {dwin.get('regime_label')}")
+    if reg.get("available"):
+        caps.append(f"regime {reg.get('regime_label')}")
     else:
-        caps.append("Darwin unavailable")
+        caps.append("regime unavailable")
     if crit.get("demote"):
         caps.append(
             f"SPY criticality {crit.get('dominant_confidence')} >= {crit.get('threshold')}"
@@ -269,14 +275,14 @@ def build_claim_boundaries(
         "thesis_hygiene_ceiling": thesis_ceiling,
         "market_path_ceiling": market_path,
         "reason": reason,
-        "darwin": dwin,
+        "regime": reg,
         "criticality": crit,
         "demotions": demotions,
         "goodhart_watch": goodhart[:40],
         "formation_tags": formation,
         "engines": [
             {"id": "world_model", "role": "thesis foresight hygiene"},
-            {"id": "darwin", "role": "regime / ecology engine"},
+            {"id": "vol_regime", "role": "VIX level and term structure cap on market-path language"},
             {"id": "criticality", "role": "LPPLS market-path cap when the error diagram allows it"},
             {"id": "house_valuation", "role": "Power Zone + contract + IC + human (P4 only)"},
             {"id": "legacy_lawrence", "role": "reference / specialist only"},

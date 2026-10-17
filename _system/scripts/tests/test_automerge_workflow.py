@@ -112,7 +112,13 @@ def test_checks_still_pending_leave_a_note_instead_of_failing():
 
 def test_python_tests_completing_is_a_retry():
     on = load().get("on") or load().get(True)
-    assert on["workflow_run"]["workflows"] == ["Research quality", "Python tests"]
+    # Every workflow that can gate a code PR re-invokes the one-shot gate on
+    # completion; Python tests completing is the original retry (PR #876 era).
+    assert on["workflow_run"]["workflows"] == [
+        "Research quality", "Python tests", "CI bootstrap smoke",
+        "LLM Workflow Governance", "Energy model tests",
+        "Filing Sentinel gold set", "Agent context",
+    ]
 
 
 def test_every_check_on_the_gated_sha_is_verified_before_the_squash():

@@ -1,6 +1,6 @@
 # Quant / evolutionary portfolio reference library
 
-Downloaded for the **Darwin tab** proposal (`_system/frameworks/darwin_portfolio_tab_proposal.md`).
+General reading on adaptive markets, complexity economics and machine-learning factor models. (Originally collected for the Darwin allocator, retired in 2026-10.)
 
 ## Local copies (this repo)
 
@@ -12,17 +12,8 @@ Downloaded for the **Darwin tab** proposal (`_system/frameworks/darwin_portfolio
 | `Arthur_Foundations_Complexity_Economics.pdf` | Arthur, *Foundations of complexity economics* (Nature Phys Rev) |
 | `CAFPO_DRL_Factor_Investment_2025.pdf` | Liu & Yang, arXiv:2509.16206 — low-frequency DRL + conditional autoencoder factors |
 
-## Place your Darwin AI investor letter here
-
-Copy the confidential deck/PDF to:
-
-`_system/reference/quant-evolution/Darwin_AI_Investments_1Q26.pdf`
-
-(Not committed if private; add to `.gitignore` if needed.)
-
 ## External links (not downloaded)
 
-- [Darwin AI Ventures](https://darwinaiventures.com/) — RL + neural network strategies (public positioning only)
 - [SFI Press — Economy as Evolving Complex System IV](https://www.sfipress.org/books/eecs-iv)
 - [AQR — Machine Learning for Factor Investing](https://www.aqr.com/Insights/Research) (browse; papers vary)
 - [BlackRock — Factor investing](https://www.blackrock.com/us/individual/investment-ideas/factor-investing) — institutional factor framing cited in CAFPO

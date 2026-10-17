@@ -50,7 +50,7 @@ class WorkflowTests(unittest.TestCase):
         self.assertIn("heal-separations", self.doc[True]["repository_dispatch"]["types"])
         self.assertIn("separation_discover", self.doc["jobs"]["decide"]["outputs"])
         run = self.doc["jobs"]["decide"]["steps"][0]["run"]
-        self.assertRegex(run, r'"0 15 \* \* 1"\) cvr_discover=true; warrant_discover=true; separation_discover=true; reverse_splits=true ;;')
+        self.assertRegex(run, r'"13 15 \* \* 1"\) cvr_discover=true; warrant_discover=true; separation_discover=true; reverse_splits=true ;;')
         self.assertIn('"dispatch:heal-separations") separation_discover=true ;;', run)
         self.assertIn('echo "separation_discover=$separation_discover"', run)
 
@@ -80,7 +80,7 @@ class GraphAndFeedTests(unittest.TestCase):
         self.assertEqual(lane["workflow_file"], "data-pipeline.yml")
         self.assertEqual(lane["job"], JOB)
         self.assertIn(JOB, yaml.safe_load(WORKFLOW.read_text(encoding="utf-8"))["jobs"])
-        self.assertEqual(lane["cadence_cron"], ["0 15 * * 1"])
+        self.assertEqual(lane["cadence_cron"], ["13 15 * * 1"])
         self.assertEqual(lane["freshness_hours"], 342)
         self.assertTrue(re.match(lane["subject_regex"], "chore: separation weekly discovery 2026-10-13"))
 
