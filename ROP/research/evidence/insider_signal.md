@@ -1,8 +1,8 @@
-# ROP — Insider conviction (2026-10-15)
+# ROP — Insider conviction (2026-10-17)
 
 > Context only. Insider activity informs scenario confidence and stance discussion; it does not auto-inflate Lawrence base IRR. Promotion requires [HUMAN REVIEW].
 
-**ICS:** 9.4 (exceptional) · **Bull case support:** moderate
+**ICS:** 9.38 (exceptional) · **Bull case support:** moderate
 
 | Scenario | Prior weight | Tilted weight |
 |----------|--------------|---------------|

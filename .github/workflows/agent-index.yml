@@ -16,11 +16,12 @@ on:
       - "_system/scripts/agent_search.py"
       - "_system/scripts/build_claim_store.py"
       - "_system/scripts/build_chunk_store.py"
-  workflow_dispatch:
 
 jobs:
   build-index:
     runs-on: ubuntu-latest
+    # Full-tree checkout plus filing-text indexing. Other full-tree jobs use 90.
+    timeout-minutes: 90
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5
@@ -33,4 +34,5 @@ jobs:
         with:
           name: agent-search-index
           path: _system/cache/agent_search.sqlite
-          retention-days: 30
+          # Governance allows 1-7 days. Seven is the longest the index can be kept.
+          retention-days: 7

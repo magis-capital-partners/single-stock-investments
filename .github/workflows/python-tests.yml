@@ -27,6 +27,9 @@ on:
       - "dashboard/data/kpi_summary.json"
       - "dashboard/data/document_catalog_summary.json"
       - "dashboard/data/agent_shards/**"
+      - "*/research/thesis_card.json"
+      - "*/research/latest.json"
+      - "GOOGL/research/valuation.json"
       - "ops-watchdog/**"
       - "AMZN/investor-documents/download_amzn_investor_docs.py"
       - "TPL/research/evidence/thematic_context.md"
@@ -50,6 +53,7 @@ on:
       - "dashboard/short-alpha-viz.js"
       - "dashboard/reverse-splits-viz.js"
       - "dashboard/shorts-edge-v3-viz.js"
+      - "dashboard/shorts-coverage-viz.js"
       - "dashboard/shorts-edge-v3.css"
       - "dashboard/reverse-splits-portfolio-viz.js"
       - "dashboard/reverse-splits-portfolio.css"
@@ -73,6 +77,9 @@ on:
       - "dashboard/data/kpi_summary.json"
       - "dashboard/data/document_catalog_summary.json"
       - "dashboard/data/agent_shards/**"
+      - "*/research/thesis_card.json"
+      - "*/research/latest.json"
+      - "GOOGL/research/valuation.json"
       - "ops-watchdog/**"
       - "AMZN/investor-documents/download_amzn_investor_docs.py"
       - "TPL/research/evidence/thematic_context.md"
@@ -96,6 +103,7 @@ on:
       - "dashboard/short-alpha-viz.js"
       - "dashboard/reverse-splits-viz.js"
       - "dashboard/shorts-edge-v3-viz.js"
+      - "dashboard/shorts-coverage-viz.js"
       - "dashboard/shorts-edge-v3.css"
       - "dashboard/reverse-splits-portfolio-viz.js"
       - "dashboard/reverse-splits-portfolio.css"
@@ -223,7 +231,9 @@ jobs:
           # top-level registries stay), the workflows some tests parse, the D1
           # migrations, edge functions and oauth proxy, the ops-watchdog worker
           # config, one criticality summary, the L0 summary feeds and L1 agent
-          # shards (the FTS5 ticker query is built from those shards), the
+          # shards (the FTS5 ticker query is built from those shards), every
+          # thesis card and latest.json (claim rebuild and the 10-ticker
+          # golden eval), GOOGL/research/valuation.json (get_valuation), the
           # TPL/GOOGL canonical evidence files the architecture test opens,
           # one ticker download script for the payload-path test, and
           # SOURCES.md for the source-index contract.
@@ -242,6 +252,9 @@ jobs:
             /dashboard/data/kpi_summary.json
             /dashboard/data/document_catalog_summary.json
             /dashboard/data/agent_shards/
+            /*/research/thesis_card.json
+            /*/research/latest.json
+            /GOOGL/research/valuation.json
             /ops-watchdog/
             /AMZN/investor-documents/download_amzn_investor_docs.py
             /TPL/research/evidence/thematic_context.md
@@ -265,6 +278,7 @@ jobs:
             /dashboard/short-alpha-viz.js
             /dashboard/reverse-splits-viz.js
             /dashboard/shorts-edge-v3-viz.js
+            /dashboard/shorts-coverage-viz.js
             /dashboard/shorts-edge-v3.css
             /dashboard/ideas.css
             /dashboard/short-alpha.css

@@ -1,8 +1,8 @@
-# AON — Insider conviction (2026-10-15)
+# AON — Insider conviction (2026-10-17)
 
 > Context only. Insider activity informs scenario confidence and stance discussion; it does not auto-inflate Lawrence base IRR. Promotion requires [HUMAN REVIEW].
 
-**ICS:** 9.61 (exceptional) · **Bull case support:** moderate
+**ICS:** 9.45 (exceptional) · **Bull case support:** moderate
 
 | Scenario | Prior weight | Tilted weight |
 |----------|--------------|---------------|
@@ -12,11 +12,11 @@
 
 | Insider | Date | Shares | Price | Value | Contrib |
 |---------|------|--------|-------|-------|---------|
-| KNIGHT LESTER B | 2026-09-02 | 7212 | $327.52 | $2362074.24 | 1.551 |
-| KNIGHT LESTER B | 2026-09-02 | 5097 | $326.53 | $1664323.41 | 1.499 |
-| KNIGHT LESTER B | 2026-09-02 | 4145 | $328.34 | $1360969.3 | 1.455 |
-| KNIGHT LESTER B | 2026-09-02 | 1739 | $325.63 | $566270.57 | 1.352 |
-| KNIGHT LESTER B | 2026-09-02 | 1440 | $329.69 | $474753.6 | 1.32 |
+| KNIGHT LESTER B | 2026-09-02 | 7212 | $327.52 | $2362074.24 | 1.526 |
+| KNIGHT LESTER B | 2026-09-02 | 5097 | $326.53 | $1664323.41 | 1.475 |
+| KNIGHT LESTER B | 2026-09-02 | 4145 | $328.34 | $1360969.3 | 1.431 |
+| KNIGHT LESTER B | 2026-09-02 | 1739 | $325.63 | $566270.57 | 1.33 |
+| KNIGHT LESTER B | 2026-09-02 | 1440 | $329.69 | $474753.6 | 1.298 |
 
 **Routine / planned sales (context):**
 

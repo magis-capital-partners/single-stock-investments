@@ -1,4 +1,4 @@
-# SNA — Insider conviction (2026-10-15)
+# SNA — Insider conviction (2026-10-17)
 
 > Context only. Insider activity informs scenario confidence and stance discussion; it does not auto-inflate Lawrence base IRR. Promotion requires [HUMAN REVIEW].
 
@@ -12,7 +12,7 @@
 
 | Insider | Date | Shares | Price | Value | Contrib |
 |---------|------|--------|-------|-------|---------|
-| Chambers Timothy L | 2026-07-28 | 9111 | $168.7 | $1537025.7 | 1.641 |
+| Chambers Timothy L | 2026-07-28 | 9111 | $168.7 | $1537025.7 | 1.614 |
 | Arregui Jesus | 2026-06-10 | 7500 | $168.7 | $1265250.0 | 1.549 |
 | Arregui Jesus | 2025-11-25 | 6500 | $138.03 | $897195.0 | 1.549 |
 | Miller Richard Thomas | 2025-12-04 | 2000 | $161.18 | $322360.0 | 1.443 |

@@ -1,4 +1,4 @@
-# WBD — Insider conviction (2026-10-15)
+# WBD — Insider conviction (2026-10-17)
 
 > Context only. Insider activity informs scenario confidence and stance discussion; it does not auto-inflate Lawrence base IRR. Promotion requires [HUMAN REVIEW].
 
@@ -13,7 +13,7 @@
 | Insider | Date | Shares | Price | Value | Contrib |
 |---------|------|--------|-------|-------|---------|
 | Wiedenfels Gunnar | 2025-12-10 | 92592 | $29.08 | $2692575.36 | 1.794 |
-| Zaslav David | 2026-07-13 | 2089876 | $10.16 | $21233140.16 | 1.704 |
+| Zaslav David | 2026-07-13 | 2089876 | $10.16 | $21233140.16 | 1.679 |
 | Wiedenfels Gunnar | 2025-12-10 | 150402 | $25.7 | $3865331.4 | 1.515 |
 | Campbell Bruce | 2026-03-04 | 183346 | $25.7 | $4711992.2 | 1.501 |
 | Campbell Bruce | 2026-03-04 | 285679 | $15.02 | $4290898.58 | 1.339 |

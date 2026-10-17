@@ -29,6 +29,9 @@ jobs:
             /dashboard/data/shorts_free_evidence.json
             /dashboard/data/shorts_free_borrow.json
             /dashboard/data/shorts_calmar_research.json
+            /dashboard/data/shorts_coverage_research.json
+            /dashboard/data/shorts_coverage_packets/
+            /dashboard/data/shorts_coverage_audits/
             /dashboard/data/free_short_packets/
           sparse-checkout-cone-mode: false
       - uses: actions/setup-python@v5
@@ -57,6 +60,7 @@ jobs:
           git add dashboard/data/reverse_splits.json
           git add dashboard/data/net_edge_audits_v3 dashboard/data/shorts_net_edge_v3.json
           if [ -f dashboard/data/shorts_calmar_research.json ]; then git add dashboard/data/shorts_calmar_research.json; fi
+          if [ -f dashboard/data/shorts_coverage_research.json ]; then git add dashboard/data/shorts_coverage_research.json dashboard/data/shorts_coverage_packets dashboard/data/shorts_coverage_audits; fi
           if [ -f dashboard/data/shorts_free_evidence.json ]; then
             git add dashboard/data/shorts_free_evidence.json dashboard/data/free_short_packets
             if [ -f dashboard/data/shorts_free_borrow.json ]; then git add dashboard/data/shorts_free_borrow.json; fi
