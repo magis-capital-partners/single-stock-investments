@@ -1,6 +1,6 @@
 # AI — Investment Thesis
 
-**Last updated:** 2026-10-09 (auto-sync)
+**Last updated:** auto-sync
 
 ## Classification
 
@@ -11,13 +11,13 @@
 | **Dhando** (Pabrai) | partial |
 | **Stance** | watch |
 | **Cycle** | trough |
-| **Implied 7yr IRR** (base) | 30.1% (total synthesis) |
-| **IRR method** | full |
-| **Lawrence bucket** | multi_sided |
+| **Implied 7yr IRR** (base) | — |
+| **IRR method** | quality_reinvestment |
+| **Lawrence bucket** | — |
 | **Payoff lens** | operating |
 | **MOI bucket** | pending |
 
-**Deep dive:** `AI/research/deep_dive_2026-10-09.md`
+**Deep dive:** `AI/research/deep_dive_2026-10-15.md` (auto-sync)
 
 ## One-line thesis
 
