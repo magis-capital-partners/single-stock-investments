@@ -1,8 +1,8 @@
-# TECH — Insider conviction (2026-10-15)
+# TECH — Insider conviction (2026-10-17)
 
 > Context only. Insider activity informs scenario confidence and stance discussion; it does not auto-inflate Lawrence base IRR. Promotion requires [HUMAN REVIEW].
 
-**ICS:** 7.28 (strong) · **Bull case support:** moderate
+**ICS:** 7.26 (strong) · **Bull case support:** moderate
 
 | Scenario | Prior weight | Tilted weight |
 |----------|--------------|---------------|
@@ -16,7 +16,7 @@
 | Herr Amy E. | 2026-05-08 | 6636 | $47.6 | $315873.6 | 1.721 |
 | Bohnen Shane | 2026-05-05 | 8400 | $47.6 | $399840.0 | 1.549 |
 | Hippel James | 2026-05-05 | 62000 | $47.6 | $2951200.0 | 1.422 |
-| Bohnen Shane | 2026-07-23 | 448 | $47.6 | $21324.8 | 0.894 |
+| Bohnen Shane | 2026-07-23 | 448 | $47.6 | $21324.8 | 0.879 |
 
 **Routine / planned sales (context):**
 

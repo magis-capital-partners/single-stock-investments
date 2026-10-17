@@ -1,4 +1,4 @@
-# ATO — Insider conviction (2026-10-15)
+# ATO — Insider conviction (2026-10-17)
 
 > Context only. Insider activity informs scenario confidence and stance discussion; it does not auto-inflate Lawrence base IRR. Promotion requires [HUMAN REVIEW].
 
@@ -12,8 +12,8 @@
 
 | Insider | Date | Shares | Price | Value | Contrib |
 |---------|------|--------|-------|-------|---------|
-| WARE WILLIAM JAMES | 2026-08-11 | 300 | $167.5945 | $50278.35 | 2.199 |
-| GARZA RAFAEL G | 2026-10-01 | 77 | $155.79 | $11995.83 | 2.143 |
+| WARE WILLIAM JAMES | 2026-08-11 | 300 | $167.5945 | $50278.35 | 2.163 |
+| GARZA RAFAEL G | 2026-10-01 | 77 | $155.79 | $11995.83 | 2.108 |
 | Sampson Richard A | 2026-02-04 | 30808 | $171.62 | $5287268.96 | 2.025 |
 | COMPTON KELLY H | 2026-03-07 | 1082 | $184.73 | $199877.86 | 1.994 |
 | AKERS JOHN K | 2026-05-02 | 16850 | $189.74 | $3197119.0 | 1.853 |

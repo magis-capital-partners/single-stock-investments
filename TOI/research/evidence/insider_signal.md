@@ -1,4 +1,4 @@
-# TOI — Insider conviction (2026-10-15)
+# TOI — Insider conviction (2026-10-17)
 
 > Context only. Insider activity informs scenario confidence and stance discussion; it does not auto-inflate Lawrence base IRR. Promotion requires [HUMAN REVIEW].
 
@@ -14,7 +14,7 @@
 |---------|------|--------|-------|-------|---------|
 | Chernett Jorey | 2026-03-13 | 263000 | $2.92 | $767960.0 | 0.938 |
 | Chernett Jorey | 2026-07-10 | 15000 | $5.85 | $87750.0 | 0.921 |
-| Podnos Yale | 2026-07-14 | 17974 | $1.87 | $33611.38 | 0.895 |
+| Podnos Yale | 2026-07-14 | 17974 | $1.87 | $33611.38 | 0.88 |
 | Chernett Jorey | 2026-03-24 | 125000 | $3.11 | $388750.0 | 0.871 |
 | Chernett Jorey | 2026-03-17 | 75000 | $3.42 | $256500.0 | 0.816 |
 

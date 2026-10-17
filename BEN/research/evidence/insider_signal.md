@@ -1,4 +1,4 @@
-# BEN — Insider conviction (2026-10-15)
+# BEN — Insider conviction (2026-10-17)
 
 > Context only. Insider activity informs scenario confidence and stance discussion; it does not auto-inflate Lawrence base IRR. Promotion requires [HUMAN REVIEW].
 
@@ -12,10 +12,10 @@
 
 | Insider | Date | Shares | Price | Value | Contrib |
 |---------|------|--------|-------|-------|---------|
-| Murphy Terrence | 2026-07-21 | 229850 | $32.63 | $7500005.5 | 2.472 |
-| Gamba Daniel | 2026-07-21 | 229850 | $32.63 | $7500005.5 | 2.32 |
-| JOHNSON JENNIFER M | 2026-07-21 | 229850 | $32.63 | $7500005.5 | 2.282 |
-| Nicholls Matthew | 2026-07-21 | 229850 | $32.63 | $7500005.5 | 2.27 |
+| Murphy Terrence | 2026-07-21 | 229850 | $32.63 | $7500005.5 | 2.432 |
+| Gamba Daniel | 2026-07-21 | 229850 | $32.63 | $7500005.5 | 2.282 |
+| JOHNSON JENNIFER M | 2026-07-21 | 229850 | $32.63 | $7500005.5 | 2.244 |
+| Nicholls Matthew | 2026-07-21 | 229850 | $32.63 | $7500005.5 | 2.233 |
 | JOHNSON JENNIFER M | 2025-11-04 | 306552 | $22.59 | $6925009.68 | 1.496 |
 
 **Routine / planned sales (context):**

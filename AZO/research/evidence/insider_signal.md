@@ -1,4 +1,4 @@
-# AZO — Insider conviction (2026-10-15)
+# AZO — Insider conviction (2026-10-17)
 
 > Context only. Insider activity informs scenario confidence and stance discussion; it does not auto-inflate Lawrence base IRR. Promotion requires [HUMAN REVIEW].
 
@@ -12,11 +12,11 @@
 
 | Insider | Date | Shares | Price | Value | Contrib |
 |---------|------|--------|-------|-------|---------|
-| Daniele Philip B. | 2026-09-25 | 250 | $587.13 | $146782.5 | 2.717 |
-| Jaycox Kenneth E | 2026-08-28 | 1688 | $2961.96 | $4999788.48 | 2.715 |
+| Daniele Philip B. | 2026-09-25 | 250 | $587.13 | $146782.5 | 2.672 |
+| Jaycox Kenneth E | 2026-08-28 | 1688 | $2961.96 | $4999788.48 | 2.67 |
 | GEORGE MICHAEL A | 2025-12-22 | 145 | $3398.13 | $492728.85 | 2.278 |
 | Hannasch Brian | 2025-12-18 | 147 | $3393.09 | $498784.23 | 2.126 |
-| LeRiche Dennis W. | 2026-08-07 | 1455 | $1060.81 | $1543478.55 | 1.937 |
+| LeRiche Dennis W. | 2026-08-07 | 1455 | $1060.81 | $1543478.55 | 1.905 |
 
 **Routine / planned sales (context):**
 
