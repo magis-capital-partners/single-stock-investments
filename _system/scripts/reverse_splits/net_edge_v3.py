@@ -185,7 +185,23 @@ def assessment(reviews, cutoff, *, selected_mechanisms=(), vetoes=()):
             "blocked": bool(contradiction or active_vetoes)}
 
 
+class BorrowHistory(tuple):
+    """An issuer index for large offline histories; records remain ordinary dicts."""
+    def __new__(cls, records=()):
+        instance = super().__new__(cls, records)
+        instance.by_issuer = {}
+        for row in instance:
+            instance.by_issuer.setdefault(row.get("issuer"), []).append(row)
+        return instance
+
+
+def issuer_borrow(records, issuer):
+    index = getattr(records, "by_issuer", None)
+    return index.get(issuer, []) if index is not None else records
+
+
 def dated_borrow(observations, issuer, cutoff, *, approval=False, max_age_hours=4.):
+    observations = issuer_borrow(observations, issuer)
     eligible = []
     recalls = [moment(r.get("known_at")) for r in observations if r.get("issuer") == issuer and r.get("kind") == "recall" and moment(r.get("known_at")) and moment(r["known_at"]) <= cutoff]
     latest_recall = max(recalls) if recalls else None

@@ -1,5 +1,9 @@
 # RSI-3.0 inputs and reproduction
 
+The separate [RSI-4 coverage study](COVERAGE_V4.md) repairs issuer, price and
+volume gaps and compares reported inputs with documented estimates. It retains
+these frozen RSI-3 results and the explored parameter search.
+
 Research only. The published dashboard uses a frozen 2026-10-13 source run. It does not connect to a broker or ThetaData. Account sizes, fees and fallback APRs are sensitivity assumptions; edit `net_edge_profiles.json` before rerunning for an intended account. Every profile retains explicit risk budgets.
 
 From the repository root:

@@ -124,13 +124,13 @@ def trailing_year(rows, end):
     return None
 
 
-def filing_rating(raw, cutoff, screen, *, overrides=(), expected_cik=None):
+def filing_rating(raw, cutoff, screen, *, overrides=(), expected_cik=None, max_age_days=200):
     if expected_cik is not None and str(raw.get("cik", "")).lstrip("0") != str(expected_cik).lstrip("0"):
         return {"score": None, "status": "identity_mismatch", "signals": {}, "evidence": []}
     metrics, currency = monetary_facts(raw, cutoff, overrides)
     anchors = sorted({r["end"] for k in FLOWS for r in metrics[k]}, reverse=True)
     anchor = anchors[0] if anchors else max((r["end"] for rows in metrics.values() for r in rows), default=None)
-    if anchor is None or not 0 <= days(anchor, market_date(cutoff)) <= 200:
+    if anchor is None or not 0 <= days(anchor, market_date(cutoff)) <= max_age_days:
         return {"score": None, "status": "stale_or_missing_period", "period": anchor, "currency": currency, "signals": {}, "evidence": []}
     flows, prior = {}, {}
     evidence = []

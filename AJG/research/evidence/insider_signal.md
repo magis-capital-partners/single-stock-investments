@@ -1,4 +1,4 @@
-# AJG — Insider conviction (2026-10-15)
+# AJG — Insider conviction (2026-10-17)
 
 > Context only. Insider activity informs scenario confidence and stance discussion; it does not auto-inflate Lawrence base IRR. Promotion requires [HUMAN REVIEW].
 
@@ -12,10 +12,10 @@
 
 | Insider | Date | Shares | Price | Value | Contrib |
 |---------|------|--------|-------|-------|---------|
-| Hudson Scott R | 2026-09-02 | 12000 | $86.17 | $1034040.0 | 1.954 |
-| Miskel Christopher C. | 2026-09-01 | 152 | $262.0 | $39824.0 | 1.804 |
+| Hudson Scott R | 2026-09-02 | 12000 | $86.17 | $1034040.0 | 1.922 |
 | GALLAGHER J PATRICK JR | 2026-03-02 | 44050 | $79.59 | $3505939.5 | 1.788 |
-| Mead Christopher E | 2026-08-19 | 3500 | $86.17 | $301595.0 | 1.769 |
+| Miskel Christopher C. | 2026-09-01 | 152 | $262.0 | $39824.0 | 1.774 |
+| Mead Christopher E | 2026-08-19 | 3500 | $86.17 | $301595.0 | 1.739 |
 | GALLAGHER J PATRICK JR | 2026-03-31 | 5345 | $215.95 | $1154252.75 | 1.361 |
 
 **Routine / planned sales (context):**

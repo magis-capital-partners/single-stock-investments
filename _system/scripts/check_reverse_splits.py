@@ -179,6 +179,11 @@ def structural_errors(ledger_dir: Path | None = None) -> list[str]:
         errors.extend(audit_calmar(paths["manifest"].parent))
     except (ValueError, KeyError, TypeError, OSError) as exc:
         errors.append("Calmar publication is invalid: " + str(exc))
+    try:
+        from reverse_splits.coverage_research import audit_artifacts
+        errors.extend(audit_artifacts(paths["manifest"].parent))
+    except (ValueError, KeyError, TypeError, OSError) as exc:
+        errors.append("Expanded coverage publication is invalid: " + str(exc))
     return errors
 
 
