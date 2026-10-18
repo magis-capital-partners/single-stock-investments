@@ -45,6 +45,12 @@
     return ` · <a href="${escapeHtml(url)}" target="_blank" rel="noopener">SEC filing</a>`;
   }
 
+  function officialLink(url) {
+    const allowed = /^https:\/\/(www\.)?sec\.gov\//.test(url || "") || /^https:\/\/disclosure2\.edinet-fsa\.go\.jp\//.test(url || "");
+    if (!allowed) return "";
+    return ` · <a href="${escapeHtml(url)}" target="_blank" rel="noopener">Filing</a>`;
+  }
+
   function money(value) {
     const number = Number(value);
     if (!Number.isFinite(number)) return "";
@@ -61,10 +67,38 @@
 
   function renderTicker(ticker, escapeHtml) {
     const safe = escapeHtml(ticker);
-    return `<details class="detail-section" id="held-by" data-ticker="${safe}"><summary>Held by</summary><div class="held-by-body" style="margin-top:10px">Loading 13F holders…</div></details>`;
+    return `<details class="detail-section" id="held-by" data-ticker="${safe}"><summary>Held by</summary><div class="held-by-body" style="margin-top:10px">Loading 13F holders…</div></details><details class="detail-section" id="intl-stakes" data-ticker="${safe}"><summary>Disclosed outside the US</summary><div class="intl-stakes-body" style="margin-top:10px">Loading disclosed stakes…</div></details>`;
+  }
+
+  function fillIntl(ticker) {
+    const root = document.getElementById("intl-stakes");
+    const slot = root && root.querySelector(".intl-stakes-body");
+    if (!slot || !root || root.dataset.ticker !== ticker) return;
+    fetch(dataUrl(`data/holdings/intl/${encodeURIComponent(ticker)}.json`))
+      .then((response) => (response.ok ? response.json() : null))
+      .then((payload) => {
+        if (root.dataset.ticker !== ticker) return;
+        if (!payload || !(payload.holders || []).length) {
+          root.hidden = true;
+          return;
+        }
+        root.hidden = false;
+        const lines = payload.holders.slice(0, 15).map((holder) => {
+          const weight = holder.pct_val != null ? ` · ${escapeHtml(holder.pct_val)}% of fund` : "";
+          const basis = holder.threshold_basis ? ` · ${escapeHtml(holder.threshold_basis)}` : "";
+          const when = holder.period_end ? ` · as of ${escapeHtml(holder.period_end)}` : "";
+          const source = holder.source ? ` · ${escapeHtml(holder.source)}` : "";
+          return `<div class="hr-line"><strong>${escapeHtml(holder.manager_name || "")}</strong> · ${shares(holder.shares)} shares · ${money(holder.value_usd)}${weight}${basis}${when}${source}${officialLink(holder.source_url)}</div>`;
+        });
+        slot.innerHTML = `<p class="tier-sub">${payload.context || ""}</p>${lines.join("")}`;
+      })
+      .catch(() => {
+        if (root.dataset.ticker === ticker) root.hidden = true;
+      });
   }
 
   function fillTicker(ticker) {
+    fillIntl(ticker);
     const slot = document.querySelector("#held-by .held-by-body");
     const root = document.getElementById("held-by");
     if (!slot || !root || root.dataset.ticker !== ticker) return;
@@ -162,5 +196,5 @@
   }
 
   ensureSummary();
-  window.FundHoldings = { renderTicker, fillTicker, badgeHtml, ensureSummary, renderManagersPage, fillManagersPage };
+  window.FundHoldings = { renderTicker, fillTicker, fillIntl, badgeHtml, ensureSummary, renderManagersPage, fillManagersPage };
 })();
