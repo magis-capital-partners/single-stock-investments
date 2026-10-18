@@ -313,6 +313,107 @@ tenths of a percent on the same sessions, and the split-specific excess is
 +1.8% on train and +3.5% on validation. All of this is gross price behaviour;
 no borrow, fill, spread or commission assumption enters any Phase 0 number.
 
+## Shorts alpha program: workstream A, execution and capacity realism (2026-10-18)
+
+Workstream A of `_system/proposals/shorts_alpha_program_2026-10-18.md` tests
+the three fill-model conventions that the proposal says consume the gross
+edge: the opening auction as a size lever (H4), passive offers under Rule 201
+on restricted sessions (H2) and participation over time instead of a 0.1%-of-ADV
+cap (H3), with IBKR tiered commissions beside the fixed schedule as a declared
+variant. Code: `reverse_splits/execution_realism.py` (events, requests, the
+data cost gate) and `reverse_splits/execution_realism_build.py` (analysis and
+publication); tests in `tests/reverse_splits/test_rs_execution_realism.py`.
+From `_system/scripts`:
+
+```powershell
+python -m reverse_splits.execution_realism quote                      # price every request; downloads nothing
+python -m reverse_splits.execution_realism download --approved-usd X  # refused unless the quoted sum fits X
+python -m reverse_splits.execution_realism build --publish
+```
+
+| File | Purpose |
+|---|---|
+| `execution_realism.json` | Aggregate results for H2, H3 and H4 on the train (2018-05 to 2022-12) and validation (2023 to 2024) splits, each read against its registered criteria, plus the commission variants and the data coverage and cost actually incurred. |
+| `execution_realism_manifest.json` | Hashes of the output, the registry, both modules, the frozen run inputs, every statistics file and every session window read; the list of hypotheses the build actually measured; the approvals under which data was bought. |
+| `local/holdout/execution_realism_holdout.json` | Sealed: the same results for entry sessions from 2025-01-01, not committed and not read until the program's final review. |
+| `local/workstream_a/` | Per-event rows (`execution_realism_full.local.json`), `quotes.json` (every request with its quote) and `approvals.json`. |
+| `local/raw/databento/{venue}/{trades,mbp-1}/sessions/` | The licensed session windows, one file per venue-session with its `.ok.json` receipt. Never committed. |
+
+**The data cost gate.** H2 and H3 need `trades` and `mbp-1` for each
+event's entry session on its listing venue: 1,650 planned requests over 550
+venue-sessions (trades for the session; mbp-1 for the first and last 65
+minutes), plus a full-session mbp-1 variant quoted only for comparison. Every
+request is priced with `metadata.get_cost` before anything is fetched. If the
+sum exceeds $0.00 nothing is downloaded until a human passes the amount back
+as `download --approved-usd`; each fetch is then capped at its own quote, and
+the approval, the quoted total and the cost incurred are written to the
+manifest. The build runs on whatever windows are local and counts the rest as
+"no data" rather than dropping them silently.
+
+### H4: the opening cross is not a size lever at $50k
+
+Official opening cross price and matched shares from the listing venue's
+`statistics` file (every one of the 671 events has exactly one cross row and
+its price equals the frozen study's official open). The modeled order is 2.5%
+of a $50k account ($1,250) in whole shares at the printed price; "replay" is
+that order capped at 0.1% of the prior 20-session split-adjusted venue ADV,
+the frozen account replay's sizing. Feasible means at most 5% of the cross.
+
+| Split, SSR state | n | $1,250 order feasible (issuer CI) | median cross | median order / cross | replay order feasible | replay orders under $100 |
+|---|---:|---|---:|---:|---:|---:|
+| Train, all | 120 | 45.0% [35.9%, 53.5%] | $21.4k | 0.06 | 100% | 54 |
+| Train, restricted | 64 | 45.3% [33.9%, 57.4%] | $22.7k | 0.05 | 100% | 29 |
+| Train, unrestricted | 56 | 44.6% [32.1%, 57.1%] | $16.2k | 0.08 | 100% | 25 |
+| Validate, all | 243 | 24.3% [19.1%, 30.0%] | $6.7k | 0.19 | 92.2% | 173 |
+| Validate, restricted | 153 | 19.6% [13.4%, 26.5%] | $6.5k | 0.19 | 95.4% | 118 |
+| Validate, unrestricted | 88 | 33.0% [23.0%, 42.7%] | $10.3k | 0.12 | 86.4% | 53 |
+
+By year the feasible share runs 38% to 82% in 2018 to 2021 and 20% to 28% in
+2022 to 2024 as the median cross falls from $22k-$82k to $6k-$10k; it is 18% to
+20% for opens under $5 and 49% at $5 and over; 51% on NYSE against 27% on
+Nasdaq and NYSE American. The closing cross supports the $1,250 cover in 15%
+of validation events. The replay order is feasible almost everywhere only
+because it is tiny: its median is 9 shares on validation and 173 of 243 such
+orders fall under the replay's own $100 minimum.
+
+**Assessment.** H4's kill branch (under 50% on validation) is met: 24.3%.
+The auction is a legality lever under Rule 201, not a size lever; a $1,250
+order is a fifth of the median cross in 2023-2024, so an auction entry of the
+modeled size would itself set the print. The SSR state does not change the
+reading (restricted 19.6%, unrestricted 33.0%).
+
+### H2 and H3: pending the data approval
+
+The queue model (`simulate_passive_offer`) and the participation pricer
+(`participation_leg`) are implemented and tested on synthetic books; their
+invariants are that nothing fills below the bid under SSR, nothing fills
+beyond buyer-initiated printed volume at or above the offer, cancellations are
+behind the order unless the displayed size says otherwise (a pro-rata variant
+is reported beside it), and a participation schedule takes a constant share of
+every continuous print. Both hypotheses stay `registered` in
+`hypotheses.jsonl` and read "Not measured" in `execution_realism.json` until
+the quoted session windows are approved and pulled; this section is updated
+with the measured results then.
+
+### Commissions as declared variants
+
+Round-trip commission, venue fees and clearing over the entry notional for the
+auction orders (official open and close prints), regulatory pass-through
+reported separately and identical under both schedules:
+
+| Order | Fixed ($0.005/sh, $1 min, 1% cap) | Tiered ($0.0035/sh, $0.35 min, 1% cap, exchange fees, clearing) | Tiered cheaper |
+|---|---:|---:|---:|
+| $1,250 account order, train (median 268 sh) | 0.3% | 0.4% | 24% |
+| $1,250 account order, validate (median 318 sh) | 0.3% | 0.4% | 14% |
+| Replay order, train (median 26 sh) | 1.3% | 1.0% | 66% |
+| Replay order, validate (median 10 sh) | 1.6% | 1.5% | 44% |
+
+At the account order the fixed schedule is cheaper because the tiered
+take-fee ($0.0030/sh removing liquidity) outweighs the lower per-share rate;
+tiered only wins on the replay's tiny tickets, where the $1 minimum binds.
+Passive fills from H2 earn the tiered add-liquidity rebate only when the fill
+model fills; that line is produced once H2 is measured.
+
 ## Original ledger schemas
 
 ### Historical execution evidence

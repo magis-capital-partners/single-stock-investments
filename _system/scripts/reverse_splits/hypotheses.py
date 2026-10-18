@@ -123,3 +123,22 @@ def declared_before(registry: list[dict], ids: list[str], built_at: str | dateti
         if when is None or not when < built:
             return False
     return True
+
+
+def mark_measured(ledger_dir: Path, ids: list[str], result_ref: str) -> int:
+    """Set ``status: measured`` and ``result_ref`` on the cited rows. ``declared_at`` is never touched;
+    a row already validated, killed or superseded keeps its status."""
+    from .ledger import write_jsonl
+
+    path = registry_path(ledger_dir)
+    rows = load_registry(ledger_dir)
+    changed = 0
+    for row in rows:
+        if str(row.get("id")) in ids and row.get("status") in ("registered", "measured"):
+            if row.get("status") != "measured" or row.get("result_ref") != result_ref:
+                row["status"] = "measured"
+                row["result_ref"] = result_ref
+                changed += 1
+    if changed:
+        write_jsonl(path, rows)
+    return changed
