@@ -1,8 +1,8 @@
-# ACGL — Insider conviction (2026-10-17)
+# ACGL — Insider conviction (2026-10-18)
 
 > Context only. Insider activity informs scenario confidence and stance discussion; it does not auto-inflate Lawrence base IRR. Promotion requires [HUMAN REVIEW].
 
-**ICS:** 8.2 (exceptional) · **Bull case support:** moderate
+**ICS:** 8.19 (exceptional) · **Bull case support:** moderate
 
 | Scenario | Prior weight | Tilted weight |
 |----------|--------------|---------------|
@@ -13,7 +13,7 @@
 | Insider | Date | Shares | Price | Value | Contrib |
 |---------|------|--------|-------|-------|---------|
 | Houston Daniel Joseph | 2026-04-30 | 5300 | $94.085 | $498650.5 | 2.025 |
-| Morin Francois | 2026-08-18 | 11010 | $27.0867 | $298224.57 | 1.546 |
+| Morin Francois | 2026-08-18 | 11010 | $27.0867 | $298224.57 | 1.533 |
 | Papadopoulo Nicolas | 2026-03-10 | 21930 | $18.9 | $414477.0 | 1.282 |
 | Rajeh Maamoun | 2026-02-11 | 31500 | $27.13 | $854595.0 | 1.172 |
 | Rajeh Maamoun | 2026-02-11 | 15930 | $27.0867 | $431491.13 | 1.091 |

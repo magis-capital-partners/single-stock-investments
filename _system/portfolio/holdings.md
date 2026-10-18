@@ -214,14 +214,14 @@ Synced from `_system/portfolio/registry.json`. Last sync: 2026-10-18.
 | CSU.DB | CSU.DB/ | Constellation Software Inc. (Series 1 Debentures) | CA | — | 2026-10-18 | unknown | watch |
 | CSX | CSX/ | CSX Corporation | US | 2026-10-14 | 2026-10-18 | unknown | watch |
 | CTAS | CTAS/ | Cintas | US | 2026-10-14 | 2026-10-18 | unknown | watch |
-| CTSH | CTSH/ | Cognizant | US | 2026-10-14 | 2026-10-18 | unknown | watch |
-| CTVA | CTVA/ | Corteva | US | 2026-10-14 | 2026-10-18 | unknown | watch |
-| CVNA | CVNA/ | Carvana | US | 2026-10-14 | 2026-10-18 | unknown | watch |
-| CVS | CVS/ | CVS Health | US | 2026-10-14 | 2026-10-18 | unknown | watch |
-| CVX | CVX/ | Chevron Corporation | US | 2026-10-14 | 2026-10-18 | unknown | watch |
-| D | D/ | Dominion Energy | US | 2026-07-29 | 2026-10-18 | unknown | watch |
-| DAL | DAL/ | Delta Air Lines | US | 2026-07-29 | 2026-10-18 | unknown | watch |
-| DASH | DASH/ | DoorDash | US | 2026-07-29 | 2026-10-18 | unknown | watch |
+| CTSH | CTSH/ | Cognizant | US | 2026-10-18 | 2026-10-18 | unknown | watch |
+| CTVA | CTVA/ | Corteva | US | 2026-10-18 | 2026-10-18 | unknown | watch |
+| CVNA | CVNA/ | Carvana | US | 2026-10-18 | 2026-10-18 | unknown | watch |
+| CVS | CVS/ | CVS Health | US | 2026-10-18 | 2026-10-18 | unknown | watch |
+| CVX | CVX/ | Chevron Corporation | US | 2026-10-18 | 2026-10-18 | unknown | watch |
+| D | D/ | Dominion Energy | US | 2026-10-18 | 2026-10-18 | unknown | watch |
+| DAL | DAL/ | Delta Air Lines | US | 2026-10-18 | 2026-10-18 | unknown | watch |
+| DASH | DASH/ | DoorDash | US | 2026-10-18 | 2026-10-18 | unknown | watch |
 | DB1.DE | DB1.DE/ | Deutsche Boerse AG | EU | 2026-07-09 | 2026-10-18 | unknown | watch |
 | DD | DD/ | DuPont | US | 2026-07-29 | 2026-10-18 | unknown | watch |
 | DDOG | DDOG/ | Datadog | US | 2026-07-29 | 2026-10-18 | unknown | watch |

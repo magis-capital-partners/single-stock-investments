@@ -1,4 +1,4 @@
-# ACMR — Insider conviction (2026-10-17)
+# ACMR — Insider conviction (2026-10-18)
 
 > Context only. Insider activity informs scenario confidence and stance discussion; it does not auto-inflate Lawrence base IRR. Promotion requires [HUMAN REVIEW].
 
@@ -12,10 +12,10 @@
 
 | Insider | Date | Shares | Price | Value | Contrib |
 |---------|------|--------|-------|-------|---------|
-| McKechnie Mark | 2026-08-20 | 30199 | $19.49 | $588578.51 | 1.887 |
-| McKechnie Mark | 2026-08-20 | 25000 | $13.89 | $347250.0 | 1.85 |
-| Wang David H | 2026-09-09 | 70000 | $1.0 | $70000.0 | 1.432 |
-| Wang David H | 2026-09-08 | 70000 | $1.0 | $70000.0 | 1.42 |
+| McKechnie Mark | 2026-08-20 | 30199 | $19.49 | $588578.51 | 1.872 |
+| McKechnie Mark | 2026-08-20 | 25000 | $13.89 | $347250.0 | 1.834 |
+| Wang David H | 2026-09-09 | 70000 | $1.0 | $70000.0 | 1.42 |
+| Wang David H | 2026-09-08 | 70000 | $1.0 | $70000.0 | 1.409 |
 | McKechnie Mark | 2026-03-12 | 60000 | $13.89 | $833400.0 | 1.377 |
 
 **Routine / planned sales (context):**

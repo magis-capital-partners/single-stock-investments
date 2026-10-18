@@ -1,13 +1,13 @@
-# AMZN - Thematic context (2026-10-17)
+# AMZN - Thematic context (2026-10-18)
 
 > Context only. Tailwinds inform stance and overlay sizing; they do not auto-inflate Lawrence base IRR. Promotion to base case requires [HUMAN REVIEW].
 
 | Indicator | Latest | As of | YoY | Direction | In base IRR? |
 |-----------|--------|-------|-----|-----------|--------------|
-| Hyperscaler capex guide (USD bn, latest) | 467.3 | 2026-10-17 | n/a | flat | no (context) |
+| Hyperscaler capex guide (USD bn, latest) | 467.3 | 2026-10-18 | n/a | flat | no (context) |
 | Natural gas (USD/MMBtu; spot or futures fallback) | 3.115999937057495 | 2026-10-16 | +6.1% | up | no (context) |
 | US urban residential electricity price (USD/kWh) | 0.196 (stale) | 2026-08-01 | +3.2% | up | no (context) |
-| WTI crude (USD/bbl) | 101.41000366210938 | 2026-10-16 | +76.5% | up | no (context) |
+| WTI crude (USD/bbl) | 99.0199966430664 | 2026-10-16 | +72.3% | up | no (context) |
 | Permian crude / oil-gas activity proxy | 107.1306 (stale) | 2026-08-01 | +9.2% | up | no (context) |
 | TPL water segment revenue (USD m, FY) | 307.5 | 2026-06-01 | n/a | flat | no (context) |
 | US Treasury 10Y yield (%) | 5.0980000495910645 | 2026-10-16 | +28.2% | up | no (context) |

@@ -1,8 +1,8 @@
-# MA — Insider conviction (2026-10-17)
+# MA — Insider conviction (2026-10-18)
 
 > Context only. Insider activity informs scenario confidence and stance discussion; it does not auto-inflate Lawrence base IRR. Promotion requires [HUMAN REVIEW].
 
-**ICS:** 7.98 (strong) · **Bull case support:** moderate
+**ICS:** 7.97 (strong) · **Bull case support:** moderate
 
 | Scenario | Prior weight | Tilted weight |
 |----------|--------------|---------------|
@@ -12,7 +12,7 @@
 
 | Insider | Date | Shares | Price | Value | Contrib |
 |---------|------|--------|-------|-------|---------|
-| McLaughlin Edward Grunde | 2026-07-15 | 19800 | $227.25 | $4499550.0 | 1.474 |
+| McLaughlin Edward Grunde | 2026-07-15 | 19800 | $227.25 | $4499550.0 | 1.462 |
 | McLaughlin Edward Grunde | 2026-07-01 | 14260 | $173.49 | $2473967.4 | 1.404 |
 | Ling Hai | 2026-02-24 | 4485 | $90.1 | $404098.5 | 1.297 |
 | Ling Hai | 2026-02-23 | 4486 | $90.1 | $404188.6 | 1.297 |
