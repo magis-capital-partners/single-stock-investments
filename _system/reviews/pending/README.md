@@ -109,7 +109,6 @@ Each is a **full restatement** of current state; the newest file dominates the o
 | `activist_triage_{date}.md` | `activist_triage.py` | 30d | 2 |
 | `activist_press_digest_{date}.md` | activist press seed harvester | 30d | 2 |
 | `fund_family_proposals_{date}.md` | `fund_families.py` | 21d | 2 |
-| `darwin_regime_brief_{date}.md` | `_system/scripts/darwin/observatory.py` | 14d | 2 |
 | `transcript_coverage_{date}.md` | `transcript_gap_report.py` | 14d | 2 |
 | `ls_algo_ic_queue_{date}.md` | ls-algo committee pass | 14d | 2 |
 

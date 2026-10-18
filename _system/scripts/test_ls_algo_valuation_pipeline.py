@@ -8,7 +8,7 @@ from unittest import mock
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 
 import investment_committee_pipeline as icp
-from darwin import run_ls_algo_valuation_pipeline as pipeline
+from marketdata import run_ls_algo_valuation_pipeline as pipeline
 
 
 class LsAlgoValuationPipelineTests(unittest.TestCase):

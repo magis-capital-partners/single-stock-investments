@@ -240,6 +240,19 @@ def conflicted_paths(branch_ref: str) -> list[str]:
     return paths
 
 
+def accept_retired_deletions(paths: list[str]) -> list[str]:
+    """Resolve unmerged generated paths that origin/main no longer has by deleting them."""
+    retired = [
+        path
+        for path in paths
+        if is_generated_path(path)
+        and run(["git", "cat-file", "-e", f"origin/main:{path}"], check=False).returncode != 0
+    ]
+    if retired:
+        run(["git", "rm", "-q", "--ignore-unmatch", "--", *retired])
+    return retired
+
+
 def conflicts_are_generated(paths: list[str]) -> bool:
     return bool(paths) and all(is_generated_path(path) for path in paths)
 
@@ -308,7 +321,12 @@ def resolve(
         raise SystemExit(merge.returncode)
     # -X theirs settles content conflicts. A modify/delete or rename conflict is
     # left unmerged, and `git add -A` would quietly resurrect a file main
-    # deleted. That needs a human, not a bot commit.
+    # deleted. That needs a human, not a bot commit -- unless the file is
+    # generated and main retired it (research_events.jsonl and the Darwin
+    # allocator's dashboard data, 2026-10): keeping main's copy then means
+    # keeping the deletion, the same choice -X theirs makes for content.
+    for path in accept_retired_deletions(unmerged_paths()):
+        print(f"PR #{pr_number}: main retired {path}; keeping the deletion")
     stuck = unmerged_paths()
     if stuck:
         run(["git", "merge", "--abort"], check=False)

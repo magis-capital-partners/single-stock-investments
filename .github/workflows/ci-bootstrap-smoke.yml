@@ -135,10 +135,10 @@ jobs:
         run: python _system/scripts/test_vault_paths.py
       - name: Lint workflow bootstrap blocks
         run: python _system/scripts/lint_ci_bootstrap.py
-      - name: Guard darwin sparse path count
+      - name: Guard dashboard sparse path count
         run: |
-          COUNT=$(python _system/scripts/ci_sparse_checkout_paths.py --count darwin)
-          echo "darwin sparse extra paths=$COUNT"
+          COUNT=$(python _system/scripts/ci_sparse_checkout_paths.py --count dashboard)
+          echo "dashboard sparse extra paths=$COUNT"
           test "$COUNT" -le 200
       - name: Guard rebuild profiles
         run: python _system/scripts/test_pages_fast_rebuild_steps.py
