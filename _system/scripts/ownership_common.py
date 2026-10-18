@@ -84,17 +84,15 @@ def fetch_submissions(cik: str) -> dict:
     return sec_fetch_json(url)
 
 
-def latest_13f_filings(cik: str, limit: int = 4) -> list[dict]:
-    try:
-        submissions = fetch_submissions(cik)
-    except (urllib.error.HTTPError, urllib.error.URLError, TimeoutError, json.JSONDecodeError):
-        return []
-    recent = submissions.get("filings", {}).get("recent") or {}
-    forms = recent.get("form") or []
-    dates = recent.get("filingDate") or []
-    reports = recent.get("reportDate") or []
-    accessions = recent.get("accessionNumber") or []
-    primaries = recent.get("primaryDocument") or []
+def _filings_from_block(cik: str, block: dict) -> list[dict]:
+    """Read one submissions page. Extra pages are flat; the main page nests under recent."""
+    if "recent" in block and isinstance(block.get("recent"), dict):
+        block = block["recent"]
+    forms = block.get("form") or []
+    dates = block.get("filingDate") or []
+    reports = block.get("reportDate") or []
+    accessions = block.get("accessionNumber") or []
+    primaries = block.get("primaryDocument") or []
     width = max(len(forms), len(dates), len(reports), len(accessions), len(primaries))
     forms = list(forms) + [""] * (width - len(forms))
     dates = list(dates) + [""] * (width - len(dates))
@@ -102,11 +100,11 @@ def latest_13f_filings(cik: str, limit: int = 4) -> list[dict]:
     accessions = list(accessions) + [""] * (width - len(accessions))
     primaries = list(primaries) + [""] * (width - len(primaries))
     cik_path = str(int(cik))
-    candidates: list[dict] = []
+    rows = []
     for form, fdate, rdate, acc, primary in zip(forms, dates, reports, accessions, primaries):
-        if form not in FORM_13F:
+        if form not in FORM_13F or not acc:
             continue
-        candidates.append(
+        rows.append(
             {
                 "form": form,
                 "filing_date": fdate,
@@ -117,8 +115,48 @@ def latest_13f_filings(cik: str, limit: int = 4) -> list[dict]:
                 "index_url": f"https://www.sec.gov/Archives/edgar/data/{cik_path}/{acc.replace('-', '')}/index.json",
             }
         )
-    candidates.sort(key=lambda f: f.get("filing_date") or "", reverse=True)
-    return candidates[:limit]
+    return rows
+
+
+def latest_13f_filings(cik: str, limit: int = 4) -> list[dict]:
+    try:
+        submissions = fetch_submissions(cik)
+    except (urllib.error.HTTPError, urllib.error.URLError, TimeoutError, json.JSONDecodeError):
+        return []
+    rows = _filings_from_block(cik, submissions.get("filings") or {})
+    rows.sort(key=lambda f: f.get("filing_date") or "", reverse=True)
+    return rows[:limit]
+
+
+def list_13f_filings(cik: str, limit: int = 40) -> list[dict]:
+    """Enough 13F rows for a multi-year backfill, including older submission pages."""
+    try:
+        submissions = fetch_submissions(cik)
+    except (urllib.error.HTTPError, urllib.error.URLError, TimeoutError, json.JSONDecodeError):
+        return []
+    filings = submissions.get("filings") or {}
+    rows = _filings_from_block(cik, filings)
+    for page in filings.get("files") or []:
+        periods = {row.get("report_date") for row in rows if row.get("form") in HOLDINGS_FORMS}
+        if len(periods) >= limit:
+            break
+        name = page.get("name") if isinstance(page, dict) else None
+        if not name:
+            continue
+        try:
+            extra = sec_fetch_json(f"https://data.sec.gov/submissions/{name}")
+        except (urllib.error.HTTPError, urllib.error.URLError, TimeoutError, json.JSONDecodeError):
+            continue
+        rows.extend(_filings_from_block(cik, extra))
+    rows.sort(key=lambda f: (f.get("filing_date") or "", f.get("accession") or ""), reverse=True)
+    deduped = []
+    seen = set()
+    for row in rows:
+        if row["accession"] in seen:
+            continue
+        seen.add(row["accession"])
+        deduped.append(row)
+    return deduped[:limit]
 
 
 def filing_document_urls(filing: dict) -> dict[str, str | None]:
