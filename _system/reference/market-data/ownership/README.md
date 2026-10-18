@@ -14,8 +14,12 @@ Static ownership layer for the dashboard research memory, biotech quant signals,
 | `tracked_fund_cik_registry.json` | SEC CIK map for tracked-fund 13F ingest |
 | `tracked_funds/records/{quarter}.json` | Portfolio-filtered tracked-fund holdings |
 | `tracked_funds/signals_latest.json` | Light QoQ ownership signals for tracked funds |
-| `cusip_ticker_map.json` | CUSIP to ticker map learned during ingest |
-| `cache/` / `tracked_funds/cache/` | Raw SEC filing caches (gitignored if large) |
+| `managers.json` | Public manager name and SEC CIK. No origin notes. |
+| `13f/positions/{quarter}/{manager}.csv` | Full 13F book for tracked, biotech, and active managers |
+| `13f/changes/{quarter}.json` | Share changes versus the prior quarter on file |
+| `13f/filings.jsonl` | Accession index. A repeat run skips a saved accession. |
+| `cusip_ticker_map.json` | CUSIP to ticker map. Name guesses are not written back. |
+| `cache/` / `tracked_funds/cache/` | Raw SEC filing caches (gitignored) |
 
 ## Rebuild
 
@@ -27,13 +31,14 @@ make research-memory            # merge into research_memory.json
 
 ## Cadence
 
-- **13F ingest:** quarterly after 13F filing window (45 days after quarter end)
+- **13F ingest:** daily check at 13:29 UTC (Data Pipeline `thirteen-f`). A manager is downloaded only when the latest holdings accession is not already saved. Quarter labels use the period of report. A 13F notice is not a book: the overlap builder sums the other managers named on that notice for the same period (Vanguard Group files this way from 2026).
 - **CIK verify:** annually or when a fund restructures
 - **Fund registry:** human edits only (`tracked_funds.json` / `biotech_specialist_funds.json`)
 
 ## Data limits
 
-- Records files store **portfolio tickers only** (not full fund portfolios)
-- Tracked-fund and Reddit social feeds are **context tier** (see `third_party_sources.md`); not base IRR
+- Older `records/` files store portfolio tickers only. `13f/positions/` stores the full public 13F book.
+- Overlap advisers (the large passive complexes) stay in `dashboard/data/overlap_holdings.json`, filtered to the book.
+- Tracked-fund holdings and the Held by panel are context (see `third_party_sources.md`). They are not an input to the base return.
 - Dashboard loads `research_memory.json` separately from `dashboard_data.json`
 - Claim ledger capped at 12,000 rows; source registry capped at 4,000 entries
