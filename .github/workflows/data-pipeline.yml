@@ -1114,6 +1114,7 @@ jobs:
           python _system/scripts/build_tracked_funds_signals.py
           python _system/scripts/build_specialist_13f_signals.py
           python _system/scripts/build_overlap_holdings.py --advisers-only
+          python _system/scripts/ingest_13f.py --periods 2 --alerts
       - name: Commit 13F holdings
         uses: ./.github/actions/commit-main
         with:
@@ -1122,6 +1123,8 @@ jobs:
             _system/reference/market-data/ownership/
             dashboard/data/overlap_holders.json
             dashboard/data/overlap_holdings.json
+            dashboard/data/fund_holdings_summary.json
+            dashboard/data/holdings/
 
   pipeline-summary:
     needs: [decide, intake-full, technicals, activist, downloads, drive, news, cvr-discover, warrant-discover, separation-discover, reverse-splits, world-model, thirteen-f]
