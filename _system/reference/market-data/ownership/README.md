@@ -31,7 +31,8 @@ make research-memory            # merge into research_memory.json
 
 ## Cadence
 
-- **13F ingest:** daily check at 13:29 UTC (Data Pipeline `thirteen-f`). A manager is downloaded only when the latest holdings accession is not already saved. Quarter labels use the period of report. A 13F notice is not a book: the overlap builder sums the other managers named on that notice for the same period (Vanguard Group files this way from 2026).
+- **13F ingest:** daily check at 13:29 UTC (Data Pipeline `thirteen-f`). A manager is downloaded only when the latest holdings accession is not already saved. Quarter labels use the period of report. The daily job reloads two periods. The 21st of February, May, August, and November reloads twelve. A 13F notice is not a book: the overlap builder sums the other managers named on that notice for the same period (Vanguard Group files this way from 2026). Another firm's book is copied only when the names share a rare word.
+- **International:** `intl/nport/` is Form N-PORT for tracked managers' non-US holdings. `intl/edinet/status.json` is Japan's 5 percent reports. Without `EDINET_API_KEY` the EDINET file stays empty. Optional `OPENFIGI_API_KEY` is not required. HKEX, SEDI, ASX, and UK/EU notices are not scraped.
 - **CIK verify:** annually or when a fund restructures
 - **Fund registry:** human edits only (`tracked_funds.json` / `biotech_specialist_funds.json`)
 

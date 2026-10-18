@@ -25,6 +25,7 @@ SCAN_FILES = (
 )
 SCAN_DIRS = (
     "_system/reference/market-data/ownership/13f",
+    "_system/reference/market-data/ownership/intl",
     "dashboard/data/holdings",
 )
 BANNED_NAME = (
