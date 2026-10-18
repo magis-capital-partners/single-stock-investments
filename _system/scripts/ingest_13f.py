@@ -628,7 +628,11 @@ def run(periods: int, alerts: bool, offline: bool, only: str | None) -> int:
             flag = "ok" if report.get("ok", True) else "reconcile"
             print(f"{manager['manager_id']} {quarter}: {flag} rows={len(rows)}", flush=True)
             records.append(filing_record(manager, built))
-            changes = diff_book(manager, rows, quarter, built.get("period_end") or "")
+            changes = [
+                change
+                for change in diff_book(manager, rows, quarter, built.get("period_end") or "")
+                if (change.get("ssi_ticker") or "").upper() in names or change.get("change_type") == "new"
+            ]
             quarter_changes.setdefault(quarter, []).extend(changes)
             fresh_changes.extend(changes)
         if records:
