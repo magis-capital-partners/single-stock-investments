@@ -234,11 +234,18 @@ def _window_items(cfg: Config, rows: list[dict]) -> dict:
     return out
 
 
-class WindowCache:
-    """Decoded DBN windows, one file at a time (a file holds every event of one venue-session)."""
+KEEP_COLUMNS = {"mbp-1": ["symbol", "action", "side", "price", "size", "flags", "bid_px_00", "ask_px_00", "bid_sz_00", "ask_sz_00"],
+                "trades": ["symbol", "side", "price", "size"]}
 
-    def __init__(self, cfg: Config):
+
+class WindowCache:
+    """Decoded DBN windows, pruned to the columns the models read. A file holds every
+    event of one venue-session, so events are processed in venue-session order and
+    only the current session's three files stay decoded."""
+
+    def __init__(self, cfg: Config, keep: int = 3):
         self.cfg = cfg
+        self.keep = keep
         self.frames: dict[str, object] = {}
         self.files: dict[str, dict] = {}
         self.cost_usd = 0.0
@@ -250,18 +257,20 @@ class WindowCache:
         if item["id"] in self.frames:
             return self.frames[item["id"]]
         if not is_complete(path):
-            self.frames[item["id"]] = None
             return None
         ok = read_json(path.with_name(path.name.replace(".dbn.zst", ".ok.json")), {})
-        self.files[item["id"]] = {"path": str(path.relative_to(self.cfg.local_dir).as_posix()), "bytes": path.stat().st_size,
-                                  "quoted_usd": float(ok.get("quoted_usd") or 0.0), "sha256": sha256_file(path)}
-        self.cost_usd += float(ok.get("quoted_usd") or 0.0)
+        if item["id"] not in self.files:
+            self.files[item["id"]] = {"path": str(path.relative_to(self.cfg.local_dir).as_posix()), "bytes": path.stat().st_size,
+                                      "quoted_usd": float(ok.get("quoted_usd") or 0.0), "sha256": sha256_file(path)}
+            self.cost_usd += float(ok.get("quoted_usd") or 0.0)
         if path.stat().st_size == 0:
-            self.frames[item["id"]] = None
-            return None
-        frame = db.DBNStore.from_file(str(path)).to_df(pretty_ts=False)
-        if len(self.frames) > 6:
-            self.frames.clear()
+            frame = None
+        else:
+            frame = db.DBNStore.from_file(str(path)).to_df(pretty_ts=False)
+            cols = [c for c in KEEP_COLUMNS[item["request"]["schema"]] if c in frame.columns]
+            frame = frame[cols]
+        while len(self.frames) >= self.keep:
+            self.frames.pop(next(iter(self.frames)))
         self.frames[item["id"]] = frame
         return frame
 
@@ -432,37 +441,100 @@ def simulate_passive_offer(book: dict, t0_ns: int, shares: int, *, horizon_ns: i
     return out
 
 
-def h2_rows(cfg: Config, rows: list[dict], items: dict, cache: WindowCache, log=print) -> list[dict]:
-    out = []
-    for n, r in enumerate(rows, 1):
-        item = items.get((r["key"], "mbp-1", "open"))
-        row = {k: r[k] for k in ("key", "issuer", "entry_date", "year", "split", "ssr_state", "dataset", "open", "close", "adv_shares", "ret")}
-        row["price_band"] = er.price_band(r["open"])
-        frame = cache.frame(item) if item else None
-        book = _book_arrays(frame, r["symbol"]) if frame is not None else None
-        if book is None:
-            row["status"] = "no_window" if frame is None else "symbol_absent_from_window"
-            out.append(row)
-            continue
-        t0 = int(datetime.fromisoformat(r["opened"]).timestamp() * 1e9) + int(er.ARRIVAL_OFFSET_SECONDS * 1e9)
-        horizon = er.PASSIVE_WINDOW_SECONDS * 10**9
-        row["status"] = "simulated"
-        probe = arrival(book, valid_book_mask(book), t0, ARRIVAL_SEARCH_SECONDS * 10**9)
-        mid = (float(book["bid"][probe]) + float(book["ask"][probe])) / 2 if probe is not None else None
-        orders = {name: er.whole_shares(dollars, mid) if mid else 0 for name, dollars in ACCOUNT_ORDERS.items()}
-        adv_cap = er.whole_shares(er.ADV_PARTICIPATION * r["adv_shares"], 1.0) if r.get("adv_shares") else None
-        orders["replay"] = min(orders[PRIMARY_ORDER], adv_cap) if adv_cap is not None else 0
-        row["orders"] = orders
-        row["sims"] = {}
-        for name, shares in orders.items():
-            for model in CANCEL_MODELS:
-                if name != PRIMARY_ORDER and model != PRIMARY_CANCEL_MODEL:
-                    continue
-                row["sims"][f"{name}/{model}"] = simulate_passive_offer(book, t0, shares, horizon_ns=horizon, cancel_model=model, ssr=True)
-        out.append(row)
-        if n % 100 == 0:
-            log(f"h2: {n}/{len(rows)} events")
-    return out
+def _h2_event(r: dict, book: dict | None, frame_missing: bool) -> dict:
+    row = {k: r[k] for k in ("key", "issuer", "entry_date", "year", "split", "ssr_state", "dataset", "open", "close", "adv_shares", "ret")}
+    row["price_band"] = er.price_band(r["open"])
+    if book is None:
+        row["status"] = "no_window" if frame_missing else "symbol_absent_from_window"
+        return row
+    t0 = int(datetime.fromisoformat(r["opened"]).timestamp() * 1e9) + int(er.ARRIVAL_OFFSET_SECONDS * 1e9)
+    horizon = er.PASSIVE_WINDOW_SECONDS * 10**9
+    row["status"] = "simulated"
+    probe = arrival(book, valid_book_mask(book), t0, ARRIVAL_SEARCH_SECONDS * 10**9)
+    mid = (float(book["bid"][probe]) + float(book["ask"][probe])) / 2 if probe is not None else None
+    orders = {name: er.whole_shares(dollars, mid) if mid else 0 for name, dollars in ACCOUNT_ORDERS.items()}
+    adv_cap = er.whole_shares(er.ADV_PARTICIPATION * r["adv_shares"], 1.0) if r.get("adv_shares") else None
+    orders["replay"] = min(orders[PRIMARY_ORDER], adv_cap) if adv_cap is not None else 0
+    row["orders"] = orders
+    row["sims"] = {}
+    for name, shares in orders.items():
+        for model in CANCEL_MODELS:
+            if name != PRIMARY_ORDER and model != PRIMARY_CANCEL_MODEL:
+                continue
+            row["sims"][f"{name}/{model}"] = simulate_passive_offer(book, t0, shares, horizon_ns=horizon, cancel_model=model, ssr=True)
+    return row
+
+
+def _h3_event(r: dict, prints: dict | None, obook: dict | None, cbook: dict | None, close_px: float, frame_missing: bool) -> dict:
+    row = {k: r[k] for k in ("key", "issuer", "entry_date", "year", "split", "ssr_state", "dataset", "open", "close", "adv_shares", "ret")}
+    row["price_band"] = er.price_band(r["open"])
+    if prints is None or obook is None or cbook is None:
+        row["status"] = "no_window" if frame_missing else "symbol_absent_from_window"
+        return row
+    opened = int(datetime.fromisoformat(r["opened"]).timestamp() * 1e9)
+    closed = int(datetime.fromisoformat(r["closed"]).timestamp() * 1e9)
+    t0 = opened + int(er.ARRIVAL_OFFSET_SECONDS * 1e9)
+    ovalid, cvalid = valid_book_mask(obook), valid_book_mask(cbook)
+    i0 = arrival(obook, ovalid, t0, ARRIVAL_SEARCH_SECONDS * 10**9)
+    x_start = closed - er.EXIT_WINDOW_SECONDS * 10**9
+    i1 = arrival(cbook, cvalid, x_start, ARRIVAL_SEARCH_SECONDS * 10**9)
+    if i0 is None or i1 is None:
+        row["status"] = "no_valid_book_at_arrival"
+        return row
+    m0 = (float(obook["bid"][i0]) + float(obook["ask"][i0])) / 2
+    m1 = (float(cbook["bid"][i1]) + float(cbook["ask"][i1])) / 2
+    entry_start, entry_end = int(obook["ts"][i0]), opened + er.ENTRY_WINDOW_SECONDS * 10**9
+    exit_start, exit_end = int(cbook["ts"][i1]), closed
+    row.update(status="priced", arrival_mid=m0, exit_arrival_mid=m1, official_close=close_px,
+               first_hour_volume=float(prints["size"][(prints["ts"] >= opened) & (prints["ts"] <= entry_end)].sum()),
+               session_volume=float(prints["size"].sum()),
+               timing_open_vs_arrival=(r["open"] - m0) / m0, timing_exit_mid_vs_close=(m1 - close_px) / m0)
+    row["legs"] = {}
+    for rate in er.PARTICIPATION_RATES:
+        specs = {"capacity": None}
+        specs.update({name: er.whole_shares(dollars, m0) for name, dollars in ACCOUNT_ORDERS.items()})
+        for name, order in specs.items():
+            entry = participation_leg(prints, obook, entry_start, entry_end, rate, order_shares=order, arrival_mid=m0)
+            if entry["status"] != "priced" or entry["taken_shares"] <= 0:
+                row["legs"][f"{name}/{rate}"] = {"status": entry.get("status", "no_fill"), "entry": entry}
+                continue
+            position = entry["taken_shares"]
+            exit_ = participation_leg(prints, cbook, exit_start, exit_end, rate, order_shares=position, arrival_mid=m0)
+            residual = position - (exit_.get("taken_shares") or 0.0)
+            buy_vwap = (((exit_.get("vwap") or 0.0) * (exit_.get("taken_shares") or 0.0)) + residual * close_px) / position
+            leg = {"status": "priced", "entry": entry, "exit": exit_, "position_shares": position, "position_usd": position * entry["vwap"],
+                   "residual_at_close_share": residual / position,
+                   "entry_shortfall": (m0 - entry["vwap"]) / m0, "exit_shortfall": (buy_vwap - m1) / m0,
+                   "entry_half_spread": entry["half_spread_vw"] or 0.0,
+                   "exit_half_spread": (exit_.get("half_spread_vw") or 0.0) * ((exit_.get("taken_shares") or 0.0) / position),
+                   "realized_gross_short_return": (entry["vwap"] - buy_vwap) / entry["vwap"]}
+            for c in er.CROSSING_FRACTIONS:
+                cost = leg["entry_shortfall"] + leg["exit_shortfall"] + c * (leg["entry_half_spread"] + leg["exit_half_spread"])
+                leg[f"round_trip_cost_c{c}"] = cost
+                leg[f"realized_short_return_c{c}"] = leg["realized_gross_short_return"] - c * (leg["entry_half_spread"] + leg["exit_half_spread"])
+            row["legs"][f"{name}/{rate}"] = leg
+    return row
+
+
+def window_rows(cfg: Config, rows: list[dict], items: dict, cache: WindowCache, crosses: dict, log=print) -> tuple[list[dict], list[dict]]:
+    """One pass over the events in venue-session order: each session's three files are decoded once."""
+    h2, h3 = [], []
+    ordered = sorted(rows, key=lambda r: (r["dataset"], r["entry_date"], r["key"]))
+    for n, r in enumerate(ordered, 1):
+        o_item, c_item, t_item = items.get((r["key"], "mbp-1", "open")), items.get((r["key"], "mbp-1", "close")), items.get((r["key"], "trades", "session"))
+        o_frame = cache.frame(o_item) if o_item else None
+        obook = _book_arrays(o_frame, r["symbol"]) if o_frame is not None else None
+        h2.append(_h2_event(r, obook, o_frame is None))
+        c_frame = cache.frame(c_item) if c_item else None
+        t_frame = cache.frame(t_item) if t_item else None
+        prints = _print_arrays(t_frame, r["symbol"]) if t_frame is not None else None
+        cbook = _book_arrays(c_frame, r["symbol"]) if c_frame is not None else None
+        close_px = crosses.get(r["key"], {}).get("close_cross_price") or r["close"]
+        h3.append(_h3_event(r, prints, obook, cbook, close_px, o_frame is None or c_frame is None or t_frame is None))
+        if n % 50 == 0:
+            log(f"windows: {n}/{len(ordered)} events ({sum(1 for x in h2 if x.get('status') == 'simulated')} simulated, "
+                f"{sum(1 for x in h3 if x.get('status') == 'priced')} priced)")
+    return h2, h3
 
 
 def h2_results(rows: list[dict]) -> dict:
@@ -568,72 +640,6 @@ def participation_leg(prints: dict | None, book: dict | None, t_start: int, t_en
             "half_spread_vw": hs, "fills_with_book": crossed, "completed": completed_at is not None, "completed_at": completed_at,
             "time_to_complete_seconds": (completed_at - t_start) / 1e9 if completed_at else None,
             "residual_shares": max(0.0, (order_shares or taken) - taken)}
-
-
-def h3_rows(cfg: Config, rows: list[dict], items: dict, cache: WindowCache, crosses: dict, log=print) -> list[dict]:
-    out = []
-    for n, r in enumerate(rows, 1):
-        row = {k: r[k] for k in ("key", "issuer", "entry_date", "year", "split", "ssr_state", "dataset", "open", "close", "adv_shares", "ret")}
-        row["price_band"] = er.price_band(r["open"])
-        t_item, o_item, c_item = items.get((r["key"], "trades", "session")), items.get((r["key"], "mbp-1", "open")), items.get((r["key"], "mbp-1", "close"))
-        t_frame = cache.frame(t_item) if t_item else None
-        o_frame = cache.frame(o_item) if o_item else None
-        c_frame = cache.frame(c_item) if c_item else None
-        prints = _print_arrays(t_frame, r["symbol"]) if t_frame is not None else None
-        obook = _book_arrays(o_frame, r["symbol"]) if o_frame is not None else None
-        cbook = _book_arrays(c_frame, r["symbol"]) if c_frame is not None else None
-        if prints is None or obook is None or cbook is None:
-            row["status"] = "no_window" if (t_frame is None or o_frame is None or c_frame is None) else "symbol_absent_from_window"
-            out.append(row)
-            continue
-        opened = int(datetime.fromisoformat(r["opened"]).timestamp() * 1e9)
-        closed = int(datetime.fromisoformat(r["closed"]).timestamp() * 1e9)
-        t0 = opened + int(er.ARRIVAL_OFFSET_SECONDS * 1e9)
-        ovalid, cvalid = valid_book_mask(obook), valid_book_mask(cbook)
-        i0 = arrival(obook, ovalid, t0, ARRIVAL_SEARCH_SECONDS * 10**9)
-        x_start = closed - er.EXIT_WINDOW_SECONDS * 10**9
-        i1 = arrival(cbook, cvalid, x_start, ARRIVAL_SEARCH_SECONDS * 10**9)
-        if i0 is None or i1 is None:
-            row["status"] = "no_valid_book_at_arrival"
-            out.append(row)
-            continue
-        m0 = (float(obook["bid"][i0]) + float(obook["ask"][i0])) / 2
-        m1 = (float(cbook["bid"][i1]) + float(cbook["ask"][i1])) / 2
-        entry_start, entry_end = int(obook["ts"][i0]), opened + er.ENTRY_WINDOW_SECONDS * 10**9
-        exit_start, exit_end = int(cbook["ts"][i1]), closed
-        close_px = crosses.get(r["key"], {}).get("close_cross_price") or r["close"]
-        row.update(status="priced", arrival_mid=m0, exit_arrival_mid=m1, official_close=close_px,
-                   first_hour_volume=float(prints["size"][(prints["ts"] >= opened) & (prints["ts"] <= entry_end)].sum()),
-                   session_volume=float(prints["size"].sum()),
-                   timing_open_vs_arrival=(r["open"] - m0) / m0, timing_exit_mid_vs_close=(m1 - close_px) / m0)
-        row["legs"] = {}
-        for rate in er.PARTICIPATION_RATES:
-            specs = {"capacity": None}
-            specs.update({name: er.whole_shares(dollars, m0) for name, dollars in ACCOUNT_ORDERS.items()})
-            for name, order in specs.items():
-                entry = participation_leg(prints, obook, entry_start, entry_end, rate, order_shares=order, arrival_mid=m0)
-                if entry["status"] != "priced" or entry["taken_shares"] <= 0:
-                    row["legs"][f"{name}/{rate}"] = {"status": entry.get("status", "no_fill"), "entry": entry}
-                    continue
-                position = entry["taken_shares"]
-                exit_ = participation_leg(prints, cbook, exit_start, exit_end, rate, order_shares=position, arrival_mid=m0)
-                residual = position - (exit_.get("taken_shares") or 0.0)
-                buy_vwap = (((exit_.get("vwap") or 0.0) * (exit_.get("taken_shares") or 0.0)) + residual * close_px) / position
-                leg = {"status": "priced", "entry": entry, "exit": exit_, "position_shares": position, "position_usd": position * entry["vwap"],
-                       "residual_at_close_share": residual / position,
-                       "entry_shortfall": (m0 - entry["vwap"]) / m0, "exit_shortfall": (buy_vwap - m1) / m0,
-                       "entry_half_spread": entry["half_spread_vw"] or 0.0,
-                       "exit_half_spread": (exit_.get("half_spread_vw") or 0.0) * ((exit_.get("taken_shares") or 0.0) / position),
-                       "realized_gross_short_return": (entry["vwap"] - buy_vwap) / entry["vwap"]}
-                for c in er.CROSSING_FRACTIONS:
-                    cost = leg["entry_shortfall"] + leg["exit_shortfall"] + c * (leg["entry_half_spread"] + leg["exit_half_spread"])
-                    leg[f"round_trip_cost_c{c}"] = cost
-                    leg[f"realized_short_return_c{c}"] = leg["realized_gross_short_return"] - c * (leg["entry_half_spread"] + leg["exit_half_spread"])
-                row["legs"][f"{name}/{rate}"] = leg
-        out.append(row)
-        if n % 100 == 0:
-            log(f"h3: {n}/{len(rows)} events")
-    return out
 
 
 def h3_results(rows: list[dict]) -> dict:
@@ -826,8 +832,7 @@ def build(cfg: Config, *, log=print) -> dict:
     h4 = h4_results(h4r)
     items = _window_items(cfg, rows)
     cache = WindowCache(cfg)
-    h2r = h2_rows(cfg, rows, items, cache, log=log)
-    h3r = h3_rows(cfg, rows, items, cache, crosses, log=log)
+    h2r, h3r = window_rows(cfg, rows, items, cache, crosses, log=log)
     h2 = h2_results(h2r)
     h3 = h3_results(h3r)
     comm_rows = commission_rows(h4r, h2r, h3r)
