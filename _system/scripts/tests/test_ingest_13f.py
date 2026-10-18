@@ -19,6 +19,84 @@ def test_sec_names_match_ignores_punctuation_and_case():
     assert not build_managers_json.names_match("Baron Capital", "Baron Financial Group LLC")
 
 
+def test_a_partial_match_needs_the_sec_name_and_a_rare_word():
+    assert build_managers_json.plausible_name_ok(
+        "Engine Capital", "Engine Capital Management, LP", "Engine Capital Management, LP"
+    )
+    assert build_managers_json.plausible_name_ok(
+        "Polen Capital", "POLEN CAPITAL MANAGEMENT LLC", "POLEN CAPITAL MANAGEMENT LLC"
+    )
+    assert build_managers_json.plausible_name_ok(
+        "Hel Ved Capital", "Hel Ved Capital Management Ltd", "Hel Ved Capital Management Ltd"
+    )
+    assert build_managers_json.plausible_name_ok(
+        "YCM (Yacktman)", "YACKTMAN ASSET MANAGEMENT LP", "YACKTMAN ASSET MANAGEMENT LP"
+    )
+    assert build_managers_json.plausible_name_ok(
+        "Ancora (Bellator/Catalyst/Merlin)", "Ancora Advisors LLC", "Ancora Advisors LLC"
+    )
+    assert build_managers_json.plausible_name_ok(
+        "Fairfax Financial", "FAIRFAX FINANCIAL HOLDINGS LTD/ CAN", "FAIRFAX FINANCIAL HOLDINGS LTD/ CAN"
+    )
+    assert build_managers_json.plausible_name_ok(
+        "Absoluto Partners",
+        "Absoluto Partners Gestao de Recursos Ltda",
+        "Absoluto Partners Gestao de Recursos Ltda",
+    )
+    assert not build_managers_json.plausible_name_ok(
+        "Armor Capital", "ARMOR ADVISORS, L.L.C.", "ARMOR ADVISORS, L.L.C."
+    )
+    assert not build_managers_json.plausible_name_ok(
+        "HCM (Hidden )", "Hidden Lake Asset Management LP", "Hidden Lake Asset Management LP"
+    )
+    assert not build_managers_json.plausible_name_ok(
+        "Greenlight Capital", "Greenlight Masters, LLC", "Greenlight Masters, LLC"
+    )
+    assert not build_managers_json.plausible_name_ok(
+        "Engine Capital", "Someone Else LP", "Engine Capital Management, LP"
+    )
+
+
+def test_efts_pick_keeps_one_firm_and_drops_a_different_legal_name():
+    pershing = {
+        "_source": {
+            "ciks": ["1336528"],
+            "display_names": ["PERSHING SQUARE CAPITAL MANAGEMENT, L.P.  (CIK 0001336528)"],
+        }
+    }
+    picked = build_managers_json.pick_efts_cik("Pershing Square Capital Management", [pershing, pershing])
+    assert picked == ("0001336528", "PERSHING SQUARE CAPITAL MANAGEMENT, L.P.")
+    masters = {
+        "_source": {
+            "ciks": ["1449674"],
+            "display_names": ["Greenlight Masters, LLC (CIK 0001449674)"],
+        }
+    }
+    assert build_managers_json.pick_efts_cik("Greenlight Capital", [masters]) is None
+    other = {
+        "_source": {
+            "ciks": ["0000000002"],
+            "display_names": ["PERSHING SQUARE CAPITAL MANAGEMENT, L.P. (CIK 0000000002)"],
+        }
+    }
+    assert build_managers_json.pick_efts_cik("Pershing Square Capital Management", [pershing, other]) is None
+
+
+def test_a_notice_does_not_copy_a_different_firm():
+    assert ingest_13f.notice_member_shares_name("Robotti & Company Advisors", "ROBERT ROBOTTI")
+    assert not ingest_13f.notice_member_shares_name("MIG Capital", "EXCHANGE TRADED CONCEPTS, LLC")
+    assert not ingest_13f.notice_member_shares_name("MIG Capital", "")
+
+
+def test_operational_notes_stay_on_the_review_list():
+    managers = [{"cik": "0001425649", "manager_id": "mig-capital"}, {"cik": "0001494311", "manager_id": "greenstone"}]
+    review = build_managers_json.attach_operational_review(managers, [])
+    reasons = {item["cik"]: item["reason"] for item in review}
+    assert reasons["0001425649"] == "latest_own_book_before_2026Q2"
+    assert reasons["0001494311"] == "latest_own_book_before_2026Q2"
+    assert any("Exchange Traded Concepts" in item["detail"] for item in review)
+
+
 def test_display_name_drops_a_parenthetical_sleeve():
     assert build_managers_json.public_display_name("Akre Capital Management (Akre Focus Fund)", "AKRE") == "Akre Capital Management"
 
@@ -91,4 +169,6 @@ def test_confidentiality_guard_rejects_letter_provenance_and_licensed_names(tmp_
 
 def test_workflow_runs_the_registry_ingest():
     text = Path(__file__).resolve().parents[3].joinpath(".github/workflows/data-pipeline.yml").read_text(encoding="utf-8")
-    assert "python _system/scripts/ingest_13f.py --periods 2 --alerts" in text
+    assert 'python _system/scripts/ingest_13f.py --periods "${THIRTEEN_F_PERIODS:-2}" --alerts' in text
+    assert '"29 13 * * *") thirteen_f=true; thirteen_f_periods=2' in text
+    assert '"29 18 21 2,5,8,11 *") thirteen_f=true; thirteen_f_periods=12' in text
