@@ -230,6 +230,89 @@ not establish an official open or close. The benchmark follows the listing
 venue in dated definitions; missing auction prices remain missing.
 See [Databento's statistics definition](https://databento.com/docs/schemas-and-data-formats/statistics).
 
+## Shorts alpha program: Phase 0 (2026-10-18)
+
+Phase 0 of `_system/proposals/shorts_alpha_program_2026-10-18.md` installs
+pre-registration and answers two questions from data already local. Code:
+`reverse_splits/phase0_research.py` (from `_system/scripts`:
+`python -m reverse_splits.phase0_research --publish`); tests in
+`tests/reverse_splits/test_rs_phase0.py`. No broker, ThetaData or vendor
+request is involved and no new licensed data was downloaded.
+
+| File | Purpose |
+|---|---|
+| `hypotheses.jsonl` | The registry: H1-H17 with cohort, horizon, exit, cost model, metric, success and kill criteria, split and `declared_at`. Rows may gain a `status` or `result_ref`; `declared_at` never changes. |
+| `phase0_research.json` | Aggregate results for H1, H7 and H8 on the train (2018-05 to 2022-12) and validation (2023 to 2024) splits, with each hypothesis read against its registered criteria. |
+| `phase0_manifest.json` | Hashes of the output, the registry, the module, the frozen run inputs and every venue file read. |
+| `local/holdout/phase0_holdout.json` | Sealed: results for entry sessions from 2025-01-01, not committed and not read until the program's final review. |
+| `local/phase0/phase0_full.local.json` | Per-event rows and control matches; licensed returns stay local. |
+
+`check_reverse_splits.py --strict` now refuses a research JSON beside the
+ledger that cites a hypothesis id missing from the registry or declared after
+the result's `built_at`, that does not declare `aggregate_only: true`, or that
+contains per-event or per-symbol-day keys.
+
+### H1: the SSR cohort
+
+Of the 671 verified ex+1 paths, 388 opened under an observed Rule 201
+restriction, 282 did not and 1 is unknown. Gross official-open-to-close short
+returns with issuer-clustered 95% intervals:
+
+| Split | Restricted | Unrestricted | Difference |
+|---|---|---|---|
+| Train (2018-2022) | n 64, +3.4% [+1.3%, +5.6%] | n 56, +0.5% [-2.0%, +2.8%] | +2.9% [-0.2%, +6.0%], t 1.8 |
+| Validate (2023-2024) | n 154, +3.7% [+1.9%, +5.4%] | n 88, +4.1% [+2.2%, +5.9%] | -0.4% [-3.0%, +2.2%], t -0.3 |
+
+Both intervals cover zero, which is H1's registered kill branch: restricted
+and unrestricted sessions are one population for the gross return, so the 58%
+of events the account replays skip under SSR carry no return penalty. Rule 201
+belongs in the fill model as a price constraint (workstream A3), not in the
+admission rule. The bar-based proxy (prior low at or below 90% of the restated
+prior close) agrees with the cached status on 551 of 668 events.
+
+### H7 and H8: the generic weak-microcap fade
+
+Universe: listed common, ordinary and ADS shares on Nasdaq, NYSE and NYSE
+American; prior listing-venue close under $5; prior 20-session three-venue
+dollar volume $50k-$20M; at least 20 prior printed sessions; no catalogued
+reverse split within 30 days; both official auction prints present.
+1,595,187 eligible symbol-days over 35 quarters (2.9% of otherwise eligible
+days lack an official print). Gross short return from the official open to
+the official close, equal weight per symbol-day; symbol-clustered intervals,
+month-clustered in brackets.
+
+| Condition | Train | Validate |
+|---|---|---|
+| All sessions | n 786,332: +0.20% [+0.18%, +0.22%] (month [+0.10%, +0.30%]) | n 409,808: +0.21% [+0.19%, +0.24%] (month [+0.08%, +0.33%]) |
+| After a close down 10% or more | n 29,472: +0.36% [+0.24%, +0.49%] | n 16,103: +0.72% [+0.54%, +0.89%] |
+| After a close up 20% or more | n 8,835: +1.28% [+0.94%, +1.61%] | n 5,261: +0.81% [+0.27%, +1.33%] |
+| Prior close under $1 | +0.44% | +0.47% |
+| Prior close $2 to $5 | +0.15% | +0.13% |
+| H8 difference (down 10% minus up 20%) | -0.92% [-1.26%, -0.56%], t -5.2 | -0.09% [-0.64%, +0.46%], t -0.3 |
+
+The fade is real, small and steady: +0.10% to +0.51% a year from 2018 to
+2024, strongest under $1. H8 as registered (a larger fade after a -10% close)
+is reversed on train and flat on validation; it is reported, not promoted.
+
+### The split family in excess of the fade
+
+Each event's return is compared with the same session's eligible universe and
+with up to three same-session listed names nearest in log prior close (within
+x2) and log dollar volume (within x3), with the subject's prior sessions
+restated by the split ratio. The recomputed auction returns matched the frozen
+study's for all 363 train and validation events.
+
+| Comparator | Train (n 120) | Validate (n 243) |
+|---|---|---|
+| Same-session universe mean | subject +2.1% vs +0.1%: excess +1.9% [+0.3%, +3.6%] | subject +3.8% vs +0.3%: excess +3.5% [+2.2%, +4.8%] |
+| Matched controls, calipers only | n 105: +1.8% [+0.2%, +3.4%] | n 185: +3.7% [+1.9%, +5.2%] |
+| Matched controls, same prior-session bucket | n 97: +1.1% [-0.6%, +2.8%] | n 166: +3.3% [+1.5%, +5.1%] |
+
+The post-split return is not the generic fade: comparable names fade a few
+tenths of a percent on the same sessions, and the split-specific excess is
++1.8% on train and +3.5% on validation. All of this is gross price behaviour;
+no borrow, fill, spread or commission assumption enters any Phase 0 number.
+
 ## Original ledger schemas
 
 ### Historical execution evidence

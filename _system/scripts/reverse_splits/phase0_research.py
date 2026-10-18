@@ -743,8 +743,9 @@ def excess_results(events: list[dict], matches: dict, day_means: dict, *, splits
             reasons["no_control_within_calipers"] += 1
         rows.append(row)
     out = {"exclusions": dict(reasons)}
+    members = {"pooled_train_validate": ("train", "validate")}
     for split in splits:
-        subset = [r for r in rows if r["split"] == split]
+        subset = [r for r in rows if r["split"] in members.get(split, (split,))]
         block = {"events": len(subset)}
         for field in ("excess_all", "excess_bucket", "excess_calipers", "excess_calipers_same_bucket"):
             have = [r for r in subset if r.get(field) is not None]
@@ -763,6 +764,46 @@ def excess_results(events: list[dict], matches: dict, day_means: dict, *, splits
 
 
 # --- assembly, sealing and publication ------------------------------------------
+
+def _covers_zero(interval: dict | None) -> bool:
+    return bool(interval) and interval.get("low") is not None and interval["low"] <= 0 <= interval["high"]
+
+
+def assessments(h1: dict, fade: dict) -> dict:
+    """Read each measured hypothesis against its registered criteria; train and validation only."""
+    train = h1["by_split"]["train"]["difference_restricted_minus_unrestricted"]
+    validate = h1["by_split"]["validate"]["difference_restricted_minus_unrestricted"]
+    if _covers_zero(train) and _covers_zero(validate):
+        verdict = ("Kill criterion met: the restricted-minus-unrestricted interval covers zero on train and on validation. "
+                   "Treat both states as one population for the gross return and model Rule 201 as a price constraint "
+                   "in the fill model, not as an admission rule.")
+    elif validate.get("t_cluster") is not None and abs(validate["t_cluster"]) >= 3:
+        verdict = "Success criterion met on validation: |t_cluster| >= 3; the two states differ in gross return."
+    else:
+        verdict = "Inconclusive on the registered criteria: neither |t_cluster| >= 3 on validation nor zero inside both intervals."
+    out = {"H1": {"registered_success": "either direction with |t_cluster| >= 3 on validation",
+                  "registered_kill": "interval covers zero on train and validation",
+                  "assessment": verdict,
+                  "train_difference": {k: train.get(k) for k in ("point", "low", "high", "t_cluster")},
+                  "validate_difference": {k: validate.get(k) for k in ("point", "low", "high", "t_cluster")}},
+           "H7": {"assessment": "Reported, not promoted: registered as a descriptive baseline."}}
+    h8 = {}
+    for split in ("train", "validate"):
+        d = ((fade.get("by_split") or {}).get(split) or {}).get("h8_down10_minus_up20") or {}
+        if d.get("point") is None:
+            h8[split] = {"reading": "not measured"}
+            continue
+        if d.get("low") is not None and d["low"] > 0:
+            reading = "as registered: larger fade after a -10% close"
+        elif d.get("high") is not None and d["high"] < 0:
+            reading = "reversed: larger fade after a +20% close"
+        else:
+            reading = "not distinguishable from zero"
+        h8[split] = {"reading": reading, **{k: d.get(k) for k in ("point", "low", "high", "t_cluster")}}
+    out["H8"] = {"assessment": "Reported, not promoted: registered as descriptive. Positive difference means the registered direction.",
+                 "by_split": h8}
+    return out
+
 
 def seal(doc: dict) -> dict:
     """Strip every holdout-split value from a results document before publication."""
@@ -844,8 +885,9 @@ def build(cfg: Config, *, run_dir: Path | None = None, labels: list[str] | None 
         local_rows["event_matches"] = scan["event_matches"]
         local_rows["excess_rows"] = excess_rows
     doc["fade_baseline"] = universe_doc
+    doc["assessments"] = assessments(h1, universe_doc)
     doc["definitions"] = {
-        "gross_short_return": "1 - exit price / entry price; positive means the short gained.",
+        "short_return_convention": "1 - exit price / entry price; positive means the short gained.",
         "split": "By the entry session date. Train 2018-05-01 to 2022-12-31, validate 2023-01-01 to 2024-12-31, holdout from 2025-01-01 (sealed).",
         "issuer_interval": "95% percentile interval from 2,000 whole-issuer (CIK) bootstrap draws; events of one issuer move together.",
         "symbol_interval": "95% percentile interval from 2,000 whole-symbol bootstrap draws over per-symbol sums; a symbol is the issuer proxy for the universe.",
@@ -892,6 +934,7 @@ def write_outputs(cfg: Config, result: dict, *, publish: bool, log=print) -> dic
         out_path = cfg.ledger_dir / "phase0_research.json"
         write_json(out_path, public)
         manifest = {"schema_version": VERSION, "built_at": doc["built_at"], "hypothesis_ids": list(HYPOTHESES),
+                    "aggregate_only": True,
                     "output": {"path": out_path.name, "sha256": sha256_file(out_path)},
                     "registry": {"path": "hypotheses.jsonl", "sha256": sha256_file(cfg.ledger_dir / "hypotheses.jsonl")},
                     "code": {"path": "_system/scripts/reverse_splits/phase0_research.py", "sha256": sha256_file(Path(__file__))},
