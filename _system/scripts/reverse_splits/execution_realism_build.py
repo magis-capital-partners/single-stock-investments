@@ -292,17 +292,40 @@ def _book_arrays(frame, symbol: str) -> dict | None:
             "bid_sz": f["bid_sz_00"].to_numpy(dtype="int64"), "ask_sz": f["ask_sz_00"].to_numpy(dtype="int64")}
 
 
-def _print_arrays(frame, symbol: str) -> dict | None:
-    """Continuous prints (crosses excluded) from a trades frame."""
+AUCTION_GUARD_NS = 2 * 10**9
+
+
+def _print_arrays(frame, symbol: str, *, opened_ns: int | None = None, closed_ns: int | None = None, cross: dict | None = None) -> dict | None:
+    """Continuous prints from a trades frame. The official opening and closing crosses are
+    removed by matching their printed price and matched shares (statistics), with a two-second
+    guard around the scheduled open and close for unsided prints as a backstop. Every other
+    print counts, whatever its side tag: the Pillar feeds tag most prints "N" and ITCH tags
+    hidden-order executions "N"."""
+    import numpy as np
+
     if frame is None or frame.empty:
         return None
     f = frame[frame["symbol"] == symbol] if "symbol" in frame.columns else frame
-    f = f[f["side"].astype(str) != "N"]
     if f.empty:
         return None
     f = f.sort_index(kind="stable")
-    return {"ts": f.index.to_numpy(dtype="int64"), "price": f["price"].to_numpy(dtype=float),
-            "size": f["size"].to_numpy(dtype="int64"), "side": f["side"].astype(str).to_numpy()}
+    ts = f.index.to_numpy(dtype="int64")
+    side = f["side"].astype(str).to_numpy()
+    price = f["price"].to_numpy(dtype=float)
+    size = f["size"].to_numpy(dtype="int64")
+    unsided = side == "N"
+    drop = np.zeros(len(ts), dtype=bool)
+    for point in ("open", "close"):
+        cp, cq = (cross or {}).get(f"{point}_cross_price"), (cross or {}).get(f"{point}_cross_shares")
+        if cp and cq:
+            drop |= unsided & (np.abs(price - cp) <= 1e-9) & (size == cq)
+    for boundary in (opened_ns, closed_ns):
+        if boundary is not None:
+            drop |= unsided & (np.abs(ts - boundary) <= AUCTION_GUARD_NS)
+    keep = ~drop
+    if not keep.any():
+        return None
+    return {"ts": ts[keep], "price": price[keep], "size": size[keep], "side": side[keep], "crosses_removed": int(drop.sum())}
 
 
 def valid_book_mask(book: dict):
@@ -341,7 +364,8 @@ def simulate_passive_offer(book: dict, t0_ns: int, shares: int, *, horizon_ns: i
                            ssr: bool = True, search_ns: int = ARRIVAL_SEARCH_SECONDS * 10**9) -> dict:
     """Rest ``shares`` at the venue best offer from the first valid book at or after ``t0``.
 
-    Fills come only from buyer-initiated prints at or above our price after the
+    Fills come only from buyer-initiated prints (a tagged buy aggressor, or an unsided
+    print at or through the displayed ask) at or above our price after the
     displayed queue ahead of us is consumed (price-time priority; cancellations are
     assumed behind us under ``conservative`` and proportional under ``pro_rata``;
     the displayed size at our price is an upper bound on the queue ahead either way).
@@ -376,6 +400,11 @@ def simulate_passive_offer(book: dict, t0_ns: int, shares: int, *, horizon_ns: i
     buyer_volume_at_or_above = 0
     while j < n and ts[j] <= deadline and remaining > 0:
         action, side, price, size = book["action"][j], book["side"][j], float(book["price"][j]), int(book["size"][j])
+        if action == "T" and side == "N":
+            # No aggressor side (Pillar prints, ITCH hidden executions): a print at or through
+            # the displayed ask took the offer; a print inside the spread or at the bid did not.
+            ask_now = float(book["ask"][j])
+            side = "B" if ask_now > 0 and price >= ask_now - eps else "A"
         if action == "T" and side == "B" and price >= P - eps and size > 0:
             buyer_volume_at_or_above += size
             take = min(size, ahead)
@@ -527,9 +556,11 @@ def window_rows(cfg: Config, rows: list[dict], items: dict, cache: WindowCache, 
         h2.append(_h2_event(r, obook, o_frame is None))
         c_frame = cache.frame(c_item) if c_item else None
         t_frame = cache.frame(t_item) if t_item else None
-        prints = _print_arrays(t_frame, r["symbol"]) if t_frame is not None else None
+        cross = crosses.get(r["key"], {})
+        prints = _print_arrays(t_frame, r["symbol"], opened_ns=int(datetime.fromisoformat(r["opened"]).timestamp() * 1e9),
+                               closed_ns=int(datetime.fromisoformat(r["closed"]).timestamp() * 1e9), cross=cross) if t_frame is not None else None
         cbook = _book_arrays(c_frame, r["symbol"]) if c_frame is not None else None
-        close_px = crosses.get(r["key"], {}).get("close_cross_price") or r["close"]
+        close_px = cross.get("close_cross_price") or r["close"]
         h3.append(_h3_event(r, prints, obook, cbook, close_px, o_frame is None or c_frame is None or t_frame is None))
         if n % 50 == 0:
             log(f"windows: {n}/{len(ordered)} events ({sum(1 for x in h2 if x.get('status') == 'simulated')} simulated, "
