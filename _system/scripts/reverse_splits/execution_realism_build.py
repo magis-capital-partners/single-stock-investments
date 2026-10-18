@@ -2,9 +2,15 @@
 gate). Everything here reads local files only.
 
 H4 reads the official opening (and closing) cross size from the venue
-``statistics`` files already local. H2 and H3 read the per-session ``mbp-1``
-and ``trades`` windows pulled under the cost gate; events whose windows were
-not pulled are counted as "no data", never dropped silently.
+``statistics`` files already local. H18 and H19 read the free one-second
+``ohlcv-1s`` session bars plus the opening and closing books the earlier quote
+study cached for every event (arrival midpoint, spread, displayed queue ahead).
+Events without a bar file or a cached book are counted as "no data", never
+dropped silently.
+
+The book-level models (``simulate_passive_offer`` on mbp-1 and
+``participation_leg`` on prints) are kept, tested, as the reference design for
+H2 and H3; they are not run, because those schemas are not free on this plan.
 """
 from __future__ import annotations
 
@@ -30,10 +36,13 @@ ACCOUNT_ORDERS = {"account_50k": er.ACCOUNT_EQUITY * er.POSITION_FRACTION,
                   "account_1m": 1_000_000.0 * er.POSITION_FRACTION}
 PRIMARY_ORDER = "account_50k"
 ARRIVAL_SEARCH_SECONDS = 60
-CANCEL_MODELS = ("conservative", "pro_rata")
+EXIT_ARRIVAL_SEARCH_SECONDS = 300
+CANCEL_MODELS = ("conservative", "pro_rata")     # the book-level reference model only
 PRIMARY_CANCEL_MODEL = "conservative"
+PRIMARY_FILL_MODEL = "bars"                      # what the published study runs
 ALL_SPLITS = ("train", "validate", "holdout")
 REPORTED_SPLITS = ALL_SPLITS + ("pooled_train_validate",)
+BOOK_LABELS = {"open_1": "bbo-1s/open/1", "open_30": "bbo-1s/open/30", "close": "bbo-1s/close/-1"}
 
 
 def _members(split: str) -> tuple[str, ...]:
@@ -135,6 +144,7 @@ def statistics_crosses(cfg: Config, rows: list[dict], log=print) -> tuple[dict, 
                 rec[f"{point}_cross_price"] = float(last["price"])
                 rec[f"{point}_cross_shares"] = int(last["quantity"])
                 rec[f"{point}_cross_rows"] = int(len(p))
+                rec[f"{point}_cross_ts"] = int(last["ts"])
             out[r["key"]] = rec
     return out, files
 
@@ -145,7 +155,7 @@ def h4_rows(rows: list[dict], crosses: dict) -> list[dict]:
         c = crosses.get(r["key"], {})
         row = {k: r[k] for k in ("key", "issuer", "entry_date", "year", "split", "ssr_state", "dataset", "open", "close", "adv_shares", "ret")}
         row["price_band"] = er.price_band(r["open"])
-        row.update(c)
+        row.update({k: v for k, v in c.items() if not k.endswith("_ts")})
         qty = c.get("open_cross_shares")
         row["cross_available"] = qty is not None and qty > 0
         row["cross_price_matches_official"] = (abs(c["open_cross_price"] - r["open"]) <= 1e-6) if c.get("open_cross_price") else None
@@ -215,33 +225,31 @@ def h4_results(rows: list[dict]) -> dict:
             "by_split": by_split, "by_year": by_year, "by_price_band_train_validate": by_band, "by_venue_train_validate": by_venue}
 
 
-# --- market-data windows ---------------------------------------------------------------
+# --- local market data: free bars and the cached books --------------------------------------
 
 def _window_items(cfg: Config, rows: list[dict]) -> dict:
-    """Planned requests keyed by (key, schema, window) with their local paths."""
-    items = er.requests_for(rows)
+    """Planned bar requests keyed by (event key, schema, window)."""
     by_group = {}
-    for item in items:
-        if not item["planned"]:
-            continue
-        by_group[(item["request"]["dataset"], item["date"], item["schema"], item["window"])] = item
+    for item in er.requests_for(rows):
+        if item["planned"]:
+            by_group[(item["request"]["dataset"], item["date"], item["schema"], item["window"])] = item
     out = {}
     for r in rows:
-        for schema, window in (("trades", "session"), ("mbp-1", "open"), ("mbp-1", "close")):
-            item = by_group.get((r["dataset"], r["entry_date"], schema, window))
-            if item:
-                out[(r["key"], schema, window)] = item
+        item = by_group.get((r["dataset"], r["entry_date"], er.FREE_SCHEMA, "session"))
+        if item:
+            out[(r["key"], er.FREE_SCHEMA, "session")] = item
     return out
 
 
 KEEP_COLUMNS = {"mbp-1": ["symbol", "action", "side", "price", "size", "flags", "bid_px_00", "ask_px_00", "bid_sz_00", "ask_sz_00"],
-                "trades": ["symbol", "side", "price", "size"]}
+                "trades": ["symbol", "side", "price", "size"],
+                "ohlcv-1s": ["symbol", "open", "high", "low", "close", "volume"]}
 
 
 class WindowCache:
     """Decoded DBN windows, pruned to the columns the models read. A file holds every
     event of one venue-session, so events are processed in venue-session order and
-    only the current session's three files stay decoded."""
+    only the current session's files stay decoded."""
 
     def __init__(self, cfg: Config, keep: int = 3):
         self.cfg = cfg
@@ -275,9 +283,33 @@ class WindowCache:
         return frame
 
 
-def _book_arrays(frame, symbol: str) -> dict | None:
-    """Numpy columns for one symbol from an mbp-1 frame."""
+def cached_books(cfg: Config) -> tuple[dict, dict | None]:
+    """The opening (1 s and 30 s) and closing (-1 s) listing-venue books the quote study
+    cached per event: bid, ask, mid, displayed sizes and the record's timestamp."""
+    path = cfg.local_dir / "execution_research" / er.QUOTE_STUDY / "observations.local.json"
+    if not path.exists():
+        return {}, None
+    obs = read_json(path, {})
+    out = {}
+    for key, labels in obs.items():
+        out[key] = {name: ((labels.get(label) or {}).get("book")) for name, label in BOOK_LABELS.items()}
+    return out, {"path": f"execution_research/{er.QUOTE_STUDY}/observations.local.json", "sha256": sha256_file(path), "events": len(out)}
 
+
+def _bar_arrays(frame, symbol: str) -> dict | None:
+    """Numpy columns for one symbol from a one-second bar frame, in time order."""
+    if frame is None or frame.empty:
+        return None
+    f = frame[frame["symbol"] == symbol] if "symbol" in frame.columns else frame
+    if f.empty:
+        return None
+    f = f.sort_index(kind="stable")
+    return {"ts": f.index.to_numpy(dtype="int64"), "open": f["open"].to_numpy(dtype=float), "high": f["high"].to_numpy(dtype=float),
+            "low": f["low"].to_numpy(dtype=float), "close": f["close"].to_numpy(dtype=float), "volume": f["volume"].to_numpy(dtype=float)}
+
+
+def _book_arrays(frame, symbol: str) -> dict | None:
+    """Numpy columns for one symbol from an mbp-1 frame (book-level reference model)."""
     if frame is None or frame.empty:
         return None
     f = frame[frame["symbol"] == symbol] if "symbol" in frame.columns else frame
@@ -296,11 +328,9 @@ AUCTION_GUARD_NS = 2 * 10**9
 
 
 def _print_arrays(frame, symbol: str, *, opened_ns: int | None = None, closed_ns: int | None = None, cross: dict | None = None) -> dict | None:
-    """Continuous prints from a trades frame. The official opening and closing crosses are
-    removed by matching their printed price and matched shares (statistics), with a two-second
-    guard around the scheduled open and close for unsided prints as a backstop. Every other
-    print counts, whatever its side tag: the Pillar feeds tag most prints "N" and ITCH tags
-    hidden-order executions "N"."""
+    """Continuous prints from a trades frame (book-level reference model). The official opening
+    and closing crosses are removed by matching their printed price and matched shares, with a
+    two-second guard around the scheduled open and close for unsided prints as a backstop."""
     import numpy as np
 
     if frame is None or frame.empty:
@@ -358,11 +388,12 @@ def arrival(book: dict, valid, t0_ns: int, search_ns: int):
     return None
 
 
-# --- H2: a passive offer under Rule 201 ----------------------------------------------------
+# --- the passive offer under Rule 201 -------------------------------------------------------
 
 def simulate_passive_offer(book: dict, t0_ns: int, shares: int, *, horizon_ns: int, cancel_model: str = PRIMARY_CANCEL_MODEL,
                            ssr: bool = True, search_ns: int = ARRIVAL_SEARCH_SECONDS * 10**9) -> dict:
-    """Rest ``shares`` at the venue best offer from the first valid book at or after ``t0``.
+    """Book-level reference model (mbp-1): rest ``shares`` at the venue best offer from the
+    first valid book at or after ``t0``.
 
     Fills come only from buyer-initiated prints (a tagged buy aggressor, or an unsided
     print at or through the displayed ask) at or above our price after the
@@ -373,7 +404,6 @@ def simulate_passive_offer(book: dict, t0_ns: int, shares: int, *, horizon_ns: i
     price it is re-priced to the best offer (or one tick above the bid) and joins the
     back of that queue, as the exchanges' re-pricing does.
     """
-
     valid = valid_book_mask(book)
     i0 = arrival(book, valid, t0_ns, search_ns)
     if i0 is None:
@@ -447,13 +477,13 @@ def simulate_passive_offer(book: dict, t0_ns: int, shares: int, *, horizon_ns: i
                 prev_level_size = None
         j += 1
     filled = shares - remaining
-    out = {"status": "simulated", "placed_at": placed, "arrival_mid": arrival_mid, "arrival_bid": arrival_bid, "arrival_ask": arrival_ask,
-           "arrival_half_spread": (arrival_ask - arrival_bid) / 2 / arrival_mid, "initial_offer": arrival_ask, "final_offer": P,
-           "shares": shares, "filled_shares": int(filled), "fill_fraction": filled / shares, "fully_filled": remaining == 0,
+    out = {"status": "simulated", "model": "mbp-1", "placed_at": placed, "arrival_mid": arrival_mid, "arrival_bid": arrival_bid,
+           "arrival_ask": arrival_ask, "arrival_half_spread": (arrival_ask - arrival_bid) / 2 / arrival_mid, "initial_offer": arrival_ask,
+           "final_offer": P, "shares": shares, "filled_shares": int(filled), "fill_fraction": filled / shares, "fully_filled": remaining == 0,
            "fill_vwap": filled_value / filled if filled else None, "fills": fills, "repriced": repriced,
            "completed_at": completed, "time_to_fill_seconds": (completed - placed) / 1e9 if completed else None,
            "buyer_volume_at_or_above_offer": int(buyer_volume_at_or_above)}
-    # Markouts after completion; drift to the deadline when unfilled.
+
     def mid_at(t):
         k = book_at(book, valid, t)
         return (float(book["bid"][k]) + float(book["ask"][k])) / 2 if k is not None else None
@@ -470,105 +500,124 @@ def simulate_passive_offer(book: dict, t0_ns: int, shares: int, *, horizon_ns: i
     return out
 
 
-def _h2_event(r: dict, book: dict | None, frame_missing: bool) -> dict:
+def ticks_at_or_above(low: float, high: float, price: float, tick: float) -> float:
+    """Share of a bar's volume attributed to prices at or above ``price`` when the volume is
+    spread evenly over the bar's tick prices from low to high inclusive."""
+    eps = tick * 1e-6
+    if high < price - eps:
+        return 0.0
+    if low >= price - eps:
+        return 1.0
+    total = int(round((high - low) / tick)) + 1
+    above = int(round((high - price) / tick)) + 1
+    return max(0.0, min(1.0, above / total))
+
+
+def bar_close_at(bars: dict, t_ns: int):
+    """Close of the last bar that starts at or before ``t_ns``."""
+    import numpy as np
+
+    j = int(np.searchsorted(bars["ts"], t_ns, side="right")) - 1
+    return float(bars["close"][j]) if j >= 0 else None
+
+
+def simulate_passive_offer_bars(bars: dict, book: dict, placed_ns: int, shares: int, *, horizon_ns: int) -> dict:
+    """Bar fill model (H18): rest ``shares`` at the cached venue best offer behind that level's
+    displayed size. Each later second's volume is spread evenly over the bar's tick prices;
+    the part at or above the offer depletes the queue ahead, then fills the order at the
+    offer price. No cancellations are credited and no re-pricing is modeled, so the fill
+    rate is an upper bound relative to the book-level model and the fill price a lower one.
+    """
+    bid, ask = float(book["bid"]), float(book["ask"])
+    if not (bid > 0 and ask > bid):
+        return {"status": "invalid_arrival_book"}
+    if shares <= 0:
+        return {"status": "order_below_one_share"}
+    arrival_mid = (bid + ask) / 2
+    P = ask
+    ahead = float(book.get("ask_size") or 0)
+    tick = tick_size(P)
+    deadline = placed_ns + horizon_ns
+    remaining = float(shares)
+    cum = 0.0
+    fills = 0
+    completed = None
+    market_above = False
+    ts = bars["ts"]
+    for j in range(len(ts)):
+        t = int(ts[j])
+        if t < placed_ns:
+            continue
+        if t > deadline:
+            break
+        frac = ticks_at_or_above(float(bars["low"][j]), float(bars["high"][j]), P, tick)
+        v = float(bars["volume"][j]) * frac
+        if v <= 0:
+            continue
+        cum += v
+        take = min(v, ahead)
+        ahead -= take
+        rem = v - take
+        if rem > 0 and remaining > 0:
+            fill = min(rem, remaining)
+            remaining -= fill
+            fills += 1
+            if float(bars["low"][j]) > P + tick * 1e-6:
+                market_above = True
+            if remaining <= 1e-9:
+                remaining = 0.0
+                completed = t + 10**9     # the end of that second
+                break
+    filled = shares - remaining
+    out = {"status": "simulated", "model": "bars", "placed_at": placed_ns, "arrival_mid": arrival_mid, "arrival_bid": bid, "arrival_ask": ask,
+           "arrival_half_spread": (ask - bid) / 2 / arrival_mid, "initial_offer": P, "final_offer": P, "queue_ahead_shares": float(book.get("ask_size") or 0),
+           "shares": shares, "filled_shares": int(round(filled)), "fill_fraction": filled / shares, "fully_filled": completed is not None,
+           "fill_vwap": P if filled > 0 else None, "fills": fills, "repriced": 0,
+           "completed_at": completed, "time_to_fill_seconds": (completed - placed_ns) / 1e9 if completed else None,
+           "buyer_volume_at_or_above_offer": cum, "fills_with_market_above_offer": market_above}
+    if completed:
+        for tau in er.MARKOUT_SECONDS:
+            m = bar_close_at(bars, completed + tau * 10**9) if ts[-1] >= completed else None
+            out[f"markout_{tau}s"] = (m - P) / arrival_mid if m is not None else None
+            out[f"mid_change_from_arrival_{tau}s"] = (m - arrival_mid) / arrival_mid if m is not None else None
+        out["improvement_vs_arrival_mid"] = (P - arrival_mid) / arrival_mid
+    else:
+        m = bar_close_at(bars, deadline)
+        out["unfilled_drift"] = (m - arrival_mid) / arrival_mid if m is not None else None
+    return out
+
+
+def _h2_event(r: dict, bars: dict | None, books: dict | None, frame_missing: bool) -> dict:
     row = {k: r[k] for k in ("key", "issuer", "entry_date", "year", "split", "ssr_state", "dataset", "open", "close", "adv_shares", "ret")}
     row["price_band"] = er.price_band(r["open"])
-    if book is None:
+    if bars is None:
         row["status"] = "no_window" if frame_missing else "symbol_absent_from_window"
         return row
-    t0 = int(datetime.fromisoformat(r["opened"]).timestamp() * 1e9) + int(er.ARRIVAL_OFFSET_SECONDS * 1e9)
-    horizon = er.PASSIVE_WINDOW_SECONDS * 10**9
+    book, offset = None, None
+    for name, off in (("open_1", 1), ("open_30", 30)):
+        b = (books or {}).get(name)
+        if b and b.get("bid") and b.get("ask") and b["ask"] > b["bid"]:
+            book, offset = b, off
+            break
+    if book is None:
+        row["status"] = "no_arrival_book"
+        return row
+    placed = int(datetime.fromisoformat(book["timestamp"]).timestamp() * 1e9)
     row["status"] = "simulated"
-    probe = arrival(book, valid_book_mask(book), t0, ARRIVAL_SEARCH_SECONDS * 10**9)
-    mid = (float(book["bid"][probe]) + float(book["ask"][probe])) / 2 if probe is not None else None
-    orders = {name: er.whole_shares(dollars, mid) if mid else 0 for name, dollars in ACCOUNT_ORDERS.items()}
+    row["placement_offset_seconds"] = offset
+    mid = book["mid"]
+    orders = {name: er.whole_shares(dollars, mid) for name, dollars in ACCOUNT_ORDERS.items()}
     adv_cap = er.whole_shares(er.ADV_PARTICIPATION * r["adv_shares"], 1.0) if r.get("adv_shares") else None
     orders["replay"] = min(orders[PRIMARY_ORDER], adv_cap) if adv_cap is not None else 0
     row["orders"] = orders
-    row["sims"] = {}
-    for name, shares in orders.items():
-        for model in CANCEL_MODELS:
-            if name != PRIMARY_ORDER and model != PRIMARY_CANCEL_MODEL:
-                continue
-            row["sims"][f"{name}/{model}"] = simulate_passive_offer(book, t0, shares, horizon_ns=horizon, cancel_model=model, ssr=True)
+    row["sims"] = {f"{name}/{PRIMARY_FILL_MODEL}": simulate_passive_offer_bars(bars, book, placed, shares, horizon_ns=er.PASSIVE_WINDOW_SECONDS * 10**9)
+                   for name, shares in orders.items()}
     return row
-
-
-def _h3_event(r: dict, prints: dict | None, obook: dict | None, cbook: dict | None, close_px: float, frame_missing: bool) -> dict:
-    row = {k: r[k] for k in ("key", "issuer", "entry_date", "year", "split", "ssr_state", "dataset", "open", "close", "adv_shares", "ret")}
-    row["price_band"] = er.price_band(r["open"])
-    if prints is None or obook is None or cbook is None:
-        row["status"] = "no_window" if frame_missing else "symbol_absent_from_window"
-        return row
-    opened = int(datetime.fromisoformat(r["opened"]).timestamp() * 1e9)
-    closed = int(datetime.fromisoformat(r["closed"]).timestamp() * 1e9)
-    t0 = opened + int(er.ARRIVAL_OFFSET_SECONDS * 1e9)
-    ovalid, cvalid = valid_book_mask(obook), valid_book_mask(cbook)
-    i0 = arrival(obook, ovalid, t0, ARRIVAL_SEARCH_SECONDS * 10**9)
-    x_start = closed - er.EXIT_WINDOW_SECONDS * 10**9
-    i1 = arrival(cbook, cvalid, x_start, ARRIVAL_SEARCH_SECONDS * 10**9)
-    if i0 is None or i1 is None:
-        row["status"] = "no_valid_book_at_arrival"
-        return row
-    m0 = (float(obook["bid"][i0]) + float(obook["ask"][i0])) / 2
-    m1 = (float(cbook["bid"][i1]) + float(cbook["ask"][i1])) / 2
-    entry_start, entry_end = int(obook["ts"][i0]), opened + er.ENTRY_WINDOW_SECONDS * 10**9
-    exit_start, exit_end = int(cbook["ts"][i1]), closed
-    row.update(status="priced", arrival_mid=m0, exit_arrival_mid=m1, official_close=close_px,
-               first_hour_volume=float(prints["size"][(prints["ts"] >= opened) & (prints["ts"] <= entry_end)].sum()),
-               session_volume=float(prints["size"].sum()),
-               timing_open_vs_arrival=(r["open"] - m0) / m0, timing_exit_mid_vs_close=(m1 - close_px) / m0)
-    row["legs"] = {}
-    for rate in er.PARTICIPATION_RATES:
-        specs = {"capacity": None}
-        specs.update({name: er.whole_shares(dollars, m0) for name, dollars in ACCOUNT_ORDERS.items()})
-        for name, order in specs.items():
-            entry = participation_leg(prints, obook, entry_start, entry_end, rate, order_shares=order, arrival_mid=m0)
-            if entry["status"] != "priced" or entry["taken_shares"] <= 0:
-                row["legs"][f"{name}/{rate}"] = {"status": entry.get("status", "no_fill"), "entry": entry}
-                continue
-            position = entry["taken_shares"]
-            exit_ = participation_leg(prints, cbook, exit_start, exit_end, rate, order_shares=position, arrival_mid=m0)
-            residual = position - (exit_.get("taken_shares") or 0.0)
-            buy_vwap = (((exit_.get("vwap") or 0.0) * (exit_.get("taken_shares") or 0.0)) + residual * close_px) / position
-            leg = {"status": "priced", "entry": entry, "exit": exit_, "position_shares": position, "position_usd": position * entry["vwap"],
-                   "residual_at_close_share": residual / position,
-                   "entry_shortfall": (m0 - entry["vwap"]) / m0, "exit_shortfall": (buy_vwap - m1) / m0,
-                   "entry_half_spread": entry["half_spread_vw"] or 0.0,
-                   "exit_half_spread": (exit_.get("half_spread_vw") or 0.0) * ((exit_.get("taken_shares") or 0.0) / position),
-                   "realized_gross_short_return": (entry["vwap"] - buy_vwap) / entry["vwap"]}
-            for c in er.CROSSING_FRACTIONS:
-                cost = leg["entry_shortfall"] + leg["exit_shortfall"] + c * (leg["entry_half_spread"] + leg["exit_half_spread"])
-                leg[f"round_trip_cost_c{c}"] = cost
-                leg[f"realized_short_return_c{c}"] = leg["realized_gross_short_return"] - c * (leg["entry_half_spread"] + leg["exit_half_spread"])
-            row["legs"][f"{name}/{rate}"] = leg
-    return row
-
-
-def window_rows(cfg: Config, rows: list[dict], items: dict, cache: WindowCache, crosses: dict, log=print) -> tuple[list[dict], list[dict]]:
-    """One pass over the events in venue-session order: each session's three files are decoded once."""
-    h2, h3 = [], []
-    ordered = sorted(rows, key=lambda r: (r["dataset"], r["entry_date"], r["key"]))
-    for n, r in enumerate(ordered, 1):
-        o_item, c_item, t_item = items.get((r["key"], "mbp-1", "open")), items.get((r["key"], "mbp-1", "close")), items.get((r["key"], "trades", "session"))
-        o_frame = cache.frame(o_item) if o_item else None
-        obook = _book_arrays(o_frame, r["symbol"]) if o_frame is not None else None
-        h2.append(_h2_event(r, obook, o_frame is None))
-        c_frame = cache.frame(c_item) if c_item else None
-        t_frame = cache.frame(t_item) if t_item else None
-        cross = crosses.get(r["key"], {})
-        prints = _print_arrays(t_frame, r["symbol"], opened_ns=int(datetime.fromisoformat(r["opened"]).timestamp() * 1e9),
-                               closed_ns=int(datetime.fromisoformat(r["closed"]).timestamp() * 1e9), cross=cross) if t_frame is not None else None
-        cbook = _book_arrays(c_frame, r["symbol"]) if c_frame is not None else None
-        close_px = cross.get("close_cross_price") or r["close"]
-        h3.append(_h3_event(r, prints, obook, cbook, close_px, o_frame is None or c_frame is None or t_frame is None))
-        if n % 50 == 0:
-            log(f"windows: {n}/{len(ordered)} events ({sum(1 for x in h2 if x.get('status') == 'simulated')} simulated, "
-                f"{sum(1 for x in h3 if x.get('status') == 'priced')} priced)")
-    return h2, h3
 
 
 def h2_results(rows: list[dict]) -> dict:
+    primary = f"{PRIMARY_ORDER}/{PRIMARY_FILL_MODEL}"
+
     def block(subset, sim_key):
         sims = [(r, r["sims"][sim_key]) for r in subset if r.get("sims") and sim_key in r["sims"]]
         simulated = [(r, s) for r, s in sims if s["status"] == "simulated"]
@@ -590,11 +639,14 @@ def h2_results(rows: list[dict]) -> dict:
                "fill_fraction_mean": _mean(s["fill_fraction"] for _, s in simulated),
                "partially_filled": sum(1 for _, s in simulated if 0 < s["fill_fraction"] < 1),
                "repriced_under_ssr": sum(1 for _, s in simulated if s["repriced"]),
+               "fills_with_market_above_offer": sum(1 for _, s in filled if s.get("fills_with_market_above_offer")),
+               "placed_at_30s": sum(1 for r, _ in simulated if r.get("placement_offset_seconds") == 30),
                "order_shares": _dist(s["shares"] for _, s in simulated),
+               "queue_ahead_shares": _dist(s.get("queue_ahead_shares") for _, s in simulated),
                "arrival_half_spread": _dist(s["arrival_half_spread"] for _, s in simulated),
                "time_to_fill_seconds": _dist(s["time_to_fill_seconds"] for _, s in filled),
                "improvement_vs_arrival_mid": _dist(s.get("improvement_vs_arrival_mid") for _, s in filled),
-               "adverse_selection_5m": {"definition": "midpoint five minutes after the fill minus the fill price, over the arrival midpoint; positive is adverse to the short",
+               "adverse_selection_5m": {"definition": "last bar close five minutes after the fill minus the fill price, over the arrival midpoint; positive is adverse to the short",
                                         **_dist(r["as"] for r in as_rows),
                                         "issuer_interval": cluster_interval(as_rows, field="as", cluster="issuer") if as_rows else None},
                "markouts": {f"{tau}s": _dist(s.get(f"markout_{tau}s") for _, s in filled) for tau in er.MARKOUT_SECONDS},
@@ -608,31 +660,27 @@ def h2_results(rows: list[dict]) -> dict:
         sub_state = [r for r in rows if r["ssr_state"] == state]
         by_state[state] = {"by_split": {split: {k: block([r for r in sub_state if r["split"] in _members(split)], k) for k in sim_keys}
                                         for split in REPORTED_SPLITS},
-                           "by_year": {y: block([r for r in sub_state if r["year"] == y], f"{PRIMARY_ORDER}/{PRIMARY_CANCEL_MODEL}")
-                                       for y in sorted({r["year"] for r in sub_state})},
-                           "by_price_band_train_validate": {band: block([r for r in sub_state if r["price_band"] == band and r["split"] in ("train", "validate")],
-                                                                        f"{PRIMARY_ORDER}/{PRIMARY_CANCEL_MODEL}")
+                           "by_year": {y: block([r for r in sub_state if r["year"] == y], primary) for y in sorted({r["year"] for r in sub_state})},
+                           "by_price_band_train_validate": {band: block([r for r in sub_state if r["price_band"] == band and r["split"] in ("train", "validate")], primary)
                                                             for band in [b[2] for b in er.PRICE_BANDS]}}
     return {"definition": ("Restricted sessions (cached Nasdaq SSR state at the entry open): a short-sale offer of the modeled size rests at the "
-                           f"listing-venue best offer from the first valid book at or after {er.ARRIVAL_OFFSET_SECONDS:.0f}s past the scheduled open, "
-                           f"judged within {er.PASSIVE_WINDOW_SECONDS // 60} minutes. Fills only from buyer-initiated prints at or above the offer after the displayed "
-                           "queue ahead is consumed; the offer is re-priced above the bid whenever the bid reaches it. Unrestricted sessions are run "
-                           "the same way as a comparison only."),
-            "primary": f"{PRIMARY_ORDER}/{PRIMARY_CANCEL_MODEL}", "orders": {k: f"{v:,.0f} USD at the arrival midpoint, whole shares" for k, v in ACCOUNT_ORDERS.items()} | {"replay": "the $50k order capped at 0.1% of prior ADV"},
-            "cancel_models": {"conservative": "cancellations are behind us; displayed size at our price bounds the queue ahead",
-                              "pro_rata": "cancellations at our price reduce the queue ahead in proportion"},
+                           "listing-venue best offer of the cached book one second after the scheduled open (thirty seconds when the one-second "
+                           f"book is missing), behind that level's displayed size, judged within {er.PASSIVE_WINDOW_SECONDS // 60} minutes. Each later "
+                           "one-second bar's volume is spread evenly over its tick prices; the part at or above the offer depletes the queue ahead and "
+                           "then fills the order at the offer price. Unrestricted sessions are run the same way as a comparison only."),
+            "primary": primary, "orders": {k: f"{v:,.0f} USD at the arrival midpoint, whole shares" for k, v in ACCOUNT_ORDERS.items()} | {"replay": "the $50k order capped at 0.1% of prior ADV"},
+            "fill_models": {"bars": "one-second bars; no cancellations credited, no re-pricing; fills at or above the offer count (upper bound on the fill rate)"},
             "by_ssr_state": by_state}
 
 
-# --- H3: participation over time --------------------------------------------------------
+# --- participation over time ------------------------------------------------------------------
 
 def participation_leg(prints: dict | None, book: dict | None, t_start: int, t_end: int, rate: float, *,
                       order_shares: float | None, arrival_mid: float) -> dict:
-    """Take ``rate`` of every continuous print in [t_start, t_end] until ``order_shares`` are done.
-
-    Fill prices are the print prices; the volume-weighted half-spread at the fill times
-    (from the last valid book at or before each print) is the spread-crossing cost.
-    """
+    """Book-level reference model: take ``rate`` of every continuous print in [t_start, t_end]
+    until ``order_shares`` are done. Fill prices are the print prices; the volume-weighted
+    half-spread at the fill times (from the last valid book at or before each print) is the
+    spread-crossing cost."""
     import numpy as np
 
     if prints is None:
@@ -673,6 +721,142 @@ def participation_leg(prints: dict | None, book: dict | None, t_start: int, t_en
             "residual_shares": max(0.0, (order_shares or taken) - taken)}
 
 
+def remove_cross(bars: dict, cross_price, cross_shares, after_ns: int) -> tuple[object, bool]:
+    """Volume per bar with the official cross print removed from the first bar at or after
+    ``after_ns`` whose range contains the cross price and that is large enough to hold it."""
+
+    vol = bars["volume"].astype(float).copy()
+    if not cross_price or not cross_shares:
+        return vol, False
+    for j in range(len(vol)):
+        if bars["ts"][j] < after_ns:
+            continue
+        if bars["ts"][j] > after_ns + 15 * 60 * 10**9:
+            break
+        if bars["low"][j] - 1e-9 <= cross_price <= bars["high"][j] + 1e-9 and vol[j] >= 0.5 * cross_shares:
+            vol[j] = max(0.0, vol[j] - cross_shares)
+            return vol, True
+    return vol, False
+
+
+def participation_leg_bars(bars: dict, volume, t_start: int, t_end: int, rate: float, *, order_shares: float | None) -> dict:
+    """Bar model (H19): take ``rate`` of every one-second bar's volume in [t_start, t_end] at
+    the bar's range midpoint until ``order_shares`` are done."""
+    import numpy as np
+
+    m = (bars["ts"] >= t_start) & (bars["ts"] <= t_end) & (volume > 0)
+    ts, vol = bars["ts"][m], volume[m]
+    px = (bars["high"][m] + bars["low"][m]) / 2
+    if not len(ts):
+        return {"status": "no_bars_in_window", "taken_shares": 0.0, "window_volume": 0.0}
+    take = rate * vol
+    cum = np.cumsum(take)
+    if order_shares is not None and order_shares > 0:
+        k = int(np.searchsorted(cum, order_shares, side="left"))
+        if k < len(cum):
+            take = take[:k + 1].copy()
+            take[-1] -= cum[k] - order_shares
+            ts, px = ts[:k + 1], px[:k + 1]
+            completed_at = int(ts[-1]) + 10**9
+        else:
+            completed_at = None
+    else:
+        completed_at = int(ts[-1]) + 10**9
+    taken = float(take.sum())
+    return {"status": "priced", "window_volume": float(vol.sum()), "bars": int(len(vol)), "taken_shares": taken,
+            "vwap": float((take * px).sum() / taken) if taken > 0 else None,
+            "completed": completed_at is not None, "completed_at": completed_at,
+            "time_to_complete_seconds": (completed_at - t_start) / 1e9 if completed_at else None,
+            "residual_shares": max(0.0, (order_shares or taken) - taken)}
+
+
+def _half_spread(book: dict | None, over: float) -> float | None:
+    if not book or not book.get("bid") or not book.get("ask") or book["ask"] <= book["bid"] or not over:
+        return None
+    return (book["ask"] - book["bid"]) / 2 / over
+
+
+def _h3_event(r: dict, bars: dict | None, books: dict | None, cross: dict, frame_missing: bool) -> dict:
+    row = {k: r[k] for k in ("key", "issuer", "entry_date", "year", "split", "ssr_state", "dataset", "open", "close", "adv_shares", "ret")}
+    row["price_band"] = er.price_band(r["open"])
+    if bars is None:
+        row["status"] = "no_window" if frame_missing else "symbol_absent_from_window"
+        return row
+    books = books or {}
+    arrival_book = next((books.get(n) for n in ("open_1", "open_30") if books.get(n) and books[n].get("ask", 0) > books[n].get("bid", 0) > 0), None)
+    if arrival_book is None:
+        row["status"] = "no_arrival_book"
+        return row
+    m0 = arrival_book["mid"]
+    opened = int(datetime.fromisoformat(r["opened"]).timestamp() * 1e9)
+    closed = int(datetime.fromisoformat(r["closed"]).timestamp() * 1e9)
+    placed = int(datetime.fromisoformat(arrival_book["timestamp"]).timestamp() * 1e9)
+    entry_end = opened + er.ENTRY_WINDOW_SECONDS * 10**9
+    x_start, x_end = closed - er.EXIT_WINDOW_SECONDS * 10**9, closed - 1
+    import numpy as np
+
+    k = int(np.searchsorted(bars["ts"], x_start, side="left"))
+    if k >= len(bars["ts"]) or bars["ts"][k] > x_start + EXIT_ARRIVAL_SEARCH_SECONDS * 10**9:
+        row["status"] = "no_exit_arrival_bar"
+        return row
+    m1 = (float(bars["high"][k]) + float(bars["low"][k])) / 2
+    volume, cross_removed = remove_cross(bars, cross.get("open_cross_price"), cross.get("open_cross_shares"), opened)
+    close_px = cross.get("close_cross_price") or r["close"]
+    hs_open = [h for h in (_half_spread(books.get("open_1"), m0), _half_spread(books.get("open_30"), m0)) if h is not None]
+    hs_entry = float(sum(hs_open) / len(hs_open))
+    hs_close = _half_spread(books.get("close"), m0)
+    row.update(status="priced", arrival_mid=m0, exit_arrival_mid=m1, official_close=close_px, cross_removed_from_bars=cross_removed,
+               exit_arrival_offset_seconds=(int(bars["ts"][k]) - x_start) / 1e9,
+               entry_half_spread=hs_entry, exit_half_spread=hs_close if hs_close is not None else hs_entry,
+               exit_spread_from="close_book" if hs_close is not None else "open_books",
+               first_hour_volume=float(volume[(bars["ts"] >= opened) & (bars["ts"] <= entry_end)].sum()),
+               session_volume=float(volume.sum()),
+               timing_open_vs_arrival=(r["open"] - m0) / m0, timing_exit_mid_vs_close=(m1 - close_px) / m0)
+    row["legs"] = {}
+    for rate in er.PARTICIPATION_RATES:
+        specs = {"capacity": None}
+        specs.update({name: er.whole_shares(dollars, m0) for name, dollars in ACCOUNT_ORDERS.items()})
+        for name, order in specs.items():
+            entry = participation_leg_bars(bars, volume, placed, entry_end, rate, order_shares=order)
+            if entry["status"] != "priced" or entry["taken_shares"] <= 0:
+                row["legs"][f"{name}/{rate}"] = {"status": entry.get("status", "no_fill"), "entry": entry}
+                continue
+            position = entry["taken_shares"]
+            exit_ = participation_leg_bars(bars, volume, x_start, x_end, rate, order_shares=position)
+            exit_taken = exit_.get("taken_shares") or 0.0
+            residual = position - exit_taken
+            buy_vwap = (((exit_.get("vwap") or 0.0) * exit_taken) + residual * close_px) / position
+            leg = {"status": "priced", "entry": entry, "exit": exit_, "position_shares": position, "position_usd": position * entry["vwap"],
+                   "residual_at_close_share": residual / position,
+                   "entry_shortfall": (m0 - entry["vwap"]) / m0, "exit_shortfall": (buy_vwap - m1) / m0,
+                   "entry_half_spread": row["entry_half_spread"],
+                   "exit_half_spread": row["exit_half_spread"] * (exit_taken / position),
+                   "realized_gross_short_return": (entry["vwap"] - buy_vwap) / entry["vwap"]}
+            for c in er.CROSSING_FRACTIONS:
+                spread = c * (leg["entry_half_spread"] + leg["exit_half_spread"])
+                leg[f"round_trip_cost_c{c}"] = leg["entry_shortfall"] + leg["exit_shortfall"] + spread
+                leg[f"realized_short_return_c{c}"] = leg["realized_gross_short_return"] - spread
+            row["legs"][f"{name}/{rate}"] = leg
+    return row
+
+
+def window_rows(cfg: Config, rows: list[dict], items: dict, cache: WindowCache, crosses: dict, books: dict, log=print) -> tuple[list[dict], list[dict]]:
+    """One pass over the events in venue-session order: each session's bar file is decoded once."""
+    h2, h3 = [], []
+    ordered = sorted(rows, key=lambda r: (r["dataset"], r["entry_date"], r["key"]))
+    for n, r in enumerate(ordered, 1):
+        item = items.get((r["key"], er.FREE_SCHEMA, "session"))
+        frame = cache.frame(item) if item else None
+        bars = _bar_arrays(frame, r["symbol"]) if frame is not None else None
+        event_books = books.get(r["key"])
+        h2.append(_h2_event(r, bars, event_books, frame is None))
+        h3.append(_h3_event(r, bars, event_books, crosses.get(r["key"], {}), frame is None))
+        if n % 50 == 0:
+            log(f"windows: {n}/{len(ordered)} events ({sum(1 for x in h2 if x.get('status') == 'simulated')} simulated, "
+                f"{sum(1 for x in h3 if x.get('status') == 'priced')} priced)")
+    return h2, h3
+
+
 def h3_results(rows: list[dict]) -> dict:
     primary_c = er.CROSSING_FRACTIONS[0]
 
@@ -705,11 +889,13 @@ def h3_results(rows: list[dict]) -> dict:
 
     leg_keys = sorted({k for r in rows if r.get("legs") for k in r["legs"]})
     primary_leg = f"capacity/{er.PARTICIPATION_RATES[0]}"
-    out = {"definition": ("Sell by taking a fixed share of every continuous listing-venue print from the first valid book after the open for 60 minutes; "
-                          "cover the same way over the last 60 minutes with any residual at the official closing print. Fill prices are the print prices. "
-                          "Cost = (entry arrival mid - sell VWAP) + (buy VWAP - exit arrival mid) + crossing fraction x the volume-weighted half-spread "
-                          "at the fill times, all over the entry arrival mid. capacity: the order is the rate times the window's printed volume. "
-                          "account_*: a fixed order of 2.5% of the account at the arrival mid; completion within the window is reported."),
+    priced_rows = [r for r in rows if r.get("status") == "priced"]
+    out = {"definition": ("Sell by taking a fixed share of every one-second listing-venue bar's volume (the opening cross removed) at the bar's range "
+                          "midpoint, from the cached arrival book after the open for 60 minutes; cover the same way over the last 60 minutes with any "
+                          "residual at the official closing print. Cost = (entry arrival mid - sell VWAP) + (buy VWAP - exit arrival price) + crossing "
+                          "fraction x the cached half-spreads (open books for the entry leg, the close book for the cover), all over the entry arrival "
+                          "mid. capacity: the order is the rate times the window's volume. account_*: a fixed order of 2.5% of the account at the "
+                          "arrival mid; completion within the window is reported."),
            "primary": primary_leg, "crossing_fractions": list(er.CROSSING_FRACTIONS), "rates": list(er.PARTICIPATION_RATES),
            "by_split": {split: {k: block([r for r in rows if r["split"] in _members(split)], k) for k in leg_keys} for split in REPORTED_SPLITS},
            "by_year": {y: {k: block([r for r in rows if r["year"] == y], k) for k in leg_keys if k.startswith("capacity/")}
@@ -718,10 +904,12 @@ def h3_results(rows: list[dict]) -> dict:
                                                    for k in leg_keys if k.startswith("capacity/")} for band in [b[2] for b in er.PRICE_BANDS]},
            "by_venue_train_validate": {ds: {k: block([r for r in rows if r["dataset"] == ds and r["split"] in ("train", "validate")], k)
                                             for k in leg_keys if k.startswith("capacity/")} for ds in sorted({r["dataset"] for r in rows})},
-           "timing": {split: {"open_print_vs_arrival_mid": _dist(r.get("timing_open_vs_arrival") for r in rows if r.get("status") == "priced" and r["split"] in _members(split)),
-                              "exit_arrival_mid_vs_close_print": _dist(r.get("timing_exit_mid_vs_close") for r in rows if r.get("status") == "priced" and r["split"] in _members(split)),
-                              "first_hour_volume_usd_at_arrival": _dist(r["first_hour_volume"] * r["arrival_mid"] for r in rows
-                                                                        if r.get("status") == "priced" and r["split"] in _members(split) and r.get("first_hour_volume") is not None)}
+           "timing": {split: {"open_print_vs_arrival_mid": _dist(r.get("timing_open_vs_arrival") for r in priced_rows if r["split"] in _members(split)),
+                              "exit_arrival_price_vs_close_print": _dist(r.get("timing_exit_mid_vs_close") for r in priced_rows if r["split"] in _members(split)),
+                              "first_hour_volume_usd_at_arrival": _dist(r["first_hour_volume"] * r["arrival_mid"] for r in priced_rows
+                                                                        if r["split"] in _members(split) and r.get("first_hour_volume") is not None),
+                              "cross_removed_from_bars": sum(1 for r in priced_rows if r["split"] in _members(split) and r.get("cross_removed_from_bars")),
+                              "exit_spread_from_open_books": sum(1 for r in priced_rows if r["split"] in _members(split) and r.get("exit_spread_from") == "open_books")}
                       for split in REPORTED_SPLITS}}
     return out
 
@@ -749,7 +937,7 @@ def commission_rows(h4: list[dict], h2: list[dict], h3: list[dict]) -> list[dict
             if shares:
                 legs[name] = {s: _round_trip(s, shares, r["open"], r["close"], passive_entry=False) for s in er.COMMISSIONS}
                 legs[name]["shares"] = shares
-        s2 = (h2_by.get(r["key"], {}).get("sims") or {}).get(f"{PRIMARY_ORDER}/{PRIMARY_CANCEL_MODEL}")
+        s2 = (h2_by.get(r["key"], {}).get("sims") or {}).get(f"{PRIMARY_ORDER}/{PRIMARY_FILL_MODEL}")
         if s2 and s2.get("status") == "simulated" and s2.get("fully_filled"):
             legs["passive_fill_then_close"] = {s: _round_trip(s, s2["shares"], s2["fill_vwap"], r["close"], passive_entry=True) for s in er.COMMISSIONS}
             legs["passive_fill_then_close"]["shares"] = s2["shares"]
@@ -804,12 +992,12 @@ def assessments(h4: dict, h2: dict, h3: dict) -> dict:
                  "validate": {k: v.get(k) for k in ("events", "share", "issuer_interval")}, "train": {k: t.get(k) for k in ("events", "share", "issuer_interval")},
                  "validate_restricted": {k: h4["by_split"]["validate"]["restricted"]["account"]["feasible"].get(k) for k in ("events", "share")},
                  "validate_replay_order": {k: h4["by_split"]["validate"]["all"]["replay"]["feasible"].get(k) for k in ("events", "share")}}
-    # H2: fill rate >= 50% and adverse selection < 0.5% on validation; kill under 25%. Restricted sessions, primary order and cancel model.
-    key = f"{PRIMARY_ORDER}/{PRIMARY_CANCEL_MODEL}"
+    # H18: fill rate >= 50% and adverse selection < 0.5% on validation; kill under 25%. Restricted sessions, primary order, bar fill model.
+    key = h2.get("primary") or f"{PRIMARY_ORDER}/{PRIMARY_FILL_MODEL}"
     blocks = {split: h2["by_ssr_state"]["restricted"]["by_split"][split].get(key) for split in ("train", "validate")}
     vb = blocks["validate"]
     if not vb or not vb["simulated"]:
-        verdict = "Not measured: no restricted validation session has a pulled mbp-1 window."
+        verdict = "Not measured: no restricted validation session has a bar file and a cached arrival book."
     else:
         fr, asel = vb["fill_rate"]["share"], vb["adverse_selection_5m"].get("mean")
         if fr is not None and fr < 0.25:
@@ -819,11 +1007,12 @@ def assessments(h4: dict, h2: dict, h3: dict) -> dict:
         else:
             verdict = (f"Between the registered thresholds on validation: fill rate {fr:.1%}" if fr is not None else "fill rate unavailable") + \
                       (f", 5-minute adverse selection {asel:.2%}." if asel is not None else ", adverse selection unavailable.")
-    out["H2"] = {"registered_success": "fill rate >= 50% and adverse selection < 0.5% on validation", "registered_kill": "fill rate under 25%",
-                 "assessment": verdict,
-                 **{split: ({"simulated": b["simulated"], "fill_rate": b["fill_rate"], "adverse_selection_5m": b["adverse_selection_5m"],
-                             "time_to_fill_seconds": b["time_to_fill_seconds"]} if b else None) for split, b in blocks.items()}}
-    # H3: under 1.5% round trip on validation at 1% participation; kill if the cost exceeds the open-to-close benchmark.
+    out["H18"] = {"registered_success": "fill rate >= 50% and adverse selection < 0.5% on validation", "registered_kill": "fill rate under 25%",
+                  "assessment": verdict,
+                  **{split: ({"simulated": b["simulated"], "fill_rate": b["fill_rate"], "adverse_selection_5m": b["adverse_selection_5m"],
+                              "time_to_fill_seconds": b["time_to_fill_seconds"], "fills_with_market_above_offer": b.get("fills_with_market_above_offer")} if b else None)
+                     for split, b in blocks.items()}}
+    # H19: under 1.5% round trip on validation at 1% participation; kill if the cost exceeds the open-to-close benchmark.
     leg = h3["primary"]
     c = er.CROSSING_FRACTIONS[0]
     hb = {split: h3["by_split"][split].get(leg) for split in ("train", "validate")}
@@ -832,7 +1021,7 @@ def assessments(h4: dict, h2: dict, h3: dict) -> dict:
                        "benchmark_minus_cost": b["benchmark_minus_cost"], "realized_short_return": b[f"realized_short_return_c{c}"]}
                       if b and b["priced"] else None) for split, b in hb.items()}
     if not vb or not vb["priced"]:
-        verdict = "Not measured: no validation session has pulled trades and mbp-1 windows."
+        verdict = "Not measured: no validation session has a bar file and a cached arrival book."
     else:
         cost = vb[f"round_trip_cost_c{c}"]["mean"]
         bench = vb["benchmark_open_to_close_same_events"]["mean"]
@@ -842,8 +1031,10 @@ def assessments(h4: dict, h2: dict, h3: dict) -> dict:
             verdict = f"Success criterion met on validation: round-trip cost {cost:.2%} at 1% participation (benchmark {bench:.2%})."
         else:
             verdict = f"Between the registered thresholds on validation: round-trip cost {cost:.2%} against a benchmark of {bench:.2%}."
-    out["H3"] = {"registered_success": "under 1.5% round trip on validation", "registered_kill": "cost exceeds the open-to-close benchmark",
-                 "assessment": verdict, **detail}
+    out["H19"] = {"registered_success": "under 1.5% round trip on validation", "registered_kill": "cost exceeds the open-to-close benchmark",
+                  "assessment": verdict, **detail}
+    for old, new in er.SUPERSEDED.items():
+        out[old] = {"assessment": f"Superseded by {new}: the registered cost model needs mbp-1 and trade prints, which are not free on this plan and are not bought."}
     return out
 
 
@@ -853,7 +1044,7 @@ def build(cfg: Config, *, log=print) -> dict:
     built_at = datetime.now(timezone.utc).replace(microsecond=0).isoformat()
     registry = load_registry(cfg.ledger_dir)
     if not declared_before(registry, list(er.HYPOTHESES), built_at):
-        raise SystemExit("hypotheses H2, H3 and H4 must be registered before the study is built")
+        raise SystemExit(f"hypotheses {', '.join(er.HYPOTHESES)} must be registered before the study is built")
     rows = er.event_rows(cfg)
     log(f"events: {len(rows)}; splits { {s: sum(1 for r in rows if r['split'] == s) for s in ALL_SPLITS} }; "
         f"ssr { dict(Counter(r['ssr_state'] for r in rows)) }")
@@ -861,31 +1052,37 @@ def build(cfg: Config, *, log=print) -> dict:
     log(f"opening crosses: {sum(1 for v in crosses.values() if v.get('open_cross_shares'))} of {len(rows)} events")
     h4r = h4_rows(rows, crosses)
     h4 = h4_results(h4r)
+    books, books_file = cached_books(cfg)
+    log(f"cached books: {sum(1 for b in books.values() if b.get('open_1'))} one-second, {sum(1 for b in books.values() if b.get('open_30'))} "
+        f"thirty-second, {sum(1 for b in books.values() if b.get('close'))} close")
     items = _window_items(cfg, rows)
     cache = WindowCache(cfg)
-    h2r, h3r = window_rows(cfg, rows, items, cache, crosses, log=log)
+    h2r, h3r = window_rows(cfg, rows, items, cache, crosses, books, log=log)
     h2 = h2_results(h2r)
     h3 = h3_results(h3r)
     comm_rows = commission_rows(h4r, h2r, h3r)
     comm = commission_results(comm_rows)
     quotes = read_json(er.work_dir(cfg) / "quotes.json", {})
-    approvals = read_json(er.work_dir(cfg) / "approvals.json", [])
-    coverage = {"events": len(rows),
-                "windows_planned": len({(k[1], k[2], v["id"]) for k, v in items.items()}),
-                "windows_local": len(cache.files),
-                "events_with_open_window": sum(1 for r in h2r if r.get("status") == "simulated"),
+    downloads = read_json(er.work_dir(cfg) / "downloads.json", [])
+    coverage = {"policy": "free data only: every request quoted first; nothing priced above $0.00 is fetched",
+                "events": len(rows),
+                "bar_files_planned": len({v["id"] for v in items.values()}),
+                "bar_files_local": len(cache.files),
+                "events_with_bars_and_arrival_book": sum(1 for r in h2r if r.get("status") == "simulated"),
                 "events_priced_for_participation": sum(1 for r in h3r if r.get("status") == "priced"),
-                "by_split_open_window": {s: sum(1 for r in h2r if r.get("status") == "simulated" and r["split"] == s) for s in ALL_SPLITS},
+                "not_simulated": dict(Counter(r.get("status") for r in h2r if r.get("status") != "simulated")),
+                "by_split_simulated": {s: sum(1 for r in h2r if r.get("status") == "simulated" and r["split"] == s) for s in ALL_SPLITS},
                 "data_cost_incurred_usd": round(cache.cost_usd, 6),
                 "quoted_planned_total_usd": ((quotes.get("summary") or {}).get("planned_total") or {}).get("usd"),
-                "approvals": [{k: a.get(k) for k in ("approved_usd", "approved_at", "splits", "quoted_total_usd", "files", "bytes")} for a in approvals]}
+                "quoted_refused_above_zero": ((quotes.get("summary") or {}).get("priced_above_zero_refused") or {}).get("requests"),
+                "downloads": [{k: d.get(k) for k in ("downloaded_at", "files", "bytes", "quoted_usd", "refused_priced_above_zero", "refused_usd")} for d in downloads]}
     doc = {"schema_version": er.VERSION, "built_at": built_at, "research_only": True, "authority": "none", "aggregate_only": True,
-           "hypothesis_ids": list(er.HYPOTHESES), "source_run_id": RUN_ID,
+           "hypothesis_ids": list(er.HYPOTHESES), "superseded": dict(er.SUPERSEDED), "source_run_id": RUN_ID,
            "splits": {k: list(v) for k, v in SPLITS.items()},
            "holdout_policy": {"start": HOLDOUT_START, "status": "sealed",
                               "location": "local/holdout/execution_realism_holdout.json (not committed, not read until the program's final review)"},
            "data": coverage,
-           "h4_opening_cross": h4, "h2_passive_offer_under_ssr": h2, "h3_participation_cost": h3, "commissions": comm}
+           "h4_opening_cross": h4, "h18_passive_offer_under_ssr": h2, "h19_participation_cost": h3, "commissions": comm}
     doc["assessments"] = assessments(h4, h2, h3)
     doc["definitions"] = {
         "short_return_convention": "1 - exit price / entry price; positive means the short gained.",
@@ -893,24 +1090,26 @@ def build(cfg: Config, *, log=print) -> dict:
         "issuer_interval": "95% percentile interval from 2,000 whole-issuer (CIK) bootstrap draws; events of one issuer move together.",
         "feasible_share": "Share of events whose order is at least one whole share and at most 5% of the matched cross shares.",
         "fill_rate": "Share of simulated orders fully filled within 15 minutes of placement; partial fills are reported separately.",
-        "adverse_selection_5m": "Midpoint five minutes after completion minus the fill price, over the arrival midpoint; positive is adverse to the short.",
-        "round_trip_cost": "Entry shortfall + exit shortfall + crossing fraction x volume-weighted half-spread at the fill times, over the entry arrival midpoint; positive is a cost.",
-        "benchmark_minus_cost": "The same events' official open-to-close gross short return minus the round-trip cost; H3's kill branch reads this below zero.",
+        "adverse_selection_5m": "Last one-second bar close five minutes after completion minus the fill price, over the arrival midpoint; positive is adverse to the short.",
+        "round_trip_cost": "Entry shortfall + exit shortfall + crossing fraction x the cached half-spreads, over the entry arrival midpoint; positive is a cost.",
+        "benchmark_minus_cost": "The same events' official open-to-close gross short return minus the round-trip cost; H19's kill branch reads this below zero.",
         "commission_fraction": "Round-trip commission, venue fees and clearing (regulatory pass-through excluded) over the entry notional.",
     }
     doc["limits"] = [
-        "Listing-venue books and prints only: not consolidated NBBO or consolidated volume; the queue model sees displayed size only, so hidden and midpoint liquidity ahead of the order is invisible and fill rates are upper bounds in that respect.",
-        "Cancellations cannot be attributed to a queue position; the primary model assumes they sit behind the order and bounds the queue ahead by the displayed size, the pro-rata variant is reported beside it.",
-        "The participation model follows printed volume with no market impact beyond the spread-crossing term; at 5% of volume that is optimistic and the cost curve across rates reflects timing and capacity only.",
-        "Arrival is the first valid book at or after one second past the scheduled open; the official opening print is the auction, not the first continuous book, and the timing difference is reported separately.",
-        "Halts inside a window simply contribute no prints; LULD and news halts are not modeled as events.",
+        "Free data only: one-second listing-venue bars and the opening and closing books cached by the earlier quote study; not consolidated volume or NBBO, and no intraday quotes between those books.",
+        "The bar fill model spreads each second's volume evenly over the bar's tick prices and credits no cancellations and no re-pricing; fills counted on bars that traded entirely above the offer may in reality have been re-priced orders, so the fill rate is an upper bound and the fill price a lower bound against the book-level model that was not run.",
+        "Hidden and midpoint liquidity ahead of the order is invisible in displayed size, which also pushes the fill rate up.",
+        "The participation model follows printed volume with no market impact beyond the spread term; at 5% of volume that is optimistic, and the spread term uses the open and close books rather than the spread at each fill time.",
+        "Arrival is the cached book one second after the scheduled open (thirty seconds where that record is missing); the exit arrival is the first bar at or after 15:00, up to five minutes later for names that did not print at 15:00.",
+        "Halts inside a window simply contribute no bars; LULD and news halts are not modeled as events.",
         "Commission schedules are declared constants (IBKR fixed and tiered at the lowest tier with representative exchange fees); regulatory pass-through uses today's published rates for every year.",
         "The opening-cross feasibility is a size test at the printed price; it does not establish that an auction order of that size would not have moved the cross price.",
-        "No borrow, locate or margin assumption enters any number here; H2's realized return to the close is gross of borrow and commissions.",
+        "No borrow, locate or margin assumption enters any number here; H18's realized return to the close is gross of borrow and commissions.",
         "Holdout results exist only under local/holdout and were not read while writing this document; nothing here was selected on them.",
     ]
-    local = {"h4": h4r, "h2": h2r, "h3": h3r, "commissions": comm_rows}
-    manifest_inputs = {"statistics_files": stat_files, "session_windows": sorted(cache.files.values(), key=lambda f: f["path"])}
+    local = {"h4": h4r, "h18": h2r, "h19": h3r, "commissions": comm_rows}
+    manifest_inputs = {"statistics_files": stat_files, "cached_books": books_file,
+                       "bar_files": sorted(cache.files.values(), key=lambda f: f["path"])}
     return {"doc": doc, "local": local, "built_at": built_at, "manifest_inputs": manifest_inputs}
 
 
@@ -955,22 +1154,21 @@ def write_outputs(cfg: Config, result: dict, *, publish: bool, log=print) -> dic
                               "sha256": sha256_file(cfg.local_dir / "execution_research" / er.QUOTE_STUDY / "targets.local.json")},
                   "ssr_states_db": {"path": str(cfg.db_path.relative_to(cfg.local_dir).as_posix()), "sha256": sha256_file(cfg.db_path)},
                   "quotes": {"path": "workstream_a/quotes.json", "sha256": sha256_file(wdir / "quotes.json")} if (wdir / "quotes.json").exists() else None,
-                  "approvals": {"path": "workstream_a/approvals.json", "sha256": sha256_file(wdir / "approvals.json")} if (wdir / "approvals.json").exists() else None,
+                  "downloads": {"path": "workstream_a/downloads.json", "sha256": sha256_file(wdir / "downloads.json")} if (wdir / "downloads.json").exists() else None,
                   **result["manifest_inputs"]}
+        measured = [h for h in er.HYPOTHESES if not str(doc["assessments"].get(h, {}).get("assessment", "")).startswith("Not me")]
+        mark_measured(cfg.ledger_dir, measured, out_path.name)
         manifest = {"schema_version": er.VERSION, "built_at": doc["built_at"], "hypothesis_ids": list(er.HYPOTHESES), "aggregate_only": True,
+                    "hypotheses_measured": measured, "superseded": dict(er.SUPERSEDED),
                     "output": {"path": out_path.name, "sha256": sha256_file(out_path)},
-                    "registry": {"path": "hypotheses.jsonl", "sha256": None},
+                    "registry": {"path": "hypotheses.jsonl", "sha256": sha256_file(cfg.ledger_dir / "hypotheses.jsonl")},
                     "code": [{"path": f"_system/scripts/reverse_splits/{name}", "sha256": sha256_file(Path(__file__).with_name(name))}
                              for name in ("execution_realism.py", "execution_realism_build.py")],
+                    "data_policy": doc["data"]["policy"],
                     "data_cost_incurred_usd": doc["data"]["data_cost_incurred_usd"],
                     "inputs": inputs,
                     "holdout": {"path": "local/holdout/execution_realism_holdout.json", "sha256": sha256_file(holdout_path), "sealed": True},
                     "raw_market_data_public": False}
-        measured = [h for h, a in doc["assessments"].items() if not str(a.get("assessment", "")).startswith("Not me")]
-        mark_measured(cfg.ledger_dir, measured, out_path.name)
-        manifest_measured = measured
-        manifest["registry"]["sha256"] = sha256_file(cfg.ledger_dir / "hypotheses.jsonl")
-        manifest["hypotheses_measured"] = manifest_measured
         write_json(cfg.ledger_dir / "execution_realism_manifest.json", manifest)
         outputs["published"] = str(out_path)
         outputs["manifest"] = str(cfg.ledger_dir / "execution_realism_manifest.json")
