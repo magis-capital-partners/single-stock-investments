@@ -15,7 +15,7 @@ on:
     - cron: "23 10 * * 0,3"  # full document harvest twice weekly
     - cron: "41 14 * * *"    # drive intake (daily)
     - cron: "47 */6 * * *"  # portfolio news
-    - cron: "13 15 * * 1"    # CVR + warrant + separation discovery Mondays
+    - cron: "13 15 * * 1"    # CVR + warrant + separation + buyback discovery Mondays
     - cron: "43 16 * * 0"    # World Model weekly (Sunday UTC: themes + KPI ledgers + strip)
 
 # Concurrency: each job below takes its own queue (data-commit-main-<job>)
@@ -48,6 +48,7 @@ jobs:
       warrant_discover: ${{ steps.pick.outputs.warrant_discover }}
       separation_discover: ${{ steps.pick.outputs.separation_discover }}
       reverse_splits: ${{ steps.pick.outputs.reverse_splits }}
+      buyback_radar: ${{ steps.pick.outputs.buyback_radar }}
       world_model: ${{ steps.pick.outputs.world_model }}
       technicals: ${{ steps.pick.outputs.technicals }}
     steps:
@@ -58,7 +59,7 @@ jobs:
           EVENT_ACTION: ${{ github.event.action }}
         run: |
           set -euo pipefail
-          intake_full=false; activist=false; downloads=false; drive=false; news=false; cvr_discover=false; warrant_discover=false; separation_discover=false; reverse_splits=false; world_model=false; technicals=false; download_mode=light
+          intake_full=false; activist=false; downloads=false; drive=false; news=false; cvr_discover=false; warrant_discover=false; separation_discover=false; reverse_splits=false; buyback_radar=false; world_model=false; technicals=false; download_mode=light
           if [ "$EVENT_NAME" = "repository_dispatch" ]; then SCHEDULE="dispatch:$EVENT_ACTION"; fi
           case "$SCHEDULE" in
             "dispatch:heal-technicals") technicals=true ;;
@@ -72,7 +73,7 @@ jobs:
             "23 10 * * 0,3") downloads=true; download_mode=full ;;
             "41 14 * * *") drive=true ;;
             "47 */6 * * *") news=true ;;
-            "13 15 * * 1") cvr_discover=true; warrant_discover=true; separation_discover=true; reverse_splits=true ;;
+            "13 15 * * 1") cvr_discover=true; warrant_discover=true; separation_discover=true; reverse_splits=true; buyback_radar=true ;;
             "43 16 * * 0") world_model=true ;;
             *) echo "::error::Unrecognized schedule='$SCHEDULE'"; exit 1 ;;
           esac
@@ -87,10 +88,11 @@ jobs:
             echo "warrant_discover=$warrant_discover"
             echo "separation_discover=$separation_discover"
             echo "reverse_splits=$reverse_splits"
+            echo "buyback_radar=$buyback_radar"
             echo "world_model=$world_model"
             echo "technicals=$technicals"
           } >> "$GITHUB_OUTPUT"
-          echo "Selected: intake_full=$intake_full technicals=$technicals activist=$activist downloads=$downloads($download_mode) drive=$drive news=$news cvr_discover=$cvr_discover warrant_discover=$warrant_discover separation_discover=$separation_discover reverse_splits=$reverse_splits world_model=$world_model"
+          echo "Selected: intake_full=$intake_full technicals=$technicals activist=$activist downloads=$downloads($download_mode) drive=$drive news=$news cvr_discover=$cvr_discover warrant_discover=$warrant_discover separation_discover=$separation_discover reverse_splits=$reverse_splits buyback_radar=$buyback_radar world_model=$world_model"
 
   intake-full:
     needs: decide
@@ -1078,8 +1080,48 @@ jobs:
         with:
           message: "chore: world-model weekly $(date -u +%Y-%m-%d)"
 
+  buyback-radar:
+    needs: decide
+    if: needs.decide.outputs.buyback_radar == 'true'
+    runs-on: ubuntu-latest
+    timeout-minutes: 90
+    concurrency:
+      group: data-commit-main-${{ github.job }}
+      cancel-in-progress: false
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          sparse-checkout: |
+            _system/scripts/ci_checkout_workspace.sh
+            _system/scripts/ci_resolve_checkout_ref.sh
+            _system/scripts/ci_sparse_checkout_paths.py
+          sparse-checkout-cone-mode: false
+          fetch-depth: 1
+      - name: Checkout workspace (full)
+        run: bash _system/scripts/ci_checkout_workspace.sh full
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Refresh buyback radar from EDGAR
+        timeout-minutes: 70
+        run: |
+          python -u _system/scripts/build_buyback_radar.py
+          python _system/scripts/build_special_situations.py
+      - name: Commit buyback radar
+        if: always()
+        uses: ./.github/actions/commit-main
+        with:
+          message: "chore: buyback radar weekly $(date -u +%Y-%m-%d)"
+          git_add: >-
+            dashboard/data/buyback_radar.json
+            dashboard/data/buyback_companies.json
+            dashboard/data/special_situations.json
+            dashboard/data/short_alpha.json
+            dashboard/data/agent_shards
+            _system/data/buyback_radar
+
   pipeline-summary:
-    needs: [decide, intake-full, technicals, activist, downloads, drive, news, cvr-discover, warrant-discover, separation-discover, reverse-splits, world-model]
+    needs: [decide, intake-full, technicals, activist, downloads, drive, news, cvr-discover, warrant-discover, separation-discover, reverse-splits, buyback-radar, world-model]
     if: always()
     runs-on: ubuntu-latest
     timeout-minutes: 5
@@ -1097,5 +1139,6 @@ jobs:
           echo "warrant_discover=${{ needs.decide.outputs.warrant_discover }} result=${{ needs.warrant-discover.result }}"
           echo "separation_discover=${{ needs.decide.outputs.separation_discover }} result=${{ needs.separation-discover.result }}"
           echo "reverse_splits=${{ needs.decide.outputs.reverse_splits }} result=${{ needs.reverse-splits.result }}"
+          echo "buyback_radar=${{ needs.decide.outputs.buyback_radar }} result=${{ needs.buyback-radar.result }}"
           echo "world_model=${{ needs.decide.outputs.world_model }} result=${{ needs.world-model.result }}"
           echo "Deploy Dashboard chains via workflow_run on successful commits."

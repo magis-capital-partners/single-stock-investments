@@ -276,6 +276,12 @@ def build_all(target_tickers: list[str] | None = None, *, build_all_shards: bool
     kpi_by_ticker, kpi_inflections = _index_kpi_by_ticker(kpi_payload)
     news_by_ticker = _index_news_by_ticker(news_payload)
     docs_by_ticker, doc_summary_stats = _index_docs_by_ticker()
+    try:
+        from build_buyback_radar import load_companies_index, shard_buyback
+        buyback_index = load_companies_index()
+    except Exception:
+        buyback_index = {}
+        shard_buyback = None  # type: ignore[assignment]
 
     all_universe_tickers = sorted(
         set(str(k).upper() for k in holdings_map.keys())
@@ -453,6 +459,9 @@ def build_all(target_tickers: list[str] | None = None, *, build_all_shards: bool
                     "context_pack_md": f"dashboard/data/context_packs/{ticker}.md",
                 },
             }
+            buyback_row = buyback_index.get(ticker)
+            if buyback_row and shard_buyback:
+                shard_payload["buyback"] = shard_buyback(buyback_row)
             # Volatile stamp last: stable prefix stays prompt-cache friendly.
             shard_payload["generated_at"] = ts
             attach_envelope(

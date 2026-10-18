@@ -36,6 +36,7 @@ Files live in `dashboard/data/`. Read the build date before the contents.
 | `short_alpha.json` | `generated_at` | Short Alpha ledger view: candidates with lenses, categories and lens reviews. Desk: Short Selling. |
 | `reverse_splits.json` | `generated_at` | Reverse-split ledger view: recent announcements, upcoming effective dates, repeat splitters. Desk: Short Selling. |
 | `special_situations.json` | `generated_at` | Ranked special situations, discovery list, history, by lane. Desk: Special Situations. |
+| `buyback_radar.json` | `generated_at` | Share-cannibal summary, buyback events, and the grading method. Per-company rows are in `buyback_companies.json`. Buyback yield is a percent of market value, not percent per year. Desk: Special Situations. |
 | `separations.json` | `generated_at` | Split-offs and spin-offs: filed terms, spread, who-must-sell flows, odd-lot alerts, discovery events. Desk: Special Situations; the forced_seller_rows also feed the Technical Analyst. |
 | `desk_briefs.json` | `generated_at` | The latest desk brief per desk, joined for the Inbox. Built from `_system/data/desk_briefs/`. |
 | `portfolio_summary.json` | `generated_at` (`_envelope.generated_at`) | **L0 summary (< 100 KB)** of active/classified portfolio tickers with stance, archetype, `base_irr_pct`, and `_envelope` freshness. Read this before opening L1 shards. |

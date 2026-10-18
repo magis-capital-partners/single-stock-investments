@@ -140,6 +140,8 @@
       <p>${esc(row.what)}</p>
       ${row.terms_summary ? `<p class="situation-terms-summary">${esc(row.terms_summary)}</p>` : ''}
       <p>${esc(row.company || '')}${row.headline_count > 1 ? ` · ${row.headline_count} headlines in the window` : ''}</p>
+      ${row.one_number ? `<p><strong>The number.</strong> ${esc(row.one_number)}</p>` : ''}
+      ${row.research_only ? '<p>Research only. Not a position.</p>' : ''}
       <p><strong>Ends.</strong> ${esc(row.ends_label || 'Not stated')}</p>
       <p><strong>Next.</strong> ${esc(row.next || '')}</p>
       <p><strong>Annualized spread.</strong> ${row.annualized_spread == null ? 'Not stated. Shown only when a filing states it.' : esc(row.annualized_spread)}</p>
@@ -149,7 +151,7 @@
     </td></tr>` : '';
     return `<tr class="${focus.trim()}" data-situation-id="${esc(row.id)}">
       <td><button type="button" class="idea-open" data-situation-open="${esc(row.id)}">${esc(row.ticker || '—')}</button></td>
-      <td>${esc(row.what)}</td>
+      <td>${esc(row.what)}${row.one_number ? ` <span class="mono">${esc(row.one_number)}</span>` : ''}${row.research_only ? ' <span class="idea-type">Research only</span>' : ''}</td>
       <td><span class="idea-type">${esc(lanes)}</span></td>
       <td>${esc(row.ends_label || '—')}</td>
       <td>${evidenceCell(row)}</td>
@@ -174,6 +176,10 @@
     const chips = [{ id: 'all', label: 'All', count: (doc.rows || []).length }].concat(
       (doc.lanes || []).map((lane) => ({ id: lane.id, label: lane.label, count: counts[lane.id] || 0 })),
     );
+    const mentionRows = state.lane === 'buyback_events' ? (doc.buyback_mentions || []) : [];
+    const mentionBlock = mentionRows.length
+      ? `<section class="ideas-surface"><div class="ideas-surface-head"><strong>Ordinary programs</strong><span>One line each. Not a situation row.</span></div><ul>${mentionRows.map((row) => `<li>${esc(row.ticker || '—')} · ${esc(row.line || '')}${row.url ? ` · <a href="${esc(row.url)}" target="_blank" rel="noopener">filing</a>` : ''}</li>`).join('')}</ul></section>`
+      : '';
     const gates = state.lane === 'warrants'
       ? `<details class="situation-gates" data-situation-gates ${state.gatesOpen ? 'open' : ''}><summary>Contract gates</summary><div data-situation-gates-host></div></details>`
       : '';
@@ -202,6 +208,7 @@
       </section>
       ${historyBlock}
       ${discoveryBlock}
+      ${mentionBlock}
       ${gates}
       ${doc.error ? `<p class="form-hint">${esc(doc.error)}</p>` : ''}
     </div>`;

@@ -12,7 +12,7 @@ from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[2]
 REQUIRED_SHARDS = {'desk_briefs':'data/desk_briefs.json','reverse_splits':'data/reverse_splits.json'}
-LANES = {'spinoffs','split_offs','mergers','warrants','restructurings','forced_sellers'}
+LANES = {'spinoffs','split_offs','mergers','warrants','restructurings','forced_sellers','buyback_events'}
 
 
 def check(root=ROOT):
@@ -42,7 +42,19 @@ def check(root=ROOT):
         errors.append('short_alpha: candidate count does not reconcile')
     lanes = {row.get('id') for row in docs.get('special_situations',{}).get('lanes',[])}
     if lanes != LANES:
-        errors.append('special_situations: expected six lanes including split_offs')
+        errors.append('special_situations: expected seven lanes including buyback_events')
+    radar_path = root/'dashboard/data/buyback_radar.json'
+    if radar_path.is_file():
+        try:
+            radar = json.loads(radar_path.read_text(encoding='utf-8'))
+        except (OSError, ValueError) as exc:
+            errors.append(f'buyback_radar: {exc}')
+            radar = {}
+        env = radar.get('_envelope') or {}
+        if env.get('schema_version') != 'magis.feed.v2' or not (env.get('health') or {}).get('status'):
+            errors.append('buyback_radar: envelope missing schema or health')
+        if radar_path.stat().st_size >= 100 * 1024:
+            errors.append('buyback_radar: over the 100 KB L0 budget')
     for name in ('desk_briefs','reverse_splits','separations'):
         doc=docs.get(name,{})
         if (doc.get('research_only'),doc.get('in_base_irr'),doc.get('authority')) != (True,False,'none'):
