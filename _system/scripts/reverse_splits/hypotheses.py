@@ -128,8 +128,6 @@ def declared_before(registry: list[dict], ids: list[str], built_at: str | dateti
 def mark_measured(ledger_dir: Path, ids: list[str], result_ref: str) -> int:
     """Set ``status: measured`` and ``result_ref`` on the cited rows. ``declared_at`` is never touched;
     a row already validated, killed or superseded keeps its status."""
-    from .ledger import write_jsonl
-
     path = registry_path(ledger_dir)
     rows = load_registry(ledger_dir)
     changed = 0
@@ -140,5 +138,8 @@ def mark_measured(ledger_dir: Path, ids: list[str], result_ref: str) -> int:
                 row["result_ref"] = result_ref
                 changed += 1
     if changed:
-        write_jsonl(path, rows)
+        # One row per line in the registry's own style (declaration order, spaces after
+        # separators) so a status change is a one-line diff.
+        lines = [json.dumps(row, ensure_ascii=False) for row in rows]
+        path.write_text("".join(line + "\n" for line in lines), encoding="utf-8")
     return changed
