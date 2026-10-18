@@ -1,23 +1,24 @@
 {
   "schema_version": "buyback_radar.v1",
-  "generated_at": "2026-10-18T17:40:45Z",
+  "generated_at": "2026-10-18T17:55:46Z",
   "as_of": "2026-10-18",
   "research_only": true,
   "in_base_irr": false,
   "authority": "none",
   "description": "Share-cannibal vector for the portfolio registry, plus buyback events that create a forced seller or a neglected buyer. Full per-company rows live in companies_ref. Annual history lives in series_ref. This file stays under 100 KB.",
-  "methodology": "Share counts are read from SEC XBRL companyfacts, one number per fiscal year from 1999 forward when the filing has it. The preferred count is the 10-K cover page, dei:EntityCommonStockSharesOutstanding. If that tag is missing, the count is us-gaap common shares outstanding, then diluted weighted-average shares, then basic weighted-average shares. When several filings report the same year, the latest filing wins, which picks up the restatement a company makes after a split. Years that fell out of the comparative columns before a later split are multiplied by a forward split of 1.5, 2, 3, 4, 5, 7, 10, 20, 25, 50, or 100 when the share count jumps by that ratio, or by a reverse split of 1-for-3 or sharper. The new level has to still be there the next year, so a one-year spike that reverts is dropped instead of treated as the peak. A 7-for-1 is included because a buyback in the split year moves the observed ratio off the exact integer. A one-year halving is not treated as a split, because that is often a real buyback; those names are flagged split_review. Retired since peak is 100 minus the latest count divided by the highest fiscal-year count in the series. The five-year and one-year changes compare the latest count with the count about five years and one year earlier. Buyback yield is last fiscal year's PaymentsForRepurchaseOfCommonStock divided by market value. Market value is the price in index_float_adv.json times the latest EDGAR share count. EDGAR has no live price, so a name with no cached price has no yield. The yield is a percent of market value, not a return per year. Pace compares the last year with the company's own five-year pace. issuing_again: the five-year change is -10% or lower and the last year is up at least 2%. stopped: that same five-year shrink, and the last year moved less than 1.5%. accelerating: the last year is down at least 3% and at least 1.5 times the company's own annual pace over five years. steady: still shrinking, but not faster than that pace. No pace is assigned when there is no shrink to compare. The A–E grade covers the last ten fiscal years and three questions, each scored 0, 1, or 2. Did the shares actually disappear, net of issuance: net decline in the share count divided by shares repurchased (StockRepurchasedDuringPeriodShares, else treasury shares acquired). 80% or more scores 2, 50% or more scores 1, and below that scores 0 and cannot be an A. Was it paid for with cash the business earned: operating cash flow minus capital spending, against repurchase cash. Covering the buybacks without new debt above a quarter of the outlay scores 2. Covering half scores 1. What was paid versus this company's own history: repurchase cash divided by shares bought that year, latest three years against the earlier years in the window. Paying 85% or less of that history scores 2. Paying up to 115% scores 1. Six points is an A, five a B, four a C, three a D, two or fewer an E. If the price-paid figure cannot be computed, the letter is marked partial and cannot be an A. A letter is withheld when repurchase cash, the share-count path, or funding cannot be read. Banks and insurers are graded with the same arithmetic. Buyback Radar withholds their letter. Treat a financial-company letter as weaker. Situation rows are only issuer tenders (SC TO-I), accelerated share repurchases announced in an 8-K, and new programs of at least about 10% of market value. A plain big-cap authorization is one line in program_mentions, not a row. Every situation row is research_only. Nothing here is a position, a stance, or an input to the base return.",
+  "methodology": "Share counts are read from SEC XBRL companyfacts, one number per fiscal year from 1999 forward when the filing has it. The preferred count is the 10-K cover page, dei:EntityCommonStockSharesOutstanding. If that tag is missing, the count is us-gaap common shares outstanding, then diluted weighted-average shares, then basic weighted-average shares. When several filings report the same year, the latest filing wins, which picks up the restatement a company makes after a split. Years that fell out of the comparative columns before a later split are multiplied by a forward split of 1.5, 2, 3, 4, 5, 7, 10, 20, 25, 50, or 100 when the share count jumps by that ratio, or by a reverse split of 1-for-3 or sharper. The new level has to still be there the next year, so a one-year spike that reverts is dropped instead of treated as the peak. A 7-for-1 is included because a buyback in the split year moves the observed ratio off the exact integer. A one-year halving is not treated as a split, because that is often a real buyback; those names are flagged split_review. Retired since peak is 100 minus the latest count divided by the highest fiscal-year count in the series. The five-year and one-year changes compare the latest count with the count about five years and one year earlier. Buyback yield is last fiscal year's repurchase cash divided by market value. The cash tag is PaymentsForRepurchaseOfCommonStock. If that tag is missing or zero for the latest fiscal year, the yield uses the first positive amount among PaymentsForRepurchaseOfEquity, TreasuryStockValueAcquiredCostMethod, and StockRepurchasedDuringPeriodValue. The tag that supplied the number is stored as repurchase_tag. A reported zero is kept only after those tags are checked. If none of them has a fact, the yield is left blank rather than shown as zero. Market value is the price in index_float_adv.json times the latest EDGAR share count. EDGAR has no live price, so a name with no cached price has no yield. The yield is a percent of market value, not a return per year. Pace compares the last year with the company's own five-year pace. issuing_again: the five-year change is -10% or lower and the last year is up at least 2%. stopped: that same five-year shrink, and the last year moved less than 1.5%. accelerating: the last year is down at least 3% and at least 1.5 times the company's own annual pace over five years. steady: still shrinking, but not faster than that pace. No pace is assigned when there is no shrink to compare. Exchange-traded funds, exchange-traded products, closed-end funds, listed investment companies, royalty trusts, and any other instrument type that is not an operating company or a holding company get no pace and no grade. A name with no instrument type is treated the same way when the SEC name says fund, ETF, ETP, SPDR, iShares, or ProShares, or when the name is a trust that sells trust assets to pay expenses. Creation and redemption of units move the share count. That is not dilution, and those names are left out of the issuing_again flag. A property or realty trust stays in. The A–E grade covers the last ten fiscal years and three questions, each scored 0, 1, or 2. Did the shares actually disappear, net of issuance: net decline in the share count divided by shares repurchased (StockRepurchasedDuringPeriodShares, else treasury shares acquired). 80% or more scores 2, 50% or more scores 1, and below that scores 0 and cannot be an A. Was it paid for with cash the business earned: operating cash flow minus capital spending, against repurchase cash. Covering the buybacks without new debt above a quarter of the outlay scores 2. Covering half scores 1. What was paid versus this company's own history: repurchase cash divided by shares bought that year, latest three years against the earlier years in the window. Paying 85% or less of that history scores 2. Paying up to 115% scores 1. Six points is an A, five a B, four a C, three a D, two or fewer an E. If the price-paid figure cannot be computed, the letter is marked partial and cannot be an A. A letter is withheld when repurchase cash, the share-count path, or funding cannot be read. Banks and insurers are graded with the same arithmetic. Buyback Radar withholds their letter. Treat a financial-company letter as weaker. Situation rows are only issuer tenders (SC TO-I), accelerated share repurchases announced in an 8-K, and new programs of at least about 10% of market value. A plain big-cap authorization is one line in program_mentions, not a row. Every situation row is research_only. Nothing here is a position, a stance, or an input to the base return.",
   "companies_ref": "dashboard/data/buyback_companies.json",
   "series_ref": "_system/data/buyback_radar/share_series.jsonl",
   "counts": {
     "companies": 681,
-    "with_yield": 459,
+    "with_yield": 488,
     "with_grade": 420,
+    "non_operating": 6,
     "pace": {
       "accelerating": 45,
       "steady": 154,
       "stopped": 22,
-      "issuing_again": 4
+      "issuing_again": 2
     },
     "events": 40,
     "program_mentions": 20,
@@ -42,7 +43,7 @@
         "retired_since_peak_pct": 74.69,
         "change_5y_pct": 4.01,
         "change_1y_pct": 0.74,
-        "buyback_yield_pct": 0.0,
+        "buyback_yield_pct": 0.54,
         "pace": null,
         "grade": "C"
       },
@@ -667,7 +668,7 @@
           "retired_since_peak_pct": 25.38,
           "change_5y_pct": -16.25,
           "change_1y_pct": 0.18,
-          "buyback_yield_pct": 0.0,
+          "buyback_yield_pct": 3.95,
           "pace": "stopped",
           "grade": "E"
         },
@@ -754,16 +755,6 @@
       ],
       "issuing_again": [
         {
-          "ticker": "USO",
-          "company": "United States Oil Fund, LP",
-          "retired_since_peak_pct": 96.6,
-          "change_5y_pct": -83.24,
-          "change_1y_pct": 10.43,
-          "buyback_yield_pct": null,
-          "pace": "issuing_again",
-          "grade": null
-        },
-        {
           "ticker": "OUST",
           "company": "Ouster, Inc.",
           "retired_since_peak_pct": 83.74,
@@ -782,16 +773,6 @@
           "buyback_yield_pct": 5.94,
           "pace": "issuing_again",
           "grade": "E"
-        },
-        {
-          "ticker": "GLD",
-          "company": "SPDR® GOLD TRUST",
-          "retired_since_peak_pct": 18.32,
-          "change_5y_pct": -12.99,
-          "change_1y_pct": 19.01,
-          "buyback_yield_pct": null,
-          "pace": "issuing_again",
-          "grade": null
         }
       ],
       "steady": [
@@ -801,7 +782,7 @@
           "retired_since_peak_pct": 82.44,
           "change_5y_pct": -24.0,
           "change_1y_pct": -2.18,
-          "buyback_yield_pct": null,
+          "buyback_yield_pct": 0.74,
           "pace": "steady",
           "grade": "D"
         },
@@ -2029,9 +2010,9 @@
   "_envelope": {
     "schema_version": "magis.feed.v2",
     "feed_id": "buyback-radar",
-    "generated_at": "2026-10-18T17:40:45Z",
+    "generated_at": "2026-10-18T17:55:46Z",
     "as_of": "2026-10-18",
-    "content_sha256": "sha256:f43f088bccab57729460982a25d204048cf1b2a7785185b7219d6ecef307c8f2",
+    "content_sha256": "sha256:20c6d9fa4ff774c7123256099d5871e21e5d39655954d385138782aa4b56f824",
     "row_count": 681,
     "upstream_inputs": [
       {

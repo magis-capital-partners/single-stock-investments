@@ -196,6 +196,191 @@ class EventTests(unittest.TestCase):
         self.assertEqual([row["ticker"] for row in mentions], ["BIG"])
 
 
+def _share_doc(points: list[tuple[int, float]], usd: dict[str, list[dict]] | None = None) -> dict:
+    dei = []
+    for fy, shares in points:
+        dei.append(
+            {
+                "form": "10-K",
+                "fp": "FY",
+                "fy": fy,
+                "end": f"{fy}-01-31",
+                "filed": f"{fy}-03-15",
+                "val": shares,
+                "accn": f"000{fy}",
+            }
+        )
+    us = {tag: {"units": {"USD": rows}} for tag, rows in (usd or {}).items()}
+    return {
+        "facts": {
+            "dei": {"EntityCommonStockSharesOutstanding": {"units": {"shares": dei}}},
+            "us-gaap": us,
+        }
+    }
+
+
+def _usd(fy: int, val: float, tag_end: str | None = None) -> dict:
+    return {
+        "form": "10-K",
+        "fp": "FY",
+        "fy": fy,
+        "start": f"{fy - 1}-02-01",
+        "end": tag_end or f"{fy}-01-31",
+        "filed": f"{fy}-03-20",
+        "val": val,
+        "accn": f"usd{fy}",
+    }
+
+
+class InstrumentTests(unittest.TestCase):
+    def test_funds_and_typed_instruments_are_not_operating_companies(self):
+        self.assertEqual(radar.is_non_operating_instrument("SPDR® GOLD TRUST", None)[0], True)
+        self.assertEqual(radar.is_non_operating_instrument("United States Oil Fund, LP", None)[0], True)
+        self.assertEqual(radar.is_non_operating_instrument("iShares Ethereum Trust ETF", None)[0], True)
+        self.assertEqual(radar.is_non_operating_instrument("Home Depot", "closed_end_fund")[0], True)
+        self.assertEqual(radar.is_non_operating_instrument("Home Depot", "etf")[0], True)
+        self.assertEqual(radar.is_non_operating_instrument("Home Depot", "listed_investment_co")[0], True)
+        self.assertEqual(radar.is_non_operating_instrument("NORTHERN TRUST CORP", None)[0], False)
+        self.assertEqual(radar.is_non_operating_instrument("CAMDEN PROPERTY TRUST", None)[0], False)
+        self.assertEqual(radar.is_non_operating_instrument("Berkshire", "holding_company")[0], False)
+        self.assertEqual(radar.is_non_operating_instrument("Berkshire", "operating_company")[0], False)
+        trust = {"facts": {"us-gaap": {"SaleOfTrustAssetsToPayExpenses": {}}}}
+        self.assertEqual(radar.is_non_operating_instrument("VS Trust", None, trust)[0], True)
+        self.assertEqual(radar.is_non_operating_instrument("Cipher Digital Inc.", None, trust)[0], False)
+
+    def test_a_fund_gets_no_pace_grade_or_issuance_flag(self):
+        # Shrink for five years, then issue. That is issuing_again for an operating company.
+        points = [(2019, 100), (2020, 100), (2021, 90), (2022, 80), (2023, 70), (2024, 60), (2025, 70)]
+        doc = _share_doc(points)
+        fund, _, reason = radar.build_company_row(
+            ticker="GLD",
+            company="SPDR® GOLD TRUST",
+            cik="0001222333",
+            in_registry=True,
+            doc=doc,
+            price=100,
+            price_as_of="2026-10-16",
+        )
+        self.assertIsNone(reason)
+        self.assertTrue(fund["non_operating"])
+        self.assertIsNone(fund["pace"])
+        self.assertIsNone(fund["grade"])
+        self.assertEqual(fund["grade_reason"], "creation_units_not_dilution")
+        operating, _, _ = radar.build_company_row(
+            ticker="NRG",
+            company="NRG Energy, Inc",
+            cik="0000000001",
+            in_registry=True,
+            doc=doc,
+            price=100,
+            price_as_of="2026-10-16",
+            instrument_type="operating_company",
+        )
+        self.assertEqual(operating["pace"], "issuing_again")
+        self.assertFalse(operating["non_operating"])
+        typed, _, _ = radar.build_company_row(
+            ticker="NAN",
+            company="Nuveen",
+            cik="0000000002",
+            in_registry=True,
+            doc=doc,
+            price=10,
+            price_as_of="2026-10-16",
+            instrument_type="closed_end_fund",
+        )
+        self.assertIsNone(typed["pace"])
+        self.assertIsNone(typed["grade"])
+        signals = radar.issuance_signals([fund, operating, typed])
+        self.assertEqual([row["ticker"] for row in signals], ["NRG"])
+
+    def test_zero_common_stock_repurchase_falls_back_and_marks_the_tag(self):
+        points = [(2024, 100), (2025, 90)]
+        doc = _share_doc(
+            points,
+            {
+                "PaymentsForRepurchaseOfCommonStock": [_usd(2024, 80), _usd(2025, 0)],
+                "PaymentsForRepurchaseOfEquity": [_usd(2025, 250)],
+                "TreasuryStockValueAcquiredCostMethod": [_usd(2025, 999)],
+            },
+        )
+        row, _, reason = radar.build_company_row(
+            ticker="HD",
+            company="HOME DEPOT, INC.",
+            cik="0000354950",
+            in_registry=True,
+            doc=doc,
+            price=10,
+            price_as_of="2026-10-16",
+        )
+        self.assertIsNone(reason)
+        self.assertEqual(row["repurchase_tag"], "PaymentsForRepurchaseOfEquity")
+        self.assertEqual(row["repurchase_fy_usd"], 250)
+        self.assertEqual(row["repurchase_fy"], 2025)
+        # 250 / (10 * 90) = 27.777... -> 27.78
+        self.assertEqual(row["buyback_yield_pct"], 27.78)
+        self.assertIn("PaymentsForRepurchaseOfEquity", radar.shard_buyback(row)["note"])
+
+    def test_a_missing_primary_tag_uses_treasury_stock_acquired(self):
+        doc = _share_doc(
+            [(2024, 50), (2025, 40)],
+            {"TreasuryStockValueAcquiredCostMethod": [_usd(2025, 40)]},
+        )
+        row, _, _ = radar.build_company_row(
+            ticker="EX",
+            company="Example Co",
+            cik="1",
+            in_registry=True,
+            doc=doc,
+            price=10,
+            price_as_of="2026-10-16",
+        )
+        self.assertEqual(row["repurchase_tag"], "TreasuryStockValueAcquiredCostMethod")
+        self.assertEqual(row["repurchase_fy_usd"], 40)
+        self.assertEqual(row["buyback_yield_pct"], 10.0)
+
+    def test_an_explicit_zero_stays_zero_after_the_other_tags_are_empty(self):
+        doc = _share_doc(
+            [(2024, 100), (2025, 100)],
+            {
+                "PaymentsForRepurchaseOfCommonStock": [_usd(2025, 0)],
+                "TreasuryStockValueAcquiredCostMethod": [_usd(2025, 0)],
+            },
+        )
+        row, _, _ = radar.build_company_row(
+            ticker="HD",
+            company="HOME DEPOT, INC.",
+            cik="1",
+            in_registry=True,
+            doc=doc,
+            price=20,
+            price_as_of="2026-10-16",
+        )
+        self.assertEqual(row["repurchase_tag"], "PaymentsForRepurchaseOfCommonStock")
+        self.assertEqual(row["repurchase_fy_usd"], 0)
+        self.assertEqual(row["buyback_yield_pct"], 0.0)
+
+    def test_a_positive_primary_tag_is_not_replaced(self):
+        doc = _share_doc(
+            [(2024, 100), (2025, 80)],
+            {
+                "PaymentsForRepurchaseOfCommonStock": [_usd(2025, 160)],
+                "StockRepurchasedDuringPeriodValue": [_usd(2025, 500)],
+            },
+        )
+        row, _, _ = radar.build_company_row(
+            ticker="LOW",
+            company="LOWES COMPANIES INC",
+            cik="1",
+            in_registry=True,
+            doc=doc,
+            price=10,
+            price_as_of="2026-10-16",
+        )
+        self.assertEqual(row["repurchase_tag"], "PaymentsForRepurchaseOfCommonStock")
+        self.assertEqual(row["repurchase_fy_usd"], 160)
+        self.assertEqual(row["buyback_yield_pct"], 20.0)
+
+
 class FeedTests(unittest.TestCase):
     def test_envelope_and_budget(self):
         company = {
@@ -283,10 +468,16 @@ const cell = BuybackViz.renderHoldingsCell({
   buyback: {grade: 'B', retired_since_peak_pct: 41.2, buyback_yield_pct: 3.4, pace: 'steady'}
 }, (v) => String(v));
 const detail = BuybackViz.renderDetail({
-  buyback: {grade: 'B', retired_since_peak_pct: 41.2, buyback_yield_pct: 3.4, pace: 'issuing_again', change_5y_pct: -30, change_1y_pct: 9.7, as_of: '2026-02-01'}
+  buyback: {grade: 'B', retired_since_peak_pct: 41.2, buyback_yield_pct: 3.4, pace: 'issuing_again', change_5y_pct: -30, change_1y_pct: 9.7, as_of: '2026-02-01', repurchase_tag: 'PaymentsForRepurchaseOfEquity'}
+}, (v) => String(v));
+const fundCell = BuybackViz.renderHoldingsCell({
+  buyback: {non_operating: true, retired_since_peak_pct: 18.3, pace: null, grade: null}
+}, (v) => String(v));
+const fundDetail = BuybackViz.renderDetail({
+  buyback: {non_operating: true, retired_since_peak_pct: 18.3, pace: null, grade: null, as_of: '2026-09-30'}
 }, (v) => String(v));
 const short = {buyback_issuance_signals: [{ticker: 'ISS', company: 'Issuer', change_1y_pct: 9.7, change_5y_pct: -30, grade: 'C'}]};
-process.stdout.write(JSON.stringify({desk, cell, detail, hasIssuing: true, signals: short.buyback_issuance_signals.length}));
+process.stdout.write(JSON.stringify({desk, cell, detail, fundCell, fundDetail, hasIssuing: true, signals: short.buyback_issuance_signals.length}));
 """
         proc = subprocess.run(["node", "-e", script], cwd=ROOT, capture_output=True, text=True, check=False)
         self.assertEqual(proc.returncode, 0, proc.stderr)
@@ -301,6 +492,10 @@ process.stdout.write(JSON.stringify({desk, cell, detail, hasIssuing: true, signa
         self.assertIn("3.4% yield", out["cell"])
         self.assertIn("issuing again", out["detail"])
         self.assertIn("not a return per year", out["detail"])
+        self.assertIn("PaymentsForRepurchaseOfEquity", out["detail"])
+        self.assertIn("not dilution", out["fundCell"])
+        self.assertIn("Creation and redemption", out["fundDetail"])
+        self.assertNotIn("issuing again", out["fundDetail"])
 
 
 class WorkflowTests(unittest.TestCase):

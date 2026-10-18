@@ -70,6 +70,29 @@ PROGRAM_ROW_PCT = 10.0         # percent of market value
 BIG_CAP_USD = 10_000_000_000
 SMALL_CAP_USD = 2_000_000_000
 
+# Latest-year buyback yield. The first tag is preferred. The others are used only
+# when that tag is missing or zero for the latest fiscal year.
+REPURCHASE_CASH_TAGS = (
+    "PaymentsForRepurchaseOfCommonStock",
+    "PaymentsForRepurchaseOfEquity",
+    "TreasuryStockValueAcquiredCostMethod",
+    "StockRepurchasedDuringPeriodValue",
+)
+# Holding companies repurchase their own shares. Everything else that is set
+# (ETF, closed-end fund, listed investment company, royalty trust) does not.
+OPERATING_INSTRUMENT_TYPES = {"operating_company", "holding_company"}
+FUND_NAME_RE = re.compile(
+    r"(?i)(\betf\b|\betp\b|exchange[- ]traded|\bspdr\b|\bishares\b|\bproshares\b|\bfund\b)"
+)
+REIT_NAME_RE = re.compile(r"(?i)(property trust|realty trust|real estate)")
+TRUST_NAME_RE = re.compile(r"(?i)\btrust\b")
+TRUST_EXPENSE_TAGS = (
+    "SaleOfTrustAssetsToPayExpenses",
+    "GainLossOnSaleOfTrustAssetsToPayExpenses",
+    "ProceedsFromSaleOfTrustAssetsToPayExpenses",
+    "CostOfTrustAssetsSoldToPayExpenses",
+)
+
 # 1.5 stays on a tight tolerance. Integer splits allow more slack because a buyback in the
 # same year moves the observed ratio off the exact split.
 FORWARD_TIGHT = (1.5,)
@@ -160,6 +183,12 @@ def html_to_text(raw: str) -> str:
     return re.sub(r"\s+", " ", text).strip()
 
 
+def _instrument_type(entry: dict) -> str | None:
+    raw = entry.get("instrument_type") or (entry.get("classification") or {}).get("instrument_type")
+    text = str(raw or "").strip()
+    return text or None
+
+
 def pad_cik(cik: object) -> str | None:
     try:
         return f"{int(str(cik).strip()):010d}"
@@ -185,6 +214,7 @@ def registry_universe() -> list[dict]:
                     "company": str(entry.get("company") or ticker),
                     "market": market or "US",
                     "cik": pad_cik((entry.get("download") or {}).get("cik")),
+                    "instrument_type": _instrument_type(entry),
                     "in_registry": True,
                     "book": book,
                 }
@@ -499,6 +529,58 @@ def annual_usd(doc: dict, tag: str) -> dict[str, float]:
     return out
 
 
+def repurchase_cash_for_year(
+    doc: dict, fy_key: str, primary: dict[str, float] | None = None
+) -> tuple[float | None, str | None]:
+    """Cash spent buying shares in one fiscal year, and the tag that supplied it.
+
+    PaymentsForRepurchaseOfCommonStock wins when it is positive. A zero or a
+    missing fact falls through to the other repurchase tags before the yield
+    is reported as zero. An explicit zero is kept when every tag is zero or
+    the later tags are missing. No fact at all leaves the yield blank.
+    """
+    series: list[tuple[str, dict[str, float]]] = []
+    for tag in REPURCHASE_CASH_TAGS:
+        if tag == REPURCHASE_CASH_TAGS[0] and primary is not None:
+            values = primary
+        else:
+            values = annual_usd(doc, tag)
+        series.append((tag, values))
+    for tag, values in series:
+        val = values.get(fy_key)
+        if isinstance(val, (int, float)) and abs(val) > 0:
+            return abs(float(val)), tag
+    for tag, values in series:
+        val = values.get(fy_key)
+        if isinstance(val, (int, float)):
+            return abs(float(val)), tag
+    return None, None
+
+
+def _has_trust_expense_tag(doc: dict | None) -> bool:
+    gaap = ((doc or {}).get("facts") or {}).get("us-gaap") or {}
+    return any(tag in gaap for tag in TRUST_EXPENSE_TAGS)
+
+
+def is_non_operating_instrument(
+    company: str, instrument_type: str | None, doc: dict | None = None
+) -> tuple[bool, str | None]:
+    """ETFs, ETPs, funds, and any instrument type that is not an operating company.
+
+    Creation and redemption change the share count. That is not a buyback pace
+    and it is not dilution. A holding company stays in: it repurchases its own shares.
+    """
+    kind = (instrument_type or "").strip().lower().replace("-", "_").replace(" ", "_")
+    if kind and kind not in OPERATING_INSTRUMENT_TYPES:
+        return True, f"instrument_type:{kind}"
+    name = company or ""
+    if FUND_NAME_RE.search(name):
+        return True, "fund_etp_name"
+    if TRUST_NAME_RE.search(name) and not REIT_NAME_RE.search(name) and _has_trust_expense_tag(doc):
+        return True, "trust_pays_expenses_from_assets"
+    return False, None
+
+
 def annual_shares_flow(doc: dict, tag: str) -> dict[str, float]:
     rows = _facts(doc, "us-gaap", tag, "shares")
     grouped: dict[str, list[dict]] = {}
@@ -710,6 +792,7 @@ def build_company_row(
     doc: dict | None,
     price: float | None,
     price_as_of: str | None,
+    instrument_type: str | None = None,
 ) -> tuple[dict | None, list[dict] | None, str | None]:
     if not doc:
         return None, None, "no_companyfacts"
@@ -769,12 +852,22 @@ def build_company_row(
     if any(point.get("split_review") for point in aligned) and change_5y is not None and abs(change_5y) > 100:
         pace = None
     graded = grade_window(aligned)
+    non_operating, non_operating_reason = is_non_operating_instrument(company, instrument_type, doc)
+    if non_operating:
+        # Creation units are not a cannibal pace and not a dilution signal.
+        pace = None
+        graded = {
+            "grade": None,
+            "grade_partial": False,
+            "grade_points": None,
+            "grade_reason": "creation_units_not_dilution",
+        }
 
-    # Last completed fiscal year with a repurchase fact, preferring the latest year
-    # even when the cash number is zero (a company that stopped).
+    # Last completed fiscal year. A zero or a missing common-stock tag falls
+    # through to the other repurchase tags before the yield is reported as zero.
     last_rep_key = _point_key(latest)
-    repurchase_usd = abs(repurchases[last_rep_key]) if last_rep_key in repurchases else None
-    repurchase_fy = latest.get("fy") if last_rep_key in repurchases else None
+    repurchase_usd, repurchase_tag = repurchase_cash_for_year(doc, last_rep_key, primary=repurchases)
+    repurchase_fy = latest.get("fy") if repurchase_tag else None
     market_value = None
     if price and price > 0 and latest["shares"] > 0:
         market_value = price * latest["shares"]
@@ -798,6 +891,9 @@ def build_company_row(
         "buyback_yield_pct": buyback_yield,
         "repurchase_fy": repurchase_fy,
         "repurchase_fy_usd": round(repurchase_usd) if repurchase_usd is not None else None,
+        "repurchase_tag": repurchase_tag,
+        "non_operating": non_operating,
+        "non_operating_reason": non_operating_reason,
         "market_value_usd": round(market_value) if market_value else None,
         "market_value_as_of": price_as_of if market_value else None,
         "market_value_source": "index_float_adv price times latest EDGAR share count" if market_value else None,
@@ -826,7 +922,23 @@ def build_company_row(
 
 def shard_buyback(row: dict) -> dict:
     """The four fields a ticker page and an agent shard show. Yield is not an IRR."""
-    return {
+    if row.get("non_operating"):
+        note = (
+            "This is a fund, ETF, or other non-operating instrument. Creation and redemption of units "
+            "move the share count. That is not dilution, so pace and grade are blank. "
+            "Buyback yield, when present, is repurchase cash as a percent of market value, not a return per year."
+        )
+    elif row.get("repurchase_tag") and row.get("repurchase_tag") != REPURCHASE_CASH_TAGS[0]:
+        note = (
+            f"Buyback yield uses {row['repurchase_tag']} because PaymentsForRepurchaseOfCommonStock "
+            "was zero or missing for the latest fiscal year. It is a percent of market value, not a return per year."
+        )
+    else:
+        note = (
+            "Buyback yield is last fiscal year's common-stock repurchase cash as a percent of market value. "
+            "It is not a return per year."
+        )
+    block = {
         "retired_since_peak_pct": row.get("retired_since_peak_pct"),
         "buyback_yield_pct": row.get("buyback_yield_pct"),
         "pace": row.get("pace"),
@@ -835,18 +947,20 @@ def shard_buyback(row: dict) -> dict:
         "change_1y_pct": row.get("change_1y_pct"),
         "as_of": row.get("shares_end"),
         "split_review": bool(row.get("split_review")),
-        "note": (
-            "Buyback yield is last fiscal year's common-stock repurchase cash as a percent of market value. "
-            "It is not a return per year."
-        ),
+        "note": note,
     }
+    if row.get("repurchase_tag"):
+        block["repurchase_tag"] = row["repurchase_tag"]
+    if row.get("non_operating"):
+        block["non_operating"] = True
+    return block
 
 
 def issuance_signals(rows: list[dict]) -> list[dict]:
     """issuing_again names, as candidate signals under dilution_financing. Not ranked shorts."""
     signals = []
     for row in rows:
-        if row.get("pace") != "issuing_again":
+        if row.get("non_operating") or row.get("pace") != "issuing_again":
             continue
         signals.append(
             {
@@ -863,7 +977,8 @@ def issuance_signals(rows: list[dict]) -> list[dict]:
                 "shares_end": row.get("shares_end"),
                 "note": (
                     "Share count rose over the last year after a multi-year shrink. "
-                    "A candidate signal for the dilution / financing lens, not a ranked short."
+                    "A candidate signal for the dilution / financing lens, not a ranked short. "
+                    "Funds, ETFs, and other non-operating instruments are omitted: creation units are not dilution."
                 ),
             }
         )
@@ -1256,7 +1371,9 @@ METHODOLOGY = (
     "or by a reverse split of 1-for-3 or sharper. The new level has to still be there the next year, so a one-year spike that reverts is dropped instead of treated as the peak. A 7-for-1 is included because a buyback in the split year moves the observed ratio off the exact integer. A one-year halving is not treated as a split, because that is often a real buyback; those names are flagged split_review. "
     "Retired since peak is 100 minus the latest count divided by the highest fiscal-year count in the series. "
     "The five-year and one-year changes compare the latest count with the count about five years and one year earlier. "
-    "Buyback yield is last fiscal year's PaymentsForRepurchaseOfCommonStock divided by market value. "
+    "Buyback yield is last fiscal year's repurchase cash divided by market value. "
+    "The cash tag is PaymentsForRepurchaseOfCommonStock. If that tag is missing or zero for the latest fiscal year, the yield uses the first positive amount among PaymentsForRepurchaseOfEquity, TreasuryStockValueAcquiredCostMethod, and StockRepurchasedDuringPeriodValue. "
+    "The tag that supplied the number is stored as repurchase_tag. A reported zero is kept only after those tags are checked. If none of them has a fact, the yield is left blank rather than shown as zero. "
     "Market value is the price in index_float_adv.json times the latest EDGAR share count. EDGAR has no live price, so a name with no cached price has no yield. "
     "The yield is a percent of market value, not a return per year. "
     "Pace compares the last year with the company's own five-year pace. "
@@ -1264,6 +1381,9 @@ METHODOLOGY = (
     f"stopped: that same five-year shrink, and the last year moved less than {PACE_FLAT_1Y:.1f}%. "
     f"accelerating: the last year is down at least {abs(PACE_ACCEL_1Y):.0f}% and at least {PACE_ACCEL_MULTIPLE:.1f} times the company's own annual pace over five years. "
     "steady: still shrinking, but not faster than that pace. No pace is assigned when there is no shrink to compare. "
+    "Exchange-traded funds, exchange-traded products, closed-end funds, listed investment companies, royalty trusts, and any other instrument type that is not an operating company or a holding company get no pace and no grade. "
+    "A name with no instrument type is treated the same way when the SEC name says fund, ETF, ETP, SPDR, iShares, or ProShares, or when the name is a trust that sells trust assets to pay expenses. "
+    "Creation and redemption of units move the share count. That is not dilution, and those names are left out of the issuing_again flag. A property or realty trust stays in. "
     "The A–E grade covers the last ten fiscal years and three questions, each scored 0, 1, or 2. "
     "Did the shares actually disappear, net of issuance: net decline in the share count divided by shares repurchased (StockRepurchasedDuringPeriodShares, else treasury shares acquired). "
     f"80% or more scores 2, {STICK_MID:.0%} or more scores 1, and below that scores 0 and cannot be an A. "
@@ -1284,7 +1404,9 @@ METHODOLOGY = (
 def _notable(companies: list[dict]) -> dict:
     ranked = [
         row for row in companies
-        if (row.get("retired_since_peak_pct") or 0) > 0 and not row.get("split_review")
+        if (row.get("retired_since_peak_pct") or 0) > 0
+        and not row.get("split_review")
+        and not row.get("non_operating")
     ]
     ranked.sort(key=lambda row: -(row.get("retired_since_peak_pct") or 0))
 
@@ -1344,6 +1466,7 @@ def assemble_feeds(
             "companies": len(companies),
             "with_yield": sum(1 for row in companies if row.get("buyback_yield_pct") is not None),
             "with_grade": sum(1 for row in companies if row.get("grade")),
+            "non_operating": sum(1 for row in companies if row.get("non_operating")),
             "pace": {
                 pace: sum(1 for row in companies if row.get("pace") == pace)
                 for pace in ("accelerating", "steady", "stopped", "issuing_again")
@@ -1477,6 +1600,7 @@ def load_company_rows(*, offline: bool, tickers: set[str] | None, refresh: bool)
             doc=doc,
             price=prices.get(ticker),
             price_as_of=price_as_of,
+            instrument_type=entry.get("instrument_type"),
         )
         if reason or row is None or series is None:
             gaps.append({"ticker": ticker, "reason": reason or "unparsed"})
@@ -1583,18 +1707,23 @@ def stamp_short_alpha(companies: list[dict]) -> int:
     signals = issuance_signals(companies)
     note = (
         "Names whose share count rose over the last year after a multi-year shrink. "
-        "Candidate signals for the dilution / financing lens. Not ranked shorts."
+        "Candidate signals for the dilution / financing lens. Not ranked shorts. "
+        "Funds, ETFs, and other non-operating instruments are omitted: creation units are not dilution."
     )
     doc["buyback_issuance_signals"] = signals
     methodology = doc.get("methodology")
     if isinstance(methodology, dict):
         methodology["buyback_issuance"] = note
     extra = " Buyback radar flags issuing_again names here as candidate signals, not ranked shorts."
+    fund_clause = " Funds, ETFs, and other non-operating instruments are omitted: creation units are not dilution."
     for row in doc.get("frameworks") or []:
         if isinstance(row, dict) and row.get("id") == "dilution_financing":
             current = str(row.get("source_note") or "")
             if "issuing_again" not in current:
-                row["source_note"] = current.rstrip() + extra
+                current = current.rstrip() + extra
+            if "creation units" not in current:
+                current = current.rstrip() + fund_clause
+            row["source_note"] = current
     text = json.dumps(doc, indent=2) + "\n"
     if path.is_file() and path.read_text(encoding="utf-8") == text:
         return 0
