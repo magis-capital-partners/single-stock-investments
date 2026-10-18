@@ -64,7 +64,7 @@ BRIEFING_PHRASES = (
     "1BDzwtkgAHsKOda2NtxlHEwc37cEjTwD7",
     "1OBaWt7SF-OME8hmXkl7tzdFLAfjBrp_C",
     "drive_intake_drop.py",
-    "14:00 UTC",
+    "14:41 UTC",
     "- [x] Repo access: `mcricenti` holds `maintain` on this repository since 2026-10-12.",
     "- [x] Memory hub: write, by pull request on a `grok/<desk>/<date>-<slug>` branch into `_system/memory-hub/research-equity/`",
     "- [x] Michael's bots join the Magis room (decided 2026-10-12).",
