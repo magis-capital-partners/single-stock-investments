@@ -273,50 +273,62 @@ def raw_path(cfg: Config, item: dict) -> Path:
     return cfg.databento_dir / req["dataset"] / req["schema"] / "sessions" / f"{item['id']}.dbn.zst"
 
 
-def quote_requests(cfg: Config, items: list[dict], *, client=None, log=print) -> dict:
+def quote_requests(cfg: Config, items: list[dict], *, client=None, log=print, workers: int = 4) -> dict:
     """Price every request (free metadata). Writes quotes.json as it goes and skips requests
     already quoted in an earlier run, so an interrupted quote resumes; downloads nothing."""
+    import threading
+    from concurrent.futures import ThreadPoolExecutor, as_completed
+
     work_dir(cfg).mkdir(parents=True, exist_ok=True)
     out_path = work_dir(cfg) / "quotes.json"
     previous = {q["id"]: q for q in (read_json(out_path, {}) or {}).get("requests", []) if q.get("status") in ("quoted", "have")}
-    quotes = []
-    next_at = 0.0
-    errors = Counter()
-    pending = [item for item in items if item["id"] not in previous]
-    log(f"{len(items) - len(pending)} requests already quoted; {len(pending)} to price", flush=True)
-
-    def save():
-        write_json(out_path, {"quoted_at": datetime.now(timezone.utc).replace(microsecond=0).isoformat(), "requests": quotes,
-                              "summary": quote_summary(quotes), "errors": dict(errors), "complete": len(quotes) == len(items)})
-
+    results: dict[str, dict] = {}
     for item in items:
-        if item["id"] in previous:
-            quotes.append({**item, **{k: previous[item["id"]][k] for k in ("quoted_usd", "status") if k in previous[item["id"]]},
-                           **({"bytes": previous[item["id"]]["bytes"]} if "bytes" in previous[item["id"]] else {})})
-            continue
         path = raw_path(cfg, item)
-        if is_complete(path):
+        if item["id"] in previous:
+            saved = previous[item["id"]]
+            results[item["id"]] = {**item, **{k: saved[k] for k in ("quoted_usd", "status", "bytes") if k in saved}}
+        elif is_complete(path):
             saved = read_json(path.with_name(path.name.replace(".dbn.zst", ".ok.json")), {})
-            quotes.append({**item, "quoted_usd": float(saved.get("quoted_usd") or 0.0), "status": "have", "bytes": int(saved.get("bytes") or 0)})
-            continue
-        if client is None:
-            client = _client()
-        time.sleep(max(0.0, next_at - time.monotonic()))
-        next_at = time.monotonic() + METADATA_INTERVAL
+            results[item["id"]] = {**item, "quoted_usd": float(saved.get("quoted_usd") or 0.0), "status": "have", "bytes": int(saved.get("bytes") or 0)}
+    pending = [item for item in items if item["id"] not in results]
+    log(f"{len(items) - len(pending)} requests already quoted; {len(pending)} to price", flush=True)
+    lock = threading.Lock()
+    state = {"next_at": 0.0, "done": 0}
+
+    def assemble():
+        quotes = [results[item["id"]] for item in items if item["id"] in results]
+        errors = Counter(q.get("error", "").split(":")[0] for q in quotes if q["status"] == "error")
+        return {"quoted_at": datetime.now(timezone.utc).replace(microsecond=0).isoformat(), "requests": quotes,
+                "summary": quote_summary(quotes), "errors": dict(errors), "complete": len(quotes) == len(items)}
+
+    def one(item):
+        with lock:
+            wait = max(0.0, state["next_at"] - time.monotonic())
+            state["next_at"] = max(state["next_at"], time.monotonic()) + METADATA_INTERVAL
+        time.sleep(wait)
         try:
             q = float(client.metadata.get_cost(**item["request"]))
             if not math.isfinite(q) or q < 0:
                 raise ValueError("invalid cost quote")
-            quotes.append({**item, "quoted_usd": q, "status": "quoted"})
+            rec = {**item, "quoted_usd": q, "status": "quoted"}
         except Exception as exc:  # noqa: BLE001 - recorded, never retried with another key
-            errors[type(exc).__name__] += 1
-            quotes.append({**item, "quoted_usd": None, "status": "error", "error": f"{type(exc).__name__}: {str(exc)[:300]}"})
-        n = len(quotes)
-        if n % 50 == 0 or n == len(items):
-            save()
-            log(f"quoted {n}/{len(items)}; running total ${sum(q['quoted_usd'] or 0 for q in quotes):.4f}", flush=True)
-    save()
-    return read_json(out_path, {})
+            rec = {**item, "quoted_usd": None, "status": "error", "error": f"{type(exc).__name__}: {str(exc)[:300]}"}
+        with lock:
+            results[item["id"]] = rec
+            state["done"] += 1
+            if state["done"] % 50 == 0 or state["done"] == len(pending):
+                write_json(out_path, assemble())
+                log(f"quoted {len(results)}/{len(items)}; running total ${sum(r['quoted_usd'] or 0 for r in results.values()):.4f}", flush=True)
+
+    if pending:
+        client = client or _client()
+        with ThreadPoolExecutor(max_workers=workers) as pool:
+            for future in as_completed([pool.submit(one, item) for item in pending]):
+                future.result()
+    out = assemble()
+    write_json(out_path, out)
+    return out
 
 
 def quote_summary(quotes: list[dict]) -> dict:
@@ -333,9 +345,12 @@ def quote_summary(quotes: list[dict]) -> dict:
             "max_single_request_usd": max((q["quoted_usd"] for q in quotes if q.get("quoted_usd") is not None), default=0.0)}
 
 
-def download(cfg: Config, *, client=None, log=print) -> dict:
+def download(cfg: Config, *, client=None, log=print, workers: int = 4) -> dict:
     """Fetch the planned requests quoted at exactly $0.00. Anything priced above that is
     listed as refused; there is no override. Each fetch is capped at $0.00 again by ``fetch``."""
+    import threading
+    from concurrent.futures import ThreadPoolExecutor, as_completed
+
     saved = read_json(work_dir(cfg) / "quotes.json", {})
     if not saved:
         raise SystemExit("run `quote` first; nothing is downloaded without a stored quote")
@@ -344,28 +359,39 @@ def download(cfg: Config, *, client=None, log=print) -> dict:
     wanted = [q for q in items if q["quoted_usd"] == 0.0 and not is_complete(raw_path(cfg, q))]
     done = {"files": 0, "bytes": 0, "quoted_usd": 0.0, "errors": 0,
             "refused_priced_above_zero": len(refused), "refused_usd": float(sum(q["quoted_usd"] or 0.0 for q in refused))}
-    if wanted:
-        client = client or _client()
-    for n, item in enumerate(wanted, 1):
+    lock = threading.Lock()
+    stop = threading.Event()
+
+    def one(item):
+        if stop.is_set():
+            return
         path = raw_path(cfg, item)
         try:
             record = fetch(client, path, max_cost=0.0, quoted_cost=item["quoted_usd"], **item["request"])
         except CostRefused as exc:
-            done["errors"] += 1
+            with lock:
+                done["errors"] += 1
             log(str(exc))
-            continue
+            return
         except Exception as exc:  # noqa: BLE001
-            done["errors"] += 1
+            with lock:
+                done["errors"] += 1
             log(f"{item['id']}: {type(exc).__name__}: {str(exc)[:200]}")
-            message = str(exc)
-            if any(s in message for s in ("401", "403", "license", "permission", "429")):
-                break
-            continue
-        done["files"] += 1
-        done["bytes"] += int(record.get("bytes") or 0)
-        done["quoted_usd"] += float(record.get("quoted_usd") or 0.0)
-        if n % 50 == 0 or n == len(wanted):
-            log(f"downloaded {n}/{len(wanted)} ({done['bytes'] / 1e6:.1f} MB, ${done['quoted_usd']:.4f})")
+            if any(s in str(exc) for s in ("401", "403", "license", "permission", "429")):
+                stop.set()
+            return
+        with lock:
+            done["files"] += 1
+            done["bytes"] += int(record.get("bytes") or 0)
+            done["quoted_usd"] += float(record.get("quoted_usd") or 0.0)
+            if done["files"] % 50 == 0 or done["files"] == len(wanted):
+                log(f"downloaded {done['files']}/{len(wanted)} ({done['bytes'] / 1e6:.1f} MB, ${done['quoted_usd']:.4f})", flush=True)
+
+    if wanted:
+        client = client or _client()
+        with ThreadPoolExecutor(max_workers=workers) as pool:
+            for future in as_completed([pool.submit(one, item) for item in wanted]):
+                future.result()
     record = {"downloaded_at": datetime.now(timezone.utc).replace(microsecond=0).isoformat(), "policy": "free only: nothing quoted above $0.00 is fetched",
               "quotes_sha256": sha256_file(work_dir(cfg) / "quotes.json"), **done}
     history = read_json(work_dir(cfg) / "downloads.json", [])
