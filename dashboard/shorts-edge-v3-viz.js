@@ -29,6 +29,7 @@
       <div class="sne-equation"><span>Fundamentals + financing<small>Prior completed issuers; no additive dilution bonus</small></span><b>→</b><span>Gross payoff distribution</span><b>−</b><span>Slippage + fees + carry<small>Evaluated at each proposed position size</small></span><b>=</b><strong>Net edge</strong></div>
       <div class="sne-coverage"><span><b>${num(c.rescored_original_691)} / 691</b>original sample with dated ratings · previously ${num(c.prior_numeric_ratings_691)}</span><span><b>${num(c.numeric_ratings)} / ${num(c.dated_primary_snapshots)}</b>ratings across dated primary records</span><span><b>${num(c.complete_framework_reviews)}</b>complete framework reviews</span><span><b>${num(c.approved_entry_locates)}</b>imported approved entry locates</span></div>
       <p class="sne-evidence">${num(c.catalogue_events)} catalogue records and ${num(c.discovery_accessions)} discovery accessions remain distinct. The catalogue is incomplete. ${num(c.reconciled_financing)} financing packages are reconciled; ${num(c.announcement_borrow_indications)} snapshots have a dated announcement-time borrow indication. Missing evidence excludes names from the complete-evidence case.</p>
+      <div id="sev-fundamental-research" aria-live="polite">${doc.fundamental_research_ref ? '<button class="rsp-action" onclick="ShortsEdgeV3Viz.openFundamentalResearch()">Compare no fundamentals versus fundamental policies · all statistics</button><p class="sne-note">Four matched policies, source recovery, chronological periods, costs and concentration checks.</p>' : ''}</div>
       <div id="sev-free-summary" aria-live="polite">${doc.free_evidence_ref ? '<p>Loading free public evidence…</p>' : ''}</div>
       <div class="sne-controls"><label>Entry<select onchange="ShortsEdgeV3Viz.change('entry',this.value)"><option value="announcement_next_open" ${state.entry === 'announcement_next_open' ? 'selected' : ''}>Next session after announcement</option><option value="post_split_next_open" ${state.entry === 'post_split_next_open' ? 'selected' : ''}>Next session after split</option></select></label><label>Maximum hold<select onchange="ShortsEdgeV3Viz.change('hold',this.value)">${[1, 5, 10, 20].map(n => `<option value="${n}" ${String(n) === state.hold ? 'selected' : ''}>${n} session${n > 1 ? 's' : ''}</option>`).join('')}</select></label><label>Exit<select onchange="ShortsEdgeV3Viz.change('exit',this.value)"><option value="bracket" ${state.exit === 'bracket' ? 'selected' : ''}>${pct(doc.policy.profit_take)} profit / ${pct(doc.policy.stop_loss)} stop / time limit</option><option value="time" ${state.exit === 'time' ? 'selected' : ''}>Time limit only</option></select></label><label>Account scenario<select onchange="ShortsEdgeV3Viz.change('account',this.value)">${doc.accounts.map(a => `<option value="${esc(a.id)}" ${a.id === state.account ? 'selected' : ''}>${esc(a.label)}</option>`).join('')}</select></label></div>
       <div id="sev-results">${results()}</div>
@@ -54,7 +55,7 @@
       }
       const summary = JSON.parse(new TextDecoder().decode(bytes));
       if (summary.schema_version !== 'shorts_net_edge.v3' || !summary.cases) throw new Error('Invalid summary');
-      mount.innerHTML = render({...summary, prospective: reference.prospective || summary.prospective, free_evidence_ref: reference.free_evidence_ref, calmar_research_ref: reference.calmar_research_ref, coverage_research_ref: reference.coverage_research_ref, clean_data_research_ref: reference.clean_data_research_ref});
+      mount.innerHTML = render({...summary, prospective: reference.prospective || summary.prospective, free_evidence_ref: reference.free_evidence_ref, calmar_research_ref: reference.calmar_research_ref, coverage_research_ref: reference.coverage_research_ref, clean_data_research_ref: reference.clean_data_research_ref, fundamental_research_ref: reference.fundamental_research_ref});
     } catch { mount.innerHTML = '<p class="sne-empty">RSI-3.0 could not be loaded. Reload to retry; no stale model results are shown.</p>'; }
   }
   function results() {
@@ -256,5 +257,14 @@
     if (global.ShortsCleanDataViz) global.ShortsCleanDataViz.open(data.clean_data_research_ref);
     else document.getElementById('sev-clean-data-research').innerHTML = '<p>The clean-data comparison could not be loaded.</p>';
   }
-  global.ShortsEdgeV3Viz = {render, change, inspect, page, openCalmarResearch, openCoverageResearch, openCleanDataResearch};
+  async function openFundamentalResearch() {
+    if (!data?.fundamental_research_ref) return;
+    if (!global.ShortsFundamentalViz) await new Promise((resolve, reject) => {
+      const script = document.createElement('script'); script.src = 'shorts-fundamental-viz.js';
+      script.onload = resolve; script.onerror = reject; document.head.appendChild(script);
+    }).catch(() => {});
+    if (global.ShortsFundamentalViz) global.ShortsFundamentalViz.open(data.fundamental_research_ref);
+    else document.getElementById('sev-fundamental-research').innerHTML = '<p>The fundamental comparison could not be loaded.</p>';
+  }
+  global.ShortsEdgeV3Viz = {render, change, inspect, page, openCalmarResearch, openCoverageResearch, openCleanDataResearch, openFundamentalResearch};
 })(window);

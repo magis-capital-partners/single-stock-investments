@@ -292,9 +292,25 @@ class SecSources:
         raw = self.get(url)
         if not raw: return None
         doc = json.loads(raw)
+        binding = None
+        if doc.get("cik") is None and doc.get("entityName"):
+            identity_url = f"https://data.sec.gov/submissions/CIK{int(cik):010d}.json"
+            identity_raw = self.get(identity_url)
+            identity = json.loads(identity_raw) if identity_raw else {}
+            names = [identity.get("name")] + [r.get("name") for r in identity.get("formerNames", [])]
+            normalize = lambda value: "".join(c.lower() for c in str(value or "") if c.isalnum())
+            if str(identity.get("cik", "")).lstrip("0") == str(int(cik)) and normalize(doc["entityName"]) in {normalize(n) for n in names if n}:
+                binding = {"cik": str(int(cik)), "source_url": identity_url,
+                           "companyfacts_sha256": sha(raw), "identity_sha256": sha(identity_raw),
+                           "basis": "exact_entity_name_or_SEC_former_name"}
+                doc = {**doc, "cik": int(cik)}
         if str(doc.get("cik", "")).lstrip("0") != str(int(cik)) or not doc.get("facts"): return None
         path = self.root/"companyfacts"/name
-        write_json(path, doc)
+        if binding:
+            path.parent.mkdir(parents=True, exist_ok=True)
+            path.write_bytes(raw)
+            write_json(path.with_name(path.name+".identity.json"), binding)
+        else: write_json(path, doc)
         return {"path": str(path.resolve()), "sha256": digest(path), "source_url": url}
 
     def submissions(self, cik, events):
@@ -341,7 +357,7 @@ class SecSources:
         return document
 
 
-def collect(source, destination, *, fetch=False, maximum=2400, snapshot_name="sources.json", write_progress=True):
+def collect(source, destination, *, fetch=False, maximum=2400, snapshot_name="sources.json", write_progress=True, resume=False):
     """Acquire candidate identities/facts, then verify them against dated filings."""
     source, destination = Path(source), Path(destination)
     if not re.fullmatch(r"sources(?:-[a-z0-9_-]+)?\.json", snapshot_name): raise ValueError("Invalid local snapshot name")
@@ -373,6 +389,15 @@ def collect(source, destination, *, fetch=False, maximum=2400, snapshot_name="so
     # Prioritize repeated issuers and recent events, using no subsequent price or return.
     ordered = sorted(groups, key=lambda c: (-sum(e["event_id"] in price_gaps for e in groups[c]), -sum(not e.get("cik") for e in groups[c]),
                      -sum((e.get("ex_date") or "") >= "2023-10-14" for e in groups[c]), -len(groups[c]), c))
+    checkpoint = sec.root/(Path(snapshot_name).stem+"-checkpoint.json")
+    resume_hash = sha((digest(Path(__file__))+digest(frozen/"manifest.json")+json.dumps(ordered)).encode())
+    start_group = 0
+    if resume:
+        previous = read_json(checkpoint, {})
+        if previous.get("resume_hash") == resume_hash:
+            identities, actions, facts, documents, identity_conflicts = (previous[k] for k in ("identities", "actions", "facts", "documents", "identity_conflicts"))
+            start_group = previous["issuer_groups_processed"]
+            print("Resume primary recovery at issuer group", start_group, flush=True)
     def snapshot(complete, processed):
         original_ciks = {e["event_id"]: str(e.get("cik") or "").lstrip("0") for e in events}
         accepted_actions = {key: row for key, row in actions.items() if original_ciks[key] or identities.get(key, {}).get("cik") == row.get("cik")}
@@ -381,11 +406,13 @@ def collect(source, destination, *, fetch=False, maximum=2400, snapshot_name="so
                 "candidates": candidates, "identities": identities, "actions": accepted_actions, "facts": facts,
                 "documents": documents, "identity_conflicts": identity_conflicts, "unresolved_name_events": [key for key in unresolved if key not in identities],
                 "source_manifest_sha256": digest(frozen/"manifest.json"), "data_cost_usd": 0,
+                "resume_hash": resume_hash,
                 "requests_this_run": sec.client.requests, "total_recorded_requests": len(sec.audit),
                 "uncached_sources_pending": sorted(sec.pending_urls),
                 "network_budget_reached": sec.client.requests >= sec.client.maximum and sec.client.maximum > 0,
                 "access_stopped": bool(sec.client.blocked), "network_status": dict(Counter(r["status"] for r in sec.audit))}
     for n, cik in enumerate(ordered):
+        if n < start_group: continue
         group = groups[cik]
         needs_identity = any(not e.get("cik") or re.fullmatch(r"CIK\d+", e["ticker"]) for e in group)
         financial_gap = any(e["event_id"] in baseline and baseline[e["event_id"]]["screen_rating"] is None for e in group)
@@ -450,7 +477,7 @@ def collect(source, destination, *, fetch=False, maximum=2400, snapshot_name="so
         if n % 10 == 0:
             print(f"Clean data issuer {n+1}/{len(ordered)}; confirmed identities {len(identities)}; primary actions {len(actions)}; new SEC GETs {sec.client.requests}", flush=True)
             if write_progress: write_json(sec.root/"progress.json", {"issuers_processed": n+1, "issuer_groups": len(ordered), "identities": len(identities), "actions": len(actions), "requests": sec.client.requests})
-        if write_progress and n % 25 == 0: write_json(sec.root/"sources-checkpoint.json", snapshot(False, n+1))
+        if write_progress and n % 25 == 0: write_json(checkpoint, snapshot(False, n+1))
         # Continue cached processing after the bounded network budget is spent.
     result = snapshot(True, len(ordered))
     write_json(sec.root/snapshot_name, result)
@@ -465,10 +492,11 @@ def main(argv=None):
     parser.add_argument("--fetch", action="store_true")
     parser.add_argument("--maximum", type=int, default=2400)
     parser.add_argument("--snapshot-name", default="sources.json")
+    parser.add_argument("--resume", action="store_true")
     args = parser.parse_args(argv)
     if not 0 <= args.maximum <= 5000: parser.error("--maximum must be between zero and 5000")
     collect(args.source_root.resolve(), args.destination.resolve(), fetch=args.fetch, maximum=args.maximum,
-            snapshot_name=args.snapshot_name, write_progress=args.snapshot_name == "sources.json")
+            snapshot_name=args.snapshot_name, write_progress=True, resume=args.resume)
 
 
 if __name__ == "__main__": main()
