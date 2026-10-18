@@ -27,7 +27,7 @@ make research-memory            # merge into research_memory.json
 
 ## Cadence
 
-- **13F ingest:** quarterly after 13F filing window (45 days after quarter end)
+- **13F ingest:** daily check at 13:29 UTC (Data Pipeline `thirteen-f`). A manager is downloaded only when the latest holdings accession is not already saved. Quarter labels use the period of report. A 13F notice is not a book: the overlap builder sums the other managers named on that notice for the same period (Vanguard Group files this way from 2026).
 - **CIK verify:** annually or when a fund restructures
 - **Fund registry:** human edits only (`tracked_funds.json` / `biotech_specialist_funds.json`)
 

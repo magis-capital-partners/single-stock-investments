@@ -77,7 +77,7 @@ Drop a VIC PDF with:
 python _system/scripts/drive_intake_drop.py --kind VIC --ticker TICKER path/to/writeup.pdf
 ```
 
-The ticker folder must already exist. The procedure is in `_system/agents/GROK.md`. The Data Pipeline job `drive` is the Drive Intake Sync. It runs daily at 14:00 UTC from `.github/workflows/data-pipeline.yml` (`0 14 * * *`). GitHub Actions can start later than that clock time.
+The ticker folder must already exist. The procedure is in `_system/agents/GROK.md`. The Data Pipeline job `drive` is the Drive Intake Sync. It runs daily at 14:41 UTC from `.github/workflows/data-pipeline.yml` (`41 14 * * *`). GitHub Actions can start later than that clock time.
 
 Manager letters, short-thesis pitch folders, and conference decks live on Drive. Search by name. Fund letters in the repo's Drive map sit under `Letters/{year and quarter}` (`_system/reference/document-store/google_drive_config.json`). Do not invent a folder id for those searches.
 
@@ -135,7 +135,7 @@ Weekday digests go out around 8:10-8:14 AM ET. Say nothing when nothing is new. 
 | --- | --- |
 | Code and repo data | A pull request from a cloud agent or the GitHub connector. |
 | Desk briefs | `_system/data/desk_briefs/<desk>/<YYYY-MM-DD>.json` by pull request on a `grok/<desk>/<YYYY-MM-DD>-<slug>` branch; `check_desk_briefs.py` must pass. |
-| Documents | Shared Drive `Admin/Intake/...`, using `drive_intake_drop.py` for VIC. The 14:00 UTC Drive Intake Sync imports them. |
+| Documents | Shared Drive `Admin/Intake/...`, using `drive_intake_drop.py` for VIC. The 14:41 UTC Drive Intake Sync imports them. |
 | Notes and lessons | The `research-equity` hub only, within the writing rules above. |
 | Anything outbound to a person | Needs Drew's approval before it is sent. |
 
