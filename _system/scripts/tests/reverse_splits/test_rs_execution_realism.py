@@ -2,7 +2,7 @@
 from __future__ import annotations
 
 import json
-from datetime import datetime, timezone
+from datetime import datetime, timedelta, timezone
 
 import numpy as np
 import pytest
@@ -68,68 +68,57 @@ def test_commission_schedules():
 
 # --- requests and the cost gate -------------------------------------------------------------
 
-def test_requests_group_symbols_per_venue_session_and_flag_the_alternative():
+def test_requests_are_one_free_bar_request_per_venue_session():
     rows = [_event(key="event/a", symbol="AAA"), _event(key="event/b", symbol="BBB", issuer="cik/2"),
             _event(key="event/c", symbol="CCC", issuer="cik/3", entry_date="2025-02-03", year="2025", split="holdout",
                    opened="2025-02-03T14:30:00+00:00", closed="2025-02-03T21:00:00+00:00")]
     items = er.requests_for(rows)
-    assert len(items) == 8 and sum(i["planned"] for i in items) == 6
-    same_day = [i for i in items if i["date"] == "2023-06-01" and i["schema"] == "trades"]
-    assert len(same_day) == 1 and same_day[0]["request"]["symbols"] == ["AAA", "BBB"] and same_day[0]["events"] == 2
-    assert same_day[0]["splits"] == ["validate"]
-    opens = {i["window"]: i for i in items if i["date"] == "2023-06-01" and i["schema"] == "mbp-1"}
-    assert opens["open"]["request"]["start"] == "2023-06-01T13:29:55+00:00"
-    assert opens["open"]["request"]["end"] == "2023-06-01T14:35:05+00:00"
-    assert opens["close"]["request"]["end"] == "2023-06-01T20:00:02+00:00" and opens["close"]["request"]["start"] == "2023-06-01T18:54:55+00:00"
-    assert opens["session_alternative"]["planned"] is False
+    assert len(items) == 2 and all(i["planned"] and i["schema"] == er.FREE_SCHEMA == "ohlcv-1s" for i in items)
+    same_day = next(i for i in items if i["date"] == "2023-06-01")
+    assert same_day["request"]["symbols"] == ["AAA", "BBB"] and same_day["events"] == 2 and same_day["splits"] == ["validate"]
+    assert same_day["request"]["start"] == "2023-06-01T13:30:00+00:00" and same_day["request"]["end"] == "2023-06-01T20:00:00+00:00"
     assert all(i["id"] == er._request_id(i["request"]) for i in items)
     assert er.requests_for(rows) == items  # deterministic
 
 
-def test_quote_summary_separates_planned_splits_and_alternatives():
-    quotes = [{"planned": True, "schema": "trades", "window": "session", "splits": ["train"], "events": 2, "quoted_usd": 0.01, "status": "quoted"},
-              {"planned": True, "schema": "mbp-1", "window": "open", "splits": ["holdout"], "events": 1, "quoted_usd": 0.02, "status": "quoted"},
-              {"planned": False, "schema": "mbp-1", "window": "session_alternative", "splits": ["train"], "events": 2, "quoted_usd": 0.5, "status": "quoted"},
-              {"planned": True, "schema": "mbp-1", "window": "close", "splits": ["train"], "events": 2, "quoted_usd": None, "status": "error"}]
+def test_quote_summary_separates_free_from_priced():
+    quotes = [{"planned": True, "schema": "ohlcv-1s", "window": "session", "splits": ["train"], "events": 2, "quoted_usd": 0.0, "status": "quoted"},
+              {"planned": True, "schema": "ohlcv-1s", "window": "session", "splits": ["holdout"], "events": 1, "quoted_usd": 0.02, "status": "quoted"},
+              {"planned": True, "schema": "ohlcv-1s", "window": "session", "splits": ["train"], "events": 2, "quoted_usd": None, "status": "error"}]
     s = er.quote_summary(quotes)
-    assert s["planned_total"] == {"requests": 2, "usd": pytest.approx(0.03), "events": 3}
-    assert s["planned_by_split"]["holdout"]["usd"] == pytest.approx(0.02) and s["planned_train_validate_only"]["usd"] == pytest.approx(0.01)
-    assert s["alternative_full_session_mbp1"]["usd"] == pytest.approx(0.5) and s["errors"] == 1
-    assert s["max_single_request_usd"] == pytest.approx(0.5)
+    assert s["planned_total"] == {"requests": 2, "usd": pytest.approx(0.02), "events": 3}
+    assert s["free"] == {"requests": 1, "usd": 0.0, "events": 2} and s["priced_above_zero_refused"]["requests"] == 1
+    assert s["planned_by_split"]["holdout"]["usd"] == pytest.approx(0.02) and s["errors"] == 1 and s["max_single_request_usd"] == pytest.approx(0.02)
 
 
-def test_download_refuses_without_quotes_or_above_the_approved_amount(tmp_path, monkeypatch):
+def test_download_fetches_only_requests_quoted_at_zero(tmp_path, monkeypatch):
     cfg = Config(raw={}, root=tmp_path)
     with pytest.raises(SystemExit, match="quote"):
-        er.download(cfg, approved_usd=100.0, client=object())
-    item = {"id": "abc", "planned": True, "schema": "trades", "window": "session", "splits": ["train"], "events": 1, "status": "quoted",
-            "quoted_usd": 0.25, "request": {"dataset": "XNAS.ITCH", "schema": "trades", "symbols": ["AAA"], "start": "s", "end": "e"}}
+        er.download(cfg, client=object())
+    free = {"id": "abc", "planned": True, "schema": "ohlcv-1s", "window": "session", "splits": ["train"], "events": 1, "status": "quoted",
+            "quoted_usd": 0.0, "request": {"dataset": "XNAS.ITCH", "schema": "ohlcv-1s", "symbols": ["AAA"], "start": "s", "end": "e"}}
+    priced = {**free, "id": "def", "quoted_usd": 0.0001, "request": {**free["request"], "symbols": ["BBB"]}}
     er.work_dir(cfg).mkdir(parents=True)
-    write_json(er.work_dir(cfg) / "quotes.json", {"requests": [item], "summary": {}})
-    with pytest.raises(SystemExit, match="exceeds the approved"):
-        er.download(cfg, approved_usd=0.10, client=object())
+    write_json(er.work_dir(cfg) / "quotes.json", {"requests": [free, priced], "summary": {}})
     seen = []
 
     def fake_fetch(client, path, max_cost=0.0, *, quoted_cost=None, **request):
-        seen.append((path, max_cost, quoted_cost))
+        assert max_cost == 0.0 and quoted_cost == 0.0
+        seen.append(request["symbols"])
         path.parent.mkdir(parents=True, exist_ok=True)
         path.write_bytes(b"x")
         path.with_name(path.name.replace(".dbn.zst", ".ok.json")).write_text(json.dumps({"quoted_usd": quoted_cost, "bytes": 1}))
         return {"quoted_usd": quoted_cost, "bytes": 1}
 
     monkeypatch.setattr(er, "fetch", fake_fetch)
-    done = er.download(cfg, approved_usd=0.25, client=object())
-    assert done["files"] == 1 and done["quoted_usd"] == pytest.approx(0.25)
-    assert seen[0][2] == 0.25 and seen[0][1] <= 0.25 + 1e-5
-    assert er.raw_path(cfg, item).exists() and "sessions" in str(er.raw_path(cfg, item))
-    again = er.download(cfg, approved_usd=0.0, client=object())  # nothing left to fetch, nothing spent
-    assert again["files"] == 0 and len(seen) == 1
-    approvals = json.loads((er.work_dir(cfg) / "approvals.json").read_text())
-    assert [a["approved_usd"] for a in approvals] == [0.25, 0.0]
-    big = {**item, "id": "big", "quoted_usd": er.MAX_QUOTE_PER_REQUEST + 1}
-    write_json(er.work_dir(cfg) / "quotes.json", {"requests": [big], "summary": {}})
-    with pytest.raises(SystemExit, match="ceiling"):
-        er.download(cfg, approved_usd=1000.0, client=object())
+    done = er.download(cfg, client=object())
+    assert seen == [["AAA"]] and done["files"] == 1 and done["quoted_usd"] == 0.0
+    assert done["refused_priced_above_zero"] == 1 and done["refused_usd"] == pytest.approx(0.0001)
+    assert er.raw_path(cfg, free).exists() and "sessions" in str(er.raw_path(cfg, free))
+    again = er.download(cfg, client=object())   # nothing left to fetch, the priced one still refused
+    assert again["files"] == 0 and again["refused_priced_above_zero"] == 1 and len(seen) == 1
+    history = json.loads((er.work_dir(cfg) / "downloads.json").read_text())
+    assert len(history) == 2 and all(h["policy"].startswith("free only") for h in history)
 
 
 # --- the passive offer under Rule 201 -----------------------------------------------------------
@@ -263,6 +252,98 @@ def test_print_arrays_drop_only_the_crosses_and_book_arrays_select_the_symbol():
     assert bk["ask"].tolist() == [9.1] and b.valid_book_mask(bk).tolist() == [True]
 
 
+# --- the bar models (what the published study runs) ---------------------------------------------
+
+def _bars(records):
+    """records: (seconds, open, high, low, close, volume)."""
+    cols = list(zip(*records))
+    return {"ts": np.array([T0 + int(c * S) for c in cols[0]], dtype="int64"),
+            "open": np.array(cols[1], dtype=float), "high": np.array(cols[2], dtype=float),
+            "low": np.array(cols[3], dtype=float), "close": np.array(cols[4], dtype=float), "volume": np.array(cols[5], dtype=float)}
+
+
+def test_ticks_at_or_above_spreads_volume_over_tick_prices():
+    assert b.ticks_at_or_above(5.00, 5.00, 5.00, 0.01) == 1.0 and b.ticks_at_or_above(4.99, 4.99, 5.00, 0.01) == 0.0
+    assert b.ticks_at_or_above(4.99, 5.00, 5.00, 0.01) == pytest.approx(0.5)      # two ticks, one at the offer
+    assert b.ticks_at_or_above(4.98, 5.01, 5.00, 0.01) == pytest.approx(0.5)      # 4.98 4.99 | 5.00 5.01
+    assert b.ticks_at_or_above(5.01, 5.03, 5.00, 0.01) == 1.0 and b.ticks_at_or_above(4.90, 4.99, 5.00, 0.01) == 0.0
+    assert b.ticks_at_or_above(0.9990, 0.9999, 0.9995, 0.0001) == pytest.approx(0.5)
+
+
+def test_bar_fill_model_depletes_the_displayed_queue_then_fills():
+    book = {"bid": 4.90, "ask": 5.00, "mid": 4.95, "ask_size": 300, "bid_size": 100, "timestamp": "x"}
+    bars = _bars([(1, 5.00, 5.00, 5.00, 5.00, 200),     # 200 at the offer: queue ahead 300 -> 100
+                  (2, 4.95, 4.95, 4.90, 4.90, 500),     # below the offer: nothing
+                  (3, 5.00, 5.00, 4.99, 5.00, 400),     # half at the offer: 200 -> queue done, 100 of ours
+                  (4, 5.01, 5.02, 5.01, 5.02, 100),     # entirely above: 100 more of ours (ambiguous slide)
+                  (300, 5.00, 5.00, 5.00, 5.00, 10),
+                  (310, 5.10, 5.10, 5.10, 5.10, 10)])
+    s = b.simulate_passive_offer_bars(bars, book, T0, 150, horizon_ns=900 * S)
+    assert s["status"] == "simulated" and s["fully_filled"] and s["filled_shares"] == 150 and s["fill_vwap"] == 5.0
+    assert s["completed_at"] == T0 + 5 * S and s["time_to_fill_seconds"] == pytest.approx(5) and s["fills"] == 2
+    assert s["buyer_volume_at_or_above_offer"] == pytest.approx(500) and s["fills_with_market_above_offer"] is True
+    assert s["improvement_vs_arrival_mid"] == pytest.approx(0.05 / 4.95)
+    assert s["markout_300s"] == pytest.approx((5.00 - 5.00) / 4.95)             # last bar by +300s (t=305) closed 5.00
+    assert s["markout_900s"] == pytest.approx((5.10 - 5.00) / 4.95)             # t=310 bar: adverse
+    partial = b.simulate_passive_offer_bars(bars, book, T0, 1000, horizon_ns=900 * S)
+    assert not partial["fully_filled"] and partial["filled_shares"] == 220 and partial["fill_fraction"] == pytest.approx(0.22)   # 100+100+10+10
+    assert partial["unfilled_drift"] == pytest.approx((5.10 - 4.95) / 4.95)
+    assert b.simulate_passive_offer_bars(bars, book, T0, 150, horizon_ns=2 * S)["filled_shares"] == 0
+    assert b.simulate_passive_offer_bars(bars, {**book, "ask": 4.90}, T0, 10, horizon_ns=900 * S)["status"] == "invalid_arrival_book"
+    assert b.simulate_passive_offer_bars(bars, book, T0, 0, horizon_ns=900 * S)["status"] == "order_below_one_share"
+    late = b.simulate_passive_offer_bars(bars, book, T0 + 3 * S, 100, horizon_ns=900 * S)   # placed at t=3: only bars from t=3 count
+    assert late["filled_shares"] == 20                                                       # 200 + 100 clear the 300 ahead; then 10 + 10
+
+
+def test_participation_on_bars_and_cross_removal():
+    bars = _bars([(0, 5.00, 5.00, 5.00, 5.00, 1000),   # the opening cross bar
+                  (1, 5.00, 5.02, 4.98, 5.00, 1000),   # range midpoint 5.00
+                  (2, 4.90, 4.90, 4.90, 4.90, 1000),
+                  (3, 4.80, 4.80, 4.80, 4.80, 2000),
+                  (4000, 4.70, 4.70, 4.70, 4.70, 1000)])
+    vol, removed = b.remove_cross(bars, 5.00, 900, T0)
+    assert removed and vol[0] == pytest.approx(100) and vol[1] == 1000
+    vol2, removed2 = b.remove_cross(bars, 5.00, 5000, T0)          # too large for any bar: nothing removed
+    assert not removed2 and vol2[0] == 1000
+    cap = b.participation_leg_bars(bars, vol, T0 + S, T0 + 3600 * S, 0.01, order_shares=None)
+    assert cap["status"] == "priced" and cap["window_volume"] == 4000 and cap["taken_shares"] == pytest.approx(40) and cap["completed"]
+    assert cap["vwap"] == pytest.approx((5.0 * 1000 + 4.9 * 1000 + 4.8 * 2000) / 4000)
+    fixed = b.participation_leg_bars(bars, vol, T0 + S, T0 + 3600 * S, 0.01, order_shares=15)
+    assert fixed["taken_shares"] == pytest.approx(15) and fixed["vwap"] == pytest.approx((5.0 * 10 + 4.9 * 5) / 15)
+    assert fixed["time_to_complete_seconds"] == pytest.approx(2)            # completes at the end of the t=2 bar
+    short = b.participation_leg_bars(bars, vol, T0 + S, T0 + 3600 * S, 0.01, order_shares=100)
+    assert not short["completed"] and short["residual_shares"] == pytest.approx(60)
+    assert b.participation_leg_bars(bars, vol, T0 + 5000 * S, T0 + 6000 * S, 0.01, order_shares=None)["status"] == "no_bars_in_window"
+
+
+def test_h18_and_h19_event_rows_use_the_cached_books():
+    bars = _bars([(0, 5.00, 5.00, 5.00, 5.00, 1000), (1, 5.00, 5.00, 5.00, 5.00, 500), (2, 5.00, 5.00, 5.00, 5.00, 500),
+                  (3, 5.00, 5.00, 5.00, 5.00, 500), (19800, 4.60, 4.70, 4.60, 4.70, 300), (19900, 4.50, 4.50, 4.50, 4.50, 300)])
+    opened = datetime.fromtimestamp(T0 / 1e9, tz=timezone.utc)
+    ev = _event(opened=opened.isoformat(), closed=(opened + timedelta(hours=6, minutes=30)).isoformat(), close=4.50, open=5.00)
+    books = {"open_1": {"bid": 4.90, "ask": 5.00, "mid": 4.95, "ask_size": 400, "bid_size": 100, "timestamp": (opened + timedelta(seconds=1)).isoformat()},
+             "open_30": {"bid": 4.92, "ask": 5.00, "mid": 4.96, "ask_size": 50, "bid_size": 100, "timestamp": (opened + timedelta(seconds=30)).isoformat()},
+             "close": {"bid": 4.48, "ask": 4.52, "mid": 4.50, "ask_size": 10, "bid_size": 10, "timestamp": "c"}}
+    h2 = b._h2_event(ev, bars, books, False)
+    assert h2["status"] == "simulated" and h2["placement_offset_seconds"] == 1 and h2["orders"]["account_50k"] == 252
+    sim = h2["sims"][f"account_50k/{b.PRIMARY_FILL_MODEL}"]
+    assert sim["fully_filled"] and sim["queue_ahead_shares"] == 400 and sim["time_to_fill_seconds"] == pytest.approx(2)   # placed t=1; 400 ahead + 252 done by the end of t=2
+    assert b._h2_event(ev, bars, {"open_1": None, "open_30": None, "close": None}, False)["status"] == "no_arrival_book"
+    assert b._h2_event(ev, None, books, True)["status"] == "no_window"
+    h3 = b._h3_event(ev, bars, books, {"open_cross_price": 5.00, "open_cross_shares": 1000, "close_cross_price": 4.50}, False)
+    assert h3["status"] == "priced" and h3["cross_removed_from_bars"] and h3["first_hour_volume"] == 1500
+    assert h3["entry_half_spread"] == pytest.approx(((0.05 / 4.95) + (0.04 / 4.95)) / 2) and h3["exit_spread_from"] == "close_book"
+    leg = h3["legs"]["capacity/0.01"]
+    assert leg["status"] == "priced" and leg["position_shares"] == pytest.approx(15) and leg["entry"]["vwap"] == 5.0
+    assert leg["entry_shortfall"] == pytest.approx((4.95 - 5.0) / 4.95)                 # sold above the arrival mid
+    assert h3["exit_arrival_mid"] == pytest.approx(4.65) and leg["exit"]["taken_shares"] == pytest.approx(6)   # 1% of 600 in the last hour
+    assert leg["residual_at_close_share"] == pytest.approx(9 / 15)
+    buy = (6 * 4.65 * 0 + 0) if False else None
+    assert leg["realized_gross_short_return"] == pytest.approx((5.0 - (6 * ((4.65 * 300 + 4.5 * 300) / 600) + 9 * 4.5) / 15) / 5.0)
+    no_exit = b._h3_event({**ev, "closed": (opened + timedelta(hours=3)).isoformat()}, bars, books, {}, False)
+    assert no_exit["status"] == "no_exit_arrival_bar"
+
+
 # --- H4 arithmetic ------------------------------------------------------------------------------
 
 def test_h4_rows_and_feasibility_shares():
@@ -298,7 +379,7 @@ def test_h2_results_handle_missing_windows_and_count_fills():
     sim = {"status": "simulated", "fully_filled": True, "fill_fraction": 1.0, "repriced": 0, "shares": 100, "arrival_half_spread": 0.01,
            "time_to_fill_seconds": 30.0, "improvement_vs_arrival_mid": 0.01, "markout_60s": 0.0, "markout_300s": 0.002, "markout_900s": 0.0,
            "fill_vwap": 5.0}
-    key = f"{b.PRIMARY_ORDER}/{b.PRIMARY_CANCEL_MODEL}"
+    key = f"{b.PRIMARY_ORDER}/{b.PRIMARY_FILL_MODEL}"
     rows = [{**_event(key="event/a"), "price_band": "5_and_over", "status": "simulated", "sims": {key: sim}},
             {**_event(key="event/b", issuer="cik/2"), "price_band": "5_and_over", "status": "simulated",
              "sims": {key: {**sim, "fully_filled": False, "fill_fraction": 0.2, "unfilled_drift": 0.03, "time_to_fill_seconds": None}}},
@@ -327,18 +408,20 @@ def test_h3_results_cost_and_kill_reading():
     assert blk["benchmark_minus_cost"]["mean"] == pytest.approx(0.05 - 0.012) and blk["round_trip_cost_c1.0"]["issuer_interval"]["clusters"] == 6
     h4 = {"by_split": {s: {"all": {"account": {"feasible": {"events": 10, "share": 0.9, "issuer_interval": {}}}, "replay": {"feasible": {"events": 10, "share": 1.0}}},
                            "restricted": {"account": {"feasible": {"events": 5, "share": 0.8}}}} for s in ("train", "validate")}}
-    h2 = {"by_ssr_state": {"restricted": {"by_split": {s: {f"{b.PRIMARY_ORDER}/{b.PRIMARY_CANCEL_MODEL}": {"simulated": 4, "fill_rate": {"share": 0.6},
+    h2 = {"primary": f"{b.PRIMARY_ORDER}/{b.PRIMARY_FILL_MODEL}",
+          "by_ssr_state": {"restricted": {"by_split": {s: {f"{b.PRIMARY_ORDER}/{b.PRIMARY_FILL_MODEL}": {"simulated": 4, "fill_rate": {"share": 0.6},
                                                                                                            "adverse_selection_5m": {"mean": 0.001},
                                                                                                            "time_to_fill_seconds": {}}} for s in ("train", "validate")}}}}
     a = b.assessments(h4, h2, res)
-    assert a["H4"]["assessment"].startswith("Success") and a["H2"]["assessment"].startswith("Success") and a["H3"]["assessment"].startswith("Success")
-    h2["by_ssr_state"]["restricted"]["by_split"]["validate"][f"{b.PRIMARY_ORDER}/{b.PRIMARY_CANCEL_MODEL}"]["fill_rate"]["share"] = 0.2
+    assert a["H4"]["assessment"].startswith("Success") and a["H18"]["assessment"].startswith("Success") and a["H19"]["assessment"].startswith("Success")
+    assert a["H2"]["assessment"].startswith("Superseded by H18") and a["H3"]["assessment"].startswith("Superseded by H19")
+    h2["by_ssr_state"]["restricted"]["by_split"]["validate"][f"{b.PRIMARY_ORDER}/{b.PRIMARY_FILL_MODEL}"]["fill_rate"]["share"] = 0.2
     h4["by_split"]["validate"]["all"]["account"]["feasible"]["share"] = 0.3
     rows_kill = [{**r, "legs": {"capacity/0.01": leg(0.06, -0.01)}} for r in rows if r.get("legs")]
     a = b.assessments(h4, h2, b.h3_results(rows_kill))
-    assert a["H4"]["assessment"].startswith("Kill") and a["H2"]["assessment"].startswith("Kill") and a["H3"]["assessment"].startswith("Kill")
+    assert a["H4"]["assessment"].startswith("Kill") and a["H18"]["assessment"].startswith("Kill") and a["H19"]["assessment"].startswith("Kill")
     empty = b.assessments(h4, h2, b.h3_results([]))
-    assert empty["H3"]["assessment"].startswith("Not measured") and empty["H3"]["validate"] is None
+    assert empty["H19"]["assessment"].startswith("Not measured") and empty["H19"]["validate"] is None
 
 
 # --- sealing, registry, publication ------------------------------------------------------------------
@@ -370,9 +453,14 @@ def test_mark_measured_updates_status_and_result_ref_only(fixture_ledger):
 
 def test_registry_still_has_seventeen_rows_and_workstream_a_cites_registered_ids():
     rows = load_jsonl(LEDGER / hyp.REGISTRY_NAME)
-    assert [r["id"] for r in rows] == [f"H{i}" for i in range(1, 18)]
+    assert [r["id"] for r in rows] == [f"H{i}" for i in range(1, 20)]
     assert hyp.registry_errors(rows) == []
     assert hyp.declared_before(rows, list(er.HYPOTHESES), datetime.now(timezone.utc))
+    by = {r["id"]: r for r in rows}
+    assert by["H2"]["status"] == "superseded" and by["H2"]["superseded_by"] == "H18"
+    assert by["H3"]["status"] == "superseded" and by["H3"]["superseded_by"] == "H19"
+    assert by["H18"]["success"] == by["H2"]["success"] and by["H19"]["success"] == by["H3"]["success"]
+    assert by["H18"]["kill"] == by["H2"]["kill"] and by["H19"]["kill"] == by["H3"]["kill"]
 
 
 def test_published_workstream_a_is_sealed_registered_and_hashed():
@@ -381,11 +469,12 @@ def test_published_workstream_a_is_sealed_registered_and_hashed():
         pytest.skip("execution_realism.json not published")
     doc = json.loads(path.read_text(encoding="utf-8"))
     assert doc["hypothesis_ids"] == list(er.HYPOTHESES) and doc["aggregate_only"] is True and doc["schema_version"] == er.VERSION
-    for block in ("h4_opening_cross", "h2_passive_offer_under_ssr", "h3_participation_cost", "commissions"):
+    for block in ("h4_opening_cross", "h18_passive_offer_under_ssr", "h19_participation_cost", "commissions"):
         text = json.dumps(doc[block])
         assert '"holdout"' not in text and '"2025"' not in text and '"2026"' not in text
     assert hyp.detail_keys(doc) == set()
-    assert {"H2", "H3", "H4"} <= set(doc["assessments"])
+    assert {"H4", "H18", "H19", "H2", "H3"} <= set(doc["assessments"])
+    assert doc["data"]["data_cost_incurred_usd"] == 0.0 and doc["data"]["policy"].startswith("free data only")
     assert doc["data"]["data_cost_incurred_usd"] is not None
     manifest = json.loads((LEDGER / "execution_realism_manifest.json").read_text(encoding="utf-8"))
     assert manifest["output"]["sha256"] and manifest["holdout"]["sealed"] is True and manifest["raw_market_data_public"] is False

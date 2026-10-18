@@ -1,19 +1,23 @@
 """Workstream A of the shorts alpha program: execution and capacity realism on
-the verified ex+1 reverse-split event (H2 passive fills under Rule 201, H3
-participation cost, H4 opening-cross feasibility, tiered versus fixed
-commissions as declared variants).
+the verified ex+1 reverse-split event (H4 opening-cross feasibility from the
+official cross sizes; H18 passive fills under Rule 201 and H19 participation
+cost from one-second venue bars and the cached opening and closing books;
+tiered versus fixed commissions as declared variants).
 
 Research only. Inputs are the frozen expansion run (per-event ex+1 outcomes
 and the historical auction identity of each event), the local SQLite SSR
 states, the local Databento ``statistics`` files (official auction prints and
-cross sizes) and, for H2 and H3, per-session ``trades`` and ``mbp-1`` files on
-the listing venue. Nothing here contacts a broker or ThetaData.
+cross sizes), the opening and closing books the earlier quote study cached for
+every event, and per-session ``ohlcv-1s`` bars on the listing venue. Nothing
+here contacts a broker or ThetaData.
 
-Data cost gate. Every Databento request is priced with ``metadata.get_cost``
-before anything is downloaded (``quote``). The quotes are summed; if the sum
-exceeds $0.00 nothing is fetched until a human passes the quoted amount back
-as ``download --approved-usd``. The approval is recorded in the manifest. Raw
-files stay under ``local/raw/databento/`` (gitignored).
+Free data only. Every Databento request is priced with ``metadata.get_cost``
+before anything is fetched (``quote``), and ``download`` fetches only requests
+quoted at exactly $0.00; anything priced above that is listed as refused and
+never bought. The one-second bar schema is $0.00 on this plan; the quote,
+trade and book schemas are not, and the paid-data queue model kept in
+``execution_realism_build`` is therefore never run. Raw files stay under
+``local/raw/databento/`` (gitignored).
 
 Published output (``execution_realism.json`` + ``execution_realism_manifest.json``)
 is aggregate only and covers the train and validation splits. Holdout rows
@@ -23,7 +27,7 @@ is aggregate only and covers the train and validation splits. Holdout rows
 From ``_system/scripts``::
 
     python -m reverse_splits.execution_realism quote
-    python -m reverse_splits.execution_realism download --approved-usd 0.00
+    python -m reverse_splits.execution_realism download
     python -m reverse_splits.execution_realism build --publish
 """
 from __future__ import annotations
@@ -36,7 +40,7 @@ import os
 import sqlite3
 import time
 from collections import Counter, defaultdict
-from datetime import datetime, timedelta, timezone
+from datetime import datetime, timezone
 from pathlib import Path
 
 from .config import Config, load_config
@@ -48,8 +52,10 @@ from .phase0_research import (
     assign_split,
 )
 
-VERSION = "shorts_ws_a.v1"
-HYPOTHESES = ("H2", "H3", "H4")
+VERSION = "shorts_ws_a.v2"
+HYPOTHESES = ("H4", "H18", "H19")
+SUPERSEDED = {"H2": "H18", "H3": "H19"}   # registered on paid book data, which this program does not buy
+FREE_SCHEMA = "ohlcv-1s"
 QUOTE_STUDY = f"{RUN_ID}__quotes_v1"
 
 # Modeled orders (the frozen account replay's protocol, portfolio_protocol.json).
@@ -74,7 +80,7 @@ CROSSING_FRACTIONS = (1.0, 0.5)      # share of our fills that cross the spread 
 PRE_OPEN_SECONDS = 5
 POST_WINDOW_SECONDS = 5
 PRICE_BANDS = ((0.0, 1.0, "under_1"), (1.0, 2.0, "1_to_2"), (2.0, 5.0, "2_to_5"), (5.0, float("inf"), "5_and_over"))
-MAX_QUOTE_PER_REQUEST = 50.0         # a single request quoted above this is a defect, not a purchase
+FREE_ONLY = True                     # the standing rule: nothing priced above $0.00 is ever fetched
 METADATA_INTERVAL = 1 / 6            # stay well below the provider's metadata rate limit
 KEY_ENV = "DATABENTO_API_KEY"
 KEY_FILE = Path(r"C:\Users\drewg\Projects\quant\DC-Execution\.env")
@@ -242,32 +248,22 @@ def _request_id(req: dict) -> str:
 
 
 def requests_for(rows: list[dict]) -> list[dict]:
-    """One request per (listing venue, session, schema, window); symbols grouped. Two mbp-1
-    windows (open + 65 min, close - 65 min) are the planned pull; a full-session mbp-1
-    variant is quoted beside them so the budget decision can see both."""
+    """One ``ohlcv-1s`` request per (listing venue, session) covering the regular session;
+    symbols grouped. Bars are labelled by their start second, so the closing cross
+    (16:00:00.x) falls outside the window and the official close comes from statistics."""
     groups: dict[tuple, dict] = {}
     for r in rows:
         opened = datetime.fromisoformat(r["opened"])
         closed = datetime.fromisoformat(r["closed"])
-        windows = {
-            ("trades", "session"): (opened - timedelta(seconds=PRE_OPEN_SECONDS), closed + timedelta(seconds=POST_WINDOW_SECONDS)),
-            ("mbp-1", "open"): (opened - timedelta(seconds=PRE_OPEN_SECONDS),
-                                opened + timedelta(seconds=ENTRY_WINDOW_SECONDS + 5 * 60 + POST_WINDOW_SECONDS)),
-            ("mbp-1", "close"): (closed - timedelta(seconds=EXIT_WINDOW_SECONDS + 5 * 60 + PRE_OPEN_SECONDS),
-                                 closed + timedelta(seconds=2)),
-            ("mbp-1", "session_alternative"): (opened - timedelta(seconds=PRE_OPEN_SECONDS), closed + timedelta(seconds=2)),
-        }
-        for (schema, window), (start, end) in windows.items():
-            key = (r["dataset"], r["entry_date"], schema, window, start.isoformat(), end.isoformat())
-            g = groups.setdefault(key, {"symbols": set(), "splits": set(), "events": 0})
-            g["symbols"].add(r["symbol"])
-            g["splits"].add(r["split"])
-            g["events"] += 1
+        key = (r["dataset"], r["entry_date"], FREE_SCHEMA, "session", opened.isoformat(), closed.isoformat())
+        g = groups.setdefault(key, {"symbols": set(), "splits": set(), "events": 0})
+        g["symbols"].add(r["symbol"])
+        g["splits"].add(r["split"])
+        g["events"] += 1
     out = []
     for (dataset, day, schema, window, start, end), g in sorted(groups.items()):
         req = dict(dataset=dataset, schema=schema, symbols=sorted(g["symbols"]), start=start, end=end)
-        out.append({"id": _request_id(req), "schema": schema, "window": window, "date": day,
-                    "planned": window != "session_alternative",
+        out.append({"id": _request_id(req), "schema": schema, "window": window, "date": day, "planned": True,
                     "splits": sorted(g["splits"]), "events": g["events"], "request": req})
     return out
 
@@ -278,18 +274,33 @@ def raw_path(cfg: Config, item: dict) -> Path:
 
 
 def quote_requests(cfg: Config, items: list[dict], *, client=None, log=print) -> dict:
-    """Price every request (free metadata). Writes quotes.json; downloads nothing."""
-    client = client or _client()
+    """Price every request (free metadata). Writes quotes.json as it goes and skips requests
+    already quoted in an earlier run, so an interrupted quote resumes; downloads nothing."""
+    work_dir(cfg).mkdir(parents=True, exist_ok=True)
+    out_path = work_dir(cfg) / "quotes.json"
+    previous = {q["id"]: q for q in (read_json(out_path, {}) or {}).get("requests", []) if q.get("status") in ("quoted", "have")}
     quotes = []
     next_at = 0.0
     errors = Counter()
-    for n, item in enumerate(items, 1):
+    pending = [item for item in items if item["id"] not in previous]
+    log(f"{len(items) - len(pending)} requests already quoted; {len(pending)} to price", flush=True)
+
+    def save():
+        write_json(out_path, {"quoted_at": datetime.now(timezone.utc).replace(microsecond=0).isoformat(), "requests": quotes,
+                              "summary": quote_summary(quotes), "errors": dict(errors), "complete": len(quotes) == len(items)})
+
+    for item in items:
+        if item["id"] in previous:
+            quotes.append({**item, **{k: previous[item["id"]][k] for k in ("quoted_usd", "status") if k in previous[item["id"]]},
+                           **({"bytes": previous[item["id"]]["bytes"]} if "bytes" in previous[item["id"]] else {})})
+            continue
         path = raw_path(cfg, item)
         if is_complete(path):
             saved = read_json(path.with_name(path.name.replace(".dbn.zst", ".ok.json")), {})
-            quotes.append({**item, "quoted_usd": float(saved.get("quoted_usd") or 0.0), "status": "have",
-                           "bytes": int(saved.get("bytes") or 0)})
+            quotes.append({**item, "quoted_usd": float(saved.get("quoted_usd") or 0.0), "status": "have", "bytes": int(saved.get("bytes") or 0)})
             continue
+        if client is None:
+            client = _client()
         time.sleep(max(0.0, next_at - time.monotonic()))
         next_at = time.monotonic() + METADATA_INTERVAL
         try:
@@ -300,57 +311,45 @@ def quote_requests(cfg: Config, items: list[dict], *, client=None, log=print) ->
         except Exception as exc:  # noqa: BLE001 - recorded, never retried with another key
             errors[type(exc).__name__] += 1
             quotes.append({**item, "quoted_usd": None, "status": "error", "error": f"{type(exc).__name__}: {str(exc)[:300]}"})
-        if n % 100 == 0 or n == len(items):
-            log(f"quoted {n}/{len(items)}; running total ${sum(q['quoted_usd'] or 0 for q in quotes):.4f}")
-    summary = quote_summary(quotes)
-    out = {"quoted_at": datetime.now(timezone.utc).replace(microsecond=0).isoformat(), "requests": quotes,
-           "summary": summary, "errors": dict(errors)}
-    work_dir(cfg).mkdir(parents=True, exist_ok=True)
-    write_json(work_dir(cfg) / "quotes.json", out)
-    return out
+        n = len(quotes)
+        if n % 50 == 0 or n == len(items):
+            save()
+            log(f"quoted {n}/{len(items)}; running total ${sum(q['quoted_usd'] or 0 for q in quotes):.4f}", flush=True)
+    save()
+    return read_json(out_path, {})
 
 
 def quote_summary(quotes: list[dict]) -> dict:
     def total(pred):
-        sel = [q for q in quotes if pred(q) and q.get("quoted_usd") is not None]
-        return {"requests": len(sel), "usd": float(sum(q["quoted_usd"] for q in sel)),
-                "events": int(sum(q["events"] for q in sel))}
-    planned = lambda q: q["planned"]  # noqa: E731
-    out = {"planned_total": total(planned),
-           "planned_by_schema_window": {f"{s}/{w}": total(lambda q, s=s, w=w: q["planned"] and q["schema"] == s and q["window"] == w)
-                                        for s, w in (("trades", "session"), ("mbp-1", "open"), ("mbp-1", "close"))},
-           "planned_by_split": {sp: total(lambda q, sp=sp: q["planned"] and q["splits"] == [sp]) for sp in ("train", "validate", "holdout")},
-           "planned_mixed_split_requests": total(lambda q: q["planned"] and len(q["splits"]) > 1),
-           "planned_train_validate_only": total(lambda q: q["planned"] and "holdout" not in q["splits"]),
-           "alternative_full_session_mbp1": total(lambda q: q["window"] == "session_alternative"),
-           "alternative_trades_plus_full_session_mbp1": total(lambda q: q["window"] == "session_alternative" or q["schema"] == "trades"),
-           "not_yet_downloaded_planned_usd": float(sum(q["quoted_usd"] or 0 for q in quotes if q["planned"] and q["status"] == "quoted")),
-           "errors": int(sum(1 for q in quotes if q["status"] == "error")),
-           "max_single_request_usd": max((q["quoted_usd"] for q in quotes if q.get("quoted_usd") is not None), default=0.0)}
-    return out
+        sel = [q for q in quotes if q.get("quoted_usd") is not None and pred(q)]
+        return {"requests": len(sel), "usd": float(sum(q["quoted_usd"] for q in sel)), "events": int(sum(q["events"] for q in sel))}
+    return {"planned_total": total(lambda q: q["planned"]),
+            "free": total(lambda q: q["planned"] and q["quoted_usd"] == 0.0),
+            "priced_above_zero_refused": total(lambda q: q["planned"] and q["quoted_usd"] > 0.0),
+            "planned_by_split": {sp: total(lambda q, sp=sp: q["planned"] and q["splits"] == [sp]) for sp in ("train", "validate", "holdout")},
+            "planned_mixed_split_requests": total(lambda q: q["planned"] and len(q["splits"]) > 1),
+            "already_local": int(sum(1 for q in quotes if q["status"] == "have")),
+            "errors": int(sum(1 for q in quotes if q["status"] == "error")),
+            "max_single_request_usd": max((q["quoted_usd"] for q in quotes if q.get("quoted_usd") is not None), default=0.0)}
 
 
-def download(cfg: Config, *, approved_usd: float, splits: tuple[str, ...] | None = None, client=None, log=print) -> dict:
-    """Fetch the planned requests. Refuses unless quotes exist and their sum for the
-    files still missing is within the approved amount. Each fetch is capped at its own quote."""
+def download(cfg: Config, *, client=None, log=print) -> dict:
+    """Fetch the planned requests quoted at exactly $0.00. Anything priced above that is
+    listed as refused; there is no override. Each fetch is capped at $0.00 again by ``fetch``."""
     saved = read_json(work_dir(cfg) / "quotes.json", {})
     if not saved:
         raise SystemExit("run `quote` first; nothing is downloaded without a stored quote")
     items = [q for q in saved["requests"] if q["planned"] and q["status"] == "quoted"]
-    if splits:
-        items = [q for q in items if set(q["splits"]) <= set(splits)]
-    wanted = [q for q in items if not is_complete(raw_path(cfg, q))]
-    total = float(sum(q["quoted_usd"] for q in wanted))
-    if any(q["quoted_usd"] > MAX_QUOTE_PER_REQUEST for q in wanted):
-        raise SystemExit("a single request is quoted above the per-request ceiling; inspect quotes.json")
-    if total > approved_usd + 1e-9:
-        raise SystemExit(f"quoted total ${total:.4f} for {len(wanted)} files exceeds the approved ${approved_usd:.4f}; nothing downloaded")
-    client = client or _client()
-    done = {"files": 0, "bytes": 0, "quoted_usd": 0.0, "errors": 0}
+    refused = [q for q in items if q["quoted_usd"] is None or q["quoted_usd"] > 0.0]
+    wanted = [q for q in items if q["quoted_usd"] == 0.0 and not is_complete(raw_path(cfg, q))]
+    done = {"files": 0, "bytes": 0, "quoted_usd": 0.0, "errors": 0,
+            "refused_priced_above_zero": len(refused), "refused_usd": float(sum(q["quoted_usd"] or 0.0 for q in refused))}
+    if wanted:
+        client = client or _client()
     for n, item in enumerate(wanted, 1):
         path = raw_path(cfg, item)
         try:
-            record = fetch(client, path, max_cost=item["quoted_usd"] + 1e-6, quoted_cost=item["quoted_usd"], **item["request"])
+            record = fetch(client, path, max_cost=0.0, quoted_cost=item["quoted_usd"], **item["request"])
         except CostRefused as exc:
             done["errors"] += 1
             log(str(exc))
@@ -367,13 +366,12 @@ def download(cfg: Config, *, approved_usd: float, splits: tuple[str, ...] | None
         done["quoted_usd"] += float(record.get("quoted_usd") or 0.0)
         if n % 50 == 0 or n == len(wanted):
             log(f"downloaded {n}/{len(wanted)} ({done['bytes'] / 1e6:.1f} MB, ${done['quoted_usd']:.4f})")
-    approval = {"approved_usd": approved_usd, "approved_at": datetime.now(timezone.utc).replace(microsecond=0).isoformat(),
-                "splits": list(splits) if splits else ["train", "validate", "holdout"], "quoted_total_usd": total,
-                "quotes_sha256": sha256_file(work_dir(cfg) / "quotes.json"), **done}
-    approvals = read_json(work_dir(cfg) / "approvals.json", [])
-    approvals.append(approval)
-    write_json(work_dir(cfg) / "approvals.json", approvals)
-    return approval
+    record = {"downloaded_at": datetime.now(timezone.utc).replace(microsecond=0).isoformat(), "policy": "free only: nothing quoted above $0.00 is fetched",
+              "quotes_sha256": sha256_file(work_dir(cfg) / "quotes.json"), **done}
+    history = read_json(work_dir(cfg) / "downloads.json", [])
+    history.append(record)
+    write_json(work_dir(cfg) / "downloads.json", history)
+    return record
 
 
 def main(argv=None) -> int:
@@ -381,9 +379,7 @@ def main(argv=None) -> int:
     sub = parser.add_subparsers(dest="command", required=True)
     q = sub.add_parser("quote", help="price every planned request; download nothing")
     q.add_argument("--config", type=Path, default=None)
-    d = sub.add_parser("download", help="fetch the planned requests within an approved amount")
-    d.add_argument("--approved-usd", type=float, required=True)
-    d.add_argument("--splits", nargs="*", default=None, help="restrict to requests whose events all fall in these splits")
+    d = sub.add_parser("download", help="fetch the planned requests quoted at exactly $0.00; nothing priced is ever fetched")
     d.add_argument("--config", type=Path, default=None)
     b = sub.add_parser("build", help="H2/H3/H4 from local files; --publish writes the aggregate JSON beside the ledger")
     b.add_argument("--publish", action="store_true")
@@ -393,12 +389,12 @@ def main(argv=None) -> int:
     if args.command == "quote":
         rows = event_rows(cfg)
         items = requests_for(rows)
-        print(f"events {len(rows)}; requests {len(items)} ({sum(i['planned'] for i in items)} planned)")
+        print(f"events {len(rows)}; requests {len(items)} ({sum(i['planned'] for i in items)} planned, schema {FREE_SCHEMA})", flush=True)
         out = quote_requests(cfg, items)
         print(json.dumps(out["summary"], indent=1))
         return 0
     if args.command == "download":
-        print(json.dumps(download(cfg, approved_usd=args.approved_usd, splits=tuple(args.splits) if args.splits else None), indent=1))
+        print(json.dumps(download(cfg), indent=1))
         return 0
     from .execution_realism_build import run_build  # noqa: WPS433 - the analysis half of the workstream
 

@@ -1,14 +1,18 @@
 {
-  "schema_version": "shorts_ws_a.v1",
-  "built_at": "2026-10-18T19:38:54+00:00",
+  "schema_version": "shorts_ws_a.v2",
+  "built_at": "2026-10-18T22:06:16+00:00",
   "research_only": true,
   "authority": "none",
   "aggregate_only": true,
   "hypothesis_ids": [
-    "H2",
-    "H3",
-    "H4"
+    "H4",
+    "H18",
+    "H19"
   ],
+  "superseded": {
+    "H2": "H18",
+    "H3": "H19"
+  },
   "source_run_id": "20261013T224003582762Z",
   "splits": {
     "train": [
@@ -26,18 +30,23 @@
     "location": "local/holdout/execution_realism_holdout.json (not committed, not read until the program's final review)"
   },
   "data": {
+    "policy": "free data only: every request quoted first; nothing priced above $0.00 is fetched",
     "events": 671,
-    "windows_planned": 1650,
-    "windows_local": 0,
-    "events_with_open_window": 0,
+    "bar_files_planned": 550,
+    "bar_files_local": 0,
+    "events_with_bars_and_arrival_book": 0,
     "events_priced_for_participation": 0,
-    "by_split_open_window": {
+    "not_simulated": {
+      "no_window": 671
+    },
+    "by_split_simulated": {
       "train": 0,
       "validate": 0
     },
     "data_cost_incurred_usd": 0.0,
     "quoted_planned_total_usd": null,
-    "approvals": []
+    "quoted_refused_above_zero": null,
+    "downloads": []
   },
   "h4_opening_cross": {
     "definition": "Official opening cross on the listing venue (statistics stat_type 1: price and matched shares). An order is feasible when it is at least one whole share and at most 5% of the cross. account: 2.5% of a $50,000 account in whole shares at the official open. replay: the account order capped at 0.1% of the prior 20-session split-adjusted venue ADV, the frozen replay's sizing. The closing cross is read the same way for the cover.",
@@ -2651,18 +2660,17 @@
       }
     }
   },
-  "h2_passive_offer_under_ssr": {
-    "definition": "Restricted sessions (cached Nasdaq SSR state at the entry open): a short-sale offer of the modeled size rests at the listing-venue best offer from the first valid book at or after 1s past the scheduled open, judged within 15 minutes. Fills only from buyer-initiated prints at or above the offer after the displayed queue ahead is consumed; the offer is re-priced above the bid whenever the bid reaches it. Unrestricted sessions are run the same way as a comparison only.",
-    "primary": "account_50k/conservative",
+  "h18_passive_offer_under_ssr": {
+    "definition": "Restricted sessions (cached Nasdaq SSR state at the entry open): a short-sale offer of the modeled size rests at the listing-venue best offer of the cached book one second after the scheduled open (thirty seconds when the one-second book is missing), behind that level's displayed size, judged within 15 minutes. Each later one-second bar's volume is spread evenly over its tick prices; the part at or above the offer depletes the queue ahead and then fills the order at the offer price. Unrestricted sessions are run the same way as a comparison only.",
+    "primary": "account_50k/bars",
     "orders": {
       "account_50k": "1,250 USD at the arrival midpoint, whole shares",
       "account_250k": "6,250 USD at the arrival midpoint, whole shares",
       "account_1m": "25,000 USD at the arrival midpoint, whole shares",
       "replay": "the $50k order capped at 0.1% of prior ADV"
     },
-    "cancel_models": {
-      "conservative": "cancellations are behind us; displayed size at our price bounds the queue ahead",
-      "pro_rata": "cancellations at our price reduce the queue ahead in proportion"
+    "fill_models": {
+      "bars": "one-second bars; no cancellations credited, no re-pricing; fills at or above the offer count (upper bound on the fill rate)"
     },
     "by_ssr_state": {
       "restricted": {
@@ -2686,7 +2694,18 @@
             "fill_fraction_mean": null,
             "partially_filled": 0,
             "repriced_under_ssr": 0,
+            "fills_with_market_above_offer": 0,
+            "placed_at_30s": 0,
             "order_shares": {
+              "n": 0,
+              "mean": null,
+              "median": null,
+              "p10": null,
+              "p25": null,
+              "p75": null,
+              "p90": null
+            },
+            "queue_ahead_shares": {
               "n": 0,
               "mean": null,
               "median": null,
@@ -2723,7 +2742,7 @@
               "p90": null
             },
             "adverse_selection_5m": {
-              "definition": "midpoint five minutes after the fill minus the fill price, over the arrival midpoint; positive is adverse to the short",
+              "definition": "last bar close five minutes after the fill minus the fill price, over the arrival midpoint; positive is adverse to the short",
               "n": 0,
               "mean": null,
               "median": null,
@@ -2795,7 +2814,18 @@
             "fill_fraction_mean": null,
             "partially_filled": 0,
             "repriced_under_ssr": 0,
+            "fills_with_market_above_offer": 0,
+            "placed_at_30s": 0,
             "order_shares": {
+              "n": 0,
+              "mean": null,
+              "median": null,
+              "p10": null,
+              "p25": null,
+              "p75": null,
+              "p90": null
+            },
+            "queue_ahead_shares": {
               "n": 0,
               "mean": null,
               "median": null,
@@ -2832,7 +2862,7 @@
               "p90": null
             },
             "adverse_selection_5m": {
-              "definition": "midpoint five minutes after the fill minus the fill price, over the arrival midpoint; positive is adverse to the short",
+              "definition": "last bar close five minutes after the fill minus the fill price, over the arrival midpoint; positive is adverse to the short",
               "n": 0,
               "mean": null,
               "median": null,
@@ -2904,7 +2934,18 @@
             "fill_fraction_mean": null,
             "partially_filled": 0,
             "repriced_under_ssr": 0,
+            "fills_with_market_above_offer": 0,
+            "placed_at_30s": 0,
             "order_shares": {
+              "n": 0,
+              "mean": null,
+              "median": null,
+              "p10": null,
+              "p25": null,
+              "p75": null,
+              "p90": null
+            },
+            "queue_ahead_shares": {
               "n": 0,
               "mean": null,
               "median": null,
@@ -2941,7 +2982,7 @@
               "p90": null
             },
             "adverse_selection_5m": {
-              "definition": "midpoint five minutes after the fill minus the fill price, over the arrival midpoint; positive is adverse to the short",
+              "definition": "last bar close five minutes after the fill minus the fill price, over the arrival midpoint; positive is adverse to the short",
               "n": 0,
               "mean": null,
               "median": null,
@@ -3013,7 +3054,18 @@
             "fill_fraction_mean": null,
             "partially_filled": 0,
             "repriced_under_ssr": 0,
+            "fills_with_market_above_offer": 0,
+            "placed_at_30s": 0,
             "order_shares": {
+              "n": 0,
+              "mean": null,
+              "median": null,
+              "p10": null,
+              "p25": null,
+              "p75": null,
+              "p90": null
+            },
+            "queue_ahead_shares": {
               "n": 0,
               "mean": null,
               "median": null,
@@ -3050,7 +3102,7 @@
               "p90": null
             },
             "adverse_selection_5m": {
-              "definition": "midpoint five minutes after the fill minus the fill price, over the arrival midpoint; positive is adverse to the short",
+              "definition": "last bar close five minutes after the fill minus the fill price, over the arrival midpoint; positive is adverse to the short",
               "n": 0,
               "mean": null,
               "median": null,
@@ -3122,7 +3174,18 @@
             "fill_fraction_mean": null,
             "partially_filled": 0,
             "repriced_under_ssr": 0,
+            "fills_with_market_above_offer": 0,
+            "placed_at_30s": 0,
             "order_shares": {
+              "n": 0,
+              "mean": null,
+              "median": null,
+              "p10": null,
+              "p25": null,
+              "p75": null,
+              "p90": null
+            },
+            "queue_ahead_shares": {
               "n": 0,
               "mean": null,
               "median": null,
@@ -3159,7 +3222,7 @@
               "p90": null
             },
             "adverse_selection_5m": {
-              "definition": "midpoint five minutes after the fill minus the fill price, over the arrival midpoint; positive is adverse to the short",
+              "definition": "last bar close five minutes after the fill minus the fill price, over the arrival midpoint; positive is adverse to the short",
               "n": 0,
               "mean": null,
               "median": null,
@@ -3231,7 +3294,18 @@
             "fill_fraction_mean": null,
             "partially_filled": 0,
             "repriced_under_ssr": 0,
+            "fills_with_market_above_offer": 0,
+            "placed_at_30s": 0,
             "order_shares": {
+              "n": 0,
+              "mean": null,
+              "median": null,
+              "p10": null,
+              "p25": null,
+              "p75": null,
+              "p90": null
+            },
+            "queue_ahead_shares": {
               "n": 0,
               "mean": null,
               "median": null,
@@ -3268,7 +3342,7 @@
               "p90": null
             },
             "adverse_selection_5m": {
-              "definition": "midpoint five minutes after the fill minus the fill price, over the arrival midpoint; positive is adverse to the short",
+              "definition": "last bar close five minutes after the fill minus the fill price, over the arrival midpoint; positive is adverse to the short",
               "n": 0,
               "mean": null,
               "median": null,
@@ -3340,7 +3414,18 @@
             "fill_fraction_mean": null,
             "partially_filled": 0,
             "repriced_under_ssr": 0,
+            "fills_with_market_above_offer": 0,
+            "placed_at_30s": 0,
             "order_shares": {
+              "n": 0,
+              "mean": null,
+              "median": null,
+              "p10": null,
+              "p25": null,
+              "p75": null,
+              "p90": null
+            },
+            "queue_ahead_shares": {
               "n": 0,
               "mean": null,
               "median": null,
@@ -3377,7 +3462,7 @@
               "p90": null
             },
             "adverse_selection_5m": {
-              "definition": "midpoint five minutes after the fill minus the fill price, over the arrival midpoint; positive is adverse to the short",
+              "definition": "last bar close five minutes after the fill minus the fill price, over the arrival midpoint; positive is adverse to the short",
               "n": 0,
               "mean": null,
               "median": null,
@@ -3451,7 +3536,18 @@
             "fill_fraction_mean": null,
             "partially_filled": 0,
             "repriced_under_ssr": 0,
+            "fills_with_market_above_offer": 0,
+            "placed_at_30s": 0,
             "order_shares": {
+              "n": 0,
+              "mean": null,
+              "median": null,
+              "p10": null,
+              "p25": null,
+              "p75": null,
+              "p90": null
+            },
+            "queue_ahead_shares": {
               "n": 0,
               "mean": null,
               "median": null,
@@ -3488,7 +3584,7 @@
               "p90": null
             },
             "adverse_selection_5m": {
-              "definition": "midpoint five minutes after the fill minus the fill price, over the arrival midpoint; positive is adverse to the short",
+              "definition": "last bar close five minutes after the fill minus the fill price, over the arrival midpoint; positive is adverse to the short",
               "n": 0,
               "mean": null,
               "median": null,
@@ -3560,7 +3656,18 @@
             "fill_fraction_mean": null,
             "partially_filled": 0,
             "repriced_under_ssr": 0,
+            "fills_with_market_above_offer": 0,
+            "placed_at_30s": 0,
             "order_shares": {
+              "n": 0,
+              "mean": null,
+              "median": null,
+              "p10": null,
+              "p25": null,
+              "p75": null,
+              "p90": null
+            },
+            "queue_ahead_shares": {
               "n": 0,
               "mean": null,
               "median": null,
@@ -3597,7 +3704,7 @@
               "p90": null
             },
             "adverse_selection_5m": {
-              "definition": "midpoint five minutes after the fill minus the fill price, over the arrival midpoint; positive is adverse to the short",
+              "definition": "last bar close five minutes after the fill minus the fill price, over the arrival midpoint; positive is adverse to the short",
               "n": 0,
               "mean": null,
               "median": null,
@@ -3669,7 +3776,18 @@
             "fill_fraction_mean": null,
             "partially_filled": 0,
             "repriced_under_ssr": 0,
+            "fills_with_market_above_offer": 0,
+            "placed_at_30s": 0,
             "order_shares": {
+              "n": 0,
+              "mean": null,
+              "median": null,
+              "p10": null,
+              "p25": null,
+              "p75": null,
+              "p90": null
+            },
+            "queue_ahead_shares": {
               "n": 0,
               "mean": null,
               "median": null,
@@ -3706,7 +3824,7 @@
               "p90": null
             },
             "adverse_selection_5m": {
-              "definition": "midpoint five minutes after the fill minus the fill price, over the arrival midpoint; positive is adverse to the short",
+              "definition": "last bar close five minutes after the fill minus the fill price, over the arrival midpoint; positive is adverse to the short",
               "n": 0,
               "mean": null,
               "median": null,
@@ -3778,7 +3896,18 @@
             "fill_fraction_mean": null,
             "partially_filled": 0,
             "repriced_under_ssr": 0,
+            "fills_with_market_above_offer": 0,
+            "placed_at_30s": 0,
             "order_shares": {
+              "n": 0,
+              "mean": null,
+              "median": null,
+              "p10": null,
+              "p25": null,
+              "p75": null,
+              "p90": null
+            },
+            "queue_ahead_shares": {
               "n": 0,
               "mean": null,
               "median": null,
@@ -3815,7 +3944,7 @@
               "p90": null
             },
             "adverse_selection_5m": {
-              "definition": "midpoint five minutes after the fill minus the fill price, over the arrival midpoint; positive is adverse to the short",
+              "definition": "last bar close five minutes after the fill minus the fill price, over the arrival midpoint; positive is adverse to the short",
               "n": 0,
               "mean": null,
               "median": null,
@@ -3896,7 +4025,18 @@
             "fill_fraction_mean": null,
             "partially_filled": 0,
             "repriced_under_ssr": 0,
+            "fills_with_market_above_offer": 0,
+            "placed_at_30s": 0,
             "order_shares": {
+              "n": 0,
+              "mean": null,
+              "median": null,
+              "p10": null,
+              "p25": null,
+              "p75": null,
+              "p90": null
+            },
+            "queue_ahead_shares": {
               "n": 0,
               "mean": null,
               "median": null,
@@ -3933,7 +4073,7 @@
               "p90": null
             },
             "adverse_selection_5m": {
-              "definition": "midpoint five minutes after the fill minus the fill price, over the arrival midpoint; positive is adverse to the short",
+              "definition": "last bar close five minutes after the fill minus the fill price, over the arrival midpoint; positive is adverse to the short",
               "n": 0,
               "mean": null,
               "median": null,
@@ -4005,7 +4145,18 @@
             "fill_fraction_mean": null,
             "partially_filled": 0,
             "repriced_under_ssr": 0,
+            "fills_with_market_above_offer": 0,
+            "placed_at_30s": 0,
             "order_shares": {
+              "n": 0,
+              "mean": null,
+              "median": null,
+              "p10": null,
+              "p25": null,
+              "p75": null,
+              "p90": null
+            },
+            "queue_ahead_shares": {
               "n": 0,
               "mean": null,
               "median": null,
@@ -4042,7 +4193,7 @@
               "p90": null
             },
             "adverse_selection_5m": {
-              "definition": "midpoint five minutes after the fill minus the fill price, over the arrival midpoint; positive is adverse to the short",
+              "definition": "last bar close five minutes after the fill minus the fill price, over the arrival midpoint; positive is adverse to the short",
               "n": 0,
               "mean": null,
               "median": null,
@@ -4114,7 +4265,18 @@
             "fill_fraction_mean": null,
             "partially_filled": 0,
             "repriced_under_ssr": 0,
+            "fills_with_market_above_offer": 0,
+            "placed_at_30s": 0,
             "order_shares": {
+              "n": 0,
+              "mean": null,
+              "median": null,
+              "p10": null,
+              "p25": null,
+              "p75": null,
+              "p90": null
+            },
+            "queue_ahead_shares": {
               "n": 0,
               "mean": null,
               "median": null,
@@ -4151,7 +4313,7 @@
               "p90": null
             },
             "adverse_selection_5m": {
-              "definition": "midpoint five minutes after the fill minus the fill price, over the arrival midpoint; positive is adverse to the short",
+              "definition": "last bar close five minutes after the fill minus the fill price, over the arrival midpoint; positive is adverse to the short",
               "n": 0,
               "mean": null,
               "median": null,
@@ -4223,7 +4385,18 @@
             "fill_fraction_mean": null,
             "partially_filled": 0,
             "repriced_under_ssr": 0,
+            "fills_with_market_above_offer": 0,
+            "placed_at_30s": 0,
             "order_shares": {
+              "n": 0,
+              "mean": null,
+              "median": null,
+              "p10": null,
+              "p25": null,
+              "p75": null,
+              "p90": null
+            },
+            "queue_ahead_shares": {
               "n": 0,
               "mean": null,
               "median": null,
@@ -4260,7 +4433,7 @@
               "p90": null
             },
             "adverse_selection_5m": {
-              "definition": "midpoint five minutes after the fill minus the fill price, over the arrival midpoint; positive is adverse to the short",
+              "definition": "last bar close five minutes after the fill minus the fill price, over the arrival midpoint; positive is adverse to the short",
               "n": 0,
               "mean": null,
               "median": null,
@@ -4332,7 +4505,18 @@
             "fill_fraction_mean": null,
             "partially_filled": 0,
             "repriced_under_ssr": 0,
+            "fills_with_market_above_offer": 0,
+            "placed_at_30s": 0,
             "order_shares": {
+              "n": 0,
+              "mean": null,
+              "median": null,
+              "p10": null,
+              "p25": null,
+              "p75": null,
+              "p90": null
+            },
+            "queue_ahead_shares": {
               "n": 0,
               "mean": null,
               "median": null,
@@ -4369,7 +4553,7 @@
               "p90": null
             },
             "adverse_selection_5m": {
-              "definition": "midpoint five minutes after the fill minus the fill price, over the arrival midpoint; positive is adverse to the short",
+              "definition": "last bar close five minutes after the fill minus the fill price, over the arrival midpoint; positive is adverse to the short",
               "n": 0,
               "mean": null,
               "median": null,
@@ -4441,7 +4625,18 @@
             "fill_fraction_mean": null,
             "partially_filled": 0,
             "repriced_under_ssr": 0,
+            "fills_with_market_above_offer": 0,
+            "placed_at_30s": 0,
             "order_shares": {
+              "n": 0,
+              "mean": null,
+              "median": null,
+              "p10": null,
+              "p25": null,
+              "p75": null,
+              "p90": null
+            },
+            "queue_ahead_shares": {
               "n": 0,
               "mean": null,
               "median": null,
@@ -4478,7 +4673,7 @@
               "p90": null
             },
             "adverse_selection_5m": {
-              "definition": "midpoint five minutes after the fill minus the fill price, over the arrival midpoint; positive is adverse to the short",
+              "definition": "last bar close five minutes after the fill minus the fill price, over the arrival midpoint; positive is adverse to the short",
               "n": 0,
               "mean": null,
               "median": null,
@@ -4550,7 +4745,18 @@
             "fill_fraction_mean": null,
             "partially_filled": 0,
             "repriced_under_ssr": 0,
+            "fills_with_market_above_offer": 0,
+            "placed_at_30s": 0,
             "order_shares": {
+              "n": 0,
+              "mean": null,
+              "median": null,
+              "p10": null,
+              "p25": null,
+              "p75": null,
+              "p90": null
+            },
+            "queue_ahead_shares": {
               "n": 0,
               "mean": null,
               "median": null,
@@ -4587,7 +4793,7 @@
               "p90": null
             },
             "adverse_selection_5m": {
-              "definition": "midpoint five minutes after the fill minus the fill price, over the arrival midpoint; positive is adverse to the short",
+              "definition": "last bar close five minutes after the fill minus the fill price, over the arrival midpoint; positive is adverse to the short",
               "n": 0,
               "mean": null,
               "median": null,
@@ -4661,7 +4867,18 @@
             "fill_fraction_mean": null,
             "partially_filled": 0,
             "repriced_under_ssr": 0,
+            "fills_with_market_above_offer": 0,
+            "placed_at_30s": 0,
             "order_shares": {
+              "n": 0,
+              "mean": null,
+              "median": null,
+              "p10": null,
+              "p25": null,
+              "p75": null,
+              "p90": null
+            },
+            "queue_ahead_shares": {
               "n": 0,
               "mean": null,
               "median": null,
@@ -4698,7 +4915,7 @@
               "p90": null
             },
             "adverse_selection_5m": {
-              "definition": "midpoint five minutes after the fill minus the fill price, over the arrival midpoint; positive is adverse to the short",
+              "definition": "last bar close five minutes after the fill minus the fill price, over the arrival midpoint; positive is adverse to the short",
               "n": 0,
               "mean": null,
               "median": null,
@@ -4770,7 +4987,18 @@
             "fill_fraction_mean": null,
             "partially_filled": 0,
             "repriced_under_ssr": 0,
+            "fills_with_market_above_offer": 0,
+            "placed_at_30s": 0,
             "order_shares": {
+              "n": 0,
+              "mean": null,
+              "median": null,
+              "p10": null,
+              "p25": null,
+              "p75": null,
+              "p90": null
+            },
+            "queue_ahead_shares": {
               "n": 0,
               "mean": null,
               "median": null,
@@ -4807,7 +5035,7 @@
               "p90": null
             },
             "adverse_selection_5m": {
-              "definition": "midpoint five minutes after the fill minus the fill price, over the arrival midpoint; positive is adverse to the short",
+              "definition": "last bar close five minutes after the fill minus the fill price, over the arrival midpoint; positive is adverse to the short",
               "n": 0,
               "mean": null,
               "median": null,
@@ -4879,7 +5107,18 @@
             "fill_fraction_mean": null,
             "partially_filled": 0,
             "repriced_under_ssr": 0,
+            "fills_with_market_above_offer": 0,
+            "placed_at_30s": 0,
             "order_shares": {
+              "n": 0,
+              "mean": null,
+              "median": null,
+              "p10": null,
+              "p25": null,
+              "p75": null,
+              "p90": null
+            },
+            "queue_ahead_shares": {
               "n": 0,
               "mean": null,
               "median": null,
@@ -4916,7 +5155,7 @@
               "p90": null
             },
             "adverse_selection_5m": {
-              "definition": "midpoint five minutes after the fill minus the fill price, over the arrival midpoint; positive is adverse to the short",
+              "definition": "last bar close five minutes after the fill minus the fill price, over the arrival midpoint; positive is adverse to the short",
               "n": 0,
               "mean": null,
               "median": null,
@@ -4988,7 +5227,18 @@
             "fill_fraction_mean": null,
             "partially_filled": 0,
             "repriced_under_ssr": 0,
+            "fills_with_market_above_offer": 0,
+            "placed_at_30s": 0,
             "order_shares": {
+              "n": 0,
+              "mean": null,
+              "median": null,
+              "p10": null,
+              "p25": null,
+              "p75": null,
+              "p90": null
+            },
+            "queue_ahead_shares": {
               "n": 0,
               "mean": null,
               "median": null,
@@ -5025,7 +5275,7 @@
               "p90": null
             },
             "adverse_selection_5m": {
-              "definition": "midpoint five minutes after the fill minus the fill price, over the arrival midpoint; positive is adverse to the short",
+              "definition": "last bar close five minutes after the fill minus the fill price, over the arrival midpoint; positive is adverse to the short",
               "n": 0,
               "mean": null,
               "median": null,
@@ -5087,8 +5337,8 @@
       }
     }
   },
-  "h3_participation_cost": {
-    "definition": "Sell by taking a fixed share of every continuous listing-venue print from the first valid book after the open for 60 minutes; cover the same way over the last 60 minutes with any residual at the official closing print. Fill prices are the print prices. Cost = (entry arrival mid - sell VWAP) + (buy VWAP - exit arrival mid) + crossing fraction x the volume-weighted half-spread at the fill times, all over the entry arrival mid. capacity: the order is the rate times the window's printed volume. account_*: a fixed order of 2.5% of the account at the arrival mid; completion within the window is reported.",
+  "h19_participation_cost": {
+    "definition": "Sell by taking a fixed share of every one-second listing-venue bar's volume (the opening cross removed) at the bar's range midpoint, from the cached arrival book after the open for 60 minutes; cover the same way over the last 60 minutes with any residual at the official closing print. Cost = (entry arrival mid - sell VWAP) + (buy VWAP - exit arrival price) + crossing fraction x the cached half-spreads (open books for the entry leg, the close book for the cover), all over the entry arrival mid. capacity: the order is the rate times the window's volume. account_*: a fixed order of 2.5% of the account at the arrival mid; completion within the window is reported.",
     "primary": "capacity/0.01",
     "crossing_fractions": [
       1.0,
@@ -5135,7 +5385,7 @@
           "p75": null,
           "p90": null
         },
-        "exit_arrival_mid_vs_close_print": {
+        "exit_arrival_price_vs_close_print": {
           "n": 0,
           "mean": null,
           "median": null,
@@ -5152,7 +5402,9 @@
           "p25": null,
           "p75": null,
           "p90": null
-        }
+        },
+        "cross_removed_from_bars": 0,
+        "exit_spread_from_open_books": 0
       },
       "validate": {
         "open_print_vs_arrival_mid": {
@@ -5164,7 +5416,7 @@
           "p75": null,
           "p90": null
         },
-        "exit_arrival_mid_vs_close_print": {
+        "exit_arrival_price_vs_close_print": {
           "n": 0,
           "mean": null,
           "median": null,
@@ -5181,7 +5433,9 @@
           "p25": null,
           "p75": null,
           "p90": null
-        }
+        },
+        "cross_removed_from_bars": 0,
+        "exit_spread_from_open_books": 0
       },
       "pooled_train_validate": {
         "open_print_vs_arrival_mid": {
@@ -5193,7 +5447,7 @@
           "p75": null,
           "p90": null
         },
-        "exit_arrival_mid_vs_close_print": {
+        "exit_arrival_price_vs_close_print": {
           "n": 0,
           "mean": null,
           "median": null,
@@ -5210,7 +5464,9 @@
           "p25": null,
           "p75": null,
           "p90": null
-        }
+        },
+        "cross_removed_from_bars": 0,
+        "exit_spread_from_open_books": 0
       }
     }
   },
@@ -6269,19 +6525,25 @@
         "share": 0.9218106995884774
       }
     },
-    "H2": {
+    "H18": {
       "registered_success": "fill rate >= 50% and adverse selection < 0.5% on validation",
       "registered_kill": "fill rate under 25%",
-      "assessment": "Not measured: no restricted validation session has a pulled mbp-1 window.",
+      "assessment": "Not measured: no restricted validation session has a bar file and a cached arrival book.",
       "train": null,
       "validate": null
     },
-    "H3": {
+    "H19": {
       "registered_success": "under 1.5% round trip on validation",
       "registered_kill": "cost exceeds the open-to-close benchmark",
-      "assessment": "Not measured: no validation session has pulled trades and mbp-1 windows.",
+      "assessment": "Not measured: no validation session has a bar file and a cached arrival book.",
       "train": null,
       "validate": null
+    },
+    "H2": {
+      "assessment": "Superseded by H18: the registered cost model needs mbp-1 and trade prints, which are not free on this plan and are not bought."
+    },
+    "H3": {
+      "assessment": "Superseded by H19: the registered cost model needs mbp-1 and trade prints, which are not free on this plan and are not bought."
     }
   },
   "definitions": {
@@ -6290,20 +6552,21 @@
     "issuer_interval": "95% percentile interval from 2,000 whole-issuer (CIK) bootstrap draws; events of one issuer move together.",
     "feasible_share": "Share of events whose order is at least one whole share and at most 5% of the matched cross shares.",
     "fill_rate": "Share of simulated orders fully filled within 15 minutes of placement; partial fills are reported separately.",
-    "adverse_selection_5m": "Midpoint five minutes after completion minus the fill price, over the arrival midpoint; positive is adverse to the short.",
-    "round_trip_cost": "Entry shortfall + exit shortfall + crossing fraction x volume-weighted half-spread at the fill times, over the entry arrival midpoint; positive is a cost.",
-    "benchmark_minus_cost": "The same events' official open-to-close gross short return minus the round-trip cost; H3's kill branch reads this below zero.",
+    "adverse_selection_5m": "Last one-second bar close five minutes after completion minus the fill price, over the arrival midpoint; positive is adverse to the short.",
+    "round_trip_cost": "Entry shortfall + exit shortfall + crossing fraction x the cached half-spreads, over the entry arrival midpoint; positive is a cost.",
+    "benchmark_minus_cost": "The same events' official open-to-close gross short return minus the round-trip cost; H19's kill branch reads this below zero.",
     "commission_fraction": "Round-trip commission, venue fees and clearing (regulatory pass-through excluded) over the entry notional."
   },
   "limits": [
-    "Listing-venue books and prints only: not consolidated NBBO or consolidated volume; the queue model sees displayed size only, so hidden and midpoint liquidity ahead of the order is invisible and fill rates are upper bounds in that respect.",
-    "Cancellations cannot be attributed to a queue position; the primary model assumes they sit behind the order and bounds the queue ahead by the displayed size, the pro-rata variant is reported beside it.",
-    "The participation model follows printed volume with no market impact beyond the spread-crossing term; at 5% of volume that is optimistic and the cost curve across rates reflects timing and capacity only.",
-    "Arrival is the first valid book at or after one second past the scheduled open; the official opening print is the auction, not the first continuous book, and the timing difference is reported separately.",
-    "Halts inside a window simply contribute no prints; LULD and news halts are not modeled as events.",
+    "Free data only: one-second listing-venue bars and the opening and closing books cached by the earlier quote study; not consolidated volume or NBBO, and no intraday quotes between those books.",
+    "The bar fill model spreads each second's volume evenly over the bar's tick prices and credits no cancellations and no re-pricing; fills counted on bars that traded entirely above the offer may in reality have been re-priced orders, so the fill rate is an upper bound and the fill price a lower bound against the book-level model that was not run.",
+    "Hidden and midpoint liquidity ahead of the order is invisible in displayed size, which also pushes the fill rate up.",
+    "The participation model follows printed volume with no market impact beyond the spread term; at 5% of volume that is optimistic, and the spread term uses the open and close books rather than the spread at each fill time.",
+    "Arrival is the cached book one second after the scheduled open (thirty seconds where that record is missing); the exit arrival is the first bar at or after 15:00, up to five minutes later for names that did not print at 15:00.",
+    "Halts inside a window simply contribute no bars; LULD and news halts are not modeled as events.",
     "Commission schedules are declared constants (IBKR fixed and tiered at the lowest tier with representative exchange fees); regulatory pass-through uses today's published rates for every year.",
     "The opening-cross feasibility is a size test at the printed price; it does not establish that an auction order of that size would not have moved the cross price.",
-    "No borrow, locate or margin assumption enters any number here; H2's realized return to the close is gross of borrow and commissions.",
+    "No borrow, locate or margin assumption enters any number here; H18's realized return to the close is gross of borrow and commissions.",
     "Holdout results exist only under local/holdout and were not read while writing this document; nothing here was selected on them."
   ]
 }
