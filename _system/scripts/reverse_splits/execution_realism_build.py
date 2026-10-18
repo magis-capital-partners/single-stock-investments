@@ -796,17 +796,23 @@ def _h3_event(r: dict, bars: dict | None, books: dict | None, cross: dict, frame
     import numpy as np
 
     k = int(np.searchsorted(bars["ts"], x_start, side="left"))
-    if k >= len(bars["ts"]) or bars["ts"][k] > x_start + EXIT_ARRIVAL_SEARCH_SECONDS * 10**9:
+    if k < len(bars["ts"]) and bars["ts"][k] <= x_start + EXIT_ARRIVAL_SEARCH_SECONDS * 10**9:
+        m1 = (float(bars["high"][k]) + float(bars["low"][k])) / 2
+        exit_offset = (int(bars["ts"][k]) - x_start) / 1e9
+    elif k > 0 and bars["ts"][k - 1] >= x_start - er.EXIT_WINDOW_SECONDS * 10**9:
+        # Nothing printed just after 15:00: the prevailing price is the last bar's close before it.
+        m1 = float(bars["close"][k - 1])
+        exit_offset = (int(bars["ts"][k - 1]) - x_start) / 1e9
+    else:
         row["status"] = "no_exit_arrival_bar"
         return row
-    m1 = (float(bars["high"][k]) + float(bars["low"][k])) / 2
     volume, cross_removed = remove_cross(bars, cross.get("open_cross_price"), cross.get("open_cross_shares"), opened)
     close_px = cross.get("close_cross_price") or r["close"]
     hs_open = [h for h in (_half_spread(books.get("open_1"), m0), _half_spread(books.get("open_30"), m0)) if h is not None]
     hs_entry = float(sum(hs_open) / len(hs_open))
     hs_close = _half_spread(books.get("close"), m0)
     row.update(status="priced", arrival_mid=m0, exit_arrival_mid=m1, official_close=close_px, cross_removed_from_bars=cross_removed,
-               exit_arrival_offset_seconds=(int(bars["ts"][k]) - x_start) / 1e9,
+               exit_arrival_offset_seconds=exit_offset,
                entry_half_spread=hs_entry, exit_half_spread=hs_close if hs_close is not None else hs_entry,
                exit_spread_from="close_book" if hs_close is not None else "open_books",
                first_hour_volume=float(volume[(bars["ts"] >= opened) & (bars["ts"] <= entry_end)].sum()),

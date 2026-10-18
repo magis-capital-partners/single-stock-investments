@@ -318,37 +318,41 @@ no borrow, fill, spread or commission assumption enters any Phase 0 number.
 Workstream A of `_system/proposals/shorts_alpha_program_2026-10-18.md` tests
 the three fill-model conventions that the proposal says consume the gross
 edge: the opening auction as a size lever (H4), passive offers under Rule 201
-on restricted sessions (H2) and participation over time instead of a 0.1%-of-ADV
-cap (H3), with IBKR tiered commissions beside the fixed schedule as a declared
-variant. Code: `reverse_splits/execution_realism.py` (events, requests, the
-data cost gate) and `reverse_splits/execution_realism_build.py` (analysis and
+on restricted sessions (H18, the free-data form of H2) and participation over
+time instead of a 0.1%-of-ADV cap (H19, the free-data form of H3), with IBKR
+tiered commissions beside the fixed schedule as a declared variant. Code:
+`reverse_splits/execution_realism.py` (events, requests, the free-only data
+gate) and `reverse_splits/execution_realism_build.py` (analysis and
 publication); tests in `tests/reverse_splits/test_rs_execution_realism.py`.
 From `_system/scripts`:
 
 ```powershell
-python -m reverse_splits.execution_realism quote                      # price every request; downloads nothing
-python -m reverse_splits.execution_realism download --approved-usd X  # refused unless the quoted sum fits X
+python -m reverse_splits.execution_realism quote      # price every request; downloads nothing; resumable
+python -m reverse_splits.execution_realism download   # fetches only requests quoted at exactly $0.00
 python -m reverse_splits.execution_realism build --publish
 ```
 
 | File | Purpose |
 |---|---|
-| `execution_realism.json` | Aggregate results for H2, H3 and H4 on the train (2018-05 to 2022-12) and validation (2023 to 2024) splits, each read against its registered criteria, plus the commission variants and the data coverage and cost actually incurred. |
-| `execution_realism_manifest.json` | Hashes of the output, the registry, both modules, the frozen run inputs, every statistics file and every session window read; the list of hypotheses the build actually measured; the approvals under which data was bought. |
+| `execution_realism.json` | Aggregate results for H4, H18 and H19 on the train (2018-05 to 2022-12) and validation (2023 to 2024) splits, each read against its registered criteria, plus the commission variants and the data coverage and cost actually incurred ($0). |
+| `execution_realism_manifest.json` | Hashes of the output, the registry, both modules, the frozen run inputs, the cached books, every statistics file and every bar file read; the list of hypotheses the build actually measured; the download receipts. |
 | `local/holdout/execution_realism_holdout.json` | Sealed: the same results for entry sessions from 2025-01-01, not committed and not read until the program's final review. |
-| `local/workstream_a/` | Per-event rows (`execution_realism_full.local.json`), `quotes.json` (every request with its quote) and `approvals.json`. |
-| `local/raw/databento/{venue}/{trades,mbp-1}/sessions/` | The licensed session windows, one file per venue-session with its `.ok.json` receipt. Never committed. |
+| `local/workstream_a/` | Per-event rows (`execution_realism_full.local.json`), `quotes.json` (every request with its quote), `downloads.json` and the archived paid-plan quote that was declined. |
+| `local/raw/databento/{venue}/ohlcv-1s/sessions/` | The free one-second bar files, one per venue-session with its `.ok.json` receipt. Never committed. |
 
-**The data cost gate.** H2 and H3 need `trades` and `mbp-1` for each
-event's entry session on its listing venue: 1,650 planned requests over 550
-venue-sessions (trades for the session; mbp-1 for the first and last 65
-minutes), plus a full-session mbp-1 variant quoted only for comparison. Every
-request is priced with `metadata.get_cost` before anything is fetched. If the
-sum exceeds $0.00 nothing is downloaded until a human passes the amount back
-as `download --approved-usd`; each fetch is then capped at its own quote, and
-the approval, the quoted total and the cost incurred are written to the
-manifest. The build runs on whatever windows are local and counts the rest as
-"no data" rather than dropping them silently.
+**Free data only.** The plan as proposed needed `trades` and `mbp-1` for
+each event session; those were quoted at $0.32 for all 671 sessions and
+declined, and the rule since 2026-10-18 is that nothing priced above $0.00 is
+bought. On this plan `ohlcv-1s`, `ohlcv-1m`, `ohlcv-1h`, `statistics`, `status`
+and `definition` quote $0.00 on all three venues; every quote, trade and book
+schema does not. `quote` prices every request with `metadata.get_cost` and
+`download` fetches only those quoted at exactly $0.00, with no override; the
+refused count and the receipts are in the manifest. H2 and H3 are therefore
+`superseded` in `hypotheses.jsonl` by H18 and H19, which carry the same
+success and kill thresholds and an explicitly declared bar-based cost model
+(registered before the bars were pulled). The book-level queue model and the
+print-based participation pricer stay in `execution_realism_build.py` as
+tested reference code; they are not run.
 
 ### H4: the opening cross is not a size lever at $50k
 
@@ -382,18 +386,109 @@ order is a fifth of the median cross in 2023-2024, so an auction entry of the
 modeled size would itself set the print. The SSR state does not change the
 reading (restricted 19.6%, unrestricted 33.0%).
 
-### H2 and H3: pending the data approval
+### H18: a passive offer under SSR rarely fills in 15 minutes
 
-The queue model (`simulate_passive_offer`) and the participation pricer
-(`participation_leg`) are implemented and tested on synthetic books; their
-invariants are that nothing fills below the bid under SSR, nothing fills
-beyond buyer-initiated printed volume at or above the offer, cancellations are
-behind the order unless the displayed size says otherwise (a pro-rata variant
-is reported beside it), and a participation schedule takes a constant share of
-every continuous print. Both hypotheses stay `registered` in
-`hypotheses.jsonl` and read "Not measured" in `execution_realism.json` until
-the quoted session windows are approved and pulled; this section is updated
-with the measured results then.
+Inputs: one-second listing-venue bars for each event session (550 files,
+$0.00) and the opening and closing books the earlier quote study cached for
+every event (bid, ask and displayed sizes one second and thirty seconds after
+the open and one second before the close; 555, 647 and 636 valid books). The
+offer rests at the cached venue best offer one second after the open (thirty
+seconds where that book is missing), behind that level's displayed size. Each
+later second's volume is spread evenly over the bar's tick prices; the part
+at or above the offer depletes the queue ahead and then fills the order at
+the offer. No cancellations are credited and no re-pricing is modeled, so the
+fill rate is an upper bound against the book-level model and the fill price a
+lower bound. Adverse selection is the last bar close five minutes after
+completion minus the fill price, over the arrival midpoint.
+
+| Restricted sessions, $1,250 order | Train | Validate |
+|---|---|---|
+| Simulated (no arrival book) | 58 (6) | 149 (4) |
+| Filled within 15 minutes (issuer CI) | 48.3% [35.7%, 60.7%] | 22.1% [15.9%, 28.7%] |
+| of which on bars entirely above the offer (possible re-pricing) | 20 of 28 | 21 of 33 |
+| Partial fills; mean filled fraction | 5; 52% | 20; 25% |
+| Time to fill, median (p75) | 139 s (324 s) | 176 s (422 s) |
+| Displayed queue ahead, median; order, median | 166 sh; 330 sh | 53 sh; 337 sh |
+| Fill price over the arrival mid (the half-spread earned) | +1.12% | +1.15% |
+| Adverse selection, 5 min, mean (CI); median | +1.89% [+0.1%, +4.1%]; +0.48% | +0.75% [-0.9%, +2.2%]; +0.99% |
+| Unfilled: midpoint drift to the 15-minute deadline | -2.05% | -2.44% |
+| Filled: gross short return to the official close | +3.43% | +4.19% |
+
+The $1,250 order is six times the displayed size at the offer on validation,
+and buyers lift that much within 15 minutes in only a fifth of restricted
+sessions (2018-2021: 50% to 86% on small samples; 2022-2024: 18% to 35%).
+Unrestricted sessions fill less often still (30.6% train, 15.9% validate).
+The order the replay actually sized (median 9 shares) fills 31.3% of the
+time; a $6,250 order 13.4%; a $25,000 order 4.0%. While the offer waits, the
+midpoint falls about 2.4%: the fade happens without the position. Filled
+orders earn the half-spread and then give it back within five minutes
+(adverse selection +0.75% mean, +0.99% median on validation, above the 0.5%
+threshold).
+
+**Assessment.** H18's kill branch (fill rate under 25% on validation) is
+met at 22.1%, and the adverse-selection half of the success criterion fails
+as well. Rule 201 is a price constraint, as Phase 0 said, but resting at the
+offer is not the way through it at this order size: the displayed book at the
+open is too thin and the price moves away while the order waits.
+
+### H19: participation over time gives the edge away before it pays the spread
+
+A fixed share (1%, 2%, 5%) of every bar's volume from the arrival book for
+60 minutes, at the bar's range midpoint, with the opening cross removed by
+its statistics size (removed on every priced event); the cover is the same
+schedule over the last 60 minutes from the first bar at or after 15:00 (the
+last close before it when nothing printed within five minutes), any residual
+at the official closing print. Cost = entry shortfall + exit shortfall +
+crossing fraction x the cached half-spreads (open books for the entry, close
+book for the cover), over the entry arrival midpoint. The primary reading is
+the registered one: the order is 1% of the window's volume and every fill
+pays the half-spread.
+
+| 1% of first-hour volume, 634 priced events | Train (n 106) | Validate (n 233) |
+|---|---|---|
+| Entry shortfall (arrival mid minus sell VWAP) | +0.49% | +1.79% |
+| Exit shortfall (buy VWAP minus 15:00 price) | -0.25% | -0.07% |
+| Half-spreads, round trip (cached open and close books) | +1.72% | +2.73% |
+| Round-trip cost, crossing fraction 1.0 (issuer CI) | +1.96% [+0.8%, +3.0%] | +4.45% [+3.6%, +5.3%] |
+| Round-trip cost, crossing fraction 0.5 | +1.10% | +3.08% |
+| Open-to-close benchmark, same events | +2.28% | +3.77% |
+| Benchmark minus cost (CI) | +0.32% [-1.4%, +2.0%] | -0.68% [-2.1%, +0.7%] |
+| Realized short return, net of the spread term (CI) | +0.11% [-1.3%, +1.5%] | -0.21% [-1.5%, +1.1%] |
+| Position at 1%: median (IQR) | $432 ($140 to $1,723) | $190 ($56 to $545) |
+| Position at 5%: median | $2,162 | $952 |
+| Residual covered at the closing print | 34% | 34% |
+
+The cost per share does not depend on the rate under a print-following model
+(1%, 2% and 5% give the same VWAP); the rate sets capacity, and capacity is
+small: median first-hour volume is $53k on train and $20k on validation, so
+1% is a few hundred dollars per event and 5% is under $1,000. The entry
+shortfall is the fade itself: on validation the price falls 1.8% during the
+hour the schedule is still selling, before any spread is paid. By year the
+cost is 0% to 1% in 2018-2021 and 4.2% to 4.5% in 2022-2024 against
+benchmarks of 3.4% to 4.1%; by venue 2.8% on NYSE against a 1.1% benchmark
+and 3.9% on Nasdaq against 3.8%. A fixed $1,250 order completes within the
+hour in 35% of train and 15% of validation events at 1% (63% and 42% at 5%).
+The official open prints 0.2% to 0.4% below the one-second midpoint, so the
+auction is not the price lever either.
+
+**Assessment.** H19's kill branch is met on validation: the round-trip cost
+(4.45%) exceeds the same events' open-to-close benchmark (3.77%). Train sits
+between the thresholds (1.96% against 2.28%). With the crossing fraction at
+0.5 the validation cost is still 3.08%, above the 1.5% success line.
+
+### What workstream A says
+
+All three fill conventions the proposal expected to release the edge fail on
+validation with free data: the opening cross cannot absorb the order, a
+passive offer under SSR seldom fills before the fade happens, and spreading
+the order over the first hour converts most of the edge into shortfall before
+the spread is paid. The sessions the account replay skips under SSR carry the
+same gross return (Phase 0), but no execution modeled here collects it at
+$1,250 a name, let alone at $6,250 or $25,000. The proposal's own stop
+condition ("the SSR cohort and the participation cost curve both fail")
+applies to the execution side: capacity really is this edge's ceiling, and
+weight moves to breadth (workstream C). Everything above is an upper bound on
+fills and a model without impact, so the real numbers are worse, not better.
 
 ### Commissions as declared variants
 
@@ -411,8 +506,12 @@ reported separately and identical under both schedules:
 At the account order the fixed schedule is cheaper because the tiered
 take-fee ($0.0030/sh removing liquidity) outweighs the lower per-share rate;
 tiered only wins on the replay's tiny tickets, where the $1 minimum binds.
-Passive fills from H2 earn the tiered add-liquidity rebate only when the fill
-model fills; that line is produced once H2 is measured.
+Passive fills from H18 earn the tiered add-liquidity rebate only when the
+fill model fills: on the 43 train and 49 validation fills the round trip is
+0.27% / 0.30% fixed against 0.20% / 0.24% tiered, tiered cheaper on every
+one. The 1%-participation position (median 116 shares train, 38 validate)
+costs 0.82% / 1.19% fixed against 0.72% / 0.98% tiered: at these ticket sizes
+the fixed minimum is a material part of the cost either way.
 
 ## Original ledger schemas
 
