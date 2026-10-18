@@ -198,6 +198,15 @@ def test_ssr_reprices_the_offer_above_a_rising_bid():
     assert s3["filled_shares"] == 0 and s3["repriced"] == 1 and s3["final_offer"] == pytest.approx(5.02)
 
 
+def test_unsided_prints_are_classified_by_the_displayed_ask():
+    recs = [(0, "A", "B", 4.90, 100, 4.90, 5.00, 100, 100),
+            (5, "T", "N", 4.95, 500, 4.90, 5.00, 100, 100),    # a hidden print inside the spread: not ours
+            (6, "T", "N", 4.90, 500, 4.90, 5.00, 100, 100),    # at the bid: a seller
+            (10, "T", "N", 5.00, 150, 4.90, 5.00, 100, 100)]   # at the displayed ask: a buyer took 100 ahead, then 50 of ours
+    s = b.simulate_passive_offer(_book(recs), T0, 50, horizon_ns=900 * S)
+    assert s["fully_filled"] and s["time_to_fill_seconds"] == pytest.approx(10) and s["buyer_volume_at_or_above_offer"] == 150
+
+
 def test_arrival_requires_a_valid_book_and_an_order():
     bad = _book([(0, "A", "B", 5.00, 100, 5.00, 5.00, 100, 100), (70, "A", "B", 4.90, 100, 4.90, 5.00, 100, 100)])
     assert b.simulate_passive_offer(bad, T0, 100, horizon_ns=900 * S)["status"] == "no_valid_book_at_arrival"
@@ -235,13 +244,19 @@ def test_participation_takes_a_constant_share_of_prints_until_done():
     assert b.participation_leg(prints, None, T0, T0 + 3600 * S, 0.02, order_shares=None, arrival_mid=5.0)["half_spread_vw"] is None
 
 
-def test_print_arrays_drop_crosses_and_book_arrays_select_the_symbol():
+def test_print_arrays_drop_only_the_crosses_and_book_arrays_select_the_symbol():
     import pandas as pd
 
-    idx = pd.Index([T0 + S, T0 + 2 * S, T0 + 3 * S], name="ts_recv")
-    frame = pd.DataFrame({"symbol": ["AAA", "AAA", "BBB"], "side": ["N", "B", "B"], "price": [5.0, 5.1, 9.0], "size": [1000, 100, 100]}, index=idx)
-    p = b._print_arrays(frame, "AAA")
-    assert list(p["size"]) == [100] and b._print_arrays(frame, "ZZZ") is None
+    idx = pd.Index([T0 + S, T0 + 2 * S, T0 + 600 * S, T0 + 700 * S, T0 + 3 * S], name="ts_recv")
+    frame = pd.DataFrame({"symbol": ["AAA", "AAA", "AAA", "AAA", "BBB"], "side": ["N", "B", "N", "N", "B"],
+                          "price": [5.0, 5.1, 5.2, 5.3, 9.0], "size": [1000, 100, 50, 2000, 100]}, index=idx)
+    cross = {"open_cross_price": 5.0, "open_cross_shares": 1000, "close_cross_price": 5.3, "close_cross_shares": 2000}
+    p = b._print_arrays(frame, "AAA", opened_ns=T0, closed_ns=T0 + 7200 * S, cross=cross)
+    assert list(p["size"]) == [100, 50] and p["crosses_removed"] == 2          # hidden print at 600s kept; both crosses matched
+    guard_only = b._print_arrays(frame, "AAA", opened_ns=T0, closed_ns=T0 + 7200 * S)
+    assert list(guard_only["size"]) == [100, 50, 2000]                       # the close cross is not within the guard
+    assert list(b._print_arrays(frame, "AAA")["size"]) == [1000, 100, 50, 2000]
+    assert b._print_arrays(frame, "ZZZ") is None
     cols = {"symbol": ["AAA", "BBB"], "action": ["A", "A"], "side": ["B", "B"], "price": [4.9, 9.0], "size": [1, 1], "flags": [128, 128],
             "bid_px_00": [4.9, 8.9], "ask_px_00": [5.0, 9.1], "bid_sz_00": [1, 1], "ask_sz_00": [2, 2]}
     bk = b._book_arrays(pd.DataFrame(cols, index=pd.Index([T0, T0 + S], name="ts_recv")), "BBB")
