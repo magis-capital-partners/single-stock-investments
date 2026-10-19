@@ -8,6 +8,7 @@ from __future__ import annotations
 
 import argparse
 import json
+import os
 import time
 import urllib.error
 import urllib.request
@@ -47,10 +48,14 @@ def collect_cusips() -> set[str]:
 
 def openfigi_map(cusips: list[str]) -> dict[str, str]:
     payload = [{"idType": "ID_CUSIP", "idValue": c} for c in cusips]
+    headers = {"Content-Type": "application/json", "User-Agent": "Magis Capital Research drew@magiscapitalpartners.com"}
+    api_key = (os.environ.get("OPENFIGI_API_KEY") or "").strip()
+    if api_key:
+        headers["X-OPENFIGI-APIKEY"] = api_key
     req = urllib.request.Request(
         OPENFIGI_URL,
         data=json.dumps(payload).encode("utf-8"),
-        headers={"Content-Type": "application/json", "User-Agent": "MarvinResearch"},
+        headers=headers,
         method="POST",
     )
     try:
@@ -119,7 +124,7 @@ def main() -> int:
             existing.update(mapped)
             print(f"  batch {i // BATCH + 1}: mapped {len(mapped)}/{len(batch)}")
             time.sleep(SLEEP)
-        save_cusip_map(existing)
+        save_cusip_map(existing, source="openfigi")
 
     n = rewrite_full_records(existing)
     print(f"Rewrote tickers on {n} fund latest.json files; map size={len(existing)}")

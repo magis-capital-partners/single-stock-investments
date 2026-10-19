@@ -120,7 +120,7 @@ class IndexWiringTests(unittest.TestCase):
         route = re.search(r"\^#\\/ideas\\/situations\(\?:\\/\(([^)]+)\)\)", INDEX)
         self.assertIsNotNone(route, "situations route regex")
         lanes = route.group(1).split("|")
-        self.assertEqual(lanes, ["spinoffs", "split-offs", "mergers", "warrants", "restructurings", "forced-sellers"])
+        self.assertEqual(lanes, ["spinoffs", "split-offs", "mergers", "warrants", "restructurings", "forced-sellers", "buyback-events"])
         self.assertIn("forced_sellers: 'forced-sellers',", INDEX)
 
     def test_separations_script_loads_beside_special_situations(self) -> None:

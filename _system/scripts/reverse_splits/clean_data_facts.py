@@ -72,8 +72,10 @@ def numeric(text, *, scale=0, sign=None, format_name=None):
     except (ValueError, OverflowError, TypeError): return None
 
 
-def standard_facts(document, cik):
+def standard_facts(document, cik, *, tags=None, flows=None):
     """Extract whole-entity contexts, supported units, explicit periods and clocks."""
+    tags = TAGS if tags is None else tags
+    flows = FLOWS if flows is None else flows
     known = moment(document.get("known_at"))
     if not known: return []
     raw = document["text"]
@@ -115,12 +117,12 @@ def standard_facts(document, cik):
             if tag and tag.startswith("{"):
                 namespace, label = tag[1:].split("}", 1)
                 family = next((k for k in ("us-gaap", "ifrs-full", "dei") if "/"+k+"/" in namespace or "/"+k+"-" in namespace or namespace.endswith("/"+k)), None)
-                tag = family+":"+label if family else None
-            if tag not in TAGS: continue
-            metric, unit = TAGS[tag], units.get(attrs.get("unitref"))
+                tag = family+":"+label if family else node.prefix+":"+label if node.prefix else None
+            if tag not in tags: continue
+            metric, unit = tags[tag], units.get(attrs.get("unitref"))
             period = contexts[attrs["contextref"]]
             if not unit or metric == "shares" and unit != "shares" or metric != "shares" and unit == "shares": continue
-            if bool(period["start"]) != (metric in FLOWS): continue
+            if bool(period["start"]) != (metric in flows): continue
             # HTML's itertext also sees ix:exclude footnote content. Excluding
             # it explicitly prevents a footnote marker from changing an amount.
             value = numeric(fact_text(node), scale=attrs.get("scale", 0), sign=attrs.get("sign"), format_name=attrs.get("format"))

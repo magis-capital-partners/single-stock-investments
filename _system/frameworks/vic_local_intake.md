@@ -13,7 +13,7 @@ python _system/scripts/drive_intake_drop.py --kind VIC --ticker TPL path\to\writ
 
 The uploader accepts only PDFs and existing repo ticker folders. It writes `Admin/Intake/VIC/{TICKER}/`, records a content hash, and returns `already_present` rather than duplicating an identical upload.
 
-The Data Pipeline Drive job runs daily at 14:00 UTC. It imports the PDF to `{TICKER}/third-party-analyses/vic/`, stages `research-vault/vic-research/{TICKER}/` (PDF gitignored; `.txt` extract committed), writes a `.source.json` sidecar, updates the Drive-ID manifest and source inventory, and records unresolved files in the GitHub job summary plus `_system/reference/document-store/drive_intake_latest.json`.
+The Data Pipeline Drive job runs daily at 14:41 UTC. It imports the PDF to `{TICKER}/third-party-analyses/vic/`, stages `research-vault/vic-research/{TICKER}/` (PDF gitignored; `.txt` extract committed), writes a `.source.json` sidecar, updates the Drive-ID manifest and source inventory, and records unresolved files in the GitHub job summary plus `_system/reference/document-store/drive_intake_latest.json`.
 
 For text that cannot be represented as a PDF:
 

@@ -13,7 +13,7 @@
 <link href="short-alpha.css?v=20261015-results" rel="stylesheet">
 <link href="reverse-splits-portfolio.css?v=20261015-results" rel="stylesheet">
 <link href="shorts-net-edge.css?v=20261015-v2" rel="stylesheet">
-<link href="shorts-edge-v3.css?v=20261017-clean-data" rel="stylesheet">
+<link href="shorts-edge-v3.css?v=20261018-fundamentals" rel="stylesheet">
 <link href="warrants.css" rel="stylesheet">
 <link href="portfolio.css?v=20261008-michael-tail" rel="stylesheet">
 <link href="ideas.css?v=20261011-separations" rel="stylesheet">
@@ -1830,6 +1830,7 @@
     <a class="view-tab" data-view="insights" href="#/insights/overview">Signals &amp; Synthesis</a>
     <a class="view-tab" data-view="activist" href="#/insights/activism">Activism</a>
     <a class="view-tab" data-view="insights" href="#/insights/data-health">Data Health</a>
+    <a class="view-tab" data-view="insights" href="#/insights/managers">Managers</a>
   </nav>
 
   <main id="main-content">
@@ -1984,15 +1985,17 @@
 <script src="technical-picture-viz.js?v=20261001-signal-study"></script>
 <script src="fico-watch-viz.js?v=20261006-fico-watch-2"></script>
 <script src="overlap-viz.js?v=20261008-overlap-line"></script>
+<script src="holdings-viz.js?v=20261018-held-by"></script>
 <script src="index-viz.js"></script>
 <script src="activist-viz.js?v=20260819-dashboard-rebuild"></script>
 <script src="short-alpha-viz.js?v=20261015-net-edge-v2"></script>
 <script src="reverse-splits-portfolio-viz.js?v=20261015-results"></script>
 <script src="shorts-net-edge-viz.js?v=20261015-v2"></script>
-<script src="shorts-edge-v3-viz.js?v=20261016-v4"></script>
+<script src="shorts-edge-v3-viz.js?v=20261018-fundamentals"></script>
 <script src="reverse-splits-viz.js?v=20261015-net-edge-v3"></script>
 <script src="warrant-viz.js"></script>
-<script src="special-situations-viz.js?v=20261011-separations"></script>
+<script src="special-situations-viz.js?v=20261018-buyback"></script>
+<script src="buyback-viz.js?v=20261018-buyback"></script>
 <script src="separations-viz.js?v=20261011-separations"></script>
 <script src="desk-briefs-viz.js?v=20261012-desk-briefs"></script>
 <script src="sleeve-viz.js?v=20261008-michael-tail"></script>
@@ -2088,6 +2091,7 @@ const HOLDINGS_COLUMNS = [
   { id: 'next_action', label: 'Next action', sort: 'valuation_decision.critical_gap_count', group: 'core' },
   { id: 'route_method', label: 'Power Zone / method', sort: 'power_zones.primary', group: 'core' },
   { id: 'special_situation', label: 'CVR / NAV', sort: 'special_situation', group: 'core' },
+  { id: 'buyback', label: 'Buyback', sort: 'buyback.retired_since_peak_pct', group: 'core' },
   { id: 'research_freshness', label: 'Freshness', sort: 'last_research', group: 'core' },
   { id: 'context', label: 'Context', sort: 'classification.investment_sleeve_label', group: 'core' },
   { id: 'cvr_stage', label: 'CVR detail', sort: 'cvr.stage', group: 'special' },
@@ -2209,7 +2213,7 @@ let insightsEventLastSeenAt = (() => {
 })();
 const INSIGHTS_LIVE_SECTIONS = new Set([
   'letters', 'podcasts', 'videos', 'inflections', 'events', 'index_watch', 'consensus',
-  'funds', 'documents', 'tickers', 'memory', 'sources',
+  'funds', 'documents', 'tickers', 'memory', 'sources', 'managers',
 ]);
 let insightsSection = (() => {
   try {
@@ -2295,6 +2299,7 @@ const SITUATION_LANE_IDS = {
   warrants: 'warrants',
   restructurings: 'restructurings',
   'forced-sellers': 'forced_sellers',
+  'buyback-events': 'buyback_events',
 };
 const SITUATION_LANE_SLUG = {
   all: '',
@@ -2304,6 +2309,7 @@ const SITUATION_LANE_SLUG = {
   warrants: 'warrants',
   restructurings: 'restructurings',
   forced_sellers: 'forced-sellers',
+  buyback_events: 'buyback-events',
 };
 
 function defaultWatchlistView() {
@@ -2384,7 +2390,7 @@ function parseRouteFromHashString(hash) {
   if (/^#\/(?:ideas\/)?warrants$/i.test(hash || '')) {
     return { view: 'situations', ticker: null, watchlistSub: null, situationLane: 'warrants', situationFocus: '', situationGatesOpen: true };
   }
-  const situationsMatch = /^#\/ideas\/situations(?:\/(spinoffs|split-offs|mergers|warrants|restructurings|forced-sellers))?(?:\/([^/?#]+))?$/i.exec(hash || '');
+  const situationsMatch = /^#\/ideas\/situations(?:\/(spinoffs|split-offs|mergers|warrants|restructurings|forced-sellers|buyback-events))?(?:\/([^/?#]+))?$/i.exec(hash || '');
   if (situationsMatch) {
     const slug = (situationsMatch[1] || '').toLowerCase();
     return {
@@ -2403,7 +2409,7 @@ function parseRouteFromHashString(hash) {
     const sub = ideasMatch[1].toLowerCase();
     return { view: sub === 'short-alpha' || sub === 'warrants' ? sub : 'watchlist', ticker: null, watchlistSub: sub };
   }
-  const insightsMatch = /^#\/insights\/(overview|activism|data-health|letters|podcasts|videos|inflections|events|index-watch|consensus|funds|documents|tickers|memory|sources)$/i.exec(hash || '');
+  const insightsMatch = /^#\/insights\/(overview|activism|data-health|letters|podcasts|videos|inflections|events|index-watch|consensus|funds|documents|tickers|memory|sources|managers)$/i.exec(hash || '');
   if (insightsMatch) {
     const section = insightsMatch[1].toLowerCase();
     return { view: section === 'activism' ? 'activist' : 'insights', insightsSection: section === 'data-health' ? 'sources' : section === 'overview' ? 'events' : section.replace('-', '_'), ticker: null, watchlistSub: null };
@@ -3396,6 +3402,7 @@ const INSIGHTS_SECTION_FILES = {
 };
 
 function insightsSectionReady(section) {
+  if (section === 'managers') return true;
   const shards = ['manifest', ...(INSIGHTS_SECTION_SHARDS[section] || [])];
   const files = INSIGHTS_SECTION_FILES[section] || [];
   return shards.every((s) => loadedShards.has(`insights:${s}`))
@@ -3409,6 +3416,24 @@ function loadInsightsSection(section) {
     ...shards.map((s) => loadInsightsShard(s)),
     ...files.map((f) => loadLazyFile(f)),
   ]);
+}
+
+function applyBuyback(row) {
+  if (!row) return;
+  const src = (data.buyback_by_ticker || {})[String(row.ticker || '').toUpperCase()];
+  if (!src) return;
+  row.buyback = {
+    retired_since_peak_pct: src.retired_since_peak_pct,
+    buyback_yield_pct: src.buyback_yield_pct,
+    pace: src.pace,
+    grade: src.grade,
+    change_5y_pct: src.change_5y_pct,
+    change_1y_pct: src.change_1y_pct,
+    as_of: src.shares_end,
+    split_review: !!src.split_review,
+    repurchase_tag: src.repurchase_tag || null,
+    non_operating: !!src.non_operating,
+  };
 }
 
 function loadTickerDetail(ticker) {
@@ -3429,6 +3454,7 @@ function loadTickerDetail(ticker) {
     if (idx >= 0) {
       const fullTechnical = data.technical_signals?.by_ticker?.[ticker];
       if (fullTechnical) data.tickers[idx].technicals = fullTechnical;
+      applyBuyback(data.tickers[idx]);
     }
     return data.tickers.find((x) => x.ticker === ticker);
   });
@@ -3485,6 +3511,17 @@ async function load() {
       };
     } catch (_) {
       // Technicals are a supplemental overlay; the fundamental dashboard remains usable.
+    }
+    try {
+      const buybackDoc = await fetchShardJson('data/buyback_companies.json');
+      const byTicker = {};
+      (buybackDoc.companies || []).forEach((row) => {
+        if (row && row.ticker) byTicker[String(row.ticker).toUpperCase()] = row;
+      });
+      data.buyback_by_ticker = byTicker;
+      data.tickers.forEach((ticker) => applyBuyback(ticker));
+    } catch (_) {
+      data.buyback_by_ticker = data.buyback_by_ticker || {};
     }
     try {
       // Every published technical signal, graded as its horizons mature, next to
@@ -4140,6 +4177,17 @@ function renderActivist() {
 }
 
 function renderInsights(opts = {}) {
+  if (insightsSection === 'managers' && window.FundHoldings) {
+    const loading = document.getElementById('insights-loading');
+    const content = document.getElementById('insights-content');
+    if (loading) loading.style.display = 'none';
+    if (content) {
+      content.style.display = 'block';
+      content.innerHTML = FundHoldings.renderManagersPage();
+      FundHoldings.fillManagersPage();
+    }
+    return;
+  }
   const refocusSearch = Boolean(opts.refocusSearch);
   const loading = document.getElementById('insights-loading');
   const content = document.getElementById('insights-content');
@@ -5530,6 +5578,11 @@ function filtered() {
       };
       av = specialRank(a);
       bv = specialRank(b);
+    } else if (sortKey === 'buyback.retired_since_peak_pct') {
+      av = a.buyback?.retired_since_peak_pct;
+      bv = b.buyback?.retired_since_peak_pct;
+      av = av == null ? -Infinity : av;
+      bv = bv == null ? -Infinity : bv;
     } else {
       if (typeof av === 'string') av = av.toLowerCase();
       if (typeof bv === 'string') bv = bv.toLowerCase();
@@ -5543,7 +5596,7 @@ function filtered() {
 function renderHoldingsCell(colId, t) {
   switch (colId) {
     case 'ticker':
-      return `<td class="mono ticker-cell">${escapeHtml(t.display_ticker || t.ticker)}${t.quote_ticker && t.quote_ticker !== (t.display_ticker || t.ticker) ? `<span class="irr-sub" title="Quote symbol"> ${escapeHtml(t.quote_ticker)}</span>` : ''}${t.equity_model?.ready ? ` <span class="badge badge-ok" title="Earnings model ${t.equity_model.production_spec || 'v5'} ready">M</span>` : ''}${t.onboard?.phase && t.onboard.phase !== 'complete' ? `<span class="onboard-badge">${t.onboard.phase}</span>` : ''}${window.SeparationsViz && t.separation?.odd_lot?.eligible_owners?.length ? ` ${SeparationsViz.renderOddLotBadge(t.separation, { escapeHtml })}` : ''}<button type="button" class="sleeve-jump" data-sleeve-jump="drew" data-ticker="${escapeHtml(t.ticker)}" title="Note on Drew tab">D</button><button type="button" class="sleeve-jump" data-sleeve-jump="michael" data-ticker="${escapeHtml(t.ticker)}" title="Note on Michael tab">M</button></td>`;
+      return `<td class="mono ticker-cell">${escapeHtml(t.display_ticker || t.ticker)}${t.quote_ticker && t.quote_ticker !== (t.display_ticker || t.ticker) ? `<span class="irr-sub" title="Quote symbol"> ${escapeHtml(t.quote_ticker)}</span>` : ''}${t.equity_model?.ready ? ` <span class="badge badge-ok" title="Earnings model ${t.equity_model.production_spec || 'v5'} ready">M</span>` : ''}${t.onboard?.phase && t.onboard.phase !== 'complete' ? `<span class="onboard-badge">${t.onboard.phase}</span>` : ''}${window.SeparationsViz && t.separation?.odd_lot?.eligible_owners?.length ? ` ${SeparationsViz.renderOddLotBadge(t.separation, { escapeHtml })}` : ''}${window.FundHoldings ? FundHoldings.badgeHtml(t.ticker) : ''}<button type="button" class="sleeve-jump" data-sleeve-jump="drew" data-ticker="${escapeHtml(t.ticker)}" title="Note on Drew tab">D</button><button type="button" class="sleeve-jump" data-sleeve-jump="michael" data-ticker="${escapeHtml(t.ticker)}" title="Note on Michael tab">M</button></td>`;
     case 'company':
       return `<td class="company-cell" title="${escapeHtml(t.company)}">${escapeHtml(t.company)}</td>`;
     case 'market':
@@ -5608,6 +5661,8 @@ function renderHoldingsCell(colId, t) {
       return `<td class="route-method-cell">${renderRouteMethodCell(t)}</td>`;
     case 'special_situation':
       return `<td class="special-situation-cell">${renderSpecialSituationCell(t)}</td>`;
+    case 'buyback':
+      return window.BuybackViz ? BuybackViz.renderHoldingsCell(t, escapeHtml) : '<td>—</td>';
     case 'research_freshness':
       return `<td class="freshness-cell">${renderResearchFreshnessCell(t)}</td>`;
     case 'context':
@@ -5969,6 +6024,7 @@ function selectTicker(ticker, opts = {}) {
     </div>
 
     ${window.OverlapViz ? OverlapViz.renderTicker(t.display_ticker || t.ticker, escapeHtml) : ''}
+    ${window.FundHoldings ? FundHoldings.renderTicker(t.ticker, escapeHtml) : ''}
 
     ${window.FicoWatch && t.ticker === 'FICO' ? FicoWatch.renderDetail(data.fico_watch, escapeHtml) : ''}
 
@@ -5985,6 +6041,7 @@ function selectTicker(ticker, opts = {}) {
     ${lensChips || ''}
     ${renderFundNavPanel(t)}
     ${renderCvrPanel(t)}
+    ${window.BuybackViz ? BuybackViz.renderDetail(t, escapeHtml) : ''}
     ${window.SeparationsViz && t.separation ? SeparationsViz.renderTickerCard(t.separation, { escapeHtml }) : ''}
 
     ${renderValuationWorkbench(t)}
@@ -6063,6 +6120,7 @@ function selectTicker(ticker, opts = {}) {
       </ul>
     </details>` : ''}`;
   if (window.OverlapViz) OverlapViz.fillTicker(t.display_ticker || t.ticker);
+  if (window.FundHoldings) FundHoldings.fillTicker(t.ticker);
   if (hasModel && typeof EquityModelViz !== 'undefined') {
     EquityModelViz.afterRender(modelBundle);
   }
@@ -6334,6 +6392,7 @@ document.querySelectorAll('#view-tabs .view-tab, .workspace-subnav .view-tab').f
     }
     if (link.getAttribute('href') === '#/insights/data-health') insightsSection = 'sources';
     if (link.getAttribute('href') === '#/insights/overview') insightsSection = 'events';
+    if (link.getAttribute('href') === '#/insights/managers') insightsSection = 'managers';
     if (link.getAttribute('href') === '#/strategies/darwin/overview') darwinViewMode = 'overview';
     setView(link.dataset.view);
   });

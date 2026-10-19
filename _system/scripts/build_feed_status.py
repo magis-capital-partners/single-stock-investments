@@ -262,6 +262,20 @@ SURFACES: list[dict] = [
         "healer": _INTAKE,
     },
     {
+        "id": "managers-13f",
+        "label": "13F managers",
+        "hash": "#/insights/managers",
+        "lane": "data-pipeline-thirteen-f",
+        "kind": "file",
+        "path": "dashboard/data/fund_holdings_summary.json",
+        "stamp_fields": ["generated_at"],
+        "max_age_hours": 54,
+        "healer": (
+            "The 13:29 UTC data-pipeline thirteen-f job refreshes filings. "
+            "This page does not dispatch that job."
+        ),
+    },
+    {
         "id": "activist",
         "label": "Activism",
         "hash": "#/insights/activism",

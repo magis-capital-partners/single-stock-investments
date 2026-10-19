@@ -33,7 +33,7 @@ Everything not listed is code or a human-gated file. A `grok/` pull request that
 
 | Surface | Who | How |
 |---|---|---|
-| Drive `Admin/Intake/{Kind}/{TICKER}/` | Any bot with the service account | `drive_intake_drop.py`; imported daily at 14:00 UTC |
+| Drive `Admin/Intake/{Kind}/{TICKER}/` | Any bot with the service account | `drive_intake_drop.py`; imported daily at 14:41 UTC |
 | Drive `Letters/`, `Investment Wisdom/` | Michael's intake bot | `_system/agents/MICHAEL.md`; needs vault write |
 | D1 sleeve notes and ideas | Drew, Michael | Dashboard sign-in; `POST /api/v1/sleeves/notes` |
 | Private research vault `short-research/{TICKER}/` | Short desk bots and humans with vault write | Narrative for a short idea; SSI holds the pointer |

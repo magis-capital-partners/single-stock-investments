@@ -1,4 +1,4 @@
-# HIMS — Insider conviction (2026-10-17)
+# HIMS — Insider conviction (2026-10-18)
 
 > Context only. Insider activity informs scenario confidence and stance discussion; it does not auto-inflate Lawrence base IRR. Promotion requires [HUMAN REVIEW].
 
@@ -15,8 +15,8 @@
 | WELLS DAVID B | 2026-05-26 | 48400 | $24.235 | $1172974.0 | 1.513 |
 | Okupe Oluyemi | 2025-11-17 | 15572 | $5.01 | $78015.72 | 1.125 |
 | Okupe Oluyemi | 2025-11-17 | 7615 | $11.53 | $87800.95 | 1.055 |
-| Okupe Oluyemi | 2025-10-17 | 7785 | $5.01 | $39002.85 | 0.954 |
 | Okupe Oluyemi | 2026-01-20 | 7317 | $5.01 | $36658.17 | 0.903 |
+| Okupe Oluyemi | 2026-04-20 | 7000 | $11.53 | $80710.0 | 0.863 |
 
 **Routine / planned sales (context):**
 

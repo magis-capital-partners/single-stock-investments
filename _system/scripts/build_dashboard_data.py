@@ -3202,6 +3202,33 @@ def load_valuation_universe_tiers() -> dict:
     return _VALUATION_TIERS_CACHE
 
 
+def missing_valuation_tier_tickers(rows: list[dict]) -> list[str]:
+    """Tickers whose published row has no Tier 1, 2, or 3 assignment."""
+    missing = []
+    for row in rows:
+        tier = (row.get("valuation_tier") or {}).get("tier")
+        if tier not in (1, 2, 3):
+            missing.append(str(row.get("ticker") or "?"))
+    return missing
+
+
+def refuse_missing_valuation_tiers(rows: list[dict]) -> None:
+    """Do not publish a dashboard row until the tier manifest covers it.
+
+    The deploy validator rejects rows with no tier. Holding the write back
+    leaves the previous dashboard in place instead of shipping the gap.
+    """
+    missing = missing_valuation_tier_tickers(rows)
+    if not missing:
+        return
+    shown = ", ".join(missing[:20])
+    extra = f" (+{len(missing) - 20} more)" if len(missing) > 20 else ""
+    raise SystemExit(
+        "Refusing to publish dashboard rows missing valuation-universe tiers: "
+        f"{shown}{extra}. Run build_valuation_universe_tiers.py first."
+    )
+
+
 def valuation_tier_for_ticker(ticker: str) -> dict | None:
     row = (load_valuation_universe_tiers().get("assignments") or {}).get(ticker.upper())
     if not row:
@@ -3766,6 +3793,7 @@ def main() -> None:
         )
     # Same prior, shard-reconstructed when the monolith is absent.
     payload = merge_sparse_payload(payload, {"tickers": list(prior_by_ticker.values())})
+    refuse_missing_valuation_tiers(payload.get("tickers") or [])
     write_oauth_config()
     from build_dashboard_shards import release_standalone_embeds, write_shards
 

@@ -50,7 +50,7 @@ class WorkflowTests(unittest.TestCase):
         self.assertIn("heal-separations", self.doc[True]["repository_dispatch"]["types"])
         self.assertIn("separation_discover", self.doc["jobs"]["decide"]["outputs"])
         run = self.doc["jobs"]["decide"]["steps"][0]["run"]
-        self.assertRegex(run, r'"13 15 \* \* 1"\) cvr_discover=true; warrant_discover=true; separation_discover=true; reverse_splits=true ;;')
+        self.assertRegex(run, r'"13 15 \* \* 1"\) cvr_discover=true; warrant_discover=true; separation_discover=true; reverse_splits=true; buyback_radar=true ;;')
         self.assertIn('"dispatch:heal-separations") separation_discover=true ;;', run)
         self.assertIn('echo "separation_discover=$separation_discover"', run)
 

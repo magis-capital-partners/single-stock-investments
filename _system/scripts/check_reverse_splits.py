@@ -36,6 +36,7 @@ from reverse_splits.ledger import (  # noqa: E402
     sha256_file,
     verify_decision_chain,
 )
+from reverse_splits.hypotheses import citation_errors, load_registry, registry_errors  # noqa: E402
 from reverse_splits.utils import parse_date  # noqa: E402
 
 DASHBOARD_PATH = REPO_ROOT / "dashboard" / "data" / "reverse_splits.json"
@@ -184,6 +185,16 @@ def structural_errors(ledger_dir: Path | None = None) -> list[str]:
         errors.extend(audit_artifacts(paths["manifest"].parent))
     except (ValueError, KeyError, TypeError, OSError) as exc:
         errors.append("Expanded coverage publication is invalid: " + str(exc))
+    # Pre-registration: a published research JSON that cites hypotheses must cite
+    # registered ones declared before it was built, and must stay aggregate only.
+    ledger_root = paths["manifest"].parent
+    try:
+        registry = load_registry(ledger_root)
+    except ValueError as exc:
+        errors.append(f"hypotheses: unreadable registry: {exc}")
+        registry = []
+    errors.extend(registry_errors(registry))
+    errors.extend(citation_errors(ledger_root, registry))
     return errors
 
 
