@@ -53,6 +53,7 @@ DEPLOY_INPUTS = (
     "_system/data/evidence_recovery_queue.json",
     "_system/scripts/build_cloudflare_pages_site.py",
     "_system/scripts/validate_portfolio_private_boundary.py",
+    "_system/scripts/reconcile_insights_event_summary.py",
     "_system/scripts/export_dashboard_d1_seed.py",
     "_system/scripts/export_sleeve_d1.py",
     "_system/scripts/prune_cloudflare_d1.py",
