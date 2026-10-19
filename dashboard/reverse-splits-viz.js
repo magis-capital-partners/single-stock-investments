@@ -521,6 +521,7 @@
       <p class="muted">Each row is an action or candidate, not necessarily an independent company or a feasible short.</p></details>`;
   }
   function attach(container,doc) {
+    if(global.ShortSleeveViz)global.ShortSleeveViz.attach(container);
     const panel=container.querySelector('[data-rs-universe]');
     if (!panel) return;
     const rows=doc.expansion_catalogue || [];
@@ -596,6 +597,9 @@
       return `${STYLE}<div class="rs-panel"><p class="muted">Unexpected reverse-split schema ${esc(doc.schema_version)}; expected reverse_splits.v1.</p></div>`;
     }
     if(doc.portfolio_research && global.ReverseSplitsPortfolioViz){
+      if(global.ShortSleeveViz && !opts.legacyResearch){
+        return `${STYLE}<div class="rs-panel">${global.ShortSleeveViz.render()}<details class="rsp-fold"><summary>Strategy research and event registry<small>Original strategy versions, execution studies, forward evidence and source records</small></summary>${render(doc,{...opts,legacyResearch:true})}</details></div>`;
+      }
       const completed=doc.forward_status?.validation?.completed?.events;
       return `${STYLE}<div class="rs-panel" data-schema="${esc(doc.schema_version || '')}">
         ${doc.net_edge_research_v3 && global.ShortsEdgeV3Viz ? `${global.ShortsEdgeV3Viz.render({...doc.net_edge_research_v3,prospective:doc.net_edge_prospective_v3 || doc.net_edge_research_v3.prospective})}<details class="rsp-fold"><summary>RSI-2.0 · intraday edge study<small>Prior research version</small></summary>${global.ShortsNetEdgeViz ? global.ShortsNetEdgeViz.render(doc.net_edge_research) : ''}</details><details class="rsp-fold"><summary>RSI-1.0 · original shorts backtest<small>Existing account results and execution research</small></summary>${global.ReverseSplitsPortfolioViz.render(doc)}</details>` : doc.net_edge_research && global.ShortsNetEdgeViz ? `${global.ShortsNetEdgeViz.render(doc.net_edge_research)}<details class="rsp-fold"><summary>RSI-1.0 · original shorts backtest<small>Existing account results and execution research</small></summary>${global.ReverseSplitsPortfolioViz.render(doc)}</details>` : global.ReverseSplitsPortfolioViz.render(doc)}

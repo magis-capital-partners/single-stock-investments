@@ -5,7 +5,9 @@ One process. One lock. Strict sequencing:
 
   1. Podcast Whisper backlog (feeds everything else)
   2. YouTube discover / captions (Whisper for videos only when podcast queue is empty)
-  3. Local-model analysis (videos first, then podcasts) — same qwen endpoint as Windows
+  3. Podcast reader summaries, published immediately (alternating with video
+     analysis when both have work, so neither surface starves)
+  4. Local-model claims analysis (videos first, then podcasts) — same qwen endpoint as Windows
 
 Never run Whisper transcription beside the LLM server. Measured on the Windows
 workstation: that concurrency dropped transcription from ~3.0 to ~0.55
@@ -58,6 +60,7 @@ DEFAULT_MODEL_PATH = os.environ.get("MEDIA_LANE_MODEL_PATH", "qwen/qwen3.5-9b")
 DEFAULT_MEMORY_FLOOR = int(os.environ.get("MEDIA_LANE_MEMORY_FLOOR_MB", "2500"))
 DEFAULT_IDLE_MINS = int(os.environ.get("MEDIA_LANE_IDLE_MINS", "30"))
 DEFAULT_WHISPER_HOURS = float(os.environ.get("MEDIA_LANE_WHISPER_HOURS", "2"))
+DEFAULT_SUMMARY_HOURS = float(os.environ.get("MEDIA_LANE_SUMMARY_HOURS", "2"))
 DEFAULT_ANALYSIS_HOURS = float(os.environ.get("MEDIA_LANE_ANALYSIS_HOURS", "2"))
 DEFAULT_YT_HOURS = float(os.environ.get("MEDIA_LANE_YT_HOURS", "1"))
 DEFAULT_YT_WHISPER = int(os.environ.get("MEDIA_LANE_YT_WHISPER", "0"))
@@ -187,6 +190,39 @@ def analysis_remaining(script: str) -> int:
     return int(doc.get("remaining") or 0)
 
 
+def reconcile_whisper_orphans() -> None:
+    """Queue catalogued audio episodes that have no transcript or queue row.
+
+    Runs every cycle, not only inside the Whisper phase: otherwise orphans
+    stay invisible while the backlog happens to read empty.
+    """
+    try:
+        out = subprocess.run(
+            [
+                sys.executable,
+                str(SCRIPTS / "fetch_podcast_transcript.py"),
+                "--reconcile-whisper-orphans",
+            ],
+            cwd=str(ROOT),
+            capture_output=True,
+            text=True,
+            timeout=600,
+        )
+        doc = json.loads(out.stdout or "{}")
+        queued = int(doc.get("queued") or 0)
+        if queued:
+            log(f"whisper orphan reconcile queued {queued} episode(s)")
+    except (OSError, subprocess.SubprocessError, json.JSONDecodeError) as exc:
+        log(f"whisper orphan reconcile failed: {exc}; continuing")
+
+
+def reader_summary_remaining() -> int:
+    doc = json_status("summarize_podcast_episode.py")
+    if "error" in doc and "remaining_model" not in doc and "remaining" not in doc:
+        return -1
+    return int(doc.get("remaining_model", doc.get("remaining", 0)) or 0)
+
+
 def find_lms() -> Path | None:
     home = Path.home()
     candidates = [
@@ -264,6 +300,13 @@ def phase_whisper(*, threads: int, chunk: int, hours: float, push: bool) -> int:
     wait_for_memory(_active_floor_mb, log=log, stop_flag=lambda: _stop)
     if _stop:
         return 0
+    # Catalogued episodes with audio but no transcript/queue row are invisible
+    # to the daemon until they are reconciled into its backlog.
+    reconcile = run_python([str(SCRIPTS / "fetch_podcast_transcript.py"), "--reconcile-whisper-orphans"])
+    if reconcile != 0:
+        log(f"whisper orphan reconcile exited code={reconcile}; continuing")
+    if _stop:
+        return 0
     env = {
         "WHISPER_MODEL": DEFAULT_MODEL,
         "WHISPER_THREADS": str(threads),
@@ -293,6 +336,36 @@ def phase_youtube(*, hours: float, whisper: int, push: bool) -> int:
     return run_python(args)
 
 
+def phase_reader_summary(*, model: str, hours: float, push: bool) -> int:
+    wait_for_memory(_active_floor_mb, log=log, stop_flag=lambda: _stop)
+    if _stop:
+        return 0
+    args = [
+        str(SCRIPTS / "summarize_podcast_episode.py"),
+        "--llm",
+        "--model", model,
+        "--hours", str(hours),
+        "--push-every-minutes", "15",
+    ]
+    if push:
+        args.append("--push")
+    return run_python(args)
+
+
+def phase_publish_podcast(*, push: bool) -> int:
+    script = SCRIPTS / "publish_podcast_dashboard.py"
+    if not script.exists():
+        log("publish_podcast_dashboard.py missing; reader summaries will publish with the next dashboard build")
+        return 0
+    wait_for_memory(_active_floor_mb, log=log, stop_flag=lambda: _stop)
+    if _stop:
+        return 0
+    args = [str(script)]
+    if push:
+        args.append("--push")
+    return run_python(args)
+
+
 def phase_analysis(script: str, *, model: str, hours: float, push: bool) -> int:
     wait_for_memory(_active_floor_mb, log=log, stop_flag=lambda: _stop)
     if _stop:
@@ -318,6 +391,7 @@ def status_snapshot() -> dict:
     return {
         "available_mb": available_mb(),
         "whisper_pending": whisper_pending(),
+        "reader_summary_remaining": reader_summary_remaining(),
         "podcast_analysis_remaining": analysis_remaining("analyze_podcast_batch.py"),
         "video_analysis_remaining": analysis_remaining("analyze_video_batch.py"),
         "receipt": str(RECEIPT_PATH),
@@ -348,6 +422,8 @@ def run_forever(args: argparse.Namespace) -> int:
         log("another media lane holds the lock; exiting")
         return 0
 
+    reader_turn = True
+    whisper_turn = True
     backoff = args.min_backoff
     try:
         while not _stop:
@@ -362,6 +438,7 @@ def run_forever(args: argparse.Namespace) -> int:
             if _stop:
                 break
 
+            reconcile_whisper_orphans()
             pending = whisper_pending()
             if pending < 0:
                 log(f"could not read whisper backlog; retrying in {backoff}s")
@@ -369,7 +446,10 @@ def run_forever(args: argparse.Namespace) -> int:
                 backoff = min(backoff * 2, args.max_backoff)
                 continue
 
-            if pending > 0:
+            # Whisper goes first, but in bounded windows: after each window
+            # the analysis phases get their turn, so a large transcription
+            # backlog cannot starve reader summaries for days.
+            if pending > 0 and whisper_turn:
                 log(f"phase=whisper ({pending} pending)")
                 code = phase_whisper(
                     threads=threads,
@@ -378,6 +458,7 @@ def run_forever(args: argparse.Namespace) -> int:
                     push=not args.no_push,
                 )
                 log(f"whisper phase exited code={code}")
+                whisper_turn = False
                 backoff = args.min_backoff if code == 0 else min(backoff * 2, args.max_backoff)
                 continue
 
@@ -404,12 +485,28 @@ def run_forever(args: argparse.Namespace) -> int:
                 backoff = min(backoff * 2, args.max_backoff)
                 continue
 
+            reader_left = reader_summary_remaining()
             video_left = analysis_remaining("analyze_video_batch.py")
             pod_left = analysis_remaining("analyze_podcast_batch.py")
-            if video_left < 0 and pod_left < 0:
+            if reader_left < 0 and video_left < 0 and pod_left < 0:
                 log(f"could not read analysis status; retrying in {backoff}s")
                 time.sleep(backoff)
                 backoff = min(backoff * 2, args.max_backoff)
+                continue
+
+            if reader_left > 0 and (video_left <= 0 or reader_turn):
+                log(f"phase=reader-summary ({reader_left} remaining)")
+                code = phase_reader_summary(
+                    model=args.model,
+                    hours=args.summary_hours,
+                    push=not args.no_push,
+                )
+                log(f"reader-summary phase exited code={code}")
+                publish_code = phase_publish_podcast(push=not args.no_push)
+                log(f"podcast publish exited code={publish_code}")
+                reader_turn = False
+                whisper_turn = True
+                backoff = args.min_backoff if code == 0 else min(backoff * 2, args.max_backoff)
                 continue
 
             if video_left > 0:
@@ -421,6 +518,8 @@ def run_forever(args: argparse.Namespace) -> int:
                     push=not args.no_push,
                 )
                 log(f"video analysis exited code={code}")
+                reader_turn = True
+                whisper_turn = True
                 backoff = args.min_backoff
                 continue
 
@@ -433,7 +532,22 @@ def run_forever(args: argparse.Namespace) -> int:
                     push=not args.no_push,
                 )
                 log(f"podcast analysis exited code={code}")
+                whisper_turn = True
                 backoff = args.min_backoff
+                continue
+
+            if pending > 0:
+                # Nothing else is waiting; spend the window transcribing.
+                log(f"phase=whisper ({pending} pending)")
+                code = phase_whisper(
+                    threads=threads,
+                    chunk=args.chunk,
+                    hours=args.whisper_hours,
+                    push=not args.no_push,
+                )
+                log(f"whisper phase exited code={code}")
+                whisper_turn = False
+                backoff = args.min_backoff if code == 0 else min(backoff * 2, args.max_backoff)
                 continue
 
             if args.exit_when_empty:
@@ -442,6 +556,7 @@ def run_forever(args: argparse.Namespace) -> int:
             log(f"all queues empty; idle {args.idle_mins}m")
             write_receipt(ready=True, phase="idle", extra={
                 "whisper_pending": 0,
+                "reader_summary_remaining": 0,
                 "podcast_remaining": 0,
                 "video_remaining": 0,
             })
@@ -470,6 +585,7 @@ def main() -> int:
     p.add_argument("--nice", type=int, default=15)
     p.add_argument("--memory-floor", type=int, default=DEFAULT_MEMORY_FLOOR)
     p.add_argument("--whisper-hours", type=float, default=DEFAULT_WHISPER_HOURS)
+    p.add_argument("--summary-hours", type=float, default=DEFAULT_SUMMARY_HOURS)
     p.add_argument("--analysis-hours", type=float, default=DEFAULT_ANALYSIS_HOURS)
     p.add_argument("--yt-hours", type=float, default=DEFAULT_YT_HOURS)
     p.add_argument("--yt-whisper", type=int, default=DEFAULT_YT_WHISPER,
@@ -488,6 +604,7 @@ def main() -> int:
         args.exit_when_empty = True
         # Cap one cycle: whisper hours small.
         args.whisper_hours = min(args.whisper_hours, 0.05)
+        args.summary_hours = min(args.summary_hours, 0.05)
         args.analysis_hours = min(args.analysis_hours, 0.05)
         args.yt_hours = min(args.yt_hours, 0.05)
         args.idle_mins = 0

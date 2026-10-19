@@ -1028,3 +1028,71 @@ from a completed immutable snapshot; mutable databases are separately frozen.
 
 Do not edit the JSONL files by hand. Run
 `python _system/scripts/check_reverse_splits.py` after any change.
+
+## Portfolio-NAV sleeve illustration (2026-10-19)
+
+The backtest route opens with incremental portfolio contribution, observed
+price-cohort distributions, five-year month-block Monte Carlo, and hypothetical
+margin/collateral. Existing strategy versions and source audits remain in the
+research fold below it.
+
+`_system/scripts/short_sleeve_research.py` reads the frozen local 20261013 run
+and cached quote observations, without network or broker access. Rebuild with:
+
+```text
+python _system/scripts/short_sleeve_research.py --source-root /path/to/local/repo --out dashboard/data/short_sleeve.json
+```
+
+CI uses the committed aggregate feed; licensed prices, per-trade observations,
+actual account NAV and account identifiers are not published. The feed contains
+90 comparisons: a fixed hypothetical $10m total NAV, three position weights
+(25/50/100 bps = $25k/$50k/$100k), five holding periods, two capacity conventions
+and exactly three combined cost cases. The default requests the full ticket;
+the capacity alternative reduces it to the prior-volume limit.
+Sizing is a fixed fraction of starting total NAV in dollars, not an independently
+funded $50k sleeve. Core investment returns are held at zero.
+Combined Michael-portfolio performance cannot be inferred from these results.
+
+Bear/base/bull combine the 75th/50th/25th cached half-spread percentiles plus
+the measured full-population mean displayed-depth cost, respectively, with
+the 90th-percentile/mean/median current indicative borrowing rate for quoted
+reverse-split names. Fixed commissions are additional. Larger orders and
+multi-session execution remain cost sensitivities, not verified fills.
+Borrow uses rounded 102% collateral and settled calendar days under T+2/T+1.
+IBKR Pro USD short-proceeds interest is credited separately, once per account,
+on settled rounded collateral including weekends until cover settlement.
+Other USD shorts are assumed to consume the first $100k zero-rate band; a
+minimum $100k external balance makes the sleeve's marginal credit conservative
+relative to unknown higher account tiers. The current 2026-10-19 tier rates
+(2.63%/3.38%/3.63%) are held fixed throughout as a sensitivity, not a reconstruction
+of historical paid interest. Same-day settled-flat trades earn no short credit.
+Core-account debit interest, collateral top-up funding and ordinary cash interest
+are excluded because settled account cash and financing history are unavailable.
+Closed-trade descriptive statistics exclude the account-level proceeds credit;
+portfolio performance and Monte Carlo include it.
+Missing closes retain the last liability mark; covers wait for an observed close.
+Open positions at the cutoff remain open rather than being deleted.
+
+An explicit reconciliation reproduces the original 1/5/10/20-session gross
+event-study counts and means. It also rebases the original eligible account's
+exact daily cash P&L onto $10m without enlarging its 115 historical tickets.
+The original account used event-specific quotes, displayed depth, entry-margin
+and trading-status checks; its accepted trades had about 1.38% weighted
+spread/depth costs. The new Base's 3.11% is a broad-cohort sensitivity: 2.44%
+median paired quote half-spreads plus 0.67% depth from a separate $500-reference
+study. Neither estimate establishes executable costs at $25k-$100k.
+
+The browser worker resamples whole interior calendar months, omitting partial
+endpoint months, with the same draws across all three cases (2,000 paths,
+five years, fixed seed). It resamples aggregate daily dollar P&L against starting
+NAV, along with margin and collateral; it does not reconstruct broker fills or
+position continuity at block boundaries. Insolvent paths keep their lower-tail
+rank in CAGR summaries. Unseen squeezes are assessed separately, not assigned
+bootstrap probabilities. Calmar is unavailable when drawdown is zero.
+
+Margin is a hypothetical 100% house floor plus FINRA per-share floors. Collateral
+includes restricted short proceeds and must not be added to margin as a second
+equity charge. The +200% squeeze reserve adds price loss to post-shock margin
+under a 200% house requirement. This is neither a worst possible loss nor
+Michael's actual available excess liquidity. All published statistics are
+conditional research; none changes a strategy threshold or order permission.

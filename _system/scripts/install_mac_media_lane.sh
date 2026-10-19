@@ -111,8 +111,8 @@ mkdir -p "${WORKTREE}/tmp" "$AGENTS"
 
 # --- render plist ------------------------------------------------------------
 # Escape & for sed replacement safety in paths.
-esc_repo="$(printf '%s' "$WORKTREE" | sed 's/[&|]/g')"
-esc_py="$(printf '%s' "$PYTHON" | sed 's/[&|]/g')"
+esc_repo="$(printf '%s' "$WORKTREE" | sed 's/[&|]/\\&/g')"
+esc_py="$(printf '%s' "$PYTHON" | sed 's/[&|]/\\&/g')"
 sed -e "s|__REPO_ROOT__|${esc_repo}|g" -e "s|__PYTHON__|${esc_py}|g" \
   "$TEMPLATE" > "$PLIST"
 

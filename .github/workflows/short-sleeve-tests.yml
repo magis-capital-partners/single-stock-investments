@@ -1,0 +1,34 @@
+name: Short sleeve research
+on:
+  push:
+    branches: [main]
+    paths: ['dashboard/short-sleeve*', 'dashboard/data/short_sleeve.json', '_system/scripts/short_sleeve_research.py', '_system/scripts/tests/test_short_sleeve*', '.github/workflows/short-sleeve-tests.yml']
+  pull_request:
+    paths: ['dashboard/short-sleeve*', 'dashboard/data/short_sleeve.json', '_system/scripts/short_sleeve_research.py', '_system/scripts/tests/test_short_sleeve*', '.github/workflows/short-sleeve-tests.yml']
+permissions:
+  contents: read
+jobs:
+  research:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          sparse-checkout: |
+            _system/scripts/short_sleeve_research.py
+            _system/scripts/tests/test_short_sleeve_research.py
+            _system/scripts/tests/test_short_sleeve_engine.cjs
+            dashboard/short-sleeve-engine.js
+            dashboard/short-sleeve-viz.js
+            dashboard/short-sleeve-worker.js
+            dashboard/data/short_sleeve.json
+          sparse-checkout-cone-mode: false
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+      - run: python -m pip install pytest numpy
+      - run: python -m pytest _system/scripts/tests/test_short_sleeve_research.py -q
+      - run: node --test _system/scripts/tests/test_short_sleeve_engine.cjs
+      - run: node --check dashboard/short-sleeve-viz.js && node --check dashboard/short-sleeve-worker.js

@@ -211,6 +211,21 @@ def test_drafts_are_marked_ready_before_the_gate_waits_on_ci():
     assert resolve["run"].index('gh pr ready "$PR"') < resolve["run"].index('echo "eligible=true"')
 
 
+def test_data_guard_materializes_desk_briefs_inside_the_sparse_checkout():
+    """PR #1225: `core.sparseCheckout=false` left schema.json unwritten on
+    git 2.55, and `|| true` hid the checkout error. The checker then died
+    before it could read the brief."""
+    data_guard = load()["jobs"]["data-guard"]
+    checkout = next(s for s in data_guard["steps"] if str(s.get("uses", "")).startswith("actions/checkout"))
+    assert checkout["with"]["ref"] == "${{ github.event.repository.default_branch }}"
+    fetch = step(data_guard, "Fetch the PR head data paths")["run"]
+    assert "git sparse-checkout add --skip-checks" in fetch
+    assert "_system/data/desk_briefs/" in fetch
+    assert "|| true" not in fetch
+    assert 'test -f _system/data/desk_briefs/schema.json' in fetch
+    assert "brief-inputs.txt" in fetch
+
+
 def test_merge_jobs_stay_serialized_on_one_lock():
     merge = load()["jobs"]["merge"]
     assert merge["concurrency"]["group"] == "agent-automerge-main"

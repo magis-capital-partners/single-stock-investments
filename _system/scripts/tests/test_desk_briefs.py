@@ -148,7 +148,10 @@ def test_thirteen_items_are_rejected(root: Path):
 # -------------------------------------------------------------------------- checker
 
 def test_committed_seed_brief_passes_the_checker():
-    report = checker.check_all(today=date(2026, 10, 12))
+    # The seed is dated 2026-10-12. Freezing the checker on that day made
+    # every later committed brief look "in the future" (tape_index
+    # 2026-10-19, PR #1225). Judge the corpus against the real clock.
+    report = checker.check_all(today=date.today())
     assert report["errors"] == [], report["errors"]
     seed = next(b for b in report["briefs"] if b["path"].endswith("special_situations/2026-10-12.json"))
     assert seed["desk"] == "special_situations"
