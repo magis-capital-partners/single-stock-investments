@@ -377,7 +377,7 @@
       "kind": "judgment",
       "empty_label": "Unscored",
       "question": "Will ATMs, warrants, converts, or stock compensation impair per-share value?",
-      "source_note": "Furnace tags serial_equity_issuance and warrant_overhang."
+      "source_note": "Furnace tags serial_equity_issuance and warrant_overhang. Buyback radar flags issuing_again names here as candidate signals, not ranked shorts. Funds, ETFs, and other non-operating instruments are omitted: creation units are not dilution."
     },
     {
       "id": "reverse_split_impairment",
@@ -35260,7 +35260,8 @@
     "crowding": "Days to cover and short interest as a share of float are FINRA short-interest readings (via Yahoo, settlement date shown), with the biotech short-interest file as a fallback. They are context, not a reason to short; the squeeze gate fires at 5 or more days to cover or 20% or more of float.",
     "excluded": "ECHX is managed in the ls-algo universe and is omitted from this book. Leads dropped by a human or an audit are listed with their reason in excluded_leads.json and are never re-added.",
     "desk_notes": "A desk_note row is a bot's or an author's idea entry: it names its source, category, dates and tags here, and its narrative lives in the private research vault behind note_ref. The category adds lenses; it never adds the fraud tag.",
-    "reverse_splits": "A reverse_split_research row is a discovery lead from the reverse-split engine with its six dated lens reviews carried as lens_reviews. Impairment is not reviewed until a lens review says so."
+    "reverse_splits": "A reverse_split_research row is a discovery lead from the reverse-split engine with its six dated lens reviews carried as lens_reviews. Impairment is not reviewed until a lens review says so.",
+    "buyback_issuance": "Names whose share count rose over the last year after a multi-year shrink. Candidate signals for the dilution / financing lens. Not ranked shorts. Funds, ETFs, and other non-operating instruments are omitted: creation units are not dilution."
   },
   "category_lenses": {
     "accounting": [
@@ -35291,5 +35292,35 @@
       "crowding_squeeze"
     ],
     "playbook": []
-  }
+  },
+  "buyback_issuance_signals": [
+    {
+      "framework_id": "dilution_financing",
+      "kind": "candidate_signal",
+      "ranked_short": false,
+      "ticker": "OUST",
+      "company": "Ouster, Inc.",
+      "pace": "issuing_again",
+      "retired_since_peak_pct": 83.74,
+      "change_5y_pct": -61.07,
+      "change_1y_pct": 16.81,
+      "grade": "E",
+      "shares_end": "2026-02-25",
+      "note": "Share count rose over the last year after a multi-year shrink. A candidate signal for the dilution / financing lens, not a ranked short. Funds, ETFs, and other non-operating instruments are omitted: creation units are not dilution."
+    },
+    {
+      "framework_id": "dilution_financing",
+      "kind": "candidate_signal",
+      "ranked_short": false,
+      "ticker": "NRG",
+      "company": "NRG Energy, Inc",
+      "pace": "issuing_again",
+      "retired_since_peak_pct": 36.47,
+      "change_5y_pct": -12.26,
+      "change_1y_pct": 8.39,
+      "grade": "E",
+      "shares_end": "2026-01-31",
+      "note": "Share count rose over the last year after a multi-year shrink. A candidate signal for the dilution / financing lens, not a ranked short. Funds, ETFs, and other non-operating instruments are omitted: creation units are not dilution."
+    }
+  ]
 }

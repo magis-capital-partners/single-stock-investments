@@ -1,0 +1,2036 @@
+{
+  "schema_version": "buyback_radar.v1",
+  "generated_at": "2026-10-18T17:55:46Z",
+  "as_of": "2026-10-18",
+  "research_only": true,
+  "in_base_irr": false,
+  "authority": "none",
+  "description": "Share-cannibal vector for the portfolio registry, plus buyback events that create a forced seller or a neglected buyer. Full per-company rows live in companies_ref. Annual history lives in series_ref. This file stays under 100 KB.",
+  "methodology": "Share counts are read from SEC XBRL companyfacts, one number per fiscal year from 1999 forward when the filing has it. The preferred count is the 10-K cover page, dei:EntityCommonStockSharesOutstanding. If that tag is missing, the count is us-gaap common shares outstanding, then diluted weighted-average shares, then basic weighted-average shares. When several filings report the same year, the latest filing wins, which picks up the restatement a company makes after a split. Years that fell out of the comparative columns before a later split are multiplied by a forward split of 1.5, 2, 3, 4, 5, 7, 10, 20, 25, 50, or 100 when the share count jumps by that ratio, or by a reverse split of 1-for-3 or sharper. The new level has to still be there the next year, so a one-year spike that reverts is dropped instead of treated as the peak. A 7-for-1 is included because a buyback in the split year moves the observed ratio off the exact integer. A one-year halving is not treated as a split, because that is often a real buyback; those names are flagged split_review. Retired since peak is 100 minus the latest count divided by the highest fiscal-year count in the series. The five-year and one-year changes compare the latest count with the count about five years and one year earlier. Buyback yield is last fiscal year's repurchase cash divided by market value. The cash tag is PaymentsForRepurchaseOfCommonStock. If that tag is missing or zero for the latest fiscal year, the yield uses the first positive amount among PaymentsForRepurchaseOfEquity, TreasuryStockValueAcquiredCostMethod, and StockRepurchasedDuringPeriodValue. The tag that supplied the number is stored as repurchase_tag. A reported zero is kept only after those tags are checked. If none of them has a fact, the yield is left blank rather than shown as zero. Market value is the price in index_float_adv.json times the latest EDGAR share count. EDGAR has no live price, so a name with no cached price has no yield. The yield is a percent of market value, not a return per year. Pace compares the last year with the company's own five-year pace. issuing_again: the five-year change is -10% or lower and the last year is up at least 2%. stopped: that same five-year shrink, and the last year moved less than 1.5%. accelerating: the last year is down at least 3% and at least 1.5 times the company's own annual pace over five years. steady: still shrinking, but not faster than that pace. No pace is assigned when there is no shrink to compare. Exchange-traded funds, exchange-traded products, closed-end funds, listed investment companies, royalty trusts, and any other instrument type that is not an operating company or a holding company get no pace and no grade. A name with no instrument type is treated the same way when the SEC name says fund, ETF, ETP, SPDR, iShares, or ProShares, or when the name is a trust that sells trust assets to pay expenses. Creation and redemption of units move the share count. That is not dilution, and those names are left out of the issuing_again flag. A property or realty trust stays in. The A–E grade covers the last ten fiscal years and three questions, each scored 0, 1, or 2. Did the shares actually disappear, net of issuance: net decline in the share count divided by shares repurchased (StockRepurchasedDuringPeriodShares, else treasury shares acquired). 80% or more scores 2, 50% or more scores 1, and below that scores 0 and cannot be an A. Was it paid for with cash the business earned: operating cash flow minus capital spending, against repurchase cash. Covering the buybacks without new debt above a quarter of the outlay scores 2. Covering half scores 1. What was paid versus this company's own history: repurchase cash divided by shares bought that year, latest three years against the earlier years in the window. Paying 85% or less of that history scores 2. Paying up to 115% scores 1. Six points is an A, five a B, four a C, three a D, two or fewer an E. If the price-paid figure cannot be computed, the letter is marked partial and cannot be an A. A letter is withheld when repurchase cash, the share-count path, or funding cannot be read. Banks and insurers are graded with the same arithmetic. Buyback Radar withholds their letter. Treat a financial-company letter as weaker. Situation rows are only issuer tenders (SC TO-I), accelerated share repurchases announced in an 8-K, and new programs of at least about 10% of market value. A plain big-cap authorization is one line in program_mentions, not a row. Every situation row is research_only. Nothing here is a position, a stance, or an input to the base return.",
+  "companies_ref": "dashboard/data/buyback_companies.json",
+  "series_ref": "_system/data/buyback_radar/share_series.jsonl",
+  "counts": {
+    "companies": 681,
+    "with_yield": 488,
+    "with_grade": 420,
+    "non_operating": 6,
+    "pace": {
+      "accelerating": 45,
+      "steady": 154,
+      "stopped": 22,
+      "issuing_again": 2
+    },
+    "events": 40,
+    "program_mentions": 20,
+    "gaps": 122,
+    "skipped_non_us": 50
+  },
+  "notable": {
+    "most_retired": [
+      {
+        "ticker": "DVA",
+        "company": "DAVITA INC.",
+        "retired_since_peak_pct": 84.49,
+        "change_5y_pct": -38.94,
+        "change_1y_pct": -16.5,
+        "buyback_yield_pct": 10.35,
+        "pace": "accelerating",
+        "grade": "E"
+      },
+      {
+        "ticker": "PTC",
+        "company": "PTC Inc.",
+        "retired_since_peak_pct": 74.69,
+        "change_5y_pct": 4.01,
+        "change_1y_pct": 0.74,
+        "buyback_yield_pct": 0.54,
+        "pace": null,
+        "grade": "C"
+      },
+      {
+        "ticker": "EBAY",
+        "company": "eBay Inc.",
+        "retired_since_peak_pct": 65.51,
+        "change_5y_pct": -34.16,
+        "change_1y_pct": null,
+        "buyback_yield_pct": 4.54,
+        "pace": null,
+        "grade": "E"
+      },
+      {
+        "ticker": "AMP",
+        "company": "AMERIPRISE FINANCIAL, INC.",
+        "retired_since_peak_pct": 64.31,
+        "change_5y_pct": -21.9,
+        "change_1y_pct": -5.14,
+        "buyback_yield_pct": 6.34,
+        "pace": "steady",
+        "grade": "D"
+      },
+      {
+        "ticker": "AZO",
+        "company": "AUTOZONE INC",
+        "retired_since_peak_pct": 62.73,
+        "change_5y_pct": -28.23,
+        "change_1y_pct": -1.61,
+        "buyback_yield_pct": 3.1,
+        "pace": "steady",
+        "grade": "E"
+      },
+      {
+        "ticker": "PRU",
+        "company": "PRUDENTIAL FINANCIAL INC",
+        "retired_since_peak_pct": 62.42,
+        "change_5y_pct": -12.34,
+        "change_1y_pct": -1.69,
+        "buyback_yield_pct": 2.47,
+        "pace": "steady",
+        "grade": null
+      },
+      {
+        "ticker": "LOW",
+        "company": "LOWES COMPANIES INC",
+        "retired_since_peak_pct": 61.2,
+        "change_5y_pct": -21.92,
+        "change_1y_pct": 0.06,
+        "buyback_yield_pct": 0.19,
+        "pace": "stopped",
+        "grade": "D"
+      },
+      {
+        "ticker": "HPQ",
+        "company": "HP INC.",
+        "retired_since_peak_pct": 61.17,
+        "change_5y_pct": -28.82,
+        "change_1y_pct": -2.11,
+        "buyback_yield_pct": 3.0,
+        "pace": "steady",
+        "grade": "E"
+      },
+      {
+        "ticker": "BBY",
+        "company": "Best Buy Co., Inc.",
+        "retired_since_peak_pct": 60.8,
+        "change_5y_pct": -16.37,
+        "change_1y_pct": -1.07,
+        "buyback_yield_pct": 1.39,
+        "pace": "stopped",
+        "grade": "E"
+      },
+      {
+        "ticker": "SYF",
+        "company": "Synchrony Financial",
+        "retired_since_peak_pct": 58.31,
+        "change_5y_pct": -40.47,
+        "change_1y_pct": -10.59,
+        "buyback_yield_pct": 11.43,
+        "pace": "steady",
+        "grade": null
+      },
+      {
+        "ticker": "TRV",
+        "company": "Travelers Companies, Inc.",
+        "retired_since_peak_pct": 57.9,
+        "change_5y_pct": -14.26,
+        "change_1y_pct": -4.63,
+        "buyback_yield_pct": 3.62,
+        "pace": "accelerating",
+        "grade": null
+      },
+      {
+        "ticker": "CF",
+        "company": "CF INDUSTRIES HOLDINGS, INC.",
+        "retired_since_peak_pct": 57.82,
+        "change_5y_pct": -28.25,
+        "change_1y_pct": -9.36,
+        "buyback_yield_pct": 7.42,
+        "pace": "steady",
+        "grade": "D"
+      },
+      {
+        "ticker": "MPC",
+        "company": "Marathon Petroleum Corporation",
+        "retired_since_peak_pct": 57.61,
+        "change_5y_pct": -54.74,
+        "change_1y_pct": -5.71,
+        "buyback_yield_pct": 2.48,
+        "pace": "steady",
+        "grade": "E"
+      },
+      {
+        "ticker": "AIZ",
+        "company": "Assurant, Inc.",
+        "retired_since_peak_pct": 57.33,
+        "change_5y_pct": -14.17,
+        "change_1y_pct": -2.15,
+        "buyback_yield_pct": 2.17,
+        "pace": "steady",
+        "grade": "E"
+      },
+      {
+        "ticker": "MCK",
+        "company": "McKESSON CORPORATION",
+        "retired_since_peak_pct": 55.71,
+        "change_5y_pct": -24.01,
+        "change_1y_pct": -3.92,
+        "buyback_yield_pct": 3.96,
+        "pace": "steady",
+        "grade": "D"
+      },
+      {
+        "ticker": "MGM",
+        "company": "MGM Resorts International",
+        "retired_since_peak_pct": 55.45,
+        "change_5y_pct": -48.3,
+        "change_1y_pct": -10.41,
+        "buyback_yield_pct": 16.29,
+        "pace": "steady",
+        "grade": "E"
+      },
+      {
+        "ticker": "FLEX",
+        "company": "FLEX LTD.",
+        "retired_since_peak_pct": 55.02,
+        "change_5y_pct": -25.34,
+        "change_1y_pct": -1.86,
+        "buyback_yield_pct": 2.62,
+        "pace": "steady",
+        "grade": "E"
+      },
+      {
+        "ticker": "ROAD",
+        "company": "Construction Partners, Inc.",
+        "retired_since_peak_pct": 53.99,
+        "change_5y_pct": null,
+        "change_1y_pct": -51.39,
+        "buyback_yield_pct": null,
+        "pace": null,
+        "grade": null
+      },
+      {
+        "ticker": "NOC",
+        "company": "NORTHROP GRUMMAN CORP /DE/",
+        "retired_since_peak_pct": 53.13,
+        "change_5y_pct": -14.87,
+        "change_1y_pct": -1.96,
+        "buyback_yield_pct": 2.29,
+        "pace": "steady",
+        "grade": "E"
+      },
+      {
+        "ticker": "KR",
+        "company": "KROGER CO",
+        "retired_since_peak_pct": 52.6,
+        "change_5y_pct": -18.54,
+        "change_1y_pct": null,
+        "buyback_yield_pct": 7.03,
+        "pace": null,
+        "grade": "E"
+      },
+      {
+        "ticker": "NVR",
+        "company": "NVR, Inc.",
+        "retired_since_peak_pct": 52.59,
+        "change_5y_pct": -24.11,
+        "change_1y_pct": -6.58,
+        "buyback_yield_pct": 11.05,
+        "pace": "steady",
+        "grade": "E"
+      },
+      {
+        "ticker": "MAR",
+        "company": "MARRIOTT INTERNATIONAL INC /MD/",
+        "retired_since_peak_pct": 51.99,
+        "change_5y_pct": -18.32,
+        "change_1y_pct": -3.88,
+        "buyback_yield_pct": 3.23,
+        "pace": "steady",
+        "grade": "E"
+      },
+      {
+        "ticker": "ADSK",
+        "company": "Autodesk, Inc.",
+        "retired_since_peak_pct": 51.97,
+        "change_5y_pct": -3.91,
+        "change_1y_pct": -0.94,
+        "buyback_yield_pct": 2.71,
+        "pace": null,
+        "grade": null
+      },
+      {
+        "ticker": "ALL",
+        "company": "ALLSTATE CORP",
+        "retired_since_peak_pct": 51.63,
+        "change_5y_pct": -14.31,
+        "change_1y_pct": -2.07,
+        "buyback_yield_pct": 1.98,
+        "pace": "steady",
+        "grade": "C"
+      },
+      {
+        "ticker": "L",
+        "company": "LOEWS CORP",
+        "retired_since_peak_pct": 51.22,
+        "change_5y_pct": -22.84,
+        "change_1y_pct": -3.2,
+        "buyback_yield_pct": 3.6,
+        "pace": "steady",
+        "grade": "C"
+      }
+    ],
+    "by_pace": {
+      "accelerating": [
+        {
+          "ticker": "LCID",
+          "company": "Lucid Group, Inc.",
+          "retired_since_peak_pct": 89.19,
+          "change_5y_pct": -55.74,
+          "change_1y_pct": -89.19,
+          "buyback_yield_pct": null,
+          "pace": "accelerating",
+          "grade": "E"
+        },
+        {
+          "ticker": "DVA",
+          "company": "DAVITA INC.",
+          "retired_since_peak_pct": 84.49,
+          "change_5y_pct": -38.94,
+          "change_1y_pct": -16.5,
+          "buyback_yield_pct": 10.35,
+          "pace": "accelerating",
+          "grade": "E"
+        },
+        {
+          "ticker": "LDOS",
+          "company": "Leidos Holdings, Inc.",
+          "retired_since_peak_pct": 82.33,
+          "change_5y_pct": -10.93,
+          "change_1y_pct": -3.64,
+          "buyback_yield_pct": 2.55,
+          "pace": "accelerating",
+          "grade": null
+        },
+        {
+          "ticker": "ACLS",
+          "company": "AXCELIS TECHNOLOGIES INC",
+          "retired_since_peak_pct": 73.55,
+          "change_5y_pct": -8.93,
+          "change_1y_pct": -4.46,
+          "buyback_yield_pct": 3.42,
+          "pace": "accelerating",
+          "grade": "E"
+        },
+        {
+          "ticker": "TRV",
+          "company": "Travelers Companies, Inc.",
+          "retired_since_peak_pct": 57.9,
+          "change_5y_pct": -14.26,
+          "change_1y_pct": -4.63,
+          "buyback_yield_pct": 3.62,
+          "pace": "accelerating",
+          "grade": null
+        },
+        {
+          "ticker": "LBRDK",
+          "company": "LIBERTY BROADBAND CORPORATION",
+          "retired_since_peak_pct": 47.49,
+          "change_5y_pct": -47.14,
+          "change_1y_pct": -35.27,
+          "buyback_yield_pct": 0.85,
+          "pace": "accelerating",
+          "grade": "E"
+        },
+        {
+          "ticker": "GS",
+          "company": "The Goldman Sachs Group, Inc.",
+          "retired_since_peak_pct": 43.61,
+          "change_5y_pct": -14.18,
+          "change_1y_pct": -4.9,
+          "buyback_yield_pct": 4.67,
+          "pace": "accelerating",
+          "grade": "E"
+        },
+        {
+          "ticker": "C",
+          "company": "Citigroup Inc",
+          "retired_since_peak_pct": 42.43,
+          "change_5y_pct": -16.19,
+          "change_1y_pct": -7.17,
+          "buyback_yield_pct": 6.15,
+          "pace": "accelerating",
+          "grade": "E"
+        },
+        {
+          "ticker": "RF",
+          "company": "Regions Financial Corporation",
+          "retired_since_peak_pct": 39.17,
+          "change_5y_pct": -10.11,
+          "change_1y_pct": -4.63,
+          "buyback_yield_pct": 4.52,
+          "pace": "accelerating",
+          "grade": null
+        },
+        {
+          "ticker": "MSCI",
+          "company": "MSCI INC.",
+          "retired_since_peak_pct": 38.89,
+          "change_5y_pct": -11.02,
+          "change_1y_pct": -5.38,
+          "buyback_yield_pct": 5.88,
+          "pace": "accelerating",
+          "grade": "E"
+        },
+        {
+          "ticker": "HSIC",
+          "company": "HENRY SCHEIN, INC.",
+          "retired_since_peak_pct": 37.59,
+          "change_5y_pct": -19.49,
+          "change_1y_pct": -7.63,
+          "buyback_yield_pct": 8.52,
+          "pace": "accelerating",
+          "grade": "D"
+        },
+        {
+          "ticker": "QCOM",
+          "company": "QUALCOMM INC/DE",
+          "retired_since_peak_pct": 37.15,
+          "change_5y_pct": -5.31,
+          "change_1y_pct": -3.6,
+          "buyback_yield_pct": 4.6,
+          "pace": "accelerating",
+          "grade": "B"
+        },
+        {
+          "ticker": "LUV",
+          "company": "SOUTHWEST AIRLINES CO.",
+          "retired_since_peak_pct": 36.43,
+          "change_5y_pct": -16.82,
+          "change_1y_pct": -17.1,
+          "buyback_yield_pct": 12.71,
+          "pace": "accelerating",
+          "grade": null
+        },
+        {
+          "ticker": "JCI",
+          "company": "JOHNSON CONTROLS INTERNATIONAL PLC",
+          "retired_since_peak_pct": 34.76,
+          "change_5y_pct": -15.58,
+          "change_1y_pct": -7.71,
+          "buyback_yield_pct": 6.64,
+          "pace": "accelerating",
+          "grade": "E"
+        },
+        {
+          "ticker": "IQV",
+          "company": "IQVIA HOLDINGS INC.",
+          "retired_since_peak_pct": 34.65,
+          "change_5y_pct": -11.28,
+          "change_1y_pct": -3.63,
+          "buyback_yield_pct": 2.7,
+          "pace": "accelerating",
+          "grade": "C"
+        },
+        {
+          "ticker": "BAC",
+          "company": "BofA Finance LLC",
+          "retired_since_peak_pct": 33.67,
+          "change_5y_pct": -16.87,
+          "change_1y_pct": -5.63,
+          "buyback_yield_pct": 5.78,
+          "pace": "accelerating",
+          "grade": null
+        },
+        {
+          "ticker": "APTV",
+          "company": "APTIV PLC",
+          "retired_since_peak_pct": 32.52,
+          "change_5y_pct": -21.21,
+          "change_1y_pct": -7.28,
+          "buyback_yield_pct": 4.13,
+          "pace": "accelerating",
+          "grade": "D"
+        },
+        {
+          "ticker": "TER",
+          "company": "TERADYNE, INC.",
+          "retired_since_peak_pct": 28.11,
+          "change_5y_pct": -6.08,
+          "change_1y_pct": -3.19,
+          "buyback_yield_pct": 1.31,
+          "pace": "accelerating",
+          "grade": "D"
+        },
+        {
+          "ticker": "TBBK",
+          "company": "THE BANCORP, INC.",
+          "retired_since_peak_pct": 27.17,
+          "change_5y_pct": -27.17,
+          "change_1y_pct": -12.22,
+          "buyback_yield_pct": 18.3,
+          "pace": "accelerating",
+          "grade": "D"
+        },
+        {
+          "ticker": "IT",
+          "company": "Gartner, Inc.",
+          "retired_since_peak_pct": 26.61,
+          "change_5y_pct": -20.59,
+          "change_1y_pct": -8.29,
+          "buyback_yield_pct": 13.63,
+          "pace": "accelerating",
+          "grade": null
+        },
+        {
+          "ticker": "NTRS",
+          "company": "NORTHERN TRUST CORP",
+          "retired_since_peak_pct": 23.24,
+          "change_5y_pct": -10.79,
+          "change_1y_pct": -5.04,
+          "buyback_yield_pct": 4.14,
+          "pace": "accelerating",
+          "grade": "B"
+        },
+        {
+          "ticker": "SWKS",
+          "company": "SKYWORKS SOLUTIONS, INC.",
+          "retired_since_peak_pct": 22.84,
+          "change_5y_pct": -9.07,
+          "change_1y_pct": -6.72,
+          "buyback_yield_pct": 7.0,
+          "pace": "accelerating",
+          "grade": "C"
+        },
+        {
+          "ticker": "AKAM",
+          "company": "Akamai Technologies, Inc",
+          "retired_since_peak_pct": 22.58,
+          "change_5y_pct": -11.23,
+          "change_1y_pct": -3.61,
+          "buyback_yield_pct": 5.98,
+          "pace": "accelerating",
+          "grade": "C"
+        },
+        {
+          "ticker": "DHI",
+          "company": "D.R. Horton, Inc.",
+          "retired_since_peak_pct": 22.38,
+          "change_5y_pct": -19.85,
+          "change_1y_pct": -9.06,
+          "buyback_yield_pct": 10.55,
+          "pace": "accelerating",
+          "grade": "D"
+        },
+        {
+          "ticker": "ADBE",
+          "company": "ADOBE INC.",
+          "retired_since_peak_pct": 21.68,
+          "change_5y_pct": -14.25,
+          "change_1y_pct": -5.7,
+          "buyback_yield_pct": 10.92,
+          "pace": "accelerating",
+          "grade": "C"
+        }
+      ],
+      "stopped": [
+        {
+          "ticker": "XTIA",
+          "company": "XTI AEROSPACE, INC.",
+          "retired_since_peak_pct": 96.4,
+          "change_5y_pct": -94.58,
+          "change_1y_pct": -0.75,
+          "buyback_yield_pct": null,
+          "pace": "stopped",
+          "grade": null
+        },
+        {
+          "ticker": "LOW",
+          "company": "LOWES COMPANIES INC",
+          "retired_since_peak_pct": 61.2,
+          "change_5y_pct": -21.92,
+          "change_1y_pct": 0.06,
+          "buyback_yield_pct": 0.19,
+          "pace": "stopped",
+          "grade": "D"
+        },
+        {
+          "ticker": "BBY",
+          "company": "Best Buy Co., Inc.",
+          "retired_since_peak_pct": 60.8,
+          "change_5y_pct": -16.37,
+          "change_1y_pct": -1.07,
+          "buyback_yield_pct": 1.39,
+          "pace": "stopped",
+          "grade": "E"
+        },
+        {
+          "ticker": "NSC",
+          "company": "NORFOLK SOUTHERN CORP",
+          "retired_since_peak_pct": 39.25,
+          "change_5y_pct": -10.85,
+          "change_1y_pct": -0.82,
+          "buyback_yield_pct": 0.73,
+          "pace": "stopped",
+          "grade": "E"
+        },
+        {
+          "ticker": "DGX",
+          "company": "Quest Diagnostics Inc",
+          "retired_since_peak_pct": 38.59,
+          "change_5y_pct": -17.68,
+          "change_1y_pct": -1.0,
+          "buyback_yield_pct": 1.71,
+          "pace": "stopped",
+          "grade": "D"
+        },
+        {
+          "ticker": "DE",
+          "company": "DEERE FUNDING CANADA Corp",
+          "retired_since_peak_pct": 36.02,
+          "change_5y_pct": -13.7,
+          "change_1y_pct": -0.42,
+          "buyback_yield_pct": 0.65,
+          "pace": "stopped",
+          "grade": "E"
+        },
+        {
+          "ticker": "LRCX",
+          "company": "LAM RESEARCH CORPORATION",
+          "retired_since_peak_pct": 32.61,
+          "change_5y_pct": -11.85,
+          "change_1y_pct": -1.13,
+          "buyback_yield_pct": 1.11,
+          "pace": "stopped",
+          "grade": "D"
+        },
+        {
+          "ticker": "VST",
+          "company": "Vistra Corp.",
+          "retired_since_peak_pct": 30.91,
+          "change_5y_pct": -30.34,
+          "change_1y_pct": -0.59,
+          "buyback_yield_pct": 1.98,
+          "pace": "stopped",
+          "grade": "E"
+        },
+        {
+          "ticker": "MCHB",
+          "company": "MECHANICS BANCORP",
+          "retired_since_peak_pct": 30.01,
+          "change_5y_pct": -20.12,
+          "change_1y_pct": 0.34,
+          "buyback_yield_pct": null,
+          "pace": "stopped",
+          "grade": "D"
+        },
+        {
+          "ticker": "ADM",
+          "company": "Archer-Daniels-Midland Co",
+          "retired_since_peak_pct": 28.8,
+          "change_5y_pct": -13.83,
+          "change_1y_pct": 0.31,
+          "buyback_yield_pct": 0.0,
+          "pace": "stopped",
+          "grade": "E"
+        },
+        {
+          "ticker": "CHRW",
+          "company": "C. H. ROBINSON WORLDWIDE, INC.",
+          "retired_since_peak_pct": 28.79,
+          "change_5y_pct": -11.35,
+          "change_1y_pct": -0.07,
+          "buyback_yield_pct": 2.08,
+          "pace": "stopped",
+          "grade": "C"
+        },
+        {
+          "ticker": "NUE",
+          "company": "NUCOR CORP",
+          "retired_since_peak_pct": 28.61,
+          "change_5y_pct": -23.58,
+          "change_1y_pct": -1.2,
+          "buyback_yield_pct": 1.21,
+          "pace": "stopped",
+          "grade": "E"
+        },
+        {
+          "ticker": "FDX",
+          "company": "FedEx Corporation",
+          "retired_since_peak_pct": 25.38,
+          "change_5y_pct": -11.51,
+          "change_1y_pct": 0.29,
+          "buyback_yield_pct": 1.14,
+          "pace": "stopped",
+          "grade": "E"
+        },
+        {
+          "ticker": "MOS",
+          "company": "MOSAIC CO",
+          "retired_since_peak_pct": 25.38,
+          "change_5y_pct": -16.25,
+          "change_1y_pct": 0.18,
+          "buyback_yield_pct": 3.95,
+          "pace": "stopped",
+          "grade": "E"
+        },
+        {
+          "ticker": "EA",
+          "company": "ELECTRONIC ARTS INC.",
+          "retired_since_peak_pct": 24.57,
+          "change_5y_pct": -12.38,
+          "change_1y_pct": -0.01,
+          "buyback_yield_pct": 1.46,
+          "pace": "stopped",
+          "grade": null
+        },
+        {
+          "ticker": "KLAC",
+          "company": "KLA Corporation",
+          "retired_since_peak_pct": 21.76,
+          "change_5y_pct": -14.46,
+          "change_1y_pct": -0.99,
+          "buyback_yield_pct": 1.0,
+          "pace": "stopped",
+          "grade": "C"
+        },
+        {
+          "ticker": "CRH",
+          "company": "CRH public limited company",
+          "retired_since_peak_pct": 20.77,
+          "change_5y_pct": -15.96,
+          "change_1y_pct": -1.22,
+          "buyback_yield_pct": 2.15,
+          "pace": "stopped",
+          "grade": "B"
+        },
+        {
+          "ticker": "MO",
+          "company": "Altria Group, Inc.",
+          "retired_since_peak_pct": 20.08,
+          "change_5y_pct": -10.05,
+          "change_1y_pct": -1.11,
+          "buyback_yield_pct": 0.81,
+          "pace": "stopped",
+          "grade": "C"
+        },
+        {
+          "ticker": "IP",
+          "company": "INTERNATIONAL PAPER COMPANY",
+          "retired_since_peak_pct": 20.0,
+          "change_5y_pct": -10.21,
+          "change_1y_pct": 0.64,
+          "buyback_yield_pct": 0.36,
+          "pace": "stopped",
+          "grade": null
+        },
+        {
+          "ticker": "CNC",
+          "company": "CENTENE CORPORATION",
+          "retired_since_peak_pct": 16.19,
+          "change_5y_pct": -15.44,
+          "change_1y_pct": -0.86,
+          "buyback_yield_pct": 1.37,
+          "pace": "stopped",
+          "grade": "D"
+        },
+        {
+          "ticker": "BABA",
+          "company": "Alibaba Group Holding Ltd",
+          "retired_since_peak_pct": 14.37,
+          "change_5y_pct": -14.37,
+          "change_1y_pct": 0.57,
+          "buyback_yield_pct": 0.54,
+          "pace": "stopped",
+          "grade": null
+        },
+        {
+          "ticker": "RTX",
+          "company": "RTX CORPORATION",
+          "retired_since_peak_pct": 11.66,
+          "change_5y_pct": -11.66,
+          "change_1y_pct": 0.76,
+          "buyback_yield_pct": 0.02,
+          "pace": "stopped",
+          "grade": null
+        }
+      ],
+      "issuing_again": [
+        {
+          "ticker": "OUST",
+          "company": "Ouster, Inc.",
+          "retired_since_peak_pct": 83.74,
+          "change_5y_pct": -61.07,
+          "change_1y_pct": 16.81,
+          "buyback_yield_pct": null,
+          "pace": "issuing_again",
+          "grade": "E"
+        },
+        {
+          "ticker": "NRG",
+          "company": "NRG Energy, Inc",
+          "retired_since_peak_pct": 36.47,
+          "change_5y_pct": -12.26,
+          "change_1y_pct": 8.39,
+          "buyback_yield_pct": 5.94,
+          "pace": "issuing_again",
+          "grade": "E"
+        }
+      ],
+      "steady": [
+        {
+          "ticker": "DD",
+          "company": "DUPONT DE NEMOURS, INC.",
+          "retired_since_peak_pct": 82.44,
+          "change_5y_pct": -24.0,
+          "change_1y_pct": -2.18,
+          "buyback_yield_pct": 0.74,
+          "pace": "steady",
+          "grade": "D"
+        },
+        {
+          "ticker": "AIG",
+          "company": "AMERICAN INTERNATIONAL GROUP, INC.",
+          "retired_since_peak_pct": 71.71,
+          "change_5y_pct": -37.95,
+          "change_1y_pct": -9.57,
+          "buyback_yield_pct": 13.75,
+          "pace": "steady",
+          "grade": "E"
+        },
+        {
+          "ticker": "AMP",
+          "company": "AMERIPRISE FINANCIAL, INC.",
+          "retired_since_peak_pct": 64.31,
+          "change_5y_pct": -21.9,
+          "change_1y_pct": -5.14,
+          "buyback_yield_pct": 6.34,
+          "pace": "steady",
+          "grade": "D"
+        },
+        {
+          "ticker": "AZO",
+          "company": "AUTOZONE INC",
+          "retired_since_peak_pct": 62.73,
+          "change_5y_pct": -28.23,
+          "change_1y_pct": -1.61,
+          "buyback_yield_pct": 3.1,
+          "pace": "steady",
+          "grade": "E"
+        },
+        {
+          "ticker": "PRU",
+          "company": "PRUDENTIAL FINANCIAL INC",
+          "retired_since_peak_pct": 62.42,
+          "change_5y_pct": -12.34,
+          "change_1y_pct": -1.69,
+          "buyback_yield_pct": 2.47,
+          "pace": "steady",
+          "grade": null
+        },
+        {
+          "ticker": "HPQ",
+          "company": "HP INC.",
+          "retired_since_peak_pct": 61.17,
+          "change_5y_pct": -28.82,
+          "change_1y_pct": -2.11,
+          "buyback_yield_pct": 3.0,
+          "pace": "steady",
+          "grade": "E"
+        },
+        {
+          "ticker": "SYF",
+          "company": "Synchrony Financial",
+          "retired_since_peak_pct": 58.31,
+          "change_5y_pct": -40.47,
+          "change_1y_pct": -10.59,
+          "buyback_yield_pct": 11.43,
+          "pace": "steady",
+          "grade": null
+        },
+        {
+          "ticker": "CF",
+          "company": "CF INDUSTRIES HOLDINGS, INC.",
+          "retired_since_peak_pct": 57.82,
+          "change_5y_pct": -28.25,
+          "change_1y_pct": -9.36,
+          "buyback_yield_pct": 7.42,
+          "pace": "steady",
+          "grade": "D"
+        },
+        {
+          "ticker": "MPC",
+          "company": "Marathon Petroleum Corporation",
+          "retired_since_peak_pct": 57.61,
+          "change_5y_pct": -54.74,
+          "change_1y_pct": -5.71,
+          "buyback_yield_pct": 2.48,
+          "pace": "steady",
+          "grade": "E"
+        },
+        {
+          "ticker": "AIZ",
+          "company": "Assurant, Inc.",
+          "retired_since_peak_pct": 57.33,
+          "change_5y_pct": -14.17,
+          "change_1y_pct": -2.15,
+          "buyback_yield_pct": 2.17,
+          "pace": "steady",
+          "grade": "E"
+        },
+        {
+          "ticker": "MCK",
+          "company": "McKESSON CORPORATION",
+          "retired_since_peak_pct": 55.71,
+          "change_5y_pct": -24.01,
+          "change_1y_pct": -3.92,
+          "buyback_yield_pct": 3.96,
+          "pace": "steady",
+          "grade": "D"
+        },
+        {
+          "ticker": "MGM",
+          "company": "MGM Resorts International",
+          "retired_since_peak_pct": 55.45,
+          "change_5y_pct": -48.3,
+          "change_1y_pct": -10.41,
+          "buyback_yield_pct": 16.29,
+          "pace": "steady",
+          "grade": "E"
+        },
+        {
+          "ticker": "FLEX",
+          "company": "FLEX LTD.",
+          "retired_since_peak_pct": 55.02,
+          "change_5y_pct": -25.34,
+          "change_1y_pct": -1.86,
+          "buyback_yield_pct": 2.62,
+          "pace": "steady",
+          "grade": "E"
+        },
+        {
+          "ticker": "NOC",
+          "company": "NORTHROP GRUMMAN CORP /DE/",
+          "retired_since_peak_pct": 53.13,
+          "change_5y_pct": -14.87,
+          "change_1y_pct": -1.96,
+          "buyback_yield_pct": 2.29,
+          "pace": "steady",
+          "grade": "E"
+        },
+        {
+          "ticker": "NVR",
+          "company": "NVR, Inc.",
+          "retired_since_peak_pct": 52.59,
+          "change_5y_pct": -24.11,
+          "change_1y_pct": -6.58,
+          "buyback_yield_pct": 11.05,
+          "pace": "steady",
+          "grade": "E"
+        },
+        {
+          "ticker": "MAR",
+          "company": "MARRIOTT INTERNATIONAL INC /MD/",
+          "retired_since_peak_pct": 51.99,
+          "change_5y_pct": -18.32,
+          "change_1y_pct": -3.88,
+          "buyback_yield_pct": 3.23,
+          "pace": "steady",
+          "grade": "E"
+        },
+        {
+          "ticker": "ALL",
+          "company": "ALLSTATE CORP",
+          "retired_since_peak_pct": 51.63,
+          "change_5y_pct": -14.31,
+          "change_1y_pct": -2.07,
+          "buyback_yield_pct": 1.98,
+          "pace": "steady",
+          "grade": "C"
+        },
+        {
+          "ticker": "L",
+          "company": "LOEWS CORP",
+          "retired_since_peak_pct": 51.22,
+          "change_5y_pct": -22.84,
+          "change_1y_pct": -3.2,
+          "buyback_yield_pct": 3.6,
+          "pace": "steady",
+          "grade": "C"
+        },
+        {
+          "ticker": "ELV",
+          "company": "ELEVANCE HEALTH, INC.",
+          "retired_since_peak_pct": 50.28,
+          "change_5y_pct": -9.88,
+          "change_1y_pct": -2.92,
+          "buyback_yield_pct": 2.75,
+          "pace": "steady",
+          "grade": "E"
+        },
+        {
+          "ticker": "PHM",
+          "company": "PULTEGROUP, INC.",
+          "retired_since_peak_pct": 50.25,
+          "change_5y_pct": -27.67,
+          "change_1y_pct": -5.0,
+          "buyback_yield_pct": 5.52,
+          "pace": "steady",
+          "grade": "D"
+        },
+        {
+          "ticker": "VRSN",
+          "company": "VERISIGN INC/CA",
+          "retired_since_peak_pct": 50.01,
+          "change_5y_pct": -18.92,
+          "change_1y_pct": -3.07,
+          "buyback_yield_pct": 3.16,
+          "pace": "steady",
+          "grade": "E"
+        },
+        {
+          "ticker": "HCA",
+          "company": "HCA Healthcare, Inc.",
+          "retired_since_peak_pct": 49.59,
+          "change_5y_pct": -34.21,
+          "change_1y_pct": -9.95,
+          "buyback_yield_pct": 9.61,
+          "pace": "steady",
+          "grade": "E"
+        },
+        {
+          "ticker": "JBL",
+          "company": "JABIL INC",
+          "retired_since_peak_pct": 48.68,
+          "change_5y_pct": -28.56,
+          "change_1y_pct": -5.32,
+          "buyback_yield_pct": 3.26,
+          "pace": "steady",
+          "grade": "E"
+        },
+        {
+          "ticker": "VLO",
+          "company": "VALERO ENERGY CORP/TX",
+          "retired_since_peak_pct": 47.44,
+          "change_5y_pct": -26.81,
+          "change_1y_pct": -5.06,
+          "buyback_yield_pct": 1.96,
+          "pace": "steady",
+          "grade": null
+        },
+        {
+          "ticker": "WTW",
+          "company": "WILLIS TOWERS WATSON PLC",
+          "retired_since_peak_pct": 47.32,
+          "change_5y_pct": -26.69,
+          "change_1y_pct": -5.16,
+          "buyback_yield_pct": 5.62,
+          "pace": "steady",
+          "grade": null
+        }
+      ]
+    }
+  },
+  "events": [
+    {
+      "event_type": "issuer_tender",
+      "odd_lot": false,
+      "dutch_auction": true,
+      "fixed_price": false,
+      "price_low": null,
+      "price_high": null,
+      "ends": "2026-04-20",
+      "one_number": "Dutch auction, price range not read",
+      "what": "Issuer tender (Dutch auction): Dutch auction, price range not read.",
+      "ends_label": "Expires 2026-04-20",
+      "ticker": "SCHL",
+      "cik": "0000866729",
+      "accession": "0001193125-26-173633",
+      "url": "https://www.sec.gov/Archives/edgar/data/866729/000119312526173633/d137954dex99a9.htm",
+      "filed": "2026-04-23",
+      "company": "SCHOLASTIC CORP  (SCHL)  (CIK 0000866729)",
+      "research_only": true,
+      "book": "history"
+    },
+    {
+      "event_type": "issuer_tender",
+      "odd_lot": true,
+      "dutch_auction": false,
+      "fixed_price": false,
+      "price_low": null,
+      "price_high": null,
+      "ends": "2026-04-23",
+      "one_number": "Odd-lot tender, price not read",
+      "what": "Issuer tender (odd-lot): Odd-lot tender, price not read.",
+      "ends_label": "Expires 2026-04-23",
+      "ticker": "RBNE",
+      "cik": "0002039060",
+      "accession": "0001140361-26-017143",
+      "url": "https://www.sec.gov/Archives/edgar/data/2039060/000114036126017143/ny20068584x2_sctoia.htm",
+      "filed": "2026-04-27",
+      "company": "Robin Energy Ltd.  (RBNE)  (CIK 0002039060)",
+      "research_only": true,
+      "book": "history"
+    },
+    {
+      "event_type": "issuer_tender",
+      "odd_lot": false,
+      "dutch_auction": false,
+      "fixed_price": true,
+      "price_low": 25.0,
+      "price_high": 25.0,
+      "ends": "2026-06-10",
+      "one_number": "$25.00",
+      "what": "Issuer tender (fixed price): $25.00.",
+      "ends_label": "Expires 2026-06-10",
+      "ticker": "EXFY",
+      "cik": "0001476840",
+      "accession": "0001476840-26-000063",
+      "url": "https://www.sec.gov/Archives/edgar/data/1476840/000147684026000063/expensifyinc-scheduletoxia.htm",
+      "filed": "2026-06-12",
+      "company": "Expensify, Inc.  (EXFY)  (CIK 0001476840)",
+      "research_only": true,
+      "book": "history"
+    },
+    {
+      "event_type": "issuer_tender",
+      "odd_lot": true,
+      "dutch_auction": true,
+      "fixed_price": false,
+      "price_low": null,
+      "price_high": null,
+      "ends": "2026-06-24",
+      "one_number": "Dutch auction, price range not read",
+      "what": "Issuer tender (Dutch auction, odd-lot): Dutch auction, price range not read.",
+      "ends_label": "Expires 2026-06-24",
+      "ticker": "HTT",
+      "cik": "0001692705",
+      "accession": "0001104659-26-078464",
+      "url": "https://www.sec.gov/Archives/edgar/data/1692705/000110465926078464/tm2618847d2_ex99-a5c.htm",
+      "filed": "2026-06-29",
+      "company": "High Templar Tech Ltd  (HTT)  (CIK 0001692705)",
+      "research_only": true,
+      "book": "history"
+    },
+    {
+      "event_type": "accelerated_share_repurchase",
+      "usd": 3000000000,
+      "ends": "2026-06-30",
+      "one_number": "$3.0 billion",
+      "what": "Accelerated share repurchase: $3.0 billion.",
+      "ends_label": "ASR completion 2026-06-30",
+      "ticker": "TKO",
+      "cik": "0001973266",
+      "accession": "0001193125-26-330561",
+      "url": "https://www.sec.gov/Archives/edgar/data/1973266/000119312526330561/tko-ex99_1.htm",
+      "filed": "2026-08-03",
+      "company": "TKO Group Holdings, Inc.  (TKO)  (CIK 0001973266)",
+      "research_only": true,
+      "book": "history"
+    },
+    {
+      "event_type": "issuer_tender",
+      "odd_lot": false,
+      "dutch_auction": false,
+      "fixed_price": true,
+      "price_low": 20.0,
+      "price_high": 20.0,
+      "ends": "2026-09-28",
+      "one_number": "$20.00",
+      "what": "Issuer tender (fixed price): $20.00.",
+      "ends_label": "Expires 2026-09-28",
+      "ticker": "GDEV",
+      "cik": "0001848739",
+      "accession": "0001104659-26-112104",
+      "url": "https://www.sec.gov/Archives/edgar/data/1848739/000110465926112104/tm2626182d2_ex99-a5c.htm",
+      "filed": "2026-09-30",
+      "company": "GDEV Inc.  (GDEV)  (CIK 0001848739)",
+      "research_only": true,
+      "book": "history"
+    },
+    {
+      "event_type": "issuer_tender",
+      "odd_lot": false,
+      "dutch_auction": true,
+      "fixed_price": false,
+      "price_low": null,
+      "price_high": null,
+      "ends": "2026-09-29",
+      "one_number": "Dutch auction, price range not read",
+      "what": "Issuer tender (Dutch auction): Dutch auction, price range not read.",
+      "ends_label": "Expires 2026-09-29",
+      "ticker": "ABUS",
+      "cik": "0001447028",
+      "accession": "0001104659-26-112579",
+      "url": "https://www.sec.gov/Archives/edgar/data/1447028/000110465926112579/tm2626584d2_sctoia.htm",
+      "filed": "2026-10-01",
+      "company": "Arbutus Biopharma Corp  (ABUS)  (CIK 0001447028)",
+      "research_only": true,
+      "book": "history"
+    },
+    {
+      "event_type": "issuer_tender",
+      "odd_lot": true,
+      "dutch_auction": false,
+      "fixed_price": false,
+      "price_low": null,
+      "price_high": null,
+      "ends": "2026-10-09",
+      "one_number": "Odd-lot tender, price not read",
+      "what": "Issuer tender (odd-lot): Odd-lot tender, price not read.",
+      "ends_label": "Expires 2026-10-09",
+      "ticker": "MDT",
+      "cik": "0001613103",
+      "accession": "0001628280-26-065823",
+      "url": "https://www.sec.gov/Archives/edgar/data/1613103/000162828026065823/mdt-amendedno4scheduleissu.htm",
+      "filed": "2026-10-14",
+      "company": "Medtronic plc  (MDT)  (CIK 0001613103)",
+      "research_only": true,
+      "book": "history"
+    },
+    {
+      "event_type": "issuer_tender",
+      "odd_lot": false,
+      "dutch_auction": false,
+      "fixed_price": true,
+      "price_low": 15.0,
+      "price_high": 15.0,
+      "ends": "2026-10-12",
+      "one_number": "$15.00",
+      "what": "Issuer tender (fixed price): $15.00.",
+      "ends_label": "Expires 2026-10-12",
+      "ticker": "CLYD",
+      "cik": "0002094256",
+      "accession": "0001104659-26-115284",
+      "url": "https://www.sec.gov/Archives/edgar/data/2094256/000110465926115284/tm2625364d2_sctoia.htm",
+      "filed": "2026-10-13",
+      "company": "BEACON TOPCO, INC.  (CLYD)  (CIK 0002094256)",
+      "research_only": true,
+      "book": "history"
+    },
+    {
+      "event_type": "accelerated_share_repurchase",
+      "usd": 87000000,
+      "ends": null,
+      "one_number": "$87.0 million",
+      "what": "Accelerated share repurchase: $87.0 million.",
+      "ends_label": "ASR completion date not stated in the excerpt",
+      "ticker": "AMCX",
+      "cik": "0001514991",
+      "accession": "0001514991-26-000086",
+      "url": "https://www.sec.gov/Archives/edgar/data/1514991/000151499126000086/amcx-73026ex991.htm",
+      "filed": "2026-07-30",
+      "company": "AMC Global Media Inc.  (AMCX)  (CIK 0001514991)",
+      "research_only": true,
+      "book": "ranked"
+    },
+    {
+      "event_type": "accelerated_share_repurchase",
+      "usd": 2000000000,
+      "ends": null,
+      "one_number": "$2.0 billion",
+      "what": "Accelerated share repurchase: $2.0 billion.",
+      "ends_label": "ASR completion date not stated in the excerpt",
+      "ticker": "BSX",
+      "cik": "0000885725",
+      "accession": "0000885725-26-000051",
+      "url": "https://www.sec.gov/Archives/edgar/data/885725/000088572526000051/q22026earningsrelease.htm",
+      "filed": "2026-07-29",
+      "company": "BOSTON SCIENTIFIC CORP  (BSX)  (CIK 0000885725)",
+      "research_only": true,
+      "book": "ranked"
+    },
+    {
+      "event_type": "accelerated_share_repurchase",
+      "usd": 6400000000,
+      "ends": null,
+      "one_number": "$6.4 billion",
+      "what": "Accelerated share repurchase: $6.4 billion.",
+      "ends_label": "ASR completion date not stated in the excerpt",
+      "ticker": "CAH",
+      "cik": "0000721371",
+      "accession": "0000721371-26-000037",
+      "url": "https://www.sec.gov/Archives/edgar/data/721371/000072137126000037/a26q4_x063026xex991xnewsre.htm",
+      "filed": "2026-08-11",
+      "company": "CARDINAL HEALTH INC  (CAH)  (CIK 0000721371)",
+      "research_only": true,
+      "book": "ranked"
+    },
+    {
+      "event_type": "accelerated_share_repurchase",
+      "usd": 150000000,
+      "ends": null,
+      "one_number": "$150.0 million",
+      "what": "Accelerated share repurchase: $150.0 million.",
+      "ends_label": "ASR completion date not stated in the excerpt",
+      "ticker": "COLL",
+      "cik": "0001267565",
+      "accession": "0001104659-26-095464",
+      "url": "https://www.sec.gov/Archives/edgar/data/1267565/000110465926095464/tm2623090d1_8k.htm",
+      "filed": "2026-08-13",
+      "company": "COLLEGIUM PHARMACEUTICAL, INC  (COLL)  (CIK 0001267565)",
+      "research_only": true,
+      "book": "ranked"
+    },
+    {
+      "event_type": "accelerated_share_repurchase",
+      "usd": 2300000000,
+      "ends": null,
+      "one_number": "$2.3 billion",
+      "what": "Accelerated share repurchase: $2.3 billion.",
+      "ends_label": "ASR completion date not stated in the excerpt",
+      "ticker": "CTSH",
+      "cik": "0001058290",
+      "accession": "0001058290-26-000030",
+      "url": "https://www.sec.gov/Archives/edgar/data/1058290/000105829026000030/exhibit9916302026.htm",
+      "filed": "2026-07-29",
+      "company": "COGNIZANT TECHNOLOGY SOLUTIONS CORP  (CTSH)  (CIK 0001058290)",
+      "research_only": true,
+      "book": "ranked"
+    },
+    {
+      "event_type": "accelerated_share_repurchase",
+      "usd": 700000000,
+      "ends": null,
+      "one_number": "$700.0 million",
+      "what": "Accelerated share repurchase: $700.0 million.",
+      "ends_label": "ASR completion date not stated in the excerpt",
+      "ticker": "CW",
+      "cik": "0000026324",
+      "accession": "0001628280-26-061788",
+      "url": "https://www.sec.gov/Archives/edgar/data/26324/000162828026061788/cw-20260910.htm",
+      "filed": "2026-09-14",
+      "company": "CURTISS WRIGHT CORP  (CW)  (CIK 0000026324)",
+      "research_only": true,
+      "book": "ranked"
+    },
+    {
+      "event_type": "accelerated_share_repurchase",
+      "usd": 755800000,
+      "ends": null,
+      "one_number": "$755.8 million",
+      "what": "Accelerated share repurchase: $755.8 million.",
+      "ends_label": "ASR completion date not stated in the excerpt",
+      "ticker": "CXW",
+      "cik": "0001070985",
+      "accession": "0001193125-26-341335",
+      "url": "https://www.sec.gov/Archives/edgar/data/1070985/000119312526341335/d118761d8k.htm",
+      "filed": "2026-08-10",
+      "company": "CoreCivic, Inc.  (CXW)  (CIK 0001070985)",
+      "research_only": true,
+      "book": "ranked"
+    },
+    {
+      "event_type": "issuer_tender",
+      "odd_lot": false,
+      "dutch_auction": false,
+      "fixed_price": true,
+      "price_low": 13.58,
+      "price_high": 13.58,
+      "ends": null,
+      "one_number": "$13.58",
+      "what": "Issuer tender (fixed price): $13.58.",
+      "ends_label": "Expiration date not stated in the excerpt",
+      "ticker": "FRBP",
+      "cik": "0001825248",
+      "accession": "0001213900-26-055115",
+      "url": "https://www.sec.gov/Archives/edgar/data/1825248/000121390026055115/ea0278249-03.htm",
+      "filed": "2026-05-12",
+      "company": "Franklin BSP Capital Corp  (FRBP)  (CIK 0001825248)",
+      "research_only": true,
+      "book": "ranked"
+    },
+    {
+      "event_type": "accelerated_share_repurchase",
+      "usd": 2300000000,
+      "ends": null,
+      "one_number": "$2.3 billion",
+      "what": "Accelerated share repurchase: $2.3 billion.",
+      "ends_label": "ASR completion date not stated in the excerpt",
+      "ticker": "GAP",
+      "cik": "0000039911",
+      "accession": "0001628280-26-059262",
+      "url": "https://www.sec.gov/Archives/edgar/data/39911/000162828026059262/q22026eprexhibit991.htm",
+      "filed": "2026-08-27",
+      "company": "GAP INC  (GAP)  (CIK 0000039911)",
+      "research_only": true,
+      "book": "ranked"
+    },
+    {
+      "event_type": "accelerated_share_repurchase",
+      "usd": 300000000,
+      "ends": null,
+      "one_number": "$300.0 million",
+      "what": "Accelerated share repurchase: $300.0 million.",
+      "ends_label": "ASR completion date not stated in the excerpt",
+      "ticker": "GRND",
+      "cik": "0001820144",
+      "accession": "0001820144-26-000023",
+      "url": "https://www.sec.gov/Archives/edgar/data/1820144/000182014426000023/shl_q2x2026xfinal.htm",
+      "filed": "2026-08-06",
+      "company": "Grindr Inc.  (GRND)  (CIK 0001820144)",
+      "research_only": true,
+      "book": "ranked"
+    },
+    {
+      "event_type": "accelerated_share_repurchase",
+      "usd": 250000000,
+      "ends": null,
+      "one_number": "$250.0 million",
+      "what": "Accelerated share repurchase: $250.0 million.",
+      "ends_label": "ASR completion date not stated in the excerpt",
+      "ticker": "JHX",
+      "cik": "0001159152",
+      "accession": "0001628280-26-058265",
+      "url": "https://www.sec.gov/Archives/edgar/data/1159152/000162828026058265/jhx-20260820.htm",
+      "filed": "2026-08-20",
+      "company": "James Hardie Industries plc  (JHX, JHIUF)  (CIK 0001159152)",
+      "research_only": true,
+      "book": "ranked"
+    },
+    {
+      "event_type": "accelerated_share_repurchase",
+      "usd": 1000000000,
+      "ends": null,
+      "one_number": "$1.0 billion",
+      "what": "Accelerated share repurchase: $1.0 billion.",
+      "ends_label": "ASR completion date not stated in the excerpt",
+      "ticker": "MSTR",
+      "cik": "0001050446",
+      "accession": "0001193125-26-286871",
+      "url": "https://www.sec.gov/Archives/edgar/data/1050446/000119312526286871/mstr-20260629.htm",
+      "filed": "2026-06-29",
+      "company": "Strategy Inc  (MSTR, STRC, STRD, STRF, STRK)  (CIK 0001050446)",
+      "research_only": true,
+      "book": "ranked"
+    },
+    {
+      "event_type": "accelerated_share_repurchase",
+      "usd": 100000000,
+      "ends": null,
+      "one_number": "$100.0 million",
+      "what": "Accelerated share repurchase: $100.0 million.",
+      "ends_label": "ASR completion date not stated in the excerpt",
+      "ticker": "NCNO",
+      "cik": "0001902733",
+      "accession": "0001902733-26-000099",
+      "url": "https://www.sec.gov/Archives/edgar/data/1902733/000190273326000099/secondquarterfy27earningsp.htm",
+      "filed": "2026-08-25",
+      "company": "nCino, Inc.  (NCNO)  (CIK 0001902733)",
+      "research_only": true,
+      "book": "ranked"
+    },
+    {
+      "event_type": "issuer_tender",
+      "odd_lot": false,
+      "dutch_auction": false,
+      "fixed_price": true,
+      "price_low": 100.0,
+      "price_high": 100.0,
+      "ends": null,
+      "one_number": "$100.00",
+      "what": "Issuer tender (fixed price): $100.00.",
+      "ends_label": "Expiration date not stated in the excerpt",
+      "ticker": "NHP",
+      "cik": "0001561032",
+      "accession": "0001140361-26-025965",
+      "url": "https://www.sec.gov/Archives/edgar/data/1561032/000114036126025965/ny20076539x1_sctoia.htm",
+      "filed": "2026-06-22",
+      "company": "National Healthcare Properties, Inc.  (NHP, HLTC, NHPAP, NHPBP)  (CIK 0001561032)",
+      "research_only": true,
+      "book": "ranked"
+    },
+    {
+      "event_type": "issuer_tender",
+      "odd_lot": true,
+      "dutch_auction": false,
+      "fixed_price": true,
+      "price_low": 2.5,
+      "price_high": 2.5,
+      "ends": null,
+      "one_number": "$2.50",
+      "what": "Issuer tender (fixed price, odd-lot): $2.50.",
+      "ends_label": "Expiration date not stated in the excerpt",
+      "ticker": "OPTU",
+      "cik": "0001702780",
+      "accession": "0001213900-26-074020",
+      "url": "https://www.sec.gov/Archives/edgar/data/1702780/000121390026074020/ea029202903ex99a5b.htm",
+      "filed": "2026-07-01",
+      "company": "Optimum Communications, Inc.  (OPTU)  (CIK 0001702780)",
+      "research_only": true,
+      "book": "ranked"
+    },
+    {
+      "event_type": "accelerated_share_repurchase",
+      "usd": 1625000000,
+      "ends": null,
+      "one_number": "$1.6 billion",
+      "what": "Accelerated share repurchase: $1.6 billion.",
+      "ends_label": "ASR completion date not stated in the excerpt",
+      "ticker": "PTC",
+      "cik": "0000857005",
+      "accession": "0001193125-26-323617",
+      "url": "https://www.sec.gov/Archives/edgar/data/857005/000119312526323617/ptc-ex99_1.htm",
+      "filed": "2026-07-29",
+      "company": "PTC INC.  (PTC)  (CIK 0000857005)",
+      "research_only": true,
+      "book": "ranked"
+    },
+    {
+      "event_type": "accelerated_share_repurchase",
+      "usd": 350000000,
+      "ends": null,
+      "one_number": "$350.0 million",
+      "what": "Accelerated share repurchase: $350.0 million.",
+      "ends_label": "ASR completion date not stated in the excerpt",
+      "ticker": "QTWO",
+      "cik": "0001410384",
+      "accession": "0001410384-26-000051",
+      "url": "https://www.sec.gov/Archives/edgar/data/1410384/000141038426000051/qtwo-20260729.htm",
+      "filed": "2026-07-29",
+      "company": "Q2 Holdings, Inc.  (QTWO)  (CIK 0001410384)",
+      "research_only": true,
+      "book": "ranked"
+    },
+    {
+      "event_type": "accelerated_share_repurchase",
+      "usd": 568000000,
+      "ends": null,
+      "one_number": "$568.0 million",
+      "what": "Accelerated share repurchase: $568.0 million.",
+      "ends_label": "ASR completion date not stated in the excerpt",
+      "ticker": "RAL",
+      "cik": "0002041385",
+      "accession": "0002041385-26-000062",
+      "url": "https://www.sec.gov/Archives/edgar/data/2041385/000204138526000062/ralq22026-ex991.htm",
+      "filed": "2026-07-30",
+      "company": "Ralliant Corp  (RAL)  (CIK 0002041385)",
+      "research_only": true,
+      "book": "ranked"
+    },
+    {
+      "event_type": "accelerated_share_repurchase",
+      "usd": 100000000,
+      "ends": null,
+      "one_number": "$100.0 million",
+      "what": "Accelerated share repurchase: $100.0 million.",
+      "ends_label": "ASR completion date not stated in the excerpt",
+      "ticker": "RMBS",
+      "cik": "0000917273",
+      "accession": "0001193125-26-333887",
+      "url": "https://www.sec.gov/Archives/edgar/data/917273/000119312526333887/d122300dex991.htm",
+      "filed": "2026-08-05",
+      "company": "RAMBUS INC  (RMBS)  (CIK 0000917273)",
+      "research_only": true,
+      "book": "ranked"
+    },
+    {
+      "event_type": "accelerated_share_repurchase",
+      "usd": 450000000,
+      "ends": null,
+      "one_number": "$450.0 million",
+      "what": "Accelerated share repurchase: $450.0 million.",
+      "ends_label": "ASR completion date not stated in the excerpt",
+      "ticker": "RMD",
+      "cik": "0000943819",
+      "accession": "0001193125-26-378487",
+      "url": "https://www.sec.gov/Archives/edgar/data/943819/000119312526378487/d530283d8k.htm",
+      "filed": "2026-09-01",
+      "company": "RESMED INC  (RMD, RSMDF)  (CIK 0000943819)",
+      "research_only": true,
+      "book": "ranked"
+    },
+    {
+      "event_type": "accelerated_share_repurchase",
+      "usd": 125000000,
+      "ends": null,
+      "one_number": "$125.0 million",
+      "what": "Accelerated share repurchase: $125.0 million.",
+      "ends_label": "ASR completion date not stated in the excerpt",
+      "ticker": "SIG",
+      "cik": "0000832988",
+      "accession": "0000832988-26-000231",
+      "url": "https://www.sec.gov/Archives/edgar/data/832988/000083298826000231/sig-20260910.htm",
+      "filed": "2026-09-14",
+      "company": "SIGNET JEWELERS LTD  (SIG)  (CIK 0000832988)",
+      "research_only": true,
+      "book": "ranked"
+    },
+    {
+      "event_type": "accelerated_share_repurchase",
+      "usd": 100000000,
+      "ends": null,
+      "one_number": "$100.0 million",
+      "what": "Accelerated share repurchase: $100.0 million.",
+      "ends_label": "ASR completion date not stated in the excerpt",
+      "ticker": "SKWD",
+      "cik": "0001519449",
+      "accession": "0001519449-26-000044",
+      "url": "https://www.sec.gov/Archives/edgar/data/1519449/000151944926000044/skwd-20260715.htm",
+      "filed": "2026-07-15",
+      "company": "Skyward Specialty Insurance Group, Inc.  (SKWD)  (CIK 0001519449)",
+      "research_only": true,
+      "book": "ranked"
+    },
+    {
+      "event_type": "accelerated_share_repurchase",
+      "usd": 1000000000,
+      "ends": null,
+      "one_number": "$1.0 billion",
+      "what": "Accelerated share repurchase: $1.0 billion.",
+      "ends_label": "ASR completion date not stated in the excerpt",
+      "ticker": "SNPS",
+      "cik": "0000883241",
+      "accession": "0001193125-26-413359",
+      "url": "https://www.sec.gov/Archives/edgar/data/883241/000119312526413359/d830308dex991.htm",
+      "filed": "2026-10-05",
+      "company": "SYNOPSYS INC  (SNPS)  (CIK 0000883241)",
+      "research_only": true,
+      "book": "ranked"
+    },
+    {
+      "event_type": "accelerated_share_repurchase",
+      "usd": 500000000,
+      "ends": null,
+      "one_number": "$500.0 million",
+      "what": "Accelerated share repurchase: $500.0 million.",
+      "ends_label": "ASR completion date not stated in the excerpt",
+      "ticker": "SOLS",
+      "cik": "0002064953",
+      "accession": "0001104659-26-102503",
+      "url": "https://www.sec.gov/Archives/edgar/data/2064953/000110465926102503/tm2620579d9_8k.htm",
+      "filed": "2026-08-27",
+      "company": "Solstice Advanced Materials Inc.  (SOLS)  (CIK 0002064953)",
+      "research_only": true,
+      "book": "ranked"
+    },
+    {
+      "event_type": "accelerated_share_repurchase",
+      "usd": 1000000000,
+      "ends": null,
+      "one_number": "$1.0 billion",
+      "what": "Accelerated share repurchase: $1.0 billion.",
+      "ends_label": "ASR completion date not stated in the excerpt",
+      "ticker": "TFX",
+      "cik": "0000096943",
+      "accession": "0000096943-26-000097",
+      "url": "https://www.sec.gov/Archives/edgar/data/96943/000009694326000097/tfx-20260807.htm",
+      "filed": "2026-08-07",
+      "company": "TELEFLEX INC  (TFX)  (CIK 0000096943)",
+      "research_only": true,
+      "book": "ranked"
+    },
+    {
+      "event_type": "accelerated_share_repurchase",
+      "usd": 3000000000,
+      "ends": null,
+      "one_number": "$3.0 billion",
+      "what": "Accelerated share repurchase: $3.0 billion.",
+      "ends_label": "ASR completion date not stated in the excerpt",
+      "ticker": "TLN",
+      "cik": "0001622536",
+      "accession": "0001622536-26-000074",
+      "url": "https://www.sec.gov/Archives/edgar/data/1622536/000162253626000074/a20260929pressreleasecapac.htm",
+      "filed": "2026-09-29",
+      "company": "Talen Energy Corp  (TLN)  (CIK 0001622536)",
+      "research_only": true,
+      "book": "ranked"
+    },
+    {
+      "event_type": "accelerated_share_repurchase",
+      "usd": 2000000000,
+      "ends": null,
+      "one_number": "$2.0 billion",
+      "what": "Accelerated share repurchase: $2.0 billion.",
+      "ends_label": "ASR completion date not stated in the excerpt",
+      "ticker": "UTHR",
+      "cik": "0001082554",
+      "accession": "0001104659-26-105953",
+      "url": "https://www.sec.gov/Archives/edgar/data/1082554/000110465926105953/tm2624887d1_ex99-1.htm",
+      "filed": "2026-09-08",
+      "company": "UNITED THERAPEUTICS Corp  (UTHR)  (CIK 0001082554)",
+      "research_only": true,
+      "book": "ranked"
+    },
+    {
+      "event_type": "accelerated_share_repurchase",
+      "usd": 960000000,
+      "ends": null,
+      "one_number": "$960.0 million",
+      "what": "Accelerated share repurchase: $960.0 million.",
+      "ends_label": "ASR completion date not stated in the excerpt",
+      "ticker": "VC",
+      "cik": "0001111335",
+      "accession": "0001111335-26-000045",
+      "url": "https://www.sec.gov/Archives/edgar/data/1111335/000111133526000045/visteonq22026pr.htm",
+      "filed": "2026-07-23",
+      "company": "VISTEON CORP  (VC)  (CIK 0001111335)",
+      "research_only": true,
+      "book": "ranked"
+    },
+    {
+      "event_type": "accelerated_share_repurchase",
+      "usd": 464000000,
+      "ends": null,
+      "one_number": "$464.0 million",
+      "what": "Accelerated share repurchase: $464.0 million.",
+      "ends_label": "ASR completion date not stated in the excerpt",
+      "ticker": "VRSK",
+      "cik": "0001442145",
+      "accession": "0001437749-26-024748",
+      "url": "https://www.sec.gov/Archives/edgar/data/1442145/000143774926024748/ex_968691.htm",
+      "filed": "2026-07-29",
+      "company": "Verisk Analytics, Inc.  (VRSK)  (CIK 0001442145)",
+      "research_only": true,
+      "book": "ranked"
+    },
+    {
+      "event_type": "accelerated_share_repurchase",
+      "usd": 1640000000,
+      "ends": null,
+      "one_number": "$1.6 billion",
+      "what": "Accelerated share repurchase: $1.6 billion.",
+      "ends_label": "ASR completion date not stated in the excerpt",
+      "ticker": "VSNT",
+      "cik": "0002067876",
+      "accession": "0002067876-26-000038",
+      "url": "https://www.sec.gov/Archives/edgar/data/2067876/000206787626000038/versantmediagroupincex991q.htm",
+      "filed": "2026-08-06",
+      "company": "Versant Media Group, Inc.  (VSNT)  (CIK 0002067876)",
+      "research_only": true,
+      "book": "ranked"
+    },
+    {
+      "event_type": "accelerated_share_repurchase",
+      "usd": 300000000,
+      "ends": null,
+      "one_number": "$300.0 million",
+      "what": "Accelerated share repurchase: $300.0 million.",
+      "ends_label": "ASR completion date not stated in the excerpt",
+      "ticker": "WEX",
+      "cik": "0001309108",
+      "accession": "0001309108-26-000026",
+      "url": "https://www.sec.gov/Archives/edgar/data/1309108/000130910826000026/wexq22026earningssupplement.htm",
+      "filed": "2026-07-22",
+      "company": "WEX Inc.  (WEX)  (CIK 0001309108)",
+      "research_only": true,
+      "book": "ranked"
+    }
+  ],
+  "program_mentions": [
+    {
+      "ticker": "AOUT",
+      "filed": "2026-10-01",
+      "line": "Program $10.0 million. Market value not on file, so the 10% test was not run.",
+      "url": "https://www.sec.gov/Archives/edgar/data/1808997/000180899726000052/oct2026buybackprclean.htm",
+      "accession": "0001808997-26-000052",
+      "usd": 10000000,
+      "program_pct_of_market_value": null
+    },
+    {
+      "ticker": "AVO",
+      "filed": "2026-10-08",
+      "line": "Program $100.0 million. Market value not on file, so the 10% test was not run.",
+      "url": "https://www.sec.gov/Archives/edgar/data/1802974/000180297426000046/avo-20261008.htm",
+      "accession": "0001802974-26-000046",
+      "usd": 100000000,
+      "program_pct_of_market_value": null
+    },
+    {
+      "ticker": "BUKS",
+      "filed": "2026-10-07",
+      "line": "Program $10.0 million. Market value not on file, so the 10% test was not run.",
+      "url": "https://www.sec.gov/Archives/edgar/data/15847/000001584726000051/bnc-stockbuybackpressrelea.htm",
+      "accession": "0000015847-26-000051",
+      "usd": 10000000,
+      "program_pct_of_market_value": null
+    },
+    {
+      "ticker": "CALM",
+      "filed": "2026-09-30",
+      "line": "Program $500.0 million. Market value not on file, so the 10% test was not run.",
+      "url": "https://www.sec.gov/Archives/edgar/data/16160/000156276226000111/exhibit991.htm",
+      "accession": "0001562762-26-000111",
+      "usd": 500000000,
+      "program_pct_of_market_value": null
+    },
+    {
+      "ticker": "CALX",
+      "filed": "2026-10-08",
+      "line": "Program $100.0 million. Market value not on file, so the 10% test was not run.",
+      "url": "https://www.sec.gov/Archives/edgar/data/1406666/000140666626000038/a991october2026pressrepurc.htm",
+      "accession": "0001406666-26-000038",
+      "usd": 100000000,
+      "program_pct_of_market_value": null
+    },
+    {
+      "ticker": "CFG",
+      "filed": "2026-10-16",
+      "line": "Program $1.9 billion, 7.2% of market value. Not a situation row.",
+      "url": "https://www.sec.gov/Archives/edgar/data/759944/000075994426000206/a3q26earningsrelease.htm",
+      "accession": "0000759944-26-000206",
+      "usd": 1950000000,
+      "program_pct_of_market_value": 7.2
+    },
+    {
+      "ticker": "EARN",
+      "filed": "2026-10-16",
+      "line": "Program $20.0 million. Market value not on file, so the 10% test was not run.",
+      "url": "https://www.sec.gov/Archives/edgar/data/1560672/000162828026066048/earn-20261009.htm",
+      "accession": "0001628280-26-066048",
+      "usd": 20000000,
+      "program_pct_of_market_value": null
+    },
+    {
+      "ticker": "JVA",
+      "filed": "2026-10-07",
+      "line": "Program $2.5 million. Market value not on file, so the 10% test was not run.",
+      "url": "https://www.sec.gov/Archives/edgar/data/1007019/000149315226046091/ex99-1.htm",
+      "accession": "0001493152-26-046091",
+      "usd": 2500000,
+      "program_pct_of_market_value": null
+    },
+    {
+      "ticker": "LOPE",
+      "filed": "2026-10-01",
+      "line": "Program $100.0 million. Market value not on file, so the 10% test was not run.",
+      "url": "https://www.sec.gov/Archives/edgar/data/1434588/000110465926112835/lope-20260928x8k.htm",
+      "accession": "0001104659-26-112835",
+      "usd": 100000000,
+      "program_pct_of_market_value": null
+    },
+    {
+      "ticker": "LW",
+      "filed": "2026-10-06",
+      "line": "Program $245.0 million. Market value not on file, so the 10% test was not run.",
+      "url": "https://www.sec.gov/Archives/edgar/data/1679273/000167927326000051/lw-20260830x8kxexx9911q27.htm",
+      "accession": "0001679273-26-000051",
+      "usd": 245000000,
+      "program_pct_of_market_value": null
+    },
+    {
+      "ticker": "MDB",
+      "filed": "2026-09-29",
+      "line": "Program $2.0 billion, 6.8% of market value. Not a situation row.",
+      "url": "https://www.sec.gov/Archives/edgar/data/1441816/000162828026063850/mdb-20260925.htm",
+      "accession": "0001628280-26-063850",
+      "usd": 2000000000,
+      "program_pct_of_market_value": 6.8
+    },
+    {
+      "ticker": "MS",
+      "filed": "2026-10-14",
+      "line": "Program $1.5 billion, 0.5% of market value. Not a situation row.",
+      "url": "https://www.sec.gov/Archives/edgar/data/895421/000089542126000288/a3q26msearningsrelease.htm",
+      "accession": "0000895421-26-000288",
+      "usd": 1500000000,
+      "program_pct_of_market_value": 0.5
+    },
+    {
+      "ticker": "NOG",
+      "filed": "2026-10-13",
+      "line": "Program $227.2 million. Market value not on file, so the 10% test was not run.",
+      "url": "https://www.sec.gov/Archives/edgar/data/1104485/000110448526000043/pre-oppressreleasexoctober.htm",
+      "accession": "0001104485-26-000043",
+      "usd": 227200000,
+      "program_pct_of_market_value": null
+    },
+    {
+      "ticker": "NSLR",
+      "filed": "2026-10-05",
+      "line": "Program $40.0 million. Market value not on file, so the 10% test was not run.",
+      "url": "https://www.sec.gov/Archives/edgar/data/1509470/000149315226045747/ex99-1.htm",
+      "accession": "0001493152-26-045747",
+      "usd": 40000000,
+      "program_pct_of_market_value": null
+    },
+    {
+      "ticker": "NWS",
+      "filed": "2026-10-16",
+      "line": "Program $1.0 billion, 5.2% of market value. Not a situation row.",
+      "url": "https://www.sec.gov/Archives/edgar/data/1564708/000156470826000230/appendix3cclassb20261015.htm",
+      "accession": "0001564708-26-000230",
+      "usd": 1000000000,
+      "program_pct_of_market_value": 5.2
+    },
+    {
+      "ticker": "OLLI",
+      "filed": "2026-10-13",
+      "line": "Program $500.0 million. Market value not on file, so the 10% test was not run.",
+      "url": "https://www.sec.gov/Archives/edgar/data/1639300/000114036126039374/ef20083658_8k.htm",
+      "accession": "0001140361-26-039374",
+      "usd": 500000000,
+      "program_pct_of_market_value": null
+    },
+    {
+      "ticker": "PBAM",
+      "filed": "2026-10-16",
+      "line": "Program $10.0 million. Market value not on file, so the 10% test was not run.",
+      "url": "https://www.sec.gov/Archives/edgar/data/1705284/000170528426000010/pbam-ex99_2.htm",
+      "accession": "0001705284-26-000010",
+      "usd": 10000000,
+      "program_pct_of_market_value": null
+    },
+    {
+      "ticker": "SCHL",
+      "filed": "2026-09-24",
+      "line": "Program $157.4 million. Market value not on file, so the 10% test was not run.",
+      "url": "https://www.sec.gov/Archives/edgar/data/866729/000086672926000022/fy27q1pressrelease.htm",
+      "accession": "0000866729-26-000022",
+      "usd": 157400000,
+      "program_pct_of_market_value": null
+    },
+    {
+      "ticker": "SUNS",
+      "filed": "2026-10-13",
+      "line": "Program $20.0 million. Market value not on file, so the 10% test was not run.",
+      "url": "https://www.sec.gov/Archives/edgar/data/2012706/000182912626011033/sunriserealty_ex99-1.htm",
+      "accession": "0001829126-26-011033",
+      "usd": 20000000,
+      "program_pct_of_market_value": null
+    },
+    {
+      "ticker": "TTMI",
+      "filed": "2026-09-24",
+      "line": "Program $430.0 million, 4.1% of market value. Not a situation row.",
+      "url": "https://www.sec.gov/Archives/edgar/data/1116942/000119312526401013/d186334dex41.htm",
+      "accession": "0001193125-26-401013",
+      "usd": 430000000,
+      "program_pct_of_market_value": 4.1
+    }
+  ],
+  "gaps_sample": [
+    {
+      "ticker": "BN",
+      "reason": "fewer_than_two_annual_share_counts"
+    },
+    {
+      "ticker": "FRMO",
+      "reason": "companyfacts_fetch_failed"
+    },
+    {
+      "ticker": "KEWL",
+      "reason": "no_cik"
+    },
+    {
+      "ticker": "OTCM",
+      "reason": "no_cik"
+    },
+    {
+      "ticker": "SJT",
+      "reason": "companyfacts_fetch_failed"
+    },
+    {
+      "ticker": "WBI",
+      "reason": "fewer_than_two_annual_share_counts"
+    },
+    {
+      "ticker": "CMSG",
+      "reason": "no_cik"
+    },
+    {
+      "ticker": "BWEL",
+      "reason": "no_cik"
+    },
+    {
+      "ticker": "LB",
+      "reason": "fewer_than_two_annual_share_counts"
+    },
+    {
+      "ticker": "HE",
+      "reason": "fewer_than_two_annual_share_counts"
+    },
+    {
+      "ticker": "MIAX",
+      "reason": "fewer_than_two_annual_share_counts"
+    },
+    {
+      "ticker": "PBT",
+      "reason": "companyfacts_fetch_failed"
+    },
+    {
+      "ticker": "CME",
+      "reason": "fewer_than_two_annual_share_counts"
+    },
+    {
+      "ticker": "GLXY",
+      "reason": "fewer_than_two_annual_share_counts"
+    },
+    {
+      "ticker": "SBR",
+      "reason": "companyfacts_fetch_failed"
+    },
+    {
+      "ticker": "AZLCZ",
+      "reason": "no_cik"
+    },
+    {
+      "ticker": "SMR",
+      "reason": "fewer_than_two_annual_share_counts"
+    },
+    {
+      "ticker": "CRCL",
+      "reason": "fewer_than_two_annual_share_counts"
+    },
+    {
+      "ticker": "HNFSA",
+      "reason": "companyfacts_fetch_failed"
+    },
+    {
+      "ticker": "WRLC",
+      "reason": "no_cik"
+    },
+    {
+      "ticker": "PDER",
+      "reason": "no_cik"
+    },
+    {
+      "ticker": "BVERS",
+      "reason": "no_cik"
+    },
+    {
+      "ticker": "GCCO",
+      "reason": "no_cik"
+    },
+    {
+      "ticker": "BSM",
+      "reason": "fewer_than_two_annual_share_counts"
+    },
+    {
+      "ticker": "KRP",
+      "reason": "fewer_than_two_annual_share_counts"
+    }
+  ],
+  "discovery": {
+    "tender_hits": 200,
+    "asr_hits": 124,
+    "program_hits": 184,
+    "documents_read": 409,
+    "fetch_failures": 9,
+    "from_local_facts": 752
+  },
+  "_envelope": {
+    "schema_version": "magis.feed.v2",
+    "feed_id": "buyback-radar",
+    "generated_at": "2026-10-18T17:55:46Z",
+    "as_of": "2026-10-18",
+    "content_sha256": "sha256:20c6d9fa4ff774c7123256099d5871e21e5d39655954d385138782aa4b56f824",
+    "row_count": 681,
+    "upstream_inputs": [
+      {
+        "path": "_system/portfolio/registry.json",
+        "role": "universe"
+      },
+      {
+        "path": "SEC EDGAR companyfacts",
+        "role": "share counts and cash flows"
+      },
+      {
+        "path": "_system/reference/market-data/fundamentals/index_float_adv.json",
+        "role": "price for market value"
+      }
+    ],
+    "health": {
+      "status": "healthy",
+      "structural_errors": 0
+    }
+  }
+}

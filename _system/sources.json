@@ -137,10 +137,26 @@
       "repo_path": "dashboard/data/special_situations.json",
       "path_kind": "file",
       "freshness_field": "generated_at",
-      "purpose": "Ranked special situations, discovery list, and history by lane (spinoffs, split_offs, mergers, warrants, restructurings, forced_sellers). Read generated_at before the rows.",
+      "purpose": "Ranked special situations, discovery list, and history by lane (spinoffs, split_offs, mergers, warrants, restructurings, forced_sellers, buyback_events). Read generated_at before the rows.",
       "owner_desk": "Magis Capital Partners / Special Situations",
       "mode": "read",
       "push": "The data pipeline writes this file. A correction is a pull request from a cloud agent or the GitHub connector."
+    },
+    {
+      "id": "dashboard-buyback-radar",
+      "type": "repo file",
+      "location": "dashboard/data/buyback_radar.json",
+      "repo_path": "dashboard/data/buyback_radar.json",
+      "path_kind": "file",
+      "freshness_field": "generated_at",
+      "purpose": "Share-cannibal summary for the portfolio registry: counts, notable names, issuer tenders, accelerated share repurchases, large new programs, and the grading method. Per-company rows are in buyback_companies.json. Read generated_at and _envelope first. research_only. Buyback yield is a percent of market value, not percent per year.",
+      "owner_desk": "Magis Capital Partners / Special Situations",
+      "mode": "read",
+      "push": "The Monday data-pipeline job writes this file from SEC EDGAR companyfacts. A correction is a pull request.",
+      "helper_repo_paths": [
+        "dashboard/data/buyback_companies.json",
+        "_system/scripts/build_buyback_radar.py"
+      ]
     },
     {
       "id": "dashboard-separations",
