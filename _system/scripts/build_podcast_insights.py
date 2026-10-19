@@ -264,7 +264,12 @@ def reader_summary_preview(ep: dict) -> dict:
     if reader:
         headline = (reader.get("headline") or "").strip()
         overview = (reader.get("overview") or "").strip()
-        preview = " ".join(x for x in [headline, overview] if x).strip()
+        # Fallback headlines repeat the first overview sentence; don't print
+        # the same sentence twice in a 220-char preview.
+        if headline and overview.lower().startswith(headline.lower().rstrip(".…")):
+            preview = overview
+        else:
+            preview = " ".join(x for x in [headline, overview] if x).strip()
         return {
             "summary_preview": preview[:220] or None,
             "summary_headline": headline or None,

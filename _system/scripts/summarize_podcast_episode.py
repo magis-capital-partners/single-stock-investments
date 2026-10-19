@@ -83,6 +83,7 @@ _BOILERPLATE_RE = re.compile(
     r"subscribe|follow (us|the show)|leave (a|us) (a )?(review|rating)|"
     r"support (the show|us on patreon)|join our (newsletter|discord|slack)|"
     r"check out our (website|sponsors?)|brought to you by|today'?s sponsor|"
+    r"this episode is (supported|brought to you) by|"
     r"learn more at|sign up at|use (code|promo)|show notes|episode notes|"
     r"all rights reserved|privacy policy|terms of (service|use)|"
     r"follow .{0,40} on (twitter|x|linkedin|instagram)|"
