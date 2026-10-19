@@ -15,8 +15,10 @@ Free data only. Every Databento request is priced with ``metadata.get_cost``
 before anything is fetched (``quote``), and ``download`` fetches only requests
 quoted at exactly $0.00; anything priced above that is listed as refused and
 never bought. The one-second bar schema is $0.00 on this plan; the quote,
-trade and book schemas are not, and the paid-data queue model kept in
-``execution_realism_build`` is therefore never run. Raw files stay under
+trade and book schemas are not. H2 and H3 (registered on trades and mbp-1)
+stay registered and unmeasured, blocked on a data budget decision whose
+quoted amounts are recorded; H18 and H19 measure the same questions on free
+bars, and the book-level models kept in ``execution_realism_build`` are not run. Raw files stay under
 ``local/raw/databento/`` (gitignored).
 
 Published output (``execution_realism.json`` + ``execution_realism_manifest.json``)
@@ -54,7 +56,10 @@ from .phase0_research import (
 
 VERSION = "shorts_ws_a.v2"
 HYPOTHESES = ("H4", "H18", "H19")
-SUPERSEDED = {"H2": "H18", "H3": "H19"}   # registered on paid book data, which this program does not buy
+FREE_DATA_FORMS = {"H2": "H18", "H3": "H19"}   # H2/H3 stay registered, blocked on a data budget decision; H18/H19 answer them on free bars
+PAID_PLAN_QUOTE = {"all_events_usd": 0.3245, "train_validate_usd": 0.2366, "full_session_mbp1_variant_usd": 0.4778,
+                   "quoted_at": "2026-10-18T21:07:43+00:00", "decision": "nothing for now (Drew, 2026-10-18)",
+                   "record": "local/workstream_a/quotes_paid_plan_2026-10-18.json"}
 FREE_SCHEMA = "ohlcv-1s"
 QUOTE_STUDY = f"{RUN_ID}__quotes_v1"
 
