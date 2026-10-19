@@ -49,7 +49,7 @@ def test_borrow_uses_settlement_weekends_and_rounded_collateral():
 def test_split_changes_share_count_without_creating_profit():
     evidence=fixture_evidence({1:100.}, {"2024-06-04":.1})
     result=sleeve.replay(evidence,10000,100,2,{"id":"test","execution_fraction":0.,"borrow_annual":0.})
-    assert result["metrics"]["net_pnl"]==-2
+    assert result["metrics"]["net_pnl_before_proceeds_interest"]==pytest.approx(-2)
     assert result["metrics"]["closed"]==1
 
 
@@ -57,7 +57,7 @@ def test_missing_cover_waits_and_does_not_become_a_zero_price_profit():
     result=sleeve.replay(fixture_evidence({1:None}),10000,100,2,{"id":"test","execution_fraction":0.,"borrow_annual":0.})
     assert result["metrics"]["delayed_covers"]==1
     assert result["metrics"]["missing_mark_days"]==1
-    assert result["metrics"]["net_pnl"]==-2
+    assert result["metrics"]["net_pnl_before_proceeds_interest"]==pytest.approx(-2)
 
 
 def test_end_of_sample_position_remains_an_open_liability():
@@ -90,13 +90,51 @@ def test_squeeze_reserve_covers_entry_exposure_even_when_price_falls_by_close():
     assert result["metrics"]["stress_margin_200"]==pytest.approx(600/10000)
 
 
+def test_short_credit_uses_collateral_tiers_and_not_total_portfolio_nav():
+    assert sleeve.annual_short_credit(0,10_000_000)==0
+    assert sleeve.annual_short_credit(100_000,10_000_000)==0
+    assert sleeve.annual_short_credit(200_000,10_000_000)==pytest.approx(100_000*.0263)
+    assert sleeve.annual_short_credit(1_000_001,10_000_000)==pytest.approx(900_000*.0263+.0338)
+    # The external account balance is excluded from the sleeve's credit.
+    assert sleeve.annual_short_credit(1_100_000,10_000_000)-sleeve.annual_short_credit(100_000,10_000_000)==pytest.approx(900_000*.0263+100_000*.0338)
+
+
+def test_short_credit_is_zero_for_same_day_settled_flat_positions():
+    result=sleeve.replay(fixture_evidence(),10_000_000,100,1,
+                         {"id":"test","execution_fraction":0.,"borrow_annual":.5},capacity=False)
+    assert result['metrics']['proceeds_interest']==0
+
+
+def test_credit_combines_names_before_tiers_and_survives_weekend_cover_settlement():
+    evidence=fixture_evidence()
+    evidence['records'].append({**evidence['records'][0],'ticker':'BBB','issuer':'issuer-b'})
+    evidence['prices']['BBB']=evidence['prices']['AAA'].copy()
+    evidence['actions']['BBB']={}
+    result=sleeve.replay(evidence,10_000_000,100,5,
+                         {"id":"test","execution_fraction":0.,"borrow_annual":.5},capacity=False)
+    # Two $100k positions at $10 have $220k rounded collateral. The zero-rate band
+    # is already used externally; six settled days include the weekend.
+    assert result['metrics']['proceeds_interest']==pytest.approx(220_000*.0263*6/360)
+    monday=next(r for r in result['series'] if r[0]==5)
+    assert monday[1]>0 and monday[2:]==[0.,0.]
+    assert result['metrics']['net_pnl']-result['metrics']['net_pnl_before_proceeds_interest']==pytest.approx(result['metrics']['proceeds_interest'])
+
+
 def test_committed_publication_is_aggregate_finite_and_has_exactly_three_cases():
     path=ROOT/"dashboard/data/short_sleeve.json"
     doc=json.loads(path.read_text())
     assert [c['id'] for c in doc['cases']]==['bear','base','bull']
     assert path.stat().st_size<20*1024*1024
-    assert len(doc['models'])==360
+    assert len(doc['models'])==90
+    assert doc['navs']==[10_000_000] and doc['weights']==[25,50,100]
+    assert doc['defaults']['nav']==10_000_000 and doc['defaults']['capacity'] is False
+    assert doc['financing']['external_short_collateral']==100_000
     assert all('ticker' not in m and 'event_id' not in m for m in doc['models'])
     assert next(g for g in doc['groups'] if g['id']=='primary' and g['horizon']==5)['n']==665
     assert next(g for g in doc['groups'] if g['id']=='primary' and g['horizon']==20)['n']==608
-    assert len({(m['nav'],m['bps'],m['horizon'],m['scenario'],m['capacity']) for m in doc['models']})==360
+    assert len({(m['nav'],m['bps'],m['horizon'],m['scenario'],m['capacity']) for m in doc['models']})==90
+    assert all(r['matched'] for r in doc['reconciliation']['price_checks'])
+    assert [p['file'] for p in doc['reconciliation']['other_policies']]==['net_edge_research.json','net_edge_research_v3.json']
+    assert doc['reconciliation']['same_tickets_on_10m']['net_pnl']==pytest.approx(doc['reconciliation']['legacy']['net_pnl'])
+    base=next(c for c in doc['cases'] if c['id']=='base')
+    assert base['execution_fraction']==pytest.approx(base['spread_fraction']+base['depth_fraction'])
