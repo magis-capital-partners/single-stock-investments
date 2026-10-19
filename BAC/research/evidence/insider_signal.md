@@ -1,4 +1,4 @@
-# BAC — Insider conviction (2026-10-17)
+# BAC — Insider conviction (2026-10-18)
 
 > Context only. Insider activity informs scenario confidence and stance discussion; it does not auto-inflate Lawrence base IRR. Promotion requires [HUMAN REVIEW].
 
@@ -12,11 +12,11 @@
 
 | Insider | Date | Shares | Price | Value | Contrib |
 |---------|------|--------|-------|-------|---------|
-| BANK OF AMERICA CORP /DE/ | 2026-08-10 | 4797 | $12.29 | $58955.13 | 1.423 |
-| BANK OF AMERICA CORP /DE/ | 2026-08-04 | 1 | $10.185 | $10.19 | 1.101 |
-| BANK OF AMERICA CORP /DE/ | 2026-08-03 | 14 | $10.2143 | $143.0 | 1.094 |
-| BANK OF AMERICA CORP /DE/ | 2026-08-04 | 1 | $10.175 | $10.18 | 0.994 |
-| BANK OF AMERICA CORP /DE/ | 2026-08-03 | 10 | $10.2143 | $102.14 | 0.98 |
+| BANK OF AMERICA CORP /DE/ | 2026-08-10 | 4797 | $12.29 | $58955.13 | 1.411 |
+| BANK OF AMERICA CORP /DE/ | 2026-08-04 | 1 | $10.185 | $10.19 | 1.092 |
+| BANK OF AMERICA CORP /DE/ | 2026-08-03 | 14 | $10.2143 | $143.0 | 1.085 |
+| BANK OF AMERICA CORP /DE/ | 2026-08-04 | 1 | $10.175 | $10.18 | 0.986 |
+| BANK OF AMERICA CORP /DE/ | 2026-08-03 | 10 | $10.2143 | $102.14 | 0.971 |
 
 **Routine / planned sales (context):**
 

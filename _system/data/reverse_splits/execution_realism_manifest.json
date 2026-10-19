@@ -1,0 +1,3815 @@
+{
+  "schema_version": "shorts_ws_a.v2",
+  "built_at": "2026-10-19T01:19:48+00:00",
+  "hypothesis_ids": [
+    "H4",
+    "H18",
+    "H19"
+  ],
+  "aggregate_only": true,
+  "hypotheses_measured": [
+    "H4",
+    "H18",
+    "H19"
+  ],
+  "blocked_on_data_budget": {
+    "H2": "H18",
+    "H3": "H19"
+  },
+  "output": {
+    "path": "execution_realism.json",
+    "sha256": "a75910acd08c34e4abc5ef314305e7d1e8a0387ee0f6928dad6a593f33a586c5"
+  },
+  "registry": {
+    "path": "hypotheses.jsonl",
+    "sha256": "ec6f209c22ceeb96d0c469fb53782ef8f12e517bcc8cb3fba9f1ab85f91d11d3"
+  },
+  "code": [
+    {
+      "path": "_system/scripts/reverse_splits/execution_realism.py",
+      "sha256": "c5c165ef61c4bfac46373be8e4b172927173bf7d4b36c3d8852f7efd56887a34"
+    },
+    {
+      "path": "_system/scripts/reverse_splits/execution_realism_build.py",
+      "sha256": "c2883a461a0bd44fac414f941a1eda80f3ae0a5e4ed42631f46a468835760b39"
+    }
+  ],
+  "data_policy": "free data only: every request quoted first; nothing priced above $0.00 is fetched",
+  "data_cost_incurred_usd": 0.0,
+  "inputs": {
+    "run_id": "20261013T224003582762Z",
+    "run_inputs": [
+      {
+        "path": "expansion/expansion_v2/runs/20261013T224003582762Z/event_outcomes/2018-0001-bfc9b915d2bf.jsonl",
+        "sha256": "750d1e211fbbd6c60780d6b4b9f3fdaf25a9fc18f4b5e9c505dd2eb5f0b649ff"
+      },
+      {
+        "path": "expansion/expansion_v2/runs/20261013T224003582762Z/event_outcomes/2019-0001-0ad2d778cfc2.jsonl",
+        "sha256": "a67b3d0a3cf00e978a0e64ffac6d0ebdc3fa75cf291d0b0df6694897c096d634"
+      },
+      {
+        "path": "expansion/expansion_v2/runs/20261013T224003582762Z/event_outcomes/2020-0001-727936ba0b25.jsonl",
+        "sha256": "b87257a000ca8f1ea013f60bec2e6389add850cfa16f780509acb90f510b762e"
+      },
+      {
+        "path": "expansion/expansion_v2/runs/20261013T224003582762Z/event_outcomes/2021-0001-fe401046f086.jsonl",
+        "sha256": "9cbc324cedce1a78b9cdf1ca120dde13713575963d8582f7aa18c335826a09af"
+      },
+      {
+        "path": "expansion/expansion_v2/runs/20261013T224003582762Z/event_outcomes/2022-0001-9ce8b51e86d2.jsonl",
+        "sha256": "cf0424a97ffe8375fd859b941e16cd21651ba667202656e7909c34aa43ff4d0f"
+      },
+      {
+        "path": "expansion/expansion_v2/runs/20261013T224003582762Z/event_outcomes/2023-0001-9f01316db0e7.jsonl",
+        "sha256": "6dabdba2997b524e409ddccca3c6498ee7248d8bfbba0ebfc04ba196340a6df9"
+      },
+      {
+        "path": "expansion/expansion_v2/runs/20261013T224003582762Z/event_outcomes/2024-0001-b0502d045ab9.jsonl",
+        "sha256": "dc143287c973d41d29a29bd7fc0f99cda033d292461c7761c1850abfea1b3940"
+      },
+      {
+        "path": "expansion/expansion_v2/runs/20261013T224003582762Z/event_outcomes/2025-0001-5d1441180e76.jsonl",
+        "sha256": "0346516fdf2ff80c86526f5be7a2791be18cf8b0a7e65e4618f3e4ce7ad724ce"
+      },
+      {
+        "path": "expansion/expansion_v2/runs/20261013T224003582762Z/event_outcomes/2026-0001-fe3b1a95271e.jsonl",
+        "sha256": "fec6c4dfc647b4998754eabe076ee457dd8fb2216f9db96418cfb3453961cd47"
+      },
+      {
+        "path": "expansion/expansion_v2/runs/20261013T224003582762Z/prices.sqlite",
+        "sha256": "5f1e5de9fcba98069245bcecfaf928b66c45659df6cd81a6a6dd4e78f0626ce0"
+      }
+    ],
+    "targets": {
+      "path": "execution_research/20261013T224003582762Z__quotes_v1/targets.local.json",
+      "sha256": "180af394d15bb5681158983eb8240ab6b70a3c2396dec885f9e5701c90033e2b"
+    },
+    "ssr_states_db": {
+      "path": "reverse_splits.db",
+      "sha256": "e73f3df59479d2f5cd950c1399fabdb5309001913b455dc93e459dd5f642a0cc"
+    },
+    "quotes": {
+      "path": "workstream_a/quotes.json",
+      "sha256": "3dd0cb841b9e57a2bf27a7cc8007554d575b61588cd0207c252a34f931d4f94c"
+    },
+    "downloads": {
+      "path": "workstream_a/downloads.json",
+      "sha256": "9211842c7aa7d5c4aa51ca394f6a7974fc648b1231251e6cdee2accf1b083399"
+    },
+    "statistics_files": [
+      {
+        "path": "raw/databento/XASE.PILLAR/statistics/2019Q1.dbn.zst",
+        "bytes": 772909,
+        "sha256": "d35f4be30f191edb8b07b97ed9d08dd538a18399ffd105575aa8eecf2d1b1f88"
+      },
+      {
+        "path": "raw/databento/XASE.PILLAR/statistics/2019Q2.dbn.zst",
+        "bytes": 783856,
+        "sha256": "623f2f4515708bcc8f236a847f4fa2bf4f18f1d0eb2e414115e795f34a12147d"
+      },
+      {
+        "path": "raw/databento/XASE.PILLAR/statistics/2019Q4.dbn.zst",
+        "bytes": 754431,
+        "sha256": "8dcaed01a8b1891a808750750f3c36428a8148010296470bd1cee0674b0e64cd"
+      },
+      {
+        "path": "raw/databento/XASE.PILLAR/statistics/2020Q3.dbn.zst",
+        "bytes": 840089,
+        "sha256": "be58fb272e97d497bb0560c82d106e148c11bea80b1c43669a7286fc8f6754fd"
+      },
+      {
+        "path": "raw/databento/XASE.PILLAR/statistics/2022Q3.dbn.zst",
+        "bytes": 919347,
+        "sha256": "d13e0db117fe5d81afc4b90be217f48ba584a51abc11daf0ca262cfb18fe4a17"
+      },
+      {
+        "path": "raw/databento/XASE.PILLAR/statistics/2022Q4.dbn.zst",
+        "bytes": 911136,
+        "sha256": "5455ebf890a2b1901ef58a5cfc3e587e240e06fdfdc2ab5040030c2cf539db85"
+      },
+      {
+        "path": "raw/databento/XASE.PILLAR/statistics/2023Q1.dbn.zst",
+        "bytes": 931671,
+        "sha256": "b93e0a01636b75e3ae6678a0e25ad0d0b825e789f350fbfe6a54b1f1fbddcf70"
+      },
+      {
+        "path": "raw/databento/XASE.PILLAR/statistics/2023Q2.dbn.zst",
+        "bytes": 954690,
+        "sha256": "c09a5c0d6815196ff08224b46b85f1f9b300a9a72450b463f5dd470a785f40fd"
+      },
+      {
+        "path": "raw/databento/XASE.PILLAR/statistics/2023Q3.dbn.zst",
+        "bytes": 998410,
+        "sha256": "3bc91cbac4103f409812ada70cab7d0c46bca3e4e11183546275fc15d32da678"
+      },
+      {
+        "path": "raw/databento/XASE.PILLAR/statistics/2024Q1.dbn.zst",
+        "bytes": 923313,
+        "sha256": "243614157ec443929efe7ed9ba0a14568bcd58535252501b8bb91d739b6edea2"
+      },
+      {
+        "path": "raw/databento/XASE.PILLAR/statistics/2024Q2.dbn.zst",
+        "bytes": 955027,
+        "sha256": "af66b4447d74a0a195ae6d1d6ff3cf67ffed2df0d9e48dce45a8f375307de31d"
+      },
+      {
+        "path": "raw/databento/XASE.PILLAR/statistics/2024Q3.dbn.zst",
+        "bytes": 955952,
+        "sha256": "44e8bfbb6cf24c04400dde900ab211a9d0e46706a9366d1076895e799820af0d"
+      },
+      {
+        "path": "raw/databento/XASE.PILLAR/statistics/2024Q4.dbn.zst",
+        "bytes": 990647,
+        "sha256": "8fb17f2a1459cf8240ead302642b26329cec519932f08fed26a9b1f3726e7868"
+      },
+      {
+        "path": "raw/databento/XASE.PILLAR/statistics/2025Q2.dbn.zst",
+        "bytes": 956494,
+        "sha256": "6eeb1a14d4779db9457044b11b15682cd3ae630c9c5142099c826cb419871482"
+      },
+      {
+        "path": "raw/databento/XASE.PILLAR/statistics/2025Q3.dbn.zst",
+        "bytes": 997555,
+        "sha256": "377f6eb01bbbbbe30af4e8420c8d1e92dd1a680f254223e39a63f509de76e040"
+      },
+      {
+        "path": "raw/databento/XASE.PILLAR/statistics/2025Q4.dbn.zst",
+        "bytes": 1007498,
+        "sha256": "7a8c4d035d8810370fe192296d1efc3223dff7a344efc223bb7cf120c75a9bc2"
+      },
+      {
+        "path": "raw/databento/XASE.PILLAR/statistics/2026Q1.dbn.zst",
+        "bytes": 1000974,
+        "sha256": "4e77552a97b22b72352af3c6e3af9df3cb2b099badc7dc0570275adba4a31666"
+      },
+      {
+        "path": "raw/databento/XASE.PILLAR/statistics/2026Q2.dbn.zst",
+        "bytes": 1031634,
+        "sha256": "fd2ac4874226d2a08560f2c408d9f93e29f6062d0cd5a6e5a5a5d10e91801b7f"
+      },
+      {
+        "path": "raw/databento/XASE.PILLAR/statistics/2026Q3.dbn.zst",
+        "bytes": 1074850,
+        "sha256": "7486e7d86dc66dab270a6a973c71996992211c5e4f7ad2f8d5e80c48176110da"
+      },
+      {
+        "path": "raw/databento/XASE.PILLAR/statistics/2026Q4.dbn.zst",
+        "bytes": 134996,
+        "sha256": "4fc7ae26ab74deeb4490b0aa38c88e28a21d2f7e3a85f6289ad7bcd679af75e7"
+      },
+      {
+        "path": "raw/databento/XNAS.ITCH/statistics/2018Q2.dbn.zst",
+        "bytes": 13375679,
+        "sha256": "326051c711fd66a6eb2ed3cc122d4b1d5f51bb84e954b4d593c7347e19263751"
+      },
+      {
+        "path": "raw/databento/XNAS.ITCH/statistics/2018Q3.dbn.zst",
+        "bytes": 19704945,
+        "sha256": "e08de162d64fd697846b6496a9a6b17b19ab9b9531b9ad02cf7bf608fd9e3157"
+      },
+      {
+        "path": "raw/databento/XNAS.ITCH/statistics/2019Q1.dbn.zst",
+        "bytes": 19473456,
+        "sha256": "e5a213ba3c956deaff3ecd4f2a1121a426f11faeda2de85fe53b237505b5dbf1"
+      },
+      {
+        "path": "raw/databento/XNAS.ITCH/statistics/2019Q2.dbn.zst",
+        "bytes": 20130930,
+        "sha256": "913a9ebe57585f32df6f83883138a8978a1bc07feb2f7ed558852d3155818e4c"
+      },
+      {
+        "path": "raw/databento/XNAS.ITCH/statistics/2019Q3.dbn.zst",
+        "bytes": 20692265,
+        "sha256": "e1dcf00dd29b6e1297282a755c6659adcbd6d185bcf03954700239fd7215e398"
+      },
+      {
+        "path": "raw/databento/XNAS.ITCH/statistics/2019Q4.dbn.zst",
+        "bytes": 20823256,
+        "sha256": "24ddb8733d4fbb253913e20d63cb79ac190606b6dcd03486036b147b874d2a95"
+      },
+      {
+        "path": "raw/databento/XNAS.ITCH/statistics/2020Q1.dbn.zst",
+        "bytes": 20691809,
+        "sha256": "4e952904cdd37f03fbce96f23e92be1d1b06e7d022726937cc0079eed727880f"
+      },
+      {
+        "path": "raw/databento/XNAS.ITCH/statistics/2020Q2.dbn.zst",
+        "bytes": 20802846,
+        "sha256": "10cc5f022bc9566431c44b1a120b7d6bdf65e7fcd0ce54db9fda42622b669578"
+      },
+      {
+        "path": "raw/databento/XNAS.ITCH/statistics/2020Q3.dbn.zst",
+        "bytes": 21580569,
+        "sha256": "bbff16bfcbcc1447f2000bee8ea5062cd4492903927630115da6a75a1901db97"
+      },
+      {
+        "path": "raw/databento/XNAS.ITCH/statistics/2020Q4.dbn.zst",
+        "bytes": 22552734,
+        "sha256": "beaef1ec2bfabbd8f098d0756ff73719d22d482c64ea66e95510f0fd3e198f52"
+      },
+      {
+        "path": "raw/databento/XNAS.ITCH/statistics/2021Q1.dbn.zst",
+        "bytes": 23332361,
+        "sha256": "e57a4d7a89eaa938b0f51baba2ac2b2bb7e6f03414d292597a2e5edee6c51921"
+      },
+      {
+        "path": "raw/databento/XNAS.ITCH/statistics/2021Q2.dbn.zst",
+        "bytes": 25663641,
+        "sha256": "05ee82d29c6a79bff6009c7f11bbd6f99eef5ce47814d62d1be5d64b82dcc58c"
+      },
+      {
+        "path": "raw/databento/XNAS.ITCH/statistics/2021Q3.dbn.zst",
+        "bytes": 27192732,
+        "sha256": "26f14cc9d68f8e714d66078e62b3c341b085c8c366d4666cad0ed3447a1da601"
+      },
+      {
+        "path": "raw/databento/XNAS.ITCH/statistics/2021Q4.dbn.zst",
+        "bytes": 28187794,
+        "sha256": "e212ad67cf59ce82377957beada4164ec384bf27ad2006cf23c3ceb2d47bf268"
+      },
+      {
+        "path": "raw/databento/XNAS.ITCH/statistics/2022Q2.dbn.zst",
+        "bytes": 28626814,
+        "sha256": "e34f17e4024f474be236b872e0190c4e541b40fb03ae7c2b61f060f1e49a3b23"
+      },
+      {
+        "path": "raw/databento/XNAS.ITCH/statistics/2022Q3.dbn.zst",
+        "bytes": 29530222,
+        "sha256": "b83b955545469b7044660df18a94b4dff6744459945aacfbd4b6a922c56beb36"
+      },
+      {
+        "path": "raw/databento/XNAS.ITCH/statistics/2022Q4.dbn.zst",
+        "bytes": 28493912,
+        "sha256": "69fee6a3e9cc543f6d92f4478c08743aaa62bae59dc6ec594e3eac9beab14aaf"
+      },
+      {
+        "path": "raw/databento/XNAS.ITCH/statistics/2023Q1.dbn.zst",
+        "bytes": 27707340,
+        "sha256": "aeac227d5a3017d5110209b2e849979cce2def1f1d2f735662fec978be4f734e"
+      },
+      {
+        "path": "raw/databento/XNAS.ITCH/statistics/2023Q2.dbn.zst",
+        "bytes": 26736748,
+        "sha256": "03a50a1ff89f048e0e59e79d8f4956692a1f8205e44ab9fb3a46e0191164e920"
+      },
+      {
+        "path": "raw/databento/XNAS.ITCH/statistics/2023Q3.dbn.zst",
+        "bytes": 26855732,
+        "sha256": "8418976b9173e711c643870dcd2194f61b0e6426a803443b02c296fcc036b3d2"
+      },
+      {
+        "path": "raw/databento/XNAS.ITCH/statistics/2023Q4.dbn.zst",
+        "bytes": 26486408,
+        "sha256": "ca6abc55ff23a932a59e1c5310323649f6a20349589d20d08e013723e2590b88"
+      },
+      {
+        "path": "raw/databento/XNAS.ITCH/statistics/2024Q1.dbn.zst",
+        "bytes": 25508963,
+        "sha256": "5c37e2dab1d792288c5a488beeca02fc17590287bfb6357d8a8746f8cad42c36"
+      },
+      {
+        "path": "raw/databento/XNAS.ITCH/statistics/2024Q2.dbn.zst",
+        "bytes": 26153856,
+        "sha256": "df32328eda8ec51fef38676f99b8b4d6a75fc3c7df27fa3ba07fb6eb654029a1"
+      },
+      {
+        "path": "raw/databento/XNAS.ITCH/statistics/2024Q3.dbn.zst",
+        "bytes": 26551969,
+        "sha256": "223b4c1cbb8a192ea4e635a419d283dfc3cef20663a6f08acfa94146d76145be"
+      },
+      {
+        "path": "raw/databento/XNAS.ITCH/statistics/2024Q4.dbn.zst",
+        "bytes": 26900477,
+        "sha256": "e3ddf69a9ca0a8af0c7637ce78ada8f911997aeb2de444573807cd97d90d6793"
+      },
+      {
+        "path": "raw/databento/XNAS.ITCH/statistics/2025Q1.dbn.zst",
+        "bytes": 27318775,
+        "sha256": "ac479b5fdc8ef4d6f2dd57bc3f9b944b49039a2056562b3a708967c11903598f"
+      },
+      {
+        "path": "raw/databento/XNAS.ITCH/statistics/2025Q2.dbn.zst",
+        "bytes": 33889031,
+        "sha256": "a076af52084d889fe56e03289b2b111a29014f8192b60997e4d258ebe19686f2"
+      },
+      {
+        "path": "raw/databento/XNAS.ITCH/statistics/2025Q3.dbn.zst",
+        "bytes": 35812368,
+        "sha256": "5f4a55acec52b26c6926018ee62352a9bb622c94fe46fa64d56d2710b59e7fd1"
+      },
+      {
+        "path": "raw/databento/XNAS.ITCH/statistics/2025Q4.dbn.zst",
+        "bytes": 37115963,
+        "sha256": "d9e0883f44d085d92cc394d1db2cc059cc3adfa37c7989d68e5d0b969722e937"
+      },
+      {
+        "path": "raw/databento/XNAS.ITCH/statistics/2026Q1.dbn.zst",
+        "bytes": 36280309,
+        "sha256": "09eb57f381773456aaf0358c6a08149c8d90bb5ad48fd6750eeb70b3f635b389"
+      },
+      {
+        "path": "raw/databento/XNAS.ITCH/statistics/2026Q2.dbn.zst",
+        "bytes": 37840948,
+        "sha256": "01df89f92965d65eb2227b578fdec77c00b99d22365b7c1f4b5e3c2200663236"
+      },
+      {
+        "path": "raw/databento/XNAS.ITCH/statistics/2026Q3.dbn.zst",
+        "bytes": 40230130,
+        "sha256": "c5dba0f4b81a412437d523e89446dc87e987b35aedadccd5d7002a9c23e396c1"
+      },
+      {
+        "path": "raw/databento/XNAS.ITCH/statistics/2026Q4.dbn.zst",
+        "bytes": 5066959,
+        "sha256": "fa1642674cb4a0f209805b20e6e0dc7649599781993c11d935aa773e0491ebb7"
+      },
+      {
+        "path": "raw/databento/XNYS.PILLAR/statistics/2018Q3.dbn.zst",
+        "bytes": 10706087,
+        "sha256": "a7ad4b78817e8f851d0e4bca12f6695878586885fa3de41a9acb17ca33d30f0e"
+      },
+      {
+        "path": "raw/databento/XNYS.PILLAR/statistics/2018Q4.dbn.zst",
+        "bytes": 10847414,
+        "sha256": "c58663fe7c5f5790a4ae628474ab008b66dd31ea33090624eb36cbc332d94c35"
+      },
+      {
+        "path": "raw/databento/XNYS.PILLAR/statistics/2019Q1.dbn.zst",
+        "bytes": 10429856,
+        "sha256": "2574c828d191cd9971c651a6e490f249d7fd8c35688c493893e935304681d895"
+      },
+      {
+        "path": "raw/databento/XNYS.PILLAR/statistics/2019Q2.dbn.zst",
+        "bytes": 10705313,
+        "sha256": "0db4bb333432fc8695dd3b9e35fdff5fb9e0604905001bf1f50a4fa8f6c9ba96"
+      },
+      {
+        "path": "raw/databento/XNYS.PILLAR/statistics/2019Q3.dbn.zst",
+        "bytes": 10408435,
+        "sha256": "80efabe1a6cb17d7413f930cc44b15a75b13371a01d2ff2b5eed9690145eb3a8"
+      },
+      {
+        "path": "raw/databento/XNYS.PILLAR/statistics/2019Q4.dbn.zst",
+        "bytes": 10380326,
+        "sha256": "5773ef9dd1342f4f6f6254d7e39ff493c43fe3840a6a57b4d43852a84eab9b89"
+      },
+      {
+        "path": "raw/databento/XNYS.PILLAR/statistics/2020Q1.dbn.zst",
+        "bytes": 10990123,
+        "sha256": "0b83479d4915d763558fbd78e62d0c647efd0b0d18d6327212977e96ec9b8df7"
+      },
+      {
+        "path": "raw/databento/XNYS.PILLAR/statistics/2020Q3.dbn.zst",
+        "bytes": 10958039,
+        "sha256": "ae782a0c1a482729e7ea16f7a92e1c0d74cb89e67201bcfa6391a922715e7d9c"
+      },
+      {
+        "path": "raw/databento/XNYS.PILLAR/statistics/2020Q4.dbn.zst",
+        "bytes": 11207240,
+        "sha256": "4cd01375c6cec862b6a432e007b34cf396480c95d9aa0b8f0d31c5b4e14b0e2d"
+      },
+      {
+        "path": "raw/databento/XNYS.PILLAR/statistics/2021Q3.dbn.zst",
+        "bytes": 11659482,
+        "sha256": "288661649187d7b5095aa7fb2353173a2d0a70202075450b99371f33eca88755"
+      },
+      {
+        "path": "raw/databento/XNYS.PILLAR/statistics/2022Q1.dbn.zst",
+        "bytes": 11314106,
+        "sha256": "677418d15d24c7ad6a3121fc394ae8ffc493298df9e98fe2a8ab21242e29fca8"
+      },
+      {
+        "path": "raw/databento/XNYS.PILLAR/statistics/2022Q2.dbn.zst",
+        "bytes": 11147172,
+        "sha256": "4bb3b57855ef0a9e9f2d520aef4c96571efff9dbe42f653d16a3123d47657a7e"
+      },
+      {
+        "path": "raw/databento/XNYS.PILLAR/statistics/2022Q3.dbn.zst",
+        "bytes": 11364159,
+        "sha256": "ad739971dcd02c59b72e1af1f70324e2231292866b204a9bd3fea923cd1efba9"
+      },
+      {
+        "path": "raw/databento/XNYS.PILLAR/statistics/2022Q4.dbn.zst",
+        "bytes": 11039351,
+        "sha256": "98bf3447f3003b28aa00e8cb4fae4ce22a2a7c9e1a6310c6bd27dd2f8e425ad5"
+      },
+      {
+        "path": "raw/databento/XNYS.PILLAR/statistics/2023Q2.dbn.zst",
+        "bytes": 10735911,
+        "sha256": "6d01f8a0d745bc2c6b23cb2e0030394284bd97c729c5eab66e16fcec3412be50"
+      },
+      {
+        "path": "raw/databento/XNYS.PILLAR/statistics/2023Q3.dbn.zst",
+        "bytes": 10886957,
+        "sha256": "78e1539d8b1a215aff446beda62de7ebdae0dafa70d6759fb4e92d59f76069f8"
+      },
+      {
+        "path": "raw/databento/XNYS.PILLAR/statistics/2023Q4.dbn.zst",
+        "bytes": 10706917,
+        "sha256": "a1717718e07360d354173931f4a3f08e783cc30d61c7e91309fa243327167c66"
+      },
+      {
+        "path": "raw/databento/XNYS.PILLAR/statistics/2024Q1.dbn.zst",
+        "bytes": 10165011,
+        "sha256": "ea9fb9a28ea61ea11259dc042368d1b6e88c8c451e399e540468d2aeeb305d9e"
+      },
+      {
+        "path": "raw/databento/XNYS.PILLAR/statistics/2024Q2.dbn.zst",
+        "bytes": 10415325,
+        "sha256": "e5826d9e04c6273729c93ae72e15d2c42e6e148c75ce5cfa5858acd798e5aa92"
+      },
+      {
+        "path": "raw/databento/XNYS.PILLAR/statistics/2024Q3.dbn.zst",
+        "bytes": 10546493,
+        "sha256": "85e61c17ac42be93adfe28143214d98ee028c20856145634b386791f1c4d6bd9"
+      },
+      {
+        "path": "raw/databento/XNYS.PILLAR/statistics/2024Q4.dbn.zst",
+        "bytes": 10623014,
+        "sha256": "d147a9585f2e414172cdb85fc8f58a54ba04aa9d5783c764ec10460fa9dab788"
+      },
+      {
+        "path": "raw/databento/XNYS.PILLAR/statistics/2025Q1.dbn.zst",
+        "bytes": 9959066,
+        "sha256": "511bc88000787eadf07819dcfd0039f76d5315b8c4aaa07cb4a66bb4d5929f2c"
+      },
+      {
+        "path": "raw/databento/XNYS.PILLAR/statistics/2025Q2.dbn.zst",
+        "bytes": 10181442,
+        "sha256": "351a0eed56acec7e096d0680d52e9ec392bab724d7d7a6d7deb22653f9078508"
+      },
+      {
+        "path": "raw/databento/XNYS.PILLAR/statistics/2025Q3.dbn.zst",
+        "bytes": 10484891,
+        "sha256": "72543bf0a16a80fda9be15bd1e60df0b5bead018c7a3e69c8ca7f058b80db0b2"
+      },
+      {
+        "path": "raw/databento/XNYS.PILLAR/statistics/2026Q1.dbn.zst",
+        "bytes": 10064505,
+        "sha256": "859bac2ed3ecb90a35d5ade9fceaf80402c49a9b236b3a1cc6c3b0825691a4f1"
+      },
+      {
+        "path": "raw/databento/XNYS.PILLAR/statistics/2026Q2.dbn.zst",
+        "bytes": 10289308,
+        "sha256": "41a1dfbe46a6919af7a1261500df9c9807a6a27f404649c48a6287fd385384a4"
+      },
+      {
+        "path": "raw/databento/XNYS.PILLAR/statistics/2026Q3.dbn.zst",
+        "bytes": 10749082,
+        "sha256": "97b2c6d0c925d68faf93d4ff4543b5e39844bd217b0529db353d3e18cb90242a"
+      }
+    ],
+    "cached_books": {
+      "path": "execution_research/20261013T224003582762Z__quotes_v1/observations.local.json",
+      "sha256": "6d5ff69a813cbadb65c97dd8fe913fee9dbf61a298a74ba8368903a4dfc78087",
+      "events": 671
+    },
+    "bar_files": [
+      {
+        "path": "raw/databento/XASE.PILLAR/ohlcv-1s/sessions/01694c543ce23b64f30338a8.dbn.zst",
+        "bytes": 3707,
+        "quoted_usd": 0.0,
+        "sha256": "fe991599111d3e6c95111d282935b2b6dbf877ff9d6e6e7b7012518959eeb7a9"
+      },
+      {
+        "path": "raw/databento/XASE.PILLAR/ohlcv-1s/sessions/09955ee16488fa06b0280892.dbn.zst",
+        "bytes": 817,
+        "quoted_usd": 0.0,
+        "sha256": "745ee014630073914768b7fd288b7b6b087f733d0cc188b48ebaed46d983e578"
+      },
+      {
+        "path": "raw/databento/XASE.PILLAR/ohlcv-1s/sessions/0eff6abc8a70d8147badc602.dbn.zst",
+        "bytes": 1402,
+        "quoted_usd": 0.0,
+        "sha256": "256174817b58a86ac0c79d1c996a3ea7da72bf25b9b19d253567abdaecdcf088"
+      },
+      {
+        "path": "raw/databento/XASE.PILLAR/ohlcv-1s/sessions/26236b70a978af4e9875fbc5.dbn.zst",
+        "bytes": 6809,
+        "quoted_usd": 0.0,
+        "sha256": "4b3b73e247d1774b687c9ec051de05dd318d0bccf5a839401ea2f06112fa6dc8"
+      },
+      {
+        "path": "raw/databento/XASE.PILLAR/ohlcv-1s/sessions/2750326ab4aaea9ea13db67a.dbn.zst",
+        "bytes": 4230,
+        "quoted_usd": 0.0,
+        "sha256": "dd7d92533de4e4cea2c7681684c375e7bc2155f9878d4afaf6796f08246e83ab"
+      },
+      {
+        "path": "raw/databento/XASE.PILLAR/ohlcv-1s/sessions/2b54013afc172debcdbd3e58.dbn.zst",
+        "bytes": 2919,
+        "quoted_usd": 0.0,
+        "sha256": "db435ece1c1bdc0920329615dc031deeeb81bb40850eec71e9485cec9279f08a"
+      },
+      {
+        "path": "raw/databento/XASE.PILLAR/ohlcv-1s/sessions/316eb521687f643cc6b08b01.dbn.zst",
+        "bytes": 1877,
+        "quoted_usd": 0.0,
+        "sha256": "01f8f5c1ebdcd383c9c87c9720d3fb296ae9711f3c982178b3472402222a24c5"
+      },
+      {
+        "path": "raw/databento/XASE.PILLAR/ohlcv-1s/sessions/324a219c6f490ad7a29fbcce.dbn.zst",
+        "bytes": 719,
+        "quoted_usd": 0.0,
+        "sha256": "1665d5b6c2941d5f05078f466b7d0ee6a786a94799a1a3ce66e94af27e327ff5"
+      },
+      {
+        "path": "raw/databento/XASE.PILLAR/ohlcv-1s/sessions/4e3148d00a2931a4a03e6b0a.dbn.zst",
+        "bytes": 758,
+        "quoted_usd": 0.0,
+        "sha256": "a94502bfcd111c840f8a3c5793c2ff81533835c11a06fd3325d64c460cabb7d6"
+      },
+      {
+        "path": "raw/databento/XASE.PILLAR/ohlcv-1s/sessions/54d04297358c6e532a6bc564.dbn.zst",
+        "bytes": 2473,
+        "quoted_usd": 0.0,
+        "sha256": "5d83d890e2ed1e80bd9913306167ac45895ba16d99b7179baf528d45d6edfade"
+      },
+      {
+        "path": "raw/databento/XASE.PILLAR/ohlcv-1s/sessions/57b0f47a1aee7cf381cafe7a.dbn.zst",
+        "bytes": 2424,
+        "quoted_usd": 0.0,
+        "sha256": "271cd560e59d45fef47cb51896c6f5232dbc78334ca99211a5bac4a2d5e3ad4a"
+      },
+      {
+        "path": "raw/databento/XASE.PILLAR/ohlcv-1s/sessions/5d685a135c2226f4b52b4c30.dbn.zst",
+        "bytes": 934,
+        "quoted_usd": 0.0,
+        "sha256": "40599a6f7ea1d0a0cbff624624d601f6de7cc39546459132f7b8c7974a50c0b1"
+      },
+      {
+        "path": "raw/databento/XASE.PILLAR/ohlcv-1s/sessions/5ea6988525527b9e19907ca7.dbn.zst",
+        "bytes": 447,
+        "quoted_usd": 0.0,
+        "sha256": "be8b20191e67090533104e044a4b27d5416ea3bc0fcf61a9f1500a6f7c996eb7"
+      },
+      {
+        "path": "raw/databento/XASE.PILLAR/ohlcv-1s/sessions/622ccc1a45c21410e0ea7849.dbn.zst",
+        "bytes": 824,
+        "quoted_usd": 0.0,
+        "sha256": "dad5e992b1ec890230e11ce1a2db904f7b2ecb6dba413dc325dd644abd45e25b"
+      },
+      {
+        "path": "raw/databento/XASE.PILLAR/ohlcv-1s/sessions/6a17485dae0192890b70809b.dbn.zst",
+        "bytes": 1097,
+        "quoted_usd": 0.0,
+        "sha256": "7831c508c268d64e2072669e1affdeba7fda5c52c94a4525e4e1d3ec6a7b1f74"
+      },
+      {
+        "path": "raw/databento/XASE.PILLAR/ohlcv-1s/sessions/6fa4f0bc53e9394ff6f840bf.dbn.zst",
+        "bytes": 1601,
+        "quoted_usd": 0.0,
+        "sha256": "ce5c924582025d895d4fb9d9dd7e182f203b052a2903586a5a428dc96fad44c8"
+      },
+      {
+        "path": "raw/databento/XASE.PILLAR/ohlcv-1s/sessions/7218f7ac1875ae7ce86e504d.dbn.zst",
+        "bytes": 381,
+        "quoted_usd": 0.0,
+        "sha256": "4f69185f89779a48864786d2ba2b04f0b292072d989c2c174255b3474afdc68f"
+      },
+      {
+        "path": "raw/databento/XASE.PILLAR/ohlcv-1s/sessions/7432cd4282d980858f834966.dbn.zst",
+        "bytes": 2609,
+        "quoted_usd": 0.0,
+        "sha256": "f79152143b02cada91f73c97684d4d9fe46393cd905466211ab3cf32802029c9"
+      },
+      {
+        "path": "raw/databento/XASE.PILLAR/ohlcv-1s/sessions/79e172047021718f7be51ab7.dbn.zst",
+        "bytes": 1028,
+        "quoted_usd": 0.0,
+        "sha256": "35e43b1b8a80e64a275c4193305eb8484b3742159bff9598e4a94ea14fd4c199"
+      },
+      {
+        "path": "raw/databento/XASE.PILLAR/ohlcv-1s/sessions/7fe72bfdd114b6618b9f8b71.dbn.zst",
+        "bytes": 1027,
+        "quoted_usd": 0.0,
+        "sha256": "78c6e010275893008e1caa620ef982402f3a748e4c83854e65adb4d0f3b08e4f"
+      },
+      {
+        "path": "raw/databento/XASE.PILLAR/ohlcv-1s/sessions/8112d2bf32824df0a3de13ab.dbn.zst",
+        "bytes": 2621,
+        "quoted_usd": 0.0,
+        "sha256": "49b4f64b781592388c5d5ea5f80ec6d0208a12f2e62f8cf7b5c819cd709eedd5"
+      },
+      {
+        "path": "raw/databento/XASE.PILLAR/ohlcv-1s/sessions/83ccc530b88be19d62decb46.dbn.zst",
+        "bytes": 2078,
+        "quoted_usd": 0.0,
+        "sha256": "2bc041e879890a43e0a6781cdbc660144e4419e2923b88d7ed5a401036141987"
+      },
+      {
+        "path": "raw/databento/XASE.PILLAR/ohlcv-1s/sessions/892230f19561e8d606364d5b.dbn.zst",
+        "bytes": 935,
+        "quoted_usd": 0.0,
+        "sha256": "2ff9f5f9871df2f2f8fde19b37d3c06d33ef216057874e55eeeb488f09b7fd00"
+      },
+      {
+        "path": "raw/databento/XASE.PILLAR/ohlcv-1s/sessions/8b10377dddc1acfebb49ec47.dbn.zst",
+        "bytes": 1039,
+        "quoted_usd": 0.0,
+        "sha256": "bb8c6e9f10dde0fde6ba39ea6e02b50b7dece4f55d0f859f5391fc1dfb19c9e2"
+      },
+      {
+        "path": "raw/databento/XASE.PILLAR/ohlcv-1s/sessions/946e2131e4e61aed93b1bde5.dbn.zst",
+        "bytes": 958,
+        "quoted_usd": 0.0,
+        "sha256": "f13f9b7f399e5f34e1b8d92aefcd3bfe0612cc5b60c5ef1176a54034f38aa68e"
+      },
+      {
+        "path": "raw/databento/XASE.PILLAR/ohlcv-1s/sessions/a1461033cc387484e4b462c4.dbn.zst",
+        "bytes": 776,
+        "quoted_usd": 0.0,
+        "sha256": "9c974419124b80643b4f663a3e884fd7aa12223227a4284b1fecf674367d0fbb"
+      },
+      {
+        "path": "raw/databento/XASE.PILLAR/ohlcv-1s/sessions/a24c6c749b19a8abea14c27d.dbn.zst",
+        "bytes": 1553,
+        "quoted_usd": 0.0,
+        "sha256": "86efac2f4cedac8eb07f61992cb5d0fb09d852a963288dec4b4052e7bc0d19b1"
+      },
+      {
+        "path": "raw/databento/XASE.PILLAR/ohlcv-1s/sessions/a482e1b37e0fa12556f23fc8.dbn.zst",
+        "bytes": 6084,
+        "quoted_usd": 0.0,
+        "sha256": "94b1d65fbb78bb978834e66283cdb1c203157971fef66cb552e191d835ab5f2d"
+      },
+      {
+        "path": "raw/databento/XASE.PILLAR/ohlcv-1s/sessions/ae8df6313820d7ee6ee78cff.dbn.zst",
+        "bytes": 474,
+        "quoted_usd": 0.0,
+        "sha256": "8186fb03a3d16d89632ae8f2983110008512f61d4cac6eccd13606a905c205db"
+      },
+      {
+        "path": "raw/databento/XASE.PILLAR/ohlcv-1s/sessions/aecbfad43309f68c0962dfca.dbn.zst",
+        "bytes": 4514,
+        "quoted_usd": 0.0,
+        "sha256": "7de48ee3fd997fb1768273ec29ac30defbc24f21604d29405767074517febd0a"
+      },
+      {
+        "path": "raw/databento/XASE.PILLAR/ohlcv-1s/sessions/b0c1e50a9c47034154172993.dbn.zst",
+        "bytes": 1642,
+        "quoted_usd": 0.0,
+        "sha256": "bc891ac8c5710277626d76b2b0efb7e744d190bafbc99f78cfb99c4c4faeaa3b"
+      },
+      {
+        "path": "raw/databento/XASE.PILLAR/ohlcv-1s/sessions/bd0e2b3977cf36a96fa46fb5.dbn.zst",
+        "bytes": 2711,
+        "quoted_usd": 0.0,
+        "sha256": "e5c57d739ec508cd4b031418b742fe3f5a042447b30fce997772177453789950"
+      },
+      {
+        "path": "raw/databento/XASE.PILLAR/ohlcv-1s/sessions/bfa3f15eb5ccc915cd3358dc.dbn.zst",
+        "bytes": 846,
+        "quoted_usd": 0.0,
+        "sha256": "7f54297164026c7e193e1a0f3dc7be44f7e243605f31588aa8c03354957e09ea"
+      },
+      {
+        "path": "raw/databento/XASE.PILLAR/ohlcv-1s/sessions/cbf5a46a95ee26cea0942477.dbn.zst",
+        "bytes": 6810,
+        "quoted_usd": 0.0,
+        "sha256": "a6db497ab8a487298572202115b4da073475618aea0dbf1c2f8e2f3834a2941e"
+      },
+      {
+        "path": "raw/databento/XASE.PILLAR/ohlcv-1s/sessions/d0884ccf282d7c089ea6636b.dbn.zst",
+        "bytes": 4007,
+        "quoted_usd": 0.0,
+        "sha256": "ef92a7986f99795f7779033bba9fffeb3eecc3d181e72e22b608d4fc52da9a2f"
+      },
+      {
+        "path": "raw/databento/XASE.PILLAR/ohlcv-1s/sessions/dd7f1a5cb928837ec3f92bf7.dbn.zst",
+        "bytes": 806,
+        "quoted_usd": 0.0,
+        "sha256": "9ee7bf079cee2e3f8c00895b4b83595e09eb621466df9d5d5372936d9c1357ca"
+      },
+      {
+        "path": "raw/databento/XASE.PILLAR/ohlcv-1s/sessions/dede77bd23c67b79bad4c3cb.dbn.zst",
+        "bytes": 2377,
+        "quoted_usd": 0.0,
+        "sha256": "402dabe038a86292a33a7707bfe85d8f92e9aacfcc9cbe03305cbc0a7bbaacad"
+      },
+      {
+        "path": "raw/databento/XASE.PILLAR/ohlcv-1s/sessions/ee9dcea190bfb23f92e13cff.dbn.zst",
+        "bytes": 974,
+        "quoted_usd": 0.0,
+        "sha256": "3259f0cf2b78fca93c5e509c660ae896842f4cffc8dc766319723deb24e507e3"
+      },
+      {
+        "path": "raw/databento/XASE.PILLAR/ohlcv-1s/sessions/f2536a9e4087a992e772f9b5.dbn.zst",
+        "bytes": 894,
+        "quoted_usd": 0.0,
+        "sha256": "c54bdbe9829c1ea9429bc6bf706bb9ed87b0bd352ca8c6f4c8823b0011cdd98b"
+      },
+      {
+        "path": "raw/databento/XASE.PILLAR/ohlcv-1s/sessions/f81a7a300a711f878c3eb506.dbn.zst",
+        "bytes": 800,
+        "quoted_usd": 0.0,
+        "sha256": "8448281f1a4947ed536b254d7e0ba39f34089cd3e6b79c608cd888370c59f31d"
+      },
+      {
+        "path": "raw/databento/XASE.PILLAR/ohlcv-1s/sessions/f9d1d54ba2b7ad68c31b3355.dbn.zst",
+        "bytes": 1941,
+        "quoted_usd": 0.0,
+        "sha256": "665e83d075c82fd34a70a7330aa0a350ff6c6a79c6bd0f522e6315e073540da4"
+      },
+      {
+        "path": "raw/databento/XNAS.ITCH/ohlcv-1s/sessions/0068b79e649b48daaf508eb4.dbn.zst",
+        "bytes": 2242,
+        "quoted_usd": 0.0,
+        "sha256": "dd40ef659ee5fbdd4f9e2dd918fa2bd867604bea9d03b2960549043733aa13e7"
+      },
+      {
+        "path": "raw/databento/XNAS.ITCH/ohlcv-1s/sessions/00d795847eff59f818f21d09.dbn.zst",
+        "bytes": 1513,
+        "quoted_usd": 0.0,
+        "sha256": "26dce3a29586779a94efad1022a991d7b27d8fbf6b1b2f4721eff12d9967ee86"
+      },
+      {
+        "path": "raw/databento/XNAS.ITCH/ohlcv-1s/sessions/00e3359cc4b9b3c70e5e3e3a.dbn.zst",
+        "bytes": 704,
+        "quoted_usd": 0.0,
+        "sha256": "05be9ac298ffe7b92a46bfc35b69f193f58cce4c3c20b68af83dc9d6adebebdb"
+      },
+      {
+        "path": "raw/databento/XNAS.ITCH/ohlcv-1s/sessions/00ee98186fbc991d520b8ac0.dbn.zst",
+        "bytes": 4754,
+        "quoted_usd": 0.0,
+        "sha256": "54e7cd8b2391c999ae733ebdd95b639af4839661f95c1705a4008460c0c981b8"
+      },
+      {
+        "path": "raw/databento/XNAS.ITCH/ohlcv-1s/sessions/01179f3b15aa98a67aed414e.dbn.zst",
+        "bytes": 2065,
+        "quoted_usd": 0.0,
+        "sha256": "f70bdf2839940fd7b7e47c16425861b1ec117701760bdf358e90481297fc6f88"
+      },
+      {
+        "path": "raw/databento/XNAS.ITCH/ohlcv-1s/sessions/01390ae4241c2a16fd28a240.dbn.zst",
+        "bytes": 7268,
+        "quoted_usd": 0.0,
+        "sha256": "9096790e92ecb7c14a526982926bd1a61c11e604a000d0a08453bd05d94328b1"
+      },
+      {
+        "path": "raw/databento/XNAS.ITCH/ohlcv-1s/sessions/01923c041dd74c69a1a82aff.dbn.zst",
+        "bytes": 307,
+        "quoted_usd": 0.0,
+        "sha256": "b2580c1e21450db4f23ff9439d063898843e2a6864f4ade981cab97cb055c3f3"
+      },
+      {
+        "path": "raw/databento/XNAS.ITCH/ohlcv-1s/sessions/02593818aefe983b27ea6ee4.dbn.zst",
+        "bytes": 2933,
+        "quoted_usd": 0.0,
+        "sha256": "aca749cd3bbe9b09e7f9d412de32ce36aafcbd83510bbe718a4ec1b013da31ea"
+      },
+      {
+        "path": "raw/databento/XNAS.ITCH/ohlcv-1s/sessions/02fa03d1d6a688f8748730a4.dbn.zst",
+        "bytes": 1505,
+        "quoted_usd": 0.0,
+        "sha256": "b20f65ebcdd6840a1956e64e44640b1b4d9a03ce0a7e548c8e74476cc570a0a2"
+      },
+      {
+        "path": "raw/databento/XNAS.ITCH/ohlcv-1s/sessions/030ccc0dddaa77a6e48b1809.dbn.zst",
+        "bytes": 9479,
+        "quoted_usd": 0.0,
+        "sha256": "8450c20be9d221f308ff6dbede1c0c9d30eee7d109126a88dc12b5ec3536ccc7"
+      },
+      {
+        "path": "raw/databento/XNAS.ITCH/ohlcv-1s/sessions/031296fcae995a792024e8ce.dbn.zst",
+        "bytes": 1168,
+        "quoted_usd": 0.0,
+        "sha256": "3f48812fb900d91bd737d4009b994d25d3c58691a581745662bab9624c182883"
+      },
+      {
+        "path": "raw/databento/XNAS.ITCH/ohlcv-1s/sessions/042095b127f4bc0077f775f9.dbn.zst",
+        "bytes": 1636,
+        "quoted_usd": 0.0,
+        "sha256": "6c644913a0d4cb759f67cebde786f02159ae3cdf1a7ab3ee33a4fbfebeb8c1d8"
+      },
+      {
+        "path": "raw/databento/XNAS.ITCH/ohlcv-1s/sessions/090ef6d562094795a2463868.dbn.zst",
+        "bytes": 2836,
+        "quoted_usd": 0.0,
+        "sha256": "42eb2a13ef59ae0576deb4acd9ab239537a584d24bec63aca8970b90d2c9c790"
+      },
+      {
+        "path": "raw/databento/XNAS.ITCH/ohlcv-1s/sessions/091513e06eca7f4d13aad7d4.dbn.zst",
+        "bytes": 2370,
+        "quoted_usd": 0.0,
+        "sha256": "9017d9a26a81915121e2cc9e9291ac8087f4630bffa45663169ced7719229a35"
+      },
+      {
+        "path": "raw/databento/XNAS.ITCH/ohlcv-1s/sessions/09599f34d3e490f7039f521c.dbn.zst",
+        "bytes": 20849,
+        "quoted_usd": 0.0,
+        "sha256": "41d3cf721f7be1266991c0c429e70a2809267783f70e978615d3e16e8fdc1b47"
+      },
+      {
+        "path": "raw/databento/XNAS.ITCH/ohlcv-1s/sessions/09d56968e8d54ecdfbf0b127.dbn.zst",
+        "bytes": 1297,
+        "quoted_usd": 0.0,
+        "sha256": "e58856a2371b1e633dc86bda8ebd1d611cb62f81da75564527506e7191efc5b3"
+      },
+      {
+        "path": "raw/databento/XNAS.ITCH/ohlcv-1s/sessions/0ab70df3c945c23058cdaca9.dbn.zst",
+        "bytes": 939,
+        "quoted_usd": 0.0,
+        "sha256": "747b6473cd0b95829dcf193c5ad8bc69d7be023d7b65c7cb8b48aae5ff00add8"
+      },
+      {
+        "path": "raw/databento/XNAS.ITCH/ohlcv-1s/sessions/0b95762a8913514b8b3b46ee.dbn.zst",
+        "bytes": 39719,
+        "quoted_usd": 0.0,
+        "sha256": "7e6304c71d08cbe76f4339c5b67af2cd9e3f66c641be1f6fb333a671891b7282"
+      },
+      {
+        "path": "raw/databento/XNAS.ITCH/ohlcv-1s/sessions/0b9a31c3654dc187f19c4e1b.dbn.zst",
+        "bytes": 883,
+        "quoted_usd": 0.0,
+        "sha256": "3cb88b0160a09a36b85d1ef523d8adf8578f176acf7a7063c0f55a24ac93c610"
+      },
+      {
+        "path": "raw/databento/XNAS.ITCH/ohlcv-1s/sessions/0bf3a98f8fac3c350e7b22c5.dbn.zst",
+        "bytes": 26782,
+        "quoted_usd": 0.0,
+        "sha256": "e3866351bff49749502bf00620dfdfb4d3d0010055a74a30847365cd14f5150f"
+      },
+      {
+        "path": "raw/databento/XNAS.ITCH/ohlcv-1s/sessions/0c0f593970c639563096c0a8.dbn.zst",
+        "bytes": 11546,
+        "quoted_usd": 0.0,
+        "sha256": "af96f102a9a408fb94f9f6180a6b3efd13b00245580efb96140540f4044241a3"
+      },
+      {
+        "path": "raw/databento/XNAS.ITCH/ohlcv-1s/sessions/0ccac462d67e4db78ceb8c59.dbn.zst",
+        "bytes": 4669,
+        "quoted_usd": 0.0,
+        "sha256": "fa35b5c4534c8cce953a9ea49d9bdc6d7061eb6a8e31f52b99b7053b50378718"
+      },
+      {
+        "path": "raw/databento/XNAS.ITCH/ohlcv-1s/sessions/0e5dcf25073bc2d52cdb8619.dbn.zst",
+        "bytes": 2038,
+        "quoted_usd": 0.0,
+        "sha256": "1e0869acdc80383497324481b6ad48b146486cc2e26ffd7b38980fddf54d4eb4"
+      },
+      {
+        "path": "raw/databento/XNAS.ITCH/ohlcv-1s/sessions/0e7e7b5ef12eb459562d03b0.dbn.zst",
+        "bytes": 2240,
+        "quoted_usd": 0.0,
+        "sha256": "521a9710eb881728891f365424b71655ff525a8e3f63744548624777bfa0e245"
+      },
+      {
+        "path": "raw/databento/XNAS.ITCH/ohlcv-1s/sessions/0ecfe997aa5a7aba09bb30ce.dbn.zst",
+        "bytes": 5840,
+        "quoted_usd": 0.0,
+        "sha256": "407b0c4ec91b916b6ac3efb6d3b047ce555e134874b27f6ea3f22851ccfd4c99"
+      },
+      {
+        "path": "raw/databento/XNAS.ITCH/ohlcv-1s/sessions/0f9f03f2d2f405051d9a3024.dbn.zst",
+        "bytes": 2337,
+        "quoted_usd": 0.0,
+        "sha256": "b7030dd3d5fd74987f1be3341e7b1fdd3d2aecd65da9fb1d56ff66e4a0b341f2"
+      },
+      {
+        "path": "raw/databento/XNAS.ITCH/ohlcv-1s/sessions/0fc964a4e1f65e4f11f37f95.dbn.zst",
+        "bytes": 1465,
+        "quoted_usd": 0.0,
+        "sha256": "8f988f14bec1d503ca5416fe24558fb8e9d1408f6acceaa6f7727ea73a28cd45"
+      },
+      {
+        "path": "raw/databento/XNAS.ITCH/ohlcv-1s/sessions/101cd6b731413d488bd81d43.dbn.zst",
+        "bytes": 521,
+        "quoted_usd": 0.0,
+        "sha256": "d109cfa03c1e52615be675821787671b3c54fb19bf69192dfcb622f27385b95d"
+      },
+      {
+        "path": "raw/databento/XNAS.ITCH/ohlcv-1s/sessions/105a5cfa03b9cc19fb86eed0.dbn.zst",
+        "bytes": 6590,
+        "quoted_usd": 0.0,
+        "sha256": "9979afeb82cbc4d841d35a200cf29462d197e295d98a060d5e4c6c5420e72d01"
+      },
+      {
+        "path": "raw/databento/XNAS.ITCH/ohlcv-1s/sessions/10811984dabb9cbcac7602fc.dbn.zst",
+        "bytes": 1872,
+        "quoted_usd": 0.0,
+        "sha256": "e04155a6381c9c2ed1fd08fc601a9cfc1a8549373b839fda0f87b32ebeb8491b"
+      },
+      {
+        "path": "raw/databento/XNAS.ITCH/ohlcv-1s/sessions/10e0fb8c167437ad77ca296b.dbn.zst",
+        "bytes": 1092,
+        "quoted_usd": 0.0,
+        "sha256": "31d8f71b2aef0bab2303baad231b8030f2adf7fa9da458246b72290434b46075"
+      },
+      {
+        "path": "raw/databento/XNAS.ITCH/ohlcv-1s/sessions/10e1835ed1c299f8ef0cf29e.dbn.zst",
+        "bytes": 2904,
+        "quoted_usd": 0.0,
+        "sha256": "104fb765c3784429a552faac9439f9692e8d087c209240f14a373b3035938f93"
+      },
+      {
+        "path": "raw/databento/XNAS.ITCH/ohlcv-1s/sessions/1205c239466192eaa012d06e.dbn.zst",
+        "bytes": 401,
+        "quoted_usd": 0.0,
+        "sha256": "ae697417c5f08e278c47f14a54750406dd659aa371925da09b82fd7f368b6b5d"
+      },
+      {
+        "path": "raw/databento/XNAS.ITCH/ohlcv-1s/sessions/127b6c6604e2a6f4045a8610.dbn.zst",
+        "bytes": 14055,
+        "quoted_usd": 0.0,
+        "sha256": "8b4c070253f4481867d6959af9553e11cdc53af3eca667613db9dbd38c7259ff"
+      },
+      {
+        "path": "raw/databento/XNAS.ITCH/ohlcv-1s/sessions/1287ed010129d72dab8ba93b.dbn.zst",
+        "bytes": 4124,
+        "quoted_usd": 0.0,
+        "sha256": "c638e5ab27e62e5ab35faab0b88a42546a7b740618cf9910bedb2888bfa49e7f"
+      },
+      {
+        "path": "raw/databento/XNAS.ITCH/ohlcv-1s/sessions/13ccc9dfd0483cce9bed3331.dbn.zst",
+        "bytes": 7958,
+        "quoted_usd": 0.0,
+        "sha256": "0f86f49ec5288285cdd6722c93823f7d83114393fa933c52d0cad17c71bf132d"
+      },
+      {
+        "path": "raw/databento/XNAS.ITCH/ohlcv-1s/sessions/13f39c075779dd95f7dc6e33.dbn.zst",
+        "bytes": 883,
+        "quoted_usd": 0.0,
+        "sha256": "993d3251c22cbd75fc753e5892c195cf73ba1f9818ff5ad960625ec0100cb69b"
+      },
+      {
+        "path": "raw/databento/XNAS.ITCH/ohlcv-1s/sessions/1432ca84bcc48342a66ebaf6.dbn.zst",
+        "bytes": 657,
+        "quoted_usd": 0.0,
+        "sha256": "ed6da664a81789bc8fb712ed249cb31c58aa5ec1e1af2a885a950e6c1c37b1b9"
+      },
+      {
+        "path": "raw/databento/XNAS.ITCH/ohlcv-1s/sessions/14b4833720bb2ea9fda6ceb0.dbn.zst",
+        "bytes": 4870,
+        "quoted_usd": 0.0,
+        "sha256": "9deaf9dd213a1e928f86628c279e1500363d9420eb79d327bbd17b664f25d3f4"
+      },
+      {
+        "path": "raw/databento/XNAS.ITCH/ohlcv-1s/sessions/158e3e9733ba7a5870c3fbaa.dbn.zst",
+        "bytes": 4167,
+        "quoted_usd": 0.0,
+        "sha256": "729de26e93316a242cac033434e67974badbd27b76de0328f54435b3825293d6"
+      },
+      {
+        "path": "raw/databento/XNAS.ITCH/ohlcv-1s/sessions/15a12d681c7890998925cdf9.dbn.zst",
+        "bytes": 1581,
+        "quoted_usd": 0.0,
+        "sha256": "6b1aa9f9fecaae420a0fb6964e2e51252d9f0de02a0908289e1905bbbd0eda41"
+      },
+      {
+        "path": "raw/databento/XNAS.ITCH/ohlcv-1s/sessions/162cdef7a8f5f3ee8d33a777.dbn.zst",
+        "bytes": 5789,
+        "quoted_usd": 0.0,
+        "sha256": "5925dcbf9cd4e63afc014915970e7897a73e7e44e0ae2de1d8f67f452501b9a4"
+      },
+      {
+        "path": "raw/databento/XNAS.ITCH/ohlcv-1s/sessions/16c2a120fd80d1ca4ffa2cd2.dbn.zst",
+        "bytes": 10680,
+        "quoted_usd": 0.0,
+        "sha256": "459f39db3653049507ab71dc1422f0a7a0fa65bd22e2971eb8203903e3921239"
+      },
+      {
+        "path": "raw/databento/XNAS.ITCH/ohlcv-1s/sessions/176859f488938cf3b2f04e09.dbn.zst",
+        "bytes": 10856,
+        "quoted_usd": 0.0,
+        "sha256": "9c458c48a630c31a24498e0117f8177727c6baeea813355c871c23fc9c4537c6"
+      },
+      {
+        "path": "raw/databento/XNAS.ITCH/ohlcv-1s/sessions/184130be40f56faaf4b61a97.dbn.zst",
+        "bytes": 1183,
+        "quoted_usd": 0.0,
+        "sha256": "267bf5e8375df6b4a970bf6f3f4b3be198ddf0ac227cd44377bfb9d9880c979c"
+      },
+      {
+        "path": "raw/databento/XNAS.ITCH/ohlcv-1s/sessions/1877f5fbcc2eb067f7d4b4c4.dbn.zst",
+        "bytes": 9341,
+        "quoted_usd": 0.0,
+        "sha256": "884a0d071d094f25f9d554cefb405311a1e355ae3a15fb9a4577ad64bb497dfb"
+      },
+      {
+        "path": "raw/databento/XNAS.ITCH/ohlcv-1s/sessions/18816cf16e9aca753c8ccbb0.dbn.zst",
+        "bytes": 462,
+        "quoted_usd": 0.0,
+        "sha256": "0122e2badba325589942f92538a5f21063fdac128cd222f432e76addf86f39a2"
+      },
+      {
+        "path": "raw/databento/XNAS.ITCH/ohlcv-1s/sessions/1933f3984b0f0238263e03b5.dbn.zst",
+        "bytes": 3015,
+        "quoted_usd": 0.0,
+        "sha256": "c30fbd87347403b97206b7823c5a17789c68ce3a0a8bc49398849a11aff66211"
+      },
+      {
+        "path": "raw/databento/XNAS.ITCH/ohlcv-1s/sessions/19a09adcf1909e9f06bfc891.dbn.zst",
+        "bytes": 886,
+        "quoted_usd": 0.0,
+        "sha256": "9c783cb71bc456aad14851049cb2957d4aad79a057fcf9ca0864d6bfa4e795cb"
+      },
+      {
+        "path": "raw/databento/XNAS.ITCH/ohlcv-1s/sessions/19e6e0e29899cb57422e18de.dbn.zst",
+        "bytes": 2140,
+        "quoted_usd": 0.0,
+        "sha256": "172fd3e10eb281268008f345a46967e6f869e84ccf2b8aad1e480778c504a640"
+      },
+      {
+        "path": "raw/databento/XNAS.ITCH/ohlcv-1s/sessions/1a3deafc71902af4596a1880.dbn.zst",
+        "bytes": 39606,
+        "quoted_usd": 0.0,
+        "sha256": "a67c90a0b3c688a0a65bfa80e87fe152fa5768da70585ee5693a736317076677"
+      },
+      {
+        "path": "raw/databento/XNAS.ITCH/ohlcv-1s/sessions/1ad0fefbc95aac9ac41ea374.dbn.zst",
+        "bytes": 753,
+        "quoted_usd": 0.0,
+        "sha256": "57e0aa2e8051cbb04423c1274af26ea167ea8bf4ef535315ddec6afda0b59f46"
+      },
+      {
+        "path": "raw/databento/XNAS.ITCH/ohlcv-1s/sessions/1bb8d7a3c6484fca9153d535.dbn.zst",
+        "bytes": 3473,
+        "quoted_usd": 0.0,
+        "sha256": "d97bf05c492dce74d1c36f78f389c363a1a5ad14e5cb4d4c3fae54f2357c356f"
+      },
+      {
+        "path": "raw/databento/XNAS.ITCH/ohlcv-1s/sessions/1befebebc2172ee69d0837ec.dbn.zst",
+        "bytes": 2693,
+        "quoted_usd": 0.0,
+        "sha256": "f3c1ed416dfc5645e072db5ce551d7918e3d9eed525a6f490104edb4004c91ba"
+      },
+      {
+        "path": "raw/databento/XNAS.ITCH/ohlcv-1s/sessions/1c22f5365bd9ded01a2f16bc.dbn.zst",
+        "bytes": 1031,
+        "quoted_usd": 0.0,
+        "sha256": "c6396db67fcf8c869f630bb343072f2af1fcfdd3e6f91f793196e1b9472c21b0"
+      },
+      {
+        "path": "raw/databento/XNAS.ITCH/ohlcv-1s/sessions/1cc242bd2709d4a7f0a281ad.dbn.zst",
+        "bytes": 861,
+        "quoted_usd": 0.0,
+        "sha256": "e23b39405523774b8441661c5955e20f39daf452354a9c77f8f2346f96489e5e"
+      },
+      {
+        "path": "raw/databento/XNAS.ITCH/ohlcv-1s/sessions/1d2dadfc491e600a966e8ac7.dbn.zst",
+        "bytes": 733,
+        "quoted_usd": 0.0,
+        "sha256": "604ea105a7b6c491c00d0b2ec34e4deee6a77cd9c0f62aacd526791a9add83bf"
+      },
+      {
+        "path": "raw/databento/XNAS.ITCH/ohlcv-1s/sessions/1d44408f00a6920f00322367.dbn.zst",
+        "bytes": 3567,
+        "quoted_usd": 0.0,
+        "sha256": "b559c0180617e5091cf130c077c91d2657ecf610538f1cbf724b40dded1c6f4f"
+      },
+      {
+        "path": "raw/databento/XNAS.ITCH/ohlcv-1s/sessions/1d80573dc02b5797881ad30a.dbn.zst",
+        "bytes": 22914,
+        "quoted_usd": 0.0,
+        "sha256": "58101cb8fc525026951b42b1abfb07ee61fbcb79a34a667d6bbd980c628ad4c8"
+      },
+      {
+        "path": "raw/databento/XNAS.ITCH/ohlcv-1s/sessions/1dc2053d216984674c6e1f3c.dbn.zst",
+        "bytes": 2435,
+        "quoted_usd": 0.0,
+        "sha256": "77620ae089430126a1abb2eedee483fc5827b2119e60ebf27bfdd453b2ac90a4"
+      },
+      {
+        "path": "raw/databento/XNAS.ITCH/ohlcv-1s/sessions/1dc4a8001ffb479224890f12.dbn.zst",
+        "bytes": 1358,
+        "quoted_usd": 0.0,
+        "sha256": "24b3b61497ba81357e4963e6d3a960c2e0b29608ced831e6827ff10b5bdd2982"
+      },
+      {
+        "path": "raw/databento/XNAS.ITCH/ohlcv-1s/sessions/1dde8b9e7de802f8dff6257c.dbn.zst",
+        "bytes": 792,
+        "quoted_usd": 0.0,
+        "sha256": "170337f6b860589ff092a8a6e11b627c3cd8d8e820de6a4daaf36765367ffc98"
+      },
+      {
+        "path": "raw/databento/XNAS.ITCH/ohlcv-1s/sessions/1e6bdc1d286c259eada608c9.dbn.zst",
+        "bytes": 5868,
+        "quoted_usd": 0.0,
+        "sha256": "74e992e7a048283d1521f31ecd7aa7ef79fa18ce01a143562d9dc8a00e39280c"
+      },
+      {
+        "path": "raw/databento/XNAS.ITCH/ohlcv-1s/sessions/203fb8089be5a48563d5828d.dbn.zst",
+        "bytes": 1316,
+        "quoted_usd": 0.0,
+        "sha256": "8c4f5265cf42b6428a09a6e5e18401ead81479f5bcd9d5c661f5ef3242ff5bb1"
+      },
+      {
+        "path": "raw/databento/XNAS.ITCH/ohlcv-1s/sessions/20968779e324d7b16872f30b.dbn.zst",
+        "bytes": 1840,
+        "quoted_usd": 0.0,
+        "sha256": "34b7ae248f9eae8fd6f9ed17086cd8f2ea7234cee4f7a2d3a7b557a57327237d"
+      },
+      {
+        "path": "raw/databento/XNAS.ITCH/ohlcv-1s/sessions/20ba2aa2fae0181f405a91a6.dbn.zst",
+        "bytes": 3019,
+        "quoted_usd": 0.0,
+        "sha256": "f787f5697589df1a214797d64487d0e1738a8f6f62a6097a90a4fe2f800d08e4"
+      },
+      {
+        "path": "raw/databento/XNAS.ITCH/ohlcv-1s/sessions/20ba76bc5017f30be2a9cc3e.dbn.zst",
+        "bytes": 1195,
+        "quoted_usd": 0.0,
+        "sha256": "262199e6f172446e9422d0d1111a4a2b91e560dcae393f779be35e1d258453a0"
+      },
+      {
+        "path": "raw/databento/XNAS.ITCH/ohlcv-1s/sessions/2139d83d97cb7f98fb260093.dbn.zst",
+        "bytes": 981,
+        "quoted_usd": 0.0,
+        "sha256": "e88e316c0e24888d125a8341d704a99d7eb6cf8264b718f606482f6568fe65be"
+      },
+      {
+        "path": "raw/databento/XNAS.ITCH/ohlcv-1s/sessions/214dcbe0195a41df08ea4048.dbn.zst",
+        "bytes": 2043,
+        "quoted_usd": 0.0,
+        "sha256": "0a9a09703e14a8de554e3d204ab6147444a1c41e5874178d8fbb27af37896e48"
+      },
+      {
+        "path": "raw/databento/XNAS.ITCH/ohlcv-1s/sessions/214fc8833c1c94e8349d6452.dbn.zst",
+        "bytes": 2252,
+        "quoted_usd": 0.0,
+        "sha256": "d4b2ffea86df2b560230939035da11fe4de749d66d2088b93635ea801ecdbcac"
+      },
+      {
+        "path": "raw/databento/XNAS.ITCH/ohlcv-1s/sessions/2174daec61bf68181f76e878.dbn.zst",
+        "bytes": 1279,
+        "quoted_usd": 0.0,
+        "sha256": "9cc905abacb370841df0c6da8d75986c8d284491dcc3233665586e0f663087a6"
+      },
+      {
+        "path": "raw/databento/XNAS.ITCH/ohlcv-1s/sessions/220a67a4c477d179aa954f5e.dbn.zst",
+        "bytes": 499,
+        "quoted_usd": 0.0,
+        "sha256": "c2d620eb46d3fe4b606eea7a570df26fc18a78a363d87354c52beaa7f5058d8d"
+      },
+      {
+        "path": "raw/databento/XNAS.ITCH/ohlcv-1s/sessions/2233f073e04343d8e2e91d7f.dbn.zst",
+        "bytes": 2234,
+        "quoted_usd": 0.0,
+        "sha256": "df9833bc09f16facb4aa8aa0a9fa836e81702a2aa3521718dc571f676b4ece54"
+      },
+      {
+        "path": "raw/databento/XNAS.ITCH/ohlcv-1s/sessions/23674b184d68dd44e138262f.dbn.zst",
+        "bytes": 3889,
+        "quoted_usd": 0.0,
+        "sha256": "3203c85e57d14ab536380844d0acd487293c50173f6ad8f910901f6489c82304"
+      },
+      {
+        "path": "raw/databento/XNAS.ITCH/ohlcv-1s/sessions/24e549c7a2f0d31658c0ca1c.dbn.zst",
+        "bytes": 3288,
+        "quoted_usd": 0.0,
+        "sha256": "a706e1c945194eba6ea00f09db0910f21edf93555c087b156338c6ce10b3526a"
+      },
+      {
+        "path": "raw/databento/XNAS.ITCH/ohlcv-1s/sessions/259664b73985dd212ce72b74.dbn.zst",
+        "bytes": 1374,
+        "quoted_usd": 0.0,
+        "sha256": "a6bcc405f6375f839e125ab6902b455aaca8cd1dd6bf91ba144621816a578973"
+      },
+      {
+        "path": "raw/databento/XNAS.ITCH/ohlcv-1s/sessions/26a7269f8866ac500cdcfe14.dbn.zst",
+        "bytes": 6359,
+        "quoted_usd": 0.0,
+        "sha256": "61b91e222d32f7e620cc8519d623d0c41a4f6fec4d3a8cc8bfe62bd7269f7a19"
+      },
+      {
+        "path": "raw/databento/XNAS.ITCH/ohlcv-1s/sessions/272522f5d8bc8d290d0ba55a.dbn.zst",
+        "bytes": 535,
+        "quoted_usd": 0.0,
+        "sha256": "705dc2becf20537c3ab57182c4b34a89157df1362171b2bd595f67a7411cce95"
+      },
+      {
+        "path": "raw/databento/XNAS.ITCH/ohlcv-1s/sessions/2784cc71027b9ad47dddc123.dbn.zst",
+        "bytes": 1117,
+        "quoted_usd": 0.0,
+        "sha256": "75b573e749365a1bfb95c165af16a4437fb36c3b9dabd978096226d0d8136686"
+      },
+      {
+        "path": "raw/databento/XNAS.ITCH/ohlcv-1s/sessions/29b02af5861636aefb1b093d.dbn.zst",
+        "bytes": 751,
+        "quoted_usd": 0.0,
+        "sha256": "97947db00694272cbdb9d6ba9e3d42327357d71f87a135f3cd3376d35cc66c0c"
+      },
+      {
+        "path": "raw/databento/XNAS.ITCH/ohlcv-1s/sessions/2a000dad9e240df9882ed6b6.dbn.zst",
+        "bytes": 823,
+        "quoted_usd": 0.0,
+        "sha256": "86fb68ef0878602d60dfa7e806490755723c42c88827ccfde994e839c0e75813"
+      },
+      {
+        "path": "raw/databento/XNAS.ITCH/ohlcv-1s/sessions/2a38c1d6b279c6da1c40c8fb.dbn.zst",
+        "bytes": 1571,
+        "quoted_usd": 0.0,
+        "sha256": "86e439261c50435fce5fffa56dc9d45d3c6556299cd4d67d7203549d9bbb35f0"
+      },
+      {
+        "path": "raw/databento/XNAS.ITCH/ohlcv-1s/sessions/2b09f965a7361c85929055d5.dbn.zst",
+        "bytes": 1094,
+        "quoted_usd": 0.0,
+        "sha256": "13770f2797be074667bd0f83c0f1aa167cb9a4ead40edcc3594ca84f07c201ad"
+      },
+      {
+        "path": "raw/databento/XNAS.ITCH/ohlcv-1s/sessions/2b7c8ae5e0265d94a7cbd88b.dbn.zst",
+        "bytes": 912,
+        "quoted_usd": 0.0,
+        "sha256": "b47e74fea5fbe19cafc0938968a5e7f5b2e7e468d3de64b7fa8b3fb0124c5804"
+      },
+      {
+        "path": "raw/databento/XNAS.ITCH/ohlcv-1s/sessions/2c780f4bb92769fb06f8bf42.dbn.zst",
+        "bytes": 3078,
+        "quoted_usd": 0.0,
+        "sha256": "4c10eeffe0eb61432c2d82fbf8fb47e6a44c0bd2597a8612cbc4497ddb827a8a"
+      },
+      {
+        "path": "raw/databento/XNAS.ITCH/ohlcv-1s/sessions/2d43206349fd88ca67d0e1cf.dbn.zst",
+        "bytes": 1299,
+        "quoted_usd": 0.0,
+        "sha256": "50c195f209fd3ccb283227fd4dacae4bf8287799ac618875e82d574d59f9aff5"
+      },
+      {
+        "path": "raw/databento/XNAS.ITCH/ohlcv-1s/sessions/2de3eb286396a616e9cd9fbf.dbn.zst",
+        "bytes": 4694,
+        "quoted_usd": 0.0,
+        "sha256": "5344148cf699e7dd8a60511e29a799491333072fedbc5c222bcd09f2114bd5a5"
+      },
+      {
+        "path": "raw/databento/XNAS.ITCH/ohlcv-1s/sessions/2e4997d7a4ff014cb605eda2.dbn.zst",
+        "bytes": 891,
+        "quoted_usd": 0.0,
+        "sha256": "94117c95f20662527f55e1d0b92cf9dfbdb091318c46178d526a03e8f88fda73"
+      },
+      {
+        "path": "raw/databento/XNAS.ITCH/ohlcv-1s/sessions/2ecd3366b2245f04f684cce2.dbn.zst",
+        "bytes": 8204,
+        "quoted_usd": 0.0,
+        "sha256": "8c8677e9ede909286c2ef74952194a33a02892ac1e7c56400b8b04495de45d35"
+      },
+      {
+        "path": "raw/databento/XNAS.ITCH/ohlcv-1s/sessions/2efbbc7b463d8ce1ceb1102a.dbn.zst",
+        "bytes": 2217,
+        "quoted_usd": 0.0,
+        "sha256": "e5ff83b2ebd9aa85e15d42b2006b3ad1a8076853902d79050b46ff555aebd4e4"
+      },
+      {
+        "path": "raw/databento/XNAS.ITCH/ohlcv-1s/sessions/2f12e25d1517771c0101c02d.dbn.zst",
+        "bytes": 328,
+        "quoted_usd": 0.0,
+        "sha256": "b1f9509de36036ae4331f725d291658491d369156e5752251c7944cdb497ff4f"
+      },
+      {
+        "path": "raw/databento/XNAS.ITCH/ohlcv-1s/sessions/2f266d9d0014a1d50dea0a7e.dbn.zst",
+        "bytes": 2307,
+        "quoted_usd": 0.0,
+        "sha256": "5c504872942d5f1554ac2c8f0dbbe42ccd3ef7d19c26e03cd312d61acbf8d70a"
+      },
+      {
+        "path": "raw/databento/XNAS.ITCH/ohlcv-1s/sessions/30076572f3148bcbae2e649c.dbn.zst",
+        "bytes": 20481,
+        "quoted_usd": 0.0,
+        "sha256": "97fd94cf1e71e52b967b32ba1ed5b609abcae52c6444ebd0009f1e0b2c1fec90"
+      },
+      {
+        "path": "raw/databento/XNAS.ITCH/ohlcv-1s/sessions/3089a362f82f757ca3cc265e.dbn.zst",
+        "bytes": 2025,
+        "quoted_usd": 0.0,
+        "sha256": "8edbbd758acb33f3d75e88bae5f73e8f94c147a820e967ac6ac810fa2983b232"
+      },
+      {
+        "path": "raw/databento/XNAS.ITCH/ohlcv-1s/sessions/3145e8edd2e6f4d07103d8e3.dbn.zst",
+        "bytes": 1379,
+        "quoted_usd": 0.0,
+        "sha256": "d2ad379d8dd062c770a032b65c7d553ca2f3f9f914dd22f7c0eecae2146e02c1"
+      },
+      {
+        "path": "raw/databento/XNAS.ITCH/ohlcv-1s/sessions/31936b7aa5acbcc2fe646fe6.dbn.zst",
+        "bytes": 19280,
+        "quoted_usd": 0.0,
+        "sha256": "39e2d3d13821b9befdf9d98c4da50dfbedbe17fa7b4c08f05603a9ce8fed09f1"
+      },
+      {
+        "path": "raw/databento/XNAS.ITCH/ohlcv-1s/sessions/31f7820ece2420811def5706.dbn.zst",
+        "bytes": 1376,
+        "quoted_usd": 0.0,
+        "sha256": "48ba82255d05875c3265ee3b83dcad7098dd17a909c809a342d41cf57c6d153b"
+      },
+      {
+        "path": "raw/databento/XNAS.ITCH/ohlcv-1s/sessions/33207a792dc3144b1f4faa87.dbn.zst",
+        "bytes": 6262,
+        "quoted_usd": 0.0,
+        "sha256": "75cf03221c56eb47650b7a37c02a7147564d97ab12e442227579e322ed1e1bb3"
+      },
+      {
+        "path": "raw/databento/XNAS.ITCH/ohlcv-1s/sessions/334fe059e348950d80dd56e7.dbn.zst",
+        "bytes": 1201,
+        "quoted_usd": 0.0,
+        "sha256": "3bdb539608aefd71d044bb9f9f2b26bc982e4b74ad182c45953b93afa7395cb8"
+      },
+      {
+        "path": "raw/databento/XNAS.ITCH/ohlcv-1s/sessions/34af7239b09d8c02a311811a.dbn.zst",
+        "bytes": 2058,
+        "quoted_usd": 0.0,
+        "sha256": "0627a37b3b6b1656f2010f55b606a736be96799271f13484dc0c5234ba421b4b"
+      },
+      {
+        "path": "raw/databento/XNAS.ITCH/ohlcv-1s/sessions/34f96c7cc9fd098a365e2ee9.dbn.zst",
+        "bytes": 492,
+        "quoted_usd": 0.0,
+        "sha256": "f2b8135d4b56102dab4fd91d11ee62729ec737c28f3f4b3566816180a506241f"
+      },
+      {
+        "path": "raw/databento/XNAS.ITCH/ohlcv-1s/sessions/350039656f2b5d099dba203e.dbn.zst",
+        "bytes": 1149,
+        "quoted_usd": 0.0,
+        "sha256": "8b416a207ebdca833f6158a33f45418a184e4779918475ae113192c087f31515"
+      },
+      {
+        "path": "raw/databento/XNAS.ITCH/ohlcv-1s/sessions/352bf037804b138aa6387e67.dbn.zst",
+        "bytes": 3802,
+        "quoted_usd": 0.0,
+        "sha256": "3b4b135129096938fa5bc0617fd392c20fd3a990c7eae0668d54c0394d240e7f"
+      },
+      {
+        "path": "raw/databento/XNAS.ITCH/ohlcv-1s/sessions/369dfc0b7fbf300062ed7c9b.dbn.zst",
+        "bytes": 1752,
+        "quoted_usd": 0.0,
+        "sha256": "8f83fb0a4fe847397d57c3f786efc86bcd5cec89016e1301ba38c03d6d5bb00d"
+      },
+      {
+        "path": "raw/databento/XNAS.ITCH/ohlcv-1s/sessions/36b24224efec0958db0db5bb.dbn.zst",
+        "bytes": 1843,
+        "quoted_usd": 0.0,
+        "sha256": "c63804f3ff7d99d6310697453c34d02f8ab58e6a120fa30f4e080bfd18e26088"
+      },
+      {
+        "path": "raw/databento/XNAS.ITCH/ohlcv-1s/sessions/37427e828f8d1c81a77b0dac.dbn.zst",
+        "bytes": 1481,
+        "quoted_usd": 0.0,
+        "sha256": "e18caba1471ec2258c6932e84502595213e5de2ed0087aa44f702106e90d1578"
+      },
+      {
+        "path": "raw/databento/XNAS.ITCH/ohlcv-1s/sessions/38fa6cd3bfa94aad83bb733f.dbn.zst",
+        "bytes": 1264,
+        "quoted_usd": 0.0,
+        "sha256": "03c066a10fac62a7730db20c834e189951e1709045a1e3b1f15dd69f97aeb29d"
+      },
+      {
+        "path": "raw/databento/XNAS.ITCH/ohlcv-1s/sessions/3aa27972d250909327357ee5.dbn.zst",
+        "bytes": 2834,
+        "quoted_usd": 0.0,
+        "sha256": "5723b4d802b764e46c26c202cc53902c8c28712c03acdd7edd2fa35ccd4552c1"
+      },
+      {
+        "path": "raw/databento/XNAS.ITCH/ohlcv-1s/sessions/3b26b4ebd037db9df345460c.dbn.zst",
+        "bytes": 859,
+        "quoted_usd": 0.0,
+        "sha256": "a169502ed96fc2a912474c07652037f33fa14a4d7cb8b297f85810233511264b"
+      },
+      {
+        "path": "raw/databento/XNAS.ITCH/ohlcv-1s/sessions/3ca4d50188d1c79e68387ef2.dbn.zst",
+        "bytes": 7982,
+        "quoted_usd": 0.0,
+        "sha256": "c966ccff24f195b82bb8f0b34a073182887c30522f59e55d7afa47ac2c291902"
+      },
+      {
+        "path": "raw/databento/XNAS.ITCH/ohlcv-1s/sessions/3d260136d75107da1370ddda.dbn.zst",
+        "bytes": 1063,
+        "quoted_usd": 0.0,
+        "sha256": "e02536a83deba4c439cdc1e36809f2effa4748fa73e9523750f079c49846e3ba"
+      },
+      {
+        "path": "raw/databento/XNAS.ITCH/ohlcv-1s/sessions/3e8f7bd9f2dd0a07159c4f1f.dbn.zst",
+        "bytes": 1542,
+        "quoted_usd": 0.0,
+        "sha256": "5205f4d7c9056ba4709bbdd1a76b6fb437d7ed36d97f898f3d73483705f058db"
+      },
+      {
+        "path": "raw/databento/XNAS.ITCH/ohlcv-1s/sessions/3fa24e8f3a1bce31bc8328bf.dbn.zst",
+        "bytes": 7579,
+        "quoted_usd": 0.0,
+        "sha256": "377ed2c3d2bd10c964faec29b39a7380c2582bdf477a835bc31ea2c19a1fedf0"
+      },
+      {
+        "path": "raw/databento/XNAS.ITCH/ohlcv-1s/sessions/400f226b7d7ab5eb7998ef4f.dbn.zst",
+        "bytes": 1139,
+        "quoted_usd": 0.0,
+        "sha256": "d9196b3336c0893775c9c81362bf1d5e6a9d2389e235b6b439577a93d636eca6"
+      },
+      {
+        "path": "raw/databento/XNAS.ITCH/ohlcv-1s/sessions/4094c5d369b93c8f4eb7cff9.dbn.zst",
+        "bytes": 5110,
+        "quoted_usd": 0.0,
+        "sha256": "ca60d00ea5227839a82c4cab05241cf0a10b65e54a15f1c7be850b380a1284ac"
+      },
+      {
+        "path": "raw/databento/XNAS.ITCH/ohlcv-1s/sessions/40dc5cb0f06aea128dcf30e2.dbn.zst",
+        "bytes": 13921,
+        "quoted_usd": 0.0,
+        "sha256": "2a9f3e6a4b8f7580398cb41260799c081493508f795b75ac4fed0bdc8de6361b"
+      },
+      {
+        "path": "raw/databento/XNAS.ITCH/ohlcv-1s/sessions/410e50f4923515ab389895d8.dbn.zst",
+        "bytes": 4731,
+        "quoted_usd": 0.0,
+        "sha256": "5a83286858ed77ec964bafdbf8ef58f235c1c7ce598a1300f8a87848d4364075"
+      },
+      {
+        "path": "raw/databento/XNAS.ITCH/ohlcv-1s/sessions/43534b2b9349eec0cdbb36dc.dbn.zst",
+        "bytes": 3082,
+        "quoted_usd": 0.0,
+        "sha256": "efc809d8afa78a2bf642b6d61a7dbf510d163cafa2322ad834f892bd7faa06c2"
+      },
+      {
+        "path": "raw/databento/XNAS.ITCH/ohlcv-1s/sessions/43a5a527a3e542d7b0a57727.dbn.zst",
+        "bytes": 2618,
+        "quoted_usd": 0.0,
+        "sha256": "3df1330acc711461d00ec597244e8b91b3b11bc85cd1cbf5b2b893d4747e9d2d"
+      },
+      {
+        "path": "raw/databento/XNAS.ITCH/ohlcv-1s/sessions/43e6611f30e66c501d6f27a0.dbn.zst",
+        "bytes": 5955,
+        "quoted_usd": 0.0,
+        "sha256": "d88dee9a0b1b66c512480d0df21c85eb65aa81672b758e9298812d592fe2ae2c"
+      },
+      {
+        "path": "raw/databento/XNAS.ITCH/ohlcv-1s/sessions/4413bc944b353993597f8f4f.dbn.zst",
+        "bytes": 638,
+        "quoted_usd": 0.0,
+        "sha256": "9c11a5f4a7f8933ec5af38aee87940ee3baa334b8c96e6fad916c43883b58d73"
+      },
+      {
+        "path": "raw/databento/XNAS.ITCH/ohlcv-1s/sessions/441b044d24ce5d05b2331568.dbn.zst",
+        "bytes": 741,
+        "quoted_usd": 0.0,
+        "sha256": "b097eae9878cd149553fd059377a925357feb61a4445888ce0e59802eaff8eb0"
+      },
+      {
+        "path": "raw/databento/XNAS.ITCH/ohlcv-1s/sessions/461a9d06ee368a0c54fac6d8.dbn.zst",
+        "bytes": 2285,
+        "quoted_usd": 0.0,
+        "sha256": "beb846720c15c149397a7027d106a6a8ff15c2af6694323d270a0fb01947cf6e"
+      },
+      {
+        "path": "raw/databento/XNAS.ITCH/ohlcv-1s/sessions/462b51331bfe87ccc2081681.dbn.zst",
+        "bytes": 1335,
+        "quoted_usd": 0.0,
+        "sha256": "36330644b6f73f5f941c01cd5d8361f4a945353ffe83268b3c39721850cc6147"
+      },
+      {
+        "path": "raw/databento/XNAS.ITCH/ohlcv-1s/sessions/462caa166422bd59d7327100.dbn.zst",
+        "bytes": 2901,
+        "quoted_usd": 0.0,
+        "sha256": "605ca3794be53ffb795583c90572ec09f82709addd508c4cabf8f55bfc95205e"
+      },
+      {
+        "path": "raw/databento/XNAS.ITCH/ohlcv-1s/sessions/465530b1eb6e265117585bbd.dbn.zst",
+        "bytes": 922,
+        "quoted_usd": 0.0,
+        "sha256": "51450583839dcc43fec6410ffbb7003694a5d7cf5de2fc5fa884535d4e3fb16c"
+      },
+      {
+        "path": "raw/databento/XNAS.ITCH/ohlcv-1s/sessions/4737f79fc0f2c215358523f3.dbn.zst",
+        "bytes": 2079,
+        "quoted_usd": 0.0,
+        "sha256": "bb376cec28c88b311e5e76c62810c23bee42d02004845aafebcc1201560c27cd"
+      },
+      {
+        "path": "raw/databento/XNAS.ITCH/ohlcv-1s/sessions/47536b8396c9dfc7d39b4a44.dbn.zst",
+        "bytes": 2166,
+        "quoted_usd": 0.0,
+        "sha256": "63fdaf0c18798af9c1ceba219ed21a12f2b9e4649f03f9a712e258d6e742fe55"
+      },
+      {
+        "path": "raw/databento/XNAS.ITCH/ohlcv-1s/sessions/4892d38780a42a784e473081.dbn.zst",
+        "bytes": 986,
+        "quoted_usd": 0.0,
+        "sha256": "72c2a6ef8aae97e9cd714afb352cd7770666464b38148a420c5f93479a785840"
+      },
+      {
+        "path": "raw/databento/XNAS.ITCH/ohlcv-1s/sessions/48cb05e49ba0ec7a35f56b31.dbn.zst",
+        "bytes": 1956,
+        "quoted_usd": 0.0,
+        "sha256": "981e251337b62a4a6b81a13842136793d15f727f60c3bae39afba60a8f8a27aa"
+      },
+      {
+        "path": "raw/databento/XNAS.ITCH/ohlcv-1s/sessions/48fdc9353f2fed091bb10abc.dbn.zst",
+        "bytes": 474,
+        "quoted_usd": 0.0,
+        "sha256": "f8f7d8de05dea6861b69cea843ad9326a8f21e1e60fa29bc4dd825de4939e888"
+      },
+      {
+        "path": "raw/databento/XNAS.ITCH/ohlcv-1s/sessions/49407016e3c6f271c7bc2184.dbn.zst",
+        "bytes": 1824,
+        "quoted_usd": 0.0,
+        "sha256": "c2bfc5b89d7f0dee18d4d315fb7bacac568ee2c668e9a5649b5503ed6ab47e33"
+      },
+      {
+        "path": "raw/databento/XNAS.ITCH/ohlcv-1s/sessions/496d5799715169e9ea8a0834.dbn.zst",
+        "bytes": 2425,
+        "quoted_usd": 0.0,
+        "sha256": "6822f3480534fbc67791a7efacc894acf566ad1ee5c6f9b7866a14e918872c97"
+      },
+      {
+        "path": "raw/databento/XNAS.ITCH/ohlcv-1s/sessions/49c15fbd3e65e19d0573ad31.dbn.zst",
+        "bytes": 2069,
+        "quoted_usd": 0.0,
+        "sha256": "3f051d98415ad575b320ac5643b5033d1045f513f91173755e22c420b8ed00b2"
+      },
+      {
+        "path": "raw/databento/XNAS.ITCH/ohlcv-1s/sessions/4a72fd88eab4e8625b7857fa.dbn.zst",
+        "bytes": 1651,
+        "quoted_usd": 0.0,
+        "sha256": "a87e290ed67307c2b309f3e2136033e41dc6a05e01508b5b08c472bf0387f510"
+      },
+      {
+        "path": "raw/databento/XNAS.ITCH/ohlcv-1s/sessions/4a7cc5fe532cf10464538499.dbn.zst",
+        "bytes": 4464,
+        "quoted_usd": 0.0,
+        "sha256": "7999b58449ef6a625f1b55a17eaa763348119384f6c3750d95d40919c38fcb40"
+      },
+      {
+        "path": "raw/databento/XNAS.ITCH/ohlcv-1s/sessions/4b478e63ed8f75a11a08dfb7.dbn.zst",
+        "bytes": 1712,
+        "quoted_usd": 0.0,
+        "sha256": "aa8bdcdfceac1f188dab55b27d8916fd58c64b67f7b0b61cd55715c7daddd62b"
+      },
+      {
+        "path": "raw/databento/XNAS.ITCH/ohlcv-1s/sessions/4b8f0dfddfb15ddd0ab36d5e.dbn.zst",
+        "bytes": 1890,
+        "quoted_usd": 0.0,
+        "sha256": "292952205640220fa5b29a7212289de270a0e9be9bebad43e0bc74b82d504c52"
+      },
+      {
+        "path": "raw/databento/XNAS.ITCH/ohlcv-1s/sessions/4b98ed12c0487b92b19528d2.dbn.zst",
+        "bytes": 47393,
+        "quoted_usd": 0.0,
+        "sha256": "b084b4196fffc062a1ad41742b5b2877065a2caf1711fcf2586379db233ab7cc"
+      },
+      {
+        "path": "raw/databento/XNAS.ITCH/ohlcv-1s/sessions/4c41a68d568c1f3e8445a560.dbn.zst",
+        "bytes": 9764,
+        "quoted_usd": 0.0,
+        "sha256": "0c07f9a5f10b8da0bc1342d3c982e284da61e76fbd88865a8a7fda4d113beebd"
+      },
+      {
+        "path": "raw/databento/XNAS.ITCH/ohlcv-1s/sessions/4c5da8ded0cf141d324f181f.dbn.zst",
+        "bytes": 5923,
+        "quoted_usd": 0.0,
+        "sha256": "217fec66bd868fccb011270fd7b5d30a1d556b163226c146014ad0988a2a3243"
+      },
+      {
+        "path": "raw/databento/XNAS.ITCH/ohlcv-1s/sessions/4cbb562765f82e15ec35e8da.dbn.zst",
+        "bytes": 7773,
+        "quoted_usd": 0.0,
+        "sha256": "e851974522674d07acaea71e3a698706edd2b43b710e027014204b329f4bacf5"
+      },
+      {
+        "path": "raw/databento/XNAS.ITCH/ohlcv-1s/sessions/4cfd6732f8ed072bfe70986f.dbn.zst",
+        "bytes": 6916,
+        "quoted_usd": 0.0,
+        "sha256": "9645f1033907e0f2e517c382371f2a3f26513efb5987a3b9d9afe09875850ec0"
+      },
+      {
+        "path": "raw/databento/XNAS.ITCH/ohlcv-1s/sessions/4d8ba85b803a613012447154.dbn.zst",
+        "bytes": 17755,
+        "quoted_usd": 0.0,
+        "sha256": "fe63aca1d76fcd268dbd8a8a7d69206bfd3bbd90dd96af4ace5123a43275a2fd"
+      },
+      {
+        "path": "raw/databento/XNAS.ITCH/ohlcv-1s/sessions/4fecd3f4a824d7f19267a2de.dbn.zst",
+        "bytes": 3968,
+        "quoted_usd": 0.0,
+        "sha256": "544e126304bb05ad9d1697587e31124d1ce2152866a3596e0264b9caff14e8d0"
+      },
+      {
+        "path": "raw/databento/XNAS.ITCH/ohlcv-1s/sessions/50346a9f3aa02b22b3c533e2.dbn.zst",
+        "bytes": 25093,
+        "quoted_usd": 0.0,
+        "sha256": "0295424da21fd00fcb8b8f32a87d3a8bc7cd7c7d178918fa68f282ad5e9e6833"
+      },
+      {
+        "path": "raw/databento/XNAS.ITCH/ohlcv-1s/sessions/507c97ebc6f1bde9b966245c.dbn.zst",
+        "bytes": 1757,
+        "quoted_usd": 0.0,
+        "sha256": "feff8cf6a16bc5ae20d34a2ace5bc76fe13a700969f3abab54f16f387b25d7b2"
+      },
+      {
+        "path": "raw/databento/XNAS.ITCH/ohlcv-1s/sessions/507f03208c4abd7c6b078f93.dbn.zst",
+        "bytes": 75570,
+        "quoted_usd": 0.0,
+        "sha256": "ef054d9bcb5b3af47c1d9de044ab8863fcb69a914053e88325731d0609d2e7c4"
+      },
+      {
+        "path": "raw/databento/XNAS.ITCH/ohlcv-1s/sessions/50a0cf31478d7ff461aefa6b.dbn.zst",
+        "bytes": 4585,
+        "quoted_usd": 0.0,
+        "sha256": "765e618c824251fe19ac14771068623d4e114a25ade014083c91a439a192b4d1"
+      },
+      {
+        "path": "raw/databento/XNAS.ITCH/ohlcv-1s/sessions/511b10a7032fb0508f4d072f.dbn.zst",
+        "bytes": 10290,
+        "quoted_usd": 0.0,
+        "sha256": "33e5199de97327f2cb533d29fd87df6746fb8b845d102de1543d562385c57c5b"
+      },
+      {
+        "path": "raw/databento/XNAS.ITCH/ohlcv-1s/sessions/52c38c14e317596e7ae67524.dbn.zst",
+        "bytes": 8000,
+        "quoted_usd": 0.0,
+        "sha256": "90567cbeb47da41557f93b9a02d5004ac8c7da56e680d915c89f1df62dc03d26"
+      },
+      {
+        "path": "raw/databento/XNAS.ITCH/ohlcv-1s/sessions/52e076e4326e245db2ea968b.dbn.zst",
+        "bytes": 2388,
+        "quoted_usd": 0.0,
+        "sha256": "5363e53041c373443ceb5dca9ff2fb596fea251293bafb7151612daf1e71862d"
+      },
+      {
+        "path": "raw/databento/XNAS.ITCH/ohlcv-1s/sessions/532d6394816c24453c2284bf.dbn.zst",
+        "bytes": 4584,
+        "quoted_usd": 0.0,
+        "sha256": "78a94f3a69f6800220eff1ecb16f1955942a18c12a4c93eceb4a1943cbe69710"
+      },
+      {
+        "path": "raw/databento/XNAS.ITCH/ohlcv-1s/sessions/5633257159288c77e4fb3f19.dbn.zst",
+        "bytes": 2008,
+        "quoted_usd": 0.0,
+        "sha256": "072f0f85ab19e80829902b88fcaa7c964c7f3ffff61bd3bf0386c6d47782c9ac"
+      },
+      {
+        "path": "raw/databento/XNAS.ITCH/ohlcv-1s/sessions/5674084a9c6d952a83f3b885.dbn.zst",
+        "bytes": 3606,
+        "quoted_usd": 0.0,
+        "sha256": "07217b618d7f4bde083a4e853b7e1f72bd550ab8d120d64dc00067131b3795e1"
+      },
+      {
+        "path": "raw/databento/XNAS.ITCH/ohlcv-1s/sessions/56a0936b729564903c06b261.dbn.zst",
+        "bytes": 823,
+        "quoted_usd": 0.0,
+        "sha256": "284f87ebf2a273f4a6dc406491655c1f5fefb3694708de5f1950c755196f1210"
+      },
+      {
+        "path": "raw/databento/XNAS.ITCH/ohlcv-1s/sessions/570fa434a4e79ceb5bcf54f5.dbn.zst",
+        "bytes": 1395,
+        "quoted_usd": 0.0,
+        "sha256": "579c14de4307076cd4892d9d154a2a848b1f704714f39b0198f739756007b244"
+      },
+      {
+        "path": "raw/databento/XNAS.ITCH/ohlcv-1s/sessions/5716f8bf54b5a780030d6a7f.dbn.zst",
+        "bytes": 4967,
+        "quoted_usd": 0.0,
+        "sha256": "fb9f7da95ff060d51a0d14b7e1af63fe1fac1617071b3bce35c174088c1279e3"
+      },
+      {
+        "path": "raw/databento/XNAS.ITCH/ohlcv-1s/sessions/576c3b1e52d84587e8abc6e5.dbn.zst",
+        "bytes": 349,
+        "quoted_usd": 0.0,
+        "sha256": "b95038b309add9fef18ac258127e25ba60d54981e674cbcc7b693ce0dc957694"
+      },
+      {
+        "path": "raw/databento/XNAS.ITCH/ohlcv-1s/sessions/57e7cd79b51507d383f382e2.dbn.zst",
+        "bytes": 1914,
+        "quoted_usd": 0.0,
+        "sha256": "742a06e81ab3dc36923132ce955a591d2e7948a952aa0b1fef6e39f6afc112c6"
+      },
+      {
+        "path": "raw/databento/XNAS.ITCH/ohlcv-1s/sessions/58999dc8c2c7ee3d9678382f.dbn.zst",
+        "bytes": 25746,
+        "quoted_usd": 0.0,
+        "sha256": "b79539f868e2fa65f70fd2ec97c5e9e4536e3727ebe80c083e57cb00e914e5a2"
+      },
+      {
+        "path": "raw/databento/XNAS.ITCH/ohlcv-1s/sessions/58d3050afca61df03ddadf1b.dbn.zst",
+        "bytes": 347,
+        "quoted_usd": 0.0,
+        "sha256": "7d4b2111d7ec8b7e3df6ff2f4479f7766aaa56fd92a2b39bf3a5eb109e2d32c7"
+      },
+      {
+        "path": "raw/databento/XNAS.ITCH/ohlcv-1s/sessions/594567ab4d36acd3147afec3.dbn.zst",
+        "bytes": 1725,
+        "quoted_usd": 0.0,
+        "sha256": "5faa2be021d659ab7da66a55ab543a2cc65691e1e6bfbec9a4d35552daaaf34c"
+      },
+      {
+        "path": "raw/databento/XNAS.ITCH/ohlcv-1s/sessions/594573eaf1d5a5a5a521f1a6.dbn.zst",
+        "bytes": 12616,
+        "quoted_usd": 0.0,
+        "sha256": "c6d54407432a68a97735759147a8e83e37fabf6084360f143f4c25c2727201a6"
+      },
+      {
+        "path": "raw/databento/XNAS.ITCH/ohlcv-1s/sessions/59887723901d0fefd521247b.dbn.zst",
+        "bytes": 1509,
+        "quoted_usd": 0.0,
+        "sha256": "8e56493eace34389c00a1bff9e9d43937ac99ccd3801eaae61db072e1e0a7e82"
+      },
+      {
+        "path": "raw/databento/XNAS.ITCH/ohlcv-1s/sessions/5a51ce9b1ece88bfc890d6aa.dbn.zst",
+        "bytes": 2613,
+        "quoted_usd": 0.0,
+        "sha256": "df843cedba42bed28f9d8450aa9612647cdf19ec7d2aa6ff88aee77849f8a6d6"
+      },
+      {
+        "path": "raw/databento/XNAS.ITCH/ohlcv-1s/sessions/5b968bcaaf579fbdbfbf65be.dbn.zst",
+        "bytes": 5575,
+        "quoted_usd": 0.0,
+        "sha256": "4a3cf7783ded449ca201ab89806dc8a5c9b7e9d0bd5e9fc4c1e0f3eb3939f1c4"
+      },
+      {
+        "path": "raw/databento/XNAS.ITCH/ohlcv-1s/sessions/5bc1929935850c6e1564c95e.dbn.zst",
+        "bytes": 24268,
+        "quoted_usd": 0.0,
+        "sha256": "a05b3f76aebf573951f15cbe6a94a9458611d9c42ff442b901e69b29e2ab59a9"
+      },
+      {
+        "path": "raw/databento/XNAS.ITCH/ohlcv-1s/sessions/5bcbfb62549d9f0865732d49.dbn.zst",
+        "bytes": 489,
+        "quoted_usd": 0.0,
+        "sha256": "fc7db7b389e7444200889a6b6f988e4262275d485d2f0bd9ea35097a467707f6"
+      },
+      {
+        "path": "raw/databento/XNAS.ITCH/ohlcv-1s/sessions/5d2693e9820ebbbcd7880f61.dbn.zst",
+        "bytes": 681,
+        "quoted_usd": 0.0,
+        "sha256": "00db069878bfce5e71e446f9b92d58de93a466280ff05a5becc47e62afdc62df"
+      },
+      {
+        "path": "raw/databento/XNAS.ITCH/ohlcv-1s/sessions/5d3e112d0d953809068500d8.dbn.zst",
+        "bytes": 1021,
+        "quoted_usd": 0.0,
+        "sha256": "87346aba4aebfbd45488ae1478a7c8ac3e5b601b0c2bc3439dc49647b0f944ff"
+      },
+      {
+        "path": "raw/databento/XNAS.ITCH/ohlcv-1s/sessions/5d4f5806d03a64d8a3562c7c.dbn.zst",
+        "bytes": 5254,
+        "quoted_usd": 0.0,
+        "sha256": "06b6c8b369a96811687c1e5dfa601081af1b1d6feed88e62f12869e8e1ba912e"
+      },
+      {
+        "path": "raw/databento/XNAS.ITCH/ohlcv-1s/sessions/5dbed00ec01176446d6f5e2f.dbn.zst",
+        "bytes": 1381,
+        "quoted_usd": 0.0,
+        "sha256": "1c994f989f235bc7e1ea4352480ebd0b770fb9013834e7142e328450b2c8cd9c"
+      },
+      {
+        "path": "raw/databento/XNAS.ITCH/ohlcv-1s/sessions/5df921032ec8379cb47d5ea0.dbn.zst",
+        "bytes": 2802,
+        "quoted_usd": 0.0,
+        "sha256": "7e9ec90ad9ff759f256ea761c6523d7d0c037c478d3b1c12fc87626b34b9f6cf"
+      },
+      {
+        "path": "raw/databento/XNAS.ITCH/ohlcv-1s/sessions/5e1fb51783ab8bdd4067bb7a.dbn.zst",
+        "bytes": 3654,
+        "quoted_usd": 0.0,
+        "sha256": "8349678964f9b93bc20b885a7c481441d074adde040e06db8611744a592c21c8"
+      },
+      {
+        "path": "raw/databento/XNAS.ITCH/ohlcv-1s/sessions/5e687c28f5352e5729ac64d0.dbn.zst",
+        "bytes": 1622,
+        "quoted_usd": 0.0,
+        "sha256": "a91a5e1260b306c4a788d8169d76b7943d7c87742cae973a5a9df25e95db661b"
+      },
+      {
+        "path": "raw/databento/XNAS.ITCH/ohlcv-1s/sessions/5edcc72174311fb8b218f79d.dbn.zst",
+        "bytes": 19587,
+        "quoted_usd": 0.0,
+        "sha256": "9037657389223e3a1cf35c66a1d2671cff9c3592aaf161b810d119233b206707"
+      },
+      {
+        "path": "raw/databento/XNAS.ITCH/ohlcv-1s/sessions/5f4f37a0c6a288aa9ad6c440.dbn.zst",
+        "bytes": 1245,
+        "quoted_usd": 0.0,
+        "sha256": "e1fe36fbd69ab8d58c5686d1e70ee137ced43df4715f115fceb25fb86953b647"
+      },
+      {
+        "path": "raw/databento/XNAS.ITCH/ohlcv-1s/sessions/5faed74a0d41f1d7a0d6983e.dbn.zst",
+        "bytes": 9380,
+        "quoted_usd": 0.0,
+        "sha256": "6a2c585d2a1be8e4d723c630503866ef0c2cc4ee40ec7508977b3891643d6570"
+      },
+      {
+        "path": "raw/databento/XNAS.ITCH/ohlcv-1s/sessions/5fe72136f06263fd0202a0aa.dbn.zst",
+        "bytes": 2039,
+        "quoted_usd": 0.0,
+        "sha256": "b7d477154121d365404e7752fb76231c4d71cac1fd13dd8569bec0cbcdb9fee9"
+      },
+      {
+        "path": "raw/databento/XNAS.ITCH/ohlcv-1s/sessions/60268772d73b394ea5a7c46b.dbn.zst",
+        "bytes": 2095,
+        "quoted_usd": 0.0,
+        "sha256": "2aea62b4c224ff19dc8ed842ebf894f089ff3b4b66f4a9d2cbad8b50a0d2a680"
+      },
+      {
+        "path": "raw/databento/XNAS.ITCH/ohlcv-1s/sessions/6071692e8b4c7b1673b726ff.dbn.zst",
+        "bytes": 15021,
+        "quoted_usd": 0.0,
+        "sha256": "ac3c3cd6e1d66bff240accb9a3d0148369f5e1386a3c71ac61a1e588a242c035"
+      },
+      {
+        "path": "raw/databento/XNAS.ITCH/ohlcv-1s/sessions/611ece9fedd1acea4a356879.dbn.zst",
+        "bytes": 4760,
+        "quoted_usd": 0.0,
+        "sha256": "69bf4132ee5d7ed41e42caec293e3be4b7af9dbf94fcc26892d0ec68d2615041"
+      },
+      {
+        "path": "raw/databento/XNAS.ITCH/ohlcv-1s/sessions/618342bf7b81ca1ed38940e0.dbn.zst",
+        "bytes": 757,
+        "quoted_usd": 0.0,
+        "sha256": "0271e2b2902020e4300f9cb5e40486ef5a6ba2355025db70f2b902aee1bdd508"
+      },
+      {
+        "path": "raw/databento/XNAS.ITCH/ohlcv-1s/sessions/621e2e20354d9b71531c3505.dbn.zst",
+        "bytes": 7124,
+        "quoted_usd": 0.0,
+        "sha256": "504cbb06db0125c8a9b69d0237ddb088718e490babccb8c65a4c08f98823214a"
+      },
+      {
+        "path": "raw/databento/XNAS.ITCH/ohlcv-1s/sessions/62b6b80fe98a8dcd60434c73.dbn.zst",
+        "bytes": 5110,
+        "quoted_usd": 0.0,
+        "sha256": "4daff51cd8b51bbc76ce340cced91d516e6a6a7f2d08cb5593a1e51c99492361"
+      },
+      {
+        "path": "raw/databento/XNAS.ITCH/ohlcv-1s/sessions/62c635fc33eca8f14236131f.dbn.zst",
+        "bytes": 6376,
+        "quoted_usd": 0.0,
+        "sha256": "2000fa373e85db3f064f6a44c6e336b3c15be9a0ea254ab7627b778e52b57069"
+      },
+      {
+        "path": "raw/databento/XNAS.ITCH/ohlcv-1s/sessions/62e8df392c8612b9b2c837bf.dbn.zst",
+        "bytes": 1184,
+        "quoted_usd": 0.0,
+        "sha256": "d5efaf8d62580ce50a96c81380f7ae851a093631c664cdd4b624fdb5ba29bba6"
+      },
+      {
+        "path": "raw/databento/XNAS.ITCH/ohlcv-1s/sessions/630060092c914753a29ef452.dbn.zst",
+        "bytes": 3038,
+        "quoted_usd": 0.0,
+        "sha256": "41af37d788d8193caebf452f587f493a916ba769b85571a5f655a7118a192d62"
+      },
+      {
+        "path": "raw/databento/XNAS.ITCH/ohlcv-1s/sessions/6364b9529c63960aa4e64201.dbn.zst",
+        "bytes": 6378,
+        "quoted_usd": 0.0,
+        "sha256": "c1ca35dfe4c0a6815dfe23e761b17037299c517f1eaf5e0bb755ef5bd13aeff8"
+      },
+      {
+        "path": "raw/databento/XNAS.ITCH/ohlcv-1s/sessions/644cff804217b9d7a584ff9b.dbn.zst",
+        "bytes": 4618,
+        "quoted_usd": 0.0,
+        "sha256": "78f19c0c7a06a2ce4f6410cbdb3fd07b739c5699aa8de670fca0f94d106ec0de"
+      },
+      {
+        "path": "raw/databento/XNAS.ITCH/ohlcv-1s/sessions/649cd1cf6bd348cd6c1374ee.dbn.zst",
+        "bytes": 3277,
+        "quoted_usd": 0.0,
+        "sha256": "0b418d65d87e1f9db1dfbfac72dbb68485c4daa0b7339a8d8479427a8bbe7d8c"
+      },
+      {
+        "path": "raw/databento/XNAS.ITCH/ohlcv-1s/sessions/64d46788dd285166e4a3289a.dbn.zst",
+        "bytes": 751,
+        "quoted_usd": 0.0,
+        "sha256": "8914c36046e9b97bcd88ad7fe32c566008391d4e6dc84d6431ae644c5418c3e9"
+      },
+      {
+        "path": "raw/databento/XNAS.ITCH/ohlcv-1s/sessions/650b91f8293d8fdbf659c4e4.dbn.zst",
+        "bytes": 9058,
+        "quoted_usd": 0.0,
+        "sha256": "2216509c60f7ef951f367df79c1851383cb56d26648738fed12826d8eb07d5d4"
+      },
+      {
+        "path": "raw/databento/XNAS.ITCH/ohlcv-1s/sessions/667cb874adae707a329bda29.dbn.zst",
+        "bytes": 1767,
+        "quoted_usd": 0.0,
+        "sha256": "53e88877d8149473dfde3d35d58b7c7d08b13ca47a15825d537c647b5d872802"
+      },
+      {
+        "path": "raw/databento/XNAS.ITCH/ohlcv-1s/sessions/668e35d3804df071ad65fc18.dbn.zst",
+        "bytes": 1808,
+        "quoted_usd": 0.0,
+        "sha256": "7544b101e6473a2aebcb97fc3b2ce1837e09cd0dc0093ae1293025f957464c29"
+      },
+      {
+        "path": "raw/databento/XNAS.ITCH/ohlcv-1s/sessions/67e9bbea1cdd1b23446215de.dbn.zst",
+        "bytes": 1451,
+        "quoted_usd": 0.0,
+        "sha256": "dfa96780d5c1aba2f365b0bd09d2d7ca49a2c39f5d5f73ab2c688ae8cbd2f4b0"
+      },
+      {
+        "path": "raw/databento/XNAS.ITCH/ohlcv-1s/sessions/6805e05bf02437597a4f875d.dbn.zst",
+        "bytes": 1022,
+        "quoted_usd": 0.0,
+        "sha256": "c009c28aed89b0ba939c990deba11a88f8623acc55019d28ecfeb0abcdc2ff04"
+      },
+      {
+        "path": "raw/databento/XNAS.ITCH/ohlcv-1s/sessions/68ef15af91f8846a7b55021c.dbn.zst",
+        "bytes": 4402,
+        "quoted_usd": 0.0,
+        "sha256": "c28c313e3f97f025ed6c7e5fe68fabad884ccf83e352f8c7c6c0fb6207948f42"
+      },
+      {
+        "path": "raw/databento/XNAS.ITCH/ohlcv-1s/sessions/69477f9bf206d42d24c5f008.dbn.zst",
+        "bytes": 8733,
+        "quoted_usd": 0.0,
+        "sha256": "85c9ea04370b5e4158108108991b59d918f77ad0b14c56e6055ee131670a5d5e"
+      },
+      {
+        "path": "raw/databento/XNAS.ITCH/ohlcv-1s/sessions/69da01b6a336d3f00eb00509.dbn.zst",
+        "bytes": 1358,
+        "quoted_usd": 0.0,
+        "sha256": "6f1a75b57510187ee4b84e94e82a6eb1c25dab31ba4c95c2af09c29b2943bf6e"
+      },
+      {
+        "path": "raw/databento/XNAS.ITCH/ohlcv-1s/sessions/6a83316a398f8dc4651269fa.dbn.zst",
+        "bytes": 822,
+        "quoted_usd": 0.0,
+        "sha256": "1108dae7f289d9b9908b7a4928155ccba00c4e4a0c43426b3584410af5aedb8c"
+      },
+      {
+        "path": "raw/databento/XNAS.ITCH/ohlcv-1s/sessions/6b2244081070bc5b84b46b7f.dbn.zst",
+        "bytes": 837,
+        "quoted_usd": 0.0,
+        "sha256": "aadd211cd90a01b3c11b078317bbc2fd58be00f5b623636a3ff05705459a077a"
+      },
+      {
+        "path": "raw/databento/XNAS.ITCH/ohlcv-1s/sessions/6b7fc4de36a056a958f52f29.dbn.zst",
+        "bytes": 1716,
+        "quoted_usd": 0.0,
+        "sha256": "4a717f54175c9387e8bde27506072cce59553a8381deeb10ec7f8d3848a43b73"
+      },
+      {
+        "path": "raw/databento/XNAS.ITCH/ohlcv-1s/sessions/6c138881c9e0403bd7b6e9c7.dbn.zst",
+        "bytes": 9146,
+        "quoted_usd": 0.0,
+        "sha256": "52e2825d99c3d86561d88c28811c6f4e527557c3ac06c0e49e994a658fba09b6"
+      },
+      {
+        "path": "raw/databento/XNAS.ITCH/ohlcv-1s/sessions/6c2c0098db12ab23871c9029.dbn.zst",
+        "bytes": 1258,
+        "quoted_usd": 0.0,
+        "sha256": "31bb646043a03e7faf276c081f43c5c68f86a88cb177c5b32dba82d346aed96a"
+      },
+      {
+        "path": "raw/databento/XNAS.ITCH/ohlcv-1s/sessions/6dfe162306626b41cc8c3b12.dbn.zst",
+        "bytes": 1008,
+        "quoted_usd": 0.0,
+        "sha256": "4e3cf530c4301497483cebedc07fa65e9dd6b78c04f1e817d71240bba8f6e373"
+      },
+      {
+        "path": "raw/databento/XNAS.ITCH/ohlcv-1s/sessions/6eb512a6570c07b6fd1311cb.dbn.zst",
+        "bytes": 46529,
+        "quoted_usd": 0.0,
+        "sha256": "2a7028a5a2a6551e05d8d8139e9639ff8d94ca7932df77e692da0d3dc1508b70"
+      },
+      {
+        "path": "raw/databento/XNAS.ITCH/ohlcv-1s/sessions/6ecc75e8181f5810433f6728.dbn.zst",
+        "bytes": 1787,
+        "quoted_usd": 0.0,
+        "sha256": "37009cbaae24778cb40c249997607f070732e124aa57b57ed2eabf5f60ed6d65"
+      },
+      {
+        "path": "raw/databento/XNAS.ITCH/ohlcv-1s/sessions/71569228f4272f6881e93807.dbn.zst",
+        "bytes": 2070,
+        "quoted_usd": 0.0,
+        "sha256": "6fd37770003deb3835a36160757d2764f52232eb953759da345c024edf2e0fe5"
+      },
+      {
+        "path": "raw/databento/XNAS.ITCH/ohlcv-1s/sessions/729b448158d30e1e4be9d4ba.dbn.zst",
+        "bytes": 680,
+        "quoted_usd": 0.0,
+        "sha256": "cbb0ae32d02a36ff2761df0d056a47e2800a56ca2321296c7b9498654ee4bbe9"
+      },
+      {
+        "path": "raw/databento/XNAS.ITCH/ohlcv-1s/sessions/7338eaf570c2cc28b36e1045.dbn.zst",
+        "bytes": 1356,
+        "quoted_usd": 0.0,
+        "sha256": "11ebb6323989ed7fac52f66ea187a54abb9cfb9f3601396437cc80d1f7978f30"
+      },
+      {
+        "path": "raw/databento/XNAS.ITCH/ohlcv-1s/sessions/738f5a917fd5636fcabf1420.dbn.zst",
+        "bytes": 10422,
+        "quoted_usd": 0.0,
+        "sha256": "48b4d499df9d4ed4299fda4322749696001a66a802274d9505f5ae0f8c800d50"
+      },
+      {
+        "path": "raw/databento/XNAS.ITCH/ohlcv-1s/sessions/74a594931c3afb3eadf3fbb5.dbn.zst",
+        "bytes": 6704,
+        "quoted_usd": 0.0,
+        "sha256": "cd97e8313e3e340e662c840c96d18c62c7fe440dbf69e1e0e7b3c73e63a57ade"
+      },
+      {
+        "path": "raw/databento/XNAS.ITCH/ohlcv-1s/sessions/74ceb3fee22090aa827c2991.dbn.zst",
+        "bytes": 496,
+        "quoted_usd": 0.0,
+        "sha256": "519199e43c30ba4e164440c68284d84b18dbf1d59a5d922af4b8f7535140d261"
+      },
+      {
+        "path": "raw/databento/XNAS.ITCH/ohlcv-1s/sessions/74d97e94be83d0acb4f31e8a.dbn.zst",
+        "bytes": 7735,
+        "quoted_usd": 0.0,
+        "sha256": "a15e368918ed5e3ae3eb9b1873eb7c9f6a3e9bbaa2536426b16ccbae31e32556"
+      },
+      {
+        "path": "raw/databento/XNAS.ITCH/ohlcv-1s/sessions/752b08cd9d5600ea184b6280.dbn.zst",
+        "bytes": 3538,
+        "quoted_usd": 0.0,
+        "sha256": "a79525ff16c76bf22e547e6b364d1e4cdd3e0964455365280bb6a2194df3cfc5"
+      },
+      {
+        "path": "raw/databento/XNAS.ITCH/ohlcv-1s/sessions/7534943c09d0904d15d2d361.dbn.zst",
+        "bytes": 2257,
+        "quoted_usd": 0.0,
+        "sha256": "866a034c90dcd37dbb67f2b36e522f7347f6cc00f2cf04f6baa04cd9b618eaf9"
+      },
+      {
+        "path": "raw/databento/XNAS.ITCH/ohlcv-1s/sessions/75998f9607637257a277185e.dbn.zst",
+        "bytes": 4906,
+        "quoted_usd": 0.0,
+        "sha256": "4d64edfae175d86e6c64c3db7f8b730b6f13036057f75d3357245b853f279f26"
+      },
+      {
+        "path": "raw/databento/XNAS.ITCH/ohlcv-1s/sessions/76159358df51cc15e4fe522f.dbn.zst",
+        "bytes": 1703,
+        "quoted_usd": 0.0,
+        "sha256": "5f709c23a8a3be175e88e53381b5a3a6cfceccfe7ed768990b104c80b3a037f9"
+      },
+      {
+        "path": "raw/databento/XNAS.ITCH/ohlcv-1s/sessions/761850876c64a5e1d3cf84d2.dbn.zst",
+        "bytes": 1904,
+        "quoted_usd": 0.0,
+        "sha256": "3b1b655b03308696d3c00434d73647aeb7c45d7be9f0930591f19829721bd56d"
+      },
+      {
+        "path": "raw/databento/XNAS.ITCH/ohlcv-1s/sessions/775917af72c961aee76cf4a0.dbn.zst",
+        "bytes": 3657,
+        "quoted_usd": 0.0,
+        "sha256": "fadff6f657cd569901cfde5cf4511b7f1fbe1c8f63e9afb530236b4d8567dc7f"
+      },
+      {
+        "path": "raw/databento/XNAS.ITCH/ohlcv-1s/sessions/77606aeb2fba1e99eb6a7c2a.dbn.zst",
+        "bytes": 1151,
+        "quoted_usd": 0.0,
+        "sha256": "0e26822115f6367d496ea8d6db9fbc187340f9e2ba40e8a7f9174b4301e38384"
+      },
+      {
+        "path": "raw/databento/XNAS.ITCH/ohlcv-1s/sessions/779aed9e117feb855c409c77.dbn.zst",
+        "bytes": 7386,
+        "quoted_usd": 0.0,
+        "sha256": "f1c19333b85e5aa619a87a2accc5d2db5716363637c3b8b3486f6dac0833ba10"
+      },
+      {
+        "path": "raw/databento/XNAS.ITCH/ohlcv-1s/sessions/786b5571212470c1042c88f0.dbn.zst",
+        "bytes": 9008,
+        "quoted_usd": 0.0,
+        "sha256": "75d4124208137328c1080858d06ed43ce614c579d57b40c307d9b60534629933"
+      },
+      {
+        "path": "raw/databento/XNAS.ITCH/ohlcv-1s/sessions/78d1a4c4e8774f7192f7457b.dbn.zst",
+        "bytes": 4847,
+        "quoted_usd": 0.0,
+        "sha256": "ee9fcb15db10669817853a3deadbd83d9253d0f5ef3ac9022e9304e2ac08b9e2"
+      },
+      {
+        "path": "raw/databento/XNAS.ITCH/ohlcv-1s/sessions/791d7abdef3cca7f91738a96.dbn.zst",
+        "bytes": 1917,
+        "quoted_usd": 0.0,
+        "sha256": "6bc83705f3fd1a7d536f35b1ffa5cd979bc788edfedd62bd541e0c8721c5738c"
+      },
+      {
+        "path": "raw/databento/XNAS.ITCH/ohlcv-1s/sessions/79a3172776eef1ffda555827.dbn.zst",
+        "bytes": 2152,
+        "quoted_usd": 0.0,
+        "sha256": "4df3cb80d98ebbf60154e0b4dc835f5d3454e6c9948144e04a7e182fabc77906"
+      },
+      {
+        "path": "raw/databento/XNAS.ITCH/ohlcv-1s/sessions/7a4e927c4ae745282a941ccf.dbn.zst",
+        "bytes": 4698,
+        "quoted_usd": 0.0,
+        "sha256": "b389377b6b82f5807aae50dfcd265373a230e26e7d0c2501125bb8610aa25266"
+      },
+      {
+        "path": "raw/databento/XNAS.ITCH/ohlcv-1s/sessions/7b62ff1ff81ab3439250a6c8.dbn.zst",
+        "bytes": 1884,
+        "quoted_usd": 0.0,
+        "sha256": "480f58bd6c59bc94438b36e717b8f09f7caa51c81332042f8677c9a5d1f5f4c9"
+      },
+      {
+        "path": "raw/databento/XNAS.ITCH/ohlcv-1s/sessions/7badb0b85dc3f3a7ce25d60c.dbn.zst",
+        "bytes": 2237,
+        "quoted_usd": 0.0,
+        "sha256": "c674ef3eca9c5cf34459ec188251c5223845c767dc8c0d8e57c52992ee8f809b"
+      },
+      {
+        "path": "raw/databento/XNAS.ITCH/ohlcv-1s/sessions/7be07c4f6cae0636d29a7f49.dbn.zst",
+        "bytes": 924,
+        "quoted_usd": 0.0,
+        "sha256": "a08b7b8931fd83b5f48a5621583315dabfa28cdde85cd9df5549a2014b1d8f61"
+      },
+      {
+        "path": "raw/databento/XNAS.ITCH/ohlcv-1s/sessions/7cce9c41a5257280df32fd1e.dbn.zst",
+        "bytes": 9399,
+        "quoted_usd": 0.0,
+        "sha256": "72eba423f65cf60b549f154285e0cb43c41840e0c054e39061891528b0b16ed9"
+      },
+      {
+        "path": "raw/databento/XNAS.ITCH/ohlcv-1s/sessions/7d03bf4f5408611f40db229a.dbn.zst",
+        "bytes": 19227,
+        "quoted_usd": 0.0,
+        "sha256": "afc8575c45e14fa6404c29c68f721a99beee604327900fd64c4dc226968cece9"
+      },
+      {
+        "path": "raw/databento/XNAS.ITCH/ohlcv-1s/sessions/7d711088de4f7cadaf8a9433.dbn.zst",
+        "bytes": 1907,
+        "quoted_usd": 0.0,
+        "sha256": "26cb30485323bdcb3ba653676dc20db62afe4f961fc99dd7734632ddeb8a1488"
+      },
+      {
+        "path": "raw/databento/XNAS.ITCH/ohlcv-1s/sessions/7d8170432afd0a6877676561.dbn.zst",
+        "bytes": 1984,
+        "quoted_usd": 0.0,
+        "sha256": "5bec0ad1ae8eca65f0380fdad62f96d8ee75505a026f2e68bb4e2c055e7fa1cf"
+      },
+      {
+        "path": "raw/databento/XNAS.ITCH/ohlcv-1s/sessions/7d8b2f0f110272876ebf0477.dbn.zst",
+        "bytes": 535,
+        "quoted_usd": 0.0,
+        "sha256": "39e9667b7d02cddff6db2e8fe6ef83fddf2413fd4f951cce874a066aa2247956"
+      },
+      {
+        "path": "raw/databento/XNAS.ITCH/ohlcv-1s/sessions/7d8d6b165488462cba6a5856.dbn.zst",
+        "bytes": 20654,
+        "quoted_usd": 0.0,
+        "sha256": "5ac2e58904741edbbcd7e9ba5daba79234a72f461186384ccf005a04ae094858"
+      },
+      {
+        "path": "raw/databento/XNAS.ITCH/ohlcv-1s/sessions/7d96ae8159d58fe9e2e28e4f.dbn.zst",
+        "bytes": 4736,
+        "quoted_usd": 0.0,
+        "sha256": "806b93233609dff9f637115c90e45830426945431d9d0930afd6e0a74a57c67b"
+      },
+      {
+        "path": "raw/databento/XNAS.ITCH/ohlcv-1s/sessions/7dcb4250315f3f57f5018812.dbn.zst",
+        "bytes": 1555,
+        "quoted_usd": 0.0,
+        "sha256": "84cd9c877903c683da489e83751dd9461ba9b0612b3302c7cfa77951d08dc4dd"
+      },
+      {
+        "path": "raw/databento/XNAS.ITCH/ohlcv-1s/sessions/7e052449d99394e699daa6e6.dbn.zst",
+        "bytes": 411,
+        "quoted_usd": 0.0,
+        "sha256": "b1f7dc62045156b7e21c49079f07842de42a08671dca09e1f3d10f66c7e23aa5"
+      },
+      {
+        "path": "raw/databento/XNAS.ITCH/ohlcv-1s/sessions/7e2a39361913184f560d336d.dbn.zst",
+        "bytes": 60697,
+        "quoted_usd": 0.0,
+        "sha256": "2d00aa7e5f58acbf9d47db161294057a91b7531fee1a593666c42d8d49bda642"
+      },
+      {
+        "path": "raw/databento/XNAS.ITCH/ohlcv-1s/sessions/7ed84f4439f692415b2402da.dbn.zst",
+        "bytes": 1230,
+        "quoted_usd": 0.0,
+        "sha256": "7ce134d3531af276f96c9c0cc37295559947dd36a36206afa05b0ce3d52b8ddd"
+      },
+      {
+        "path": "raw/databento/XNAS.ITCH/ohlcv-1s/sessions/7f5863214ddfe5ebfff26172.dbn.zst",
+        "bytes": 19010,
+        "quoted_usd": 0.0,
+        "sha256": "dac347d2cc8af0613495143bb710a2d33f3bbbd4552b89b6688fc79d8df9903b"
+      },
+      {
+        "path": "raw/databento/XNAS.ITCH/ohlcv-1s/sessions/800f07f8df5be08deed89701.dbn.zst",
+        "bytes": 153388,
+        "quoted_usd": 0.0,
+        "sha256": "f3a1a769787f86a5b4dfa97b4ece178cc882194726f283edb5772b7e3c01a218"
+      },
+      {
+        "path": "raw/databento/XNAS.ITCH/ohlcv-1s/sessions/80daf6ea954d694386026956.dbn.zst",
+        "bytes": 3966,
+        "quoted_usd": 0.0,
+        "sha256": "5505f4cc14154dd661f72342a9d3b9e071d0a5f3e4593dc154be4ff3c9c55a40"
+      },
+      {
+        "path": "raw/databento/XNAS.ITCH/ohlcv-1s/sessions/81b82448c1457b35e56bef32.dbn.zst",
+        "bytes": 2411,
+        "quoted_usd": 0.0,
+        "sha256": "4d3500f747d2a25fd721920b6ef09f816c60cf8e318a6c2f764fb933ba90e273"
+      },
+      {
+        "path": "raw/databento/XNAS.ITCH/ohlcv-1s/sessions/82bb88092fc47612d4de78ed.dbn.zst",
+        "bytes": 1748,
+        "quoted_usd": 0.0,
+        "sha256": "323ada144779257226666073435500f146bc0c9c1b8899a4a2a77844c5d2619b"
+      },
+      {
+        "path": "raw/databento/XNAS.ITCH/ohlcv-1s/sessions/8374f10a34aa91efa4ab635b.dbn.zst",
+        "bytes": 3588,
+        "quoted_usd": 0.0,
+        "sha256": "dfec2bdb23bf16499db66ec15020af0c0634f44013059a74de06f7ede454c345"
+      },
+      {
+        "path": "raw/databento/XNAS.ITCH/ohlcv-1s/sessions/845ae891522ded0311641ea8.dbn.zst",
+        "bytes": 1211,
+        "quoted_usd": 0.0,
+        "sha256": "6d966322b40e22db5bb026795c0e3652864a35e8950674a61002874e077b8d8a"
+      },
+      {
+        "path": "raw/databento/XNAS.ITCH/ohlcv-1s/sessions/849253c70098fa232886088f.dbn.zst",
+        "bytes": 7708,
+        "quoted_usd": 0.0,
+        "sha256": "9dd3ae33daf6f89067f4eba08a576645b66dfb6b77d032902b64b9caa750dbbf"
+      },
+      {
+        "path": "raw/databento/XNAS.ITCH/ohlcv-1s/sessions/8525df0ca072c0f4e046ade0.dbn.zst",
+        "bytes": 3015,
+        "quoted_usd": 0.0,
+        "sha256": "aff7db863d2e921a6f84785f34cefafded035b73cf2ba647e995325d2bf78c4d"
+      },
+      {
+        "path": "raw/databento/XNAS.ITCH/ohlcv-1s/sessions/852f98fe7e6de176d2c6245f.dbn.zst",
+        "bytes": 3834,
+        "quoted_usd": 0.0,
+        "sha256": "ce91a82a53542ddcd85db693d322b47f595287ee95b445fdaac480212bb40684"
+      },
+      {
+        "path": "raw/databento/XNAS.ITCH/ohlcv-1s/sessions/8551cab269c8f3aff6f89e82.dbn.zst",
+        "bytes": 18936,
+        "quoted_usd": 0.0,
+        "sha256": "ec895e586dfa536106f9480bd2d696be75bd91395e51866cbd0c226251238a1f"
+      },
+      {
+        "path": "raw/databento/XNAS.ITCH/ohlcv-1s/sessions/8588009c0b818fcc34d0551e.dbn.zst",
+        "bytes": 6559,
+        "quoted_usd": 0.0,
+        "sha256": "e5d04e647c98114de9a92350242e68418a3b48dc6209057c663e5dfd798005f3"
+      },
+      {
+        "path": "raw/databento/XNAS.ITCH/ohlcv-1s/sessions/8591435f515d7a027f356a37.dbn.zst",
+        "bytes": 2701,
+        "quoted_usd": 0.0,
+        "sha256": "ba527de3811b71a892ce843e650feee5539ba6e007abaf5692301e426b4df19f"
+      },
+      {
+        "path": "raw/databento/XNAS.ITCH/ohlcv-1s/sessions/863aa1444d73f57ce96adee2.dbn.zst",
+        "bytes": 16889,
+        "quoted_usd": 0.0,
+        "sha256": "a26a0b9e74aef1be6506ea79879bdb2ae403fc4e8817fee873662249a4e46ee9"
+      },
+      {
+        "path": "raw/databento/XNAS.ITCH/ohlcv-1s/sessions/871539bafb39069950d320d2.dbn.zst",
+        "bytes": 2380,
+        "quoted_usd": 0.0,
+        "sha256": "ca1278640a3bde2c845e78d0d2d289de31a748607d80db3e9a83cb14a05454ad"
+      },
+      {
+        "path": "raw/databento/XNAS.ITCH/ohlcv-1s/sessions/8779bdebc46ec555dbaaa7ce.dbn.zst",
+        "bytes": 1538,
+        "quoted_usd": 0.0,
+        "sha256": "a492e06df35d9e1afda3e1820433bdec6d53c9c79cee2ce8ab6020d2325e17ad"
+      },
+      {
+        "path": "raw/databento/XNAS.ITCH/ohlcv-1s/sessions/8823b8c730f518619e5d17b8.dbn.zst",
+        "bytes": 1041,
+        "quoted_usd": 0.0,
+        "sha256": "3673f482d69a7c7b7570e41a1115086929de74901da8f1983dccd2b2cef1b079"
+      },
+      {
+        "path": "raw/databento/XNAS.ITCH/ohlcv-1s/sessions/88943fdafece6ec0530d4f62.dbn.zst",
+        "bytes": 2827,
+        "quoted_usd": 0.0,
+        "sha256": "8d19daa5ba422629594b983f9965b75c1a465b532566fae85a6aeddcf5f52ca6"
+      },
+      {
+        "path": "raw/databento/XNAS.ITCH/ohlcv-1s/sessions/893af3de4e6d5afaee229c05.dbn.zst",
+        "bytes": 3409,
+        "quoted_usd": 0.0,
+        "sha256": "4568367fca6ba388ea93a41112ecd3ba032731ccae72b6f59247e1ca4e412a1f"
+      },
+      {
+        "path": "raw/databento/XNAS.ITCH/ohlcv-1s/sessions/896ebb5c12ec055e5a2f2923.dbn.zst",
+        "bytes": 2253,
+        "quoted_usd": 0.0,
+        "sha256": "71949602072ce8ea2b44ace0352b01f91cb28d57e6ab5276473513108acd70ed"
+      },
+      {
+        "path": "raw/databento/XNAS.ITCH/ohlcv-1s/sessions/8992189f6f9dcd6c7ba4d913.dbn.zst",
+        "bytes": 1729,
+        "quoted_usd": 0.0,
+        "sha256": "e54162166dede927a21849160fec9aeac25243f65b813782b30dc8284d983fa8"
+      },
+      {
+        "path": "raw/databento/XNAS.ITCH/ohlcv-1s/sessions/89e73c17ea0b3c13088898bd.dbn.zst",
+        "bytes": 34084,
+        "quoted_usd": 0.0,
+        "sha256": "61ea7896a91b0816d3a905fb857b68ac1afea9245af53ae2645ddb53ac257a89"
+      },
+      {
+        "path": "raw/databento/XNAS.ITCH/ohlcv-1s/sessions/8acddae015d7d86d770215c6.dbn.zst",
+        "bytes": 1036,
+        "quoted_usd": 0.0,
+        "sha256": "c10435383be07dfb212003a841b4e2225019cd93a21b22286829f3a463c76481"
+      },
+      {
+        "path": "raw/databento/XNAS.ITCH/ohlcv-1s/sessions/8be751a91fdd1f190be60513.dbn.zst",
+        "bytes": 13152,
+        "quoted_usd": 0.0,
+        "sha256": "fce781bb1e85ce50f5b41e4aea78d9ba9147f047786de12c0b5765136151a50d"
+      },
+      {
+        "path": "raw/databento/XNAS.ITCH/ohlcv-1s/sessions/8c5ba00fa14cc5f1b591fea0.dbn.zst",
+        "bytes": 4418,
+        "quoted_usd": 0.0,
+        "sha256": "d082451906b0f4d8da9dd4d6510c858a5dfa4951aa5efdd7d407da039ac57498"
+      },
+      {
+        "path": "raw/databento/XNAS.ITCH/ohlcv-1s/sessions/8d3036056b4904e0d858fe92.dbn.zst",
+        "bytes": 5404,
+        "quoted_usd": 0.0,
+        "sha256": "b5860d0bec9b8f0a3ab222aa7e311652d78072001646df59606af60d14561da4"
+      },
+      {
+        "path": "raw/databento/XNAS.ITCH/ohlcv-1s/sessions/8dc82ccbbcb692b6eac4492e.dbn.zst",
+        "bytes": 7119,
+        "quoted_usd": 0.0,
+        "sha256": "86705bfd32d79677db330f6857b324f323858b7042488cf8f687908b4083948c"
+      },
+      {
+        "path": "raw/databento/XNAS.ITCH/ohlcv-1s/sessions/8e8d927eeeb758e945c5be41.dbn.zst",
+        "bytes": 423,
+        "quoted_usd": 0.0,
+        "sha256": "a23f6be47291d2c6dbe7d3f902976487ca04dacb09b937f9c79ea653a696b93b"
+      },
+      {
+        "path": "raw/databento/XNAS.ITCH/ohlcv-1s/sessions/8f05c21f85f2f397bb7ea1f7.dbn.zst",
+        "bytes": 1303,
+        "quoted_usd": 0.0,
+        "sha256": "07a0d47635937a377dd0b5903fd9173ebbb29f17e441e944e3963fa8fb5c090e"
+      },
+      {
+        "path": "raw/databento/XNAS.ITCH/ohlcv-1s/sessions/90d7579b54305efc707d94f3.dbn.zst",
+        "bytes": 1894,
+        "quoted_usd": 0.0,
+        "sha256": "77a715a813d1a3dff7cc8924fe55456f3fe713bb90bd05321f0eca7a324a7b53"
+      },
+      {
+        "path": "raw/databento/XNAS.ITCH/ohlcv-1s/sessions/9110b12855961aa4a12c427d.dbn.zst",
+        "bytes": 4117,
+        "quoted_usd": 0.0,
+        "sha256": "29b4cd9edfa7e62e0ebbdfbecfd5bdd0e946cd72c19a307b86ebc64b7cda7753"
+      },
+      {
+        "path": "raw/databento/XNAS.ITCH/ohlcv-1s/sessions/914c1cef6a166a57b9dcd695.dbn.zst",
+        "bytes": 694,
+        "quoted_usd": 0.0,
+        "sha256": "89ca148c6f23a59446c699f6db6942e379895eddd072fc21386d4f691db96544"
+      },
+      {
+        "path": "raw/databento/XNAS.ITCH/ohlcv-1s/sessions/91f8cb4edb38a85533fb505f.dbn.zst",
+        "bytes": 571,
+        "quoted_usd": 0.0,
+        "sha256": "9327634de27a23099eaf8a733ee2a08e6fe9054003c132a174658eca952124fe"
+      },
+      {
+        "path": "raw/databento/XNAS.ITCH/ohlcv-1s/sessions/9296345ed4c823bf5f100694.dbn.zst",
+        "bytes": 10149,
+        "quoted_usd": 0.0,
+        "sha256": "69d8f085024847e077284c1e73f5f9083eaf7f63dfe166f4ff20a17dd2e5cb30"
+      },
+      {
+        "path": "raw/databento/XNAS.ITCH/ohlcv-1s/sessions/92adb7b412d8bd6e1bd7becc.dbn.zst",
+        "bytes": 3332,
+        "quoted_usd": 0.0,
+        "sha256": "1db530737266961e13f389c69842675a3b016c3f29eaad8027fd3265214d2323"
+      },
+      {
+        "path": "raw/databento/XNAS.ITCH/ohlcv-1s/sessions/9368f817338fa7eba8a7e080.dbn.zst",
+        "bytes": 46970,
+        "quoted_usd": 0.0,
+        "sha256": "b869b5bc72858e5712eb27ca2edb94aaa4da5aae7e8c6becd595c22a14186365"
+      },
+      {
+        "path": "raw/databento/XNAS.ITCH/ohlcv-1s/sessions/93bba6c2998c2dfdeaa874af.dbn.zst",
+        "bytes": 7715,
+        "quoted_usd": 0.0,
+        "sha256": "79ba908f64f1d0a67c1ffcf1ca6138a930130b0408dc00a7a5b1482da6298987"
+      },
+      {
+        "path": "raw/databento/XNAS.ITCH/ohlcv-1s/sessions/93c756cbc6765dbe017cebe0.dbn.zst",
+        "bytes": 4280,
+        "quoted_usd": 0.0,
+        "sha256": "035f84156c2f21907cede3d53a252f0b689b8fbd471f60d199ac3a8732498e60"
+      },
+      {
+        "path": "raw/databento/XNAS.ITCH/ohlcv-1s/sessions/940b28d483b5a4fb4876bed4.dbn.zst",
+        "bytes": 1003,
+        "quoted_usd": 0.0,
+        "sha256": "55cd9e30197a0f04403b567796dd7f4805e4e8641abe8c7f78322b3364e49876"
+      },
+      {
+        "path": "raw/databento/XNAS.ITCH/ohlcv-1s/sessions/955db55776820de154d41a04.dbn.zst",
+        "bytes": 1378,
+        "quoted_usd": 0.0,
+        "sha256": "f1a874e124bd7bb82b249608a7e224de807545bbf9ac01e274bedf3ecfc34ff6"
+      },
+      {
+        "path": "raw/databento/XNAS.ITCH/ohlcv-1s/sessions/9714b2eec6ef20f40f895785.dbn.zst",
+        "bytes": 1013,
+        "quoted_usd": 0.0,
+        "sha256": "e14f79f33ab4f3c1cdacd8863391f42d97c09f7de77bc81be15ee640d2d83855"
+      },
+      {
+        "path": "raw/databento/XNAS.ITCH/ohlcv-1s/sessions/98f9f3123b77a6871df797a8.dbn.zst",
+        "bytes": 487,
+        "quoted_usd": 0.0,
+        "sha256": "edc3b07f358efde04afd02faabc561fc1f42cbbbe57243a71084bc269bd3bd27"
+      },
+      {
+        "path": "raw/databento/XNAS.ITCH/ohlcv-1s/sessions/99d02357a2a221cf40d7afd2.dbn.zst",
+        "bytes": 893,
+        "quoted_usd": 0.0,
+        "sha256": "07d3b23e0c9db0faecb5541402638df6770efcd0a9f2ce19e6ce8b769ed3a8b5"
+      },
+      {
+        "path": "raw/databento/XNAS.ITCH/ohlcv-1s/sessions/9a1be32b7e58c50bde8e0ef9.dbn.zst",
+        "bytes": 4751,
+        "quoted_usd": 0.0,
+        "sha256": "96756249127993610885084455628a3e5fc9c90422dd37bd7e43f72ef2e51357"
+      },
+      {
+        "path": "raw/databento/XNAS.ITCH/ohlcv-1s/sessions/9b3da868959b164f83aa03ae.dbn.zst",
+        "bytes": 1198,
+        "quoted_usd": 0.0,
+        "sha256": "04cb1dfdd4cf2425c73891cc66c01b94e10009b6b3ca61155d67c530933451b7"
+      },
+      {
+        "path": "raw/databento/XNAS.ITCH/ohlcv-1s/sessions/9b62968e351cf3a26480b5f1.dbn.zst",
+        "bytes": 6775,
+        "quoted_usd": 0.0,
+        "sha256": "f95306ecdb98c13c524b96e6d45068d3cf9e07d213d166cc4e6625556a982986"
+      },
+      {
+        "path": "raw/databento/XNAS.ITCH/ohlcv-1s/sessions/9bcab4241895c917e61100f7.dbn.zst",
+        "bytes": 1613,
+        "quoted_usd": 0.0,
+        "sha256": "9240e9e714ff948896206107a59f3fc7be0a247492b1091d0dec612801ca8c04"
+      },
+      {
+        "path": "raw/databento/XNAS.ITCH/ohlcv-1s/sessions/9c318b5e2c4cbfa8a3d91ee3.dbn.zst",
+        "bytes": 1728,
+        "quoted_usd": 0.0,
+        "sha256": "baa7050ac3636a64847b10957de9685a9622c04bb9f06d926bd29a7142cb02e3"
+      },
+      {
+        "path": "raw/databento/XNAS.ITCH/ohlcv-1s/sessions/9c3c7597dc5b09a7d604de87.dbn.zst",
+        "bytes": 2125,
+        "quoted_usd": 0.0,
+        "sha256": "5dc5803b6d559f5f5a0c833a04b8d32cade28d2c2c274eaae5fc6f32959e4c8a"
+      },
+      {
+        "path": "raw/databento/XNAS.ITCH/ohlcv-1s/sessions/9c823d08a062f2a85d678325.dbn.zst",
+        "bytes": 638,
+        "quoted_usd": 0.0,
+        "sha256": "49b34040265fb31726b88d2e5c803aa5b4f5793ce3cc3a194aa32219eee3487b"
+      },
+      {
+        "path": "raw/databento/XNAS.ITCH/ohlcv-1s/sessions/9cd30ded26a979c20aebfd88.dbn.zst",
+        "bytes": 727,
+        "quoted_usd": 0.0,
+        "sha256": "d140e810d08731b6e11a2f501cfbacb6ed97fb144e8c19f0ae5ca9afced8f737"
+      },
+      {
+        "path": "raw/databento/XNAS.ITCH/ohlcv-1s/sessions/9cdbc28a8641ed79f7b77138.dbn.zst",
+        "bytes": 1140,
+        "quoted_usd": 0.0,
+        "sha256": "240061aad2f09e7e37971c1097b55f0e67817de4cf135ec1edafec8d666d13df"
+      },
+      {
+        "path": "raw/databento/XNAS.ITCH/ohlcv-1s/sessions/9d0e55343a6cf7374a4fa810.dbn.zst",
+        "bytes": 869,
+        "quoted_usd": 0.0,
+        "sha256": "9b1b7381c667f79f569c1c267feb0e1988f3b1ac057a36347c973f6e5b7c3e5a"
+      },
+      {
+        "path": "raw/databento/XNAS.ITCH/ohlcv-1s/sessions/9d9f7c17c10c73cb33134c60.dbn.zst",
+        "bytes": 3936,
+        "quoted_usd": 0.0,
+        "sha256": "752250baa77716242f40ac650fb9175c03401617c85a46165756554cb7056647"
+      },
+      {
+        "path": "raw/databento/XNAS.ITCH/ohlcv-1s/sessions/9e21d73057843725cdd81e72.dbn.zst",
+        "bytes": 5194,
+        "quoted_usd": 0.0,
+        "sha256": "96ad64fc74f480d54b95a34c813f183bc7b23cd16a2e675fd7f049311072bc6f"
+      },
+      {
+        "path": "raw/databento/XNAS.ITCH/ohlcv-1s/sessions/9e7415dbefcc2eec997336b7.dbn.zst",
+        "bytes": 2012,
+        "quoted_usd": 0.0,
+        "sha256": "9edb5c11b35644aa3fe2094043ccd9f413cf655213a05e1457497dd56c4853bd"
+      },
+      {
+        "path": "raw/databento/XNAS.ITCH/ohlcv-1s/sessions/9e8a49993e81ebe1b9947967.dbn.zst",
+        "bytes": 1235,
+        "quoted_usd": 0.0,
+        "sha256": "e47fd2d1bba12fb17166951a0d665a5aa8bca0dc6343cca202e8c8bac0f89d14"
+      },
+      {
+        "path": "raw/databento/XNAS.ITCH/ohlcv-1s/sessions/9eaef1eea3e4aa1d4f433ea2.dbn.zst",
+        "bytes": 901,
+        "quoted_usd": 0.0,
+        "sha256": "a0d482db4342e039ba0760693303245202632d369ce1bb0db3c8f486e13271e1"
+      },
+      {
+        "path": "raw/databento/XNAS.ITCH/ohlcv-1s/sessions/9f6a6e53bb9c2c2e1b06c51f.dbn.zst",
+        "bytes": 1628,
+        "quoted_usd": 0.0,
+        "sha256": "5407e6f96a558cc40ddce29d3a371c42491f14cef7b79f74738f7f07c914f145"
+      },
+      {
+        "path": "raw/databento/XNAS.ITCH/ohlcv-1s/sessions/9fdb69a7801461297445be47.dbn.zst",
+        "bytes": 2334,
+        "quoted_usd": 0.0,
+        "sha256": "04ea3fffe19f553be5d6b8713417ececbd070d601d29cdb4d21e6ecfa3d8efaa"
+      },
+      {
+        "path": "raw/databento/XNAS.ITCH/ohlcv-1s/sessions/a034699c76bbb7f2b9759519.dbn.zst",
+        "bytes": 984,
+        "quoted_usd": 0.0,
+        "sha256": "9cfc20b55f6d057c634b659e8f6e7af510d449717440c9c8a2fe100e9fb25456"
+      },
+      {
+        "path": "raw/databento/XNAS.ITCH/ohlcv-1s/sessions/a0b51664c38db40e6122bbb3.dbn.zst",
+        "bytes": 5352,
+        "quoted_usd": 0.0,
+        "sha256": "66c5d9dfa1bef794ce57333831e5e60e5af598c662f8a68bc1bb56610dced315"
+      },
+      {
+        "path": "raw/databento/XNAS.ITCH/ohlcv-1s/sessions/a19dbd37735d5f0bea564e37.dbn.zst",
+        "bytes": 647,
+        "quoted_usd": 0.0,
+        "sha256": "988c6f2a60fbb0d887d1b6674ccba0e3e1eb625723a4ec26e7c0401317a61a59"
+      },
+      {
+        "path": "raw/databento/XNAS.ITCH/ohlcv-1s/sessions/a1a71de119ba8e6f2266e0c8.dbn.zst",
+        "bytes": 1090,
+        "quoted_usd": 0.0,
+        "sha256": "21f65a1102e99c5ec390105296552fb8c846eee92c803eccb0d2a1f80a35a615"
+      },
+      {
+        "path": "raw/databento/XNAS.ITCH/ohlcv-1s/sessions/a1f5a6b28c21e5d5da57370f.dbn.zst",
+        "bytes": 1496,
+        "quoted_usd": 0.0,
+        "sha256": "f9db62d54993629df2a86d1b5b2f8258088e90fba8bf0e354e51eec38561e17d"
+      },
+      {
+        "path": "raw/databento/XNAS.ITCH/ohlcv-1s/sessions/a28bfbec9f65d224c63ef3af.dbn.zst",
+        "bytes": 726,
+        "quoted_usd": 0.0,
+        "sha256": "3e05f3c3d71ce0e29323b89e98d380be939670185a201fa28c355ed0e401be55"
+      },
+      {
+        "path": "raw/databento/XNAS.ITCH/ohlcv-1s/sessions/a2e1fbadf9a19782fc560fab.dbn.zst",
+        "bytes": 4655,
+        "quoted_usd": 0.0,
+        "sha256": "96c4f2836ec4e6cbb08c402ff3a7c9cc2d8ad0e7efcc80227e38533282a30528"
+      },
+      {
+        "path": "raw/databento/XNAS.ITCH/ohlcv-1s/sessions/a3b15adea31a30a2cd2dde66.dbn.zst",
+        "bytes": 1426,
+        "quoted_usd": 0.0,
+        "sha256": "0b6cef28f39d706ba194c1210f8b50d373dc0595fa3cfc35cd47255abcb7accf"
+      },
+      {
+        "path": "raw/databento/XNAS.ITCH/ohlcv-1s/sessions/a4a5a4c8e4d7a2a9ece57ae2.dbn.zst",
+        "bytes": 2085,
+        "quoted_usd": 0.0,
+        "sha256": "c59340e62c80ca7bb05cc95a7962f6d6c55e10fa6ddf8b37cd708f0aea0b1b47"
+      },
+      {
+        "path": "raw/databento/XNAS.ITCH/ohlcv-1s/sessions/a52670659970bb4996db6c63.dbn.zst",
+        "bytes": 3288,
+        "quoted_usd": 0.0,
+        "sha256": "4de38071210104b318f6b01358330b6f25aab0081d1c950bbe73c2ae6c59b014"
+      },
+      {
+        "path": "raw/databento/XNAS.ITCH/ohlcv-1s/sessions/a795ceb5be3c6404cf8c88f6.dbn.zst",
+        "bytes": 2911,
+        "quoted_usd": 0.0,
+        "sha256": "8a56ace93e8591f6135b8c457c242967d03e679810f493984861d82e873ff688"
+      },
+      {
+        "path": "raw/databento/XNAS.ITCH/ohlcv-1s/sessions/a7b58cdccba850e70dda0590.dbn.zst",
+        "bytes": 1228,
+        "quoted_usd": 0.0,
+        "sha256": "915335e3b3251ad3192c22f33629619da254c96087b4494fff881eb3c646d4d8"
+      },
+      {
+        "path": "raw/databento/XNAS.ITCH/ohlcv-1s/sessions/a88229d976073835d7490755.dbn.zst",
+        "bytes": 2729,
+        "quoted_usd": 0.0,
+        "sha256": "78c6608815c678d8396c1d4f222f670b44c480945e312c60bafcc00e883a64e6"
+      },
+      {
+        "path": "raw/databento/XNAS.ITCH/ohlcv-1s/sessions/a92208b5c2183b703d8c8b4e.dbn.zst",
+        "bytes": 1537,
+        "quoted_usd": 0.0,
+        "sha256": "b23ab41fd3951f93e31c39b88fbd1382eac42e64bc42140ccc428b1d6e882905"
+      },
+      {
+        "path": "raw/databento/XNAS.ITCH/ohlcv-1s/sessions/a9a35fa94e6fcaece219f00b.dbn.zst",
+        "bytes": 1078,
+        "quoted_usd": 0.0,
+        "sha256": "7104e836df4944e021dddab96493fb96f7d94f5f8966d8c169fac1e3d654a3c1"
+      },
+      {
+        "path": "raw/databento/XNAS.ITCH/ohlcv-1s/sessions/aad7db606f2998f0af9046b3.dbn.zst",
+        "bytes": 1085,
+        "quoted_usd": 0.0,
+        "sha256": "3f1401d9ab789f3e8be9ef193af556446148366a0d65cbcc4afdb00ed073c332"
+      },
+      {
+        "path": "raw/databento/XNAS.ITCH/ohlcv-1s/sessions/abc0ba7c7ce97f00bd7ed0bf.dbn.zst",
+        "bytes": 7496,
+        "quoted_usd": 0.0,
+        "sha256": "8c8bd7641114e0a80318821f6f7b7a30758d572e66cf503efee5381e12f39538"
+      },
+      {
+        "path": "raw/databento/XNAS.ITCH/ohlcv-1s/sessions/abf21aa653568ffae3a428fe.dbn.zst",
+        "bytes": 211,
+        "quoted_usd": 0.0,
+        "sha256": "566998bb99b6fe373f08bce9c6392d08147675e1df82e6bfc6876f3898a915b5"
+      },
+      {
+        "path": "raw/databento/XNAS.ITCH/ohlcv-1s/sessions/ac651beed3d79bc1de81becb.dbn.zst",
+        "bytes": 2519,
+        "quoted_usd": 0.0,
+        "sha256": "9344ae53c332f5e221006e829ce4d4ed0b4c6def6fc465ba4a90d64099e564aa"
+      },
+      {
+        "path": "raw/databento/XNAS.ITCH/ohlcv-1s/sessions/ad1321d6ce00b0241238ed45.dbn.zst",
+        "bytes": 1269,
+        "quoted_usd": 0.0,
+        "sha256": "3b3a47a8e08196d0e2cda09cd6ef4b6ab8ca72c7744bef416157b48dcaa9b338"
+      },
+      {
+        "path": "raw/databento/XNAS.ITCH/ohlcv-1s/sessions/ad37d0a9ecbcd0759d41be49.dbn.zst",
+        "bytes": 1126,
+        "quoted_usd": 0.0,
+        "sha256": "e1db1cd34c9e69d08505e1a9f09bf5c5013a90c1c8118ef62a10a68a5a3017c7"
+      },
+      {
+        "path": "raw/databento/XNAS.ITCH/ohlcv-1s/sessions/ad628693e5d843118ccf1d9e.dbn.zst",
+        "bytes": 1621,
+        "quoted_usd": 0.0,
+        "sha256": "feb759addfa2a2a2f82651197e60157473a50f7c930f557d43a7e946605a683c"
+      },
+      {
+        "path": "raw/databento/XNAS.ITCH/ohlcv-1s/sessions/b0b93448c969e76e6dfe828e.dbn.zst",
+        "bytes": 2269,
+        "quoted_usd": 0.0,
+        "sha256": "5e3da5c3fa7bed757226d08da71f2dc5bd6d3194488c912e7075491a5aac8acb"
+      },
+      {
+        "path": "raw/databento/XNAS.ITCH/ohlcv-1s/sessions/b112572ff82a470b020a2940.dbn.zst",
+        "bytes": 3640,
+        "quoted_usd": 0.0,
+        "sha256": "6f60a5c47fc2edb12d92bb0fb0ee1acecd7e03b9a1a89a595c516b1f9cd25dd2"
+      },
+      {
+        "path": "raw/databento/XNAS.ITCH/ohlcv-1s/sessions/b199dd8d69dfe2e05f7428c8.dbn.zst",
+        "bytes": 1166,
+        "quoted_usd": 0.0,
+        "sha256": "18459dcb1c6e1ade4d36b0e7383b526e2a7f276632c65a7dbea8c1cd882c9f35"
+      },
+      {
+        "path": "raw/databento/XNAS.ITCH/ohlcv-1s/sessions/b1aa7dba3b7164a6cf011b17.dbn.zst",
+        "bytes": 4876,
+        "quoted_usd": 0.0,
+        "sha256": "4dc47724d4477bdb86a9f1176302a6a4eb9b3fdaf54165c12c2eaa949ee926d7"
+      },
+      {
+        "path": "raw/databento/XNAS.ITCH/ohlcv-1s/sessions/b217640791349b0ed397e078.dbn.zst",
+        "bytes": 4126,
+        "quoted_usd": 0.0,
+        "sha256": "d9103eeaca172a910228d84a96ad2d3fd3f6f2d5700903b4346d1d3d99126c31"
+      },
+      {
+        "path": "raw/databento/XNAS.ITCH/ohlcv-1s/sessions/b26c7a50f73c3d78a274fe38.dbn.zst",
+        "bytes": 1350,
+        "quoted_usd": 0.0,
+        "sha256": "906d97611553dcb12fb8ff1bab54f396fa59474d1be29d33867e94e97a1aa066"
+      },
+      {
+        "path": "raw/databento/XNAS.ITCH/ohlcv-1s/sessions/b2a236129799c292cc5900df.dbn.zst",
+        "bytes": 2574,
+        "quoted_usd": 0.0,
+        "sha256": "2bbd2a63494bf63578fbdcc95ccf012fd3d7d6ca90fd1775ea8e21ce43183582"
+      },
+      {
+        "path": "raw/databento/XNAS.ITCH/ohlcv-1s/sessions/b6bb71117f090fce0baaa433.dbn.zst",
+        "bytes": 1252,
+        "quoted_usd": 0.0,
+        "sha256": "5a16ece52e6e5345a9ecebd507c67a07da0fa9dfec117a4d2f87b52e3a7c8fc5"
+      },
+      {
+        "path": "raw/databento/XNAS.ITCH/ohlcv-1s/sessions/b726ddda9f5d000a4d1b0536.dbn.zst",
+        "bytes": 1790,
+        "quoted_usd": 0.0,
+        "sha256": "823c33b8d4f2a00f6d7f24d0784779336b3013e1521ff7a96cc31941a4c28f22"
+      },
+      {
+        "path": "raw/databento/XNAS.ITCH/ohlcv-1s/sessions/b747e6098d5dd7842d597b5e.dbn.zst",
+        "bytes": 3083,
+        "quoted_usd": 0.0,
+        "sha256": "77a3a02835e06c7e56bd15a75a01eb1644426ed904da9e532812c34844b278c7"
+      },
+      {
+        "path": "raw/databento/XNAS.ITCH/ohlcv-1s/sessions/b838be4ac4f09785d44dfe56.dbn.zst",
+        "bytes": 666,
+        "quoted_usd": 0.0,
+        "sha256": "d8bf2391d5fcc9f889ead775d636bddc7537a29946d9186214513d9b8a868ff1"
+      },
+      {
+        "path": "raw/databento/XNAS.ITCH/ohlcv-1s/sessions/b87d55a1036b754985653070.dbn.zst",
+        "bytes": 3789,
+        "quoted_usd": 0.0,
+        "sha256": "7ca594b70de94e83527909de7d8c808404be642bc17569af03fcc0c370a0a4b7"
+      },
+      {
+        "path": "raw/databento/XNAS.ITCH/ohlcv-1s/sessions/b9ad048c44cfe20728b92f9f.dbn.zst",
+        "bytes": 796,
+        "quoted_usd": 0.0,
+        "sha256": "f15a0a526a4c65d25013c43e1b474f8491abba08f3dcee8479ae2ecda6e63ba0"
+      },
+      {
+        "path": "raw/databento/XNAS.ITCH/ohlcv-1s/sessions/b9f1b391718bff5f505e4b90.dbn.zst",
+        "bytes": 10610,
+        "quoted_usd": 0.0,
+        "sha256": "15b93042066cdc444aacba04a4107ef8a414735038e0e055002393df02061e8a"
+      },
+      {
+        "path": "raw/databento/XNAS.ITCH/ohlcv-1s/sessions/bae7280b7919de7d2561cb0d.dbn.zst",
+        "bytes": 5934,
+        "quoted_usd": 0.0,
+        "sha256": "e84f4e503565645ceee8747f18b69254f42a31d40e563f5f27940b3cdcfbc161"
+      },
+      {
+        "path": "raw/databento/XNAS.ITCH/ohlcv-1s/sessions/bd450e44aca25f59e0dbfce5.dbn.zst",
+        "bytes": 1029,
+        "quoted_usd": 0.0,
+        "sha256": "690abcce36ea5c624028b8195e5c4c1738a0d72d759b37ff8485ff41853769d3"
+      },
+      {
+        "path": "raw/databento/XNAS.ITCH/ohlcv-1s/sessions/bdaea1db7d78819f1baed024.dbn.zst",
+        "bytes": 7853,
+        "quoted_usd": 0.0,
+        "sha256": "ae5bafacdad00bfbcb73464533f44cb29e765668150c288d3c73c2656b2f3748"
+      },
+      {
+        "path": "raw/databento/XNAS.ITCH/ohlcv-1s/sessions/be2f68e0e728b86f18096172.dbn.zst",
+        "bytes": 814,
+        "quoted_usd": 0.0,
+        "sha256": "3f887b14e8ee3fd563f9d0dffdc1522056052be79424e33192eaf2646ebe60ab"
+      },
+      {
+        "path": "raw/databento/XNAS.ITCH/ohlcv-1s/sessions/be76af4973911fc8614ec7c4.dbn.zst",
+        "bytes": 760,
+        "quoted_usd": 0.0,
+        "sha256": "23f63358659a97cf8a2964268339962bd53580960910797b4ae0a8b522cf098e"
+      },
+      {
+        "path": "raw/databento/XNAS.ITCH/ohlcv-1s/sessions/bf1248d49868580fe4adf4fd.dbn.zst",
+        "bytes": 1659,
+        "quoted_usd": 0.0,
+        "sha256": "b2f078b58a40e8e80d9ea776e638c0cad8a539d68a46b94cd2567e82289c10f0"
+      },
+      {
+        "path": "raw/databento/XNAS.ITCH/ohlcv-1s/sessions/c1b2246f10a6c20815cfbdaa.dbn.zst",
+        "bytes": 1623,
+        "quoted_usd": 0.0,
+        "sha256": "d87505e5f1f9b542a2081cfd3568ad1c22c76d4c93439df510a0fff54d954957"
+      },
+      {
+        "path": "raw/databento/XNAS.ITCH/ohlcv-1s/sessions/c23ebc48e571b278cd902b53.dbn.zst",
+        "bytes": 18912,
+        "quoted_usd": 0.0,
+        "sha256": "b7c994a7b49ae5ef9559371eb2946b6d65cb7a976a0a4e2a43c68fcce1e6db32"
+      },
+      {
+        "path": "raw/databento/XNAS.ITCH/ohlcv-1s/sessions/c28ccc8dde1678a2d3e71df1.dbn.zst",
+        "bytes": 6713,
+        "quoted_usd": 0.0,
+        "sha256": "38526f3df11ddd9a30145ca616c313150343a2830005b4ebc865f46fce776d0a"
+      },
+      {
+        "path": "raw/databento/XNAS.ITCH/ohlcv-1s/sessions/c2fec886921e6667f9985c8e.dbn.zst",
+        "bytes": 915,
+        "quoted_usd": 0.0,
+        "sha256": "2298772c0376fc78cf2d896c0f29a07ecbdbb2c6187a1ca85db26fae78ca50b1"
+      },
+      {
+        "path": "raw/databento/XNAS.ITCH/ohlcv-1s/sessions/c3ad15ac33265ab6bf98da6f.dbn.zst",
+        "bytes": 1828,
+        "quoted_usd": 0.0,
+        "sha256": "5e074f071770762d8d57b87b9526f9bb471e70fc3daa4fc31d8868f0086ecc03"
+      },
+      {
+        "path": "raw/databento/XNAS.ITCH/ohlcv-1s/sessions/c3aee3b89d0a04bc1f1cd13f.dbn.zst",
+        "bytes": 1111,
+        "quoted_usd": 0.0,
+        "sha256": "c96855df978986d905c7e37bed8d112e6daee2e1202894a08427b3012090b2d9"
+      },
+      {
+        "path": "raw/databento/XNAS.ITCH/ohlcv-1s/sessions/c4cbce43015a79f4ac13c8ce.dbn.zst",
+        "bytes": 5504,
+        "quoted_usd": 0.0,
+        "sha256": "5fd254cafba2a9993d42a113c6090320451aba194b93ba8977388bb68aaadb72"
+      },
+      {
+        "path": "raw/databento/XNAS.ITCH/ohlcv-1s/sessions/c60e58da09b58d4ff44dae0a.dbn.zst",
+        "bytes": 18604,
+        "quoted_usd": 0.0,
+        "sha256": "25cfaa5a893f20d0c50d0b50dd4c0b5125ba9dc2b5d5b1e292b6879e6c4147f4"
+      },
+      {
+        "path": "raw/databento/XNAS.ITCH/ohlcv-1s/sessions/c647cbdaaeda47cab61990da.dbn.zst",
+        "bytes": 2037,
+        "quoted_usd": 0.0,
+        "sha256": "3c6cd6a14f3b18f4aabaf6e1079db5abd823cefc7ab5d4bece6848b4a9883d55"
+      },
+      {
+        "path": "raw/databento/XNAS.ITCH/ohlcv-1s/sessions/c65734b425e0b11be6a0b626.dbn.zst",
+        "bytes": 2396,
+        "quoted_usd": 0.0,
+        "sha256": "2eb30bca9f0ea6d06a4abaa6f0209d47ea0b655294b715c624dbcab7732cee7c"
+      },
+      {
+        "path": "raw/databento/XNAS.ITCH/ohlcv-1s/sessions/c674e66d0d19081b1b1990a1.dbn.zst",
+        "bytes": 701,
+        "quoted_usd": 0.0,
+        "sha256": "4438c3b870fe4b1b9ffa1b75ef26246cb2a68e77932306b6910fe2bf7b12bced"
+      },
+      {
+        "path": "raw/databento/XNAS.ITCH/ohlcv-1s/sessions/c81c5a3e372f639abb8b5b38.dbn.zst",
+        "bytes": 3242,
+        "quoted_usd": 0.0,
+        "sha256": "89002d215244682bd105f2ad3af2ea60dfa432ef49dff6201a252cd9f4f516fd"
+      },
+      {
+        "path": "raw/databento/XNAS.ITCH/ohlcv-1s/sessions/c86afafda8423440ef186c04.dbn.zst",
+        "bytes": 1688,
+        "quoted_usd": 0.0,
+        "sha256": "078af989e1c07a4a241c5ecec6da2943ca445fda99eea72c0dc44754e2b52ba4"
+      },
+      {
+        "path": "raw/databento/XNAS.ITCH/ohlcv-1s/sessions/c8b839aaedf247c8ac6ada42.dbn.zst",
+        "bytes": 1322,
+        "quoted_usd": 0.0,
+        "sha256": "07dff589386e62e643bacd0070be2dc755e78014862db5d1dd4a565c377e33b5"
+      },
+      {
+        "path": "raw/databento/XNAS.ITCH/ohlcv-1s/sessions/c93b86b2b0dc00ce4e706524.dbn.zst",
+        "bytes": 1576,
+        "quoted_usd": 0.0,
+        "sha256": "edc61ac1c64372e1fb0a304f3d81eac11361d7b25b95f68df5ed20f2ec53ed6e"
+      },
+      {
+        "path": "raw/databento/XNAS.ITCH/ohlcv-1s/sessions/caaf0ef5fcd50ce434112def.dbn.zst",
+        "bytes": 5226,
+        "quoted_usd": 0.0,
+        "sha256": "64c7b2b809094caf7e8cc655878d668587fc7ec5b4bc9d2a17a15993e6aaed7f"
+      },
+      {
+        "path": "raw/databento/XNAS.ITCH/ohlcv-1s/sessions/ce0b2435c11b2c30ebaacf66.dbn.zst",
+        "bytes": 4702,
+        "quoted_usd": 0.0,
+        "sha256": "07d535b5a5b7287c9d3417523f0cf828c85502e90d5225d57a4762c208a5b403"
+      },
+      {
+        "path": "raw/databento/XNAS.ITCH/ohlcv-1s/sessions/ce58980054df08a055733316.dbn.zst",
+        "bytes": 7208,
+        "quoted_usd": 0.0,
+        "sha256": "111b5cf997990204d5ce787c2e221415460b29a847ae4a7cf8b2bd7e1294d7a4"
+      },
+      {
+        "path": "raw/databento/XNAS.ITCH/ohlcv-1s/sessions/cf320220747895fb5b821d36.dbn.zst",
+        "bytes": 3716,
+        "quoted_usd": 0.0,
+        "sha256": "91ae38fda9a23d4988bd60faa90fce4f8ead6daea5898d689820ab483bef4658"
+      },
+      {
+        "path": "raw/databento/XNAS.ITCH/ohlcv-1s/sessions/cf6871d4c48b2aa7764ca85d.dbn.zst",
+        "bytes": 1009,
+        "quoted_usd": 0.0,
+        "sha256": "338f3e6b09f1b74fb2d9da0078bbad15c97ffa7f258ec21e5a1faad9d1b39a2e"
+      },
+      {
+        "path": "raw/databento/XNAS.ITCH/ohlcv-1s/sessions/cf8239f64f1d7a92f6c491b8.dbn.zst",
+        "bytes": 1751,
+        "quoted_usd": 0.0,
+        "sha256": "4f5b74f4b8cbe931c2031ab58b45accf5614e35af6fc53faa252bbabe42f8686"
+      },
+      {
+        "path": "raw/databento/XNAS.ITCH/ohlcv-1s/sessions/d002c8b9f560aec2fc55dad7.dbn.zst",
+        "bytes": 4013,
+        "quoted_usd": 0.0,
+        "sha256": "1389dd08aa12c16b3d4a6d602409558262a5cea2fc6a52c76981bafb46dc9271"
+      },
+      {
+        "path": "raw/databento/XNAS.ITCH/ohlcv-1s/sessions/d0b5dfbf77d561dfa288d92b.dbn.zst",
+        "bytes": 1415,
+        "quoted_usd": 0.0,
+        "sha256": "4dcada30cb636f65517d8846ae18fe04a5dd7fa9a3c2203bfde2587a39cf881e"
+      },
+      {
+        "path": "raw/databento/XNAS.ITCH/ohlcv-1s/sessions/d1a952dac40d9f64acb3b324.dbn.zst",
+        "bytes": 6395,
+        "quoted_usd": 0.0,
+        "sha256": "79b984365b73e1fc07c87501fe601dc66377d8eb97b0ec06e5340e3f6cc75ef0"
+      },
+      {
+        "path": "raw/databento/XNAS.ITCH/ohlcv-1s/sessions/d22347c8f045135cb4aab46e.dbn.zst",
+        "bytes": 4939,
+        "quoted_usd": 0.0,
+        "sha256": "754e07de30bb46db582ae60faafd2494bd246070bbe5385eaa57c47c9e90c799"
+      },
+      {
+        "path": "raw/databento/XNAS.ITCH/ohlcv-1s/sessions/d23e9ab5035c104d3687c060.dbn.zst",
+        "bytes": 2599,
+        "quoted_usd": 0.0,
+        "sha256": "0b6a9985b9ba796464d930ae320a4c4dbc9b068226778af6e699c91dd7b66cf3"
+      },
+      {
+        "path": "raw/databento/XNAS.ITCH/ohlcv-1s/sessions/d4ba25077b8029a1c9afe3bc.dbn.zst",
+        "bytes": 3417,
+        "quoted_usd": 0.0,
+        "sha256": "ed5eff6c2510b8ca2f276dfbc8ba070711a333d52b6466b97eea1558bef15538"
+      },
+      {
+        "path": "raw/databento/XNAS.ITCH/ohlcv-1s/sessions/d5fa7cffc636bdfa05bbad34.dbn.zst",
+        "bytes": 1939,
+        "quoted_usd": 0.0,
+        "sha256": "0822762c1de169a6bb6f0a87f49df01706677705e8a325791376894b9ece413d"
+      },
+      {
+        "path": "raw/databento/XNAS.ITCH/ohlcv-1s/sessions/d62b4aff15fdd23ffc428327.dbn.zst",
+        "bytes": 7889,
+        "quoted_usd": 0.0,
+        "sha256": "e49a2764acaecb9f07c02177b38e20074579db4a642e2a9c1c1414ae69117476"
+      },
+      {
+        "path": "raw/databento/XNAS.ITCH/ohlcv-1s/sessions/d688525c2bd54caa60bfc2c3.dbn.zst",
+        "bytes": 7652,
+        "quoted_usd": 0.0,
+        "sha256": "822353a98bd87e87bc37a80606a1830376fca2a49136440d2b9502c9ef8a3654"
+      },
+      {
+        "path": "raw/databento/XNAS.ITCH/ohlcv-1s/sessions/d6a1856c2540dcb17d48c7eb.dbn.zst",
+        "bytes": 3075,
+        "quoted_usd": 0.0,
+        "sha256": "0b9c7d85ad44783d552dffad123e6e8accae271c862c6c8d3e6003a33dcba724"
+      },
+      {
+        "path": "raw/databento/XNAS.ITCH/ohlcv-1s/sessions/d808a175e148d3886da5b5b7.dbn.zst",
+        "bytes": 8380,
+        "quoted_usd": 0.0,
+        "sha256": "2a9e3bdeb5432fa52627d57ad972015481a78f59655e46fcfbe9e4a4fac74bea"
+      },
+      {
+        "path": "raw/databento/XNAS.ITCH/ohlcv-1s/sessions/d90f6dee7d43bda0f06705cd.dbn.zst",
+        "bytes": 4173,
+        "quoted_usd": 0.0,
+        "sha256": "cab382dfa596f134297c0a441a59bdde09746b6099c8f86536331dfaf6088c27"
+      },
+      {
+        "path": "raw/databento/XNAS.ITCH/ohlcv-1s/sessions/d9380b2827ceae1290ec108d.dbn.zst",
+        "bytes": 2844,
+        "quoted_usd": 0.0,
+        "sha256": "c2fe5094c188ee1c87e4f275d9e717af2cf3021ffca1d2df3b0c2d0c03cbaa32"
+      },
+      {
+        "path": "raw/databento/XNAS.ITCH/ohlcv-1s/sessions/d98c113380501a0cadbf8bd8.dbn.zst",
+        "bytes": 8508,
+        "quoted_usd": 0.0,
+        "sha256": "9c4f4c8816f59d17a49504e4bcd999b9af22fa7af64e3993a7f25a140d49c288"
+      },
+      {
+        "path": "raw/databento/XNAS.ITCH/ohlcv-1s/sessions/db07335bfe28a10dfbdf6821.dbn.zst",
+        "bytes": 1641,
+        "quoted_usd": 0.0,
+        "sha256": "542b576e962fc88a1a3002917cb292d21cc1dc5ec9c58e8aaf208b410d9c6823"
+      },
+      {
+        "path": "raw/databento/XNAS.ITCH/ohlcv-1s/sessions/db6b72bcb4e82467cd56a2fd.dbn.zst",
+        "bytes": 3718,
+        "quoted_usd": 0.0,
+        "sha256": "c41f328732bb29f979ce533f4500f3cef0a8419004e65aa42b76a92a06e509a6"
+      },
+      {
+        "path": "raw/databento/XNAS.ITCH/ohlcv-1s/sessions/dce7d0b72048e58c8ca0f612.dbn.zst",
+        "bytes": 2167,
+        "quoted_usd": 0.0,
+        "sha256": "cdf03fe494925823b81ff2c915bb0495ea2e4b9a501751ee543e4736163f11ad"
+      },
+      {
+        "path": "raw/databento/XNAS.ITCH/ohlcv-1s/sessions/dcfaa3e6080dd8d19813ccfc.dbn.zst",
+        "bytes": 2593,
+        "quoted_usd": 0.0,
+        "sha256": "d2196e8abc235dd55d6a5eda256f2c6274e6d926bc68073153697ec452a12dac"
+      },
+      {
+        "path": "raw/databento/XNAS.ITCH/ohlcv-1s/sessions/dd3cd0bd1c909f713021b253.dbn.zst",
+        "bytes": 15060,
+        "quoted_usd": 0.0,
+        "sha256": "a8e7d6cee796a5ff99bdf1e56ae2aee16c2b8ec8ae020f1954f3c88c597713d8"
+      },
+      {
+        "path": "raw/databento/XNAS.ITCH/ohlcv-1s/sessions/dd673501b051f1d9e2fc0ce9.dbn.zst",
+        "bytes": 628,
+        "quoted_usd": 0.0,
+        "sha256": "122dd56978a9b08f6d2ccbd0a9acb13047d39be581fdf329ae8e07bce6ae1fe5"
+      },
+      {
+        "path": "raw/databento/XNAS.ITCH/ohlcv-1s/sessions/ddf55016ab74be3f8b95a394.dbn.zst",
+        "bytes": 2092,
+        "quoted_usd": 0.0,
+        "sha256": "13bc21db789f6752a7b576d2b16fbffb59f1818127ae800df755c0425174d90f"
+      },
+      {
+        "path": "raw/databento/XNAS.ITCH/ohlcv-1s/sessions/de7f7279c3ce0ebe73435f37.dbn.zst",
+        "bytes": 2972,
+        "quoted_usd": 0.0,
+        "sha256": "6842bc6a091254c2a627252a86812c770949c69fb3f4af65c326e352b0cd36ce"
+      },
+      {
+        "path": "raw/databento/XNAS.ITCH/ohlcv-1s/sessions/deda51c46ac5d92bbb247fe4.dbn.zst",
+        "bytes": 745,
+        "quoted_usd": 0.0,
+        "sha256": "c0f48141470806886a3d25ab704e7d81def4ff725a0e5eb450eb0179e8762cfc"
+      },
+      {
+        "path": "raw/databento/XNAS.ITCH/ohlcv-1s/sessions/df9381907ff206574bf76444.dbn.zst",
+        "bytes": 27401,
+        "quoted_usd": 0.0,
+        "sha256": "062dc56f8d7a0b840d72a82cda50c2d10326d662f21eb8eeb18c83c7671ff3c3"
+      },
+      {
+        "path": "raw/databento/XNAS.ITCH/ohlcv-1s/sessions/e07f4151a195f270bae18a40.dbn.zst",
+        "bytes": 1322,
+        "quoted_usd": 0.0,
+        "sha256": "4e0469e8c81b934d404c229768ff54f4fd2e43caebffbd4c278f572e5d019551"
+      },
+      {
+        "path": "raw/databento/XNAS.ITCH/ohlcv-1s/sessions/e088e607a5c5ca7c96cf9bd7.dbn.zst",
+        "bytes": 815,
+        "quoted_usd": 0.0,
+        "sha256": "aa0f885f526b10e98cf7bcd185c7d024d0a7c0b3b57650e16e022305612e5a0c"
+      },
+      {
+        "path": "raw/databento/XNAS.ITCH/ohlcv-1s/sessions/e17c203672249ad2556ebb75.dbn.zst",
+        "bytes": 1560,
+        "quoted_usd": 0.0,
+        "sha256": "765151ee5655f7bfc785087b29a75a20401dc0c1c91bf9c80c35a373da358f2f"
+      },
+      {
+        "path": "raw/databento/XNAS.ITCH/ohlcv-1s/sessions/e20583c0ec531a2b2e48dcce.dbn.zst",
+        "bytes": 7769,
+        "quoted_usd": 0.0,
+        "sha256": "2fe5babedfda674370d880661f5505a511981c9d2876565bb7c34ead3313def5"
+      },
+      {
+        "path": "raw/databento/XNAS.ITCH/ohlcv-1s/sessions/e23af4edec3c1f29a81eb690.dbn.zst",
+        "bytes": 1784,
+        "quoted_usd": 0.0,
+        "sha256": "a32e727b15b08ab0f03f26113cf0b60f15722202de5ac6703a0c4b16da654afa"
+      },
+      {
+        "path": "raw/databento/XNAS.ITCH/ohlcv-1s/sessions/e26acde25ff8a22f3c3df253.dbn.zst",
+        "bytes": 8427,
+        "quoted_usd": 0.0,
+        "sha256": "f4cc2c69ff3507c324ab0c40688ece48f1d1fd38ce37747975897c8d97d85515"
+      },
+      {
+        "path": "raw/databento/XNAS.ITCH/ohlcv-1s/sessions/e28ef0dd8401e8d64b8a21fc.dbn.zst",
+        "bytes": 3781,
+        "quoted_usd": 0.0,
+        "sha256": "f85d865846cdf69c315d12f1d09bf3b59fd21b0f3435112adfee4f2605de7ad1"
+      },
+      {
+        "path": "raw/databento/XNAS.ITCH/ohlcv-1s/sessions/e2ea9696ad007a10d9356d64.dbn.zst",
+        "bytes": 2812,
+        "quoted_usd": 0.0,
+        "sha256": "d6290579b43877d70c80ceb4d6a47efc3cd4f0799f77a67bcb9775737baefa73"
+      },
+      {
+        "path": "raw/databento/XNAS.ITCH/ohlcv-1s/sessions/e3bc9791c795d4e266ec536c.dbn.zst",
+        "bytes": 7190,
+        "quoted_usd": 0.0,
+        "sha256": "c42de5e3e63c81cb730d1dd3b319b9db9f46e1983fcb36ba8f37a6003b930c0d"
+      },
+      {
+        "path": "raw/databento/XNAS.ITCH/ohlcv-1s/sessions/e40dbe8ddf9235bc0be36dbb.dbn.zst",
+        "bytes": 1916,
+        "quoted_usd": 0.0,
+        "sha256": "c0d6c0e1eb2c70dd5fcf80cb6d9f70260f3e8757646c857d8708761d7d84d1c1"
+      },
+      {
+        "path": "raw/databento/XNAS.ITCH/ohlcv-1s/sessions/e484d9dd82bad8f7aebe21c6.dbn.zst",
+        "bytes": 2813,
+        "quoted_usd": 0.0,
+        "sha256": "5769537ca4aaedeb26ca0f74fb35ad6b7f11720dae62ce2252d042a7b46c0aa6"
+      },
+      {
+        "path": "raw/databento/XNAS.ITCH/ohlcv-1s/sessions/e496eb235e34c47fa846718a.dbn.zst",
+        "bytes": 1849,
+        "quoted_usd": 0.0,
+        "sha256": "bbee22a1e42deb0970a634a830a9e4e520162c1108f86fd0daf000fe080feef1"
+      },
+      {
+        "path": "raw/databento/XNAS.ITCH/ohlcv-1s/sessions/e5b5bbf96bcb9431eee29ff9.dbn.zst",
+        "bytes": 1226,
+        "quoted_usd": 0.0,
+        "sha256": "9388c746351300084a911a7753dae9a74210f78641406b27d633b21db4af8eab"
+      },
+      {
+        "path": "raw/databento/XNAS.ITCH/ohlcv-1s/sessions/e83a7d339ef4aeb0e636756a.dbn.zst",
+        "bytes": 8076,
+        "quoted_usd": 0.0,
+        "sha256": "cf8c48a5e2957d28848fea80e42160ee455824aa1069927cf5f79baa162d6837"
+      },
+      {
+        "path": "raw/databento/XNAS.ITCH/ohlcv-1s/sessions/e8b7cc3b088be6dcba8e36cb.dbn.zst",
+        "bytes": 12323,
+        "quoted_usd": 0.0,
+        "sha256": "8acbd8188132d28dc7f0672a4d5cb39236173f50af086bef853431bef378b028"
+      },
+      {
+        "path": "raw/databento/XNAS.ITCH/ohlcv-1s/sessions/e920db7523b3603636a9ce4f.dbn.zst",
+        "bytes": 1066,
+        "quoted_usd": 0.0,
+        "sha256": "745216bc83bf45f57c18617ca11f8d118901e0475c1b9fb42fbc97c0d764adb1"
+      },
+      {
+        "path": "raw/databento/XNAS.ITCH/ohlcv-1s/sessions/e920ea292bd04e2a7fc0703f.dbn.zst",
+        "bytes": 1002,
+        "quoted_usd": 0.0,
+        "sha256": "473c8b50efe7e6d8dc5f9815b7b46b17bca5c9b40a87ba59954a29a4a497f454"
+      },
+      {
+        "path": "raw/databento/XNAS.ITCH/ohlcv-1s/sessions/e94f5283ef9d6d2b0a68164b.dbn.zst",
+        "bytes": 5683,
+        "quoted_usd": 0.0,
+        "sha256": "e38b3bc20565526e57629fab0545f9d7e38ad409f527edd980a9fc43127e4b90"
+      },
+      {
+        "path": "raw/databento/XNAS.ITCH/ohlcv-1s/sessions/eccb85effbde868647497540.dbn.zst",
+        "bytes": 4844,
+        "quoted_usd": 0.0,
+        "sha256": "a06af72043a82161bf08519242a5dc755711749f7f13491e27e8089d01bd17b0"
+      },
+      {
+        "path": "raw/databento/XNAS.ITCH/ohlcv-1s/sessions/eed798002b56b19a5e940465.dbn.zst",
+        "bytes": 5405,
+        "quoted_usd": 0.0,
+        "sha256": "c313da86e4ea00d7176cdfc52a8f68a93e9172fcfe88b0c936aaa480ca9d7fc2"
+      },
+      {
+        "path": "raw/databento/XNAS.ITCH/ohlcv-1s/sessions/ef0fe15ba1f23a2b633fe47b.dbn.zst",
+        "bytes": 4300,
+        "quoted_usd": 0.0,
+        "sha256": "da870993dba4eabf4bc6e94416b82afbe1d9c0d39ff7e1757d366b0918d4b66a"
+      },
+      {
+        "path": "raw/databento/XNAS.ITCH/ohlcv-1s/sessions/ef2574feffd9639476696d8a.dbn.zst",
+        "bytes": 1586,
+        "quoted_usd": 0.0,
+        "sha256": "be6cc322b925a90bccdecb5bf7d76e05bb0e18e83c271b7576a5c5c21e4fc6e5"
+      },
+      {
+        "path": "raw/databento/XNAS.ITCH/ohlcv-1s/sessions/f14d5a3c2b6b25ae3e172f3f.dbn.zst",
+        "bytes": 2713,
+        "quoted_usd": 0.0,
+        "sha256": "f8c59d9ebbaab998b6b42313e9bd3d5e20b6a0e9452f0897cfa190ffb41dc875"
+      },
+      {
+        "path": "raw/databento/XNAS.ITCH/ohlcv-1s/sessions/f312ad6ccf1006836f8005a8.dbn.zst",
+        "bytes": 4017,
+        "quoted_usd": 0.0,
+        "sha256": "249653cebb9bfabca59ef6219daf74007f955e78e50be36dd9e7b16fb7ca69d7"
+      },
+      {
+        "path": "raw/databento/XNAS.ITCH/ohlcv-1s/sessions/f318f3dbe36ff1ddfbd8c040.dbn.zst",
+        "bytes": 6778,
+        "quoted_usd": 0.0,
+        "sha256": "1837e730193799d28a56f856667dc5e65b87b8ee947efcb69211a10bea1ab6dd"
+      },
+      {
+        "path": "raw/databento/XNAS.ITCH/ohlcv-1s/sessions/f32f43a2c431131311785e88.dbn.zst",
+        "bytes": 10366,
+        "quoted_usd": 0.0,
+        "sha256": "da60cdd7053cb0d21c173e1e4be6ee2624d41aa9fbbff2b394b340aed91097a2"
+      },
+      {
+        "path": "raw/databento/XNAS.ITCH/ohlcv-1s/sessions/f380fca09f1f6894a9ab74d8.dbn.zst",
+        "bytes": 3772,
+        "quoted_usd": 0.0,
+        "sha256": "b319223dad49b1ffbf8e7619da0696d3d522467785dc92fbe3d5a8f9d9116a1b"
+      },
+      {
+        "path": "raw/databento/XNAS.ITCH/ohlcv-1s/sessions/f3ad6fe461007eafd74f90dd.dbn.zst",
+        "bytes": 6054,
+        "quoted_usd": 0.0,
+        "sha256": "5b87f3c32f598bdd2cf244d10e44900f890093e9e87f73b9a15b9aeb5b3ba642"
+      },
+      {
+        "path": "raw/databento/XNAS.ITCH/ohlcv-1s/sessions/f3ed4a8d68164bb560ad5c3e.dbn.zst",
+        "bytes": 1587,
+        "quoted_usd": 0.0,
+        "sha256": "81c3e009bce8afed34eae0e7e71c6dafa92613f817c039a77a57f2d44e063e88"
+      },
+      {
+        "path": "raw/databento/XNAS.ITCH/ohlcv-1s/sessions/f425af2dbd8910ce8bfd9b45.dbn.zst",
+        "bytes": 792,
+        "quoted_usd": 0.0,
+        "sha256": "aab2242cfa491b0a55644cf471959d869c7614bf9ab64d423e839cfb30f7e2e7"
+      },
+      {
+        "path": "raw/databento/XNAS.ITCH/ohlcv-1s/sessions/f4f097f734a749890bbc32c5.dbn.zst",
+        "bytes": 649,
+        "quoted_usd": 0.0,
+        "sha256": "b9c532993b9d4252d62fc48c025289cbe248a5ae0306622dd897a4856cbf36c8"
+      },
+      {
+        "path": "raw/databento/XNAS.ITCH/ohlcv-1s/sessions/f5873f7888a678c680b616de.dbn.zst",
+        "bytes": 1147,
+        "quoted_usd": 0.0,
+        "sha256": "af0dba064f6807b8d072b9f939d87d5eb47c58882ab2928296c6bdfc4d998c86"
+      },
+      {
+        "path": "raw/databento/XNAS.ITCH/ohlcv-1s/sessions/f7e953ffd5c3bcabbdb7df73.dbn.zst",
+        "bytes": 11652,
+        "quoted_usd": 0.0,
+        "sha256": "ec98f11e0ddffd35776badc9de1368f21f63fd26f3eaf58ffce0ee1398ef5bdd"
+      },
+      {
+        "path": "raw/databento/XNAS.ITCH/ohlcv-1s/sessions/f7f7d179550a27d5007efd4d.dbn.zst",
+        "bytes": 1910,
+        "quoted_usd": 0.0,
+        "sha256": "8facb22fd19be5a6d33bea230c303ea95faccb207edc1bccc000087134828579"
+      },
+      {
+        "path": "raw/databento/XNAS.ITCH/ohlcv-1s/sessions/f8b4dd08c3261e8ed13bd87b.dbn.zst",
+        "bytes": 4104,
+        "quoted_usd": 0.0,
+        "sha256": "c9b2a3e985e7042485022090e1e3aaa18110da70c5456744d4a55d7c9f38a793"
+      },
+      {
+        "path": "raw/databento/XNAS.ITCH/ohlcv-1s/sessions/f9276d4d41371608889d1564.dbn.zst",
+        "bytes": 1588,
+        "quoted_usd": 0.0,
+        "sha256": "42476a9e788df28540b7141b14d0ca765a697b76602b20f1f0b9ff5306790231"
+      },
+      {
+        "path": "raw/databento/XNAS.ITCH/ohlcv-1s/sessions/f9e5d2a97fc02dd62729d3b1.dbn.zst",
+        "bytes": 9284,
+        "quoted_usd": 0.0,
+        "sha256": "e40eb499ba1985704903aa7fe425bd73be2a9d70d9cee5d53878dd49c55dcb9d"
+      },
+      {
+        "path": "raw/databento/XNAS.ITCH/ohlcv-1s/sessions/fa3db988e82ed6738fce1e71.dbn.zst",
+        "bytes": 1139,
+        "quoted_usd": 0.0,
+        "sha256": "570c6643d96a5c080e796bb2fcfc2818d87e45b79b2dadda8a343ff446922625"
+      },
+      {
+        "path": "raw/databento/XNAS.ITCH/ohlcv-1s/sessions/fa685ff6012f66e5665f0c20.dbn.zst",
+        "bytes": 1825,
+        "quoted_usd": 0.0,
+        "sha256": "36d76340b87f41309154c566831ef6a5404f527cacf1bbde63972c261786cedf"
+      },
+      {
+        "path": "raw/databento/XNAS.ITCH/ohlcv-1s/sessions/fac2e1b065d6216b79e968ec.dbn.zst",
+        "bytes": 922,
+        "quoted_usd": 0.0,
+        "sha256": "ef444dc3fa1466a377949a4a4ab1d63d8f0d6164f9b512b1dc49e84d1bb6ac62"
+      },
+      {
+        "path": "raw/databento/XNAS.ITCH/ohlcv-1s/sessions/fb64cc6b4b041b9cfa82754d.dbn.zst",
+        "bytes": 811,
+        "quoted_usd": 0.0,
+        "sha256": "9291485e98f8dc97dd0a0365a1ee2afd7af2677503c0ef9d66160c7965e97581"
+      },
+      {
+        "path": "raw/databento/XNAS.ITCH/ohlcv-1s/sessions/fba341cf643a279ba1c98197.dbn.zst",
+        "bytes": 621,
+        "quoted_usd": 0.0,
+        "sha256": "5868c22ca2d3b7f8215854009c34eb86f2a51904ac1d961660a3a9e033dc4678"
+      },
+      {
+        "path": "raw/databento/XNAS.ITCH/ohlcv-1s/sessions/fcdf235f4ddc6bf323d8fcc0.dbn.zst",
+        "bytes": 562,
+        "quoted_usd": 0.0,
+        "sha256": "5bab17e6ea502310cd91302216edb28a34fff7e67ac4001508d57e2153f082b9"
+      },
+      {
+        "path": "raw/databento/XNAS.ITCH/ohlcv-1s/sessions/fd8a8e0df5b89975a897fa54.dbn.zst",
+        "bytes": 7107,
+        "quoted_usd": 0.0,
+        "sha256": "f781f345a6954616c313bf7356f783c7d40df4ca19145295160eb171c785729b"
+      },
+      {
+        "path": "raw/databento/XNAS.ITCH/ohlcv-1s/sessions/fde77815692cf59249401ec8.dbn.zst",
+        "bytes": 3892,
+        "quoted_usd": 0.0,
+        "sha256": "0a03f5bec05148e187739eb11c8b3c5cfc01faa3557183b1564995e5e1cc677d"
+      },
+      {
+        "path": "raw/databento/XNAS.ITCH/ohlcv-1s/sessions/fe176b44a32cfe374a350898.dbn.zst",
+        "bytes": 552,
+        "quoted_usd": 0.0,
+        "sha256": "dfdde4bb9432289d84aaf53de84e057aab5da8537ee0c4de01637d4b5ba6730f"
+      },
+      {
+        "path": "raw/databento/XNAS.ITCH/ohlcv-1s/sessions/ff6bc2a08add22eecf29699b.dbn.zst",
+        "bytes": 1215,
+        "quoted_usd": 0.0,
+        "sha256": "c275ccf08e2e3f05e0546abc0fb77effbf31956f8cedfd3cbd5e675a02e4274d"
+      },
+      {
+        "path": "raw/databento/XNYS.PILLAR/ohlcv-1s/sessions/0159eeae507cd37e8f2fc393.dbn.zst",
+        "bytes": 3235,
+        "quoted_usd": 0.0,
+        "sha256": "b3c15ca9d30c35bc03e2688a6c9e130457b8023b920c845ac768736ba437fccd"
+      },
+      {
+        "path": "raw/databento/XNYS.PILLAR/ohlcv-1s/sessions/0a0e2377ebe27a1e44c9ad38.dbn.zst",
+        "bytes": 7548,
+        "quoted_usd": 0.0,
+        "sha256": "f28c4e7c1e2d2dcb9ff2a7a611292539f066e64bbe996dcefdfbb9f29b349b47"
+      },
+      {
+        "path": "raw/databento/XNYS.PILLAR/ohlcv-1s/sessions/0d4b3bfe09aadb71464a6218.dbn.zst",
+        "bytes": 3584,
+        "quoted_usd": 0.0,
+        "sha256": "ff278c48ed9f8bae33feb1c00845a5325f3a962367891555e9876293efbaa95e"
+      },
+      {
+        "path": "raw/databento/XNYS.PILLAR/ohlcv-1s/sessions/0e6459514314b48edeeb8265.dbn.zst",
+        "bytes": 2982,
+        "quoted_usd": 0.0,
+        "sha256": "980ef1e3a7b9ae6d76495fb65602e7e310ef61fd0dd7fb6c68ff75c232ecbe83"
+      },
+      {
+        "path": "raw/databento/XNYS.PILLAR/ohlcv-1s/sessions/0eede483faccf42d057d03c6.dbn.zst",
+        "bytes": 1299,
+        "quoted_usd": 0.0,
+        "sha256": "e6441a4479976949e686acd4809a590cf6dc5355d4f20b90baedae5804c97fcf"
+      },
+      {
+        "path": "raw/databento/XNYS.PILLAR/ohlcv-1s/sessions/16401d3ef26a7c5ffb934b9b.dbn.zst",
+        "bytes": 1343,
+        "quoted_usd": 0.0,
+        "sha256": "34e781fa38eb980fe78335867dec240aad505636cecb900ec0a0e82b0e706562"
+      },
+      {
+        "path": "raw/databento/XNYS.PILLAR/ohlcv-1s/sessions/1f887ca1bdb6326dc589dca3.dbn.zst",
+        "bytes": 60174,
+        "quoted_usd": 0.0,
+        "sha256": "674c3f8f8a82b8e14784df449a0fe6a3b1308a93a7fa743395c2c2b43e9d699f"
+      },
+      {
+        "path": "raw/databento/XNYS.PILLAR/ohlcv-1s/sessions/20c244a66c133fe8e1a39584.dbn.zst",
+        "bytes": 14806,
+        "quoted_usd": 0.0,
+        "sha256": "ac7a1f2623af5ecdcfa483ed93770f88aa6b5f47470ce68b0a2f2178a9e3a5cb"
+      },
+      {
+        "path": "raw/databento/XNYS.PILLAR/ohlcv-1s/sessions/22170915eee6b4879b403022.dbn.zst",
+        "bytes": 3832,
+        "quoted_usd": 0.0,
+        "sha256": "389f14cfa9de32b7b5be464a391da5d0e2d429f34dc303c1057d728a3d68c635"
+      },
+      {
+        "path": "raw/databento/XNYS.PILLAR/ohlcv-1s/sessions/2243581ce2bc0ed75b0702c0.dbn.zst",
+        "bytes": 592,
+        "quoted_usd": 0.0,
+        "sha256": "63be0d8955573b98c6414a61a994796d4803ed0513dcde4b8e6ded6c645f477a"
+      },
+      {
+        "path": "raw/databento/XNYS.PILLAR/ohlcv-1s/sessions/2251628c0fe3793a5a5b57b3.dbn.zst",
+        "bytes": 10565,
+        "quoted_usd": 0.0,
+        "sha256": "0be31b9e303144c73e7646a4cbac300f8e885df41c4636c34e9c033b8c9ee7ed"
+      },
+      {
+        "path": "raw/databento/XNYS.PILLAR/ohlcv-1s/sessions/2dcd5011455e41e4f9a564d0.dbn.zst",
+        "bytes": 2921,
+        "quoted_usd": 0.0,
+        "sha256": "c87a9575f62cadd812fb9f409a10f679b4d41764405e75e3afb8e48cd069c3c5"
+      },
+      {
+        "path": "raw/databento/XNYS.PILLAR/ohlcv-1s/sessions/32c8174cd3ad0bb223f103e5.dbn.zst",
+        "bytes": 19365,
+        "quoted_usd": 0.0,
+        "sha256": "3cbea92873daf828eb29e27dccc1fefc28873b385883404c508c57df69209ea2"
+      },
+      {
+        "path": "raw/databento/XNYS.PILLAR/ohlcv-1s/sessions/33d95f5d6e4025ee4cba5ab7.dbn.zst",
+        "bytes": 34421,
+        "quoted_usd": 0.0,
+        "sha256": "9b46c19f85cace7a109dbbe0b96960f8e8a98c4a8a2f7ec2087fc31c3113a3ca"
+      },
+      {
+        "path": "raw/databento/XNYS.PILLAR/ohlcv-1s/sessions/361c76d57632ce199241e774.dbn.zst",
+        "bytes": 5134,
+        "quoted_usd": 0.0,
+        "sha256": "9d3db3827b4101ae30e041de8c76ff0a4fb44402609f35617d1fd1c21566af77"
+      },
+      {
+        "path": "raw/databento/XNYS.PILLAR/ohlcv-1s/sessions/41b4e29637c914132afab17c.dbn.zst",
+        "bytes": 639,
+        "quoted_usd": 0.0,
+        "sha256": "9c1d4e54e0b091ed9f83a0a2c7b3f3ffb19110186704b700696910fdd813576f"
+      },
+      {
+        "path": "raw/databento/XNYS.PILLAR/ohlcv-1s/sessions/4734649ab08a4869b72d9d63.dbn.zst",
+        "bytes": 8380,
+        "quoted_usd": 0.0,
+        "sha256": "99a46ce4fcd22ced0dbb4c9935a12869bebadd906cc53127f56a918e8a17748e"
+      },
+      {
+        "path": "raw/databento/XNYS.PILLAR/ohlcv-1s/sessions/47a9bf614523e791ed297b30.dbn.zst",
+        "bytes": 3365,
+        "quoted_usd": 0.0,
+        "sha256": "dd380e27929332293f73847539b8cbf0f8b2d6e8a123b17af4cc30851c8b7d3f"
+      },
+      {
+        "path": "raw/databento/XNYS.PILLAR/ohlcv-1s/sessions/4bcbf52395cf1309c773ef0e.dbn.zst",
+        "bytes": 565,
+        "quoted_usd": 0.0,
+        "sha256": "c1663a4b559808d9cc53db021d41165e0f50badb6979737bf03ce8593b4dd606"
+      },
+      {
+        "path": "raw/databento/XNYS.PILLAR/ohlcv-1s/sessions/4dce00a1b008f418953aef87.dbn.zst",
+        "bytes": 5692,
+        "quoted_usd": 0.0,
+        "sha256": "4d03572cc2e72eabc5d77cb7e04e47f3c72f5a7b7303951fcb26b11fbb998dab"
+      },
+      {
+        "path": "raw/databento/XNYS.PILLAR/ohlcv-1s/sessions/520007fc250395052fcd3d9d.dbn.zst",
+        "bytes": 1321,
+        "quoted_usd": 0.0,
+        "sha256": "576dcb2316143b4385834e5e41af99ac1568a791775e3fc728d4d036ea2f3c47"
+      },
+      {
+        "path": "raw/databento/XNYS.PILLAR/ohlcv-1s/sessions/52153a4607beda8085fe5d6a.dbn.zst",
+        "bytes": 21823,
+        "quoted_usd": 0.0,
+        "sha256": "b86732b7d66e1c53c8bd051833a4d8839eb5e78cdea7f48f1ad4118413999c14"
+      },
+      {
+        "path": "raw/databento/XNYS.PILLAR/ohlcv-1s/sessions/558619b2b735701bbbeb05e7.dbn.zst",
+        "bytes": 942,
+        "quoted_usd": 0.0,
+        "sha256": "e2c1f10735a5e5d55fa1c4dfa34b2b34966d6ad9e07230b7d89414dc37eccab6"
+      },
+      {
+        "path": "raw/databento/XNYS.PILLAR/ohlcv-1s/sessions/580e35ebe9d9e1b241fdafc9.dbn.zst",
+        "bytes": 2366,
+        "quoted_usd": 0.0,
+        "sha256": "cfdd0d630eda5ce29aa9906312bd874dffc0068e7666e4dc454122786a3af639"
+      },
+      {
+        "path": "raw/databento/XNYS.PILLAR/ohlcv-1s/sessions/5a329c81db288046a816b028.dbn.zst",
+        "bytes": 1314,
+        "quoted_usd": 0.0,
+        "sha256": "8fd6ae96d87a415bac4baf2b7fb450496de92e7c5a9ebcad3d6625e9abdcecb0"
+      },
+      {
+        "path": "raw/databento/XNYS.PILLAR/ohlcv-1s/sessions/5d6da7936c880b14a2ad5881.dbn.zst",
+        "bytes": 18097,
+        "quoted_usd": 0.0,
+        "sha256": "3b17730d9aa37023346948b097a5ba7fbd5a68b233f3d9bf1e68e7ab384593c8"
+      },
+      {
+        "path": "raw/databento/XNYS.PILLAR/ohlcv-1s/sessions/66bfeec83ccbb8fab332e0a2.dbn.zst",
+        "bytes": 1453,
+        "quoted_usd": 0.0,
+        "sha256": "8bb4149b6b750220319a70e6ff7a6dadcbf5961b024d376d01a35d07de04e633"
+      },
+      {
+        "path": "raw/databento/XNYS.PILLAR/ohlcv-1s/sessions/6b1d735c62e2f44a13621545.dbn.zst",
+        "bytes": 1857,
+        "quoted_usd": 0.0,
+        "sha256": "7808f6387d6ef7f2ad7dbd5b39b397b9405d68b01de108182e8c3075b14206c5"
+      },
+      {
+        "path": "raw/databento/XNYS.PILLAR/ohlcv-1s/sessions/6b6fc04c8ccd107a3222dfb6.dbn.zst",
+        "bytes": 19121,
+        "quoted_usd": 0.0,
+        "sha256": "35069a6fa81d0d52f38cbe7901a522227c6be4d632520c962e9d1914205f206c"
+      },
+      {
+        "path": "raw/databento/XNYS.PILLAR/ohlcv-1s/sessions/6cde33828b18995752cc2177.dbn.zst",
+        "bytes": 2399,
+        "quoted_usd": 0.0,
+        "sha256": "743a71a6bc2d8fbde0cae423d426661d5c53a6fa30ca21d4524a78087132ea8a"
+      },
+      {
+        "path": "raw/databento/XNYS.PILLAR/ohlcv-1s/sessions/72d1c27d33f4f649c8421f34.dbn.zst",
+        "bytes": 2141,
+        "quoted_usd": 0.0,
+        "sha256": "a3be6b9f9a4a89e951658028999ed50d2763d741898fd1ac79394c6da57ae0f2"
+      },
+      {
+        "path": "raw/databento/XNYS.PILLAR/ohlcv-1s/sessions/73cf415dc41e8ec9bf6d4aa4.dbn.zst",
+        "bytes": 704,
+        "quoted_usd": 0.0,
+        "sha256": "426e8aba40b041966afc946891a21273ea86f1b9b33f9679f58344491b3c64e7"
+      },
+      {
+        "path": "raw/databento/XNYS.PILLAR/ohlcv-1s/sessions/75c3d4cb261a0212fad47d41.dbn.zst",
+        "bytes": 21794,
+        "quoted_usd": 0.0,
+        "sha256": "79aff7edadf1e8afa2a7d2297d4040575012d37fa1c0e286d9c44ab9b6eccaeb"
+      },
+      {
+        "path": "raw/databento/XNYS.PILLAR/ohlcv-1s/sessions/79458cda9e554b2385d0e130.dbn.zst",
+        "bytes": 1056,
+        "quoted_usd": 0.0,
+        "sha256": "fe534e17548a498741d4e1c6f8f8c4ea72171f0f88662a393f3cbae6dd171ca3"
+      },
+      {
+        "path": "raw/databento/XNYS.PILLAR/ohlcv-1s/sessions/80603e3e64e0b0447297ee96.dbn.zst",
+        "bytes": 1486,
+        "quoted_usd": 0.0,
+        "sha256": "f8fadcf7566e0290df395cebf699ad491510d2b3679190e877278069fbfdad08"
+      },
+      {
+        "path": "raw/databento/XNYS.PILLAR/ohlcv-1s/sessions/8087ff7c46290245db52eef4.dbn.zst",
+        "bytes": 1252,
+        "quoted_usd": 0.0,
+        "sha256": "73fd149cbfd72040a2097166ab109c9456b79605998e265010078259f5197545"
+      },
+      {
+        "path": "raw/databento/XNYS.PILLAR/ohlcv-1s/sessions/82a9c87495473f63561ae5eb.dbn.zst",
+        "bytes": 8313,
+        "quoted_usd": 0.0,
+        "sha256": "a5ece460079f4a7ac215725d92412f7edbad286436a43615ff05f353a687b8a0"
+      },
+      {
+        "path": "raw/databento/XNYS.PILLAR/ohlcv-1s/sessions/8af9402fc884b871873f60d6.dbn.zst",
+        "bytes": 3971,
+        "quoted_usd": 0.0,
+        "sha256": "18063c56248b744329af79e6eb2b9ccfe9b8323812147a78c72f5143dc805279"
+      },
+      {
+        "path": "raw/databento/XNYS.PILLAR/ohlcv-1s/sessions/8b24068bc0601bea3a714b0a.dbn.zst",
+        "bytes": 3416,
+        "quoted_usd": 0.0,
+        "sha256": "a950c9f1f7e5bc6e61174d0b5cf1b7650957fec5bab0268d14eae9f3b3b72974"
+      },
+      {
+        "path": "raw/databento/XNYS.PILLAR/ohlcv-1s/sessions/8d115705adea84480fd1a605.dbn.zst",
+        "bytes": 1249,
+        "quoted_usd": 0.0,
+        "sha256": "45ce8ec5ac1ce8352d863f75bf5452d2441bda42732a5069132110eaabd36a4e"
+      },
+      {
+        "path": "raw/databento/XNYS.PILLAR/ohlcv-1s/sessions/8d9406c0dd81c961ed0ffcbd.dbn.zst",
+        "bytes": 11346,
+        "quoted_usd": 0.0,
+        "sha256": "0d34d0a09b44a257925551b1cf4c78e684cc78df6e728a8766955d05e5e9d926"
+      },
+      {
+        "path": "raw/databento/XNYS.PILLAR/ohlcv-1s/sessions/8da83fa7071f3c35dbb9ac89.dbn.zst",
+        "bytes": 661,
+        "quoted_usd": 0.0,
+        "sha256": "2e58326d505cfc0558155dbc5be18a5c2673db64504c60e8c3e92206b31382df"
+      },
+      {
+        "path": "raw/databento/XNYS.PILLAR/ohlcv-1s/sessions/8fc626ee6a77f9deb117b9e9.dbn.zst",
+        "bytes": 8107,
+        "quoted_usd": 0.0,
+        "sha256": "218f14b6b4e929796f67ed0e4aed6eb89e2e66ef594db22077ebb024d847c546"
+      },
+      {
+        "path": "raw/databento/XNYS.PILLAR/ohlcv-1s/sessions/92d89032c3ae6d043e281e59.dbn.zst",
+        "bytes": 863,
+        "quoted_usd": 0.0,
+        "sha256": "fcac3409b6f682b7abb50b229d8c59afeea939e3936559c2640436021da0f0c8"
+      },
+      {
+        "path": "raw/databento/XNYS.PILLAR/ohlcv-1s/sessions/934d4fd02142bb6214c8f6d5.dbn.zst",
+        "bytes": 5817,
+        "quoted_usd": 0.0,
+        "sha256": "35ca63cef1122d318f476cece4121bc47c2a3ca49a0f9bf8f84f7f2acd852c4f"
+      },
+      {
+        "path": "raw/databento/XNYS.PILLAR/ohlcv-1s/sessions/9809e4d329e51302651e98dd.dbn.zst",
+        "bytes": 12719,
+        "quoted_usd": 0.0,
+        "sha256": "f37bb5a8b2bacb4656df473a403505ea1253f5d3bf7c45e4a9132c2c6df03fd5"
+      },
+      {
+        "path": "raw/databento/XNYS.PILLAR/ohlcv-1s/sessions/9d87bed034f401e3bbf3c6cc.dbn.zst",
+        "bytes": 407,
+        "quoted_usd": 0.0,
+        "sha256": "41a5903f0dc2d81621f2130578173a3f30fda56b919f3b4f8df14189dc591285"
+      },
+      {
+        "path": "raw/databento/XNYS.PILLAR/ohlcv-1s/sessions/9e7445c67c6ec675fd464a07.dbn.zst",
+        "bytes": 29915,
+        "quoted_usd": 0.0,
+        "sha256": "7a91c0029706dca706ebec4e2ab558330cf1572a7b1b8baa859fb80c52c543db"
+      },
+      {
+        "path": "raw/databento/XNYS.PILLAR/ohlcv-1s/sessions/ab58b1bdb9d87e0ee0cd0212.dbn.zst",
+        "bytes": 869,
+        "quoted_usd": 0.0,
+        "sha256": "42e41ec95aba011d15dbfe2bb2369c072f914895c318ef0663e9d00f5c2cd7ce"
+      },
+      {
+        "path": "raw/databento/XNYS.PILLAR/ohlcv-1s/sessions/b575e16dd72e8ff242425db6.dbn.zst",
+        "bytes": 1953,
+        "quoted_usd": 0.0,
+        "sha256": "76dac874f6d854dcce2e0431e69ebfc790946d0b5bc59027cd20e0c5a5370353"
+      },
+      {
+        "path": "raw/databento/XNYS.PILLAR/ohlcv-1s/sessions/b9f6884224a4260d5312d605.dbn.zst",
+        "bytes": 763,
+        "quoted_usd": 0.0,
+        "sha256": "fe658f580b08262233703cebb7cc29dea8f3d53d596c08bceab285ac12d32e73"
+      },
+      {
+        "path": "raw/databento/XNYS.PILLAR/ohlcv-1s/sessions/c8940520ef4a806237f36e6a.dbn.zst",
+        "bytes": 778,
+        "quoted_usd": 0.0,
+        "sha256": "071a3370ce521cb8c14b9b92e0e4419f383df6b5ec2fa19c161dcfb2609cf478"
+      },
+      {
+        "path": "raw/databento/XNYS.PILLAR/ohlcv-1s/sessions/ce32be9ae96f59920de51928.dbn.zst",
+        "bytes": 694,
+        "quoted_usd": 0.0,
+        "sha256": "e7d5186a83d4ce77723471e2967826973bed665bbaf8c55bc442d800a9c02272"
+      },
+      {
+        "path": "raw/databento/XNYS.PILLAR/ohlcv-1s/sessions/d23fa1a046d3487a1b3845bd.dbn.zst",
+        "bytes": 10610,
+        "quoted_usd": 0.0,
+        "sha256": "e69df312b876653951aad98039c591a43ebf664353126ded61b224752007729c"
+      },
+      {
+        "path": "raw/databento/XNYS.PILLAR/ohlcv-1s/sessions/d2d10e222d1e928d7daba738.dbn.zst",
+        "bytes": 11114,
+        "quoted_usd": 0.0,
+        "sha256": "6687eb6f627bd0dc656959efd4a51a3ea053d7b5c9e432cc1376957ff4c46f5e"
+      },
+      {
+        "path": "raw/databento/XNYS.PILLAR/ohlcv-1s/sessions/d735a2bd566488ebdd6b625f.dbn.zst",
+        "bytes": 7252,
+        "quoted_usd": 0.0,
+        "sha256": "2e4bb1dfcc7e1baef292e84b48502ddd0645153e9fa1a7229ae795e4f852081c"
+      },
+      {
+        "path": "raw/databento/XNYS.PILLAR/ohlcv-1s/sessions/da7f7b1ef16225e2f0a0d66c.dbn.zst",
+        "bytes": 4430,
+        "quoted_usd": 0.0,
+        "sha256": "018a6214b31ef43d22fa3167d7e4bfd05d603f6efcf97a25d7300a2a00323f00"
+      },
+      {
+        "path": "raw/databento/XNYS.PILLAR/ohlcv-1s/sessions/dcd8017eae45763c55e19d22.dbn.zst",
+        "bytes": 984,
+        "quoted_usd": 0.0,
+        "sha256": "bf762ad5c439692ca750c3658927b9fb3701f9bc493ce99dfbcc014e0c085fb3"
+      },
+      {
+        "path": "raw/databento/XNYS.PILLAR/ohlcv-1s/sessions/dd440a1fe839b1f9ec788a42.dbn.zst",
+        "bytes": 54090,
+        "quoted_usd": 0.0,
+        "sha256": "46f51eff28dfc2d563e8d07440ae8b4c7381a91b5a796e68d568990f4b9c9384"
+      },
+      {
+        "path": "raw/databento/XNYS.PILLAR/ohlcv-1s/sessions/e042745705467477765db2c0.dbn.zst",
+        "bytes": 3107,
+        "quoted_usd": 0.0,
+        "sha256": "259a38b838ec749caeb0bc460f80f2dc97ee5aebc6d590f09ec812000b9d7417"
+      },
+      {
+        "path": "raw/databento/XNYS.PILLAR/ohlcv-1s/sessions/e1e2da10caff456661408fbf.dbn.zst",
+        "bytes": 510,
+        "quoted_usd": 0.0,
+        "sha256": "608644d182a7de2041a1814891cbf76352f28412d1509f52238b689329fd75a2"
+      },
+      {
+        "path": "raw/databento/XNYS.PILLAR/ohlcv-1s/sessions/e5c9dacf3be5b7e6b283d0af.dbn.zst",
+        "bytes": 4770,
+        "quoted_usd": 0.0,
+        "sha256": "9ab6ae602fb3cac828cdd9d9958c2af7bd30a36230821e20f120c9e3522f36b5"
+      },
+      {
+        "path": "raw/databento/XNYS.PILLAR/ohlcv-1s/sessions/e948941244eebe45bd16ef21.dbn.zst",
+        "bytes": 5784,
+        "quoted_usd": 0.0,
+        "sha256": "ba3d410a8895c0adeaf8751af6d82bd1bbb22a61e03056af11060f8d51d3e5da"
+      },
+      {
+        "path": "raw/databento/XNYS.PILLAR/ohlcv-1s/sessions/f494a131150724efa8e9309a.dbn.zst",
+        "bytes": 1712,
+        "quoted_usd": 0.0,
+        "sha256": "4a0404a17fd9fc51d823b281d6a511e6a16a8e6d177a2d5dc140b7bf908a0d52"
+      },
+      {
+        "path": "raw/databento/XNYS.PILLAR/ohlcv-1s/sessions/f54f5e201741479a104af4bd.dbn.zst",
+        "bytes": 1652,
+        "quoted_usd": 0.0,
+        "sha256": "3c5e99a99556397627d9d41791fdf93a5b6a42b66d75268af759df914243f128"
+      },
+      {
+        "path": "raw/databento/XNYS.PILLAR/ohlcv-1s/sessions/f8275f6df1bf53edf6e399ab.dbn.zst",
+        "bytes": 818,
+        "quoted_usd": 0.0,
+        "sha256": "01b78f189acd99391cada5c52c417da3b8c7485e82862afdd25c3c71df80ee03"
+      },
+      {
+        "path": "raw/databento/XNYS.PILLAR/ohlcv-1s/sessions/f90106b7bffbd1769ca5d261.dbn.zst",
+        "bytes": 1175,
+        "quoted_usd": 0.0,
+        "sha256": "232f0d4ddc4bb8262eb264ff6d38e8ce62880f3a12008b22908b3a6d72b9dd27"
+      },
+      {
+        "path": "raw/databento/XNYS.PILLAR/ohlcv-1s/sessions/fbfba219e383ac522d53b043.dbn.zst",
+        "bytes": 8478,
+        "quoted_usd": 0.0,
+        "sha256": "281dd30229a25c9da2909f716752bb0cad910aee802562778f67f8c27f1a66b3"
+      },
+      {
+        "path": "raw/databento/XNYS.PILLAR/ohlcv-1s/sessions/fd3e05289e98e3562adcbb1e.dbn.zst",
+        "bytes": 9894,
+        "quoted_usd": 0.0,
+        "sha256": "87425c539a9a885272a9c95931690447edeb7f18a1afed4d23d5d199367d48a7"
+      },
+      {
+        "path": "raw/databento/XNYS.PILLAR/ohlcv-1s/sessions/fd9a29d1adf10e44df9552af.dbn.zst",
+        "bytes": 691,
+        "quoted_usd": 0.0,
+        "sha256": "cca980b0c5bc5fb1d9942d8edbb7eaf1407c4a7c838d09aa6e3c9d3dd85b694c"
+      },
+      {
+        "path": "raw/databento/XNYS.PILLAR/ohlcv-1s/sessions/fdda7798e75ee7d2e2b0a7d0.dbn.zst",
+        "bytes": 8578,
+        "quoted_usd": 0.0,
+        "sha256": "e7a32eefc0b43cfea62185cec94ec61e6cdf9664254ee5b407cafb83924f3a52"
+      },
+      {
+        "path": "raw/databento/XNYS.PILLAR/ohlcv-1s/sessions/fdeff8edede521b80f5cba89.dbn.zst",
+        "bytes": 4007,
+        "quoted_usd": 0.0,
+        "sha256": "e57aa31b2081fb9bf1dd2f72deb9059fb921b61386d39c14804e41b667770b49"
+      }
+    ]
+  },
+  "holdout": {
+    "path": "local/holdout/execution_realism_holdout.json",
+    "sha256": "8a6b867c63b6bd4552604ba21fb8a26fe7e434d60fe2cc1f2b79cd474a76fae4",
+    "sealed": true
+  },
+  "raw_market_data_public": false
+}

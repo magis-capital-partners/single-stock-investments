@@ -1,4 +1,4 @@
-# ARM — Insider conviction (2026-10-17)
+# ARM — Insider conviction (2026-10-18)
 
 > Context only. Insider activity informs scenario confidence and stance discussion; it does not auto-inflate Lawrence base IRR. Promotion requires [HUMAN REVIEW].
 
@@ -12,7 +12,7 @@
 
 | Insider | Date | Shares | Price | Value | Contrib |
 |---------|------|--------|-------|-------|---------|
-| Haas Rene A. | 2026-08-31 | 64 | $108.33 | $6933.12 | 0.782 |
+| Haas Rene A. | 2026-08-31 | 64 | $108.33 | $6933.12 | 0.775 |
 
 **Routine / planned sales (context):**
 

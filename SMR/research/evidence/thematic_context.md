@@ -1,4 +1,4 @@
-# SMR - Thematic context (2026-10-17)
+# SMR - Thematic context (2026-10-18)
 
 > Context only. Tailwinds inform stance and overlay sizing; they do not auto-inflate Lawrence base IRR. Promotion to base case requires [HUMAN REVIEW].
 
@@ -14,7 +14,7 @@
 | AGI expert-horizon years ahead (public quotes) | 5.0 | 2026-06-01 | +0.0% | flat | no (context) |
 | Robotaxi expert-horizon years ahead (public quotes) | 2.0 | 2026-06-01 | +0.0% | flat | no (context) |
 | URA uranium miners ETF (USD) | 35.43000030517578 | 2026-10-16 | -36.4% | down | no (context) |
-| Hyperscaler capex guide (USD bn, latest) | 467.3 | 2026-10-17 | n/a | flat | no (context) |
+| Hyperscaler capex guide (USD bn, latest) | 467.3 | 2026-10-18 | n/a | flat | no (context) |
 | US urban residential electricity price (USD/kWh) | 0.196 (stale) | 2026-08-01 | +3.2% | up | no (context) |
 | AGI expert-horizon years ahead (public quotes) | 5.0 | 2026-06-01 | +0.0% | flat | no (context) |
 

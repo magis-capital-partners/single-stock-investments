@@ -1,8 +1,8 @@
-# BLK — Insider conviction (2026-10-17)
+# BLK — Insider conviction (2026-10-18)
 
 > Context only. Insider activity informs scenario confidence and stance discussion; it does not auto-inflate Lawrence base IRR. Promotion requires [HUMAN REVIEW].
 
-**ICS:** 5.83 (moderate) · **Bull case support:** moderate
+**ICS:** 5.81 (moderate) · **Bull case support:** moderate
 
 | Scenario | Prior weight | Tilted weight |
 |----------|--------------|---------------|
@@ -12,7 +12,7 @@
 
 | Insider | Date | Shares | Price | Value | Contrib |
 |---------|------|--------|-------|-------|---------|
-| Meade Christopher J. | 2026-07-16 | 18095 | $513.5 | $9291782.5 | 1.586 |
+| Meade Christopher J. | 2026-07-16 | 18095 | $513.5 | $9291782.5 | 1.573 |
 | Goldstein Robert L. | 2026-02-10 | 54190 | $513.5 | $27826565.0 | 1.549 |
 | Small Martin | 2026-01-16 | 27047 | $513.5 | $13888634.5 | 1.549 |
 | Kushel J. Richard | 2026-01-21 | 20000 | $513.5 | $10270000.0 | 1.385 |

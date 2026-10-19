@@ -1,8 +1,8 @@
-# AMCR — Insider conviction (2026-10-17)
+# AMCR — Insider conviction (2026-10-18)
 
 > Context only. Insider activity informs scenario confidence and stance discussion; it does not auto-inflate Lawrence base IRR. Promotion requires [HUMAN REVIEW].
 
-**ICS:** 8.89 (exceptional) · **Bull case support:** moderate
+**ICS:** 8.87 (exceptional) · **Bull case support:** moderate
 
 | Scenario | Prior weight | Tilted weight |
 |----------|--------------|---------------|
@@ -12,7 +12,7 @@
 
 | Insider | Date | Shares | Price | Value | Contrib |
 |---------|------|--------|-------|-------|---------|
-| Scherger Stephen R. | 2026-09-15 | 1851 | $42.25 | $78204.75 | 1.982 |
+| Scherger Stephen R. | 2026-09-15 | 1851 | $42.25 | $78204.75 | 1.965 |
 | Konieczny Peter | 2025-11-10 | 60000 | $8.41 | $504600.0 | 1.529 |
 | Glerum James T Jr. | 2025-11-10 | 59808 | $8.34 | $498798.72 | 1.377 |
 | Wilson Ian | 2025-11-10 | 79000 | $8.35 | $659650.0 | 1.19 |

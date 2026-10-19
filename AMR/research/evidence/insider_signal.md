@@ -1,4 +1,4 @@
-# AMR — Insider conviction (2026-10-17)
+# AMR — Insider conviction (2026-10-18)
 
 > Context only. Insider activity informs scenario confidence and stance discussion; it does not auto-inflate Lawrence base IRR. Promotion requires [HUMAN REVIEW].
 
@@ -12,11 +12,11 @@
 
 | Insider | Date | Shares | Price | Value | Contrib |
 |---------|------|--------|-------|-------|---------|
-| Courtis Kenneth S. | 2026-09-08 | 2891 | $226.92 | $656025.72 | 2.355 |
-| Courtis Kenneth S. | 2026-09-08 | 2749 | $226.13 | $621631.37 | 2.351 |
-| Courtis Kenneth S. | 2026-09-08 | 2109 | $225.21 | $474967.89 | 2.331 |
-| Courtis Kenneth S. | 2026-09-08 | 1847 | $223.85 | $413450.95 | 2.323 |
-| Gorzynski Michael | 2026-08-21 | 10000 | $208.9169 | $2089169.0 | 2.26 |
+| Courtis Kenneth S. | 2026-09-08 | 2891 | $226.92 | $656025.72 | 2.335 |
+| Courtis Kenneth S. | 2026-09-08 | 2749 | $226.13 | $621631.37 | 2.331 |
+| Courtis Kenneth S. | 2026-09-08 | 2109 | $225.21 | $474967.89 | 2.312 |
+| Courtis Kenneth S. | 2026-09-08 | 1847 | $223.85 | $413450.95 | 2.304 |
+| Gorzynski Michael | 2026-08-21 | 10000 | $208.9169 | $2089169.0 | 2.241 |
 
 **Routine / planned sales (context):**
 

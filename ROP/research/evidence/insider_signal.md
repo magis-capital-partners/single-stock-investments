@@ -1,8 +1,8 @@
-# ROP — Insider conviction (2026-10-17)
+# ROP — Insider conviction (2026-10-18)
 
 > Context only. Insider activity informs scenario confidence and stance discussion; it does not auto-inflate Lawrence base IRR. Promotion requires [HUMAN REVIEW].
 
-**ICS:** 9.38 (exceptional) · **Bull case support:** moderate
+**ICS:** 9.36 (exceptional) · **Bull case support:** moderate
 
 | Scenario | Prior weight | Tilted weight |
 |----------|--------------|---------------|
@@ -20,8 +20,8 @@
 
 **Routine / planned sales (context):**
 
-- Stipancich John K: 2000 @ $379.05 on 2026-07-27
 - Conley Jason: 3065 @ $353.87 on 2026-03-10
+- Stipancich John K: 2000 @ $379.05 on 2026-07-27
 - WALLMAN RICHARD F: 6434 @ $361.0 on 2026-07-24
 
 Source: `_system/reference/market-data/insider/ROP_transactions.csv`.

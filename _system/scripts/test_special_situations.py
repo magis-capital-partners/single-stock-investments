@@ -274,7 +274,7 @@ class SpecialSituationTests(unittest.TestCase):
         self.assertEqual(payload["schema_version"], "special_situations.v1")
         self.assertEqual(
             [lane["id"] for lane in payload["lanes"]],
-            ["spinoffs", "split_offs", "mergers", "warrants", "restructurings", "forced_sellers"],
+            ["spinoffs", "split_offs", "mergers", "warrants", "restructurings", "forced_sellers", "buyback_events"],
         )
         self.assertIsNone(payload["rows"][0]["annualized_spread"] if payload["rows"] else None)
 

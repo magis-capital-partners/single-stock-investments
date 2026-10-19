@@ -20,7 +20,7 @@ from zoneinfo import ZoneInfo
 
 from .config import load_config
 from .ledger import load_jsonl, read_json, write_json
-from .net_edge import FRAMEWORKS, moment
+from .net_edge import moment
 from .net_edge_evidence import (capitalization, digest, fetch_missing_companyfacts,
                                 filing_rating, prospective_status, validate_import)
 from .net_edge_v3 import (VERSION, Account, StudyPolicy, assessment, calibration,
@@ -348,7 +348,8 @@ def recalled_outcome(candidate, records):
 
 
 def simulate(candidates, policy, account, sessions, store, evidence, *, variant,
-             keep_daily=False, start_day="2018-05-01", end_day="2026-10-13", entry_end_day=None):
+             keep_daily=False, start_day="2018-05-01", end_day="2026-10-13", entry_end_day=None,
+             entry_ranking="forecast"):
     from .net_edge_v3 import issuer_borrow
     by_day, positions, pending, ledger, journal, daily = defaultdict(list), [], [], [], [], []
     for c in candidates:
@@ -375,8 +376,9 @@ def simulate(candidates, policy, account, sessions, store, evidence, *, variant,
             return p["shares"]*factor*maintenance_per_share(mark/factor)
         used_margin = sum(margin(p, p["last_mark"]) for p in positions)
         used_stress = sum(p["shares"]*p["last_mark"]*p["size"]["stress_fraction"] for p in positions)
-        day_entries = sorted(by_day.get(day, []) if not entry_end_day or day <= entry_end_day else [],
-                             key=lambda c: (-(c["forecast"].get("gross_lower_bound") or -1), c["snapshot"]["key"]))
+        if entry_ranking not in {"forecast", "prior_liquidity"}: raise ValueError("Unknown entry ranking")
+        rank = (lambda c: (-(c["outcome"].get("prior_adv") or 0)*(c["outcome"].get("entry_price") or 0), c["snapshot"]["key"])) if entry_ranking == "prior_liquidity" else (lambda c: (-(c["forecast"].get("gross_lower_bound") or -1), c["snapshot"]["key"]))
+        day_entries = sorted(by_day.get(day, []) if not entry_end_day or day <= entry_end_day else [], key=rank)
         for candidate in day_entries:
             s, o, f = candidate["snapshot"], candidate["outcome"], candidate["forecast"]
             reason = None
@@ -468,7 +470,10 @@ def simulate(candidates, policy, account, sessions, store, evidence, *, variant,
         positions = still_open
         nav = cash-sum(p["shares"]*p["last_mark"] for p in positions)
         nav_high = max(nav_high, nav); maximum_dd = min(maximum_dd, nav/nav_high-1)
-        daily.append({"date": day, "equity": nav, "open_names": len(positions)})
+        daily.append({"date": day, "equity": nav, "open_names": len(positions),
+                      **({"joint_high_equity_bound": stress_nav, "joint_high_margin_bound": stress_margin,
+                          "gross_close": sum(p["shares"]*p["last_mark"] for p in positions),
+                          "entries": sum(r.get("shares", 0) > 0 for r in journal if r["date"] == day)} if keep_daily else {})})
         old_day = day
     # Include already-incurred return-settlement liabilities after the sample end.
     ending = daily[-1]["equity"]-sum(r["amount"] for r in pending)

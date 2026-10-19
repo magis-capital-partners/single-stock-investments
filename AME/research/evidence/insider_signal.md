@@ -1,4 +1,4 @@
-# AME — Insider conviction (2026-10-17)
+# AME — Insider conviction (2026-10-18)
 
 > Context only. Insider activity informs scenario confidence and stance discussion; it does not auto-inflate Lawrence base IRR. Promotion requires [HUMAN REVIEW].
 
@@ -12,7 +12,7 @@
 
 | Insider | Date | Shares | Price | Value | Contrib |
 |---------|------|--------|-------|-------|---------|
-| Stanage Nick L | 2026-08-11 | 4000 | $255.85 | $1023400.0 | 3.218 |
+| Stanage Nick L | 2026-08-11 | 4000 | $255.85 | $1023400.0 | 3.192 |
 | Puri Dalip | 2026-03-18 | 3780 | $212.77 | $804270.6 | 1.686 |
 | AMATO THOMAS A | 2026-03-18 | 950 | $212.77 | $202131.5 | 1.671 |
 | Stefany Suzanne | 2026-03-18 | 950 | $212.77 | $202131.5 | 1.67 |

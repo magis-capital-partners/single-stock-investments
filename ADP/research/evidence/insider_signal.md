@@ -1,22 +1,22 @@
-# ADP — Insider conviction (2026-10-17)
+# ADP — Insider conviction (2026-10-18)
 
 > Context only. Insider activity informs scenario confidence and stance discussion; it does not auto-inflate Lawrence base IRR. Promotion requires [HUMAN REVIEW].
 
-**ICS:** 9.8 (exceptional) · **Bull case support:** moderate
+**ICS:** 9.77 (exceptional) · **Bull case support:** moderate
 
 | Scenario | Prior weight | Tilted weight |
 |----------|--------------|---------------|
 | Bear | 20% | 20% |
-| Base | 55% | 40% |
-| Bull | 25% | 40% |
+| Base | 55% | 41% |
+| Bull | 25% | 39% |
 
 | Insider | Date | Shares | Price | Value | Contrib |
 |---------|------|--------|-------|-------|---------|
 | SWAN ROBERT HOLMES | 2026-05-07 | 3619 | $206.05 | $745694.95 | 1.721 |
-| Kwon David | 2026-08-20 | 967 | $169.84 | $164235.28 | 1.494 |
-| Kwon David | 2026-07-30 | 887 | $138.53 | $122876.11 | 1.218 |
+| Kwon David | 2026-08-20 | 967 | $169.84 | $164235.28 | 1.482 |
+| Kwon David | 2026-07-30 | 887 | $138.53 | $122876.11 | 1.207 |
 | Kwon David | 2026-01-06 | 1137 | $138.53 | $157508.61 | 1.12 |
-| Kwon David | 2026-07-31 | 250 | $138.53 | $34632.5 | 0.88 |
+| Kwon David | 2026-07-31 | 250 | $138.53 | $34632.5 | 0.873 |
 
 **Routine / planned sales (context):**
 

@@ -1,4 +1,4 @@
-# APH — Insider conviction (2026-10-17)
+# APH — Insider conviction (2026-10-18)
 
 > Context only. Insider activity informs scenario confidence and stance discussion; it does not auto-inflate Lawrence base IRR. Promotion requires [HUMAN REVIEW].
 
@@ -12,10 +12,10 @@
 
 | Insider | Date | Shares | Price | Value | Contrib |
 |---------|------|--------|-------|-------|---------|
-| Silverman David M | 2026-08-05 | 120000 | $21.995 | $2639400.0 | 1.874 |
-| Lampo Craig A | 2026-08-04 | 193200 | $22.3725 | $4322367.0 | 1.858 |
-| D'AMICO LANCE E | 2026-08-03 | 50000 | $22.5525 | $1127625.0 | 1.821 |
-| NORWITT RICHARD ADAM | 2026-07-31 | 500000 | $22.3725 | $11186250.0 | 1.57 |
+| Silverman David M | 2026-08-05 | 120000 | $21.995 | $2639400.0 | 1.858 |
+| Lampo Craig A | 2026-08-04 | 193200 | $22.3725 | $4322367.0 | 1.843 |
+| D'AMICO LANCE E | 2026-08-03 | 50000 | $22.5525 | $1127625.0 | 1.806 |
+| NORWITT RICHARD ADAM | 2026-07-31 | 500000 | $22.3725 | $11186250.0 | 1.557 |
 | Lampo Craig A | 2025-11-11 | 300000 | $21.995 | $6598500.0 | 1.549 |
 
 **Routine / planned sales (context):**

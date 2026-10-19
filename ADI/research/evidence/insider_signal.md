@@ -1,4 +1,4 @@
-# ADI — Insider conviction (2026-10-17)
+# ADI — Insider conviction (2026-10-18)
 
 > Context only. Insider activity informs scenario confidence and stance discussion; it does not auto-inflate Lawrence base IRR. Promotion requires [HUMAN REVIEW].
 
@@ -12,9 +12,9 @@
 
 | Insider | Date | Shares | Price | Value | Contrib |
 |---------|------|--------|-------|-------|---------|
-| ROCHE VINCENT | 2026-10-01 | 10000 | $108.08 | $1080800.0 | 2.981 |
-| ROCHE VINCENT | 2026-09-01 | 10000 | $108.08 | $1080800.0 | 2.282 |
-| ROCHE VINCENT | 2026-08-03 | 10000 | $108.08 | $1080800.0 | 1.788 |
+| ROCHE VINCENT | 2026-10-01 | 10000 | $108.08 | $1080800.0 | 2.957 |
+| ROCHE VINCENT | 2026-09-01 | 10000 | $108.08 | $1080800.0 | 2.263 |
+| ROCHE VINCENT | 2026-08-03 | 10000 | $108.08 | $1080800.0 | 1.773 |
 | ROCHE VINCENT | 2026-05-26 | 30000 | $144.06 | $4321800.0 | 1.697 |
 | ROCHE VINCENT | 2026-05-22 | 30000 | $144.06 | $4321800.0 | 1.697 |
 

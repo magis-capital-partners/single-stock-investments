@@ -1,4 +1,4 @@
-# AMRZ — Insider conviction (2026-10-17)
+# AMRZ — Insider conviction (2026-10-18)
 
 > Context only. Insider activity informs scenario confidence and stance discussion; it does not auto-inflate Lawrence base IRR. Promotion requires [HUMAN REVIEW].
 
@@ -12,11 +12,11 @@
 
 | Insider | Date | Shares | Price | Value | Contrib |
 |---------|------|--------|-------|-------|---------|
-| Sanche Jacques Wolf | 2026-08-26 | 4150 | $45.02 | $186833.0 | 2.703 |
-| Singleton Denise R | 2026-08-25 | 3500 | $44.115 | $154402.5 | 2.409 |
-| Clark Stephen S | 2026-08-11 | 5260 | $47.31 | $248850.6 | 2.27 |
-| Jenisch Jan Philipp | 2026-09-02 | 15000 | $42.53 | $637950.0 | 2.188 |
-| Oran Baris | 2026-08-12 | 3000 | $47.13 | $141390.0 | 2.171 |
+| Sanche Jacques Wolf | 2026-08-26 | 4150 | $45.02 | $186833.0 | 2.68 |
+| Singleton Denise R | 2026-08-25 | 3500 | $44.115 | $154402.5 | 2.389 |
+| Clark Stephen S | 2026-08-11 | 5260 | $47.31 | $248850.6 | 2.251 |
+| Jenisch Jan Philipp | 2026-09-02 | 15000 | $42.53 | $637950.0 | 2.17 |
+| Oran Baris | 2026-08-12 | 3000 | $47.13 | $141390.0 | 2.153 |
 
 **Routine / planned sales (context):**
 

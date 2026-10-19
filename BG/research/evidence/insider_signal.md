@@ -1,4 +1,4 @@
-# BG — Insider conviction (2026-10-17)
+# BG — Insider conviction (2026-10-18)
 
 > Context only. Insider activity informs scenario confidence and stance discussion; it does not auto-inflate Lawrence base IRR. Promotion requires [HUMAN REVIEW].
 
@@ -12,9 +12,9 @@
 
 | Insider | Date | Shares | Price | Value | Contrib |
 |---------|------|--------|-------|-------|---------|
-| Mahoney Christopher | 2026-07-31 | 5000 | $105.53 | $527650.0 | 1.902 |
-| HECKMAN GREGORY A | 2026-09-01 | 992 | $119.25 | $118296.0 | 1.681 |
-| Mahoney Christopher | 2026-08-04 | 1500 | $107.6 | $161400.0 | 1.524 |
+| Mahoney Christopher | 2026-07-31 | 5000 | $105.53 | $527650.0 | 1.886 |
+| HECKMAN GREGORY A | 2026-09-01 | 992 | $119.25 | $118296.0 | 1.667 |
+| Mahoney Christopher | 2026-08-04 | 1500 | $107.6 | $161400.0 | 1.512 |
 | HECKMAN GREGORY A | 2026-06-01 | 927 | $126.92 | $117654.84 | 1.381 |
 | Garros Julio | 2026-02-11 | 6500 | $50.07 | $325455.0 | 1.134 |
 

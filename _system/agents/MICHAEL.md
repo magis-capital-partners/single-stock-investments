@@ -82,7 +82,7 @@ Books do not go through `make letter-import-drive`.
 python _system/scripts/drive_intake_drop.py --kind VIC --ticker TPL path\to\writeup.pdf
 ```
 
-3. Leave it. The Data Pipeline scans Drive daily at 14:00 UTC, writes a `.source.json` sidecar, stages VIC into `research-vault/vic-research/{TICKER}/`, and rebuilds insights/dashboard data when files import.
+3. Leave it. The Data Pipeline scans Drive daily at 14:41 UTC, writes a `.source.json` sidecar, stages VIC into `research-vault/vic-research/{TICKER}/`, and rebuilds insights/dashboard data when files import.
 4. Ambiguous files stay in Drive and show up in the Drive job summary and `_system/reference/document-store/drive_intake_latest.json`. Do not guess a ticker.
 
 ## After every add
