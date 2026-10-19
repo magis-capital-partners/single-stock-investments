@@ -54,9 +54,6 @@ re_pass: false
 | Classification IRR | n/a | 8.8% | — |
 | Valuation bridge base | n/a | None% | — |
 
-**Lint notes:**
-- CSCO/research: adversarial date adversarial_2026-10-17.md != dive 2026-10-18
-
 ---
 
 ## Disclosure scan
