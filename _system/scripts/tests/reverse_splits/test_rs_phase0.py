@@ -25,9 +25,10 @@ def _registry_rows(declared_at: str, hid: str = "H1") -> list[dict]:
 
 def test_registry_is_valid_and_complete():
     rows = load_jsonl(REGISTRY)
-    assert [r["id"] for r in rows] == [f"H{i}" for i in range(1, 18)]
+    assert [r["id"] for r in rows] == [f"H{i}" for i in range(1, 20)]
     assert hyp.registry_errors(rows) == []
-    assert all(r["declared_in"].endswith("shorts_alpha_program_2026-10-18.md") for r in rows)
+    assert all(r["declared_in"].endswith("shorts_alpha_program_2026-10-18.md") for r in rows[:17])
+    assert all("README.md" in r["declared_in"] for r in rows[17:])   # H18/H19: the free-data redesign of H2/H3
     assert {r["family"] for r in rows} >= {"split", "fade", "financing", "notice", "conditioning", "fee", "portfolio"}
 
 
