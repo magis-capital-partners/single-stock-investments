@@ -1096,3 +1096,40 @@ equity charge. The +200% squeeze reserve adds price loss to post-shock margin
 under a 200% house requirement. This is neither a worst possible loss nor
 Michael's actual available excess liquidity. All published statistics are
 conditional research; none changes a strategy threshold or order permission.
+
+### Matched execution-cost audit (2026-10-19)
+
+`_system/scripts/short_execution_audit.py` verifies the frozen books, decision
+points, path index and each of 671 cached path files before comparing listing
+and observed multi-venue quotes at identical decision times. It separately
+sweeps the same original share quantity through entry and cover depth at
+$500/$25k/$50k/$100k. Spread, additional depth, commissions and timing relative
+to the auction benchmark reconcile to the exact price-P&L shortfall.
+
+`dashboard/data/short_execution_audit.json` publishes aggregates only; the
+generated `execution_cost_audit_2026-10-19.md` reports the comparisons. Static
+book support is not a broker fill. Unsupported quantities remain coverage gaps;
+cost summaries condition on both legs fitting the displayed books, so different
+size rows have different surviving samples. A common-support table holds the
+same events fixed and explicitly identifies that hindsight selection.
+
+Rebuild using the existing licensed local cache:
+
+```text
+python _system/scripts/short_execution_audit.py --source-root /path/to/local/repo --local-out /path/to/local/execution_cost_audit/20261019_v1 --out dashboard/data/short_execution_audit.json --report _system/data/reverse_splits/execution_cost_audit_2026-10-19.md --collect-nbbo
+```
+
+The local acquisition plan defines 4,000 entry/exit windows for the five
+holding periods, including 595 windows for 100 events selected deterministically
+by year, listing venue and prior liquidity, without return outcomes. Multi-day
+historical exit symbols require confirmation before collection. The optional
+Massive collector uses an existing licensed environment key, bounded requests,
+safe pagination, local-only raw records and SIP timestamps for as-of quote
+selection. Provider denials stop collection. No purchases, subscription upgrades,
+broker connections, ThetaData calls or trades occur. As published, no key was
+configured: verified NBBO pairs and actual broker fills are both zero.
+
+The dashboard shows these findings inside execution evidence. Its 90 sleeve
+scenarios retain the legacy costs as sensitivities: neither the conditional
+supported-order means nor the available-venue touch spread is substituted for
+the missing full-population, size-dependent, multi-session execution costs.

@@ -44,7 +44,11 @@ test('cached selection cannot be overwritten by a previous simulation or error',
   const source=fs.readFileSync(path.join(__dirname,'../../../dashboard/short-sleeve-viz.js'),'utf8');
   vm.runInNewContext(source,sandbox);
   const doc=JSON.parse(fs.readFileSync(path.join(__dirname,'../../../dashboard/data/short_sleeve.json'),'utf8'));
+  doc.execution_audit=JSON.parse(fs.readFileSync(path.join(__dirname,'../../../dashboard/data/short_execution_audit.json'),'utf8'));
   sandbox.window.ShortSleeveViz.mount(host,doc);
+  assert.match(host.innerHTML,/Latest execution audit/);
+  assert.match(host.innerHTML,/126 \/ 282/);
+  assert.match(host.innerHTML,/not validated by this audit/);
   const results=Object.fromEntries(['bear','base','bull'].map(id=>[id,{trials:10,cagr:{p50:.01},
     max_drawdown:{p95:.02},loss_probability:.1,ruin_probability:0,
     peak_margin:{p95:.01},peak_collateral:{p95:.011},fan:[]} ]));
