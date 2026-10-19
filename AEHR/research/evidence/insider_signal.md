@@ -1,4 +1,4 @@
-# AEHR — Insider conviction (2026-10-18)
+# AEHR — Insider conviction (2026-10-19)
 
 > Context only. Insider activity informs scenario confidence and stance discussion; it does not auto-inflate Lawrence base IRR. Promotion requires [HUMAN REVIEW].
 
@@ -12,11 +12,11 @@
 
 | Insider | Date | Shares | Price | Value | Contrib |
 |---------|------|--------|-------|-------|---------|
-| Siu Chris | 2026-10-01 | 1089 | $6.6725 | $7266.35 | 1.686 |
-| SPORCK ALISTAIR N | 2026-10-01 | 1221 | $6.6725 | $8147.12 | 1.564 |
-| ENGINEER ADIL | 2026-08-12 | 15000 | $9.45 | $141750.0 | 1.439 |
-| WIMMERS DIDIER | 2026-10-01 | 1311 | $6.6725 | $8747.65 | 1.379 |
-| SALAMONE ALBERTO | 2026-10-01 | 1512 | $6.6725 | $10088.82 | 1.16 |
+| Siu Chris | 2026-10-01 | 1089 | $6.6725 | $7266.35 | 1.672 |
+| SPORCK ALISTAIR N | 2026-10-01 | 1221 | $6.6725 | $8147.12 | 1.551 |
+| ENGINEER ADIL | 2026-08-12 | 15000 | $9.45 | $141750.0 | 1.427 |
+| WIMMERS DIDIER | 2026-10-01 | 1311 | $6.6725 | $8747.65 | 1.368 |
+| SALAMONE ALBERTO | 2026-10-01 | 1512 | $6.6725 | $10088.82 | 1.151 |
 
 **Routine / planned sales (context):**
 

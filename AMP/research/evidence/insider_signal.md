@@ -1,4 +1,4 @@
-# AMP — Insider conviction (2026-10-18)
+# AMP — Insider conviction (2026-10-19)
 
 > Context only. Insider activity informs scenario confidence and stance discussion; it does not auto-inflate Lawrence base IRR. Promotion requires [HUMAN REVIEW].
 
@@ -12,11 +12,11 @@
 
 | Insider | Date | Shares | Price | Value | Contrib |
 |---------|------|--------|-------|-------|---------|
-| CRACCHIOLO JAMES M | 2026-07-28 | 52932 | $165.41 | $8755482.12 | 2.073 |
-| Berman Walter Stanley | 2026-07-28 | 10905 | $165.41 | $1803796.05 | 1.738 |
-| Berman Walter Stanley | 2026-07-28 | 23206 | $197.87 | $4591771.22 | 1.738 |
-| Williams William Jerryl | 2026-07-28 | 10948 | $165.41 | $1810908.68 | 1.545 |
-| McGraw Deirdre Davey | 2026-08-06 | 1000 | $298.09 | $298090.0 | 1.36 |
+| CRACCHIOLO JAMES M | 2026-07-28 | 52932 | $165.41 | $8755482.12 | 2.056 |
+| Berman Walter Stanley | 2026-07-28 | 10905 | $165.41 | $1803796.05 | 1.724 |
+| Berman Walter Stanley | 2026-07-28 | 23206 | $197.87 | $4591771.22 | 1.724 |
+| Williams William Jerryl | 2026-07-28 | 10948 | $165.41 | $1810908.68 | 1.532 |
+| McGraw Deirdre Davey | 2026-08-06 | 1000 | $298.09 | $298090.0 | 1.349 |
 
 **Routine / planned sales (context):**
 

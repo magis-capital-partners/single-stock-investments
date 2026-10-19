@@ -1,4 +1,4 @@
-# AMKR — Insider conviction (2026-10-18)
+# AMKR — Insider conviction (2026-10-19)
 
 > Context only. Insider activity informs scenario confidence and stance discussion; it does not auto-inflate Lawrence base IRR. Promotion requires [HUMAN REVIEW].
 
@@ -12,11 +12,11 @@
 
 | Insider | Date | Shares | Price | Value | Contrib |
 |---------|------|--------|-------|-------|---------|
-| ALEXANDER DOUGLAS A | 2026-10-02 | 5000 | $8.51 | $42550.0 | 2.217 |
-| KIM JAMES J | 2026-07-20 | 200000 | $9.86 | $1972000.0 | 1.445 |
-| KIM JAMES J | 2026-07-20 | 250000 | $9.48 | $2370000.0 | 1.441 |
+| ALEXANDER DOUGLAS A | 2026-10-02 | 5000 | $8.51 | $42550.0 | 2.198 |
+| KIM JAMES J | 2026-07-20 | 200000 | $9.86 | $1972000.0 | 1.433 |
+| KIM JAMES J | 2026-07-20 | 250000 | $9.48 | $2370000.0 | 1.429 |
 | Carolin Roger Anthony | 2026-05-05 | 20000 | $11.71 | $234200.0 | 1.428 |
-| ALEXANDER DOUGLAS A | 2026-08-07 | 5000 | $8.51 | $42550.0 | 1.39 |
+| ALEXANDER DOUGLAS A | 2026-08-07 | 5000 | $8.51 | $42550.0 | 1.379 |
 
 **Routine / planned sales (context):**
 

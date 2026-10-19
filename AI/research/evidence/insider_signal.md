@@ -1,4 +1,4 @@
-# AI — Insider conviction (2026-10-18)
+# AI — Insider conviction (2026-10-19)
 
 > Context only. Insider activity informs scenario confidence and stance discussion; it does not auto-inflate Lawrence base IRR. Promotion requires [HUMAN REVIEW].
 
@@ -12,10 +12,10 @@
 
 | Insider | Date | Shares | Price | Value | Contrib |
 |---------|------|--------|-------|-------|---------|
-| SIEBEL THOMAS M | 2026-10-13 | 435363 | $3.9 | $1697915.7 | 4.02 |
-| SIEBEL THOMAS M | 2026-09-15 | 282001 | $3.9 | $1099803.9 | 3.046 |
-| SIEBEL THOMAS M | 2026-09-16 | 162247 | $3.9 | $632763.3 | 2.898 |
-| SIEBEL THOMAS M | 2026-08-11 | 453314 | $3.9 | $1767924.6 | 2.387 |
+| SIEBEL THOMAS M | 2026-10-13 | 435363 | $3.9 | $1697915.7 | 3.986 |
+| SIEBEL THOMAS M | 2026-09-15 | 282001 | $3.9 | $1099803.9 | 3.021 |
+| SIEBEL THOMAS M | 2026-09-16 | 162247 | $3.9 | $632763.3 | 2.874 |
+| SIEBEL THOMAS M | 2026-08-11 | 453314 | $3.9 | $1767924.6 | 2.368 |
 | SIEBEL THOMAS M | 2026-06-01 | 6166667 | $11.16 | $68820003.72 | 2.329 |
 
 **Routine / planned sales (context):**

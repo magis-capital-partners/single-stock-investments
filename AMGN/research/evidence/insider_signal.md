@@ -1,4 +1,4 @@
-# AMGN — Insider conviction (2026-10-18)
+# AMGN — Insider conviction (2026-10-19)
 
 > Context only. Insider activity informs scenario confidence and stance discussion; it does not auto-inflate Lawrence base IRR. Promotion requires [HUMAN REVIEW].
 
@@ -13,10 +13,10 @@
 | Insider | Date | Shares | Price | Value | Contrib |
 |---------|------|--------|-------|-------|---------|
 | Bradway Robert A | 2026-03-04 | 119782 | $156.35 | $18727915.7 | 1.731 |
-| Grygiel Nancy A. | 2026-08-06 | 1970 | $177.46 | $349596.2 | 1.642 |
-| Khosla Rachna | 2026-08-13 | 1252 | $162.6 | $203575.2 | 1.608 |
-| Miller Derek | 2026-08-06 | 2069 | $162.6 | $336419.4 | 1.559 |
-| Miller Derek | 2026-08-06 | 1821 | $177.46 | $323154.66 | 1.538 |
+| Grygiel Nancy A. | 2026-08-06 | 1970 | $177.46 | $349596.2 | 1.629 |
+| Khosla Rachna | 2026-08-13 | 1252 | $162.6 | $203575.2 | 1.594 |
+| Miller Derek | 2026-08-06 | 2069 | $162.6 | $336419.4 | 1.547 |
+| Miller Derek | 2026-08-06 | 1821 | $177.46 | $323154.66 | 1.525 |
 
 **Routine / planned sales (context):**
 

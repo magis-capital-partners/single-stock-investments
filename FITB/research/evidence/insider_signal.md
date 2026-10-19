@@ -1,4 +1,4 @@
-# FITB — Insider conviction (2026-10-18)
+# FITB — Insider conviction (2026-10-19)
 
 > Context only. Insider activity informs scenario confidence and stance discussion; it does not auto-inflate Lawrence base IRR. Promotion requires [HUMAN REVIEW].
 
@@ -14,9 +14,9 @@
 |---------|------|--------|-------|-------|---------|
 | Spence Timothy | 2026-02-17 | 15887 | $33.17 | $526971.79 | 1.393 |
 | Schramm Jude | 2026-02-23 | 14228 | $26.72 | $380172.16 | 1.21 |
-| Leonard James C. | 2026-07-20 | 9654 | $26.72 | $257954.88 | 1.107 |
-| Leonard James C. | 2026-07-20 | 8772 | $26.52 | $232633.44 | 1.081 |
-| Leonard James C. | 2026-07-20 | 8248 | $29.64 | $244470.72 | 1.079 |
+| Leonard James C. | 2026-07-20 | 9654 | $26.72 | $257954.88 | 1.097 |
+| Leonard James C. | 2026-07-20 | 8772 | $26.52 | $232633.44 | 1.072 |
+| Leonard James C. | 2026-07-20 | 8248 | $29.64 | $244470.72 | 1.07 |
 
 **Routine / planned sales (context):**
 

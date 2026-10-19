@@ -1,20 +1,20 @@
-# SJT - Thematic context (2026-10-18)
+# SJT - Thematic context (2026-10-19)
 
 > Context only. Tailwinds inform stance and overlay sizing; they do not auto-inflate Lawrence base IRR. Promotion to base case requires [HUMAN REVIEW].
 
 | Indicator | Latest | As of | YoY | Direction | In base IRR? |
 |-----------|--------|-------|-----|-----------|--------------|
-| High-yield OAS credit spread (%) | -0.69 | 2026-10-16 | +30.3% | up | no (context) |
-| US Treasury 10Y yield (%) | 5.0980000495910645 | 2026-10-16 | +28.2% | up | no (context) |
-| US Treasury 2Y yield (%) | 4.89900016784668 | 2026-10-16 | +38.0% | up | no (context) |
-| Trade-weighted USD index (broad) | 101.83999633789062 | 2026-10-16 | +3.5% | up | no (context) |
-| VIX index level | 19.989999771118164 | 2026-10-16 | -21.0% | down | no (context) |
-| HYG vs TLT 1-month return spread (%) | -0.25 | 2026-10-16 | +87.6% | up | no (context) |
-| SPY 20-day realized vol (annualized %) | 10.2 | 2026-10-16 | -19.6% | down | no (context) |
+| High-yield OAS credit spread (%) | -0.35 | 2026-10-19 | +70.3% | up | no (context) |
+| US Treasury 10Y yield (%) | 5.13100004196167 | 2026-10-19 | +28.7% | up | no (context) |
+| US Treasury 2Y yield (%) | 4.925999641418457 | 2026-10-19 | +37.7% | up | no (context) |
+| Trade-weighted USD index (broad) | 101.97699737548828 | 2026-10-19 | +3.4% | up | no (context) |
+| VIX index level | 18.280000686645508 | 2026-10-19 | +0.3% | flat | no (context) |
+| HYG vs TLT 1-month return spread (%) | 0.09 | 2026-10-19 | +102.7% | up | no (context) |
+| SPY 20-day realized vol (annualized %) | 8.84 | 2026-10-19 | -33.2% | down | no (context) |
 | AGI expert-horizon years ahead (public quotes) | 5.0 | 2026-06-01 | +0.0% | flat | no (context) |
 | Robotaxi expert-horizon years ahead (public quotes) | 2.0 | 2026-06-01 | +0.0% | flat | no (context) |
-| WTI crude (USD/bbl) | 99.0199966430664 | 2026-10-16 | +72.3% | up | no (context) |
-| Natural gas (USD/MMBtu; spot or futures fallback) | 3.115999937057495 | 2026-10-16 | +6.1% | up | no (context) |
+| WTI crude (USD/bbl) | 98.36000061035156 | 2026-10-19 | +71.0% | up | no (context) |
+| Natural gas (USD/MMBtu; spot or futures fallback) | 3.0369999408721924 | 2026-10-19 | -10.6% | down | no (context) |
 | Permian crude / oil-gas activity proxy | 107.1306 (stale) | 2026-08-01 | +9.2% | up | no (context) |
 
 Source panels: `_system/reference/market-data/themes/manifest.json`.

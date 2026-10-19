@@ -1,8 +1,8 @@
-# USB — Insider conviction (2026-10-18)
+# USB — Insider conviction (2026-10-19)
 
 > Context only. Insider activity informs scenario confidence and stance discussion; it does not auto-inflate Lawrence base IRR. Promotion requires [HUMAN REVIEW].
 
-**ICS:** 5.22 (moderate) · **Bull case support:** moderate
+**ICS:** 5.2 (moderate) · **Bull case support:** moderate
 
 | Scenario | Prior weight | Tilted weight |
 |----------|--------------|---------------|
@@ -14,7 +14,7 @@
 |---------|------|--------|-------|-------|---------|
 | Runkel Mark G. | 2026-02-06 | 15339 | $55.01 | $843798.39 | 1.609 |
 | CECERE ANDREW | 2025-10-20 | 140445 | $39.49 | $5546173.05 | 1.359 |
-| CHOSY JAMES L | 2026-07-23 | 24711 | $55.01 | $1359352.11 | 1.31 |
+| CHOSY JAMES L | 2026-07-23 | 24711 | $55.01 | $1359352.11 | 1.299 |
 | CHOSY JAMES L | 2025-10-20 | 29428 | $39.49 | $1162111.72 | 1.257 |
 
 **Routine / planned sales (context):**

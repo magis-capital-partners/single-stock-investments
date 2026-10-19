@@ -1,8 +1,8 @@
-# BABA — Insider conviction (2026-10-18)
+# BABA — Insider conviction (2026-10-19)
 
 > Context only. Insider activity informs scenario confidence and stance discussion; it does not auto-inflate Lawrence base IRR. Promotion requires [HUMAN REVIEW].
 
-**ICS:** 4.3 (moderate) · **Bull case support:** moderate
+**ICS:** 4.25 (moderate) · **Bull case support:** moderate
 
 | Scenario | Prior weight | Tilted weight |
 |----------|--------------|---------------|
@@ -12,9 +12,9 @@
 
 | Insider | Date | Shares | Price | Value | Contrib |
 |---------|------|--------|-------|-------|---------|
-| Wu Yongming | 2026-08-24 | 350000 | $14.24 | $4984000.0 | 2.395 |
-| Tsai Joseph C | 2026-08-25 | 720000 | $14.47 | $10418400.0 | 1.176 |
-| Tsai Joseph C | 2026-08-24 | 720000 | $14.29 | $10288800.0 | 1.167 |
+| Wu Yongming | 2026-08-24 | 350000 | $14.24 | $4984000.0 | 2.375 |
+| Tsai Joseph C | 2026-08-25 | 720000 | $14.47 | $10418400.0 | 1.166 |
+| Tsai Joseph C | 2026-08-24 | 720000 | $14.29 | $10288800.0 | 1.157 |
 
 **Routine / planned sales (context):**
 

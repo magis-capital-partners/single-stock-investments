@@ -1,8 +1,8 @@
-# BMY — Insider conviction (2026-10-18)
+# BMY — Insider conviction (2026-10-19)
 
 > Context only. Insider activity informs scenario confidence and stance discussion; it does not auto-inflate Lawrence base IRR. Promotion requires [HUMAN REVIEW].
 
-**ICS:** 3.47 (weak) · **Bull case support:** none
+**ICS:** 3.45 (weak) · **Bull case support:** none
 
 | Scenario | Prior weight | Tilted weight |
 |----------|--------------|---------------|
@@ -12,7 +12,7 @@
 
 | Insider | Date | Shares | Price | Value | Contrib |
 |---------|------|--------|-------|-------|---------|
-| Short Bartie Wendy | 2026-09-01 | 1236 | $66.92 | $82713.12 | 2.295 |
+| Short Bartie Wendy | 2026-09-01 | 1236 | $66.92 | $82713.12 | 2.276 |
 | Haller Julia A | 2026-06-15 | 20460 | $53.76 | $1099929.6 | 1.721 |
 
 **Routine / planned sales (context):**

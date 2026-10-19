@@ -1,4 +1,4 @@
-# ALLE — Insider conviction (2026-10-18)
+# ALLE — Insider conviction (2026-10-19)
 
 > Context only. Insider activity informs scenario confidence and stance discussion; it does not auto-inflate Lawrence base IRR. Promotion requires [HUMAN REVIEW].
 
@@ -15,8 +15,8 @@
 | MAIN SUE | 2026-03-11 | 1300 | $149.5827 | $194457.51 | 2.425 |
 | PETERS LAUREN B | 2025-11-25 | 1600 | $165.4409 | $264705.44 | 2.232 |
 | MAIN SUE | 2026-03-11 | 600 | $150.0533 | $90031.98 | 2.049 |
-| MIZELL STEVEN | 2026-08-28 | 170 | $158.28 | $26907.6 | 1.77 |
-| Ilardi David S. | 2026-08-18 | 549 | $71.835 | $39437.41 | 1.101 |
+| MIZELL STEVEN | 2026-08-28 | 170 | $158.28 | $26907.6 | 1.755 |
+| Ilardi David S. | 2026-08-18 | 549 | $71.835 | $39437.41 | 1.092 |
 
 **Routine / planned sales (context):**
 

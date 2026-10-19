@@ -102,7 +102,7 @@
 | B3SA3.SA | no_hit | — | — | No activist index hits |
 | BA | no_hit | — | — | No activist index hits |
 | BABA | indexed | L16/S0 | 2026-09-22 | 16 long, 0 short indexed; 0 short feed-eligible |
-| BAC | indexed | L16/S0 | 2026-10-05 | 16 long, 0 short indexed; 0 short feed-eligible |
+| BAC | indexed | L17/S0 | 2026-10-15 | 17 long, 0 short indexed; 0 short feed-eligible |
 | BALL | indexed | L2/S0 | 2025-04-21 | 2 long, 0 short indexed; 0 short feed-eligible |
 | BAX | indexed | L2/S0 | 2019-05-17 | 2 long, 0 short indexed; 0 short feed-eligible |
 | BB | indexed | L7/S0 | 2026-05-06 | 7 long, 0 short indexed; 0 short feed-eligible |
