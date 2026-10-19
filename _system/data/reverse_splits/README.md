@@ -1028,3 +1028,49 @@ from a completed immutable snapshot; mutable databases are separately frozen.
 
 Do not edit the JSONL files by hand. Run
 `python _system/scripts/check_reverse_splits.py` after any change.
+
+## Portfolio-NAV sleeve illustration (2026-10-19)
+
+The backtest route opens with incremental portfolio contribution, observed
+price-cohort distributions, five-year month-block Monte Carlo, and hypothetical
+margin/collateral. Existing strategy versions and source audits remain in the
+research fold below it.
+
+`_system/scripts/short_sleeve_research.py` reads the frozen local 20261013 run
+and cached quote observations, without network or broker access. Rebuild with:
+
+```text
+python _system/scripts/short_sleeve_research.py --source-root /path/to/local/repo --out dashboard/data/short_sleeve.json
+```
+
+CI uses the committed aggregate feed; licensed prices, per-trade observations,
+actual account NAV and account identifiers are not published. The feed contains
+360 comparisons: three illustrative total NAVs, four position weights, five
+holding periods, two capacity conventions and exactly three combined cost cases.
+Sizing is a fixed fraction of starting total NAV in dollars, not an independently
+funded $50k sleeve. Core investment returns and cash interest are held at zero.
+Combined Michael-portfolio performance cannot be inferred from these results.
+
+Bear/base/bull combine the 75th/50th/25th cached half-spread percentiles plus
+the measured full-population mean displayed-depth cost, respectively, with
+the 90th-percentile/mean/median current indicative borrowing rate for quoted
+reverse-split names. Fixed commissions are additional. Larger orders and
+multi-session execution remain cost sensitivities, not verified fills.
+Borrow uses rounded 102% collateral and settled calendar days under T+2/T+1.
+Missing closes retain the last liability mark; covers wait for an observed close.
+Open positions at the cutoff remain open rather than being deleted.
+
+The browser worker resamples whole interior calendar months, omitting partial
+endpoint months, with the same draws across all three cases (2,000 paths,
+five years, fixed seed). It resamples aggregate daily dollar P&L against starting
+NAV, along with margin and collateral; it does not reconstruct broker fills or
+position continuity at block boundaries. Insolvent paths keep their lower-tail
+rank in CAGR summaries. Unseen squeezes are assessed separately, not assigned
+bootstrap probabilities. Calmar is unavailable when drawdown is zero.
+
+Margin is a hypothetical 100% house floor plus FINRA per-share floors. Collateral
+includes restricted short proceeds and must not be added to margin as a second
+equity charge. The +200% squeeze reserve adds price loss to post-shock margin
+under a 200% house requirement. This is neither a worst possible loss nor
+Michael's actual available excess liquidity. All published statistics are
+conditional research; none changes a strategy threshold or order permission.
