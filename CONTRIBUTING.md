@@ -18,7 +18,7 @@ This repository is the one hub for Magis Capital Partners research. Drew, Michae
 | Short idea | A row in `_system/research/short-alpha/candidates.json` (`origin: desk_note`) plus the narrative note in the private research vault, pointed to by `note_ref` | `build_short_alpha_dashboard.py --check` | Automerge on a `grok/` branch |
 | Short scorecard row | `_system/reference/activist-reports/short_scorecard/` | folder README | Automerge on a `grok/` branch |
 | VIC text | `{TICKER}/third-party-analyses/vic/*.md` | `third_party_inventory.py` | Automerge on a `grok/` branch |
-| PDF | Drive `Admin/Intake/{Kind}/{TICKER}/` via `drive_intake_drop.py` | Drive Intake Sync, 14:00 UTC | Not a git change |
+| PDF | Drive `Admin/Intake/{Kind}/{TICKER}/` via `drive_intake_drop.py` | Drive Intake Sync, 14:41 UTC | Not a git change |
 | Ticker research | `{TICKER}/research/` | Provenance manifest gate | Automerge on a `cursor/` branch |
 | Code, workflows, frameworks, schemas | Anywhere else | `python-tests.yml`, lints, graph invariants | Human review, then merge |
 | Beliefs, capital, approvals | `_system/memory/MEMORY.md`, `human_decision.json`, `_system/reviews/approved/` | None | Drew only |

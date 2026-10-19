@@ -8,7 +8,7 @@ Use this Shared Drive folder as the repo drop zone:
 - Path on Shared Drive: `Admin/Intake`
 - Label: Single Stock Research PDF Store
 - Service account: `pdf-store-uploader@single-stock-pdf-store.iam.gserviceaccount.com`
-- Workflow: the `Data Pipeline` Drive job is scheduled daily at 14:00 UTC. GitHub Actions may start scheduled work later than the nominal cron time.
+- Workflow: the `Data Pipeline` Drive job is scheduled daily at 14:41 UTC (`41 14 * * *`). GitHub Actions may start scheduled work later than the nominal cron time.
 
 The live Drive layout is under `Admin/Intake` by intake type:
 

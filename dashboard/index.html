@@ -1830,6 +1830,7 @@
     <a class="view-tab" data-view="insights" href="#/insights/overview">Signals &amp; Synthesis</a>
     <a class="view-tab" data-view="activist" href="#/insights/activism">Activism</a>
     <a class="view-tab" data-view="insights" href="#/insights/data-health">Data Health</a>
+    <a class="view-tab" data-view="insights" href="#/insights/managers">Managers</a>
   </nav>
 
   <main id="main-content">
@@ -1984,6 +1985,7 @@
 <script src="technical-picture-viz.js?v=20261001-signal-study"></script>
 <script src="fico-watch-viz.js?v=20261006-fico-watch-2"></script>
 <script src="overlap-viz.js?v=20261008-overlap-line"></script>
+<script src="holdings-viz.js?v=20261018-held-by"></script>
 <script src="index-viz.js"></script>
 <script src="activist-viz.js?v=20260819-dashboard-rebuild"></script>
 <script src="short-alpha-viz.js?v=20261015-net-edge-v2"></script>
@@ -2211,7 +2213,7 @@ let insightsEventLastSeenAt = (() => {
 })();
 const INSIGHTS_LIVE_SECTIONS = new Set([
   'letters', 'podcasts', 'videos', 'inflections', 'events', 'index_watch', 'consensus',
-  'funds', 'documents', 'tickers', 'memory', 'sources',
+  'funds', 'documents', 'tickers', 'memory', 'sources', 'managers',
 ]);
 let insightsSection = (() => {
   try {
@@ -2407,7 +2409,7 @@ function parseRouteFromHashString(hash) {
     const sub = ideasMatch[1].toLowerCase();
     return { view: sub === 'short-alpha' || sub === 'warrants' ? sub : 'watchlist', ticker: null, watchlistSub: sub };
   }
-  const insightsMatch = /^#\/insights\/(overview|activism|data-health|letters|podcasts|videos|inflections|events|index-watch|consensus|funds|documents|tickers|memory|sources)$/i.exec(hash || '');
+  const insightsMatch = /^#\/insights\/(overview|activism|data-health|letters|podcasts|videos|inflections|events|index-watch|consensus|funds|documents|tickers|memory|sources|managers)$/i.exec(hash || '');
   if (insightsMatch) {
     const section = insightsMatch[1].toLowerCase();
     return { view: section === 'activism' ? 'activist' : 'insights', insightsSection: section === 'data-health' ? 'sources' : section === 'overview' ? 'events' : section.replace('-', '_'), ticker: null, watchlistSub: null };
@@ -3400,6 +3402,7 @@ const INSIGHTS_SECTION_FILES = {
 };
 
 function insightsSectionReady(section) {
+  if (section === 'managers') return true;
   const shards = ['manifest', ...(INSIGHTS_SECTION_SHARDS[section] || [])];
   const files = INSIGHTS_SECTION_FILES[section] || [];
   return shards.every((s) => loadedShards.has(`insights:${s}`))
@@ -4174,6 +4177,17 @@ function renderActivist() {
 }
 
 function renderInsights(opts = {}) {
+  if (insightsSection === 'managers' && window.FundHoldings) {
+    const loading = document.getElementById('insights-loading');
+    const content = document.getElementById('insights-content');
+    if (loading) loading.style.display = 'none';
+    if (content) {
+      content.style.display = 'block';
+      content.innerHTML = FundHoldings.renderManagersPage();
+      FundHoldings.fillManagersPage();
+    }
+    return;
+  }
   const refocusSearch = Boolean(opts.refocusSearch);
   const loading = document.getElementById('insights-loading');
   const content = document.getElementById('insights-content');
@@ -5582,7 +5596,7 @@ function filtered() {
 function renderHoldingsCell(colId, t) {
   switch (colId) {
     case 'ticker':
-      return `<td class="mono ticker-cell">${escapeHtml(t.display_ticker || t.ticker)}${t.quote_ticker && t.quote_ticker !== (t.display_ticker || t.ticker) ? `<span class="irr-sub" title="Quote symbol"> ${escapeHtml(t.quote_ticker)}</span>` : ''}${t.equity_model?.ready ? ` <span class="badge badge-ok" title="Earnings model ${t.equity_model.production_spec || 'v5'} ready">M</span>` : ''}${t.onboard?.phase && t.onboard.phase !== 'complete' ? `<span class="onboard-badge">${t.onboard.phase}</span>` : ''}${window.SeparationsViz && t.separation?.odd_lot?.eligible_owners?.length ? ` ${SeparationsViz.renderOddLotBadge(t.separation, { escapeHtml })}` : ''}<button type="button" class="sleeve-jump" data-sleeve-jump="drew" data-ticker="${escapeHtml(t.ticker)}" title="Note on Drew tab">D</button><button type="button" class="sleeve-jump" data-sleeve-jump="michael" data-ticker="${escapeHtml(t.ticker)}" title="Note on Michael tab">M</button></td>`;
+      return `<td class="mono ticker-cell">${escapeHtml(t.display_ticker || t.ticker)}${t.quote_ticker && t.quote_ticker !== (t.display_ticker || t.ticker) ? `<span class="irr-sub" title="Quote symbol"> ${escapeHtml(t.quote_ticker)}</span>` : ''}${t.equity_model?.ready ? ` <span class="badge badge-ok" title="Earnings model ${t.equity_model.production_spec || 'v5'} ready">M</span>` : ''}${t.onboard?.phase && t.onboard.phase !== 'complete' ? `<span class="onboard-badge">${t.onboard.phase}</span>` : ''}${window.SeparationsViz && t.separation?.odd_lot?.eligible_owners?.length ? ` ${SeparationsViz.renderOddLotBadge(t.separation, { escapeHtml })}` : ''}${window.FundHoldings ? FundHoldings.badgeHtml(t.ticker) : ''}<button type="button" class="sleeve-jump" data-sleeve-jump="drew" data-ticker="${escapeHtml(t.ticker)}" title="Note on Drew tab">D</button><button type="button" class="sleeve-jump" data-sleeve-jump="michael" data-ticker="${escapeHtml(t.ticker)}" title="Note on Michael tab">M</button></td>`;
     case 'company':
       return `<td class="company-cell" title="${escapeHtml(t.company)}">${escapeHtml(t.company)}</td>`;
     case 'market':
@@ -6010,6 +6024,7 @@ function selectTicker(ticker, opts = {}) {
     </div>
 
     ${window.OverlapViz ? OverlapViz.renderTicker(t.display_ticker || t.ticker, escapeHtml) : ''}
+    ${window.FundHoldings ? FundHoldings.renderTicker(t.ticker, escapeHtml) : ''}
 
     ${window.FicoWatch && t.ticker === 'FICO' ? FicoWatch.renderDetail(data.fico_watch, escapeHtml) : ''}
 
@@ -6105,6 +6120,7 @@ function selectTicker(ticker, opts = {}) {
       </ul>
     </details>` : ''}`;
   if (window.OverlapViz) OverlapViz.fillTicker(t.display_ticker || t.ticker);
+  if (window.FundHoldings) FundHoldings.fillTicker(t.ticker);
   if (hasModel && typeof EquityModelViz !== 'undefined') {
     EquityModelViz.afterRender(modelBundle);
   }
@@ -6376,6 +6392,7 @@ document.querySelectorAll('#view-tabs .view-tab, .workspace-subnav .view-tab').f
     }
     if (link.getAttribute('href') === '#/insights/data-health') insightsSection = 'sources';
     if (link.getAttribute('href') === '#/insights/overview') insightsSection = 'events';
+    if (link.getAttribute('href') === '#/insights/managers') insightsSection = 'managers';
     if (link.getAttribute('href') === '#/strategies/darwin/overview') darwinViewMode = 'overview';
     setView(link.dataset.view);
   });

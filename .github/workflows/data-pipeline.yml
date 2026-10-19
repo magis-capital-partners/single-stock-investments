@@ -14,6 +14,8 @@ on:
     - cron: "23 12 * * 1,2,4,5,6" # light portfolio refresh
     - cron: "23 10 * * 0,3"  # full document harvest twice weekly
     - cron: "41 14 * * *"    # drive intake (daily)
+    - cron: "29 13 * * *"    # 13F check (daily, 9:29 ET)
+    - cron: "29 18 21 2,5,8,11 *"  # 13F twelve-quarter reconcile, 21st of Feb/May/Aug/Nov
     - cron: "47 */6 * * *"  # portfolio news
     - cron: "13 15 * * 1"    # CVR + warrant + separation + buyback discovery Mondays
     - cron: "43 16 * * 0"    # World Model weekly (Sunday UTC: themes + KPI ledgers + strip)
@@ -51,6 +53,8 @@ jobs:
       buyback_radar: ${{ steps.pick.outputs.buyback_radar }}
       world_model: ${{ steps.pick.outputs.world_model }}
       technicals: ${{ steps.pick.outputs.technicals }}
+      thirteen_f: ${{ steps.pick.outputs.thirteen_f }}
+      thirteen_f_periods: ${{ steps.pick.outputs.thirteen_f_periods }}
     steps:
       - id: pick
         env:
@@ -59,7 +63,7 @@ jobs:
           EVENT_ACTION: ${{ github.event.action }}
         run: |
           set -euo pipefail
-          intake_full=false; activist=false; downloads=false; drive=false; news=false; cvr_discover=false; warrant_discover=false; separation_discover=false; reverse_splits=false; buyback_radar=false; world_model=false; technicals=false; download_mode=light
+          intake_full=false; activist=false; downloads=false; drive=false; news=false; cvr_discover=false; warrant_discover=false; separation_discover=false; reverse_splits=false; buyback_radar=false; world_model=false; technicals=false; thirteen_f=false; thirteen_f_periods=2; download_mode=light
           if [ "$EVENT_NAME" = "repository_dispatch" ]; then SCHEDULE="dispatch:$EVENT_ACTION"; fi
           case "$SCHEDULE" in
             "dispatch:heal-technicals") technicals=true ;;
@@ -72,6 +76,8 @@ jobs:
             "23 12 * * 1,2,4,5,6") downloads=true; download_mode=light ;;
             "23 10 * * 0,3") downloads=true; download_mode=full ;;
             "41 14 * * *") drive=true ;;
+            "29 13 * * *") thirteen_f=true; thirteen_f_periods=2 ;;
+            "29 18 21 2,5,8,11 *") thirteen_f=true; thirteen_f_periods=12 ;;
             "47 */6 * * *") news=true ;;
             "13 15 * * 1") cvr_discover=true; warrant_discover=true; separation_discover=true; reverse_splits=true; buyback_radar=true ;;
             "43 16 * * 0") world_model=true ;;
@@ -91,6 +97,8 @@ jobs:
             echo "buyback_radar=$buyback_radar"
             echo "world_model=$world_model"
             echo "technicals=$technicals"
+            echo "thirteen_f=$thirteen_f"
+            echo "thirteen_f_periods=$thirteen_f_periods"
           } >> "$GITHUB_OUTPUT"
           echo "Selected: intake_full=$intake_full technicals=$technicals activist=$activist downloads=$downloads($download_mode) drive=$drive news=$news cvr_discover=$cvr_discover warrant_discover=$warrant_discover separation_discover=$separation_discover reverse_splits=$reverse_splits buyback_radar=$buyback_radar world_model=$world_model"
 
@@ -1120,8 +1128,53 @@ jobs:
             dashboard/data/agent_shards
             _system/data/buyback_radar
 
+  thirteen-f:
+    needs: decide
+    if: needs.decide.outputs.thirteen_f == 'true'
+    runs-on: ubuntu-latest
+    timeout-minutes: 90
+    concurrency:
+      group: data-commit-main-${{ github.job }}
+      cancel-in-progress: false
+    env:
+      SEC_USER_AGENT: ${{ vars.SEC_USER_AGENT }}
+      THIRTEEN_F_PERIODS: ${{ needs.decide.outputs.thirteen_f_periods }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          sparse-checkout: |
+            _system/scripts/ci_checkout_workspace.sh
+            _system/scripts/ci_resolve_checkout_ref.sh
+            _system/scripts/ci_sparse_checkout_paths.py
+          sparse-checkout-cone-mode: false
+          fetch-depth: 1
+      - name: Checkout workspace (13F ownership)
+        run: bash _system/scripts/ci_checkout_workspace.sh minimal
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Check 13F filings
+        run: |
+          set -euo pipefail
+          python _system/scripts/ingest_tracked_funds_13f.py --periods 2
+          python _system/scripts/ingest_specialist_13f.py --backfill-quarters 2
+          python _system/scripts/build_tracked_funds_signals.py
+          python _system/scripts/build_specialist_13f_signals.py
+          python _system/scripts/build_overlap_holdings.py --advisers-only
+          python _system/scripts/ingest_13f.py --periods "${THIRTEEN_F_PERIODS:-2}" --alerts
+      - name: Commit 13F holdings
+        uses: ./.github/actions/commit-main
+        with:
+          message: "chore: refresh 13F holdings $(date -u +%Y-%m-%d)"
+          git_add: >-
+            _system/reference/market-data/ownership/
+            dashboard/data/overlap_holders.json
+            dashboard/data/overlap_holdings.json
+            dashboard/data/fund_holdings_summary.json
+            dashboard/data/holdings/
+
   pipeline-summary:
-    needs: [decide, intake-full, technicals, activist, downloads, drive, news, cvr-discover, warrant-discover, separation-discover, reverse-splits, buyback-radar, world-model]
+    needs: [decide, intake-full, technicals, activist, downloads, drive, news, cvr-discover, warrant-discover, separation-discover, reverse-splits, buyback-radar, world-model, thirteen-f]
     if: always()
     runs-on: ubuntu-latest
     timeout-minutes: 5
@@ -1141,4 +1194,5 @@ jobs:
           echo "reverse_splits=${{ needs.decide.outputs.reverse_splits }} result=${{ needs.reverse-splits.result }}"
           echo "buyback_radar=${{ needs.decide.outputs.buyback_radar }} result=${{ needs.buyback-radar.result }}"
           echo "world_model=${{ needs.decide.outputs.world_model }} result=${{ needs.world-model.result }}"
+          echo "thirteen_f=${{ needs.decide.outputs.thirteen_f }} result=${{ needs.thirteen-f.result }}"
           echo "Deploy Dashboard chains via workflow_run on successful commits."

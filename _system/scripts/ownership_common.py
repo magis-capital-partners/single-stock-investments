@@ -11,6 +11,10 @@ import xml.etree.ElementTree as ET
 from datetime import datetime, timezone
 from pathlib import Path
 
+from sec_client import get_bytes as sec_get_bytes
+from sec_client import get_json as sec_get_json
+from sec_client import sec_user_agent
+
 ROOT = Path(__file__).resolve().parents[2]
 OWNERSHIP_DIR = ROOT / "_system" / "reference" / "market-data" / "ownership"
 FUNDS_PATH = OWNERSHIP_DIR / "biotech_specialist_funds.json"
@@ -31,9 +35,11 @@ BOOK_QUARTER_RE = re.compile(r"^\d{4}Q[1-4]$")
 REGISTRY_PATH = ROOT / "_system" / "portfolio" / "registry.json"
 SEC_TICKER_CIK_PATH = ROOT / "_system" / "reference" / "market-data" / "fundamentals" / "_sec_ticker_cik_map.json"
 
-SEC_UA = "MarvinResearch contact@example.com"
-SLEEP_SEC = 0.12
+# Declared contact. SEC_USER_AGENT overrides this. The fetch client paces at ~5/s.
+SEC_UA = sec_user_agent()
+SLEEP_SEC = 0.0
 FORM_13F = {"13F-HR", "13F-HR/A", "13F-NT", "13F-NT/A"}
+HOLDINGS_FORMS = {"13F-HR", "13F-HR/A"}
 
 
 def load_json(path: Path, default=None):
@@ -62,15 +68,11 @@ def slug(value: str | None, limit: int = 80) -> str:
 
 
 def sec_fetch_json(url: str) -> dict:
-    req = urllib.request.Request(url, headers={"User-Agent": SEC_UA, "Accept": "application/json"})
-    with urllib.request.urlopen(req, timeout=90) as resp:
-        return json.load(resp)
+    return sec_get_json(url)
 
 
 def sec_fetch_bytes(url: str) -> bytes:
-    req = urllib.request.Request(url, headers={"User-Agent": SEC_UA})
-    with urllib.request.urlopen(req, timeout=120) as resp:
-        return resp.read()
+    return sec_get_bytes(url)
 
 
 def cik_padded(cik: str | int) -> str:
@@ -82,50 +84,108 @@ def fetch_submissions(cik: str) -> dict:
     return sec_fetch_json(url)
 
 
-def latest_13f_filings(cik: str, limit: int = 4) -> list[dict]:
-    try:
-        submissions = fetch_submissions(cik)
-    except (urllib.error.HTTPError, urllib.error.URLError, TimeoutError, json.JSONDecodeError):
-        return []
-    recent = submissions.get("filings", {}).get("recent") or {}
-    forms = recent.get("form") or []
-    dates = recent.get("filingDate") or []
-    accessions = recent.get("accessionNumber") or []
-    primaries = recent.get("primaryDocument") or []
+def _filings_from_block(cik: str, block: dict) -> list[dict]:
+    """Read one submissions page. Extra pages are flat; the main page nests under recent."""
+    if "recent" in block and isinstance(block.get("recent"), dict):
+        block = block["recent"]
+    forms = block.get("form") or []
+    dates = block.get("filingDate") or []
+    reports = block.get("reportDate") or []
+    accessions = block.get("accessionNumber") or []
+    primaries = block.get("primaryDocument") or []
+    width = max(len(forms), len(dates), len(reports), len(accessions), len(primaries))
+    forms = list(forms) + [""] * (width - len(forms))
+    dates = list(dates) + [""] * (width - len(dates))
+    reports = list(reports) + [""] * (width - len(reports))
+    accessions = list(accessions) + [""] * (width - len(accessions))
+    primaries = list(primaries) + [""] * (width - len(primaries))
     cik_path = str(int(cik))
-    candidates: list[dict] = []
-    for form, fdate, acc, primary in zip(forms, dates, accessions, primaries):
-        if form not in FORM_13F:
+    rows = []
+    for form, fdate, rdate, acc, primary in zip(forms, dates, reports, accessions, primaries):
+        if form not in FORM_13F or not acc:
             continue
-        candidates.append(
+        rows.append(
             {
                 "form": form,
                 "filing_date": fdate,
+                "report_date": rdate,
                 "accession": acc,
                 "primary_document": primary,
                 "cik_path": cik_path,
                 "index_url": f"https://www.sec.gov/Archives/edgar/data/{cik_path}/{acc.replace('-', '')}/index.json",
             }
         )
-    candidates.sort(key=lambda f: f.get("filing_date") or "", reverse=True)
-    return candidates[:limit]
+    return rows
+
+
+def latest_13f_filings(cik: str, limit: int = 4) -> list[dict]:
+    try:
+        submissions = fetch_submissions(cik)
+    except (urllib.error.HTTPError, urllib.error.URLError, TimeoutError, json.JSONDecodeError):
+        return []
+    rows = _filings_from_block(cik, submissions.get("filings") or {})
+    rows.sort(key=lambda f: f.get("filing_date") or "", reverse=True)
+    return rows[:limit]
+
+
+def list_13f_filings(cik: str, limit: int = 40) -> list[dict]:
+    """Enough 13F rows for a multi-year backfill, including older submission pages."""
+    try:
+        submissions = fetch_submissions(cik)
+    except (urllib.error.HTTPError, urllib.error.URLError, TimeoutError, json.JSONDecodeError):
+        return []
+    filings = submissions.get("filings") or {}
+    rows = _filings_from_block(cik, filings)
+    for page in filings.get("files") or []:
+        periods = {row.get("report_date") for row in rows if row.get("form") in HOLDINGS_FORMS}
+        if len(periods) >= limit:
+            break
+        name = page.get("name") if isinstance(page, dict) else None
+        if not name:
+            continue
+        try:
+            extra = sec_fetch_json(f"https://data.sec.gov/submissions/{name}")
+        except (urllib.error.HTTPError, urllib.error.URLError, TimeoutError, json.JSONDecodeError):
+            continue
+        rows.extend(_filings_from_block(cik, extra))
+    rows.sort(key=lambda f: (f.get("filing_date") or "", f.get("accession") or ""), reverse=True)
+    deduped = []
+    seen = set()
+    for row in rows:
+        if row["accession"] in seen:
+            continue
+        seen.add(row["accession"])
+        deduped.append(row)
+    return deduped[:limit]
+
+
+def filing_document_urls(filing: dict) -> dict[str, str | None]:
+    """Info table and cover page from one filing index request."""
+    empty = {"info_table": None, "primary": None}
+    try:
+        index = sec_fetch_json(filing["index_url"])
+    except (urllib.error.HTTPError, urllib.error.URLError, TimeoutError, json.JSONDecodeError, OSError):
+        return empty
+    base = filing["index_url"].rsplit("/", 1)[0]
+    info = primary = None
+    fallback = None
+    for item in index.get("directory", {}).get("item") or []:
+        name = item.get("name") or ""
+        lower = name.lower()
+        if not lower.endswith(".xml"):
+            continue
+        url = f"{base}/{name}"
+        if "infotable" in lower:
+            info = url
+        elif lower.endswith("primary_doc.xml"):
+            primary = url
+        elif "primary" not in lower and "xsl" not in lower and fallback is None:
+            fallback = url
+    return {"info_table": info or fallback, "primary": primary}
 
 
 def filing_info_table_url(filing: dict) -> str | None:
-    try:
-        index = sec_fetch_json(filing["index_url"])
-    except (urllib.error.HTTPError, urllib.error.URLError, TimeoutError, json.JSONDecodeError):
-        return None
-    base = filing["index_url"].rsplit("/", 1)[0]
-    for item in index.get("directory", {}).get("item") or []:
-        name = (item.get("name") or "").lower()
-        if "infotable" in name and name.endswith(".xml"):
-            return f"{base}/{item['name']}"
-    for item in index.get("directory", {}).get("item") or []:
-        name = (item.get("name") or "").lower()
-        if name.endswith(".xml") and "primary" not in name and "xsl" not in name:
-            return f"{base}/{item['name']}"
-    return None
+    return filing_document_urls(filing)["info_table"]
 
 
 def _local(tag: str) -> str:
@@ -170,19 +230,78 @@ def portfolio_universe() -> tuple[dict[str, dict], dict[str, str]]:
     return tickers, names
 
 
-def load_cusip_map() -> dict[str, str]:
+def load_cusip_document() -> dict:
+    from thirteenf_core import cusip_entries_from_legacy
+
     doc = load_json(CUSIP_MAP_PATH, {"mappings": {}})
-    return doc.get("mappings") or {}
+    mappings = doc.get("mappings") or {}
+    if mappings and all(isinstance(value, str) for value in mappings.values()):
+        migrated = cusip_entries_from_legacy(mappings)
+        migrated["updated_at"] = doc.get("updated_at")
+        return migrated
+    if "quarantine" not in doc and mappings:
+        migrated = cusip_entries_from_legacy(mappings)
+        migrated["updated_at"] = doc.get("updated_at")
+        return migrated
+    return doc
 
 
-def save_cusip_map(mappings: dict[str, str]) -> None:
-    save_json(CUSIP_MAP_PATH, {"updated_at": now_iso(), "mappings": dict(sorted(mappings.items()))})
+def load_cusip_map() -> dict[str, str]:
+    from thirteenf_core import ticker_map
+
+    doc = load_cusip_document()
+    return ticker_map(doc.get("mappings") or {})
+
+
+def save_cusip_map(mappings: dict[str, str], *, source: str = "legacy") -> None:
+    """Persist ticker strings without dropping source, confidence, or the quarantine list.
+
+    Name-match callers should not call this. OpenFIGI and reviewed corrections may.
+    """
+    from thirteenf_core import structural_ticker
+
+    doc = load_cusip_document()
+    current = doc.get("mappings") or {}
+    quarantine = doc.get("quarantine") or {}
+    for cusip, ticker in (mappings or {}).items():
+        key = str(cusip).upper().strip()
+        symbol = str(ticker or "").upper().strip()
+        if not key or not symbol:
+            continue
+        if structural_ticker(symbol):
+            quarantine[key] = {
+                "ticker": symbol,
+                "source": source,
+                "confidence": "low",
+                "reason": "structural_ticker",
+            }
+            current.pop(key, None)
+            continue
+        prior = current.get(key) if isinstance(current.get(key), dict) else None
+        if prior and prior.get("ticker") == symbol:
+            continue
+        if prior and prior.get("source") == "reviewed" and source != "reviewed":
+            continue
+        current[key] = {"ticker": symbol, "source": source, "confidence": "high" if source in {"reviewed", "openfigi"} else "medium"}
+    save_json(
+        CUSIP_MAP_PATH,
+        {
+            "updated_at": now_iso(),
+            "mappings": dict(sorted(current.items())),
+            "quarantine": dict(sorted(quarantine.items())),
+        },
+    )
 
 
 def match_holding_to_ticker(holding: dict, names: dict[str, str], cusip_map: dict[str, str]) -> str | None:
+    from thirteenf_core import structural_ticker
+
     cusip = (holding.get("cusip") or "").upper().strip()
     if cusip and cusip in cusip_map:
-        return cusip_map[cusip]
+        ticker = cusip_map[cusip]
+        if structural_ticker(ticker):
+            return None
+        return ticker
     issuer = normalize_name(str(holding.get("nameOfIssuer") or ""))
     if not issuer:
         return None
