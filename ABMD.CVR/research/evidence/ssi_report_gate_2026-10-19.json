@@ -1,16 +1,16 @@
 {
   "schema_version": "1.0",
-  "as_of": "2026-10-18",
+  "as_of": "2026-10-19",
   "checks": [
     {
       "name": "locator_resolution",
-      "verdict": "FAIL",
-      "detail": "0 claims Skeptic-verified, 0 failed; report renders verified claims only"
+      "verdict": "BLOCKED",
+      "detail": "0 claims Skeptic-verified, 0 failed; no prior-period filing exists to diff against, so no claims were emitted"
     },
     {
       "name": "comparability_gate",
-      "verdict": "PASS",
-      "detail": "1 cross-filing gated comparisons; 0 intra-filing fallbacks (flagged per-row)"
+      "verdict": "BLOCKED",
+      "detail": "0 cross-filing gated comparisons; 0 intra-filing fallbacks (flagged per-row); issuer has no prior-period filing of a comparable form"
     },
     {
       "name": "consensus_reconciliation",
@@ -29,8 +29,8 @@
     },
     {
       "name": "falsification_quantified",
-      "verdict": "FAIL",
-      "detail": "0 severity≥3 tripwires, each a re-derivation procedure on hashed sources"
+      "verdict": "BLOCKED",
+      "detail": "0 severity≥3 tripwires, each a re-derivation procedure on hashed sources; none available without a prior-period filing to diff"
     },
     {
       "name": "statistical_caveats",
@@ -45,7 +45,7 @@
     {
       "name": "time_zero_snapshot",
       "verdict": "PASS",
-      "detail": "snapshot present for 2026-10-18: True"
+      "detail": "snapshot present for 2026-10-19: True"
     },
     {
       "name": "gold_conversion",
@@ -58,6 +58,6 @@
       "detail": "renderer writes only research/ artifacts; never MEMORY.md"
     }
   ],
-  "result": "NOT SHIPPABLE",
-  "summary": "7 pass / 2 fail / 2 blocked (blocked = missing external feed or outstanding upstream valuation work, not a defect in this run)"
+  "result": "DRAFT (blocked)",
+  "summary": "6 pass / 0 fail / 5 blocked (blocked = missing external feed or outstanding upstream valuation work, not a defect in this run)"
 }
