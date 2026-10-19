@@ -1,0 +1,2048 @@
+{
+  "schema_version": "shorts_phase0.v1",
+  "built_at": "2026-10-18T18:00:10+00:00",
+  "research_only": true,
+  "authority": "none",
+  "aggregate_only": true,
+  "hypothesis_ids": [
+    "H1",
+    "H7",
+    "H8"
+  ],
+  "source_run_id": "20261013T224003582762Z",
+  "splits": {
+    "train": [
+      "2018-05-01",
+      "2022-12-31"
+    ],
+    "validate": [
+      "2023-01-01",
+      "2024-12-31"
+    ]
+  },
+  "holdout_policy": {
+    "start": "2025-01-01",
+    "status": "sealed",
+    "location": "local/holdout/phase0_holdout.json (not committed, not read until the program's final review)"
+  },
+  "h1_ssr_cohort": {
+    "definition": "Verified reverse split; next exchange session official open to official close; gross short return. SSR state is the cached Nasdaq status at the entry open (ssr_states): restricted, unrestricted or unknown.",
+    "states": {
+      "restricted": 388,
+      "unrestricted": 282,
+      "unknown": 1
+    },
+    "by_split": {
+      "train": {
+        "restricted": {
+          "events": 64,
+          "mean": 0.03443327896968933,
+          "median": 0.03884512236004023,
+          "positive_share": 0.640625,
+          "issuers": 62,
+          "issuer_interval": {
+            "clusters": 62,
+            "low": 0.013176449345993465,
+            "high": 0.05586826051892204,
+            "draws": 2000,
+            "method": "95% percentile interval; whole-issuer bootstrap; observed trades only, not future book returns"
+          },
+          "year_interval": {
+            "clusters": 5,
+            "low": 0.019575517831591813,
+            "high": 0.05025056357119419,
+            "draws": 2000,
+            "method": "95% percentile interval; whole-issuer bootstrap; observed trades only, not future book returns"
+          }
+        },
+        "unrestricted": {
+          "events": 56,
+          "mean": 0.005012300476365502,
+          "median": 0.007104754113727185,
+          "positive_share": 0.5714285714285714,
+          "issuers": 56,
+          "issuer_interval": {
+            "clusters": 56,
+            "low": -0.019851556357607766,
+            "high": 0.027928571296572807,
+            "draws": 2000,
+            "method": "95% percentile interval; whole-issuer bootstrap; observed trades only, not future book returns"
+          },
+          "year_interval": {
+            "clusters": 5,
+            "low": -0.011396191837014211,
+            "high": 0.01971671583023866,
+            "draws": 2000,
+            "method": "95% percentile interval; whole-issuer bootstrap; observed trades only, not future book returns"
+          }
+        },
+        "unknown": 0,
+        "difference_restricted_minus_unrestricted": {
+          "clusters": 116,
+          "point": 0.029420978493323827,
+          "low": -0.0017827378741944986,
+          "high": 0.060141793181749004,
+          "draws": 2000,
+          "se": 0.01616272364117567,
+          "t_cluster": 1.8202983077908865,
+          "bootstrap_two_sided_p": 0.064,
+          "method": "95% percentile interval of the difference; whole-issuer bootstrap resampling both groups jointly"
+        }
+      },
+      "validate": {
+        "restricted": {
+          "events": 154,
+          "mean": 0.036966224832736025,
+          "median": 0.04465811965811972,
+          "positive_share": 0.6883116883116883,
+          "issuers": 147,
+          "issuer_interval": {
+            "clusters": 147,
+            "low": 0.01935825698942944,
+            "high": 0.053670038797067006,
+            "draws": 2000,
+            "method": "95% percentile interval; whole-issuer bootstrap; observed trades only, not future book returns"
+          },
+          "year_interval": {
+            "clusters": 2,
+            "low": null,
+            "high": null,
+            "method": "too few issuer clusters"
+          }
+        },
+        "unrestricted": {
+          "events": 88,
+          "mean": 0.04061110505476119,
+          "median": 0.02400782714143973,
+          "positive_share": 0.6477272727272727,
+          "issuers": 86,
+          "issuer_interval": {
+            "clusters": 86,
+            "low": 0.021493355985047043,
+            "high": 0.05881618168410432,
+            "draws": 2000,
+            "method": "95% percentile interval; whole-issuer bootstrap; observed trades only, not future book returns"
+          },
+          "year_interval": {
+            "clusters": 2,
+            "low": null,
+            "high": null,
+            "method": "too few issuer clusters"
+          }
+        },
+        "unknown": 1,
+        "difference_restricted_minus_unrestricted": {
+          "clusters": 227,
+          "point": -0.0036448802220251653,
+          "low": -0.030120198626208645,
+          "high": 0.02210499523710506,
+          "draws": 2000,
+          "se": 0.013097064304348352,
+          "t_cluster": -0.278297497616701,
+          "bootstrap_two_sided_p": 0.746,
+          "method": "95% percentile interval of the difference; whole-issuer bootstrap resampling both groups jointly"
+        }
+      },
+      "pooled_train_validate": {
+        "restricted": {
+          "events": 218,
+          "mean": 0.03622260769863057,
+          "median": 0.043728908417977275,
+          "positive_share": 0.6743119266055045,
+          "issuers": 202,
+          "issuer_interval": {
+            "clusters": 202,
+            "low": 0.021736540110726586,
+            "high": 0.049715754936340006,
+            "draws": 2000,
+            "method": "95% percentile interval; whole-issuer bootstrap; observed trades only, not future book returns"
+          },
+          "year_interval": {
+            "clusters": 7,
+            "low": 0.028772490766893623,
+            "high": 0.04227746946579128,
+            "draws": 2000,
+            "method": "95% percentile interval; whole-issuer bootstrap; observed trades only, not future book returns"
+          }
+        },
+        "unrestricted": {
+          "events": 144,
+          "mean": 0.0267671254964962,
+          "median": 0.01546432841769635,
+          "positive_share": 0.6180555555555556,
+          "issuers": 142,
+          "issuer_interval": {
+            "clusters": 142,
+            "low": 0.011804215686951416,
+            "high": 0.04164550876484618,
+            "draws": 2000,
+            "method": "95% percentile interval; whole-issuer bootstrap; observed trades only, not future book returns"
+          },
+          "year_interval": {
+            "clusters": 7,
+            "low": 0.0018842726056234153,
+            "high": 0.03825791969385384,
+            "draws": 2000,
+            "method": "95% percentile interval; whole-issuer bootstrap; observed trades only, not future book returns"
+          }
+        },
+        "unknown": 1,
+        "difference_restricted_minus_unrestricted": {
+          "clusters": 326,
+          "point": 0.009455482202134362,
+          "low": -0.011091704518577966,
+          "high": 0.0306338657806694,
+          "draws": 2000,
+          "se": 0.010678261132614142,
+          "t_cluster": 0.8854889466277333,
+          "bootstrap_two_sided_p": 0.358,
+          "method": "95% percentile interval of the difference; whole-issuer bootstrap resampling both groups jointly"
+        }
+      }
+    },
+    "by_year": {
+      "2018": {
+        "restricted": {
+          "events": 5,
+          "mean": 0.0016273157539502315,
+          "median": -0.012499999999999956,
+          "positive_share": 0.4,
+          "issuers": 5,
+          "issuer_interval": {
+            "clusters": 5,
+            "low": -0.047687194791101416,
+            "high": 0.054023757932208614,
+            "draws": 2000,
+            "method": "95% percentile interval; whole-issuer bootstrap; observed trades only, not future book returns"
+          },
+          "year_interval": {
+            "clusters": 1,
+            "low": null,
+            "high": null,
+            "method": "too few issuer clusters"
+          }
+        },
+        "unrestricted": {
+          "events": 3,
+          "mean": -0.04797634300480599,
+          "median": -0.030000000000000027,
+          "positive_share": 0.3333333333333333,
+          "issuers": 3,
+          "issuer_interval": {
+            "clusters": 3,
+            "low": null,
+            "high": null,
+            "method": "too few issuer clusters"
+          },
+          "year_interval": {
+            "clusters": 1,
+            "low": null,
+            "high": null,
+            "method": "too few issuer clusters"
+          }
+        },
+        "unknown": 0,
+        "difference_restricted_minus_unrestricted": {
+          "clusters": 8,
+          "point": 0.04960365875875622,
+          "low": -0.031897698211412986,
+          "high": 0.13975374279270072,
+          "draws": 1954,
+          "se": 0.04503575133849963,
+          "t_cluster": 1.1014284714808706,
+          "bootstrap_two_sided_p": 0.28249744114636643,
+          "method": "95% percentile interval of the difference; whole-issuer bootstrap resampling both groups jointly"
+        }
+      },
+      "2019": {
+        "restricted": {
+          "events": 17,
+          "mean": 0.05796072147857875,
+          "median": 0.0470588235294116,
+          "positive_share": 0.7058823529411765,
+          "issuers": 17,
+          "issuer_interval": {
+            "clusters": 17,
+            "low": 0.007652261473126412,
+            "high": 0.1087065063779353,
+            "draws": 2000,
+            "method": "95% percentile interval; whole-issuer bootstrap; observed trades only, not future book returns"
+          },
+          "year_interval": {
+            "clusters": 1,
+            "low": null,
+            "high": null,
+            "method": "too few issuer clusters"
+          }
+        },
+        "unrestricted": {
+          "events": 17,
+          "mean": 0.0004005770719374658,
+          "median": 0.014542343883661268,
+          "positive_share": 0.5294117647058824,
+          "issuers": 17,
+          "issuer_interval": {
+            "clusters": 17,
+            "low": -0.05315940338745519,
+            "high": 0.054415884276361806,
+            "draws": 2000,
+            "method": "95% percentile interval; whole-issuer bootstrap; observed trades only, not future book returns"
+          },
+          "year_interval": {
+            "clusters": 1,
+            "low": null,
+            "high": null,
+            "method": "too few issuer clusters"
+          }
+        },
+        "unknown": 0,
+        "difference_restricted_minus_unrestricted": {
+          "clusters": 34,
+          "point": 0.057560144406641284,
+          "low": -0.01755058494138692,
+          "high": 0.13088644496075574,
+          "draws": 2000,
+          "se": 0.037961585767572595,
+          "t_cluster": 1.5162734443988928,
+          "bootstrap_two_sided_p": 0.135,
+          "method": "95% percentile interval of the difference; whole-issuer bootstrap resampling both groups jointly"
+        }
+      },
+      "2020": {
+        "restricted": {
+          "events": 11,
+          "mean": 0.03038153874641428,
+          "median": 0.036363636363636376,
+          "positive_share": 0.6363636363636364,
+          "issuers": 11,
+          "issuer_interval": {
+            "clusters": 11,
+            "low": -0.011882040614719973,
+            "high": 0.07034599062622282,
+            "draws": 2000,
+            "method": "95% percentile interval; whole-issuer bootstrap; observed trades only, not future book returns"
+          },
+          "year_interval": {
+            "clusters": 1,
+            "low": null,
+            "high": null,
+            "method": "too few issuer clusters"
+          }
+        },
+        "unrestricted": {
+          "events": 15,
+          "mean": -0.006518838347975309,
+          "median": -0.002109704641350074,
+          "positive_share": 0.4,
+          "issuers": 15,
+          "issuer_interval": {
+            "clusters": 15,
+            "low": -0.03923894301928557,
+            "high": 0.026684483341763425,
+            "draws": 2000,
+            "method": "95% percentile interval; whole-issuer bootstrap; observed trades only, not future book returns"
+          },
+          "year_interval": {
+            "clusters": 1,
+            "low": null,
+            "high": null,
+            "method": "too few issuer clusters"
+          }
+        },
+        "unknown": 0,
+        "difference_restricted_minus_unrestricted": {
+          "clusters": 26,
+          "point": 0.03690037709438959,
+          "low": -0.01711473316530323,
+          "high": 0.08999991635821403,
+          "draws": 2000,
+          "se": 0.02715762284269394,
+          "t_cluster": 1.3587484187452248,
+          "bootstrap_two_sided_p": 0.172,
+          "method": "95% percentile interval of the difference; whole-issuer bootstrap resampling both groups jointly"
+        }
+      },
+      "2021": {
+        "restricted": {
+          "events": 7,
+          "mean": 0.0288074472582809,
+          "median": 0.03947368421052633,
+          "positive_share": 0.7142857142857143,
+          "issuers": 7,
+          "issuer_interval": {
+            "clusters": 7,
+            "low": -0.02450206721728448,
+            "high": 0.08096840633675338,
+            "draws": 2000,
+            "method": "95% percentile interval; whole-issuer bootstrap; observed trades only, not future book returns"
+          },
+          "year_interval": {
+            "clusters": 1,
+            "low": null,
+            "high": null,
+            "method": "too few issuer clusters"
+          }
+        },
+        "unrestricted": {
+          "events": 4,
+          "mean": 0.024283334951239355,
+          "median": 0.0194476123566219,
+          "positive_share": 0.75,
+          "issuers": 4,
+          "issuer_interval": {
+            "clusters": 4,
+            "low": null,
+            "high": null,
+            "method": "too few issuer clusters"
+          },
+          "year_interval": {
+            "clusters": 1,
+            "low": null,
+            "high": null,
+            "method": "too few issuer clusters"
+          }
+        },
+        "unknown": 0,
+        "difference_restricted_minus_unrestricted": {
+          "clusters": 11,
+          "point": 0.004524112307041545,
+          "low": -0.06987650092601586,
+          "high": 0.07755885206844865,
+          "draws": 1985,
+          "se": 0.03800420553034396,
+          "t_cluster": 0.11904241238326445,
+          "bootstrap_two_sided_p": 0.8896725440806046,
+          "method": "95% percentile interval of the difference; whole-issuer bootstrap resampling both groups jointly"
+        }
+      },
+      "2022": {
+        "restricted": {
+          "events": 24,
+          "mean": 0.028100498047333486,
+          "median": 0.024080793420416136,
+          "positive_share": 0.625,
+          "issuers": 24,
+          "issuer_interval": {
+            "clusters": 24,
+            "low": -0.005505710073368744,
+            "high": 0.06013321591688534,
+            "draws": 2000,
+            "method": "95% percentile interval; whole-issuer bootstrap; observed trades only, not future book returns"
+          },
+          "year_interval": {
+            "clusters": 1,
+            "low": null,
+            "high": null,
+            "method": "too few issuer clusters"
+          }
+        },
+        "unrestricted": {
+          "events": 17,
+          "mean": 0.024615134169565962,
+          "median": 0.038167938931297773,
+          "positive_share": 0.7647058823529411,
+          "issuers": 17,
+          "issuer_interval": {
+            "clusters": 17,
+            "low": -0.028700221654146624,
+            "high": 0.06786072267355696,
+            "draws": 2000,
+            "method": "95% percentile interval; whole-issuer bootstrap; observed trades only, not future book returns"
+          },
+          "year_interval": {
+            "clusters": 1,
+            "low": null,
+            "high": null,
+            "method": "too few issuer clusters"
+          }
+        },
+        "unknown": 0,
+        "difference_restricted_minus_unrestricted": {
+          "clusters": 41,
+          "point": 0.0034853638777675236,
+          "low": -0.050975051998721634,
+          "high": 0.07052167974674946,
+          "draws": 2000,
+          "se": 0.031510089586341584,
+          "t_cluster": 0.11061104311421238,
+          "bootstrap_two_sided_p": 0.935,
+          "method": "95% percentile interval of the difference; whole-issuer bootstrap resampling both groups jointly"
+        }
+      },
+      "2023": {
+        "restricted": {
+          "events": 68,
+          "mean": 0.03298028841452118,
+          "median": 0.0546158176189136,
+          "positive_share": 0.7205882352941176,
+          "issuers": 68,
+          "issuer_interval": {
+            "clusters": 68,
+            "low": -0.0007661089656396976,
+            "high": 0.06071849109371219,
+            "draws": 2000,
+            "method": "95% percentile interval; whole-issuer bootstrap; observed trades only, not future book returns"
+          },
+          "year_interval": {
+            "clusters": 1,
+            "low": null,
+            "high": null,
+            "method": "too few issuer clusters"
+          }
+        },
+        "unrestricted": {
+          "events": 41,
+          "mean": 0.03516394411840843,
+          "median": 0.015384615384615441,
+          "positive_share": 0.6585365853658537,
+          "issuers": 41,
+          "issuer_interval": {
+            "clusters": 41,
+            "low": 0.010555362048270157,
+            "high": 0.059084853620271965,
+            "draws": 2000,
+            "method": "95% percentile interval; whole-issuer bootstrap; observed trades only, not future book returns"
+          },
+          "year_interval": {
+            "clusters": 1,
+            "low": null,
+            "high": null,
+            "method": "too few issuer clusters"
+          }
+        },
+        "unknown": 1,
+        "difference_restricted_minus_unrestricted": {
+          "clusters": 109,
+          "point": -0.0021836557038872606,
+          "low": -0.04201360786096763,
+          "high": 0.03632004296120399,
+          "draws": 2000,
+          "se": 0.019720136283858353,
+          "t_cluster": -0.1107322825996219,
+          "bootstrap_two_sided_p": 0.928,
+          "method": "95% percentile interval of the difference; whole-issuer bootstrap resampling both groups jointly"
+        }
+      },
+      "2024": {
+        "restricted": {
+          "events": 86,
+          "mean": 0.04011789548899892,
+          "median": 0.031860324775071336,
+          "positive_share": 0.6627906976744186,
+          "issuers": 84,
+          "issuer_interval": {
+            "clusters": 84,
+            "low": 0.02037503693905027,
+            "high": 0.060745844934271015,
+            "draws": 2000,
+            "method": "95% percentile interval; whole-issuer bootstrap; observed trades only, not future book returns"
+          },
+          "year_interval": {
+            "clusters": 1,
+            "low": null,
+            "high": null,
+            "method": "too few issuer clusters"
+          }
+        },
+        "unrestricted": {
+          "events": 47,
+          "mean": 0.04536288374391998,
+          "median": 0.026470588235294024,
+          "positive_share": 0.6382978723404256,
+          "issuers": 47,
+          "issuer_interval": {
+            "clusters": 47,
+            "low": 0.017449432140620516,
+            "high": 0.07350459004956318,
+            "draws": 2000,
+            "method": "95% percentile interval; whole-issuer bootstrap; observed trades only, not future book returns"
+          },
+          "year_interval": {
+            "clusters": 1,
+            "low": null,
+            "high": null,
+            "method": "too few issuer clusters"
+          }
+        },
+        "unknown": 0,
+        "difference_restricted_minus_unrestricted": {
+          "clusters": 127,
+          "point": -0.0052449882549210625,
+          "low": -0.04080292056409926,
+          "high": 0.027029037981909625,
+          "draws": 2000,
+          "se": 0.0176877827813715,
+          "t_cluster": -0.2965316975989214,
+          "bootstrap_two_sided_p": 0.783,
+          "method": "95% percentile interval of the difference; whole-issuer bootstrap resampling both groups jointly"
+        }
+      }
+    },
+    "bar_proxy_validation": {
+      "confusion": {
+        "status_restricted__proxy_restricted": 335,
+        "status_restricted__proxy_unrestricted": 51,
+        "status_unrestricted__proxy_restricted": 66,
+        "status_unrestricted__proxy_unrestricted": 216
+      },
+      "proxy": "prior session low <= 0.9 x the close before it, with the pre-split close restated by the split ratio",
+      "events_without_proxy": 3
+    }
+  },
+  "fade_baseline": {
+    "definition": "Listed common, ordinary or ADS shares (Nasdaq ITCH definitions, listing venue XNAS/XNYS/XASE), prior listing-venue close under $5, prior 20-session three-venue dollar volume between $50,000 and $20,000,000, at least 20 prior printed sessions, no catalogued reverse split within 30 calendar days, and both official auction prints present. Gross short return = 1 - official close / official open on the listing venue. Equal weight per symbol-day.",
+    "price_basis": "Official listing-venue opening and closing auction prints (Databento statistics types 1 and 11). Conditioning features (prior close, prior-session return, dollar volume, Rule 201 proxy) come from the listing-venue daily bar and the three-venue volume sum; those bars span pre-market and after-hours prints.",
+    "quarters": [
+      "2018Q2",
+      "2018Q3",
+      "2018Q4",
+      "2019Q1",
+      "2019Q2",
+      "2019Q3",
+      "2019Q4",
+      "2020Q1",
+      "2020Q2",
+      "2020Q3",
+      "2020Q4",
+      "2021Q1",
+      "2021Q2",
+      "2021Q3",
+      "2021Q4",
+      "2022Q1",
+      "2022Q2",
+      "2022Q3",
+      "2022Q4",
+      "2023Q1",
+      "2023Q2",
+      "2023Q3",
+      "2023Q4",
+      "2024Q1",
+      "2024Q2",
+      "2024Q3",
+      "2024Q4",
+      "2025Q1",
+      "2025Q2",
+      "2025Q3",
+      "2025Q4",
+      "2026Q1",
+      "2026Q2",
+      "2026Q3",
+      "2026Q4"
+    ],
+    "coverage": {
+      "candidate_symbol_days": 1642114,
+      "candidate_missing_auction": 46927,
+      "eligible_symbol_days": 1595187,
+      "definition_rows": 25027,
+      "exclusion_windows": 9875
+    },
+    "by_split": {
+      "train": {
+        "all": {
+          "symbol_days": 786332,
+          "symbols": 3229,
+          "mean": 0.0019978979352800763,
+          "positive_share": 0.525201823148492,
+          "symbol_interval": {
+            "clusters": 3229,
+            "low": 0.001832185913177944,
+            "high": 0.0021673616605854887,
+            "draws": 2000,
+            "se": 8.553119581491038e-05,
+            "method": "95% percentile interval; whole-symbol bootstrap; observed sessions only"
+          },
+          "month_interval": {
+            "clusters": 56,
+            "low": 0.0010238867531129209,
+            "high": 0.0030108061012569715,
+            "draws": 2000,
+            "se": 0.0004940847758082571,
+            "method": "95% percentile interval; whole-month bootstrap; observed sessions only"
+          }
+        },
+        "band_1_to_2": {
+          "symbol_days": 182580,
+          "symbols": 2025,
+          "mean": 0.0019301504847304355,
+          "positive_share": 0.5173567751122795,
+          "symbol_interval": {
+            "clusters": 2025,
+            "low": 0.001626319833412417,
+            "high": 0.0022238117828995824,
+            "draws": 2000,
+            "se": 0.0001546210866957977,
+            "method": "95% percentile interval; whole-symbol bootstrap; observed sessions only"
+          },
+          "month_interval": {
+            "clusters": 56,
+            "low": 0.0008066598456738406,
+            "high": 0.0031426755177542407,
+            "draws": 2000,
+            "se": 0.0005822228942932524,
+            "method": "95% percentile interval; whole-month bootstrap; observed sessions only"
+          }
+        },
+        "band_2_to_5": {
+          "symbol_days": 497483,
+          "symbols": 3090,
+          "mean": 0.0015183083891209682,
+          "positive_share": 0.5171654106773498,
+          "symbol_interval": {
+            "clusters": 3090,
+            "low": 0.0013417805624495558,
+            "high": 0.0016856533097185477,
+            "draws": 2000,
+            "se": 8.614609886466923e-05,
+            "method": "95% percentile interval; whole-symbol bootstrap; observed sessions only"
+          },
+          "month_interval": {
+            "clusters": 56,
+            "low": 0.0006539872591449998,
+            "high": 0.0023974802501336287,
+            "draws": 2000,
+            "se": 0.0004451072330496484,
+            "method": "95% percentile interval; whole-month bootstrap; observed sessions only"
+          }
+        },
+        "band_under_1": {
+          "symbol_days": 106269,
+          "symbols": 1265,
+          "mean": 0.00435942364563046,
+          "positive_share": 0.576301649587368,
+          "symbol_interval": {
+            "clusters": 1265,
+            "low": 0.003822356201489683,
+            "high": 0.004949711614682075,
+            "draws": 2000,
+            "se": 0.0002887724736061362,
+            "method": "95% percentile interval; whole-symbol bootstrap; observed sessions only"
+          },
+          "month_interval": {
+            "clusters": 56,
+            "low": 0.0026924098698241704,
+            "high": 0.005985241902909333,
+            "draws": 2000,
+            "se": 0.0008267087410957141,
+            "method": "95% percentile interval; whole-month bootstrap; observed sessions only"
+          }
+        },
+        "down10": {
+          "symbol_days": 29472,
+          "symbols": 2901,
+          "mean": 0.0036399955497965005,
+          "positive_share": 0.5463490770901195,
+          "symbol_interval": {
+            "clusters": 2901,
+            "low": 0.0024178557890960073,
+            "high": 0.004893519314474859,
+            "draws": 2000,
+            "se": 0.0006320062008569508,
+            "method": "95% percentile interval; whole-symbol bootstrap; observed sessions only"
+          },
+          "month_interval": {
+            "clusters": 56,
+            "low": 0.0006557344448649235,
+            "high": 0.006686953395406896,
+            "draws": 2000,
+            "se": 0.0015565496242904732,
+            "method": "95% percentile interval; whole-month bootstrap; observed sessions only"
+          }
+        },
+        "middle": {
+          "symbol_days": 748025,
+          "symbols": 3195,
+          "mean": 0.0018056932396172357,
+          "positive_share": 0.5234651248287157,
+          "symbol_interval": {
+            "clusters": 3195,
+            "low": 0.0016428435585776303,
+            "high": 0.0019633984516084437,
+            "draws": 2000,
+            "se": 8.200741026984772e-05,
+            "method": "95% percentile interval; whole-symbol bootstrap; observed sessions only"
+          },
+          "month_interval": {
+            "clusters": 56,
+            "low": 0.0008001402491417295,
+            "high": 0.002867664252791061,
+            "draws": 2000,
+            "se": 0.0005140123509791479,
+            "method": "95% percentile interval; whole-month bootstrap; observed sessions only"
+          }
+        },
+        "ssr_proxy_restricted": {
+          "symbol_days": 66759,
+          "symbols": 3042,
+          "mean": 0.0025758047681276944,
+          "positive_share": 0.5397624290357854,
+          "symbol_interval": {
+            "clusters": 3042,
+            "low": 0.001821558128518718,
+            "high": 0.0033270703036895463,
+            "draws": 2000,
+            "se": 0.0003851770539916427,
+            "method": "95% percentile interval; whole-symbol bootstrap; observed sessions only"
+          },
+          "month_interval": {
+            "clusters": 56,
+            "low": 0.0008070678989458935,
+            "high": 0.0044909738838506495,
+            "draws": 2000,
+            "se": 0.0009598899045609571,
+            "method": "95% percentile interval; whole-month bootstrap; observed sessions only"
+          }
+        },
+        "ssr_proxy_unrestricted": {
+          "symbol_days": 719573,
+          "symbols": 3186,
+          "mean": 0.0019442821350011967,
+          "positive_share": 0.5238509504942515,
+          "symbol_interval": {
+            "clusters": 3186,
+            "low": 0.0017809947481703847,
+            "high": 0.002108203957396262,
+            "draws": 2000,
+            "se": 8.281472893392504e-05,
+            "method": "95% percentile interval; whole-symbol bootstrap; observed sessions only"
+          },
+          "month_interval": {
+            "clusters": 56,
+            "low": 0.0009267188765245868,
+            "high": 0.002998384618457165,
+            "draws": 2000,
+            "se": 0.0005215790053781481,
+            "method": "95% percentile interval; whole-month bootstrap; observed sessions only"
+          }
+        },
+        "up20": {
+          "symbol_days": 8835,
+          "symbols": 2065,
+          "mean": 0.012793372364048422,
+          "positive_share": 0.6016977928692699,
+          "symbol_interval": {
+            "clusters": 2065,
+            "low": 0.009433493631777435,
+            "high": 0.016069278384190033,
+            "draws": 2000,
+            "se": 0.0017028345950774095,
+            "method": "95% percentile interval; whole-symbol bootstrap; observed sessions only"
+          },
+          "month_interval": {
+            "clusters": 56,
+            "low": 0.0076867498182108815,
+            "high": 0.017650384365680078,
+            "draws": 2000,
+            "se": 0.0025557177995459627,
+            "method": "95% percentile interval; whole-month bootstrap; observed sessions only"
+          }
+        },
+        "h8_down10_minus_up20": {
+          "point": -0.009153376814251922,
+          "low": -0.012560344247411783,
+          "high": -0.00559740248969665,
+          "draws": 2000,
+          "se": 0.001764299054494808,
+          "t_cluster": -5.188109572995783,
+          "method": "95% percentile interval of the difference; whole-symbol bootstrap resampling both conditions jointly"
+        },
+        "ssr_proxy_restricted_minus_unrestricted": {
+          "point": 0.0006315226331264981,
+          "low": -0.00014357627204151678,
+          "high": 0.0014185988025400068,
+          "draws": 2000,
+          "se": 0.0003917013173918684,
+          "t_cluster": 1.6122555760891302,
+          "method": "95% percentile interval of the difference; whole-symbol bootstrap resampling both conditions jointly"
+        }
+      },
+      "validate": {
+        "all": {
+          "symbol_days": 409808,
+          "symbols": 2643,
+          "mean": 0.0021499145871031545,
+          "positive_share": 0.520050853082419,
+          "symbol_interval": {
+            "clusters": 2643,
+            "low": 0.0018993874011363151,
+            "high": 0.002398551954111519,
+            "draws": 2000,
+            "se": 0.000128153014426124,
+            "method": "95% percentile interval; whole-symbol bootstrap; observed sessions only"
+          },
+          "month_interval": {
+            "clusters": 24,
+            "low": 0.000809864696043486,
+            "high": 0.0033466972283109553,
+            "draws": 2000,
+            "se": 0.0006518524586013033,
+            "method": "95% percentile interval; whole-month bootstrap; observed sessions only"
+          }
+        },
+        "band_1_to_2": {
+          "symbol_days": 107182,
+          "symbols": 1629,
+          "mean": 0.0023374915970015716,
+          "positive_share": 0.514386744042843,
+          "symbol_interval": {
+            "clusters": 1629,
+            "low": 0.0019177093583409844,
+            "high": 0.0027606167167838662,
+            "draws": 2000,
+            "se": 0.00021456075191175774,
+            "method": "95% percentile interval; whole-symbol bootstrap; observed sessions only"
+          },
+          "month_interval": {
+            "clusters": 24,
+            "low": 0.0008345868156206778,
+            "high": 0.0036968241740039805,
+            "draws": 2000,
+            "se": 0.0007281755738351067,
+            "method": "95% percentile interval; whole-month bootstrap; observed sessions only"
+          }
+        },
+        "band_2_to_5": {
+          "symbol_days": 232952,
+          "symbols": 2256,
+          "mean": 0.00128716176817011,
+          "positive_share": 0.5083450667948762,
+          "symbol_interval": {
+            "clusters": 2256,
+            "low": 0.0010368716877868155,
+            "high": 0.0015553550503122752,
+            "draws": 2000,
+            "se": 0.0001303692483402972,
+            "method": "95% percentile interval; whole-symbol bootstrap; observed sessions only"
+          },
+          "month_interval": {
+            "clusters": 24,
+            "low": 6.107789019434586e-05,
+            "high": 0.0023755483417976014,
+            "draws": 2000,
+            "se": 0.000599250884875637,
+            "method": "95% percentile interval; whole-month bootstrap; observed sessions only"
+          }
+        },
+        "band_under_1": {
+          "symbol_days": 69674,
+          "symbols": 1274,
+          "mean": 0.0047459348471880995,
+          "positive_share": 0.5679019433361081,
+          "symbol_interval": {
+            "clusters": 1274,
+            "low": 0.003980117778469606,
+            "high": 0.005519113229913493,
+            "draws": 2000,
+            "se": 0.0003969338774910119,
+            "method": "95% percentile interval; whole-symbol bootstrap; observed sessions only"
+          },
+          "month_interval": {
+            "clusters": 24,
+            "low": 0.0026873954394099025,
+            "high": 0.006573868619714074,
+            "draws": 2000,
+            "se": 0.00097984853218283,
+            "method": "95% percentile interval; whole-month bootstrap; observed sessions only"
+          }
+        },
+        "down10": {
+          "symbol_days": 16103,
+          "symbols": 2182,
+          "mean": 0.007205974895038951,
+          "positive_share": 0.5627522821834441,
+          "symbol_interval": {
+            "clusters": 2182,
+            "low": 0.005383492379732477,
+            "high": 0.008935246828821042,
+            "draws": 2000,
+            "se": 0.000926993565561365,
+            "method": "95% percentile interval; whole-symbol bootstrap; observed sessions only"
+          },
+          "month_interval": {
+            "clusters": 24,
+            "low": 0.004643484649316761,
+            "high": 0.009504226368462532,
+            "draws": 2000,
+            "se": 0.0012403352017746748,
+            "method": "95% percentile interval; whole-month bootstrap; observed sessions only"
+          }
+        },
+        "middle": {
+          "symbol_days": 388444,
+          "symbols": 2633,
+          "mean": 0.0018595951109923437,
+          "positive_share": 0.5175005921059406,
+          "symbol_interval": {
+            "clusters": 2633,
+            "low": 0.0016363708688657943,
+            "high": 0.0020824575512521106,
+            "draws": 2000,
+            "se": 0.00011448794555302142,
+            "method": "95% percentile interval; whole-symbol bootstrap; observed sessions only"
+          },
+          "month_interval": {
+            "clusters": 24,
+            "low": 0.00045570836803340457,
+            "high": 0.0030876290012502566,
+            "draws": 2000,
+            "se": 0.000664209789643589,
+            "method": "95% percentile interval; whole-month bootstrap; observed sessions only"
+          }
+        },
+        "ssr_proxy_restricted": {
+          "symbol_days": 36057,
+          "symbols": 2353,
+          "mean": 0.0032520281492070357,
+          "positive_share": 0.5454142052860749,
+          "symbol_interval": {
+            "clusters": 2353,
+            "low": 0.0020186693238507408,
+            "high": 0.004503294392729435,
+            "draws": 2000,
+            "se": 0.0006272385039456582,
+            "method": "95% percentile interval; whole-symbol bootstrap; observed sessions only"
+          },
+          "month_interval": {
+            "clusters": 24,
+            "low": 0.0014523741760001394,
+            "high": 0.004909387816431483,
+            "draws": 2000,
+            "se": 0.0009013220174069067,
+            "method": "95% percentile interval; whole-month bootstrap; observed sessions only"
+          }
+        },
+        "ssr_proxy_unrestricted": {
+          "symbol_days": 373751,
+          "symbols": 2627,
+          "mean": 0.0020435900322289743,
+          "positive_share": 0.5176039662770133,
+          "symbol_interval": {
+            "clusters": 2627,
+            "low": 0.0018140177118642967,
+            "high": 0.002274794943842194,
+            "draws": 2000,
+            "se": 0.00011823205017989111,
+            "method": "95% percentile interval; whole-symbol bootstrap; observed sessions only"
+          },
+          "month_interval": {
+            "clusters": 24,
+            "low": 0.0006506301768983543,
+            "high": 0.0033056399407790306,
+            "draws": 2000,
+            "se": 0.0006673100929052784,
+            "method": "95% percentile interval; whole-month bootstrap; observed sessions only"
+          }
+        },
+        "up20": {
+          "symbol_days": 5261,
+          "symbols": 1615,
+          "mean": 0.008109830846311996,
+          "positive_share": 0.577646835202433,
+          "symbol_interval": {
+            "clusters": 1615,
+            "low": 0.0026748181036237487,
+            "high": 0.013329267930930169,
+            "draws": 2000,
+            "se": 0.00267577239914584,
+            "method": "95% percentile interval; whole-symbol bootstrap; observed sessions only"
+          },
+          "month_interval": {
+            "clusters": 24,
+            "low": 0.003683905039969134,
+            "high": 0.012562205413991362,
+            "draws": 2000,
+            "se": 0.002294179668392322,
+            "method": "95% percentile interval; whole-month bootstrap; observed sessions only"
+          }
+        },
+        "h8_down10_minus_up20": {
+          "point": -0.000903855951273045,
+          "low": -0.006368537516812872,
+          "high": 0.004609036029490916,
+          "draws": 2000,
+          "se": 0.002833683221974997,
+          "t_cluster": -0.3189685933359492,
+          "method": "95% percentile interval of the difference; whole-symbol bootstrap resampling both conditions jointly"
+        },
+        "ssr_proxy_restricted_minus_unrestricted": {
+          "point": 0.001208438116978061,
+          "low": -1.548468198029649e-05,
+          "high": 0.002434151792975085,
+          "draws": 2000,
+          "se": 0.0006204849361009006,
+          "t_cluster": 1.9475704351048901,
+          "method": "95% percentile interval of the difference; whole-symbol bootstrap resampling both conditions jointly"
+        }
+      },
+      "pooled_train_validate": {
+        "all": {
+          "symbol_days": 1196140,
+          "symbols": 3969,
+          "mean": 0.002049980166499091,
+          "positive_share": 0.523437055863026,
+          "symbol_interval": {
+            "clusters": 3969,
+            "low": 0.001899965702118207,
+            "high": 0.0021978764777099823,
+            "draws": 2000,
+            "se": 7.57644236860477e-05,
+            "method": "95% percentile interval; whole-symbol bootstrap; observed sessions only"
+          },
+          "month_interval": {
+            "clusters": 80,
+            "low": 0.0013121034750814674,
+            "high": 0.002797246020457342,
+            "draws": 2000,
+            "se": 0.0003867565715545915,
+            "method": "95% percentile interval; whole-month bootstrap; observed sessions only"
+          }
+        },
+        "band_1_to_2": {
+          "symbol_days": 289762,
+          "symbols": 2715,
+          "mean": 0.002080824607270468,
+          "positive_share": 0.516258170498547,
+          "symbol_interval": {
+            "clusters": 2715,
+            "low": 0.0018408204615635447,
+            "high": 0.0023376199791351913,
+            "draws": 2000,
+            "se": 0.00012827878089750113,
+            "method": "95% percentile interval; whole-symbol bootstrap; observed sessions only"
+          },
+          "month_interval": {
+            "clusters": 80,
+            "low": 0.0012055968972353127,
+            "high": 0.0029640023798360986,
+            "draws": 2000,
+            "se": 0.0004495914208364131,
+            "method": "95% percentile interval; whole-month bootstrap; observed sessions only"
+          }
+        },
+        "band_2_to_5": {
+          "symbol_days": 730435,
+          "symbols": 3768,
+          "mean": 0.001444590580358047,
+          "positive_share": 0.5143524064427362,
+          "symbol_interval": {
+            "clusters": 3768,
+            "low": 0.001297879229177281,
+            "high": 0.0015939432725730316,
+            "draws": 2000,
+            "se": 7.411670519329808e-05,
+            "method": "95% percentile interval; whole-symbol bootstrap; observed sessions only"
+          },
+          "month_interval": {
+            "clusters": 80,
+            "low": 0.0007315845545729774,
+            "high": 0.0021247521385221162,
+            "draws": 2000,
+            "se": 0.0003571313546973438,
+            "method": "95% percentile interval; whole-month bootstrap; observed sessions only"
+          }
+        },
+        "band_under_1": {
+          "symbol_days": 175943,
+          "symbols": 1982,
+          "mean": 0.004512483338015647,
+          "positive_share": 0.5729753386039796,
+          "symbol_interval": {
+            "clusters": 1982,
+            "low": 0.004038058800518093,
+            "high": 0.004986912171250732,
+            "draws": 2000,
+            "se": 0.00024011891951302577,
+            "method": "95% percentile interval; whole-symbol bootstrap; observed sessions only"
+          },
+          "month_interval": {
+            "clusters": 80,
+            "low": 0.003355143706195005,
+            "high": 0.005710862592545828,
+            "draws": 2000,
+            "se": 0.0006159116626470978,
+            "method": "95% percentile interval; whole-month bootstrap; observed sessions only"
+          }
+        },
+        "down10": {
+          "symbol_days": 45575,
+          "symbols": 3596,
+          "mean": 0.004899961877749089,
+          "positive_share": 0.552144816236972,
+          "symbol_interval": {
+            "clusters": 3596,
+            "low": 0.003943154452156097,
+            "high": 0.005975010227783893,
+            "draws": 2000,
+            "se": 0.000519184605868749,
+            "method": "95% percentile interval; whole-symbol bootstrap; observed sessions only"
+          },
+          "month_interval": {
+            "clusters": 80,
+            "low": 0.002624739925961749,
+            "high": 0.007155482176782732,
+            "draws": 2000,
+            "se": 0.001198771913382456,
+            "method": "95% percentile interval; whole-month bootstrap; observed sessions only"
+          }
+        },
+        "middle": {
+          "symbol_days": 1136469,
+          "symbols": 3937,
+          "mean": 0.0018241168468818704,
+          "positive_share": 0.5214264533392464,
+          "symbol_interval": {
+            "clusters": 3937,
+            "low": 0.0016812833015170032,
+            "high": 0.001961000949606599,
+            "draws": 2000,
+            "se": 7.025902537600365e-05,
+            "method": "95% percentile interval; whole-symbol bootstrap; observed sessions only"
+          },
+          "month_interval": {
+            "clusters": 80,
+            "low": 0.0010403912361735162,
+            "high": 0.0026022855335475982,
+            "draws": 2000,
+            "se": 0.0003987664856778377,
+            "method": "95% percentile interval; whole-month bootstrap; observed sessions only"
+          }
+        },
+        "ssr_proxy_restricted": {
+          "symbol_days": 102816,
+          "symbols": 3741,
+          "mean": 0.002812952551075658,
+          "positive_share": 0.541744475568005,
+          "symbol_interval": {
+            "clusters": 3741,
+            "low": 0.0021506277350666026,
+            "high": 0.003481067798839926,
+            "draws": 2000,
+            "se": 0.0003322105663973962,
+            "method": "95% percentile interval; whole-symbol bootstrap; observed sessions only"
+          },
+          "month_interval": {
+            "clusters": 80,
+            "low": 0.0014573864704340513,
+            "high": 0.004221746297483374,
+            "draws": 2000,
+            "se": 0.0007152255261233634,
+            "method": "95% percentile interval; whole-month bootstrap; observed sessions only"
+          }
+        },
+        "ssr_proxy_unrestricted": {
+          "symbol_days": 1093324,
+          "symbols": 3926,
+          "mean": 0.0019782303753185953,
+          "positive_share": 0.5217154292780548,
+          "symbol_interval": {
+            "clusters": 3926,
+            "low": 0.0018377110198932998,
+            "high": 0.0021256768005603727,
+            "draws": 2000,
+            "se": 7.218528537182864e-05,
+            "method": "95% percentile interval; whole-symbol bootstrap; observed sessions only"
+          },
+          "month_interval": {
+            "clusters": 80,
+            "low": 0.0012040046670635013,
+            "high": 0.0027631240642260984,
+            "draws": 2000,
+            "se": 0.0004043942444548553,
+            "method": "95% percentile interval; whole-month bootstrap; observed sessions only"
+          }
+        },
+        "up20": {
+          "symbol_days": 14096,
+          "symbols": 2828,
+          "mean": 0.01104535080298065,
+          "positive_share": 0.5927213393870602,
+          "symbol_interval": {
+            "clusters": 2828,
+            "low": 0.008092991287757149,
+            "high": 0.014044946009609396,
+            "draws": 2000,
+            "se": 0.001540470545574898,
+            "method": "95% percentile interval; whole-symbol bootstrap; observed sessions only"
+          },
+          "month_interval": {
+            "clusters": 80,
+            "low": 0.007252058477490352,
+            "high": 0.014616466021421755,
+            "draws": 2000,
+            "se": 0.0018752822304678883,
+            "method": "95% percentile interval; whole-month bootstrap; observed sessions only"
+          }
+        },
+        "h8_down10_minus_up20": {
+          "point": -0.006145388925231561,
+          "low": -0.00918878442426778,
+          "high": -0.0028906887755423376,
+          "draws": 2000,
+          "se": 0.0016105763671636745,
+          "t_cluster": -3.815645784033187,
+          "method": "95% percentile interval of the difference; whole-symbol bootstrap resampling both conditions jointly"
+        },
+        "ssr_proxy_restricted_minus_unrestricted": {
+          "point": 0.0008347221757570625,
+          "low": 0.00021887656025738414,
+          "high": 0.001492105790791464,
+          "draws": 2000,
+          "se": 0.0003316531431089102,
+          "t_cluster": 2.5168529021989445,
+          "method": "95% percentile interval of the difference; whole-symbol bootstrap resampling both conditions jointly"
+        }
+      }
+    },
+    "by_year": [
+      {
+        "year": "2018",
+        "all": {
+          "symbol_days": 64679,
+          "mean": 0.005095713573455136,
+          "positive_share": 0.5374387359111922,
+          "symbol_interval": {
+            "clusters": 1038,
+            "low": 0.004611017660318398,
+            "high": 0.005587465343132499,
+            "draws": 2000,
+            "se": 0.0002459861657048827,
+            "method": "95% percentile interval; whole-symbol bootstrap; observed sessions only"
+          }
+        },
+        "down10": {
+          "symbol_days": 1994,
+          "mean": 0.012957377467336294,
+          "positive_share": 0.5842527582748245,
+          "symbol_interval": {
+            "clusters": 623,
+            "low": 0.008585938234227253,
+            "high": 0.017048218589914687,
+            "draws": 2000,
+            "se": 0.002157136630277259,
+            "method": "95% percentile interval; whole-symbol bootstrap; observed sessions only"
+          }
+        },
+        "middle": {
+          "symbol_days": 62141,
+          "mean": 0.004649971546261598,
+          "positive_share": 0.5348803527461741,
+          "symbol_interval": {
+            "clusters": 1033,
+            "low": 0.00420316421646038,
+            "high": 0.005102769018383449,
+            "draws": 2000,
+            "se": 0.0002337268472222502,
+            "method": "95% percentile interval; whole-symbol bootstrap; observed sessions only"
+          }
+        },
+        "up20": {
+          "symbol_days": 544,
+          "mean": 0.027196260462121646,
+          "positive_share": 0.6580882352941176,
+          "symbol_interval": {
+            "clusters": 296,
+            "low": 0.012349364528253765,
+            "high": 0.040560693996089484,
+            "draws": 2000,
+            "se": 0.007147224469800861,
+            "method": "95% percentile interval; whole-symbol bootstrap; observed sessions only"
+          }
+        }
+      },
+      {
+        "year": "2019",
+        "all": {
+          "symbol_days": 127091,
+          "mean": 0.001895512853919561,
+          "positive_share": 0.5140961987866961,
+          "symbol_interval": {
+            "clusters": 1323,
+            "low": 0.0015401673329996557,
+            "high": 0.002255907936530075,
+            "draws": 2000,
+            "se": 0.00018172684307013972,
+            "method": "95% percentile interval; whole-symbol bootstrap; observed sessions only"
+          }
+        },
+        "down10": {
+          "symbol_days": 3436,
+          "mean": 0.008131908223999883,
+          "positive_share": 0.5567520372526193,
+          "symbol_interval": {
+            "clusters": 883,
+            "low": 0.004862372003203294,
+            "high": 0.011398040361453794,
+            "draws": 2000,
+            "se": 0.001687854845998788,
+            "method": "95% percentile interval; whole-symbol bootstrap; observed sessions only"
+          }
+        },
+        "middle": {
+          "symbol_days": 122493,
+          "mean": 0.0015933147381785463,
+          "positive_share": 0.511898639105908,
+          "symbol_interval": {
+            "clusters": 1320,
+            "low": 0.0012535033293779177,
+            "high": 0.0019293161999408002,
+            "draws": 2000,
+            "se": 0.00017332574707782148,
+            "method": "95% percentile interval; whole-symbol bootstrap; observed sessions only"
+          }
+        },
+        "up20": {
+          "symbol_days": 1162,
+          "mean": 0.015311088843479035,
+          "positive_share": 0.6196213425129088,
+          "symbol_interval": {
+            "clusters": 556,
+            "low": 0.006242914024250598,
+            "high": 0.023660909584835025,
+            "draws": 2000,
+            "se": 0.004470081441015535,
+            "method": "95% percentile interval; whole-symbol bootstrap; observed sessions only"
+          }
+        }
+      },
+      {
+        "year": "2020",
+        "all": {
+          "symbol_days": 189321,
+          "mean": 0.0014817993996226121,
+          "positive_share": 0.5314413086767976,
+          "symbol_interval": {
+            "clusters": 1777,
+            "low": 0.0011543243084285936,
+            "high": 0.001812942919349537,
+            "draws": 2000,
+            "se": 0.00017160837915085976,
+            "method": "95% percentile interval; whole-symbol bootstrap; observed sessions only"
+          }
+        },
+        "down10": {
+          "symbol_days": 9846,
+          "mean": 0.00045919725422246757,
+          "positive_share": 0.5421490960796262,
+          "symbol_interval": {
+            "clusters": 1600,
+            "low": -0.001895683355608454,
+            "high": 0.0028515957040488567,
+            "draws": 2000,
+            "se": 0.0012134229068390238,
+            "method": "95% percentile interval; whole-symbol bootstrap; observed sessions only"
+          }
+        },
+        "middle": {
+          "symbol_days": 175881,
+          "mean": 0.0012054741412744284,
+          "positive_share": 0.5288405228535202,
+          "symbol_interval": {
+            "clusters": 1734,
+            "low": 0.0008803833017964038,
+            "high": 0.0015063488020958004,
+            "draws": 2000,
+            "se": 0.00015877112450779358,
+            "method": "95% percentile interval; whole-symbol bootstrap; observed sessions only"
+          }
+        },
+        "up20": {
+          "symbol_days": 3594,
+          "mean": 0.017805923909123642,
+          "positive_share": 0.6293823038397329,
+          "symbol_interval": {
+            "clusters": 1117,
+            "low": 0.012487677089080346,
+            "high": 0.022631250335090114,
+            "draws": 2000,
+            "se": 0.0025920071061204804,
+            "method": "95% percentile interval; whole-symbol bootstrap; observed sessions only"
+          }
+        }
+      },
+      {
+        "year": "2021",
+        "all": {
+          "symbol_days": 183129,
+          "mean": 0.0010082265227663962,
+          "positive_share": 0.5227954065167177,
+          "symbol_interval": {
+            "clusters": 1514,
+            "low": 0.0007111244593010782,
+            "high": 0.001283839812145582,
+            "draws": 2000,
+            "se": 0.00014944083766892989,
+            "method": "95% percentile interval; whole-symbol bootstrap; observed sessions only"
+          }
+        },
+        "down10": {
+          "symbol_days": 4692,
+          "mean": -0.003448344323136633,
+          "positive_share": 0.5132139812446718,
+          "symbol_interval": {
+            "clusters": 1119,
+            "low": -0.0057589831753012966,
+            "high": -0.0011012904763743293,
+            "draws": 2000,
+            "se": 0.001215534884108491,
+            "method": "95% percentile interval; whole-symbol bootstrap; observed sessions only"
+          }
+        },
+        "middle": {
+          "symbol_days": 177023,
+          "mean": 0.0010390257198150377,
+          "positive_share": 0.5223615010478865,
+          "symbol_interval": {
+            "clusters": 1510,
+            "low": 0.0007290593533309672,
+            "high": 0.0013224720664142646,
+            "draws": 2000,
+            "se": 0.00015073811157918993,
+            "method": "95% percentile interval; whole-symbol bootstrap; observed sessions only"
+          }
+        },
+        "up20": {
+          "symbol_days": 1414,
+          "mean": 0.011940379386864942,
+          "positive_share": 0.6089108910891089,
+          "symbol_interval": {
+            "clusters": 627,
+            "low": 0.003510433757888329,
+            "high": 0.01968688686090795,
+            "draws": 2000,
+            "se": 0.004197013352224139,
+            "method": "95% percentile interval; whole-symbol bootstrap; observed sessions only"
+          }
+        }
+      },
+      {
+        "year": "2022",
+        "all": {
+          "symbol_days": 222112,
+          "mean": 0.002410277418086449,
+          "positive_share": 0.5246587307304423,
+          "symbol_interval": {
+            "clusters": 2154,
+            "low": 0.0020901142882854707,
+            "high": 0.0027209023263145417,
+            "draws": 2000,
+            "se": 0.00015766173074007904,
+            "method": "95% percentile interval; whole-symbol bootstrap; observed sessions only"
+          }
+        },
+        "down10": {
+          "symbol_days": 9504,
+          "mean": 0.00685585826127451,
+          "positive_share": 0.5553451178451179,
+          "symbol_interval": {
+            "clusters": 1715,
+            "low": 0.004587877277788398,
+            "high": 0.008951820414705478,
+            "draws": 2000,
+            "se": 0.0011175378663102736,
+            "method": "95% percentile interval; whole-symbol bootstrap; observed sessions only"
+          }
+        },
+        "middle": {
+          "symbol_days": 210487,
+          "mean": 0.002235902711542427,
+          "positive_share": 0.5232627193128316,
+          "symbol_interval": {
+            "clusters": 2150,
+            "low": 0.0019494484995277303,
+            "high": 0.002515017368122451,
+            "draws": 2000,
+            "se": 0.00014440162681275519,
+            "method": "95% percentile interval; whole-symbol bootstrap; observed sessions only"
+          }
+        },
+        "up20": {
+          "symbol_days": 2121,
+          "mean": -0.00020508867211994406,
+          "positive_share": 0.5256954266855257,
+          "symbol_interval": {
+            "clusters": 975,
+            "low": -0.007013953788219939,
+            "high": 0.006278412286950107,
+            "draws": 2000,
+            "se": 0.0033247932116575725,
+            "method": "95% percentile interval; whole-symbol bootstrap; observed sessions only"
+          }
+        }
+      },
+      {
+        "year": "2023",
+        "all": {
+          "symbol_days": 204937,
+          "mean": 0.0019146972971617376,
+          "positive_share": 0.5131869794131855,
+          "symbol_interval": {
+            "clusters": 2121,
+            "low": 0.0016007424168887558,
+            "high": 0.0022427706767913376,
+            "draws": 2000,
+            "se": 0.00016426820189911504,
+            "method": "95% percentile interval; whole-symbol bootstrap; observed sessions only"
+          }
+        },
+        "down10": {
+          "symbol_days": 7586,
+          "mean": 0.009089802319618463,
+          "positive_share": 0.5680200369100975,
+          "symbol_interval": {
+            "clusters": 1580,
+            "low": 0.006672774708493906,
+            "high": 0.011516633881371582,
+            "draws": 2000,
+            "se": 0.0012390431054127263,
+            "method": "95% percentile interval; whole-symbol bootstrap; observed sessions only"
+          }
+        },
+        "middle": {
+          "symbol_days": 195023,
+          "mean": 0.0015854930852838487,
+          "positive_share": 0.5103756992764956,
+          "symbol_interval": {
+            "clusters": 2114,
+            "low": 0.0013106830755131049,
+            "high": 0.0018927554089846156,
+            "draws": 2000,
+            "se": 0.00014955199917071355,
+            "method": "95% percentile interval; whole-symbol bootstrap; observed sessions only"
+          }
+        },
+        "up20": {
+          "symbol_days": 2328,
+          "mean": 0.006112311692653489,
+          "positive_share": 0.5700171821305842,
+          "symbol_interval": {
+            "clusters": 1001,
+            "low": -0.0017804938641940078,
+            "high": 0.013488605625198147,
+            "draws": 2000,
+            "se": 0.003939457973424189,
+            "method": "95% percentile interval; whole-symbol bootstrap; observed sessions only"
+          }
+        }
+      },
+      {
+        "year": "2024",
+        "all": {
+          "symbol_days": 204871,
+          "mean": 0.002385207653221464,
+          "positive_share": 0.5269169379756041,
+          "symbol_interval": {
+            "clusters": 2108,
+            "low": 0.002067098471353545,
+            "high": 0.0027046866455353717,
+            "draws": 2000,
+            "se": 0.00016438889371635948,
+            "method": "95% percentile interval; whole-symbol bootstrap; observed sessions only"
+          }
+        },
+        "down10": {
+          "symbol_days": 8517,
+          "mean": 0.005528070134811151,
+          "positive_share": 0.5580603498884584,
+          "symbol_interval": {
+            "clusters": 1661,
+            "low": 0.003014940631245366,
+            "high": 0.007969396332060426,
+            "draws": 2000,
+            "se": 0.0012645663664141464,
+            "method": "95% percentile interval; whole-symbol bootstrap; observed sessions only"
+          }
+        },
+        "middle": {
+          "symbol_days": 193421,
+          "mean": 0.0021359673733617234,
+          "positive_share": 0.5246844965127881,
+          "symbol_interval": {
+            "clusters": 2095,
+            "low": 0.001829045557200031,
+            "high": 0.002414472067718922,
+            "draws": 2000,
+            "se": 0.00015113157965130543,
+            "method": "95% percentile interval; whole-symbol bootstrap; observed sessions only"
+          }
+        },
+        "up20": {
+          "symbol_days": 2933,
+          "mean": 0.009695314852352572,
+          "positive_share": 0.5837026934878964,
+          "symbol_interval": {
+            "clusters": 1156,
+            "low": 0.0019604694913454186,
+            "high": 0.01667577974299399,
+            "draws": 2000,
+            "se": 0.003804669005640286,
+            "method": "95% percentile interval; whole-symbol bootstrap; observed sessions only"
+          }
+        }
+      }
+    ],
+    "split_family_excess": {
+      "exclusions": {
+        "no_control_within_calipers": 118
+      },
+      "train": {
+        "events": 120,
+        "excess_all": {
+          "events": 120,
+          "mean": 0.019469874467684462,
+          "median": 0.02148860450736878,
+          "positive_share": 0.5916666666666667,
+          "issuers": 116,
+          "issuer_interval": {
+            "clusters": 116,
+            "low": 0.003354999133423406,
+            "high": 0.03622534595257558,
+            "draws": 2000,
+            "method": "95% percentile interval; whole-issuer bootstrap; observed trades only, not future book returns"
+          },
+          "year_interval": {
+            "clusters": 5,
+            "low": 0.008576709983309632,
+            "high": 0.025890932560073337,
+            "draws": 2000,
+            "method": "95% percentile interval; whole-issuer bootstrap; observed trades only, not future book returns"
+          },
+          "subject_mean": 0.02070348900613821,
+          "comparator_mean": 0.0012336145384537467
+        },
+        "excess_bucket": {
+          "events": 110,
+          "mean": 0.01906670000861463,
+          "median": 0.016411034766143924,
+          "positive_share": 0.5818181818181818,
+          "issuers": 106,
+          "issuer_interval": {
+            "clusters": 106,
+            "low": 0.003346260297911655,
+            "high": 0.03497252146411151,
+            "draws": 2000,
+            "method": "95% percentile interval; whole-issuer bootstrap; observed trades only, not future book returns"
+          },
+          "year_interval": {
+            "clusters": 5,
+            "low": 0.004588360541756838,
+            "high": 0.0264827225317234,
+            "draws": 2000,
+            "method": "95% percentile interval; whole-issuer bootstrap; observed trades only, not future book returns"
+          },
+          "subject_mean": 0.02231037827296719,
+          "comparator_mean": 0.0032436782643525588
+        },
+        "excess_calipers": {
+          "events": 105,
+          "mean": 0.018119830862724534,
+          "median": 0.01096492991819938,
+          "positive_share": 0.5714285714285714,
+          "issuers": 102,
+          "issuer_interval": {
+            "clusters": 102,
+            "low": 0.0024962840037642763,
+            "high": 0.03417034286089406,
+            "draws": 2000,
+            "method": "95% percentile interval; whole-issuer bootstrap; observed trades only, not future book returns"
+          },
+          "year_interval": {
+            "clusters": 5,
+            "low": 0.002779339945151539,
+            "high": 0.024347673113940135,
+            "draws": 2000,
+            "method": "95% percentile interval; whole-issuer bootstrap; observed trades only, not future book returns"
+          },
+          "subject_mean": 0.021496602327036735,
+          "comparator_mean": 0.003376771464312205
+        },
+        "excess_calipers_same_bucket": {
+          "events": 97,
+          "mean": 0.010930758760752005,
+          "median": 0.006249161153175087,
+          "positive_share": 0.5257731958762887,
+          "issuers": 94,
+          "issuer_interval": {
+            "clusters": 94,
+            "low": -0.00592752590485871,
+            "high": 0.027790746353686606,
+            "draws": 2000,
+            "method": "95% percentile interval; whole-issuer bootstrap; observed trades only, not future book returns"
+          },
+          "year_interval": {
+            "clusters": 5,
+            "low": -0.013623739067966455,
+            "high": 0.021780693835416986,
+            "draws": 2000,
+            "method": "95% percentile interval; whole-issuer bootstrap; observed trades only, not future book returns"
+          },
+          "subject_mean": 0.019113364304812384,
+          "comparator_mean": 0.008182605544060377
+        },
+        "recomputed_auction_return_check": {
+          "events": 120,
+          "mean_abs_difference": 0.0,
+          "within_1bp": 120
+        }
+      },
+      "validate": {
+        "events": 243,
+        "excess_all": {
+          "events": 243,
+          "mean": 0.03519071817011849,
+          "median": 0.03418702592599756,
+          "positive_share": 0.6872427983539094,
+          "issuers": 228,
+          "issuer_interval": {
+            "clusters": 228,
+            "low": 0.022328453023733853,
+            "high": 0.047577518369346754,
+            "draws": 2000,
+            "method": "95% percentile interval; whole-issuer bootstrap; observed trades only, not future book returns"
+          },
+          "year_interval": {
+            "clusters": 2,
+            "low": null,
+            "high": null,
+            "method": "too few issuer clusters"
+          },
+          "subject_mean": 0.038204282779739564,
+          "comparator_mean": 0.0030135646096210683
+        },
+        "excess_bucket": {
+          "events": 224,
+          "mean": 0.030748555568151627,
+          "median": 0.028306802342496985,
+          "positive_share": 0.6607142857142857,
+          "issuers": 211,
+          "issuer_interval": {
+            "clusters": 211,
+            "low": 0.01697158139007545,
+            "high": 0.04408483428642783,
+            "draws": 2000,
+            "method": "95% percentile interval; whole-issuer bootstrap; observed trades only, not future book returns"
+          },
+          "year_interval": {
+            "clusters": 2,
+            "low": null,
+            "high": null,
+            "method": "too few issuer clusters"
+          },
+          "subject_mean": 0.034773117912076254,
+          "comparator_mean": 0.0040245623439246255
+        },
+        "excess_calipers": {
+          "events": 185,
+          "mean": 0.03660266496073208,
+          "median": 0.046007030638291035,
+          "positive_share": 0.654054054054054,
+          "issuers": 175,
+          "issuer_interval": {
+            "clusters": 175,
+            "low": 0.019002540875858343,
+            "high": 0.0521429916180814,
+            "draws": 2000,
+            "method": "95% percentile interval; whole-issuer bootstrap; observed trades only, not future book returns"
+          },
+          "year_interval": {
+            "clusters": 2,
+            "low": null,
+            "high": null,
+            "method": "too few issuer clusters"
+          },
+          "subject_mean": 0.04125943375270903,
+          "comparator_mean": 0.004656768791976958
+        },
+        "excess_calipers_same_bucket": {
+          "events": 166,
+          "mean": 0.03309643034179639,
+          "median": 0.03373387020051184,
+          "positive_share": 0.6265060240963856,
+          "issuers": 156,
+          "issuer_interval": {
+            "clusters": 156,
+            "low": 0.014991153497153934,
+            "high": 0.051426538054674585,
+            "draws": 2000,
+            "method": "95% percentile interval; whole-issuer bootstrap; observed trades only, not future book returns"
+          },
+          "year_interval": {
+            "clusters": 2,
+            "low": null,
+            "high": null,
+            "method": "too few issuer clusters"
+          },
+          "subject_mean": 0.03634940949527367,
+          "comparator_mean": 0.003252979153477281
+        },
+        "recomputed_auction_return_check": {
+          "events": 243,
+          "mean_abs_difference": 0.0,
+          "within_1bp": 243
+        }
+      },
+      "pooled_train_validate": {
+        "events": 363,
+        "excess_all": {
+          "events": 363,
+          "mean": 0.029993745045346916,
+          "median": 0.02669358048304657,
+          "positive_share": 0.6556473829201102,
+          "issuers": 327,
+          "issuer_interval": {
+            "clusters": 327,
+            "low": 0.020060278194496503,
+            "high": 0.03964045950299251,
+            "draws": 2000,
+            "method": "95% percentile interval; whole-issuer bootstrap; observed trades only, not future book returns"
+          },
+          "year_interval": {
+            "clusters": 7,
+            "low": 0.018170791828598702,
+            "high": 0.0351802656123902,
+            "draws": 2000,
+            "method": "95% percentile interval; whole-issuer bootstrap; observed trades only, not future book returns"
+          },
+          "subject_mean": 0.032418896408301104,
+          "comparator_mean": 0.0024251513629541853
+        },
+        "excess_bucket": {
+          "events": 334,
+          "mean": 0.026901237868902913,
+          "median": 0.02416862182256983,
+          "positive_share": 0.6347305389221557,
+          "issuers": 304,
+          "issuer_interval": {
+            "clusters": 304,
+            "low": 0.016241561609581536,
+            "high": 0.03759961317759368,
+            "draws": 2000,
+            "method": "95% percentile interval; whole-issuer bootstrap; observed trades only, not future book returns"
+          },
+          "year_interval": {
+            "clusters": 7,
+            "low": 0.016871822358810604,
+            "high": 0.03143146050506042,
+            "draws": 2000,
+            "method": "95% percentile interval; whole-issuer bootstrap; observed trades only, not future book returns"
+          },
+          "subject_mean": 0.03066862282135171,
+          "comparator_mean": 0.003767384952448795
+        },
+        "excess_calipers": {
+          "events": 290,
+          "mean": 0.02991060433903969,
+          "median": 0.03334303489253152,
+          "positive_share": 0.6241379310344828,
+          "issuers": 267,
+          "issuer_interval": {
+            "clusters": 267,
+            "low": 0.018527428284634592,
+            "high": 0.04129458891778056,
+            "draws": 2000,
+            "method": "95% percentile interval; whole-issuer bootstrap; observed trades only, not future book returns"
+          },
+          "year_interval": {
+            "clusters": 7,
+            "low": 0.01607130888053579,
+            "high": 0.0356817209708323,
+            "draws": 2000,
+            "method": "95% percentile interval; whole-issuer bootstrap; observed trades only, not future book returns"
+          },
+          "subject_mean": 0.034103925822724236,
+          "comparator_mean": 0.004193321483684548
+        },
+        "excess_calipers_same_bucket": {
+          "events": 263,
+          "mean": 0.024921258694034772,
+          "median": 0.021353954687288106,
+          "positive_share": 0.5893536121673004,
+          "issuers": 242,
+          "issuer_interval": {
+            "clusters": 242,
+            "low": 0.011688498491752025,
+            "high": 0.037812186461783574,
+            "draws": 2000,
+            "method": "95% percentile interval; whole-issuer bootstrap; observed trades only, not future book returns"
+          },
+          "year_interval": {
+            "clusters": 7,
+            "low": 0.006757733279465916,
+            "high": 0.03166616579248913,
+            "draws": 2000,
+            "method": "95% percentile interval; whole-issuer bootstrap; observed trades only, not future book returns"
+          },
+          "subject_mean": 0.029992389025787946,
+          "comparator_mean": 0.005071130331753175
+        },
+        "recomputed_auction_return_check": {
+          "events": 363,
+          "mean_abs_difference": 0.0,
+          "within_1bp": 363
+        }
+      }
+    }
+  },
+  "assessments": {
+    "H1": {
+      "registered_success": "either direction with |t_cluster| >= 3 on validation",
+      "registered_kill": "interval covers zero on train and validation",
+      "assessment": "Kill criterion met: the restricted-minus-unrestricted interval covers zero on train and on validation. Treat both states as one population for the gross return and model Rule 201 as a price constraint in the fill model, not as an admission rule.",
+      "train_difference": {
+        "point": 0.029420978493323827,
+        "low": -0.0017827378741944986,
+        "high": 0.060141793181749004,
+        "t_cluster": 1.8202983077908865
+      },
+      "validate_difference": {
+        "point": -0.0036448802220251653,
+        "low": -0.030120198626208645,
+        "high": 0.02210499523710506,
+        "t_cluster": -0.278297497616701
+      }
+    },
+    "H7": {
+      "assessment": "Reported, not promoted: registered as a descriptive baseline."
+    },
+    "H8": {
+      "assessment": "Reported, not promoted: registered as descriptive. Positive difference means the registered direction.",
+      "by_split": {
+        "train": {
+          "reading": "reversed: larger fade after a +20% close",
+          "point": -0.009153376814251922,
+          "low": -0.012560344247411783,
+          "high": -0.00559740248969665,
+          "t_cluster": -5.188109572995783
+        },
+        "validate": {
+          "reading": "not distinguishable from zero",
+          "point": -0.000903855951273045,
+          "low": -0.006368537516812872,
+          "high": 0.004609036029490916,
+          "t_cluster": -0.3189685933359492
+        }
+      }
+    }
+  },
+  "definitions": {
+    "short_return_convention": "1 - exit price / entry price; positive means the short gained.",
+    "split": "By the entry session date. Train 2018-05-01 to 2022-12-31, validate 2023-01-01 to 2024-12-31, holdout from 2025-01-01 (sealed).",
+    "issuer_interval": "95% percentile interval from 2,000 whole-issuer (CIK) bootstrap draws; events of one issuer move together.",
+    "symbol_interval": "95% percentile interval from 2,000 whole-symbol bootstrap draws over per-symbol sums; a symbol is the issuer proxy for the universe.",
+    "month_interval": "95% percentile interval from 2,000 whole-calendar-month bootstrap draws; sessions of one month move together.",
+    "t_cluster": "Point estimate divided by the bootstrap standard error of the difference; a descriptive ratio, not an asymptotic test.",
+    "excess_all": "Event return minus the same-session mean fade of all eligible sub-$5 names (at least five names that session).",
+    "excess_bucket": "Event return minus the same-session mean fade of eligible names in the same prior-session-return bucket.",
+    "excess_calipers": "Event return minus the mean of up to three same-session listed names nearest in log prior close (within x2) and log dollar volume (within x3), no price cap, no catalogued split within 30 days.",
+    "excess_calipers_same_bucket": "As excess_calipers, additionally requiring the same prior-session-return bucket."
+  },
+  "limits": [
+    "Gross price behaviour only: no borrow, locate, spread, depth, commission or fill assumption enters any number here.",
+    "The universe is listed names on the three venue datasets since 2018-05; OTC and pre-2018 names are absent, and a symbol is used as the issuer cluster.",
+    "Conditioning features come from daily bars that include pre-market and after-hours prints; the return itself uses official auction prints.",
+    "Three-venue volume understates consolidated volume, so the dollar-volume band is conservative relative to a consolidated definition.",
+    "The Rule 201 proxy is a bar-based approximation; the event cohort's SSR state is the cached Nasdaq status and is the authoritative H1 contrast.",
+    "Catalogued-split exclusion windows rely on the ledger and the expansion catalogue; an undiscovered split would leave its sessions in the universe.",
+    "Matched controls use pre-entry features only; they describe a conditional comparison, not a causal or executable alpha claim.",
+    "Holdout results exist only under local/holdout and were not read while writing this document; nothing here was selected on them.",
+    "H7 and H8 are descriptive baselines by registration; they are reported, not promoted."
+  ]
+}
