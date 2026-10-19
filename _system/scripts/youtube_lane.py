@@ -42,6 +42,7 @@ import argparse
 import os
 import re
 import shlex
+import shutil
 import subprocess
 import sys
 from datetime import datetime, timezone
@@ -75,6 +76,16 @@ MAIN_PATHS = (
 # click. Scoped to this one directory so the `git add -A` discipline above still
 # holds: nothing outside it is ever staged by this lane.
 MAIN_DIRS = ("dashboard/data/insights/video_details",)
+
+# The podcast batch publishes the same way. The manifest is shared with the
+# video shard, so a podcast push rewrites it and must start from the copy
+# already on main rather than an empty file.
+PODCAST_PATHS = (
+    "dashboard/data/insights/manifest.json",
+    "dashboard/data/insights/podcasts.json",
+    "_system/reference/podcasts/insights_index_mirror.json",
+)
+PODCAST_DIRS = ("dashboard/data/insights/podcast_episodes",)
 
 # The branch this lane publishes to. It commits to HEAD and then pushes, so
 # `git push origin main` -- which resolves the *local* ref of that name --
@@ -205,6 +216,16 @@ def self_update() -> None:
             run_git(ROOT, "checkout", "--", rel, check=False, timeout=120)
             run_git(ROOT, "clean", "-fdq", "--", rel, check=False, timeout=120)
     try:
+        # This Mac runs the lane from the media-lane commit, which is not on
+        # main. Rebasing that checkout replays the commit onto main inside the
+        # worktree the LaunchAgent is executing. Leave it. The shard is
+        # published from a separate main worktree instead.
+        contained = run_git(ROOT, "merge-base", "--is-ancestor", "HEAD",
+                            f"origin/{MAIN_BRANCH}", check=False, timeout=60)
+        if contained.returncode != 0:
+            log("self-update skipped: checkout is not on origin/main, "
+                "so rebasing it would replay local commits")
+            return
         run_git(ROOT, "-c", "rebase.autoStash=true", "pull", "--rebase",
                 "origin", "main", timeout=900)
         log("worktree updated from origin/main")
@@ -265,7 +286,97 @@ def _push_vault_locked(repo: Path, message: str) -> bool | None:
         return False
 
 
-def push_main(message: str) -> bool | None:
+def _publish_worktree() -> Path:
+    override = os.environ.get("YOUTUBE_PUBLISH_WORKTREE", "").strip()
+    if override:
+        return Path(override)
+    return Path.home() / "Projects" / "ssi-dashboard-publish"
+
+
+def _head_is_origin_main() -> bool:
+    """True when this checkout has nothing origin/main does not already have."""
+    run_git(ROOT, "fetch", "origin", MAIN_BRANCH, timeout=300)
+    contained = run_git(ROOT, "merge-base", "--is-ancestor", "HEAD",
+                        f"origin/{MAIN_BRANCH}", check=False, timeout=60)
+    return contained.returncode == 0
+
+
+def _ensure_publish_worktree() -> Path:
+    """A detached sparse checkout of origin/main, used only to publish shards.
+
+    The lane worktree on this Mac is the media-lane commit. Committing the
+    shard there and pushing HEAD:main would publish that commit to the public
+    repository. The shard is copied onto a checkout that starts at origin/main,
+    and only the published paths are committed.
+    """
+    path = _publish_worktree()
+    if not (path / ".git").exists():
+        if path.exists():
+            raise OSError(f"publish worktree path exists and is not a worktree: {path}")
+        path.parent.mkdir(parents=True, exist_ok=True)
+        # --no-checkout first. `worktree add --sparse` is not in this git, and a
+        # normal add would materialize the whole repository (~15 GB) just to
+        # publish a handful of dashboard files.
+        run_git(ROOT, "worktree", "add", "--detach", "--no-checkout", str(path),
+                f"origin/{MAIN_BRANCH}", timeout=300)
+        run_git(path, "sparse-checkout", "init", "--cone", timeout=120)
+        run_git(path, "sparse-checkout", "set",
+                "dashboard/data/insights", "_system/reference/video", timeout=120)
+        run_git(path, "checkout", "--detach", f"origin/{MAIN_BRANCH}", timeout=300)
+    # Expand before reset so a cone created for videos also materializes the
+    # podcast mirror. set is idempotent.
+    run_git(path, "sparse-checkout", "set",
+            "dashboard/data/insights",
+            "_system/reference/video",
+            "_system/reference/podcasts",
+            timeout=120)
+    run_git(path, "fetch", "origin", MAIN_BRANCH, timeout=300)
+    run_git(path, "reset", "--hard", f"origin/{MAIN_BRANCH}", timeout=180)
+    return path
+
+
+def _sync_published(src: Path, dst: Path, paths: tuple[str, ...] = MAIN_PATHS,
+                    dirs: tuple[str, ...] = MAIN_DIRS) -> None:
+    for rel in (*paths, *dirs):
+        source = src / rel
+        target = dst / rel
+        if target.is_dir():
+            shutil.rmtree(target)
+        elif target.exists():
+            target.unlink()
+        if source.is_dir():
+            shutil.copytree(source, target)
+        elif source.is_file():
+            target.parent.mkdir(parents=True, exist_ok=True)
+            shutil.copy2(source, target)
+
+
+def _push_published_apart(message: str, paths: tuple[str, ...] = MAIN_PATHS,
+                          dirs: tuple[str, ...] = MAIN_DIRS) -> bool | None:
+    """Commit the shard on a main checkout and push that, not the lane HEAD."""
+    repo = _ensure_publish_worktree()
+    _sync_published(ROOT, repo, paths, dirs)
+    present = [p for p in paths if (repo / p).is_file()]
+    if present:
+        run_git(repo, "add", "--sparse", *present, timeout=300)
+    # Always stage the shard directory, including when the sync removed it.
+    # Gating on the directory still existing left a deleted corpus in the index.
+    for rel in dirs:
+        run_git(repo, "add", "--sparse", "-A", rel, timeout=300)
+    staged = run_git(repo, "diff", "--cached", "--quiet", check=False, timeout=120)
+    if staged.returncode == 0:
+        log("main: nothing to commit")
+        return None
+    run_git(repo, "commit", "-m", message, timeout=300)
+    run_git(repo, "-c", "rebase.autoStash=true", "pull", "--rebase",
+            "origin", MAIN_BRANCH, timeout=900)
+    run_git(repo, "push", "origin", f"HEAD:{MAIN_BRANCH}", timeout=600)
+    log("main: pushed")
+    return True
+
+
+def push_main(message: str, paths: tuple[str, ...] = MAIN_PATHS,
+              dirs: tuple[str, ...] = MAIN_DIRS) -> bool | None:
     """Commit the published video shard to this repository's main.
 
     True on a completed push, None when there was nothing to push, False when
@@ -274,11 +385,12 @@ def push_main(message: str) -> bool | None:
     a failed push exit 0.
     """
     try:
-        # Detached (the lane worktree's normal state) reports no branch and is
-        # fine. A *named* branch that is not main is not: on 2026-09-24 and -25
-        # this worktree sat on wip/youtube-video-details, where a commit to HEAD
-        # and a push of `main` were two unrelated things, and two days of work
-        # went nowhere while the vault push succeeded and the lane logged green.
+        # Detached at origin/main (the lane worktree's normal state) reports no
+        # branch and publishes in place. A *named* branch that is not main is
+        # not: on 2026-09-24 and -25 this worktree sat on
+        # wip/youtube-video-details, where a commit to HEAD and a push of `main`
+        # were two unrelated things, and two days of work went nowhere while
+        # the vault push succeeded and the lane logged green.
         head = run_git(ROOT, "symbolic-ref", "-q", "--short", "HEAD",
                        check=False, timeout=120)
         branch = head.stdout.strip() if head.returncode == 0 else ""
@@ -286,14 +398,22 @@ def push_main(message: str) -> bool | None:
             log(f"main: worktree is on '{branch}', not '{MAIN_BRANCH}' or detached; "
                 "refusing to publish from a branch this lane does not track")
             return False
-        present = [p for p in MAIN_PATHS if (ROOT / p).is_file()]
-        dirs = [d for d in MAIN_DIRS if (ROOT / d).is_dir()]
-        if not present and not dirs:
+        present = [p for p in paths if (ROOT / p).is_file()]
+        present_dirs = [d for d in dirs if (ROOT / d).is_dir()]
+        if not present and not present_dirs:
             log("main: no published shard to commit")
             return None
+        # Detached is fine only when it is origin/main. A detached media-lane
+        # commit is not: pull --rebase would replay it and HEAD:main would
+        # publish it. The shard still has to reach main, so it is committed on
+        # a checkout that starts there.
+        if not _head_is_origin_main():
+            log("main: checkout is not origin/main; publishing the shard from "
+                "a main worktree so local commits stay local")
+            return _push_published_apart(message, paths, dirs)
         if present:
             run_git(ROOT, "add", "--sparse", *present, timeout=300)
-        for rel in dirs:
+        for rel in present_dirs:
             # -A so a shard that disappeared from the corpus is staged as a
             # deletion; without it the index keeps advertising a dead video.
             run_git(ROOT, "add", "--sparse", "-A", rel, timeout=300)
@@ -313,6 +433,9 @@ def push_main(message: str) -> bool | None:
     except (subprocess.CalledProcessError, subprocess.TimeoutExpired, OSError) as exc:
         log(f"main push failed: {describe_failure(exc)}")
         run_git(ROOT, "rebase", "--abort", check=False, timeout=120)
+        apart = _publish_worktree()
+        if (apart / ".git").exists():
+            run_git(apart, "rebase", "--abort", check=False, timeout=120)
         return False
 
 

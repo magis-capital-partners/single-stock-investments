@@ -400,6 +400,55 @@ def upsert_whisper_backlog_item(episode: dict, *, status: str = "pending") -> No
     save_whisper_backlog(doc)
 
 
+def reconcile_whisper_orphans(*, limit: int | None = None) -> dict:
+    """Queue catalogued episodes that have audio but no transcript or queue row.
+
+    ``transcript_status`` alone stranded hundreds of episodes: they had an
+    ``audio_url``, no ``.txt``, and no ``whisper_backlog.json`` entry, so the
+    daemon that drains the queue could never see them.  Bulk-write the queue
+    once rather than calling the per-episode upsert hundreds of times.
+    """
+    root = podcasts_root(create=True)
+    doc = load_whisper_backlog()
+    items = list(doc.get("items") or [])
+    by_id = {str(i.get("episode_id")): i for i in items if i.get("episode_id")}
+    candidates: list[dict] = []
+    for meta_path in (root / "episodes").rglob("*.meta.json"):
+        meta = load_json(meta_path) or {}
+        eid = str(meta.get("episode_id") or "")
+        if not eid or not meta.get("audio_url"):
+            continue
+        txt_path = meta_path.with_name(f"{eid}.txt")
+        if txt_path.exists() or eid in by_id:
+            continue
+        candidates.append(meta)
+    candidates.sort(key=lambda m: str(m.get("published") or ""), reverse=True)
+    if limit is not None:
+        candidates = candidates[: max(0, limit)]
+    for meta in candidates:
+        items.append(
+            {
+                "episode_id": meta.get("episode_id"),
+                "show_id": meta.get("show_id"),
+                "title": meta.get("title"),
+                "published": meta.get("published"),
+                "audio_url": meta.get("audio_url"),
+                "link": meta.get("link"),
+                "status": "pending",
+                "attempts": 0,
+                "queued_by": "reconcile_whisper_orphans",
+            }
+        )
+    if candidates:
+        doc["items"] = items
+        save_whisper_backlog(doc)
+    return {
+        "queued": len(candidates),
+        "whisper_pending": whisper_pending_count(),
+        "episode_ids": [str(m.get("episode_id")) for m in candidates[:20]],
+    }
+
+
 def delete_audio_cache(episode_id: str) -> None:
     cache = podcasts_root(create=True) / "audio-cache"
     if not cache.is_dir():
@@ -419,6 +468,7 @@ def fetch_one(episode: dict, show_by_id: dict[str, dict], *, allow_whisper: bool
     source = None
     text = None
     name_repairs: dict = {}
+    whisper_segments: list[dict] = []
 
     if txt_path.exists() and meta_path.exists():
         meta = load_json(meta_path) or {}
@@ -443,7 +493,7 @@ def fetch_one(episode: dict, show_by_id: dict[str, dict], *, allow_whisper: bool
         try:
             if not audio_path.exists():
                 download_audio(url, audio_path)
-            text = whisper_transcribe(audio_path, episode)
+            text = whisper_transcribe(audio_path, episode, whisper_segments)
             if text:
                 source = "whisper"
                 status = "transcribed"
@@ -460,7 +510,10 @@ def fetch_one(episode: dict, show_by_id: dict[str, dict], *, allow_whisper: bool
         if episode.get("audio_url") and not allow_whisper:
             upsert_whisper_backlog_item(episode, status="pending")
 
-    # Always write meta; write transcript when available
+    # Always write meta; write transcript when available.  Preserve a reader
+    # summary on a still-sourceless stub: dropping it would blank the page
+    # until the next summariser pass for no gain.  A new transcript changes
+    # the source hash, so the summariser will replace it on its next run.
     meta = {
         **episode,
         "transcript_source": source,
@@ -468,10 +521,14 @@ def fetch_one(episode: dict, show_by_id: dict[str, dict], *, allow_whisper: bool
         "fetched_at": datetime.now(timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ"),
         "transcript_path": str(txt_path.relative_to(podcasts_root())) if text else None,
         "name_repairs": name_repairs or None,
+        "whisper_model": WHISPER_MODEL if source == "whisper" else (episode.get("whisper_model") if not text else None),
+        "transcript_segment_count": len(whisper_segments) if source == "whisper" else None,
         "sha1_audio": hashlib.sha1((episode.get("audio_url") or "").encode()).hexdigest()
         if episode.get("audio_url")
         else None,
     }
+    if not text and prior and isinstance(prior.get("reader_summary"), dict):
+        meta["reader_summary"] = prior["reader_summary"]
     # Order matters: write the transcript first. meta.json is what declares a
     # transcript exists, so if the machine dies between the two writes the
     # surviving state must be "transcript present, not yet recorded" (harmless
@@ -479,7 +536,19 @@ def fetch_one(episode: dict, show_by_id: dict[str, dict], *, allow_whisper: bool
     # that left 215 episodes claiming transcripts they never had.
     if text:
         atomic_write_text(txt_path, text + "\n")
+        if whisper_segments:
+            sidecar = transcript_segments.write_sidecar(txt_path, whisper_segments)
+            if sidecar is not None:
+                try:
+                    meta["transcript_segments_path"] = str(sidecar.relative_to(podcasts_root()))
+                except ValueError:
+                    meta["transcript_segments_path"] = str(sidecar)
     atomic_write_text(meta_path, json.dumps(meta, indent=2) + "\n")
+    if not text and episode.get("audio_url"):
+        # A failed or deferred Whisper attempt is queue state, not a terminal
+        # episode state.  Leaving it only in transcript_status stranded
+        # episodes forever because the daemon drains the backlog file.
+        upsert_whisper_backlog_item(meta, status="pending")
     if text:
         # Mark backlog done if present
         doc = load_whisper_backlog()
@@ -714,7 +783,16 @@ def main() -> int:
         metavar="N",
         help="Drain N pending items from whisper_backlog.json (newest first)",
     )
+    p.add_argument(
+        "--reconcile-whisper-orphans",
+        action="store_true",
+        help="Queue episodes with audio but no transcript or backlog row, then exit",
+    )
+    p.add_argument("--reconcile-limit", type=int, default=None)
     args = p.parse_args()
+    if args.reconcile_whisper_orphans:
+        print(json.dumps(reconcile_whisper_orphans(limit=args.reconcile_limit), indent=2))
+        return 0
     if args.whisper_batch is not None:
         summary = drain_whisper_backlog(batch=args.whisper_batch)
         print(json.dumps({k: summary.get(k) for k in ("attempted", "by_status", "whisper_pending")}, indent=2))

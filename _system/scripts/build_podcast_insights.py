@@ -154,6 +154,7 @@ def build_episode_record(
         "themes": analysis_themes(analysis, theme_hits(text or (meta.get("description") or ""))),
         "highlights": meta.get("highlights") or [],
         "summary": meta.get("summary") or None,
+        "reader_summary": meta.get("reader_summary") if isinstance(meta.get("reader_summary"), dict) else None,
         "in_book": any(bool(c.get("in_book")) for c in (resolved.get("companies") or []))
         or any(bool(o.get("in_book")) for o in (resolved.get("officers") or [])),
         "near_universe": bool(resolved.get("near_universe_any")),
@@ -252,6 +253,92 @@ def analysis_themes(analysis: dict, fallback: list[dict]) -> list[dict]:
     return themes or list(fallback or [])
 
 
+def reader_summary_preview(ep: dict) -> dict:
+    """Thin, reader-facing summary fields for the dashboard index.
+
+    The full key points stay in the detail shard.  During rollout a thesis or
+    legacy summary is a better preview than a blank, but it is labelled as
+    what it is; only ``reader_summary`` counts toward published coverage.
+    """
+    reader = ep.get("reader_summary") if isinstance(ep.get("reader_summary"), dict) else {}
+    if reader:
+        headline = (reader.get("headline") or "").strip()
+        overview = (reader.get("overview") or "").strip()
+        # Fallback headlines repeat the first overview sentence; don't print
+        # the same sentence twice in a 220-char preview.
+        if headline and overview.lower().startswith(headline.lower().rstrip(".…")):
+            preview = overview
+        else:
+            preview = " ".join(x for x in [headline, overview] if x).strip()
+        return {
+            "summary_preview": preview[:220] or None,
+            "summary_headline": headline or None,
+            "summary_source_label": reader.get("source_label"),
+            "summary_status": reader.get("status"),
+            "summary_basis": reader.get("source_basis"),
+        }
+    thesis = (ep.get("thesis") or "").strip()
+    if thesis:
+        return {
+            "summary_preview": thesis[:220],
+            "summary_headline": None,
+            "summary_source_label": "From transcript analysis",
+            "summary_status": "legacy",
+            "summary_basis": "transcript",
+        }
+    legacy = (ep.get("summary") or "").strip()
+    if legacy:
+        return {
+            "summary_preview": legacy[:220],
+            "summary_headline": None,
+            "summary_source_label": "Automatic extract — summary upgrade pending",
+            "summary_status": "legacy",
+            "summary_basis": "transcript",
+        }
+    return {
+        "summary_preview": None,
+        "summary_headline": None,
+        "summary_source_label": None,
+        "summary_status": None,
+        "summary_basis": None,
+    }
+
+
+def reader_summary_detail(reader: dict | None) -> dict | None:
+    if not isinstance(reader, dict) or not (reader.get("overview") or "").strip():
+        return None
+    points = []
+    for point in reader.get("key_points") or []:
+        if not isinstance(point, dict) or not (point.get("text") or "").strip():
+            continue
+        points.append(
+            {
+                "text": (point.get("text") or "")[:320],
+                "evidence_quote": (point.get("evidence_quote") or "")[:400] or None,
+                "timestamp_seconds": point.get("timestamp_seconds"),
+            }
+        )
+    coverage = reader.get("coverage") if isinstance(reader.get("coverage"), dict) else {}
+    return {
+        "version": reader.get("version"),
+        "status": reader.get("status"),
+        "source_basis": reader.get("source_basis"),
+        "source_label": reader.get("source_label"),
+        "headline": (reader.get("headline") or "")[:240] or None,
+        "overview": (reader.get("overview") or "")[:1200],
+        "key_points": points[:5],
+        "why_it_matters": (reader.get("why_it_matters") or "")[:500] or None,
+        "coverage": {
+            "source_chars": coverage.get("source_chars"),
+            "chunks_total": coverage.get("chunks_total"),
+            "chunks_used": coverage.get("chunks_used"),
+            "kind": coverage.get("kind"),
+        },
+        "generated_at": reader.get("generated_at"),
+        "model": reader.get("model"),
+    }
+
+
 def index_row_from_episode(ep: dict) -> dict:
     """Thin projection for CI mirror and dashboard podcast_index."""
     try:
@@ -296,7 +383,11 @@ def index_row_from_episode(ep: dict) -> dict:
         "in_book": bool(ep.get("in_book")),
         "highlight_count": len(highlights),
         "highlight_previews": previews,
-        "has_summary": bool((ep.get("summary") or "").strip()),
+        "has_summary": bool(
+            (ep.get("summary") or "").strip()
+            or ((ep.get("reader_summary") or {}).get("overview") or "").strip()
+        ),
+        **reader_summary_preview(ep),
         "themes": themes,
         "source_document": ep.get("source_document"),
         "link": ep.get("link"),
@@ -411,6 +502,7 @@ def episode_detail_payload(ep: dict) -> dict:
         "title": ep.get("title"),
         "published": ep.get("published"),
         "summary": ep.get("summary") or None,
+        "reader_summary": reader_summary_detail(ep.get("reader_summary")),
         "highlights": highlights,
         "themes": themes,
         "guests": guests,
@@ -493,6 +585,8 @@ def build() -> dict:
             rec["highlights"] = filter_highlights(meta["highlights"])
         if meta.get("summary"):
             rec["summary"] = meta["summary"]
+        if isinstance(meta.get("reader_summary"), dict):
+            rec["reader_summary"] = meta["reader_summary"]
         episodes.append(rec)
 
     episodes.sort(key=lambda e: e.get("published") or "", reverse=True)

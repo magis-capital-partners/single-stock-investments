@@ -80,10 +80,16 @@ def main() -> int:
         if rc != 0:
             return rc
 
+    # Episodes already in the catalog can have audio, no transcript, and no
+    # queue row even when this refresh's discovery pass never selected them.
+    rc = run([py, str(SCRIPTS / "fetch_podcast_transcript.py"), "--reconcile-whisper-orphans"])
+    if rc != 0:
+        return rc
+
     for script in (
         "build_officer_directory.py",
         "build_podcast_insights.py",
-        "summarize_podcast_episode.py",  # writes highlights/summary to *.meta.json only
+        "summarize_podcast_episode.py",  # universal reader_summary fallbacks to *.meta.json
         "build_podcast_insights.py",  # rebuild vault catalog + detail shards from meta
     ):
         rc = run([py, str(SCRIPTS / script)])
@@ -113,6 +119,15 @@ def main() -> int:
                     "n = emit_episode_detail_shards(); "
                     "print(f'shards ok detail={n}')"
                 ),
+            ]
+        )
+        if rc != 0:
+            return rc
+        rc = run(
+            [
+                py,
+                str(SCRIPTS / "check_podcast_summary_coverage.py"),
+                "--require-published",
             ]
         )
         if rc != 0:
