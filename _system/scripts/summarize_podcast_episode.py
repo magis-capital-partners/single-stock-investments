@@ -294,7 +294,10 @@ def clean_source_text(text: str) -> str:
         line = _WS_RE.sub(" ", raw).strip(" \t-•*")
         if not line:
             continue
-        if line.count("http") or line.count("/") > 10:
+        # Slash-heavy short lines are navigation/link lists. A long prose
+        # line (an already-cleaned transcript is one line) must survive:
+        # counting slashes across 100k chars would empty real episodes.
+        if line.count("http") or (line.count("/") > 10 and len(line) < 1000):
             continue
         lines.append(line)
     # Drop chrome lines (nav, subscribe pleas) only when real content

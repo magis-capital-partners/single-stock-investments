@@ -377,6 +377,18 @@ class PodcastHarvestTests(unittest.TestCase):
             self.assertEqual(source["basis"], "transcript")
             self.assertEqual(source["kind"], "partial")
 
+    def test_clean_source_text_keeps_long_single_line_prose(self):
+        from summarize_podcast_episode import clean_source_text, _meaningful_sentences
+
+        prose = " ".join(
+            f"On 9/{(i % 27) + 1}/2026 the host reviewed position {i} and/or its hedge, "
+            "explaining patient reinvestment in clear and simple terms for listeners."
+            for i in range(30)
+        )
+        cleaned = clean_source_text(prose)
+        self.assertGreater(len(cleaned), 1000)
+        self.assertGreaterEqual(len(_meaningful_sentences(cleaned)), 5)
+
     def test_fallback_skips_page_chrome_sentences(self):
         from summarize_podcast_episode import (
             classify_source,
