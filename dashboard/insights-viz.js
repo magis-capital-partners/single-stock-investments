@@ -868,6 +868,12 @@
       ? merged.highlights.map(h => (typeof h === 'string' ? h : (h.quote || h.text || ''))).filter(Boolean)
       : (merged.highlight_previews || []).filter(Boolean);
     const summary = (merged.summary || '').trim();
+    const reader = merged.reader_summary && typeof merged.reader_summary === 'object'
+      ? merged.reader_summary
+      : null;
+    const readerPoints = reader && Array.isArray(reader.key_points)
+      ? reader.key_points.filter(p => p && String(p.text || '').trim())
+      : [];
     const transcriptRef = podcastTranscriptRef(merged.source_document);
     const transcriptLink = transcriptRef
       ? evidenceLink(transcriptRef, linkHtml, ghRepo, 'Transcript')
@@ -881,10 +887,11 @@
       .filter(c => c && String(c.claim || '').trim());
     const analysis = merged.analysis || null;
     const analysed = Boolean(analysis);
-    // The model's thesis is the summary. The extractive line is what the page
-    // used before analysis existed, and it stays only until that pass runs.
-    const lead = thesis
-      || (analysed ? 'Analyzed. No investable claims were extracted.' : summary);
+    // Reader summary is the lead whenever it exists. The claims thesis and
+    // legacy extract remain only as rollout fallbacks for shards that predate
+    // reader_summary; neither is allowed to look like a finished summary.
+    const lead = reader ? '' : (thesis
+      || (analysed ? 'Analyzed. No investable claims were extracted.' : summary));
     const leadNote = thesis
       ? 'Model summary'
       : (analysed ? 'Analysis finished with no thesis and no claims' : (summary ? 'Automatic extract from the transcript' : ''));
@@ -908,6 +915,22 @@
         ${personas.length ? `<p class="tier-sub">Personas: ${escapeHtml(personas.join(', '))}</p>` : ''}
         ${themes ? `<div style="margin:8px 0"><strong>Themes:</strong> ${themes}</div>` : ''}
         ${loading ? '<p class="tier-sub">Loading summary and highlights…</p>' : ''}
+        ${reader ? `
+        <section class="podcast-reader-summary" aria-label="Episode summary">
+          <h4>IN SHORT</h4>
+          ${reader.headline ? `<p class="podcast-headline">${escapeHtml(reader.headline)}</p>` : ''}
+          <p class="podcast-overview">${escapeHtml(reader.overview || '')}</p>
+          <span class="video-thesis-src">${escapeHtml(reader.source_label || 'Reader summary')}${reader.status === 'pending_model' ? ' · Full transcript summary is queued' : ''}${reader.status === 'needs_review' ? ' · Needs review' : ''}</span>
+          ${readerPoints.length ? `
+          <h4>KEY POINTS</h4>
+          <ul class="podcast-key-points">${readerPoints.map(p => `
+            <li>
+              <span>${escapeHtml(p.text)}</span>
+              ${p.evidence_quote ? `<details><summary>Evidence</summary><blockquote>&ldquo;${escapeHtml(p.evidence_quote)}&rdquo;</blockquote></details>` : ''}
+            </li>`).join('')}
+          </ul>` : ''}
+          ${reader.why_it_matters ? `<h4>WHY IT MATTERS</h4><p class="podcast-overview">${escapeHtml(reader.why_it_matters)}</p>` : ''}
+        </section>` : ''}
         ${lead ? `
         <div class="video-thesis">
           <p>${escapeHtml(lead)}</p>
@@ -935,10 +958,11 @@
           </li>`).join('')}</ul>
         ` : ''}
         ${renderTranscriptBlock(merged.transcript, claims, escapeHtml, merged.transcript_truncated)}
-        ${!analysed && highlights.length ? `
+        ${!reader && !analysed && highlights.length ? `
         <h4 style="margin-top:14px;font-size:12px;color:var(--text-muted)">HIGHLIGHTS</h4>
         <ul class="dev-list">${highlights.map(p => `<li style="font-size:13px;line-height:1.45">${escapeHtml(p)}</li>`).join('')}</ul>
-        ` : (!analysed && !loading && merged.highlight_count ? `<p class="tier-sub">${merged.highlight_count} highlight(s) — open transcript for detail</p>` : '')}
+        ` : (!reader && !analysed && !loading && merged.highlight_count ? `<p class="tier-sub">${merged.highlight_count} highlight(s) — open transcript for detail</p>` : '')}
+        ${reader ? `<div class="podcast-source-box"><strong>Summary source</strong><span>${escapeHtml(reader.source_label || '—')}</span>${reader.coverage?.kind ? `<span>Coverage: ${escapeHtml(reader.coverage.kind)}</span>` : ''}${reader.generated_at ? `<span>Generated: ${escapeHtml(reader.generated_at)}</span>` : ''}</div>` : ''}
         <p class="tier-sub" style="margin-top:12px">${[transcriptLink, episodeLink].filter(Boolean).join(' · ') || '—'}</p>
       </div>`;
   }
@@ -953,6 +977,7 @@
       selectedEpisodeId = null,
       episodeDetail = null,
       episodeDetailLoading = false,
+      sort = 'date',
     } = opts;
     let list = Array.isArray(rows) ? rows.slice() : [];
     if (period) list = list.filter(r => periodMatchesRecord(r, period, ['published']));
@@ -969,9 +994,19 @@
           r.show_title, r.title, (r.guests || []).join(' '), (r.tickers || []).join(' '),
           (r.persona_ids || []).join(' '),
           (r.themes || []).map(t => (typeof t === 'string' ? t : t.theme) || '').join(' '),
+          r.summary_preview || '', r.summary_headline || '', r.summary_source_label || '',
         ].join(' ').toLowerCase();
         return blob.includes(q);
       });
+    }
+    if (sort === 'useful') {
+      const score = r => (r.summary_basis === 'transcript' && r.summary_status === 'ready' ? 8 : 0)
+        + (r.summary_preview ? 3 : 0)
+        + (r.claim_count || 0)
+        + (r.in_book ? 2 : 0)
+        + (r.has_officer_hit ? 1 : 0);
+      list.sort((a, b) => score(b) - score(a)
+        || String(b.published || '').localeCompare(String(a.published || '')));
     }
 
     if (selectedEpisodeId) {
@@ -1002,6 +1037,11 @@
       { id: 'in_book', label: 'In book' },
       { id: 'highlights', label: 'Has highlights' },
     ];
+    const sortPills = `
+      <nav class="source-pills" style="margin-bottom:10px" aria-label="Sort podcasts">
+        <button type="button" class="filter-btn source-pill${sort === 'date' ? ' active' : ''}" data-podcast-sort="date">Newest</button>
+        <button type="button" class="filter-btn source-pill${sort === 'useful' ? ' active' : ''}" data-podcast-sort="useful">Most useful</button>
+      </nav>`;
 
     if (!list.length) {
       return `
@@ -1011,6 +1051,7 @@
         <nav class="source-pills" id="podcast-flag-tabs" style="margin-bottom:10px">
           ${flagPills.map(p => `<button type="button" class="filter-btn source-pill${flagFilter === p.id ? ' active' : ''}" data-podcast-flag="${escapeHtml(p.id)}">${escapeHtml(p.label)}</button>`).join('')}
         </nav>
+        ${sortPills}
         <p class="muted">${(rows || []).length ? 'No episodes match these filters.' : 'No podcast episodes indexed yet. Run <code>make podcasts-refresh</code>.'}</p>`;
     }
 
@@ -1021,42 +1062,48 @@
       <nav class="source-pills" id="podcast-flag-tabs" style="margin-bottom:10px">
         ${flagPills.map(p => `<button type="button" class="filter-btn source-pill${flagFilter === p.id ? ' active' : ''}" data-podcast-flag="${escapeHtml(p.id)}">${escapeHtml(p.label)}</button>`).join('')}
       </nav>
+      ${sortPills}
       <p class="tier-sub" style="margin-bottom:8px">${list.length} episode(s)${bookOnly ? ' · in-book / ticker overlap' : ''}${period && !period.all ? ` · ${escapeHtml(period.label || '')}` : ''}</p>
-      <table class="darwin-table" id="insights-podcast-table">
-        <thead><tr><th>Date</th><th>Show</th><th>Episode</th><th>Guests / PZ</th><th>Tickers</th><th>Flags</th><th>Highlights</th><th>Source</th></tr></thead>
-        <tbody>
+      <div class="podcast-list" id="insights-podcast-list">
           ${list.slice(0, 100).map(r => {
             const flags = [
               r.has_pz_guest ? 'PZ guest' : '',
               r.has_officer_hit ? 'Officer' : '',
               r.near_universe ? 'Near-universe' : '',
               r.in_book ? 'In book' : '',
-            ].filter(Boolean).join(' · ') || '—';
-            const guests = (r.guests || []).filter(Boolean).slice(0, 4).join(', ') || '—';
-            const personas = (r.persona_ids || []).slice(0, 3).join(', ');
-            const guestCell = personas ? `${escapeHtml(guests)}<div class="tier-sub" style="font-size:10px">${escapeHtml(personas)}</div>` : escapeHtml(guests);
-            const tickers = (r.tickers || []).slice(0, 6);
-            const tickerCell = tickers.length
-              ? tickers.map(t => `<button type="button" class="linkish mono" data-select-ticker="${escapeHtml(t)}">${escapeHtml(t)}</button>`).join(' ')
-              : '—';
+            ].filter(Boolean);
+            const guests = (r.guests || []).filter(Boolean).slice(0, 4);
+            const tickers = (r.tickers || []).slice(0, 8);
             const transcriptRef = podcastTranscriptRef(r.source_document);
             const src = transcriptRef
               ? evidenceLink(transcriptRef, linkHtml, ghRepo, 'Transcript')
-              : (r.link ? linkHtml(r.link, 'Open', 'source-open-link') : '—');
+              : (r.link ? linkHtml(r.link, 'Episode', 'source-open-link') : '');
             const eid = escapeHtml(r.episode_id || '');
-            return `<tr class="podcast-row" data-podcast-episode="${eid}" style="cursor:pointer">
-              <td class="mono">${escapeHtml(r.published || '—')}</td>
-              <td>${escapeHtml(r.show_title || r.show_id || '—')}</td>
-              <td style="font-size:11px;max-width:260px"><button type="button" class="linkish" data-podcast-episode="${eid}" style="text-align:left">${escapeHtml(r.title || '—')}</button></td>
-              <td style="font-size:11px">${guestCell}</td>
-              <td class="mono" style="font-size:11px">${tickerCell}</td>
-              <td style="font-size:11px">${escapeHtml(flags)}</td>
-              <td class="mono">${escapeHtml(String(r.highlight_count ?? 0))}</td>
-              <td>${src}</td>
-            </tr>`;
+            const summary = (r.summary_preview || '').trim();
+            const marks = [
+              r.claim_count ? `${r.claim_count} verified claim${r.claim_count === 1 ? '' : 's'}` : '',
+              r.summary_status === 'pending_model' ? 'full summary queued' : '',
+            ].filter(Boolean);
+            return `<article class="podcast-row" data-podcast-episode="${eid}" tabindex="0" aria-label="${escapeHtml(r.title || 'Podcast episode')}">
+              <div class="podcast-row-topline">
+                <span>${escapeHtml(r.show_title || r.show_id || 'Podcast')}</span>
+                ${r.summary_source_label ? `<span class="video-source-mark">${escapeHtml(r.summary_source_label)}</span>` : ''}
+                <time>${escapeHtml((r.published || '—').slice(0, 10))}</time>
+              </div>
+              <h3>${escapeHtml(r.title || 'Untitled episode')}</h3>
+              ${summary ? `<p class="podcast-summary-preview">${escapeHtml(summary)}</p>` : '<p class="podcast-summary-preview podcast-summary-missing">Summary is being prepared. Open the episode for the available source details.</p>'}
+              <div class="video-research-tags">
+                ${tickers.map(t => `<button type="button" class="video-ticker mono" data-select-ticker="${escapeHtml(t)}">${escapeHtml(t)}</button>`).join('')}
+                ${guests.map(g => `<span>${escapeHtml(g)}</span>`).join('')}
+                ${flags.map(f => `<span>${escapeHtml(f)}</span>`).join('')}
+              </div>
+              <footer>
+                <span>${marks.length ? escapeHtml(marks.join(' · ')) : 'Open for summary, key points, and source'}</span>
+                ${src}
+              </footer>
+            </article>`;
           }).join('')}
-        </tbody>
-      </table>
+      </div>
       ${list.length > 100 ? `<p class="tier-sub">${list.length - 100} more episodes — refine search</p>` : ''}`;
   }
 
@@ -5582,6 +5629,7 @@
           period,
           showId: podcastShowId,
           flagFilter: podcastFlagFilter,
+          sort: options?.podcastSort || 'date',
           selectedEpisodeId: selectedPodcastEpisodeId,
           episodeDetail: podcastEpisodeDetail,
           episodeDetailLoading: podcastEpisodeDetailLoading,

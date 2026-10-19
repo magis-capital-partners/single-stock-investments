@@ -3354,6 +3354,21 @@ def analysis_depth(rows) -> int:
     return sum(1 for row in (rows or []) if row_was_analysed(row))
 
 
+def reader_summary_depth(rows) -> dict[str, int]:
+    """Published reader-summary depth, split by the basis a reader can trust."""
+    out = {"with_reader_summary": 0, "transcript_ready": 0, "pending_model": 0}
+    for row in rows or []:
+        summary = row.get("reader_summary") if isinstance(row, dict) else None
+        if not isinstance(summary, dict) or not (summary.get("overview") or "").strip():
+            continue
+        out["with_reader_summary"] += 1
+        if summary.get("status") == "ready" and summary.get("source_basis") == "transcript":
+            out["transcript_ready"] += 1
+        if summary.get("status") == "pending_model":
+            out["pending_model"] += 1
+    return out
+
+
 def latest_filing_fact_files() -> list[Path]:
     latest: list[Path] = []
     for ticker_dir in ROOT.iterdir():
@@ -3449,12 +3464,14 @@ def build_source_health(
                 # of the fourteen this number did not move, and every count on
                 # this row rose while the corpus got less readable.
                 "with_analysis": analysis_depth(_pod.get("episodes")),
+                **reader_summary_depth(_pod.get("episodes")),
                 "as_of": newest_as_of([e.get("published") for e in (_pod.get("episodes") or [])]),
                 "notes": (
                     f"episodes={_pod.get('episode_count') or len(_pod.get('episodes') or [])}"
                     f" transcripts={_pod.get('transcript_count') or 0}"
                     f" whisper_pending={_pod.get('whisper_pending') or 0}"
                     f" analysed={analysis_depth(_pod.get('episodes'))}"
+                    f" reader_summaries={reader_summary_depth(_pod.get('episodes'))['with_reader_summary']}"
                 ),
                 "path": (
                     relative_path(PODCASTS_INSIGHTS)

@@ -340,6 +340,257 @@ class PodcastHarvestTests(unittest.TestCase):
                 self.assertEqual(doc["items"][0]["episode_id"], "ep-1")
                 self.assertEqual(ft.whisper_pending_count(), 1)
 
+    def test_classify_source_respects_transcript_provenance(self):
+        from summarize_podcast_episode import classify_source
+
+        with tempfile.TemporaryDirectory() as td:
+            txt = Path(td) / "ep.txt"
+            # An episode-page scrape: navigation + chapters + description.
+            scrape = (
+                "Toggle navigation About Episodes All Episodes Archives "
+                "Chapters: (00:00) Intro (08:49) His Plan (16:15) Recovery. "
+                + "The guest explains how patience and low costs compound. " * 40
+            )
+            txt.write_text(scrape, encoding="utf-8")
+            meta = {
+                "title": "Scrape",
+                "show_title": "Example",
+                "transcript_source": "published_html",
+                "description": "The guest explains how patience and low costs compound wealth over time.",
+            }
+            self.assertEqual(classify_source(meta, txt)["basis"], "notes")
+
+            # A dialogue transcript from the same provenance is a transcript.
+            turns = " ".join(
+                f"Host{i%2}: Question number {i} about investing patiently today? "
+                f"Guest: Answer {i} explains steady reinvestment and low costs clearly."
+                for i in range(12)
+            )
+            txt.write_text(turns, encoding="utf-8")
+            meta["transcript_source"] = "published_html"
+            self.assertEqual(classify_source(meta, txt)["basis"], "transcript")
+
+            # Whisper output is speech even when the episode is short.
+            txt.write_text("spoken words about compounding and patience " * 40, encoding="utf-8")
+            meta["transcript_source"] = "whisper"
+            source = classify_source(meta, txt)
+            self.assertEqual(source["basis"], "transcript")
+            self.assertEqual(source["kind"], "partial")
+
+    def test_fallback_skips_page_chrome_sentences(self):
+        from summarize_podcast_episode import (
+            classify_source,
+            fallback_reader_summary,
+        )
+
+        meta = {
+            "title": "Chrome test",
+            "show_title": "Example Show",
+            "description": (
+                "Example Show - Apple Podcasts Search Home New Top Charts Sign In. "
+                "Chapters: (00:00) Intro (08:49) The main discussion begins here. "
+                "The guest explains how steady reinvestment and patience help a "
+                "portfolio grow over many years. Avoiding large losses matters "
+                "more than chasing every short-term gain in markets."
+            ),
+        }
+        source = classify_source(meta, None)
+        summary = fallback_reader_summary(meta, source)
+        combined = (summary["headline"] + " " + summary["overview"]).lower()
+        self.assertNotIn("top charts", combined)
+        self.assertNotIn("chapters", combined)
+        self.assertIn("reinvestment", combined)
+
+    def test_reader_summary_notes_fallback_and_validation(self):
+        from summarize_podcast_episode import (
+            classify_source,
+            fallback_reader_summary,
+            reader_summary_errors,
+        )
+
+        meta = {
+            "title": "How compounding works",
+            "show_title": "Example Show",
+            "published": "2026-01-01",
+            "description": (
+                "A guest explains how steady reinvestment, patience, and low fees "
+                "help a portfolio grow over time. They also discuss why avoiding "
+                "large losses matters more than chasing every gain."
+            ),
+        }
+        source = classify_source(meta, None)
+        self.assertEqual(source["basis"], "notes")
+        summary = fallback_reader_summary(meta, source)
+        self.assertEqual(summary["source_basis"], "notes")
+        self.assertIn("episode notes", summary["source_label"])
+        self.assertEqual(
+            reader_summary_errors(
+                summary, source_text=source["validation_text"], basis="notes"
+            ),
+            [],
+        )
+
+    def test_reader_summary_rejects_invented_numbers_and_unverified_quotes(self):
+        from summarize_podcast_episode import reader_summary_errors
+
+        source = "The guest said revenue rose steadily because customers stayed for many years."
+        summary = {
+            "version": "reader_summary_v1",
+            "status": "ready",
+            "source_basis": "transcript",
+            "source_label": "From the transcript",
+            "headline": "The guest explains customer retention",
+            "overview": (
+                "The guest says revenue rose 37 percent because customers stayed. "
+                "That loyalty gave the business time to grow steadily."
+            ),
+            "key_points": [
+                {
+                    "text": "Customers stayed for many years",
+                    "evidence_quote": "this exact sentence was never spoken",
+                    "timestamp_seconds": None,
+                },
+                {
+                    "text": "Revenue rose steadily over time",
+                    "evidence_quote": "revenue rose steadily",
+                    "timestamp_seconds": None,
+                },
+                {
+                    "text": "Loyalty supported steady growth",
+                    "evidence_quote": "customers stayed for many years",
+                    "timestamp_seconds": None,
+                },
+            ],
+            "why_it_matters": None,
+        }
+        errors = reader_summary_errors(summary, source_text=source, basis="transcript")
+        self.assertTrue(any("number not found" in e for e in errors), errors)
+        self.assertTrue(any("verified evidence" in e for e in errors), errors)
+
+    def test_model_reader_summary_uses_verified_quotes(self):
+        from unittest import mock
+
+        import summarize_podcast_episode as summarizer
+
+        source_text = (
+            "The guest explains that patient investors benefited because the "
+            "business reinvested cash carefully for many years. She says the "
+            "owners avoided debt and kept costs low while competitors spent "
+            "heavily. That discipline protected the company when markets fell."
+        )
+        source = {
+            "basis": "transcript",
+            "text": source_text,
+            "validation_text": source_text,
+            "kind": "full",
+        }
+        doc = {
+            "headline": "Patient owners built value by avoiding debt",
+            "overview": (
+                "The guest explains that patient investors benefited from careful "
+                "reinvestment over many years. Avoiding debt and controlling "
+                "costs protected the company when markets fell. The discussion "
+                "gives listeners a simple way to judge management discipline."
+            ),
+            "key_points": [
+                {
+                    "text": "The business reinvested cash carefully for years",
+                    "evidence_quote": "business reinvested cash carefully for many years",
+                },
+                {
+                    "text": "Owners avoided debt and kept costs low",
+                    "evidence_quote": "owners avoided debt and kept costs low",
+                },
+                {
+                    "text": "Discipline protected the company in falling markets",
+                    "evidence_quote": "discipline protected the company when markets fell",
+                },
+            ],
+            "why_it_matters": "It shows how balance-sheet discipline supports compounding.",
+        }
+        with mock.patch.object(summarizer, "_llm_json", return_value=doc):
+            summary = summarizer.model_reader_summary(
+                {"title": "Patient capital", "show_title": "Example"}, source, model="qwen-gpu"
+            )
+        self.assertEqual(summary["status"], "ready")
+        self.assertEqual(len(summary["key_points"]), 3)
+        self.assertTrue(all(p["evidence_quote"] for p in summary["key_points"]))
+
+    def test_reader_summary_flows_to_index_and_detail(self):
+        from build_podcast_insights import episode_detail_payload, index_row_from_episode
+
+        reader = {
+            "version": "reader_summary_v1",
+            "status": "ready",
+            "source_basis": "transcript",
+            "source_label": "From the transcript",
+            "headline": "A clear explanation of compounding",
+            "overview": "The guest explains compounding in plain language.",
+            "key_points": [
+                {"text": "Patience matters", "evidence_quote": "patience matters", "timestamp_seconds": 42}
+            ],
+            "why_it_matters": "It helps listeners judge long-term returns.",
+            "coverage": {"source_chars": 5000, "chunks_total": 1, "chunks_used": 1, "kind": "full"},
+            "generated_at": "2026-10-18T00:00:00Z",
+            "model": "qwen-gpu",
+        }
+        ep = {
+            "episode_id": "reader-ep",
+            "show_id": "s",
+            "show_title": "Show",
+            "title": "Compounding",
+            "reader_summary": reader,
+        }
+        row = index_row_from_episode(ep)
+        self.assertIn("clear explanation", row["summary_preview"])
+        self.assertEqual(row["summary_source_label"], "From the transcript")
+        detail = episode_detail_payload(ep)
+        self.assertEqual(detail["reader_summary"]["key_points"][0]["timestamp_seconds"], 42)
+
+    def test_whisper_orphans_are_reconciled_and_failed_whisper_is_queued(self):
+        import tempfile
+        from pathlib import Path
+        from unittest import mock
+
+        import fetch_podcast_transcript as ft
+
+        with tempfile.TemporaryDirectory() as td:
+            root = Path(td)
+            ep_dir = root / "episodes" / "2026"
+            ep_dir.mkdir(parents=True)
+            (ep_dir / "orphan.meta.json").write_text(
+                json.dumps(
+                    {
+                        "episode_id": "orphan",
+                        "show_id": "s",
+                        "title": "Orphan",
+                        "published": "2026-01-01",
+                        "audio_url": "https://example.com/orphan.mp3",
+                    }
+                ),
+                encoding="utf-8",
+            )
+            with mock.patch.object(ft, "podcasts_root", return_value=root):
+                result = ft.reconcile_whisper_orphans()
+                self.assertEqual(result["queued"], 1)
+                self.assertEqual(ft.whisper_pending_count(), 1)
+
+                ep = {
+                    "episode_id": "deferred",
+                    "show_id": "s",
+                    "title": "Deferred",
+                    "published": "2026-01-02",
+                    "audio_url": "https://example.com/deferred.mp3",
+                }
+                with mock.patch.object(ft, "try_published_transcript", return_value=None), mock.patch.object(
+                    ft, "download_audio", side_effect=lambda _url, dest: dest
+                ), mock.patch.object(ft, "whisper_transcribe", return_value=None):
+                    fetched = ft.fetch_one(ep, {}, allow_whisper=True)
+                self.assertEqual(fetched["status"], "whisper_unavailable")
+                backlog = ft.load_whisper_backlog()
+                deferred = next(i for i in backlog["items"] if i["episode_id"] == "deferred")
+                self.assertEqual(deferred["status"], "pending")
+
     def test_episode_detail_payload(self):
         from build_podcast_insights import episode_detail_payload
 

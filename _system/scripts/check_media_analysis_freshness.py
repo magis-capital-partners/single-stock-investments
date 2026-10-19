@@ -109,7 +109,11 @@ def observe(manifest: dict) -> dict[str, dict]:
             # zero, which would look like a total collapse.
             out[name] = {"analysed": None, "corpus": _int(row.get(corpus_key))}
             continue
-        out[name] = {"analysed": analysed, "corpus": _int(row.get(corpus_key))}
+        item = {"analysed": analysed, "corpus": _int(row.get(corpus_key))}
+        if name == "podcasts" and row.get("with_reader_summary") is not None:
+            item["reader_summaries"] = _int(row.get("with_reader_summary"))
+            item["reader_corpus"] = _int(row.get("items") or row.get("episode_count"))
+        out[name] = item
     return out
 
 
@@ -129,12 +133,50 @@ def evaluate(
         analysed, corpus = now["analysed"], now["corpus"]
         was = previous.get(name) or {}
 
+        # Reader summaries have their own stall clock.  Claims can keep
+        # moving while every new episode remains unreadable, and vice versa.
+        reader_next = None
+        reader_value = _int(now.get("reader_summaries"))
+        reader_corpus = _int(now.get("reader_corpus"))
+        if reader_value is not None and reader_corpus is not None:
+            prior_reader = was.get("reader") if isinstance(was.get("reader"), dict) else {}
+            prior_value = _int(prior_reader.get("reader_summaries"))
+            prior_change = prior_reader.get("last_change_at")
+            if prior_value is None or reader_value != prior_value or not prior_change:
+                reader_next = {
+                    "reader_summaries": reader_value,
+                    "reader_corpus": reader_corpus,
+                    "last_change_at": today.isoformat(),
+                }
+            else:
+                reader_next = {
+                    "reader_summaries": reader_value,
+                    "reader_corpus": reader_corpus,
+                    "last_change_at": prior_change,
+                }
+                backlog = reader_corpus - reader_value
+                if backlog > 0:
+                    try:
+                        stalled = (today - date.fromisoformat(str(prior_change))).days
+                    except ValueError:
+                        stalled = 0
+                    if stalled >= stall_days:
+                        problems.append(
+                            f"{name}: reader-summary lane is stale. summaries stuck at "
+                            f"{reader_value} for {stalled} days (last moved {prior_change}) "
+                            f"with {backlog} episodes lacking a reader summary. "
+                            "Check media_lane_supervisor.py phase=reader-summary and "
+                            "summarize_podcast_episode.py --status on the Mac lane."
+                        )
+
         if analysed is None:
             problems.append(
                 f"{name}: source_health has no with_analysis field; "
                 "build_insights.py should be writing it"
             )
             nxt[name] = was or {}
+            if reader_next is not None:
+                nxt[name]["reader"] = reader_next
             continue
 
         last_value = _int(was.get("analysed"))
@@ -147,9 +189,13 @@ def evaluate(
                 "corpus": corpus,
                 "last_change_at": today.isoformat(),
             }
+            if reader_next is not None:
+                nxt[name]["reader"] = reader_next
             continue
 
         nxt[name] = {"analysed": analysed, "corpus": corpus, "last_change_at": last_change}
+        if reader_next is not None:
+            nxt[name]["reader"] = reader_next
         backlog = (corpus - analysed) if corpus is not None else None
         if not backlog or backlog <= 0:
             continue  # nothing left to read; standing still is correct
@@ -289,6 +335,11 @@ def main() -> int:
             analysed, corpus = row["analysed"], row["corpus"]
             shown = "?" if analysed is None else analysed
             print(f"{name}: analysed {shown} of {corpus if corpus is not None else '?'}")
+            if row.get("reader_summaries") is not None:
+                print(
+                    f"{name}: reader summaries {row['reader_summaries']} of "
+                    f"{row.get('reader_corpus') if row.get('reader_corpus') is not None else '?'}"
+                )
         for msg in problems:
             print(f"WARN: {msg}")
             # The Actions log otherwise shows only "exit code 1". Name the lane,

@@ -2257,6 +2257,7 @@ let selectedFundId = null;
 let selectedPodcastEpisodeId = null;
 let podcastShowId = 'all';
 let podcastFlagFilter = 'all';
+let podcastSort = 'date';
 let podcastEpisodeDetail = null;
 let podcastEpisodeDetailLoading = false;
 let podcastEpisodeDetailCache = {};
@@ -4228,6 +4229,7 @@ function renderInsights(opts = {}) {
     selectedFundId,
     podcastShowId,
     podcastFlagFilter,
+    podcastSort,
     selectedPodcastEpisodeId,
     podcastEpisodeDetail,
     podcastEpisodeDetailLoading,
@@ -4321,6 +4323,7 @@ function renderInsights(opts = {}) {
       if (insightsSection !== 'podcasts') {
         podcastShowId = 'all';
         podcastFlagFilter = 'all';
+        podcastSort = 'date';
       }
       if (insightsSection !== 'videos') {
         videoSort = 'date';
@@ -4613,7 +4616,20 @@ function renderInsights(opts = {}) {
       renderInsights();
     });
   });
+  content.querySelectorAll('[data-podcast-sort]').forEach(btn => {
+    btn.addEventListener('click', () => {
+      podcastSort = btn.dataset.podcastSort || 'date';
+      selectedPodcastEpisodeId = null;
+      renderInsights();
+    });
+  });
   content.querySelectorAll('[data-podcast-episode]').forEach(el => {
+    el.addEventListener('keydown', (e) => {
+      if (e.key !== 'Enter' && e.key !== ' ') return;
+      if (e.target.closest('a, button')) return;
+      e.preventDefault();
+      el.click();
+    });
     el.addEventListener('click', (e) => {
       if (e.target.closest('a, [data-select-ticker]')) return;
       e.stopPropagation();
