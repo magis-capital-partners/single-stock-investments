@@ -88,6 +88,7 @@ _BOILERPLATE_RE = re.compile(
     r"follow .{0,40} on (twitter|x|linkedin|instagram)|"
     # Episode-page chrome from scraped publisher/Apple/Libsyn pages.
     r"search home new top charts|toggle navigation|top charts|sign in|"
+    r"brand logo|log in sign up|substack|"
     r"learn more about your ad choices|visit megaphone|adchoices|"
     r"^\s*\(\d{1,2}:\d{2}(:\d{2})?\)\s*-?\s*(introduction|intro|welcome)\b|"
     r"chapters?\s*:\s*\(\d{1,2}:\d{2}"
