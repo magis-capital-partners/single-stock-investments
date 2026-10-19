@@ -218,6 +218,7 @@ def replay(evidence, nav, bps, horizon, scenario, capacity=True):
         coll = sum(p["q"]*math.ceil(1.02*p["mark"]) for p in active)
         gross = sum(p["q"]*p["mark"] for p in active)
         opening_req, opening_coll, opening_gross = req, coll, gross
+        opening_shock_req = sum(margin(p["q"], p["mark"]*3, house=2.) for p in active)
         req = coll = gross = shock_req = 0.
         remaining = []
         for p in active:
@@ -254,10 +255,11 @@ def replay(evidence, nav, bps, horizon, scenario, capacity=True):
             else:
                 remaining.append(p)
         active = remaining; pnl[i] = daily; equity += daily
+        closing_stress_reserve = 2*gross+shock_req
         req, coll, gross = max(req, opening_req), max(coll, opening_coll), max(gross, opening_gross)
         max_margin = max(max_margin, req); max_collateral = max(max_collateral, coll); max_gross = max(max_gross, gross)
-        max_stress_margin = max(max_stress_margin, shock_req)
-        max_stress_reserve = max(max_stress_reserve, 2*gross+shock_req)
+        max_stress_margin = max(max_stress_margin, opening_shock_req, shock_req)
+        max_stress_reserve = max(max_stress_reserve, 2*opening_gross+opening_shock_req, closing_stress_reserve)
         min_headroom = min(min_headroom, equity-req)
         if daily or req or coll:
             sparse.append([i, round(daily/nav, 10), round(req/nav, 8), round(coll/nav, 8)])

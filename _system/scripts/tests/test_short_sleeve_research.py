@@ -82,6 +82,14 @@ def test_capacity_shrinks_targets_and_costs_are_monotonic():
     assert bear["metrics"]["net_pnl"]<bull["metrics"]["net_pnl"]
 
 
+def test_squeeze_reserve_covers_entry_exposure_even_when_price_falls_by_close():
+    result=sleeve.replay(fixture_evidence({0:1.}),10000,100,1,
+                         {"id":"test","execution_fraction":0.,"borrow_annual":0.})
+    # Entry notional $100, a +200% price loss $200 and post-shock margin $600.
+    assert result["metrics"]["stress_reserve_200"]==pytest.approx(800/10000)
+    assert result["metrics"]["stress_margin_200"]==pytest.approx(600/10000)
+
+
 def test_committed_publication_is_aggregate_finite_and_has_exactly_three_cases():
     path=ROOT/"dashboard/data/short_sleeve.json"
     doc=json.loads(path.read_text())
