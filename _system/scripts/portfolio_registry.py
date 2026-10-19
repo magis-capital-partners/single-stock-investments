@@ -99,6 +99,7 @@ EXCHANGE_META = {
     "CP": "NYSE",
     "CNI": "NYSE",
     "FER": "NASDAQ",
+    "TIPT": "NASDAQ",
     "EVR": "CSE",
     "GPW.WA": "WSE",
     "DNP.WA": "WSE",

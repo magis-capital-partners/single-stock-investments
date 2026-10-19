@@ -71,7 +71,14 @@ def resolve_identity(
     security_type = reviewed.get("security_type")
     if not security_type:
         security_type = "exchange_traded_fund" if any(x in text for x in (" etf", " fund", " trust")) else "operating_company"
-    archetype = reviewed.get("archetype") or ("holding_company" if security_type == "exchange_traded_fund" else "compounder")
+    registry_archetype = str(((entry.get("classification") or {}).get("archetype") or "")).strip()
+    if registry_archetype.lower() in {"", "unknown", "pending", "-"}:
+        registry_archetype = ""
+    default_archetype = "holding_company" if security_type == "exchange_traded_fund" else "compounder"
+    # A reviewed override wins. Otherwise keep a real registry archetype
+    # (holding_co, compounder, and so on) instead of stamping every operating
+    # company as a compounder.
+    archetype = reviewed.get("archetype") or registry_archetype or default_archetype
     route = route or {}
     route_methods = route.get("primary_methods") or []
     route_has_signal = bool(route_methods) and (

@@ -745,6 +745,7 @@ Synced from `_system/portfolio/registry.json`. Last sync: 2026-10-19.
 | TFPM | TFPM/ | Triple Flag Precious Metals Corp. | US | 2026-07-09 | 2026-10-19 | unknown | watch |
 | TGT | TGT/ | Target Corporation | US | 2026-07-10 | 2026-10-19 | unknown | watch |
 | THYP | THYP/ | THYP | US | 2026-07-29 | 2026-10-19 | unknown | watch |
+| TIPT | TIPT/ | Tiptree Inc. | US | — | 2026-10-19 | holding_co | watch |
 | TJX | TJX/ | TJX Companies | US | 2026-07-10 | 2026-10-19 | unknown | watch |
 | TKO | TKO/ | TKO Group Holdings | US | 2026-07-10 | 2026-10-19 | unknown | watch |
 | TLT | TLT/ | TLT | US | 2026-07-29 | 2026-10-19 | unknown | watch |
@@ -860,4 +861,4 @@ Synced from `_system/portfolio/registry.json`. Last sync: 2026-10-19.
 | ZETA | ZETA/ | ZETA | US | 2026-07-28 | 2026-10-19 | unknown | watch |
 | ZTS | ZTS/ | Zoetis | US | 2026-07-10 | 2026-10-19 | unknown | watch |
 
-**853 holdings total.** Registry: `_system/portfolio/registry.json`
+**854 holdings total.** Registry: `_system/portfolio/registry.json`
