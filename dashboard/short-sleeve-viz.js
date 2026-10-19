@@ -82,11 +82,11 @@
     function persist(){try{sessionStorage.setItem('short-sleeve-v1',JSON.stringify(state));}catch(_){}}
     function simulate(){
       const id=++request,k=key(),models=selectedModels();worker?.terminate();
-      const complete=results=>{cache.set(k,results);if(request!==id||!host.isConnected)return;mc=results;paint();};
+      const complete=results=>{cache.set(k,results);if(request!==id||key()!==k||!host.isConnected)return;mc=results;paint();};
       try {worker=new Worker('short-sleeve-worker.js');worker.onmessage=e=>{if(e.data.error){fail(e.data.error);return;}complete(e.data.results);};worker.onerror=()=>fallback();worker.postMessage({id,days:doc.days,models});}
       catch(_){fallback();}
-      function fallback(){worker?.terminate();setTimeout(()=>{try{complete(global.ShortSleeveEngine.monteCarlo(doc.days,models));}catch(e){fail(e.message);}},0);}
-      function fail(message){if(request!==id)return;const el=host.querySelector('.ss-mc-summary');if(el){el.setAttribute('role','alert');el.textContent=`Simulation unavailable: ${message}`;}}
+      function fallback(){if(request!==id||key()!==k)return;worker?.terminate();setTimeout(()=>{try{complete(global.ShortSleeveEngine.monteCarlo(doc.days,models));}catch(e){fail(e.message);}},0);}
+      function fail(message){if(request!==id||key()!==k)return;const el=host.querySelector('.ss-mc-summary');if(el){el.setAttribute('role','alert');el.textContent=`Simulation unavailable: ${message}`;}}
     }
     paint();simulate();
     if(global.ResizeObserver){const observer=new ResizeObserver(()=>{if(host.isConnected)plots();else{observer.disconnect();worker?.terminate();}});observer.observe(host);}
