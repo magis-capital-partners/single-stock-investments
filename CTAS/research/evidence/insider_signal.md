@@ -1,8 +1,8 @@
-# CTAS — Insider conviction (2026-10-18)
+# CTAS — Insider conviction (2026-10-19)
 
 > Context only. Insider activity informs scenario confidence and stance discussion; it does not auto-inflate Lawrence base IRR. Promotion requires [HUMAN REVIEW].
 
-**ICS:** 5.46 (moderate) · **Bull case support:** moderate
+**ICS:** 5.44 (moderate) · **Bull case support:** moderate
 
 | Scenario | Prior weight | Tilted weight |
 |----------|--------------|---------------|
@@ -13,7 +13,7 @@
 | Insider | Date | Shares | Price | Value | Contrib |
 |---------|------|--------|-------|-------|---------|
 | Coletti Robert E. | 2026-04-09 | 10548 | $27.1 | $285850.8 | 1.641 |
-| Barstad Melanie W. | 2026-07-16 | 10548 | $27.1 | $285850.8 | 1.585 |
+| Barstad Melanie W. | 2026-07-16 | 10548 | $27.1 | $285850.8 | 1.571 |
 | TYSOE RONALD W | 2026-04-20 | 5500 | $27.1 | $149050.0 | 1.38 |
 | Coletti Robert E. | 2026-04-09 | 1996 | $26.86 | $53612.56 | 1.14 |
 

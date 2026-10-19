@@ -1,4 +1,4 @@
-# APO — Insider conviction (2026-10-15)
+# APO — Insider conviction (2026-10-19)
 
 > Context only. Insider activity informs scenario confidence and stance discussion; it does not auto-inflate Lawrence base IRR. Promotion requires [HUMAN REVIEW].
 
@@ -20,8 +20,8 @@
 **Routine / planned sales (context):**
 
 - Kelly Martin: 1534 @ $0.0 on 2026-08-14
-- Kelly Martin: 3000 @ $140.845 on 2026-08-14
 - ROWAN MARC J: 140000 @ $0.0 on 2026-05-08
+- Kelly Martin: 3000 @ $140.845 on 2026-08-14
 
 Source: `_system/reference/market-data/insider/APO_transactions.csv`.
 Lawrence base IRR unchanged (`in_base_irr: False`).

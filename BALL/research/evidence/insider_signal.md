@@ -1,4 +1,4 @@
-# BALL — Insider conviction (2026-10-18)
+# BALL — Insider conviction (2026-10-19)
 
 > Context only. Insider activity informs scenario confidence and stance discussion; it does not auto-inflate Lawrence base IRR. Promotion requires [HUMAN REVIEW].
 
@@ -12,10 +12,10 @@
 
 | Insider | Date | Shares | Price | Value | Contrib |
 |---------|------|--------|-------|-------|---------|
-| Glew Mandy | 2026-08-25 | 2278 | $56.64 | $129025.92 | 2.114 |
-| Goodwin Deron | 2026-08-11 | 6940 | $37.585 | $260839.9 | 1.924 |
-| Glew Mandy | 2026-08-25 | 1788 | $55.87 | $99895.56 | 1.638 |
-| Glew Mandy | 2026-08-25 | 2015 | $51.35 | $103470.25 | 1.633 |
+| Glew Mandy | 2026-08-25 | 2278 | $56.64 | $129025.92 | 2.096 |
+| Goodwin Deron | 2026-08-11 | 6940 | $37.585 | $260839.9 | 1.908 |
+| Glew Mandy | 2026-08-25 | 1788 | $55.87 | $99895.56 | 1.625 |
+| Glew Mandy | 2026-08-25 | 2015 | $51.35 | $103470.25 | 1.619 |
 | Villatoro Fauze | 2026-03-04 | 1551 | $64.5112 | $100056.87 | 1.609 |
 
 **Routine / planned sales (context):**

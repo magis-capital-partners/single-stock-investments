@@ -1,4 +1,4 @@
-# APTV — Insider conviction (2026-10-18)
+# APTV — Insider conviction (2026-10-19)
 
 > Context only. Insider activity informs scenario confidence and stance discussion; it does not auto-inflate Lawrence base IRR. Promotion requires [HUMAN REVIEW].
 
@@ -13,10 +13,10 @@
 | Insider | Date | Shares | Price | Value | Contrib |
 |---------|------|--------|-------|-------|---------|
 | Agnevall Hakan | 2025-12-12 | 3700 | $80.248 | $296917.6 | 2.019 |
-| CLARK KEVIN P | 2026-08-10 | 51190 | $48.8901 | $2502684.22 | 1.914 |
+| CLARK KEVIN P | 2026-08-10 | 51190 | $48.8901 | $2502684.22 | 1.898 |
 | Agnevall Hakan | 2026-05-08 | 6100 | $57.73 | $352153.0 | 1.588 |
-| Agnevall Hakan | 2026-08-13 | 4100 | $48.581 | $199182.1 | 1.495 |
-| Mahoney Sean O | 2026-08-11 | 4000 | $50.287 | $201148.0 | 1.403 |
+| Agnevall Hakan | 2026-08-13 | 4100 | $48.581 | $199182.1 | 1.483 |
+| Mahoney Sean O | 2026-08-11 | 4000 | $50.287 | $201148.0 | 1.391 |
 
 **Routine / planned sales (context):**
 

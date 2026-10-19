@@ -1,4 +1,4 @@
-# A — Insider conviction (2026-10-18)
+# A — Insider conviction (2026-10-19)
 
 > Context only. Insider activity informs scenario confidence and stance discussion; it does not auto-inflate Lawrence base IRR. Promotion requires [HUMAN REVIEW].
 
@@ -12,7 +12,7 @@
 
 | Insider | Date | Shares | Price | Value | Contrib |
 |---------|------|--------|-------|-------|---------|
-| Boehnlein Glenn S | 2026-09-08 | 817 | $146.85 | $119976.45 | 2.162 |
+| Boehnlein Glenn S | 2026-09-08 | 817 | $146.85 | $119976.45 | 2.144 |
 | Soriot Pascal | 2026-03-19 | 2158 | $111.75 | $241156.5 | 1.683 |
 | Brown Judy L | 2026-03-19 | 2158 | $111.75 | $241156.5 | 1.683 |
 | Dolsten Mikael | 2026-03-19 | 2158 | $111.75 | $241156.5 | 1.548 |

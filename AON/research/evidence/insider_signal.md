@@ -1,8 +1,8 @@
-# AON — Insider conviction (2026-10-18)
+# AON — Insider conviction (2026-10-19)
 
 > Context only. Insider activity informs scenario confidence and stance discussion; it does not auto-inflate Lawrence base IRR. Promotion requires [HUMAN REVIEW].
 
-**ICS:** 9.37 (exceptional) · **Bull case support:** moderate
+**ICS:** 9.29 (exceptional) · **Bull case support:** moderate
 
 | Scenario | Prior weight | Tilted weight |
 |----------|--------------|---------------|
@@ -12,17 +12,17 @@
 
 | Insider | Date | Shares | Price | Value | Contrib |
 |---------|------|--------|-------|-------|---------|
-| KNIGHT LESTER B | 2026-09-02 | 7212 | $327.52 | $2362074.24 | 1.513 |
-| KNIGHT LESTER B | 2026-09-02 | 5097 | $326.53 | $1664323.41 | 1.462 |
-| KNIGHT LESTER B | 2026-09-02 | 4145 | $328.34 | $1360969.3 | 1.419 |
-| KNIGHT LESTER B | 2026-09-02 | 1739 | $325.63 | $566270.57 | 1.319 |
-| KNIGHT LESTER B | 2026-09-02 | 1440 | $329.69 | $474753.6 | 1.287 |
+| KNIGHT LESTER B | 2026-09-02 | 7212 | $327.52 | $2362074.24 | 1.5 |
+| KNIGHT LESTER B | 2026-09-02 | 5097 | $326.53 | $1664323.41 | 1.45 |
+| KNIGHT LESTER B | 2026-09-02 | 4145 | $328.34 | $1360969.3 | 1.407 |
+| KNIGHT LESTER B | 2026-09-02 | 1739 | $325.63 | $566270.57 | 1.308 |
+| KNIGHT LESTER B | 2026-09-02 | 1440 | $329.69 | $474753.6 | 1.277 |
 
 **Routine / planned sales (context):**
 
+- Reese Edmund: 2198 @ $343.56 on 2026-07-01
+- Reese Edmund: 250 @ $321.7 on 2026-02-13
 - Zeidel Darren: 700 @ $376.0 on 2026-07-28
-- Zeidel Darren: 725 @ $378.0 on 2026-07-28
-- Zeidel Darren: 475 @ $380.0 on 2026-07-28
 
 Source: `_system/reference/market-data/insider/AON_transactions.csv`.
 Lawrence base IRR unchanged (`in_base_irr: False`).

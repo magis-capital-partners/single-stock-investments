@@ -1,4 +1,4 @@
-# ASTS — Insider conviction (2026-10-18)
+# ASTS — Insider conviction (2026-10-19)
 
 > Context only. Insider activity informs scenario confidence and stance discussion; it does not auto-inflate Lawrence base IRR. Promotion requires [HUMAN REVIEW].
 
@@ -14,9 +14,9 @@
 |---------|------|--------|-------|-------|---------|
 | LARSON KEITH R | 2025-12-17 | 715 | $70.02 | $50064.3 | 2.125 |
 | LARSON KEITH R | 2025-12-24 | 625 | $80.0 | $50000.0 | 1.935 |
-| Cisneros Adriana | 2026-08-31 | 8768 | $57.0 | $499776.0 | 1.894 |
-| Cisneros Adriana | 2026-08-31 | 1384 | $57.79 | $79981.36 | 1.696 |
-| Cisneros Adriana | 2026-08-31 | 670 | $58.87 | $39442.9 | 1.449 |
+| Cisneros Adriana | 2026-08-31 | 8768 | $57.0 | $499776.0 | 1.878 |
+| Cisneros Adriana | 2026-08-31 | 1384 | $57.79 | $79981.36 | 1.682 |
+| Cisneros Adriana | 2026-08-31 | 670 | $58.87 | $39442.9 | 1.437 |
 
 **Routine / planned sales (context):**
 

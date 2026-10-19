@@ -1,8 +1,8 @@
-# FIS — Insider conviction (2026-10-18)
+# FIS — Insider conviction (2026-10-19)
 
 > Context only. Insider activity informs scenario confidence and stance discussion; it does not auto-inflate Lawrence base IRR. Promotion requires [HUMAN REVIEW].
 
-**ICS:** 5.68 (moderate) · **Bull case support:** moderate
+**ICS:** 5.67 (moderate) · **Bull case support:** moderate
 
 | Scenario | Prior weight | Tilted weight |
 |----------|--------------|---------------|
@@ -15,7 +15,7 @@
 | Goldstein Jeffrey A | 2026-04-15 | 1197 | $47.39 | $56725.83 | 1.569 |
 | Ferris Stephanie | 2026-03-05 | 19846 | $50.39 | $1000039.94 | 1.545 |
 | Goldstein Jeffrey A | 2026-01-15 | 941 | $64.11 | $60327.51 | 1.545 |
-| Goldstein Jeffrey A | 2026-07-15 | 1386 | $41.39 | $57366.54 | 1.278 |
+| Goldstein Jeffrey A | 2026-07-15 | 1386 | $41.39 | $57366.54 | 1.269 |
 
 **Routine / planned sales (context):**
 

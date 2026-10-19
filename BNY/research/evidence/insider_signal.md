@@ -1,4 +1,4 @@
-# BNY — Insider conviction (2026-10-18)
+# BNY — Insider conviction (2026-10-19)
 
 > Context only. Insider activity informs scenario confidence and stance discussion; it does not auto-inflate Lawrence base IRR. Promotion requires [HUMAN REVIEW].
 
@@ -12,7 +12,7 @@
 
 | Insider | Date | Shares | Price | Value | Contrib |
 |---------|------|--------|-------|-------|---------|
-| Vince Robin A. | 2026-07-16 | 24833 | $161.075 | $3999975.47 | 1.839 |
+| Vince Robin A. | 2026-07-16 | 24833 | $161.075 | $3999975.47 | 1.824 |
 | Echevarria Joseph | 2026-07-01 | 616 | $146.02 | $89948.32 | 0.823 |
 | O'CONNOR SANDRA | 2026-07-01 | 188 | $146.02 | $27451.76 | 0.772 |
 | Echevarria Joseph | 2026-04-01 | 743 | $120.97 | $89880.71 | 0.713 |

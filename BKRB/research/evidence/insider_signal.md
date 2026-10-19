@@ -1,4 +1,4 @@
-# BKRB — Insider conviction (2026-10-18)
+# BKRB — Insider conviction (2026-10-19)
 
 > Context only. Insider activity informs scenario confidence and stance discussion; it does not auto-inflate Lawrence base IRR. Promotion requires [HUMAN REVIEW].
 
@@ -12,11 +12,11 @@
 
 | Insider | Date | Shares | Price | Value | Contrib |
 |---------|------|--------|-------|-------|---------|
-| O'Sullivan Michael J. | 2026-08-12 | 400 | $512.52 | $205008.0 | 2.341 |
-| BERKSHIRE HATHAWAY INC | 2026-10-02 | 842753 | $80.04 | $67453950.12 | 1.85 |
-| BERKSHIRE HATHAWAY INC | 2026-09-18 | 33122 | $74.8 | $2477525.6 | 1.803 |
-| BERKSHIRE HATHAWAY INC | 2026-09-30 | 638813 | $81.59 | $52120752.67 | 1.783 |
-| BERKSHIRE HATHAWAY INC | 2026-09-18 | 1218429 | $76.39 | $93075791.31 | 1.758 |
+| O'Sullivan Michael J. | 2026-08-12 | 400 | $512.52 | $205008.0 | 2.322 |
+| BERKSHIRE HATHAWAY INC | 2026-10-02 | 842753 | $80.04 | $67453950.12 | 1.835 |
+| BERKSHIRE HATHAWAY INC | 2026-09-18 | 33122 | $74.8 | $2477525.6 | 1.788 |
+| BERKSHIRE HATHAWAY INC | 2026-09-30 | 638813 | $81.59 | $52120752.67 | 1.768 |
+| BERKSHIRE HATHAWAY INC | 2026-09-18 | 1218429 | $76.39 | $93075791.31 | 1.744 |
 
 **Routine / planned sales (context):**
 
