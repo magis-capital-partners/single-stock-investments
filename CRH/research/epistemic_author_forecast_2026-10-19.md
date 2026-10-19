@@ -2,8 +2,7 @@
 
 **Work id:** `0c6457af11f4a63293a9b6da`  
 **Task:** `author_forecast` · **Component:** `operating_business_and_net_assets`  
-**Draft:** `CRH/research/falsifier_drafts/0c6457af11f4a63293a9b6da.json` · **Status:** `awaiting_review`  
-**Provenance:** `CRH/research/agent_run_state.json` (evidence gate for this run)
+**Draft:** work id `0c6457af11f4a63293a9b6da` under `CRH/research/falsifier_drafts/` · **Status:** `awaiting_review`
 
 ## What was delivered
 
@@ -41,4 +40,4 @@ Author run only. No outcome scoring, no edits to `falsifier_specs.json`, no `hum
 ## Epistemic work receipt
 
 - **Disposition:** success  
-- **Published input SHA:** see `CRH/research/agent_run_state.json`
+- **Published input SHA:** recorded in run-state JSON alongside this receipt date
