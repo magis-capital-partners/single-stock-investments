@@ -9,8 +9,9 @@ Events without a bar file or a cached book are counted as "no data", never
 dropped silently.
 
 The book-level models (``simulate_passive_offer`` on mbp-1 and
-``participation_leg`` on prints) are kept, tested, as the reference design for
-H2 and H3; they are not run, because those schemas are not free on this plan.
+``participation_leg`` on prints) are kept, tested, as the design registered for
+H2 and H3; they are not run, because those schemas are not free on this plan and
+the paid pull is blocked on a data budget decision.
 """
 from __future__ import annotations
 
@@ -1039,8 +1040,11 @@ def assessments(h4: dict, h2: dict, h3: dict) -> dict:
             verdict = f"Between the registered thresholds on validation: round-trip cost {cost:.2%} against a benchmark of {bench:.2%}."
     out["H19"] = {"registered_success": "under 1.5% round trip on validation", "registered_kill": "cost exceeds the open-to-close benchmark",
                   "assessment": verdict, **detail}
-    for old, new in er.SUPERSEDED.items():
-        out[old] = {"assessment": f"Superseded by {new}: the registered cost model needs mbp-1 and trade prints, which are not free on this plan and are not bought."}
+    for paid, free in er.FREE_DATA_FORMS.items():
+        out[paid] = {"assessment": ("Not measured: blocked on a data budget decision (nothing for now). The registered cost model needs trades and "
+                                    f"mbp-1, quoted at ${er.PAID_PLAN_QUOTE['all_events_usd']:.4f} for all 671 entry sessions "
+                                    f"(${er.PAID_PLAN_QUOTE['train_validate_usd']:.4f} train and validation only); {free} measures the same question on free one-second bars."),
+                     "paid_plan_quote": dict(er.PAID_PLAN_QUOTE), "free_data_form": free}
     return out
 
 
@@ -1083,7 +1087,7 @@ def build(cfg: Config, *, log=print) -> dict:
                 "quoted_refused_above_zero": ((quotes.get("summary") or {}).get("priced_above_zero_refused") or {}).get("requests"),
                 "downloads": [{k: d.get(k) for k in ("downloaded_at", "files", "bytes", "quoted_usd", "refused_priced_above_zero", "refused_usd")} for d in downloads]}
     doc = {"schema_version": er.VERSION, "built_at": built_at, "research_only": True, "authority": "none", "aggregate_only": True,
-           "hypothesis_ids": list(er.HYPOTHESES), "superseded": dict(er.SUPERSEDED), "source_run_id": RUN_ID,
+           "hypothesis_ids": list(er.HYPOTHESES), "blocked_on_data_budget": dict(er.FREE_DATA_FORMS), "source_run_id": RUN_ID,
            "splits": {k: list(v) for k, v in SPLITS.items()},
            "holdout_policy": {"start": HOLDOUT_START, "status": "sealed",
                               "location": "local/holdout/execution_realism_holdout.json (not committed, not read until the program's final review)"},
@@ -1165,7 +1169,7 @@ def write_outputs(cfg: Config, result: dict, *, publish: bool, log=print) -> dic
         measured = [h for h in er.HYPOTHESES if not str(doc["assessments"].get(h, {}).get("assessment", "")).startswith("Not me")]
         mark_measured(cfg.ledger_dir, measured, out_path.name)
         manifest = {"schema_version": er.VERSION, "built_at": doc["built_at"], "hypothesis_ids": list(er.HYPOTHESES), "aggregate_only": True,
-                    "hypotheses_measured": measured, "superseded": dict(er.SUPERSEDED),
+                    "hypotheses_measured": measured, "blocked_on_data_budget": dict(er.FREE_DATA_FORMS),
                     "output": {"path": out_path.name, "sha256": sha256_file(out_path)},
                     "registry": {"path": "hypotheses.jsonl", "sha256": sha256_file(cfg.ledger_dir / "hypotheses.jsonl")},
                     "code": [{"path": f"_system/scripts/reverse_splits/{name}", "sha256": sha256_file(Path(__file__).with_name(name))}

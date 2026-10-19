@@ -414,7 +414,8 @@ def test_h3_results_cost_and_kill_reading():
                                                                                                            "time_to_fill_seconds": {}}} for s in ("train", "validate")}}}}
     a = b.assessments(h4, h2, res)
     assert a["H4"]["assessment"].startswith("Success") and a["H18"]["assessment"].startswith("Success") and a["H19"]["assessment"].startswith("Success")
-    assert a["H2"]["assessment"].startswith("Superseded by H18") and a["H3"]["assessment"].startswith("Superseded by H19")
+    assert a["H2"]["assessment"].startswith("Not measured: blocked") and a["H2"]["free_data_form"] == "H18"
+    assert a["H3"]["assessment"].startswith("Not measured: blocked") and a["H3"]["paid_plan_quote"]["all_events_usd"] == pytest.approx(0.3245)
     h2["by_ssr_state"]["restricted"]["by_split"]["validate"][f"{b.PRIMARY_ORDER}/{b.PRIMARY_FILL_MODEL}"]["fill_rate"]["share"] = 0.2
     h4["by_split"]["validate"]["all"]["account"]["feasible"]["share"] = 0.3
     rows_kill = [{**r, "legs": {"capacity/0.01": leg(0.06, -0.01)}} for r in rows if r.get("legs")]
@@ -457,8 +458,8 @@ def test_registry_still_has_seventeen_rows_and_workstream_a_cites_registered_ids
     assert hyp.registry_errors(rows) == []
     assert hyp.declared_before(rows, list(er.HYPOTHESES), datetime.now(timezone.utc))
     by = {r["id"]: r for r in rows}
-    assert by["H2"]["status"] == "superseded" and by["H2"]["superseded_by"] == "H18"
-    assert by["H3"]["status"] == "superseded" and by["H3"]["superseded_by"] == "H19"
+    assert by["H2"]["status"] == "registered" and by["H2"]["free_data_form"] == "H18" and by["H2"]["result_ref"] is None
+    assert by["H3"]["status"] == "registered" and by["H3"]["free_data_form"] == "H19" and "blocked" in by["H3"]["note"]
     assert by["H18"]["success"] == by["H2"]["success"] and by["H19"]["success"] == by["H3"]["success"]
     assert by["H18"]["kill"] == by["H2"]["kill"] and by["H19"]["kill"] == by["H3"]["kill"]
 

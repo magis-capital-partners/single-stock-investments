@@ -341,18 +341,23 @@ python -m reverse_splits.execution_realism build --publish
 | `local/raw/databento/{venue}/ohlcv-1s/sessions/` | The free one-second bar files, one per venue-session with its `.ok.json` receipt. Never committed. |
 
 **Free data only.** The plan as proposed needed `trades` and `mbp-1` for
-each event session; those were quoted at $0.32 for all 671 sessions and
-declined, and the rule since 2026-10-18 is that nothing priced above $0.00 is
-bought. On this plan `ohlcv-1s`, `ohlcv-1m`, `ohlcv-1h`, `statistics`, `status`
-and `definition` quote $0.00 on all three venues; every quote, trade and book
-schema does not. `quote` prices every request with `metadata.get_cost` and
-`download` fetches only those quoted at exactly $0.00, with no override; the
-refused count and the receipts are in the manifest. H2 and H3 are therefore
-`superseded` in `hypotheses.jsonl` by H18 and H19, which carry the same
-success and kill thresholds and an explicitly declared bar-based cost model
-(registered before the bars were pulled). The book-level queue model and the
-print-based participation pricer stay in `execution_realism_build.py` as
-tested reference code; they are not run.
+each event session. Every request was quoted first: $0.3245 for all 671
+sessions ($0.2366 for train and validation only; $0.4778 with full-session
+mbp-1), recorded in `local/workstream_a/quotes_paid_plan_2026-10-18.json`.
+Drew's decision on 2026-10-18 was "nothing for now" and, going forward, free
+data only. So H2 and H3 stay `registered` and unmeasured in
+`hypotheses.jsonl`, blocked on that budget decision (their rows carry the
+note and the quoted amounts so it can be revisited), and H18 and H19 measure
+the same two questions on free data with the same success and kill
+thresholds and an explicitly declared bar-based cost model, registered before
+the bars were pulled. On this plan `ohlcv-1s`, `ohlcv-1m`, `ohlcv-1h`,
+`statistics`, `status` and `definition` quote $0.00 on all three venues;
+every quote, trade and book schema does not. `quote` prices every request
+with `metadata.get_cost` and `download` fetches only those quoted at exactly
+$0.00, with no override; the refused count and the receipts are in the
+manifest. The book-level queue model and the print-based participation
+pricer stay in `execution_realism_build.py` as the tested design for H2 and
+H3; they are not run.
 
 ### H4: the opening cross is not a size lever at $50k
 
