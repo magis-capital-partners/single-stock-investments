@@ -1,10 +1,11 @@
-# LEU (LEU)
+# CENTRUS ENERGY CORP  (LEU)  (CIK 0001065059) contingent / CVR candidate (LEU)
 
-**Ticker:** LEU | **Market:** US
-**Last updated:** 2026-07-24
+**Ticker:** LEU | **Market:** US  
+**Last updated:** 2026-10-19  
+**Stage:** pre-close stub (discovery)
 
-## Download
+## Next actions
 
-```powershell
-python LEU/investor-documents/download_leu_investor_docs.py
-```
+1. Pull merger 8-K / DEFM14A / CVR agreement into `investor-documents/sec/`.
+2. Fill `research/cvr_terms.json` (set `stub=false`, `terms_complete=true`).
+3. Nightly sync will sleeve onto the CVRs filter.
