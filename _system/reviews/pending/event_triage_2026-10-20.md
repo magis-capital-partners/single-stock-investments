@@ -1,10 +1,50 @@
 # Event triage — human review queue
 
 **Date:** 2026-10-20
-**Rows:** 2901
+**Rows:** 5127
 
 | Date | Ticker | Source | Tier | Materiality | Rules | Title |
 |------|--------|--------|------|-------------|-------|-------|
+| 2026-10-20 | MSFT | news | context | 38 | rule_conflict, activist_cross_link, neutral_low_impact | Microsoft vs. Oracle: Which Tech Stock Is a Better Buy in 20 |
+| 2026-10-20 | DIS | news | context | 38 | rule_conflict, activist_cross_link, neutral_low_impact | Walt Disney (DIS) Could Be 13% Undervalued On TV And Streami |
+| 2026-10-20 | APLD | news | context | 38 | rule_conflict, activist_cross_link, neutral_low_impact | Is Applied Digital Stock Stock an Undervalued AI Stock to Bu |
+| 2026-10-20 | ACHR | kpi_trend | context | 66 | rule_conflict, activist_cross_link, routine_governance_watch | Leadership / governance on watch |
+| 2026-10-20 | ARES | kpi_trend | context | 66 | rule_conflict, activist_cross_link, routine_governance_watch | Leadership / governance on watch |
+| 2026-10-20 | AVY | kpi_trend | context | 66 | rule_conflict, activist_cross_link, routine_governance_watch | Leadership / governance on watch |
+| 2026-10-20 | AXON | kpi_trend | context | 66 | rule_conflict, activist_cross_link, routine_governance_watch | Leadership / governance on watch |
+| 2026-10-20 | BB | kpi_trend | context | 66 | rule_conflict, activist_cross_link, routine_governance_watch | Leadership / governance on watch |
+| 2026-10-20 | BEN | kpi_trend | context | 66 | rule_conflict, activist_cross_link, routine_governance_watch | Leadership / governance on watch |
+| 2026-10-20 | BMY | kpi_trend | context | 66 | rule_conflict, activist_cross_link, routine_governance_watch | Leadership / governance on watch |
+| 2026-10-20 | BNY | kpi_trend | context | 66 | rule_conflict, activist_cross_link, routine_governance_watch | Leadership / governance on watch |
+| 2026-10-20 | CHRW | kpi_trend | context | 66 | rule_conflict, activist_cross_link, routine_governance_watch | Leadership / governance on watch |
+| 2026-10-20 | CIFR | kpi_trend | context | 66 | rule_conflict, activist_cross_link, routine_governance_watch | Leadership / governance on watch |
+| 2026-10-20 | CORZ | kpi_trend | context | 66 | rule_conflict, activist_cross_link, routine_governance_watch | Leadership / governance on watch |
+| 2026-10-20 | CRM | kpi_trend | context | 66 | rule_conflict, activist_cross_link, routine_governance_watch | Leadership / governance on watch |
+| 2026-10-20 | CSCO | kpi_trend | context | 66 | rule_conflict, activist_cross_link, routine_governance_watch | Leadership / governance on watch |
+| 2026-10-20 | CVNA | kpi_trend | context | 66 | rule_conflict, activist_cross_link, routine_governance_watch | Leadership / governance on watch |
+| 2026-10-20 | DASH | kpi_trend | context | 66 | rule_conflict, activist_cross_link, routine_governance_watch | Leadership / governance on watch |
+| 2026-10-20 | DIS | kpi_trend | context | 66 | rule_conflict, activist_cross_link, routine_governance_watch | Leadership / governance on watch |
+| 2026-10-20 | EA | kpi_trend | context | 66 | rule_conflict, activist_cross_link, routine_governance_watch | Leadership / governance on watch |
+| 2026-10-20 | EOSE | kpi_trend | context | 66 | rule_conflict, activist_cross_link, routine_governance_watch | Leadership / governance on watch |
+| 2026-10-20 | FOX | kpi_trend | context | 66 | rule_conflict, activist_cross_link, routine_governance_watch | Leadership / governance on watch |
+| 2026-10-20 | FOXA | kpi_trend | context | 66 | rule_conflict, activist_cross_link, routine_governance_watch | Leadership / governance on watch |
+| 2026-10-20 | GNRC | kpi_trend | context | 66 | rule_conflict, activist_cross_link, routine_governance_watch | Leadership / governance on watch |
+| 2026-10-20 | GOOG | kpi_trend | context | 66 | rule_conflict, activist_cross_link, routine_governance_watch | Leadership / governance on watch |
+| 2026-10-20 | HIMS | kpi_trend | context | 66 | rule_conflict, activist_cross_link, routine_governance_watch | Leadership / governance on watch |
+| 2026-10-20 | HON | kpi_trend | context | 66 | rule_conflict, activist_cross_link, routine_governance_watch | Leadership / governance on watch |
+| 2026-10-20 | INCY | kpi_trend | context | 66 | rule_conflict, activist_cross_link, routine_governance_watch | Leadership / governance on watch |
+| 2026-10-20 | INTU | kpi_trend | context | 66 | rule_conflict, activist_cross_link, routine_governance_watch | Leadership / governance on watch |
+| 2026-10-20 | IVZ | kpi_trend | context | 66 | rule_conflict, activist_cross_link, routine_governance_watch | Leadership / governance on watch |
+| 2026-10-20 | KR | kpi_trend | context | 66 | rule_conflict, activist_cross_link, routine_governance_watch | Leadership / governance on watch |
+| 2026-10-20 | STX | kpi_trend | context | 66 | rule_conflict, activist_cross_link, routine_governance_watch | Leadership / governance on watch |
+| 2026-10-20 | TFC | kpi_trend | context | 66 | rule_conflict, activist_cross_link, routine_governance_watch | Leadership / governance on watch |
+| 2026-10-20 | TGT | kpi_trend | context | 66 | rule_conflict, activist_cross_link, routine_governance_watch | Leadership / governance on watch |
+| 2026-10-20 | VEEV | kpi_trend | context | 66 | rule_conflict, activist_cross_link, routine_governance_watch | Leadership / governance on watch |
+| 2026-10-20 | WBD | kpi_trend | context | 66 | rule_conflict, activist_cross_link, routine_governance_watch | Leadership / governance on watch |
+| 2026-10-20 | YUM | kpi_trend | context | 66 | rule_conflict, activist_cross_link, routine_governance_watch | Leadership / governance on watch |
+| 2026-10-19 | DASH | news | context | 38 | rule_conflict, activist_cross_link, neutral_low_impact | Abel Hall LLC Acquires New Stake in DoorDash, Inc. $DASH - M |
+| 2026-10-19 | UNP | news | context | 38 | rule_conflict, activist_cross_link, neutral_low_impact | Greg Jennings LLC Makes New Investment in Union Pacific Corp |
+| 2026-10-19 | GOOGL | news | context | 38 | rule_conflict, activist_cross_link, neutral_low_impact | Alphabet Stock Slipped After Q2 Earnings. Here's What Invest |
 | 2026-10-19 | AMZN | news | context | 38 | rule_conflict, activist_cross_link, neutral_low_impact | AWS Margin Expansion and Retail Execution Power Amazon (AMZN |
 | 2026-10-19 | HSIC | news | context | 38 | rule_conflict, activist_cross_link, neutral_low_impact | How CFO Change At Henry Schein (HSIC) Has Changed Its Invest |
 | 2026-10-19 | MS | news | context | 38 | rule_conflict, activist_cross_link, neutral_low_impact | Morgan Stanley: 3 Key Takeaways for Long-Term Investors |
@@ -15,6 +55,7 @@
 | 2026-10-19 | KR | news | context | 38 | rule_conflict, activist_cross_link, neutral_low_impact | The high-stakes case over the failed Albertsons-Kroger merge |
 | 2026-10-19 | KR | news | context | 38 | rule_conflict, activist_cross_link, neutral_low_impact | The high-stakes case over the failed Albertsons-Kroger merge |
 | 2026-10-19 | UNP | news | context | 38 | rule_conflict, activist_cross_link, neutral_low_impact | Stay Ahead of the Game With Union Pacific (UNP) Q3 Earnings: |
+| 2026-10-19 | EXE | news | context | 38 | rule_conflict, activist_cross_link, neutral_low_impact | Chord Energy names Lou as new President and CEO; Brown moves |
 | 2026-10-19 | EXE | news | context | 38 | rule_conflict, activist_cross_link, neutral_low_impact | Expand Energy Corporation Names Danny Brown President and Ch |
 | 2026-10-19 | APLD | news | context | 38 | rule_conflict, activist_cross_link, neutral_low_impact | APLD's Interest Costs Surge: Can AI Growth Restore Profitabi |
 | 2026-10-19 | HPQ | news | context | 38 | rule_conflict, activist_cross_link, neutral_low_impact | Can HPQ Protect Margins Amid Rising Memory & Storage Costs? |
@@ -24,55 +65,12 @@
 | 2026-10-19 | MO | news | context | 38 | rule_conflict, activist_cross_link, neutral_low_impact | If You Invested $100 a Month in This High-Yield Dividend Sto |
 | 2026-10-19 | SBUX | news | context | 38 | rule_conflict, activist_cross_link, neutral_low_impact | Starbucks raises its quarterly dividend for Starbucks stock  |
 | 2026-10-19 | PSX | news | context | 38 | rule_conflict, activist_cross_link, neutral_low_impact | Does Dividend Increase Change The Bull Case For Phillips 66  |
-| 2026-10-19 | HAS | news | context | 38 | rule_conflict, activist_cross_link, neutral_low_impact | Equity Conviction Note – 11/2/2026 – Hasbro – Market Outlook |
-| 2026-10-19 | ACHR | kpi_trend | context | 66 | rule_conflict, activist_cross_link, routine_governance_watch | Leadership / governance on watch |
-| 2026-10-19 | APLD | kpi_trend | context | 66 | rule_conflict, activist_cross_link, routine_governance_watch | Leadership / governance on watch |
-| 2026-10-19 | ARES | kpi_trend | context | 66 | rule_conflict, activist_cross_link, routine_governance_watch | Leadership / governance on watch |
-| 2026-10-19 | AVY | kpi_trend | context | 66 | rule_conflict, activist_cross_link, routine_governance_watch | Leadership / governance on watch |
-| 2026-10-19 | AXON | kpi_trend | context | 66 | rule_conflict, activist_cross_link, routine_governance_watch | Leadership / governance on watch |
-| 2026-10-19 | BB | kpi_trend | context | 66 | rule_conflict, activist_cross_link, routine_governance_watch | Leadership / governance on watch |
-| 2026-10-19 | BEN | kpi_trend | context | 66 | rule_conflict, activist_cross_link, routine_governance_watch | Leadership / governance on watch |
-| 2026-10-19 | BMY | kpi_trend | context | 66 | rule_conflict, activist_cross_link, routine_governance_watch | Leadership / governance on watch |
-| 2026-10-19 | BNY | kpi_trend | context | 66 | rule_conflict, activist_cross_link, routine_governance_watch | Leadership / governance on watch |
-| 2026-10-19 | CHRW | kpi_trend | context | 66 | rule_conflict, activist_cross_link, routine_governance_watch | Leadership / governance on watch |
-| 2026-10-19 | CIFR | kpi_trend | context | 66 | rule_conflict, activist_cross_link, routine_governance_watch | Leadership / governance on watch |
-| 2026-10-19 | CORZ | kpi_trend | context | 66 | rule_conflict, activist_cross_link, routine_governance_watch | Leadership / governance on watch |
-| 2026-10-19 | CRM | kpi_trend | context | 66 | rule_conflict, activist_cross_link, routine_governance_watch | Leadership / governance on watch |
-| 2026-10-19 | CSCO | kpi_trend | context | 66 | rule_conflict, activist_cross_link, routine_governance_watch | Leadership / governance on watch |
-| 2026-10-19 | CVNA | kpi_trend | context | 66 | rule_conflict, activist_cross_link, routine_governance_watch | Leadership / governance on watch |
-| 2026-10-19 | DASH | kpi_trend | context | 66 | rule_conflict, activist_cross_link, routine_governance_watch | Leadership / governance on watch |
-| 2026-10-19 | DIS | kpi_trend | context | 66 | rule_conflict, activist_cross_link, routine_governance_watch | Leadership / governance on watch |
-| 2026-10-19 | EA | kpi_trend | context | 66 | rule_conflict, activist_cross_link, routine_governance_watch | Leadership / governance on watch |
-| 2026-10-19 | EOSE | kpi_trend | context | 66 | rule_conflict, activist_cross_link, routine_governance_watch | Leadership / governance on watch |
-| 2026-10-19 | FOX | kpi_trend | context | 66 | rule_conflict, activist_cross_link, routine_governance_watch | Leadership / governance on watch |
-| 2026-10-19 | FOXA | kpi_trend | context | 66 | rule_conflict, activist_cross_link, routine_governance_watch | Leadership / governance on watch |
-| 2026-10-19 | GNRC | kpi_trend | context | 66 | rule_conflict, activist_cross_link, routine_governance_watch | Leadership / governance on watch |
-| 2026-10-19 | GOOG | kpi_trend | context | 66 | rule_conflict, activist_cross_link, routine_governance_watch | Leadership / governance on watch |
-| 2026-10-19 | HIMS | kpi_trend | context | 66 | rule_conflict, activist_cross_link, routine_governance_watch | Leadership / governance on watch |
-| 2026-10-19 | HON | kpi_trend | context | 66 | rule_conflict, activist_cross_link, routine_governance_watch | Leadership / governance on watch |
-| 2026-10-19 | INCY | kpi_trend | context | 66 | rule_conflict, activist_cross_link, routine_governance_watch | Leadership / governance on watch |
-| 2026-10-19 | INTU | kpi_trend | context | 66 | rule_conflict, activist_cross_link, routine_governance_watch | Leadership / governance on watch |
-| 2026-10-19 | IVZ | kpi_trend | context | 66 | rule_conflict, activist_cross_link, routine_governance_watch | Leadership / governance on watch |
-| 2026-10-19 | KR | kpi_trend | context | 66 | rule_conflict, activist_cross_link, routine_governance_watch | Leadership / governance on watch |
-| 2026-10-19 | STX | kpi_trend | context | 66 | rule_conflict, activist_cross_link, routine_governance_watch | Leadership / governance on watch |
-| 2026-10-19 | TFC | kpi_trend | context | 66 | rule_conflict, activist_cross_link, routine_governance_watch | Leadership / governance on watch |
-| 2026-10-19 | TGT | kpi_trend | context | 66 | rule_conflict, activist_cross_link, routine_governance_watch | Leadership / governance on watch |
-| 2026-10-19 | VEEV | kpi_trend | context | 66 | rule_conflict, activist_cross_link, routine_governance_watch | Leadership / governance on watch |
-| 2026-10-19 | WBD | kpi_trend | context | 66 | rule_conflict, activist_cross_link, routine_governance_watch | Leadership / governance on watch |
-| 2026-10-19 | YUM | kpi_trend | context | 66 | rule_conflict, activist_cross_link, routine_governance_watch | Leadership / governance on watch |
 | 2026-10-18 | SYY | news | context | 38 | rule_conflict, activist_cross_link, neutral_low_impact | Sysco (SYY) Ends LA Strike On A Narrative That Still Looks U |
 | 2026-10-18 | MSFT | news | context | 38 | rule_conflict, activist_cross_link, neutral_low_impact | Some Investors Are Questioning the AI Trade. Microsoft Is Bu |
-| 2026-10-18 | O | news | context | 38 | rule_conflict, activist_cross_link, neutral_low_impact | Will Raised AFFO Guidance Change Realty Income (O) Stock Nar |
-| 2026-10-18 | FAST | news | context | 38 | rule_conflict, activist_cross_link, neutral_low_impact | Fastenal (FAST) Could Be 2% Overvalued As Strong Q3 Results  |
-| 2026-10-18 | O | news | context | 38 | rule_conflict, activist_cross_link, neutral_low_impact | Learn Why The Bull Case For Realty Income Stock Could Change |
 | 2026-10-17 | VRSK | kpi_trend | context | 66 | rule_conflict, activist_cross_link, routine_governance_watch | Leadership / governance on watch |
-| 2026-10-17 | UNP | news | context | 38 | rule_conflict, activist_cross_link, neutral_low_impact | Union Pacific (UNP) Faces A Leadership Handoff As Valuation  |
-| 2026-10-17 | GOOGL | news | context | 38 | rule_conflict, activist_cross_link, neutral_low_impact | Greg Abel Made Major Additions to Alphabet and Delta Last Qu |
-| 2026-10-17 | RF | news | context | 38 | rule_conflict, activist_cross_link, neutral_low_impact | Regions Financial: 3 Key Takeaways for Long-Term Investors |
 | 2026-10-15 | DLTR | kpi_trend | context | 66 | rule_conflict, activist_cross_link, routine_governance_watch | Leadership / governance on watch |
 | 2026-10-15 | GE | kpi_trend | context | 66 | rule_conflict, activist_cross_link, routine_governance_watch | Leadership / governance on watch |
 | 2026-10-14 | MSCI | kpi_trend | context | 66 | rule_conflict, activist_cross_link, routine_governance_watch | Leadership / governance on watch |
-| 2026-10-14 | VZ | kpi_trend | context | 66 | rule_conflict, activist_cross_link, routine_governance_watch | Leadership / governance on watch |
 | 2026-10-11 | GOOG | third_party | context | 21 | rule_conflict, activist_cross_link, neutral_low_impact | PX14A6G · GOOG · 2026-04-28 |
 | 2026-10-11 | VTR | third_party | context | 21 | rule_conflict, activist_cross_link, neutral_low_impact | DFAN14A (proxy solicitation) · VTR · 2024-01-11 |
 | 2026-10-11 | BUR | vic_research | context | 27 | rule_conflict, activist_cross_link, neutral_low_impact | 07-BURFORD-CAPITAL-BUR-4694552095_151e |
@@ -205,3 +203,5 @@
 | 2026-10-11 | AMZN | third_party | context | 21 | rule_conflict, activist_cross_link, entity_mismatch, neutral_low_impact | Strategic Organizing Center — DEFA14A |
 | 2026-10-11 | MCD | third_party | context | 21 | rule_conflict, activist_cross_link, entity_mismatch, neutral_low_impact | Strategic Organizing Center — DEFA14A |
 | 2026-10-11 | MCD | third_party | context | 21 | rule_conflict, activist_cross_link, entity_mismatch, neutral_low_impact | The Carlyle Group — PX14A6G |
+| 2026-10-11 | MCD | third_party | context | 21 | rule_conflict, activist_cross_link, entity_mismatch, neutral_low_impact | Icahn Enterprises — PX14A6G |
+| 2026-10-11 | MCD | third_party | context | 21 | rule_conflict, activist_cross_link, entity_mismatch, neutral_low_impact | Icahn Enterprises — DEFA14A |
