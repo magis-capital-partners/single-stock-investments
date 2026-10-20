@@ -1,5 +1,17 @@
 # Reverse-split research data
 
+### Dollar profit and smaller targets on 20 October 2026
+
+The [business sizing sensitivity](business_sizing_2026-10-20.md) reports annual
+dollar trading profit, observed dollar drawdown and operating-overhead break-even
+for $250 through $100k opening targets. All 57 declared size/filter/cost variants
+are retained in [aggregate results](business_sizing_2026-10-20.json), registered as
+H20 before the run. The base adaptive mix generates about $4,095 per year before
+operating overhead under the modeled fill/fee assumptions. Smaller fixed targets
+admit more trades but do not demonstrate steadier profits. This remains
+retrospective research with unverified borrows and fills; the patient execution
+proposal and new event families are not included.
+
 ### Intraday execution research on 20 October 2026
 
 The [entry-capacity explanation and intraday algorithm proposal](intraday_execution_research_2026-10-20.md)
