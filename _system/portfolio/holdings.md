@@ -330,6 +330,7 @@ Synced from `_system/portfolio/registry.json`. Last sync: 2026-10-20.
 | FRMI | FRMI/ | Fermi Inc. | US | 2026-07-09 | 2026-10-20 | unknown | watch |
 | FRMO | FRMO/ | FRMO Corporation | US | 2026-07-09 | 2026-10-20 | holding_co | hold |
 | FRT | FRT/ | Federal Realty Investment Trust | US | 2026-07-29 | 2026-10-20 | unknown | watch |
+| FRU.TO | FRU.TO/ | Freehold Royalties Ltd. | CA | — | 2026-10-20 | unknown | watch |
 | FSLR | FSLR/ | First Solar | US | 2026-07-29 | 2026-10-20 | unknown | watch |
 | FTC.L | FTC.L/ | Filtronic plc | UK | — | 2026-10-20 | unknown | watch |
 | FTNT | FTNT/ | Fortinet | US | 2026-07-29 | 2026-10-20 | unknown | watch |
@@ -470,8 +471,10 @@ Synced from `_system/portfolio/registry.json`. Last sync: 2026-10-20.
 | LDOS | LDOS/ | Leidos | US | 2026-07-10 | 2026-10-20 | unknown | watch |
 | LEN | LEN/ | Lennar | US | 2026-07-10 | 2026-10-20 | unknown | watch |
 | LEU | LEU/ | LEU | US | 2026-07-28 | 2026-10-20 | unknown | watch |
+| LGND | LGND/ | Ligand Pharmaceuticals Incorporated | US | — | 2026-10-20 | unknown | watch |
 | LH | LH/ | Labcorp | US | 2026-07-10 | 2026-10-20 | unknown | watch |
 | LHX | LHX/ | L3Harris | US | 2026-07-10 | 2026-10-20 | unknown | watch |
+| LIF.TO | LIF.TO/ | Labrador Iron Ore Royalty Corporation | CA | — | 2026-10-20 | unknown | watch |
 | LII | LII/ | Lennox International | US | 2026-07-10 | 2026-10-20 | unknown | watch |
 | LIN | LIN/ | Linde plc | US | 2026-07-10 | 2026-10-20 | unknown | watch |
 | LITE | LITE/ | Lumentum | US | 2026-07-28 | 2026-10-20 | unknown | watch |
@@ -756,6 +759,7 @@ Synced from `_system/portfolio/registry.json`. Last sync: 2026-10-20.
 | TPHS | TPHS/ | Trinity Place Holdings Inc. | US | 2026-07-17 | 2026-10-20 | optionality | watch |
 | TPL | TPL/ | Texas Pacific Land Corporation | US | 2026-07-09 | 2026-10-20 | unknown | watch |
 | TPR | TPR/ | Tapestry, Inc. | US | 2026-07-10 | 2026-10-20 | unknown | watch |
+| TPZ.TO | TPZ.TO/ | Topaz Energy Corp. | CA | — | 2026-10-20 | unknown | watch |
 | TRC | TRC/ | Tejon Ranch Co. | US | 2026-07-09 | 2026-10-20 | unknown | watch |
 | TRGP | TRGP/ | Targa Resources | US | 2026-07-10 | 2026-10-20 | unknown | watch |
 | TRMB | TRMB/ | Trimble Inc. | US | 2026-07-10 | 2026-10-20 | unknown | watch |
@@ -808,6 +812,7 @@ Synced from `_system/portfolio/registry.json`. Last sync: 2026-10-20.
 | VLO | VLO/ | Valero Energy | US | 2026-07-10 | 2026-10-20 | unknown | watch |
 | VLTO | VLTO/ | Veralto | US | 2026-07-10 | 2026-10-20 | unknown | watch |
 | VMC | VMC/ | Vulcan Materials Company | US | 2026-09-07 | 2026-10-20 | unknown | watch |
+| VNOM | VNOM/ | Viper Energy, Inc. | US | — | 2026-10-20 | unknown | watch |
 | VOXR | VOXR/ | Vox Royalty Corp | US | 2026-07-09 | 2026-10-20 | unknown | watch |
 | VRSK | VRSK/ | Verisk Analytics | US | 2026-07-10 | 2026-10-20 | unknown | watch |
 | VRSN | VRSN/ | Verisign | US | 2026-07-10 | 2026-10-20 | unknown | watch |
@@ -861,4 +866,4 @@ Synced from `_system/portfolio/registry.json`. Last sync: 2026-10-20.
 | ZETA | ZETA/ | ZETA | US | 2026-07-28 | 2026-10-20 | unknown | watch |
 | ZTS | ZTS/ | Zoetis | US | 2026-07-10 | 2026-10-20 | unknown | watch |
 
-**854 holdings total.** Registry: `_system/portfolio/registry.json`
+**859 holdings total.** Registry: `_system/portfolio/registry.json`
