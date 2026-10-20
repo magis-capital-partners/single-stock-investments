@@ -97,10 +97,36 @@ def test_cross_host_pagination_is_not_followed(tmp_path):
     assert len(s.calls)==1
 
 
+def access_receipt():
+    return {'provider':'Databento','authenticated':True,'as_of':'2026-10-19',
+            'sip_status':'dataset_not_found','all_feeds_bundle_status':'dataset_not_found',
+            'mini_start':'2023-03-28','mini_is_official_nbbo':False,'downloads':0,'charged_usd':0,
+            'credential':'PRIVATE_KEY','sample_quotes':[{'dataset':'EQUS.MINI','schema':'bbo-1s',
+            'date':'2023-03-30','quoted_usd':.00000149,'credential':'PRIVATE_KEY'}]}
+
+
+def test_databento_access_metadata_does_not_publish_credentials_or_claim_nbbo():
+    r=audit.databento_access(access_receipt(),0)
+    assert r['authenticated'] is True and r['mini_is_official_nbbo'] is False
+    assert r['new_download_budget_usd']==r['downloads']==r['charged_usd']==0
+    assert r['nbbo_verified_pairs']==0
+    assert 'PRIVATE_KEY' not in json.dumps(r)
+    assert r['sample_usage_quotes'][0]['quoted_usd']>0
+
+
+@pytest.mark.parametrize('field,value', [('authenticated',False),('sip_status','available'),
+                                        ('downloads',1),('charged_usd',.01)])
+def test_changed_databento_receipt_cannot_reuse_zero_download_interpretation(field,value):
+    receipt=access_receipt();receipt[field]=value
+    with pytest.raises(ValueError):audit.databento_access(receipt,0)
+
+
 def test_public_feed_is_aggregate_and_missing_costs_are_explicit():
     path=ROOT/'dashboard/data/short_execution_audit.json';raw=path.read_text();d=json.loads(raw)
     assert d['coverage']['target_events']==671 and d['coverage']['paths_hash_verified']==671
     assert d['coverage']['actual_broker_fills']==0
+    assert d['access']['provider']=='Databento' and d['access']['authenticated'] is True
+    assert d['access']['new_download_budget_usd']==d['access']['downloads']==d['access']['charged_usd']==0
     for name in ('"ticker":','"event_id":','"bid_levels":','"ask_levels":','PRIVATE_KEY'):
         assert name not in raw
     for group in d['size_audits']:

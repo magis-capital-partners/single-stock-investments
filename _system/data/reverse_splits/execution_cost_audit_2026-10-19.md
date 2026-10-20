@@ -95,9 +95,11 @@ Timing measures background price differences between auction benchmarks and samp
 
 ## Remaining work
 
-NBBO access: unavailable_no_configured_key. Verified NBBO events: 0. Actual broker fills: 0.
+NBBO access: authenticated_sip_not_retrievable. Verified NBBO events: 0. Actual broker fills: 0.
 Prepared 4000 windows, including 595 for the deterministic 100-event pilot.
 Multi-session exit costs remain unmeasured; no same-day spread estimate is relabeled as a measured multi-session cost.
+
+Databento access verified. EQUS.SIP and EQUS.ALL returned dataset_not_found through the authenticated historical API. Available EQUS.MINI is a derived venue-subset BBO from 2023-03-28, not official NBBO. New downloads are capped at $0 by request. The sampled quote/depth requests have positive usage prices, so none were downloaded. Existing cached-data estimates are unchanged.
 
 - Multi-venue quotes cover observed feeds, not official consolidated NBBO.
 - Cached decision quotes are matched exactly in clock; depth books add a modeled 100ms response and may mix sampled top quotes with deeper books.
@@ -105,4 +107,4 @@ Multi-session exit costs remain unmeasured; no same-day spread estimate is relab
 - Different size rows have different surviving samples. Common-support rows hold the same events fixed but select a liquid subset with hindsight.
 - Static books do not establish smart-router access, successful fills, replenishment, cancellations, price impact or borrow approval.
 - Auction-to-continuous timing is separate from spread/depth. Multi-session exits and stops need additional dated quote paths.
-- No real trades were submitted. New licensed NBBO data require configured existing access; no purchase or subscription upgrade is performed.
+- No real trades were submitted. New chargeable quote downloads require a budget; no purchase or subscription upgrade is performed.

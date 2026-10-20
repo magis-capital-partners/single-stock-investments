@@ -1116,7 +1116,7 @@ same events fixed and explicitly identifies that hindsight selection.
 Rebuild using the existing licensed local cache:
 
 ```text
-python _system/scripts/short_execution_audit.py --source-root /path/to/local/repo --local-out /path/to/local/execution_cost_audit/20261019_v1 --out dashboard/data/short_execution_audit.json --report _system/data/reverse_splits/execution_cost_audit_2026-10-19.md --collect-nbbo
+python _system/scripts/short_execution_audit.py --source-root /path/to/local/repo --local-out /path/to/local/execution_cost_audit/20261019_v1 --out dashboard/data/short_execution_audit.json --report _system/data/reverse_splits/execution_cost_audit_2026-10-19.md --databento-access-receipt /path/to/local/databento_access_summary.local.json
 ```
 
 The local acquisition plan defines 4,000 entry/exit windows for the five
@@ -1126,8 +1126,21 @@ historical exit symbols require confirmation before collection. The optional
 Massive collector uses an existing licensed environment key, bounded requests,
 safe pagination, local-only raw records and SIP timestamps for as-of quote
 selection. Provider denials stop collection. No purchases, subscription upgrades,
-broker connections, ThetaData calls or trades occur. As published, no key was
-configured: verified NBBO pairs and actual broker fills are both zero.
+broker connections, ThetaData calls or trades occur.
+
+Databento access was verified on 2026-10-19 using the existing protected local
+credential. The earlier environment-only credential check missed it. Through
+the authenticated historical API, EQUS.SIP and EQUS.ALL returned
+`dataset_not_found`; this is an observed access result, not a claim that the
+provider cannot supply those products. EQUS.MINI is available from 2023-03-28
+and provides a derived BBO from a venue subset, not official consolidated NBBO.
+Individual historical venue feeds are also available. The local same-day
+100-event pilot expands to 2,444 concrete quote/depth requests. Free metadata
+checks priced sampled requests above zero; no chargeable downloads were made.
+The user explicitly confirmed a **$0 cap on new downloads**. No new data have
+replaced the existing cached estimates. Verified NBBO pairs and actual broker
+fills remain zero. Raw receipts, request plans and credentials stay local;
+the public feed includes only allowlisted access/pricing metadata.
 
 The dashboard shows these findings inside execution evidence. Its 90 sleeve
 scenarios retain the legacy costs as sensitivities: neither the conditional
