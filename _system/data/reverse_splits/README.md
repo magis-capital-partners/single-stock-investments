@@ -1146,3 +1146,47 @@ The dashboard shows these findings inside execution evidence. Its 90 sleeve
 scenarios retain the legacy costs as sensitivities: neither the conditional
 supported-order means nor the available-venue touch spread is substituted for
 the missing full-population, size-dependent, multi-session execution costs.
+
+### Adaptive sizing experiment (2026-10-20)
+
+`_system/scripts/short_adaptive_sizing.py` tests fixed $25k/$50k/$100k,
+cost-filtered sizing and conditional gross-edge-plus-cost sizing on $10m NAV.
+The 56 eligible events before 2023 initialize an expanding fit; all 226 eligible
+events from 2023-01-03 to 2026-10-13 remain in the test population. Only earlier
+sessions supply training labels. Entry quotes, prior venue dollar volume,
+price and split multiple are entry-time features. The protocol is fixed before
+the first run and published inside `dashboard/data/short_adaptive_sizing.json`.
+This is retrospective walk-forward research designed after previous inspection
+of the sample, not an untouched or prospective validation cohort.
+
+Admissions never inspect the future cover book or realized test return.
+Candidate orders must fit the decision book within 3% below the midpoint.
+The response book 100ms later can give partial or zero IOC fills. Missing cover
+depth is retained using declared residual-price sensitivities, with its share
+fraction and trade count disclosed. Additional impact is 0/25/50 bps per side
+for bull/base/bear; unsupported cover shares are priced 2/5/10% above the worst
+available ask. These are assumptions, not calibrated fill or impact estimates.
+All policies share three-name, issuer and entry squeeze-reserve constraints.
+Same-session modeled closes have zero settled borrow and proceeds-interest
+accrual; delayed real completions would change financing.
+
+The first base run takes five adaptive trades, all $25k targets, and earns
+$13,348 versus $30,693 on 32 fixed-$25k trades. It does not establish a return
+uplift from fitting gross edge. The adaptive sample has zero observed drawdown
+and undefined Calmar; five winners cannot establish a squeeze-tail estimate.
+One adaptive cover includes modeled residual shares. Results, financing/risk
+limits and all three cases are in `adaptive_sizing_2026-10-20.md`.
+
+The shared month-block bootstrap now keeps every boundary-month session. The
+prior routine dropped the first and last month, which could remove a real tail
+loss and reverse the apparent result in a sparse sleeve. A regression test
+ensures those losses remain eligible for resampling. Resampling still cannot
+invent losses absent from five profitable trades or refit the policy.
+
+```text
+python _system/scripts/short_adaptive_sizing.py --source-root /path/to/licensed/cache/repo --local-out /path/to/local/adaptive_sizing/20261020_v1 --out dashboard/data/short_adaptive_sizing.json --report _system/data/reverse_splits/adaptive_sizing_2026-10-20.md
+```
+
+No additional downloads occur. Individual decisions, training counts, forecasts
+and fills stay local. Only aggregate performance and the protocol publish.
+This first test is same-day; multi-session cover costs remain unmeasured.
