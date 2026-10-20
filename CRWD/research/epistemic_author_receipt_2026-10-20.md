@@ -7,7 +7,7 @@
 
 ## What was delivered
 
-Prospective falsifier v3 **`crwd-operating-owner-earnings-2027q3`** (spec revision **11**) types the owner-earnings leg of the valuation-contract prose falsifier: trailing-twelve-month normalized owner earnings at **2026-10-31** resolve **below 1,310.241 USD millions** (low-case `owner_earnings` anchor on the admitted `owner_earnings_reinvestment_dcf` proof trace; contract_hash `49c4379339951fac9c7ba403d3fdd54edadf9586234e9dcf3986ecf0e98b27fe`).
+Prospective falsifier v3 **`crwd-operating-owner-earnings-2027q3`** (spec revision **12**) types the owner-earnings leg of the valuation-contract prose falsifier: trailing-twelve-month normalized owner earnings at **2026-10-31** resolve **below 1,310.241 USD millions** (low-case `owner_earnings` anchor on the admitted `owner_earnings_reinvestment_dcf` proof trace; contract_hash `49c4379339951fac9c7ba403d3fdd54edadf9586234e9dcf3986ecf0e98b27fe`).
 
 ## Facts (primary)
 
