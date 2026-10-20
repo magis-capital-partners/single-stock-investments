@@ -3,7 +3,7 @@
 **Work id:** `290e1242482eb2878775b1a4`  
 **Task:** `author_forecast` · **Component:** `operating_business_and_net_assets`  
 **Draft:** `ASML/research/falsifier_drafts/290e1242482eb2878775b1a4.json` · **Status:** `awaiting_review`  
-**Provenance:** evidence packet hash and input SHA are recorded in `ASML/research/agent_run_state.json` (paired manifest in the same folder).
+**Provenance:** see paired dispatch artifacts under `ASML/research/` (run state + manifest).
 
 ## What was delivered
 
