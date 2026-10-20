@@ -5,12 +5,12 @@ on:
     paths: ['_system/scripts/**', '_system/reference/security_identity_overrides.json', '_system/data/event_triage_rules.json', 'dashboard/insights-viz.js', 'dashboard/index.html', 'dashboard/insights-events.css', '.github/workflows/event-relevance-tests.yml']
   pull_request:
     paths: ['_system/scripts/**', '_system/reference/security_identity_overrides.json', '_system/data/event_triage_rules.json', 'dashboard/insights-viz.js', 'dashboard/index.html', 'dashboard/insights-events.css', '.github/workflows/event-relevance-tests.yml']
-  workflow_dispatch:
 permissions:
   contents: read
 jobs:
   regressions:
     runs-on: ubuntu-latest
+    timeout-minutes: 10
     steps:
       - uses: actions/checkout@v4
         with:
