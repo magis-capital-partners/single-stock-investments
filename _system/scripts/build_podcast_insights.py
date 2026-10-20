@@ -154,6 +154,7 @@ def build_episode_record(
         "themes": analysis_themes(analysis, theme_hits(text or (meta.get("description") or ""))),
         "highlights": meta.get("highlights") or [],
         "summary": meta.get("summary") or None,
+        "description": (meta.get("description") or "").strip()[:8000] or None,
         "reader_summary": meta.get("reader_summary") if isinstance(meta.get("reader_summary"), dict) else None,
         "in_book": any(bool(c.get("in_book")) for c in (resolved.get("companies") or []))
         or any(bool(o.get("in_book")) for o in (resolved.get("officers") or [])),
@@ -326,7 +327,7 @@ def reader_summary_detail(reader: dict | None) -> dict | None:
         "source_label": reader.get("source_label"),
         "headline": (reader.get("headline") or "")[:240] or None,
         "overview": (reader.get("overview") or "")[:1200],
-        "key_points": points[:5],
+        "key_points": points[:8],
         "why_it_matters": (reader.get("why_it_matters") or "")[:500] or None,
         "coverage": {
             "source_chars": coverage.get("source_chars"),
@@ -437,7 +438,21 @@ def write_podcast_index_mirror(payload: dict) -> Path:
     return INDEX_MIRROR_PATH
 
 
-def episode_detail_payload(ep: dict) -> dict:
+# The vault is private, so the public detail page can only show a transcript
+# that was copied into the shard. Longer episodes keep the opening.
+TRANSCRIPT_CAP = 400_000
+
+
+def episode_notes(ep: dict) -> str | None:
+    """Publisher notes for episodes that do not yet have a real transcript."""
+    text = " ".join(str(ep.get("description") or "").split()).strip()
+    if len(text) < 80:
+        return None
+    return text[:6000]
+
+
+def episode_detail_payload(ep: dict, transcript: str | None = None,
+                           transcript_truncated: bool = False) -> dict:
     """Lazy-load payload for Podcasts tab episode click (~2 KB avg)."""
     try:
         from summarize_podcast_episode import filter_highlights  # noqa: WPS433
@@ -516,7 +531,12 @@ def episode_detail_payload(ep: dict) -> dict:
         "source_document": ep.get("source_document"),
         "link": ep.get("link"),
         "highlight_count": len(highlights),
+        "notes": episode_notes(ep),
+        "transcript_source": ep.get("transcript_source"),
     }
+    if transcript:
+        detail["transcript"] = transcript
+        detail["transcript_truncated"] = bool(transcript_truncated)
     analysis = ep.get("analysis") if isinstance(ep.get("analysis"), dict) else None
     if analysis or claims:
         detail["thesis"] = (ep.get("thesis") or "").strip() or None
@@ -526,7 +546,9 @@ def episode_detail_payload(ep: dict) -> dict:
     return detail
 
 
-def emit_episode_detail_shards(payload: dict | None = None) -> int:
+def emit_episode_detail_shards(payload: dict | None = None,
+                               transcripts: dict | None = None,
+                               truncated: dict | None = None) -> int:
     """Write dashboard/data/insights/podcast_episodes/{episode_id}.json for click-through."""
     out_dir = ROOT / "dashboard" / "data" / "insights" / "podcast_episodes"
     out_dir.mkdir(parents=True, exist_ok=True)
@@ -543,7 +565,11 @@ def emit_episode_detail_shards(payload: dict | None = None) -> int:
         # Safe filename
         safe = re.sub(r"[^A-Za-z0-9._-]+", "_", str(eid))[:180]
         keep.add(f"{safe}.json")
-        detail = episode_detail_payload(ep)
+        detail = episode_detail_payload(
+            ep,
+            transcript=(transcripts or {}).get(str(eid)),
+            transcript_truncated=bool((truncated or {}).get(str(eid))),
+        )
         path = out_dir / f"{safe}.json"
         path.write_text(json.dumps(detail, separators=(",", ":"), ensure_ascii=False) + "\n", encoding="utf-8")
         written += 1
@@ -575,6 +601,8 @@ def build() -> dict:
         filter_highlights = lambda hs: list(hs or [])  # type: ignore
 
     episodes: list[dict] = []
+    transcripts: dict[str, str] = {}
+    truncated: dict[str, bool] = {}
     for txt_path, meta_path in iter_episode_files(root) or []:
         meta = load_json(meta_path) or {}
         if not meta.get("episode_id"):
@@ -587,6 +615,11 @@ def build() -> dict:
             rec["summary"] = meta["summary"]
         if isinstance(meta.get("reader_summary"), dict):
             rec["reader_summary"] = meta["reader_summary"]
+        eid = str(rec.get("episode_id") or "")
+        if eid and txt_path.is_file():
+            raw = txt_path.read_text(encoding="utf-8", errors="replace")
+            transcripts[eid] = raw[:TRANSCRIPT_CAP]
+            truncated[eid] = len(raw) > TRANSCRIPT_CAP
         episodes.append(rec)
 
     episodes.sort(key=lambda e: e.get("published") or "", reverse=True)
@@ -608,7 +641,7 @@ def build() -> dict:
     }
     (root / "insights.json").write_text(json.dumps(payload, indent=2) + "\n", encoding="utf-8")
     write_podcast_index_mirror(payload)
-    detail_n = emit_episode_detail_shards(payload)
+    detail_n = emit_episode_detail_shards(payload, transcripts, truncated)
     payload["episode_detail_shards"] = detail_n
     return payload
 
