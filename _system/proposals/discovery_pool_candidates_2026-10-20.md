@@ -1,6 +1,6 @@
 # Discovery pool candidates — 2026-10-20
 
-**Status:** proposal only. Nothing below is in `show_registry.json` or `channel_registry.json`.
+**Status:** implemented 2026-10-20. The three podcasts, nine YouTube rows, the guest names, and the three officers are in the registries. Second-wave shows (Joys of Compounding, the Good Investing podcast, ACQ2) are still waiting. The leave-off list was not added.
 **Checked:** iTunes catalogue counts, live RSS, and YouTube Atom feeds on 2026-10-20.
 **Book this is aimed at:** the hold-stance names (Japan Exchange, Amazon, Brookfield, Danaher, FRMO, Alphabet, Gyrodyne, ICE, QuidelOrtho, S&P Global, Teqnion) and the existing public-market pool (value, compounders, capital allocation, special situations, croupiers). a16z stays off.
 
