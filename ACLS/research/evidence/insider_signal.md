@@ -1,4 +1,4 @@
-# ACLS — Insider conviction (2026-10-15)
+# ACLS — Insider conviction (2026-06-04)
 
 > Context only. Insider activity informs scenario confidence and stance discussion; it does not auto-inflate Lawrence base IRR. Promotion requires [HUMAN REVIEW].
 
@@ -15,9 +15,9 @@
 
 **Routine / planned sales (context):**
 
-- Tatnall Christopher: 136 @ $105.04 on 2026-09-15
-- Redinbo Greg: 208 @ $105.04 on 2026-09-15
-- Ryzhik David: 127 @ $145.01 on 2026-07-15
+- Sayiner Necip: 1586 @ $157.4422 on 2026-06-03
+- Mahoney Robert John: 1155 @ $155.24 on 2026-06-02
+- Sutton Todd: 2000 @ $159.99 on 2026-05-27
 
 Source: `_system/reference/market-data/insider/ACLS_transactions.csv`.
 Lawrence base IRR unchanged (`in_base_irr: False`).

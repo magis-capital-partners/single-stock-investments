@@ -1,27 +1,23 @@
-# ABBV — Insider conviction (2026-10-19)
+# ABBV — Insider conviction (2026-08-18)
 
 > Context only. Insider activity informs scenario confidence and stance discussion; it does not auto-inflate Lawrence base IRR. Promotion requires [HUMAN REVIEW].
 
-**ICS:** 4.68 (moderate) · **Bull case support:** moderate
+**ICS:** 0.0 (negligible) · **Bull case support:** none
 
 | Scenario | Prior weight | Tilted weight |
 |----------|--------------|---------------|
-| Bear | 20% | 20% |
-| Base | 55% | 53% |
-| Bull | 25% | 27% |
+| Bear | 20% | 28% |
+| Base | 55% | 47% |
+| Bull | 25% | 25% |
 
 | Insider | Date | Shares | Price | Value | Contrib |
 |---------|------|--------|-------|-------|---------|
-| Donoghoe Nicholas | 2026-08-14 | 32710 | $79.02 | $2584744.2 | 1.629 |
-| Siatis Perry C | 2026-02-25 | 7314 | $149.62 | $1094320.68 | 1.164 |
-| Siatis Perry C | 2026-02-25 | 7775 | $175.28 | $1362802.0 | 1.15 |
-| Siatis Perry C | 2026-02-25 | 7292 | $192.86 | $1406335.12 | 1.122 |
 
 **Routine / planned sales (context):**
 
-- Michael Robert A.: 36523 @ $232.08 on 2026-02-27
 - Donoghoe Nicholas: 32710 @ $250.0 on 2026-08-14
-- Reents Scott T: 21638 @ $232.08 on 2026-02-27
+- Purdue David Ryan: 5230 @ $233.56 on 2026-03-04
+- Siatis Perry C: 5777 @ $233.51 on 2026-03-02 (10b5-1)
 
 Source: `_system/reference/market-data/insider/ABBV_transactions.csv`.
 Lawrence base IRR unchanged (`in_base_irr: False`).

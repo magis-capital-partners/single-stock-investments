@@ -1,28 +1,23 @@
-# AMGN — Insider conviction (2026-10-19)
+# AMGN — Insider conviction (2026-08-13)
 
 > Context only. Insider activity informs scenario confidence and stance discussion; it does not auto-inflate Lawrence base IRR. Promotion requires [HUMAN REVIEW].
 
-**ICS:** 10.0 (exceptional) · **Bull case support:** moderate
+**ICS:** 0.0 (negligible) · **Bull case support:** none
 
 | Scenario | Prior weight | Tilted weight |
 |----------|--------------|---------------|
-| Bear | 20% | 20% |
-| Base | 55% | 40% |
-| Bull | 25% | 40% |
+| Bear | 20% | 28% |
+| Base | 55% | 47% |
+| Bull | 25% | 25% |
 
 | Insider | Date | Shares | Price | Value | Contrib |
 |---------|------|--------|-------|-------|---------|
-| Bradway Robert A | 2026-03-04 | 119782 | $156.35 | $18727915.7 | 1.731 |
-| Grygiel Nancy A. | 2026-08-06 | 1970 | $177.46 | $349596.2 | 1.629 |
-| Khosla Rachna | 2026-08-13 | 1252 | $162.6 | $203575.2 | 1.594 |
-| Miller Derek | 2026-08-06 | 2069 | $162.6 | $336419.4 | 1.547 |
-| Miller Derek | 2026-08-06 | 1821 | $177.46 | $323154.66 | 1.525 |
 
 **Routine / planned sales (context):**
 
-- Bradway Robert A: 2079 @ $331.11 on 2026-05-07
-- Bradway Robert A: 1702 @ $329.59 on 2026-05-06
-- Bradway Robert A: 2631 @ $329.82 on 2026-05-02
+- Khosla Rachna: 1252 @ $416.4256 on 2026-08-13
+- Khosla Rachna: 2000 @ $412.567 on 2026-08-11
+- Miller Derek: 2069 @ $402.5444 on 2026-08-06
 
 Source: `_system/reference/market-data/insider/AMGN_transactions.csv`.
 Lawrence base IRR unchanged (`in_base_irr: False`).

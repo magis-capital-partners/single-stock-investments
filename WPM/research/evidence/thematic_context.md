@@ -1,20 +1,20 @@
-# WPM - Thematic context (2026-10-19)
+# WPM - Thematic context (2026-10-20)
 
 > Context only. Tailwinds inform stance and overlay sizing; they do not auto-inflate Lawrence base IRR. Promotion to base case requires [HUMAN REVIEW].
 
 | Indicator | Latest | As of | YoY | Direction | In base IRR? |
 |-----------|--------|-------|-----|-----------|--------------|
-| High-yield OAS credit spread (%) | -0.35 | 2026-10-19 | +70.3% | up | no (context) |
-| US Treasury 10Y yield (%) | 5.13100004196167 | 2026-10-19 | +28.7% | up | no (context) |
-| US Treasury 2Y yield (%) | 4.925999641418457 | 2026-10-19 | +37.7% | up | no (context) |
-| Trade-weighted USD index (broad) | 101.97699737548828 | 2026-10-19 | +3.4% | up | no (context) |
-| VIX index level | 18.280000686645508 | 2026-10-19 | +0.3% | flat | no (context) |
-| HYG vs TLT 1-month return spread (%) | 0.09 | 2026-10-19 | +102.7% | up | no (context) |
-| SPY 20-day realized vol (annualized %) | 8.84 | 2026-10-19 | -33.2% | down | no (context) |
+| High-yield OAS credit spread (%) | -0.49 | 2026-10-20 | +58.5% | up | no (context) |
+| US Treasury 10Y yield (%) | 5.116999626159668 | 2026-10-20 | +28.4% | up | no (context) |
+| US Treasury 2Y yield (%) | 4.934999942779541 | 2026-10-20 | +37.9% | up | no (context) |
+| Trade-weighted USD index (broad) | 101.70899963378906 | 2026-10-20 | +3.2% | up | no (context) |
+| VIX index level | 17.479999542236328 | 2026-10-20 | -4.1% | down | no (context) |
+| HYG vs TLT 1-month return spread (%) | -0.21 | 2026-10-20 | +93.7% | up | no (context) |
+| SPY 20-day realized vol (annualized %) | 8.86 | 2026-10-20 | -33.0% | down | no (context) |
 | AGI expert-horizon years ahead (public quotes) | 5.0 | 2026-06-01 | +0.0% | flat | no (context) |
 | Robotaxi expert-horizon years ahead (public quotes) | 2.0 | 2026-06-01 | +0.0% | flat | no (context) |
-| Gold spot (USD/oz) | 379.82000732421875 | 2026-10-19 | -5.8% | down | no (context) |
-| GDX miners ETF (USD) | 86.86499786376953 | 2026-10-19 | +8.1% | up | no (context) |
-| GDX / GLD ratio (miners vs bullion) | 0.2287 | 2026-10-19 | +14.8% | up | no (context) |
+| Gold spot (USD/oz) | 377.9494934082031 | 2026-10-20 | -6.3% | down | no (context) |
+| GDX miners ETF (USD) | 86.72000122070312 | 2026-10-20 | +7.9% | up | no (context) |
+| GDX / GLD ratio (miners vs bullion) | 0.2294 | 2026-10-20 | +15.1% | up | no (context) |
 
 Source panels: `_system/reference/market-data/themes/manifest.json`.

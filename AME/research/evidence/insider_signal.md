@@ -1,28 +1,24 @@
-# AME — Insider conviction (2026-10-19)
+# AME — Insider conviction (2026-08-12)
 
 > Context only. Insider activity informs scenario confidence and stance discussion; it does not auto-inflate Lawrence base IRR. Promotion requires [HUMAN REVIEW].
 
-**ICS:** 10.0 (exceptional) · **Bull case support:** moderate
+**ICS:** 2.71 (weak) · **Bull case support:** none
 
 | Scenario | Prior weight | Tilted weight |
 |----------|--------------|---------------|
-| Bear | 20% | 20% |
-| Base | 55% | 40% |
-| Bull | 25% | 40% |
+| Bear | 20% | 23% |
+| Base | 55% | 52% |
+| Bull | 25% | 25% |
 
 | Insider | Date | Shares | Price | Value | Contrib |
 |---------|------|--------|-------|-------|---------|
-| Stanage Nick L | 2026-08-11 | 4000 | $255.85 | $1023400.0 | 3.165 |
-| Puri Dalip | 2026-03-18 | 3780 | $212.77 | $804270.6 | 1.686 |
-| AMATO THOMAS A | 2026-03-18 | 950 | $212.77 | $202131.5 | 1.671 |
-| Stefany Suzanne | 2026-03-18 | 950 | $212.77 | $202131.5 | 1.67 |
-| ZAPICO DAVID A | 2025-11-25 | 88000 | $63.37 | $5576560.0 | 1.649 |
+| Stanage Nick L | 2026-08-11 | 4000 | $255.85 | $1023400.0 | 3.139 |
 
 **Routine / planned sales (context):**
 
-- ZAPICO DAVID A: 2092 @ $209.37 on 2026-03-22
-- ZAPICO DAVID A: 1412 @ $211.5 on 2026-03-19
-- ZAPICO DAVID A: 1604 @ $212.77 on 2026-03-18
+- ZAPICO DAVID A: 28390 @ $201.76 on 2025-12-12
+- ZAPICO DAVID A: 7432 @ $194.89 on 2025-11-25
+- ZAPICO DAVID A: 25815 @ $195.82 on 2025-11-25
 
 Source: `_system/reference/market-data/insider/AME_transactions.csv`.
 Lawrence base IRR unchanged (`in_base_irr: False`).

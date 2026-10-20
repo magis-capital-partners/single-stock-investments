@@ -749,7 +749,7 @@
 | TFPM | indexed | L5/S0 | 2026-06-30 | 5 long, 0 short indexed; 0 short feed-eligible |
 | TGT | indexed | L1/S0 | 2026-05-15 | 1 long, 0 short indexed; 0 short feed-eligible |
 | THYP | no_hit | — | — | No activist index hits |
-| TIPT | no_hit | — | — | No activist index hits |
+| TIPT | indexed | L17/S0 | 2026-03-12 | 17 long, 0 short indexed; 0 short feed-eligible |
 | TJX | no_hit | — | — | No activist index hits |
 | TKO | indexed | L28/S0 | 2026-01-02 | 28 long, 0 short indexed; 0 short feed-eligible |
 | TLT | no_hit | — | — | No activist index hits |
