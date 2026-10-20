@@ -107,12 +107,12 @@ Documents in folder: **75** (all listed below; Tier 1–3 extracted or keyword-s
 | scan | 8-K | 2026-04-06 | `investor-documents/sec-edgar/8-K_20260406_rpt20260331_acc0000
 
 ## Canonical pointers (open only when needed)
-- deep_dive: CSCO/research/deep_dive_2026-10-17.md (sha256 sha256:d2cc247feaf71947...)
+- deep_dive: CSCO/research/deep_dive_2026-10-18.md (sha256 sha256:b111f14390d6c5a5...)
 - filing_digest: CSCO/research/evidence/filing_digest.md (sha256 sha256:111ae640f30736ea...)
-- adversarial: CSCO/research/adversarial_2026-10-17.md (sha256 sha256:b1ef73013a09b16c...)
-- valuation: CSCO/research/valuation.json (sha256 sha256:351ac04d0c82e62f...)
-- thesis_card: CSCO/research/thesis_card.json (sha256 sha256:72b21ea2e1e9aa6a...)
-- cross_check: CSCO/research/cross_check_third_party_2026-10-17.md (sha256 sha256:4ea5ccc4e07bd43d...)
+- adversarial: CSCO/research/adversarial_2026-10-18.md (sha256 sha256:707c4e284a9b17d1...)
+- valuation: CSCO/research/valuation.json (sha256 sha256:e9f854230ca874ba...)
+- thesis_card: CSCO/research/thesis_card.json (sha256 sha256:9f8a1e09745bdc87...)
+- cross_check: CSCO/research/cross_check_third_party_2026-10-18.md (sha256 sha256:8fc2e5dca19c953e...)
 
 ## Excluded from this pack
 - CSCO/research/valuation.json (full; returns block included, open only for assumption audit)

@@ -11,8 +11,8 @@
 |-------|-------|
 | Evidence gate hash | see `CSCO/research/agent_run_state.json` (`evidence_hash`) |
 | Work item input digest | see manifest (`epistemic_input_sha`) |
-| component_fingerprint | `590c7e00aeae584c85e240358f7ff1060c1c9a5202d41acb0267751703ddbf44` |
-| contract_hash | `c340c3bc7280e77e4c9b7238f8fc327945005c3f3509ac5800d421942e57316a` |
+| component_fingerprint | see draft (`component_fingerprint`) |
+| contract_hash | see draft (`contract_hash`) |
 
 ## Epistemic loop
 
