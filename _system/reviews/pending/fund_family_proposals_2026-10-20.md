@@ -1,4 +1,4 @@
-# Fund family proposals (2026-10-09)
+# Fund family proposals (2026-10-20)
 
 Auto-detected multi-strategy shops from shared prefix + identical letter snippets.
 Promote confirmed rows into `_system/data/fund_families.json`.
