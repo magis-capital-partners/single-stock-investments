@@ -13,6 +13,7 @@ failure is a specific git refusal, and a mocked git would only restate it.
 from __future__ import annotations
 
 import contextlib
+import json
 import os
 import subprocess
 import sys
@@ -368,6 +369,84 @@ class ExitCodeTests(unittest.TestCase):
         ps1 = (SCRIPTS / "youtube_supervisor.ps1").read_text(encoding="utf-8")
         self.assertIn("$code = $LASTEXITCODE", ps1)
         self.assertIn("exit $code", ps1)
+
+
+class InsightManifestSyncTests(unittest.TestCase):
+    def test_sync_patches_podcasts_onto_main_and_counts_mains_events(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            src = root / "lane" / "dashboard" / "data" / "insights"
+            dst = root / "main" / "dashboard" / "data" / "insights"
+            src.mkdir(parents=True)
+            dst.mkdir(parents=True)
+            stale = {
+                "generated_at": "2026-10-15T09:13:13Z",
+                "event_count": 1539,
+                "letter_count": 100,
+                "source_health": {
+                    "videos": {"items": 1},
+                    "podcasts": {"items": 4670, "generated_at": "2026-10-20T11:07:59Z"},
+                },
+                "provenance": {"event_triage_summary": {"retained_event_count": 1539}},
+                "shards": {"podcasts": "data/insights/podcasts.json"},
+            }
+            current = {
+                "generated_at": "2026-10-20T09:30:36Z",
+                "event_count": 1539,
+                "letter_count": 12865,
+                "source_health": {
+                    "filing_facts": {"status": "ok"},
+                    "videos": {"items": 98, "generated_at": "kept"},
+                    "superinvestor_letters": {"items": 12865},
+                },
+                "provenance": {
+                    "other": "keep",
+                    "event_triage_summary": {"retained_event_count": 1539, "raw_event_count": 800},
+                },
+                "shards": {
+                    "events": "data/insights/events.json",
+                    "video_details": "data/insights/video_details/",
+                },
+            }
+            events = {"events": [
+                {"observed_at": "2026-01-01", "tier": "signal", "feed_eligible": True},
+                {"observed_at": "2026-01-03", "tier": "context", "feed_eligible": True},
+                {"observed_at": "2026-01-02", "tier": "noise", "feed_eligible": False},
+            ]}
+            (src / "manifest.json").write_text(json.dumps(stale), encoding="utf-8")
+            (dst / "manifest.json").write_text(json.dumps(current), encoding="utf-8")
+            (dst / "events.json").write_text(json.dumps(events), encoding="utf-8")
+            lane._sync_insight_manifest(
+                src / "manifest.json", dst / "manifest.json", videos=False, podcasts=True,
+            )
+            manifest = json.loads((dst / "manifest.json").read_text(encoding="utf-8"))
+            summary = manifest["provenance"]["event_triage_summary"]
+            self.assertEqual(summary["retained_event_count"], 3)
+            self.assertEqual(manifest["event_count"], 3)
+            self.assertEqual(manifest["letter_count"], 12865)
+            self.assertEqual(manifest["generated_at"], "2026-10-20T09:30:36Z")
+            self.assertEqual(manifest["source_health"]["podcasts"]["items"], 4670)
+            self.assertEqual(manifest["source_health"]["videos"]["generated_at"], "kept")
+            self.assertEqual(manifest["source_health"]["filing_facts"]["status"], "ok")
+            self.assertEqual(summary["raw_event_count"], 800)
+            self.assertEqual(manifest["provenance"]["other"], "keep")
+            self.assertEqual(manifest["shards"]["video_details"], "data/insights/video_details/")
+            self.assertEqual(manifest["shards"]["podcasts"], "data/insights/podcasts.json")
+
+    def test_sync_refuses_to_publish_onto_a_stub(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            src = root / "src"
+            dst = root / "dst"
+            src.mkdir()
+            dst.mkdir()
+            (src / "manifest.json").write_text("{}", encoding="utf-8")
+            (dst / "manifest.json").write_text(
+                json.dumps({"generated_at": "2026-10-19T16:50:44Z", "shards": {}}),
+                encoding="utf-8",
+            )
+            with self.assertRaises(RuntimeError):
+                lane._sync_insight_manifest(src / "manifest.json", dst / "manifest.json", videos=True, podcasts=False)
 
 
 if __name__ == "__main__":

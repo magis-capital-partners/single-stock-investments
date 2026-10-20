@@ -3266,19 +3266,24 @@ def load_activist_feed() -> dict | None:
 
 
 def load_insights_document() -> dict | None:
-    """Load the current sharded Insights contract, with legacy monolith fallback."""
+    """Load the current sharded Insights contract, with legacy monolith fallback.
+
+    A gitignored ``insights.json`` stub must not hide the committed shards.
+    Shard files contribute only their own keys, so ``videos.json`` cannot
+    replace the manifest stamp or drop source health.
+    """
     legacy = _load_json(DATA_DIR / "insights.json")
-    if legacy:
+    if isinstance(legacy, dict) and legacy.get("source_health") and (
+        "events" in legacy or legacy.get("provenance")
+    ):
         return legacy
     shard_dir = DATA_DIR / "insights"
     if not shard_dir.is_dir():
-        return None
-    merged: dict = {}
-    for path in sorted(shard_dir.glob("*.json")):
-        shard = _load_json(path)
-        if isinstance(shard, dict):
-            merged.update(shard)
-    return merged or None
+        return legacy if isinstance(legacy, dict) and legacy else None
+    from build_dashboard_shards import merge_insight_shards
+
+    merged = merge_insight_shards(shard_dir)
+    return merged or (legacy if isinstance(legacy, dict) and legacy else None)
 
 
 def activist_summary_for_ticker(ticker: str) -> dict:

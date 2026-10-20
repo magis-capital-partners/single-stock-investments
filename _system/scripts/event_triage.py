@@ -521,6 +521,8 @@ def triage_events(events: list[dict], *, activist_tickers: set[str] | None = Non
         "context": sum(1 for e in triaged if e.get("tier") == "context" and e.get("feed_eligible")),
         "noise": sum(1 for e in triaged if e.get("tier") == "noise" or not e.get("feed_eligible")),
         "human_review": sum(1 for e in triaged if e.get("triage_verdict") == "human_review"),
+        # The list this function returns, not a count remembered from an earlier pass.
+        "retained_event_count": len(triaged),
     }
     triaged.sort(
         key=lambda e: (
