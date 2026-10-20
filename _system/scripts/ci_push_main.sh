@@ -213,6 +213,18 @@ PY
 resolve_insight_conflicts() {
   # Keep the shard side that still has rows, then derive retained_event_count
   # from the events list left in the worktree. Never delete these files.
+  # Skip unless this worktree actually has an insight conflict. Other rebase
+  # conflicts (epistemic queues, forecast logs) are resolved above and below,
+  # including inside throwaway repos that do not contain this script.
+  local file found=0
+  while IFS= read -r file; do
+    [ -n "$file" ] || continue
+    if is_insight_shard "$file"; then
+      found=1
+      break
+    fi
+  done <<< "$(conflicted_files)"
+  [ "$found" -eq 1 ] || return 0
   if ! "$PYTHON" _system/scripts/reconcile_insights_event_summary.py --resolve-rebase-conflicts; then
     echo "::error::Insight shard conflict resolution failed."
     return 1
