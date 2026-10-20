@@ -92,6 +92,9 @@ PROFILES: dict[str, list[list[str]]] = {
         ["_system/scripts/fetch_respiratory_panel.py"],
         ["_system/scripts/build_qdel_respiratory_model.py"],
         ["_system/scripts/build_fico_watch.py"],
+        # Before KPI trends so the nightly monolith and the shards pick up
+        # issuer operating series. A blocked source keeps the last file.
+        ["_system/scripts/fetch_operating_kpis.py"],
         ["_system/scripts/build_kpi_trends.py"],
         ["_system/scripts/repair_letter_dates.py", "--apply"],
         ["_system/scripts/build_superinvestor_insights.py"],
@@ -176,6 +179,7 @@ EXTERNAL_STEP_POLICY: dict[str, tuple[int, int]] = {
     "_system/scripts/sync_pdf_store_google_drive.py": (2, 20 * 60),
     "_system/scripts/audit_drive_pdf_store.py": (3, 10 * 60),
     "_system/scripts/fetch_respiratory_panel.py": (3, 5 * 60),
+    "_system/scripts/fetch_operating_kpis.py": (2, 15 * 60),
     "_system/scripts/fetch_theme_panel.py": (3, 5 * 60),
     "_system/scripts/fetch_crypto_panel.py": (3, 5 * 60),
     "_system/scripts/refresh_cvr_universe.py": (2, 15 * 60),

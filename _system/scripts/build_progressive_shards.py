@@ -40,6 +40,11 @@ from atomic_io import (  # noqa: E402
     write_json_if_changed,
 )
 from build_thesis_card import build_card, write_card  # noqa: E402
+from operating_kpis.trends import (  # noqa: E402
+    merge_operating_series,
+    operating_latest_rows,
+    select_shard_series,
+)
 
 DATA_DIR = ROOT / "dashboard" / "data"
 AGENT_SHARDS_DIR = DATA_DIR / "agent_shards"
@@ -129,6 +134,13 @@ def _index_kpi_by_ticker(kpi_payload: dict[str, Any]) -> tuple[dict[str, list[di
                 "period": period,
                 "human_summary": m.get("human_summary"),
             }
+            # Extra keys only on issuer operating rows, so a later full rebuild
+            # does not rewrite every fundamental compact row.
+            if m.get("tier") == "operating":
+                compact["unit"] = m.get("unit")
+                compact["yoy_basis"] = m.get("yoy_basis")
+                compact["source"] = m.get("source") or "issuer_operating"
+                compact["tier"] = "operating"
             by_ticker[ticker].append(compact)
             if direction in ("accelerating", "decelerating", "inflecting", "break") and m.get("display", True):
                 inflections.append({"ticker": ticker, **compact})
@@ -274,6 +286,7 @@ def build_all(target_tickers: list[str] | None = None, *, build_all_shards: bool
     kpi_payload = _load_json(KPI_TRENDS_PATH)
     news_payload = _load_json(NEWS_PATH)
     kpi_by_ticker, kpi_inflections = _index_kpi_by_ticker(kpi_payload)
+    merge_operating_series(kpi_by_ticker)
     news_by_ticker = _index_news_by_ticker(news_payload)
     docs_by_ticker, doc_summary_stats = _index_docs_by_ticker()
     try:
@@ -429,10 +442,13 @@ def build_all(target_tickers: list[str] | None = None, *, build_all_shards: bool
                 "truncation": {
                     "key_assumptions": {"shown": min(len(card.get("key_assumptions") or []), 8), "total": len(card.get("key_assumptions") or [])},
                     "open_questions": {"shown": min(len(card.get("open_questions") or []), 6), "total": len(card.get("open_questions") or [])},
-                    "kpi_series": {"shown": min(len(kpi_by_ticker.get(ticker) or []), 12), "total": len(kpi_by_ticker.get(ticker) or [])},
+                    "kpi_series": {
+                        "shown": len(select_shard_series(kpi_by_ticker.get(ticker) or [])),
+                        "total": len(kpi_by_ticker.get(ticker) or []),
+                    },
                     "documents": {"shown": len(docs_by_ticker.get(ticker) or []), "note": "capped at 15 most recent in builder"},
                 },
-                "kpi_series": (kpi_by_ticker.get(ticker) or [])[:12],
+                "kpi_series": select_shard_series(kpi_by_ticker.get(ticker) or []),
                 "recent_news": news_by_ticker.get(ticker) or [],
                 "documents": docs_by_ticker.get(ticker) or [],
                 "l2_pointers": {
@@ -555,11 +571,13 @@ def build_all(target_tickers: list[str] | None = None, *, build_all_shards: bool
             "as_of": str(kpi_gen)[:10],
             "description": (
                 "L0 KPI inflection summary extracted from dashboard/data/kpi_trends.json. "
-                "Contains accelerating/decelerating series so desk bots avoid parsing the 7 MB monolith."
+                "Inflections are the accelerating and decelerating series. "
+                "operating_latest carries issuer operating levels even when the series is steady."
             ),
             "inflection_count": len(kpi_inflections),
             "covered_ticker_count": len(kpi_by_ticker),
             "inflections": kpi_inflections[:120],
+            "operating_latest": operating_latest_rows(),
             "full_feed_path": "dashboard/data/kpi_trends.json",
         },
         feed_id="dashboard-kpi-summary",

@@ -5,33 +5,8 @@
     "gold_royalties"
   ],
   "schema_version": "1.0",
-  "note": "MSB is an iron-ore royalty trust tagged on gold_royalties for theme machinery; KPIs are trust distributions + gold sleeve pulse for portfolio strip coverage only.",
+  "note": "MSB is an iron-ore royalty trust. The gold spot proxy was the wrong industry template and has been removed. Remaining rows are the trust distribution and the unit price.",
   "kpis": [
-    {
-      "kpi_id": "gold_spot_proxy",
-      "label": "Gold spot proxy (GLD USD) — sleeve pulse",
-      "unit": "usd_gld",
-      "expected": {
-        "op": "gte",
-        "value": 200,
-        "horizon": "sleeve_pulse"
-      },
-      "actual": {
-        "value": 384.5799865722656,
-        "as_of": "2026-10-09"
-      },
-      "status": "pass",
-      "source": "theme:gold_spot_usd",
-      "evidence_tier": "market",
-      "last_checked": "2026-10-11",
-      "binds_to": {
-        "valuation_path": "inputs.price",
-        "on_fail": "stance_only",
-        "note": "Sleeve pulse only; MSB economics are iron-ore royalties not gold"
-      },
-      "in_base_irr": false,
-      "prediction_role": "orientation"
-    },
     {
       "kpi_id": "distribution_per_unit",
       "label": "FY2026 declared distributions per unit (USD)",
@@ -45,7 +20,7 @@
         "value": 1.28,
         "as_of": "2026-07-21"
       },
-      "status": "pass",
+      "status": "stale",
       "source": "valuation:component_valuation.components[0].valuation.calculation_proof.inputs[0].value",
       "evidence_tier": "filing",
       "last_checked": "2026-09-06",
@@ -70,7 +45,7 @@
         "value": 24.46,
         "as_of": "2026-07-21"
       },
-      "status": "pass",
+      "status": "stale",
       "source": "valuation:inputs.price",
       "evidence_tier": "market",
       "last_checked": "2026-09-06",
@@ -83,9 +58,9 @@
     }
   ],
   "summary": {
-    "pass": 3,
+    "pass": 0,
     "fail": 0,
-    "stale": 0,
+    "stale": 2,
     "unchecked": 0
   }
 }
