@@ -65,12 +65,12 @@ def resolve_identity(
     as_of: str,
     route: dict | None = None,
 ) -> dict:
+    from security_profiles import resolve_economic_profile
     reviewed = (overrides.get("tickers") or {}).get(ticker, {})
     company = str(entry.get("company") or ticker)
     text = company.lower()
-    security_type = reviewed.get("security_type")
-    if not security_type:
-        security_type = "exchange_traded_fund" if any(x in text for x in (" etf", " fund", " trust")) else "operating_company"
+    economic = resolve_economic_profile(ticker, entry=entry, override=reviewed)
+    security_type = economic['security_type']
     registry_archetype = str(((entry.get("classification") or {}).get("archetype") or "")).strip()
     if registry_archetype.lower() in {"", "unknown", "pending", "-"}:
         registry_archetype = ""
@@ -85,6 +85,8 @@ def resolve_identity(
         float(route.get("score") or 0) > 0
         or str(route.get("status") or "") not in {"", "default_needs_review"}
     )
+    if security_type == 'exchange_traded_fund' and 'owner_earnings_reinvestment_dcf' in route_methods:
+        route_has_signal = False
     fallback_profile = "catalyst_asset_value" if security_type == "exchange_traded_fund" else "quality_reinvestment"
     fallback_method = "net_asset_value" if security_type == "exchange_traded_fund" else "owner_earnings_reinvestment_dcf"
     profile = reviewed.get("valuation_profile") or (
@@ -93,6 +95,8 @@ def resolve_identity(
     method = reviewed.get("primary_method") or (
         route_methods[0] if route_has_signal else fallback_method
     )
+    if economic['classification_status'] == 'unresolved':
+        archetype, profile, method = 'unknown', None, None
     if reviewed.get("primary_method"):
         method_source = "reviewed_override"
     elif route_has_signal:
@@ -101,7 +105,7 @@ def resolve_identity(
         method_source = "deterministic_fallback_pending_route_evidence"
     return {
         "schema_version": "1.0", "ticker": ticker, "as_of": as_of,
-        "issuer_name": reviewed.get("issuer_name") or company,
+        **economic,
         "security_type": security_type, "market": entry.get("market"),
         "cik": (entry.get("download") or {}).get("cik"),
         "archetype": archetype, "valuation_profile": profile,
@@ -110,7 +114,7 @@ def resolve_identity(
         "route_status": route.get("status"),
         "route_score": route.get("score"),
         "route_input_hash": route.get("input_hash"),
-        "status": "reviewed_override" if reviewed else "rule_resolved",
+        "status": 'classification_unresolved' if economic['classification_status'] == 'unresolved' else ("reviewed_override" if reviewed else "rule_resolved"),
         "reason": reviewed.get("reason") or "Resolved from registry metadata and deterministic name/type rules.",
         "reviewed_at": reviewed.get("reviewed_at"),
     }

@@ -29,21 +29,13 @@ SIZE_BANDS = (
 
 def type_factor(row: dict) -> float:
     """Open-market purchase > award acquire > sale; planned sales crushed elsewhere."""
-    action = (row.get("action") or row.get("transaction_action") or "").lower()
     code = (row.get("transaction_code") or "").upper()
     acquired = (row.get("acquired_disposed") or "").upper()
-    is_buy = action == "purchase" or code == "P" or acquired == "A"
-    is_sale = action == "sale" or code == "S" or acquired == "D"
-    if is_buy and code in {"", "P"} and acquired in {"", "A"}:
-        # Prefer open-market P over generic A when code known
-        if code == "P":
-            return 1.0
-        if code in {"A", "M", "G"} or row.get("is_award"):
-            return 0.55
-        return 0.92
-    if is_sale:
+    if code == 'P' and acquired in {'', 'A'}:
+        return 1.0
+    if code == 'S' and acquired in {'', 'D'}:
         return 0.62
-    return 0.5
+    return {'A': 0.25, 'M': 0.25, 'G': 0.1, 'F': 0.1}.get(code, 0.2)
 
 
 def role_factor(row: dict) -> float:
@@ -58,16 +50,15 @@ def role_factor(row: dict) -> float:
         return 1.05 if "chair" in title else 1.0
     if row.get("is_officer") or "officer" in title:
         return 0.9 if _is_buy(row) else 0.55
-    if row.get("is_ten_pct") or "10%" in title or "ten percent" in title:
+    if row.get("is_ten_pct") or row.get('is_ten_pct_owner') or "10%" in title or "ten percent" in title:
         return 1.15
     return 0.8
 
 
 def _is_buy(row: dict) -> bool:
-    action = (row.get("action") or "").lower()
     code = (row.get("transaction_code") or "").upper()
     acquired = (row.get("acquired_disposed") or "").upper()
-    return action == "purchase" or code == "P" or acquired == "A"
+    return code == 'P' and acquired in {'', 'A'}
 
 
 def size_factor(value_usd: float | None) -> float:

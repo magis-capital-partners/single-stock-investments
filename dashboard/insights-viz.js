@@ -1724,7 +1724,7 @@
       eventReview = 'unreviewed',
       reviewState = {},
     } = opts || {};
-    let list = dedupeEvents(events);
+    let list = dedupeEvents(events).map(event => applyEventFeedback(event, reviewState.feedback?.[event.id]));
     const reviewed = reviewState.reviewed || {};
     const saved = reviewState.saved || {};
     const muted = reviewState.mutedTemplates || {};
@@ -1742,7 +1742,7 @@
     if (eventReview === 'reviewed') list = list.filter(e => reviewed[e.id]);
     if (eventReview === 'saved') list = list.filter(e => saved[e.id]);
     if (eventReview === 'needs_review') {
-      list = list.filter(e => e.needs_review || e.triage_verdict === 'human_review');
+      list = list.filter(e => e.needs_review || e.triage_verdict === 'human_review' || e.review_feedback);
     }
     if (eventReview !== 'muted') list = list.filter(e => !muted[e.template_id]);
     if (eventReview === 'muted') list = list.filter(e => muted[e.template_id]);
@@ -2075,6 +2075,33 @@
     ).join('')}</div>`;
   }
 
+  const EVENT_FEEDBACK_LABELS = {
+    wrong_company: 'Wrong company', wrong_interpretation: 'Wrong interpretation', already_known: 'Already known',
+  };
+
+  function applyEventFeedback(event, feedback) {
+    if (!feedback || !EVENT_FEEDBACK_LABELS[feedback.reason]) return event;
+    return { ...event, review_feedback: feedback.reason, direction: 'neutral',
+      tier: feedback.reason === 'wrong_company' ? 'noise' : 'context',
+      feed_eligible: feedback.reason !== 'wrong_company',
+      needs_review: feedback.reason !== 'already_known' };
+  }
+
+  function eventRelevanceSummary(event, escapeHtml) {
+    const profile = event.security_profile || {};
+    const labels = [];
+    if (profile.economic_profile) labels.push(profile.economic_profile.replaceAll('_', ' '));
+    if (profile.underlying_exposure) labels.push(`Exposure: ${profile.underlying_exposure}`);
+    if (event.economic_channel) labels.push(`Driver: ${event.economic_channel.replaceAll('_', ' ')}`);
+    if (event.actor_name) labels.push(`Actor: ${event.actor_name}`);
+    if (event.issuer_ticker) labels.push(`Target: ${event.issuer_ticker}`);
+    if (event.relationship) labels.push(`${event.relationship} relationship`);
+    if (event.transaction_date) labels.push(`Transacted ${event.transaction_date}${event.transaction_end_date && event.transaction_end_date !== event.transaction_date ? ` to ${event.transaction_end_date}` : ''}`);
+    if (event.period_end) labels.push(`Period ended ${event.period_end}`);
+    if (event.review_feedback) labels.push(`Your flag: ${EVENT_FEEDBACK_LABELS[event.review_feedback]}`);
+    return labels.length ? `<p class="event-economic-context">${labels.map(label => `<span>${escapeHtml(label)}</span>`).join('')}</p>` : '';
+  }
+
   function renderDecisionEventCard(event, escapeHtml, linkHtml, ghRepo, opts) {
     const reviewState = opts.reviewState || {};
     const isReviewed = Boolean((reviewState.reviewed || {})[event.id]);
@@ -2084,7 +2111,7 @@
     const dateLabel = event.event_kind === 'scheduled' ? (event.effective_at || event.observed_at) : event.observed_at;
     return `<article class="event-card${isReviewed ? ' is-reviewed' : ''}" data-event-id="${escapeHtml(event.id || '')}" data-testid="event-card">
       <div class="event-card-topline"><span class="event-priority" title="Decision priority">${priority}</span><span class="badge ${eventTierBadge(event)}">${escapeHtml(event.tier || 'context')}</span><span class="badge ${directionClass}">${escapeHtml(event.direction || 'neutral')}</span><button type="button" class="event-ticker" data-event-open-ticker="${escapeHtml(event.ticker || '')}">${escapeHtml(event.ticker || 'PORTFOLIO')}</button><span>${escapeHtml(event.source_label || SOURCE_LABEL[event.source] || event.source || 'source')}</span><span>${escapeHtml(AXIS_LABEL[event.impact_axis] || event.impact_axis || 'context')}</span><span class="event-date">${escapeHtml(dateLabel || 'n/a')}${event.event_kind === 'scheduled' ? ' - upcoming' : ''}</span></div>
-      <div class="event-card-main"><div><h3>${escapeHtml(event.title || 'Insight')}</h3><p class="event-change">${escapeHtml((event.summary || '').slice(0, 360))}</p></div><div class="event-decision-context"><p><span>Why it matters</span>${escapeHtml(event.why_it_matters || 'Review against the current thesis.')}</p><p><span>Follow-up</span>${escapeHtml(event.recommended_follow_up || 'Review the evidence.')}</p></div></div>
+      <div class="event-card-main"><div><h3>${escapeHtml(event.title || 'Insight')}</h3><p class="event-change">${escapeHtml((event.summary || '').slice(0, 360))}</p>${eventRelevanceSummary(event, escapeHtml)}</div><div class="event-decision-context"><p><span>Why it matters</span>${escapeHtml(event.why_it_matters || 'Review against the current thesis.')}</p><p><span>Follow-up</span>${escapeHtml(event.recommended_follow_up || 'Review the evidence.')}</p></div></div>
       <div class="event-card-footer"><div class="event-evidence">${renderEventEvidence(event, escapeHtml, linkHtml, ghRepo)}</div><div class="event-card-actions">${event.triage_verdict === 'human_review' || event.needs_review ? '<span class="badge badge-warn">needs verification</span>' : ''}${event.evidence_status === 'missing' ? '<span class="badge badge-warn">no evidence link</span>' : ''}<button type="button" class="filter-btn" data-event-detail="${escapeHtml(event.id || '')}">Details</button><button type="button" class="filter-btn" data-event-save="${escapeHtml(event.id || '')}">${isSaved ? 'Saved' : 'Save'}</button><button type="button" class="filter-btn" data-event-reviewed="${escapeHtml(event.id || '')}">${isReviewed ? 'Reviewed' : 'Mark reviewed'}</button><button type="button" class="filter-btn" data-event-mute="${escapeHtml(event.template_id || '')}">Mute pattern</button></div></div>
     </article>`;
   }
@@ -2093,13 +2120,15 @@
     const v = event.verification || {};
     const note = ((reviewState || {}).notes || {})[event.id] || '';
     const comparison = event.prior_value != null || event.current_value != null
-      ? `<div class="event-detail-comparison"><span>Prior <b>${escapeHtml(fmtFilingValue(event.prior_value))}</b></span><span>Current <b>${escapeHtml(fmtFilingValue(event.current_value))}</b></span><span>Change <b>${escapeHtml(event.change_pct != null ? `${event.change_pct}%` : 'n/a')}</b></span></div>`
+      ? `<div class="event-detail-comparison"><span>Prior <b>${escapeHtml(fmtFilingValue(event.prior_value))}</b></span><span>Current <b>${escapeHtml(fmtFilingValue(event.current_value))}</b></span><span>Change <b>${escapeHtml(event.prior_value * event.current_value < 0 ? 'Crossed zero' : event.change_pct != null ? `${Number(event.change_pct).toFixed(1)}%` : 'n/a')}</b></span><span>Unit <b>${escapeHtml(v.unit || 'unverified')}</b></span></div>`
       : '';
     const rules = (event.triage_rules || []).map(rule => `<span>${escapeHtml(rule)}</span>`).join('');
     const snippet = v.extract_snippet ? `<pre>${escapeHtml(v.extract_snippet)}</pre>` : '';
     return `<div class="event-detail-header"><div><span class="mono">${escapeHtml(event.ticker || 'portfolio')}</span><h3>${escapeHtml(event.title || 'Insight')}</h3></div><button type="button" class="filter-btn" id="event-detail-close">Close</button></div>
-      <p>${escapeHtml(event.summary || '')}</p>${comparison}
+      <p>${escapeHtml(event.summary || '')}</p>${eventRelevanceSummary(applyEventFeedback(event, reviewState?.feedback?.[event.id]), escapeHtml)}${comparison}
+      <p class="tier-sub">Published ${escapeHtml(event.published_at || event.observed_at || 'unknown')} · Processed ${escapeHtml(event.processed_at || 'unknown')} · Fact confidence ${escapeHtml(event.fact_confidence || event.confidence || 'unknown')} · Interpretation confidence ${escapeHtml(event.interpretation_confidence || 'unknown')}. Importance ranks attention; direction is an interpretation, not a price forecast.</p>
       <div class="event-detail-grid"><section><h4>Why it matters</h4><p>${escapeHtml(event.why_it_matters || '')}</p></section><section><h4>Recommended follow-up</h4><p>${escapeHtml(event.recommended_follow_up || '')}</p></section><section><h4>Evidence</h4><div>${renderEventEvidence(event, escapeHtml, linkHtml, ghRepo)}</div>${snippet}</section><section><h4>Ranking explanation</h4><p>Priority ${Number(event.decision_priority || 0)} - materiality ${Number(event.materiality || 0)} - confidence ${escapeHtml(event.confidence || 'med')} - novelty ${escapeHtml(event.novelty_score ?? 'n/a')} - evidence ${Number(event.evidence_count || 0)}</p><div class="event-rule-list">${rules}</div></section></div>
+      <div class="event-feedback"><strong>Flag this event</strong><p>Your flags change your feed and are saved on this browser. Export them for a shared rules review.</p>${Object.entries(EVENT_FEEDBACK_LABELS).map(([reason, label]) => `<button type="button" class="filter-btn" data-event-feedback="${reason}">${label}</button>`).join('')}<button type="button" class="filter-btn" data-event-feedback="clear">Clear flag</button><button type="button" class="filter-btn" id="event-export-feedback">Export flags</button></div>
       <label class="event-note-label">Research note<textarea id="event-note-input" rows="4" placeholder="Record the thesis implication, disagreement, or next question...">${escapeHtml(note)}</textarea></label>
       <div class="event-detail-actions"><button type="button" class="filter-btn" id="event-note-save" data-event-note-id="${escapeHtml(event.id || '')}">Save note</button><button type="button" class="filter-btn" data-event-open-ticker="${escapeHtml(event.ticker || '')}">Open ticker insights</button></div>`;
   }
@@ -2142,6 +2171,13 @@
         drawer.style.display = 'block';
         drawer.querySelector('#event-detail-close')?.addEventListener('click', () => { drawer.style.display = 'none'; });
         drawer.querySelector('#event-note-save')?.addEventListener('click', () => options.onAction?.('note', event.id, drawer.querySelector('#event-note-input')?.value || ''));
+        drawer.querySelectorAll('[data-event-feedback]').forEach(button => button.addEventListener('click', () => options.onAction?.('feedback', event.id, button.dataset.eventFeedback)));
+        drawer.querySelector('#event-export-feedback')?.addEventListener('click', () => {
+          const labels = Object.entries(options.reviewState?.feedback || {}).map(([id, flag]) => ({ id, ...flag, event: byId[id] || null }));
+          const url = URL.createObjectURL(new Blob([JSON.stringify({ schema_version: 1, labels }, null, 2)], { type: 'application/json' }));
+          const anchor = document.createElement('a'); anchor.href = url; anchor.download = 'event-review-flags.json'; anchor.click();
+          setTimeout(() => URL.revokeObjectURL(url), 1000);
+        });
         drawer.querySelectorAll('[data-event-open-ticker]').forEach(tickerButton => tickerButton.addEventListener('click', () => options.onOpenTicker?.(tickerButton.dataset.eventOpenTicker || '')));
         drawer.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
       });
@@ -5839,6 +5875,10 @@
     attachFilingVerifyHandlers,
     attachEventHandlers,
     baseFilterEvents,
+    applyEventFeedback,
+    eventRelevanceSummary,
+    renderDecisionEventCard,
+    renderEventDetailBody,
     filterEvents,
     diversifyEvents,
     attachConsensusHandlers,

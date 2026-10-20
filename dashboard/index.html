@@ -1978,7 +1978,7 @@
 <script src="equity-model-viz.js"></script>
 <script src="search-match.js"></script>
 <script src="energy-model-viz.js?v=20261015-energy"></script>
-<script src="insights-viz.js?v=20261015-energy"></script>
+<script src="insights-viz.js?v=20261020-relevance"></script>
 <script src="valuation-viz.js"></script>
 <script src="criticality-viz.js?v=20261001-signal-study"></script>
 <script src="vol-viz.js?v=20261009-volume-residual"></script>
@@ -4491,7 +4491,12 @@ function renderInsights(opts = {}) {
         renderInsights();
       },
       onAction(action, id, value) {
-        if (action === 'note') {
+        if (action === 'feedback') {
+          const feedback = { ...(insightsEventWorkflow.feedback || {}) };
+          if (value === 'clear') delete feedback[id];
+          else feedback[id] = { reason: value, recorded_at: new Date().toISOString() };
+          insightsEventWorkflow.feedback = feedback;
+        } else if (action === 'note') {
           insightsEventWorkflow.notes = { ...insightsEventWorkflow.notes, [id]: value };
         } else {
           const field = action === 'muted' ? 'mutedTemplates' : action;

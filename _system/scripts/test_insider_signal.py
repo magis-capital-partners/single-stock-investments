@@ -14,6 +14,7 @@ from insider_signal_common import (  # noqa: E402
     names_match,
     parse_form4_xml,
     score_transactions,
+    cik_for_ticker,
 )
 
 
@@ -116,6 +117,12 @@ def lmnr_fixture_txs() -> list[dict]:
     txs.extend(parse_form4_xml(LMNR_FIXTURE, meta))
     txs.extend(parse_form4_xml(SLATER_FIXTURE, meta))
     txs.extend(parse_form4_xml(HAMM_SALE, meta))
+    # This fixture deliberately models three reporting owners of one issuer.
+    # Explicit issuer identity and transaction type are required for conviction.
+    for row in txs:
+        row['issuer_ticker'] = 'LMNR'
+        row['issuer_cik'] = cik_for_ticker('LMNR')
+        row['transaction_code'] = 'P' if row['acquired_disposed'] == 'A' else 'S'
     return txs
 
 
