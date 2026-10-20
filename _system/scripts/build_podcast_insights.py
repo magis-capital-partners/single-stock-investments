@@ -155,6 +155,7 @@ def build_episode_record(
         "highlights": meta.get("highlights") or [],
         "summary": meta.get("summary") or None,
         "description": (meta.get("description") or "").strip()[:8000] or None,
+        "enclosure_hash": meta.get("enclosure_hash"),
         "reader_summary": meta.get("reader_summary") if isinstance(meta.get("reader_summary"), dict) else None,
         "in_book": any(bool(c.get("in_book")) for c in (resolved.get("companies") or []))
         or any(bool(o.get("in_book")) for o in (resolved.get("officers") or [])),
@@ -583,6 +584,80 @@ def emit_episode_detail_shards(payload: dict | None = None,
     return written
 
 
+def _episode_rank(ep: dict) -> tuple:
+    reader = ep.get("reader_summary") if isinstance(ep.get("reader_summary"), dict) else {}
+    return (
+        1 if reader.get("status") == "ready" and reader.get("source_basis") == "transcript" else 0,
+        1 if ep.get("claims") or ep.get("analysis") else 0,
+        1 if ep.get("transcript_source") == "whisper" else 0,
+        1 if reader.get("source_basis") == "transcript" else 0,
+        1 if reader.get("overview") else 0,
+        len(ep.get("description") or ""),
+        str(ep.get("published") or ""),
+    )
+
+
+def merge_episode_pair(a: dict, b: dict) -> dict:
+    """Keep the richer copy of one recording and fill gaps from the other."""
+    winner, loser = (a, b) if _episode_rank(a) >= _episode_rank(b) else (b, a)
+    winner = dict(winner)
+    for key in (
+        "claims", "numbers", "analysis", "thesis", "description", "summary",
+        "highlights", "positions", "themes", "guests", "reader_summary",
+    ):
+        if not winner.get(key) and loser.get(key):
+            winner[key] = loser[key]
+    for flag in ("in_book", "near_universe", "has_pz_guest", "has_officer_hit"):
+        winner[flag] = bool(winner.get(flag) or loser.get(flag))
+    return winner
+
+
+def dedupe_episodes(episodes: list[dict]) -> list[dict]:
+    """Collapse the same recording saved twice under different ids.
+
+    Podcast Index and a show's own feed often mint different guids for one
+    audio file. The enclosure hash is the recording; the episode id is not.
+    """
+    parent = list(range(len(episodes)))
+
+    def find(i: int) -> int:
+        while parent[i] != i:
+            parent[i] = parent[parent[i]]
+            i = parent[i]
+        return i
+
+    def union(i: int, j: int) -> None:
+        ri, rj = find(i), find(j)
+        if ri != rj:
+            parent[rj] = ri
+
+    by_enc: dict[str, int] = {}
+    by_id: dict[str, int] = {}
+    for i, ep in enumerate(episodes):
+        enc = str(ep.get("enclosure_hash") or "")
+        eid = str(ep.get("episode_id") or "")
+        if enc:
+            if enc in by_enc:
+                union(i, by_enc[enc])
+            else:
+                by_enc[enc] = i
+        if eid:
+            if eid in by_id:
+                union(i, by_id[eid])
+            else:
+                by_id[eid] = i
+    groups: dict[int, list[dict]] = {}
+    for i, ep in enumerate(episodes):
+        groups.setdefault(find(i), []).append(ep)
+    out: list[dict] = []
+    for members in groups.values():
+        kept = members[0]
+        for other in members[1:]:
+            kept = merge_episode_pair(kept, other)
+        out.append(kept)
+    return out
+
+
 def build() -> dict:
     root = podcasts_root(create=True)
     master = load_security_master()
@@ -622,6 +697,7 @@ def build() -> dict:
             truncated[eid] = len(raw) > TRANSCRIPT_CAP
         episodes.append(rec)
 
+    episodes = dedupe_episodes(episodes)
     episodes.sort(key=lambda e: e.get("published") or "", reverse=True)
     # Progress metrics
     txt_count = sum(1 for _ in (root / "episodes").rglob("*.txt")) if (root / "episodes").is_dir() else 0
