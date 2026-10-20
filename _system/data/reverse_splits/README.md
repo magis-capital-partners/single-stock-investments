@@ -1,5 +1,20 @@
 # Reverse-split research data
 
+### Intraday execution research on 20 October 2026
+
+The [entry-capacity explanation and intraday algorithm proposal](intraday_execution_research_2026-10-20.md)
+reproduces the $2,587.48 median opening bid capacity and specifies a test of partial
+positions, incoming buying flow, alpha decay and cover liquidity. It is a research
+proposal, not a newly backtested or live execution strategy. The existing backtests
+retain their frozen entry and exit rules.
+
+Eight free research PDFs were downloaded into ignored local literature storage.
+The [bibliography and checksums](intraday_execution_literature_2026-10-20.json)
+identify the exact versions; the [capacity audit](entry_capacity_audit_2026-10-20.json)
+contains aggregate results. Reproduce the latter offline with
+`python _system/scripts/short_entry_capacity_audit.py --source-root <cached-repo> --out <aggregate.json> --local-out <cached-repo>/_system/data/reverse_splits/local/adaptive_sizing/20261020_v1/entry_capacity_audit.local.json`.
+No paid market data, broker connections or orders are involved.
+
 US listed and OTC reverse-split research: completed events and candidates with
 an ex date, filing disclosures, FINRA positioning
 context, the persisted shared-capital book runs and the append-only RSI-1.0
