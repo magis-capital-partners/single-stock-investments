@@ -7,6 +7,7 @@ from pathlib import Path
 
 import build_video_detail
 from build_video_insights import INDEX_MIRROR_PATH, build_catalog
+from reconcile_insights_event_summary import prepare_published_manifest
 from vault_paths import videos_root
 
 ROOT = Path(__file__).resolve().parents[2]
@@ -51,26 +52,33 @@ def publish(root: Path | None = None) -> dict:
     write_json(SHARD_PATH, shard)
     write_json(INDEX_MIRROR_PATH, catalog, compact=False)
 
-    manifest = load_json(MANIFEST_PATH)
-    manifest["video_count"] = catalog.get("video_count", 0)
-    manifest.setdefault("shards", {})["videos"] = "data/insights/videos.json"
-    manifest["shards"]["video_details"] = "data/insights/video_details/"
-    health = manifest.setdefault("source_health", {})
-    health["videos"] = {
-        "status": "ok" if catalog.get("video_count") else "empty",
-        "items": catalog.get("video_count", 0),
-        "as_of": catalog.get("newest_published"),
-        "generated_at": catalog.get("generated_at"),
-        "status_counts": catalog.get("status_counts") or {},
-        "path": "_system/reference/video/insights_index_mirror.json",
-        # Depth, not count. The admitted total moves with the collection lane
-        # and says nothing about whether the surface is worth reading; these do.
-        "detail_shards": details.get("shards", 0),
-        "with_analysis": details.get("with_analysis", 0),
-        "with_timestamps": details.get("with_timestamps", 0),
-        "claims": details.get("claims", 0),
-        "summary_sources": details.get("by_summary_source") or {},
-    }
+    def mutate(manifest: dict) -> None:
+        manifest["video_count"] = catalog.get("video_count", 0)
+        manifest.setdefault("shards", {})["videos"] = "data/insights/videos.json"
+        manifest["shards"]["video_details"] = "data/insights/video_details/"
+        health = manifest.setdefault("source_health", {})
+        health["videos"] = {
+            "status": "ok" if catalog.get("video_count") else "empty",
+            "items": catalog.get("video_count", 0),
+            "as_of": catalog.get("newest_published"),
+            "generated_at": catalog.get("generated_at"),
+            "status_counts": catalog.get("status_counts") or {},
+            "path": "_system/reference/video/insights_index_mirror.json",
+            # Depth, not count. The admitted total moves with the collection lane
+            # and says nothing about whether the surface is worth reading; these do.
+            "detail_shards": details.get("shards", 0),
+            "with_analysis": details.get("with_analysis", 0),
+            "with_timestamps": details.get("with_timestamps", 0),
+            "claims": details.get("claims", 0),
+            "summary_sources": details.get("by_summary_source") or {},
+        }
+
+    events_doc = load_json(INSIGHTS_DIR / "events.json")
+    events = events_doc.get("events")
+    try:
+        manifest = prepare_published_manifest(load_json(MANIFEST_PATH), events, mutate)
+    except ValueError as exc:
+        raise SystemExit(str(exc)) from exc
     write_json(MANIFEST_PATH, manifest)
     catalog["details"] = details
     return catalog

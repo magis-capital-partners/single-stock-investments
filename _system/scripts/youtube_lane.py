@@ -39,6 +39,7 @@ until someone asks for them.
 from __future__ import annotations
 
 import argparse
+import json
 import os
 import re
 import shlex
@@ -335,11 +336,57 @@ def _ensure_publish_worktree() -> Path:
     return path
 
 
+INSIGHT_MANIFEST = "dashboard/data/insights/manifest.json"
+
+
+def _read_json(path: Path) -> dict:
+    try:
+        value = json.loads(path.read_text(encoding="utf-8"))
+    except (OSError, json.JSONDecodeError):
+        return {}
+    return value if isinstance(value, dict) else {}
+
+
+def _sync_insight_manifest(src: Path, dst: Path, *, videos: bool, podcasts: bool) -> None:
+    """Patch this lane's media fields onto the manifest that already matches events.
+
+    The lane worktree keeps its own manifest for hours. Copying that file
+    onto origin/main put a retained_event_count of 1539 next to an events
+    shard of 1530. The destination events list is the one this commit leaves
+    in place, so the count is derived from it.
+    """
+    from reconcile_insights_event_summary import (
+        apply_media_fields,
+        is_publishable_manifest,
+        reconciled_manifest,
+    )
+
+    destination = _read_json(dst)
+    if not is_publishable_manifest(destination):
+        raise RuntimeError(f"refusing to publish onto a stub insight manifest at {dst}")
+    merged = apply_media_fields(destination, _read_json(src), videos=videos, podcasts=podcasts)
+    events_doc = _read_json(dst.parent / "events.json")
+    events = events_doc.get("events")
+    if not isinstance(events, list):
+        raise RuntimeError(f"insight events shard missing beside {dst}")
+    updated = reconciled_manifest(merged, events)
+    dst.parent.mkdir(parents=True, exist_ok=True)
+    dst.write_text(
+        json.dumps(updated, ensure_ascii=False, separators=(",", ":")) + "\n",
+        encoding="utf-8",
+    )
+
+
 def _sync_published(src: Path, dst: Path, paths: tuple[str, ...] = MAIN_PATHS,
                     dirs: tuple[str, ...] = MAIN_DIRS) -> None:
+    videos = "dashboard/data/insights/videos.json" in paths
+    podcasts = "dashboard/data/insights/podcasts.json" in paths
     for rel in (*paths, *dirs):
         source = src / rel
         target = dst / rel
+        if rel == INSIGHT_MANIFEST:
+            _sync_insight_manifest(source, target, videos=videos, podcasts=podcasts)
+            continue
         if target.is_dir():
             shutil.rmtree(target)
         elif target.exists():
