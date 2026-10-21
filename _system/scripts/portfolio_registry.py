@@ -78,6 +78,7 @@ EXCHANGE_META = {
     "CEE": "NYSE",
     "NAN": "NYSE",
     "URB.A.TO": "TSX",
+    "DC.A.TO": "TSX",
     "RMV.L": "LSE",
     "0388.HK": "HKEX",
     "ABX": "NASDAQ",
