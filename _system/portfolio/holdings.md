@@ -1,6 +1,6 @@
 # Holdings
 
-Synced from `_system/portfolio/registry.json`. Last sync: 2026-10-20.
+Synced from `_system/portfolio/registry.json`. Last sync: 2026-10-21.
 
 **Classification schema:** `_system/frameworks/classification.md` · source map: `_system/portfolio/classification.json`
 
@@ -223,6 +223,7 @@ Synced from `_system/portfolio/registry.json`. Last sync: 2026-10-20.
 | DAL | DAL/ | Delta Air Lines | US | 2026-10-18 | 2026-10-20 | unknown | watch |
 | DASH | DASH/ | DoorDash | US | 2026-10-18 | 2026-10-20 | unknown | watch |
 | DB1.DE | DB1.DE/ | Deutsche Boerse AG | EU | 2026-07-09 | 2026-10-20 | unknown | watch |
+| DC.A.TO | DC.A.TO/ | Dundee Corporation | CA | — | 2026-10-21 | holding_co | watch |
 | DD | DD/ | DuPont | US | 2026-07-29 | 2026-10-20 | unknown | watch |
 | DDOG | DDOG/ | Datadog | US | 2026-07-29 | 2026-10-20 | unknown | watch |
 | DE | DE/ | Deere & Company | US | 2026-07-29 | 2026-10-20 | unknown | watch |
@@ -866,4 +867,4 @@ Synced from `_system/portfolio/registry.json`. Last sync: 2026-10-20.
 | ZETA | ZETA/ | ZETA | US | 2026-07-28 | 2026-10-20 | unknown | watch |
 | ZTS | ZTS/ | Zoetis | US | 2026-07-10 | 2026-10-20 | unknown | watch |
 
-**859 holdings total.** Registry: `_system/portfolio/registry.json`
+**860 holdings total.** Registry: `_system/portfolio/registry.json`
