@@ -1,0 +1,81 @@
+name: Buyback radar regression checks
+on:
+  pull_request:
+    branches: [main]
+    paths:
+      - "_system/scripts/buyback*.py"
+      - "_system/scripts/buyback_policy.json"
+      - "_system/scripts/build_buyback_radar.py"
+      - "_system/scripts/build_special_situations.py"
+      - "_system/scripts/build_short_alpha_dashboard.py"
+      - "_system/scripts/build_dashboard_shards.py"
+      - "_system/scripts/build_progressive_shards.py"
+      - "_system/graph/graph_sources.json"
+      - "_system/scripts/tests/test_buyback_radar*"
+      - "dashboard/buyback*"
+      - "dashboard/index.html"
+      - "dashboard/special-situations-viz.js"
+      - "dashboard/short-alpha-viz.js"
+      - ".github/workflows/buyback-radar-tests.yml"
+      - ".github/workflows/data-pipeline.yml"
+  push:
+    branches: [main]
+    paths:
+      - "_system/scripts/buyback*.py"
+      - "_system/scripts/buyback_policy.json"
+      - "_system/scripts/build_buyback_radar.py"
+      - "_system/scripts/build_special_situations.py"
+      - "_system/scripts/build_short_alpha_dashboard.py"
+      - "_system/scripts/build_dashboard_shards.py"
+      - "_system/scripts/build_progressive_shards.py"
+      - "_system/graph/graph_sources.json"
+      - "_system/scripts/tests/test_buyback_radar*"
+      - "dashboard/buyback*"
+      - "dashboard/index.html"
+      - "dashboard/special-situations-viz.js"
+      - "dashboard/short-alpha-viz.js"
+      - ".github/workflows/buyback-radar-tests.yml"
+      - ".github/workflows/data-pipeline.yml"
+permissions:
+  contents: read
+jobs:
+  buyback-contracts:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          sparse-checkout: |
+            _system/scripts
+            dashboard
+            .github/workflows
+          sparse-checkout-cone-mode: false
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+      - name: Financial event and publication regressions
+        run: |
+          python -m unittest discover -s _system/scripts/tests -p test_buyback_radar.py
+          python -m unittest discover -s _system/scripts -p test_special_situations.py
+      - name: Shared UI and routing contracts
+        run: node --test _system/scripts/tests/test_buyback_radar_ui.cjs
+      - name: Validate published snapshot
+        run: python _system/scripts/build_buyback_radar.py --check
+      - name: Install pinned browser used by the smoke tests
+        run: |
+          npm install --no-save --ignore-scripts --prefix "$RUNNER_TEMP/buyback-browser" playwright@1.62.1
+          "$RUNNER_TEMP/buyback-browser/node_modules/.bin/playwright" install --with-deps chromium
+      - name: Desktop mobile and interaction smoke checks
+        env:
+          SSI_PLAYWRIGHT_MODULE: ${{ runner.temp }}/buyback-browser/node_modules/playwright
+          BUYBACK_SCREENSHOT_DIR: ${{ runner.temp }}/buyback-screenshots
+        run: node _system/scripts/tests/test_buyback_radar_browser.cjs
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: buyback-ui-screenshots
+          path: ${{ runner.temp }}/buyback-screenshots
+          if-no-files-found: ignore

@@ -30,7 +30,7 @@
   //   activist         daily scan (data-pipeline.yml, 06:00 UTC) + a day
   //   two_phase_watch  weekly (two-phase-watch.yml, Sunday 17:00 UTC) + three days,
   //                    matching two_phase_watch.py's own >10-day stale rule
-  const FEED_MAX_AGE_HOURS = Object.freeze({ darwin: 96, activist: 48, two_phase_watch: 240 });
+  const FEED_MAX_AGE_HOURS = Object.freeze({ darwin: 96, activist: 48, two_phase_watch: 240, buyback_radar: 102 });
 
   // A timestamp or a bare calendar date, as epoch ms (UTC), or null.
   const stampMs = (value) => {
@@ -83,6 +83,7 @@
       if (state === 'unreadable') return 'Unreadable stamp';
       if (state === 'stale') return 'Stale';
       if (state === 'fresh') return 'Fresh';
+      if (state === 'degraded') return 'Review required';
       if (state === 'empty') return 'Current, no actionable rows';
       if (state === 'api') return 'Live API';
       return 'Unknown';
