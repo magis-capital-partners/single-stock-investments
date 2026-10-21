@@ -17,6 +17,7 @@
 <link href="short-sleeve.css?v=20261019-portfolio" rel="stylesheet">
 <link href="warrants.css" rel="stylesheet">
 <link href="portfolio.css?v=20261008-michael-tail" rel="stylesheet">
+<link href="buyback.css?v=20261020-v2" rel="stylesheet">
 <link href="ideas.css?v=20261011-separations" rel="stylesheet">
 <link href="energy-model.css?v=20261015-energy" rel="stylesheet">
 <style>
@@ -1998,7 +1999,7 @@
 <script src="reverse-splits-viz.js?v=20261015-net-edge-v3"></script>
 <script src="warrant-viz.js"></script>
 <script src="special-situations-viz.js?v=20261018-buyback"></script>
-<script src="buyback-viz.js?v=20261018-buyback"></script>
+<script src="buyback-viz.js?v=20261020-v2"></script>
 <script src="separations-viz.js?v=20261011-separations"></script>
 <script src="desk-briefs-viz.js?v=20261012-desk-briefs"></script>
 <script src="sleeve-viz.js?v=20261008-michael-tail"></script>
@@ -2094,7 +2095,7 @@ const HOLDINGS_COLUMNS = [
   { id: 'next_action', label: 'Next action', sort: 'valuation_decision.critical_gap_count', group: 'core' },
   { id: 'route_method', label: 'Power Zone / method', sort: 'power_zones.primary', group: 'core' },
   { id: 'special_situation', label: 'CVR / NAV', sort: 'special_situation', group: 'core' },
-  { id: 'buyback', label: 'Buyback', sort: 'buyback.retired_since_peak_pct', group: 'core' },
+  { id: 'buyback', label: 'Buyback', sort: 'buyback.net_reduction_1y', group: 'core' },
   { id: 'research_freshness', label: 'Freshness', sort: 'last_research', group: 'core' },
   { id: 'context', label: 'Context', sort: 'classification.investment_sleeve_label', group: 'core' },
   { id: 'cvr_stage', label: 'CVR detail', sort: 'cvr.stage', group: 'special' },
@@ -2374,6 +2375,7 @@ function setAppHash(nextHash) {
 }
 
 function parseRouteFromHashString(hash) {
+  hash = String(hash || '').split('?')[0];
   const portfolioMatch = /^#\/portfolio(?:\/(all|drew|michael))?(?:\/(positions|risk|margin|performance|orders|reconciliation))?$/i.exec(hash || '');
   if (portfolioMatch) {
     return { view: 'portfolio', scope: (portfolioMatch[1] || 'all').toLowerCase(), section: (portfolioMatch[2] || 'positions').toLowerCase(), ticker: null, watchlistSub: null };
@@ -2474,14 +2476,17 @@ function syncRouteHash() {
   } else if (activeView === 'darwin') {
     setAppHash(`#/strategies/darwin/${darwinViewMode || 'overview'}`);
   } else if (activeView === 'holdings') {
-    setAppHash(selected ? `#/research/coverage/${encodeURIComponent(selected)}` : '#/research/coverage');
+    const buybackSection = new URLSearchParams(location.hash.split('?')[1] || '').get('section') === 'buyback';
+    const buybackSuffix = selected && buybackSection ? '?section=buyback' : '';
+    setAppHash(selected ? `#/research/coverage/${encodeURIComponent(selected)}${buybackSuffix}` : '#/research/coverage');
   } else if (activeView === 'valuation') {
     setAppHash('#/research/valuation');
   } else if (activeView === 'watchlist') {
     const sub = WATCHLIST_VIEWS.has(watchlistViewMode) ? watchlistViewMode : defaultWatchlistView();
     setAppHash(`#/ideas/${sub}`);
   } else if (activeView === 'short-alpha') {
-    setAppHash(`#/ideas/${activeView}${shortAlphaSection==='backtest' ? '/backtest' : ''}`);
+    const focusQuery = new URLSearchParams(location.hash.split('?')[1] || '').get('buyback');
+    setAppHash(`#/ideas/${activeView}${shortAlphaSection==='backtest' ? '/backtest' : ''}${focusQuery ? '?buyback='+encodeURIComponent(focusQuery) : ''}`);
   } else if (activeView === 'situations') {
     const slug = SITUATION_LANE_SLUG[situationLane] || '';
     const focus = situationFocus ? `/${encodeURIComponent(situationFocus)}` : '';
@@ -2524,7 +2529,7 @@ function applyRouteFromHash() {
   setView(route.view, { syncHash: false });
   if (route.view === 'holdings' && route.ticker) {
     const hit = data.tickers.find(x => x.ticker === route.ticker);
-    if (hit) {
+    if (hit || window.BuybackViz?.company(route.ticker)) {
       selectTicker(route.ticker, { syncHash: false });
       syncRouteHash();
       return true;
@@ -3424,19 +3429,10 @@ function loadInsightsSection(section) {
 
 function applyBuyback(row) {
   if (!row) return;
-  const src = (data.buyback_by_ticker || {})[String(row.ticker || '').toUpperCase()];
-  if (!src) return;
-  row.buyback = {
-    retired_since_peak_pct: src.retired_since_peak_pct,
-    buyback_yield_pct: src.buyback_yield_pct,
-    pace: src.pace,
-    grade: src.grade,
-    change_5y_pct: src.change_5y_pct,
-    change_1y_pct: src.change_1y_pct,
-    as_of: src.shares_end,
-    split_review: !!src.split_review,
-    repurchase_tag: src.repurchase_tag || null,
-    non_operating: !!src.non_operating,
+  const src = window.BuybackViz && BuybackViz.company(row.ticker);
+  row.buyback = src ? { ...src } : {
+    schema_version: 'buyback.v2', data_status: 'unavailable',
+    data_reason: 'verified_snapshot_unavailable', rank_eligible: false, metrics: {},
   };
 }
 
@@ -3517,15 +3513,10 @@ async function load() {
       // Technicals are a supplemental overlay; the fundamental dashboard remains usable.
     }
     try {
-      const buybackDoc = await fetchShardJson('data/buyback_companies.json');
-      const byTicker = {};
-      (buybackDoc.companies || []).forEach((row) => {
-        if (row && row.ticker) byTicker[String(row.ticker).toUpperCase()] = row;
-      });
-      data.buyback_by_ticker = byTicker;
-      data.tickers.forEach((ticker) => applyBuyback(ticker));
+      if (window.BuybackViz) await BuybackViz.load();
+      data.tickers.forEach(applyBuyback);
     } catch (_) {
-      data.buyback_by_ticker = data.buyback_by_ticker || {};
+      data.tickers.forEach(applyBuyback);
     }
     try {
       // Every published technical signal, graded as its horizons mature, next to
@@ -3548,6 +3539,7 @@ async function load() {
       data.insights = null;
     }
   }
+  if (window.BuybackViz) { await BuybackViz.load(); data.tickers.forEach(applyBuyback); }
   try {
     const response = await fetch('/api/v1/market-risk/latest', {
       headers: { accept: 'application/json' },
@@ -3697,7 +3689,10 @@ async function loadShortAlpha() {
         if (!response.ok) throw new Error(`Short Alpha data ${response.status}`);
         return response.json();
       })
-      .then(value => { shortAlphaData = value; return value; })
+      .then(async value => {
+        if (window.BuybackViz) { await BuybackViz.load(); value = BuybackViz.projectShorts(value); }
+        shortAlphaData = value; return value;
+      })
       .finally(() => { shortAlphaPromise = null; });
   }
   return shortAlphaPromise;
@@ -3787,7 +3782,10 @@ async function loadSituations() {
         if (!response.ok) throw new Error(`Special situations data ${response.status}`);
         return response.json();
       })
-      .then(value => { situationData = value; return value; })
+      .then(async value => {
+        if (window.BuybackViz) { await BuybackViz.load(); value = BuybackViz.projectSituations(value); }
+        situationData = value; return value;
+      })
       .catch(error => {
         situationData = { rows: [], discovery: [], history: [], lanes: [], error: error.message };
         return situationData;
@@ -5453,6 +5451,7 @@ function renderSummary() {
 function filtered() {
   const q = document.getElementById('search').value.toLowerCase();
   return data.tickers.filter(t => {
+    if (window.BuybackViz && !BuybackViz.matches(t)) return false;
     if (marketFilter !== 'ALL' && t.market !== marketFilter) return false;
     if (sleeveFilter !== 'ALL') {
       const sid = t.classification?.investment_sleeve;
@@ -5602,11 +5601,8 @@ function filtered() {
       };
       av = specialRank(a);
       bv = specialRank(b);
-    } else if (sortKey === 'buyback.retired_since_peak_pct') {
-      av = a.buyback?.retired_since_peak_pct;
-      bv = b.buyback?.retired_since_peak_pct;
-      av = av == null ? -Infinity : av;
-      bv = bv == null ? -Infinity : bv;
+    } else if (sortKey.startsWith('buyback.')) {
+      return window.BuybackViz ? BuybackViz.compareRows(a, b, sortKey.slice(8), sortAsc) : 0;
     } else {
       if (typeof av === 'string') av = av.toLowerCase();
       if (typeof bv === 'string') bv = bv.toLowerCase();
@@ -5836,6 +5832,10 @@ function renderFundNavPanel(t) {
 }
 
 function renderTable() {
+  if (window.BuybackViz) BuybackViz.mountCoverageControls({
+    onFilter: renderTable,
+    onSort: key => { sortKey = 'buyback.' + key; sortAsc = false; renderTable(); },
+  });
   const rows = filtered();
   const cols = visibleHoldingsColumns();
   renderHoldingsThead();
@@ -5927,8 +5927,16 @@ function selectTicker(ticker, opts = {}) {
   if (typeof EquityModelViz !== 'undefined') EquityModelViz.destroyCharts();
   renderTable();
   const t = data.tickers.find(x => x.ticker === ticker);
-  if (!t) return;
-  // Every per-share figure in the panels below is quoted in this listing's
+    if (!t) {
+      const buyback = window.BuybackViz?.company(ticker);
+      if (buyback) {
+        document.getElementById('main-grid').classList.remove('detail-closed');
+        document.getElementById('detail').innerHTML = '<h2>'+escapeHtml(ticker)+'</h2><p>'+escapeHtml(buyback.company)+'</p>'+BuybackViz.renderDetail({ticker,buyback});
+        if (opts.syncHash !== false) syncRouteHash();
+      }
+      return;
+    }
+    // Every per-share figure in the panels below is quoted in this listing's
   // currency. Publish it before any of them render.
   setActiveQuoteUnits(t);
   if (!t.__detail) {

@@ -27,6 +27,7 @@ FEED_LANES = {
     "spx_surface": "data-pipeline-technicals",
     "warrant_monitor": "data-pipeline-warrant-discover",
     "separations": "data-pipeline-separation-discover",
+    "buyback_radar": "data-pipeline-buyback-radar",
     "desk_briefs": "data-pipeline-intake-full",
     "reverse_splits": "data-pipeline-reverse-splits",
     "short_alpha": "data-pipeline-intake-full",
@@ -41,6 +42,7 @@ LABELS = {
     "unreadable": "Unreadable stamp",
     "stale": "Stale",
     "fresh": "Fresh",
+    "degraded": "Review required",
     "empty": "Current, no actionable rows",
     "api": "Live API",
 }
@@ -64,6 +66,10 @@ _INTAKE = "Nightly intake republishes this surface. This page does not dispatch 
 
 # hash is the operator route. One hash may have several rows.
 SURFACES: list[dict] = [
+    {"id":"buyback-radar","label":"Buyback Radar","hash":"#/research/coverage",
+     "lane":"data-pipeline-buyback-radar","kind":"file","data_feed":"buyback_radar",
+     "path":"dashboard/data/buyback_manifest.json","stamp_fields":["generated_at"],
+     "healer":"Data Pipeline daily buyback refresh; repair with heal-buyback-radar"},
     {
         "id": "portfolio",
         "label": "Portfolio",
@@ -650,6 +656,8 @@ def build_feed_status(root: Path | None = None, now: datetime | None = None) -> 
             if exists:
                 stamp = _first_stamp(doc, list(resolved.get("stamp_fields") or ["generated_at"]))
             status = classify_feed(exists, stamp, max_age, moment, empty=empty and exists)
+        if resolved.get("data_feed")=="buyback_radar" and exists and status in {"fresh","empty"} and doc.get("health")!="healthy":
+            status="degraded"
         receipt_path = root / RECEIPTS_REL / f"{lane}.json"
         receipt = _load_json(receipt_path) if receipt_path.is_file() else None
         receipt_at = receipt.get("last_success_at") if isinstance(receipt, dict) else None

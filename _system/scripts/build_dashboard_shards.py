@@ -551,3 +551,30 @@ def write_shards(payload: dict, insights_doc: dict | None, data_dir: Path) -> di
         "ticker_shards": ticker_count,
         "insights_shards": insight_count,
     }
+
+
+def refresh_buyback_projection(folder=None):
+    """Refresh canonical buyback fields while preserving all other shard contents."""
+    from build_buyback_radar import load_companies_index, shard_buyback
+    from atomic_io import write_json_if_changed, attach_envelope
+    index=load_companies_index()
+    if not index:raise ValueError("Verified buyback snapshot unavailable")
+    folder=Path(folder) if folder else Path(__file__).resolve().parents[2] / "dashboard/data/tickers"
+    updated=0
+    for path in sorted(folder.glob("*.json")):
+        try:doc=json.loads(path.read_text(encoding="utf-8"))
+        except (OSError,ValueError):continue
+        ticker=doc.get("ticker") or path.stem
+        row=index.get(ticker)
+        doc["buyback"]=shard_buyback(row) if row else {"schema_version":"buyback.v2","ticker":ticker,"data_status":"unavailable","data_reason":"issuer_outside_snapshot","rank_eligible":False,"metrics":{}}
+        if doc.get("_envelope"):
+            env=doc["_envelope"]
+            doc=attach_envelope(doc,feed_id=env.get("feed_id","ticker-shard"),as_of=env.get("as_of"),row_count=env.get("row_count"))
+        if write_json_if_changed(path,doc):updated+=1
+    return updated
+
+
+if __name__ == "__main__":
+    import sys
+    if sys.argv[1:]==["--refresh-buyback-projection"]:
+        print("Refreshed buyback ticker shards:",refresh_buyback_projection())

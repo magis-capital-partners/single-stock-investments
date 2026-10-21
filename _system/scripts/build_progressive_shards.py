@@ -39,12 +39,6 @@ from atomic_io import (  # noqa: E402
      semantic_text_sha256,
     write_json_if_changed,
 )
-from build_thesis_card import build_card, write_card  # noqa: E402
-from operating_kpis.trends import (  # noqa: E402
-    merge_operating_series,
-    operating_latest_rows,
-    select_shard_series,
-)
 
 DATA_DIR = ROOT / "dashboard" / "data"
 AGENT_SHARDS_DIR = DATA_DIR / "agent_shards"
@@ -278,6 +272,8 @@ def is_active_book_ticker(ticker: str, reg_entry: dict[str, Any], val: dict[str,
 
 
 def build_all(target_tickers: list[str] | None = None, *, build_all_shards: bool = False) -> dict[str, Any]:
+    from build_thesis_card import build_card, write_card
+    from operating_kpis.trends import merge_operating_series, operating_latest_rows, select_shard_series
     ts = now_iso()
     registry = _load_json(REGISTRY_PATH)
     holdings_map = registry.get("holdings") or {}
@@ -636,5 +632,30 @@ def main(argv: list[str] | None = None) -> int:
     return 0
 
 
+
+def refresh_buyback_projection(folder=None):
+    """Refresh canonical buyback fields while preserving all other shard contents."""
+    from build_buyback_radar import load_companies_index, shard_buyback
+    from atomic_io import write_json_if_changed, attach_envelope
+    index=load_companies_index()
+    if not index:raise ValueError("Verified buyback snapshot unavailable")
+    folder=Path(folder) if folder else AGENT_SHARDS_DIR
+    updated=0
+    for path in sorted(folder.glob("*.json")):
+        try:doc=json.loads(path.read_text(encoding="utf-8"))
+        except (OSError,ValueError):continue
+        ticker=doc.get("ticker") or path.stem
+        row=index.get(ticker)
+        doc["buyback"]=shard_buyback(row) if row else {"schema_version":"buyback.v2","ticker":ticker,"data_status":"unavailable","data_reason":"issuer_outside_snapshot","rank_eligible":False,"metrics":{}}
+        if doc.get("_envelope"):
+            env=doc["_envelope"]
+            doc=attach_envelope(doc,feed_id=env.get("feed_id","ticker-shard"),as_of=env.get("as_of"),row_count=env.get("row_count"))
+        if write_json_if_changed(path,doc):updated+=1
+    return updated
+
 if __name__ == "__main__":
-    raise SystemExit(main())
+    import sys
+    if sys.argv[1:]==["--refresh-buyback-projection"]:
+        print("Refreshed buyback agent shards:",refresh_buyback_projection())
+    else:
+        raise SystemExit(main())

@@ -427,20 +427,18 @@
       </div>
     </details>`;
   }
-  function renderIssuanceSignals(payload, framework) {
-    if (framework !== 'all' && framework !== 'dilution_financing') return '';
-    const rows = (payload && payload.buyback_issuance_signals) || [];
-    if (!rows.length) return '';
-    const items = rows.map((row) => {
-      const year = row.change_1y_pct == null ? '—' : `${row.change_1y_pct}%`;
-      const five = row.change_5y_pct == null ? '—' : `${row.change_5y_pct}%`;
-      return `<li><strong>${esc(row.ticker)}</strong> ${esc(row.company || '')} · last year ${esc(year)} after five years ${esc(five)}. Grade ${esc(row.grade || '—')}. Not a ranked short.</li>`;
-    }).join('');
-    return `<section class="short-section"><h3 class="short-section-title">Issuing again <span>${rows.length}</span></h3><p class="form-hint">Share count rose over the last year after a multi-year shrink. A candidate signal for dilution / financing. Not a ranked short.</p><ul>${items}</ul></section>`;
+  function renderIssuanceSignals(payload, filters) {
+    return global.BuybackViz ? global.BuybackViz.renderSignals(payload.buyback_issuance_signals || [], filters) : '';
   }
+  let lastBuybackFocus = '';
   function render(payload) {
     const maps = { frameworks: frameworkMap(payload), payload };
     const saved = read(FILTER_KEY, { query: '', framework: 'all', stage: 'all' });
+    const buybackFocus = new URLSearchParams(global.location?.hash.split('?')[1] || '').get('buyback');
+    if (buybackFocus && buybackFocus !== lastBuybackFocus) {
+      saved.query = buybackFocus; saved.framework = 'dilution_financing'; saved.stage = 'all';
+      write(FILTER_KEY, saved); lastBuybackFocus = buybackFocus;
+    }
     const selected = read(SELECTED_KEY, '');
     const candidates = getCandidates(payload).filter(row => {
       const hay = `${row.ticker} ${row.security_name} ${row.hypothesis} ${row.origin || ''} ${row.category || ''} ${row.source || ''} ${(row.tags || []).join(' ')} ${row.summary || ''}`.toLowerCase();
@@ -480,7 +478,7 @@
       <div class="short-alpha-stat"><span>Quant screen</span><strong>${payload.quant_screen ? (payload.quant_screen.scored_count ?? '—') : '—'}</strong><small>${payload.quant_screen ? `scored of ${payload.quant_screen.universe_count ?? '—'} names` : 'not built on this checkout'}</small></div>
     </div>
     <section class="short-section"><h3 class="short-section-title">Frameworks</h3>${renderFrameworkBoard(payload, saved.framework)}</section>
-    ${renderIssuanceSignals(payload, saved.framework)}
+    ${renderIssuanceSignals(payload, saved)}
     <div class="short-alpha-toolbar">
       <input class="search" data-short-search placeholder="Search ticker, name, or thesis…" value="${esc(saved.query)}" aria-label="Search short names">
       <select class="short-alpha-filter" data-short-framework aria-label="Filter by short framework"><option value="all">All frameworks</option>${frameworkOptions(payload, saved.framework)}</select>
@@ -553,6 +551,7 @@
     return out;
   }
   function attach(container, payload, rerender) {
+    global.BuybackViz?.attachSignals(container, rerender);
     const search = container.querySelector('[data-short-search]');
     const framework = container.querySelector('[data-short-framework]');
     const stage = container.querySelector('[data-short-stage]');

@@ -354,6 +354,17 @@
       ],
       "freshness_hours": 102,
       "subject_regex": "^chore: archive reverse-split borrow indications"
+    },
+    {
+      "name": "data-pipeline-buyback-radar",
+      "workflow_file": "data-pipeline.yml",
+      "job": "buyback-radar",
+      "cadence_cron": [
+        "13 15 * * 1",
+        "19 15 * * 2-5"
+      ],
+      "freshness_hours": 102,
+      "subject_regex": "^chore: buyback radar (refresh|weekly)"
     }
   ],
   "unmonitored_workflows": {},
@@ -712,6 +723,18 @@
         "health.structural_errors": {
           "max_count": 0,
           "why": "duplicate event keys, enum violations and chain breaks are structural, not freshness"
+        }
+      }
+    },
+    "buyback_radar": {
+      "path": "dashboard/data/buyback_manifest.json",
+      "stamp_field": "generated_at",
+      "max_age_hours": 102,
+      "healer": "data-pipeline buyback-radar; repository_dispatch heal-buyback-radar",
+      "assert_fields": {
+        "schema_version": {
+          "equals": "buyback_manifest.v2",
+          "why": "one coherent issuer and event snapshot owns all three views"
         }
       }
     }
