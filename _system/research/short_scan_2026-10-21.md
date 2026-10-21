@@ -424,7 +424,7 @@
 | INFQ | indexed | L5/S0 | 2026-05-26 | 5 long, 0 short indexed; 0 short feed-eligible |
 | INTC | indexed | L1/S0 | 2021-01-29 | 1 long, 0 short indexed; 0 short feed-eligible |
 | INTU | indexed | L1/S1 | 2024-09-20 | 1 long, 1 short indexed; 1 short feed-eligible |
-| INV | indexed | L13/S0 | 2026-05-05 | 13 long, 0 short indexed; 0 short feed-eligible |
+| INV | indexed | L15/S0 | 2026-10-20 | 15 long, 0 short indexed; 0 short feed-eligible |
 | INVH | indexed | L4/S0 | 2020-02-14 | 4 long, 0 short indexed; 0 short feed-eligible |
 | IONQ | indexed | L4/S1 | 2026-04-01 | 4 long, 1 short indexed; 0 short feed-eligible |
 | IP | indexed | L2/S0 | 2021-05-21 | 2 long, 0 short indexed; 0 short feed-eligible |
@@ -476,7 +476,7 @@
 | LDOS | indexed | L0/S1 | 2021-02-16 | 0 long, 1 short indexed; 1 short feed-eligible |
 | LEN | indexed | L20/S0 | 2026-02-19 | 20 long, 0 short indexed; 0 short feed-eligible |
 | LEU | indexed | L18/S0 | 2026-05-15 | 18 long, 0 short indexed; 0 short feed-eligible |
-| LGND | no_hit | — | — | No activist index hits |
+| LGND | indexed | L9/S0 | 2026-05-18 | 9 long, 0 short indexed; 0 short feed-eligible |
 | LH | indexed | L2/S0 | 2023-07-24 | 2 long, 0 short indexed; 0 short feed-eligible |
 | LHX | indexed | L1/S0 | 2022-07-15 | 1 long, 0 short indexed; 0 short feed-eligible |
 | LIF.TO | no_hit | — | — | No activist index hits |
@@ -817,7 +817,7 @@
 | VLO | indexed | L2/S0 | 2019-01-10 | 2 long, 0 short indexed; 0 short feed-eligible |
 | VLTO | no_hit | — | — | No activist index hits |
 | VMC | indexed | L2/S0 | 2021-08-05 | 2 long, 0 short indexed; 0 short feed-eligible |
-| VNOM | no_hit | — | — | No activist index hits |
+| VNOM | indexed | L7/S0 | 2026-09-03 | 7 long, 0 short indexed; 0 short feed-eligible |
 | VOXR | no_hit | — | — | No activist index hits |
 | VRSK | indexed | L2/S0 | 2022-03-21 | 2 long, 0 short indexed; 0 short feed-eligible |
 | VRSN | no_hit | — | — | No activist index hits |

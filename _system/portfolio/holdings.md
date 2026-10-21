@@ -222,14 +222,14 @@ Synced from `_system/portfolio/registry.json`. Last sync: 2026-10-21.
 | D | D/ | Dominion Energy | US | 2026-10-18 | 2026-10-21 | unknown | watch |
 | DAL | DAL/ | Delta Air Lines | US | 2026-10-18 | 2026-10-21 | unknown | watch |
 | DASH | DASH/ | DoorDash | US | 2026-10-18 | 2026-10-21 | unknown | watch |
-| DB1.DE | DB1.DE/ | Deutsche Boerse AG | EU | 2026-07-09 | 2026-10-21 | unknown | watch |
+| DB1.DE | DB1.DE/ | Deutsche Boerse AG | EU | 2026-10-21 | 2026-10-21 | unknown | watch |
 | DC.A.TO | DC.A.TO/ | Dundee Corporation | CA | — | 2026-10-21 | holding_co | watch |
-| DD | DD/ | DuPont | US | 2026-07-29 | 2026-10-21 | unknown | watch |
-| DDOG | DDOG/ | Datadog | US | 2026-07-29 | 2026-10-21 | unknown | watch |
-| DE | DE/ | Deere & Company | US | 2026-07-29 | 2026-10-21 | unknown | watch |
-| DECK | DECK/ | Deckers Brands | US | 2026-07-29 | 2026-10-21 | unknown | watch |
-| DELL | DELL/ | Dell Technologies | US | 2026-07-29 | 2026-10-21 | unknown | watch |
-| DG | DG/ | Dollar General | US | 2026-07-29 | 2026-10-21 | unknown | watch |
+| DD | DD/ | DuPont | US | 2026-10-21 | 2026-10-21 | unknown | watch |
+| DDOG | DDOG/ | Datadog | US | 2026-10-21 | 2026-10-21 | unknown | watch |
+| DE | DE/ | Deere & Company | US | 2026-10-21 | 2026-10-21 | unknown | watch |
+| DECK | DECK/ | Deckers Brands | US | 2026-10-21 | 2026-10-21 | unknown | watch |
+| DELL | DELL/ | Dell Technologies | US | 2026-10-21 | 2026-10-21 | unknown | watch |
+| DG | DG/ | Dollar General | US | 2026-10-21 | 2026-10-21 | unknown | watch |
 | DGX | DGX/ | Quest Diagnostics | US | 2026-07-29 | 2026-10-21 | unknown | watch |
 | DHI | DHI/ | D. R. Horton | US | 2026-07-29 | 2026-10-21 | unknown | watch |
 | DHR | DHR/ | Danaher Corporation | US | 2026-07-09 | 2026-10-21 | compounder | hold |
