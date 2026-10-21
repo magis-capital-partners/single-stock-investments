@@ -59,7 +59,7 @@ jobs:
       - name: Financial event and publication regressions
         run: |
           python -m unittest discover -s _system/scripts/tests -p test_buyback_radar.py
-          python -m unittest discover -s _system/scripts -p test_special_situations.py
+          python -m unittest _system/scripts/test_special_situations.py
       - name: Shared UI and routing contracts
         run: node --test _system/scripts/tests/test_buyback_radar_ui.cjs
       - name: Validate published snapshot
