@@ -3,19 +3,10 @@ name: Data Pipeline
 # Single scheduled writer lane for deterministic data jobs.
 
 on:
+  # No workflow_dispatch: test_llm_workflow_governance.py bans a manual run.
+  # On-demand buyback repair stays repository_dispatch type heal-buyback-radar.
   repository_dispatch:
     types: [heal-technicals, heal-warrants, heal-separations, heal-reverse-splits, heal-buyback-radar]
-  workflow_dispatch:
-    inputs:
-      tickers:
-        description: "Optional comma-separated buyback issuers to repair"
-        required: false
-        type: string
-      refresh:
-        description: "Refetch issuer disclosures"
-        required: false
-        default: false
-        type: boolean
   # Off the hour and off :30: top-of-hour crons queue for hours on GitHub's
   # scheduler. Odd minutes keep the same cadence and the same ET windows.
   schedule:
@@ -77,7 +68,6 @@ jobs:
           set -euo pipefail
           intake_full=false; activist=false; downloads=false; drive=false; news=false; cvr_discover=false; warrant_discover=false; separation_discover=false; reverse_splits=false; buyback_radar=false; world_model=false; technicals=false; thirteen_f=false; thirteen_f_periods=2; download_mode=light
           if [ "$EVENT_NAME" = "repository_dispatch" ]; then SCHEDULE="dispatch:$EVENT_ACTION"; fi
-          if [ "$EVENT_NAME" = "workflow_dispatch" ]; then SCHEDULE="dispatch:heal-buyback-radar"; fi
           case "$SCHEDULE" in
             "dispatch:heal-buyback-radar") buyback_radar=true ;;
             "19 15 * * 2-5") buyback_radar=true ;;
@@ -1139,9 +1129,9 @@ jobs:
       - name: Refresh buyback radar from EDGAR
         timeout-minutes: 70
         env:
-          BUYBACK_TICKERS: ${{ inputs.tickers || '' }}
+          BUYBACK_TICKERS: ""
           BUYBACK_WEEKLY: ${{ github.event.schedule == '13 15 * * 1' }}
-          BUYBACK_REFRESH: ${{ inputs.refresh || false }}
+          BUYBACK_REFRESH: "false"
         run: |
           set -euo pipefail
           args=()
