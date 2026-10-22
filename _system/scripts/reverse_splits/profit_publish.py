@@ -18,12 +18,44 @@ def public_event(e,coverage,name):
             'event_status','episode_start','features','locator_basis','source_hash_basis']
     out={k:e.get(k) for k in fields}
     out['name']=e.get('name') or name or ''
+    if e.get('source_review'):out['source_review']=e['source_review']
+    if e.get('terms_review'):
+        out['terms_review']={k:v for k,v in e['terms_review'].items() if k in {'source_url','locator','evidence_known_at','source_sha256','saleable_shares','shares_before','net_proceeds','economic_state','notes','reviewer'}}
     f=e.get('financials',{})
     out['financials']={k:f.get(k) for k in ['cash','ttm_cfo','runway_years','score','period','currency','cash_pressure',
         'cash_pressure_known','status','source_url','source_sha256']}
     out['price_coverage']=coverage.get(e['id'],{})
     out['passages']=[{**r,'excerpt':r['excerpt'][:900]} for r in e.get('passages',[])[:2]]
     return out
+
+def operations(args):
+    """Public source facts and aggregate receipts only; no private trade paths."""
+    def optional(name):
+        path=args.work/name
+        return read(path) if path.exists() else {}
+    prices=optional('market_data_receipt.local.json');discovery=optional('public_discovery.local.json')
+    audit=optional('liability_audit.local.json');rows=audit.get('rows',[])
+    terms=optional('terms_import.json')
+    if isinstance(terms,dict):terms=terms.get('records',[])
+    names={e['id']:e.get('ticker') for e in read(args.work/'effective_events.local.json')}
+    forward=optional('forward_policies.json')
+    return {'schema_version':'short_profit_operations.v1','as_of':datetime.now(timezone.utc).isoformat(),
+        'source_review':optional('source_review_receipt.json'),
+        'financial_backfill':optional('financial_backfill_receipt.json'),
+        'financial_coverage':optional('financial_coverage.local.json'),
+        'market_data':{**{k:prices.get(k) for k in ['through','actual_last_day','overlay_rows','skipped_missing_invalid_rows','new_paid_downloads_usd','identity_warning','price_overlay_sha256','raw_manifest_sha256']},
+            'distinct_requested_symbols':len({s for r in prices.get('requests',[]) if r.get('status')=='downloaded' for s in r['symbols']}),
+            'successful_zero_cost_requests':sum(r.get('status')=='downloaded' for r in prices.get('requests',[])),
+            'refused_chargeable_requests':sum(r.get('status')=='refused_nonzero_or_invalid_quote' for r in prices.get('requests',[]))},
+        'universe_expansion':{k:discovery.get(k) for k in ['indexed_filings','processed_filings','remaining_filings','coverage_complete','since','scope']},
+        'obligation_audit':{'as_of':audit.get('as_of'),'scope':audit.get('scope'),'records':len(rows),
+            'primary_headers_bound':sum(bool(r.get('primary_header_bound')) for r in rows),
+            'loan_terminations_verified':sum(bool(r.get('loan_termination_verified')) for r in rows),
+            'rows':[{k:r.get(k) for k in ['event_id','ticker','cik','source_url','source_sha256','primary_header_bound','resolution_status','loan_termination_verified','obligation_retained']} for r in rows]},
+        'reconciled_financings':[{'ticker':names.get(r['event_id']),**{k:r.get(k) for k in ['event_id','source_url','locator','evidence_known_at','source_sha256','saleable_shares','shares_before','net_proceeds','economic_state','notes']}} for r in terms],
+        'forward_policies':forward,
+        'account_exports':'Excluded at user request. No historical broker exports imported.',
+        'borrow_monitor':'Public IBKR FTP, dated SQL archive and dashboard history; current indications are not historical loan approvals.'}
 
 
 def publish(args):
@@ -69,6 +101,8 @@ def publish(args):
     write(dest/'corporate-actions.json',{'schema_version':'short_profit_actions.v1','dataset_version':version,
         'rows':read(args.work/'corporate_action_repairs.json')})
     evidence=status(args.work)
+    ops=operations(args)
+    write(dest/'operations.json',ops)
     discovery_path=args.work/'public_discovery.local.json'
     discovery=read(discovery_path) if discovery_path.exists() else {}
     discovery_receipt={k:discovery.get(k) for k in ['requests','coverage_complete','new_paid_downloads_usd','since','scope']}
@@ -87,7 +121,7 @@ def publish(args):
     count=Counter(e['family'] for e in events)
     summary={'schema_version':'short_profit_program.v1','dataset_version':version,'built_at':datetime.now(timezone.utc).isoformat(),
         'research_only':True,'authority':'none','nav':10_000_000,'counts':dict(count),'issuers':len({e['issuer'] for e in events}),
-        'source_manifest':manifest,'public_discovery':discovery_receipt,'protocol':protocol,'cases':list(CASES.values()),'signals':[{'id':i,'label':l} for i,l in SIGNALS],
+        'source_manifest':manifest,'public_discovery':discovery_receipt,'operations':ops,'protocol':protocol,'cases':list(CASES.values()),'signals':[{'id':i,'label':l} for i,l in SIGNALS],
         'models':models['models'],'research_code_sha256':models['code_sha256'],'price_coverage':coverage['counts'],'corporate_actions':coverage['corporate_actions'],'evidence':evidence,
         'study_aggregates':read(args.work/'study_aggregates.json'),'parts':parts,
         'review_panel_size':len(queue),'defaults':{'signal':'financing_cash','horizon':5,'target':25000,'case':'base','sizing':'fixed','exit_policy':'time'},
@@ -125,7 +159,7 @@ def publish(args):
         'assessment':'Exploratory conditional results. Source, corporate-action and security-linkage repairs occurred during development. Not validated profitability or production authority.'})
     write(dest/'manifest.json',{'schema_version':'short_profit_manifest.v1','dataset_version':version,
         'summary_sha256':digest(dest/'summary.json'),'parts':parts,'files':[
-            {'file':n,'sha256':digest(dest/n)} for n in ['literature.json','review-queue.json','corporate-actions.json']]})
+            {'file':n,'sha256':digest(dest/n)} for n in ['literature.json','review-queue.json','corporate-actions.json','operations.json','baseline-2026-10-22.json'] if (dest/n).exists()]})
     # Copy the authored audit, not third-party full-text papers.
     report=args.source_root/'output/pdf/short_alpha_literature_audit_and_profit_plan_2026-10-21.pdf'
     if report.exists():shutil.copyfile(report,dest/'audit-2026-10-21.pdf')

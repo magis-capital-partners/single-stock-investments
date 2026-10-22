@@ -86,7 +86,15 @@ def validate(record,*,now=None):
     if kind=='review':
         if not r.get('reviewer') or r.get('outcome_blinded') is not True:raise ValueError('Review needs identity and outcome blinding')
         for k in ['identity','clock','economic_state','cash_and_shares','saleability']:
-            if r.get('checks',{}).get(k) not in {'pass','fail','unresolved'}:raise ValueError('Incomplete review checks')
+            value=r.get('checks',{}).get(k)
+            if value=='not_applicable' and k in {'cash_and_shares','saleability'} and r.get('event_family') in {'split','deficiency'}:continue
+            if value not in {'pass','fail','unresolved'}:raise ValueError('Incomplete review checks')
+        corrections=r.get('corrections',{})
+        if set(corrections)-{'known_at','ticker','event_status','features'}:raise ValueError('Unsupported source correction')
+        if corrections.get('known_at') and corrections['known_at']!=r.get('primary_known_at'):raise ValueError('Corrected clock needs bound primary timestamp')
+        if corrections.get('features'):
+            from .profit_data import validate_event
+            validate_event({'features':corrections['features'],'source_url':r['source_url'],'source_locator':r['locator'],'known_at':r['known_at']})
     return r
 
 
@@ -147,6 +155,7 @@ def status(work):
             f=by_hash[r['forecast_sha256']]
             calibration.append({'event_id':f['event_id'],'forecast':f.get('expected_net_dollars'),'net_dollars':r['net_dollars']})
     reviews=[r for r in records if r['kind']=='review']
+    latest_reviews={r['event_id']:r for r in reviews}
     fills=[r for r in records if r['kind']=='fill']
     quotes=[r for r in records if r['kind']=='quote']
     costs=[]
@@ -163,7 +172,8 @@ def status(work):
         'frozen_abstentions':sum(r['record']['status']=='abstain' for r in forecasts),
         'evaluated_forecasts':len(calibration),'forward_net_dollars':sum(r['net_dollars'] for r in calibration),
         'source_reviews':len({r['event_id'] for r in reviews}),
-        'review_passes':sum(all(x=='pass' for x in r['checks'].values()) for r in reviews),
+        'review_passes':sum(all(x in {'pass','not_applicable'} for x in r['checks'].values()) for r in latest_reviews.values()),
+        'independent_second_reviews':sum(r.get('review_stage')=='independent_second_pass' for r in reviews),
         'observed_fills':len(fills),'nbbo_matched_fills':len(costs),
         'entry_shortfall':distribution([r['implementation_shortfall'] for r in costs if r['phase']=='entry']),
         'cover_shortfall':distribution([r['implementation_shortfall'] for r in costs if r['phase']=='cover']),

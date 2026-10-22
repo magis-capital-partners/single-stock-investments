@@ -303,7 +303,7 @@ def attach_financials(events, root, work):
             event['financials'] = saved[ck]
             coverage['events_with_financial_file'] += 1
             if saved[ck]['cash_pressure_known']: coverage['events_with_runway'] += 1
-        if coverage['events_with_financial_file'] % 100 < len(group):
+        if coverage['events_with_financial_file'] % 1000 < len(group):
             write(cache, saved)
             print('Dated financial features', coverage['events_with_financial_file'], flush=True)
     write(cache, saved)
@@ -363,7 +363,22 @@ def materialize_events(work,root):
                 'passages':parsed['passages'],'captured_at':r['captured_at']})
             ids.add(identity)
     records=[r['record'] for r in load(work)]
+    index={e['id']:e for e in events}
+    for review in records:
+        if review['kind']!='review':continue
+        e=index.get(review['event_id'])
+        if not e:raise ValueError('Source review references unknown event')
+        for field,value in review.get('corrections',{}).items():
+            if field=='features':e['features'].update(value)
+            else:e[field]=value
+        if review.get('corrections',{}).get('known_at'):e['clock_basis']='reviewed_bound_SEC_acceptance'
+        e['review_status']='agent_first_source_review' if review.get('review_stage')=='first_pass' else 'source_reviewed'
+        e['source_review']={k:review.get(k) for k in ['reviewer','review_stage','checks','notes','source_url','locator','source_sha256']}
     apply_terms_reviews(events,[r for r in records if r['kind']=='terms'])
+    # Refilter facts when a source correction changes the public clock.
+    if records:
+        financial_coverage=attach_financials(events,root,work)
+        write(work/'financial_coverage.local.json',financial_coverage)
     events.sort(key=lambda e:(datetime.fromisoformat(e['known_at']).timestamp() if e.get('known_at') else float('inf'),e['id']))
     seen_states=set()
     for e in events:
@@ -372,7 +387,14 @@ def materialize_events(work,root):
         e['features']['first_state_disclosure']=state not in seen_states
         seen_states.add(state)
     write(work/'effective_events.local.json',events)
-    write(work/'review_queue.json',audit_queue(events))
+    queue_path=work/'review_queue.json'
+    queue=read(queue_path) if queue_path.exists() else audit_queue(events)
+    for row in queue:
+        e=index.get(row['event_id'])
+        if e and e.get('source_review'):
+            row.update(status=e['review_status'],review=e['source_review'],ticker=e.get('ticker'),date=e['event_date'],
+                source_url=e['source_review']['source_url'],locator=e['source_review']['locator'],terms_reconciled=bool(e.get('terms_review')))
+    write(queue_path,queue)
     return events
 
 

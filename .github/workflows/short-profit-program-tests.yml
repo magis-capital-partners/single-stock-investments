@@ -2,9 +2,9 @@ name: Short strategy lab
 on:
   push:
     branches: [main]
-    paths: ['_system/scripts/reverse_splits/profit_*.py', '_system/scripts/short_profit_program.py', '_system/scripts/tests/reverse_splits/test_profit_program.py', '_system/scripts/tests/test_short_profit_program.cjs', 'dashboard/short-profit-program*', 'dashboard/data/short_profit_program/**', '.github/workflows/short-profit-program-tests.yml']
+    paths: ['_system/scripts/reverse_splits/profit_*.py', '_system/scripts/short_profit_program.py', '_system/scripts/tests/reverse_splits/test_profit_*.py', '_system/scripts/tests/test_short_profit_program.cjs', 'dashboard/short-profit-program*', 'dashboard/data/short_profit_program/**', '.github/workflows/short-profit-program-tests.yml']
   pull_request:
-    paths: ['_system/scripts/reverse_splits/profit_*.py', '_system/scripts/short_profit_program.py', '_system/scripts/tests/reverse_splits/test_profit_program.py', '_system/scripts/tests/test_short_profit_program.cjs', 'dashboard/short-profit-program*', 'dashboard/data/short_profit_program/**', '.github/workflows/short-profit-program-tests.yml']
+    paths: ['_system/scripts/reverse_splits/profit_*.py', '_system/scripts/short_profit_program.py', '_system/scripts/tests/reverse_splits/test_profit_*.py', '_system/scripts/tests/test_short_profit_program.cjs', 'dashboard/short-profit-program*', 'dashboard/data/short_profit_program/**', '.github/workflows/short-profit-program-tests.yml']
 permissions:
   contents: read
 jobs:
@@ -16,7 +16,9 @@ jobs:
         with:
           sparse-checkout: |
             _system/scripts/reverse_splits/
-            _system/scripts/tests/reverse_splits/test_profit_program.py
+            _system/scripts/tests/reverse_splits/test_profit*.py
+            _system/scripts/refresh_short_alpha_borrow.py
+            _system/data/reverse_splits/config.toml
             _system/scripts/tests/test_short_profit_program.cjs
             _system/scripts/short_profit_program.py
             _system/scripts/short_patient_execution.py
@@ -32,7 +34,7 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: '24'
-      - run: python -m pip install pytest numpy
-      - run: python -m pytest _system/scripts/tests/reverse_splits/test_profit_program.py -q
+      - run: python -m pip install pytest numpy requests exchange-calendars==4.13.2
+      - run: python -m pytest _system/scripts/tests/reverse_splits/test_profit_program.py _system/scripts/tests/reverse_splits/test_profit_borrow.py _system/scripts/tests/reverse_splits/test_profit_operations.py -q
       - run: node --check dashboard/short-profit-program.js
       - run: node --test _system/scripts/tests/test_short_profit_program.cjs
