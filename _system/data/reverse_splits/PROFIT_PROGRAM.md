@@ -143,3 +143,8 @@ Monte Carlo resamples 63-session calendar blocks of the complete marked portfoli
 preserving within-block overlap/cost dependence. It cannot validate assumed fills
 or represent unobserved tails. Residual-liability and squeeze stresses remain
 separate, without attaching invented probabilities.
+
+The committed 22 October snapshot uses daily prices through 13 October 2026.
+Newer SEC discoveries remain visible but cannot enter a priced replay without
+coverage. The build date is not the market-data date. Case labels describe joint
+assumptions, not confidence bounds: changed fills can reverse return ordering.
