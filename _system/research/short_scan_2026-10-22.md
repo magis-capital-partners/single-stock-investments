@@ -772,7 +772,7 @@
 | TRV | indexed | L1/S0 | 2025-05-19 | 1 long, 0 short indexed; 0 short feed-eligible |
 | TSCO | no_hit | — | — | No activist index hits |
 | TSEM | no_hit | — | — | No activist index hits |
-| TSLA | indexed | L10/S0 | 2025-11-05 | 10 long, 0 short indexed; 0 short feed-eligible |
+| TSLA | indexed | L11/S0 | 2026-10-19 | 11 long, 0 short indexed; 0 short feed-eligible |
 | TSM | no_hit | — | — | No activist index hits |
 | TSN | indexed | L11/S0 | 2026-02-13 | 11 long, 0 short indexed; 0 short feed-eligible |
 | TSUI | no_hit | — | — | No activist index hits |

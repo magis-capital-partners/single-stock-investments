@@ -228,36 +228,88 @@
       default: return true;
     }
   }
-  function mountCoverageControls(hooks) {
-    if (document.getElementById('buyback-coverage-controls')) return;
-    var search = document.getElementById('search');
-    if (!search) return;
-    var saved = coverageState(), el = document.createElement('div'); el.id = 'buyback-coverage-controls'; el.className = 'bb-controls';
+  var SCREEN_SORTS = [['net_reduction_1y','Net reduction · 1Y'],['net_reduction_3y','Net reduction · 3Y'],['gross_cash_ratio','Buyback cash'],['net_cash_ratio','Net cash ratio'],['retirement_efficiency','Retirement efficiency'],['remaining_authorization_ratio','Remaining capacity'],['pace','Execution pace'],['quality','Evidence eligibility']];
+  function screenSortKey() {
+    var saved = coverageState();
+    return saved.sort || 'net_reduction_1y';
+  }
+  function screenRows() {
+    var saved = coverageState();
+    var rows = ((state.snapshot && state.snapshot.companies && state.snapshot.companies.companies) || []).map(function(row) {
+      return { ticker: row.ticker, company: row.company, buyback: row };
+    }).filter(function(row) { return matches(row, saved.filter); });
+    var key = screenSortKey();
+    rows.sort(function(a, b) { return compareRows(a, b, key, false); });
+    return rows;
+  }
+  function paintScreenTable(table) {
+    var rows = screenRows();
+    var total = ((state.snapshot && state.snapshot.companies && state.snapshot.companies.companies) || []).length;
+    var body = rows.map(function(row) {
+      var record = row.buyback;
+      var net = metric(record, 'net_reduction_1y');
+      var spent = metric(record, 'gross_cash_ratio');
+      return '<tr><td>' + tickerLink(row.ticker) + '</td><td>' + esc(row.company) + '</td><td>' + status(record) + '</td><td>' + esc(net.value == null ? label(net.reason) : pct(net.value)) + '</td><td>' + esc(pct(metric(record, 'net_reduction_3y').value)) + '</td><td>' + esc(label(record.pace || 'unavailable')) + '</td><td>' + esc(spent.value == null ? '—' : pct(spent.value)) + '</td><td>' + esc(record.shares_end || '—') + '</td></tr>';
+    }).join('');
+    table.innerHTML = '<p class="bb-muted">Showing ' + rows.length + ' of ' + total + ' issuers.</p>' +
+      (rows.length ? '<div class="bb-scroll"><table><thead><tr><th>Ticker</th><th>Company</th><th>Data</th><th>Net reduction · 1Y</th><th>Net reduction · 3Y</th><th>Pace</th><th>Buyback cash</th><th>Shares as of</th></tr></thead><tbody>' + body + '</tbody></table></div>' : '<p>No issuers match this screen.</p>');
+  }
+  function mountScreen(host) {
+    if (!host) return;
+    var saved = coverageState();
+    var sortKey = screenSortKey();
+    if (!saved.sort) { saved.sort = sortKey; write(FILTER_KEY, saved); }
+    var el = document.createElement('div');
+    el.id = 'buyback-screen-controls';
+    el.className = 'bb-controls';
     el.innerHTML = '<label>Buyback screen <select data-bb-filter aria-label="Buyback screen">' + [['all','All companies'],['verified','Verified share reducers'],['accelerating','Accelerating'],['offset','Dilution offsets repurchases'],['events','Active events'],['review','Data requires review']].map(function(o) { return '<option value="' + o[0] + '"' + (saved.filter === o[0] ? ' selected' : '') + '>' + o[1] + '</option>'; }).join('') +
-      '</select></label><label>Buyback sort <select data-bb-sort aria-label="Buyback sort"><option value=""'+(!saved.activeSort ? ' selected' : '')+'>Choose buyback sort</option>' + [['net_reduction_1y','Net reduction · 1Y'],['net_reduction_3y','Net reduction · 3Y'],['gross_cash_ratio','Gross cash ratio'],['net_cash_ratio','Net cash ratio'],['retirement_efficiency','Retirement efficiency'],['remaining_authorization_ratio','Remaining capacity'],['pace','Execution pace'],['quality','Evidence eligibility']].map(function(o) { return '<option value="' + o[0] + '"' + (saved.activeSort && saved.sort === o[0] ? ' selected' : '') + '>' + o[1] + '</option>'; }).join('') + '</select></label>' +
+      '</select></label><label>Buyback sort <select data-bb-sort aria-label="Buyback sort">' + SCREEN_SORTS.map(function(o) { return '<option value="' + o[0] + '"' + (sortKey === o[0] ? ' selected' : '') + '>' + o[1] + '</option>'; }).join('') + '</select></label>' +
       '<small>' + esc(state.error || (state.snapshot ? state.snapshot.manifest.counts.verified + ' verified issuers · snapshot ' + state.snapshot.manifest.as_of : 'Awaiting verified data')) + '</small>';
-    var screenKey='ssi-buyback-saved-screens-v2',screens=read(screenKey,{});
-    el.innerHTML+='<label>Saved buyback screen<select data-bb-saved><option value="">Choose a saved screen</option>'+Object.keys(screens).sort().map(function(name){return '<option value="'+esc(name)+'">'+esc(name)+'</option>';}).join('')+'</select></label><label>Screen name<input data-bb-screen-name maxlength="60" aria-label="Buyback screen name"></label><button type="button" data-bb-screen-save>Save screen</button><button type="button" data-bb-screen-delete>Delete selected screen</button><small data-bb-screen-message aria-live="polite"></small>';
-    el.innerHTML+=changeDigest();
-    search.parentElement.insertAdjacentElement('afterend',el);
-    el.querySelector('[data-bb-filter]').addEventListener('change',function(e) { saved.filter = e.target.value; write(FILTER_KEY,saved); hooks.onFilter(); });
-    el.querySelector('[data-bb-sort]').addEventListener('change',function(e) { if(!e.target.value)return;saved.sort = e.target.value;saved.activeSort=true; write(FILTER_KEY,saved); hooks.onSort(e.target.value); });
-    el.querySelector('[data-bb-screen-save]').addEventListener('click',function(){
-      var input=el.querySelector('[data-bb-screen-name]'),name=input.value.trim();if(!name){input.focus();return;}
-      screens[name]=Object.assign({},saved);var ok=write(screenKey,screens);
-      var select=el.querySelector('[data-bb-saved]');select.innerHTML='<option value="">Choose a saved screen</option>'+Object.keys(screens).sort().map(function(n){return '<option value="'+esc(n)+'">'+esc(n)+'</option>';}).join('');
-      select.value=name;el.querySelector('[data-bb-screen-message]').textContent=ok ? 'Buyback filter and sort saved on this browser.' : 'Browser storage is unavailable.';
+    var screenKey = 'ssi-buyback-saved-screens-v2', screens = read(screenKey, {});
+    el.innerHTML += '<label>Saved buyback screen<select data-bb-saved><option value="">Choose a saved screen</option>' + Object.keys(screens).sort().map(function(name) { return '<option value="' + esc(name) + '">' + esc(name) + '</option>'; }).join('') + '</select></label><label>Screen name<input data-bb-screen-name maxlength="60" aria-label="Buyback screen name"></label><button type="button" data-bb-screen-save>Save screen</button><button type="button" data-bb-screen-delete disabled>Delete selected screen</button><small data-bb-screen-message aria-live="polite"></small>';
+    el.innerHTML += changeDigest();
+    var table = document.createElement('div');
+    table.className = 'bb-panel';
+    host.replaceChildren(el, table);
+    function refreshSaved(selectedName) {
+      var select = el.querySelector('[data-bb-saved]');
+      select.innerHTML = '<option value="">Choose a saved screen</option>' + Object.keys(screens).sort().map(function(name) { return '<option value="' + esc(name) + '">' + esc(name) + '</option>'; }).join('');
+      select.value = selectedName || '';
+      el.querySelector('[data-bb-screen-delete]').disabled = !select.value;
+    }
+    function applyScreen() {
+      el.querySelector('[data-bb-filter]').value = saved.filter || 'all';
+      el.querySelector('[data-bb-sort]').value = screenSortKey();
+      paintScreenTable(table);
+    }
+    el.querySelector('[data-bb-filter]').addEventListener('change', function(e) { saved.filter = e.target.value; write(FILTER_KEY, saved); applyScreen(); });
+    el.querySelector('[data-bb-sort]').addEventListener('change', function(e) { saved.sort = e.target.value; saved.activeSort = true; write(FILTER_KEY, saved); paintScreenTable(table); });
+    el.querySelector('[data-bb-screen-save]').addEventListener('click', function() {
+      var input = el.querySelector('[data-bb-screen-name]'), name = input.value.trim();
+      if (!name) { input.focus(); return; }
+      saved.sort = screenSortKey();
+      saved.activeSort = true;
+      screens[name] = Object.assign({}, saved);
+      var ok = write(screenKey, screens);
+      refreshSaved(name);
+      el.querySelector('[data-bb-screen-message]').textContent = ok ? 'Buyback filter and sort saved on this browser.' : 'Browser storage is unavailable.';
     });
-    el.querySelector('[data-bb-saved]').addEventListener('change',function(e){
-      if(!screens[e.target.value])return;saved=Object.assign({},screens[e.target.value]);write(FILTER_KEY,saved);
-      el.querySelector('[data-bb-filter]').value=saved.filter;el.querySelector('[data-bb-sort]').value=saved.activeSort ? saved.sort : '';
-      if(saved.activeSort)hooks.onSort(saved.sort);else hooks.onFilter();
+    el.querySelector('[data-bb-saved]').addEventListener('change', function(e) {
+      el.querySelector('[data-bb-screen-delete]').disabled = !e.target.value;
+      if (!screens[e.target.value]) return;
+      saved = Object.assign({}, screens[e.target.value]);
+      write(FILTER_KEY, saved);
+      applyScreen();
     });
-    el.querySelector('[data-bb-screen-delete]').addEventListener('click',function(){
-      var select=el.querySelector('[data-bb-saved]'),name=select.value;if(!name)return;delete screens[name];write(screenKey,screens);select.querySelector('option:checked')?.remove();
-      el.querySelector('[data-bb-screen-message]').textContent='Saved screen deleted.';
+    el.querySelector('[data-bb-screen-delete]').addEventListener('click', function() {
+      var select = el.querySelector('[data-bb-saved]'), name = select.value;
+      if (!name) return;
+      delete screens[name];
+      write(screenKey, screens);
+      refreshSaved('');
+      el.querySelector('[data-bb-screen-message]').textContent = 'Saved screen deleted.';
     });
-    if(saved.activeSort)hooks.onSort(saved.sort);
+    paintScreenTable(table);
   }
   function eventRow(e) {
     return {id:e.id,lane:'buyback_events',lanes:['buyback_events'],book:e.book,ticker:e.ticker,company:e.company,what:e.what,
@@ -312,7 +364,7 @@
     var summary=state.snapshot && state.snapshot.summary;
     if(!summary)return '';
     var rows=(summary.changes || []).map(function(c){return '<li>'+tickerLink(c.ticker)+' / '+esc(label(c.kind))+' / '+esc(c.reason)+'</li>';});
-    return '<details class="bb-panel"><summary>Snapshot changes / '+(summary.changes_count || 0)+'</summary><ul>'+rows.join('')+'</ul>'+(summary.changes_count>rows.length ? '<small>Showing the first '+rows.length+' changes.</small>' : '')+'</details>';
+    return '<details class="bb-panel bb-changes"><summary>Snapshot changes / '+(summary.changes_count || 0)+'</summary><ul>'+rows.join('')+'</ul>'+(summary.changes_count>rows.length ? '<small>Showing the first '+rows.length+' changes.</small>' : '')+'</details>';
   }
   function researchNote(b) {
     var records=read('ssi-buyback-research-outcomes-v2',[]).filter(function(r){return r.issuer_id===b.issuer_id;});
@@ -333,5 +385,5 @@
   }
 
   function projectShorts(doc) { return Object.assign({},doc,{buyback_issuance_signals:state.snapshot && !snapshotExpired() ? state.snapshot.companies.issuance_signals || [] : [],buyback_snapshot:state.snapshot && state.snapshot.manifest,buyback_error:state.error}); }
-  global.BuybackViz = {load:load,company:company,renderHoldingsCell:renderHoldingsCell,renderDetail:renderDetail,renderEventDetails:renderEventDetails,projectSituations:projectSituations,projectShorts:projectShorts,renderSignals:renderSignals,attachSignals:attachSignals,mountCoverageControls:mountCoverageControls,matches:matches,compareRows:compareRows,metric:metric,hydrateAll:hydrateAll,attachScenarios:attachScenarios,tenderScenario:tenderScenario,epsScenario:epsScenario};
+  global.BuybackViz = {load:load,company:company,renderHoldingsCell:renderHoldingsCell,renderDetail:renderDetail,renderEventDetails:renderEventDetails,projectSituations:projectSituations,projectShorts:projectShorts,renderSignals:renderSignals,attachSignals:attachSignals,mountScreen:mountScreen,matches:matches,compareRows:compareRows,metric:metric,hydrateAll:hydrateAll,attachScenarios:attachScenarios,tenderScenario:tenderScenario,epsScenario:epsScenario};
 })(window);
