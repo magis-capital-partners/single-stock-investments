@@ -521,6 +521,17 @@
       <p class="muted">Each row is an action or candidate, not necessarily an independent company or a feasible short.</p></details>`;
   }
   function attach(container,doc) {
+    if(container.querySelector('[data-short-profit-program]')){
+      if(global.ShortProfitProgram)global.ShortProfitProgram.attach(container);
+      const legacy=container.querySelector('[data-spp-legacy]');
+      if(legacy&&!legacy.dataset.listener){
+        legacy.dataset.listener='true';
+        legacy.addEventListener('toggle',()=>{
+          if(legacy.open&&!legacy.dataset.mounted){legacy.dataset.mounted='true';attach(legacy,doc);}
+        });
+      }
+      return;
+    }
     if(global.ShortSleeveViz)global.ShortSleeveViz.attach(container);
     const panel=container.querySelector('[data-rs-universe]');
     if (!panel) return;
@@ -598,7 +609,7 @@
     }
     if(doc.portfolio_research && global.ReverseSplitsPortfolioViz){
       if(global.ShortSleeveViz && !opts.legacyResearch){
-        return `${STYLE}<div class="rs-panel">${global.ShortSleeveViz.render()}<details class="rsp-fold"><summary>Strategy research and event registry<small>Original strategy versions, execution studies, forward evidence and source records</small></summary>${render(doc,{...opts,legacyResearch:true})}</details></div>`;
+        return `${STYLE}<div class="rs-panel">${global.ShortProfitProgram?global.ShortProfitProgram.render():''}<details class="rsp-fold" data-spp-legacy><summary>Earlier reverse-split portfolio and execution studies<small>Preserved comparisons; different rules and cost assumptions</small></summary>${global.ShortSleeveViz.render()}<details class="rsp-fold"><summary>Strategy research and event registry<small>Original strategy versions, execution studies, forward evidence and source records</small></summary>${render(doc,{...opts,legacyResearch:true})}</details></details></div>`;
       }
       const completed=doc.forward_status?.validation?.completed?.events;
       return `${STYLE}<div class="rs-panel" data-schema="${esc(doc.schema_version || '')}">

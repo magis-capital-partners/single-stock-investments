@@ -644,6 +644,9 @@ def main(argv: list[str] | None = None) -> int:
     target = args.out or DASHBOARD_PATH
     write_json(target, payload)
     import shutil
+    profit_source = (args.ledger_dir or DATA_DIR) / "profit_program"
+    if (profit_source / "manifest.json").exists():
+        shutil.copytree(profit_source, target.parent / "short_profit_program", dirs_exist_ok=True)
     audit_source = (args.ledger_dir or DATA_DIR) / "net_edge_audits_v3"
     if audit_source.exists():
         shutil.copytree(audit_source, target.parent / "net_edge_audits_v3", dirs_exist_ok=True)

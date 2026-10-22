@@ -1,0 +1,38 @@
+name: Short strategy lab
+on:
+  push:
+    branches: [main]
+    paths: ['_system/scripts/reverse_splits/profit_*.py', '_system/scripts/short_profit_program.py', '_system/scripts/tests/reverse_splits/test_profit_program.py', '_system/scripts/tests/test_short_profit_program.cjs', 'dashboard/short-profit-program*', 'dashboard/data/short_profit_program/**', '.github/workflows/short-profit-program-tests.yml']
+  pull_request:
+    paths: ['_system/scripts/reverse_splits/profit_*.py', '_system/scripts/short_profit_program.py', '_system/scripts/tests/reverse_splits/test_profit_program.py', '_system/scripts/tests/test_short_profit_program.cjs', 'dashboard/short-profit-program*', 'dashboard/data/short_profit_program/**', '.github/workflows/short-profit-program-tests.yml']
+permissions:
+  contents: read
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          sparse-checkout: |
+            _system/scripts/reverse_splits/
+            _system/scripts/tests/reverse_splits/test_profit_program.py
+            _system/scripts/tests/test_short_profit_program.cjs
+            _system/scripts/short_profit_program.py
+            _system/scripts/short_patient_execution.py
+            dashboard/short-profit-program.js
+            dashboard/short-profit-program.css
+            dashboard/reverse-splits-viz.js
+            dashboard/index.html
+            dashboard/data/short_profit_program/
+          sparse-checkout-cone-mode: false
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+      - run: python -m pip install pytest numpy
+      - run: python -m pytest _system/scripts/tests/reverse_splits/test_profit_program.py -q
+      - run: node --check dashboard/short-profit-program.js
+      - run: node --test _system/scripts/tests/test_short_profit_program.cjs

@@ -1,5 +1,16 @@
 # Reverse-split research data
 
+### Strategy lab and expanded event dataset on 22 October 2026
+
+The [short alpha strategy lab](PROFIT_PROGRAM.md) joins financing discoveries,
+listing deficiencies and reverse splits with source links, availability clocks
+and as-filed financial features. The dashboard retains all 420 declared daily
+holding/cost/sizing/exit comparisons, funding estimates, conditional Monte Carlo
+and source-study return distributions. A separate replay repairs the older
+patient model's unsupported covers as persistent short obligations. Extracted
+contexts and conditional fills are not verified financing terms or broker fills;
+source review, observed execution and prospective validation remain explicit gates.
+
 ### Patient entries, SSR and $25k–$50k targets on 20 October 2026
 
 The [patient execution sensitivity](patient_execution_2026-10-20.md) now tests all
