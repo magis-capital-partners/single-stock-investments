@@ -18,7 +18,7 @@
 <link href="short-profit-program.css?v=20261022-program-v1" rel="stylesheet">
 <link href="warrants.css" rel="stylesheet">
 <link href="portfolio.css?v=20261008-michael-tail" rel="stylesheet">
-<link href="buyback.css?v=20261020-v2" rel="stylesheet">
+<link href="buyback.css?v=20261022-screen" rel="stylesheet">
 <link href="ideas.css?v=20261011-separations" rel="stylesheet">
 <link href="energy-model.css?v=20261015-energy" rel="stylesheet">
 <style>
@@ -2001,7 +2001,7 @@
 <script src="reverse-splits-viz.js?v=20261022-profit-program"></script>
 <script src="warrant-viz.js"></script>
 <script src="special-situations-viz.js?v=20261018-buyback"></script>
-<script src="buyback-viz.js?v=20261020-v2"></script>
+<script src="buyback-viz.js?v=20261022-screen"></script>
 <script src="separations-viz.js?v=20261011-separations"></script>
 <script src="desk-briefs-viz.js?v=20261012-desk-briefs"></script>
 <script src="sleeve-viz.js?v=20261008-michael-tail"></script>
@@ -2298,7 +2298,7 @@ const MEMORY_VIEW_KEY = 'ssp_memory_view_v1';
 const MEMORY_TYPE_KEY = 'ssp_memory_type_v1';
 const BIOTECH_SCOPE_KEY = 'ssp_biotech_scope_v1';
 const WATCHLIST_VIEW_KEY = 'ssp_watchlist_view_v1';
-const WATCHLIST_VIEWS = new Set(['all', 'queue', 'nol', 'banks', 'rock']);
+const WATCHLIST_VIEWS = new Set(['all', 'queue', 'nol', 'banks', 'rock', 'buybacks']);
 const SITUATION_LANE_IDS = {
   spinoffs: 'spinoffs',
   'split-offs': 'split_offs',
@@ -2412,7 +2412,7 @@ function parseRouteFromHashString(hash) {
   }
   const shortBacktestMatch = /^#\/ideas\/short-alpha\/backtest$/i.test(hash || '');
   if (shortBacktestMatch) return { view:'short-alpha', shortAlphaSection:'backtest', ticker:null, watchlistSub:null };
-  const ideasMatch = /^#\/ideas\/(all|queue|nol|banks|rock|short-alpha)$/i.exec(hash || '');
+  const ideasMatch = /^#\/ideas\/(all|queue|nol|banks|rock|buybacks|short-alpha)$/i.exec(hash || '');
   if (ideasMatch) {
     const sub = ideasMatch[1].toLowerCase();
     return { view: sub === 'short-alpha' || sub === 'warrants' ? sub : 'watchlist', ticker: null, watchlistSub: sub };
@@ -2435,7 +2435,7 @@ function parseRouteFromHashString(hash) {
       watchlistSub: null,
     };
   }
-  const watchlistMatch = /^#\/watchlist(?:\/(queue|nol|banks|rock))?$/i.exec(hash || '');
+  const watchlistMatch = /^#\/watchlist(?:\/(queue|nol|banks|rock|buybacks))?$/i.exec(hash || '');
   if (watchlistMatch) {
     return {
       view: 'watchlist',
@@ -3929,7 +3929,7 @@ function setView(view, opts = {}) {
   });
   document.querySelectorAll('.workspace-subnav').forEach((nav) => { nav.hidden = nav.id !== `${parentView}-subnav`; });
   document.querySelectorAll('.workspace-subnav .view-tab').forEach((link) => {
-    const ideasGroupMatch = link.dataset.ideasGroup === 'screens' && view === 'watchlist' && ['nol', 'banks'].includes(watchlistViewMode);
+    const ideasGroupMatch = link.dataset.ideasGroup === 'screens' && view === 'watchlist' && ['nol', 'banks', 'rock', 'buybacks'].includes(watchlistViewMode);
     const active = ideasGroupMatch || (link.dataset.view === view && (!link.dataset.watchlistRoute || link.dataset.watchlistRoute === watchlistViewMode));
     link.classList.toggle('active', active);
     if (active) link.setAttribute('aria-current', 'page'); else link.removeAttribute('aria-current');
@@ -4805,6 +4805,7 @@ function renderWatchlistSubNav(active) {
     <button type="button" class="${active === 'nol' ? 'active' : ''}" data-watchlist-view="nol">NOL carryforwards · ${nolCount}</button>
     <button type="button" class="${active === 'banks' ? 'active' : ''}" data-watchlist-view="banks">Advantaged banks · ${bankCount}</button>
     <button type="button" class="${active === 'rock' ? 'active' : ''}" data-watchlist-view="rock">Aggregates · ${rockCount}</button>
+    <button type="button" class="${active === 'buybacks' ? 'active' : ''}" data-watchlist-view="buybacks">Buybacks</button>
   </div>`;
 }
 
@@ -5154,6 +5155,14 @@ function renderWatchlistRockBody() {
     </div>`;
 }
 
+function renderWatchlistBuybacksBody() {
+  return `<div class="watchlist-section">
+    <h3>Buybacks</h3>
+    <p class="form-hint">Share counts from the latest verified SEC snapshot. These filters apply only here. Research coverage still shows a buyback column, and it is not filtered by this screen.</p>
+    <div data-buyback-screen></div>
+  </div>`;
+}
+
 function renderWatchlistTab() {
   const loading = document.getElementById('watchlist-loading');
   const content = document.getElementById('watchlist-content');
@@ -5179,6 +5188,7 @@ function renderWatchlistTab() {
   if (watchlistViewMode === 'all') body = renderIdeasIndexBody();
   else if (watchlistViewMode === 'banks') body = renderWatchlistBanksBody();
   else if (watchlistViewMode === 'rock') body = renderWatchlistRockBody();
+  else if (watchlistViewMode === 'buybacks') body = renderWatchlistBuybacksBody();
   else body = renderWatchlistNolBody();
 
   content.innerHTML = watchlistViewMode === 'all' ? body : `<div class="ideas-shell"><header class="ideas-header"><div><h2>Research Screens</h2><p>Specialized screens share one decision grammar: actionable rows first, blockers explicit, methodology collapsed.</p></div><span class="ideas-asof">As of ${escapeHtml(window.DashboardFormat.date(data.generated_at || data.generatedAt))}</span></header>${renderWatchlistSubNav(watchlistViewMode)}${body}</div>`;
@@ -5186,6 +5196,13 @@ function renderWatchlistTab() {
   content.querySelectorAll('[data-watchlist-view]').forEach(btn => {
     btn.addEventListener('click', () => setWatchlistView(btn.dataset.watchlistView));
   });
+  if (watchlistViewMode === 'buybacks' && window.BuybackViz) {
+    BuybackViz.load().then(() => {
+      if (watchlistViewMode !== 'buybacks') return;
+      const live = document.getElementById('watchlist-content')?.querySelector('[data-buyback-screen]');
+      if (live) BuybackViz.mountScreen(live);
+    });
+  }
   content.querySelectorAll('[data-idea-filter]').forEach((button) => button.addEventListener('click', () => {
     ideaFilter = button.dataset.ideaFilter;
     setIdeaUrlState({ ideaFilter });
@@ -5453,7 +5470,6 @@ function renderSummary() {
 function filtered() {
   const q = document.getElementById('search').value.toLowerCase();
   return data.tickers.filter(t => {
-    if (window.BuybackViz && !BuybackViz.matches(t)) return false;
     if (marketFilter !== 'ALL' && t.market !== marketFilter) return false;
     if (sleeveFilter !== 'ALL') {
       const sid = t.classification?.investment_sleeve;
@@ -5834,10 +5850,6 @@ function renderFundNavPanel(t) {
 }
 
 function renderTable() {
-  if (window.BuybackViz) BuybackViz.mountCoverageControls({
-    onFilter: renderTable,
-    onSort: key => { sortKey = 'buyback.' + key; sortAsc = false; renderTable(); },
-  });
   const rows = filtered();
   const cols = visibleHoldingsColumns();
   renderHoldingsThead();
