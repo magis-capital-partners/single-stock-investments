@@ -4,6 +4,12 @@ on:
   schedule:
     # Before the US open in both Eastern standard and daylight time.
     - cron: "0 13 * * 1-5"
+    - cron: "5 15,17,19,21 * * 1-5"
+  push:
+    branches: [main]
+    paths:
+      - '_system/scripts/reverse_splits/profit_borrow.py'
+      - '.github/workflows/reverse-split-borrow-history.yml'
 permissions:
   contents: write
 concurrency:
@@ -36,31 +42,109 @@ jobs:
             /dashboard/data/shorts_clean_data_changes.json
             /dashboard/data/shorts_clean_data_queue/
             /dashboard/data/free_short_packets/
+            /dashboard/data/short_profit_program/
+            /dashboard/data/short_borrow/
+            /dashboard/data/short_forward/
+            /dashboard/cloudflare/
+            /.github/actions/deploy-cloudflare-dashboard/
           sparse-checkout-cone-mode: false
       - uses: actions/setup-python@v5
         with:
           python-version: "3.12"
       - name: Install public disclosure collectors and exchange calendar
         run: pip install requests yfinance beautifulsoup4 lxml exchange-calendars==4.13.2
+      - name: Restore recent public vintages for idempotent ephemeral runners
+        if: always()
+        run: |
+          python -m _system.scripts.reverse_splits.profit_borrow sql --since "$(date -u -d '7 days ago' +%F)" --output _system/data/reverse_splits/local/borrow_monitor/bootstrap.sql
+          python - <<'PY'
+          import sqlite3
+          from pathlib import Path
+          base=Path('_system/data/reverse_splits/local/borrow_monitor')
+          with sqlite3.connect(base/'borrow.sqlite') as db:
+              db.executescript((base/'bootstrap.sql').read_text(encoding='utf-8'))
+          PY
+      - name: Archive timestamped public availability and fee indications
+        if: always()
+        run: python -m _system.scripts.reverse_splits.profit_borrow collect --legacy-archive
+      - name: Register new opportunities against immutable research rules
+        if: always() && github.event_name == 'schedule'
+        env:
+          SCHEDULE: ${{ github.event.schedule }}
+        run: |
+          LIMIT=80
+          if [ "$SCHEDULE" = '0 13 * * 1-5' ]; then LIMIT=250; fi
+          python -m _system.scripts.reverse_splits.profit_refresh monitor --max-requests "$LIMIT"
       - name: Rebuild the ledger and discover recent public disclosures
+        if: github.event_name == 'schedule' && github.event.schedule == '0 13 * * 1-5'
         timeout-minutes: 15
         run: |
           python -m _system.scripts.reverse_splits.cli import-ledger
           python -m _system.scripts.reverse_splits.cli seed --since-days 3 --max-tickers 50
           python -m _system.scripts.reverse_splits.cli clocks --since-days 3 --text-limit 100
           python -m _system.scripts.reverse_splits.cli export-ledger
-      - name: Archive timestamped public availability and fee indications
-        run: python -m _system.scripts.reverse_splits.borrow_archive
       - name: Freeze discovery observations and explicit prospective abstentions
+        if: github.event_name == 'schedule' && github.event.schedule == '0 13 * * 1-5'
         run: python -m _system.scripts.reverse_splits.net_edge_evidence capture
       - name: Refresh the dashboard evidence and prospective counts
+        if: github.event_name == 'schedule' && github.event.schedule == '0 13 * * 1-5'
         run: python _system/scripts/build_reverse_splits_dashboard.py
+      - uses: actions/setup-node@v4
+        if: always()
+        with:
+          node-version: '24'
+      - name: Prepare bounded database history synchronization
+        if: always()
+        run: |
+          python -m _system.scripts.reverse_splits.profit_borrow sql --since "$(date -u +%F)"
+          python - <<'PY'
+          from datetime import datetime,timedelta,timezone
+          from pathlib import Path
+          cutoff=(datetime.now(timezone.utc)-timedelta(days=90)).isoformat()
+          path=Path('_system/data/reverse_splits/local/borrow_monitor/d1.sql')
+          # At most one old public vintage per capture: indexed source/PK lookups,
+          # with the full dated JSON archive retained outside the hot database.
+          oldest=f"SELECT id FROM short_borrow_sources WHERE source='ibkr_public_ftp' AND as_of<'{cutoff}' ORDER BY as_of LIMIT 1"
+          with path.open('a',encoding='utf-8') as out:
+              out.write(f'\nDELETE FROM short_borrow_observations WHERE source_id IN ({oldest});\n')
+              out.write(f'DELETE FROM short_borrow_sources WHERE id IN ({oldest}) AND NOT EXISTS (SELECT 1 FROM short_borrow_observations WHERE source_id=short_borrow_sources.id);\n')
+          PY
+      - name: Synchronize public indications to the dashboard database
+        if: always()
+        env:
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+          DATABASE_NAME: ${{ vars.CLOUDFLARE_D1_DATABASE || 'single-stock-investments' }}
+        run: |
+          set -euo pipefail
+          if [ -z "$CLOUDFLARE_API_TOKEN" ] || [ -z "$CLOUDFLARE_ACCOUNT_ID" ]; then
+            echo 'Database credentials unavailable; retaining the dated file snapshot.' >&2
+            exit 1
+          fi
+          python - <<'PY'
+          import datetime, os, sys
+          sys.path.insert(0, '.github/actions/deploy-cloudflare-dashboard')
+          from d1_budget import check, WRITE_THRESHOLD
+          budget=check(os.environ['CLOUDFLARE_ACCOUNT_ID'],os.environ['CLOUDFLARE_API_TOKEN'],datetime.datetime.now(datetime.timezone.utc).date().isoformat())
+          print(budget.describe())
+          # Reserve room for an entire day of indexed observations and shared dashboard writes.
+          if not budget.available or budget.over or budget.rows_written+40000>WRITE_THRESHOLD:
+              raise SystemExit('Database sync deferred by shared free-tier guard; dated file capture is preserved.')
+          PY
+          npm ci --prefix dashboard/cloudflare
+          WRANGLER="$PWD/dashboard/cloudflare/node_modules/.bin/wrangler"
+          "$WRANGLER" d1 list --json > _system/data/reverse_splits/local/borrow_monitor/databases.json
+          python -c 'import json,os,pathlib; p=pathlib.Path("_system/data/reverse_splits/local/borrow_monitor"); raw=json.loads((p/"databases.json").read_text()); rows=raw if isinstance(raw,list) else raw["result"]; db=next(r for r in rows if r["name"]==os.environ["DATABASE_NAME"]); (p/"wrangler.json").write_text(json.dumps({"name":"ssi-short-borrow-sync","compatibility_date":"2026-10-22","d1_databases":[{"binding":"DB","database_name":db["name"],"database_id":db.get("uuid",db.get("database_id"))}]}))'
+          "$WRANGLER" d1 execute "$DATABASE_NAME" --remote --yes --config _system/data/reverse_splits/local/borrow_monitor/wrangler.json --file _system/data/reverse_splits/local/borrow_monitor/d1.sql
       - name: Save the derived archive
+        if: always()
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
           git add _system/data/reverse_splits/borrow_history _system/data/reverse_splits/edge_observations _system/data/reverse_splits/edge_prospective _system/data/reverse_splits/announcements* _system/data/reverse_splits/events* _system/data/reverse_splits/ledger_manifest.json
           git add dashboard/data/reverse_splits.json
+          git add _system/data/reverse_splits/borrow_monitor dashboard/data/short_borrow
+          if [ -d dashboard/data/short_forward ]; then git add _system/data/reverse_splits/profit_forward dashboard/data/short_forward; fi
           git add dashboard/data/net_edge_audits_v3 dashboard/data/shorts_net_edge_v3.json
           if [ -f dashboard/data/shorts_calmar_research.json ]; then git add dashboard/data/shorts_calmar_research.json; fi
           if [ -f dashboard/data/shorts_coverage_research.json ]; then git add dashboard/data/shorts_coverage_research.json dashboard/data/shorts_coverage_packets dashboard/data/shorts_coverage_audits; fi

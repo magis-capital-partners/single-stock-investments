@@ -84,6 +84,7 @@ def main(argv=None):
     parser.add_argument('--input', type=Path)
     parser.add_argument('--max-requests',type=int,default=200)
     parser.add_argument('--since',default='2026-10-14')
+    parser.add_argument('--price-through',help='Last completed daily price session for this explicitly versioned replay')
     args = parser.parse_args(argv)
     args.work = args.work or args.source_root / '_system/data/reverse_splits/local/profit_program/20261022_v1'
     args.study_source = args.study_source or args.source_root / '_system/data/reverse_splits/local/literature_audit_2026-10-21/sources/practitioner_pack/practitioner/microcapledger'

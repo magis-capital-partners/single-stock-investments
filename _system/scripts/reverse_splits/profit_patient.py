@@ -119,7 +119,7 @@ def build_patient(args):
     events=read(args.work/'effective_events.local.json')
     present={e['ticker'] for e in events}
     extras=[{'ticker':r['ticker'],'family':'price_adapter','features':{}} for r in prepared['rows'] if r['ticker'] not in present]
-    prices=PriceStore(args.source_root,events+extras,first='2023-01-03')
+    prices=PriceStore(args.source_root,events+extras,first='2023-01-03',last=getattr(args,'price_through',None) or '2026-10-13',overlay=args.work/'prices_overlay.sqlite')
     arrays=[]
     for row in prepared['rows']:
         path=Path(row['prepared']).resolve()

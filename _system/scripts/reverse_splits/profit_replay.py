@@ -28,6 +28,7 @@ SIGNALS = [
 
 def selected(event, signal):
     f = event.get('features', {})
+    if f.get('review_excluded') is True:return False
     family = event['family']
     cash = event.get('financials', {}).get('cash_pressure') is True
     supply = f.get('terms_verified') is True and (f.get('quantified_saleable_supply') or 0) >= .1 * (f.get('shares_before') or math.inf)
@@ -346,7 +347,7 @@ def build(args):
     code_at_start=code_hash()
     events=materialize_events(args.work,args.source_root)
     frozen=read(args.work/'protocol.json')
-    prices=PriceStore(args.source_root,events)
+    prices=PriceStore(args.source_root,events,last=getattr(args,'price_through',None) or '2026-10-13',overlay=args.work/'prices_overlay.sqlite')
     opportunities=prepare_opportunities(events,prices,args.work)
     write(args.work/'coverage_counts.json',dict(Counter(o['coverage_status'] for o in opportunities)))
     models=[]

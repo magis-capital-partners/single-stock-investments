@@ -70,3 +70,20 @@ Rules that travel with the contract:
 | `reverse_split_research` | `import_reverse_split_queue.py`, from the rsdb review queue export | `lead`, `research.status: requires_analyst_review` |
 
 A lead is not a thesis. `sync_leads` and the importer never overwrite an existing row, whatever its stage. The reverse-split import writes the hypothesis "Reverse-split discovery lead; impairment not yet reviewed." and carries the six lens reviews so the analyst's work starts from the engine's record, not from a blank.
+
+## Short strategy lab: data operations
+
+The October 22 research update adds source reviews, dated financial backfill, a separate price overlay, obligation auditing and two immutable prospective policies. These are exploratory research operations, not approval to trade. Historical account exports remain excluded at the user's request. Actual fills, approved borrow, recalls and loan-termination evidence remain missing.
+
+Public IBKR collection starts with `python -m _system.scripts.reverse_splits.profit_borrow collect --legacy-archive`. It uses the public FTP file, verifies its published checksum and row count, and stores every US row in ignored `local/borrow_monitor/borrow.sqlite`. SSI watchlist observations are published in `borrow_monitor/daily/` and `dashboard/data/short_borrow/`. The existing scheduled borrow workflow captures five times each weekday and synchronizes matching observations to D1, subject to the shared free-tier budget guard. Source markers are written after observations so incomplete database imports do not advertise a complete vintage. A dated static snapshot remains available if database synchronization fails; stale captures are labeled. Public indications never approve a loan or rewrite historical costs.
+
+`profit_borrow import-etf --input <borrow_history.json>` imports matching ETF-history symbols into a separate proxy source. Reconstructed daily timestamps and ticker reuse prevent treating those records as issuer-verified intraday loan observations. ETF code/data are read only.
+
+For the versioned research work folder, use these bounded, resumable collectors:
+
+- `python -m _system.scripts.reverse_splits.profit_refresh facts --work <versioned-work-folder> --max-requests 100` collects missing SEC companyfacts. The replay filters as-filed observations again at each public event clock; missing/custom-tag foreign financials remain unknown.
+- `python -m _system.scripts.reverse_splits.profit_discovery --work <versioned-work-folder> --max-requests 250` screens full-market SEC indexes independently of split membership. Hash-ordered, incomplete queues are not a complete financing universe or verified trades.
+- `python -m _system.scripts.reverse_splits.profit_market_data --work <versioned-work-folder> --max-symbols 600 --through YYYY-MM-DD` prices each exact Databento request first and refuses every nonzero or invalid quote. CSV daily bars and the price overlay stay ignored and private. No raw licensed bars are published; current symbol histories still require dated security-continuity checks.
+- `python -m _system.scripts.reverse_splits.profit_operations audit-liabilities --work <versioned-work-folder> --max-requests 150` binds unresolved replay events to SEC sources without assuming a delisting closes a short loan.
+
+`profit_forward/forward_policies.json` pins two paper policies selected after historical exploration. The weekday `profit_refresh monitor` checks screen newly published financing contexts and public split leads and records explicit pre-entry abstentions while inputs are unverified. Already-passed entries stay missed. This is a monitoring/evidence queue, not a completed forward profitability test. New rules require a new policy version; actual execution and independent future outcomes are prerequisites to production.

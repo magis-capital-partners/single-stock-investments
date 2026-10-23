@@ -95,7 +95,7 @@ def fee(qty, price, day, sell, charge_day=None):
 
 
 class PriceStore:
-    def __init__(self, root, events, *, first='2021-01-01', last='2026-10-13'):
+    def __init__(self, root, events, *, first='2021-01-01', last='2026-10-13', overlay=None):
         import exchange_calendars as xcals
         source = Path(root)/f'_system/data/reverse_splits/local/expansion/expansion_v2/runs/{RUN}/prices.sqlite'
         self.source = source
@@ -135,6 +135,17 @@ class PriceStore:
                         self.actions[r['ticker']][r['ex_date']]=None
                     else: self.actions[r['ticker']][r['ex_date']]=ratio
         conn.close()
+        if overlay and Path(overlay).exists():
+            extra=sqlite3.connect(Path(overlay).resolve().as_uri()+'?mode=ro&immutable=1',uri=True)
+            extra.row_factory=sqlite3.Row
+            for r in extra.execute('SELECT p.*,v.nominal,v.source,v.volume_basis FROM prices_daily p JOIN price_provenance v USING(ticker,date) WHERE p.date<=?',(last,)):
+                vals=[r[k] for k in ('open','high','low','close')]
+                if not r['nominal'] or not all(x is not None and math.isfinite(x) and x>0 for x in vals):continue
+                if r['volume'] is None or not math.isfinite(r['volume']) or r['volume']<0:continue
+                if r['low']>min(r['open'],r['close']) or r['high']<max(r['open'],r['close']):continue
+                # Preserve the frozen historical input; add gaps and later sessions only.
+                self.series[r['ticker']].setdefault(r['date'],{'o':r['open'],'h':r['high'],'l':r['low'],'c':r['close'],'v':r['volume'],'ref':sum(vals)/4,'source':r['source'],'volume_basis':r['volume_basis']})
+            extra.close()
         # The old SQLite reverse_splits table is incomplete. Reconcile real
         # corporate actions before treating nominal price jumps as investment P&L.
         # Ratio conventions differ: catalogue ratio=new/old; provider ratio=old/new.
