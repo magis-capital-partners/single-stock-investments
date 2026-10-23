@@ -249,13 +249,12 @@ SURFACES: list[dict] = [
         "id": "rock",
         "label": "Aggregates",
         "hash": "#/ideas/rock",
-        "lane": "data-pipeline-intake-full",
+        "lane": "aggregates-screener",
         "kind": "file",
-        "path": "dashboard/data/core.json",
+        "path": "dashboard/data/rock_aggregates_screener.json",
         "stamp_fields": ["generated_at"],
-        "embedded_key": "rock_aggregates_screener",
         "actionable_flag": None,
-        "healer": _INTAKE,
+        "healer": "Aggregates Screener daily source refresh; repair with heal-aggregates",
     },
     {
         "id": "insights-events",
@@ -270,7 +269,7 @@ SURFACES: list[dict] = [
     {
         "id": "managers-13f",
         "label": "13F managers",
-        "hash": "#/insights/managers",
+        "hash": "#/insights/investors/directory",
         "lane": "data-pipeline-thirteen-f",
         "kind": "file",
         "path": "dashboard/data/fund_holdings_summary.json",
@@ -297,8 +296,8 @@ SURFACES: list[dict] = [
     },
     {
         "id": "data-health",
-        "label": "Data Health",
-        "hash": "#/insights/data-health",
+        "label": "Data status",
+        "hash": "#/data-status",
         "lane": "data-pipeline-intake-full",
         "kind": "file",
         "path": "dashboard/data/insights/manifest.json",
@@ -362,7 +361,7 @@ SURFACES: list[dict] = [
     {
         "id": "consensus",
         "label": "Consensus",
-        "hash": "#/insights/consensus",
+        "hash": "#/insights/investors/signals",
         "lane": "data-pipeline-intake-full",
         "kind": "file",
         "path": "dashboard/data/insights/consensus.json",
@@ -656,6 +655,8 @@ def build_feed_status(root: Path | None = None, now: datetime | None = None) -> 
             if exists:
                 stamp = _first_stamp(doc, list(resolved.get("stamp_fields") or ["generated_at"]))
             status = classify_feed(exists, stamp, max_age, moment, empty=empty and exists)
+        if spec.get('id')=='rock' and exists and status in {'fresh','empty'} and (doc.get('coverage') or {}).get('failures'):
+            status='degraded'
         if resolved.get("data_feed")=="buyback_radar" and exists and status in {"fresh","empty"} and doc.get("health")!="healthy":
             status="degraded"
         receipt_path = root / RECEIPTS_REL / f"{lane}.json"

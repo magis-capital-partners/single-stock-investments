@@ -1,19 +1,24 @@
 # Market-risk component pipeline
 
-The batch component publisher runs in GitHub Actions. It executes every 30 minutes during U.S. weekdays from 08:07 through 18:07 America/New_York, with an offset end-of-day snapshot at approximately 18:37. The schedule is deliberately offset from the top of the hour to reduce scheduled-run contention.
+The batch component publisher runs in GitHub Actions once per weekday at 22:19 UTC (18:19 Eastern during daylight time, 17:19 during standard time). This is the configured start time, not a guaranteed publication deadline.
 
 Workflow: `.github/workflows/market-risk-components.yml`
 
 The workflow checks out:
 
-- `single-stock-investments` for the builder and SSI breadth snapshot;
+- `single-stock-investments` for the builder, breadth snapshot, SPX surface and volatility snapshots;
 - `GoldmanDrew/etf-dashboard` for leveraged-ETF flows and holdings;
-- `GoldmanDrew/ls-algo` for volatility and borrow context;
-- `magis-capital-partners/spx-0dte` for sanitized options and VIX features.
+- `GoldmanDrew/ls-algo` for volatility and borrow context.
+
+It does not check out the SPX trading repository or contact the brokerage Gateway.
 
 It publishes a signed snapshot to the Cloudflare market-risk ingest Worker and verifies that the generated artifact contains the expected component coverage. Required repository secrets are `MARKET_RISK_INGEST_TOKEN` and `LS_ALGO_TOKEN`; the ingest URL is a non-secret workflow variable.
 
-The Databento flow/liquidity monitor is intentionally separate. It is a persistent market-hours stream and remains on the Windows worker (`Magis Market Risk Databento Monitor`) because a scheduled GitHub-hosted job is not a durable streaming runtime.
+The former Windows Databento live monitor is disabled according to the current Forced Flow Daily workflow. Daily capitulation is refreshed by `.github/workflows/forced-flow-daily.yml` and the technical pipeline. The browser distinguishes daily observations from any timestamp-valid live record.
+
+Each component keeps its own observation date. A successful ingest or a recent build timestamp does not establish that all sources cover the latest completed session. The publisher commits a durable static fallback at most once per UTC day; that existing gate can skip an improved later same-day fallback.
+
+For the audited stale-input causes, the comparison-date bug fix, and the proposed staged close refresh, see [Dashboard cleanup and market risk freshness](dashboard-cleanup-and-market-risk-plan.md). The earlier 16:13/16:43 refreshes in that plan are not implemented schedules.
 
 The legacy Windows batch task (`Magis Market Risk Component Pipeline`) was disabled after the first successful GitHub Actions publish. To run a local fallback manually:
 

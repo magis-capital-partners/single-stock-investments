@@ -607,6 +607,14 @@ def build_snapshot(raw: dict) -> dict:
     """Turn one raw CBOE payload into a surface snapshot."""
     data = (raw or {}).get("data") or {}
     as_of, snapshot_timestamp = _snapshot_date(raw or {})
+    from market_sessions import completed_session
+    try:
+        observed = datetime.fromisoformat(str(snapshot_timestamp).replace('Z','+00:00'))
+        if observed.tzinfo is None:
+            observed = observed.replace(tzinfo=timezone.utc)
+        cash_session = completed_session(observed, delay_minutes=30)
+    except (ValueError, TypeError):
+        cash_session = None
 
     spot = _finite(data.get("current_price"))
     spot_source = "data.current_price"
@@ -642,10 +650,13 @@ def build_snapshot(raw: dict) -> dict:
         "model_version": MODEL_VERSION,
         "research_only": True,
         "as_of": as_of,
+        "session_date": cash_session,
+        "session_basis": "Latest completed US cash-equity session; delayed chain snapshot time is separate",
         "source": {
             "url": SOURCE_URL,
             "delayed_minutes": DELAYED_MINUTES,
             "snapshot_timestamp": snapshot_timestamp,
+            "timestamp_timezone_assumption": "UTC for a provider stamp without an explicit offset",
             "provider": "cboe_delayed_quotes",
         },
         "spot": {

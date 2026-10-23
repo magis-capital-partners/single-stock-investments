@@ -74,6 +74,17 @@ test('filters use verified eligibility and events from shared data',async()=>{
  assert.ok(h.api.matches(row,'verified'));assert.ok(h.api.matches(row,'events'));
  assert.ok(!h.api.matches({...row,buyback:{...row.buyback,rank_eligible:false}},'verified'));
 });
+
+test('focused shortlist requires recurring reductions and evidenced repurchase cash',async()=>{
+ const h=harness();await h.api.load();const b=h.api.company('TEST');
+ const row={ticker:'TEST',buyback:{...b,metrics:{...b.metrics,net_reduction_3y:{...b.metrics.net_reduction_1y,value:12}}}};
+ assert.ok(h.api.matches(row,'focused'));
+ for(const [key,value] of [['net_reduction_1y',4.99],['net_reduction_3y',-1],['gross_cash_ratio',0]]){
+  const changed={...row,buyback:{...row.buyback,metrics:{...row.buyback.metrics,[key]:{...b.metrics.net_reduction_1y,value}}}};
+  assert.ok(!h.api.matches(changed,'focused'),key);
+ }
+ assert.ok(!h.api.matches({...row,buyback:{...row.buyback,refresh_status:'fetch_failed'}},'focused'));
+});
 test('Special Situations replaces only its buyback lane',async()=>{
  const h=harness();await h.api.load();const doc=h.api.projectSituations({rows:[{id:'old',lane:'buyback_events'},{id:'merger',lane:'mergers'}]});
  assert.equal(doc.rows.length,2);assert.ok(doc.rows.some(x=>x.id==='merger'));assert.ok(!doc.rows.some(x=>x.id==='old'));

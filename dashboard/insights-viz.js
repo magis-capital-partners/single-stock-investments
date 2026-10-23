@@ -4331,97 +4331,7 @@
         empty: row.status === 'empty',
       });
     const label = format ? format.feedLabel(state) : (row.label_text || state);
-    return `<p class="tier-sub">${escapeHtml(row.label)} · ${escapeHtml(label)} · as of ${escapeHtml(row.stamp || 'no stamp')} · lane ${escapeHtml(row.lane || '')}. ${escapeHtml(row.next_action || '')} <a href="#/insights/data-health">Data Health</a></p>`;
-  }
-
-  function renderDashboardFeeds(status, escapeHtml) {
-    const rows = feedStatusRows(status);
-    if (!rows.length) {
-      return '<p class="subhead">Dashboard feed status has not been published. Nightly intake writes it. This page does not dispatch refreshes.</p>';
-    }
-    const format = global.DashboardFormat;
-    return `
-      <div class="detail-section">
-        <h3>Dashboard feeds</h3>
-        <p class="tier-sub" style="margin-bottom:8px">Age, owner lane, and the next action. Refresh stays with the scheduled job.</p>
-        <table class="darwin-table" id="dashboard-feed-table">
-          <thead><tr><th>Surface</th><th>Status</th><th>As of</th><th>Owner lane</th><th>Next action</th></tr></thead>
-          <tbody>
-            ${rows.map((row) => {
-              const state = row.kind === 'api' || !format
-                ? (row.status || 'api')
-                : format.feedState(row.stamp, row.max_age_hours, {
-                  exists: row.exists !== false,
-                  empty: row.status === 'empty',
-                });
-              const label = format ? format.feedLabel(state) : (row.label_text || state);
-              const cls = state === 'fresh' || state === 'empty' || state === 'api'
-                ? 'badge-ok'
-                : (state === 'stale' ? 'badge-warn' : 'badge-bad');
-              return `<tr>
-                <td><a href="${escapeHtml(row.hash || '#/insights/data-health')}">${escapeHtml(row.label || row.id)}</a></td>
-                <td><span class="badge ${cls}">${escapeHtml(label)}</span></td>
-                <td class="mono">${escapeHtml(row.stamp || row.lane_receipt_at || 'n/a')}</td>
-                <td class="mono">${escapeHtml(row.lane || '')}</td>
-                <td class="tier-sub">${escapeHtml(row.next_action || '')}</td>
-              </tr>`;
-            }).join('')}
-          </tbody>
-        </table>
-      </div>`;
-  }
-
-  function renderSourceHealth(health, escapeHtml) {
-    const rows = Object.entries(health || {});
-    if (!rows.length) {
-      return '<p class="subhead">No source health data yet.</p>';
-    }
-    return `
-      <table class="darwin-table" id="insights-source-table">
-        <thead><tr><th>Source</th><th>Status</th><th>Records</th><th>Items</th><th>As of</th><th>Notes</th></tr></thead>
-        <tbody>
-          ${rows.map(([key, h]) => {
-            const status = h.status || 'unknown';
-            const cls = status === 'ok' ? 'badge-ok' : (status === 'missing' || status === 'forbidden' ? 'badge-warn' : 'badge-us');
-            const notes = h.notes || (h.warnings ? `${h.warnings} warning(s)` : (h.path || ''));
-            return `
-              <tr>
-                <td>${escapeHtml(key.replace(/_/g, ' '))}</td>
-                <td><span class="badge ${cls}">${escapeHtml(status)}</span></td>
-                <td class="mono">${h.records ?? 'n/a'}</td>
-                <td class="mono">${h.items ?? 'n/a'}</td>
-                <td class="mono">${escapeHtml(h.as_of || 'n/a')}</td>
-                <td class="tier-sub">${escapeHtml(notes)}</td>
-              </tr>`;
-          }).join('')}
-        </tbody>
-      </table>`;
-  }
-
-  function renderDataSourceCandidates(candidates, escapeHtml) {
-    const tools = candidates?.selected_tools || [];
-    if (!tools.length) return '<p class="subhead">No TerminalValue candidate source registry yet.</p>';
-    return `
-      <div class="detail-section">
-        <h3>TerminalValue candidate feeds</h3>
-        <p class="tier-sub" style="margin-bottom:8px">
-          ${escapeHtml(candidates.source_label || 'TerminalValue.io')} · reviewed ${escapeHtml(candidates.reviewed_at || 'n/a')} · ${tools.length} selected feeds
-        </p>
-        <table class="darwin-table">
-          <thead><tr><th>Provider</th><th>Role</th><th>Status</th><th>Priority</th><th>Credential</th><th>Target</th></tr></thead>
-          <tbody>
-            ${tools.map(t => `
-              <tr>
-                <td>${escapeHtml(t.name || 'Provider')}</td>
-                <td>${escapeHtml(t.dashboard_role || '')}</td>
-                <td><span class="badge ${t.integration_status === 'live' ? 'badge-ok' : 'badge-warn'}">${escapeHtml(t.integration_status || 'candidate')}</span></td>
-                <td>${escapeHtml(t.priority || 'medium')}</td>
-                <td>${t.credential_required ? 'required' : 'not required'}</td>
-                <td class="mono" style="font-size:11px">${escapeHtml(t.target_pipeline || '')}</td>
-              </tr>`).join('')}
-          </tbody>
-        </table>
-      </div>`;
+    return `<p class="tier-sub">${escapeHtml(row.label)} · ${escapeHtml(label)} · as of ${escapeHtml(row.stamp || 'no stamp')} · lane ${escapeHtml(row.lane || '')}. ${escapeHtml(row.next_action || '')} <a href="#/insights/data-health">Data status</a></p>`;
   }
 
   function catalogSourceLabel(row) {
@@ -5649,9 +5559,9 @@
     ];
     const sectionGroups = [
       { label: 'Signals', ids: ['events', 'inflections', 'index_watch'] },
-      { label: 'Sources', ids: ['letters', 'podcasts', 'videos', 'funds', 'documents'] },
-      { label: 'Synthesis', ids: ['consensus', 'tickers'] },
-      { label: 'Memory & health', ids: ['memory', 'sources'] },
+      { label: 'Sources', ids: ['letters', 'podcasts', 'videos', 'documents'] },
+      { label: 'Synthesis', ids: ['tickers'] },
+      { label: 'Memory', ids: ['memory'] },
     ];
 
     let body = '';
@@ -5806,16 +5716,14 @@
         body += renderMemoryLedger(memory, escapeHtml, linkHtml, memoryOpts);
       }
     } else {
-      body = renderDashboardFeeds(options?.feedStatus, escapeHtml)
-        + renderSourceHealth(insights?.source_health || {}, escapeHtml)
-        + renderDataSourceCandidates(insights?.data_source_candidates || {}, escapeHtml);
+      body = global.WorkspaceTools ? global.WorkspaceTools.renderStatus(options?.feedStatus, insights?.source_health) : '<p>Source status is unavailable.</p>';
     }
 
     const showPeriodControls = activeSection !== 'tickers' && activeSection !== 'inflections' && activeSection !== 'memory' && activeSection !== 'events';
     const bookLabel = activeSection === 'tickers' ? 'Holdings only' : 'Our book overlap';
 
     return `
-      <h2 style="font-size:18px;margin-bottom:6px">Insights</h2>
+      ${activeSection === 'consensus' ? '' : '<h2 style="font-size:18px;margin-bottom:6px">Insights</h2>'}
       <p class="subhead" style="margin-bottom:14px">
         Portfolio context only · ${insights?.event_count || 0} events · ${insights?.letter_count || 0} letters · ${insights?.podcast_count || 0} podcasts · ${insights?.video_count || 0} videos · ${insights?.front_record_count || 0} front records · ${insights?.archived_record_count || 0} archived
       </p>
