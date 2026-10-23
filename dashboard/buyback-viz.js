@@ -11,7 +11,12 @@
   function safeUrl(url) { return /^https?:\/\//i.test(String(url || '')) ? String(url) : ''; }
   function read(key, fallback) { try { return JSON.parse(localStorage.getItem(key)) || fallback; } catch (_) { return fallback; } }
   function write(key, value) { try { localStorage.setItem(key, JSON.stringify(value)); return true; } catch (_) { return false; } }
-  function coverageState() { return read(FILTER_KEY, {filter:'all',sort:'net_reduction_1y'}); }
+  function coverageState() {
+    var saved = read(FILTER_KEY, {});
+    // Upgrade the old unfiltered landing screen once; retain deliberate screens.
+    if (!saved.radarVersion) saved.filter = !saved.filter || saved.filter === 'all' ? 'focused' : saved.filter;
+    return Object.assign({filter:'focused',sort:'net_reduction_1y',query:''}, saved, {radarVersion:1});
+  }
   function snapshotExpired() {
     var m=state.snapshot && state.snapshot.manifest;if(!m)return false;
     var stamp=Date.parse(m.generated_at || (m.as_of ? m.as_of+'T00:00:00Z' : ''));
@@ -156,7 +161,7 @@
     if (!b || b.schema_version !== 'buyback.v2') return '<section class="detail-section bb-panel"><h3>Buyback</h3><p>' + esc(state.error || 'Awaiting a verified snapshot.') + '</p></section>';
     var metrics = [['Net reduction · 1Y','net_reduction_1y'],['Net reduction · 3Y','net_reduction_3y'],['Net reduction · 5Y','net_reduction_5y'],['Gross repurchase cash ratio','gross_cash_ratio'],['Net cash repurchase ratio','net_cash_ratio'],['Shares down from observed peak','since_peak'],['Net retirement efficiency','retirement_efficiency'],['Remaining authorization / market value','remaining_authorization_ratio']];
     var cards = metrics.map(function(r) { var m = metric(b,r[1]); return '<div class="bb-stat"><span>' + esc(r[0]) + '</span><strong>' + esc(pct(m.value)) + '</strong><small>' +
-      esc(m.start && m.end ? m.start + ' → ' + m.end : label(m.reason || b.data_reason)) +(num(m.annualized_pct) ? ' / '+pct(m.annualized_pct)+' annualized' : '')+ '</small>'+evidence(m.sources)+'</div>'; }).join('');
+      esc(m.start && m.end ? m.start + ' → ' + m.end : label(m.reason || b.data_reason)) +(num(m.annualized_pct) ? ' / '+pct(m.annualized_pct)+' annualized' : '')+ '</small>'+evidence(m.sources)+'</div>'; });
     var events = eventsFor(row.ticker);
     var out = '<details class="detail-section bb-panel" data-buyback-detail="' + esc(b.issuer_id) + '" data-bb-ticker="' + esc(row.ticker) + '" open><summary>Buyback · ' + esc((snapshotExpired() ? 'snapshot overdue' : label(b.data_status))) + ' · shares ' + esc(b.shares_end || 'unavailable') + '</summary>' +
       '<div class="bb-heading">' + status(b) + '<span>Confidence: ' + esc(label(b.confidence)) + '</span><a href="#/ideas/situations/buyback-events/' + encodeURIComponent(row.ticker) + '">Buyback events</a><a href="#/ideas/short-alpha?buyback=' + encodeURIComponent(row.ticker) + '">Issuance research</a></div>' +
@@ -165,7 +170,7 @@
       (b.refresh_reason ? '<p class="bb-notice">'+esc(b.refresh_reason)+'</p>' : '') +
       (b.explanation ? '<p>' + esc(b.explanation) + ' ' + sourceLink(b.explanation_source) + '</p>' : '') +
       (b.last_change ? '<p class="bb-notice">' + esc(label(b.last_change.kind)) + ' · ' + esc(b.last_change.reason || '') + '</p>' : '') +
-      '<div class="bb-grid bb-metrics">' + cards + '</div><p class="bb-muted">Positive net reduction means fewer shares. Cash repurchase ratios describe the stated FY or TTM period; they are not investment returns.</p>' + assessment(b) + epsForm() + researchNote(b) +
+      '<div class="bb-grid bb-metrics bb-headline-metrics">' + cards.slice(0,2).join('') + '</div><details class="bb-fold"><summary>Cash returns and longer history</summary><div class="bb-grid bb-metrics">' + cards.slice(2).join('') + '</div><p class="bb-muted">Positive reduction means fewer shares. Repurchase cash ratios are not investment returns.</p></details><details class="bb-fold"><summary>Capital allocation assessment</summary>' + assessment(b) + '</details>' + epsForm() + researchNote(b) +
       '<div data-bb-history="' + esc(b.issuer_id) + '" aria-live="polite">Loading share history…</div>' +
       (events.length ? '<details><summary>Programs and events · ' + events.length + '</summary>' + events.map(function(e) { return '<article class="bb-event"><h4>' + esc(e.what) + '</h4>' + renderEventDetails(e) + '</article>'; }).join('') + '</details>' : '<p class="bb-muted">No verified event or review item in this snapshot.</p>') + evidence(b.sources) + '</details>';
     if (typeof queueMicrotask === 'function') queueMicrotask(hydrateAll);
@@ -220,6 +225,7 @@
   function matches(row,filter) {
     var b = row.buyback || {}, net = metric(b,'net_reduction_1y').value;
     switch(filter || coverageState().filter) {
+      case 'focused': return b.rank_eligible && net >= 5 && metric(b,'net_reduction_3y').value > 0 && metric(b,'gross_cash_ratio').value > 0;
       case 'verified': return b.rank_eligible && net > 0;
       case 'accelerating': return !snapshotExpired() && b.rank_eligible && b.pace === 'accelerating';
       case 'offset': return metric(b,'gross_cash_ratio').value > 0 && net != null && net <= 0;
@@ -237,22 +243,29 @@
     var saved = coverageState();
     var rows = ((state.snapshot && state.snapshot.companies && state.snapshot.companies.companies) || []).map(function(row) {
       return { ticker: row.ticker, company: row.company, buyback: row };
-    }).filter(function(row) { return matches(row, saved.filter); });
+    }).filter(function(row) {
+      var query = String(saved.query || '').trim().toLowerCase();
+      return matches(row, saved.filter) && (!query || (row.ticker + ' ' + row.company).toLowerCase().includes(query));
+    });
     var key = screenSortKey();
     rows.sort(function(a, b) { return compareRows(a, b, key, false); });
     return rows;
   }
-  function paintScreenTable(table) {
+  function paintScreenTable(table, page) {
     var rows = screenRows();
+    var size = 30, pages = Math.max(1, Math.ceil(rows.length / size));
+    page = Math.max(0, Math.min(page || 0, pages - 1));
+    table.dataset.page = String(page);
     var total = ((state.snapshot && state.snapshot.companies && state.snapshot.companies.companies) || []).length;
-    var body = rows.map(function(row) {
+    var body = rows.slice(page * size, (page + 1) * size).map(function(row) {
       var record = row.buyback;
       var net = metric(record, 'net_reduction_1y');
       var spent = metric(record, 'gross_cash_ratio');
-      return '<tr><td>' + tickerLink(row.ticker) + '</td><td>' + esc(row.company) + '</td><td>' + status(record) + '</td><td>' + esc(net.value == null ? label(net.reason) : pct(net.value)) + '</td><td>' + esc(pct(metric(record, 'net_reduction_3y').value)) + '</td><td>' + esc(label(record.pace || 'unavailable')) + '</td><td>' + esc(spent.value == null ? '—' : pct(spent.value)) + '</td><td>' + esc(record.shares_end || '—') + '</td></tr>';
+      return '<tr><td class="bb-company">' + tickerLink(row.ticker) + '<small>' + esc(row.company) + '</small></td><td class="bb-number ' + (net.value > 0 ? 'bb-positive' : '') + '"><strong>' + esc(pct(net.value)) + '</strong></td><td class="bb-number">' + esc(pct(metric(record, 'net_reduction_3y').value)) + '</td><td><span class="bb-pace">' + esc(label(record.pace || 'not measured')) + '</span></td><td class="bb-number">' + esc(pct(spent.value)) + '<small>' + esc(spent.period_label || record.yield_period || '') + '</small></td><td>' + status(record) + '<small>' + esc(net.value == null ? label(net.reason || record.data_reason) : 'Shares ' + (record.shares_end || 'undated')) + '</small></td></tr>';
     }).join('');
-    table.innerHTML = '<p class="bb-muted">Showing ' + rows.length + ' of ' + total + ' issuers.</p>' +
-      (rows.length ? '<div class="bb-scroll"><table><thead><tr><th>Ticker</th><th>Company</th><th>Data</th><th>Net reduction · 1Y</th><th>Net reduction · 3Y</th><th>Pace</th><th>Buyback cash</th><th>Shares as of</th></tr></thead><tbody>' + body + '</tbody></table></div>' : '<p>No issuers match this screen.</p>');
+    table.innerHTML = '<div class="bb-results-head"><span role="status">' + rows.length + ' matching issuers <span class="bb-muted">/ ' + total + ' covered</span></span><span class="bb-muted">Positive reduction = fewer shares</span></div>' +
+      (rows.length ? '<div class="bb-scroll" tabindex="0" role="region" aria-label="Buyback results"><table><thead><tr><th>Company</th><th>Shares reduced · 1Y</th><th>3Y</th><th>Execution</th><th title="Gross repurchase cash divided by market value; not an investment return">Cash / market value</th><th>Evidence</th></tr></thead><tbody>' + body + '</tbody></table></div><div class="bb-pagination"><span>' + (page * size + 1) + '–' + Math.min((page + 1) * size, rows.length) + ' of ' + rows.length + '</span><div><button type="button" data-bb-page="' + (page - 1) + '"' + (page === 0 ? ' disabled' : '') + '>Previous</button><button type="button" data-bb-page="' + (page + 1) + '"' + (page + 1 >= pages ? ' disabled' : '') + '>Next</button></div></div>' : '<div class="bb-empty"><strong>No companies match this screen</strong><p>Try Verified reducers or All companies, or clear your search. Missing evidence stays out of the shortlist.</p></div>');
+    table.querySelectorAll('[data-bb-page]').forEach(function(button) { button.addEventListener('click', function() { paintScreenTable(table, Number(button.dataset.bbPage)); }); });
   }
   function mountScreen(host) {
     if (!host) return;
@@ -261,16 +274,23 @@
     if (!saved.sort) { saved.sort = sortKey; write(FILTER_KEY, saved); }
     var el = document.createElement('div');
     el.id = 'buyback-screen-controls';
-    el.className = 'bb-controls';
-    el.innerHTML = '<label>Buyback screen <select data-bb-filter aria-label="Buyback screen">' + [['all','All companies'],['verified','Verified share reducers'],['accelerating','Accelerating'],['offset','Dilution offsets repurchases'],['events','Active events'],['review','Data requires review']].map(function(o) { return '<option value="' + o[0] + '"' + (saved.filter === o[0] ? ' selected' : '') + '>' + o[1] + '</option>'; }).join('') +
+    el.className = 'bb-controls bb-radar-controls';
+    el.innerHTML = '<label class="bb-search">Find a company<input type="search" data-bb-search placeholder="Ticker or company" value="' + esc(saved.query || '') + '"></label><label>Show <select data-bb-filter aria-label="Buyback screen">' + [['focused','Focused shortlist · 5%+'],['verified','Verified share reducers'],['accelerating','Accelerating'],['offset','Dilution offsets repurchases'],['events','Active events'],['review','Data requires review'],['all','All companies']].map(function(o) { return '<option value="' + o[0] + '"' + (saved.filter === o[0] ? ' selected' : '') + '>' + o[1] + '</option>'; }).join('') +
       '</select></label><label>Buyback sort <select data-bb-sort aria-label="Buyback sort">' + SCREEN_SORTS.map(function(o) { return '<option value="' + o[0] + '"' + (sortKey === o[0] ? ' selected' : '') + '>' + o[1] + '</option>'; }).join('') + '</select></label>' +
-      '<small>' + esc(state.error || (state.snapshot ? state.snapshot.manifest.counts.verified + ' verified issuers · snapshot ' + state.snapshot.manifest.as_of : 'Awaiting verified data')) + '</small>';
+      '<button type="button" data-bb-reset>Reset shortlist</button><p class="bb-filter-note" data-bb-filter-note></p>';
     var screenKey = 'ssi-buyback-saved-screens-v2', screens = read(screenKey, {});
-    el.innerHTML += '<label>Saved buyback screen<select data-bb-saved><option value="">Choose a saved screen</option>' + Object.keys(screens).sort().map(function(name) { return '<option value="' + esc(name) + '">' + esc(name) + '</option>'; }).join('') + '</select></label><label>Screen name<input data-bb-screen-name maxlength="60" aria-label="Buyback screen name"></label><button type="button" data-bb-screen-save>Save screen</button><button type="button" data-bb-screen-delete disabled>Delete selected screen</button><small data-bb-screen-message aria-live="polite"></small>';
-    el.innerHTML += changeDigest();
+    el.innerHTML += '<details class="bb-saved-tools"><summary>Saved screens</summary><div class="bb-controls"><label>Saved buyback screen<select data-bb-saved><option value="">Choose a saved screen</option>' + Object.keys(screens).sort().map(function(name) { return '<option value="' + esc(name) + '">' + esc(name) + '</option>'; }).join('') + '</select></label><label>Screen name<input data-bb-screen-name maxlength="60" aria-label="Buyback screen name"></label><button type="button" data-bb-screen-save>Save screen</button><button type="button" data-bb-screen-delete disabled>Delete selected screen</button><small data-bb-screen-message aria-live="polite"></small></div></details>';
     var table = document.createElement('div');
-    table.className = 'bb-panel';
-    host.replaceChildren(el, table);
+    table.className = 'bb-panel bb-results';
+    var heading = document.createElement('div');
+    heading.className = 'bb-radar-head';
+    var all = ((state.snapshot && state.snapshot.companies && state.snapshot.companies.companies) || []);
+    var focused = all.filter(function(b) { return matches({ticker:b.ticker,buyback:b}, 'focused'); }).length;
+    var reducers = all.filter(function(b) { return matches({ticker:b.ticker,buyback:b}, 'verified'); }).length;
+    heading.innerHTML = '<div class="bb-radar-title"><div><span class="bb-eyebrow">Capital allocation</span><h3>Buyback radar</h3><p>Find companies that are actually shrinking their share count.</p></div><div class="bb-snapshot">SEC filing evidence<small>Snapshot ' + esc(state.snapshot ? state.snapshot.manifest.as_of : 'unavailable') + '</small></div></div><div class="bb-radar-stats"><div><strong>' + focused + '</strong><span>Focused shortlist</span><small>5%+ fewer shares in one year</small></div><div><strong>' + reducers + '</strong><span>Verified reducers</span><small>Positive one-year net reduction</small></div><div><strong>' + all.length + '</strong><span>Companies covered</span><small>One shared evidence snapshot</small></div></div>' + (state.error || snapshotExpired() ? '<p class="bb-notice" role="status">' + esc(state.error || 'Snapshot overdue. Rankings are withheld until evidence refreshes.') + '</p>' : '');
+    var changes = document.createElement('div'); changes.innerHTML = changeDigest();
+    host.classList.add('bb-radar');
+    host.replaceChildren(heading, el, table, changes);
     function refreshSaved(selectedName) {
       var select = el.querySelector('[data-bb-saved]');
       select.innerHTML = '<option value="">Choose a saved screen</option>' + Object.keys(screens).sort().map(function(name) { return '<option value="' + esc(name) + '">' + esc(name) + '</option>'; }).join('');
@@ -278,10 +298,14 @@
       el.querySelector('[data-bb-screen-delete]').disabled = !select.value;
     }
     function applyScreen() {
-      el.querySelector('[data-bb-filter]').value = saved.filter || 'all';
+      el.querySelector('[data-bb-filter]').value = saved.filter || 'focused';
       el.querySelector('[data-bb-sort]').value = screenSortKey();
+      el.querySelector('[data-bb-search]').value = saved.query || '';
+      el.querySelector('[data-bb-filter-note]').textContent = saved.filter === 'focused' ? 'Shortlist: verified evidence, at least 5% net share reduction in 1Y, positive reduction over 3Y, and reported repurchase cash. Sorted by 1Y reduction by default.' : 'Filters apply to this radar. Company evidence, buyback events and issuance research use the same snapshot.';
       paintScreenTable(table);
     }
+    el.querySelector('[data-bb-search]').addEventListener('input', function(e) { saved.query = e.target.value; write(FILTER_KEY, saved); paintScreenTable(table); });
+    el.querySelector('[data-bb-reset]').addEventListener('click', function() { saved = {filter:'focused',sort:'net_reduction_1y',query:'',radarVersion:1}; write(FILTER_KEY,saved); refreshSaved(''); applyScreen(); });
     el.querySelector('[data-bb-filter]').addEventListener('change', function(e) { saved.filter = e.target.value; write(FILTER_KEY, saved); applyScreen(); });
     el.querySelector('[data-bb-sort]').addEventListener('change', function(e) { saved.sort = e.target.value; saved.activeSort = true; write(FILTER_KEY, saved); paintScreenTable(table); });
     el.querySelector('[data-bb-screen-save]').addEventListener('click', function() {
@@ -297,7 +321,7 @@
     el.querySelector('[data-bb-saved]').addEventListener('change', function(e) {
       el.querySelector('[data-bb-screen-delete]').disabled = !e.target.value;
       if (!screens[e.target.value]) return;
-      saved = Object.assign({}, screens[e.target.value]);
+      saved = Object.assign({query:''}, screens[e.target.value], {radarVersion:1});
       write(FILTER_KEY, saved);
       applyScreen();
     });
@@ -309,7 +333,7 @@
       refreshSaved('');
       el.querySelector('[data-bb-screen-message]').textContent = 'Saved screen deleted.';
     });
-    paintScreenTable(table);
+    applyScreen();
   }
   function eventRow(e) {
     return {id:e.id,lane:'buyback_events',lanes:['buyback_events'],book:e.book,ticker:e.ticker,company:e.company,what:e.what,

@@ -365,6 +365,29 @@
       ],
       "freshness_hours": 102,
       "subject_regex": "^chore: buyback radar (refresh|weekly)"
+    },
+    {
+      "name": "market-close",
+      "workflow_file": "market-close.yml",
+      "job": "refresh",
+      "cadence_cron": [
+        "13,43 13,16 * * 1-5",
+        "19 18 * * 1-5"
+      ],
+      "timezone": "America/New_York",
+      "freshness_hours": 102,
+      "subject_regex": "^chore\\(risk\\): (publish completed-session|reconcile close)"
+    },
+    {
+      "name": "aggregates-screener",
+      "workflow_file": "aggregates-screener.yml",
+      "job": "refresh",
+      "cadence_cron": [
+        "27 18 * * 1-5"
+      ],
+      "timezone": "America/New_York",
+      "freshness_hours": 102,
+      "subject_regex": "^chore: refresh aggregates"
     }
   ],
   "unmonitored_workflows": {},

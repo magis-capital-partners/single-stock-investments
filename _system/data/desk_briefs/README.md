@@ -35,12 +35,15 @@ one (the ledgers' first-write-wins rule).
    contents), then the filing each row points at, then the web only to fill a name or an
    exhibit. The schema is `schema.json` in this directory.
 2. Run `python _system/scripts/check_desk_briefs.py`. It must print no `ERROR` line.
-3. Commit on a branch named `grok/<desk>/<YYYY-MM-DD>-<slug>` and open a pull request
-   that touches only this directory (and, when a lesson was learned,
-   `_system/memory-hub/research-equity/daily/<YYYY-MM-DD>.md`). A PR that touches code
+3. Run `python _system/scripts/build_desk_briefs.py`. Commit
+   `dashboard/data/desk_briefs.json` in the same commit as the new brief. The
+   checker fails when that file's desk paths are not the latest brief per desk.
+   The Inbox reads the payload, not the brief directory.
+4. Commit on a branch named `grok/<desk>/<YYYY-MM-DD>-<slug>` and open a pull request
+   that touches only the new brief, that rebuilt payload, and, when a lesson was learned,
+   `_system/memory-hub/research-equity/daily/<YYYY-MM-DD>.md`. A PR that touches code
    or any human-gated path waits for a human.
-4. The check runs in CI on the PR. When the lane is wired (see "Wiring" below) a
-   data-only `grok/` PR that passes auto-merges; until then Drew merges it.
+5. The check runs in CI on the PR. A data-only `grok/` PR that passes auto-merges.
 
 The chat room gets a one-line pointer (ticker and the one number). The brief is the
 record; a chat post is not.
@@ -102,8 +105,9 @@ in `_system/graph/graph_sources.json` (`stamp_field: generated_at`, `assert_fiel
 nightly rebuild profile runs `check_desk_briefs.py --warn-only` and
 `build_desk_briefs.py`, `build_feed_status.py` lists it, `build_dashboard_shards.py`
 maps `desk_briefs` to `data/desk_briefs.json`, and `python-tests.yml` lists
-`_system/scripts/tests/test_desk_briefs.py`. Until then, run the two scripts by hand
-after merging a brief.
+`_system/scripts/tests/test_desk_briefs.py`. The brief's own pull request commits
+the rebuilt payload. The nightly lane runs the same two scripts again so the
+stamp stays current after other dashboard files move.
 
 ## Lessons still go to the hub
 

@@ -2,7 +2,7 @@
 
 > Context only. Insider activity informs scenario confidence and stance discussion; it does not auto-inflate Lawrence base IRR. Promotion requires [HUMAN REVIEW].
 
-**ICS:** 2.26 (weak) · **Bull case support:** none
+**ICS:** 2.24 (weak) · **Bull case support:** none
 
 | Scenario | Prior weight | Tilted weight |
 |----------|--------------|---------------|
@@ -12,7 +12,7 @@
 
 | Insider | Date | Shares | Price | Value | Contrib |
 |---------|------|--------|-------|-------|---------|
-| WARE WILLIAM JAMES | 2026-08-11 | 300 | $167.5945 | $50278.35 | 2.075 |
+| WARE WILLIAM JAMES | 2026-08-11 | 300 | $167.5945 | $50278.35 | 2.057 |
 
 **Routine / planned sales (context):**
 

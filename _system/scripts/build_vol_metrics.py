@@ -17,9 +17,9 @@ is z-scored over its **own** observations.
 
 Nothing is forward filled. Every fallback contributes real dated observations,
 and partial recovery is merged with committed history rather than replacing it.
-The published spine is capped at the latest completed US session (18:00 New
-York cutoff), avoiding a mixture of today's partial Yahoo candle and yesterday's
-official closes.
+The published spine is capped at the latest completed exchange session. Current
+Yahoo bars require a post-close provider timestamp; the volatility complex has
+its own additional close buffer. Initial and settled releases remain distinct.
 
 The ``spx_0dte`` block is **retired** and reports nulls. It used to carry
 ``options_stress`` z-scores forward out of ``market_risk_components.json``,
@@ -97,6 +97,7 @@ import urllib.parse
 from datetime import datetime, timedelta, timezone
 from pathlib import Path
 from zoneinfo import ZoneInfo
+from market_sessions import completed_session, session_close, NEW_YORK as SESSION_TZ
 
 ROOT = Path(__file__).resolve().parents[2]
 SCRIPTS = Path(__file__).resolve().parent
@@ -167,7 +168,7 @@ CHAIN_MAX_DTE_ERROR = 45
 # Daily observations are not comparable until the US session has settled.
 # The scheduled lane runs late evening; local/manual runs during market hours
 # must not mix today's partial Yahoo candle with yesterday's official closes.
-SESSION_COMPLETE_HOUR_ET = 18
+SESSION_COMPLETE_HOUR_ET = 16  # Compatibility constant; market_sessions owns the actual close gate.
 NEW_YORK = ZoneInfo("America/New_York")
 
 # metric key -> Yahoo symbol. ``spx_close`` is an input for realized vol and is
@@ -253,16 +254,7 @@ def completed_session_cutoff(now: datetime | None = None) -> str:
     Calendar holidays need no hard-coded calendar: filtering source dates to
     this upper bound naturally lands on the prior actual observation.
     """
-    current = now or datetime.now(timezone.utc)
-    if current.tzinfo is None:
-        current = current.replace(tzinfo=timezone.utc)
-    local = current.astimezone(NEW_YORK)
-    candidate = local.date()
-    if candidate.weekday() >= 5 or local.hour < SESSION_COMPLETE_HOUR_ET:
-        candidate -= timedelta(days=1)
-    while candidate.weekday() >= 5:
-        candidate -= timedelta(days=1)
-    return candidate.isoformat()
+    return completed_session(now, delay_minutes=10)
 
 
 def trailing_zscore(window: list, min_observations: int = MIN_OBSERVATIONS):
@@ -407,6 +399,9 @@ def _fetch_yahoo_close_series(symbol: str, start: datetime, end: datetime) -> di
     if not result:
         raise ValueError(f"Yahoo returned no result for {symbol}")
     result = result[0]
+    current = datetime.now(timezone.utc)
+    today = current.astimezone(SESSION_TZ).date().isoformat()
+    market_time = (result.get("meta") or {}).get("regularMarketTime")
     timestamps = result.get("timestamp") or []
     quote = ((result.get("indicators") or {}).get("quote") or [{}])[0]
     closes = quote.get("close") or []
@@ -416,6 +411,18 @@ def _fetch_yahoo_close_series(symbol: str, start: datetime, end: datetime) -> di
         if close is None or close <= 0:
             continue
         date = datetime.fromtimestamp(timestamp, tz=timezone.utc).strftime("%Y-%m-%d")
+        if date == today:
+            try:
+                closed = session_close(date)
+                # The listed volatility complex can continue after the cash
+                # equity close. Keep the initial release provisional and wait
+                # for its own post-close timestamp, not merely SPX's date.
+                index_delay = 0 if symbol == '^GSPC' else 15
+                provider_close = closed + timedelta(minutes=index_delay)
+                if current < provider_close + timedelta(minutes=10) or not market_time or datetime.fromtimestamp(market_time, timezone.utc) < provider_close:
+                    continue
+            except (ValueError, TypeError):
+                continue
         series[date] = close
     if not series:
         raise ValueError(f"Yahoo returned no usable closes for {symbol}")
@@ -1269,9 +1276,10 @@ def build_latest(
         "research_only": True,
         "cadence": "daily",
         "as_of": latest["date"],
+        "session_date": latest["date"],
+        "release_stage": "settled" if datetime.fromisoformat(generated_at.replace('Z','+00:00')).astimezone(NEW_YORK).hour >= 18 else "provisional",
         "source": (
-            "composite:yahoo-chart-v8(full+recent-tail),cboe-daily-official,"
-            "cnbc-move-delayed; spx-0dte via market_risk_components.json"
+            "composite:yahoo-chart-v8(full+recent-tail),cboe-daily-official,cnbc-move-delayed"
         ),
         "metrics": metrics,
         "regime": {
@@ -1324,8 +1332,8 @@ def build_latest(
                 "move_cross_check": "CNBC delayed .MOVE close",
                 "merge_rule": "committed history preserved; fresh observations win by date",
                 "session_cutoff": (
-                    f"completed US weekdays only; current session admitted after "
-                    f"{SESSION_COMPLETE_HOUR_ET}:00 America/New_York"
+                    "exchange sessions with holiday/early-close support; cash close + 10 minutes; "
+                    "same-day vendor bars require their own post-close timestamp"
                 ),
             },
             "stale_detail": {LEVEL_SYMBOLS.get(k, SPX_SYMBOL): v for k, v in stale.items()},

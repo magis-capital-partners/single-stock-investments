@@ -74,6 +74,17 @@ export function validateOrderRequest(payload, authorizedOwner) {
   }
 
   const option = validateOptionIdentity(payload, secType);
+  const strategy = String(payload.strategy || "single_stock").trim().slice(0, 32);
+  let framework = {};
+  if (strategy === "short_framework") {
+    const decision = String(payload.framework_decision_id || "");
+    const binding = String(payload.framework_request_sha256 || "");
+    if (!/^[a-f0-9]{64}$/.test(decision) || !/^[a-f0-9]{64}$/.test(binding)
+      || payload.rationale !== `SF1:${decision}:${binding}` || secType !== "STK") {
+      throw new TypeError("A reviewed short-framework decision and exact request binding are required.");
+    }
+    framework = { framework_decision_id: decision, framework_request_sha256: binding };
+  }
   return {
     owner: authorizedOwner,
     conid,
@@ -90,9 +101,16 @@ export function validateOrderRequest(payload, authorizedOwner) {
     // "live" only records an intent; the hub still needs its own live interlock
     // enabled and its kill switch off before anything transmits.
     mode: payload.mode || "dry_run",
-    strategy: String(payload.strategy || "single_stock").trim().slice(0, 32),
+    strategy,
     rationale: String(payload.rationale || "").slice(0, 500),
+    ...framework,
   };
+}
+
+export function frameworkRequestCore(ticket) {
+  const keys = ['conid', 'symbol', 'sec_type', 'action', 'quantity', 'limit_price', 'currency',
+    'tif', 'outside_rth', 'mode', 'strategy', 'framework_decision_id'];
+  return Object.fromEntries(keys.sort().map(key => [key, ticket[key]]));
 }
 
 /**
