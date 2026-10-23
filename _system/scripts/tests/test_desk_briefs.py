@@ -229,6 +229,53 @@ def test_confidence_must_be_backed_by_evidence_of_that_kind(root: Path):
     assert any("own id" in e for e in _check(root)["errors"])
 
 
+def test_filing_instructions_rebuild_the_dashboard_payload_in_the_same_commit():
+    readme = (ROOT / "_system" / "data" / "desk_briefs" / "README.md").read_text(encoding="utf-8")
+    prompt = (ROOT / "_system" / "prompts" / "grok_scan_agents.md").read_text(encoding="utf-8")
+    tape = prompt.split("## 5. Index, forced flow, and tape", 1)[1].split("## 6. Short selling", 1)[0]
+    for text in (readme, tape):
+        assert "python _system/scripts/build_desk_briefs.py" in text
+        assert "dashboard/data/desk_briefs.json" in text
+        assert "same commit" in text
+
+
+def test_checker_rejects_a_stale_dashboard_payload(root: Path):
+    _write(root, "activism", "2026-10-12", GOOD)
+    payload = root / "dashboard" / "data" / "desk_briefs.json"
+    payload.parent.mkdir(parents=True, exist_ok=True)
+    payload.write_text(json.dumps({"schema_version": "desk_briefs.v1", "desks": []}) + "\n", encoding="utf-8")
+    args = [
+        "--briefs-dir", str(root / "_system" / "data" / "desk_briefs"),
+        "--registry", str(root / "_system" / "portfolio" / "registry.json"),
+        "--schema", str(root / "_system" / "data" / "desk_briefs" / "schema.json"),
+        "--root", str(root), "--today", "2026-10-12",
+    ]
+    errors = checker.committed_payload_errors(
+        root=root,
+        briefs_dir=root / "_system" / "data" / "desk_briefs",
+        registry_path=root / "_system" / "portfolio" / "registry.json",
+        schema_path=root / "_system" / "data" / "desk_briefs" / "schema.json",
+    )
+    assert errors and "build_desk_briefs.py" in errors[0]
+    assert "same commit" in errors[0]
+    assert checker.main(args) == 1
+    assert checker.main(args + ["--warn-only"]) == 0
+    assert builder.main([
+        "--out", str(payload),
+        "--briefs-dir", str(root / "_system" / "data" / "desk_briefs"),
+        "--registry", str(root / "_system" / "portfolio" / "registry.json"),
+        "--schema", str(root / "_system" / "data" / "desk_briefs" / "schema.json"),
+        "--root", str(root), "--now", "2026-10-12T12:00:00Z",
+    ]) == 0
+    assert checker.committed_payload_errors(
+        root=root,
+        briefs_dir=root / "_system" / "data" / "desk_briefs",
+        registry_path=root / "_system" / "portfolio" / "registry.json",
+        schema_path=root / "_system" / "data" / "desk_briefs" / "schema.json",
+    ) == []
+    assert checker.main(args) == 0
+
+
 def test_cli_exit_codes_and_warn_only(root: Path):
     brief = copy.deepcopy(GOOD)
     brief["items"][0]["ticker"] = "ZZZZ"

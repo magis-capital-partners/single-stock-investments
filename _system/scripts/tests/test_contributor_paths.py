@@ -82,6 +82,18 @@ def test_malformed_grok_branch_is_other(ref):
     assert guard.classify_branch(ref) == "other"
 
 
+def test_rebuilt_dashboard_payload_stays_on_the_data_lane():
+    ref = "grok/tape_index/2026-10-23-digest"
+    files = [
+        "_system/data/desk_briefs/tape_index/2026-10-23.json",
+        "_system/memory-hub/research-equity/daily/2026-10-23.md",
+        "dashboard/data/desk_briefs.json",
+    ]
+    ok, offending = guard.check(ref, files)
+    assert ok, offending
+    assert lanes.classify(ref, files) == "data"
+
+
 def test_classifier_routes_grok_data_prs_to_the_data_lane():
     assert lanes.classify(GROK, ["_system/data/desk_briefs/activism/2026-10-12.json"]) == "data"
     assert lanes.classify(GROK, ["_system/scripts/x.py"]) == "code"
