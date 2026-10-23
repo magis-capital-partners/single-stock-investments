@@ -15,9 +15,12 @@
 <link href="shorts-net-edge.css?v=20261015-v2" rel="stylesheet">
 <link href="shorts-edge-v3.css?v=20261018-fundamentals" rel="stylesheet">
 <link href="short-sleeve.css?v=20261019-portfolio" rel="stylesheet">
+<link href="short-profit-program.css?v=20261022-framework-v1" rel="stylesheet">
 <link href="warrants.css" rel="stylesheet">
 <link href="portfolio.css?v=20261008-michael-tail" rel="stylesheet">
-<link href="buyback.css?v=20261020-v2" rel="stylesheet">
+<link href="buyback.css?v=20261022-radar" rel="stylesheet">
+<link href="workspace-tools.css?v=20261023" rel="stylesheet">
+<link href="aggregates.css?v=20261023" rel="stylesheet">
 <link href="ideas.css?v=20261011-separations" rel="stylesheet">
 <link href="energy-model.css?v=20261015-energy" rel="stylesheet">
 <style>
@@ -1793,7 +1796,7 @@
   <header class="topbar">
     <div class="topbar-left">
       <h1 class="topbar-logo">SINGLE STOCK PORTFOLIO</h1>
-      <div class="topbar-meta"><span class="dot dot-green"></span><span id="meta-updated">Loading…</span></div>
+      <div class="topbar-meta"><span class="dot dot-green"></span><span id="meta-updated">Loading…</span><a class="data-status-link" href="#/data-status">Data status</a></div>
     </div>
     <div class="topbar-actions">
       <span class="form-hint">Universe intake is automated from LS-algo</span>
@@ -1831,8 +1834,7 @@
   <nav class="view-tabs workspace-subnav" id="insights-subnav" aria-label="Insights" hidden>
     <a class="view-tab" data-view="insights" href="#/insights/overview">Signals &amp; Synthesis</a>
     <a class="view-tab" data-view="activist" href="#/insights/activism">Activism</a>
-    <a class="view-tab" data-view="insights" href="#/insights/data-health">Data Health</a>
-    <a class="view-tab" data-view="insights" href="#/insights/managers">Managers</a>
+    <a class="view-tab" data-view="insights" href="#/insights/investors/signals">Investors</a>
   </nav>
 
   <main id="main-content">
@@ -1981,12 +1983,16 @@
 <script src="energy-model-viz.js?v=20261015-energy"></script>
 <script src="insights-viz.js?v=20261020-relevance"></script>
 <script src="valuation-viz.js"></script>
-<script src="criticality-viz.js?v=20261001-signal-study"></script>
+<script src="market-sessions.js?v=20261023"></script>
+<script src="market-risk-data.js?v=20261023"></script>
+<script src="criticality-viz.js?v=20261022-session-comparison"></script>
 <script src="vol-viz.js?v=20261009-volume-residual"></script>
 <script src="technical-viz.js?v=20261009-volume-residual"></script>
 <script src="technical-picture-viz.js?v=20261001-signal-study"></script>
 <script src="fico-watch-viz.js?v=20261006-fico-watch-2"></script>
 <script src="overlap-viz.js?v=20261008-overlap-line"></script>
+<script src="workspace-tools.js?v=20261023"></script>
+<script src="aggregates-viz.js?v=20261023"></script>
 <script src="holdings-viz.js?v=20261018-held-by"></script>
 <script src="index-viz.js"></script>
 <script src="activist-viz.js?v=20260819-dashboard-rebuild"></script>
@@ -1996,10 +2002,13 @@
 <script src="shorts-edge-v3-viz.js?v=20261018-fundamentals"></script>
 <script src="short-sleeve-engine.js?v=20261019-portfolio"></script>
 <script src="short-sleeve-viz.js?v=20261020-patient"></script>
-<script src="reverse-splits-viz.js?v=20261015-net-edge-v3"></script>
+<script src="short-framework-engine.js?v=20261022-framework-v1"></script>
+<script src="short-framework-viz.js?v=20261022-framework-v1"></script>
+<script src="short-profit-program.js?v=20261022-framework-v1"></script>
+<script src="reverse-splits-viz.js?v=20261022-profit-program"></script>
 <script src="warrant-viz.js"></script>
 <script src="special-situations-viz.js?v=20261018-buyback"></script>
-<script src="buyback-viz.js?v=20261020-v2"></script>
+<script src="buyback-viz.js?v=20261022-radar"></script>
 <script src="separations-viz.js?v=20261011-separations"></script>
 <script src="desk-briefs-viz.js?v=20261012-desk-briefs"></script>
 <script src="sleeve-viz.js?v=20261008-michael-tail"></script>
@@ -2296,7 +2305,7 @@ const MEMORY_VIEW_KEY = 'ssp_memory_view_v1';
 const MEMORY_TYPE_KEY = 'ssp_memory_type_v1';
 const BIOTECH_SCOPE_KEY = 'ssp_biotech_scope_v1';
 const WATCHLIST_VIEW_KEY = 'ssp_watchlist_view_v1';
-const WATCHLIST_VIEWS = new Set(['all', 'queue', 'nol', 'banks', 'rock']);
+const WATCHLIST_VIEWS = new Set(['all', 'queue', 'nol', 'banks', 'rock', 'buybacks']);
 const SITUATION_LANE_IDS = {
   spinoffs: 'spinoffs',
   'split-offs': 'split_offs',
@@ -2410,11 +2419,14 @@ function parseRouteFromHashString(hash) {
   }
   const shortBacktestMatch = /^#\/ideas\/short-alpha\/backtest$/i.test(hash || '');
   if (shortBacktestMatch) return { view:'short-alpha', shortAlphaSection:'backtest', ticker:null, watchlistSub:null };
-  const ideasMatch = /^#\/ideas\/(all|queue|nol|banks|rock|short-alpha)$/i.exec(hash || '');
+  const ideasMatch = /^#\/ideas\/(all|queue|nol|banks|rock|buybacks|short-alpha)$/i.exec(hash || '');
   if (ideasMatch) {
     const sub = ideasMatch[1].toLowerCase();
     return { view: sub === 'short-alpha' || sub === 'warrants' ? sub : 'watchlist', ticker: null, watchlistSub: sub };
   }
+  if (/^#\/data-status$/i.test(hash || '')) return {view:'insights',insightsSection:'sources',ticker:null,watchlistSub:null};
+  const investorMatch=/^#\/insights\/investors(?:\/(signals|directory))?$/i.exec(hash || '');
+  if (investorMatch) return {view:'insights',insightsSection:investorMatch[1]==='directory'?'managers':'consensus',ticker:null,watchlistSub:null};
   const insightsMatch = /^#\/insights\/(overview|activism|data-health|letters|podcasts|videos|inflections|events|index-watch|consensus|funds|documents|tickers|memory|sources|managers)$/i.exec(hash || '');
   if (insightsMatch) {
     const section = insightsMatch[1].toLowerCase();
@@ -2433,7 +2445,7 @@ function parseRouteFromHashString(hash) {
       watchlistSub: null,
     };
   }
-  const watchlistMatch = /^#\/watchlist(?:\/(queue|nol|banks|rock))?$/i.exec(hash || '');
+  const watchlistMatch = /^#\/watchlist(?:\/(queue|nol|banks|rock|buybacks))?$/i.exec(hash || '');
   if (watchlistMatch) {
     return {
       view: 'watchlist',
@@ -2494,7 +2506,7 @@ function syncRouteHash() {
   } else if (activeView === 'activist') {
     setAppHash('#/insights/activism');
   } else if (activeView === 'insights') {
-    setAppHash(insightsSection === 'sources' ? '#/insights/data-health' : `#/insights/${String(insightsSection || 'events').replace('_', '-')}`);
+    setAppHash(insightsSection === 'sources' ? '#/data-status' : insightsSection === 'managers' ? '#/insights/investors/directory' : insightsSection === 'consensus' ? '#/insights/investors/signals' : `#/insights/${String(insightsSection || 'events').replace('_', '-')}`);
   } else if (activeView === 'risk') {
     setAppHash('#/market-risk');
   } else if ((activeView === 'drew' || activeView === 'michael') && sleevePrefill[activeView]) {
@@ -2693,14 +2705,14 @@ function feedNotice(id) {
   const row = feedById(id);
   const format = window.DashboardFormat;
   if (!row || !format) {
-    return 'Feed status is missing. <a href="#/insights/data-health">Data Health</a>';
+    return 'Feed status is missing. <a href="#/insights/data-health">Data status</a>';
   }
   const state = row.kind === 'api' ? (row.status || 'api') : feedClockState(id);
   const cls = state === 'fresh' || state === 'empty' || state === 'api'
     ? 'badge-ok'
     : (state === 'stale' ? 'badge-warn' : 'badge-bad');
   const action = row.next_action || row.healer || '';
-  return `<span class="badge ${cls}">${escapeHtml(format.feedLabel(state))}</span> ${escapeHtml(action)} <a href="#/insights/data-health">Data Health</a>`;
+  return `<span class="badge ${cls}">${escapeHtml(format.feedLabel(state))}</span> ${escapeHtml(action)} <a href="#/insights/data-health">Data status</a>`;
 }
 
 function screenUnavailable(id, missingTitle) {
@@ -3565,10 +3577,9 @@ async function load() {
     data.quotes = null;
   }
   try {
-    const componentFallback = await fetchShardJson('data/market_risk_components.json');
-    if (data.market_risk && !(data.market_risk.components || []).length) {
-      data.market_risk.components = componentFallback.components || [];
-    }
+    const [componentFallback, criticalityFallback] = await Promise.all([
+      fetchShardJson('data/market_risk_components.json'),fetchShardJson('data/criticality_summary.json')]);
+    if(window.MarketRiskData)data.market_risk=MarketRiskData.merge(data.market_risk_origin==='api'?data.market_risk:null,criticalityFallback,componentFallback);
   } catch (_) {}
   // Volatility panel feeds. Each is optional and independently tolerant: a
   // missing file leaves its slot null/empty and VolViz renders its own empty
@@ -3633,6 +3644,23 @@ async function load() {
   else if (activeView === 'watchlist') renderWatchlistTab();
 }
 
+let marketRiskRefreshPending=false;
+async function refreshMarketRisk() {
+  if(marketRiskRefreshPending || !data || activeView!=='risk' || document.hidden)return;
+  marketRiskRefreshPending=true;
+  const paths=['/api/v1/market-risk/latest','data/criticality_summary.json','data/market_risk_components.json','data/vol_metrics_latest.json','data/spx_surface_latest.json','data/capitulation_daily.json','data/technical_summary.json'];
+  try {
+    const result=await Promise.allSettled(paths.map(async path=>{const r=await fetch(path,{cache:'no-store',signal:AbortSignal.timeout(12000)});if(!r.ok)throw new Error(path);return r.json();}));
+    const value=i=>result[i].status==='fulfilled'?result[i].value:null;
+    if(value(0)||value(1)||value(2))data.market_risk=MarketRiskData.merge(value(0),value(1) || data.market_risk,value(2) || {components:data.market_risk?.components});
+    for(const [i,key] of [[3,'vol_metrics'],[4,'spx_surface'],[5,'capitulation']])if(value(i))data[key]=value(i);
+    if(value(6))data.technical_signals_ref={...data.technical_signals_ref,market_context:value(6).market_context};
+    renderMarketRiskView();
+  } finally {marketRiskRefreshPending=false;}
+}
+window.setInterval(refreshMarketRisk,60000);
+document.addEventListener('visibilitychange',()=>{if(!document.hidden)void refreshMarketRisk();});
+
 function renderMarketRiskView() {
   const loading = document.getElementById('risk-loading');
   const content = document.getElementById('risk-content');
@@ -3664,12 +3692,8 @@ function renderMarketRiskView() {
   // The verdict line is the first thing on the page: one plain-English sentence
   // composed from the survivors, plus the trust line that says whether to
   // believe it.
-  const riskOrigin = data.market_risk_origin === 'api'
-    ? 'Live /api/v1/market-risk/latest'
-    : (data.market_risk_origin === 'committed'
-      ? 'Committed market_risk_components.json fallback'
-      : 'Market risk source unavailable');
-  const riskClock = `<p class="tier-sub" style="margin:0 0 10px">${escapeHtml(riskOrigin)}. ${feedNotice('market-risk')} ${feedNotice('market-risk-components')}</p>`;
+  const freshnessSummary=window.MarketRiskData?MarketRiskData.summary(data.market_risk):null;
+  const riskClock=`<div class="risk-freshness-bar"><span>${freshnessSummary?.session?'Session '+escapeHtml(freshnessSummary.session):'Awaiting a dated session'} · ${freshnessSummary?.current || 0}/${freshnessSummary?.total || 0} inputs current · ${freshnessSummary?.pending || 0} pending</span><span>Close refresh: +13m / +43m · settled 18:19 ET</span><button type="button" data-risk-refresh>Check for updates</button><a href="#/data-status">Source status</a></div>`;
   const quoteRows = (data.quotes?.quotes || []).filter(q => q.price != null);
   const quotesLine = quoteRows.length
     ? `<p class="tier-sub" style="margin:0 0 10px">${quoteRows.map(q => `${escapeHtml(q.symbol)} ${Number(q.price).toLocaleString(undefined, { maximumFractionDigits: 2 })}${q.change_pct != null ? ` (${q.change_pct >= 0 ? '+' : ''}${q.change_pct}%)` : ''}${q.stale ? ' · stale' : ''} · as of ${escapeHtml(String(q.as_of || '').slice(0, 16).replace('T', ' '))}`).join(' &nbsp; ')}</p>`
@@ -3679,6 +3703,7 @@ function renderMarketRiskView() {
     data.market_risk_details || {},
     riskOptions,
   )}${volPanel}`;
+  content.querySelector('[data-risk-refresh]')?.addEventListener('click',()=>void refreshMarketRisk());
 }
 
 async function loadShortAlpha() {
@@ -3927,7 +3952,7 @@ function setView(view, opts = {}) {
   });
   document.querySelectorAll('.workspace-subnav').forEach((nav) => { nav.hidden = nav.id !== `${parentView}-subnav`; });
   document.querySelectorAll('.workspace-subnav .view-tab').forEach((link) => {
-    const ideasGroupMatch = link.dataset.ideasGroup === 'screens' && view === 'watchlist' && ['nol', 'banks'].includes(watchlistViewMode);
+    const ideasGroupMatch = link.dataset.ideasGroup === 'screens' && view === 'watchlist' && ['nol', 'banks', 'rock', 'buybacks'].includes(watchlistViewMode);
     const active = ideasGroupMatch || (link.dataset.view === view && (!link.dataset.watchlistRoute || link.dataset.watchlistRoute === watchlistViewMode));
     link.classList.toggle('active', active);
     if (active) link.setAttribute('aria-current', 'page'); else link.removeAttribute('aria-current');
@@ -4179,6 +4204,12 @@ function renderActivist() {
 }
 
 function renderInsights(opts = {}) {
+  if (insightsSection === 'sources' && window.WorkspaceTools) {
+    const loading=document.getElementById('insights-loading'),content=document.getElementById('insights-content');
+    if(loading)loading.style.display='none';
+    if(content){content.style.display='block';WorkspaceTools.mountStatus(content,data?.feed_status,data?.insights?.source_health);}
+    return;
+  }
   if (insightsSection === 'managers' && window.FundHoldings) {
     const loading = document.getElementById('insights-loading');
     const content = document.getElementById('insights-content');
@@ -4201,7 +4232,7 @@ function renderInsights(opts = {}) {
       loadInsightsSection(insightsSection).then(
         () => renderInsights(opts),
         () => {
-          loading.textContent = 'Insights feed unavailable · check Insights → Data Health for source status.';
+          loading.textContent = 'Insights feed unavailable · open Data status for source details.';
         },
       );
     }
@@ -4209,7 +4240,7 @@ function renderInsights(opts = {}) {
   }
   const insights = data.insights;
   if (!insights || !window.InsightsViz) {
-    loading.textContent = 'Insights feed unavailable · check Insights → Data Health for source status.';
+    loading.textContent = 'Insights feed unavailable · open Data status for source details.';
     content.style.display = 'none';
     return;
   }
@@ -4277,6 +4308,7 @@ function renderInsights(opts = {}) {
     biotechSearch,
     biotechShowLimit,
   });
+  if (insightsSection === 'consensus' && window.WorkspaceTools) content.insertAdjacentHTML('afterbegin',WorkspaceTools.investorNav(false));
   if (window.EnergyModelViz) EnergyModelViz.bind(content);
   if (window.IndexViz && IndexViz.bindIndexWatchToggles && data.index_membership) {
     IndexViz.bindIndexWatchToggles(content, data.index_membership, {
@@ -4803,6 +4835,7 @@ function renderWatchlistSubNav(active) {
     <button type="button" class="${active === 'nol' ? 'active' : ''}" data-watchlist-view="nol">NOL carryforwards · ${nolCount}</button>
     <button type="button" class="${active === 'banks' ? 'active' : ''}" data-watchlist-view="banks">Advantaged banks · ${bankCount}</button>
     <button type="button" class="${active === 'rock' ? 'active' : ''}" data-watchlist-view="rock">Aggregates · ${rockCount}</button>
+    <button type="button" class="${active === 'buybacks' ? 'active' : ''}" data-watchlist-view="buybacks">Buybacks</button>
   </div>`;
 }
 
@@ -5107,49 +5140,13 @@ function renderWatchlistBanksBody() {
 }
 
 function renderWatchlistRockBody() {
-  const rock = data.rock_aggregates_screener || {};
-  const rockRows = rock.rows || [];
-  const pureOnly = localStorage.getItem('rockPureOnly') === '1';
-  const visible = pureOnly ? rockRows.filter(r => r.is_pure_rock === true) : rockRows;
-  const pureCount = rock.pure_rock_count != null ? rock.pure_rock_count : rockRows.filter(r => r.is_pure_rock).length;
-  const cell = (v) => escapeHtml(v || '—');
-  const rowHtml = (r) => `
-          <tr>
-            <td class="mono">${escapeHtml(r.ticker)}${r.in_holdings ? ' <span class="badge badge-ok" title="Already a holding">H</span>' : ''}${r.in_watchlist ? ' <span class="badge badge-warn" title="On watchlist">W</span>' : ''}${r.screen_status === 'pending_sec' ? ` <span class="badge badge-warn" title="${escapeHtml(r.sec_error || 'SEC facts unavailable')}">!</span>` : ''}</td>
-            <td>${escapeHtml(r.company)}</td>
-            <td><span class="badge badge-sleeve">${cell(r.rock_type_label || r.rock_type)}</span></td>
-            <td class="mono" title="Latest full fiscal year${r.fiscal_year_end ? ' ending ' + escapeHtml(r.fiscal_year_end) : ''}">${cell(r.revenue_display)}</td>
-            <td class="mono" title="(Operating income + DD&amp;A) ÷ revenue, FY">${cell(r.ebitda_margin_display)}</td>
-            <td class="mono" title="(CFO − capex) ÷ EBITDA, FY">${cell(r.fcf_conversion_display)}</td>
-            <td class="mono" title="Capex ÷ revenue, FY. Maintenance vs growth split is not in XBRL">${cell(r.capex_pct_revenue_display)}</td>
-            <td class="mono" title="(Total debt − cash) ÷ EBITDA. Negative means net cash">${cell(r.net_debt_ebitda_display)}</td>
-            <td class="mono" title="Operating income × (1 − 21% flat statutory) ÷ (equity + total debt − cash)">${cell(r.roic_display)}</td>
-            <td class="mono" title="(Market cap + net debt) ÷ EBITDA">${cell(r.ev_ebitda_display)}</td>
-            <td class="mono" title="(Goodwill + intangibles) ÷ equity — roll-up quality check">${cell(r.goodwill_equity_display)}</td>
-            <td class="mono" title="Permitted reserve life is disclosed in 10-K Item 2 Properties, not XBRL. Fills in once the aggregates reserves filing panel is built.">${cell(r.reserve_life_display)}</td>
-            <td class="mono" style="font-size:11px">${cell(r.fiscal_year_end)}</td>
-            <td>${r.in_holdings ? '<span class="form-hint">holding</span>' : `<button type="button" class="btn-secondary btn-sm" data-rock-watch="${escapeHtml(r.ticker)}"
-              data-company="${escapeHtml(r.company)}" data-market="${escapeHtml(r.market)}">+ Watchlist</button>`}</td>
-          </tr>`;
-  const head = `<thead><tr>
-        <th>Ticker</th><th>Company</th><th>Type</th><th>Rev (FY)</th><th>EBITDA %</th><th>FCF conv</th><th>Capex % rev</th><th>ND/EBITDA</th><th>ROIC</th><th>EV/EBITDA</th><th>GW+Int / Eq</th><th>Reserve life</th><th>FY end</th><th></th>
-      </tr></thead>`;
-  const table = rockRows.length ? `
-    <label class="form-hint" style="display:inline-flex;align-items:center;gap:6px;margin-bottom:10px">
-      <input type="checkbox" id="rock-pure-only" ${pureOnly ? 'checked' : ''}>
-      Show aggregates only (hide cement, lime, asphalt)
-    </label>
-    ${visible.length ? `<table class="darwin-table">${head}<tbody>${visible.map(rowHtml).join('')}</tbody></table>` : '<div class="operator-empty"><strong>No producers match this filter</strong><span>Clear “Show aggregates only” to restore cement, lime and asphalt names.</span></div>'}`
-    : screenUnavailable('rock', 'Aggregates screen not published');
-  return `
-    <div class="watchlist-section">
-      <h3>Aggregates screener (${rockRows.length}${pureCount != null ? ` · ${pureCount} aggregates` : ''})</h3>
-      <p class="tier-sub" style="margin-bottom:8px">${feedNotice('rock')}</p>
-      <p class="form-hint" style="margin-bottom:10px">${escapeHtml(rock.criteria || 'US aggregates, cement and lime producers. Seed list plus SEC companyfacts.')}</p>
-      <p class="form-hint" style="margin-bottom:10px">Freight caps the economic haul radius near 25 miles, so each quarry is a local oligopoly and the thesis is price per ton compounding above cost per ton. The two metrics that decide it — freight-adjusted price per ton and cash gross profit per ton — are not in XBRL; they arrive with the aggregates unit-economics filing panel. Macro context: <code>aggregates_infrastructure</code> theme panel.</p>
-      ${table}
-      <p class="form-hint" style="margin-top:10px">Source · SEC company facts (latest full fiscal year for flows) plus Yahoo chart price. Holdings are kept in rank order rather than pushed to the bottom: VMC, MLM and CRH are the benchmark the rest is read against.</p>
-    </div>`;
+  return '<div data-aggregates-screen></div>';
+}
+
+function renderWatchlistBuybacksBody() {
+  return `<div class="watchlist-section">
+    <div data-buyback-screen></div>
+  </div>`;
 }
 
 function renderWatchlistTab() {
@@ -5177,6 +5174,7 @@ function renderWatchlistTab() {
   if (watchlistViewMode === 'all') body = renderIdeasIndexBody();
   else if (watchlistViewMode === 'banks') body = renderWatchlistBanksBody();
   else if (watchlistViewMode === 'rock') body = renderWatchlistRockBody();
+  else if (watchlistViewMode === 'buybacks') body = renderWatchlistBuybacksBody();
   else body = renderWatchlistNolBody();
 
   content.innerHTML = watchlistViewMode === 'all' ? body : `<div class="ideas-shell"><header class="ideas-header"><div><h2>Research Screens</h2><p>Specialized screens share one decision grammar: actionable rows first, blockers explicit, methodology collapsed.</p></div><span class="ideas-asof">As of ${escapeHtml(window.DashboardFormat.date(data.generated_at || data.generatedAt))}</span></header>${renderWatchlistSubNav(watchlistViewMode)}${body}</div>`;
@@ -5184,6 +5182,24 @@ function renderWatchlistTab() {
   content.querySelectorAll('[data-watchlist-view]').forEach(btn => {
     btn.addEventListener('click', () => setWatchlistView(btn.dataset.watchlistView));
   });
+  if (watchlistViewMode === 'rock' && window.AggregatesViz) {
+    const host=content.querySelector('[data-aggregates-screen]');
+    host.textContent='Loading aggregates evidence.';
+    fetch('data/rock_aggregates_screener.json',{cache:'no-store'}).then(r=>{if(!r.ok)throw new Error('Aggregates snapshot unavailable');return r.json();}).then(payload=>{
+      if(!host.isConnected || watchlistViewMode!=='rock')return;
+      data.rock_aggregates_screener=payload;
+      AggregatesViz.mount(host,payload,{
+        onWatch:row=>openOnboardModal({ticker:row.ticker,company:row.company,market:row.market,watchlistOnly:true}),worldModel:data.world_model,
+      });
+    }).catch(e=>{if(host.isConnected)host.textContent=e.message;});
+  }
+  if (watchlistViewMode === 'buybacks' && window.BuybackViz) {
+    BuybackViz.load().then(() => {
+      if (watchlistViewMode !== 'buybacks') return;
+      const live = document.getElementById('watchlist-content')?.querySelector('[data-buyback-screen]');
+      if (live) BuybackViz.mountScreen(live);
+    });
+  }
   content.querySelectorAll('[data-idea-filter]').forEach((button) => button.addEventListener('click', () => {
     ideaFilter = button.dataset.ideaFilter;
     setIdeaUrlState({ ideaFilter });
@@ -5243,14 +5259,6 @@ function renderWatchlistTab() {
       watchlistOnly: true,
     }));
   });
-  const rockPureCb = content.querySelector('#rock-pure-only');
-  if (rockPureCb) {
-    rockPureCb.addEventListener('change', () => {
-      localStorage.setItem('rockPureOnly', rockPureCb.checked ? '1' : '0');
-      renderWatchlistTab();
-    });
-  }
-
   content.querySelectorAll('[data-rock-watch]').forEach(btn => {
     btn.addEventListener('click', () => openOnboardModal({
       ticker: btn.dataset.rockWatch,
@@ -5451,7 +5459,6 @@ function renderSummary() {
 function filtered() {
   const q = document.getElementById('search').value.toLowerCase();
   return data.tickers.filter(t => {
-    if (window.BuybackViz && !BuybackViz.matches(t)) return false;
     if (marketFilter !== 'ALL' && t.market !== marketFilter) return false;
     if (sleeveFilter !== 'ALL') {
       const sid = t.classification?.investment_sleeve;
@@ -5832,10 +5839,6 @@ function renderFundNavPanel(t) {
 }
 
 function renderTable() {
-  if (window.BuybackViz) BuybackViz.mountCoverageControls({
-    onFilter: renderTable,
-    onSort: key => { sortKey = 'buyback.' + key; sortAsc = false; renderTable(); },
-  });
   const rows = filtered();
   const cols = visibleHoldingsColumns();
   renderHoldingsThead();
@@ -6425,6 +6428,7 @@ document.querySelectorAll('#view-tabs .view-tab, .workspace-subnav .view-tab').f
     if (link.getAttribute('href') === '#/insights/data-health') insightsSection = 'sources';
     if (link.getAttribute('href') === '#/insights/overview') insightsSection = 'events';
     if (link.getAttribute('href') === '#/insights/managers') insightsSection = 'managers';
+    if (link.getAttribute('href') === '#/insights/investors/signals') insightsSection = 'consensus';
     if (link.getAttribute('href') === '#/strategies/darwin/overview') darwinViewMode = 'overview';
     setView(link.dataset.view);
   });

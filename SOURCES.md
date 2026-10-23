@@ -119,7 +119,7 @@ Ranked desk output is a data drop, not a note. One JSON file per desk per day at
 | Desks | `special_situations`, `activism`, `fundamentals`, `nol_tax_assets`, `tape_index`, `stahl`, `short_selling`. |
 | Items | At most 12, best first. Every item has a ticker from `_system/portfolio/registry.json` (or the literal `unresolved`), a headline of at most 160 characters, one number, evidence with the accession or URL, and a confidence of `filing`, `provider`, `news`, or `web`. |
 | Inputs | `inputs_read` records every file read with the stamp it carried, so a brief built on stale data says so. |
-| Push | A pull request on a `grok/<desk>/<YYYY-MM-DD>-<slug>` branch that touches only the brief and, if needed, the hub daily note. The check must pass. |
+| Push | A pull request on a `grok/<desk>/<YYYY-MM-DD>-<slug>` branch that touches the brief, the rebuilt `dashboard/data/desk_briefs.json` from `build_desk_briefs.py` in that same commit, and, if needed, the hub daily note. The check must pass. |
 | Authority | `research_only: true`, `in_base_irr: false`, `authority: "none"`. No position, no size, no stance, no fraud tag. |
 
 ## Room and desks

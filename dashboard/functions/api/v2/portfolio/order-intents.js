@@ -12,7 +12,7 @@
 import { failure, json, requestId, requireDatabase } from "../../../_lib/http.js";
 import { requirePortfolioViewer } from "../../../_lib/auth.js";
 import { portfolioOrderOwner } from "../../../_lib/paper-orders.js";
-import { validateOrderRequest } from "../../../_lib/order-requests.js";
+import { validateOrderRequest, frameworkRequestCore } from "../../../_lib/order-requests.js";
 import { expireStalePreviewsStatement, isStalePreview } from "../../../_lib/command-channel.js";
 
 const PUBLIC_COLUMNS = `request_id,owner,strategy,conid,symbol,sec_type,action,quantity_decimal,
@@ -86,6 +86,12 @@ export async function onRequestPost(context) {
     } catch (error) {
       return json({ error: error.message, request_id: id }, 400, privateHeaders());
     }
+    if (ticket.strategy === "short_framework") {
+      const core = JSON.stringify(frameworkRequestCore(ticket));
+      const digest = Array.from(new Uint8Array(await crypto.subtle.digest("SHA-256", new TextEncoder().encode(core))))
+        .map(value => value.toString(16).padStart(2, "0")).join("");
+      if (digest !== ticket.framework_request_sha256) return json({ error: "Reviewed framework request contents changed.", request_id: id }, 400, privateHeaders());
+    }
 
     const db = requireDatabase(context.env);
     const run = await db.prepare(`SELECT account_alias FROM portfolio_source_runs
@@ -96,13 +102,22 @@ export async function onRequestPost(context) {
     }
 
     const now = new Date().toISOString();
-    const requestKey = uuid();
+    const requestKey = ticket.strategy === "short_framework" ? `sf-${ticket.framework_request_sha256}` : uuid();
+    if (ticket.strategy === "short_framework") {
+      const prior = await db.prepare("SELECT request_id,owner,state FROM portfolio_order_requests WHERE request_id=?").bind(requestKey).first();
+      if (prior) {
+        if (prior.owner !== owner) return json({ error: "Request binding is already in use.", request_id: id }, 409, privateHeaders());
+        return json({ schema_version: "portfolio_order_requests.v1", request_id_created: prior.request_id,
+          state: prior.state, idempotent: true, request_id: id }, 200, privateHeaders());
+      }
+    }
     // The option identity rides with the request so the ticket can be *read*.
     // It is not the source of truth for what gets sent: the hub re-qualifies the
     // conId at preview and builds the fingerprint from what IBKR returns, so a
     // browser that lied about the strike would produce a fingerprint that does
     // not match what it displayed, and the approval would not bind.
-    await db.prepare(`INSERT INTO portfolio_order_requests
+    const insertion = ticket.strategy === "short_framework" ? "INSERT OR IGNORE" : "INSERT";
+    const inserted = await db.prepare(`${insertion} INTO portfolio_order_requests
       (request_id,account_alias,owner,strategy,conid,symbol,sec_type,action,quantity_decimal,
        limit_price_decimal,currency,tif,outside_rth,mode,rationale,expiry,strike_decimal,right_code,
        multiplier_decimal,trading_class,exchange,local_symbol,state,created_at,updated_at)
@@ -113,6 +128,12 @@ export async function onRequestPost(context) {
       ticket.expiry, ticket.strike, ticket.right, ticket.multiplier,
       ticket.trading_class, ticket.exchange, ticket.local_symbol, now, now,
     ).run();
+    if (ticket.strategy === "short_framework" && Number(inserted?.meta?.changes) === 0) {
+      const prior = await db.prepare("SELECT request_id,owner,state FROM portfolio_order_requests WHERE request_id=?").bind(requestKey).first();
+      if (!prior || prior.owner !== owner) return json({ error: "Request binding conflict.", request_id: id }, 409, privateHeaders());
+      return json({ schema_version: "portfolio_order_requests.v1", request_id_created: prior.request_id,
+        state: prior.state, idempotent: true, request_id: id }, 200, privateHeaders());
+    }
 
     return json({
       schema_version: "portfolio_order_requests.v1",

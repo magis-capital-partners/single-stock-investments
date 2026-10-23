@@ -15,6 +15,8 @@ import urllib.request
 from datetime import date, datetime, timezone
 from pathlib import Path
 from typing import Any, Iterable
+from market_sessions import completed_session, sessions_behind, session_close, NEW_YORK
+from market_risk_publication import reconcile
 
 ROOT = Path(__file__).resolve().parents[2]
 DEFAULT_ETF_ROOT = Path.home() / "Projects/quant/etf-dashboard"
@@ -43,7 +45,10 @@ def iso(value: Any) -> str | None:
     if not text:
         return None
     if len(text) == 10:
-        return f"{text}T20:00:00+00:00"
+        try:
+            return session_close(text).astimezone(timezone.utc).isoformat()
+        except ValueError:
+            return None
     return text.replace("Z", "+00:00")
 
 
@@ -55,7 +60,10 @@ def business_age(value: Any, today: date | None = None) -> int | None:
         start = datetime.fromisoformat(stamp).date()
     except ValueError:
         return None
-    end = today or datetime.now(timezone.utc).date()
+    end = today or date.fromisoformat(completed_session())
+    session_age = sessions_behind(start, str(end))
+    if session_age is not None:
+        return session_age
     if start >= end:
         return 0
     count = 0
@@ -69,7 +77,7 @@ def business_age(value: Any, today: date | None = None) -> int | None:
 
 def quality(as_of: Any, cadence: str) -> str:
     age = business_age(as_of)
-    if age is None:
+    if age is None or age < 0:
         return "unavailable"
     limits = {"intraday": (0, 1), "daily": (1, 3), "event": (2, 5)}
     ready, delayed = limits.get(cadence, (1, 3))
@@ -97,12 +105,13 @@ def component(
     *, score: float | None = None, value: float | None = None, unit: str | None = None,
     scope: str = "market", entitlement_mode: str = "derived",
 ) -> dict:
-    stamp = iso(as_of) or datetime.now(timezone.utc).isoformat()
+    stamp = iso(as_of)
     return {
         "component": name,
         "scope": scope,
         "symbol": symbol,
         "as_of": stamp,
+        "session_date": datetime.fromisoformat(stamp).astimezone(NEW_YORK).date().isoformat() if stamp else None,
         "cadence": cadence,
         "source": source,
         "model_version": MODEL_VERSION,
@@ -137,9 +146,17 @@ def build_letf(root: Path) -> list[dict]:
         rows = rows_from_mapping(data.get("by_underlying"))
         if not rows:
             continue
-        as_of = data.get("as_of") or data.get("latest_date") or data.get("build_time")
-        if not as_of:
-            as_of = max((row.get(row_time) for row in rows if row.get(row_time)), default=None)
+        as_of = max((row.get(row_time) for row in rows if row.get(row_time)), default=None)
+        as_of = as_of or data.get("latest_date") or data.get("as_of")
+        observed_dates = {str(row.get(row_time))[:10] for row in rows if row.get(row_time)}
+        excluded = 0
+        if len(observed_dates) > 1:
+            newest = max(observed_dates)
+            selected = [row for row in rows if str(row.get(row_time) or '')[:10] == newest]
+            excluded = len(rows)-len(selected)
+            rows = selected
+        universe = sorted(str(row.get('underlying') or '') for row in rows)
+        universe_hash = hashlib.sha256(json.dumps(universe).encode()).hexdigest()[:20]
         net = sum(finite(row.get(net_field)) or 0.0 for row in rows)
         gross = sum(finite(row.get(gross_field)) or 0.0 for row in rows)
         auction_values = [abs(finite(row.get(auction_field)) or 0.0) for row in rows]
@@ -156,6 +173,9 @@ def build_letf(root: Path) -> list[dict]:
                 "net_dollars": round(net, 2),
                 "gross_dollars": round(gross, 2),
                 "underlyings": len(rows),
+                "universe_hash": universe_hash,
+                "mixed_session_rows_excluded": excluded,
+                "published_at": data.get("generated_at") or data.get("build_time"),
                 "buy_underlyings": sum((finite(row.get(net_field)) or 0.0) > 0 for row in rows),
                 "sell_underlyings": sum((finite(row.get(net_field)) or 0.0) < 0 for row in rows),
                 "peak_abs_pct_auction_volume": round(max(auction_values, default=0.0), 5),
@@ -376,7 +396,7 @@ def build_spx(ssi_root: Path) -> list[dict]:
     term_ratio = None if not atm_30 or not atm_91 else round(atm_30 / atm_91, 6)
     peaks = [abs(value) for value in (skew_z, term_z, rv_z) if value is not None]
     output.append(component(
-        "options_stress", "SPX", surface.get("as_of") or vol.get("as_of"), "daily",
+        "options_stress", "SPX", min(filter(None,[vol.get("as_of"),surface.get("session_date") or surface.get("as_of")]),default=None), "daily",
         f"single-stock-investments:{SPX_SURFACE_LATEST}", {
             "label": "SPX surface stress",
             "description": (
@@ -410,7 +430,7 @@ def build_spx(ssi_root: Path) -> list[dict]:
                 "straddle_residual_z retired with the spx-0dte intraday feed"
             ),
         },
-        score=min(100.0, 25.0 * max(peaks)) if peaks else 0.0,
+        score=min(100.0, 25.0 * max(peaks)) if peaks else None,
         value=skew_z, unit="z_score", entitlement_mode="derived",
     ))
 
@@ -451,7 +471,7 @@ def build_spx(ssi_root: Path) -> list[dict]:
         # amplify moves. Positive net gamma dampens them, so it scores zero.
         score = 0.0 if gamma_value >= 0 or not gross else min(100.0, 100.0 * abs(gamma_value) / gross)
         output.append(component(
-            "dealer_gamma", "SPX", surface.get("as_of"), "daily",
+            "dealer_gamma", "SPX", surface.get("session_date") or surface.get("as_of"), "daily",
             f"single-stock-investments:{SPX_SURFACE_LATEST}", {
                 "label": "Dealer gamma (open-interest proxy)",
                 "description": (
@@ -463,6 +483,8 @@ def build_spx(ssi_root: Path) -> list[dict]:
                 "put_gamma_notional": put_gamma,
                 "net_gamma_notional": gamma_value,
                 "contracts_used": gamma.get("contracts_used"),
+                "snapshot_timestamp": (surface.get('source') or {}).get('snapshot_timestamp'),
+                "session_basis": surface.get('session_basis'),
                 "method": gamma.get("method"),
                 "formula": gamma.get("formula"),
                 "sign_convention": gamma.get("sign_convention"),
@@ -560,6 +582,8 @@ def build(etf_root: Path, ls_root: Path, ssi_root: Path = ROOT) -> dict:
         "schema_version": 1,
         "model_version": MODEL_VERSION,
         "generated_at": generated,
+        "expected_session": completed_session(),
+        "release_stage": "settled" if datetime.now(timezone.utc).astimezone(NEW_YORK).hour >= 18 else "provisional",
         "source": "single-stock-investments:market-risk-component-builder",
         "research_only": True,
         "components": components,
@@ -612,6 +636,11 @@ def main() -> int:
         payload = json.loads(args.output.read_text(encoding="utf-8"))
     else:
         payload = build(args.etf_root, args.ls_root, args.ssi_root)
+        try:
+            prior = read_json(args.ssi_root / 'dashboard/data/market_risk_components.json')
+        except (OSError, ValueError):
+            prior = {}
+        payload['reconciliation'] = reconcile(payload, prior.get('reconciliation'))
         write_atomic(args.output, payload)
     result = None
     if args.publish or args.publish_only:

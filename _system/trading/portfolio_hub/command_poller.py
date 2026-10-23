@@ -391,8 +391,12 @@ class OrderCommandLoop:
             mode=row.get("mode") or "dry_run",
             tif=row.get("tif") or "DAY",
             outside_rth=bool(row.get("outside_rth")),
+            reduce_only=(row["action"] == "BUY") if row.get("strategy") == "short_framework" else None,
         )
-        draft = self.service.create(intent)
+        if row.get("strategy") == "short_framework":
+            draft = self.service.create(intent, framework_binding=row.get("rationale"))
+        else:
+            draft = self.service.create(intent)
         self.channel.publish(row["request_id"], {"state": "drafting", "intent_uuid": draft["intent_uuid"]})
 
         previewed = self.service.preview(draft["intent_uuid"])

@@ -1,6 +1,6 @@
 {
   "schema_version": "desk_briefs.v1",
-  "generated_at": "2026-10-21T10:03:19Z",
+  "generated_at": "2026-10-23T21:12:25Z",
   "caption": "Ranked output from the Magis desk bots, one brief per desk per day, filed by pull request and checked by schema. A brief is research only: it carries no authority, sizes nothing, and never enters a base IRR. The one number on each row is the dashboard's or the filing's, not the bot's.",
   "desks": [
     {
@@ -9,7 +9,7 @@
       "owner": "drew",
       "author": "claude-drew-special-situations",
       "as_of": "2026-10-12",
-      "age_hours": 226.1,
+      "age_hours": 285.2,
       "stale": true,
       "path": "_system/data/desk_briefs/special_situations/2026-10-12.json",
       "items": [
@@ -243,93 +243,62 @@
       "desk_label": "Index, forced flow and tape",
       "owner": "drew",
       "author": "grok-drew-tape-index",
-      "as_of": "2026-10-19",
-      "age_hours": 58.1,
+      "as_of": "2026-10-20",
+      "age_hours": 93.2,
       "stale": false,
-      "path": "_system/data/desk_briefs/tape_index/2026-10-19.json",
+      "path": "_system/data/desk_briefs/tape_index/2026-10-20.json",
       "items": [
         {
-          "ticker": "MRNA",
-          "headline": "Moderna Nasdaq-100 add (replacing WBD) is new in index_membership; news puts it effective 2026-10-09, but the feed's effective is null and memberships empty.",
-          "one_number": "Nasdaq-100 add, effective 2026-10-09 (news); stretch_z 2.24 vs +2",
-          "lane": "index_event",
-          "evidence": [
-            {
-              "kind": "dashboard",
-              "ref": "dashboard/data/index_membership.json by_ticker.MRNA.confirmed_events (announced 2026-10-02 and 2026-10-18, confidence news_unconfirmed)",
-              "url": null
-            },
-            {
-              "kind": "news",
-              "ref": "Zacks Investment Research 2026-10-08 via portfolio_news.json (category index_inclusion): added 2026-10-09 replacing WBD",
-              "url": null
-            },
-            {
-              "kind": "dashboard",
-              "ref": "dashboard/data/technical_summary.json by_ticker.MRNA.scores.stretch_z=2.239, trend_z=3.432, setup extended (as_of 2026-10-16)",
-              "url": null
-            }
-          ],
-          "confidence": "news",
-          "next": "Confirm the effective date on the Nasdaq notice; the add flow is already past, so this is a record fix, not an upcoming event.",
-          "handoff": null
-        },
-        {
-          "ticker": "XP",
-          "headline": "XP sits 0.91% from the S&P 400 size band (size_band_watch, next S&P share update 2026-12-19) while it prints the highest positive stretch_z in the universe.",
-          "one_number": "distance_to_boundary -0.91% (sp400); stretch_z 3.19 vs +2",
-          "lane": "index_event",
-          "evidence": [
-            {
-              "kind": "dashboard",
-              "ref": "dashboard/data/index_membership.json portfolio_summary.predictor_watch XP (recon_status size_band_watch, mcap_source rank_day_snapshot:2026-10-31)",
-              "url": null
-            },
-            {
-              "kind": "dashboard",
-              "ref": "dashboard/data/technical_summary.json by_ticker.XP.scores.stretch_z=3.194, trend_z=3.232, rsi_14=77.9 (as_of 2026-10-16)",
-              "url": null
-            }
-          ],
-          "confidence": "provider",
-          "next": "Distance is unchanged since the 2026-10-16 file despite a -9.3% 5d move; treat it as a snapshot, not a live distance.",
-          "handoff": null
-        },
-        {
           "ticker": "CRWV",
-          "headline": "CoreWeave moved from normal to capitulation_candidate on the 2026-10-16 print, on 2.49x relative volume; no stabilization confirmation yet.",
-          "one_number": "5d -25.2% (capitulation_candidate; panic 82.9)",
+          "headline": "CoreWeave moved from capitulation_candidate (posted 2026-10-19) to panic on the 2026-10-19 print, on 2.54x relative volume; RSI sits at the 25 line.",
+          "one_number": "5d -23.9% (panic; RSI 25.0)",
           "lane": "capitulation",
           "evidence": [
             {
               "kind": "dashboard",
-              "ref": "dashboard/data/technical_summary.json by_ticker.CRWV.capitulation.state, scores.panic=82.9; measures.return_5d_pct=-25.21; rsi_14=26.4 (as_of 2026-10-16)",
+              "ref": "dashboard/data/technical_summary.json by_ticker.CRWV.capitulation.state=panic; measures.return_5d_pct=-23.85; rsi_14=25.0; relative_volume_20d=2.54 (as_of 2026-10-19)",
               "url": null
             },
             {
               "kind": "dashboard",
-              "ref": "dashboard/data/agent_shards/CRWV.json (shard built, generated 2026-10-16T20:26:21Z)",
+              "ref": "dashboard/data/agent_shards/CRWV.json (shard generated 2026-10-16T20:26:21Z, predates this print)",
               "url": null
             }
           ],
           "confidence": "provider",
-          "next": "Watch for the feed's confirmation flags (positive session, upper-half close, volume cooled).",
+          "next": "Watch for the feed's confirmation flags before reading this as exhaustion.",
           "handoff": null
         },
         {
-          "ticker": "NBIS",
-          "headline": "Nebius moved from stress_building to capitulation_candidate; trend_z -1.23 sits just inside the -1.25 threshold.",
-          "one_number": "5d -25.2% (capitulation_candidate; pressure 91.9)",
+          "ticker": "EOSE",
+          "headline": "Eos Energy moved from capitulation_candidate to panic with CMF -0.392, among the heaviest distribution prints in the universe.",
+          "one_number": "5d -24.3% (panic; CMF -0.392)",
           "lane": "capitulation",
           "evidence": [
             {
               "kind": "dashboard",
-              "ref": "dashboard/data/technical_summary.json by_ticker.NBIS.capitulation.scores.pressure=91.9; measures.return_5d_pct=-25.15; rsi_14=26.4 (as_of 2026-10-16)",
+              "ref": "dashboard/data/technical_summary.json by_ticker.EOSE.capitulation.state=panic; measures.return_5d_pct=-24.27; chaikin_money_flow_20d=-0.392; rsi_14=19.5 (as_of 2026-10-19)",
+              "url": null
+            }
+          ],
+          "confidence": "provider",
+          "next": "Agent shard not built for EOSE.",
+          "handoff": null
+        },
+        {
+          "ticker": "GLXY",
+          "headline": "Galaxy Digital moved from capitulation_candidate to panic with RSI under 10, alongside the crypto-miner cluster flagged 2026-10-19.",
+          "one_number": "RSI 9.7 vs 25 (panic; 5d -20.9%)",
+          "lane": "oversold",
+          "evidence": [
+            {
+              "kind": "dashboard",
+              "ref": "dashboard/data/technical_summary.json by_ticker.GLXY.setup.indicators.rsi_14=9.7; measures.return_5d_pct=-20.89; capitulation.state=panic (as_of 2026-10-19)",
               "url": null
             },
             {
               "kind": "dashboard",
-              "ref": "dashboard/data/agent_shards/NBIS.json",
+              "ref": "dashboard/data/agent_shards/GLXY.json (shard generated 2026-10-16T20:26:21Z, predates this print)",
               "url": null
             }
           ],
@@ -338,61 +307,51 @@
           "handoff": null
         },
         {
-          "ticker": "APLD",
-          "headline": "Applied Digital is now a capitulation_candidate and is also on the index watch (sp400 size_band_watch -6.37%; Russell 1000 add news from July).",
-          "one_number": "5d -23.8% (capitulation_candidate; pressure 92.2)",
-          "lane": "capitulation",
+          "ticker": "MOS",
+          "headline": "Mosaic moved from stress_building to panic with RSI 11.3 and stretch_z -1.97, just inside the -2 threshold.",
+          "one_number": "RSI 11.3 vs 25 (panic; CMF -0.247)",
+          "lane": "oversold",
           "evidence": [
             {
               "kind": "dashboard",
-              "ref": "dashboard/data/technical_summary.json by_ticker.APLD.capitulation.scores.pressure=92.2; measures.return_5d_pct=-23.78; rsi_14=23.4 (as_of 2026-10-16)",
-              "url": null
-            },
-            {
-              "kind": "dashboard",
-              "ref": "dashboard/data/index_membership.json portfolio_summary.predictor_watch APLD (sp400, distance -6.37%, unchanged since 2026-10-16)",
-              "url": null
-            },
-            {
-              "kind": "dashboard",
-              "ref": "dashboard/data/agent_shards/APLD.json",
+              "ref": "dashboard/data/technical_summary.json by_ticker.MOS.setup.indicators.rsi_14=11.3, chaikin_money_flow_20d=-0.247; scores.stretch_z=-1.97; capitulation.state=panic (as_of 2026-10-19)",
               "url": null
             }
           ],
           "confidence": "provider",
-          "next": "The index distance predates the drawdown; re-read once the rank-day snapshot refreshes.",
+          "next": "Agent shard not built for MOS.",
           "handoff": null
         },
         {
-          "ticker": "STX",
-          "headline": "Seagate moved from panic to capitulation_candidate with RSI under 25; CMF is positive (+0.155) while the price fell.",
-          "one_number": "RSI 18.1 vs 25 (capitulation_candidate; 5d -18.4%)",
+          "ticker": "LEU",
+          "headline": "Centrus moved from capitulation_candidate (posted 2026-10-15) to panic; the 5-day loss is unchanged at about -18.6%.",
+          "one_number": "5d -18.6% (panic; rvol 1.76)",
           "lane": "capitulation",
           "evidence": [
             {
               "kind": "dashboard",
-              "ref": "dashboard/data/technical_summary.json by_ticker.STX.setup.indicators.rsi_14=18.1, chaikin_money_flow_20d=0.155; capitulation.state (as_of 2026-10-16)",
+              "ref": "dashboard/data/technical_summary.json by_ticker.LEU.capitulation.state=panic; measures.return_5d_pct=-18.62; relative_volume_20d=1.76; rsi_14=31.3 (as_of 2026-10-19)",
               "url": null
             }
           ],
           "confidence": "provider",
-          "next": "Agent shard not built for STX; thesis_card exists but was not needed for a tape flag.",
+          "next": "Agent shard not built for LEU.",
           "handoff": null
         },
         {
-          "ticker": "CLSK",
-          "headline": "CleanSpark moved from panic to capitulation_candidate with one of the lowest RSI prints in the universe.",
-          "one_number": "RSI 6.1 vs 25 (capitulation_candidate; 5d -20.0%)",
+          "ticker": "FLEX",
+          "headline": "Flex stays capitulation_candidate but its 5-day loss deepened to -25.3% from -15.9% at the 2026-10-15 post, on 1.79x volume.",
+          "one_number": "5d -25.3% (capitulation_candidate; RSI 27.8)",
           "lane": "capitulation",
           "evidence": [
             {
               "kind": "dashboard",
-              "ref": "dashboard/data/technical_summary.json by_ticker.CLSK.setup.indicators.rsi_14=6.1; measures.return_5d_pct=-19.96; capitulation.state (as_of 2026-10-16)",
+              "ref": "dashboard/data/technical_summary.json by_ticker.FLEX.capitulation.state=capitulation_candidate; measures.return_5d_pct=-25.33; rsi_14=27.8; relative_volume_20d=1.79 (as_of 2026-10-19)",
               "url": null
             },
             {
               "kind": "dashboard",
-              "ref": "dashboard/data/agent_shards/CLSK.json",
+              "ref": "dashboard/data/agent_shards/FLEX.json (shard generated 2026-10-16T20:26:21Z, predates this print)",
               "url": null
             }
           ],
@@ -401,30 +360,51 @@
           "handoff": null
         },
         {
-          "ticker": "MARA",
-          "headline": "MARA is in panic with the lowest RSI 14 in the dashboard universe; CMF -0.379 shows distribution.",
-          "one_number": "RSI 2.5 vs 25 (panic; CMF -0.379)",
+          "ticker": "SCHW",
+          "headline": "Schwab's setup regime moved from deteriorating to washed_out; it stays capitulation_candidate with RSI under 25.",
+          "one_number": "stretch_z -2.13 vs -2 (washed_out; RSI 24.0)",
           "lane": "oversold",
           "evidence": [
             {
               "kind": "dashboard",
-              "ref": "dashboard/data/technical_summary.json by_ticker.MARA.setup.indicators.rsi_14=2.5, chaikin_money_flow_20d=-0.379; capitulation.state=panic (as_of 2026-10-16)",
+              "ref": "dashboard/data/technical_summary.json by_ticker.SCHW.scores.stretch_z=-2.127, trend_z=-1.522; rsi_14=24.0; regime.setup=washed_out; capitulation.state=capitulation_candidate (as_of 2026-10-19)",
               "url": null
             }
           ],
           "confidence": "provider",
-          "next": "Agent shard and thesis card not built for MARA.",
+          "next": "Broker/custody cluster: BAC capitulation_candidate (RSI 21.5), STT eased to stress_building.",
           "handoff": null
         },
         {
-          "ticker": "CIFR",
-          "headline": "Cipher's 5-day loss deepened to -33.6% from -26.8% at the 2026-10-14 post; the feed now labels it panic, not capitulation_candidate.",
-          "one_number": "5d -33.6% (panic; RSI 4.6)",
+          "ticker": "USAR",
+          "headline": "USA Rare Earth stays in panic and its setup regime moved from deteriorating to washed_out.",
+          "one_number": "RSI 15.9 vs 25 (panic; stretch_z -2.02)",
           "lane": "oversold",
           "evidence": [
             {
               "kind": "dashboard",
-              "ref": "dashboard/data/technical_summary.json by_ticker.CIFR.measures.return_5d_pct=-33.58; setup.indicators.rsi_14=4.6; capitulation.state=panic (as_of 2026-10-16)",
+              "ref": "dashboard/data/technical_summary.json by_ticker.USAR.setup.indicators.rsi_14=15.9; scores.stretch_z=-2.017; regime.setup=washed_out; capitulation.state=panic (as_of 2026-10-19)",
+              "url": null
+            }
+          ],
+          "confidence": "provider",
+          "next": "Agent shard not built for USAR.",
+          "handoff": null
+        },
+        {
+          "ticker": "GTX",
+          "headline": "Garrett Motion moved from stress_building to capitulation_candidate on 2.26x relative volume.",
+          "one_number": "RSI 25.8 vs 35 (capitulation_candidate; 5d -9.4%)",
+          "lane": "capitulation",
+          "evidence": [
+            {
+              "kind": "dashboard",
+              "ref": "dashboard/data/technical_summary.json by_ticker.GTX.capitulation.state=capitulation_candidate; rsi_14=25.8; measures.return_5d_pct=-9.43; relative_volume_20d=2.26 (as_of 2026-10-19)",
+              "url": null
+            },
+            {
+              "kind": "dashboard",
+              "ref": "dashboard/data/agent_shards/GTX.json (shard generated 2026-10-16T20:26:21Z, predates this print)",
               "url": null
             }
           ],
@@ -433,144 +413,127 @@
           "handoff": null
         },
         {
-          "ticker": "STT",
-          "headline": "State Street moved from panic to capitulation_candidate with RSI under 20 and positive money flow (CMF +0.215 vs +0.10).",
-          "one_number": "RSI 19.9 vs 25 (capitulation_candidate; CMF +0.215)",
+          "ticker": "9984.T",
+          "headline": "SoftBank Group moved from stress_building to panic on the 2026-10-20 Tokyo print; TOPIX periodic review is 2026-10-31 per the index calendar.",
+          "one_number": "5d -14.2% (panic; CMF -0.254)",
           "lane": "capitulation",
           "evidence": [
             {
               "kind": "dashboard",
-              "ref": "dashboard/data/technical_summary.json by_ticker.STT.setup.indicators.rsi_14=19.9, chaikin_money_flow_20d=0.215; capitulation.state (as_of 2026-10-16)",
+              "ref": "dashboard/data/technical_summary.json by_ticker.9984.T.capitulation.state=panic; measures.return_5d_pct=-14.24; chaikin_money_flow_20d=-0.254 (as_of 2026-10-20) (as_of 2026-10-19)",
               "url": null
-            }
-          ],
-          "confidence": "provider",
-          "next": "Custody/broker cluster: BAC, SCHW (capitulation_candidate), MS, GS (washed_out) print alongside.",
-          "handoff": null
-        },
-        {
-          "ticker": "FER",
-          "headline": "Ferrovial, new to the dashboard, prints a washed_out setup with stretch_z -3.22 and trend_z -2.62.",
-          "one_number": "stretch_z -3.22 vs -2 (washed_out; RSI 17.1)",
-          "lane": "oversold",
-          "evidence": [
+            },
             {
               "kind": "dashboard",
-              "ref": "dashboard/data/technical_summary.json by_ticker.FER.scores.stretch_z=-3.216, trend_z=-2.622; setup.indicators.rsi_14=17.1; regime.setup=washed_out (as_of 2026-10-16)",
+              "ref": "dashboard/data/agent_shards/9984.T.json (shard generated 2026-10-16T20:26:21Z, predates this print)",
               "url": null
             }
           ],
           "confidence": "provider",
-          "next": "Agent shard and thesis card not built for FER; capitulation state is stress_building, not panic.",
+          "next": "No TOPIX event is recorded for 9984.T in index_membership; the calendar date is context only.",
           "handoff": null
         },
         {
-          "ticker": "CSU",
-          "headline": "Constellation Software meets the stored breakout definition: leading_uptrend, +6.2% vs 50-day, rvol 1.03, CMF +0.288.",
-          "one_number": "breakout CMF 0.288 vs 0.10",
+          "ticker": "BRK-B",
+          "headline": "Berkshire B newly meets the stored breakout definition: leading_uptrend, +4.6% vs 50-day, rvol 1.13, CMF +0.131; RSI 87.3 is overbought.",
+          "one_number": "breakout CMF 0.131 vs 0.10 (RSI 87.3)",
           "lane": "breakout",
           "evidence": [
             {
               "kind": "dashboard",
-              "ref": "dashboard/data/technical_summary.json by_ticker.CSU.setup.direction=leading_uptrend; indicators.chaikin_money_flow_20d=0.288, relative_volume_20d=1.03, price_vs_50d_pct=6.2 (as_of 2026-10-16)",
-              "url": null
-            },
-            {
-              "kind": "dashboard",
-              "ref": "dashboard/data/agent_shards/CSU.json",
+              "ref": "dashboard/data/technical_summary.json by_ticker.BRK-B.setup.direction=leading_uptrend; chaikin_money_flow_20d=0.131, relative_volume_20d=1.13, price_vs_50d_pct=4.62, rsi_14=87.3 (as_of 2026-10-19)",
               "url": null
             }
           ],
           "confidence": "provider",
-          "next": null,
+          "next": "The feed carries BRK-B and BRK.B as duplicate rows with identical values; counted once.",
+          "handoff": null
+        },
+        {
+          "ticker": "TMO",
+          "headline": "Thermo Fisher newly meets the stored breakout definition: leading_uptrend, +6.5% vs 50-day, rvol 1.09, CMF +0.187.",
+          "one_number": "breakout CMF 0.187 vs 0.10",
+          "lane": "breakout",
+          "evidence": [
+            {
+              "kind": "dashboard",
+              "ref": "dashboard/data/technical_summary.json by_ticker.TMO.setup.direction=leading_uptrend; chaikin_money_flow_20d=0.187, relative_volume_20d=1.09, price_vs_50d_pct=6.46 (as_of 2026-10-19)",
+              "url": null
+            }
+          ],
+          "confidence": "provider",
+          "next": "Agent shard not built for TMO.",
           "handoff": null
         }
       ],
       "inputs_read": [
         {
           "path": "dashboard/data/technical_summary.json",
-          "generated_at": "2026-10-19T07:57:35Z",
-          "age_hours_at_read": 16.0,
+          "generated_at": "2026-10-20T07:44:33Z",
+          "age_hours_at_read": 16.3,
           "exists": true
         },
         {
           "path": "dashboard/data/capitulation_daily.json",
-          "generated_at": "2026-10-19T07:59:06.648734+00:00",
-          "age_hours_at_read": 16.0,
+          "generated_at": "2026-10-20T07:46:50.547817+00:00",
+          "age_hours_at_read": 16.2,
           "exists": true
         },
         {
           "path": "dashboard/data/index_membership.json",
-          "generated_at": "2026-10-19T09:46:50Z",
-          "age_hours_at_read": 14.2,
+          "generated_at": "2026-10-20T09:28:40Z",
+          "age_hours_at_read": 14.5,
           "exists": true
         },
         {
           "path": "dashboard/data/portfolio_news.json",
-          "generated_at": "2026-10-19T06:01:22.811190+00:00",
+          "generated_at": "2026-10-20T06:00:05.150235+00:00",
           "age_hours_at_read": 18.0,
           "exists": true
         },
         {
           "path": "_system/portfolio/registry.json",
-          "generated_at": "2026-10-19T09:49:53Z",
-          "age_hours_at_read": 14.2,
+          "generated_at": "2026-10-20T09:32:02Z",
+          "age_hours_at_read": 14.5,
           "exists": true
         },
         {
           "path": "dashboard/data/agent_shards/CRWV.json",
           "generated_at": "2026-10-16T20:26:21Z",
-          "age_hours_at_read": 75.6,
+          "age_hours_at_read": 99.6,
           "exists": true
         },
         {
-          "path": "dashboard/data/agent_shards/NBIS.json",
+          "path": "dashboard/data/agent_shards/GLXY.json",
           "generated_at": "2026-10-16T20:26:21Z",
-          "age_hours_at_read": 75.6,
+          "age_hours_at_read": 99.6,
           "exists": true
         },
         {
-          "path": "dashboard/data/agent_shards/APLD.json",
+          "path": "dashboard/data/agent_shards/FLEX.json",
           "generated_at": "2026-10-16T20:26:21Z",
-          "age_hours_at_read": 75.6,
+          "age_hours_at_read": 99.6,
           "exists": true
         },
         {
-          "path": "dashboard/data/agent_shards/CLSK.json",
+          "path": "dashboard/data/agent_shards/GTX.json",
           "generated_at": "2026-10-16T20:26:21Z",
-          "age_hours_at_read": 75.6,
+          "age_hours_at_read": 99.6,
           "exists": true
         },
         {
-          "path": "dashboard/data/agent_shards/XP.json",
+          "path": "dashboard/data/agent_shards/9984.T.json",
           "generated_at": "2026-10-16T20:26:21Z",
-          "age_hours_at_read": 75.6,
-          "exists": true
-        },
-        {
-          "path": "dashboard/data/agent_shards/CSU.json",
-          "generated_at": "2026-10-16T20:26:21Z",
-          "age_hours_at_read": 75.6,
-          "exists": true
-        },
-        {
-          "path": "_system/data/desk_briefs/schema.json",
-          "generated_at": null,
-          "age_hours_at_read": null,
-          "exists": true
-        },
-        {
-          "path": "_system/agents/DESKS.md",
-          "generated_at": null,
-          "age_hours_at_read": null,
+          "age_hours_at_read": 99.6,
           "exists": true
         }
       ],
       "screens_empty": [
+        "index_adds_new",
         "index_deletes_new",
         "confirmed_next_30d"
       ],
-      "notes": "market_context: technical_summary SPY state panic (pressure 82.1, breadth_panic 17.8% vs 8.9% prior run); capitulation_candidate count 6 to 23, panic 66 to 120. capitulation_daily keeps SPY normal (drawdown -2.03%, under the -5% gate) but XLK and IWM in stress. Flags cluster in that state: AI infra/crypto miners, storage, custody banks. Held: HKHC; thin or limited data (BUR, INFQ, DRNZ, OSS, MSB, GCCO); contradictory prints (EIX, PCG, NTAP, RSI-100 flat lines); 8 stale names."
+      "notes": "market_context: technical_summary SPY panic to stress_building (pressure 76.9, breadth_panic 6.4% vs 17.8%); panic 120 to 48, capitulation_candidate 23 to 9. capitulation_daily SPY normal (drawdown -1.62%); XLK still stress. Index: no new adds, deletes or confirmed events; predictor_watch unchanged. Held: HKHC; thin (GEMI, IDA.AX, SEVN, WEST, NRP, GCCO, BUR); panic or capitulation prints with RSI over 50 (FE, NI, SRE, DTE, JPM, WFC, RTX, WMB, NRG, ES). Stamps: technical_summary has no _envelope (legacy generated_at); index_membership uses generated."
     }
   ],
   "items_flat": [
@@ -814,102 +777,66 @@
       "stale": true
     },
     {
-      "ticker": "MRNA",
-      "headline": "Moderna Nasdaq-100 add (replacing WBD) is new in index_membership; news puts it effective 2026-10-09, but the feed's effective is null and memberships empty.",
-      "one_number": "Nasdaq-100 add, effective 2026-10-09 (news); stretch_z 2.24 vs +2",
-      "lane": "index_event",
-      "evidence": [
-        {
-          "kind": "dashboard",
-          "ref": "dashboard/data/index_membership.json by_ticker.MRNA.confirmed_events (announced 2026-10-02 and 2026-10-18, confidence news_unconfirmed)",
-          "url": null
-        },
-        {
-          "kind": "news",
-          "ref": "Zacks Investment Research 2026-10-08 via portfolio_news.json (category index_inclusion): added 2026-10-09 replacing WBD",
-          "url": null
-        },
-        {
-          "kind": "dashboard",
-          "ref": "dashboard/data/technical_summary.json by_ticker.MRNA.scores.stretch_z=2.239, trend_z=3.432, setup extended (as_of 2026-10-16)",
-          "url": null
-        }
-      ],
-      "confidence": "news",
-      "next": "Confirm the effective date on the Nasdaq notice; the add flow is already past, so this is a record fix, not an upcoming event.",
-      "handoff": null,
-      "desk": "tape_index",
-      "owner": "drew",
-      "as_of": "2026-10-19",
-      "author": "grok-drew-tape-index",
-      "stale": false
-    },
-    {
-      "ticker": "XP",
-      "headline": "XP sits 0.91% from the S&P 400 size band (size_band_watch, next S&P share update 2026-12-19) while it prints the highest positive stretch_z in the universe.",
-      "one_number": "distance_to_boundary -0.91% (sp400); stretch_z 3.19 vs +2",
-      "lane": "index_event",
-      "evidence": [
-        {
-          "kind": "dashboard",
-          "ref": "dashboard/data/index_membership.json portfolio_summary.predictor_watch XP (recon_status size_band_watch, mcap_source rank_day_snapshot:2026-10-31)",
-          "url": null
-        },
-        {
-          "kind": "dashboard",
-          "ref": "dashboard/data/technical_summary.json by_ticker.XP.scores.stretch_z=3.194, trend_z=3.232, rsi_14=77.9 (as_of 2026-10-16)",
-          "url": null
-        }
-      ],
-      "confidence": "provider",
-      "next": "Distance is unchanged since the 2026-10-16 file despite a -9.3% 5d move; treat it as a snapshot, not a live distance.",
-      "handoff": null,
-      "desk": "tape_index",
-      "owner": "drew",
-      "as_of": "2026-10-19",
-      "author": "grok-drew-tape-index",
-      "stale": false
-    },
-    {
       "ticker": "CRWV",
-      "headline": "CoreWeave moved from normal to capitulation_candidate on the 2026-10-16 print, on 2.49x relative volume; no stabilization confirmation yet.",
-      "one_number": "5d -25.2% (capitulation_candidate; panic 82.9)",
+      "headline": "CoreWeave moved from capitulation_candidate (posted 2026-10-19) to panic on the 2026-10-19 print, on 2.54x relative volume; RSI sits at the 25 line.",
+      "one_number": "5d -23.9% (panic; RSI 25.0)",
       "lane": "capitulation",
       "evidence": [
         {
           "kind": "dashboard",
-          "ref": "dashboard/data/technical_summary.json by_ticker.CRWV.capitulation.state, scores.panic=82.9; measures.return_5d_pct=-25.21; rsi_14=26.4 (as_of 2026-10-16)",
+          "ref": "dashboard/data/technical_summary.json by_ticker.CRWV.capitulation.state=panic; measures.return_5d_pct=-23.85; rsi_14=25.0; relative_volume_20d=2.54 (as_of 2026-10-19)",
           "url": null
         },
         {
           "kind": "dashboard",
-          "ref": "dashboard/data/agent_shards/CRWV.json (shard built, generated 2026-10-16T20:26:21Z)",
+          "ref": "dashboard/data/agent_shards/CRWV.json (shard generated 2026-10-16T20:26:21Z, predates this print)",
           "url": null
         }
       ],
       "confidence": "provider",
-      "next": "Watch for the feed's confirmation flags (positive session, upper-half close, volume cooled).",
+      "next": "Watch for the feed's confirmation flags before reading this as exhaustion.",
       "handoff": null,
       "desk": "tape_index",
       "owner": "drew",
-      "as_of": "2026-10-19",
+      "as_of": "2026-10-20",
       "author": "grok-drew-tape-index",
       "stale": false
     },
     {
-      "ticker": "NBIS",
-      "headline": "Nebius moved from stress_building to capitulation_candidate; trend_z -1.23 sits just inside the -1.25 threshold.",
-      "one_number": "5d -25.2% (capitulation_candidate; pressure 91.9)",
+      "ticker": "EOSE",
+      "headline": "Eos Energy moved from capitulation_candidate to panic with CMF -0.392, among the heaviest distribution prints in the universe.",
+      "one_number": "5d -24.3% (panic; CMF -0.392)",
       "lane": "capitulation",
       "evidence": [
         {
           "kind": "dashboard",
-          "ref": "dashboard/data/technical_summary.json by_ticker.NBIS.capitulation.scores.pressure=91.9; measures.return_5d_pct=-25.15; rsi_14=26.4 (as_of 2026-10-16)",
+          "ref": "dashboard/data/technical_summary.json by_ticker.EOSE.capitulation.state=panic; measures.return_5d_pct=-24.27; chaikin_money_flow_20d=-0.392; rsi_14=19.5 (as_of 2026-10-19)",
+          "url": null
+        }
+      ],
+      "confidence": "provider",
+      "next": "Agent shard not built for EOSE.",
+      "handoff": null,
+      "desk": "tape_index",
+      "owner": "drew",
+      "as_of": "2026-10-20",
+      "author": "grok-drew-tape-index",
+      "stale": false
+    },
+    {
+      "ticker": "GLXY",
+      "headline": "Galaxy Digital moved from capitulation_candidate to panic with RSI under 10, alongside the crypto-miner cluster flagged 2026-10-19.",
+      "one_number": "RSI 9.7 vs 25 (panic; 5d -20.9%)",
+      "lane": "oversold",
+      "evidence": [
+        {
+          "kind": "dashboard",
+          "ref": "dashboard/data/technical_summary.json by_ticker.GLXY.setup.indicators.rsi_14=9.7; measures.return_5d_pct=-20.89; capitulation.state=panic (as_of 2026-10-19)",
           "url": null
         },
         {
           "kind": "dashboard",
-          "ref": "dashboard/data/agent_shards/NBIS.json",
+          "ref": "dashboard/data/agent_shards/GLXY.json (shard generated 2026-10-16T20:26:21Z, predates this print)",
           "url": null
         }
       ],
@@ -918,76 +845,66 @@
       "handoff": null,
       "desk": "tape_index",
       "owner": "drew",
-      "as_of": "2026-10-19",
+      "as_of": "2026-10-20",
       "author": "grok-drew-tape-index",
       "stale": false
     },
     {
-      "ticker": "APLD",
-      "headline": "Applied Digital is now a capitulation_candidate and is also on the index watch (sp400 size_band_watch -6.37%; Russell 1000 add news from July).",
-      "one_number": "5d -23.8% (capitulation_candidate; pressure 92.2)",
-      "lane": "capitulation",
+      "ticker": "MOS",
+      "headline": "Mosaic moved from stress_building to panic with RSI 11.3 and stretch_z -1.97, just inside the -2 threshold.",
+      "one_number": "RSI 11.3 vs 25 (panic; CMF -0.247)",
+      "lane": "oversold",
       "evidence": [
         {
           "kind": "dashboard",
-          "ref": "dashboard/data/technical_summary.json by_ticker.APLD.capitulation.scores.pressure=92.2; measures.return_5d_pct=-23.78; rsi_14=23.4 (as_of 2026-10-16)",
-          "url": null
-        },
-        {
-          "kind": "dashboard",
-          "ref": "dashboard/data/index_membership.json portfolio_summary.predictor_watch APLD (sp400, distance -6.37%, unchanged since 2026-10-16)",
-          "url": null
-        },
-        {
-          "kind": "dashboard",
-          "ref": "dashboard/data/agent_shards/APLD.json",
+          "ref": "dashboard/data/technical_summary.json by_ticker.MOS.setup.indicators.rsi_14=11.3, chaikin_money_flow_20d=-0.247; scores.stretch_z=-1.97; capitulation.state=panic (as_of 2026-10-19)",
           "url": null
         }
       ],
       "confidence": "provider",
-      "next": "The index distance predates the drawdown; re-read once the rank-day snapshot refreshes.",
+      "next": "Agent shard not built for MOS.",
       "handoff": null,
       "desk": "tape_index",
       "owner": "drew",
-      "as_of": "2026-10-19",
+      "as_of": "2026-10-20",
       "author": "grok-drew-tape-index",
       "stale": false
     },
     {
-      "ticker": "STX",
-      "headline": "Seagate moved from panic to capitulation_candidate with RSI under 25; CMF is positive (+0.155) while the price fell.",
-      "one_number": "RSI 18.1 vs 25 (capitulation_candidate; 5d -18.4%)",
+      "ticker": "LEU",
+      "headline": "Centrus moved from capitulation_candidate (posted 2026-10-15) to panic; the 5-day loss is unchanged at about -18.6%.",
+      "one_number": "5d -18.6% (panic; rvol 1.76)",
       "lane": "capitulation",
       "evidence": [
         {
           "kind": "dashboard",
-          "ref": "dashboard/data/technical_summary.json by_ticker.STX.setup.indicators.rsi_14=18.1, chaikin_money_flow_20d=0.155; capitulation.state (as_of 2026-10-16)",
+          "ref": "dashboard/data/technical_summary.json by_ticker.LEU.capitulation.state=panic; measures.return_5d_pct=-18.62; relative_volume_20d=1.76; rsi_14=31.3 (as_of 2026-10-19)",
           "url": null
         }
       ],
       "confidence": "provider",
-      "next": "Agent shard not built for STX; thesis_card exists but was not needed for a tape flag.",
+      "next": "Agent shard not built for LEU.",
       "handoff": null,
       "desk": "tape_index",
       "owner": "drew",
-      "as_of": "2026-10-19",
+      "as_of": "2026-10-20",
       "author": "grok-drew-tape-index",
       "stale": false
     },
     {
-      "ticker": "CLSK",
-      "headline": "CleanSpark moved from panic to capitulation_candidate with one of the lowest RSI prints in the universe.",
-      "one_number": "RSI 6.1 vs 25 (capitulation_candidate; 5d -20.0%)",
+      "ticker": "FLEX",
+      "headline": "Flex stays capitulation_candidate but its 5-day loss deepened to -25.3% from -15.9% at the 2026-10-15 post, on 1.79x volume.",
+      "one_number": "5d -25.3% (capitulation_candidate; RSI 27.8)",
       "lane": "capitulation",
       "evidence": [
         {
           "kind": "dashboard",
-          "ref": "dashboard/data/technical_summary.json by_ticker.CLSK.setup.indicators.rsi_14=6.1; measures.return_5d_pct=-19.96; capitulation.state (as_of 2026-10-16)",
+          "ref": "dashboard/data/technical_summary.json by_ticker.FLEX.capitulation.state=capitulation_candidate; measures.return_5d_pct=-25.33; rsi_14=27.8; relative_volume_20d=1.79 (as_of 2026-10-19)",
           "url": null
         },
         {
           "kind": "dashboard",
-          "ref": "dashboard/data/agent_shards/CLSK.json",
+          "ref": "dashboard/data/agent_shards/FLEX.json (shard generated 2026-10-16T20:26:21Z, predates this print)",
           "url": null
         }
       ],
@@ -996,40 +913,66 @@
       "handoff": null,
       "desk": "tape_index",
       "owner": "drew",
-      "as_of": "2026-10-19",
+      "as_of": "2026-10-20",
       "author": "grok-drew-tape-index",
       "stale": false
     },
     {
-      "ticker": "MARA",
-      "headline": "MARA is in panic with the lowest RSI 14 in the dashboard universe; CMF -0.379 shows distribution.",
-      "one_number": "RSI 2.5 vs 25 (panic; CMF -0.379)",
+      "ticker": "SCHW",
+      "headline": "Schwab's setup regime moved from deteriorating to washed_out; it stays capitulation_candidate with RSI under 25.",
+      "one_number": "stretch_z -2.13 vs -2 (washed_out; RSI 24.0)",
       "lane": "oversold",
       "evidence": [
         {
           "kind": "dashboard",
-          "ref": "dashboard/data/technical_summary.json by_ticker.MARA.setup.indicators.rsi_14=2.5, chaikin_money_flow_20d=-0.379; capitulation.state=panic (as_of 2026-10-16)",
+          "ref": "dashboard/data/technical_summary.json by_ticker.SCHW.scores.stretch_z=-2.127, trend_z=-1.522; rsi_14=24.0; regime.setup=washed_out; capitulation.state=capitulation_candidate (as_of 2026-10-19)",
           "url": null
         }
       ],
       "confidence": "provider",
-      "next": "Agent shard and thesis card not built for MARA.",
+      "next": "Broker/custody cluster: BAC capitulation_candidate (RSI 21.5), STT eased to stress_building.",
       "handoff": null,
       "desk": "tape_index",
       "owner": "drew",
-      "as_of": "2026-10-19",
+      "as_of": "2026-10-20",
       "author": "grok-drew-tape-index",
       "stale": false
     },
     {
-      "ticker": "CIFR",
-      "headline": "Cipher's 5-day loss deepened to -33.6% from -26.8% at the 2026-10-14 post; the feed now labels it panic, not capitulation_candidate.",
-      "one_number": "5d -33.6% (panic; RSI 4.6)",
+      "ticker": "USAR",
+      "headline": "USA Rare Earth stays in panic and its setup regime moved from deteriorating to washed_out.",
+      "one_number": "RSI 15.9 vs 25 (panic; stretch_z -2.02)",
       "lane": "oversold",
       "evidence": [
         {
           "kind": "dashboard",
-          "ref": "dashboard/data/technical_summary.json by_ticker.CIFR.measures.return_5d_pct=-33.58; setup.indicators.rsi_14=4.6; capitulation.state=panic (as_of 2026-10-16)",
+          "ref": "dashboard/data/technical_summary.json by_ticker.USAR.setup.indicators.rsi_14=15.9; scores.stretch_z=-2.017; regime.setup=washed_out; capitulation.state=panic (as_of 2026-10-19)",
+          "url": null
+        }
+      ],
+      "confidence": "provider",
+      "next": "Agent shard not built for USAR.",
+      "handoff": null,
+      "desk": "tape_index",
+      "owner": "drew",
+      "as_of": "2026-10-20",
+      "author": "grok-drew-tape-index",
+      "stale": false
+    },
+    {
+      "ticker": "GTX",
+      "headline": "Garrett Motion moved from stress_building to capitulation_candidate on 2.26x relative volume.",
+      "one_number": "RSI 25.8 vs 35 (capitulation_candidate; 5d -9.4%)",
+      "lane": "capitulation",
+      "evidence": [
+        {
+          "kind": "dashboard",
+          "ref": "dashboard/data/technical_summary.json by_ticker.GTX.capitulation.state=capitulation_candidate; rsi_14=25.8; measures.return_5d_pct=-9.43; relative_volume_20d=2.26 (as_of 2026-10-19)",
+          "url": null
+        },
+        {
+          "kind": "dashboard",
+          "ref": "dashboard/data/agent_shards/GTX.json (shard generated 2026-10-16T20:26:21Z, predates this print)",
           "url": null
         }
       ],
@@ -1038,75 +981,75 @@
       "handoff": null,
       "desk": "tape_index",
       "owner": "drew",
-      "as_of": "2026-10-19",
+      "as_of": "2026-10-20",
       "author": "grok-drew-tape-index",
       "stale": false
     },
     {
-      "ticker": "STT",
-      "headline": "State Street moved from panic to capitulation_candidate with RSI under 20 and positive money flow (CMF +0.215 vs +0.10).",
-      "one_number": "RSI 19.9 vs 25 (capitulation_candidate; CMF +0.215)",
+      "ticker": "9984.T",
+      "headline": "SoftBank Group moved from stress_building to panic on the 2026-10-20 Tokyo print; TOPIX periodic review is 2026-10-31 per the index calendar.",
+      "one_number": "5d -14.2% (panic; CMF -0.254)",
       "lane": "capitulation",
       "evidence": [
         {
           "kind": "dashboard",
-          "ref": "dashboard/data/technical_summary.json by_ticker.STT.setup.indicators.rsi_14=19.9, chaikin_money_flow_20d=0.215; capitulation.state (as_of 2026-10-16)",
+          "ref": "dashboard/data/technical_summary.json by_ticker.9984.T.capitulation.state=panic; measures.return_5d_pct=-14.24; chaikin_money_flow_20d=-0.254 (as_of 2026-10-20) (as_of 2026-10-19)",
           "url": null
-        }
-      ],
-      "confidence": "provider",
-      "next": "Custody/broker cluster: BAC, SCHW (capitulation_candidate), MS, GS (washed_out) print alongside.",
-      "handoff": null,
-      "desk": "tape_index",
-      "owner": "drew",
-      "as_of": "2026-10-19",
-      "author": "grok-drew-tape-index",
-      "stale": false
-    },
-    {
-      "ticker": "FER",
-      "headline": "Ferrovial, new to the dashboard, prints a washed_out setup with stretch_z -3.22 and trend_z -2.62.",
-      "one_number": "stretch_z -3.22 vs -2 (washed_out; RSI 17.1)",
-      "lane": "oversold",
-      "evidence": [
+        },
         {
           "kind": "dashboard",
-          "ref": "dashboard/data/technical_summary.json by_ticker.FER.scores.stretch_z=-3.216, trend_z=-2.622; setup.indicators.rsi_14=17.1; regime.setup=washed_out (as_of 2026-10-16)",
+          "ref": "dashboard/data/agent_shards/9984.T.json (shard generated 2026-10-16T20:26:21Z, predates this print)",
           "url": null
         }
       ],
       "confidence": "provider",
-      "next": "Agent shard and thesis card not built for FER; capitulation state is stress_building, not panic.",
+      "next": "No TOPIX event is recorded for 9984.T in index_membership; the calendar date is context only.",
       "handoff": null,
       "desk": "tape_index",
       "owner": "drew",
-      "as_of": "2026-10-19",
+      "as_of": "2026-10-20",
       "author": "grok-drew-tape-index",
       "stale": false
     },
     {
-      "ticker": "CSU",
-      "headline": "Constellation Software meets the stored breakout definition: leading_uptrend, +6.2% vs 50-day, rvol 1.03, CMF +0.288.",
-      "one_number": "breakout CMF 0.288 vs 0.10",
+      "ticker": "BRK-B",
+      "headline": "Berkshire B newly meets the stored breakout definition: leading_uptrend, +4.6% vs 50-day, rvol 1.13, CMF +0.131; RSI 87.3 is overbought.",
+      "one_number": "breakout CMF 0.131 vs 0.10 (RSI 87.3)",
       "lane": "breakout",
       "evidence": [
         {
           "kind": "dashboard",
-          "ref": "dashboard/data/technical_summary.json by_ticker.CSU.setup.direction=leading_uptrend; indicators.chaikin_money_flow_20d=0.288, relative_volume_20d=1.03, price_vs_50d_pct=6.2 (as_of 2026-10-16)",
-          "url": null
-        },
-        {
-          "kind": "dashboard",
-          "ref": "dashboard/data/agent_shards/CSU.json",
+          "ref": "dashboard/data/technical_summary.json by_ticker.BRK-B.setup.direction=leading_uptrend; chaikin_money_flow_20d=0.131, relative_volume_20d=1.13, price_vs_50d_pct=4.62, rsi_14=87.3 (as_of 2026-10-19)",
           "url": null
         }
       ],
       "confidence": "provider",
-      "next": null,
+      "next": "The feed carries BRK-B and BRK.B as duplicate rows with identical values; counted once.",
       "handoff": null,
       "desk": "tape_index",
       "owner": "drew",
-      "as_of": "2026-10-19",
+      "as_of": "2026-10-20",
+      "author": "grok-drew-tape-index",
+      "stale": false
+    },
+    {
+      "ticker": "TMO",
+      "headline": "Thermo Fisher newly meets the stored breakout definition: leading_uptrend, +6.5% vs 50-day, rvol 1.09, CMF +0.187.",
+      "one_number": "breakout CMF 0.187 vs 0.10",
+      "lane": "breakout",
+      "evidence": [
+        {
+          "kind": "dashboard",
+          "ref": "dashboard/data/technical_summary.json by_ticker.TMO.setup.direction=leading_uptrend; chaikin_money_flow_20d=0.187, relative_volume_20d=1.09, price_vs_50d_pct=6.46 (as_of 2026-10-19)",
+          "url": null
+        }
+      ],
+      "confidence": "provider",
+      "next": "Agent shard not built for TMO.",
+      "handoff": null,
+      "desk": "tape_index",
+      "owner": "drew",
+      "as_of": "2026-10-20",
       "author": "grok-drew-tape-index",
       "stale": false
     }
@@ -1130,7 +1073,7 @@
   "counts": {
     "briefs": 2,
     "items": 21,
-    "files": 2,
+    "files": 3,
     "by_desk": {
       "special_situations": 9,
       "tape_index": 12
@@ -1143,14 +1086,14 @@
     "status": "degraded",
     "structural_errors": [],
     "problems": [
-      "special_situations brief is 9 days old (2026-10-12)"
+      "special_situations brief is 12 days old (2026-10-12)"
     ],
     "warnings": [
       "_system/data/desk_briefs/tape_index/2026-10-19.json: inputs_read[11] (_system/data/desk_briefs/schema.json) carries no stamp",
       "_system/data/desk_briefs/tape_index/2026-10-19.json: inputs_read[12] (_system/agents/DESKS.md) carries no stamp"
     ],
     "stale_days": 7,
-    "checked_at": "2026-10-21T10:03:19Z"
+    "checked_at": "2026-10-23T21:12:25Z"
   },
   "research_only": true,
   "in_base_irr": false,
@@ -1158,9 +1101,9 @@
   "_envelope": {
     "schema_version": "magis.feed.v2",
     "feed_id": "dashboard-desk-briefs",
-    "generated_at": "2026-10-21T10:03:19Z",
-    "as_of": "2026-10-21",
-    "content_sha256": "sha256:a5382981942abc20984c2a0a3d317c8b0fa57d44328f57a5505b72aacdbe6abd",
+    "generated_at": "2026-10-23T21:12:25Z",
+    "as_of": "2026-10-23",
+    "content_sha256": "sha256:2fcf8a0d8a5acdd81292b3b5a0cb641cac0e4e92c3694d1cb5dbc16a3ba6a94e",
     "row_count": 21,
     "upstream_inputs": [],
     "health": {

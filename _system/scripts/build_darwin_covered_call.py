@@ -49,6 +49,9 @@ NASDAQ_URL = "https://api.nasdaq.com/api/calendar/earnings?date={day}"
 USER_AGENT = ("Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 "
               "(KHTML, like Gecko) Chrome/126 Safari/537.36")
 
+# Research windows from lookup_v1.json. They are contiguous except 25-29 days, the hole
+# between the 21-day and 35-day buckets. tenor_for_dte fills that hole; do not widen these
+# tuples or the bucket centre used to pick an expiry will move.
 TENORS = {"7d": (4, 10), "14d": (11, 17), "21d": (18, 24), "35d": (30, 38), "42d": (39, 46)}
 DELTAS = (0.10, 0.20, 0.30, 0.40, 0.50)
 DELTA_TOLERANCE = 0.07
@@ -58,7 +61,7 @@ LIQUID_REL_SPREAD = 0.25
 MIN_CELL_MONTHS = 24           # a cell needs this much history before it is ranked
 MIN_TOP_CELL_T = 1.5           # the cross-index list only shows cells that were clearly positive
 MIN_TOP_SCORE = 3              # walk-forward: score 3-4 weeklies paid (t 1.9 / 3.8); score 2 did not (t 1.2)
-MIN_COVERAGE = 0.80            # refuse to publish if fewer chains than this arrived
+MIN_COVERAGE = 0.80            # refuse to publish if fewer names than this scored
 CONDITIONS = ("low_beta", "rich_call_skew", "iv_above_forecast", "near_52w_high")
 OCC = re.compile(r"^(?P<root>.+?)(?P<yy>\d{2})(?P<mm>\d{2})(?P<dd>\d{2})(?P<cp>[CP])(?P<strike>\d{8})$")
 
@@ -180,17 +183,55 @@ def name_skew(rows: list[dict], spot: float) -> tuple[float | None, float | None
     return atm_iv, skew
 
 
+def tenor_for_dte(dte: int) -> str | None:
+    """Tenor bucket for this many days to expiry.
+
+    Days inside a research window stay on that window. The windows are contiguous except
+    for 25 through 29 days, between the 21-day bucket (through 24) and the 35-day bucket
+    (from 30). A standard monthly expiry, the third Friday, spends several sessions in
+    that hole. Names that list only the monthly then matched no bucket, candidate
+    selection returned nothing, and the name was dropped as ``no_liquid_calls`` even
+    though the chain, the quotes, and the deltas were usable. That hole is why coverage
+    fell from a normal print to about half the S&P 500 on 22 Oct 2026, the first session
+    November's monthly (the 20th) was 29 days out, and it is still open while that
+    expiry stays inside 25-29 days.
+
+    A day in the hole takes the nearer window centre (the same centres candidate
+    selection uses). 25-27 are closer to the 21-day centre, 28-29 to the 35-day centre.
+    Every hole day is farther from that centre than every day already inside the window,
+    so filling the hole cannot displace an expiry the research window would have chosen.
+    Days outside the outer windows (under 4, over 46) stay excluded.
+    """
+    for tenor, (lo, hi) in TENORS.items():
+        if lo <= dte <= hi:
+            return tenor
+    spans = sorted(TENORS.items(), key=lambda item: item[1][0])
+    for (t1, (lo1, hi1)), (t2, (lo2, hi2)) in zip(spans, spans[1:]):
+        if hi1 < dte < lo2:
+            c1 = (lo1 + hi1) / 2
+            c2 = (lo2 + hi2) / 2
+            return t1 if abs(dte - c1) <= abs(dte - c2) else t2
+    return None
+
+
 def candidate_calls(rows: list[dict], spot: float) -> list[dict]:
     """One expiry per tenor bucket (nearest the bucket's centre), one call per delta target."""
     calls = [r for r in rows if r["right"] == "C" and r["rel_spread"] <= MAX_REL_SPREAD]
+    grouped: dict[str, list[dict]] = {tenor: [] for tenor in TENORS}
+    for row in calls:
+        tenor = tenor_for_dte(row["dte"])
+        if tenor:
+            grouped[tenor].append(row)
     out = []
     for tenor, (lo, hi) in TENORS.items():
-        exps = sorted({r["dte"] for r in calls if lo <= r["dte"] <= hi})
-        if not exps:
+        group = grouped[tenor]
+        if not group:
             continue
         centre = (lo + hi) / 2
-        dte = min(exps, key=lambda d: abs(d - centre))
-        q = [r for r in calls if r["dte"] == dte]
+        # On a distance tie, keep the shorter expiry. That matches min() over a sorted
+        # list of days, which is what the in-window picker did before the hole was filled.
+        dte = min({r["dte"] for r in group}, key=lambda d: (abs(d - centre), d))
+        q = [r for r in group if r["dte"] == dte]
         for target in DELTAS:
             r = min(q, key=lambda x: abs(x["delta"] - target))
             if abs(r["delta"] - target) > DELTA_TOLERANCE:

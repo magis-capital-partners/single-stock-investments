@@ -10,6 +10,11 @@ directory matches ``desk``, every ``inputs_read`` path exists, and the stated
 Exit 1 on any error. ``--warn-only`` reports and exits 0 (the nightly rebuild lane
 does not own these files; the PR check does).
 
+When ``dashboard/data/desk_briefs.json`` is in the tree, its desk paths must be
+what ``build_desk_briefs.py`` would write from these briefs. A missing payload
+is ignored here so a sparse checkout that has not materialized the file can
+still validate the briefs; the committed-payload test covers a full checkout.
+
     python _system/scripts/check_desk_briefs.py
     python _system/scripts/check_desk_briefs.py --warn-only
     python _system/scripts/check_desk_briefs.py path/to/one/brief.json
@@ -21,7 +26,7 @@ from __future__ import annotations
 import argparse
 import json
 import re
-from datetime import date, timedelta
+from datetime import date, datetime, timedelta, timezone
 from pathlib import Path
 
 try:
@@ -267,6 +272,53 @@ def check_all(
     return {"briefs": briefs, "errors": errors, "warnings": warnings, "files": len(files)}
 
 
+def committed_payload_errors(
+    *,
+    root: Path,
+    briefs_dir: Path,
+    registry_path: Path,
+    schema_path: Path,
+) -> list[str]:
+    """Desk paths in the Inbox payload must match a fresh build.
+
+    Compares paths only. ``generated_at`` moves every rebuild and is not the gate.
+    A missing payload returns no error: sparse CI checkouts validate briefs
+    before they materialize the file, and the full-tree test still fails a
+    stale committed payload.
+    """
+    payload_path = root / "dashboard" / "data" / "desk_briefs.json"
+    if not payload_path.is_file():
+        return []
+    try:
+        committed = json.loads(payload_path.read_text(encoding="utf-8"))
+    except json.JSONDecodeError as exc:
+        return [(
+            "dashboard/data/desk_briefs.json is not valid JSON "
+            f"({exc}). Run python _system/scripts/build_desk_briefs.py and commit "
+            "dashboard/data/desk_briefs.json in the same commit as the brief."
+        )]
+    # Local import: build_desk_briefs imports this module.
+    import build_desk_briefs as builder
+
+    fresh = builder.build(
+        briefs_dir=briefs_dir,
+        registry_path=registry_path,
+        schema_path=schema_path,
+        root=root,
+        now=datetime.now(timezone.utc),
+    )
+    committed_paths = [desk.get("path") for desk in committed.get("desks") or []]
+    fresh_paths = [desk.get("path") for desk in fresh["desks"]]
+    if committed_paths == fresh_paths:
+        return []
+    return [(
+        "dashboard/data/desk_briefs.json does not list the latest brief per desk "
+        f"(committed {committed_paths}, rebuilt {fresh_paths}). "
+        "Run python _system/scripts/build_desk_briefs.py and commit "
+        "dashboard/data/desk_briefs.json in the same commit as the new brief."
+    )]
+
+
 def main(argv: list[str] | None = None) -> int:
     parser = argparse.ArgumentParser(description=__doc__.splitlines()[0])
     parser.add_argument("paths", nargs="*", type=Path, help="brief files to check (default: every file under the briefs directory)")
@@ -289,6 +341,17 @@ def main(argv: list[str] | None = None) -> int:
         root=args.root,
         today=args.today,
     )
+    # A one-file check is a brief, not the Inbox join. The payload gate runs
+    # when the command is judging the corpus the dashboard is built from.
+    if not args.paths:
+        report["errors"].extend(
+            committed_payload_errors(
+                root=args.root,
+                briefs_dir=args.briefs_dir,
+                registry_path=args.registry,
+                schema_path=args.schema,
+            )
+        )
     for line in report["errors"]:
         print(f"ERROR {line}")
     for line in report["warnings"]:
