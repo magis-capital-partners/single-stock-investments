@@ -1,4 +1,4 @@
-# AAOI — Insider conviction (2026-10-15)
+# AAOI — Insider conviction (2026-10-14)
 
 > Context only. Insider activity informs scenario confidence and stance discussion; it does not auto-inflate Lawrence base IRR. Promotion requires [HUMAN REVIEW].
 
@@ -15,9 +15,9 @@
 
 **Routine / planned sales (context):**
 
-- BLACK RICHARD B: 2200 @ $0.0 on 2026-09-15
 - Chen Min-Chu (Mike): 8247 @ $201.0 on 2026-06-02
 - DeLaney Cynthia: 56575 @ $189.2285 on 2026-05-26
+- Yeh William H: 15000 @ $105.7559 on 2026-03-09
 
 Source: `_system/reference/market-data/insider/AAOI_transactions.csv`.
 Lawrence base IRR unchanged (`in_base_irr: False`).

@@ -1,0 +1,48 @@
+name: Aggregates Screener
+on:
+  schedule:
+    - cron: "27 18 * * 1-5"
+      timezone: America/New_York
+  repository_dispatch:
+    types: [heal-aggregates, aggregates-evidence-ready]
+permissions:
+  contents: write
+concurrency:
+  group: aggregates-screener
+  cancel-in-progress: false
+jobs:
+  refresh:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          sparse-checkout: |
+            _system/scripts
+            _system/reference/market-data/screens
+            _system/portfolio/registry.json
+            _system/data/aggregates
+            dashboard/data/aggregates
+            dashboard/data/rock_aggregates_screener.json
+            dashboard/data/technical_summary.json
+            .github/actions/commit-main
+          fetch-depth: 1
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - uses: actions/cache@v4
+        with:
+          path: _system/data/aggregates/cache
+          key: aggregates-evidence-v1-${{ github.run_id }}
+          restore-keys: aggregates-evidence-v1-
+      - name: Refresh financial and operating evidence
+        run: |
+          python _system/scripts/build_rock_aggregates_screener.py --refresh-operating --write
+          python _system/scripts/build_rock_aggregates_screener.py --check
+      - name: Publish validated aggregates snapshot
+        uses: ./.github/actions/commit-main
+        with:
+          message: "chore: refresh aggregates operating evidence and valuation"
+          git_add: >-
+            _system/data/aggregates/observations.jsonl
+            dashboard/data/rock_aggregates_screener.json dashboard/data/aggregates/details

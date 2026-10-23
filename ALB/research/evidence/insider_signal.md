@@ -1,22 +1,17 @@
-# ALB — Insider conviction (2026-10-15)
+# ALB — Insider conviction (2026-05-19)
 
 > Context only. Insider activity informs scenario confidence and stance discussion; it does not auto-inflate Lawrence base IRR. Promotion requires [HUMAN REVIEW].
 
-**ICS:** 10.0 (exceptional) · **Bull case support:** moderate
+**ICS:** 0.0 (negligible) · **Bull case support:** none
 
 | Scenario | Prior weight | Tilted weight |
 |----------|--------------|---------------|
-| Bear | 20% | 20% |
-| Base | 55% | 40% |
-| Bull | 25% | 40% |
+| Bear | 20% | 28% |
+| Base | 55% | 47% |
+| Bull | 25% | 25% |
 
 | Insider | Date | Shares | Price | Value | Contrib |
 |---------|------|--------|-------|-------|---------|
-| Masters J Kent | 2026-02-26 | 9032 | $184.93 | $1670287.76 | 2.222 |
-| LaBauve Donald J. Jr. | 2026-02-27 | 1266 | $178.67 | $226196.22 | 1.801 |
-| Anderson Melissa H. | 2026-02-26 | 1129 | $184.93 | $208785.97 | 1.76 |
-| Norris Eric | 2026-02-26 | 1806 | $184.93 | $333983.58 | 1.609 |
-| Gagarinas Autumn M. | 2026-02-26 | 194 | $184.93 | $35876.42 | 1.255 |
 
 **Routine / planned sales (context):**
 

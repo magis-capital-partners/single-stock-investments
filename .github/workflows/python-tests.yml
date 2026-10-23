@@ -49,6 +49,9 @@ on:
       - "dashboard/special-situations-viz.js"
       - "dashboard/separations-viz.js"
       - "dashboard/buyback-viz.js"
+      - "dashboard/buyback.css"
+      - "dashboard/data/buyback_manifest.json"
+      - "dashboard/data/buyback_snapshots/**"
       - "dashboard/desk-briefs-viz.js"
       - "dashboard/overlap-viz.js"
       - "dashboard/short-alpha-viz.js"
@@ -68,6 +71,7 @@ on:
       - "dashboard/data/short_alpha.json"
       - "dashboard/data/short_sleeve.json"
       - "dashboard/data/short_execution_audit.json"
+      - "dashboard/data/short_adaptive_sizing.json"
       - "dashboard/data/technical_summary.json"
       - "dashboard/data/capitulation_daily.json"
       - "dashboard/data/index_membership.json"
@@ -108,6 +112,9 @@ on:
       - "dashboard/special-situations-viz.js"
       - "dashboard/separations-viz.js"
       - "dashboard/buyback-viz.js"
+      - "dashboard/buyback.css"
+      - "dashboard/data/buyback_manifest.json"
+      - "dashboard/data/buyback_snapshots/**"
       - "dashboard/desk-briefs-viz.js"
       - "dashboard/overlap-viz.js"
       - "dashboard/short-alpha-viz.js"
@@ -127,6 +134,7 @@ on:
       - "dashboard/data/short_alpha.json"
       - "dashboard/data/short_sleeve.json"
       - "dashboard/data/short_execution_audit.json"
+      - "dashboard/data/short_adaptive_sizing.json"
       - "dashboard/data/technical_summary.json"
       - "dashboard/data/capitulation_daily.json"
       - "dashboard/data/index_membership.json"
@@ -293,6 +301,9 @@ jobs:
             /dashboard/special-situations-viz.js
             /dashboard/separations-viz.js
             /dashboard/buyback-viz.js
+            /dashboard/buyback.css
+            /dashboard/data/buyback_manifest.json
+            /dashboard/data/buyback_snapshots/
             /dashboard/desk-briefs-viz.js
             /dashboard/overlap-viz.js
             /dashboard/short-alpha-viz.js
@@ -310,6 +321,7 @@ jobs:
             /dashboard/data/short_alpha.json
             /dashboard/data/short_sleeve.json
             /dashboard/data/short_execution_audit.json
+            /dashboard/data/short_adaptive_sizing.json
             /dashboard/data/technical_summary.json
             /dashboard/data/capitulation_daily.json
             /dashboard/data/index_membership.json
@@ -332,7 +344,7 @@ jobs:
           python -m pip install --disable-pip-version-check --quiet \
             "pytest==9.1.1" "PyYAML==6.0.3" "jsonschema==4.26.0" "numpy==2.3.3" "scipy==1.16.2" \
             "ruff==0.16.0" "pandas==3.0.3" "requests==2.34.2" \
-            "beautifulsoup4==4.15.0" "lxml==6.1.1"
+            "beautifulsoup4==4.15.0" "lxml==6.1.1" "exchange-calendars==4.13.2"
       - name: Trading and script test suites
         run: |
           set -euo pipefail

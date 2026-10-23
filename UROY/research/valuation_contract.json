@@ -303,8 +303,9 @@
     "status": "routed",
     "profile_id": "scarce_asset_optionality",
     "label": "Scarce assets, royalties, and optionality",
-    "score": 14.0,
+    "score": 20.0,
     "reasons": [
+      "archetype=optionality",
       "component categories=real_option",
       "existing methods=unit_nav",
       "investment_sleeve=real_assets_land",
@@ -350,9 +351,8 @@
     "secondary_profiles": [
       {
         "profile_id": "quality_reinvestment",
-        "score": 7.0,
+        "score": 1.0,
         "reasons": [
-          "archetype=compounder",
           "component categories=operating_business"
         ]
       },
@@ -366,8 +366,9 @@
     ],
     "scorecard": {
       "scarce_asset_optionality": {
-        "score": 14.0,
+        "score": 20.0,
         "reasons": [
+          "archetype=optionality",
           "component categories=real_option",
           "existing methods=unit_nav",
           "investment_sleeve=real_assets_land",
@@ -375,9 +376,8 @@
         ]
       },
       "quality_reinvestment": {
-        "score": 7.0,
+        "score": 1.0,
         "reasons": [
-          "archetype=compounder",
           "component categories=operating_business"
         ]
       },
@@ -412,12 +412,12 @@
     },
     "decision_rule": "Power Zones select the fitting economic method and eligible independent reviewers; they never choose the valuation answer or capital decision.",
     "ticker": "UROY",
-    "as_of": "2026-10-19",
+    "as_of": "2026-10-23",
     "route_source": "canonical_power_zone_router",
     "config_path": "_system/frameworks/power_zones.json",
     "config_updated": "2026-07-14",
     "classification": {
-      "archetype": "compounder",
+      "archetype": "optionality",
       "moat": "narrow",
       "dhando": "partial",
       "stance": "watch",
@@ -430,69 +430,105 @@
     },
     "specialist_power_zones": [
       {
-        "persona": "pabrai",
-        "label": "Mohnish Pabrai",
-        "independence_group": "asymmetry_downside",
-        "in_power_zone": true,
-        "fit": 0.75,
-        "matched": 3,
-        "known_fields": 4,
-        "matched_fields": [
-          "dhando",
-          "investment_sleeve",
-          "cycle"
-        ],
-        "excluded_by": null,
-        "match_rate": null,
-        "score": 64
-      },
-      {
         "persona": "greenblatt",
         "label": "Joel Greenblatt",
         "independence_group": "special_situations",
         "in_power_zone": true,
-        "fit": 0.667,
-        "matched": 2,
+        "fit": 1.0,
+        "matched": 3,
         "known_fields": 3,
         "matched_fields": [
+          "archetype",
           "dhando",
           "cycle"
         ],
         "excluded_by": null,
         "match_rate": null,
-        "score": 57
+        "score": 85
+      },
+      {
+        "persona": "hk",
+        "label": "Horizon Kinetics",
+        "independence_group": "scarce_assets",
+        "in_power_zone": true,
+        "fit": 1.0,
+        "matched": 2,
+        "known_fields": 2,
+        "matched_fields": [
+          "archetype",
+          "investment_sleeve"
+        ],
+        "excluded_by": null,
+        "match_rate": null,
+        "score": 85
       },
       {
         "persona": "klarman_asset_value",
         "label": "Klarman / Baupost",
         "independence_group": "asset_realization",
         "in_power_zone": true,
-        "fit": 0.667,
-        "matched": 2,
+        "fit": 1.0,
+        "matched": 3,
         "known_fields": 3,
         "matched_fields": [
+          "archetype",
           "dhando",
           "cycle"
         ],
         "excluded_by": null,
         "match_rate": null,
-        "score": 57
+        "score": 85
       },
       {
-        "persona": "lawrence",
-        "label": "Bryan Lawrence",
-        "independence_group": "quality_reinvestment",
+        "persona": "moi",
+        "label": "MOI / Mihaljevic",
+        "independence_group": "special_situations",
         "in_power_zone": true,
-        "fit": 0.667,
-        "matched": 2,
+        "fit": 1.0,
+        "matched": 3,
         "known_fields": 3,
         "matched_fields": [
           "archetype",
-          "dhando"
+          "dhando",
+          "cycle"
         ],
         "excluded_by": null,
         "match_rate": null,
-        "score": 57
+        "score": 85
+      },
+      {
+        "persona": "pabrai",
+        "label": "Mohnish Pabrai",
+        "independence_group": "asymmetry_downside",
+        "in_power_zone": true,
+        "fit": 1.0,
+        "matched": 4,
+        "known_fields": 4,
+        "matched_fields": [
+          "dhando",
+          "archetype",
+          "investment_sleeve",
+          "cycle"
+        ],
+        "excluded_by": null,
+        "match_rate": null,
+        "score": 85
+      },
+      {
+        "persona": "stahl",
+        "label": "Murray Stahl",
+        "independence_group": "scarce_assets",
+        "in_power_zone": true,
+        "fit": 1.0,
+        "matched": 2,
+        "known_fields": 2,
+        "matched_fields": [
+          "archetype",
+          "investment_sleeve"
+        ],
+        "excluded_by": null,
+        "match_rate": null,
+        "score": 85
       },
       {
         "persona": "marks_credit_cycle",
@@ -505,22 +541,6 @@
         "matched_fields": [
           "cycle",
           "dhando"
-        ],
-        "excluded_by": null,
-        "match_rate": null,
-        "score": 57
-      },
-      {
-        "persona": "moi",
-        "label": "MOI / Mihaljevic",
-        "independence_group": "special_situations",
-        "in_power_zone": true,
-        "fit": 0.667,
-        "matched": 2,
-        "known_fields": 3,
-        "matched_fields": [
-          "dhando",
-          "cycle"
         ],
         "excluded_by": null,
         "match_rate": null,
@@ -550,8 +570,8 @@
         }
       ]
     },
-    "input_hash": "ffb89f61c929c0ad88dfe39ae0a2e2f8843241ed00f0cecd26214283b906c63c",
-    "generated_at": "2026-10-19T08:10:34.232551+00:00"
+    "input_hash": "f571fd51049c54f403c71307038758e0b9199eab35b5413c88f8d9cad1f32770",
+    "generated_at": "2026-10-23T08:01:13.164089+00:00"
   },
   "market": {
     "price_per_share": 2.96,

@@ -39,7 +39,6 @@ from atomic_io import (  # noqa: E402
      semantic_text_sha256,
     write_json_if_changed,
 )
-from build_thesis_card import build_card, write_card  # noqa: E402
 
 DATA_DIR = ROOT / "dashboard" / "data"
 AGENT_SHARDS_DIR = DATA_DIR / "agent_shards"
@@ -129,6 +128,13 @@ def _index_kpi_by_ticker(kpi_payload: dict[str, Any]) -> tuple[dict[str, list[di
                 "period": period,
                 "human_summary": m.get("human_summary"),
             }
+            # Extra keys only on issuer operating rows, so a later full rebuild
+            # does not rewrite every fundamental compact row.
+            if m.get("tier") == "operating":
+                compact["unit"] = m.get("unit")
+                compact["yoy_basis"] = m.get("yoy_basis")
+                compact["source"] = m.get("source") or "issuer_operating"
+                compact["tier"] = "operating"
             by_ticker[ticker].append(compact)
             if direction in ("accelerating", "decelerating", "inflecting", "break") and m.get("display", True):
                 inflections.append({"ticker": ticker, **compact})
@@ -266,6 +272,8 @@ def is_active_book_ticker(ticker: str, reg_entry: dict[str, Any], val: dict[str,
 
 
 def build_all(target_tickers: list[str] | None = None, *, build_all_shards: bool = False) -> dict[str, Any]:
+    from build_thesis_card import build_card, write_card
+    from operating_kpis.trends import merge_operating_series, operating_latest_rows, select_shard_series
     ts = now_iso()
     registry = _load_json(REGISTRY_PATH)
     holdings_map = registry.get("holdings") or {}
@@ -274,6 +282,7 @@ def build_all(target_tickers: list[str] | None = None, *, build_all_shards: bool
     kpi_payload = _load_json(KPI_TRENDS_PATH)
     news_payload = _load_json(NEWS_PATH)
     kpi_by_ticker, kpi_inflections = _index_kpi_by_ticker(kpi_payload)
+    merge_operating_series(kpi_by_ticker)
     news_by_ticker = _index_news_by_ticker(news_payload)
     docs_by_ticker, doc_summary_stats = _index_docs_by_ticker()
     try:
@@ -429,10 +438,13 @@ def build_all(target_tickers: list[str] | None = None, *, build_all_shards: bool
                 "truncation": {
                     "key_assumptions": {"shown": min(len(card.get("key_assumptions") or []), 8), "total": len(card.get("key_assumptions") or [])},
                     "open_questions": {"shown": min(len(card.get("open_questions") or []), 6), "total": len(card.get("open_questions") or [])},
-                    "kpi_series": {"shown": min(len(kpi_by_ticker.get(ticker) or []), 12), "total": len(kpi_by_ticker.get(ticker) or [])},
+                    "kpi_series": {
+                        "shown": len(select_shard_series(kpi_by_ticker.get(ticker) or [])),
+                        "total": len(kpi_by_ticker.get(ticker) or []),
+                    },
                     "documents": {"shown": len(docs_by_ticker.get(ticker) or []), "note": "capped at 15 most recent in builder"},
                 },
-                "kpi_series": (kpi_by_ticker.get(ticker) or [])[:12],
+                "kpi_series": select_shard_series(kpi_by_ticker.get(ticker) or []),
                 "recent_news": news_by_ticker.get(ticker) or [],
                 "documents": docs_by_ticker.get(ticker) or [],
                 "l2_pointers": {
@@ -555,11 +567,13 @@ def build_all(target_tickers: list[str] | None = None, *, build_all_shards: bool
             "as_of": str(kpi_gen)[:10],
             "description": (
                 "L0 KPI inflection summary extracted from dashboard/data/kpi_trends.json. "
-                "Contains accelerating/decelerating series so desk bots avoid parsing the 7 MB monolith."
+                "Inflections are the accelerating and decelerating series. "
+                "operating_latest carries issuer operating levels even when the series is steady."
             ),
             "inflection_count": len(kpi_inflections),
             "covered_ticker_count": len(kpi_by_ticker),
             "inflections": kpi_inflections[:120],
+            "operating_latest": operating_latest_rows(),
             "full_feed_path": "dashboard/data/kpi_trends.json",
         },
         feed_id="dashboard-kpi-summary",
@@ -618,5 +632,30 @@ def main(argv: list[str] | None = None) -> int:
     return 0
 
 
+
+def refresh_buyback_projection(folder=None):
+    """Refresh canonical buyback fields while preserving all other shard contents."""
+    from build_buyback_radar import load_companies_index, shard_buyback
+    from atomic_io import write_json_if_changed, attach_envelope
+    index=load_companies_index()
+    if not index:raise ValueError("Verified buyback snapshot unavailable")
+    folder=Path(folder) if folder else AGENT_SHARDS_DIR
+    updated=0
+    for path in sorted(folder.glob("*.json")):
+        try:doc=json.loads(path.read_text(encoding="utf-8"))
+        except (OSError,ValueError):continue
+        ticker=doc.get("ticker") or path.stem
+        row=index.get(ticker)
+        doc["buyback"]=shard_buyback(row) if row else {"schema_version":"buyback.v2","ticker":ticker,"data_status":"unavailable","data_reason":"issuer_outside_snapshot","rank_eligible":False,"metrics":{}}
+        if doc.get("_envelope"):
+            env=doc["_envelope"]
+            doc=attach_envelope(doc,feed_id=env.get("feed_id","ticker-shard"),as_of=env.get("as_of"),row_count=env.get("row_count"))
+        if write_json_if_changed(path,doc):updated+=1
+    return updated
+
 if __name__ == "__main__":
-    raise SystemExit(main())
+    import sys
+    if sys.argv[1:]==["--refresh-buyback-projection"]:
+        print("Refreshed buyback agent shards:",refresh_buyback_projection())
+    else:
+        raise SystemExit(main())

@@ -210,5 +210,79 @@ class SlimTickerRowTests(unittest.TestCase):
         self.assertIn('id="two-phase-watch"', html)
 
 
+class InsightManifestGuardTests(unittest.TestCase):
+    def _publishable(self, retained: int) -> dict:
+        return {
+            "generated_at": "2026-10-20T09:30:36Z",
+            "event_count": retained,
+            "letter_count": 12865,
+            "source_health": {"filing_facts": {"status": "ok"}, "superinvestor_letters": {"items": 12865}},
+            "provenance": {"event_triage_summary": {"retained_event_count": retained, "raw_event_count": 800}},
+            "shards": {"podcast_episodes": "data/insights/podcast_episodes/"},
+        }
+
+    def test_partial_doc_does_not_stub_the_manifest_or_null_podcasts(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            data = Path(tmp)
+            insight = data / "insights"
+            insight.mkdir()
+            events = [
+                {"observed_at": "2026-01-02", "tier": "signal", "feed_eligible": True},
+                {"observed_at": "2026-01-01", "tier": "context", "feed_eligible": True},
+            ]
+            (insight / "manifest.json").write_text(json.dumps(self._publishable(1539)), encoding="utf-8")
+            (insight / "events.json").write_text(json.dumps({"events": events, "events_by_ticker": {}}), encoding="utf-8")
+            (insight / "podcasts.json").write_text(
+                json.dumps({"podcast_index": [{"id": "ep"}], "podcast_by_show": {"s": [1]}, "episode_count": 1}),
+                encoding="utf-8",
+            )
+            before_podcasts = (insight / "podcasts.json").read_bytes()
+            # The download-sync stub: a video timestamp, no corpus, and a shard
+            # map that forgot the detail directories.
+            bds.write_insights_shards({
+                "generated_at": "2026-10-19T16:50:44Z",
+                "shards": {"videos": "data/insights/videos.json"},
+                "event_count": 1539,
+            }, data)
+            manifest = json.loads((insight / "manifest.json").read_text(encoding="utf-8"))
+            summary = manifest["provenance"]["event_triage_summary"]
+            self.assertEqual(summary["retained_event_count"], 2)
+            self.assertEqual(manifest["event_count"], 2)
+            self.assertEqual(manifest["letter_count"], 12865)
+            self.assertEqual(manifest["generated_at"], "2026-10-20T09:30:36Z")
+            self.assertIn("filing_facts", manifest["source_health"])
+            self.assertEqual(manifest["shards"]["podcast_episodes"], "data/insights/podcast_episodes/")
+            self.assertEqual((insight / "podcasts.json").read_bytes(), before_podcasts)
+            self.assertEqual(summary["raw_event_count"], 800)
+
+    def test_written_events_set_the_count_even_when_the_summary_is_stale(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            data = Path(tmp)
+            doc = self._publishable(99)
+            doc["events"] = [{"observed_at": "2026-02-01", "tier": "noise", "feed_eligible": False}]
+            doc["events_by_ticker"] = {}
+            bds.write_insights_shards(doc, data)
+            manifest = json.loads((data / "insights" / "manifest.json").read_text(encoding="utf-8"))
+            self.assertEqual(manifest["provenance"]["event_triage_summary"]["retained_event_count"], 1)
+            self.assertEqual(manifest["event_count"], 1)
+            shard = json.loads((data / "insights" / "events.json").read_text(encoding="utf-8"))
+            self.assertEqual(len(shard["events"]), 1)
+
+    def test_merge_does_not_let_the_video_shard_replace_the_manifest(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            insight = Path(tmp)
+            (insight / "manifest.json").write_text(json.dumps(self._publishable(2)), encoding="utf-8")
+            (insight / "videos.json").write_text(json.dumps({
+                "generated_at": "2026-10-19T16:50:44Z",
+                "video_index": [{"video_id": "x"}],
+                "video_by_channel": {},
+            }), encoding="utf-8")
+            merged = bds.merge_insight_shards(insight)
+            self.assertEqual(merged["generated_at"], "2026-10-20T09:30:36Z")
+            self.assertEqual(merged["letter_count"], 12865)
+            self.assertEqual(len(merged["video_index"]), 1)
+            self.assertIn("source_health", merged)
+
+
 if __name__ == "__main__":
     unittest.main()

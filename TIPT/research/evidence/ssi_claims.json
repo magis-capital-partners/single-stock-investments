@@ -1,9 +1,9 @@
 {
   "schema_version": "1.0",
   "ticker": "TIPT",
-  "as_of": "2026-10-19",
-  "pack_hash": "99f42e22c1c521cff92ed590fd4c6825886cbd9128f1d02623dbc31f5ef29167",
-  "pack_as_of": "2026-10-19",
+  "as_of": "2026-10-21",
+  "pack_hash": "9568a1e4b5ff930fb59f296ca90d742a8bf2f3b6d31a55346a8c6897a24a6a0a",
+  "pack_as_of": "2026-10-21",
   "claims": [],
   "claim_count": 0,
   "severity_histogram": {
@@ -19,26 +19,79 @@
     "footnote_detail": 0
   },
   "management_ledger": {
-    "as_of": "2026-10-19",
-    "pack_hash": "99f42e22c1c521cff92ed590fd4c6825886cbd9128f1d02623dbc31f5ef29167",
+    "as_of": "2026-10-21",
+    "pack_hash": "9568a1e4b5ff930fb59f296ca90d742a8bf2f3b6d31a55346a8c6897a24a6a0a",
     "promise_count": 0,
     "statement_count": 0,
     "resolved_count": 0,
     "hit_rate": null,
     "unresolvable_count": 0,
-    "observed_buybacks": null,
+    "observed_buybacks": {
+      "window": "latest_fy",
+      "value": 0,
+      "periods": [
+        "2024-12-31"
+      ],
+      "tag": "us-gaap:PaymentsForRepurchaseOfCommonStock",
+      "accn": "0001393726-25-000028"
+    },
     "rows": []
   },
   "spawner": {
-    "pack_hash": "99f42e22c1c521cff92ed590fd4c6825886cbd9128f1d02623dbc31f5ef29167",
-    "components": {},
+    "pack_hash": "9568a1e4b5ff930fb59f296ca90d742a8bf2f3b6d31a55346a8c6897a24a6a0a",
+    "components": {
+      "buyback_trajectory": {
+        "share_count_change_1y_pct": 1.66,
+        "share_count_cagr_pct": 15.66,
+        "years_observed": 10,
+        "read": "diluting",
+        "evidence_ref": {
+          "tag": "dei:EntityCommonStockSharesOutstanding",
+          "first": {
+            "end": "2012-03-30",
+            "accn": "0001193125-12-152199"
+          },
+          "last": {
+            "end": "2026-03-01",
+            "accn": "0001393726-26-000009"
+          }
+        }
+      },
+      "capex_intensity": {
+        "capex_to_ocf": 0.0,
+        "capex_to_ocf_median": 0.04,
+        "years_observed": 12,
+        "period_end": "2025-12-31",
+        "read": "capital_light",
+        "negative_ocf_years": 1,
+        "evidence_ref": {
+          "capex_tag": "us-gaap:PaymentsToAcquirePropertyPlantAndEquipment",
+          "ocf_tag": "us-gaap:NetCashProvidedByUsedInOperatingActivities"
+        }
+      },
+      "shareholder_returns": {
+        "buybacks_3y": [
+          1727000,
+          0,
+          0
+        ],
+        "dividends_3y": [
+          7401000,
+          18312000,
+          9071000
+        ],
+        "total_payout_ratio_latest": 0.0,
+        "evidence_ref": {
+          "buybacks_tag": "us-gaap:PaymentsForRepurchaseOfCommonStock",
+          "dividends_tag": "us-gaap:PaymentsOfDividendsCommonStock"
+        }
+      }
+    },
     "abstentions": [
-      "buyback_trajectory:missing_share_count_pair",
-      "capex_intensity:missing_capex_or_ocf",
       "small_bet_discipline:requires_segment_history",
       "kill_discipline:requires_segment_history"
     ],
-    "basis": "filing_facts"
+    "basis": "xbrl_series"
   },
   "dropped_modalities": {
     "unrouted_delta_rows": 0,

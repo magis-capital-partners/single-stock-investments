@@ -78,6 +78,7 @@ EXCHANGE_META = {
     "CEE": "NYSE",
     "NAN": "NYSE",
     "URB.A.TO": "TSX",
+    "DC.A.TO": "TSX",
     "RMV.L": "LSE",
     "0388.HK": "HKEX",
     "ABX": "NASDAQ",
@@ -100,6 +101,11 @@ EXCHANGE_META = {
     "CNI": "NYSE",
     "FER": "NASDAQ",
     "TIPT": "NASDAQ",
+    "VNOM": "NASDAQ",
+    "LGND": "NASDAQ",
+    "LIF.TO": "TSX",
+    "FRU.TO": "TSX",
+    "TPZ.TO": "TSX",
     "EVR": "CSE",
     "GPW.WA": "WSE",
     "DNP.WA": "WSE",
@@ -116,6 +122,11 @@ EXCHANGE_META = {
     "TFPM": "NYSE",
     "X.TO": "TSX",
     "XP": "NASDAQ",
+    "TOI.V": "TSXV",
+    "LIFCO.ST": "Nasdaq Stockholm",
+    "RACE": "NYSE",
+    "WCN": "NYSE",
+    "MKL": "NYSE",
 }
 
 DOWNLOAD_TYPE_OVERRIDES = {

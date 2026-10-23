@@ -16,8 +16,15 @@ from __future__ import annotations
 
 import json
 import re
+import subprocess
 import sys
 from pathlib import Path
+
+from reconcile_insights_event_summary import (
+    is_publishable_manifest,
+    reconciled_manifest,
+    richer_manifest,
+)
 
 CORE_VERSION = 1
 
@@ -293,33 +300,164 @@ def write_ticker_shards(payload: dict, data_dir: Path) -> int:
     return len(written)
 
 
+def _read_json_object(path: Path) -> dict | None:
+    try:
+        value = json.loads(path.read_text(encoding="utf-8"))
+    except (OSError, json.JSONDecodeError, UnicodeError):
+        return None
+    return value if isinstance(value, dict) else None
+
+
+def _repo_insight_dir() -> Path:
+    return Path(__file__).resolve().parents[2] / "dashboard" / "data" / "insights"
+
+
+def _git_manifest(spec: str) -> dict | None:
+    root = Path(__file__).resolve().parents[2]
+    result = subprocess.run(
+        ["git", "show", spec],
+        cwd=root,
+        capture_output=True,
+        check=False,
+    )
+    if result.returncode != 0 or not result.stdout:
+        return None
+    try:
+        value = json.loads(result.stdout)
+    except json.JSONDecodeError:
+        return None
+    return value if isinstance(value, dict) else None
+
+
+def recover_insight_manifest(insights_dir: Path) -> dict | None:
+    """On-disk manifest, or the last publishable copy still in the git index.
+
+    Conflict regeneration deletes the worktree file before the dashboard
+    builder runs. Reading stage 2/3 puts that copy back. A temp directory
+    outside this repo does not consult git, so tests cannot pick up main.
+    """
+    on_disk = _read_json_object(insights_dir / "manifest.json")
+    best = on_disk if isinstance(on_disk, dict) else None
+    try:
+        insights_dir.resolve().relative_to(_repo_insight_dir().resolve())
+    except ValueError:
+        return best
+    rel = "dashboard/data/insights/manifest.json"
+    for spec in (f":2:{rel}", f":3:{rel}", f"HEAD:{rel}"):
+        best = richer_manifest(best, _git_manifest(spec))
+    return best
+
+
+def merge_insight_shards(shard_dir: Path) -> dict | None:
+    """Manifest metadata, overlaid with each shard's own keys.
+
+    Alphabetical ``*.json`` merging let ``videos.json`` (last) replace
+    ``generated_at``, and a deleted manifest disappeared entirely. Shard
+    stamps stay on the shards.
+    """
+    manifest = recover_insight_manifest(shard_dir)
+    merged: dict = dict(manifest) if isinstance(manifest, dict) else {}
+    stamp = merged.get("generated_at")
+    for name, keys in INSIGHTS_SHARDS.items():
+        shard = _read_json_object(shard_dir / f"{name}.json")
+        if not isinstance(shard, dict):
+            continue
+        for key in keys:
+            if key in shard and shard[key] is not None:
+                merged[key] = shard[key]
+    if stamp is not None:
+        merged["generated_at"] = stamp
+    return merged or None
+
+
+def _shard_payload(insights_doc: dict, insights_dir: Path, name: str, keys: tuple[str, ...], stamp) -> dict | None:
+    """Rows this doc actually has. Missing keys must not null an existing shard."""
+    existing = _read_json_object(insights_dir / f"{name}.json") or {}
+    if any(key not in insights_doc or insights_doc[key] is None for key in keys):
+        if not any(key in insights_doc and insights_doc[key] is not None for key in keys):
+            return None
+        if not existing:
+            return None
+        shard = {key: existing.get(key) for key in keys}
+        for key in keys:
+            if key in insights_doc and insights_doc[key] is not None:
+                shard[key] = insights_doc[key]
+    else:
+        shard = {key: insights_doc[key] for key in keys}
+    for extra in ("video_status_counts", "video_newest_published", "episode_count"):
+        if extra not in shard and extra in existing and extra not in insights_doc:
+            shard[extra] = existing[extra]
+    if stamp is not None:
+        shard["generated_at"] = stamp
+    elif existing.get("generated_at"):
+        shard["generated_at"] = existing["generated_at"]
+    return shard
+
+
 def write_insights_shards(insights_doc: dict | None, data_dir: Path) -> int:
     insights_dir = data_dir / "insights"
     insights_dir.mkdir(parents=True, exist_ok=True)
     if not isinstance(insights_doc, dict):
         return 0
     sharded_keys = {k for keys in INSIGHTS_SHARDS.values() for k in keys}
-    manifest = {k: v for k, v in insights_doc.items() if k not in sharded_keys}
-    try:
-        from check_media_analysis_freshness import note_observed_counts
-        note_observed_counts(manifest)
-    except Exception as exc:  # noqa: BLE001 - the shard must still publish if the clock cannot
-        print(f"media analysis clock not updated: {exc}", file=sys.stderr)
-    manifest["shards"] = {
-        name: f"data/insights/{name}.json" for name in INSIGHTS_SHARDS
-    }
-    (insights_dir / "manifest.json").write_text(_dump(manifest), encoding="utf-8")
-    count = 1
+    existing = recover_insight_manifest(insights_dir)
+    if is_publishable_manifest(insights_doc):
+        base = dict(insights_doc)
+    elif is_publishable_manifest(existing):
+        # A partial rebuild (deleted manifest, video stamp only) keeps the
+        # corpus and health already on disk or in the index.
+        base = dict(existing)
+        for key, value in insights_doc.items():
+            # shards and the stamp belong to the publishable manifest. A
+            # partial doc's copy of either one is how a stub erased
+            # video_details and the intake timestamp.
+            if key in sharded_keys or key in {"generated_at", "shards"} or value is None:
+                continue
+            base[key] = value
+    else:
+        base = None
+        print(
+            "refusing to write an insight manifest stub; no publishable manifest to keep",
+            file=sys.stderr,
+        )
+
+    events = insights_doc.get("events") if isinstance(insights_doc.get("events"), list) else None
+    if events is None:
+        on_disk_events = _read_json_object(insights_dir / "events.json")
+        if isinstance(on_disk_events, dict) and isinstance(on_disk_events.get("events"), list):
+            events = on_disk_events["events"]
+    if base is not None and isinstance(events, list):
+        base = reconciled_manifest(base, events)
+
+    count = 0
+    if is_publishable_manifest(base):
+        manifest = {k: v for k, v in base.items() if k not in sharded_keys}
+        try:
+            from check_media_analysis_freshness import note_observed_counts
+            note_observed_counts(manifest)
+        except Exception as exc:  # noqa: BLE001 - the shard must still publish if the clock cannot
+            print(f"media analysis clock not updated: {exc}", file=sys.stderr)
+        manifest["shards"] = {
+            name: f"data/insights/{name}.json" for name in INSIGHTS_SHARDS
+        }
+        previous_shards = base.get("shards") if isinstance(base.get("shards"), dict) else {}
+        for key, value in previous_shards.items():
+            manifest["shards"].setdefault(key, value)
+        (insights_dir / "manifest.json").write_text(_dump(manifest), encoding="utf-8")
+        count += 1
+        stamp = base.get("generated_at")
+    else:
+        stamp = None
+
     # Every shard carries the parent doc's stamp. Without it a shard cannot be
     # registered as a P6 data feed at all: podcasts.json held 3,561 episodes and
     # no date, so nothing could tell that its newest episode was 2026-07-28 and
     # the pipeline had not run since. A feed with no stamp cannot go stale --
     # it can only be noticed by a human reading the page.
-    stamp = insights_doc.get("generated_at")
     for name, keys in INSIGHTS_SHARDS.items():
-        shard = {k: insights_doc.get(k) for k in keys}
-        if stamp is not None:
-            shard["generated_at"] = stamp
+        shard = _shard_payload(insights_doc, insights_dir, name, keys, stamp)
+        if shard is None:
+            continue
         (insights_dir / f"{name}.json").write_text(_dump(shard), encoding="utf-8")
         count += 1
     return count
@@ -413,3 +551,30 @@ def write_shards(payload: dict, insights_doc: dict | None, data_dir: Path) -> di
         "ticker_shards": ticker_count,
         "insights_shards": insight_count,
     }
+
+
+def refresh_buyback_projection(folder=None):
+    """Refresh canonical buyback fields while preserving all other shard contents."""
+    from build_buyback_radar import load_companies_index, shard_buyback
+    from atomic_io import write_json_if_changed, attach_envelope
+    index=load_companies_index()
+    if not index:raise ValueError("Verified buyback snapshot unavailable")
+    folder=Path(folder) if folder else Path(__file__).resolve().parents[2] / "dashboard/data/tickers"
+    updated=0
+    for path in sorted(folder.glob("*.json")):
+        try:doc=json.loads(path.read_text(encoding="utf-8"))
+        except (OSError,ValueError):continue
+        ticker=doc.get("ticker") or path.stem
+        row=index.get(ticker)
+        doc["buyback"]=shard_buyback(row) if row else {"schema_version":"buyback.v2","ticker":ticker,"data_status":"unavailable","data_reason":"issuer_outside_snapshot","rank_eligible":False,"metrics":{}}
+        if doc.get("_envelope"):
+            env=doc["_envelope"]
+            doc=attach_envelope(doc,feed_id=env.get("feed_id","ticker-shard"),as_of=env.get("as_of"),row_count=env.get("row_count"))
+        if write_json_if_changed(path,doc):updated+=1
+    return updated
+
+
+if __name__ == "__main__":
+    import sys
+    if sys.argv[1:]==["--refresh-buyback-projection"]:
+        print("Refreshed buyback ticker shards:",refresh_buyback_projection())

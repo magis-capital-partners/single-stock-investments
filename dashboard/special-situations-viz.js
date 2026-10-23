@@ -146,6 +146,7 @@
       <p><strong>Next.</strong> ${esc(row.next || '')}</p>
       <p><strong>Annualized spread.</strong> ${row.annualized_spread == null ? 'Not stated. Shown only when a filing states it.' : esc(row.annualized_spread)}</p>
       ${exchangeTermsHtml(row.spread)}
+      ${row.buyback_event && global.BuybackViz ? global.BuybackViz.renderEventDetails(row.buyback_event) : ''}
       ${whoMustSellHtml(row.flow)}
       <p><strong>Source.</strong> ${evidenceCell(row)} · ${esc(row.evidence_kind || '')}</p>
     </td></tr>` : '';
@@ -176,9 +177,9 @@
     const chips = [{ id: 'all', label: 'All', count: (doc.rows || []).length }].concat(
       (doc.lanes || []).map((lane) => ({ id: lane.id, label: lane.label, count: counts[lane.id] || 0 })),
     );
-    const mentionRows = state.lane === 'buyback_events' ? (doc.buyback_mentions || []) : [];
+    const mentionRows = state.lane === 'buyback_events' ? (doc.buyback_mentions || []).filter(row => !state.query || `${row.ticker} ${row.line}`.toLowerCase().includes(state.query.toLowerCase())) : [];
     const mentionBlock = mentionRows.length
-      ? `<section class="ideas-surface"><div class="ideas-surface-head"><strong>Ordinary programs</strong><span>One line each. Not a situation row.</span></div><ul>${mentionRows.map((row) => `<li>${esc(row.ticker || '—')} · ${esc(row.line || '')}${row.url ? ` · <a href="${esc(row.url)}" target="_blank" rel="noopener">filing</a>` : ''}</li>`).join('')}</ul></section>`
+      ? `<section class="ideas-surface"><div class="ideas-surface-head"><strong>Ordinary programs</strong><span>One line each. Not a situation row.</span></div><ul>${mentionRows.map((row) => `<li>${esc(row.ticker || '—')} · ${esc(row.filed || '')} · ${esc(row.line || '')}${row.url ? ` · <a href="${esc(row.url)}" target="_blank" rel="noopener">filing</a>` : ''}</li>`).join('')}</ul></section>`
       : '';
     const gates = state.lane === 'warrants'
       ? `<details class="situation-gates" data-situation-gates ${state.gatesOpen ? 'open' : ''}><summary>Contract gates</summary><div data-situation-gates-host></div></details>`
@@ -208,6 +209,7 @@
       </section>
       ${historyBlock}
       ${discoveryBlock}
+      ${state.lane === 'buyback_events' ? `<p class="bb-notice">${doc.buyback_error ? esc(doc.buyback_error) : `Buyback evidence snapshot ${esc(doc.buyback_snapshot?.as_of || 'unavailable')}. Review items have unresolved terms, status, or size.`}</p>` : ''}
       ${mentionBlock}
       ${gates}
       ${doc.error ? `<p class="form-hint">${esc(doc.error)}</p>` : ''}
@@ -249,6 +251,7 @@
     container.querySelector('[data-situation-gates]')?.addEventListener('toggle', (event) => {
       state.gatesOpen = event.target.open;
     });
+    global.BuybackViz?.attachScenarios(container);
     const focusRow = container.querySelector('tr.is-focus');
     if (focusRow) focusRow.scrollIntoView({ block: 'nearest' });
   }

@@ -406,6 +406,18 @@ test_epistemic_outputs_are_regenerable() {
     echo "FAIL: work queue is rebuilt, not line-unioned"
     exit 1
   fi
+  is_insight_shard "dashboard/data/insights/manifest.json" || {
+    echo "FAIL: insight manifest should resolve as an insight shard"
+    exit 1
+  }
+  if is_regenerable_artifact "dashboard/data/insights/manifest.json"; then
+    echo "FAIL: insight manifest must not be deleted and rebuilt"
+    exit 1
+  fi
+  if is_regenerable_artifact "dashboard/data/insights/events.json"; then
+    echo "FAIL: insight events shard must not be deleted and rebuilt"
+    exit 1
+  fi
 }
 
 test_epistemic_rebase_keeps_both_log_lines() {

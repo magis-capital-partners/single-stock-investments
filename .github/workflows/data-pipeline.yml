@@ -3,8 +3,10 @@ name: Data Pipeline
 # Single scheduled writer lane for deterministic data jobs.
 
 on:
+  # No workflow_dispatch: test_llm_workflow_governance.py bans a manual run.
+  # On-demand buyback repair stays repository_dispatch type heal-buyback-radar.
   repository_dispatch:
-    types: [heal-technicals, heal-warrants, heal-separations, heal-reverse-splits]
+    types: [heal-technicals, heal-warrants, heal-separations, heal-reverse-splits, heal-buyback-radar]
   # Off the hour and off :30: top-of-hour crons queue for hours on GitHub's
   # scheduler. Odd minutes keep the same cadence and the same ET windows.
   schedule:
@@ -17,6 +19,7 @@ on:
     - cron: "29 13 * * *"    # 13F check (daily, 9:29 ET)
     - cron: "29 18 21 2,5,8,11 *"  # 13F twelve-quarter reconcile, 21st of Feb/May/Aug/Nov
     - cron: "47 */6 * * *"  # portfolio news
+    - cron: "19 15 * * 2-5" # incremental buyback refresh Tuesday-Friday
     - cron: "13 15 * * 1"    # CVR + warrant + separation + buyback discovery Mondays
     - cron: "43 16 * * 0"    # World Model weekly (Sunday UTC: themes + KPI ledgers + strip)
 
@@ -66,6 +69,8 @@ jobs:
           intake_full=false; activist=false; downloads=false; drive=false; news=false; cvr_discover=false; warrant_discover=false; separation_discover=false; reverse_splits=false; buyback_radar=false; world_model=false; technicals=false; thirteen_f=false; thirteen_f_periods=2; download_mode=light
           if [ "$EVENT_NAME" = "repository_dispatch" ]; then SCHEDULE="dispatch:$EVENT_ACTION"; fi
           case "$SCHEDULE" in
+            "dispatch:heal-buyback-radar") buyback_radar=true ;;
+            "19 15 * * 2-5") buyback_radar=true ;;
             "dispatch:heal-technicals") technicals=true ;;
             "dispatch:heal-warrants") warrant_discover=true ;;
             "dispatch:heal-separations") separation_discover=true ;;
@@ -1110,19 +1115,45 @@ jobs:
       - uses: actions/setup-python@v5
         with:
           python-version: "3.12"
+      - name: Buyback cache date
+        id: buyback-cache-date
+        run: echo "day=$(date -u +%Y-%m-%d)" >> "$GITHUB_OUTPUT"
+      - uses: actions/cache@v4
+        with:
+          path: |
+            _system/data/buyback_radar/cache
+            _system/data/buyback_radar/filings
+          key: ${{ runner.os }}-buyback-v2-${{ steps.buyback-cache-date.outputs.day }}
+          restore-keys: |
+            ${{ runner.os }}-buyback-v2-
       - name: Refresh buyback radar from EDGAR
         timeout-minutes: 70
+        env:
+          BUYBACK_TICKERS: ""
+          BUYBACK_WEEKLY: ${{ github.event.schedule == '13 15 * * 1' }}
+          BUYBACK_REFRESH: "false"
         run: |
-          python -u _system/scripts/build_buyback_radar.py
-          python _system/scripts/build_special_situations.py
+          set -euo pipefail
+          args=()
+          if [ "$BUYBACK_REFRESH" = "true" ] || [ "$BUYBACK_WEEKLY" = "true" ]; then args+=(--refresh); fi
+          if [ -n "$BUYBACK_TICKERS" ]; then args+=(--tickers "$BUYBACK_TICKERS" --write); fi
+          python -u _system/scripts/build_buyback_radar.py "${args[@]}"
+          python _system/scripts/build_buyback_radar.py --check
+          python _system/scripts/build_special_situations.py --refresh-buyback-projection
+          python _system/scripts/build_short_alpha_dashboard.py --refresh-buyback-projection
+          python _system/scripts/build_progressive_shards.py --refresh-buyback-projection
+          python _system/scripts/build_dashboard_shards.py --refresh-buyback-projection
       - name: Commit buyback radar
-        if: always()
+        if: success()
         uses: ./.github/actions/commit-main
         with:
-          message: "chore: buyback radar weekly $(date -u +%Y-%m-%d)"
+          message: "chore: buyback radar refresh $(date -u +%Y-%m-%d)"
           git_add: >-
             dashboard/data/buyback_radar.json
             dashboard/data/buyback_companies.json
+            dashboard/data/buyback_manifest.json
+            dashboard/data/buyback_snapshots
+            dashboard/data/tickers
             dashboard/data/special_situations.json
             dashboard/data/short_alpha.json
             dashboard/data/agent_shards

@@ -162,9 +162,11 @@ jobs:
           # Two automerge lanes. A cursor/* diff that touches a ticker
           # research tree (a deep dive, a manifest, a committee packet) stays
           # on the provenance gate, including when the manifest is missing.
-          # A cursor/* diff that does not — workflow, script, and ledger
-          # fixes — is a code PR. codex/* and claude/* are always code.
-          # Both code lanes gate on every CI check being green.
+          # kpi_ledger.json and book_estimate.json are mechanical and stay on
+          # the code lane unless another research file is in the same diff.
+          # A cursor/* diff that does not touch ticker research (workflow,
+          # script, and ledger fixes) is a code PR. codex/* and claude/* are
+          # always code. Both code lanes gate on every CI check being green.
           gh api --paginate "repos/$REPO/pulls/$PR/files" --jq '.[].filename' > "$RUNNER_TEMP/pr-files.txt"
           # A workflow_run retry checks out the PR head. A branch cut before
           # this script existed will not have it; the default branch does.
@@ -535,12 +537,15 @@ jobs:
           # schema.json (PR #1225). Add the data roots to the sparse
           # checkout (that materializes them from main), then overlay the
           # PR head, then materialize every inputs_read path the briefs name.
+          # dashboard/data/desk_briefs.json is overlaid too: the checker
+          # rejects a payload whose desk paths are not the latest brief.
           git sparse-checkout add --skip-checks \
             /_system/data/desk_briefs/ \
             /_system/data/separations/ \
             /_system/research/short-alpha/ \
             /_system/memory-hub/ \
             /_system/portfolio/registry.json \
+            /dashboard/data/desk_briefs.json \
             /SOURCES.md \
             /_system/sources.json
           overlay() {
@@ -550,6 +555,7 @@ jobs:
             fi
           }
           overlay _system/data/desk_briefs
+          overlay dashboard/data/desk_briefs.json
           overlay _system/data/separations
           overlay _system/research/short-alpha
           overlay _system/memory-hub

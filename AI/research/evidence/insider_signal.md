@@ -1,28 +1,25 @@
-# AI — Insider conviction (2026-10-19)
+# AI — Insider conviction (2026-10-14)
 
 > Context only. Insider activity informs scenario confidence and stance discussion; it does not auto-inflate Lawrence base IRR. Promotion requires [HUMAN REVIEW].
 
-**ICS:** 10.0 (exceptional) · **Bull case support:** moderate
+**ICS:** 1.38 (negligible) · **Bull case support:** none
 
 | Scenario | Prior weight | Tilted weight |
 |----------|--------------|---------------|
-| Bear | 20% | 20% |
-| Base | 55% | 40% |
-| Bull | 25% | 40% |
+| Bear | 20% | 25% |
+| Base | 55% | 50% |
+| Bull | 25% | 25% |
 
 | Insider | Date | Shares | Price | Value | Contrib |
 |---------|------|--------|-------|-------|---------|
-| SIEBEL THOMAS M | 2026-10-13 | 435363 | $3.9 | $1697915.7 | 3.986 |
-| SIEBEL THOMAS M | 2026-09-15 | 282001 | $3.9 | $1099803.9 | 3.021 |
-| SIEBEL THOMAS M | 2026-09-16 | 162247 | $3.9 | $632763.3 | 2.874 |
-| SIEBEL THOMAS M | 2026-08-11 | 453314 | $3.9 | $1767924.6 | 2.368 |
-| SIEBEL THOMAS M | 2026-06-01 | 6166667 | $11.16 | $68820003.72 | 2.329 |
+| Snabe Jim H. | 2026-03-09 | 25000 | $9.0 | $225000.0 | 1.247 |
+| Snabe Jim H. | 2026-03-27 | 10000 | $7.73 | $77300.0 | 0.955 |
 
 **Routine / planned sales (context):**
 
-- Hyten John E.: 2500 @ $12.16 on 2026-10-15
 - SIEBEL THOMAS M: 22780 @ $10.56 on 2026-09-14
-- SIEBEL THOMAS M: 21986 @ $0.0 on 2026-09-14
+- SIEBEL THOMAS M: 16890 @ $10.3 on 2026-09-02
+- SIEBEL THOMAS M: 139500 @ $9.61 on 2026-08-03
 
 Source: `_system/reference/market-data/insider/AI_transactions.csv`.
 Lawrence base IRR unchanged (`in_base_irr: False`).

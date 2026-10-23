@@ -895,75 +895,132 @@
     const leadNote = thesis
       ? 'Model summary'
       : (analysed ? 'Analysis finished with no thesis and no claims' : (summary ? 'Automatic extract from the transcript' : ''));
+    const numbers = (Array.isArray(merged.numbers) ? merged.numbers : [])
+      .filter(n => n && String(n.value || '').trim());
+    const notes = String(merged.notes || '').trim();
+    const readerBasis = reader ? String(reader.source_basis || '') : '';
+    const transcriptIsSpeech = merged.transcript_source === 'whisper' || readerBasis === 'transcript';
+    const byTicker = new Map();
+    claims.forEach(c => {
+      const key = c.ticker || c.company || '—';
+      if (!byTicker.has(key)) byTicker.set(key, []);
+      byTicker.get(key).push(c);
+    });
     const verifiedRate = analysis && typeof analysis.quote_verified_rate === 'number'
       ? Math.round(analysis.quote_verified_rate * 100)
       : null;
     const stanceBadge = st => {
       const s = String(st || 'neutral').toLowerCase();
       const cls = s === 'bullish' ? 'badge-ok' : (s === 'bearish' ? 'badge-bad' : '');
-      return `<span class="badge${cls ? ' ' + cls : ''}">${escapeHtml(s)}</span>`;
+      return `<span class="badge ${videoStanceClass(s) || cls}">${escapeHtml(s)}</span>`;
     };
+    const summaryNote = [
+      reader && reader.source_label,
+      reader && reader.status === 'pending_model' ? 'full transcript summary is queued' : '',
+      reader && reader.status === 'needs_review' ? 'needs review' : '',
+    ].filter(Boolean).join(' · ');
     return `
       <div class="detail-section fund-detail" id="podcast-episode-detail">
         <div style="display:flex;align-items:center;gap:12px;margin-bottom:12px">
           <button type="button" class="filter-btn" data-podcast-back>← Back</button>
           <h3 style="margin:0;font-size:15px;line-height:1.35">${escapeHtml(merged.title || 'Episode')}</h3>
         </div>
-        <p class="tier-sub">${escapeHtml(merged.show_title || merged.show_id || 'Podcast')} · ${escapeHtml(merged.published || '—')}</p>
+        <p class="tier-sub">${escapeHtml(merged.show_title || merged.show_id || 'Podcast')} ·
+          ${escapeHtml((merged.published || '—').slice(0, 10))}
+          ${episodeLink ? ' · ' + episodeLink : ''}</p>
         ${flags.length ? `<p style="margin:8px 0">${flags.map(f => `<span class="badge badge-us">${escapeHtml(f)}</span>`).join(' ')}</p>` : ''}
         ${guests.length ? `<p class="tier-sub">Guests: ${escapeHtml(guests.join(', '))}</p>` : ''}
         ${personas.length ? `<p class="tier-sub">Personas: ${escapeHtml(personas.join(', '))}</p>` : ''}
-        ${themes ? `<div style="margin:8px 0"><strong>Themes:</strong> ${themes}</div>` : ''}
-        ${loading ? '<p class="tier-sub">Loading summary and highlights…</p>' : ''}
+        ${loading ? '<p class="tier-sub">Loading the episode…</p>' : ''}
+
         ${reader ? `
-        <section class="podcast-reader-summary" aria-label="Episode summary">
-          <h4>IN SHORT</h4>
+        <div class="video-thesis">
           ${reader.headline ? `<p class="podcast-headline">${escapeHtml(reader.headline)}</p>` : ''}
-          <p class="podcast-overview">${escapeHtml(reader.overview || '')}</p>
-          <span class="video-thesis-src">${escapeHtml(reader.source_label || 'Reader summary')}${reader.status === 'pending_model' ? ' · Full transcript summary is queued' : ''}${reader.status === 'needs_review' ? ' · Needs review' : ''}</span>
-          ${readerPoints.length ? `
-          <h4>KEY POINTS</h4>
-          <ul class="podcast-key-points">${readerPoints.map(p => `
-            <li>
-              <span>${escapeHtml(p.text)}</span>
-              ${p.evidence_quote ? `<details><summary>Evidence</summary><blockquote>&ldquo;${escapeHtml(p.evidence_quote)}&rdquo;</blockquote></details>` : ''}
-            </li>`).join('')}
-          </ul>` : ''}
-          ${reader.why_it_matters ? `<h4>WHY IT MATTERS</h4><p class="podcast-overview">${escapeHtml(reader.why_it_matters)}</p>` : ''}
-        </section>` : ''}
-        ${lead ? `
+          <p>${escapeHtml(reader.overview || '')}</p>
+          ${summaryNote ? `<span class="video-thesis-src">${escapeHtml(summaryNote)}</span>` : ''}
+        </div>` : (lead ? `
         <div class="video-thesis">
           <p>${escapeHtml(lead)}</p>
           ${leadNote ? `<span class="video-thesis-src">${escapeHtml(leadNote)}</span>` : ''}
+        </div>` : '')}
+
+        ${readerPoints.length ? `
+        <h4 class="video-detail-head">KEY POINTS</h4>
+        <div class="video-claims">
+          ${readerPoints.map(p => `
+            <article class="video-claim">
+              <p class="video-claim-text">${escapeHtml(p.text)}</p>
+              ${p.evidence_quote ? `<blockquote class="video-quote">“${escapeHtml(p.evidence_quote)}”</blockquote>` : ''}
+            </article>`).join('')}
         </div>` : ''}
+
+        ${reader && reader.why_it_matters ? `
+        <h4 class="video-detail-head">WHY IT MATTERS</h4>
+        <p class="podcast-overview">${escapeHtml(reader.why_it_matters)}</p>` : ''}
+
+        ${byTicker.size ? `
+        <h4 class="video-detail-head">WHAT WAS CLAIMED${verifiedRate === null ? '' : ` · ${verifiedRate}% QUOTE-VERIFIED`}</h4>
+        <div class="video-claims">
+          ${[...byTicker.entries()].map(([key, rows]) => `
+            <section class="video-claim-group">
+              <header>
+                ${rows[0].ticker
+                  ? videoTickerPill(rows[0].ticker, rows[0].stance, escapeHtml)
+                  : `<span class="mono">${escapeHtml(key)}</span>`}
+                ${rows[0].company && rows[0].ticker ? `<span class="video-company">${escapeHtml(rows[0].company)}</span>` : ''}
+              </header>
+              ${rows.map(c => `
+                <article class="video-claim">
+                  <p class="video-claim-text">${stanceBadge(c.stance)}${escapeHtml(c.claim)}</p>
+                  ${c.quote ? `<blockquote class="video-quote">“${escapeHtml(c.quote)}”</blockquote>` : ''}
+                </article>`).join('')}
+            </section>`).join('')}
+        </div>` : ''}
+
+        ${numbers.length ? `
+        <h4 class="video-detail-head">FIGURES CITED</h4>
+        <ul class="video-numbers">
+          ${numbers.map(n => `<li><strong class="mono">${escapeHtml(n.value)}</strong><span>${escapeHtml(n.what || '')}</span></li>`).join('')}
+        </ul>` : ''}
+
+        ${(merged.themes || []).length ? `
+        <h4 class="video-detail-head">THEMES</h4>
+        <p class="video-themes">${(merged.themes || []).map(t => {
+          const label = typeof t === 'string' ? t : (t.theme || '');
+          const stance = typeof t === 'object' ? t.stance : '';
+          return label ? `<span class="badge ${videoStanceClass(stance)}">${escapeHtml(label)}</span>` : '';
+        }).join(' ')}</p>` : (themes ? `<div style="margin:8px 0">${themes}</div>` : '')}
+
         ${tickers.length ? `
-        <div style="margin:10px 0">
-          <strong>Tickers</strong>
-          <div style="margin-top:6px;display:flex;flex-wrap:wrap;gap:6px">
-            ${tickers.map(t => `<button type="button" class="filter-btn source-pill mono" data-select-ticker="${escapeHtml(t)}">${escapeHtml(t)}</button>`).join('')}
-          </div>
+        <h4 class="video-detail-head">TICKERS</h4>
+        <div style="display:flex;flex-wrap:wrap;gap:6px">
+          ${tickers.map(t => videoTickerPill(t, null, escapeHtml)).join('')}
         </div>` : ''}
+
         ${positions.length ? `
-        <h4 style="margin-top:14px;font-size:12px;color:var(--text-muted)">TICKER COMMENTARY</h4>
-        <ul class="dev-list">${positions.map(p => `<li style="font-size:12px"><span class="mono">${escapeHtml(p.ticker)}</span>${p.commentary ? ` — ${escapeHtml(String(p.commentary).slice(0, 200))}` : ''}</li>`).join('')}</ul>
-        ` : ''}
-        ${claims.length ? `
-        <h4 style="margin-top:14px;font-size:12px;color:var(--text-muted)">CLAIMS${
-          verifiedRate === null ? '' : ` · ${verifiedRate}% QUOTE-VERIFIED`}</h4>
-        <ul class="dev-list">${claims.map(c => `
-          <li style="font-size:12px;line-height:1.45;margin-bottom:8px">
-            ${c.ticker ? `<button type="button" class="filter-btn source-pill mono" data-select-ticker="${escapeHtml(c.ticker)}">${escapeHtml(c.ticker)}</button> ` : ''}${stanceBadge(c.stance)}
-            <div style="margin-top:3px">${escapeHtml(String(c.claim).slice(0, 400))}</div>
-            ${c.quote && c.quote_verified ? `<div class="tier-sub" style="margin-top:3px;font-style:italic">&ldquo;${escapeHtml(String(c.quote).slice(0, 300))}&rdquo;</div>` : ''}
-          </li>`).join('')}</ul>
-        ` : ''}
-        ${renderTranscriptBlock(merged.transcript, claims, escapeHtml, merged.transcript_truncated)}
+        <h4 class="video-detail-head">TICKER COMMENTARY</h4>
+        <ul class="dev-list">${positions.map(p => `<li style="font-size:12px"><span class="mono">${escapeHtml(p.ticker)}</span>${p.action && p.action !== 'discussed' ? ` · ${escapeHtml(p.action)}` : ''}${p.commentary ? ` — ${escapeHtml(String(p.commentary).slice(0, 240))}` : ''}</li>`).join('')}</ul>` : ''}
+
+        ${notes && !transcriptIsSpeech ? `
+        <h4 class="video-detail-head">EPISODE NOTES</h4>
+        <div class="video-transcript" style="max-height:28em;overflow:auto;white-space:pre-wrap;font-size:12px;line-height:1.45">${escapeHtml(notes)}</div>
+        <p class="tier-sub">These are the publisher's notes. A transcript summary replaces them once the episode is transcribed.</p>` : ''}
+
+        ${transcriptIsSpeech ? renderTranscriptBlock(merged.transcript, claims, escapeHtml, merged.transcript_truncated) : ''}
+
         ${!reader && !analysed && highlights.length ? `
-        <h4 style="margin-top:14px;font-size:12px;color:var(--text-muted)">HIGHLIGHTS</h4>
-        <ul class="dev-list">${highlights.map(p => `<li style="font-size:13px;line-height:1.45">${escapeHtml(p)}</li>`).join('')}</ul>
-        ` : (!reader && !analysed && !loading && merged.highlight_count ? `<p class="tier-sub">${merged.highlight_count} highlight(s) — open transcript for detail</p>` : '')}
-        ${reader ? `<div class="podcast-source-box"><strong>Summary source</strong><span>${escapeHtml(reader.source_label || '—')}</span>${reader.coverage?.kind ? `<span>Coverage: ${escapeHtml(reader.coverage.kind)}</span>` : ''}${reader.generated_at ? `<span>Generated: ${escapeHtml(reader.generated_at)}</span>` : ''}</div>` : ''}
-        <p class="tier-sub" style="margin-top:12px">${[transcriptLink, episodeLink].filter(Boolean).join(' · ') || '—'}</p>
+        <h4 class="video-detail-head">HIGHLIGHTS</h4>
+        <ul class="dev-list">${highlights.map(p => `<li style="font-size:13px;line-height:1.45">${escapeHtml(p)}</li>`).join('')}</ul>` : ''}
+
+        <h4 class="video-detail-head">PROVENANCE</h4>
+        <ul class="video-prov">
+          <li><span>Summary</span><b>${escapeHtml((reader && reader.source_label) || 'Not written yet')}</b></li>
+          ${reader && reader.coverage ? `<li><span>Coverage</span><b class="mono">${escapeHtml(String(reader.coverage.kind || '—'))}${reader.coverage.chunks_used ? ' · ' + escapeHtml(String(reader.coverage.chunks_used)) + ' of ' + escapeHtml(String(reader.coverage.chunks_total || reader.coverage.chunks_used)) + ' parts' : ''}</b></li>` : ''}
+          ${analysis ? `
+          <li><span>Claims analysis</span><b class="mono">${escapeHtml(String(analysis.chunks_analyzed || 0))} of ${escapeHtml(String(analysis.chunks_total || 0))} windows${verifiedRate === null ? '' : ' · ' + verifiedRate + '% of quotes verified'}</b></li>` : ''}
+          <li><span>Transcript</span><b>${transcriptIsSpeech ? 'Available on this page' : 'Not available yet'}</b></li>
+        </ul>
+        <p class="tier-sub" style="margin-top:12px">${transcriptLink || ''}</p>
       </div>`;
   }
 
@@ -1667,7 +1724,7 @@
       eventReview = 'unreviewed',
       reviewState = {},
     } = opts || {};
-    let list = dedupeEvents(events);
+    let list = dedupeEvents(events).map(event => applyEventFeedback(event, reviewState.feedback?.[event.id]));
     const reviewed = reviewState.reviewed || {};
     const saved = reviewState.saved || {};
     const muted = reviewState.mutedTemplates || {};
@@ -1685,7 +1742,7 @@
     if (eventReview === 'reviewed') list = list.filter(e => reviewed[e.id]);
     if (eventReview === 'saved') list = list.filter(e => saved[e.id]);
     if (eventReview === 'needs_review') {
-      list = list.filter(e => e.needs_review || e.triage_verdict === 'human_review');
+      list = list.filter(e => e.needs_review || e.triage_verdict === 'human_review' || e.review_feedback);
     }
     if (eventReview !== 'muted') list = list.filter(e => !muted[e.template_id]);
     if (eventReview === 'muted') list = list.filter(e => muted[e.template_id]);
@@ -2018,6 +2075,33 @@
     ).join('')}</div>`;
   }
 
+  const EVENT_FEEDBACK_LABELS = {
+    wrong_company: 'Wrong company', wrong_interpretation: 'Wrong interpretation', already_known: 'Already known',
+  };
+
+  function applyEventFeedback(event, feedback) {
+    if (!feedback || !EVENT_FEEDBACK_LABELS[feedback.reason]) return event;
+    return { ...event, review_feedback: feedback.reason, direction: 'neutral',
+      tier: feedback.reason === 'wrong_company' ? 'noise' : 'context',
+      feed_eligible: feedback.reason !== 'wrong_company',
+      needs_review: feedback.reason !== 'already_known' };
+  }
+
+  function eventRelevanceSummary(event, escapeHtml) {
+    const profile = event.security_profile || {};
+    const labels = [];
+    if (profile.economic_profile) labels.push(profile.economic_profile.replaceAll('_', ' '));
+    if (profile.underlying_exposure) labels.push(`Exposure: ${profile.underlying_exposure}`);
+    if (event.economic_channel) labels.push(`Driver: ${event.economic_channel.replaceAll('_', ' ')}`);
+    if (event.actor_name) labels.push(`Actor: ${event.actor_name}`);
+    if (event.issuer_ticker) labels.push(`Target: ${event.issuer_ticker}`);
+    if (event.relationship) labels.push(`${event.relationship} relationship`);
+    if (event.transaction_date) labels.push(`Transacted ${event.transaction_date}${event.transaction_end_date && event.transaction_end_date !== event.transaction_date ? ` to ${event.transaction_end_date}` : ''}`);
+    if (event.period_end) labels.push(`Period ended ${event.period_end}`);
+    if (event.review_feedback) labels.push(`Your flag: ${EVENT_FEEDBACK_LABELS[event.review_feedback]}`);
+    return labels.length ? `<p class="event-economic-context">${labels.map(label => `<span>${escapeHtml(label)}</span>`).join('')}</p>` : '';
+  }
+
   function renderDecisionEventCard(event, escapeHtml, linkHtml, ghRepo, opts) {
     const reviewState = opts.reviewState || {};
     const isReviewed = Boolean((reviewState.reviewed || {})[event.id]);
@@ -2027,7 +2111,7 @@
     const dateLabel = event.event_kind === 'scheduled' ? (event.effective_at || event.observed_at) : event.observed_at;
     return `<article class="event-card${isReviewed ? ' is-reviewed' : ''}" data-event-id="${escapeHtml(event.id || '')}" data-testid="event-card">
       <div class="event-card-topline"><span class="event-priority" title="Decision priority">${priority}</span><span class="badge ${eventTierBadge(event)}">${escapeHtml(event.tier || 'context')}</span><span class="badge ${directionClass}">${escapeHtml(event.direction || 'neutral')}</span><button type="button" class="event-ticker" data-event-open-ticker="${escapeHtml(event.ticker || '')}">${escapeHtml(event.ticker || 'PORTFOLIO')}</button><span>${escapeHtml(event.source_label || SOURCE_LABEL[event.source] || event.source || 'source')}</span><span>${escapeHtml(AXIS_LABEL[event.impact_axis] || event.impact_axis || 'context')}</span><span class="event-date">${escapeHtml(dateLabel || 'n/a')}${event.event_kind === 'scheduled' ? ' - upcoming' : ''}</span></div>
-      <div class="event-card-main"><div><h3>${escapeHtml(event.title || 'Insight')}</h3><p class="event-change">${escapeHtml((event.summary || '').slice(0, 360))}</p></div><div class="event-decision-context"><p><span>Why it matters</span>${escapeHtml(event.why_it_matters || 'Review against the current thesis.')}</p><p><span>Follow-up</span>${escapeHtml(event.recommended_follow_up || 'Review the evidence.')}</p></div></div>
+      <div class="event-card-main"><div><h3>${escapeHtml(event.title || 'Insight')}</h3><p class="event-change">${escapeHtml((event.summary || '').slice(0, 360))}</p>${eventRelevanceSummary(event, escapeHtml)}</div><div class="event-decision-context"><p><span>Why it matters</span>${escapeHtml(event.why_it_matters || 'Review against the current thesis.')}</p><p><span>Follow-up</span>${escapeHtml(event.recommended_follow_up || 'Review the evidence.')}</p></div></div>
       <div class="event-card-footer"><div class="event-evidence">${renderEventEvidence(event, escapeHtml, linkHtml, ghRepo)}</div><div class="event-card-actions">${event.triage_verdict === 'human_review' || event.needs_review ? '<span class="badge badge-warn">needs verification</span>' : ''}${event.evidence_status === 'missing' ? '<span class="badge badge-warn">no evidence link</span>' : ''}<button type="button" class="filter-btn" data-event-detail="${escapeHtml(event.id || '')}">Details</button><button type="button" class="filter-btn" data-event-save="${escapeHtml(event.id || '')}">${isSaved ? 'Saved' : 'Save'}</button><button type="button" class="filter-btn" data-event-reviewed="${escapeHtml(event.id || '')}">${isReviewed ? 'Reviewed' : 'Mark reviewed'}</button><button type="button" class="filter-btn" data-event-mute="${escapeHtml(event.template_id || '')}">Mute pattern</button></div></div>
     </article>`;
   }
@@ -2036,13 +2120,15 @@
     const v = event.verification || {};
     const note = ((reviewState || {}).notes || {})[event.id] || '';
     const comparison = event.prior_value != null || event.current_value != null
-      ? `<div class="event-detail-comparison"><span>Prior <b>${escapeHtml(fmtFilingValue(event.prior_value))}</b></span><span>Current <b>${escapeHtml(fmtFilingValue(event.current_value))}</b></span><span>Change <b>${escapeHtml(event.change_pct != null ? `${event.change_pct}%` : 'n/a')}</b></span></div>`
+      ? `<div class="event-detail-comparison"><span>Prior <b>${escapeHtml(fmtFilingValue(event.prior_value))}</b></span><span>Current <b>${escapeHtml(fmtFilingValue(event.current_value))}</b></span><span>Change <b>${escapeHtml(event.prior_value * event.current_value < 0 ? 'Crossed zero' : event.change_pct != null ? `${Number(event.change_pct).toFixed(1)}%` : 'n/a')}</b></span><span>Unit <b>${escapeHtml(v.unit || 'unverified')}</b></span></div>`
       : '';
     const rules = (event.triage_rules || []).map(rule => `<span>${escapeHtml(rule)}</span>`).join('');
     const snippet = v.extract_snippet ? `<pre>${escapeHtml(v.extract_snippet)}</pre>` : '';
     return `<div class="event-detail-header"><div><span class="mono">${escapeHtml(event.ticker || 'portfolio')}</span><h3>${escapeHtml(event.title || 'Insight')}</h3></div><button type="button" class="filter-btn" id="event-detail-close">Close</button></div>
-      <p>${escapeHtml(event.summary || '')}</p>${comparison}
+      <p>${escapeHtml(event.summary || '')}</p>${eventRelevanceSummary(applyEventFeedback(event, reviewState?.feedback?.[event.id]), escapeHtml)}${comparison}
+      <p class="tier-sub">Published ${escapeHtml(event.published_at || event.observed_at || 'unknown')} · Processed ${escapeHtml(event.processed_at || 'unknown')} · Fact confidence ${escapeHtml(event.fact_confidence || event.confidence || 'unknown')} · Interpretation confidence ${escapeHtml(event.interpretation_confidence || 'unknown')}. Importance ranks attention; direction is an interpretation, not a price forecast.</p>
       <div class="event-detail-grid"><section><h4>Why it matters</h4><p>${escapeHtml(event.why_it_matters || '')}</p></section><section><h4>Recommended follow-up</h4><p>${escapeHtml(event.recommended_follow_up || '')}</p></section><section><h4>Evidence</h4><div>${renderEventEvidence(event, escapeHtml, linkHtml, ghRepo)}</div>${snippet}</section><section><h4>Ranking explanation</h4><p>Priority ${Number(event.decision_priority || 0)} - materiality ${Number(event.materiality || 0)} - confidence ${escapeHtml(event.confidence || 'med')} - novelty ${escapeHtml(event.novelty_score ?? 'n/a')} - evidence ${Number(event.evidence_count || 0)}</p><div class="event-rule-list">${rules}</div></section></div>
+      <div class="event-feedback"><strong>Flag this event</strong><p>Your flags change your feed and are saved on this browser. Export them for a shared rules review.</p>${Object.entries(EVENT_FEEDBACK_LABELS).map(([reason, label]) => `<button type="button" class="filter-btn" data-event-feedback="${reason}">${label}</button>`).join('')}<button type="button" class="filter-btn" data-event-feedback="clear">Clear flag</button><button type="button" class="filter-btn" id="event-export-feedback">Export flags</button></div>
       <label class="event-note-label">Research note<textarea id="event-note-input" rows="4" placeholder="Record the thesis implication, disagreement, or next question...">${escapeHtml(note)}</textarea></label>
       <div class="event-detail-actions"><button type="button" class="filter-btn" id="event-note-save" data-event-note-id="${escapeHtml(event.id || '')}">Save note</button><button type="button" class="filter-btn" data-event-open-ticker="${escapeHtml(event.ticker || '')}">Open ticker insights</button></div>`;
   }
@@ -2085,6 +2171,13 @@
         drawer.style.display = 'block';
         drawer.querySelector('#event-detail-close')?.addEventListener('click', () => { drawer.style.display = 'none'; });
         drawer.querySelector('#event-note-save')?.addEventListener('click', () => options.onAction?.('note', event.id, drawer.querySelector('#event-note-input')?.value || ''));
+        drawer.querySelectorAll('[data-event-feedback]').forEach(button => button.addEventListener('click', () => options.onAction?.('feedback', event.id, button.dataset.eventFeedback)));
+        drawer.querySelector('#event-export-feedback')?.addEventListener('click', () => {
+          const labels = Object.entries(options.reviewState?.feedback || {}).map(([id, flag]) => ({ id, ...flag, event: byId[id] || null }));
+          const url = URL.createObjectURL(new Blob([JSON.stringify({ schema_version: 1, labels }, null, 2)], { type: 'application/json' }));
+          const anchor = document.createElement('a'); anchor.href = url; anchor.download = 'event-review-flags.json'; anchor.click();
+          setTimeout(() => URL.revokeObjectURL(url), 1000);
+        });
         drawer.querySelectorAll('[data-event-open-ticker]').forEach(tickerButton => tickerButton.addEventListener('click', () => options.onOpenTicker?.(tickerButton.dataset.eventOpenTicker || '')));
         drawer.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
       });
@@ -2832,7 +2925,7 @@
     const ceilingShort = wmClassShort(claimCeiling);
     const counts = strip.counts || {};
     const historySeries = strip.history_series || {};
-    const regime = bounds.regime || {};
+    const darwin = bounds.darwin || {};
     const demotions = bounds.demotions || [];
     const isHorizonDemotion = (d) => {
       const art = String(d.artifact || '');
@@ -2848,7 +2941,7 @@
     const engines = bounds.engines || [];
     const enginesTooltip = engines.length
       ? engines.map(e => `${e.id || ''}: ${e.role || ''}`).join(' · ')
-      : 'World Model / market regime / house valuation / Lawrence / Santa Fe stay separate languages';
+      : 'World Model / Darwin / house valuation / Lawrence / Santa Fe stay separate languages';
     const claimHygieneSummary = (() => {
       const bits = [`${goodhartFails.length} GH fails`];
       if (horizonDemotions.length) bits.push('horizons P0');
@@ -3103,7 +3196,7 @@
 
         <details class="wm-panel">
           <summary>Claim hygiene <span class="tier-sub">(${escapeHtml(claimHygieneSummary)})</span></summary>
-          <p class="tier-sub wm-claim-line">Regime: <strong>${escapeHtml(String(regime.regime_label || 'n/a'))}</strong>${regime.stress ? ' (stress)' : ''} · Thesis ${escapeHtml(wmClassShort(bounds.thesis_hygiene_ceiling || 'P3_oriented'))} · Path ${escapeHtml(wmClassShort(bounds.market_path_ceiling || claimCeiling))}</p>
+          <p class="tier-sub wm-claim-line">Darwin: <strong>${escapeHtml(String(darwin.regime_label || 'n/a'))}</strong>${darwin.stress ? ' (stress)' : ''} · Thesis ${escapeHtml(wmClassShort(bounds.thesis_hygiene_ceiling || 'P3_oriented'))} · Path ${escapeHtml(wmClassShort(bounds.market_path_ceiling || claimCeiling))}</p>
           ${horizonDemotions.length ? `<p class="tier-sub wm-claim-line">Horizons already P0 (see Expert horizons) — demotion rows suppressed</p>` : ''}
           ${demotionRows ? `<table class="darwin-table wm-table">
             <thead><tr><th>Demotion</th><th>Class</th><th>Why</th></tr></thead>
@@ -4238,97 +4331,7 @@
         empty: row.status === 'empty',
       });
     const label = format ? format.feedLabel(state) : (row.label_text || state);
-    return `<p class="tier-sub">${escapeHtml(row.label)} · ${escapeHtml(label)} · as of ${escapeHtml(row.stamp || 'no stamp')} · lane ${escapeHtml(row.lane || '')}. ${escapeHtml(row.next_action || '')} <a href="#/insights/data-health">Data Health</a></p>`;
-  }
-
-  function renderDashboardFeeds(status, escapeHtml) {
-    const rows = feedStatusRows(status);
-    if (!rows.length) {
-      return '<p class="subhead">Dashboard feed status has not been published. Nightly intake writes it. This page does not dispatch refreshes.</p>';
-    }
-    const format = global.DashboardFormat;
-    return `
-      <div class="detail-section">
-        <h3>Dashboard feeds</h3>
-        <p class="tier-sub" style="margin-bottom:8px">Age, owner lane, and the next action. Refresh stays with the scheduled job.</p>
-        <table class="darwin-table" id="dashboard-feed-table">
-          <thead><tr><th>Surface</th><th>Status</th><th>As of</th><th>Owner lane</th><th>Next action</th></tr></thead>
-          <tbody>
-            ${rows.map((row) => {
-              const state = row.kind === 'api' || !format
-                ? (row.status || 'api')
-                : format.feedState(row.stamp, row.max_age_hours, {
-                  exists: row.exists !== false,
-                  empty: row.status === 'empty',
-                });
-              const label = format ? format.feedLabel(state) : (row.label_text || state);
-              const cls = state === 'fresh' || state === 'empty' || state === 'api'
-                ? 'badge-ok'
-                : (state === 'stale' ? 'badge-warn' : 'badge-bad');
-              return `<tr>
-                <td><a href="${escapeHtml(row.hash || '#/insights/data-health')}">${escapeHtml(row.label || row.id)}</a></td>
-                <td><span class="badge ${cls}">${escapeHtml(label)}</span></td>
-                <td class="mono">${escapeHtml(row.stamp || row.lane_receipt_at || 'n/a')}</td>
-                <td class="mono">${escapeHtml(row.lane || '')}</td>
-                <td class="tier-sub">${escapeHtml(row.next_action || '')}</td>
-              </tr>`;
-            }).join('')}
-          </tbody>
-        </table>
-      </div>`;
-  }
-
-  function renderSourceHealth(health, escapeHtml) {
-    const rows = Object.entries(health || {});
-    if (!rows.length) {
-      return '<p class="subhead">No source health data yet.</p>';
-    }
-    return `
-      <table class="darwin-table" id="insights-source-table">
-        <thead><tr><th>Source</th><th>Status</th><th>Records</th><th>Items</th><th>As of</th><th>Notes</th></tr></thead>
-        <tbody>
-          ${rows.map(([key, h]) => {
-            const status = h.status || 'unknown';
-            const cls = status === 'ok' ? 'badge-ok' : (status === 'missing' || status === 'forbidden' ? 'badge-warn' : 'badge-us');
-            const notes = h.notes || (h.warnings ? `${h.warnings} warning(s)` : (h.path || ''));
-            return `
-              <tr>
-                <td>${escapeHtml(key.replace(/_/g, ' '))}</td>
-                <td><span class="badge ${cls}">${escapeHtml(status)}</span></td>
-                <td class="mono">${h.records ?? 'n/a'}</td>
-                <td class="mono">${h.items ?? 'n/a'}</td>
-                <td class="mono">${escapeHtml(h.as_of || 'n/a')}</td>
-                <td class="tier-sub">${escapeHtml(notes)}</td>
-              </tr>`;
-          }).join('')}
-        </tbody>
-      </table>`;
-  }
-
-  function renderDataSourceCandidates(candidates, escapeHtml) {
-    const tools = candidates?.selected_tools || [];
-    if (!tools.length) return '<p class="subhead">No TerminalValue candidate source registry yet.</p>';
-    return `
-      <div class="detail-section">
-        <h3>TerminalValue candidate feeds</h3>
-        <p class="tier-sub" style="margin-bottom:8px">
-          ${escapeHtml(candidates.source_label || 'TerminalValue.io')} · reviewed ${escapeHtml(candidates.reviewed_at || 'n/a')} · ${tools.length} selected feeds
-        </p>
-        <table class="darwin-table">
-          <thead><tr><th>Provider</th><th>Role</th><th>Status</th><th>Priority</th><th>Credential</th><th>Target</th></tr></thead>
-          <tbody>
-            ${tools.map(t => `
-              <tr>
-                <td>${escapeHtml(t.name || 'Provider')}</td>
-                <td>${escapeHtml(t.dashboard_role || '')}</td>
-                <td><span class="badge ${t.integration_status === 'live' ? 'badge-ok' : 'badge-warn'}">${escapeHtml(t.integration_status || 'candidate')}</span></td>
-                <td>${escapeHtml(t.priority || 'medium')}</td>
-                <td>${t.credential_required ? 'required' : 'not required'}</td>
-                <td class="mono" style="font-size:11px">${escapeHtml(t.target_pipeline || '')}</td>
-              </tr>`).join('')}
-          </tbody>
-        </table>
-      </div>`;
+    return `<p class="tier-sub">${escapeHtml(row.label)} · ${escapeHtml(label)} · as of ${escapeHtml(row.stamp || 'no stamp')} · lane ${escapeHtml(row.lane || '')}. ${escapeHtml(row.next_action || '')} <a href="#/insights/data-health">Data status</a></p>`;
   }
 
   function catalogSourceLabel(row) {
@@ -5556,9 +5559,9 @@
     ];
     const sectionGroups = [
       { label: 'Signals', ids: ['events', 'inflections', 'index_watch'] },
-      { label: 'Sources', ids: ['letters', 'podcasts', 'videos', 'funds', 'documents'] },
-      { label: 'Synthesis', ids: ['consensus', 'tickers'] },
-      { label: 'Memory & health', ids: ['memory', 'sources'] },
+      { label: 'Sources', ids: ['letters', 'podcasts', 'videos', 'documents'] },
+      { label: 'Synthesis', ids: ['tickers'] },
+      { label: 'Memory', ids: ['memory'] },
     ];
 
     let body = '';
@@ -5713,16 +5716,14 @@
         body += renderMemoryLedger(memory, escapeHtml, linkHtml, memoryOpts);
       }
     } else {
-      body = renderDashboardFeeds(options?.feedStatus, escapeHtml)
-        + renderSourceHealth(insights?.source_health || {}, escapeHtml)
-        + renderDataSourceCandidates(insights?.data_source_candidates || {}, escapeHtml);
+      body = global.WorkspaceTools ? global.WorkspaceTools.renderStatus(options?.feedStatus, insights?.source_health) : '<p>Source status is unavailable.</p>';
     }
 
     const showPeriodControls = activeSection !== 'tickers' && activeSection !== 'inflections' && activeSection !== 'memory' && activeSection !== 'events';
     const bookLabel = activeSection === 'tickers' ? 'Holdings only' : 'Our book overlap';
 
     return `
-      <h2 style="font-size:18px;margin-bottom:6px">Insights</h2>
+      ${activeSection === 'consensus' ? '' : '<h2 style="font-size:18px;margin-bottom:6px">Insights</h2>'}
       <p class="subhead" style="margin-bottom:14px">
         Portfolio context only · ${insights?.event_count || 0} events · ${insights?.letter_count || 0} letters · ${insights?.podcast_count || 0} podcasts · ${insights?.video_count || 0} videos · ${insights?.front_record_count || 0} front records · ${insights?.archived_record_count || 0} archived
       </p>
@@ -5782,6 +5783,10 @@
     attachFilingVerifyHandlers,
     attachEventHandlers,
     baseFilterEvents,
+    applyEventFeedback,
+    eventRelevanceSummary,
+    renderDecisionEventCard,
+    renderEventDetailBody,
     filterEvents,
     diversifyEvents,
     attachConsensusHandlers,

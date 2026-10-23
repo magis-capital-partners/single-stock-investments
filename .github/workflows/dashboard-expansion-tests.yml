@@ -1,0 +1,35 @@
+name: Dashboard expansion checks
+on:
+  pull_request:
+    paths: ["dashboard/**", "_system/scripts/aggregates*", "_system/scripts/market*", "_system/scripts/build_rock_aggregates_screener.py", "_system/scripts/build_vol_metrics.py", "_system/scripts/build_market_risk_components.py", "_system/scripts/tests/test_dashboard_expansion.py", ".github/workflows/market-close.yml", ".github/workflows/aggregates-screener.yml", ".github/workflows/market-risk-components.yml", ".github/workflows/dashboard-expansion-tests.yml"]
+  push:
+    branches: [main]
+    paths: ["dashboard/**", "_system/scripts/aggregates*", "_system/scripts/market*", "_system/scripts/tests/test_dashboard_expansion.py"]
+permissions:
+  contents: read
+jobs:
+  contracts:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          sparse-checkout: |
+            dashboard
+            _system/scripts
+            _system/data/aggregates
+            .github/workflows
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+      - name: Financial periods, sessions and publication contracts
+        run: |
+          python -m unittest discover -s _system/scripts/tests -p test_dashboard_expansion.py
+          python -m unittest _system/scripts/test_rock_aggregates_screener.py
+          python -m unittest discover -s _system/scripts/tests -p test_market_risk_components.py
+          python _system/scripts/build_rock_aggregates_screener.py --check
+      - name: Screen and risk rendering contracts
+        run: node --test dashboard/cloudflare/test-dashboard-expansion.mjs dashboard/cloudflare/test-spa-risk-quality.mjs _system/scripts/tests/test_buyback_radar_ui.cjs

@@ -1,4 +1,4 @@
-# ARE — Insider conviction (2026-10-19)
+# ARE — Insider conviction (2026-09-15)
 
 > Context only. Insider activity informs scenario confidence and stance discussion; it does not auto-inflate Lawrence base IRR. Promotion requires [HUMAN REVIEW].
 
@@ -12,17 +12,17 @@
 
 | Insider | Date | Shares | Price | Value | Contrib |
 |---------|------|--------|-------|-------|---------|
-| MARCUS JOEL S | 2026-09-11 | 5000 | $49.68 | $248400.0 | 2.805 |
+| MARCUS JOEL S | 2026-09-11 | 5000 | $49.68 | $248400.0 | 2.713 |
 | MARCUS JOEL S | 2026-02-12 | 17300 | $53.74 | $929702.0 | 2.022 |
 | MARCUS JOEL S | 2026-02-12 | 7700 | $54.31 | $418187.0 | 1.862 |
-| MARCUS JOEL S | 2026-08-17 | 5000 | $46.28 | $231400.0 | 1.803 |
+| MARCUS JOEL S | 2026-08-17 | 5000 | $46.28 | $231400.0 | 1.744 |
 | MARCUS JOEL S | 2026-05-06 | 3989 | $45.99 | $183454.11 | 1.301 |
 
 **Routine / planned sales (context):**
 
-- Moglia Peter M: 1068 @ $47.46 on 2026-09-30
-- Moglia Peter M: 1068 @ $51.29 on 2026-08-31
-- Moglia Peter M: 1068 @ $51.45 on 2026-07-31
+- Fukuzaki-Carlson Kristina: 16810 @ $50.51 on 2026-09-11
+- Gavinet Andres: 10000 @ $50.93 on 2026-08-31
+- Gossett Bret E.: 4702 @ $53.55 on 2026-02-27
 
 Source: `_system/reference/market-data/insider/ARE_transactions.csv`.
 Lawrence base IRR unchanged (`in_base_irr: False`).

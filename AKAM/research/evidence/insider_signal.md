@@ -1,4 +1,4 @@
-# AKAM — Insider conviction (2026-10-15)
+# AKAM — Insider conviction (2026-09-28)
 
 > Context only. Insider activity informs scenario confidence and stance discussion; it does not auto-inflate Lawrence base IRR. Promotion requires [HUMAN REVIEW].
 
@@ -15,9 +15,9 @@
 
 **Routine / planned sales (context):**
 
-- LEIGHTON F THOMSON: 11292 @ $101.0 on 2026-03-06
-- LEIGHTON F THOMSON: 9822 @ $102.08 on 2026-03-04
-- LEIGHTON F THOMSON: 14490 @ $97.64 on 2026-03-03
+- Ranganathan Madhu: 3131 @ $102.0 on 2026-03-04
+- MILLER JON: 11000 @ $102.67 on 2026-03-04
+- Ahola Aaron: 4500 @ $106.2703 on 2026-03-16
 
 Source: `_system/reference/market-data/insider/AKAM_transactions.csv`.
 Lawrence base IRR unchanged (`in_base_irr: False`).

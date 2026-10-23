@@ -2,25 +2,20 @@
 
 > Context only. Insider activity informs scenario confidence and stance discussion; it does not auto-inflate Lawrence base IRR. Promotion requires [HUMAN REVIEW].
 
-**ICS:** 5.77 (moderate) · **Bull case support:** moderate
+**ICS:** 0.0 (negligible) · **Bull case support:** none
 
 | Scenario | Prior weight | Tilted weight |
 |----------|--------------|---------------|
-| Bear | 20% | 20% |
-| Base | 55% | 51% |
-| Bull | 25% | 29% |
+| Bear | 20% | 28% |
+| Base | 55% | 47% |
+| Bull | 25% | 25% |
 
 | Insider | Date | Shares | Price | Value | Contrib |
 |---------|------|--------|-------|-------|---------|
-| Bernstein David C | 2026-09-01 | 5224 | $40.18 | $209900.32 | 1.556 |
-| CHENAULT KENNETH I | 2026-08-07 | 8346 | $59.91 | $500008.86 | 1.418 |
-| CHENAULT KENNETH I | 2026-06-29 | 8346 | $59.91 | $500008.86 | 1.172 |
-| BALOGH ARISTOTLE N | 2025-12-17 | 11488 | $122.41 | $1406246.08 | 1.038 |
-| BALOGH ARISTOTLE N | 2025-12-19 | 1915 | $122.41 | $234415.15 | 0.833 |
 
 **Routine / planned sales (context):**
 
-- Blecharczyk Nathan: 4077 @ $0.0 on 2026-10-12
+- Bernstein David C: 1369 @ $168.01 on 2026-10-15
 - Blecharczyk Nathan: 2852 @ $163.4469 on 2026-10-12
 - Blecharczyk Nathan: 4267 @ $164.7228 on 2026-10-12
 

@@ -7,6 +7,8 @@ Sources, in order of trust:
         Real fiscal period ends; quarterly scope enforced at extraction.
   - dashboard/data/equity_models.json  (model observation series)
   - dashboard/data/portfolio_news.json (monthly news-flow counts)
+  - _system/reference/market-data/operating_kpis/{TICKER}.json
+        Issuer operating series (fetch_operating_kpis.py). Shown even when steady.
 
 Quarterly fundamentals are analyzed on a year-over-year basis: growth compares
 each quarter to the same quarter a year earlier (killing seasonality), and the
@@ -748,6 +750,11 @@ def apply_display_cap(metrics: list[dict]) -> None:
         # excluded from the fundamentals display budget below.
         if m.get("tier") == "context":
             continue
+        # Issuer operating series (monthly ADV, share, revenue per contract)
+        # stay on the ticker even when the year-over-year change is steady.
+        if m.get("tier") == "operating":
+            m["display"] = True
+            continue
         if m.get("tier") == "excluded":
             m["display"] = False
             continue
@@ -799,11 +806,15 @@ def apply_display_cap(metrics: list[dict]) -> None:
     primary = sorted([m for m in candidates if m.get("tier") == "primary"], key=strength, reverse=True)
     secondary = sorted([m for m in candidates if m.get("tier") == "secondary"], key=strength, reverse=True)
 
-    shown = sum(1 for m in metrics if m.get("display") and m.get("tier") != "context")
+    shown = sum(
+        1 for m in metrics if m.get("display") and m.get("tier") not in ("context", "operating")
+    )
     for m in primary[: max(0, MAX_PRIMARY_DISPLAY - shown)]:
         m["display"] = True
         shown += 1
-    displayed_now = sum(1 for x in metrics if x.get("display") and x.get("tier") != "context")
+    displayed_now = sum(
+        1 for x in metrics if x.get("display") and x.get("tier") not in ("context", "operating")
+    )
     for m in secondary[: max(0, MAX_SECONDARY_DISPLAY - (shown - displayed_now))]:
         if not m.get("display"):
             m["display"] = True
@@ -1434,6 +1445,18 @@ def build_trends() -> dict:
     peer_overlay_count = apply_peer_relative_overlays(by_ticker, registry)
     earnings_revision_count = apply_earnings_revision_signals(by_ticker, earnings_by_ticker)
 
+    operating_count = 0
+    from operating_kpis.trends import metrics_by_ticker as operating_metrics_by_ticker
+
+    for ticker, operating_metrics in sorted(operating_metrics_by_ticker().items()):
+        entry = by_ticker.setdefault(ticker, {"metrics": []})
+        existing = {metric.get("metric") for metric in entry.get("metrics") or []}
+        for metric in operating_metrics:
+            if metric.get("metric") in existing:
+                continue
+            entry.setdefault("metrics", []).append(metric)
+            operating_count += 1
+
     respiratory_metric = respiratory_context_metric()
     respiratory_count = 0
     if respiratory_metric:
@@ -1515,6 +1538,7 @@ def build_trends() -> dict:
             "peer_relative_count": peer_relative_count,
             "earnings_revision_count": earnings_revision_count,
             "respiratory_context_count": respiratory_count,
+            "operating_kpi_series": operating_count,
             "stale_suppressed_count": stale_suppressed,
             "leadership_risk_watch": leadership_elevated,
             "avg_strength": round(statistics.mean(strength_values), 3) if strength_values else 0.0,

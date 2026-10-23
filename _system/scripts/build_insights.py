@@ -797,6 +797,8 @@ def from_kpi_trends(doc: dict | None) -> list[dict]:
                     event_type=event_type,
                     impact_axis="fundamentals",
                     trend=trend,
+                    metric_name=base_name,
+                    processed_at=(doc or {}).get('generated_at'),
                     trend_metric=metric.get("metric"),
                     trend_points=points[-8:],
                     trend_accel=metric.get("accel"),
@@ -1225,6 +1227,7 @@ def from_valuation_context(ticker: str, val: dict) -> list[dict]:
                 direction="bearish" if (ics_f or 0) < 4 else "bullish",
                 evidence_ref=f"{ticker}/research/valuation.json#insider_signal",
                 event_type="insider_signal",
+                constituent_identity_verified=bool(insider.get('constituent_identity_verified')),
                 impact_axis="ownership",
                 confidence="low",
                 ics=ics_f,
@@ -1584,7 +1587,11 @@ def filing_verification_block(ticker: str, doc: dict, metric: dict, name: str) -
         "metric": name,
         "prior_value": metric.get("prior"),
         "current_value": metric.get("current"),
-        "unit": "USD thousands",
+        "unit": metric.get('unit') or 'unverified',
+        "context_verified": bool(metric.get('context_verified')),
+        "current_period": metric.get('current_period'),
+        "prior_period": metric.get('prior_period'),
+        "scope": metric.get('scope'),
         "comparison": metric.get("comparison") or "YoY annual",
         "source_filing_ref": source_filing,
         "extract_ref": extract_ref,
@@ -1636,8 +1643,13 @@ def from_filing_facts(ticker_dir: Path, ticker: str) -> list[dict]:
     doc = load_json(latest)
     if not isinstance(doc, dict):
         return []
-
+    from filing_facts import revalidate_filing_document
+    doc = revalidate_filing_document(doc, ticker_dir)
+    filing_meta = doc.get('filing_meta') or filing_metadata_from_text_path(doc.get('source_text'))
+    publication_date = filing_meta.get('filing_date')
     metrics = doc.get("metrics") or {}
+    from security_profiles import security_profile
+    profile = security_profile(ticker)
     evidence = filing_evidence_fields(ticker, doc)
     candidates: list[dict] = []
     for name, metric in metrics.items():
@@ -1667,6 +1679,8 @@ def from_filing_facts(ticker_dir: Path, ticker: str) -> list[dict]:
         if not filing_metric_passes_magnitude(name, metric, change):
             continue
         label = METRIC_LABELS.get(name, name.replace("_", " ").title())
+        if profile['economic_profile'].endswith('_fund') and name == 'net_income':
+            label = 'Net change in assets from operations'
         candidates.append(
             {
                 "name": name,
@@ -1680,7 +1694,9 @@ def from_filing_facts(ticker_dir: Path, ticker: str) -> list[dict]:
         )
 
     out: list[dict] = []
-    for item in sorted(candidates, key=lambda x: x["abs_change"], reverse=True)[:2]:
+    # Keep all material candidates: a large secondary accounting change must not
+    # crowd a relevant driver out before instrument-aware ranking gets to see it.
+    for item in sorted(candidates, key=lambda x: x["abs_change"], reverse=True):
         metric = item["metric"]
         verification = filing_verification_block(ticker, doc, metric, item["name"])
         needs_review = filing_metric_needs_review(metric, item.get("change"))
@@ -1700,10 +1716,15 @@ def from_filing_facts(ticker_dir: Path, ticker: str) -> list[dict]:
                 f"({item['prior']:,.1f} to {item['current']:,.1f})."
             )
             direction = metric_direction(item["name"], change)
+            if item['prior'] * item['current'] < 0:
+                title = f"{item['label']} turned {'negative' if item['current'] < 0 else 'positive'}"
+                claim = f"{item['label']} moved from {item['prior']:,.1f} to {item['current']:,.1f} ({metric.get('unit') or 'unit unverified'}). A percentage comparison across zero is not meaningful."
         out.append(
             insight_record(
                 source="filing",
-                as_of=doc.get("as_of"),
+                as_of=publication_date,
+                processed_at=doc.get('as_of'),
+                period_end=filing_meta.get('period_end'),
                 scope="ticker",
                 ref=ticker,
                 title=title,
@@ -1733,7 +1754,8 @@ def from_filing_facts(ticker_dir: Path, ticker: str) -> list[dict]:
         out.append(
             insight_record(
                 source="filing",
-                as_of=doc.get("as_of"),
+                as_of=publication_date,
+                processed_at=doc.get('as_of'),
                 scope="ticker",
                 ref=ticker,
                 title="Filing facts refreshed",
@@ -1770,139 +1792,136 @@ def _insider_ics_for_ticker(ticker: str) -> float | None:
     val = load_json(val_path)
     if not isinstance(val, dict):
         return None
-    ics = (val.get("insider_signal") or {}).get("ics")
+    signal = val.get('insider_signal') or {}
+    if not signal.get('constituent_identity_verified'):
+        return None
+    ics = signal.get('ics')
     try:
         return float(ics) if ics is not None else None
     except (TypeError, ValueError):
         return None
 
 
-def from_insider_transactions(
-    our_tickers: set[str],
-    *,
-    holdings_tickers: set[str] | None = None,
-) -> list[dict]:
+def from_insider_transactions(our_tickers: set[str], *, holdings_tickers: set[str] | None = None) -> list[dict]:
+    """Route ownership events by the security issuer, never by the queried CIK."""
+    from security_profiles import canonical_symbol
     manifest = load_json(INSIDER_MANIFEST)
     if not isinstance(manifest, dict):
         return []
     holdings = holdings_tickers or set()
-    out: list[dict] = []
-    for ticker, meta in (manifest.get("tickers") or {}).items():
-        ticker = str(ticker).upper()
-        if our_tickers and ticker not in our_tickers:
+    front = {canonical_symbol(t): t for t in sorted(our_tickers)}
+    registry = load_json(ROOT / '_system/portfolio/registry.json') or {}
+    entries = registry.get('holdings') or {}
+    cik_tickers = {}
+    for tk in sorted(our_tickers):
+        cik = str(((entries.get(tk) or {}).get('download') or {}).get('cik') or '').lstrip('0')
+        if cik:
+            cik_tickers.setdefault(cik, []).append(tk)
+    seen, grouped = set(), {}
+    ownership_cache = load_json(INSIDER_DIR / 'ownership_cache.json') or {}
+    for query_ticker, meta in (manifest.get('tickers') or {}).items():
+        path = insider_csv_path((meta or {}).get('csv'))
+        if not path or not path.exists():
             continue
-        csv_path = insider_csv_path((meta or {}).get("csv"))
-        if not csv_path or not csv_path.exists():
-            continue
-        rows: list[dict] = []
-        try:
-            with csv_path.open(newline="", encoding="utf-8") as f:
-                for row in csv.DictReader(f):
-                    code = (row.get("transaction_code") or "").upper()
-                    acquired = (row.get("acquired_disposed") or "").upper()
-                    value = abs(to_float(row.get("value_usd")) or 0.0)
-                    if code not in {"P", "S"} and acquired not in {"A", "D"}:
-                        continue
-                    if value < 25000 and code != "P":
-                        continue
-                    rows.append(row)
-        except OSError:
-            continue
-        grouped: dict[tuple, dict] = {}
-        actors_by_day: dict[str, set[str]] = {}
-        for row in rows:
-            code = (row.get("transaction_code") or "").upper()
-            acquired = (row.get("acquired_disposed") or "").upper()
-            value = abs(to_float(row.get("value_usd")) or 0.0)
-            if code not in {"P", "S"} and acquired not in {"A", "D"}:
+        with path.open(newline='', encoding='utf-8') as handle:
+            cached_rows = list(csv.DictReader(handle))
+        expanded, replaced = [], set()
+        for row in cached_rows:
+            accession = row.get('accession')
+            cached = (ownership_cache.get('filings') or {}).get(accession) or {}
+            if cached.get('transactions'):
+                if accession not in replaced:
+                    expanded.extend(cached['transactions'])
+                    replaced.add(accession)
+            else:
+                expanded.append(row)
+        for row in expanded:
+            issuer = str(row.get('issuer_ticker') or '').upper()
+            issuer_cik = str(row.get('issuer_cik') or '').lstrip('0')
+            target = front.get(canonical_symbol(issuer)) or issuer or None
+            if not target and row.get('identity_status') != 'ambiguous_share_class' and issuer_cik in cik_tickers:
+                candidates = cik_tickers[issuer_cik]
+                # A CIK alone cannot choose between different share classes.
+                if len({canonical_symbol(t) for t in candidates}) == 1:
+                    target = candidates[0]
+            verified = bool(target and issuer_cik)
+            if target:
+                expected = str((((entries.get(target) or {}).get('download') or {}).get('cik')) or '').lstrip('0')
+                verified = verified and (not expected or expected == issuer_cik)
+            if not target:
+                # Retain unresolved history as context on the queried ticker.
+                target = front.get(canonical_symbol(query_ticker))
+                verified = False
+            if not target:
                 continue
-            if value < 25000 and code != "P":
+            code = (row.get('transaction_code') or '').upper()
+            acquired = (row.get('acquired_disposed') or '').upper()
+            value = abs(to_float(row.get('value_usd')) or 0)
+            if value < 25000 and code != 'P':
                 continue
-            is_buy = code == "P" or acquired == "A"
-            action = "purchase" if is_buy else "sale"
-            actor = short_text(row.get("insider") or "Insider", 80)
-            as_of = normalize_date(row.get("filing_date") or row.get("transaction_date") or meta.get("as_of"))
-            filing_ref = row.get("source_path") or relative_path(csv_path)
-            is_10b5 = str(row.get("is_10b5_1") or "").lower() in {"1", "true", "yes"}
-            key = (ticker, as_of or "", actor.lower(), action, filing_ref)
-            bucket = grouped.setdefault(
-                key,
-                {
-                    "ticker": ticker,
-                    "as_of": as_of,
-                    "actor": actor,
-                    "action": action,
-                    "filing_ref": filing_ref,
-                    "shares": 0.0,
-                    "value": 0.0,
-                    "confidence": "low",
-                    "transaction_code": code or ("P" if is_buy else "S"),
-                    "acquired_disposed": acquired or ("A" if is_buy else "D"),
-                    "is_10b5_1": is_10b5,
-                    "is_director": str(row.get("is_director") or "").lower() in {"1", "true", "yes"},
-                    "is_officer": str(row.get("is_officer") or "").lower() in {"1", "true", "yes"},
-                    "title": row.get("officer_title") or row.get("title") or "",
-                },
-            )
-            shares = to_float(row.get("shares")) or 0.0
-            bucket["shares"] += shares
-            bucket["value"] += value
-            bucket["is_10b5_1"] = bucket["is_10b5_1"] or is_10b5
-            if value >= 100000:
-                bucket["confidence"] = "med"
-            if as_of:
-                actors_by_day.setdefault(as_of, set()).add(actor.lower())
-        distinct_insiders = len({b["actor"].lower() for b in grouped.values()})
-        cluster_size = max((len(v) for v in actors_by_day.values()), default=1)
-        ics = _insider_ics_for_ticker(ticker)
-        in_holdings = ticker in holdings
-        in_watchlist = bool(our_tickers and ticker in our_tickers and not in_holdings)
-        ranked = sorted(grouped.values(), key=lambda b: (b["value"], b["as_of"] or ""), reverse=True)
-        for bucket in ranked[:2]:
-            value = bucket["value"]
-            shares = bucket["shares"]
-            value_text = f"${value:,.0f}" if value else "undisclosed value"
-            share_text = f"{shares:,.0f} shares" if shares else "shares"
-            score_row = {
-                "action": bucket["action"],
-                "transaction_code": bucket.get("transaction_code"),
-                "acquired_disposed": bucket.get("acquired_disposed"),
-                "value_usd": value,
-                "as_of": bucket["as_of"] or meta.get("as_of"),
-                "is_10b5_1": bucket.get("is_10b5_1"),
-                "is_director": bucket.get("is_director"),
-                "is_officer": bucket.get("is_officer"),
-                "title": bucket.get("title"),
-                "cluster_size": cluster_size,
-                "distinct_insiders": distinct_insiders,
-            }
-            scored = score_form4_event(
-                score_row,
-                in_holdings=in_holdings,
-                in_watchlist=in_watchlist,
-                ics=ics,
-            )
-            out.append(
-                insight_record(
-                    source="insider",
-                    as_of=bucket["as_of"] or meta.get("as_of"),
-                    scope="ticker",
-                    ref=ticker,
-                    title=f"Insider {bucket['action']}: {bucket['actor']}",
-                    claim=f"{bucket['actor']} reported an insider {bucket['action']} of {share_text} ({value_text}).",
-                    direction="bullish" if bucket["action"] == "purchase" else "bearish",
-                    evidence_ref=bucket["filing_ref"],
-                    event_type="form4_transaction",
-                    impact_axis="ownership",
-                    confidence=bucket["confidence"],
-                    value_usd=value,
-                    action=bucket["action"],
-                    ics=ics,
-                    materiality=scored["materiality"],
-                    materiality_components=scored["materiality_components"],
-                    tier=scored["tier"],
-                )
-            )
+            actor = short_text(row.get('insider') or 'Unknown reporting owner', 120)
+            identity = (row.get('accession') or row.get('source_path'), issuer_cik or issuer,
+                        row.get('owner_cik') or actor, row.get('transaction_index'),
+                        row.get('security_title'), row.get('transaction_date'), code,
+                        to_float(row.get('shares')), to_float(row.get('price')))
+            if identity in seen:
+                continue
+            seen.add(identity)
+            filing_ref = row.get('source_path') or relative_path(path)
+            key = (target, row.get('filing_date'), row.get('owner_cik') or actor,
+                   code, row.get('security_title'), filing_ref)
+            bucket = grouped.setdefault(key, dict(row, target=target, actor=actor,
+                filing_ref=filing_ref, verified=verified, value=0.0, total_shares=0.0,
+                query_ticker=query_ticker, transaction_dates=[]))
+            bucket['value'] += value
+            bucket['total_shares'] += to_float(row.get('shares')) or 0
+            bucket['verified'] = bucket['verified'] and verified
+            bucket['transaction_dates'].append(row.get('transaction_date') or '')
+    out = []
+    owner_clusters = {}
+    for b in grouped.values():
+        if b.get('transaction_code') == 'P':
+            owner_clusters.setdefault((b['target'], b.get('filing_date')), set()).add(b.get('owner_cik') or b['actor'])
+    for bucket in grouped.values():
+        target, actor = bucket['target'], bucket['actor']
+        code = bucket.get('transaction_code') or ''
+        action = {'P': 'purchase', 'S': 'sale', 'A': 'award', 'M': 'exercise', 'G': 'gift', 'F': 'tax withholding'}.get(code, 'ownership change')
+        trade_date = min(filter(None, bucket['transaction_dates']), default=None)
+        owner_cik = str(bucket.get('owner_cik') or '').lstrip('0')
+        economic_id = hashlib.sha1('|'.join(str(x or '') for x in (
+            bucket.get('accession') or bucket['filing_ref'], bucket.get('issuer_cik'),
+            owner_cik or actor, bucket.get('security_title'), code)).encode()).hexdigest()[:20]
+        owners = owner_clusters.get((target, bucket.get('filing_date')), set())
+        score_row = {**bucket, 'action': action, 'value_usd': bucket['value'],
+                     'as_of': bucket.get('filing_date'), 'cluster_size': len(owners), 'distinct_insiders': len(owners)}
+        for flag in ('is_director', 'is_officer', 'is_ten_pct_owner', 'is_10b5_1'):
+            score_row[flag] = str(bucket.get(flag) or '').lower() in {'true', '1', 'yes'}
+        scored = score_form4_event(score_row, in_holdings=target in holdings,
+            in_watchlist=target not in holdings, ics=_insider_ics_for_ticker(target))
+        description = f"{actor} reported a {action} of {bucket['total_shares']:,.0f} {bucket.get('security_title') or 'shares'} in {bucket.get('issuer_name') or bucket.get('issuer_ticker') or 'an unverified issuer'} (${bucket['value']:,.0f})."
+        row = insight_record(source='insider', as_of=bucket.get('filing_date'), scope='ticker', ref=target,
+            title=f"{actor}: {action} in {bucket.get('issuer_ticker') or 'unverified issuer'}",
+            claim=description, direction=('bullish' if code == 'P' else 'bearish' if code == 'S' else 'neutral') if bucket['verified'] else 'neutral',
+            evidence_ref=bucket['filing_ref'], event_type='form4_transaction', impact_axis='ownership',
+            evidence_label='SEC Form 4',
+            confidence='high' if bucket['verified'] else 'low', value_usd=bucket['value'], action=action,
+            materiality=scored['materiality'], materiality_components=scored['materiality_components'], tier=scored['tier'],
+            issuer_ticker=bucket.get('issuer_ticker'), issuer_cik=bucket.get('issuer_cik'),
+            target_ticker=bucket.get('issuer_ticker'), issuer_name=bucket.get('issuer_name'),
+            actor_name=actor, actor_cik=bucket.get('owner_cik'), transaction_code=code,
+            transaction_date=trade_date, transaction_end_date=max(filter(None, bucket['transaction_dates']), default=None), published_at=bucket.get('filing_date'),
+            security_title=bucket.get('security_title'), relationship='direct',
+            entity_verified=bucket['verified'], economic_event_id=economic_id,
+            transaction_value_usd=bucket['value'])
+        out.append(row)
+        if owner_cik and bucket['verified']:
+            for owner_ticker in cik_tickers.get(owner_cik, []):
+                if canonical_symbol(owner_ticker) == canonical_symbol(target):
+                    continue
+                out.append({**row, 'ref': owner_ticker, 'relationship': 'indirect',
+                    'direction': 'neutral', 'impact_axis': 'capital_allocation',
+                    'title': f"Capital allocation: {actor} {action} in {bucket.get('issuer_ticker')}",
+                    'tier': 'context'})
     return out
 
 
@@ -3167,6 +3186,8 @@ def events_from_records(
             or contains_ticker_token(entity_text, ticker)
             or has_company_hint(entity_text, ticker, company_hints)
         )
+        if record.get('entity_verified') is not None:
+            entity_verified = bool(record['entity_verified'])
         in_holdings = bool(ticker and ticker in holdings_tickers)
         in_watchlist = bool(ticker and ticker in front_tickers and ticker not in holdings_tickers)
         event = {
@@ -3193,6 +3214,13 @@ def events_from_records(
             "portfolio_relevance": event_relevance(ticker, scope, holdings_tickers, front_tickers),
             "score": event_score(record, ticker, holdings_tickers, front_tickers),
             "entity_verified": entity_verified,
+            **{key: record.get(key) for key in (
+                'issuer_ticker', 'issuer_cik', 'issuer_name', 'target_ticker', 'actor_name',
+                'actor_cik', 'transaction_code', 'transaction_date', 'transaction_value_usd',
+                'transaction_end_date',
+                'security_title', 'relationship', 'economic_event_id', 'processed_at', 'period_end',
+                'constituent_identity_verified',
+            ) if record.get(key) is not None},
             "evidence_ref": record.get("evidence_ref"),
             "evidence_url": record.get("evidence_url") or evidence_url(record.get("evidence_ref")),
             "evidence_label": record.get("evidence_label") or evidence_label(record.get("evidence_ref")),

@@ -1,6 +1,8 @@
 name: Deploy Dashboard (Cloudflare Pages)
 
 on:
+  repository_dispatch:
+    types: [market-risk-source-ready]
   # Recovery path after the 00:00 UTC D1 quota reset: retries D1 stages that a
   # deploy deferred, and guarantees one retention pass per UTC day. Cheap when
   # there is nothing to do: the deploy gate skips it unless the deploy inputs
@@ -46,9 +48,13 @@ on:
     workflows:
       - Data Pipeline
       - Forced Flow Daily
+      - Market Close
+      - Market Risk Components
+      - Aggregates Screener
       - Power Zone Universe
       - LS-algo Universe Intake
       - Darwin Covered Call
+      - Reverse-split borrow indications
     types: [completed]
     branches: [main]
 

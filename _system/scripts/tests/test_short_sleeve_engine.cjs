@@ -20,6 +20,12 @@ test('a first-day loss enters maximum drawdown and insolvency is retained',()=>{
   const r=monteCarlo(['2024-01-02'],[{scenario:'bear',series:[[0,-1.2,2,2.1]]}],5,1,42).bear;
   assert.equal(r.ruin_probability,1);assert.equal(r.cagr.p50,null);assert.ok(r.max_drawdown.p50>=1.2);
 });
+test('losses in boundary months remain in the bootstrap population',()=>{
+  const result=monteCarlo(['2024-01-02','2024-02-01','2024-03-01'],
+    [{scenario:'test',series:[[0,-.1,0,0],[2,-.2,0,0]]}],200,1/252,13).test;
+  assert.ok(result.loss_probability>.5,'boundary losses were excluded');
+  assert.ok(result.max_drawdown.p95>=.19);
+});
 test('insolvent growth paths retain their percentile rank rather than being dropped',()=>{
   const r=monteCarlo(['2024-01-02','2024-02-01'],[{scenario:'base',series:[[0,-1.2,2,2.1],[1,.01,.01,.011]]}],100,1/252,42).base;
   assert.ok(r.ruin_probability>.1&&r.ruin_probability<.9);
@@ -45,6 +51,7 @@ test('cached selection cannot be overwritten by a previous simulation or error',
   vm.runInNewContext(source,sandbox);
   const doc=JSON.parse(fs.readFileSync(path.join(__dirname,'../../../dashboard/data/short_sleeve.json'),'utf8'));
   doc.execution_audit=JSON.parse(fs.readFileSync(path.join(__dirname,'../../../dashboard/data/short_execution_audit.json'),'utf8'));
+  doc.adaptive_sizing=JSON.parse(fs.readFileSync(path.join(__dirname,'../../../dashboard/data/short_adaptive_sizing.json'),'utf8'));
   sandbox.window.ShortSleeveViz.mount(host,doc);
   assert.match(host.innerHTML,/Latest execution audit/);
   assert.match(host.innerHTML,/126 \/ 282/);
@@ -52,6 +59,9 @@ test('cached selection cannot be overwritten by a previous simulation or error',
   assert.match(host.innerHTML,/Databento access verified/);
   assert.match(host.innerHTML,/New downloads are capped at \$0/);
   assert.doesNotMatch(host.innerHTML,/none is configured/);
+  assert.match(host.innerHTML,/New test: size by expected net edge/);
+  assert.match(host.innerHTML,/earns less/);
+  assert.match(host.innerHTML,/no reliable estimate of squeeze risk/);
   const results=Object.fromEntries(['bear','base','bull'].map(id=>[id,{trials:10,cagr:{p50:.01},
     max_drawdown:{p95:.02},loss_probability:.1,ruin_probability:0,
     peak_margin:{p95:.01},peak_collateral:{p95:.011},fan:[]} ]));
