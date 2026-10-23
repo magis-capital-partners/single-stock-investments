@@ -1,6 +1,6 @@
 # Holdings
 
-Synced from `_system/portfolio/registry.json`. Last sync: 2026-10-22.
+Synced from `_system/portfolio/registry.json`. Last sync: 2026-10-23.
 
 **Classification schema:** `_system/frameworks/classification.md` · source map: `_system/portfolio/classification.json`
 
@@ -476,6 +476,7 @@ Synced from `_system/portfolio/registry.json`. Last sync: 2026-10-22.
 | LH | LH/ | Labcorp | US | 2026-07-10 | 2026-10-22 | unknown | watch |
 | LHX | LHX/ | L3Harris | US | 2026-07-10 | 2026-10-22 | unknown | watch |
 | LIF.TO | LIF.TO/ | Labrador Iron Ore Royalty Corporation | CA | — | 2026-10-22 | unknown | watch |
+| LIFCO.ST | LIFCO.ST/ | Lifco AB | SE | — | 2026-10-23 | unknown | watch |
 | LII | LII/ | Lennox International | US | 2026-07-10 | 2026-10-22 | unknown | watch |
 | LIN | LIN/ | Linde plc | US | 2026-07-10 | 2026-10-22 | unknown | watch |
 | LITE | LITE/ | Lumentum | US | 2026-07-28 | 2026-10-22 | unknown | watch |
@@ -514,6 +515,7 @@ Synced from `_system/portfolio/registry.json`. Last sync: 2026-10-22.
 | MGM | MGM/ | MGM Resorts | US | 2026-07-10 | 2026-10-22 | unknown | watch |
 | MIAX | MIAX/ | Miami International Holdings | US | 2026-07-09 | 2026-10-22 | unknown | watch |
 | MKC | MKC/ | McCormick & Company | US | 2026-07-10 | 2026-10-22 | unknown | watch |
+| MKL | MKL/ | Markel Group Inc. | US | — | 2026-10-23 | unknown | watch |
 | MLM | MLM/ | Martin Marietta Materials | US | 2026-09-07 | 2026-10-22 | unknown | watch |
 | MMM | MMM/ | 3M | US | 2026-07-09 | 2026-10-22 | unknown | watch |
 | MNST | MNST/ | Monster Beverage | US | 2026-07-28 | 2026-10-22 | unknown | watch |
@@ -643,6 +645,7 @@ Synced from `_system/portfolio/registry.json`. Last sync: 2026-10-22.
 | QQQ | QQQ/ | QQQ | US | 2026-07-29 | 2026-10-22 | unknown | watch |
 | QS | QS/ | QS | US | 2026-07-29 | 2026-10-22 | unknown | watch |
 | QUBT | QUBT/ | QUBT | US | 2026-07-29 | 2026-10-22 | unknown | watch |
+| RACE | RACE/ | Ferrari N.V. | US | — | 2026-10-23 | unknown | watch |
 | RBLX | RBLX/ | RBLX | US | 2026-07-28 | 2026-10-22 | unknown | watch |
 | RCAT | RCAT/ | Red Cat Holdings, Inc. | US | 2026-07-29 | 2026-10-22 | unknown | watch |
 | RCL | RCL/ | Royal Caribbean Group | US | 2026-07-10 | 2026-10-22 | unknown | watch |
@@ -756,6 +759,7 @@ Synced from `_system/portfolio/registry.json`. Last sync: 2026-10-22.
 | TMO | TMO/ | Thermo Fisher Scientific | US | 2026-07-10 | 2026-10-22 | unknown | watch |
 | TMUS | TMUS/ | T-Mobile US | US | 2026-07-10 | 2026-10-22 | unknown | watch |
 | TOI | TOI/ | The Oncology Institute, Inc. | US | 2026-07-09 | 2026-10-22 | unknown | watch |
+| TOI.V | TOI.V/ | Topicus.com Inc. | CA | — | 2026-10-23 | unknown | watch |
 | TOP | TOP/ | TOP | US | 2026-07-29 | 2026-10-22 | unknown | watch |
 | TPHS | TPHS/ | Trinity Place Holdings Inc. | US | 2026-07-17 | 2026-10-22 | optionality | watch |
 | TPL | TPL/ | Texas Pacific Land Corporation | US | 2026-07-09 | 2026-10-22 | unknown | watch |
@@ -827,6 +831,7 @@ Synced from `_system/portfolio/registry.json`. Last sync: 2026-10-22.
 | WAT | WAT/ | Waters Corporation | US | 2026-07-10 | 2026-10-22 | unknown | watch |
 | WBD | WBD/ | Warner Bros. Discovery | US | 2026-07-10 | 2026-10-22 | unknown | watch |
 | WBI | WBI/ | WaterBridge Infrastructure | US | 2026-07-09 | 2026-10-22 | infrastructure | watch |
+| WCN | WCN/ | Waste Connections, Inc. | US | — | 2026-10-23 | unknown | watch |
 | WDAY | WDAY/ | Workday, Inc. | US | 2026-07-10 | 2026-10-22 | unknown | watch |
 | WDC | WDC/ | Western Digital | US | 2026-07-10 | 2026-10-22 | unknown | watch |
 | WEC | WEC/ | WEC Energy Group | US | 2026-07-10 | 2026-10-22 | unknown | watch |
@@ -867,4 +872,4 @@ Synced from `_system/portfolio/registry.json`. Last sync: 2026-10-22.
 | ZETA | ZETA/ | ZETA | US | 2026-07-28 | 2026-10-22 | unknown | watch |
 | ZTS | ZTS/ | Zoetis | US | 2026-07-10 | 2026-10-22 | unknown | watch |
 
-**860 holdings total.** Registry: `_system/portfolio/registry.json`
+**865 holdings total.** Registry: `_system/portfolio/registry.json`
