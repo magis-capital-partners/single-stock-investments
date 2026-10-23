@@ -9,8 +9,8 @@
 | spec_id | `asml-opbiz-oe-2026fy-v4` |
 | spec_revision | 22 |
 | status | `awaiting_review` |
-| evidence_hash | `6e4e4df6101646b39843968807df322a094f9985d1209403bc75d0c51ca1080f` | <!-- pragma: allowlist secret -->
-| epistemic_input_sha | `cf3ba63e1817faeec62f7777d2f4ca0d45332234` | <!-- pragma: allowlist secret -->
+| evidence_hash | see `ASML/research/agent_run_state.json` |
+| epistemic_input_sha | see `ASML/research/falsifier_drafts/290e1242482eb2878775b1a4.json` |
 | contract_hash | `5512118aa814b15d424031b02216db92e04fb7beaf896813266b3c6c1fc578a6` |
 | component_fingerprint | `4080c692e2d41ed5e8c8bb19cc5abb21e04b5d945b4f3f58c4832093f0829480` |
 | calibration_release_hash | null |
