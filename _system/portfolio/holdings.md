@@ -1,6 +1,6 @@
 # Holdings
 
-Synced from `_system/portfolio/registry.json`. Last sync: 2026-10-22.
+Synced from `_system/portfolio/registry.json`. Last sync: 2026-10-23.
 
 **Classification schema:** `_system/frameworks/classification.md` · source map: `_system/portfolio/classification.json`
 
@@ -91,6 +91,7 @@ Synced from `_system/portfolio/registry.json`. Last sync: 2026-10-22.
 | AWK | AWK/ | American Water Works | US | 2026-08-19 | 2026-10-22 | unknown | watch |
 | AXON | AXON/ | Axon Enterprise, Inc. | US | 2026-08-19 | 2026-10-22 | unknown | watch |
 | AXP | AXP/ | American Express | US | 2026-08-19 | 2026-10-22 | unknown | watch |
+| AXR | AXR/ | AMREP Corporation | US | 2026-10-23 | 2026-10-23 | optionality | watch |
 | AXTI | AXTI/ | AXTI | US | 2026-08-23 | 2026-10-22 | cyclical | watch |
 | AZLCZ | AZLCZ/ | Aztec Land and Cattle Company | US | 2026-08-23 | 2026-10-22 | unknown | watch |
 | AZO | AZO/ | AutoZone | US | 2026-08-23 | 2026-10-22 | unknown | watch |
@@ -867,4 +868,4 @@ Synced from `_system/portfolio/registry.json`. Last sync: 2026-10-22.
 | ZETA | ZETA/ | ZETA | US | 2026-07-28 | 2026-10-22 | unknown | watch |
 | ZTS | ZTS/ | Zoetis | US | 2026-07-10 | 2026-10-22 | unknown | watch |
 
-**860 holdings total.** Registry: `_system/portfolio/registry.json`
+**861 holdings total.** Registry: `_system/portfolio/registry.json`
