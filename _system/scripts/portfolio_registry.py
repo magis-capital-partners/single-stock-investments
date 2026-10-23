@@ -122,6 +122,11 @@ EXCHANGE_META = {
     "TFPM": "NYSE",
     "X.TO": "TSX",
     "XP": "NASDAQ",
+    "TOI.V": "TSXV",
+    "LIFCO.ST": "Nasdaq Stockholm",
+    "RACE": "NYSE",
+    "WCN": "NYSE",
+    "MKL": "NYSE",
 }
 
 DOWNLOAD_TYPE_OVERRIDES = {

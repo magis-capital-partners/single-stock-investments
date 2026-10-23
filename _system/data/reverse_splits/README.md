@@ -1,5 +1,26 @@
 # Reverse-split research data
 
+### Shared backtest, shadow and order-review framework on 23 October 2026
+
+The [shared short framework](FRAMEWORK.md) reuses the existing event, as-filed
+fundamental and execution research with one browser/Node decision engine. Its
+new dashboard Framework tab retains all 180 matched comparisons and exposes
+missing evidence. Private source reviews, broker imports, frozen forecasts,
+position/loan accounting and content-bound handoffs feed the existing human
+order desk. Current cached evidence admits zero verified entries; live evidence
+and policy approval remain outstanding. The older studies are unchanged.
+
+### Strategy lab and expanded event dataset on 22 October 2026
+
+The [short alpha strategy lab](PROFIT_PROGRAM.md) joins financing discoveries,
+listing deficiencies and reverse splits with source links, availability clocks
+and as-filed financial features. The dashboard retains all 420 declared daily
+holding/cost/sizing/exit comparisons, funding estimates, conditional Monte Carlo
+and source-study return distributions. A separate replay repairs the older
+patient model's unsupported covers as persistent short obligations. Extracted
+contexts and conditional fills are not verified financing terms or broker fills;
+source review, observed execution and prospective validation remain explicit gates.
+
 ### Patient entries, SSR and $25k–$50k targets on 20 October 2026
 
 The [patient execution sensitivity](patient_execution_2026-10-20.md) now tests all

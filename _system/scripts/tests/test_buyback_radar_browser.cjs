@@ -13,22 +13,45 @@ page.on('pageerror',e=>errors.push(e.message));
 await page.route('https://buyback.test/**',async route=>{
  const url=new URL(route.request().url()),relative=decodeURIComponent(url.pathname.slice(1));
  if(relative===''){
-  return route.fulfill({contentType:'text/html',body:'<!doctype html><html><head><meta charset="utf-8"><link rel="stylesheet" href="/buyback.css"><style>body{background:#10131a;color:#e7eaf0;font:14px system-ui;margin:24px;}main{max-width:1200px;margin:auto}a{color:#72c8c3}table{width:100%}h1{font-size:24px}button{cursor:pointer}</style></head><body><main><h1>Buyback research</h1><div id="coverage"><div><input id="search" placeholder="Search"></div><table><tbody id="cells"></tbody></table></div><div id="detail"></div><div id="events"></div><div id="signals"></div></main><script src="/buyback-viz.js"></script></body></html>'});
+  return route.fulfill({contentType:'text/html',body:'<!doctype html><html><head><meta charset="utf-8"><link rel="stylesheet" href="/buyback.css"><style>body{background:#10131a;color:#e7eaf0;font:14px system-ui;margin:24px;}main{max-width:1200px;margin:auto}a{color:#72c8c3}table{width:100%}h1{font-size:24px}button{cursor:pointer}</style></head><body><main><h1>Buyback research</h1><div id="coverage"><div><input id="search" placeholder="Search"></div><table><tbody id="cells"></tbody></table></div><div id="screen"></div><div id="detail"></div><div id="events"></div><div id="signals"></div></main><script src="/buyback-viz.js"></script></body></html>'});
  }
  const file=path.join(root,'dashboard',relative);
  if(!file.startsWith(path.join(root,'dashboard')) || !fs.existsSync(file))return route.fulfill({status:404,body:'not found'});
  return route.fulfill({body:fs.readFileSync(file),contentType:relative.endsWith('.js')?'application/javascript':relative.endsWith('.css')?'text/css':'application/json'});
 });
-await page.goto('https://buyback.test/#/research/coverage/'+selected.ticker+'?section=buyback');
+await page.goto('https://buyback.test/#/ideas/buybacks');
 await page.evaluate(async ticker=>{
  await BuybackViz.load();const b=BuybackViz.company(ticker);
  document.getElementById('cells').innerHTML='<tr><td>'+ticker+'</td>'+BuybackViz.renderHoldingsCell({ticker,buyback:b})+'</tr>';
- BuybackViz.mountCoverageControls({onFilter:()=>{},onSort:()=>{}});
+ BuybackViz.mountScreen(document.getElementById('screen'));
  document.getElementById('detail').innerHTML=BuybackViz.renderDetail({ticker,buyback:b});
 },selected.ticker);
+assert.equal(await page.locator('#buyback-coverage-controls').count(),0);
+assert.equal(await page.locator('#screen #buyback-screen-controls').count(),1);
+assert.equal(await page.locator('#screen table tbody tr').count()>0,true);
+assert.equal(await page.locator('[data-bb-filter]').inputValue(),'focused');
+await page.locator('#screen').screenshot({path:path.join(shotDir,'buyback-radar-desktop.png')});
+const firstTicker=await page.locator('#screen tbody tr .bb-company a').first().innerText();
+await page.locator('[data-bb-search]').fill(firstTicker);
+assert.ok(await page.locator('#screen tbody tr').count()>0);
+assert.ok((await page.locator('#screen tbody tr').count())<=30);
+await page.locator('[data-bb-search]').fill('no-such-company-12345');
+assert.equal(await page.locator('#screen tbody tr').count(),0);
+await page.locator('[data-bb-reset]').click();
+assert.equal(await page.locator('[data-bb-search]').inputValue(),'');
+await page.locator('[data-bb-filter]').selectOption('all');
+assert.equal(await page.locator('#screen tbody tr').count(),30);
+await page.locator('[data-bb-page="1"]').click();
+assert.match(await page.locator('.bb-pagination > span').innerText(),/^31/);
+await page.locator('[data-bb-reset]').click();
+await page.setViewportSize({width:390,height:844});
+assert.equal(await page.evaluate(()=>document.documentElement.scrollWidth>innerWidth+1),false,'focused radar overflow on mobile');
+await page.locator('#screen').screenshot({path:path.join(shotDir,'buyback-radar-mobile.png')});
+await page.setViewportSize({width:1400,height:1000});
 await page.waitForFunction(()=>document.querySelector('[data-bb-history]')?.textContent.includes('Actual outstanding shares'));
 await page.locator('select[data-bb-filter]').selectOption('review');
 assert.equal(await page.evaluate(()=>JSON.parse(localStorage.getItem('ssi-buyback-coverage-v2')).filter),'review');
+await page.locator('.bb-saved-tools > summary').click();
 await page.locator('[data-bb-screen-name]').fill('Review queue');
 await page.locator('[data-bb-screen-save]').click();
 assert.ok(await page.evaluate(()=>JSON.parse(localStorage.getItem('ssi-buyback-saved-screens-v2'))['Review queue']));

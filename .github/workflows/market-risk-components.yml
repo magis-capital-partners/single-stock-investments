@@ -2,7 +2,11 @@ name: Market Risk Components
 
 on:
   repository_dispatch:
-    types: [heal-market-risk]
+    types: [heal-market-risk, market-risk-source-ready]
+  workflow_run:
+    workflows: [Market Close]
+    types: [completed]
+    branches: [main]
   # Once daily after the US close, down from twice-hourly across a ten-hour
   # window (20 runs a weekday). Every run writes a fresh row per component
   # into D1, and nothing reads market-risk components intraday -- this is a
@@ -10,11 +14,11 @@ on:
   # 19 runs bought no freshness anyone consumed while growing the table that
   # every read has to scan.
   #
-  # GitHub Actions evaluates schedule.cron in UTC and silently ignores any
-  # `timezone:` key, so this is written directly in UTC. 22:15 UTC is 18:15 ET
-  # under EDT and 17:15 ET under EST, so it lands after the 16:00 ET close in
-  # both and needs no DST compensation. Intraday cadence can be restored
-  # per-component if something is ever shown to need it.
+  # This existing schedule is explicitly UTC: 22:19 UTC is 18:19 ET under EDT
+  # and 17:19 ET under EST. GitHub now supports an IANA timezone field; a
+  # proposed staged close refresh is documented in
+  # docs/dashboard-cleanup-and-market-risk-plan.md. Changing the cron alone
+  # would not bypass the volatility builder's 18:00 ET completion gate.
   schedule:
     - cron: "19 22 * * 1-5"  # moved off the quarter-hour, where GitHub drops and delays scheduled runs
 permissions:
@@ -27,6 +31,7 @@ concurrency:
 jobs:
   build-and-publish:
     runs-on: ubuntu-latest
+    if: github.event_name != 'workflow_run' || github.event.workflow_run.conclusion == 'success'
     timeout-minutes: 20
     env:
       MARKET_RISK_INGEST_URL: https://single-stock-market-risk-ingest.magis-capital.workers.dev/api/v1/market-risk/ingest
@@ -46,6 +51,9 @@ jobs:
           git -C "$source_root" sparse-checkout init --no-cone
           git -C "$source_root" sparse-checkout set \
             _system/scripts/build_market_risk_components.py \
+            _system/scripts/market_sessions.py \
+            _system/scripts/market_risk_publication.py \
+            _system/scripts/buyback_calendar.py \
             dashboard/data/technical_summary.json \
             dashboard/data/spx_surface_latest.json \
             dashboard/data/vol_metrics_latest.json
@@ -53,6 +61,9 @@ jobs:
           mkdir -p _system/scripts dashboard/data
           cp "$source_root/_system/scripts/build_market_risk_components.py" \
             _system/scripts/build_market_risk_components.py
+          for script in market_sessions market_risk_publication buyback_calendar; do
+            cp "$source_root/_system/scripts/$script.py" "_system/scripts/$script.py"
+          done
           for name in technical_summary spx_surface_latest vol_metrics_latest; do
             cp "$source_root/dashboard/data/$name.json" "dashboard/data/$name.json"
           done
@@ -121,16 +132,9 @@ jobs:
           print(json.dumps({"components": len(components), "coverage": coverage}, sort_keys=True))
           PY
 
-      - name: Commit daily dashboard fallback snapshot
-        # dashboard/data/market_risk_components.json is the static fallback the
-        # Cloudflare page serves verbatim when the D1 API path fails; without
-        # this step it stays frozen at whatever run last committed it. Commit
-        # AT MOST ONCE PER UTC DAY (deploy-churn guard): skip when the
-        # committed file's generated_at already carries the same UTC date as
-        # the fresh snapshot. Uses ci_push_main.sh, the same push helper the
-        # repo's other committing workflows use, run inside the RUNNER_TEMP
-        # sparse clone from the fetch step (the workspace itself is not a
-        # checkout of this repository).
+      - name: Commit changed dashboard fallback snapshot
+        # Allow newer observations and improved verification later the same day.
+        # Identical source state is idempotent; generated_at alone cannot deploy.
         shell: bash
         run: |
           set -euo pipefail
@@ -143,32 +147,9 @@ jobs:
             dashboard/data/market_risk_components.json
           git -C "$source_root" fetch --depth 1 origin main
           git -C "$source_root" checkout -B main origin/main
-          decision=$(python - \
+          decision=$(python _system/scripts/market_risk_publication.py \
             "$source_root/dashboard/data/market_risk_components.json" \
-            "$RUNNER_TEMP/market-risk-components.json" <<'PY'
-          import json
-          import sys
-          from pathlib import Path
-
-          def gen_date(path):
-              try:
-                  stamp = json.loads(Path(path).read_text(encoding="utf-8")).get("generated_at") or ""
-              except (OSError, ValueError):
-                  return None
-              return str(stamp)[:10] or None
-
-          committed_date = gen_date(sys.argv[1])
-          fresh_date = gen_date(sys.argv[2])
-          print(
-              f"committed generated_at date={committed_date} "
-              f"fresh generated_at date={fresh_date}",
-              file=sys.stderr,
-          )
-          if fresh_date is None:
-              raise SystemExit("fresh snapshot has no generated_at; refusing to decide")
-          print("skip" if committed_date == fresh_date else "commit")
-          PY
-          )
+            "$RUNNER_TEMP/market-risk-components.json")
           if [ "$decision" = "commit" ]; then
             cp "$RUNNER_TEMP/market-risk-components.json" \
               "$source_root/dashboard/data/market_risk_components.json"
@@ -177,7 +158,7 @@ jobs:
             bash _system/scripts/ci_push_main.sh \
               "chore(risk): daily market-risk components dashboard fallback"
           else
-            echo "Once-daily gate: committed fallback already has today's UTC generated_at; skipping commit."
+            echo "Source observations and verification state are unchanged; skipping duplicate publication."
           fi
 
       - id: publish
