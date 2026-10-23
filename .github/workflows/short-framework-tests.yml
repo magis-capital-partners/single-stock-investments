@@ -1,0 +1,54 @@
+name: Shared short framework
+on:
+  push:
+    branches: [main]
+    paths: &paths
+      - '_system/scripts/short_framework/**'
+      - '_system/scripts/short_framework.cjs'
+      - '_system/scripts/tests/test_short_framework.cjs'
+      - '_system/scripts/tests/test_short_framework_browser.cjs'
+      - '_system/trading/portfolio_hub/short_framework.py'
+      - '_system/trading/portfolio_hub/orders.py'
+      - '_system/trading/portfolio_hub/command_poller.py'
+      - '_system/trading/portfolio_hub/tests/test_short_framework.py'
+      - 'dashboard/short-framework-*.js'
+      - 'dashboard/short-profit-program.js'
+      - 'dashboard/short-profit-program.css'
+      - 'dashboard/index.html'
+      - 'dashboard/functions/_lib/order-requests.js'
+      - 'dashboard/functions/api/v2/portfolio/order-intents.js'
+      - 'dashboard/data/short_framework/**'
+      - 'dashboard/cloudflare/test-short-framework.mjs'
+      - '.github/workflows/short-framework-tests.yml'
+  pull_request:
+    paths: *paths
+permissions:
+  contents: read
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          sparse-checkout: |
+            _system/scripts/short_framework/
+            _system/scripts/short_framework.cjs
+            _system/scripts/tests/test_short_framework.cjs
+            _system/scripts/tests/test_short_profit_program.cjs
+            _system/data/reverse_splits/framework/
+            _system/trading/
+            dashboard/
+          sparse-checkout-cone-mode: false
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - run: python -m pip install pytest
+      - run: node --test _system/scripts/tests/test_short_framework.cjs _system/scripts/tests/test_short_profit_program.cjs
+      - run: python -m pytest _system/trading/portfolio_hub/tests/test_orders.py _system/trading/portfolio_hub/tests/test_short_framework.py -q
+      - run: node --test dashboard/cloudflare/test-short-framework.mjs dashboard/cloudflare/test-command-channel.mjs dashboard/cloudflare/test-command-peek.mjs dashboard/cloudflare/test-order-expiry.mjs
+      - run: node --check dashboard/short-framework-viz.js
+      - run: node --check dashboard/short-profit-program.js

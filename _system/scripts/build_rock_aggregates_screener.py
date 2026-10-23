@@ -29,6 +29,7 @@ import urllib.error
 import urllib.request
 from datetime import datetime, timezone
 from pathlib import Path
+from aggregates_facts import collect, financial_history, balance_at
 
 ROOT = Path(__file__).resolve().parents[2]
 SEED_PATH = ROOT / "_system" / "reference" / "market-data" / "screens" / "rock_aggregates_seed.csv"
@@ -298,9 +299,9 @@ def fetch_yahoo_price(symbol: str) -> tuple[float | None, str | None]:
     return None, None
 
 
-def screen_ticker(cik: str) -> dict:
+def screen_ticker(cik: str, facts: dict | None = None) -> dict:
     url = f"https://data.sec.gov/api/xbrl/companyfacts/CIK{cik}.json"
-    data = fetch_json(url)
+    data = facts if facts is not None else fetch_json(url)
     if not data:
         return {"sec_error": "companyfacts unavailable"}
 
@@ -314,46 +315,29 @@ def screen_ticker(cik: str) -> dict:
             "sec_error": f"IFRS filer (namespaces: {namespaces}); US-GAAP tag map does not apply",
         }
 
-    revenue, revenue_date = latest_annual_usd_fact(data, REVENUE_TAGS)
-    op_income, _ = latest_annual_usd_fact(data, OPERATING_INCOME_TAGS)
-    dda, _ = latest_annual_usd_fact(data, DDA_TAGS)
-    cfo, _ = latest_annual_usd_fact(data, CFO_TAGS)
-    capex, _ = latest_annual_usd_fact(data, CAPEX_TAGS)
-    net_income, _ = latest_annual_usd_fact(data, INCOME_TAGS)
-
-    ppe, _ = latest_usd_fact(data, PPE_TAGS)
-    goodwill, _ = latest_usd_fact(data, GOODWILL_TAGS)
-    intangibles, _ = latest_usd_fact(data, INTANGIBLE_TAGS)
-    equity, equity_date = latest_usd_fact(data, EQUITY_TAGS)
-    cash, _ = latest_usd_fact(data, CASH_TAGS)
-    lt_debt, _ = latest_usd_fact(data, LT_DEBT_TAGS)
-    st_debt, _ = latest_usd_fact(data, ST_DEBT_TAGS)
-    assets, assets_date = latest_usd_fact(data, ASSETS_TAGS)
-    shares, shares_date = latest_shares_fact(data)
-
-    filing_dates = [d for d in (equity_date, assets_date) if d]
-    return {
-        "cik": cik,
-        "revenue_usd": revenue,
-        "operating_income_usd": op_income,
-        "dda_usd": dda,
-        "cfo_usd": cfo,
-        "capex_usd": capex,
-        "net_income_usd": net_income,
-        "ppe_net_usd": ppe,
-        "goodwill_usd": goodwill,
-        "intangibles_usd": intangibles,
-        "equity_usd": equity,
-        "cash_usd": cash,
-        "long_term_debt_usd": lt_debt,
-        "short_term_debt_usd": st_debt,
-        "total_assets_usd": assets,
-        "shares_outstanding": shares,
-        "shares_as_of": shares_date,
-        "fiscal_year_end": revenue_date,
-        "filing_as_of": max(filing_dates) if filing_dates else None,
-        "sec_entity": data.get("entityName"),
-    }
+    observed = datetime.now(timezone.utc).isoformat()
+    observations = collect(data, '', cik, observed)
+    history = financial_history(observations)
+    annual = [r for r in history if r['period_type']=='FY' and r.get('revenue_usd') is not None]
+    if not annual:
+        return {'cik':cik,'sec_error':'No comparable full-year USD financial observations'}
+    latest = annual[-1]
+    balance_dates = sorted({r['period_end'] for r in observations if r['period_type']=='instant'})
+    balance_date = balance_dates[-1] if balance_dates else latest['period_end']
+    balance = balance_at(observations,balance_date)
+    fy_balance = balance_at(observations,latest['period_end'])
+    prior = annual[-2] if len(annual)>1 else None
+    prior_balance = balance_at(observations,prior['period_end']) if prior else {}
+    shares,shares_date=latest_shares_fact(data)
+    share_history=[]
+    for namespace,tag in [('us-gaap','CommonStockSharesOutstanding'),('dei','EntityCommonStockSharesOutstanding')]:
+        for unit,entries in data.get('facts',{}).get(namespace,{}).get(tag,{}).get('units',{}).items():
+            if 'share' in unit.lower():share_history.extend(entries)
+    return {**latest,**{k:v for k,v in balance.items() if k!='sources'},'cik':cik,'fiscal_year_end':latest['period_end'],
+        'filing_as_of':balance_date,'shares_outstanding':shares,'shares_as_of':shares_date,'sec_entity':data.get('entityName'),
+        'annual_balance':fy_balance,'prior_annual_balance':prior_balance,'financial_history':history,'financial_observations':observations,
+        'flow_basis':'FY','financial_sources':latest['sources'],'balance_sources':balance.get('sources',[]),
+        'financial_vintages':collect(data,'',cik,observed,retain_vintages=True),'share_history':share_history}
 
 
 def compute_rock_metrics(sec: dict, price: float | None, mcap: float | None) -> dict:
@@ -367,13 +351,10 @@ def compute_rock_metrics(sec: dict, price: float | None, mcap: float | None) -> 
     goodwill = sec.get("goodwill_usd")
     intangibles = sec.get("intangibles_usd")
 
-    total_debt = None
-    if sec.get("long_term_debt_usd") is not None or sec.get("short_term_debt_usd") is not None:
-        total_debt = (sec.get("long_term_debt_usd") or 0.0) + (sec.get("short_term_debt_usd") or 0.0)
-
-    net_debt = None
-    if total_debt is not None:
-        net_debt = total_debt - (cash or 0.0)
+    total_debt = sec.get('total_debt_usd')
+    if total_debt is None and sec.get('long_term_debt_usd') is not None and sec.get('short_term_debt_usd') is not None:
+        total_debt = sec['long_term_debt_usd'] + sec['short_term_debt_usd']
+    net_debt = total_debt - cash if total_debt is not None and cash is not None else None
 
     ebitda = None
     if op_income is not None and dda is not None:
@@ -402,16 +383,14 @@ def compute_rock_metrics(sec: dict, price: float | None, mcap: float | None) -> 
     # Invested capital = equity + total debt - cash. Long-lived, heavily
     # depreciated quarry assets make book equity a poor denominator on its own.
     roic_pct = None
-    if op_income is not None and equity is not None and total_debt is not None:
+    if op_income is not None and equity is not None and total_debt is not None and cash is not None:
         invested = equity + total_debt - (cash or 0.0)
         if invested > 0:
             roic_pct = round(100.0 * (op_income * (1 - NOPAT_TAX_RATE)) / invested, 1)
 
     goodwill_equity_pct = None
-    if equity and equity > 0:
-        intangible_total = (goodwill or 0.0) + (intangibles or 0.0)
-        if goodwill is not None or intangibles is not None:
-            goodwill_equity_pct = round(100.0 * intangible_total / equity, 1)
+    if equity and equity > 0 and goodwill is not None and intangibles is not None:
+        goodwill_equity_pct = round(100.0 * (goodwill + intangibles) / equity, 1)
 
     ev = None
     if mcap is not None and net_debt is not None:
@@ -425,7 +404,17 @@ def compute_rock_metrics(sec: dict, price: float | None, mcap: float | None) -> 
     if fcf is not None and mcap and mcap > 0:
         fcf_yield_pct = round(100.0 * fcf / mcap, 1)
 
+    average_roic = None
+    balances = [sec.get('annual_balance',{}),sec.get('prior_annual_balance',{})]
+    capital = [b['equity_usd']+b['total_debt_usd']-b['cash_usd'] for b in balances if all(b.get(k) is not None for k in ['equity_usd','total_debt_usd','cash_usd'])]
+    if len(capital)==2 and sum(capital)>0 and op_income is not None:
+        average_roic=round(100*op_income*(1-NOPAT_TAX_RATE)/(sum(capital)/2),2)
     return {
+        'roic_average_pct':average_roic,
+        'roic_basis':'FY operating income at a labeled 21% tax assumption / average fiscal-year invested capital',
+        'ebitda_basis':'operating income plus DD&A proxy',
+        'roic_proxy_pct':roic_pct,
+        'financial_basis':'period-aligned FY flows; balance date stated separately',
         "ebitda_usd": ebitda,
         "ebitda_margin_pct": ebitda_margin_pct,
         "fcf_usd": fcf,
@@ -491,86 +480,8 @@ def sort_key(row: dict):
 
 
 def build_rows() -> list[dict]:
-    holdings, watchlist = load_registry_sets()
-    seeds = load_seed_rows()
-    cik_map = load_cik_map()
-
-    out: list[dict] = []
-    for seed in seeds:
-        ticker = seed["ticker"]
-        row = {**seed}
-        base_ticker = ticker.split(".")[0]
-        cik = cik_map.get(base_ticker) or cik_map.get(ticker)
-
-        sec: dict = {}
-        if cik:
-            sec = screen_ticker(cik)
-            if sec.get("sec_entity") and (not row.get("company") or row["company"] == ticker):
-                row["company"] = sec["sec_entity"]
-            time.sleep(0.12)
-
-        price, _ = fetch_yahoo_price(base_ticker)
-        time.sleep(0.08)
-        shares = sec.get("shares_outstanding")
-        mcap = price * shares if (price is not None and shares and shares > 0) else None
-
-        metrics = compute_rock_metrics(sec, price, mcap)
-        cap_bucket = cap_bucket_from_mcap(mcap) or seed.get("cap_tier_seed") or None
-        has_core = sec.get("revenue_usd") is not None or sec.get("equity_usd") is not None
-
-        row.update(
-            {
-                "in_holdings": ticker in holdings,
-                "in_watchlist": ticker in watchlist,
-                "cik": sec.get("cik") or cik,
-                "sec_error": sec.get("sec_error"),
-                "screen_status": "ok" if has_core else "pending_sec",
-                "flow_basis": "FY",
-                "fiscal_year_end": sec.get("fiscal_year_end"),
-                "revenue_usd": sec.get("revenue_usd"),
-                "operating_income_usd": sec.get("operating_income_usd"),
-                "dda_usd": sec.get("dda_usd"),
-                "cfo_usd": sec.get("cfo_usd"),
-                "capex_usd": sec.get("capex_usd"),
-                "net_income_usd": sec.get("net_income_usd"),
-                "ppe_net_usd": sec.get("ppe_net_usd"),
-                "goodwill_usd": sec.get("goodwill_usd"),
-                "intangibles_usd": sec.get("intangibles_usd"),
-                "equity_usd": sec.get("equity_usd"),
-                "cash_usd": sec.get("cash_usd"),
-                "total_assets_usd": sec.get("total_assets_usd"),
-                "shares_outstanding": shares,
-                "shares_as_of": sec.get("shares_as_of"),
-                "filing_as_of": sec.get("filing_as_of"),
-                "cap_bucket": cap_bucket,
-                "is_pure_rock": seed.get("rock_type") in PURE_ROCK_TYPES,
-                # Reserve life and per-ton unit economics are not in XBRL. They land
-                # via filing_panels once P3/P4 of the plan are built; the column
-                # stays visibly empty until then rather than being hidden.
-                "reserve_life_years": None,
-                "cash_gross_profit_per_ton": None,
-                **metrics,
-                "revenue_display": fmt_usd(sec.get("revenue_usd")),
-                "ebitda_display": fmt_usd(metrics["ebitda_usd"]),
-                "ebitda_margin_display": fmt_pct(metrics["ebitda_margin_pct"]),
-                "fcf_display": fmt_usd(metrics["fcf_usd"]),
-                "fcf_conversion_display": fmt_pct(metrics["fcf_conversion_pct"]),
-                "capex_pct_revenue_display": fmt_pct(metrics["capex_pct_revenue"]),
-                "net_debt_display": fmt_usd(metrics["net_debt_usd"]),
-                "net_debt_ebitda_display": fmt_multiple(metrics["net_debt_ebitda"]),
-                "roic_display": fmt_pct(metrics["roic_pct"]),
-                "goodwill_equity_display": fmt_pct(metrics["goodwill_equity_pct"]),
-                "ev_ebitda_display": fmt_multiple(metrics["ev_ebitda"]),
-                "fcf_yield_display": fmt_pct(metrics["fcf_yield_pct"]),
-                "market_cap_display": fmt_usd(mcap),
-                "reserve_life_display": None,
-            }
-        )
-        row.pop("cap_tier_seed", None)
-        out.append(row)
-
-    out.sort(key=sort_key)
-    return out
+    from aggregates_pipeline import run
+    return run(ROOT, write=False)['rows']
 
 
 def build_payload(rows: list[dict] | None = None) -> dict:
@@ -580,17 +491,9 @@ def build_payload(rows: list[dict] | None = None) -> dict:
     return {
         "built_at": datetime.now(timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ"),
         "criteria": (
-            "US aggregates, cement and lime producers (seed list). Flow metrics "
-            "(revenue, operating income, DD&A, CFO, capex) are the latest FULL-YEAR "
-            "figures only -- aggregates volumes are seasonal, so mixing a quarter for "
-            "one company with a year for another would not be comparable. Balance-sheet "
-            "items use the latest reading including quarters. EBITDA = operating income "
-            "+ DD&A (depletion included). ROIC = operating income x (1 - 21% flat "
-            "statutory rate) / (equity + total debt - cash); an effective rate belongs "
-            "in a deep dive. EV = market cap + net debt; market cap = SEC shares x Yahoo "
-            "chart price. Reserve life and cash gross profit per ton are NOT in XBRL and "
-            "stay empty until the filing panels are built. "
-            f"Seed: {SEED_PATH.relative_to(ROOT).as_posix()}."
+            "US materials peers with period-aligned FULL-YEAR financial flows and dated operating evidence. "
+            "Corporate EBITDA is operating income plus DD&A. ROIC uses an explicit 21% tax assumption. "
+            "Missing inputs remain null; aggregates and integrated/adjacent peer groups remain separate."
         ),
         "seed_path": str(SEED_PATH.relative_to(ROOT)).replace("\\", "/"),
         "row_count": len(rows),
@@ -604,17 +507,16 @@ def main() -> int:
     parser.add_argument(
         "--write", action="store_true", help="Write dashboard/data/rock_aggregates_screener.json"
     )
+    parser.add_argument('--offline', action='store_true', help='Rebuild from cached and verified evidence only')
+    parser.add_argument('--refresh-operating', action='store_true', help='Discover five years of issuer filings and quarter tables')
+    parser.add_argument('--check', action='store_true', help='Validate the published snapshot and detail references')
     args = parser.parse_args()
-
-    payload = build_payload()
-    rows = payload["rows"]
-
-    if args.write:
-        OUTPUT.parent.mkdir(parents=True, exist_ok=True)
-        OUTPUT.write_text(json.dumps(payload, indent=2) + "\n", encoding="utf-8")
-        print(f"Wrote {OUTPUT} ({len(rows)} rows, {payload['pure_rock_count']} pure rock)")
+    from aggregates_pipeline import run, check
+    if args.check:
+        check(ROOT)
     else:
-        print(json.dumps(payload, indent=2))
+        payload=run(ROOT, offline=args.offline, refresh_operating=args.refresh_operating, write=args.write)
+        print(json.dumps({'rows':payload['row_count'],'coverage':payload['coverage']},sort_keys=True))
 
     return 0
 
