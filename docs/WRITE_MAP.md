@@ -18,6 +18,7 @@ Branch prefixes: humans use any branch; Cursor research agents keep `cursor/`; G
 | Path | Format | Checker | Consumer |
 |---|---|---|---|
 | `_system/data/desk_briefs/<desk>/<YYYY-MM-DD>.json` | `_system/data/desk_briefs/schema.json` | `check_desk_briefs.py` | `build_desk_briefs.py` → Inbox "Desk briefs" |
+| `dashboard/data/desk_briefs.json` | Rebuilt by `build_desk_briefs.py` in the same commit as a new brief | `check_desk_briefs.py` (desk paths must match the rebuild) | Inbox "Desk briefs" |
 | `_system/memory-hub/research-equity/daily/<YYYY-MM-DD>.md` | `[PROPOSED]` bullets, at most three per session | Hub README | Human promotion |
 | `_system/memory-hub/research-equity/CONTEXT.md` | One desk line under `## Desk` per session | Hub README | Humans and bots at session start |
 | `_system/data/separations/separation_registry.jsonl`, `_system/data/separations/separation_amendments.jsonl` | Append-only rows with filing accessions | `check_separation_universe.py --strict` | Separations lane, Special Situations desk |
