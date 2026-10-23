@@ -107,11 +107,11 @@ Documents in folder: **87** (all listed below; Tier 1–3 extracted or keyword-s
 | scan | 8-K | 2024-08-28 | `third-party-analyses/activist_reports/long/8-K_20240828_acc0001108524_24_
 
 ## Canonical pointers (open only when needed)
-- deep_dive: CRM/research/deep_dive_2026-09-12.md (sha256 sha256:3547c95460f6501e...)
+- deep_dive: CRM/research/deep_dive_2026-09-12.md (sha256 sha256:22c5a3e86daa6d1a...)
 - filing_digest: CRM/research/evidence/filing_digest.md (sha256 sha256:ddff157bc4dc9ce5...)
 - adversarial: CRM/research/adversarial_2026-09-12.md (sha256 sha256:b990ad2bebc5eaca...)
-- valuation: CRM/research/valuation.json (sha256 sha256:7776410c08ae6bbe...)
-- thesis_card: CRM/research/thesis_card.json (sha256 sha256:d9b9e37649d02095...)
+- valuation: CRM/research/valuation.json (sha256 sha256:903a39200e572bbf...)
+- thesis_card: CRM/research/thesis_card.json (sha256 sha256:4b1083b56dbd4c89...)
 - cross_check: CRM/research/cross_check_third_party_2026-09-12.md (sha256 sha256:ceeb9fe8b0e7f5b9...)
 
 ## Excluded from this pack
