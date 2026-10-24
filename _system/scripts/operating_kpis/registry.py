@@ -18,6 +18,9 @@ from operating_kpis.cme import fetch_cme
 from operating_kpis.ice import fetch_ice
 from operating_kpis.miax import fetch_miax
 from operating_kpis.occ import fetch_occ
+from operating_kpis.filings import fetch_filing_kpis
+from operating_kpis.psk import fetch_psk
+from functools import partial
 
 # (ticker, fetch). Order is the nightly order.
 ADAPTERS: list[tuple[str, object]] = [
@@ -26,4 +29,9 @@ ADAPTERS: list[tuple[str, object]] = [
     ("CME", fetch_cme),
     ("ICE", fetch_ice),
     ("OCC", fetch_occ),
+    ("FNV", partial(fetch_filing_kpis, "FNV")),
+    ("WPM", partial(fetch_filing_kpis, "WPM")),
+    ("RGLD", partial(fetch_filing_kpis, "RGLD")),
+    ("TPL", partial(fetch_filing_kpis, "TPL")),
+    ("PSK.TO", fetch_psk),
 ]

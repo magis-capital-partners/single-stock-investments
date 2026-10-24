@@ -98,7 +98,7 @@ def _check(root: Path, today: str = "2026-10-12") -> dict:
 def test_schema_is_valid_draft_2020_12_and_accepts_the_fixture():
     schema = checker.load_schema()
     assert schema["$schema"] == "https://json-schema.org/draft/2020-12/schema"
-    assert schema["properties"]["schema_version"]["const"] == "desk_briefs.v1"
+    assert set(schema["properties"]["schema_version"]["enum"]) == {"desk_briefs.v1", "desk_briefs.v2"}
     assert set(schema["properties"]["desk"]["enum"]) == set(checker.DESKS)
     assert schema["properties"]["items"]["maxItems"] == 12
     assert schema["properties"]["items"]["items"]["properties"]["headline"]["maxLength"] == 160

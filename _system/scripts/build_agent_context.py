@@ -98,6 +98,7 @@ def build_pack(ticker: str, *, task: str = "general", budget: int | None = None,
         digest_text = (root / digest_rel).read_text(encoding="utf-8", errors="ignore")[:MAX_DIGEST_CHARS]
 
     included = ["identity", "thesis", "returns"]
+    compounder = shard.get("compounder_monitor") or {}
     if claims:
         included.append("claims")
     if digest_text:
@@ -138,6 +139,16 @@ def build_pack(ticker: str, *, task: str = "general", budget: int | None = None,
         if isinstance(row, dict):
             lines.append(f"- {row.get('input')}: {row.get('value')} (source: {row.get('source') or 'see valuation assumption ledger'})")
     lines.append("")
+    if compounder:
+        lines.append("## Core compounder research monitoring")
+        bridge = compounder.get("tci_return_bridge") or {}
+        base = (bridge.get("scenarios") or {}).get("base") or {}
+        lines.append(f"- Diagnostic 7-year cash-flow IRR: {base.get('exact_irr_pct')}% per year; status {bridge.get('status')}. Research only.")
+        lines.append(f"- Buy bands: {(compounder.get('buy_zones') or {}).get('status')}; model {compounder.get('model_level')}.")
+        for item in (compounder.get("what_missing") or [])[:5]:
+            lines.append(f"- {str(item.get('text'))[:250]} (source: {(item.get('source') or {}).get('ref')})")
+        lines.append("")
+        included.append("compounder_monitor")
     lines.append("## Open questions (stable)")
     for question in (thesis.get("open_questions") or [])[:6]:
         lines.append(f"- {question}")

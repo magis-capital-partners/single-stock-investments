@@ -44,6 +44,12 @@ per hit (ticker and the one number) that points at the brief. Chat is never the 
 
 ## Fundamentals (`fundamentals`)
 
+Core compounder monitoring also uses `buy_zone`, `irr_delta`, `model_stale`, and
+`what_missing`. These are research conditions, never capital instructions.
+Every monitoring item carries dated source evidence and its fact/inference/opinion
+classification. Emit changes only; suppress initial backfill and retain overflow
+for the next existing desk brief. Source gaps remain explicit.
+
 - **Owner:** drew.
 - **Reads:** `dashboard/data/kpi_trends.json` (`generated_at`; `inflection_count`, per-ticker direction), `dashboard/data/portfolio_news.json` (`build_time`; categories guidance, earnings_material, capital_raise, buyback, dividend_policy, management, accounting, legal, regulatory; confidence >= 0.8; about a 30-day window), `dashboard/data/document_catalog.json` (`generated_at`) and the news row's `linked_filing`, `dashboard/data/fico_watch.json` (`generated_at`; optional, FICO only), `dashboard/data/special_situations.json` (`generated_at`; what Special Situations already owns before a handoff), `_system/portfolio/registry.json` (`meta.updated`; holdings versus universe).
 - **Screens:** guidance and KPI breaks (accelerating or decelerating in `kpi_trends`, or a company-issued change; steady is not a break); capital-structure change that stays with the going concern (raise, buyback start or exhaustion, dividend cut, special dividend, convertible); news versus filing disagreement (both sentences, filing primary); management, accounting and legal events (CEO/CFO exit, restatement, auditor change, material weakness, government or court action).

@@ -3130,11 +3130,42 @@ function renderInvestmentCommittee(t) {
     </div>`;
 }
 
+function renderCoreCompounder(t) {
+  const view = t.compounder_monitor;
+  if (!view) return '';
+  const bridge = view.tci_return_bridge || {};
+  const cases = bridge.scenarios || {};
+  const num = value => value == null ? 'GAP' : Number(value).toFixed(2);
+  const rows = ['bear', 'base', 'bull'].map(name => {
+    const row = cases[name] || {};
+    return `<tr><td>${escapeHtml(name)}</td><td>${num(row.fcf_yield_pct)}%</td><td>${num(row.per_share_fcf_growth_pct)}%</td><td>${num(row.multiple_change_pct)}%</td><td>${num(row.exact_irr_pct)}%</td><td>${num(row.reconciliation_gap_pp)} pp</td><td>${num(bridge.sensitivity_10yr?.[name]?.exact_irr_pct)}%</td></tr>`;
+  }).join('');
+  const quality = (view.quality_assessment?.criteria || []).map(row => `<li>${escapeHtml(row.criterion.replace(/_/g, ' '))}: ${row.value == null ? escapeHtml(row.rating || 'GAP — evidence review needed') : num(row.value) + '%'}</li>`).join('');
+  const drivers = (view.kpi_coverage || []).map(row => `<tr><td>${escapeHtml(row.kpi_id)}</td><td>${row.value == null ? 'GAP' : escapeHtml(String(row.value)) + ' ' + escapeHtml(row.unit || '')}</td><td>${escapeHtml(row.period || '—')}</td><td>${escapeHtml(row.status)}</td></tr>`).join('');
+  const missing = (view.what_missing || []).map(row => `<li>${escapeHtml(String(row.text).slice(0, 600))}<div class="tier-sub">${escapeHtml(row.source?.claim_type || 'inference')} · ${escapeHtml(row.source?.ref || 'Source gap')} · ${escapeHtml(row.source?.as_of || 'date unavailable')}</div></li>`).join('');
+  return `<div class="detail-section component-value-card">
+    <h3>Core compounder research <span class="badge badge-warn">${escapeHtml(view.model_level || 'unmodeled')}</span></h3>
+    <div class="tier-sub">TCI cash-flow diagnostic · percent per year · ${escapeHtml(bridge.model_as_of || 'model date unavailable')} · research only; capital authority remains with the owner.</div>
+    <div class="summary" style="margin-top:10px">${escapeHtml(view.driver_to_fcf || '')}</div>
+    ${cases.base ? `<div style="overflow-x:auto"><table class="component-table"><thead><tr><th>Case</th><th>FCF yield</th><th>FCF/share growth</th><th>Multiple</th><th>Exact 7yr IRR</th><th>Timing gap</th><th>10yr sensitivity</th></tr></thead><tbody>${rows}</tbody></table></div>` : '<p>Return bridge withheld: normalized cash flow and causal scenarios require underwriting.</p>'}
+    <div class="tier-sub">${escapeHtml(bridge.persona_horizon_note || '')}</div>
+    <details style="margin-top:12px"><summary>Return assumptions and gaps</summary><ul>${(bridge.gaps || []).map(gap => `<li>${escapeHtml(gap)}</li>`).join('')}</ul></details>
+    <details style="margin-top:12px"><summary>Business quality</summary><ul>${quality}</ul></details>
+    <details style="margin-top:12px"><summary>Issuer operating drivers</summary><div style="overflow-x:auto"><table class="component-table"><thead><tr><th>Driver</th><th>Latest observation</th><th>Period</th><th>Status</th></tr></thead><tbody>${drivers}</tbody></table></div></details>
+    <details style="margin-top:12px"><summary>What are we missing? (${(view.what_missing || []).length})</summary><ul>${missing}</ul></details>
+    ${(view.operating_conflicts || []).length ? '<p>Conflicting source observations require review; both sources are retained in the operating KPI store.</p>' : ''}
+  </div>`;
+}
+
 function renderPricingAnalysis(t) {
   const p = t.pricing_analysis;
   if (!p) return '';
   const values = p.component_value_per_share || {};
   const entry = p.entry_prices?.base || {};
+  const zones = p.buy_zones || {};
+  const zoneHtml = zones.status === 'available'
+    ? `<div class="metric-grid metric-grid-3" style="margin-top:12px">${(zones.zones || []).map(z => `<div class="metric"><div class="k">${escapeHtml(z.label)}${z.active ? ' · in band' : ''}</div><div class="v mono">≤ ${fmtQuote(z.price)}</div><div class="tier-sub">${(z.requirements || []).map(r => `${escapeHtml(r.case === 'low' ? 'Bear' : r.case)} ≥ ${escapeHtml(String(r.hurdle_pct))}%`).join(' and ')}</div></div>`).join('')}</div><div class="tier-sub">Research hurdle bands · owner review required. Royalty corroboration: ${escapeHtml(zones.royalty_corroboration?.status || 'unavailable')}.</div>`
+    : `<div class="tier-sub" style="margin-top:12px">Buy zones withheld: ${escapeHtml((zones.blockers || []).join(' ') || p.entry_price_unavailable_reason || 'Dated decision-grade economics are required.')}</div>`;
   const economic = p.economic_value_bridge || {};
   const grossNav = economic.gross_comparable_nav_per_share || {};
   const convergence = economic.nav_convergence_entry_prices?.base || {};
@@ -3167,10 +3198,13 @@ function renderPricingAnalysis(t) {
       </div>
       <div class="metric-grid" style="margin-top:10px">
         <div class="metric"><div class="k">10% hurdle</div><div class="v mono">${fmtQuote(entry['10pct'])}</div></div>
+        <div class="metric"><div class="k">8% hurdle</div><div class="v mono">${fmtQuote(entry['8pct'])}</div></div>
         <div class="metric"><div class="k">12% hurdle</div><div class="v mono">${fmtQuote(entry['12pct'])}</div></div>
         <div class="metric"><div class="k">15% hurdle</div><div class="v mono">${fmtQuote(entry['15pct'])}</div></div>
         <div class="metric"><div class="k">20% hurdle</div><div class="v mono">${fmtQuote(entry['20pct'])}</div></div>
+        <div class="metric"><div class="k">18% hurdle</div><div class="v mono">${fmtQuote(entry['18pct'])}</div></div>
       </div>
+      ${zoneHtml}
       <div class="summary" style="margin-top:12px">${escapeHtml(p.conclusion || '')}</div>
       ${economicHtml}
       <div class="tier-sub" style="margin-top:8px"><strong>Price-implied owner-cash growth:</strong> ${fmtPct(p.implied_growth_pct)} · <strong>Current/contracted support:</strong> ${fmtQuote(p.current_supported_value)} · <strong>Price paid for growth/options:</strong> ${fmtQuote(p.market_price_above_supported_value)}</div>
@@ -6081,6 +6115,7 @@ function selectTicker(ticker, opts = {}) {
 
     ${renderValuationWorkbench(t)}
     ${window.ValuationViz ? ValuationViz.renderPropertiesPanel(t, valuationHelpers()) : ''}
+    ${renderCoreCompounder(t)}
     ${renderPricingAnalysis(t)}
     ${window.ValuationViz ? ValuationViz.renderLegacyComponentNote(t, escapeHtml) : ''}
     ${t.valuation_workbench ? '' : renderComponentValuation(t)}

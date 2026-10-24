@@ -257,7 +257,7 @@
     "feed_id": "agent-shard-bn",
     "generated_at": "2026-10-16T20:26:21Z",
     "as_of": "2026-09-17",
-    "content_sha256": "sha256:617368efdf0e0f1ba0e2ff76ce331714edeb9971dcf8074535c310fa88023279",
+    "content_sha256": "sha256:860b6e852c4b7ecdac4e623c48495759a476f197e6cc9f592678fe188a15ca9a",
     "row_count": 1,
     "upstream_inputs": [],
     "health": {
@@ -422,5 +422,388 @@
     "source_cutoff": null,
     "detail_ref": "buyback_snapshots/b410e8b3c045dcf79f8e/details/cik_1001085.json",
     "snapshot_id": "b410e8b3c045dcf79f8e"
+  },
+  "compounder_monitor": {
+    "ticker": "BN",
+    "as_of": "2026-10-24",
+    "research_only": true,
+    "capital_actionable": false,
+    "model_level": "evidence_blocked",
+    "tci_return_bridge": {
+      "schema_version": "1.0",
+      "unit": "percent_per_year",
+      "method": "dated_forward_cashflow_schedule_per_share@1.0",
+      "status": "diagnostic",
+      "research_only": true,
+      "capital_actionable": false,
+      "horizon_years": 7,
+      "persona_horizon_note": "Hohn's 4-year lens scores business fit; the contract uses the existing 7-year cash-flow horizon, with a separate 10-year sensitivity.",
+      "model_as_of": "2026-09-17",
+      "price": 37.31,
+      "price_as_of": "2026-09-17",
+      "sources": [
+        {
+          "ref": "BN/research/valuation.json#inputs.price",
+          "locator": "Yahoo BN 2026-09-17",
+          "as_of": "2026-09-17",
+          "claim_type": "inference",
+          "status": "assumption"
+        },
+        {
+          "ref": "BN/research/valuation.json#inputs.fcf_per_share",
+          "locator": "LTM distributable earnings $2.61/sh per Q2 2026 supplemental (2026-Q2-BN-Supplemental.pdf)",
+          "as_of": "2026-09-17",
+          "claim_type": "inference",
+          "status": "assumption"
+        }
+      ],
+      "normalization_note": "Distributable earnings as owner-cash proxy. Realizations are lumpy. Base path uses trailing twelve month total distributable earnings and does not assume a heroic realization year.",
+      "claim_type": "inference",
+      "scenarios": {
+        "bear": {
+          "fcf_yield_pct": 6.995443580809434,
+          "per_share_fcf_growth_pct": 4.713308573762776,
+          "multiple_change_pct": -0.2974686296034035,
+          "approximate_return_pct": 11.411283524968805,
+          "exact_irr_pct": 11.837338048962124,
+          "reconciliation_gap_pp": 0.42605452399331867,
+          "reconciliation_reason": "Compounding, growing interim cash distributions and terminal timing.",
+          "growth_components": {
+            "organic_growth_pct": null,
+            "reinvestment_rate_pct": null,
+            "incremental_roic_pct": null,
+            "dilution_pct": null,
+            "buyback_accretion_pct": null
+          },
+          "growth_component_gap_pp": null,
+          "growth_components_status": "gap",
+          "mechanism": "Fundraising slowdown; realization drought",
+          "claim_type": "inference",
+          "legacy_reported_return_pct": 11.8
+        },
+        "base": {
+          "fcf_yield_pct": 6.995443580809434,
+          "per_share_fcf_growth_pct": 7.424751637029892,
+          "multiple_change_pct": 1.6227045085518421,
+          "approximate_return_pct": 16.042899726391166,
+          "exact_irr_pct": 16.45826448602666,
+          "reconciliation_gap_pp": 0.41536475963549435,
+          "reconciliation_reason": "Compounding, growing interim cash distributions and terminal timing.",
+          "growth_components": {
+            "organic_growth_pct": null,
+            "reinvestment_rate_pct": null,
+            "incremental_roic_pct": null,
+            "dilution_pct": null,
+            "buyback_accretion_pct": null
+          },
+          "growth_component_gap_pp": null,
+          "growth_components_status": "gap",
+          "mechanism": "Fee-related earnings grew 20% in Q2; trailing twelve month distributable earnings before realizations grew 7% per share. Base keeps 8% as a conservative path versus management 15%+ distributable earnings target.",
+          "claim_type": "inference",
+          "legacy_reported_return_pct": 16.5
+        },
+        "bull": {
+          "fcf_yield_pct": 6.995443580809434,
+          "per_share_fcf_growth_pct": 9.134375779965387,
+          "multiple_change_pct": 3.3470898676734917,
+          "approximate_return_pct": 19.476909228448314,
+          "exact_irr_pct": 19.913089674851744,
+          "reconciliation_gap_pp": 0.43618044640343,
+          "reconciliation_reason": "Compounding, growing interim cash distributions and terminal timing.",
+          "growth_components": {
+            "organic_growth_pct": null,
+            "reinvestment_rate_pct": null,
+            "incremental_roic_pct": null,
+            "dilution_pct": null,
+            "buyback_accretion_pct": null
+          },
+          "growth_component_gap_pp": null,
+          "growth_components_status": "gap",
+          "mechanism": "BN+BNT simplification premium; strong realization window",
+          "claim_type": "inference",
+          "legacy_reported_return_pct": 19.9
+        }
+      },
+      "sensitivity_10yr": {
+        "bear": {
+          "fcf_yield_pct": 6.995443580809434,
+          "per_share_fcf_growth_pct": 4.498803820905062,
+          "multiple_change_pct": -0.20832107265890132,
+          "approximate_return_pct": 11.285926329055595,
+          "exact_irr_pct": 11.742664325096284,
+          "reconciliation_gap_pp": 0.45673799604068854,
+          "reconciliation_reason": "Compounding, growing interim cash distributions and terminal timing.",
+          "growth_components": {
+            "organic_growth_pct": null,
+            "reinvestment_rate_pct": null,
+            "incremental_roic_pct": null,
+            "dilution_pct": null,
+            "buyback_accretion_pct": null
+          },
+          "growth_component_gap_pp": null,
+          "growth_components_status": "gap",
+          "mechanism": "Fundraising slowdown; realization drought",
+          "claim_type": "inference",
+          "legacy_reported_return_pct": 11.8
+        },
+        "base": {
+          "fcf_yield_pct": 6.995443580809434,
+          "per_share_fcf_growth_pct": 6.995327000762064,
+          "multiple_change_pct": 1.1331475895866694,
+          "approximate_return_pct": 15.123918171158167,
+          "exact_irr_pct": 15.543834771016352,
+          "reconciliation_gap_pp": 0.4199165998581851,
+          "reconciliation_reason": "Compounding, growing interim cash distributions and terminal timing.",
+          "growth_components": {
+            "organic_growth_pct": null,
+            "reinvestment_rate_pct": null,
+            "incremental_roic_pct": null,
+            "dilution_pct": null,
+            "buyback_accretion_pct": null
+          },
+          "growth_component_gap_pp": null,
+          "growth_components_status": "gap",
+          "mechanism": "Fee-related earnings grew 20% in Q2; trailing twelve month distributable earnings before realizations grew 7% per share. Base keeps 8% as a conservative path versus management 15%+ distributable earnings target.",
+          "claim_type": "inference",
+          "legacy_reported_return_pct": 16.5
+        },
+        "bull": {
+          "fcf_yield_pct": 6.995443580809434,
+          "per_share_fcf_growth_pct": 8.489630840924157,
+          "multiple_change_pct": 2.3313671470601482,
+          "approximate_return_pct": 17.81644156879374,
+          "exact_irr_pct": 18.20935237359396,
+          "reconciliation_gap_pp": 0.3929108048002199,
+          "reconciliation_reason": "Compounding, growing interim cash distributions and terminal timing.",
+          "growth_components": {
+            "organic_growth_pct": null,
+            "reinvestment_rate_pct": null,
+            "incremental_roic_pct": null,
+            "dilution_pct": null,
+            "buyback_accretion_pct": null
+          },
+          "growth_component_gap_pp": null,
+          "growth_components_status": "gap",
+          "mechanism": "BN+BNT simplification premium; strong realization window",
+          "claim_type": "inference",
+          "legacy_reported_return_pct": 19.9
+        }
+      },
+      "gaps": [
+        "GAP: bear cited causal drivers require underwriting; scenario notes alone are insufficient.",
+        "GAP: bear growth attribution missing organic_growth_pct, reinvestment_rate_pct, incremental_roic_pct, dilution_pct, buyback_accretion_pct; do not add buybacks twice to per-share growth.",
+        "GAP: base cited causal drivers require underwriting; scenario notes alone are insufficient.",
+        "GAP: base growth attribution missing organic_growth_pct, reinvestment_rate_pct, incremental_roic_pct, dilution_pct, buyback_accretion_pct; do not add buybacks twice to per-share growth.",
+        "GAP: bull cited causal drivers require underwriting; scenario notes alone are insufficient.",
+        "GAP: bull growth attribution missing organic_growth_pct, reinvestment_rate_pct, incremental_roic_pct, dilution_pct, buyback_accretion_pct; do not add buybacks twice to per-share growth."
+      ]
+    },
+    "quality_assessment": {
+      "status": "pending_human_review",
+      "criteria": [
+        {
+          "criterion": "moat_barrier",
+          "rating": null,
+          "value": null,
+          "sources": [],
+          "claim_type": "opinion",
+          "status": "gap"
+        },
+        {
+          "criterion": "real_pricing_power",
+          "rating": null,
+          "value": null,
+          "sources": [],
+          "claim_type": "opinion",
+          "status": "gap"
+        },
+        {
+          "criterion": "capex_revenue_pct",
+          "rating": null,
+          "value": null,
+          "sources": [],
+          "claim_type": "opinion",
+          "status": "gap"
+        },
+        {
+          "criterion": "capex_da_pct",
+          "rating": null,
+          "value": null,
+          "sources": [],
+          "claim_type": "opinion",
+          "status": "gap"
+        },
+        {
+          "criterion": "incremental_roic_pct",
+          "rating": null,
+          "value": null,
+          "sources": [],
+          "claim_type": "opinion",
+          "status": "gap"
+        },
+        {
+          "criterion": "capital_allocation",
+          "rating": null,
+          "value": null,
+          "sources": [],
+          "claim_type": "opinion",
+          "status": "gap"
+        },
+        {
+          "criterion": "governance",
+          "rating": null,
+          "value": null,
+          "sources": [],
+          "claim_type": "opinion",
+          "status": "gap"
+        }
+      ],
+      "classification_moat": "stable",
+      "locked_fact_count": 6,
+      "rule": "Unmeasured quality is unscored; every qualitative rating requires evidence and review."
+    },
+    "buy_zones": {
+      "schema_version": "1.0",
+      "config_version": "2026-10-23.1",
+      "status": "withheld",
+      "research_only": true,
+      "capital_actionable": false,
+      "model_level": "evidence_blocked",
+      "blockers": [
+        "The valuation workbench is evidence-blocked; hurdle prices are withheld until proof is decision-grade.",
+        "prospective_falsifier_gate: new/materially changed components lack eligible, source-preflighted v3 forecasts or typed v3 untestable dispositions: core_engine, reinvestment_or_assets"
+      ],
+      "zones": [],
+      "deepest_active_zone": null,
+      "royalty_corroboration": {
+        "status": "unavailable",
+        "signal": null,
+        "role": "corroborating_only"
+      }
+    },
+    "driver_to_fcf": "look_through_owner_cash + distributable_earnings - parent_costs; NAV marks kept separate from distributions; no forced FCF multiple",
+    "kpi_coverage": [
+      {
+        "kpi_id": "nav_per_share",
+        "status": "gap",
+        "value": null,
+        "unit": null,
+        "period": null,
+        "source": null
+      },
+      {
+        "kpi_id": "book_value_per_share",
+        "status": "gap",
+        "value": null,
+        "unit": null,
+        "period": null,
+        "source": null
+      },
+      {
+        "kpi_id": "float_growth_pct",
+        "status": "gap",
+        "value": null,
+        "unit": null,
+        "period": null,
+        "source": null
+      },
+      {
+        "kpi_id": "combined_ratio_pct",
+        "status": "gap",
+        "value": null,
+        "unit": null,
+        "period": null,
+        "source": null
+      },
+      {
+        "kpi_id": "distributable_earnings_per_share",
+        "status": "gap",
+        "value": null,
+        "unit": null,
+        "period": null,
+        "source": null
+      }
+    ],
+    "what_missing": [
+      {
+        "id": "open_question",
+        "text": "Live price moved from **$42.39** (July dive) to **$37.31**. Confirm the quote is a regular-session close, not a bad print.",
+        "source": {
+          "ref": "BN/research/thesis_card.json",
+          "as_of": "2026-09-17",
+          "claim_type": "inference"
+        },
+        "status": "open"
+      },
+      {
+        "id": "open_question",
+        "text": "Holdings already **hold**. Math now clears the 15% band. No agent capital decision.",
+        "source": {
+          "ref": "BN/research/thesis_card.json",
+          "as_of": "2026-09-17",
+          "claim_type": "inference"
+        },
+        "status": "open"
+      },
+      {
+        "id": "open_question",
+        "text": "Management targets 15%+ distributable-earnings growth. Base uses 8%. Raising base growth to 10% would be a human override.",
+        "source": {
+          "ref": "BN/research/thesis_card.json",
+          "as_of": "2026-09-17",
+          "claim_type": "inference"
+        },
+        "status": "open"
+      },
+      {
+        "id": "unresolved_falsifier",
+        "text": "The source-locked owner-earnings bridge falls below the level supporting the current decision-grade component.",
+        "source": {
+          "ref": "BN/research/falsifier_specs.json",
+          "as_of": "2026-09-01T04:00:00Z",
+          "claim_type": "inference"
+        },
+        "status": "open"
+      },
+      {
+        "id": "tracked_investor_13f_gap",
+        "text": "Tracked lens-investor history must be reconciled; existing specialist signals do not establish Hohn coverage.",
+        "source": {
+          "ref": "_system/lenses/personas.json",
+          "as_of": null,
+          "claim_type": "inference"
+        },
+        "status": "open"
+      }
+    ],
+    "freshness": {
+      "status": "stale",
+      "as_of": "2026-10-19",
+      "dates": {
+        "model_as_of": "2026-09-17",
+        "latest_fact_as_of": "2026-03-31",
+        "oldest_fact_as_of": "2025-12-31",
+        "price_as_of": "2026-09-17"
+      },
+      "age_days": {
+        "model_as_of": 32,
+        "latest_fact_as_of": 202,
+        "price_as_of": 32
+      },
+      "review_threshold_days": {
+        "model_as_of": 365,
+        "latest_fact_as_of": 548,
+        "price_as_of": 7
+      },
+      "warnings": [
+        "price_as_of is 32 days old (review threshold 7)"
+      ],
+      "rule": "Freshness is disclosed separately from proof completeness; stale or undated inputs require review before a new capital decision."
+    },
+    "reported_after_model": [],
+    "canonical_base_irr_pct": null,
+    "operating_conflicts": [],
+    "proposal_id": "tci-0928c79acaf2f23898db",
+    "proposal_status": "pending_human_review"
   }
 }
