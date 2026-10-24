@@ -1,7 +1,7 @@
 # GTX — Activist reconciliation (Milly mechanical)
 
-**Date:** 2026-10-10
-**Reports processed:** 66
+**Date:** 2026-10-24
+**Reports processed:** 67
 **Human review:** 66
 
 ## Summary
@@ -74,6 +74,7 @@
 | Honeywell International Inc. | long | 2020-10-29 | activist_13d | human_review | needs_human | `GTX/third-party-analyses/activist_reports/long/SC-13D_20201029_acc0001193125_20_280206.htm` |
 | Unresolved SEC filer | long | 2021-05-13 | activist_13d | human_review | needs_human | `GTX/third-party-analyses/activist_reports/long/SC-13D_20210513_acc0001193125_21_160613.htm` |
 | Unresolved SEC filer | long | 2021-05-14 | activist_13d | human_review | needs_human | `GTX/third-party-analyses/activist_reports/long/SC-13D_20210514_acc0001193125_21_161983.htm` |
+| Sessa Capital | long | 2024-02-12 | campaign_outcome | auto_context | context | `GTX/third-party-analyses/activist_reports/long/8-K_20240212_acc0001193125_24_031076.htm` |
 
 ## Notes (human review)
 

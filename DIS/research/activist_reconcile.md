@@ -1,7 +1,7 @@
 # DIS — Activist reconciliation (Milly mechanical)
 
-**Date:** 2026-10-10
-**Reports processed:** 3
+**Date:** 2026-10-24
+**Reports processed:** 4
 **Human review:** 3
 
 ## Summary
@@ -11,6 +11,7 @@
 | Unresolved SEC filer | long | 2024-03-28 | activist_proxy | human_review | needs_human | `DIS/third-party-analyses/activist_reports/long/PX14A6G_20240328_acc0001096906_24_000644.htm` |
 | Unresolved SEC filer | long | 2024-03-28 | activist_proxy | human_review | needs_human | `DIS/third-party-analyses/activist_reports/long/PX14A6G_20240328_acc0001096906_24_000634.htm` |
 | Unresolved SEC filer | long | 2024-03-11 | activist_proxy | human_review | needs_human | `DIS/third-party-analyses/activist_reports/long/PX14A6G_20240311_acc0001096906_24_000377.htm` |
+| Trian Partners | long | 2024-04-09 | campaign_outcome | auto_context | context | `DIS/third-party-analyses/activist_reports/long/8-K_20240409_acc0000950157_24_000595.htm` |
 
 ## Notes (human review)
 

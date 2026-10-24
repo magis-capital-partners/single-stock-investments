@@ -1,7 +1,7 @@
 # LLY — Activist reconciliation (Milly mechanical)
 
-**Date:** 2026-10-10
-**Reports processed:** 2
+**Date:** 2026-10-24
+**Reports processed:** 3
 **Human review:** 2
 
 ## Summary
@@ -10,6 +10,7 @@
 |------|------|------|-------|--------|---------|------|
 | Unresolved SEC filer | long | 2022-12-01 | activist_13d | human_review | needs_human | `LLY/third-party-analyses/activist_reports/long/SC-13D/A_20221201_acc0001193125_22_296525.htm` |
 | Unresolved SEC filer | long | 2022-10-27 | activist_13d | human_review | needs_human | `LLY/third-party-analyses/activist_reports/long/SC-13D_20221027_acc0001193125_22_271007.htm` |
+| ELI LILLY & Co | long | 2026-10-16 | activist_13d | auto_context | context | `LLY/third-party-analyses/activist_reports/long/SC-13D_20261016_acc0000059478_26_000095.xml` |
 
 ## Notes (human review)
 

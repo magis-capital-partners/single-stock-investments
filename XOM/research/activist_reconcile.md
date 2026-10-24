@@ -1,7 +1,7 @@
 # XOM — Activist reconciliation (Milly mechanical)
 
-**Date:** 2026-10-10
-**Reports processed:** 7
+**Date:** 2026-10-24
+**Reports processed:** 8
 **Human review:** 7
 
 ## Summary
@@ -15,6 +15,7 @@
 | Unresolved SEC filer | long | 2023-05-05 | activist_proxy | human_review | needs_human | `XOM/third-party-analyses/activist_reports/long/PX14A6G_20230505_acc0001214659_23_006550.htm` |
 | Unresolved SEC filer | long | 2023-04-19 | activist_proxy | human_review | needs_human | `XOM/third-party-analyses/activist_reports/long/PX14A6G_20230419_acc0001214659_23_005620.htm` |
 | Unresolved SEC filer | long | 2021-04-22 | activist_proxy | human_review | needs_human | `XOM/third-party-analyses/activist_reports/long/PX14A6G_20210422_acc0001214659_21_004380.htm` |
+| Engine No. 1 | long | 2021-06-02 | campaign_outcome | auto_context | context | `XOM/third-party-analyses/activist_reports/long/8-K_20210602_acc0000034088_21_000031.htm` |
 
 ## Notes (human review)
 

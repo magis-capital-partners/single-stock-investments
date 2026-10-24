@@ -1,7 +1,7 @@
 # TMUS — Activist reconciliation (Milly mechanical)
 
-**Date:** 2026-10-10
-**Reports processed:** 6
+**Date:** 2026-10-24
+**Reports processed:** 7
 **Human review:** 6
 
 ## Summary
@@ -14,6 +14,7 @@
 | Unresolved SEC filer | long | 2020-07-29 | activist_13d | human_review | needs_human | `TMUS/third-party-analyses/activist_reports/long/SC-13D/A_20200729_acc0000950157_20_000941.htm` |
 | Unresolved SEC filer | long | 2020-06-24 | activist_13d | human_review | needs_human | `TMUS/third-party-analyses/activist_reports/long/SC-13D/A_20200624_acc0000950157_20_000800.htm` |
 | Unresolved SEC filer | long | 2020-05-20 | activist_proxy | human_review | needs_human | `TMUS/third-party-analyses/activist_reports/long/PX14A6G_20200520_acc0001377739_20_000033.htm` |
+| HoldCo Asset Management | long | 2020-04-01 | campaign_outcome | auto_signal | campaign_active | `TMUS/third-party-analyses/activist_reports/long/8-K_20200401_acc0001193125_20_093622.htm` |
 
 ## Notes (human review)
 

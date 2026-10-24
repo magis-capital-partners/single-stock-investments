@@ -1,7 +1,7 @@
 # WBD — Activist reconciliation (Milly mechanical)
 
-**Date:** 2026-10-10
-**Reports processed:** 38
+**Date:** 2026-10-24
+**Reports processed:** 41
 **Human review:** 38
 
 ## Summary
@@ -46,6 +46,9 @@
 | Unresolved SEC filer | long | 2026-01-09 | activist_proxy | human_review | needs_human | `WBD/third-party-analyses/activist_reports/long/DFAN14A_20260109_acc0001104659_26_002522.htm` |
 | Unresolved SEC filer | long | 2026-01-08 | activist_proxy | human_review | needs_human | `WBD/third-party-analyses/activist_reports/long/DFAN14A_20260108_acc0001104659_26_002175.htm` |
 | Unresolved SEC filer | long | 2025-12-22 | activist_proxy | human_review | needs_human | `WBD/third-party-analyses/activist_reports/long/DFAN14A_20251222_acc0001104659_25_123497.htm` |
+| HoldCo Asset Management | long | 2026-10-06 | campaign_outcome | auto_context | context | `WBD/third-party-analyses/activist_reports/long/8-K_20261006_acc0001193125_26_415055.htm` |
+| HoldCo Asset Management | long | 2026-01-20 | campaign_outcome | auto_context | context | `WBD/third-party-analyses/activist_reports/long/8-K_20260120_acc0001193125_26_015949.htm` |
+| HoldCo Asset Management | long | 2025-12-05 | campaign_outcome | auto_context | context | `WBD/third-party-analyses/activist_reports/long/8-K_20251205_acc0001193125_25_309873.htm` |
 
 ## Notes (human review)
 
