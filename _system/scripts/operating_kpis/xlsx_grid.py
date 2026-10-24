@@ -2,10 +2,27 @@
 from __future__ import annotations
 
 import zipfile
+import re
+from datetime import datetime, timedelta
 from xml.etree import ElementTree as ET
 
 NS = {"m": "http://schemas.openxmlformats.org/spreadsheetml/2006/main"}
 MAIN = "{http://schemas.openxmlformats.org/spreadsheetml/2006/main}"
+
+
+def _date_style_ids(book: zipfile.ZipFile) -> set[int]:
+    if "xl/styles.xml" not in book.namelist():
+        return set()
+    root = ET.fromstring(book.read("xl/styles.xml"))
+    formats = {int(n.get("numFmtId")): n.get("formatCode", "")
+               for n in root.findall("m:numFmts/m:numFmt", NS)}
+    result = set()
+    for index, cell in enumerate(root.findall("m:cellXfs/m:xf", NS)):
+        fmt = int(cell.get("numFmtId") or 0)
+        code = re.sub(r'"[^\"]*"|\[[^\]]*\]', '', formats.get(fmt, "")).lower()
+        if fmt in set(range(14, 23)) | {45, 46, 47} or ("y" in code and ("m" in code or "d" in code)):
+            result.add(index)
+    return result
 
 
 def _col_index(ref: str) -> int:
@@ -66,6 +83,9 @@ def read_sheet(raw: bytes, *, sheet_name: str | None = None) -> list[list[str]]:
         if not chosen or chosen not in book.namelist():
             return []
         strings = _shared_strings(book)
+        date_styles = _date_style_ids(book)
+        props = ET.fromstring(book.read("xl/workbook.xml")).find("m:workbookPr", NS)
+        epoch = datetime(1904, 1, 1) if props is not None and props.get("date1904") in {"1", "true"} else datetime(1899, 12, 30)
         root = ET.fromstring(book.read(chosen))
         grid: dict[int, dict[int, str]] = {}
         max_col = 0
@@ -85,6 +105,11 @@ def read_sheet(raw: bytes, *, sheet_name: str | None = None) -> list[list[str]]:
                     text = strings[int(node.text)]
                 else:
                     text = node.text
+                    if int(cell.get("s") or 0) in date_styles:
+                        try:
+                            text = (epoch + timedelta(days=float(text))).strftime("%Y-%m-%d")
+                        except (ValueError, OverflowError):
+                            pass
                 col = _col_index(ref)
                 grid[row_index][col] = text
                 max_col = max(max_col, col)

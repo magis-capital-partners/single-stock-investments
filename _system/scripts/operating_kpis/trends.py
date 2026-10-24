@@ -8,7 +8,8 @@ from __future__ import annotations
 
 from collections import defaultdict
 
-from operating_kpis.model import iter_stores
+from operating_kpis.model import iter_stores, period_end, period_key
+from datetime import date
 
 LABELS = {
     "options_adv": "Options ADV",
@@ -96,12 +97,22 @@ def _direction(yoy_points: list[tuple[str, float]], basis: str) -> tuple[str, fl
 
 
 def metric_from_points(points: list[dict], *, evidence_ref: str) -> dict:
-    ordered = sorted(points, key=lambda row: row["period"])
+    def frequency(period):
+        return "quarterly" if "Q" in period else ("annual" if len(period) == 4 else "monthly")
+    rank = {"annual": 1, "quarterly": 2, "monthly": 3}
+    ordered = sorted(points, key=lambda row: (period_key(row["period"]), rank[frequency(row["period"])]))
     latest = ordered[-1]
+    cadence = frequency(latest["period"])
+    # Keep mixed source periods in the store, but never compute acceleration
+    # across a monthly observation and a quarterly/annual aggregate.
+    ordered = [row for row in ordered if frequency(row["period"]) == cadence]
     basis = str(latest.get("yoy_basis") or "ratio")
     yoy_points = [(row["period"], float(row["yoy"])) for row in ordered if row.get("yoy") is not None]
     direction, accel = _direction(yoy_points, basis)
     growth = latest.get("yoy")
+    end = period_end(latest["period"])
+    age = (date.today() - end).days if end else None
+    limit = 550 if len(latest["period"]) == 4 else (160 if "Q" in latest["period"] else 75)
     return {
         "metric": latest["kpi"],
         "label": label_for(latest["kpi"]),
@@ -117,11 +128,14 @@ def metric_from_points(points: list[dict], *, evidence_ref: str) -> dict:
         "level_latest": latest["value"],
         "latest_period": latest["period"],
         "unit": latest.get("unit"),
+        "cadence": cadence,
         "yoy_basis": basis,
         "accel": accel,
         "display": True,
         "material": True,
-        "stale": False,
+        "series_age_days": age,
+        "stale": age is None or age > limit,
+        "source_url": latest.get("source_url"),
         "human_summary": human_summary(latest["kpi"], latest),
         "points": [{"period": row["period"], "value": row["value"], "yoy": row.get("yoy")} for row in ordered],
     }
@@ -190,7 +204,7 @@ def operating_latest_rows() -> list[dict]:
             if not kpi or not period:
                 continue
             prev = latest.get(kpi)
-            if prev is None or period > str(prev.get("period") or ""):
+            if prev is None or period_key(period) > period_key(str(prev.get("period") or "")):
                 latest[kpi] = point
         for kpi, point in sorted(latest.items()):
             rows.append({

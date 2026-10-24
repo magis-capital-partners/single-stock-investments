@@ -1752,6 +1752,17 @@ def pricing_analysis_summary(ticker_dir: Path) -> dict | None:
     except (json.JSONDecodeError, OSError):
         return None
     values = floor_equity_value_range(data.get("component_value_per_share") or {}, ndigits=4)
+    # Legacy numeric grids cannot survive a present-value/blocked contract.
+    from buy_zones import build_buy_zones
+    contract_path = ticker_dir / "research/valuation_contract.json"
+    if contract_path.exists():
+        current_contract = json.loads(contract_path.read_text(encoding="utf-8"))
+        current_hash = (current_contract.get("change_control") or {}).get("model_hash")
+        if (current_contract.get("status") != "decision_grade"
+                or (current_hash and data.get("contract_model_hash") != current_hash)):
+            data = {**data, "entry_price_status": "unavailable",
+                    "entry_price_unavailable_reason": "Current contract is blocked or pricing belongs to a different model revision."}
+    zones = build_buy_zones(data, royalty_signal=((data.get("buy_zones") or {}).get("royalty_corroboration") or {}).get("signal"))
     return {
         "as_of": data.get("as_of"),
         "price": data.get("price"),
@@ -1760,8 +1771,11 @@ def pricing_analysis_summary(ticker_dir: Path) -> dict | None:
         "current_supported_value": data.get("base_value_supported_by_current_or_contracted_assets"),
         "market_price_above_supported_value": data.get("market_price_above_current_or_contracted_value"),
         "implied_growth_pct": data.get("market_implied_constant_owner_cash_growth_pct"),
-        "entry_prices": data.get("entry_prices_by_hurdle_and_case"),
-        "entry_price_15pct_base": data.get("primary_entry_price_15pct_base"),
+        "entry_prices": data.get("entry_prices_by_hurdle_and_case") if zones["status"] == "available" else {},
+        "buy_zones": zones,
+        "entry_price_status": data.get("entry_price_status"),
+        "entry_price_unavailable_reason": data.get("entry_price_unavailable_reason"),
+        "entry_price_15pct_base": data.get("primary_entry_price_15pct_base") if zones["status"] == "available" else None,
         "decision": data.get("decision"),
         "conclusion": data.get("pricing_conclusion"),
         "strongest_counter_explanation": data.get("strongest_counter_explanation"),
@@ -1769,6 +1783,11 @@ def pricing_analysis_summary(ticker_dir: Path) -> dict | None:
         "economic_value_bridge": data.get("economic_value_bridge"),
         "committee_routing": data.get("committee_routing"),
     }
+
+
+def core_compounder_summary(ticker: str) -> dict | None:
+    from refresh_core_compounders import load_views
+    return load_views(ROOT).get(ticker)
 
 
 def valuation_total_return_panel(ticker: str, ticker_dir: Path) -> dict | None:
@@ -2987,6 +3006,7 @@ def build_ticker_row(
         "ssi_report": latest_ssi_report(ticker_dir),
         "human_review": valuation_human_review(ticker_dir),
         "pricing_analysis": pricing_analysis_summary(ticker_dir),
+        "compounder_monitor": core_compounder_summary(ticker),
         "investment_committee": investment_committee_summary(ticker_dir),
         "valuation_workbench": valuation_workbench_summary(ticker_dir),
         "component_valuation": valuation_component_summary(ticker_dir),

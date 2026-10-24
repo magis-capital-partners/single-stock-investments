@@ -11,6 +11,7 @@ from collections import Counter
 from datetime import datetime, timezone
 from pathlib import Path
 
+from atomic_io import write_text_if_changed
 from build_dashboard_data import (
     ROOT,
     investment_committee_summary,
@@ -19,6 +20,7 @@ from build_dashboard_data import (
     load_power_zones,
     power_zones_for_ticker,
     pricing_analysis_summary,
+    core_compounder_summary,
     property_register_summary,
     valuation_component_summary,
     valuation_decision_summary,
@@ -144,6 +146,7 @@ def _attach_current_valuation(row: dict, *, include_detail: bool) -> bool:
     row["power_zones"] = power_zones_for_ticker(ticker)
     if include_detail:
         row["valuation_workbench"] = workbench
+        row["compounder_monitor"] = core_compounder_summary(ticker)
         row["component_valuation"] = component
         row["pricing_analysis"] = pricing_analysis_summary(ticker_dir)
         row["investment_committee"] = investment_committee_summary(ticker_dir)
@@ -191,7 +194,7 @@ def refresh_served_data(data_dir: Path, tickers: tuple[str, ...] | None = None) 
     if power_zones:
         core["power_zones"] = power_zones
     core["generated_at"] = datetime.now(timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ")
-    core_path.write_text(json.dumps(core, separators=(",", ":")), encoding="utf-8")
+    write_text_if_changed(core_path, json.dumps(core, separators=(",", ":")))
 
     shard_updated = 0
     for path in sorted((data_dir / "tickers").glob("*.json")):
@@ -200,7 +203,7 @@ def refresh_served_data(data_dir: Path, tickers: tuple[str, ...] | None = None) 
         if wanted is not None and ticker not in wanted:
             continue
         if _attach_current_valuation(row, include_detail=True):
-            path.write_text(json.dumps(row, separators=(",", ":")), encoding="utf-8")
+            write_text_if_changed(path, json.dumps(row, separators=(",", ":")))
             shard_updated += 1
     return {"core_rows": core_updated, "ticker_shards": shard_updated}
 

@@ -47,6 +47,8 @@ DETAIL_ONLY_FIELDS = (
     "transcripts",
     "total_return_panel",
     "pricing_analysis",
+    "compounder_monitor",
+    "ssi_report",
     "properties",
     "links",
     "investment_committee",

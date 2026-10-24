@@ -38,6 +38,7 @@ from atomic_io import (  # noqa: E402
     semantic_json_sha256,
      semantic_text_sha256,
     write_json_if_changed,
+    write_text_if_changed,
 )
 
 DATA_DIR = ROOT / "dashboard" / "data"
@@ -274,6 +275,8 @@ def is_active_book_ticker(ticker: str, reg_entry: dict[str, Any], val: dict[str,
 def build_all(target_tickers: list[str] | None = None, *, build_all_shards: bool = False) -> dict[str, Any]:
     from build_thesis_card import build_card, write_card
     from operating_kpis.trends import merge_operating_series, operating_latest_rows, select_shard_series
+    from refresh_core_compounders import read as read_core_state
+    core_views = read_core_state(ROOT / "_system/data/core_compounder_state.json").get("views") or {}
     ts = now_iso()
     registry = _load_json(REGISTRY_PATH)
     holdings_map = registry.get("holdings") or {}
@@ -408,6 +411,7 @@ def build_all(target_tickers: list[str] | None = None, *, build_all_shards: bool
                 "company": summary_row["company"],
                 "book": "holdings" if is_holding else ("watchlist" if is_watchlist else "research"),
                 "shard_status": "built",
+                "compounder_monitor": core_views.get(ticker),
                 "as_of": val.get("as_of") or ts[:10],
                 "registry": {
                     "market": reg_entry.get("market"),
@@ -556,7 +560,12 @@ def build_all(target_tickers: list[str] | None = None, *, build_all_shards: bool
         as_of=ts[:10],
         row_count=len(manifest_rows),
     )
-    write_json_if_changed(DATA_DIR / "research_manifest.json", research_manifest)
+    manifest_path = DATA_DIR / "research_manifest.json"
+    write_json_if_changed(manifest_path, research_manifest, indent=None)
+    if manifest_path.stat().st_size > 100 * 1024:
+        # Compact legacy pretty-printed feeds without dropping evidence or
+        # raising the L0 budget. Semantic JSON equality otherwise skips this.
+        write_text_if_changed(manifest_path, json.dumps(research_manifest, separators=(",", ":"), ensure_ascii=False))
 
     # 3. Write L0 kpi_summary.json
     kpi_gen = kpi_payload.get("generated_at") or ts

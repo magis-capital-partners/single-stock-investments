@@ -615,7 +615,7 @@ def attribution_causes(old_proof: dict, new_proof: dict, old_component: dict, ne
     return causes or ["assumption_or_unclassified"]
 
 
-def attribution_view(research: Path, current: dict) -> dict:
+def _component_attribution_view(research: Path, current: dict) -> dict:
     contract = current.get("universal_valuation_contract") or {}
     current_total = (
         (contract.get("valuation") or {}).get("value_per_share")
@@ -691,6 +691,25 @@ def attribution_view(research: Path, current: dict) -> dict:
         "unexplained_per_share": round(total_delta - explained, 2),
         "explanation": "Component changes are classified from observable differences in quantity, comparable method, probability, timing, capital, evidence, and schedule scope.",
     }
+
+
+def attribution_view(research: Path, current: dict) -> dict:
+    from refresh_core_compounders import slim_model
+    from tci_return_bridge import irr_attribution
+    result = _component_attribution_view(research, current)
+    candidates = []
+    current_key = str((current.get("inputs") or {}).get("price_as_of") or current.get("as_of") or "")
+    for path in (research / "valuation_history").glob("valuation_*.json"):
+        previous = read_json(path)
+        stamp = str((previous.get("inputs") or {}).get("price_as_of") or previous.get("as_of") or "")
+        if stamp and stamp <= current_key and previous.get("method") == "full" and slim_model(previous) != slim_model(current):
+            candidates.append((stamp, path.name, previous))
+    if candidates and current.get("method") == "full":
+        _, name, previous = max(candidates, key=lambda row: (row[0], row[1]))
+        result["tci_irr"] = {**irr_attribution(previous, current), "prior_snapshot": f"valuation_history/{name}"}
+    else:
+        result["tci_irr"] = {"status": "waiting_for_comparable_baseline", "unit": "percentage_points_per_year"}
+    return result
 
 
 def build(ticker: str, as_of: str | None = None) -> dict:

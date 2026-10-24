@@ -108,6 +108,7 @@ PROFILES: dict[str, list[list[str]]] = {
         ["_system/scripts/build_biotech_composite.py"],
         ["_system/scripts/build_research_memory.py"],
         # Backfill compact agent-context cards for the whole universe.
+        ["_system/scripts/refresh_core_compounders.py", "--write", "--propose"],
         ["_system/scripts/build_thesis_card.py", "--all"],
         # Valuation authority is owned by the Power Zone Universe workflow
         # (run_security_decision_pipeline) and the activist slice by the
@@ -135,6 +136,7 @@ PROFILES: dict[str, list[list[str]]] = {
         # and before lint, so the ledger lint sees this file.
         ["_system/scripts/build_fico_watch.py"],
         ["_system/scripts/lint_kpi_ledger.py"],
+        ["_system/scripts/refresh_core_compounders.py", "--write"],
         ["_system/scripts/build_world_model_snapshot.py", "--skip-resolve", "--skip-snowball"],
         [
             "_system/scripts/apply_world_model_context.py",

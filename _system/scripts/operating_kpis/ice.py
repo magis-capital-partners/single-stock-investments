@@ -74,7 +74,7 @@ def parse_ice_release(
     return points, note
 
 
-def fetch_ice(fetched_at: str) -> tuple[list[dict], list[dict]]:
+def _fetch_legacy_ice(fetched_at: str) -> tuple[list[dict], list[dict]]:
     notes = []
     for url in CANDIDATE_URLS:
         status, body, err = http_get(url, timeout=20)
@@ -110,3 +110,116 @@ def fetch_ice(fetched_at: str) -> tuple[list[dict], list[dict]]:
             continue
         return points, [{"ticker": "ICE", "status": "ok", "source_url": url}]
     return [], notes
+
+
+# Source discovery and row definitions ported from the dated Magis mirror.
+FEED = ("https://ir.theice.com/feed/ContentAsset.svc/GetContentAssetList?apiKey=BF185719B0464B3CB809D23926182246"
+        "&LanguageId=1&assetType=&pageSize=-1&pageNumber=0&tagList=&includeTags=true&year=-1&excludeSelection=1")
+DERIV = {  # (col A label stripped, col B label stripped or None) -> kpi, unit ; block = ADV/RPC/OI
+    ("ADV", "TOTAL ENERGY", None): ("adv_energy", "contracts_k"),
+    ("ADV", None, "Brent (1)"): ("adv_brent", "contracts_k"),
+    ("ADV", None, "Nat Gas (4)"): ("adv_natgas", "contracts_k"),
+    ("ADV", "TOTAL AGRICULTURE & METALS", None): ("adv_ag_metals", "contracts_k"),
+    ("ADV", "TOTAL COMMODITIES", None): ("adv_commodities", "contracts_k"),
+    ("ADV", "Interest Rates", "Short-term Interest Rates (9)"): ("adv_stir", "contracts_k"),
+    ("ADV", "TOTAL FINANCIALS", None): ("adv_financials", "contracts_k"),
+    ("ADV", "TOTAL FUTURES & OPTIONS", None): ("adv_total_fo", "contracts_k"),
+    ("RPC", "Energy", None): ("rpc3m_energy", "usd_per_contract"),
+    ("RPC", "Agriculture & Metals", None): ("rpc3m_ag_metals", "usd_per_contract"),
+    ("RPC", "TOTAL COMMODITIES", None): ("rpc3m_commodities", "usd_per_contract"),
+    ("RPC", "Interest Rates", None): ("rpc3m_interest_rates", "usd_per_contract"),
+    ("RPC", "TOTAL FINANCIALS", None): ("rpc3m_financials", "usd_per_contract"),
+    ("OI", "TOTAL COMMODITIES", None): ("oi_commodities", "contracts_k"),
+    ("OI", "TOTAL FINANCIALS", None): ("oi_financials", "contracts_k"),
+}
+REQUIRED = {"adv_total_fo", "adv_energy", "rpc3m_energy", "rpc3m_financials"}
+
+
+def _period(value: str) -> str | None:
+    if re.fullmatch(r"\d{4}-\d{2}-\d{2}", value):
+        return value[:7]
+    quarter = re.fullmatch(r"([1-4])Q(\d{2})", value.strip())
+    return f"20{quarter.group(2)}Q{quarter.group(1)}" if quarter else month_period(value)
+
+
+def parse_ice_xlsx(raw: bytes, *, source_url: str, doc: str, fetched_at: str) -> list[dict]:
+    import io
+    import zipfile
+    from operating_kpis.xlsx_grid import read_sheet, sheet_names
+    from operating_kpis.model import parse_number
+
+    with zipfile.ZipFile(io.BytesIO(raw)) as book:
+        names = [name for name, _ in sheet_names(book)]
+    derivatives = next((name for name in names if name.startswith("Derivs")), None)
+    if not derivatives:
+        raise LayoutError("ICE workbook has no Derivs sheet")
+    out, found = [], set()
+    for sheet in [derivatives, *(["US Equity Options"] if "US Equity Options" in names else [])]:
+        columns, block = {}, None
+        for row in read_sheet(raw, sheet_name=sheet):
+            periods = {i: _period(value) for i, value in enumerate(row) if _period(value)}
+            if len(periods) >= 3:
+                columns = periods
+                continue
+            a, b = (row + ["", ""])[:2]
+            a, b = a.strip(), b.strip()
+            if "Monthly ADV" in a:
+                block = "ADV"
+            elif "Rate per Contract" in a:
+                block = "RPC"
+            elif a.endswith("Derivatives OI"):
+                block = "OI"
+            specs = []
+            if sheet == "US Equity Options":
+                spec = {"US Equity Options": ("nyse_options_adv", "contracts_k"),
+                        "NYSE Share of Group Total": ("nyse_options_share", "share")}.get(a or b)
+                if spec:
+                    specs = [spec]
+            else:
+                for (section, label_a, label_b), spec in DERIV.items():
+                    if section != block or (label_a is not None and a != label_a) or (label_b is not None and b != label_b):
+                        continue
+                    if label_a and label_b is None and b and block == "ADV" and not a.startswith("TOTAL"):
+                        continue
+                    specs.append(spec)
+            for kpi, source_unit in specs:
+                for index, period in columns.items():
+                    value = parse_number(row[index]) if index < len(row) else None
+                    if value is None:
+                        continue
+                    unit = source_unit
+                    if source_unit == "contracts_k":
+                        value *= 1000
+                        unit = "contracts" if kpi.startswith("oi_") else "contracts_per_day"
+                    elif source_unit == "share":
+                        value *= 100
+                        unit = "share_pct"
+                    if kpi == "rpc3m_energy" and not 0.3 < value < 5:
+                        raise LayoutError(f"ICE implausible energy RPC {value}")
+                    point = make_point(ticker="ICE", kpi=kpi, period=period, value=value, unit=unit,
+                                       source_url=source_url, doc=doc, fetched_at=fetched_at,
+                                       yoy_basis="percentage_points" if unit == "share_pct" else "ratio")
+                    point["source_unit"] = source_unit
+                    point["measurement_basis"] = "rolling_three_months" if kpi.startswith("rpc3m_") else "period"
+                    out.append(point)
+                    found.add(kpi)
+    if REQUIRED - found:
+        raise LayoutError(f"ICE required rows missing: {sorted(REQUIRED - found)}")
+    return out
+
+
+def fetch_ice(fetched_at: str) -> tuple[list[dict], list[dict]]:
+    import json
+    status, body, error = http_get(FEED, timeout=30)
+    if status != 200:
+        return [], [{"ticker": "ICE", "status": "blocked", "source_url": FEED, "note": error}]
+    assets = json.loads(body).get("GetContentAssetListResult", [])
+    assets = [a for a in assets if "Monthly Statistics" in a.get("Title", "") and a.get("FilePath", "").endswith(".xlsx")]
+    if not assets:
+        raise LayoutError("ICE Monthly Statistics workbook missing from content feed")
+    url = max(assets, key=lambda a: a.get("ContentAssetDate") or "")["FilePath"]
+    status, body, error = http_get(url, timeout=30)
+    if status != 200:
+        return [], [{"ticker": "ICE", "status": "blocked", "source_url": url, "note": error}]
+    points = parse_ice_xlsx(body, source_url=url, doc=url.rsplit("/", 1)[-1], fetched_at=fetched_at)
+    return points, [{"ticker": "ICE", "status": "ok", "source_url": url}]
