@@ -1982,6 +1982,8 @@
 <script src="search-match.js"></script>
 <script src="energy-model-viz.js?v=20261015-energy"></script>
 <script src="insights-viz.js?v=20261020-relevance"></script>
+<link rel="stylesheet" href="fund-letters/reader.css?v=1">
+<script src="fund-letters/reader.js?v=1"></script>
 <script src="valuation-viz.js"></script>
 <script src="market-sessions.js?v=20261023"></script>
 <script src="market-risk-data.js?v=20261023"></script>
@@ -4204,6 +4206,25 @@ function renderActivist() {
 }
 
 function renderInsights(opts = {}) {
+  const previousReader = document.querySelector('[data-reader-root]');
+  if (previousReader && window.FundLettersReader) FundLettersReader.unmount(previousReader);
+  if (insightsSection === 'letters' && window.FundLettersReader) {
+    const loading = document.getElementById('insights-loading');
+    const content = document.getElementById('insights-content');
+    if (loading) loading.style.display = 'none';
+    if (content) {
+      content.style.display = 'block';
+      content.innerHTML = '<nav class="source-pills" aria-label="Insights sections">' + [['letters','Fund Letters'],['consensus','Consensus'],['managers','Managers'],['funds','Funds'],['podcasts','Podcasts'],['videos','Videos'],['documents','Documents'],['tickers','Ticker insights'],['sources','Data status']].map(([id,title]) => `<button type="button" class="filter-btn${id === 'letters' ? ' active' : ''}" data-reader-section="${id}">${title}</button>`).join('') + '</nav><div data-reader-root></div>';
+      content.querySelectorAll('[data-reader-section]').forEach(button => button.addEventListener('click', () => {
+        insightsSection = button.dataset.readerSection;
+        selectedFundId = null;
+        try { localStorage.setItem(INSIGHTS_SECTION_KEY, insightsSection); } catch (_) { /* unavailable */ }
+        renderInsights();
+      }));
+      FundLettersReader.mount(content.querySelector('[data-reader-root]'), { embedded: true });
+    }
+    return;
+  }
   if (insightsSection === 'sources' && window.WorkspaceTools) {
     const loading=document.getElementById('insights-loading'),content=document.getElementById('insights-content');
     if(loading)loading.style.display='none';

@@ -13,6 +13,24 @@ inputs:
 runs:
   using: composite
   steps:
+    - name: Preserve restricted dashboard sources before public staging
+      shell: bash
+      run: |
+        set -euo pipefail
+        python _system/scripts/migrate_dashboard_sources.py
+        vault="${RESEARCH_VAULT_ROOT:-_external/research-vault}"
+        if [ -d "$vault/dashboard-private" ]; then
+          # Persist only these immutable objects; other vault work belongs to its lane.
+          git -C "$vault" add --force -- dashboard-private
+          if ! git -C "$vault" diff --cached --quiet -- dashboard-private; then
+            if [ -n "$(git -C "$vault" diff --cached --name-only -- . ':!dashboard-private')" ]; then
+              echo "::error::Unrelated vault files are staged; publish those before preserving dashboard snapshots."
+              exit 1
+            fi
+            bash _system/scripts/ci_push_vault.sh "Preserve restricted dashboard source snapshots" "--force dashboard-private"
+          fi
+        fi
+
     - name: Stage and push
       shell: bash
       run: |
@@ -26,6 +44,10 @@ runs:
         # --sparse allows staging paths written on disk that sit outside a
         # sparse-checkout cone (e.g. dashboard/data after a minimal checkout).
         git add --sparse ${{ inputs.git_add }}
+        if [ -f dashboard/private-assets.json ]; then
+          git add --sparse dashboard/private-assets.json .gitattributes
+        fi
+        python _system/scripts/audit_fund_letter_exposure.py --staged --strict
         bash _system/scripts/ci_push_main.sh "${{ inputs.message }}"
 
     - name: Deploy chain note

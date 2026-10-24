@@ -49,9 +49,32 @@ outputs:
 runs:
   using: composite
   steps:
+    - name: Locate private dashboard snapshots
+      id: private-snapshots
+      shell: bash
+      run: |
+        python - <<'PY'
+        import json, os
+        from pathlib import Path
+        manifest = Path("dashboard/private-assets.json")
+        saved = json.loads(manifest.read_text()) if manifest.exists() else {}
+        needed = bool(saved.get("assets") or saved.get("repository_assets"))
+        vault = Path(os.environ.get("RESEARCH_VAULT_ROOT", "_external/research-vault"))
+        with open(os.environ["GITHUB_OUTPUT"], "a") as output:
+            print("checkout=" + str(needed and not (vault / ".git").exists()).lower(), file=output)
+        PY
+
+    - name: Checkout private snapshots for deployment
+      if: steps.private-snapshots.outputs.checkout == 'true'
+      uses: ./.github/actions/checkout-vault
+
     - name: Install pinned Cloudflare tooling
       shell: bash
       run: npm ci --prefix dashboard/cloudflare
+
+    - name: Restore private repository inputs for owner data synchronization
+      shell: bash
+      run: python _system/scripts/private_dashboard_assets.py --repository-only
 
     - name: Verify Cloudflare boundary and function contracts
       shell: bash
@@ -63,6 +86,8 @@ runs:
         python -m pip install --disable-pip-version-check pytest jsonschema pyyaml
         python -m pytest -q \
           _system/scripts/test_build_cloudflare_pages_site.py \
+          _system/scripts/test_private_dashboard_assets.py \
+          _system/scripts/test_fund_letters.py \
           _system/trading/portfolio_hub/tests \
           _system/scripts/tests/test_dashboard_d1_seed_budget.py \
           _system/scripts/tests/test_prune_cloudflare_d1.py \
@@ -219,8 +244,12 @@ runs:
           echo "MARKET_RISK_INGEST_TOKEN is required for the signed risk ingest." >&2
           exit 1
         fi
-        if [ -z "${PORTFOLIO_INGEST_TOKEN:-}" ] || [ -z "${CF_ACCESS_TEAM_DOMAIN:-}" ] || [ -z "${CF_ACCESS_AUD:-}" ]; then
-          echo "Portfolio Access/ingest secrets are not fully provisioned; public Pages deploy continues and portfolio APIs stay fail-closed."
+        if [ -z "${CF_ACCESS_TEAM_DOMAIN:-}" ] || [ -z "${CF_ACCESS_AUD:-}" ]; then
+          echo "Cloudflare Access issuer and application audience are required for every dashboard and reader route." >&2
+          exit 1
+        fi
+        if [ -z "${PORTFOLIO_INGEST_TOKEN:-}" ]; then
+          echo "Portfolio ingest credentials are not provisioned; machine ingestion stays fail-closed."
         fi
         if [ -z "${PORTFOLIO_DREW_ACCESS_EMAILS:-}" ] || [ -z "${PORTFOLIO_MICHAEL_ACCESS_EMAILS:-}" ]; then
           echo "Portfolio owner login maps are not fully provisioned; paper order entry stays fail-closed."
@@ -264,6 +293,7 @@ runs:
             "PORTFOLIO_INGEST_TOKEN",
             "CF_ACCESS_TEAM_DOMAIN",
             "CF_ACCESS_AUD",
+            "CF_ACCESS_REVOKED_EMAILS",
             "SLEEVE_INGEST_TOKEN",
             "PORTFOLIO_DREW_ACCESS_EMAILS",
             "PORTFOLIO_MICHAEL_ACCESS_EMAILS",
@@ -318,7 +348,7 @@ runs:
           fi
         } >> "$GITHUB_STEP_SUMMARY"
 
-    - name: Verify unauthenticated portfolio denial
+    - name: Verify unauthenticated dashboard and reader denial
       shell: bash
       env:
         PAGE_URL: ${{ steps.deploy.outputs.page_url }}
@@ -335,3 +365,10 @@ runs:
           exit 1
         fi
         echo "Private portfolio boundary verified: book=$BOOK_STATUS static=$STATIC_STATUS"
+        for path in / /data/core.json /data/insights/letters.json /fund-letters/ /fund-letters/reader.js /api/fund-letters /cloudflare-artifact-manifest.json; do
+          STATUS="$(curl -sS -o /dev/null -w '%{http_code}' "$PAGE_URL$path")"
+          if [ "$STATUS" = "200" ]; then
+            echo "Unauthenticated access boundary failed: $path" >&2
+            exit 1
+          fi
+        done

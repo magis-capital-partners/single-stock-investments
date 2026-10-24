@@ -52,6 +52,8 @@ DEPLOY_INPUTS = (
     "dashboard",
     "_system/data/evidence_recovery_queue.json",
     "_system/scripts/build_cloudflare_pages_site.py",
+    "_system/scripts/private_dashboard_assets.py",
+    "_system/scripts/stage_pages_functions.py",
     "_system/scripts/validate_portfolio_private_boundary.py",
     "_system/scripts/reconcile_insights_event_summary.py",
     "_system/scripts/export_dashboard_d1_seed.py",

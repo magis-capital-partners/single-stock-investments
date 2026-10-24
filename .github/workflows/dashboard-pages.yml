@@ -20,6 +20,8 @@ on:
       - "_system/scripts/fetch_float_adv.py"
       - "_system/scripts/build_technical_signals.py"
       - "_system/scripts/build_cloudflare_pages_site.py"
+      - "_system/scripts/private_dashboard_assets.py"
+      - "_system/scripts/stage_pages_functions.py"
       - "_system/scripts/export_dashboard_d1_seed.py"
       - "_system/scripts/export_sleeve_d1.py"
       - "_system/scripts/prune_cloudflare_d1.py"
@@ -375,6 +377,7 @@ jobs:
           PORTFOLIO_INGEST_TOKEN: ${{ secrets.PORTFOLIO_INGEST_TOKEN }}
           CF_ACCESS_TEAM_DOMAIN: ${{ secrets.CF_ACCESS_TEAM_DOMAIN }}
           CF_ACCESS_AUD: ${{ secrets.CF_ACCESS_AUD }}
+          CF_ACCESS_REVOKED_EMAILS: ${{ secrets.CF_ACCESS_REVOKED_EMAILS }}
           PORTFOLIO_DREW_ACCESS_EMAILS: ${{ secrets.PORTFOLIO_DREW_ACCESS_EMAILS }}
           PORTFOLIO_MICHAEL_ACCESS_EMAILS: ${{ secrets.PORTFOLIO_MICHAEL_ACCESS_EMAILS }}
           IBKR_ACCOUNT_IDS_FOR_SCAN: ${{ secrets.IBKR_ACCOUNT_IDS_FOR_SCAN }}
