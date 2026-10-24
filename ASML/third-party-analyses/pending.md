@@ -1,6 +1,6 @@
 # ASML — Pending third-party sources
 
-**Updated:** 2026-10-23
+**Updated:** 2026-10-24
 
 Approve in `_system/frameworks/third_party_sources.md` before using in base IRR.
 
