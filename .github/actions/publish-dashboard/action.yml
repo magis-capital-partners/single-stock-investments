@@ -31,6 +31,18 @@ outputs:
 runs:
   using: composite
   steps:
+    - name: Checkout private inputs for deploy-only validation
+      if: inputs.skip_rebuild == 'true' && env.RESEARCH_VAULT_CLONE_TOKEN != ''
+      uses: ./.github/actions/checkout-vault
+
+    - name: Restore full inputs before deploy-only validation
+      if: inputs.skip_rebuild == 'true'
+      shell: bash
+      run: |
+        if [ -f dashboard/private-assets.json ]; then
+          python _system/scripts/private_dashboard_assets.py
+        fi
+
     - name: Set up Python
       if: inputs.skip_rebuild != 'true' || inputs.validate == 'true'
       uses: actions/setup-python@v5

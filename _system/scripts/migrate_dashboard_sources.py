@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """Keep full audited artifacts in the private vault; redact public dashboard snapshots.
 
-The source tree retains all counts, identities, dates and other non-source data.
+Public counterparts retain structural counts only. Full payloads stay private.
 Cloudflare builds restore the exact private versions after authorization middleware
 has been installed. No private payload is printed or added to the public index.
 """
@@ -12,43 +12,27 @@ import hashlib
 import csv
 import io
 import json
-import re
 import shutil
 from pathlib import Path
 
 from audit_fund_letter_exposure import audit
-from private_dashboard_assets import ROOT, digest, overlay_manifest, private_object, safe_relative
+from private_dashboard_assets import ROOT, digest, hydration_state, write_hydration, overlay_manifest, private_object, safe_relative
 from vault_paths import research_vault_root
 
-PRIVATE_FIELDS = {
-    "source_file", "source_document", "raw_extract", "evidence_quote", "raw_text", "extracted_text",
-    "lead_summary", "commentary", "thesis", "quote", "evidence", "evidence_url", "evidence_label",
-    "source_url", "drive_url", "drive_id", "drive_file_id", "drive_pdf_id", "download_token",
-    "duplicate_sources", "alternate_sources", "source_ref",
-}
-PRIVATE_VALUE = re.compile(r"https?://drive\.google\.com/|_system[/\\]reference[/\\]superinvestor-letters", re.I)
-
-
-def redact(value, *, letter_context=False):
+def public_snapshot(value):
+    """Only structural metadata is published; no source-derived leaf values survive."""
+    shape = "object" if isinstance(value, dict) else "array" if isinstance(value, list) else "scalar"
+    public = {"private_snapshot": True, "source_shape": shape}
+    if isinstance(value, (dict, list)):
+        public["entry_count"] = len(value)
     if isinstance(value, dict):
-        # A letter record can contain extracts under generic text/claim/summary names.
-        letter = letter_context or value.get("source_type") in {"superinvestor_letter", "superinvestor-letters", "fund_letter", "letter"} or any(isinstance(v, str) and "superinvestor-letters/" in v for v in value.values())
-        clean = {}
-        for key, item in value.items():
-            normalized_key = re.sub(r"[^a-z]", "", key.lower())
-            if key in PRIVATE_FIELDS or (key.lower().startswith("drive_") or normalized_key.startswith(("drivefile", "drivefolder", "driveroot", "driveweb", "gdrive"))) or normalized_key in {"driveid", "fileid", "folderid", "localpdfpath", "textextractpath", "alternatetextextractpaths", "alternatepdfpaths", "links"} or (letter and key in {"text", "claim", "summary", "description", "snippet", "excerpt", "text_excerpt"}):
-                continue
-            if PRIVATE_VALUE.search(key):
-                # Some link indexes use private paths as keys and bare Drive IDs as values.
-                clean["restricted-" + hashlib.sha256(key.encode()).hexdigest()[:24]] = None
-            else:
-                clean[key] = redact(item, letter_context=letter)
-        return clean
-    if isinstance(value, list):
-        return [redact(v, letter_context=letter_context) for v in value]
-    if isinstance(value, str) and PRIVATE_VALUE.search(value):
-        return ""
-    return value
+        names = {"letters", "funds", "records", "rows", "items", "documents", "tickers", "positions"}
+        public["collection_counts"] = {key: len(item) for key, item in value.items() if key in names and isinstance(item, (list, dict))}
+    return public
+
+
+def is_placeholder(value):
+    return isinstance(value, dict) and value.get("private_snapshot") is True or isinstance(value, list) and len(value) == 1 and is_placeholder(value[0])
 
 
 def write_public_attributes(root: Path, manifest: dict) -> None:
@@ -71,13 +55,15 @@ def migrate(root: Path = ROOT, *, paths: list[str] | None = None) -> dict:
     vault = research_vault_root()
     source = root / "dashboard"
     manifest = overlay_manifest(source)
+    format_changed = manifest.get("publication_format") != "metadata-only-v1"
     entries = manifest.setdefault("assets", {})
     repository_entries = manifest.setdefault("repository_assets", {})
     prior_originals = manifest.pop("originals_migrated", [])
+    hydrated = hydration_state(root)
     # The append-only journal recovers a crash between redaction and manifest commit.
     # Content-addressed objects retain old versions used by concurrent builds.
     journal = vault / "dashboard-private/migration-journal.jsonl" if vault else None
-    recovered = bool(prior_originals)
+    recovered = bool(prior_originals) or (format_changed and bool(entries or repository_entries))
     if journal and journal.is_file():
         for line in journal.read_text(encoding="utf-8").splitlines():
             item = json.loads(line)
@@ -98,7 +84,7 @@ def migrate(root: Path = ROOT, *, paths: list[str] | None = None) -> dict:
     managed.update(repository_entries)
     for relative in candidates:
         safe_relative(relative)
-    pending = [p for p in candidates if (root / p).is_file() and ((root / p).suffix.lower() in {".json", ".jsonl", ".csv", ".pdf", ".txt", ".md"}) and (p not in managed or digest(root / p) != managed[p]["public_sha256"])]
+    pending = [p for p in candidates if (root / p).is_file() and ((root / p).suffix.lower() in {".json", ".jsonl", ".csv", ".pdf", ".txt", ".md"}) and (format_changed or p not in managed or digest(root / p) != managed[p]["public_sha256"])]
     if not pending and not recovered:
         if managed:
             write_public_attributes(root, manifest)
@@ -130,53 +116,59 @@ def migrate(root: Path = ROOT, *, paths: list[str] | None = None) -> dict:
         collection = entries if dashboard else repository_entries
         key = path.relative_to(source).as_posix() if dashboard else relative
         existing = collection.get(key)
-        if existing and digest(path) == existing["public_sha256"]:
+        original_hash = digest(path)
+        upgrading = existing and original_hash == existing["public_sha256"] and format_changed
+        payload_path = private_object(vault, existing["private_sha256"]) if upgrading else path
+        if upgrading and (not payload_path.is_file() or digest(payload_path) != existing["private_sha256"]):
+            raise RuntimeError(f"Private snapshot is missing or mismatched: {key}")
+        if existing and original_hash == existing["public_sha256"] and not upgrading:
             continue  # Never replace the full private copy with its redacted public counterpart.
+        if existing and not upgrading and original_hash != existing["private_sha256"] and hydrated.get(relative) != existing["private_sha256"]:
+            raise RuntimeError(f"Hydrate the managed private snapshot before rebuilding: {key}")
         if path.suffix.lower() in {".json", ".jsonl"}:
             lines = path.suffix.lower() == ".jsonl"
-            doc = [json.loads(line) for line in path.read_text(encoding="utf-8").splitlines() if line.strip()] if lines else json.loads(path.read_text(encoding="utf-8"))
-            redacted = redact(doc)
-            if existing and redacted == doc and digest(path) != existing["private_sha256"]:
+            doc = [json.loads(line) for line in payload_path.read_text(encoding="utf-8").splitlines() if line.strip()] if lines else json.loads(payload_path.read_text(encoding="utf-8"))
+            redacted = public_snapshot(doc)
+            if existing and is_placeholder(doc) and digest(payload_path) != existing["private_sha256"]:
                 raise RuntimeError(f"Hydrate the managed private snapshot before rebuilding: {key}")
-            if redacted == doc and not existing:
-                continue
-            text = "".join(json.dumps(row, ensure_ascii=False, separators=(",", ":")) + "\n" for row in redacted) if lines else json.dumps(redacted, ensure_ascii=False, separators=(",", ":")) + "\n"
+            text = json.dumps(redacted, ensure_ascii=False, separators=(",", ":")) + "\n"
         elif path.suffix.lower() == ".md":
             text = "This source-linked research document is available in the private research archive.\n"
-            if existing and path.read_text(encoding="utf-8") == text:
+            if existing and payload_path.read_text(encoding="utf-8") == text:
                 raise RuntimeError(f"Hydrate the managed private snapshot before rebuilding: {key}")
         else:
-            rows = list(csv.DictReader(io.StringIO(path.read_text(encoding="utf-8"))))
-            clean = [redact(row) for row in rows]
-            if existing and clean == rows and digest(path) != existing["private_sha256"]:
+            rows = list(csv.DictReader(io.StringIO(payload_path.read_text(encoding="utf-8"))))
+            if existing and rows and "private_snapshot" in rows[0] and digest(path) != existing["private_sha256"]:
                 raise RuntimeError(f"Hydrate the managed private snapshot before rebuilding: {key}")
-            if clean == rows and not existing:
-                continue
             stream = io.StringIO()
-            writer = csv.DictWriter(stream, fieldnames=list(clean[0]) if clean else [], lineterminator="\n")
-            writer.writeheader(); writer.writerows(clean)
+            writer = csv.DictWriter(stream, fieldnames=["private_snapshot", "entry_count"], lineterminator="\n")
+            writer.writeheader(); writer.writerow({"private_snapshot": "true", "entry_count": len(rows)})
             text = stream.getvalue()
-        private_hash = digest(path)
+        private_hash = digest(payload_path)
         private = private_object(vault, private_hash)
         private.parent.mkdir(parents=True, exist_ok=True)
         if not private.exists():
-            shutil.copy2(path, private)
-        if private_hash != digest(private) or private_hash != digest(path):
+            shutil.copy2(payload_path, private)
+        if private_hash != digest(private) or private_hash != digest(payload_path):
             raise RuntimeError(f"Private copy failed verification: {key}")
         # Journal the recovery mapping before redacting the local public copy.
         entry = {"private_sha256": private_hash, "public_sha256": hashlib.sha256(text.encode("utf-8")).hexdigest()}
-        with journal.open("a", encoding="utf-8") as log:
-            log.write(json.dumps({"path": key, "scope": "dashboard" if dashboard else "repository", "entry": entry}) + "\n")
+        if entry != existing:
+            with journal.open("a", encoding="utf-8") as log:
+                log.write(json.dumps({"path": key, "scope": "dashboard" if dashboard else "repository", "entry": entry}) + "\n")
         collection[key] = entry
         temporary = path.with_name(path.name + ".private-redaction.tmp")
         temporary.write_bytes(text.encode("utf-8"))
-        if digest(path) != private_hash:
+        if digest(path) != original_hash:
             raise RuntimeError(f"Input changed during migration; retry without overwriting it: {key}")
         temporary.replace(path)
+        hydrated.pop(relative, None)
         changed += 1
     manifest["schema_version"] = 1
+    manifest["publication_format"] = "metadata-only-v1"
     manifest["originals_migrated_count"] = max(manifest.get("originals_migrated_count", 0), len(set(prior_originals) | set(originals)))
     manifest_text = json.dumps(manifest, sort_keys=True, separators=(",", ":")) + "\n"
+    write_hydration(root, hydrated)
     write_public_attributes(root, manifest)
     for destination in (source / "private-assets.json", vault / "dashboard-private/manifest.json"):
         temporary = destination.with_suffix(".json.tmp")

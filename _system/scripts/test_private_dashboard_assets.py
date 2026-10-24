@@ -38,10 +38,15 @@ def test_private_preservation_public_redaction_idempotence_and_new_versions(work
     entry = assets.overlay_manifest(source)["assets"]["data/letters.json"]
     first = assets.private_object(vault, entry["private_sha256"])
     assert first.read_bytes() == before
-    assert json.loads(path.read_text()) == {"fund": "Example", "count": 3, "position": {"ticker": "X"}}
+    assert json.loads(path.read_text()) == {"private_snapshot": True, "source_shape": "object", "entry_count": 6, "collection_counts": {}}
     assert migration.migrate(root, paths=[])["migrated_or_updated_assets"] == 0
     assert assets.private_source(source, "data/letters.json") == first
     assert assets.hydrate(source) == 1
+    journal = vault / "dashboard-private/migration-journal.jsonl"
+    previous_journal = journal.read_bytes()
+    migration.migrate(root, paths=[])
+    assert journal.read_bytes() == previous_journal
+    assets.hydrate(source)
     original["count"] = 4
     write(path, original)
     assert migration.migrate(root, paths=[])["migrated_or_updated_assets"] == 1
@@ -50,13 +55,11 @@ def test_private_preservation_public_redaction_idempotence_and_new_versions(work
     assert second != first and first.read_bytes() == before
 
 
-def test_nested_letter_text_is_removed_but_non_letter_numbers_remain():
-    doc = {"rows": [{"source_type": "superinvestor_letter", "text": "extract", "items": [{"claim": "another extract", "ticker": "ACME"}]}, {"source_type": "earnings", "text": "reported results", "revenue": 42}]}
-    assert migration.redact(doc) == {"rows": [{"source_type": "superinvestor_letter", "items": [{"ticker": "ACME"}]}, {"source_type": "earnings", "text": "reported results", "revenue": 42}]}
-    mapped = migration.redact({"_system/reference/superinvestor-letters/2020Q1/a.pdf": "bare-private-drive-id"})
-    assert list(mapped.values()) == [None]
-    assert "superinvestor-letters" not in json.dumps(mapped)
-    assert migration.redact({"drive_file_id":"private-id", "driveFolderId":"private-folder", "folder_id":"private-root", "links":{"letter.pdf":"bare-id"}, "fund":"A"}) == {"fund":"A"}
+def test_public_snapshot_is_an_allowlist_even_for_unknown_extract_fields():
+    doc = {"fund": "Source identity", "raw_field_we_have_never_seen": "verbatim secret", "risks": ["copied source paragraph"], "drive_file_id": "secret", "letters": [{"anything": "private"}]}
+    clean = migration.public_snapshot(doc)
+    assert clean == {"private_snapshot": True, "source_shape": "object", "entry_count": 5, "collection_counts": {"letters": 1}}
+    assert "secret" not in json.dumps(clean) and "verbatim" not in json.dumps(clean)
 
 
 def test_changed_public_snapshot_cannot_replace_private_copy(workspace):
@@ -100,6 +103,24 @@ def test_interrupted_manifest_write_recovers_from_private_journal(workspace):
     assert migration.migrate(root, paths=[])["managed_private_assets"] == 1
     assert assets.overlay_manifest(source) == expected
     assert "SECRET" in assets.private_source(source, "data/letter.json").read_text()
+
+
+def test_legacy_redacted_payload_is_upgraded_from_verified_private_original(workspace):
+    root, source, _ = workspace
+    path = source / "data/letter.json"
+    write(path, {"source_url": "https://drive.google.com/file/d/SECRET", "unrecognized_prose": "original private prose"})
+    migration.migrate(root, paths=["dashboard/data/letter.json"])
+    private = assets.private_source(source, "data/letter.json")
+    original = private.read_bytes()
+    write(path, {"risks": ["A source paragraph left by an older sanitizer"]})
+    manifest = assets.overlay_manifest(source)
+    manifest.pop("publication_format")
+    manifest["assets"]["data/letter.json"]["public_sha256"] = assets.digest(path)
+    write(source / assets.MANIFEST_NAME, manifest)
+    migration.migrate(root, paths=[])
+    assert json.loads(path.read_text())["private_snapshot"] is True
+    assert "source paragraph" not in path.read_text()
+    assert assets.private_source(source, "data/letter.json").read_bytes() == original
 
 
 def test_raw_original_is_verified_and_preserved_before_removal(workspace):
@@ -171,7 +192,7 @@ def test_repository_jsonl_and_source_linked_research_restore_exactly(workspace):
     original = {p: p.read_bytes() for p in (catalog, note)}
     result = migration.migrate(root, paths=[p.relative_to(root).as_posix() for p in original])
     assert result["managed_private_assets"] == 2
-    assert json.loads(catalog.read_text()) == {"ticker": "A"}
+    assert json.loads(catalog.read_text()) == {"private_snapshot": True, "source_shape": "array", "entry_count": 1}
     assert "private passage" not in note.read_text()
     assert migration.migrate(root, paths=[])["migrated_or_updated_assets"] == 0
     assert assets.hydrate_repository(root) == 2

@@ -64,6 +64,8 @@ DEPLOY_INPUTS = (
     "_system/scripts/ci_dashboard_deploy_mode.sh",
     ".github/workflows/dashboard-pages.yml",
     ".github/actions/deploy-cloudflare-dashboard",
+    ".github/actions/preserve-private-dashboard",
+    ".github/actions/checkout-vault",
     ".github/actions/publish-dashboard",
 )
 

@@ -94,6 +94,9 @@ runs:
           _system/scripts/tests/test_deploy_d1_sync.py \
           _system/scripts/tests/test_dashboard_deploy_workflow.py
 
+    - name: Preserve regenerated private inputs before deployment
+      uses: ./.github/actions/preserve-private-dashboard
+
     - name: Build Cloudflare-safe dashboard artifact
       shell: bash
       run: |
@@ -101,6 +104,10 @@ runs:
         python _system/scripts/build_cloudflare_pages_site.py
         python _system/scripts/validate_portfolio_private_boundary.py _cf_project/site
         python _system/scripts/stage_pages_functions.py _cf_project
+
+    - name: Restore complete owner inputs for D1 exports
+      shell: bash
+      run: python _system/scripts/private_dashboard_assets.py
 
     - name: Ensure Pages project and D1 database exist
       id: resources
