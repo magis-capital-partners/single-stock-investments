@@ -12,11 +12,11 @@
 
 | Insider | Date | Shares | Price | Value | Contrib |
 |---------|------|--------|-------|-------|---------|
-| Sanche Jacques Wolf | 2026-08-26 | 4150 | $45.02 | $186833.0 | 2.571 |
-| Singleton Denise R | 2026-08-25 | 3500 | $44.115 | $154402.5 | 2.291 |
-| Clark Stephen S | 2026-08-11 | 5260 | $47.31 | $248850.6 | 2.159 |
-| Jenisch Jan Philipp | 2026-09-02 | 15000 | $42.53 | $637950.0 | 2.082 |
-| Oran Baris | 2026-08-12 | 3000 | $47.13 | $141390.0 | 2.065 |
+| Sanche Jacques Wolf | 2026-08-26 | 4150 | $45.02 | $186833.0 | 2.55 |
+| Singleton Denise R | 2026-08-25 | 3500 | $44.115 | $154402.5 | 2.272 |
+| Clark Stephen S | 2026-08-11 | 5260 | $47.31 | $248850.6 | 2.141 |
+| Jenisch Jan Philipp | 2026-09-02 | 15000 | $42.53 | $637950.0 | 2.064 |
+| Oran Baris | 2026-08-12 | 3000 | $47.13 | $141390.0 | 2.048 |
 
 Source: `_system/reference/market-data/insider/AMRZ_transactions.csv`.
 Lawrence base IRR unchanged (`in_base_irr: False`).
