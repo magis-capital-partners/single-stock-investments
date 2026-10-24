@@ -1,10 +1,12 @@
 {
-  "schema_version": "3.0",
+  "schema_version": "3.1",
   "ticker": "ABMD.CVR",
   "as_of": "2026-10-24",
+  "model_as_of": "2026-10-24",
   "authority": "valuation_contract",
   "contract_source": "valuation_contract.json",
   "contract_status": "evidence_blocked",
+  "contract_model_hash": "d26ca2b545f0b027c8f6a3509144b9fcb91d41a62bfd2944f45d8e51d83bb52e",
   "proof_status": "evidence_blocked",
   "model_level": "unmodeled",
   "price": null,
@@ -45,21 +47,27 @@
   },
   "entry_prices_by_hurdle_and_case": {
     "low": {
+      "8pct": null,
       "10pct": null,
       "12pct": null,
       "15pct": null,
+      "18pct": null,
       "20pct": null
     },
     "base": {
+      "8pct": null,
       "10pct": null,
       "12pct": null,
       "15pct": null,
+      "18pct": null,
       "20pct": null
     },
     "high": {
+      "8pct": null,
       "10pct": null,
       "12pct": null,
       "15pct": null,
+      "18pct": null,
       "20pct": null
     }
   },
@@ -85,5 +93,29 @@
     "profile_id": "capital_cycle",
     "label": "Capital cycle and normalized industry economics",
     "input_hash": "eed7ff9cffee495cc32527dd5e4d751a08822497e62f529d33f6efc3531d4046"
+  },
+  "evidence_blockers": [
+    "A complete economic ownership map has not been supplied.",
+    "Market price per share is missing or non-positive; cannot mark decision_grade or compare value with price."
+  ],
+  "buy_zones": {
+    "schema_version": "1.0",
+    "config_version": "2026-10-23.1",
+    "status": "withheld",
+    "research_only": true,
+    "capital_actionable": false,
+    "model_level": "unmodeled",
+    "blockers": [
+      "A complete economic ownership map has not been supplied.",
+      "Market price per share is missing or non-positive; cannot mark decision_grade or compare value with price.",
+      "The valuation workbench is evidence-blocked; hurdle prices are withheld until proof is decision-grade."
+    ],
+    "zones": [],
+    "deepest_active_zone": null,
+    "royalty_corroboration": {
+      "status": "unavailable",
+      "signal": null,
+      "role": "corroborating_only"
+    }
   }
 }
