@@ -2497,8 +2497,9 @@ function syncRouteHash() {
   } else if (activeView === 'darwin') {
     setAppHash(`#/strategies/darwin/${darwinViewMode || 'overview'}`);
   } else if (activeView === 'holdings') {
-    const section = window.ResearchWorkspace?.activeTab() || 'overview';
     const params = new URLSearchParams(location.hash.split('?')[1] || '');
+    const requested = params.get('section');
+    const section = typeof ResearchWorkspace !== 'undefined' ? ResearchWorkspace.activeTab() : ['overview','valuation','business','evidence','buyback'].includes(requested) ? requested : 'overview';
     const focus = section === 'business' && (params.get('section') === 'buyback' || params.get('focus') === 'buyback') ? '&focus=buyback' : '';
     setAppHash(selected ? `#/research/coverage/${encodeURIComponent(selected)}?section=${section}${focus}` : '#/research/coverage');
   } else if (activeView === 'valuation') {
@@ -3206,6 +3207,7 @@ function renderPricingAnalysis(t) {
       <div class="metric-grid metric-grid-3">
         <div class="metric"><div class="k">Snapshot price</div><div class="v mono">${fmtQuote(p.price)}</div></div>
         ${values.base == null ? '' : `<div class="metric"><div class="k">Base component value</div><div class="v mono">${fmtQuote(values.base)}</div><div class="tier-sub">${fmtPct(p.upside_downside_pct?.base)} vs price</div></div>`}
+        ${p.entry_price_15pct_base == null ? '' : `<div class="metric"><div class="k">15% owner-cash entry (audit)</div><div class="v mono">${fmtQuote(p.entry_price_15pct_base)}</div></div>`}
       </div>
       ${Object.entries(entry).some(([,value]) => value != null) ? `<div class="metric-grid" style="margin-top:10px">${Object.entries(entry).filter(([,value]) => value != null).map(([hurdle,value]) => `<div class="metric"><div class="k">${escapeHtml(hurdle.replace('pct','%'))} hurdle</div><div class="v mono">${fmtQuote(value)}</div></div>`).join('')}</div>` : '<p class="rw-empty">Entry thresholds unavailable. Dated forward economics and a complete ownership map are required.</p>'}
       ${zoneHtml}
