@@ -222,6 +222,9 @@ def main() -> int:
     if path.exists() and not args.served_only:
         print(f"{path.relative_to(ROOT)}: {refresh(path, tickers)} valuation rows")
     served = refresh_served_data(ROOT / "dashboard" / "data", tickers)
+    from datetime import date
+    from build_irr_readiness import publish
+    publish(ROOT / "dashboard/data", ROOT, date.today())
     print(
         "dashboard/data/core.json: "
         f"{served['core_rows']} valuation rows; "

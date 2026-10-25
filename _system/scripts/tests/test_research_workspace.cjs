@@ -68,3 +68,11 @@ test('technical review instructions get a readable overview label',()=>{
  assert.equal(rw.friendlyAction('Complete the next hash-bound isolated outputs: pre_mortem.json'), 'Complete the independent review documents.');
  assert.equal(rw.friendlyAction('Replace stale or unbound outputs against the frozen packet'), 'Update the independent review with the latest evidence.');
 });
+
+test('IRR checklist separates numerical diagnostics from missing underwriting',()=>{
+ const t={irr_readiness:{as_of:'2026-10-25',diagnostic_math_complete:true,next_action:'Review evidence',requirements:[{id:'price',label:'Price',status:'ready',source_ref:'TEST/research/valuation.json#inputs.price'},{id:'underwriting',label:'Scenario support',status:'blocked',next_action:'Support growth with sources',source_ref:'TEST/research/valuation.json'}]}};
+ const html=rw.irrReadiness(t,h);
+ assert.match(html,/1 of 2 checks complete/);assert.match(html,/Missing · Scenario support/);assert.match(html,/underwriting and publication checks still apply/);
+ assert.match(html,/valuation.json#inputs.price/);assert.doesNotMatch(html,/valuation.json%23/);
+ assert.match(rw.irrReadiness({},h),/checklist unavailable/);
+});

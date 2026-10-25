@@ -2291,7 +2291,9 @@ def load_insights_for_ticker(ticker: str, insights_doc: dict | None) -> list[dic
         return []
     by_ticker = insights_doc.get("by_ticker") or {}
     rows = by_ticker.get(ticker.upper()) or by_ticker.get(ticker) or []
-    return filter_identity_rows(ticker, rows)
+    from research_integrity import reconcile_letter
+    return filter_identity_rows(ticker, [fixed for row in rows if
+        (fixed := reconcile_letter(ticker, row) if row.get("source") == "superinvestor_letter" else row) is not None])
 
 
 SOURCE_PRIORITY = {
@@ -2326,10 +2328,13 @@ def load_letter_discussants(ticker: str, insights_doc: dict | None) -> list[dict
     )
     out: list[dict] = []
     for r in rows:
-        row = dict(r)
+        from research_integrity import reconcile_letter
+        row = reconcile_letter(ticker, r)
+        if row is None:
+            continue
         source_ref = row.get("source_document") or source_document_ref(row.get("source_file"))
         row["source_document"] = source_ref
-        row["evidence_url"] = insight_evidence_url(source_ref) or row.get("evidence_url")
+        row["evidence_url"] = (row.get("classification_review") or {}).get("source_url") or insight_evidence_url(source_ref) or row.get("evidence_url")
         row["evidence_label"] = row.get("evidence_label") or best_document_label(source_ref)
         row["evidence_document_id"] = row.get("evidence_document_id") or document_id_for_ref(source_ref)
         out.append(row)
@@ -2361,7 +2366,10 @@ def load_events_for_ticker(ticker: str, insights_doc: dict | None) -> list[dict]
     )
     out: list[dict] = []
     for r in rows:
-        row = dict(r)
+        from research_integrity import reconcile_letter
+        row = reconcile_letter(ticker, r) if r.get("source") == "superinvestor_letter" else dict(r)
+        if row is None:
+            continue
         row["evidence_url"] = insight_evidence_url(row.get("evidence_ref")) or row.get("evidence_url")
         if not row.get("evidence_label"):
             ref = source_document_ref(row.get("evidence_ref"))
@@ -2592,6 +2600,11 @@ def build_essential_insights(
     raw_insights: list[dict],
     discussants: list[dict],
 ) -> dict:
+    # Context, other instruments, and unresolved classifications remain readable
+    # in Evidence, but cannot become an equity ownership signal.
+    discussants = [r for r in discussants if r.get("relationship") not in {"context", "instrument", "unverified"}]
+    events = [r for r in events if r.get("relationship") not in {"context", "instrument", "unverified"}]
+    raw_insights = [r for r in raw_insights if r.get("relationship") not in {"context", "instrument", "unverified"}]
     all_rows = events if events else raw_insights
     source_rows = [*events, *raw_insights]
     specific_rows, portfolio_rows = split_insight_rows(all_rows)
@@ -2645,14 +2658,14 @@ def build_essential_insights(
             "event_type": "letter_position",
             "impact_axis": "ownership",
             "date": d0.get("letter_date"),
-            "direction": {"add": "bullish", "trim": "bearish", "new": "bullish", "short": "bearish"}.get(
+            "direction": {"add": "bullish", "trim": "bearish", "sell": "bearish", "exit": "bearish", "new": "bullish", "short": "bearish"}.get(
                 d0.get("action"), "neutral"
             ),
             "confidence": "med",
             "score": 0,
             "title": title,
             "summary": summary,
-            "evidence_url": insight_evidence_url(d0.get("source_document") or d0.get("source_file")) or d0.get("evidence_url"),
+            "evidence_url": (d0.get("classification_review") or {}).get("source_url") or insight_evidence_url(d0.get("source_document") or d0.get("source_file")) or d0.get("evidence_url"),
             "evidence_label": d0.get("evidence_label") or best_document_label(d0.get("source_document") or d0.get("source_file")),
             "evidence_document_id": d0.get("evidence_document_id") or document_id_for_ref(d0.get("source_document") or d0.get("source_file")),
         }
@@ -3096,6 +3109,11 @@ def build_ticker_row(
         classification["investment_sleeve_label"] = _INVESTMENT_SLEEVE_LABELS.get(
             "cvr_contingent", "CVRs"
         )
+    from build_irr_readiness import assess_company, attach_readiness
+    from research_integrity import classification_audit
+    row["classification_audit"] = classification_audit(ticker)
+    attach_readiness(row, assess_company(row, _load_json(ticker_dir / "research/valuation.json") or {},
+        _load_json(ticker_dir / "research/valuation_contract.json") or {}, as_of=datetime.now(timezone.utc).date()), detailed=True)
     return row
 
 
