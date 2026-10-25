@@ -1,4 +1,4 @@
-# BSM - Thematic context (2026-10-24)
+# BSM - Thematic context (2026-10-25)
 
 > Context only. Tailwinds inform stance and overlay sizing; they do not auto-inflate Lawrence base IRR. Promotion to base case requires [HUMAN REVIEW].
 
@@ -14,7 +14,7 @@
 | AGI expert-horizon years ahead (public quotes) | 5.0 | 2026-06-01 | +0.0% | flat | no (context) |
 | Robotaxi expert-horizon years ahead (public quotes) | 2.0 | 2026-06-01 | +0.0% | flat | no (context) |
 | WTI crude (USD/bbl) | 103.2699966430664 | 2026-10-23 | +67.1% | up | no (context) |
-| Natural gas (USD/MMBtu; spot or futures fallback) | 2.640000104904175 | 2026-10-23 | -21.1% | down | no (context) |
+| Natural gas (USD/MMBtu; spot or futures fallback) | 3.049999952316284 | 2026-10-23 | -8.8% | down | no (context) |
 | Permian crude / oil-gas activity proxy | 107.1306 (stale) | 2026-08-01 | +9.2% | up | no (context) |
 
 Source panels: `_system/reference/market-data/themes/manifest.json`.

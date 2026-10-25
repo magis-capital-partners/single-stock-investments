@@ -230,14 +230,14 @@ Synced from `_system/portfolio/registry.json`. Last sync: 2026-10-25.
 | DECK | DECK/ | Deckers Brands | US | 2026-10-21 | 2026-10-25 | unknown | watch |
 | DELL | DELL/ | Dell Technologies | US | 2026-10-21 | 2026-10-25 | unknown | watch |
 | DG | DG/ | Dollar General | US | 2026-10-21 | 2026-10-25 | unknown | watch |
-| DGX | DGX/ | Quest Diagnostics | US | 2026-07-29 | 2026-10-25 | unknown | watch |
-| DHI | DHI/ | D. R. Horton | US | 2026-07-29 | 2026-10-25 | unknown | watch |
-| DHR | DHR/ | Danaher Corporation | US | 2026-07-09 | 2026-10-25 | compounder | hold |
-| DIA | DIA/ | DIA | US | 2026-07-29 | 2026-10-25 | unknown | watch |
-| DIS | DIS/ | Walt Disney Company (The) | US | 2026-07-29 | 2026-10-25 | unknown | watch |
-| DJT | DJT/ | DJT | US | 2026-07-29 | 2026-10-25 | unknown | watch |
-| DKNG | DKNG/ | DKNG | US | 2026-07-29 | 2026-10-25 | unknown | watch |
-| DLR | DLR/ | Digital Realty | US | 2026-07-29 | 2026-10-25 | unknown | watch |
+| DGX | DGX/ | Quest Diagnostics | US | 2026-10-25 | 2026-10-25 | unknown | watch |
+| DHI | DHI/ | D. R. Horton | US | 2026-10-25 | 2026-10-25 | unknown | watch |
+| DHR | DHR/ | Danaher Corporation | US | 2026-10-25 | 2026-10-25 | compounder | hold |
+| DIA | DIA/ | DIA | US | 2026-10-25 | 2026-10-25 | unknown | watch |
+| DIS | DIS/ | Walt Disney Company (The) | US | 2026-10-25 | 2026-10-25 | unknown | watch |
+| DJT | DJT/ | DJT | US | 2026-10-25 | 2026-10-25 | unknown | watch |
+| DKNG | DKNG/ | DKNG | US | 2026-10-25 | 2026-10-25 | unknown | watch |
+| DLR | DLR/ | Digital Realty | US | 2026-10-25 | 2026-10-25 | unknown | watch |
 | DLTR | DLTR/ | Dollar Tree | US | 2026-07-29 | 2026-10-25 | unknown | watch |
 | DMLP | DMLP/ | Dorchester Minerals LP | US | 2026-07-09 | 2026-10-25 | unknown | watch |
 | DNN | DNN/ | DNN | US | 2026-07-29 | 2026-10-25 | unknown | watch |

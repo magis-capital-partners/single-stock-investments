@@ -1,4 +1,4 @@
-# TRC - Thematic context (2026-10-24)
+# TRC - Thematic context (2026-10-25)
 
 > Context only. Tailwinds inform stance and overlay sizing; they do not auto-inflate Lawrence base IRR. Promotion to base case requires [HUMAN REVIEW].
 
@@ -16,6 +16,6 @@
 | TPL water segment revenue (USD m, FY) | 307.5 | 2026-06-01 | n/a | flat | no (context) |
 | WTI crude (USD/bbl) | 103.2699966430664 | 2026-10-23 | +67.1% | up | no (context) |
 | Permian crude / oil-gas activity proxy | 107.1306 (stale) | 2026-08-01 | +9.2% | up | no (context) |
-| Hyperscaler capex guide (USD bn, latest) | 467.3 | 2026-10-24 | n/a | flat | no (context) |
+| Hyperscaler capex guide (USD bn, latest) | 467.3 | 2026-10-25 | n/a | flat | no (context) |
 
 Source panels: `_system/reference/market-data/themes/manifest.json`.
