@@ -116,4 +116,12 @@ Refresh the aggregate, hash-verified browser publication after a completed study
     node _system/scripts/build_third_plus_dashboard.cjs
     node _system/scripts/build_third_plus_dashboard.cjs --check
 
-The publication reads committed aggregate results only. It does not rerun the research, download market data, expose per-event licensed price outcomes, or connect to a broker. Research code tests and live strategy validation are displayed separately.
+The publication reads committed aggregate results and the hash-bound explanatory decision audit. It does not rerun the research, download market data, expose per-event licensed price outcomes, or connect to a broker. Research code tests and live strategy validation are displayed separately.
+
+### Candidate exclusions, sizing and full dashboard guide
+
+The dashboard now includes every one of the original 210 events for each of the 21 rules and nine cases, including failed/unknown signal gates and first execution/account rejection. A name search, reason selector and CSV downloads expose historical ticker, issuer and event date so repeated splits remain distinct. Each admitted position includes its initial modeled dollar exposure, all applied dollar ceilings, binding cap, concurrent account positions, planned exit and terminal exit state. Ten expandable guide sections explain signals, clocks, sizing, execution, costs, accounting, statistics and missing evidence.
+
+`fundamental_filters_v3/decision_audit.json` is a separate explanatory publication, not a new optimized study. Reproduce it offline with `node _system/scripts/build_third_plus_decision_audit.cjs --source-root <checkout-with-existing-local-study-cache>`, then rebuild the dashboard with `node _system/scripts/build_third_plus_dashboard.cjs`. The generator checks frozen engine and feature fingerprints, instruments a transient copy in memory, and requires exact equality of all stored position records and daily P&L paths for all 189 displayed models. The registered engine, research ledgers and outcome definitions are unchanged. Public content is limited to historical identities, categorical states and derived modeled sizing dollars; raw prices, volumes, quantities and per-event returns remain private.
+
+The audit explicitly identifies a material implementability gap: entry capacity depends on final entry-day volume while the assumed entry is at the opening auction. A quantity known before entry or timestamped intraday execution replay is required before live interpretation. The reference account assumes zero other-sleeve stress loss and does not replay SPX exposure.

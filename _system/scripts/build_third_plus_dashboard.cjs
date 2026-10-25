@@ -1,11 +1,12 @@
 #!/usr/bin/env node
 'use strict';
-// Publishes only aggregate research. No prices, per-event outcomes or broker data.
+// Publishes aggregates plus categorical event decisions and derived sizing dollars.
+// No raw prices, volumes, quantities, per-event returns or broker data.
 const fs=require('node:fs'),path=require('node:path'),crypto=require('node:crypto');
 const ROOT=path.resolve(__dirname,'../..'),STUDY='_system/data/reverse_splits/third_plus_signal_study/';
 const sha=x=>crypto.createHash('sha256').update(x).digest('hex');
 const read=n=>JSON.parse(fs.readFileSync(path.join(ROOT,STUDY,n),'utf8'));
-const SOURCE_FILES=['plan.json','saved_screens/third_plus_no_50pct_rally.summary.json','reconciliation_v2/summary.json','fundamental_filters_v3/summary.json','fundamental_filters_v3/manifest.json','fundamental_filters_v3/validation.json','fundamental_filters_v3/implementation_revision.json'];
+const SOURCE_FILES=['plan.json','saved_screens/third_plus_no_50pct_rally.summary.json','reconciliation_v2/summary.json','fundamental_filters_v3/summary.json','fundamental_filters_v3/manifest.json','fundamental_filters_v3/validation.json','fundamental_filters_v3/implementation_revision.json','fundamental_filters_v3/decision_audit.json','fundamental_filters_v3/experiment_register.json'];
 const CASES=[
  {id:'primary',label:'20 sessions · reference sizing',note:'$1m reference NAV; 1% participation; three-name limit; existing squeeze reserves.'},
  {id:'h10',label:'10 sessions · reference sizing',note:'Same account, costs and participation; common 20-session maturity exclusion.'},
@@ -24,6 +25,7 @@ function compact(s){
  return out;
 }
 function build(){
+ const audit=read('fundamental_filters_v3/decision_audit.json');
  const doc=read('fundamental_filters_v3/summary.json'),recon=read('reconciliation_v2/summary.json'),saved=read('saved_screens/third_plus_no_50pct_rally.summary.json'),plan=read('plan.json'),validation=read('fundamental_filters_v3/validation.json'),manifest=read('fundamental_filters_v3/manifest.json');
  const sourceHashes=Object.fromEntries(SOURCE_FILES.map(n=>[STUDY+n,sha(fs.readFileSync(path.join(ROOT,STUDY,n)))]));
  if(sourceHashes[STUDY+'fundamental_filters_v3/summary.json']!==manifest.outputs['summary.json'])throw new Error('Study summary does not match its manifest');
@@ -41,13 +43,16 @@ function build(){
  {title:'Compare fixed additions',value:doc.protocol.primary_tests+' added rules',detail:doc.validation.model_definitions+' model definitions; '+doc.validation.unique_replays+' unique replays. Keep account rules, clocks and costs comparable.'},
  {title:'Check what survives',value:doc.finalists.length+' validated additions',detail:'Require uncertainty, concentration, chronology, costs and exit obligations to pass. The highest historical profit is not an established optimum.'}
  ],
- rules,cases:CASES,models,coverage:doc.coverage,feature_rules:doc.protocol.feature_rules,profiles:doc.profiles,
+ rules,cases:CASES,models,audit,coverage:doc.coverage,feature_rules:doc.protocol.feature_rules,profiles:doc.profiles,
  reconciliation:{cash:recon.cash_numeric,cfo:recon.ttm_cfo_numeric,exact_share_growth:recon.share_growth_numeric,dilution_threshold:recon.share_threshold_resolved,stale_cash:recon.remaining_source_limitations.stale_cash_observations,stale_shares:recon.remaining_source_limitations.stale_share_observations,missing_entry:recon.no_original_entry_session,financial_reports:recon.financial_reports_recovered,current_reports:recon.financing_reports,transaction_reports:recon.full_transaction_reports,source_files:recon.validation.recovered_source_files_hash_verified,financing_adjusted_cash_verified:recon.all_210_financing_adjusted_cash_verified,independent_financing_reviews_complete:recon.all_210_independent_financing_reviews_complete},
  tests:{node_passed:validation.node_tests.passed,python_passed:validation.python_tests.passed,future_public_evidence:validation.future_public_evidence,baseline_replications:validation.baseline_replications.length,covered_positions_checked:validation.covered_control_position_checks,models:doc.validation.model_definitions,unique_replays:doc.validation.unique_replays,primary_claims:doc.protocol.primary_tests,validated_additions:doc.finalists.length},
  chronology:{quarters:doc.walk_forward.decisions.length,selected_additions:doc.walk_forward.decisions.filter(q=>q.arm!=='saved').length,minimum_training_issuers:30,net_pnl:doc.walk_forward.summary.net_pnl},
  issuer_removal_replays:doc.issuer_removal_replays.map(r=>({arm:r.arm,count:r.count,net_pnl:r.summary.net_pnl,open_positions:r.summary.open_positions})),
  verified_entries:doc.verified_execution.entered,production_authority:'none',source_hashes:sourceHashes,
  links:{report:'https://github.com/magis-capital-partners/single-stock-investments/blob/main/'+STUDY+'fundamental_filters_v3/REPORT.md',recommendation:'https://github.com/magis-capital-partners/single-stock-investments/blob/main/'+STUDY+'fundamental_filters_v3/RECOMMENDATION.md',protocol:'https://github.com/magis-capital-partners/single-stock-investments/blob/main/'+STUDY+'fundamental_filters_v3/protocol.json',reconciliation:'https://github.com/magis-capital-partners/single-stock-investments/blob/main/'+STUDY+'reconciliation_v2/REPORT.md'}};
+ if(audit.verification.frozen_manifest_sha256!==sourceHashes[STUDY+'fundamental_filters_v3/manifest.json']||audit.verification.experiment_register_sha256!==sourceHashes[STUDY+'fundamental_filters_v3/experiment_register.json']||audit.verification.engine_sha256!==manifest.freeze.code['_system/scripts/reverse_split_repeat_study.cjs']||audit.verification.features_sha256!==manifest.features_sha256)throw new Error('Decision audit source fingerprints do not match');
+ if(audit.schema!=='third_plus_decision_audit.v1'||audit.data_version!==doc.data_version||audit.events.length!==210||audit.verification.models!==189||audit.verification.positions_and_daily_paths_exact!==true)throw new Error('Incomplete decision audit');
+ for(const c of CASES)for(const r of rules){const m=models[c.id][r.id],a=audit.models[c.id]?.[r.id];if(!a||a.statuses.length!==210||a.statuses.some(s=>!s))throw new Error('Missing event decisions');for(const [key,n]of Object.entries(m.funnel)){if(key!=='selected'&&a.statuses.filter(s=>s===key).length!==n)throw new Error('Event audit does not reconcile: '+c.id+' / '+r.id+' / '+key);}if(a.statuses.filter(s=>!s.startsWith('signal_')).length!==m.funnel.selected)throw new Error('Audit selection mismatch');for(const [i,d]of Object.entries(a.details))if(a.statuses[i]==='entered'&&(!Number.isFinite(d.size?.notional)||!d.position||!d.size.binding.length))throw new Error('Missing admitted size');}
  if(data.cohort.events!==210||rules.length!==21||rules.some(r=>CASES.some(c=>!models[c.id][r.id])))throw new Error('Incomplete study publication');
  for(const byRule of Object.values(models))for(const m of Object.values(byRule)){
  if(Math.abs(m.monthly.reduce((sum,p)=>sum+p[1],0)-m.net_pnl)>.01)throw new Error('Monthly P&L does not reconcile');
@@ -58,7 +63,9 @@ function build(){
 }
 function publish(check=false){
  const doc=build(),body=JSON.stringify(doc)+'\n',file=path.join(ROOT,'dashboard/data/third_plus_study.json'),manifest=JSON.stringify({schema:'third_plus_dashboard_manifest.v1',data_version:doc.data_version,payload:'third_plus_study.json',sha256:sha(body)},null,2)+'\n',mf=path.join(ROOT,'dashboard/data/third_plus_study_manifest.json');
- if(check){if(fs.readFileSync(file,'utf8')!==body||fs.readFileSync(mf,'utf8')!==manifest)throw new Error('Dashboard study snapshot is stale');return;}
+ const D=require('../../dashboard/third-plus-study-details.js'),csvs=[['exclusions','decisions','selected_exclusions'],['all_decisions','decisions','all'],['sizing','sizes','entered']].map(([name,kind,filter])=>({file:path.join(ROOT,'dashboard/data/third_plus_dilution_primary_'+name+'.csv'),body:D.csv(doc,{rule:'dilution',case:'primary',auditFilter:filter},kind).replaceAll('\r\n','\n')}));
+ if(check){if(fs.readFileSync(file,'utf8')!==body||fs.readFileSync(mf,'utf8')!==manifest||csvs.some(c=>fs.readFileSync(c.file,'utf8')!==c.body))throw new Error('Dashboard study snapshot is stale');return;}
+ for(const c of csvs)fs.writeFileSync(c.file,c.body);
  fs.mkdirSync(path.dirname(file),{recursive:true});fs.writeFileSync(file,body);fs.writeFileSync(mf,manifest);console.log('Published '+doc.rules.length+' rules / '+doc.cases.length+' cases; '+Buffer.byteLength(body)+' bytes');
 }
 module.exports={build,publish,compact,CASES};
