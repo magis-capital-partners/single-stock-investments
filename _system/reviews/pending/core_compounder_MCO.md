@@ -1,7 +1,7 @@
 # Core compounder review: MCO
 
 Research only; pending human review.
-Proposal: `tci-a3f43fc729b0a542ca03`
+Proposal: `tci-02a05f028ec795244200`
 
 ## Evidence and underwriting gaps
 

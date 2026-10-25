@@ -1,7 +1,7 @@
 # Core compounder review: MA
 
 Research only; pending human review.
-Proposal: `tci-d5dd9b8ba341d6582610`
+Proposal: `tci-48fb4318e8f8805c9a6e`
 
 ## Evidence and underwriting gaps
 

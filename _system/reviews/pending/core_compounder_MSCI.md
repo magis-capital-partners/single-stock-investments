@@ -1,7 +1,7 @@
 # Core compounder review: MSCI
 
 Research only; pending human review.
-Proposal: `tci-828afdfa919804de5c55`
+Proposal: `tci-c25db0c4602067a55bf9`
 
 ## Evidence and underwriting gaps
 

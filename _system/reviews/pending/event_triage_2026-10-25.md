@@ -1,33 +1,46 @@
 # Event triage — human review queue
 
-**Date:** 2026-10-23
-**Rows:** 7121
+**Date:** 2026-10-25
+**Rows:** 7109
 
 | Date | Ticker | Source | Tier | Materiality | Rules | Title |
 |------|--------|--------|------|-------------|-------|-------|
-| 2026-10-23 | BB | news | context | 38 | rule_conflict, activist_cross_link, neutral_low_impact | BB Stock Slips Overnight: Retail Debates CEO's Share Sale Am |
-| 2026-10-23 | SBUX | news | context | 38 | rule_conflict, activist_cross_link, neutral_low_impact | Insider Selling: Starbucks (NASDAQ:SBUX) CEO Sells $58,800.0 |
-| 2026-10-23 | UNP | news | context | 38 | rule_conflict, activist_cross_link, neutral_low_impact | What Union Pacific (UNP) Said on Its Q3 Earnings Call - Mark |
-| 2026-10-23 | LUV | news | context | 38 | rule_conflict, activist_cross_link, neutral_low_impact | Southwest Airlines (LUV) Stock Climbs As Q3 Earnings Show Ma |
-| 2026-10-22 | T | news | context | 38 | rule_conflict, activist_cross_link, neutral_low_impact | 9-1-1 Service Outage for T-Mobile and AT&T Customers in Sant |
-| 2026-10-22 | SBUX | news | context | 38 | rule_conflict, activist_cross_link, neutral_low_impact | Starbucks international CEO sells $58,800 in common stock -  |
-| 2026-10-22 | SCHW | news | context | 38 | rule_conflict, activist_cross_link, neutral_low_impact | Charles Schwab (SCHW) Declares $0.32 Quarterly Dividend; 1.4 |
-| 2026-10-22 | UNP | news | context | 38 | rule_conflict, activist_cross_link, neutral_low_impact | Union Pacific Corporation (UNP) Stock Forecasts - Yahoo Fina |
-| 2026-10-22 | HAS | news | context | 38 | rule_conflict, activist_cross_link, neutral_low_impact | Hasbro CEO Chris Cocks breaks down the importance of play -  |
-| 2026-10-22 | APD | news | context | 38 | rule_conflict, activist_cross_link, neutral_low_impact | Air Products (APD) Declares $1.81 Quarterly Dividend; 2.4% Y |
-| 2026-10-22 | UNP | news | context | 38 | rule_conflict, activist_cross_link, neutral_low_impact | Union Pacific Releases Q3 2026 Financial Results - AlphaStre |
-| 2026-10-22 | APD | news | context | 38 | rule_conflict, activist_cross_link, neutral_low_impact | Air Products (APD) Declares $1.81 Quarterly Dividend - Tradi |
-| 2026-10-22 | T | news | context | 38 | rule_conflict, activist_cross_link, neutral_low_impact | 911 Outage Impacting T-Mobile and AT&T Customers in Santa Ba |
-| 2026-10-22 | T | news | context | 38 | rule_conflict, activist_cross_link, neutral_low_impact | Santa Barbara Police Report 911 Outage for AT&T and T-Mobile |
-| 2026-10-22 | CCI | news | context | 38 | rule_conflict, activist_cross_link, neutral_low_impact | Crown Castle's Q3 AFFO Beats Estimates on Lower Expenses |
-| 2026-10-22 | UNP | news | context | 38 | rule_conflict, activist_cross_link, neutral_low_impact | UNP Q3 Earnings Beat Estimates on Volume Growth, Pricing Gai |
-| 2026-10-22 | ROL | news | context | 38 | rule_conflict, activist_cross_link, neutral_low_impact | ROL's Q3 Earnings Miss Estimates on Weak Demand & Higher Cos |
-| 2026-10-22 | LUV | news | context | 38 | rule_conflict, activist_cross_link, neutral_low_impact | LUV Q3 Earnings Beat on Record Revenues and Higher Fares |
-| 2026-10-22 | HON | news | context | 38 | rule_conflict, activist_cross_link, neutral_low_impact | [Honeywell International Q3 2026 Earnings Call] Honeywell Te |
-| 2026-10-22 | HON | news | context | 38 | rule_conflict, activist_cross_link, neutral_low_impact | HON Q3 Earnings Beat on Automation Strength, Outlook Raised |
-| 2026-10-22 | UNP | news | context | 38 | rule_conflict, activist_cross_link, neutral_low_impact | Union Pacific (UNP) Reports Strong Q3 Results Amid Fuel Cost |
+| 2026-10-25 | VZ | news | context | 38 | rule_conflict, activist_cross_link, neutral_low_impact | Form 4 Verizon Communications : Kyle Malady (EVP and Group C |
+| 2026-10-25 | QCOM | news | context | 38 | rule_conflict, activist_cross_link, neutral_low_impact | How Investors May Respond To Qualcomm Stock Earnings Outlook |
+| 2026-10-24 | CTAS | news | context | 38 | rule_conflict, activist_cross_link, neutral_low_impact | What Cintas (CTAS)'s Raised Guidance Means For Shareholders  |
+| 2026-10-24 | UNP | news | context | 38 | rule_conflict, activist_cross_link, neutral_low_impact | Union Pacific Corporation: 3 Key Takeaways for Long-Term Inv |
+| 2026-10-24 | HON | news | context | 38 | rule_conflict, activist_cross_link, neutral_low_impact | Honeywell Technologies: 3 Key Takeaways for Long-Term Invest |
+| 2026-10-24 | HAS | news | context | 38 | rule_conflict, activist_cross_link, neutral_low_impact | Why Hasbro Stock Surged This Week |
+| 2026-10-24 | CVNA | news | context | 38 | rule_conflict, activist_cross_link, neutral_low_impact | Carvana's Reckoning Day on Oct. 28: Can Used-Car King Overco |
+| 2026-10-24 | MSFT | news | context | 38 | rule_conflict, activist_cross_link, neutral_low_impact | Microsoft's Azure Turbo: Beat on Revenue and Earnings, Raise |
+| 2026-10-24 | DG | news | context | 38 | rule_conflict, activist_cross_link, neutral_low_impact | Dollar General (DG) Could Be 7% Undervalued After Raised 202 |
+| 2026-10-24 | GOOGL | news | context | 38 | rule_conflict, activist_cross_link, neutral_low_impact | Alphabet Stock Forecast: GOOGL Breaks Triangle Support as Ca |
+| 2026-10-24 | AMZN | news | context | 38 | rule_conflict, activist_cross_link, neutral_low_impact | Amazon Spent More on Data Centers Last Quarter Than AWS Earn |
+| 2026-10-24 | MO | news | context | 38 | rule_conflict, activist_cross_link, neutral_low_impact | Earnings Outlook Change The Bull Case For Altria Stock (MO)? |
+| 2026-10-24 | UNP | news | context | 38 | rule_conflict, activist_cross_link, neutral_low_impact | How Earnings Beat At Union Pacific Stock Has Changed Its Inv |
+| 2026-10-23 | UNP | news | context | 38 | rule_conflict, activist_cross_link, neutral_low_impact | Union Pacific (NYSE:UNP) Share Price, Forecast & Analysis -  |
+| 2026-10-23 | AVY | news | context | 38 | rule_conflict, activist_cross_link, neutral_low_impact | Avery Dennison (AVY) Declares $1.00 Quarterly Dividend; 2.2% |
+| 2026-10-23 | T | news | context | 38 | rule_conflict, activist_cross_link, neutral_low_impact | Stock Market Today, Oct. 23: AT&T Slides on SpaceX Cell-Site |
+| 2026-10-23 | ACA | news | context | 38 | rule_conflict, activist_cross_link, neutral_low_impact | A director exchanges shares for $150 each in Arcosa (ACA)'s  |
+| 2026-10-23 | ACA | news | context | 38 | rule_conflict, activist_cross_link, neutral_low_impact | A director returns 17,931 Arcosa (ACA) shares for $150 each  |
+| 2026-10-23 | ACA | news | context | 38 | rule_conflict, activist_cross_link, neutral_low_impact | At $150 per share, Arcosa (ACA) CEO disposes of shares under |
+| 2026-10-23 | WELL | news | context | 38 | rule_conflict, activist_cross_link, neutral_low_impact | Did Dividend Increase Just Shift Welltower (WELL) Investment |
+| 2026-10-23 | UNP | news | context | 38 | rule_conflict, activist_cross_link, neutral_low_impact | Union Pacific (UNP) Stock Slips Even As Q3 Earnings Power Im |
+| 2026-10-23 | TFC | news | context | 38 | rule_conflict, activist_cross_link, neutral_low_impact | Truist Financial (TFC) Tests Its Valuation As Results Guidan |
+| 2026-10-23 | CSGP | news | context | 38 | rule_conflict, activist_cross_link, neutral_low_impact | CoStar Group to Report Q3 Earnings: What's in Store for the  |
+| 2026-10-23 | CHRW | news | context | 38 | rule_conflict, activist_cross_link, neutral_low_impact | C.H. Robinson Gears Up for Q3 Earnings: What's in Store for  |
+| 2026-10-23 | CTAS | news | context | 38 | rule_conflict, activist_cross_link, neutral_low_impact | Cintas (CTAS) Up 13.3% Since Last Earnings Report: Can It Co |
+| 2026-10-23 | GE | news | context | 38 | rule_conflict, activist_cross_link, neutral_low_impact | Constellation Energy vs. GE Vernova: Which Utilities Stock I |
+| 2026-10-23 | UNP | news | context | 38 | rule_conflict, activist_cross_link, neutral_low_impact | StoneX Reiterates Buy Rating on Union Pacific (UNP) - Street |
+| 2026-10-23 | CRM | news | context | 38 | rule_conflict, activist_cross_link, neutral_low_impact | Salesforce vs. Snowflake: Which Technology Stock Is a Better |
+| 2026-10-23 | HON | news | context | 38 | rule_conflict, activist_cross_link, neutral_low_impact | HON Q3 Earnings Call Highlights Higher Outlook and Energy De |
+| 2026-10-23 | JOE | vic_research | context | 7 | rule_conflict, activist_cross_link, entity_mismatch, neutral_low_impact, subject | 01-Douglas-Dynamics |
+| 2026-10-23 | JOE | vic_research | context | 7 | rule_conflict, activist_cross_link, entity_mismatch, neutral_low_impact, subject | 01-cleveland-cliffs |
+| 2026-10-23 | JOE | vic_research | context | 7 | rule_conflict, activist_cross_link, entity_mismatch, neutral_low_impact, subject | 01-greencore-group |
+| 2026-10-23 | JOE | vic_research | context | 7 | rule_conflict, activist_cross_link, entity_mismatch, neutral_low_impact, subject | 01_ICT_International_Container_Terminal_Services_Inc |
+| 2026-10-23 | JOE | vic_research | context | 7 | rule_conflict, activist_cross_link, entity_mismatch, neutral_low_impact, subject | 02-polypid |
 | 2026-10-21 | GOOGL | video_research | context | 5 | rule_conflict, activist_cross_link, entity_mismatch, neutral_low_impact, subject | Eric Schmidt: Are We Ready for Superintelligence? | Podcast  |
-| 2026-10-16 | PL | insider | context | 48 | neutral_low_impact, insider_materiality, subject_unverified | Robinson Kristen: sale in unverified issuer |
+| 2026-10-16 | PL | insider | context | 47 | neutral_low_impact, insider_materiality, subject_unverified | Robinson Kristen: sale in unverified issuer |
 | 2026-10-14 | PL | insider | context | 35 | neutral_low_impact, insider_materiality, subject_unverified | Raymond John w: sale in unverified issuer |
 | 2026-10-11 | BUR | vic_research | context | 27 | rule_conflict, activist_cross_link, neutral_low_impact | 07-BURFORD-CAPITAL-BUR-4694552095_151e |
 | 2026-10-11 | BUR | vic_research | context | 27 | rule_conflict, activist_cross_link, neutral_low_impact | VIC PDF intake - BUR - BUR VIC PDF |
@@ -141,11 +154,6 @@
 | 2026-10-11 | O | third_party | context | 21 | rule_conflict, activist_cross_link, neutral_low_impact | Verdad Capital — Biotech Investing (Obenshain, Rasmussen, Wi |
 | 2026-10-11 | QDEL | third_party | context | 21 | rule_conflict, activist_cross_link, neutral_low_impact | McIntyre Partnerships |
 | 2026-10-11 | COF | third_party | context | 21 | rule_conflict, activist_cross_link, neutral_low_impact | Teleios Capital — PX14A6G |
-| 2026-10-11 | JOE | vic_research | context | 5 | rule_conflict, activist_cross_link, entity_mismatch, neutral_low_impact, subject | 01-Douglas-Dynamics |
-| 2026-10-11 | JOE | vic_research | context | 5 | rule_conflict, activist_cross_link, entity_mismatch, neutral_low_impact, subject | 01-cleveland-cliffs |
-| 2026-10-11 | JOE | vic_research | context | 5 | rule_conflict, activist_cross_link, entity_mismatch, neutral_low_impact, subject | 01-greencore-group |
-| 2026-10-11 | JOE | vic_research | context | 5 | rule_conflict, activist_cross_link, entity_mismatch, neutral_low_impact, subject | 01_ICT_International_Container_Terminal_Services_Inc |
-| 2026-10-11 | JOE | vic_research | context | 5 | rule_conflict, activist_cross_link, entity_mismatch, neutral_low_impact, subject | 02-polypid |
 | 2026-10-11 | ACHR | vic_research | context | 5 | rule_conflict, activist_cross_link, entity_mismatch, neutral_low_impact, subject | 01_Archer_4955058434_000e |
 | 2026-10-11 | DASH | vic_research | context | 5 | rule_conflict, activist_cross_link, entity_mismatch, neutral_low_impact, subject | 04-Yelp |
 | 2026-10-11 | TMUS | vic_research | context | 5 | rule_conflict, activist_cross_link, entity_mismatch, neutral_low_impact, subject | 13-Helios-Towers |
@@ -197,11 +205,3 @@
 | 2026-10-11 | WELL | third_party | context | 4 | rule_conflict, activist_cross_link, entity_mismatch, neutral_low_impact, subject | HoldCo Asset Management — DEFA14A |
 | 2026-10-11 | RKLB | third_party | context | 4 | rule_conflict, activist_cross_link, entity_mismatch, neutral_low_impact, subject | Bessemer Venture Partners VIII Institutional ... — SC 13D/A |
 | 2026-10-11 | RKLB | third_party | context | 4 | rule_conflict, activist_cross_link, entity_mismatch, neutral_low_impact, subject | Khosla Ventures Seed Associates B, LLC — SC 13D/A |
-| 2026-10-11 | MRK | third_party | context | 4 | rule_conflict, activist_cross_link, entity_mismatch, neutral_low_impact, subject | Teleios Capital — PX14A6G |
-| 2026-10-11 | MRK | third_party | context | 4 | rule_conflict, activist_cross_link, entity_mismatch, neutral_low_impact, subject | Elliott Management — PX14A6G |
-| 2026-10-11 | MPWR | third_party | context | 4 | rule_conflict, activist_cross_link, entity_mismatch, neutral_low_impact, subject | Oct 9, 2019 |
-| 2026-10-11 | MP | third_party | context | 4 | rule_conflict, activist_cross_link, entity_mismatch, neutral_low_impact, subject | JHL Capital Group — SC 13D/A |
-| 2026-10-11 | MP | third_party | context | 4 | rule_conflict, activist_cross_link, entity_mismatch, neutral_low_impact, subject | QVT (+4) — SC 13D/A |
-| 2026-10-11 | BB | third_party | context | 4 | rule_conflict, activist_cross_link, entity_mismatch, neutral_low_impact, subject | HoldCo Asset Management — SC 13D/A |
-| 2026-10-11 | SYY | third_party | context | 4 | rule_conflict, activist_cross_link, entity_mismatch, neutral_low_impact, subject | Trian Partners — DEFA14A |
-| 2026-10-11 | SYY | third_party | context | 4 | rule_conflict, activist_cross_link, entity_mismatch, neutral_low_impact, subject | Trian Partners — SC 13D/A |
