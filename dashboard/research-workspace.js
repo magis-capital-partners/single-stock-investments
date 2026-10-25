@@ -179,6 +179,6 @@
     root._rwObserver.observe(root, { childList: true, subtree: true });
     return current;
   }
-  global.ResearchWorkspace = {number, metrics, metricValue, friendlyAction, scrollToTarget, range, scenarios, kpis, section, overview, normalize, mount, validTab, activeTab:()=>current?.tab || 'overview', activate:(tab)=>current?.activate(tab), rememberScroll:()=>{ if(current){ const state=states.get(current.ticker); if(state) { state.scroll[current.tab]=current.root.scrollTop; state.open ||= {}; state.open[current.tab]=[...current.root.querySelectorAll('.rw-panel:not([hidden]) > details[open] > summary')].map(el=>el.textContent); } } }};
+  global.ResearchWorkspace = {number, metrics, metricValue, friendlyAction, scrollToTarget, range, scenarios, kpis, section, overview, normalize, mount, validTab, activeTab:()=>current?.tab || 'overview', activate:(tab)=>current?.activate(tab), rememberScroll:()=>{ if(current?.root.querySelector('.rw-panel:not([hidden])')){ const state=states.get(current.ticker); if(state) { state.scroll[current.tab]=current.root.scrollTop; state.open ||= {}; state.open[current.tab]=[...current.root.querySelectorAll('.rw-panel:not([hidden]) > details[open] > summary')].map(el=>el.textContent); } } }};
   if (typeof module !== 'undefined') module.exports = global.ResearchWorkspace;
 })(typeof window !== 'undefined' ? window : globalThis);
