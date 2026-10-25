@@ -1,0 +1,230 @@
+{
+  "schema": "third_plus_signal_study.protocol.v1",
+  "frozen_at": "2026-10-23T21:37:39.532Z",
+  "plan_sha256": "32fe47ce7a7a8be43dba365de029b9f61904f84f6124dd61872fe7fc1790abb1",
+  "plan": {
+    "schema_version": "third_plus_signal_study_plan.v1",
+    "status": "planned_not_executed",
+    "created_date_ET": "2026-10-23",
+    "purpose": "Find incremental signals that improve net, feasible third-and-later reverse-split shorts while controlling tail loss and data selection.",
+    "baseline_summary": "_system/data/reverse_splits/repeat_magnitude_study/summary.json",
+    "baseline_definition": {
+      "minimum_documented_ordinal": 3,
+      "count_by": "SEC issuer ID; distinct effective dates; prior actions publicly known before decision",
+      "supplemented_candidates": 210,
+      "issuers": 119,
+      "provider_only_sensitivity": 196,
+      "target_dollars": 25000,
+      "one_open_position_per_issuer": true,
+      "entry": "First eligible session after effective-day close and source availability + five minutes; features frozen before order submission."
+    },
+    "primary_horizon_sessions": 20,
+    "replication_horizon_sessions": 10,
+    "primary_sizing": "Conditional 1% prior share ADV and recorded execution-volume caps; 0.1% and 5% sensitivities; full $25k is a separate benchmark.",
+    "decision_labels": [
+      "research_candidate",
+      "insufficient_evidence",
+      "rejected",
+      "forward_shadow_candidate"
+    ],
+    "signals": [
+      {
+        "id": "S1",
+        "name": "Cash pressure",
+        "rule": "Negative TTM operating cash flow and cash runway below six months.",
+        "requirements": "As-filed unrestricted cash, consistent currency and public-clock evidence; adjust for confirmed cash proceeds/uses since the balance date without double counting. Unknown pro forma funding => runway unknown.",
+        "status": "Cached raw runway coverage 142/210; 141 satisfy the initial freshness/public-clock check; pro forma audit pending."
+      },
+      {
+        "id": "S2",
+        "name": "Recent dilutive financing",
+        "rule": "Completed equity-linked financing publicly disclosed in the preceding 60 calendar days, with independently reconciled issuance/security class.",
+        "requirements": "Distinguish actual issuance and saleable supply from authorization, registration capacity, amendments and boilerplate; preserve transaction IDs, cash proceeds, lockups and availability dates.",
+        "status": "48 cached source leads and 137 provider flags; zero independently verified terms. Audit required before selection."
+      },
+      {
+        "id": "S3",
+        "name": "Rapid repeat splitting",
+        "rule": "Previous distinct reverse split effective no more than 180 calendar days before the current split.",
+        "requirements": "Same issuer and security class; deduplicate date conflicts; incomplete earlier history remains flagged.",
+        "status": "Derivable from existing action catalogues; historical identity review pending."
+      },
+      {
+        "id": "S4",
+        "name": "Actual share dilution",
+        "rule": "At least 25% growth in split-adjusted end-of-period common shares over the preceding six months.",
+        "requirements": "Use latest public comparable observations; prior observation within 150–240 days of latest period; same share class, consolidated basis and denominator type. Never mix weighted-average EPS shares or double-adjust restated shares.",
+        "status": "Extract from cached filing facts; coverage and restatement audit pending."
+      },
+      {
+        "id": "S5",
+        "name": "Weak split-day close",
+        "rule": "Completed effective-day close below its open and in the bottom quarter of the day's high-low range.",
+        "requirements": "Only use a complete public bar before entry. Missing or zero-range bars are unknown. Next eligible session entry; no intrabar or VWAP claims.",
+        "status": "Existing daily nominal bars; must validate price provenance and action units."
+      },
+      {
+        "id": "S6",
+        "name": "Existing price weakness",
+        "rule": "Mechanically adjusted close-to-close return over the last 20 completed sessions at or below -20%.",
+        "requirements": "All observations precede submission; full split/ADS adjustment path; no total-return claim without distributions.",
+        "status": "Existing daily cache; missing intervals and action conflicts remain unknown."
+      },
+      {
+        "id": "S7",
+        "name": "Squeeze-risk veto",
+        "rule": "Skip if any mechanically adjusted close-to-close rise in the last five completed sessions was at least 50%.",
+        "requirements": "Uses only prior observations; no exclusions based on subsequent squeezes or named losing stocks.",
+        "status": "Existing daily cache; hypothesis rather than an established safeguard.",
+        "pass_semantics": "S7 passes when the veto condition is NOT triggered; missing five-session history is unknown, not safe."
+      }
+    ],
+    "combinations": [
+      {
+        "id": "C1",
+        "rule": "S1 AND S2"
+      },
+      {
+        "id": "C2",
+        "rule": "S1 AND S2 AND S7 passes"
+      },
+      {
+        "id": "C3",
+        "rule": "S1 AND S2 AND S5 AND S7 passes"
+      },
+      {
+        "id": "C4",
+        "rule": "S5 AND S6 AND S7 passes"
+      }
+    ],
+    "comparator_arms": [
+      "Third-plus only",
+      "Third-plus plus existing score>=60"
+    ],
+    "core_arm_count": 13,
+    "primary_incremental_tests": 11,
+    "threshold_policy": "One fixed threshold per signal; no outcome-driven grid. Any alternative threshold requires a dated amendment and is explicitly another tested hypothesis.",
+    "controls": [
+      "As-of split magnitude",
+      "Ordinal 3 versus 4+",
+      "Calendar year",
+      "Log pre-entry price and liquidity",
+      "Financial coverage and filing age",
+      "Venue/security-class identity"
+    ],
+    "missing_data": "Three states: pass/fail/unknown. Feature-specific covered-universe baseline and full-universe exclusion funnel; absence of cached evidence is not a negative fact.",
+    "chronology": {
+      "seed": "2023–2024: 43 raw candidates",
+      "diagnostics": [
+        "2025: 73 raw candidates",
+        "2026: 94 raw candidates"
+      ],
+      "walk_forward": "Select at most two rules using only prior completed labels; quarter-by-quarter replay. At least 30 training issuers; otherwise retain baseline. Purge unfinished/overlapping label paths and embargo at least 20 sessions. Unresolved outcomes never become completed training labels.",
+      "historical_status": "All these years are already explored development history. No retrospective split is described as an untouched holdout.",
+      "prospective": "Freeze selected rules and hashes before the first future enrollment; an outcome never examined after registration is the real validation."
+    },
+    "execution": {
+      "primary": "Conditional daily proxies; 1% share ADV participation; 0.1% and 5% reported separately. Prior share ADV in entry-day units. Current-day volume constrains simulated execution only and is not a pre-entry predictor.",
+      "borrow": "No historical approved quantity reconstructed from ADV. Verified-borrow replay stays zero until timestamped evidence exists. Log locate fee, APR, quantity, recalls and loan return prospectively.",
+      "costs": "Reuse existing 20/50/150% APR and execution/depth scenarios; frozen dated fee schedule. Report missing dividends, servicing, locate and recall obligations; do not rank on a zero-cost benchmark.",
+      "SSR": "Strict restricted/unknown skip comparator; passive-compliant conditional route only with adequate quote/execution evidence. Never assume any auction or VWAP order is automatically exempt.",
+      "accounting": "Retain delayed/fractional covers, unresolved liabilities, mechanical actions, stale marks and post-cover loan carry; do not drop unavailable exits.",
+      "risk": "Use identical declared research-account constraints for every rule; production policy stays frozen. Reuse current +200% price-rise stress, 0.5% NAV per-name loss reserve and 2% NAV sleeve reserve: nominal per-name <=0.25% NAV and aggregate sleeve <=1% NAV before other strategy reservations. Full $25k is a separate hypothetical benchmark. Verified execution and thesis/cost gates are reported separately, not silently relaxed.",
+      "sensitivity_nav": [
+        500000,
+        1000000,
+        5000000,
+        10000000
+      ],
+      "SPX": "Offline analysis only. No Gateway calls, production policy edits, automatic orders or new recurring sessions."
+    },
+    "reporting": [
+      "Incremental net portfolio P&L and capital use versus same-policy baseline",
+      "Same-covered-universe comparisons to separate feature effect from missingness",
+      "Trade/issuer counts, filled dollars, coverage and all rejections",
+      "Issuer and calendar-block uncertainty on incremental results",
+      "Worst trade/day, drawdown, per-trade adverse excursion and high-price stress",
+      "Closed versus unresolved P&L and liability aging",
+      "2025/2026 diagnostics; new versus returning issuers",
+      "Leave-best-issuer and leave-best-five-issuers concentration checks",
+      "Source/action/timestamp sensitivity; provider-only history sensitivity",
+      "Holm adjustment across 11 primary incremental claims; log every secondary experiment"
+    ],
+    "promotion": {
+      "historical_minimum": "At least 30 independent issuers in the selected evaluable sample; smaller cells remain descriptive.",
+      "required": "Positive incremental net result under realistic modeled capacity, uncertainty and family-wise correction; no deterioration in declared tail budget; not dependent on one winner, missing exits or one calendar block. Report trade count and capital reduction alongside total P&L.",
+      "forward_gate": "At least 50 independently sourced eligible issuer decisions and 30 different issuers, with a fully logged shadow execution ledger; this is a minimum review point, not statistical proof. Extend enrollment until precision on realized net edge and tail loss is adequate. No automatic production promotion."
+    },
+    "sequence": [
+      "Reproduce previous baseline and lock source hashes, protocol and experiment register.",
+      "Audit as-of feature coverage; reconcile financing flags, actual proceeds, share units and prior actions.",
+      "Run seven single signals and four fixed combinations against both baselines, with shared maturity/exit rules.",
+      "Apply chronological diagnostics, uncertainty, multiple-test correction and capacity/tail comparisons; retain at most two research finalists.",
+      "Test a separate delayed-confirmation timing arm and conservative next-session-open risk exits only for finalists, with matching delay/exit baselines; do not assume stop prices fill through gaps.",
+      "Freeze a forward shadow protocol and enrollment ledger; no live orders or scheduled broker collection."
+    ],
+    "new_market_data_budget_USD": 0,
+    "unavailable_features": [
+      "Reliable historical float/short interest",
+      "Borrow utilization or recall probability",
+      "Intraday VWAP/queue fills across all events",
+      "Historical social-media hype",
+      "Verified future catalyst calendars"
+    ],
+    "data_outputs_public": "Aggregated results and protocol only; licensed per-event returns and source ledgers remain local.",
+    "primary_objective": "Maximize incremental net portfolio P&L at the same account capital and stress budget, subject to no worse declared tail-loss/drawdown limit; report the profit/drawdown/capacity frontier. Improved mean return alone is not success.",
+    "diagnostics_required": [
+      "Ordinal 3, 4 and 5+ strata; these are descriptive controls, not extra thresholds selected after seeing returns.",
+      "Cached financing flag versus independently reconciled deal; post-financing pro forma runway versus stale reported runway.",
+      "Stricter data-identity and source-clock versions; repairs known only later cannot become decision features."
+    ]
+  },
+  "implementation": {
+    "primary": {
+      "horizon": 20,
+      "cost": "base",
+      "cap": 0.01,
+      "nav": 1000000,
+      "maximumNames": 3,
+      "ssrMode": "strict",
+      "causalCarry": true
+    },
+    "replication_horizon": 10,
+    "common_maturity_sessions": 20,
+    "primary_new_claims": 11,
+    "core_arms": [
+      "baseline",
+      "score60",
+      "S1",
+      "S2",
+      "S3",
+      "S4",
+      "S5",
+      "S6",
+      "S7",
+      "C1",
+      "C2",
+      "C3",
+      "C4"
+    ],
+    "amendment_before_new_returns": [
+      "Use a declared $1m reference NAV for the fixed-budget primary; it is not an assertion about the user account.",
+      "Restricted/unknown SSR is skipped in the primary. Legacy 50% passive capture is an unsupported execution sensitivity, not verified fills.",
+      "Source leads remain unverified until two independent outcome-blinded source-bound reviews are imported.",
+      "No historical research promotion while any selected position is unresolved; this is a stricter evidence gate, not an inferred zero-value exit.",
+      "A 20% completed-close risk exit and up-to-three-bar failed-rebound test are implemented, but run only for finalists.",
+      "S1 is conditional on cached funding coverage; any observed unresolved financing blocks pro forma selection."
+    ],
+    "rule_thresholds": "Exactly the seven original fixed thresholds; no threshold search."
+  },
+  "source_hashes": {
+    "_system/scripts/third_plus_signal_study.cjs": "e7fbf289342bfc151e76e369a53f9eb0126f3d96f6588c33b328e5841bd5be18",
+    "_system/scripts/third_plus_signal_study.test.cjs": "b0c2e443f9d7f92fbad82af4c445e64911b179c83e598ed71f21b54205ea9ee3",
+    "_system/scripts/reverse_split_repeat_study.cjs": "e89d039068ecbb3e2d2bc558abb531fbe1c247dc19fb6f139d55f3be03ee5cdd",
+    "_system/scripts/third_plus_signal/features.cjs": "07496db3bd9747bdc229a94fea7eb93b475dd4f5bd8fac4bc43c2cc16737cae1",
+    "_system/scripts/third_plus_signal/statistics.cjs": "d48bfd29983c5d6566d11a607058fce3440ae7ead443ce2d564af6058e0042d5",
+    "_system/scripts/third_plus_signal/engine.cjs": "cd4670797a688836ed830e2b22c7e6a8fb2660ec681a015c88baf60e18c49ea7",
+    "_system/scripts/third_plus_signal/forward.cjs": "bd67aef77139d880aa9564238ac477b7261a31967701c5de7375b4141f08e14c",
+    "_system/scripts/third_plus_signal/report.cjs": "907a1e28bb551697fdb5e61fd850d54c5f8a21d33d446a31bbcd6d0061fc7f7c"
+  }
+}
