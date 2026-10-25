@@ -31,6 +31,15 @@ test('historical series are explicitly separated from current signals',()=>{
  assert.match(rw.kpis(t,h,Infinity,true),/Historical series · not a current signal/);
  assert.match(rw.kpis(t,h,Infinity,true),/stale/);
 });
+test('cleared series and dated observations are not duplicated as uncleared history',()=>{
+ const current = {...metric,label:'Current revenue'};
+ const past = {...metric,label:'Historical margin',display:false,stale:true};
+ const t = {kpi_trends:{metrics:[current,past]}};
+ const historical = rw.kpis(t,h,Infinity,true);
+ assert.match(historical,/Historical margin/); assert.doesNotMatch(historical,/Current revenue/);
+ assert.match(rw.kpis({kpi_trends:{metrics:[current]}},h,Infinity,true),/No additional historical/);
+ assert.match(rw.kpis({compounder_monitor:{kpi_coverage:[{status:'current',value:10}]}},h,Infinity,true),/No additional historical/);
+});
 test('a present value never becomes a forward-return figure',()=>{
  const t={valuation_decision:{output_basis:'present_value_today',return_publishable:false,value_per_share:{low:70,base:100,high:150},price_per_share:80,annualized_return_at_price_pct:{base:42},forward_return_reason:'Dated cash flows required'}};
  const html=rw.range(t,h); assert.match(html,/Forward return/); assert.match(html,/Unavailable/); assert.doesNotMatch(html,/42%/); assert.match(html,/Price date missing/);

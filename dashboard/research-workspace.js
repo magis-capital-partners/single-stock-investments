@@ -36,8 +36,10 @@
     return h.linkHtml(url, 'Source');
   }
   function kpis(t, h, limit = Infinity, historical = false) {
-    const rows = historical ? (t.kpi_trends?.metrics || []).filter(m => !m.composite && !m.artifact && (m.points || []).filter(p => number(p.value) != null).length >= 2).slice(0,limit) : metrics(t, limit);
+    const cleared = new Set(metrics(t));
+    const rows = historical ? (t.kpi_trends?.metrics || []).filter(m => !cleared.has(m) && !m.composite && !m.artifact && (m.points || []).filter(p => number(p.value) != null).length >= 2).slice(0,limit) : [...cleared].slice(0,limit);
     if (!rows.length) {
+      if (historical) return '<p class="rw-empty">No additional historical KPI series. Cleared series are shown above.</p>';
       const observations = (t.compounder_monitor?.kpi_coverage || []).filter(m => m.status === 'current' && number(m.value) != null).slice(0,limit);
       if (observations.length) return `<div class="rw-kpis">${observations.map(m => `<article class="rw-kpi"><h4>${h.escapeHtml(text(m.kpi_id))}</h4><div class="rw-kpi-number">${new Intl.NumberFormat(undefined,{notation:'compact',maximumFractionDigits:2}).format(Number(m.value))}</div><p>${h.escapeHtml(text(m.unit || 'unit unspecified'))}</p><p class="rw-meta">${h.escapeHtml(date(m.period))} · ${sourceLink(m.source?.ref,h)}</p><p class="rw-meta">Latest observation · trend unavailable</p></article>`).join('')}</div>`;
       return '<p class="rw-empty">No current, comparable KPI series is cleared for display. Operating-driver observations and gaps are retained in Business &amp; KPIs.</p>';
