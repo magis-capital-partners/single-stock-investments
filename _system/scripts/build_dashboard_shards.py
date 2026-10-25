@@ -54,6 +54,7 @@ DETAIL_ONLY_FIELDS = (
     "investment_committee",
     "human_review",
     "decision_summary",
+    "classification_audit",
 )
 
 # Top-level payload keys that stay out of core.json (fetched lazily instead).
@@ -204,6 +205,11 @@ def _slim_essential_insights(essential: dict) -> dict:
 def slim_ticker_row(row: dict) -> dict:
     """Trim a full dashboard row down to what the holdings table needs."""
     slim = {k: v for k, v in row.items() if k not in DETAIL_ONLY_FIELDS}
+    readiness = row.get("irr_readiness")
+    if isinstance(readiness, dict):
+        slim["irr_readiness"] = {k: readiness[k] for k in
+            ("as_of", "status", "blocked_count", "diagnostic_math_complete", "work_group", "next_action") if k in readiness}
+    slim.pop("return_claim_audit", None)
     essential = row.get("essential_insights")
     if isinstance(essential, dict):
         slim["essential_insights"] = _slim_essential_insights(essential)
@@ -401,6 +407,8 @@ def write_insights_shards(insights_doc: dict | None, data_dir: Path) -> int:
     insights_dir.mkdir(parents=True, exist_ok=True)
     if not isinstance(insights_doc, dict):
         return 0
+    from refresh_research_integrity import reconcile_insight_payload
+    insights_doc = reconcile_insight_payload(insights_doc)
     sharded_keys = {k for keys in INSIGHTS_SHARDS.values() for k in keys}
     existing = recover_insight_manifest(insights_dir)
     if is_publishable_manifest(insights_doc):
@@ -539,6 +547,16 @@ def write_shards(payload: dict, insights_doc: dict | None, data_dir: Path) -> di
         refuse_infra_collapse(payload, prior_rows)
         refuse_research_collapse(payload, prior_rows)
         refuse_valuation_collapse(payload, prior_rows)
+    from research_integrity import gate_return_claims
+    for row in payload.get("tickers") or []:
+        gate_return_claims(row)
+    companies = [r["irr_readiness"] for r in payload.get("tickers") or [] if (r.get("irr_readiness") or {}).get("requirements")]
+    if companies and len(companies) == len(payload.get("tickers") or []):
+        from datetime import date
+        from build_irr_readiness import report_for_companies
+        report = report_for_companies(companies, date.fromisoformat(companies[0]["as_of"]))
+        (data_dir / "irr_readiness.json").write_text(_dump(report), encoding="utf-8")
+        payload.setdefault("summary", {})["irr_readiness"] = report["summary"]
     core = build_core_payload(payload)
     core_path.write_text(_dump(core), encoding="utf-8")
     ticker_count = write_ticker_shards(payload, data_dir)

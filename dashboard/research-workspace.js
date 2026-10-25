@@ -32,7 +32,8 @@
   }
   function sourceLink(ref, h) {
     if (!ref) return '';
-    const url = /^https?:\/\//i.test(ref) ? ref : `https://github.com/${h.ghRepo || 'magis-capital-partners/single-stock-investments'}/blob/main/${String(ref).split('/').map(encodeURIComponent).join('/')}`;
+    const [path, fragment] = String(ref).split('#', 2);
+    const url = /^https?:\/\//i.test(ref) ? ref : `https://github.com/${h.ghRepo || 'magis-capital-partners/single-stock-investments'}/blob/main/${path.split('/').map(encodeURIComponent).join('/')}${fragment ? '#' + encodeURIComponent(fragment) : ''}`;
     return h.linkHtml(url, 'Source');
   }
   function kpis(t, h, limit = Infinity, historical = false) {
@@ -76,7 +77,20 @@
     const d = decision(t), committee = t.valuation_workbench?.committee || {}, e = h.escapeHtml;
     const meta = global.ValuationViz?.modelLevelMeta(d.model_level,d.status) || {label:text(d.model_level || d.status || 'unmodeled'),cls:'badge-warn'};
     const owner = committee.owner_status || 'pending';
-    return `<div class="rw-status"><span>Stance <strong>${e(t.classification?.stance || 'unassigned')}</strong></span>${t.human_review?.approved_stance ? `<span>Owner stance <strong>${e(t.human_review.approved_stance)}</strong></span>` : ''}<span>Readiness <strong class="badge ${meta.cls}">${e(meta.label)}</strong></span><span>Owner <strong>${e(text(owner))}</strong></span></div>`;
+    return `<div class="rw-status"><span>Stance <strong>${e(t.classification?.stance || 'unassigned')}</strong></span>${t.human_review?.approved_stance ? `<span>Owner stance <strong>${e(t.human_review.approved_stance)}</strong></span>` : ''}<span>Model <strong class="badge ${meta.cls}">${e(meta.label)}</strong></span><span>IRR <strong>${t.irr_readiness?.status === 'ready' ? 'Ready' : 'Inputs or review missing'}</strong></span><span>Owner <strong>${e(text(owner))}</strong></span></div>`;
+  }
+  function irrReadiness(t,h) {
+    const readiness = t.irr_readiness, e = h.escapeHtml;
+    if (!readiness?.requirements) return '<p class="rw-empty">IRR checklist unavailable. A model label alone does not establish return readiness.</p>';
+    const requirements = readiness.requirements, completed = requirements.filter(r=>r.status === 'ready').length;
+    const gaps = requirements.filter(r=>r.status !== 'ready');
+    return `<section class="rw-irr-checklist"><div class="rw-value-heading"><h3>What is missing for an IRR?</h3><span class="rw-meta">${completed} of ${requirements.length} checks complete · ${e(date(readiness.as_of))}</span></div><div class="rw-irr-progress" role="img" aria-label="${completed} of ${requirements.length} IRR checks complete">${requirements.map(r=>`<span class="${r.status==='ready'?'complete':'missing'}" title="${e(r.label)}: ${r.status==='ready'?'complete':'missing'}"></span>`).join('')}</div><p>${e(readiness.next_action || '')}</p><p class="rw-meta">${readiness.diagnostic_math_complete ? 'A numerical scenario sensitivity exists; underwriting and publication checks still apply.' : 'No complete numerical scenario sensitivity is available.'}</p><details class="rw-section"><summary>${gaps.length ? `${gaps.length} missing checks` : 'All checks complete'} · view evidence and next steps</summary><ol class="rw-irr-steps">${requirements.map(r=>`<li><strong>${r.status==='ready'?'Complete':'Missing'} · ${e(r.label)}</strong>${r.status==='ready'?'':`<p>${e(r.next_action)}</p>`}<span class="rw-meta">${sourceLink(r.source_ref,h)}</span></li>`).join('')}</ol></details>${t.return_claim_audit ? `<details class="rw-section"><summary>Earlier return claim · audit only</summary><p class="rw-meta">${e(t.return_claim_audit.reason)}</p><p>${e(t.return_claim_audit.original_thesis)}</p></details>` : ''}</section>`;
+  }
+  function classificationAudit(t,h) {
+    const audit = t.classification_audit, e = h.escapeHtml;
+    if (!audit || !(audit.confirmed_count || audit.review_count)) return '';
+    const rows = [...(audit.confirmed || []).map(r=>({...r,label:'Confirmed · corrected'})), ...(audit.needs_review || []).map(r=>({...r,label:'Needs source review'}))];
+    return `<p class="rw-meta">${Number(audit.confirmed_count) || 0} confirmed corrections · ${Number(audit.review_count) || 0} review candidates. Review candidates are not established errors. Wrong-issuer attributions are excluded from ownership signals.</p><ol class="rw-irr-steps">${rows.map(r=>`<li><strong>${e(r.label)} · ${e(text(r.fund_id))} · ${e(r.quarter)}</strong><p>${e(r.reason)}</p>${r.source_url ? sourceLink(r.source_url,h) : ''}</li>`).join('')}</ol>`;
   }
   function friendlyAction(value) {
     const raw = String(value || 'Review primary evidence and establish a dated valuation.');
@@ -180,5 +194,7 @@
     return current;
   }
   global.ResearchWorkspace = {number, metrics, metricValue, friendlyAction, scrollToTarget, range, scenarios, kpis, section, overview, normalize, mount, validTab, activeTab:()=>current?.tab || 'overview', activate:(tab)=>current?.activate(tab), rememberScroll:()=>{ if(current?.root.querySelector('.rw-panel:not([hidden])')){ const state=states.get(current.ticker); if(state) { state.scroll[current.tab]=current.root.scrollTop; state.open ||= {}; state.open[current.tab]=[...current.root.querySelectorAll('.rw-panel:not([hidden]) > details[open] > summary')].map(el=>el.textContent); } } }};
+  global.ResearchWorkspace.irrReadiness = irrReadiness;
+  global.ResearchWorkspace.classificationAudit = classificationAudit;
   if (typeof module !== 'undefined') module.exports = global.ResearchWorkspace;
 })(typeof window !== 'undefined' ? window : globalThis);

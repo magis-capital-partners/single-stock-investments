@@ -66,6 +66,12 @@ def build_bridge(valuation: dict, *, price: float | None = None) -> dict:
     if not inputs.get("fcf_source") or not valuation.get("as_of"):
         result["gaps"].append("GAP: dated owner-cash source is missing.")
         return result
+    policy = (valuation.get("valuation_methodology") or {}).get("forward_return_policy") or {}
+    expected_policy = {"distribution_basis": "modeled_fcf_is_distributable_after_reinvestment",
+        "reinvestment_treatment": "embedded_in_modeled_fcf", "net_assets_timing": "embedded_in_terminal_equity_value"}
+    if any(policy.get(key) != expected for key, expected in expected_policy.items()):
+        result["gaps"].append("GAP: the full-model sensitivity distributes all modeled FCF and adds terminal equity value; explicitly reconcile reinvestment, buybacks and net-asset timing before publishing it as shareholder IRR.")
+    result["distribution_assumption"] = "Sensitivity assumes all modeled FCF is distributable after reinvestment and cash/debt are already reflected in terminal equity proceeds. Not established without an explicit reconciled policy."
     for name, case in CASES.items():
         scenario = (valuation.get("scenarios") or {}).get(name) or {}
         g1 = number(scenario.get("growth_y1_5"))
