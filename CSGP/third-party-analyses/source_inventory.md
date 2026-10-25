@@ -1,6 +1,6 @@
 # CSGP — Third-party source inventory
 
-**Date:** 2026-10-11
+**Date:** 2026-10-25
 **Sources:** 83 total (0 approved, 0 pending, 83 context)
 
 | ID | Title | Path | Status | Use |
@@ -12,6 +12,7 @@
 | activist_long | D.E. Shaw Group Letter to CoStar Board: Reduced Transparency | `_system/reference/activist-reports/de_shaw/de_shaw_2026-03-10_DE_Shaw_Group_Letter_to_CoStar_Board.html` | context | activist/long — press_wire |
 | activist_long | Third Point — DEFA14A | `CSGP/third-party-analyses/activist_reports/long/DEFA14A_20260518_acc0001193125_26_227978.htm` | context | activist/long — sec_edgar |
 | activist_long | acc0001057352 26 000008 | `CSGP/third-party-analyses/activist_reports/long/8-K_20260213_acc0001057352_26_000008.htm` | context | activist/long — local |
+| activist_long | acc0001193125 25 074119 | `CSGP/third-party-analyses/activist_reports/long/8-K_20250407_acc0001193125_25_074119.htm` | context | activist/long — local |
 | activist_long | acc0001057352 18 000006 | `CSGP/third-party-analyses/activist_reports/long/8-K_20180117_acc0001057352_18_000006.htm` | context | activist/long — local |
 | activist_long | acc0001057352 18 000008 | `CSGP/third-party-analyses/activist_reports/long/8-K_20180221_acc0001057352_18_000008.htm` | context | activist/long — local |
 | activist_long | acc0001057352 18 000059 | `CSGP/third-party-analyses/activist_reports/long/8-K_20180423_acc0001057352_18_000059.htm` | context | activist/long — local |
@@ -72,7 +73,6 @@
 | activist_long | acc0001057352 24 000122 | `CSGP/third-party-analyses/activist_reports/long/8-K_20241022_acc0001057352_24_000122.htm` | context | activist/long — local |
 | activist_long | acc0001057352 25 000004 | `CSGP/third-party-analyses/activist_reports/long/8-K_20250218_acc0001057352_25_000004.htm` | context | activist/long — local |
 | activist_long | acc0001193125 25 042465 | `CSGP/third-party-analyses/activist_reports/long/8-K_20250228_acc0001193125_25_042465.htm` | context | activist/long — local |
-| activist_long | acc0001193125 25 074119 | `CSGP/third-party-analyses/activist_reports/long/8-K_20250407_acc0001193125_25_074119.htm` | context | activist/long — local |
 | activist_long | acc0001057352 25 000063 | `CSGP/third-party-analyses/activist_reports/long/8-K_20250429_acc0001057352_25_000063.htm` | context | activist/long — local |
 | activist_long | acc0001057352 25 000069 | `CSGP/third-party-analyses/activist_reports/long/8-K_20250509_acc0001057352_25_000069.htm` | context | activist/long — local |
 | activist_long | acc0001057352 25 000083 | `CSGP/third-party-analyses/activist_reports/long/8-K_20250627_acc0001057352_25_000083.htm` | context | activist/long — local |
@@ -89,4 +89,4 @@
 | activist_long | acc0001057352 26 000061 | `CSGP/third-party-analyses/activist_reports/long/8-K_20260728_acc0001057352_26_000061.htm` | context | activist/long — local |
 | activist_long | acc0001057352 26 000072 | `CSGP/third-party-analyses/activist_reports/long/8-K_20260821_acc0001057352_26_000072.htm` | context | activist/long — local |
 
-Cross-check required: `CSGP/research/cross_check_third_party_2026-10-11.md`
+Cross-check required: `CSGP/research/cross_check_third_party_2026-10-25.md`

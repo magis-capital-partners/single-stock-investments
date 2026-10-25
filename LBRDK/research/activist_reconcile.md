@@ -1,7 +1,7 @@
 # LBRDK — Activist reconciliation (Milly mechanical)
 
-**Date:** 2026-10-24
-**Reports processed:** 3
+**Date:** 2026-10-25
+**Reports processed:** 1
 **Human review:** 1
 
 ## Summary
@@ -9,8 +9,6 @@
 | Firm | Side | Date | Class | Triage | Verdict | Path |
 |------|------|------|-------|--------|---------|------|
 | Unresolved SEC filer | long | 2024-11-14 | activist_13d | human_review | needs_human | `LBRDK/third-party-analyses/activist_reports/long/SC-13D/A_20241114_acc0001104659_24_119241.htm` |
-| Grizzly Research | long | 2020-12-22 | campaign_outcome | auto_context | context | `LBRDK/third-party-analyses/activist_reports/long/8-K_20201222_acc0001104659_20_138229.htm` |
-| Grizzly Research | long | 2020-09-29 | campaign_outcome | auto_context | context | `LBRDK/third-party-analyses/activist_reports/long/8-K_20200929_acc0001104659_20_109405.htm` |
 
 ## Notes (human review)
 

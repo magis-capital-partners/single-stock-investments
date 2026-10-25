@@ -1,7 +1,7 @@
 # LEU — Third-party source inventory
 
-**Date:** 2026-10-11
-**Sources:** 162 total (0 approved, 0 pending, 162 context)
+**Date:** 2026-10-25
+**Sources:** 163 total (0 approved, 0 pending, 163 context)
 
 | ID | Title | Path | Status | Use |
 |----|-------|------|--------|-----|
@@ -167,5 +167,6 @@
 | activist_long | acc0001628280 26 061036 | `LEU/third-party-analyses/activist_reports/long/8-K_20260909_acc0001628280_26_061036.htm` | context | activist/long — local |
 | activist_long | acc0001104659 26 107103 | `LEU/third-party-analyses/activist_reports/long/8-K_20260911_acc0001104659_26_107103.htm` | context | activist/long — local |
 | activist_long | acc0001628280 26 062535 | `LEU/third-party-analyses/activist_reports/long/8-K_20260917_acc0001628280_26_062535.htm` | context | activist/long — local |
+| activist_long | acc0001628280 26 066212 | `LEU/third-party-analyses/activist_reports/long/8-K_20261019_acc0001628280_26_066212.htm` | context | activist/long — local |
 
-Cross-check required: `LEU/research/cross_check_third_party_2026-10-11.md`
+Cross-check required: `LEU/research/cross_check_third_party_2026-10-25.md`

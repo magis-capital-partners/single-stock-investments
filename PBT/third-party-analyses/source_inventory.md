@@ -1,7 +1,7 @@
 # PBT — Third-party source inventory
 
-**Date:** 2026-10-11
-**Sources:** 133 total (0 approved, 0 pending, 133 context)
+**Date:** 2026-10-25
+**Sources:** 136 total (0 approved, 0 pending, 136 context)
 
 | ID | Title | Path | Status | Use |
 |----|-------|------|--------|-----|
@@ -15,6 +15,7 @@
 | activist_long | PREN14A 1 tm2528518-2_pren14a.htm PREN14A tm2... — PREN14A ( | `PBT/third-party-analyses/activist_reports/long/PREN14A_20251015_acc0001104659_25_099792.htm` | context | activist/long — sec_edgar |
 | activist_long | SoftVest Advisors, LLC — SC 13D/A | `PBT/third-party-analyses/activist_reports/long/SC-13D/A_20251010_acc0001104659_25_098799.xml` | context | activist/long — sec_edgar |
 | activist_long | SoftVest Advisors, LLC — SC 13D | `PBT/third-party-analyses/activist_reports/long/SC-13D_20251010_acc0001104659_25_098559.xml` | context | activist/long — sec_edgar |
+| activist_long | DEFN14A (proxy solicitation) · PBT · 2026-10-23 | `PBT/third-party-analyses/activist_reports/long/DEFN14A_20261023_acc0001213900_26_112106.htm` | context | activist/long — sec_edgar |
 | activist_long | acc0001193125 18 015761 | `PBT/third-party-analyses/activist_reports/long/8-K_20180122_acc0001193125_18_015761.htm` | context | activist/long — local |
 | activist_long | acc0001193125 18 049703 | `PBT/third-party-analyses/activist_reports/long/8-K_20180220_acc0001193125_18_049703.htm` | context | activist/long — local |
 | activist_long | acc0001193125 18 058241 | `PBT/third-party-analyses/activist_reports/long/8-K_20180226_acc0001193125_18_058241.htm` | context | activist/long — local |
@@ -138,5 +139,7 @@
 | activist_long | acc0001193125 26 323159 | `PBT/third-party-analyses/activist_reports/long/8-K_20260729_acc0001193125_26_323159.htm` | context | activist/long — local |
 | activist_long | acc0001193125 26 360716 | `PBT/third-party-analyses/activist_reports/long/8-K_20260821_acc0001193125_26_360716.htm` | context | activist/long — local |
 | activist_long | acc0001193125 26 395269 | `PBT/third-party-analyses/activist_reports/long/8-K_20260918_acc0001193125_26_395269.htm` | context | activist/long — local |
+| activist_long | acc0001193125 26 426034 | `PBT/third-party-analyses/activist_reports/long/8-K_20261020_acc0001193125_26_426034.htm` | context | activist/long — local |
+| activist_long | acc0001193125 26 430502 | `PBT/third-party-analyses/activist_reports/long/8-K_20261023_acc0001193125_26_430502.htm` | context | activist/long — local |
 
-Cross-check required: `PBT/research/cross_check_third_party_2026-10-11.md`
+Cross-check required: `PBT/research/cross_check_third_party_2026-10-25.md`

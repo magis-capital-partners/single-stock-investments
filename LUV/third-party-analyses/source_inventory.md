@@ -1,7 +1,7 @@
 # LUV — Third-party source inventory
 
-**Date:** 2026-10-11
-**Sources:** 189 total (0 approved, 0 pending, 189 context)
+**Date:** 2026-10-25
+**Sources:** 190 total (0 approved, 0 pending, 190 context)
 
 | ID | Title | Path | Status | Use |
 |----|-------|------|--------|-----|
@@ -194,5 +194,6 @@
 | activist_long | acc0001193125 26 340284 | `LUV/third-party-analyses/activist_reports/long/8-K_20260807_acc0001193125_26_340284.htm` | context | activist/long — local |
 | activist_long | acc0000092380 26 000093 | `LUV/third-party-analyses/activist_reports/long/8-K_20260810_acc0000092380_26_000093.htm` | context | activist/long — local |
 | activist_long | acc0000092380 26 000098 | `LUV/third-party-analyses/activist_reports/long/8-K_20260812_acc0000092380_26_000098.htm` | context | activist/long — local |
+| activist_long | acc0000092380 26 000104 | `LUV/third-party-analyses/activist_reports/long/8-K_20261021_acc0000092380_26_000104.htm` | context | activist/long — local |
 
-Cross-check required: `LUV/research/cross_check_third_party_2026-10-11.md`
+Cross-check required: `LUV/research/cross_check_third_party_2026-10-25.md`

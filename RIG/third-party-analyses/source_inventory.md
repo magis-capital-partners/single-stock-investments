@@ -1,7 +1,7 @@
 # RIG — Third-party source inventory
 
-**Date:** 2026-10-11
-**Sources:** 249 total (0 approved, 0 pending, 249 context)
+**Date:** 2026-10-25
+**Sources:** 253 total (0 approved, 0 pending, 253 context)
 
 | ID | Title | Path | Status | Use |
 |----|-------|------|--------|-----|
@@ -254,5 +254,9 @@
 | activist_long | acc0001451505 26 000068 | `RIG/third-party-analyses/activist_reports/long/8-K_20260915_acc0001451505_26_000068.htm` | context | activist/long — local |
 | activist_long | acc0001104659 26 112402 | `RIG/third-party-analyses/activist_reports/long/8-K_20260930_acc0001104659_26_112402.htm` | context | activist/long — local |
 | activist_long | acc0001451505 26 000072 | `RIG/third-party-analyses/activist_reports/long/8-K_20261009_acc0001451505_26_000072.htm` | context | activist/long — local |
+| activist_long | acc0001104659 26 115871 | `RIG/third-party-analyses/activist_reports/long/8-K_20261014_acc0001104659_26_115871.htm` | context | activist/long — local |
+| activist_long | acc0001451505 26 000075 | `RIG/third-party-analyses/activist_reports/long/8-K_20261015_acc0001451505_26_000075.htm` | context | activist/long — local |
+| activist_long | acc0001451505 26 000077 | `RIG/third-party-analyses/activist_reports/long/8-K_20261019_acc0001451505_26_000077.htm` | context | activist/long — local |
+| activist_long | acc0001104659 26 118513 | `RIG/third-party-analyses/activist_reports/long/8-K_20261023_acc0001104659_26_118513.htm` | context | activist/long — local |
 
-Cross-check required: `RIG/research/cross_check_third_party_2026-10-11.md`
+Cross-check required: `RIG/research/cross_check_third_party_2026-10-25.md`

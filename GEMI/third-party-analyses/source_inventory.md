@@ -1,7 +1,7 @@
 # GEMI — Third-party source inventory
 
-**Date:** 2026-10-11
-**Sources:** 10 total (0 approved, 0 pending, 10 context)
+**Date:** 2026-10-25
+**Sources:** 11 total (0 approved, 0 pending, 11 context)
 
 | ID | Title | Path | Status | Use |
 |----|-------|------|--------|-----|
@@ -15,5 +15,6 @@
 | activist_long | acc0002055592 26 000048 | `GEMI/third-party-analyses/activist_reports/long/8-K_20260514_acc0002055592_26_000048.htm` | context | activist/long — local |
 | activist_long | acc0002055592 26 000055 | `GEMI/third-party-analyses/activist_reports/long/8-K_20260615_acc0002055592_26_000055.htm` | context | activist/long — local |
 | activist_long | acc0002055592 26 000063 | `GEMI/third-party-analyses/activist_reports/long/8-K_20260813_acc0002055592_26_000063.htm` | context | activist/long — local |
+| activist_long | acc0001104659 26 115771 | `GEMI/third-party-analyses/activist_reports/long/8-K_20261014_acc0001104659_26_115771.htm` | context | activist/long — local |
 
-Cross-check required: `GEMI/research/cross_check_third_party_2026-10-11.md`
+Cross-check required: `GEMI/research/cross_check_third_party_2026-10-25.md`

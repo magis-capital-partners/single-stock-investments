@@ -1,6 +1,6 @@
 # COLD — Third-party source inventory
 
-**Date:** 2026-10-11
+**Date:** 2026-10-25
 **Sources:** 153 total (0 approved, 0 pending, 153 context)
 
 | ID | Title | Path | Status | Use |
@@ -8,6 +8,7 @@
 | vic | 06-Americold | `COLD/third-party-analyses/vic/06-Americold.pdf` | context | Value Investors Club (licensed corpus; variant view, not base IRR) |
 | activist_long | ties Exchange Act of 1934. This is not a soli... — PX14A6G | `COLD/third-party-analyses/activist_reports/long/PX14A6G_20260430_acc0001213900_26_050284.htm` | context | activist/long — sec_edgar |
 | activist_long | ties Exchange Act of 1934. This is not a soli... — PX14A6G | `COLD/third-party-analyses/activist_reports/long/PX14A6G_20260423_acc0001213900_26_046903.htm` | context | activist/long — sec_edgar |
+| activist_long | acc0001193125 25 327562 | `COLD/third-party-analyses/activist_reports/long/8-K_20251222_acc0001193125_25_327562.htm` | context | activist/long — local |
 | activist_long | acc0001193125 18 017612 | `COLD/third-party-analyses/activist_reports/long/8-K_20180123_acc0001193125_18_017612.htm` | context | activist/long — local |
 | activist_long | acc0001193125 18 033427 | `COLD/third-party-analyses/activist_reports/long/8-K_20180206_acc0001193125_18_033427.htm` | context | activist/long — local |
 | activist_long | acc0001628280 18 003114 | `COLD/third-party-analyses/activist_reports/long/8-K_20180313_acc0001628280_18_003114.htm` | context | activist/long — local |
@@ -141,7 +142,6 @@
 | activist_long | acc0001455863 25 000055 | `COLD/third-party-analyses/activist_reports/long/8-K_20250908_acc0001455863_25_000055.htm` | context | activist/long — local |
 | activist_long | acc0001628280 25 049853 | `COLD/third-party-analyses/activist_reports/long/8-K_20251106_acc0001628280_25_049853.htm` | context | activist/long — local |
 | activist_long | acc0001628280 25 055952 | `COLD/third-party-analyses/activist_reports/long/8-K_20251209_acc0001628280_25_055952.htm` | context | activist/long — local |
-| activist_long | acc0001193125 25 327562 | `COLD/third-party-analyses/activist_reports/long/8-K_20251222_acc0001193125_25_327562.htm` | context | activist/long — local |
 | activist_long | acc0001193125 25 328716 | `COLD/third-party-analyses/activist_reports/long/8-K_20251222_acc0001193125_25_328716.htm` | context | activist/long — local |
 | activist_long | acc0001193125 26 022600 | `COLD/third-party-analyses/activist_reports/long/8-K_20260126_acc0001193125_26_022600.htm` | context | activist/long — local |
 | activist_long | acc0001628280 26 009471 | `COLD/third-party-analyses/activist_reports/long/8-K_20260219_acc0001628280_26_009471.htm` | context | activist/long — local |
@@ -159,4 +159,4 @@
 | activist_long | acc0001193125 26 377096 | `COLD/third-party-analyses/activist_reports/long/8-K_20260831_acc0001193125_26_377096.htm` | context | activist/long — local |
 | activist_long | acc0001628280 26 061151 | `COLD/third-party-analyses/activist_reports/long/8-K_20260909_acc0001628280_26_061151.htm` | context | activist/long — local |
 
-Cross-check required: `COLD/research/cross_check_third_party_2026-10-11.md`
+Cross-check required: `COLD/research/cross_check_third_party_2026-10-25.md`

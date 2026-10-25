@@ -1,7 +1,7 @@
 # TEM — Third-party source inventory
 
-**Date:** 2026-10-11
-**Sources:** 28 total (0 approved, 0 pending, 28 context)
+**Date:** 2026-10-25
+**Sources:** 30 total (0 approved, 0 pending, 30 context)
 
 | ID | Title | Path | Status | Use |
 |----|-------|------|--------|-----|
@@ -9,6 +9,7 @@
 | activist_long | Tempus AI, Inc. — SC 13D | `TEM/third-party-analyses/activist_reports/long/SC-13D_20240703_acc0001493152_24_026166.htm` | context | activist/long — sec_edgar |
 | activist_long | Tempus AI, Inc — SC 13D/A | `TEM/third-party-analyses/activist_reports/long/SC-13D/A_20260721_acc0001193125_26_310289.xml` | context | activist/long — sec_edgar |
 | activist_long | Tempus AI, Inc — SC 13D/A | `TEM/third-party-analyses/activist_reports/long/SC-13D/A_20250912_acc0001641172_25_027202.xml` | context | activist/long — sec_edgar |
+| activist_short | Tempus AI, Inc. | `_system/reference/activist-reports/spruce_point/spruce_point_2025-05-28_tempus-ai-inc.html` | context | activist/short — publisher_site |
 | activist_long | acc0001193125 24 162594 | `TEM/third-party-analyses/activist_reports/long/8-K_20240617_acc0001193125_24_162594.htm` | context | activist/long — local |
 | activist_long | acc0001193125 24 194863 | `TEM/third-party-analyses/activist_reports/long/8-K_20240806_acc0001193125_24_194863.htm` | context | activist/long — local |
 | activist_long | acc0001493152 24 033274 | `TEM/third-party-analyses/activist_reports/long/8-K_20240820_acc0001493152_24_033274.htm` | context | activist/long — local |
@@ -33,5 +34,6 @@
 | activist_long | acc0001193125 26 308469 | `TEM/third-party-analyses/activist_reports/long/8-K_20260720_acc0001193125_26_308469.htm` | context | activist/long — local |
 | activist_long | acc0001193125 26 309073 | `TEM/third-party-analyses/activist_reports/long/8-K_20260720_acc0001193125_26_309073.htm` | context | activist/long — local |
 | activist_long | acc0001193125 26 326083 | `TEM/third-party-analyses/activist_reports/long/8-K_20260730_acc0001193125_26_326083.htm` | context | activist/long — local |
+| activist_long | acc0001193125 26 429533 | `TEM/third-party-analyses/activist_reports/long/8-K_20261023_acc0001193125_26_429533.htm` | context | activist/long — local |
 
-Cross-check required: `TEM/research/cross_check_third_party_2026-10-11.md`
+Cross-check required: `TEM/research/cross_check_third_party_2026-10-25.md`

@@ -1,7 +1,7 @@
 # HON — Activist reconciliation (Milly mechanical)
 
-**Date:** 2026-10-24
-**Reports processed:** 9
+**Date:** 2026-10-25
+**Reports processed:** 8
 **Human review:** 8
 
 ## Summary
@@ -16,7 +16,6 @@
 | Unresolved SEC filer | long | 2021-03-11 | activist_13d | human_review | needs_human | `HON/third-party-analyses/activist_reports/long/SC-13D/A_20210311_acc0001193125_21_076916.htm` |
 | Honeywell International Inc. | long | 2020-10-29 | activist_13d | human_review | needs_human | `HON/third-party-analyses/activist_reports/long/SC-13D_20201029_acc0001193125_20_280206.htm` |
 | Unresolved SEC filer | long | 2022-04-21 | activist_proxy | human_review | needs_human | `HON/third-party-analyses/activist_reports/long/PX14A6G_20220421_acc0001214659_22_005568.htm` |
-| Elliott Management | long | 2025-05-28 | campaign_outcome | auto_context | context | `HON/third-party-analyses/activist_reports/long/8-K_20250528_acc0001193125_25_128673.htm` |
 
 ## Notes (human review)
 

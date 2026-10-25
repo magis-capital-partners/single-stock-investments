@@ -1,7 +1,7 @@
 # TKO — Activist reconciliation (Milly mechanical)
 
-**Date:** 2026-10-24
-**Reports processed:** 3
+**Date:** 2026-10-25
+**Reports processed:** 1
 **Human review:** 1
 
 ## Summary
@@ -9,8 +9,6 @@
 | Firm | Side | Date | Class | Triage | Verdict | Path |
 |------|------|------|-------|--------|---------|------|
 | Ariel Emanuel | long | 2025-03-26 | activist_13d | human_review | needs_human | `TKO/third-party-analyses/activist_reports/long/SC-13D/A_20250326_acc0000950170_25_045661.xml` |
-| HoldCo Asset Management | long | 2024-01-23 | campaign_outcome | auto_context | context | `TKO/third-party-analyses/activist_reports/long/8-K_20240123_acc0001193125_24_012566.htm` |
-| HoldCo Asset Management | long | 2023-09-12 | campaign_outcome | auto_context | context | `TKO/third-party-analyses/activist_reports/long/8-K_20230912_acc0001193125_23_233543.htm` |
 
 ## Notes (human review)
 

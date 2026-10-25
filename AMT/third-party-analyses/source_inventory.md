@@ -1,11 +1,10 @@
 # AMT — Third-party source inventory
 
-**Date:** 2026-10-11
-**Sources:** 224 total (0 approved, 0 pending, 224 context)
+**Date:** 2026-10-25
+**Sources:** 223 total (0 approved, 0 pending, 223 context)
 
 | ID | Title | Path | Status | Use |
 |----|-------|------|--------|-----|
-| activist_short | Mar 10, 2021 | `_system/reference/activist-reports/spruce_point/spruce_point_2021-03-10_american-battery-metals-corp-comstock-mi.html` | context | activist/short — publisher_site |
 | activist_long | ATC TRS II LLC — SC 13D | `AMT/third-party-analyses/activist_reports/long/SC-13D_20210416_acc0001193125_21_119443.htm` | context | activist/long — sec_edgar |
 | activist_long | ATC TRS II LLC — SC 13D/A | `AMT/third-party-analyses/activist_reports/long/SC-13D/A_20251211_acc0001193125_25_315968.xml` | context | activist/long — sec_edgar |
 | activist_long | HoldCo Asset Management — SC TO-T | `AMT/third-party-analyses/activist_reports/long/SC-TO-T_20211129_acc0001193125_21_341764.htm` | context | activist/long — sec_edgar |
@@ -230,4 +229,4 @@
 | activist_long | acc0001193125 26 390605 | `AMT/third-party-analyses/activist_reports/long/8-K_20260914_acc0001193125_26_390605.htm` | context | activist/long — local |
 | activist_long | acc0001053507 26 000145 | `AMT/third-party-analyses/activist_reports/long/8-K_20260918_acc0001053507_26_000145.htm` | context | activist/long — local |
 
-Cross-check required: `AMT/research/cross_check_third_party_2026-10-11.md`
+Cross-check required: `AMT/research/cross_check_third_party_2026-10-25.md`

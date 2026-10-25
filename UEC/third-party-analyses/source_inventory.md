@@ -1,11 +1,11 @@
 # UEC — Third-party source inventory
 
-**Date:** 2026-10-11
+**Date:** 2026-10-25
 **Sources:** 207 total (0 approved, 0 pending, 207 context)
 
 | ID | Title | Path | Status | Use |
 |----|-------|------|--------|-----|
-| activist_short | Sep 18, 2025 | `_system/reference/activist-reports/spruce_point/spruce_point_2025-09-18_uranium-energy-corporation.html` | context | activist/short — publisher_site |
+| activist_short | Uranium Energy Corporation | `_system/reference/activist-reports/spruce_point/spruce_point_2025-09-18_uranium-energy-corporation.html` | context | activist/short — publisher_site |
 | activist_long | URANIUM ENERGY CORP. — SC 13D/A | `UEC/third-party-analyses/activist_reports/long/SC-13D/A_20210526_acc0001183740_21_000112.htm` | context | activist/long — sec_edgar |
 | activist_long | URANIUM ENERGY CORP. — SC 13D/A | `UEC/third-party-analyses/activist_reports/long/SC-13D/A_20231019_acc0001183740_23_000118.htm` | context | activist/long — sec_edgar |
 | activist_long | URANIUM ENERGY CORP. — SC 13D/A | `UEC/third-party-analyses/activist_reports/long/SC-13D/A_20240212_acc0001183740_24_000016.htm` | context | activist/long — sec_edgar |
@@ -213,4 +213,4 @@
 | activist_long | acc0001437749 26 024336 | `UEC/third-party-analyses/activist_reports/long/8-K_20260723_acc0001437749_26_024336.htm` | context | activist/long — local |
 | activist_long | acc0001437749 26 031416 | `UEC/third-party-analyses/activist_reports/long/8-K_20260929_acc0001437749_26_031416.htm` | context | activist/long — local |
 
-Cross-check required: `UEC/research/cross_check_third_party_2026-10-11.md`
+Cross-check required: `UEC/research/cross_check_third_party_2026-10-25.md`

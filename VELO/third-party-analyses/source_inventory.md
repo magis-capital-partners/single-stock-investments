@@ -1,7 +1,7 @@
 # VELO — Third-party source inventory
 
-**Date:** 2026-10-11
-**Sources:** 108 total (0 approved, 0 pending, 108 context)
+**Date:** 2026-10-25
+**Sources:** 110 total (0 approved, 0 pending, 110 context)
 
 | ID | Title | Path | Status | Use |
 |----|-------|------|--------|-----|
@@ -113,5 +113,7 @@
 | activist_long | acc0001193125 26 303150 | `VELO/third-party-analyses/activist_reports/long/8-K_20260714_acc0001193125_26_303150.htm` | context | activist/long — local |
 | activist_long | acc0001193125 26 344537 | `VELO/third-party-analyses/activist_reports/long/8-K_20260811_acc0001193125_26_344537.htm` | context | activist/long — local |
 | activist_long | acc0001193125 26 412304 | `VELO/third-party-analyses/activist_reports/long/8-K_20261002_acc0001193125_26_412304.htm` | context | activist/long — local |
+| activist_long | acc0001493152 26 046400 | `VELO/third-party-analyses/activist_reports/long/8-K_20261009_acc0001493152_26_046400.htm` | context | activist/long — local |
+| activist_long | acc0001825079 26 000012 | `VELO/third-party-analyses/activist_reports/long/8-K_20261015_acc0001825079_26_000012.htm` | context | activist/long — local |
 
-Cross-check required: `VELO/research/cross_check_third_party_2026-10-11.md`
+Cross-check required: `VELO/research/cross_check_third_party_2026-10-25.md`

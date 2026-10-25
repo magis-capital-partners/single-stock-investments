@@ -1,6 +1,6 @@
 # TKO — Third-party source inventory
 
-**Date:** 2026-10-11
+**Date:** 2026-10-25
 **Sources:** 68 total (0 approved, 0 pending, 68 context)
 
 | ID | Title | Path | Status | Use |
@@ -31,6 +31,7 @@
 | activist_long | HoldCo Asset Management — SC 13G | `TKO/third-party-analyses/activist_reports/long/SC-13G_20240209_acc0001193125_24_030386.htm` | context | activist/long — sec_edgar |
 | activist_long | HoldCo Asset Management — SC 13G | `TKO/third-party-analyses/activist_reports/long/SC-13G_20240209_acc0001193125_24_029042.htm` | context | activist/long — sec_edgar |
 | activist_long | Ariel Emanuel — SC 13D | `TKO/third-party-analyses/activist_reports/long/SC-13D_20231124_acc0001193125_23_282774.htm` | context | activist/long — sec_edgar |
+| activist_long | acc0001193125 24 012566 | `TKO/third-party-analyses/activist_reports/long/8-K_20240123_acc0001193125_24_012566.htm` | context | activist/long — local |
 | activist_long | acc0001193125 23 233543 | `TKO/third-party-analyses/activist_reports/long/8-K_20230912_acc0001193125_23_233543.htm` | context | activist/long — local |
 | activist_long | acc0001193125 23 247481 | `TKO/third-party-analyses/activist_reports/long/8-K_20230929_acc0001193125_23_247481.htm` | context | activist/long — local |
 | activist_long | acc0001193125 23 268188 | `TKO/third-party-analyses/activist_reports/long/8-K_20231101_acc0001193125_23_268188.htm` | context | activist/long — local |
@@ -38,7 +39,6 @@
 | activist_long | acc0001193125 23 274530 | `TKO/third-party-analyses/activist_reports/long/8-K_20231109_acc0001193125_23_274530.htm` | context | activist/long — local |
 | activist_long | acc0001193125 23 277103 | `TKO/third-party-analyses/activist_reports/long/8-K_20231114_acc0001193125_23_277103.htm` | context | activist/long — local |
 | activist_long | acc0001193125 24 007554 | `TKO/third-party-analyses/activist_reports/long/8-K_20240112_acc0001193125_24_007554.htm` | context | activist/long — local |
-| activist_long | acc0001193125 24 012566 | `TKO/third-party-analyses/activist_reports/long/8-K_20240123_acc0001193125_24_012566.htm` | context | activist/long — local |
 | activist_long | acc0001193125 24 012600 | `TKO/third-party-analyses/activist_reports/long/8-K_20240123_acc0001193125_24_012600.htm` | context | activist/long — local |
 | activist_long | acc0001193125 24 013037 | `TKO/third-party-analyses/activist_reports/long/8-K_20240123_acc0001193125_24_013037.htm` | context | activist/long — local |
 | activist_long | acc0001193125 24 017357 | `TKO/third-party-analyses/activist_reports/long/8-K_20240129_acc0001193125_24_017357.htm` | context | activist/long — local |
@@ -74,4 +74,4 @@
 | activist_long | acc0001193125 26 269552 | `TKO/third-party-analyses/activist_reports/long/8-K_20260612_acc0001193125_26_269552.htm` | context | activist/long — local |
 | activist_long | acc0001193125 26 330561 | `TKO/third-party-analyses/activist_reports/long/8-K_20260803_acc0001193125_26_330561.htm` | context | activist/long — local |
 
-Cross-check required: `TKO/research/cross_check_third_party_2026-10-11.md`
+Cross-check required: `TKO/research/cross_check_third_party_2026-10-25.md`
