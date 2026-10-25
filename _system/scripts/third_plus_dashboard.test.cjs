@@ -6,8 +6,8 @@ test('publication preserves cohort counts and the frozen benchmark results',()=>
  assert.equal(doc.cohort.events,210);assert.equal(doc.cohort.saved_events+doc.cohort.vetoed+doc.cohort.unknown_rally,210);
  assert.equal(doc.models.primary.saved.net_pnl,7385.199847977776);assert.equal(doc.models.primary.dilution.net_pnl,7997.102773533332);
 });
-test('every rule has the nine declared cases without fabricating a cross-product',()=>{
- assert.equal(doc.rules.length,21);assert.equal(doc.cases.length,9);
+test('every rule has the twelve declared cases without fabricating a cross-product',()=>{
+ assert.equal(doc.rules.length,21);assert.equal(doc.cases.length,12);
  for(const c of doc.cases)for(const r of doc.rules)assert.ok(doc.models[c.id][r.id]);
  assert.equal(doc.models.full_20.saved.nav,null);assert.equal(doc.models.primary.saved.nav,1000000);
 });
@@ -52,7 +52,7 @@ test('primary evidence remains distinguished from code checks and live readiness
 test('published dashboard bytes are reproducible from the committed study sources',()=>{P.publish(true);});
 
 const D=require('../../dashboard/third-plus-study-details.js'),Audit=require('./build_third_plus_decision_audit.cjs');
-test('all 189 event audits classify the entire cohort and reconcile every frozen funnel',()=>{
+test('all 252 event audits classify the entire cohort and reconcile every frozen funnel',()=>{
  for(const c of doc.cases)for(const r of doc.rules){const a=doc.audit.models[c.id][r.id],m=doc.models[c.id][r.id];assert.equal(a.statuses.length,210);assert.ok(a.statuses.every(Boolean));assert.equal(a.statuses.filter(s=>!s.startsWith('signal_')).length,m.funnel.selected);for(const [k,n]of Object.entries(m.funnel))if(k!=='selected')assert.equal(a.statuses.filter(s=>s===k).length,n);}
  assert.equal(new Set(doc.audit.events.map(e=>e.id)).size,210);assert.equal(doc.audit.verification.positions_and_daily_paths_exact,true);
 });
@@ -67,7 +67,7 @@ test('default exclusions resolve to maturity, BINI liquidity, restricted status 
  assert.equal(rs.find(r=>r.ticker==='DFLI').status,'signal_unknown');
 });
 test('every admitted size is the minimum whole-share ceiling and matches aggregate sizes and exit states',()=>{
- for(const c of doc.cases)for(const r of doc.rules){const m=doc.models[c.id][r.id],rs=D.rows(doc,{rule:r.id,case:c.id}).filter(x=>x.status==='entered');let total=0;for(const x of rs){const s=x.detail.size;assert.ok(s.notional>0&&s.notional<=25000);assert.ok(Math.abs(s.notional-Math.min(...Object.values(s.limits)))<=.011);assert.ok(s.binding.every(k=>Math.abs(s.notional-s.limits[k])<=.011));assert.ok(Math.abs(s.notional/25000-s.target_fraction)<.000001);total+=s.notional;}if(rs.length)assert.ok(Math.abs(total/rs.length-m.mean_position)<.006);assert.equal(rs.filter(x=>x.detail.position.open).length,m.open_positions);assert.equal(rs.filter(x=>!x.detail.position.open).length,m.closed);}
+ for(const c of doc.cases)for(const r of doc.rules){const m=doc.models[c.id][r.id],rs=D.rows(doc,{rule:r.id,case:c.id}).filter(x=>x.status==='entered');let total=0;for(const x of rs){const s=x.detail.size;assert.ok(s.notional>0&&s.notional<=m.target);assert.ok(Math.abs(s.notional-Math.min(...Object.values(s.limits)))<=.011);assert.ok(s.binding.every(k=>Math.abs(s.notional-s.limits[k])<=.011));assert.ok(Math.abs(s.notional/m.target-s.target_fraction)<.000001);total+=s.notional;}if(rs.length)assert.ok(Math.abs(total/rs.length-m.mean_position)<.006);assert.equal(rs.filter(x=>x.detail.position.open).length,m.open_positions);assert.equal(rs.filter(x=>!x.detail.position.open).length,m.closed);}
 });
 test('event publication contains derived sizing but no raw market prices or per-event returns',()=>{
  const forbidden=new Set(['entry_price','entry_fill','adv_shares','adv_dollars','volume','qty','entry_units','pnl','net_return','gross_pnl','mark','borrow','fees','covers','daily']);
@@ -85,10 +85,25 @@ test('candidate names, audit search and downloadable CSV resist markup and formu
  assert.ok(D.csv(x,{rule:'dilution',case:'primary',auditFilter:'all'},'decisions').includes("'=HYPERLINK"));
 });
 test('guide discloses future same-day volume, zero SPX stress, no automatic stop and unresolved exits',()=>{
- const html=D.guide(doc,{rule:'dilution',case:'primary'});assert.match(html,/uses future same-day information/);assert.match(html,/Other-sleeve stress loss was zero/);assert.match(html,/no automatic stop/);assert.match(html,/fully implementable/);assert.match(html,/not verified actual bills/);
+ const html=D.guide(doc,{rule:'dilution',case:'primary'});assert.match(html,/use future same-day information/);assert.ok(html.includes('Other-sleeve stress loss was zero'));assert.match(html,/no automatic stop/);assert.match(html,/fully implementable/);assert.match(html,/not verified actual bills/);
  const sizes=D.sizing(doc,{rule:'dilution',case:'primary'});assert.match(sizes,/95%/);assert.match(sizes,/0.0025/);assert.match(sizes,/0.01/);assert.match(sizes,/35.58/);
 });
 test('audit instrumentation fails closed when an expected frozen hook changes',()=>{
  const source=fs.readFileSync(path.join(ROOT,'_system/scripts/reverse_split_repeat_study.cjs'),'utf8');assert.ok(Audit.instrument(source).includes('opts.audit?.'));
  assert.throws(()=>Audit.instrument(source.replace('  const byDay=new Map();','  const differentName=new Map();')),/Frozen audit hook changed/);
+});
+
+test('requested account parameters and admission gates are explicit and separate from the frozen primary',()=>{
+ const m=doc.models.requested_100k.dilution;assert.equal(doc.default_case,'requested_100k');assert.equal(m.nav,10000000);assert.equal(m.target,100000);assert.equal(m.cap,.1);assert.equal(m.maximumNames,3);assert.equal(m.minimumMaturitySessions,0);assert.equal(m.margin_capacity_applied,false);assert.equal(m.sleeve_cap_applied,false);assert.equal(m.riskLimits,false);assert.equal(doc.models.primary.dilution.net_pnl,7997.102773533332);assert.equal(m.net_pnl,102545.82940031702);assert.equal(doc.requested_sizing.validation.baseline_models_matched,21);assert.equal(doc.requested_sizing.validation.new_models,63);
+});
+test('requested default adds the late KUST entry with an unfinished horizon and no fabricated exit',()=>{
+ const a=doc.audit.models.requested_100k.dilution,m=doc.models.requested_100k.dilution;assert.equal(m.entered,41);assert.equal(m.funnel.common_maturity_excluded,0);assert.equal(m.immature_positions,1);const i=doc.audit.events.findIndex(e=>e.ticker==='KUST'&&e.event_date==='2026-10-01');assert.equal(a.statuses[i],'entered');assert.equal(a.details[i].position.immature,true);assert.equal(a.details[i].position.closed,null);assert.equal(a.details[i].position.planned_exit,null);
+ for(const c of doc.cases.filter(c=>c.requested))for(const r of doc.rules){const x=doc.models[c.id][r.id],z=doc.audit.models[c.id][r.id];assert.equal(x.funnel.common_maturity_excluded,0);for(const d of Object.values(z.details)){if(d.size){assert.equal(d.size.limits.per_name,undefined);assert.equal(d.size.limits.margin,undefined);assert.equal(d.size.limits.sleeve,undefined);}}}
+});
+test('all 97 disputed restrictions match fresh raw opening-status messages across 63 symbols',()=>{
+ const s=doc.ssr;assert.equal(s.counts.original_events,97);assert.equal(s.counts.original_tickers,63);assert.equal(s.counts.original_matched,97);assert.equal(s.counts.original_same_day,97);assert.equal(new Set(s.original_exclusions).size,97);for(const i of s.original_exclusions){const r=s.rows.find(r=>r.event===i);assert.equal(r.raw_state,1);assert.equal(r.stored_state,1);assert.equal(r.raw_matches_stored,true);assert.equal(r.fresh_same_day,true);}assert.equal(s.counts.all_stored_known,208);assert.equal(s.counts.all_raw_known,209);
+});
+test('requested dashboard wording separates revised assumptions, incomplete follow-up and hypothetical execution',()=>{
+ const state={rule:'dilution',case:'requested_100k',all:false},html=V.view(doc,state);assert.ok(html.includes('$100,000 is the target'));assert.ok(html.includes('no minimum follow-up window'));assert.ok(html.includes('or minimum maturity exclusion'));assert.ok(html.includes('Sliced execution remains unmodeled'));assert.ok(html.includes('A price restriction'));assert.ok(html.includes('above the bid'));assert.ok(html.includes('incomplete follow-up'));assert.ok(!D.sizing(doc,state).includes('0.0025'));
+ const prior=D.sizing(doc,{...state,case:'requested_prior_only'});assert.ok(prior.includes('uses only prior information'));assert.equal(doc.models.requested_prior_only.dilution.entryVolumeMode,'prior_only');
 });

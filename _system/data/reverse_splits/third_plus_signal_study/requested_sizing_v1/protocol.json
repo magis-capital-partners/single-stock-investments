@@ -1,0 +1,55 @@
+{
+  "schema": "third_plus_requested_sizing.protocol.v1",
+  "requested_parameters": {
+    "nav": 10000000,
+    "target": 100000,
+    "cap": 0.1,
+    "maximumNames": 3,
+    "riskLimits": false,
+    "minimumMaturitySessions": 0,
+    "horizon": 20,
+    "cost": "base",
+    "ssrMode": "strict",
+    "causalCarry": true
+  },
+  "unchanged": [
+    "Original 210-event population and as-of signals",
+    "Three simultaneous open positions",
+    "20-session planned time exit, with unresolved obligations retained",
+    "Frozen base fees, 50% borrow APR and execution debit"
+  ],
+  "changes": [
+    "Dollar cap replaces 0.25%-of-equity name reserve",
+    "Remove margin-capacity and sleeve-reserve admission limits",
+    "10x original 1% volume caps to 10%",
+    "Remove common maturity exclusion; unfinished recent positions stay open and marked"
+  ],
+  "cases": [
+    {
+      "id": "requested_100k",
+      "label": "Requested · $100k cap / $10m account",
+      "requested": true,
+      "note": "$100,000 position cap; $10m reference NAV; 10% prior ADV and final-day volume; three-name limit; no margin/sleeve cap or maturity exclusion. Opening fills remain hypothetical."
+    },
+    {
+      "id": "requested_prior_only",
+      "label": "Requested · prior-volume entry sizing",
+      "requested": true,
+      "note": "Same $100k cap / $10m reference and three names; entry quantity uses only 10% prior ADV. Exit cap remains 10% daily volume. Opening fills and borrowing are unverified."
+    },
+    {
+      "id": "requested_SSR_proxy",
+      "label": "Requested · SSR capture sensitivity",
+      "requested": true,
+      "hypothetical": true,
+      "note": "Requested sizing with unsupported restricted/unknown SSR capture at 50% of the entry-volume allowance. This does not prove compliant fills or borrow availability."
+    }
+  ],
+  "limitations": [
+    "No observed locates, fills or sliced execution",
+    "Final-day entry-volume case uses hindsight information",
+    "Reference NAV is an accounting denominator, not a verified funding or margin simulation",
+    "All historical data were explored; no new significance or optimal-filter claim"
+  ],
+  "production_authority": "none"
+}

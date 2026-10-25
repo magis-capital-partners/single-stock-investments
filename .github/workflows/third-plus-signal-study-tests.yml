@@ -8,10 +8,16 @@ on:
       - '_system/scripts/third_plus_signal_study.test.cjs'
       - '_system/scripts/build_third_plus_dashboard.cjs'
       - '_system/scripts/build_third_plus_decision_audit.cjs'
+      - '_system/scripts/build_third_plus_ssr_publication.cjs'
+      - '_system/scripts/build_third_plus_requested_report.cjs'
+      - '_system/scripts/third_plus_requested_sizing.cjs'
+      - '_system/scripts/third_plus_sizing*'
+      - '_system/scripts/third_plus_ssr_audit.py'
       - '_system/scripts/third_plus_dashboard.test.cjs'
       - 'dashboard/third-plus-study*'
       - 'dashboard/data/third_plus_study*.json'
       - 'dashboard/data/third_plus_dilution_primary_*.csv'
+      - 'dashboard/data/third_plus_requested_*.csv'
       - '_system/data/reverse_splits/third_plus_signal_study/**'
       - '_system/scripts/third_plus_fundamental*'
       - '_system/scripts/third_plus_reconciliation*'
@@ -40,11 +46,16 @@ jobs:
             _system/scripts/third_plus_signal_study.test.cjs
             _system/scripts/build_third_plus_dashboard.cjs
             _system/scripts/build_third_plus_decision_audit.cjs
+            _system/scripts/build_third_plus_ssr_publication.cjs
+            _system/scripts/build_third_plus_requested_report.cjs
+            _system/scripts/third_plus_requested_sizing.cjs
+            _system/scripts/third_plus_sizing*
             _system/scripts/third_plus_dashboard.test.cjs
             dashboard/third-plus-study.js
             dashboard/third-plus-study-details.js
             dashboard/data/third_plus_study*.json
             dashboard/data/third_plus_dilution_primary_*.csv
+            dashboard/data/third_plus_requested_*.csv
             _system/data/reverse_splits/third_plus_signal_study/
             _system/scripts/third_plus_fundamental*
             _system/scripts/third_plus_reconciliation*
@@ -67,6 +78,9 @@ jobs:
       - name: Verify offline filing extraction
         run: python -m unittest discover -s _system/scripts -p test_third_plus_reconciliation.py
       - name: Verify offline financial and execution invariants
-        run: node --test --test-reporter=tap _system/scripts/third_plus_signal_study.test.cjs _system/scripts/third_plus_saved_screen.test.cjs _system/scripts/third_plus_reconciliation.test.cjs _system/scripts/third_plus_fundamental_filters.test.cjs _system/scripts/third_plus_dashboard.test.cjs
+        run: node --test --test-reporter=tap _system/scripts/third_plus_signal_study.test.cjs _system/scripts/third_plus_saved_screen.test.cjs _system/scripts/third_plus_reconciliation.test.cjs _system/scripts/third_plus_fundamental_filters.test.cjs _system/scripts/third_plus_dashboard.test.cjs _system/scripts/third_plus_sizing.test.cjs
       - name: Verify published dashboard snapshot
         run: node _system/scripts/build_third_plus_dashboard.cjs --check
+
+      - name: Verify requested scenario report
+        run: node _system/scripts/build_third_plus_requested_report.cjs --check
