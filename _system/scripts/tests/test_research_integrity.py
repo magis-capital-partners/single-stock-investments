@@ -216,3 +216,26 @@ def test_readiness_check_detects_a_stale_served_detail(tmp_path):
         publish(tmp_path, tmp_path, date(2026, 10, 25), check=True)
     with pytest.raises(ValueError, match="nonempty universe"):
         build_report([], tmp_path, date(2026, 10, 25))
+
+
+def test_targeted_refresh_reconciles_manifest_without_restamping_or_changing_events(tmp_path):
+    import json
+    from refresh_research_integrity import refresh
+    (tmp_path / "insights").mkdir()
+    (tmp_path / "core.json").write_text(json.dumps({"tickers": []}), encoding="utf8")
+    manifest = {"generated_at": "2026-10-24", "record_count": 100, "source_health": {"letters": {"count": 50}},
+        "provenance": {"event_triage_summary": {"retained_event_count": 1}}}
+    events = {"events": [{"source": "news", "tier": "signal", "feed_eligible": True},
+                          {"source": "news", "tier": "context", "feed_eligible": True}]}
+    path = tmp_path / "insights/manifest.json"
+    path.write_text(json.dumps(manifest), encoding="utf8")
+    event_path = tmp_path / "insights/events.json"
+    event_path.write_text(json.dumps(events), encoding="utf8")
+    assert refresh(tmp_path)["insight_manifest"] == 1
+    fixed = json.loads(path.read_text(encoding="utf8"))
+    assert fixed["provenance"]["event_triage_summary"]["retained_event_count"] == 2
+    assert fixed["record_count"] == 100
+    assert fixed["generated_at"] == manifest["generated_at"]
+    assert fixed["source_health"] == manifest["source_health"]
+    assert json.loads(event_path.read_text(encoding="utf8")) == events
+    assert refresh(tmp_path) == {}

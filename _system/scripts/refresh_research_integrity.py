@@ -147,6 +147,15 @@ def refresh(data_dir: Path, *, check=False) -> dict:
         if path.name == "manifest.json": continue
         text = path.read_text(encoding="utf-8")
         save(path, json.loads(text), reconcile_insight_payload(json.loads(text)), "insight_shards")
+    manifest_path, events_path = data_dir / "insights/manifest.json", data_dir / "insights/events.json"
+    if manifest_path.is_file() and events_path.is_file():
+        from reconcile_insights_event_summary import reconciled_manifest
+        manifest = json.loads(manifest_path.read_text(encoding="utf-8"))
+        events_doc = json.loads(events_path.read_text(encoding="utf-8"))
+        # Metadata must describe the event shard actually being served, even
+        # when its count was stale before this targeted refresh. Source-health
+        # fields, intake counts, timestamps and the events themselves stay put.
+        save(manifest_path, manifest, reconciled_manifest(manifest, events_doc["events"]), "insight_manifest")
     return dict(changes)
 
 
