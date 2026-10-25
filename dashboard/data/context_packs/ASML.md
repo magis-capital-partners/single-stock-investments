@@ -181,8 +181,8 @@ Documents in folder: **9** (all listed below; Tier 1–3 extracted or keyword-sc
 - deep_dive: ASML/research/deep_dive_2026-09-29.md (sha256 sha256:222a4decc3b52554...)
 - filing_digest: ASML/research/evidence/filing_digest.md (sha256 sha256:6f3e02ae394539ec...)
 - adversarial: ASML/research/adversarial_2026-09-29.md (sha256 sha256:e42944dcde17ccb9...)
-- valuation: ASML/research/valuation.json (sha256 sha256:c53a52621295dbe1...)
-- thesis_card: ASML/research/thesis_card.json (sha256 sha256:535827ea2ca6c866...)
+- valuation: ASML/research/valuation.json (sha256 sha256:17bbb9a33d97af31...)
+- thesis_card: ASML/research/thesis_card.json (sha256 sha256:8021147cbb3eed94...)
 - cross_check: ASML/research/cross_check_third_party_2026-09-29.md (sha256 sha256:e128b1027c34a4b6...)
 
 ## Excluded from this pack
