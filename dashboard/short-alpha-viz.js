@@ -506,13 +506,14 @@
     return `<nav class="short-view-nav" aria-label="Shorts research"><a href="#/ideas/short-alpha"${section==='ideas' ? ' aria-current="page"' : ''}>Short ideas</a><a href="#/ideas/short-alpha/backtest"${section==='backtest' ? ' aria-current="page"' : ''}>Reverse-split backtest</a></nav>`;
   }
   function renderBacktest() {
-    return `${navigation('backtest')}<section class="short-section short-reverse-splits" data-short-reverse-splits><div class="rsp-feed-status" data-short-reverse-status role="status">Loading reverse-split results…</div><div data-short-reverse-splits-body></div></section>`;
+    return `${navigation('backtest')}${global.ThirdPlusStudyViz ? global.ThirdPlusStudyViz.render() : '<p class="short-alpha-note">Third-plus study is unavailable. Earlier backtests are preserved below.</p>'}<details class="tps-legacy" data-third-plus-legacy><summary>Earlier portfolio, execution and event studies<small>Separate research versions with different rules and assumptions</small></summary><section class="short-section short-reverse-splits" data-short-reverse-splits><div class="rsp-feed-status" data-short-reverse-status role="status">Open this section to load earlier results.</div><div data-short-reverse-splits-body></div></section></details>`;
   }
   // The Reverse splits sub-section is filled by index.html from data/reverse_splits.json
   // through window.ReverseSplitsViz.render(doc) (dashboard/reverse-splits-viz.js). The
   // section stays hidden when the file is absent or the renderer is not loaded.
   function mountReverseSplits(container, doc) {
     const teaser=container && container.querySelector('[data-short-backtest-teaser]');
+    if(teaser && global.ThirdPlusStudyViz){teaser.innerHTML=global.ThirdPlusStudyViz.teaser();return true;}
     if(teaser){
       const html=global.ShortsNetEdgeViz?.teaser(doc) || global.ReverseSplitsPortfolioViz?.teaser(doc);
       teaser.innerHTML=html || '<p class="rsp-feed-status">Backtest summary unavailable. <a href="#/ideas/short-alpha/backtest">Open the backtest view</a> for its data status.</p>';
