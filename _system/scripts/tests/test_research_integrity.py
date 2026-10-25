@@ -62,13 +62,33 @@ def test_withheld_return_claims_are_archived_not_published_or_destroyed():
 
 
 def test_hurdles_and_historical_returns_are_not_removed():
-    for thesis in ("Require an IRR above 12%.", "Historical IRR 12% since inception."):
+    for thesis in ("Require an IRR above 12%.", "Requires an IRR above 12%.", "Target IRR 15%.", "Historical IRR 12% since inception."):
         row = {"one_line_thesis": thesis, "valuation_decision": {"return_publishable": False}}
         gate_return_claims(row)
         assert row["one_line_thesis"] == thesis
     row = {"one_line_thesis": "Toll road; 8.11% synthesis IRR below our 15% hurdle.", "valuation_decision": {"return_publishable": False}}
     gate_return_claims(row)
     assert "8.11%" not in row["one_line_thesis"]
+
+
+def test_history_does_not_clear_a_separate_forward_claim():
+    row = {"one_line_thesis": "Historical IRR 12% since inception. Forward return 20% at spot.",
+           "valuation_decision": {"return_publishable": False}}
+    gate_return_claims(row)
+    assert "Historical IRR 12%" in row["one_line_thesis"]
+    assert "20%" not in row["one_line_thesis"]
+
+
+def test_cleared_return_is_sourced_from_the_current_contract_not_old_prose():
+    row = {"one_line_thesis": "Network moat; base IRR 9.2%.", "valuation_decision": {
+        "return_publishable": True, "forward_return_status": "available", "forward_return_at_price_pct": {"base": 14.5}}}
+    gate_return_claims(row)
+    assert "9.2%" not in row["one_line_thesis"]
+    assert "14.50%" in row["one_line_thesis"]
+    assert "9.2%" in row["return_claim_audit"]["original_thesis"]
+    original = copy.deepcopy(row)
+    gate_return_claims(row)
+    assert row == original
 
 
 def test_all_company_readiness_stays_separate_from_model_maturity():

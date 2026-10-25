@@ -7,6 +7,7 @@ different document. Review candidates never change a published action.
 from __future__ import annotations
 
 import json
+import math
 import re
 from copy import deepcopy
 from functools import lru_cache
@@ -147,7 +148,7 @@ def classification_audit(ticker: str) -> dict:
 RETURN_CLAIM = re.compile(r"(?:\bIRRs?\b|\b(?:base|forward|expected|annualized)[ -]return\b)", re.I)
 PERCENT = re.compile(r"[+\-~≈]?\d+(?:\.\d+)?\s*(?:%|percent)\b|[+\-~≈]?\d+(?:\.\d+)?\s*%", re.I)
 HISTORICAL = re.compile(r"\b(?:historical|historically|since inception|realized)\b", re.I)
-HURDLE_ONLY = re.compile(r"\b(?:require|required|hurdle|minimum|threshold)\b.{0,35}\bIRR\b|\bIRR\s+(?:hurdle|threshold|target)\b", re.I)
+HURDLE_ONLY = re.compile(r"\b(?:require(?:s|d)?|hurdle|minimum|threshold)\b.{0,35}\bIRR\b|\btarget(?:ed)?\s+(?:an?\s+)?IRR\b|\bIRR\s+(?:hurdle|threshold|target)\b", re.I)
 
 
 def gate_return_text(text: str, publishable: bool) -> str:
@@ -155,7 +156,7 @@ def gate_return_text(text: str, publishable: bool) -> str:
         return text
     # Splitting at semicolons/dashes preserves the investment case around an
     # unsupported return. Decimal points are deliberately not boundaries.
-    clauses = re.split(r"(;|\s+[—–]\s+)", text)
+    clauses = re.split(r"(;|\s+[—–]\s+|(?<=[.!?])\s+(?=[A-Z]))", text)
     for i in range(0, len(clauses), 2):
         part = clauses[i]
         if RETURN_CLAIM.search(part) and PERCENT.search(part) and not HISTORICAL.search(part) and not HURDLE_ONLY.search(part):
@@ -167,8 +168,24 @@ def gate_return_text(text: str, publishable: bool) -> str:
 
 def gate_return_claims(row: dict) -> None:
     text = (row.get("return_claim_audit") or {}).get("original_thesis") or row.get("one_line_thesis") or ""
-    safe = gate_return_text(text, bool((row.get("valuation_decision") or {}).get("return_publishable")))
+    decision = row.get("valuation_decision") or {}
+    try:
+        base = float((decision.get("forward_return_at_price_pct") or {}).get("base"))
+    except (TypeError, ValueError):
+        base = None
+    publishable = decision.get("return_publishable") is True and decision.get("forward_return_status") == "available" and base is not None and math.isfinite(base)
+    # Even after a model is cleared, old prose is not authority for today's
+    # return. Replace prospective numeric claims with the current contract.
+    safe = gate_return_text(text, False)
     if safe != text:
-        row.setdefault("return_claim_audit", {"status": "withheld", "original_thesis": text,
-            "reason": "Current thesis conflicts with canonical forward-return eligibility; source text retained for audit."})
+        if publishable:
+            safe = safe.replace(" Forward IRR unavailable; dated cash flows and publication checks required.", "")
+            safe = safe.rstrip(" ;—–") + f". Canonical base forward IRR {base:.2f}% per year."
+        row["return_claim_audit"] = {"status": "reconciled" if publishable else "withheld", "original_thesis": text,
+            "reason": "Prospective return claims are governed by the current canonical contract; original source wording retained for audit."}
         row["one_line_thesis"] = safe.strip()
+    elif row.get("return_claim_audit"):
+        # A historical return or pure hurdle cleared by a narrower parser is
+        # restored, rather than permanently carrying an earlier false flag.
+        row["one_line_thesis"] = text
+        row.pop("return_claim_audit", None)
