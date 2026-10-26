@@ -3347,9 +3347,11 @@ def build(prior_by_ticker: dict[str, dict] | None = None) -> dict:
     memory_doc = _load_json(RESEARCH_MEMORY_PATH)
     registry_doc = _load_json(DOCUMENT_REGISTRY_PATH) or {}
     registry_docs = list(registry_doc.get("documents") or [])
-    rows = [
-        build_ticker_row(
-            t,
+    licensed_by_ticker = (_load_json(DATA_DIR / "licensed_sources.json") or {}).get("by_ticker") or {}
+    rows = []
+    for ticker in tickers:
+        row = build_ticker_row(
+            ticker,
             holdings,
             portfolio_class,
             insights_doc,
@@ -3357,8 +3359,10 @@ def build(prior_by_ticker: dict[str, dict] | None = None) -> dict:
             reg.get("watchlist") or {},
             registry_docs,
         )
-        for t in tickers
-    ]
+        licensed = licensed_by_ticker.get(ticker)
+        if licensed:
+            row["licensed_sources"] = licensed
+        rows.append(row)
     if prior_by_ticker is None:
         prior_by_ticker = load_prior_dashboard_rows()
     if infra_restore_allowed(tickers) and prior_by_ticker:

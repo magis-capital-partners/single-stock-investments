@@ -1,0 +1,191 @@
+name: Licensed research sync
+
+on:
+  schedule:
+    # Saturday 17:17 UTC. Off letter backfill (Sunday 16:00, Wednesday 15:00)
+    # and off the quarter-hour, where GitHub drops scheduled runs.
+    - cron: "17 17 * * 6"
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+env:
+  RESEARCH_VAULT_REPO_URL: ${{ secrets.RESEARCH_VAULT_REPO_URL }}
+  RESEARCH_VAULT_CLONE_TOKEN: ${{ secrets.RESEARCH_VAULT_CLONE_TOKEN }}
+  RESEARCH_VAULT_ROOT: _external/research-vault
+
+jobs:
+  plan:
+    runs-on: ubuntu-latest
+    timeout-minutes: 90
+    outputs:
+      shard_count: ${{ steps.matrix.outputs.shard_count }}
+      shard_matrix: ${{ steps.matrix.outputs.shard_matrix }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          sparse-checkout: |
+            _system/scripts/ci_checkout_workspace.sh
+            _system/scripts/ci_resolve_checkout_ref.sh
+            _system/scripts/ci_sparse_checkout_paths.py
+          sparse-checkout-cone-mode: false
+          fetch-depth: 1
+
+      - name: Checkout workspace (scripts + dashboard on main)
+        run: bash _system/scripts/ci_checkout_workspace.sh pages main
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Install dependencies
+        run: pip install -r _system/scripts/requirements.txt
+
+      - name: Check Google credentials secret
+        env:
+          GOOGLE_APPLICATION_CREDENTIALS_JSON: ${{ secrets.GOOGLE_APPLICATION_CREDENTIALS_JSON }}
+        run: |
+          if [ -z "$GOOGLE_APPLICATION_CREDENTIALS_JSON" ]; then
+            echo "GOOGLE_APPLICATION_CREDENTIALS_JSON is not configured."
+            exit 1
+          fi
+          printf '%s' "$GOOGLE_APPLICATION_CREDENTIALS_JSON" > "$RUNNER_TEMP/google-service-account.json"
+          echo "GOOGLE_APPLICATION_CREDENTIALS=$RUNNER_TEMP/google-service-account.json" >> "$GITHUB_ENV"
+
+      - name: Classify ValueLine and write public labels
+        run: |
+          python _system/scripts/import_drive_valueline.py \
+            --write-public \
+            --classified-out "$RUNNER_TEMP/valueline_classified.json"
+
+      - name: Match Expert Calls and write public labels
+        run: |
+          python _system/scripts/import_drive_expert_calls.py \
+            --write-public \
+            --fetch-sec \
+            --plans-out "$RUNNER_TEMP/expert_plans.json"
+
+      - name: Dry-run Expert Calls Drive organization
+        # Never pass --apply here. Drew reviews the CSV before any move.
+        # Michael's bot uploads into this folder.
+        run: |
+          python _system/scripts/organize_expert_calls_drive.py \
+            --from-plans "$RUNNER_TEMP/expert_plans.json" \
+            --dry-run
+
+      - name: Upload classification for the vault shards
+        uses: actions/upload-artifact@v4
+        with:
+          name: licensed-research-plan
+          path: |
+            ${{ runner.temp }}/valueline_classified.json
+            ${{ runner.temp }}/expert_plans.json
+          retention-days: 7
+
+      - name: Commit public metadata and the Drive plan
+        uses: ./.github/actions/commit-main
+        with:
+          message: |
+            Refresh ValueLine and Expert Call labels.
+
+            Dashboard files are dates and Drive links. The Expert Calls CSV is a dry run.
+          git_add: >-
+            dashboard/data/licensed_sources.json
+            dashboard/data/insights/valueline.json
+            dashboard/data/insights/expert_calls.json
+            _system/reference/document-store/valueline_unmatched.csv
+            _system/reference/document-store/valueline_sync_summary.json
+            _system/reference/document-store/expert_calls_unmatched.csv
+            _system/reference/document-store/expert_calls_misfiled_vic.json
+            _system/reference/document-store/expert_calls_drive_plan.csv
+            _system/reference/document-store/expert_calls_drive_plan_summary.json
+
+      - id: matrix
+        run: |
+          COUNT=8
+          MATRIX=$(python -c "import json; print(json.dumps({'shard': list(range($COUNT))}))")
+          echo "shard_count=$COUNT" >> "$GITHUB_OUTPUT"
+          echo "shard_matrix=$MATRIX" >> "$GITHUB_OUTPUT"
+
+  ingest:
+    needs: plan
+    runs-on: ubuntu-latest
+    timeout-minutes: 120
+    strategy:
+      fail-fast: false
+      max-parallel: 1
+      matrix: ${{ fromJson(needs.plan.outputs.shard_matrix) }}
+    concurrency:
+      group: licensed-research-vault-${{ matrix.shard }}
+      cancel-in-progress: false
+    steps:
+      - uses: jlumbroso/free-disk-space@54081f138730dfa15788a46383842cd2f914a1be # v1.3.1
+        with:
+          tool-cache: false
+          android: true
+          dotnet: true
+          haskell: true
+          docker-images: true
+          swap-storage: true
+
+      - uses: actions/checkout@v4
+        with:
+          sparse-checkout: |
+            _system/scripts/ci_checkout_workspace.sh
+            _system/scripts/ci_resolve_checkout_ref.sh
+            _system/scripts/ci_sparse_checkout_paths.py
+          sparse-checkout-cone-mode: false
+          fetch-depth: 1
+
+      - name: Checkout workspace (minimal + scripts)
+        run: bash _system/scripts/ci_checkout_workspace.sh minimal
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Install dependencies
+        run: pip install -r _system/scripts/requirements.txt
+
+      - name: Checkout research vault
+        uses: ./.github/actions/checkout-vault
+
+      - name: Configure Google credentials
+        env:
+          GOOGLE_APPLICATION_CREDENTIALS_JSON: ${{ secrets.GOOGLE_APPLICATION_CREDENTIALS_JSON }}
+        run: |
+          printf '%s' "$GOOGLE_APPLICATION_CREDENTIALS_JSON" > "$RUNNER_TEMP/google-service-account.json"
+          echo "GOOGLE_APPLICATION_CREDENTIALS=$RUNNER_TEMP/google-service-account.json" >> "$GITHUB_ENV"
+
+      - name: Download the plan
+        uses: actions/download-artifact@v4
+        with:
+          name: licensed-research-plan
+          path: ${{ runner.temp }}/licensed-research-plan
+
+      - name: Import this shard into the vault
+        env:
+          SHARD: ${{ matrix.shard }}
+          SHARD_COUNT: ${{ needs.plan.outputs.shard_count }}
+        run: |
+          set -euo pipefail
+          python _system/scripts/import_drive_valueline.py \
+            --apply \
+            --from-classified "$RUNNER_TEMP/licensed-research-plan/valueline_classified.json" \
+            --shard-index "$SHARD" \
+            --shard-count "$SHARD_COUNT"
+          python _system/scripts/import_drive_expert_calls.py \
+            --apply \
+            --from-plans "$RUNNER_TEMP/licensed-research-plan/expert_plans.json" \
+            --shard-index "$SHARD" \
+            --shard-count "$SHARD_COUNT"
+
+      - name: Commit extracts to the research vault
+        uses: ./.github/actions/commit-vault
+        with:
+          message: |
+            Ingest ValueLine and Expert Call text (shard ${{ matrix.shard }}/${{ needs.plan.outputs.shard_count }}).
+
+            PDFs and Word files stay gitignored. Dashboard files are not updated here.
+          git_add: valueline/ expert-calls/
