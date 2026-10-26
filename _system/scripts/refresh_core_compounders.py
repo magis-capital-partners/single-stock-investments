@@ -219,6 +219,15 @@ def ticker_view(ticker: str, *, root: Path, config: dict, as_of: str, royalty_si
         checks.append({"id": "calendar_overdue", "text": "Past scheduled earnings remain unconfirmed; verify the calendar before calling them reported.",
                        "source": evidence(f"{ticker}/research/evidence/earnings_calendar.json", calendar.get("as_of")), "status": "open"})
     quality = quality_view(ticker, valuation, read(research / "valuation_fact_ledger.json"), classification, config)
+    # A legacy ledger observation remains usable when the operating feed has
+    # not ingested it yet. Preserve its actual date and provenance.
+    legacy_points = {p.get("kpi_id"): p for p in ledger.get("kpis") or []}
+    for item in coverage:
+        old = legacy_points.get(item["kpi_id"]) or {}
+        actual = old.get("actual") or {}
+        if item["value"] is None and number(actual.get("value")) is not None and actual.get("as_of") and old.get("source"):
+            item.update(value=actual["value"], unit=old.get("unit"), period=actual["as_of"],
+                        status="historical", source=evidence(old["source"], actual["as_of"], "fact"))
     returns = ((contract.get("valuation") or {}).get("forward_return_at_price_pct") or {})
     canonical_return = returns.get("base") if contract.get("status") == "decision_grade" and contract.get("model_level") in {"stock_specific", "committee_reviewed", "owner_approved"} else None
     conditions = {f"kpi:{r['kpi_id']}": r.get("status") in {"fail", "stale"} for r in ledger.get("kpis") or []}

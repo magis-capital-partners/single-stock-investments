@@ -57,6 +57,8 @@ def build_bridge(valuation: dict, *, price: float | None = None) -> dict:
         "claim_type": "inference", "scenarios": {}, "sensitivity_10yr": {},
         "forward_cashflow_schedule": {}, "gaps": [],
     }
+    if valuation.get("method") == "owner_earnings_reinvestment_dcf":
+        return owner_cash_bridge(valuation, result)
     if valuation.get("method") != "full":
         result["gaps"].append("GAP: method is not a per-share full cash-flow model; retain its approved NAV/issuer-specific method.")
         return result
@@ -123,6 +125,49 @@ def build_bridge(valuation: dict, *, price: float | None = None) -> dict:
             result["gaps"].append(f"GAP: {name} growth attribution missing {', '.join(missing)}; do not add buybacks twice to per-share growth.")
     if len(result["scenarios"]) == 3:
         result["status"] = "diagnostic"
+    return result
+
+
+def owner_cash_bridge(valuation: dict, result: dict) -> dict:
+    """Read undiscounted proof nodes, never annualize the proof's present value.
+
+    The terminal owner-cash multiple is treated as equity proceeds. No separate
+    cash or debt is added; this avoids counting financing claims a second time.
+    This explicit settlement convention is a research scenario assumption.
+    """
+    from calculation_proof import evaluate_calculation_proof
+    from universal_valuation_contract import _cashflow_irr
+
+    components = (valuation.get("component_valuation_results") or {}).get("additive_components") or []
+    if len(components) != 1 or number(result.get("price")) is None or result["price"] <= 0:
+        result["gaps"].append("GAP: owner-cash bridge requires one reconciled operating component and a positive price.")
+        return result
+    proof = components[0].get("calculation_proof") or {}
+    evaluated = evaluate_calculation_proof(proof)
+    if evaluated.get("status") != "valid":
+        result["gaps"].append("GAP: invalid owner-cash calculation proof.")
+        return result
+    result["distribution_assumption"] = "Use proof owner cash after reinvestment; terminal owner-cash multiple is equity proceeds; no additional cash/debt settlement."
+    for name, case in CASES.items():
+        nodes = {n["id"]: n["value"] for n in evaluated["traces"][case]}
+        shares = number(nodes.get("shares_m"))
+        cash = [number(nodes.get(f"owner_cash_y{y}")) for y in range(1, 8)]
+        terminal = number(nodes.get("terminal_value"))
+        if shares is None or shares <= 0 or terminal is None or any(v is None for v in cash):
+            result["gaps"].append(f"GAP: {case} undiscounted owner-cash, terminal or diluted-share proof nodes unavailable.")
+            continue
+        flows = [{"year": y, "amount_per_share": v / shares} for y, v in enumerate(cash, 1)]
+        flows[-1]["amount_per_share"] += terminal / shares
+        exact = _cashflow_irr(result["price"], flows)
+        if exact is None:
+            result["gaps"].append(f"GAP: {case} shareholder cash-flow IRR unresolved.")
+            continue
+        result["forward_cashflow_schedule"][case] = flows
+        result["scenarios"][name] = {"exact_irr_pct": exact, "claim_type": "inference",
+            "mechanism": result["distribution_assumption"], "growth_components_status": "proof_derived"}
+    if len(result["scenarios"]) == 3:
+        result["status"] = "diagnostic"
+    result["sources"] = evaluated.get("source_lineage") or []
     return result
 
 

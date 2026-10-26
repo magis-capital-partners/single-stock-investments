@@ -205,6 +205,9 @@ def _slim_essential_insights(essential: dict) -> dict:
 def slim_ticker_row(row: dict) -> dict:
     """Trim a full dashboard row down to what the holdings table needs."""
     slim = {k: v for k, v in row.items() if k not in DETAIL_ONLY_FIELDS}
+    if isinstance(row.get("autonomous_irr"), dict):
+        from autonomous_compounders import summary_estimate
+        slim["autonomous_irr"] = summary_estimate(row["autonomous_irr"])
     readiness = row.get("irr_readiness")
     if isinstance(readiness, dict):
         slim["irr_readiness"] = {k: readiness[k] for k in

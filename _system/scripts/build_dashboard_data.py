@@ -1787,7 +1787,18 @@ def pricing_analysis_summary(ticker_dir: Path) -> dict | None:
 
 def core_compounder_summary(ticker: str) -> dict | None:
     from refresh_core_compounders import load_views
-    return load_views(ROOT).get(ticker)
+    from autonomous_compounders import load_estimate
+    existing = load_views(ROOT).get(ticker)
+    automatic = load_estimate(ticker, ROOT)
+    if not automatic or not existing:
+        return existing
+    # Avoid mutating the shared cached monitor while projecting measured quality.
+    spec = ((_load_json(ROOT / "_system/reference/core_compounders.json") or {}).get("issuers") or {}).get(ticker) or {}
+    ids = set(spec.get("kpi_ids") or [])
+    return {**existing,
+            "driver_to_fcf": spec.get("driver_to_fcf") or existing.get("driver_to_fcf"),
+            "kpi_coverage": [p for p in existing.get("kpi_coverage") or [] if p.get("kpi_id") in ids],
+            "quality_assessment": automatic.get("quality_assessment") or existing.get("quality_assessment")}
 
 
 def valuation_total_return_panel(ticker: str, ticker_dir: Path) -> dict | None:
@@ -3114,6 +3125,8 @@ def build_ticker_row(
     row["classification_audit"] = classification_audit(ticker)
     attach_readiness(row, assess_company(row, _load_json(ticker_dir / "research/valuation.json") or {},
         _load_json(ticker_dir / "research/valuation_contract.json") or {}, as_of=datetime.now(timezone.utc).date()), detailed=True)
+    from autonomous_compounders import load_estimate
+    row["autonomous_irr"] = load_estimate(ticker, ROOT)
     return row
 
 

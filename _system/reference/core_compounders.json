@@ -1,6 +1,6 @@
 {
   "schema_version": "magis.core_compounders.v1",
-  "version": "2026-10-23.1",
+  "version": "2026-10-26.1",
   "universe_source": "Drew canonical list 2026-10-22; supplied implementation brief 2026-10-23",
   "tickers": [
     "MA",
@@ -285,10 +285,8 @@
       "kpi_ids": [
         "rated_issuance_m",
         "ratings_revenue_m",
-        "subscription_retention_pct",
-        "subscription_abr_m",
-        "index_linked_aum_m",
-        "index_fee_bps"
+        "analytics_revenue_m",
+        "subscription_retention_pct"
       ],
       "existing_kpi_ids": [
         "spy_20d_realized_vol",
@@ -297,7 +295,8 @@
       "primary_source": "MCO/research/evidence/filing_facts.json",
       "cadence": "quarterly_or_issuer_reporting",
       "non_us_ingestion_gap": false,
-      "classification_source": "_system/portfolio/registry.json#/holdings/MCO/classification"
+      "classification_source": "_system/portfolio/registry.json#/holdings/MCO/classification",
+      "kpi_role": "monitoring; missing optional operating drivers do not prevent a sourced mechanical return estimate"
     },
     "SPGI": {
       "sector": "ratings_data",
@@ -323,8 +322,6 @@
       "sector": "ratings_data",
       "driver_to_fcf": "rated_issuance * fee_yield + subscription_ABR * retention + index_AUM * fee_bps / 10000; cash margin less capex per share",
       "kpi_ids": [
-        "rated_issuance_m",
-        "ratings_revenue_m",
         "subscription_retention_pct",
         "subscription_abr_m",
         "index_linked_aum_m",
@@ -337,7 +334,8 @@
       "primary_source": "MSCI/research/evidence/filing_facts.json",
       "cadence": "quarterly_or_issuer_reporting",
       "non_us_ingestion_gap": false,
-      "classification_source": "_system/portfolio/registry.json#/holdings/MSCI/classification"
+      "classification_source": "_system/portfolio/registry.json#/holdings/MSCI/classification",
+      "kpi_role": "monitoring; missing optional operating drivers do not prevent a sourced mechanical return estimate"
     },
     "FNV": {
       "sector": "royalties",
@@ -542,7 +540,7 @@
     },
     "CPRT": {
       "sector": "serial_acquirers",
-      "driver_to_fcf": "organic_owner_cash + acquisition_capital * incremental_ROIC - financing_cost - minority_claims; per diluted_share, acquisitions funded once",
+      "driver_to_fcf": "auction_units * revenue_per_unit - cash_costs - cash_tax - maintenance_and_growth_capex; attributable_to_diluted_shares",
       "kpi_ids": [
         "auction_units",
         "revenue_per_unit",
@@ -553,7 +551,8 @@
       "primary_source": "CPRT/research/evidence/filing_facts.json",
       "cadence": "quarterly_or_issuer_reporting",
       "non_us_ingestion_gap": false,
-      "classification_source": "_system/portfolio/registry.json#/holdings/CPRT/classification"
+      "classification_source": "_system/portfolio/registry.json#/holdings/CPRT/classification",
+      "kpi_role": "monitoring; missing optional operating drivers do not prevent a sourced mechanical return estimate"
     },
     "BRK.B": {
       "sector": "holdcos",
@@ -576,16 +575,15 @@
       "driver_to_fcf": "look_through_owner_cash + distributable_earnings - parent_costs; NAV marks kept separate from distributions; no forced FCF multiple",
       "kpi_ids": [
         "nav_per_share",
-        "book_value_per_share",
-        "float_growth_pct",
-        "combined_ratio_pct",
-        "distributable_earnings_per_share"
+        "distributable_earnings_per_share",
+        "fee_related_earnings_m"
       ],
       "existing_kpi_ids": [],
       "primary_source": "BN/research/evidence/filing_facts.json",
       "cadence": "quarterly_or_issuer_reporting",
       "non_us_ingestion_gap": true,
-      "classification_source": "_system/portfolio/registry.json#/holdings/BN/classification"
+      "classification_source": "_system/portfolio/registry.json#/holdings/BN/classification",
+      "kpi_role": "monitoring; missing optional operating drivers do not prevent a sourced mechanical return estimate"
     },
     "MKL": {
       "sector": "holdcos",
@@ -609,55 +607,53 @@
       "kpi_ids": [
         "nav_per_share",
         "book_value_per_share",
-        "float_growth_pct",
-        "combined_ratio_pct",
-        "distributable_earnings_per_share"
+        "look_through_earnings_m"
       ],
       "existing_kpi_ids": [],
       "primary_source": "FRMO/research/evidence/filing_facts.json",
       "cadence": "quarterly_or_issuer_reporting",
       "non_us_ingestion_gap": false,
-      "classification_source": "_system/portfolio/registry.json#/holdings/FRMO/classification"
+      "classification_source": "_system/portfolio/registry.json#/holdings/FRMO/classification",
+      "kpi_role": "monitoring; missing optional operating drivers do not prevent a sourced mechanical return estimate"
     },
     "AENA.MC": {
       "sector": "infrastructure",
       "driver_to_fcf": "traffic * tariff_or_price_mix - operating_costs - tax - maintenance_and_growth_capex; adjust net_debt once",
       "kpi_ids": [
-        "traffic_volume",
-        "tariff_growth_pct",
-        "price_mix_pct",
-        "operating_ratio_pct",
+        "passengers",
+        "aeronautical_revenue_per_passenger",
+        "commercial_revenue_per_passenger",
         "capex_m"
       ],
       "existing_kpi_ids": [],
       "primary_source": "AENA.MC/research/evidence/filing_facts.json",
       "cadence": "quarterly_or_issuer_reporting",
       "non_us_ingestion_gap": true,
-      "classification_source": "_system/portfolio/registry.json#/holdings/AENA.MC/classification"
+      "classification_source": "_system/portfolio/registry.json#/holdings/AENA.MC/classification",
+      "kpi_role": "monitoring; missing optional operating drivers do not prevent a sourced mechanical return estimate"
     },
     "FER": {
       "sector": "infrastructure",
       "driver_to_fcf": "traffic * tariff_or_price_mix - operating_costs - tax - maintenance_and_growth_capex; adjust net_debt once",
       "kpi_ids": [
         "traffic_volume",
-        "tariff_growth_pct",
-        "price_mix_pct",
-        "operating_ratio_pct",
+        "toll_revenue_growth_pct",
+        "managed_lane_revenue_m",
         "capex_m"
       ],
       "existing_kpi_ids": [],
       "primary_source": "FER/research/evidence/filing_facts.json",
       "cadence": "quarterly_or_issuer_reporting",
       "non_us_ingestion_gap": false,
-      "classification_source": "_system/portfolio/registry.json#/holdings/FER/classification"
+      "classification_source": "_system/portfolio/registry.json#/holdings/FER/classification",
+      "kpi_role": "monitoring; missing optional operating drivers do not prevent a sourced mechanical return estimate"
     },
     "CP": {
       "sector": "infrastructure",
       "driver_to_fcf": "traffic * tariff_or_price_mix - operating_costs - tax - maintenance_and_growth_capex; adjust net_debt once",
       "kpi_ids": [
         "traffic_volume",
-        "tariff_growth_pct",
-        "price_mix_pct",
+        "freight_revenue_per_unit",
         "operating_ratio_pct",
         "capex_m"
       ],
@@ -665,23 +661,25 @@
       "primary_source": "CP/research/evidence/filing_facts.json",
       "cadence": "quarterly_or_issuer_reporting",
       "non_us_ingestion_gap": true,
-      "classification_source": "_system/portfolio/registry.json#/holdings/CP/classification"
+      "classification_source": "_system/portfolio/registry.json#/holdings/CP/classification",
+      "kpi_role": "monitoring; missing optional operating drivers do not prevent a sourced mechanical return estimate"
     },
     "WCN": {
       "sector": "infrastructure",
       "driver_to_fcf": "traffic * tariff_or_price_mix - operating_costs - tax - maintenance_and_growth_capex; adjust net_debt once",
       "kpi_ids": [
-        "traffic_volume",
-        "tariff_growth_pct",
+        "organic_growth_pct",
         "price_mix_pct",
-        "operating_ratio_pct",
+        "collection_volume_growth_pct",
+        "operating_margin_pct",
         "capex_m"
       ],
       "existing_kpi_ids": [],
       "primary_source": "WCN/research/evidence/filing_facts.json",
       "cadence": "quarterly_or_issuer_reporting",
       "non_us_ingestion_gap": true,
-      "classification_source": "_system/portfolio/registry.json#/holdings/WCN/classification"
+      "classification_source": "_system/portfolio/registry.json#/holdings/WCN/classification",
+      "kpi_role": "monitoring; missing optional operating drivers do not prevent a sourced mechanical return estimate"
     },
     "COST": {
       "sector": "consumer_platforms",
@@ -704,8 +702,6 @@
       "sector": "consumer_platforms",
       "driver_to_fcf": "membership_fees + segment_units * price_mix * cash_margin - taxes - capex; segment cash flows reconciled to diluted_share",
       "kpi_ids": [
-        "membership_fee_income_m",
-        "renewal_rate_pct",
         "organic_growth_pct",
         "price_mix_pct",
         "segment_operating_income_m",
@@ -715,24 +711,25 @@
       "primary_source": "RMS.PA/research/evidence/filing_facts.json",
       "cadence": "quarterly_or_issuer_reporting",
       "non_us_ingestion_gap": true,
-      "classification_source": "_system/portfolio/registry.json#/holdings/RMS.PA/classification"
+      "classification_source": "_system/portfolio/registry.json#/holdings/RMS.PA/classification",
+      "kpi_role": "monitoring; missing optional operating drivers do not prevent a sourced mechanical return estimate"
     },
     "RACE": {
       "sector": "consumer_platforms",
       "driver_to_fcf": "membership_fees + segment_units * price_mix * cash_margin - taxes - capex; segment cash flows reconciled to diluted_share",
       "kpi_ids": [
-        "membership_fee_income_m",
-        "renewal_rate_pct",
-        "organic_growth_pct",
-        "price_mix_pct",
-        "segment_operating_income_m",
+        "shipments",
+        "average_selling_price",
+        "personalization_revenue_pct",
+        "operating_margin_pct",
         "capex_m"
       ],
       "existing_kpi_ids": [],
       "primary_source": "RACE/research/evidence/filing_facts.json",
       "cadence": "quarterly_or_issuer_reporting",
       "non_us_ingestion_gap": false,
-      "classification_source": "_system/portfolio/registry.json#/holdings/RACE/classification"
+      "classification_source": "_system/portfolio/registry.json#/holdings/RACE/classification",
+      "kpi_role": "monitoring; missing optional operating drivers do not prevent a sourced mechanical return estimate"
     },
     "GOOGL": {
       "sector": "consumer_platforms",
