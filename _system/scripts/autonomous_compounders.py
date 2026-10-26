@@ -349,7 +349,16 @@ def operating_points(ticker, data):
             add('cash_margin_pct', 100 * p['owner_cash'] / revenue['value'], 'pct', source, p['sources'] + [revenue])
     for p in book_history(data):
         add('book_value_per_share', p['per_share'], p['currency'] + '_per_share', p['sources'][0], p['sources'])
-    return points
+    # The existing store keys annual observations by year. Multiple rolling
+    # twelve-month ends in one year must not overwrite one another repeatedly
+    # on every replay; retain the latest economic end in that annual slot.
+    selected = {}
+    for point in points:
+        key = (point['kpi'], point['period'])
+        old = selected.get(key)
+        if not old or point['fiscal_period_end'] > old['fiscal_period_end']:
+            selected[key] = point
+    return [selected[k] for k in sorted(selected)]
 
 
 def distribution_history(data):

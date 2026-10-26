@@ -163,3 +163,18 @@ def test_core_rows_keep_returns_but_not_large_cashflow_histories():
     assert row['autonomous_irr']['forward_irr_pct'] == full['forward_irr_pct']
     assert 'financial_observations' not in row['autonomous_irr']
     assert 'forward_cashflow_schedule' not in row['autonomous_irr']
+
+
+def test_multiple_twelve_month_ends_do_not_create_revisions_on_every_replay(tmp_path):
+    data = inputs()
+    extra = [dict(p, period='2025-06-30', value=p['value'] * 2) for p in data['facts'] if p['period']=='2025-12-31']
+    data['facts'] += extra
+    points = ac.operating_points('MA', data)
+    assert len(points) == len({(p['kpi'],p['period']) for p in points})
+    assert all(p['fiscal_period_end']=='2025-12-31' for p in points if p['period']=='2025')
+    from operating_kpis import model
+    with patch.object(model, 'STORE_DIR', tmp_path):
+        path = model.write_ticker_store('MA', points, sources=[], fetched_at='2026-10-26')
+        original = path.read_bytes()
+        model.write_ticker_store('MA', points, sources=[], fetched_at='2026-10-26')
+        assert path.read_bytes() == original
