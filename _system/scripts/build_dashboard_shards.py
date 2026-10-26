@@ -55,6 +55,13 @@ DETAIL_ONLY_FIELDS = (
     "human_review",
     "decision_summary",
     "classification_audit",
+    # Drive links for Value Line and expert calls. The detail pane loads
+    # data/licensed_sources.json (and the ticker shard still carries the same
+    # object). Putting the links on every boot row added 313 KB on 2026-10-26
+    # and pushed core.json through the 6.0 MB budget.
+    "licensed_sources",
+    # Thesis sentence for the detail header. The holdings table does not read it.
+    "one_line_thesis",
 )
 
 # Top-level payload keys that stay out of core.json (fetched lazily instead).
@@ -122,6 +129,29 @@ _COMPONENT_VALUATION_DETAIL_ONLY = (
 # and legacy audit remain available in the per-ticker shard once a row opens.
 # Keeping the full object in core.json duplicates several kilobytes per ticker
 # and makes the SPA pay that cost before the user has selected a security.
+
+# Holdings index cell (index-viz.js renderHoldingsCell / bestDistance) only
+# reads watch-status scorecards, and it reads distance_to_boundary_pct.
+# n_a and ineligible cards are the bulk of the list and never reach that cell.
+# The index page itself loads index_membership.json, not these boot copies.
+_INDEX_SCORECARD_WATCH_STATUSES = (
+    "inclusion_candidate",
+    "deletion_risk",
+    "banding_hold",
+    "committee_watch",
+)
+_INDEX_SCORECARD_CORE_FIELDS = ("index", "status", "distance_to_boundary_pct")
+
+# irr_readiness.next_action is a sentence per ticker for the detail checklist.
+# The boot row only needs the status the table and workspace header read.
+_IRR_READINESS_CORE_FIELDS = (
+    "as_of",
+    "status",
+    "blocked_count",
+    "diagnostic_math_complete",
+    "work_group",
+)
+
 _VALUATION_DECISION_CORE_FIELDS = (
     "status",
     "proof_status",
@@ -179,10 +209,71 @@ def slim_valuation_decision(decision: dict | None) -> dict:
         for key in _VALUATION_DECISION_CORE_FIELDS
         if key in decision
     }
+    # The holdings IRR tooltip reads model_as_of. Fact and price dates render
+    # in the detail strip, which loads the full decision from the ticker shard.
+    dates = decision.get("dates")
+    if isinstance(dates, dict) and dates.get("model_as_of") is not None:
+        slim["dates"] = {"model_as_of": dates.get("model_as_of")}
+    else:
+        slim.pop("dates", None)
     tier = slim_valuation_tier(decision.get("universe_tier"))
     if tier:
         slim["universe_tier"] = tier
     return slim
+
+
+def _slim_power_zones(zones: dict) -> dict:
+    """Keep the table's route and the lead persona fit. Drop the route hash
+    and the per-persona match lists. The detail pane replaces this object
+    from the ticker shard, which still has every persona.
+    """
+    slim = {
+        key: value
+        for key, value in zones.items()
+        if key != "zones"
+    }
+    route = zones.get("valuation_route")
+    if isinstance(route, dict):
+        slim["valuation_route"] = {
+            key: value for key, value in route.items() if key != "input_hash"
+        }
+    catalog = zones.get("zones") if isinstance(zones.get("zones"), dict) else {}
+    in_zone = zones.get("in_zone") or []
+    lead_id = in_zone[0] if in_zone else None
+    lead = catalog.get(lead_id) if isinstance(lead_id, str) else None
+    if isinstance(lead, dict):
+        compact = {
+            key: lead.get(key)
+            for key in ("fit", "score", "in_power_zone")
+            if key in lead
+        }
+        if compact:
+            slim["zones"] = {lead_id: compact}
+    return slim
+
+
+def _slim_deep_dive(dive: dict) -> dict:
+    """The table links the report. The executive summary renders after the
+    ticker shard loads.
+    """
+    return {key: value for key, value in dive.items() if key != "executive_summary"}
+
+
+def _slim_index_scorecards(cards: list) -> list:
+    kept = []
+    for card in cards:
+        if not isinstance(card, dict):
+            continue
+        if card.get("status") not in _INDEX_SCORECARD_WATCH_STATUSES:
+            continue
+        compact = {
+            key: card.get(key)
+            for key in _INDEX_SCORECARD_CORE_FIELDS
+            if key in card
+        }
+        if compact:
+            kept.append(compact)
+    return kept
 
 
 def _slim_essential_insights(essential: dict) -> dict:
@@ -210,8 +301,9 @@ def slim_ticker_row(row: dict) -> dict:
         slim["autonomous_irr"] = summary_estimate(row["autonomous_irr"])
     readiness = row.get("irr_readiness")
     if isinstance(readiness, dict):
-        slim["irr_readiness"] = {k: readiness[k] for k in
-            ("as_of", "status", "blocked_count", "diagnostic_math_complete", "work_group", "next_action") if k in readiness}
+        slim["irr_readiness"] = {
+            k: readiness[k] for k in _IRR_READINESS_CORE_FIELDS if k in readiness
+        }
     slim.pop("return_claim_audit", None)
     essential = row.get("essential_insights")
     if isinstance(essential, dict):
@@ -219,12 +311,28 @@ def slim_ticker_row(row: dict) -> dict:
     component_valuation = row.get("component_valuation")
     if isinstance(component_valuation, dict):
         slim["component_valuation"] = _slim_component_valuation(component_valuation)
-    valuation_decision = slim_valuation_decision(row.get("valuation_decision"))
-    if valuation_decision:
-        slim["valuation_decision"] = valuation_decision
     valuation_tier = slim_valuation_tier(row.get("valuation_tier"))
     if valuation_tier:
         slim["valuation_tier"] = valuation_tier
+    valuation_decision = slim_valuation_decision(row.get("valuation_decision"))
+    if valuation_decision:
+        # valuation_tier is already on the boot row. Repeating universe_tier
+        # inside the decision was a second copy of the same label.
+        if valuation_tier:
+            valuation_decision.pop("universe_tier", None)
+        slim["valuation_decision"] = valuation_decision
+    deep_dive = row.get("deep_dive")
+    if isinstance(deep_dive, dict):
+        slim["deep_dive"] = _slim_deep_dive(deep_dive)
+    power_zones = row.get("power_zones")
+    if isinstance(power_zones, dict):
+        slim["power_zones"] = _slim_power_zones(power_zones)
+    activist = row.get("activist")
+    if isinstance(activist, dict) and "latest" in activist:
+        # Badge uses the counts. The latest report renders from the shard.
+        activist_slim = dict(activist)
+        activist_slim.pop("latest", None)
+        slim["activist"] = activist_slim
     # KPI badge summary keeps the table's trend hints without the series.
     kpi = row.get("kpi_trends")
     if isinstance(kpi, dict):
@@ -239,11 +347,7 @@ def slim_ticker_row(row: dict) -> dict:
     if isinstance(membership, dict):
         compact = dict(membership)
         if isinstance(compact.get("scorecards"), list):
-            compact["scorecards"] = [
-                {k: s.get(k) for k in ("index", "status", "distance", "rank") if k in s}
-                for s in compact["scorecards"][:6]
-                if isinstance(s, dict)
-            ]
+            compact["scorecards"] = _slim_index_scorecards(compact["scorecards"])
         if isinstance(compact.get("confirmed_events"), list):
             compact["confirmed_events"] = compact["confirmed_events"][:3]
         compact.pop("inputs_missing", None)

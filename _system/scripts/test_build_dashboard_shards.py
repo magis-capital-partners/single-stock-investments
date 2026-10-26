@@ -155,7 +155,8 @@ class SlimTickerRowTests(unittest.TestCase):
         self.assertNotIn("decision_eligibility", slim["valuation_decision"])
         self.assertNotIn("legacy_audit", slim["valuation_decision"])
         self.assertNotIn("forward_cashflow_schedule", slim["valuation_decision"])
-        self.assertNotIn("assignment_reasons", slim["valuation_decision"]["universe_tier"])
+        self.assertNotIn("universe_tier", slim["valuation_decision"])
+        self.assertEqual(slim["valuation_tier"]["label"], "Active underwriting")
 
     def test_every_valuation_decision_sort_key_survives_the_slim(self):
         if not INDEX_HTML.exists():  # pragma: no cover
@@ -168,6 +169,136 @@ class SlimTickerRowTests(unittest.TestCase):
             {"annualized_return_at_price_pct", "proof_complete_pct", "unvalued_component_count"},
             "A new boot-time decision field was added without updating the core slim contract",
         )
+
+    def test_detail_prose_stays_on_the_shard(self):
+        """Boot rows keep table fields. Detail prose is already on the ticker shard."""
+        row = {
+            "ticker": "T",
+            "one_line_thesis": "A long thesis the table never renders.",
+            "licensed_sources": {
+                "expert_calls": [{"drive_url": "https://drive.example/a", "label": "call"}],
+                "valueline": {"drive_url": "https://drive.example/b", "label": "vl"},
+            },
+            "deep_dive": {
+                "path": "T/research/deep_dive.md",
+                "date": "2026-10-01",
+                "stance": "watch",
+                "github_url": "https://example.test/dive",
+                "executive_summary": "A paragraph the evidence tab renders after the shard loads.",
+            },
+            "power_zones": {
+                "in_zone": ["hohn"],
+                "classified": True,
+                "valuation_route": {
+                    "profile_id": "quality_reinvestment",
+                    "label": "High-return compounder",
+                    "status": "routed",
+                    "primary_methods": ["owner_earnings"],
+                    "input_hash": "a" * 64,
+                },
+                "zones": {
+                    "hohn": {
+                        "in_power_zone": True,
+                        "fit": 1.0,
+                        "score": 85,
+                        "matched_fields": ["archetype", "moat"],
+                    },
+                    "pabrai": {"in_power_zone": False, "fit": 0.25, "score": 21, "matched_fields": ["dhando"]},
+                },
+            },
+            "irr_readiness": {
+                "as_of": "2026-10-26",
+                "status": "blocked",
+                "blocked_count": 5,
+                "diagnostic_math_complete": True,
+                "work_group": "underwrite_cashflow_model",
+                "next_action": "Record a positive listing-currency quote.",
+                "requirements": [{"id": "price", "status": "missing"}],
+            },
+            "activist": {
+                "long_count": 1,
+                "short_count": 0,
+                "signal_count": 1,
+                "has_unreconciled": False,
+                "latest": {"firm_name": "Example", "title": "A long letter", "date": "2026-01-01"},
+            },
+            "valuation_decision": {
+                "status": "evidence_blocked",
+                "dates": {
+                    "model_as_of": "2026-08-04",
+                    "latest_fact_as_of": "2026-03-16",
+                    "oldest_fact_as_of": "2025-03-17",
+                    "price_as_of": None,
+                },
+                "next_action": "Freeze the evidence packet.",
+                "universe_tier": {"tier": 2, "tier_id": "tier_2", "label": "Coverage"},
+            },
+            "valuation_tier": {"tier": 2, "tier_id": "tier_2", "label": "Coverage"},
+            "index_membership": {
+                "badge_status": "inclusion_candidate",
+                "priority_score": 3,
+                "scorecards": [
+                    {"index": "sp500", "status": "n_a", "distance_to_boundary_pct": 40, "checks": {"x": 1}},
+                    {"index": "russell", "status": "ineligible", "distance_to_boundary_pct": 12, "checks": {"y": 1}},
+                    {
+                        "index": "sp400",
+                        "status": "inclusion_candidate",
+                        "distance_to_boundary_pct": 4.5,
+                        "checks": {"z": 1},
+                        "gating_check": "float",
+                    },
+                ],
+            },
+        }
+        slim = bds.slim_ticker_row(row)
+        self.assertNotIn("one_line_thesis", slim)
+        self.assertNotIn("licensed_sources", slim)
+        self.assertEqual(slim["deep_dive"]["date"], "2026-10-01")
+        self.assertEqual(slim["deep_dive"]["github_url"], "https://example.test/dive")
+        self.assertNotIn("executive_summary", slim["deep_dive"])
+        self.assertNotIn("input_hash", slim["power_zones"]["valuation_route"])
+        self.assertEqual(slim["power_zones"]["valuation_route"]["primary_methods"], ["owner_earnings"])
+        self.assertEqual(slim["power_zones"]["zones"], {
+            "hohn": {"in_power_zone": True, "fit": 1.0, "score": 85},
+        })
+        self.assertEqual(slim["irr_readiness"]["status"], "blocked")
+        self.assertEqual(slim["irr_readiness"]["work_group"], "underwrite_cashflow_model")
+        self.assertNotIn("next_action", slim["irr_readiness"])
+        self.assertNotIn("requirements", slim["irr_readiness"])
+        self.assertEqual(slim["activist"]["long_count"], 1)
+        self.assertNotIn("latest", slim["activist"])
+        self.assertEqual(slim["valuation_decision"]["dates"], {"model_as_of": "2026-08-04"})
+        self.assertEqual(slim["valuation_decision"]["next_action"], "Freeze the evidence packet.")
+        self.assertNotIn("universe_tier", slim["valuation_decision"])
+        self.assertEqual(slim["valuation_tier"]["label"], "Coverage")
+        self.assertEqual(slim["index_membership"]["scorecards"], [{
+            "index": "sp400",
+            "status": "inclusion_candidate",
+            "distance_to_boundary_pct": 4.5,
+        }])
+        self.assertEqual(slim["index_membership"]["badge_status"], "inclusion_candidate")
+        # The source row is what the ticker shard writes. Slimming must not mutate it.
+        self.assertIn("executive_summary", row["deep_dive"])
+        self.assertIn("latest", row["activist"])
+        self.assertIn("input_hash", row["power_zones"]["valuation_route"])
+        self.assertEqual(len(row["index_membership"]["scorecards"]), 3)
+
+    def test_decision_keeps_universe_tier_when_the_row_has_no_valuation_tier(self):
+        slim = bds.slim_ticker_row({
+            "ticker": "T",
+            "valuation_decision": {
+                "status": "provisional",
+                "universe_tier": {
+                    "tier": 1,
+                    "tier_id": "tier_1",
+                    "label": "Active underwriting",
+                    "assignment_reasons": ["paper"],
+                },
+            },
+        })
+        self.assertEqual(slim["valuation_decision"]["universe_tier"], {
+            "tier": 1, "tier_id": "tier_1", "label": "Active underwriting",
+        })
 
     def test_next_calendar_event_stays_off_the_core_row(self):
         slim = bds.slim_ticker_row({
