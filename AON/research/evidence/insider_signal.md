@@ -2,7 +2,7 @@
 
 > Context only. Insider activity informs scenario confidence and stance discussion; it does not auto-inflate Lawrence base IRR. Promotion requires [HUMAN REVIEW].
 
-**ICS:** 8.84 (exceptional) · **Bull case support:** moderate
+**ICS:** 8.76 (exceptional) · **Bull case support:** moderate
 
 | Scenario | Prior weight | Tilted weight |
 |----------|--------------|---------------|
@@ -12,11 +12,11 @@
 
 | Insider | Date | Shares | Price | Value | Contrib |
 |---------|------|--------|-------|-------|---------|
-| KNIGHT LESTER B | 2026-09-02 | 7212 | $327.52 | $2362074.24 | 1.427 |
-| KNIGHT LESTER B | 2026-09-02 | 5097 | $326.53 | $1664323.41 | 1.38 |
-| KNIGHT LESTER B | 2026-09-02 | 4145 | $328.34 | $1360969.3 | 1.338 |
-| KNIGHT LESTER B | 2026-09-02 | 1739 | $325.63 | $566270.57 | 1.244 |
-| KNIGHT LESTER B | 2026-09-02 | 1440 | $329.69 | $474753.6 | 1.214 |
+| KNIGHT LESTER B | 2026-09-02 | 7212 | $327.52 | $2362074.24 | 1.415 |
+| KNIGHT LESTER B | 2026-09-02 | 5097 | $326.53 | $1664323.41 | 1.368 |
+| KNIGHT LESTER B | 2026-09-02 | 4145 | $328.34 | $1360969.3 | 1.327 |
+| KNIGHT LESTER B | 2026-09-02 | 1739 | $325.63 | $566270.57 | 1.234 |
+| KNIGHT LESTER B | 2026-09-02 | 1440 | $329.69 | $474753.6 | 1.204 |
 
 **Routine / planned sales (context):**
 

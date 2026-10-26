@@ -12,10 +12,10 @@
 
 | Insider | Date | Shares | Price | Value | Contrib |
 |---------|------|--------|-------|-------|---------|
-| Kalathur Rajesh | 2026-08-21 | 2829 | $177.0 | $500733.0 | 3.102 |
+| Kalathur Rajesh | 2026-08-21 | 2829 | $177.0 | $500733.0 | 3.076 |
 | Kalathur Rajesh | 2026-03-10 | 2671 | $185.3 | $494936.3 | 2.531 |
 | REILLY EUGENE F | 2025-10-31 | 5554 | $178.99 | $994110.46 | 2.531 |
-| Clarke Teresa Hillary | 2026-10-20 | 42 | $183.2 | $7694.4 | 1.787 |
+| Clarke Teresa Hillary | 2026-10-20 | 42 | $183.2 | $7694.4 | 1.773 |
 | Clarke Teresa Hillary | 2026-07-13 | 46 | $167.52 | $7705.92 | 0.849 |
 
 **Routine / planned sales (context):**
