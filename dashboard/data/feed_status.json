@@ -1,6 +1,6 @@
 {
   "schema_version": "1",
-  "generated_at": "2026-10-26T19:35:48Z",
+  "generated_at": "2026-10-26T21:39:59Z",
   "surfaces": [
     {
       "id": "buyback-radar",
@@ -34,7 +34,7 @@
       "status": "api",
       "label_text": "Live API",
       "lane": "deploy",
-      "lane_receipt_at": "2026-10-26T14:36:29Z",
+      "lane_receipt_at": "2026-10-26T20:30:51Z",
       "healer": "Wait for the next Flex report. This page does not read the Gateway.",
       "next_action": "Wait for the next Flex report. This page does not read the Gateway."
     },
@@ -90,7 +90,7 @@
       "lane": "ls-algo",
       "lane_receipt_at": "2026-10-25T08:03:05Z",
       "healer": "When the snapshot is stopped, unknown, or older than its cadence, ls-algo owns the next action. This page does not probe the Gateway.",
-      "next_action": "When the snapshot is stopped, unknown, or older than its cadence, ls-algo owns the next action. This page does not probe the Gateway."
+      "next_action": "When the snapshot is stopped, unknown, or older than its cadence, ls-algo owns the next action. This page does not probe the Gateway. A lane-failure issue is open."
     },
     {
       "id": "darwin",
@@ -100,13 +100,13 @@
       "api": null,
       "artifact": "dashboard/data/darwin_cc.json",
       "stamp_field": "generated_at",
-      "stamp": "2026-10-24T00:01:15Z",
+      "stamp": "2026-10-26T20:06:32Z",
       "max_age_hours": 96.0,
       "exists": true,
       "status": "fresh",
       "label_text": "Fresh",
       "lane": "darwin-covered-call",
-      "lane_receipt_at": "2026-10-24T00:07:52Z",
+      "lane_receipt_at": "2026-10-26T20:15:30Z",
       "healer": "darwin-covered-call.yml rebuilds the signal from Cboe delayed chains several times each weekday (build_darwin_covered_call.py). This page does not dispatch that job.",
       "next_action": "darwin-covered-call.yml rebuilds the signal from Cboe delayed chains several times each weekday (build_darwin_covered_call.py). This page does not dispatch that job."
     },
@@ -118,7 +118,7 @@
       "api": null,
       "artifact": "dashboard/data/core.json",
       "stamp_field": "generated_at",
-      "stamp": "2026-10-26T19:34:12Z",
+      "stamp": "2026-10-26T21:38:17Z",
       "max_age_hours": 54.0,
       "exists": true,
       "status": "fresh",
@@ -126,7 +126,7 @@
       "lane": "data-pipeline-intake-full",
       "lane_receipt_at": "2026-10-25T09:18:54Z",
       "healer": "Nightly intake republishes this surface. This page does not dispatch that job.",
-      "next_action": "Nightly intake republishes this surface. This page does not dispatch that job."
+      "next_action": "Nightly intake republishes this surface. This page does not dispatch that job. A lane-failure issue is open."
     },
     {
       "id": "technical-summary",
@@ -154,7 +154,7 @@
       "api": null,
       "artifact": "dashboard/data/core.json",
       "stamp_field": "generated_at",
-      "stamp": "2026-10-26T19:34:12Z",
+      "stamp": "2026-10-26T21:38:17Z",
       "max_age_hours": 56.0,
       "exists": true,
       "status": "fresh",
@@ -172,7 +172,7 @@
       "api": null,
       "artifact": "dashboard/data/core.json",
       "stamp_field": "generated_at",
-      "stamp": "2026-10-26T19:34:12Z",
+      "stamp": "2026-10-26T21:38:17Z",
       "max_age_hours": 54.0,
       "exists": true,
       "status": "fresh",
@@ -180,7 +180,7 @@
       "lane": "data-pipeline-intake-full",
       "lane_receipt_at": "2026-10-25T09:18:54Z",
       "healer": "Nightly intake republishes this surface. This page does not dispatch that job.",
-      "next_action": "Nightly intake republishes this surface. This page does not dispatch that job."
+      "next_action": "Nightly intake republishes this surface. This page does not dispatch that job. A lane-failure issue is open."
     },
     {
       "id": "short-alpha",
@@ -198,7 +198,7 @@
       "lane": "data-pipeline-intake-full",
       "lane_receipt_at": "2026-10-25T09:18:54Z",
       "healer": "python _system/scripts/build_short_alpha_dashboard.py (build_dashboard_data.build_short_alpha inside data-pipeline intake-full, check=True; --check also runs in the automerge data-guard for PRs touching _system/research/short-alpha/)",
-      "next_action": "python _system/scripts/build_short_alpha_dashboard.py (build_dashboard_data.build_short_alpha inside data-pipeline intake-full, check=True; --check also runs in the automerge data-guard for PRs touching _system/research/short-alpha/)"
+      "next_action": "python _system/scripts/build_short_alpha_dashboard.py (build_dashboard_data.build_short_alpha inside data-pipeline intake-full, check=True; --check also runs in the automerge data-guard for PRs touching _system/research/short-alpha/) A lane-failure issue is open."
     },
     {
       "id": "reverse-splits",
@@ -208,13 +208,13 @@
       "api": null,
       "artifact": "dashboard/data/reverse_splits.json",
       "stamp_field": "generated_at",
-      "stamp": "2026-10-25T13:14:17Z",
+      "stamp": "2026-10-26T20:56:57Z",
       "max_age_hours": 100.0,
       "exists": true,
       "status": "fresh",
       "label_text": "Fresh",
       "lane": "data-pipeline-reverse-splits",
-      "lane_receipt_at": "2026-10-12T17:02:01Z",
+      "lane_receipt_at": "2026-10-26T20:57:25Z",
       "healer": "python _system/scripts/build_reverse_splits_dashboard.py (data-pipeline nightly intake-full rebuild + Monday reverse-splits job; repository_dispatch heal-reverse-splits)",
       "next_action": "python _system/scripts/build_reverse_splits_dashboard.py (data-pipeline nightly intake-full rebuild + Monday reverse-splits job; repository_dispatch heal-reverse-splits)"
     },
@@ -234,7 +234,7 @@
       "lane": "data-pipeline-intake-full",
       "lane_receipt_at": "2026-10-25T09:18:54Z",
       "healer": "python _system/scripts/check_desk_briefs.py --warn-only && python _system/scripts/build_desk_briefs.py (data-pipeline nightly intake-full; briefs arrive by grok/<desk>/<date>-<slug> PR and the automerge data-guard)",
-      "next_action": "python _system/scripts/check_desk_briefs.py --warn-only && python _system/scripts/build_desk_briefs.py (data-pipeline nightly intake-full; briefs arrive by grok/<desk>/<date>-<slug> PR and the automerge data-guard)"
+      "next_action": "python _system/scripts/check_desk_briefs.py --warn-only && python _system/scripts/build_desk_briefs.py (data-pipeline nightly intake-full; briefs arrive by grok/<desk>/<date>-<slug> PR and the automerge data-guard) A lane-failure issue is open."
     },
     {
       "id": "warrants",
@@ -288,7 +288,7 @@
       "lane": "data-pipeline-intake-full",
       "lane_receipt_at": "2026-10-25T09:18:54Z",
       "healer": "python _system/scripts/build_special_situations.py (ci_rebuild_profile intake-full step after build_separations_dashboard.py)",
-      "next_action": "python _system/scripts/build_special_situations.py (ci_rebuild_profile intake-full step after build_separations_dashboard.py)"
+      "next_action": "python _system/scripts/build_special_situations.py (ci_rebuild_profile intake-full step after build_separations_dashboard.py) A lane-failure issue is open."
     },
     {
       "id": "nol",
@@ -298,7 +298,7 @@
       "api": null,
       "artifact": "dashboard/data/core.json",
       "stamp_field": "generated_at",
-      "stamp": "2026-10-26T19:34:12Z",
+      "stamp": "2026-10-26T21:38:17Z",
       "max_age_hours": 54.0,
       "exists": true,
       "status": "fresh",
@@ -306,7 +306,7 @@
       "lane": "data-pipeline-intake-full",
       "lane_receipt_at": "2026-10-25T09:18:54Z",
       "healer": "Nightly intake republishes this surface. This page does not dispatch that job.",
-      "next_action": "Nightly intake republishes this surface. This page does not dispatch that job."
+      "next_action": "Nightly intake republishes this surface. This page does not dispatch that job. A lane-failure issue is open."
     },
     {
       "id": "banks",
@@ -316,7 +316,7 @@
       "api": null,
       "artifact": "dashboard/data/core.json",
       "stamp_field": "generated_at",
-      "stamp": "2026-10-26T19:34:12Z",
+      "stamp": "2026-10-26T21:38:17Z",
       "max_age_hours": 54.0,
       "exists": true,
       "status": "fresh",
@@ -324,7 +324,7 @@
       "lane": "data-pipeline-intake-full",
       "lane_receipt_at": "2026-10-25T09:18:54Z",
       "healer": "Nightly intake republishes this surface. This page does not dispatch that job.",
-      "next_action": "Nightly intake republishes this surface. This page does not dispatch that job."
+      "next_action": "Nightly intake republishes this surface. This page does not dispatch that job. A lane-failure issue is open."
     },
     {
       "id": "rock",
@@ -334,7 +334,7 @@
       "api": null,
       "artifact": "dashboard/data/rock_aggregates_screener.json",
       "stamp_field": "generated_at",
-      "stamp": "2026-10-26T19:35:36.248816+00:00",
+      "stamp": "2026-10-26T21:39:47.400285+00:00",
       "max_age_hours": 102.0,
       "exists": true,
       "status": "fresh",
@@ -360,7 +360,7 @@
       "lane": "data-pipeline-intake-full",
       "lane_receipt_at": "2026-10-25T09:18:54Z",
       "healer": "Nightly intake republishes this surface. This page does not dispatch that job.",
-      "next_action": "Nightly intake republishes this surface. This page does not dispatch that job."
+      "next_action": "Nightly intake republishes this surface. This page does not dispatch that job. A lane-failure issue is open."
     },
     {
       "id": "managers-13f",
@@ -370,13 +370,13 @@
       "api": null,
       "artifact": "dashboard/data/fund_holdings_summary.json",
       "stamp_field": "generated_at",
-      "stamp": "2026-10-25T17:47:13Z",
+      "stamp": "2026-10-26T19:45:19Z",
       "max_age_hours": 54.0,
       "exists": true,
       "status": "fresh",
       "label_text": "Fresh",
       "lane": "data-pipeline-thirteen-f",
-      "lane_receipt_at": "2026-10-25T17:47:25Z",
+      "lane_receipt_at": "2026-10-26T19:45:32Z",
       "healer": "The 13:29 UTC data-pipeline thirteen-f job refreshes filings. This page does not dispatch that job.",
       "next_action": "The 13:29 UTC data-pipeline thirteen-f job refreshes filings. This page does not dispatch that job."
     },
@@ -414,7 +414,7 @@
       "lane": "data-pipeline-intake-full",
       "lane_receipt_at": "2026-10-25T09:18:54Z",
       "healer": "This table is written with the dashboard build. It does not dispatch refreshes.",
-      "next_action": "This table is written with the dashboard build. It does not dispatch refreshes."
+      "next_action": "This table is written with the dashboard build. It does not dispatch refreshes. A lane-failure issue is open."
     },
     {
       "id": "letters",
@@ -468,7 +468,7 @@
       "lane": "data-pipeline-intake-full",
       "lane_receipt_at": "2026-10-25T09:18:54Z",
       "healer": "Nightly intake republishes this surface. This page does not dispatch that job.",
-      "next_action": "Nightly intake republishes this surface. This page does not dispatch that job."
+      "next_action": "Nightly intake republishes this surface. This page does not dispatch that job. A lane-failure issue is open."
     },
     {
       "id": "inflections",
@@ -486,7 +486,7 @@
       "lane": "data-pipeline-intake-full",
       "lane_receipt_at": "2026-10-25T09:18:54Z",
       "healer": "Nightly intake republishes this surface. This page does not dispatch that job.",
-      "next_action": "Nightly intake republishes this surface. This page does not dispatch that job."
+      "next_action": "Nightly intake republishes this surface. This page does not dispatch that job. A lane-failure issue is open."
     },
     {
       "id": "index-watch",
@@ -496,7 +496,7 @@
       "api": null,
       "artifact": "dashboard/data/index_membership.json",
       "stamp_field": "generated",
-      "stamp": "2026-10-25T13:13:07Z",
+      "stamp": "2026-10-26T21:36:44Z",
       "max_age_hours": 54.0,
       "exists": true,
       "status": "fresh",
@@ -504,7 +504,7 @@
       "lane": "data-pipeline-intake-full",
       "lane_receipt_at": "2026-10-25T09:18:54Z",
       "healer": "Index membership is rebuilt by nightly intake (insights, activist, and full profiles). This page does not run that job.",
-      "next_action": "Index membership is rebuilt by nightly intake (insights, activist, and full profiles). This page does not run that job."
+      "next_action": "Index membership is rebuilt by nightly intake (insights, activist, and full profiles). This page does not run that job. A lane-failure issue is open."
     },
     {
       "id": "consensus",
@@ -522,7 +522,7 @@
       "lane": "data-pipeline-intake-full",
       "lane_receipt_at": "2026-10-25T09:18:54Z",
       "healer": "Nightly intake republishes this surface. This page does not dispatch that job.",
-      "next_action": "Nightly intake republishes this surface. This page does not dispatch that job."
+      "next_action": "Nightly intake republishes this surface. This page does not dispatch that job. A lane-failure issue is open."
     },
     {
       "id": "funds",
@@ -540,7 +540,7 @@
       "lane": "data-pipeline-intake-full",
       "lane_receipt_at": "2026-10-25T09:18:54Z",
       "healer": "Nightly intake republishes this surface. This page does not dispatch that job.",
-      "next_action": "Nightly intake republishes this surface. This page does not dispatch that job."
+      "next_action": "Nightly intake republishes this surface. This page does not dispatch that job. A lane-failure issue is open."
     },
     {
       "id": "documents",
@@ -550,7 +550,7 @@
       "api": null,
       "artifact": "dashboard/data/document_catalog.json",
       "stamp_field": "generated_at",
-      "stamp": "2026-10-26T19:32:37Z",
+      "stamp": "2026-10-26T21:37:01Z",
       "max_age_hours": 54.0,
       "exists": true,
       "status": "fresh",
@@ -558,7 +558,7 @@
       "lane": "data-pipeline-intake-full",
       "lane_receipt_at": "2026-10-25T09:18:54Z",
       "healer": "Nightly intake republishes this surface. This page does not dispatch that job.",
-      "next_action": "Nightly intake republishes this surface. This page does not dispatch that job."
+      "next_action": "Nightly intake republishes this surface. This page does not dispatch that job. A lane-failure issue is open."
     },
     {
       "id": "memory",
@@ -576,7 +576,7 @@
       "lane": "data-pipeline-intake-full",
       "lane_receipt_at": "2026-10-25T09:18:54Z",
       "healer": "Nightly intake republishes this surface. This page does not dispatch that job.",
-      "next_action": "Nightly intake republishes this surface. This page does not dispatch that job."
+      "next_action": "Nightly intake republishes this surface. This page does not dispatch that job. A lane-failure issue is open."
     },
     {
       "id": "market-risk",
