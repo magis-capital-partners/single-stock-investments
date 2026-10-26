@@ -1,7 +1,7 @@
 # EQPT — Third-party source inventory
 
-**Date:** 2026-10-11
-**Sources:** 10 total (0 approved, 0 pending, 10 context)
+**Date:** 2026-10-25
+**Sources:** 11 total (0 approved, 0 pending, 11 context)
 
 | ID | Title | Path | Status | Use |
 |----|-------|------|--------|-----|
@@ -15,5 +15,6 @@
 | activist_long | acc0000950103 26 010008 | `EQPT/third-party-analyses/activist_reports/long/8-K_20260702_acc0000950103_26_010008.htm` | context | activist/long — local |
 | activist_long | acc0001693736 26 000013 | `EQPT/third-party-analyses/activist_reports/long/8-K_20260710_acc0001693736_26_000013.htm` | context | activist/long — local |
 | activist_long | acc0001693736 26 000016 | `EQPT/third-party-analyses/activist_reports/long/8-K_20260812_acc0001693736_26_000016.htm` | context | activist/long — local |
+| activist_long | acc0001628280 26 066204 | `EQPT/third-party-analyses/activist_reports/long/8-K_20261019_acc0001628280_26_066204.htm` | context | activist/long — local |
 
-Cross-check required: `EQPT/research/cross_check_third_party_2026-10-11.md`
+Cross-check required: `EQPT/research/cross_check_third_party_2026-10-25.md`

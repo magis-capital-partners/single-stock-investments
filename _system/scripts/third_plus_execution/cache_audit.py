@@ -125,10 +125,10 @@ def audit(source, project, output):
           'Prepared arrays were hash-inventoried; this audit does not independently revalidate every upstream raw record.'],
         broker_connections=0,new_market_data_usd=0,holdout_files_opened=0)
     output.parent.mkdir(parents=True,exist_ok=True)
-    output.write_text(json.dumps(result,indent=2,allow_nan=False)+'\n',encoding='utf-8')
+    output.write_text(json.dumps(result,indent=2,allow_nan=False)+'\n',encoding='utf-8', newline='\n')
     private_output=local/'third_plus_signal_study/ssr_execution_v1/cache_sources.local.json'
     private_output.parent.mkdir(parents=True,exist_ok=True)
-    private_output.write_text(json.dumps(dict(files=private,source_hashes=sources),indent=2)+'\n',encoding='utf-8')
+    private_output.write_text(json.dumps(dict(files=private,source_hashes=sources),indent=2)+'\n',encoding='utf-8', newline='\n')
     print(json.dumps(groups,indent=2))
 
 if __name__=='__main__':

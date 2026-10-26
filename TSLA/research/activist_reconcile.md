@@ -1,7 +1,7 @@
 # TSLA — Activist reconciliation (Milly mechanical)
 
-**Date:** 2026-10-24
-**Reports processed:** 4
+**Date:** 2026-10-25
+**Reports processed:** 3
 **Human review:** 3
 
 ## Summary
@@ -11,7 +11,6 @@
 | Unresolved SEC filer | long | 2025-11-05 | activist_proxy | human_review | needs_human | `TSLA/third-party-analyses/activist_reports/long/PX14A6G_20251105_acc0001096906_25_001748.htm` |
 | Unresolved SEC filer | long | 2025-11-05 | activist_proxy | human_review | needs_human | `TSLA/third-party-analyses/activist_reports/long/PX14A6G_20251105_acc0001096906_25_001745.htm` |
 | Unresolved SEC filer | long | 2018-05-14 | activist_proxy | human_review | needs_human | `TSLA/third-party-analyses/activist_reports/long/PX14A6G_20180514_acc0001377739_18_000021.htm` |
-| CIAM | long | 2026-10-19 | activist_proxy | auto_signal | campaign_active | `TSLA/third-party-analyses/activist_reports/long/DEFA14A_20261019_acc0001104659_26_116948.htm` |
 
 ## Notes (human review)
 

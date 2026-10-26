@@ -1,11 +1,11 @@
-# MSFT - Thematic context (2026-10-24)
+# MSFT - Thematic context (2026-10-25)
 
 > Context only. Tailwinds inform stance and overlay sizing; they do not auto-inflate Lawrence base IRR. Promotion to base case requires [HUMAN REVIEW].
 
 | Indicator | Latest | As of | YoY | Direction | In base IRR? |
 |-----------|--------|-------|-----|-----------|--------------|
-| Hyperscaler capex guide (USD bn, latest) | 467.3 | 2026-10-24 | n/a | flat | no (context) |
-| Natural gas (USD/MMBtu; spot or futures fallback) | 2.640000104904175 | 2026-10-23 | -21.1% | down | no (context) |
+| Hyperscaler capex guide (USD bn, latest) | 467.3 | 2026-10-25 | n/a | flat | no (context) |
+| Natural gas (USD/MMBtu; spot or futures fallback) | 3.049999952316284 | 2026-10-23 | -8.8% | down | no (context) |
 | US urban residential electricity price (USD/kWh) | 0.196 (stale) | 2026-08-01 | +3.2% | up | no (context) |
 | WTI crude (USD/bbl) | 103.2699966430664 | 2026-10-23 | +67.1% | up | no (context) |
 | Permian crude / oil-gas activity proxy | 107.1306 (stale) | 2026-08-01 | +9.2% | up | no (context) |

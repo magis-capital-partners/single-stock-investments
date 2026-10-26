@@ -88,4 +88,4 @@ With an absent archive, the runner completes the entire evidence matrix and emit
 
 Sources: [Rule 201](https://www.ecfr.gov/current/title-17/chapter-II/part-242/subject-group-ECFR1607681c7b4f78d/section-242.201), [Nasdaq Equity 4, 4763](https://listingcenter.nasdaq.com/rulebook/nasdaq/rules/nasdaq-equity-4), and the prior SSR_EXECUTION_PLAN.md. Rechecked October 25, 2026 ET.
 
-Publication d80d02e6ee9e6476b94bd48f121a21aab5ad1b3f7d077a01097ebe4adef86be8.
+Publication 44b10b6c764cf13d8ea2a47dca0fba0551a29bd4317fd339077fb213287e7ebf.

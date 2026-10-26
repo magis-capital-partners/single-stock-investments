@@ -1,7 +1,7 @@
 # TOP — Third-party source inventory
 
-**Date:** 2026-10-11
-**Sources:** 9 total (0 approved, 0 pending, 9 context)
+**Date:** 2026-10-25
+**Sources:** 12 total (0 approved, 0 pending, 12 context)
 
 | ID | Title | Path | Status | Use |
 |----|-------|------|--------|-----|
@@ -14,5 +14,8 @@
 | activist_long | acc0001213900 26 097717 | `TOP/third-party-analyses/activist_reports/long/8-K_20260904_acc0001213900_26_097717.htm` | context | activist/long — local |
 | activist_long | acc0001213900 26 101845 | `TOP/third-party-analyses/activist_reports/long/8-K_20260921_acc0001213900_26_101845.htm` | context | activist/long — local |
 | activist_long | acc0001213900 26 104318 | `TOP/third-party-analyses/activist_reports/long/8-K_20260929_acc0001213900_26_104318.htm` | context | activist/long — local |
+| activist_long | acc0001213900 26 108497 | `TOP/third-party-analyses/activist_reports/long/8-K_20261009_acc0001213900_26_108497.htm` | context | activist/long — local |
+| activist_long | acc0001213900 26 109242 | `TOP/third-party-analyses/activist_reports/long/8-K_20261014_acc0001213900_26_109242.htm` | context | activist/long — local |
+| activist_long | acc0001213900 26 110029 | `TOP/third-party-analyses/activist_reports/long/8-K_20261016_acc0001213900_26_110029.htm` | context | activist/long — local |
 
-Cross-check required: `TOP/research/cross_check_third_party_2026-10-11.md`
+Cross-check required: `TOP/research/cross_check_third_party_2026-10-25.md`

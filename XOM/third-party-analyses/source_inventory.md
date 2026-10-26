@@ -1,6 +1,6 @@
 # XOM — Third-party source inventory
 
-**Date:** 2026-10-11
+**Date:** 2026-10-25
 **Sources:** 215 total (0 approved, 0 pending, 215 context)
 
 | ID | Title | Path | Status | Use |
@@ -113,6 +113,7 @@
 | activist_long | Inclusive Capital — DEFA14A | `XOM/third-party-analyses/activist_reports/long/DEFA14A_20210316_acc0001193125_21_082318.htm` | context | activist/long — sec_edgar |
 | activist_long | Engine No. 1 — DEFA14A | `XOM/third-party-analyses/activist_reports/long/DEFA14A_20210315_acc0001193125_21_081554.htm` | context | activist/long — sec_edgar |
 | activist_long | Engine No. 1 — DEFA14A | `XOM/third-party-analyses/activist_reports/long/DEFA14A_20210127_acc0001193125_21_019222.htm` | context | activist/long — sec_edgar |
+| activist_long | acc0000034088 21 000031 | `XOM/third-party-analyses/activist_reports/long/8-K_20210602_acc0000034088_21_000031.htm` | context | activist/long — local |
 | activist_long | acc0000034088 20 000004 | `XOM/third-party-analyses/activist_reports/long/8-K_20200103_acc0000034088_20_000004.htm` | context | activist/long — local |
 | activist_long | acc0000034088 20 000011 | `XOM/third-party-analyses/activist_reports/long/8-K_20200131_acc0000034088_20_000011.htm` | context | activist/long — local |
 | activist_long | acc0000034088 20 000019 | `XOM/third-party-analyses/activist_reports/long/8-K_20200303_acc0000034088_20_000019.htm` | context | activist/long — local |
@@ -136,7 +137,6 @@
 | activist_long | acc0000034088 21 000014 | `XOM/third-party-analyses/activist_reports/long/8-K_20210301_acc0000034088_21_000014.htm` | context | activist/long — local |
 | activist_long | acc0000034088 21 000017 | `XOM/third-party-analyses/activist_reports/long/8-K_20210331_acc0000034088_21_000017.htm` | context | activist/long — local |
 | activist_long | acc0000034088 21 000021 | `XOM/third-party-analyses/activist_reports/long/8-K_20210430_acc0000034088_21_000021.htm` | context | activist/long — local |
-| activist_long | acc0000034088 21 000031 | `XOM/third-party-analyses/activist_reports/long/8-K_20210602_acc0000034088_21_000031.htm` | context | activist/long — local |
 | activist_long | acc0000034088 21 000041 | `XOM/third-party-analyses/activist_reports/long/8-K_20210630_acc0000034088_21_000041.htm` | context | activist/long — local |
 | activist_long | acc0000034088 21 000043 | `XOM/third-party-analyses/activist_reports/long/8-K_20210722_acc0000034088_21_000043.htm` | context | activist/long — local |
 | activist_long | acc0000034088 21 000046 | `XOM/third-party-analyses/activist_reports/long/8-K_20210730_acc0000034088_21_000046.htm` | context | activist/long — local |
@@ -221,4 +221,4 @@
 | activist_long | acc0000034088 26 000078 | `XOM/third-party-analyses/activist_reports/long/8-K_20260529_acc0000034088_26_000078.htm` | context | activist/long — local |
 | activist_long | acc0001193125 26 291986 | `XOM/third-party-analyses/activist_reports/long/8-K_20260701_acc0001193125_26_291986.htm` | context | activist/long — local |
 
-Cross-check required: `XOM/research/cross_check_third_party_2026-10-11.md`
+Cross-check required: `XOM/research/cross_check_third_party_2026-10-25.md`

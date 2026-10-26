@@ -1,7 +1,7 @@
 # OXY — Third-party source inventory
 
-**Date:** 2026-10-11
-**Sources:** 168 total (0 approved, 0 pending, 168 context)
+**Date:** 2026-10-25
+**Sources:** 169 total (0 approved, 0 pending, 169 context)
 
 | ID | Title | Path | Status | Use |
 |----|-------|------|--------|-----|
@@ -173,5 +173,6 @@
 | activist_long | acc0001628280 26 030567 | `OXY/third-party-analyses/activist_reports/long/8-K_20260505_acc0001628280_26_030567.htm` | context | activist/long — local |
 | activist_long | acc0001628280 26 047886 | `OXY/third-party-analyses/activist_reports/long/8-K_20260710_acc0001628280_26_047886.htm` | context | activist/long — local |
 | activist_long | acc0001628280 26 053377 | `OXY/third-party-analyses/activist_reports/long/8-K_20260805_acc0001628280_26_053377.htm` | context | activist/long — local |
+| activist_long | acc0001628280 26 065586 | `OXY/third-party-analyses/activist_reports/long/8-K_20261013_acc0001628280_26_065586.htm` | context | activist/long — local |
 
-Cross-check required: `OXY/research/cross_check_third_party_2026-10-11.md`
+Cross-check required: `OXY/research/cross_check_third_party_2026-10-25.md`

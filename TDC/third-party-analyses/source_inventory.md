@@ -1,6 +1,6 @@
 # TDC — Third-party source inventory
 
-**Date:** 2026-10-11
+**Date:** 2026-10-25
 **Sources:** 74 total (0 approved, 0 pending, 74 context)
 
 | ID | Title | Path | Status | Use |
@@ -9,6 +9,7 @@
 | activist_long | Lynrock Lake LP — SC 13D/A | `TDC/third-party-analyses/activist_reports/long/SC-13D/A_20260617_acc0000921895_26_001622.xml` | context | activist/long — sec_edgar |
 | activist_long | Lynrock Lake LP — SC 13D/A | `TDC/third-party-analyses/activist_reports/long/SC-13D/A_20260212_acc0000921895_26_000319.xml` | context | activist/long — sec_edgar |
 | activist_long | Lynrock Lake LP — SC 13D | `TDC/third-party-analyses/activist_reports/long/SC-13D_20250321_acc0001415889_25_008727.xml` | context | activist/long — sec_edgar |
+| activist_long | acc0001193125 19 287419 | `TDC/third-party-analyses/activist_reports/long/8-K_20191107_acc0001193125_19_287419.htm` | context | activist/long — local |
 | activist_long | acc0001193125 18 032190 | `TDC/third-party-analyses/activist_reports/long/8-K_20180205_acc0001193125_18_032190.htm` | context | activist/long — local |
 | activist_long | acc0000816761 18 000003 | `TDC/third-party-analyses/activist_reports/long/8-K_20180208_acc0000816761_18_000003.htm` | context | activist/long — local |
 | activist_long | acc0001193125 18 126952 | `TDC/third-party-analyses/activist_reports/long/8-K_20180423_acc0001193125_18_126952.htm` | context | activist/long — local |
@@ -24,7 +25,6 @@
 | activist_long | acc0000816761 19 000015 | `TDC/third-party-analyses/activist_reports/long/8-K_20190502_acc0000816761_19_000015.htm` | context | activist/long — local |
 | activist_long | acc0001193125 19 138225 | `TDC/third-party-analyses/activist_reports/long/8-K_20190506_acc0001193125_19_138225.htm` | context | activist/long — local |
 | activist_long | acc0000816761 19 000026 | `TDC/third-party-analyses/activist_reports/long/8-K_20190801_acc0000816761_19_000026.htm` | context | activist/long — local |
-| activist_long | acc0001193125 19 287419 | `TDC/third-party-analyses/activist_reports/long/8-K_20191107_acc0001193125_19_287419.htm` | context | activist/long — local |
 | activist_long | acc0000816761 20 000003 | `TDC/third-party-analyses/activist_reports/long/8-K_20200206_acc0000816761_20_000003.htm` | context | activist/long — local |
 | activist_long | acc0001193125 20 136409 | `TDC/third-party-analyses/activist_reports/long/8-K_20200507_acc0001193125_20_136409.htm` | context | activist/long — local |
 | activist_long | acc0001193125 20 158523 | `TDC/third-party-analyses/activist_reports/long/8-K_20200602_acc0001193125_20_158523.htm` | context | activist/long — local |
@@ -80,4 +80,4 @@
 | activist_long | acc0001628280 26 052549 | `TDC/third-party-analyses/activist_reports/long/8-K_20260804_acc0001628280_26_052549.htm` | context | activist/long — local |
 | activist_long | acc0000816761 26 000032 | `TDC/third-party-analyses/activist_reports/long/8-K_20260817_acc0000816761_26_000032.htm` | context | activist/long — local |
 
-Cross-check required: `TDC/research/cross_check_third_party_2026-10-11.md`
+Cross-check required: `TDC/research/cross_check_third_party_2026-10-25.md`

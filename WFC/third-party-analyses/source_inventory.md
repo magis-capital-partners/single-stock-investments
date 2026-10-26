@@ -1,7 +1,7 @@
 # WFC — Third-party source inventory
 
-**Date:** 2026-10-11
-**Sources:** 24 total (0 approved, 0 pending, 24 context)
+**Date:** 2026-10-25
+**Sources:** 25 total (0 approved, 0 pending, 25 context)
 
 | ID | Title | Path | Status | Use |
 |----|-------|------|--------|-----|
@@ -29,5 +29,6 @@
 | activist_long | acc0001193125 26 356890 | `WFC/third-party-analyses/activist_reports/long/8-K_20260819_acc0001193125_26_356890.htm` | context | activist/long — local |
 | activist_long | acc0000072971 26 000308 | `WFC/third-party-analyses/activist_reports/long/8-K_20260923_acc0000072971_26_000308.htm` | context | activist/long — local |
 | activist_long | acc0001193125 26 401071 | `WFC/third-party-analyses/activist_reports/long/8-K_20260924_acc0001193125_26_401071.htm` | context | activist/long — local |
+| activist_long | acc0000072971 26 000318 | `WFC/third-party-analyses/activist_reports/long/8-K_20261013_acc0000072971_26_000318.htm` | context | activist/long — local |
 
-Cross-check required: `WFC/research/cross_check_third_party_2026-10-11.md`
+Cross-check required: `WFC/research/cross_check_third_party_2026-10-25.md`

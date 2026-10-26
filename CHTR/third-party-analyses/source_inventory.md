@@ -1,7 +1,7 @@
 # CHTR — Third-party source inventory
 
-**Date:** 2026-10-11
-**Sources:** 178 total (0 approved, 0 pending, 178 context)
+**Date:** 2026-10-25
+**Sources:** 180 total (0 approved, 0 pending, 180 context)
 
 | ID | Title | Path | Status | Use |
 |----|-------|------|--------|-----|
@@ -45,6 +45,7 @@
 | activist_long | Advance Publications, Inc — SC 13D/A | `CHTR/third-party-analyses/activist_reports/long/SC-13D/A_20250520_acc0000950142_25_001436.xml` | context | activist/long — sec_edgar |
 | activist_long | Liberty Broadband Corporation — SC 13D/A | `CHTR/third-party-analyses/activist_reports/long/SC-13D/A_20250519_acc0001104659_25_050222.xml` | context | activist/long — sec_edgar |
 | activist_long | Cox Enterprises, Inc — SC 13D/A | `CHTR/third-party-analyses/activist_reports/long/SC-13D/A_20260930_acc0001104659_26_112404.xml` | context | activist/long — sec_edgar |
+| activist_long | acc0001140361 24 046322 | `CHTR/third-party-analyses/activist_reports/long/8-K_20241113_acc0001140361_24_046322.htm` | context | activist/long — local |
 | activist_long | acc0001091667 18 000061 | `CHTR/third-party-analyses/activist_reports/long/8-K_20180427_acc0001091667_18_000061.htm` | context | activist/long — local |
 | activist_long | acc0001091667 18 000072 | `CHTR/third-party-analyses/activist_reports/long/8-K_20180430_acc0001091667_18_000072.htm` | context | activist/long — local |
 | activist_long | acc0001193125 18 212266 | `CHTR/third-party-analyses/activist_reports/long/8-K_20180703_acc0001193125_18_212266.htm` | context | activist/long — local |
@@ -143,7 +144,6 @@
 | activist_long | acc0001104659 24 061218 | `CHTR/third-party-analyses/activist_reports/long/8-K_20240514_acc0001104659_24_061218.htm` | context | activist/long — local |
 | activist_long | acc0001091667 24 000103 | `CHTR/third-party-analyses/activist_reports/long/8-K_20240726_acc0001091667_24_000103.htm` | context | activist/long — local |
 | activist_long | acc0001091667 24 000121 | `CHTR/third-party-analyses/activist_reports/long/8-K_20241101_acc0001091667_24_000121.htm` | context | activist/long — local |
-| activist_long | acc0001140361 24 046322 | `CHTR/third-party-analyses/activist_reports/long/8-K_20241113_acc0001140361_24_046322.htm` | context | activist/long — local |
 | activist_long | acc0001104659 24 126817 | `CHTR/third-party-analyses/activist_reports/long/8-K_20241209_acc0001104659_24_126817.htm` | context | activist/long — local |
 | activist_long | acc0001140361 24 049316 | `CHTR/third-party-analyses/activist_reports/long/8-K_20241213_acc0001140361_24_049316.htm` | context | activist/long — local |
 | activist_long | acc0001091667 25 000033 | `CHTR/third-party-analyses/activist_reports/long/8-K_20250131_acc0001091667_25_000033.htm` | context | activist/long — local |
@@ -183,5 +183,7 @@
 | activist_long | acc0001104659 26 100972 | `CHTR/third-party-analyses/activist_reports/long/8-K_20260826_acc0001104659_26_100972.htm` | context | activist/long — local |
 | activist_long | acc0001140361 26 035084 | `CHTR/third-party-analyses/activist_reports/long/8-K_20260831_acc0001140361_26_035084.htm` | context | activist/long — local |
 | activist_long | acc0001091667 26 000055 | `CHTR/third-party-analyses/activist_reports/long/8-K_20260915_acc0001091667_26_000055.htm` | context | activist/long — local |
+| activist_long | acc0001140361 26 039336 | `CHTR/third-party-analyses/activist_reports/long/8-K_20261013_acc0001140361_26_039336.htm` | context | activist/long — local |
+| activist_long | acc0001091667 26 000060 | `CHTR/third-party-analyses/activist_reports/long/8-K_20261019_acc0001091667_26_000060.htm` | context | activist/long — local |
 
-Cross-check required: `CHTR/research/cross_check_third_party_2026-10-11.md`
+Cross-check required: `CHTR/research/cross_check_third_party_2026-10-25.md`

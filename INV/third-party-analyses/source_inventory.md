@@ -1,7 +1,7 @@
 # INV — Third-party source inventory
 
-**Date:** 2026-10-11
-**Sources:** 70 total (0 approved, 1 pending, 69 context)
+**Date:** 2026-10-25
+**Sources:** 75 total (0 approved, 1 pending, 74 context)
 
 | ID | Title | Path | Status | Use |
 |----|-------|------|--------|-----|
@@ -19,6 +19,8 @@
 | activist_long | WE-INN LLC — SC 13D/A | `INV/third-party-analyses/activist_reports/long/SC-13D/A_20251120_acc0001140361_25_042897.xml` | context | activist/long — sec_edgar |
 | activist_long | WE-INN LLC — SC 13D/A | `INV/third-party-analyses/activist_reports/long/SC-13D/A_20251024_acc0001140361_25_039356.xml` | context | activist/long — sec_edgar |
 | activist_long | Otworth Michael — SC 13D | `INV/third-party-analyses/activist_reports/long/SC-13D_20250818_acc0001847082_25_000002.xml` | context | activist/long — sec_edgar |
+| activist_long | Ascent Capital Partners LLC — SC 13D/A | `INV/third-party-analyses/activist_reports/long/SC-13D/A_20261020_acc0002041777_26_000006.xml` | context | activist/long — sec_edgar |
+| activist_long | Ascent Capital Partners LLC — SC 13D/A | `INV/third-party-analyses/activist_reports/long/SC-13D/A_20261019_acc0002041777_26_000005.xml` | context | activist/long — sec_edgar |
 | activist_long | acc0001140361 24 043179 | `INV/third-party-analyses/activist_reports/long/8-K_20241009_acc0001140361_24_043179.htm` | context | activist/long — local |
 | activist_long | acc0001140361 24 044030 | `INV/third-party-analyses/activist_reports/long/8-K_20241023_acc0001140361_24_044030.htm` | context | activist/long — local |
 | activist_long | acc0001140361 24 046318 | `INV/third-party-analyses/activist_reports/long/8-K_20241113_acc0001140361_24_046318.htm` | context | activist/long — local |
@@ -75,5 +77,8 @@
 | activist_long | acc0002001557 26 000175 | `INV/third-party-analyses/activist_reports/long/8-K_20260921_acc0002001557_26_000175.htm` | context | activist/long — local |
 | activist_long | acc0001140361 26 038822 | `INV/third-party-analyses/activist_reports/long/8-K_20261006_acc0001140361_26_038822.htm` | context | activist/long — local |
 | activist_long | acc0002001557 26 000192 | `INV/third-party-analyses/activist_reports/long/8-K_20261008_acc0002001557_26_000192.htm` | context | activist/long — local |
+| activist_long | acc0002001557 26 000194 | `INV/third-party-analyses/activist_reports/long/8-K_20261013_acc0002001557_26_000194.htm` | context | activist/long — local |
+| activist_long | acc0002001557 26 000196 | `INV/third-party-analyses/activist_reports/long/8-K_20261020_acc0002001557_26_000196.htm` | context | activist/long — local |
+| activist_long | acc0002001557 26 000198 | `INV/third-party-analyses/activist_reports/long/8-K_20261023_acc0002001557_26_000198.htm` | context | activist/long — local |
 
-Cross-check required: `INV/research/cross_check_third_party_2026-10-11.md`
+Cross-check required: `INV/research/cross_check_third_party_2026-10-25.md`

@@ -1,7 +1,7 @@
 # NEE — Third-party source inventory
 
-**Date:** 2026-10-11
-**Sources:** 179 total (0 approved, 0 pending, 179 context)
+**Date:** 2026-10-25
+**Sources:** 180 total (0 approved, 0 pending, 180 context)
 
 | ID | Title | Path | Status | Use |
 |----|-------|------|--------|-----|
@@ -184,5 +184,6 @@
 | activist_long | acc0000753308 26 000071 | `NEE/third-party-analyses/activist_reports/long/8-K_20260903_acc0000753308_26_000071.htm` | context | activist/long — local |
 | activist_long | acc0001104659 26 107537 | `NEE/third-party-analyses/activist_reports/long/8-K_20260914_acc0001104659_26_107537.htm` | context | activist/long — local |
 | activist_long | acc0000753308 26 000074 | `NEE/third-party-analyses/activist_reports/long/8-K_20261006_acc0000753308_26_000074.htm` | context | activist/long — local |
+| activist_long | acc0000753308 26 000077 | `NEE/third-party-analyses/activist_reports/long/8-K_20261021_acc0000753308_26_000077.htm` | context | activist/long — local |
 
-Cross-check required: `NEE/research/cross_check_third_party_2026-10-11.md`
+Cross-check required: `NEE/research/cross_check_third_party_2026-10-25.md`

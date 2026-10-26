@@ -3324,7 +3324,7 @@
     "notes": "Capstone IRR combining filings, segments, overlays, third-party, qualitative"
   },
   "context_overlay": {
-    "as_of": "2026-10-24",
+    "as_of": "2026-10-25",
     "disclaimer": "Context only. Tailwinds inform stance and overlay sizing; they do not auto-inflate Lawrence base IRR. Promotion to base case requires [HUMAN REVIEW].",
     "themes": [
       {
@@ -3446,7 +3446,7 @@
   "insider_signal": {
     "as_of": "2026-08-03",
     "disclaimer": "Context only. Insider activity informs scenario confidence and stance discussion; it does not auto-inflate Lawrence base IRR. Promotion requires [HUMAN REVIEW].",
-    "processed_at": "2026-10-24",
+    "processed_at": "2026-10-25",
     "constituent_identity_verified": true,
     "score_version": 2,
     "in_base_irr": false,
@@ -3486,7 +3486,7 @@
         "price": 15.293,
         "value_usd": 458790.0,
         "is_10b5_1": false,
-        "contrib": -0.142
+        "contrib": -0.14
       },
       {
         "insider": "Johnson Stephen L",
@@ -3495,7 +3495,7 @@
         "price": 15.2626,
         "value_usd": 457878.0,
         "is_10b5_1": false,
-        "contrib": -0.14
+        "contrib": -0.139
       },
       {
         "insider": "Johnson Stephen L",
@@ -3504,7 +3504,7 @@
         "price": 15.0126,
         "value_usd": 450378.0,
         "is_10b5_1": false,
-        "contrib": -0.139
+        "contrib": -0.138
       },
       {
         "insider": "Johnson Stephen L",
@@ -3513,7 +3513,7 @@
         "price": 15.1606,
         "value_usd": 454818.0,
         "is_10b5_1": false,
-        "contrib": -0.138
+        "contrib": -0.137
       },
       {
         "insider": "Johnson Stephen L",
@@ -3522,7 +3522,7 @@
         "price": 14.6704,
         "value_usd": 440112.0,
         "is_10b5_1": false,
-        "contrib": -0.137
+        "contrib": -0.136
       }
     ],
     "narrative_hooks": [],
@@ -3662,21 +3662,27 @@
     "implied_growth_contract": "Constant 7-year owner-cash growth with a 7x terminal owner-cash multiple; diagnostic, not forecast.",
     "entry_prices_by_hurdle_and_case": {
       "bear": {
+        "8pct": 20.27,
         "10pct": 18.62,
         "12pct": 17.16,
         "15pct": 15.27,
+        "18pct": 13.68,
         "20pct": 12.76
       },
       "base": {
+        "8pct": 33.24,
         "10pct": 30.2,
         "12pct": 27.53,
         "15pct": 24.1,
+        "18pct": 21.25,
         "20pct": 19.61
       },
       "bull": {
+        "8pct": 47.23,
         "10pct": 42.63,
         "12pct": 38.6,
         "15pct": 33.46,
+        "18pct": 29.2,
         "20pct": 26.76
       }
     },
@@ -3926,7 +3932,7 @@
   "human_review": {
     "live_price_confirmed": false
   },
-  "schema_version": "magis.valuation.v2",
+  "schema_version": "magis.valuation.v3",
   "returns": {
     "base_irr_pct": 32.04,
     "unit": "percent_per_year",
@@ -3937,5 +3943,266 @@
       "base": 30.5,
       "bull": 38.7
     }
+  },
+  "tci_return_bridge": {
+    "schema_version": "1.0",
+    "unit": "percent_per_year",
+    "method": "dated_forward_cashflow_schedule_per_share@1.0",
+    "status": "diagnostic",
+    "research_only": true,
+    "capital_actionable": false,
+    "horizon_years": 7,
+    "persona_horizon_note": "Hohn's 4-year lens scores business fit; the contract uses the existing 7-year cash-flow horizon, with a separate 10-year sensitivity.",
+    "model_as_of": "2026-07-21",
+    "price": 13.43,
+    "price_as_of": "2026-08-31",
+    "sources": [
+      {
+        "ref": "AAL/research/valuation.json#inputs.price",
+        "locator": "Yahoo AAL close 2026-08-31",
+        "as_of": "2026-07-21",
+        "claim_type": "inference",
+        "status": "assumption"
+      },
+      {
+        "ref": "AAL/research/valuation.json#inputs.fcf_per_share",
+        "locator": "Mid-cycle operating income proxy $2040.5M ÷ 658.621M shares; FY2025 OCF $3099.0M and capex $3779.0M per AAL/investor-documents/sec-edgar/10-K_20260218_rpt20251231_acc0000006201_26_000014.htm",
+        "as_of": "2026-07-21",
+        "claim_type": "inference",
+        "status": "assumption"
+      }
+    ],
+    "normalization_note": "FY2025 GAAP net income $111M reflects trough operating income and heavy non-cash items; Lawrence base uses mid-cycle operating income and OCF per share, not peak 2023 heroics.",
+    "claim_type": "inference",
+    "scenarios": {
+      "bear": {
+        "fcf_yield_pct": 23.08265078183172,
+        "per_share_fcf_growth_pct": -4.152353377496787,
+        "multiple_change_pct": 2.0689552226428765,
+        "approximate_return_pct": 20.99925262697781,
+        "exact_irr_pct": 18.528700612174852,
+        "reconciliation_gap_pp": -2.4705520148029585,
+        "reconciliation_reason": "Compounding, growing interim cash distributions and terminal timing.",
+        "growth_components": {
+          "organic_growth_pct": null,
+          "reinvestment_rate_pct": null,
+          "incremental_roic_pct": null,
+          "dilution_pct": null,
+          "buyback_accretion_pct": null
+        },
+        "growth_component_gap_pp": null,
+        "growth_components_status": "gap",
+        "mechanism": "Recession, fare compression, fuel spike; debt wall limits equity recovery",
+        "claim_type": "inference",
+        "legacy_reported_return_pct": 18.5
+      },
+      "base": {
+        "fcf_yield_pct": 23.08265078183172,
+        "per_share_fcf_growth_pct": 2.7132894940900876,
+        "multiple_change_pct": 7.094977276985648,
+        "approximate_return_pct": 32.89091755290745,
+        "exact_irr_pct": 30.5164594775746,
+        "reconciliation_gap_pp": -2.3744580753328535,
+        "reconciliation_reason": "Compounding, growing interim cash distributions and terminal timing.",
+        "growth_components": {
+          "organic_growth_pct": null,
+          "reinvestment_rate_pct": null,
+          "incremental_roic_pct": null,
+          "dilution_pct": null,
+          "buyback_accretion_pct": null
+        },
+        "growth_component_gap_pp": null,
+        "growth_components_status": "gap",
+        "mechanism": "Mid-cycle demand normalization; modest deleveraging from OCF; exit 7× owner cash",
+        "claim_type": "inference",
+        "legacy_reported_return_pct": 30.5
+      },
+      "bull": {
+        "fcf_yield_pct": 23.08265078183172,
+        "per_share_fcf_growth_pct": 6.841697490633303,
+        "multiple_change_pct": 11.009761626848281,
+        "approximate_return_pct": 40.934109899313306,
+        "exact_irr_pct": 38.719534410715724,
+        "reconciliation_gap_pp": -2.214575488597582,
+        "reconciliation_reason": "Compounding, growing interim cash distributions and terminal timing.",
+        "growth_components": {
+          "organic_growth_pct": null,
+          "reinvestment_rate_pct": null,
+          "incremental_roic_pct": null,
+          "dilution_pct": null,
+          "buyback_accretion_pct": null
+        },
+        "growth_component_gap_pp": null,
+        "growth_components_status": "gap",
+        "mechanism": "Sustained premium cabin mix and loyalty monetization; faster debt paydown",
+        "claim_type": "inference",
+        "legacy_reported_return_pct": 38.7
+      }
+    },
+    "sensitivity_10yr": {
+      "bear": {
+        "fcf_yield_pct": 23.08265078183172,
+        "per_share_fcf_growth_pct": -3.5116587353684503,
+        "multiple_change_pct": 1.4438138746710738,
+        "approximate_return_pct": 21.014805921134347,
+        "exact_irr_pct": 18.401996617660636,
+        "reconciliation_gap_pp": -2.6128093034737105,
+        "reconciliation_reason": "Compounding, growing interim cash distributions and terminal timing.",
+        "growth_components": {
+          "organic_growth_pct": null,
+          "reinvestment_rate_pct": null,
+          "incremental_roic_pct": null,
+          "dilution_pct": null,
+          "buyback_accretion_pct": null
+        },
+        "growth_component_gap_pp": null,
+        "growth_components_status": "gap",
+        "mechanism": "Recession, fare compression, fuel spike; debt wall limits equity recovery",
+        "claim_type": "inference",
+        "legacy_reported_return_pct": 18.5
+      },
+      "base": {
+        "fcf_yield_pct": 23.08265078183172,
+        "per_share_fcf_growth_pct": 2.4987804805501224,
+        "multiple_change_pct": 4.915190156780103,
+        "approximate_return_pct": 30.496621419161944,
+        "exact_irr_pct": 28.331682552793847,
+        "reconciliation_gap_pp": -2.1649388663680966,
+        "reconciliation_reason": "Compounding, growing interim cash distributions and terminal timing.",
+        "growth_components": {
+          "organic_growth_pct": null,
+          "reinvestment_rate_pct": null,
+          "incremental_roic_pct": null,
+          "dilution_pct": null,
+          "buyback_accretion_pct": null
+        },
+        "growth_component_gap_pp": null,
+        "growth_components_status": "gap",
+        "mechanism": "Mid-cycle demand normalization; modest deleveraging from OCF; exit 7× owner cash",
+        "claim_type": "inference",
+        "legacy_reported_return_pct": 30.5
+      },
+      "bull": {
+        "fcf_yield_pct": 23.08265078183172,
+        "per_share_fcf_growth_pct": 5.9811303959341755,
+        "multiple_change_pct": 7.585271223406531,
+        "approximate_return_pct": 36.649052401172426,
+        "exact_irr_pct": 34.73241328261793,
+        "reconciliation_gap_pp": -1.9166391185544995,
+        "reconciliation_reason": "Compounding, growing interim cash distributions and terminal timing.",
+        "growth_components": {
+          "organic_growth_pct": null,
+          "reinvestment_rate_pct": null,
+          "incremental_roic_pct": null,
+          "dilution_pct": null,
+          "buyback_accretion_pct": null
+        },
+        "growth_component_gap_pp": null,
+        "growth_components_status": "gap",
+        "mechanism": "Sustained premium cabin mix and loyalty monetization; faster debt paydown",
+        "claim_type": "inference",
+        "legacy_reported_return_pct": 38.7
+      }
+    },
+    "forward_cashflow_schedule": {
+      "low": [
+        {
+          "year": 1,
+          "amount_per_share": 2.945
+        },
+        {
+          "year": 2,
+          "amount_per_share": 2.7977499999999997
+        },
+        {
+          "year": 3,
+          "amount_per_share": 2.6578625
+        },
+        {
+          "year": 4,
+          "amount_per_share": 2.5249693749999995
+        },
+        {
+          "year": 5,
+          "amount_per_share": 2.3987209062499995
+        },
+        {
+          "year": 6,
+          "amount_per_share": 2.3507464881249995
+        },
+        {
+          "year": 7,
+          "amount_per_share": 13.822389350174998
+        }
+      ],
+      "base": [
+        {
+          "year": 1,
+          "amount_per_share": 3.193
+        },
+        {
+          "year": 2,
+          "amount_per_share": 3.28879
+        },
+        {
+          "year": 3,
+          "amount_per_share": 3.3874537
+        },
+        {
+          "year": 4,
+          "amount_per_share": 3.489077311
+        },
+        {
+          "year": 5,
+          "amount_per_share": 3.59374963033
+        },
+        {
+          "year": 6,
+          "amount_per_share": 3.6656246229366003
+        },
+        {
+          "year": 7,
+          "amount_per_share": 29.91149692316266
+        }
+      ],
+      "high": [
+        {
+          "year": 1,
+          "amount_per_share": 3.3480000000000003
+        },
+        {
+          "year": 2,
+          "amount_per_share": 3.6158400000000004
+        },
+        {
+          "year": 3,
+          "amount_per_share": 3.9051072000000007
+        },
+        {
+          "year": 4,
+          "amount_per_share": 4.217515776000001
+        },
+        {
+          "year": 5,
+          "amount_per_share": 4.554917038080001
+        },
+        {
+          "year": 6,
+          "amount_per_share": 4.737113719603201
+        },
+        {
+          "year": 7,
+          "amount_per_share": 49.2659826838733
+        }
+      ]
+    },
+    "gaps": [
+      "GAP: bear cited causal drivers require underwriting; scenario notes alone are insufficient.",
+      "GAP: bear growth attribution missing organic_growth_pct, reinvestment_rate_pct, incremental_roic_pct, dilution_pct, buyback_accretion_pct; do not add buybacks twice to per-share growth.",
+      "GAP: base cited causal drivers require underwriting; scenario notes alone are insufficient.",
+      "GAP: base growth attribution missing organic_growth_pct, reinvestment_rate_pct, incremental_roic_pct, dilution_pct, buyback_accretion_pct; do not add buybacks twice to per-share growth.",
+      "GAP: bull cited causal drivers require underwriting; scenario notes alone are insufficient.",
+      "GAP: bull growth attribution missing organic_growth_pct, reinvestment_rate_pct, incremental_roic_pct, dilution_pct, buyback_accretion_pct; do not add buybacks twice to per-share growth."
+    ]
   }
 }

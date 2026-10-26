@@ -3397,7 +3397,7 @@
     "notes": "Capstone IRR combining filings, segments, overlays, third-party, qualitative"
   },
   "context_overlay": {
-    "as_of": "2026-10-24",
+    "as_of": "2026-10-25",
     "disclaimer": "Context only. Tailwinds inform stance and overlay sizing; they do not auto-inflate Lawrence base IRR. Promotion to base case requires [HUMAN REVIEW].",
     "themes": [
       {
@@ -3519,7 +3519,7 @@
   "insider_signal": {
     "as_of": "2026-10-21",
     "disclaimer": "Context only. Insider activity informs scenario confidence and stance discussion; it does not auto-inflate Lawrence base IRR. Promotion requires [HUMAN REVIEW].",
-    "processed_at": "2026-10-24",
+    "processed_at": "2026-10-25",
     "constituent_identity_verified": true,
     "score_version": 2,
     "in_base_irr": false,
@@ -3762,21 +3762,27 @@
     "implied_growth_contract": "Constant 7-year owner-cash growth with a 26x terminal owner-cash multiple; diagnostic, not forecast.",
     "entry_prices_by_hurdle_and_case": {
       "bear": {
+        "8pct": 161.33,
         "10pct": 144.51,
         "12pct": 129.84,
         "15pct": 111.23,
+        "18pct": 95.93,
         "20pct": 87.23
       },
       "base": {
+        "8pct": 230.49,
         "10pct": 205.53,
         "12pct": 183.82,
         "15pct": 156.34,
+        "18pct": 133.81,
         "20pct": 121.05
       },
       "bull": {
+        "8pct": 314.96,
         "10pct": 280.03,
         "12pct": 249.69,
         "15pct": 211.34,
+        "18pct": 179.97,
         "20pct": 162.23
       }
     },
@@ -4015,7 +4021,7 @@
       "independence_groups": []
     }
   },
-  "schema_version": "magis.valuation.v2",
+  "schema_version": "magis.valuation.v3",
   "returns": {
     "base_irr_pct": 1.44,
     "unit": "percent_per_year",
@@ -4026,5 +4032,266 @@
       "base": 0.2,
       "bull": 5.2
     }
+  },
+  "tci_return_bridge": {
+    "schema_version": "1.0",
+    "unit": "percent_per_year",
+    "method": "dated_forward_cashflow_schedule_per_share@1.0",
+    "status": "diagnostic",
+    "research_only": true,
+    "capital_actionable": false,
+    "horizon_years": 7,
+    "persona_horizon_note": "Hohn's 4-year lens scores business fit; the contract uses the existing 7-year cash-flow horizon, with a separate 10-year sensitivity.",
+    "model_as_of": "2026-07-22",
+    "price": 372.46,
+    "price_as_of": "2026-07-20",
+    "sources": [
+      {
+        "ref": "ADI/research/valuation.json#inputs.price",
+        "locator": "Yahoo ADI close 2026-07-20",
+        "as_of": "2026-07-22",
+        "claim_type": "inference",
+        "status": "assumption"
+      },
+      {
+        "ref": "ADI/research/valuation.json#inputs.fcf_per_share",
+        "locator": "FY2025 operating cash flow $4812.2M less capital spending $533.6M ÷ 496.709M diluted shares per ADI/investor-documents/sec-edgar/10-K_20251125_rpt20251101_acc0000006281_25_000153.htm",
+        "as_of": "2026-07-22",
+        "claim_type": "inference",
+        "status": "assumption"
+      }
+    ],
+    "normalization_note": "FY2025 free cash flow per share anchors owner cash after FY2024 trough recovery; Maxim integration amortization affects GAAP EPS but not the filing-locked cash bridge.",
+    "claim_type": "inference",
+    "scenarios": {
+      "bear": {
+        "fcf_yield_pct": 2.3127047199699295,
+        "per_share_fcf_growth_pct": 1.7132796720845667,
+        "multiple_change_pct": -10.429641641056698,
+        "approximate_return_pct": -6.403657249002201,
+        "exact_irr_pct": -5.570611266081178,
+        "reconciliation_gap_pp": 0.833045982921023,
+        "reconciliation_reason": "Compounding, growing interim cash distributions and terminal timing.",
+        "growth_components": {
+          "organic_growth_pct": null,
+          "reinvestment_rate_pct": null,
+          "incremental_roic_pct": null,
+          "dilution_pct": null,
+          "buyback_accretion_pct": null
+        },
+        "growth_component_gap_pp": null,
+        "growth_components_status": "gap",
+        "mechanism": "Industrial inventory correction and communications softness",
+        "claim_type": "inference",
+        "legacy_reported_return_pct": -5.6
+      },
+      "base": {
+        "fcf_yield_pct": 2.3127047199699295,
+        "per_share_fcf_growth_pct": 4.424641294240117,
+        "multiple_change_pct": -7.008782559511884,
+        "approximate_return_pct": -0.27143654530183703,
+        "exact_irr_pct": 0.15540876234401826,
+        "reconciliation_gap_pp": 0.42684530764585527,
+        "reconciliation_reason": "Compounding, growing interim cash distributions and terminal timing.",
+        "growth_components": {
+          "organic_growth_pct": null,
+          "reinvestment_rate_pct": null,
+          "incremental_roic_pct": null,
+          "dilution_pct": null,
+          "buyback_accretion_pct": null
+        },
+        "growth_component_gap_pp": null,
+        "growth_components_status": "gap",
+        "mechanism": "Mid-cycle analog recovery with industrial and automotive mix",
+        "claim_type": "inference",
+        "legacy_reported_return_pct": 0.2
+      },
+      "bull": {
+        "fcf_yield_pct": 2.3127047199699295,
+        "per_share_fcf_growth_pct": 6.841697490633303,
+        "multiple_change_pct": -4.209087732675676,
+        "approximate_return_pct": 4.945314477927556,
+        "exact_irr_pct": 5.229906187435836,
+        "reconciliation_gap_pp": 0.2845917095082804,
+        "reconciliation_reason": "Compounding, growing interim cash distributions and terminal timing.",
+        "growth_components": {
+          "organic_growth_pct": null,
+          "reinvestment_rate_pct": null,
+          "incremental_roic_pct": null,
+          "dilution_pct": null,
+          "buyback_accretion_pct": null
+        },
+        "growth_component_gap_pp": null,
+        "growth_components_status": "gap",
+        "mechanism": "AI data-center power and connectivity mix uplift",
+        "claim_type": "inference",
+        "legacy_reported_return_pct": 5.2
+      }
+    },
+    "sensitivity_10yr": {
+      "bear": {
+        "fcf_yield_pct": 2.3127047199699295,
+        "per_share_fcf_growth_pct": 1.4987684654350852,
+        "multiple_change_pct": -7.420460070942947,
+        "approximate_return_pct": -3.608986885537932,
+        "exact_irr_pct": -2.6645953926418557,
+        "reconciliation_gap_pp": 0.9443914928960764,
+        "reconciliation_reason": "Compounding, growing interim cash distributions and terminal timing.",
+        "growth_components": {
+          "organic_growth_pct": null,
+          "reinvestment_rate_pct": null,
+          "incremental_roic_pct": null,
+          "dilution_pct": null,
+          "buyback_accretion_pct": null
+        },
+        "growth_component_gap_pp": null,
+        "growth_components_status": "gap",
+        "mechanism": "Industrial inventory correction and communications softness",
+        "claim_type": "inference",
+        "legacy_reported_return_pct": -5.6
+      },
+      "base": {
+        "fcf_yield_pct": 2.3127047199699295,
+        "per_share_fcf_growth_pct": 3.995192196562636,
+        "multiple_change_pct": -4.959359715153466,
+        "approximate_return_pct": 1.3485372013790986,
+        "exact_irr_pct": 1.9275668549481668,
+        "reconciliation_gap_pp": 0.5790296535690682,
+        "reconciliation_reason": "Compounding, growing interim cash distributions and terminal timing.",
+        "growth_components": {
+          "organic_growth_pct": null,
+          "reinvestment_rate_pct": null,
+          "incremental_roic_pct": null,
+          "dilution_pct": null,
+          "buyback_accretion_pct": null
+        },
+        "growth_component_gap_pp": null,
+        "growth_components_status": "gap",
+        "mechanism": "Mid-cycle analog recovery with industrial and automotive mix",
+        "claim_type": "inference",
+        "legacy_reported_return_pct": 0.2
+      },
+      "bull": {
+        "fcf_yield_pct": 2.3127047199699295,
+        "per_share_fcf_growth_pct": 5.9811303959341755,
+        "multiple_change_pct": -2.9653113936199293,
+        "approximate_return_pct": 5.328523722284176,
+        "exact_irr_pct": 5.772119035625794,
+        "reconciliation_gap_pp": 0.4435953133416177,
+        "reconciliation_reason": "Compounding, growing interim cash distributions and terminal timing.",
+        "growth_components": {
+          "organic_growth_pct": null,
+          "reinvestment_rate_pct": null,
+          "incremental_roic_pct": null,
+          "dilution_pct": null,
+          "buyback_accretion_pct": null
+        },
+        "growth_component_gap_pp": null,
+        "growth_components_status": "gap",
+        "mechanism": "AI data-center power and connectivity mix uplift",
+        "claim_type": "inference",
+        "legacy_reported_return_pct": 5.2
+      }
+    },
+    "forward_cashflow_schedule": {
+      "low": [
+        {
+          "year": 1,
+          "amount_per_share": 8.786178
+        },
+        {
+          "year": 2,
+          "amount_per_share": 8.96190156
+        },
+        {
+          "year": 3,
+          "amount_per_share": 9.1411395912
+        },
+        {
+          "year": 4,
+          "amount_per_share": 9.323962383024
+        },
+        {
+          "year": 5,
+          "amount_per_share": 9.51044163068448
+        },
+        {
+          "year": 6,
+          "amount_per_share": 9.605546046991325
+        },
+        {
+          "year": 7,
+          "amount_per_share": 203.733631656686
+        }
+      ],
+      "base": [
+        {
+          "year": 1,
+          "amount_per_share": 9.044595
+        },
+        {
+          "year": 2,
+          "amount_per_share": 9.49682475
+        },
+        {
+          "year": 3,
+          "amount_per_share": 9.9716659875
+        },
+        {
+          "year": 4,
+          "amount_per_share": 10.470249286875001
+        },
+        {
+          "year": 5,
+          "amount_per_share": 10.993761751218752
+        },
+        {
+          "year": 6,
+          "amount_per_share": 11.323574603755315
+        },
+        {
+          "year": 7,
+          "amount_per_share": 314.9086097304353
+        }
+      ],
+      "high": [
+        {
+          "year": 1,
+          "amount_per_share": 9.303011999999999
+        },
+        {
+          "year": 2,
+          "amount_per_share": 10.04725296
+        },
+        {
+          "year": 3,
+          "amount_per_share": 10.851033196800001
+        },
+        {
+          "year": 4,
+          "amount_per_share": 11.719115852544002
+        },
+        {
+          "year": 5,
+          "amount_per_share": 12.656645120747523
+        },
+        {
+          "year": 6,
+          "amount_per_share": 13.162910925577425
+        },
+        {
+          "year": 7,
+          "amount_per_share": 451.7511029658172
+        }
+      ]
+    },
+    "gaps": [
+      "GAP: bear cited causal drivers require underwriting; scenario notes alone are insufficient.",
+      "GAP: bear growth attribution missing organic_growth_pct, reinvestment_rate_pct, incremental_roic_pct, dilution_pct, buyback_accretion_pct; do not add buybacks twice to per-share growth.",
+      "GAP: base cited causal drivers require underwriting; scenario notes alone are insufficient.",
+      "GAP: base growth attribution missing organic_growth_pct, reinvestment_rate_pct, incremental_roic_pct, dilution_pct, buyback_accretion_pct; do not add buybacks twice to per-share growth.",
+      "GAP: bull cited causal drivers require underwriting; scenario notes alone are insufficient.",
+      "GAP: bull growth attribution missing organic_growth_pct, reinvestment_rate_pct, incremental_roic_pct, dilution_pct, buyback_accretion_pct; do not add buybacks twice to per-share growth."
+    ]
   }
 }

@@ -1,7 +1,7 @@
 # CIFR — Third-party source inventory
 
-**Date:** 2026-10-11
-**Sources:** 111 total (0 approved, 0 pending, 111 context)
+**Date:** 2026-10-25
+**Sources:** 114 total (0 approved, 0 pending, 114 context)
 
 | ID | Title | Path | Status | Use |
 |----|-------|------|--------|-----|
@@ -31,6 +31,7 @@
 | activist_long | HoldCo Asset Management — SC 13D/A | `CIFR/third-party-analyses/activist_reports/long/SC-13D/A_20250710_acc0001123292_25_000307.xml` | context | activist/long — sec_edgar |
 | activist_long | acc0000950170 23 008766 | `CIFR/third-party-analyses/activist_reports/long/8-K_20230320_acc0000950170_23_008766.htm` | context | activist/long — local |
 | activist_long | HoldCo Asset Management — SC 13D/A | `CIFR/third-party-analyses/activist_reports/long/SC-13D/A_20261007_acc0001123292_26_001382.xml` | context | activist/long — sec_edgar |
+| activist_long | acc0001193125 21 260900 | `CIFR/third-party-analyses/activist_reports/long/8-K_20210831_acc0001193125_21_260900.htm` | context | activist/long — local |
 | activist_long | acc0001213900 20 033703 | `CIFR/third-party-analyses/activist_reports/long/8-K_20201028_acc0001213900_20_033703.htm` | context | activist/long — local |
 | activist_long | acc0001829126 20 000170 | `CIFR/third-party-analyses/activist_reports/long/8-K_20201124_acc0001829126_20_000170.htm` | context | activist/long — local |
 | activist_long | acc0001213900 20 041111 | `CIFR/third-party-analyses/activist_reports/long/8-K_20201204_acc0001213900_20_041111.htm` | context | activist/long — local |
@@ -44,7 +45,6 @@
 | activist_long | acc0001213900 21 036443 | `CIFR/third-party-analyses/activist_reports/long/8-K_20210712_acc0001213900_21_036443.htm` | context | activist/long — local |
 | activist_long | acc0001213900 21 039974 | `CIFR/third-party-analyses/activist_reports/long/8-K_20210803_acc0001213900_21_039974.htm` | context | activist/long — local |
 | activist_long | acc0001213900 21 044758 | `CIFR/third-party-analyses/activist_reports/long/8-K_20210825_acc0001213900_21_044758.htm` | context | activist/long — local |
-| activist_long | acc0001193125 21 260900 | `CIFR/third-party-analyses/activist_reports/long/8-K_20210831_acc0001193125_21_260900.htm` | context | activist/long — local |
 | activist_long | acc0001193125 21 263859 | `CIFR/third-party-analyses/activist_reports/long/8-K_20210902_acc0001193125_21_263859.htm` | context | activist/long — local |
 | activist_long | acc0001193125 21 267907 | `CIFR/third-party-analyses/activist_reports/long/8-K_20210908_acc0001193125_21_267907.htm` | context | activist/long — local |
 | activist_long | acc0001193125 21 297413 | `CIFR/third-party-analyses/activist_reports/long/8-K_20211013_acc0001193125_21_297413.htm` | context | activist/long — local |
@@ -116,5 +116,8 @@
 | activist_long | acc0000950103 26 008994 | `CIFR/third-party-analyses/activist_reports/long/8-K_20260615_acc0000950103_26_008994.htm` | context | activist/long — local |
 | activist_long | acc0001819989 26 000038 | `CIFR/third-party-analyses/activist_reports/long/8-K_20260804_acc0001819989_26_000038.htm` | context | activist/long — local |
 | activist_long | acc0001819989 26 000043 | `CIFR/third-party-analyses/activist_reports/long/8-K_20260925_acc0001819989_26_000043.htm` | context | activist/long — local |
+| activist_long | acc0001193125 26 419743 | `CIFR/third-party-analyses/activist_reports/long/8-K_20261013_acc0001193125_26_419743.htm` | context | activist/long — local |
+| activist_long | acc0001193125 26 421035 | `CIFR/third-party-analyses/activist_reports/long/8-K_20261014_acc0001193125_26_421035.htm` | context | activist/long — local |
+| activist_long | acc0001193125 26 424297 | `CIFR/third-party-analyses/activist_reports/long/8-K_20261016_acc0001193125_26_424297.htm` | context | activist/long — local |
 
-Cross-check required: `CIFR/research/cross_check_third_party_2026-10-11.md`
+Cross-check required: `CIFR/research/cross_check_third_party_2026-10-25.md`

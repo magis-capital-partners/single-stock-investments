@@ -1,7 +1,7 @@
 # GS — Third-party source inventory
 
-**Date:** 2026-10-11
-**Sources:** 23 total (0 approved, 0 pending, 23 context)
+**Date:** 2026-10-25
+**Sources:** 24 total (0 approved, 0 pending, 24 context)
 
 | ID | Title | Path | Status | Use |
 |----|-------|------|--------|-----|
@@ -28,5 +28,6 @@
 | activist_long | acc0001193125 26 310408 | `GS/third-party-analyses/activist_reports/long/8-K_20260721_acc0001193125_26_310408.htm` | context | activist/long — local |
 | activist_long | acc0001193125 26 318147 | `GS/third-party-analyses/activist_reports/long/8-K_20260727_acc0001193125_26_318147.htm` | context | activist/long — local |
 | activist_long | acc0001193125 26 344912 | `GS/third-party-analyses/activist_reports/long/8-K_20260811_acc0001193125_26_344912.htm` | context | activist/long — local |
+| activist_long | acc0000886982 26 000529 | `GS/third-party-analyses/activist_reports/long/8-K_20261013_acc0000886982_26_000529.htm` | context | activist/long — local |
 
-Cross-check required: `GS/research/cross_check_third_party_2026-10-11.md`
+Cross-check required: `GS/research/cross_check_third_party_2026-10-25.md`

@@ -1,7 +1,7 @@
 # RKLB — Third-party source inventory
 
-**Date:** 2026-10-11
-**Sources:** 119 total (0 approved, 0 pending, 119 context)
+**Date:** 2026-10-25
+**Sources:** 120 total (0 approved, 0 pending, 120 context)
 
 | ID | Title | Path | Status | Use |
 |----|-------|------|--------|-----|
@@ -19,7 +19,7 @@
 | activist_long | Khosla Ventures Seed Associates B, LLC — SC 13D | `RKLB/third-party-analyses/activist_reports/long/SC-13D_20210907_acc0001193125_21_266616.htm` | context | activist/long — sec_edgar |
 | activist_long | Bessemer Venture Partners VIII Institutional ... — SC 13D | `RKLB/third-party-analyses/activist_reports/long/SC-13D_20210907_acc0001193125_21_266638.htm` | context | activist/long — sec_edgar |
 | activist_long | SC 13D · RKLB · 2021-09-07 | `RKLB/third-party-analyses/activist_reports/long/SC-13D_20210907_acc0001193125_21_266747.htm` | context | activist/long — sec_edgar |
-| activist_short | Chris Drose 2/25/25 Chris Drose 2/25/25 | `_system/reference/activist-reports/bleecker_street/bleecker_street_2026-09-26_rklb.html` | context | activist/short — publisher_site |
+| activist_short | Rocket Lab (RKLB): We Think It’s Gonna Be a Long, Long Time | `_system/reference/activist-reports/bleecker_street/bleecker_street_undated_rklb-pfejmoff.html` | context | activist/short — publisher_site |
 | activist_short | Chris Drose 2/25/25 Chris Drose 2/25/25 | `_system/reference/activist-reports/bleecker_street/bleecker_street_2026-09-27_rklb.html` | context | activist/short — publisher_site |
 | activist_short | Chris Drose 2/25/25 Chris Drose 2/25/25 | `_system/reference/activist-reports/bleecker_street/bleecker_street_2026-09-28_rklb.html` | context | activist/short — publisher_site |
 | activist_short | Chris Drose 2/25/25 Chris Drose 2/25/25 | `_system/reference/activist-reports/bleecker_street/bleecker_street_2026-09-30_rklb.html` | context | activist/short — publisher_site |
@@ -124,5 +124,6 @@
 | activist_long | acc0001753926 26 001454 | `RKLB/third-party-analyses/activist_reports/long/8-K_20260813_acc0001753926_26_001454.htm` | context | activist/long — local |
 | activist_long | acc0001753926 26 001463 | `RKLB/third-party-analyses/activist_reports/long/8-K_20260813_acc0001753926_26_001463.htm` | context | activist/long — local |
 | activist_long | acc0001753926 26 001769 | `RKLB/third-party-analyses/activist_reports/long/8-K_20260915_acc0001753926_26_001769.htm` | context | activist/long — local |
+| activist_long | acc0001819994 26 000067 | `RKLB/third-party-analyses/activist_reports/long/8-K_20261014_acc0001819994_26_000067.htm` | context | activist/long — local |
 
-Cross-check required: `RKLB/research/cross_check_third_party_2026-10-11.md`
+Cross-check required: `RKLB/research/cross_check_third_party_2026-10-25.md`

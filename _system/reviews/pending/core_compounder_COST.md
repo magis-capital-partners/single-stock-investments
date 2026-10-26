@@ -1,7 +1,7 @@
 # Core compounder review: COST
 
 Research only; pending human review.
-Proposal: `tci-9bf018d7d61835f72db3`
+Proposal: `tci-ffb53905716a191d84b0`
 
 ## Evidence and underwriting gaps
 

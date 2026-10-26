@@ -1,11 +1,11 @@
 # HIMS — Third-party source inventory
 
-**Date:** 2026-10-11
+**Date:** 2026-10-25
 **Sources:** 51 total (0 approved, 0 pending, 51 context)
 
 | ID | Title | Path | Status | Use |
 |----|-------|------|--------|-----|
-| activist_short | Jul 13, 2023 | `_system/reference/activist-reports/spruce_point/spruce_point_2023-07-13_hims-hers-health-inc.html` | context | activist/short — publisher_site |
+| activist_short | Hims & Hers Health, Inc. | `_system/reference/activist-reports/spruce_point/spruce_point_2023-07-13_hims-hers-health-inc.html` | context | activist/short — publisher_site |
 | activist_long | Forerunner Ventures GP III, LLC — SC 13D/A | `HIMS/third-party-analyses/activist_reports/long/SC-13D/A_20230301_acc0001104659_23_027319.htm` | context | activist/long — sec_edgar |
 | activist_long | Institutional Venture Management XV, LLC — SC 13D/A | `HIMS/third-party-analyses/activist_reports/long/SC-13D/A_20230306_acc0001104659_23_029044.htm` | context | activist/long — sec_edgar |
 | activist_long | Redpoint Ventures VI, LLC — SC 13D/A | `HIMS/third-party-analyses/activist_reports/long/SC-13D/A_20230306_acc0001104659_23_029104.htm` | context | activist/long — sec_edgar |
@@ -57,4 +57,4 @@
 | activist_long | acc0001773751 26 000161 | `HIMS/third-party-analyses/activist_reports/long/8-K_20260810_acc0001773751_26_000161.htm` | context | activist/long — local |
 | activist_long | acc0001773751 26 000220 | `HIMS/third-party-analyses/activist_reports/long/8-K_20261007_acc0001773751_26_000220.htm` | context | activist/long — local |
 
-Cross-check required: `HIMS/research/cross_check_third_party_2026-10-11.md`
+Cross-check required: `HIMS/research/cross_check_third_party_2026-10-25.md`

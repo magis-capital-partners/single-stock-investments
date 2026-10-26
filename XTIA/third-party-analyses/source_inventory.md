@@ -1,7 +1,7 @@
 # XTIA — Third-party source inventory
 
-**Date:** 2026-10-11
-**Sources:** 266 total (0 approved, 0 pending, 266 context)
+**Date:** 2026-10-25
+**Sources:** 271 total (0 approved, 0 pending, 271 context)
 
 | ID | Title | Path | Status | Use |
 |----|-------|------|--------|-----|
@@ -271,5 +271,10 @@
 | activist_long | acc0001213900 26 072297 | `XTIA/third-party-analyses/activist_reports/long/8-K_20260626_acc0001213900_26_072297.htm` | context | activist/long — local |
 | activist_long | acc0001213900 26 090951 | `XTIA/third-party-analyses/activist_reports/long/8-K_20260818_acc0001213900_26_090951.htm` | context | activist/long — local |
 | activist_long | acc0001213900 26 095910 | `XTIA/third-party-analyses/activist_reports/long/8-K_20260901_acc0001213900_26_095910.htm` | context | activist/long — local |
+| activist_long | acc0001213900 26 108698 | `XTIA/third-party-analyses/activist_reports/long/8-K_20261013_acc0001213900_26_108698.htm` | context | activist/long — local |
+| activist_long | acc0001213900 26 109218 | `XTIA/third-party-analyses/activist_reports/long/8-K_20261014_acc0001213900_26_109218.htm` | context | activist/long — local |
+| activist_long | acc0001213900 26 110351 | `XTIA/third-party-analyses/activist_reports/long/8-K_20261016_acc0001213900_26_110351.htm` | context | activist/long — local |
+| activist_long | acc0001213900 26 111088 | `XTIA/third-party-analyses/activist_reports/long/8-K_20261020_acc0001213900_26_111088.htm` | context | activist/long — local |
+| activist_long | acc0001213900 26 111632 | `XTIA/third-party-analyses/activist_reports/long/8-K_20261022_acc0001213900_26_111632.htm` | context | activist/long — local |
 
-Cross-check required: `XTIA/research/cross_check_third_party_2026-10-11.md`
+Cross-check required: `XTIA/research/cross_check_third_party_2026-10-25.md`

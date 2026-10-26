@@ -1,7 +1,7 @@
 # BE — Third-party source inventory
 
-**Date:** 2026-10-11
-**Sources:** 116 total (0 approved, 0 pending, 116 context)
+**Date:** 2026-10-25
+**Sources:** 117 total (0 approved, 0 pending, 117 context)
 
 | ID | Title | Path | Status | Use |
 |----|-------|------|--------|-----|
@@ -121,5 +121,6 @@
 | activist_long | acc0001193125 26 274388 | `BE/third-party-analyses/activist_reports/long/8-K_20260617_acc0001193125_26_274388.htm` | context | activist/long — local |
 | activist_long | acc0001628280 26 047734 | `BE/third-party-analyses/activist_reports/long/8-K_20260709_acc0001628280_26_047734.htm` | context | activist/long — local |
 | activist_long | acc0001628280 26 050150 | `BE/third-party-analyses/activist_reports/long/8-K_20260728_acc0001628280_26_050150.htm` | context | activist/long — local |
+| activist_long | acc0001628280 26 066890 | `BE/third-party-analyses/activist_reports/long/8-K_20261022_acc0001628280_26_066890.htm` | context | activist/long — local |
 
-Cross-check required: `BE/research/cross_check_third_party_2026-10-11.md`
+Cross-check required: `BE/research/cross_check_third_party_2026-10-25.md`
