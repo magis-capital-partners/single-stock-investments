@@ -133,3 +133,7 @@ The audit explicitly identifies a material implementability gap: entry capacity 
 Reproduce with `node _system/scripts/third_plus_requested_sizing.cjs --source-root <existing-cache-checkout>`. Reconcile SSR with `python _system/scripts/third_plus_ssr_audit.py --source-root <existing-cache-checkout> --events dashboard/data/third_plus_study.json --output <existing-cache-checkout>/_system/data/reverse_splits/local/third_plus_signal_study/requested_sizing_v1/ssr_source_audit.local.json`, then `node _system/scripts/build_third_plus_ssr_publication.cjs --source-root <existing-cache-checkout>`. These read existing cached files without data-service API requests. Finally rebuild the dashboard and run `node _system/scripts/build_third_plus_requested_report.cjs`.
 
 All 97 original default restricted flags match same-day Nasdaq opening messages across 63 tickers. Rule 201 is a price test; the strict skip is a modeling choice. This source check is not an independent broker or trigger-trade verification.
+
+### Proposed SSR execution plan
+
+[SSR_EXECUTION_PLAN.md](SSR_EXECUTION_PLAN.md) specifies a shared live/replay parent-child engine, permitted-price and queue-preserving routes, causal participation, matched controls, historical data gaps, broker calibration and SPX isolation. `ssr_execution_proposal.v1.json` contains the proposed 12-comparison design; `ssr_execution_inventory.v1.json` records the limited older-cache overlap audit. These are proposals, not executed backtests or production policy. Existing results are unchanged.
