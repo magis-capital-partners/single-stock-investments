@@ -110,6 +110,28 @@ def test_retry_retains_source_cache_without_fabrication(tmp_path):
     assert all(x['retry'] == 'next_scheduled_run' for x in result['errors'])
 
 
+def test_unchanged_collection_calculates_from_persisted_source_timestamps(tmp_path):
+    data = inputs()
+    data['attempted_at'] = '2026-10-26T08:00:00Z'
+    data['errors'] = []
+    data['schema_version'] = '1.0'
+    data['ticker'] = 'MA'
+    for p in data['facts']:
+        p['retrieved_at'] = '2026-10-26T08:00:00Z'
+    data['quote']['retrieved_at'] = '2026-10-26T08:00:00Z'
+    path = tmp_path / ac.INPUTS / 'MA.json'
+    path.parent.mkdir(parents=True)
+    path.write_text(json.dumps(data))
+    fresh = copy.deepcopy(data)
+    for p in fresh['facts']:
+        p['retrieved_at'] = '2026-10-26T10:00:00Z'
+    fresh['quote']['retrieved_at'] = '2026-10-26T10:00:00Z'
+    with patch.object(ac, 'quote', return_value=fresh['quote']), patch.object(ac, 'provider_facts', return_value=fresh['facts']):
+        returned = ac.collect('MA', {}, '2026-10-26', tmp_path)
+    assert returned == ac.read(path)
+    assert ac.estimate('MA', returned, '2026-10-26') == ac.estimate('MA', ac.read(path), '2026-10-26')
+
+
 def test_ferrari_and_hermes_do_not_require_membership_fees():
     config = ac.read(Path(__file__).resolve().parents[2] / 'reference/core_compounders.json')
     for ticker in ('RACE', 'RMS.PA'):

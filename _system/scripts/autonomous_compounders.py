@@ -269,7 +269,10 @@ def collect(ticker, entry, as_of, root=ROOT):
             except (OSError, ValueError, KeyError, TypeError, IndexError) as exc:
                 result['errors'].append({'collector': 'fx', 'error': str(exc), 'retry': 'next_scheduled_run'})
     write_json_if_changed(path, result, volatile_keys={'retrieved_at', 'attempted_at'})
-    return result
+    # An unchanged observation keeps its original on-disk retrieval metadata.
+    # Every calculation must use that persisted record, not an ephemeral copy
+    # whose timestamps the semantic writer intentionally did not save.
+    return read(path)
 
 
 def observed_rows(data, field):
