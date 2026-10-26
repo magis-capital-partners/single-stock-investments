@@ -28,7 +28,11 @@ from build_dashboard_data import (
     valuation_tier_for_ticker,
     valuation_workbench_summary,
 )
-from build_dashboard_shards import slim_valuation_decision, slim_valuation_tier
+from build_dashboard_shards import (
+    _slim_power_zones,
+    slim_valuation_decision,
+    slim_valuation_tier,
+)
 
 DEFAULT_TICKERS = ("TPL", "LB", "WBI", "AZLCZ", "MSB", "C", "NVR", "NUE", "BIIB")
 PROPERTY_SEED_TICKERS = ("STHO", "TPL", "LAND", "PCYO", "CDZI")
@@ -141,9 +145,16 @@ def _attach_current_valuation(row: dict, *, include_detail: bool) -> bool:
         row["valuation_decision"] = decision
         row["valuation_tier"] = tier
     else:
-        row["valuation_decision"] = slim_valuation_decision(decision)
-        row["valuation_tier"] = slim_valuation_tier(tier)
-    row["power_zones"] = power_zones_for_ticker(ticker)
+        tier_slim = slim_valuation_tier(tier)
+        decision_slim = slim_valuation_decision(decision)
+        if tier_slim:
+            decision_slim.pop("universe_tier", None)
+        row["valuation_decision"] = decision_slim
+        row["valuation_tier"] = tier_slim
+    zones = power_zones_for_ticker(ticker)
+    if isinstance(zones, dict) and not include_detail:
+        zones = _slim_power_zones(zones)
+    row["power_zones"] = zones
     if include_detail:
         row["valuation_workbench"] = workbench
         row["compounder_monitor"] = core_compounder_summary(ticker)

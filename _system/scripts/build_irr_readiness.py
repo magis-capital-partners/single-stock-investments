@@ -152,8 +152,12 @@ def report_for_companies(companies: list[dict], as_of: date) -> dict:
 
 
 def attach_readiness(row: dict, company: dict, *, detailed: bool) -> None:
-    row["irr_readiness"] = company if detailed else {k: company[k] for k in
-        ("as_of", "status", "blocked_count", "diagnostic_math_complete", "work_group", "next_action")}
+    if detailed:
+        row["irr_readiness"] = company
+    else:
+        # Same boot fields as slim_ticker_row. next_action stays on the ticker shard.
+        from build_dashboard_shards import _IRR_READINESS_CORE_FIELDS
+        row["irr_readiness"] = {k: company[k] for k in _IRR_READINESS_CORE_FIELDS if k in company}
     gate_return_claims(row)
 
 
