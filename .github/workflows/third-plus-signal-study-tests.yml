@@ -6,6 +6,8 @@ on:
       - '_system/scripts/third_plus_signal/**'
       - '_system/scripts/third_plus_execution/**'
       - 'dashboard/third-plus-execution.js'
+      - 'dashboard/third-plus-venue.js'
+      - 'dashboard/data/third_plus_venue_execution*'
       - 'dashboard/data/third_plus_execution*'
       - '_system/scripts/third_plus_signal_study.cjs'
       - '_system/scripts/third_plus_signal_study.test.cjs'
@@ -47,6 +49,8 @@ jobs:
             _system/scripts/third_plus_signal/
             _system/scripts/third_plus_execution/
             dashboard/third-plus-execution.js
+            dashboard/third-plus-venue.js
+            dashboard/data/third_plus_venue_execution*
             dashboard/data/third_plus_execution*
             _system/scripts/third_plus_signal_study.cjs
             _system/scripts/third_plus_signal_study.test.cjs
@@ -95,3 +99,5 @@ jobs:
         run: |
           node --test --test-reporter=tap _system/scripts/third_plus_execution/*.test.cjs
           node _system/scripts/third_plus_execution/publish.cjs --check
+          python -m unittest discover -s _system/scripts/third_plus_execution -p test_venue_capture.py
+          node _system/scripts/third_plus_execution/venue_publish.cjs --check
