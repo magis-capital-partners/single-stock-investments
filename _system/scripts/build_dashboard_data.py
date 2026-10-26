@@ -1793,7 +1793,12 @@ def core_compounder_summary(ticker: str) -> dict | None:
     if not automatic or not existing:
         return existing
     # Avoid mutating the shared cached monitor while projecting measured quality.
-    return {**existing, "quality_assessment": automatic.get("quality_assessment") or existing.get("quality_assessment")}
+    spec = ((_load_json(ROOT / "_system/reference/core_compounders.json") or {}).get("issuers") or {}).get(ticker) or {}
+    ids = set(spec.get("kpi_ids") or [])
+    return {**existing,
+            "driver_to_fcf": spec.get("driver_to_fcf") or existing.get("driver_to_fcf"),
+            "kpi_coverage": [p for p in existing.get("kpi_coverage") or [] if p.get("kpi_id") in ids],
+            "quality_assessment": automatic.get("quality_assessment") or existing.get("quality_assessment")}
 
 
 def valuation_total_return_panel(ticker: str, ticker_dir: Path) -> dict | None:

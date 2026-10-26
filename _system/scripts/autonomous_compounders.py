@@ -534,6 +534,7 @@ def publish(root, estimates, as_of):
             detail['autonomous_irr'] = full
             monitor = detail.get('compounder_monitor')
             if monitor:
+                monitor['driver_to_fcf'] = (config.get('issuers', {}).get(t) or {}).get('driver_to_fcf') or monitor.get('driver_to_fcf')
                 existing = {p['kpi_id']: p for p in monitor.get('kpi_coverage') or []}
                 store = read(root / '_system/reference/market-data/operating_kpis' / (t + '.json'))
                 points = {}
