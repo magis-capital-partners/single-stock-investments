@@ -137,3 +137,7 @@ All 97 original default restricted flags match same-day Nasdaq opening messages 
 ### Proposed SSR execution plan
 
 [SSR_EXECUTION_PLAN.md](SSR_EXECUTION_PLAN.md) specifies a shared live/replay parent-child engine, permitted-price and queue-preserving routes, causal participation, matched controls, historical data gaps, broker calibration and SPX isolation. `ssr_execution_proposal.v1.json` contains the proposed 12-comparison design; `ssr_execution_inventory.v1.json` records the limited older-cache overlap audit. These are proposals, not executed backtests or production policy. Existing results are unchanged.
+
+## SSR event replay implementation
+
+The [execution backtest report](ssr_execution_v1/REPORT.md) documents the implemented partial-fill replay, all 2,016 model definitions and exact-cohort data gaps. The [input contract](ssr_execution_v1/DATA_CONTRACT.md) specifies the qualified historical archive. The current audited sampled caches do not establish event-level SSR fill performance; missing paths publish null financial metrics. Existing opening-fill sensitivities remain separate.

@@ -1,0 +1,69 @@
+{
+  "schema": "third_plus_ssr_backtest.protocol.v1",
+  "status": "implemented_research_only",
+  "signal": "All 21 frozen signal arms; default third-plus + saved S7 rally veto + S4 dilution >=25%",
+  "nav_usd": 10000000,
+  "target_initial_usd": 100000,
+  "maximum_issuers": 3,
+  "margin_capacity_admission": false,
+  "sleeve_risk_admission": false,
+  "minimum_future_sessions": 0,
+  "horizon_sessions": 20,
+  "arrival": "09:31 ET on original eligible date",
+  "windows_minutes": [
+    30,
+    60
+  ],
+  "participation_rates": [
+    0.05,
+    0.1
+  ],
+  "latency_ms": [
+    100,
+    500,
+    2000
+  ],
+  "primary_latency_ms": 500,
+  "child_usd": 2000,
+  "working_children_per_issuer": 1,
+  "cooldown_seconds": 5,
+  "feed_health_seconds": 1,
+  "rolling_flow_seconds": 60,
+  "borrow_apr": 0.5,
+  "borrow_stress_apr": 1.5,
+  "primary_comparisons": 12,
+  "matched_controls": 4,
+  "borrow_evidence_modes": [
+    "conditional",
+    "verified"
+  ],
+  "policies": [
+    {
+      "id": "E0",
+      "label": "Matched SSR skip"
+    },
+    {
+      "id": "E1",
+      "label": "Displayed offer"
+    },
+    {
+      "id": "E2",
+      "label": "Permitted inside price"
+    },
+    {
+      "id": "E3",
+      "label": "Native SSR repricer"
+    }
+  ],
+  "clear_status_policy": "E1 displayed offer in every policy, including E0; same edge/clock/volume/cost assumptions",
+  "queue": "Eligible chosen-venue buyer prints after acknowledgement consume queue ahead before own quantity. No cancellation credit. Hidden-liquidity uncertainty remains; these are conditional simulations.",
+  "cover": "Original signal-anchored 20th session; 90 to 15 minutes before close, same 5/10% causal-flow budget. Unfilled balance retries the next observed session and remains a liability; no final-print completion.",
+  "parent_budget": "Freeze floor($100,000 / first valid arrival midpoint) shares; no expansion after decline. Report actual proceeds separately.",
+  "flow": "Only regular deduplicated external direct-venue prints; observe before reserving, reserve filled + working + pending-cancel shares. Rolling budget also applies.",
+  "edge": "Source-available fixed edge forecast required in archive. No return-based fit or optimal schedule is inferred from the current caches.",
+  "source_policy": "Certified source attributes are ingest attestations, not independent proof of simulated fills. No sampled-bar or 50%-capture substitute.",
+  "uncertainty": "For complete primary-latency paths compare to matched E0 using issuer bootstrap and six-month calendar blocks, then Holm over 12 comparisons per rule. Missing paths and unresolved exit evidence withhold selection claims.",
+  "production_authority": "none",
+  "data_purchase_usd": 0,
+  "holdout_access": false
+}
