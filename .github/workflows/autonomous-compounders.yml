@@ -1,0 +1,54 @@
+name: Autonomous compounder IRRs
+
+on:
+  schedule:
+    - cron: '23 8,18 * * 1-5'
+      timezone: America/New_York
+  repository_dispatch:
+    types: [refresh-autonomous-compounders]
+
+permissions:
+  contents: write
+
+concurrency:
+  group: autonomous-compounder-irrs
+  cancel-in-progress: false
+
+jobs:
+  refresh:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 1
+          sparse-checkout: |
+            _system/scripts
+            _system/portfolio/registry.json
+            _system/reference/core_compounders.json
+            _system/reference/market-data/compounders
+            _system/reference/market-data/operating_kpis
+            _system/data/autonomous_compounders.json
+            dashboard/data/core.json
+            dashboard/data/tickers
+            .github/actions/commit-main
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Install parser and regression dependencies
+        run: pip install pytest pypdf
+      - name: Verify automatic publication checks
+        run: python -m pytest -q _system/scripts/tests/test_autonomous_compounders.py
+      - name: Collect, validate and publish every core compounder
+        run: python _system/scripts/autonomous_compounders.py --collect
+      - name: Validate source-bound replay and complete universe
+        run: python _system/scripts/autonomous_compounders.py --check
+      - name: Publish dated research estimates
+        uses: ./.github/actions/commit-main
+        with:
+          message: 'chore(research): refresh autonomous compounder IRRs'
+          git_add: >-
+            _system/data/autonomous_compounders.json
+            _system/reference/market-data/compounders
+            _system/reference/market-data/operating_kpis
+            dashboard/data/core.json dashboard/data/tickers

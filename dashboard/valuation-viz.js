@@ -107,6 +107,12 @@
         sub: d.forward_return_reason || 'Dated payoff or cash-flow return at the current price',
       };
     }
+    const automatic = t.autonomous_irr;
+    const estimate = automatic?.forward_irr_pct?.base;
+    if (automatic?.status === 'available' && estimate != null && Number.isFinite(Number(estimate))) {
+      return {pct: Number(estimate), label: 'Automatic research IRR', source: 'autonomous_research_estimate',
+        sub: '7-year mechanical scenarios with dated inputs and explicit assumptions · research estimate'};
+    }
     return {
       pct: null,
       label: 'Forward return',

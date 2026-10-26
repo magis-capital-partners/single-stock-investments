@@ -2886,9 +2886,9 @@ function renderIrrCell(t) {
     const ret = ValuationViz.displayReturn(t);
     if (ret.pct != null && Number.isFinite(Number(ret.pct))) {
       const pct = Number(ret.pct);
-      const years = t.valuation_decision?.horizon_years
+      const years = (ret.source === 'autonomous_research_estimate' ? t.autonomous_irr?.horizon_years : null) ?? t.valuation_decision?.horizon_years
         ?? t.valuation_workbench?.valuation?.horizon_years;
-      const label = 'contract forward';
+      const label = ret.source === 'autonomous_research_estimate' ? 'automatic estimate' : 'contract forward';
       const title = [ret.sub, years != null ? `${years}y horizon` : '', t.valuation_decision?.dates?.model_as_of ? `model as of ${t.valuation_decision.dates.model_as_of}` : '']
         .filter(Boolean).join(' · ');
       return `<span class="irr-cell ${irrClass(pct)}" title="${escapeHtml(title)}">${pct.toFixed(pct % 1 ? 1 : 0)}%${label ? `<span class="irr-sub">${escapeHtml(label)}</span>` : ''}</span>`;
@@ -2926,6 +2926,7 @@ function renderPriceValueCell(t) {
 }
 
 function renderNextActionCell(t) {
+  if (t.autonomous_irr) return `<div class="decision-action">${t.autonomous_irr.status === 'available' ? 'Automatic refresh scheduled' : 'Automatic source retry scheduled'}</div><div class="tier-sub">Research estimate · no approval queue</div>`;
   const d = decisionForRow(t);
   const critical = Number(d.critical_gap_count || 0);
   const open = Number(d.open_gap_count || 0);
@@ -3155,10 +3156,14 @@ function renderCoreCompounder(t, mode = 'valuation') {
     const row = cases[name] || {};
     return `<tr><td>${escapeHtml(name)}</td><td>${num(row.fcf_yield_pct)}%</td><td>${num(row.per_share_fcf_growth_pct)}%</td><td>${num(row.multiple_change_pct)}%</td><td>${num(row.exact_irr_pct)}%</td><td>${num(row.reconciliation_gap_pp)} pp</td><td>${num(bridge.sensitivity_10yr?.[name]?.exact_irr_pct)}%</td></tr>`;
   }).join('');
-  const quality = (view.quality_assessment?.criteria || []).map(row => `<li>${escapeHtml(row.criterion.replace(/_/g, ' '))}: ${row.value == null ? escapeHtml(row.rating || 'GAP — evidence review needed') : num(row.value) + '%'}</li>`).join('');
+  const quality = (view.quality_assessment?.criteria || []).map(row => `<li>${escapeHtml(row.criterion.replace(/_/g, ' '))}: ${row.value == null ? escapeHtml(row.rating || row.reason || row.status || 'Data unavailable') : num(row.value) + '%'}</li>`).join('');
   const drivers = (view.kpi_coverage || []).map(row => `<tr><td>${escapeHtml(row.kpi_id)}</td><td>${row.value == null ? 'GAP' : escapeHtml(String(row.value)) + ' ' + escapeHtml(row.unit || '')}</td><td>${escapeHtml(row.period || '—')}</td><td>${escapeHtml(row.status)}</td></tr>`).join('');
   const missing = (view.what_missing || []).map(row => `<li>${escapeHtml(String(row.text).slice(0, 600))}<div class="tier-sub">${escapeHtml(row.source?.claim_type || 'inference')} · ${escapeHtml(row.source?.ref || 'Source gap')} · ${escapeHtml(row.source?.as_of || 'date unavailable')}</div></li>`).join('');
-  if (mode === 'business') return `<p>${escapeHtml(view.driver_to_fcf || '')}</p><h4>Business quality</h4><ul>${quality}</ul><h4>Issuer operating drivers</h4><div style="overflow-x:auto"><table class="component-table"><thead><tr><th>Driver</th><th>Latest observation</th><th>Period</th><th>Status</th></tr></thead><tbody>${drivers}</tbody></table></div>${(view.operating_conflicts || []).length ? '<p>Conflicting source observations require review; both sources are retained in the operating KPI store.</p>' : ''}`;
+  const financial = t.autonomous_irr?.financial_observations || [];
+  const latestFinancial = new Map();
+  financial.forEach(p => { if (!latestFinancial.has(p.kpi) || p.period > latestFinancial.get(p.kpi).period) latestFinancial.set(p.kpi,p); });
+  const financialHtml = latestFinancial.size ? `<h4>Automatically collected financial observations</h4><div style="overflow-x:auto"><table class="component-table"><thead><tr><th>Metric</th><th>Value</th><th>Fiscal period end</th><th>Evidence</th></tr></thead><tbody>${[...latestFinancial.values()].map(p=>`<tr><td>${escapeHtml(p.kpi.replace(/_/g,' '))}</td><td>${Number(p.value).toLocaleString(undefined,{maximumFractionDigits:2})} ${escapeHtml(p.unit)}</td><td>${escapeHtml(p.fiscal_period_end || p.period)}</td><td>${linkHtml(p.source_url,'Source')}</td></tr>`).join('')}</tbody></table></div>` : '';
+  if (mode === 'business') return `${financialHtml}<p>${escapeHtml(view.driver_to_fcf || '')}</p><h4>Business quality</h4><ul>${quality}</ul><h4>Issuer operating drivers</h4><div style="overflow-x:auto"><table class="component-table"><thead><tr><th>Driver</th><th>Latest observation</th><th>Period</th><th>Status</th></tr></thead><tbody>${drivers}</tbody></table></div>${(view.operating_conflicts || []).length ? '<p>Conflicting source observations require review; both sources are retained in the operating KPI store.</p>' : ''}`;
   return `<div class="detail-section component-value-card">
     <h3>Core compounder research <span class="badge badge-warn">${escapeHtml(view.model_level || 'unmodeled')}</span></h3>
     <div class="tier-sub">TCI cash-flow diagnostic · percent per year · ${escapeHtml(bridge.model_as_of || 'model date unavailable')} · research only; capital authority remains with the owner.</div>

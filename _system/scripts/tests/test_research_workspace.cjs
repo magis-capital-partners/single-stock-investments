@@ -76,3 +76,22 @@ test('IRR checklist separates numerical diagnostics from missing underwriting',(
  assert.match(html,/valuation.json#inputs.price/);assert.doesNotMatch(html,/valuation.json%23/);
  assert.match(rw.irrReadiness({},h),/checklist unavailable/);
 });
+
+test('automatic estimates display without a human review queue and retain all scenarios',()=>{
+ const a={status:'available',model_route:'retained_owner_cash',method_version:'test/1',as_of:'2026-10-26',horizon_years:7,
+  forward_irr_pct:{low:-2,base:6,high:12},quote:{value:100,currency:'USD',as_of:'2026-10-23',source_url:'https://provider.test/quote'},
+  assumptions:{basis:'Explicit scenario assumption'},forward_cashflow_schedule:{low:[{date:'2033-10-23',amount_per_share:80}],base:[{date:'2033-10-23',amount_per_share:150}],high:[{date:'2033-10-23',amount_per_share:200}]}};
+ const t={autonomous_irr:a,valuation_decision:{return_publishable:false}};
+ const html=rw.irrReadiness(t,h);
+ assert.match(html,/no human approval queue/);assert.match(html,/retained owner cash/);assert.match(html,/-2%/);assert.match(html,/6%/);assert.match(html,/12%/);
+ assert.match(html,/2033-10-23/);assert.match(html,/https:\/\/provider.test\/quote/);assert.doesNotMatch(html,/NaN|undefined/);
+ assert.match(rw.scenarios(t,h),/Automatic research IRR scenarios/);
+ assert.equal(context.ValuationViz.displayReturn(t).source,'autonomous_research_estimate');
+ assert.equal(context.ValuationViz.displayReturn(t).pct,6);
+});
+
+test('a failed automatic refresh withdraws returns and describes its automatic retry',()=>{
+ const t={autonomous_irr:{status:'data_unavailable',forward_irr_pct:null,blockers:['Quote expired']}};
+ const html=rw.irrReadiness(t,h);assert.match(html,/Quote expired/);assert.match(html,/next scheduled run/);
+ assert.equal(context.ValuationViz.displayReturn(t).pct,null);
+});
