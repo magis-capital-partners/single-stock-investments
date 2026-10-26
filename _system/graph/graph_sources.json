@@ -280,6 +280,16 @@
       "subject_regex": "^(chore|feat|fix)\\((letters|letter)\\)|letter backfill|Refresh dashboard payloads after letter backfill"
     },
     {
+      "name": "licensed-research",
+      "workflow_file": "licensed-research-sync.yml",
+      "job": "plan",
+      "cadence_cron": [
+        "17 17 * * 6"
+      ],
+      "freshness_hours": 342,
+      "subject_regex": "Refresh ValueLine and Expert Call labels|Ingest ValueLine and Expert Call text"
+    },
+    {
       "name": "podcasts",
       "workflow_file": "podcast-refresh.yml",
       "job": "refresh",

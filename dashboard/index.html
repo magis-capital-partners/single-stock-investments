@@ -3427,6 +3427,24 @@ window.addEventListener('energy-model-retry', async () => {
   renderInsights();
 });
 
+function renderLicensedSources(t, escapeHtml, linkHtml) {
+  const lic = t && t.licensed_sources;
+  if (!lic || (!lic.valueline && !(lic.expert_calls || []).length)) return '';
+  const lines = [];
+  if (lic.valueline && lic.valueline.label) {
+    lines.push(`<div class="hr-line">${lic.valueline.drive_url ? linkHtml(lic.valueline.drive_url, lic.valueline.label) : escapeHtml(lic.valueline.label)}</div>`);
+  }
+  (lic.expert_calls || []).forEach((call) => {
+    const label = call.label || (call.date ? `Expert call dated ${call.date}` : 'Expert call');
+    lines.push(`<div class="hr-line">${call.drive_url ? linkHtml(call.drive_url, label) : escapeHtml(label)}</div>`);
+  });
+  if (!lines.length) return '';
+  const extra = lic.expert_call_count > (lic.expert_calls || []).length
+    ? `<p class="tier-sub">${lic.expert_call_count} expert calls on file. Showing the latest.</p>`
+    : '';
+  return `<details class="detail-section"><summary>Licensed research</summary><div style="margin-top:8px">${lines.join('')}</div>${extra}<p class="tier-sub">Drive link only. Report text stays in the private vault.</p></details>`;
+}
+
 function loadLazyFile(key) {
   const loaders = {
     research_memory: () => loadShardOnce('file:research_memory', 'data/research_memory.json', (doc) => { data.research_memory = doc; }),
@@ -3441,6 +3459,7 @@ function loadLazyFile(key) {
     activist_feed: () => loadShardOnce('file:activist_feed', 'data/activist_feed.json', (doc) => { data.activist_feed = doc; }),
     activist_discovery: () => loadShardOnce('file:activist_discovery', 'data/activist_filer_discovery.json', (doc) => { data.activist_discovery = doc; }),
     darwin_cc: () => loadShardOnce('file:darwin_cc', 'data/darwin_cc.json', (doc) => { data.darwin_cc = doc; }),
+    licensed_sources: () => loadShardOnce('file:licensed_sources', 'data/licensed_sources.json', (doc) => { data.licensed_sources = doc; }),
   };
   return loaders[key] ? loaders[key]() : Promise.resolve();
 }
@@ -3504,11 +3523,14 @@ function loadTickerDetail(ticker) {
       }
     }),
     loadLazyFile('technical_signals').catch(() => {}),
+    loadLazyFile('licensed_sources').catch(() => {}),
   ]).then(() => {
     const idx = data.tickers.findIndex((x) => x.ticker === ticker);
     if (idx >= 0) {
       const fullTechnical = data.technical_signals?.by_ticker?.[ticker];
       if (fullTechnical) data.tickers[idx].technicals = fullTechnical;
+      const licensed = data.licensed_sources?.by_ticker?.[ticker];
+      if (licensed) data.tickers[idx].licensed_sources = licensed;
       applyBuyback(data.tickers[idx]);
     }
     return data.tickers.find((x) => x.ticker === ticker);
@@ -6174,6 +6196,7 @@ ${essentialInsights}`, true)}
           </li>`).join('')}
       </ul>
     </details>
+    ${renderLicensedSources(t, escapeHtml, linkHtml)}
 
     <details class="detail-section tier-4">
       <summary>Infrastructure · ${Number(t.completeness || 0)}% · ${Number(t.pdf_count || 0)} PDFs${t.sec_filings ? ` · ${t.sec_filings} SEC` : ''}</summary>

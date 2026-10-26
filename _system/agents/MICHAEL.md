@@ -25,6 +25,8 @@ Read the filename and the first pages. Pick **one** row. If two rows could apply
 | Kind | How to recognize | Drive folder | Vault path |
 |------|------------------|--------------|------------|
 | **Fund letter** | LP / GP letter, quarterly update, investor letter, "dear partners" | `Letters/{YYYY Qn}/` | `superinvestor-letters/{YYYY}Q{n}/` |
+| **ValueLine** | Company report, survey, or Special Situations PDF | `ValueLine Research/` | `valueline/{TICKER}/{edition}/` (text only) |
+| **Expert call** | Transcript named with a date and a company | `Expert Calls/` | `expert-calls/{TICKER}/` (markdown only) |
 | **Book / wisdom** | Full book, chapter scan, MOI, Klarman, Munger, Stahl, Pabrai, TCI | `Research Sources/Investment Wisdom/{author}/` | `investment-wisdom/{author}/` |
 | **Manager meeting** | Magis diligence notes from a live manager call | `Manager Meetings/{YYYY-MM-DD}/` | `manager-meetings/{YYYY-MM-DD}/` |
 | **VIC writeup** | Value Investors Club idea | `Admin/Intake/VIC/{TICKER}/` | `vic-research/{TICKER}/` (and SSI `{TICKER}/third-party-analyses/vic/`) |

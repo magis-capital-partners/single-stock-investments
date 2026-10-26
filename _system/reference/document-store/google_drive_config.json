@@ -58,8 +58,32 @@
     "sync_script": "_system/scripts/sync_manager_meetings_drive.py",
     "notes": "Canonical PDFs live in research-vault/manager-meetings/. Mirror to Shared Drive Manager Meetings/{YYYY-MM-DD}/. Do not use Admin/Intake."
   },
+  "valueline": {
+    "drive_root_folder_id": "0AFpaOm4iTLqjUk9PVA",
+    "drive_folder_prefix": "ValueLine Research",
+    "fallback_folder_ids": {
+      "current": "1Vkxdo3k6HqLkqR0QO6in8KMTkm3r57FJ",
+      "old": "1XGiU-iANX7TJyHgsXea_NRHZuJlzWESl",
+      "special_situations": "1wnqyCJLNXoLMOJcVL7czHh-1fkIizCOu",
+      "full_surveys": "1_IWMLwwMLu5VUvDzfy33GgkjqxuHrxLO"
+    },
+    "vault_subdir": "valueline",
+    "label": "ValueLine company reports and surveys",
+    "sync_script": "_system/scripts/import_drive_valueline.py",
+    "notes": "Resolve folders by name under ValueLine Research. Store extracts in the vault. Public dashboard files get a date and a Drive link only."
+  },
+  "expert_calls": {
+    "drive_root_folder_id": "0AFpaOm4iTLqjUk9PVA",
+    "drive_folder_prefix": "Expert Calls",
+    "fallback_folder_id": "1dc9SyIh2BOQKuQshldbCYk6G6W0n0pgW",
+    "vault_subdir": "expert-calls",
+    "label": "Expert call transcripts",
+    "sync_script": "_system/scripts/import_drive_expert_calls.py",
+    "organize_script": "_system/scripts/organize_expert_calls_drive.py",
+    "notes": "New uploads land in the Expert Calls root. The organizer files them into {TICKER}/, _Unmatched/, or _Duplicates/. The default run writes a CSV and does not move files. Pass --apply only after that CSV is approved."
+  },
   "service_account_email": "pdf-store-uploader@single-stock-pdf-store.iam.gserviceaccount.com",
   "folder_strategy": "mirror_source_path",
   "access_model": "shared_drive_permissions",
-  "notes": "All PDFs route into one Shared Drive. Letters go under Letters/{YYYY Qn}. Books go under Research Sources/Investment Wisdom/{author}. Ticker VIC/research/company/activist PDFs go through drive_intake (Admin/Intake). Manager meetings use manager_meetings. Do not mix those four."
+  "notes": "All PDFs route into one Shared Drive. Letters go under Letters/{YYYY Qn}. Books go under Research Sources/Investment Wisdom/{author}. Ticker VIC/research/company/activist PDFs go through drive_intake (Admin/Intake). Manager meetings use manager_meetings. ValueLine and Expert Calls stay in their own trees and are not copied into the public filename index."
 }
