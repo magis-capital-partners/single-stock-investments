@@ -121,16 +121,28 @@ jobs:
             echo 'Database credentials unavailable; retaining the dated file snapshot.' >&2
             exit 1
           fi
-          python - <<'PY'
+          marker="${RUNNER_TEMP}/borrow-sync-deferred"
+          rm -f "$marker"
+          BORROW_SYNC_DEFERRED="$marker" python - <<'PY'
           import datetime, os, sys
           sys.path.insert(0, '.github/actions/deploy-cloudflare-dashboard')
-          from d1_budget import check, WRITE_THRESHOLD
+          from d1_budget import check, sync_blocked
           budget=check(os.environ['CLOUDFLARE_ACCOUNT_ID'],os.environ['CLOUDFLARE_API_TOKEN'],datetime.datetime.now(datetime.timezone.utc).date().isoformat())
           print(budget.describe())
+          if not budget.available:
+              raise SystemExit(budget.describe())
           # Reserve room for an entire day of indexed observations and shared dashboard writes.
-          if not budget.available or budget.over or budget.rows_written+40000>WRITE_THRESHOLD:
-              raise SystemExit('Database sync deferred by shared free-tier guard; dated file capture is preserved.')
+          # The defer line stays 70,000 rows written. Waiting is a warning, not a failed step:
+          # the dated archive is already saved, and the next run syncs when the quota allows.
+          deferred=sync_blocked(budget, reserve=40_000)
+          if deferred:
+              print('::warning::'+deferred)
+              open(os.environ['BORROW_SYNC_DEFERRED'],'w',encoding='utf-8').write(deferred)
+              raise SystemExit(0)
           PY
+          if [ -f "$marker" ]; then
+            exit 0
+          fi
           npm ci --prefix dashboard/cloudflare
           WRANGLER="$PWD/dashboard/cloudflare/node_modules/.bin/wrangler"
           "$WRANGLER" d1 list --json > _system/data/reverse_splits/local/borrow_monitor/databases.json
