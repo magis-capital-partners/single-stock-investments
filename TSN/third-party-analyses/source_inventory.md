@@ -1,6 +1,6 @@
 # TSN — Third-party source inventory
 
-**Date:** 2026-10-25
+**Date:** 2026-10-27
 **Sources:** 114 total (0 approved, 0 pending, 114 context)
 
 | ID | Title | Path | Status | Use |
@@ -10,12 +10,6 @@
 | activist_long | Mariner Research — DEFA14A | `TSN/third-party-analyses/activist_reports/long/DEFA14A_20231221_acc0000100493_23_000138.htm` | context | activist/long — sec_edgar |
 | activist_long | Mariner Research — DEFA14A | `TSN/third-party-analyses/activist_reports/long/DEFA14A_20221221_acc0000100493_22_000131.htm` | context | activist/long — sec_edgar |
 | activist_long | Mariner Research — DEFA14A | `TSN/third-party-analyses/activist_reports/long/DEFA14A_20211222_acc0000100493_21_000196.htm` | context | activist/long — sec_edgar |
-| activist_long | acc0000100493 24 000021 | `TSN/third-party-analyses/activist_reports/long/8-K_20240212_acc0000100493_24_000021.htm` | context | activist/long — local |
-| activist_long | acc0000100493 23 000049 | `TSN/third-party-analyses/activist_reports/long/8-K_20230213_acc0000100493_23_000049.htm` | context | activist/long — local |
-| activist_long | acc0000100493 22 000021 | `TSN/third-party-analyses/activist_reports/long/8-K_20220214_acc0000100493_22_000021.htm` | context | activist/long — local |
-| activist_long | acc0000100493 21 000044 | `TSN/third-party-analyses/activist_reports/long/8-K_20210217_acc0000100493_21_000044.htm` | context | activist/long — local |
-| activist_long | acc0000100493 20 000043 | `TSN/third-party-analyses/activist_reports/long/8-K_20200212_acc0000100493_20_000043.htm` | context | activist/long — local |
-| activist_long | acc0000100493 19 000072 | `TSN/third-party-analyses/activist_reports/long/8-K_20190510_acc0000100493_19_000072.htm` | context | activist/long — local |
 | activist_long | acc0000100493 18 000016 | `TSN/third-party-analyses/activist_reports/long/8-K_20180208_acc0000100493_18_000016.htm` | context | activist/long — local |
 | activist_long | acc0000100493 18 000040 | `TSN/third-party-analyses/activist_reports/long/8-K_20180214_acc0000100493_18_000040.htm` | context | activist/long — local |
 | activist_long | acc0000100493 18 000047 | `TSN/third-party-analyses/activist_reports/long/8-K_20180320_acc0000100493_18_000047.htm` | context | activist/long — local |
@@ -37,10 +31,12 @@
 | activist_long | acc0000950103 19 002069 | `TSN/third-party-analyses/activist_reports/long/8-K_20190219_acc0000950103_19_002069.htm` | context | activist/long — local |
 | activist_long | acc0000100493 19 000046 | `TSN/third-party-analyses/activist_reports/long/8-K_20190225_acc0000100493_19_000046.htm` | context | activist/long — local |
 | activist_long | acc0000100493 19 000062 | `TSN/third-party-analyses/activist_reports/long/8-K_20190506_acc0000100493_19_000062.htm` | context | activist/long — local |
+| activist_long | acc0000100493 19 000072 | `TSN/third-party-analyses/activist_reports/long/8-K_20190510_acc0000100493_19_000072.htm` | context | activist/long — local |
 | activist_long | acc0000100493 19 000094 | `TSN/third-party-analyses/activist_reports/long/8-K_20190805_acc0000100493_19_000094.htm` | context | activist/long — local |
 | activist_long | acc0000100493 19 000105 | `TSN/third-party-analyses/activist_reports/long/8-K_20190903_acc0000100493_19_000105.htm` | context | activist/long — local |
 | activist_long | acc0000100493 19 000117 | `TSN/third-party-analyses/activist_reports/long/8-K_20191112_acc0000100493_19_000117.htm` | context | activist/long — local |
 | activist_long | acc0000100493 20 000014 | `TSN/third-party-analyses/activist_reports/long/8-K_20200206_acc0000100493_20_000014.htm` | context | activist/long — local |
+| activist_long | acc0000100493 20 000043 | `TSN/third-party-analyses/activist_reports/long/8-K_20200212_acc0000100493_20_000043.htm` | context | activist/long — local |
 | activist_long | acc0000100493 20 000045 | `TSN/third-party-analyses/activist_reports/long/8-K_20200219_acc0000100493_20_000045.htm` | context | activist/long — local |
 | activist_long | acc0000100493 20 000055 | `TSN/third-party-analyses/activist_reports/long/8-K_20200221_acc0000100493_20_000055.htm` | context | activist/long — local |
 | activist_long | acc0000100493 20 000062 | `TSN/third-party-analyses/activist_reports/long/8-K_20200313_acc0000100493_20_000062.htm` | context | activist/long — local |
@@ -54,6 +50,7 @@
 | activist_long | acc0000100493 20 000203 | `TSN/third-party-analyses/activist_reports/long/8-K_20201221_acc0000100493_20_000203.htm` | context | activist/long — local |
 | activist_long | acc0000100493 21 000002 | `TSN/third-party-analyses/activist_reports/long/8-K_20210120_acc0000100493_21_000002.htm` | context | activist/long — local |
 | activist_long | acc0000100493 21 000012 | `TSN/third-party-analyses/activist_reports/long/8-K_20210211_acc0000100493_21_000012.htm` | context | activist/long — local |
+| activist_long | acc0000100493 21 000044 | `TSN/third-party-analyses/activist_reports/long/8-K_20210217_acc0000100493_21_000044.htm` | context | activist/long — local |
 | activist_long | acc0000100493 21 000053 | `TSN/third-party-analyses/activist_reports/long/8-K_20210222_acc0000100493_21_000053.htm` | context | activist/long — local |
 | activist_long | acc0000100493 21 000066 | `TSN/third-party-analyses/activist_reports/long/8-K_20210325_acc0000100493_21_000066.htm` | context | activist/long — local |
 | activist_long | acc0000100493 21 000074 | `TSN/third-party-analyses/activist_reports/long/8-K_20210510_acc0000100493_21_000074.htm` | context | activist/long — local |
@@ -67,6 +64,7 @@
 | activist_long | acc0000100493 21 000176 | `TSN/third-party-analyses/activist_reports/long/8-K_20211209_acc0000100493_21_000176.htm` | context | activist/long — local |
 | activist_long | acc0000100493 22 000006 | `TSN/third-party-analyses/activist_reports/long/8-K_20220112_acc0000100493_22_000006.htm` | context | activist/long — local |
 | activist_long | acc0000100493 22 000015 | `TSN/third-party-analyses/activist_reports/long/8-K_20220207_acc0000100493_22_000015.htm` | context | activist/long — local |
+| activist_long | acc0000100493 22 000021 | `TSN/third-party-analyses/activist_reports/long/8-K_20220214_acc0000100493_22_000021.htm` | context | activist/long — local |
 | activist_long | acc0000100493 22 000063 | `TSN/third-party-analyses/activist_reports/long/8-K_20220509_acc0000100493_22_000063.htm` | context | activist/long — local |
 | activist_long | acc0000100493 22 000077 | `TSN/third-party-analyses/activist_reports/long/8-K_20220808_acc0000100493_22_000077.htm` | context | activist/long — local |
 | activist_long | acc0000100493 22 000084 | `TSN/third-party-analyses/activist_reports/long/8-K_20220829_acc0000100493_22_000084.htm` | context | activist/long — local |
@@ -74,12 +72,14 @@
 | activist_long | acc0000100493 22 000096 | `TSN/third-party-analyses/activist_reports/long/8-K_20221114_acc0000100493_22_000096.htm` | context | activist/long — local |
 | activist_long | acc0000100493 23 000007 | `TSN/third-party-analyses/activist_reports/long/8-K_20230109_acc0000100493_23_000007.htm` | context | activist/long — local |
 | activist_long | acc0000100493 23 000022 | `TSN/third-party-analyses/activist_reports/long/8-K_20230206_acc0000100493_23_000022.htm` | context | activist/long — local |
+| activist_long | acc0000100493 23 000049 | `TSN/third-party-analyses/activist_reports/long/8-K_20230213_acc0000100493_23_000049.htm` | context | activist/long — local |
 | activist_long | acc0000100493 23 000066 | `TSN/third-party-analyses/activist_reports/long/8-K_20230508_acc0000100493_23_000066.htm` | context | activist/long — local |
 | activist_long | acc0000100493 23 000084 | `TSN/third-party-analyses/activist_reports/long/8-K_20230807_acc0000100493_23_000084.htm` | context | activist/long — local |
 | activist_long | acc0000100493 23 000092 | `TSN/third-party-analyses/activist_reports/long/8-K_20230907_acc0000100493_23_000092.htm` | context | activist/long — local |
 | activist_long | acc0000100493 23 000104 | `TSN/third-party-analyses/activist_reports/long/8-K_20231113_acc0000100493_23_000104.htm` | context | activist/long — local |
 | activist_long | acc0000100493 23 000131 | `TSN/third-party-analyses/activist_reports/long/8-K_20231207_acc0000100493_23_000131.htm` | context | activist/long — local |
 | activist_long | acc0000100493 24 000013 | `TSN/third-party-analyses/activist_reports/long/8-K_20240205_acc0000100493_24_000013.htm` | context | activist/long — local |
+| activist_long | acc0000100493 24 000021 | `TSN/third-party-analyses/activist_reports/long/8-K_20240212_acc0000100493_24_000021.htm` | context | activist/long — local |
 | activist_long | acc0001140361 24 010809 | `TSN/third-party-analyses/activist_reports/long/8-K_20240301_acc0001140361_24_010809.htm` | context | activist/long — local |
 | activist_long | acc0001140361 24 012356 | `TSN/third-party-analyses/activist_reports/long/8-K_20240308_acc0001140361_24_012356.htm` | context | activist/long — local |
 | activist_long | acc0000100493 24 000068 | `TSN/third-party-analyses/activist_reports/long/8-K_20240506_acc0000100493_24_000068.htm` | context | activist/long — local |
@@ -120,4 +120,4 @@
 | activist_long | acc0001140361 26 034204 | `TSN/third-party-analyses/activist_reports/long/8-K_20260824_acc0001140361_26_034204.htm` | context | activist/long — local |
 | activist_long | acc0000100493 26 000067 | `TSN/third-party-analyses/activist_reports/long/8-K_20260903_acc0000100493_26_000067.htm` | context | activist/long — local |
 
-Cross-check required: `TSN/research/cross_check_third_party_2026-10-25.md`
+Cross-check required: `TSN/research/cross_check_third_party_2026-10-27.md`

@@ -1,6 +1,6 @@
 # LUV — Third-party source inventory
 
-**Date:** 2026-10-25
+**Date:** 2026-10-27
 **Sources:** 190 total (0 approved, 0 pending, 190 context)
 
 | ID | Title | Path | Status | Use |
@@ -45,8 +45,6 @@
 | activist_long | Elliott Management — DEFA14A | `LUV/third-party-analyses/activist_reports/long/DEFA14A_20240814_acc0001193125_24_200736.htm` | context | activist/long — sec_edgar |
 | activist_long | Elliott Management — SC 13D/A | `LUV/third-party-analyses/activist_reports/long/SC-13D/A_20240813_acc0000902664_24_005096.htm` | context | activist/long — sec_edgar |
 | activist_long | Elliott Management — SC 13D | `LUV/third-party-analyses/activist_reports/long/SC-13D_20240805_acc0000902664_24_004970.htm` | context | activist/long — sec_edgar |
-| activist_long | acc0000092380 25 000025 | `LUV/third-party-analyses/activist_reports/long/8-K_20250207_acc0000092380_25_000025.htm` | context | activist/long — local |
-| activist_long | acc0001193125 24 242286 | `LUV/third-party-analyses/activist_reports/long/8-K_20241024_acc0001193125_24_242286.htm` | context | activist/long — local |
 | activist_long | acc0000092380 18 000002 | `LUV/third-party-analyses/activist_reports/long/8-K_20180102_acc0000092380_18_000002.htm` | context | activist/long — local |
 | activist_long | acc0000092380 18 000006 | `LUV/third-party-analyses/activist_reports/long/8-K_20180109_acc0000092380_18_000006.htm` | context | activist/long — local |
 | activist_long | acc0000092380 18 000008 | `LUV/third-party-analyses/activist_reports/long/8-K_20180125_acc0000092380_18_000008.htm` | context | activist/long — local |
@@ -166,12 +164,14 @@
 | activist_long | acc0000092380 24 000121 | `LUV/third-party-analyses/activist_reports/long/8-K_20240926_acc0000092380_24_000121.htm` | context | activist/long — local |
 | activist_long | acc0000092380 24 000122 | `LUV/third-party-analyses/activist_reports/long/8-K_20240926_acc0000092380_24_000122.htm` | context | activist/long — local |
 | activist_long | acc0000092380 24 000145 | `LUV/third-party-analyses/activist_reports/long/8-K_20241024_acc0000092380_24_000145.htm` | context | activist/long — local |
+| activist_long | acc0001193125 24 242286 | `LUV/third-party-analyses/activist_reports/long/8-K_20241024_acc0001193125_24_242286.htm` | context | activist/long — local |
 | activist_long | acc0001193125 24 243459 | `LUV/third-party-analyses/activist_reports/long/8-K_20241025_acc0001193125_24_243459.htm` | context | activist/long — local |
 | activist_long | acc0000092380 24 000174 | `LUV/third-party-analyses/activist_reports/long/8-K_20241205_acc0000092380_24_000174.htm` | context | activist/long — local |
 | activist_long | acc0000092380 25 000003 | `LUV/third-party-analyses/activist_reports/long/8-K_20250107_acc0000092380_25_000003.htm` | context | activist/long — local |
 | activist_long | acc0001193125 25 004026 | `LUV/third-party-analyses/activist_reports/long/8-K_20250110_acc0001193125_25_004026.htm` | context | activist/long — local |
 | activist_long | acc0001193125 25 013376 | `LUV/third-party-analyses/activist_reports/long/8-K_20250127_acc0001193125_25_013376.htm` | context | activist/long — local |
 | activist_long | acc0000092380 25 000007 | `LUV/third-party-analyses/activist_reports/long/8-K_20250130_acc0000092380_25_000007.htm` | context | activist/long — local |
+| activist_long | acc0000092380 25 000025 | `LUV/third-party-analyses/activist_reports/long/8-K_20250207_acc0000092380_25_000025.htm` | context | activist/long — local |
 | activist_long | acc0001193125 25 023650 | `LUV/third-party-analyses/activist_reports/long/8-K_20250210_acc0001193125_25_023650.htm` | context | activist/long — local |
 | activist_long | acc0001193125 25 028035 | `LUV/third-party-analyses/activist_reports/long/8-K_20250218_acc0001193125_25_028035.htm` | context | activist/long — local |
 | activist_long | acc0001193125 25 029062 | `LUV/third-party-analyses/activist_reports/long/8-K_20250219_acc0001193125_25_029062.htm` | context | activist/long — local |
@@ -196,4 +196,4 @@
 | activist_long | acc0000092380 26 000098 | `LUV/third-party-analyses/activist_reports/long/8-K_20260812_acc0000092380_26_000098.htm` | context | activist/long — local |
 | activist_long | acc0000092380 26 000104 | `LUV/third-party-analyses/activist_reports/long/8-K_20261021_acc0000092380_26_000104.htm` | context | activist/long — local |
 
-Cross-check required: `LUV/research/cross_check_third_party_2026-10-25.md`
+Cross-check required: `LUV/research/cross_check_third_party_2026-10-27.md`

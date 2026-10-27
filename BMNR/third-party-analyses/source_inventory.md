@@ -1,7 +1,7 @@
 # BMNR — Third-party source inventory
 
-**Date:** 2026-10-25
-**Sources:** 143 total (0 approved, 0 pending, 143 context)
+**Date:** 2026-10-27
+**Sources:** 144 total (0 approved, 0 pending, 144 context)
 
 | ID | Title | Path | Status | Use |
 |----|-------|------|--------|-----|
@@ -148,5 +148,6 @@
 | activist_long | acc0001493152 26 046088 | `BMNR/third-party-analyses/activist_reports/long/8-K_20261007_acc0001493152_26_046088.htm` | context | activist/long — local |
 | activist_long | acc0001493152 26 046744 | `BMNR/third-party-analyses/activist_reports/long/8-K_20261013_acc0001493152_26_046744.htm` | context | activist/long — local |
 | activist_long | acc0001493152 26 047517 | `BMNR/third-party-analyses/activist_reports/long/8-K_20261019_acc0001493152_26_047517.htm` | context | activist/long — local |
+| activist_long | acc0001493152 26 048429 | `BMNR/third-party-analyses/activist_reports/long/8-K_20261026_acc0001493152_26_048429.htm` | context | activist/long — local |
 
-Cross-check required: `BMNR/research/cross_check_third_party_2026-10-25.md`
+Cross-check required: `BMNR/research/cross_check_third_party_2026-10-27.md`
