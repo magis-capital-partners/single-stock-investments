@@ -81,7 +81,7 @@ if [ -n "${SLEEVE_INGEST_TOKEN:-}" ]; then
   # the primary fetch has finished. This creates no trading/API login. Keep the
   # token in its current file and never rotate it for this feature.
   if [ -n "${SLEEVE_CLOSED_LOTS_QUERY_ID:-}" ]; then
-    if systemctl is-active --quiet ls-algo-daily.service; then
+    if systemctl is-active --quiet ls-algo-daily.service || systemctl is-active --quiet ls-algo-eod-retry.service; then
       log "closed-lot refresh deferred: primary EOD producer is still active"
     else
       (

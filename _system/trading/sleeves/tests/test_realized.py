@@ -276,3 +276,37 @@ def test_broker_closed_lot_links_to_its_opening_owner_not_the_closing_trader(tmp
     result = history(write_report(tmp_path, rows, lots=lots))
     assert result["records"][0]["owner"] == "drew"
     assert result["records"][0]["allocation_reason"] == "broker_matched_opening_order_reference"
+
+
+def test_old_endpoint_http_success_does_not_mark_history_published(tmp_path, monkeypatch):
+    from _system.trading.sleeves import realized_cli
+    store = RealizedStore(tmp_path / "state")
+    store.ingest(write_report(tmp_path, [trade()]), account="TEST")
+    result = store.build(account="TEST", ls_symbols=set(), blacklist=set())
+    calls = []
+    def old_endpoint(*args, **kwargs):
+        calls.append(args)
+        return {"ok": True, "book": {"owner": "drew"}}
+    monkeypatch.setattr(realized_cli, "post_ingest", old_endpoint)
+    with pytest.raises(RuntimeError, match="did not acknowledge"):
+        realized_cli.publish(store, result, url="https://example.test/ingest", token="test")
+    assert len(calls) == 1
+    assert store.db.execute("SELECT count(*) FROM realized_publications").fetchone()[0] == 0
+    store.close()
+
+
+@pytest.mark.parametrize("code,expected_calls", [("1003", 1), ("1025", 1), ("1001", 3)])
+def test_unavailable_or_failed_flex_reports_cannot_enter_a_request_loop(tmp_path, monkeypatch, code, expected_calls):
+    import io
+    from _system.trading.sleeves import realized_flex
+    calls = []
+    def request(*args, **kwargs):
+        calls.append(1)
+        return io.BytesIO(f"<FlexStatementResponse><Status>Fail</Status><ErrorCode>{code}</ErrorCode></FlexStatementResponse>".encode())
+    monkeypatch.setattr(realized_flex.urllib.request, "urlopen", request)
+    monkeypatch.setattr(realized_flex.time, "sleep", lambda _: None)
+    with pytest.raises(RuntimeError, match=code):
+        realized_flex.fetch_report(query_id="123", account="TEST", start="2025-01-01", through="2025-01-31",
+                                  destination=tmp_path / "report.xml", token="test-token")
+    assert len(calls) == expected_calls
+    assert not (tmp_path / "report.xml").exists()
