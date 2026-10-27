@@ -5,6 +5,7 @@
 }
 
 .fl-reader {
+  color-scheme: light;
   --fl-ink: #122438;
   --fl-prose: #263a52;
   --fl-muted: #5b718a;
@@ -14,9 +15,12 @@
   --fl-paper: #ffffff;
   --fl-wash: #f6f8fb;
   --fl-subtle: #eff3f9;
+  --fl-control-bg: #f1f5fb;
+  --fl-menu-bg: #ffffff;
   --fl-hover: #e8eef8;
   --fl-active: #e0eaf8;
   --fl-shadow: 0 1px 2px rgba(15, 29, 48, 0.04);
+  --fl-chevron: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%235b718a' stroke-width='2.2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'/%3E%3C/svg%3E");
   --fl-sans: 'DM Sans', system-ui, -apple-system, 'Segoe UI', sans-serif;
   --fl-serif: Charter, 'Iowan Old Style', 'Palatino Linotype', Cambria, Georgia, serif;
   --fl-mono: 'JetBrains Mono', ui-monospace, SFMono-Regular, Menlo, monospace;
@@ -27,18 +31,22 @@
 }
 
 .fl-reader.is-embedded {
+  color-scheme: dark;
   --fl-ink: #e6edf7;
   --fl-prose: #cbd5e1;
   --fl-muted: #8b9bb4;
   --fl-blue: #60a5fa;
   --fl-blue-soft: rgba(96, 165, 250, 0.14);
-  --fl-line: rgba(148, 163, 184, 0.16);
+  --fl-line: #1e2d46;
   --fl-paper: #111827;
   --fl-wash: transparent;
-  --fl-subtle: rgba(255, 255, 255, 0.03);
-  --fl-hover: rgba(59, 130, 246, 0.1);
-  --fl-active: rgba(59, 130, 246, 0.16);
+  --fl-subtle: #151d2e;
+  --fl-control-bg: #0d1424;
+  --fl-menu-bg: #151d2e;
+  --fl-hover: #1a2438;
+  --fl-active: #1e2d46;
   --fl-shadow: none;
+  --fl-chevron: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%238b9bb4' stroke-width='2.2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'/%3E%3C/svg%3E");
   border: 1px solid var(--fl-line);
   border-radius: 10px;
   background: #0b111e;
@@ -80,19 +88,44 @@
   min-height: 34px;
   border: 1px solid var(--fl-line);
   border-radius: 6px;
-  background: var(--fl-paper);
+  background-color: var(--fl-control-bg);
+  color: var(--fl-ink);
   padding: 5px 10px;
   transition: border-color 0.12s ease, background-color 0.12s ease;
+}
+
+.fl-reader select {
+  appearance: none;
+  -webkit-appearance: none;
+  background-image: var(--fl-chevron);
+  background-repeat: no-repeat;
+  background-position: right 9px center;
+  background-size: 12px 12px;
+  padding-right: 28px;
+  cursor: pointer;
+}
+
+.fl-reader select option,
+.fl-reader select optgroup {
+  background-color: var(--fl-menu-bg);
+  color: var(--fl-ink);
+  font-family: var(--fl-sans);
+  font-size: 13px;
 }
 
 .fl-reader button {
   cursor: pointer;
 }
 
-.fl-reader button:hover,
-.fl-reader select:hover {
+.fl-reader button:hover {
   border-color: var(--fl-blue);
-  background: var(--fl-hover);
+  background-color: var(--fl-hover);
+}
+
+.fl-reader select:hover,
+.fl-reader input:hover {
+  border-color: var(--fl-blue);
+  background-color: var(--fl-control-bg);
 }
 
 .fl-reader :focus-visible {
@@ -202,7 +235,7 @@
   padding: 2px;
   border: 1px solid var(--fl-line);
   border-radius: 7px;
-  background: var(--fl-subtle);
+  background-color: var(--fl-control-bg);
   gap: 2px;
 }
 
@@ -222,9 +255,9 @@
 }
 
 .fl-view-tab.is-active {
-  background: var(--fl-paper) !important;
-  color: var(--fl-ink) !important;
-  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.08);
+  background-color: var(--fl-blue) !important;
+  color: #ffffff !important;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.12);
 }
 
 .fl-filters {
@@ -245,11 +278,12 @@
   width: 100%;
   padding-left: 11px;
   font-size: 13px;
-  background: var(--fl-subtle);
+  background-color: var(--fl-control-bg);
 }
 
 .fl-search-field input[type="search"]:focus {
-  background: var(--fl-paper);
+  background-color: var(--fl-control-bg);
+  border-color: var(--fl-blue);
 }
 
 .fl-compact-field {
@@ -259,8 +293,9 @@
 
 .fl-compact-field select {
   font-size: 12.5px;
-  padding: 4px 10px;
-  color: var(--fl-prose);
+  padding: 5px 28px 5px 10px;
+  background-color: var(--fl-control-bg);
+  color: var(--fl-ink);
 }
 
 .fl-date-range {
@@ -271,14 +306,24 @@
   list-style: none;
   cursor: pointer;
   min-height: 34px;
-  padding: 5px 10px;
+  padding: 5px 28px 5px 10px;
   border: 1px solid var(--fl-line);
   border-radius: 6px;
-  background: var(--fl-paper);
+  background-color: var(--fl-control-bg);
+  background-image: var(--fl-chevron);
+  background-repeat: no-repeat;
+  background-position: right 9px center;
+  background-size: 12px 12px;
   font-size: 12.5px;
-  color: var(--fl-prose);
+  color: var(--fl-ink);
   display: inline-flex;
   align-items: center;
+  transition: border-color 0.12s ease, background-color 0.12s ease;
+}
+
+.fl-date-range > summary:hover,
+.fl-date-range[open] > summary {
+  border-color: var(--fl-blue);
 }
 
 .fl-date-range > summary::-webkit-details-marker {
@@ -290,14 +335,19 @@
   right: 0;
   top: calc(100% + 6px);
   z-index: 30;
-  background: var(--fl-paper);
+  background-color: var(--fl-menu-bg);
   border: 1px solid var(--fl-line);
   border-radius: 8px;
   padding: 12px;
-  box-shadow: 0 10px 28px rgba(0, 0, 0, 0.18);
+  box-shadow: 0 10px 28px rgba(0, 0, 0, 0.25);
   display: grid;
   gap: 8px;
   min-width: 210px;
+}
+
+.fl-date-range-pop input[type="date"] {
+  background-color: var(--fl-control-bg);
+  color: var(--fl-ink);
 }
 
 .fl-date-range-pop label {
