@@ -188,6 +188,9 @@ jobs:
   hub-payloads:
     runs-on: ubuntu-latest
     timeout-minutes: 5
+    env:
+      RESEARCH_VAULT_ROOT: _external/research-vault
+      RESEARCH_VAULT_CLONE_TOKEN: ${{ secrets.RESEARCH_VAULT_CLONE_TOKEN }}
     steps:
       - uses: actions/checkout@v4
         with:
@@ -196,6 +199,10 @@ jobs:
           filter: blob:none
           sparse-checkout: |
             /_system/scripts/check_hub_payloads.py
+            /_system/scripts/private_dashboard_assets.py
+            /_system/scripts/vault_paths.py
+            /.github/actions/checkout-vault/
+            /dashboard/private-assets.json
             /dashboard/data/core.json
             /dashboard/data/desk_briefs.json
             /dashboard/data/reverse_splits.json
@@ -207,6 +214,8 @@ jobs:
       - uses: actions/setup-python@v5
         with:
           python-version: "3.12"
+      - name: Restore authorized private hub inputs
+        uses: ./.github/actions/checkout-vault
       - name: Committed hub shards reconcile
         run: python _system/scripts/check_hub_payloads.py
 
