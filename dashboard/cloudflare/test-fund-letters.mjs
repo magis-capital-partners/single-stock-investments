@@ -143,10 +143,30 @@ test('years and labels are not numerical claims, and stance reaches readers with
   const dated=draft();dated.overview+=' Written in 2011 after QE2 ended.';
   assert.deepEqual(validateDraft(dated,sourceSections(source)),[]);
   const row={id:'l0',fund_id:'fund',fund:'Fund',reporting_period:'2011Q1',letter_date:null,publication_date:null,published_at:'x',created_at:'y',revision_id:'r1',overview:'Overview'};
-  const letter=readerLetter(row,[{id:'i1',title:'Acme',ticker:null,idea_type:'long',activity:'new',summary:'Summary',evolution:null,compared_letter_id:null}],{focus:'macro',leaning_in:[{subject:'Equities',why:'Cash yields are low.',quote:'PRIVATE QUOTE'}],leaning_out:[{subject:'Cash',why:'Yields are low.',quote:'PRIVATE QUOTE 2'}]});
+  const letter=readerLetter(row,[{id:'i1',title:'Acme',ticker:null,idea_type:'long',activity:'new',summary:'Summary',evolution:null,compared_letter_id:null}],{focus:'macro',leaning_in:[{subject:'Equities',why:'Cash yields are low.',quote:'PRIVATE QUOTE'}],leaning_out:[{subject:'Cash',why:'Yields are low.',quote:'PRIVATE QUOTE 2'}]},'Macro tilt towards equities.');
   assert.equal(letter.stance.focus,'macro');
+  assert.equal(letter.focus,'macro');
+  assert.equal(letter.headline,'Macro tilt towards equities.');
+  assert.equal(readerLetter(row,[],null,'https://drive.google.com/SECRET').headline,null);
   assert.deepEqual(letter.stance.leaning_in,[{subject:'Equities',why:'Cash yields are low.'}]);
   assert.equal(JSON.stringify(letter).includes('PRIVATE QUOTE'),false);
+});
+test('cross-fund letters feed, period catalog, and category/activity filters return allowlisted summaries',async()=>{
+  const DB=database();seed(DB,3);
+  DB.db.exec("UPDATE fl_revisions SET content_json='{\"headline\":\"Headline for l0\",\"stance\":{\"focus\":\"micro\"}}' WHERE id='r0'");
+  DB.db.exec("UPDATE fl_ideas SET activity='new' WHERE revision_id='r0'");
+  const catalog=await(await onRequestGet(context({action:'funds'},reader,DB))).json();
+  assert.deepEqual(catalog.periods,[{period:'2020Q1',count:3}]);
+  const allLetters=await(await onRequestGet(context({action:'letters'},reader,DB))).json();
+  assert.equal(allLetters.letters.length,3);
+  assert.equal(allLetters.letters[0].headline,'Headline for l0');
+  assert.equal(allLetters.letters[0].focus,'micro');
+  assert.equal(JSON.stringify(allLetters).includes('SECRET'),false);
+  const byAct=await(await onRequestGet(context({action:'letters',activity:'new,add',period:'2020',type:'long,short'},reader,DB))).json();
+  assert.equal(byAct.letters.length,1);
+  assert.equal(byAct.letters[0].id,'l0');
+  const searchByAct=await(await onRequestGet(context({action:'search',activity:'new,add',period:'2020Q1',type:'long,short'},reader,DB))).json();
+  assert.equal(searchByAct.results.length,1);
 });
 test('owner edits create revisions and publication requires six explicit attestations',async()=>{
   const DB=database();seed(DB);

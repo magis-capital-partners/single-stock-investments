@@ -21,14 +21,20 @@ function readerStance(stance) {
   const result = { focus: ["micro", "macro", "mixed"].includes(focus) ? focus : "micro", leaning_in: lean(stance.leaning_in), leaning_out: lean(stance.leaning_out) };
   return result.leaning_in.length || result.leaning_out.length ? result : null;
 }
-export function readerLetter(row, ideas, stance = null) {
+export function readerLetter(row, ideas, stance = null, headline = null) {
+  const focus = safe(stance?.focus || row?.focus);
   return { id: safe(row.id), fund_id: safe(row.fund_id), fund: safe(row.fund), reporting_period: safe(row.reporting_period),
     letter_date: safe(row.letter_date) || null, publication_date: safe(row.publication_date) || null,
     summary_published_at: safe(row.published_at), summary_revised_at: safe(row.created_at),
-    revision_id: safe(row.revision_id), overview: safe(row.overview), stance: readerStance(stance), ideas: ideas.map(readerIdea) };
+    revision_id: safe(row.revision_id), headline: safe(headline ?? row.headline) || null,
+    focus: ["micro", "macro", "mixed"].includes(focus) ? focus : null,
+    overview: safe(row.overview), stance: readerStance(stance), ideas: ideas.map(readerIdea) };
 }
 export function readerFund(row) {
   return { id: safe(row.id), name: safe(row.name), manager: safe(row.manager), strategy: safe(row.strategy), letter_count: Number(row.letter_count), latest: safe(row.latest) };
+}
+export function readerPeriod(row) {
+  return { period: safe(row.reporting_period), count: Number(row.letter_count || 0) };
 }
 export function readerArchiveEntry(row) {
   return { id: safe(row.id), reporting_period: safe(row.reporting_period), letter_date: safe(row.letter_date) || null };
@@ -89,13 +95,13 @@ export function validateDraft(draft, parts) {
   if (!parts.length || visited.length !== parts.length || new Set(visited).size !== parts.length || visited.some(id => !sections.has(id))) errors.push("Reconcile every source passage exactly once.");
   if (ids.some(id => !covered.has(id))) errors.push("Every idea must appear in the completeness checklist.");
   const stanceText = [draft.stance?.leaning_in, draft.stance?.leaning_out].flatMap(items => (Array.isArray(items) ? items : []).flatMap(i => [i?.subject, i?.why]));
-  const stanceQuotes = [draft.stance?.leaning_in, draft.stance?.leaning_out].flatMap(items => (Array.isArray(items) ? items : []).map(i => i?.quote || ""));
+  const stanceQuotes = [draft.stance?.leaning_in, draft.stance?.leaning_out].flatMap(items => (Array.isArray(items) ? items : []).flatMap(i => [i?.quote || "", ...(Array.isArray(i?.quotes) ? i.quotes : [])]));
   const sourceWords = words(parts.map(p => p.text).join(" "));
   const grams = new Set(sourceWords.slice(0, -11).map((_, i) => sourceWords.slice(i, i + 12).join(" ")));
   const prose = [draft.overview, ...draft.ideas.flatMap(i => [i?.title, i?.summary, i?.evolution, i?.activity]), ...stanceText].filter(Boolean).join(" ");
   const allQuotes = [...draft.ideas.flatMap(i => (i?.evidence || []).map(e => e?.quote || "")), ...stanceQuotes].join(" ");
   for (const n of numbers(prose)) if (!allQuotes.includes(n)) errors.push(`Published numerical claim ${n} lacks cited evidence.`);
-  if (safe(prose) !== prose) errors.push("Reader prose contains a source link or private reference.");
+  if (safe(prose) !== prose || (draft.headline && safe(draft.headline) !== String(draft.headline))) errors.push("Reader prose contains a source link or private reference.");
   const tokens = words(prose);
   if (tokens.slice(0, -11).some((_, i) => grams.has(tokens.slice(i, i + 12).join(" ")))) errors.push("At least twelve consecutive source words copied; rewrite original prose.");
   return [...new Set(errors)];
@@ -107,11 +113,58 @@ export function pageArgs(params) {
   return { offset, limit: Math.min(50, Math.max(1, Number.parseInt(params.get("limit") || "20", 10) || 20)) };
 }
 
+function appendPeriodAndDateFilters(params, clauses, args) {
+  const period = (params.get("period") || "").trim();
+  if (period) {
+    if (/^\d{4}Q[1-4]$/i.test(period)) {
+      clauses.push("UPPER(l.reporting_period)=?");
+      args.push(period.toUpperCase());
+    } else if (/^\d{4}$/.test(period)) {
+      clauses.push("(l.reporting_period LIKE ? OR COALESCE(l.letter_date,l.publication_date,'') LIKE ?)");
+      args.push(`${period}%`, `${period}%`);
+    } else {
+      throw new TypeError("Use a YYYY or YYYYQn period.");
+    }
+  }
+  // Date filters use known dates, falling back to the reporting quarter for discovery only.
+  const periodDate = "COALESCE(l.letter_date,l.publication_date,CASE WHEN l.reporting_period GLOB '[0-9][0-9][0-9][0-9]Q[1-4]' THEN substr(l.reporting_period,1,4)||CASE substr(l.reporting_period,6,1) WHEN '1' THEN '-01-01' WHEN '2' THEN '-04-01' WHEN '3' THEN '-07-01' ELSE '-10-01' END END)";
+  for (const [key, comparison] of [["from", ">="], ["to", "<="]]) {
+    if (params.get(key)) {
+      if (!/^\d{4}-\d{2}-\d{2}$/.test(params.get(key))) throw new TypeError("Use an ISO date.");
+      clauses.push(`${key === 'from' ? LETTER_SORT_SQL : periodDate}${comparison}?`);
+      args.push(params.get(key));
+    }
+  }
+}
+
 export function searchWhere(params) {
   const clauses = ["l.published_revision IS NOT NULL"];
   const args = [];
-  for (const [key, column] of [["fund", "l.fund_id"], ["type", "i.idea_type"]]) {
-    if (params.get(key)) { clauses.push(`${column}=?`); args.push(params.get(key)); }
+  if (params.get("fund")) {
+    clauses.push("l.fund_id=?");
+    args.push(params.get("fund"));
+  }
+  const rawType = (params.get("type") || "").trim();
+  if (rawType) {
+    const types = rawType.split(",").map(s => s.trim()).filter(Boolean);
+    if (types.length === 1) {
+      clauses.push("i.idea_type=?");
+      args.push(types[0]);
+    } else if (types.length > 1) {
+      clauses.push(`i.idea_type IN (${types.map(() => "?").join(",")})`);
+      args.push(...types);
+    }
+  }
+  const rawActivity = (params.get("activity") || "").trim();
+  if (rawActivity) {
+    const activities = rawActivity.split(",").map(s => s.trim().toLowerCase()).filter(Boolean);
+    if (activities.length === 1) {
+      clauses.push("LOWER(COALESCE(i.activity,''))=?");
+      args.push(activities[0]);
+    } else if (activities.length > 1) {
+      clauses.push(`LOWER(COALESCE(i.activity,'')) IN (${activities.map(() => "?").join(",")})`);
+      args.push(...activities);
+    }
   }
   const q = (params.get("q") || "").trim();
   if (q) {
@@ -119,13 +172,43 @@ export function searchWhere(params) {
     clauses.push("(i.title LIKE ? ESCAPE '\\' OR i.ticker LIKE ? ESCAPE '\\' OR i.summary LIKE ? ESCAPE '\\' OR f.name LIKE ? ESCAPE '\\')");
     args.push(match, match, match, match);
   }
-  // Date filters use known dates, falling back to the reporting quarter for discovery only.
-  const periodDate = "COALESCE(l.letter_date,l.publication_date,CASE WHEN l.reporting_period GLOB '[0-9][0-9][0-9][0-9]Q[1-4]' THEN substr(l.reporting_period,1,4)||CASE substr(l.reporting_period,6,1) WHEN '1' THEN '-01-01' WHEN '2' THEN '-04-01' WHEN '3' THEN '-07-01' ELSE '-10-01' END END)";
-  for (const [key, comparison] of [["from", ">="], ["to", "<="]]) {
-    if (params.get(key)) {
-      if (!/^\d{4}-\d{2}-\d{2}$/.test(params.get(key))) throw new TypeError("Use an ISO date.");
-      clauses.push(`${key === 'from' ? LETTER_SORT_SQL : periodDate}${comparison}?`); args.push(params.get(key));
+  appendPeriodAndDateFilters(params, clauses, args);
+  return { sql: clauses.join(" AND "), args };
+}
+
+export function letterWhere(params) {
+  const clauses = ["l.published_revision IS NOT NULL"];
+  const args = [];
+  if (params.get("fund")) {
+    clauses.push("l.fund_id=?");
+    args.push(params.get("fund"));
+  }
+  if (params.get("letter")) {
+    clauses.push("l.id=?");
+    args.push(params.get("letter"));
+  }
+  const rawType = (params.get("type") || "").trim();
+  if (rawType) {
+    const types = rawType.split(",").map(s => s.trim()).filter(Boolean);
+    if (types.length) {
+      clauses.push(`EXISTS(SELECT 1 FROM fl_ideas i WHERE i.letter_id=l.id AND i.revision_id=l.published_revision AND i.idea_type IN (${types.map(() => "?").join(",")}))`);
+      args.push(...types);
     }
   }
+  const rawActivity = (params.get("activity") || "").trim();
+  if (rawActivity) {
+    const activities = rawActivity.split(",").map(s => s.trim().toLowerCase()).filter(Boolean);
+    if (activities.length) {
+      clauses.push(`EXISTS(SELECT 1 FROM fl_ideas i WHERE i.letter_id=l.id AND i.revision_id=l.published_revision AND LOWER(COALESCE(i.activity,'')) IN (${activities.map(() => "?").join(",")}))`);
+      args.push(...activities);
+    }
+  }
+  const q = (params.get("q") || "").trim();
+  if (q) {
+    const match = `%${q.replace(/[\\%_]/g, "\\$&")}%`;
+    clauses.push("(f.name LIKE ? ESCAPE '\\' OR f.manager LIKE ? ESCAPE '\\' OR COALESCE(l.reporting_period,'') LIKE ? ESCAPE '\\' OR r.overview LIKE ? ESCAPE '\\' OR EXISTS(SELECT 1 FROM fl_ideas i WHERE i.letter_id=l.id AND i.revision_id=l.published_revision AND (i.title LIKE ? ESCAPE '\\' OR i.ticker LIKE ? ESCAPE '\\' OR i.summary LIKE ? ESCAPE '\\')))");
+    args.push(match, match, match, match, match, match, match);
+  }
+  appendPeriodAndDateFilters(params, clauses, args);
   return { sql: clauses.join(" AND "), args };
 }
