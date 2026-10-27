@@ -4,6 +4,7 @@ import { privateJson, requireHumanViewer } from "./_lib/auth.js";
 // No wildcard exemption: adding an ingestion route requires an explicit security review.
 export const MACHINE_ROUTES = new Set([
   "/api/v1/market-risk/ingest", "/api/v1/quotes/ingest", "/api/v1/sleeves/ingest",
+  "/api/v1/sleeves/realized-ingest",
   "/api/v2/portfolio/ingest", "/api/v2/portfolio/ingest/peek",
   "/api/v2/portfolio/ingest/contract-lookups/claim", "/api/v2/portfolio/ingest/contract-lookups/publish",
   "/api/v2/portfolio/ingest/order-requests/claim", "/api/v2/portfolio/ingest/order-requests/publish",
