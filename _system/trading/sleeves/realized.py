@@ -415,8 +415,11 @@ def build_history(events: list[dict], lots: list[dict], *, reports: list[dict], 
         if end and date.fromisoformat(start).toordinal() > date.fromisoformat(end).toordinal() + 1:
             gaps.append({"after": end, "before": start})
         end = max(end or stop, stop)
+    observed_dates = [r["trade_date"] for r in records if r["trade_date"]]
     return {"schema_version": VERSION, "through": through, "records": records,
             "coverage": {"from": coverage[0][0] if coverage else None, "through": end, "gaps": gaps,
+                         "observed_from": min(observed_dates) if observed_dates else None,
+                         "observed_through": max(observed_dates) if observed_dates else None,
                          "closed_lots_available": bool(lots), "opening_match_method": "broker_reported; never reconstructed FIFO"},
             "reconciliation": {"status": "needs_review" if comparisons or exceptions else "matched",
                                "differences": comparisons, "exceptions": exceptions,

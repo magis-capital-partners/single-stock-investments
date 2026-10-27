@@ -10,6 +10,7 @@ function requirePrivateArchive(env) {
 const SHA = /^[a-f0-9]{64}$/;
 const DECIMAL = /^-?\d{1,24}(?:\.\d{1,24})?$/;
 const OWNERS = new Set(['drew', 'michael', 'unallocated']);
+const OWNER_BITS = { drew: 1, michael: 2, unallocated: 4 };
 export const MAX_INGEST_BYTES = 400_000;
 
 export function canonical(value) {
@@ -101,6 +102,7 @@ export async function storeRealized(env, payload) {
     const manifest = payload.manifest;
     if (!manifest || !validDate(manifest.through) || !Array.isArray(manifest.batch_hashes)
       || manifest.batch_hashes.length > 2000 || manifest.batch_hashes.some(x => !SHA.test(x))
+      || !['row_v1', 'packed_v1'].includes(manifest.storage || 'row_v1')
       || !Number.isSafeInteger(manifest.row_count) || manifest.row_count < 0 || manifest.row_count > 100_000
       || !Array.isArray(manifest.archives) || manifest.archives.length > 1000
       || manifest.archives.some(a => !SHA.test(a.report_id || '') || !Array.isArray(a.part_shas) || a.part_shas.length > 2000 || a.part_shas.some(s => !SHA.test(s)))
@@ -128,7 +130,8 @@ export async function storeRealized(env, payload) {
     if (generation.state !== 'staging') throw new TypeError('Completed generations are immutable');
     for (const row of payload.records) validateRecord(row, account);
     await archive.put(`${prefix}/batch-${payload.batch_index}.json`, canonical(payload.records), { httpMetadata: { contentType: 'application/json' } });
-    const statements = payload.records.map(row => db.prepare(`INSERT INTO sleeve_realized_records
+    const packed = manifest.storage === 'packed_v1';
+    const statements = packed ? [] : payload.records.map(row => db.prepare(`INSERT INTO sleeve_realized_records
       (generation_id,record_id,owner,trade_date,settlement_date,settlement_status,ticker,payload_json) VALUES (?,?,?,?,?,?,?,?)`)
       .bind(gen, row.record_id, row.owner, row.trade_date, row.settlement_date, row.settlement_status, row.ticker.toUpperCase(), canonical(row)));
     const grouped = new Map();
@@ -137,10 +140,20 @@ export async function storeRealized(env, payload) {
       if (!grouped.has(key)) grouped.set(key, []);
       grouped.get(key).push(row);
     }
+    const daily = [];
     for (const [key, rows] of grouped) {
       const [owner, trade, settle, state, ticker] = JSON.parse(key);
-      statements.push(db.prepare('INSERT INTO sleeve_realized_daily VALUES (?,?,?,?,?,?,?,?)')
-        .bind(gen, owner, trade, settle, state, ticker, canonical(summarize(rows)), payload.batch_index));
+      const summary = summarize(rows);
+      if (packed) daily.push({ owner, trade_date: trade, settlement_date: settle, settlement_status: state, ticker, summary });
+      else statements.push(db.prepare('INSERT INTO sleeve_realized_daily VALUES (?,?,?,?,?,?,?,?)')
+        .bind(gen, owner, trade, settle, state, ticker, canonical(summary), payload.batch_index));
+    }
+    if (packed) {
+      const tradeDates = payload.records.map(row => row.trade_date).sort();
+      const settleDates = payload.records.map(row => row.settlement_date).filter(Boolean).sort();
+      statements.push(db.prepare('INSERT OR IGNORE INTO sleeve_realized_pages VALUES (?,?,?,?,?,?,?,?,?)')
+        .bind(sha, payload.records.length, payload.records.reduce((mask, row) => mask | OWNER_BITS[row.owner], 0), tradeDates[0] || '', tradeDates.at(-1) || '',
+          settleDates[0] || '', settleDates.at(-1) || '', canonical(payload.records), canonical(daily)));
     }
     statements.push(db.prepare('INSERT INTO sleeve_realized_batches VALUES (?,?,?,?)').bind(gen, payload.batch_index, sha, payload.records.length));
     await db.batch(statements);
@@ -155,8 +168,15 @@ export async function storeRealized(env, payload) {
     const parts = await db.prepare('SELECT part,content_sha FROM sleeve_realized_archive_parts WHERE account=? AND report_id=? ORDER BY part').bind(account, source.report_id).all();
     if (parts.results.length !== source.part_shas.length || parts.results.some((p, i) => p.part !== i || p.content_sha !== source.part_shas[i])) throw new TypeError('Original source archive is incomplete');
   }
-  const count = await db.prepare('SELECT COUNT(*) AS count FROM sleeve_realized_records WHERE generation_id=?').bind(gen).first();
-  if (Number(count.count) !== manifest.row_count) throw new TypeError('Published record count does not match manifest');
+  const packed = manifest.storage === 'packed_v1';
+  const count = await db.prepare(packed
+    ? `SELECT COUNT(*) AS count,COUNT(DISTINCT json_extract(j.value,'$.record_id')) AS unique_count
+       FROM sleeve_realized_batches b JOIN sleeve_realized_pages p ON p.content_sha=b.content_sha,
+         json_each(p.records_json) j WHERE b.generation_id=?`
+    : 'SELECT COUNT(*) AS count FROM sleeve_realized_records WHERE generation_id=?').bind(gen).first();
+  if (Number(count.count) !== manifest.row_count || (packed && Number(count.unique_count) !== manifest.row_count)) {
+    throw new TypeError('Published record count or unique record count does not match manifest');
+  }
   // Daily totals were calculated from validated rows inside each atomic batch.
   // Completion never buffers the complete financial history in Worker memory.
   await db.batch([
@@ -197,10 +217,29 @@ export async function loadRealized(db, params) {
   if (ticker.length > 100) throw new TypeError('Ticker is too long');
   const limit = Math.min(100, Math.max(1, Number.parseInt(params.get('limit') || '50', 10) || 50));
   const filters = { generation: generationId, owner, from, to, basis, status, ticker };
-  const where = ['generation_id=?', 'owner=?', `${basis}>=?`, `${basis}<=?`], args = [generationId, owner, from, to];
+  const packed = manifest.storage === 'packed_v1';
+  const range = basis === 'trade_date' ? 'trade' : 'settle';
+  // SQLite expands only date-overlapping pages. The response contains the
+  // selected records, never a complete history buffered inside the Worker.
+  const pageFilter = `b.generation_id=? AND p.${range}_max>=? AND p.${range}_min<=? AND (p.owner_mask & ?) != 0`;
+  const metadata = ['owner', 'trade_date', 'settlement_date', 'settlement_status', 'ticker'];
+  const expanded = metadata.map(key => `${key === 'ticker' ? 'UPPER(' : ''}json_extract(j.value,'$.${key}')${key === 'ticker' ? ')' : ''} AS ${key}`).join(',');
+  const dailySource = packed
+    ? `SELECT ${expanded},json_extract(j.value,'$.summary') AS payload_json
+       FROM sleeve_realized_batches b JOIN sleeve_realized_pages p ON p.content_sha=b.content_sha,
+         json_each(p.daily_json) j WHERE ${pageFilter}`
+    : 'SELECT owner,trade_date,settlement_date,settlement_status,ticker,payload_json FROM sleeve_realized_daily WHERE generation_id=?';
+  const recordSource = packed
+    ? `SELECT ${expanded},json_extract(j.value,'$.record_id') AS record_id,j.value AS payload_json
+       FROM sleeve_realized_batches b JOIN sleeve_realized_pages p ON p.content_sha=b.content_sha,
+         json_each(p.records_json) j WHERE ${pageFilter}`
+    : 'SELECT owner,trade_date,settlement_date,settlement_status,ticker,record_id,payload_json FROM sleeve_realized_records WHERE generation_id=?';
+  const sourceArgs = packed ? [generationId, from, to, OWNER_BITS[owner] | OWNER_BITS.unallocated] : [generationId];
+  const recordArgs = packed ? [generationId, from, to, OWNER_BITS[owner]] : [generationId];
+  const where = ['owner=?', `${basis}>=?`, `${basis}<=?`], args = [owner, from, to];
   if (status !== 'all') { where.push('settlement_status=?'); args.push(status); }
   if (ticker) { where.push('ticker=?'); args.push(ticker); }
-  const daily = await db.prepare(`SELECT payload_json FROM sleeve_realized_daily WHERE ${where.join(' AND ')}`).bind(...args).all();
+  const daily = await db.prepare(`SELECT payload_json FROM (${dailySource}) WHERE ${where.join(' AND ')}`).bind(...sourceArgs, ...args).all();
   const summary = summarize(daily.results.map(r => JSON.parse(r.payload_json)));
   const pageWhere = [...where], pageArgs = [...args];
   if (params.get('cursor')) {
@@ -208,13 +247,14 @@ export async function loadRealized(db, params) {
     try { cursor = JSON.parse(atob(params.get('cursor'))); } catch { throw new TypeError('Invalid history cursor'); }
     if (canonical(cursor.filters) !== canonical(filters) || !validDate(cursor.date) || typeof cursor.id !== 'string' || cursor.id.length > 180) throw new TypeError('Cursor does not match the selected history');
     pageWhere.push(`(${basis}<? OR (${basis}=? AND record_id<?))`); pageArgs.push(cursor.date, cursor.date, cursor.id);
+    if (packed && cursor.date < to) recordArgs[2] = cursor.date;
   }
-  const page = await db.prepare(`SELECT record_id,${basis} AS page_date,payload_json FROM sleeve_realized_records
-    WHERE ${pageWhere.join(' AND ')} ORDER BY ${basis} DESC,record_id DESC LIMIT ?`).bind(...pageArgs, limit + 1).all();
+  const page = await db.prepare(`SELECT record_id,${basis} AS page_date,payload_json FROM (${recordSource})
+    WHERE ${pageWhere.join(' AND ')} ORDER BY ${basis} DESC,record_id DESC LIMIT ?`).bind(...recordArgs, ...pageArgs, limit + 1).all();
   const more = page.results.length > limit, rows = page.results.slice(0, limit), last = rows.at(-1);
-  const unresolvedArgs = [...args]; unresolvedArgs[1] = 'unallocated';
-  const unresolved = await db.prepare(`SELECT payload_json FROM sleeve_realized_daily WHERE ${where.join(' AND ')}`)
-    .bind(...unresolvedArgs).all();
+  const unresolvedArgs = [...args]; unresolvedArgs[0] = 'unallocated';
+  const unresolved = await db.prepare(`SELECT payload_json FROM (${dailySource}) WHERE ${where.join(' AND ')}`)
+    .bind(...sourceArgs, ...unresolvedArgs).all();
   return { status: 'available', owner, account: ref.account, generation_id: generationId, through,
     from, to, basis, settlement: status, ticker, summary, coverage: manifest.coverage,
     reconciliation: manifest.reconciliation, unresolved: summarize(unresolved.results.map(r => JSON.parse(r.payload_json))),

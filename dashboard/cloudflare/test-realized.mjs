@@ -12,7 +12,8 @@ import { onRequestGet } from '../functions/api/v1/sleeves/realized.js';
 
 if (!globalThis.crypto) globalThis.crypto = webcrypto;
 const hash = value => createHash('sha256').update(typeof value === 'string' ? value : canonical(value)).digest('hex');
-const migration = readFileSync(new URL('./migrations/0024_sleeve_realized.sql', import.meta.url), 'utf8');
+const migration = ['0024_sleeve_realized.sql', '0025_sleeve_realized_pages.sql']
+  .map(name => readFileSync(new URL(`./migrations/${name}`, import.meta.url), 'utf8')).join('\n');
 let NativeDatabase;
 try { NativeDatabase = (await import('node:sqlite')).DatabaseSync; } catch { /* Python adapter below also exercises real SQLite. */ }
 
@@ -52,7 +53,7 @@ const row = (id, owner = 'drew', extra = {}) => ({ record_id: id, account: 'TEST
 
 async function stage(env, rows, suffix = '1', extra = {}) {
   const base = { schema_version: 'sleeve_realized.v1', generation_id: suffix.repeat(64), account: 'TEST' };
-  const manifest = { through: '2026-10-26', row_count: rows.length, batch_hashes: rows.length ? [hash(rows)] : [], archives: [],
+  const manifest = { storage: 'packed_v1', through: '2026-10-26', row_count: rows.length, batch_hashes: rows.length ? [hash(rows)] : [], archives: [],
     coverage: { from: '2026-01-01', through: '2026-10-26', gaps: [] }, reconciliation: { status: 'matched' }, ...extra };
   await storeRealized(env, { ...base, kind: 'begin', manifest });
   if (rows.length) await storeRealized(env, { ...base, kind: 'batch', batch_index: 0, records: rows });
@@ -106,6 +107,57 @@ test('pagination is pinned to dataset and filter and summaries include all rows'
   assert.notEqual(first.records[0].record_id, second.records[0].record_id);
   await assert.rejects(loadRealized(db, params({ from: '2026-10-01', cursor: first.next_cursor })), /Cursor/);
   assert.equal((await loadRealized(db, params({ owner: 'michael' }))).summary.count, 1);
+  db.close();
+});
+
+test('packed pages preserve exact totals and pagination across batches with bounded database writes', async () => {
+  const db = database(), env = envFor(db), base = { schema_version: 'sleeve_realized.v1', generation_id: 'd'.repeat(64), account: 'TEST' };
+  const batches = [0, 1].map(batch => Array.from({ length: 80 }, (_, index) => row(`${batch}-${String(index).padStart(3, '0')}`)));
+  const manifest = { storage: 'packed_v1', through: '2026-10-26', row_count: 160, batch_hashes: batches.map(hash), archives: [] };
+  await storeRealized(env, { ...base, kind: 'begin', manifest });
+  for (const [batch_index, records] of batches.entries()) await storeRealized(env, { ...base, kind: 'batch', batch_index, records });
+  await storeRealized(env, { ...base, kind: 'complete' });
+  assert.equal((await db.prepare('SELECT COUNT(*) AS n FROM sleeve_realized_pages').first()).n, 2);
+  assert.equal((await db.prepare('SELECT COUNT(*) AS n FROM sleeve_realized_records').first()).n, 0);
+  assert.equal((await db.prepare('SELECT COUNT(*) AS n FROM sleeve_realized_daily').first()).n, 0);
+  const first = await loadRealized(db, params({ limit: '100' }));
+  assert.equal(first.summary.realized_usd, '16'); assert.equal(first.summary.count, 160);
+  const second = await loadRealized(db, params({ limit: '100', cursor: first.next_cursor, generation: first.generation_id }));
+  assert.equal(second.records.length, 60);
+  assert.equal(new Set([...first.records, ...second.records].map(r => r.record_id)).size, 160);
+  db.close();
+});
+
+test('duplicate record IDs across packed batches cannot become visible', async () => {
+  const db = database(), env = envFor(db), records = [row('duplicate')];
+  const base = { schema_version: 'sleeve_realized.v1', generation_id: 'e'.repeat(64), account: 'TEST' };
+  await storeRealized(env, { ...base, kind: 'begin', manifest: { storage: 'packed_v1', through: '2026-10-26', row_count: 2, batch_hashes: [hash(records), hash(records)], archives: [] } });
+  for (const batch_index of [0, 1]) await storeRealized(env, { ...base, kind: 'batch', batch_index, records });
+  await assert.rejects(storeRealized(env, { ...base, kind: 'complete' }), /unique record count/);
+  assert.equal((await loadRealized(db, params())).status, 'not_ingested');
+  db.close();
+});
+
+test('unchanged pages are reused across generations without changing pinned views', async () => {
+  const db = database(), env = envFor(db), rows = [row('unchanged')];
+  const first = await stage(env, rows, 'a');
+  await storeRealized(env, { ...first, kind: 'complete' });
+  const second = await stage(env, rows, 'b');
+  await storeRealized(env, { ...second, kind: 'complete' });
+  assert.equal((await db.prepare('SELECT COUNT(*) AS n FROM sleeve_realized_pages').first()).n, 1);
+  assert.equal((await db.prepare('SELECT COUNT(*) AS n FROM sleeve_realized_batches').first()).n, 2);
+  assert.equal((await loadRealized(db, params({ generation: first.generation_id }))).summary.realized_usd, '0.1');
+  assert.equal((await loadRealized(db, params())).records[0].record_id, 'unchanged');
+  db.close();
+});
+
+test('existing row-based generations remain readable during a storage upgrade', async () => {
+  const db = database(), env = envFor(db);
+  const base = await stage(env, [row('legacy')], 'f', { storage: 'row_v1' });
+  await storeRealized(env, { ...base, kind: 'complete' });
+  const result = await loadRealized(db, params());
+  assert.equal(result.summary.realized_usd, '0.1');
+  assert.equal(result.records[0].record_id, 'legacy');
   db.close();
 });
 
