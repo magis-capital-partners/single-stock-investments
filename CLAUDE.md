@@ -119,3 +119,43 @@ Local checks that do not touch the Gateway:
 python _system/scripts/check_ib_gateway_registry.py --skip-mirrors --scan-ssi
 python _system/scripts/check_ib_gateway_registry.py  # manual cross-repo mirror check
 ```
+
+## ThetaData seat (one key, one terminal) — DO NOT VIOLATE
+
+The ThetaData key is **shared with spx-0dte, and spx-0dte is the protected
+party** — the same standing as the Gateway contract above. Mirrored
+machine-wide in `~/.claude/CLAUDE.md`, in spx-0dte's `AGENTS.md` (Rule 0T) and
+in ls-algo's `CLAUDE.md`; they must agree.
+
+**One key holds ONE terminal session and the NEWEST login wins.** A second
+login invalidates the first one's session: the loser keeps answering
+`/v3/terminal/mdds/status` with `CONNECTED` while every data endpoint returns
+**HTTP 478**. That is not a crash, so `Restart=always` never fires and the
+terminal serves nothing for hours behind green health checks (2026-09-08
+twice, 2026-09-10). During the session NY4's terminal is the **live SPX
+executor's market-data source**; taking it blinds live trading, and running SPX
+on its IB fallback flips its skew gate on ~12.8% of minutes.
+
+**RULE: during the seat window — 07:45–16:15 ET, Mon–Fri, US holidays
+excluded — nothing in this repo touches ThetaData**, and **never start a local
+ThetaTerminal, at any hour**. The window is wider than RTH on purpose: it runs
+from 07:45 (the owner moved it from 08:40 on 2026-09-29, because spx-0dte's
+early-ORB pre-open job reads NY4's terminal from 07:55) through spx-0dte's
+16:15 pull. If a pull genuinely cannot wait, stop and ask the user in chat and
+say why it cannot wait until after 16:15 ET; approval for one such action never
+carries to the next.
+
+**What takes or shares the seat here:**
+
+- `_system/research/systematic_flows_volatility/`: `scripts/check_data_access.py`
+  and `scripts/collect_and_analyze_event.py` (both `from thetadata import
+  ThetaClient` with `THETADATA_API_KEY`: running either is a login, and a login
+  takes the seat), and the vendored
+  `internal_ls_algo/code_and_config/bucket5_theta.py` (same hazard). Research
+  scripts with no schedule, which is exactly why they are easy to run without
+  thinking.
+- `_external/single_stock_options/pull_greeks_eod.py` (+ `run_overnight.py`,
+  `pull_entry_snapshots.py`, `speed_test*.py`; git-ignored): BORROWS NY4's seat
+  through spx-0dte's `theta_seat.borrowed_seat()`, never a local terminal, and
+  stands aside for the seat window, 16:00–19:00, and while spx-0dte's nightly is
+  still running. Halt it with a `STOP` file in that folder.
