@@ -58,6 +58,30 @@ def restore_copy(private: Path, public: Path, root: Path) -> None:
         temporary.unlink(missing_ok=True)
 
 
+def read_resolved_json(source: Path, relative: str) -> tuple[dict, bool]:
+    """Read a dashboard JSON file, following a private snapshot without copying it.
+
+    The second value is true when the bytes came from the vault object. A
+    hydrated checkout returns the public file and false, because that file
+    already holds the private bytes. Callers must not write the resolved
+    document back over a public placeholder.
+    """
+    safe_relative(relative)
+    public = source / relative
+    if not public.is_file():
+        return {}, False
+    document = json.loads(public.read_text(encoding="utf-8"))
+    if not isinstance(document, dict) or document.get("private_snapshot") is not True:
+        return document if isinstance(document, dict) else {}, False
+    resolved = private_source(source, relative)
+    if resolved == public:
+        return document, False
+    loaded = json.loads(resolved.read_text(encoding="utf-8"))
+    if not isinstance(loaded, dict):
+        raise ValueError(f"Private snapshot is not a JSON object: {relative}")
+    return loaded, True
+
+
 def private_source(source: Path, relative: str, manifest: dict | None = None) -> Path:
     safe_relative(relative)
     entry = (manifest or overlay_manifest(source)).get("assets", {}).get(relative)
