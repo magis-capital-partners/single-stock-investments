@@ -44,3 +44,10 @@ runs:
         if not status.get("letters_exists"):
             print("::warning::superinvestor-letters missing in cloned research-vault")
         PY
+
+    - name: Restore selected private inputs for authorized processing
+      shell: bash
+      run: |
+        if [ -f _system/scripts/private_dashboard_assets.py ] && [ -f dashboard/private-assets.json ]; then
+          python _system/scripts/private_dashboard_assets.py
+        fi

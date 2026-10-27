@@ -1,7 +1,7 @@
 {
   "schema_version": "3.0",
   "ticker": "AEHR",
-  "as_of": "2026-10-26",
+  "as_of": "2026-10-27",
   "proof_status": "decision_grade",
   "model_level": "stock_specific",
   "model_level_reason": "The proof-complete model uses stock-specific components and assumptions.",
@@ -15,7 +15,9 @@
     "model_as_of": "2026-07-24",
     "latest_fact_as_of": "2026-05-29",
     "oldest_fact_as_of": "2025-05-30",
-    "price_as_of": "2026-08-04"
+    "price_as_of": "2026-08-04",
+    "forecast_as_of": "2026-07-24",
+    "calculation_as_of": "2026-08-04"
   },
   "legacy_audit": {
     "actionable": false,
@@ -70,18 +72,20 @@
       "high": null
     },
     "forward_return_status": "withheld",
-    "forward_return_reason": "present_value_today cannot be annualized as a future payoff",
+    "forward_return_reason": "shared_forecast_incomplete",
     "required_return_pct": 10.0,
     "downside_to_low_pct": -100.0,
     "unvalued_component_count": 0,
     "unresolved_evidence_count": 0,
     "proof_complete_pct": 100.0,
-    "model_hash": "51ca3bf89a1c8d4091aeda74b6369d655824e10b0c4cc6456765af5dd4170e31",
+    "model_hash": "00eb095aac6e4fca5978df8e3cd071b9c8db8cf7ee78636b3cb5333033a7bb12",
     "dates": {
       "model_as_of": "2026-07-24",
       "latest_fact_as_of": "2026-05-29",
       "oldest_fact_as_of": "2025-05-30",
-      "price_as_of": "2026-08-04"
+      "price_as_of": "2026-08-04",
+      "forecast_as_of": "2026-07-24",
+      "calculation_as_of": "2026-08-04"
     },
     "legacy_audit": {
       "actionable": false,
@@ -102,7 +106,11 @@
     },
     "primary_power_zone": "High-return compounder",
     "owner_decision": null,
-    "next_action": "Freeze the evidence packet and select three method-independent raters."
+    "next_action": "Freeze the evidence packet and select three method-independent raters.",
+    "forecast_id": "f5091557cf8cc958937e99f99bee860b4f630ad7e42133af4134fd800ad90a0b",
+    "calculation_status": "model_gap",
+    "research_return_available": false,
+    "calculation_reason": "realization_timing_missing:value_per_share"
   },
   "business": {
     "status": "complete",
@@ -2245,7 +2253,9 @@
       "model_as_of": "2026-07-24",
       "latest_fact_as_of": "2026-05-29",
       "oldest_fact_as_of": "2025-05-30",
-      "price_as_of": "2026-08-04"
+      "price_as_of": "2026-08-04",
+      "forecast_as_of": "2026-07-24",
+      "calculation_as_of": "2026-08-04"
     },
     "legacy_audit": {
       "actionable": false,
@@ -4634,7 +4644,7 @@
       }
     ],
     "change_control": {
-      "model_hash": "51ca3bf89a1c8d4091aeda74b6369d655824e10b0c4cc6456765af5dd4170e31",
+      "model_hash": "00eb095aac6e4fca5978df8e3cd071b9c8db8cf7ee78636b3cb5333033a7bb12",
       "method_versions": [
         "net_asset_value@1.0",
         "owner_cash_or_dividend_discount@1.0",
@@ -5240,17 +5250,19 @@
   },
   "freshness": {
     "status": "stale",
-    "as_of": "2026-10-26",
+    "as_of": "2026-10-27",
     "dates": {
       "model_as_of": "2026-07-24",
       "latest_fact_as_of": "2026-05-29",
       "oldest_fact_as_of": "2025-05-30",
-      "price_as_of": "2026-08-04"
+      "price_as_of": "2026-08-04",
+      "forecast_as_of": "2026-07-24",
+      "calculation_as_of": "2026-08-04"
     },
     "age_days": {
-      "model_as_of": 94,
-      "latest_fact_as_of": 150,
-      "price_as_of": 83
+      "model_as_of": 95,
+      "latest_fact_as_of": 151,
+      "price_as_of": 84
     },
     "review_threshold_days": {
       "model_as_of": 365,
@@ -5258,7 +5270,7 @@
       "price_as_of": 7
     },
     "warnings": [
-      "price_as_of is 83 days old (review threshold 7)"
+      "price_as_of is 84 days old (review threshold 7)"
     ],
     "rule": "Freshness is disclosed separately from proof completeness; stale or undated inputs require review before a new capital decision."
   }

@@ -2042,7 +2042,7 @@
     ]
   },
   "change_control": {
-    "model_hash": "5e8403e889f6e04ad2dafb0b4e2984a43e8f92ae13ec44dc579ba2f2ca8f59e3",
+    "model_hash": "458690a3feb4428d084b23ede75d4f62b2ca4e9d4b6ebe1c5ccc1947e516d2d2",
     "method_versions": [
       "milestone_nav@1.0",
       "owner_cash_dcf@1.0",
@@ -2053,6 +2053,157 @@
     "rule": "A source fact is locked. Every assumption change requires a reason, author, timestamp, and before/after value."
   },
   "decision_rule": "Proof status and investment readiness are separate. Every material claim must be valued exactly once by a valid calculation proof, every evidence blocker must be resolved, and the model must be stock-specific before committee review. Only a human decision can authorize capital.",
+  "shared_forecast": {
+    "schema_version": "1.0",
+    "method_version": "shared-valuation-forecast/1.1",
+    "ticker": "BMNR",
+    "status": "model_gap",
+    "research_only": true,
+    "requires_human_review": false,
+    "capital_actionable": false,
+    "as_of": "2026-08-31",
+    "model_as_of": "2026-07-21",
+    "quote": {
+      "value": 25.32,
+      "as_of": "2026-08-31",
+      "source_url": "Yahoo BMNR close 2026-08-31",
+      "currency": null
+    },
+    "forecast_hash": "dd9fa423e707e8b2e764a770468eb4ea4b9e919390f6b33f2889ede129c3daad",
+    "forward_irr_pct": {
+      "low": null,
+      "base": null,
+      "high": null
+    },
+    "present_value_today_per_share": {
+      "low": null,
+      "base": null,
+      "high": null
+    },
+    "model_present_value_per_share": {
+      "low": null,
+      "base": null,
+      "high": null
+    },
+    "required_return_pct": {
+      "low": null,
+      "base": null,
+      "high": null
+    },
+    "forward_cashflow_schedule": {},
+    "buy_prices": [],
+    "components": [
+      {
+        "component_id": "eth_look_through_today",
+        "method": "unit_nav",
+        "status": "model_gap",
+        "present_value_per_share": {}
+      },
+      {
+        "component_id": "eth_trajectory_net_dilution",
+        "method": "milestone_nav",
+        "status": "model_gap",
+        "present_value_per_share": {}
+      },
+      {
+        "component_id": "staking_and_legacy_cash",
+        "method": "owner_cash_dcf",
+        "status": "model_gap",
+        "present_value_per_share": {}
+      },
+      {
+        "component_id": "warrants_tax_preferred_reserve",
+        "method": "realization_reserve",
+        "status": "model_gap",
+        "present_value_per_share": {
+          "base": -0.0,
+          "high": -0.0
+        }
+      }
+    ],
+    "gaps": [
+      {
+        "component_id": "eth_look_through_today",
+        "case": "low",
+        "code": "realization_timing_missing:value_per_share"
+      },
+      {
+        "component_id": "eth_look_through_today",
+        "case": "base",
+        "code": "realization_timing_missing:value_per_share"
+      },
+      {
+        "component_id": "eth_look_through_today",
+        "case": "high",
+        "code": "realization_timing_missing:value_per_share"
+      },
+      {
+        "component_id": "eth_trajectory_net_dilution",
+        "case": "low",
+        "code": "realization_timing_missing:value_per_share"
+      },
+      {
+        "component_id": "eth_trajectory_net_dilution",
+        "case": "base",
+        "code": "realization_timing_missing:value_per_share"
+      },
+      {
+        "component_id": "eth_trajectory_net_dilution",
+        "case": "high",
+        "code": "realization_timing_missing:value_per_share"
+      },
+      {
+        "component_id": "staking_and_legacy_cash",
+        "case": "low",
+        "code": "realization_timing_missing:value_per_share"
+      },
+      {
+        "component_id": "staking_and_legacy_cash",
+        "case": "base",
+        "code": "realization_timing_missing:value_per_share"
+      },
+      {
+        "component_id": "staking_and_legacy_cash",
+        "case": "high",
+        "code": "realization_timing_missing:value_per_share"
+      },
+      {
+        "component_id": "warrants_tax_preferred_reserve",
+        "case": "low",
+        "code": "realization_timing_missing:reserve_per_share"
+      }
+    ],
+    "warnings": [],
+    "source_refs": [
+      {
+        "node_id": "warrant_liability_m",
+        "ref": "BMNR/investor-documents/sec-edgar/10-Q_20260714_rpt20260531_acc0001628280_26_048157.htm",
+        "locator": "Warrant liability $2,100 thousand at May 31, 2026",
+        "as_of": "2026-05-31",
+        "source_id": "0cbb2dedaa6b2b35fc45997959d1142f99382f855b76990ef031c81fce7eed3f"
+      },
+      {
+        "node_id": "deferred_tax_m",
+        "ref": "BMNR/investor-documents/sec-edgar/10-Q_20260714_rpt20260531_acc0001628280_26_048157.htm",
+        "locator": "Deferred tax liability $92,300 thousand at May 31, 2026",
+        "as_of": "2026-05-31",
+        "source_id": "a6fd1106043c876fc63d9423d3f905c522d8c00f703173127d8ea07c9a0fcfd8"
+      },
+      {
+        "node_id": "shares_m",
+        "ref": "BMNR/investor-documents/sec-edgar/10-Q_20260714_rpt20260531_acc0001628280_26_048157.htm",
+        "locator": "Cover page; 579,652,432 common shares outstanding May 31, 2026",
+        "as_of": "2026-05-31",
+        "source_id": "76a913b8e0e2134b9e51d24c8604282bc7b0f31ffbce69987f5c4d4912b45124"
+      }
+    ],
+    "next_action": "automatic_model_refresh",
+    "reconciliation": {
+      "passed": false
+    },
+    "settlement_policy": "Explicit cash/debt additions in an operating DCF are time-zero acquisition adjustments; hypothetical settlement, not declared dividends.",
+    "calculation_id": "6c66cabeac5d58974f92fd425a3d58727f2070576265bd447e6113de112e8e6a"
+  },
   "authority": "universal_valuation_contract",
   "legacy_reference_present": true,
   "falsifier_coverage": {

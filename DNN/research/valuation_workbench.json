@@ -1,7 +1,7 @@
 {
   "schema_version": "3.0",
   "ticker": "DNN",
-  "as_of": "2026-10-26",
+  "as_of": "2026-10-27",
   "proof_status": "evidence_blocked",
   "model_level": "evidence_blocked",
   "model_level_reason": "Curated primary-evidence follow-ups remain open.",
@@ -15,7 +15,9 @@
     "model_as_of": "2026-08-23",
     "latest_fact_as_of": null,
     "oldest_fact_as_of": null,
-    "price_as_of": "2026-08-21"
+    "price_as_of": "2026-08-21",
+    "forecast_as_of": "2026-08-23",
+    "calculation_as_of": "2026-08-21"
   },
   "legacy_audit": {
     "actionable": false,
@@ -70,18 +72,20 @@
       "high": null
     },
     "forward_return_status": "withheld",
-    "forward_return_reason": "model maturity is not eligible to publish a return",
+    "forward_return_reason": "shared_forecast_incomplete",
     "required_return_pct": null,
     "downside_to_low_pct": null,
     "unvalued_component_count": 4,
     "unresolved_evidence_count": 0,
     "proof_complete_pct": 0.0,
-    "model_hash": "faaccf6394ad66cd401580932fdf4cae871a52b5b9b2b562e1a354ea4f44e208",
+    "model_hash": "470fe6cd6946845a3ded3b0d9ae919e687b3eb6a517a92e2dcabc0a8249d9793",
     "dates": {
       "model_as_of": "2026-08-23",
       "latest_fact_as_of": null,
       "oldest_fact_as_of": null,
-      "price_as_of": "2026-08-21"
+      "price_as_of": "2026-08-21",
+      "forecast_as_of": "2026-08-23",
+      "calculation_as_of": "2026-08-21"
     },
     "legacy_audit": {
       "actionable": false,
@@ -102,7 +106,11 @@
     },
     "primary_power_zone": "High-return compounder",
     "owner_decision": null,
-    "next_action": "Freeze the evidence packet and select three method-independent raters."
+    "next_action": "Freeze the evidence packet and select three method-independent raters.",
+    "forecast_id": null,
+    "calculation_status": "model_gap",
+    "research_return_available": false,
+    "calculation_reason": "forecast_date_missing_or_future"
   },
   "business": {
     "status": "incomplete",
@@ -340,7 +348,9 @@
       "model_as_of": "2026-08-23",
       "latest_fact_as_of": null,
       "oldest_fact_as_of": null,
-      "price_as_of": "2026-08-21"
+      "price_as_of": "2026-08-21",
+      "forecast_as_of": "2026-08-23",
+      "calculation_as_of": "2026-08-21"
     },
     "legacy_audit": {
       "actionable": false,
@@ -684,7 +694,7 @@
     },
     "source_lineage": [],
     "change_control": {
-      "model_hash": "faaccf6394ad66cd401580932fdf4cae871a52b5b9b2b562e1a354ea4f44e208",
+      "model_hash": "470fe6cd6946845a3ded3b0d9ae919e687b3eb6a517a92e2dcabc0a8249d9793",
       "method_versions": [],
       "change_log": [],
       "rule": "A source fact is locked. Every assumption change requires a reason, author, timestamp, and before/after value."
@@ -981,17 +991,19 @@
   },
   "freshness": {
     "status": "stale",
-    "as_of": "2026-10-26",
+    "as_of": "2026-10-27",
     "dates": {
       "model_as_of": "2026-08-23",
       "latest_fact_as_of": null,
       "oldest_fact_as_of": null,
-      "price_as_of": "2026-08-21"
+      "price_as_of": "2026-08-21",
+      "forecast_as_of": "2026-08-23",
+      "calculation_as_of": "2026-08-21"
     },
     "age_days": {
-      "model_as_of": 64,
+      "model_as_of": 65,
       "latest_fact_as_of": null,
-      "price_as_of": 66
+      "price_as_of": 67
     },
     "review_threshold_days": {
       "model_as_of": 365,
@@ -1000,7 +1012,7 @@
     },
     "warnings": [
       "latest_fact_as_of is not dated",
-      "price_as_of is 66 days old (review threshold 7)"
+      "price_as_of is 67 days old (review threshold 7)"
     ],
     "rule": "Freshness is disclosed separately from proof completeness; stale or undated inputs require review before a new capital decision."
   }

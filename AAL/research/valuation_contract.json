@@ -1709,7 +1709,7 @@
     ]
   },
   "change_control": {
-    "model_hash": "fcff55910f98ae44f8f998f89270b04398afbe34117761b2d04fc8880eef5c0c",
+    "model_hash": "3ebcb93e810709d1ab97a1afaadcc2805d93eb662f21d6c549927efcd7a094c0",
     "method_versions": [
       "net_asset_value@1.0",
       "owner_cash_or_dividend_discount@1.0",
@@ -1719,6 +1719,154 @@
     "rule": "A source fact is locked. Every assumption change requires a reason, author, timestamp, and before/after value."
   },
   "decision_rule": "Proof status and investment readiness are separate. Every material claim must be valued exactly once by a valid calculation proof, every evidence blocker must be resolved, and the model must be stock-specific before committee review. Only a human decision can authorize capital.",
+  "shared_forecast": {
+    "schema_version": "1.0",
+    "method_version": "shared-valuation-forecast/1.1",
+    "ticker": "AAL",
+    "status": "model_gap",
+    "research_only": true,
+    "requires_human_review": false,
+    "capital_actionable": false,
+    "as_of": "2026-08-31",
+    "model_as_of": "2026-07-21",
+    "quote": {
+      "value": 13.43,
+      "as_of": "2026-08-31",
+      "source_url": "Yahoo AAL close 2026-08-31",
+      "currency": null
+    },
+    "forecast_hash": "a2be80e6a011022fd5462ec9a02f8655bb7c162cedc0cf97b42a59b2d222aee6",
+    "forward_irr_pct": {
+      "low": null,
+      "base": null,
+      "high": null
+    },
+    "present_value_today_per_share": {
+      "low": null,
+      "base": null,
+      "high": null
+    },
+    "model_present_value_per_share": {
+      "low": null,
+      "base": null,
+      "high": null
+    },
+    "required_return_pct": {
+      "low": null,
+      "base": null,
+      "high": null
+    },
+    "forward_cashflow_schedule": {},
+    "buy_prices": [],
+    "components": [
+      {
+        "component_id": "midcycle_passenger_network",
+        "method": "owner_cash_or_dividend_discount",
+        "status": "model_gap",
+        "present_value_per_share": {}
+      },
+      {
+        "component_id": "aadvantage_co_brand_option",
+        "method": "risk_adjusted_milestone_value",
+        "status": "model_gap",
+        "present_value_per_share": {
+          "low": 0.0
+        }
+      },
+      {
+        "component_id": "net_financial_claims",
+        "method": "net_asset_value",
+        "status": "model_gap",
+        "present_value_per_share": {}
+      },
+      {
+        "component_id": "cycle_leverage_reserve",
+        "method": "net_asset_value",
+        "status": "model_gap",
+        "present_value_per_share": {}
+      }
+    ],
+    "gaps": [
+      {
+        "component_id": "midcycle_passenger_network",
+        "case": "low",
+        "code": "realization_timing_missing:owner_cash_per_share"
+      },
+      {
+        "component_id": "midcycle_passenger_network",
+        "case": "base",
+        "code": "realization_timing_missing:owner_cash_per_share"
+      },
+      {
+        "component_id": "midcycle_passenger_network",
+        "case": "high",
+        "code": "realization_timing_missing:owner_cash_per_share"
+      },
+      {
+        "component_id": "aadvantage_co_brand_option",
+        "case": "base",
+        "code": "realization_timing_missing:value_per_share"
+      },
+      {
+        "component_id": "aadvantage_co_brand_option",
+        "case": "high",
+        "code": "realization_timing_missing:value_per_share"
+      },
+      {
+        "component_id": "net_financial_claims",
+        "case": "low",
+        "code": "realization_timing_missing:value_per_share"
+      },
+      {
+        "component_id": "net_financial_claims",
+        "case": "base",
+        "code": "realization_timing_missing:value_per_share"
+      },
+      {
+        "component_id": "net_financial_claims",
+        "case": "high",
+        "code": "realization_timing_missing:value_per_share"
+      },
+      {
+        "component_id": "cycle_leverage_reserve",
+        "case": "low",
+        "code": "realization_timing_missing:value_per_share"
+      },
+      {
+        "component_id": "cycle_leverage_reserve",
+        "case": "base",
+        "code": "realization_timing_missing:value_per_share"
+      },
+      {
+        "component_id": "cycle_leverage_reserve",
+        "case": "high",
+        "code": "realization_timing_missing:value_per_share"
+      }
+    ],
+    "warnings": [],
+    "source_refs": [
+      {
+        "node_id": "total_revenue_m",
+        "ref": "AAL/investor-documents/sec-edgar/10-K_20260218_rpt20251231_acc0000006201_26_000014.htm",
+        "locator": "RevenueFromContractWithCustomerExcludingAssessedTax $54,633M (FY2025)",
+        "as_of": "2025-12-31",
+        "source_id": "f755a21ca4ce438ac3c00287b873ca4d5277c85a0bbc17ba44aa247b8a2b1523"
+      },
+      {
+        "node_id": "shares_m",
+        "ref": "AAL/investor-documents/sec-edgar/10-Q_20260423_rpt20260331_acc0000006201_26_000032.htm",
+        "locator": "Q1 2026 net income $382M / diluted EPS $0.58",
+        "as_of": "2026-03-31",
+        "source_id": "1f189f58f3e84aa0f5fcb6236b03784536f60778ca02c17cb695630152cbd2c5"
+      }
+    ],
+    "next_action": "automatic_model_refresh",
+    "reconciliation": {
+      "passed": false
+    },
+    "settlement_policy": "Explicit cash/debt additions in an operating DCF are time-zero acquisition adjustments; hypothetical settlement, not declared dividends.",
+    "calculation_id": "56e9c5373204ee17550f33aa7f7258934578c34ab08da5274f2dcaf692fedb46"
+  },
   "authority": "universal_valuation_contract",
   "legacy_reference_present": true,
   "falsifier_coverage": {

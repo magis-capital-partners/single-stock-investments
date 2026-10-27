@@ -364,12 +364,88 @@
     ]
   },
   "change_control": {
-    "model_hash": "70f02a5a5cdb8351b7f564a23b60aa5f62e3e3eae03723bb38957500519d87dc",
+    "model_hash": "d3778f2083075c4efbd2b82d8f580a135c10f5fc6e13fab2f3ceb3692c5373d5",
     "method_versions": [],
     "change_log": [],
     "rule": "A source fact is locked. Every assumption change requires a reason, author, timestamp, and before/after value."
   },
   "decision_rule": "Proof status and investment readiness are separate. Every material claim must be valued exactly once by a valid calculation proof, every evidence blocker must be resolved, and the model must be stock-specific before committee review. Only a human decision can authorize capital.",
+  "shared_forecast": {
+    "schema_version": "1.0",
+    "method_version": "shared-valuation-forecast/1.1",
+    "ticker": "ASTS",
+    "status": "model_gap",
+    "research_only": true,
+    "requires_human_review": false,
+    "capital_actionable": false,
+    "as_of": "2026-07-17",
+    "model_as_of": "2026-07-17",
+    "quote": {
+      "value": 57.23,
+      "as_of": "2026-07-17",
+      "source_url": "Yahoo ASTS close 2026-07-17",
+      "currency": null
+    },
+    "forecast_hash": "982bc23e2d7df7cbc65dcf32a83766280789f0b7e8f011d57ac3fb222c420ab7",
+    "forward_irr_pct": {
+      "low": null,
+      "base": null,
+      "high": null
+    },
+    "present_value_today_per_share": {
+      "low": null,
+      "base": null,
+      "high": null
+    },
+    "model_present_value_per_share": {
+      "low": null,
+      "base": null,
+      "high": null
+    },
+    "required_return_pct": {
+      "low": null,
+      "base": null,
+      "high": null
+    },
+    "forward_cashflow_schedule": {},
+    "buy_prices": [],
+    "components": [
+      {
+        "component_id": "dated_payoff_fallback",
+        "method": "dated_payoff",
+        "status": "model_gap",
+        "present_value_per_share": {}
+      }
+    ],
+    "gaps": [
+      {
+        "code": "material_component_coverage_incomplete"
+      },
+      {
+        "component_id": "dated_payoff_fallback",
+        "case": "low",
+        "code": "invalid_calculation_proof"
+      },
+      {
+        "component_id": "dated_payoff_fallback",
+        "case": "base",
+        "code": "invalid_calculation_proof"
+      },
+      {
+        "component_id": "dated_payoff_fallback",
+        "case": "high",
+        "code": "invalid_calculation_proof"
+      }
+    ],
+    "warnings": [],
+    "source_refs": [],
+    "next_action": "automatic_model_refresh",
+    "reconciliation": {
+      "passed": false
+    },
+    "settlement_policy": "Explicit cash/debt additions in an operating DCF are time-zero acquisition adjustments; hypothetical settlement, not declared dividends.",
+    "calculation_id": "46ef41e16162f4a0db356b43036969c201f3ca4d2b45d65869e9c0a123be1994"
+  },
   "authority": "universal_valuation_contract",
   "legacy_reference_present": true,
   "falsifier_coverage": {

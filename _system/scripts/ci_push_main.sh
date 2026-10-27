@@ -363,6 +363,8 @@ clean_worktree_for_rebase() {
 ci_push_main() {
   local msg="${1:?commit message required}"
   sync_self_from_origin_main
+  # Inspect the actual index, so a sanitized worktree cannot conceal staged sources.
+  "$PYTHON" _system/scripts/audit_fund_letter_exposure.py --staged --strict
   # A self-refresh updates this tracked helper in the worktree. Stage it so a
   # later rebase always starts from a clean tree.
   git diff --quiet -- _system/scripts/ci_push_main.sh || git add _system/scripts/ci_push_main.sh
@@ -400,6 +402,8 @@ ci_push_main() {
       echo "::error::Aborting push: commits ahead of origin/main exceed GitHub size limits."
       exit 1
     fi
+    # Rebase conflict regeneration can introduce fresh private source fields.
+    "$PYTHON" _system/scripts/audit_fund_letter_exposure.py --strict
     if git push origin HEAD:main; then
       echo "Pushed to main (attempt $attempt)."
       exit 0

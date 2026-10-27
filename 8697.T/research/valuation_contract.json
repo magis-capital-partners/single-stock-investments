@@ -2421,7 +2421,7 @@
     ]
   },
   "change_control": {
-    "model_hash": "28952ffe06a46aa4bfdce5904165501a9eceb91d9c8fd0f5839e7cebd2113dc4",
+    "model_hash": "ddd51092ae4d03d2a6891cce88876977f38a325b5d5351614a50a7da98da088c",
     "method_versions": [
       "midcycle_capacity_value@1.0",
       "net_asset_value@1.0",
@@ -2432,6 +2432,164 @@
     "rule": "A source fact is locked. Every assumption change requires a reason, author, timestamp, and before/after value."
   },
   "decision_rule": "Proof status and investment readiness are separate. Every material claim must be valued exactly once by a valid calculation proof, every evidence blocker must be resolved, and the model must be stock-specific before committee review. Only a human decision can authorize capital.",
+  "shared_forecast": {
+    "schema_version": "1.0",
+    "method_version": "shared-valuation-forecast/1.1",
+    "ticker": "8697.T",
+    "status": "model_gap",
+    "research_only": true,
+    "requires_human_review": false,
+    "capital_actionable": false,
+    "as_of": "2026-09-01",
+    "model_as_of": "2026-08-04",
+    "quote": {
+      "value": 2235.5,
+      "as_of": "2026-09-01",
+      "source_url": "Yahoo 8697.T close 2026-09-01",
+      "currency": null
+    },
+    "forecast_hash": "164af314e4838b784ff62f88c8c2ff10cf468c10ddccffe9307d85cc0302192a",
+    "forward_irr_pct": {
+      "low": null,
+      "base": null,
+      "high": null
+    },
+    "present_value_today_per_share": {
+      "low": null,
+      "base": null,
+      "high": null
+    },
+    "model_present_value_per_share": {
+      "low": null,
+      "base": null,
+      "high": null
+    },
+    "required_return_pct": {
+      "low": null,
+      "base": null,
+      "high": null
+    },
+    "forward_cashflow_schedule": {},
+    "buy_prices": [],
+    "components": [
+      {
+        "component_id": "core_engine",
+        "method": "owner_cash_or_dividend_discount",
+        "status": "available",
+        "present_value_per_share": {
+          "low": 1240.31,
+          "base": 1600.4001,
+          "high": 2040.51
+        }
+      },
+      {
+        "component_id": "reinvestment_or_assets",
+        "method": "owner_earnings_reinvestment_dcf",
+        "status": "model_gap",
+        "present_value_per_share": {}
+      },
+      {
+        "component_id": "net_financial_claims",
+        "method": "net_asset_value",
+        "status": "model_gap",
+        "present_value_per_share": {
+          "low": 0.0
+        }
+      },
+      {
+        "component_id": "downside_reserve",
+        "method": "midcycle_capacity_value",
+        "status": "model_gap",
+        "present_value_per_share": {}
+      }
+    ],
+    "gaps": [
+      {
+        "component_id": "reinvestment_or_assets",
+        "case": "low",
+        "code": "realization_timing_missing:reinvestment_value_per_share"
+      },
+      {
+        "component_id": "reinvestment_or_assets",
+        "case": "base",
+        "code": "realization_timing_missing:reinvestment_value_per_share"
+      },
+      {
+        "component_id": "reinvestment_or_assets",
+        "case": "high",
+        "code": "realization_timing_missing:reinvestment_value_per_share"
+      },
+      {
+        "component_id": "net_financial_claims",
+        "case": "base",
+        "code": "realization_timing_missing:net_financial_per_share"
+      },
+      {
+        "component_id": "net_financial_claims",
+        "case": "high",
+        "code": "realization_timing_missing:net_financial_per_share"
+      },
+      {
+        "component_id": "downside_reserve",
+        "case": "low",
+        "code": "realization_timing_missing:normalized_owner_cash"
+      },
+      {
+        "component_id": "downside_reserve",
+        "case": "base",
+        "code": "realization_timing_missing:normalized_owner_cash"
+      },
+      {
+        "component_id": "downside_reserve",
+        "case": "high",
+        "code": "realization_timing_missing:normalized_owner_cash"
+      }
+    ],
+    "warnings": [],
+    "source_refs": [
+      {
+        "node_id": "normalized_owner_cash",
+        "ref": "8697.T/02_Quarterly/Earnings_Releases/E_ER_JPX_Q4FY2025.pdf",
+        "locator": "FY2025 parent EPS \u00a576.81; normalized to \u00a570 for clearing pass-through / volume cyclicality",
+        "as_of": "2026-03-31",
+        "source_id": "e1ba0c821eb1fff708f9ed64044b95dacfe86f3993c4d6697c5bc14672313619"
+      },
+      {
+        "node_id": "operating_revenue_b",
+        "ref": "8697.T/02_Quarterly/Earnings_Releases/E_ER_JPX_Q4FY2025.pdf",
+        "locator": "FY2025 operating revenue \u00a5198.7B (+22.5% YoY)",
+        "as_of": "2026-03-31",
+        "source_id": "a03b5f1bddefeb345cdf28a259944e17f6b555339dbad295c02962c37b2f2e34"
+      },
+      {
+        "node_id": "net_income_b",
+        "ref": "8697.T/02_Quarterly/Earnings_Releases/E_ER_JPX_Q4FY2025.pdf",
+        "locator": "FY2025 net income \u00a579.1B; ROE 23.1%",
+        "as_of": "2026-03-31",
+        "source_id": "633a8d0858afd413f129121287ae1f22d8714b3beb8d95c092b31d0fc223c7ae"
+      },
+      {
+        "node_id": "parent_equity_b",
+        "ref": "8697.T/02_Quarterly/Earnings_Releases/E_ER_JPX_Q4FY2025.pdf",
+        "locator": "Total equity attributable to owners of the parent company \u00a5345,015 million (consolidated balance sheet, FY2026 period-end)",
+        "as_of": "2026-03-31",
+        "source_id": "8ef363d185b9dd766c6c8afa1ee0c1057272b9d1cfbe0a8fa1a5fa046630951a"
+      },
+      {
+        "node_id": "shares_m",
+        "ref": "8697.T/02_Quarterly/Earnings_Releases/E_ER_JPX_Q4FY2025.pdf",
+        "locator": "Note (3) Number of issued shares at period-end FY2026 (Mar 31, 2026): 1,030,321,466; weighted average ordinary shares 1,030,321 thousand",
+        "as_of": "2026-03-31",
+        "source_id": "6c705fcea6845c918f05bb7546fbdd141ef19eda8b08d74cda09bb9513bc49b1"
+      }
+    ],
+    "next_action": "automatic_model_refresh",
+    "reconciliation": {
+      "passed": false
+    },
+    "settlement_policy": "Explicit cash/debt additions in an operating DCF are time-zero acquisition adjustments; hypothetical settlement, not declared dividends.",
+    "calculation_id": "92933b71fb559b634036bd7388affbc99f7d0c2d8fb70a6eaa6a95104613bc07"
+  },
   "authority": "universal_valuation_contract",
   "legacy_reference_present": true,
   "falsifier_coverage": {

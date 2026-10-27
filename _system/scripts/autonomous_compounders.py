@@ -13,26 +13,32 @@ import argparse
 import calendar
 import hashlib
 import json
-import math
 import re
 import statistics
+import threading
 import time
 import urllib.error
 import urllib.parse
 import urllib.request
 from datetime import date, datetime, timezone
-from pathlib import Path
 from functools import lru_cache
+from itertools import pairwise
+from pathlib import Path
 
-from atomic_io import write_json_if_changed, write_text_if_changed, semantic_json_sha256
+from atomic_io import semantic_json_sha256, write_json_if_changed, write_text_if_changed
 from sec_client import SecClient
 from tci_return_bridge import number
-from universal_valuation_contract import _cashflow_irr, normalize_forward_cashflow_schedule
+from universal_valuation_contract import (
+    _cashflow_irr,
+    normalize_forward_cashflow_schedule,
+)
 
 ROOT = Path(__file__).resolve().parents[2]
 STATE = Path('_system/data/autonomous_compounders.json')
 INPUTS = Path('_system/reference/market-data/compounders')
 VERSION = 'owner-cash-scenarios/1.0'
+_PRIMARY_SEC_LOCK = threading.Lock()
+_PRIMARY_SEC_CLIENT = SecClient(max_attempts=2)
 FIELDS = {
     'ocf': 'OperatingCashFlow', 'capex': 'CapitalExpenditure',
     'revenue': 'TotalRevenue', 'operating_income': 'OperatingIncome',
@@ -55,7 +61,10 @@ SEC_TAGS = {
     'sbc': ['ShareBasedCompensation'],
     'net_income': ['NetIncomeLossAvailableToCommonStockholdersBasic', 'ProfitLossAttributableToOwnersOfParent', 'NetIncomeLoss'],
 }
-SYMBOLS = {'CSU': 'CSU.TO', 'LMN': 'LMN.V', 'LIFCO.ST': 'LIFCO-B.ST', 'LSEG': 'LSEG.L', 'BRK.B': 'BRK-B', 'BN': 'BN', 'FRMO': 'FRMO'}
+SYMBOLS = {'CSU': 'CSU.TO', 'LMN': 'LMN.V', 'LIFCO.ST': 'LIFCO-B.ST', 'LSEG': 'LSEG.L', 'BRK.B': 'BRK-B', 'BF.B': 'BF-B', 'HEI.A': 'HEI-A', 'BN': 'BN', 'FRMO': 'FRMO', 'BYMA': 'BYMA.BA', 'BMYS.KL': '1818.KL', 'PSH': 'PSHD.L'}
+# Bursa listing identity: https://bursa.listedcompany.com/interactive_chart.html (stock code 1818).
+# BYMA provider symbol is also recorded in BYMA/research/valuation.json inputs.price_source.
+# PSH USD listing: https://www.londonstockexchange.com/stock/PSHD/pershing-square-holdings-ltd
 HOLDINGS = {'BRK.B', 'BN', 'MKL', 'FRMO'}
 
 
@@ -115,8 +124,13 @@ def quote(symbol, as_of):
     meta = data['meta']
     if meta.get('symbol', '').upper() != symbol.upper():
         raise ValueError('Quote symbol does not match requested listing')
+    quotes = (data.get('indicators') or {}).get('quote') or [{}]
     rows = [(datetime.fromtimestamp(t, timezone.utc).date().isoformat(), number(v))
-            for t, v in zip(data.get('timestamp') or [], data['indicators']['quote'][0]['close'])]
+            for t, v in zip(data.get('timestamp') or [], quotes[0].get('close') or [])]
+    # Some valid listings return metadata but no historical close array. A
+    # dated regular-session observation is usable; an undated price is not.
+    if not rows and meta.get('regularMarketTime') and number(meta.get('regularMarketPrice')) is not None:
+        rows = [(datetime.fromtimestamp(meta['regularMarketTime'], timezone.utc).date().isoformat(), number(meta['regularMarketPrice']))]
     rows = [(d, v) for d, v in rows if v is not None and v > 0 and d <= as_of]
     if not rows:
         raise ValueError('No positive dated quote')
@@ -125,6 +139,7 @@ def quote(symbol, as_of):
     if currency == 'GBp':
         value, currency = value / 100, 'GBP'
     return {'value': value, 'currency': currency, 'as_of': d, 'symbol': symbol,
+            'company_name': meta.get('longName') or meta.get('shortName'),
             'source_url': url, 'retrieved_at': stamp(), 'claim_type': 'provider_observation'}
 
 
@@ -190,15 +205,31 @@ def primary_facts(payload, url, as_of):
     return facts
 
 
+def latest_primary_report(payload, url, as_of):
+    """Discover new quarters separately from the annual model inputs."""
+    rows = []
+    for namespace in ('us-gaap', 'ifrs-full'):
+        for tag in SEC_TAGS['ocf']:
+            for points in (((payload.get('facts') or {}).get(namespace) or {}).get(tag) or {}).get('units', {}).values():
+                rows.extend(p for p in points if p.get('end') and p.get('filed') and p.get('start')
+                            and p['end'] <= as_of and p['filed'] <= as_of
+                            and p.get('form') in ('10-K', '10-Q', '20-F', '40-F', '10-K/A', '10-Q/A', '20-F/A', '40-F/A'))
+    if not rows:
+        return None
+    row = max(rows, key=lambda p: (p['end'], p['filed']))
+    return {'period': row['end'], 'filed': row['filed'], 'accession': row.get('accn'), 'source_url': url}
+
+
 def frmo_report_facts(as_of):
     """Discover the newest issuer report and validate its explicit table scale."""
     from io import BytesIO
+
     from pypdf import PdfReader
 
     index = 'https://www.frmocorp.com/10ks.html'
     with urllib.request.urlopen(index, timeout=30) as response:
         html = response.read().decode('utf-8')
-    links = re.findall(r'href=["\']([^"\']*FRMO_Annual_Report_(\d{4})\.pdf)["\']', html, re.I)
+    links = re.findall(r'href=["\']([^"\']*FRMO_Annual_Report_(\d{4})\.pdf)["\']', html, re.IGNORECASE)
     links = [(p, int(y)) for p, y in links if int(y) <= int(as_of[:4])]
     if not links:
         raise ValueError('FRMO annual report discovery layout changed')
@@ -218,7 +249,7 @@ def parse_frmo_report(texts, url, year, as_of, content_hash):
     if f'{year} {year-1}' not in re.sub(r'\s+', ' ', balance):
         raise ValueError('FRMO balance-sheet year columns changed')
     def pair(pattern, text):
-        match = re.search(pattern + r'\s*\$?\s*([\d,]+)\s*\$?\s*([\d,]+)', text, re.I)
+        match = re.search(pattern + r'\s*\$?\s*([\d,]+)\s*\$?\s*([\d,]+)', text, re.IGNORECASE)
         if not match:
             raise ValueError('FRMO table label changed: ' + pattern)
         return [float(v.replace(',', '')) * 1000 for v in match.groups()]
@@ -237,8 +268,8 @@ def parse_frmo_report(texts, url, year, as_of, content_hash):
     return facts
 
 
-def collect(ticker, entry, as_of, root=ROOT):
-    path = root / INPUTS / (ticker + '.json')
+def collect(ticker, entry, as_of, root=ROOT, inputs_dir=INPUTS):
+    path = root / inputs_dir / (ticker + '.json')
     prior = read(path)
     result = {'schema_version': '1.0', 'ticker': ticker, 'attempted_at': stamp(),
               'quote': prior.get('quote'), 'facts': prior.get('facts') or [], 'errors': []}
@@ -252,7 +283,10 @@ def collect(ticker, entry, as_of, root=ROOT):
     if cik and ticker != 'FRMO':
         url = f'https://data.sec.gov/api/xbrl/companyfacts/CIK{int(cik):010d}.json'
         try:
-            primary = primary_facts(SecClient(max_attempts=2).get_json(url, timeout=30), url, as_of)
+            with _PRIMARY_SEC_LOCK:
+                payload = _PRIMARY_SEC_CLIENT.get_json(url, timeout=30)
+            primary = primary_facts(payload, url, as_of)
+            result['latest_report'] = latest_primary_report(payload, url, as_of)
             # Replace only the same field, period AND currency. Preserve other history.
             keys = {(p['field'], p['period'], p['currency']) for p in primary}
             result['facts'] = [p for p in result['facts'] if (p['field'], p['period'], p['currency']) not in keys] + primary
@@ -453,7 +487,7 @@ def estimate(ticker, data, as_of):
     if result['blockers']:
         return result
     growth = []
-    for a, b in zip(history, history[1:]):
+    for a, b in pairwise(history):
         elapsed = (date.fromisoformat(b['period']) - date.fromisoformat(a['period'])).days / 365.25
         if a['owner_cash'] > 0 and b['owner_cash'] > 0 and a['currency'] == b['currency'] and .8 <= elapsed <= 1.2:
             growth.append((b['owner_cash'] / a['owner_cash']) ** (1 / elapsed) - 1)
@@ -618,6 +652,11 @@ def check(root=ROOT):
         expected = estimate(ticker, read(root / INPUTS / (ticker + '.json')), report['as_of'])
         if semantic_json_sha256(row) != semantic_json_sha256(expected):
             raise ValueError(ticker + ': estimate does not replay from its inputs')
+        # Active PV/IRR publication has moved to the full-universe shared lane.
+        # Its separate --check verifies served rows after this historical source
+        # collector completes; do not demand the retired UI fallback here.
+        if (core.get(ticker, {}).get('valuation_decision') or {}).get('calculation_status'):
+            continue
         served = read(root / 'dashboard/data/tickers' / shard_filename(ticker)).get('autonomous_irr')
         if served != row:
             raise ValueError(ticker + ': detail publication is stale')

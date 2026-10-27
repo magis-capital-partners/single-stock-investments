@@ -180,7 +180,7 @@
     },
     "decision_rule": "Power Zones select the fitting economic method and eligible independent reviewers; they never choose the valuation answer or capital decision.",
     "ticker": "ETHA",
-    "as_of": "2026-10-26",
+    "as_of": "2026-10-27",
     "route_source": "canonical_power_zone_router",
     "config_path": "_system/frameworks/power_zones.json",
     "config_updated": "2026-07-14",
@@ -219,8 +219,8 @@
         }
       ]
     },
-    "input_hash": "5456a0baa4bc58a0f8dd806dd6f00725f0e0dd2fe5ee7e812b5b757a761e4d03",
-    "generated_at": "2026-10-26T21:33:57.999384+00:00"
+    "input_hash": "155a3dc6c6b52e0690cf0bfe5bd6f55fee73fb577f54e58b60512e44504992fc",
+    "generated_at": "2026-10-27T08:28:40.140989+00:00"
   },
   "market": {
     "price_per_share": 20.37,
@@ -377,12 +377,65 @@
     ]
   },
   "change_control": {
-    "model_hash": "e430fdb9e1632102be2daff2f2c8d311e593cb8abd11daadede503a1a64a47f8",
+    "model_hash": "9da977c92de4875ca7705bac47afbf73aec5c68713cfaf66b93c54f3f111d76b",
     "method_versions": [],
     "change_log": [],
     "rule": "A source fact is locked. Every assumption change requires a reason, author, timestamp, and before/after value."
   },
   "decision_rule": "Proof status and investment readiness are separate. Every material claim must be valued exactly once by a valid calculation proof, every evidence blocker must be resolved, and the model must be stock-specific before committee review. Only a human decision can authorize capital.",
+  "shared_forecast": {
+    "schema_version": "1.0",
+    "method_version": "shared-valuation-forecast/1.1",
+    "ticker": "ETHA",
+    "status": "model_gap",
+    "research_only": true,
+    "requires_human_review": false,
+    "capital_actionable": false,
+    "as_of": "2026-10-01",
+    "model_as_of": "2026-10-02",
+    "quote": {
+      "value": 20.37,
+      "as_of": "2026-10-01",
+      "source_url": "Yahoo ETHA close 2026-10-01",
+      "currency": null
+    },
+    "forecast_hash": null,
+    "forward_irr_pct": {
+      "low": null,
+      "base": null,
+      "high": null
+    },
+    "present_value_today_per_share": {
+      "low": null,
+      "base": null,
+      "high": null
+    },
+    "model_present_value_per_share": {
+      "low": null,
+      "base": null,
+      "high": null
+    },
+    "required_return_pct": {
+      "low": null,
+      "base": null,
+      "high": null
+    },
+    "forward_cashflow_schedule": {},
+    "buy_prices": [],
+    "components": [],
+    "gaps": [
+      {
+        "code": "forecast_date_missing_or_future"
+      }
+    ],
+    "warnings": [],
+    "source_refs": [],
+    "next_action": "automatic_model_refresh",
+    "reconciliation": {
+      "passed": false
+    },
+    "settlement_policy": "Explicit cash/debt additions in an operating DCF are time-zero acquisition adjustments; hypothetical settlement, not declared dividends."
+  },
   "authority": "universal_valuation_contract",
   "legacy_reference_present": true,
   "falsifier_coverage": {

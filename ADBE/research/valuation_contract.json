@@ -2262,7 +2262,7 @@
     ]
   },
   "change_control": {
-    "model_hash": "c85c385aa52a5b12ddd1660db5ba843fab2beea18e325ab21045145cdaf6bf31",
+    "model_hash": "d486bc4cf8b812ee8e0ca1ef911a9de8aa03a664450b10604c232885a7574f78",
     "method_versions": [
       "net_asset_value@1.0",
       "owner_cash_or_dividend_discount@1.0",
@@ -2273,6 +2273,182 @@
     "rule": "A source fact is locked. Every assumption change requires a reason, author, timestamp, and before/after value."
   },
   "decision_rule": "Proof status and investment readiness are separate. Every material claim must be valued exactly once by a valid calculation proof, every evidence blocker must be resolved, and the model must be stock-specific before committee review. Only a human decision can authorize capital.",
+  "shared_forecast": {
+    "schema_version": "1.0",
+    "method_version": "shared-valuation-forecast/1.1",
+    "ticker": "ADBE",
+    "status": "model_gap",
+    "research_only": true,
+    "requires_human_review": false,
+    "capital_actionable": false,
+    "as_of": "2026-08-31",
+    "model_as_of": "2026-07-22",
+    "quote": {
+      "value": 292.79,
+      "as_of": "2026-08-31",
+      "source_url": "Yahoo ADBE close 2026-08-31",
+      "currency": null
+    },
+    "forecast_hash": "b1b6ffdf707cc13cab94c0e91b785343fd4871ead9ccf7a60128626f7f4ac53f",
+    "forward_irr_pct": {
+      "low": null,
+      "base": null,
+      "high": null
+    },
+    "present_value_today_per_share": {
+      "low": null,
+      "base": null,
+      "high": null
+    },
+    "model_present_value_per_share": {
+      "low": null,
+      "base": null,
+      "high": null
+    },
+    "required_return_pct": {
+      "low": null,
+      "base": null,
+      "high": null
+    },
+    "forward_cashflow_schedule": {},
+    "buy_prices": [],
+    "components": [
+      {
+        "component_id": "digital_media_document_engine",
+        "method": "owner_earnings_reinvestment_dcf",
+        "status": "model_gap",
+        "present_value_per_share": {}
+      },
+      {
+        "component_id": "digital_experience_engine",
+        "method": "owner_cash_or_dividend_discount",
+        "status": "model_gap",
+        "present_value_per_share": {}
+      },
+      {
+        "component_id": "firefly_ai_monetization_option",
+        "method": "risk_adjusted_milestone_value",
+        "status": "model_gap",
+        "present_value_per_share": {
+          "low": 0.0
+        }
+      },
+      {
+        "component_id": "net_financial_claims",
+        "method": "net_asset_value",
+        "status": "model_gap",
+        "present_value_per_share": {}
+      },
+      {
+        "component_id": "ai_competition_and_sbc_reserve",
+        "method": "net_asset_value",
+        "status": "model_gap",
+        "present_value_per_share": {}
+      }
+    ],
+    "gaps": [
+      {
+        "component_id": "digital_media_document_engine",
+        "case": "low",
+        "code": "realization_timing_missing:media_owner_cash_per_share"
+      },
+      {
+        "component_id": "digital_media_document_engine",
+        "case": "base",
+        "code": "realization_timing_missing:media_owner_cash_per_share"
+      },
+      {
+        "component_id": "digital_media_document_engine",
+        "case": "high",
+        "code": "realization_timing_missing:media_owner_cash_per_share"
+      },
+      {
+        "component_id": "digital_experience_engine",
+        "case": "low",
+        "code": "realization_timing_missing:experience_owner_cash_per_share"
+      },
+      {
+        "component_id": "digital_experience_engine",
+        "case": "base",
+        "code": "realization_timing_missing:experience_owner_cash_per_share"
+      },
+      {
+        "component_id": "digital_experience_engine",
+        "case": "high",
+        "code": "realization_timing_missing:experience_owner_cash_per_share"
+      },
+      {
+        "component_id": "firefly_ai_monetization_option",
+        "case": "base",
+        "code": "realization_timing_missing:value_per_share"
+      },
+      {
+        "component_id": "firefly_ai_monetization_option",
+        "case": "high",
+        "code": "realization_timing_missing:value_per_share"
+      },
+      {
+        "component_id": "net_financial_claims",
+        "case": "low",
+        "code": "realization_timing_missing:value_per_share"
+      },
+      {
+        "component_id": "net_financial_claims",
+        "case": "base",
+        "code": "realization_timing_missing:value_per_share"
+      },
+      {
+        "component_id": "net_financial_claims",
+        "case": "high",
+        "code": "realization_timing_missing:value_per_share"
+      },
+      {
+        "component_id": "ai_competition_and_sbc_reserve",
+        "case": "low",
+        "code": "realization_timing_missing:value_per_share"
+      },
+      {
+        "component_id": "ai_competition_and_sbc_reserve",
+        "case": "base",
+        "code": "realization_timing_missing:value_per_share"
+      },
+      {
+        "component_id": "ai_competition_and_sbc_reserve",
+        "case": "high",
+        "code": "realization_timing_missing:value_per_share"
+      }
+    ],
+    "warnings": [],
+    "source_refs": [
+      {
+        "node_id": "rpo_m",
+        "ref": "ADBE/investor-documents/sec-edgar/10-K_20260115_rpt20251128_acc0000796343_26_000003.htm",
+        "locator": "RPO $22,520M at November 28, 2025; 65% recognized within 12 months",
+        "as_of": "2025-11-28",
+        "source_id": "f82480feb199d9e10cfce281f7611b176a5e3f407da697cd191b6114a3f3735f"
+      },
+      {
+        "node_id": "subscription_revenue_m",
+        "ref": "ADBE/investor-documents/sec-edgar/10-K_20260115_rpt20251128_acc0000796343_26_000003.htm",
+        "locator": "Subscription revenue $22.90B of $23.77B total revenue (FY2025)",
+        "as_of": "2025-11-28",
+        "source_id": "c4a5b820f9e870613a7d78efd4f8790d973c15f8c4fcb8432d36b2eb6efa7679"
+      },
+      {
+        "node_id": "shares_m",
+        "ref": "ADBE/investor-documents/sec-edgar/10-K_20260115_rpt20251128_acc0000796343_26_000003.htm",
+        "locator": "Weighted average diluted shares 427M (FY2025)",
+        "as_of": "2025-11-28",
+        "source_id": "44622bbe46ebfda324bbf5d98440432b0d993aa1014892334a9e76915eadf904"
+      }
+    ],
+    "next_action": "automatic_model_refresh",
+    "reconciliation": {
+      "passed": false
+    },
+    "settlement_policy": "Explicit cash/debt additions in an operating DCF are time-zero acquisition adjustments; hypothetical settlement, not declared dividends.",
+    "calculation_id": "a9822bf5261f65212cca8768973d5f8e1aec71c55eb927f84f46d5776b98b587"
+  },
   "authority": "universal_valuation_contract",
   "legacy_reference_present": true,
   "falsifier_coverage": {

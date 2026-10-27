@@ -1696,7 +1696,7 @@
     ]
   },
   "change_control": {
-    "model_hash": "1ae20f396a1796feb0dd30bce1a43f4b1bb7cc69fa9ab190a120de5e31d1a4b4",
+    "model_hash": "33456399083347de720793139e56af48d2fa6f76538c03bf26ad2fe7fb697a9e",
     "method_versions": [
       "book_claim@1.0",
       "liquidation_nav@1.0",
@@ -1707,6 +1707,163 @@
     "rule": "A source fact is locked. Every assumption change requires a reason, author, timestamp, and before/after value."
   },
   "decision_rule": "Proof status and investment readiness are separate. Every material claim must be valued exactly once by a valid calculation proof, every evidence blocker must be resolved, and the model must be stock-specific before committee review. Only a human decision can authorize capital.",
+  "shared_forecast": {
+    "schema_version": "1.0",
+    "method_version": "shared-valuation-forecast/1.1",
+    "ticker": "GYRO",
+    "status": "model_gap",
+    "research_only": true,
+    "requires_human_review": false,
+    "capital_actionable": false,
+    "as_of": "2026-08-31",
+    "model_as_of": "2026-07-21",
+    "quote": {
+      "value": 5.0,
+      "as_of": "2026-08-31",
+      "source_url": "Yahoo GYRO close 2026-08-31",
+      "currency": null
+    },
+    "forecast_hash": "61e4589b114ae08f66ec8037e9664142a33efc4dc8f1498140dae7d925743623",
+    "forward_irr_pct": {
+      "low": null,
+      "base": null,
+      "high": null
+    },
+    "present_value_today_per_share": {
+      "low": null,
+      "base": null,
+      "high": null
+    },
+    "model_present_value_per_share": {
+      "low": null,
+      "base": null,
+      "high": null
+    },
+    "required_return_pct": {
+      "low": null,
+      "base": null,
+      "high": null
+    },
+    "forward_cashflow_schedule": {},
+    "buy_prices": [],
+    "components": [
+      {
+        "component_id": "real_estate_nrv",
+        "method": "liquidation_nav",
+        "status": "model_gap",
+        "present_value_per_share": {}
+      },
+      {
+        "component_id": "cash_and_other_assets",
+        "method": "net_asset_value",
+        "status": "model_gap",
+        "present_value_per_share": {}
+      },
+      {
+        "component_id": "loans_payable",
+        "method": "book_claim",
+        "status": "model_gap",
+        "present_value_per_share": {}
+      },
+      {
+        "component_id": "estimated_liquidation_costs",
+        "method": "realization_reserve",
+        "status": "model_gap",
+        "present_value_per_share": {}
+      },
+      {
+        "component_id": "other_liabilities",
+        "method": "book_claim",
+        "status": "model_gap",
+        "present_value_per_share": {}
+      }
+    ],
+    "gaps": [
+      {
+        "component_id": "real_estate_nrv",
+        "case": "low",
+        "code": "realization_timing_missing:claim_per_share"
+      },
+      {
+        "component_id": "real_estate_nrv",
+        "case": "base",
+        "code": "realization_timing_missing:claim_per_share"
+      },
+      {
+        "component_id": "real_estate_nrv",
+        "case": "high",
+        "code": "realization_timing_missing:claim_per_share"
+      },
+      {
+        "component_id": "cash_and_other_assets",
+        "case": "low",
+        "code": "realization_timing_missing:claim_per_share"
+      },
+      {
+        "component_id": "cash_and_other_assets",
+        "case": "base",
+        "code": "realization_timing_missing:claim_per_share"
+      },
+      {
+        "component_id": "cash_and_other_assets",
+        "case": "high",
+        "code": "realization_timing_missing:claim_per_share"
+      },
+      {
+        "component_id": "loans_payable",
+        "case": "low",
+        "code": "realization_timing_missing:claim_per_share"
+      },
+      {
+        "component_id": "loans_payable",
+        "case": "base",
+        "code": "realization_timing_missing:claim_per_share"
+      },
+      {
+        "component_id": "loans_payable",
+        "case": "high",
+        "code": "realization_timing_missing:claim_per_share"
+      },
+      {
+        "component_id": "estimated_liquidation_costs",
+        "case": "low",
+        "code": "realization_timing_missing:claim_per_share"
+      },
+      {
+        "component_id": "estimated_liquidation_costs",
+        "case": "base",
+        "code": "realization_timing_missing:claim_per_share"
+      },
+      {
+        "component_id": "estimated_liquidation_costs",
+        "case": "high",
+        "code": "realization_timing_missing:claim_per_share"
+      },
+      {
+        "component_id": "other_liabilities",
+        "case": "low",
+        "code": "realization_timing_missing:claim_per_share"
+      },
+      {
+        "component_id": "other_liabilities",
+        "case": "base",
+        "code": "realization_timing_missing:claim_per_share"
+      },
+      {
+        "component_id": "other_liabilities",
+        "case": "high",
+        "code": "realization_timing_missing:claim_per_share"
+      }
+    ],
+    "warnings": [],
+    "source_refs": [],
+    "next_action": "automatic_model_refresh",
+    "reconciliation": {
+      "passed": false
+    },
+    "settlement_policy": "Explicit cash/debt additions in an operating DCF are time-zero acquisition adjustments; hypothetical settlement, not declared dividends.",
+    "calculation_id": "f7d5eb1ca6e813be01eaa69a1a06a0f58df3497885c7c0c65be6f3f386f20328"
+  },
   "authority": "universal_valuation_contract",
   "legacy_reference_present": true,
   "falsifier_coverage": {

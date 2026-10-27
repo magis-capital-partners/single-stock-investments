@@ -1812,7 +1812,7 @@
     ]
   },
   "change_control": {
-    "model_hash": "7349161de009101984e562444783dd0d8e65804f6160533b439b4e690e046320",
+    "model_hash": "33e339b0837e9b403be116610912f2ea5793b88fff616e6ebb03c3422d9fa6cb",
     "method_versions": [
       "owner_earnings_reinvestment_dcf@1.0"
     ],
@@ -1820,6 +1820,104 @@
     "rule": "A source fact is locked. Every assumption change requires a reason, author, timestamp, and before/after value."
   },
   "decision_rule": "Proof status and investment readiness are separate. Every material claim must be valued exactly once by a valid calculation proof, every evidence blocker must be resolved, and the model must be stock-specific before committee review. Only a human decision can authorize capital.",
+  "shared_forecast": {
+    "schema_version": "1.0",
+    "method_version": "shared-valuation-forecast/1.1",
+    "ticker": "INCY",
+    "status": "model_gap",
+    "research_only": true,
+    "requires_human_review": false,
+    "capital_actionable": false,
+    "as_of": "2026-07-20",
+    "model_as_of": "2026-07-20",
+    "quote": {
+      "value": 115.65,
+      "as_of": "2026-07-20",
+      "source_url": "Yahoo INCY close 2026-07-20",
+      "currency": null
+    },
+    "forecast_hash": "880089358c443f8855985c2c2e586b232240e769bc223d28388f21b69496a0dc",
+    "forward_irr_pct": {
+      "low": null,
+      "base": null,
+      "high": null
+    },
+    "present_value_today_per_share": {
+      "low": null,
+      "base": null,
+      "high": null
+    },
+    "model_present_value_per_share": {
+      "low": null,
+      "base": null,
+      "high": null
+    },
+    "required_return_pct": {
+      "low": null,
+      "base": null,
+      "high": null
+    },
+    "forward_cashflow_schedule": {},
+    "buy_prices": [],
+    "components": [
+      {
+        "component_id": "operating_business_and_net_assets",
+        "method": "owner_earnings_reinvestment_dcf",
+        "status": "available",
+        "present_value_per_share": {
+          "low": -7.2983,
+          "base": 45.7064,
+          "high": 153.4985
+        }
+      }
+    ],
+    "gaps": [
+      {
+        "code": "limited_liability_equity_waterfall_missing"
+      }
+    ],
+    "warnings": [],
+    "source_refs": [
+      {
+        "node_id": "owner_earnings",
+        "ref": "INCY/research/evidence/sec_companyfacts.json",
+        "locator": "us-gaap:NetCashProvidedByUsedInOperatingActivities; accession 0000879169-26-000010; form 10-K",
+        "as_of": "2025-12-31",
+        "content_sha256": "9bbd2db86b80214c3617ff9f7074d096505585c04e7f1cb88ed756d013c45641",
+        "source_id": "29e66aabf4ba5df6ccef6c654acb0b30a2f4498d1a1f2e567cb4a7405d31c5ac"
+      },
+      {
+        "node_id": "cash",
+        "ref": "INCY/research/evidence/sec_companyfacts.json",
+        "locator": "us-gaap:CashCashEquivalentsRestrictedCashAndRestrictedCashEquivalents; accession 0000879169-26-000026; form 10-Q",
+        "as_of": "2026-03-31",
+        "content_sha256": "9bbd2db86b80214c3617ff9f7074d096505585c04e7f1cb88ed756d013c45641",
+        "source_id": "e6b6fd821c338f46f79115b5597c3d311f5f22528692dfd4a24ae2e461e9a334"
+      },
+      {
+        "node_id": "debt",
+        "ref": "INCY/research/evidence/sec_companyfacts.json",
+        "locator": "us-gaap:LongTermDebt; accession 0001558370-19-000682; form 10-K",
+        "as_of": "2018-12-31",
+        "content_sha256": "9bbd2db86b80214c3617ff9f7074d096505585c04e7f1cb88ed756d013c45641",
+        "source_id": "86bdc203effca01470d4862074210738b5ddc8ea149505a134436ce52238849b"
+      },
+      {
+        "node_id": "shares_m",
+        "ref": "INCY/research/evidence/sec_companyfacts.json",
+        "locator": "dei:EntityCommonStockSharesOutstanding; accession 0000879169-26-000026; form 10-Q",
+        "as_of": "2026-04-21",
+        "content_sha256": "9bbd2db86b80214c3617ff9f7074d096505585c04e7f1cb88ed756d013c45641",
+        "source_id": "92e83db911a3096c34fd59abf0a4e9ca04e4e8f975dd5b9d2e84bd8377f77658"
+      }
+    ],
+    "next_action": "automatic_model_refresh",
+    "reconciliation": {
+      "passed": false
+    },
+    "settlement_policy": "Explicit cash/debt additions in an operating DCF are time-zero acquisition adjustments; hypothetical settlement, not declared dividends.",
+    "calculation_id": "3c7c3726f344ca18e68d889d785a43487a8db91201e4e09b1fb76a6bb4cb34fd"
+  },
   "authority": "universal_valuation_contract",
   "legacy_reference_present": false,
   "falsifier_coverage": {

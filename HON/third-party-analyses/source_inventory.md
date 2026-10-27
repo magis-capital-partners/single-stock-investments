@@ -1,6 +1,6 @@
 # HON — Third-party source inventory
 
-**Date:** 2026-10-25
+**Date:** 2026-10-27
 **Sources:** 124 total (0 approved, 0 pending, 124 context)
 
 | ID | Title | Path | Status | Use |
@@ -20,7 +20,6 @@
 | activist_long | Elliott Management — DEFA14A | `HON/third-party-analyses/activist_reports/long/DEFA14A_20260424_acc0001193125_26_177532.htm` | context | activist/long — sec_edgar |
 | activist_long | HoldCo Asset Management — DEFA14A | `HON/third-party-analyses/activist_reports/long/DEFA14A_20250428_acc0001193125_25_100622.htm` | context | activist/long — sec_edgar |
 | activist_long | PX14A6G · HON · 2022-04-21 | `HON/third-party-analyses/activist_reports/long/PX14A6G_20220421_acc0001214659_22_005568.htm` | context | activist/long — sec_edgar |
-| activist_long | acc0001193125 25 128673 | `HON/third-party-analyses/activist_reports/long/8-K_20250528_acc0001193125_25_128673.htm` | context | activist/long — local |
 | activist_long | acc0000773840 20 000019 | `HON/third-party-analyses/activist_reports/long/8-K_20200429_acc0000773840_20_000019.htm` | context | activist/long — local |
 | activist_long | acc0000773840 20 000024 | `HON/third-party-analyses/activist_reports/long/8-K_20200501_acc0000773840_20_000024.htm` | context | activist/long — local |
 | activist_long | acc0000930413 20 001445 | `HON/third-party-analyses/activist_reports/long/8-K_20200514_acc0000930413_20_001445.htm` | context | activist/long — local |
@@ -99,6 +98,7 @@
 | activist_long | acc0000773840 25 000035 | `HON/third-party-analyses/activist_reports/long/8-K_20250429_acc0000773840_25_000035.htm` | context | activist/long — local |
 | activist_long | acc0001193125 25 115181 | `HON/third-party-analyses/activist_reports/long/8-K_20250508_acc0001193125_25_115181.htm` | context | activist/long — local |
 | activist_long | acc0000773840 25 000043 | `HON/third-party-analyses/activist_reports/long/8-K_20250523_acc0000773840_25_000043.htm` | context | activist/long — local |
+| activist_long | acc0001193125 25 128673 | `HON/third-party-analyses/activist_reports/long/8-K_20250528_acc0001193125_25_128673.htm` | context | activist/long — local |
 | activist_long | acc0000773840 25 000054 | `HON/third-party-analyses/activist_reports/long/8-K_20250624_acc0000773840_25_000054.htm` | context | activist/long — local |
 | activist_long | acc0000773840 25 000062 | `HON/third-party-analyses/activist_reports/long/8-K_20250724_acc0000773840_25_000062.htm` | context | activist/long — local |
 | activist_long | acc0000773840 25 000067 | `HON/third-party-analyses/activist_reports/long/8-K_20250730_acc0000773840_25_000067.htm` | context | activist/long — local |
@@ -130,4 +130,4 @@
 | activist_long | acc0000773840 26 000130 | `HON/third-party-analyses/activist_reports/long/8-K_20260819_acc0000773840_26_000130.htm` | context | activist/long — local |
 | activist_long | acc0000773840 26 000141 | `HON/third-party-analyses/activist_reports/long/8-K_20261022_acc0000773840_26_000141.htm` | context | activist/long — local |
 
-Cross-check required: `HON/research/cross_check_third_party_2026-10-25.md`
+Cross-check required: `HON/research/cross_check_third_party_2026-10-27.md`

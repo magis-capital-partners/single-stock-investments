@@ -1,7 +1,7 @@
 # Core compounder review: TDG
 
 Research only; pending human review.
-Proposal: `tci-b587e445312f1e48a5ed`
+Proposal: `tci-2de5153c5b226b79cf71`
 
 ## Evidence and underwriting gaps
 

@@ -1,7 +1,7 @@
 # BAC — Third-party source inventory
 
-**Date:** 2026-10-25
-**Sources:** 31 total (0 approved, 0 pending, 31 context)
+**Date:** 2026-10-27
+**Sources:** 32 total (0 approved, 0 pending, 32 context)
 
 | ID | Title | Path | Status | Use |
 |----|-------|------|--------|-----|
@@ -36,5 +36,6 @@
 | activist_long | acc0000070858 26 000364 | `BAC/third-party-analyses/activist_reports/long/8-K_20260724_acc0000070858_26_000364.htm` | context | activist/long — local |
 | activist_long | acc0000070858 26 000481 | `BAC/third-party-analyses/activist_reports/long/8-K_20261014_acc0000070858_26_000481.htm` | context | activist/long — local |
 | activist_long | acc0000070858 26 000494 | `BAC/third-party-analyses/activist_reports/long/8-K_20261021_acc0000070858_26_000494.htm` | context | activist/long — local |
+| activist_long | acc0001193125 26 430566 | `BAC/third-party-analyses/activist_reports/long/8-K_20261023_acc0001193125_26_430566.htm` | context | activist/long — local |
 
-Cross-check required: `BAC/research/cross_check_third_party_2026-10-25.md`
+Cross-check required: `BAC/research/cross_check_third_party_2026-10-27.md`
