@@ -293,3 +293,20 @@ def test_old_endpoint_http_success_does_not_mark_history_published(tmp_path, mon
     assert len(calls) == 1
     assert store.db.execute("SELECT count(*) FROM realized_publications").fetchone()[0] == 0
     store.close()
+
+
+@pytest.mark.parametrize("code,expected_calls", [("1003", 1), ("1025", 1), ("1001", 3)])
+def test_unavailable_or_failed_flex_reports_cannot_enter_a_request_loop(tmp_path, monkeypatch, code, expected_calls):
+    import io
+    from _system.trading.sleeves import realized_flex
+    calls = []
+    def request(*args, **kwargs):
+        calls.append(1)
+        return io.BytesIO(f"<FlexStatementResponse><Status>Fail</Status><ErrorCode>{code}</ErrorCode></FlexStatementResponse>".encode())
+    monkeypatch.setattr(realized_flex.urllib.request, "urlopen", request)
+    monkeypatch.setattr(realized_flex.time, "sleep", lambda _: None)
+    with pytest.raises(RuntimeError, match=code):
+        realized_flex.fetch_report(query_id="123", account="TEST", start="2025-01-01", through="2025-01-31",
+                                  destination=tmp_path / "report.xml", token="test-token")
+    assert len(calls) == expected_calls
+    assert not (tmp_path / "report.xml").exists()

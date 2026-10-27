@@ -14,7 +14,7 @@ from pathlib import Path
 from .realized import read_report
 
 BASE = "https://ndcdyn.interactivebrokers.com/AccountManagement/FlexWebService"
-PENDING = {"1001", "1003", "1004", "1005", "1006", "1007", "1008", "1009", "1018", "1019", "1021"}
+PENDING = {"1001", "1004", "1005", "1006", "1007", "1008", "1009", "1018", "1019", "1021"}
 
 
 @contextmanager
@@ -90,6 +90,7 @@ def fetch_report(*, query_id: str, account: str, start: str, through: str, desti
 
     try:
         reference = None
+        failed_attempts = 0
         while time.monotonic() < deadline:
             request("GetStatement" if reference else "SendRequest", reference or query_id,
                     None if reference else {"fd": first.strftime("%Y%m%d"), "td": last.strftime("%Y%m%d")})
@@ -103,8 +104,15 @@ def fetch_report(*, query_id: str, account: str, start: str, through: str, desti
             state, code, new_reference = status
             if state == "Success" and new_reference:
                 reference = new_reference
+                failed_attempts = 0
             elif code not in PENDING:
                 raise RuntimeError(f"Flex report error {code or 'unknown'}; check report configuration/token without changing broker sessions")
+            elif code != "1019":
+                failed_attempts += 1
+                if failed_attempts >= 3:
+                    raise RuntimeError(f"Flex report error {code}: failed-attempt budget reached; stop requests and inspect report availability")
+                if code == "1018":
+                    time.sleep(min(35, max(0, deadline - time.monotonic())))
         raise TimeoutError("Flex report generation timed out; existing files preserved")
     finally:
         temporary.unlink(missing_ok=True)
