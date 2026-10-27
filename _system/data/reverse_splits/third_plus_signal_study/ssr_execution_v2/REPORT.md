@@ -1,83 +1,72 @@
-# Every-name execution on cached and $0 data
+# Corrected every-candidate execution audit
 
-This is an explicit one-second-bar execution sensitivity. It is not observed historical execution, a borrow-verified strategy, or proof of Rule 201 compliance. Raw licensed bars and private position ledgers remain outside the public repository.
+Historical executable account performance is **not established**. The former marked P&L and drawdown are retired, not restated as zero. Available bars and sampled venue quotes cannot establish historical usable borrow, national-price eligibility, queue priority, broker margin or complete loan/exit outcomes. No winning parameter or live strategy is selected.
 
-## Coverage and outcomes
+## Repaired mechanics
 
-| Population | Events | Independent order attempts | Modeled fills, 60m | Modeled fills, exploratory 240m | Modeled fills, full session |
-|---|---:|---:|---:|---:|---:|
-| Original SSR skips | 100 | 100 | 98 | 100 | 100 |
-| Every prior exclusion | 129 | 129 | 122 | 128 | 129 |
-| Default signal | 170 | 170 | 155 | 166 | 169 |
+- No synthetic bid/ask or fixed 1.72% spread replaces missing quotes. Missing, stale or partial quote capture is an evidence gap, not a no-fill.
+- No uniform within-bar volume distribution. Optional bar diagnostics require fresh observed quotes and a whole bar strictly beyond the resting limit after acknowledgement; queue and capture remain unverified.
+- Both buy and sell fills respect the working limit. Pending cancellations keep reservations. Bar data cannot establish observed fills or national-price compliance.
+- Verified account mode requires archived usable borrow quantity, rate and expiry, loan recall terms, consolidated national quotes, venue book/trades and dated margin evidence. Unknown values remain unavailable; no fixed borrow APR is a historical observation.
+- Dated issuer-bound primary filings follow TNFA into QCLS and distinguish DBGI OTC trading, its later Nasdaq return, and PIXY suspension. No delisting implies a zero liability or an assumed broker release.
+- Account equity becomes unknown at the first unresolved live-position price or execution gap. Later admissions, P&L and drawdown are withheld, rather than running indefinitely on frozen marks and occupied slots.
+- The three-issuer limit and explicit account risk budgets apply to the account. Independent entry diagnostics omit slot competition and cannot be summed as executable account capacity.
+- Morning account equity and pending parent reservations determine admission. Future no-fills, proceeds and closing marks cannot change an earlier morning decision. Paid fractional-cover surplus remains a marked long asset.
+- A separate 20-session official-auction price benchmark follows verified symbol continuity and split factors. It excludes costs and execution and reports missing/immature outcomes; complete-price-case averages are selected-sample diagnostics, not strategy returns.
+- The 21 signals and 24 settings are retrospective comparisons, not an untouched validation set. No best historical setting is promoted.
+- Historical borrow, OTC executions and actual broker settlements cannot be reconstructed by inventing observations. No broker, ThetaData or paid acquisition is used.
 
-Each independent opportunity is simulated without competition for issuer slots. It is a counterfactual attribution record. The account keeps three simultaneous short issuers; these independently executable opportunities cannot be summed as available account capacity. No-fill names remain no-fills, and signal failures remain failures.
+## Entire cohort remains visible
 
-## Account comparisons
+210 original events; 170 pass the default saved rally veto plus share-growth signal. All 21 frozen signals retain 24 account definitions. Required evidence is checked before calculating portfolio admissions and returns. Independent bar entry diagnostics do not substitute for those account results.
 
-$10m reference NAV, $100k initial parent ceiling, unchanged signal-anchored 20-session exit, 500ms latency, maximum $2k entry child, one working child per issuer. No margin-capacity or sleeve-risk admission gate. Covers can purchase at least one whole share even when its price exceeds the child-dollar ceiling.
+| Missing requirement in default account | Candidates |
+|---|---:|
+| borrow_history | 170 |
+| dated_borrow_costs | 170 |
+| dated_margin_costs | 170 |
+| loan_terms | 170 |
+| margin_history | 170 |
+| national_prices | 170 |
+| qualified_capture_missing | 170 |
+| queue_and_trade_history | 170 |
+| settlement_evidence | 170 |
 
-| Policy | Entry window | Participation | Entries | Net marked P&L | Closing drawdown | Missing cover sessions |
-|---|---:|---:|---:|---:|---:|---:|
-| E0 | 30m | 5% | 24 | $11492.76 | $-28366.67 | 473 |
-| E0 | 30m | 10% | 25 | $17258.87 | $-41998.07 | 473 |
-| E0 | 60m | 5% | 27 | $76922.73 | $-30115.63 | 473 |
-| E0 | 60m | 10% | 27 | $76016.16 | $-29641.20 | 473 |
-| E0 | 240m | 5% | 21 | $30012.04 | $-38536.27 | 822 |
-| E0 | 240m | 10% | 21 | $31886.84 | $-36587.82 | 822 |
-| E0 | Full session | 5% | 12 | $-748.27 | $-4413.86 | 1535 |
-| E0 | Full session | 10% | 12 | $211.56 | $-6632.22 | 1535 |
-| E1 | 30m | 5% | 26 | $-3373.01 | $-53080.24 | 1175 |
-| E1 | 30m | 10% | 44 | $-4470.39 | $-96887.96 | 695 |
-| E1 | 60m | 5% | 28 | $-2319.71 | $-88747.92 | 1175 |
-| E1 | 60m | 10% | 37 | $-436.17 | $-159687.70 | 853 |
-| E1 | 240m | 5% | 16 | $-13746.79 | $-16802.54 | 1766 |
-| E1 | 240m | 10% | 16 | $-25489.78 | $-31615.96 | 1766 |
-| E1 | Full session | 5% | 11 | $-31449.01 | $-65421.42 | 2221 |
-| E1 | Full session | 10% | 11 | $-45146.44 | $-70604.04 | 2221 |
-| E2 | 30m | 5% | 42 | $-404.91 | $-75563.25 | 695 |
-| E2 | 30m | 10% | 27 | $-6538.06 | $-128656.65 | 1175 |
-| E2 | 60m | 5% | 35 | $981.11 | $-114029.25 | 853 |
-| E2 | 60m | 10% | 28 | $-5783.86 | $-205761.24 | 1175 |
-| E2 | 240m | 5% | 16 | $-17157.21 | $-20077.65 | 1766 |
-| E2 | 240m | 10% | 16 | $-34091.59 | $-39802.61 | 1766 |
-| E2 | Full session | 5% | 10 | $-34191.19 | $-68864.69 | 2221 |
-| E2 | Full session | 10% | 10 | $-54543.93 | $-79707.73 | 2221 |
+The archive includes 4847 event sessions, 69 with sampled quotes and 4778 without. Missing source/symbol capture is preserved as a gap, not an empty observed market. Receipt/index/source hashes bind the local inputs. Raw licensed prices and position quantities remain private.
 
-E0 is the matched restriction-skip control. E1 joins the modeled offer. E2 improves one modeled permitted increment. All 24 comparisons are retained for every one of the 21 frozen signals. The default remains the declared 60-minute E2/10% case. The 240-minute and full-session access extensions were added after examining first-hour no-fills and are exploratory. No parameter winner or untouched validation is claimed.
+## Official-price benchmark
 
-## Evidence and assumptions
+This is a separate price-only diagnostic, not executable P&L. 157 / 170 selected events have both official auction prices and resolved split/security continuity; 13 remain missing or immature. Complete cases are a selected subset.
 
-- Historical usable borrow is assumed; fees use 50% APR with 150% stress.
-- National-price eligibility is conditional; source venue quotes are never renamed NBBO.
-- No own-order price impact is observed; add 10bp per executed side and 30bp stress.
-- No new edge forecast filter; frozen signals and fixed execution deadlines decide attempts.
-- Source gaps and missing covers retain liabilities and incomplete-result labels.
-- Three issuer slots stay in the account model; independent opportunities are separate counterfactuals and cannot be summed as executable account capacity.
-- A restricted short child receives no fill when its price is at/below the contemporaneous venue/proxy bid. Broker national-price protection is still assumed, not established by these data.
-- For bars, 50% of the estimated volume at/above the working offer supplies assumed eligible fill flow; 25%/75% sensitivities are separate. This is a fraction of bar flow, not a probability of filling the parent.
-- Missing quote paths use the previous completed bar close with an assumed 0.86% half spread. Current bar range/volume determine modeled execution only after submission; never entry admission.
-- Fractional shorts may be covered by buying the next whole share. Full cash and fees are charged; any surplus long asset receives zero NAV credit and is reported as an uncredited reserve. No broker cash-in-lieu settlement is invented.
-- The 240-minute and full-session extensions are exploratory access comparisons added after examining shorter-window no-fills. Full session ends 15 minutes before the actual close, including early closes. Report all windows; no untouched validation or optimality claim.
+| Outcome coverage | Events |
+|---|---:|
+| observed_price_pair | 157 |
+| venue_exit | 2 |
+| missing_official_price | 7 |
+| immature | 4 |
 
-The source archive has 4847 event sessions: 69 with sampled quote paths and 4778 requiring the lagged-bar spread proxy. Empty queried bars are retained as zero observed flow. All new requests were quoted and refreshed at $0 before download; cumulative reserved acquisition cost is $0. No ThetaData, Gateway, broker session or sealed execution holdout was accessed.
+## Security lifecycle sources
 
-The bar model sizes from information available before a child order, reserves cumulative and rolling past-flow capacity, then uses later bar range and volume to assign assumed fills. It never uses final-day volume to size an opening order. A uniform-within-bar price allocation and 25/50/75% capture sensitivities represent unknown buyer flow/queue. They are assumptions, not calibrated fill probabilities. Cover prices are quote/bar sensitivities; partial and unavailable covers retain obligations.
+- TNFA (cik/1321834), 2025-09-25: symbol_change → QCLS. [Primary filing](https://www.sec.gov/Archives/edgar/data/1321834/000149315225015774/form8-k.htm).
+- DBGI (cik/1668010), 2024-12-18: venue_exit → OTC. [Primary filing](https://www.sec.gov/Archives/edgar/data/1668010/000149315225003666/forms-1.htm).
+- PIXY (cik/1675634), 2024-10-28: venue_exit → suspended_bankruptcy. [Primary filing](https://www.sec.gov/Archives/edgar/data/1675634/000147793224006691/pixy_8k.htm).
+- DBGI (cik/1668010), 2025-08-20: venue_resume. [Primary filing](https://www.sec.gov/Archives/edgar/data/1668010/000149315225019083/forms-1.htm).
 
-Fractional shorts can be covered through a whole-share overbuy. Full cash and commission are charged. Any surplus long asset is assigned zero NAV credit and reported as an uncredited reserve. This does not invent a cash-in-lieu broker settlement. Unresolved identities, missing prices and remaining shorts are never silently zeroed.
+## Risk and validation
 
-Primary account status: incomplete_exit_evidence. The marked result includes incomplete cover paths and cannot establish completed-strategy performance.
+The hypothetical account retains three issuers and adds declared budgets: 0.25% equity per issuer, 1% sleeve gross, a 2% loss budget under a +200% squeeze, and 80% margin usage. These are model limits; verified mode still requires the historical broker schedule. A risk breach has no assumed successful liquidation. The 21 signals and 24 settings remain retrospective; no untouched validation claim is made.
 
-## Reproduce
+Regression tests cover buy-limit violations, missing quotes, nonuniform bar paths, symbol transitions, split units, venue changes, stale-price gaps, evidence gating, fees and publication consistency. Passing mechanics tests does not establish historical profitability. Missing historical borrow, OTC executions or broker settlement records remain explicit unresolved inputs. No ThetaData, IB Gateway, broker session, paid acquisition or sealed holdout was accessed.
+
+## Reproduce offline
 
 ```powershell
-python _system/scripts/third_plus_execution/venue_capture.py plan --source-root <cache-repository>
-python _system/scripts/third_plus_execution/venue_capture.py status --source-root <cache-repository>
-python _system/scripts/third_plus_execution/venue_capture.py free-bars --source-root <cache-repository>
+python _system/scripts/third_plus_execution/venue_capture.py normalize-free --source-root <cache-repository>
 node _system/scripts/third_plus_execution/venue_study.cjs --source-root <cache-repository>
 node _system/scripts/third_plus_execution/venue_publish.cjs
 node --test _system/scripts/third_plus_execution/*.test.cjs
 ```
 
-The exact source index is hash-bound and private. Public code/result hashes bind this publication. Broker behavior and borrow inventory require separate prospective confirmation; this change transmits no orders.
+The normalizer uses existing receipt-verified files only and performs no downloads. Missing successor captures stay missing even when successor daily benchmark prices exist. Qualified replay inputs and historical lending/settlement evidence are required to produce an executable account estimate.
 
-Publication 08ea8bc979e9061f968b973126e5ecad4912d3062ff6f2899bf5061d6b098044.
+Publication fdcaffdc421d4e77c2aa8ca20a955d4523d91b1ad3becb37cc692f7637c88f64.

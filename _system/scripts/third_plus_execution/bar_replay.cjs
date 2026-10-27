@@ -3,23 +3,33 @@
 const {fee,above}=require('./replay.cjs');
 const sum=xs=>xs.reduce((a,b)=>a+b,0),EPS=1e-8;
 function gaps(s,start,end){
- if(!s)return ['session_missing'];const out=[];
+ if(!s)return ['session_missing'];const out=[...(s.data_gaps||[])];
  if(s.schema!=='third_plus_bar_session.v2')out.push('schema');
  if(s.synthetic)out.push('synthetic');
  if(!(s.capture_start_ms<=start&&s.capture_end_ms>=end))out.push('window');
  if(!s.source_hashes?.length||s.source_hashes.some(h=>!/^[a-f0-9]{64}$/.test(h)))out.push('source_hashes');
+ // OHLC does not identify a spread. An absent/partial quote path is missing
+ // evidence, not a no-fill and never permission to manufacture a bid and ask.
+ const quotes=s.quotes||[];let i=0,q=null;
+ if(!quotes.length)out.push('quote_history');
+ else for(const b of s.bars||[]){
+  const at=b[0]*1000;if(at<start||at>=end)continue;
+  while(i<quotes.length&&quotes[i][0]*1000<=at)q=quotes[i++];
+  if(!q||at-q[0]*1000>1000||!(q[1]>0&&q[2]>=q[1])){out.push('quote_history');break;}
+ }
  return out;
 }
 function eligibleFraction(bar,limit){
- const [,o,h,l,c,v]=bar;if(!v||h<limit-EPS)return 0;if(l>=limit-EPS)return 1;
- return Math.max(0,Math.min(1,(h-limit)/Math.max(h-l,limit>=1?.01:.0001)));
+ // Entire-bar clearance is a conservative scenario. A crossing range contains
+ // no information about how much volume traded above our price or after ack.
+ const [,,,low,,v]=bar;return v>0&&low>limit+EPS?1:0;
 }
 function replay(s,opt){
- const o={side:'sell',policy:'E2',participation:.1,latency_ms:500,child_usd:2000,target_usd:100000,capture:.5,half_spread:.0086,cooldown_ms:5000,borrow_mode:'conditional',...opt};
+ const o={side:'sell',policy:'E2',participation:.1,latency_ms:500,child_usd:2000,target_usd:100000,capture:.5,cooldown_ms:5000,borrow_mode:'conditional',...opt};
  if(!['E0','E1','E2'].includes(o.policy)||!(o.participation>0&&o.participation<=.1)||!(o.capture>=0&&o.capture<=1)||!(o.end_ms>o.start_ms)||!(o.latency_ms>0))throw Error('Invalid bar sensitivity settings');
  const missing=gaps(s,o.start_ms,o.end_ms);if(missing.length)return {status:'data_missing',gaps:missing};
  if(o.borrow_mode==='verified')return {status:'data_missing',gaps:['borrow_history']};
- const cacheKey=JSON.stringify([o.side,o.policy,o.participation,o.latency_ms,o.child_usd,o.target_usd,o.quantity,o.capture,o.half_spread,o.start_ms,o.end_ms,o.initial_price]);
+ const cacheKey=JSON.stringify([o.side,o.policy,o.participation,o.latency_ms,o.child_usd,o.target_usd,o.quantity,o.capture,o.cooldown_ms,o.start_ms,o.end_ms,o.initial_price]);
  if(s._results?.has(cacheKey))return s._results.get(cacheKey);
  const bars=s.bars,quotes=s.quotes||[],states=s.statuses||[],fills=[],flow=[];
  let last=o.initial_price||null,qi=0,si=0,quote=null,restricted=s.opening_restricted!==0,trading=true;
@@ -29,7 +39,7 @@ function replay(s,opt){
   while(qi<quotes.length&&quotes[qi][0]*1000<=at)quote=quotes[qi++];
   while(si<states.length&&states[si].available_ms<=at){const z=states[si++];if(z.restricted==='Y'||z.restricted==='N')restricted=z.restricted==='Y';if(z.trading==='Y'||z.trading==='N')trading=z.trading==='Y';}
   if(quote&&quote[0]*1000<=at&&at-quote[0]*1000<=1000)return {bid:quote[1],ask:quote[2],mid:(quote[1]+quote[2])/2};
-  return last>0?{bid:last*(1-o.half_spread),ask:last*(1+o.half_spread),mid:last}:null;
+  return null;
  }
  function finish(){if(child?.filled)fees+=fee(child.filled,child.cash/child.filled,s.date,o.side==='sell');child=null;eligibleCarry=0;}
  function decide(at){
@@ -42,7 +52,7 @@ function replay(s,opt){
   const desired=o.side==='buy'?m.ask:o.policy==='E1'||!restricted?Math.max(m.ask,above(m.bid,tick)):above(m.bid,tick);
   if(child){
    const priceBlocked=o.side==='sell'&&restricted&&child.price<=m.bid+EPS;
-   if(!child.cancel_at&&(priceBlocked||at-lastAction>=o.cooldown_ms&&desired<child.price-EPS)){child.cancel_at=at+o.latency_ms;lastAction=at;}
+   if(!child.cancel_at&&(priceBlocked||at-lastAction>=o.cooldown_ms&&Math.abs(desired-child.price)>EPS)){child.cancel_at=at+o.latency_ms;lastAction=at;}
    return;
   }
   if(filled>=target||at-lastAction<o.cooldown_ms)return;
@@ -66,13 +76,13 @@ function replay(s,opt){
    const permitted=o.side!=='sell'||!restricted||(o.policy!=='E0'&&child?.price>m?.bid+EPS);
    if(child&&child.ack_at<=start&&(!child.cancel_at||child.cancel_at>=end)&&m&&permitted){
     // The order was already live. Future bar range/volume determine an assumed execution, never admission.
-    const eligible=o.side==='buy'?1:eligibleFraction(b,child.price);
-    eligibleCarry+=o.participation*v*eligible*(o.side==='buy'?1:o.capture);
+    const eligible=o.side==='buy'?(high<child.price-EPS&&m.ask<=child.price+EPS?1:0):eligibleFraction(b,child.price);
+    eligibleCarry+=o.participation*v*eligible*o.capture;
     const q=Math.min(child.remaining,Math.floor(eligibleCarry+EPS));
     if(q>0){
      eligibleCarry-=q;
-     const price=o.side==='buy'?Math.max(m.ask,(op+high+low+close)/4*(1+(s.quote_basis==='lagged_bar_spread_proxy'?o.half_spread:0))):child.price;
-     fills.push({at_ms:end,quantity:q,price,child_id:child.id,trade_id:'assumed-bar:'+t,side:o.side,evidence:'bar_fill_assumption'});
+     const price=child.price;
+     fills.push({at_ms:end,quantity:q,price,limit_price:child.price,child_id:child.id,trade_id:'assumed-bar:'+t,side:o.side,evidence:'whole_bar_clearance_scenario'});
      child.remaining-=q;child.filled+=q;child.cash+=q*price;filled+=q;
      if(!child.remaining)finish();
     }

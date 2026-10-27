@@ -10,7 +10,7 @@ function load(dir){
   const name=path.resolve(dir,row.file),relative=path.relative(fs.realpathSync(dir),fs.realpathSync(name));
   if(relative.startsWith('..')||path.isAbsolute(relative)||/sealed|holdout/i.test(relative))throw Error('Forbidden venue archive path');
   const s={...row.header,event_count:row.events,_results:new Map()};
-  if(!['third_plus_venue_session.v2','third_plus_bar_session.v2'].includes(s.schema)||s.synthetic||s.event_id!==row.event_id||s.date!==row.date)throw Error('Venue archive identity mismatch');
+  if(!['third_plus_execution_session.v1','third_plus_venue_session.v2','third_plus_bar_session.v2'].includes(s.schema)||s.synthetic||s.event_id!==row.event_id||s.date!==row.date)throw Error('Venue archive identity mismatch');
   const data=()=>{
    if(!loaded.has(name)){
     const bytes=fs.readFileSync(name);if(sha(bytes)!==row.sha256)throw Error('Venue source hash mismatch');
