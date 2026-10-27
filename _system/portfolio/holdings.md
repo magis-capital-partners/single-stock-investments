@@ -676,6 +676,7 @@ Synced from `_system/portfolio/registry.json`. Last sync: 2026-10-27.
 | RSG | RSG/ | Republic Services | US | 2026-07-10 | 2026-10-27 | unknown | watch |
 | RTX | RTX/ | RTX Corporation | US | 2026-07-28 | 2026-10-27 | unknown | watch |
 | RVTY | RVTY/ | Revvity | US | 2026-07-10 | 2026-10-27 | unknown | watch |
+| RX.V | RX.V/ | BioSyent Inc. | CA | 2026-10-27 | 2026-10-27 | compounder | watch |
 | RYN | RYN/ | Rayonier, Inc. | US | 2026-07-09 | 2026-10-27 | optionality | watch |
 | S68.SI | S68.SI/ | Singapore Exchange Limited | EU | 2026-07-09 | 2026-10-27 | unknown | watch |
 | SAF.PA | SAF.PA/ | Safran SA | EU | — | 2026-10-27 | unknown | watch |
@@ -872,4 +873,4 @@ Synced from `_system/portfolio/registry.json`. Last sync: 2026-10-27.
 | ZETA | ZETA/ | ZETA | US | 2026-07-28 | 2026-10-27 | unknown | watch |
 | ZTS | ZTS/ | Zoetis | US | 2026-07-10 | 2026-10-27 | unknown | watch |
 
-**865 holdings total.** Registry: `_system/portfolio/registry.json`
+**866 holdings total.** Registry: `_system/portfolio/registry.json`
