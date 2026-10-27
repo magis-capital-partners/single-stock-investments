@@ -29,6 +29,7 @@ INDEX_PATH = ROOT / "dashboard" / "data" / "index_membership.json"
 NOL_PATH = ROOT / "dashboard" / "data" / "nol_382_facts.json"
 CVR_PATH = ROOT / "_system" / "reference" / "cvr" / "cvr_universe.json"
 SEPARATIONS_PATH = ROOT / "dashboard" / "data" / "separations.json"
+BUYBACK_PATH = ROOT / "dashboard" / "data" / "buyback_radar.json"
 
 SCHEMA = "special_situations.v1"
 MIN_NEWS_CONFIDENCE = 0.8
@@ -40,6 +41,7 @@ LANES = [
     {"id": "warrants", "label": "Warrants and rights", "source": "Greenblatt"},
     {"id": "restructurings", "label": "Restructurings", "source": "Greenblatt"},
     {"id": "forced_sellers", "label": "Forced sellers", "source": "Manual of Ideas"},
+    {"id": "buyback_events", "label": "Buyback events", "source": "EDGAR"},
 ]
 LANE_ORDER = {row["id"]: index for index, row in enumerate(LANES)}
 
@@ -845,6 +847,49 @@ def nol_rows(nol: dict, live_tickers: set[str]) -> list[dict]:
     return rows
 
 
+def buyback_event_rows(doc: dict | None) -> list[dict]:
+    """Issuer tenders, accelerated repurchases, and large new programs. Research only."""
+    rows = []
+    for event in (doc or {}).get("events") or []:
+        if not isinstance(event, dict):
+            continue
+        ticker = str(event.get("ticker") or "").upper()
+        if not ticker:
+            continue
+        if event.get("book") == "mentions":
+            continue
+        book = event.get("book") if event.get("book") in {"ranked", "discovery", "history"} else "discovery"
+        if (doc or {}).get("schema_version") == "buyback_radar.v2" and book == "ranked" and not event.get("terms_verified"):
+            book = "discovery"
+        row = _row(
+            lane="buyback_events",
+            book=book,
+            ticker=ticker,
+            company=str(event.get("company") or ticker),
+            what=str(event.get("what") or "Buyback event"),
+            ends=event.get("ends") or None,
+            ends_label=str(event.get("ends_label") or "End date not stated"),
+            evidence_url=event.get("url"),
+            evidence_label="SEC filing",
+            evidence_kind="filing",
+            source_feed="buyback_radar",
+            as_of=str(event.get("filed") or "")[:10] or None,
+            next_action=event.get("next") or "Verify the current terms and status.",
+            extra_id=str(event.get("accession") or event.get("event_type") or ""),
+        )
+        row["event_type"] = event.get("event_type")
+        row["accession"] = event.get("accession")
+        row["one_number"] = event.get("one_number")
+        row["id"] = event.get("id") or row["id"]
+        row["status"] = event.get("status") or "needs_review"
+        row["buyback_event"] = event
+        row["snapshot_id"] = (doc or {}).get("snapshot_id")
+        row["research_only"] = True
+        row["annualized_spread"] = None
+        rows.append(row)
+    return rows
+
+
 def _sort_key(row: dict) -> tuple:
     ends = str(row.get("ends") or "9999-99-99")
     return (LANE_ORDER.get(row.get("lane"), 99), ends, str(row.get("ticker") or ""))
@@ -859,6 +904,7 @@ def build_book(
     cvr: dict | None = None,
     nol: dict | None = None,
     separations: dict | None = None,
+    buyback: dict | None = None,
     generated_at: str | None = None,
 ) -> dict:
     news = news or {}
@@ -868,6 +914,7 @@ def build_book(
     index_doc = index_doc or {}
     cvr = cvr or {}
     nol = nol or {}
+    buyback = buyback or {}
     cvr_ranked, cvr_discovery = cvr_rows(cvr)
     warrant_ranked, warrant_discovery, history = warrant_rows(warrants)
     restructuring_news = restructuring_news_rows(news)
@@ -885,6 +932,7 @@ def build_book(
         *dividend_cut_rows(news),
         *index_delete_rows(index_doc),
         *separation_forced_seller_rows(separations),
+        *[row for row in buyback_event_rows(buyback) if row["book"] == "ranked"],
     ]
     live = {
         row["ticker"]
@@ -899,8 +947,10 @@ def build_book(
         *separation_event_rows(separations),
         *cvr_discovery,
         *warrant_discovery,
+        *[row for row in buyback_event_rows(buyback) if row["book"] == "discovery"],
     ]
     history.extend(r for r in separation_spins + separation_splits if r["book"] == "history")
+    history.extend(row for row in buyback_event_rows(buyback) if row["book"] == "history")
     discovery.sort(key=_sort_key)
     history.sort(key=_sort_key)
 
@@ -919,7 +969,9 @@ def build_book(
         "definition": (
             "A usual holder is forced to sell, or the security is too odd for the usual buyer, "
             "and the situation has a date when it ends. Spinoffs, merger securities, warrants, "
-            "and restructurings follow Greenblatt. Forced sellers follow the Manual of Ideas."
+            "and restructurings follow Greenblatt. Forced sellers follow the Manual of Ideas. "
+            "Buyback events are issuer tenders, accelerated share repurchases, and new programs "
+            "of at least about 10 percent of market value. A plain authorization is a one-line mention."
         ),
         "caption": separations.get("caption"),
         "lanes": LANES,
@@ -931,6 +983,8 @@ def build_book(
         "rows": ranked,
         "discovery": discovery,
         "history": history,
+        "buyback_mentions": list(buyback.get("program_mentions") or []),
+        "buyback_snapshot": {"snapshot_id": buyback.get("snapshot_id"), "as_of": buyback.get("as_of")},
     }
 
 
@@ -952,10 +1006,13 @@ def write_book(path: Path | None = None) -> Path | None:
         cvr=_load(CVR_PATH),
         nol=_load(NOL_PATH),
         separations=_load(SEPARATIONS_PATH),
+        buyback=__import__("build_buyback_radar").load_buyback_projection(),
     )
+    from situation_rows import attach_to_book
+    attach_to_book(payload)
     target = path or OUT_PATH
     target.parent.mkdir(parents=True, exist_ok=True)
-    target.write_text(json.dumps(payload, indent=2) + "\n", encoding="utf-8")
+    target.write_text(json.dumps(payload, indent=2, ensure_ascii=False) + "\n", encoding="utf-8")
     ranked = payload["counts"]["ranked"]
     print(
         f"Wrote {target} ranked={sum(ranked.values())} "
@@ -964,8 +1021,32 @@ def write_book(path: Path | None = None) -> Path | None:
     return target
 
 
+def refresh_buyback_projection(path=None):
+    """Update this producer's buyback lane without rebuilding unrelated research."""
+    from build_buyback_radar import load_buyback_projection
+    from atomic_io import write_json_if_changed
+    target=path or OUT_PATH
+    doc=_load(target)
+    if not doc:raise ValueError("Existing Special Situations book is required")
+    projection=load_buyback_projection()
+    if not projection.get("snapshot_id"):raise ValueError("Verified buyback snapshot unavailable")
+    for key,book in (("rows","ranked"),("discovery","discovery"),("history","history")):
+        rows=[r for r in doc.get(key,[]) if r.get("lane")!="buyback_events" or r.get("source_feed")=="situation_register"]
+        rows.extend(r for r in buyback_event_rows(projection) if r["book"]==book)
+        doc[key]=sorted(rows,key=_sort_key)
+        counts=doc.setdefault("counts",{}).setdefault(book,{})
+        counts["buyback_events"]=sum(r.get("lane")=="buyback_events" for r in rows)
+    doc["buyback_mentions"]=projection.get("program_mentions",[])
+    doc["buyback_snapshot"]={k:projection.get(k) for k in ("snapshot_id","as_of","generated_at")}
+    write_json_if_changed(target,doc)
+    return doc
+
 def main() -> None:
-    write_book()
+    import sys
+    if sys.argv[1:]==["--refresh-buyback-projection"]:
+        refresh_buyback_projection()
+    else:
+        write_book()
 
 
 if __name__ == "__main__":

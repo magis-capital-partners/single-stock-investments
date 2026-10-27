@@ -1,6 +1,6 @@
 # Filing digest — ETHA
 
-**Generated:** 2026-10-16  
+**Generated:** 2026-10-21  
 **Agent:** Marvin (`build_filing_evidence.py`)  
 **Inventory:** `ETHA/research/evidence/document_inventory.json`  
 
@@ -10,22 +10,24 @@ Documents in folder: **11** (all listed below; Tier 1–3 extracted or keyword-s
 
 | Tier | Kind | File date | Path | Chars |
 |------|------|-----------|------|-------|
-| full | 10-K | 2025-03-05 | `investor-documents/sec-edgar/10-K_20250305_rpt20241231_acc0001437749_25_006261.htm` | 524453 |
-| full | 10-K | 2026-02-27 | `investor-documents/sec-edgar/10-K_20260227_rpt20251231_acc0001437749_26_006054.htm` | 588484 |
+| full | 10-K | 2025-03-05 | `investor-documents/sec-edgar/10-K_20250305_rpt20241231_acc0001437749_25_006261.htm` | 529239 |
+| full | 10-K | 2026-02-27 | `investor-documents/sec-edgar/10-K_20260227_rpt20251231_acc0001437749_26_006054.htm` | 596131 |
 | partial | 10-Q | 2024-08-08 | `investor-documents/sec-edgar/10-Q_20240808_rpt20240630_acc0001437749_24_025407.htm` | 30057 |
 | partial | 10-Q | 2024-11-07 | `investor-documents/sec-edgar/10-Q_20241107_rpt20240930_acc0001437749_24_033814.htm` | 30057 |
-| full | 10-Q | 2025-05-07 | `investor-documents/sec-edgar/10-Q_20250507_rpt20250331_acc0001437749_25_015164.htm` | 140202 |
+| full | 10-Q | 2025-05-07 | `investor-documents/sec-edgar/10-Q_20250507_rpt20250331_acc0001437749_25_015164.htm` | 145142 |
 | partial | 10-Q | 2025-08-05 | `investor-documents/sec-edgar/10-Q_20250805_rpt20250630_acc0001437749_25_024883.htm` | 30058 |
 | partial | 10-Q | 2025-11-06 | `investor-documents/sec-edgar/10-Q_20251106_rpt20250930_acc0001437749_25_033432.htm` | 30058 |
-| full | 10-Q | 2026-05-07 | `investor-documents/sec-edgar/10-Q_20260507_rpt20260331_acc0001437749_26_015531.htm` | 68402 |
-| partial | 8-K | 2024-09-19 | `investor-documents/sec-edgar/8-K_20240919_rpt20240916_acc0001437749_24_029620.htm` | 4642 |
-| partial | 8-K | 2025-04-08 | `investor-documents/sec-edgar/8-K_20250408_rpt20250407_acc0001437749_25_011312.htm` | 6385 |
-| partial | 8-K | 2026-03-31 | `investor-documents/sec-edgar/8-K_20260331_rpt20260327_acc0001437749_26_010477.htm` | 4374 |
+| full | 10-Q | 2026-05-07 | `investor-documents/sec-edgar/10-Q_20260507_rpt20260331_acc0001437749_26_015531.htm` | 76155 |
+| partial | 8-K | 2024-09-19 | `investor-documents/sec-edgar/8-K_20240919_rpt20240916_acc0001437749_24_029620.htm` | 4667 |
+| partial | 8-K | 2025-04-08 | `investor-documents/sec-edgar/8-K_20250408_rpt20250407_acc0001437749_25_011312.htm` | 6410 |
+| partial | 8-K | 2026-03-31 | `investor-documents/sec-edgar/8-K_20260331_rpt20260327_acc0001437749_26_010477.htm` | 4399 |
 
 ## Tier: full — extracts
 
 ### `investor-documents/sec-edgar/10-K_20260227_rpt20251231_acc0001437749_26_006054.htm`
 **Keyword snippets (related party, financials, segments):**
+- IncreaseDecreaseInAccountsPayableRelatedParties: 1858513.0
+- IncreaseDecreaseInAccountsPayableRelatedParties: 444633.0
 - Cost of investment in ether: $12,538,047,760 and $3,543,902,275, respectively.
 - (Address of principal executive offices) (Zip Code)
 - Risk Factors Summary
@@ -59,11 +61,10 @@ Documents in folder: **11** (all listed below; Tier 1–3 extracted or keyword-s
 - The lack of an active trading market for the Shares may result in losses on your investment at the time of disposition of your Shares.
 - The Sponsor and the Trustee may agree to amend the Trust Agreement without the consent of the Shareholders.
 - Shareholders do not have the protections associated with ownership of shares in an investment company registered under the Investment Company Act or the protections afforded by the CEA.
-- As the Sponsor and its management have limited history of operating investment vehicles like the Trust, their experience may be inadequate or unsuitable to manage the Trust.
-- The Trust ' s delivery or sale of ether to pay expenses or other operations of the Trust could result in Shareholders incurring tax liability without an associated distribution from the Trust.
 
 ### `investor-documents/sec-edgar/10-K_20250305_rpt20241231_acc0001437749_25_006261.htm`
 **Keyword snippets (related party, financials, segments):**
+- IncreaseDecreaseInAccountsPayableRelatedParties: 444633.0
 - Cost of investment in ether: $3,543,902,275.
 - (Address of principal executive offices) (Zip Code)
 - Risk Factors Summary
@@ -98,10 +99,11 @@ Documents in folder: **11** (all listed below; Tier 1–3 extracted or keyword-s
 - Shareholders do not have the protections associated with ownership of shares in an investment company registered under the Investment Company Act or the protections afforded by the CEA.
 - As the Sponsor and its management have limited history of operating investment vehicles like the Trust, their experience may be inadequate or unsuitable to manage the Trust.
 - The Trust ' s delivery or sale of ether to pay expenses or other operations of the Trust could result in Shareholders incurring tax liability without an associated distribution from the Trust.
-- Regulatory changes or interpretations could obligate the Trust, the Trustee or the Sponsor to register and comply with new regulations, resulting in potentially extraordinary, nonrecurring expenses to the Trust.
 
 ### `investor-documents/sec-edgar/10-Q_20260507_rpt20260331_acc0001437749_26_015531.htm`
 **Keyword snippets (related party, financials, segments):**
+- IncreaseDecreaseInAccountsPayableRelatedParties: -907680.0
+- IncreaseDecreaseInAccountsPayableRelatedParties: -177432.0
 - Cost of investment in ether: $10,674,287,156 and $12,538,047,760, respectively.
 - (Address of principal executive offices) (Zip Code)
 - Risk Factors
@@ -127,6 +129,7 @@ Documents in folder: **11** (all listed below; Tier 1–3 extracted or keyword-s
 
 ### `investor-documents/sec-edgar/10-Q_20250507_rpt20250331_acc0001437749_25_015164.htm`
 **Keyword snippets (related party, financials, segments):**
+- IncreaseDecreaseInAccountsPayableRelatedParties: -177432.0
 - Cost of investment in ether: $3,887,465,641 and $3,543,902,275, respectively.
 - (Address of principal executive offices) (Zip Code)
 - Risk Factors
@@ -154,6 +157,8 @@ Documents in folder: **11** (all listed below; Tier 1–3 extracted or keyword-s
 
 ### `investor-documents/sec-edgar/10-Q_20251106_rpt20250930_acc0001437749_25_033432.htm`
 **Keyword snippets (related party, financials, segments):**
+- IncreaseDecreaseInAccountsPayableRelatedParties: 2911532.0
+- IncreaseDecreaseInAccountsPayableRelatedParties: 84058.0
 - Cost of investment in ether: $13,483,951,930 and $3,543,902,275, respectively.
 - (Address of principal executive offices) (Zip Code)
 - Risk Factors
@@ -164,6 +169,8 @@ Documents in folder: **11** (all listed below; Tier 1–3 extracted or keyword-s
 
 ### `investor-documents/sec-edgar/10-Q_20250805_rpt20250630_acc0001437749_25_024883.htm`
 **Keyword snippets (related party, financials, segments):**
+- IncreaseDecreaseInAccountsPayableRelatedParties: 116736.0
+- IncreaseDecreaseInAccountsPayableRelatedParties: 420.0
 - Cost of investment in ether: $5,242,898,137 and $3,543,902,275, respectively.
 - (Address of principal executive offices) (Zip Code)
 - Risk Factors
@@ -174,6 +181,7 @@ Documents in folder: **11** (all listed below; Tier 1–3 extracted or keyword-s
 
 ### `investor-documents/sec-edgar/10-Q_20241107_rpt20240930_acc0001437749_24_033814.htm`
 **Keyword snippets (related party, financials, segments):**
+- IncreaseDecreaseInAccountsPayableRelatedParties: 84058.0
 - Cost of investment in ether: $1,157,342,168.
 - (Address of principal executive offices) (Zip Code)
 - Risk Factors
@@ -182,11 +190,10 @@ Documents in folder: **11** (all listed below; Tier 1–3 extracted or keyword-s
 - Net investment loss
 - Net investment loss ( 171,857 )
 - Coinbase Custody Trust Company, LLC (the "Ether Custodian") is responsible for safekeeping the ether owned by the Trust. The Ether Custodian is appointed by the Trustee.
-- 4 - Related Parties
-- The Sponsor and the Trustee are considered to be related parties to the Trust. The Trustee's fee is paid by the Sponsor and is not a separate expense of the Trust.
 
 ### `investor-documents/sec-edgar/10-Q_20240808_rpt20240630_acc0001437749_24_025407.htm`
 **Keyword snippets (related party, financials, segments):**
+- IncreaseDecreaseInAccountsPayableRelatedParties: 420.0
 - Cost of investment in ether is $10,000,000.
 - (Address of principal executive offices) (Zip Code)
 - Risk Factors
@@ -197,8 +204,6 @@ Documents in folder: **11** (all listed below; Tier 1–3 extracted or keyword-s
 - Coinbase Custody Trust Company, LLC (the "Ether Custodian") is responsible for safekeeping the ether owned by the Trust. The Ether Custodian is appointed by the Trustee.
 - 4 - Related Parties
 - The Sponsor and the Trustee are considered to be related parties to the Trust. The Trustee's fee is paid by the Sponsor and is not a separate expense of the Trust.
-- 8 - Investment Valuation
-- Unobservable inputs that are unobservable for the asset or liability, including the Trust's assumptions used in determining the fair value of investments.
 
 ### `investor-documents/sec-edgar/8-K_20260331_rpt20260327_acc0001437749_26_010477.htm`
 **Keyword snippets (related party, financials, segments):**

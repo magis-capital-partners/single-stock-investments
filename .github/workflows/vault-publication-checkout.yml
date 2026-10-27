@@ -1,0 +1,128 @@
+name: Vault publication checkout
+
+# Proves the publication-only vault checkout stays inside a standard runner.
+# The three scheduled loops use the same input. No manual dispatch: governance
+# allows schedule, pull_request, and repository events only.
+
+on:
+  pull_request:
+    branches: [main]
+    paths:
+      - ".github/actions/checkout-vault/**"
+      - ".github/actions/commit-main/**"
+      - ".github/workflows/memory-digest.yml"
+      - ".github/workflows/falsifier-resolution.yml"
+      - ".github/workflows/committee-outcomes.yml"
+      - ".github/workflows/vault-publication-checkout.yml"
+      - "_system/scripts/vault_publication_sparse.py"
+      - "_system/scripts/tests/test_vault_publication_checkout.py"
+      - "dashboard/private-assets.json"
+
+permissions:
+  contents: read
+
+jobs:
+  publication-objects:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    env:
+      RESEARCH_VAULT_CLONE_TOKEN: ${{ secrets.RESEARCH_VAULT_CLONE_TOKEN }}
+      RESEARCH_VAULT_ROOT: _external/research-vault
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.pull_request.head.sha || github.sha }}
+          fetch-depth: 1
+          filter: blob:none
+          sparse-checkout: |
+            /.github/actions/checkout-vault/
+            /_system/scripts/vault_publication_sparse.py
+            /_system/scripts/vault_paths.py
+            /_system/scripts/private_dashboard_assets.py
+            /dashboard/private-assets.json
+          sparse-checkout-cone-mode: false
+      - name: Checkout publication objects
+        uses: ./.github/actions/checkout-vault
+        with:
+          publication-only: "true"
+          hydrate: "false"
+      - name: Record the narrowed checkout
+        run: |
+          set -euo pipefail
+          vault=_external/research-vault
+          du -sh "$vault" "$vault/dashboard-private" "$vault/dashboard-private/objects"
+          df -h .
+          for banned in \
+            dashboard-private/company-source-backfill-v2 \
+            dashboard-private/investor-history \
+            dashboard-private/company-research-cache \
+            superinvestor-letters \
+            podcasts \
+            videos \
+            sumzero-research \
+            vic-research \
+            investment-wisdom \
+            dropbox-ingestion
+          do
+            if [ -e "$vault/$banned" ]; then
+              echo "::error::publication checkout included $banned"
+              exit 1
+            fi
+          done
+          python3 - <<'PY'
+          import json
+          import os
+          import sys
+          from pathlib import Path
+
+          sys.path.insert(0, "_system/scripts")
+          from private_dashboard_assets import digest, private_object
+
+          vault = Path("_external/research-vault")
+          size = sum(path.stat().st_size for path in vault.rglob("*") if path.is_file())
+          # Room must remain for the full single-stock tree plus hydration.
+          # The private repo is about 18 GiB; this cap rejects a checkout that
+          # pulled the extraction archive back in.
+          cap = 6 * 1024 ** 3
+          print(f"publication checkout bytes: {size}")
+          if size > cap:
+              raise SystemExit(f"publication checkout is {size} bytes, over the {cap} byte cap")
+          manifest = json.loads(Path("dashboard/private-assets.json").read_text(encoding="utf-8"))
+          shas = []
+          gzip_sha = None
+          objects = vault / "dashboard-private" / "objects"
+          for section in ("assets", "repository_assets"):
+              for entry in (manifest.get(section) or {}).values():
+                  sha = entry["private_sha256"]
+                  blob = objects / sha
+                  if sha not in shas:
+                      shas.append(sha)
+                  if gzip_sha is None:
+                      with blob.open("rb") as stream:
+                          if stream.read(2) == b"\x1f\x8b":
+                              gzip_sha = sha
+          sample = [shas[0], shas[-1]] if shas else []
+          if gzip_sha:
+              sample.append(gzip_sha)
+          seen = []
+          for sha in sample:
+              if sha in seen:
+                  continue
+              seen.append(sha)
+              restored = private_object(vault, sha)
+              if digest(restored) != sha:
+                  raise SystemExit("private object hash mismatch")
+          count = sum(1 for path in objects.iterdir() if path.is_file()) if objects.is_dir() else 0
+          text = (
+              "### Publication vault checkout\n"
+              f"- bytes: {size}\n"
+              f"- object files on disk: {count}\n"
+              f"- manifest objects: {len(shas)}\n"
+              f"- decoder checked: {len(seen)}\n"
+              "- excluded: company-source-backfill-v2, investor-history, "
+              "company-research-cache, letters, podcasts, videos, sumzero, vic, wisdom\n"
+          )
+          print(text)
+          with open(os.environ["GITHUB_STEP_SUMMARY"], "a", encoding="utf-8") as handle:
+              handle.write(text)
+          PY

@@ -1,10 +1,10 @@
 # PEG — Third-party source inventory
 
-**Date:** 2026-10-11
-**Sources:** 1 total (0 approved, 0 pending, 1 context)
+**Date:** 2026-10-25
+**Sources:** 0 total (0 approved, 0 pending, 0 context)
 
 | ID | Title | Path | Status | Use |
 |----|-------|------|--------|-----|
-| activist_short | Academic Studies Find That Retaliatory Lawsuits Against Shor | `_system/reference/activist-reports/grizzly/grizzly_2026-01-01_academic-studies-find-that-public-compan.html` | context | activist/short — publisher_site |
+| (none) | — | — | — | Primary filings only |
 
-Cross-check required: `PEG/research/cross_check_third_party_2026-10-11.md`
+Cross-check required: `PEG/research/cross_check_third_party_2026-10-25.md`

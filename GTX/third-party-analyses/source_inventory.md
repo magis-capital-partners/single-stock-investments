@@ -1,6 +1,6 @@
 # GTX — Third-party source inventory
 
-**Date:** 2026-10-11
+**Date:** 2026-10-25
 **Sources:** 316 total (0 approved, 0 pending, 316 context)
 
 | ID | Title | Path | Status | Use |
@@ -198,6 +198,8 @@
 | activist_long | Centerbridge Credit Partners Master, L.P — SC 13D/A | `GTX/third-party-analyses/activist_reports/long/SC-13D/A_20250530_acc0000895345_25_000201.xml` | context | activist/long — sec_edgar |
 | activist_long | Sessa Capital — DEFA14A | `GTX/third-party-analyses/activist_reports/long/DEFA14A_20230414_acc0001193125_23_102129.htm` | context | activist/long — sec_edgar |
 | activist_long | Sessa Capital — DEFA14A | `GTX/third-party-analyses/activist_reports/long/DEFA14A_20220415_acc0001193125_22_106274.htm` | context | activist/long — sec_edgar |
+| activist_long | acc0001193125 24 031076 | `GTX/third-party-analyses/activist_reports/long/8-K_20240212_acc0001193125_24_031076.htm` | context | activist/long — local |
+| activist_long | acc0001193125 21 145249 | `GTX/third-party-analyses/activist_reports/long/8-K_20210430_acc0001193125_21_145249.htm` | context | activist/long — local |
 | activist_long | acc0001193125 18 269183 | `GTX/third-party-analyses/activist_reports/long/8-K_20180907_acc0001193125_18_269183.htm` | context | activist/long — local |
 | activist_long | acc0001193125 18 273578 | `GTX/third-party-analyses/activist_reports/long/8-K_20180914_acc0001193125_18_273578.htm` | context | activist/long — local |
 | activist_long | acc0001193125 18 280079 | `GTX/third-party-analyses/activist_reports/long/8-K_20180921_acc0001193125_18_280079.htm` | context | activist/long — local |
@@ -255,7 +257,6 @@
 | activist_long | acc0001193125 21 128110 | `GTX/third-party-analyses/activist_reports/long/8-K_20210423_acc0001193125_21_128110.htm` | context | activist/long — local |
 | activist_long | acc0001193125 21 134457 | `GTX/third-party-analyses/activist_reports/long/8-K_20210427_acc0001193125_21_134457.htm` | context | activist/long — local |
 | activist_long | acc0001564590 21 021589 | `GTX/third-party-analyses/activist_reports/long/8-K_20210429_acc0001564590_21_021589.htm` | context | activist/long — local |
-| activist_long | acc0001193125 21 145249 | `GTX/third-party-analyses/activist_reports/long/8-K_20210430_acc0001193125_21_145249.htm` | context | activist/long — local |
 | activist_long | acc0001193125 21 148087 | `GTX/third-party-analyses/activist_reports/long/8-K_20210503_acc0001193125_21_148087.htm` | context | activist/long — local |
 | activist_long | acc0001193125 21 176966 | `GTX/third-party-analyses/activist_reports/long/8-K_20210528_acc0001193125_21_176966.htm` | context | activist/long — local |
 | activist_long | acc0001193125 21 177120 | `GTX/third-party-analyses/activist_reports/long/8-K_20210528_acc0001193125_21_177120.htm` | context | activist/long — local |
@@ -297,7 +298,6 @@
 | activist_long | acc0001735707 23 000072 | `GTX/third-party-analyses/activist_reports/long/8-K_20231024_acc0001735707_23_000072.htm` | context | activist/long — local |
 | activist_long | acc0001735707 23 000079 | `GTX/third-party-analyses/activist_reports/long/8-K_20231024_acc0001735707_23_000079.htm` | context | activist/long — local |
 | activist_long | acc0000950142 23 002916 | `GTX/third-party-analyses/activist_reports/long/8-K_20231207_acc0000950142_23_002916.htm` | context | activist/long — local |
-| activist_long | acc0001193125 24 031076 | `GTX/third-party-analyses/activist_reports/long/8-K_20240212_acc0001193125_24_031076.htm` | context | activist/long — local |
 | activist_long | acc0001735707 24 000010 | `GTX/third-party-analyses/activist_reports/long/8-K_20240215_acc0001735707_24_000010.htm` | context | activist/long — local |
 | activist_long | acc0001735707 24 000023 | `GTX/third-party-analyses/activist_reports/long/8-K_20240425_acc0001735707_24_000023.htm` | context | activist/long — local |
 | activist_long | acc0001735707 24 000031 | `GTX/third-party-analyses/activist_reports/long/8-K_20240507_acc0001735707_24_000031.htm` | context | activist/long — local |
@@ -322,4 +322,4 @@
 | activist_long | acc0000950157 26 000817 | `GTX/third-party-analyses/activist_reports/long/8-K_20260727_acc0000950157_26_000817.htm` | context | activist/long — local |
 | activist_long | acc0001735707 26 000025 | `GTX/third-party-analyses/activist_reports/long/8-K_20260729_acc0001735707_26_000025.htm` | context | activist/long — local |
 
-Cross-check required: `GTX/research/cross_check_third_party_2026-10-11.md`
+Cross-check required: `GTX/research/cross_check_third_party_2026-10-25.md`

@@ -1,4 +1,4 @@
-# BN — Insider conviction (2026-10-17)
+# BN — Insider conviction (2026-10-19)
 
 > Context only. Insider activity informs scenario confidence and stance discussion; it does not auto-inflate Lawrence base IRR. Promotion requires [HUMAN REVIEW].
 
@@ -12,8 +12,8 @@
 
 | Insider | Date | Shares | Price | Value | Contrib |
 |---------|------|--------|-------|-------|---------|
-| BROOKFIELD Corp /ON/ | 2026-08-20 | 115917 | $10.5257 | $1220107.57 | 1.698 |
-| BROOKFIELD Corp /ON/ | 2026-07-20 | 107584 | $10.365 | $1115108.16 | 1.359 |
+| BROOKFIELD Corp /ON/ | 2026-08-20 | 115917 | $10.5257 | $1220107.57 | 1.67 |
+| BROOKFIELD Corp /ON/ | 2026-07-20 | 107584 | $10.365 | $1115108.16 | 1.336 |
 | Brookfield Asset Management Ltd. | 2026-01-21 | 104268 | $10.431 | $1087619.51 | 1.284 |
 | BROOKFIELD Corp /ON/ | 2026-04-20 | 105505 | $10.3726 | $1094361.16 | 1.28 |
 | Brookfield Asset Management Ltd. | 2026-02-20 | 105895 | $10.3778 | $1098957.13 | 1.234 |

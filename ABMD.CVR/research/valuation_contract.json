@@ -11,9 +11,9 @@
     "reason": "Model must be stock-specific and evidence-clear before committee review."
   },
   "ticker": "ABMD.CVR",
-  "as_of": "2026-10-17",
+  "as_of": "2026-10-29",
   "dates": {
-    "model_as_of": "2026-10-17",
+    "model_as_of": "2026-10-29",
     "latest_fact_as_of": null,
     "oldest_fact_as_of": null,
     "price_as_of": null
@@ -134,7 +134,7 @@
     },
     "decision_rule": "Power Zones select the fitting economic method and eligible independent reviewers; they never choose the valuation answer or capital decision.",
     "ticker": "ABMD.CVR",
-    "as_of": "2026-10-17",
+    "as_of": "2026-10-29",
     "route_source": "canonical_power_zone_router",
     "config_path": "_system/frameworks/power_zones.json",
     "config_updated": "2026-07-14",
@@ -168,8 +168,8 @@
         }
       ]
     },
-    "input_hash": "b91992c32dbfa1e24223106c7cfa09c05e93a29ae0620d6771104b577acd11d3",
-    "generated_at": "2026-10-17T07:16:28.961724+00:00"
+    "input_hash": "ec31af4c4a37e9ce316fd875ab6722aeefdf9d7b3f7175aed1d9d276267e82b5",
+    "generated_at": "2026-10-29T09:16:40.602364+00:00"
   },
   "market": {
     "price_per_share": null,
@@ -294,12 +294,75 @@
     ]
   },
   "change_control": {
-    "model_hash": "5224bd2642b354851698af6e1447ebab18b4956ac83d9243ad738aa37ce7725c",
+    "model_hash": "83e55086715ccedfe68a7c5971a7f376b517f1f22acc5044145f1c533da152a0",
     "method_versions": [],
     "change_log": [],
     "rule": "A source fact is locked. Every assumption change requires a reason, author, timestamp, and before/after value."
   },
   "decision_rule": "Proof status and investment readiness are separate. Every material claim must be valued exactly once by a valid calculation proof, every evidence blocker must be resolved, and the model must be stock-specific before committee review. Only a human decision can authorize capital.",
+  "shared_forecast": {
+    "schema_version": "1.0",
+    "method_version": "shared-valuation-forecast/1.3",
+    "ticker": "ABMD.CVR",
+    "status": "sync_gap",
+    "research_only": true,
+    "requires_human_review": false,
+    "capital_actionable": false,
+    "as_of": "2026-10-29",
+    "model_as_of": "2026-10-29",
+    "quote": {},
+    "forecast_hash": null,
+    "forward_irr_pct": {
+      "low": null,
+      "base": null,
+      "high": null
+    },
+    "present_value_today_per_share": {
+      "low": null,
+      "base": null,
+      "high": null
+    },
+    "model_present_value_per_share": {
+      "low": null,
+      "base": null,
+      "high": null
+    },
+    "required_return_pct": {
+      "low": null,
+      "base": null,
+      "high": null
+    },
+    "forward_cashflow_schedule": {},
+    "buy_prices": [],
+    "components": [],
+    "gaps": [
+      {
+        "code": "listing_calendar_or_completed_close_unverified"
+      },
+      {
+        "code": "corporate_action_history_unverified"
+      }
+    ],
+    "warnings": [],
+    "source_refs": [],
+    "next_action": "automatic_source_refresh",
+    "reconciliation": {
+      "passed": false
+    },
+    "settlement_policy": "Explicit cash/debt additions in an operating DCF are time-zero acquisition adjustments; hypothetical settlement, not declared dividends.",
+    "financial_period": null,
+    "market_sync": {
+      "status": "updating",
+      "price_as_of": null,
+      "financial_period": null,
+      "model_as_of": "2026-10-29",
+      "price_policy": "latest_completed_exchange_session",
+      "basis_id": null,
+      "latest_report": {}
+    },
+    "assumptions_as_of": "2026-10-29",
+    "calculation_id": "7dfe6e54e19f015dd33874c67d8bba9b0b8e7dee5df08539583151e650afec96"
+  },
   "authority": "universal_valuation_contract",
   "model_scaffold_ref": "ABMD.CVR/research/valuation_model_scaffold.json",
   "next_action": "Gather the listed primary evidence and compile the first proof-complete component model; never substitute an analyst plug.",

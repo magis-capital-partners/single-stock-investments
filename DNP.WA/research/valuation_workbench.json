@@ -1,7 +1,7 @@
 {
   "schema_version": "3.0",
   "ticker": "DNP.WA",
-  "as_of": "2026-10-16",
+  "as_of": "2026-10-27",
   "proof_status": "evidence_blocked",
   "model_level": "evidence_blocked",
   "model_level_reason": "Prospective falsifier coverage is incomplete.",
@@ -15,7 +15,9 @@
     "model_as_of": "2026-07-27",
     "latest_fact_as_of": "2026-07-27",
     "oldest_fact_as_of": "2025-12-31",
-    "price_as_of": "2026-07-27"
+    "price_as_of": "2026-07-27",
+    "forecast_as_of": "2026-07-27",
+    "calculation_as_of": "2026-07-27"
   },
   "legacy_audit": {
     "actionable": false,
@@ -70,18 +72,20 @@
       "high": null
     },
     "forward_return_status": "withheld",
-    "forward_return_reason": "model maturity is not eligible to publish a return",
+    "forward_return_reason": "shared_forecast_incomplete",
     "required_return_pct": 9.0,
     "downside_to_low_pct": -40.89,
     "unvalued_component_count": 0,
     "unresolved_evidence_count": 0,
     "proof_complete_pct": 100.0,
-    "model_hash": "a4aa5143f1001a871b5dc69b915ccb699b2333b049e25fbd5bba488902c86015",
+    "model_hash": "a2a5652552a206c98291df107766278ef3c1717075f2192aae8a3470726cdc58",
     "dates": {
       "model_as_of": "2026-07-27",
       "latest_fact_as_of": "2026-07-27",
       "oldest_fact_as_of": "2025-12-31",
-      "price_as_of": "2026-07-27"
+      "price_as_of": "2026-07-27",
+      "forecast_as_of": "2026-07-27",
+      "calculation_as_of": "2026-07-27"
     },
     "legacy_audit": {
       "actionable": false,
@@ -102,7 +106,11 @@
     },
     "primary_power_zone": "High-return compounder",
     "owner_decision": null,
-    "next_action": "Freeze the evidence packet and select three method-independent raters."
+    "next_action": "Freeze the evidence packet and select three method-independent raters.",
+    "forecast_id": "9016e257d8793f8ab70496821ebf289adc1d47283dab5002430265f3e0e1fec1",
+    "calculation_status": "model_gap",
+    "research_return_available": false,
+    "calculation_reason": "realization_timing_missing:pipeline_value_per_share; realization_timing_missing:value_per_share; realization_timing_missing:cycle_reserve_per_share"
   },
   "business": {
     "status": "complete",
@@ -1442,8 +1450,8 @@
                   "ref": "DNP.WA/research/valuation.json",
                   "locator": "inputs.price",
                   "as_of": "2026-07-27",
-                  "content_sha256": "e58e6358d32094838391e58b551840186429bacb5e64a36ac4a78d8cf223a01e",
-                  "source_id": "b8365d6722974c0efda74e71598a6a2434f24d2dc3db35b9f186b69129c2ca06"
+                  "content_sha256": "e7ef9bbb04cdb0cb998098c249b106c62c4821a18a670d4a9d68380197f46bd3",
+                  "source_id": "380bcfb91decf44cc691be82f9b7a8711f55a25dd32f543b002d73804dea75fb"
                 },
                 "rationale": null
               },
@@ -1482,8 +1490,8 @@
                   "ref": "DNP.WA/research/valuation.json",
                   "locator": "inputs.price",
                   "as_of": "2026-07-27",
-                  "content_sha256": "e58e6358d32094838391e58b551840186429bacb5e64a36ac4a78d8cf223a01e",
-                  "source_id": "b8365d6722974c0efda74e71598a6a2434f24d2dc3db35b9f186b69129c2ca06"
+                  "content_sha256": "e7ef9bbb04cdb0cb998098c249b106c62c4821a18a670d4a9d68380197f46bd3",
+                  "source_id": "380bcfb91decf44cc691be82f9b7a8711f55a25dd32f543b002d73804dea75fb"
                 },
                 "rationale": null
               },
@@ -1522,8 +1530,8 @@
                   "ref": "DNP.WA/research/valuation.json",
                   "locator": "inputs.price",
                   "as_of": "2026-07-27",
-                  "content_sha256": "e58e6358d32094838391e58b551840186429bacb5e64a36ac4a78d8cf223a01e",
-                  "source_id": "b8365d6722974c0efda74e71598a6a2434f24d2dc3db35b9f186b69129c2ca06"
+                  "content_sha256": "e7ef9bbb04cdb0cb998098c249b106c62c4821a18a670d4a9d68380197f46bd3",
+                  "source_id": "380bcfb91decf44cc691be82f9b7a8711f55a25dd32f543b002d73804dea75fb"
                 },
                 "rationale": null
               },
@@ -1558,8 +1566,8 @@
               "ref": "DNP.WA/research/valuation.json",
               "locator": "inputs.price",
               "as_of": "2026-07-27",
-              "content_sha256": "e58e6358d32094838391e58b551840186429bacb5e64a36ac4a78d8cf223a01e",
-              "source_id": "b8365d6722974c0efda74e71598a6a2434f24d2dc3db35b9f186b69129c2ca06"
+              "content_sha256": "e7ef9bbb04cdb0cb998098c249b106c62c4821a18a670d4a9d68380197f46bd3",
+              "source_id": "380bcfb91decf44cc691be82f9b7a8711f55a25dd32f543b002d73804dea75fb"
             },
             {
               "node_id": "normalized_owner_cash",
@@ -1573,7 +1581,7 @@
             "passed": true,
             "errors": []
           },
-          "proof_hash": "28d9c30a1feadb2b3f1aa6176b2cb5c3d2683666df4da7a13e9438ec60ebab32"
+          "proof_hash": "8c308e9ab87f915b1acfb7e22be4329a72879bac5359c422977fd49ee70f8309"
         },
         "evidence_tier": "primary_derived",
         "evidence_level": "primary_derived",
@@ -1650,7 +1658,9 @@
       "model_as_of": "2026-07-27",
       "latest_fact_as_of": "2026-07-27",
       "oldest_fact_as_of": "2025-12-31",
-      "price_as_of": "2026-07-27"
+      "price_as_of": "2026-07-27",
+      "forecast_as_of": "2026-07-27",
+      "calculation_as_of": "2026-07-27"
     },
     "legacy_audit": {
       "actionable": false,
@@ -3075,8 +3085,8 @@
                   "ref": "DNP.WA/research/valuation.json",
                   "locator": "inputs.price",
                   "as_of": "2026-07-27",
-                  "content_sha256": "e58e6358d32094838391e58b551840186429bacb5e64a36ac4a78d8cf223a01e",
-                  "source_id": "b8365d6722974c0efda74e71598a6a2434f24d2dc3db35b9f186b69129c2ca06"
+                  "content_sha256": "e7ef9bbb04cdb0cb998098c249b106c62c4821a18a670d4a9d68380197f46bd3",
+                  "source_id": "380bcfb91decf44cc691be82f9b7a8711f55a25dd32f543b002d73804dea75fb"
                 },
                 "rationale": null
               },
@@ -3115,8 +3125,8 @@
                   "ref": "DNP.WA/research/valuation.json",
                   "locator": "inputs.price",
                   "as_of": "2026-07-27",
-                  "content_sha256": "e58e6358d32094838391e58b551840186429bacb5e64a36ac4a78d8cf223a01e",
-                  "source_id": "b8365d6722974c0efda74e71598a6a2434f24d2dc3db35b9f186b69129c2ca06"
+                  "content_sha256": "e7ef9bbb04cdb0cb998098c249b106c62c4821a18a670d4a9d68380197f46bd3",
+                  "source_id": "380bcfb91decf44cc691be82f9b7a8711f55a25dd32f543b002d73804dea75fb"
                 },
                 "rationale": null
               },
@@ -3155,8 +3165,8 @@
                   "ref": "DNP.WA/research/valuation.json",
                   "locator": "inputs.price",
                   "as_of": "2026-07-27",
-                  "content_sha256": "e58e6358d32094838391e58b551840186429bacb5e64a36ac4a78d8cf223a01e",
-                  "source_id": "b8365d6722974c0efda74e71598a6a2434f24d2dc3db35b9f186b69129c2ca06"
+                  "content_sha256": "e7ef9bbb04cdb0cb998098c249b106c62c4821a18a670d4a9d68380197f46bd3",
+                  "source_id": "380bcfb91decf44cc691be82f9b7a8711f55a25dd32f543b002d73804dea75fb"
                 },
                 "rationale": null
               },
@@ -3191,8 +3201,8 @@
               "ref": "DNP.WA/research/valuation.json",
               "locator": "inputs.price",
               "as_of": "2026-07-27",
-              "content_sha256": "e58e6358d32094838391e58b551840186429bacb5e64a36ac4a78d8cf223a01e",
-              "source_id": "b8365d6722974c0efda74e71598a6a2434f24d2dc3db35b9f186b69129c2ca06"
+              "content_sha256": "e7ef9bbb04cdb0cb998098c249b106c62c4821a18a670d4a9d68380197f46bd3",
+              "source_id": "380bcfb91decf44cc691be82f9b7a8711f55a25dd32f543b002d73804dea75fb"
             },
             {
               "node_id": "normalized_owner_cash",
@@ -3206,7 +3216,7 @@
             "passed": true,
             "errors": []
           },
-          "proof_hash": "28d9c30a1feadb2b3f1aa6176b2cb5c3d2683666df4da7a13e9438ec60ebab32"
+          "proof_hash": "8c308e9ab87f915b1acfb7e22be4329a72879bac5359c422977fd49ee70f8309"
         },
         "evidence_tier": "primary_derived",
         "evidence_level": "primary_derived",
@@ -3273,7 +3283,7 @@
       },
       "all_material_components_priced": true,
       "calculation_errors": [],
-      "aggregate_proof_hash": "90e5668d07279a146395258bc5cb1f7173d6ca31045a168e019ef1a6f91a3848"
+      "aggregate_proof_hash": "c2a16bd21d7691620f69e4ae2321d18cc2a3101a7a33de404b0f1bf3f80c0835"
     },
     "model_checks": {
       "calculation_graphs_valid": true,
@@ -3349,8 +3359,8 @@
         "ref": "DNP.WA/research/valuation.json",
         "locator": "inputs.price",
         "as_of": "2026-07-27",
-        "content_sha256": "e58e6358d32094838391e58b551840186429bacb5e64a36ac4a78d8cf223a01e",
-        "source_id": "b8365d6722974c0efda74e71598a6a2434f24d2dc3db35b9f186b69129c2ca06"
+        "content_sha256": "e7ef9bbb04cdb0cb998098c249b106c62c4821a18a670d4a9d68380197f46bd3",
+        "source_id": "380bcfb91decf44cc691be82f9b7a8711f55a25dd32f543b002d73804dea75fb"
       },
       {
         "component_id": "cycle_reserve",
@@ -3362,7 +3372,7 @@
       }
     ],
     "change_control": {
-      "model_hash": "a4aa5143f1001a871b5dc69b915ccb699b2333b049e25fbd5bba488902c86015",
+      "model_hash": "a2a5652552a206c98291df107766278ef3c1717075f2192aae8a3470726cdc58",
       "method_versions": [
         "midcycle_capacity_value@1.0",
         "net_asset_value@1.0",
@@ -3561,21 +3571,35 @@
     "drivers": [],
     "category_totals_per_share": {},
     "unexplained_per_share": null,
-    "explanation": "The current component schedule is the first decision-grade baseline; attribution begins with the next dated valuation snapshot."
+    "explanation": "The current component schedule is the first decision-grade baseline; attribution begins with the next dated valuation snapshot.",
+    "tci_irr": {
+      "status": "available",
+      "method": "price_then_fcf_then_growth_then_multiple",
+      "unit": "percentage_points_per_year",
+      "total_delta_pp": 0.0,
+      "price_pp": 0.0,
+      "fcf_pp": 0.0,
+      "growth_pp": 0.0,
+      "multiple_pp": 0.0,
+      "residual_pp": 0.0,
+      "prior_snapshot": "valuation_history/valuation_2026-07-27.json"
+    }
   },
   "freshness": {
     "status": "stale",
-    "as_of": "2026-10-16",
+    "as_of": "2026-10-27",
     "dates": {
       "model_as_of": "2026-07-27",
       "latest_fact_as_of": "2026-07-27",
       "oldest_fact_as_of": "2025-12-31",
-      "price_as_of": "2026-07-27"
+      "price_as_of": "2026-07-27",
+      "forecast_as_of": "2026-07-27",
+      "calculation_as_of": "2026-07-27"
     },
     "age_days": {
-      "model_as_of": 81,
-      "latest_fact_as_of": 81,
-      "price_as_of": 81
+      "model_as_of": 92,
+      "latest_fact_as_of": 92,
+      "price_as_of": 92
     },
     "review_threshold_days": {
       "model_as_of": 365,
@@ -3583,7 +3607,7 @@
       "price_as_of": 7
     },
     "warnings": [
-      "price_as_of is 81 days old (review threshold 7)"
+      "price_as_of is 92 days old (review threshold 7)"
     ],
     "rule": "Freshness is disclosed separately from proof completeness; stale or undated inputs require review before a new capital decision."
   }

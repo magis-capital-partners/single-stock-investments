@@ -2888,7 +2888,7 @@
     ]
   },
   "change_control": {
-    "model_hash": "ad5925adbba7485287d3ba6218dd7f3d52bd68da0df15f7304958efa0f71aeef",
+    "model_hash": "8be5bf327f1db896b42da8f9247fa9be97e12dc12b7eb28e590e776df2b32282",
     "method_versions": [
       "net_asset_value@1.0",
       "owner_cash_or_dividend_discount@1.0",
@@ -2898,6 +2898,178 @@
     "rule": "A source fact is locked. Every assumption change requires a reason, author, timestamp, and before/after value."
   },
   "decision_rule": "Proof status and investment readiness are separate. Every material claim must be valued exactly once by a valid calculation proof, every evidence blocker must be resolved, and the model must be stock-specific before committee review. Only a human decision can authorize capital.",
+  "shared_forecast": {
+    "schema_version": "1.0",
+    "method_version": "shared-valuation-forecast/1.1",
+    "ticker": "QDEL",
+    "status": "model_gap",
+    "research_only": true,
+    "requires_human_review": false,
+    "capital_actionable": false,
+    "as_of": "2026-08-31",
+    "model_as_of": "2026-07-21",
+    "quote": {
+      "value": 14.43,
+      "as_of": "2026-08-31",
+      "source_url": "Yahoo QDEL close 2026-08-31",
+      "currency": null
+    },
+    "forecast_hash": "59fc2826887443e0c4c07b553b6bac83af3720df0586538e408c4e959a312226",
+    "forward_irr_pct": {
+      "low": null,
+      "base": null,
+      "high": null
+    },
+    "present_value_today_per_share": {
+      "low": null,
+      "base": null,
+      "high": null
+    },
+    "model_present_value_per_share": {
+      "low": null,
+      "base": null,
+      "high": null
+    },
+    "required_return_pct": {
+      "low": null,
+      "base": null,
+      "high": null
+    },
+    "forward_cashflow_schedule": {},
+    "buy_prices": [],
+    "components": [
+      {
+        "component_id": "core_diagnostics_engine",
+        "method": "owner_cash_or_dividend_discount",
+        "status": "available",
+        "present_value_per_share": {
+          "low": 4.8297,
+          "base": 7.5802,
+          "high": 10.3391
+        }
+      },
+      {
+        "component_id": "product_and_pipeline_options",
+        "method": "risk_adjusted_milestone_value",
+        "status": "model_gap",
+        "present_value_per_share": {
+          "low": 0.0
+        }
+      },
+      {
+        "component_id": "net_financial_claims",
+        "method": "net_asset_value",
+        "status": "model_gap",
+        "present_value_per_share": {}
+      },
+      {
+        "component_id": "downside_reserve",
+        "method": "net_asset_value",
+        "status": "model_gap",
+        "present_value_per_share": {}
+      }
+    ],
+    "gaps": [
+      {
+        "component_id": "product_and_pipeline_options",
+        "case": "base",
+        "code": "realization_timing_missing:incremental_option_per_share"
+      },
+      {
+        "component_id": "product_and_pipeline_options",
+        "case": "high",
+        "code": "realization_timing_missing:incremental_option_per_share"
+      },
+      {
+        "component_id": "net_financial_claims",
+        "case": "low",
+        "code": "realization_timing_missing:near_term_owner_cash_claim_m"
+      },
+      {
+        "component_id": "net_financial_claims",
+        "case": "base",
+        "code": "realization_timing_missing:near_term_owner_cash_claim_m"
+      },
+      {
+        "component_id": "net_financial_claims",
+        "case": "high",
+        "code": "realization_timing_missing:near_term_owner_cash_claim_m"
+      },
+      {
+        "component_id": "downside_reserve",
+        "case": "low",
+        "code": "realization_timing_missing:value_per_share"
+      },
+      {
+        "component_id": "downside_reserve",
+        "case": "base",
+        "code": "realization_timing_missing:value_per_share"
+      },
+      {
+        "component_id": "downside_reserve",
+        "case": "high",
+        "code": "realization_timing_missing:value_per_share"
+      }
+    ],
+    "warnings": [],
+    "source_refs": [
+      {
+        "node_id": "labs_revenue_m",
+        "ref": "QDEL/investor-documents/sec-edgar/10-K_20260219_rpt20251228_acc0001906324_26_000008.htm",
+        "locator": "Labs revenue $1,505.7M (+4.5% YoY) FY2025 segment note",
+        "as_of": "2025-12-28",
+        "source_id": "df3ef1942801411b380cdc2e858a339c20b987525c3176f5624073d37a30dec9"
+      },
+      {
+        "node_id": "ih_revenue_m",
+        "ref": "QDEL/investor-documents/sec-edgar/10-K_20260219_rpt20251228_acc0001906324_26_000008.htm",
+        "locator": "Immunohematology revenue $543.8M (+3.1% YoY) FY2025 segment note",
+        "as_of": "2025-12-28",
+        "source_id": "d5c90a6102d6c8c809a96e138e735e34cf6626cf3008ab34736cdc7a593891b5"
+      },
+      {
+        "node_id": "consolidated_ebitda_m",
+        "ref": "QDEL/investor-documents/sec-edgar/10-K_20260219_rpt20251228_acc0001906324_26_000008.htm",
+        "locator": "Adjusted EBITDA $597.0M (21.9% margin) FY2025",
+        "as_of": "2025-12-28",
+        "source_id": "b7a3f9b81ef747313c53842321eea5e1675ce50f31d30c1624893e7aaf29f222"
+      },
+      {
+        "node_id": "guided_ebitda_mid_m",
+        "ref": "QDEL/investor-documents/ir-quidelortho/QuidelOrtho-First-Quarter-2026-Earnings-Presentation_050526_vfinal.pdf",
+        "locator": "FY2026 adjusted EBITDA guidance $615M to $630M",
+        "as_of": "2026-03-29",
+        "source_id": "e46527f9ea43d196d4be5c720a51727229161313eab3295b28c955cb69abaf15"
+      },
+      {
+        "node_id": "shares_m",
+        "ref": "QDEL/investor-documents/sec-edgar/10-K_20260219_rpt20251228_acc0001906324_26_000008.htm",
+        "locator": "Weighted average diluted shares 67.8M FY2025",
+        "as_of": "2025-12-28",
+        "source_id": "a49e16cec8f4357a48f54d288f5af564d55f863e3861fbabc36e863f247fec7b"
+      },
+      {
+        "node_id": "poc_revenue_m",
+        "ref": "QDEL/investor-documents/sec-edgar/10-K_20260219_rpt20251228_acc0001906324_26_000008.htm",
+        "locator": "Point of Care revenue $601.6M (-13.4% YoY) FY2025",
+        "as_of": "2025-12-28",
+        "source_id": "49f948d8bf335322a35414a913f7b26bf0973055e60d8a3f75f9aa7f99a6e745"
+      },
+      {
+        "node_id": "molecular_revenue_m",
+        "ref": "QDEL/investor-documents/sec-edgar/10-K_20260219_rpt20251228_acc0001906324_26_000008.htm",
+        "locator": "Molecular revenue $26.5M FY2025",
+        "as_of": "2025-12-28",
+        "source_id": "8d0545936c4266ea3e19bca2857817e85b532619352bacf6295a44abe65716f2"
+      }
+    ],
+    "next_action": "automatic_model_refresh",
+    "reconciliation": {
+      "passed": false
+    },
+    "settlement_policy": "Explicit cash/debt additions in an operating DCF are time-zero acquisition adjustments; hypothetical settlement, not declared dividends.",
+    "calculation_id": "7404b3a3448822be58d36aad7cdd36bed84eb79cfddcc9aaba347064af24aed3"
+  },
   "authority": "universal_valuation_contract",
   "legacy_reference_present": true,
   "falsifier_coverage": {

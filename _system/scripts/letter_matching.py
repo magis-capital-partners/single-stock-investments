@@ -75,6 +75,7 @@ ACTION_PATTERNS: list[tuple[str, re.Pattern[str]]] = [
     ("add", re.compile(r"\b(added|increased|accumulat\w*|bought more|topped up|built up)\b", re.I)),
     ("trim", re.compile(r"\b(trimmed|reduced|pared|lightened|sold down|took profits)\b", re.I)),
     ("exit", re.compile(r"\b(exited|eliminated|closed|sold out|fully sold|divested)\b", re.I)),
+    ("sell", re.compile(r"\bsold\b", re.I)),
     ("short", re.compile(r"\b(short(?:ed|ing)?|put position|bearish bet)\b", re.I)),
     ("buy", re.compile(r"\b(purchased|bought|acquired)\b", re.I)),
 ]
@@ -102,7 +103,7 @@ TABLE_CHANGE_MAP = {
     "trimmed": "trim",
     "trim": "trim",
     "reduced": "trim",
-    "sold": "exit",
+    "sold": "sell",
     "exit": "exit",
     "closed": "exit",
     "hold": "hold",
@@ -741,23 +742,73 @@ def _semantic_entity_allowed(
     return True
 
 
+NON_ISSUER_SENSES = {
+    "AAPL": r"\b(?:another |a )?bite at the apple\b",
+    "BKNG": r"\bbooking\s+(?:(?:nearly|almost|a|an|the)\s+)*(?:[0-9.,%]+\s+)?(?:gain|profit|loss)\b",
+    "CCL": r"\b(?:Carnival Group|CCL Products)\b",
+    "CPT": r"\bCopper Property (?:Pass Through )?Trust\s*\(?CPT\)?|\bCPT\s*\([^)]*Copper Property[^)]*\)",
+    "CRH": r"\bCorporate Risk Holdings(?: LLC)?\s*\(?CRH\)?|\bCRH\s*\([^)]*Corporate Risk[^)]*\)",
+    "CRM": r"\bCRM (?:software|systems?|market|category)\b",
+    "CVS": r"\bCVS Group\b",
+    "EQT": r"\bEQT Partners\b",
+    "ETN": r"\bETF/ETN\b",
+    "EVO.ST": r"\bevolution of (?:these|the|our) (?:exposures|positions|portfolio)\b",
+    "FTC.L": r"\bFederal Trade Commission\s*\(?FTC\)?|\bFTC\s*\(Federal Trade Commission\)",
+    "LIN": r"\bLIN TV\b",
+    "MOS": r"\binvestment mosaic\b",
+    "MPC": r"\bMPC Containerships\b",
+    "NTRS": r"\b(?:Northern Data|northern Illinois)\b",
+    "PEG": r"\bPEG (?:ratio|multiple)\b|\bPrice.to.EBITDA Growth\s*\(?PEG\)?",
+    "SOC": r"\bSumitomo Osaka Cement\s*\(?SOC\)?",
+    "XYZ": r"\b(?:a |the |large |small )?block of (?:shares|stock)\b",
+    "RYN": r"\bRayonier Advanced Materials\b",
+    "WMT": r"\bWalmart de M[eé]xico\b",
+}
+
+
+def _issuer_spans(text: str, ticker: str, spans: list[int]) -> list[int]:
+    """Exclude a wrong sense at that mention, without erasing a true issuer elsewhere."""
+    pattern = NON_ISSUER_SENSES.get(ticker)
+    if not pattern:
+        return spans
+    wrong = list(re.finditer(pattern, text, re.I))
+    return [pos for pos in spans if not any(m.start() <= pos < m.end() for m in wrong)]
+
+
 def _relation_action(text: str, pos: int) -> str | None:
     """Classify only fund-to-security actions in the same local clause."""
-    start = max(0, pos - 150)
-    end = min(len(text), pos + 150)
+    # A neighbouring sentence or a subsequent coordinated trade cannot lend
+    # its verb to this issuer ("bought TJX and sold Copart"). A sale alone does
+    # not establish a complete exit.
+    raw_start, raw_end = max(0, pos - 300), min(len(text), pos + 220)
+    boundaries = [(raw_start + m.start(), raw_start + m.end()) for m in re.finditer(r"[;!?]|\.(?=\s+[A-Z]|$)", text[raw_start:raw_end])]
+    start = max([raw_start] + [end for _start, end in boundaries if end <= pos])
+    end = min([raw_end] + [start for start, _end in boundaries if start > pos])
     snippet = text[start:end]
     local_pos = pos - start
-    candidates: list[tuple[int, str]] = []
+    candidates: list[tuple[int, int, str]] = []
     for action, pattern in ACTION_PATTERNS:
         for match in pattern.finditer(snippet):
             distance = min(abs(match.start() - local_pos), abs(match.end() - local_pos))
             if distance > 100:
                 continue
+            before = match.start() < local_pos
+            prefix = snippet[:match.start()]
+            if action == "sell" and (re.search(r"\bfully\s+$", prefix, re.I) or re.match(r"\s+(?:out|down)\b", snippet[match.end():], re.I)):
+                continue
+            if re.search(r"\b(?:not|never|would|could|might|may|will|intend to|plan to|didn't)\s+(?:\w+\s+){0,2}$", prefix, re.I):
+                continue
+            # A following verb belongs to the next issuer unless this is an
+            # explicit passive position construction: "X was sold".
+            if not before and not re.search(r"\b(?:was|were|has been|have been)\s+(?:fully\s+)?$", prefix[local_pos:], re.I):
+                continue
             clause_start = max(0, min(match.start(), local_pos) - 70)
             clause_end = min(len(snippet), max(match.end(), local_pos) + 70)
             clause = snippet[clause_start:clause_end]
             if action == "short":
-                if not re.search(r"\b(?:our short|we short(?:ed)?|short position|short holding)\b", clause, re.I):
+                if not before or not re.search(r"\b(?:our short|we short(?:ed)?|short position|short holding)\b", snippet[match.start():local_pos] if match.group().lower() == "short" else snippet, re.I):
+                    continue
+                if re.search(r"\b(?:long position|long holding|long book)\b", snippet[match.end():local_pos], re.I):
                     continue
             else:
                 actor_prefix = snippet[max(0, match.start() - 45) : match.start()]
@@ -769,6 +820,8 @@ def _relation_action(text: str, pos: int) -> str | None:
                         re.I,
                     )
                 )
+                actor_direct = actor_direct or (before and bool(re.search(
+                    r"\b(?:we|the fund|our fund|our portfolio)\b[^.!?;]{0,150}\band\s+$", snippet[:match.start()], re.I)))
                 between = snippet[min(match.end(), local_pos) : max(match.start(), local_pos)]
                 position_link = bool(
                     re.search(r"\b(?:position|holding|stake|shares)\b", between, re.I)
@@ -786,8 +839,10 @@ def _relation_action(text: str, pos: int) -> str | None:
                 )
                 if not (actor_direct or position_link):
                     continue
-            candidates.append((distance, {"buy": "add"}.get(action, action)))
-    return min(candidates, default=(0, None), key=lambda row: row[0])[1]
+            # Prefer the last preceding verb, then the longer phrase ("sold
+            # out" must beat plain "sold"). Never prefer a nearby later verb.
+            candidates.append((match.start() if before else -1000-distance, match.end()-match.start(), {"buy": "add"}.get(action, action)))
+    return max(candidates, default=(0, 0, None), key=lambda row: row[:2])[2]
 
 
 def _classify_action(window: str) -> str | None:
@@ -1038,16 +1093,23 @@ def match_letter(text: str, master: SecurityMaster, as_of: str | None = None) ->
     # --- finalize each candidate ---
     mentions: list[dict] = []
     for ticker, b in cand.items():
+        b["spans"] = _issuer_spans(text, ticker, b["spans"])
+        if not b["spans"]:
+            continue
         if not _semantic_entity_allowed(text, ticker, b, master, as_of):
             continue
         spans = sorted(set(b["spans"]))
         windows = [_window(text, p) for p in spans[:6]]
         action = b.get("table_action")
+        action_pos = None
         if not action:
             for pos in spans[:8]:
-                action = _relation_action(text, pos)
-                if action:
-                    break
+                candidate_action = _relation_action(text, pos)
+                if candidate_action:
+                    action = candidate_action
+                    # Later explicit trade context supersedes an earlier
+                    # holdings/performance mention or historical trade.
+                    action_pos = pos
         in_table = holdings_zone and any(
             HOLDINGS_HEADING_RE.search(text[max(0, p - 600):p]) for p in spans[:4]
         )
@@ -1059,6 +1121,8 @@ def match_letter(text: str, master: SecurityMaster, as_of: str | None = None) ->
         if in_table and b["tier"] != "A":
             b["tier"] = "B"
         evidence = _best_evidence(text, spans, ticker)
+        if action_pos is not None:
+            evidence = _window(text, action_pos, 220)
         mentions.append(
             {
                 "ticker": ticker,

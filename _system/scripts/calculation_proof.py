@@ -21,7 +21,7 @@ PRICED_STATUSES = {"calculated", "bounded_estimate"}
 ALL_STATUSES = PRICED_STATUSES | {"unpriced", "legacy_sensitivity"}
 OPS = {
     "add", "subtract", "multiply", "divide", "sum", "negative", "minimum",
-    "maximum", "power", "discount", "present_value",
+    "maximum", "power", "greater_equal", "discount", "present_value",
 }
 
 
@@ -108,6 +108,9 @@ def _apply(op: str, args: list[float], node: dict) -> float:
     if op == "power":
         if len(args) != 2: raise ValueError("power requires two arguments")
         return args[0] ** args[1]
+    if op == "greater_equal":
+        if len(args) != 2: raise ValueError("greater_equal requires two arguments")
+        return float(args[0] >= args[1])
     if op == "discount":
         if len(args) != 3: raise ValueError("discount requires value, rate, and years")
         if args[1] <= -1 or args[2] < 0: raise ValueError("invalid discount rate or years")
@@ -129,7 +132,7 @@ def _fmt(value: float) -> str:
 def _formula(node: dict, resolved: list[float]) -> tuple[str, str]:
     op = node["op"]
     args = node.get("args") or []
-    symbols = {"add": "+", "subtract": "-", "multiply": "×", "divide": "÷", "power": "^"}
+    symbols = {"add": "+", "subtract": "-", "multiply": "×", "divide": "÷", "power": "^", "greater_equal": "≥"}
     if op in symbols and len(args) == 2:
         return f"{args[0]} {symbols[op]} {args[1]}", f"{_fmt(resolved[0])} {symbols[op]} {_fmt(resolved[1])}"
     if op == "negative":

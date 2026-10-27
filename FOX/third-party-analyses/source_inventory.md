@@ -1,7 +1,7 @@
 # FOX — Third-party source inventory
 
-**Date:** 2026-10-11
-**Sources:** 81 total (0 approved, 0 pending, 81 context)
+**Date:** 2026-10-25
+**Sources:** 83 total (0 approved, 0 pending, 83 context)
 
 | ID | Title | Path | Status | Use |
 |----|-------|------|--------|-----|
@@ -12,8 +12,9 @@
 | activist_long | HoldCo Asset Management — SC 13D | `FOX/third-party-analyses/activist_reports/long/SC-13D_20250912_acc0000950170_25_114595.xml` | context | activist/long — sec_edgar |
 | activist_long | Cruden Financial Services LLC — SC 13G/A | `FOX/third-party-analyses/activist_reports/long/SC-13G/A_20250912_acc0000950172_25_000163.xml` | context | activist/long — sec_edgar |
 | activist_long | Elliott Management — PX14A6G | `FOX/third-party-analyses/activist_reports/long/PX14A6G_20211008_acc0001214659_21_010343.htm` | context | activist/long — sec_edgar |
-| activist_long | acc0001193125 19 076846 | `FOX/third-party-analyses/activist_reports/long/8-K_20190315_acc0001193125_19_076846.htm` | context | activist/long — local |
+| activist_long | acc0001193125 26 271101 | `FOX/third-party-analyses/activist_reports/long/8-K_20260615_acc0001193125_26_271101.htm` | context | activist/long — local |
 | activist_long | acc0001193125 19 079678 | `FOX/third-party-analyses/activist_reports/long/8-K_20190319_acc0001193125_19_079678.htm` | context | activist/long — local |
+| activist_long | acc0001193125 19 076846 | `FOX/third-party-analyses/activist_reports/long/8-K_20190315_acc0001193125_19_076846.htm` | context | activist/long — local |
 | activist_long | acc0001193125 19 081543 | `FOX/third-party-analyses/activist_reports/long/8-K_20190321_acc0001193125_19_081543.htm` | context | activist/long — local |
 | activist_long | acc0001193125 19 099978 | `FOX/third-party-analyses/activist_reports/long/8-K_20190408_acc0001193125_19_099978.htm` | context | activist/long — local |
 | activist_long | acc0001193125 19 122404 | `FOX/third-party-analyses/activist_reports/long/8-K_20190426_acc0001193125_19_122404.htm` | context | activist/long — local |
@@ -81,10 +82,11 @@
 | activist_long | acc0001628280 26 033145 | `FOX/third-party-analyses/activist_reports/long/8-K_20260511_acc0001628280_26_033145.htm` | context | activist/long — local |
 | activist_long | acc0001628280 26 042499 | `FOX/third-party-analyses/activist_reports/long/8-K_20260611_acc0001628280_26_042499.htm` | context | activist/long — local |
 | activist_long | acc0001193125 26 270285 | `FOX/third-party-analyses/activist_reports/long/8-K_20260615_acc0001193125_26_270285.htm` | context | activist/long — local |
-| activist_long | acc0001193125 26 271101 | `FOX/third-party-analyses/activist_reports/long/8-K_20260615_acc0001193125_26_271101.htm` | context | activist/long — local |
 | activist_long | acc0001193125 26 290605 | `FOX/third-party-analyses/activist_reports/long/8-K_20260630_acc0001193125_26_290605.htm` | context | activist/long — local |
 | activist_long | acc0001628280 26 053892 | `FOX/third-party-analyses/activist_reports/long/8-K_20260806_acc0001628280_26_053892.htm` | context | activist/long — local |
 | activist_long | acc0001193125 26 385979 | `FOX/third-party-analyses/activist_reports/long/8-K_20260909_acc0001193125_26_385979.htm` | context | activist/long — local |
 | activist_long | acc0001193125 26 415558 | `FOX/third-party-analyses/activist_reports/long/8-K_20261006_acc0001193125_26_415558.htm` | context | activist/long — local |
+| activist_long | acc0001193125 26 421830 | `FOX/third-party-analyses/activist_reports/long/8-K_20261014_acc0001193125_26_421830.htm` | context | activist/long — local |
+| activist_long | acc0001628280 26 066365 | `FOX/third-party-analyses/activist_reports/long/8-K_20261020_acc0001628280_26_066365.htm` | context | activist/long — local |
 
-Cross-check required: `FOX/research/cross_check_third_party_2026-10-11.md`
+Cross-check required: `FOX/research/cross_check_third_party_2026-10-25.md`

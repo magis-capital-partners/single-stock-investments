@@ -1,0 +1,1093 @@
+#!/usr/bin/env python3
+"""Build complete, private company source libraries; never uses brokerage services.
+
+Outputs belong under _private until copied into the authenticated Pages artifact.
+No summaries/Insights caps are used as inventory boundaries.
+"""
+from __future__ import annotations
+
+import argparse
+import hashlib
+from collections import Counter, defaultdict
+from datetime import datetime, timezone
+import json
+import os
+from pathlib import Path
+import re
+import subprocess
+import sys
+import time
+from urllib.parse import quote
+
+from company_sources import CATEGORIES, SOURCE_SUFFIXES, Matcher, SourceIndex, category, date_from, digest, extract, retain_previous, tokens
+from company_extract_formats import EXTRA_SUFFIXES
+
+ROOT = Path(__file__).resolve().parents[2]
+PUBLICATION_LAYOUT = 2
+CONTENT_BUNDLE_BYTES = 16_000_000
+TEXT_INLINE_BYTES = 1_000_000
+TEXT_CHUNK_CHARS = 4_000_000
+COMPANY_PAGE_ROWS = 1000
+COMPANY_PAGE_BYTES = 8_000_000
+VAULT_COLLECTIONS = ("superinvestor-letters", "vic-research", "sumzero-research", "investment-wisdom", "manager-meetings", "expert-calls", "expert_calls", "valueline", "podcasts", "videos", "dropbox-ingestion", "short-research", "activist-research", "filings-extracts")
+IGNORE_NAMES = {"README.md", "AGENTS.md", "SKILL.md", "INDEX.csv", "manifest.json", "catalog_manifest.jsonl", "DOWNLOAD_MANIFEST.json",
+                "insights.json", "letters_index.json", "drive_import_manifest.json", "drive_import_log.jsonl", "fetch_log.jsonl",
+                "duplicate_audit.json", "funds_unresolved.json", "funds.json", "manifest.csv", "sources.json"}
+SKIP_PARTS = {".git", "_eval", "tests", "__pycache__", "node_modules", "dashboard-private", "sec-edgar"}
+SHARED_MODELS = {
+    "_system/scripts/commodity_configs/crude.json": "Oil supply demand and inventory model assumptions",
+    "_system/scripts/commodity_configs/copper.json": "Copper supply demand and concentrate model assumptions",
+    "_system/scripts/commodity_configs/gold.json": "Gold monetary stock and price model assumptions",
+    "_system/scripts/commodity_configs/silver.json": "Silver supply demand and gold-linked price model assumptions",
+    "dashboard/data/energy_model.json": "Natural gas supply and demand model",
+    "dashboard/data/energy_btc_bridge.json": "Natural gas and Bitcoin mining sensitivity model",
+    "_system/scripts/energy_model_config.json": "Natural gas model assumptions and reference forecast",
+    "_system/scripts/btc_cost_of_production.py": "Bitcoin cost-of-production methodology",
+    "_system/scripts/energy_btc_bridge.py": "Natural gas and Bitcoin mining model methodology",
+    "_system/scripts/power_cost_model.py": "Electricity contract cost model methodology",
+}
+COMPANY_DATA_FOLDERS = {'fundamentals', 'operating_kpis', 'valuation_fundamentals', 'valuation_quotes', 'compounders', 'insider', 'returns', 'equity'}
+
+
+def market_data_owner(path: Path, companies: dict) -> list[str]:
+    """Only known ticker-file conventions establish ownership of numeric data."""
+    if path.parent.name not in COMPANY_DATA_FOLDERS:
+        return []
+    name = path.stem.upper()
+    if path.parent.name == 'insider':name = name.removesuffix('_TRANSACTIONS')
+    if path.parent.name == 'returns':name = name.replace('_', '.')
+    if path.parent.name == 'equity':name = re.sub(r'_(?:DAILY|WEEKLY|MONTHLY)_[A-Z]{3}$', '', name)
+    return [name] if name in companies else []
+
+
+def write(path: Path, value) -> None:
+    path.parent.mkdir(parents=True, exist_ok=True)
+    body = json.dumps(value, ensure_ascii=False, separators=(",", ":")) + "\n"
+    if path.is_file() and path.read_text(encoding="utf-8") == body:
+        return
+    temp = path.with_suffix(path.suffix + f".{os.getpid()}.tmp")
+    temp.write_text(body, encoding="utf-8")
+    for attempt in range(10):
+        try:
+            temp.replace(path);break
+        except PermissionError:
+            if attempt==9:raise
+            time.sleep(.05*(attempt+1))
+
+
+def io_path(path: Path):
+    # Long imported titles can exceed Windows' legacy path limit even though
+    # directory enumeration finds them. Preserve the logical path in links.
+    if os.name == 'nt' and len(str(path.absolute())) >= 248 and not str(path).startswith('\\\\?\\'):
+        absolute = str(path.absolute())
+        return Path('\\\\?\\UNC\\' + absolute[2:] if absolute.startswith('\\\\') else '\\\\?\\' + absolute)
+    return path
+
+
+def load(path: Path, default=None):
+    path = io_path(path)
+    return json.loads(path.read_text(encoding="utf-8-sig")) if path.is_file() else ({} if default is None else default)
+
+
+def write_mapping(root: Path, folder: str, values: dict) -> list[str]:
+    """Stable private cache shards also stay below GitHub's individual blob limit."""
+    groups = defaultdict(dict)
+    for key, value in values.items():
+        groups[digest(key)[:2]][key] = value
+    files = []
+    for prefix, group in sorted(groups.items()):
+        relative = f"{folder}/{prefix}.json"
+        write(root / relative, group)
+        files.append(relative)
+    return files
+
+
+def resolved(root: Path, relative: str):
+    """Read private snapshots without hydrating or overwriting the user's files."""
+    from private_dashboard_assets import private_source
+    path = root / relative
+    if not path.is_file():
+        return None
+    manifest = load(root / "dashboard/private-assets.json")
+    entries = manifest.get("assets", {}) if relative.startswith("dashboard/") else manifest.get("repository_assets", {})
+    key = relative.removeprefix("dashboard/") if relative.startswith("dashboard/") else relative
+    base = root / "dashboard" if relative.startswith("dashboard/") else root
+    if key in entries:
+        path = private_source(base, key, {"assets": entries})
+    return path
+
+
+def document(root: Path, relative: str):
+    path = resolved(root, relative)
+    result = load(path) if path else {}
+    if isinstance(result, dict) and result.get("private_snapshot"):
+        raise RuntimeError(f"Unresolved private input: {relative}")
+    return result
+
+
+def url_anchor(url: str) -> str:
+    match = re.search(r"(?:drive\.google\.com/file/d/|docs\.google\.com/(?:document|spreadsheets|presentation)/d/)([A-Za-z0-9_-]+)", url)
+    return "drive:" + match[1] if match else "url:" + url
+
+
+def safe_files(directory: Path):
+    if not directory.is_dir():
+        return
+    for folder, subdirs, names in os.walk(directory):
+        subdirs[:] = sorted(d for d in subdirs if d not in SKIP_PARTS and not d.startswith("."))
+        for name in sorted(names):
+            path = Path(folder) / name
+            if path.suffix.lower() in SOURCE_SUFFIXES | EXTRA_SUFFIXES and name not in IGNORE_NAMES and not name.endswith(".meta.json"):
+                yield path
+
+
+def read_companies(root: Path) -> dict:
+    registry = document(root, "_system/portfolio/registry.json")
+    companies = {str(t).upper(): row for book in ("watchlist", "holdings") for t, row in (registry.get(book) or {}).items()}
+    core = document(root, "dashboard/data/core.json")
+    for row in core.get("tickers", []):
+        if row.get("ticker"):
+            companies[row["ticker"]] = {**companies.get(row["ticker"], {}), **{k: row[k] for k in ("company", "market", "exchange", "display_ticker") if row.get(k)}}
+    # A new watchlist member must receive an archive before its valuation or
+    # ordinary coverage row is ready. Existing issuer identities take precedence.
+    compounders = load(root / "_system/reference/core_compounders.json")
+    for ticker in compounders.get("tickers", []):
+        name = compounders.get("issuers", {}).get(ticker, {}).get("display_name")
+        if name:
+            companies.setdefault(ticker, {"company": name})
+    if not companies:
+        raise RuntimeError("No company universe; refusing to publish an empty library")
+    return companies
+
+
+class Builder:
+    def __init__(self, root: Path, vault: Path | None, output: Path, cache: Path, *, companies=None):
+        self.root, self.vault, self.output, self.cache = root, vault, output, cache
+        self.companies = companies if companies is not None else read_companies(root)
+        master = document(root, "_system/reference/securities/security_master.json") if companies is None else {}
+        master = master.get("securities", master)
+        self.matcher = Matcher(self.companies, {t:master.get(t,{}) for t in self.companies})
+        self.index = SourceIndex()
+        self.receipts = []
+        self.good = set()
+        self.refs = defaultdict(list)
+        self.metadata = {}
+        self.company_metadata = {}
+        self.company_metadata_failed = set()
+        self.git_entries = None
+        self.file_failures = Counter()
+        self.now = datetime.now(timezone.utc).isoformat(timespec="seconds")
+        self.previous = load(cache / "index.json")
+        if self.previous.get("record_parts"):
+            self.previous["records"] = {}
+            for part in self.previous["record_parts"]:
+                self.previous["records"].update(load(cache / part))
+        self.previous_versions = {(r.get("family"), r.get("revision")):r for r in self.previous.get("records", {}).values() if r.get("revision")}
+        self.themes = load(Path(__file__).with_name("company_research_themes.json"), [])
+        # Consume the maintained business-driver map, with explicit issuer lists
+        # and rationale. Portfolio-wide wildcards and the legacy unreviewed
+        # linkage graph are deliberately ineligible as company sources.
+        curated = document(root, "_system/portfolio/holdings_themes.json").get("themes", {})
+        for theme_id, theme in curated.items():
+            tickers = [t for t in theme.get("tickers", []) if t != "*" and t in self.companies]
+            if tickers and theme.get("rationale"):
+                patterns = [re.escape(theme_id).replace("_", "[ _-]")]
+                for node in (root / "_system/reference/industry").glob("*.json"):
+                    if theme_id in load(node).get("linked_theme_ids", []):
+                        patterns.append(re.escape(node.stem).replace("_", "[ _-]"))
+                self.themes.append({"id": theme_id, "patterns": patterns, "tickers": tickers, "reason": theme["rationale"]})
+        self.seen = set()
+        identities = {t:{k:r.get(k) for k in ("company", "market", "exchange")} for t,r in self.companies.items()}
+        self.match_version = digest(json.dumps(identities, sort_keys=True) + json.dumps(master, sort_keys=True) + digest(Path(__file__).with_name("company_sources.py").read_bytes()))
+        match_manifest = load(cache / "matches.json")
+        self.matches = {}
+        if match_manifest.get("version") == self.match_version:
+            for part in match_manifest.get("parts", []):
+                self.matches.update(load(cache / part))
+
+    def receipt(self, name, count, status="complete", detail=None):
+        if self.file_failures[name]:
+            status, detail = "partial", f"{self.file_failures[name]} originals could not be read; discovery continued"
+        self.receipts.append({"collection": name, "discovered": count, "status": status, "checked_at": self.now, "detail": detail})
+        if status == "complete":
+            self.good.add(name)
+        print(f"Research inventory: {name}: {count} files ({status})", flush=True)
+
+    def add(self, record, anchors):
+        # Keep source bodies on disk. A full coverage run can contain many GB
+        # of filings; only the document currently being processed is resident.
+        body = record.pop("text", "")
+        record["text_length"] = len(body)
+        if body:
+            sha = digest(body)
+            path = self.cache / "published-text" / (sha + ".json")
+            if not path.is_file():
+                write(path, {"text": body})
+            record["text_cache"] = sha
+        key = self.index.add(record, anchors)
+        if record.get("extraction_review"):
+            self.index.records[key]["extraction_review"] = record["extraction_review"]
+        return key
+
+    def text(self, record):
+        if "text" in record:
+            return record["text"]
+        if record.get("text_cache"):
+            return load(self.cache / "published-text" / (record["text_cache"] + ".json")).get("text", "")
+        return ""
+
+    def source_words(self, record):
+        if not record.get("text_cache") and not record.get("text"):
+            return []
+        key = record.get("text_cache") or digest(record.get("text", ""))
+        path = self.cache / "words" / (key + ".json")
+        if path.is_file():
+            return load(path, [])
+        words = sorted(tokens(self.text(record)))
+        write(path, words)
+        return words
+
+    def base(self, identity, title, origin, *, text="", state="indexed", date=None, author=None, period=None, explicit=(), locations=(), mime="", path=""):
+        match_text = text
+        normalized_path = '/' + path.replace('\\','/')
+        issuer_owned = bool(explicit) and (
+            normalized_path.startswith('/_system/reference/market-data/')
+            or '/third-party-analyses/activist_reports/' in normalized_path
+            or '/research/evidence/_text/mgmt/' in normalized_path
+            or any('/'+folder+'/' in normalized_path for folder in ('investor-documents','financials','models'))
+        )
+        if issuer_owned:
+            # An issuer's filings and operating data belong to that issuer.
+            # Incidental banks, vendors and peers in its disclosures should not
+            # flood other company libraries. The complete body remains searchable.
+            match_text = ""
+        elif explicit and Path(path).suffix.lower() in {".json", ".csv", ".tsv"}:
+            # Company-owned tables already have issuer identity. Discover other
+            # issuers only in narrative fields, never among numeric observations
+            # or schema keys. The full original remains indexed for search.
+            narratives = []
+            if Path(path).suffix.lower() == ".json":
+                try:
+                    pending = [json.loads(text)]
+                    while pending:
+                        value = pending.pop()
+                        if isinstance(value, dict):
+                            pending.extend(value.values())
+                        elif isinstance(value, list):
+                            pending.extend(value)
+                        elif isinstance(value, str) and len(value) >= 80 and len(value.split()) >= 15:
+                            narratives.append(value)
+                except ValueError:
+                    pass
+            match_text = "\n\n".join(narratives)
+        # A Drive filename and its vault rendition often differ only by the
+        # extension. Reuse issuer matching for their identical complete text;
+        # original titles and locations remain distinct source metadata.
+        suffix = Path(title).suffix.lower()
+        match_title = title[:-len(suffix)] if suffix in SOURCE_SUFFIXES else title
+        match_key = digest(self.match_version + match_title + digest(match_text) + json.dumps(list(explicit)))
+        if match_key not in self.matches:
+            checkpoint = self.cache / "match-work" / match_key[:2] / (match_key + ".json")
+            matched = load(checkpoint, None) if checkpoint.is_file() else None
+            if not isinstance(matched, list) or len(matched) != 2:
+                matched = self.matcher.match(match_title, match_text, explicit)
+                write(checkpoint, matched)
+            self.matches[match_key] = matched
+        links, review = self.matches[match_key]
+        if issuer_owned:
+            links = [item for item in links if item['ticker'] in explicit]
+        record = {"id": digest(identity)[:32], "title": title, "category": category(path or title, mime), "date": date or date_from(title), "author": author or "", "period": period,
+                  "origins": [origin], "locations": list(locations), "text": text, "processing_status": state,
+                  "relationships": list(links), "review": list(review), "availability": "available", "indexed_at": self.now,
+                  "family": digest(re.sub(r"(?:19|20)\d{2}[-_]\d{2}[-_]\d{2}", "", path or identity))[:24]}
+        for theme in self.themes:
+            # Title/path signals must be about the subject itself; no blanket macro wildcard.
+            matched = not explicit and any(re.search(pattern, path or title, re.I) for pattern in theme.get("patterns", []))
+            if not matched:
+                continue
+            for ticker in theme["tickers"]:
+                if ticker not in self.companies or any(r["ticker"] == ticker for r in record["relationships"]):
+                    continue
+                record["relationships"].append({"ticker": ticker, "relationship": "industry_context", "reason": theme["reason"], "match": "reviewed_business_driver", "passages": [], "theme": theme["id"]})
+            if record["category"] not in {"models", "calls", "letters", "media"}:
+                record["category"] = "industry"
+        return record
+
+    def cached_extract(self, data, suffix):
+        sha = digest(data)
+        path = self.cache / "text" / f"{sha}.json"
+        prior = load(path)
+        if prior.get('source_cache_path'):
+            target = (self.cache / prior['source_cache_path']).resolve()
+            recovered = load(target) if target.is_relative_to(self.cache.resolve()) else {}
+            from backfill_company_sources import complete_cache
+            prior = recovered if recovered.get('content_sha256') == sha and complete_cache(recovered, suffix) else {}
+        if prior.get('status') != 'indexed':
+            md5 = hashlib.md5(data, usedforsecurity=False).hexdigest()
+            pointer = load(self.cache / 'md5' / (md5 + '.json'))
+            target = self.cache / pointer.get('path', '')
+            if pointer.get('path') and target.resolve().is_relative_to(self.cache.resolve()):
+                recovered = load(target)
+                from backfill_company_sources import complete_cache
+                if recovered.get('content_sha256') == sha and complete_cache(recovered, suffix):
+                    prior = recovered
+                    # The portable recovery cache already owns the full text.
+                    # Keep only a verified reference and extraction metadata
+                    # here instead of duplicating the corpus during deployment.
+                    write(path, {'version': 1, 'source_cache_path': pointer['path'],
+                                 'content_sha256': sha, 'status': prior['status'],
+                                 'extraction': prior.get('extraction', {})})
+        verified_pages = suffix != '.pdf' or prior.get('status') != 'indexed' or prior.get('extraction',{}).get('pages')
+        if prior.get("version") == 1 and verified_pages and prior.get("status") in {"indexed", "needs_ocr", "needs_transcript", "empty_source"}:
+            return prior["text"], prior["status"], sha
+        from backfill_company_sources import extract_complete
+        text, state, details = extract_complete(data, suffix)
+        write(path, {"version": 1, "text": text, "status": state, "extraction": details})
+        return text, state, sha
+
+    def local(self, path: Path, origin: str, *, explicit=(), relative=None):
+        try:
+            return self._local(path, origin, explicit=explicit, relative=relative)
+        except (OSError, ValueError, RuntimeError) as exc:
+            self.file_failures[origin] += 1
+            rel = relative or path.relative_to(self.root).as_posix()
+            repo = "research-vault" if rel.startswith("vault/") else "single-stock-investments"
+            url = f"https://github.com/magis-capital-partners/{repo}/blob/main/{quote(rel.removeprefix('vault/'), safe='/')}"
+            record = self.base("unreadable:" + rel, path.stem, origin, explicit=explicit, path=rel, state="awaiting_extraction", locations=[{"kind":"source","url":url,"label":"Original source"}])
+            record["availability"] = "unavailable"
+            record["extraction_error"] = type(exc).__name__
+            self.add(record, ["path:" + rel])
+
+    def _local(self, path: Path, origin: str, *, explicit=(), relative=None):
+        rel = relative or path.relative_to(self.root).as_posix()
+        logical = "_system/reference/" + rel.removeprefix("vault/") if rel.startswith("vault/") else rel
+        actual = resolved(self.root, rel) if not rel.startswith("vault/") else path
+        if actual is None:
+            return
+        data = io_path(actual).read_bytes()
+        companion = next((path.with_suffix(s) for s in (".txt", ".md") if path.suffix.lower() == ".pdf" and io_path(path.with_suffix(s)).is_file()), None)
+        media_cache = {}
+        if path.suffix.lower() in {'.mp3','.m4a','.mp4','.wav'}:
+            from backfill_company_sources import transcript_for
+            companion = transcript_for(path, self.vault)
+            media_cache = load(self.cache/'media'/(digest(path.name)+'.json'))
+        if companion:
+            text, state, _ = self.cached_extract(io_path(companion).read_bytes(), companion.suffix.lower())
+            sha = digest(data)
+        elif media_cache.get('status') == 'indexed':
+            text, state, sha = media_cache['text'], 'indexed', digest(data)
+        else:
+            text, state, sha = self.cached_extract(data, ".txt" if rel in SHARED_MODELS and path.suffix == ".py" else path.suffix.lower())
+        # Metadata-only placeholders are not evidence and never become "zero sources".
+        if '"private_snapshot":true' in text.replace(" ", ""):
+            raise RuntimeError(f"Unresolved private snapshot: {rel}")
+        meta_path = path.with_suffix(".meta.json")
+        meta = load(meta_path)
+        md = self.metadata.get(logical, {})
+        title = meta.get("title") or md.get("title") or path.stem.replace("_", " ")
+        repo = "research-vault" if rel.startswith("vault/") else "single-stock-investments"
+        repository_path = rel.removeprefix("vault/")
+        if actual != path and self.vault and actual.is_relative_to(self.vault):
+            repo, repository_path = "research-vault", actual.relative_to(self.vault).as_posix()
+        locations = [{"kind": "vault" if repo == "research-vault" else "repository", "url": f"https://github.com/magis-capital-partners/{repo}/blob/main/{quote(repository_path, safe='/')}", "label": "Vault original" if repo == "research-vault" else "Research original"}]
+        for loc in self.refs[logical]:
+            if loc not in locations:
+                locations.insert(0, loc)
+        record = self.base("sha256:" + sha, title, origin, text=text, state=state, date=meta.get("published") or md.get("date"), author=meta.get("show_title") or md.get("author"), period=meta.get("period") or md.get("period"), explicit=explicit, locations=locations, path=rel)
+        if explicit and rel.startswith('_system/reference/market-data/'):
+            record['category'] = 'models'
+        record["content_hash"] = sha
+        record["content_md5"] = hashlib.md5(data, usedforsecurity=False).hexdigest()
+        record["format"] = path.suffix.lstrip(".")
+        extraction = load(self.cache / "text" / (sha + ".json")).get("extraction", {})
+        if extraction.get("ocr_pages") or extraction.get("ocr_chapters"):
+            record["extraction_review"] = "Automatic OCR; verify against the original"
+        elif media_cache.get("transcript_kind") == "automatic":
+            record["extraction_review"] = "Automatic transcript; verify against the original"
+        if rel in SHARED_MODELS:
+            record["category"] = "models"
+        if path.suffix.lower() == ".json":
+            try:
+                body = json.loads(text)
+                if isinstance(body, dict):
+                    record["date"] = body.get("as_of") or body.get("model_as_of") or record["date"]
+                    record["model_purpose"] = body.get("description") or body.get("purpose")
+                    record["assumptions"] = body.get("assumptions")
+                    record["source_refs"] = body.get("sources") or body.get("source_refs") or ([body["reference"]] if body.get("reference") else None)
+                    if rel.startswith("_system/scripts/commodity_configs/") and rel in SHARED_MODELS:
+                        # The reviewed issuer list defines model relevance. A
+                        # company name inside generic assumptions is not a
+                        # direct company discussion and must not broaden scope.
+                        record["relationships"] = [{"ticker": ticker, "relationship": "industry_context",
+                            "reason": body.get("question") or title, "match": "reviewed_business_driver",
+                            "passages": [], "theme": body["id"] + "-market"}
+                            for ticker in body.get("related_tickers", []) if ticker in self.companies]
+                        record["review"] = []
+                        record["model_purpose"] = body.get("question")
+                        record["assumptions"] = body.get("scenarios")
+                        record["date"] = body.get("version", "").rsplit(".", 1)[0] or record["date"]
+            except ValueError:
+                pass
+        rendition = str(Path(logical).with_suffix(""))
+        anchors = ["sha:" + sha, "path:" + logical]
+        anchors.append("md5:" + hashlib.md5(data, usedforsecurity=False).hexdigest())
+        # Adjacent PDF/text versions are explicit original/extract companions, not filename guesses across folders.
+        if path.suffix.lower() in {".pdf", ".txt", ".md"}:
+            anchors.append("rendition:" + rendition)
+        anchors.extend(url_anchor(loc["url"]) for loc in locations if loc["kind"] == "drive")
+        self.add(record, anchors)
+
+    def registries(self):
+        for relative in ("dashboard/data/document_registry.json", "dashboard/data/document_catalog.json"):
+            try:
+                doc = document(self.root, relative)
+                rows = doc.get("documents", [])
+                for row in rows:
+                    ref = row.get("local_pdf_path") or row.get("path") or row.get("local_path") or ""
+                    url = row.get("drive_web_view_link") or row.get("drive_url") or row.get("webViewLink")
+                    ticker = row.get("ticker")
+                    if not ticker and ref.split("/")[0] in self.companies:
+                        ticker = ref.split("/")[0]
+                    loc = [{"kind": "drive", "url": url, "label": "Open original"}] if url else []
+                    if ref:
+                        self.refs[ref].extend(loc)
+                        self.metadata[ref] = row
+                    title = row.get("title") or row.get("filename") or Path(ref).stem or "Research document"
+                    identity = row.get("sha256") or row.get("doc_id") or url or ref
+                    if not identity:
+                        continue
+                    record = self.base(str(identity), title, relative, state="awaiting_extraction", date=row.get("document_date") or row.get("date"), explicit=[ticker] if ticker else [], locations=loc, path=ref)
+                    anchors = (["path:" + ref] if ref else []) + ([url_anchor(url)] if url else [])
+                    if row.get("sha256"):
+                        anchors.append("sha:" + row["sha256"].removeprefix("sha256:"))
+                    self.add(record, anchors)
+                self.receipt(relative, len(rows), "complete" if doc else "unavailable")
+            except Exception as exc:
+                self.receipt(relative, 0, "failed", type(exc).__name__)
+
+    def local_corpora(self):
+        self.prepare_company_metadata()
+        if self.vault:
+            try:
+                for row in load(self.vault / "superinvestor-letters/letters_index.json", []):
+                    for field in ("source_file", "source_document"):
+                        if row.get(field):
+                            self.metadata[row[field]] = {**self.metadata.get(row[field], {}), "author": row.get("fund") or row.get("manager"), "date": row.get("letter_date"), "period": row.get("quarter")}
+            except (OSError, ValueError, TypeError):
+                self.receipt("vault:letter_metadata", 0, "failed", "Fund names and dates could not be read")
+        for ticker in sorted(self.companies):
+            name = "company:" + ticker
+            count = 0
+            try:
+                base = self.root / ticker
+                self.filings(ticker)
+                self.company_inventory(ticker)
+                for folder in ("research", "third-party-analyses", "investor-documents", "transcripts", "models", "financials"):
+                    for path in safe_files(base / folder):
+                        if re.search(r"(?:source_inventory|activist_reports_index|latest|security_identity|classification|human_decision|download|readiness|audit|forecast_market_sync|committee_packet)", path.stem, re.I):
+                            continue
+                        self.local(path, name, explicit=[ticker])
+                        count += 1
+                self.receipt(name, count, "complete" if base.exists() else "unavailable", None if base.exists() else "Company files absent from this checkout")
+            except Exception as exc:
+                self.receipt(name, count, "failed", type(exc).__name__)
+        if not self.vault:
+            self.receipt("vault", 0, "unavailable", "Private vault not mounted")
+            return
+        for collection in VAULT_COLLECTIONS:
+            folder = self.vault / collection
+            if not folder.is_dir():
+                continue
+            count = 0
+            try:
+                for path in safe_files(folder):
+                    rel = path.relative_to(self.vault).as_posix()
+                    explicit = [p for p in path.relative_to(folder).parts[:-1] if p in self.companies]
+                    self.local(path, "vault:" + collection, explicit=explicit, relative="vault/" + rel)
+                    count += 1
+                self.receipt("vault:" + collection, count)
+            except Exception as exc:
+                self.receipt("vault:" + collection, count, "failed", type(exc).__name__)
+        for collection in ("industry", "world_model", "market-data", "energy", "kpi"):
+            folder = self.root / "_system/reference" / collection
+            count = 0
+            try:
+                for path in safe_files(folder):
+                    owners = market_data_owner(path, self.companies) if collection == 'market-data' else []
+                    self.local(path, "shared:" + collection, explicit=owners)
+                    count += 1
+                self.receipt("shared:" + collection, count, "complete" if folder.exists() else "unavailable")
+            except Exception as exc:
+                self.receipt("shared:" + collection, count, "failed", type(exc).__name__)
+        self.shared_models()
+        from company_commodity_sources import build as commodity_originals
+        commodity_originals(self)
+
+    def shared_models(self):
+        count = 0
+        for relative, title in SHARED_MODELS.items():
+            if not (self.root / relative).is_file():
+                continue
+            self.metadata[relative] = {"title": title, "author": "Internal research"}
+            self.local(self.root / relative, "shared:models")
+            count += 1
+        self.receipt("shared:models", count)
+
+    def git_tree(self):
+        if self.git_entries is None:
+            result = subprocess.run(["git", "ls-tree", "-r", "-z", "HEAD"], cwd=self.root, capture_output=True, check=True)
+            self.git_entries = [entry.split("\t", 1) for entry in result.stdout.decode("utf-8").split("\0") if "\t" in entry]
+        return self.git_entries
+
+    def prepare_company_metadata(self):
+        """Preserve filing URLs and inventory links even in sparse deployments."""
+        try:
+            entries = self.git_tree()
+        except subprocess.CalledProcessError:
+            return  # Local-only fixtures and full, unversioned research exports.
+        from backfill_company_sources import Worker
+        local = os.environ.get("COMPANY_SOURCE_LOCAL_ROOT")
+        worker = Worker(self.root, self.cache, self.vault, Path(local) if local else None)
+        try:
+            for header, relative in entries:
+                parts = relative.split("/")
+                if parts[0] not in self.companies or "/".join(parts[1:]) not in {
+                    "investor-documents/DOWNLOAD_MANIFEST.json", "third-party-analyses/source_inventory.json"
+                }:
+                    continue
+                if (self.root / relative).is_file():
+                    continue
+                sha = header.split()[-1]
+                cached = self.cache / "metadata" / (sha + ".json")
+                try:
+                    if cached.is_file():
+                        doc = load(cached)
+                    else:
+                        raw = worker.git_bytes({"path": relative, "sha": sha})
+                        doc = json.loads(raw.decode("utf-8-sig"))
+                        if isinstance(doc, dict) and doc.get("private_snapshot"):
+                            raise ValueError("Unresolved private inventory")
+                        write(cached, doc)
+                    self.company_metadata[relative] = doc
+                except (OSError, ValueError, subprocess.SubprocessError):
+                    self.company_metadata_failed.add(parts[0])
+        finally:
+            worker.close()
+
+    def git_inventory(self, extraction_budget=300):
+        """A sparse deploy still inventories historical company originals from the Git tree.
+
+        Missing file bytes are honestly marked awaiting extraction, never hidden.
+        Live local files take precedence; Git IDs also detect renames and copies.
+        """
+        count = 0
+        by_company = Counter()
+        started = time.monotonic()
+        for header, rel in self.git_tree():
+            parts = rel.split("/")
+            if len(parts) < 3 or parts[0] not in self.companies or parts[1] not in {"research", "third-party-analyses", "investor-documents", "models", "transcripts", "financials"}:
+                continue
+            path = Path(rel)
+            if path.suffix.lower() not in SOURCE_SUFFIXES | EXTRA_SUFFIXES or path.name in IGNORE_NAMES:
+                continue
+            if "sec-edgar" in parts and path.suffix.lower() not in {".htm", ".html", ".txt", ".pdf"}:
+                continue
+            if re.search(r"(?:source_inventory|activist_reports_index|latest|security_identity|classification|human_decision|download|readiness|audit|committee_packet)", path.stem, re.I):
+                continue
+            count += 1
+            by_company[parts[0]] += 1
+            existing = self.index.records.get(self.index.anchors.get("path:" + rel), {})
+            if existing.get("processing_status") == "indexed":
+                continue
+            sha = header.split()[-1]
+            url = f"https://github.com/magis-capital-partners/single-stock-investments/blob/main/{quote(rel,safe='/')}"
+            cached_path = self.cache / "git" / (sha + ".json")
+            cached = load(cached_path)
+            if not cached and time.monotonic() - started < extraction_budget:
+                try:
+                    local_path = self.root / rel
+                    blob = local_path.read_bytes() if local_path.is_file() else subprocess.run(["git", "show", f"HEAD:{rel}"], cwd=self.root, capture_output=True, check=True, timeout=25).stdout
+                    body, status, _ = self.cached_extract(blob, path.suffix.lower())
+                    if '"private_snapshot":true' not in body.replace(" ", ""):
+                        cached = {"text": body, "status": status}
+                        write(cached_path, cached)
+                except (subprocess.SubprocessError, OSError):
+                    pass
+            locations = [{"kind":"repository","url":url,"label":"Research original"}]
+            locations = self.refs.get(rel) or locations
+            record = self.base("git:"+sha,path.stem.replace("_"," "),"git_inventory",text=cached.get("text", ""),explicit=[parts[0]],state=cached.get("status", "awaiting_extraction"),locations=locations,path=rel)
+            if cached.get("extraction", {}).get("ocr_pages") or cached.get("extraction", {}).get("ocr_chapters"):
+                record["extraction_review"] = "Automatic OCR; verify against the original"
+            if cached.get('content_md5'):record['content_md5']=cached['content_md5']
+            self.add(record,["git:"+sha,"path:"+rel]+(['md5:'+cached['content_md5']] if cached.get('content_md5') else []))
+            if count % 5000 == 0:
+                print(f"Research inventory: git: {count} originals processed", flush=True)
+        self.receipt("git_inventory",count)
+        # Discovery is complete when the committed tree and its metadata have
+        # been read. Extraction status remains separate on each original.
+        for receipt in self.receipts:
+            ticker = receipt["collection"].removeprefix("company:")
+            if receipt["collection"].startswith("company:") and receipt["status"] == "unavailable" and ticker not in self.company_metadata_failed:
+                receipt.update(status="complete", discovered=by_company[ticker], detail="Committed company tree and filing inventories scanned")
+                self.good.add(receipt["collection"])
+            elif ticker in self.company_metadata_failed:
+                receipt.update(status="partial", detail="Some committed source metadata could not be read")
+                self.good.discard(receipt["collection"])
+
+    def filings(self, ticker):
+        path = self.root / ticker / "investor-documents/DOWNLOAD_MANIFEST.json"
+        doc = load(path) if path.is_file() else self.company_metadata.get(path.relative_to(self.root).as_posix(), {})
+        def rows(value):
+            if isinstance(value, list):
+                for x in value:
+                    yield from rows(x)
+            elif isinstance(value, dict):
+                url = value.get("url") or value.get("source_url") or value.get("sec_url")
+                if url and re.match(r"https?://", str(url)):
+                    yield value, url
+                else:
+                    for x in value.values():
+                        if isinstance(x, (dict, list)):
+                            yield from rows(x)
+        for row, url in rows(doc):
+            filed = row.get("filing_date") or row.get("filingDate") or row.get("date")
+            title = " \u00b7 ".join(str(v) for v in [row.get("form") or row.get("type"), filed, row.get("primary_document") or row.get("primary")] if v) or Path(url).name
+            location = {"kind": "filing", "url": url, "label": "Official filing"}
+            from backfill_company_filings import cached_filing
+            recovered = cached_filing(self.cache, url)
+            rec = self.base(url, title, "company:" + ticker, text=recovered.get("text", ""), state=recovered.get("status", "awaiting_extraction"), explicit=[ticker], date=filed, period=row.get("report"), locations=[location], path="investor-documents/" + title)
+            if recovered.get("original_sha256"):
+                rec["revision"] = recovered["original_sha256"]
+                rec["content_hash"] = recovered["original_sha256"]
+            if recovered.get("extraction", {}).get("ocr_pages"):
+                rec["extraction_review"] = "Automatic OCR; verify against the original"
+            ref = row.get("local") or row.get("local_path")
+            if ref:
+                self.refs[ref].append(location)
+                self.metadata[ref] = {"title": title, "date": filed}
+            self.add(rec, ["url:" + url] + (["path:" + ref] if ref else []) + (["sha:" + recovered["original_sha256"]] if recovered.get("original_sha256") else []))
+
+    def company_inventory(self, ticker):
+        relative = f"{ticker}/third-party-analyses/source_inventory.json"
+        doc = document(self.root, relative) if (self.root / relative).is_file() else self.company_metadata.get(relative, {})
+        for row in doc.get("sources", []):
+            ref = row.get("path") or row.get("source_ref")
+            url = row.get("url") or row.get("source_url") or row.get("drive_url")
+            if not ref and not url:
+                continue
+            locations = [{"kind": "source", "url": url, "label": "Original source"}] if url else []
+            if ref:
+                self.refs[ref].extend(locations)
+            rec = self.base(url or ref, row.get("title") or Path(ref or url).stem, "company:"+ticker, state="awaiting_extraction", date=row.get("date"), author=row.get("author"), explicit=[ticker] if row.get("status") in {"approved", "context", "verified"} else [], locations=locations, path=ref or url)
+            self.add(rec, (["path:"+ref] if ref else []) + (["url:"+url] if url else []))
+
+    def drive(self, service=None, roots=None, download=False, download_budget=300):
+        """Enumerate all pages and all formats under configured research roots, including licensed folders."""
+        from drive_store_common import drive_service, configured_root_ids, execute_with_retry, build_folder_paths, FOLDER_MIME
+        if service is None:
+            service = drive_service(readonly=True)
+        # Bound a stalled transport as well as the batch's extraction budget.
+        http = getattr(service, "_http", None)
+        transport = getattr(http, "http", http)
+        if transport is not None and hasattr(transport, "timeout"):
+            transport.timeout = 30
+        if roots is None:
+            roots = configured_root_ids(document(self.root, "_system/reference/document-store/google_drive_config.json"))
+        if not roots:
+            raise RuntimeError("No configured Drive research roots")
+        items, seen, queue = {}, set(), []
+        drives = set()
+        for root in roots:
+            meta = execute_with_retry(service.files().get(fileId=root, fields="id,name,driveId,parents", supportsAllDrives=True))
+            if meta.get("driveId") and not meta.get("parents"):
+                drives.add(meta["driveId"])
+            else:
+                queue.append(root)
+        fields = "nextPageToken,files(id,name,mimeType,parents,webViewLink,modifiedTime,md5Checksum,size,appProperties,shortcutDetails)"
+        for drive_id in drives:
+            token = None
+            while True:
+                response = execute_with_retry(service.files().list(corpora="drive",driveId=drive_id,q="trashed = false",pageSize=1000,pageToken=token,supportsAllDrives=True,includeItemsFromAllDrives=True,fields=fields))
+                items.update({item["id"]: item for item in response.get("files",[])})
+                token = response.get("nextPageToken")
+                if not token:
+                    break
+        while queue:
+            parent = queue.pop(0)
+            if parent in seen:
+                continue
+            seen.add(parent)
+            token = None
+            while True:
+                response = execute_with_retry(service.files().list(q=f"'{parent}' in parents and trashed = false", pageSize=1000, pageToken=token, supportsAllDrives=True, includeItemsFromAllDrives=True,
+                    fields=fields))
+                for item in response.get("files", []):
+                    items[item["id"]] = item
+                    if item["mimeType"] == FOLDER_MIME:
+                        queue.append(item["id"])
+                token = response.get("nextPageToken")
+                if not token:
+                    break
+        paths = build_folder_paths(list(items.values()), roots)
+        write(self.cache/'drive-inventory.json', {'items':list(items.values()), 'checked_at':self.now})
+        download_start = time.monotonic()
+        count = 0
+        attempted = {p.stem for p in (self.cache / "drive").glob("*.json")}
+        def priority(item):
+            revision = item.get("md5Checksum") or item.get("modifiedTime") or "unknown"
+            return digest(item["id"] + revision) not in attempted, item.get("modifiedTime", ""), item["id"]
+        for item in sorted(items.values(), key=priority, reverse=True):
+            if item["mimeType"] == FOLDER_MIME:
+                continue
+            if item['mimeType']=='application/vnd.google-apps.shortcut':
+                target_id=(item.get('shortcutDetails') or {}).get('targetId')
+                if target_id:
+                    try:
+                        target=execute_with_retry(service.files().get(fileId=target_id,fields='id,name,mimeType,modifiedTime,md5Checksum,webViewLink',supportsAllDrives=True))
+                        item={**item,**target,'id':item['id'],'parents':item.get('parents',[]),'download_id':target_id}
+                    except Exception:
+                        self.file_failures['drive']+=1
+            count += 1
+            name = item["name"]
+            parent = "/".join(paths.get(p, "") for p in item.get("parents", []))
+            full = parent + "/" + name
+            explicit = [p for p in parent.split("/") if p in self.companies]
+            props = item.get("appProperties") or {}
+            if props.get("ticker") in self.companies:
+                explicit.append(props["ticker"])
+            url = item.get("webViewLink") or f"https://drive.google.com/file/d/{item['id']}/view"
+            existing = self.index.anchors.get(url_anchor(url)) or self.index.anchors.get("md5:" + str(item.get("md5Checksum")))
+            old = self.index.records.get(existing, {})
+            revision = item.get("md5Checksum") or item.get("modifiedTime") or "unknown"
+            changed = (old.get("content_md5") and item.get("md5Checksum") and old["content_md5"] != item["md5Checksum"]) or (old.get("revision") and old["revision"] != revision)
+            if changed:
+                old["family"] = "drive:" + item["id"]
+                old["availability"] = "superseded"
+                self.index.anchors.pop(url_anchor(url), None)
+                old = {}
+            old_text = self.text(old)
+            text, state = old_text, old.get("processing_status", "awaiting_extraction")
+            prior = self.previous_versions.get(("drive:" + item["id"], revision), {})
+            if not text and prior.get("text_cache"):
+                text, state = self.text(prior), prior["processing_status"]
+            cachefile = self.cache / "drive" / f"{digest(item['id'] + revision)}.json"
+            cached = load(cachefile)
+            if cached and (cached.get("text") or not text):
+                text, state = cached.get("text", ""), cached["status"]
+            retry_due = time.time() - cached.get("attempted_at", 0) >= 86400
+            if not text and retry_due and download and (download_budget <= 0 or time.monotonic() - download_start < download_budget):
+                try:
+                    mime = item["mimeType"]
+                    exports = {"application/vnd.google-apps.document": ("text/plain", ".txt"), "application/vnd.google-apps.spreadsheet": ("application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", ".xlsx"), "application/vnd.google-apps.presentation": ("application/vnd.openxmlformats-officedocument.presentationml.presentation", ".pptx")}
+                    if mime in exports:
+                        export_mime, suffix = exports[mime]
+                        data = execute_with_retry(service.files().export_media(fileId=item.get('download_id',item["id"]), mimeType=export_mime))
+                    elif Path(name).suffix.lower() in SOURCE_SUFFIXES | EXTRA_SUFFIXES and not mime.startswith(("audio/", "video/")):
+                        suffix = Path(name).suffix.lower()
+                        data = execute_with_retry(service.files().get_media(fileId=item.get('download_id',item["id"]), supportsAllDrives=True))
+                    else:
+                        data, suffix = b"", ".unsupported"
+                    text, state, _ = self.cached_extract(data, suffix)
+                except Exception as exc:
+                    state = "access_unavailable" if getattr(getattr(exc, "resp", None), "status", None) in {403, 404} else "awaiting_extraction"
+                write(cachefile, {"text": text, "status": state, "attempted_at": time.time()})
+            identity = "md5:" + item["md5Checksum"] if item.get("md5Checksum") else "drive:" + item["id"] + ":" + revision
+            # Exact originals already matched in this run retain all their
+            # verified passages when SourceIndex merges their Drive location.
+            # Recheck the new title/folder, not a second copy of the same body.
+            # Changed revisions, newly extracted text and prior-run-only records
+            # still receive the complete full-text match.
+            already_matched = bool(old_text and text == old_text and old.get("processing_status") == "indexed")
+            rec = self.base(identity, name, "drive", text="" if already_matched else text, state=state, explicit=explicit, locations=[{"kind": "drive", "url": url, "label": "Open original"}], mime=item["mimeType"], path=full)
+            rec["text"] = text
+            if cached.get("extraction", {}).get("ocr_pages") or cached.get("extraction", {}).get("ocr_chapters"):
+                rec["extraction_review"] = "Automatic OCR; verify against the original"
+            elif cached.get("extraction", {}).get("transcript_kind") == "automatic":
+                rec["extraction_review"] = "Automatic transcript; verify against the original"
+            rec.update({"family": "drive:" + item["id"], "revision": revision, "modified_at": item.get("modifiedTime"), "format": item["mimeType"]})
+            if state == "access_unavailable":
+                rec["availability"] = "access_unavailable"
+            anchors = [url_anchor(url)]
+            if item.get("md5Checksum"):
+                anchors.append("md5:" + item["md5Checksum"])
+            if props.get("sha256"):
+                anchors.append("sha:" + props["sha256"])
+            self.add(rec, anchors)
+            if count % 5000 == 0:
+                print(f"Research inventory: drive: {count} originals processed", flush=True)
+        self.receipt("drive", count)
+
+    def publish_cached(self):
+        """Publish the completed recovery snapshot without rediscovering sources."""
+        for part in self.previous.get("record_parts", []):
+            path = (self.cache / part).resolve()
+            if not path.is_relative_to(self.cache.resolve()) or not path.is_file():
+                raise RuntimeError("The private source snapshot is missing a record partition")
+        records = self.previous.get("records", {})
+        if not records or not self.previous.get("generated_at"):
+            raise RuntimeError("A completed private company-source snapshot is required")
+        if load(self.cache / "matches.json").get("version") != self.match_version:
+            raise RuntimeError("Company identities or matching rules changed; refresh the source snapshot first")
+        for sha in {r.get("text_cache") for r in records.values()} - {None, ""}:
+            if not re.fullmatch(r"[a-f0-9]{64}", sha) or not (self.cache / "published-text" / (sha + ".json")).is_file():
+                raise RuntimeError("The private source snapshot is missing a recovered text body")
+        self.index.records = dict(records)
+        self.receipts = self.previous.get("receipts", [])
+        self.good = {r["collection"] for r in self.receipts if r.get("status") == "complete"}
+        # Keep the actual source observation time visible; deployment is not a
+        # new Drive sync and must not refresh its coverage timestamps.
+        self.now = self.previous["generated_at"]
+        return self.publish()
+
+    def publish(self):
+        # A recovered Git original can acquire a Drive revision identity when
+        # exact-byte copies merge. Do not resurrect its old empty placeholder
+        # under the former ID; preserve genuinely different historical bodies.
+        aliases = {}
+        for anchor, current_id in self.index.anchors.items():
+            identity = ("sha256:" + anchor[4:] if anchor.startswith("sha:") else
+                        anchor[4:] if anchor.startswith("url:") else
+                        anchor if anchor.startswith(("git:", "md5:")) else None)
+            if identity:
+                aliases[digest(identity)[:32]] = current_id
+        previous = {}
+        # Git normalizes text-file line endings between Windows and Linux.
+        # The same original URL and unchanged text is not a historical edition.
+        text_formats = {"txt", "md", "json", "csv", "tsv", "html", "htm"}
+        current_locations = defaultdict(list)
+        normalized = {}
+        for current in self.index.records.values():
+            if current.get("format") in text_formats:
+                for location in current.get("locations", []):
+                    if location.get("url"):
+                        current_locations[(location["url"], current["format"])].append(current)
+        def normalized_body(record):
+            key = record.get("text_cache") or record["id"]
+            if key not in normalized:
+                normalized[key] = digest(self.text(record).replace("\r\n", "\n").replace("\r", "\n"))
+            return normalized[key]
+        for key, old in self.previous.get("records", {}).items():
+            current = self.index.records.get(aliases.get(key), {})
+            has_body = bool(old.get("text_cache") or old.get("text") or old.get("text_length"))
+            same_body = bool(old.get("text_cache") and old.get("text_cache") == current.get("text_cache"))
+            distinct_revision = old.get("revision") and current.get("revision") and old["revision"] != current["revision"]
+            if current and not distinct_revision and (not has_body or same_body):
+                continue
+            if key not in self.index.records and has_body and old.get("format") in text_formats:
+                candidates = [r for loc in old.get("locations", []) for r in current_locations.get((loc.get("url"), old["format"]), [])]
+                if any(not (old.get("revision") and r.get("revision") and old["revision"] != r["revision"])
+                       and normalized_body(old) == normalized_body(r) for r in candidates):
+                    continue
+            previous[key] = old
+        records = retain_previous(self.index.records, previous, self.good)
+        by_ticker = defaultdict(list)
+        bundles, content_batch, content_size = {}, {}, 0
+        # A resumed build may discover the same originals in a different order.
+        # Reuse verified immutable bundles so that this does not duplicate the
+        # entire corpus on disk. Changed documents get a new bundle; unchanged
+        # documents may continue sharing their previous one.
+        reusable = {}
+        if load(self.output / "manifest.json").get("layout_version") == PUBLICATION_LAYOUT:
+            for path in (self.output / "documents").glob("*.json"):
+                try:
+                    prior = load(path)
+                    if path.stem != digest(json.dumps(prior, sort_keys=True))[:24]:
+                        continue
+                    for sid, content in prior.items():
+                        reusable[(sid, digest(json.dumps(content, sort_keys=True)))] = path.relative_to(self.output).as_posix()
+                except (OSError, ValueError, AttributeError):
+                    continue
+        def flush_content():
+            nonlocal content_batch, content_size
+            if content_batch:
+                filename = "documents/" + digest(json.dumps(content_batch, sort_keys=True))[:24] + ".json"
+                write(self.output / filename, content_batch)
+                bundles.update({sid:filename for sid in content_batch})
+                content_batch, content_size = {}, 0
+        review = []
+        status_counts = Counter()
+        for rec in records.values():
+            previous = self.previous.get("records", {}).get(rec["id"], {})
+            if previous.get("indexed_at"):
+                rec["indexed_at"] = previous["indexed_at"]
+            status_counts[rec["processing_status"]] += 1
+            review.extend({"source_id": rec["id"], **r} for r in rec.get("review", []))
+            # Preserve import reconciliation logs in the archive, but do not
+            # present these administrative inventories as company research.
+            if any(re.search(r"/research/activist_reconcile(?:_\d{4}-\d{2}-\d{2})?\.md(?:$|[?#])", loc.get("url", ""), re.I)
+                   for loc in rec.get("locations", [])):
+                continue
+            if not any(r["ticker"] in self.companies for r in rec.get("relationships", [])):
+                continue
+            full_text = self.text(rec)
+            parts = []
+            if len(full_text.encode("utf-8")) > TEXT_INLINE_BYTES:
+                for start in range(0,len(full_text),TEXT_CHUNK_CHARS):
+                    part = full_text[start:start+TEXT_CHUNK_CHARS]
+                    filename = "text/" + digest(part) + ".json"
+                    write(self.output / filename, {"text":part})
+                    parts.append(filename)
+            content = {"id": rec["id"], "title": rec["title"], "text": "" if parts else full_text, "text_parts":parts, "locations": rec.get("locations", []), "processing_status": rec["processing_status"]}
+            reused = reusable.get((rec["id"], digest(json.dumps(content, sort_keys=True)))) if reusable else None
+            if reused:
+                bundles[rec["id"]] = reused
+            else:
+                content_bytes = len(json.dumps(content, ensure_ascii=False).encode())
+                if content_batch and content_size + content_bytes > CONTENT_BUNDLE_BYTES:
+                    flush_content()
+                content_batch[rec["id"]] = content
+                content_size += content_bytes
+            for relation in rec.get("relationships", []):
+                if relation["ticker"] not in self.companies:
+                    continue
+                view = {k: v for k, v in rec.items() if k not in {"text", "text_cache", "text_length", "relationships", "review"}}
+                view.update(relation)
+                by_ticker[relation["ticker"]].append(view)
+        flush_content()
+        summary = {}
+        review_counts = Counter(r.get("ticker") for r in review)
+        unassigned_pending = sum(r["processing_status"] != "indexed" and not r.get("relationships") for r in records.values())
+        for ticker in sorted(self.companies):
+            rows = sorted(by_ticker[ticker], key=lambda r: (r.get("relationship") == "direct", r.get("date") or "", r["title"]), reverse=True)
+            # Multiple matching passages/locations still count as one document per company.
+            unique = {}
+            for row in rows:
+                unique.setdefault(row["id"], row)
+            rows = list(unique.values())
+            families = defaultdict(list)
+            for row in rows:
+                families[row.get("family") or row["id"]].append(row)
+            for versions in families.values():
+                versions.sort(key=lambda r: (r.get("availability") != "superseded", r.get("modified_at") or r.get("date") or "", r.get("indexed_at") or ""), reverse=True)
+                for i, row in enumerate(versions):
+                    row["is_latest"] = i == 0
+                    row["version_count"] = len(versions)
+            index = defaultdict(list)
+            source_ids = [r["id"] for r in rows]
+            for ordinal, row in enumerate(rows):
+                row["content_path"] = bundles[row["id"]]
+                for word in set(self.source_words(records[row["id"]])) | tokens(row["title"] + " " + row.get("author", "")):
+                    index[word].append(ordinal)
+            pages = []
+            page, page_size = [], 2
+            def emit_page(items):
+                filename = f"companies/{ticker}/{digest(json.dumps(items, sort_keys=True))[:24]}.json"
+                write(self.output / filename, items)
+                pages.append(filename)
+            for row in rows:
+                row_size = len(json.dumps(row, ensure_ascii=False).encode("utf-8")) + 1
+                if page and (len(page) >= COMPANY_PAGE_ROWS or page_size + row_size > COMPANY_PAGE_BYTES):
+                    emit_page(page)
+                    page, page_size = [], 2
+                page.append(row)
+                page_size += row_size
+            if page:
+                emit_page(page)
+            search_path = f"search/{ticker}.json"
+            search_parts, search_chunk, search_size = [], {}, 0
+            for word, ids in sorted(index.items()):
+                entry_size = len(json.dumps({word: ids}).encode())
+                if search_chunk and search_size + entry_size > 4_000_000:
+                    filename = f"search/{ticker}/{digest(json.dumps(search_chunk, sort_keys=True))[:24]}.json"
+                    write(self.output / filename, search_chunk)
+                    search_parts.append(filename)
+                    search_chunk, search_size = {}, 0
+                search_chunk[word] = ids
+                search_size += entry_size
+            if search_parts:
+                filename = f"search/{ticker}/{digest(json.dumps(search_chunk, sort_keys=True))[:24]}.json"
+                write(self.output / filename, search_chunk)
+                search_parts.append(filename)
+                write(self.output / search_path, {"__parts": search_parts, "__ids": source_ids})
+            else:
+                write(self.output / search_path, {**search_chunk, "__ids": source_ids})
+            counts = dict(Counter(r["category"] for r in rows))
+            pending = sum(r["processing_status"] != "indexed" for r in rows)
+            receipts = [r for r in self.receipts if not r["collection"].startswith("company:") or r["collection"] == "company:" + ticker]
+            incomplete = [r for r in receipts if r["status"] != "complete"]
+            review_count = review_counts[ticker]
+            coverage = {"checked_at": self.now, "status": "partial" if incomplete or pending or review_count or unassigned_pending else "complete", "pending": pending, "unassigned_pending": unassigned_pending, "review_count": review_count, "unavailable_collections": len(incomplete), "receipts": receipts}
+            featured=[]
+            for kind in ("analysis","calls","letters","filings","models"):
+                hit=next((r for r in rows if r["category"]==kind and r["relationship"]=="direct" and r.get("availability")=="available"),None)
+                if hit:
+                    featured.append(hit)
+            manifest = {"schema_version": 1, "ticker": ticker, "company": self.companies[ticker].get("company"), "total": len(rows), "categories": counts, "coverage": coverage, "pages": pages, "search_path": search_path, "featured": featured}
+            write(self.output / f"companies/{ticker}.json", manifest)
+            summary[ticker] = {"total": len(rows), "categories": counts, "pending": pending}
+        report = {"schema_version": 1, "layout_version": PUBLICATION_LAYOUT, "generated_at": self.now, "documents": len(records), "companies": len(summary), "linked_companies": sum(v["total"] > 0 for v in summary.values()), "processing": dict(status_counts), "review_count": len(review), "receipts": self.receipts, "tickers": summary}
+        write(self.output / "manifest.json", report)
+        if len(json.dumps(review).encode()) > 4_000_000:
+            review_parts = []
+            for start in range(0, len(review), 5000):
+                chunk = review[start:start+5000]
+                relative = "review/" + digest(json.dumps(chunk, sort_keys=True))[:24] + ".json"
+                write(self.output / relative, {"items": chunk})
+                review_parts.append(relative)
+            write(self.output / "review.json", {"count": len(review), "parts": review_parts})
+        else:
+            write(self.output / "review.json", {"items": review})
+        saved = {}
+        saved_text = set()
+        for key, record in records.items():
+            sha = record.get("text_cache")
+            if not sha and record.get("text"):
+                sha = digest(record["text"])
+                if sha not in saved_text:
+                    write(self.cache / "published-text" / (sha + ".json"), {"text": record["text"]})
+                    saved_text.add(sha)
+            saved[key] = {k:v for k,v in record.items() if k != "text"}
+            if sha:
+                saved[key]["text_cache"] = sha
+        parts = write_mapping(self.cache, "records", saved)
+        write(self.cache / "index.json", {"record_parts": parts, "receipts": self.receipts, "generated_at": self.now})
+        write(self.cache / "matches.json", {"version": self.match_version, "parts": write_mapping(self.cache, "relationships", self.matches)})
+        return report
+
+
+def main():
+    parser = argparse.ArgumentParser(description=__doc__)
+    parser.add_argument("--source-root", type=Path, default=ROOT)
+    parser.add_argument("--vault", type=Path)
+    parser.add_argument("--output", type=Path, default=ROOT / "_private/company-research/site")
+    parser.add_argument("--cache", type=Path, default=ROOT / "_private/company-research/cache")
+    parser.add_argument("--drive", action="store_true")
+    parser.add_argument("--download", action="store_true")
+    parser.add_argument("--publish-cached", action="store_true", help="Publish the completed private snapshot without live source discovery")
+    parser.add_argument("--download-budget-seconds", type=int, default=300, help="Text extraction work budget; inventory is never capped. Zero means unlimited.")
+    parser.add_argument("--git-budget-seconds", type=int, default=300, help="Git extraction budget. Zero consumes existing backfill results only.")
+    parser.add_argument("--tickers", nargs="+", help="Explicitly scoped verification run; omit to build the full universe")
+    args = parser.parse_args()
+    if args.publish_cached and (args.drive or args.download or args.tickers):
+        parser.error("--publish-cached requires the complete snapshot and cannot run live discovery")
+    from vault_paths import research_vault_root
+    vault = args.vault or research_vault_root()
+    if vault:
+        os.environ["RESEARCH_VAULT_ROOT"] = str(vault.resolve())
+    companies = read_companies(args.source_root)
+    if args.tickers:
+        companies = {t:companies[t] for t in args.tickers}
+    build = Builder(args.source_root, vault, args.output, args.cache, companies=companies if args.tickers else None)
+    if args.publish_cached:
+        report = build.publish_cached()
+        print(json.dumps({k: v for k, v in report.items() if k not in {"tickers", "receipts"}}))
+        return
+    build.registries()
+    build.local_corpora()
+    try:
+        build.git_inventory(extraction_budget=args.git_budget_seconds)
+    except Exception as exc:
+        build.receipt("git_inventory", 0, "failed", type(exc).__name__)
+    if args.drive:
+        try:
+            build.drive(download=args.download, download_budget=args.download_budget_seconds)
+        except (Exception, SystemExit) as exc:
+            build.receipt("drive", 0, "failed", type(exc).__name__)
+    else:
+        build.receipt("drive", 0, "not_scanned", "Using stored originals; live Drive enumeration was not requested")
+    report = build.publish()
+    print(json.dumps({k: v for k, v in report.items() if k not in {"tickers", "receipts"}}))
+
+
+if __name__ == "__main__":
+    main()

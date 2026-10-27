@@ -32,9 +32,25 @@ jobs:
     steps:
       - uses: actions/checkout@v4
         with:
+          # Non-cone. _system and dashboard/data are not enough: the architecture
+          # tests rebuild claims from every thesis card, pick the golden
+          # tickers from thesis cards plus latest.json, read
+          # GOOGL/research/valuation.json, and open the TPL and GOOGL
+          # evidence files. Same set the Python tests job checks out.
           sparse-checkout: |
             _system
             dashboard/data
+            /*/research/thesis_card.json
+            /*/research/latest.json
+            /GOOGL/research/valuation.json
+            /TPL/research/evidence/thematic_context.md
+            /TPL/research/evidence/insider_signal.md
+            /TPL/research/evidence/filing_digest.md
+            /TPL/third-party-analyses/source_inventory.json
+            /GOOGL/research/evidence/thematic_context.md
+            /GOOGL/research/evidence/insider_signal.md
+            /GOOGL/research/evidence/filing_digest.md
+            /GOOGL/third-party-analyses/source_inventory.json
           sparse-checkout-cone-mode: false
       - uses: actions/setup-python@v5
         with:

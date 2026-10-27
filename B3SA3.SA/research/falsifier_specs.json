@@ -1,0 +1,148 @@
+{
+  "schema_version": "3.0",
+  "ticker": "B3SA3.SA",
+  "specs": [
+    {
+      "spec_schema_version": "3.0",
+      "spec_id": "b3sa3-sa-stahl-hk-listing-close-2027-04-28",
+      "spec_revision": 1,
+      "forecast_class": "ex_ante",
+      "forecast_role": "diagnostic",
+      "authored_at": "2026-10-29T18:00:00Z",
+      "information_cutoff_at": "2026-10-28T12:00:00Z",
+      "registered_at": "2026-10-29T18:00:00Z",
+      "registration_commit": "3a170ca50936df6724b5165c083246f19a676c08",
+      "analysis_run_id": "fundamental-analyst-2026-10-29",
+      "author": "fundamental-analyst",
+      "model_id": "fundamental-analyst-weekly-v1",
+      "prompt_version": "case-log-table-v1",
+      "contract_hash": "3755ad11c310d8ba5ff640d248a73746570a854518e22bf63dfedd497f54e121",
+      "component_fingerprint": "9b59c74d8c05b27487cb173758de6ba90a58ad508fd1d9d6d88cdd740a31c6fd",
+      "method_id": "component_owner_cash_and_unit_nav",
+      "power_zone": "scarce_asset_optionality",
+      "component_id": "monitoring",
+      "correlation_group": "b3sa3.sa-fundamental-analyst-2026-10-28",
+      "metric": "listing close",
+      "comparator": "lte",
+      "threshold": 12.42,
+      "threshold_basis": {
+        "source_ref": "_system/research/fundamental_analyst/CASE_LOG_2026-10-28.md",
+        "rule": "Fire when the review-date B3SA3.SA close is at or below R$12.42, the 15% IRR buy price in the 2026-10-28 Stahl/HK case-log row. A hit means that buy price was met. A miss means the close was still above it.",
+        "claim_type": "fact"
+      },
+      "unit": "BRL",
+      "measurement_period_end": "2027-04-28",
+      "observable_after": "2027-04-28",
+      "resolution_deadline": "2027-04-28",
+      "source_hint": "listing_close",
+      "observation_plan": {
+        "metric_definition_id": "fundamental_analyst_observation",
+        "metric_definition_version": "1.0",
+        "source_adapter": "fundamental_analyst_observation",
+        "fiscal_period": "EVENT",
+        "observation_type": "instant",
+        "duration_basis": "point",
+        "canonical_unit": "BRL",
+        "expected_publication_date": "2027-04-28",
+        "accepted_forms": [
+          "analyst_observation"
+        ],
+        "maximum_source_lag_days": 14,
+        "end_date_tolerance_days": 7,
+        "historical_replay": {
+          "status": "passed",
+          "evidence_ref": "B3SA3.SA/research/fundamental_analyst/replay_2026-10-28.json"
+        },
+        "outcome_unavailable_at_registration": true
+      },
+      "probability_fires": null,
+      "calibration_eligible": false,
+      "severity": 4,
+      "derived_from": "Business fits; wait for price (Stahl / HK)",
+      "rationale": "Call (2026-10-28, Stahl / HK): Business fits; wait for price Reason: Exchange \"croupier\" toll model fits the lens (murray-stahl.md §1/§1b). Base IRR 12.0% at R$14.50 is below the 15% hurdle, which is met at ~R$12.42 (PRINCIPLES A13). Source: _system/research/fundamental_analyst/CASE_LOG_2026-10-28.md. Registered test: Fire when the review-date B3SA3.SA close is at or below R$12.42, the 15% IRR buy price in the 2026-10-28 Stahl/HK case-log row. A hit means that buy price was met. A miss means the close was still above it. Probability was not stated, so this spec is diagnostic and is not Brier-scored.",
+      "untestable": false,
+      "supersedes_spec_id": null,
+      "call": "Business fits; wait for price",
+      "lens": "Stahl / HK",
+      "case_log_ref": "_system/research/fundamental_analyst/CASE_LOG_2026-10-28.md",
+      "source": {
+        "case_log": "_system/research/fundamental_analyst/CASE_LOG_2026-10-28.md",
+        "lens": "Stahl / HK",
+        "call_date": "2026-10-28",
+        "ticker_cell": "B3 (B3SA3)"
+      },
+      "typed_blocker": "B3SA3.SA has no economic_ownership_map component named monitoring. The graph withholds typed status until a contract component exists, so E2 does not count this spec yet. resolve_falsifiers.py still scores it after the review date because the spec itself is valid."
+    },
+    {
+      "spec_schema_version": "3.0",
+      "spec_id": "b3sa3-sa-hohn-fee-increase-2027-04-28",
+      "spec_revision": 1,
+      "forecast_class": "ex_ante",
+      "forecast_role": "diagnostic",
+      "authored_at": "2026-10-29T18:00:00Z",
+      "information_cutoff_at": "2026-10-28T12:00:00Z",
+      "registered_at": "2026-10-29T18:00:00Z",
+      "registration_commit": "3a170ca50936df6724b5165c083246f19a676c08",
+      "analysis_run_id": "fundamental-analyst-2026-10-29",
+      "author": "fundamental-analyst",
+      "model_id": "fundamental-analyst-weekly-v1",
+      "prompt_version": "case-log-table-v1",
+      "contract_hash": "3755ad11c310d8ba5ff640d248a73746570a854518e22bf63dfedd497f54e121",
+      "component_fingerprint": "9b59c74d8c05b27487cb173758de6ba90a58ad508fd1d9d6d88cdd740a31c6fd",
+      "method_id": "component_owner_cash_and_unit_nav",
+      "power_zone": "scarce_asset_optionality",
+      "component_id": "monitoring",
+      "correlation_group": "b3sa3.sa-fundamental-analyst-2026-10-28",
+      "metric": "realised annual fee or price/mix change",
+      "comparator": "gt",
+      "threshold": 0,
+      "threshold_basis": {
+        "source_ref": "_system/research/fundamental_analyst/CASE_LOG_2026-10-28.md",
+        "rule": "Fire when a realised annual fee or price/mix change above zero is recorded. The 2026-10-28 Hohn evidence note says the pricing-power objection lapses only once B3 shows a realised fee increase. Zero is that boundary, not an inflation hurdle. A hit means an increase was observed.",
+        "claim_type": "inference"
+      },
+      "unit": "percent",
+      "measurement_period_end": "2027-04-28",
+      "observable_after": "2027-04-28",
+      "resolution_deadline": "2027-04-28",
+      "source_hint": "realised_fee_or_price_mix_change_pct",
+      "observation_plan": {
+        "metric_definition_id": "fundamental_analyst_observation",
+        "metric_definition_version": "1.0",
+        "source_adapter": "fundamental_analyst_observation",
+        "fiscal_period": "EVENT",
+        "observation_type": "instant",
+        "duration_basis": "point",
+        "canonical_unit": "percent",
+        "expected_publication_date": "2027-04-28",
+        "accepted_forms": [
+          "analyst_observation"
+        ],
+        "maximum_source_lag_days": 14,
+        "end_date_tolerance_days": 7,
+        "historical_replay": {
+          "status": "passed",
+          "evidence_ref": "B3SA3.SA/research/fundamental_analyst/replay_2026-10-28.json"
+        },
+        "outcome_unavailable_at_registration": true
+      },
+      "probability_fires": null,
+      "calibration_eligible": false,
+      "severity": 3,
+      "derived_from": "Watch; pricing power unproven (Hohn)",
+      "rationale": "Call (2026-10-28, Hohn): Watch; pricing power unproven Reason: Pricing power unproven: no realised record yet of price rises above inflation (chris-hohn.md §2 pricing-power test; PRINCIPLES A6). Base IRR 12.0% < 15%. Source: _system/research/fundamental_analyst/CASE_LOG_2026-10-28.md. Registered test: Fire when a realised annual fee or price/mix change above zero is recorded. The 2026-10-28 Hohn evidence note says the pricing-power objection lapses only once B3 shows a realised fee increase. Zero is that boundary, not an inflation hurdle. A hit means an increase was observed. Probability was not stated, so this spec is diagnostic and is not Brier-scored.",
+      "untestable": false,
+      "supersedes_spec_id": null,
+      "call": "Watch; pricing power unproven",
+      "lens": "Hohn",
+      "case_log_ref": "_system/research/fundamental_analyst/CASE_LOG_2026-10-28.md",
+      "source": {
+        "case_log": "_system/research/fundamental_analyst/CASE_LOG_2026-10-28.md",
+        "lens": "Hohn",
+        "call_date": "2026-10-28",
+        "ticker_cell": "B3 (B3SA3)"
+      },
+      "typed_blocker": "B3SA3.SA has no economic_ownership_map component named monitoring. The graph withholds typed status until a contract component exists, so E2 does not count this spec yet. resolve_falsifiers.py still scores it after the review date because the spec itself is valid."
+    }
+  ]
+}

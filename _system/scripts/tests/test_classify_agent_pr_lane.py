@@ -63,6 +63,35 @@ def test_a_committee_packet_stays_on_the_research_lane():
     ) == "research"
 
 
+def test_a_mechanical_ledger_or_book_estimate_stays_on_the_code_lane():
+    lane = load()
+    assert lane.classify(
+        "cursor/operating-kpi-ingest-4a60",
+        [
+            "MSB/research/kpi_ledger.json",
+            "GYRO/research/kpi_ledger.json",
+            "FRMO/research/book_estimate.json",
+            "_system/scripts/classify_agent_pr_lane.py",
+        ],
+    ) == "code"
+
+
+def test_a_ledger_plus_a_deep_dive_stays_on_the_research_lane():
+    lane = load()
+    assert lane.classify(
+        "cursor/operating-kpi-ingest-4a60",
+        [
+            "FRMO/research/book_estimate.json",
+            "FRMO/research/deep_dive_2026-10-20.md",
+        ],
+    ) == "research"
+
+
+def test_a_nested_ledger_copy_is_still_ticker_research():
+    lane = load()
+    assert lane.is_ticker_research("MSB/research/evidence/kpi_ledger.json") is True
+
+
 def test_a_manifest_stays_on_the_research_lane():
     lane = load()
     assert lane.classify(

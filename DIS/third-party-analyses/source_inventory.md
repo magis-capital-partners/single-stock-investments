@@ -1,6 +1,6 @@
 # DIS — Third-party source inventory
 
-**Date:** 2026-10-11
+**Date:** 2026-10-25
 **Sources:** 296 total (0 approved, 0 pending, 296 context)
 
 | ID | Title | Path | Status | Use |
@@ -212,6 +212,8 @@
 | activist_long | The Carlyle Group — DEFA14A | `DIS/third-party-analyses/activist_reports/long/DEFA14A_20220228_acc0001193125_22_058086.htm` | context | activist/long — sec_edgar |
 | activist_long | The Carlyle Group — DEFA14A | `DIS/third-party-analyses/activist_reports/long/DEFA14A_20210216_acc0001193125_21_045237.htm` | context | activist/long — sec_edgar |
 | activist_long | The Carlyle Group — DEFA14A | `DIS/third-party-analyses/activist_reports/long/DEFA14A_20200121_acc0001104659_20_005268.htm` | context | activist/long — sec_edgar |
+| activist_long | acc0000950157 24 000595 | `DIS/third-party-analyses/activist_reports/long/8-K_20240409_acc0000950157_24_000595.htm` | context | activist/long — local |
+| activist_long | acc0001744489 22 000167 | `DIS/third-party-analyses/activist_reports/long/8-K_20220930_acc0001744489_22_000167.htm` | context | activist/long — local |
 | activist_long | acc0001744489 20 000044 | `DIS/third-party-analyses/activist_reports/long/8-K_20200204_acc0001744489_20_000044.htm` | context | activist/long — local |
 | activist_long | acc0001744489 20 000054 | `DIS/third-party-analyses/activist_reports/long/8-K_20200225_acc0001744489_20_000054.htm` | context | activist/long — local |
 | activist_long | acc0001744489 20 000066 | `DIS/third-party-analyses/activist_reports/long/8-K_20200311_acc0001744489_20_000066.htm` | context | activist/long — local |
@@ -247,7 +249,6 @@
 | activist_long | acc0001744489 22 000099 | `DIS/third-party-analyses/activist_reports/long/8-K_20220511_acc0001744489_22_000099.htm` | context | activist/long — local |
 | activist_long | acc0001744489 22 000121 | `DIS/third-party-analyses/activist_reports/long/8-K_20220628_acc0001744489_22_000121.htm` | context | activist/long — local |
 | activist_long | acc0001744489 22 000160 | `DIS/third-party-analyses/activist_reports/long/8-K_20220810_acc0001744489_22_000160.htm` | context | activist/long — local |
-| activist_long | acc0001744489 22 000167 | `DIS/third-party-analyses/activist_reports/long/8-K_20220930_acc0001744489_22_000167.htm` | context | activist/long — local |
 | activist_long | acc0001744489 22 000192 | `DIS/third-party-analyses/activist_reports/long/8-K_20221108_acc0001744489_22_000192.htm` | context | activist/long — local |
 | activist_long | acc0001744489 22 000200 | `DIS/third-party-analyses/activist_reports/long/8-K_20221121_acc0001744489_22_000200.htm` | context | activist/long — local |
 | activist_long | acc0001744489 23 000047 | `DIS/third-party-analyses/activist_reports/long/8-K_20230208_acc0001744489_23_000047.htm` | context | activist/long — local |
@@ -274,7 +275,6 @@
 | activist_long | acc0001193125 24 049404 | `DIS/third-party-analyses/activist_reports/long/8-K_20240228_acc0001193125_24_049404.htm` | context | activist/long — local |
 | activist_long | acc0001193125 24 057958 | `DIS/third-party-analyses/activist_reports/long/8-K_20240304_acc0001193125_24_057958.htm` | context | activist/long — local |
 | activist_long | acc0000950157 24 000570 | `DIS/third-party-analyses/activist_reports/long/8-K_20240403_acc0000950157_24_000570.htm` | context | activist/long — local |
-| activist_long | acc0000950157 24 000595 | `DIS/third-party-analyses/activist_reports/long/8-K_20240409_acc0000950157_24_000595.htm` | context | activist/long — local |
 | activist_long | acc0001744489 24 000149 | `DIS/third-party-analyses/activist_reports/long/8-K_20240507_acc0001744489_24_000149.htm` | context | activist/long — local |
 | activist_long | acc0001744489 24 000226 | `DIS/third-party-analyses/activist_reports/long/8-K_20240719_acc0001744489_24_000226.htm` | context | activist/long — local |
 | activist_long | acc0001744489 24 000231 | `DIS/third-party-analyses/activist_reports/long/8-K_20240807_acc0001744489_24_000231.htm` | context | activist/long — local |
@@ -302,4 +302,4 @@
 | activist_long | acc0001744489 26 000036 | `DIS/third-party-analyses/activist_reports/long/8-K_20260506_acc0001744489_26_000036.htm` | context | activist/long — local |
 | activist_long | acc0001744489 26 000056 | `DIS/third-party-analyses/activist_reports/long/8-K_20260805_acc0001744489_26_000056.htm` | context | activist/long — local |
 
-Cross-check required: `DIS/research/cross_check_third_party_2026-10-11.md`
+Cross-check required: `DIS/research/cross_check_third_party_2026-10-25.md`

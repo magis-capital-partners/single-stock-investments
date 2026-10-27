@@ -1,8 +1,8 @@
-# PAYX — Insider conviction (2026-10-17)
+# PAYX — Insider conviction (2026-10-18)
 
 > Context only. Insider activity informs scenario confidence and stance discussion; it does not auto-inflate Lawrence base IRR. Promotion requires [HUMAN REVIEW].
 
-**ICS:** 4.74 (moderate) · **Bull case support:** moderate
+**ICS:** 4.73 (moderate) · **Bull case support:** moderate
 
 | Scenario | Prior weight | Tilted weight |
 |----------|--------------|---------------|
@@ -12,7 +12,7 @@
 
 | Insider | Date | Shares | Price | Value | Contrib |
 |---------|------|--------|-------|-------|---------|
-| MUCCI MARTIN | 2026-07-14 | 214482 | $57.24 | $12276949.68 | 1.3 |
+| MUCCI MARTIN | 2026-07-14 | 214482 | $57.24 | $12276949.68 | 1.291 |
 | TUCCI JOSEPH M | 2026-06-26 | 10220 | $60.59 | $619229.8 | 1.135 |
 | VELLI JOSEPH M | 2026-05-08 | 10220 | $60.59 | $619229.8 | 1.115 |
 | BONADIO TOM | 2026-02-04 | 1000 | $98.498 | $98498.0 | 0.858 |

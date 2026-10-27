@@ -224,7 +224,7 @@ def _npv(rate: float, cashflows: list[dict]) -> float:
     )
 
 
-def _cashflow_irr(price: float | None, cashflows: list[dict]) -> float | None:
+def _cashflow_irr(price: float | None, cashflows: list[dict], *, decimal_places: int = 2) -> float | None:
     try:
         price_value = float(price)
     except (TypeError, ValueError):
@@ -263,7 +263,7 @@ def _cashflow_irr(price: float | None, cashflows: list[dict]) -> float | None:
             low = mid
             low_value = mid_value
     result = (low + high) / 2
-    return round(result * 100, 2) if isfinite(result) else None
+    return round(result * 100, decimal_places) if isfinite(result) else None
 
 
 def entry_price_for_contract_valuation(
@@ -459,6 +459,15 @@ def build_universal_valuation_contract(data: dict, explicit_profile: str | None 
     if shares is None and inputs.get("shares_millions") is not None:
         shares = float(inputs["shares_millions"]) * 1_000_000
     methodology = data.get("valuation_methodology") or {}
+    if methodology.get("schedule_generator") == "tci_return_bridge@1.0":
+        # Explicit opt-in after proposal promotion. The existing method-fit,
+        # ownership, source-lock and calculation-proof gates still decide
+        # eligibility; deriving a schedule never upgrades those controls.
+        from tci_return_bridge import build_bridge
+        bridge = build_bridge(data)
+        data["tci_return_bridge"] = bridge
+        methodology = {**methodology, "forward_cashflow_schedule": bridge.get("forward_cashflow_schedule") or {}}
+        data["valuation_methodology"] = methodology
     output_basis, output_basis_status, basis_errors = _resolve_output_basis(
         methodology, additive
     )
@@ -466,6 +475,11 @@ def build_universal_valuation_contract(data: dict, explicit_profile: str | None 
     distributions = float(methodology.get("expected_distributions_per_share") or 0)
     validation_errors = list(economic.get("validation_errors") or [])
     evidence_blockers: list[str] = []
+    if methodology.get("schedule_generator") == "tci_return_bridge@1.0":
+        evidence_blockers.extend((data.get("tci_return_bridge") or {}).get("gaps") or [])
+        bear = (data.get("scenarios") or {}).get("bear") or {}
+        if not bear.get("moat_impairment_spec_ids"):
+            evidence_blockers.append("TCI schedule requires anchored typed bear moat-impairment falsifiers.")
     try:
         price_ok = price is not None and float(price) > 0
     except (TypeError, ValueError):
@@ -940,6 +954,11 @@ def build_universal_valuation_contract(data: dict, explicit_profile: str | None 
             "authorize capital."
         ),
     }
+    # Research availability is a mathematical property, independent of capital
+    # approval. Keep the legacy proof-output fields for compatibility; all new
+    # price/return publication uses this one source-bound forecast.
+    from valuation_forecast import build_forecast
+    contract["shared_forecast"] = build_forecast(data)
     contract["change_control"]["model_hash"] = canonical_hash({k: v for k, v in contract.items() if k != "change_control"})
     data["universal_valuation_contract"] = contract
     return contract

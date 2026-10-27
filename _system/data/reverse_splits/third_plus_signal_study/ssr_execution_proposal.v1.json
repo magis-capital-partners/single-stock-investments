@@ -1,0 +1,108 @@
+{
+  "schema": "third_plus_ssr_execution_proposal.v1",
+  "status": "proposed_not_backtested_or_live",
+  "asof_et": "2026-10-25",
+  "production_authority": "none",
+  "parameters_inherited": {
+    "reference_nav_usd": 10000000,
+    "parent_initial_notional_cap_usd": 100000,
+    "maximum_concurrent_issuers": 3,
+    "margin_capacity_admission": false,
+    "sleeve_reserve_admission": false,
+    "minimum_future_sessions": 0,
+    "planned_exit_sessions": 20,
+    "signal": "Third-plus AND saved daily-50%-rally veto AND dilution >=25% for primary comparison; other arms preserved"
+  },
+  "parent_policy": {
+    "entry_session": "Original eligible entry session; no new future-public information",
+    "arrival": "09:31 ET for continuous-session primary; source availability and valid-market gates must also pass",
+    "entry_windows_minutes": [
+      30,
+      60
+    ],
+    "primary_window_minutes": 60,
+    "participation_rates": [
+      0.05,
+      0.1
+    ],
+    "hard_max_participation": 0.1,
+    "participation_denominator": "Deduplicated external observed volume through latest available timestamp; independent reserve for working and pending-cancel children",
+    "child_notional_cap_usd": 2000,
+    "maximum_live_children_per_issuer": 1,
+    "minimum_reprice_interval_seconds": 5,
+    "stale_quote_threshold_seconds": 1,
+    "admission_requires": [
+      "broker-confirmed usable borrow quantity and expiry",
+      "valid as-of NBBO and market status",
+      "allowed route and dated price grid",
+      "remaining parent/borrow/working-quantity budget",
+      "remaining net-edge estimate positive after covering and costs"
+    ],
+    "freshness_definition": "Age of the validated market state and feed continuity/heartbeat, not time since the last quote price change.",
+    "reprice_exception": "Discretionary cooldown never delays route-required handling or a safety cancellation.",
+    "cap_basis": "Fixed parent share budget from $100,000 / valid arrival midpoint; track actual fill proceeds separately and never expand the share budget after a price decline.",
+    "deadline_reference": "09:31 ET plus the declared window on the original entry session; no restart or extension after a halt, borrow delay or rejected child."
+  },
+  "policies": [
+    {
+      "id": "E0",
+      "name": "Matched SSR-skip control",
+      "role": "Same clear-status execution, clocks and other rules; skip only restricted states"
+    },
+    {
+      "id": "E1",
+      "name": "Displayed offer with queue preservation"
+    },
+    {
+      "id": "E2",
+      "name": "Improve to route-permitted price above NBB",
+      "role": "preferred first hypothesis"
+    },
+    {
+      "id": "E3",
+      "name": "Broker/venue-native SSR repricer",
+      "requires": "Verified behavior and supported access for actual security/account"
+    }
+  ],
+  "primary_comparisons": 12,
+  "comparison_definition": "3 continuous-session methods x 2 windows x 2 participation rates; original skip control separate",
+  "optional_followups": [
+    "Venue-supported opening auction as separate experiment",
+    "Broker-supported passive peg or midpoint route after verification",
+    "Delayed next eligible session as separately defined strategy"
+  ],
+  "latency_stress_ms": [
+    100,
+    500,
+    2000
+  ],
+  "fill_models": [
+    "Conservative event-level queue, with no unobserved cancellation credit",
+    "Alternative measured queue assumptions calibrated only from prior own executions"
+  ],
+  "live_parity": "One deterministic decision state machine; historical exchange simulator versus isolated broker adapter",
+  "simulation_requirements": [
+    "Receipt-time or latency-aware market events; no final-day volume at order decision",
+    "Do not fill solely because a bar touched the limit",
+    "No duplicate consolidated/direct-feed volume or reuse of unchanged depth",
+    "Route-specific initially-displayed-order handling; no unconditional repricing on bid touch",
+    "Partial fills, pending-cancel fills, borrow reservations, per-child fees and cover liabilities",
+    "Keep original signal-anchored exit clock in primary; recent incomplete positions remain marked",
+    "No blanket 50% restricted fill assumption in credible primary replay"
+  ],
+  "proof_checkpoints": {
+    "shadow": "All eligible decisions logged, with quote/status/borrow coverage and no unsupported fill claims",
+    "execution_pilot": "At least 200 child attempts over 30 SSR parent decisions and 20 issuers, plus adequate fills in each chosen quote/spread regime; minimum checkpoint, not automatic validation",
+    "strategy_evidence": "At least 50 eligible future parent decisions over 30 issuers; uncertainty and adverse-selection/concentration/cost/exit checks still required",
+    "scale": "Small authorized parents first; increase only after realized borrow, fill, shortfall and cover calibration. $100k remains the ceiling."
+  },
+  "operational_boundary": {
+    "SSI": "Research, intent display and Flex HTTPS reconciliation; no standing/polling Gateway connection",
+    "autonomous_executor": "Separately reviewed service and broker connection isolated from SPX Gateway; no client ID assigned here",
+    "authorization": "A future live implementation requires broker access and explicit order authorization; no trades or settings changed by this proposal"
+  },
+  "data_purchase_authority_usd": 0,
+  "sealed_holdout_access": false,
+  "control_definition": "A matched E0 for each window/participation setting isolates SSR execution. Preserve the old opening-fill backtest as a separate diagnostic, not as the matched execution control.",
+  "historical_borrow": "Keep conditional-on-borrow replay separate from borrow-verified replay. Current indicative inventory cannot establish past locates."
+}

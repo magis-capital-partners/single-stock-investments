@@ -1,19 +1,19 @@
-# UAL — Insider conviction (2026-10-17)
+# UAL — Insider conviction (2026-10-19)
 
 > Context only. Insider activity informs scenario confidence and stance discussion; it does not auto-inflate Lawrence base IRR. Promotion requires [HUMAN REVIEW].
 
-**ICS:** 2.29 (weak) · **Bull case support:** none
+**ICS:** 2.24 (weak) · **Bull case support:** none
 
 | Scenario | Prior weight | Tilted weight |
 |----------|--------------|---------------|
-| Bear | 20% | 23% |
+| Bear | 20% | 24% |
 | Base | 55% | 52% |
 | Bull | 25% | 25% |
 
 | Insider | Date | Shares | Price | Value | Contrib |
 |---------|------|--------|-------|-------|---------|
-| KIRBY J SCOTT | 2026-07-21 | 159321 | $58.69 | $9350549.49 | 1.716 |
-| Hart Brett J | 2026-07-27 | 21521 | $77.56 | $1669168.76 | 1.277 |
+| KIRBY J SCOTT | 2026-07-21 | 159321 | $58.69 | $9350549.49 | 1.688 |
+| Hart Brett J | 2026-07-27 | 21521 | $77.56 | $1669168.76 | 1.256 |
 
 **Routine / planned sales (context):**
 

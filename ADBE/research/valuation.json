@@ -4155,7 +4155,7 @@
       ]
     },
     "change_control": {
-      "model_hash": "bdf9f3fe4f4b08b69b00db0ba433102f6624dac9d5409138da1ccff5433de6e0",
+      "model_hash": "8869ef32cdca65706679f1d117441e3bd99625c5ad944b1b61f92365b839005b",
       "method_versions": [
         "net_asset_value@1.0",
         "owner_cash_or_dividend_discount@1.0",
@@ -4165,7 +4165,74 @@
       "change_log": [],
       "rule": "A source fact is locked. Every assumption change requires a reason, author, timestamp, and before/after value."
     },
-    "decision_rule": "Proof status and investment readiness are separate. Every material claim must be valued exactly once by a valid calculation proof, every evidence blocker must be resolved, and the model must be stock-specific before committee review. Only a human decision can authorize capital."
+    "decision_rule": "Proof status and investment readiness are separate. Every material claim must be valued exactly once by a valid calculation proof, every evidence blocker must be resolved, and the model must be stock-specific before committee review. Only a human decision can authorize capital.",
+    "shared_forecast": {
+      "schema_version": "1.0",
+      "method_version": "shared-valuation-forecast/1.3",
+      "ticker": "ADBE",
+      "status": "sync_gap",
+      "research_only": true,
+      "requires_human_review": false,
+      "capital_actionable": false,
+      "as_of": "2026-08-31",
+      "model_as_of": "2026-07-22",
+      "quote": {
+        "value": 292.79,
+        "as_of": "2026-08-31",
+        "source_url": "Yahoo ADBE close 2026-08-31"
+      },
+      "forecast_hash": null,
+      "forward_irr_pct": {
+        "low": null,
+        "base": null,
+        "high": null
+      },
+      "present_value_today_per_share": {
+        "low": null,
+        "base": null,
+        "high": null
+      },
+      "model_present_value_per_share": {
+        "low": null,
+        "base": null,
+        "high": null
+      },
+      "required_return_pct": {
+        "low": null,
+        "base": null,
+        "high": null
+      },
+      "forward_cashflow_schedule": {},
+      "buy_prices": [],
+      "components": [],
+      "gaps": [
+        {
+          "code": "listing_calendar_or_completed_close_unverified"
+        },
+        {
+          "code": "corporate_action_history_unverified"
+        }
+      ],
+      "warnings": [],
+      "source_refs": [],
+      "next_action": "automatic_source_refresh",
+      "reconciliation": {
+        "passed": false
+      },
+      "settlement_policy": "Explicit cash/debt additions in an operating DCF are time-zero acquisition adjustments; hypothetical settlement, not declared dividends.",
+      "financial_period": "2025-11-28",
+      "market_sync": {
+        "status": "updating",
+        "price_as_of": "2026-08-31",
+        "financial_period": "2025-11-28",
+        "model_as_of": "2026-07-22",
+        "price_policy": "latest_completed_exchange_session",
+        "basis_id": null,
+        "latest_report": {}
+      },
+      "assumptions_as_of": "2026-07-22",
+      "calculation_id": "5f88425ebdf0c6a4c9cc3864467a5475a2f3148effbe894991b74eb2c19fe2e3"
+    }
   },
   "synthesis": {
     "status": "complete",
@@ -4250,7 +4317,7 @@
     "notes": "Capstone IRR combining filings, segments, overlays, third-party, qualitative"
   },
   "context_overlay": {
-    "as_of": "2026-10-17",
+    "as_of": "2026-10-29",
     "disclaimer": "Context only. Tailwinds inform stance and overlay sizing; they do not auto-inflate Lawrence base IRR. Promotion to base case requires [HUMAN REVIEW].",
     "themes": [
       {
@@ -4260,10 +4327,10 @@
           {
             "id": "hy_oas",
             "label": "High-yield OAS credit spread (%)",
-            "latest": -0.69,
-            "as_of": "2026-10-16",
-            "yoy_pct": 30.3,
-            "direction": "up",
+            "latest": -1.55,
+            "as_of": "2026-10-29",
+            "yoy_pct": -52.0,
+            "direction": "down",
             "good_for": "risk_regime",
             "source": "spread:HYG-LQD:21d (HYG-LQD 1m spread proxy, not OAS)",
             "stale": false,
@@ -4272,9 +4339,9 @@
           {
             "id": "ust_10y",
             "label": "US Treasury 10Y yield (%)",
-            "latest": 5.0980000495910645,
-            "as_of": "2026-10-16",
-            "yoy_pct": 28.2,
+            "latest": 4.991000175476074,
+            "as_of": "2026-10-29",
+            "yoy_pct": 23.0,
             "direction": "up",
             "good_for": "rates_regime",
             "source": "yahoo:^TNX",
@@ -4284,9 +4351,9 @@
           {
             "id": "ust_2y",
             "label": "US Treasury 2Y yield (%)",
-            "latest": 4.89900016784668,
-            "as_of": "2026-10-16",
-            "yoy_pct": 38.0,
+            "latest": 4.804999828338623,
+            "as_of": "2026-10-29",
+            "yoy_pct": 30.0,
             "direction": "up",
             "good_for": "rates_regime",
             "source": "yahoo:^FVX",
@@ -4296,9 +4363,9 @@
           {
             "id": "dxy_broad",
             "label": "Trade-weighted USD index (broad)",
-            "latest": 101.83999633789062,
-            "as_of": "2026-10-16",
-            "yoy_pct": 3.5,
+            "latest": 102.0250015258789,
+            "as_of": "2026-10-29",
+            "yoy_pct": 2.8,
             "direction": "up",
             "good_for": "dollar_regime",
             "source": "yahoo:DX-Y.NYB",
@@ -4308,10 +4375,10 @@
           {
             "id": "vix_level",
             "label": "VIX index level",
-            "latest": 19.989999771118164,
-            "as_of": "2026-10-16",
-            "yoy_pct": -21.0,
-            "direction": "down",
+            "latest": 17.059999465942383,
+            "as_of": "2026-10-29",
+            "yoy_pct": 0.8,
+            "direction": "flat",
             "good_for": "vol_regime",
             "source": "yahoo:^VIX",
             "stale": false,
@@ -4320,10 +4387,10 @@
           {
             "id": "credit_impulse_1m",
             "label": "HYG vs TLT 1-month return spread (%)",
-            "latest": -0.25,
-            "as_of": "2026-10-16",
-            "yoy_pct": 87.6,
-            "direction": "up",
+            "latest": -4.27,
+            "as_of": "2026-10-29",
+            "yoy_pct": -92.3,
+            "direction": "down",
             "good_for": "credit_impulse",
             "source": "spread:HYG-TLT:21d",
             "stale": false,
@@ -4332,9 +4399,9 @@
           {
             "id": "spy_20d_realized_vol",
             "label": "SPY 20-day realized vol (annualized %)",
-            "latest": 10.2,
-            "as_of": "2026-10-16",
-            "yoy_pct": -19.6,
+            "latest": 10.02,
+            "as_of": "2026-10-29",
+            "yoy_pct": -27.9,
             "direction": "down",
             "good_for": "equity_vol",
             "source": "realized_vol:SPY:20d",
@@ -4370,8 +4437,11 @@
     ]
   },
   "insider_signal": {
-    "as_of": "2026-10-17",
+    "as_of": "2026-09-18",
     "disclaimer": "Context only. Insider activity informs scenario confidence and stance discussion; it does not auto-inflate Lawrence base IRR. Promotion requires [HUMAN REVIEW].",
+    "processed_at": "2026-10-29",
+    "constituent_identity_verified": true,
+    "score_version": 2,
     "in_base_irr": false,
     "window_days": 365,
     "ics": 0.83,
@@ -4397,7 +4467,7 @@
       "sell_score": -1.0,
       "cluster_bonus": 0.0,
       "net_buy_usd": 1945130.0,
-      "net_sell_usd": 83168329.48,
+      "net_sell_usd": 50773008.97,
       "price_today": 292.79
     },
     "top_buys": [
@@ -4419,7 +4489,7 @@
         "price": 246.0861,
         "value_usd": 339106.65,
         "is_10b5_1": false,
-        "contrib": -0.224
+        "contrib": -0.203
       },
       {
         "insider": "NARAYEN SHANTANU",
@@ -4428,7 +4498,7 @@
         "price": 247.3596,
         "value_usd": 848443.43,
         "is_10b5_1": false,
-        "contrib": -0.224
+        "contrib": -0.203
       },
       {
         "insider": "NARAYEN SHANTANU",
@@ -4437,7 +4507,7 @@
         "price": 248.1427,
         "value_usd": 1778686.87,
         "is_10b5_1": false,
-        "contrib": -0.224
+        "contrib": -0.203
       },
       {
         "insider": "NARAYEN SHANTANU",
@@ -4446,7 +4516,7 @@
         "price": 249.1717,
         "value_usd": 2569707.74,
         "is_10b5_1": false,
-        "contrib": -0.224
+        "contrib": -0.203
       },
       {
         "insider": "NARAYEN SHANTANU",
@@ -4455,11 +4525,11 @@
         "price": 250.1868,
         "value_usd": 4402036.75,
         "is_10b5_1": false,
-        "contrib": -0.224
+        "contrib": -0.203
       }
     ],
     "narrative_hooks": [],
-    "transaction_count": 244
+    "transaction_count": 21
   },
   "lens_consensus": {
     "as_of": "2026-07-22",
@@ -4514,21 +4584,27 @@
     "implied_growth_contract": "Constant 7-year owner-cash growth with a 25x terminal owner-cash multiple; diagnostic, not forecast.",
     "entry_prices_by_hurdle_and_case": {
       "bear": {
+        "8pct": 507.95,
         "10pct": 454.28,
         "12pct": 407.54,
         "15pct": 348.24,
+        "18pct": 299.54,
         "20pct": 271.89
       },
       "base": {
+        "8pct": 747.37,
         "10pct": 665.61,
         "12pct": 594.54,
         "15pct": 504.6,
+        "18pct": 430.96,
         "20pct": 389.25
       },
       "bull": {
+        "8pct": 1014.28,
         "10pct": 900.98,
         "12pct": 802.59,
         "15pct": 678.28,
+        "18pct": 576.67,
         "20pct": 519.21
       }
     },
@@ -4807,7 +4883,7 @@
       "independence_groups": []
     }
   },
-  "schema_version": "magis.valuation.v2",
+  "schema_version": "magis.valuation.v3",
   "returns": {
     "base_irr_pct": 27.1,
     "unit": "percent_per_year",
@@ -4818,5 +4894,268 @@
       "base": 25.9,
       "bull": 31.9
     }
+  },
+  "tci_return_bridge": {
+    "schema_version": "1.0",
+    "unit": "percent_per_year",
+    "method": "dated_forward_cashflow_schedule_per_share@1.0",
+    "status": "diagnostic",
+    "research_only": true,
+    "capital_actionable": false,
+    "horizon_years": 7,
+    "persona_horizon_note": "Hohn's 4-year lens scores business fit; the contract uses the existing 7-year cash-flow horizon, with a separate 10-year sensitivity.",
+    "model_as_of": "2026-07-22",
+    "price": 292.79,
+    "price_as_of": "2026-08-31",
+    "sources": [
+      {
+        "ref": "ADBE/research/valuation.json#inputs.price",
+        "locator": "Yahoo ADBE close 2026-08-31",
+        "as_of": "2026-07-22",
+        "claim_type": "inference",
+        "status": "assumption"
+      },
+      {
+        "ref": "ADBE/research/valuation.json#inputs.fcf_per_share",
+        "locator": "FY2025 operating cash flow $10031.0M less capital spending $179.0M ÷ 427.0M diluted shares per ADBE/investor-documents/sec-edgar/10-K_20260115_rpt20251128_acc0000796343_26_000003.htm",
+        "as_of": "2026-07-22",
+        "claim_type": "inference",
+        "status": "assumption"
+      }
+    ],
+    "normalization_note": "Lawrence uses reported free cash flow; stock-based compensation is already a non-cash add-back in cash from operations.",
+    "claim_type": "inference",
+    "scenarios": {
+      "bear": {
+        "fcf_yield_pct": 7.879367464735817,
+        "per_share_fcf_growth_pct": 4.424641294240117,
+        "multiple_change_pct": 6.713001592657353,
+        "approximate_return_pct": 19.01701035163329,
+        "exact_irr_pct": 18.46569794486595,
+        "reconciliation_gap_pp": -0.5513124067673374,
+        "reconciliation_reason": "Compounding, growing interim cash distributions and terminal timing.",
+        "growth_components": {
+          "organic_growth_pct": null,
+          "reinvestment_rate_pct": null,
+          "incremental_roic_pct": null,
+          "dilution_pct": null,
+          "buyback_accretion_pct": null
+        },
+        "growth_component_gap_pp": null,
+        "growth_components_status": "gap",
+        "mechanism": "Generative-AI competition slows net new Creative Cloud seats; multiple compresses",
+        "claim_type": "inference",
+        "legacy_reported_return_pct": 18.5
+      },
+      "base": {
+        "fcf_yield_pct": 7.879367464735817,
+        "per_share_fcf_growth_pct": 8.134296718466505,
+        "multiple_change_pct": 10.169562138203837,
+        "approximate_return_pct": 26.18322632140616,
+        "exact_irr_pct": 25.8921682488734,
+        "reconciliation_gap_pp": -0.29105807253275984,
+        "reconciliation_reason": "Compounding, growing interim cash distributions and terminal timing.",
+        "growth_components": {
+          "organic_growth_pct": null,
+          "reinvestment_rate_pct": null,
+          "incremental_roic_pct": null,
+          "dilution_pct": null,
+          "buyback_accretion_pct": null
+        },
+        "growth_component_gap_pp": null,
+        "growth_components_status": "gap",
+        "mechanism": "Subscription RPO supports mid-single-digit visibility; Firefly embedded in Creative Cloud",
+        "claim_type": "inference",
+        "legacy_reported_return_pct": 25.9
+      },
+      "bull": {
+        "fcf_yield_pct": 7.879367464735817,
+        "per_share_fcf_growth_pct": 10.842260696067196,
+        "multiple_change_pct": 13.076727148502654,
+        "approximate_return_pct": 31.79835530930567,
+        "exact_irr_pct": 31.879434995671176,
+        "reconciliation_gap_pp": 0.08107968636550567,
+        "reconciliation_reason": "Compounding, growing interim cash distributions and terminal timing.",
+        "growth_components": {
+          "organic_growth_pct": null,
+          "reinvestment_rate_pct": null,
+          "incremental_roic_pct": null,
+          "dilution_pct": null,
+          "buyback_accretion_pct": null
+        },
+        "growth_component_gap_pp": null,
+        "growth_components_status": "gap",
+        "mechanism": "AI monetization lifts ARPU; Experience Cloud share gains; sustained buybacks",
+        "claim_type": "inference",
+        "legacy_reported_return_pct": 31.9
+      }
+    },
+    "sensitivity_10yr": {
+      "bear": {
+        "fcf_yield_pct": 7.879367464735817,
+        "per_share_fcf_growth_pct": 3.995192196562636,
+        "multiple_change_pct": 4.653109074217321,
+        "approximate_return_pct": 16.527668735515775,
+        "exact_irr_pct": 15.90048442574901,
+        "reconciliation_gap_pp": -0.6271843097667649,
+        "reconciliation_reason": "Compounding, growing interim cash distributions and terminal timing.",
+        "growth_components": {
+          "organic_growth_pct": null,
+          "reinvestment_rate_pct": null,
+          "incremental_roic_pct": null,
+          "dilution_pct": null,
+          "buyback_accretion_pct": null
+        },
+        "growth_component_gap_pp": null,
+        "growth_components_status": "gap",
+        "mechanism": "Generative-AI competition slows net new Creative Cloud seats; multiple compresses",
+        "claim_type": "inference",
+        "legacy_reported_return_pct": 18.5
+      },
+      "base": {
+        "fcf_yield_pct": 7.879367464735817,
+        "per_share_fcf_growth_pct": 7.489534374282236,
+        "multiple_change_pct": 7.014625586322554,
+        "approximate_return_pct": 22.38352742534061,
+        "exact_irr_pct": 21.835848290830853,
+        "reconciliation_gap_pp": -0.5476791345097567,
+        "reconciliation_reason": "Compounding, growing interim cash distributions and terminal timing.",
+        "growth_components": {
+          "organic_growth_pct": null,
+          "reinvestment_rate_pct": null,
+          "incremental_roic_pct": null,
+          "dilution_pct": null,
+          "buyback_accretion_pct": null
+        },
+        "growth_component_gap_pp": null,
+        "growth_components_status": "gap",
+        "mechanism": "Subscription RPO supports mid-single-digit visibility; Firefly embedded in Creative Cloud",
+        "claim_type": "inference",
+        "legacy_reported_return_pct": 25.9
+      },
+      "bull": {
+        "fcf_yield_pct": 7.879367464735817,
+        "per_share_fcf_growth_pct": 9.98181667894018,
+        "multiple_change_pct": 8.983627935718253,
+        "approximate_return_pct": 26.844812079394252,
+        "exact_irr_pct": 26.459902947775056,
+        "reconciliation_gap_pp": -0.38490913161919593,
+        "reconciliation_reason": "Compounding, growing interim cash distributions and terminal timing.",
+        "growth_components": {
+          "organic_growth_pct": null,
+          "reinvestment_rate_pct": null,
+          "incremental_roic_pct": null,
+          "dilution_pct": null,
+          "buyback_accretion_pct": null
+        },
+        "growth_component_gap_pp": null,
+        "growth_components_status": "gap",
+        "mechanism": "AI monetization lifts ARPU; Experience Cloud share gains; sustained buybacks",
+        "claim_type": "inference",
+        "legacy_reported_return_pct": 31.9
+      }
+    },
+    "forward_cashflow_schedule": {
+      "low": [
+        {
+          "year": 1,
+          "amount_per_share": 24.2235
+        },
+        {
+          "year": 2,
+          "amount_per_share": 25.434675000000002
+        },
+        {
+          "year": 3,
+          "amount_per_share": 26.706408750000005
+        },
+        {
+          "year": 4,
+          "amount_per_share": 28.041729187500007
+        },
+        {
+          "year": 5,
+          "amount_per_share": 29.44381564687501
+        },
+        {
+          "year": 6,
+          "amount_per_share": 30.32713011628126
+        },
+        {
+          "year": 7,
+          "amount_per_share": 655.9758244151636
+        }
+      ],
+      "base": [
+        {
+          "year": 1,
+          "amount_per_share": 25.146300000000004
+        },
+        {
+          "year": 2,
+          "amount_per_share": 27.409467000000006
+        },
+        {
+          "year": 3,
+          "amount_per_share": 29.87631903000001
+        },
+        {
+          "year": 4,
+          "amount_per_share": 32.56518774270001
+        },
+        {
+          "year": 5,
+          "amount_per_share": 35.49605463954302
+        },
+        {
+          "year": 6,
+          "amount_per_share": 37.625817917915604
+        },
+        {
+          "year": 7,
+          "amount_per_share": 1036.9675418177542
+        }
+      ],
+      "high": [
+        {
+          "year": 1,
+          "amount_per_share": 25.838400000000004
+        },
+        {
+          "year": 2,
+          "amount_per_share": 28.93900800000001
+        },
+        {
+          "year": 3,
+          "amount_per_share": 32.41168896000001
+        },
+        {
+          "year": 4,
+          "amount_per_share": 36.30109163520002
+        },
+        {
+          "year": 5,
+          "amount_per_share": 40.65722263142402
+        },
+        {
+          "year": 6,
+          "amount_per_share": 43.909800441937946
+        },
+        {
+          "year": 7,
+          "amount_per_share": 1470.1001187960826
+        }
+      ]
+    },
+    "gaps": [
+      "GAP: the full-model sensitivity distributes all modeled FCF and adds terminal equity value; explicitly reconcile reinvestment, buybacks and net-asset timing before publishing it as shareholder IRR.",
+      "GAP: bear cited causal drivers require underwriting; scenario notes alone are insufficient.",
+      "GAP: bear growth attribution missing organic_growth_pct, reinvestment_rate_pct, incremental_roic_pct, dilution_pct, buyback_accretion_pct; do not add buybacks twice to per-share growth.",
+      "GAP: base cited causal drivers require underwriting; scenario notes alone are insufficient.",
+      "GAP: base growth attribution missing organic_growth_pct, reinvestment_rate_pct, incremental_roic_pct, dilution_pct, buyback_accretion_pct; do not add buybacks twice to per-share growth.",
+      "GAP: bull cited causal drivers require underwriting; scenario notes alone are insufficient.",
+      "GAP: bull growth attribution missing organic_growth_pct, reinvestment_rate_pct, incremental_roic_pct, dilution_pct, buyback_accretion_pct; do not add buybacks twice to per-share growth."
+    ],
+    "distribution_assumption": "Sensitivity assumes all modeled FCF is distributable after reinvestment and cash/debt are already reflected in terminal equity proceeds. Not established without an explicit reconciled policy."
   }
 }

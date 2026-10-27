@@ -15,12 +15,34 @@
       "marvin_contract_backfill": {},
       "epistemic_forecast": {},
       "investment_committee": {
-        "frontier_task_ids": ["chair-synthesis"]
+        "frontier_task_ids": [
+          "chair-synthesis"
+        ]
       },
       "vicki_ir": {},
       "ci_autofix": {},
       "podcast_highlights": {},
-      "podcast_entity_resolve": {}
+      "podcast_entity_resolve": {},
+      "valuation_underwriter": {
+        "model": "gpt-6.1-sol",
+        "reasoning_effort": "high",
+        "provider": "codex-local",
+        "frontier_reasons": [
+          "company_underwriting"
+        ]
+      },
+      "valuation_challenger": {
+        "model": "gpt-6.1-sol",
+        "reasoning_effort": "high",
+        "provider": "codex-local",
+        "frontier_reasons": [
+          "company_underwriting"
+        ]
+      },
+      "valuation_builder": {
+        "model": "underwriting-compiler/1",
+        "provider": "deterministic"
+      }
     }
   },
   "default": {
@@ -78,7 +100,11 @@
       "per_subject_daily_limit": 1,
       "duplicate_evidence_block": true,
       "cooldown_hours": 72,
-      "allowed_reasons": ["ir_gap", "adapter_failed", "manual_override"]
+      "allowed_reasons": [
+        "ir_gap",
+        "adapter_failed",
+        "manual_override"
+      ]
     },
     "ci_autofix": {
       "daily_repo_limit": 2,
@@ -93,14 +119,47 @@
       "per_subject_daily_limit": 1,
       "duplicate_evidence_block": true,
       "cooldown_hours": 168,
-      "allowed_reasons": ["new_episode", "manual_refresh"]
+      "allowed_reasons": [
+        "new_episode",
+        "manual_refresh"
+      ]
     },
     "podcast_entity_resolve": {
       "daily_repo_limit": 10,
       "per_subject_daily_limit": 2,
       "duplicate_evidence_block": true,
       "cooldown_hours": 72,
-      "allowed_reasons": ["ambiguous_guest_company", "manual_override"]
+      "allowed_reasons": [
+        "ambiguous_guest_company",
+        "manual_override"
+      ]
+    },
+    "valuation_underwriter": {
+      "daily_repo_limit": 6,
+      "per_subject_daily_limit": 2,
+      "duplicate_evidence_block": true,
+      "cooldown_hours": 0,
+      "allowed_reasons": [
+        "company_underwriting"
+      ]
+    },
+    "valuation_challenger": {
+      "daily_repo_limit": 6,
+      "per_subject_daily_limit": 2,
+      "duplicate_evidence_block": true,
+      "cooldown_hours": 0,
+      "allowed_reasons": [
+        "company_underwriting"
+      ]
+    },
+    "valuation_builder": {
+      "daily_repo_limit": 6,
+      "per_subject_daily_limit": 2,
+      "duplicate_evidence_block": true,
+      "cooldown_hours": 0,
+      "allowed_reasons": [
+        "company_underwriting"
+      ]
     }
   }
 }

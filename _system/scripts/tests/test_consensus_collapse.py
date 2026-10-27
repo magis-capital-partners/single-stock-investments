@@ -134,6 +134,36 @@ class TestConsensusCollapse(unittest.TestCase):
         self.assertEqual(len(cons["by_ticker"]["ZLAB"]), 1)
         self.assertIn("3 strategies", cons["by_ticker"]["ZLAB"][0]["fund"])
 
+    def test_traded_holding_survives_the_rank_cap(self):
+        """A held name ranked 82nd was cut, so period-over-period it read as every fund exiting."""
+        crowded = [f"C{i:03d}" for i in range(81)]
+
+        def letter(fund: str, positions: list[dict]) -> dict:
+            return {
+                "fund": fund,
+                "fund_id": fund.lower().replace(" ", "-"),
+                "quarter": "2026Q1",
+                "letter_date": "2026-03-31",
+                "positions": positions,
+            }
+
+        letters = [
+            letter(fund, [{"ticker": tk, "action": "add", "commentary": f"{fund} added {tk}."} for tk in crowded])
+            for fund in ("Alder Value", "Birch Street")
+        ]
+        letters.append(letter("Cedar Hill", [
+            {"ticker": "HELD", "action": "trim", "commentary": "Cedar Hill trimmed HELD."},
+            {"ticker": "QUIET", "action": "discussed", "commentary": "Cedar Hill mentioned QUIET."},
+        ]))
+        cons = build_consensus(letters, {"HELD", "QUIET"}, {})
+        block = cons["by_quarter"]["2026Q1"]
+        ranked = [row["ticker"] for row in block["most_discussed"]]
+        self.assertEqual(ranked[:80], crowded[:80])
+        self.assertIn("HELD", ranked)
+        self.assertNotIn(crowded[80], ranked)
+        self.assertNotIn("QUIET", ranked)
+        self.assertIn("HELD", [row["ticker"] for row in block["biggest_changes"]])
+
 
 if __name__ == "__main__":
     unittest.main()

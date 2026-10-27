@@ -1,14 +1,16 @@
 {
-  "schema_version": "3.0",
+  "schema_version": "3.1",
   "ticker": "AI",
   "as_of": "2026-10-27",
+  "model_as_of": "2026-07-28",
   "authority": "valuation_contract",
   "contract_source": "valuation_contract.json",
   "contract_status": "evidence_blocked",
+  "contract_model_hash": "9a5601589cbdd31c7610bc0b7d6f06117056603ec32fc4cfdc8b016523f5a115",
   "proof_status": "evidence_blocked",
   "model_level": "evidence_blocked",
-  "price": 12.79,
-  "price_source": "Yahoo AI close 2026-10-26",
+  "price": 11.34,
+  "price_source": "Yahoo AI close 2026-10-08",
   "component_value_per_share": {
     "low": 5.5019,
     "base": 20.9768,
@@ -39,27 +41,33 @@
   },
   "required_return_pct": 12.0,
   "margin_of_safety_pct": {
-    "low": -132.47,
-    "base": 39.03,
-    "high": 74.86
+    "low": -106.11,
+    "base": 45.94,
+    "high": 77.71
   },
   "entry_prices_by_hurdle_and_case": {
     "low": {
+      "8pct": null,
       "10pct": null,
       "12pct": null,
       "15pct": null,
+      "18pct": null,
       "20pct": null
     },
     "base": {
+      "8pct": null,
       "10pct": null,
       "12pct": null,
       "15pct": null,
+      "18pct": null,
       "20pct": null
     },
     "high": {
+      "8pct": null,
       "10pct": null,
       "12pct": null,
       "15pct": null,
+      "18pct": null,
       "20pct": null
     }
   },
@@ -71,9 +79,9 @@
     "actionable": false,
     "status": "audit_only",
     "annualized_return_at_price_pct": {
-      "low": -11.35,
-      "base": 7.32,
-      "high": 21.81
+      "low": -9.82,
+      "base": 9.18,
+      "high": 23.92
     },
     "formula": "((present_value_or_output + undated_distributions) / price) ** (1 / horizon_years) - 1",
     "reason_non_actionable": "This legacy calculation treated a present value as a future payoff and cannot be used as a forward return, hurdle entry price, ranking signal, or capital decision."
@@ -87,5 +95,27 @@
     "profile_id": "quality_reinvestment",
     "label": "High-return compounder",
     "input_hash": "0c629b6beac96b907a4236f6878f7060a357d88971319609f81aa403cf76989d"
+  },
+  "evidence_blockers": [
+    "prospective_falsifier_gate: new/materially changed components lack eligible, source-preflighted v3 forecasts or typed v3 untestable dispositions: core_engine, cycle_reserve, net_financial_claims, reinvestment_runway"
+  ],
+  "buy_zones": {
+    "schema_version": "1.0",
+    "config_version": "2026-10-26.1",
+    "status": "withheld",
+    "research_only": true,
+    "capital_actionable": false,
+    "model_level": "evidence_blocked",
+    "blockers": [
+      "The valuation workbench is evidence-blocked; hurdle prices are withheld until proof is decision-grade.",
+      "prospective_falsifier_gate: new/materially changed components lack eligible, source-preflighted v3 forecasts or typed v3 untestable dispositions: core_engine, cycle_reserve, net_financial_claims, reinvestment_runway"
+    ],
+    "zones": [],
+    "deepest_active_zone": null,
+    "royalty_corroboration": {
+      "status": "unavailable",
+      "signal": null,
+      "role": "corroborating_only"
+    }
   }
 }

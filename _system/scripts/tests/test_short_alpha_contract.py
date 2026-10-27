@@ -436,8 +436,10 @@ def test_library_lists_the_playbook_and_paper_note() -> None:
 RENDER_JS = """
 global.window = global;
 require(%(viz)s);
+require(require('node:path').join(require('node:path').dirname(%(viz)s), 'strategy-workbench.js'));
 const payload = %(payload)s;
 const out = { html: ShortAlphaViz.render(payload), strip: ShortAlphaViz.lensStrip(payload.candidates[1].lens_reviews),
+  strategy: StrategyWorkbench.renderShort('backtest'),
   vault: ShortAlphaViz.noteRefHtml('research-vault/short-research/FAKE/2026-10-10-lockup-into-atm.md'),
   ssi: ShortAlphaViz.noteRefHtml('FAKE/research/short_note.md'), unsafe: ShortAlphaViz.noteRefHtml('../x.md'),
   mount: typeof ShortAlphaViz.mountReverseSplits };
@@ -477,18 +479,21 @@ def test_shorts_tab_renders_entry_fields_and_lens_strip(tmp_path: Path) -> None:
     assert out["vault"].startswith('<span class="short-note-ref is-vault"') and "href" not in out["vault"]
     assert out["ssi"].startswith('<a class="short-note-ref" href="https://github.com/magis-capital-partners/single-stock-investments/blob/main/FAKE/research/short_note.md"')
     assert "href" not in out["unsafe"]
-    assert 'data-short-reverse-splits hidden' in html and ">Reverse splits<" in html
+    assert 'data-short-reverse-splits' not in html
+    assert 'href="#/strategies/systematic-shorts/backtest"' in html
+    assert 'Short backtest selection' in out["strategy"]
+    assert 'Earlier research' in out["strategy"]
+    assert 'Strategy</a>' in out["strategy"]
     assert out["mount"] == "function"
 
 
 @pytest.mark.skipif(not INDEX.exists(), reason="dashboard/index.html absent (sparse checkout)")
 def test_index_wires_the_reverse_splits_sub_section() -> None:
     text = INDEX.read_text(encoding="utf-8")
-    # The cache-bust token changes with the renderer. The contract is that
-    # index.html loads this file once, with a version query, and mounts it.
-    tags = re.findall(r'<script src="(reverse-splits-viz\.js\?v=[^"]+)"></script>', text)
-    assert len(tags) == 1, tags
-    assert "data/reverse_splits.json" in text
-    assert "window.ReverseSplitsViz &&" in text
-    assert "ShortAlphaViz.mountReverseSplits(content, doc)" in text
-    assert "mountReverseSplitsSection(content);" in text
+    # Broad Shorts UI is retired; selected strategy and curated comparisons own the page.
+    for name in ("reverse-split-strategy", "reverse-split-research", "reverse-split-live"):
+        tags = re.findall(r'<script src="(' + name + r'\.js\?v=[^"]+)"></script>', text)
+        assert len(tags) == 1, tags
+    assert 'data-view="reverse-split-strategy"' in text
+    assert 'data-view="systematic-shorts"' not in text
+    assert '<script src="reverse-splits-viz.js' not in text

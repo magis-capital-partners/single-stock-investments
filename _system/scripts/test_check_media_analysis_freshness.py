@@ -47,6 +47,18 @@ class ObserveTests(unittest.TestCase):
         self.assertEqual(chk.observe({"source_health": {}}), {})
         self.assertEqual(chk.observe({}), {})
 
+    def test_reader_summary_depth_is_observed_for_podcasts(self):
+        got = chk.observe({"source_health": {
+            "podcasts": {
+                "transcript_count": 4222,
+                "with_analysis": 413,
+                "with_reader_summary": 1200,
+                "items": 4670,
+            },
+        }})
+        self.assertEqual(got["podcasts"]["reader_summaries"], 1200)
+        self.assertEqual(got["podcasts"]["reader_corpus"], 4670)
+
 
 class StallTests(unittest.TestCase):
     def test_the_real_outage_is_caught(self):
@@ -121,6 +133,34 @@ class StallTests(unittest.TestCase):
         observed = {"videos": {"analysed": 16, "corpus": None}}
         problems, _ = chk.evaluate(observed, state("videos", 16, "2026-09-01"), today=DAY)
         self.assertEqual(problems, [])
+
+    def test_reader_summary_stall_is_reported_independently_of_claims(self):
+        observed = {
+            "podcasts": {
+                "analysed": 500,
+                "corpus": 4222,
+                "reader_summaries": 1200,
+                "reader_corpus": 4670,
+            }
+        }
+        prior = {
+            "sources": {
+                "podcasts": {
+                    "analysed": 413,
+                    "corpus": 4222,
+                    "last_change_at": "2026-09-11",
+                    "reader": {
+                        "reader_summaries": 1200,
+                        "reader_corpus": 4670,
+                        "last_change_at": "2026-09-11",
+                    },
+                }
+            }
+        }
+        problems, nxt = chk.evaluate(observed, prior, today=DAY)
+        self.assertEqual(len(problems), 1, problems)
+        self.assertIn("reader-summary lane is stale", problems[0])
+        self.assertEqual(nxt["sources"]["podcasts"]["reader"]["last_change_at"], "2026-09-11")
 
 
 class ReceiptTests(unittest.TestCase):

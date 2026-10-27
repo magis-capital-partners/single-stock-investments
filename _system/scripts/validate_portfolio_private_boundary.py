@@ -1,8 +1,10 @@
 #!/usr/bin/env python3
 """Fail closed when a deploy artifact contains portfolio data or broker identifiers."""
+
 from __future__ import annotations
 
 import argparse
+import json
 import os
 import re
 from pathlib import Path
@@ -15,7 +17,17 @@ FORBIDDEN_RELATIVE_PATHS = {
     "data/portfolio.json",
     "data/account_snapshot.json",
 }
-TEXT_SUFFIXES = {".html", ".js", ".css", ".json", ".jsonl", ".md", ".txt", ".xml", ".csv"}
+TEXT_SUFFIXES = {
+    ".html",
+    ".js",
+    ".css",
+    ".json",
+    ".jsonl",
+    ".md",
+    ".txt",
+    ".xml",
+    ".csv",
+}
 
 
 def validate(root: Path, explicit_identifiers: tuple[str, ...] = ()) -> list[str]:
@@ -26,17 +38,54 @@ def validate(root: Path, explicit_identifiers: tuple[str, ...] = ()) -> list[str
             failures.append(f"forbidden private artifact: {relative}")
     for path in root.rglob("*.json"):
         relative = path.relative_to(root).as_posix()
-        if relative.startswith("data/sleeves_") or relative.startswith("data/portfolio/") or relative.startswith("data/account/"):
+        if (
+            relative.startswith("data/sleeves_")
+            or relative.startswith("data/portfolio/")
+            or relative.startswith("data/account/")
+        ):
             failures.append(f"forbidden private artifact pattern: {relative}")
     for path in root.rglob("*"):
         if not path.is_file() or path.suffix.lower() not in TEXT_SUFFIXES:
             continue
         content = path.read_bytes()
         if ACCOUNT_PATTERN.search(content):
-            failures.append(f"broker account identifier: {path.relative_to(root).as_posix()}")
+            failures.append(
+                f"broker account identifier: {path.relative_to(root).as_posix()}"
+            )
         text = content.decode("utf-8", errors="ignore")
-        if any(identifier and identifier in text for identifier in explicit_identifiers):
-            failures.append(f"configured private identifier: {path.relative_to(root).as_posix()}")
+        if any(
+            identifier and identifier in text for identifier in explicit_identifiers
+        ):
+            failures.append(
+                f"configured private identifier: {path.relative_to(root).as_posix()}"
+            )
+    holdings = root / "data/holdings"
+    index = holdings / "directory_index.json"
+    if (
+        index.is_file()
+        and json.loads(index.read_text(encoding="utf-8")).get("asset_bundle_format")
+        == "gzip-members-v1"
+    ):
+        if __package__:
+            from .holdings_asset_bundles import iter_packed_assets
+        else:
+            from holdings_asset_bundles import iter_packed_assets
+        try:
+            for relative, content in iter_packed_assets(holdings):
+                if ACCOUNT_PATTERN.search(content):
+                    failures.append(
+                        f"broker account identifier: data/holdings/{relative}"
+                    )
+                text = content.decode("utf-8", errors="ignore")
+                if any(
+                    identifier and identifier in text
+                    for identifier in explicit_identifiers
+                ):
+                    failures.append(
+                        f"configured private identifier: data/holdings/{relative}"
+                    )
+        except (ValueError, OSError, EOFError, TypeError, KeyError) as error:
+            failures.append(f"unreadable compressed holdings: {error}")
     return failures
 
 
@@ -44,7 +93,11 @@ def main() -> int:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("root", type=Path, nargs="?", default=Path("_cf_project/site"))
     args = parser.parse_args()
-    identifiers = tuple(value.strip() for value in os.environ.get("IBKR_ACCOUNT_IDS_FOR_SCAN", "").split(",") if value.strip())
+    identifiers = tuple(
+        value.strip()
+        for value in os.environ.get("IBKR_ACCOUNT_IDS_FOR_SCAN", "").split(",")
+        if value.strip()
+    )
     failures = validate(args.root, identifiers)
     if failures:
         for failure in failures:

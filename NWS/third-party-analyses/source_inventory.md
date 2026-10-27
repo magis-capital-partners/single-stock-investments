@@ -1,7 +1,7 @@
 # NWS — Third-party source inventory
 
-**Date:** 2026-10-11
-**Sources:** 754 total (0 approved, 0 pending, 754 context)
+**Date:** 2026-10-25
+**Sources:** 763 total (0 approved, 0 pending, 763 context)
 
 | ID | Title | Path | Status | Use |
 |----|-------|------|--------|-----|
@@ -759,5 +759,14 @@
 | activist_long | acc0001564708 26 000217 | `NWS/third-party-analyses/activist_reports/long/8-K_20261007_acc0001564708_26_000217.htm` | context | activist/long — local |
 | activist_long | acc0001564708 26 000218 | `NWS/third-party-analyses/activist_reports/long/8-K_20261008_acc0001564708_26_000218.htm` | context | activist/long — local |
 | activist_long | acc0001564708 26 000219 | `NWS/third-party-analyses/activist_reports/long/8-K_20261009_acc0001564708_26_000219.htm` | context | activist/long — local |
+| activist_long | acc0001564708 26 000220 | `NWS/third-party-analyses/activist_reports/long/8-K_20261013_acc0001564708_26_000220.htm` | context | activist/long — local |
+| activist_long | acc0001564708 26 000221 | `NWS/third-party-analyses/activist_reports/long/8-K_20261014_acc0001564708_26_000221.htm` | context | activist/long — local |
+| activist_long | acc0001564708 26 000222 | `NWS/third-party-analyses/activist_reports/long/8-K_20261015_acc0001564708_26_000222.htm` | context | activist/long — local |
+| activist_long | acc0001564708 26 000230 | `NWS/third-party-analyses/activist_reports/long/8-K_20261016_acc0001564708_26_000230.htm` | context | activist/long — local |
+| activist_long | acc0001564708 26 000231 | `NWS/third-party-analyses/activist_reports/long/8-K_20261019_acc0001564708_26_000231.htm` | context | activist/long — local |
+| activist_long | acc0001564708 26 000232 | `NWS/third-party-analyses/activist_reports/long/8-K_20261020_acc0001564708_26_000232.htm` | context | activist/long — local |
+| activist_long | acc0001564708 26 000233 | `NWS/third-party-analyses/activist_reports/long/8-K_20261021_acc0001564708_26_000233.htm` | context | activist/long — local |
+| activist_long | acc0001564708 26 000234 | `NWS/third-party-analyses/activist_reports/long/8-K_20261022_acc0001564708_26_000234.htm` | context | activist/long — local |
+| activist_long | acc0001564708 26 000235 | `NWS/third-party-analyses/activist_reports/long/8-K_20261023_acc0001564708_26_000235.htm` | context | activist/long — local |
 
-Cross-check required: `NWS/research/cross_check_third_party_2026-10-11.md`
+Cross-check required: `NWS/research/cross_check_third_party_2026-10-25.md`

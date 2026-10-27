@@ -37,6 +37,21 @@ OVERLAP_CHARS = 200
 _HEADING_RE = re.compile(r"^(#{1,4})\s+(.+)$", re.MULTILINE)
 
 
+def stable_chunk_id(*, source_path: str, section: str | None, text: str, ticker: str = "", kind: str = "") -> str:
+    """Id scheme shared by the chunk store and the search indexer.
+
+    ``sha256:`` plus the first 24 hex chars. Thesis rows hash ticker and the
+    opening text. Every other kind hashes source path, section, and the
+    opening text, which is what ``_add_file`` has always written.
+    """
+    if kind == "thesis":
+        material = f"{ticker}|thesis|{text[:200]}"
+    else:
+        material = f"{source_path}|{section}|{text[:200]}"
+    digest = hashlib.sha256(material.encode("utf-8")).hexdigest()
+    return f"sha256:{digest[:24]}"
+
+
 def chunk_text(text: str) -> list[tuple[str | None, str]]:
     """Split markdown by heading, then by size with a small overlap."""
     sections: list[tuple[str | None, str]] = []
@@ -68,9 +83,8 @@ def _add_file(rows: list[dict[str, Any]], *, ticker: str, kind: str, path: Path,
         return
     rel = path.relative_to(root).as_posix()
     for section, piece in chunk_text(text):
-        digest = hashlib.sha256(f"{rel}|{section}|{piece[:200]}".encode("utf-8")).hexdigest()
         row: dict[str, Any] = {
-            "chunk_id": f"sha256:{digest[:24]}",
+            "chunk_id": stable_chunk_id(source_path=rel, section=section, text=piece, ticker=ticker, kind=kind),
             "ticker": ticker,
             "kind": kind,
             "source_path": rel,
@@ -103,9 +117,8 @@ def build_chunks(*, root: Path = ROOT) -> list[dict[str, Any]]:
                 card = {}
             text = "\n\n".join(str(card.get(k) or "") for k in ("thesis", "why_market_wrong"))
             if len(text.strip()) >= 120:
-                digest = hashlib.sha256(f"{ticker}|thesis|{text[:200]}".encode("utf-8")).hexdigest()
                 rows.append({
-                    "chunk_id": f"sha256:{digest[:24]}",
+                    "chunk_id": stable_chunk_id(source_path=card_path.relative_to(root).as_posix(), section=None, text=text, ticker=ticker, kind="thesis"),
                     "ticker": ticker,
                     "kind": "thesis",
                     "source_path": card_path.relative_to(root).as_posix(),

@@ -518,6 +518,25 @@ def render(payload: dict) -> str:
     return json.dumps(payload, indent=2, ensure_ascii=False) + "\n"
 
 
+def write_manifest(root: Path = ROOT, as_of: str | None = None, *, out: Path | None = None) -> dict:
+    """Build and write the tier manifest. Registry membership alone is Tier 3.
+
+    The download sync calls this before it rebuilds the dashboard, so a ticker
+    that just joined the registry is tiered by the same rules as every other
+    name. Validation failure raises rather than writing a partial manifest.
+    """
+    stamp = as_of or datetime.now(timezone.utc).date().isoformat()
+    payload = build(stamp, root)
+    validation = payload.get("validation") or {}
+    if validation.get("status") != "pass":
+        errors = validation.get("errors") or ["validation failed"]
+        raise ValueError("Valuation universe tiers failed validation: " + "; ".join(errors[:8]))
+    target = Path(out) if out else Path(root) / OUTPUT_REL
+    target.parent.mkdir(parents=True, exist_ok=True)
+    target.write_text(render(payload), encoding="utf-8")
+    return payload
+
+
 def main() -> int:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--date", default=datetime.now(timezone.utc).date().isoformat())

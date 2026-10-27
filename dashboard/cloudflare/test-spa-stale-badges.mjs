@@ -52,7 +52,7 @@ test("the helper is quiet inside the cadence and loud past it", () => {
   assert.match(format.staleBadge("2026-09-06", 240), /STALE since 2026-09-06/, "bare calendar dates are read too");
   assert.equal(format.staleBadge("", 48), "", "no stamp, no claim");
   assert.equal(format.staleBadge("not a date", 48), "");
-  assert.deepEqual({ ...format.FEED_MAX_AGE_HOURS }, { darwin: 96, activist: 48, two_phase_watch: 240 });
+  assert.deepEqual({ ...format.FEED_MAX_AGE_HOURS }, { darwin: 96, activist: 48, two_phase_watch: 240, buyback_radar: 102 });
 });
 
 test("activist: a daily scan last run a month ago is badged on the Last scan line", () => {

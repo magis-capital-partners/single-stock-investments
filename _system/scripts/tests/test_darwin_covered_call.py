@@ -54,6 +54,72 @@ def test_occ_symbols_parse_and_filter_by_dte():
     assert cc.parse_chain(dead, TODAY)[1] == [], "a zero bid cannot be sold"
 
 
+def _listed_calls(symbol: str, dtes: list[int], spot: float = 100.0) -> dict:
+    """One expiry per requested DTE, with a call near each delta target."""
+    options = []
+    for dte in dtes:
+        exp = TODAY + timedelta(days=dte)
+        for delta, strike in ((0.50, 100), (0.40, 102), (0.30, 105), (0.20, 108), (0.10, 112)):
+            mid = 2.0
+            options.append({"option": f"{symbol}{exp:%y%m%d}C{int(strike * 1000):08d}",
+                            "bid": round(mid * 0.97, 2), "ask": round(mid * 1.03, 2),
+                            "iv": 0.30, "delta": delta, "open_interest": 2000})
+    return {"current_price": spot, "options": options}
+
+
+def test_research_windows_stay_put_and_the_monthly_hole_is_filled():
+    for tenor, (lo, hi) in cc.TENORS.items():
+        for dte in range(lo, hi + 1):
+            assert cc.tenor_for_dte(dte) == tenor, (dte, tenor)
+    # 25-27 are closer to the 21-day centre (21) than to the 35-day centre (34).
+    # 28-29 are closer to 34. 22 Oct 2026 was the first session the November
+    # monthly (20 Nov) sat in this hole, at 29 days.
+    assert [cc.tenor_for_dte(d) for d in (25, 26, 27, 28, 29)] == ["21d", "21d", "21d", "35d", "35d"]
+    for dte in (1, 2, 3, 47, 48, 49, 50):
+        assert cc.tenor_for_dte(dte) is None
+
+
+def test_monthly_expiry_in_the_tenor_hole_is_scored_without_displacing_a_window_expiry():
+    spot, rows = cc.parse_chain(_listed_calls("MON", [29]), TODAY)
+    calls = cc.candidate_calls(rows, spot)
+    assert {c["tenor"] for c in calls} == {"35d"}
+    assert {c["dte"] for c in calls} == {29}
+
+    spot, rows = cc.parse_chain(_listed_calls("MON", [26]), TODAY)
+    calls = cc.candidate_calls(rows, spot)
+    assert {c["tenor"] for c in calls} == {"21d"}
+    assert {c["dte"] for c in calls} == {26}
+
+    # A weekly already inside the research window keeps the bucket. The hole expiry is only a fallback.
+    spot, rows = cc.parse_chain(_listed_calls("BOTH", [28, 35]), TODAY)
+    by_tenor = {c["tenor"]: c["dte"] for c in cc.candidate_calls(rows, spot)}
+    assert by_tenor["35d"] == 35
+
+    spot, rows = cc.parse_chain(_listed_calls("BOTH", [21, 26]), TODAY)
+    by_tenor = {c["tenor"]: c["dte"] for c in cc.candidate_calls(rows, spot)}
+    assert by_tenor["21d"] == 21
+
+    # The nearest hole day still loses to the nearest in-window day (30 is closer to the 35-day centre than 29).
+    spot, rows = cc.parse_chain(_listed_calls("NEAR", [29, 30]), TODAY)
+    by_tenor = {c["tenor"]: c["dte"] for c in cc.candidate_calls(rows, spot)}
+    assert by_tenor["35d"] == 30
+    spot, rows = cc.parse_chain(_listed_calls("NEAR", [24, 25]), TODAY)
+    by_tenor = {c["tenor"]: c["dte"] for c in cc.candidate_calls(rows, spot)}
+    assert by_tenor["21d"] == 24
+
+    # Outside the outer windows stays excluded, same as before the hole was filled.
+    spot, rows = cc.parse_chain(_listed_calls("EDGE", [3, 47]), TODAY)
+    assert rows, "parse keeps 3-day and 47-day contracts; the tenor map is what drops them"
+    assert cc.candidate_calls(rows, spot) == []
+
+    out = cc.build_payload(["MON"], {"MON": tech(0.5, -5)}, {"MON": _listed_calls("MON", [29])},
+                           {}, LOOKUP, today=TODAY, now=NOW)
+    assert out["names"][0]["status"] == "ok"
+    assert out["universe"]["scored"] == 1 and out["universe"]["coverage"] == 1.0
+    assert out["names"][0]["calls"]
+    assert all(c["tenor"] == "35d" and c["dte"] == 29 for c in out["names"][0]["calls"])
+
+
 def test_one_expiry_per_bucket_and_delta_within_tolerance():
     spot, rows = cc.parse_chain(chain("AAA"), TODAY)
     calls = cc.candidate_calls(rows, spot)

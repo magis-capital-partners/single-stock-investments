@@ -1,12 +1,13 @@
 # SBET — Third-party source inventory
 
-**Date:** 2026-10-11
-**Sources:** 59 total (0 approved, 0 pending, 59 context)
+**Date:** 2026-10-25
+**Sources:** 60 total (0 approved, 0 pending, 60 context)
 
 | ID | Title | Path | Status | Use |
 |----|-------|------|--------|-----|
 | activist_long | Consensys Software Inc — SC 13D/A | `SBET/third-party-analyses/activist_reports/long/SC-13D/A_20260416_acc0001493152_26_017133.xml` | context | activist/long — sec_edgar |
 | activist_long | Consensys Software Inc — SC 13D | `SBET/third-party-analyses/activist_reports/long/SC-13D_20250606_acc0001641172_25_014202.xml` | context | activist/long — sec_edgar |
+| activist_long | Consensys Software Inc — SC 13D/A | `SBET/third-party-analyses/activist_reports/long/SC-13D/A_20261013_acc0001493152_26_046897.xml` | context | activist/long — sec_edgar |
 | activist_long | acc0001493152 24 007396 | `SBET/third-party-analyses/activist_reports/long/8-K_20240221_acc0001493152_24_007396.htm` | context | activist/long — local |
 | activist_long | acc0001493152 24 009433 | `SBET/third-party-analyses/activist_reports/long/8-K_20240308_acc0001493152_24_009433.htm` | context | activist/long — local |
 | activist_long | acc0001493152 24 017702 | `SBET/third-party-analyses/activist_reports/long/8-K_20240503_acc0001493152_24_017702.htm` | context | activist/long — local |
@@ -65,4 +66,4 @@
 | activist_long | acc0001493152 26 031202 | `SBET/third-party-analyses/activist_reports/long/8-K_20260630_acc0001493152_26_031202.htm` | context | activist/long — local |
 | activist_long | acc0001493152 26 036741 | `SBET/third-party-analyses/activist_reports/long/8-K_20260810_acc0001493152_26_036741.htm` | context | activist/long — local |
 
-Cross-check required: `SBET/research/cross_check_third_party_2026-10-11.md`
+Cross-check required: `SBET/research/cross_check_third_party_2026-10-25.md`

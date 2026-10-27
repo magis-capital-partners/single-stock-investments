@@ -164,8 +164,11 @@ def build_card(ticker: str) -> dict | None:
         "display": implied.get("display") or (f"{base_irr}%" if base_irr is not None else None),
         "scenarios_pct": scenarios,
     }
+    from refresh_core_compounders import load_views
+    quality = (load_views(ROOT).get(ticker) or {}).get("quality_assessment")
     return {
-        "schema_version": "2.0",
+        **({"quality_assessment": quality} if quality else {}),
+        "schema_version": "3.0" if quality else "2.0",
         "ticker": ticker,
         "generated_at": datetime.now(timezone.utc).isoformat(timespec="seconds"),
         "thesis": first_paragraph(section_text(markdown, "## What this business is")),

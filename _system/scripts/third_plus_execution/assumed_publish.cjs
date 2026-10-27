@@ -1,0 +1,28 @@
+'use strict';
+const fs=require('node:fs'),path=require('node:path'),Study=require('./assumed_study.cjs');
+const ROOT=path.resolve(__dirname,'../../..'),DIR=path.join(ROOT,'_system/data/reverse_splits/third_plus_signal_study/assumed_execution_v1');
+const dollars=x=>(x<0?'−':'')+'$'+Math.abs(x).toLocaleString('en-US',{minimumFractionDigits:2,maximumFractionDigits:2});
+function report(d){
+ let s='# Full backtest with tradability assumed\n\nEvery signal-qualified security is assumed borrowable and accessible. This is a completed **assumption-based simulation**, using observed market data where available and explicit estimates for unknown execution, costs and exits. It does not claim that historical fills or lending terms were observed.\n\n';
+ s+='Market window: '+d.first+' through '+d.market_through+'. Fixed $100,000 maximum position, $10 million reference account, 20 sessions including entry, 60-minute entry window, 10% participation and improved permitted offer (E2). The account retains three issuers; the independent comparison removes that capacity limit.\n\n';
+ s+='| Signal / scenario | Three-slot net P&L | Closing drawdown | Account entries | No-slot-limit net P&L | Independent entries |\n|---|---:|---:|---:|---:|---:|\n';
+ for(const rule of ['dilution','third_plus_only'])for(const scenario of ['base','favorable','stress']){
+  const r=d.rules[rule],m=r.models.find(x=>x.scenario===scenario&&x.policy==='E2'&&x.minutes===60&&x.participation===.1);
+  s+='| '+r.label+' / '+d.protocol.scenarios[scenario].label+' | '+dollars(m.account.net_pnl)+' | '+dollars(m.account.max_drawdown_dollars)+' | '+m.account.entered+' | '+dollars(m.all_candidates.net_pnl)+' | '+m.all_candidates.entered+' |\n';
+ }
+ const m=d.rules.dilution.models.find(x=>x.scenario==='base'&&x.policy==='E2'&&x.minutes===60&&x.participation===.1),a=m.account,i=m.all_candidates;
+ s+='\nThe default share-growth screen has 170 qualifying events. The base account attempts '+a.attempted+', enters '+a.entered+', has '+a.no_fill+' no-fills, excludes '+a.name_limit+' for occupied slots and '+a.issuer_open+' for an already-open issuer. '+a.open_positions+' remain open with '+dollars(a.open_liability)+' marked liability. Independent attempts: '+i.attempted+'; entries: '+i.entered+'; no-fills: '+i.no_fill+'; open positions: '+i.open_positions+'. All 210 events remain individually auditable, including events outside the signal and not yet eligible at the cutoff.\n\n';
+ s+='Base account: '+dollars(a.gross_before_costs)+' before separately charged costs; borrow '+dollars(a.costs.borrow)+', fees '+dollars(a.costs.fees)+', locates '+dollars(a.costs.locate)+', impact '+dollars(a.costs.impact)+'. Spread and exit premiums are embedded in fill prices. Mean entry '+dollars(a.mean_position)+', '+a.partial+' partial fills. Base account excluding its best issuer: '+dollars(a.pnl_without_best_issuer)+'; excluding its best five: '+dollars(a.pnl_without_best5_issuers)+'.\n\n';
+ s+='Estimated data coverage in base account: '+a.estimated_quote_entries+' entries contain estimated quotes, '+a.proxy_entry+' use proxy entry paths, '+a.proxy_exit+' exits use capture/venue estimates, '+a.residual_exit+' require residual completion premiums and '+a.proxy_mark_sessions+' session marks are carried. '+a.unpriced_entries+' entries use the $5 fallback; '+a.split_proxy_sessions+' unresolved-factor sessions. Peak modeled collateral '+dollars(a.modeled_margin_requirement)+'; '+a.margin_breach_days+' closes exceed reference account equity.\n\n';
+ s+='## Assumptions\n\n'+d.protocol.assumptions.map(x=>'- '+x).join('\n')+'\n\n';
+ s+='| Scenario | Borrow APR | Half-spread | Eligible capture | Impact / side | Locate / share (minimum) | Residual premium | Missing/OTC premium |\n|---|---:|---:|---:|---:|---:|---:|---:|\n';
+ for(const v of Object.values(d.protocol.scenarios))s+='| '+v.label+' | '+100*v.borrow_apr+'% | '+v.half_spread_bps+' bp | '+100*v.capture+'% | '+v.impact_bps+' bp | $'+v.locate_per_share+' ($'+v.locate_min+') | '+100*v.residual_premium+'% | '+100*v.missing_exit_premium+'% |\n';
+ s+='\nThese scenario inputs are declared estimates, not calibrated historical lender quotes or probabilistic confidence limits. Price-volume allocation and queue capture are assumptions; fills respect modeled limits. The stress case can change admissions because its fills and exit dates differ. The historical-evidence audit remains available separately. No ThetaData, Gateway, live broker connection, paid acquisition or sealed holdout is used.\n\n';
+ s+='## Reference methodology\n\n'+d.protocol.references.map(x=>'- ['+x.label+']('+x.url+')').join('\n')+'\n\n## Offline reproduction\n\n```powershell\nnode _system/scripts/third_plus_execution/assumed_study.cjs --source-root <repository-with-existing-cache>\nnode _system/scripts/third_plus_execution/assumed_publish.cjs\nnode _system/scripts/third_plus_execution/assumed_study.cjs --check\nnode _system/scripts/third_plus_execution/assumed_publish.cjs --check\n```\n\nArchive index SHA-256: '+d.archive.index_sha256+'. It binds session receipt hashes and cached input files. Source code and frozen signal inputs are bound by the publication source hashes. No market data download is performed.\n\nPublication '+d.data_version+'.\n';return s;
+}
+function publish(check=false){
+ const d=Study.check(),file=path.join(DIR,'REPORT.md'),text=report(d);
+ if(check){if(fs.readFileSync(file,'utf8')!==text)throw Error('Stale assumed report');}else{fs.mkdirSync(DIR,{recursive:true});fs.writeFileSync(file,text);}
+ console.log((check?'Verified':'Published')+' full assumed backtest report');
+}
+module.exports={report,publish};if(require.main===module)publish(process.argv.includes('--check'));

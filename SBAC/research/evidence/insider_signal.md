@@ -1,4 +1,4 @@
-# SBAC — Insider conviction (2026-10-15)
+# SBAC — Insider conviction (2026-10-18)
 
 > Context only. Insider activity informs scenario confidence and stance discussion; it does not auto-inflate Lawrence base IRR. Promotion requires [HUMAN REVIEW].
 
@@ -22,7 +22,7 @@
 
 - Montagner Marc: 815 @ $195.69 on 2026-03-06
 - Montagner Marc: 978 @ $195.69 on 2026-03-06
-- Montagner Marc: 624 @ $197.42 on 2025-10-17
+- LANGER JACK: 1496 @ $213.61 on 2026-05-13
 
 Source: `_system/reference/market-data/insider/SBAC_transactions.csv`.
 Lawrence base IRR unchanged (`in_base_irr: False`).

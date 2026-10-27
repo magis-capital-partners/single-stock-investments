@@ -1,6 +1,6 @@
 # BIIB — Third-party source inventory
 
-**Date:** 2026-10-11
+**Date:** 2026-10-25
 **Sources:** 96 total (0 approved, 0 pending, 96 context)
 
 | ID | Title | Path | Status | Use |
@@ -13,10 +13,10 @@
 | activist_long | Biogen Inc — SC 13D/A | `BIIB/third-party-analyses/activist_reports/long/SC-13D/A_20250730_acc0000950157_25_000596.xml` | context | activist/long — sec_edgar |
 | activist_long | Biogen Inc — SC 13D/A | `BIIB/third-party-analyses/activist_reports/long/SC-13D/A_20250721_acc0000950157_25_000586.xml` | context | activist/long — sec_edgar |
 | activist_long | BIOGEN INC — SC 13D | `BIIB/third-party-analyses/activist_reports/long/SC-13D_20250110_acc0000950170_25_004311.xml` | context | activist/long — sec_edgar |
+| activist_long | acc0001193125 18 204063 | `BIIB/third-party-analyses/activist_reports/long/8-K_20180626_acc0001193125_18_204063.htm` | context | activist/long — local |
 | activist_long | acc0000875045 18 000002 | `BIIB/third-party-analyses/activist_reports/long/8-K_20180125_acc0000875045_18_000002.htm` | context | activist/long — local |
 | activist_long | acc0000875045 18 000007 | `BIIB/third-party-analyses/activist_reports/long/8-K_20180424_acc0000875045_18_000007.htm` | context | activist/long — local |
 | activist_long | acc0000875045 18 000012 | `BIIB/third-party-analyses/activist_reports/long/8-K_20180615_acc0000875045_18_000012.htm` | context | activist/long — local |
-| activist_long | acc0001193125 18 204063 | `BIIB/third-party-analyses/activist_reports/long/8-K_20180626_acc0001193125_18_204063.htm` | context | activist/long — local |
 | activist_long | acc0000875045 18 000017 | `BIIB/third-party-analyses/activist_reports/long/8-K_20180724_acc0000875045_18_000017.htm` | context | activist/long — local |
 | activist_long | acc0000875045 18 000023 | `BIIB/third-party-analyses/activist_reports/long/8-K_20180803_acc0000875045_18_000023.htm` | context | activist/long — local |
 | activist_long | acc0000875045 18 000029 | `BIIB/third-party-analyses/activist_reports/long/8-K_20181023_acc0000875045_18_000029.htm` | context | activist/long — local |
@@ -102,4 +102,4 @@
 | activist_long | acc0000875045 26 000068 | `BIIB/third-party-analyses/activist_reports/long/8-K_20260701_acc0000875045_26_000068.htm` | context | activist/long — local |
 | activist_long | acc0000875045 26 000073 | `BIIB/third-party-analyses/activist_reports/long/8-K_20260729_acc0000875045_26_000073.htm` | context | activist/long — local |
 
-Cross-check required: `BIIB/research/cross_check_third_party_2026-10-11.md`
+Cross-check required: `BIIB/research/cross_check_third_party_2026-10-25.md`

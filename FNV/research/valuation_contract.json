@@ -1786,7 +1786,7 @@
     ]
   },
   "change_control": {
-    "model_hash": "81c8294debcdd3de92a8b63272d09a6d3390a67fa4b0be5b36086565c17cb9bb",
+    "model_hash": "8d668e6f21695d5202af09d9b9de6959ca30e8a84b04f788f869042c696bb4b4",
     "method_versions": [
       "depletion_reserve@1.0",
       "net_asset_value@1.0",
@@ -1797,6 +1797,154 @@
     "rule": "A source fact is locked. Every assumption change requires a reason, author, timestamp, and before/after value."
   },
   "decision_rule": "Proof status and investment readiness are separate. Every material claim must be valued exactly once by a valid calculation proof, every evidence blocker must be resolved, and the model must be stock-specific before committee review. Only a human decision can authorize capital.",
+  "shared_forecast": {
+    "schema_version": "1.0",
+    "method_version": "shared-valuation-forecast/1.1",
+    "ticker": "FNV",
+    "status": "model_gap",
+    "research_only": true,
+    "requires_human_review": false,
+    "capital_actionable": false,
+    "as_of": "2026-07-23",
+    "model_as_of": "2026-07-23",
+    "quote": {
+      "value": 215.2,
+      "as_of": "2026-07-23",
+      "source_url": "Yahoo FNV close 2026-07-23",
+      "currency": null
+    },
+    "forecast_hash": "ab61651c46fab4be3f04d34de62782ea412cf25573b0dc03d443c503cb9d1e9f",
+    "forward_irr_pct": {
+      "low": null,
+      "base": null,
+      "high": null
+    },
+    "present_value_today_per_share": {
+      "low": null,
+      "base": null,
+      "high": null
+    },
+    "model_present_value_per_share": {
+      "low": null,
+      "base": null,
+      "high": null
+    },
+    "required_return_pct": {
+      "low": null,
+      "base": null,
+      "high": null
+    },
+    "forward_cashflow_schedule": {},
+    "buy_prices": [],
+    "components": [
+      {
+        "component_id": "producing_royalty_stream",
+        "method": "royalty_distribution_curve",
+        "status": "model_gap",
+        "present_value_per_share": {}
+      },
+      {
+        "component_id": "development_inventory_option",
+        "method": "unit_nav_and_milestone_option",
+        "status": "model_gap",
+        "present_value_per_share": {
+          "low": 0.0
+        }
+      },
+      {
+        "component_id": "net_financial_claims",
+        "method": "net_asset_value",
+        "status": "model_gap",
+        "present_value_per_share": {}
+      },
+      {
+        "component_id": "depletion_and_realization_reserve",
+        "method": "depletion_reserve",
+        "status": "model_gap",
+        "present_value_per_share": {}
+      }
+    ],
+    "gaps": [
+      {
+        "component_id": "producing_royalty_stream",
+        "case": "low",
+        "code": "realization_timing_missing:operating_cash_flow_m"
+      },
+      {
+        "component_id": "producing_royalty_stream",
+        "case": "base",
+        "code": "realization_timing_missing:operating_cash_flow_m"
+      },
+      {
+        "component_id": "producing_royalty_stream",
+        "case": "high",
+        "code": "realization_timing_missing:operating_cash_flow_m"
+      },
+      {
+        "component_id": "development_inventory_option",
+        "case": "base",
+        "code": "realization_timing_missing:value_per_share"
+      },
+      {
+        "component_id": "development_inventory_option",
+        "case": "high",
+        "code": "realization_timing_missing:value_per_share"
+      },
+      {
+        "component_id": "net_financial_claims",
+        "case": "low",
+        "code": "realization_timing_missing:value_per_share"
+      },
+      {
+        "component_id": "net_financial_claims",
+        "case": "base",
+        "code": "realization_timing_missing:value_per_share"
+      },
+      {
+        "component_id": "net_financial_claims",
+        "case": "high",
+        "code": "realization_timing_missing:value_per_share"
+      },
+      {
+        "component_id": "depletion_and_realization_reserve",
+        "case": "low",
+        "code": "realization_timing_missing:owner_cash_per_share"
+      },
+      {
+        "component_id": "depletion_and_realization_reserve",
+        "case": "base",
+        "code": "realization_timing_missing:owner_cash_per_share"
+      },
+      {
+        "component_id": "depletion_and_realization_reserve",
+        "case": "high",
+        "code": "realization_timing_missing:owner_cash_per_share"
+      }
+    ],
+    "warnings": [],
+    "source_refs": [
+      {
+        "node_id": "equity_investments_m",
+        "ref": "FNV/investor-documents/ir-fnv/NR-Franco-Nevada-Reports-Record-Q1-2026-Results-vFinal-2026-05-12.pdf",
+        "locator": "Available Capital footnote: equity investments $1,142.4 million at March 31, 2026",
+        "as_of": "2026-03-31",
+        "source_id": "73e4c09e15559465f2e6e9ce9aab0caa2eee2c2240e2569cbc390f8ac3845dca"
+      },
+      {
+        "node_id": "shares_m",
+        "ref": "FNV/investor-documents/ir-fnv/NR-Franco-Nevada-Reports-Record-Q1-2026-Results-vFinal-2026-05-12.pdf",
+        "locator": "Q1 2026 weighted average diluted shares 192.8 million",
+        "as_of": "2026-03-31",
+        "source_id": "c49b004c434977cdccf292665d072afb4b2e34939ab249b060e98acab8a7559d"
+      }
+    ],
+    "next_action": "automatic_model_refresh",
+    "reconciliation": {
+      "passed": false
+    },
+    "settlement_policy": "Explicit cash/debt additions in an operating DCF are time-zero acquisition adjustments; hypothetical settlement, not declared dividends.",
+    "calculation_id": "f3c529d554294b3ae2f157971131ca5afc5f57fc06a543596e274d7febe9ecad"
+  },
   "authority": "universal_valuation_contract",
   "legacy_reference_present": true,
   "falsifier_coverage": {

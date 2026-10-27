@@ -1,207 +1,207 @@
 # Event triage — human review queue
 
 **Date:** 2026-10-27
-**Rows:** 719
+**Rows:** 6488
 
 | Date | Ticker | Source | Tier | Materiality | Rules | Title |
 |------|--------|--------|------|-------------|-------|-------|
-| 2026-10-18 | O | news | context | 32 | rule_conflict, activist_cross_link, neutral_low_impact | Learn Why The Bull Case For Realty Income Stock Could Change |
-| 2026-10-17 | UNP | news | context | 32 | rule_conflict, activist_cross_link, neutral_low_impact | Union Pacific (UNP) Faces A Leadership Handoff As Valuation  |
-| 2026-10-17 | GOOGL | news | context | 32 | rule_conflict, activist_cross_link, neutral_low_impact | Greg Abel Made Major Additions to Alphabet and Delta Last Qu |
-| 2026-10-17 | RF | news | context | 32 | rule_conflict, activist_cross_link, neutral_low_impact | Regions Financial: 3 Key Takeaways for Long-Term Investors |
-| 2026-10-17 | AOS | news | context | 32 | rule_conflict, activist_cross_link, neutral_low_impact | A. O. Smith’s Dividend Looks Sustainable Despite a Mixed Gro |
-| 2026-10-17 | DASH | news | context | 32 | rule_conflict, activist_cross_link, neutral_low_impact | DoorDash, Inc. $DASH Stock Acquired by Vontobel Holding Ltd. |
-| 2026-10-17 | TSLA | news | context | 32 | rule_conflict, activist_cross_link, neutral_low_impact | Tesla, Inc. $TSLA Shares Newly Acquired by TB Alternative As |
-| 2026-10-17 | MSFT | news | context | 32 | rule_conflict, activist_cross_link, neutral_low_impact | Here's How Microsoft's $175 Billion in Capital Expenditures  |
-| 2026-10-17 | UNP | news | context | 32 | rule_conflict, activist_cross_link, neutral_low_impact | Union Pacific Corporation (UNP) Options Chain - Yahoo! Finan |
-| 2026-10-17 | UNP | news | context | 32 | rule_conflict, activist_cross_link, neutral_low_impact | Union Pacific Announces Upcoming CFO Leadership Transition - |
-| 2026-10-17 | SYY | news | context | 32 | rule_conflict, activist_cross_link, neutral_low_impact | Is Strike Resolution Altering The Investment Case For Sysco  |
-| 2026-10-17 | WMT | news | context | 32 | rule_conflict, activist_cross_link, neutral_low_impact | Walmart president & CEO John Furner sells $1.58m in WMT shar |
-| 2026-10-17 | VRSK | news | context | 32 | rule_conflict, activist_cross_link, neutral_low_impact | Verisk Analytics (VRSK) CFO Elizabeth Mann Sells 400 Shares  |
-| 2026-10-17 | ACHR | kpi_trend | context | 55 | rule_conflict, activist_cross_link, routine_governance_watch | Leadership / governance on watch |
-| 2026-10-17 | ARES | kpi_trend | context | 55 | rule_conflict, activist_cross_link, routine_governance_watch | Leadership / governance on watch |
-| 2026-10-17 | AVY | kpi_trend | context | 55 | rule_conflict, activist_cross_link, routine_governance_watch | Leadership / governance on watch |
-| 2026-10-17 | AXON | kpi_trend | context | 55 | rule_conflict, activist_cross_link, routine_governance_watch | Leadership / governance on watch |
-| 2026-10-17 | BB | kpi_trend | context | 55 | rule_conflict, activist_cross_link, routine_governance_watch | Leadership / governance on watch |
-| 2026-10-17 | BEN | kpi_trend | context | 55 | rule_conflict, activist_cross_link, routine_governance_watch | Leadership / governance on watch |
-| 2026-10-17 | BMY | kpi_trend | context | 55 | rule_conflict, activist_cross_link, routine_governance_watch | Leadership / governance on watch |
-| 2026-10-17 | BNY | kpi_trend | context | 55 | rule_conflict, activist_cross_link, routine_governance_watch | Leadership / governance on watch |
-| 2026-10-17 | CHRW | kpi_trend | context | 55 | rule_conflict, activist_cross_link, routine_governance_watch | Leadership / governance on watch |
-| 2026-10-17 | CIFR | kpi_trend | context | 55 | rule_conflict, activist_cross_link, routine_governance_watch | Leadership / governance on watch |
-| 2026-10-17 | CORZ | kpi_trend | context | 55 | rule_conflict, activist_cross_link, routine_governance_watch | Leadership / governance on watch |
-| 2026-10-17 | CRM | kpi_trend | context | 55 | rule_conflict, activist_cross_link, routine_governance_watch | Leadership / governance on watch |
-| 2026-10-17 | CSCO | kpi_trend | context | 55 | rule_conflict, activist_cross_link, routine_governance_watch | Leadership / governance on watch |
-| 2026-10-17 | CVNA | kpi_trend | context | 55 | rule_conflict, activist_cross_link, routine_governance_watch | Leadership / governance on watch |
-| 2026-10-17 | DASH | kpi_trend | context | 55 | rule_conflict, activist_cross_link, routine_governance_watch | Leadership / governance on watch |
-| 2026-10-17 | DIS | kpi_trend | context | 55 | rule_conflict, activist_cross_link, routine_governance_watch | Leadership / governance on watch |
-| 2026-10-17 | EA | kpi_trend | context | 55 | rule_conflict, activist_cross_link, routine_governance_watch | Leadership / governance on watch |
-| 2026-10-17 | EOSE | kpi_trend | context | 55 | rule_conflict, activist_cross_link, routine_governance_watch | Leadership / governance on watch |
-| 2026-10-17 | FOX | kpi_trend | context | 55 | rule_conflict, activist_cross_link, routine_governance_watch | Leadership / governance on watch |
-| 2026-10-17 | FOXA | kpi_trend | context | 55 | rule_conflict, activist_cross_link, routine_governance_watch | Leadership / governance on watch |
-| 2026-10-17 | GNRC | kpi_trend | context | 55 | rule_conflict, activist_cross_link, routine_governance_watch | Leadership / governance on watch |
-| 2026-10-17 | GOOG | kpi_trend | context | 55 | rule_conflict, activist_cross_link, routine_governance_watch | Leadership / governance on watch |
-| 2026-10-17 | HIMS | kpi_trend | context | 55 | rule_conflict, activist_cross_link, routine_governance_watch | Leadership / governance on watch |
-| 2026-10-17 | HON | kpi_trend | context | 55 | rule_conflict, activist_cross_link, routine_governance_watch | Leadership / governance on watch |
-| 2026-10-17 | INCY | kpi_trend | context | 55 | rule_conflict, activist_cross_link, routine_governance_watch | Leadership / governance on watch |
-| 2026-10-17 | INTU | kpi_trend | context | 55 | rule_conflict, activist_cross_link, routine_governance_watch | Leadership / governance on watch |
-| 2026-10-17 | IVZ | kpi_trend | context | 55 | rule_conflict, activist_cross_link, routine_governance_watch | Leadership / governance on watch |
-| 2026-10-17 | KR | kpi_trend | context | 55 | rule_conflict, activist_cross_link, routine_governance_watch | Leadership / governance on watch |
-| 2026-10-17 | MS | kpi_trend | context | 55 | rule_conflict, activist_cross_link, routine_governance_watch | Leadership / governance on watch |
-| 2026-10-17 | STX | kpi_trend | context | 55 | rule_conflict, activist_cross_link, routine_governance_watch | Leadership / governance on watch |
-| 2026-10-17 | TFC | kpi_trend | context | 55 | rule_conflict, activist_cross_link, routine_governance_watch | Leadership / governance on watch |
-| 2026-10-17 | TGT | kpi_trend | context | 55 | rule_conflict, activist_cross_link, routine_governance_watch | Leadership / governance on watch |
-| 2026-10-17 | VEEV | kpi_trend | context | 55 | rule_conflict, activist_cross_link, routine_governance_watch | Leadership / governance on watch |
-| 2026-10-17 | WBD | kpi_trend | context | 55 | rule_conflict, activist_cross_link, routine_governance_watch | Leadership / governance on watch |
-| 2026-10-17 | YUM | kpi_trend | context | 55 | rule_conflict, activist_cross_link, routine_governance_watch | Leadership / governance on watch |
-| 2026-10-17 | ZETA | news | context | 32 | rule_conflict, activist_cross_link, neutral_low_impact | Form 4 Zeta Global Holdings Corp: William Landman (Director) |
-| 2026-10-16 | T | news | context | 32 | rule_conflict, activist_cross_link, neutral_low_impact | AT&T (T) Announces Retirement of Global Marketing Officer Lo |
-| 2026-10-16 | WMT | news | context | 32 | rule_conflict, activist_cross_link, neutral_low_impact | Insider Selling: Walmart (NASDAQ:WMT) CEO Sells 13,125 Share |
-| 2026-10-16 | QCOM | news | context | 32 | rule_conflict, activist_cross_link, neutral_low_impact | CFO converts stock units at Qualcomm (QCOM); 3,267 shares ar |
-| 2026-10-16 | PSX | news | context | 32 | rule_conflict, activist_cross_link, neutral_low_impact | Phillips 66 (PSX) Declares $1.33 Quarterly Dividend; 1.8% Yi |
-| 2026-10-16 | GE | news | context | 32 | rule_conflict, activist_cross_link, neutral_low_impact | Vaso Stock Surges 149% in a Year: What's Behind the Rally? |
-| 2026-10-16 | PSX | news | context | 32 | rule_conflict, activist_cross_link, neutral_low_impact | Phillips 66 (PSX) Raises Quarterly Dividend by 4.7%, Yieldin |
-| 2026-10-16 | CRM | news | context | 32 | rule_conflict, activist_cross_link, neutral_low_impact | Strong 2027 Guidance and Generative AI Drive Salesforce’s (C |
-| 2026-10-16 | UNP | news | context | 32 | rule_conflict, activist_cross_link, neutral_low_impact | Union Pacific Stock (UNP) Dips on News the CFO Is Stepping D |
-| 2026-10-16 | PSX | news | context | 32 | rule_conflict, activist_cross_link, neutral_low_impact | Phillips 66 (PSX) Raises Quarterly Dividend to $1.33, Reflec |
-| 2026-10-16 | LUV | news | context | 32 | rule_conflict, activist_cross_link, neutral_low_impact | Southwest Airlines Q3 setup: Guidance faces earnings-revisio |
-| 2026-10-16 | UNP | news | context | 32 | rule_conflict, activist_cross_link, neutral_low_impact | Union Pacific (UNP) CFO Jennifer Hamann to Retire in Early 2 |
-| 2026-10-16 | PSX | news | context | 32 | rule_conflict, activist_cross_link, neutral_low_impact | Phillips 66 Announces Increase in Quarterly Dividend - Yahoo |
-| 2026-10-16 | TFC | news | context | 32 | rule_conflict, activist_cross_link, neutral_low_impact | TFC Q3 Earnings Miss Estimates as Securities Losses, Higher  |
-| 2026-10-16 | QCOM | news | context | 32 | rule_conflict, activist_cross_link, neutral_low_impact | Qualcomm (QCOM) Insider Sale: EVP, General Counsel & Corpora |
-| 2026-10-16 | VEEV | news | context | 32 | rule_conflict, activist_cross_link, neutral_low_impact | Veeva Systems (VEEV) Insider Sale: SVP, Gen. Counsel, Secret |
-| 2026-10-15 | DLTR | kpi_trend | context | 55 | rule_conflict, activist_cross_link, routine_governance_watch | Leadership / governance on watch |
-| 2026-10-15 | GE | kpi_trend | context | 55 | rule_conflict, activist_cross_link, routine_governance_watch | Leadership / governance on watch |
-| 2026-10-11 | GOOG | third_party | context | 21 | rule_conflict, activist_cross_link, neutral_low_impact | PX14A6G · GOOG · 2026-04-28 |
-| 2026-10-11 | VTR | third_party | context | 21 | rule_conflict, activist_cross_link, neutral_low_impact | DFAN14A (proxy solicitation) · VTR · 2024-01-11 |
-| 2026-10-11 | QDEL | vic_research | context | 27 | rule_conflict, activist_cross_link, neutral_low_impact | VIC PDF intake - QDEL - QDEL VIC PDF |
-| 2026-10-11 | TFPM | vic_research | context | 27 | rule_conflict, activist_cross_link, neutral_low_impact | VIC PDF intake - TFPM - TFPM VIC PDF |
-| 2026-10-11 | JOE | vic_research | context | 27 | rule_conflict, activist_cross_link, entity_mismatch, neutral_low_impact | 01-Douglas-Dynamics |
-| 2026-10-11 | JOE | vic_research | context | 27 | rule_conflict, activist_cross_link, entity_mismatch, neutral_low_impact | 01-cleveland-cliffs |
-| 2026-10-11 | JOE | vic_research | context | 27 | rule_conflict, activist_cross_link, entity_mismatch, neutral_low_impact | 01-greencore-group |
-| 2026-10-11 | JOE | vic_research | context | 27 | rule_conflict, activist_cross_link, entity_mismatch, neutral_low_impact | 01_ICT_International_Container_Terminal_Services_Inc |
-| 2026-10-11 | JOE | vic_research | context | 27 | rule_conflict, activist_cross_link, entity_mismatch, neutral_low_impact | 02-polypid |
-| 2026-10-11 | CHTR | vic_research | context | 27 | rule_conflict, activist_cross_link, neutral_low_impact | 07-Charter-Communications |
-| 2026-10-11 | DLTR | vic_research | context | 27 | rule_conflict, activist_cross_link, neutral_low_impact | DLTR - 03-dollar-tree |
-| 2026-10-11 | ACHR | vic_research | context | 27 | rule_conflict, activist_cross_link, entity_mismatch, neutral_low_impact | 01_Archer_4955058434_000e |
-| 2026-10-11 | LLY | vic_research | context | 27 | rule_conflict, activist_cross_link, neutral_low_impact | 05-Eli-Lilly-LLY-9821723250_1e07 |
-| 2026-10-11 | DASH | vic_research | context | 27 | rule_conflict, activist_cross_link, entity_mismatch, neutral_low_impact | 04-Yelp |
-| 2026-10-11 | TMUS | vic_research | context | 27 | rule_conflict, activist_cross_link, entity_mismatch, neutral_low_impact | 13-Helios-Towers |
-| 2026-10-11 | BR | vic_research | context | 27 | rule_conflict, activist_cross_link, neutral_low_impact | 04-Broadridge |
-| 2026-10-11 | BR | vic_research | context | 27 | rule_conflict, activist_cross_link, neutral_low_impact | 05-BROADRIDGE-BR-9240874431 |
-| 2026-10-11 | FRMI | vic_research | context | 27 | rule_conflict, activist_cross_link, neutral_low_impact | VIC PDF intake - FRMI - FRMI.pdf |
-| 2026-10-11 | FRMI | vic_research | context | 27 | rule_conflict, activist_cross_link, neutral_low_impact | VIC PDF intake - FRMI - FRMI VIC PDF |
-| 2026-10-11 | CVNA | vic_research | context | 27 | rule_conflict, activist_cross_link, neutral_low_impact | 04-Carvana-CVNA-3997733949_3268 |
-| 2026-10-11 | VEEV | vic_research | context | 27 | rule_conflict, activist_cross_link, neutral_low_impact | 08_VEEV_9648539704_25e4 |
-| 2026-10-11 | GPGI | vic_research | context | 27 | rule_conflict, activist_cross_link, neutral_low_impact | GPGI - 09-GPGI |
-| 2026-10-11 | BUR | vic_research | context | 27 | rule_conflict, activist_cross_link, neutral_low_impact | 07-BURFORD-CAPITAL-BUR-4694552095_151e |
-| 2026-10-11 | BUR | vic_research | context | 27 | rule_conflict, activist_cross_link, neutral_low_impact | VIC PDF intake - BUR - BUR VIC PDF |
-| 2026-10-11 | WMT | vic_research | context | 27 | rule_conflict, activist_cross_link, entity_mismatch, neutral_low_impact | 02-pattern-group |
-| 2026-10-11 | PLUG | vic_research | context | 27 | rule_conflict, activist_cross_link, neutral_low_impact | 06-Plug-Power_13b1 |
-| 2026-10-11 | PSA | vic_research | context | 27 | rule_conflict, activist_cross_link, neutral_low_impact | 01-Public-Storage_8bfc |
-| 2026-10-11 | MSFT | vic_research | context | 27 | rule_conflict, activist_cross_link, neutral_low_impact | MSFT - 06-tencent-holdings |
-| 2026-10-11 | INTU | vic_research | context | 27 | rule_conflict, activist_cross_link, neutral_low_impact | INTU - 10-Intuit_606e |
-| 2026-10-11 | INTU | vic_research | context | 27 | rule_conflict, activist_cross_link, neutral_low_impact | INTU - 163568 |
-| 2026-10-11 | TSLA | vic_research | context | 27 | rule_conflict, activist_cross_link, neutral_low_impact | VIC PDF intake - TSLA - TSLA VIC PDF |
-| 2026-10-11 | AMZN | vic_research | context | 27 | rule_conflict, activist_cross_link, neutral_low_impact | VIC PDF intake - AMZN - AMZN VIC PDF |
-| 2026-10-11 | WULF | vic_research | context | 27 | rule_conflict, activist_cross_link, neutral_low_impact | WULF - 08-TeraWulf |
-| 2026-10-11 | APLD | vic_research | context | 27 | rule_conflict, activist_cross_link, neutral_low_impact | VIC PDF intake - APLD - APLD VIC PDF |
-| 2026-10-11 | MDLZ | vic_research | context | 27 | rule_conflict, activist_cross_link, neutral_low_impact | MDLZ - 02-Mondelez_428d |
-| 2026-10-11 | CSGP | vic_research | context | 27 | rule_conflict, activist_cross_link, neutral_low_impact | 09-CoStar-Group |
-| 2026-10-11 | CSGP | vic_research | context | 27 | rule_conflict, activist_cross_link, neutral_low_impact | VIC PDF intake - CSGP - CSGP VIC PDF |
-| 2026-10-11 | SOFI | vic_research | context | 27 | rule_conflict, activist_cross_link, neutral_low_impact | SOFI |
-| 2026-10-11 | TRC | vic_research | context | 27 | rule_conflict, activist_cross_link, neutral_low_impact | VIC PDF intake - TRC - TRC VIC PDF |
-| 2026-10-11 | INVH | vic_research | context | 27 | rule_conflict, activist_cross_link, neutral_low_impact | 11_INVH_INVITATION_HOMES_INC_e4ea |
-| 2026-10-11 | GOOGL | vic_research | context | 27 | rule_conflict, activist_cross_link, neutral_low_impact | VIC PDF intake - GOOGL - GOOGL VIC PDF |
-| 2026-10-11 | GME | third_party | context | 21 | rule_conflict, activist_cross_link, neutral_low_impact | DFAN14A (proxy solicitation) · GME · 2019-03-14 |
-| 2026-10-11 | WBD | third_party | context | 21 | rule_conflict, activist_cross_link, neutral_low_impact | DFAN14A (proxy solicitation) · WBD · 2026-03-30 |
-| 2026-10-11 | HAS | third_party | context | 21 | rule_conflict, activist_cross_link, neutral_low_impact | DFAN14A (proxy solicitation) · HAS · 2022-02-17 |
-| 2026-10-11 | ROAD | third_party | context | 21 | rule_conflict, activist_cross_link, neutral_low_impact | SC 13D/A · ROAD · 2024-10-22 |
-| 2026-10-11 | GOOGL | third_party | context | 21 | rule_conflict, activist_cross_link, neutral_low_impact | PX14A6G · GOOGL · 2026-04-28 |
-| 2026-10-11 | MO | third_party | context | 21 | rule_conflict, activist_cross_link, neutral_low_impact | SC 13D/A · MO · 2021-06-16 |
-| 2026-10-11 | GME | third_party | context | 21 | rule_conflict, activist_cross_link, neutral_low_impact | DEFC14A (proxy solicitation) · GME · 2020-04-24 |
-| 2026-10-11 | SYK | third_party | context | 21 | rule_conflict, activist_cross_link, neutral_low_impact | __Ronda E. Stryker — SC 13D/A |
-| 2026-10-11 | TGT | third_party | context | 21 | rule_conflict, activist_cross_link, entity_mismatch, neutral_low_impact | acc0000027419 18 000003 |
-| 2026-10-11 | XOM | third_party | context | 21 | rule_conflict, activist_cross_link, entity_mismatch, neutral_low_impact | Engine (+7) — DEFC14A (proxy solicitation) |
-| 2026-10-11 | CSX | third_party | context | 21 | rule_conflict, activist_cross_link, entity_mismatch, neutral_low_impact | Mantle (+2) — SC 13D/A |
-| 2026-10-11 | PDD | third_party | context | 21 | rule_conflict, activist_cross_link, entity_mismatch, neutral_low_impact | Petrus Advisers — SC 13D/A |
-| 2026-10-11 | GTX | third_party | context | 21 | rule_conflict, activist_cross_link, neutral_low_impact | SC 13D/A · GTX · 2020-10-16 |
-| 2026-10-11 | ACHR | third_party | context | 21 | rule_conflict, activist_cross_link, neutral_low_impact | SC 13D/A · ACHR · 2022-10-27 |
-| 2026-10-11 | EQT | third_party | context | 21 | rule_conflict, activist_cross_link, neutral_low_impact | DEFC14A (proxy solicitation) · EQT · 2019-05-20 |
-| 2026-10-11 | RKT | third_party | context | 21 | rule_conflict, activist_cross_link, entity_mismatch, neutral_low_impact | Daniel Gilbert Trust #1 u/a/d 8/23/16 — SC 13D/A |
-| 2026-10-11 | LLY | third_party | context | 21 | rule_conflict, activist_cross_link, neutral_low_impact | SC 13D/A · LLY · 2022-12-01 |
-| 2026-10-11 | SMCI | third_party | context | 21 | rule_conflict, activist_cross_link, entity_mismatch, neutral_low_impact | Oaktree Value Equity Fund, L.P. — SC 13D/A |
-| 2026-10-11 | GNRC | third_party | context | 21 | rule_conflict, activist_cross_link, neutral_low_impact | Generac Power Systems, Inc. — SC 13D |
-| 2026-10-11 | GNRC | third_party | context | 21 | rule_conflict, activist_cross_link, entity_mismatch, neutral_low_impact | acc0001437749 18 002286 |
-| 2026-10-11 | WMT | third_party | context | 21 | rule_conflict, activist_cross_link, neutral_low_impact | PX14A6G · WMT · 2025-05-27 |
-| 2026-10-11 | PLUG | third_party | context | 21 | rule_conflict, activist_cross_link, entity_mismatch, neutral_low_impact | Grove Energy Capital LLC — SC 13D/A |
-| 2026-10-11 | SOC | third_party | context | 21 | rule_conflict, activist_cross_link, entity_mismatch, neutral_low_impact | James C. Flores — SC 13D/A |
-| 2026-10-11 | SOC | third_party | context | 21 | rule_conflict, activist_cross_link, entity_mismatch, neutral_low_impact | Christopher B. Sarofim — SC 13D/A |
-| 2026-10-11 | EXE | third_party | context | 21 | rule_conflict, activist_cross_link, entity_mismatch, neutral_low_impact | Esquisto Holdings, LLC — SC 13D/A |
-| 2026-10-11 | MSFT | third_party | context | 21 | rule_conflict, activist_cross_link, neutral_low_impact | PX14A6G · MSFT · 2025-11-12 |
-| 2026-10-11 | AMR | third_party | context | 21 | rule_conflict, activist_cross_link, entity_mismatch, neutral_low_impact | PERCY ROCKDALE LLC — SC 13D/A |
-| 2026-10-11 | AMZN | third_party | context | 21 | rule_conflict, activist_cross_link, neutral_low_impact | PX14A6G · AMZN · 2025-04-16 |
-| 2026-10-11 | HON | third_party | context | 21 | rule_conflict, activist_cross_link, neutral_low_impact | SC 13D/A · HON · 2021-01-12 |
-| 2026-10-11 | MDLZ | third_party | context | 21 | rule_conflict, activist_cross_link, neutral_low_impact | PX14A6G · MDLZ · 2025-04-29 |
-| 2026-10-11 | GYRO | third_party | context | 21 | rule_conflict, activist_cross_link, neutral_low_impact | DFAN14A (proxy solicitation) · GYRO · 2023-04-28 |
-| 2026-10-11 | ACA | third_party | context | 21 | rule_conflict, activist_cross_link, entity_mismatch, neutral_low_impact | ValueAct Capital — SC 13D/A |
-| 2026-10-11 | UPST | third_party | context | 21 | rule_conflict, activist_cross_link, entity_mismatch, neutral_low_impact | Third (+1) — SC 13G/A |
-| 2026-10-11 | GRAB | third_party | context | 21 | rule_conflict, activist_cross_link, entity_mismatch, neutral_low_impact | Uber Technologies, Inc. — SC 13D |
-| 2026-10-11 | UEC | third_party | context | 21 | rule_conflict, activist_cross_link, neutral_low_impact | URANIUM ENERGY CORP. — SC 13D/A |
-| 2026-10-11 | RCAT | third_party | context | 21 | rule_conflict, activist_cross_link, entity_mismatch, neutral_low_impact | Red Cat Holdings, Inc. — SC 13D/A |
-| 2026-10-11 | TFPM | third_party | context | 21 | rule_conflict, activist_cross_link, entity_mismatch, neutral_low_impact | Elliott Management — SC 13D/A |
-| 2026-10-11 | TGT | third_party | context | 21 | rule_conflict, activist_cross_link, entity_mismatch, neutral_low_impact | acc0001104659 18 004908 |
-| 2026-10-11 | HLT | third_party | context | 21 | rule_conflict, activist_cross_link, entity_mismatch, neutral_low_impact | HoldCo Asset Management — SC 13D/A |
-| 2026-10-11 | FOX | third_party | context | 21 | rule_conflict, activist_cross_link, entity_mismatch, neutral_low_impact | HoldCo Asset Management — SC 13D/A |
-| 2026-10-11 | PONY | third_party | context | 21 | rule_conflict, activist_cross_link, entity_mismatch, neutral_low_impact | HoldCo Asset Management — SC 13G/A |
-| 2026-10-11 | HCA | third_party | context | 21 | rule_conflict, activist_cross_link, entity_mismatch, neutral_low_impact | Jun 30, 2020 |
-| 2026-10-11 | ZETA | third_party | context | 21 | rule_conflict, activist_cross_link, entity_mismatch, neutral_low_impact | HoldCo Asset Management — SC 13G/A |
-| 2026-10-11 | FOXA | third_party | context | 21 | rule_conflict, activist_cross_link, entity_mismatch, neutral_low_impact | HoldCo Asset Management — SC 13D/A |
-| 2026-10-11 | WBI | third_party | context | 21 | rule_conflict, activist_cross_link, entity_mismatch, neutral_low_impact | HoldCo Asset Management — SC 13G/A |
-| 2026-10-11 | WBI | third_party | context | 21 | rule_conflict, activist_cross_link, entity_mismatch, neutral_low_impact | acc0001193125 25 207591 |
-| 2026-10-11 | INVH | third_party | context | 21 | rule_conflict, activist_cross_link, entity_mismatch, neutral_low_impact | HoldCo Asset Management — SC 13G/A |
-| 2026-10-11 | MP | third_party | context | 21 | rule_conflict, activist_cross_link, entity_mismatch, neutral_low_impact | JHL Capital Group — SC 13D/A |
-| 2026-10-11 | MP | third_party | context | 21 | rule_conflict, activist_cross_link, entity_mismatch, neutral_low_impact | QVT (+4) — SC 13D/A |
-| 2026-10-11 | QDEL | third_party | context | 21 | rule_conflict, activist_cross_link, entity_mismatch, neutral_low_impact | `mcintyre` |
-| 2026-10-11 | QDEL | third_party | context | 21 | rule_conflict, activist_cross_link, entity_mismatch, neutral_low_impact | `mcintyre_q2` |
-| 2026-10-11 | QDEL | third_party | context | 21 | rule_conflict, activist_cross_link, entity_mismatch, neutral_low_impact | `jefferies_2026-08-06` |
-| 2026-10-11 | HSIC | third_party | context | 21 | rule_conflict, activist_cross_link, entity_mismatch, neutral_low_impact | KKR Hawaii Holdings L.P — SC 13D/A |
-| 2026-10-11 | SYK | third_party | context | 21 | rule_conflict, activist_cross_link, neutral_low_impact | STRYKER RONDA E — SC 13D/A |
-| 2026-10-11 | SYK | third_party | context | 21 | rule_conflict, activist_cross_link, neutral_low_impact | Stryker Corporation — SC 13D/A |
-| 2026-10-11 | PSX | third_party | context | 21 | rule_conflict, activist_cross_link, entity_mismatch, neutral_low_impact | Link Co — SC 13D |
-| 2026-10-11 | PSX | third_party | context | 21 | rule_conflict, activist_cross_link, entity_mismatch, neutral_low_impact | Elliott Management — DFAN14A (proxy solicitation) |
-| 2026-10-11 | DIS | third_party | context | 21 | rule_conflict, activist_cross_link, entity_mismatch, neutral_low_impact | Trian Partners — DEFC14A (proxy solicitation) |
-| 2026-10-11 | GDRZF | third_party | context | 21 | rule_conflict, activist_cross_link, entity_mismatch, neutral_low_impact | STEELHEAD PARTNERS, LLC — SC 13D/A |
-| 2026-10-11 | GDRZF | third_party | context | 21 | rule_conflict, activist_cross_link, entity_mismatch, neutral_low_impact | Camac Partners — SC 13D/A |
-| 2026-10-11 | BEN | third_party | context | 21 | rule_conflict, activist_cross_link, neutral_low_impact | Franklin Resources, Inc. — SC 13D/A |
-| 2026-10-11 | XOM | third_party | context | 21 | rule_conflict, activist_cross_link, entity_mismatch, neutral_low_impact | Engine (+7) — DFAN14A (proxy solicitation) |
-| 2026-10-11 | DG | third_party | context | 21 | rule_conflict, activist_cross_link, entity_mismatch, neutral_low_impact | Icahn Enterprises — PX14A6G |
-| 2026-10-11 | CSX | third_party | context | 21 | rule_conflict, activist_cross_link, neutral_low_impact | DFAN14A (proxy solicitation) · CSX · 2022-05-02 |
-| 2026-10-11 | CSX | third_party | context | 21 | rule_conflict, activist_cross_link, entity_mismatch, neutral_low_impact | Mantle Ridge — PREN14A (proxy solicitation) |
-| 2026-10-11 | VMC | third_party | context | 21 | rule_conflict, activist_cross_link, neutral_low_impact | VULCAN MATERIALS COMPANY — DFAN14A (proxy solicitation) |
-| 2026-10-11 | VMC | third_party | context | 21 | rule_conflict, activist_cross_link, entity_mismatch, neutral_low_impact | Grizzly Research — DFAN14A (proxy solicitation) |
-| 2026-10-11 | EOSE | third_party | context | 21 | rule_conflict, activist_cross_link, entity_mismatch, neutral_low_impact | B. Riley Financial, Inc. — SC 13D/A |
-| 2026-10-11 | EOSE | third_party | context | 21 | rule_conflict, activist_cross_link, neutral_low_impact | AltEnergy LLC — SC 13D/A |
-| 2026-10-11 | NSC | third_party | context | 21 | rule_conflict, activist_cross_link, entity_mismatch, neutral_low_impact | Ancora Advisors — PX14A6G |
-| 2026-10-11 | NSC | third_party | context | 21 | rule_conflict, activist_cross_link, entity_mismatch, neutral_low_impact | Ancora Advisors — DEFA14A |
-| 2026-10-11 | VZ | third_party | context | 21 | rule_conflict, activist_cross_link, neutral_low_impact | VERIZON COMMUNICATIONS INC — DFAN14A (proxy solicitation) |
-| 2026-10-11 | KVUE | third_party | context | 21 | rule_conflict, activist_cross_link, entity_mismatch, neutral_low_impact | Starboard Value — PREC14A (proxy solicitation) |
-| 2026-10-11 | EA | third_party | context | 21 | rule_conflict, activist_cross_link, neutral_low_impact | DFAN14A (proxy solicitation) · EA · 2021-02-08 |
-| 2026-10-11 | EA | third_party | context | 21 | rule_conflict, activist_cross_link, entity_mismatch, neutral_low_impact | DFAN14A 1 d112573ddfan14a.htm DFAN14A DFAN14A... — DFAN14A ( |
-| 2026-10-11 | EA | third_party | context | 21 | rule_conflict, activist_cross_link, entity_mismatch, neutral_low_impact | PUBLIC INVESTMENT FUND — SC 13D/A |
-| 2026-10-11 | EA | third_party | context | 21 | rule_conflict, activist_cross_link, entity_mismatch, neutral_low_impact | Pentwater Capital — SC 13G |
-| 2026-10-11 | APD | third_party | context | 21 | rule_conflict, activist_cross_link, entity_mismatch, neutral_low_impact | Mantle (+4) — DEFC14A (proxy solicitation) |
-| 2026-10-11 | APD | third_party | context | 21 | rule_conflict, activist_cross_link, entity_mismatch, neutral_low_impact | Mantle Ridge — DEFC14A (proxy solicitation) |
-| 2026-10-11 | APD | third_party | context | 21 | rule_conflict, activist_cross_link, entity_mismatch, neutral_low_impact | Mantle (+6) — DFAN14A (proxy solicitation) |
-| 2026-10-11 | CCI | third_party | context | 21 | rule_conflict, activist_cross_link, entity_mismatch, neutral_low_impact | ValueAct Capital — DEFC14A (proxy solicitation) |
-| 2026-10-11 | CCI | third_party | context | 21 | rule_conflict, activist_cross_link, entity_mismatch, neutral_low_impact | BOOTS PARALLEL 1, LP — DFAN14A (proxy solicitation) |
-| 2026-10-11 | GE | third_party | context | 21 | rule_conflict, activist_cross_link, entity_mismatch, neutral_low_impact | General Electric Company — SC 13D/A |
-| 2026-10-11 | GE | third_party | context | 21 | rule_conflict, activist_cross_link, entity_mismatch, neutral_low_impact | Inc — SC 13D/A |
-| 2026-10-11 | LDOS | third_party | context | 21 | rule_conflict, activist_cross_link, entity_mismatch, neutral_low_impact | Feb 16, 2021 |
-| 2026-10-11 | YUM | third_party | context | 21 | rule_conflict, activist_cross_link, entity_mismatch, neutral_low_impact | Corvex Management — SC 13G/A |
-| 2026-10-11 | YUM | third_party | context | 21 | rule_conflict, activist_cross_link, neutral_low_impact | PX14A6G · YUM · 2025-05-14 |
-| 2026-10-11 | PDD | third_party | context | 21 | rule_conflict, activist_cross_link, entity_mismatch, neutral_low_impact | Tencent Holdings Limited — SC 13D/A |
-| 2026-10-11 | CHTR | third_party | context | 21 | rule_conflict, activist_cross_link, entity_mismatch, neutral_low_impact | Advance Publications, Inc. — SC 13D/A |
-| 2026-10-11 | CART | third_party | context | 21 | rule_conflict, activist_cross_link, entity_mismatch, neutral_low_impact | SEQUOIA CAPITAL GLOBAL GROWTH FUND II, L.P. (... — SC 13D/A |
-| 2026-10-11 | DLTR | third_party | context | 21 | rule_conflict, activist_cross_link, entity_mismatch, neutral_low_impact | Mantle Ridge — DEFA14A |
-| 2026-10-11 | DLTR | third_party | context | 21 | rule_conflict, activist_cross_link, entity_mismatch, neutral_low_impact | Pershing Square — DEFA14A |
-| 2026-10-11 | NWSA | third_party | context | 21 | rule_conflict, activist_cross_link, entity_mismatch, neutral_low_impact | Starboard (+2) — DFAN14A (proxy solicitation) |
+| 2026-10-27 | PSX | news | context | 38 | rule_conflict, activist_cross_link, neutral_low_impact | Does Dividend Increase Change The Bull Case For Phillips 66  |
+| 2026-10-27 | HAS | news | context | 38 | rule_conflict, activist_cross_link, neutral_low_impact | Pawtucket mayor, residents push back on Hasbro CEO’s comment |
+| 2026-10-27 | DASH | news | context | 38 | rule_conflict, activist_cross_link, neutral_low_impact | DoorDash nears $17B deal to acquire Instacart, boosting groc |
+| 2026-10-27 | DASH | news | context | 38 | rule_conflict, activist_cross_link, neutral_low_impact | DoorDash in advanced talks to acquire Instacart, WSJ reports |
+| 2026-10-27 | DASH | news | context | 38 | rule_conflict, activist_cross_link, neutral_low_impact | DoorDash in advanced talks to acquire Instacart in potential |
+| 2026-10-27 | GOOGL | news | context | 38 | rule_conflict, activist_cross_link, neutral_low_impact | Alphabet Must Show This on Oct. 28 or the Stock Could Stall |
+| 2026-10-27 | MSFT | news | context | 38 | rule_conflict, activist_cross_link, neutral_low_impact | Anthropic's Billions in Microsoft Commitments Add to Its Mou |
+| 2026-10-27 | LDOS | news | context | 38 | rule_conflict, activist_cross_link, neutral_low_impact | Leidos (LDOS) Stock May Be 43% Below Fair Value Despite Cybe |
+| 2026-10-26 | DASH | news | context | 38 | rule_conflict, activist_cross_link, neutral_low_impact | DoorDash nears $17B deal to acquire Instacart, shaking up gr |
+| 2026-10-26 | EQT | news | context | 38 | rule_conflict, activist_cross_link, neutral_low_impact | Why Range Resources Stock Surged Today |
+| 2026-10-26 | DASH | news | context | 38 | rule_conflict, activist_cross_link, neutral_low_impact | DoorDash in advanced talks to acquire Instacart: WSJ - Yahoo |
+| 2026-10-26 | PSA | news | context | 38 | rule_conflict, activist_cross_link, neutral_low_impact | Public Storage Q3 earnings grow amid reduced churn, guidance |
+| 2026-10-26 | WELL | news | context | 38 | rule_conflict, activist_cross_link, neutral_low_impact | Welltower falls on Q3 earnings miss despite raising guidance |
+| 2026-10-26 | PFG | news | context | 38 | rule_conflict, activist_cross_link, neutral_low_impact | Principal Financial (PFG) Q3 Earnings and Revenues Miss Esti |
+| 2026-10-26 | PFG | news | context | 38 | rule_conflict, activist_cross_link, neutral_low_impact | Principal Financial (PFG) Q3 Earnings and Revenues Miss Esti |
+| 2026-10-26 | UNP | news | context | 38 | rule_conflict, activist_cross_link, neutral_low_impact | Union Pacific (NYSE:UNP) Share Price, Forecast & Analysis -  |
+| 2026-10-26 | WELL | news | context | 38 | rule_conflict, activist_cross_link, neutral_low_impact | Welltower Q3 Normalized FFO, Revenue Rise; 2026 FFO Outlook  |
+| 2026-10-26 | WELL | news | context | 38 | rule_conflict, activist_cross_link, neutral_low_impact | Welltower (WELL) Misses Q3 EPS by 11c; raises guidance - Str |
+| 2026-10-26 | DASH | news | context | 38 | rule_conflict, activist_cross_link, neutral_low_impact | Exclusive | DoorDash Is in Advanced Talks to Acquire Deliver |
+| 2026-10-26 | DASH | news | context | 38 | rule_conflict, activist_cross_link, neutral_low_impact | Exclusive / DoorDash in exclusive talks to acquire Instacart |
+| 2026-10-26 | OXY | news | context | 38 | rule_conflict, activist_cross_link, neutral_low_impact | Occidental Petroleum (OXY) Declares Quarterly Dividend of $0 |
+| 2026-10-26 | OXY | news | context | 38 | rule_conflict, activist_cross_link, neutral_low_impact | Occidental Petroleum (OXY) Declares $0.28 Quarterly Dividend |
+| 2026-10-26 | FDX | news | context | 38 | rule_conflict, activist_cross_link, neutral_low_impact | FedEx's CFO hiring could spark more cash returns to sharehol |
+| 2026-10-26 | VZ | news | context | 38 | rule_conflict, activist_cross_link, neutral_low_impact | Verizon CEO Schulman says he's demanding of employees, but i |
+| 2026-10-26 | VZ | news | context | 38 | rule_conflict, activist_cross_link, neutral_low_impact | Verizon Communications (VZ) Raises 2026 Guidance Amid Solid  |
+| 2026-10-26 | VZ | news | context | 38 | rule_conflict, activist_cross_link, neutral_low_impact | Verizon Q3 Revenue Hits $34.3B, Raises 2026 Outlook - grafa. |
+| 2026-10-26 | VZ | news | context | 38 | rule_conflict, activist_cross_link, neutral_low_impact | Verizon CEO Says SpaceX May Be Years Away From Becoming Amer |
+| 2026-10-26 | VZ | news | context | 38 | rule_conflict, activist_cross_link, neutral_low_impact | Verizon (VZ) Reports Strong Earnings and Guidance Amid Compe |
+| 2026-10-26 | FDX | news | context | 38 | rule_conflict, activist_cross_link, neutral_low_impact | FedEx (FDX) Appoints Jamere Jackson as New Chief Financial O |
+| 2026-10-26 | INTU | news | context | 38 | rule_conflict, activist_cross_link, neutral_low_impact | Intuit vs. BILL: Which Financial Software Stock Is a Better  |
+| 2026-10-26 | INTU | news | context | 38 | rule_conflict, activist_cross_link, neutral_low_impact | Intuit's Multi-Year Strategy Supports Growth Outlook, Oppenh |
+| 2026-10-26 | GNRC | news | context | 38 | rule_conflict, activist_cross_link, neutral_low_impact | Generac to Report Q3 Earnings: Should Investors Hold or Fold |
+| 2026-10-26 | XYL | news | context | 38 | rule_conflict, activist_cross_link, neutral_low_impact | Xylem Gears Up to Post Q3 Earnings: What's in the Cards? |
+| 2026-10-26 | VZ | news | context | 38 | rule_conflict, activist_cross_link, neutral_low_impact | Verizon Stock Moves Lower as Revenue Miss Overshadows Earnin |
+| 2026-10-26 | GEN | news | context | 38 | rule_conflict, activist_cross_link, neutral_low_impact | Gen Digital to Report Q2 Earnings: What's in the Cards for t |
+| 2026-10-26 | MS | news | context | 38 | rule_conflict, activist_cross_link, neutral_low_impact | Morgan Stanley Investment Management Acquires Virginia Indus |
+| 2026-10-26 | MP | news | context | 38 | rule_conflict, activist_cross_link, neutral_low_impact | Male cheetah found injured in MP’s Morena, Tiger Strike Forc |
+| 2026-10-26 | VZ | news | context | 38 | rule_conflict, activist_cross_link, neutral_low_impact | Verizon Beats Q3 Earnings Estimates on Strong Margins, Reven |
+| 2026-10-26 | VZ | news | context | 38 | rule_conflict, activist_cross_link, neutral_low_impact | Verizon raises 2026 outlook after strong postpaid subscriber |
+| 2026-10-26 | VZ | news | context | 38 | rule_conflict, activist_cross_link, neutral_low_impact | Verizon Communications Q3 Adjusted Earnings, Revenue Increas |
+| 2026-10-26 | VZ | news | context | 38 | rule_conflict, activist_cross_link, neutral_low_impact | Verizon Communications (VZ) Q3 Earnings Surpass Estimates |
+| 2026-10-26 | VZ | news | context | 38 | rule_conflict, activist_cross_link, neutral_low_impact | Verizon Posts Record Q3 2026 Results, Raises Full-Year Guida |
+| 2026-10-26 | UNP | news | context | 38 | rule_conflict, activist_cross_link, neutral_low_impact | Union Pacific Corporation $UNP Stock: Loring Wolcott & Cooli |
+| 2026-10-26 | GE | news | context | 38 | rule_conflict, activist_cross_link, neutral_low_impact | GE Vernova Reports Oct. 28. Here's the 1 Number That Matters |
+| 2026-10-26 | JOE | vic_research | context | 7 | rule_conflict, activist_cross_link, entity_mismatch, neutral_low_impact, subject | 01-Douglas-Dynamics |
+| 2026-10-26 | JOE | vic_research | context | 7 | rule_conflict, activist_cross_link, entity_mismatch, neutral_low_impact, subject | 01-cleveland-cliffs |
+| 2026-10-26 | JOE | vic_research | context | 7 | rule_conflict, activist_cross_link, entity_mismatch, neutral_low_impact, subject | 01-greencore-group |
+| 2026-10-26 | JOE | vic_research | context | 7 | rule_conflict, activist_cross_link, entity_mismatch, neutral_low_impact, subject | 01_ICT_International_Container_Terminal_Services_Inc |
+| 2026-10-26 | JOE | vic_research | context | 7 | rule_conflict, activist_cross_link, entity_mismatch, neutral_low_impact, subject | 02-polypid |
+| 2026-10-25 | BUR | vic_research | context | 33 | rule_conflict, activist_cross_link, neutral_low_impact | 07-BURFORD-CAPITAL-BUR-4694552095_151e |
+| 2026-10-25 | BUR | vic_research | context | 33 | rule_conflict, activist_cross_link, neutral_low_impact | VIC PDF intake - BUR - BUR VIC PDF |
+| 2026-10-25 | CVNA | vic_research | context | 33 | rule_conflict, activist_cross_link, neutral_low_impact | 04-Carvana-CVNA-3997733949_3268 |
+| 2026-10-25 | LLY | vic_research | context | 33 | rule_conflict, activist_cross_link, neutral_low_impact | 05-Eli-Lilly-LLY-9821723250_1e07 |
+| 2026-10-25 | DLTR | vic_research | context | 33 | rule_conflict, activist_cross_link, neutral_low_impact | DLTR - 03-dollar-tree |
+| 2026-10-25 | FRMI | vic_research | context | 33 | rule_conflict, activist_cross_link, neutral_low_impact | VIC PDF intake - FRMI - FRMI.pdf |
+| 2026-10-25 | FRMI | vic_research | context | 33 | rule_conflict, activist_cross_link, neutral_low_impact | VIC PDF intake - FRMI - FRMI VIC PDF |
+| 2026-10-25 | BR | vic_research | context | 33 | rule_conflict, activist_cross_link, neutral_low_impact | 04-Broadridge |
+| 2026-10-25 | BR | vic_research | context | 33 | rule_conflict, activist_cross_link, neutral_low_impact | 05-BROADRIDGE-BR-9240874431 |
+| 2026-10-25 | APLD | vic_research | context | 33 | rule_conflict, activist_cross_link, neutral_low_impact | VIC PDF intake - APLD - APLD VIC PDF |
+| 2026-10-25 | CSGP | vic_research | context | 33 | rule_conflict, activist_cross_link, neutral_low_impact | 09-CoStar-Group |
+| 2026-10-25 | CSGP | vic_research | context | 33 | rule_conflict, activist_cross_link, neutral_low_impact | VIC PDF intake - CSGP - CSGP VIC PDF |
+| 2026-10-25 | PLUG | vic_research | context | 33 | rule_conflict, activist_cross_link, neutral_low_impact | 06-Plug-Power_13b1 |
+| 2026-10-25 | PSA | vic_research | context | 33 | rule_conflict, activist_cross_link, neutral_low_impact | 01-Public-Storage_8bfc |
+| 2026-10-25 | GPGI | vic_research | context | 33 | rule_conflict, activist_cross_link, neutral_low_impact | GPGI - 09-GPGI |
+| 2026-10-25 | INTU | vic_research | context | 33 | rule_conflict, activist_cross_link, neutral_low_impact | INTU - 10-Intuit_606e |
+| 2026-10-25 | INTU | vic_research | context | 33 | rule_conflict, activist_cross_link, neutral_low_impact | INTU - 163568 |
+| 2026-10-25 | TSLA | vic_research | context | 33 | rule_conflict, activist_cross_link, neutral_low_impact | VIC PDF intake - TSLA - TSLA VIC PDF |
+| 2026-10-25 | CHTR | vic_research | context | 33 | rule_conflict, activist_cross_link, neutral_low_impact | 07-Charter-Communications |
+| 2026-10-25 | AXON | third_party | context | 25 | rule_conflict, activist_cross_link, neutral_low_impact | Axon Enterprises, Inc. |
+| 2026-10-25 | MTD | third_party | context | 25 | rule_conflict, activist_cross_link, neutral_low_impact | Mettler-Toledo International, Inc. |
+| 2026-10-25 | AOS | third_party | context | 25 | rule_conflict, activist_cross_link, neutral_low_impact | A O Smith Corp. |
+| 2026-10-25 | AOS | third_party | context | 25 | rule_conflict, activist_cross_link, neutral_low_impact | Smith Family Voting Trust 26-6901000 — SC 13D/A |
+| 2026-10-25 | BUR | third_party | context | 25 | rule_conflict, activist_cross_link, neutral_low_impact | Block on Bloomberg Markets Discussing Latest Short, Burford  |
+| 2026-10-25 | GME | third_party | context | 25 | rule_conflict, activist_cross_link, neutral_low_impact | DEFC14A (proxy solicitation) · GME · 2020-04-24 |
+| 2026-10-25 | UEC | third_party | context | 25 | rule_conflict, activist_cross_link, neutral_low_impact | Uranium Energy Corporation |
+| 2026-10-25 | CVNA | third_party | context | 25 | rule_conflict, activist_cross_link, neutral_low_impact | Carvana: A Father-Son Accounting Grift For The Ages |
+| 2026-10-25 | CVNA | third_party | context | 25 | rule_conflict, activist_cross_link, neutral_low_impact | Carvana Co. |
+| 2026-10-25 | MPWR | third_party | context | 25 | rule_conflict, activist_cross_link, neutral_low_impact | Monolithic Power Systems, Inc. |
+| 2026-10-25 | XYL | third_party | context | 25 | rule_conflict, activist_cross_link, neutral_low_impact | Xylem Inc. |
+| 2026-10-25 | LGND | third_party | context | 25 | rule_conflict, activist_cross_link, neutral_low_impact | Ligand Pharmaceuticals Incorporated — SC 13D |
+| 2026-10-25 | GYRO | third_party | context | 25 | rule_conflict, activist_cross_link, neutral_low_impact | DFAN14A (proxy solicitation) · GYRO · 2023-04-28 |
+| 2026-10-25 | CTAS | third_party | context | 25 | rule_conflict, activist_cross_link, neutral_low_impact | Cintas Corp. |
+| 2026-10-25 | CTAS | third_party | context | 25 | rule_conflict, activist_cross_link, neutral_low_impact | DFAN14A (proxy solicitation) · CTAS · 2025-12-22 |
+| 2026-10-25 | CTAS | third_party | context | 25 | rule_conflict, activist_cross_link, neutral_low_impact | Cintas Corp — SC 13D |
+| 2026-10-25 | DXCM | third_party | context | 25 | rule_conflict, activist_cross_link, neutral_low_impact | Dexcom, Inc. |
+| 2026-10-25 | LLY | third_party | context | 25 | rule_conflict, activist_cross_link, neutral_low_impact | ELI LILLY AND COMPANY — DFAN14A (proxy solicitation) |
+| 2026-10-25 | LLY | third_party | context | 25 | rule_conflict, activist_cross_link, neutral_low_impact | SC 13D/A · LLY · 2022-12-01 |
+| 2026-10-25 | ROL | third_party | context | 25 | rule_conflict, activist_cross_link, neutral_low_impact | Rollins, Inc. |
+| 2026-10-25 | ROL | third_party | context | 25 | rule_conflict, activist_cross_link, neutral_low_impact | R. Randall Rollins Voting Trust U/A dated Aug... — SC 13D/A |
+| 2026-10-25 | ROL | third_party | context | 25 | rule_conflict, activist_cross_link, neutral_low_impact | Gary W. Rollins Voting Trust U/A dated Septem... — SC 13D/A |
+| 2026-10-25 | HIMS | third_party | context | 25 | rule_conflict, activist_cross_link, neutral_low_impact | Hims & Hers Health, Inc. |
+| 2026-10-25 | GTX | third_party | context | 25 | rule_conflict, activist_cross_link, neutral_low_impact | SC 13D/A · GTX · 2020-10-16 |
+| 2026-10-25 | MS | third_party | context | 25 | rule_conflict, activist_cross_link, neutral_low_impact | ValueAct Capital’s Bet on Morgan Stanley Bet Goes Only So Fa |
+| 2026-10-25 | BR | third_party | context | 25 | rule_conflict, activist_cross_link, neutral_low_impact | Broadridge Financial Solutions, Inc. |
+| 2026-10-25 | CHD | third_party | context | 25 | rule_conflict, activist_cross_link, neutral_low_impact | Church & Dwight Co., Inc. |
+| 2026-10-25 | ERIE | third_party | context | 25 | rule_conflict, activist_cross_link, neutral_low_impact | Erie Indemnity Company |
+| 2026-10-25 | MSCI | third_party | context | 25 | rule_conflict, activist_cross_link, neutral_low_impact | MSCI |
+| 2026-10-25 | CSGP | third_party | context | 25 | rule_conflict, activist_cross_link, neutral_low_impact | Third Point Sends Letter to Board of Directors of CoStar Gro |
+| 2026-10-25 | CSGP | third_party | context | 25 | rule_conflict, activist_cross_link, neutral_low_impact | The D. E. Shaw Group Releases Open Letter and Presentation t |
+| 2026-10-25 | CSGP | third_party | context | 25 | rule_conflict, activist_cross_link, neutral_low_impact | D.E. Shaw Group Letter to CoStar Board: Reduced Transparency |
+| 2026-10-25 | CRM | third_party | context | 25 | rule_conflict, activist_cross_link, neutral_low_impact | PX14A6G · CRM · 2024-03-28 |
+| 2026-10-25 | EOSE | third_party | context | 25 | rule_conflict, activist_cross_link, neutral_low_impact | AltEnergy LLC — SC 13D/A |
+| 2026-10-25 | ZBRA | third_party | context | 25 | rule_conflict, activist_cross_link, neutral_low_impact | Zebra Technologies Corp. |
+| 2026-10-25 | HSIC | third_party | context | 25 | rule_conflict, activist_cross_link, neutral_low_impact | Henry Schein, Inc. |
+| 2026-10-25 | TSN | third_party | context | 25 | rule_conflict, activist_cross_link, neutral_low_impact | TYSON LIMITED PARTNERSHIP — SC 13D/A |
+| 2026-10-25 | TSN | third_party | context | 25 | rule_conflict, activist_cross_link, neutral_low_impact | Tyson Limited Partnership (IRS I.D. #71-0692500) — SC 13D/A |
+| 2026-10-25 | PLUG | third_party | context | 25 | rule_conflict, activist_cross_link, neutral_low_impact | Plug Power Inc. |
+| 2026-10-25 | BG | third_party | context | 25 | rule_conflict, activist_cross_link, neutral_low_impact | Bunge Global SA |
+| 2026-10-25 | ROAD | third_party | context | 25 | rule_conflict, activist_cross_link, neutral_low_impact | Construction Partners, Inc. |
+| 2026-10-25 | O | third_party | context | 25 | rule_conflict, activist_cross_link, neutral_low_impact | Realty Income Corp. |
+| 2026-10-25 | AVY | third_party | context | 25 | rule_conflict, activist_cross_link, neutral_low_impact | Avery Dennison Corp. |
+| 2026-10-25 | OXY | third_party | context | 25 | rule_conflict, activist_cross_link, neutral_low_impact | OXY USA Inc — SC 13D/A |
+| 2026-10-25 | UPST | third_party | context | 25 | rule_conflict, activist_cross_link, neutral_low_impact | Upstart (UPST): A Jump Start On The Road To Financial Hell |
+| 2026-10-25 | ALGN | third_party | context | 25 | rule_conflict, activist_cross_link, neutral_low_impact | Align Technology, Inc. |
+| 2026-10-25 | WBD | third_party | context | 25 | rule_conflict, activist_cross_link, neutral_low_impact | Warner Bros. Discovery, Inc — SC 13D/A |
+| 2026-10-25 | PSA | third_party | context | 25 | rule_conflict, activist_cross_link, neutral_low_impact | Public Storage — SC 13D/A |
+| 2026-10-25 | HON | third_party | context | 25 | rule_conflict, activist_cross_link, neutral_low_impact | Honeywell International Inc. — SC 13D/A |
+| 2026-10-25 | HON | third_party | context | 25 | rule_conflict, activist_cross_link, neutral_low_impact | SC 13D/A · HON · 2021-01-12 |
+| 2026-10-25 | INTU | third_party | context | 25 | rule_conflict, activist_cross_link, neutral_low_impact | Intuit Inc. |
+| 2026-10-25 | INTU | third_party | context | 25 | rule_conflict, activist_cross_link, neutral_low_impact | PX14A6G · INTU · 2024-01-12 |
+| 2026-10-25 | SYK | third_party | context | 25 | rule_conflict, activist_cross_link, neutral_low_impact | Stryker Corp. |
+| 2026-10-25 | SYK | third_party | context | 25 | rule_conflict, activist_cross_link, neutral_low_impact | STRYKER RONDA E — SC 13D/A |
+| 2026-10-25 | SYK | third_party | context | 25 | rule_conflict, activist_cross_link, neutral_low_impact | __Ronda E. Stryker — SC 13D/A |
+| 2026-10-25 | SYK | third_party | context | 25 | rule_conflict, activist_cross_link, neutral_low_impact | Stryker Corporation — SC 13D/A |
+| 2026-10-25 | GNRC | third_party | context | 25 | rule_conflict, activist_cross_link, neutral_low_impact | Generac Holdings, Inc. |
+| 2026-10-25 | GNRC | third_party | context | 25 | rule_conflict, activist_cross_link, neutral_low_impact | Generac Power Systems, Inc. — SC 13D |
+| 2026-10-25 | TSLA | third_party | context | 25 | rule_conflict, activist_cross_link, neutral_low_impact | PX14A6G · TSLA · 2025-11-05 |
+| 2026-10-25 | LDOS | third_party | context | 25 | rule_conflict, activist_cross_link, neutral_low_impact | Leidos Holdings, Inc. |
+| 2026-10-25 | MNST | third_party | context | 25 | rule_conflict, activist_cross_link, neutral_low_impact | Monster Beverage Corp. |
+| 2026-10-25 | GME | third_party | context | 25 | rule_conflict, activist_cross_link, neutral_low_impact | DFAN14A (proxy solicitation) · GME · 2019-03-14 |
+| 2026-10-25 | ROAD | third_party | context | 25 | rule_conflict, activist_cross_link, neutral_low_impact | SC 13D/A · ROAD · 2024-10-22 |
+| 2026-10-25 | WBD | third_party | context | 25 | rule_conflict, activist_cross_link, neutral_low_impact | DFAN14A (proxy solicitation) · WBD · 2026-03-30 |
+| 2026-10-25 | UEC | third_party | context | 25 | rule_conflict, activist_cross_link, neutral_low_impact | URANIUM ENERGY CORP. — SC 13D/A |
+| 2026-10-25 | APLD | third_party | context | 25 | rule_conflict, activist_cross_link, neutral_low_impact | Applied Digital / Marvin shop summary (PF3 PR) |
+| 2026-10-25 | O | third_party | context | 25 | rule_conflict, activist_cross_link, neutral_low_impact | Verdad Capital — Biotech Investing (Obenshain, Rasmussen, Wi |
+| 2026-10-25 | AXON | third_party | context | 5 | rule_conflict, activist_cross_link, entity_mismatch, neutral_low_impact, subject | Iceberg Research — PX14A6G |
+| 2026-10-25 | TIPT | third_party | context | 5 | rule_conflict, activist_cross_link, entity_mismatch, neutral_low_impact, subject | Barnes Michael Gene — SC 13D/A |
+| 2026-10-25 | TIPT | third_party | context | 5 | rule_conflict, activist_cross_link, entity_mismatch, neutral_low_impact, subject | Third Point — DEFA14A |
+| 2026-10-25 | TIPT | third_party | context | 5 | rule_conflict, activist_cross_link, entity_mismatch, neutral_low_impact, subject | Veradace Capital Management LLC — SC 13D/A |
+| 2026-10-25 | RCAT | third_party | context | 5 | rule_conflict, activist_cross_link, entity_mismatch, neutral_low_impact, subject | Red Cat Holdings, Inc. — SC 13D/A |
+| 2026-10-25 | RCAT | third_party | context | 5 | rule_conflict, activist_cross_link, entity_mismatch, neutral_low_impact, subject | Jonathan Read — SC 13D |
+| 2026-10-25 | RCAT | third_party | context | 5 | rule_conflict, activist_cross_link, entity_mismatch, neutral_low_impact, subject | Jeffrey M. Thompson — SC 13D |
+| 2026-10-25 | RCAT | third_party | context | 5 | rule_conflict, activist_cross_link, entity_mismatch, neutral_low_impact, subject | Gregory French — SC 13D |
+| 2026-10-25 | NWSA | third_party | context | 5 | rule_conflict, activist_cross_link, entity_mismatch, neutral_low_impact, subject | HoldCo Asset Management — DEFA14A |
+| 2026-10-25 | NWSA | third_party | context | 5 | rule_conflict, activist_cross_link, entity_mismatch, neutral_low_impact, subject | MFT SH Family Trust — SC 13D |
+| 2026-10-25 | NWSA | third_party | context | 5 | rule_conflict, activist_cross_link, entity_mismatch, neutral_low_impact, subject | HoldCo Asset Management — SC 13D |
+| 2026-10-25 | NWSA | third_party | context | 5 | rule_conflict, activist_cross_link, entity_mismatch, neutral_low_impact, subject | Cruden Financial Services LLC — SC 13G/A |
+| 2026-10-25 | NWSA | third_party | context | 5 | rule_conflict, activist_cross_link, entity_mismatch, neutral_low_impact, subject | Starboard (+2) — DFAN14A (proxy solicitation) |
+| 2026-10-25 | TKO | third_party | context | 5 | rule_conflict, activist_cross_link, entity_mismatch, neutral_low_impact, subject | HoldCo Asset Management — SC 13D/A |
+| 2026-10-25 | TKO | third_party | context | 5 | rule_conflict, activist_cross_link, entity_mismatch, neutral_low_impact, subject | Silver (+1) — SC 13D/A |
+| 2026-10-25 | FAST | third_party | context | 5 | rule_conflict, activist_cross_link, entity_mismatch, neutral_low_impact, subject | Third Point — PX14A6G |
+| 2026-10-25 | CVNA | third_party | context | 5 | rule_conflict, activist_cross_link, entity_mismatch, neutral_low_impact, subject | Verde Investments, Inc. — SC 13D/A |
+| 2026-10-25 | RKLB | third_party | context | 5 | rule_conflict, activist_cross_link, entity_mismatch, neutral_low_impact, subject | Bessemer Venture Partners VIII Institutional ... — SC 13D/A |
+| 2026-10-25 | RKLB | third_party | context | 5 | rule_conflict, activist_cross_link, entity_mismatch, neutral_low_impact, subject | Khosla Ventures Seed Associates B, LLC — SC 13D/A |
+| 2026-10-25 | LGND | third_party | context | 5 | rule_conflict, activist_cross_link, entity_mismatch, neutral_low_impact, subject | HoldCo Asset Management — DEFA14A |
+| 2026-10-25 | GYRO | third_party | context | 5 | rule_conflict, activist_cross_link, entity_mismatch, neutral_low_impact, subject | Star Equity Fund — PREC14A (proxy solicitation) |
+| 2026-10-25 | GYRO | third_party | context | 5 | rule_conflict, activist_cross_link, entity_mismatch, neutral_low_impact, subject | GAMCO (+6) — SC 13D/A |
+| 2026-10-25 | CTAS | third_party | context | 5 | rule_conflict, activist_cross_link, entity_mismatch, neutral_low_impact, subject | Summer Hill Partners, LLLP – 27-0228576 — SC 13D/A |
+| 2026-10-25 | LLY | third_party | context | 5 | rule_conflict, activist_cross_link, entity_mismatch, neutral_low_impact, subject | Bulldog Investors — SC 13D/A |
+| 2026-10-25 | DLTR | third_party | context | 5 | rule_conflict, activist_cross_link, entity_mismatch, neutral_low_impact, subject | Mantle Ridge — DEFA14A |
+| 2026-10-25 | DLTR | third_party | context | 5 | rule_conflict, activist_cross_link, entity_mismatch, neutral_low_impact, subject | Pershing Square — DEFA14A |
+| 2026-10-25 | HIMS | third_party | context | 5 | rule_conflict, activist_cross_link, entity_mismatch, neutral_low_impact, subject | Forerunner Ventures GP III, LLC — SC 13D/A |
+| 2026-10-25 | HIMS | third_party | context | 5 | rule_conflict, activist_cross_link, entity_mismatch, neutral_low_impact, subject | Institutional Venture Management XV, LLC — SC 13D/A |
+| 2026-10-25 | HIMS | third_party | context | 5 | rule_conflict, activist_cross_link, entity_mismatch, neutral_low_impact, subject | Redpoint Ventures VI, LLC — SC 13D/A |
+| 2026-10-25 | FRMI | third_party | context | 5 | rule_conflict, activist_cross_link, entity_mismatch, neutral_low_impact, subject | Vicksburg Investments Management — DEFC14A (proxy solicitati |
+| 2026-10-25 | FRMI | third_party | context | 5 | rule_conflict, activist_cross_link, entity_mismatch, neutral_low_impact, subject | Vicksburg Investments Management — DFAN14A (proxy solicitati |
+| 2026-10-25 | GTX | third_party | context | 5 | rule_conflict, activist_cross_link, entity_mismatch, neutral_low_impact, subject | Sessa Capital — SC 13D/A |
+| 2026-10-25 | HCA | third_party | context | 5 | rule_conflict, activist_cross_link, entity_mismatch, neutral_low_impact, subject | Frisco (+5) — SC 13D |
+| 2026-10-25 | HCA | third_party | context | 5 | rule_conflict, activist_cross_link, entity_mismatch, neutral_low_impact, subject | Greenlight Capital — PX14A6G |
+| 2026-10-25 | HCA | third_party | context | 5 | rule_conflict, activist_cross_link, entity_mismatch, neutral_low_impact, subject | acc0001193125 18 080824 |
+| 2026-10-25 | MS | third_party | context | 5 | rule_conflict, activist_cross_link, entity_mismatch, neutral_low_impact, subject | HK + SSI + LCI + IR PDFs (CMSG) |
+| 2026-10-25 | MS | third_party | context | 5 | rule_conflict, activist_cross_link, entity_mismatch, neutral_low_impact, subject | HK + SSI context (MSB) |
+| 2026-10-25 | MS | third_party | context | 5 | rule_conflict, activist_cross_link, entity_mismatch, neutral_low_impact, subject | MITSUBISHI UFJ FINANCIAL GROUP, INC — SC 13D/A |
+| 2026-10-25 | NWS | third_party | context | 5 | rule_conflict, activist_cross_link, entity_mismatch, neutral_low_impact, subject | HoldCo Asset Management — DEFA14A |
+| 2026-10-25 | NWS | third_party | context | 5 | rule_conflict, activist_cross_link, entity_mismatch, neutral_low_impact, subject | MFT SH Family Trust — SC 13D |
+| 2026-10-25 | NWS | third_party | context | 5 | rule_conflict, activist_cross_link, entity_mismatch, neutral_low_impact, subject | HoldCo Asset Management — SC 13D |
+| 2026-10-25 | NWS | third_party | context | 5 | rule_conflict, activist_cross_link, entity_mismatch, neutral_low_impact, subject | Cruden Financial Services LLC — SC 13G/A |
+| 2026-10-25 | NWS | third_party | context | 5 | rule_conflict, activist_cross_link, entity_mismatch, neutral_low_impact, subject | Starboard (+2) — DFAN14A (proxy solicitation) |
+| 2026-10-25 | APLD | third_party | context | 5 | rule_conflict, activist_cross_link, entity_mismatch, neutral_low_impact, subject | Research note (run-the-table bull case) |
+| 2026-10-25 | APLD | third_party | context | 5 | rule_conflict, activist_cross_link, entity_mismatch, neutral_low_impact, subject | Oasis Management (SC 13D/A) |
+| 2026-10-25 | APLD | third_party | context | 5 | rule_conflict, activist_cross_link, entity_mismatch, neutral_low_impact, subject | Wolfpack Research short cache (Jul 2023) |
+| 2026-10-25 | FOX | third_party | context | 5 | rule_conflict, activist_cross_link, entity_mismatch, neutral_low_impact, subject | Cruden Financial Services LLC — SC 13G |
+| 2026-10-25 | FOX | third_party | context | 5 | rule_conflict, activist_cross_link, entity_mismatch, neutral_low_impact, subject | HoldCo Asset Management — SC 13D/A |
+| 2026-10-25 | FOX | third_party | context | 5 | rule_conflict, activist_cross_link, entity_mismatch, neutral_low_impact, subject | HoldCo Asset Management — DEFA14A |
+| 2026-10-25 | FOX | third_party | context | 5 | rule_conflict, activist_cross_link, entity_mismatch, neutral_low_impact, subject | MFT SH Family Trust — SC 13D |
+| 2026-10-25 | CRM | third_party | context | 5 | rule_conflict, activist_cross_link, entity_mismatch, neutral_low_impact, subject | ValueAct Capital — DEFA14A |
+| 2026-10-25 | CRM | third_party | context | 5 | rule_conflict, activist_cross_link, entity_mismatch, neutral_low_impact, subject | Elliott Management — PX14A6G |
+| 2026-10-25 | CRM | third_party | context | 5 | rule_conflict, activist_cross_link, entity_mismatch, neutral_low_impact, subject | Teleios Capital — PX14A6G |
+| 2026-10-25 | LUV | third_party | context | 5 | rule_conflict, activist_cross_link, entity_mismatch, neutral_low_impact, subject | Elliott Management — SC 13D/A |
+| 2026-10-25 | EOSE | third_party | context | 5 | rule_conflict, activist_cross_link, entity_mismatch, neutral_low_impact, subject | B. Riley Financial, Inc. — SC 13D/A |
+| 2026-10-25 | FOXA | third_party | context | 5 | rule_conflict, activist_cross_link, entity_mismatch, neutral_low_impact, subject | Cruden Financial Services LLC — SC 13G |
+| 2026-10-25 | FOXA | third_party | context | 5 | rule_conflict, activist_cross_link, entity_mismatch, neutral_low_impact, subject | HoldCo Asset Management — SC 13D/A |
+| 2026-10-25 | FOXA | third_party | context | 5 | rule_conflict, activist_cross_link, entity_mismatch, neutral_low_impact, subject | HoldCo Asset Management — DEFA14A |
+| 2026-10-25 | FOXA | third_party | context | 5 | rule_conflict, activist_cross_link, entity_mismatch, neutral_low_impact, subject | MFT SH Family Trust — SC 13D |
+| 2026-10-25 | HSIC | third_party | context | 5 | rule_conflict, activist_cross_link, entity_mismatch, neutral_low_impact, subject | KKR Hawaii Holdings L.P — SC 13D/A |
+| 2026-10-25 | TSN | third_party | context | 5 | rule_conflict, activist_cross_link, entity_mismatch, neutral_low_impact, subject | Mariner Research — DEFA14A |
+| 2026-10-25 | PLUG | third_party | context | 5 | rule_conflict, activist_cross_link, entity_mismatch, neutral_low_impact, subject | Grove Energy Capital LLC — SC 13D/A |
+| 2026-10-25 | GE | third_party | context | 5 | rule_conflict, activist_cross_link, entity_mismatch, neutral_low_impact, subject | Trian Partners — SC 13D/A |
+| 2026-10-25 | GE | third_party | context | 5 | rule_conflict, activist_cross_link, entity_mismatch, neutral_low_impact, subject | General Electric Company — SC 13D/A |
+| 2026-10-25 | GE | third_party | context | 5 | rule_conflict, activist_cross_link, entity_mismatch, neutral_low_impact, subject | Inc — SC 13D/A |

@@ -1,0 +1,92 @@
+{
+  "schema_version": "1.0",
+  "ticker": "TIPT",
+  "as_of": "2026-10-21",
+  "facts": [
+    {
+      "field_id": "operating_cash_flow_m",
+      "value": 168.218,
+      "unit": "USD millions",
+      "locked": true,
+      "confidence": "high",
+      "source": {
+        "ref": "TIPT/research/evidence/sec_companyfacts.json",
+        "locator": "us-gaap:NetCashProvidedByUsedInOperatingActivities; accession 0001393726-26-000009; form 10-K",
+        "as_of": "2025-12-31",
+        "content_sha256": "717b787aa78b33c97b85a0db41a780d3a0db6f59efdef680443bd1167adca2d8"
+      }
+    },
+    {
+      "field_id": "capital_expenditures_m",
+      "value": 0.0,
+      "unit": "USD millions",
+      "locked": true,
+      "confidence": "high",
+      "source": {
+        "ref": "TIPT/research/evidence/sec_companyfacts.json",
+        "locator": "us-gaap:PaymentsToAcquirePropertyPlantAndEquipment; accession 0001393726-26-000009; form 10-K",
+        "as_of": "2025-12-31",
+        "content_sha256": "717b787aa78b33c97b85a0db41a780d3a0db6f59efdef680443bd1167adca2d8"
+      }
+    },
+    {
+      "field_id": "cash_m",
+      "value": 33.400999999999996,
+      "unit": "USD millions",
+      "locked": true,
+      "confidence": "high",
+      "source": {
+        "ref": "TIPT/research/evidence/sec_companyfacts.json",
+        "locator": "us-gaap:CashAndCashEquivalentsAtCarryingValue; accession 0001393726-26-000026; form 10-Q",
+        "as_of": "2026-03-31",
+        "content_sha256": "717b787aa78b33c97b85a0db41a780d3a0db6f59efdef680443bd1167adca2d8"
+      }
+    },
+    {
+      "field_id": "debt_m",
+      "value": 64.12599999999999,
+      "unit": "USD millions",
+      "locked": true,
+      "confidence": "high",
+      "source": {
+        "ref": "TIPT/research/evidence/sec_companyfacts.json",
+        "locator": "us-gaap:LongTermDebtNoncurrent; accession 0001393726-26-000026; form 10-Q",
+        "as_of": "2026-03-31",
+        "content_sha256": "717b787aa78b33c97b85a0db41a780d3a0db6f59efdef680443bd1167adca2d8"
+      }
+    },
+    {
+      "field_id": "shares_outstanding",
+      "value": 37570075.0,
+      "unit": "shares",
+      "locked": true,
+      "confidence": "high",
+      "source": {
+        "ref": "TIPT/research/evidence/sec_companyfacts.json",
+        "locator": "dei:EntityCommonStockSharesOutstanding; accession 0001393726-26-000026; form 10-Q",
+        "as_of": "2026-04-29",
+        "content_sha256": "717b787aa78b33c97b85a0db41a780d3a0db6f59efdef680443bd1167adca2d8"
+      }
+    },
+    {
+      "field_id": "normalized_owner_earnings_m",
+      "value": 168.218,
+      "unit": "USD millions",
+      "source": {
+        "ref": "TIPT/research/evidence/sec_companyfacts.json",
+        "locator": "us-gaap:NetCashProvidedByUsedInOperatingActivities; accession 0001393726-26-000009; form 10-K",
+        "as_of": "2025-12-31",
+        "content_sha256": "717b787aa78b33c97b85a0db41a780d3a0db6f59efdef680443bd1167adca2d8"
+      },
+      "derived_from": [
+        "operating_cash_flow_m",
+        "capital_expenditures_m"
+      ],
+      "formula": "operating_cash_flow_m - abs(capital_expenditures_m)",
+      "confidence": "medium",
+      "locked": true
+    }
+  ],
+  "source_count": 1,
+  "generated_at": "2026-10-21T08:05:53.077299Z"
+}

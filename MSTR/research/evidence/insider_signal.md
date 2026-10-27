@@ -1,4 +1,4 @@
-# MSTR — Insider conviction (2026-10-17)
+# MSTR — Insider conviction (2026-10-18)
 
 > Context only. Insider activity informs scenario confidence and stance discussion; it does not auto-inflate Lawrence base IRR. Promotion requires [HUMAN REVIEW].
 
@@ -13,10 +13,10 @@
 | Insider | Date | Shares | Price | Value | Contrib |
 |---------|------|--------|-------|-------|---------|
 | Shao Wei-Ming | 2025-11-12 | 20000 | $40.46 | $809200.0 | 1.377 |
-| Patten Jarrod M | 2025-10-17 | 12000 | $96.875 | $1162500.0 | 1.33 |
 | Shao Wei-Ming | 2025-11-11 | 5334 | $69.123 | $368702.08 | 1.265 |
 | Shao Wei-Ming | 2025-11-10 | 5334 | $69.123 | $368702.08 | 1.265 |
 | RICKERTSEN CARL J | 2026-01-12 | 5000 | $155.879 | $779395.0 | 1.26 |
+| Le Phong | 2026-03-19 | 2509 | $99.62 | $249946.58 | 1.25 |
 
 **Routine / planned sales (context):**
 

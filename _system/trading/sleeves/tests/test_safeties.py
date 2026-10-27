@@ -114,3 +114,41 @@ def test_spx_option_blocked_for_sleeves():
     )
     assert not result.ok
     assert any("SPX" in f for f in result.failures)
+
+
+def test_etf_0dte_options_and_shares_blocked_for_both_sleeves():
+    # A sleeve SELL of SPY would sell etf-0dte's overnight delivery out from
+    # under its 09:30 unwind; a BUY would net against it. Neither owner may.
+    for owner in ("drew", "michael"):
+        for root in ("SPY", "QQQ"):
+            for side in ("BUY", "SELL"):
+                shares = check_safeties(
+                    owner=owner, ticker=root, side=side, qty=10, limit_price=500,
+                    quote=_quote(last=500), proposal={"snapshot_last": 500},
+                )
+                assert not shares.ok
+                assert any("etf-0dte" in f for f in shares.failures), (owner, root, side, shares.failures)
+
+                quote = _quote(last=2)
+                quote.update({"secType": "OPT", "underlying": root, "multiplier": 100})
+                option = check_safeties(
+                    owner=owner, ticker=root, side=side, qty=1, limit_price=2,
+                    quote=quote, proposal={"snapshot_last": 2},
+                )
+                assert not option.ok
+                assert any("etf-0dte" in f for f in option.failures), (owner, root, side, option.failures)
+
+
+def test_etf_0dte_rows_never_count_toward_a_sleeves_gross():
+    # The delivery sits in the shared account; it is nobody's exposure here.
+    # Counted, 1.4M of it would breach Drew's 200k gross on a 1k buy.
+    delivered = [
+        {"symbol": "SPY", "secType": "STK", "qty": 2000, "marketValue": 1_160_000,
+         "classification": {"bucket": "etf_0dte_delivery", "reason": "expected_delivery", "owner": None}},
+        {"symbol": "QQQ", "secType": "STK", "qty": 500, "marketValue": 250_000},   # unclassified: classified here
+    ]
+    result = check_safeties(
+        owner="drew", ticker="CSU", side="BUY", qty=10, limit_price=100,
+        quote=_quote(), proposal={"snapshot_last": 100}, current_positions=delivered,
+    )
+    assert result.ok, result.failures

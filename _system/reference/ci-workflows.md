@@ -95,6 +95,7 @@ Research Watchdog only checks freshness. `check_media_analysis_freshness.py` fai
 | `news` / `marvin-pick` | base plus holdings research metadata | news and evidence selection |
 | `dashboard` | base only; zero ticker trees | dashboard rebuild (the `darwin` alias was removed with the Darwin allocator, 2026-10) |
 | `pages` | `_system`, `.github`, `dashboard` | deploy-only |
+| `thirteen-f` | `_system`, `.github`, and the 13F dashboard files (`overlap_holders.json`, `overlap_holdings.json`, `fund_holdings_summary.json`, `index_membership.json`, `holdings/`) | Data Pipeline 13F ownership |
 
 Sparse ticker paths are applied once with `git sparse-checkout set --stdin`. The dashboard profile has a hard cap of 200 extra paths.
 

@@ -88,6 +88,14 @@ letter-extract-text:
 	$(PYTHON) $(SCRIPTS)/import_drive_letter_orphans.py --skip-download --build
 	@echo OK: letter-extract-text
 
+.PHONY: licensed-research-plan
+
+licensed-research-plan:
+	$(PYTHON) $(SCRIPTS)/import_drive_valueline.py --from-index --write-public
+	@echo "Expert Calls plan (no Drive changes):"
+	@echo "  python _system/scripts/organize_expert_calls_drive.py --dry-run --from-listing FILE --fetch-sec"
+	@echo "Vault import is --apply in licensed-research-sync.yml. Do not pass --apply to the organizer until the CSV is approved."
+
 letter-repair-dates:
 	$(PYTHON) $(SCRIPTS)/repair_letter_dates.py --apply
 	@echo OK: letter-repair-dates
@@ -436,7 +444,7 @@ activist-registry-audit:
 	@echo OK: activist-registry-audit
 
 activist-triage-check:
-	$(PYTHON) -m unittest _system/scripts/test_activist_triage.py _system/scripts/test_activist_feed.py _system/scripts/test_activist_coverage.py _system/scripts/test_activist_taxonomy.py
+	$(PYTHON) -m unittest _system/scripts/test_activist_triage.py _system/scripts/test_activist_feed.py _system/scripts/test_activist_coverage.py _system/scripts/test_activist_taxonomy.py _system/scripts/test_activist_subject.py
 	@echo OK: activist-triage-check
 
 event-triage:

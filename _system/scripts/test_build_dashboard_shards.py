@@ -155,7 +155,8 @@ class SlimTickerRowTests(unittest.TestCase):
         self.assertNotIn("decision_eligibility", slim["valuation_decision"])
         self.assertNotIn("legacy_audit", slim["valuation_decision"])
         self.assertNotIn("forward_cashflow_schedule", slim["valuation_decision"])
-        self.assertNotIn("assignment_reasons", slim["valuation_decision"]["universe_tier"])
+        self.assertNotIn("universe_tier", slim["valuation_decision"])
+        self.assertEqual(slim["valuation_tier"]["label"], "Active underwriting")
 
     def test_every_valuation_decision_sort_key_survives_the_slim(self):
         if not INDEX_HTML.exists():  # pragma: no cover
@@ -168,6 +169,136 @@ class SlimTickerRowTests(unittest.TestCase):
             {"annualized_return_at_price_pct", "proof_complete_pct", "unvalued_component_count"},
             "A new boot-time decision field was added without updating the core slim contract",
         )
+
+    def test_detail_prose_stays_on_the_shard(self):
+        """Boot rows keep table fields. Detail prose is already on the ticker shard."""
+        row = {
+            "ticker": "T",
+            "one_line_thesis": "A long thesis the table never renders.",
+            "licensed_sources": {
+                "expert_calls": [{"drive_url": "https://drive.example/a", "label": "call"}],
+                "valueline": {"drive_url": "https://drive.example/b", "label": "vl"},
+            },
+            "deep_dive": {
+                "path": "T/research/deep_dive.md",
+                "date": "2026-10-01",
+                "stance": "watch",
+                "github_url": "https://example.test/dive",
+                "executive_summary": "A paragraph the evidence tab renders after the shard loads.",
+            },
+            "power_zones": {
+                "in_zone": ["hohn"],
+                "classified": True,
+                "valuation_route": {
+                    "profile_id": "quality_reinvestment",
+                    "label": "High-return compounder",
+                    "status": "routed",
+                    "primary_methods": ["owner_earnings"],
+                    "input_hash": "a" * 64,
+                },
+                "zones": {
+                    "hohn": {
+                        "in_power_zone": True,
+                        "fit": 1.0,
+                        "score": 85,
+                        "matched_fields": ["archetype", "moat"],
+                    },
+                    "pabrai": {"in_power_zone": False, "fit": 0.25, "score": 21, "matched_fields": ["dhando"]},
+                },
+            },
+            "irr_readiness": {
+                "as_of": "2026-10-26",
+                "status": "blocked",
+                "blocked_count": 5,
+                "diagnostic_math_complete": True,
+                "work_group": "underwrite_cashflow_model",
+                "next_action": "Record a positive listing-currency quote.",
+                "requirements": [{"id": "price", "status": "missing"}],
+            },
+            "activist": {
+                "long_count": 1,
+                "short_count": 0,
+                "signal_count": 1,
+                "has_unreconciled": False,
+                "latest": {"firm_name": "Example", "title": "A long letter", "date": "2026-01-01"},
+            },
+            "valuation_decision": {
+                "status": "evidence_blocked",
+                "dates": {
+                    "model_as_of": "2026-08-04",
+                    "latest_fact_as_of": "2026-03-16",
+                    "oldest_fact_as_of": "2025-03-17",
+                    "price_as_of": None,
+                },
+                "next_action": "Freeze the evidence packet.",
+                "universe_tier": {"tier": 2, "tier_id": "tier_2", "label": "Coverage"},
+            },
+            "valuation_tier": {"tier": 2, "tier_id": "tier_2", "label": "Coverage"},
+            "index_membership": {
+                "badge_status": "inclusion_candidate",
+                "priority_score": 3,
+                "scorecards": [
+                    {"index": "sp500", "status": "n_a", "distance_to_boundary_pct": 40, "checks": {"x": 1}},
+                    {"index": "russell", "status": "ineligible", "distance_to_boundary_pct": 12, "checks": {"y": 1}},
+                    {
+                        "index": "sp400",
+                        "status": "inclusion_candidate",
+                        "distance_to_boundary_pct": 4.5,
+                        "checks": {"z": 1},
+                        "gating_check": "float",
+                    },
+                ],
+            },
+        }
+        slim = bds.slim_ticker_row(row)
+        self.assertNotIn("one_line_thesis", slim)
+        self.assertNotIn("licensed_sources", slim)
+        self.assertEqual(slim["deep_dive"]["date"], "2026-10-01")
+        self.assertEqual(slim["deep_dive"]["github_url"], "https://example.test/dive")
+        self.assertNotIn("executive_summary", slim["deep_dive"])
+        self.assertNotIn("input_hash", slim["power_zones"]["valuation_route"])
+        self.assertEqual(slim["power_zones"]["valuation_route"]["primary_methods"], ["owner_earnings"])
+        self.assertEqual(slim["power_zones"]["zones"], {
+            "hohn": {"in_power_zone": True, "fit": 1.0, "score": 85},
+        })
+        self.assertEqual(slim["irr_readiness"]["status"], "blocked")
+        self.assertEqual(slim["irr_readiness"]["work_group"], "underwrite_cashflow_model")
+        self.assertNotIn("next_action", slim["irr_readiness"])
+        self.assertNotIn("requirements", slim["irr_readiness"])
+        self.assertEqual(slim["activist"]["long_count"], 1)
+        self.assertNotIn("latest", slim["activist"])
+        self.assertEqual(slim["valuation_decision"]["dates"], {"model_as_of": "2026-08-04"})
+        self.assertEqual(slim["valuation_decision"]["next_action"], "Freeze the evidence packet.")
+        self.assertNotIn("universe_tier", slim["valuation_decision"])
+        self.assertEqual(slim["valuation_tier"]["label"], "Coverage")
+        self.assertEqual(slim["index_membership"]["scorecards"], [{
+            "index": "sp400",
+            "status": "inclusion_candidate",
+            "distance_to_boundary_pct": 4.5,
+        }])
+        self.assertEqual(slim["index_membership"]["badge_status"], "inclusion_candidate")
+        # The source row is what the ticker shard writes. Slimming must not mutate it.
+        self.assertIn("executive_summary", row["deep_dive"])
+        self.assertIn("latest", row["activist"])
+        self.assertIn("input_hash", row["power_zones"]["valuation_route"])
+        self.assertEqual(len(row["index_membership"]["scorecards"]), 3)
+
+    def test_decision_keeps_universe_tier_when_the_row_has_no_valuation_tier(self):
+        slim = bds.slim_ticker_row({
+            "ticker": "T",
+            "valuation_decision": {
+                "status": "provisional",
+                "universe_tier": {
+                    "tier": 1,
+                    "tier_id": "tier_1",
+                    "label": "Active underwriting",
+                    "assignment_reasons": ["paper"],
+                },
+            },
+        })
+        self.assertEqual(slim["valuation_decision"]["universe_tier"], {
+            "tier": 1, "tier_id": "tier_1", "label": "Active underwriting",
+        })
 
     def test_next_calendar_event_stays_off_the_core_row(self):
         slim = bds.slim_ticker_row({
@@ -208,6 +339,125 @@ class SlimTickerRowTests(unittest.TestCase):
         self.assertIn("renderTwoPhaseWatch", html)
         self.assertIn("Two-phase cooling watch", html)
         self.assertIn('id="two-phase-watch"', html)
+
+
+class InsightManifestGuardTests(unittest.TestCase):
+    def _publishable(self, retained: int) -> dict:
+        return {
+            "generated_at": "2026-10-20T09:30:36Z",
+            "event_count": retained,
+            "letter_count": 12865,
+            "source_health": {"filing_facts": {"status": "ok"}, "superinvestor_letters": {"items": 12865}},
+            "provenance": {"event_triage_summary": {"retained_event_count": retained, "raw_event_count": 800}},
+            "shards": {"podcast_episodes": "data/insights/podcast_episodes/"},
+        }
+
+    def test_partial_doc_does_not_stub_the_manifest_or_null_podcasts(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            data = Path(tmp)
+            insight = data / "insights"
+            insight.mkdir()
+            events = [
+                {"observed_at": "2026-01-02", "tier": "signal", "feed_eligible": True},
+                {"observed_at": "2026-01-01", "tier": "context", "feed_eligible": True},
+            ]
+            (insight / "manifest.json").write_text(json.dumps(self._publishable(1539)), encoding="utf-8")
+            (insight / "events.json").write_text(json.dumps({"events": events, "events_by_ticker": {}}), encoding="utf-8")
+            (insight / "podcasts.json").write_text(
+                json.dumps({"podcast_index": [{"id": "ep"}], "podcast_by_show": {"s": [1]}, "episode_count": 1}),
+                encoding="utf-8",
+            )
+            before_podcasts = (insight / "podcasts.json").read_bytes()
+            # The download-sync stub: a video timestamp, no corpus, and a shard
+            # map that forgot the detail directories.
+            bds.write_insights_shards({
+                "generated_at": "2026-10-19T16:50:44Z",
+                "shards": {"videos": "data/insights/videos.json"},
+                "event_count": 1539,
+            }, data)
+            manifest = json.loads((insight / "manifest.json").read_text(encoding="utf-8"))
+            summary = manifest["provenance"]["event_triage_summary"]
+            self.assertEqual(summary["retained_event_count"], 2)
+            self.assertEqual(manifest["event_count"], 2)
+            self.assertEqual(manifest["letter_count"], 12865)
+            self.assertEqual(manifest["generated_at"], "2026-10-20T09:30:36Z")
+            self.assertIn("filing_facts", manifest["source_health"])
+            self.assertEqual(manifest["shards"]["podcast_episodes"], "data/insights/podcast_episodes/")
+            self.assertEqual((insight / "podcasts.json").read_bytes(), before_podcasts)
+            self.assertEqual(summary["raw_event_count"], 800)
+
+    def test_written_events_set_the_count_even_when_the_summary_is_stale(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            data = Path(tmp)
+            doc = self._publishable(99)
+            doc["events"] = [{"observed_at": "2026-02-01", "tier": "noise", "feed_eligible": False}]
+            doc["events_by_ticker"] = {}
+            bds.write_insights_shards(doc, data)
+            manifest = json.loads((data / "insights" / "manifest.json").read_text(encoding="utf-8"))
+            self.assertEqual(manifest["provenance"]["event_triage_summary"]["retained_event_count"], 1)
+            self.assertEqual(manifest["event_count"], 1)
+            shard = json.loads((data / "insights" / "events.json").read_text(encoding="utf-8"))
+            self.assertEqual(len(shard["events"]), 1)
+
+    def _podcast_shard(self, stamp: str, rows: int) -> dict:
+        return {
+            "generated_at": stamp,
+            "episode_count": rows,
+            "podcast_index": [{"id": f"ep{i}"} for i in range(rows)],
+            "podcast_by_show": {"s": list(range(rows))},
+        }
+
+    def test_rebuild_never_regresses_a_fresher_podcast_shard(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            data = Path(tmp)
+            insight = data / "insights"
+            insight.mkdir()
+            manifest = self._publishable(0)
+            manifest["generated_at"] = "2026-10-15T09:13:13Z"
+            (insight / "manifest.json").write_text(json.dumps(manifest), encoding="utf-8")
+            (insight / "events.json").write_text(json.dumps({"events": [], "events_by_ticker": {}}), encoding="utf-8")
+            (insight / "podcasts.json").write_text(
+                json.dumps(self._podcast_shard("2026-10-29T17:41:26Z", 3)), encoding="utf-8"
+            )
+            before = (insight / "podcasts.json").read_bytes()
+            # What build_dashboard_data hands over: the shards merged back
+            # under the older manifest stamp.
+            doc = bds.merge_insight_shards(insight)
+            self.assertEqual(doc["generated_at"], "2026-10-15T09:13:13Z")
+            bds.write_insights_shards(doc, data)
+            self.assertEqual((insight / "podcasts.json").read_bytes(), before)
+
+    def test_newer_doc_still_replaces_an_older_podcast_shard(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            data = Path(tmp)
+            insight = data / "insights"
+            insight.mkdir()
+            (insight / "podcasts.json").write_text(
+                json.dumps(self._podcast_shard("2026-10-15T09:13:13Z", 1)), encoding="utf-8"
+            )
+            doc = self._publishable(0)
+            doc["generated_at"] = "2026-10-29T21:19:55Z"
+            doc.update({"events": [], "events_by_ticker": {}})
+            doc.update({k: v for k, v in self._podcast_shard("ignored", 4).items() if k != "generated_at"})
+            bds.write_insights_shards(doc, data)
+            shard = json.loads((insight / "podcasts.json").read_text(encoding="utf-8"))
+            self.assertEqual(shard["generated_at"], "2026-10-29T21:19:55Z")
+            self.assertEqual(len(shard["podcast_index"]), 4)
+
+    def test_merge_does_not_let_the_video_shard_replace_the_manifest(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            insight = Path(tmp)
+            (insight / "manifest.json").write_text(json.dumps(self._publishable(2)), encoding="utf-8")
+            (insight / "videos.json").write_text(json.dumps({
+                "generated_at": "2026-10-19T16:50:44Z",
+                "video_index": [{"video_id": "x"}],
+                "video_by_channel": {},
+            }), encoding="utf-8")
+            merged = bds.merge_insight_shards(insight)
+            self.assertEqual(merged["generated_at"], "2026-10-20T09:30:36Z")
+            self.assertEqual(merged["letter_count"], 12865)
+            self.assertEqual(len(merged["video_index"]), 1)
+            self.assertIn("source_health", merged)
 
 
 if __name__ == "__main__":

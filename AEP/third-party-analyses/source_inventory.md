@@ -1,10 +1,10 @@
 # AEP — Third-party source inventory
 
-**Date:** 2026-10-11
-**Sources:** 1 total (0 approved, 0 pending, 1 context)
+**Date:** 2026-10-25
+**Sources:** 0 total (0 approved, 0 pending, 0 context)
 
 | ID | Title | Path | Status | Use |
 |----|-------|------|--------|-----|
-| activist_short | Mar 10, 2021 | `_system/reference/activist-reports/spruce_point/spruce_point_2021-03-10_american-battery-metals-corp-comstock-mi.html` | context | activist/short — publisher_site |
+| (none) | — | — | — | Primary filings only |
 
-Cross-check required: `AEP/research/cross_check_third_party_2026-10-11.md`
+Cross-check required: `AEP/research/cross_check_third_party_2026-10-25.md`

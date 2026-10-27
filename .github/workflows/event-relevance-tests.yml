@@ -1,0 +1,53 @@
+name: Event relevance regression checks
+on:
+  push:
+    branches: [main]
+    paths: ['_system/scripts/**', '_system/reference/security_identity_overrides.json', '_system/data/event_triage_rules.json', 'dashboard/insights-viz.js', 'dashboard/index.html', 'dashboard/insights-events.css', '.github/workflows/event-relevance-tests.yml']
+  pull_request:
+    paths: ['_system/scripts/**', '_system/reference/security_identity_overrides.json', '_system/data/event_triage_rules.json', 'dashboard/insights-viz.js', 'dashboard/index.html', 'dashboard/insights-events.css', '.github/workflows/event-relevance-tests.yml']
+permissions:
+  contents: read
+jobs:
+  regressions:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          sparse-checkout-cone-mode: false
+          sparse-checkout: |
+            /_system/scripts/
+            /_system/templates/
+            /_system/frameworks/
+            /_system/data/event_triage_rules.json
+            /_system/portfolio/registry.json
+            /_system/reference/security_identity_overrides.json
+            /_system/reference/securities/security_master.json
+            /_system/reference/valuation_method_registry.json
+            /_system/reference/valuation_followups.json
+            /dashboard/insights-viz.js
+            /dashboard/search-match.js
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Attribution, financial extraction, relevance, and existing pipeline regressions
+        run: >-
+          python -B -m unittest
+          _system/scripts/test_event_relevance.py
+          _system/scripts/test_xbrl_context.py
+          _system/scripts/test_event_triage.py
+          _system/scripts/test_event_materiality.py
+          _system/scripts/test_insider_signal.py
+          _system/scripts/test_insider_materiality.py
+          _system/scripts/test_event_feed_ui.py
+          _system/scripts/test_event_feed_history.py
+          _system/scripts/test_build_filing_evidence.py
+          _system/scripts/test_build_insights_letter_guard.py
+          _system/scripts/tests/test_valuation_readiness_automation.py
+      - name: Filing pairing regressions
+        run: python -B _system/scripts/test_filing_facts.py
+      - name: Event card and review controls
+        run: node --test _system/scripts/tests/test_event_relevance_ui.cjs

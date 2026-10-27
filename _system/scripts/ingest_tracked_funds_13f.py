@@ -17,21 +17,16 @@ sys.path.insert(0, str(ROOT / "_system" / "scripts"))
 from ownership_common import (  # noqa: E402
     OWNERSHIP_DIR,
     cik_padded,
-    filing_info_table_url,
     latest_13f_filings,
     load_cusip_map,
     load_json,
     match_holding_to_ticker,
     now_iso,
-    parse_13f_info_table_xml,
     portfolio_universe,
-    quarter_from_date,
-    save_cusip_map,
     save_json,
-    sec_fetch_bytes,
-    sleep,
     slug,
 )
+from thirteenf_period import build_period, periods_for_fund  # noqa: E402
 
 TRACKED_DIR = OWNERSHIP_DIR / "tracked_funds"
 FUNDS_PATH = OWNERSHIP_DIR / "tracked_funds.json"
@@ -57,30 +52,6 @@ def tracked_funds_for_ingest() -> list[dict]:
             continue
         out.append({**fund, "fund_id": fid, "cik": str(cik).lstrip("0")})
     return out
-
-
-def _parse_shares(row: dict) -> int | None:
-    nested = row.get("shrsOrPrnAmt")
-    if isinstance(nested, dict):
-        val = nested.get("sshPrnamt")
-        if val is not None and str(val).isdigit():
-            return int(str(val))
-    raw = row.get("sshPrnamt")
-    if raw is not None:
-        digits = "".join(ch for ch in str(raw) if ch.isdigit())
-        if digits:
-            return int(digits)
-    return None
-
-
-def _parse_value(row: dict) -> int | None:
-    raw = row.get("value")
-    if raw is None:
-        return None
-    digits = "".join(ch for ch in str(raw) if ch.isdigit())
-    if not digits:
-        return None
-    return int(digits)
 
 
 def load_prior_records(quarter: str) -> dict[tuple[str, str], dict]:
@@ -125,29 +96,65 @@ def change_type(current: dict, prior: dict | None) -> str:
     return "add" if delta_pct > 0 else "trim"
 
 
+def _saved_accession(fund_id: str, quarter: str) -> str | None:
+    path = RECORDS_DIR / f"{quarter}.json"
+    if not path.exists():
+        return None
+    rows = [row for row in json.loads(path.read_text(encoding="utf-8")).get("records") or [] if row.get("fund_id") == fund_id]
+    if not rows or any(row.get("shares") in (None, "") for row in rows):
+        return None
+    accessions = {row.get("accession") for row in rows}
+    if len(accessions) == 1:
+        return next(iter(accessions))
+    return None
+
+
+def _periods_already_saved(fund_id: str, groups: list[list[dict]]) -> bool:
+    from thirteenf_core import quarter_from_period
+
+    for group in groups:
+        quarter = quarter_from_period(group[-1].get("report_date"))
+        if not quarter or _saved_accession(fund_id, quarter) != group[-1].get("accession"):
+            return False
+    return True
+
+
+def _keep_saved(fund_id: str, groups: list[list[dict]], by_quarter: dict[str, list[dict]]) -> None:
+    from thirteenf_core import quarter_from_period
+
+    for group in groups:
+        quarter = quarter_from_period(group[-1].get("report_date"))
+        path = RECORDS_DIR / f"{quarter}.json"
+        if not path.exists():
+            continue
+        rows = [row for row in json.loads(path.read_text(encoding="utf-8")).get("records") or [] if row.get("fund_id") == fund_id]
+        by_quarter.setdefault(quarter, []).extend(rows)
+
+
 def holdings_book_rows(
     fund: dict,
-    xml_bytes: bytes,
+    positions: list[dict],
     filing: dict | None,
     names: dict[str, str],
     cusip_map: dict[str, str],
     prior: dict,
     info_url: str | None,
-) -> tuple[list[dict], dict[str, str]]:
-    raw = parse_13f_info_table_xml(xml_bytes)
-    quarter = quarter_from_date((filing or {}).get("filing_date")) or "unknown"
+    quarter: str,
+) -> list[dict]:
+    """Portfolio overlay. Name matches are not written back into the CUSIP map."""
     book_set = {t.upper() for t in names}
     book_rows: list[dict] = []
-    for holding in raw:
+    for holding in positions:
+        if holding.get("put_call"):
+            continue
+        if (holding.get("sh_prn") or "SH").upper() not in {"SH", ""}:
+            continue
         cusip = (holding.get("cusip") or "").upper().strip()
-        shares = _parse_shares(holding)
-        value = _parse_value(holding)
-        issuer = holding.get("nameOfIssuer")
-        ticker = match_holding_to_ticker(holding, names, cusip_map)
-        if ticker and cusip and ticker in book_set:
-            cusip_map[cusip] = ticker
-        elif ticker and cusip and cusip not in cusip_map:
-            cusip_map[cusip] = ticker
+        shares = holding.get("shares")
+        value = holding.get("value_usd")
+        issuer = holding.get("issuer")
+        probe = {"cusip": cusip, "nameOfIssuer": issuer}
+        ticker = match_holding_to_ticker(probe, names, cusip_map)
         if not ticker or ticker.upper() not in book_set:
             continue
         prior_row = prior.get((fund["fund_id"], ticker))
@@ -156,7 +163,9 @@ def holdings_book_rows(
             "fund": fund.get("fund"),
             "ticker": ticker,
             "quarter": quarter,
+            "period_end": (filing or {}).get("period_end"),
             "filing_date": (filing or {}).get("filing_date"),
+            "accession": (filing or {}).get("accession"),
             "shares": shares,
             "market_value_usd": value,
             "cusip": cusip,
@@ -164,6 +173,7 @@ def holdings_book_rows(
             "source_url": info_url,
             "cik": cik_padded(fund["cik"]),
             "change_type": change_type({"shares": shares}, prior_row),
+            "in_base_irr": False,
         }
         if prior_row and prior_row.get("shares"):
             row["change_shares_pct"] = round(
@@ -171,13 +181,14 @@ def holdings_book_rows(
                 2,
             )
         book_rows.append(row)
-    return book_rows, cusip_map
+    return book_rows
 
 
 def main() -> int:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--offline", action="store_true", help="Use cached XML only; do not fetch SEC")
     parser.add_argument("--max-funds", type=int, default=0, help="Limit funds for testing")
+    parser.add_argument("--periods", type=int, default=2, help="How many report periods to write (default 2)")
     args = parser.parse_args()
 
     if args.offline and not CACHE_DIR.exists():
@@ -205,89 +216,93 @@ def main() -> int:
         return 0
 
     cusip_map = load_cusip_map()
-    all_book: list[dict] = []
-    quarter_counts: dict[str, int] = {}
+    by_quarter: dict[str, list[dict]] = {}
     CACHE_DIR.mkdir(parents=True, exist_ok=True)
     RECORDS_DIR.mkdir(parents=True, exist_ok=True)
 
-    prior_quarter = latest_record_quarter()
-    prior = load_prior_records(prior_quarter) if prior_quarter else {}
-
     for fund in funds:
-        book_rows: list[dict] = []
         if args.offline:
-            cache_files = sorted(CACHE_DIR.glob(f"{fund['fund_id']}_*.xml"), reverse=True)
-            if not cache_files:
-                print(f"{fund['fund_id']}: no cache")
-                continue
-            xml_bytes = cache_files[0].read_bytes()
-            book_rows, cusip_map = holdings_book_rows(fund, xml_bytes, None, names, cusip_map, prior, None)
-            # Prefer quarter from prior latest if present
-            if book_rows and book_rows[0].get("quarter") in {None, "unknown"}:
-                q = prior_quarter or "unknown"
-                for row in book_rows:
-                    row["quarter"] = q
-        else:
-            filings = latest_13f_filings(fund["cik"], limit=2)
-            if not filings:
-                print(f"{fund['fund_id']}: no 13F filings")
-                continue
-            filing = filings[0]
-            info_url = filing_info_table_url(filing)
-            sleep()
-            if not info_url:
-                print(f"{fund['fund_id']}: no InfoTable")
-                continue
-            cache_path = CACHE_DIR / f"{fund['fund_id']}_{filing['accession'].replace('-', '')}.xml"
-            if cache_path.exists():
-                xml_bytes = cache_path.read_bytes()
-            else:
+            filings = []
+            for meta_path in sorted(CACHE_DIR.glob(f"{fund['fund_id']}_*.meta.json")):
                 try:
-                    xml_bytes = sec_fetch_bytes(info_url)
-                    cache_path.write_bytes(xml_bytes)
-                except Exception as exc:  # noqa: BLE001
-                    print(f"{fund['fund_id']}: fetch failed ({exc})")
+                    meta = json.loads(meta_path.read_text(encoding="utf-8"))
+                except json.JSONDecodeError:
                     continue
-                sleep()
-            book_rows, cusip_map = holdings_book_rows(
-                fund, xml_bytes, filing, names, cusip_map, prior, info_url
+                accession = meta_path.name[len(fund["fund_id"]) + 1 : -len(".meta.json")]
+                filings.append(
+                    {
+                        "form": meta.get("form") or "13F-HR",
+                        "filing_date": meta.get("filing_date"),
+                        "report_date": meta.get("report_date"),
+                        "accession": accession,
+                        "index_url": "",
+                    }
+                )
+        else:
+            filings = latest_13f_filings(fund["cik"], limit=12)
+        groups = periods_for_fund(filings, args.periods)
+        if not groups:
+            print(f"{fund['fund_id']}: no 13F-HR period")
+            continue
+        if _periods_already_saved(fund["fund_id"], groups):
+            print(f"{fund['fund_id']}: unchanged")
+            _keep_saved(fund["fund_id"], groups, by_quarter)
+            continue
+        fund_rows = 0
+        running_prior: dict[tuple[str, str], dict] = {}
+        for group in groups:
+            built = build_period(group, fund_id=fund["fund_id"], cache_dir=CACHE_DIR, offline=args.offline)
+            if not built:
+                continue
+            quarter = built["quarter"]
+            prior = running_prior
+            filing_meta = {
+                "period_end": built["period_end"],
+                "filing_date": built["filing_date"],
+                "accession": built["accession"],
+            }
+            book_rows = holdings_book_rows(
+                fund, built["rows"], filing_meta, names, cusip_map, prior, built["source_url"], quarter
             )
+            by_quarter.setdefault(quarter, []).extend(book_rows)
+            running_prior = {(row["fund_id"], row["ticker"]): row for row in book_rows}
+            fund_rows += len(book_rows)
+            if not built["reconciliation"].get("ok"):
+                print(f"{fund['fund_id']} {quarter}: reconciliation {built['reconciliation']}")
+        print(f"{fund['fund_id']}: {fund_rows} book matches")
 
-        all_book.extend(book_rows)
-        for row in book_rows:
-            q = row.get("quarter") or "unknown"
-            quarter_counts[q] = quarter_counts.get(q, 0) + 1
-        print(f"{fund['fund_id']}: {len(book_rows)} book matches")
-
-    save_cusip_map(cusip_map)
-
-    if not all_book:
+    if not by_quarter:
         payload = {
             "generated_at": now_iso(),
-            "quarter": prior_quarter,
+            "quarter": None,
             "fund_count": 0,
             "record_count": 0,
             "records": [],
             "status": "empty",
             "notes": "No portfolio-matched tracked-fund holdings this run.",
+            "in_base_irr": False,
         }
         save_json(RECORDS_DIR / "latest.json", payload)
         print("No portfolio-matched tracked-fund records")
         return 0
 
-    quarter = max(quarter_counts, key=quarter_counts.get) if quarter_counts else all_book[0].get("quarter") or "latest"
-    payload = {
-        "generated_at": now_iso(),
-        "quarter": quarter,
-        "fund_count": len({r["fund_id"] for r in all_book}),
-        "record_count": len(all_book),
-        "records": sorted(all_book, key=lambda r: (r.get("ticker") or "", r.get("fund_id") or "")),
-        "status": "ok",
-        "notes": "Portfolio/watchlist overlay only for curated great funds.",
-    }
-    save_json(RECORDS_DIR / f"{quarter}.json", payload)
-    save_json(RECORDS_DIR / "latest.json", payload)
-    print(f"Wrote {len(all_book)} tracked-fund book records for {quarter}")
+    latest_quarter = sorted(by_quarter)[-1]
+    for quarter, rows in by_quarter.items():
+        payload = {
+            "generated_at": now_iso(),
+            "quarter": quarter,
+            "period_end": rows[0].get("period_end") if rows else None,
+            "fund_count": len({r["fund_id"] for r in rows}),
+            "record_count": len(rows),
+            "records": sorted(rows, key=lambda r: (r.get("ticker") or "", r.get("fund_id") or "")),
+            "status": "ok",
+            "in_base_irr": False,
+            "notes": "Portfolio overlay only. Quarter is the period of report, not the filing date. Context tier, not base IRR.",
+        }
+        save_json(RECORDS_DIR / f"{quarter}.json", payload)
+        if quarter == latest_quarter:
+            save_json(RECORDS_DIR / "latest.json", payload)
+        print(f"Wrote {len(rows)} tracked-fund book records for {quarter}")
     return 0
 
 

@@ -65,19 +65,28 @@ def resolve_identity(
     as_of: str,
     route: dict | None = None,
 ) -> dict:
+    from security_profiles import resolve_economic_profile
     reviewed = (overrides.get("tickers") or {}).get(ticker, {})
     company = str(entry.get("company") or ticker)
     text = company.lower()
-    security_type = reviewed.get("security_type")
-    if not security_type:
-        security_type = "exchange_traded_fund" if any(x in text for x in (" etf", " fund", " trust")) else "operating_company"
-    archetype = reviewed.get("archetype") or ("holding_company" if security_type == "exchange_traded_fund" else "compounder")
+    economic = resolve_economic_profile(ticker, entry=entry, override=reviewed)
+    security_type = economic['security_type']
+    registry_archetype = str(((entry.get("classification") or {}).get("archetype") or "")).strip()
+    if registry_archetype.lower() in {"", "unknown", "pending", "-"}:
+        registry_archetype = ""
+    default_archetype = "holding_company" if security_type == "exchange_traded_fund" else "compounder"
+    # A reviewed override wins. Otherwise keep a real registry archetype
+    # (holding_co, compounder, and so on) instead of stamping every operating
+    # company as a compounder.
+    archetype = reviewed.get("archetype") or registry_archetype or default_archetype
     route = route or {}
     route_methods = route.get("primary_methods") or []
     route_has_signal = bool(route_methods) and (
         float(route.get("score") or 0) > 0
         or str(route.get("status") or "") not in {"", "default_needs_review"}
     )
+    if security_type == 'exchange_traded_fund' and 'owner_earnings_reinvestment_dcf' in route_methods:
+        route_has_signal = False
     fallback_profile = "catalyst_asset_value" if security_type == "exchange_traded_fund" else "quality_reinvestment"
     fallback_method = "net_asset_value" if security_type == "exchange_traded_fund" else "owner_earnings_reinvestment_dcf"
     profile = reviewed.get("valuation_profile") or (
@@ -86,6 +95,8 @@ def resolve_identity(
     method = reviewed.get("primary_method") or (
         route_methods[0] if route_has_signal else fallback_method
     )
+    if economic['classification_status'] == 'unresolved':
+        archetype, profile, method = 'unknown', None, None
     if reviewed.get("primary_method"):
         method_source = "reviewed_override"
     elif route_has_signal:
@@ -94,7 +105,7 @@ def resolve_identity(
         method_source = "deterministic_fallback_pending_route_evidence"
     return {
         "schema_version": "1.0", "ticker": ticker, "as_of": as_of,
-        "issuer_name": reviewed.get("issuer_name") or company,
+        **economic,
         "security_type": security_type, "market": entry.get("market"),
         "cik": (entry.get("download") or {}).get("cik"),
         "archetype": archetype, "valuation_profile": profile,
@@ -103,7 +114,7 @@ def resolve_identity(
         "route_status": route.get("status"),
         "route_score": route.get("score"),
         "route_input_hash": route.get("input_hash"),
-        "status": "reviewed_override" if reviewed else "rule_resolved",
+        "status": 'classification_unresolved' if economic['classification_status'] == 'unresolved' else ("reviewed_override" if reviewed else "rule_resolved"),
         "reason": reviewed.get("reason") or "Resolved from registry metadata and deterministic name/type rules.",
         "reviewed_at": reviewed.get("reviewed_at"),
     }
@@ -895,6 +906,10 @@ def merge_compiled_model(prior: dict, model: dict) -> dict:
     """
     if not isinstance(prior, dict) or not prior:
         return model
+    if prior.get('underwriting'):
+        # Only the independent underwriting pipeline may replace sealed economics.
+        # Source collection continues; shared repricing validates the receipt.
+        return copy.deepcopy(prior)
     merged = copy.deepcopy(prior)
     merged.update(model)
     automation = (model.get("valuation_methodology") or {}).get("automation")
@@ -1434,6 +1449,9 @@ def compile_existing_approved_proofs(ticker: str, as_of: str, identity: dict) ->
 
 def compile_valuation(ticker: str, as_of: str, identity: dict, ledger: dict) -> dict | None:
     """Dispatch only to the compiler selected by the canonical Power Zone route."""
+    prior = read_json(ROOT / ticker / "research" / "valuation.json")
+    if prior.get('underwriting'):
+        return copy.deepcopy(prior)
     existing = compile_existing_approved_proofs(ticker, as_of, identity)
     if existing:
         return existing

@@ -154,6 +154,17 @@ def _separation_role(data: dict) -> str | None:
 
 def route_valuation(data: dict, explicit_profile: str | None = None) -> dict:
     classification = data.get("classification_inputs") or {}
+    methodology = data.get("valuation_methodology") or {}
+    if methodology.get("automation") == "independent_underwriting":
+        # The independent author replaces the old classification. Read that
+        # reviewed decision rather than routing the dated schedule as a generic DCF.
+        classification = data.get("classification") or {}
+        if explicit_profile is None:
+            explicit_profile = {
+                "financial_equity": "credit_and_normalized_returns",
+                "inventory_runoff": "catalyst_asset_value",
+                "royalty_cashflow": "scarce_asset_optionality",
+            }.get(methodology.get("framework"))
     archetype = str(classification.get("archetype") or "").lower()
     sleeve = str(classification.get("investment_sleeve") or "").lower()
     separation_role = _separation_role(data)

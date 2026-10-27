@@ -1,0 +1,88 @@
+name: Preserve private dashboard snapshots
+description: Export immutable source snapshots privately before any public artifact is staged or deployed
+inputs:
+  preserve-company-cache:
+    description: Archive new recovery work. Snapshot-only deployment leaves the verified source archive unchanged.
+    default: "true"
+runs:
+  using: composite
+  steps:
+    - name: Preserve restricted dashboard sources before public staging
+      shell: bash
+      env:
+        PRESERVE_COMPANY_CACHE: ${{ inputs.preserve-company-cache }}
+      run: |
+        set -euo pipefail
+        # A sparse job can see restricted files and still omit the publication
+        # manifest. migrate_dashboard_sources.py would then treat the manifest
+        # as empty and replace the committed one with only this checkout.
+        if [ ! -f dashboard/private-assets.json ] || [ ! -f .gitattributes ]; then
+          sparse="$(git config --get core.sparseCheckout || true)"
+          if [ "$sparse" != "true" ]; then
+            echo "::error::The publication manifest is missing from a full checkout."
+            exit 1
+          fi
+          git sparse-checkout add --skip-checks -- /dashboard/private-assets.json /.gitattributes
+          git checkout HEAD -- dashboard/private-assets.json .gitattributes
+        fi
+        test -f dashboard/private-assets.json
+        test -f .gitattributes
+        # Stage only what this migration changes. A narrow git_add must not
+        # commit the updated manifest without the redacted public files, and
+        # it must not pick up the rest of the job's dirty tree from here.
+        before="$(mktemp)"
+        after="$(mktemp)"
+        git status --porcelain=v1 -uall > "$before"
+        python _system/scripts/migrate_dashboard_sources.py
+        git status --porcelain=v1 -uall > "$after"
+        python3 - "$before" "$after" <<'PY'
+        import subprocess
+        import sys
+
+        def load(path):
+            found = {}
+            for line in open(path, encoding="utf-8"):
+                if len(line) < 4:
+                    continue
+                body = line[3:].rstrip("\n")
+                if " -> " in body:
+                    body = body.split(" -> ", 1)[1]
+                found[body] = line[:2]
+            return found
+
+        old, new = load(sys.argv[1]), load(sys.argv[2])
+        changed = [path for path, status in new.items() if old.get(path) != status]
+        visible = []
+        for path in changed:
+            ignored = subprocess.run(["git", "check-ignore", "-q", "--", path])
+            if ignored.returncode == 0:
+                continue
+            visible.append(path)
+        if visible:
+            subprocess.run(["git", "add", "--sparse", "--", *visible], check=True)
+        PY
+        vault="${RESEARCH_VAULT_ROOT:-_external/research-vault}"
+        if [ -d "$vault/dashboard-private" ]; then
+          python _system/scripts/preserve_commodity_inputs.py --vault "$vault"
+          cache="$vault/dashboard-private/company-research-cache"
+          if [ "$PRESERVE_COMPANY_CACHE" = "true" ] && { [ -d "$cache/git" ] || [ -d "$cache/drive" ]; }; then
+            python _system/scripts/company_source_cache.py pack --cache "$cache" --archive "$vault/dashboard-private/company-source-backfill-v2"
+            python _system/scripts/push_company_source_parts.py --vault "$vault"
+          fi
+          # Persist only these immutable objects; other vault work belongs to its lane.
+          # The portable archive owns all recovery state. Do not also commit
+          # hundreds of thousands of loose cache files beside it.
+          exclusions=(':(exclude)dashboard-private/company-research-cache')
+          exclusions+=(':(exclude)**/work.sqlite*' ':(exclude)**/*.tmp')
+          if [ "$PRESERVE_COMPANY_CACHE" != "true" ]; then
+            exclusions+=(':(exclude)dashboard-private/company-source-backfill-v2')
+          fi
+          git -C "$vault" add --force -- dashboard-private "${exclusions[@]}"
+          if ! git -C "$vault" diff --cached --quiet -- dashboard-private; then
+            if [ -n "$(git -C "$vault" diff --cached --name-only -- . ':!dashboard-private')" ]; then
+              echo "::error::Unrelated vault files are staged; publish those before preserving dashboard snapshots."
+              exit 1
+            fi
+            bash _system/scripts/ci_push_vault.sh "Preserve restricted dashboard source snapshots" "--force dashboard-private ${exclusions[*]}"
+          fi
+        fi

@@ -33,18 +33,40 @@ UA = "MarvinResearch/1.0 (marvin@oakcliff-capital.com)"
 
 
 def settlement_candidates(n: int = 24) -> list[str]:
-    """Biweekly settlement dates are typically mid-month and month-end-ish; probe recent Fridays."""
+    """Probe midmonth and month-end business days, including holiday offsets.
+
+    FINRA settlements are twice monthly, not a Friday-only series. A returned
+    file remains authoritative; candidate dates never establish an observation.
+    """
     today = date.today()
     out: list[str] = []
     d = today
     while len(out) < n * 3:
-        # FINRA biweekly files often land on settlement Fridays
-        if d.weekday() == 4:  # Friday
+        if d.weekday() < 5 and (12 <= d.day <= 16 or (d + timedelta(days=4)).month != d.month):
             out.append(d.strftime("%Y%m%d"))
         d -= timedelta(days=1)
         if (today - d).days > 180:
             break
     return out[: n * 2]
+
+
+def short_observation(hit: dict, ymd: str | None, cached: dict, today: date) -> dict:
+    """Keep observed float percentage separate from the volume burden proxy."""
+    shares, adv = hit.get("short_interest_shares"), hit.get("avg_daily_volume")
+    result = {**hit, "settlement_ymd": ymd, "short_interest_pct": None,
+              "source": "finra_biweekly", "volume_burden_pct": 100*shares/(20*adv) if shares is not None and adv and adv > 0 else None}
+    try:
+        observed = date.fromisoformat(cached["short_interest_date"])
+        previous = date.fromisoformat(ymd) if ymd and "-" in ymd else date.fromisoformat(f"{ymd[:4]}-{ymd[4:6]}-{ymd[6:]}") if ymd else date.min
+        pct = cached.get("short_percent_float")
+        if observed >= previous and observed <= today and isinstance(pct, (int, float)) and not isinstance(pct, bool) and 0 <= pct <= 10:
+            result.update(short_interest_pct=100*pct, settlement_ymd=observed.isoformat(),
+                          short_interest_shares=cached.get("short_interest_shares"),
+                          days_to_cover=cached.get("days_to_cover"), source=cached.get("source") or "dated_index_cache",
+                          source_ref="_system/reference/market-data/fundamentals/index_float_adv.json", volume_burden_pct=None)
+    except (ValueError, KeyError, TypeError):
+        pass
+    return result
 
 
 def download_latest_csv(*, offline: bool = False) -> tuple[Path | None, str | None]:
@@ -138,59 +160,23 @@ def main() -> int:
         if row.get("in_biotech_quant_universe")
     }
     path, ymd = download_latest_csv(offline=args.offline)
-    if not path:
-        print("No FINRA short-interest CSV available (run online or cache files)")
-        # Keep heuristic short candidates so UI is not empty
-        for ticker, row in universe.items():
-            if (row.get("consensus_quintile") or 5) <= 2 and not row.get("convergence_flag"):
-                row["short_candidate_score"] = max(row.get("short_candidate_score") or 0, 40)
-            else:
-                row.setdefault("short_candidate_score", row.get("short_candidate_score") or 0)
-        save_json(SIGNALS_PATH, signals)
-        save_json(
-            SHORT_INTEREST_PATH,
-            {
-                "generated_at": now_iso(),
-                "settlement_ymd": None,
-                "source": "heuristic_fallback",
-                "ticker_count": 0,
-                "by_ticker": {},
-                "notes": "No FINRA CSV cached — heuristic short_candidate_score only. Run without --offline.",
-            },
-        )
-        return 0
-
-    finra = parse_finra_csv(path)
+    finra = parse_finra_csv(path) if path else {}
+    cache = load_json(ROOT / "_system/reference/market-data/fundamentals/index_float_adv.json", {}).get("by_ticker") or {}
     by_ticker: dict[str, dict] = {}
     si_pct_inputs: dict[str, float] = {}
 
     for ticker, row in universe.items():
         sym = ticker.upper().replace(".", "")
         hit = finra.get(ticker.upper()) or finra.get(sym)
-        if not hit:
+        observation = short_observation(hit or {}, ymd if hit else None, cache.get(ticker) or {}, date.today())
+        if not hit and observation.get("short_interest_pct") is None:
             continue
-        shares = hit.get("short_interest_shares")
-        adv = hit.get("avg_daily_volume")
-        days = hit.get("days_to_cover")
-        # Prefer SI / ADV as pct proxy when float unavailable
-        si_pct = None
-        if shares and adv and adv > 0:
-            si_pct = round(100.0 * shares / (adv * 20), 4)  # rough % of ~1m ADV float proxy
-            # Also store days_to_cover-based intensity
-        if days is not None:
-            si_pct_inputs[ticker] = float(days)
-        elif si_pct is not None:
-            si_pct_inputs[ticker] = float(si_pct)
-        by_ticker[ticker] = {
-            "ticker": ticker,
-            "settlement_ymd": ymd,
-            "short_interest_shares": shares,
-            "avg_daily_volume": adv,
-            "days_to_cover": days,
-            "short_interest_pct": si_pct,
-            "source": "finra_biweekly",
-            "source_file": str(path.relative_to(ROOT)).replace("\\", "/"),
-        }
+        observation["ticker"] = ticker
+        if hit and path:
+            observation["source_file"] = str(path.relative_to(ROOT)).replace("\\", "/")
+        if observation.get("days_to_cover") is not None:
+            si_pct_inputs[ticker] = float(observation["days_to_cover"])
+        by_ticker[ticker] = observation
 
     quintiles = assign_quintiles(si_pct_inputs, higher_is_better=True)
     for ticker, row in by_ticker.items():
@@ -212,7 +198,7 @@ def main() -> int:
     payload = {
         "generated_at": now_iso(),
         "settlement_ymd": ymd,
-        "source": "FINRA Equity Short Interest (biweekly CDN)",
+        "source": "Dated FINRA shares and published float percentages; see per-row provenance",
         "ticker_count": len(by_ticker),
         "by_ticker": by_ticker,
         "notes": "Context-tier market data. Diversified short book input — not single-name conviction.",
@@ -226,6 +212,8 @@ def main() -> int:
             sig["short_interest_quintile"] = row.get("short_interest_quintile")
             sig["days_to_cover"] = row.get("days_to_cover")
             sig["short_candidate_score"] = row.get("short_candidate_score")
+            sig["short_interest_observed_at"] = row.get("settlement_ymd")
+            sig["short_interest_source"] = row.get("source")
     save_json(SIGNALS_PATH, signals)
     print(f"Wrote FINRA SI for {len(by_ticker)} quant tickers (settlement {ymd})")
     return 0

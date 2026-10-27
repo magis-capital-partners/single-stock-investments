@@ -1,7 +1,7 @@
 {
   "schema_version": "3.0",
   "ticker": "A",
-  "as_of": "2026-10-16",
+  "as_of": "2026-10-27",
   "proof_status": "evidence_blocked",
   "model_level": "evidence_blocked",
   "model_level_reason": "Prospective falsifier coverage is incomplete.",
@@ -15,7 +15,9 @@
     "model_as_of": "2026-07-25",
     "latest_fact_as_of": "2026-07-09",
     "oldest_fact_as_of": "2025-10-31",
-    "price_as_of": "2026-07-09"
+    "price_as_of": "2026-07-09",
+    "forecast_as_of": "2026-07-25",
+    "calculation_as_of": "2026-07-09"
   },
   "legacy_audit": {
     "actionable": false,
@@ -70,18 +72,20 @@
       "high": null
     },
     "forward_return_status": "withheld",
-    "forward_return_reason": "model maturity is not eligible to publish a return",
+    "forward_return_reason": "shared_forecast_incomplete",
     "required_return_pct": 9.0,
     "downside_to_low_pct": -70.01,
     "unvalued_component_count": 0,
     "unresolved_evidence_count": 0,
     "proof_complete_pct": 100.0,
-    "model_hash": "869441292335994672bda8017f14cb5fa663a4632aa10d13b9f4102c0c68b3a7",
+    "model_hash": "43a4bbe909b56584fa917d784c87708b2fc39103bc85d36630af3e62667a30af",
     "dates": {
       "model_as_of": "2026-07-25",
       "latest_fact_as_of": "2026-07-09",
       "oldest_fact_as_of": "2025-10-31",
-      "price_as_of": "2026-07-09"
+      "price_as_of": "2026-07-09",
+      "forecast_as_of": "2026-07-25",
+      "calculation_as_of": "2026-07-09"
     },
     "legacy_audit": {
       "actionable": false,
@@ -102,7 +106,11 @@
     },
     "primary_power_zone": "High-return compounder",
     "owner_decision": null,
-    "next_action": "Freeze the evidence packet and select three method-independent raters."
+    "next_action": "Freeze the evidence packet and select three method-independent raters.",
+    "forecast_id": null,
+    "calculation_status": "model_gap",
+    "research_return_available": false,
+    "calculation_reason": "forecast_date_missing_or_future"
   },
   "business": {
     "status": "complete",
@@ -1589,8 +1597,8 @@
                   "ref": "A/research/valuation.json",
                   "locator": "inputs.price Yahoo A close 2026-07-09",
                   "as_of": "2026-07-09",
-                  "content_sha256": "12aec4d69da7d6727ce428ff44d4d9f233f4012cad10438b5fac2ee2829f08cc",
-                  "source_id": "7042d05ed849acc7b1c52a73d06979836e43b9d81639c2a3dc59cb154cf4f94c"
+                  "content_sha256": "ffffffec1ecc0906ef0154f40fbd89a2008d17c7d57742a55c3487b8ac72a36d",
+                  "source_id": "b8c99970631f36ef2e6f60facf053aa70790447aadc5c8f4a9d576c90e1b4e48"
                 },
                 "rationale": null
               },
@@ -1629,8 +1637,8 @@
                   "ref": "A/research/valuation.json",
                   "locator": "inputs.price Yahoo A close 2026-07-09",
                   "as_of": "2026-07-09",
-                  "content_sha256": "12aec4d69da7d6727ce428ff44d4d9f233f4012cad10438b5fac2ee2829f08cc",
-                  "source_id": "7042d05ed849acc7b1c52a73d06979836e43b9d81639c2a3dc59cb154cf4f94c"
+                  "content_sha256": "ffffffec1ecc0906ef0154f40fbd89a2008d17c7d57742a55c3487b8ac72a36d",
+                  "source_id": "b8c99970631f36ef2e6f60facf053aa70790447aadc5c8f4a9d576c90e1b4e48"
                 },
                 "rationale": null
               },
@@ -1669,8 +1677,8 @@
                   "ref": "A/research/valuation.json",
                   "locator": "inputs.price Yahoo A close 2026-07-09",
                   "as_of": "2026-07-09",
-                  "content_sha256": "12aec4d69da7d6727ce428ff44d4d9f233f4012cad10438b5fac2ee2829f08cc",
-                  "source_id": "7042d05ed849acc7b1c52a73d06979836e43b9d81639c2a3dc59cb154cf4f94c"
+                  "content_sha256": "ffffffec1ecc0906ef0154f40fbd89a2008d17c7d57742a55c3487b8ac72a36d",
+                  "source_id": "b8c99970631f36ef2e6f60facf053aa70790447aadc5c8f4a9d576c90e1b4e48"
                 },
                 "rationale": null
               },
@@ -1705,8 +1713,8 @@
               "ref": "A/research/valuation.json",
               "locator": "inputs.price Yahoo A close 2026-07-09",
               "as_of": "2026-07-09",
-              "content_sha256": "12aec4d69da7d6727ce428ff44d4d9f233f4012cad10438b5fac2ee2829f08cc",
-              "source_id": "7042d05ed849acc7b1c52a73d06979836e43b9d81639c2a3dc59cb154cf4f94c"
+              "content_sha256": "ffffffec1ecc0906ef0154f40fbd89a2008d17c7d57742a55c3487b8ac72a36d",
+              "source_id": "b8c99970631f36ef2e6f60facf053aa70790447aadc5c8f4a9d576c90e1b4e48"
             },
             {
               "node_id": "normalized_owner_cash",
@@ -1720,7 +1728,7 @@
             "passed": true,
             "errors": []
           },
-          "proof_hash": "dcb0b1da6996595a1b25f8e978be2a2bfbd202a0b177e9e1ad0e9e0fa2171053"
+          "proof_hash": "eaa8c5cfefc3a1a82d07d9990ff020ddc12405d8b3549636e3a452d0b65bfcd4"
         },
         "evidence_tier": "primary_derived",
         "evidence_level": "primary_derived",
@@ -1797,7 +1805,9 @@
       "model_as_of": "2026-07-25",
       "latest_fact_as_of": "2026-07-09",
       "oldest_fact_as_of": "2025-10-31",
-      "price_as_of": "2026-07-09"
+      "price_as_of": "2026-07-09",
+      "forecast_as_of": "2026-07-25",
+      "calculation_as_of": "2026-07-09"
     },
     "legacy_audit": {
       "actionable": false,
@@ -3369,8 +3379,8 @@
                   "ref": "A/research/valuation.json",
                   "locator": "inputs.price Yahoo A close 2026-07-09",
                   "as_of": "2026-07-09",
-                  "content_sha256": "12aec4d69da7d6727ce428ff44d4d9f233f4012cad10438b5fac2ee2829f08cc",
-                  "source_id": "7042d05ed849acc7b1c52a73d06979836e43b9d81639c2a3dc59cb154cf4f94c"
+                  "content_sha256": "ffffffec1ecc0906ef0154f40fbd89a2008d17c7d57742a55c3487b8ac72a36d",
+                  "source_id": "b8c99970631f36ef2e6f60facf053aa70790447aadc5c8f4a9d576c90e1b4e48"
                 },
                 "rationale": null
               },
@@ -3409,8 +3419,8 @@
                   "ref": "A/research/valuation.json",
                   "locator": "inputs.price Yahoo A close 2026-07-09",
                   "as_of": "2026-07-09",
-                  "content_sha256": "12aec4d69da7d6727ce428ff44d4d9f233f4012cad10438b5fac2ee2829f08cc",
-                  "source_id": "7042d05ed849acc7b1c52a73d06979836e43b9d81639c2a3dc59cb154cf4f94c"
+                  "content_sha256": "ffffffec1ecc0906ef0154f40fbd89a2008d17c7d57742a55c3487b8ac72a36d",
+                  "source_id": "b8c99970631f36ef2e6f60facf053aa70790447aadc5c8f4a9d576c90e1b4e48"
                 },
                 "rationale": null
               },
@@ -3449,8 +3459,8 @@
                   "ref": "A/research/valuation.json",
                   "locator": "inputs.price Yahoo A close 2026-07-09",
                   "as_of": "2026-07-09",
-                  "content_sha256": "12aec4d69da7d6727ce428ff44d4d9f233f4012cad10438b5fac2ee2829f08cc",
-                  "source_id": "7042d05ed849acc7b1c52a73d06979836e43b9d81639c2a3dc59cb154cf4f94c"
+                  "content_sha256": "ffffffec1ecc0906ef0154f40fbd89a2008d17c7d57742a55c3487b8ac72a36d",
+                  "source_id": "b8c99970631f36ef2e6f60facf053aa70790447aadc5c8f4a9d576c90e1b4e48"
                 },
                 "rationale": null
               },
@@ -3485,8 +3495,8 @@
               "ref": "A/research/valuation.json",
               "locator": "inputs.price Yahoo A close 2026-07-09",
               "as_of": "2026-07-09",
-              "content_sha256": "12aec4d69da7d6727ce428ff44d4d9f233f4012cad10438b5fac2ee2829f08cc",
-              "source_id": "7042d05ed849acc7b1c52a73d06979836e43b9d81639c2a3dc59cb154cf4f94c"
+              "content_sha256": "ffffffec1ecc0906ef0154f40fbd89a2008d17c7d57742a55c3487b8ac72a36d",
+              "source_id": "b8c99970631f36ef2e6f60facf053aa70790447aadc5c8f4a9d576c90e1b4e48"
             },
             {
               "node_id": "normalized_owner_cash",
@@ -3500,7 +3510,7 @@
             "passed": true,
             "errors": []
           },
-          "proof_hash": "dcb0b1da6996595a1b25f8e978be2a2bfbd202a0b177e9e1ad0e9e0fa2171053"
+          "proof_hash": "eaa8c5cfefc3a1a82d07d9990ff020ddc12405d8b3549636e3a452d0b65bfcd4"
         },
         "evidence_tier": "primary_derived",
         "evidence_level": "primary_derived",
@@ -3567,7 +3577,7 @@
       },
       "all_material_components_priced": true,
       "calculation_errors": [],
-      "aggregate_proof_hash": "ff62805dc14530c5b6c8d7a338a55b3d7fd4b1d327256d1432fdd1d7cb43917b"
+      "aggregate_proof_hash": "c12196f864a96f2bdfc6650be12c7072a8225bcecdd20483615662544d09946f"
     },
     "model_checks": {
       "calculation_graphs_valid": true,
@@ -3667,8 +3677,8 @@
         "ref": "A/research/valuation.json",
         "locator": "inputs.price Yahoo A close 2026-07-09",
         "as_of": "2026-07-09",
-        "content_sha256": "12aec4d69da7d6727ce428ff44d4d9f233f4012cad10438b5fac2ee2829f08cc",
-        "source_id": "7042d05ed849acc7b1c52a73d06979836e43b9d81639c2a3dc59cb154cf4f94c"
+        "content_sha256": "ffffffec1ecc0906ef0154f40fbd89a2008d17c7d57742a55c3487b8ac72a36d",
+        "source_id": "b8c99970631f36ef2e6f60facf053aa70790447aadc5c8f4a9d576c90e1b4e48"
       },
       {
         "component_id": "biopharma_cycle_reserve",
@@ -3680,7 +3690,7 @@
       }
     ],
     "change_control": {
-      "model_hash": "869441292335994672bda8017f14cb5fa663a4632aa10d13b9f4102c0c68b3a7",
+      "model_hash": "43a4bbe909b56584fa917d784c87708b2fc39103bc85d36630af3e62667a30af",
       "method_versions": [
         "midcycle_capacity_value@1.0",
         "net_asset_value@1.0",
@@ -3879,21 +3889,35 @@
     "drivers": [],
     "category_totals_per_share": {},
     "unexplained_per_share": null,
-    "explanation": "The current component schedule is the first decision-grade baseline; attribution begins with the next dated valuation snapshot."
+    "explanation": "The current component schedule is the first decision-grade baseline; attribution begins with the next dated valuation snapshot.",
+    "tci_irr": {
+      "status": "available",
+      "method": "price_then_fcf_then_growth_then_multiple",
+      "unit": "percentage_points_per_year",
+      "total_delta_pp": 0.0,
+      "price_pp": 0.0,
+      "fcf_pp": 0.0,
+      "growth_pp": 0.0,
+      "multiple_pp": 0.0,
+      "residual_pp": 0.0,
+      "prior_snapshot": "valuation_history/valuation_2026-07-10.json"
+    }
   },
   "freshness": {
     "status": "stale",
-    "as_of": "2026-10-16",
+    "as_of": "2026-10-27",
     "dates": {
       "model_as_of": "2026-07-25",
       "latest_fact_as_of": "2026-07-09",
       "oldest_fact_as_of": "2025-10-31",
-      "price_as_of": "2026-07-09"
+      "price_as_of": "2026-07-09",
+      "forecast_as_of": "2026-07-25",
+      "calculation_as_of": "2026-07-09"
     },
     "age_days": {
-      "model_as_of": 83,
-      "latest_fact_as_of": 99,
-      "price_as_of": 99
+      "model_as_of": 94,
+      "latest_fact_as_of": 110,
+      "price_as_of": 110
     },
     "review_threshold_days": {
       "model_as_of": 365,
@@ -3901,7 +3925,7 @@
       "price_as_of": 7
     },
     "warnings": [
-      "price_as_of is 99 days old (review threshold 7)"
+      "price_as_of is 110 days old (review threshold 7)"
     ],
     "rule": "Freshness is disclosed separately from proof completeness; stale or undated inputs require review before a new capital decision."
   }

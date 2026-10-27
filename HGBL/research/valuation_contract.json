@@ -3744,7 +3744,7 @@
     ]
   },
   "change_control": {
-    "model_hash": "da59abff05334e7c39fa901e5127a66f29bbbbeda4741bb2f47ebd24d03e0e9f",
+    "model_hash": "bb97e860b51643e971a3732b7421acdb9cff66c9ac2e47609f9d30089addc541",
     "method_versions": [
       "net_asset_value@1.0",
       "net_debt@1.0",
@@ -3756,6 +3756,231 @@
     "rule": "A source fact is locked. Every assumption change requires a reason, author, timestamp, and before/after value."
   },
   "decision_rule": "Proof status and investment readiness are separate. Every material claim must be valued exactly once by a valid calculation proof, every evidence blocker must be resolved, and the model must be stock-specific before committee review. Only a human decision can authorize capital.",
+  "shared_forecast": {
+    "schema_version": "1.0",
+    "method_version": "shared-valuation-forecast/1.1",
+    "ticker": "HGBL",
+    "status": "model_gap",
+    "research_only": true,
+    "requires_human_review": false,
+    "capital_actionable": false,
+    "as_of": "2026-07-21",
+    "model_as_of": "2026-07-21",
+    "quote": {
+      "value": 1.26,
+      "as_of": "2026-07-21",
+      "source_url": "Yahoo HGBL close 2026-07-16",
+      "currency": null
+    },
+    "forecast_hash": "d5edae7dfc56263d85b40b0ae2b5bca7f4ce7ed6df2eb07c34dd726870c94517",
+    "forward_irr_pct": {
+      "low": null,
+      "base": null,
+      "high": null
+    },
+    "present_value_today_per_share": {
+      "low": null,
+      "base": null,
+      "high": null
+    },
+    "model_present_value_per_share": {
+      "low": null,
+      "base": null,
+      "high": null
+    },
+    "required_return_pct": {
+      "low": null,
+      "base": null,
+      "high": null
+    },
+    "forward_cashflow_schedule": {},
+    "buy_prices": [],
+    "components": [
+      {
+        "component_id": "fee_franchises_after_corporate",
+        "method": "owner_earnings_multiple",
+        "status": "model_gap",
+        "present_value_per_share": {}
+      },
+      {
+        "component_id": "specialty_lending_notes",
+        "method": "net_asset_value",
+        "status": "model_gap",
+        "present_value_per_share": {}
+      },
+      {
+        "component_id": "equity_method_investments",
+        "method": "net_asset_value",
+        "status": "model_gap",
+        "present_value_per_share": {}
+      },
+      {
+        "component_id": "cash_inventory_ppe_net_working",
+        "method": "net_asset_value",
+        "status": "model_gap",
+        "present_value_per_share": {}
+      },
+      {
+        "component_id": "debt_and_leases",
+        "method": "net_debt",
+        "status": "model_gap",
+        "present_value_per_share": {}
+      },
+      {
+        "component_id": "preferred_liquidation_claim",
+        "method": "senior_claim",
+        "status": "model_gap",
+        "present_value_per_share": {}
+      },
+      {
+        "component_id": "debtx_commercial_loan_platform",
+        "method": "probability_weighted_acquisition_earnout",
+        "status": "model_gap",
+        "present_value_per_share": {
+          "low": 0.0
+        }
+      }
+    ],
+    "gaps": [
+      {
+        "component_id": "fee_franchises_after_corporate",
+        "case": "low",
+        "code": "realization_timing_missing:value_per_share"
+      },
+      {
+        "component_id": "fee_franchises_after_corporate",
+        "case": "base",
+        "code": "realization_timing_missing:value_per_share"
+      },
+      {
+        "component_id": "fee_franchises_after_corporate",
+        "case": "high",
+        "code": "realization_timing_missing:value_per_share"
+      },
+      {
+        "component_id": "specialty_lending_notes",
+        "case": "low",
+        "code": "realization_timing_missing:value_per_share"
+      },
+      {
+        "component_id": "specialty_lending_notes",
+        "case": "base",
+        "code": "realization_timing_missing:value_per_share"
+      },
+      {
+        "component_id": "specialty_lending_notes",
+        "case": "high",
+        "code": "realization_timing_missing:value_per_share"
+      },
+      {
+        "component_id": "equity_method_investments",
+        "case": "low",
+        "code": "realization_timing_missing:value_per_share"
+      },
+      {
+        "component_id": "equity_method_investments",
+        "case": "base",
+        "code": "realization_timing_missing:value_per_share"
+      },
+      {
+        "component_id": "equity_method_investments",
+        "case": "high",
+        "code": "realization_timing_missing:value_per_share"
+      },
+      {
+        "component_id": "cash_inventory_ppe_net_working",
+        "case": "low",
+        "code": "realization_timing_missing:value_per_share"
+      },
+      {
+        "component_id": "cash_inventory_ppe_net_working",
+        "case": "base",
+        "code": "realization_timing_missing:value_per_share"
+      },
+      {
+        "component_id": "cash_inventory_ppe_net_working",
+        "case": "high",
+        "code": "realization_timing_missing:value_per_share"
+      },
+      {
+        "component_id": "debt_and_leases",
+        "case": "low",
+        "code": "realization_timing_missing:adjusted_claim"
+      },
+      {
+        "component_id": "debt_and_leases",
+        "case": "base",
+        "code": "realization_timing_missing:adjusted_claim"
+      },
+      {
+        "component_id": "debt_and_leases",
+        "case": "high",
+        "code": "realization_timing_missing:adjusted_claim"
+      },
+      {
+        "component_id": "preferred_liquidation_claim",
+        "case": "low",
+        "code": "realization_timing_missing:adjusted_claim"
+      },
+      {
+        "component_id": "preferred_liquidation_claim",
+        "case": "base",
+        "code": "realization_timing_missing:adjusted_claim"
+      },
+      {
+        "component_id": "preferred_liquidation_claim",
+        "case": "high",
+        "code": "realization_timing_missing:adjusted_claim"
+      },
+      {
+        "component_id": "debtx_commercial_loan_platform",
+        "case": "base",
+        "code": "realization_timing_missing:incremental_option_per_share"
+      },
+      {
+        "component_id": "debtx_commercial_loan_platform",
+        "case": "high",
+        "code": "realization_timing_missing:incremental_option_per_share"
+      }
+    ],
+    "warnings": [],
+    "source_refs": [
+      {
+        "node_id": "acquisition_consideration_m",
+        "ref": "HGBL/investor-documents/sec-edgar/10-Q_20260507_rpt20260331_acc0001193125_26_211813.htm",
+        "locator": "Acquired substantially all assets of The Debt Exchange Inc. for ~$8.5M effective January 1, 2026",
+        "as_of": "2026-03-31",
+        "source_id": "ac0a5ac49e5e10651aa519f8e814b610d0cafadddedb940d92e13cc788d11450"
+      },
+      {
+        "node_id": "q1_commercial_loss_m",
+        "ref": "HGBL/investor-documents/sec-edgar/10-Q_20260507_rpt20260331_acc0001193125_26_211813.htm",
+        "locator": "Commercial Loans segment operating loss ($606) thousand Q1 2026",
+        "as_of": "2026-03-31",
+        "source_id": "224c95bccb9f7c4110a3dd7238d9ae71d79e01198931658058ea82424b4f56c7"
+      },
+      {
+        "node_id": "goodwill_from_debtx_m",
+        "ref": "HGBL/investor-documents/sec-edgar/10-Q_20260507_rpt20260331_acc0001193125_26_211813.htm",
+        "locator": "Goodwill of $5.3 million recognized in 2026 related to DebtX acquisition",
+        "as_of": "2026-03-31",
+        "source_id": "0da309a8d93e8957d240c08fef181bce555a1f1e870f1524e8bab518b9f314ef"
+      },
+      {
+        "node_id": "shares_m",
+        "ref": "HGBL/investor-documents/sec-edgar/10-Q_20260507_rpt20260331_acc0001193125_26_211813.htm",
+        "locator": "34,734,754 shares outstanding at March 31, 2026",
+        "as_of": "2026-03-31",
+        "source_id": "b96a1c13625ef6218c5bace39f4473f6c1f710def168f62d241247973313f375"
+      }
+    ],
+    "next_action": "automatic_model_refresh",
+    "reconciliation": {
+      "passed": false
+    },
+    "settlement_policy": "Explicit cash/debt additions in an operating DCF are time-zero acquisition adjustments; hypothetical settlement, not declared dividends.",
+    "calculation_id": "bc4946f1e0d65af8b5b3f453a7526c02213620944ceabc8d6aeaa40df5a08a04"
+  },
   "authority": "universal_valuation_contract",
   "legacy_reference_present": true,
   "falsifier_coverage": {

@@ -1,7 +1,7 @@
 # DHR — Third-party source inventory
 
-**Date:** 2026-10-11
-**Sources:** 87 total (0 approved, 0 pending, 87 context)
+**Date:** 2026-10-25
+**Sources:** 89 total (0 approved, 0 pending, 89 context)
 
 | ID | Title | Path | Status | Use |
 |----|-------|------|--------|-----|
@@ -92,5 +92,7 @@
 | activist_long | acc0001193125 26 255555 | `DHR/third-party-analyses/activist_reports/long/8-K_20260603_acc0001193125_26_255555.htm` | context | activist/long — local |
 | activist_long | acc0000313616 26 000163 | `DHR/third-party-analyses/activist_reports/long/8-K_20260721_acc0000313616_26_000163.htm` | context | activist/long — local |
 | activist_long | acc0001193125 26 330652 | `DHR/third-party-analyses/activist_reports/long/8-K_20260803_acc0001193125_26_330652.htm` | context | activist/long — local |
+| activist_long | acc0000313616 26 000193 | `DHR/third-party-analyses/activist_reports/long/8-K_20261013_acc0000313616_26_000193.htm` | context | activist/long — local |
+| activist_long | acc0000313616 26 000201 | `DHR/third-party-analyses/activist_reports/long/8-K_20261021_acc0000313616_26_000201.htm` | context | activist/long — local |
 
-Cross-check required: `DHR/research/cross_check_third_party_2026-10-11.md`
+Cross-check required: `DHR/research/cross_check_third_party_2026-10-25.md`

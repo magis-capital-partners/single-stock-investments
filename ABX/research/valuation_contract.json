@@ -1926,7 +1926,7 @@
     ]
   },
   "change_control": {
-    "model_hash": "61c31860f307bfdfcc4f4de520e183bc3a4644706b0a992e68a200c127d855b5",
+    "model_hash": "2c2329a34f2a9b119171acf5cf732215f660e266d4ea5812085e355d6a1c0a03",
     "method_versions": [
       "net_asset_value@1.0",
       "owner_cash_or_dividend_discount@1.0",
@@ -1937,6 +1937,175 @@
     "rule": "A source fact is locked. Every assumption change requires a reason, author, timestamp, and before/after value."
   },
   "decision_rule": "Proof status and investment readiness are separate. Every material claim must be valued exactly once by a valid calculation proof, every evidence blocker must be resolved, and the model must be stock-specific before committee review. Only a human decision can authorize capital.",
+  "shared_forecast": {
+    "schema_version": "1.0",
+    "method_version": "shared-valuation-forecast/1.1",
+    "ticker": "ABX",
+    "status": "model_gap",
+    "research_only": true,
+    "requires_human_review": false,
+    "capital_actionable": false,
+    "as_of": "2026-08-04",
+    "model_as_of": "2026-08-04",
+    "quote": {
+      "value": 10.86,
+      "as_of": "2026-08-04",
+      "source_url": "Yahoo ABX close 2026-08-04",
+      "currency": null
+    },
+    "forecast_hash": "f5162165d176df8f070847ffc697ad3194cac66450d1906fafda8187b4f8ef87",
+    "forward_irr_pct": {
+      "low": null,
+      "base": null,
+      "high": null
+    },
+    "present_value_today_per_share": {
+      "low": null,
+      "base": null,
+      "high": null
+    },
+    "model_present_value_per_share": {
+      "low": null,
+      "base": null,
+      "high": null
+    },
+    "required_return_pct": {
+      "low": null,
+      "base": null,
+      "high": null
+    },
+    "forward_cashflow_schedule": {},
+    "buy_prices": [],
+    "components": [
+      {
+        "component_id": "life_solutions_engine",
+        "method": "owner_earnings_reinvestment_dcf",
+        "status": "model_gap",
+        "present_value_per_share": {}
+      },
+      {
+        "component_id": "asset_management_franchise",
+        "method": "owner_cash_or_dividend_discount",
+        "status": "model_gap",
+        "present_value_per_share": {}
+      },
+      {
+        "component_id": "technology_platform_option",
+        "method": "risk_adjusted_milestone_value",
+        "status": "model_gap",
+        "present_value_per_share": {
+          "low": 0.0
+        }
+      },
+      {
+        "component_id": "net_financial_claims",
+        "method": "net_asset_value",
+        "status": "model_gap",
+        "present_value_per_share": {}
+      },
+      {
+        "component_id": "longevity_and_funding_reserve",
+        "method": "net_asset_value",
+        "status": "model_gap",
+        "present_value_per_share": {}
+      }
+    ],
+    "gaps": [
+      {
+        "component_id": "life_solutions_engine",
+        "case": "low",
+        "code": "realization_timing_missing:value_per_share"
+      },
+      {
+        "component_id": "life_solutions_engine",
+        "case": "base",
+        "code": "realization_timing_missing:value_per_share"
+      },
+      {
+        "component_id": "life_solutions_engine",
+        "case": "high",
+        "code": "realization_timing_missing:value_per_share"
+      },
+      {
+        "component_id": "asset_management_franchise",
+        "case": "low",
+        "code": "realization_timing_missing:fee_owner_cash_per_share"
+      },
+      {
+        "component_id": "asset_management_franchise",
+        "case": "base",
+        "code": "realization_timing_missing:fee_owner_cash_per_share"
+      },
+      {
+        "component_id": "asset_management_franchise",
+        "case": "high",
+        "code": "realization_timing_missing:fee_owner_cash_per_share"
+      },
+      {
+        "component_id": "technology_platform_option",
+        "case": "base",
+        "code": "realization_timing_missing:value_per_share"
+      },
+      {
+        "component_id": "technology_platform_option",
+        "case": "high",
+        "code": "realization_timing_missing:value_per_share"
+      },
+      {
+        "component_id": "net_financial_claims",
+        "case": "low",
+        "code": "realization_timing_missing:value_per_share"
+      },
+      {
+        "component_id": "net_financial_claims",
+        "case": "base",
+        "code": "realization_timing_missing:value_per_share"
+      },
+      {
+        "component_id": "net_financial_claims",
+        "case": "high",
+        "code": "realization_timing_missing:value_per_share"
+      },
+      {
+        "component_id": "longevity_and_funding_reserve",
+        "case": "low",
+        "code": "realization_timing_missing:value_per_share"
+      },
+      {
+        "component_id": "longevity_and_funding_reserve",
+        "case": "base",
+        "code": "realization_timing_missing:value_per_share"
+      },
+      {
+        "component_id": "longevity_and_funding_reserve",
+        "case": "high",
+        "code": "realization_timing_missing:value_per_share"
+      }
+    ],
+    "warnings": [],
+    "source_refs": [
+      {
+        "node_id": "technology_revenue_m",
+        "ref": "ABX/investor-documents/sec-edgar/10-K_20260313_rpt20251231_acc0001628280_26_017775.htm",
+        "locator": "Technology Services segment revenue $0.7M; Abacus Intel launched Q4 2024",
+        "as_of": "2025-12-31",
+        "source_id": "e5077c1a2e01173f0c3322f3b09290c5a1d27681d6bacf169b1073eb4e202c49"
+      },
+      {
+        "node_id": "shares_m",
+        "ref": "ABX/investor-documents/sec-edgar/10-K_20260313_rpt20251231_acc0001628280_26_017775.htm",
+        "locator": "WeightedAverageNumberOfDilutedSharesOutstanding 99,230,950 (FY2025)",
+        "as_of": "2025-12-31",
+        "source_id": "5b3a7bd3613ba1aa6198acb024f6f37e29b564d753e3858c6dfb664e750b0e1e"
+      }
+    ],
+    "next_action": "automatic_model_refresh",
+    "reconciliation": {
+      "passed": false
+    },
+    "settlement_policy": "Explicit cash/debt additions in an operating DCF are time-zero acquisition adjustments; hypothetical settlement, not declared dividends.",
+    "calculation_id": "28e50e661e90d1a2468ca75d6a5716a50ae073e64cb4f22b23c814c1702794f2"
+  },
   "authority": "universal_valuation_contract",
   "legacy_reference_present": true,
   "falsifier_coverage": {

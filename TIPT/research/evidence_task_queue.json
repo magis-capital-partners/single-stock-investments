@@ -1,0 +1,191 @@
+{
+  "schema_version": "3.0",
+  "ticker": "TIPT",
+  "updated_at": "2026-10-29T09:16:43Z",
+  "method_id": "component_owner_cash_and_unit_nav",
+  "method_profile": "scarce_asset_optionality",
+  "route_status": "routed",
+  "ready_count": 1,
+  "task_count": 8,
+  "terminal_count": 7,
+  "tasks": [
+    {
+      "id": "method_input:component_owner_cash_and_unit_nav:economic_ownership_map",
+      "priority": "critical",
+      "field_id": "economic_ownership_map",
+      "method_id": "component_owner_cash_and_unit_nav",
+      "question": "Supply a primary-source value for economic ownership map.",
+      "evidence_required": "economic_ownership_map",
+      "input_schema": {
+        "type": "object"
+      },
+      "acceptance_test": "A locked fact-ledger row has a primary source ref, locator, as-of date, and a value that passes the method input schema.",
+      "collector": "primary_documents_then_fact_ledger",
+      "status": "unavailable",
+      "attempts": 5,
+      "last_attempt_at": "2026-10-27T08:28:30Z",
+      "max_attempts": 5,
+      "next_attempt_at": null,
+      "last_error": "Automated collection exhausted retry budget without satisfying acceptance test.",
+      "satisfied_by": "normalized_fact_ledger",
+      "evidence_refs": []
+    },
+    {
+      "id": "method_input:component_owner_cash_and_unit_nav:normalized_owner_cash",
+      "priority": "critical",
+      "field_id": "normalized_owner_cash",
+      "method_id": "component_owner_cash_and_unit_nav",
+      "question": "Supply a primary-source value for normalized owner cash.",
+      "evidence_required": "normalized_owner_cash",
+      "input_schema": {
+        "type": "number",
+        "min": 0,
+        "unit": "USD millions"
+      },
+      "acceptance_test": "A locked fact-ledger row has a primary source ref, locator, as-of date, and a value that passes the method input schema.",
+      "collector": "primary_documents_then_fact_ledger",
+      "status": "unavailable",
+      "attempts": 5,
+      "last_attempt_at": "2026-10-27T08:28:30Z",
+      "max_attempts": 5,
+      "next_attempt_at": null,
+      "last_error": "Automated collection exhausted retry budget without satisfying acceptance test.",
+      "satisfied_by": "normalized_fact_ledger",
+      "evidence_refs": []
+    },
+    {
+      "id": "method_input:component_owner_cash_and_unit_nav:asset_quantity",
+      "priority": "critical",
+      "field_id": "asset_quantity",
+      "method_id": "component_owner_cash_and_unit_nav",
+      "question": "Supply a primary-source value for asset quantity.",
+      "evidence_required": "asset_quantity",
+      "input_schema": {
+        "type": "number",
+        "min": 0,
+        "unit": "asset units"
+      },
+      "acceptance_test": "A locked fact-ledger row has a primary source ref, locator, as-of date, and a value that passes the method input schema.",
+      "collector": "primary_documents_then_fact_ledger",
+      "status": "unavailable",
+      "attempts": 5,
+      "last_attempt_at": "2026-10-27T08:28:30Z",
+      "max_attempts": 5,
+      "next_attempt_at": null,
+      "last_error": "Automated collection exhausted retry budget without satisfying acceptance test.",
+      "satisfied_by": "normalized_fact_ledger",
+      "evidence_refs": []
+    },
+    {
+      "id": "method_input:component_owner_cash_and_unit_nav:unit_value",
+      "priority": "critical",
+      "field_id": "unit_value",
+      "method_id": "component_owner_cash_and_unit_nav",
+      "question": "Supply a primary-source value for unit value.",
+      "evidence_required": "unit_value",
+      "input_schema": {
+        "type": "number",
+        "min": 0,
+        "unit": "USD millions per asset unit"
+      },
+      "acceptance_test": "A locked fact-ledger row has a primary source ref, locator, as-of date, and a value that passes the method input schema.",
+      "collector": "market_and_filing_facts",
+      "status": "unavailable",
+      "attempts": 5,
+      "last_attempt_at": "2026-10-27T08:28:30Z",
+      "max_attempts": 5,
+      "next_attempt_at": null,
+      "last_error": "Automated collection exhausted retry budget without satisfying acceptance test.",
+      "satisfied_by": "normalized_fact_ledger",
+      "evidence_refs": []
+    },
+    {
+      "id": "method_input:component_owner_cash_and_unit_nav:senior_claims",
+      "priority": "critical",
+      "field_id": "senior_claims",
+      "method_id": "component_owner_cash_and_unit_nav",
+      "question": "Supply a primary-source value for senior claims.",
+      "evidence_required": "senior_claims",
+      "input_schema": {
+        "type": "number",
+        "min": 0,
+        "unit": "USD millions"
+      },
+      "acceptance_test": "A locked fact-ledger row has a primary source ref, locator, as-of date, and a value that passes the method input schema.",
+      "collector": "primary_contracts_and_filings",
+      "status": "unavailable",
+      "attempts": 5,
+      "last_attempt_at": "2026-10-27T08:28:30Z",
+      "max_attempts": 5,
+      "next_attempt_at": null,
+      "last_error": "Automated collection exhausted retry budget without satisfying acceptance test.",
+      "satisfied_by": "normalized_fact_ledger",
+      "evidence_refs": []
+    },
+    {
+      "id": "method_input:component_owner_cash_and_unit_nav:tax_and_realization_costs",
+      "priority": "critical",
+      "field_id": "tax_and_realization_costs",
+      "method_id": "component_owner_cash_and_unit_nav",
+      "question": "Supply a primary-source value for tax and realization costs.",
+      "evidence_required": "tax_and_realization_costs",
+      "input_schema": {
+        "type": "number",
+        "min": 0,
+        "unit": "USD millions"
+      },
+      "acceptance_test": "A locked fact-ledger row has a primary source ref, locator, as-of date, and a value that passes the method input schema.",
+      "collector": "primary_contracts_and_filings",
+      "status": "unavailable",
+      "attempts": 5,
+      "last_attempt_at": "2026-10-27T08:28:30Z",
+      "max_attempts": 5,
+      "next_attempt_at": null,
+      "last_error": "Automated collection exhausted retry budget without satisfying acceptance test.",
+      "satisfied_by": "normalized_fact_ledger",
+      "evidence_refs": []
+    },
+    {
+      "id": "method_input:component_owner_cash_and_unit_nav:shares_outstanding",
+      "priority": "critical",
+      "field_id": "shares_outstanding",
+      "method_id": "component_owner_cash_and_unit_nav",
+      "question": "Supply a primary-source value for shares outstanding.",
+      "evidence_required": "shares_outstanding",
+      "input_schema": {
+        "type": "number",
+        "min_exclusive": 0,
+        "unit": "shares"
+      },
+      "acceptance_test": "A locked fact-ledger row has a primary source ref, locator, as-of date, and a value that passes the method input schema.",
+      "collector": "primary_documents_then_fact_ledger",
+      "status": "evidence_ready",
+      "attempts": 0,
+      "last_attempt_at": null,
+      "max_attempts": 5,
+      "next_attempt_at": null,
+      "last_error": null,
+      "satisfied_by": "normalized_fact_ledger",
+      "evidence_refs": [
+        "TIPT/research/evidence/sec_companyfacts.json"
+      ]
+    },
+    {
+      "id": "complete_component_model_required",
+      "priority": "critical",
+      "field_id": "component_model",
+      "method_id": "component_owner_cash_and_unit_nav",
+      "question": "Build a complete primary-sourced component valuation.",
+      "evidence_required": "economic_ownership_map; normalized_owner_cash; asset_quantity; unit_value; senior_claims; tax_and_realization_costs; shares_outstanding",
+      "acceptance_test": "Every material economic claim is valued exactly once with a valid deterministic proof.",
+      "collector": "compile_component_owner_cash_and_unit_nav",
+      "status": "unavailable",
+      "attempts": 5,
+      "max_attempts": 5,
+      "last_attempt_at": "2026-10-27T08:28:30Z",
+      "next_attempt_at": null,
+      "last_error": "Automated collection exhausted retry budget without satisfying acceptance test.",
+      "evidence_refs": []
+    }
+  ]
+}

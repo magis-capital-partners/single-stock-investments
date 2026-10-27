@@ -26,6 +26,12 @@ ACTION_LABELS = {
     "trim": "trimmed",
     "new": "initiated",
     "short": "shorted",
+    "sell": "sold (extent unspecified)",
+    "exit": "exited",
+    "unverified": "action awaiting source review",
+    "sold_options": "sold call options",
+    "sold_warrants": "sold warrants",
+    "bought_bonds": "bought bonds",
     "discussed": "discussed",
     "hold": "holds",
 }

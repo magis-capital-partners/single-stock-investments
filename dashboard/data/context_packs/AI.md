@@ -11,14 +11,14 @@
 C3.ai, Inc. (NYSE: AI) sells enterprise application software for artificial intelligence: a model-driven platform used to build, deploy, and operate predictive and generative AI applications for large organizations. **[Fact]** The company reports as a single operating segment. **[Fact]** FY2026 revenue (year ended April 30, 2026) was **$227.1 million**, down from **$327.6 million** in FY2025 per XBRL-tagged filing extracts in `filing_facts_2026-08-06.json`. **[Fact]** Cash and cash equivalents were **$66.2 million** with **no reported long-term debt** at the April 30, 2026 balance sheet date on the FY2026 10-K. **[Inference]** C3.ai is an application-layer enterprise AI vendor competing with hyperscaler platforms and specialized software peers; owner economics today depend on converting large-deal pipeline into durable subscription revenue without further dilution.
 
 ## Why the market might be wrong (stable)
-The market may overweight **CEO Thomas Siebel's return**, **Federal and Shell partnership headlines**, and **episodic insider purchases** while underweighting a **31% revenue decline**, an **unproven switching-cost moat** against hyperscalers, and **stock-based compensation dilution**. **[Inference]** At about **$11.34** (Yahoo close 2026-10-08 in `valuation.json`), the stock still embeds recovery in normalized owner cash that filings have not confirmed: our base case uses **$0.80 per share** starting owner cash **[Assumption]**, not spot GAAP earnings (mechanical net income tags in the filing extract conflict with loss-making history and are not used as the cash anchor). **[Inference]** The universal contract sums four non-overlapping components to roughly **$21 per share** base intrinsic value at the prior price stub; at a higher spot price, implied contract returns compress even if pipeline optionality is real. Moat durability remains the binding gate.
+The market may overweight **CEO Thomas Siebel's return**, **Federal and Shell partnership headlines**, and **episodic insider purchases** while underweighting a **31% revenue decline**, an **unproven switching-cost moat** against hyperscalers, and **stock-based compensation dilution**. **[Inference]** At about **$10.82** (Yahoo close 2026-08-31 in `valuation.json`), the stock still embeds recovery in normalized owner cash that filings have not confirmed: our base case uses **$0.80 per share** starting owner cash **[Assumption]**, not spot GAAP earnings (mechanical net income tags in the filing extract conflict with loss-making history and are not used as the cash anchor). **[Inference]** The universal contract sums four non-overlapping components to roughly **$21 per share** base intrinsic value at the prior price stub; at a higher spot price, implied contract returns compress even if pipeline optionality is real. Moat durability remains the binding gate.
 
 ## Returns (stable, percent per year)
-- Base return: 27.48% per year (7yr IRR (total synthesis))
-- Scenarios (percent per year): bear 7.7, base 21.9, bull 36.0
+- Base return: 30.1% per year (7yr IRR (total synthesis))
+- Scenarios (percent per year): bear 9.9, base 24.5, bull 38.8
 
 ## Key assumptions (stable)
-- Price today: **$12.79** (source: Yahoo AI close 2026-10-26)
+- Price today: **$11.34** (source: Yahoo AI close 2026-10-08)
 - Starting free cash flow per share: **$0.8** (source: FY2026 (ended 2026-04-30) OCF .2M less ~ growth/SBC-adjusted reinvestment [Assumption] ÷ ~137.5M shares ≈ .80/sh; XBRL tags in thousands)
 - Growth in years 1 through 5: **15.0%** per year (source: [Assumption])
 - Growth in years 6 through 7: **8.0%** per year (source: Scenario base)
@@ -29,7 +29,7 @@ The market may overweight **CEO Thomas Siebel's return**, **Federal and Shell pa
 - Confirm live price vs **$10.82** stub (`human_review.live_price_confirmed: false`).
 - Reconcile normalized owner cash **$0.80/sh** to FY2027 filing OCF and SBC schedule; mechanical net income tags flagged inconsistent.
 - Siebel insider activity is mixed; do not promote insider tilt to base IRR without discussion.
-- Clear prospective falsifier gate for all four components (`core_engine`, `reinvestment_runway`, `net_financial_claims`, `cycle_reserve`) via reviewed v3 specs or approved untestable dispositions.
+- Clear `cycle_reserve` prospective falsifier gate (author forecast + independent review, or approved untestable disposition).
 - No approved third-party sources in base IRR; SC-13G filings are context only.
 
 ## Verified claims (stable, cited)
@@ -107,12 +107,12 @@ Documents in folder: **67** (all listed below; Tier 1–3 extracted or keyword-s
 | scan | 8-K | 2026-06-03 | `investor-documents/sec-edgar/8-K_20260603_rpt20260603_acc00015775
 
 ## Canonical pointers (open only when needed)
-- deep_dive: AI/research/deep_dive_2026-10-27.md (sha256 sha256:5cc3464bbfa3979c...)
+- deep_dive: AI/research/deep_dive_2026-10-09.md (sha256 sha256:2cab048fc123b57a...)
 - filing_digest: AI/research/evidence/filing_digest.md (sha256 sha256:3419c5441291d721...)
-- adversarial: AI/research/adversarial_2026-10-27.md (sha256 sha256:68591ad9ae2ea074...)
-- valuation: AI/research/valuation.json (sha256 sha256:4172d1474fec9414...)
-- thesis_card: AI/research/thesis_card.json (sha256 sha256:3da85efe542f5b0e...)
-- cross_check: AI/research/cross_check_third_party_2026-10-27.md (sha256 sha256:dd6bf86e27294124...)
+- adversarial: AI/research/adversarial_2026-10-09.md (sha256 sha256:76c3aa92912bd412...)
+- valuation: AI/research/valuation.json (sha256 sha256:13ac968c048acfb7...)
+- thesis_card: AI/research/thesis_card.json (sha256 sha256:ffe1956a29be8217...)
+- cross_check: AI/research/cross_check_third_party_2026-10-09.md (sha256 sha256:b56909562863af06...)
 
 ## Excluded from this pack
 - AI/research/valuation.json (full; returns block included, open only for assumption audit)
