@@ -121,6 +121,8 @@ jobs:
       # replaces. ci_checkout_workspace.sh does not clone the vault.
       - name: Checkout research vault
         uses: ./.github/actions/checkout-vault
+        with:
+          include-source-archive: 'false'
 
       - uses: actions/setup-python@v5
         with:

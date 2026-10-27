@@ -397,12 +397,88 @@
     ]
   },
   "change_control": {
-    "model_hash": "8a56be6ad30fd5872bbb815b45135b49bbe4287711c1aee78670511eeae3291a",
+    "model_hash": "6b3849fd03920417abb873bed6de63e60a1432a92d1ed39c65403c512be5edd5",
     "method_versions": [],
     "change_log": [],
     "rule": "A source fact is locked. Every assumption change requires a reason, author, timestamp, and before/after value."
   },
   "decision_rule": "Proof status and investment readiness are separate. Every material claim must be valued exactly once by a valid calculation proof, every evidence blocker must be resolved, and the model must be stock-specific before committee review. Only a human decision can authorize capital.",
+  "shared_forecast": {
+    "schema_version": "1.0",
+    "method_version": "shared-valuation-forecast/1.1",
+    "ticker": "NU",
+    "status": "model_gap",
+    "research_only": true,
+    "requires_human_review": false,
+    "capital_actionable": false,
+    "as_of": "2026-07-28",
+    "model_as_of": "2026-07-28",
+    "quote": {
+      "value": 14.68,
+      "as_of": "2026-07-28",
+      "source_url": "Yahoo NU quote 2026-07-28",
+      "currency": null
+    },
+    "forecast_hash": "1240640003b2ce38ad1fb0f914f8e0073e682700ee17b61e09910984eedeb520",
+    "forward_irr_pct": {
+      "low": null,
+      "base": null,
+      "high": null
+    },
+    "present_value_today_per_share": {
+      "low": null,
+      "base": null,
+      "high": null
+    },
+    "model_present_value_per_share": {
+      "low": null,
+      "base": null,
+      "high": null
+    },
+    "required_return_pct": {
+      "low": null,
+      "base": null,
+      "high": null
+    },
+    "forward_cashflow_schedule": {},
+    "buy_prices": [],
+    "components": [
+      {
+        "component_id": "operating_business_fallback",
+        "method": "owner_cash_dcf",
+        "status": "model_gap",
+        "present_value_per_share": {}
+      }
+    ],
+    "gaps": [
+      {
+        "code": "material_component_coverage_incomplete"
+      },
+      {
+        "component_id": "operating_business_fallback",
+        "case": "low",
+        "code": "invalid_calculation_proof"
+      },
+      {
+        "component_id": "operating_business_fallback",
+        "case": "base",
+        "code": "invalid_calculation_proof"
+      },
+      {
+        "component_id": "operating_business_fallback",
+        "case": "high",
+        "code": "invalid_calculation_proof"
+      }
+    ],
+    "warnings": [],
+    "source_refs": [],
+    "next_action": "automatic_model_refresh",
+    "reconciliation": {
+      "passed": false
+    },
+    "settlement_policy": "Explicit cash/debt additions in an operating DCF are time-zero acquisition adjustments; hypothetical settlement, not declared dividends.",
+    "calculation_id": "a2b722aceffa78c3a0382ea56fee746657ae31e4ab9be076c83fe568c7748375"
+  },
   "authority": "universal_valuation_contract",
   "legacy_reference_present": true,
   "falsifier_coverage": {

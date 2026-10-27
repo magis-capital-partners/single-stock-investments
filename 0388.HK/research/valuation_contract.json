@@ -2272,7 +2272,7 @@
     ]
   },
   "change_control": {
-    "model_hash": "e94247de87debfe0e870dd421153e5c751ed8436811b01c1719d757851022ca1",
+    "model_hash": "be41e8bc06807e2639324eaa8b0fa041e47e67d7c4c6b3ea74238f9708f187b7",
     "method_versions": [
       "midcycle_capacity_value@1.0",
       "net_asset_value@1.0",
@@ -2283,6 +2283,164 @@
     "rule": "A source fact is locked. Every assumption change requires a reason, author, timestamp, and before/after value."
   },
   "decision_rule": "Proof status and investment readiness are separate. Every material claim must be valued exactly once by a valid calculation proof, every evidence blocker must be resolved, and the model must be stock-specific before committee review. Only a human decision can authorize capital.",
+  "shared_forecast": {
+    "schema_version": "1.0",
+    "method_version": "shared-valuation-forecast/1.1",
+    "ticker": "0388.HK",
+    "status": "model_gap",
+    "research_only": true,
+    "requires_human_review": false,
+    "capital_actionable": false,
+    "as_of": "2026-08-04",
+    "model_as_of": "2026-08-04",
+    "quote": {
+      "value": 383.0,
+      "as_of": null,
+      "source_url": "Yahoo Finance close 2026-06-10 HKD (confirm live)",
+      "currency": null
+    },
+    "forecast_hash": "02153d9f3f60fe28c27a29ec301a698bcac014c8c51ddd718f40011b8022ef85",
+    "forward_irr_pct": {
+      "low": null,
+      "base": null,
+      "high": null
+    },
+    "present_value_today_per_share": {
+      "low": null,
+      "base": null,
+      "high": null
+    },
+    "model_present_value_per_share": {
+      "low": null,
+      "base": null,
+      "high": null
+    },
+    "required_return_pct": {
+      "low": null,
+      "base": null,
+      "high": null
+    },
+    "forward_cashflow_schedule": {},
+    "buy_prices": [],
+    "components": [
+      {
+        "component_id": "core_engine",
+        "method": "owner_cash_or_dividend_discount",
+        "status": "available",
+        "present_value_per_share": {
+          "low": 152.47,
+          "base": 243.82,
+          "high": 299.64
+        }
+      },
+      {
+        "component_id": "reinvestment_or_assets",
+        "method": "owner_earnings_reinvestment_dcf",
+        "status": "model_gap",
+        "present_value_per_share": {}
+      },
+      {
+        "component_id": "net_financial_claims",
+        "method": "net_asset_value",
+        "status": "model_gap",
+        "present_value_per_share": {
+          "low": 0.0
+        }
+      },
+      {
+        "component_id": "downside_reserve",
+        "method": "midcycle_capacity_value",
+        "status": "model_gap",
+        "present_value_per_share": {}
+      }
+    ],
+    "gaps": [
+      {
+        "component_id": "reinvestment_or_assets",
+        "case": "low",
+        "code": "realization_timing_missing:reinvestment_value_per_share"
+      },
+      {
+        "component_id": "reinvestment_or_assets",
+        "case": "base",
+        "code": "realization_timing_missing:reinvestment_value_per_share"
+      },
+      {
+        "component_id": "reinvestment_or_assets",
+        "case": "high",
+        "code": "realization_timing_missing:reinvestment_value_per_share"
+      },
+      {
+        "component_id": "net_financial_claims",
+        "case": "base",
+        "code": "realization_timing_missing:net_financial_per_share"
+      },
+      {
+        "component_id": "net_financial_claims",
+        "case": "high",
+        "code": "realization_timing_missing:net_financial_per_share"
+      },
+      {
+        "component_id": "downside_reserve",
+        "case": "low",
+        "code": "realization_timing_missing:normalized_owner_cash"
+      },
+      {
+        "component_id": "downside_reserve",
+        "case": "base",
+        "code": "realization_timing_missing:normalized_owner_cash"
+      },
+      {
+        "component_id": "downside_reserve",
+        "case": "high",
+        "code": "realization_timing_missing:normalized_owner_cash"
+      }
+    ],
+    "warnings": [],
+    "source_refs": [
+      {
+        "node_id": "normalized_owner_cash",
+        "ref": "0388.HK/investor-documents/ir-0388.hk/260316sr_e.pdf",
+        "locator": "FY2025 basic EPS HK$14.05; normalized to HK$11 for peak turnover and margin-fund pass-through",
+        "as_of": "2026-03-16",
+        "source_id": "73217af3308cdf6a368c97b72eb6ae353028cee0d526bd287db9244eec5da459"
+      },
+      {
+        "node_id": "revenue_b",
+        "ref": "0388.HK/official-reports/annual-reports/annual_report_fy2024.pdf",
+        "locator": "FY2024 revenue and other income HK$22.4B (+9% YoY)",
+        "as_of": "2025-03-17",
+        "source_id": "0ff547cee9af5cd3313d747a3cb45bd6f48302aaaa9cce14d66a119c4540fec0"
+      },
+      {
+        "node_id": "profit_b",
+        "ref": "0388.HK/official-reports/annual-reports/annual_report_fy2024.pdf",
+        "locator": "FY2024 profit attributable HK$13.1B (+10% YoY); basic EPS HK$10.32",
+        "as_of": "2025-03-17",
+        "source_id": "c5bd9c75da7547adabc2a73ceda7215bb61894753db89ed08fb5a45b7881b96d"
+      },
+      {
+        "node_id": "parent_equity_b",
+        "ref": "0388.HK/official-reports/annual-reports/annual_report_fy2024.pdf",
+        "locator": "Equity context; clearing member deposits and margin funds largely pass-through per annual report notes",
+        "as_of": "2025-03-17",
+        "source_id": "0cfdce92d0fbbbe6a647fe24c6e458f175785129d0dfa931de00d62c4e476eec"
+      },
+      {
+        "node_id": "shares_m",
+        "ref": "0388.HK/investor-documents/ir-0388.hk/260316ar_e.pdf",
+        "locator": "1,267,836,895 HKEX shares in issue as at 31 December 2025 (FY2025 annual report shareholder information; unchanged vs 31 December 2024)",
+        "as_of": "2026-03-16",
+        "source_id": "75812c1eef6ba2ef5bf8a97f88e3cfc778df9df5a1d1097b9217f4c2b9b356c1"
+      }
+    ],
+    "next_action": "automatic_model_refresh",
+    "reconciliation": {
+      "passed": false
+    },
+    "settlement_policy": "Explicit cash/debt additions in an operating DCF are time-zero acquisition adjustments; hypothetical settlement, not declared dividends.",
+    "calculation_id": "923fa00c573552760f72c2a7d4edd0b4f33b6b3e4e6654312533218d5bc1d4e6"
+  },
   "authority": "universal_valuation_contract",
   "legacy_reference_present": true,
   "falsifier_coverage": {

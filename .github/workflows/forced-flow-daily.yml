@@ -26,6 +26,10 @@ jobs:
   refresh:
     runs-on: ubuntu-latest
     timeout-minutes: 20
+    env:
+      RESEARCH_VAULT_REPO_URL: ${{ secrets.RESEARCH_VAULT_REPO_URL }}
+      RESEARCH_VAULT_CLONE_TOKEN: ${{ secrets.RESEARCH_VAULT_CLONE_TOKEN }}
+      RESEARCH_VAULT_ROOT: _external/research-vault
     steps:
       - uses: actions/checkout@v4
         with:
@@ -37,6 +41,8 @@ jobs:
           fetch-depth: 1
       - name: Checkout dashboard data workspace
         run: bash _system/scripts/ci_checkout_workspace.sh dashboard
+      - name: Checkout research vault
+        uses: ./.github/actions/checkout-vault
       - uses: actions/setup-python@v5
         with:
           python-version: "3.12"

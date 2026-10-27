@@ -307,7 +307,7 @@ def screen_ticker(cik: str, facts: dict | None = None) -> dict:
 
     # IFRS filers (Cemex files 20-F under ifrs-full) carry no us-gaap namespace at
     # all. Say so on the row rather than returning a blank that reads as a bug.
-    if not any(data.get('facts',{}).get(ns) for ns in ['us-gaap','ifrs-full']):
+    if not data.get("facts", {}).get("us-gaap"):
         namespaces = ", ".join(sorted(data.get("facts", {}).keys())) or "none"
         return {
             "cik": cik,
@@ -317,24 +317,10 @@ def screen_ticker(cik: str, facts: dict | None = None) -> dict:
 
     observed = datetime.now(timezone.utc).isoformat()
     observations = collect(data, '', cik, observed)
-    if str(cik).lstrip('0')=='918646':
-        # Eagle's consolidated statement presents pretax earnings, net interest
-        # and other nonoperating income rather than a tagged operating subtotal.
-        periods={}
-        for row in observations:
-            periods.setdefault((row.get('period_start'),row['period_end'],row['period_type']),{})[row['metric']]=row
-        for (start,end,kind),inputs in periods.items():
-            keys=['pretax_income_usd','interest_expense_usd','nonoperating_income_usd']
-            if start and 'operating_income_usd' not in inputs and all(k in inputs for k in keys):
-                observations.append({**inputs[keys[0]],'metric':'operating_income_usd',
-                    'value':inputs[keys[0]]['value']+inputs[keys[1]]['value']-inputs[keys[2]]['value'],
-                    'status':'derived','locator':'Consolidated earnings: pretax + net interest - other nonoperating income',
-                    'inputs':[inputs[k] for k in keys],'formula_version':'exp-operating-subtotal-v1'})
     history = financial_history(observations)
     annual = [r for r in history if r['period_type']=='FY' and r.get('revenue_usd') is not None]
     if not annual:
-        prefix='IFRS filer (ifrs-full): ' if data.get('facts',{}).get('ifrs-full') and not data.get('facts',{}).get('us-gaap') else ''
-        return {'cik':cik,'sec_error':prefix+'No comparable full-year USD financial observations'}
+        return {'cik':cik,'sec_error':'No comparable full-year USD financial observations'}
     latest = annual[-1]
     balance_dates = sorted({r['period_end'] for r in observations if r['period_type']=='instant'})
     balance_date = balance_dates[-1] if balance_dates else latest['period_end']

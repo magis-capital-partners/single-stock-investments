@@ -32,6 +32,7 @@ while the reverted-from content is still deploying can be judged "already
 deployed" by its gate; the next trigger of any kind compares against the
 finished deploy and ships it.
 """
+
 from __future__ import annotations
 
 import argparse
@@ -52,6 +53,30 @@ DEPLOY_INPUTS = (
     "dashboard",
     "_system/data/evidence_recovery_queue.json",
     "_system/scripts/build_cloudflare_pages_site.py",
+    "_system/scripts/build_company_research.py",
+    "_system/scripts/company_sources.py",
+    "_system/scripts/company_research_themes.json",
+    "_system/scripts/stage_company_research.py",
+    "_system/scripts/stage_investor_history.py",
+    "_system/scripts/investor_universe.py",
+    "_system/scripts/investor_corpus.py",
+    "_system/scripts/build_superinvestor_insights.py",
+    "_system/scripts/fund_registry.py",
+    "_system/scripts/fund_identity.py",
+    "_system/scripts/letter_dedup.py",
+    "_system/scripts/letter_date_parser.py",
+    "_system/reference/investors/public_roster.json",
+    "_system/reference/investors/manager_aliases.json",
+    "_system/reference/investors/historical_filers.json",
+    "_system/scripts/investor_history.py",
+    "_system/scripts/investor_history_checkpoint.py",
+    "_system/scripts/global_disclosures.py",
+    "_system/scripts/public_holdings.py",
+    "_system/scripts/letter_holdings_tables.py",
+    "_system/reference/investors/public_holdings_sources.json",
+    "_system/reference/investors/required_managers.json",
+    "_system/scripts/private_dashboard_assets.py",
+    "_system/scripts/stage_pages_functions.py",
     "_system/scripts/validate_portfolio_private_boundary.py",
     "_system/scripts/reconcile_insights_event_summary.py",
     "_system/scripts/export_dashboard_d1_seed.py",
@@ -62,13 +87,17 @@ DEPLOY_INPUTS = (
     "_system/scripts/ci_dashboard_deploy_mode.sh",
     ".github/workflows/dashboard-pages.yml",
     ".github/actions/deploy-cloudflare-dashboard",
+    ".github/actions/preserve-private-dashboard",
+    ".github/actions/checkout-vault",
     ".github/actions/publish-dashboard",
 )
 
 ALWAYS_DEPLOY_EVENTS = {"workflow_dispatch"}
 
 
-def object_ids(rev: str = "HEAD", paths: tuple[str, ...] = DEPLOY_INPUTS, cwd: Path | None = None) -> dict[str, str]:
+def object_ids(
+    rev: str = "HEAD", paths: tuple[str, ...] = DEPLOY_INPUTS, cwd: Path | None = None
+) -> dict[str, str]:
     """Git object id per path at ``rev`` ("absent" when the path does not exist).
 
     Asks only for %(objectname), which git resolves from tree objects without
@@ -95,9 +124,13 @@ def object_ids(rev: str = "HEAD", paths: tuple[str, ...] = DEPLOY_INPUTS, cwd: P
     return out
 
 
-def fingerprint(rev: str = "HEAD", paths: tuple[str, ...] = DEPLOY_INPUTS, cwd: Path | None = None) -> str:
+def fingerprint(
+    rev: str = "HEAD", paths: tuple[str, ...] = DEPLOY_INPUTS, cwd: Path | None = None
+) -> str:
     ids = object_ids(rev, paths, cwd)
-    payload = FINGERPRINT_VERSION + "\n" + "".join(f"{path} {ids[path]}\n" for path in paths)
+    payload = (
+        FINGERPRINT_VERSION + "\n" + "".join(f"{path} {ids[path]}\n" for path in paths)
+    )
     return hashlib.sha256(payload.encode("utf-8")).hexdigest()
 
 
@@ -131,7 +164,10 @@ def decide(
     if event == "schedule" and not pruned_today:
         return True, "inputs unchanged, but today's D1 retention has not run"
     if event in {"workflow_run", "schedule", "push"}:
-        return False, "deploy inputs unchanged: the last deploy shipped and synced exactly these"
+        return (
+            False,
+            "deploy inputs unchanged: the last deploy shipped and synced exactly these",
+        )
     return True, f"unrecognized event {event!r}; deploying to be safe"
 
 
@@ -179,18 +215,20 @@ def main(argv: list[str] | None = None) -> int:
 
     dc = sub.add_parser("decide", help="turn cache lookups into should_deploy")
     dc.add_argument("--event", required=True)
-    dc.add_argument("--fingerprint", default="", help="this run's deploy-input fingerprint")
+    dc.add_argument(
+        "--fingerprint", default="", help="this run's deploy-input fingerprint"
+    )
     dc.add_argument(
         "--last-file",
         default="",
         help="file holding the last fully synced deploy's fingerprint (restored from "
-             "the newest dashboard-deploy-last-v1- cache entry); missing means unknown",
+        "the newest dashboard-deploy-last-v1- cache entry); missing means unknown",
     )
     dc.add_argument(
         "--shipped-file",
         default="",
         help="file holding the last deploy's fingerprint that shipped Pages, D1 synced or "
-             "not (restored from the newest dashboard-deploy-shipped-v1- cache entry)",
+        "not (restored from the newest dashboard-deploy-shipped-v1- cache entry)",
     )
     dc.add_argument("--deferred-hit", default="false")
     dc.add_argument("--pruned-hit", default="false")
@@ -198,10 +236,13 @@ def main(argv: list[str] | None = None) -> int:
 
     args = parser.parse_args(argv)
     if args.command == "fingerprint":
-        _write_outputs(args.github_output, {
-            "hash": fingerprint(args.rev),
-            "utc_date": datetime.now(timezone.utc).strftime("%Y-%m-%d"),
-        })
+        _write_outputs(
+            args.github_output,
+            {
+                "hash": fingerprint(args.rev),
+                "utc_date": datetime.now(timezone.utc).strftime("%Y-%m-%d"),
+            },
+        )
         return 0
     last = last_deployed(args.last_file)
     shipped = last_deployed(args.shipped_file)
@@ -212,12 +253,15 @@ def main(argv: list[str] | None = None) -> int:
         deferred_today=_flag(args.deferred_hit),
         pruned_today=_flag(args.pruned_hit),
     )
-    _write_outputs(args.github_output, {
-        "should_deploy": "true" if deploy else "false",
-        "reason": reason,
-        "last_deployed": last or "none",
-        "last_shipped": shipped or "none",
-    })
+    _write_outputs(
+        args.github_output,
+        {
+            "should_deploy": "true" if deploy else "false",
+            "reason": reason,
+            "last_deployed": last or "none",
+            "last_shipped": shipped or "none",
+        },
+    )
     return 0
 
 

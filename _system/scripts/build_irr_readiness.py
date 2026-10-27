@@ -18,6 +18,12 @@ from tci_return_bridge import build_bridge, number
 from universal_valuation_contract import normalize_forward_cashflow_schedule
 
 ROOT = Path(__file__).resolve().parents[2]
+# Same 6.0 MB boot budget as validate_dashboard_data.CORE_MAX_MB (size / 1e6).
+CORE_MAX_MB = 6.0
+# assess_company reads only these row fields besides ticker. A shard fills one
+# in when the boot row no longer carries it. A value already on the boot row
+# stays, so a detail shard cannot change the score.
+_ROW_FIELDS_FROM_SHARD = ("company", "units", "valuation_decision")
 
 
 def read_json(path: Path) -> dict:
@@ -133,8 +139,16 @@ def build_report(rows: list[dict], root: Path, as_of: date) -> dict:
     tickers = [r.get("ticker") for r in rows]
     if not tickers or not all(tickers) or len(set(tickers)) != len(tickers):
         raise ValueError("IRR coverage requires a nonempty universe of unique tickers.")
-    companies = [assess_company(row, read_json(root / row["ticker"] / "research/valuation.json"),
-        read_json(root / row["ticker"] / "research/valuation_contract.json"), as_of=as_of) for row in rows]
+    def evidence(relative):
+        document=read_json(root / relative)
+        if document.get("private_snapshot"):
+            # A private pointer is an access/restore issue, never an empty
+            # issuer model. Fail before replacing the last valid readiness run.
+            from private_dashboard_assets import read_resolved_json
+            document, _=read_resolved_json(root, relative)
+        return document
+    companies = [assess_company(row, evidence(f'{row["ticker"]}/research/valuation.json'),
+        evidence(f'{row["ticker"]}/research/valuation_contract.json'), as_of=as_of) for row in rows]
     return report_for_companies(companies, as_of)
 
 
@@ -161,36 +175,133 @@ def attach_readiness(row: dict, company: dict, *, detailed: bool) -> None:
     gate_return_claims(row)
 
 
+def _private_snapshot(document: dict) -> bool:
+    return document.get("private_snapshot") is True
+
+
+def _load_served_json(data_dir: Path, relative_under_data: str, *, required: bool) -> dict | None:
+    """Read a served JSON file. A private snapshot is read from the vault object.
+
+    Nothing is copied onto the public file. required is for the boot file: a
+    missing vault must stop the publish rather than shrink the universe to the
+    few shard files that are still public.
+    """
+    public = read_json(data_dir / relative_under_data)
+    if not _private_snapshot(public):
+        return public
+    relative = "data/" + relative_under_data.replace("\\", "/")
+    message = (
+        f"{relative} is a private snapshot. "
+        "Check out the research vault before building IRR readiness."
+    )
+    from private_dashboard_assets import overlay_manifest, private_source
+    if relative not in (overlay_manifest(data_dir.parent).get("assets") or {}):
+        if required:
+            raise ValueError(message)
+        return None
+    try:
+        resolved = private_source(data_dir.parent, relative)
+    except (RuntimeError, ValueError) as exc:
+        raise ValueError(message) from exc
+    loaded = read_json(resolved)
+    if _private_snapshot(loaded):
+        if required:
+            raise ValueError(message)
+        return None
+    return loaded
+
+
+def universe_rows(data_dir: Path) -> list[dict]:
+    """Ticker rows for the readiness score.
+
+    The public boot file used to carry tickers. It is now often a private
+    snapshot, and the array lives in the vault object for data/core.json.
+    Company, units, and the valuation decision are read from a ticker shard
+    when the boot row does not have them. A shard never replaces a value the
+    boot row already has.
+    """
+    core = _load_served_json(data_dir, "core.json", required=True) or {}
+    rows = [row for row in core.get("tickers") or [] if isinstance(row, dict)]
+    by_ticker: dict[str, dict] = {}
+    for row in rows:
+        ticker = row.get("ticker")
+        if ticker and ticker not in by_ticker:
+            by_ticker[ticker] = row
+    tickers_dir = data_dir / "tickers"
+    if not tickers_dir.is_dir():
+        return rows
+    for path in sorted(tickers_dir.glob("*.json")):
+        shard = _load_served_json(data_dir, f"tickers/{path.name}", required=False)
+        if not shard:
+            continue
+        ticker = shard.get("ticker")
+        if not ticker:
+            continue
+        row = by_ticker.get(ticker)
+        if row is None:
+            row = {"ticker": ticker}
+            by_ticker[ticker] = row
+            rows.append(row)
+        for field in _ROW_FIELDS_FROM_SHARD:
+            if not row.get(field) and shard.get(field):
+                row[field] = shard[field]
+    return rows
+
+
 def publish(data_dir: Path, root: Path, as_of: date, *, check=False) -> dict:
-    core = read_json(data_dir / "core.json")
-    report = build_report(core["tickers"], root, as_of)
+    public_core_path = data_dir / "core.json"
+    public_core = read_json(public_core_path)
+    rows = universe_rows(data_dir)
+    report = build_report(rows, root, as_of)
     serialized = json.dumps(report, ensure_ascii=False, separators=(",", ":")) + "\n"
     path = data_dir / "irr_readiness.json"
+    by_ticker = {company["ticker"]: company for company in report["companies"]}
     if check:
         if not path.is_file() or read_json(path) != report:
             raise ValueError("IRR readiness is stale; rebuild with the same --as-of date.")
-        from build_dashboard_shards import shard_filename
-        for row, company in zip(core["tickers"], report["companies"]):
-            expected = {}
-            attach_readiness(expected, company, detailed=False)
-            if row.get("irr_readiness") != expected["irr_readiness"]:
-                raise ValueError(f'{row["ticker"]}: core IRR checklist is stale.')
-            detail = read_json(data_dir / "tickers" / shard_filename(row["ticker"]))
-            if detail.get("irr_readiness") != company:
-                raise ValueError(f'{row["ticker"]}: detail IRR checklist is stale or missing.')
+        if not _private_snapshot(public_core):
+            for row in public_core.get("tickers") or []:
+                company = by_ticker.get(row.get("ticker"))
+                expected = {}
+                if company is not None:
+                    attach_readiness(expected, company, detailed=False)
+                if company is None or row.get("irr_readiness") != expected["irr_readiness"]:
+                    raise ValueError(f'{row.get("ticker")}: core IRR checklist is stale.')
+        for detail_path in sorted((data_dir / "tickers").glob("*.json")):
+            detail = read_json(detail_path)
+            if _private_snapshot(detail):
+                continue
+            ticker = detail.get("ticker")
+            if ticker in by_ticker and detail.get("irr_readiness") != by_ticker[ticker]:
+                raise ValueError(f"{ticker}: detail IRR checklist is stale or missing.")
     else:
+        core_payload = None
+        if not _private_snapshot(public_core):
+            for row in public_core.get("tickers") or []:
+                company = by_ticker.get(row.get("ticker"))
+                if company is None:
+                    continue
+                attach_readiness(row, company, detailed=False)
+                row.pop("return_claim_audit", None)
+            public_core.setdefault("summary", {})["irr_readiness"] = report["summary"]
+            core_payload = json.dumps(public_core, ensure_ascii=False, separators=(",", ":"))
+            size_mb = len(core_payload.encode("utf-8")) / 1e6
+            if size_mb > CORE_MAX_MB:
+                raise ValueError(
+                    f"core.json would be {size_mb:.2f} MB (budget {CORE_MAX_MB} MB). "
+                    "The boot file was left unchanged."
+                )
         write_text_if_changed(path, serialized)
-        by_ticker = {c["ticker"]: c for c in report["companies"]}
-        for row in core["tickers"]:
-            attach_readiness(row, by_ticker[row["ticker"]], detailed=False)
-            row.pop("return_claim_audit", None)
-        core.setdefault("summary", {})["irr_readiness"] = report["summary"]
-        write_text_if_changed(data_dir / "core.json", json.dumps(core, ensure_ascii=False, separators=(",", ":")))
-        for path in sorted((data_dir / "tickers").glob("*.json")):
-            row = read_json(path)
-            if row.get("ticker") in by_ticker:
-                attach_readiness(row, by_ticker[row["ticker"]], detailed=True)
-                write_text_if_changed(path, json.dumps(row, ensure_ascii=False, separators=(",", ":")))
+        if core_payload is not None:
+            write_text_if_changed(public_core_path, core_payload)
+        for detail_path in sorted((data_dir / "tickers").glob("*.json")):
+            detail = read_json(detail_path)
+            if _private_snapshot(detail):
+                continue
+            ticker = detail.get("ticker")
+            if ticker in by_ticker:
+                attach_readiness(detail, by_ticker[ticker], detailed=True)
+                write_text_if_changed(detail_path, json.dumps(detail, ensure_ascii=False, separators=(",", ":")))
     return report
 
 

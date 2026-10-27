@@ -96,6 +96,7 @@
   }
 
   async function fillManagersPage() {
+    if (window.InvestorHistory) return window.InvestorHistory.fill();
     const root=document.getElementById('managers-page'); if(!root)return;
     try {
       const response=await fetch(dataUrl('data/holdings/managers_index.json'));
@@ -122,7 +123,8 @@
           detail.innerHTML=`<h3>${escapeHtml(d.name)}</h3><p>Holdings: ${escapeHtml(d.period_end || d.quarter || 'undated')}<br>Filed: ${escapeHtml(d.filed_at || d.filing_date || 'See SEC filing history')}</p>
             <p><a href="https://www.sec.gov/cgi-bin/browse-edgar?action=getcompany&CIK=${encodeURIComponent(d.cik || '')}&type=13F-HR" target="_blank" rel="noopener">SEC filing history</a></p>
             <div class="workspace-scroll"><table class="workspace-table"><thead><tr><th>Position</th><th>Weight</th><th>Value</th></tr></thead><tbody>${positions.map(r=>`<tr><td>${escapeHtml(r.ssi_ticker || r.ticker || r.issuer)}<small>${escapeHtml(r.issuer)}</small></td><td>${r.weight_pct==null?'—':Number(r.weight_pct).toFixed(1)+'%'}</td><td>${money(r.value_usd)}</td></tr>`).join('')}</tbody></table></div>
-            <details class="workspace-fold"><summary>Changes in our book · ${(d.ssi_changes || []).length}</summary>${(d.ssi_changes || []).map(r=>`<p>${escapeHtml(r.change_type)} ${escapeHtml(r.ticker)}</p>`).join('') || '<p>No changes recorded.</p>'}</details>`;
+            <details class="workspace-fold"><summary>Changes in our book · ${(d.ssi_changes || []).length}</summary>${(d.ssi_changes || []).map(r=>`<p>${escapeHtml(r.change_type)} ${escapeHtml(r.ticker)}</p>`).join('') || '<p>No changes recorded.</p>'}</details>
+            ${d.watchlist ? `<details class="workspace-fold"><summary>All reported changes · ${(d.changes || []).length}</summary>${(d.changes || []).map(r=>`<p>${escapeHtml(r.change_type)} ${escapeHtml(r.ticker || r.issuer || r.cusip || "position")}${r.shares_delta_pct==null?'':` ${Number(r.shares_delta_pct).toFixed(1)}%`}</p>`).join('') || '<p>No changes at the reporting threshold.</p>'}</details>` : ''}`;
           detail.focus({preventScroll:true});if(window.innerWidth<900)detail.scrollIntoView({block:'start'});
         } catch(e) { if(ticket===request && root.isConnected)detail.textContent=e.message; }
       }

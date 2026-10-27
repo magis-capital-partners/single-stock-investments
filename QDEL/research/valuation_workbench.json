@@ -1,7 +1,7 @@
 {
   "schema_version": "3.0",
   "ticker": "QDEL",
-  "as_of": "2026-10-26",
+  "as_of": "2026-10-27",
   "proof_status": "decision_grade",
   "model_level": "stock_specific",
   "model_level_reason": "The proof-complete model uses stock-specific components and assumptions.",
@@ -15,7 +15,9 @@
     "model_as_of": "2026-07-21",
     "latest_fact_as_of": "2026-03-29",
     "oldest_fact_as_of": "2025-12-28",
-    "price_as_of": "2026-08-31"
+    "price_as_of": "2026-08-31",
+    "forecast_as_of": "2026-07-21",
+    "calculation_as_of": "2026-08-31"
   },
   "legacy_audit": {
     "actionable": false,
@@ -70,18 +72,20 @@
       "high": null
     },
     "forward_return_status": "withheld",
-    "forward_return_reason": "present_value_today cannot be annualized as a future payoff",
+    "forward_return_reason": "shared_forecast_incomplete",
     "required_return_pct": 10.0,
     "downside_to_low_pct": -87.6,
     "unvalued_component_count": 0,
     "unresolved_evidence_count": 0,
     "proof_complete_pct": 100.0,
-    "model_hash": "ad5925adbba7485287d3ba6218dd7f3d52bd68da0df15f7304958efa0f71aeef",
+    "model_hash": "8be5bf327f1db896b42da8f9247fa9be97e12dc12b7eb28e590e776df2b32282",
     "dates": {
       "model_as_of": "2026-07-21",
       "latest_fact_as_of": "2026-03-29",
       "oldest_fact_as_of": "2025-12-28",
-      "price_as_of": "2026-08-31"
+      "price_as_of": "2026-08-31",
+      "forecast_as_of": "2026-07-21",
+      "calculation_as_of": "2026-08-31"
     },
     "legacy_audit": {
       "actionable": false,
@@ -102,7 +106,11 @@
     },
     "primary_power_zone": "High-return compounder",
     "owner_decision": null,
-    "next_action": "Complete the next hash-bound isolated outputs: pre_mortem.json, round_1/buffett_weschler.json, round_1/hohn.json, round_1/marathon_capital_cycle.json."
+    "next_action": "Complete the next hash-bound isolated outputs: pre_mortem.json, round_1/buffett_weschler.json, round_1/hohn.json, round_1/marathon_capital_cycle.json.",
+    "forecast_id": "7404b3a3448822be58d36aad7cdd36bed84eb79cfddcc9aaba347064af24aed3",
+    "calculation_status": "model_gap",
+    "research_return_available": false,
+    "calculation_reason": "realization_timing_missing:incremental_option_per_share; realization_timing_missing:near_term_owner_cash_claim_m; realization_timing_missing:value_per_share"
   },
   "business": {
     "status": "complete",
@@ -2501,7 +2509,9 @@
       "model_as_of": "2026-07-21",
       "latest_fact_as_of": "2026-03-29",
       "oldest_fact_as_of": "2025-12-28",
-      "price_as_of": "2026-08-31"
+      "price_as_of": "2026-08-31",
+      "forecast_as_of": "2026-07-21",
+      "calculation_as_of": "2026-08-31"
     },
     "legacy_audit": {
       "actionable": false,
@@ -5143,7 +5153,7 @@
       }
     ],
     "change_control": {
-      "model_hash": "ad5925adbba7485287d3ba6218dd7f3d52bd68da0df15f7304958efa0f71aeef",
+      "model_hash": "8be5bf327f1db896b42da8f9247fa9be97e12dc12b7eb28e590e776df2b32282",
       "method_versions": [
         "net_asset_value@1.0",
         "owner_cash_or_dividend_discount@1.0",
@@ -5726,17 +5736,19 @@
   },
   "freshness": {
     "status": "stale",
-    "as_of": "2026-10-26",
+    "as_of": "2026-10-27",
     "dates": {
       "model_as_of": "2026-07-21",
       "latest_fact_as_of": "2026-03-29",
       "oldest_fact_as_of": "2025-12-28",
-      "price_as_of": "2026-08-31"
+      "price_as_of": "2026-08-31",
+      "forecast_as_of": "2026-07-21",
+      "calculation_as_of": "2026-08-31"
     },
     "age_days": {
-      "model_as_of": 97,
-      "latest_fact_as_of": 211,
-      "price_as_of": 56
+      "model_as_of": 98,
+      "latest_fact_as_of": 212,
+      "price_as_of": 57
     },
     "review_threshold_days": {
       "model_as_of": 365,
@@ -5744,7 +5756,7 @@
       "price_as_of": 7
     },
     "warnings": [
-      "price_as_of is 56 days old (review threshold 7)"
+      "price_as_of is 57 days old (review threshold 7)"
     ],
     "rule": "Freshness is disclosed separately from proof completeness; stale or undated inputs require review before a new capital decision."
   }

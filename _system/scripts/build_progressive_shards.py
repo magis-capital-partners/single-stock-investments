@@ -71,6 +71,44 @@ def _safe_shard_name(ticker: str) -> str:
     return _SAFE_TICKER_RE.sub("_", str(ticker).upper()) + ".json"
 
 
+def write_kpi_summary(payload: dict[str, Any], data_dir: Path = DATA_DIR) -> dict[str, Any]:
+    """Keep the startup preview bounded; retain every operating fact and source on demand."""
+    full_rows = payload.get("operating_latest") or []
+    full_path = data_dir / "operating_kpi_latest.json"
+    full = attach_envelope(
+        {"schema_version": "magis.operating_kpi_latest.v1",
+         "generated_at": payload.get("generated_at"), "as_of": payload.get("as_of"),
+         "rows": full_rows},
+        feed_id="dashboard-operating-kpi-latest", as_of=payload.get("as_of"),
+        row_count=len(full_rows),
+    )
+    write_json_if_changed(full_path, full, indent=None)
+    preview = {**payload, "inflections": list(payload.get("inflections") or []),
+               "operating_latest_count": len(full_rows),
+               "operating_latest_path": "dashboard/data/operating_kpi_latest.json",
+               "operating_latest": [
+                   {key: row[key] for key in ("ticker", "kpi", "label", "period", "value", "unit", "yoy", "yoy_basis") if key in row}
+                   for row in full_rows],
+               "preview_only": True}
+    envelope = payload.get("_envelope") or {}
+    while True:
+        preview = attach_envelope(
+            preview, feed_id=envelope.get("feed_id", "dashboard-kpi-summary"),
+            as_of=payload.get("as_of"), row_count=len(preview["inflections"]),
+            upstream_inputs=envelope.get("upstream_inputs") or [],
+        )
+        text = json.dumps(preview, separators=(",", ":"), ensure_ascii=False) + "\n"
+        if len(text.encode("utf-8")) < 100 * 1024:
+            write_text_if_changed(data_dir / "kpi_summary.json", text)
+            return preview
+        # Inflections already represent a ranked preview. Preserve all levels
+        # until even that alone exceeds the budget; complete rows remain above.
+        rows = preview["inflections"] or preview["operating_latest"]
+        if not rows:
+            raise ValueError("KPI summary metadata exceeds the L0 size budget")
+        rows.pop()
+
+
 def _index_kpi_by_ticker(kpi_payload: dict[str, Any]) -> tuple[dict[str, list[dict[str, Any]]], list[dict[str, Any]]]:
     """Extract compact per-ticker KPI series and top-level inflections."""
     by_ticker: dict[str, list[dict[str, Any]]] = defaultdict(list)
@@ -596,7 +634,7 @@ def build_all(target_tickers: list[str] | None = None, *, build_all_shards: bool
             }
         ],
     )
-    write_json_if_changed(DATA_DIR / "kpi_summary.json", kpi_summary)
+    write_kpi_summary(kpi_summary)
 
     # 4. Write L0 document_catalog_summary.json
     doc_cat_summary = attach_envelope(

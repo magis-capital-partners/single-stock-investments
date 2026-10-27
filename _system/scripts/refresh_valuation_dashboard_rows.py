@@ -195,21 +195,29 @@ def refresh_served_data(data_dir: Path, tickers: tuple[str, ...] | None = None) 
     core_path = data_dir / "core.json"
     core = json.loads(core_path.read_text(encoding="utf-8"))
     core_updated = 0
-    for row in core.get("tickers") or []:
+    # A private snapshot is a metadata placeholder. Stamping generated_at on it
+    # changes the public digest, and the next vault read then refuses the file.
+    # The ticker rows live in the vault object; leave the placeholder alone.
+    if core.get("private_snapshot") is True:
+        core = None
+    for row in (core or {}).get("tickers") or []:
         ticker = str(row.get("ticker") or "").upper()
         if wanted is not None and ticker not in wanted:
             continue
         core_updated += int(_attach_current_valuation(row, include_detail=False))
-    _refresh_summary(core)
-    power_zones = load_power_zones()
-    if power_zones:
-        core["power_zones"] = power_zones
-    core["generated_at"] = datetime.now(timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ")
-    write_text_if_changed(core_path, json.dumps(core, separators=(",", ":")))
+    if core is not None:
+        _refresh_summary(core)
+        power_zones = load_power_zones()
+        if power_zones:
+            core["power_zones"] = power_zones
+        core["generated_at"] = datetime.now(timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ")
+        write_text_if_changed(core_path, json.dumps(core, separators=(",", ":")))
 
     shard_updated = 0
     for path in sorted((data_dir / "tickers").glob("*.json")):
         row = json.loads(path.read_text(encoding="utf-8"))
+        if row.get("private_snapshot") is True:
+            continue
         ticker = str(row.get("ticker") or "").upper()
         if wanted is not None and ticker not in wanted:
             continue

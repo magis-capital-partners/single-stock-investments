@@ -48,6 +48,14 @@ Rules that keep SPX safe (test-enforced where noted):
    NBBO stream. The bridge uses `snapshot=True` only, cancels in `finally`,
    and is leak-tested (50 quotes → 0 open lines, ≤1 concurrent). Keep it
    that way; never add a streaming subscription to the hub.
+
+   **Measured 2026-10-27 16:20 ET** (spx-0dte
+   `scripts/probe_market_data_lines.py`, client 19, off-hours,
+   owner-approved): no error 101 at **504** simultaneous lines, the most one
+   0DTE expiry qualified. Whether the pool holds the ~600 that SPX (~440) plus
+   the two etf-0dte executors (80 each) need is NOT yet proven: the probe now
+   ladders across `--max-expiries`, so the next owner-approved run is
+   `--target 600 --max-expiries 3`, then 640.
 5. **`reqAutoOpenOrders` must never appear in this repo** (test-enforced) —
    binding TWS orders is how a hub session could end up owning SPX orders.
 6. **Never stop/restart the Gateway process** or flip its global Read-Only
@@ -55,6 +63,16 @@ Rules that keep SPX safe (test-enforced where noted):
    are disconnected. spx-0dte's `ibc_guard` restart carve-out requires
    independent evidence that the protected executor is dead, in addition to
    its handshake checks and restart cap. SSI never invokes that carve-out.
+
+   *Note (spx-0dte plan W7, 2026-10-27; a reading of the carve-out, not a
+   change to it):* the executor-dead evidence is the **SPX** executor's
+   (client 17) and only its. The etf-0dte executors (50/51) and their
+   watchdogs (130/131) share this Gateway, and `ibc_guard` reads their lock
+   and heartbeat for PAGING only: a dead ETF heartbeat, a missing ETF lock or
+   a failed ETF connect never counts toward the one remedial restart, because
+   the restart hits SPX (spx-0dte
+   `live/test_etf_watchdog.py::GuardEtfEvidenceIsPagingOnly`). An ETF
+   watchdog's dead-executor response never touches the Gateway process either.
 7. **Background jobs deployed to NY4** (Whisper backfill and other non-Gateway
    batch work) run
    `Nice≥15` + `CPUQuota` + `IOSchedulingClass=idle` so the SPX executor never
@@ -119,3 +137,84 @@ Local checks that do not touch the Gateway:
 python _system/scripts/check_ib_gateway_registry.py --skip-mirrors --scan-ssi
 python _system/scripts/check_ib_gateway_registry.py  # manual cross-repo mirror check
 ```
+
+## ThetaData seat (one key, one terminal) — DO NOT VIOLATE
+
+The ThetaData key is **shared with spx-0dte, and spx-0dte is the protected
+party** — the same standing as the Gateway contract above. Mirrored
+machine-wide in `~/.claude/CLAUDE.md`, in spx-0dte's `AGENTS.md` (Rule 0T) and
+in ls-algo's `CLAUDE.md`; they must agree.
+
+**One key holds ONE terminal session and the NEWEST login wins.** A second
+login invalidates the first one's session: the loser keeps answering
+`/v3/terminal/mdds/status` with `CONNECTED` while every data endpoint returns
+**HTTP 478**. That is not a crash, so `Restart=always` never fires and the
+terminal serves nothing for hours behind green health checks (2026-09-08
+twice, 2026-09-10). During the session NY4's terminal is the **live SPX
+executor's market-data source**; taking it blinds live trading, and running SPX
+on its IB fallback flips its skew gate on ~12.8% of minutes.
+
+**RULE: during the seat window — 07:45–16:15 ET, Mon–Fri, US holidays
+excluded — nothing in this repo touches ThetaData**, and **never start a local
+ThetaTerminal, at any hour**. The window is wider than RTH on purpose: it runs
+from 07:45 (the owner moved it from 08:40 on 2026-09-29, because spx-0dte's
+early-ORB pre-open job reads NY4's terminal from 07:55) through spx-0dte's
+16:15 pull. If a pull genuinely cannot wait, stop and ask the user in chat and
+say why it cannot wait until after 16:15 ET; approval for one such action never
+carries to the next.
+
+**What takes or shares the seat here:**
+
+- `_system/research/systematic_flows_volatility/`: `scripts/check_data_access.py`
+  and `scripts/collect_and_analyze_event.py` (both `from thetadata import
+  ThetaClient` with `THETADATA_API_KEY`: running either is a login, and a login
+  takes the seat), and the vendored
+  `internal_ls_algo/code_and_config/bucket5_theta.py` (same hazard). Research
+  scripts with no schedule, which is exactly why they are easy to run without
+  thinking.
+- `_external/single_stock_options/pull_greeks_eod.py` (+ `run_overnight.py`,
+  `pull_entry_snapshots.py`, `speed_test*.py`; git-ignored): BORROWS NY4's seat
+  through spx-0dte's `theta_seat.borrowed_seat()`, never a local terminal, and
+  stands aside for the seat window, 16:00–19:00, and while spx-0dte's nightly is
+  still running. Halt it with a `STOP` file in that folder.
+
+**The etf-0dte executors are consumers too, through ONE lane.** spx-0dte's
+`etf-executor@spy` (client 50) and `@qqq` (client 51) read NY4's terminal for
+their DECISIONS only, through spx-0dte's `live/etf_vendor_lane.py` (owner
+design 2026-10-25, spx-0dte `notes/etf_decision_timing_2026-10-26.md`); IB keeps
+their orders, stops and rails. The budget is the STANDARD tier's 4 concurrent
+requests: SPX's spot worker, SPX's chain worker (its aligned rounds ride it),
+SPX's executor-thread snapshots, and ONE ETF lane. The lane is enforced, not
+scheduled:
+
+- an OS lock, `live_paths.etf_vendor_lane_lock_path()`
+  (`data/live/etf_vendor_lane.lock` on NY4, flock), held from before a burst to
+  its last answer, so only one ETF request is ever out. A lane that cannot take
+  it by its first round yields that slot to IB;
+- one request in flight per process; 5 whole-expiry snapshots per slot at the
+  product's planned second (SPX's S +20 s SPY, +40 s QQQ, mod 60), 24 slots =
+  120 requests a product a session, capped at 150; a timeout stops the burst
+  and holds the lock 3 s more, because the abandoned request still runs on the
+  terminal;
+- it needs SPX's vendor-row capture shadow OFF (disarmed in ACTIVE since
+  spx-0dte #437).
+
+**The lane ships DISARMED.** Its arming pair,
+`enable_vendor_decision_lane_live` (False) and
+`vendor_decision_lane_shadow_only` (True), is elided from spx-0dte's release
+train at those pins and is armed only on an ETF config
+(`live/etf_live_strategy.py`); SPX's config is refused. Arming it (shadow,
+then on) is the owner's decision.
+
+**The yield rule (SPX is the protected party).** Before every read the ETF
+reads SPX's `heartbeat.json` `risk.data_source.theta_health` and decides that
+slot on IB if SPX's feed looks stressed or cannot be seen: heartbeat missing or
+older than 20 s, SPX not trading, no vendor witness, terminal unreachable or
+disconnected, a new 478, a stall in the last 60 s, a tick older than 5 s, p50
+over 80 ms or p95 over 450 ms (3x the 2026-10-23 26/149 ms), p50 over 1.5x its
+session baseline, or an SPX tranche due. Three transport failures, three
+timeouts, any 478 on its own request, or two SPX stalls overlapping its bursts
+switch it off for the session. `DISABLE_ETF_VENDOR_LANE` in `data/live/` (both)
+or `data/live/<product>/` stops it without a restart. The lane is live
+trading's own use of the seat, like SPX's: it is never a pull, never an agent's
+tool, and no test of it may reach the terminal (its tests use fakes).

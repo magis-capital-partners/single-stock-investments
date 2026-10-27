@@ -12,7 +12,6 @@ import hashlib
 import json
 import re
 import tempfile
-import time
 from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any
@@ -98,17 +97,7 @@ def _atomic_write_text(path: Path, text: str) -> None:
     ) as handle:
         handle.write(text)
         tmp = Path(handle.name)
-    try:
-        for attempt in range(7):
-            try:
-                tmp.replace(path)
-                break
-            except OSError as exc:
-                transient=exc.errno in {13,22} or getattr(exc,'winerror',None) in {5,32,33}
-                if not transient or attempt==6:raise
-                time.sleep(.1*2**attempt)
-    finally:
-        tmp.unlink(missing_ok=True)
+    tmp.replace(path)
 
 
 def write_text_if_changed(path: Path, content: str) -> bool:

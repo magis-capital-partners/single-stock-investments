@@ -2945,7 +2945,7 @@
     ]
   },
   "change_control": {
-    "model_hash": "e0af61f782054aa442a84319b05f720e234444aeb9a292243ae7e720116836c2",
+    "model_hash": "db777575c16b992f7b6231fa22974eac413d19d93ecddbcbc413d2e5990f4e40",
     "method_versions": [
       "balance_sheet_claim@1.0",
       "capital_cycle_reserve@1.0",
@@ -2956,6 +2956,186 @@
     "rule": "A source fact is locked. Every assumption change requires a reason, author, timestamp, and before/after value."
   },
   "decision_rule": "Proof status and investment readiness are separate. Every material claim must be valued exactly once by a valid calculation proof, every evidence blocker must be resolved, and the model must be stock-specific before committee review. Only a human decision can authorize capital.",
+  "shared_forecast": {
+    "schema_version": "1.0",
+    "method_version": "shared-valuation-forecast/1.1",
+    "ticker": "WBI",
+    "status": "model_gap",
+    "research_only": true,
+    "requires_human_review": false,
+    "capital_actionable": false,
+    "as_of": "2026-08-31",
+    "model_as_of": "2026-07-24",
+    "quote": {
+      "value": 31.8,
+      "as_of": "2026-08-31",
+      "source_url": "Yahoo WBI close 2026-08-31",
+      "currency": null
+    },
+    "forecast_hash": "8c5e087c3580efdf4d17a802327d560a30a319b9864f40afe6e32ab7c1b0837a",
+    "forward_irr_pct": {
+      "low": null,
+      "base": null,
+      "high": null
+    },
+    "present_value_today_per_share": {
+      "low": null,
+      "base": null,
+      "high": null
+    },
+    "model_present_value_per_share": {
+      "low": null,
+      "base": null,
+      "high": null
+    },
+    "required_return_pct": {
+      "low": null,
+      "base": null,
+      "high": null
+    },
+    "forward_cashflow_schedule": {},
+    "buy_prices": [],
+    "components": [
+      {
+        "component_id": "core_water_network",
+        "method": "normalized_ebitda_enterprise_value",
+        "status": "model_gap",
+        "present_value_per_share": {}
+      },
+      {
+        "component_id": "net_debt",
+        "method": "balance_sheet_claim",
+        "status": "model_gap",
+        "present_value_per_share": {}
+      },
+      {
+        "component_id": "contracted_growth_projects",
+        "method": "milestone_project_option",
+        "status": "model_gap",
+        "present_value_per_share": {
+          "low": 0.0
+        }
+      },
+      {
+        "component_id": "capex_execution_reserve",
+        "method": "capital_cycle_reserve",
+        "status": "model_gap",
+        "present_value_per_share": {
+          "high": -0.0
+        }
+      }
+    ],
+    "gaps": [
+      {
+        "component_id": "core_water_network",
+        "case": "low",
+        "code": "realization_timing_missing:value_per_share"
+      },
+      {
+        "component_id": "core_water_network",
+        "case": "base",
+        "code": "realization_timing_missing:value_per_share"
+      },
+      {
+        "component_id": "core_water_network",
+        "case": "high",
+        "code": "realization_timing_missing:value_per_share"
+      },
+      {
+        "component_id": "net_debt",
+        "case": "low",
+        "code": "realization_timing_missing:debt_stress_m"
+      },
+      {
+        "component_id": "net_debt",
+        "case": "base",
+        "code": "realization_timing_missing:debt_stress_m"
+      },
+      {
+        "component_id": "net_debt",
+        "case": "high",
+        "code": "realization_timing_missing:debt_stress_m"
+      },
+      {
+        "component_id": "contracted_growth_projects",
+        "case": "base",
+        "code": "realization_timing_missing:incremental_contracted_value_per_share"
+      },
+      {
+        "component_id": "contracted_growth_projects",
+        "case": "high",
+        "code": "realization_timing_missing:incremental_contracted_value_per_share"
+      },
+      {
+        "component_id": "capex_execution_reserve",
+        "case": "low",
+        "code": "realization_timing_missing:reserve_per_share"
+      },
+      {
+        "component_id": "capex_execution_reserve",
+        "case": "base",
+        "code": "realization_timing_missing:reserve_per_share"
+      }
+    ],
+    "warnings": [],
+    "source_refs": [
+      {
+        "node_id": "capex_guide_mid_m",
+        "ref": "WBI/investor-documents/sec-edgar/10-Q_20260507_rpt20260331_acc0001193125_26_209490.htm",
+        "locator": "2026 capex guidance $430M-$490M includes Speedway and Devon-supporting projects",
+        "as_of": "2026-03-31",
+        "source_id": "a9ac7d144a13e9639200e2478a9af2253f82f94f9ba7401e1b1571d7f9288cc0"
+      },
+      {
+        "node_id": "fy2025_operating_cash_flow_m",
+        "ref": "WBI/investor-documents/sec-edgar/10-K_20260316_rpt20251231_acc0001193125_26_106541.htm",
+        "locator": "FY2025 operating cash flow $159.7M per cash flow statement",
+        "as_of": "2026-03-31",
+        "source_id": "947cc3a7b711ce65223c54f3579faaace2c543fe017720e683344a4b18dd111f"
+      },
+      {
+        "node_id": "fy2025_investing_outflow_m",
+        "ref": "WBI/investor-documents/sec-edgar/10-K_20260316_rpt20251231_acc0001193125_26_106541.htm",
+        "locator": "FY2025 investing cash outflow $218.6M per cash flow statement",
+        "as_of": "2026-03-31",
+        "source_id": "805afd8872e93b6cfe5a78d091cd0d0815b78ed03726d7d809245a6f4d4433f8"
+      },
+      {
+        "node_id": "fy2025_adj_ebitda_m",
+        "ref": "WBI/investor-documents/sec-edgar/10-K_20260316_rpt20251231_acc0001193125_26_106541.htm",
+        "locator": "FY2025 adjusted EBITDA $254.0M per MD&A reconciliation",
+        "as_of": "2026-03-31",
+        "source_id": "f6684b6e36cd91f9d32b4dadfeac2e88ef8f5af4e19d627eb7f2e5ca5dc2d2ff"
+      },
+      {
+        "node_id": "shares_m",
+        "ref": "WBI/investor-documents/sec-edgar/10-Q_20260507_rpt20260331_acc0001193125_26_209490.htm",
+        "locator": "47.016M Class A plus 76.440M Class B/OpCo units",
+        "as_of": "2026-03-31",
+        "source_id": "ab3aad2527d6f5c8c058962ea66d28f10f215ad858a21f1290e16036efa9dd16"
+      },
+      {
+        "node_id": "capex_guide_mid_m",
+        "ref": "WBI/investor-documents/sec-edgar/10-Q_20260507_rpt20260331_acc0001193125_26_209490.htm",
+        "locator": "2026 capex guidance $430M-$490M",
+        "as_of": "2026-03-31",
+        "source_id": "6cb00da672da642333af2069014d31484ad1992b1d161440b56c9fdab460b689"
+      },
+      {
+        "node_id": "fy2025_investing_outflow_m",
+        "ref": "WBI/investor-documents/sec-edgar/10-K_20260316_rpt20251231_acc0001193125_26_106541.htm",
+        "locator": "FY2025 investing cash outflow $218.6M; cohort capital not separately disclosed",
+        "as_of": "2026-03-31",
+        "source_id": "7730ce643635b7f06a6acc6e00cc9486c59b4c2eecae7ce7a93185a9636abd8d"
+      }
+    ],
+    "next_action": "automatic_model_refresh",
+    "reconciliation": {
+      "passed": false
+    },
+    "settlement_policy": "Explicit cash/debt additions in an operating DCF are time-zero acquisition adjustments; hypothetical settlement, not declared dividends.",
+    "calculation_id": "05c94db5d8f2b4108ea1a7917a63a0842b9a2e2c6d837f124624dc5158e1fad4"
+  },
   "cohort_expected_profile": "predictable_cash_flow",
   "profile_match": true,
   "cohort_purpose": "Contracted infrastructure, project-cohort returns, leverage, and funding.",

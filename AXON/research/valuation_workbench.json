@@ -1,7 +1,7 @@
 {
   "schema_version": "3.0",
   "ticker": "AXON",
-  "as_of": "2026-10-26",
+  "as_of": "2026-10-27",
   "proof_status": "decision_grade",
   "model_level": "screening_grade",
   "model_level_reason": "The source-locked automated owner-earnings template uses generic assumption bounds; it is useful for triage but is not stock-specific underwriting.",
@@ -15,7 +15,9 @@
     "model_as_of": "2026-09-01",
     "latest_fact_as_of": "2026-04-30",
     "oldest_fact_as_of": "2025-12-31",
-    "price_as_of": "2026-08-31"
+    "price_as_of": "2026-08-31",
+    "forecast_as_of": "2026-09-01",
+    "calculation_as_of": "2026-08-31"
   },
   "legacy_audit": {
     "actionable": false,
@@ -70,18 +72,20 @@
       "high": null
     },
     "forward_return_status": "withheld",
-    "forward_return_reason": "model maturity is not eligible to publish a return",
+    "forward_return_reason": "shared_forecast_incomplete",
     "required_return_pct": 10.0,
     "downside_to_low_pct": -100.0,
     "unvalued_component_count": 0,
     "unresolved_evidence_count": 0,
     "proof_complete_pct": 100.0,
-    "model_hash": "dec8aaaf77d7bde8be4f1c3532d21f1e15ffb5106322ac2fc3d0fd4ec34af5ed",
+    "model_hash": "0e0b9f386a5d548b15be960eedab2da05738ee1e185cf7872620a17b53c8ee13",
     "dates": {
       "model_as_of": "2026-09-01",
       "latest_fact_as_of": "2026-04-30",
       "oldest_fact_as_of": "2025-12-31",
-      "price_as_of": "2026-08-31"
+      "price_as_of": "2026-08-31",
+      "forecast_as_of": "2026-09-01",
+      "calculation_as_of": "2026-08-31"
     },
     "legacy_audit": {
       "actionable": false,
@@ -102,7 +106,11 @@
     },
     "primary_power_zone": "High-return compounder",
     "owner_decision": null,
-    "next_action": "Freeze the evidence packet and select three method-independent raters."
+    "next_action": "Freeze the evidence packet and select three method-independent raters.",
+    "forecast_id": null,
+    "calculation_status": "model_gap",
+    "research_return_available": false,
+    "calculation_reason": "forecast_date_missing_or_future"
   },
   "business": {
     "status": "complete",
@@ -1545,7 +1553,9 @@
       "model_as_of": "2026-09-01",
       "latest_fact_as_of": "2026-04-30",
       "oldest_fact_as_of": "2025-12-31",
-      "price_as_of": "2026-08-31"
+      "price_as_of": "2026-08-31",
+      "forecast_as_of": "2026-09-01",
+      "calculation_as_of": "2026-08-31"
     },
     "legacy_audit": {
       "actionable": false,
@@ -3130,7 +3140,7 @@
       }
     ],
     "change_control": {
-      "model_hash": "dec8aaaf77d7bde8be4f1c3532d21f1e15ffb5106322ac2fc3d0fd4ec34af5ed",
+      "model_hash": "0e0b9f386a5d548b15be960eedab2da05738ee1e185cf7872620a17b53c8ee13",
       "method_versions": [
         "owner_earnings_reinvestment_dcf@1.0"
       ],
@@ -3334,17 +3344,19 @@
   },
   "freshness": {
     "status": "stale",
-    "as_of": "2026-10-26",
+    "as_of": "2026-10-27",
     "dates": {
       "model_as_of": "2026-09-01",
       "latest_fact_as_of": "2026-04-30",
       "oldest_fact_as_of": "2025-12-31",
-      "price_as_of": "2026-08-31"
+      "price_as_of": "2026-08-31",
+      "forecast_as_of": "2026-09-01",
+      "calculation_as_of": "2026-08-31"
     },
     "age_days": {
-      "model_as_of": 55,
-      "latest_fact_as_of": 179,
-      "price_as_of": 56
+      "model_as_of": 56,
+      "latest_fact_as_of": 180,
+      "price_as_of": 57
     },
     "review_threshold_days": {
       "model_as_of": 365,
@@ -3352,7 +3364,7 @@
       "price_as_of": 7
     },
     "warnings": [
-      "price_as_of is 56 days old (review threshold 7)"
+      "price_as_of is 57 days old (review threshold 7)"
     ],
     "rule": "Freshness is disclosed separately from proof completeness; stale or undated inputs require review before a new capital decision."
   }

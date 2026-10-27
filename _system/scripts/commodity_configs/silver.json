@@ -1,0 +1,170 @@
+{
+  "id": "silver",
+  "title": "Silver",
+  "engine": "gold_and_physical_balance",
+  "question": "How much metal remains after fabrication and investment demand?",
+  "unit": "USD/troy oz",
+  "in_base_irr": false,
+  "version": "2026-10-28.1",
+  "related_tickers": [
+    "PAAS",
+    "AG",
+    "CDE",
+    "HL",
+    "MAG",
+    "WPM",
+    "FNV",
+    "TFPM",
+    "OR"
+  ],
+  "sources": [
+    {
+      "id": "silver_survey",
+      "label": "World Silver Survey 2026",
+      "url": "https://silverinstitute.org/wp-content/uploads/2026/04/World-Silver-Survey-2026.pdf",
+      "published_at": "2026-04-15",
+      "max_age_days": 400,
+      "required": true,
+      "capture_kind": "publisher_bytes",
+      "sha256": "dc7a35277822a20498319fc6737f17b9e8f8fa93e5ce49b6a6565967ae220383",
+      "reviewed_at": "2026-10-28"
+    }
+  ],
+  "reference": {
+    "annual": [
+      {
+        "year": 2024,
+        "period": "2024",
+        "basis": "published_history",
+        "mine_moz": 823.6,
+        "recycling_moz": 194.5,
+        "supply_moz": 1019.6,
+        "industrial_moz": 679,
+        "pv_moz": 197.5,
+        "jewellery_moz": 205.1,
+        "coin_bar_moz": 190.9,
+        "demand_moz": 1157.4,
+        "balance_moz": -137.9,
+        "etp_moz": 67.5,
+        "balance_less_etp_moz": -205.4,
+        "price": 28.27
+      },
+      {
+        "year": 2025,
+        "period": "2025",
+        "basis": "published_history",
+        "mine_moz": 846.6,
+        "recycling_moz": 197.6,
+        "supply_moz": 1090.4,
+        "industrial_moz": 657.4,
+        "pv_moz": 186.6,
+        "jewellery_moz": 189.3,
+        "coin_bar_moz": 217.7,
+        "demand_moz": 1130.6,
+        "balance_moz": -40.3,
+        "etp_moz": 278.1,
+        "balance_less_etp_moz": -318.4,
+        "price": 40.03
+      },
+      {
+        "year": 2026,
+        "period": "2026",
+        "basis": "published_forecast",
+        "mine_moz": 844.1,
+        "recycling_moz": 211.3,
+        "supply_moz": 1066.4,
+        "industrial_moz": 639.6,
+        "pv_moz": 151,
+        "jewellery_moz": 159.4,
+        "coin_bar_moz": 257.6,
+        "demand_moz": 1112.6,
+        "balance_moz": -46.3,
+        "etp_moz": 30,
+        "balance_less_etp_moz": -76.3,
+        "price": null
+      }
+    ],
+    "primary_share_pct": 26,
+    "byproduct_2025_moz": 625.5,
+    "copper_byproduct_2025_moz": 237.3,
+    "lease_rate": null,
+    "available_inventory_moz": null
+  },
+  "scenarios": [
+    {
+      "id": "base",
+      "label": "Physical base case",
+      "byproduct_growth_pct": 1,
+      "primary_growth_pct": 0.5,
+      "recycling_growth_pct": 2,
+      "other_demand_growth_pct": 1,
+      "gold_scenario": "official_bid",
+      "gold_silver_ratio": 90,
+      "pv_growth_pct": -2,
+      "etp_moz": 30,
+      "assumption_basis": "Solar paths, gold/silver ratios, growth and ETF flows are explicit analyst assumptions after the 2026 published outlook. The ratio is not a mean-reversion promise."
+    },
+    {
+      "id": "thrifting",
+      "label": "Faster solar thrifting",
+      "byproduct_growth_pct": 1,
+      "primary_growth_pct": 0.5,
+      "recycling_growth_pct": 2,
+      "other_demand_growth_pct": 1,
+      "gold_scenario": "real_rates",
+      "gold_silver_ratio": 100,
+      "pv_growth_pct": -7,
+      "etp_moz": 0,
+      "assumption_basis": "Solar paths, gold/silver ratios, growth and ETF flows are explicit analyst assumptions after the 2026 published outlook. The ratio is not a mean-reversion promise."
+    },
+    {
+      "id": "investment_sink",
+      "label": "Investment absorption",
+      "byproduct_growth_pct": 1,
+      "primary_growth_pct": 0.5,
+      "recycling_growth_pct": 2,
+      "other_demand_growth_pct": 1,
+      "gold_scenario": "damper",
+      "gold_silver_ratio": 75,
+      "pv_growth_pct": -12,
+      "etp_moz": 150,
+      "assumption_basis": "Solar paths, gold/silver ratios, growth and ETF flows are explicit analyst assumptions after the 2026 published outlook. The ratio is not a mean-reversion promise."
+    }
+  ],
+  "falsifiers": [
+    {
+      "metric": "Solar demand",
+      "threshold": "Below the 12% annual-decline scenario",
+      "source_id": "silver_survey"
+    },
+    {
+      "metric": "Primary-mine share",
+      "threshold": "Above 35% of mine supply",
+      "source_id": "silver_survey"
+    },
+    {
+      "metric": "Investment absorption",
+      "threshold": "ETP outflows of 278 million ounces",
+      "source_id": "silver_survey"
+    },
+    {
+      "metric": "Stock availability",
+      "threshold": "Lease stress fades and available stocks recover; lease series missing",
+      "source_id": "silver_survey"
+    }
+  ],
+  "limitations": [
+    "The 2026 forecast is annual, not a fabricated monthly time series.",
+    "ETP absorption is shown once below the physical balance. Unknown available inventory prevents an exhaustion date.",
+    "Copper-related byproduct supply is not added twice. Gold scenarios are inherited and identified.",
+    "Primary AISC is not a hard market floor; most silver supply is a byproduct."
+  ],
+  "cost_floor": {
+    "value": 12.21,
+    "unit": "USD/troy oz",
+    "status": "slack_at_reference_price",
+    "binding": false,
+    "source_id": "silver_survey",
+    "note": "Primary-mine AISC in 2025. Byproduct mines follow their primary-metal economics."
+  }
+}

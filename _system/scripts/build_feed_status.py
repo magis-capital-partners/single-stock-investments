@@ -11,7 +11,6 @@ import json
 import re
 from datetime import datetime, timezone
 from pathlib import Path
-from dashboard_data_coverage import surface_coverage
 
 ROOT = Path(__file__).resolve().parents[2]
 OUT_REL = Path("dashboard/data/feed_status.json")
@@ -45,7 +44,8 @@ LABELS = {
     "fresh": "Fresh",
     "degraded": "Review required",
     "empty": "Current, no actionable rows",
-    "api": "Live API",
+    "api": "Check observation dates",
+    "unauthorized": "Private snapshot unavailable",
 }
 
 # Windows below are the producer cadence plus a grace period, matching
@@ -228,8 +228,9 @@ SURFACES: list[dict] = [
         "hash": "#/ideas/nol",
         "lane": "data-pipeline-intake-full",
         "kind": "file",
-        "path": "dashboard/data/nol_screener.json",
-        "stamp_fields": ["built_at"],
+        "path": "dashboard/data/core.json",
+        "stamp_fields": ["generated_at"],
+        "embedded_key": "nol_screener",
         "actionable_flag": "is_actionable",
         "healer": _INTAKE,
     },
@@ -239,8 +240,9 @@ SURFACES: list[dict] = [
         "hash": "#/ideas/banks",
         "lane": "data-pipeline-intake-full",
         "kind": "file",
-        "path": "dashboard/data/advantaged_banks_screener.json",
-        "stamp_fields": ["built_at"],
+        "path": "dashboard/data/core.json",
+        "stamp_fields": ["generated_at"],
+        "embedded_key": "advantaged_banks_screener",
         "actionable_flag": "is_low_cost",
         "healer": _INTAKE,
     },
@@ -444,6 +446,29 @@ SURFACES: list[dict] = [
     },
 ]
 
+# Workspaces added after the original operator catalog. These use the existing
+# owning lanes; this display registry never creates a collector or dispatcher.
+SURFACES.extend([
+    {"id":"reverse-split-strategy","label":"Reverse-split short research","hash":"#/strategies/reverse-split/overview",
+     "lane":"data-pipeline-reverse-splits","kind":"file","path":"dashboard/data/reverse_split_strategy/summary.json",
+     "stamp_fields":["as_of"],"max_age_hours":87600,"healer":"Frozen historical study. Reconcile all scenario hashes and cash flows before replacing this publication; no live execution authority."},
+    {"id":"compounders","label":"Long Term Compounders","hash":"#/research/compounders",
+     "lane":"valuation","kind":"file","path":"dashboard/data/compounders.json","stamp_fields":["as_of"],
+     "max_age_hours":240,"healer":"Maintain the shared company roster and verify company valuation evidence."},
+    {"id":"systematic-shorts","label":"Systematic Shorts","hash":"#/strategies/systematic-shorts/overview",
+     "lane":"data-pipeline-reverse-splits","kind":"file","path":"dashboard/data/third_plus_study_manifest.json",
+     "stamp_fields":["generated_at","as_of"],"max_age_hours":240,"healer":"Refresh the existing study publications and inspect point-in-time input coverage."},
+    {"id":"biotech-quant","label":"Biotech Quant","hash":"#/strategies/biotech-quant/overview",
+     "lane":"data-pipeline-intake-full","kind":"file","path":"dashboard/data/biotech_quant.json",
+     "stamp_fields":["as_of","generated_at"],"max_age_hours":240,"healer":"Rebuild dated factor evidence and the existing research/paper publication."},
+    {"id":"context","label":"Portfolio context","hash":"#/insights/context",
+     "lane":"data-pipeline-intake-full","kind":"file","path":"dashboard/data/world_model.json",
+     "stamp_fields":["generated_at","as_of"],"max_age_hours":240,"healer":"Refresh dated context sources; keep forecasts separate from observations."},
+    {"id":"irr-readiness","label":"IRR evidence readiness","hash":"#/research/valuation",
+     "lane":"valuation","kind":"file","path":"dashboard/data/irr_readiness.json",
+     "stamp_fields":["as_of","generated_at"],"max_age_hours":56,"healer":"Reconcile canonical price/model fields and complete source-backed valuation requirements."},
+])
+
 
 def surface_specs() -> list[dict]:
     return [dict(row) for row in SURFACES]
@@ -470,8 +495,6 @@ def parse_stamp(value) -> datetime | None:
     text = str(value).strip()
     if not text:
         return None
-    if re.fullmatch(r"\d{4}-\d{2}-\d{2}", text):
-        return datetime(int(text[0:4]), int(text[5:7]), int(text[8:10]), tzinfo=timezone.utc)
     try:
         stamp = datetime.fromisoformat(text.replace("Z", "+00:00"))
     except ValueError:
@@ -496,7 +519,10 @@ def classify_feed(
     """
     if not exists:
         return "missing"
-    limit = None if max_age_hours is None else float(max_age_hours)
+    try:
+        limit = None if max_age_hours is None else float(max_age_hours)
+    except (TypeError, ValueError):
+        return "unreadable"
     if limit is None or limit <= 0:
         return "unreadable"
     parsed = parse_stamp(stamp)
@@ -506,6 +532,8 @@ def classify_feed(
     if moment.tzinfo is None:
         moment = moment.replace(tzinfo=timezone.utc)
     age_hours = (moment - parsed).total_seconds() / 3600.0
+    if age_hours < -5/60:
+        return "unreadable"
     if age_hours > limit:
         return "stale"
     if empty:
@@ -605,7 +633,7 @@ def _resolve_source(spec: dict, feeds: dict) -> dict:
     return resolved
 
 
-def build_feed_status(root: Path | None = None, now: datetime | None = None) -> dict:
+def build_feed_status(root: Path | None = None, now: datetime | None = None, *, dashboard: Path | None = None) -> dict:
     root = root or ROOT
     moment = now or datetime.now(timezone.utc)
     config = _load_json(root / GRAPH_REL) or {}
@@ -617,19 +645,19 @@ def build_feed_status(root: Path | None = None, now: datetime | None = None) -> 
     supervisor_lanes = supervisor.get("lanes") if isinstance(supervisor.get("lanes"), dict) else {}
     open_lanes = _open_issue_lanes(supervisor)
     cache: dict[str, object] = {}
+    from dashboard_data_coverage import surface_coverage
 
     def load_rel(rel: str):
         if rel not in cache:
-            path=root / rel
-            cache[rel] = _load_json(path)
-            if isinstance(cache[rel],dict) and cache[rel].get('private_snapshot') and rel.startswith('dashboard/'):
-                # Read the verified archive in place; never hydrate private
-                # content into public dashboard files just to inspect health.
+            path = dashboard / rel.removeprefix("dashboard/") if dashboard and rel.startswith("dashboard/") else root / rel
+            doc = _load_json(path)
+            if isinstance(doc, dict) and doc.get("private_snapshot"):
+                from private_dashboard_assets import read_resolved_json
                 try:
-                    from private_dashboard_assets import private_source
-                    cache[rel]=_load_json(private_source(root/'dashboard',rel[len('dashboard/'):]))
-                except (OSError,ValueError,RuntimeError,ImportError):
-                    pass
+                    doc, _ = read_resolved_json(dashboard or root / "dashboard", rel.removeprefix("dashboard/"))
+                except (RuntimeError, ValueError, OSError):
+                    doc = {"private_snapshot": True}
+            cache[rel] = doc
         return cache[rel]
 
     surfaces = []
@@ -639,14 +667,26 @@ def build_feed_status(root: Path | None = None, now: datetime | None = None) -> 
         lane_row = lanes.get(lane) or {}
         max_age = resolved.get("max_age_hours")
         if max_age is None:
-            max_age = lane_row.get("freshness_hours")
+            max_age = lane_row.get("freshness_hours") or 54
         healer = str(resolved.get("healer") or "")
         kind = resolved.get("kind") or "file"
         stamp = None
         exists = False
         empty = False
         artifact = resolved.get("path")
-        coverage = None
+        if spec["id"] == "podcasts":
+            # The graph catalog tracks the upstream mirror. This surface serves
+            # the podcast shard, which can be published independently of it.
+            artifact="dashboard/data/insights/podcasts.json"
+            resolved["stamp_fields"]=["generated_at"]
+        # Prefer standalone screen publications. A recent core build cannot
+        # establish that embedded financial facts were themselves refreshed.
+        standalone = {"nol":"nol_screener", "banks":"advantaged_banks_screener"}.get(spec["id"])
+        if standalone and load_rel(f"dashboard/data/{standalone}.json") is not None:
+            artifact=f"dashboard/data/{standalone}.json"
+            resolved.pop("embedded_key", None)
+            resolved["stamp_fields"]=["generated_at","built_at","as_of"]
+        doc = None
         if kind == "api":
             exists = True
             status = "api"
@@ -661,15 +701,11 @@ def build_feed_status(root: Path | None = None, now: datetime | None = None) -> 
                     exists = False
                 else:
                     empty = actionable == 0
-            elif exists and resolved.get('actionable_flag'):
-                rows=doc.get('rows') or []
-                empty=not any(row.get(resolved['actionable_flag']) for row in rows if isinstance(row,dict))
             if exists:
                 stamp = _first_stamp(doc, list(resolved.get("stamp_fields") or ["generated_at"]))
             status = classify_feed(exists, stamp, max_age, moment, empty=empty and exists)
-            coverage = surface_coverage(resolved['id'], doc) if exists else None
-            if coverage and coverage['incomplete_rows'] and status in {'fresh','empty'}:
-                status='degraded'
+            if isinstance(doc,dict) and doc.get("private_snapshot"):
+                status="unauthorized"
         if spec.get('id')=='rock' and exists and status in {'fresh','empty'} and (doc.get('coverage') or {}).get('failures'):
             status='degraded'
         if resolved.get("data_feed")=="buyback_radar" and exists and status in {"fresh","empty"} and doc.get("health")!="healthy":
@@ -680,8 +716,6 @@ def build_feed_status(root: Path | None = None, now: datetime | None = None) -> 
         lane_state = supervisor_lanes.get(lane) if isinstance(supervisor_lanes.get(lane), dict) else {}
         clause = _supervisor_clause(lane, lane_state, open_lanes)
         next_action = healer if not clause else f"{healer} {clause}".strip()
-        if coverage and coverage['incomplete_rows']:
-            next_action=f"{coverage['next_action']} {next_action}".strip()
         surfaces.append({
             "id": resolved["id"],
             "label": resolved.get("label") or resolved["id"],
@@ -699,10 +733,7 @@ def build_feed_status(root: Path | None = None, now: datetime | None = None) -> 
             "lane_receipt_at": receipt_at,
             "healer": healer,
             "next_action": next_action,
-            "coverage": coverage,
-            "observation_dates": ({'borrow': (doc.get('borrow_meta') or {}).get('as_of'),
-                                   'research':doc.get('as_of')}
-                                  if kind!='api' and exists and resolved['id']=='short-alpha' else None),
+            "coverage": surface_coverage(resolved["id"], doc) if isinstance(doc,dict) else None,
         })
     return {
         "schema_version": "1",
@@ -711,10 +742,10 @@ def build_feed_status(root: Path | None = None, now: datetime | None = None) -> 
     }
 
 
-def write_feed_status(root: Path | None = None, now: datetime | None = None) -> Path:
+def write_feed_status(root: Path | None = None, now: datetime | None = None, *, dashboard: Path | None = None) -> Path:
     root = root or ROOT
-    payload = build_feed_status(root, now)
-    path = root / OUT_REL
+    payload = build_feed_status(root, now, dashboard=dashboard)
+    path = dashboard / "data/feed_status.json" if dashboard else root / OUT_REL
     path.parent.mkdir(parents=True, exist_ok=True)
     path.write_text(json.dumps(payload, indent=2) + "\n", encoding="utf-8")
     print(f"Wrote {path} ({len(payload['surfaces'])} surfaces)")

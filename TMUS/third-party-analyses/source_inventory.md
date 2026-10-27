@@ -1,6 +1,6 @@
 # TMUS — Third-party source inventory
 
-**Date:** 2026-10-25
+**Date:** 2026-10-27
 **Sources:** 197 total (0 approved, 0 pending, 197 context)
 
 | ID | Title | Path | Status | Use |
@@ -56,13 +56,13 @@
 | activist_long | PX14A6G · TMUS · 2020-05-20 | `TMUS/third-party-analyses/activist_reports/long/PX14A6G_20200520_acc0001377739_20_000033.htm` | context | activist/long — sec_edgar |
 | activist_long | Deutsche (+3) — SC 13D/A | `TMUS/third-party-analyses/activist_reports/long/SC-13D/A_20200402_acc0001193125_20_096138.htm` | context | activist/long — sec_edgar |
 | activist_long | SoftBank Group Capital Ltd — SC 13D | `TMUS/third-party-analyses/activist_reports/long/SC-13D_20200402_acc0001140361_20_007831.htm` | context | activist/long — sec_edgar |
-| activist_long | acc0001193125 20 093622 | `TMUS/third-party-analyses/activist_reports/long/8-K_20200401_acc0001193125_20_093622.htm` | context | activist/long — local |
 | activist_long | acc0001193125 20 071678 | `TMUS/third-party-analyses/activist_reports/long/8-K_20200312_acc0001193125_20_071678.htm` | context | activist/long — local |
 | activist_long | acc0001193125 20 075308 | `TMUS/third-party-analyses/activist_reports/long/8-K_20200317_acc0001193125_20_075308.htm` | context | activist/long — local |
 | activist_long | acc0001193125 20 076470 | `TMUS/third-party-analyses/activist_reports/long/8-K_20200318_acc0001193125_20_076470.htm` | context | activist/long — local |
 | activist_long | acc0001193125 20 078392 | `TMUS/third-party-analyses/activist_reports/long/8-K_20200319_acc0001193125_20_078392.htm` | context | activist/long — local |
 | activist_long | acc0001283699 20 000064 | `TMUS/third-party-analyses/activist_reports/long/8-K_20200325_acc0001283699_20_000064.htm` | context | activist/long — local |
 | activist_long | acc0001140361 20 007620 | `TMUS/third-party-analyses/activist_reports/long/8-K_20200401_acc0001140361_20_007620.htm` | context | activist/long — local |
+| activist_long | acc0001193125 20 093622 | `TMUS/third-party-analyses/activist_reports/long/8-K_20200401_acc0001193125_20_093622.htm` | context | activist/long — local |
 | activist_long | acc0001140361 20 008648 | `TMUS/third-party-analyses/activist_reports/long/8-K_20200413_acc0001140361_20_008648.htm` | context | activist/long — local |
 | activist_long | acc0001193125 20 109354 | `TMUS/third-party-analyses/activist_reports/long/8-K_20200416_acc0001193125_20_109354.htm` | context | activist/long — local |
 | activist_long | acc0001193125 20 119230 | `TMUS/third-party-analyses/activist_reports/long/8-K_20200424_acc0001193125_20_119230.htm` | context | activist/long — local |
@@ -203,4 +203,4 @@
 | activist_long | acc0001283699 26 000100 | `TMUS/third-party-analyses/activist_reports/long/8-K_20260723_acc0001283699_26_000100.htm` | context | activist/long — local |
 | activist_long | acc0001193125 26 381901 | `TMUS/third-party-analyses/activist_reports/long/8-K_20260903_acc0001193125_26_381901.htm` | context | activist/long — local |
 
-Cross-check required: `TMUS/research/cross_check_third_party_2026-10-25.md`
+Cross-check required: `TMUS/research/cross_check_third_party_2026-10-27.md`

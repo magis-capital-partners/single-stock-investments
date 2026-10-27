@@ -1,6 +1,6 @@
 # LBRDK — Third-party source inventory
 
-**Date:** 2026-10-11
+**Date:** 2026-10-27
 **Sources:** 202 total (0 approved, 0 pending, 202 context)
 
 | ID | Title | Path | Status | Use |
@@ -42,9 +42,6 @@
 | activist_long | John C. Malone — SC 13D/A | `LBRDK/third-party-analyses/activist_reports/long/SC-13D/A_20181217_acc0001104659_18_073369.htm` | context | activist/long — sec_edgar |
 | activist_long | D.E. (+2) — SC 13G/A | `LBRDK/third-party-analyses/activist_reports/long/SC-13G/A_20180710_acc0001144204_18_037834.htm` | context | activist/long — sec_edgar |
 | activist_long | D.E. (+1) — SC 13G/A | `LBRDK/third-party-analyses/activist_reports/long/SC-13G/A_20180214_acc0001144204_18_008956.htm` | context | activist/long — sec_edgar |
-| activist_long | acc0001104659 24 117312 | `LBRDK/third-party-analyses/activist_reports/long/8-K_20241113_acc0001104659_24_117312.htm` | context | activist/long — local |
-| activist_long | acc0001104659 20 138229 | `LBRDK/third-party-analyses/activist_reports/long/8-K_20201222_acc0001104659_20_138229.htm` | context | activist/long — local |
-| activist_long | acc0001104659 20 109405 | `LBRDK/third-party-analyses/activist_reports/long/8-K_20200929_acc0001104659_20_109405.htm` | context | activist/long — local |
 | activist_long | acc0001611983 18 000002 | `LBRDK/third-party-analyses/activist_reports/long/8-K_20180206_acc0001611983_18_000002.htm` | context | activist/long — local |
 | activist_long | acc0001611983 18 000004 | `LBRDK/third-party-analyses/activist_reports/long/8-K_20180228_acc0001611983_18_000004.htm` | context | activist/long — local |
 | activist_long | acc0001611983 18 000006 | `LBRDK/third-party-analyses/activist_reports/long/8-K_20180416_acc0001611983_18_000006.htm` | context | activist/long — local |
@@ -83,6 +80,7 @@
 | activist_long | acc0001104659 20 097768 | `LBRDK/third-party-analyses/activist_reports/long/8-K_20200824_acc0001104659_20_097768.htm` | context | activist/long — local |
 | activist_long | acc0001104659 20 098132 | `LBRDK/third-party-analyses/activist_reports/long/8-K_20200825_acc0001104659_20_098132.htm` | context | activist/long — local |
 | activist_long | acc0001104659 20 099624 | `LBRDK/third-party-analyses/activist_reports/long/8-K_20200827_acc0001104659_20_099624.htm` | context | activist/long — local |
+| activist_long | acc0001104659 20 109405 | `LBRDK/third-party-analyses/activist_reports/long/8-K_20200929_acc0001104659_20_109405.htm` | context | activist/long — local |
 | activist_long | acc0001611983 20 000018 | `LBRDK/third-party-analyses/activist_reports/long/8-K_20201008_acc0001611983_20_000018.htm` | context | activist/long — local |
 | activist_long | acc0001611983 20 000020 | `LBRDK/third-party-analyses/activist_reports/long/8-K_20201022_acc0001611983_20_000020.htm` | context | activist/long — local |
 | activist_long | acc0001104659 20 127047 | `LBRDK/third-party-analyses/activist_reports/long/8-K_20201119_acc0001104659_20_127047.htm` | context | activist/long — local |
@@ -91,6 +89,7 @@
 | activist_long | acc0001611983 20 000023 | `LBRDK/third-party-analyses/activist_reports/long/8-K_20201214_acc0001611983_20_000023.htm` | context | activist/long — local |
 | activist_long | acc0001104659 20 135778 | `LBRDK/third-party-analyses/activist_reports/long/8-K_20201215_acc0001104659_20_135778.htm` | context | activist/long — local |
 | activist_long | acc0001104659 20 136386 | `LBRDK/third-party-analyses/activist_reports/long/8-K_20201216_acc0001104659_20_136386.htm` | context | activist/long — local |
+| activist_long | acc0001104659 20 138229 | `LBRDK/third-party-analyses/activist_reports/long/8-K_20201222_acc0001104659_20_138229.htm` | context | activist/long — local |
 | activist_long | acc0001611983 21 000002 | `LBRDK/third-party-analyses/activist_reports/long/8-K_20210211_acc0001611983_21_000002.htm` | context | activist/long — local |
 | activist_long | acc0001611983 21 000004 | `LBRDK/third-party-analyses/activist_reports/long/8-K_20210225_acc0001611983_21_000004.htm` | context | activist/long — local |
 | activist_long | acc0001611983 21 000006 | `LBRDK/third-party-analyses/activist_reports/long/8-K_20210226_acc0001611983_21_000006.htm` | context | activist/long — local |
@@ -169,6 +168,7 @@
 | activist_long | acc0001611983 24 000036 | `LBRDK/third-party-analyses/activist_reports/long/8-K_20241010_acc0001611983_24_000036.htm` | context | activist/long — local |
 | activist_long | acc0001611983 24 000038 | `LBRDK/third-party-analyses/activist_reports/long/8-K_20241022_acc0001611983_24_000038.htm` | context | activist/long — local |
 | activist_long | acc0001611983 24 000040 | `LBRDK/third-party-analyses/activist_reports/long/8-K_20241107_acc0001611983_24_000040.htm` | context | activist/long — local |
+| activist_long | acc0001104659 24 117312 | `LBRDK/third-party-analyses/activist_reports/long/8-K_20241113_acc0001104659_24_117312.htm` | context | activist/long — local |
 | activist_long | acc0001611983 24 000042 | `LBRDK/third-party-analyses/activist_reports/long/8-K_20241210_acc0001611983_24_000042.htm` | context | activist/long — local |
 | activist_long | acc0001104659 25 005279 | `LBRDK/third-party-analyses/activist_reports/long/8-K_20250122_acc0001104659_25_005279.htm` | context | activist/long — local |
 | activist_long | acc0001611983 25 000002 | `LBRDK/third-party-analyses/activist_reports/long/8-K_20250130_acc0001611983_25_000002.htm` | context | activist/long — local |
@@ -208,4 +208,4 @@
 | activist_long | acc0001611983 26 000014 | `LBRDK/third-party-analyses/activist_reports/long/8-K_20260715_acc0001611983_26_000014.htm` | context | activist/long — local |
 | activist_long | acc0001140361 26 033932 | `LBRDK/third-party-analyses/activist_reports/long/8-K_20260821_acc0001140361_26_033932.htm` | context | activist/long — local |
 
-Cross-check required: `LBRDK/research/cross_check_third_party_2026-10-11.md`
+Cross-check required: `LBRDK/research/cross_check_third_party_2026-10-27.md`

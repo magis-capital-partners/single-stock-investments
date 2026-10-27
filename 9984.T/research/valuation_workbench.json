@@ -1,7 +1,7 @@
 {
   "schema_version": "3.0",
   "ticker": "9984.T",
-  "as_of": "2026-10-26",
+  "as_of": "2026-10-27",
   "proof_status": "decision_grade",
   "model_level": "stock_specific",
   "model_level_reason": "The proof-complete model uses stock-specific components and assumptions.",
@@ -15,7 +15,9 @@
     "model_as_of": "2026-07-24",
     "latest_fact_as_of": "2025-03-31",
     "oldest_fact_as_of": "2025-03-31",
-    "price_as_of": "2026-07-23"
+    "price_as_of": "2026-07-23",
+    "forecast_as_of": "2026-07-24",
+    "calculation_as_of": "2026-07-23"
   },
   "legacy_audit": {
     "actionable": false,
@@ -70,18 +72,20 @@
       "high": null
     },
     "forward_return_status": "withheld",
-    "forward_return_reason": "present_value_today cannot be annualized as a future payoff",
+    "forward_return_reason": "shared_forecast_incomplete",
     "required_return_pct": null,
     "downside_to_low_pct": 30.48,
     "unvalued_component_count": 0,
     "unresolved_evidence_count": 0,
     "proof_complete_pct": 100.0,
-    "model_hash": "11df9c9eec8a57857ab311e6d469a68cf56f5a352995011882854613ebd4e7f4",
+    "model_hash": "bb2f5ef8afbe8264dc3ac2827f16d5b435739a08904fb57bb66d75ea4db16c57",
     "dates": {
       "model_as_of": "2026-07-24",
       "latest_fact_as_of": "2025-03-31",
       "oldest_fact_as_of": "2025-03-31",
-      "price_as_of": "2026-07-23"
+      "price_as_of": "2026-07-23",
+      "forecast_as_of": "2026-07-24",
+      "calculation_as_of": "2026-07-23"
     },
     "legacy_audit": {
       "actionable": false,
@@ -102,7 +106,11 @@
     },
     "primary_power_zone": "High-return compounder",
     "owner_decision": null,
-    "next_action": "Freeze the evidence packet and select three method-independent raters."
+    "next_action": "Freeze the evidence packet and select three method-independent raters.",
+    "forecast_id": null,
+    "calculation_status": "model_gap",
+    "research_return_available": false,
+    "calculation_reason": "forecast_date_missing_or_future"
   },
   "business": {
     "status": "complete",
@@ -1090,7 +1098,9 @@
       "model_as_of": "2026-07-24",
       "latest_fact_as_of": "2025-03-31",
       "oldest_fact_as_of": "2025-03-31",
-      "price_as_of": "2026-07-23"
+      "price_as_of": "2026-07-23",
+      "forecast_as_of": "2026-07-24",
+      "calculation_as_of": "2026-07-23"
     },
     "legacy_audit": {
       "actionable": false,
@@ -2245,7 +2255,7 @@
       }
     ],
     "change_control": {
-      "model_hash": "11df9c9eec8a57857ab311e6d469a68cf56f5a352995011882854613ebd4e7f4",
+      "model_hash": "bb2f5ef8afbe8264dc3ac2827f16d5b435739a08904fb57bb66d75ea4db16c57",
       "method_versions": [
         "net_asset_value@1.0",
         "probability_weighted_catalyst_nav@1.0"
@@ -2611,17 +2621,19 @@
   },
   "freshness": {
     "status": "stale",
-    "as_of": "2026-10-26",
+    "as_of": "2026-10-27",
     "dates": {
       "model_as_of": "2026-07-24",
       "latest_fact_as_of": "2025-03-31",
       "oldest_fact_as_of": "2025-03-31",
-      "price_as_of": "2026-07-23"
+      "price_as_of": "2026-07-23",
+      "forecast_as_of": "2026-07-24",
+      "calculation_as_of": "2026-07-23"
     },
     "age_days": {
-      "model_as_of": 94,
-      "latest_fact_as_of": 574,
-      "price_as_of": 95
+      "model_as_of": 95,
+      "latest_fact_as_of": 575,
+      "price_as_of": 96
     },
     "review_threshold_days": {
       "model_as_of": 365,
@@ -2629,8 +2641,8 @@
       "price_as_of": 7
     },
     "warnings": [
-      "latest_fact_as_of is 574 days old (review threshold 548)",
-      "price_as_of is 95 days old (review threshold 7)"
+      "latest_fact_as_of is 575 days old (review threshold 548)",
+      "price_as_of is 96 days old (review threshold 7)"
     ],
     "rule": "Freshness is disclosed separately from proof completeness; stale or undated inputs require review before a new capital decision."
   }

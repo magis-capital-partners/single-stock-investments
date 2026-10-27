@@ -1,0 +1,85 @@
+{
+  "schema_version": "3.0",
+  "ticker": "INTC",
+  "specs": [
+    {
+      "spec_schema_version": "3.0",
+      "spec_id": "intc-multilens-base-irr-2027-04-29",
+      "spec_revision": 1,
+      "forecast_class": "ex_ante",
+      "forecast_role": "diagnostic",
+      "authored_at": "2026-10-30T18:00:00Z",
+      "information_cutoff_at": "2026-10-29T12:00:00Z",
+      "registered_at": "2026-10-30T18:00:00Z",
+      "registration_commit": "3ccf28bdc308209762b05617d82396eabf171208",
+      "analysis_run_id": "fundamental-analyst-2026-10-30",
+      "author": "fundamental-analyst",
+      "model_id": "fundamental-analyst-weekly-v1",
+      "prompt_version": "case-log-table-v1",
+      "contract_hash": "c12dcaf72e9573c14474260eaf4ef2ec6db40b1b4bd6c91347563231b62cc774",
+      "component_fingerprint": "25b54222584ca0467471bfc0d6a3940473e22a39530afaf3a5f75d64029ea3ca",
+      "method_id": "owner_earnings_reinvestment_dcf",
+      "power_zone": "quality_reinvestment",
+      "component_id": "monitoring",
+      "correlation_group": "intc-fundamental-analyst-2026-10-29",
+      "metric": "base IRR at the review price",
+      "comparator": "gte",
+      "threshold": 15,
+      "threshold_basis": {
+        "source_ref": "_system/research/fundamental_analyst/CASE_LOG_2026-10-29.md",
+        "rule": "Fire when the base IRR at the review price is at least 15% per year. The 2026-10-29 Q3'26 call passes INTC because the base IRR is -9.9% at $92.07, below the 15% hurdle (base-case 15% price about $16, bull about $52). A hit means that hurdle reason failed. INTC is not on the core compounder list. research/INTC_Q3_2026_update.md carries the arithmetic.",
+        "claim_type": "inference"
+      },
+      "unit": "percent",
+      "measurement_period_end": "2027-04-29",
+      "observable_after": "2027-04-29",
+      "resolution_deadline": "2027-04-29",
+      "source_hint": "base_irr_pct",
+      "observation_plan": {
+        "metric_definition_id": "fundamental_analyst_observation",
+        "metric_definition_version": "1.0",
+        "source_adapter": "fundamental_analyst_observation",
+        "fiscal_period": "EVENT",
+        "observation_type": "instant",
+        "duration_basis": "point",
+        "canonical_unit": "percent",
+        "expected_publication_date": "2027-04-29",
+        "accepted_forms": [
+          "analyst_observation"
+        ],
+        "maximum_source_lag_days": 14,
+        "end_date_tolerance_days": 7,
+        "historical_replay": {
+          "status": "passed",
+          "evidence_ref": "INTC/research/fundamental_analyst/replay_2026-10-29.json"
+        },
+        "outcome_unavailable_at_registration": true
+      },
+      "probability_fires": 0.3,
+      "calibration_eligible": false,
+      "severity": 4,
+      "derived_from": "Pass (not a compounder at this price) (Multi-lens (Buffett, Munger, Hohn, Pabrai, Li Lu, Stahl/HK, Begg, PRINCIPLES))",
+      "rationale": "Call (2026-10-29, Multi-lens (Buffett, Munger, Hohn, Pabrai, Li Lu, Stahl/HK, Begg, PRINCIPLES)): Pass (not a compounder at this price) Reason: Q3'26 8-K (0000050863-26-000188): DCAI +78%, foundry loss -$1.85B (27.7% of rev), GM 44.1%; Q4 guide $15-16B vs $17.07B est, GM 38%; TTM owner cash ~$0.25/sh; shares +17% YoY; no named 14A customer. Base IRR -9.9%, bull +5.9% (PRINCIPLES A13; Hohn >=3 short attributes; Munger Q18; TS16 red-team). research/INTC_Q3_2026_update.md Source: _system/research/fundamental_analyst/CASE_LOG_2026-10-29.md. Registered test: Fire when the base IRR at the review price is at least 15% per year. The 2026-10-29 Q3'26 call passes INTC because the base IRR is -9.9% at $92.07, below the 15% hurdle (base-case 15% price about $16, bull about $52). A hit means that hurdle reason failed. INTC is not on the core compounder list. research/INTC_Q3_2026_update.md carries the arithmetic. Stated probability the call is right at review: 70%. Probability this falsifier fires (the call is wrong on its own terms) = 0.3. Recorded as diagnostic; calibration promotion needs an independent human review.",
+      "untestable": false,
+      "supersedes_spec_id": null,
+      "call": "Pass (not a compounder at this price)",
+      "lens": "Multi-lens (Buffett, Munger, Hohn, Pabrai, Li Lu, Stahl/HK, Begg, PRINCIPLES)",
+      "case_log_ref": "_system/research/fundamental_analyst/CASE_LOG_2026-10-29.md",
+      "source": {
+        "case_log": "_system/research/fundamental_analyst/CASE_LOG_2026-10-29.md",
+        "lens": "Multi-lens (Buffett, Munger, Hohn, Pabrai, Li Lu, Stahl/HK, Begg, PRINCIPLES)",
+        "call_date": "2026-10-29",
+        "ticker_cell": "INTC"
+      },
+      "probability_basis": {
+        "stated_probability_call_right": 0.7,
+        "stated_text": "70% (base IRR still < 15% at review price)",
+        "probability_fires_derivation": "probability_fires = 1 - stated_probability_call_right; the falsifier fires when the call is wrong on its own terms.",
+        "calibration_status": "recorded_not_yet_eligible",
+        "calibration_note": "Diagnostic until a human promotes it. v3 calibration eligibility needs forecast_role=primary, an independent review record, and the economic-impact fields (see falsifier_specs.calibration_eligibility). Recording the probability does not promote it.",
+        "brier_basis": "At review, Brier = (stated_probability_call_right - outcome_right)^2, with outcome_right = 1 if the call held, i.e. this falsifier missed."
+      },
+      "typed_blocker": "INTC has no economic_ownership_map component named monitoring. The graph withholds typed status until a contract component exists, so E2 does not count this spec yet. resolve_falsifiers.py still scores it after the review date because the spec itself is valid."
+    }
+  ]
+}

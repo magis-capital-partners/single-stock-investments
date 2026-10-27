@@ -9,10 +9,19 @@ inputs:
     description: Arguments to git add
     required: false
     default: "-A"
+  preserve-company-cache:
+    description: Forwarded to preserve-private-dashboard. False leaves the extraction archive on its own lane.
+    required: false
+    default: "true"
 
 runs:
   using: composite
   steps:
+    - name: Preserve restricted dashboard sources before public staging
+      uses: ./.github/actions/preserve-private-dashboard
+      with:
+        preserve-company-cache: ${{ inputs.preserve-company-cache }}
+
     - name: Stage and push
       shell: bash
       run: |
@@ -26,6 +35,10 @@ runs:
         # --sparse allows staging paths written on disk that sit outside a
         # sparse-checkout cone (e.g. dashboard/data after a minimal checkout).
         git add --sparse ${{ inputs.git_add }}
+        if [ -f dashboard/private-assets.json ]; then
+          git add --sparse dashboard/private-assets.json .gitattributes
+        fi
+        python _system/scripts/audit_fund_letter_exposure.py --staged --strict
         bash _system/scripts/ci_push_main.sh "${{ inputs.message }}"
 
     - name: Deploy chain note

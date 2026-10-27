@@ -3,7 +3,6 @@
 from __future__ import annotations
 
 import json
-from dashboard_catalog_recovery import merge_podcast_catalogs
 import csv
 import hashlib
 import re
@@ -2513,6 +2512,16 @@ def _consensus_row_map(store: dict[str, dict]) -> dict[str, dict]:
     return {b["ticker"]: _finalize_consensus_row(b) for b in store.values()}
 
 
+def _cap_keep_book(rows: list[dict], cap: int) -> list[dict]:
+    """First ``cap`` rows plus every traded in-book row after them, in rank order.
+
+    A held name cut from one quarter's block reads as every fund dropping it when
+    the dashboard compares periods. Mention-only rows carry no fund votes, so
+    cutting those cannot fake a shift.
+    """
+    return [row for i, row in enumerate(rows) if i < cap or (row.get("in_book") and row.get("fund_count"))]
+
+
 def _compute_qoq_shifts(curr: dict[str, dict], prev: dict[str, dict]) -> list[dict]:
     """Quarter-over-quarter fund positioning shifts between two quarter stores."""
     curr_map = _consensus_row_map(curr)
@@ -2644,8 +2653,8 @@ def build_consensus(letters: list[dict], our_tickers: set[str], names: dict[str,
         )
         return {
             "letter_count": sum(1 for letter in letters if (q == "all" or letter.get("quarter") == q)),
-            "most_discussed": most[:80],
-            "biggest_changes": changes[:40],
+            "most_discussed": _cap_keep_book(most, 80),
+            "biggest_changes": _cap_keep_book(changes, 40),
             "activity": _collapse_consensus_rows(activity)[:20],
         }
 
@@ -2719,23 +2728,24 @@ def fund_profiles(letters: list[dict], our_tickers: set[str]) -> dict[str, dict]
             {
                 "quarter": letter.get("quarter"),
                 "letter_date": letter.get("letter_date"),
-                "lead_summary": short_text(letter.get("lead_summary"), 320),
+                "lead_summary": letter.get("lead_summary") or "",
                 "themes": [
                     {"theme": theme.get("theme"), "stance": theme.get("stance")}
-                    for theme in (letter.get("themes") or [])[:8]
+                    for theme in (letter.get("themes") or [])
                     if isinstance(theme, dict) and theme.get("theme")
                 ],
                 "positions": [
                     {
                         "ticker": pos.get("ticker"),
                         "action": pos.get("action"),
-                        "commentary": short_text(pos.get("commentary") or pos.get("thesis"), 280),
+                        "commentary": pos.get("commentary") or pos.get("thesis") or "",
                     }
-                    for pos in (letter.get("positions") or [])[:10]
+                    for pos in (letter.get("positions") or [])
                     if isinstance(pos, dict) and pos.get("ticker")
                 ],
-                "risks": [short_text(value, 240) for value in (letter.get("risks") or [])[:5]],
-                "catalysts": [short_text(value, 240) for value in (letter.get("catalysts") or [])[:5]],
+                "risks": list(letter.get("risks") or []),
+                "catalysts": list(letter.get("catalysts") or []),
+                "duplicate_count": int(letter.get("duplicate_count") or 0),
                 "evidence_url": letter_ev["evidence_url"],
                 "evidence_label": letter_ev["evidence_label"],
             }
@@ -2747,9 +2757,7 @@ def fund_profiles(letters: list[dict], our_tickers: set[str]) -> dict[str, dict]
             key=lambda row: (row.get("letter_date") or "", row.get("quarter") or ""),
             reverse=True,
         )
-        quarters = {row.get("quarter") for row in profile["letters"] if row.get("quarter")}
-        # Extra letters beyond one-per-quarter are near-dups / monthly copies
-        profile["duplicate_count"] = max(0, len(profile["letters"]) - max(len(quarters), 1))
+        profile["duplicate_count"] = sum(row["duplicate_count"] for row in profile["letters"])
         profile["letter_count"] = len(profile["letters"])
         profile["latest_quarter"] = profile["letters"][0].get("quarter") if profile["letters"] else None
     return by_fund
@@ -4040,21 +4048,19 @@ def main() -> int:
         prior_podcasts, new_podcasts
     )
     if preserve_podcasts:
-        merged_podcasts=merge_podcast_catalogs(prior_podcasts,new_podcasts)
-        payload["podcast_index"] = merged_podcasts
-        payload["podcast_by_show"] = podcast_by_show({'episodes':merged_podcasts})
-        payload["podcast_count"] = len(merged_podcasts)
+        payload["podcast_index"] = prior_podcasts
+        payload["podcast_by_show"] = (prior or {}).get("podcast_by_show") or {}
         payload["podcast_index_preserved"] = {
             "reason": podcast_reason,
             "rebuilt_count": len(new_podcasts),
             "preserved_count": len(prior_podcasts),
-            "merged_count": len(merged_podcasts),
             "rebuilt_newest": newest_as_of(r.get("published") for r in new_podcasts),
             "preserved_newest": newest_as_of(r.get("published") for r in prior_podcasts),
         }
         print(
-            f"PRESERVE podcast_index: {podcast_reason}; retaining missing history "
-            "and applying current episodes and summaries.",
+            f"PRESERVE podcast_index: {podcast_reason}; keeping the committed catalog. "
+            "The corpus this lane saw is behind the published one -- check that "
+            "research-vault/podcasts was cloned and is current.",
             file=sys.stderr,
         )
 

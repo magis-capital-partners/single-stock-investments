@@ -350,19 +350,96 @@ ensure_main_rebase_history() {
   fi
 }
 
+# Happy-path files besides this script. The audit is unconditional, and it
+# reads dashboard/private-assets.json (the staged blob, then the worktree
+# copy after rebase). compact_dated_artifacts.py imports atomic_io. A sparse
+# checkout that only named this script died with Errno 2 before it could
+# push (market-risk runs 40586235090 and 40587210458). Narrow callers should
+# list these same paths; this still checks them out if one is forgotten.
+PUSH_DEPENDENCY_PATHS=(
+  _system/scripts/audit_fund_letter_exposure.py
+  _system/scripts/compact_dated_artifacts.py
+  _system/scripts/atomic_io.py
+  dashboard/private-assets.json
+)
+
+materialize_push_dependencies() {
+  local sparse path
+  local -a missing=() present=()
+  sparse="$(git config --get core.sparseCheckout || true)"
+  [ "$sparse" = "true" ] || return 0
+  for path in "${PUSH_DEPENDENCY_PATHS[@]}"; do
+    if [ ! -e "$path" ]; then
+      missing+=("$path")
+    fi
+  done
+  [ "${#missing[@]}" -eq 0 ] && return 0
+  git sparse-checkout add --skip-checks -- "${missing[@]}"
+  for path in "${missing[@]}"; do
+    if git cat-file -e "HEAD:${path}" 2>/dev/null; then
+      present+=("$path")
+    fi
+  done
+  if [ "${#present[@]}" -gt 0 ]; then
+    git checkout HEAD -- "${present[@]}"
+  fi
+  for path in "${PUSH_DEPENDENCY_PATHS[@]}"; do
+    if [ ! -e "$path" ]; then
+      echo "::error::ci_push_main.sh still cannot see ${path} after widening the sparse checkout."
+      return 1
+    fi
+  done
+}
+
 clean_worktree_for_rebase() {
   # Rebuild steps may dirty files outside the staged commit set; rebase refuses
   # to start with unstaged changes. --keep-index preserves the commit payload.
   git update-index -q --refresh || true
   if ! git diff --quiet || [ -n "$(git ls-files --others --exclude-standard | head -n 1)" ]; then
     echo "Stashing unstaged/untracked worktree dirt before rebase..."
-    git stash push -u --keep-index -m "ci_push_main-pre-rebase" || true
+    local before after file expected actual
+    local -a remaining=()
+    before=$(git rev-parse -q --verify refs/stash || true)
+    git stash push -u --keep-index -m "ci_push_main-pre-rebase" || return 1
+    after=$(git rev-parse -q --verify refs/stash || true)
+    if ! git diff --quiet; then
+      # Some sparse/hydrated worktrees retain tracked dirt after stash. Restore
+      # only regular files whose exact Git content is in the new stash. Never
+      # discard unbacked edits, symlinks, submodules, or a local user's work.
+      if [ "${GITHUB_ACTIONS:-}" != "true" ] || [ -z "$after" ] || [ "$before" = "$after" ]; then
+        echo "::error::Rebase cleanup left unsaved tracked changes."
+        return 1
+      fi
+      while IFS= read -r -d '' file; do
+        if [ ! -f "$file" ] || [ -L "$file" ]; then
+          echo "::error::Cannot safely restore residual path: $file"
+          return 1
+        fi
+        expected=$(git rev-parse --verify "${after}:${file}") || return 1
+        actual=$(git hash-object --path="$file" -- "$file") || return 1
+        if [ "$expected" != "$actual" ]; then
+          echo "::error::Residual changes are not in the saved backup: $file"
+          return 1
+        fi
+        remaining+=("$file")
+      done < <(git diff --name-only -z)
+      if [ "${#remaining[@]}" -gt 0 ]; then
+        git -c submodule.recurse=false restore --worktree -- "${remaining[@]}" || return 1
+      fi
+      if ! git diff --quiet; then
+        echo "::error::Verified backup cleanup could not produce a clean index. Check committed source line endings; the saved backup was preserved."
+        return 1
+      fi
+    fi
   fi
 }
 
 ci_push_main() {
   local msg="${1:?commit message required}"
   sync_self_from_origin_main
+  materialize_push_dependencies
+  # Inspect the actual index, so a sanitized worktree cannot conceal staged sources.
+  "$PYTHON" _system/scripts/audit_fund_letter_exposure.py --staged --strict
   # A self-refresh updates this tracked helper in the worktree. Stage it so a
   # later rebase always starts from a clean tree.
   git diff --quiet -- _system/scripts/ci_push_main.sh || git add _system/scripts/ci_push_main.sh
@@ -386,6 +463,10 @@ ci_push_main() {
     ensure_main_rebase_history
     clean_worktree_for_rebase
     if ! git rebase origin/main; then
+      if ! rebase_in_progress; then
+        echo "::error::Rebase did not start; publication has not advanced onto main."
+        exit 1
+      fi
       while rebase_in_progress && try_resolve_rebase_conflicts; do
         echo "Resolved regenerable rebase conflicts; continuing rebase (attempt $attempt/$MAX_ATTEMPTS)."
       done
@@ -400,6 +481,8 @@ ci_push_main() {
       echo "::error::Aborting push: commits ahead of origin/main exceed GitHub size limits."
       exit 1
     fi
+    # Rebase conflict regeneration can introduce fresh private source fields.
+    "$PYTHON" _system/scripts/audit_fund_letter_exposure.py --strict --verify-public-snapshots
     if git push origin HEAD:main; then
       echo "Pushed to main (attempt $attempt)."
       exit 0

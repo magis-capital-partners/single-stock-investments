@@ -1,0 +1,96 @@
+name: Loop checkout size
+
+# Measures the narrowed main checkout that Canonical Memory Triage, the
+# Epistemic Falsifier Loop, and the Committee Outcome Loop use, and fails if it
+# grows back toward the full tree. No manual dispatch: governance allows
+# schedule, pull_request, and repository events only.
+
+on:
+  pull_request:
+    branches: [main]
+    paths:
+      - ".github/workflows/memory-digest.yml"
+      - ".github/workflows/falsifier-resolution.yml"
+      - ".github/workflows/committee-outcomes.yml"
+      - ".github/workflows/loop-checkout-size.yml"
+      - "_system/scripts/loop_checkout_sparse.py"
+      - "_system/scripts/tests/test_loop_checkout_sparse.py"
+      - "_system/graph/graph_sources.json"
+
+permissions:
+  contents: read
+
+jobs:
+  measure:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    strategy:
+      fail-fast: false
+      matrix:
+        # 1: memory triage and committee outcomes. 0: the falsifier loop.
+        fetch-depth: [1, 0]
+    steps:
+      - name: Start the clock
+        run: echo "CHECKOUT_STARTED=$(date +%s)" >> "$GITHUB_ENV"
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.pull_request.head.sha || github.sha }}
+          fetch-depth: ${{ matrix.fetch-depth }}
+          filter: blob:none
+          # CHECKOUT_PATTERNS in _system/scripts/loop_checkout_sparse.py.
+          sparse-checkout: |
+            /*
+            !/*/
+            /.github/
+            /_eval/
+            /_system/
+            !/_system/reference/activist-reports/
+            !/_system/reference/investment-wisdom/
+            /*/research/
+            /dashboard/private-assets.json
+          sparse-checkout-cone-mode: false
+      - name: Materialize cited sources and registered feeds
+        run: |
+          set -euo pipefail
+          echo "MATERIALIZE_STARTED=$(date +%s)" >> "$GITHUB_ENV"
+          python3 _system/scripts/loop_checkout_sparse.py > "$RUNNER_TEMP/loop-inputs.txt"
+          git sparse-checkout add --skip-checks --stdin < "$RUNNER_TEMP/loop-inputs.txt"
+      - name: Record the narrowed checkout
+        env:
+          DEPTH: ${{ matrix.fetch-depth }}
+        run: |
+          set -euo pipefail
+          done_at=$(date +%s)
+          checkout=$((MATERIALIZE_STARTED - CHECKOUT_STARTED))
+          materialize=$((done_at - MATERIALIZE_STARTED))
+          on_disk=$(git ls-files -t | grep -c '^H')
+          tracked=$(git ls-files | wc -l)
+          worktree=$(du -s -B1 --exclude=.git . | cut -f1)
+          gitdir=$(du -s -B1 .git | cut -f1)
+          filings=$(git ls-files -t -- '*/investor-documents/*' | grep -c '^H' || true)
+          # Without the change this job would write the whole 54 GB tree.
+          cap=$((8 * 1024 * 1024 * 1024))
+          # The publication step stages with `git add --sparse -A`. On the real
+          # index, a path left out of the checkout must not be staged as deleted.
+          git add --sparse -A
+          staged=$(git diff --cached --name-only | wc -l)
+          deleted=$(git diff --cached --name-only --diff-filter=D | wc -l)
+          {
+            echo "### Loop checkout (fetch-depth ${DEPTH})"
+            echo "- actions/checkout seconds: ${checkout}"
+            echo "- materialize seconds: ${materialize}"
+            echo "- files on disk: ${on_disk} of ${tracked} tracked"
+            echo "- worktree bytes: ${worktree}"
+            echo "- .git bytes: ${gitdir}"
+            echo "- investor-documents files on disk: ${filings}"
+            echo "- staged after git add --sparse -A: ${staged} (deletions: ${deleted})"
+          } | tee -a "$GITHUB_STEP_SUMMARY"
+          if [ "$worktree" -gt "$cap" ]; then
+            echo "::error::loop checkout is ${worktree} bytes, over the ${cap} byte cap"
+            exit 1
+          fi
+          if [ "$staged" -ne 0 ]; then
+            echo "::error::git add --sparse -A staged ${staged} paths on a clean sparse checkout"
+            git diff --cached --name-status | head -20
+            exit 1
+          fi

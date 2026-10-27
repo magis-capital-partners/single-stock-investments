@@ -1,0 +1,100 @@
+name: Investor holdings history
+on:
+  push:
+    branches: [main]
+    paths:
+      - '_system/scripts/investor_history*.py'
+      - '_system/scripts/investor_universe.py'
+      - '_system/scripts/investor_corpus.py'
+      - '_system/scripts/build_superinvestor_insights.py'
+      - '_system/scripts/fund_registry.py'
+      - '_system/scripts/fund_identity.py'
+      - '_system/scripts/letter_dedup.py'
+      - '_system/scripts/letter_date_parser.py'
+      - '_system/scripts/global_disclosures.py'
+      - '_system/scripts/letter_holdings_tables.py'
+      - '_system/scripts/discover_public_funds.py'
+      - '_system/scripts/refresh_investor_history.py'
+      - '_system/scripts/thirteenf_legacy.py'
+      - '_system/reference/investors/**'
+      - '.github/workflows/investor-history.yml'
+  schedule:
+    - cron: '37 4 * * *'
+  repository_dispatch:
+    types: [backfill-investor-history]
+permissions:
+  contents: write
+concurrency:
+  group: investor-history-refresh
+  cancel-in-progress: false
+jobs:
+  refresh:
+    runs-on: ubuntu-latest
+    timeout-minutes: 300
+    env:
+      SEC_USER_AGENT: ${{ vars.SEC_USER_AGENT }}
+      RESEARCH_VAULT_CLONE_TOKEN: ${{ secrets.RESEARCH_VAULT_CLONE_TOKEN }}
+      RESEARCH_VAULT_ROOT: _external/research-vault
+      CI_PUSH_NO_THIN: '1'
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          filter: blob:none
+          sparse-checkout: |
+            _system/scripts
+            _system/reference/market-data/ownership
+            _system/reference/investors
+            _system/portfolio
+            dashboard
+            .github
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - uses: ./.github/actions/checkout-vault
+        with:
+          hydrate: 'false'
+          include-source-archive: 'false'
+          include-investor-history: 'true'
+      - name: Keep compressed archive pushes bounded
+        run: |
+          git -C "$RESEARCH_VAULT_ROOT" config pack.window 0
+          git -C "$RESEARCH_VAULT_ROOT" config push.negotiate true
+      - name: Restore durable private holdings checkpoint
+        run: python _system/scripts/investor_history_checkpoint.py restore --archive "$RESEARCH_VAULT_ROOT/dashboard-private/investor-history"
+      - name: Restore selected authorized directory inputs
+        run: python _system/scripts/private_dashboard_assets.py
+      - name: Complete or resume the full public history
+        id: history
+        continue-on-error: true
+        run: python _system/scripts/refresh_investor_history.py --seconds 14400
+      - name: Save a verified checkpoint even after an interrupted source
+        if: always() && (steps.history.outcome == 'success' || steps.history.outcome == 'failure')
+        run: >-
+          python _system/scripts/investor_history_checkpoint.py pack
+          --archive "$RESEARCH_VAULT_ROOT/dashboard-private/investor-history"
+          --public-receipt dashboard/data/holdings/archive_receipt.json
+      - name: Persist the private checkpoint
+        if: always() && (steps.history.outcome == 'success' || steps.history.outcome == 'failure')
+        uses: ./.github/actions/commit-vault
+        with:
+          message: 'Preserve resumable investor holdings history'
+          git_add: >-
+            dashboard-private/investor-history
+            dashboard-private/objects
+            dashboard-private/manifest.json
+            dashboard-private/migration-journal.jsonl
+            dashboard-private/.gitattributes
+      - name: Publish dated holdings and coverage
+        if: steps.history.outcome == 'success'
+        uses: ./.github/actions/commit-main
+        with:
+          message: 'chore: refresh complete investor holdings history and disclosures'
+          git_add: >-
+            _system/reference/market-data/ownership/managers.json
+            _system/reference/investors/
+            dashboard/data/holdings/
+            dashboard/private-assets.json
+            .gitattributes
+      - name: Report a failed source processing run
+        if: steps.history.outcome == 'failure'
+        run: exit 1

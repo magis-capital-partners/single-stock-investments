@@ -39,6 +39,22 @@ permissions:
 # Each committing job opts into data-commit-main below.
 
 jobs:
+  company-source-backfill:
+    needs: decide
+    if: needs.decide.outputs.drive == 'true'
+    uses: ./.github/workflows/company-source-backfill.yml
+    with:
+      seconds: '1200'
+    secrets: inherit
+
+  company-source-scans:
+    needs: company-source-backfill
+    uses: ./.github/workflows/company-source-backfill.yml
+    with:
+      seconds: '1200'
+      recover_scans: true
+    secrets: inherit
+
   decide:
     runs-on: ubuntu-latest
     timeout-minutes: 5
@@ -114,7 +130,7 @@ jobs:
     timeout-minutes: 180
     concurrency:
       # Per-job queue - see the concurrency note at the top of this file.
-      group: data-commit-main-${{ github.job }}
+      group: data-commit-main-intake-full
       cancel-in-progress: false
     env:
       RESEARCH_VAULT_REPO_URL: ${{ secrets.RESEARCH_VAULT_REPO_URL }}
@@ -190,8 +206,12 @@ jobs:
     timeout-minutes: 75
     concurrency:
       # Per-job queue - see the concurrency note at the top of this file.
-      group: data-commit-main-${{ github.job }}
+      group: data-commit-main-technicals
       cancel-in-progress: false
+    env:
+      RESEARCH_VAULT_REPO_URL: ${{ secrets.RESEARCH_VAULT_REPO_URL }}
+      RESEARCH_VAULT_CLONE_TOKEN: ${{ secrets.RESEARCH_VAULT_CLONE_TOKEN }}
+      RESEARCH_VAULT_ROOT: _external/research-vault
     steps:
       - uses: actions/checkout@v4
         with:
@@ -203,6 +223,8 @@ jobs:
           fetch-depth: 1
       - name: Checkout dashboard data workspace
         run: bash _system/scripts/ci_checkout_workspace.sh dashboard
+      - name: Checkout research vault
+        uses: ./.github/actions/checkout-vault
       - uses: actions/setup-python@v5
         with:
           python-version: "3.12"
@@ -294,16 +316,16 @@ jobs:
     needs: decide
     if: needs.decide.outputs.activist == 'true'
     runs-on: ubuntu-latest
-    # Every step below carries its own limit (they sum to 261 minutes), and
-    # this job limit sits above that sum, so the JOB limit can never be what
-    # stops the run: GitHub reports a job timeout as "cancelled", and that is
-    # how this job failed silently on every run from 2026-08-03 to 2026-09-24
-    # (last "activist scan sync" commit: 2026-08-02). A step that hits its own
+    # Every step below carries its own limit, and this job limit sits 10
+    # minutes above that sum, so the JOB limit can never be what stops the
+    # run: GitHub reports a job timeout as "cancelled", and that is how this
+    # job failed silently on every run from 2026-08-03 to 2026-09-24 (last
+    # "activist scan sync" commit: 2026-08-02). A step that hits its own
     # limit fails red instead. Typical runs take well under half of this.
-    timeout-minutes: 280
+    timeout-minutes: 297
     concurrency:
       # Per-job queue - see the concurrency note at the top of this file.
-      group: data-commit-main-${{ github.job }}
+      group: data-commit-main-activist
       cancel-in-progress: false
     env:
       RESEARCH_VAULT_REPO_URL: ${{ secrets.RESEARCH_VAULT_REPO_URL }}
@@ -332,6 +354,9 @@ jobs:
         name: Checkout workspace (full)
         timeout-minutes: 20
         run: bash _system/scripts/ci_checkout_workspace.sh full
+      - name: Checkout research vault
+        timeout-minutes: 5
+        uses: ./.github/actions/checkout-vault
       - uses: actions/setup-python@v5
         timeout-minutes: 5
         with:
@@ -349,7 +374,7 @@ jobs:
         timeout-minutes: 37
         name: "Activist scan: SEC filings (rotating, 30-minute budget)"
         continue-on-error: true
-        run: timeout --kill-after=60s 35m python -u _system/scripts/scan_activist_sources.py --phase sec --budget-min 30 --workers 3
+        run: timeout --kill-after=60s 35m python _system/scripts/scan_activist_sources.py --phase sec --budget-min 30
       - name: Commit SEC phase progress
         timeout-minutes: 8
         # Never on a failed/partial checkout: `git add -A` there could stage
@@ -461,8 +486,12 @@ jobs:
     timeout-minutes: 270
     concurrency:
       # Per-job queue - see the concurrency note at the top of this file.
-      group: data-commit-main-${{ github.job }}
+      group: data-commit-main-downloads
       cancel-in-progress: false
+    env:
+      RESEARCH_VAULT_REPO_URL: ${{ secrets.RESEARCH_VAULT_REPO_URL }}
+      RESEARCH_VAULT_CLONE_TOKEN: ${{ secrets.RESEARCH_VAULT_CLONE_TOKEN }}
+      RESEARCH_VAULT_ROOT: _external/research-vault
     steps:
       - uses: jlumbroso/free-disk-space@54081f138730dfa15788a46383842cd2f914a1be # v1.3.1
         with:
@@ -482,6 +511,8 @@ jobs:
           fetch-depth: 1
       - name: Checkout workspace (full)
         run: bash _system/scripts/ci_checkout_workspace.sh full
+      - name: Checkout research vault
+        uses: ./.github/actions/checkout-vault
       - uses: actions/setup-python@v5
         with:
           python-version: "3.12"
@@ -513,7 +544,7 @@ jobs:
     timeout-minutes: 60
     concurrency:
       # Per-job queue - see the concurrency note at the top of this file.
-      group: data-commit-main-${{ github.job }}
+      group: data-commit-main-drive
       cancel-in-progress: false
     outputs:
       imported: ${{ steps.import.outputs.imported }}
@@ -733,7 +764,7 @@ jobs:
     timeout-minutes: 65
     concurrency:
       # Per-job queue - see the concurrency note at the top of this file.
-      group: data-commit-main-${{ github.job }}
+      group: data-commit-main-news
       cancel-in-progress: false
     env:
       POLYGON_API_KEY: ${{ secrets.POLYGON_API_KEY || secrets.POLYGON_IO_API_KEY }}
@@ -794,8 +825,12 @@ jobs:
     timeout-minutes: 30
     concurrency:
       # Per-job queue - see the concurrency note at the top of this file.
-      group: data-commit-main-${{ github.job }}
+      group: data-commit-main-cvr-discover
       cancel-in-progress: false
+    env:
+      RESEARCH_VAULT_REPO_URL: ${{ secrets.RESEARCH_VAULT_REPO_URL }}
+      RESEARCH_VAULT_CLONE_TOKEN: ${{ secrets.RESEARCH_VAULT_CLONE_TOKEN }}
+      RESEARCH_VAULT_ROOT: _external/research-vault
     steps:
       - uses: actions/checkout@v4
         with:
@@ -807,6 +842,8 @@ jobs:
           fetch-depth: 1
       - name: Checkout workspace (CVR reference + scripts)
         run: bash _system/scripts/ci_checkout_workspace.sh minimal
+      - name: Checkout research vault
+        uses: ./.github/actions/checkout-vault
       - uses: actions/setup-python@v5
         with:
           python-version: "3.12"
@@ -881,8 +918,12 @@ jobs:
     timeout-minutes: 30
     concurrency:
       # Per-job queue - see the concurrency note at the top of this file.
-      group: data-commit-main-${{ github.job }}
+      group: data-commit-main-warrant-discover
       cancel-in-progress: false
+    env:
+      RESEARCH_VAULT_REPO_URL: ${{ secrets.RESEARCH_VAULT_REPO_URL }}
+      RESEARCH_VAULT_CLONE_TOKEN: ${{ secrets.RESEARCH_VAULT_CLONE_TOKEN }}
+      RESEARCH_VAULT_ROOT: _external/research-vault
     steps:
       - uses: actions/checkout@v4
         with:
@@ -894,6 +935,8 @@ jobs:
           fetch-depth: 1
       - name: Checkout warrant workspace
         run: bash _system/scripts/ci_checkout_workspace.sh minimal
+      - name: Checkout research vault
+        uses: ./.github/actions/checkout-vault
       - uses: actions/setup-python@v5
         with:
           python-version: "3.12"
@@ -942,8 +985,12 @@ jobs:
     timeout-minutes: 30
     concurrency:
       # Per-job queue - see the concurrency note at the top of this file.
-      group: data-commit-main-${{ github.job }}
+      group: data-commit-main-separation-discover
       cancel-in-progress: false
+    env:
+      RESEARCH_VAULT_REPO_URL: ${{ secrets.RESEARCH_VAULT_REPO_URL }}
+      RESEARCH_VAULT_CLONE_TOKEN: ${{ secrets.RESEARCH_VAULT_CLONE_TOKEN }}
+      RESEARCH_VAULT_ROOT: _external/research-vault
     steps:
       - uses: actions/checkout@v4
         with:
@@ -955,6 +1002,8 @@ jobs:
           fetch-depth: 1
       - name: Checkout separation workspace
         run: bash _system/scripts/ci_checkout_workspace.sh minimal
+      - name: Checkout research vault
+        uses: ./.github/actions/checkout-vault
       - uses: actions/setup-python@v5
         with:
           python-version: "3.12"
@@ -998,8 +1047,12 @@ jobs:
     timeout-minutes: 60
     concurrency:
       # Per-job queue - see the concurrency note at the top of this file.
-      group: data-commit-main-${{ github.job }}
+      group: data-commit-main-reverse-splits
       cancel-in-progress: false
+    env:
+      RESEARCH_VAULT_REPO_URL: ${{ secrets.RESEARCH_VAULT_REPO_URL }}
+      RESEARCH_VAULT_CLONE_TOKEN: ${{ secrets.RESEARCH_VAULT_CLONE_TOKEN }}
+      RESEARCH_VAULT_ROOT: _external/research-vault
     steps:
       - uses: actions/checkout@v4
         with:
@@ -1011,6 +1064,8 @@ jobs:
           fetch-depth: 1
       - name: Checkout reverse-split workspace
         run: bash _system/scripts/ci_checkout_workspace.sh minimal
+      - name: Checkout research vault
+        uses: ./.github/actions/checkout-vault
       - uses: actions/setup-python@v5
         with:
           python-version: "3.12"
@@ -1064,8 +1119,12 @@ jobs:
     timeout-minutes: 45
     concurrency:
       # Per-job queue - see the concurrency note at the top of this file.
-      group: data-commit-main-${{ github.job }}
+      group: data-commit-main-world-model
       cancel-in-progress: false
+    env:
+      RESEARCH_VAULT_REPO_URL: ${{ secrets.RESEARCH_VAULT_REPO_URL }}
+      RESEARCH_VAULT_CLONE_TOKEN: ${{ secrets.RESEARCH_VAULT_CLONE_TOKEN }}
+      RESEARCH_VAULT_ROOT: _external/research-vault
     steps:
       - uses: actions/checkout@v4
         with:
@@ -1077,6 +1136,8 @@ jobs:
           fetch-depth: 1
       - name: Checkout workspace (full)
         run: bash _system/scripts/ci_checkout_workspace.sh full
+      - name: Checkout research vault
+        uses: ./.github/actions/checkout-vault
       - uses: actions/setup-python@v5
         with:
           python-version: "3.12"
@@ -1099,8 +1160,12 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 90
     concurrency:
-      group: data-commit-main-${{ github.job }}
+      group: data-commit-main-buyback-radar
       cancel-in-progress: false
+    env:
+      RESEARCH_VAULT_REPO_URL: ${{ secrets.RESEARCH_VAULT_REPO_URL }}
+      RESEARCH_VAULT_CLONE_TOKEN: ${{ secrets.RESEARCH_VAULT_CLONE_TOKEN }}
+      RESEARCH_VAULT_ROOT: _external/research-vault
     steps:
       - uses: actions/checkout@v4
         with:
@@ -1112,6 +1177,8 @@ jobs:
           fetch-depth: 1
       - name: Checkout workspace (full)
         run: bash _system/scripts/ci_checkout_workspace.sh full
+      - name: Checkout research vault
+        uses: ./.github/actions/checkout-vault
       - uses: actions/setup-python@v5
         with:
           python-version: "3.12"
@@ -1165,11 +1232,14 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 90
     concurrency:
-      group: data-commit-main-${{ github.job }}
+      group: data-commit-main-thirteen-f
       cancel-in-progress: false
     env:
       SEC_USER_AGENT: ${{ vars.SEC_USER_AGENT }}
       THIRTEEN_F_PERIODS: ${{ needs.decide.outputs.thirteen_f_periods }}
+      RESEARCH_VAULT_REPO_URL: ${{ secrets.RESEARCH_VAULT_REPO_URL }}
+      RESEARCH_VAULT_CLONE_TOKEN: ${{ secrets.RESEARCH_VAULT_CLONE_TOKEN }}
+      RESEARCH_VAULT_ROOT: _external/research-vault
     steps:
       - uses: actions/checkout@v4
         with:
@@ -1181,6 +1251,8 @@ jobs:
           fetch-depth: 1
       - name: Checkout workspace (13F ownership)
         run: bash _system/scripts/ci_checkout_workspace.sh thirteen-f
+      - name: Checkout research vault
+        uses: ./.github/actions/checkout-vault
       - uses: actions/setup-python@v5
         with:
           python-version: "3.12"

@@ -16,10 +16,46 @@ jobs:
   resolve-and-validate:
     runs-on: ubuntu-latest
     timeout-minutes: 40
+    env:
+      RESEARCH_VAULT_REPO_URL: ${{ secrets.RESEARCH_VAULT_REPO_URL }}
+      RESEARCH_VAULT_CLONE_TOKEN: ${{ secrets.RESEARCH_VAULT_CLONE_TOKEN }}
+      RESEARCH_VAULT_ROOT: _external/research-vault
     steps:
       - uses: actions/checkout@v4
         with:
+          # Full history, without blobs. This job commits _system/graph/, and
+          # E4 diffs MEMORY.md against the oldest of its last 15 commits, which
+          # reaches back to the first commits of the repository.
           fetch-depth: 0
+          filter: blob:none
+          # CHECKOUT_PATTERNS in _system/scripts/loop_checkout_sparse.py; the
+          # contract test keeps the three loops and that list identical.
+          sparse-checkout: |
+            /*
+            !/*/
+            /.github/
+            /_eval/
+            /_system/
+            !/_system/reference/activist-reports/
+            !/_system/reference/investment-wisdom/
+            /*/research/
+            /dashboard/private-assets.json
+          sparse-checkout-cone-mode: false
+      - name: Materialize cited sources and registered feeds
+        # graph_invariants.py stats every belief citation (E5) and reads every
+        # registered data feed (P6). refresh_falsifier_evidence.py can read a
+        # 20-F or 40-F cover. All three can sit outside the patterns above.
+        run: |
+          set -euo pipefail
+          python3 _system/scripts/loop_checkout_sparse.py > "$RUNNER_TEMP/loop-inputs.txt"
+          git sparse-checkout add --skip-checks --stdin < "$RUNNER_TEMP/loop-inputs.txt"
+          echo "added $(wc -l < "$RUNNER_TEMP/loop-inputs.txt") patterns; $(git ls-files -t | grep -c '^H') files on disk"
+      - name: Checkout research vault
+        uses: ./.github/actions/checkout-vault
+        with:
+          # Evidence is SEC companyfacts and in-repo falsifier files. The vault
+          # checkout only hydrates private snapshots for the publication guard.
+          publication-only: "true"
       - uses: actions/setup-python@v5
         with:
           python-version: "3.12"
@@ -87,6 +123,7 @@ jobs:
         id: commit
         uses: ./.github/actions/commit-main
         with:
+          preserve-company-cache: "false"
           message: |
             chore(epistemic): daily evidence resolution and control-plane refresh
 
@@ -94,7 +131,10 @@ jobs:
             calibration and queues, and validate the resulting repository state.
           # The checkout starts clean and this ordered job is the sole writer.
           # -A safely includes optional newly created draft/release paths without
-          # a shell glob becoming a fatal unmatched git pathspec.
+          # a shell glob becoming a fatal unmatched git pathspec. commit-main
+          # stages with --sparse; a path left out of the sparse checkout is
+          # skip-worktree, so -A does not stage it as deleted
+          # (test_loop_checkout_sparse.py).
           git_add: -A
       - name: Wake the research queue explicitly
         if: success()

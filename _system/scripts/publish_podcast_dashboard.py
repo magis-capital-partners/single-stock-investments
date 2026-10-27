@@ -9,6 +9,8 @@ from __future__ import annotations
 
 import argparse
 import json
+import os
+import sys
 from pathlib import Path
 
 import build_podcast_insights as bpi
@@ -46,8 +48,16 @@ def _manifest() -> dict:
     """The manifest on this checkout, or the one already on the publish worktree.
 
     A podcast publish rewrites manifest.json. Starting from an empty file would
-    drop every other shard the site loads.
+    drop every other shard the site loads. A public placeholder is read from
+    the vault so the rewrite is not applied to the metadata stub.
     """
+    if MANIFEST_PATH.is_file():
+        try:
+            manifest = youtube_lane._resolved_manifest(MANIFEST_PATH)
+        except RuntimeError:
+            manifest = load_json(MANIFEST_PATH)
+        if len((manifest.get("shards") or {})) >= 3:
+            return manifest
     manifest = load_json(MANIFEST_PATH)
     if len((manifest.get("shards") or {})) >= 3:
         return manifest
@@ -107,13 +117,18 @@ def publish() -> dict:
             "path": "_system/reference/podcasts/insights_index_mirror.json",
         }
 
-    events_doc = load_json(INSIGHTS_DIR / "events.json")
-    events = events_doc.get("events")
+    events = youtube_lane._events_beside(MANIFEST_PATH)
     try:
         manifest = prepare_published_manifest(_manifest(), events, mutate)
     except ValueError as exc:
         raise SystemExit(str(exc)) from exc
     write_json(MANIFEST_PATH, manifest)
+    try:
+        youtube_lane.seal_insights_manifest(MANIFEST_PATH, videos=False, podcasts=True)
+    except RuntimeError as exc:
+        raise SystemExit(str(exc)) from exc
+    from build_feed_status import write_feed_status
+    write_feed_status(ROOT)
     return {
         "episode_count": len(rows),
         "with_analysis": analysed,
@@ -131,6 +146,9 @@ def main() -> int:
     parser.add_argument("--push", action="store_true",
                         help="Commit the shard on origin/main and push it.")
     args = parser.parse_args()
+    if args.push and youtube_lane.self_update() is True:
+        print("re-executing so this publish uses the publisher it just pulled")
+        os.execv(sys.executable, [sys.executable, *sys.argv])
     result = publish()
     print(
         f"podcast dashboard: {result['episode_count']} episodes, "

@@ -1,6 +1,6 @@
 """Comparable issuer operating observations; nulls never imply zero."""
 from __future__ import annotations
-from datetime import date, timedelta
+from datetime import date
 from aggregates_facts import finite
 
 METRICS={
@@ -50,32 +50,6 @@ def comparable(a,b):
 
 
 def operating_periods(observations):
-    observations=[r for r in observations if r.get('status')!='superseded']
-    # Reconcile cumulative disclosures into standalone quarters. Dollar/ton
-    # observations require their matching shipment weights; never subtract ASPs.
-    additive={'shipments_million_tons','segment_revenue_usd','segment_ebitda_usd','segment_gross_profit_usd','production_million_tons','maintenance_capex_usd','growth_capex_usd'}
-    derived=[]
-    for current in observations:
-        if current.get('period_type') not in {'FY','YTD'} or not current.get('period_start'):continue
-        previous=[r for r in observations if r['ticker']==current['ticker'] and r['metric']==current['metric'] and r.get('period_start')==current['period_start'] and r['period_end']<current['period_end'] and comparable(r,current)]
-        if not previous:continue
-        prior=max(previous,key=lambda r:(r['period_end'],r['published_at']))
-        start=(date.fromisoformat(prior['period_end'])+timedelta(days=1)).isoformat()
-        days=(date.fromisoformat(current['period_end'])-date.fromisoformat(start)).days+1
-        if not 70<=days<=110:continue
-        if any(r['ticker']==current['ticker'] and r['metric']==current['metric'] and r.get('period_start')==start and r['period_end']==current['period_end'] and r['period_type']=='Q' for r in observations):continue
-        value=None;inputs=[current,prior]
-        if current['metric'] in additive:value=current['value']-prior['value']
-        elif current['metric'].endswith('_per_ton'):
-            tons=[]
-            for item in [current,prior]:
-                matches=[r for r in observations if r['ticker']==item['ticker'] and r['metric']=='shipments_million_tons' and r.get('period_start')==item['period_start'] and r['period_end']==item['period_end'] and all(r.get(k)==item.get(k) for k in COMPARABILITY if k not in {'unit','currency','freight_basis'})]
-                tons.append(max(matches,key=lambda r:(r['published_at'],r['retrieved_at'])) if matches else None)
-            if all(tons) and tons[0]['value']>tons[1]['value']:
-                value=(current['value']*tons[0]['value']-prior['value']*tons[1]['value'])/(tons[0]['value']-tons[1]['value']);inputs+=tons
-        if value is not None:
-            derived.append({**current,'value':round(value,6),'period_start':start,'period_type':'Q','status':'derived','inputs':inputs,'formula_version':'cumulative-period-difference-v1'})
-    observations+=derived
     selected={}
     for row in observations:
         validate(row)

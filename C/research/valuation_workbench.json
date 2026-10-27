@@ -1,7 +1,7 @@
 {
   "schema_version": "3.0",
   "ticker": "C",
-  "as_of": "2026-10-26",
+  "as_of": "2026-10-27",
   "proof_status": "decision_grade",
   "model_level": "stock_specific",
   "model_level_reason": "The proof-complete model uses stock-specific components and assumptions.",
@@ -15,7 +15,9 @@
     "model_as_of": "2026-08-13",
     "latest_fact_as_of": "2025-12-31",
     "oldest_fact_as_of": "2025-12-31",
-    "price_as_of": "2026-08-31"
+    "price_as_of": "2026-08-31",
+    "forecast_as_of": "2026-08-13",
+    "calculation_as_of": "2026-08-31"
   },
   "legacy_audit": {
     "actionable": false,
@@ -70,18 +72,20 @@
       "high": null
     },
     "forward_return_status": "withheld",
-    "forward_return_reason": "present_value_today cannot be annualized as a future payoff",
+    "forward_return_reason": "shared_forecast_incomplete",
     "required_return_pct": 10.0,
     "downside_to_low_pct": -75.68,
     "unvalued_component_count": 0,
     "unresolved_evidence_count": 0,
     "proof_complete_pct": 100.0,
-    "model_hash": "37f57058b990d0c025c0d3ddbc8ad3506554f6b53496b5660078fbb2baf78bf3",
+    "model_hash": "d36884b8801afb7f56d864690248d8ae81f79894765bddefad86ddbaf7816122",
     "dates": {
       "model_as_of": "2026-08-13",
       "latest_fact_as_of": "2025-12-31",
       "oldest_fact_as_of": "2025-12-31",
-      "price_as_of": "2026-08-31"
+      "price_as_of": "2026-08-31",
+      "forecast_as_of": "2026-08-13",
+      "calculation_as_of": "2026-08-31"
     },
     "legacy_audit": {
       "actionable": false,
@@ -102,7 +106,11 @@
     },
     "primary_power_zone": "Credit, funding, and normalized financial returns",
     "owner_decision": null,
-    "next_action": "Complete the next hash-bound isolated outputs: pre_mortem.json, round_1/marks_credit_cycle.json, round_1/buffett_weschler.json, round_1/klarman_asset_value.json."
+    "next_action": "Complete the next hash-bound isolated outputs: pre_mortem.json, round_1/marks_credit_cycle.json, round_1/buffett_weschler.json, round_1/klarman_asset_value.json.",
+    "forecast_id": "a6f8ee8d6afe243ca0009d0d01e0c16af719136e8f81d963ea56b54a3e77db73",
+    "calculation_status": "model_gap",
+    "research_return_available": false,
+    "calculation_reason": "realization_timing_missing:value_per_share; realization_timing_missing:reserve_gross"
   },
   "business": {
     "status": "complete",
@@ -2496,7 +2504,9 @@
       "model_as_of": "2026-08-13",
       "latest_fact_as_of": "2025-12-31",
       "oldest_fact_as_of": "2025-12-31",
-      "price_as_of": "2026-08-31"
+      "price_as_of": "2026-08-31",
+      "forecast_as_of": "2026-08-13",
+      "calculation_as_of": "2026-08-31"
     },
     "legacy_audit": {
       "actionable": false,
@@ -5137,7 +5147,7 @@
       }
     ],
     "change_control": {
-      "model_hash": "37f57058b990d0c025c0d3ddbc8ad3506554f6b53496b5660078fbb2baf78bf3",
+      "model_hash": "d36884b8801afb7f56d864690248d8ae81f79894765bddefad86ddbaf7816122",
       "method_versions": [
         "capital_structure_and_excess_return@1.0",
         "net_asset_value@1.0",
@@ -6384,17 +6394,19 @@
   },
   "freshness": {
     "status": "stale",
-    "as_of": "2026-10-26",
+    "as_of": "2026-10-27",
     "dates": {
       "model_as_of": "2026-08-13",
       "latest_fact_as_of": "2025-12-31",
       "oldest_fact_as_of": "2025-12-31",
-      "price_as_of": "2026-08-31"
+      "price_as_of": "2026-08-31",
+      "forecast_as_of": "2026-08-13",
+      "calculation_as_of": "2026-08-31"
     },
     "age_days": {
-      "model_as_of": 74,
-      "latest_fact_as_of": 299,
-      "price_as_of": 56
+      "model_as_of": 75,
+      "latest_fact_as_of": 300,
+      "price_as_of": 57
     },
     "review_threshold_days": {
       "model_as_of": 365,
@@ -6402,7 +6414,7 @@
       "price_as_of": 7
     },
     "warnings": [
-      "price_as_of is 56 days old (review threshold 7)"
+      "price_as_of is 57 days old (review threshold 7)"
     ],
     "rule": "Freshness is disclosed separately from proof completeness; stale or undated inputs require review before a new capital decision."
   }

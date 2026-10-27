@@ -14,6 +14,7 @@ Usage:
 from __future__ import annotations
 
 import argparse
+import hashlib
 import json
 import re
 import sqlite3
@@ -27,11 +28,106 @@ if str(SCRIPTS) not in sys.path:
     sys.path.insert(0, str(SCRIPTS))
 
 from agent_schema import cosine, hash_embedding  # noqa: E402
-from build_chunk_store import chunk_text  # noqa: E402
+from build_chunk_store import chunk_text, stable_chunk_id  # noqa: E402
 
 DEFAULT_DB = ROOT / "_system" / "cache" / "agent_search.sqlite"
 CHUNKS_JSONL = ROOT / "_system" / "data" / "chunks.jsonl"
 MAX_FILING_CHUNKS_PER_FILE = 40
+
+
+def _is_private_snapshot(row: dict[str, Any]) -> bool:
+    return row.get("private_snapshot") is True
+
+
+def restored_private_rows(root: Path, public_path: Path) -> list[dict[str, Any]] | None:
+    """Return the vault copy of a placeholder JSONL, or None when it is not available.
+
+    Public checkouts of ``chunks.jsonl`` are a one-line metadata placeholder
+    after the fund-letter migration. The curated rows stay in the private
+    research vault. This reader is for a vault that is already on disk. The
+    public agent-index artifact must not clone that vault: the repository is
+    public, and the sqlite upload would republish the private text.
+    """
+    try:
+        rel = public_path.resolve().relative_to(root.resolve()).as_posix()
+    except ValueError:
+        return None
+    manifest_path = root / "dashboard" / "private-assets.json"
+    if not manifest_path.is_file():
+        return None
+    try:
+        manifest = json.loads(manifest_path.read_text(encoding="utf-8"))
+    except (OSError, json.JSONDecodeError):
+        return None
+    entry = (manifest.get("repository_assets") or {}).get(rel) or {}
+    digest = str(entry.get("private_sha256") or "")
+    if not re.fullmatch(r"[0-9a-f]{64}", digest):
+        return None
+    from vault_paths import research_vault_root
+
+    vault = research_vault_root()
+    if vault is None:
+        return None
+    from private_dashboard_assets import private_object
+    private = private_object(vault, digest)
+    if not private.is_file():
+        return None
+    payload = private.read_bytes()
+    if hashlib.sha256(payload).hexdigest() != digest:
+        raise RuntimeError(f"Private chunk snapshot hash mismatch for {rel}")
+    rows: list[dict[str, Any]] = []
+    for line in payload.decode("utf-8", errors="ignore").splitlines():
+        if not line.strip():
+            continue
+        row = json.loads(line)
+        if isinstance(row, dict) and not _is_private_snapshot(row):
+            rows.append(row)
+    return rows
+
+
+def iter_chunk_rows(chunks_path: Path, root: Path) -> list[dict[str, Any]]:
+    rows: list[dict[str, Any]] = []
+    placeholder = False
+    for line in chunks_path.read_text(encoding="utf-8", errors="ignore").splitlines():
+        if not line.strip():
+            continue
+        row = json.loads(line)
+        if not isinstance(row, dict):
+            continue
+        if _is_private_snapshot(row):
+            placeholder = True
+            restored = restored_private_rows(root, chunks_path)
+            if restored:
+                rows.extend(restored)
+            continue
+        rows.append(row)
+    if placeholder and not rows:
+        print(
+            "chunks.jsonl is a private snapshot placeholder; curated chunks are not in this checkout.",
+            file=sys.stderr,
+        )
+    return rows
+
+
+def chunk_row_id(row: dict[str, Any]) -> str | None:
+    """Use a written chunk_id, or the chunk-store scheme when the row has text.
+
+    A private-snapshot placeholder has neither an id nor text. It is not a chunk.
+    """
+    existing = row.get("chunk_id")
+    if isinstance(existing, str) and existing.strip():
+        return existing
+    text = row.get("text")
+    if not isinstance(text, str) or not text.strip():
+        return None
+    section = row.get("section")
+    return stable_chunk_id(
+        source_path=str(row.get("source_path") or ""),
+        section=section if isinstance(section, str) else None,
+        text=text,
+        ticker=str(row.get("ticker") or ""),
+        kind=str(row.get("kind") or ""),
+    )
 
 
 def _sanitize(raw: str) -> str:
@@ -61,18 +157,20 @@ def build_search_index(db_path: Path = DEFAULT_DB, *, root: Path = ROOT, include
 
         chunks_path = root / "_system" / "data" / "chunks.jsonl"
         chunk_count = 0
+        derived_chunk_ids = 0
         if chunks_path.is_file():
-            for line in chunks_path.read_text(encoding="utf-8", errors="ignore").splitlines():
-                if not line.strip():
+            for row in iter_chunk_rows(chunks_path, root):
+                had_id = isinstance(row.get("chunk_id"), str) and bool(str(row.get("chunk_id")).strip())
+                chunk_id = chunk_row_id(row)
+                if chunk_id is None:
                     continue
-                row = json.loads(line)
-                add(str(row["chunk_id"]), str(row.get("ticker") or ""), str(row.get("kind")), str(row.get("source_path")), row.get("section"), str(row.get("text")))
+                if not had_id:
+                    derived_chunk_ids += 1
+                add(chunk_id, str(row.get("ticker") or ""), str(row.get("kind")), str(row.get("source_path") or ""), row.get("section"), str(row.get("text") or ""))
                 chunk_count += 1
 
         filing_count = 0
         if include_filing_text:
-            import hashlib
-
             for text_path in sorted(root.glob("*/research/evidence/_text/*.txt")):
                 ticker = text_path.parent.parent.parent.parent.name
                 try:
@@ -90,7 +188,12 @@ def build_search_index(db_path: Path = DEFAULT_DB, *, root: Path = ROOT, include
         conn.commit()
     finally:
         conn.close()
-    return {"chunks": chunk_count, "filing_text_chunks": filing_count, "total": chunk_count + filing_count}
+    return {
+        "chunks": chunk_count,
+        "derived_chunk_ids": derived_chunk_ids,
+        "filing_text_chunks": filing_count,
+        "total": chunk_count + filing_count,
+    }
 
 
 def search(query: str, *, ticker: str | None = None, kind: str | None = None, limit: int = 10, db_path: Path = DEFAULT_DB, root: Path = ROOT) -> dict[str, Any]:

@@ -23,6 +23,20 @@ def write(p, value):
     p.write_text(json.dumps(value,allow_nan=False,separators=(',',':'))+'\n',encoding='utf-8',newline='\n')
 
 
+def security_for(row):
+    """Join dated primary-source symbol/venue events by issuer, never ticker alone."""
+    ledger=read(Path(__file__).resolve().parents[2]/'data/reverse_splits/third_plus_signal_study/ssr_execution_v2/security_lifecycle.v1.json')
+    symbol=row['ticker'];venue='NASDAQ';sources=[]
+    for e in sorted(ledger['events'],key=lambda e:e['effective']):
+        if e['issuer']!=row['issuer'] or e['ticker']!=symbol or e['effective']>row['date']:continue
+        sources.append(e['source_url'])
+        if e['kind']=='symbol_change':
+            if e.get('same_security') is not True:raise ValueError('Unproven successor security')
+            symbol=e['successor']
+        else:venue='NASDAQ' if e['kind']=='venue_resume' else e['destination']
+    return symbol,venue,sources
+
+
 def make_plan(inputs):
     import exchange_calendars as xc
     cal=xc.get_calendar('XNYS',start='2023-01-01',end='2027-01-01')
@@ -33,7 +47,7 @@ def make_plan(inputs):
         op=cal.session_open(day).to_pydatetime();cl=cal.session_close(day).to_pydatetime()
         start=op.timestamp() if kind=='entry' else cl.timestamp()-91*60
         end=op.timestamp()+61*60+5 if kind=='entry' else cl.timestamp()-15*60+5
-        request=dict(dataset='XNAS.ITCH',schema='mbp-10',symbols=sorted({r['ticker'] for r in rows}),
+        request=dict(dataset='XNAS.ITCH',schema='mbp-10',symbols=sorted({security_for(r)[0] for r in rows}),
                      start=datetime.fromtimestamp(start,timezone.utc).isoformat(),end=datetime.fromtimestamp(end,timezone.utc).isoformat())
         ident=hashlib.sha256(json.dumps(request,sort_keys=True).encode()).hexdigest()[:24]
         jobs.append(dict(id=ident,request=request,rows=rows,open_ms=int(op.timestamp()*1000),close_ms=int(cl.timestamp()*1000)))
@@ -229,6 +243,15 @@ def free_bars(source,work):
     plan=price(dict(schema='third_plus_free_bar_plan.v2',jobs=jobs),client,free)
     if plan['quote_failures']:raise ValueError('Unpriced free-bar requests; rerun price before collecting')
     collect(plan,client,free,0)
+    normalize_free(source,work)
+
+
+def normalize_free(source,work):
+    """Rebuild from hash-verified existing sources only. No client or network."""
+    import databento as db
+    import numpy as np
+    free=work/'free_bars';groups=defaultdict(list)
+    for j in read(work/'plan.local.json')['jobs']:groups[j['rows'][0]['date'][:7]].append(j)
     status=read(work/'status.local.json')['sessions'];prepared=read(source/'_system/data/reverse_splits/local/patient_execution/20261020_v1/prepared.local.json')['rows']
     quotes={(r['ticker'],r['date']):r for r in prepared if r.get('prepared')};index=[];counts=defaultdict(int)
     for job in read(free/'collection.local.json')['jobs']:
@@ -237,29 +260,32 @@ def free_bars(source,work):
         frame=db.DBNStore.from_file(str(p)).to_df(pretty_ts=False)
         for original_job in groups[job['month']]:
             for row in original_job['rows']:
+                symbol,venue,lineage_sources=security_for(row)
+                source_complete=symbol in job['request']['symbols'] and venue=='NASDAQ'
                 start=int(datetime.fromisoformat(original_job['request']['start']).timestamp())
                 end=int(datetime.fromisoformat(original_job['request']['end']).timestamp())
                 if row['kind']=='entry':end=original_job['close_ms']//1000-15*60+5
-                f=frame[frame['symbol']==row['ticker']].copy() if len(frame) and 'symbol' in frame else frame.iloc[:0].copy()
+                f=frame[frame['symbol']==symbol].copy() if source_complete and len(frame) and 'symbol' in frame else frame.iloc[:0].copy()
                 f=f[(f.index//10**9>=start-1800)&(f.index//10**9<end)]
                 bars=[[int(at)//10**9,float(x.open),float(x.high),float(x.low),float(x.close),int(x.volume)] for at,x in f.iterrows()]
-                q=quotes.get((row['ticker'],row['date']));qp=[];hashes=[receipt['sha256']]
+                q=quotes.get((symbol,row['date']));qp=[];hashes=[receipt['sha256']]
                 if q:
                     qpfile=Path(q['prepared']);qpfile.resolve().relative_to((source/'_system/data/reverse_splits/local').resolve())
                     with np.load(qpfile,allow_pickle=False) as a:
                         mask=(a['ts']>=start-1)&(a['ts']<end)&a['valid']
                         qp=[[int(t),float(b),float(s)] for t,b,s in zip(a['ts'][mask],a['bid'][mask],a['ask'][mask]) if math.isfinite(b) and math.isfinite(s) and b>0 and s>=b]
                     hashes.append(sha(qpfile))
-                st=status.get(row['date']+'|'+row['ticker'],{})
+                st=status.get(row['date']+'|'+symbol,{})
                 if st:hashes.append(st['source_sha256'])
                 s=dict(schema='third_plus_bar_session.v2',event_id=row['id'],issuer=row['issuer'],date=row['date'],open_ms=original_job['open_ms'],close_ms=original_job['close_ms'],
                        capture_start_ms=start*1000,capture_end_ms=end*1000,source_hashes=hashes,bars=bars,quotes=qp,statuses=st.get('records',[]),
-                       opening_restricted=row['restricted'],quote_basis='sampled_venue_quotes' if qp else 'lagged_bar_spread_proxy',
-                       evidence_level='one_second_bar_fill_sensitivity',volume_scope='single_venue',empty_observed=not bool(bars))
+                       opening_restricted=row['restricted'],quote_basis='sampled_venue_quotes' if qp else 'missing',source_ticker=symbol,venue=venue,lineage_sources=lineage_sources,
+                       data_gaps=[] if source_complete else ['venue_exit' if venue!='NASDAQ' else 'symbol_capture_missing'],
+                       evidence_level='observed_bars_with_unverified_execution',volume_scope='single_venue',empty_observed=source_complete and not bool(bars))
                 name=hashlib.sha256((row['id']+'|'+row['date']+'|'+row['kind']).encode()).hexdigest()[:24]+'.json'
                 file=work/'sessions'/name;write(file,s)
                 index.append(dict(event_id=row['id'],date=row['date'],kind=row['kind'],file='sessions/'+name,sha256=sha(file),events=len(bars),header={k:v for k,v in s.items() if k not in ('bars','quotes','statuses')}))
-                counts['sessions']+=1;counts['sampled_quotes']+=bool(qp);counts['bar_quote_proxy']+=not bool(qp);counts['empty_bars']+=not bool(bars)
+                counts['sessions']+=1;counts['sampled_quotes']+=bool(qp);counts['missing_quotes']+=not bool(qp);counts['empty_bars']+=source_complete and not bool(bars);counts['source_gaps']+=not source_complete
         print('Prepared free-bar month',job['month'],counts['sessions'],'sessions',flush=True)
     write(work/'index.local.json',dict(schema='third_plus_venue_archive.v2',mode='bar_sensitivity',sessions=index,counts=dict(counts)))
     write(work/'collection.local.json',dict(schema='third_plus_free_collection.v2',authorized_cap_usd=0,reserved_cost_usd=0,files=[j['sha256'] for j in read(free/'collection.local.json')['jobs'] if j.get('sha256')]))
@@ -284,7 +310,7 @@ def extend_covers(source,work):
 
 
 def main():
-    ap=argparse.ArgumentParser();ap.add_argument('command',choices=['plan','price','collect','normalize','status','free-bars','extend-covers']);ap.add_argument('--source-root',type=Path,required=True);ap.add_argument('--project-root',type=Path,default=Path(__file__).resolve().parents[3]);ap.add_argument('--budget-usd',type=float,default=0);a=ap.parse_args()
+    ap=argparse.ArgumentParser();ap.add_argument('command',choices=['plan','price','collect','normalize','normalize-free','status','free-bars','extend-covers']);ap.add_argument('--source-root',type=Path,required=True);ap.add_argument('--project-root',type=Path,default=Path(__file__).resolve().parents[3]);ap.add_argument('--budget-usd',type=float,default=0);a=ap.parse_args()
     work=a.source_root/'_system/data/reverse_splits/local/third_plus_signal_study/ssr_execution_v2';work.mkdir(parents=True,exist_ok=True)
     if a.command=='plan':
         subprocess.run(['node',str(Path(__file__).with_name('export_venue_inputs.cjs')),str(a.source_root),str(work/'inputs.local.json')],check=True)
@@ -292,6 +318,7 @@ def main():
     elif a.command=='normalize':normalize(work)
     elif a.command=='status':status_archive(a.source_root,work)
     elif a.command=='free-bars':free_bars(a.source_root,work)
+    elif a.command=='normalize-free':normalize_free(a.source_root,work)
     elif a.command=='extend-covers':extend_covers(a.source_root,work)
     else:
         sys.path.insert(0,str(a.source_root/'_system/scripts'))

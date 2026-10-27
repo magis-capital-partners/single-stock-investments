@@ -4,7 +4,6 @@ from __future__ import annotations
 
 import csv
 import json
-from atomic_io import _atomic_write_text
 import os
 import re
 import sys
@@ -214,7 +213,7 @@ def reconcile_onboard_status(ticker_dir: Path, pdf_count: int) -> dict | None:
         "deep_dive_pending": status.get("deep_dive_pending", True),
     }
     path = ticker_dir / ".onboard_status.json"
-    _atomic_write_text(path, json.dumps(healed, indent=2) + "\n")
+    path.write_text(json.dumps(healed, indent=2) + "\n", encoding="utf-8")
     return healed
 
 
@@ -722,7 +721,7 @@ def build_document_catalog(document_registry: dict | None) -> dict | None:
         "known_tickers": sorted(by_ticker.keys()),
         "documents": rows,
     }
-    _atomic_write_text(DOCUMENT_CATALOG_PATH, json.dumps(catalog, indent=2, sort_keys=True) + "\n")
+    DOCUMENT_CATALOG_PATH.write_text(json.dumps(catalog, indent=2, sort_keys=True) + "\n", encoding="utf-8")
     return catalog
 
 
@@ -1551,7 +1550,7 @@ def valuation_decision_summary(
         status in {"evidence_blocked", "provisional"}
         or model_level not in RETURN_PUBLISHABLE_MODEL_LEVELS
     )
-    return {
+    view = {
         "status": status,
         "proof_status": proof_status,
         "model_level": model_level,
@@ -1611,6 +1610,13 @@ def valuation_decision_summary(
             "TPL", "LB", "WBI", "AZLCZ", "MSB", "C", "NVR", "NUE", "BIIB",
         },
     }
+    from refresh_shared_forecasts import calculate
+    from valuation_forecast import attach_forecast
+    if ((ticker_dir / 'research/valuation.json').is_file()
+            or (ROOT / '_system/reference/market-data/valuation_fundamentals' / (ticker + '.json')).is_file()):
+        return attach_forecast({'valuation_decision': view}, calculate(ticker, ROOT, datetime.now(timezone.utc).date().isoformat()), detailed=False)['valuation_decision']
+    return view
+
 
 
 def valuation_queue_summary(rows: list[dict]) -> dict:
@@ -3128,6 +3134,10 @@ def build_ticker_row(
         _load_json(ticker_dir / "research/valuation_contract.json") or {}, as_of=datetime.now(timezone.utc).date()), detailed=True)
     from autonomous_compounders import load_estimate
     row["autonomous_irr"] = load_estimate(ticker, ROOT)
+    from refresh_shared_forecasts import calculate
+    from valuation_forecast import attach_forecast
+    attach_forecast(row, calculate(ticker, ROOT, datetime.now(timezone.utc).date().isoformat()))
+    row.pop("autonomous_irr", None)
     return row
 
 
@@ -3558,7 +3568,7 @@ def write_oauth_config() -> None:
             "Create a GitHub OAuth App; callback URL must match .../oauth/callback.html on Pages.",
         ),
     }
-    _atomic_write_text(OAUTH_CONFIG, json.dumps(payload, indent=2) + "\n")
+    OAUTH_CONFIG.write_text(json.dumps(payload, indent=2) + "\n", encoding="utf-8")
 
 
 def _load_json(path: Path) -> dict | None:
@@ -3747,7 +3757,8 @@ def main() -> None:
     learning_loop = build_learning_loop_summary()
     if memory_doc and learning_loop:
         memory_doc["learning_loop"] = learning_loop
-        _atomic_write_text(RESEARCH_MEMORY_PATH, json.dumps(memory_doc, separators=(",", ":")))
+        RESEARCH_MEMORY_PATH.write_text(
+            json.dumps(memory_doc, separators=(",", ":")), encoding="utf-8")
     # Restore and guards must judge against the same prior (shard-aware).
     payload = build(prior_by_ticker)
     if short_alpha:
@@ -3864,7 +3875,7 @@ def main() -> None:
     released = release_standalone_embeds(payload)
     if released:
         print(f"Left standalone embeds out of the monolith: {', '.join(released)}")
-    _atomic_write_text(OUTPUT, json.dumps(payload, separators=(",", ":")))
+    OUTPUT.write_text(json.dumps(payload, separators=(",", ":")), encoding="utf-8")
     print(f"Wrote {OUTPUT} ({payload['summary']['ticker_count']} tickers)")
     if UNRESOLVED_UNITS:
         # Not fatal: these render as bare numbers, which is honest. It is still a

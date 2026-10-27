@@ -13,26 +13,32 @@ import argparse
 import calendar
 import hashlib
 import json
-import math
 import re
 import statistics
+import threading
 import time
 import urllib.error
 import urllib.parse
 import urllib.request
 from datetime import date, datetime, timezone
-from pathlib import Path
 from functools import lru_cache
+from itertools import pairwise
+from pathlib import Path
 
-from atomic_io import write_json_if_changed, write_text_if_changed, semantic_json_sha256
+from atomic_io import semantic_json_sha256, write_json_if_changed, write_text_if_changed
 from sec_client import SecClient
 from tci_return_bridge import number
-from universal_valuation_contract import _cashflow_irr, normalize_forward_cashflow_schedule
+from universal_valuation_contract import (
+    _cashflow_irr,
+    normalize_forward_cashflow_schedule,
+)
 
 ROOT = Path(__file__).resolve().parents[2]
 STATE = Path('_system/data/autonomous_compounders.json')
 INPUTS = Path('_system/reference/market-data/compounders')
 VERSION = 'owner-cash-scenarios/1.0'
+_PRIMARY_SEC_LOCK = threading.Lock()
+_PRIMARY_SEC_CLIENT = SecClient(max_attempts=2)
 FIELDS = {
     'ocf': 'OperatingCashFlow', 'capex': 'CapitalExpenditure',
     'revenue': 'TotalRevenue', 'operating_income': 'OperatingIncome',
@@ -55,7 +61,10 @@ SEC_TAGS = {
     'sbc': ['ShareBasedCompensation'],
     'net_income': ['NetIncomeLossAvailableToCommonStockholdersBasic', 'ProfitLossAttributableToOwnersOfParent', 'NetIncomeLoss'],
 }
-SYMBOLS = {'CSU': 'CSU.TO', 'LMN': 'LMN.V', 'LIFCO.ST': 'LIFCO-B.ST', 'LSEG': 'LSEG.L', 'BRK.B': 'BRK-B', 'BN': 'BN', 'FRMO': 'FRMO'}
+SYMBOLS = {'CSU': 'CSU.TO', 'LMN': 'LMN.V', 'LIFCO.ST': 'LIFCO-B.ST', 'LSEG': 'LSEG.L', 'BRK.B': 'BRK-B', 'BF.B': 'BF-B', 'HEI.A': 'HEI-A', 'BN': 'BN', 'FRMO': 'FRMO', 'BYMA': 'BYMA.BA', 'BMYS.KL': '1818.KL', 'PSH': 'PSHD.L'}
+# Bursa listing identity: https://bursa.listedcompany.com/interactive_chart.html (stock code 1818).
+# BYMA provider symbol is also recorded in BYMA/research/valuation.json inputs.price_source.
+# PSH USD listing: https://www.londonstockexchange.com/stock/PSHD/pershing-square-holdings-ltd
 HOLDINGS = {'BRK.B', 'BN', 'MKL', 'FRMO'}
 
 
@@ -115,8 +124,13 @@ def quote(symbol, as_of):
     meta = data['meta']
     if meta.get('symbol', '').upper() != symbol.upper():
         raise ValueError('Quote symbol does not match requested listing')
+    quotes = (data.get('indicators') or {}).get('quote') or [{}]
     rows = [(datetime.fromtimestamp(t, timezone.utc).date().isoformat(), number(v))
-            for t, v in zip(data.get('timestamp') or [], data['indicators']['quote'][0]['close'])]
+            for t, v in zip(data.get('timestamp') or [], quotes[0].get('close') or [])]
+    # Some valid listings return metadata but no historical close array. A
+    # dated regular-session observation is usable; an undated price is not.
+    if not rows and meta.get('regularMarketTime') and number(meta.get('regularMarketPrice')) is not None:
+        rows = [(datetime.fromtimestamp(meta['regularMarketTime'], timezone.utc).date().isoformat(), number(meta['regularMarketPrice']))]
     rows = [(d, v) for d, v in rows if v is not None and v > 0 and d <= as_of]
     if not rows:
         raise ValueError('No positive dated quote')
@@ -125,6 +139,7 @@ def quote(symbol, as_of):
     if currency == 'GBp':
         value, currency = value / 100, 'GBP'
     return {'value': value, 'currency': currency, 'as_of': d, 'symbol': symbol,
+            'company_name': meta.get('longName') or meta.get('shortName'),
             'source_url': url, 'retrieved_at': stamp(), 'claim_type': 'provider_observation'}
 
 
@@ -190,15 +205,79 @@ def primary_facts(payload, url, as_of):
     return facts
 
 
+def latest_primary_report(payload, url, as_of):
+    """Discover new quarters separately from the annual model inputs."""
+    rows = []
+    for namespace in ('us-gaap', 'ifrs-full'):
+        for tag in SEC_TAGS['ocf']:
+            for points in (((payload.get('facts') or {}).get(namespace) or {}).get(tag) or {}).get('units', {}).values():
+                rows.extend(p for p in points if p.get('end') and p.get('filed') and p.get('start')
+                            and p['end'] <= as_of and p['filed'] <= as_of
+                            and p.get('form') in ('10-K', '10-Q', '20-F', '40-F', '10-K/A', '10-Q/A', '20-F/A', '40-F/A'))
+    if not rows:
+        return None
+    row = max(rows, key=lambda p: (p['end'], p['filed']))
+    return {'period': row['end'], 'filed': row['filed'], 'accession': row.get('accn'), 'source_url': url}
+
+
+def submission_reports(payload, cik, as_of):
+    """Discover reports independently of whether a particular XBRL tag exists."""
+    recent = (payload.get('filings') or {}).get('recent') or {}
+    result = []
+    for i, form in enumerate(recent.get('form') or []):
+        if form not in {'10-K', '10-Q', '20-F', '40-F', '6-K', '10-K/A', '10-Q/A', '20-F/A', '40-F/A'}:
+            continue
+        def value(key):
+            rows = recent.get(key) or []
+            return rows[i] if i < len(rows) else ''
+        period, filed, accession, document = (value(k) for k in ('reportDate', 'filingDate', 'accessionNumber', 'primaryDocument'))
+        if not period or not filed or period > as_of or filed > as_of:
+            continue
+        if not re.fullmatch(r'\d{10}-\d{2}-\d{6}', accession) or not re.fullmatch(r'[A-Za-z0-9_.-]+', document):
+            continue
+        result.append({'period': period, 'filed': filed, 'accession': accession, 'form': form,
+                       'source_url': f'https://www.sec.gov/Archives/edgar/data/{int(cik)}/{accession.replace("-", "")}/{document}'})
+    return sorted(result, key=lambda r: (r['period'], r['filed']), reverse=True)
+
+
+def primary_observations(payload, url, as_of):
+    """Keep dated quarterly/annual/instant evidence separate from annual economics."""
+    from underwriting_evidence import EXTRA_TAGS
+    selected = {}
+    cutoff = date.fromisoformat(as_of).year-10
+    for namespace in ('us-gaap', 'ifrs-full', 'dei'):
+        tags = set(EXTRA_TAGS) | {t for rows in SEC_TAGS.values() for t in rows}
+        tags |= {'CashAndCashEquivalents', 'Assets', 'Liabilities', 'Equity', 'CommonStockSharesOutstanding', 'EntityCommonStockSharesOutstanding'}
+        for tag in sorted(tags):
+            item = ((payload.get('facts') or {}).get(namespace) or {}).get(tag) or {}
+            for unit, rows in (item.get('units') or {}).items():
+                if unit != 'shares' and not re.fullmatch('[A-Z]{3}', unit):
+                    continue
+                for raw in rows:
+                    period, filed = raw.get('end'), raw.get('filed')
+                    if not period or not filed or period > as_of or filed > as_of or int(period[:4]) < cutoff or number(raw.get('val')) is None:
+                        continue
+                    key = (namespace, tag, unit, raw.get('start'), period)
+                    if key in selected and selected[key]['filed'] >= filed:
+                        continue
+                    field = ('shares' if tag in SEC_TAGS['shares'] else 'balance_shares') if unit == 'shares' else tag
+                    selected[key] = {'field': field, 'tag': tag, 'value': float(raw['val']), 'currency': unit,
+                                     'start': raw.get('start'), 'period': period, 'filed': filed, 'form': raw.get('form'),
+                                     'source_url': url, 'source_kind': 'primary', 'locator': namespace+':'+tag+'; '+str(raw.get('accn')),
+                                     'measurement_type': 'flow' if raw.get('start') else 'balance', 'scope': 'reported consolidated'}
+    return sorted(selected.values(), key=lambda r: (r['period'], r['locator'], r.get('start') or ''))
+
+
 def frmo_report_facts(as_of):
     """Discover the newest issuer report and validate its explicit table scale."""
     from io import BytesIO
+
     from pypdf import PdfReader
 
     index = 'https://www.frmocorp.com/10ks.html'
     with urllib.request.urlopen(index, timeout=30) as response:
         html = response.read().decode('utf-8')
-    links = re.findall(r'href=["\']([^"\']*FRMO_Annual_Report_(\d{4})\.pdf)["\']', html, re.I)
+    links = re.findall(r'href=["\']([^"\']*FRMO_Annual_Report_(\d{4})\.pdf)["\']', html, re.IGNORECASE)
     links = [(p, int(y)) for p, y in links if int(y) <= int(as_of[:4])]
     if not links:
         raise ValueError('FRMO annual report discovery layout changed')
@@ -218,7 +297,7 @@ def parse_frmo_report(texts, url, year, as_of, content_hash):
     if f'{year} {year-1}' not in re.sub(r'\s+', ' ', balance):
         raise ValueError('FRMO balance-sheet year columns changed')
     def pair(pattern, text):
-        match = re.search(pattern + r'\s*\$?\s*([\d,]+)\s*\$?\s*([\d,]+)', text, re.I)
+        match = re.search(pattern + r'\s*\$?\s*([\d,]+)\s*\$?\s*([\d,]+)', text, re.IGNORECASE)
         if not match:
             raise ValueError('FRMO table label changed: ' + pattern)
         return [float(v.replace(',', '')) * 1000 for v in match.groups()]
@@ -237,11 +316,12 @@ def parse_frmo_report(texts, url, year, as_of, content_hash):
     return facts
 
 
-def collect(ticker, entry, as_of, root=ROOT):
-    path = root / INPUTS / (ticker + '.json')
+def collect(ticker, entry, as_of, root=ROOT, inputs_dir=INPUTS):
+    path = root / inputs_dir / (ticker + '.json')
     prior = read(path)
     result = {'schema_version': '1.0', 'ticker': ticker, 'attempted_at': stamp(),
-              'quote': prior.get('quote'), 'facts': prior.get('facts') or [], 'errors': []}
+              'quote': prior.get('quote'), 'facts': prior.get('facts') or [],
+              'primary_observations': prior.get('primary_observations') or [], 'primary_documents': [], 'errors': []}
     symbol = SYMBOLS.get(ticker, ticker)
     for kind, fn in [('quote', lambda: quote(symbol, as_of)), ('facts', lambda: frmo_report_facts(as_of) if ticker == 'FRMO' else provider_facts(symbol, as_of))]:
         try:
@@ -251,13 +331,56 @@ def collect(ticker, entry, as_of, root=ROOT):
     cik = (entry.get('download') or {}).get('cik')
     if cik and ticker != 'FRMO':
         url = f'https://data.sec.gov/api/xbrl/companyfacts/CIK{int(cik):010d}.json'
+        payload = {}
         try:
-            primary = primary_facts(SecClient(max_attempts=2).get_json(url, timeout=30), url, as_of)
+            with _PRIMARY_SEC_LOCK:
+                payload = _PRIMARY_SEC_CLIENT.get_json(url, timeout=30)
+            primary = primary_facts(payload, url, as_of)
+            result['latest_report'] = latest_primary_report(payload, url, as_of)
+            result['primary_observations'] = primary_observations(payload, url, as_of)
             # Replace only the same field, period AND currency. Preserve other history.
             keys = {(p['field'], p['period'], p['currency']) for p in primary}
             result['facts'] = [p for p in result['facts'] if (p['field'], p['period'], p['currency']) not in keys] + primary
         except (OSError, ValueError) as exc:
             result['errors'].append({'collector': 'sec_primary', 'error': str(exc), 'retry': 'next_scheduled_run'})
+        discovery_url = f'https://data.sec.gov/submissions/CIK{int(cik):010d}.json'
+        try:
+            with _PRIMARY_SEC_LOCK:
+                submissions = _PRIMARY_SEC_CLIENT.get_json(discovery_url, timeout=30)
+            reports = submission_reports(submissions, cik, as_of)
+            candidates = reports + [r for r in (result.get('latest_report'), prior.get('latest_report')) if r]
+            if candidates:
+                result['latest_report'] = max(candidates, key=lambda r: (r['period'], r['filed']))
+            result['report_discovery'] = {'status': 'verified' if reports else 'no_reports',
+                                          'source_url': discovery_url, 'checked_at': as_of}
+            from valuation_earnings import collect_earnings, latest_disclosure
+            formal_candidates = reports+[r for r in [latest_primary_report(payload, url, as_of)] if r]
+            formal = max(formal_candidates, key=lambda r: (r['period'], r['filed'])) if formal_candidates else {}
+            disclosure = latest_disclosure(submissions, cik, as_of, formal)
+            if disclosure:
+                result['latest_disclosure'] = disclosure
+                try:
+                    with _PRIMARY_SEC_LOCK:
+                        _, documents = collect_earnings(submissions, cik, as_of, formal, _PRIMARY_SEC_CLIENT,
+                                                       prior.get('primary_documents') or [])
+                    result['primary_documents'] = documents
+                    resolved = [d for d in documents if d.get('period')]
+                    if not resolved:
+                        raise ValueError('New earnings disclosure needs a verified reporting period and financial tables')
+                    latest = max(resolved, key=lambda d: (d['period'], d['filed']))
+                    earnings_report = {k: latest[k] for k in ('period', 'filed', 'accession', 'form', 'source_url')}
+                    result['latest_report'] = max([result.get('latest_report') or earnings_report, earnings_report],
+                                                key=lambda r: (r['period'], r['filed']))
+                except (OSError, ValueError, KeyError, TypeError) as exc:
+                    result['report_discovery']['status'] = 'earnings_unresolved'
+                    result['errors'].append({'collector': 'sec_earnings', 'error': str(exc), 'retry': 'next_scheduled_run'})
+        except (OSError, ValueError, KeyError, TypeError) as exc:
+            result['report_discovery'] = {'status': 'failed', 'source_url': discovery_url, 'checked_at': as_of}
+            result['latest_report'] = result.get('latest_report') or prior.get('latest_report')
+            if prior.get('latest_disclosure'):
+                result['latest_disclosure'] = prior['latest_disclosure']
+                result['primary_documents'] = prior.get('primary_documents') or []
+            result['errors'].append({'collector': 'sec_submissions', 'error': str(exc), 'retry': 'next_scheduled_run'})
     currencies = {p['currency'] for p in result['facts'] if p['field'] in {'ocf', 'equity', 'dividends'} and p.get('currency')}
     if len(currencies) == 1 and result.get('quote'):
         source_currency = next(iter(currencies))
@@ -453,7 +576,7 @@ def estimate(ticker, data, as_of):
     if result['blockers']:
         return result
     growth = []
-    for a, b in zip(history, history[1:]):
+    for a, b in pairwise(history):
         elapsed = (date.fromisoformat(b['period']) - date.fromisoformat(a['period'])).days / 365.25
         if a['owner_cash'] > 0 and b['owner_cash'] > 0 and a['currency'] == b['currency'] and .8 <= elapsed <= 1.2:
             growth.append((b['owner_cash'] / a['owner_cash']) ** (1 / elapsed) - 1)
@@ -587,7 +710,7 @@ def run(root=ROOT, as_of=None, collect_inputs=False, tickers=None):
     selected = tickers or config['tickers']
     if set(selected) - set(config['tickers']):
         raise ValueError('Unknown core compounder')
-    prior = read(root / STATE).get('companies') or {}
+    prior = {t: r for t, r in (read(root / STATE).get('companies') or {}).items() if t in config['tickers']}
     for ticker in selected:
         data = collect(ticker, registry.get(ticker) or {}, as_of, root) if collect_inputs else read(root / INPUTS / (ticker + '.json'))
         prior[ticker] = estimate(ticker, data, as_of)
@@ -618,6 +741,11 @@ def check(root=ROOT):
         expected = estimate(ticker, read(root / INPUTS / (ticker + '.json')), report['as_of'])
         if semantic_json_sha256(row) != semantic_json_sha256(expected):
             raise ValueError(ticker + ': estimate does not replay from its inputs')
+        # Active PV/IRR publication has moved to the full-universe shared lane.
+        # Its separate --check verifies served rows after this historical source
+        # collector completes; do not demand the retired UI fallback here.
+        if ticker not in core or (core.get(ticker, {}).get('valuation_decision') or {}).get('calculation_status'):
+            continue
         served = read(root / 'dashboard/data/tickers' / shard_filename(ticker)).get('autonomous_irr')
         if served != row:
             raise ValueError(ticker + ': detail publication is stale')

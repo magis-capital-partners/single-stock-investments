@@ -18,8 +18,8 @@ import json
 import re
 import subprocess
 import sys
+from datetime import datetime, timezone
 from pathlib import Path
-from atomic_io import _atomic_write_text
 
 from reconcile_insights_event_summary import (
     is_publishable_manifest,
@@ -31,6 +31,8 @@ CORE_VERSION = 1
 
 # Row fields only needed once a ticker is opened in the detail pane.
 DETAIL_ONLY_FIELDS = (
+    "valuation_evidence",
+    "shared_forecast",
     "download_script_path",
     "two_phase_watch",
     "insights",
@@ -154,6 +156,13 @@ _IRR_READINESS_CORE_FIELDS = (
 )
 
 _VALUATION_DECISION_CORE_FIELDS = (
+    "economic_review_status",
+    "market_sync",
+    "forecast_id",
+    "calculation_status",
+    "research_return_available",
+    "calculation_reason",
+    "quote_currency",
     "status",
     "proof_status",
     "model_level",
@@ -210,11 +219,18 @@ def slim_valuation_decision(decision: dict | None) -> dict:
         for key in _VALUATION_DECISION_CORE_FIELDS
         if key in decision
     }
+    # Pre-selection freshness checks need the verdict and its expiry. Filing
+    # URLs, accessions and the source-basis proof remain in the full ticker.
+    market = decision.get('market_sync')
+    if isinstance(market, dict):
+        slim['market_sync'] = {key: market[key] for key in
+                              ('status', 'valid_until', 'price_as_of', 'financial_period', 'model_as_of', 'share_basis_as_of')
+                              if key in market}
     # The holdings IRR tooltip reads model_as_of. Fact and price dates render
     # in the detail strip, which loads the full decision from the ticker shard.
     dates = decision.get("dates")
     if isinstance(dates, dict) and dates.get("model_as_of") is not None:
-        slim["dates"] = {"model_as_of": dates.get("model_as_of")}
+        slim["dates"] = {k: dates[k] for k in ("model_as_of", "price_as_of", "forecast_as_of", "calculation_as_of", "financial_period", "share_basis_as_of", "assumptions_as_of") if dates.get(k) is not None}
     else:
         slim.pop("dates", None)
     tier = slim_valuation_tier(decision.get("universe_tier"))
@@ -403,7 +419,7 @@ def write_ticker_shards(payload: dict, data_dir: Path) -> int:
     written: set[str] = set()
     for row in payload.get("tickers") or []:
         name = shard_filename(row.get("ticker", ""))
-        _atomic_write_text(tickers_dir / name, _dump(row))
+        (tickers_dir / name).write_text(_dump(row), encoding="utf-8")
         written.add(name)
     # Prune shards for tickers no longer in the universe.
     removed = 0
@@ -486,9 +502,33 @@ def merge_insight_shards(shard_dir: Path) -> dict | None:
     return merged or None
 
 
+def _stamp_time(value) -> datetime | None:
+    if not isinstance(value, str) or not value.strip():
+        return None
+    try:
+        when = datetime.fromisoformat(value.strip().replace("Z", "+00:00"))
+    except ValueError:
+        return None
+    return when if when.tzinfo else when.replace(tzinfo=timezone.utc)
+
+
 def _shard_payload(insights_doc: dict, insights_dir: Path, name: str, keys: tuple[str, ...], stamp) -> dict | None:
-    """Rows this doc actually has. Missing keys must not null an existing shard."""
+    """Rows this doc actually has. Missing keys must not null an existing shard.
+
+    A shard stamped later than this doc belongs to a lane that published it
+    on its own (podcasts, videos). Re-slicing it under the manifest stamp
+    walked podcasts.json back from 2026-10-29 to 2026-10-15 in every lane
+    that rebuilt the dashboard, and P6 then failed podcast_catalog.
+    """
     existing = _read_json_object(insights_dir / f"{name}.json") or {}
+    incoming = _stamp_time(stamp)
+    current = _stamp_time(existing.get("generated_at"))
+    if incoming is not None and current is not None and incoming < current:
+        print(
+            f"keeping {name}.json: on-disk stamp {existing['generated_at']} is newer than {stamp}",
+            file=sys.stderr,
+        )
+        return None
     if any(key not in insights_doc or insights_doc[key] is None for key in keys):
         if not any(key in insights_doc and insights_doc[key] is not None for key in keys):
             return None
@@ -561,7 +601,7 @@ def write_insights_shards(insights_doc: dict | None, data_dir: Path) -> int:
         previous_shards = base.get("shards") if isinstance(base.get("shards"), dict) else {}
         for key, value in previous_shards.items():
             manifest["shards"].setdefault(key, value)
-        _atomic_write_text(insights_dir / "manifest.json", _dump(manifest))
+        (insights_dir / "manifest.json").write_text(_dump(manifest), encoding="utf-8")
         count += 1
         stamp = base.get("generated_at")
     else:
@@ -576,7 +616,7 @@ def write_insights_shards(insights_doc: dict | None, data_dir: Path) -> int:
         shard = _shard_payload(insights_doc, insights_dir, name, keys, stamp)
         if shard is None:
             continue
-        _atomic_write_text(insights_dir / f"{name}.json", _dump(shard))
+        (insights_dir / f"{name}.json").write_text(_dump(shard), encoding="utf-8")
         count += 1
     return count
 
@@ -666,7 +706,7 @@ def write_shards(payload: dict, insights_doc: dict | None, data_dir: Path) -> di
         (data_dir / "irr_readiness.json").write_text(_dump(report), encoding="utf-8")
         payload.setdefault("summary", {})["irr_readiness"] = report["summary"]
     core = build_core_payload(payload)
-    _atomic_write_text(core_path, _dump(core))
+    core_path.write_text(_dump(core), encoding="utf-8")
     ticker_count = write_ticker_shards(payload, data_dir)
     insight_count = write_insights_shards(insights_doc, data_dir)
     core_mb = core_path.stat().st_size / 1e6

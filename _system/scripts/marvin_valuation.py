@@ -974,6 +974,10 @@ def load_classification(ticker: str) -> dict:
 
 
 def compute_valuation(data: dict) -> dict:
+    if data.get('underwriting'):
+        # Sealed dated cash flows are priced by the shared PV/IRR engine.
+        # Legacy scenario recomputation must not inject a different model.
+        return data
     method = data.get("method", data.get("irr_method", "full"))
     inputs = data.get("inputs", {})
     price = inputs.get("price")
@@ -1136,7 +1140,7 @@ def main() -> None:
         parser.error("Provide --ticker or --file")
 
     data = load_valuation(path)
-    if not data.get("classification_inputs"):
+    if not data.get("classification_inputs") and not data.get('underwriting'):
         ticker = data.get("ticker") or args.ticker
         if ticker:
             data["classification_inputs"] = {

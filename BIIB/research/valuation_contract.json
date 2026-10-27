@@ -3605,7 +3605,7 @@
     ]
   },
   "change_control": {
-    "model_hash": "2b8be49a498ed680a8ac1cc8cb449e6ee5358955e553e2ad889a6dd248fec51d",
+    "model_hash": "ed998c3795bfcac3de38e7b5a25ad0c6fd81a68256badc8be2d45a8a6d1af9d9",
     "method_versions": [
       "milestone_probability_tree@1.0",
       "product_level_dcf@1.0",
@@ -3617,6 +3617,184 @@
     "rule": "A source fact is locked. Every assumption change requires a reason, author, timestamp, and before/after value."
   },
   "decision_rule": "Proof status and investment readiness are separate. Every material claim must be valued exactly once by a valid calculation proof, every evidence blocker must be resolved, and the model must be stock-specific before committee review. Only a human decision can authorize capital.",
+  "shared_forecast": {
+    "schema_version": "1.0",
+    "method_version": "shared-valuation-forecast/1.1",
+    "ticker": "BIIB",
+    "status": "model_gap",
+    "research_only": true,
+    "requires_human_review": false,
+    "capital_actionable": false,
+    "as_of": "2026-08-31",
+    "model_as_of": "2026-07-23",
+    "quote": {
+      "value": 216.65,
+      "as_of": "2026-08-31",
+      "source_url": "Yahoo BIIB close 2026-08-31",
+      "currency": null
+    },
+    "forecast_hash": "5c813a1a41b8da5d046a9187412953cbf44154a76a3de8889e128252b06de236",
+    "forward_irr_pct": {
+      "low": null,
+      "base": null,
+      "high": null
+    },
+    "present_value_today_per_share": {
+      "low": null,
+      "base": null,
+      "high": null
+    },
+    "model_present_value_per_share": {
+      "low": null,
+      "base": null,
+      "high": null
+    },
+    "required_return_pct": {
+      "low": null,
+      "base": null,
+      "high": null
+    },
+    "forward_cashflow_schedule": {},
+    "buy_prices": [],
+    "components": [
+      {
+        "component_id": "legacy_products",
+        "method": "product_level_dcf",
+        "status": "model_gap",
+        "present_value_per_share": {}
+      },
+      {
+        "component_id": "growth_products",
+        "method": "product_level_dcf",
+        "status": "model_gap",
+        "present_value_per_share": {}
+      },
+      {
+        "component_id": "pipeline",
+        "method": "milestone_probability_tree",
+        "status": "model_gap",
+        "present_value_per_share": {}
+      },
+      {
+        "component_id": "apellis_assets",
+        "method": "transaction_anchored_probability_tree",
+        "status": "model_gap",
+        "present_value_per_share": {}
+      },
+      {
+        "component_id": "net_debt_acquisition_and_cvrs",
+        "method": "senior_claims",
+        "status": "model_gap",
+        "present_value_per_share": {}
+      },
+      {
+        "component_id": "patent_failure_and_burn_reserve",
+        "method": "risk_reserve",
+        "status": "model_gap",
+        "present_value_per_share": {}
+      }
+    ],
+    "gaps": [
+      {
+        "component_id": "legacy_products",
+        "case": "low",
+        "code": "realization_timing_missing:value_per_share"
+      },
+      {
+        "component_id": "legacy_products",
+        "case": "base",
+        "code": "realization_timing_missing:value_per_share"
+      },
+      {
+        "component_id": "legacy_products",
+        "case": "high",
+        "code": "realization_timing_missing:value_per_share"
+      },
+      {
+        "component_id": "growth_products",
+        "case": "low",
+        "code": "realization_timing_missing:value_per_share"
+      },
+      {
+        "component_id": "growth_products",
+        "case": "base",
+        "code": "realization_timing_missing:value_per_share"
+      },
+      {
+        "component_id": "growth_products",
+        "case": "high",
+        "code": "realization_timing_missing:value_per_share"
+      },
+      {
+        "component_id": "pipeline",
+        "case": "low",
+        "code": "realization_timing_missing:value_per_share"
+      },
+      {
+        "component_id": "pipeline",
+        "case": "base",
+        "code": "realization_timing_missing:value_per_share"
+      },
+      {
+        "component_id": "pipeline",
+        "case": "high",
+        "code": "realization_timing_missing:value_per_share"
+      },
+      {
+        "component_id": "apellis_assets",
+        "case": "low",
+        "code": "realization_timing_missing:value_per_share"
+      },
+      {
+        "component_id": "apellis_assets",
+        "case": "base",
+        "code": "realization_timing_missing:value_per_share"
+      },
+      {
+        "component_id": "apellis_assets",
+        "case": "high",
+        "code": "realization_timing_missing:value_per_share"
+      },
+      {
+        "component_id": "net_debt_acquisition_and_cvrs",
+        "case": "low",
+        "code": "realization_timing_missing:value_per_share"
+      },
+      {
+        "component_id": "net_debt_acquisition_and_cvrs",
+        "case": "base",
+        "code": "realization_timing_missing:value_per_share"
+      },
+      {
+        "component_id": "net_debt_acquisition_and_cvrs",
+        "case": "high",
+        "code": "realization_timing_missing:value_per_share"
+      },
+      {
+        "component_id": "patent_failure_and_burn_reserve",
+        "case": "low",
+        "code": "realization_timing_missing:claims_per_share"
+      },
+      {
+        "component_id": "patent_failure_and_burn_reserve",
+        "case": "base",
+        "code": "realization_timing_missing:claims_per_share"
+      },
+      {
+        "component_id": "patent_failure_and_burn_reserve",
+        "case": "high",
+        "code": "realization_timing_missing:claims_per_share"
+      }
+    ],
+    "warnings": [],
+    "source_refs": [],
+    "next_action": "automatic_model_refresh",
+    "reconciliation": {
+      "passed": false
+    },
+    "settlement_policy": "Explicit cash/debt additions in an operating DCF are time-zero acquisition adjustments; hypothetical settlement, not declared dividends.",
+    "calculation_id": "d81701c1d847a3710ed1d2c445a28b6dfe116cf9f5db0961eabf260dee20f420"
+  },
   "cohort_expected_profile": "binary_milestone",
   "profile_match": true,
   "cohort_purpose": "Legacy products, growth products, pipeline probabilities, patent duration, cash, debt, and dilution.",

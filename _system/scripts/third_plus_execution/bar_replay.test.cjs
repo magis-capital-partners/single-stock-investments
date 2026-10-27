@@ -3,9 +3,10 @@ const test=require('node:test'),assert=require('node:assert/strict'),R=require('
 const Study=require('./venue_study.cjs');
 function fixture({day='2026-01-05',id='a',cover=false}={}){
  const open=Date.parse(day+'T14:30:00Z'),close=Date.parse(day+'T21:00:00Z'),start=cover?close-90*60000:open+60000;
- const bars=Array.from({length:80},(_,i)=>[(start-1000+i*1000)/1000,10,10.10,9.98,10,1000]);
+ const bars=Array.from({length:80},(_,i)=>[(start-1000+i*1000)/1000,10.03,10.05,10.02,10.03,1000]);
+ const quotes=bars.map(b=>[b[0],cover?10.05:10,cover?10.10:10.04]);
  return {schema:'third_plus_bar_session.v2',event_id:id,issuer:'cik/'+id,date:day,open_ms:open,close_ms:close,capture_start_ms:start-1000,capture_end_ms:cover?close-15*60000+5000:start+65000,
- source_hashes:['a'.repeat(64)],opening_restricted:1,quote_basis:'lagged_bar_spread_proxy',bars,quotes:[],statuses:[],_results:new Map()};
+ source_hashes:['a'.repeat(64)],opening_restricted:1,quote_basis:'sampled_venue_quotes',bars,quotes,statuses:[],_results:new Map()};
 }
 function options(s,x={}){return {start_ms:s.open_ms+60000,end_ms:s.open_ms+120000,initial_price:10,target_usd:100000,policy:'E2',...x};}
 test('SSR names receive causal partial-fill attempts while matched skip remains a control',()=>{

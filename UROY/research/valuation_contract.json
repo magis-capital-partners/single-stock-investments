@@ -412,7 +412,7 @@
     },
     "decision_rule": "Power Zones select the fitting economic method and eligible independent reviewers; they never choose the valuation answer or capital decision.",
     "ticker": "UROY",
-    "as_of": "2026-10-27",
+    "as_of": "2026-10-29",
     "route_source": "canonical_power_zone_router",
     "config_path": "_system/frameworks/power_zones.json",
     "config_updated": "2026-07-14",
@@ -570,8 +570,8 @@
         }
       ]
     },
-    "input_hash": "c1b8b5eca278ff46de78463a881e4d45e352fc2f3c687694769d9a587ebb3ac9",
-    "generated_at": "2026-10-27T08:28:34.982157+00:00"
+    "input_hash": "f04bf2c191c0dbca9d984028b8b52040d6f53ee5fe7369308de23e7f458bec75",
+    "generated_at": "2026-10-29T09:16:33.137701+00:00"
   },
   "market": {
     "price_per_share": 2.96,
@@ -769,12 +769,85 @@
     ]
   },
   "change_control": {
-    "model_hash": "a8077641c2d7087cb311403e3e1ea07a5c5b146cb55be75b691a2756cc2a1ee7",
+    "model_hash": "7153380cdb9d0e9166e85339671f22d897bf13dd82c318b64e3f3ce85b195404",
     "method_versions": [],
     "change_log": [],
     "rule": "A source fact is locked. Every assumption change requires a reason, author, timestamp, and before/after value."
   },
   "decision_rule": "Proof status and investment readiness are separate. Every material claim must be valued exactly once by a valid calculation proof, every evidence blocker must be resolved, and the model must be stock-specific before committee review. Only a human decision can authorize capital.",
+  "shared_forecast": {
+    "schema_version": "1.0",
+    "method_version": "shared-valuation-forecast/1.3",
+    "ticker": "UROY",
+    "status": "sync_gap",
+    "research_only": true,
+    "requires_human_review": false,
+    "capital_actionable": false,
+    "as_of": "2026-07-27",
+    "model_as_of": "2026-07-31",
+    "quote": {
+      "value": 2.96,
+      "as_of": "2026-07-27",
+      "source_url": "Yahoo UROY last 2026-07-27; 1:1 exchange into New URC \u2014 use as listing proxy until New URC tape prints"
+    },
+    "forecast_hash": null,
+    "forward_irr_pct": {
+      "low": null,
+      "base": null,
+      "high": null
+    },
+    "present_value_today_per_share": {
+      "low": null,
+      "base": null,
+      "high": null
+    },
+    "model_present_value_per_share": {
+      "low": null,
+      "base": null,
+      "high": null
+    },
+    "required_return_pct": {
+      "low": null,
+      "base": null,
+      "high": null
+    },
+    "forward_cashflow_schedule": {},
+    "buy_prices": [],
+    "components": [],
+    "gaps": [
+      {
+        "code": "listing_calendar_or_completed_close_unverified"
+      },
+      {
+        "code": "model_assumptions_expired"
+      },
+      {
+        "code": "corporate_action_history_unverified"
+      },
+      {
+        "code": "financial_inputs_expired_or_undated"
+      }
+    ],
+    "warnings": [],
+    "source_refs": [],
+    "next_action": "automatic_source_refresh",
+    "reconciliation": {
+      "passed": false
+    },
+    "settlement_policy": "Explicit cash/debt additions in an operating DCF are time-zero acquisition adjustments; hypothetical settlement, not declared dividends.",
+    "financial_period": null,
+    "market_sync": {
+      "status": "updating",
+      "price_as_of": "2026-07-27",
+      "financial_period": null,
+      "model_as_of": "2026-07-31",
+      "price_policy": "latest_completed_exchange_session",
+      "basis_id": null,
+      "latest_report": {}
+    },
+    "assumptions_as_of": "2026-07-31",
+    "calculation_id": "1a095a9ed6cba0e00384a30c8a642e5272365f7cbe3f0c38f6af587710f03a97"
+  },
   "authority": "universal_valuation_contract",
   "legacy_reference_present": true,
   "falsifier_coverage": {

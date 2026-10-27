@@ -48,6 +48,8 @@ from typing import Any
 
 from .flex import flex_date, parse_flex_file
 from .publisher import publish_payload
+from .allocation_policy import classify_policy_position, load_ls_universe, load_drew_symbols
+from _system.trading.sleeves.strategy_ownership import configured_registry, annotate_lots, digest
 
 
 def _now() -> str:
@@ -85,6 +87,10 @@ def build_account_snapshot(
     that can disagree about the same account.
     """
     parsed = parse_flex_file(positions_xml, account_alias=account_alias)
+    registry = configured_registry(account=account_alias, through=parsed["session_date"])
+    if registry:
+        # Retrying an evidence version must preserve its snapshot identity.
+        parsed["as_of"] = registry.payload["prepared_at"]
     rows: list[dict[str, Any]] = []
     untranslated = 0
 
@@ -154,13 +160,17 @@ def build_account_snapshot(
     warnings: list[str] = []
     account_values = _account_values(parsed, base_currency=base_currency, warnings=warnings)
     has_nav = any(row["tag"] == "NetLiquidation" for row in account_values)
+    ownership = None
+    if registry:
+        ownership = {"version": registry.version, "through": registry.payload["through"],
+                     "allocations": _owned_allocations(parsed, registry, account_alias, base_currency)}
     if parsed.get("session_date") is None:
         # Flagged, never papered over: without a readable session date the edge
         # can only judge freshness from ingest time, and says so.
         warnings.append(f"session date unreadable: {parsed.get('session_date_raw')!r}")
     return {
         "schema_version": "account_snapshot.v1",
-        "source_run_id": source_run_id or parsed["source_run_id"],
+        "source_run_id": source_run_id or (parsed["source_run_id"] + "-" + registry.version[:20] if registry else parsed["source_run_id"]),
         "account_alias": account_alias,
         "gateway_session_id": None,
         "as_of": parsed["as_of"], "base_currency": base_currency,
@@ -175,6 +185,7 @@ def build_account_snapshot(
             # is due, not for two hours.
             "feed": "flex_eod",
             "session_date": parsed["session_date"],
+            **({"ownership_required": True, "ownership": ownership} if ownership else {}),
             "note": (
                 "Flex equity summary states net liquidation. Margin tags are absent until a Flex section states them."
                 if has_nav else
@@ -191,6 +202,34 @@ def build_account_snapshot(
             "untranslated_rows": untranslated,
         },
     }
+
+
+def _owned_allocations(parsed, registry, account, base_currency):
+    """Split BEFORE folding: cost/P&L follow broker lots, not a quantity ratio."""
+    from collections import defaultdict
+    groups = defaultdict(list)
+    ls_symbols, drew_symbols = load_ls_universe(), load_drew_symbols()
+    for row in annotate_lots(parsed["positions"], registry, account=account):
+        policy = classify_policy_position(row, ls_symbols=ls_symbols, drew_symbols=drew_symbols)
+        groups[(row["conid"], row.get("model_code") or "", policy.owner, policy.strategy)].append(row)
+    allocations = []
+    for (conid, model, owner, strategy), lots in sorted(groups.items()):
+        quantity = sum((Decimal(str(r["quantity"])) for r in lots), Decimal(0))
+        cost = sum((Decimal(str(r.get("cost_basis") or 0)) for r in lots), Decimal(0))
+        value = sum((Decimal(str(r.get("market_value") or 0)) for r in lots), Decimal(0))
+        pnl = sum((Decimal(str(r.get("unrealized_pnl") or 0)) for r in lots), Decimal(0))
+        rates = [Decimal(1) if r.get("currency") == base_currency else _decimal(r.get("fx_rate_to_base")) for r in lots]
+        translated = all(rate is not None and rate > 0 for rate in rates)
+        base_value = sum((Decimal(str(r.get("market_value") or 0)) * rate for r, rate in zip(lots, rates)), Decimal(0)) if translated else None
+        base_pnl = sum((Decimal(str(r.get("unrealized_pnl") or 0)) * rate for r, rate in zip(lots, rates)), Decimal(0)) if translated else None
+        allocations.append({"conid": conid, "model_code": model, "owner": owner, "strategy": strategy,
+            "quantity_decimal": _text(quantity), "confidence": "authoritative",
+            "position": {"quantity_decimal": _text(quantity), "average_cost_decimal": _text(cost / quantity) if quantity else None,
+                "average_cost_native_decimal": _text(cost / quantity) if quantity else None,
+                "market_value_decimal": _text(value), "market_value_native_decimal": _text(value),
+                "market_value_base_decimal": _text(base_value), "unrealized_pnl_decimal": _text(pnl),
+                "unrealized_pnl_base_decimal": _text(base_pnl)}})
+    return allocations
 
 
 def publish_flex_snapshot(
@@ -219,6 +258,8 @@ def publish_flex_snapshot(
         }
 
     payload = build_account_snapshot(positions, account_alias=account_alias)
+    if url and not dry_run and not payload["completeness"].get("ownership_required"):
+        raise ValueError("ownership registry required for publication; prepare realized sync before publishing positions")
     result: dict[str, Any] = {
         "session_date": payload["completeness"]["session_date"],
         "position_rows": payload["flex"]["position_rows"],
