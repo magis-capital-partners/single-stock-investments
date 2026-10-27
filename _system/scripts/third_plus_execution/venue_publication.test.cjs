@@ -5,10 +5,10 @@ const d=JSON.parse(fs.readFileSync(require('node:path').resolve(__dirname,'../..
 const state={rule:'dilution',policy:'E2',minutes:60,rate:.1,group:'excluded',query:''};
 test('all original exclusions remain individual opportunities and no historical evidence is upgraded',()=>{
  V.validate(d);assert.equal(V.rows(d,state).length,129);assert.equal(V.rows(d,{...state,group:'ssr'}).length,100);
- const excluded=V.rows(d,state);assert.equal(excluded.filter(e=>e.attempted).length,129);assert.equal(excluded.filter(e=>e.full_session_filled).length,129);
- assert.ok(excluded.some(e=>!e.filled&&e.full_session_filled),'Shorter-window no-fills must remain visible');
+ const excluded=V.rows(d,state);assert.ok(excluded.some(e=>e.execution_status==='execution_data_missing'));assert.ok(excluded.filter(e=>e.attempted).length<129);
+ assert.equal(d.legacy_result_retired,true);assert.equal(d.result_status,'historical_execution_not_established');
  assert.equal(d.verified_nbbo_entries,0);assert.equal(d.verified_borrow_entries,0);assert.equal(d.acquisition.reserved_cost_usd,0);assert.equal(d.acquisition.authorized_cap_usd,0);
- assert.equal(d.rules.dilution.opportunities.filter(e=>e.previous_decision==='ssr_rejected'&&e.evaluated).length,100);
+ assert.equal(d.rules.dilution.opportunities.filter(e=>e.previous_decision==='ssr_rejected').length,100);
 });
 test('every frozen signal has all methods, participation rates and declared windows',()=>{
  assert.equal(Object.keys(d.rules).length,21);
@@ -20,13 +20,14 @@ test('monthly cash accounting reconciles and missing results never become zero p
   if(m.summary)assert.ok(Math.abs(m.summary.monthly.reduce((n,x)=>n+x[1],0)-m.summary.net_pnl)<.01);
  }
  assert.equal(V.money(null),'Unavailable');assert.equal(V.money(0),'$0');
+ for(const m of d.rules.debt_distress.models){assert.equal(m.selected,0);assert.equal(m.summary,null);assert.equal(m.status,'no_candidates');}
 });
 test('dashboard distinguishes independent fills, account slots and bar assumptions',()=>{
- const html=V.view(d,state);assert.match(html,/one-second Nasdaq bars/);assert.match(html,/three concurrent issuers/);assert.match(html,/exploratory 240-minute/);assert.match(html,/Borrow availability/);assert.match(html,/not observed executions/);
+ const html=V.view(d,state);assert.match(html,/Historical account return is unavailable/);assert.match(html,/Missing evidence is never counted as zero profit/);assert.match(html,/Three issuer slots/);assert.match(html,/fresh observed quotes/);assert.ok(!html.includes('98 with modeled fills'));
  assert.ok(!html.includes('verified historical fills'));assert.equal(V.rows(d,{...state,query:'shph'}).length,1);
 });
 test('CSV includes every event, remains formula safe and labels conditional evidence',()=>{
- const s=V.csv(d,{...state,group:'all'});assert.equal(s.charCodeAt(0),65279);assert.equal(s.trimEnd().split('\n').length,211);assert.match(s,/conditional venue\/NBB\/borrow sensitivity/);
+ const s=V.csv(d,{...state,group:'all'});assert.equal(s.charCodeAt(0),65279);assert.equal(s.trimEnd().split('\n').length,211);assert.match(s,/account performance unavailable/);
  const c=structuredClone(d);c.rules.dilution.opportunities[0].ticker='=DANGEROUS()';assert.match(V.csv(c,{...state,group:'all'}),/'=DANGEROUS/);
 });
 test('new public artifacts contain derived decisions without raw bars, quotes, shares or private paths',()=>{
@@ -34,7 +35,7 @@ test('new public artifacts contain derived decisions without raw bars, quotes, s
  assert.ok(Object.keys(d.sources).every(k=>!k.includes('/local/')));
 });
 test('publication hash verification rejects mixed data and HTML escapes untrusted names',async()=>{
- const body=JSON.stringify(d),m={schema:'third_plus_venue_manifest.v2',payload:'third_plus_venue_execution.json',data_version:d.data_version,sha256:crypto.createHash('sha256').update(body).digest('hex')};
+ const body=JSON.stringify(d),m={schema:'third_plus_venue_manifest.v3',payload:'third_plus_venue_execution.json',data_version:d.data_version,sha256:crypto.createHash('sha256').update(body).digest('hex')};
  const fetcher=async url=>url.includes('manifest')?{ok:true,json:async()=>m}:{ok:true,text:async()=>body};
  assert.equal((await V.load(fetcher,crypto.webcrypto)).data_version,d.data_version);m.sha256='0'.repeat(64);await assert.rejects(()=>V.load(fetcher,crypto.webcrypto),/different publications/);
  const c=structuredClone(d);c.rules.dilution.opportunities[0].ticker='<script>bad</script>';assert.ok(!V.view(c,{...state,group:'all'}).includes('<script>bad'));
