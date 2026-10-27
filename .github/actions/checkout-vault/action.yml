@@ -6,6 +6,10 @@ inputs:
     description: Git ref for vault repo (default main)
     required: false
     default: main
+  hydrate:
+    description: Copy private objects over public placeholders. false leaves the public files in place so a later commit cannot publish private bytes.
+    required: false
+    default: "true"
 
 runs:
   using: composite
@@ -46,6 +50,7 @@ runs:
         PY
 
     - name: Restore selected private inputs for authorized processing
+      if: inputs.hydrate != 'false'
       shell: bash
       run: |
         if [ -f _system/scripts/private_dashboard_assets.py ] && [ -f dashboard/private-assets.json ]; then
