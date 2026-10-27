@@ -41,7 +41,7 @@ No approved third-party research sources are in `_system/frameworks/third_party_
 
 | Lens | Owner cash / value | Return / horizon | Stance hint |
 |------|-------------------|------------------|-------------|
-| Marvin floor | **$0.80/sh**; component base ~**$21/sh** | Synthesis per `valuation.json` (7-year model) | watch |
+| Marvin floor | **$0.80/sh**; component base ~**$21/sh** | Synthesis **27.5%** per year at **$12.79** (7-year model) | watch |
 | External | — | — | — |
 | **Blended best estimate** | **$0.80/sh** | Marvin synthesis (no approved external inputs) | **watch** |
 
