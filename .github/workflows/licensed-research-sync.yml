@@ -34,6 +34,9 @@ jobs:
       - name: Checkout workspace (scripts + dashboard on main)
         run: bash _system/scripts/ci_checkout_workspace.sh pages main
 
+      - name: Checkout research vault
+        uses: ./.github/actions/checkout-vault
+
       - uses: actions/setup-python@v5
         with:
           python-version: "3.12"
