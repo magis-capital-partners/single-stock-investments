@@ -2,7 +2,10 @@
 """Download 13F books for registry managers and write positions, changes, and dashboard files.
 
 Overlap-only advisers stay in the filtered overlap file. This command writes full
-books for tracked, biotech, and active managers. Holdings are context only.
+books for tracked, biotech, and active managers. A watchlist manager reports every
+new position, every exit, and share adds or trims at or above the watchlist
+threshold. Other managers keep SSI-book changes, plus any new position.
+Holdings are context only.
 """
 from __future__ import annotations
 
@@ -28,10 +31,12 @@ from ownership_common import (  # noqa: E402
     sec_fetch_bytes,
 )
 from thirteenf_core import (  # noqa: E402
+    HOLDINGS_FORMS,
     aggregate_positions,
     annotate_weights,
     book_source_for_latest_period,
     diff_positions,
+    normalize_date,
     other_managers_from_primary,
     quarter_from_period,
 )
@@ -53,6 +58,7 @@ CONTEXT = (
     "13F filings are long US-listed positions only, and they arrive about 45 days after quarter end. "
     "They are context. They are not an input to the base return."
 )
+DEFAULT_WATCHLIST_THRESHOLD_PCT = 5.0
 CSV_FIELDS = [
     "manager_id",
     "quarter",
@@ -76,9 +82,146 @@ CSV_FIELDS = [
 ]
 
 
+def load_registry() -> dict:
+    return json.loads(MANAGERS_PATH.read_text(encoding="utf-8"))
+
+
 def load_managers() -> list[dict]:
-    document = json.loads(MANAGERS_PATH.read_text(encoding="utf-8"))
+    document = load_registry()
     return [row for row in document.get("managers") or [] if row.get("book") == "full" and row.get("cik")]
+
+
+def watchlist_threshold_pct(document: dict | None, override: float | None = None) -> float:
+    """Share-change percent that a watchlist add or trim must reach."""
+    if override is not None:
+        return float(override)
+    raw = (document or {}).get("watchlist_share_change_pct")
+    if raw is None or raw == "":
+        return DEFAULT_WATCHLIST_THRESHOLD_PCT
+    return float(raw)
+
+
+def is_watchlist(manager: dict) -> bool:
+    return "watchlist" in (manager.get("roles") or [])
+
+
+def reported_changes(
+    manager: dict,
+    changes: list[dict],
+    universe: set[str],
+    threshold_pct: float,
+) -> list[dict]:
+    """Changes worth writing.
+
+    A watchlist manager reports the whole book: every new position, every exit,
+    and adds or trims at or above the threshold. Any other manager keeps the
+    SSI book, plus a new position even when that ticker is outside the book.
+    """
+    if not is_watchlist(manager):
+        return [
+            change
+            for change in changes
+            if (change.get("ssi_ticker") or "").upper() in universe or change.get("change_type") == "new"
+        ]
+    kept = []
+    for change in changes:
+        kind = change.get("change_type")
+        if kind in {"new", "exit"}:
+            kept.append(change)
+            continue
+        if kind not in {"add", "trim"}:
+            continue
+        pct = change.get("shares_delta_pct")
+        if pct is None or abs(float(pct)) >= float(threshold_pct):
+            kept.append(change)
+    return kept
+
+
+def select_successor_filings(filings: list[dict], current_cik: str, history: list[dict] | None) -> list[dict]:
+    """Keep one filer per quarter when the book moves to a new CIK.
+
+    A prior CIK keeps every quarter it still filed as a holdings report on or
+    before its through date. The current CIK supplies later quarters, including
+    a quarter the prior CIK filed only as a notice.
+    """
+    current = cik_padded(current_cik)
+    through_by_cik: dict[str, str] = {}
+    for item in history or []:
+        cik = cik_padded(item.get("cik") or "")
+        if cik and cik != current:
+            through_by_cik[cik] = (item.get("through") or "")[:10]
+
+    def allowed(filing: dict) -> bool:
+        cik = cik_padded(filing.get("cik") or "")
+        if not cik or cik == current:
+            return True
+        if cik not in through_by_cik:
+            return False
+        through = through_by_cik[cik]
+        filed = (filing.get("filing_date") or "")[:10]
+        return not through or not filed or filed <= through
+
+    allowed_rows = [row for row in filings if allowed(row)]
+    claimed: set[str] = set()
+    for filing in allowed_rows:
+        cik = cik_padded(filing.get("cik") or "")
+        if cik not in through_by_cik or filing.get("form") not in HOLDINGS_FORMS:
+            continue
+        period = normalize_date(filing.get("report_date")) or ""
+        if period:
+            claimed.add(period)
+    kept = []
+    for filing in allowed_rows:
+        cik = cik_padded(filing.get("cik") or "")
+        period = normalize_date(filing.get("report_date")) or ""
+        if period in claimed and cik == current:
+            continue
+        kept.append(filing)
+    return kept
+
+
+def filings_for_manager(manager: dict, limit: int) -> list[dict]:
+    """Current CIK plus prior CIKs, tagged so a successor quarter is not mixed."""
+    current = cik_padded(manager.get("cik") or "")
+    rows: list[dict] = []
+    if current:
+        for filing in list_13f_filings(current, limit=limit):
+            copied = dict(filing)
+            copied["cik"] = current
+            rows.append(copied)
+    for item in manager.get("cik_history") or []:
+        cik = cik_padded(item.get("cik") or "")
+        if not cik or cik == current:
+            continue
+        through = (item.get("through") or "")[:10]
+        for filing in list_13f_filings(cik, limit=limit):
+            filed = (filing.get("filing_date") or "")[:10]
+            if through and filed and filed > through:
+                continue
+            copied = dict(filing)
+            copied["cik"] = cik
+            rows.append(copied)
+    rows.sort(key=lambda filing: (filing.get("filing_date") or "", filing.get("accession") or ""), reverse=True)
+    deduped = []
+    seen: set[str] = set()
+    for row in rows:
+        accession = row.get("accession") or ""
+        if not accession or accession in seen:
+            continue
+        seen.add(accession)
+        deduped.append(row)
+    return deduped
+
+
+def registry_ciks_for(managers: list[dict]) -> set[str]:
+    found: set[str] = set()
+    for row in managers:
+        if row.get("cik"):
+            found.add(cik_padded(row["cik"]))
+        for item in row.get("cik_history") or []:
+            if item.get("cik"):
+                found.add(cik_padded(item["cik"]))
+    return found
 
 
 def _iso_now() -> str:
@@ -147,7 +290,7 @@ def filing_record(manager: dict, built: dict) -> dict:
     report = built.get("reconciliation") or {}
     return {
         "manager_id": manager["manager_id"],
-        "cik": manager.get("cik"),
+        "cik": built.get("cik") or manager.get("cik"),
         "accession": built.get("accession"),
         "member_accessions": built.get("member_accessions") or [],
         "form": (built.get("forms") or ["13F-HR"])[-1],
@@ -260,13 +403,15 @@ def notice_book(manager: dict, notice: dict, period: str, registry_ciks: set[str
 
 
 def books_for_manager(manager: dict, periods: int, registry_ciks: set[str], offline: bool) -> list[dict]:
-    filings = [] if offline else list_13f_filings(manager["cik"], limit=max(16, periods * 4))
     if offline:
         return []
+    filings = filings_for_manager(manager, max(16, periods * 4))
+    filings = select_successor_filings(filings, manager.get("cik") or "", manager.get("cik_history") or [])
     direct = []
     for group in periods_for_fund(filings, periods):
         built = build_period(group, fund_id=manager["manager_id"], cache_dir=CACHE, offline=False)
         if built:
+            built["cik"] = cik_padded(group[-1].get("cik") or manager.get("cik") or "")
             direct.append(built)
     decision = book_source_for_latest_period(filings)
     if decision.get("mode") == "notice":
@@ -340,7 +485,12 @@ def diff_book(manager: dict, rows: list[dict], quarter: str, period_end: str) ->
     return kept
 
 
-def write_changes(quarter: str, period_end: str, manager_changes: dict[str, list[dict]]) -> None:
+def write_changes(
+    quarter: str,
+    period_end: str,
+    manager_changes: dict[str, list[dict]],
+    threshold_pct: float | None = None,
+) -> None:
     path = CHANGES / f"{quarter}.json"
     current = {"changes": []}
     if path.exists():
@@ -360,11 +510,13 @@ def write_changes(quarter: str, period_end: str, manager_changes: dict[str, list
         "context": CONTEXT,
         "changes": kept,
     }
+    if threshold_pct is not None:
+        payload["watchlist_share_change_pct"] = threshold_pct
     path.parent.mkdir(parents=True, exist_ok=True)
     path.write_text(json.dumps(payload, separators=(",", ":")) + "\n", encoding="utf-8")
 
 
-def build_dashboard(names: dict[str, str]) -> None:
+def build_dashboard(names: dict[str, str], threshold_pct: float | None = None) -> None:
     """Latest book per manager, joined to SSI tickers."""
     if not POSITIONS.exists():
         return
@@ -464,10 +616,16 @@ def build_dashboard(names: dict[str, str]) -> None:
         + "\n",
         encoding="utf-8",
     )
-    _write_manager_views(latest, managers, names, changes_by_key)
+    _write_manager_views(latest, managers, names, changes_by_key, threshold_pct)
 
 
-def _write_manager_views(latest: dict, managers: dict, names: dict[str, str], changes_by_key: dict) -> None:
+def _write_manager_views(
+    latest: dict,
+    managers: dict,
+    names: dict[str, str],
+    changes_by_key: dict,
+    threshold_pct: float | None = None,
+) -> None:
     """Manager pages, a changes feed, and ideas that are not in the SSI book."""
     if BY_MANAGER.exists():
         for stale in BY_MANAGER.glob("*.json"):
@@ -481,9 +639,11 @@ def _write_manager_views(latest: dict, managers: dict, names: dict[str, str], ch
     outside: dict[str, dict] = {}
     consensus: dict[str, list[str]] = {}
     feed_changes = []
+    watchlist_feed = []
     for manager_id, (quarter, rows) in sorted(latest.items()):
         manager = managers.get(manager_id) or {"display_name": manager_id}
         name = manager.get("display_name") or manager_id
+        watchlist = is_watchlist(manager)
         equity = [row for row in rows if not row.get("put_call") and (row.get("sh_prn") or "SH") == "SH"]
         equity.sort(key=lambda row: -(row.get("value_usd") or 0))
         ssi_rows = [row for row in equity if (row.get("ssi_ticker") or "").upper() in names]
@@ -499,6 +659,7 @@ def _write_manager_views(latest: dict, managers: dict, names: dict[str, str], ch
                 "top_issuer": top.get("issuer") or "",
                 "top_ticker": top.get("ticker") or "",
                 "top_weight_pct": top.get("weight_pct"),
+                "watchlist": watchlist,
             }
         )
         all_changes = []
@@ -522,6 +683,7 @@ def _write_manager_views(latest: dict, managers: dict, names: dict[str, str], ch
             "cik": manager.get("cik"),
             "quarter": quarter,
             "context": CONTEXT,
+            "watchlist": watchlist,
             "positions": [
                 {
                     "issuer": row.get("issuer") or "",
@@ -536,6 +698,8 @@ def _write_manager_views(latest: dict, managers: dict, names: dict[str, str], ch
             ],
             "ssi_changes": own_changes[:40],
         }
+        if watchlist:
+            page["changes"] = all_changes
         (BY_MANAGER / f"{manager_id}.json").write_text(json.dumps(page) + "\n", encoding="utf-8")
         if quarter != feed_quarter:
             continue
@@ -543,6 +707,9 @@ def _write_manager_views(latest: dict, managers: dict, names: dict[str, str], ch
             feed_changes.append({"manager_id": manager_id, "name": name, **change})
             if change.get("change_type") in {"new", "add"}:
                 consensus.setdefault(change["ticker"], []).append(name)
+        if watchlist:
+            for change in all_changes:
+                watchlist_feed.append({"manager_id": manager_id, "name": name, **change})
         new_outside = {change["ticker"] for change in all_changes if change.get("change_type") == "new" and change["ticker"] not in names}
         for row in equity:
             ticker = (row.get("ticker") or "").upper()
@@ -563,6 +730,7 @@ def _write_manager_views(latest: dict, managers: dict, names: dict[str, str], ch
         if len(names_list) >= 3
     ]
     feed_changes.sort(key=lambda row: (row.get("ticker") or "", row.get("name") or ""))
+    watchlist_feed.sort(key=lambda row: (row.get("name") or "", row.get("ticker") or "", row.get("change_type") or ""))
     MANAGERS_INDEX_PATH.write_text(
         json.dumps(
             {
@@ -585,6 +753,8 @@ def _write_manager_views(latest: dict, managers: dict, names: dict[str, str], ch
                 "generated_at": _iso_now(),
                 "context": CONTEXT,
                 "changes": feed_changes[:400],
+                "watchlist_share_change_pct": threshold_pct,
+                "watchlist_changes": watchlist_feed[:400],
                 "consensus": agreed,
                 "outside_book": ideas[:80],
             }
@@ -594,13 +764,22 @@ def _write_manager_views(latest: dict, managers: dict, names: dict[str, str], ch
     )
 
 
-def run(periods: int, alerts: bool, offline: bool, only: str | None) -> int:
-    managers = load_managers()
+def run(
+    periods: int,
+    alerts: bool,
+    offline: bool,
+    only: str | None,
+    threshold_override: float | None = None,
+) -> int:
+    document = load_registry()
+    managers = [row for row in document.get("managers") or [] if row.get("book") == "full" and row.get("cik")]
     if only:
-        managers = [row for row in managers if row["manager_id"] == only]
+        wanted = {item.strip() for item in only.split(",") if item.strip()}
+        managers = [row for row in managers if row["manager_id"] in wanted]
+    threshold = watchlist_threshold_pct(document, threshold_override)
     _tickers, names = portfolio_universe()
     cusip_map = load_cusip_map()
-    registry_ciks = {cik_padded(row["cik"]) for row in managers if row.get("cik")}
+    registry_ciks = registry_ciks_for(managers)
     failures = []
     fresh_changes: list[dict] = []
     for manager in managers:
@@ -628,19 +807,20 @@ def run(periods: int, alerts: bool, offline: bool, only: str | None) -> int:
             flag = "ok" if report.get("ok", True) else "reconcile"
             print(f"{manager['manager_id']} {quarter}: {flag} rows={len(rows)}", flush=True)
             records.append(filing_record(manager, built))
-            changes = [
-                change
-                for change in diff_book(manager, rows, quarter, built.get("period_end") or "")
-                if (change.get("ssi_ticker") or "").upper() in names or change.get("change_type") == "new"
-            ]
+            changes = reported_changes(
+                manager,
+                diff_book(manager, rows, quarter, built.get("period_end") or ""),
+                set(names),
+                threshold,
+            )
             quarter_changes.setdefault(quarter, []).extend(changes)
             fresh_changes.extend(changes)
         if records:
             upsert_filings(records)
         for quarter, changes in quarter_changes.items():
             period_end = next((item.get("period_end") for item in built_rows if item.get("quarter") == quarter), "")
-            write_changes(quarter, period_end or "", {manager["manager_id"]: changes})
-    build_dashboard(names)
+            write_changes(quarter, period_end or "", {manager["manager_id"]: changes}, threshold)
+    build_dashboard(names, threshold)
     if alerts and fresh_changes:
         today = datetime.now(timezone.utc).strftime("%Y-%m-%d")
         lines = alert_lines(fresh_changes, set(names), today=today)
@@ -659,9 +839,15 @@ def main() -> int:
     parser.add_argument("--periods", type=int, default=2)
     parser.add_argument("--alerts", action="store_true")
     parser.add_argument("--offline", action="store_true")
-    parser.add_argument("--manager", default=None)
+    parser.add_argument("--manager", default=None, help="One manager id, or a comma-separated list.")
+    parser.add_argument(
+        "--watchlist-threshold",
+        type=float,
+        default=None,
+        help="Share-change percent for watchlist adds and trims. Default is managers.json, or 5.",
+    )
     args = parser.parse_args()
-    return run(args.periods, args.alerts, args.offline, args.manager)
+    return run(args.periods, args.alerts, args.offline, args.manager, args.watchlist_threshold)
 
 
 if __name__ == "__main__":
