@@ -20,7 +20,7 @@ async function load(fetcher=root.fetch.bind(root),crypt=root.crypto){
  const body=await b.text(),hash=Array.from(new Uint8Array(await crypt.subtle.digest('SHA-256',new TextEncoder().encode(body)))).map(v=>v.toString(16).padStart(2,'0')).join('');
  if(hash!==m.sha256)throw Error('Execution files belong to different publications.');const d=validate(JSON.parse(body));if(d.data_version!==m.data_version)throw Error('Execution version mismatch.');return d;
 }
-function render(rule){return '<section class="tps-section" id="tps-venue" data-venue-execution data-rule="'+esc(rule)+'"><p role="status">Loading every-name execution results…</p></section>';}
+function render(rule){const A=root.ThirdPlusAssumed||(typeof require==='function'?require('./third-plus-assumed.js'):null);return (A?A.render(rule):'')+'<details class="tps-details"><summary>Historical evidence audit and data requirements</summary><section class="tps-section" id="tps-venue" data-venue-execution data-rule="'+esc(rule)+'"><p role="status">Loading every-name execution results…</p></section></details>';}
 function chosen(d,s){const r=d.rules[s.rule],m=r.models.find(m=>m.policy===s.policy&&m.minutes===Number(s.minutes)&&m.participation===Number(s.rate));return {...m,coverage:r.coverage_sets[m.coverage_set],decisions:r.decision_sets[m.decision_set]};}
 function rows(d,s){return d.rules[s.rule].opportunities.filter(e=>(s.group==='all'||s.group==='ssr'&&e.previous_decision==='ssr_rejected'||s.group==='excluded'&&['ssr_rejected','risk_capacity','missing_liquidity'].includes(e.previous_decision)||s.group==='selected'&&!e.execution_status.startsWith('signal_'))&&(!s.query||[e.ticker,e.name,e.event_date,e.entry_day,labels[e.execution_status]].join(' ').toLowerCase().includes(s.query.toLowerCase())));}
 function body(d,s){const html=view(d,s);return html.slice(html.indexOf('<tbody data-venue-body>')+'<tbody data-venue-body>'.length,html.indexOf('</tbody></table></div><button'));}
@@ -51,6 +51,7 @@ function csv(d,s){
  return '\ufeff'+[['ticker','issuer','split_date','intended_entry','previous_reason','independent_status','order_attempted','modeled_fill','modeled_entry_usd','exit_status','modeled_fill_240m','modeled_entry_usd_240m','modeled_fill_full_session','modeled_entry_usd_full_session','account_policy','account_window_minutes','account_participation','account_decision','resolved_ticker','price_path_status','data_gaps','evidence'],...rows(d,s).map(e=>[e.ticker,e.issuer,e.event_date,e.entry_day,e.previous_decision,e.execution_status,e.attempted,e.filled,e.entry_dollars,e.exit_status,e.extended_filled,e.extended_entry_dollars,e.full_session_filled,e.full_session_entry_dollars,s.policy,s.minutes,s.rate,chosen(d,s).decisions.find(a=>a.id===e.id)?.status,e.resolved_ticker,e.price_path_status,(e.gaps||[]).join(';'),'unverified entry diagnostic; account performance unavailable'])].map(r=>r.map(cell).join(',')).join('\n')+'\n';
 }
 async function attach(container){
+ const A=root.ThirdPlusAssumed||(typeof require==='function'?require('./third-plus-assumed.js'):null);if(A)A.attach(container);
  const host=container.querySelector('[data-venue-execution]');if(!host||host.dataset.mounted)return;host.dataset.mounted='true';
  try{
   pending||=load().catch(e=>{pending=null;throw e;});const d=await pending;if(!host.isConnected)return;
