@@ -30,6 +30,7 @@ CORE_VERSION = 1
 
 # Row fields only needed once a ticker is opened in the detail pane.
 DETAIL_ONLY_FIELDS = (
+    "shared_forecast",
     "download_script_path",
     "two_phase_watch",
     "insights",
@@ -153,6 +154,11 @@ _IRR_READINESS_CORE_FIELDS = (
 )
 
 _VALUATION_DECISION_CORE_FIELDS = (
+    "forecast_id",
+    "calculation_status",
+    "research_return_available",
+    "calculation_reason",
+    "quote_currency",
     "status",
     "proof_status",
     "model_level",
@@ -213,7 +219,7 @@ def slim_valuation_decision(decision: dict | None) -> dict:
     # in the detail strip, which loads the full decision from the ticker shard.
     dates = decision.get("dates")
     if isinstance(dates, dict) and dates.get("model_as_of") is not None:
-        slim["dates"] = {"model_as_of": dates.get("model_as_of")}
+        slim["dates"] = {k: dates[k] for k in ("model_as_of", "price_as_of", "forecast_as_of", "calculation_as_of") if dates.get(k) is not None}
     else:
         slim.pop("dates", None)
     tier = slim_valuation_tier(decision.get("universe_tier"))

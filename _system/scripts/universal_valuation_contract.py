@@ -954,6 +954,11 @@ def build_universal_valuation_contract(data: dict, explicit_profile: str | None 
             "authorize capital."
         ),
     }
+    # Research availability is a mathematical property, independent of capital
+    # approval. Keep the legacy proof-output fields for compatibility; all new
+    # price/return publication uses this one source-bound forecast.
+    from valuation_forecast import build_forecast
+    contract["shared_forecast"] = build_forecast(data)
     contract["change_control"]["model_hash"] = canonical_hash({k: v for k, v in contract.items() if k != "change_control"})
     data["universal_valuation_contract"] = contract
     return contract

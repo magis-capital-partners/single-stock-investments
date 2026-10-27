@@ -2891,13 +2891,13 @@ function renderIrrCell(t) {
       const pct = Number(ret.pct);
       const years = (ret.source === 'autonomous_research_estimate' ? t.autonomous_irr?.horizon_years : null) ?? t.valuation_decision?.horizon_years
         ?? t.valuation_workbench?.valuation?.horizon_years;
-      const label = ret.source === 'autonomous_research_estimate' ? 'automatic estimate' : 'contract forward';
-      const title = [ret.sub, years != null ? `${years}y horizon` : '', t.valuation_decision?.dates?.model_as_of ? `model as of ${t.valuation_decision.dates.model_as_of}` : '']
+      const label = ret.source === 'shared_valuation_forecast' ? 'same valuation model' : 'contract forward';
+      const title = [ret.sub, years != null ? `${Number(years).toFixed(1)}y horizon` : '', t.valuation_decision?.dates?.model_as_of ? `model as of ${t.valuation_decision.dates.model_as_of}` : '']
         .filter(Boolean).join(' · ');
       return `<span class="irr-cell ${irrClass(pct)}" title="${escapeHtml(title)}">${pct.toFixed(pct % 1 ? 1 : 0)}%${label ? `<span class="irr-sub">${escapeHtml(label)}</span>` : ''}</span>`;
     }
   }
-  return '<span class="irr-cell irr-pending" title="No publishable dated forward-cash-flow return">—<span class="irr-sub">not modeled</span></span>';
+  return `<span class="irr-cell irr-pending" title="${escapeHtml(window.ValuationViz?.forecastGapLabel(t.valuation_decision?.calculation_reason) || "Dated shareholder forecast unavailable")}">—<span class="irr-sub">${t.valuation_decision?.calculation_status === "quote_gap" ? "quote refresh pending" : "forecast incomplete"}</span></span>`;
 }
 
 const METHOD_BY_PROFILE = {
@@ -2918,7 +2918,7 @@ function renderPriceValueCell(t) {
   const u = quoteUnitsOf(t);
   const d = decisionForRow(t);
   const values = d.value_per_share || t.component_valuation?.total_equity_value_per_share || {};
-  const price = d.price_per_share ?? t.component_valuation?.market_price_per_share;
+  const price = d.calculation_status === 'identity_gap' ? null : d.price_per_share ?? t.component_valuation?.market_price_per_share;
   const priceText = price == null ? '—' : fmtQuote(price, u, 0);
   const baseText = values.base == null ? '—' : fmtQuote(values.base, u, 0);
   const range = values.low == null || values.high == null
@@ -2929,6 +2929,7 @@ function renderPriceValueCell(t) {
 }
 
 function renderNextActionCell(t) {
+  if (t.valuation_decision?.calculation_status) return `<div class="decision-action">${t.valuation_decision.research_return_available ? 'Automatic model refresh scheduled' : 'Automatic forecast repair scheduled'}</div><div class="tier-sub">${escapeHtml(window.ValuationViz?.forecastGapLabel(t.valuation_decision.calculation_reason) || 'PV and IRR reconciled')}</div>`;
   if (t.autonomous_irr) return `<div class="decision-action">${t.autonomous_irr.status === 'available' ? 'Automatic refresh scheduled' : 'Automatic source retry scheduled'}</div><div class="tier-sub">Research estimate · no approval queue</div>`;
   const d = decisionForRow(t);
   const critical = Number(d.critical_gap_count || 0);
@@ -5602,10 +5603,8 @@ function filtered() {
     } else if (sortKey === 'classification.analysis_irr_pct') {
       // Old saved preferences map to the canonical forward-return sort.  Do
       // not revive classification IRRs as a fallback.
-      av = a.valuation_decision?.return_publishable
-        ? a.valuation_decision?.forward_return_at_price_pct?.base : null;
-      bv = b.valuation_decision?.return_publishable
-        ? b.valuation_decision?.forward_return_at_price_pct?.base : null;
+      av = window.ValuationViz?.displayReturn(a).pct ?? null;
+      bv = window.ValuationViz?.displayReturn(b).pct ?? null;
       av = av == null ? -Infinity : av;
       bv = bv == null ? -Infinity : bv;
     } else if (sortKey === 'classification.stance') {
@@ -5673,9 +5672,7 @@ function filtered() {
       sortKey === 'valuation_decision.forward_return_at_price_pct.base'
       || sortKey === 'valuation_decision.annualized_return_at_price_pct.base'
     ) {
-      const forwardOf = (t) => t.valuation_decision?.return_publishable
-        ? t.valuation_decision?.forward_return_at_price_pct?.base
-        : null;
+      const forwardOf = (t) => window.ValuationViz?.displayReturn(t).pct ?? null;
       av = forwardOf(a);
       bv = forwardOf(b);
       av = av == null ? -Infinity : av;

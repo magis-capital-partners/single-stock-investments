@@ -55,7 +55,10 @@ SEC_TAGS = {
     'sbc': ['ShareBasedCompensation'],
     'net_income': ['NetIncomeLossAvailableToCommonStockholdersBasic', 'ProfitLossAttributableToOwnersOfParent', 'NetIncomeLoss'],
 }
-SYMBOLS = {'CSU': 'CSU.TO', 'LMN': 'LMN.V', 'LIFCO.ST': 'LIFCO-B.ST', 'LSEG': 'LSEG.L', 'BRK.B': 'BRK-B', 'BN': 'BN', 'FRMO': 'FRMO'}
+SYMBOLS = {'CSU': 'CSU.TO', 'LMN': 'LMN.V', 'LIFCO.ST': 'LIFCO-B.ST', 'LSEG': 'LSEG.L', 'BRK.B': 'BRK-B', 'BF.B': 'BF-B', 'HEI.A': 'HEI-A', 'BN': 'BN', 'FRMO': 'FRMO', 'BYMA': 'BYMA.BA', 'BMYS.KL': '1818.KL', 'PSH': 'PSHD.L'}
+# Bursa listing identity: https://bursa.listedcompany.com/interactive_chart.html (stock code 1818).
+# BYMA provider symbol is also recorded in BYMA/research/valuation.json inputs.price_source.
+# PSH USD listing: https://www.londonstockexchange.com/stock/PSHD/pershing-square-holdings-ltd
 HOLDINGS = {'BRK.B', 'BN', 'MKL', 'FRMO'}
 
 
@@ -115,8 +118,13 @@ def quote(symbol, as_of):
     meta = data['meta']
     if meta.get('symbol', '').upper() != symbol.upper():
         raise ValueError('Quote symbol does not match requested listing')
+    quotes = (data.get('indicators') or {}).get('quote') or [{}]
     rows = [(datetime.fromtimestamp(t, timezone.utc).date().isoformat(), number(v))
-            for t, v in zip(data.get('timestamp') or [], data['indicators']['quote'][0]['close'])]
+            for t, v in zip(data.get('timestamp') or [], quotes[0].get('close') or [])]
+    # Some valid listings return metadata but no historical close array. A
+    # dated regular-session observation is usable; an undated price is not.
+    if not rows and meta.get('regularMarketTime') and number(meta.get('regularMarketPrice')) is not None:
+        rows = [(datetime.fromtimestamp(meta['regularMarketTime'], timezone.utc).date().isoformat(), number(meta['regularMarketPrice']))]
     rows = [(d, v) for d, v in rows if v is not None and v > 0 and d <= as_of]
     if not rows:
         raise ValueError('No positive dated quote')
@@ -125,6 +133,7 @@ def quote(symbol, as_of):
     if currency == 'GBp':
         value, currency = value / 100, 'GBP'
     return {'value': value, 'currency': currency, 'as_of': d, 'symbol': symbol,
+            'company_name': meta.get('longName') or meta.get('shortName'),
             'source_url': url, 'retrieved_at': stamp(), 'claim_type': 'provider_observation'}
 
 
@@ -237,8 +246,8 @@ def parse_frmo_report(texts, url, year, as_of, content_hash):
     return facts
 
 
-def collect(ticker, entry, as_of, root=ROOT):
-    path = root / INPUTS / (ticker + '.json')
+def collect(ticker, entry, as_of, root=ROOT, inputs_dir=INPUTS):
+    path = root / inputs_dir / (ticker + '.json')
     prior = read(path)
     result = {'schema_version': '1.0', 'ticker': ticker, 'attempted_at': stamp(),
               'quote': prior.get('quote'), 'facts': prior.get('facts') or [], 'errors': []}
@@ -618,6 +627,11 @@ def check(root=ROOT):
         expected = estimate(ticker, read(root / INPUTS / (ticker + '.json')), report['as_of'])
         if semantic_json_sha256(row) != semantic_json_sha256(expected):
             raise ValueError(ticker + ': estimate does not replay from its inputs')
+        # Active PV/IRR publication has moved to the full-universe shared lane.
+        # Its separate --check verifies served rows after this historical source
+        # collector completes; do not demand the retired UI fallback here.
+        if (core.get(ticker, {}).get('valuation_decision') or {}).get('calculation_status'):
+            continue
         served = read(root / 'dashboard/data/tickers' / shard_filename(ticker)).get('autonomous_irr')
         if served != row:
             raise ValueError(ticker + ': detail publication is stale')

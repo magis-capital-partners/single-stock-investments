@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import json
+import math
 import os
 import subprocess
 import sys
@@ -383,7 +384,14 @@ def main() -> int:
         model_level = decision.get("model_level")
         if model_level not in MODEL_LEVELS:
             invalid_model_levels.append(f"{row.get('ticker')}={model_level}")
-        if decision.get("output_basis") == "present_value_today" and any(
+        shared = bool(decision.get('calculation_status'))
+        shared_valid = (shared and decision.get('calculation_status') == 'available'
+                        and decision.get('research_return_available') is True
+                        and len(str(decision.get('forecast_id') or '')) == 64
+                        and decision.get('forward_return_status') == 'available'
+                        and all(isinstance(returns.get(c), (int, float)) and not isinstance(returns[c], bool)
+                                and math.isfinite(returns[c]) for c in ('low', 'base', 'high')))
+        if decision.get("output_basis") == "present_value_today" and not shared_valid and any(
             returns.get(case) is not None for case in ("low", "base", "high")
         ):
             present_value_return_leaks.append(str(row.get("ticker") or ""))
@@ -391,6 +399,13 @@ def main() -> int:
         if base_return is None:
             continue
         ticker = str(row.get("ticker") or "")
+        if shared:
+            if not shared_valid:
+                blocked_with_published_irr.append(ticker)
+            # Source-bound shared forecasts are research calculations. Capital
+            # maturity and outlier approvals remain separate; they cannot gate
+            # a reproducible research IRR or authorize a capital decision.
+            continue
         if (
             decision.get("status") != "decision_grade"
             or decision.get("model_level") not in RETURN_PUBLISHABLE_MODEL_LEVELS
