@@ -5,6 +5,7 @@ from __future__ import annotations
 import json
 import re
 import time
+import threading
 from datetime import datetime, timedelta, timezone
 import urllib.request
 from pathlib import Path
@@ -39,6 +40,16 @@ SEC_UA = "MarvinActivistScan contact@example.com"
 SLEEP_SEC = 0.12
 ROOT = Path(__file__).resolve().parents[2]
 READ_LIMIT = 250_000
+_REQUEST_LOCK = threading.Lock()
+_LAST_REQUEST = 0.0
+
+
+def throttle_sec() -> None:
+    """Share a conservative five-request/second ceiling across ticker workers."""
+    global _LAST_REQUEST
+    with _REQUEST_LOCK:
+        time.sleep(max(0.0, .2 - (time.monotonic() - _LAST_REQUEST)))
+        _LAST_REQUEST = time.monotonic()
 
 
 def sec_url(cik_path: str, accession: str, primary: str) -> str:
@@ -50,6 +61,7 @@ def fetch_submissions(cik: str) -> dict:
     cik_padded = f"{int(cik):010d}"
     url = f"https://data.sec.gov/submissions/CIK{cik_padded}.json"
     req = urllib.request.Request(url, headers={"User-Agent": SEC_UA})
+    throttle_sec()
     with urllib.request.urlopen(req, timeout=60) as resp:
         return json.load(resp)
 
@@ -60,6 +72,7 @@ def download(url: str, dest: Path) -> bool:
     dest.parent.mkdir(parents=True, exist_ok=True)
     req = urllib.request.Request(url, headers={"User-Agent": SEC_UA})
     try:
+        throttle_sec()
         with urllib.request.urlopen(req, timeout=120) as resp:
             data = resp.read()
     except Exception as exc:
@@ -233,6 +246,7 @@ def fetch_schedule_13_xml(cik_path: str, accession: str | None) -> dict:
     url = f"https://www.sec.gov/Archives/edgar/data/{cik_path}/{nodash}/primary_doc.xml"
     req = urllib.request.Request(url, headers={"User-Agent": SEC_UA})
     try:
+        throttle_sec()
         with urllib.request.urlopen(req, timeout=60) as resp:
             payload = resp.read().decode("utf-8", errors="ignore")
     except Exception:

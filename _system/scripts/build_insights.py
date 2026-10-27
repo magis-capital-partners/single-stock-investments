@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import json
+from dashboard_catalog_recovery import merge_podcast_catalogs
 import csv
 import hashlib
 import re
@@ -4039,19 +4040,21 @@ def main() -> int:
         prior_podcasts, new_podcasts
     )
     if preserve_podcasts:
-        payload["podcast_index"] = prior_podcasts
-        payload["podcast_by_show"] = (prior or {}).get("podcast_by_show") or {}
+        merged_podcasts=merge_podcast_catalogs(prior_podcasts,new_podcasts)
+        payload["podcast_index"] = merged_podcasts
+        payload["podcast_by_show"] = podcast_by_show({'episodes':merged_podcasts})
+        payload["podcast_count"] = len(merged_podcasts)
         payload["podcast_index_preserved"] = {
             "reason": podcast_reason,
             "rebuilt_count": len(new_podcasts),
             "preserved_count": len(prior_podcasts),
+            "merged_count": len(merged_podcasts),
             "rebuilt_newest": newest_as_of(r.get("published") for r in new_podcasts),
             "preserved_newest": newest_as_of(r.get("published") for r in prior_podcasts),
         }
         print(
-            f"PRESERVE podcast_index: {podcast_reason}; keeping the committed catalog. "
-            "The corpus this lane saw is behind the published one -- check that "
-            "research-vault/podcasts was cloned and is current.",
+            f"PRESERVE podcast_index: {podcast_reason}; retaining missing history "
+            "and applying current episodes and summaries.",
             file=sys.stderr,
         )
 

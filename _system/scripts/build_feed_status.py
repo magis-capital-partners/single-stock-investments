@@ -11,6 +11,7 @@ import json
 import re
 from datetime import datetime, timezone
 from pathlib import Path
+from dashboard_data_coverage import surface_coverage
 
 ROOT = Path(__file__).resolve().parents[2]
 OUT_REL = Path("dashboard/data/feed_status.json")
@@ -227,9 +228,8 @@ SURFACES: list[dict] = [
         "hash": "#/ideas/nol",
         "lane": "data-pipeline-intake-full",
         "kind": "file",
-        "path": "dashboard/data/core.json",
-        "stamp_fields": ["generated_at"],
-        "embedded_key": "nol_screener",
+        "path": "dashboard/data/nol_screener.json",
+        "stamp_fields": ["built_at"],
         "actionable_flag": "is_actionable",
         "healer": _INTAKE,
     },
@@ -239,9 +239,8 @@ SURFACES: list[dict] = [
         "hash": "#/ideas/banks",
         "lane": "data-pipeline-intake-full",
         "kind": "file",
-        "path": "dashboard/data/core.json",
-        "stamp_fields": ["generated_at"],
-        "embedded_key": "advantaged_banks_screener",
+        "path": "dashboard/data/advantaged_banks_screener.json",
+        "stamp_fields": ["built_at"],
         "actionable_flag": "is_low_cost",
         "healer": _INTAKE,
     },
@@ -621,7 +620,16 @@ def build_feed_status(root: Path | None = None, now: datetime | None = None) -> 
 
     def load_rel(rel: str):
         if rel not in cache:
-            cache[rel] = _load_json(root / rel)
+            path=root / rel
+            cache[rel] = _load_json(path)
+            if isinstance(cache[rel],dict) and cache[rel].get('private_snapshot') and rel.startswith('dashboard/'):
+                # Read the verified archive in place; never hydrate private
+                # content into public dashboard files just to inspect health.
+                try:
+                    from private_dashboard_assets import private_source
+                    cache[rel]=_load_json(private_source(root/'dashboard',rel[len('dashboard/'):]))
+                except (OSError,ValueError,RuntimeError,ImportError):
+                    pass
         return cache[rel]
 
     surfaces = []
@@ -638,6 +646,7 @@ def build_feed_status(root: Path | None = None, now: datetime | None = None) -> 
         exists = False
         empty = False
         artifact = resolved.get("path")
+        coverage = None
         if kind == "api":
             exists = True
             status = "api"
@@ -652,9 +661,15 @@ def build_feed_status(root: Path | None = None, now: datetime | None = None) -> 
                     exists = False
                 else:
                     empty = actionable == 0
+            elif exists and resolved.get('actionable_flag'):
+                rows=doc.get('rows') or []
+                empty=not any(row.get(resolved['actionable_flag']) for row in rows if isinstance(row,dict))
             if exists:
                 stamp = _first_stamp(doc, list(resolved.get("stamp_fields") or ["generated_at"]))
             status = classify_feed(exists, stamp, max_age, moment, empty=empty and exists)
+            coverage = surface_coverage(resolved['id'], doc) if exists else None
+            if coverage and coverage['incomplete_rows'] and status in {'fresh','empty'}:
+                status='degraded'
         if spec.get('id')=='rock' and exists and status in {'fresh','empty'} and (doc.get('coverage') or {}).get('failures'):
             status='degraded'
         if resolved.get("data_feed")=="buyback_radar" and exists and status in {"fresh","empty"} and doc.get("health")!="healthy":
@@ -665,6 +680,8 @@ def build_feed_status(root: Path | None = None, now: datetime | None = None) -> 
         lane_state = supervisor_lanes.get(lane) if isinstance(supervisor_lanes.get(lane), dict) else {}
         clause = _supervisor_clause(lane, lane_state, open_lanes)
         next_action = healer if not clause else f"{healer} {clause}".strip()
+        if coverage and coverage['incomplete_rows']:
+            next_action=f"{coverage['next_action']} {next_action}".strip()
         surfaces.append({
             "id": resolved["id"],
             "label": resolved.get("label") or resolved["id"],
@@ -682,6 +699,10 @@ def build_feed_status(root: Path | None = None, now: datetime | None = None) -> 
             "lane_receipt_at": receipt_at,
             "healer": healer,
             "next_action": next_action,
+            "coverage": coverage,
+            "observation_dates": ({'borrow': (doc.get('borrow_meta') or {}).get('as_of'),
+                                   'research':doc.get('as_of')}
+                                  if kind!='api' and exists and resolved['id']=='short-alpha' else None),
         })
     return {
         "schema_version": "1",

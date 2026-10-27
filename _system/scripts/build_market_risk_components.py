@@ -19,7 +19,9 @@ from market_sessions import completed_session, sessions_behind, session_close, N
 from market_risk_publication import reconcile
 
 ROOT = Path(__file__).resolve().parents[2]
-DEFAULT_ETF_ROOT = Path.home() / "Projects/quant/etf-dashboard"
+DEFAULT_ETF_ROOT = ROOT.parent / "etf-dashboard"
+if not DEFAULT_ETF_ROOT.exists():
+    DEFAULT_ETF_ROOT = Path.home() / "Projects/quant/etf-dashboard"
 DEFAULT_LS_ROOT = Path.home() / "Projects/quant/ls-algo"
 OUTPUT = ROOT / "dashboard" / "data" / "market_risk_components.json"
 
@@ -599,6 +601,27 @@ def write_atomic(path: Path, payload: dict) -> None:
     temporary.replace(path)
 
 
+def retain_newer_observations(payload: dict, prior: dict) -> dict:
+    """A stale local checkout cannot replace a newer published observation."""
+    key=lambda row:(row.get('component'),row.get('scope'),row.get('symbol'))
+    current={key(row):row for row in payload.get('components',[])}
+    for old in prior.get('components',[]):
+        if old.get('quality_state')=='unavailable' or old.get('model_version')!=MODEL_VERSION:
+            continue
+        fresh=current.get(key(old))
+        if fresh is not None and fresh.get('quality_state')!='unavailable' and str(fresh.get('as_of') or '')>=str(old.get('as_of') or ''):
+            continue
+        retained=dict(old)
+        retained['quality_state']=quality(old.get('as_of'),old.get('cadence','daily'))
+        retained['refresh_note']='Retained newer source observation; local source snapshot is older or unavailable.'
+        current[key(old)]=retained
+    payload['components']=list(current.values())
+    payload['coverage']={state:sum(row.get('quality_state')==state for row in current.values())
+                         for state in ('ready','delayed','stale','unavailable')}
+    payload['coverage']['total']=len(current)
+    return payload
+
+
 def publish(url: str, token: str, payload: dict) -> dict:
     body = json.dumps({
         "schema_version": 1,
@@ -640,6 +663,7 @@ def main() -> int:
             prior = read_json(args.ssi_root / 'dashboard/data/market_risk_components.json')
         except (OSError, ValueError):
             prior = {}
+        payload=retain_newer_observations(payload,prior)
         payload['reconciliation'] = reconcile(payload, prior.get('reconciliation'))
         write_atomic(args.output, payload)
     result = None

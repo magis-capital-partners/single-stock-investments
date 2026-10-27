@@ -15,6 +15,7 @@ from aggregates_extract import parse_tables
 VERSION='aggregates.v2'
 PEERS={'VMC':'aggregates_focused','MLM':'aggregates_focused','CRH':'integrated_materials','AMRZ':'integrated_materials','KNF':'integrated_materials','ACA':'integrated_materials','GVA':'contractors_asphalt','ROAD':'contractors_asphalt','EXP':'cement','USLM':'lime','CX':'cement'}
 REGISTRY={
+ 'TTAM':{'cik':'0002035304','currency':'USD','shares_per_listing_unit':1},
  'VMC':{'cik':'0001396009','currency':'USD','shares_per_listing_unit':1},
  'MLM':{'cik':'0000916076','currency':'USD','shares_per_listing_unit':1},
  'KNF':{'cik':'0001955520','currency':'USD','shares_per_listing_unit':1},
@@ -22,11 +23,17 @@ REGISTRY={
  'CRH':{'cik':'0000849395','currency':'USD','shares_per_listing_unit':1,'listing_unit_valid_from':'2023-09-25'},
  'AMRZ':{'cik':'0002035989','currency':'USD','shares_per_listing_unit':1,'listing_unit_valid_from':'2025-06-23'},
  'GVA':{'cik':'0000861459','currency':'USD','shares_per_listing_unit':1},
- 'ROAD':{'cik':'0001718227','currency':'USD','shares_per_listing_unit':1},
+ 'ROAD':{'cik':'0001718227','currency':'USD','shares_per_listing_unit':1,
+         'identity_source_url':'https://www.sec.gov/Archives/edgar/data/1718227/000162828026054661/road-20260630.htm',
+         'identity_locator':'Note 9: Class A and B identical except voting, conversion and transfer restrictions; cover gives both classes on the same date'},
  'EXP':{'cik':'0000918646','currency':'USD','shares_per_listing_unit':1},
  'USLM':{'cik':'0000082020','currency':'USD','shares_per_listing_unit':1},
- 'CX':{'cik':'0001076378','currency':'USD','shares_per_listing_unit':None,'reason':'IFRS/ADS mapping requires verified ordinary-share and listing-unit reconciliation'},
+ 'CX':{'cik':'0001076378','currency':'USD','shares_per_listing_unit':10,
+       'share_unit':'CPO','listing_unit':'ADS',
+       'identity_source_url':'https://www.sec.gov/Archives/edgar/data/1076378/000119312526177605/d120395d20f.htm',
+       'identity_locator':'20-F cover: each ADS represents ten CPOs; reported outstanding security is CPOs'},
 }
+PEERS['TTAM']='integrated_materials'
 
 
 def local_companyfacts(ticker, root, cache):
@@ -66,7 +73,16 @@ def local_companyfacts(ticker, root, cache):
 
 def dump(path, doc):
     path.parent.mkdir(parents=True,exist_ok=True)
-    temp=path.with_suffix(path.suffix+'.tmp');temp.write_text(json.dumps(doc,ensure_ascii=False,indent=2)+'\n',encoding='utf-8');temp.replace(path)
+    temp=path.with_suffix(path.suffix+'.tmp');temp.write_text(json.dumps(doc,ensure_ascii=False,separators=(',',':'))+'\n',encoding='utf-8');temp.replace(path)
+
+
+def bounded_facts(facts,earliest_year):
+    """Bound the published history, retaining the full cached SEC response."""
+    cutoff=f'{earliest_year}-01-01'
+    return {**facts,'facts':{namespace:{tag:{**block,'units':{
+        unit:[row for row in rows if str(row.get('end') or '')>=cutoff]
+        for unit,rows in block.get('units',{}).items()}}
+        for tag,block in tags.items()} for namespace,tags in facts.get('facts',{}).items()}}
 
 
 def request(url, cache, offline=False):
@@ -82,6 +98,63 @@ def request(url, cache, offline=False):
         raise
 
 
+def reviewed_share_totals(rows,ticker):
+    """ROAD's two economically identical classes, explicitly reviewed in Note 9."""
+    if ticker!='ROAD':return []
+    groups={}
+    for row in rows:
+        if row['tag']!='dei:EntityCommonStockSharesOutstanding' or row.get('start'):continue
+        if row['scope'] not in {'us-gaap:CommonClassAMember','us-gaap:CommonClassBMember'}:continue
+        groups.setdefault(row['end'],{}).setdefault(row['scope'],[]).append(row)
+    result=[]
+    for end,classes in groups.items():
+        if len(classes)!=2 or any(len({r['value'] for r in part})!=1 for part in classes.values()):continue
+        inputs=[part[0] for part in classes.values()]
+        result.append({**inputs[0],'scope':'entity','value':sum(r['value'] for r in inputs),
+                       'status':'derived','inputs':inputs,'locator':'10-Q cover Class A + Class B; Note 9 identical economic rights'})
+    return result
+
+
+def supplement_filing_facts(facts,ticker,cache,offline=False):
+    """Fill companyfacts omissions from the latest primary inline filings.
+
+    A companyfacts observation wins for the same concept/period. Conflicting
+    inline duplicates are excluded instead of letting a note's scale overwrite
+    a consolidated statement. Class-specific counts remain separate.
+    """
+    from buyback_facts import parse_filing_facts
+    config=REGISTRY[ticker]
+    submissions=json.loads(request(f"https://data.sec.gov/submissions/CIK{config['cik']}.json",cache,offline))
+    recent=submissions.get('filings',{}).get('recent',{})
+    result=json.loads(json.dumps(facts))
+    chosen=[]
+    for i,form in enumerate(recent.get('form',[])):
+        if form in {'10-K','10-Q','20-F','40-F'} and form not in [recent['form'][j] for j in chosen]:chosen.append(i)
+        if len(chosen)>=2:break
+    for i in chosen:
+        accession=recent['accessionNumber'][i]
+        url=f"https://www.sec.gov/Archives/edgar/data/{int(config['cik'])}/{accession.replace('-','')}/{recent['primaryDocument'][i]}"
+        raw=parse_filing_facts(request(url,cache,offline),accession=accession,filed=recent['filingDate'][i],url=url)
+        raw.extend(reviewed_share_totals(raw,ticker))
+        grouped={}
+        for row in raw:
+            if row['scope']!='entity' or not row.get('end') or ':' not in row['tag']:continue
+            namespace,tag=row['tag'].split(':',1)
+            if namespace not in {'us-gaap','ifrs-full','dei'}:continue
+            unit='shares' if 'share' in str(row['unit']).lower() else 'USD' if 'usd' in str(row['unit']).lower() else None
+            if unit is not None:grouped.setdefault((namespace,tag,unit,row.get('start'),row['end']),[]).append(row)
+        for (namespace,tag,unit,start,end),rows in grouped.items():
+            if len({r['value'] for r in rows})!=1:continue
+            target=result.setdefault('facts',{}).setdefault(namespace,{}).setdefault(tag,{'units':{}})['units'].setdefault(unit,[])
+            if any(r.get('start')==start and r['end']==end for r in target):continue
+            entry={'val':rows[0]['value'],'end':end,'filed':recent['filingDate'][i],'accn':accession,'form':recent['form'][i]}
+            if rows[0].get('inputs'):
+                entry.update(inputs=rows[0]['inputs'],locator=rows[0]['locator'],status='derived')
+            if start:entry['start']=start
+            target.append(entry)
+    return result
+
+
 def discover(ticker,root,cache,offline=False,limit=32):
     config=REGISTRY[ticker];cik=config['cik'];items=[];errors=[]
     try:
@@ -93,7 +166,7 @@ def discover(ticker,root,cache,offline=False,limit=32):
                 except (OSError,ValueError):pass
         for recent in files:
             for i,form in enumerate(recent.get('form',[])):
-                if form not in {'10-K','10-K/A','10-Q','10-Q/A'}:continue
+                if form not in {'10-K','10-K/A','10-Q','10-Q/A','20-F','20-F/A','40-F'}:continue
                 end=recent.get('reportDate',[])[i]
                 if end[:4]<str(datetime.now().year-6):continue
                 accession=recent['accessionNumber'][i]
@@ -157,6 +230,10 @@ def publish(root, rows, details, errors):
     payload=build_payload(rows);payload['schema_version']=VERSION;payload['generated_at']=datetime.now(timezone.utc).isoformat()
     payload['coverage']={'issuers':len(rows),'operating':sum(bool(r.get('operating_latest',{}).get('FY')) for r in rows),'financial_verified':sum(r.get('financial_status')=='verified' for r in rows),'failures':errors}
     payload['criteria']='Period-aligned FULL-YEAR financial comparisons and separately sourced aggregates operations. Corporate EBITDA is an operating-income-plus-DD&A proxy; ROIC uses a labeled 21% tax assumption. Missing observations are never zero.'
+    candidate_path=root/'_system/reference/market-data/screens/rock_aggregates_candidates.json'
+    candidates=json.loads(candidate_path.read_text(encoding='utf-8')) if candidate_path.exists() else {}
+    payload['discovery']=candidates.get('rows',[])
+    payload['retired']=candidates.get('retired',[])
     for row,detail in zip(rows,details):dump(root/'dashboard/data'/row['detail_ref'],detail)
     dump(root/'dashboard/data/rock_aggregates_screener.json',payload)
     return payload
@@ -192,7 +269,9 @@ def run(root, *, offline=False, refresh_operating=False, write=True):
         error=[];sec={};quote=None;prices=[]
         try:
             facts=json.loads(request(f"https://data.sec.gov/api/xbrl/companyfacts/CIK{config['cik']}.json",cache,offline))
-            sec=builder.screen_ticker(config['cik'],facts=facts)
+            try:facts=supplement_filing_facts(facts,ticker,cache,offline)
+            except (OSError,ValueError,KeyError,IndexError) as exc:error.append('Inline filing supplement: '+str(exc))
+            sec=builder.screen_ticker(config['cik'],facts=bounded_facts(facts,datetime.now().year-6))
         except (ValueError,OSError) as e:error.append('Financial facts: '+str(e))
         if not sec.get('financial_history'):
             local=local_companyfacts(ticker,root,cache)

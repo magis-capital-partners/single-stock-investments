@@ -19,6 +19,7 @@ import re
 import subprocess
 import sys
 from pathlib import Path
+from atomic_io import _atomic_write_text
 
 from reconcile_insights_event_summary import (
     is_publishable_manifest,
@@ -402,7 +403,7 @@ def write_ticker_shards(payload: dict, data_dir: Path) -> int:
     written: set[str] = set()
     for row in payload.get("tickers") or []:
         name = shard_filename(row.get("ticker", ""))
-        (tickers_dir / name).write_text(_dump(row), encoding="utf-8")
+        _atomic_write_text(tickers_dir / name, _dump(row))
         written.add(name)
     # Prune shards for tickers no longer in the universe.
     removed = 0
@@ -560,7 +561,7 @@ def write_insights_shards(insights_doc: dict | None, data_dir: Path) -> int:
         previous_shards = base.get("shards") if isinstance(base.get("shards"), dict) else {}
         for key, value in previous_shards.items():
             manifest["shards"].setdefault(key, value)
-        (insights_dir / "manifest.json").write_text(_dump(manifest), encoding="utf-8")
+        _atomic_write_text(insights_dir / "manifest.json", _dump(manifest))
         count += 1
         stamp = base.get("generated_at")
     else:
@@ -575,7 +576,7 @@ def write_insights_shards(insights_doc: dict | None, data_dir: Path) -> int:
         shard = _shard_payload(insights_doc, insights_dir, name, keys, stamp)
         if shard is None:
             continue
-        (insights_dir / f"{name}.json").write_text(_dump(shard), encoding="utf-8")
+        _atomic_write_text(insights_dir / f"{name}.json", _dump(shard))
         count += 1
     return count
 
@@ -665,7 +666,7 @@ def write_shards(payload: dict, insights_doc: dict | None, data_dir: Path) -> di
         (data_dir / "irr_readiness.json").write_text(_dump(report), encoding="utf-8")
         payload.setdefault("summary", {})["irr_readiness"] = report["summary"]
     core = build_core_payload(payload)
-    core_path.write_text(_dump(core), encoding="utf-8")
+    _atomic_write_text(core_path, _dump(core))
     ticker_count = write_ticker_shards(payload, data_dir)
     insight_count = write_insights_shards(insights_doc, data_dir)
     core_mb = core_path.stat().st_size / 1e6
