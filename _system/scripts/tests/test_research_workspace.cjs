@@ -86,12 +86,25 @@ test('automatic estimates display without a human review queue and retain all sc
  assert.match(html,/no human approval queue/);assert.match(html,/retained owner cash/);assert.match(html,/-2%/);assert.match(html,/6%/);assert.match(html,/12%/);
  assert.match(html,/2033-10-23/);assert.match(html,/https:\/\/provider.test\/quote/);assert.doesNotMatch(html,/NaN|undefined/);
  assert.match(rw.scenarios(t,h),/Automatic research IRR scenarios/);
- assert.equal(context.ValuationViz.displayReturn(t).source,'autonomous_research_estimate');
- assert.equal(context.ValuationViz.displayReturn(t).pct,6);
+ assert.equal(context.ValuationViz.displayReturn(t).source,'missing');
+ assert.equal(context.ValuationViz.displayReturn(t).pct,null);
 });
 
 test('a failed automatic refresh withdraws returns and describes its automatic retry',()=>{
  const t={autonomous_irr:{status:'data_unavailable',forward_irr_pct:null,blockers:['Quote expired']}};
  const html=rw.irrReadiness(t,h);assert.match(html,/Quote expired/);assert.match(html,/next scheduled run/);
  assert.equal(context.ValuationViz.displayReturn(t).pct,null);
+});
+
+
+test('a shared model supplies the displayed return without committee approval',()=>{
+ const t={valuation_decision:{return_publishable:false,research_return_available:true,calculation_status:'available',forward_return_at_price_pct:{low:-2,base:8,high:15}},autonomous_irr:{status:'available',forward_irr_pct:{base:99}}};
+ assert.equal(context.ValuationViz.displayReturn(t).pct,8);
+ assert.equal(context.ValuationViz.displayReturn(t).source,'shared_valuation_forecast');
+ assert.match(rw.scenarios(t,h),/8%/);
+ assert.doesNotMatch(rw.scenarios(t,h),/99%/);
+ t.valuation_decision.research_return_available=false;
+ t.valuation_decision.calculation_status='model_gap';
+ assert.equal(context.ValuationViz.displayReturn(t).pct,null);
+ assert.doesNotMatch(rw.scenarios(t,h),/99%/);
 });

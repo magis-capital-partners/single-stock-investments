@@ -1,5 +1,9 @@
 # Autonomous compounder research IRRs
 
+The active dashboard now uses [shared valuation forecasts](SHARED_VALUATION_FORECASTS.md)
+for the entire coverage universe. The separate estimates described below are a
+historical research product and are not a fallback for the main Forward Return column.
+
 The canonical 37-company list has a separate unattended research-estimate lane.
 It collects dated quotes and annual fundamentals, reconciles reporting and
 listing currencies, constructs three dated shareholder cash-flow scenarios,

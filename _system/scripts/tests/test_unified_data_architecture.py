@@ -108,6 +108,27 @@ def test_l0_summary_feeds_exist_and_respect_size_budget() -> None:
         assert env.get("health", {}).get("status") == "healthy"
 
 
+def test_kpi_startup_preview_is_bounded_without_losing_source_rows(tmp_path: Path) -> None:
+    from build_progressive_shards import write_kpi_summary
+
+    rows = [{"ticker": f"T{i}", "kpi": "orders", "label": "Orders", "period": "2026-09",
+             "value": i, "unit": "count", "yoy": .1, "yoy_basis": "ratio",
+             "source_url": "https://issuer.test/" + "source/" * 150, "doc": "Filing"}
+            for i in range(900)]
+    payload = {"generated_at": "2026-10-27T00:00:00Z", "as_of": "2026-10-27",
+               "operating_latest": rows, "inflection_count": 120,
+               "inflections": [{"ticker": "T1", "human_summary": "growth " * 200}] * 120,
+               "full_feed_path": "dashboard/data/kpi_trends.json"}
+    preview = write_kpi_summary(payload, tmp_path)
+    assert (tmp_path / "kpi_summary.json").stat().st_size < 102_400
+    assert preview["operating_latest_count"] == len(rows)
+    assert preview["inflection_count"] == 120
+    full = json.loads((tmp_path / "operating_kpi_latest.json").read_text(encoding="utf-8"))
+    assert full["rows"] == rows
+    assert payload["operating_latest"] == rows
+    assert len(payload["inflections"]) == 120
+
+
 def test_l1_agent_shards_and_canonical_evidence() -> None:
     for ticker in ("TPL", "GOOGL"):
         shard_path = ROOT / "dashboard" / "data" / "agent_shards" / f"{ticker}.json"

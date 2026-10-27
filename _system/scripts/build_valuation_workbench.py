@@ -394,7 +394,7 @@ def decision_view(valuation: dict, committee: dict) -> dict:
         and contract_valuation.get("forward_return_status") == "available"
     )
     published_returns = forward_returns if return_publishable else {case: None for case in ("low", "base", "high")}
-    return {
+    view = {
         "status": contract.get("status"),
         "proof_status": contract.get("proof_status") or contract.get("status"),
         "model_level": model_level,
@@ -436,6 +436,9 @@ def decision_view(valuation: dict, committee: dict) -> dict:
         "owner_decision": committee.get("owner_decision"),
         "next_action": committee.get("next_action"),
     }
+    from valuation_forecast import build_forecast, attach_forecast
+    forecast = build_forecast(valuation)
+    return attach_forecast({'valuation_decision': view}, forecast, detailed=False)['valuation_decision']
 
 
 def freshness_view(decision: dict, as_of: str) -> dict:

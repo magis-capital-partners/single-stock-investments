@@ -1550,7 +1550,7 @@ def valuation_decision_summary(
         status in {"evidence_blocked", "provisional"}
         or model_level not in RETURN_PUBLISHABLE_MODEL_LEVELS
     )
-    return {
+    view = {
         "status": status,
         "proof_status": proof_status,
         "model_level": model_level,
@@ -1610,6 +1610,13 @@ def valuation_decision_summary(
             "TPL", "LB", "WBI", "AZLCZ", "MSB", "C", "NVR", "NUE", "BIIB",
         },
     }
+    from refresh_shared_forecasts import calculate
+    from valuation_forecast import attach_forecast
+    if ((ticker_dir / 'research/valuation.json').is_file()
+            or (ROOT / '_system/reference/market-data/valuation_fundamentals' / (ticker + '.json')).is_file()):
+        return attach_forecast({'valuation_decision': view}, calculate(ticker, ROOT, datetime.now(timezone.utc).date().isoformat()), detailed=False)['valuation_decision']
+    return view
+
 
 
 def valuation_queue_summary(rows: list[dict]) -> dict:
@@ -3127,6 +3134,10 @@ def build_ticker_row(
         _load_json(ticker_dir / "research/valuation_contract.json") or {}, as_of=datetime.now(timezone.utc).date()), detailed=True)
     from autonomous_compounders import load_estimate
     row["autonomous_irr"] = load_estimate(ticker, ROOT)
+    from refresh_shared_forecasts import calculate
+    from valuation_forecast import attach_forecast
+    attach_forecast(row, calculate(ticker, ROOT, datetime.now(timezone.utc).date().isoformat()))
+    row.pop("autonomous_irr", None)
     return row
 
 

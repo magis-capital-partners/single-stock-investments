@@ -96,33 +96,47 @@
     }).join('')}</ul>`;
   }
 
+  function forecastGapLabel(reason) {
+    const labels = {
+      realization_timing_missing:'Asset or business cash flows need a realization date.',
+      annual_operating_cash_flow_missing:'Annual operating cash flow is unavailable.',
+      annual_capex_missing:'Annual capital spending is unavailable.',
+      annual_diluted_share_count_missing:'A matching diluted share count is missing.',
+      positive_normalized_owner_cash_not_established:'A cash-flow recovery model is needed.',
+      parent_cashflow_attribution_missing:'Parent shareholder cash flow needs reconciliation.',
+      annual_financial_inputs_expired:'Financial inputs need an update.',
+      annual_period_or_currency_reconciliation_missing:'Financial periods or currencies need reconciliation.',
+      holding_company_component_forecast_missing:'Holding-company assets need a cash-flow forecast.',
+      method_specific_forecast_missing:'This business needs a model suited to its economics.',
+      instrument_cashflow_schedule_missing:'The security needs a dated payment schedule.',
+      issuer_forecast_missing:'An issuer cash-flow forecast is missing.',
+      invalid_calculation_proof:'Valuation calculations need repair.',
+      material_component_coverage_incomplete:'The valuation omits a material business or asset.',
+      limited_liability_equity_waterfall_missing:'Debt and equity recoveries need a settlement model.',
+      unique_shareholder_irr_unavailable:'Cash flows do not give a unique annual return.',
+      fresh_sourced_quote_missing:'A recent sourced quote is unavailable.',
+      quote_issuer_mismatch:'The price source identifies a different company.',
+      dated_reporting_to_listing_fx_missing:'A recent currency conversion is unavailable.',
+      forecast_date_missing_or_future:'The forecast date needs correction.',
+      overlapping_additive_components:'The valuation counts an asset more than once.',
+      proof_cashflow_reconciliation_failed:'Cash flows do not reconcile to the valuation.'
+    };
+    return [...new Set(String(reason||'').split(';').map(x=>x.trim()).filter(Boolean).map(x=>labels[x.split(':')[0]]||x.replace(/_/g,' ')))].join(' ');
+  }
+
   function displayReturn(t) {
     const d = decisionOf(t);
-    const atPrice = d.forward_return_at_price_pct?.base;
-    if (d.return_publishable && atPrice != null && Number.isFinite(Number(atPrice))) {
-      return {
-        pct: Number(atPrice),
-        label: 'Forward return',
-        source: 'contract_forward_return',
-        sub: d.forward_return_reason || 'Dated payoff or cash-flow return at the current price',
-      };
+    const value = d.forward_return_at_price_pct?.base;
+    // New rows are exclusively governed by the shared forecast. A stale
+    // legacy/automatic estimate cannot bypass a missing schedule or quote.
+    const shared = Object.prototype.hasOwnProperty.call(d, 'calculation_status');
+    const available = shared ? d.research_return_available === true : d.return_publishable === true;
+    if (available && value != null && Number.isFinite(Number(value))) {
+      return {pct:Number(value), label:'Forward IRR', source:shared ? 'shared_valuation_forecast' : 'contract_forward_return',
+        sub:shared ? 'PV, IRR and entry prices use the same valuation forecast' : d.forward_return_reason || 'Dated shareholder cash flows'};
     }
-    const automatic = t.autonomous_irr;
-    const estimate = automatic?.forward_irr_pct?.base;
-    if (automatic?.status === 'available' && estimate != null && Number.isFinite(Number(estimate))) {
-      return {pct: Number(estimate), label: 'Automatic research IRR', source: 'autonomous_research_estimate',
-        sub: '7-year mechanical scenarios with dated inputs and explicit assumptions · research estimate'};
-    }
-    return {
-      pct: null,
-      label: 'Forward return',
-      source: 'missing',
-      sub: d.forward_return_reason || (
-        d.model_level === 'screening_grade'
-          ? 'Withheld: generic screening model'
-          : 'Not modeled from dated forward cash flows'
-      ),
-    };
+    return {pct:null, label:'Forward return', source:'missing',
+      sub:forecastGapLabel(d.calculation_reason) || d.forward_return_reason || 'Dated shareholder forecast unavailable'};
   }
 
   function primaryPowerZone(t, personaMeta) {
@@ -755,6 +769,7 @@
     modelLevelMeta,
     tierMeta,
     displayReturn,
+    forecastGapLabel,
     primaryPowerZone,
     renderPowerZoneCell,
     renderValuationStatusCell,
