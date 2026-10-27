@@ -276,3 +276,20 @@ def test_broker_closed_lot_links_to_its_opening_owner_not_the_closing_trader(tmp
     result = history(write_report(tmp_path, rows, lots=lots))
     assert result["records"][0]["owner"] == "drew"
     assert result["records"][0]["allocation_reason"] == "broker_matched_opening_order_reference"
+
+
+def test_old_endpoint_http_success_does_not_mark_history_published(tmp_path, monkeypatch):
+    from _system.trading.sleeves import realized_cli
+    store = RealizedStore(tmp_path / "state")
+    store.ingest(write_report(tmp_path, [trade()]), account="TEST")
+    result = store.build(account="TEST", ls_symbols=set(), blacklist=set())
+    calls = []
+    def old_endpoint(*args, **kwargs):
+        calls.append(args)
+        return {"ok": True, "book": {"owner": "drew"}}
+    monkeypatch.setattr(realized_cli, "post_ingest", old_endpoint)
+    with pytest.raises(RuntimeError, match="did not acknowledge"):
+        realized_cli.publish(store, result, url="https://example.test/ingest", token="test")
+    assert len(calls) == 1
+    assert store.db.execute("SELECT count(*) FROM realized_publications").fetchone()[0] == 0
+    store.close()
