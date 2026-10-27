@@ -2718,23 +2718,24 @@ def fund_profiles(letters: list[dict], our_tickers: set[str]) -> dict[str, dict]
             {
                 "quarter": letter.get("quarter"),
                 "letter_date": letter.get("letter_date"),
-                "lead_summary": short_text(letter.get("lead_summary"), 320),
+                "lead_summary": letter.get("lead_summary") or "",
                 "themes": [
                     {"theme": theme.get("theme"), "stance": theme.get("stance")}
-                    for theme in (letter.get("themes") or [])[:8]
+                    for theme in (letter.get("themes") or [])
                     if isinstance(theme, dict) and theme.get("theme")
                 ],
                 "positions": [
                     {
                         "ticker": pos.get("ticker"),
                         "action": pos.get("action"),
-                        "commentary": short_text(pos.get("commentary") or pos.get("thesis"), 280),
+                        "commentary": pos.get("commentary") or pos.get("thesis") or "",
                     }
-                    for pos in (letter.get("positions") or [])[:10]
+                    for pos in (letter.get("positions") or [])
                     if isinstance(pos, dict) and pos.get("ticker")
                 ],
-                "risks": [short_text(value, 240) for value in (letter.get("risks") or [])[:5]],
-                "catalysts": [short_text(value, 240) for value in (letter.get("catalysts") or [])[:5]],
+                "risks": list(letter.get("risks") or []),
+                "catalysts": list(letter.get("catalysts") or []),
+                "duplicate_count": int(letter.get("duplicate_count") or 0),
                 "evidence_url": letter_ev["evidence_url"],
                 "evidence_label": letter_ev["evidence_label"],
             }
@@ -2746,9 +2747,7 @@ def fund_profiles(letters: list[dict], our_tickers: set[str]) -> dict[str, dict]
             key=lambda row: (row.get("letter_date") or "", row.get("quarter") or ""),
             reverse=True,
         )
-        quarters = {row.get("quarter") for row in profile["letters"] if row.get("quarter")}
-        # Extra letters beyond one-per-quarter are near-dups / monthly copies
-        profile["duplicate_count"] = max(0, len(profile["letters"]) - max(len(quarters), 1))
+        profile["duplicate_count"] = sum(row["duplicate_count"] for row in profile["letters"])
         profile["letter_count"] = len(profile["letters"])
         profile["latest_quarter"] = profile["letters"][0].get("quarter") if profile["letters"] else None
     return by_fund

@@ -1,5 +1,10 @@
 const ACCESS_ASSERTION_HEADER = "cf-access-jwt-assertion";
 const CLOCK_SKEW_SECONDS = 60;
+// Verified by the owner, 2026-10-23. Names and client supplied headers never grant a role.
+export const DASHBOARD_OWNERS = Object.freeze({
+  "drew@magiscapitalpartners.com": "drew",
+  "mike@magiscapitalpartners.com": "michael",
+});
 
 function decodeBase64Url(value) {
   const normalized = String(value || "").replace(/-/g, "+").replace(/_/g, "/");
@@ -40,7 +45,7 @@ export function validateAccessClaims(payload, env, nowSeconds = Date.now() / 100
   if (!Number.isFinite(Number(payload?.exp)) || Number(payload.exp) < nowSeconds - CLOCK_SKEW_SECONDS) {
     throw new Error("Access token expired");
   }
-  if (payload?.nbf != null && Number(payload.nbf) > nowSeconds + CLOCK_SKEW_SECONDS) {
+  if (payload?.nbf != null && (!Number.isFinite(Number(payload.nbf)) || Number(payload.nbf) > nowSeconds + CLOCK_SKEW_SECONDS)) {
     throw new Error("Access token is not active");
   }
   if (String(payload?.type || "") !== "app") {
@@ -92,14 +97,28 @@ function localDevelopmentBypass(request, env) {
   return hostname === "localhost" || hostname === "127.0.0.1";
 }
 
-export async function requirePortfolioViewer(context) {
+export function humanRole(viewer, env = {}) {
+  if (!viewer?.email || viewer.service_token) return null;
+  const email = viewer.email.trim().toLowerCase();
+  const revoked = String(env.CF_ACCESS_REVOKED_EMAILS || "").toLowerCase().split(/[\s,;]+/);
+  if (revoked.includes(email)) return null;
+  return DASHBOARD_OWNERS[email] ? "owner" : "reader";
+}
+
+export async function requireHumanViewer(context) {
+  if (context.data?.humanViewer) return context.data.humanViewer;
   if (localDevelopmentBypass(context.request, context.env)) {
-    return { email: "local-development", subject: "local-development", claims: {} };
+    // Local access is explicit and cannot be enabled on a deployed hostname.
+    return { email: "local-development", subject: "local-development", role: "owner", claims: {} };
   }
-  const token = context.request.headers.get(ACCESS_ASSERTION_HEADER) || "";
+  const cookie = context.request.headers.get("cookie") || "";
+  const token = context.request.headers.get(ACCESS_ASSERTION_HEADER)
+    || cookie.match(/(?:^|;\s*)CF_Authorization=([^;]+)/)?.[1] || "";
   if (!token) return null;
   try {
-    return await verifyAccessJwt(token, context.env);
+    const viewer = await verifyAccessJwt(token, context.env);
+    const role = humanRole(viewer, context.env);
+    return role ? { ...viewer, role } : null;
   } catch (error) {
     console.error(JSON.stringify({
       message: "portfolio Access validation failed",
@@ -108,6 +127,11 @@ export async function requirePortfolioViewer(context) {
     }));
     return null;
   }
+}
+
+export async function requirePortfolioViewer(context) {
+  const viewer = await requireHumanViewer(context);
+  return viewer?.role === "owner" ? viewer : null;
 }
 
 export function privateJson(payload, status = 200) {
