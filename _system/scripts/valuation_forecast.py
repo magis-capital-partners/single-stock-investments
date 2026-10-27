@@ -15,7 +15,7 @@ from datetime import date, timedelta
 
 from calculation_proof import evaluate_calculation_proof
 
-VERSION = 'shared-valuation-forecast/1.0'
+VERSION = 'shared-valuation-forecast/1.1'
 CASES = ('low', 'base', 'high')
 HURDLES = (8, 10, 12, 15, 18, 20)
 
@@ -54,11 +54,17 @@ def _npv(rows, rate=None):
     return sum(r['amount_per_share'] / (1 + (r['discount_rate'] if rate is None else rate)) ** r['year'] for r in rows)
 
 
+def _money(value):
+    # Preserve sub-cent economics and cross-platform replay; format for people
+    # only at the UI boundary rather than rounding calculations to currency ticks.
+    return float(f'{value:.12g}')
+
+
 def _irr(price, rows):
     """Time-zero settlements change acquisition outlay, not future cash timing."""
     from universal_valuation_contract import _cashflow_irr
     immediate = sum(r['amount_per_share'] for r in rows if r['year'] == 0)
-    return _cashflow_irr(price - immediate, [r for r in rows if r['year'] > 0])
+    return _cashflow_irr(price - immediate, [r for r in rows if r['year'] > 0], decimal_places=8)
 
 
 class ForecastGap(ValueError):
@@ -272,7 +278,7 @@ def build_forecast(valuation, *, quote=None, as_of=None, fx=None):
     if any(model_pv[c] < 0 for c in CASES):
         result['gaps'].append({'code': 'limited_liability_equity_waterfall_missing'})
         return result
-    result['model_present_value_per_share'] = {c: round(model_pv[c], 4) for c in CASES}
+    result['model_present_value_per_share'] = {c: _money(model_pv[c]) for c in CASES}
     currencies = {str((c.get('calculation_proof') or {}).get('output_unit') or '')[:3].upper() for c in components}
     quote_currency = quote.get('currency')
     if len(currencies) > 1:
@@ -288,7 +294,7 @@ def build_forecast(valuation, *, quote=None, as_of=None, fx=None):
             return result
         schedules = {c: [{**r, 'amount_per_share': r['amount_per_share']*conversion} for r in schedules[c]] for c in CASES}
         result['fx'] = fx
-    result['present_value_today_per_share'] = {c: round(_npv(schedules[c]), 4) for c in CASES}
+    result['present_value_today_per_share'] = {c: _money(_npv(schedules[c])) for c in CASES}
     result['forward_cashflow_schedule'] = schedules
     result['required_return_pct'] = {c: round(rates[c][0]*100, 8) if rates[c] and len(set(rates[c])) == 1 else None for c in CASES}
     result['horizon_years'] = max((r['year'] for rows in schedules.values() for r in rows), default=0)
@@ -311,7 +317,7 @@ def build_forecast(valuation, *, quote=None, as_of=None, fx=None):
         result['gaps'].append({'code': 'unique_shareholder_irr_unavailable'})
         return result
     result['forward_irr_pct'] = returns
-    result['buy_prices'] = [{'hurdle_pct': h, 'prices': {c: round(_npv(schedules[c], h/100), 4) for c in CASES}} for h in HURDLES]
+    result['buy_prices'] = [{'hurdle_pct': h, 'prices': {c: _money(_npv(schedules[c], h/100)) for c in CASES}} for h in HURDLES]
     result['status'] = 'available'
     result['next_action'] = 'scheduled_refresh'
     return result

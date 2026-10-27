@@ -74,6 +74,22 @@ def test_pv_and_every_hurdle_reprice_to_their_required_return():
             assert _irr(zone['prices'][case], rows) == pytest.approx(zone['hurdle_pct'], abs=.01)
 
 
+def test_subcent_models_preserve_calculation_precision_before_display_rounding():
+    value = model()
+    proof = value['component_valuation_results']['additive_components'][0]['calculation_proof']
+    for item in proof['inputs'] + proof['assumptions']:
+        if 'value' in item:
+            item['value'] *= .00012345
+    value['inputs']['price'] *= .00012345
+    forecast = build_forecast(value)
+    assert forecast['status'] == 'available'
+    for case, rows in forecast['forward_cashflow_schedule'].items():
+        rate = forecast['forward_irr_pct'][case]
+        assert _npv(rows, rate / 100) == pytest.approx(forecast['quote']['value'], rel=1e-8)
+        for zone in forecast['buy_prices']:
+            assert _irr(zone['prices'][case], rows) == pytest.approx(zone['hurdle_pct'], abs=.00001)
+
+
 def test_later_quote_rolls_remaining_forecast_without_moving_cash_dates():
     original = build_forecast(model())
     later = build_forecast(model(), quote={'value': 100, 'as_of': '2027-10-27', 'source_url': 'https://provider.test'}, as_of='2027-10-27')

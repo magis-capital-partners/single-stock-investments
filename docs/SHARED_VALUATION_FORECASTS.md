@@ -95,6 +95,10 @@ gaps, currency conversion, stale quotes, future sources, complete coverage,
 deterministic replay, served-payload tampering and committee-independent research
 publication. Entry-price round trips must reproduce their target IRR within
 0.01 percentage point. Component PVs reconcile within proof rounding tolerance.
+Every unattended replay also checks purchase-price NPV residuals and every
+positive hurdle entry price across all available scenarios. The common solver
+retains eight decimal places for research IRRs and twelve significant digits
+for PV and entry prices; the display applies currency and percentage rounding.
 
 An autonomous refresh cannot infer undisclosed realization terms or invent an
 issuer forecast. The audit distinguishes available calculations, quote gaps and

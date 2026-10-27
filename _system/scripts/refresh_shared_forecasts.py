@@ -15,7 +15,7 @@ from pathlib import Path
 
 from atomic_io import write_json_if_changed, semantic_json_sha256
 from build_dashboard_shards import shard_filename, slim_valuation_decision
-from valuation_forecast import VERSION, attach_forecast, build_forecast
+from valuation_forecast import VERSION, attach_forecast, build_forecast, _npv, _irr
 
 ROOT = Path(__file__).resolve().parents[2]
 STATE = Path('_system/data/shared_valuation_forecasts.json')
@@ -252,6 +252,18 @@ def check(root=ROOT):
         if replayed != forecast or any(audit.get(k) != replayed.get(k) for k in ('status', 'calculation_id', 'forecast_hash', 'source_model_hash', 'model_basis', 'gaps',
                                                                            'model_present_value_per_share', 'present_value_today_per_share', 'forward_irr_pct')):
             raise ValueError(ticker+': forecast does not replay from the current issuer model and quote')
+        if forecast['status'] == 'available':
+            for case, schedule in forecast['forward_cashflow_schedule'].items():
+                price = forecast['quote']['value']
+                rate = forecast['forward_irr_pct'][case]
+                if abs(_npv(schedule, rate / 100) - price) > max(abs(price), 1e-8) * 1e-6:
+                    raise ValueError(ticker+': '+case+' IRR does not reproduce the purchase price')
+                for zone in forecast['buy_prices']:
+                    entry = zone['prices'][case]
+                    if entry is not None and entry > 0:
+                        repriced = _irr(entry, schedule)
+                        if repriced is None or abs(repriced - zone['hurdle_pct']) > .01:
+                            raise ValueError(ticker+': '+case+' entry price does not reproduce its hurdle IRR')
         expected = attach_forecast({'valuation_decision': {}}, forecast, detailed=False)['valuation_decision']
         for served in [rows[ticker].get('valuation_decision') or {}, detail.get('valuation_decision') or {}]:
             for field in ['forecast_id', 'calculation_status', 'research_return_available', 'forward_return_at_price_pct']:

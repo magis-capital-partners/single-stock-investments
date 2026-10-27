@@ -224,7 +224,7 @@ def _npv(rate: float, cashflows: list[dict]) -> float:
     )
 
 
-def _cashflow_irr(price: float | None, cashflows: list[dict]) -> float | None:
+def _cashflow_irr(price: float | None, cashflows: list[dict], *, decimal_places: int = 2) -> float | None:
     try:
         price_value = float(price)
     except (TypeError, ValueError):
@@ -263,7 +263,7 @@ def _cashflow_irr(price: float | None, cashflows: list[dict]) -> float | None:
             low = mid
             low_value = mid_value
     result = (low + high) / 2
-    return round(result * 100, 2) if isfinite(result) else None
+    return round(result * 100, decimal_places) if isfinite(result) else None
 
 
 def entry_price_for_contract_valuation(
