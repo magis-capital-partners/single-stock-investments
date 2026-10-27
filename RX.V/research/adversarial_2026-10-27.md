@@ -27,11 +27,14 @@ None that require a rewrite of the cited statement lines. Gaps below stay as hum
 
 ## Inference gaps
 
-- SEDAR issuer number, CUSIP, and ISIN.
-- Management ownership percent.
-- Oral-health cash from operations as its own line.
-- Any issuer-bid cancellations after 30 June 2026.
-- Whether preferred shares are outstanding.
+- SEDAR issuer number, CUSIP, and ISIN. The official PDFs read on 27 October 2026 do not print CUSIP or ISIN.
+- Dollar sales by brand, and a separate oral-health cash-from-operations line.
+- The earn-out formula. The June estimate of contingent consideration is not split.
+- A July-and-August issuer-bid share count on its own line. The half-year cancellation is 218,500 shares. The current bid's cancellation through 20 August 2026 is 250,000, measured from 15 December 2025.
+
+## What the circular closed
+
+Director and insider share counts, the 6 April 2026 record-date count of 11,437,090, 2025 pay, and the issuer-bid terms are now in the dive from the 6 April 2026 circular. Preferred shares outstanding are nil at 30 June 2026 and at 31 December 2025. One discussion sentence uses 162,061 as if it were a share count. Note 18 uses that figure as the share-capital dollar reduction and 218,500 as the share count. That is a wording clash, not a change to owner cash. Owner-cash inputs were re-added from the official 2025 and second-quarter 2026 cash flow statements and did not change. The latest completed close is still CAD 16.61 on 26 October 2026.
 
 ## Consistency
 

@@ -19,4 +19,4 @@ RX.V is the registry id because a bare `RX` row in the security master is an unv
 python RX.V/investor-documents/download_rx_v_investor_docs.py
 ```
 
-Official biosyent.com PDFs returned HTTP 403 from the research environment on 2026-10-27. The second-quarter 2026 management discussion was saved from a newsfile mirror. See `_download_log.txt`.
+The nine issuer PDFs used for the 27 October 2026 gap fill are under `investor-documents/` (annual report, 2025 financial statements and management discussion, second-quarter 2026 statements, management discussion, and results presentation, the 6 April 2026 circular, and the Oral Science signing and closing releases). The second-quarter management discussion is cited at its biosyent.com URL. See `document-index.csv` and `_download_log.txt`. A direct download from this environment still hits HTTP 403.

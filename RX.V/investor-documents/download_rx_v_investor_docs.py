@@ -3,7 +3,8 @@
 
 Does not use the Constellation Software downloader. Official biosyent.com
 files are often behind a Cloudflare challenge. Each attempt is appended to
-RX.V/_download_log.txt. Existing PDFs are not deleted.
+RX.V/_download_log.txt. Existing PDFs are not deleted. The nine files Drew
+supplied on 2026-10-27 are the copies under investor-documents/.
 """
 from __future__ import annotations
 
@@ -20,7 +21,15 @@ UA = "Marvin research single-stock-investments (RX.V BioSyent; contact: research
 FILES = [
     (
         "https://www.biosyent.com/wp-content/uploads/2026/04/2025-BioSyent-AR_web-FINAL.pdf",
-        DEST / "annual-reports" / "2025-BioSyent-AR.pdf",
+        DEST / "annual-reports" / "2025-annual-report.pdf",
+    ),
+    (
+        "https://www.biosyent.com/wp-content/uploads/2026/03/BioSyent-Inc.-2025-Financial-Statements.pdf",
+        DEST / "annual-reports" / "2025-financial-statements.pdf",
+    ),
+    (
+        "https://www.biosyent.com/wp-content/uploads/2026/03/BioSyent-Inc.-2025-MDA.pdf",
+        DEST / "annual-reports" / "2025-mda.pdf",
     ),
     (
         "https://www.biosyent.com/wp-content/uploads/2026/08/2026-BioSyent-Q2-Financials-FINAL.pdf",
@@ -28,15 +37,23 @@ FILES = [
     ),
     (
         "https://www.biosyent.com/wp-content/uploads/2026/08/2026-BioSyent-Q2-MDA-FINAL.pdf",
-        DEST / "interim" / "2026-Q2-mda-official.pdf",
-    ),
-    (
-        "https://www.biosyent.com/wp-content/uploads/2026/08/PR-2026-08-20-Q2-Earnings-Release-FINAL-v3.pdf",
-        DEST / "press" / "2026-08-20-q2-earnings.pdf",
-    ),
-    (
-        "https://newsfile.futunn.com/public/NN-PersistNoticeAttachment/7781/20260821/SEDAR_PLUS/CSA_SEDAR_PLUS_NOTICE_RECORD_ID_2483060.pdf",
         DEST / "interim" / "2026-Q2-mda.pdf",
+    ),
+    (
+        "https://www.biosyent.com/wp-content/uploads/2026/08/Q2-2026-Results-Presentation-FINAL-v2.pdf",
+        DEST / "interim" / "2026-Q2-results-presentation.pdf",
+    ),
+    (
+        "https://www.biosyent.com/wp-content/uploads/2026/04/BioSyent-Inc.-2026-Management-Information-Circular-and-Notice-of-Meeting-April-6-2026-FINAL.pdf",
+        DEST / "circular" / "2026-04-06-management-information-circular.pdf",
+    ),
+    (
+        "https://www.biosyent.com/wp-content/uploads/2026/02/SPA-Signing-PR-FINAL-CLEAN-Feb-9-2026.pdf",
+        DEST / "press" / "2026-02-09-oral-science-signing.pdf",
+    ),
+    (
+        "https://www.biosyent.com/wp-content/uploads/2026/02/SPA-Closing-PR-Mar-2-2026-FINAL.pdf",
+        DEST / "press" / "2026-03-02-oral-science-closing.pdf",
     ),
 ]
 

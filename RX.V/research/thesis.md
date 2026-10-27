@@ -25,4 +25,4 @@ Canadian specialty seller of licensed and acquired products. At CAD 16.61 the se
 
 ## [HUMAN REVIEW]
 
-See the deep dive. SEDAR issuer number, CUSIP, ISIN, and insider ownership are still open.
+See the deep dive. SEDAR issuer number, CUSIP, and ISIN are still open. The 6 April 2026 circular now supplies director ownership, the record-date share count, pay, and the issuer bid. Preferred shares outstanding are nil in the 30 June 2026 statements.

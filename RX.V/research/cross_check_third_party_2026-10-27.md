@@ -52,3 +52,9 @@ Marvin floor only; no third-party indexed as of 2026-10-27.
 - https://www.biosyent.com/wp-content/uploads/2026/04/2025-BioSyent-AR_web-FINAL.pdf
 - https://www.biosyent.com/wp-content/uploads/2026/08/2026-BioSyent-Q2-Financials-FINAL.pdf
 - https://www.biosyent.com/wp-content/uploads/2026/08/2026-BioSyent-Q2-MDA-FINAL.pdf
+- https://www.biosyent.com/wp-content/uploads/2026/03/BioSyent-Inc.-2025-Financial-Statements.pdf
+- https://www.biosyent.com/wp-content/uploads/2026/03/BioSyent-Inc.-2025-MDA.pdf
+- https://www.biosyent.com/wp-content/uploads/2026/04/BioSyent-Inc.-2026-Management-Information-Circular-and-Notice-of-Meeting-April-6-2026-FINAL.pdf
+- https://www.biosyent.com/wp-content/uploads/2026/02/SPA-Signing-PR-FINAL-CLEAN-Feb-9-2026.pdf
+- https://www.biosyent.com/wp-content/uploads/2026/02/SPA-Closing-PR-Mar-2-2026-FINAL.pdf
+- `RX.V/investor-documents/`
