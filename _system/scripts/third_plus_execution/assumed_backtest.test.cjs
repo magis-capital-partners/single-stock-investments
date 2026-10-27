@@ -44,6 +44,10 @@ test('an SSR transition after partial execution retains one filled position rath
  const date='2026-01-02',open=E.clock(date,9,30),s={open_ms:open,close_ms:open+23400000,opening_restricted:0,bars:Array.from({length:180},(_,i)=>[(open+i*1000)/1000,10,10,10,10,1000]),quotes:[],statuses:[{available_ms:open+90000,restricted:'Y'}]};
  const x=E.execute(s,date,10,10000,{minutes:1,policy:'E0'});assert.ok(x.filled_shares>0);assert.equal(x.status,'filled');
 });
+test('estimated external flow cannot trade through a captured halt',()=>{
+ const date='2026-01-02',open=E.clock(date,9,30),s={open_ms:open,close_ms:open+23400000,bars:[],statuses:[{available_ms:open,trading:'N'}]};
+ assert.equal(E.execute(s,date,10,234000,{minutes:1}).filled_shares,0);
+});
 test('split-adjusted liabilities and paid fractional overbuy reconcile',()=>{
  const {ctx,c}=fixture();ctx.factor=(t,a,b)=>b>c.day?3:1;ctx.prices.point=(t,d)=>({open:d===c.day?10:30,high:d===c.day?10:30,close:d===c.day?10:30});ctx.auction=(t,d)=>({close:d===c.day?10:30});
  const t=E.trade(ctx,new Map(),c,{horizon:2});assert.equal(t.open_liability,0);assert.ok(Number.isFinite(t.net_pnl));assert.ok(t.net_pnl<0);assert.ok(Math.abs(t.net_pnl)<t.entry.notional*.1);

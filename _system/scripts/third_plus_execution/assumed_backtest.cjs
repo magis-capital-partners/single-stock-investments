@@ -32,7 +32,10 @@ function eligible(bar,limit,sell){
 function execute(session,date,initial,adv,options={}){
  const o={...DEFAULTS,...SCENARIOS.base,...options},sell=o.side!=='buy',[start,end]=window(session,date,sell?'sell':'buy',o.minutes);
  const sourceBars=session?.bars||[],sourceGap=!sourceBars.length||session?.data_gaps?.length>0;
- const bars=sourceGap?proxyBars(start,end,initial,adv):sourceBars,quotes=sourceGap?[]:session?.quotes||[],states=sourceGap?[]:session?.statuses||[];
+ const bars=sourceGap?proxyBars(start,end,initial,adv):sourceBars,quotes=sourceGap?[]:session?.quotes||[];
+ // A missing tape does not erase an observed halt on this security. Status for
+ // an uncaptured successor or a departed venue does not describe its new market.
+ const states=session?.data_gaps?.some(g=>['symbol_capture_missing','venue_exit'].includes(g))?[]:session?.statuses||[];
  let mid=initial,qi=0,si=0,quote=null,restricted=session?.opening_restricted!==0,trading=true,filled=0,notional=0,fees=0,child=null,lastAction=-Infinity,children=0,volume=0,rollingVolume=0,rollingFills=0,fi=0,vi=0,carry=0,observedQuotes=0,estimatedQuotes=0;
  const fills=[],flow=[];let target=o.quantity??null,arrival=null;
  function market(t){
