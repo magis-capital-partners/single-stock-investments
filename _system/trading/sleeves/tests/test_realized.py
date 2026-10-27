@@ -88,6 +88,81 @@ def test_hifo_broker_matches_split_shared_security_between_owners(tmp_path):
     assert all(r["lot_matched"] for r in rows)
 
 
+def sibling_report(tmp_path, rows):
+    path = write_report(tmp_path)
+    root = ET.parse(path)
+    section = root.find(".//Trades")
+    for tag, row in rows:
+        ET.SubElement(section, tag, row)
+    root.write(path, encoding="utf-8")
+    return path
+
+
+def test_ibkr_sibling_lots_link_closes_without_reusing_opening_transaction_ids(tmp_path):
+    path = sibling_report(tmp_path, [
+        ("Trade", trade(transactionID="close-a", tradeID="a", symbol="3905.T", dateTime="20261023;100000", levelOfDetail="EXECUTION")),
+        ("Lot", trade(transactionID="opening-a", tradeID="", symbol="3905.T", dateTime="20261023;100000", openDateTime="20260914;100000", levelOfDetail="CLOSED_LOT", quantity="10")),
+        ("Trade", trade(transactionID="close-b", tradeID="b", symbol="3905.T", dateTime="20261023;100000", levelOfDetail="EXECUTION")),
+        ("Lot", trade(transactionID="opening-a", tradeID="", symbol="3905.T", dateTime="20261023;100000", openDateTime="20260914;100000", levelOfDetail="CLOSED_LOT", quantity="10")),
+    ])
+    report = read_report(path, account="TEST")
+    assert [r["closingTransactionID"] for r in report["lots"]] == ["close-a", "close-b"]
+    assert [r["openingTransactionID"] for r in report["lots"]] == ["opening-a", "opening-a"]
+    result = history(path)
+    assert len(result["records"]) == 2
+    assert all(r["owner"] == "drew" and r["lot_matched"] for r in result["records"])
+    assert sum(float(r["realized_usd"]) for r in result["records"]) == 38
+
+
+def test_sibling_lot_cannot_attach_to_a_different_contract_or_execution_time(tmp_path):
+    path = sibling_report(tmp_path, [
+        ("Trade", trade(symbol="3905.T", dateTime="20261023;100000", levelOfDetail="EXECUTION")),
+        ("Lot", trade(transactionID="opening", tradeID="", conid="999", dateTime="20261023;100000", openDateTime="20260914;100000", levelOfDetail="CLOSED_LOT")),
+        ("Lot", trade(transactionID="opening", tradeID="", dateTime="20261023;100001", openDateTime="20260914;100000", levelOfDetail="CLOSED_LOT")),
+    ])
+    report = read_report(path, account="TEST")
+    assert all(not lot["closingTransactionID"] for lot in report["lots"])
+    assert "closed_lot_without_closing_execution_link" in report["warnings"]
+    assert history(path)["records"][0]["owner"] == "unallocated"
+
+
+def test_sibling_opening_transaction_id_proves_owner_in_a_shared_contract(tmp_path):
+    path = sibling_report(tmp_path, [
+        ("Trade", trade(transactionID="opening-d", tradeID="d", openCloseIndicator="O", fifoPnlRealized="0", orderReference="DREW_SLEEVE", tradeDate="20261001", dateTime="20261001;100000")),
+        ("Trade", trade(transactionID="opening-m", tradeID="m", openCloseIndicator="O", fifoPnlRealized="0", orderReference="MICHAEL_SLEEVE", tradeDate="20261002", dateTime="20261002;100000")),
+        ("Trade", trade(dateTime="20261023;100000", levelOfDetail="EXECUTION")),
+        ("Lot", trade(transactionID="opening-d", tradeID="", dateTime="20261023;100000", openDateTime="20261001;100000", levelOfDetail="CLOSED_LOT", quantity="10")),
+    ])
+    row = history(path)["records"][0]
+    assert row["owner"] == "drew"
+    assert row["confidence"] == "opening_reference"
+    assert row["opening_transaction_id"] == "opening-d"
+
+
+def test_sibling_lots_still_require_quantity_and_profit_conservation(tmp_path):
+    path = sibling_report(tmp_path, [
+        ("Trade", trade(symbol="3905.T", dateTime="20261023;100000", levelOfDetail="EXECUTION")),
+        ("Lot", trade(transactionID="opening", tradeID="", symbol="3905.T", dateTime="20261023;100000", openDateTime="20260914;100000", levelOfDetail="CLOSED_LOT", quantity="1")),
+    ])
+    result = history(path)
+    assert result["records"][0]["owner"] == "unallocated"
+    assert not result["records"][0]["lot_matched"]
+    assert result["records"][0]["realized_usd"] == "19"
+
+
+def test_broker_tax_fragments_with_same_opening_id_are_preserved_after_conservation(tmp_path):
+    lot = trade(transactionID="opening", tradeID="", symbol="3905.T", dateTime="20261023;100000",
+                openDateTime="20260914;100000", levelOfDetail="CLOSED_LOT", quantity="5", fifoPnlRealized="9.5")
+    path = sibling_report(tmp_path, [
+        ("Trade", trade(symbol="3905.T", dateTime="20261023;100000", levelOfDetail="EXECUTION")),
+        ("Lot", lot), ("Lot", lot),
+    ])
+    rows = history(path)["records"]
+    assert len(rows) == len({r["record_id"] for r in rows}) == 2
+    assert all(r["owner"] == "drew" and r["lot_matched"] for r in rows)
+    assert sum(float(r["realized_usd"]) for r in rows) == 19
+
+
 def test_mismatching_lot_amounts_do_not_double_count_execution(tmp_path):
     result = history(write_report(tmp_path, [trade()], lots=[{"tradeID": "t1", "fifoPnlRealized": "999"}]))
     assert len(result["records"]) == 1

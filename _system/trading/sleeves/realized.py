@@ -9,7 +9,7 @@ import hashlib
 import json
 import re
 import xml.etree.ElementTree as ET
-from collections import defaultdict
+from collections import Counter, defaultdict
 from datetime import date
 from decimal import Decimal, InvalidOperation
 from pathlib import Path
@@ -78,12 +78,42 @@ def read_report(path: Path, *, account: str) -> dict:
     dates: list[str] = []
     selected_count = 0
     sections: set[str] = set()
+    preceding_execution: dict = {}
+
+    def closed_lot(attrs: dict, parent: dict) -> None:
+        # Activity XML emits <Trade EXECUTION/><Lot CLOSED_LOT/> siblings.
+        # A Lot's transactionID identifies its OPENING transaction; attaching
+        # it to a closing ID by that value would join unrelated executions.
+        # Preserve the broker's row grouping, then require P&L and quantity
+        # conservation in build_history before using any opening evidence.
+        closing = parent or preceding_execution
+        same_execution = bool(
+            identifier(attrs.get("conid")) and attrs.get("conid") == closing.get("conid")
+            and attrs.get("dateTime") and attrs.get("dateTime") == closing.get("dateTime")
+            and all(attrs.get(k, "") == closing.get(k, "") for k in ("model", "currency", "buySell"))
+        )
+        close_trade = pick(attrs, "closingTradeID", "closeTradeID")
+        close_tx = pick(attrs, "closingTransactionID")
+        if parent or same_execution:
+            close_trade = close_trade or pick(closing, "tradeID")
+            close_tx = close_tx or pick(closing, "transactionID")
+        attrs["closingTradeID"], attrs["closingTransactionID"] = close_trade, close_tx
+        opening_tx = identifier(attrs.get("transactionID"))
+        if opening_tx and opening_tx != close_tx:
+            attrs.setdefault("openingTransactionID", opening_tx)
+        if not close_trade and not close_tx and not attrs.get("tradeID"):
+            warning = "closed_lot_without_closing_execution_link"
+            if warning not in result["warnings"]:
+                result["warnings"].append(warning)
+        result["lots"].append(attrs)
+
     for event, elem in ET.iterparse(path, events=("start", "end")):
         tag = elem.tag.rsplit("}", 1)[-1]
         if event == "start":
             attrs = dict(elem.attrib)
             stack.append((tag, attrs))
             if tag == "FlexStatement":
+                preceding_execution = {}
                 selected = pick(attrs, "accountId", "accountID") == account
                 if selected:
                     selected_count += 1
@@ -103,13 +133,18 @@ def read_report(path: Path, *, account: str) -> dict:
             if tag == "Trade":
                 if level not in result["trade_levels"]:
                     result["trade_levels"].append(level)
-                if level in {"EXECUTION", "", "CLOSEDLOT"}:
-                    result["lots" if level == "CLOSEDLOT" else "events"].append(attrs)
+                if level == "CLOSEDLOT":
+                    closed_lot(attrs, {})
+                elif level in {"EXECUTION", ""}:
+                    result["events"].append(attrs)
+                    preceding_execution = attrs
+                else:
+                    preceding_execution = {}
             elif tag in {"Lot", "ClosedLot"}:
                 parent = next((a for t, a in reversed(stack[:-1]) if t == "Trade"), {})
-                attrs["closingTradeID"] = pick(attrs, "closingTradeID", "closeTradeID") or pick(parent, "tradeID")
-                attrs["closingTransactionID"] = pick(parent, "transactionID")
-                result["lots"].append(attrs)
+                if level and level not in result["trade_levels"]:
+                    result["trade_levels"].append(level)
+                closed_lot(attrs, parent)
             elif tag == "OpenPosition":
                 result["positions"].append(attrs)
             elif tag == "FIFOPerformanceSummaryUnderlying" and identifier(attrs.get("conid")):
@@ -119,6 +154,9 @@ def read_report(path: Path, *, account: str) -> dict:
                 result["actions"].append(attrs)
         if tag == "FlexStatement":
             selected = False
+            preceding_execution = {}
+        elif tag == "Trades":
+            preceding_execution = {}
         stack.pop()
         elem.clear()
     if not selected_count:
@@ -273,9 +311,19 @@ def build_history(events: list[dict], lots: list[dict], *, reports: list[dict], 
         # realization. Use detail only after it reconciles to the execution.
         amounts = [decimal(pick(lot, "fifoPnlRealized", "realizedPnl")) for lot in matched]
         def lot_identity(lot):
-            return identifier(pick(lot, "lotID", "openTradeID", "openingTradeID")) or digest({
-                k: lot.get(k) for k in ("openDateTime", "openDate", "costBasisPrice", "openPrice", "model")})[:24]
-        lot_ids = [lot_identity(lot) for lot in matched]
+            # Wash-sale and corporate-action fragments can share the opening
+            # transaction, timestamp and even every reported field. Retain
+            # their multiplicity when the ENTIRE closing group conserves both
+            # quantity and P&L; do not drop identical broker tax fragments.
+            return digest({"opening_id": pick(lot, "lotID", "openTradeID", "openingTradeID", "openingTransactionID"),
+                           **{k: lot.get(k) for k in ("openDateTime", "openDate", "holdingPeriodDateTime",
+                                                      "costBasisPrice", "openPrice", "model")}})[:24]
+        identities = [lot_identity(lot) for lot in matched]
+        multiplicities, occurrences = Counter(identities), Counter()
+        lot_ids = []
+        for identity in identities:
+            occurrences[identity] += 1
+            lot_ids.append(identity + (f":fragment:{occurrences[identity]}" if multiplicities[identity] > 1 else ""))
         quantities = [decimal(pick(lot, "quantity", "closedQuantity")) for lot in matched]
         fill_quantity = abs(decimal(event["quantity"]) or ZERO)
         quantity_ok = bool(quantities) and all(q is not None for q in quantities) and (
@@ -295,6 +343,7 @@ def build_history(events: list[dict], lots: list[dict], *, reports: list[dict], 
             opening = flex_date(pick(lot, "openDateTime", "openDate"), lot.get("_date_order")) if lot else event.get("opening_date")
             row["opening_date"] = opening
             row["opening_trade_id"] = pick(lot, "openTradeID", "openingTradeID") if lot else ""
+            row["opening_transaction_id"] = pick(lot, "openingTransactionID") if lot else ""
             row["lot_matched"] = bool(lot)
             if lot:
                 pnl = decimal(pick(lot, "fifoPnlRealized", "realizedPnl"))
@@ -309,7 +358,8 @@ def build_history(events: list[dict], lots: list[dict], *, reports: list[dict], 
             confidence = "legacy_inferred" if owner in {"drew", "michael"} else "unallocated"
             known = openings.get((event["conid"], event["model"]), set())
             explicit_owners = known - {"unknown"}
-            matched_owner = opening_owners_by_id.get(row["opening_trade_id"]) if lot else None
+            matched_owner = (opening_owners_by_id.get(row["opening_trade_id"])
+                             or opening_owners_by_id.get(row["opening_transaction_id"])) if lot else None
             potentially_shared = len(explicit_owners) > 1 or ("unknown" in known and any(o != owner for o in explicit_owners))
             if owner != "excluded" and matched_owner:
                 owner, reason, confidence = matched_owner, "broker_matched_opening_order_reference", "opening_reference"

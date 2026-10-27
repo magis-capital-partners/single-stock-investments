@@ -33,6 +33,14 @@ realized P&L, currency/FX and full security identity. Include Corporate Actions
 and Option Exercises/Assignments/Expirations when available. Inspect a small
 report to validate its actual linkage and detail levels before backfilling.
 
+The separate query `1687504` was validated against its 2026 YTD XML: Executions,
+Closed Lots, audit identifiers, opening timestamps, currency conversion rates,
+corporate actions, option events and the broker P&L summary are present. IBKR
+emits `<Lot>` siblings immediately after their closing `<Trade>`; a Lot's
+`transactionID` refers to the opening transaction. Keep both identities separate.
+Sibling association requires matching contract/time/currency/model/direction,
+and lot quantities and P&L must reconcile before they inform owner allocation.
+
 Store `SLEEVE_CLOSED_LOTS_QUERY_ID` in the existing portfolio publisher's private
 environment file. The daily wrapper retrieves a 35-day overlap only after the
 primary EOD service has finished, using its established Flex reporting token in
