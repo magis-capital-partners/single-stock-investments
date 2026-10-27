@@ -2,7 +2,7 @@ import assert from 'node:assert/strict';
 import { DatabaseSync } from 'node:sqlite';
 import { readFileSync } from 'node:fs';
 import test from 'node:test';
-import { humanRole, requireHumanViewer } from '../functions/_lib/auth.js';
+import { humanRole, requireHumanViewer, viewerFromAccessPayload } from '../functions/_lib/auth.js';
 import { accessDecision, onRequest } from '../functions/_middleware.js';
 import { readerIdea, readerLetter, sourceSections, validateDraft } from '../functions/_lib/fund-letters.js';
 import { onRequestGet, onRequestPost } from '../functions/api/fund-letters.js';
@@ -33,6 +33,9 @@ test('only the two verified identities become owners; service tokens and revoked
   assert.equal(humanRole({email:'DREW@magiscapitalpartners.com'}),'owner');
   assert.equal(humanRole({email:'mike@magiscapitalpartners.com'}),'owner');
   assert.equal(humanRole({email:'drew@example.com'}),'reader');
+  assert.equal(viewerFromAccessPayload({email:'drew@magiscapitalpartners.com',common_name:'Drew'}).service_token,null);
+  assert.equal(humanRole(viewerFromAccessPayload({email:'drew@magiscapitalpartners.com',common_name:'Drew'})),'owner');
+  assert.equal(humanRole(viewerFromAccessPayload({common_name:'ingest-token'})),null);
   assert.equal(humanRole({email:'reader@example.com',service_token:'machine'}),null);
   assert.equal(humanRole(reader,{CF_ACCESS_REVOKED_EMAILS:'reader@example.com'}),null);
 });
@@ -49,7 +52,10 @@ test('signed owners and readers, revocation, forged/expired tokens and cookie au
       const signed=await token(email);
       const ctx={request:new Request('https://preview.pages.dev/fund-letters/',{headers:{'cf-access-jwt-assertion':signed}}),env,data:{},next:async()=>new Response('allowed')};
       assert.equal((await requireHumanViewer(ctx)).role,role);
-      assert.equal((await onRequest(ctx)).status,200);
+      ctx.data={};
+      const response=await onRequest(ctx);
+      if(role==='owner'){assert.equal(response.status,302);assert.equal(response.headers.get('location'),'/');}
+      else assert.equal(response.status,200);
       ctx.request=new Request('https://preview.pages.dev/data/core.json',{headers:{'cf-access-jwt-assertion':signed}});ctx.data={};
       assert.equal((await onRequest(ctx)).status,role==='owner'?200:403);
     }

@@ -12,10 +12,12 @@ export const READER_PATHS = new Set([
   "/fund-letters", "/fund-letters/", "/fund-letters/index.html",
   "/fund-letters/reader.js", "/fund-letters/reader.css", "/api/fund-letters",
 ]);
+const OWNER_READER_ENTRY = new Set(["/fund-letters", "/fund-letters/", "/fund-letters/index.html"]);
 
 export function accessDecision(path, method, viewer) {
   if (method === "POST" && MACHINE_ROUTES.has(path)) return "machine";
   if (!viewer) return "unauthenticated";
+  if (viewer.role === "owner" && OWNER_READER_ENTRY.has(path)) return "owner-home";
   if (viewer.role === "owner" || READER_PATHS.has(path)) return "allow";
   return path === "/" || path === "/index.html" ? "reader-home" : "forbidden";
 }
@@ -30,6 +32,7 @@ export async function onRequest(context) {
   if (decision === "unauthenticated") return privateJson({ error: "Sign in through Cloudflare Access." }, 401);
   if (decision === "forbidden") return privateJson({ error: "Owner access required." }, 403);
   if (decision === "reader-home") return new Response(null, { status: 302, headers: { location: "/fund-letters/", "cache-control": "no-store, private" } });
+  if (decision === "owner-home") return new Response(null, { status: 302, headers: { location: "/", "cache-control": "no-store, private" } });
   if (viewer) context.data.humanViewer = viewer;
   const upstream = await context.next();
   const response = new Response(upstream.body, upstream);

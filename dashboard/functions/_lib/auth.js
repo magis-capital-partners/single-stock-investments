@@ -83,10 +83,21 @@ export async function verifyAccessJwt(token, env, fetchImpl = fetch) {
     new TextEncoder().encode(`${parts[0]}.${parts[1]}`),
   );
   if (!valid) throw new Error("Invalid Access token signature");
+  return viewerFromAccessPayload(payload);
+}
+
+export function viewerFromAccessPayload(payload) {
+  const email = String(payload?.email || "").trim().toLowerCase() || null;
+  const commonName = String(payload?.common_name || "").trim();
+  // Human Access tokens include the person's name next to their email.
+  // A service token has a name and no human email, or an explicit service-token id.
+  const serviceToken = payload?.service_token_id || payload?.service_token_status
+    ? (commonName || "service-token")
+    : (!email && commonName ? commonName : null);
   return {
-    email: String(payload.email || "").toLowerCase() || null,
-    subject: String(payload.sub || "") || null,
-    service_token: String(payload.common_name || "") || null,
+    email,
+    subject: String(payload?.sub || "") || null,
+    service_token: serviceToken,
     claims: payload,
   };
 }
