@@ -6,7 +6,20 @@
   'use strict';
 
   function decisionOf(t) {
-    return t.valuation_decision || {};
+    const d = t.valuation_decision || {};
+    if (d.calculation_status && d.research_return_available === true) {
+      const expiry = Date.parse(d.market_sync?.valid_until || '');
+      if (d.market_sync?.status !== 'verified' || !Number.isFinite(expiry) || Date.now() >= expiry) {
+        const empty = {low:null,base:null,high:null};
+        return {...d,calculation_status:'sync_gap',research_return_available:false,
+          value_per_share:empty,present_value_today_per_share:empty,margin_of_safety_pct:empty,
+          upside_to_value_pct:empty,upside_downside_pct:empty,forward_return_at_price_pct:empty,
+          annualized_return_at_price_pct:empty,forward_return_status:'withheld',
+          calculation_reason:Number.isFinite(expiry)?'completed_session_quote_missing':'market_sync_expiry_unverified',
+          market_sync:{...d.market_sync,status:'updating'}};
+      }
+    }
+    return d;
   }
 
   function statusMeta(status) {
@@ -67,6 +80,7 @@
 
   function renderValueRangeCell(t, fmtNum, units) {
     const d = decisionOf(t);
+    if (d.calculation_status && d.research_return_available !== true) return '<span class="mono" style="color:var(--text-muted)">Model updating</span>';
     const r = d.value_per_share || t.component_valuation?.total_equity_value_per_share;
     if (!r || r.low == null || r.base == null || r.high == null) {
       return '<span class="mono" style="color:var(--text-muted)">incomplete</span>';
@@ -77,6 +91,7 @@
 
   function renderPriceToBaseCell(t, fmtPct) {
     const d = decisionOf(t);
+    if (d.calculation_status && d.research_return_available !== true) return '<span class="mono" style="color:var(--text-muted)">—</span>';
     const pct = d.margin_of_safety_pct?.base;
     if (pct == null) {
       return '<span class="mono" style="color:var(--text-muted)">—</span>';
@@ -115,6 +130,19 @@
       limited_liability_equity_waterfall_missing:'Debt and equity recoveries need a settlement model.',
       unique_shareholder_irr_unavailable:'Cash flows do not give a unique annual return.',
       fresh_sourced_quote_missing:'A recent sourced quote is unavailable.',
+      corporate_action_history_unverified:'Split history is being refreshed.',
+      corporate_action_history_invalid:'The corporate-action source needs reconciliation.',
+      source_share_basis_unverified:'The source share basis needs verification.',
+      pre_listing_share_basis_unverified:'Pre-listing shares need reconciliation with the listed security.',
+      share_basis_date_outside_verified_history:'Split history does not yet cover every model input.',
+      completed_session_quote_missing:'The latest completed market close is being refreshed.',
+      market_sync_expiry_unverified:'Price freshness is being verified.',
+      listing_calendar_or_completed_close_unverified:'The listing calendar or completed close needs verification.',
+      financial_inputs_expired_or_undated:'The financial inputs need a dated source update.',
+      model_assumptions_expired:'The model assumptions need a source-backed refresh.',
+      new_financial_report_after_model:'A newer financial report needs to be incorporated into the model.',
+      newer_balance_sheet_inputs_available:'Newer reported balance-sheet inputs need to be incorporated.',
+      ordinary_and_listing_share_actions_unreconciled:'The ordinary-share and depositary-share adjustments need reconciliation.',
       quote_issuer_mismatch:'The price source identifies a different company.',
       dated_reporting_to_listing_fx_missing:'A recent currency conversion is unavailable.',
       forecast_date_missing_or_future:'The forecast date needs correction.',
@@ -137,6 +165,13 @@
     }
     return {pct:null, label:'Forward return', source:'missing',
       sub:forecastGapLabel(d.calculation_reason) || d.forward_return_reason || 'Dated shareholder forecast unavailable'};
+  }
+
+  function renderMarketSyncCell(t, escapeHtml) {
+    const d = decisionOf(t), dates = d.dates || {};
+    const good = d.research_return_available === true && d.market_sync?.status === 'verified';
+    const title = `Completed close ${dates.price_as_of || 'unavailable'}; financial inputs ${dates.financial_period || 'undated'}; model assumptions ${dates.model_as_of || 'undated'}. ${good ? 'Listing, currency and share basis verified.' : forecastGapLabel(d.calculation_reason)}`;
+    return `<span class="badge ${good ? 'badge-ok' : 'badge-warn'}" title="${escapeHtml(title)}">${good ? 'Synced' : 'Model updating'}</span><div class="irr-sub">Close ${escapeHtml(dates.price_as_of || 'missing')}</div><div class="irr-sub">Model ${escapeHtml(dates.model_as_of || 'undated')}</div>`;
   }
 
   function primaryPowerZone(t, personaMeta) {
@@ -770,6 +805,7 @@
     tierMeta,
     displayReturn,
     forecastGapLabel,
+    renderMarketSyncCell,
     primaryPowerZone,
     renderPowerZoneCell,
     renderValuationStatusCell,

@@ -13,9 +13,13 @@ from datetime import datetime, timezone
 from functools import lru_cache
 from pathlib import Path
 
-from atomic_io import write_json_if_changed, semantic_json_sha256
-from build_dashboard_shards import shard_filename, slim_valuation_decision
-from valuation_forecast import VERSION, attach_forecast, build_forecast, _npv, _irr
+from atomic_io import semantic_json_sha256, write_json_if_changed
+from build_dashboard_shards import (
+    shard_filename,
+    slim_ticker_row,
+    slim_valuation_decision,
+)
+from valuation_forecast import VERSION, _irr, _npv, attach_forecast, build_forecast
 
 ROOT = Path(__file__).resolve().parents[2]
 STATE = Path('_system/data/shared_valuation_forecasts.json')
@@ -24,7 +28,10 @@ FUNDAMENTALS = Path('_system/reference/market-data/valuation_fundamentals')
 
 
 def read(path):
-    return json.loads(path.read_text(encoding='utf-8')) if path.is_file() else {}
+    value = json.loads(path.read_text(encoding='utf-8')) if path.is_file() else {}
+    if isinstance(value, dict) and value.get('private_snapshot') is True:
+        raise ValueError('Private input placeholder; restore authorized private inputs before refreshing: '+str(path))
+    return value
 
 
 @lru_cache(maxsize=2)
@@ -43,32 +50,52 @@ def _registry(path, mtime):
     return read(Path(path)).get('holdings') or {}
 
 
-def calculate(ticker, root, as_of):
+def calculate(ticker, root, as_of, evaluated_at=None):
     valuation = read(root/ticker/'research/valuation.json')
     valuation.setdefault('ticker', ticker)
     cached = read(root/QUOTES/(ticker+'.json'))
     automatic = read(root/'_system/reference/market-data/compounders'/(ticker+'.json'))
     quote = cached.get('quote') or automatic.get('quote')
+    market = copy.deepcopy(cached.get('corporate_actions') or {})
     if cached.get('identity', {}).get('status') == 'mismatch' and quote:
         quote = {**quote, 'value': None, 'identity_status': 'mismatch', 'identity': cached['identity']}
     generated = False
     legacy = False
-    facts = {}
+    facts = read(root/FUNDAMENTALS/(ticker+'.json')) or automatic
+    if facts.get('latest_report'):
+        market['latest_report'] = facts['latest_report']
     if not (valuation.get('component_valuation_results') or {}).get('additive_components'):
-        from legacy_forecast_model import build as legacy_model
         from automatic_forecast_model import build
+        from legacy_forecast_model import build as legacy_model
         facts = read(root/FUNDAMENTALS/(ticker+'.json')) or automatic
         share_basis = read(root/'_system/reference/valuation_listing_ratios.json').get('listings', {}).get(ticker)
+        if share_basis:
+            market['listing_ratio'] = share_basis
+        from valuation_share_basis import (
+            BasisGap,
+            history_start,
+            normalize_fundamentals,
+            validate_market,
+        )
+        try:
+            validate_market(market, quote or {}, history_start(valuation, facts))
+            facts, adjustments = normalize_fundamentals(facts, market, quote)
+            market['fundamental_adjustments'] = adjustments
+        except BasisGap as exc:
+            market['normalization_error'] = str(exc)
         candidate = legacy_model(valuation, currency=(quote or {}).get('currency'))
         if candidate:
             valuation, legacy = candidate, True
         candidate = None if legacy else build(ticker, facts, universe(root).get(ticker) or {}, as_of, share_basis=share_basis)
         if candidate:
             valuation, generated = candidate, True
-    forecast = build_forecast(valuation, quote=quote, fx=cached.get('fx') or facts.get('fx') or automatic.get('fx'), as_of=as_of)
+    forecast = build_forecast(valuation, quote=quote, fx=cached.get('fx') or facts.get('fx') or automatic.get('fx'), as_of=as_of, market=market, evaluated_at=evaluated_at)
+    if market.get('fundamental_adjustments') and forecast.get('market_sync'):
+        forecast['market_sync']['fundamental_adjustments'] = market['fundamental_adjustments']
     if not (valuation.get('component_valuation_results') or {}).get('additive_components'):
         from automatic_forecast_model import missing_inputs
-        forecast['gaps'] = [{'code': code} for code in missing_inputs(ticker, facts, universe(root).get(ticker) or {}, as_of)]
+        forecast['gaps'].extend({'code': code} for code in missing_inputs(ticker, facts, universe(root).get(ticker) or {}, as_of)
+                                if code not in {g['code'] for g in forecast['gaps']})
         forecast['collector_errors'] = facts.get('errors') or []
         forecast['next_action'] = 'automatic_source_refresh'
     if cached.get('identity', {}).get('status') == 'mismatch':
@@ -131,13 +158,24 @@ def refresh_quote(ticker, row, root, as_of):
     path = root/QUOTES/(ticker+'.json')
     old = read(path)
     try:
-        current = quote(symbol, as_of)
+        from autonomous_compounders import get_json
+        from valuation_market_sync import collect_market
+        from valuation_share_basis import history_start
+        valuation = read(root/ticker/'research/valuation.json')
+        facts = read(root/FUNDAMENTALS/(ticker+'.json'))
+        current, actions = collect_market(symbol, as_of, min('2000-01-01', history_start(valuation, facts)), get_json)
+        old['corporate_actions'] = actions
         prior_identity = old.get('identity') or {}
         old.update({'quote': current, 'error': None})
         registry_path = root/'_system/portfolio/registry.json'
         registry = _registry(str(registry_path), registry_path.stat().st_mtime_ns) if registry_path.is_file() else {}
         aliases = read(root/'_system/reference/valuation_identity_aliases.json').get('tickers') or {}
         old['identity'] = quote_identity(ticker, row, current, registry, aliases)
+        if actions['events'] and facts.get('facts') and old['identity']['status'] != 'mismatch':
+            from valuation_share_evidence import collect_share_evidence
+            old['corporate_actions']['share_evidence'] = collect_share_evidence(
+                ticker, facts, actions, registry.get(ticker) or {}, prior=old.get('share_evidence'))
+            old['share_evidence'] = old['corporate_actions']['share_evidence']
         if prior_identity.get('status') == 'mismatch' and old['identity']['status'] == 'symbol_only':
             old['identity'] = prior_identity
         valuation = read(root/ticker/'research/valuation.json')
@@ -151,48 +189,68 @@ def refresh_quote(ticker, row, root, as_of):
         if source_currency and source_currency != current['currency']:
             fx = quote(source_currency+current['currency']+'=X', as_of)
             old['fx'] = {**fx, 'from_currency': source_currency, 'to_currency': current['currency']}
-    except Exception as exc:  # A failed issuer must not abort the universe.
+    except Exception as exc:  # noqa: BLE001 -- Isolate source failures; mark the old snapshot unusable.
         old['error'] = f'{type(exc).__name__}: {exc}'
+        old['corporate_actions'] = {**(old.get('corporate_actions') or {}), 'status': 'unverified', 'error': old['error']}
     write_json_if_changed(path, old, volatile_keys={'retrieved_at'})
     return ticker
 
 
 def refresh_missing_model_inputs(ticker, row, root, as_of, registry):
     """Collect financials for missing models; never overwrite an issuer's PV."""
-    valuation = read(root/ticker/'research/valuation.json')
-    if (valuation.get('component_valuation_results') or {}).get('additive_components'):
-        return
     from autonomous_compounders import collect
     path = root/FUNDAMENTALS/(ticker+'.json')
     prior = read(path)
-    # Annual observations refresh weekly; a price move does not reset a forecast.
-    if prior.get('facts') and not prior.get('errors') and prior.get('last_collected') and 0 <= (datetime.fromisoformat(as_of)-datetime.fromisoformat(prior['last_collected'])).days < 7:
-        return
+    # Recheck on every scheduled run: a report can arrive after the morning
+    # collection on the very same date. Observation dates and the economic
+    # anchor below remain independent of this collection attempt.
     data = collect(ticker, registry.get(ticker) or {}, as_of, root, inputs_dir=FUNDAMENTALS)
     financial_hash = semantic_json_sha256(data.get('facts') or [], volatile_keys={'retrieved_at'})
-    anchor = prior.get('model_anchor') if financial_hash == prior.get('financial_hash') else as_of
+    # Compare economics in one verified share epoch, not source retrieval/file
+    # dates. A pure split or a restatement of the same observations does not
+    # move the cash-flow forecast's original economic date.
+    cached = read(root/QUOTES/(ticker+'.json'))
+    unchanged = financial_signature(prior, cached) == financial_signature(data, cached)
+    anchor = prior.get('model_anchor') if unchanged else as_of
     saved = {'facts': data.get('facts') or [], 'quote': data.get('quote'), 'model_anchor': anchor or as_of,
+             'latest_report': data.get('latest_report') or prior.get('latest_report'),
              'financial_hash': financial_hash, 'last_collected': as_of, 'fx': data.get('fx'), 'errors': data.get('errors') or []}
     write_json_if_changed(path, saved, volatile_keys={'retrieved_at'})
 
 
-def publish(root, companies, as_of):
+def financial_signature(data, cached):
+    from valuation_share_basis import BasisGap, normalize_fundamentals
+    try:
+        normalized, _ = normalize_fundamentals(data, cached['corporate_actions'], cached['quote'])
+        from autonomous_compounders import economics
+        return semantic_json_sha256([{k: float(row[k]) if k in ('owner_cash', 'shares') else row[k] for k in ('period', 'currency', 'owner_cash', 'shares')}
+                                    for row in economics(normalized)[-5:]])
+    except (BasisGap, KeyError, TypeError):
+        return semantic_json_sha256(sorted([(p.get('field'), p.get('period'), p.get('currency') or '', p.get('value'))
+                                            for p in data.get('facts') or []]))
+
+
+def publish(root, companies, as_of, evaluated_at=None):
     core_path = root/'dashboard/data/core.json'
     core = read(core_path)
     rows = {r['ticker']: r for r in core.get('tickers') or []}
+    if not rows or not companies:
+        raise ValueError('Coverage universe is empty or a private placeholder; restore authorized private inputs before refreshing')
     if set(rows) != set(companies):
         raise ValueError('Forecast report must account for the entire coverage universe')
     counts = dict(Counter(f['status'] for f in companies.values()))
     gaps = Counter(g['code'].split(':')[0] for f in companies.values() for g in f.get('gaps') or [])
     summary = {'companies': len(companies), 'available': counts.get('available', 0), 'statuses': counts,
                'gap_counts': dict(gaps), 'requires_human_review': False,
+               'verified_share_basis': sum(bool((f.get('market_sync') or {}).get('basis_id')) for f in companies.values()),
+               'split_adjusted_companies': sum(any(p.get('factor', 1) != 1 for p in
+                   (f.get('market_sync') or {}).get('adjustments', [])+(f.get('market_sync') or {}).get('fundamental_adjustments', [])) for f in companies.values()),
                'available_by_model_basis': dict(Counter(f.get('model_basis') for f in companies.values() if f['status'] == 'available'))}
     # Full dated schedules live once, in the detail shards. The all-universe
     # audit remains compact enough to commit and inspect.
-    audit = {t: {**{k: f.get(k) for k in ('status', 'forecast_hash', 'calculation_id', 'source_model_hash', 'model_basis', 'gaps',
-                                        'model_present_value_per_share', 'present_value_today_per_share', 'forward_irr_pct')},
+    audit = {t: {**audit_snapshot(f),
                  'forecast_ref': 'dashboard/data/tickers/'+shard_filename(t)} for t, f in companies.items()}
-    report = {'schema_version': '1.0', 'method_version': VERSION, 'as_of': as_of, 'summary': summary,
+    report = {'schema_version': '1.0', 'method_version': VERSION, 'as_of': as_of, 'evaluated_at': evaluated_at, 'summary': summary,
               'companies': audit}
     write_json_if_changed(root/STATE, report, indent=None)
     for ticker, forecast in companies.items():
@@ -201,6 +259,8 @@ def publish(root, companies, as_of):
         row['valuation_decision'] = slim_valuation_decision(row['valuation_decision'])
         path = root/'dashboard/data/tickers'/shard_filename(ticker)
         detail = read(path) or copy.deepcopy(row)
+        for key, value in row.items():
+            detail.setdefault(key, value)
         attach_forecast(detail, forecast)
         # Legacy mechanical scenarios remain in the historical report, not in
         # the active workspace. They must never supersede issuer economics.
@@ -208,6 +268,7 @@ def publish(root, companies, as_of):
         row.pop('autonomous_irr', None)
         write_json_if_changed(path, detail, indent=None)
     core.setdefault('summary', {})['shared_valuation_forecasts'] = summary
+    core['tickers'] = [slim_ticker_row(row) for row in core['tickers']]
     write_json_if_changed(core_path, core, indent=None)
     _universe.cache_clear()
     # Some build lanes still consume the monolithic bundle before sharding.
@@ -223,16 +284,28 @@ def publish(root, companies, as_of):
     return report
 
 
+def audit_snapshot(forecast):
+    fields = ('status', 'forecast_hash', 'calculation_id', 'source_model_hash', 'model_basis', 'gaps',
+              'model_present_value_per_share', 'present_value_today_per_share', 'forward_irr_pct',
+              'financial_period', 'assumptions_as_of')
+    return {**{k: forecast.get(k) for k in fields}, 'market_sync': {
+        k: (forecast.get('market_sync') or {}).get(k) for k in
+        ('status', 'basis_id', 'price_as_of', 'financial_period', 'model_as_of', 'latest_report', 'valid_until')}}
+
+
 def run(root=ROOT, as_of=None, collect=False, workers=6):
     as_of = as_of or datetime.now(timezone.utc).date().isoformat()
     rows = universe(root)
+    if not rows:
+        raise ValueError('Coverage universe is empty or a private placeholder; restore authorized private inputs before refreshing')
     if collect:
         registry = read(root/'_system/portfolio/registry.json').get('holdings') or {}
         with ThreadPoolExecutor(max_workers=workers) as pool:
-            list(pool.map(lambda t: refresh_quote(t, rows[t], root, as_of), sorted(rows)))
             list(pool.map(lambda t: refresh_missing_model_inputs(t, rows[t], root, as_of, registry), sorted(rows)))
-    companies = {t: calculate(t, root, as_of) for t in sorted(rows)}
-    return publish(root, companies, as_of)
+            list(pool.map(lambda t: refresh_quote(t, rows[t], root, as_of), sorted(rows)))
+    evaluated_at = datetime.now(timezone.utc).isoformat()
+    companies = {t: calculate(t, root, as_of, evaluated_at=evaluated_at) for t in sorted(rows)}
+    return publish(root, companies, as_of, evaluated_at=evaluated_at)
 
 
 def check(root=ROOT):
@@ -241,16 +314,17 @@ def check(root=ROOT):
     _universe.cache_clear()
     report = read(root/STATE)
     rows = universe(root)
+    if not rows:
+        raise ValueError('Coverage universe is empty or a private placeholder; restore authorized private inputs before checking')
     companies = report.get('companies') or {}
     if set(rows) != set(companies):
         raise ValueError('Full-universe forecast coverage is incomplete')
     for ticker, audit in companies.items():
-        replayed = calculate(ticker, root, report['as_of'])
+        replayed = calculate(ticker, root, report['as_of'], evaluated_at=report.get('evaluated_at'))
         path = root/'dashboard/data/tickers'/shard_filename(ticker)
         detail = read(path)
         forecast = detail.get('shared_forecast')
-        if replayed != forecast or any(audit.get(k) != replayed.get(k) for k in ('status', 'calculation_id', 'forecast_hash', 'source_model_hash', 'model_basis', 'gaps',
-                                                                           'model_present_value_per_share', 'present_value_today_per_share', 'forward_irr_pct')):
+        if replayed != forecast or {k: v for k, v in audit.items() if k != 'forecast_ref'} != audit_snapshot(replayed):
             raise ValueError(ticker+': forecast does not replay from the current issuer model and quote')
         if forecast['status'] == 'available':
             for case, schedule in forecast['forward_cashflow_schedule'].items():
@@ -266,13 +340,19 @@ def check(root=ROOT):
                             raise ValueError(ticker+': '+case+' entry price does not reproduce its hurdle IRR')
         expected = attach_forecast({'valuation_decision': {}}, forecast, detailed=False)['valuation_decision']
         for served in [rows[ticker].get('valuation_decision') or {}, detail.get('valuation_decision') or {}]:
-            for field in ['forecast_id', 'calculation_status', 'research_return_available', 'forward_return_at_price_pct']:
+            for field in ['forecast_id', 'calculation_status', 'research_return_available', 'forward_return_at_price_pct',
+                          'value_per_share', 'margin_of_safety_pct', 'upside_to_value_pct', 'market_sync']:
                 if served.get(field) != expected.get(field):
                     raise ValueError(ticker+': served '+field+' does not match its forecast')
             if forecast['reconciliation'].get('passed') and served.get('value_per_share') != expected.get('value_per_share'):
                 raise ValueError(ticker+': served PV differs from its IRR forecast')
             if expected.get('price_per_share') is not None and served.get('price_per_share') != expected['price_per_share']:
                 raise ValueError(ticker+': served price differs from its IRR forecast')
+        for served in (rows[ticker], detail):
+            cv = served.get('component_valuation')
+            if isinstance(cv, dict) and (cv.get('total_equity_value_per_share') != expected.get('value_per_share')
+                                         or cv.get('upside_downside_pct') != expected.get('upside_to_value_pct')):
+                raise ValueError(ticker+': legacy comparison bypasses the shared publication gate')
     return report['summary']
 
 

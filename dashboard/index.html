@@ -1987,7 +1987,7 @@
 <script src="insights-viz.js?v=20261020-relevance"></script>
 <link rel="stylesheet" href="fund-letters/reader.css?v=1">
 <script src="fund-letters/reader.js?v=1"></script>
-<script src="valuation-viz.js?v=20261027-shared-forecast"></script>
+<script src="valuation-viz.js?v=20261027-market-sync"></script>
 <script src="market-sessions.js?v=20261023"></script>
 <script src="market-risk-data.js?v=20261023"></script>
 <script src="criticality-viz.js?v=20261022-session-comparison"></script>
@@ -2024,7 +2024,7 @@
 <script src="ui-format.js?v=20260819-currency"></script>
 <script src="portfolio-viz.js?v=20261008-michael-tail"></script>
 <script src="oauth.js"></script>
-<script src="research-workspace.js?v=20261027-shared-forecast"></script>
+<script src="research-workspace.js?v=20261027-market-sync"></script>
 <script>
 const GH_REPO = 'magis-capital-partners/single-stock-investments';
 const GITHUB_REPO = GH_REPO;
@@ -2116,7 +2116,7 @@ const HOLDINGS_COLUMNS = [
   { id: 'special_situation', label: 'CVR / NAV', sort: 'special_situation', group: 'details' },
   { id: 'buyback', label: 'Buyback', sort: 'buyback.net_reduction_1y', group: 'details' },
   { id: 'kpi_pulse', label: 'KPI trend', sort: 'kpi_trends.business_momentum.score', group: 'core' },
-  { id: 'research_freshness', label: 'Freshness', sort: 'last_research', group: 'core' },
+  { id: 'research_freshness', label: 'Price / model', sort: 'valuation_decision.dates.price_as_of', group: 'core' },
   { id: 'context', label: 'Context', sort: 'classification.investment_sleeve_label', group: 'details' },
   { id: 'cvr_stage', label: 'CVR detail', sort: 'cvr.stage', group: 'special' },
   { id: 'nav_disc', label: 'NAV detail', sort: 'fund_nav.display_discount_pct', group: 'special' },
@@ -2922,7 +2922,8 @@ function renderPriceValueCell(t) {
   const values = d.value_per_share || t.component_valuation?.total_equity_value_per_share || {};
   const price = d.calculation_status === 'identity_gap' ? null : d.price_per_share ?? t.component_valuation?.market_price_per_share;
   const priceText = price == null ? '—' : fmtQuote(price, u, 0);
-  const baseText = values.base == null ? '—' : fmtQuote(values.base, u, 0);
+  const updating = d.calculation_status && d.research_return_available !== true;
+  const baseText = updating ? 'Model updating' : values.base == null ? '—' : fmtQuote(values.base, u, 0);
   const range = values.low == null || values.high == null
     ? 'range incomplete'
     : `L ${fmtQuote(values.low, u, 0)} · H ${fmtQuote(values.high, u, 0)}`;
@@ -2931,7 +2932,8 @@ function renderPriceValueCell(t) {
 }
 
 function renderNextActionCell(t) {
-  if (t.valuation_decision?.calculation_status) return `<div class="decision-action">${t.valuation_decision.research_return_available ? 'Automatic model refresh scheduled' : 'Automatic forecast repair scheduled'}</div><div class="tier-sub">${escapeHtml(window.ValuationViz?.forecastGapLabel(t.valuation_decision.calculation_reason) || 'PV and IRR reconciled')}</div>`;
+  const currentDecision = decisionForRow(t);
+  if (currentDecision.calculation_status) return `<div class="decision-action">${currentDecision.research_return_available ? 'Automatic source refresh scheduled' : 'Model updating'}</div><div class="tier-sub">${escapeHtml(window.ValuationViz?.forecastGapLabel(currentDecision.calculation_reason) || 'PV and IRR reconciled')}</div>`;
   if (t.autonomous_irr) return `<div class="decision-action">${t.autonomous_irr.status === 'available' ? 'Automatic refresh scheduled' : 'Automatic source retry scheduled'}</div><div class="tier-sub">Research estimate · no approval queue</div>`;
   const d = decisionForRow(t);
   const critical = Number(d.critical_gap_count || 0);
@@ -2981,6 +2983,7 @@ function renderSpecialSituationCell(t) {
 }
 
 function renderResearchFreshnessCell(t) {
+  if (t.valuation_decision?.calculation_status && window.ValuationViz?.renderMarketSyncCell) return ValuationViz.renderMarketSyncCell(t, escapeHtml);
   const asOf = t.last_research || t.classification?.analysis_as_of;
   if (!asOf) return '<span class="mono" style="color:var(--text-muted)">—</span>';
   const timestamp = Date.parse(asOf);
@@ -5613,8 +5616,8 @@ function filtered() {
     let av = a[sortKey], bv = b[sortKey];
     if (sortKey.includes('.')) {
       const parts = sortKey.split('.');
-      av = parts.reduce((o, k) => (o == null ? o : o[k]), a);
-      bv = parts.reduce((o, k) => (o == null ? o : o[k]), b);
+      av = parts.reduce((o, k) => (o == null ? o : o[k]), parts[0]==='valuation_decision'?{valuation_decision:decisionForRow(a)}:a);
+      bv = parts.reduce((o, k) => (o == null ? o : o[k]), parts[0]==='valuation_decision'?{valuation_decision:decisionForRow(b)}:b);
     }
     if (sortKey === 'fund_nav.display_discount_pct' || sortKey === 'fund_nav.discount_to_reported_nav_pct') {
       av = fundNavDisplayDiscount(a);
@@ -5998,6 +6001,19 @@ function renderTable() {
 function getEquityModelBundle(ticker) {
   return (data.equity_models && data.equity_models.tickers && data.equity_models.tickers[ticker]) || null;
 }
+
+// Repaint only when a published quote expires. No new request, clock-based
+// extension, or stale fallback can keep a return in the rankings overnight.
+let expiredForecastSignature = '';
+function refreshForecastExpiry() {
+  if (document.hidden || !data?.tickers || !window.ValuationViz) return;
+  const signature = data.tickers.filter(t=>t.valuation_decision?.research_return_available && !ValuationViz.decisionOf(t).research_return_available).map(t=>t.ticker).join('|');
+  if (signature === expiredForecastSignature) return;
+  expiredForecastSignature = signature;
+  if (activeView === 'holdings') { if (selected) selectTicker(selected); else renderTable(); }
+}
+window.setInterval(refreshForecastExpiry, 60000);
+document.addEventListener('visibilitychange', refreshForecastExpiry);
 
 function wireDetailEvents(ticker) {
   const detail = document.getElementById('detail');
