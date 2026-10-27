@@ -259,3 +259,20 @@ def test_execution_query_is_not_mistaken_for_supplemental_closed_lots(tmp_path):
     with pytest.raises(ValueError, match="executions only"):
         store.ingest(write_report(tmp_path, [trade()]), account="TEST", role="closed_lots")
     store.close()
+
+
+def test_one_tagged_opening_does_not_claim_untagged_opening_lots(tmp_path):
+    rows = [trade(transactionID="open1", tradeID="o1", openCloseIndicator="O", fifoPnlRealized="0", orderReference="DREW_SLEEVE"),
+            trade(transactionID="open2", tradeID="o2", openCloseIndicator="O", fifoPnlRealized="0"), trade()]
+    result = history(write_report(tmp_path, rows))
+    assert result["records"][0]["owner"] == "unallocated"
+
+
+def test_broker_closed_lot_links_to_its_opening_owner_not_the_closing_trader(tmp_path):
+    rows = [trade(transactionID="open1", tradeID="o1", openCloseIndicator="O", fifoPnlRealized="0", orderReference="DREW_SLEEVE"),
+            trade(transactionID="open2", tradeID="o2", openCloseIndicator="O", fifoPnlRealized="0", orderReference="MICHAEL_SLEEVE"),
+            trade(orderReference="MICHAEL_SLEEVE")]
+    lots = [{"tradeID": "t1", "openTradeID": "o1", "openDateTime": "20260914;100000", "quantity": "-10", "fifoPnlRealized": "19"}]
+    result = history(write_report(tmp_path, rows, lots=lots))
+    assert result["records"][0]["owner"] == "drew"
+    assert result["records"][0]["allocation_reason"] == "broker_matched_opening_order_reference"

@@ -249,13 +249,17 @@ def build_history(events: list[dict], lots: list[dict], *, reports: list[dict], 
         if key:
             lot_map[key].append(lot)
     openings: dict[tuple, set[str]] = defaultdict(set)
+    opening_owners_by_id = {}
     for event in effective:
         if event["is_open"]:
             ref = event["order_ref"].upper()
             explicit = "drew" if "DREW_SLEEVE" in ref or re.search(r"MAGIS\|[^|]+\|DREW\|", ref) else (
                 "michael" if "MICHAEL_SLEEVE" in ref or re.search(r"MAGIS\|[^|]+\|MICHAEL\|", ref) else "")
+            openings[(event["conid"], event["model"])].add(explicit or "unknown")
             if explicit:
-                openings[(event["conid"], event["model"])].add(explicit)
+                for identity in (event["trade_id"], event["transaction_id"], event["exec_id"]):
+                    if identity:
+                        opening_owners_by_id[identity] = explicit
     held = {identifier(pick(p, "conid", "conId")) for p in positions
             if (decimal(pick(p, "position", "quantity")) or ZERO) != 0}
     records, exceptions = [], []
@@ -304,10 +308,15 @@ def build_history(events: list[dict], lots: list[dict], *, reports: list[dict], 
                                                    blacklist=set(policy["blacklist"]) if policy else blacklist, opening_date=opening)
             confidence = "legacy_inferred" if owner in {"drew", "michael"} else "unallocated"
             known = openings.get((event["conid"], event["model"]), set())
-            if owner != "excluded" and len(known) > 1 and not lot:
-                owner, reason = "unallocated", "multiple_opening_owners_without_lot_match"
-            elif owner not in {"excluded", "unallocated"} and len(known) == 1 and event["ticker"] != "3905.T":
-                owner, reason, confidence = next(iter(known)), "consistent_opening_order_references", "opening_reference"
+            explicit_owners = known - {"unknown"}
+            matched_owner = opening_owners_by_id.get(row["opening_trade_id"]) if lot else None
+            potentially_shared = len(explicit_owners) > 1 or ("unknown" in known and any(o != owner for o in explicit_owners))
+            if owner != "excluded" and matched_owner:
+                owner, reason, confidence = matched_owner, "broker_matched_opening_order_reference", "opening_reference"
+            elif owner != "excluded" and potentially_shared and event["ticker"] != "3905.T":
+                owner, reason, confidence = "unallocated", "multiple_opening_owners_without_linked_owner_evidence", "unallocated"
+            elif owner not in {"excluded", "unallocated"} and len(explicit_owners) == 1 and "unknown" not in known and event["ticker"] != "3905.T":
+                owner, reason, confidence = next(iter(explicit_owners)), "consistent_opening_order_references", "opening_reference"
             applicable = [r for r in rules if r.get("account") == event["account"]
                           and (r.get("record_id") == row["record_id"] or (
                               r.get("conid") == event["conid"] and opening
