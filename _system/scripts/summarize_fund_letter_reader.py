@@ -27,7 +27,7 @@ sys.path.insert(0, str(ROOT / "_system" / "scripts"))
 from vault_paths import letters_root, resolve_ref_to_path  # noqa: E402
 
 PROMPT_VERSION = "letter_detail_v4"
-PIPELINE_VERSION = "fund-reader-local.2"
+PIPELINE_VERSION = "fund-reader-local.3"
 CHUNK_CHARS = 7000
 OUTPUT_NAME = "_reader_summaries"
 # Same vocabulary as the dashboard archive, so a draft needs no translation at import.
@@ -205,6 +205,214 @@ def checkable_numbers(prose: str) -> list[str]:
 def number_errors(prose: str, quotes: list[str]) -> list[str]:
     haystack = " ".join(quotes)
     return [f"number {number} is not in a verified quote" for number in checkable_numbers(prose) if number not in haystack]
+
+
+def split_sentences(text: str) -> list[str]:
+    return [piece for piece in re.split(r"(?<=[.!?])\s+", text or "") if piece.strip()]
+
+
+def source_sentence_for_number(number: str, source: str) -> str | None:
+    """A short exact source window around a figure. The window is contiguous
+    in the normalised source, so it verifies as a quote and can be attached
+    as evidence for a number the summary uses but its main quote omits."""
+    for sentence in split_sentences(norm(source)):
+        if number not in NUMBER_RE.findall(LABEL_RE.sub(" ", sentence)):
+            continue
+        words = sentence.split()
+        index = next((i for i, word in enumerate(words) if number in word), 0)
+        window = " ".join(words[max(0, index - 16): index + 17]).strip(" ,;")
+        if window and quote_ok(window, source):
+            return window
+    return None
+
+
+def _tokens(text: str) -> list[str]:
+    return re.findall(r"[\w]+", (text or "").lower())
+
+
+def repair_payload(payload: dict, source: str) -> tuple[list[str], list[str]]:
+    """Deterministic verification and repair. No model call, no human gate.
+
+    A figure the prose uses is either backed by an exact source sentence,
+    which is attached as evidence, or the sentence carrying it is removed.
+    Passage notes the consolidation dropped become factual ideas, so the
+    completeness checklist is satisfied by construction. Word-count and
+    coverage heuristics from generation stay visible as warnings; the
+    blocking errors returned here mirror the dashboard publication gate.
+    Mutates payload and returns (errors, warnings)."""
+    warnings = [str(item) for item in payload.get("errors") or []]
+    notes = payload.get("passage_notes") or []
+    ideas = payload.get("ideas") or []
+    for idea in ideas:
+        quotes = [idea.get("quote")] + list(idea.get("quotes") or [])
+        idea["quotes"] = list(dict.fromkeys(q for q in quotes if q and quote_ok(q, source)))
+        idea["quote"] = idea["quotes"][0] if idea["quotes"] else idea.get("quote")
+    ideas = [idea for idea in ideas if idea.get("quotes")]
+    stance = payload.get("stance") or {"focus": "micro", "leaning_in": [], "leaning_out": []}
+    for lean in (stance.get("leaning_in") or []) + (stance.get("leaning_out") or []):
+        quotes = [lean.get("quote")] + list(lean.get("quotes") or [])
+        lean["quotes"] = list(dict.fromkeys(q for q in quotes if q and quote_ok(q, source)))
+        lean["quote"] = lean["quotes"][0] if lean["quotes"] else lean.get("quote")
+    stance["leaning_in"] = [lean for lean in stance.get("leaning_in") or [] if lean.get("quotes")]
+    stance["leaning_out"] = [lean for lean in stance.get("leaning_out") or [] if lean.get("quotes")]
+
+    archive_bodies = [norm(part["text"]) for part in sections(source, size=6000)]
+
+    def locatable(quote: str) -> bool:
+        cleaned = norm(quote)
+        return bool(cleaned) and any(cleaned in body for body in archive_bodies)
+
+    def attach(owner: dict, number: str) -> bool:
+        if len(owner.get("quotes") or []) >= 6:
+            return False
+        found = source_sentence_for_number(number, source)
+        if not found:
+            return False
+        if not locatable(found):
+            words = found.split()
+            index = next((i for i, word in enumerate(words) if number in word), 0)
+            found = " ".join(words[max(0, index - 8): index + 9]).strip(" ,;")
+            if not locatable(found):
+                return False
+        owner.setdefault("quotes", []).append(found)
+        owner["quote"] = owner["quotes"][0]
+        return True
+
+    def repair_numbers(text: str, owner: dict | None) -> str:
+        kept = []
+        for sentence in split_sentences(text or ""):
+            unsupported = [n for n in checkable_numbers(sentence)
+                           if not any(n in q for q in (owner or {}).get("quotes") or [])]
+            dropped = False
+            for number in unsupported:
+                if owner is None or not attach(owner, number):
+                    dropped = True
+                    break
+            if not dropped:
+                kept.append(sentence)
+        return " ".join(kept)
+
+    # Coverage by construction: an unrepresented passage note becomes an idea.
+    represented = " ".join(f"{idea.get('title') or ''} {idea.get('summary') or ''}".lower() for idea in ideas)
+    all_quotes = [q for idea in ideas for q in idea["quotes"]]
+    for note in notes:
+        quote = note.get("quote") or ""
+        subject = (note.get("subject") or "").strip()
+        if quote in all_quotes or (len(subject) > 3 and subject.lower() in represented):
+            continue
+        if not quote_ok(quote, source):
+            continue
+        ideas.append({
+            "id": "", "title": subject or "Position note", "ticker": note.get("ticker"),
+            "idea_type": note.get("kind") if note.get("kind") in KINDS else "factual_note",
+            "activity": note.get("activity") or "hold", "summary": note.get("point") or "",
+            "evolution": None, "compared_letter_id": None, "quote": quote, "quotes": [quote],
+        })
+        all_quotes.append(quote)
+        warnings.append(f"coverage: passage note '{(subject or 'untitled')[:60]}' restored as its own idea")
+    seen_ids: dict[str, int] = {}
+    for index, idea in enumerate(ideas):
+        base = slug(str(idea.get("id") or idea.get("title") or ""), f"idea-{index + 1}")
+        seen_ids[base] = seen_ids.get(base, 0) + 1
+        idea["id"] = base if seen_ids[base] == 1 else f"{base}-{seen_ids[base]}"
+
+    # Macro stance by construction: stated positioning activity in macro,
+    # sector or portfolio notes is a lean, with the note itself as evidence.
+    if not (stance["leaning_in"] or stance["leaning_out"]):
+        for note in notes:
+            if note.get("kind") not in {"macro", "sector", "portfolio"}:
+                continue
+            side = {"new": "leaning_in", "add": "leaning_in"}.get(note.get("activity") or "")
+            side = side or {"exit": "leaning_out", "trim": "leaning_out"}.get(note.get("activity") or "")
+            if not side or len(stance[side]) >= 4 or not quote_ok(note.get("quote") or "", source):
+                continue
+            stance[side].append({
+                "subject": (note.get("subject") or note.get("kind") or "Portfolio").strip(),
+                "why": note.get("point") or "", "quote": note["quote"], "quotes": [note["quote"]],
+            })
+        if stance["leaning_in"] or stance["leaning_out"]:
+            kinds = {idea.get("idea_type") for idea in ideas}
+            stance["focus"] = "mixed" if kinds - {"macro", "sector", "portfolio"} else "macro"
+            warnings.append("stance: leaning in/out derived from stated positioning notes")
+    if stance.get("focus") in {"macro", "mixed"} and not (stance["leaning_in"] or stance["leaning_out"]):
+        stance["focus"] = "micro"
+        warnings.append("stance: no supported leaning stated; focus recorded as micro")
+
+    for idea in ideas:
+        idea["summary"] = repair_numbers(idea.get("summary") or "", idea)
+        title = idea.get("title") or ""
+        for number in checkable_numbers(title):
+            if not any(number in q for q in idea["quotes"]):
+                title = title.replace(number, "").strip(" -,:")
+        idea["title"] = title or "Position note"
+    first = ideas[0] if ideas else None
+    payload["overview"] = "\n\n".join(
+        repair_numbers(paragraph, first) for paragraph in (payload.get("overview") or "").split("\n\n")
+    ).strip()
+    for lean in stance["leaning_in"] + stance["leaning_out"]:
+        lean["why"] = repair_numbers(lean.get("why") or "", lean)
+    stance["leaning_in"] = [lean for lean in stance["leaning_in"] if (lean.get("why") or "").strip()]
+    stance["leaning_out"] = [lean for lean in stance["leaning_out"] if (lean.get("why") or "").strip()]
+
+    rendered = payload["overview"] + " " + " ".join(idea.get("summary") or "" for idea in ideas)
+    if URL_RE.search(rendered):
+        payload["overview"] = URL_RE.sub("", payload["overview"])
+        for idea in ideas:
+            idea["summary"] = URL_RE.sub("", idea.get("summary") or "")
+        warnings.append("removed a source link from reader prose")
+
+    source_tokens = _tokens(source)
+    grams = {tuple(source_tokens[i:i + 12]) for i in range(max(0, len(source_tokens) - 11))}
+
+    def drop_copied(text: str) -> str:
+        kept = []
+        for sentence in split_sentences(text or ""):
+            tokens = _tokens(sentence)
+            if any(tuple(tokens[i:i + 12]) in grams for i in range(max(0, len(tokens) - 11))):
+                warnings.append("removed a sentence copying twelve or more source words")
+                continue
+            kept.append(sentence)
+        return " ".join(kept)
+
+    payload["overview"] = "\n\n".join(drop_copied(p) for p in payload["overview"].split("\n\n")).strip()
+    for idea in ideas:
+        idea["summary"] = drop_copied(idea.get("summary") or "")
+    ideas = [idea for idea in ideas if idea["summary"].strip()]
+
+    # Evidence only counts where the archive can cite it: inside one of its
+    # own 6,000-character sections. Quotes that span a boundary are replaced
+    # by their locatable sentences, then figures are re-checked against
+    # what remains.
+    for idea in ideas:
+        kept: list[str] = []
+        for quote in idea["quotes"]:
+            if locatable(quote):
+                kept.append(quote)
+            else:
+                kept.extend(s for s in split_sentences(quote) if locatable(s))
+        if kept:
+            idea["quotes"] = list(dict.fromkeys(kept))
+            idea["quote"] = idea["quotes"][0]
+        idea["summary"] = repair_numbers(idea.get("summary") or "", idea)
+    ideas = [idea for idea in ideas if idea["summary"].strip()]
+    payload["ideas"] = ideas
+    payload["stance"] = stance
+
+    errors: list[str] = []
+    if not payload["overview"]:
+        errors.append("summary is missing an overview")
+    if not ideas:
+        errors.append("summary has no verified idea")
+    all_quotes = [q for idea in ideas for q in idea["quotes"]]
+    all_quotes += [q for lean in stance["leaning_in"] + stance["leaning_out"] for q in lean.get("quotes") or []]
+    errors.extend(number_errors(payload["overview"], all_quotes))
+    for lean in stance["leaning_in"] + stance["leaning_out"]:
+        errors.extend(number_errors(lean.get("why") or "", lean.get("quotes") or []))
+    for idea in ideas:
+        errors.extend(number_errors(idea.get("summary") or "", idea["quotes"]))
+    errors.extend(public_text_errors(payload["overview"] + " " + " ".join(i.get("summary") or "" for i in ideas)))
+    payload["warnings"] = sorted(set(warnings))
+    return sorted(set(errors)), payload["warnings"]
 
 
 def slug(value: str, fallback: str) -> str:
@@ -410,6 +618,23 @@ def reduce_notes(notes: list[dict], record: dict, model: str | None, source: str
     }
 
 
+def map_with_split(part: dict, record: dict, model: str | None, depth: int = 0) -> dict:
+    """A passage whose model reply is not valid JSON is split and retried,
+    so one malformed reply cannot fail a whole letter."""
+    try:
+        return map_passage(part, record, model)
+    except Exception:
+        if depth >= 2 or len(part["text"]) < 3000:
+            raise
+        notes, reasons = [], []
+        for index, sub in enumerate(sections(part["text"], size=max(1200, len(part["text"]) // 2))):
+            sub = {**sub, "id": f"{part['id']}.{index + 1}"}
+            mapped = map_with_split(sub, record, model, depth + 1)
+            notes.extend(mapped["notes"])
+            reasons.append(mapped.get("skip_reason") or "")
+        return {"passage_id": part["id"], "notes": notes, "skip_reason": " ".join(reasons)}
+
+
 def summarize_letter(record: dict, text: str, model: str | None) -> dict:
     parts = sections(text)
     if "".join(part["text"] for part in parts) != text:
@@ -418,14 +643,20 @@ def summarize_letter(record: dict, text: str, model: str | None) -> dict:
     covered = []
     started = time.monotonic()
     for part in parts:
-        mapped = map_passage(part, record, model)
+        mapped = map_with_split(part, record, model)
         covered.append(part["id"])
         notes.extend(mapped["notes"])
     reduced = reduce_notes(notes, record, model, text) if notes else {
         "headline": "", "overview": "", "ideas": [], "stance": {"focus": "micro", "leaning_in": [], "leaning_out": []},
         "errors": ["no verified notes in any passage"], "notes_sent": 0,
     }
-    status = "draft" if not reduced["errors"] else "needs_review"
+    payload_core = {
+        "headline": reduced["headline"], "overview": reduced["overview"], "ideas": reduced["ideas"],
+        "stance": reduced["stance"], "passage_notes": notes, "errors": list(reduced["errors"]),
+    }
+    errors, warnings = repair_payload(payload_core, text)
+    reduced = {**reduced, **payload_core}
+    status = "draft" if not errors else "quarantine"
     return {
         "prompt_version": PROMPT_VERSION,
         "pipeline_version": PIPELINE_VERSION,
@@ -453,7 +684,8 @@ def summarize_letter(record: dict, text: str, model: str | None) -> dict:
         "overview": reduced["overview"],
         "ideas": reduced["ideas"],
         "passage_notes": notes,
-        "errors": reduced["errors"],
+        "errors": errors,
+        "warnings": warnings,
     }
 
 
@@ -467,9 +699,22 @@ def to_archive_draft(summary: dict, text: str) -> tuple[dict, list[str]]:
     errors = []
     covered: dict[str, list[str]] = {part["id"]: [] for part in parts}
     for index, idea in enumerate(summary.get("ideas") or []):
-        quote = norm(idea.get("quote") or "")
-        section_id = next((sid for sid, body in normalised if quote and quote in body), None)
-        if not section_id:
+        quotes = [idea.get("quote")] + list(idea.get("quotes") or [])
+        evidence = []
+        for raw_quote in dict.fromkeys(q for q in quotes if q):
+            quote = norm(raw_quote)
+            section_id = next((sid for sid, body in normalised if quote and quote in body), None)
+            if section_id:
+                evidence.append({"claim": idea.get("title") or "investment discussion", "section_id": section_id, "quote": raw_quote})
+                continue
+            # A quote spanning a section boundary still supports its claims
+            # sentence by sentence; each sentence locates on its own.
+            for sentence in split_sentences(raw_quote):
+                cleaned = norm(sentence)
+                located = next((sid for sid, body in normalised if cleaned and cleaned in body), None)
+                if located:
+                    evidence.append({"claim": idea.get("title") or "investment discussion", "section_id": located, "quote": sentence})
+        if not evidence:
             errors.append(f"idea {idea.get('title') or index} quote spans a section boundary")
             continue
         item = {
@@ -481,10 +726,11 @@ def to_archive_draft(summary: dict, text: str) -> tuple[dict, list[str]]:
             "summary": idea.get("summary") or "",
             "evolution": None,
             "compared_letter_id": None,
-            "evidence": [{"claim": idea.get("title") or "investment discussion", "section_id": section_id, "quote": idea.get("quote") or ""}],
+            "evidence": evidence,
         }
         ideas.append(item)
-        covered[section_id].append(item["id"])
+        for entry in evidence:
+            covered[entry["section_id"]].append(item["id"])
     checklist = [
         {
             "section_id": part["id"],
@@ -521,9 +767,9 @@ def already_done(content_hash: str, retry_failed: bool) -> bool:
         return False
     if saved.get("chunks_covered") != saved.get("chunks_total"):
         return False
-    if retry_failed and saved.get("status") == "failed":
+    if retry_failed and saved.get("status") in {"failed", "quarantine"}:
         return False
-    return saved.get("status") in {"draft", "needs_review", "blocked_extraction"}
+    return saved.get("status") in {"draft", "quarantine", "needs_review", "blocked_extraction"}
 
 
 def write_summary(content_hash: str, payload: dict) -> None:
@@ -606,6 +852,9 @@ def run(limit: int | None, retry_failed: bool, model: str | None, fund: str | No
                 payload["model"] = selected
                 draft, draft_errors = to_archive_draft(payload, text)
                 payload["draft_errors"] = draft_errors
+                if draft_errors:
+                    payload["status"] = "quarantine"
+                    payload["errors"] = sorted(set(payload["errors"] + draft_errors))
                 write_summary(content_hash, payload)
                 if draft["ideas"]:
                     draft_path(content_hash).write_text(json.dumps(draft, ensure_ascii=False, indent=1), encoding="utf-8")
@@ -638,15 +887,69 @@ def run(limit: int | None, retry_failed: bool, model: str | None, fund: str | No
     return counts
 
 
+def repair_existing() -> dict:
+    """Re-verify every saved summary against its source. No model call.
+
+    Files a live summary run may be writing are skipped when very fresh, so
+    this pass is safe to run alongside it."""
+    by_ref = {}
+    for record in load_records():
+        path = letter_path(record)
+        if path is not None:
+            by_ref[record.get("source_file")] = path
+    counts = {"checked": 0, "draft": 0, "quarantine": 0, "skipped": 0}
+    for path in sorted(output_dir().glob("*.json")):
+        if path.name == "progress.json" or path.name.endswith(".draft.json"):
+            continue
+        if time.time() - path.stat().st_mtime < 120:
+            counts["skipped"] += 1
+            continue
+        try:
+            payload = json.loads(path.read_text(encoding="utf-8"))
+        except (OSError, json.JSONDecodeError):
+            continue
+        if not isinstance(payload, dict) or "overview" not in payload:
+            continue
+        if payload.get("prompt_version") != PROMPT_VERSION:
+            counts["skipped"] += 1
+            continue
+        source_path = by_ref.get(payload.get("source_ref"))
+        if source_path is None:
+            counts["skipped"] += 1
+            continue
+        counts["checked"] += 1
+        text = source_path.read_text(encoding="utf-8", errors="replace")
+        payload["errors"] = list(payload.get("errors") or [])
+        errors, _warnings = repair_payload(payload, text)
+        draft, draft_errors = to_archive_draft(payload, text)
+        payload["pipeline_version"] = PIPELINE_VERSION
+        payload["errors"] = sorted(set(errors + draft_errors))
+        payload["draft_errors"] = draft_errors
+        payload["status"] = "draft" if not payload["errors"] else "quarantine"
+        payload["letter_focus"] = (payload.get("stance") or {}).get("focus", payload.get("letter_focus"))
+        write_summary(path.stem, payload)
+        if draft["ideas"]:
+            draft_path(path.stem).write_text(json.dumps(draft, ensure_ascii=False, indent=1), encoding="utf-8")
+        counts[payload["status"]] += 1
+        print(json.dumps({"repaired": payload["status"], "fund_id": payload.get("fund_id"),
+                          "period": payload.get("reporting_period"), "errors": len(payload["errors"])}), flush=True)
+    return counts
+
+
 def main() -> int:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--limit", type=int, default=None)
     parser.add_argument("--all", action="store_true")
     parser.add_argument("--retry-failed", action="store_true")
+    parser.add_argument("--repair-existing", action="store_true",
+                        help="Re-verify saved summaries against their sources; no model call")
     parser.add_argument("--model")
     parser.add_argument("--fund", help="Only this fund_id")
     parser.add_argument("--period", help="Only this reporting period, e.g. 2011Q1")
     args = parser.parse_args()
+    if args.repair_existing:
+        print(json.dumps(repair_existing()))
+        return 0
     if not args.all and args.limit is None:
         args.limit = 1
     result = run(None if args.all else args.limit, args.retry_failed, args.model, fund=args.fund, period=args.period)

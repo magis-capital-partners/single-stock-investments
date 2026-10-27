@@ -4,9 +4,9 @@ The shared reader lives at `/fund-letters/` and in the dashboard’s Fund Letter
 
 ## Access boundary
 
-The verified owner identities are `drew@magiscapitalpartners.com` and `mike@magiscapitalpartners.com`. Every other admitted human identity is a reader. Service tokens cannot become human readers or owners.
+The verified owner identities are `drew@magiscapitalpartners.com` and `mike@magiscapitalpartners.com`. Those two logins, and no others, can load the main dashboard. Every other admitted human identity is a reader. Service tokens cannot become human readers or owners.
 
-Root Pages middleware runs on **every path**, including static assets, guessed filenames, manifests, preview hosts and APIs. `_routes.json` has no exclusions. Only the reader shell, its two assets and its API are reader-accessible. A reader opening `/` is redirected to the reader. Owner APIs also check ownership themselves. Exact POST ingestion routes retain their existing cryptographic machine authentication; there is no ingestion-prefix exemption.
+Root Pages middleware runs on **every path**, including static assets, guessed filenames, manifests, preview hosts and APIs. `_routes.json` has no exclusions. Only the Fund Letters reader shell, its two assets and its API are reader-accessible. A reader opening `/` or `/index.html` is redirected to `/fund-letters/`, the Fund Letters tab, and every other dashboard path is denied before the asset or API is read. Owner APIs also check ownership themselves. Exact POST ingestion routes retain their existing cryptographic machine authentication; there is no ingestion-prefix exemption.
 
 Configure `CF_ACCESS_TEAM_DOMAIN` and `CF_ACCESS_AUD` in both production and preview environments. Missing identity configuration denies access. Use a Cloudflare Access application covering the entire hostname, with the intended approved-user policy. Application authorization restricts those admitted users further. If more-specific Access applications exist, reconcile their audiences/policies before release. An ordinary Cloudflare account is not admission to the application. Keep R2 public access disabled.
 
@@ -18,15 +18,15 @@ Local development bypass requires `PORTFOLIO_AUTH_MODE=development` **and** a lo
 
 Schema: `dashboard/cloudflare/migrations/0023_fund_letters.sql`. Funds, canonical letters, source sections, idea discussions, evidence, immutable revisions, review issues, processing checkpoints and releases are separate records. Published pointers identify the reader-visible revision; a failed later attempt does not remove an existing publication.
 
-All local generated data goes under ignored `_private/fund_letters/`. The inventory starts from the complete private vault, reuses established fund normalization, and hashes full normalized text. It collapses exact copies within a fund, preserves distinct same-quarter letters, and recovers nonidentical editions from prior duplicate-source lists for review. Uncertain identities and alternate sources remain in the owner queue. It does not auto-merge distinct strategies.
+All local generated data goes under ignored `_private/fund_letters/`. The inventory starts from the complete private vault, reuses established fund normalization, and hashes full normalized text. It collapses exact copies within a fund, preserves distinct same-quarter letters, and recovers nonidentical editions from prior duplicate-source lists. The automated lane resolves an identity, extraction or duplicate-source question only on deterministic evidence: the canonical fund record exists, the full text reconciles exactly to its sections, or the content hash is unique within the fund. Anything else stays unpublished with the reason recorded. It does not auto-merge distinct strategies.
 
 Dates are separate: reporting period, verified printed date, independently supplied publication date, first ingestion, revision creation and summary publication. Quarter/month endpoints, filename dates and file modification dates are not promoted to verified printed dates. Unknown exact dates remain visibly unknown. Owners can correct dates with a recorded evidence note.
 
-Synthesis maps **every** source passage, including tables and footnotes, independent of the ticker universe. It covers public and private companies, credit, shorts, special situations, unnamed investments, sector/macro arguments and portfolio reasoning. Table-only references stay factual notes. Passage inventories are cached by canonical content and pipeline version; repeated ideas are consolidated for the letter. `--retry-failed` retries failed work. Generation never publishes automatically.
+Synthesis maps **every** source passage, including tables and footnotes, independent of the ticker universe. It covers public and private companies, credit, shorts, special situations, unnamed investments, sector/macro arguments and portfolio reasoning. Table-only references stay factual notes. Passage inventories are cached by canonical content and pipeline version; repeated ideas are consolidated for the letter. `--retry-failed` retries failed work. The summarizer itself never publishes; the automated lane below publishes only after the deterministic verifier passes.
 
-Validation checks full passage reconciliation, unique idea IDs, exact private evidence quotes, numerical support, dated comparisons, source-link leakage and copied twelve-word sequences. These mechanical checks supplement editorial review. Publishing requires recorded confirmation of all six checks: complete document, idea coverage, claim accuracy, numerical accuracy, original writing and historical dates. Unresolved identity, extraction or alternate-source issues block publication. Unknown printed dates can remain unknown.
+Validation checks full passage reconciliation, unique idea IDs, exact private evidence quotes, numerical support, dated comparisons, source-link leakage and copied twelve-word sequences. Publication records all six checks as machine-verified on the exact revision: complete document, idea coverage, claim accuracy, numerical accuracy, original writing and historical dates. The verifier repairs before it rejects: a figure backed elsewhere in the letter gains that exact source sentence as evidence, a figure found nowhere in the letter loses its sentence, a dropped passage note becomes its own idea, and a copied sentence is removed. Letters that still fail are quarantined with the reason and retried by the summarizer; no human review is required. Unresolved identity, extraction or alternate-source issues block publication. Unknown printed dates can remain unknown.
 
-Owner review controls expose original-letter links, private references/evidence, draft editing, revision selection, explicit editorial checks and issue resolution. Saving creates a new revision. Publishing an older revision restores it while retaining the later revisions. Optimistic concurrency rejects publication against a stale published pointer.
+Owner review controls still expose original-letter links, private references/evidence, draft editing, revision selection, explicit editorial checks and issue resolution for the two owners. Saving creates a new revision. Publishing an older revision restores it while retaining the later revisions. Optimistic concurrency rejects publication against a stale published pointer.
 
 ## Commands
 
@@ -42,20 +42,26 @@ python _system/scripts/fund_letters.py import-draft LETTER_ID PRIVATE_DRAFT.json
 
 Synthesis defaults to LM Studio’s native `/api/v1/chat` endpoint through the existing local transport, with reasoning disabled, no stored chats and no integrations. Start/load a suitable local model before running it. `--transport compatible` supports a compatible chat endpoint. Hidden reasoning and output exhausted at the token budget are rejected. The endpoint must be loopback. Large or scanned documents that cannot be processed must remain unresolved; do not sample away text, invent a thesis, or substitute the old extracts.
 
-A local reader-summary stage also runs over the private vault extracts. It reads every passage, asks the local model for detailed company-level notes (business, thesis, activity, size, valuation, catalyst, named risk) and, for macro or mixed letters, the fund's main stances with what it is leaning into or out of. Every figure must appear in a verbatim quote checked in code; calendar years and labels such as QE2 are not numerical claims. It writes private drafts plus dashboard-shaped draft files (overview, ideas, private evidence, completeness checklist, and a stance block the reader renders as “Leaning in / Leaning out”) under `superinvestor-letters/_reader_summaries/` in the private vault. It never publishes: import a draft with `import-draft`, review it in the owner interface, and publish only with the six editorial attestations.
+A local reader-summary stage also runs over the private vault extracts. It reads every passage, asks the local model for detailed company-level notes (business, thesis, activity, size, valuation, catalyst, named risk) and, for macro or mixed letters, the fund's main stances with what it is leaning into or out of. Every figure must appear in a verbatim quote checked in code; calendar years and labels such as QE2 are not numerical claims. It writes private summaries plus dashboard-shaped draft files (overview, ideas, private evidence, completeness checklist, and a stance block the reader renders as “Leaning in / Leaning out”) under `superinvestor-letters/_reader_summaries/` in the private vault.
+
+The automated lane is `_system/scripts/auto_fund_letters.py`. Each cycle repairs saved drafts, summarizes the next batch with the local model, imports every verified draft, publishes it on the machine-verified checks, exports a release, syncs that release to D1/private R2 when `--sync-remote` has its config and credentials, and commits the private summaries to the research vault. `publish_state.json` in the summaries directory records every outcome, so a restart resumes instead of repeating work. Quarantined letters are retried with `--retry-failed`; they are never silently published and never wait on a person.
 
 ```powershell
 $env:RESEARCH_VAULT_ROOT = "PATH_TO_PRIVATE_RESEARCH_VAULT"
 python _system/scripts/summarize_fund_letter_reader.py --fund FUND_ID --period 2011Q1 --limit 1
-python _system/scripts/summarize_fund_letter_reader.py --all
+python _system/scripts/summarize_fund_letter_reader.py --repair-existing
+python _system/scripts/auto_fund_letters.py --batch 5 --cycles 1
+python _system/scripts/auto_fund_letters.py --batch 5 --cycles 0 --sync-remote
 ```
 
-For publication through the local pipeline, provide an explicit JSON object setting the six `EDITORIAL_CHECKS` keys to true after review:
+Publication through the local pipeline can also be run one revision at a time, with no human attestation:
 
 ```powershell
-python _system/scripts/fund_letters.py publish REVISION_ID --author EDITOR --attestations PRIVATE_CHECKS.json
+python _system/scripts/fund_letters.py publish REVISION_ID --automated
 python _system/scripts/fund_letters.py export --output _private/fund_letters/releases/RELEASE_NAME
 ```
+
+The owner interface keeps its six explicit editorial checkboxes for manual publishing; the automated lane does not use them and cannot fabricate them. Its `checks_json` records `mode: machine`, the verifier version, section/idea/evidence counts, and the per-check results for the exact revision.
 
 Export refuses an existing release directory. It creates an immutable content-hashed manifest, append-only `archive.sql`, private source text objects, guarded `activate.sql`, and guarded `rollback.sql`. Full text is stored locally and in private R2, rather than duplicated in the remote D1 database. Sources are required for server-side editing/publication checks. Reader responses use explicit field allowlists and omit URLs, file paths, Drive IDs, raw extracts and evidence.
 
@@ -96,16 +102,16 @@ Hydrated files contain private material and must be sanitized before public stag
 
 ## Release gates and remaining work
 
-**This implementation has not been cut over to production.** The local inventory contains 12,892 canonical letters across 2,346 fund identities, with 104 missing text extracts. These are inventory counts, not a claim that the corpus has been summarized, identity-reviewed or published.
+**Remote cutover is still pending.** The local inventory built by the automated lane contains 19,339 canonical letters across 5,074 fund identities, with 1,050 missing text extracts. The first verified batch is published in the local archive; the dashboard shows letters only after a release is synced to D1 and activated, which needs the Wrangler login on this Mac, the `_cf_project/wrangler.jsonc` config with the real D1 UUID and `PRIVATE_ARTIFACTS` bucket, and `CLOUDFLARE_API_TOKEN` plus `CLOUDFLARE_ACCOUNT_ID` in the lane's environment for the D1 budget check. Until that sync runs, the live Fund Letters tab stays empty. These are inventory counts, not a claim that the corpus has been summarized or published.
 
-The initial broad exposure scan included unrelated provenance fields; the refined audit examines actual Drive links, letter references, letter extracts and tracked originals. It covers current tracked dashboard assets and letter-related repository data/research. The detailed report is `_private/fund_letters/exposure.json`. Historical public copies cannot be recalled. The audit does not certify forks, git history, external mirrors, other research collections or alternate hosting.
+The refined exposure audit examines actual Drive links, letter references, letter extracts and tracked originals. It covers current tracked dashboard assets and letter-related repository data/research. The detailed report is `_private/fund_letters/exposure.json`. Historical public copies cannot be recalled. The audit does not certify forks, git history, external mirrors, other research collections or alternate hosting.
 
 ```powershell
 python _system/scripts/audit_fund_letter_exposure.py --strict
 ```
 
-The initial local-model pilot failed claim/evidence/number checks and was retained privately as failed drafts. One complete Comus letter has a manually corrected original draft awaiting owner review. There are **zero published letters**; neither an inventory nor a failed model run counts as backfill completion. A model/editorial process must pass the representative pilot before corpus generation and publication proceed.
+The automated lane has published its first verified batch into the local archive and checkpoints each batch to the private research vault. Neither an inventory nor a failed model run counts as backfill completion; the corpus backfill is the resumable lane, and letters with no readable extract stay quarantined with the reason recorded. Remote publication follows the sync step above, one release per batch, so the Fund Letters tab fills incrementally rather than in one cutover.
 
-GitHub Pages publication is disabled in the publishing action because it cannot enforce the application middleware. The GitHub Pages API returned 404 during inspection; that is not a certificate about cached copies or alternate hosting. Before production activation: merge the sanitized public counterparts; review a pilot containing long, short, complex, scanned and older letters against complete originals; resolve extraction failures; complete the resumable corpus backfill; verify actual owner/reader/removed/unauthenticated logins and direct requests on primary, preview and alternate hosts; then clear legacy caches and hosting. Do not describe a local role simulation as a live Access-policy validation.
+GitHub Pages publication is disabled in the publishing action because it cannot enforce the application middleware. The GitHub Pages API returned 404 during inspection; that is not a certificate about cached copies or alternate hosting. Before declaring the live site verified, check actual owner, reader, removed and unauthenticated logins and direct requests on primary, preview and alternate hosts; then clear legacy caches and hosting. Do not describe a local role simulation as a live Access-policy validation.
 
 Relevant Cloudflare references: [JWT validation](https://developers.cloudflare.com/cloudflare-one/access-controls/applications/http-apps/authorization-cookie/validating-json/), [application path precedence](https://developers.cloudflare.com/cloudflare-one/access-controls/policies/app-paths/), and [Pages middleware](https://developers.cloudflare.com/pages/functions/middleware/).

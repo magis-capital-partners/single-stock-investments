@@ -89,7 +89,7 @@ export function validateDraft(draft, parts) {
   if (!parts.length || visited.length !== parts.length || new Set(visited).size !== parts.length || visited.some(id => !sections.has(id))) errors.push("Reconcile every source passage exactly once.");
   if (ids.some(id => !covered.has(id))) errors.push("Every idea must appear in the completeness checklist.");
   const stanceText = [draft.stance?.leaning_in, draft.stance?.leaning_out].flatMap(items => (Array.isArray(items) ? items : []).flatMap(i => [i?.subject, i?.why]));
-  const stanceQuotes = [draft.stance?.leaning_in, draft.stance?.leaning_out].flatMap(items => (Array.isArray(items) ? items : []).map(i => i?.quote || ""));
+  const stanceQuotes = [draft.stance?.leaning_in, draft.stance?.leaning_out].flatMap(items => (Array.isArray(items) ? items : []).flatMap(i => [i?.quote || "", ...(Array.isArray(i?.quotes) ? i.quotes : [])]));
   const sourceWords = words(parts.map(p => p.text).join(" "));
   const grams = new Set(sourceWords.slice(0, -11).map((_, i) => sourceWords.slice(i, i + 12).join(" ")));
   const prose = [draft.overview, ...draft.ideas.flatMap(i => [i?.title, i?.summary, i?.evolution, i?.activity]), ...stanceText].filter(Boolean).join(" ");

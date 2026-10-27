@@ -114,6 +114,60 @@ def test_rewritten_reduce_quote_inherits_the_verified_note_quote():
     assert s.inherit_quote("Unrelated topic", "nothing matches", notes, SOURCE) is None
 
 
+REPAIR_SOURCE = (
+    "The fund bought Acme at 10 times earnings. Revenue increased 20% in the latest year. "
+    "The refinery stake returned 30% over the holding period as utilization rose. "
+    "Management plans to repay debt. Loss of customers is a risk."
+)
+
+
+def base_payload(**extra):
+    payload = {
+        "headline": "Example", "overview": "The fund bought Acme at 10 times earnings.",
+        "ideas": [{"id": "acme", "title": "Acme", "ticker": None, "idea_type": "long", "activity": "new",
+                   "summary": "The fund bought Acme at 10 times earnings for its recurring revenue.",
+                   "quote": "The fund bought Acme at 10 times earnings.", "quotes": ["The fund bought Acme at 10 times earnings."]}],
+        "stance": {"focus": "micro", "leaning_in": [], "leaning_out": []},
+        "passage_notes": [], "errors": [],
+    }
+    payload.update(extra)
+    return payload
+
+
+def test_repair_attaches_the_source_sentence_behind_a_number():
+    payload = base_payload(overview="The fund bought Acme. The refinery stake returned 30% over the holding period.")
+    errors, _ = s.repair_payload(payload, REPAIR_SOURCE)
+    assert errors == []
+    assert any("30%" in quote for idea in payload["ideas"] for quote in idea["quotes"])
+
+
+def test_repair_drops_a_sentence_whose_number_is_nowhere_in_the_source():
+    payload = base_payload(overview="The fund bought Acme at 10 times earnings. Gains reached 77% last year.")
+    errors, _ = s.repair_payload(payload, REPAIR_SOURCE)
+    assert errors == []
+    assert "77%" not in payload["overview"]
+
+
+def test_repair_restores_an_uncovered_passage_note_as_an_idea():
+    note = {"kind": "credit", "subject": "PrivateCo credit", "ticker": None, "activity": "hold",
+            "point": "The fund holds PrivateCo credit and expects repayment from operating cash flow.",
+            "quote": "Management plans to repay debt.", "quote_verified": True}
+    payload = base_payload(passage_notes=[note])
+    errors, _ = s.repair_payload(payload, REPAIR_SOURCE)
+    assert errors == []
+    assert any(idea["title"] == "PrivateCo credit" for idea in payload["ideas"])
+
+
+def test_repair_derives_a_macro_lean_from_positioning_notes():
+    note = {"kind": "macro", "subject": "Precious metals miners", "ticker": None, "activity": "new",
+            "point": "The fund added precious metals miners as a hedge against currency debasement.",
+            "quote": "Revenue increased 20% in the latest year.", "quote_verified": True}
+    payload = base_payload(passage_notes=[note], stance={"focus": "macro", "leaning_in": [], "leaning_out": []})
+    errors, _ = s.repair_payload(payload, REPAIR_SOURCE)
+    assert errors == []
+    assert payload["stance"]["leaning_in"][0]["subject"] == "Precious metals miners"
+
+
 def test_prompt_version_bump_invalidates_old_cache(tmp_path, monkeypatch):
     monkeypatch.setattr(s, "output_dir", lambda: tmp_path)
     path = s.summary_path("abc")

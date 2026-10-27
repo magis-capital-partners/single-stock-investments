@@ -68,11 +68,30 @@ test('direct dashboard requests, private data, guessed files and source APIs are
   for(const path of ['/data/core.json','/index-viz.js','/data/insights/letters.json','/api/v2/portfolio/book','/original.pdf','/fund-letters/../../data/core.json','/cloudflare-artifact-manifest.json']) assert.equal(accessDecision(path,'GET',reader),'forbidden',path);
   assert.equal(accessDecision('/fund-letters/','GET',reader),'allow');
   assert.equal(accessDecision('/api/fund-letters','GET',reader),'allow');
+  assert.equal(accessDecision('/fund-letters/index.html','GET',reader),'allow');
+  assert.equal(accessDecision('/api/fund-letters','GET',reader),'allow');
   assert.equal(accessDecision('/','GET',reader),'reader-home');
+  assert.equal(accessDecision('/index.html','GET',reader),'reader-home');
   assert.equal(accessDecision('/fund-letters/','GET',null),'unauthenticated');
   assert.equal(accessDecision('/api/v2/portfolio/ingest','GET',null),'unauthenticated');
   assert.equal(accessDecision('/api/v2/portfolio/ingest','POST',null),'machine');
   assert.equal(accessDecision('/api/v2/portfolio/ingest/guessed','POST',null),'unauthenticated');
+});
+test('only Drew and Michael reach the main dashboard; every other signed-in user lands on Fund Letters',async()=>{
+  const michael = {email:'mike@magiscapitalpartners.com',role:'owner'};
+  for(const viewer of [owner,michael]) {
+    assert.equal(accessDecision('/','GET',viewer),'allow');
+    assert.equal(accessDecision('/index.html','GET',viewer),'allow');
+    assert.equal(accessDecision('/data/core.json','GET',viewer),'allow');
+    let calls=0;
+    const response=await onRequest({request:new Request('https://test.example/'),env:{},data:{humanViewer:viewer},next:async()=>{calls++;return new Response('main dashboard');}});
+    assert.equal(response.status,200);assert.equal(await response.text(),'main dashboard');assert.equal(calls,1);
+  }
+  for(const home of ['/','/index.html']) {
+    let calls=0;
+    const response=await onRequest({request:new Request('https://test.example'+home),env:{},data:{humanViewer:reader},next:async()=>{calls++;return new Response('must not serve dashboard');}});
+    assert.equal(response.status,302);assert.equal(response.headers.get('location'),'/fund-letters/');assert.equal(calls,0);
+  }
 });
 test('middleware denies before reading and prevents role-dependent cache reuse',async()=>{
   let calls=0;

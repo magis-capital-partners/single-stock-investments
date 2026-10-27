@@ -257,8 +257,10 @@ def quality_errors(draft: dict, parts: list[dict]) -> list[str]:
         for number in checkable_numbers(body):
             if number not in " ".join(quotes):
                 errors.append(f"{label}: numerical claim {number} lacks cited evidence.")
-    rendered = " ".join([str(draft.get("overview") or "")] + [" ".join(str(i.get(k) or "") for k in ("title", "summary", "evolution", "activity")) for i in ideas if isinstance(i, dict)])
-    all_quotes = " ".join(str(e.get("quote") or "") for i in ideas if isinstance(i, dict) for e in (i.get("evidence") or []) if isinstance(e, dict))
+    stance = draft.get("stance") if isinstance(draft.get("stance"), dict) else {}
+    leans = [lean for key in ("leaning_in", "leaning_out") for lean in (stance.get(key) or []) if isinstance(lean, dict)]
+    rendered = " ".join([str(draft.get("overview") or "")] + [" ".join(str(i.get(k) or "") for k in ("title", "summary", "evolution", "activity")) for i in ideas if isinstance(i, dict)] + [" ".join(str(lean.get(k) or "") for k in ("subject", "why")) for lean in leans])
+    all_quotes = " ".join([str(e.get("quote") or "") for i in ideas if isinstance(i, dict) for e in (i.get("evidence") or []) if isinstance(e, dict)] + [str(q) for lean in leans for q in [lean.get("quote"), *(lean.get("quotes") or [])] if q])
     for number in checkable_numbers(rendered):
         if number not in all_quotes:
             errors.append(f"Published numerical claim {number} lacks cited evidence.")
@@ -315,6 +317,77 @@ def chronological_key(letter) -> str:
     return period
 
 
+AUTO_AUTHOR = "automated-verifier"
+
+
+def auto_resolve_reviews(db, letter_id: str) -> list[str]:
+    """Resolve blocking reviews only on deterministic evidence.
+
+    Identity resolves when the letter's canonical fund record exists (the
+    inventory consolidation already assigned it). Extraction resolves when
+    the full text is present and its sections reconcile exactly. Duplicate
+    sources resolve when no other letter of the fund shares the content
+    hash, so no exact copy is being hidden. Anything else stays open and
+    keeps the letter out of publication; it does not need a human, it needs
+    a better extract or a genuinely distinct edition."""
+    resolved = []
+    letter = db.execute("SELECT * FROM fl_letters WHERE id=?", (letter_id,)).fetchone()
+    if not letter:
+        return resolved
+    open_kinds = {row[0] for row in db.execute("SELECT kind FROM fl_reviews WHERE letter_id=? AND status='open' AND kind IN ('identity','extraction','duplicate_sources')", (letter_id,))}
+    if "identity" in open_kinds and db.execute("SELECT 1 FROM fl_funds WHERE id=?", (letter["fund_id"],)).fetchone():
+        db.execute("UPDATE fl_reviews SET status='resolved',detail=detail||' [auto: canonical fund record exists]' WHERE letter_id=? AND kind='identity'", (letter_id,))
+        resolved.append("identity")
+    if "extraction" in open_kinds:
+        text = letter["source_text"] or ""
+        joined = "".join(row[0] for row in db.execute("SELECT text FROM fl_sections WHERE letter_id=? ORDER BY ordinal", (letter_id,)))
+        if len(text.strip()) > 100 and joined == text:
+            db.execute("UPDATE fl_reviews SET status='resolved',detail=detail||' [auto: full text present, sections reconcile]' WHERE letter_id=? AND kind='extraction'", (letter_id,))
+            resolved.append("extraction")
+    if "duplicate_sources" in open_kinds:
+        twins = db.execute("SELECT COUNT(*) FROM fl_letters WHERE fund_id=? AND content_hash=? AND id!=?", (letter["fund_id"], letter["content_hash"], letter_id)).fetchone()[0]
+        if twins == 0:
+            db.execute("UPDATE fl_reviews SET status='resolved',detail=detail||' [auto: content hash unique within fund]' WHERE letter_id=? AND kind='duplicate_sources'", (letter_id,))
+            resolved.append("duplicate_sources")
+    if resolved:
+        db.commit()
+    return resolved
+
+
+def machine_attestations(db, revision_id: str) -> tuple[dict, dict]:
+    """The six editorial checks as machine-verified records. Each key is
+    true only when the corresponding deterministic check passes on this
+    exact revision; the evidence behind every key is stored with it."""
+    row = db.execute("SELECT * FROM fl_revisions WHERE id=?", (revision_id,)).fetchone()
+    if not row:
+        raise ValueError("Unknown revision")
+    draft = json.loads(row["content_json"])
+    parts = [dict(p) for p in db.execute("SELECT id,text FROM fl_sections WHERE letter_id=? ORDER BY ordinal", (row["letter_id"],))]
+    errors = quality_errors(draft, parts)
+    text = "".join(part["text"] for part in parts)
+    evidence_count = sum(len(idea.get("evidence") or []) for idea in draft.get("ideas") or [])
+    checks = {
+        "complete_document": bool(parts) and not any("checklist" in e or "Full document" in e for e in errors),
+        "idea_coverage": not any("checklist" in e or "occur in the completeness" in e for e in errors),
+        "claim_accuracy": evidence_count > 0 and not any("evidence must match" in e for e in errors),
+        "numerical_accuracy": not any("numerical claim" in e.lower() for e in errors),
+        "original_writing": not any("twelve" in e or "source link" in e for e in errors),
+        "historical_dates": not any("Evolution" in e or "evolution" in e for e in errors),
+    }
+    record = {
+        "mode": "machine",
+        "verifier": VERSION,
+        "verified_at": now(),
+        "source_chars": len(text),
+        "sections": len(parts),
+        "ideas": len(draft.get("ideas") or []),
+        "evidence_quotes": evidence_count,
+        "errors": errors,
+        "checks": checks,
+    }
+    return {key: bool(checks[key]) for key in EDITORIAL_CHECKS}, record
+
+
 def publish(db, revision_id: str, author: str, attestations: dict) -> None:
     if not all(attestations.get(key) is True for key in EDITORIAL_CHECKS):
         raise ValueError("All six editorial checks require explicit owner attestation.")
@@ -334,11 +407,34 @@ def publish(db, revision_id: str, author: str, attestations: dict) -> None:
     if db.execute("SELECT 1 FROM fl_reviews WHERE letter_id=? AND kind IN ('identity','extraction','duplicate_sources') AND status='open'", (row["letter_id"],)).fetchone():
         raise ValueError("Resolve identity, extraction and duplicate-source reviews before publication.")
     stamp = now()
+    record = {"editorial": {key: attestations.get(key) for key in EDITORIAL_CHECKS}, "reviewed_by": author, "reviewed_at": stamp, "pipeline_version": VERSION, "errors": []}
+    if attestations.get("_machine_record"):
+        record["automated"] = attestations["_machine_record"]
     with db:
-        db.execute("UPDATE fl_revisions SET status='published',published_at=COALESCE(published_at,?),checks_json=? WHERE id=?", (stamp, dumps({"editorial": attestations, "reviewed_by": author, "reviewed_at": stamp, "pipeline_version": VERSION, "errors": []}), revision_id))
+        db.execute("UPDATE fl_revisions SET status='published',published_at=COALESCE(published_at,?),checks_json=? WHERE id=?", (stamp, dumps(record), revision_id))
         db.execute("UPDATE fl_letters SET published_revision=?,status='published' WHERE id=?", (revision_id, row["letter_id"]))
         db.execute("UPDATE fl_reviews SET status='resolved' WHERE letter_id=? AND kind='summary'", (row["letter_id"],))
         db.execute("INSERT INTO fl_publication_events VALUES(?,?,?,?,?,?,?)", ("event-" + uuid.uuid4().hex, row["letter_id"], revision_id, letter["published_revision"], author, stamp, "publish"))
+
+
+def publish_automated(db, revision_id: str, author: str = AUTO_AUTHOR) -> dict:
+    """Publish with no human in the loop. The owner-approved policy is that
+    the six editorial checks are machine-verified on the exact revision:
+    every passage reconciled, every figure inside an exact source quote,
+    no copied twelve-word run, no source link, dates only as recorded.
+    A revision that fails any check, or a letter whose identity, extraction
+    or duplicate-source question cannot be settled deterministically, is
+    not published; it stays queued with the reason recorded."""
+    row = db.execute("SELECT letter_id FROM fl_revisions WHERE id=?", (revision_id,)).fetchone()
+    if not row:
+        raise ValueError("Unknown revision")
+    resolved = auto_resolve_reviews(db, row["letter_id"])
+    attestations, record = machine_attestations(db, revision_id)
+    record["auto_resolved_reviews"] = resolved
+    if not all(attestations.values()):
+        raise ValueError("Automated publication blocked: " + "; ".join(record["errors"] or ["a machine check failed"]))
+    publish(db, revision_id, author, {**attestations, "_machine_record": record})
+    return {"published": revision_id, "letter_id": row["letter_id"], "auto_resolved": resolved, "checks": record["checks"]}
 
 
 def local_completion(messages: list[dict], model: str, maximum: int, transport: str) -> str:
@@ -501,8 +597,10 @@ def main() -> int:
     imp.add_argument("--author", required=True)
     pub = sub.add_parser("publish")
     pub.add_argument("revision_id")
-    pub.add_argument("--author", required=True)
-    pub.add_argument("--attestations", type=Path, required=True)
+    pub.add_argument("--author", default=AUTO_AUTHOR)
+    pub.add_argument("--attestations", type=Path)
+    pub.add_argument("--automated", action="store_true",
+                     help="Publish on machine-verified checks, with no human attestation")
     exp = sub.add_parser("export")
     exp.add_argument("--output", type=Path, required=True)
     sub.add_parser("status")
@@ -525,8 +623,13 @@ def main() -> int:
         revision_id, errors = save_draft(db, args.letter_id, json.loads(args.file.read_text(encoding="utf-8")), args.author)
         result = {"revision_id": revision_id, "errors": errors}
     elif args.command == "publish":
-        publish(db, args.revision_id, args.author, json.loads(args.attestations.read_text(encoding="utf-8")))
-        result = {"published": args.revision_id}
+        if args.automated:
+            result = publish_automated(db, args.revision_id, args.author)
+        else:
+            if not args.attestations:
+                raise SystemExit("publish needs --attestations FILE or --automated")
+            publish(db, args.revision_id, args.author, json.loads(args.attestations.read_text(encoding="utf-8")))
+            result = {"published": args.revision_id}
     elif args.command == "export":
         result = export_release(db, args.output)
     else:

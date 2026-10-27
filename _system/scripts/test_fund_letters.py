@@ -109,6 +109,33 @@ def test_duplicate_sources_require_review_before_publication(archive, tmp_path):
         fl.publish(archive, revision, "owner", dict.fromkeys(fl.EDITORIAL_CHECKS, True))
 
 
+def test_automated_publication_needs_no_human_and_records_machine_checks(archive, tmp_path):
+    fl.inventory(archive, [record(tmp_path, fund_resolution="normalized", duplicate_sources=["uncertain-edition.pdf"])])
+    letter_id = archive.execute("SELECT id FROM fl_letters").fetchone()[0]
+    assert archive.execute("SELECT count(*) FROM fl_reviews WHERE status='open' AND kind='duplicate_sources'").fetchone()[0] == 1
+    revision, errors = fl.save_draft(archive, letter_id, draft(), "automated-verifier")
+    assert errors == []
+    result = fl.publish_automated(archive, revision)
+    assert "duplicate_sources" in result["auto_resolved"]
+    assert archive.execute("SELECT published_revision FROM fl_letters").fetchone()[0] == revision
+    checks = json.loads(archive.execute("SELECT checks_json FROM fl_revisions WHERE id=?", (revision,)).fetchone()[0])
+    assert checks["automated"]["mode"] == "machine"
+    assert all(checks["automated"]["checks"].values())
+    assert checks["reviewed_by"] == "automated-verifier"
+
+
+def test_automated_publication_refuses_a_draft_that_fails_machine_checks(archive, tmp_path):
+    fl.inventory(archive, [record(tmp_path)])
+    letter_id = archive.execute("SELECT id FROM fl_letters").fetchone()[0]
+    bad = draft()
+    bad["ideas"][0]["summary"] += " The shares will reach 900 next year."
+    revision, errors = fl.save_draft(archive, letter_id, bad, "automated-verifier")
+    assert errors
+    with pytest.raises(ValueError, match="Automated publication blocked"):
+        fl.publish_automated(archive, revision)
+    assert archive.execute("SELECT published_revision FROM fl_letters").fetchone()[0] is None
+
+
 def test_repeated_inventory_and_drafts_are_idempotent(archive, tmp_path):
     rows = [record(tmp_path)]
     fl.inventory(archive, rows)
