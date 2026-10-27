@@ -527,12 +527,18 @@ def build_dashboard(names: dict[str, str], threshold_pct: float | None = None) -
             if rows:
                 latest[csv_path.stem] = (quarter_dir.name, rows)
     changes_by_key: dict[tuple[str, str, str], dict] = {}
+    reported_by_manager: dict[tuple[str, str], list[dict]] = {}
     if CHANGES.exists():
         for path in sorted(CHANGES.glob("*.json")):
             payload = json.loads(path.read_text(encoding="utf-8"))
             for change in payload.get("changes") or []:
                 ticker = (change.get("ssi_ticker") or change.get("ticker") or "").upper()
-                changes_by_key[(change.get("manager_id"), ticker, change.get("quarter") or "")] = change
+                owner = change.get("manager_id") or ""
+                quarter_key = change.get("quarter") or ""
+                if ticker:
+                    changes_by_key[(owner, ticker, quarter_key)] = change
+                if owner and quarter_key:
+                    reported_by_manager.setdefault((owner, quarter_key), []).append(change)
     managers = {
         row["manager_id"]: row
         for row in json.loads(MANAGERS_PATH.read_text(encoding="utf-8")).get("managers") or []
@@ -616,7 +622,17 @@ def build_dashboard(names: dict[str, str], threshold_pct: float | None = None) -
         + "\n",
         encoding="utf-8",
     )
-    _write_manager_views(latest, managers, names, changes_by_key, threshold_pct)
+    _write_manager_views(latest, managers, names, changes_by_key, reported_by_manager, threshold_pct)
+
+
+def _change_view(change: dict) -> dict:
+    return {
+        "ticker": (change.get("ssi_ticker") or change.get("ticker") or ""),
+        "issuer": change.get("issuer") or "",
+        "cusip": change.get("cusip") or "",
+        "change_type": change.get("change_type"),
+        "shares_delta_pct": change.get("shares_delta_pct"),
+    }
 
 
 def _write_manager_views(
@@ -624,6 +640,7 @@ def _write_manager_views(
     managers: dict,
     names: dict[str, str],
     changes_by_key: dict,
+    reported_by_manager: dict,
     threshold_pct: float | None = None,
 ) -> None:
     """Manager pages, a changes feed, and ideas that are not in the SSI book."""
@@ -675,6 +692,7 @@ def _write_manager_views(
                 }
             )
         own_changes = [change for change in all_changes if change["ticker"] in names]
+        reported = [_change_view(change) for change in reported_by_manager.get((manager_id, quarter), [])]
         page = {
             "schema_version": 1,
             "in_base_irr": False,
@@ -699,7 +717,7 @@ def _write_manager_views(
             "ssi_changes": own_changes[:40],
         }
         if watchlist:
-            page["changes"] = all_changes
+            page["changes"] = reported
         (BY_MANAGER / f"{manager_id}.json").write_text(json.dumps(page) + "\n", encoding="utf-8")
         if quarter != feed_quarter:
             continue
@@ -708,7 +726,7 @@ def _write_manager_views(
             if change.get("change_type") in {"new", "add"}:
                 consensus.setdefault(change["ticker"], []).append(name)
         if watchlist:
-            for change in all_changes:
+            for change in reported:
                 watchlist_feed.append({"manager_id": manager_id, "name": name, **change})
         new_outside = {change["ticker"] for change in all_changes if change.get("change_type") == "new" and change["ticker"] not in names}
         for row in equity:
