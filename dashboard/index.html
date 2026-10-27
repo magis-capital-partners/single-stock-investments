@@ -1985,8 +1985,8 @@
 <script src="search-match.js"></script>
 <script src="energy-model-viz.js?v=20261015-energy"></script>
 <script src="insights-viz.js?v=20261020-relevance"></script>
-<link rel="stylesheet" href="fund-letters/reader.css?v=1">
-<script src="fund-letters/reader.js?v=1"></script>
+<link rel="stylesheet" href="fund-letters/reader.css?v=2">
+<script src="fund-letters/reader.js?v=2"></script>
 <script src="valuation-viz.js?v=20261027-market-sync"></script>
 <script src="market-sessions.js?v=20261023"></script>
 <script src="market-risk-data.js?v=20261023"></script>
@@ -4297,11 +4297,23 @@ function renderInsights(opts = {}) {
     if (loading) loading.style.display = 'none';
     if (content) {
       content.style.display = 'block';
-      content.innerHTML = '<nav class="source-pills" aria-label="Insights sections">' + [['letters','Fund Letters'],['consensus','Consensus'],['managers','Managers'],['funds','Funds'],['podcasts','Podcasts'],['videos','Videos'],['documents','Documents'],['tickers','Ticker insights'],['sources','Data status']].map(([id,title]) => `<button type="button" class="filter-btn${id === 'letters' ? ' active' : ''}" data-reader-section="${id}">${title}</button>`).join('') + '</nav><div data-reader-root></div>';
+      const navGroups = [
+        ['Signals', [['events', 'What changed'], ['inflections', 'Inflections'], ['index_watch', 'Index Watch']]],
+        ['Sources', [['letters', 'Letters'], ['podcasts', 'Podcasts'], ['videos', 'Videos'], ['funds', 'Funds'], ['documents', 'PDF library']]],
+        ['Synthesis', [['consensus', 'Consensus'], ['managers', 'Managers'], ['tickers', 'Ticker insights']]],
+        ['Memory & health', [['memory', 'Research memory'], ['sources', 'Pipeline status']]],
+      ];
+      content.innerHTML = '<h2 style="font-size:18px;margin-bottom:6px">Insights</h2>'
+        + '<nav class="insights-section-groups" id="insights-section-tabs" aria-label="Insights workbench" style="margin-bottom:12px">'
+        + navGroups.map(([groupLabel, items]) => `<div class="insights-section-group"><span>${groupLabel}</span><div>`
+          + items.map(([id, title]) => `<button type="button" class="view-tab${id === 'letters' ? ' active' : ''}" data-insights-section="${id}" data-reader-section="${id}">${title}</button>`).join('')
+          + '</div></div>').join('')
+        + '</nav><div data-reader-root></div>';
       content.querySelectorAll('[data-reader-section]').forEach(button => button.addEventListener('click', () => {
         insightsSection = button.dataset.readerSection;
         selectedFundId = null;
         try { localStorage.setItem(INSIGHTS_SECTION_KEY, insightsSection); } catch (_) { /* unavailable */ }
+        syncRouteHash();
         renderInsights();
       }));
       FundLettersReader.mount(content.querySelector('[data-reader-root]'), { embedded: true });

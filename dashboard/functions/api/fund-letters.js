@@ -1,6 +1,6 @@
 import { privateJson, requireHumanViewer } from "../_lib/auth.js";
 import { requireDatabase } from "../_lib/http.js";
-import { EDITORIAL_CHECKS, LETTER_SORT_SQL, pageArgs, readerArchiveEntry, readerFund, readerLetter, readerSearchResult, searchWhere, sourceSections, validateDraft } from "../_lib/fund-letters.js";
+import { EDITORIAL_CHECKS, LETTER_SORT_SQL, letterWhere, pageArgs, readerArchiveEntry, readerFund, readerLetter, readerPeriod, readerSearchResult, searchWhere, sourceSections, validateDraft } from "../_lib/fund-letters.js";
 
 const all = async (db, sql, args = []) => (await db.prepare(sql).bind(...args).all()).results || [];
 const first = (db, sql, args = []) => db.prepare(sql).bind(...args).first();
@@ -33,29 +33,36 @@ export async function onRequestGet(context) {
     const db = requireDatabase(context.env);
     const { offset, limit } = pageArgs(params);
     if (action === "funds") {
-      const rows = await all(db, `SELECT f.id,f.name,f.manager,f.strategy,COUNT(l.id) letter_count,
-        (SELECT COALESCE(l.letter_date,l.reporting_period) FROM fl_letters l WHERE l.fund_id=f.id AND l.published_revision IS NOT NULL ORDER BY ${LETTER_SORT_SQL} DESC,l.id LIMIT 1) latest
-        FROM fl_funds f JOIN fl_letters l ON l.fund_id=f.id AND l.published_revision IS NOT NULL GROUP BY f.id ORDER BY f.name,f.id`);
-      return privateJson({ funds: rows.map(readerFund) });
+      const [rows, periodRows] = await Promise.all([
+        all(db, `SELECT f.id,f.name,f.manager,f.strategy,COUNT(l.id) letter_count,
+          (SELECT COALESCE(NULLIF(l.reporting_period,''),l.letter_date) FROM fl_letters l WHERE l.fund_id=f.id AND l.published_revision IS NOT NULL ORDER BY ${LETTER_SORT_SQL} DESC,l.id LIMIT 1) latest
+          FROM fl_funds f JOIN fl_letters l ON l.fund_id=f.id AND l.published_revision IS NOT NULL GROUP BY f.id ORDER BY f.name,f.id`),
+        all(db, `SELECT reporting_period,COUNT(id) letter_count FROM fl_letters WHERE published_revision IS NOT NULL AND reporting_period IS NOT NULL AND reporting_period!='' GROUP BY reporting_period ORDER BY reporting_period DESC`),
+      ]);
+      return privateJson({ funds: rows.map(readerFund), periods: periodRows.map(readerPeriod).filter(p => p.period) });
     }
     if (action === "archive") {
       const letters = await all(db, `SELECT id,reporting_period,letter_date FROM fl_letters l WHERE fund_id=? AND published_revision IS NOT NULL ORDER BY ${LETTER_SORT_SQL} DESC,id`, [params.get("fund")]);
       return privateJson({ letters: letters.map(readerArchiveEntry) });
     }
     if (action === "letters") {
-      const fund = params.get("fund");
-      if (!fund) return privateJson({ error: "Choose a fund." }, 400);
-      // Optional letter pin makes any search hit/deep link directly reachable, regardless of age.
-      const pinned = params.get("letter");
+      const where = letterWhere(params);
       const rows = await all(db, `SELECT l.id,l.fund_id,f.name fund,l.reporting_period,l.letter_date,l.publication_date,
         r.id revision_id,r.overview,r.created_at,r.published_at,r.content_json FROM fl_letters l JOIN fl_funds f ON f.id=l.fund_id
-        JOIN fl_revisions r ON r.id=l.published_revision WHERE l.fund_id=? ${pinned ? "AND l.id=?" : ""}
-        ORDER BY ${LETTER_SORT_SQL} DESC,l.id LIMIT ? OFFSET ?`, pinned ? [fund, pinned, limit+1, offset] : [fund, limit+1, offset]);
+        JOIN fl_revisions r ON r.id=l.published_revision WHERE ${where.sql}
+        ORDER BY ${LETTER_SORT_SQL} DESC,l.id LIMIT ? OFFSET ?`, [...where.args, limit+1, offset]);
       const page = rows.slice(0, limit);
       const letters = await Promise.all(page.map(async row => {
-        let stance = null;
-        try { stance = JSON.parse(row.content_json || "{}").stance || null; } catch { stance = null; }
-        return readerLetter(row, await all(db, "SELECT * FROM fl_ideas WHERE letter_id=? AND revision_id=? ORDER BY ordinal", [row.id, row.revision_id]), stance);
+        let stance = null, headline = null;
+        try {
+          const parsed = JSON.parse(row.content_json || "{}");
+          stance = parsed.stance || null;
+          headline = parsed.headline || null;
+        } catch {
+          stance = null;
+          headline = null;
+        }
+        return readerLetter(row, await all(db, "SELECT * FROM fl_ideas WHERE letter_id=? AND revision_id=? ORDER BY ordinal", [row.id, row.revision_id]), stance, headline);
       }));
       return privateJson({ letters, next_offset: rows.length > limit ? offset+limit : null });
     }
