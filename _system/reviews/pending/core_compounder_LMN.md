@@ -1,7 +1,7 @@
 # Core compounder review: LMN
 
 Research only; pending human review.
-Proposal: `tci-f799d0522f8bb189348a`
+Proposal: `tci-37712847f4bf1362f4e0`
 
 ## Evidence and underwriting gaps
 

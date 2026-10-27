@@ -1,10 +1,14 @@
 # Core compounder review: TPL
 
 Research only; pending human review.
-Proposal: `tci-4e33fcfa2110183366af`
+Proposal: `tci-86121b021caf15b31d95`
 
 ## Evidence and underwriting gaps
 
+- Confirm tract-level NRA roll-forward before narrowing visible vs dormant inventory bands. — TPL/research/thesis_card.json (as of 2026-07-15; inference)
+- Separate maintenance and growth water capital when disclosure permits. — TPL/research/thesis_card.json (as of 2026-07-15; inference)
+- Post-Horizon Kinetics governance and incentive alignment (LCI Substack cited; not in base IRR). — TPL/research/thesis_card.json (as of 2026-07-15; inference)
+- Review pending VIC PDF before any third-party numeric promotion. — TPL/research/thesis_card.json (as of 2026-07-15; inference)
 - Owner cash, reinvestment economics, or competitive position remains below the low-case path for two reporting periods. — TPL/research/falsifier_specs.json (as of 2026-08-10T10:40:30-04:00; inference)
 - A directly comparable transaction or asset-specific impairment supports a value below the low-case unit mark after like-for-like adjustments. — TPL/research/falsifier_specs.json (as of 2026-08-10T10:40:30-04:00; inference)
 - Owner cash, reinvestment economics, or competitive position remains below the low-case path for two reporting periods. — TPL/research/falsifier_specs.json (as of 2026-08-10T10:40:30-04:00; inference)

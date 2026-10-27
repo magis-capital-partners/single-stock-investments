@@ -1,10 +1,15 @@
 # Core compounder review: CPRT
 
 Research only; pending human review.
-Proposal: `tci-719d3cca6afab758f6e8`
+Proposal: `tci-9607542adaa0baff2084`
 
 ## Evidence and underwriting gaps
 
+- Confirm live price before sizing adds — CPRT/research/thesis_card.json (as of 2026-07-20; inference)
+- Approve comp-based land roll-up before promoting overlay into stance — CPRT/research/thesis_card.json (as of 2026-07-20; inference)
+- Assessor tie-out: yards 151, 59, 148 (recorded purchases) plus Phoenix/Houston/Denver assumption acres — CPRT/research/thesis_card.json (as of 2026-07-20; inference)
+- Close registry gap to 281 facilities (international scrape) — CPRT/research/thesis_card.json (as of 2026-07-20; inference)
+- Override watch → **core** documented: quality + dhando full despite <15% IRR at de-rated price — CPRT/research/thesis_card.json (as of 2026-07-20; inference)
 - {'persona': 'hohn', 'label': 'Chris Hohn / TCI', 'verdict': 'watch', 'return_pct': 0.12, 'key_metric': 'fcf_yield=None', 'conviction': 0.744, 'falsifier': 'FCF yield < 0.5% or commoditized archetype (turnaround/optionality only)'} — CPRT/research/valuation.json#lens_consensus (as of 2026-07-20; opinion)
 - {'persona': 'klarman_asset_value', 'label': 'Klarman / Baupost', 'verdict': 'watch', 'return_pct': 0.12, 'key_metric': 'asset_nav_per_share=None', 'conviction': 0.744, 'falsifier': 'Asset value lacks an independently evidenced realization path or is already capitalized in operating cash flow.'} — CPRT/research/valuation.json#lens_consensus (as of 2026-07-20; opinion)
 - {'persona': 'lawrence', 'label': 'Lawrence (house IRR)', 'verdict': 'watch', 'return_pct': 0.12, 'key_metric': 'synthesis_pct=None', 'conviction': 0.744, 'falsifier': 'Synthesis incomplete or irr_method pending'} — CPRT/research/valuation.json#lens_consensus (as of 2026-07-20; opinion)
@@ -14,3 +19,4 @@ Proposal: `tci-719d3cca6afab758f6e8`
 - Insurance assignment volumes, yard throughput, or auction service revenue per unit deteriorate enough that normalized owner earnings fall below the low-case path for two consecutive reporting periods. — CPRT/research/falsifier_specs.json (as of 2026-09-01T23:00:00Z; inference)
 - Tracked lens-investor history must be reconciled; existing specialist signals do not establish Hohn coverage. — _system/lenses/personas.json (as of None; inference)
 - The strongest sourced bear argument is not available through latest.json. — CPRT/research/latest.json (as of 2026-07-20; opinion)
+- Issuer operating periods postdate the model; reconcile them with its assumptions. — _system/reference/market-data/operating_kpis/CPRT.json (as of 2026-10-27; inference)

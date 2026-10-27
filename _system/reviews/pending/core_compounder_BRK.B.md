@@ -1,7 +1,7 @@
 # Core compounder review: BRK.B
 
 Research only; pending human review.
-Proposal: `tci-8575cc5eb728c995e5d8`
+Proposal: `tci-7f70c764d1157f896624`
 
 ## Evidence and underwriting gaps
 
