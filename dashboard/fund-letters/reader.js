@@ -48,14 +48,6 @@
     return `<span class="fl-badge fl-badge--${escape(tone)}${extraClass ? ' ' + extraClass : ''}">${escape(text)}</span>`;
   }
 
-  function ideaMetaBadges(item) {
-    const out = [];
-    if (item.idea_type) out.push(badgeHtml(label(item.idea_type), typeTone(item.idea_type)));
-    if (item.ticker) out.push(`<span class="fl-ticker">${escape(item.ticker)}</span>`);
-    if (item.activity && item.activity !== 'hold') out.push(badgeHtml(label(item.activity), activityTone(item.activity)));
-    return out.join('');
-  }
-
   async function api(args, payload) {
     const response = await fetch('/api/fund-letters?' + new URLSearchParams(args), {
       cache: 'no-store',
@@ -73,9 +65,13 @@
     states.get(root)?.dispose();
     const embedded = Boolean(options.embedded);
     let params = new URLSearchParams(embedded ? sessionStorage.getItem('fl-reader-state') || '' : location.search);
-    let funds = [], periods = [], role = 'reader', next = null, loading = false, sequence = 0, disposed = false, observer, pages = 0, restoring = false;
+    let funds = [], periods = [], tickerSignals = [], role = 'reader', next = null, loading = false, sequence = 0, disposed = false, observer, pages = 0, restoring = false;
     let dirSort = 'recent';
     let searchTimer = null;
+    const bookSet = new Set((options.bookTickers || []).map(t => String(t || '').trim().toUpperCase()).filter(Boolean));
+    const watchlistSet = new Set((options.watchlistTickers || []).map(t => String(t || '').trim().toUpperCase()).filter(Boolean));
+    const tickerStatsMap = new Map();
+
     const abort = new AbortController();
     const controller = {
       dispose() {
@@ -108,9 +104,26 @@
           <button type="button" class="fl-view-tab" data-view-mode="ideas">Ideas &amp; Theses</button>
         </div>
         <form class="fl-filters" role="search">
-          <label class="fl-search-field">
-            <span class="fl-sr-only">Company, ticker, fund or investment argument</span>
-            <input name="q" type="search" placeholder="Search company, ticker, fund, or argument…" autocomplete="off">
+          <div class="fl-search-field">
+            <label class="fl-sr-only" for="fl-search-input">Company, ticker, fund or investment argument</label>
+            <input id="fl-search-input" name="q" type="search" placeholder="Search company, ticker, or try ticker:TK type:short action:new focus:macro…" autocomplete="off">
+            <div class="fl-search-suggest" hidden role="listbox" aria-label="Search suggestions"></div>
+          </div>
+          <label class="fl-compact-field">
+            <span class="fl-sr-only">Signal or overlap</span>
+            <select name="signal" aria-label="Signal or overlap">
+              <option value="">All signals</option>
+              <optgroup label="Cross-fund signals">
+                <option value="multi">2+ funds discussing</option>
+                <option value="battleground">Long vs. Short battleground</option>
+                <option value="evolution">Updated vs. prior letter</option>
+              </optgroup>
+              <optgroup label="Letter focus">
+                <option value="focus:micro">Micro / stock-picking focus</option>
+                <option value="focus:macro">Macro / regime focus</option>
+                <option value="focus:mixed">Mixed focus</option>
+              </optgroup>
+            </select>
           </label>
           <label class="fl-compact-field">
             <span class="fl-sr-only">Period</span>
@@ -161,6 +174,7 @@
         </form>
         ${embedded ? '<div class="fl-owner-tools"></div>' : ''}
       </div>
+      <div class="fl-active-filters" hidden aria-label="Active filters"></div>
       <div class="fl-grid">
         <aside class="fl-directory" aria-label="Fund directory">
           <div class="fl-directory-head">
@@ -182,6 +196,9 @@
 
     const reading = root.querySelector('.fl-reading');
     const form = root.querySelector('form.fl-filters');
+    const searchInput = form.elements.q;
+    const suggestBox = root.querySelector('.fl-search-suggest');
+    const activeFiltersBar = root.querySelector('.fl-active-filters');
     const directory = root.querySelector('.fl-directory');
     const dialog = root.querySelector('dialog');
     const resetBtn = form.querySelector('[data-reset]');
@@ -193,6 +210,28 @@
       }
     };
 
+    function ideaMetaBadges(item) {
+      const out = [];
+      if (item.idea_type) out.push(badgeHtml(label(item.idea_type), typeTone(item.idea_type)));
+      if (item.ticker) {
+        const sym = String(item.ticker).trim().toUpperCase();
+        out.push(`<button type="button" class="fl-ticker" data-pick-ticker="${escape(sym)}" title="Filter by ${escape(sym)}">${escape(sym)}</button>`);
+        if (role === 'owner' && bookSet.has(sym)) {
+          out.push(badgeHtml('In book', 'add'));
+        } else if (role === 'owner' && watchlistSet.has(sym)) {
+          out.push(badgeHtml('Watchlist', 'macro'));
+        }
+        const sig = tickerStatsMap.get(sym);
+        if (sig?.battleground) {
+          out.push(badgeHtml(`Battleground (${sig.bull_count}▲ ${sig.bear_count}▼)`, 'warn'));
+        } else if (sig?.multi_fund) {
+          out.push(badgeHtml(`${sig.fund_count} funds`, 'special'));
+        }
+      }
+      if (item.activity && item.activity !== 'hold') out.push(badgeHtml(label(item.activity), activityTone(item.activity)));
+      return out.join('');
+    }
+
     function activeViewMode() {
       if (params.get('mode') === 'review' && role === 'owner') return 'review';
       if (params.get('view') === 'ideas') return 'ideas';
@@ -200,7 +239,79 @@
     }
 
     function hasFilters() {
-      return ['q', 'type', 'activity', 'period', 'from', 'to'].some(k => params.get(k));
+      return ['q', 'type', 'activity', 'period', 'from', 'to', 'signal', 'focus', 'tickers'].some(k => params.get(k));
+    }
+
+    function populateSignalSelect() {
+      const select = form.elements.signal;
+      if (!select) return;
+      const multiCount = tickerSignals.filter(t => t.multi_fund).length;
+      const battleCount = tickerSignals.filter(t => t.battleground).length;
+      const ownerOptgroup = role === 'owner' && (bookSet.size || watchlistSet.size)
+        ? `<optgroup label="Portfolio &amp; Watchlist">
+            ${bookSet.size ? `<option value="scope:book">In our book (${bookSet.size} tickers)</option>` : ''}
+            ${watchlistSet.size ? `<option value="scope:watchlist">On watchlist (${watchlistSet.size} tickers)</option>` : ''}
+            ${(bookSet.size && watchlistSet.size) ? `<option value="scope:universe">Full research universe</option>` : ''}
+          </optgroup>`
+        : '';
+      select.innerHTML = `<option value="">All signals</option>
+        ${ownerOptgroup}
+        <optgroup label="Cross-fund signals">
+          <option value="multi">2+ funds discussing${multiCount ? ` (${multiCount} tickers)` : ''}</option>
+          <option value="battleground">Long vs. Short battleground${battleCount ? ` (${battleCount} tickers)` : ''}</option>
+          <option value="evolution">Updated vs. prior letter</option>
+        </optgroup>
+        <optgroup label="Letter focus">
+          <option value="focus:micro">Micro / stock-picking focus</option>
+          <option value="focus:macro">Macro / regime focus</option>
+          <option value="focus:mixed">Mixed focus</option>
+        </optgroup>`;
+      const currentSignal = params.get('signal') || (params.get('focus') ? `focus:${params.get('focus')}` : '') || (params.get('scope') ? `scope:${params.get('scope')}` : '');
+      select.value = currentSignal;
+    }
+
+    function renderActiveFilterPills() {
+      if (!activeFiltersBar) return;
+      const pills = [];
+      if (params.get('fund')) {
+        const fn = funds.find(f => f.id === params.get('fund'))?.name || params.get('fund');
+        pills.push({ key: 'fund', label: `Fund: ${fn}` });
+      }
+      if (params.get('scope')) {
+        const scopeNames = { book: 'In our book', watchlist: 'On watchlist', universe: 'Research universe' };
+        pills.push({ key: 'scope', label: `Portfolio: ${scopeNames[params.get('scope')] || params.get('scope')}` });
+      }
+      if (params.get('signal')) {
+        const sigNames = { multi: '2+ funds discussing', battleground: 'Long vs. Short battleground', evolution: 'Updated vs. prior letter' };
+        pills.push({ key: 'signal', label: `Signal: ${sigNames[params.get('signal')] || params.get('signal')}` });
+      }
+      if (params.get('focus')) {
+        pills.push({ key: 'focus', label: `Focus: ${params.get('focus')}` });
+      }
+      if (params.get('tickers')) {
+        pills.push({ key: 'tickers', label: `Ticker: ${params.get('tickers')}` });
+      }
+      if (params.get('period')) {
+        pills.push({ key: 'period', label: `Period: ${params.get('period')}` });
+      }
+      if (params.get('type')) {
+        pills.push({ key: 'type', label: `Type: ${label(params.get('type'))}` });
+      }
+      if (params.get('activity')) {
+        pills.push({ key: 'activity', label: `Action: ${label(params.get('activity'))}` });
+      }
+      if (params.get('q')) {
+        pills.push({ key: 'q', label: `Query: “${params.get('q')}”` });
+      }
+      if (!pills.length) {
+        activeFiltersBar.hidden = true;
+        activeFiltersBar.innerHTML = '';
+        return;
+      }
+      activeFiltersBar.hidden = false;
+      activeFiltersBar.innerHTML = `<span class="fl-active-label">Active filters:</span>`
+        + pills.map(p => `<button type="button" class="fl-filter-pill" data-clear-key="${escape(p.key)}">${escape(p.label)} <span aria-hidden="true">×</span></button>`).join('')
+        + `<button type="button" class="fl-filter-clear-all" data-reset-all>Reset all</button>`;
     }
 
     function syncControlStates() {
@@ -210,8 +321,9 @@
         btn.classList.toggle('is-active', isCurrent);
         btn.setAttribute('aria-selected', String(isCurrent));
       });
-      const anyActive = hasFilters() || Boolean(params.get('fund')) || Boolean(params.get('letter'));
+      const anyActive = hasFilters() || Boolean(params.get('fund')) || Boolean(params.get('letter')) || Boolean(params.get('scope'));
       if (resetBtn) resetBtn.hidden = !anyActive;
+      renderActiveFilterPills();
     }
 
     function populatePeriodSelect() {
@@ -233,6 +345,123 @@
         + (yearOpts ? `<optgroup label="By year">${yearOpts}</optgroup>` : '')
         + (quarterOpts ? `<optgroup label="By quarter">${quarterOpts}</optgroup>` : '');
       select.value = params.get('period') || '';
+    }
+
+    function buildSearchSuggestions(rawInput) {
+      const text = String(rawInput || '');
+      const parts = text.split(/\s+/);
+      const lastToken = parts[parts.length - 1] || '';
+      const prefixText = parts.slice(0, -1).join(' ');
+      const withPrefix = token => (prefixText ? `${prefixText} ${token} ` : `${token} `);
+      const items = [];
+
+      if (!lastToken || !lastToken.includes(':')) {
+        const q = lastToken.toLowerCase();
+        const operators = [
+          { token: 'is:multi', label: 'is:multi', hint: 'Tickers discussed by 2+ funds' },
+          { token: 'is:battleground', label: 'is:battleground', hint: 'Long vs. Short disagreement across funds' },
+          ...(role === 'owner' && bookSet.size ? [{ token: 'is:book', label: 'is:book', hint: `Overlaps our portfolio (${bookSet.size} tickers)` }] : []),
+          { token: 'type:long', label: 'type:long', hint: 'Long equity theses' },
+          { token: 'type:short', label: 'type:short', hint: 'Short equity theses' },
+          { token: 'action:new', label: 'action:new', hint: 'New position initiations' },
+          { token: 'action:exit', label: 'action:exit', hint: 'Closed / exited positions' },
+          { token: 'focus:macro', label: 'focus:macro', hint: 'Macro & regime letters' },
+          { token: 'focus:micro', label: 'focus:micro', hint: 'Stock-picking letters' },
+        ];
+        for (const op of operators) {
+          if (!q || op.token.includes(q) || op.hint.toLowerCase().includes(q)) {
+            items.push({ value: withPrefix(op.token), label: op.label, hint: op.hint });
+          }
+        }
+        if (q.length >= 1) {
+          for (const t of tickerSignals.filter(x => x.ticker.toLowerCase().startsWith(q)).slice(0, 4)) {
+            items.push({
+              value: withPrefix(`ticker:${t.ticker}`),
+              label: `ticker:${t.ticker}`,
+              hint: `${t.fund_count} ${t.fund_count === 1 ? 'fund' : 'funds'}${t.battleground ? ' · Battleground' : ''}`,
+            });
+          }
+          for (const f of funds.filter(x => x.name.toLowerCase().includes(q) || x.id.includes(q)).slice(0, 3)) {
+            items.push({
+              value: withPrefix(`fund:${f.id}`),
+              label: `fund:${f.id}`,
+              hint: `${f.name} (${f.letter_count})`,
+            });
+          }
+        } else {
+          for (const t of tickerSignals.slice(0, 4)) {
+            items.push({
+              value: withPrefix(`ticker:${t.ticker}`),
+              label: `ticker:${t.ticker}`,
+              hint: `${t.fund_count} ${t.fund_count === 1 ? 'fund' : 'funds'}${t.battleground ? ' · Battleground' : ''}`,
+            });
+          }
+        }
+        return items.slice(0, 8);
+      }
+
+      const [rawKey, rawVal = ''] = lastToken.split(':', 2);
+      const key = rawKey.toLowerCase();
+      const val = rawVal.toLowerCase();
+      if (key === 'ticker' || key === 'sym') {
+        for (const t of tickerSignals.filter(x => !val || x.ticker.toLowerCase().startsWith(val)).slice(0, 8)) {
+          items.push({
+            value: withPrefix(`ticker:${t.ticker}`),
+            label: `ticker:${t.ticker}`,
+            hint: `${t.fund_count} ${t.fund_count === 1 ? 'fund' : 'funds'} · ${t.bull_count}▲ ${t.bear_count}▼`,
+          });
+        }
+      } else if (key === 'type') {
+        for (const t of types.filter(x => !val || x.includes(val))) {
+          items.push({ value: withPrefix(`type:${t}`), label: `type:${t}`, hint: label(t) });
+        }
+      } else if (key === 'action' || key === 'activity') {
+        for (const a of ['new', 'add', 'trim', 'exit', 'hold', 'short', 'cover'].filter(x => !val || x.startsWith(val))) {
+          items.push({ value: withPrefix(`action:${a}`), label: `action:${a}`, hint: `Position action: ${a}` });
+        }
+      } else if (key === 'focus') {
+        for (const f of ['micro', 'macro', 'mixed'].filter(x => !val || x.startsWith(val))) {
+          items.push({ value: withPrefix(`focus:${f}`), label: `focus:${f}`, hint: `${label(f)} letter focus` });
+        }
+      } else if (key === 'period' || key === 'quarter' || key === 'year') {
+        for (const p of periods.filter(x => !val || x.period.toLowerCase().startsWith(val)).slice(0, 8)) {
+          items.push({ value: withPrefix(`period:${p.period}`), label: `period:${p.period}`, hint: `${p.count} letters` });
+        }
+      } else if (key === 'fund') {
+        for (const f of funds.filter(x => !val || x.id.includes(val) || x.name.toLowerCase().includes(val)).slice(0, 8)) {
+          items.push({ value: withPrefix(`fund:${f.id}`), label: `fund:${f.id}`, hint: `${f.name} (${f.letter_count})` });
+        }
+      } else if (key === 'is' || key === 'signal') {
+        const sigs = [
+          { id: 'multi', hint: 'Tickers discussed by 2+ funds' },
+          { id: 'battleground', hint: 'Long vs. Short disagreement' },
+          { id: 'evolution', hint: 'Updated thesis vs. prior letter' },
+          ...(role === 'owner' && bookSet.size ? [{ id: 'book', hint: 'Overlaps our portfolio' }] : []),
+        ];
+        for (const s of sigs.filter(x => !val || x.id.startsWith(val))) {
+          items.push({ value: withPrefix(`is:${s.id}`), label: `is:${s.id}`, hint: s.hint });
+        }
+      }
+      return items.slice(0, 8);
+    }
+
+    function renderSuggestions() {
+      if (!suggestBox || document.activeElement !== searchInput) {
+        if (suggestBox) suggestBox.hidden = true;
+        return;
+      }
+      const list = buildSearchSuggestions(searchInput.value);
+      if (!list.length) {
+        suggestBox.hidden = true;
+        return;
+      }
+      suggestBox.hidden = false;
+      suggestBox.innerHTML = `<div class="fl-suggest-head">Smart search tokens <span>click to apply</span></div>`
+        + list.map(item => `
+          <button type="button" class="fl-suggest-item" role="option" data-suggest-val="${escape(item.value)}">
+            <code class="fl-suggest-code">${escape(item.label)}</code>
+            <span class="fl-suggest-hint">${escape(item.hint)}</span>
+          </button>`).join('');
     }
 
     function remember() {
@@ -288,6 +517,53 @@
       form.elements.fund.value = currentFund;
     }
 
+    function renderSignalStrip() {
+      const activeSignal = params.get('signal') || '';
+      const activeScope = params.get('scope') || '';
+      const activeTicker = (params.get('tickers') || '').toUpperCase();
+      let relevant = [];
+      let title = '';
+      if (activeSignal === 'battleground') {
+        relevant = tickerSignals.filter(t => t.battleground);
+        title = 'Battleground tickers (Long vs. Short disagreement across archive)';
+      } else if (activeSignal === 'multi') {
+        relevant = tickerSignals.filter(t => t.multi_fund);
+        title = 'Multi-fund overlap (2+ funds discussing)';
+      } else if (activeScope === 'book' && role === 'owner') {
+        relevant = tickerSignals.filter(t => bookSet.has(t.ticker));
+        title = 'Portfolio holdings discussed in published letters';
+      } else if (activeScope === 'watchlist' && role === 'owner') {
+        relevant = tickerSignals.filter(t => watchlistSet.has(t.ticker));
+        title = 'Watchlist securities discussed in published letters';
+      } else if (!hasFilters() && !params.get('fund')) {
+        relevant = tickerSignals.filter(t => t.multi_fund || t.battleground || (role === 'owner' && bookSet.has(t.ticker))).slice(0, 10);
+        if (relevant.length) title = 'Cross-fund signals & overlap';
+      }
+      if (!relevant.length) return '';
+      return `
+        <section class="fl-signal-strip" aria-label="${escape(title)}">
+          <div class="fl-signal-strip-head">
+            <span class="fl-meta">${escape(title)}</span>
+            ${activeTicker ? `<button type="button" class="fl-btn-ghost" data-pick-ticker="">Show all tickers</button>` : ''}
+          </div>
+          <div class="fl-signal-pills">
+            ${relevant.slice(0, 14).map(t => {
+              const isSelected = activeTicker === t.ticker;
+              const isBook = role === 'owner' && bookSet.has(t.ticker);
+              return `
+                <button type="button"
+                        class="fl-signal-pill${isSelected ? ' is-active' : ''}${t.battleground ? ' is-battleground' : ''}"
+                        data-pick-ticker="${escape(isSelected ? '' : t.ticker)}">
+                  <strong>${escape(t.ticker)}</strong>
+                  <span>${t.fund_count} ${t.fund_count === 1 ? 'fund' : 'funds'}</span>
+                  <small>${t.bull_count}▲ ${t.bear_count}▼</small>
+                  ${isBook ? '<em class="fl-in-book-dot" title="In our book">Book</em>' : ''}
+                </button>`;
+            }).join('')}
+          </div>
+        </section>`;
+    }
+
     function resultHtml(item) {
       return `
         <article class="fl-result">
@@ -311,6 +587,7 @@
       const primaryIdeas = ideas.filter(i => i.idea_type !== 'factual_note');
       const chipIdeas = (primaryIdeas.length ? primaryIdeas : ideas).slice(0, 5);
       const previewParagraph = String(letter.overview || '').split(/\n\s*\n/).filter(Boolean)[0] || '';
+      const hasBookOverlap = role === 'owner' && ideas.some(i => i.ticker && bookSet.has(String(i.ticker).toUpperCase()));
       return `
         <article class="fl-letter-card" id="fl-card-${escape(letter.id)}">
           <header class="fl-letter-card-head">
@@ -318,6 +595,8 @@
               <button type="button" class="fl-fund-tag" data-fund="${escape(letter.fund_id)}">${escape(letter.fund)}</button>
               <span class="fl-period-tag">${escape(letter.reporting_period || 'Undated')}</span>
               ${letter.letter_date ? `<span class="fl-date-inline">${escape(letter.letter_date)}</span>` : ''}
+              ${letter.focus ? badgeHtml(label(letter.focus), letter.focus === 'macro' ? 'macro' : letter.focus === 'mixed' ? 'special' : 'neutral') : ''}
+              ${hasBookOverlap ? badgeHtml('In our book', 'add') : ''}
             </div>
             <div class="fl-letter-card-actions">
               ${role === 'owner' ? `<button type="button" class="fl-btn-ghost" data-source="${escape(letter.id)}">Edit</button>` : ''}
@@ -335,15 +614,19 @@
           ${previewParagraph ? `<p class="fl-letter-card-preview">${escape(previewParagraph)}</p>` : ''}
           ${chipIdeas.length ? `
           <div class="fl-card-ideas" aria-label="Discussed in this letter">
-            ${chipIdeas.map(i => `
-              <a class="fl-idea-chip"
+            ${chipIdeas.map(i => {
+              const sym = i.ticker ? String(i.ticker).toUpperCase() : '';
+              const inBook = role === 'owner' && sym && bookSet.has(sym);
+              return `
+              <a class="fl-idea-chip${inBook ? ' is-book' : ''}"
                  href="${escape(link({ fund: letter.fund_id, letter: letter.id, idea: i.id }))}"
                  data-open-letter="${escape(letter.id)}"
                  data-open-fund="${escape(letter.fund_id)}"
                  data-open-idea="${escape(i.id)}">
-                ${i.ticker ? `<strong class="fl-chip-ticker">${escape(i.ticker)}</strong>` : ''}
+                ${sym ? `<strong class="fl-chip-ticker">${escape(sym)}</strong>` : ''}
                 <span>${escape(i.title)}</span>
-              </a>`).join('')}
+              </a>`;
+            }).join('')}
             ${ideas.length > chipIdeas.length ? `<span class="fl-more-ideas">+${ideas.length - chipIdeas.length} more</span>` : ''}
           </div>` : ''}
         </article>`;
@@ -483,6 +766,36 @@
       }
     }
 
+    function resolveEffectiveQueryArgs() {
+      const args = { ...Object.fromEntries(params) };
+      let qText = String(args.q || '');
+      if (/\bis:book\b/i.test(qText)) {
+        qText = qText.replace(/\bis:book\b/gi, '').trim();
+        args.q = qText;
+        args.scope = 'book';
+      }
+      if (/\bis:watchlist\b/i.test(qText)) {
+        qText = qText.replace(/\bis:watchlist\b/gi, '').trim();
+        args.q = qText;
+        args.scope = 'watchlist';
+      }
+      if (args.scope && role === 'owner') {
+        const targetSet = args.scope === 'book'
+          ? bookSet
+          : args.scope === 'watchlist'
+            ? watchlistSet
+            : new Set([...bookSet, ...watchlistSet]);
+        const scopeList = [...targetSet];
+        if (scopeList.length) {
+          args.tickers = args.tickers ? `${args.tickers},${scopeList.join(',')}` : scopeList.join(',');
+        } else {
+          args.tickers = '__NONE__';
+        }
+      }
+      delete args.scope;
+      return args;
+    }
+
     async function load(append = false, restoreScroll = null) {
       if (loading && append) return;
       const ticket = ++sequence;
@@ -502,18 +815,25 @@
       for (const key of ['q', 'type', 'activity', 'period', 'from', 'to', 'fund']) {
         if (form.elements[key]) form.elements[key].value = params.get(key) || '';
       }
+      if (form.elements.signal) {
+        form.elements.signal.value = params.get('signal')
+          || (params.get('focus') ? `focus:${params.get('focus')}` : '')
+          || (params.get('scope') ? `scope:${params.get('scope')}` : '');
+      }
       const reviewing = params.get('mode') === 'review' && role === 'owner';
-      for (const key of ['type', 'activity', 'period', 'from', 'to', 'fund']) {
+      for (const key of ['signal', 'type', 'activity', 'period', 'from', 'to', 'fund']) {
         const wrapper = form.elements[key]?.closest('label, details');
         if (wrapper) wrapper.hidden = reviewing;
       }
-      form.elements.q.placeholder = reviewing ? 'Find a fund or review issue…' : 'Search company, ticker, fund, or argument…';
+      form.elements.q.placeholder = reviewing
+        ? 'Find a fund or review issue…'
+        : 'Search company, ticker, or try ticker:TK type:short action:new focus:macro…';
       if (reviewing) form.elements.q.value = params.get('review_q') || '';
       syncControlStates();
       drawDirectory(directory.querySelector('input').value);
 
       try {
-        const args = { ...Object.fromEntries(params), offset: append ? String(next) : '0' };
+        const args = { ...resolveEffectiveQueryArgs(), offset: append ? String(next) : '0' };
         const mode = activeViewMode();
 
         if (mode === 'review') {
@@ -618,9 +938,10 @@
             const activePeriod = params.get('period') || 'All periods';
             const activeFund = params.get('fund') ? (funds.find(f => f.id === params.get('fund'))?.name || '') : 'All funds';
             reading.innerHTML = `
+              ${renderSignalStrip()}
               <header class="fl-section-head">
                 <div>
-                  <h2>${hasFilters() ? 'Matching fund letters' : 'Recent fund letters'}</h2>
+                  <h2>${hasFilters() || params.get('scope') ? 'Matching fund letters' : 'Recent fund letters'}</h2>
                 </div>
                 <span class="fl-date">${escape(activeFund)} · ${escape(activePeriod)}${params.get('type') ? ' · ' + escape(label(params.get('type'))) : ''}${params.get('activity') ? ' · ' + escape(label(params.get('activity'))) : ''}</span>
               </header>
@@ -629,7 +950,7 @@
           reading.querySelector('[data-items]').insertAdjacentHTML(
             'beforeend',
             data.letters.map(letterCardHtml).join('')
-              || `<div class="fl-empty"><h2>${funds.length ? 'No matching letters' : 'The archive is being prepared'}</h2><p>${funds.length ? 'Try a different search term, period, or category filter.' : 'Letters will appear here after their summaries have completed verification.'}</p></div>`,
+              || `<div class="fl-empty"><h2>${funds.length ? 'No matching letters' : 'The archive is being prepared'}</h2><p>${funds.length ? 'Try a different search term, signal filter, or period.' : 'Letters will appear here after their summaries have completed verification.'}</p></div>`,
           );
           next = data.next_offset;
         } else {
@@ -637,9 +958,10 @@
           if (ticket !== sequence || disposed) return;
           if (!append) {
             reading.innerHTML = `
+              ${renderSignalStrip()}
               <header class="fl-section-head">
                 <div>
-                  <h2>${hasFilters() ? 'Matching investment ideas' : 'Recent investment arguments'}</h2>
+                  <h2>${hasFilters() || params.get('scope') ? 'Matching investment ideas' : 'Recent investment arguments'}</h2>
                 </div>
                 <span class="fl-date">${params.get('fund') ? escape(funds.find(f => f.id === params.get('fund'))?.name || '') : 'All funds'} · ${params.get('type') ? escape(label(params.get('type'))) : 'All categories'}${params.get('period') ? ' · ' + escape(params.get('period')) : ''}</span>
               </header>
@@ -648,7 +970,7 @@
           reading.querySelector('[data-items]').insertAdjacentHTML(
             'beforeend',
             data.results.map(resultHtml).join('')
-              || `<div class="fl-empty"><h2>${funds.length ? 'No matching ideas' : 'The archive is being prepared'}</h2><p>${funds.length ? 'Try a different company, date range or idea type. Clear filters to explore every published idea.' : 'Letters will appear here after their summaries have completed review.'}</p></div>`,
+              || `<div class="fl-empty"><h2>${funds.length ? 'No matching ideas' : 'The archive is being prepared'}</h2><p>${funds.length ? 'Try a different company, signal filter, or idea type. Clear filters to explore every published idea.' : 'Letters will appear here after their summaries have completed review.'}</p></div>`,
           );
           next = data.next_offset;
         }
@@ -778,6 +1100,7 @@
     on(form, 'submit', e => {
       e.preventDefault();
       if (searchTimer) global.clearTimeout(searchTimer);
+      if (suggestBox) suggestBox.hidden = true;
       if (params.get('mode') === 'review' && role === 'owner') {
         navigate({ review_q: form.elements.q.value, letter: '', idea: '' });
         return;
@@ -789,7 +1112,24 @@
       ));
     });
 
-    on(form.elements.q, 'input', () => {
+    on(searchInput, 'focus', () => {
+      renderSuggestions();
+    });
+
+    on(searchInput, 'blur', () => {
+      global.setTimeout(() => {
+        if (suggestBox) suggestBox.hidden = true;
+      }, 160);
+    });
+
+    on(searchInput, 'keydown', e => {
+      if (e.key === 'Escape' && suggestBox && !suggestBox.hidden) {
+        suggestBox.hidden = true;
+      }
+    });
+
+    on(searchInput, 'input', () => {
+      renderSuggestions();
       if (searchTimer) global.clearTimeout(searchTimer);
       searchTimer = global.setTimeout(() => {
         if (params.get('mode') === 'review' && role === 'owner') {
@@ -800,14 +1140,26 @@
       }, 240);
     });
 
-    on(resetBtn, 'click', () => navigate({
-      q: '', type: '', activity: '', period: '', from: '', to: '', fund: '', letter: '', idea: '', mode: '', stack: '',
-    }));
+    const resetAllFilters = () => navigate({
+      q: '', type: '', activity: '', period: '', from: '', to: '', fund: '', letter: '', idea: '', mode: '', stack: '', signal: '', focus: '', scope: '', tickers: '',
+    });
+
+    on(resetBtn, 'click', resetAllFilters);
 
     on(form.elements.fund, 'change', () => navigate({ fund: form.elements.fund.value, letter: '', idea: '', mode: '', stack: '' }));
     on(form.elements.period, 'change', () => navigate({ period: form.elements.period.value, letter: '', idea: '', mode: '' }));
     on(form.elements.type, 'change', () => navigate({ type: form.elements.type.value, letter: '', idea: '', mode: '' }));
     on(form.elements.activity, 'change', () => navigate({ activity: form.elements.activity.value, letter: '', idea: '', mode: '' }));
+    on(form.elements.signal, 'change', () => {
+      const val = form.elements.signal.value || '';
+      if (val.startsWith('focus:')) {
+        navigate({ focus: val.slice(6), signal: '', scope: '', letter: '', idea: '', mode: '' });
+      } else if (val.startsWith('scope:')) {
+        navigate({ scope: val.slice(6), signal: '', focus: '', letter: '', idea: '', mode: '' });
+      } else {
+        navigate({ signal: val, focus: '', scope: '', letter: '', idea: '', mode: '' });
+      }
+    });
     on(form.elements.from, 'change', () => navigate({ from: form.elements.from.value, letter: '', idea: '', mode: '' }));
     on(form.elements.to, 'change', () => navigate({ to: form.elements.to.value, letter: '', idea: '', mode: '' }));
 
@@ -816,6 +1168,28 @@
     on(root, 'click', e => {
       const target = e.target.closest('a,button');
       if (!target || e.ctrlKey || e.metaKey || e.shiftKey) return;
+      if (target.dataset.suggestVal !== undefined) {
+        e.preventDefault();
+        searchInput.value = target.dataset.suggestVal;
+        if (suggestBox) suggestBox.hidden = true;
+        navigate({ q: searchInput.value.trim(), letter: '', idea: '' });
+        return;
+      }
+      if (target.dataset.clearKey) {
+        e.preventDefault();
+        navigate({ [target.dataset.clearKey]: '', letter: '', idea: '' });
+        return;
+      }
+      if (target.hasAttribute('data-reset-all')) {
+        e.preventDefault();
+        resetAllFilters();
+        return;
+      }
+      if (target.dataset.pickTicker !== undefined) {
+        e.preventDefault();
+        navigate({ tickers: target.dataset.pickTicker, letter: '', idea: '', mode: '' });
+        return;
+      }
       if (target.dataset.dirSort) {
         e.preventDefault();
         dirSort = target.dataset.dirSort;
@@ -904,9 +1278,16 @@
       const [session, catalog] = await Promise.all([api({ action: 'session' }), api({ action: 'funds' })]);
       if (disposed) return;
       role = session.role;
+      if (role === 'owner' && Array.isArray(session.book_tickers)) {
+        session.book_tickers.forEach(t => bookSet.add(String(t || '').trim().toUpperCase()));
+      }
       funds = catalog.funds || [];
       periods = catalog.periods || [];
+      tickerSignals = catalog.tickers || [];
+      tickerStatsMap.clear();
+      tickerSignals.forEach(t => tickerStatsMap.set(t.ticker, t));
       populatePeriodSelect();
+      populateSignalSelect();
       const tools = root.querySelector('.fl-owner-tools');
       if (tools) {
         if (role === 'owner') {
