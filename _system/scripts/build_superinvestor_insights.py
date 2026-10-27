@@ -10,6 +10,7 @@ consensus layer can decide what to count.
 from __future__ import annotations
 
 import csv
+import hashlib
 import json
 import os
 import re
@@ -97,7 +98,7 @@ SECTION_PATTERNS: dict[str, re.Pattern[str]] = {
 
 ACTION_DIRECTION = {
     "new": "bullish", "add": "bullish", "buy": "bullish",
-    "trim": "bearish", "exit": "bearish", "short": "bearish",
+    "trim": "bearish", "sell": "bearish", "exit": "bearish", "short": "bearish",
     "hold": "neutral", "discuss": "neutral",
 }
 
@@ -389,7 +390,8 @@ def build_letter_record(
                 break
 
     document_meta = document_meta or {}
-    return {
+    from research_integrity import reconcile_positions
+    return reconcile_positions({
         "fund_id": meta["fund_id"],
         "fund": meta["fund"],
         "manager": meta.get("manager", ""),
@@ -404,6 +406,7 @@ def build_letter_record(
         "letter_eligible": letter_eligible,
         "classification_reason": classification_reason,
         "source_file": _stable_ref(path),
+        "source_content_sha256": hashlib.sha256(path.read_bytes()).hexdigest(),
         "source_document": source_document_ref(path),
         "canonical_document_id": document_meta.get("canonical_document_id"),
         "content_hash": document_meta.get("content_hash"),
@@ -419,7 +422,7 @@ def build_letter_record(
         "catalysts": sections.get("catalysts", []),
         "macro_views": sections.get("outlook", []) + sections.get("macro", []),
         "maps_to_persona": personas,
-    }
+    })
 
 
 def _worker_init() -> None:

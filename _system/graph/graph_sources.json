@@ -280,6 +280,16 @@
       "subject_regex": "^(chore|feat|fix)\\((letters|letter)\\)|letter backfill|Refresh dashboard payloads after letter backfill"
     },
     {
+      "name": "licensed-research",
+      "workflow_file": "licensed-research-sync.yml",
+      "job": "plan",
+      "cadence_cron": [
+        "17 17 * * 6"
+      ],
+      "freshness_hours": 342,
+      "subject_regex": "Refresh ValueLine and Expert Call labels|Ingest ValueLine and Expert Call text"
+    },
+    {
       "name": "podcasts",
       "workflow_file": "podcast-refresh.yml",
       "job": "refresh",
@@ -388,6 +398,18 @@
       "timezone": "America/New_York",
       "freshness_hours": 102,
       "subject_regex": "^chore: refresh aggregates"
+    },
+    {
+      "name": "autonomous-compounder-irrs",
+      "workflow_file": "autonomous-compounders.yml",
+      "job": "refresh",
+      "work_step": "Verify every served PV and IRR against the same model",
+      "cadence_cron": [
+        "23 8,18 * * 1-5"
+      ],
+      "timezone": "America/New_York",
+      "freshness_hours": 96,
+      "subject_regex": "^chore\\(research\\): refresh autonomous compounder IRRs"
     }
   ],
   "unmonitored_workflows": {},

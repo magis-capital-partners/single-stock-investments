@@ -1,8 +1,8 @@
 # PCG — Activist reconciliation (Milly mechanical)
 
-**Date:** 2026-10-10
-**Reports processed:** 15
-**Human review:** 15
+**Date:** 2026-10-25
+**Reports processed:** 16
+**Human review:** 16
 
 ## Summary
 
@@ -19,6 +19,7 @@
 | Unresolved SEC filer | long | 2019-12-11 | activist_13d | human_review | needs_human | `PCG/third-party-analyses/activist_reports/long/SC-13D/A_20191211_acc0001193125_19_311576.htm` |
 | Unresolved SEC filer | long | 2019-09-13 | activist_13d | human_review | needs_human | `PCG/third-party-analyses/activist_reports/long/SC-13D/A_20190913_acc0001193125_19_244939.htm` |
 | Unresolved SEC filer | long | 2019-08-08 | activist_13d | human_review | needs_human | `PCG/third-party-analyses/activist_reports/long/SC-13D/A_20190808_acc0001193125_19_216266.htm` |
+| Abrams Capital Management, L.P. | long | 2019-08-07 | activist_13d | human_review | needs_human | `PCG/third-party-analyses/activist_reports/long/SC-13D_20190807_acc0000904454_19_000594.htm` |
 | Unresolved SEC filer | long | 2019-04-23 | activist_13d | human_review | needs_human | `PCG/third-party-analyses/activist_reports/long/SC-13D/A_20190423_acc0001193125_19_114947.htm` |
 | Unresolved SEC filer | long | 2019-04-23 | activist_13d | human_review | needs_human | `PCG/third-party-analyses/activist_reports/long/SC-13D/A_20190423_acc0001193125_19_114935.htm` |
 | Unresolved SEC filer | long | 2019-04-04 | activist_13d | human_review | needs_human | `PCG/third-party-analyses/activist_reports/long/SC-13D/A_20190404_acc0001193125_19_097545.htm` |
@@ -190,6 +191,18 @@
 
 <Center><DIV STYLE="width:8.5in" align="left">
  <P STYLE="line-height:1.0pt;margin-top:0pt;margin-bottom:0pt;bord…
+
+**Abrams Capital Management, L.P.** (2019-08-07): <DOCUMENT>
+<TYPE>SC 13D
+<SEQUENCE>1
+<FILENAME>s13d_08032019-pgecorp.htm
+<DESCRIPTION>SCHEDULE 13D FOR PG&E CORPORATION BY ABRAMS CAPITAL MANAGEMENT, L.P.
+<TEXT>
+<html>
+  <head>
+    <title></title>
+    <!-- Licensed to: Ropes & Gray
+         Document created using EDGARfilings PRO…
 
 **Unresolved SEC filer** (2019-04-23): <DOCUMENT>
 <TYPE>SC 13D/A

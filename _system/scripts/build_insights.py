@@ -833,6 +833,8 @@ def from_kpi_trends(doc: dict | None) -> list[dict]:
 def from_superinvestor_letters(doc: dict) -> list[dict]:
     out: list[dict] = []
     for letter in doc.get("letters") or []:
+        from research_integrity import reconcile_positions
+        letter = reconcile_positions(letter)
         fund = letter.get("fund", "Unknown")
         fund_id = letter.get("fund_id") or fund
         as_of = letter.get("letter_date")
@@ -876,17 +878,20 @@ def from_superinvestor_letters(doc: dict) -> list[dict]:
                     scope="ticker",
                     ref=tk,
                     claim=claim,
-                    direction={"add": "bullish", "trim": "bearish"}.get(action, "neutral"),
+                    direction={"add": "bullish", "new": "bullish", "trim": "bearish", "sell": "bearish", "exit": "bearish", "short": "bearish"}.get(action, "neutral"),
                     evidence_ref=source_ref,
                     evidence_url=letter_ev["evidence_url"],
                     evidence_label=letter_ev["evidence_label"],
                     event_type="letter_position",
-                    impact_axis="ownership",
+                    impact_axis="ownership" if pos.get("relationship", "position") == "position" else "variant_view",
                     fund=fund,
                     fund_id=fund_id,
                     quarter=letter.get("quarter"),
                     action=action,
                     position_action=action,
+                    relationship=pos.get("relationship"),
+                    instrument=pos.get("instrument"),
+                    classification_review=pos.get("classification_review"),
                     commentary=commentary,
                 )
             )
@@ -2318,7 +2323,7 @@ def letter_index(letters: list[dict], our_tickers: set[str]) -> list[dict]:
         )
         # trim only — exits stay in exits so Trim/Exit UI concat cannot double-count
         trims = unique_tickers(
-            [p["ticker"] for p in positions if p.get("action") == "trim" and p.get("ticker")]
+            [p["ticker"] for p in positions if p.get("action") in {"trim", "sell"} and p.get("ticker")]
         )
         shorts = unique_tickers(
             [p["ticker"] for p in positions if p.get("action") == "short" and p.get("ticker")]
@@ -2384,7 +2389,7 @@ def security_names() -> dict[str, str]:
 
 
 BUY_ACTIONS = {"new", "add", "buy"}
-SELL_ACTIONS = {"trim", "exit"}
+SELL_ACTIONS = {"trim", "exit", "sell"}
 SHORT_ACTIONS = {"short"}
 ACTIONABLE = BUY_ACTIONS | SELL_ACTIONS | SHORT_ACTIONS
 
@@ -2566,6 +2571,8 @@ def build_consensus(letters: list[dict], our_tickers: set[str], names: dict[str,
 
     for letter in letters:
         q = letter.get("quarter") or "unknown"
+        from research_integrity import reconcile_positions
+        letter = reconcile_positions(letter)
         quarters.add(q)
         fund = letter.get("fund") or "Unknown"
         fund_id = letter.get("fund_id") or fund
@@ -2929,6 +2936,8 @@ def ticker_discussants(
     """Per-ticker summary of which funds discuss it (letters only)."""
     by_ticker: dict[str, dict[str, dict]] = {}
     for letter in letters:
+        from research_integrity import reconcile_positions
+        letter = reconcile_positions(letter)
         fund = letter.get("fund") or "Unknown"
         fund_id = letter.get("fund_id") or fund
         fam_id = family_id_for_fund(fund_id, family_id=letter.get("family_id"))
@@ -2963,6 +2972,10 @@ def ticker_discussants(
                     "quarter": letter.get("quarter"),
                     "letter_date": letter.get("letter_date"),
                     "action": pos.get("action", "discussed"),
+                    "relationship": pos.get("relationship"),
+                    "instrument": pos.get("instrument"),
+                    "classification_review": pos.get("classification_review"),
+                    "reported_action": pos.get("reported_action"),
                     "commentary": commentary,
                     "source_file": letter.get("source_file"),
                     "source_document": letter_ev["source_document"],
@@ -3816,6 +3829,8 @@ def main() -> int:
         ]
         letters, fund_identity_audit = consolidate_letter_funds_stable(letters)
         letters, downstream_duplicates_suppressed = dedupe_canonical_letters(letters)
+        from research_integrity import reconcile_positions
+        letters = [reconcile_positions(letter) for letter in letters]
         letters_doc = {**letters_doc, "letters": letters}
         records.extend(from_superinvestor_letters(letters_doc))
 
@@ -4059,6 +4074,8 @@ def main() -> int:
         )
 
     OUTPUT.parent.mkdir(parents=True, exist_ok=True)
+    from refresh_research_integrity import reconcile_insight_payload
+    payload = reconcile_insight_payload(payload)
     serialized_payload = json.dumps(payload, separators=(",", ":")) + "\n"
     _atomic_write(OUTPUT, serialized_payload)
     print(

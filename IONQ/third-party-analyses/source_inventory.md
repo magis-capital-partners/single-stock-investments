@@ -1,7 +1,7 @@
 # IONQ — Third-party source inventory
 
-**Date:** 2026-10-11
-**Sources:** 83 total (0 approved, 0 pending, 83 context)
+**Date:** 2026-10-25
+**Sources:** 85 total (0 approved, 0 pending, 85 context)
 
 | ID | Title | Path | Status | Use |
 |----|-------|------|--------|-----|
@@ -9,7 +9,7 @@
 | activist_long | Citron Research — SC 13D/A | `IONQ/third-party-analyses/activist_reports/long/SC-13D/A_20230609_acc0001072613_23_000356.htm` | context | activist/long — sec_edgar |
 | activist_long | NEA Partners 15, L.P. — SC 13D | `IONQ/third-party-analyses/activist_reports/long/SC-13D_20211021_acc0001072613_21_000602.htm` | context | activist/long — sec_edgar |
 | activist_long | IonQ, Inc — SC 13D | `IONQ/third-party-analyses/activist_reports/long/SC-13D_20260401_acc0000950142_26_001035.xml` | context | activist/long — sec_edgar |
-| activist_short | Download PDF > | `_system/reference/activist-reports/scorpion/scorpion_2026-10-11_IONQ.pdf` | context | activist/short — publisher_site |
+| activist_short | Download PDF > | `_system/reference/activist-reports/scorpion/scorpion_undated_IONQ-nifdmpdk.pdf` | context | activist/short — publisher_site |
 | activist_long | acc0001193125 20 296051 | `IONQ/third-party-analyses/activist_reports/long/8-K_20201117_acc0001193125_20_296051.htm` | context | activist/long — local |
 | activist_long | acc0001193125 20 301544 | `IONQ/third-party-analyses/activist_reports/long/8-K_20201123_acc0001193125_20_301544.htm` | context | activist/long — local |
 | activist_long | acc0001193125 20 330614 | `IONQ/third-party-analyses/activist_reports/long/8-K_20201231_acc0001193125_20_330614.htm` | context | activist/long — local |
@@ -88,5 +88,7 @@
 | activist_long | acc0001193125 26 338998 | `IONQ/third-party-analyses/activist_reports/long/8-K_20260807_acc0001193125_26_338998.htm` | context | activist/long — local |
 | activist_long | acc0001193125 26 374694 | `IONQ/third-party-analyses/activist_reports/long/8-K_20260828_acc0001193125_26_374694.htm` | context | activist/long — local |
 | activist_long | acc0001193125 26 384388 | `IONQ/third-party-analyses/activist_reports/long/8-K_20260908_acc0001193125_26_384388.htm` | context | activist/long — local |
+| activist_long | acc0001193125 26 419609 | `IONQ/third-party-analyses/activist_reports/long/8-K_20261013_acc0001193125_26_419609.htm` | context | activist/long — local |
+| activist_long | acc0001193125 26 424230 | `IONQ/third-party-analyses/activist_reports/long/8-K_20261016_acc0001193125_26_424230.htm` | context | activist/long — local |
 
-Cross-check required: `IONQ/research/cross_check_third_party_2026-10-11.md`
+Cross-check required: `IONQ/research/cross_check_third_party_2026-10-25.md`

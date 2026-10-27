@@ -1,0 +1,103 @@
+name: Third-plus signal study tests
+on:
+  push:
+    branches: [main]
+    paths: &paths
+      - '_system/scripts/third_plus_signal/**'
+      - '_system/scripts/third_plus_execution/**'
+      - 'dashboard/third-plus-execution.js'
+      - 'dashboard/third-plus-venue.js'
+      - 'dashboard/data/third_plus_venue_execution*'
+      - 'dashboard/data/third_plus_execution*'
+      - '_system/scripts/third_plus_signal_study.cjs'
+      - '_system/scripts/third_plus_signal_study.test.cjs'
+      - '_system/scripts/build_third_plus_dashboard.cjs'
+      - '_system/scripts/build_third_plus_decision_audit.cjs'
+      - '_system/scripts/build_third_plus_ssr_publication.cjs'
+      - '_system/scripts/build_third_plus_requested_report.cjs'
+      - '_system/scripts/third_plus_requested_sizing.cjs'
+      - '_system/scripts/third_plus_sizing*'
+      - '_system/scripts/third_plus_ssr_audit.py'
+      - '_system/scripts/third_plus_dashboard.test.cjs'
+      - 'dashboard/third-plus-study*'
+      - 'dashboard/data/third_plus_study*.json'
+      - 'dashboard/data/third_plus_dilution_primary_*.csv'
+      - 'dashboard/data/third_plus_requested_*.csv'
+      - '_system/data/reverse_splits/third_plus_signal_study/**'
+      - '_system/scripts/third_plus_fundamental*'
+      - '_system/scripts/third_plus_reconciliation*'
+      - '_system/scripts/test_third_plus_reconciliation.py'
+      - '_system/scripts/third_plus_saved_screen.cjs'
+      - '_system/scripts/third_plus_saved_screen.test.cjs'
+      - '_system/data/reverse_splits/third_plus_signal_study/saved_screens/third_plus_no_50pct_rally.v1.json'
+      - '_system/scripts/reverse_split_repeat_study.cjs'
+      - '_system/scripts/short_framework/**'
+      - 'dashboard/short-framework-engine.js'
+      - '.github/workflows/third-plus-signal-study-tests.yml'
+  pull_request:
+    paths: *paths
+permissions:
+  contents: read
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          sparse-checkout: |
+            _system/scripts/third_plus_signal/
+            _system/scripts/third_plus_execution/
+            dashboard/third-plus-execution.js
+            dashboard/third-plus-venue.js
+            dashboard/data/third_plus_venue_execution*
+            dashboard/data/third_plus_execution*
+            _system/scripts/third_plus_signal_study.cjs
+            _system/scripts/third_plus_signal_study.test.cjs
+            _system/scripts/build_third_plus_dashboard.cjs
+            _system/scripts/build_third_plus_decision_audit.cjs
+            _system/scripts/build_third_plus_ssr_publication.cjs
+            _system/scripts/build_third_plus_requested_report.cjs
+            _system/scripts/third_plus_requested_sizing.cjs
+            _system/scripts/third_plus_sizing*
+            _system/scripts/third_plus_dashboard.test.cjs
+            dashboard/third-plus-study.js
+            dashboard/third-plus-study-details.js
+            dashboard/data/third_plus_study*.json
+            dashboard/data/third_plus_dilution_primary_*.csv
+            dashboard/data/third_plus_requested_*.csv
+            _system/data/reverse_splits/third_plus_signal_study/
+            _system/scripts/third_plus_fundamental*
+            _system/scripts/third_plus_reconciliation*
+            _system/scripts/test_third_plus_reconciliation.py
+            _system/scripts/third_plus_saved_screen.cjs
+            _system/scripts/third_plus_saved_screen.test.cjs
+            _system/data/reverse_splits/third_plus_signal_study/saved_screens/third_plus_no_50pct_rally.v1.json
+            _system/scripts/reverse_split_repeat_study.cjs
+            _system/scripts/short_framework/
+            dashboard/short-framework-engine.js
+          sparse-checkout-cone-mode: false
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Install filing parser dependency
+        run: python -m pip install lxml==6.1.1
+      - name: Verify offline filing extraction
+        run: python -m unittest discover -s _system/scripts -p test_third_plus_reconciliation.py
+      - name: Verify offline financial and execution invariants
+        run: node --test --test-reporter=tap _system/scripts/third_plus_signal_study.test.cjs _system/scripts/third_plus_saved_screen.test.cjs _system/scripts/third_plus_reconciliation.test.cjs _system/scripts/third_plus_fundamental_filters.test.cjs _system/scripts/third_plus_dashboard.test.cjs _system/scripts/third_plus_sizing.test.cjs
+      - name: Verify published dashboard snapshot
+        run: node _system/scripts/build_third_plus_dashboard.cjs --check
+
+      - name: Verify requested scenario report
+        run: node _system/scripts/build_third_plus_requested_report.cjs --check
+
+      - name: Verify SSR partial-fill replay and publication
+        run: |
+          node --test --test-reporter=tap _system/scripts/third_plus_execution/*.test.cjs
+          node _system/scripts/third_plus_execution/publish.cjs --check
+          python -m unittest discover -s _system/scripts/third_plus_execution -p test_venue_capture.py
+          node _system/scripts/third_plus_execution/venue_publish.cjs --check

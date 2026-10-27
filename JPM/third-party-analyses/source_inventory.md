@@ -1,7 +1,7 @@
 # JPM — Third-party source inventory
 
-**Date:** 2026-10-11
-**Sources:** 38 total (0 approved, 0 pending, 38 context)
+**Date:** 2026-10-25
+**Sources:** 41 total (0 approved, 0 pending, 41 context)
 
 | ID | Title | Path | Status | Use |
 |----|-------|------|--------|-----|
@@ -43,5 +43,8 @@
 | activist_long | acc0001628280 26 048086 | `JPM/third-party-analyses/activist_reports/long/8-K_20260714_acc0001628280_26_048086.htm` | context | activist/long — local |
 | activist_long | acc0000019617 26 000288 | `JPM/third-party-analyses/activist_reports/long/8-K_20260723_acc0000019617_26_000288.htm` | context | activist/long — local |
 | activist_long | acc0001193125 26 314128 | `JPM/third-party-analyses/activist_reports/long/8-K_20260723_acc0001193125_26_314128.htm` | context | activist/long — local |
+| activist_long | acc0001628280 26 065582 | `JPM/third-party-analyses/activist_reports/long/8-K_20261013_acc0001628280_26_065582.htm` | context | activist/long — local |
+| activist_long | acc0001628280 26 065616 | `JPM/third-party-analyses/activist_reports/long/8-K_20261013_acc0001628280_26_065616.htm` | context | activist/long — local |
+| activist_long | acc0001193125 26 426704 | `JPM/third-party-analyses/activist_reports/long/8-K_20261020_acc0001193125_26_426704.htm` | context | activist/long — local |
 
-Cross-check required: `JPM/research/cross_check_third_party_2026-10-11.md`
+Cross-check required: `JPM/research/cross_check_third_party_2026-10-25.md`

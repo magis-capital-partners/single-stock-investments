@@ -1,0 +1,189 @@
+{
+  "signals": [
+    {
+      "id": "S1",
+      "name": "Cash pressure",
+      "rule": "Negative TTM operating cash flow and cash runway below six months.",
+      "requirements": "As-filed unrestricted cash, consistent currency and public-clock evidence; adjust for confirmed cash proceeds/uses since the balance date without double counting. Unknown pro forma funding => runway unknown.",
+      "status": "Cached raw runway coverage 142/210; 141 satisfy the initial freshness/public-clock check; pro forma audit pending."
+    },
+    {
+      "id": "S2",
+      "name": "Recent dilutive financing",
+      "rule": "Completed equity-linked financing publicly disclosed in the preceding 60 calendar days, with independently reconciled issuance/security class.",
+      "requirements": "Distinguish actual issuance and saleable supply from authorization, registration capacity, amendments and boilerplate; preserve transaction IDs, cash proceeds, lockups and availability dates.",
+      "status": "48 cached source leads and 137 provider flags; zero independently verified terms. Audit required before selection."
+    },
+    {
+      "id": "S3",
+      "name": "Rapid repeat splitting",
+      "rule": "Previous distinct reverse split effective no more than 180 calendar days before the current split.",
+      "requirements": "Same issuer and security class; deduplicate date conflicts; incomplete earlier history remains flagged.",
+      "status": "Derivable from existing action catalogues; historical identity review pending."
+    },
+    {
+      "id": "S4",
+      "name": "Actual share dilution",
+      "rule": "At least 25% growth in split-adjusted end-of-period common shares over the preceding six months.",
+      "requirements": "Use latest public comparable observations; prior observation within 150–240 days of latest period; same share class, consolidated basis and denominator type. Never mix weighted-average EPS shares or double-adjust restated shares.",
+      "status": "Extract from cached filing facts; coverage and restatement audit pending."
+    },
+    {
+      "id": "S5",
+      "name": "Weak split-day close",
+      "rule": "Completed effective-day close below its open and in the bottom quarter of the day's high-low range.",
+      "requirements": "Only use a complete public bar before entry. Missing or zero-range bars are unknown. Next eligible session entry; no intrabar or VWAP claims.",
+      "status": "Existing daily nominal bars; must validate price provenance and action units."
+    },
+    {
+      "id": "S6",
+      "name": "Existing price weakness",
+      "rule": "Mechanically adjusted close-to-close return over the last 20 completed sessions at or below -20%.",
+      "requirements": "All observations precede submission; full split/ADS adjustment path; no total-return claim without distributions.",
+      "status": "Existing daily cache; missing intervals and action conflicts remain unknown."
+    },
+    {
+      "id": "S7",
+      "name": "Squeeze-risk veto",
+      "rule": "Skip if any mechanically adjusted close-to-close rise in the last five completed sessions was at least 50%.",
+      "requirements": "Uses only prior observations; no exclusions based on subsequent squeezes or named losing stocks.",
+      "status": "Existing daily cache; hypothesis rather than an established safeguard.",
+      "pass_semantics": "S7 passes when the veto condition is NOT triggered; missing five-session history is unknown, not safe."
+    }
+  ],
+  "arms": [
+    {
+      "id": "baseline",
+      "requires": []
+    },
+    {
+      "id": "score60",
+      "requires": [
+        "score60"
+      ]
+    },
+    {
+      "id": "S1",
+      "requires": [
+        "S1"
+      ]
+    },
+    {
+      "id": "S2",
+      "requires": [
+        "S2"
+      ]
+    },
+    {
+      "id": "S3",
+      "requires": [
+        "S3"
+      ]
+    },
+    {
+      "id": "S4",
+      "requires": [
+        "S4"
+      ]
+    },
+    {
+      "id": "S5",
+      "requires": [
+        "S5"
+      ]
+    },
+    {
+      "id": "S6",
+      "requires": [
+        "S6"
+      ]
+    },
+    {
+      "id": "S7",
+      "requires": [
+        "S7"
+      ]
+    },
+    {
+      "id": "C1",
+      "requires": [
+        "S1",
+        "S2"
+      ]
+    },
+    {
+      "id": "C2",
+      "requires": [
+        "S1",
+        "S2",
+        "S7"
+      ]
+    },
+    {
+      "id": "C3",
+      "requires": [
+        "S1",
+        "S2",
+        "S5",
+        "S7"
+      ]
+    },
+    {
+      "id": "C4",
+      "requires": [
+        "S5",
+        "S6",
+        "S7"
+      ]
+    }
+  ],
+  "pass_fail_unknown": true,
+  "coverage": {
+    "score60": {
+      "pass": 56,
+      "fail": 80,
+      "unknown": 74
+    },
+    "S1": {
+      "pass": 13,
+      "fail": 28,
+      "unknown": 169
+    },
+    "S2": {
+      "pass": 0,
+      "fail": 0,
+      "unknown": 210
+    },
+    "S3": {
+      "pass": 77,
+      "fail": 113,
+      "unknown": 20
+    },
+    "S4": {
+      "pass": 17,
+      "fail": 4,
+      "unknown": 189
+    },
+    "S5": {
+      "pass": 55,
+      "fail": 153,
+      "unknown": 2
+    },
+    "S6": {
+      "pass": 154,
+      "fail": 47,
+      "unknown": 9
+    },
+    "S7": {
+      "pass": 190,
+      "fail": 12,
+      "unknown": 8
+    },
+    "reported_runway": {
+      "pass": 98,
+      "fail": 61,
+      "unknown": 51
+    }
+  },
+  "notes": "Three states: pass/fail/unknown. Feature-specific covered-universe baseline and full-universe exclusion funnel; absence of cached evidence is not a negative fact."
+}

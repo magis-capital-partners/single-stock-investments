@@ -12,10 +12,12 @@ from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[2]
 REQUIRED_SHARDS = {'desk_briefs':'data/desk_briefs.json','reverse_splits':'data/reverse_splits.json'}
+# Decimal megabytes, matching validate_dashboard_data.CORE_MAX_MB. Do not raise it.
+CORE_MAX_MB = 6.0
 LANES = {'spinoffs','split_offs','mergers','warrants','restructurings','forced_sellers','buyback_events'}
 
 
-def check(root=ROOT):
+def check(root=ROOT, core_max_mb=CORE_MAX_MB):
     errors, artifacts = [], {}
     docs = {}
     for name in ('core','desk_briefs','reverse_splits','short_alpha','special_situations','separations'):
@@ -28,6 +30,11 @@ def check(root=ROOT):
                 errors.append(f'{name}: no build timestamp')
             docs[name] = doc
             artifacts[name] = {'generated_at':stamp,'sha256':hashlib.sha256(raw).hexdigest(),'bytes':len(raw)}
+            if name == 'core' and len(raw) / 1e6 > core_max_mb:
+                errors.append(
+                    f'core: {len(raw) / 1e6:.2f} MB exceeds the {core_max_mb:.1f} MB boot budget; '
+                    'slim rows further in build_dashboard_shards.py'
+                )
         except (OSError,ValueError) as exc:
             errors.append(f'{name}: {exc}')
     core = docs.get('core',{})

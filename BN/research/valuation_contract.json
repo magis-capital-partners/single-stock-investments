@@ -2474,7 +2474,7 @@
     ]
   },
   "change_control": {
-    "model_hash": "eea6f515444af888f8d946a6a1bfdd8dc4dc4a4b143b4c0985f8d6dfc2918d42",
+    "model_hash": "a9a465375eb2e1ca4c42752e380e3dcedc260eba31f21a7e8625416c01482350",
     "method_versions": [
       "net_asset_value@1.0",
       "owner_earnings_reinvestment_dcf@1.0"
@@ -2483,6 +2483,144 @@
     "rule": "A source fact is locked. Every assumption change requires a reason, author, timestamp, and before/after value."
   },
   "decision_rule": "Proof status and investment readiness are separate. Every material claim must be valued exactly once by a valid calculation proof, every evidence blocker must be resolved, and the model must be stock-specific before committee review. Only a human decision can authorize capital.",
+  "shared_forecast": {
+    "schema_version": "1.0",
+    "method_version": "shared-valuation-forecast/1.1",
+    "ticker": "BN",
+    "status": "model_gap",
+    "research_only": true,
+    "requires_human_review": false,
+    "capital_actionable": false,
+    "as_of": "2026-09-17",
+    "model_as_of": "2026-09-17",
+    "quote": {
+      "value": 37.31,
+      "as_of": "2026-09-17",
+      "source_url": "Yahoo BN 2026-09-17",
+      "currency": null
+    },
+    "forecast_hash": "2de68f7f377db62bda88af859ed6df0477799686a7cfb0be9b21c13446b62eee",
+    "forward_irr_pct": {
+      "low": null,
+      "base": null,
+      "high": null
+    },
+    "present_value_today_per_share": {
+      "low": null,
+      "base": null,
+      "high": null
+    },
+    "model_present_value_per_share": {
+      "low": null,
+      "base": null,
+      "high": null
+    },
+    "required_return_pct": {
+      "low": null,
+      "base": null,
+      "high": null
+    },
+    "forward_cashflow_schedule": {},
+    "buy_prices": [],
+    "components": [
+      {
+        "component_id": "core_engine",
+        "method": "owner_earnings_reinvestment_dcf",
+        "status": "available",
+        "present_value_per_share": {
+          "low": 22.0574,
+          "base": 32.7526,
+          "high": 50.3438
+        }
+      },
+      {
+        "component_id": "reinvestment_or_assets",
+        "method": "net_asset_value",
+        "status": "model_gap",
+        "present_value_per_share": {}
+      },
+      {
+        "component_id": "net_financial_claims",
+        "method": "net_asset_value",
+        "status": "model_gap",
+        "present_value_per_share": {
+          "low": 0.0
+        }
+      },
+      {
+        "component_id": "downside_reserve",
+        "method": "net_asset_value",
+        "status": "model_gap",
+        "present_value_per_share": {}
+      }
+    ],
+    "gaps": [
+      {
+        "component_id": "reinvestment_or_assets",
+        "case": "low",
+        "code": "realization_timing_missing:value_per_share"
+      },
+      {
+        "component_id": "reinvestment_or_assets",
+        "case": "base",
+        "code": "realization_timing_missing:value_per_share"
+      },
+      {
+        "component_id": "reinvestment_or_assets",
+        "case": "high",
+        "code": "realization_timing_missing:value_per_share"
+      },
+      {
+        "component_id": "net_financial_claims",
+        "case": "base",
+        "code": "realization_timing_missing:value_per_share"
+      },
+      {
+        "component_id": "net_financial_claims",
+        "case": "high",
+        "code": "realization_timing_missing:value_per_share"
+      },
+      {
+        "component_id": "downside_reserve",
+        "case": "low",
+        "code": "realization_timing_missing:value_per_share"
+      },
+      {
+        "component_id": "downside_reserve",
+        "case": "base",
+        "code": "realization_timing_missing:value_per_share"
+      },
+      {
+        "component_id": "downside_reserve",
+        "case": "high",
+        "code": "realization_timing_missing:value_per_share"
+      }
+    ],
+    "warnings": [],
+    "source_refs": [
+      {
+        "node_id": "owner_earnings",
+        "ref": "BN/investor-documents/ir-bn/2026-Q1-BN-Supplemental-vF-2.pdf",
+        "locator": "LTM DE $2.54/sh \u00d7 60% direct+operating split; DE definition and LTM per Q1-26 supplemental",
+        "as_of": "2026-03-31",
+        "source_id": "3830b6d190b7e333c5918a06fe35e0e42e1f8b0ad172c06e8e32c1a86f1fbee1"
+      },
+      {
+        "node_id": "shares_m",
+        "ref": "BN/research/evidence/sec_companyfacts.json",
+        "locator": "ifrs-full:AdjustedWeightedAverageShares; form 40-F filed 2026-03-18; CY2025",
+        "as_of": "2025-12-31",
+        "content_sha256": "7fc2b1cb00ab42b7bc20039a32d63e87317cfae7a314ac24d87fa0fff4ff3f00",
+        "source_id": "25a381d0a964446773c498f4e0f6d09c751857c4a27ae65329701c50cc903578"
+      }
+    ],
+    "next_action": "automatic_model_refresh",
+    "reconciliation": {
+      "passed": false
+    },
+    "settlement_policy": "Explicit cash/debt additions in an operating DCF are time-zero acquisition adjustments; hypothetical settlement, not declared dividends.",
+    "calculation_id": "6a513f0ae0bda1cb1227a686104912f6606f22b5c822be6f4f1695f1d22af7e8"
+  },
   "authority": "universal_valuation_contract",
   "legacy_reference_present": true,
   "falsifier_coverage": {

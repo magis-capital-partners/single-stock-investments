@@ -18,7 +18,7 @@ const mean = xs => xs.length ? sum(xs)/xs.length : null;
 function quant(xs,p){ if(!xs.length)return null;const a=xs.slice().sort((a,b)=>a-b),i=(a.length-1)*p;return a[Math.floor(i)]+(a[Math.ceil(i)]-a[Math.floor(i)])*(i%1); }
 function groups(rows,key){const m=new Map();for(const r of rows){const k=key(r),v=m.get(k)||[];v.push(r);m.set(k,v);}return m;}
 function dist(xs){return {n:xs.length,mean:mean(xs),median:quant(xs,.5),p05:quant(xs,.05),p95:quant(xs,.95),min:xs.length?Math.min(...xs):null,max:xs.length?Math.max(...xs):null,win_rate:mean(xs.map(x=>+(x>0)))};}
-function bin(x){return x<5?'2–<5':x<10?'5–<10':x<20?'10–<20':x<50?'20–<50':x<100?'50–<100':'100+';}
+function bin(x){return x<5?'>1–<5':x<10?'5–<10':x<20?'10–<20':x<50?'20–<50':x<100?'50–<100':'100+';}
 function rng(seed=20261023){let s=seed>>>0;return()=>{s=(1664525*s+1013904223)>>>0;return s/4294967296;};}
 function clusterCI(rows,value='ret',B=2000){
   const clusters=[...groups(rows,r=>r.issuer).values()],random=rng();
@@ -135,29 +135,31 @@ function label(ctx,r,h){
 function replay(ctx, opts){
   const {prices,auction,factor,settlement}=ctx,c=CASES[opts.cost],cap=opts.cap??null,h=opts.horizon;
   const filter=r=>opts.ordinal==='provider'?r.provider_ordinal>=3:opts.ordinal==='all'?true:r.ordinal>=3;
-  const cutoff=prices.days.length-(h>20?h:20);
+  const cutoff=prices.days.length-(opts.maturitySessions||Math.max(20,h));
+  if(!c||!Number.isInteger(h)||h<1||h>60||cap!==null&&(!(cap>0)||cap>1)||opts.nav!==undefined&&(!(opts.nav>0)||!Number.isFinite(opts.nav)))throw new Error('Invalid replay options');
   const universe=ctx.candidates.filter(filter).filter(r=>opts.financial==='all'||opts.financial==='scored'&&r.scored||opts.financial==='score60'&&r.scored&&r.score>=60);
-  const funnel={selected:universe.length,common_maturity_excluded:0,missing_entry:0,missing_liquidity:0,overlap:0,zero_capacity:0,entered:0};
+  const funnel={selected:universe.length,common_maturity_excluded:0,missing_entry:0,missing_liquidity:0,overlap:0,zero_capacity:0,entered:0,ssr_rejected:0,risk_capacity:0,verified_evidence_missing:0};
   const byDay=new Map();
   for(const r of universe){
-    if(r.i===undefined||r.i>cutoff){funnel.common_maturity_excluded++;continue;}
+    if(r.i===undefined||(r.maturity_index??r.i)>cutoff){funnel.common_maturity_excluded++;continue;}
     if(!r.entry_price||!prices.point(r.ticker,r.day)){funnel.missing_entry++;continue;}
     if(cap!==null&&!r.liquidity_complete){funnel.missing_liquidity++;continue;}
     const a=byDay.get(r.day)||[];a.push(r);byDay.set(r.day,a);
   }
   const positions=[],daily=[];let cash=0,peak=0,maxDD=0,previous=0;
   const allDays=prices.days,dayIndex=prices.index;
-  let day=allDays[0],peakExposure=0,peakMargin=0,peakNames=0,staleSessions=0,loanTail=0;
+  let day=allDays[0],peakExposure=0,peakMargin=0,peakNames=0,staleSessions=0,loanTail=0,riskBreachSessions=0;
   function applyCash(p,category,value){cash+=value;p[category]=(p[category]||0)+value;}
   function mark(p,ds){
     const f=factor(p.ticker,p.day,ds);
     if(f===null){p.action_conflict=true;return;}
     const old=p.factor;p.factor=f;
-    p.mark*=f/old;
+    p.mark*=f/old;p.open_mark=p.mark;
+    if(opts.stopCloseFraction&&p.units>1e-9&&p.open_mark/p.factor>=p.entry_price*(1+opts.stopCloseFraction))p.stop_due=ds;
     if((Date.parse(ds)-Date.parse(p.last_mark))/DAY>7)p.identity_unresolved=true;
     if(p.identity_unresolved)return;
     const point=prices.point(p.ticker,ds),a=auction(p.ticker,ds);
-    if(point){p.mark=a.close||point.close;p.last_mark=ds;}
+    if(point){p.mark=a.close||point.close;p.last_mark=ds;if(p.units>1e-9)p.max_adverse_price_return=Math.max(p.max_adverse_price_return||0,point.high/p.factor/p.entry_price-1);}
   }
   for(;day<=prices.last;day=A.dateAfter(day)){
     const idx=dayIndex.get(day),session=idx!==undefined;
@@ -169,7 +171,7 @@ function replay(ctx, opts){
       let billed=p.loan_units;
       if(day===p.loan_start&&billed<=1e-9&&p.borrow_days===0)billed=p.entry_units;
       if(billed>1e-9&&day>=p.loan_start){
-        const charge=collateral(billed/p.factor,p.mark)*c.apr/360;
+        const charge=collateral(billed/p.factor,opts.causalCarry?p.open_mark:p.mark)*c.apr/360;
         applyCash(p,'borrow',-charge);p.borrow_days++;
       }
     }
@@ -177,24 +179,36 @@ function replay(ctx, opts){
     for(const r of (byDay.get(day)||[]).sort((a,b)=>a.id.localeCompare(b.id))){
       if(positions.some(p=>p.issuer===r.issuer&&p.units>1e-9)){funnel.overlap++;continue;}
       const point=prices.point(r.ticker,day),ssr=prices.ssrQuery.get(r.ticker,day);
-      let qty=Math.floor(25000/r.entry_price);
+      if(opts.evidence==='verified'){funnel.verified_evidence_missing++;continue;}
+      if(opts.ssrMode==='strict'&&ssr?.restricted!==0){funnel.ssr_rejected++;continue;}
+      const target=opts.target||25000;let qty=Math.floor(target/r.entry_price);
+      if(opts.nav){
+        const open=positions.filter(p=>p.units>1e-9),exposure=sum(open.map(p=>p.units/p.factor*(p.open_mark||p.mark))),required=sum(open.map(p=>margin(p.units/p.factor,p.open_mark||p.mark)));
+        const equity=opts.nav+cash-exposure,budget=Math.min(.0025*equity,Math.max(0,.01*equity-(opts.otherStressLoss||0)/2-exposure));
+        if(open.length>=(opts.maximumNames||3)){funnel.risk_capacity++;continue;}
+        qty=Math.min(qty,Math.floor(budget/r.entry_price),Math.floor(Math.max(0,.8*equity-required)/margin(1,r.entry_price)));
+        if(qty<=0){funnel.risk_capacity++;continue;}
+      }
       if(cap!==null){
         qty=Math.min(qty,Math.floor(cap*r.adv_shares),Math.floor(cap*point.volume*(ssr?.restricted===0?1:.5)));
       }
       if(qty<1){funnel.zero_capacity++;continue;}
       const spread=execution(c,qty*r.entry_price)/2,fill=r.entry_price*(1-spread);
-      const p={...r,horizon:h,entry_units:qty,units:qty,loan_units:0,factor:1,mark:point.close,last_mark:day,
-        entry_reference_notional:qty*r.entry_price,entry_proceeds:qty*fill,entry_fill:fill,deadline:idx+h-1,
-        planned_exit:allDays[idx+h-1],loan_start:settlement(day),pending_returns:[],borrow:0,borrow_days:0,fees:0,
-        covers:0,execution_cost:qty*(r.entry_price-fill),stale_sessions:0,cover_children:0,filled_fraction:qty*r.entry_price/25000};
+      const p={...r,horizon:h,entry_units:qty,units:qty,loan_units:0,factor:1,mark:auction(r.ticker,day).close||point.close,last_mark:day,
+        open_mark:r.entry_price,max_adverse_price_return:Math.max(0,point.high/r.entry_price-1),
+        entry_reference_notional:qty*r.entry_price,entry_proceeds:qty*fill,entry_fill:fill,deadline:r.exit_index_override??idx+h-1,
+        planned_exit:allDays[r.exit_index_override??idx+h-1],loan_start:settlement(day),pending_returns:[],borrow:0,borrow_days:0,fees:0,
+        covers:0,execution_cost:qty*(r.entry_price-fill),stale_sessions:0,cover_children:0,filled_fraction:qty*r.entry_price/target};
       positions.push(p);cash+=p.entry_proceeds;
       if(c.fees)applyCash(p,'fees',-fee(qty,fill,day,true,p.loan_start));
       funnel.entered++;
     }
     // Close at the session close; for h1 the entry session is also the exit session.
     for(const p of positions){
-      if(p.units<=1e-9||idx<p.deadline||p.identity_unresolved||p.action_conflict)continue;
-      const point=prices.point(p.ticker,day),close=auction(p.ticker,day).close;
+      if(p.units<=1e-9||idx<p.deadline&&!p.stop_due)continue;
+      if(p.identity_unresolved||p.action_conflict){p.overdue=true;continue;}
+      const point=prices.point(p.ticker,day),close=p.stop_due?auction(p.ticker,day).open:auction(p.ticker,day).close;
+      if(p.stop_due)p.exit_price_basis='next_session_open_after_prior_close_threshold';
       if(!point||!close){p.overdue=true;continue;}
       let q=p.units/p.factor;
       if(cap!==null)q=Math.min(Math.floor(q+1e-10),Math.floor(cap*point.volume));
@@ -212,7 +226,7 @@ function replay(ctx, opts){
       const v=p.units/p.factor*p.mark;liability+=v;exposure+=v;required+=margin(p.units/p.factor,p.mark);names++;
       if(p.last_mark!==day){p.stale_sessions++;stale+=v;}
     }
-    const pnl=cash-liability;peak=Math.max(peak,pnl);maxDD=Math.min(maxDD,pnl-peak);
+    const pnl=cash-liability;if(opts.nav&&(2*exposure+(opts.otherStressLoss||0)>.02*(opts.nav+pnl)||required>.8*(opts.nav+pnl)))riskBreachSessions++;peak=Math.max(peak,pnl);maxDD=Math.min(maxDD,pnl-peak);
     peakExposure=Math.max(peakExposure,exposure);peakMargin=Math.max(peakMargin,required);peakNames=Math.max(peakNames,names);staleSessions+=+(stale>0);
     daily.push({date:day,pnl,change:pnl-previous,liability,exposure,margin:required,names,stale});previous=pnl;
   }
@@ -250,7 +264,7 @@ function replay(ctx, opts){
     win_rate_closed:mean(closed.map(p=>+(p.pnl>0))),profit_factor_closed:sum(closed.filter(p=>p.pnl>0).map(p=>p.pnl))/-sum(closed.filter(p=>p.pnl<0).map(p=>p.pnl)),
     max_drawdown_dollars:drawdown,worst_day:Math.min(...daily.map(d=>d.change)),best_day:Math.max(...daily.map(d=>d.change)),
     worst_trade:positions.length?Math.min(...positions.map(p=>p.pnl)):null,best_trade:positions.length?Math.max(...positions.map(p=>p.pnl)):null,
-    peak_exposure:peakExposure,peak_margin:peakMargin,peak_open_names:peakNames,
+    risk_breach_sessions:riskBreachSessions,peak_exposure:peakExposure,peak_margin:peakMargin,peak_open_names:peakNames,
     nav_for_200pct_squeeze_at_2pct_loss_budget:2*peakExposure/.02,
     open_positions:positions.filter(p=>p.units>1e-9).length,open_liability:sum(positions.map(p=>p.open_liability)),stale_sessions:staleSessions,
     overdue_positions:positions.filter(p=>p.overdue).length,fractional_residuals:positions.filter(p=>p.units>0&&p.units/p.factor<1).length,
@@ -259,13 +273,13 @@ function replay(ctx, opts){
     positive_months:monthly.filter(x=>x.pnl>0).length,total_months:monthly.length,best_month:monthly.length?Math.max(...monthly.map(x=>x.pnl)):null,
     worst_month:monthly.length?Math.min(...monthly.map(x=>x.pnl)):null,annualized_pnl:years?net/years:null,trades_per_year:years?positions.length/years:null,
     pooled_net_return:sum(positions.map(p=>p.entry_reference_notional))?net/sum(positions.map(p=>p.entry_reference_notional)):null,
-    issuer_bootstrap_mean_trade_return_95:clusterCI(returns),
+    issuer_bootstrap_mean_trade_return_95:opts.fastStats?null:clusterCI(returns),
     top5_issuer_profit_share:net?sum(issuerPnls.slice().sort((a,b)=>b.pnl-a.pnl).slice(0,5).map(x=>x.pnl))/net:null,
     pnl_without_best_issuer:net-(issuerPnls.length?Math.max(...issuerPnls.map(x=>x.pnl)):0),
     pnl_without_best5_issuers:net-sum(issuerPnls.slice().sort((a,b)=>b.pnl-a.pnl).slice(0,5).map(x=>x.pnl)),
-    monthly,yearly,broker_verified_entries:0,borrow_availability_verified:false,account_capital_limit_applied:false,
+    monthly,yearly,broker_verified_entries:0,borrow_availability_verified:false,account_capital_limit_applied:!!opts.nav,
     negative_marked_trades:positions.filter(p=>p.pnl<0).length};
-  return {summary,daily,positions};
+  return enrichSummary({summary,daily,positions});
 }
 function tests(){
   const assert=require('node:assert/strict');
@@ -279,7 +293,7 @@ function tests(){
   assert.equal(25000-1000*8-1500*8,5000);
   assert.equal(25000-1000*8-1500*12,-1000);
   const inv=invert([[2,0],[0,4]]);assert.deepEqual(inv,[[.5,0],[0,.25]]);
-  return {hand_accounting_checks:10,passed:true};
+  return {hand_accounting_checks:11,passed:true};
 }
 
 function protocol(){
@@ -295,7 +309,7 @@ function protocol(){
     accounting:'Nominal prices and mechanical action share adjustments. Vendor < provider < automated primary repair < verified catalogue. ACT/360 rounded collateral borrow from settlement through modeled return, minimum one billed day; dated commissions and SEC/TAF schedule reused from profit_prices.',
     omissions:'No proceeds interest, dividends, locate charges, forced buy-ins, corporate-action servicing fees, taxes or overhead.',
     costs:CASES,financial:'Existing as-filed numeric score, at least three independent signals, every filing public by entry, period age <=200 days. Higher score means greater distress. Show all, financially scored subset and score>=60 separately.',
-    magnitude:'Old/new price multiple. Corroborated same-issuer same-date catalogue ratio supersedes provider ratio. Bins: 2–<5, 5–<10, 10–<20, 20–<50, 50–<100, >=100.',
+    magnitude:'Old/new price multiple. Corroborated same-issuer same-date catalogue ratio supersedes provider ratio. Bins: >1–<5, 5–<10, 10–<20, 20–<50, 50–<100, >=100.',
     statistics:'Event-weighted arithmetic short returns; 2,000 issuer-cluster bootstrap mean intervals. Exploratory OLS with issuer-cluster standard errors, year, repeat status, log price and log prior ADV; finance-covered fit adds score. No multiple-testing adjustment or untouched historical holdout.',
     exclusions:'No sealed holdout files, Gateway/broker access, or new paid market data. Previously explored history is development evidence.'};
 }
@@ -308,7 +322,7 @@ function magnitudeStudy(ctx){
     const valid=rows.filter(r=>r.status==='observed');
     for(const cohort of ['all','scored','score60','third_plus']){
       const eligible=valid.filter(r=>cohort==='all'||cohort==='scored'&&r.scored||cohort==='score60'&&r.scored&&r.score>=60||cohort==='third_plus'&&r.ordinal>=3);
-      for(const b of ['2–<5','5–<10','10–<20','20–<50','50–<100','100+','ALL']){
+      for(const b of ['>1–<5','5–<10','10–<20','20–<50','50–<100','100+','ALL']){
         tables.push({h,cohort,bin:b,...stats(b==='ALL'?eligible:eligible.filter(r=>r.bin===b))});
       }
     }
@@ -374,7 +388,7 @@ function makeReport(doc){
   s+=table(['Sessions','Mature eligible','Observed paths','Missing entry','Missing exit','Action conflict'],doc.magnitude.coverage.map(r=>[r.h,r.eligible,r.statuses.observed||0,r.statuses.missing_entry||0,r.statuses.missing_exit||0,r.statuses.action_conflict||0]));
   for(const h of [1,5,10,20,60]){
     s+='\n### '+h+' sessions: gross short returns\n\n';
-    s+=table(['Old per new share','All n','All mean / median','Scored n / mean','Score>=60 n / mean','Third+ n / mean','All mean 95%'],['2–<5','5–<10','10–<20','20–<50','50–<100','100+','ALL'].map(b=>{
+    s+=table(['Old per new share','All n','All mean / median','Scored n / mean','Score>=60 n / mean','Third+ n / mean','All mean 95%'],['>1–<5','5–<10','10–<20','20–<50','50–<100','100+','ALL'].map(b=>{
       const get=cohort=>doc.magnitude.tables.find(r=>r.h===h&&r.bin===b&&r.cohort===cohort),a=get('all'),f=get('scored'),g=get('score60'),t=get('third_plus');
       return [b,a.n,pct(a.mean)+' / '+pct(a.median),f.n+' / '+pct(f.mean),g.n+' / '+pct(g.mean),t.n+' / '+pct(t.mean),ci(a.issuer_bootstrap_95)];
     }));
@@ -417,7 +431,7 @@ function htmlReport(doc,md,baseLedger){
 async function main(){
   fs.mkdirSync(OUT,{recursive:true});fs.mkdirSync(PRIVATE,{recursive:true});
   const declared=protocol();json(path.join(OUT,'protocol.json'),declared);
-  const test=tests(),ctx=load(),models=[],ledgers=[];
+  const test={...tests(),portfolio:extendedTests()},ctx=load(),models=[],ledgers=[];
   function run(horizon,cost='base',cap=null,financial='all',ordinal='extended'){
     const o={horizon,cost,cap,financial,ordinal},r=replay(ctx,o);models.push(r.summary);ledgers.push(r);
     const id=[ordinal,financial,'h'+horizon,cost,cap===null?'full':'cap'+cap].join('__');
@@ -431,19 +445,99 @@ async function main(){
     run(h,'depth_base',.05);run(h,'base',null,'scored');run(h,'base',null,'score60');run(h,'base',null,'all','provider');
   }
   run(60,'ideal');run(60,'base');
-  const magnitude=magnitudeStudy(ctx),validation={tests:test,oracle:oracle(ctx)};
+  const magnitude=magnitudeStudy(ctx),validation={tests:test,oracle:oracle(ctx)},diagnostic=diagnostics(ctx,ledgers);
   const counting=[{definition:'Provider catalogue only',rows:ctx.candidates.filter(r=>r.provider_ordinal>=3)},{definition:'Supplemented same-CIK history',rows:ctx.candidates.filter(r=>r.ordinal>=3)}].map(x=>({definition:x.definition,n:x.rows.length,issuers:new Set(x.rows.map(r=>r.issuer)).size}));
   const base=ledgers.find(r=>r.summary.horizon===10&&r.summary.cost==='base'&&r.summary.cap===null&&r.summary.financial==='all'&&r.summary.ordinal==='extended');
   const qa={ratio_overrides:ctx.actionFlags.length,financial_statuses:Object.fromEntries([...groups(ctx.candidates,r=>r.financial_status)].map(([k,v])=>[k,v.length])),candidates:ctx.candidates.length,candidate_issuers:new Set(ctx.candidates.map(r=>r.issuer)).size,complete_lifetime_history:false,new_market_data_spend:0};
-  const doc={schema:'repeat_magnitude_study.v1',built_at:new Date().toISOString(),price_asof:ctx.prices.last,protocol:declared,counting,models,magnitude,validation,data_quality:qa,
+  const doc={schema:'repeat_magnitude_study.v1',built_at:new Date().toISOString(),price_asof:ctx.prices.last,protocol:declared,counting,models,magnitude,diagnostic,validation,data_quality:qa,
     inputs:[path.join(CACHE,'effective_events.local.json'),path.join(CACHE,'corporate_action_repairs.json'),path.join(RUN,'event_outcomes.parts.json'),path.join(RUN,'prices.sqlite'),__filename].map(f=>({file:path.relative(ROOT,f).replace(/\\/g,'/'),sha256:hash(f)}))};
   json(path.join(OUT,'summary.json'),doc);json(path.join(PRIVATE,'candidates.local.json'),ctx.candidates);
   json(path.join(PRIVATE,'audit.local.json'),{ratio_overrides:ctx.actionFlags,oracle:validation.oracle,
     residuals:ledgers.map(r=>({options:{h:r.summary.horizon,cost:r.summary.cost,cap:r.summary.cap,financial:r.summary.financial,ordinal:r.summary.ordinal},positions:r.positions.filter(p=>p.units>1e-9).map(p=>({id:p.id,ticker:p.ticker,issuer:p.issuer,entry:p.day,planned_exit:p.planned_exit,liability:p.open_liability,units:p.units,identity_unresolved:p.identity_unresolved,action_conflict:p.action_conflict}))})),
     outliers:base.positions.slice().sort((a,b)=>a.pnl-b.pnl).filter((p,i,a)=>i<10||i>=a.length-10)});
-  const md=makeReport(doc);fs.writeFileSync(path.join(OUT,'REPORT.md'),md);
+  const md=makeReport(doc)+additionalReport(doc);fs.writeFileSync(path.join(OUT,'REPORT.md'),md);
   fs.writeFileSync(path.join(OUT,'REPORT.html'),htmlReport(doc,md,base));
   ctx.prices.close();console.log(JSON.stringify({saved:OUT,models:models.length,counting,base:base.summary},null,2));
 }
-module.exports={load,label,replay,tests,protocol,regression,stats,magnitudeStudy,makeReport,htmlReport};
+module.exports={load,label,replay,tests,extendedTests,diagnostics,protocol,regression,stats,magnitudeStudy,makeReport,htmlReport,enrichSummary,additionalReport};
 if(require.main===module)main().catch(e=>{console.error(e);process.exitCode=1;});
+
+
+function extendedTests(){
+  const assert=require('node:assert/strict'),days=[];
+  for(let d='2025-01-02';days.length<45;d=A.dateAfter(d))if(![0,6].includes(new Date(d+'T12:00:00Z').getUTCDay()))days.push(d);
+  function fixture({action=false,missing=false,capacity=false}={}){
+    const index=new Map(days.map((d,i)=>[d,i]));
+    const row={id:'fixture',issuer:'cik/1',ticker:'TEST',day:days[0],i:0,ordinal:3,provider_ordinal:3,entry_price:10,liquidity_complete:true,adv_shares:1000,scored:true,score:70};
+    const point=(t,d)=>({open:10,high:10,low:8,close:action&&d>days[0]?80:8,volume:capacity&&index.get(d)<2?0:100000});
+    const prices={days,index,last:days.at(-1),point,ssrQuery:{get:()=>({restricted:0})}};
+    return {candidates:[row],prices,auction:(t,d)=>({open:10,close:missing?null:action&&d>days[0]?80:8}),
+      factor:(t,a,b)=>action&&a<b?10:1,settlement:d=>days[index.get(d)+1]||A.dateAfter(d)};
+  }
+  let r=replay(fixture(),{horizon:1,cost:'ideal',cap:null,financial:'all',ordinal:'extended'});
+  assert.equal(r.summary.net_pnl,5000);assert.equal(r.summary.closed,1);
+  r=replay(fixture({action:true}),{horizon:5,cost:'ideal',cap:null,financial:'all',ordinal:'extended'});
+  assert.equal(r.summary.net_pnl,5000);assert.equal(r.positions[0].factor,10);
+  r=replay(fixture({missing:true}),{horizon:5,cost:'ideal',cap:null,financial:'all',ordinal:'extended'});
+  assert.equal(r.summary.closed,0);assert.equal(r.summary.open_positions,1);assert.equal(r.summary.open_liability,20000);assert.equal(r.summary.net_pnl,5000);
+  const f=fixture();f.prices.point=(t,d)=>({open:10,high:10,low:8,close:8,volume:d===days[1]?100:100000});
+  r=replay(f,{horizon:2,cost:'ideal',cap:.05,financial:'all',ordinal:'extended'});
+  assert.equal(r.summary.entered,1);assert.equal(r.positions[0].entry_units,50);
+  assert.equal(r.positions[0].cover_children,2);assert.equal(r.summary.net_pnl,100);
+  return {synthetic_portfolio_assertions:12,passed:true,cases:['fixed-dollar gain','intervening 1-for-10 action','missing exit retains full liability','liquidity-constrained partial covers']};
+}
+function diagnostics(ctx,ledgers){
+  const primary=ledgers.filter(r=>r.summary.horizon<=20&&r.summary.ordinal==='extended'&&r.summary.financial==='all'&&r.summary.cost==='base');
+  const chronological=primary.flatMap(r=>['2023-2024','2025','2026'].map(period=>{
+    const ps=r.positions.filter(p=>period==='2023-2024'?p.day<'2025-01-01':p.day.startsWith(period));
+    return {h:r.summary.horizon,cap:r.summary.cap,entry_period:period,trades:ps.length,issuers:new Set(ps.map(p=>p.issuer)).size,marked_pnl:sum(ps.map(p=>p.pnl)),net_per_entry_dollar:sum(ps.map(p=>p.entry_reference_notional))?sum(ps.map(p=>p.pnl))/sum(ps.map(p=>p.entry_reference_notional)):null,unresolved:ps.filter(p=>p.units>0).length};
+  }));
+  const exact=[];
+  for(const h of [1,5,10,20])for(const multiple of [5,10,20,50,100])for(const cohort of ['all','scored','score60','third_plus']){
+    const rows=ctx.candidates.filter(r=>r.i!==undefined&&r.i<=ctx.prices.days.length-20&&Math.abs(r.multiple-multiple)<1e-7)
+      .map(r=>label(ctx,r,h)).filter(r=>r.status==='observed'&&(cohort==='all'||cohort==='scored'&&r.scored||cohort==='score60'&&r.scored&&r.score>=60||cohort==='third_plus'&&r.ordinal>=3));
+    exact.push({h,multiple,cohort,...stats(rows)});
+  }
+  const full20=ledgers.find(r=>r.summary.horizon===20&&r.summary.cost==='base'&&r.summary.cap===null&&r.summary.financial==='all'&&r.summary.ordinal==='extended');
+  const cap20=ledgers.find(r=>r.summary.horizon===20&&r.summary.cost==='base'&&r.summary.cap===.05&&r.summary.financial==='all'&&r.summary.ordinal==='extended');
+  const capacityPairs=full20.positions.filter(p=>p.closed).map(p=>{const other=cap20.positions.find(q=>q.id===p.id);return other?{id:p.id,full:p.pnl,capped:other.pnl,full_exit:p.closed,capped_exit:other.closed||null,capped_open:other.units>0,entry_fraction:other.entry_reference_notional/p.entry_reference_notional}:null;}).filter(Boolean);
+  return {chronological,exact,capacity_comparison:{paired_positions:capacityPairs.length,delayed_or_open_covers:capacityPairs.filter(p=>p.capped_exit!==p.full_exit).length,mean_entry_fraction:mean(capacityPairs.map(p=>p.entry_fraction))},
+    limitations:['No sealed holdout touched','Chronological diagnostics reuse explored history and have no retraining','Historical loan capacity and recall paths unobserved']};
+}
+
+
+function movingBlockCI(monthly,B=2000,block=6){
+  if(monthly.length<block)return null;const random=rng(77123),draws=[];
+  for(let b=0;b<B;b++){const values=[];while(values.length<monthly.length){const start=Math.floor(random()*monthly.length);for(let j=0;j<block&&values.length<monthly.length;j++)values.push(monthly[(start+j)%monthly.length].pnl);}draws.push(mean(values));}
+  return [quant(draws,.025),quant(draws,.975)];
+}
+function additionalReport(doc){
+  const money=x=>x==null?'—':new Intl.NumberFormat('en-US',{style:'currency',currency:'USD',maximumFractionDigits:0}).format(x);
+  const pct=x=>x==null?'—':(100*x).toFixed(2)+'%';
+  const table=(h,rows)=>'| '+h.join(' | ')+' |\n| '+h.map(()=>'---').join(' | ')+' |\n'+rows.map(r=>'| '+r.join(' | ')+' |').join('\n')+'\n';
+  const get=(h,cap=null)=>doc.models.find(r=>r.horizon===h&&r.cap===cap&&r.cost==='base'&&r.financial==='all'&&r.ordinal==='extended');
+  let s='\n## Additional robustness and accounting\n\n### Volume limits across all horizons\n\n';
+  s+=table(['Sessions','Sizing','Entries','Mean position','Net P&L','Monthly mean','Max drawdown','Open liability'],[1,5,10,20].flatMap(h=>[null,.05,.01,.001].map(cap=>{const r=get(h,cap);return[h,cap===null?'Full-fill':100*cap+'% ADV/volume',r.entered,money(r.mean_position),money(r.net_pnl),money(r.mean_monthly_since_first_entry),money(r.max_drawdown_dollars),money(r.open_liability)];})));
+  s+='\nVolume limits change allocation and cover timing. Smaller capacity is not the full-fill result multiplied by a constant.\n\n### Open versus closed P&L and monthly uncertainty\n\n';
+  s+=table(['Model','Closed-trade P&L','Open marked P&L','Monthly mean','6-month-block 95% interval','At least 95% target entries','Break-even APR'],[10,20].flatMap(h=>[null,.05].map(cap=>{const r=get(h,cap);return[h+' sessions / '+(cap===null?'full':'5%'),money(r.closed_trade_pnl),money(r.open_trade_marked_pnl),money(r.mean_monthly_since_first_entry),r.monthly_block_bootstrap_95?.map(money).join(' to '),r.full_target_entries+' / '+r.entered,pct(r.break_even_borrow_apr)];})));
+  s+='\nIntervals resample six-month blocks of the same explored monthly history, including zeros; these are sensitivity intervals, not forward guarantees. Break-even APR holds historical marks, covers and base execution fixed. Open marked P&L is not completed profit.\n\n### Entry-year cohorts\n\n';
+  s+=table(['Horizon / sizing','Entry period','Trades / issuers','Marked P&L','Return per entry dollar','Unresolved'],doc.diagnostic.chronological.map(r=>[r.h+' / '+(r.cap===null?'full':100*r.cap+'%'),r.entry_period,r.trades+' / '+r.issuers,money(r.marked_pnl),pct(r.net_per_entry_dollar),r.unresolved]));
+  s+='\nEntry-year P&L includes later carry and marks through the cutoff, unlike calendar-year changes. All periods were already explored.\n\n### Exact ratio comparison, ten-session gross returns\n\n';
+  s+=table(['Exact ratio','All n / mean','Scored n / mean','Score>=60 n / mean','Third+ n / mean'],[5,10,20,50,100].map(m=>{const get=c=>doc.diagnostic.exact.find(r=>r.h===10&&r.multiple===m&&r.cohort===c);return['1-for-'+m,...['all','scored','score60','third_plus'].map(c=>{const r=get(c);return r.n+' / '+pct(r.mean);})];}));
+  s+='\nThe >1–<5 bucket includes supplied 1-for-1.5 and 1-for-1.99 actions. Exact ratios avoid mixing 1-for-100 with larger actions. In the twenty-session comparison, '+doc.diagnostic.capacity_comparison.delayed_or_open_covers+' of '+doc.diagnostic.capacity_comparison.paired_positions+' paired full-fill closed positions have a delayed or still-open cover in the 5% model.\n\n### Twenty-session calendar years and months\n\n';
+  const full=get(20),cap=get(20,.05);
+  s+=table(['Year','Full-fill P&L','5% volume P&L'],full.yearly.map(r=>[r.year,money(r.pnl),money(cap.yearly.find(x=>x.year===r.year)?.pnl)]));
+  s+='\n'+table(['Month','Full-fill P&L','5% volume P&L'],full.monthly.map(r=>[r.month,money(r.pnl),money(cap.monthly.find(x=>x.month===r.month)?.pnl)]));
+  s+='\nCost references: https://www.interactivebrokers.com/en/pricing/short-sale-cost.php and https://www.interactivebrokers.com/en/trading/short-securities-availability.php . Rates and availability vary; these pages do not supply historical locates. The frozen fee table is a scenario, not a broker invoice.\n';
+  return s;
+}
+
+function enrichSummary(result){
+  const {summary:r,positions:p, daily}=result,closed=p.filter(x=>x.units<=1e-9);
+  r.closed_trade_pnl=sum(closed.map(x=>x.pnl));
+  r.open_trade_marked_pnl=sum(p.filter(x=>x.units>1e-9).map(x=>x.pnl));
+  r.full_target_entries=p.filter(x=>x.filled_fraction>=.95).length;
+  r.monthly_block_bootstrap_95=r.fastStats?null:movingBlockCI(r.monthly);
+  r.break_even_borrow_apr=r.borrow_cost>0&&CASES[r.cost].apr>0?CASES[r.cost].apr*(r.gross_pnl-r.execution_cost-r.commissions_and_fees)/r.borrow_cost:null;
+  return result;
+}

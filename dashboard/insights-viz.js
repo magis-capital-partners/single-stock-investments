@@ -294,7 +294,8 @@
         <h3>Who discusses this</h3>
         <ul class="source-stack">
           ${discussants.slice(0, 8).map(d => {
-            const action = d.action || 'discussed';
+            const actionLabels = {sell:'sold (extent unspecified)',exit:'exited',unverified:'action awaiting source review',sold_options:'sold call options',sold_warrants:'sold warrants',bought_bonds:'bought bonds'};
+            const action = actionLabels[d.action] || d.action || 'discussed';
             const badge = STANCE_BADGE[action] || 'badge-us';
             const snippet = escapeHtml(cleanText(d.commentary, 220));
             const link = recordEvidenceLink(d, linkHtml, ghRepo);
@@ -308,6 +309,7 @@
               </div>
               <div class="source-card-title">${escapeHtml(d.fund || 'Investor letter')}</div>
               ${snippet ? `<div class="source-card-body">${snippet}</div>` : ''}
+              ${d.classification_review ? `<p class="source-card-meta">${escapeHtml(d.classification_review.status === 'corrected' ? 'Source-reviewed correction' : 'Source review needed')}: ${escapeHtml(d.classification_review.reason || '')}</p>` : ''}
               <div class="source-card-footer">
                 <span>${escapeHtml(d.quarter || '—')}</span>
                 ${link}

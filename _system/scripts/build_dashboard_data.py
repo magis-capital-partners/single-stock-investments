@@ -1550,7 +1550,7 @@ def valuation_decision_summary(
         status in {"evidence_blocked", "provisional"}
         or model_level not in RETURN_PUBLISHABLE_MODEL_LEVELS
     )
-    return {
+    view = {
         "status": status,
         "proof_status": proof_status,
         "model_level": model_level,
@@ -1610,6 +1610,13 @@ def valuation_decision_summary(
             "TPL", "LB", "WBI", "AZLCZ", "MSB", "C", "NVR", "NUE", "BIIB",
         },
     }
+    from refresh_shared_forecasts import calculate
+    from valuation_forecast import attach_forecast
+    if ((ticker_dir / 'research/valuation.json').is_file()
+            or (ROOT / '_system/reference/market-data/valuation_fundamentals' / (ticker + '.json')).is_file()):
+        return attach_forecast({'valuation_decision': view}, calculate(ticker, ROOT, datetime.now(timezone.utc).date().isoformat()), detailed=False)['valuation_decision']
+    return view
+
 
 
 def valuation_queue_summary(rows: list[dict]) -> dict:
@@ -1752,6 +1759,17 @@ def pricing_analysis_summary(ticker_dir: Path) -> dict | None:
     except (json.JSONDecodeError, OSError):
         return None
     values = floor_equity_value_range(data.get("component_value_per_share") or {}, ndigits=4)
+    # Legacy numeric grids cannot survive a present-value/blocked contract.
+    from buy_zones import build_buy_zones
+    contract_path = ticker_dir / "research/valuation_contract.json"
+    if contract_path.exists():
+        current_contract = json.loads(contract_path.read_text(encoding="utf-8"))
+        current_hash = (current_contract.get("change_control") or {}).get("model_hash")
+        if (current_contract.get("status") != "decision_grade"
+                or (current_hash and data.get("contract_model_hash") != current_hash)):
+            data = {**data, "entry_price_status": "unavailable",
+                    "entry_price_unavailable_reason": "Current contract is blocked or pricing belongs to a different model revision."}
+    zones = build_buy_zones(data, royalty_signal=((data.get("buy_zones") or {}).get("royalty_corroboration") or {}).get("signal"))
     return {
         "as_of": data.get("as_of"),
         "price": data.get("price"),
@@ -1760,8 +1778,11 @@ def pricing_analysis_summary(ticker_dir: Path) -> dict | None:
         "current_supported_value": data.get("base_value_supported_by_current_or_contracted_assets"),
         "market_price_above_supported_value": data.get("market_price_above_current_or_contracted_value"),
         "implied_growth_pct": data.get("market_implied_constant_owner_cash_growth_pct"),
-        "entry_prices": data.get("entry_prices_by_hurdle_and_case"),
-        "entry_price_15pct_base": data.get("primary_entry_price_15pct_base"),
+        "entry_prices": data.get("entry_prices_by_hurdle_and_case") if zones["status"] == "available" else {},
+        "buy_zones": zones,
+        "entry_price_status": data.get("entry_price_status"),
+        "entry_price_unavailable_reason": data.get("entry_price_unavailable_reason"),
+        "entry_price_15pct_base": data.get("primary_entry_price_15pct_base") if zones["status"] == "available" else None,
         "decision": data.get("decision"),
         "conclusion": data.get("pricing_conclusion"),
         "strongest_counter_explanation": data.get("strongest_counter_explanation"),
@@ -1769,6 +1790,22 @@ def pricing_analysis_summary(ticker_dir: Path) -> dict | None:
         "economic_value_bridge": data.get("economic_value_bridge"),
         "committee_routing": data.get("committee_routing"),
     }
+
+
+def core_compounder_summary(ticker: str) -> dict | None:
+    from refresh_core_compounders import load_views
+    from autonomous_compounders import load_estimate
+    existing = load_views(ROOT).get(ticker)
+    automatic = load_estimate(ticker, ROOT)
+    if not automatic or not existing:
+        return existing
+    # Avoid mutating the shared cached monitor while projecting measured quality.
+    spec = ((_load_json(ROOT / "_system/reference/core_compounders.json") or {}).get("issuers") or {}).get(ticker) or {}
+    ids = set(spec.get("kpi_ids") or [])
+    return {**existing,
+            "driver_to_fcf": spec.get("driver_to_fcf") or existing.get("driver_to_fcf"),
+            "kpi_coverage": [p for p in existing.get("kpi_coverage") or [] if p.get("kpi_id") in ids],
+            "quality_assessment": automatic.get("quality_assessment") or existing.get("quality_assessment")}
 
 
 def valuation_total_return_panel(ticker: str, ticker_dir: Path) -> dict | None:
@@ -2272,7 +2309,9 @@ def load_insights_for_ticker(ticker: str, insights_doc: dict | None) -> list[dic
         return []
     by_ticker = insights_doc.get("by_ticker") or {}
     rows = by_ticker.get(ticker.upper()) or by_ticker.get(ticker) or []
-    return filter_identity_rows(ticker, rows)
+    from research_integrity import reconcile_letter
+    return filter_identity_rows(ticker, [fixed for row in rows if
+        (fixed := reconcile_letter(ticker, row) if row.get("source") == "superinvestor_letter" else row) is not None])
 
 
 SOURCE_PRIORITY = {
@@ -2307,10 +2346,13 @@ def load_letter_discussants(ticker: str, insights_doc: dict | None) -> list[dict
     )
     out: list[dict] = []
     for r in rows:
-        row = dict(r)
+        from research_integrity import reconcile_letter
+        row = reconcile_letter(ticker, r)
+        if row is None:
+            continue
         source_ref = row.get("source_document") or source_document_ref(row.get("source_file"))
         row["source_document"] = source_ref
-        row["evidence_url"] = insight_evidence_url(source_ref) or row.get("evidence_url")
+        row["evidence_url"] = (row.get("classification_review") or {}).get("source_url") or insight_evidence_url(source_ref) or row.get("evidence_url")
         row["evidence_label"] = row.get("evidence_label") or best_document_label(source_ref)
         row["evidence_document_id"] = row.get("evidence_document_id") or document_id_for_ref(source_ref)
         out.append(row)
@@ -2342,7 +2384,10 @@ def load_events_for_ticker(ticker: str, insights_doc: dict | None) -> list[dict]
     )
     out: list[dict] = []
     for r in rows:
-        row = dict(r)
+        from research_integrity import reconcile_letter
+        row = reconcile_letter(ticker, r) if r.get("source") == "superinvestor_letter" else dict(r)
+        if row is None:
+            continue
         row["evidence_url"] = insight_evidence_url(row.get("evidence_ref")) or row.get("evidence_url")
         if not row.get("evidence_label"):
             ref = source_document_ref(row.get("evidence_ref"))
@@ -2573,6 +2618,11 @@ def build_essential_insights(
     raw_insights: list[dict],
     discussants: list[dict],
 ) -> dict:
+    # Context, other instruments, and unresolved classifications remain readable
+    # in Evidence, but cannot become an equity ownership signal.
+    discussants = [r for r in discussants if r.get("relationship") not in {"context", "instrument", "unverified"}]
+    events = [r for r in events if r.get("relationship") not in {"context", "instrument", "unverified"}]
+    raw_insights = [r for r in raw_insights if r.get("relationship") not in {"context", "instrument", "unverified"}]
     all_rows = events if events else raw_insights
     source_rows = [*events, *raw_insights]
     specific_rows, portfolio_rows = split_insight_rows(all_rows)
@@ -2626,14 +2676,14 @@ def build_essential_insights(
             "event_type": "letter_position",
             "impact_axis": "ownership",
             "date": d0.get("letter_date"),
-            "direction": {"add": "bullish", "trim": "bearish", "new": "bullish", "short": "bearish"}.get(
+            "direction": {"add": "bullish", "trim": "bearish", "sell": "bearish", "exit": "bearish", "new": "bullish", "short": "bearish"}.get(
                 d0.get("action"), "neutral"
             ),
             "confidence": "med",
             "score": 0,
             "title": title,
             "summary": summary,
-            "evidence_url": insight_evidence_url(d0.get("source_document") or d0.get("source_file")) or d0.get("evidence_url"),
+            "evidence_url": (d0.get("classification_review") or {}).get("source_url") or insight_evidence_url(d0.get("source_document") or d0.get("source_file")) or d0.get("evidence_url"),
             "evidence_label": d0.get("evidence_label") or best_document_label(d0.get("source_document") or d0.get("source_file")),
             "evidence_document_id": d0.get("evidence_document_id") or document_id_for_ref(d0.get("source_document") or d0.get("source_file")),
         }
@@ -2987,6 +3037,7 @@ def build_ticker_row(
         "ssi_report": latest_ssi_report(ticker_dir),
         "human_review": valuation_human_review(ticker_dir),
         "pricing_analysis": pricing_analysis_summary(ticker_dir),
+        "compounder_monitor": core_compounder_summary(ticker),
         "investment_committee": investment_committee_summary(ticker_dir),
         "valuation_workbench": valuation_workbench_summary(ticker_dir),
         "component_valuation": valuation_component_summary(ticker_dir),
@@ -3076,6 +3127,17 @@ def build_ticker_row(
         classification["investment_sleeve_label"] = _INVESTMENT_SLEEVE_LABELS.get(
             "cvr_contingent", "CVRs"
         )
+    from build_irr_readiness import assess_company, attach_readiness
+    from research_integrity import classification_audit
+    row["classification_audit"] = classification_audit(ticker)
+    attach_readiness(row, assess_company(row, _load_json(ticker_dir / "research/valuation.json") or {},
+        _load_json(ticker_dir / "research/valuation_contract.json") or {}, as_of=datetime.now(timezone.utc).date()), detailed=True)
+    from autonomous_compounders import load_estimate
+    row["autonomous_irr"] = load_estimate(ticker, ROOT)
+    from refresh_shared_forecasts import calculate
+    from valuation_forecast import attach_forecast
+    attach_forecast(row, calculate(ticker, ROOT, datetime.now(timezone.utc).date().isoformat()))
+    row.pop("autonomous_irr", None)
     return row
 
 
@@ -3309,9 +3371,11 @@ def build(prior_by_ticker: dict[str, dict] | None = None) -> dict:
     memory_doc = _load_json(RESEARCH_MEMORY_PATH)
     registry_doc = _load_json(DOCUMENT_REGISTRY_PATH) or {}
     registry_docs = list(registry_doc.get("documents") or [])
-    rows = [
-        build_ticker_row(
-            t,
+    licensed_by_ticker = (_load_json(DATA_DIR / "licensed_sources.json") or {}).get("by_ticker") or {}
+    rows = []
+    for ticker in tickers:
+        row = build_ticker_row(
+            ticker,
             holdings,
             portfolio_class,
             insights_doc,
@@ -3319,8 +3383,10 @@ def build(prior_by_ticker: dict[str, dict] | None = None) -> dict:
             reg.get("watchlist") or {},
             registry_docs,
         )
-        for t in tickers
-    ]
+        licensed = licensed_by_ticker.get(ticker)
+        if licensed:
+            row["licensed_sources"] = licensed
+        rows.append(row)
     if prior_by_ticker is None:
         prior_by_ticker = load_prior_dashboard_rows()
     if infra_restore_allowed(tickers) and prior_by_ticker:

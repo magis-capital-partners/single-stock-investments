@@ -1,7 +1,7 @@
 # NEE — Third-party source inventory
 
-**Date:** 2026-10-11
-**Sources:** 179 total (0 approved, 0 pending, 179 context)
+**Date:** 2026-10-27
+**Sources:** 180 total (0 approved, 0 pending, 180 context)
 
 | ID | Title | Path | Status | Use |
 |----|-------|------|--------|-----|
@@ -27,8 +27,6 @@
 | activist_long | NextEra Energy, Inc. — SC 13D | `NEE/third-party-analyses/activist_reports/long/SC-13D_20230905_acc0001123292_23_000104.htm` | context | activist/long — sec_edgar |
 | activist_long | NextEra Energy, Inc. — SC 13D | `NEE/third-party-analyses/activist_reports/long/SC-13D_20230720_acc0001123292_23_000088.htm` | context | activist/long — sec_edgar |
 | activist_long | NextEra Energy, Inc. — SC 13D | `NEE/third-party-analyses/activist_reports/long/SC-13D_20220801_acc0001123292_22_000099.htm` | context | activist/long — sec_edgar |
-| activist_long | acc0000753308 26 000046 | `NEE/third-party-analyses/activist_reports/long/8-K_20260615_acc0000753308_26_000046.htm` | context | activist/long — local |
-| activist_long | acc0001104659 26 063001 | `NEE/third-party-analyses/activist_reports/long/8-K_20260518_acc0001104659_26_063001.htm` | context | activist/long — local |
 | activist_long | acc0000753308 19 000079 | `NEE/third-party-analyses/activist_reports/long/8-K_20190306_acc0000753308_19_000079.htm` | context | activist/long — local |
 | activist_long | acc0000753308 19 000091 | `NEE/third-party-analyses/activist_reports/long/8-K_20190313_acc0000753308_19_000091.htm` | context | activist/long — local |
 | activist_long | acc0000753308 19 000098 | `NEE/third-party-analyses/activist_reports/long/8-K_20190315_acc0000753308_19_000098.htm` | context | activist/long — local |
@@ -173,9 +171,11 @@
 | activist_long | acc0000753308 26 000024 | `NEE/third-party-analyses/activist_reports/long/8-K_20260320_acc0000753308_26_000024.htm` | context | activist/long — local |
 | activist_long | acc0000753308 26 000028 | `NEE/third-party-analyses/activist_reports/long/8-K_20260423_acc0000753308_26_000028.htm` | context | activist/long — local |
 | activist_long | acc0001104659 26 062992 | `NEE/third-party-analyses/activist_reports/long/8-K_20260518_acc0001104659_26_062992.htm` | context | activist/long — local |
+| activist_long | acc0001104659 26 063001 | `NEE/third-party-analyses/activist_reports/long/8-K_20260518_acc0001104659_26_063001.htm` | context | activist/long — local |
 | activist_long | acc0000753308 26 000039 | `NEE/third-party-analyses/activist_reports/long/8-K_20260526_acc0000753308_26_000039.htm` | context | activist/long — local |
 | activist_long | acc0000753308 26 000041 | `NEE/third-party-analyses/activist_reports/long/8-K_20260527_acc0000753308_26_000041.htm` | context | activist/long — local |
 | activist_long | acc0000753308 26 000043 | `NEE/third-party-analyses/activist_reports/long/8-K_20260601_acc0000753308_26_000043.htm` | context | activist/long — local |
+| activist_long | acc0000753308 26 000046 | `NEE/third-party-analyses/activist_reports/long/8-K_20260615_acc0000753308_26_000046.htm` | context | activist/long — local |
 | activist_long | acc0000753308 26 000052 | `NEE/third-party-analyses/activist_reports/long/8-K_20260622_acc0000753308_26_000052.htm` | context | activist/long — local |
 | activist_long | acc0001104659 26 081863 | `NEE/third-party-analyses/activist_reports/long/8-K_20260708_acc0001104659_26_081863.htm` | context | activist/long — local |
 | activist_long | acc0000753308 26 000058 | `NEE/third-party-analyses/activist_reports/long/8-K_20260724_acc0000753308_26_000058.htm` | context | activist/long — local |
@@ -184,5 +184,6 @@
 | activist_long | acc0000753308 26 000071 | `NEE/third-party-analyses/activist_reports/long/8-K_20260903_acc0000753308_26_000071.htm` | context | activist/long — local |
 | activist_long | acc0001104659 26 107537 | `NEE/third-party-analyses/activist_reports/long/8-K_20260914_acc0001104659_26_107537.htm` | context | activist/long — local |
 | activist_long | acc0000753308 26 000074 | `NEE/third-party-analyses/activist_reports/long/8-K_20261006_acc0000753308_26_000074.htm` | context | activist/long — local |
+| activist_long | acc0000753308 26 000077 | `NEE/third-party-analyses/activist_reports/long/8-K_20261021_acc0000753308_26_000077.htm` | context | activist/long — local |
 
-Cross-check required: `NEE/research/cross_check_third_party_2026-10-11.md`
+Cross-check required: `NEE/research/cross_check_third_party_2026-10-27.md`

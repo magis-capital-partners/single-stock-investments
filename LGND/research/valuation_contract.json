@@ -11,9 +11,9 @@
     "reason": "Model must be stock-specific and evidence-clear before committee review."
   },
   "ticker": "LGND",
-  "as_of": "2026-10-20",
+  "as_of": "2026-10-27",
   "dates": {
-    "model_as_of": "2026-10-20",
+    "model_as_of": "2026-10-27",
     "latest_fact_as_of": null,
     "oldest_fact_as_of": null,
     "price_as_of": null
@@ -126,7 +126,7 @@
     },
     "decision_rule": "Power Zones select the fitting economic method and eligible independent reviewers; they never choose the valuation answer or capital decision.",
     "ticker": "LGND",
-    "as_of": "2026-10-20",
+    "as_of": "2026-10-24",
     "route_source": "canonical_power_zone_router",
     "config_path": "_system/frameworks/power_zones.json",
     "config_updated": "2026-07-14",
@@ -138,7 +138,7 @@
       "cycle": "-",
       "moi_bucket": "pending",
       "payoff_lens": "pending",
-      "investment_sleeve": "-"
+      "investment_sleeve": "healthcare_pharma"
     },
     "specialist_power_zones": [],
     "committee": {
@@ -164,8 +164,8 @@
         }
       ]
     },
-    "input_hash": "a6028230068500a53fb7e11a64cd98d56721209b4f17536c4513f7449b5071fc",
-    "generated_at": "2026-10-20T22:10:58.664815+00:00"
+    "input_hash": "14da736207e4ac02407d37ace1836204bb01fd582e7824252f31b689904f21de",
+    "generated_at": "2026-10-24T15:08:10.821867+00:00"
   },
   "market": {
     "price_per_share": null,
@@ -290,12 +290,66 @@
     ]
   },
   "change_control": {
-    "model_hash": "adf77ad8e4f2f0f6d125bf3da4be54f9ba81cf43e42b86e86f18b574d387a347",
+    "model_hash": "d5f7af81290bb1307e009ea62069d12762f3a9066d3be17448de8f15f21947de",
     "method_versions": [],
     "change_log": [],
     "rule": "A source fact is locked. Every assumption change requires a reason, author, timestamp, and before/after value."
   },
   "decision_rule": "Proof status and investment readiness are separate. Every material claim must be valued exactly once by a valid calculation proof, every evidence blocker must be resolved, and the model must be stock-specific before committee review. Only a human decision can authorize capital.",
+  "shared_forecast": {
+    "schema_version": "1.0",
+    "method_version": "shared-valuation-forecast/1.1",
+    "ticker": "LGND",
+    "status": "model_gap",
+    "research_only": true,
+    "requires_human_review": false,
+    "capital_actionable": false,
+    "as_of": "2026-10-27",
+    "model_as_of": "2026-10-27",
+    "quote": {
+      "value": null,
+      "as_of": null,
+      "source_url": null,
+      "currency": null
+    },
+    "forecast_hash": "8a3bc4e5db67f35b6a185b143b5e8dba839621b786a49c762fe9964aef0b5d8d",
+    "forward_irr_pct": {
+      "low": null,
+      "base": null,
+      "high": null
+    },
+    "present_value_today_per_share": {
+      "low": null,
+      "base": null,
+      "high": null
+    },
+    "model_present_value_per_share": {
+      "low": null,
+      "base": null,
+      "high": null
+    },
+    "required_return_pct": {
+      "low": null,
+      "base": null,
+      "high": null
+    },
+    "forward_cashflow_schedule": {},
+    "buy_prices": [],
+    "components": [],
+    "gaps": [
+      {
+        "code": "issuer_forecast_missing"
+      }
+    ],
+    "warnings": [],
+    "source_refs": [],
+    "next_action": "automatic_model_refresh",
+    "reconciliation": {
+      "passed": false
+    },
+    "settlement_policy": "Explicit cash/debt additions in an operating DCF are time-zero acquisition adjustments; hypothetical settlement, not declared dividends.",
+    "calculation_id": "2c7df3a869093503b2562c3c345a29de5b237eda733757af525d775bfd6a5c95"
+  },
   "authority": "universal_valuation_contract",
   "model_scaffold_ref": "LGND/research/valuation_model_scaffold.json",
   "next_action": "Gather the listed primary evidence and compile the first proof-complete component model; never substitute an analyst plug.",

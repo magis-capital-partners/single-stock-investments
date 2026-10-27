@@ -377,12 +377,88 @@
     ]
   },
   "change_control": {
-    "model_hash": "4cb681310601b4134ce7d73eedb46ca29b42a24862837a42f018df566925316a",
+    "model_hash": "114d9a55a7fb42211ed9234419f1c9cde86ae4e394b0ba4421d5973f928892a5",
     "method_versions": [],
     "change_log": [],
     "rule": "A source fact is locked. Every assumption change requires a reason, author, timestamp, and before/after value."
   },
   "decision_rule": "Proof status and investment readiness are separate. Every material claim must be valued exactly once by a valid calculation proof, every evidence blocker must be resolved, and the model must be stock-specific before committee review. Only a human decision can authorize capital.",
+  "shared_forecast": {
+    "schema_version": "1.0",
+    "method_version": "shared-valuation-forecast/1.1",
+    "ticker": "HIMS",
+    "status": "model_gap",
+    "research_only": true,
+    "requires_human_review": false,
+    "capital_actionable": false,
+    "as_of": "2026-07-18",
+    "model_as_of": "2026-07-18",
+    "quote": {
+      "value": 32.84,
+      "as_of": "2026-07-18",
+      "source_url": "Yahoo Finance HIMS regular market price 2026-07-18",
+      "currency": null
+    },
+    "forecast_hash": "290e7b1c99345fb6430c6f5833fbd2d48b7ca35c2d6b72e8e973bb216c9fb98d",
+    "forward_irr_pct": {
+      "low": null,
+      "base": null,
+      "high": null
+    },
+    "present_value_today_per_share": {
+      "low": null,
+      "base": null,
+      "high": null
+    },
+    "model_present_value_per_share": {
+      "low": null,
+      "base": null,
+      "high": null
+    },
+    "required_return_pct": {
+      "low": null,
+      "base": null,
+      "high": null
+    },
+    "forward_cashflow_schedule": {},
+    "buy_prices": [],
+    "components": [
+      {
+        "component_id": "operating_business_fallback",
+        "method": "owner_cash_dcf",
+        "status": "model_gap",
+        "present_value_per_share": {}
+      }
+    ],
+    "gaps": [
+      {
+        "code": "material_component_coverage_incomplete"
+      },
+      {
+        "component_id": "operating_business_fallback",
+        "case": "low",
+        "code": "invalid_calculation_proof"
+      },
+      {
+        "component_id": "operating_business_fallback",
+        "case": "base",
+        "code": "invalid_calculation_proof"
+      },
+      {
+        "component_id": "operating_business_fallback",
+        "case": "high",
+        "code": "invalid_calculation_proof"
+      }
+    ],
+    "warnings": [],
+    "source_refs": [],
+    "next_action": "automatic_model_refresh",
+    "reconciliation": {
+      "passed": false
+    },
+    "settlement_policy": "Explicit cash/debt additions in an operating DCF are time-zero acquisition adjustments; hypothetical settlement, not declared dividends.",
+    "calculation_id": "7723e753e6aa809d57aec1a572816e297f8aa1ac8d4f63738e7bfd146de5a7be"
+  },
   "authority": "universal_valuation_contract",
   "legacy_reference_present": true,
   "falsifier_coverage": {

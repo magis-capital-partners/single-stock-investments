@@ -11,9 +11,9 @@
     "reason": "Model must be stock-specific and evidence-clear before committee review."
   },
   "ticker": "FRU.TO",
-  "as_of": "2026-10-20",
+  "as_of": "2026-10-27",
   "dates": {
-    "model_as_of": "2026-10-20",
+    "model_as_of": "2026-10-27",
     "latest_fact_as_of": null,
     "oldest_fact_as_of": null,
     "price_as_of": null
@@ -90,11 +90,21 @@
       "stock compensation or acquisitions omitted",
       "terminal value unsupported by a durable mechanism"
     ],
-    "secondary_profiles": [],
+    "secondary_profiles": [
+      {
+        "profile_id": "scarce_asset_optionality",
+        "score": 2.0,
+        "reasons": [
+          "investment_sleeve=real_assets_lt"
+        ]
+      }
+    ],
     "scorecard": {
       "scarce_asset_optionality": {
-        "score": 0.0,
-        "reasons": []
+        "score": 2.0,
+        "reasons": [
+          "investment_sleeve=real_assets_lt"
+        ]
       },
       "quality_reinvestment": {
         "score": 16.0,
@@ -126,7 +136,7 @@
     },
     "decision_rule": "Power Zones select the fitting economic method and eligible independent reviewers; they never choose the valuation answer or capital decision.",
     "ticker": "FRU.TO",
-    "as_of": "2026-10-20",
+    "as_of": "2026-10-24",
     "route_source": "canonical_power_zone_router",
     "config_path": "_system/frameworks/power_zones.json",
     "config_updated": "2026-07-14",
@@ -138,7 +148,7 @@
       "cycle": "-",
       "moi_bucket": "pending",
       "payoff_lens": "pending",
-      "investment_sleeve": "-"
+      "investment_sleeve": "real_assets_lt"
     },
     "specialist_power_zones": [],
     "committee": {
@@ -164,8 +174,8 @@
         }
       ]
     },
-    "input_hash": "4089ec429cc57d08046f2e6b60b6e02b2c28172b0f231db89f712f4b9e7e8dc4",
-    "generated_at": "2026-10-20T22:09:06.460665+00:00"
+    "input_hash": "a56e8d59dcabcd3a72eb91c1343e5afd35cde0a214ffa85c10bf67747222f695",
+    "generated_at": "2026-10-24T15:08:10.534603+00:00"
   },
   "market": {
     "price_per_share": null,
@@ -290,12 +300,66 @@
     ]
   },
   "change_control": {
-    "model_hash": "4af58f61762a22191d3a442a4afc9c2c6db9bd541f3e7181e1057e03d7917a54",
+    "model_hash": "a45ed9b7939508b929eb0ccf44ec6a6dc958150dead412ff50651e638d784068",
     "method_versions": [],
     "change_log": [],
     "rule": "A source fact is locked. Every assumption change requires a reason, author, timestamp, and before/after value."
   },
   "decision_rule": "Proof status and investment readiness are separate. Every material claim must be valued exactly once by a valid calculation proof, every evidence blocker must be resolved, and the model must be stock-specific before committee review. Only a human decision can authorize capital.",
+  "shared_forecast": {
+    "schema_version": "1.0",
+    "method_version": "shared-valuation-forecast/1.1",
+    "ticker": "FRU.TO",
+    "status": "model_gap",
+    "research_only": true,
+    "requires_human_review": false,
+    "capital_actionable": false,
+    "as_of": "2026-10-27",
+    "model_as_of": "2026-10-27",
+    "quote": {
+      "value": null,
+      "as_of": null,
+      "source_url": null,
+      "currency": null
+    },
+    "forecast_hash": "8a3bc4e5db67f35b6a185b143b5e8dba839621b786a49c762fe9964aef0b5d8d",
+    "forward_irr_pct": {
+      "low": null,
+      "base": null,
+      "high": null
+    },
+    "present_value_today_per_share": {
+      "low": null,
+      "base": null,
+      "high": null
+    },
+    "model_present_value_per_share": {
+      "low": null,
+      "base": null,
+      "high": null
+    },
+    "required_return_pct": {
+      "low": null,
+      "base": null,
+      "high": null
+    },
+    "forward_cashflow_schedule": {},
+    "buy_prices": [],
+    "components": [],
+    "gaps": [
+      {
+        "code": "issuer_forecast_missing"
+      }
+    ],
+    "warnings": [],
+    "source_refs": [],
+    "next_action": "automatic_model_refresh",
+    "reconciliation": {
+      "passed": false
+    },
+    "settlement_policy": "Explicit cash/debt additions in an operating DCF are time-zero acquisition adjustments; hypothetical settlement, not declared dividends.",
+    "calculation_id": "2c7df3a869093503b2562c3c345a29de5b237eda733757af525d775bfd6a5c95"
+  },
   "authority": "universal_valuation_contract",
   "model_scaffold_ref": "FRU.TO/research/valuation_model_scaffold.json",
   "next_action": "Gather the listed primary evidence and compile the first proof-complete component model; never substitute an analyst plug.",

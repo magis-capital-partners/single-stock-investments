@@ -1,7 +1,7 @@
 # MS — Third-party source inventory
 
-**Date:** 2026-10-11
-**Sources:** 17 total (2 approved, 0 pending, 15 context)
+**Date:** 2026-10-25
+**Sources:** 18 total (2 approved, 0 pending, 16 context)
 
 | ID | Title | Path | Status | Use |
 |----|-------|------|--------|-----|
@@ -22,5 +22,6 @@
 | activist_long | acc0000950103 26 007291 | `MS/third-party-analyses/activist_reports/long/8-K_20260515_acc0000950103_26_007291.htm` | context | activist/long — local |
 | activist_long | acc0000950103 26 009448 | `MS/third-party-analyses/activist_reports/long/8-K_20260624_acc0000950103_26_009448.htm` | context | activist/long — local |
 | activist_long | acc0000895421 26 000207 | `MS/third-party-analyses/activist_reports/long/8-K_20260715_acc0000895421_26_000207.htm` | context | activist/long — local |
+| activist_long | acc0000895421 26 000288 | `MS/third-party-analyses/activist_reports/long/8-K_20261014_acc0000895421_26_000288.htm` | context | activist/long — local |
 
-Cross-check required: `MS/research/cross_check_third_party_2026-10-11.md`
+Cross-check required: `MS/research/cross_check_third_party_2026-10-25.md`

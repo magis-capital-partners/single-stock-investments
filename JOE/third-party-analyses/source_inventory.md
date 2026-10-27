@@ -1,7 +1,7 @@
 # JOE — Third-party source inventory
 
-**Date:** 2026-10-23
-**Sources:** 84 total (0 approved, 0 pending, 84 context)
+**Date:** 2026-10-27
+**Sources:** 147 total (0 approved, 0 pending, 147 context)
 
 | ID | Title | Path | Status | Use |
 |----|-------|------|--------|-----|
@@ -89,5 +89,68 @@
 | activist_long | Fairholme Capital Management — SC 13D/A | `JOE/third-party-analyses/activist_reports/long/SC-13D/A_20260507_acc0000919574_26_002739.xml` | context | activist/long — sec_edgar |
 | activist_long | Fairholme Capital Management — SC 13D/A | `JOE/third-party-analyses/activist_reports/long/SC-13D/A_20250902_acc0000919574_25_005524.xml` | context | activist/long — sec_edgar |
 | activist_long | Fairholme Capital Management — SC 13D/A | `JOE/third-party-analyses/activist_reports/long/SC-13D/A_20250307_acc0000919574_25_001869.xml` | context | activist/long — sec_edgar |
+| activist_long | acc0001157523 18 000479 | `JOE/third-party-analyses/activist_reports/long/8-K_20180301_acc0001157523_18_000479.htm` | context | activist/long — local |
+| activist_long | acc0000745308 18 000006 | `JOE/third-party-analyses/activist_reports/long/8-K_20180405_acc0000745308_18_000006.htm` | context | activist/long — local |
+| activist_long | acc0001157523 18 000796 | `JOE/third-party-analyses/activist_reports/long/8-K_20180425_acc0001157523_18_000796.htm` | context | activist/long — local |
+| activist_long | acc0001157523 18 001138 | `JOE/third-party-analyses/activist_reports/long/8-K_20180517_acc0001157523_18_001138.htm` | context | activist/long — local |
+| activist_long | acc0001157523 18 001177 | `JOE/third-party-analyses/activist_reports/long/8-K_20180523_acc0001157523_18_001177.htm` | context | activist/long — local |
+| activist_long | acc0001157523 18 001197 | `JOE/third-party-analyses/activist_reports/long/8-K_20180525_acc0001157523_18_001197.htm` | context | activist/long — local |
+| activist_long | acc0001157523 18 001647 | `JOE/third-party-analyses/activist_reports/long/8-K_20180801_acc0001157523_18_001647.htm` | context | activist/long — local |
+| activist_long | acc0001157523 18 001711 | `JOE/third-party-analyses/activist_reports/long/8-K_20180803_acc0001157523_18_001711.htm` | context | activist/long — local |
+| activist_long | acc0001157523 18 001850 | `JOE/third-party-analyses/activist_reports/long/8-K_20180821_acc0001157523_18_001850.htm` | context | activist/long — local |
+| activist_long | acc0001157523 18 002232 | `JOE/third-party-analyses/activist_reports/long/8-K_20181031_acc0001157523_18_002232.htm` | context | activist/long — local |
+| activist_long | acc0001157523 19 000473 | `JOE/third-party-analyses/activist_reports/long/8-K_20190227_acc0001157523_19_000473.htm` | context | activist/long — local |
+| activist_long | acc0001157523 19 001022 | `JOE/third-party-analyses/activist_reports/long/8-K_20190501_acc0001157523_19_001022.htm` | context | activist/long — local |
+| activist_long | acc0001157523 19 001261 | `JOE/third-party-analyses/activist_reports/long/8-K_20190520_acc0001157523_19_001261.htm` | context | activist/long — local |
+| activist_long | acc0001157523 19 001285 | `JOE/third-party-analyses/activist_reports/long/8-K_20190523_acc0001157523_19_001285.htm` | context | activist/long — local |
+| activist_long | acc0001157523 19 001645 | `JOE/third-party-analyses/activist_reports/long/8-K_20190731_acc0001157523_19_001645.htm` | context | activist/long — local |
+| activist_long | acc0001157523 19 001879 | `JOE/third-party-analyses/activist_reports/long/8-K_20190816_acc0001157523_19_001879.htm` | context | activist/long — local |
+| activist_long | acc0001157523 19 002089 | `JOE/third-party-analyses/activist_reports/long/8-K_20191023_acc0001157523_19_002089.htm` | context | activist/long — local |
+| activist_long | acc0001157523 19 002136 | `JOE/third-party-analyses/activist_reports/long/8-K_20191030_acc0001157523_19_002136.htm` | context | activist/long — local |
+| activist_long | acc0001157523 20 000195 | `JOE/third-party-analyses/activist_reports/long/8-K_20200212_acc0001157523_20_000195.htm` | context | activist/long — local |
+| activist_long | acc0001157523 20 000270 | `JOE/third-party-analyses/activist_reports/long/8-K_20200226_acc0001157523_20_000270.htm` | context | activist/long — local |
+| activist_long | acc0001157523 20 000597 | `JOE/third-party-analyses/activist_reports/long/8-K_20200429_acc0001157523_20_000597.htm` | context | activist/long — local |
+| activist_long | acc0001157523 20 000770 | `JOE/third-party-analyses/activist_reports/long/8-K_20200519_acc0001157523_20_000770.htm` | context | activist/long — local |
+| activist_long | acc0001157523 20 000798 | `JOE/third-party-analyses/activist_reports/long/8-K_20200522_acc0001157523_20_000798.htm` | context | activist/long — local |
+| activist_long | acc0001157523 20 001060 | `JOE/third-party-analyses/activist_reports/long/8-K_20200729_acc0001157523_20_001060.htm` | context | activist/long — local |
+| activist_long | acc0001157523 20 001357 | `JOE/third-party-analyses/activist_reports/long/8-K_20201028_acc0001157523_20_001357.htm` | context | activist/long — local |
+| activist_long | acc0001157523 21 000250 | `JOE/third-party-analyses/activist_reports/long/8-K_20210224_acc0001157523_21_000250.htm` | context | activist/long — local |
+| activist_long | acc0001157523 21 000525 | `JOE/third-party-analyses/activist_reports/long/8-K_20210428_acc0001157523_21_000525.htm` | context | activist/long — local |
+| activist_long | acc0001157523 21 000678 | `JOE/third-party-analyses/activist_reports/long/8-K_20210518_acc0001157523_21_000678.htm` | context | activist/long — local |
+| activist_long | acc0001157523 21 000697 | `JOE/third-party-analyses/activist_reports/long/8-K_20210520_acc0001157523_21_000697.htm` | context | activist/long — local |
+| activist_long | acc0001157523 21 000942 | `JOE/third-party-analyses/activist_reports/long/8-K_20210728_acc0001157523_21_000942.htm` | context | activist/long — local |
+| activist_long | acc0001157523 21 001262 | `JOE/third-party-analyses/activist_reports/long/8-K_20211027_acc0001157523_21_001262.htm` | context | activist/long — local |
+| activist_long | acc0001157523 22 000240 | `JOE/third-party-analyses/activist_reports/long/8-K_20220223_acc0001157523_22_000240.htm` | context | activist/long — local |
+| activist_long | acc0001157523 22 000483 | `JOE/third-party-analyses/activist_reports/long/8-K_20220427_acc0001157523_22_000483.htm` | context | activist/long — local |
+| activist_long | acc0001157523 22 000644 | `JOE/third-party-analyses/activist_reports/long/8-K_20220517_acc0001157523_22_000644.htm` | context | activist/long — local |
+| activist_long | acc0001157523 22 000662 | `JOE/third-party-analyses/activist_reports/long/8-K_20220518_acc0001157523_22_000662.htm` | context | activist/long — local |
+| activist_long | acc0001157523 22 000928 | `JOE/third-party-analyses/activist_reports/long/8-K_20220727_acc0001157523_22_000928.htm` | context | activist/long — local |
+| activist_long | acc0001157523 22 001400 | `JOE/third-party-analyses/activist_reports/long/8-K_20221026_acc0001157523_22_001400.htm` | context | activist/long — local |
+| activist_long | acc0001157523 22 001657 | `JOE/third-party-analyses/activist_reports/long/8-K_20221118_acc0001157523_22_001657.htm` | context | activist/long — local |
+| activist_long | acc0001157523 23 000332 | `JOE/third-party-analyses/activist_reports/long/8-K_20230222_acc0001157523_23_000332.htm` | context | activist/long — local |
+| activist_long | acc0001157523 23 000621 | `JOE/third-party-analyses/activist_reports/long/8-K_20230426_acc0001157523_23_000621.htm` | context | activist/long — local |
+| activist_long | acc0001157523 23 000850 | `JOE/third-party-analyses/activist_reports/long/8-K_20230516_acc0001157523_23_000850.htm` | context | activist/long — local |
+| activist_long | acc0001157523 23 000887 | `JOE/third-party-analyses/activist_reports/long/8-K_20230518_acc0001157523_23_000887.htm` | context | activist/long — local |
+| activist_long | acc0001157523 23 001159 | `JOE/third-party-analyses/activist_reports/long/8-K_20230726_acc0001157523_23_001159.htm` | context | activist/long — local |
+| activist_long | acc0001157523 23 001545 | `JOE/third-party-analyses/activist_reports/long/8-K_20231025_acc0001157523_23_001545.htm` | context | activist/long — local |
+| activist_long | acc0001157523 24 000155 | `JOE/third-party-analyses/activist_reports/long/8-K_20240201_acc0001157523_24_000155.htm` | context | activist/long — local |
+| activist_long | acc0001558370 24 001430 | `JOE/third-party-analyses/activist_reports/long/8-K_20240221_acc0001558370_24_001430.htm` | context | activist/long — local |
+| activist_long | acc0001558370 24 005589 | `JOE/third-party-analyses/activist_reports/long/8-K_20240424_acc0001558370_24_005589.htm` | context | activist/long — local |
+| activist_long | acc0001558370 24 008045 | `JOE/third-party-analyses/activist_reports/long/8-K_20240514_acc0001558370_24_008045.htm` | context | activist/long — local |
+| activist_long | acc0001558370 24 008418 | `JOE/third-party-analyses/activist_reports/long/8-K_20240517_acc0001558370_24_008418.htm` | context | activist/long — local |
+| activist_long | acc0001558370 24 010044 | `JOE/third-party-analyses/activist_reports/long/8-K_20240724_acc0001558370_24_010044.htm` | context | activist/long — local |
+| activist_long | acc0001558370 24 013519 | `JOE/third-party-analyses/activist_reports/long/8-K_20241023_acc0001558370_24_013519.htm` | context | activist/long — local |
+| activist_long | acc0001558370 25 001600 | `JOE/third-party-analyses/activist_reports/long/8-K_20250226_acc0001558370_25_001600.htm` | context | activist/long — local |
+| activist_long | acc0001558370 25 005273 | `JOE/third-party-analyses/activist_reports/long/8-K_20250423_acc0001558370_25_005273.htm` | context | activist/long — local |
+| activist_long | acc0001558370 25 007481 | `JOE/third-party-analyses/activist_reports/long/8-K_20250513_acc0001558370_25_007481.htm` | context | activist/long — local |
+| activist_long | acc0001558370 25 007750 | `JOE/third-party-analyses/activist_reports/long/8-K_20250514_acc0001558370_25_007750.htm` | context | activist/long — local |
+| activist_long | acc0001558370 25 009444 | `JOE/third-party-analyses/activist_reports/long/8-K_20250723_acc0001558370_25_009444.htm` | context | activist/long — local |
+| activist_long | acc0001104659 25 103723 | `JOE/third-party-analyses/activist_reports/long/8-K_20251029_acc0001104659_25_103723.htm` | context | activist/long — local |
+| activist_long | acc0001104659 26 019660 | `JOE/third-party-analyses/activist_reports/long/8-K_20260225_acc0001104659_26_019660.htm` | context | activist/long — local |
+| activist_long | acc0001104659 26 051504 | `JOE/third-party-analyses/activist_reports/long/8-K_20260429_acc0001104659_26_051504.htm` | context | activist/long — local |
+| activist_long | acc0001104659 26 054983 | `JOE/third-party-analyses/activist_reports/long/8-K_20260504_acc0001104659_26_054983.htm` | context | activist/long — local |
+| activist_long | acc0001104659 26 058957 | `JOE/third-party-analyses/activist_reports/long/8-K_20260512_acc0001104659_26_058957.htm` | context | activist/long — local |
+| activist_long | acc0001104659 26 061171 | `JOE/third-party-analyses/activist_reports/long/8-K_20260514_acc0001104659_26_061171.htm` | context | activist/long — local |
+| activist_long | acc0001104659 26 088142 | `JOE/third-party-analyses/activist_reports/long/8-K_20260729_acc0001104659_26_088142.htm` | context | activist/long — local |
 
-Cross-check required: `JOE/research/cross_check_third_party_2026-10-23.md`
+Cross-check required: `JOE/research/cross_check_third_party_2026-10-27.md`

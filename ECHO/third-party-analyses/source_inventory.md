@@ -1,6 +1,6 @@
 # ECHO — Third-party source inventory
 
-**Date:** 2026-10-11
+**Date:** 2026-10-27
 **Sources:** 115 total (0 approved, 0 pending, 115 context)
 
 | ID | Title | Path | Status | Use |
@@ -121,4 +121,4 @@
 | activist_long | acc0001415404 26 000042 | `ECHO/third-party-analyses/activist_reports/long/8-K_20260807_acc0001415404_26_000042.htm` | context | activist/long — local |
 | activist_long | acc0001415404 26 000048 | `ECHO/third-party-analyses/activist_reports/long/8-K_20261002_acc0001415404_26_000048.htm` | context | activist/long — local |
 
-Cross-check required: `ECHO/research/cross_check_third_party_2026-10-11.md`
+Cross-check required: `ECHO/research/cross_check_third_party_2026-10-27.md`

@@ -2764,7 +2764,7 @@
     ]
   },
   "change_control": {
-    "model_hash": "51ca3bf89a1c8d4091aeda74b6369d655824e10b0c4cc6456765af5dd4170e31",
+    "model_hash": "00eb095aac6e4fca5978df8e3cd071b9c8db8cf7ee78636b3cb5333033a7bb12",
     "method_versions": [
       "net_asset_value@1.0",
       "owner_cash_or_dividend_discount@1.0",
@@ -2774,6 +2774,185 @@
     "rule": "A source fact is locked. Every assumption change requires a reason, author, timestamp, and before/after value."
   },
   "decision_rule": "Proof status and investment readiness are separate. Every material claim must be valued exactly once by a valid calculation proof, every evidence blocker must be resolved, and the model must be stock-specific before committee review. Only a human decision can authorize capital.",
+  "shared_forecast": {
+    "schema_version": "1.0",
+    "method_version": "shared-valuation-forecast/1.1",
+    "ticker": "AEHR",
+    "status": "model_gap",
+    "research_only": true,
+    "requires_human_review": false,
+    "capital_actionable": false,
+    "as_of": "2026-08-04",
+    "model_as_of": "2026-07-24",
+    "quote": {
+      "value": 109.89,
+      "as_of": "2026-08-04",
+      "source_url": "Yahoo AEHR close 2026-08-04",
+      "currency": null
+    },
+    "forecast_hash": "53408e7721360bb35522b4aa4a042775a8b06347257b5313994d991f4c993efc",
+    "forward_irr_pct": {
+      "low": null,
+      "base": null,
+      "high": null
+    },
+    "present_value_today_per_share": {
+      "low": null,
+      "base": null,
+      "high": null
+    },
+    "model_present_value_per_share": {
+      "low": null,
+      "base": null,
+      "high": null
+    },
+    "required_return_pct": {
+      "low": null,
+      "base": null,
+      "high": null
+    },
+    "forward_cashflow_schedule": {},
+    "buy_prices": [],
+    "components": [
+      {
+        "component_id": "midcycle_burn_in_operations",
+        "method": "owner_cash_or_dividend_discount",
+        "status": "available",
+        "present_value_per_share": {
+          "low": 0.5882,
+          "base": 2.551,
+          "high": 14.4194
+        }
+      },
+      {
+        "component_id": "deferred_revenue_milestone_option",
+        "method": "risk_adjusted_milestone_value",
+        "status": "model_gap",
+        "present_value_per_share": {
+          "low": 0.0
+        }
+      },
+      {
+        "component_id": "net_financial_claims",
+        "method": "net_asset_value",
+        "status": "model_gap",
+        "present_value_per_share": {}
+      },
+      {
+        "component_id": "cycle_customer_concentration_reserve",
+        "method": "net_asset_value",
+        "status": "model_gap",
+        "present_value_per_share": {}
+      }
+    ],
+    "gaps": [
+      {
+        "component_id": "deferred_revenue_milestone_option",
+        "case": "base",
+        "code": "realization_timing_missing:value_per_share"
+      },
+      {
+        "component_id": "deferred_revenue_milestone_option",
+        "case": "high",
+        "code": "realization_timing_missing:value_per_share"
+      },
+      {
+        "component_id": "net_financial_claims",
+        "case": "low",
+        "code": "realization_timing_missing:value_per_share"
+      },
+      {
+        "component_id": "net_financial_claims",
+        "case": "base",
+        "code": "realization_timing_missing:value_per_share"
+      },
+      {
+        "component_id": "net_financial_claims",
+        "case": "high",
+        "code": "realization_timing_missing:value_per_share"
+      },
+      {
+        "component_id": "cycle_customer_concentration_reserve",
+        "case": "low",
+        "code": "realization_timing_missing:value_per_share"
+      },
+      {
+        "component_id": "cycle_customer_concentration_reserve",
+        "case": "base",
+        "code": "realization_timing_missing:value_per_share"
+      },
+      {
+        "component_id": "cycle_customer_concentration_reserve",
+        "case": "high",
+        "code": "realization_timing_missing:value_per_share"
+      }
+    ],
+    "warnings": [],
+    "source_refs": [
+      {
+        "node_id": "total_revenue_m",
+        "ref": "AEHR/investor-documents/sec-edgar/10-K_20250728_rpt20250530_acc0001654954_25_008553.htm",
+        "locator": "Revenues $58,968 thousand FY2025",
+        "as_of": "2025-05-30",
+        "source_id": "15402e2fe283c1802d4ea1481381a463d1e30dc29ec2573f7ee5b76e4a4d4624"
+      },
+      {
+        "node_id": "operating_cash_flow_m",
+        "ref": "AEHR/investor-documents/sec-edgar/10-K_20250728_rpt20250530_acc0001654954_25_008553.htm",
+        "locator": "NetCashProvidedByUsedInOperatingActivities sign=- scale=3 \u2192 ($7.4M) FY2025",
+        "as_of": "2025-05-30",
+        "source_id": "f3786a92f8c2512974b5fdb88cf2421f43aa7e556e8bb62e663fb86faa711f93"
+      },
+      {
+        "node_id": "capex_m",
+        "ref": "AEHR/investor-documents/sec-edgar/10-K_20250728_rpt20250530_acc0001654954_25_008553.htm",
+        "locator": "PaymentsToAcquirePropertyPlantAndEquipment $4,992 thousand FY2025",
+        "as_of": "2025-05-30",
+        "source_id": "84bbd6be87f26fd7eda987955c05d2977ae2ff15af2e91865006030fc52dcf26"
+      },
+      {
+        "node_id": "shares_m",
+        "ref": "AEHR/investor-documents/sec-edgar/10-K_20250728_rpt20250530_acc0001654954_25_008553.htm",
+        "locator": "WeightedAverageNumberOfDilutedSharesOutstanding 29,581 thousand FY2025",
+        "as_of": "2025-05-30",
+        "source_id": "88e7186f771e8229cabe525c7d02e454683c1db0bc75bce26076ba320266f760"
+      },
+      {
+        "node_id": "effective_backlog_m",
+        "ref": "AEHR/investor-documents/sec-edgar/8-K_ex991_20260714_fy2026_results.htm",
+        "locator": "Effective backlog $100.6 million including bookings since May 29, 2026 (FY2026 results exhibit 99.1)",
+        "as_of": "2026-05-29",
+        "source_id": "022884b1d32140beebe851083f05d0f14c5187c8455eb6d67c8c308134a23bcc"
+      },
+      {
+        "node_id": "reported_backlog_m",
+        "ref": "AEHR/investor-documents/sec-edgar/8-K_ex991_20260714_fy2026_results.htm",
+        "locator": "Backlog as of May 29, 2026 was $80.6 million (FY2026 results exhibit 99.1)",
+        "as_of": "2026-05-29",
+        "source_id": "372b82964c10b3c745879dae3f193482219b432387cbb6be3bc99ef06640191a"
+      },
+      {
+        "node_id": "deferred_revenue_m",
+        "ref": "AEHR/investor-documents/sec-edgar/10-Q_20260408_rpt20260227_acc0001654954_26_003348.htm",
+        "locator": "Deferred revenue short-term $1.857M plus noncurrent $0.053M as of 2026-02-27",
+        "as_of": "2026-02-27",
+        "source_id": "4d298c704839d7bd819c2dcc88e83263775f8be38afb891f2a0f44aaf427e322"
+      },
+      {
+        "node_id": "shares_m",
+        "ref": "AEHR/investor-documents/sec-edgar/10-Q_20260408_rpt20260227_acc0001654954_26_003348.htm",
+        "locator": "EntityCommonStockSharesOutstanding 31,453,254 as of 2026-04-01",
+        "as_of": "2026-04-01",
+        "source_id": "a3686a610e7a67aef12d6622495b2decbb194cfd0f2afc613b62bf08e21cae57"
+      }
+    ],
+    "next_action": "automatic_model_refresh",
+    "reconciliation": {
+      "passed": false
+    },
+    "settlement_policy": "Explicit cash/debt additions in an operating DCF are time-zero acquisition adjustments; hypothetical settlement, not declared dividends.",
+    "calculation_id": "f5091557cf8cc958937e99f99bee860b4f630ad7e42133af4134fd800ad90a0b"
+  },
   "authority": "universal_valuation_contract",
   "legacy_reference_present": true,
   "falsifier_coverage": {

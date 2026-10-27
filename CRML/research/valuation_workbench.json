@@ -1,7 +1,7 @@
 {
   "schema_version": "3.0",
   "ticker": "CRML",
-  "as_of": "2026-10-23",
+  "as_of": "2026-10-27",
   "proof_status": "decision_grade",
   "model_level": "stock_specific",
   "model_level_reason": "The proof-complete model uses stock-specific components and assumptions.",
@@ -15,7 +15,9 @@
     "model_as_of": "2026-07-23",
     "latest_fact_as_of": "2025-06-30",
     "oldest_fact_as_of": "2025-06-30",
-    "price_as_of": "2026-08-31"
+    "price_as_of": "2026-08-31",
+    "forecast_as_of": "2026-07-23",
+    "calculation_as_of": "2026-08-31"
   },
   "legacy_audit": {
     "actionable": false,
@@ -70,18 +72,20 @@
       "high": null
     },
     "forward_return_status": "withheld",
-    "forward_return_reason": "present_value_today cannot be annualized as a future payoff",
+    "forward_return_reason": "shared_forecast_incomplete",
     "required_return_pct": null,
     "downside_to_low_pct": -100.0,
     "unvalued_component_count": 0,
     "unresolved_evidence_count": 0,
     "proof_complete_pct": 100.0,
-    "model_hash": "19635840f60becd99dee9932d4c02227b2a64ecc5f76fc227dd00d294a908e97",
+    "model_hash": "572d019d43758dff887b163e1041b960d3385e7380bff16fedbe107140cdc305",
     "dates": {
       "model_as_of": "2026-07-23",
       "latest_fact_as_of": "2025-06-30",
       "oldest_fact_as_of": "2025-06-30",
-      "price_as_of": "2026-08-31"
+      "price_as_of": "2026-08-31",
+      "forecast_as_of": "2026-07-23",
+      "calculation_as_of": "2026-08-31"
     },
     "legacy_audit": {
       "actionable": false,
@@ -102,7 +106,11 @@
     },
     "primary_power_zone": "High-return compounder",
     "owner_decision": null,
-    "next_action": "Complete the next hash-bound isolated outputs: pre_mortem.json, round_1/buffett_weschler.json, round_1/hohn.json, round_1/marathon_capital_cycle.json."
+    "next_action": "Complete the next hash-bound isolated outputs: pre_mortem.json, round_1/buffett_weschler.json, round_1/hohn.json, round_1/marathon_capital_cycle.json.",
+    "forecast_id": "cb80c4bc75e82fb1c01b06bad3eddf11f6675c71828310fb2e7474f093a872dc",
+    "calculation_status": "model_gap",
+    "research_return_available": false,
+    "calculation_reason": "realization_timing_missing:cash_m; realization_timing_missing:value_per_share; realization_timing_missing:dilution_reserve_per_share"
   },
   "business": {
     "status": "complete",
@@ -1344,7 +1352,9 @@
       "model_as_of": "2026-07-23",
       "latest_fact_as_of": "2025-06-30",
       "oldest_fact_as_of": "2025-06-30",
-      "price_as_of": "2026-08-31"
+      "price_as_of": "2026-08-31",
+      "forecast_as_of": "2026-07-23",
+      "calculation_as_of": "2026-08-31"
     },
     "legacy_audit": {
       "actionable": false,
@@ -2765,7 +2775,7 @@
       }
     ],
     "change_control": {
-      "model_hash": "19635840f60becd99dee9932d4c02227b2a64ecc5f76fc227dd00d294a908e97",
+      "model_hash": "572d019d43758dff887b163e1041b960d3385e7380bff16fedbe107140cdc305",
       "method_versions": [
         "net_asset_value@1.0",
         "probability_weighted_catalyst_nav@1.0",
@@ -3671,21 +3681,27 @@
       "scope": -0.93
     },
     "unexplained_per_share": 0.0,
-    "explanation": "Component changes are classified from observable differences in quantity, comparable method, probability, timing, capital, evidence, and schedule scope."
+    "explanation": "Component changes are classified from observable differences in quantity, comparable method, probability, timing, capital, evidence, and schedule scope.",
+    "tci_irr": {
+      "status": "waiting_for_comparable_baseline",
+      "unit": "percentage_points_per_year"
+    }
   },
   "freshness": {
     "status": "stale",
-    "as_of": "2026-10-23",
+    "as_of": "2026-10-27",
     "dates": {
       "model_as_of": "2026-07-23",
       "latest_fact_as_of": "2025-06-30",
       "oldest_fact_as_of": "2025-06-30",
-      "price_as_of": "2026-08-31"
+      "price_as_of": "2026-08-31",
+      "forecast_as_of": "2026-07-23",
+      "calculation_as_of": "2026-08-31"
     },
     "age_days": {
-      "model_as_of": 92,
-      "latest_fact_as_of": 480,
-      "price_as_of": 53
+      "model_as_of": 96,
+      "latest_fact_as_of": 484,
+      "price_as_of": 57
     },
     "review_threshold_days": {
       "model_as_of": 365,
@@ -3693,7 +3709,7 @@
       "price_as_of": 7
     },
     "warnings": [
-      "price_as_of is 53 days old (review threshold 7)"
+      "price_as_of is 57 days old (review threshold 7)"
     ],
     "rule": "Freshness is disclosed separately from proof completeness; stale or undated inputs require review before a new capital decision."
   }

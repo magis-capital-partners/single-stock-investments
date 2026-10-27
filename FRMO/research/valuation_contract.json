@@ -1752,7 +1752,7 @@
     ]
   },
   "change_control": {
-    "model_hash": "8bea48f1f4fb3b89875bc50f3e216fc5efd0c3d2c3235f60fa670875ead4dcfd",
+    "model_hash": "5190cc887d4a092e19c803f01c2ba20d77b4b64bd1f3310e7b758bf41c067887",
     "method_versions": [
       "net_asset_value@1.0",
       "probability_weighted_catalyst_nav@1.0"
@@ -1761,6 +1761,163 @@
     "rule": "A source fact is locked. Every assumption change requires a reason, author, timestamp, and before/after value."
   },
   "decision_rule": "Proof status and investment readiness are separate. Every material claim must be valued exactly once by a valid calculation proof, every evidence blocker must be resolved, and the model must be stock-specific before committee review. Only a human decision can authorize capital.",
+  "shared_forecast": {
+    "schema_version": "1.0",
+    "method_version": "shared-valuation-forecast/1.1",
+    "ticker": "FRMO",
+    "status": "model_gap",
+    "research_only": true,
+    "requires_human_review": false,
+    "capital_actionable": false,
+    "as_of": "2026-08-31",
+    "model_as_of": "2026-07-21",
+    "quote": {
+      "value": 7.23,
+      "as_of": "2026-08-31",
+      "source_url": "Yahoo FRMO close 2026-08-31",
+      "currency": null
+    },
+    "forecast_hash": "c230cd295e08613f59b1289e3a6aee86e4956e94242f906bde676bb9a5e6766b",
+    "forward_irr_pct": {
+      "low": null,
+      "base": null,
+      "high": null
+    },
+    "present_value_today_per_share": {
+      "low": null,
+      "base": null,
+      "high": null
+    },
+    "model_present_value_per_share": {
+      "low": null,
+      "base": null,
+      "high": null
+    },
+    "required_return_pct": {
+      "low": null,
+      "base": null,
+      "high": null
+    },
+    "forward_cashflow_schedule": {},
+    "buy_prices": [],
+    "components": [
+      {
+        "component_id": "core_engine",
+        "method": "net_asset_value",
+        "status": "model_gap",
+        "present_value_per_share": {}
+      },
+      {
+        "component_id": "reinvestment_or_assets",
+        "method": "probability_weighted_catalyst_nav",
+        "status": "model_gap",
+        "present_value_per_share": {}
+      },
+      {
+        "component_id": "net_financial_claims",
+        "method": "net_asset_value",
+        "status": "model_gap",
+        "present_value_per_share": {
+          "low": 0.0
+        }
+      },
+      {
+        "component_id": "downside_reserve",
+        "method": "net_asset_value",
+        "status": "model_gap",
+        "present_value_per_share": {}
+      }
+    ],
+    "gaps": [
+      {
+        "component_id": "core_engine",
+        "case": "low",
+        "code": "realization_timing_missing:value_per_share"
+      },
+      {
+        "component_id": "core_engine",
+        "case": "base",
+        "code": "realization_timing_missing:value_per_share"
+      },
+      {
+        "component_id": "core_engine",
+        "case": "high",
+        "code": "realization_timing_missing:value_per_share"
+      },
+      {
+        "component_id": "reinvestment_or_assets",
+        "case": "low",
+        "code": "realization_timing_missing:value_per_share"
+      },
+      {
+        "component_id": "reinvestment_or_assets",
+        "case": "base",
+        "code": "realization_timing_missing:value_per_share"
+      },
+      {
+        "component_id": "reinvestment_or_assets",
+        "case": "high",
+        "code": "realization_timing_missing:value_per_share"
+      },
+      {
+        "component_id": "net_financial_claims",
+        "case": "base",
+        "code": "realization_timing_missing:value_per_share"
+      },
+      {
+        "component_id": "net_financial_claims",
+        "case": "high",
+        "code": "realization_timing_missing:value_per_share"
+      },
+      {
+        "component_id": "downside_reserve",
+        "case": "low",
+        "code": "realization_timing_missing:value_per_share"
+      },
+      {
+        "component_id": "downside_reserve",
+        "case": "base",
+        "code": "realization_timing_missing:value_per_share"
+      },
+      {
+        "component_id": "downside_reserve",
+        "case": "high",
+        "code": "realization_timing_missing:value_per_share"
+      }
+    ],
+    "warnings": [],
+    "source_refs": [
+      {
+        "node_id": "shares_m",
+        "ref": "FRMO/investor-documents/ir-frmo/2026-02-28_Quarterly_Report.pdf",
+        "locator": "Outstanding shares 44,022,781 as of February 28, 2026",
+        "as_of": "2026-02-28",
+        "source_id": "9a27ca7b64a604f86d23dcdb05e69ee16f4cb89befaad030af91d99596663d50"
+      },
+      {
+        "node_id": "cash_m",
+        "ref": "FRMO/research/evidence/_text/2026-02-28_Quarterly_Report.pdf.txt",
+        "locator": "Balance sheet; Cash and cash equivalents $45,590 thousand",
+        "as_of": "2026-02-28",
+        "content_sha256": "5b765224ded2b7c33672eb63fa226a94b6068385ea5d3c3ac3db1efd0cf41396",
+        "source_id": "f9f5f5178b6dd758bb2345781ac284cb0a48de124f7da1d26ee76003beadea2b"
+      },
+      {
+        "node_id": "digital_assets_m",
+        "ref": "FRMO/research/evidence/_text/2026-02-28_Quarterly_Report.pdf.txt",
+        "locator": "Balance sheet; Digital assets, at fair value $10,911 thousand",
+        "as_of": "2026-02-28",
+        "content_sha256": "5b765224ded2b7c33672eb63fa226a94b6068385ea5d3c3ac3db1efd0cf41396",
+        "source_id": "4070e6d69b903a45f145178eef8a1472ab9d52d5443575f52eb42ff24be16339"
+      }
+    ],
+    "next_action": "automatic_model_refresh",
+    "reconciliation": {
+      "passed": false
+    },
+    "settlement_policy": "Explicit cash/debt additions in an operating DCF are time-zero acquisition adjustments; hypothetical settlement, not declared dividends.",
+    "calculation_id": "7f02dbc6ee225b7dd2a0e64e8977c784a5a4e2d9301082b56ab78e51000fc60f"
+  },
   "authority": "universal_valuation_contract",
   "legacy_reference_present": true,
   "falsifier_coverage": {

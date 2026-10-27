@@ -1,0 +1,31 @@
+{
+  "schema": "third_plus_saved_screen.v1",
+  "id": "third_plus_no_50pct_rally_v1",
+  "name": "Third-or-later reverse split + 50% rally veto",
+  "saved_at": "2026-10-24T13:52:19.757Z",
+  "selection_status": "user_selected_research_screen",
+  "validation_status": "not_validated_for_live",
+  "production_authority": "none",
+  "universe": {
+    "minimum_documented_reverse_split_ordinal": 3,
+    "ordinal_includes_current_split": true,
+    "identity_basis": "Existing same-issuer event catalogue; security continuity remains provisional."
+  },
+  "filter": {
+    "feature": "S7",
+    "completed_sessions": 5,
+    "return_basis": "Mechanically split/ADS-adjusted daily close-to-close price return",
+    "veto_if_any_daily_return_greater_than_or_equal_to": 0.5,
+    "pass_if_maximum_daily_return_less_than": 0.5,
+    "unknown_action": "exclude",
+    "not_cumulative_five_day_return": true
+  },
+  "additional_fundamental_requirements": [],
+  "entry_clock": "Only use completed sessions strictly before entry. Existing study uses the next eligible session after the split.",
+  "source_study": {
+    "path": "_system/data/reverse_splits/third_plus_signal_study/summary.json",
+    "arm": "S7",
+    "data_version": "c9ae184106e4f65128574c1ed53387db0dd1129a10cd87e8afa5ee8cfc09b8d3"
+  },
+  "note": "Saved for reuse and research at the user request. It does not change the study promotion decision or the abstaining forward execution policy."
+}

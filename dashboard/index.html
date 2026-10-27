@@ -11,6 +11,7 @@
 <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600;700&family=DM+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
 <link href="insights-events.css" rel="stylesheet">
 <link href="short-alpha.css?v=20261015-results" rel="stylesheet">
+<link href="third-plus-study.css?v=20261025-ssr-replay" rel="stylesheet">
 <link href="reverse-splits-portfolio.css?v=20261015-results" rel="stylesheet">
 <link href="shorts-net-edge.css?v=20261015-v2" rel="stylesheet">
 <link href="shorts-edge-v3.css?v=20261018-fundamentals" rel="stylesheet">
@@ -1789,6 +1790,7 @@
     }
   }
 </style>
+<link rel="stylesheet" href="research-workspace.css?v=20261025">
 </head>
 <body>
 <a class="skip-link" href="#main-content">Skip to dashboard</a>
@@ -1863,6 +1865,7 @@
 
   <div class="main detail-closed" id="main-grid">
     <div class="table-wrap">
+      <nav class="rw-stock-list" id="research-stock-list" aria-label="Research stocks" hidden></nav>
       <table>
         <thead id="holdings-thead">
           <tr id="holdings-thead-row"></tr>
@@ -1871,7 +1874,7 @@
       </table>
       <div class="empty" id="empty" style="display:none">No tickers match your filters.</div>
     </div>
-    <aside class="detail" id="detail">
+    <aside class="detail" id="detail" aria-label="Stock research">
       <div class="loading">Select a ticker</div>
     </aside>
   </div>
@@ -1984,7 +1987,7 @@
 <script src="insights-viz.js?v=20261020-relevance"></script>
 <link rel="stylesheet" href="fund-letters/reader.css?v=1">
 <script src="fund-letters/reader.js?v=1"></script>
-<script src="valuation-viz.js"></script>
+<script src="valuation-viz.js?v=20261027-shared-forecast"></script>
 <script src="market-sessions.js?v=20261023"></script>
 <script src="market-risk-data.js?v=20261023"></script>
 <script src="criticality-viz.js?v=20261022-session-comparison"></script>
@@ -1998,7 +2001,11 @@
 <script src="holdings-viz.js?v=20261018-held-by"></script>
 <script src="index-viz.js"></script>
 <script src="activist-viz.js?v=20260819-dashboard-rebuild"></script>
-<script src="short-alpha-viz.js?v=20261015-net-edge-v2"></script>
+<script src="third-plus-study-details.js?v=20261025-ssr-replay"></script>
+<script src="third-plus-venue.js?v=20261026-venue"></script>
+<script src="third-plus-execution.js?v=20261025-ssr-replay"></script>
+  <script src="third-plus-study.js?v=20261025-ssr-replay"></script>
+<script src="short-alpha-viz.js?v=20261024-third-plus"></script>
 <script src="reverse-splits-portfolio-viz.js?v=20261015-results"></script>
 <script src="shorts-net-edge-viz.js?v=20261015-v2"></script>
 <script src="shorts-edge-v3-viz.js?v=20261018-fundamentals"></script>
@@ -2017,6 +2024,7 @@
 <script src="ui-format.js?v=20260819-currency"></script>
 <script src="portfolio-viz.js?v=20261008-michael-tail"></script>
 <script src="oauth.js"></script>
+<script src="research-workspace.js?v=20261027-shared-forecast"></script>
 <script>
 const GH_REPO = 'magis-capital-partners/single-stock-investments';
 const GITHUB_REPO = GH_REPO;
@@ -2095,20 +2103,21 @@ let devicePollCancelled = false;
 const HOLDINGS_SORT_KEY = 'ssp_holdings_sort_v1';
 const HOLDINGS_COL_GROUPS_KEY = 'ssp_holdings_col_groups_v1';
 const HOLDINGS_COLUMNS = [
-  { id: 'ticker', label: 'Ticker', sort: 'ticker', group: 'core' },
-  { id: 'company', label: 'Company', sort: 'company', group: 'core' },
-  { id: 'stance', label: 'Stance', sort: 'classification.stance', group: 'core' },
+  { id: 'ticker', label: 'Stock', sort: 'ticker', group: 'core' },
+  { id: 'company', label: 'Company', sort: 'company', group: 'details' },
+  { id: 'stance', label: 'Stance', sort: 'classification.stance', group: 'details' },
   { id: 'valuation', label: 'Decision', sort: 'valuation_decision.status', group: 'core' },
   { id: 'price_value', label: 'PV today', sort: 'valuation_decision.value_per_share.base', group: 'core' },
-  { id: 'vs_price', label: 'Margin of safety', sort: 'valuation_decision.margin_of_safety_pct.base', group: 'core' },
+  { id: 'vs_price', label: 'Margin of safety', sort: 'valuation_decision.margin_of_safety_pct.base', group: 'details' },
   { id: 'irr', label: 'Forward return', sort: 'valuation_decision.forward_return_at_price_pct.base', group: 'core' },
-  { id: 'technical_setup', label: 'Fear / tape', sort: 'technicals.capitulation.scores.panic', group: 'core' },
+  { id: 'technical_setup', label: 'Fear / tape', sort: 'technicals.capitulation.scores.panic', group: 'details' },
   { id: 'next_action', label: 'Next action', sort: 'valuation_decision.critical_gap_count', group: 'core' },
-  { id: 'route_method', label: 'Power Zone / method', sort: 'power_zones.primary', group: 'core' },
-  { id: 'special_situation', label: 'CVR / NAV', sort: 'special_situation', group: 'core' },
-  { id: 'buyback', label: 'Buyback', sort: 'buyback.net_reduction_1y', group: 'core' },
+  { id: 'route_method', label: 'Power Zone / method', sort: 'power_zones.primary', group: 'details' },
+  { id: 'special_situation', label: 'CVR / NAV', sort: 'special_situation', group: 'details' },
+  { id: 'buyback', label: 'Buyback', sort: 'buyback.net_reduction_1y', group: 'details' },
+  { id: 'kpi_pulse', label: 'KPI trend', sort: 'kpi_trends.business_momentum.score', group: 'core' },
   { id: 'research_freshness', label: 'Freshness', sort: 'last_research', group: 'core' },
-  { id: 'context', label: 'Context', sort: 'classification.investment_sleeve_label', group: 'core' },
+  { id: 'context', label: 'Context', sort: 'classification.investment_sleeve_label', group: 'details' },
   { id: 'cvr_stage', label: 'CVR detail', sort: 'cvr.stage', group: 'special' },
   { id: 'nav_disc', label: 'NAV detail', sort: 'fund_nav.display_discount_pct', group: 'special' },
   { id: 'technical_trend', label: 'Panic', sort: 'technicals.capitulation.scores.panic', group: 'technical' },
@@ -2133,6 +2142,7 @@ const HOLDINGS_COLUMNS = [
   { id: 'activist', label: 'Activist', sort: 'activist.long_count', group: 'index' },
 ];
 const COL_GROUP_META = [
+  { id: 'details', label: 'Company & decision detail' },
   { id: 'special', label: 'CVR / NAV detail' },
   { id: 'technical', label: 'Technicals detail' },
   { id: 'ops', label: 'Ops' },
@@ -2141,6 +2151,10 @@ const COL_GROUP_META = [
 ];
 
 let selected = null;
+let coverageTableScroll = 0;
+let coverageListScroll = 0;
+let coveragePageScroll = 0;
+let detailRequestVersion = 0;
 let sortKey = (() => {
   try {
     const saved = JSON.parse(localStorage.getItem(HOLDINGS_SORT_KEY) || 'null');
@@ -2156,7 +2170,7 @@ let sortAsc = (() => {
   return true;
 })();
 let columnGroups = (() => {
-  const defaults = { special: false, technical: false, ops: false, insights: false, index: false };
+  const defaults = { details: false, special: false, technical: false, ops: false, insights: false, index: false };
   try {
     return { ...defaults, ...JSON.parse(localStorage.getItem(HOLDINGS_COL_GROUPS_KEY) || '{}') };
   } catch (_) {
@@ -2490,9 +2504,11 @@ function syncRouteHash() {
   } else if (activeView === 'darwin') {
     setAppHash(`#/strategies/darwin/${darwinViewMode || 'overview'}`);
   } else if (activeView === 'holdings') {
-    const buybackSection = new URLSearchParams(location.hash.split('?')[1] || '').get('section') === 'buyback';
-    const buybackSuffix = selected && buybackSection ? '?section=buyback' : '';
-    setAppHash(selected ? `#/research/coverage/${encodeURIComponent(selected)}${buybackSuffix}` : '#/research/coverage');
+    const params = new URLSearchParams(location.hash.split('?')[1] || '');
+    const requested = params.get('section');
+    const section = typeof ResearchWorkspace !== 'undefined' ? ResearchWorkspace.activeTab() : ['overview','valuation','business','evidence','buyback'].includes(requested) ? requested : 'overview';
+    const focus = section === 'business' && (params.get('section') === 'buyback' || params.get('focus') === 'buyback') ? '&focus=buyback' : '';
+    setAppHash(selected ? `#/research/coverage/${encodeURIComponent(selected)}?section=${section}${focus}` : '#/research/coverage');
   } else if (activeView === 'valuation') {
     setAppHash('#/research/valuation');
   } else if (activeView === 'watchlist') {
@@ -2544,12 +2560,11 @@ function applyRouteFromHash() {
   if (route.view === 'holdings' && route.ticker) {
     const hit = data.tickers.find(x => x.ticker === route.ticker);
     if (hit || window.BuybackViz?.company(route.ticker)) {
-      selectTicker(route.ticker, { syncHash: false });
-      syncRouteHash();
+      selectTicker(route.ticker, { syncHash: false, workspaceTab: new URLSearchParams(location.hash.split('?')[1] || '').get('section') || 'overview' });
       return true;
     }
   }
-  if (route.view !== 'holdings') {
+  if (route.view !== 'holdings' || !route.ticker) {
     clearTickerSelection({ syncHash: false });
     syncRouteHash();
     return true;
@@ -2819,9 +2834,12 @@ function renderReadNextCard(t) {
 }
 
 function clearTickerSelection(opts = {}) {
+  window.ResearchWorkspace?.rememberScroll();
   selected = null;
   const grid = document.getElementById('main-grid');
+  document.body.classList.remove('research-focused-page');
   grid.classList.remove('model-expanded');
+  document.getElementById('detail').classList.remove('research-workspace');
   grid.classList.add('detail-closed');
   document.getElementById('detail').innerHTML = '<div class="loading">Select a ticker</div>';
   renderTable();
@@ -2873,15 +2891,15 @@ function renderIrrCell(t) {
     const ret = ValuationViz.displayReturn(t);
     if (ret.pct != null && Number.isFinite(Number(ret.pct))) {
       const pct = Number(ret.pct);
-      const years = t.valuation_decision?.horizon_years
+      const years = (ret.source === 'autonomous_research_estimate' ? t.autonomous_irr?.horizon_years : null) ?? t.valuation_decision?.horizon_years
         ?? t.valuation_workbench?.valuation?.horizon_years;
-      const label = 'contract forward';
-      const title = [ret.sub, years != null ? `${years}y horizon` : '', t.valuation_decision?.dates?.model_as_of ? `model as of ${t.valuation_decision.dates.model_as_of}` : '']
+      const label = ret.source === 'shared_valuation_forecast' ? 'same valuation model' : 'contract forward';
+      const title = [ret.sub, years != null ? `${Number(years).toFixed(1)}y horizon` : '', t.valuation_decision?.dates?.model_as_of ? `model as of ${t.valuation_decision.dates.model_as_of}` : '']
         .filter(Boolean).join(' · ');
       return `<span class="irr-cell ${irrClass(pct)}" title="${escapeHtml(title)}">${pct.toFixed(pct % 1 ? 1 : 0)}%${label ? `<span class="irr-sub">${escapeHtml(label)}</span>` : ''}</span>`;
     }
   }
-  return '<span class="irr-cell irr-pending" title="No publishable dated forward-cash-flow return">—<span class="irr-sub">not modeled</span></span>';
+  return `<span class="irr-cell irr-pending" title="${escapeHtml(window.ValuationViz?.forecastGapLabel(t.valuation_decision?.calculation_reason) || "Dated shareholder forecast unavailable")}">—<span class="irr-sub">${t.valuation_decision?.calculation_status === "quote_gap" ? "quote refresh pending" : "forecast incomplete"}</span></span>`;
 }
 
 const METHOD_BY_PROFILE = {
@@ -2902,7 +2920,7 @@ function renderPriceValueCell(t) {
   const u = quoteUnitsOf(t);
   const d = decisionForRow(t);
   const values = d.value_per_share || t.component_valuation?.total_equity_value_per_share || {};
-  const price = d.price_per_share ?? t.component_valuation?.market_price_per_share;
+  const price = d.calculation_status === 'identity_gap' ? null : d.price_per_share ?? t.component_valuation?.market_price_per_share;
   const priceText = price == null ? '—' : fmtQuote(price, u, 0);
   const baseText = values.base == null ? '—' : fmtQuote(values.base, u, 0);
   const range = values.low == null || values.high == null
@@ -2913,6 +2931,8 @@ function renderPriceValueCell(t) {
 }
 
 function renderNextActionCell(t) {
+  if (t.valuation_decision?.calculation_status) return `<div class="decision-action">${t.valuation_decision.research_return_available ? 'Automatic model refresh scheduled' : 'Automatic forecast repair scheduled'}</div><div class="tier-sub">${escapeHtml(window.ValuationViz?.forecastGapLabel(t.valuation_decision.calculation_reason) || 'PV and IRR reconciled')}</div>`;
+  if (t.autonomous_irr) return `<div class="decision-action">${t.autonomous_irr.status === 'available' ? 'Automatic refresh scheduled' : 'Automatic source retry scheduled'}</div><div class="tier-sub">Research estimate · no approval queue</div>`;
   const d = decisionForRow(t);
   const critical = Number(d.critical_gap_count || 0);
   const open = Number(d.open_gap_count || 0);
@@ -2921,7 +2941,7 @@ function renderNextActionCell(t) {
   const gaps = critical || open
     ? `<div class="irr-sub">${critical} critical · ${open} open</div>`
     : '';
-  return `<div class="decision-action" title="${escapeHtml(action)}">${escapeHtml(action)}</div>${gaps}`;
+  return `<div class="decision-action" title="${escapeHtml(action)}">${escapeHtml(window.ResearchWorkspace?.friendlyAction(action) || action)}</div>${gaps}`;
 }
 
 function renderRouteMethodCell(t) {
@@ -3132,11 +3152,47 @@ function renderInvestmentCommittee(t) {
     </div>`;
 }
 
+function renderCoreCompounder(t, mode = 'valuation') {
+  const view = t.compounder_monitor;
+  if (!view) return '';
+  const bridge = view.tci_return_bridge || {};
+  const cases = bridge.scenarios || {};
+  const num = value => value == null ? 'GAP' : Number(value).toFixed(2);
+  const rows = ['bear', 'base', 'bull'].map(name => {
+    const row = cases[name] || {};
+    return `<tr><td>${escapeHtml(name)}</td><td>${num(row.fcf_yield_pct)}%</td><td>${num(row.per_share_fcf_growth_pct)}%</td><td>${num(row.multiple_change_pct)}%</td><td>${num(row.exact_irr_pct)}%</td><td>${num(row.reconciliation_gap_pp)} pp</td><td>${num(bridge.sensitivity_10yr?.[name]?.exact_irr_pct)}%</td></tr>`;
+  }).join('');
+  const quality = (view.quality_assessment?.criteria || []).map(row => `<li>${escapeHtml(row.criterion.replace(/_/g, ' '))}: ${row.value == null ? escapeHtml(row.rating || row.reason || row.status || 'Data unavailable') : num(row.value) + '%'}</li>`).join('');
+  const drivers = (view.kpi_coverage || []).map(row => `<tr><td>${escapeHtml(row.kpi_id)}</td><td>${row.value == null ? 'GAP' : escapeHtml(String(row.value)) + ' ' + escapeHtml(row.unit || '')}</td><td>${escapeHtml(row.period || '—')}</td><td>${escapeHtml(row.status)}</td></tr>`).join('');
+  const missing = (view.what_missing || []).map(row => `<li>${escapeHtml(String(row.text).slice(0, 600))}<div class="tier-sub">${escapeHtml(row.source?.claim_type || 'inference')} · ${escapeHtml(row.source?.ref || 'Source gap')} · ${escapeHtml(row.source?.as_of || 'date unavailable')}</div></li>`).join('');
+  const financial = t.autonomous_irr?.financial_observations || [];
+  const latestFinancial = new Map();
+  financial.forEach(p => { if (!latestFinancial.has(p.kpi) || p.period > latestFinancial.get(p.kpi).period) latestFinancial.set(p.kpi,p); });
+  const financialHtml = latestFinancial.size ? `<h4>Automatically collected financial observations</h4><div style="overflow-x:auto"><table class="component-table"><thead><tr><th>Metric</th><th>Value</th><th>Fiscal period end</th><th>Evidence</th></tr></thead><tbody>${[...latestFinancial.values()].map(p=>`<tr><td>${escapeHtml(p.kpi.replace(/_/g,' '))}</td><td>${Number(p.value).toLocaleString(undefined,{maximumFractionDigits:2})} ${escapeHtml(p.unit)}</td><td>${escapeHtml(p.fiscal_period_end || p.period)}</td><td>${linkHtml(p.source_url,'Source')}</td></tr>`).join('')}</tbody></table></div>` : '';
+  if (mode === 'business') return `${financialHtml}<p>${escapeHtml(view.driver_to_fcf || '')}</p><h4>Business quality</h4><ul>${quality}</ul><h4>Issuer operating drivers</h4><div style="overflow-x:auto"><table class="component-table"><thead><tr><th>Driver</th><th>Latest observation</th><th>Period</th><th>Status</th></tr></thead><tbody>${drivers}</tbody></table></div>${(view.operating_conflicts || []).length ? '<p>Conflicting source observations require review; both sources are retained in the operating KPI store.</p>' : ''}`;
+  return `<div class="detail-section component-value-card">
+    <h3>Core compounder research <span class="badge badge-warn">${escapeHtml(view.model_level || 'unmodeled')}</span></h3>
+    <div class="tier-sub">TCI cash-flow diagnostic · percent per year · ${escapeHtml(bridge.model_as_of || 'model date unavailable')} · research only; capital authority remains with the owner.</div>
+    <div class="summary" style="margin-top:10px">${escapeHtml(view.driver_to_fcf || '')}</div>
+    ${cases.base ? `<div style="overflow-x:auto"><table class="component-table"><thead><tr><th>Case</th><th>FCF yield</th><th>FCF/share growth</th><th>Multiple</th><th>Exact 7yr IRR</th><th>Timing gap</th><th>10yr sensitivity</th></tr></thead><tbody>${rows}</tbody></table></div>` : '<p>Return bridge withheld: normalized cash flow and causal scenarios require underwriting.</p>'}
+    <div class="tier-sub">${escapeHtml(bridge.persona_horizon_note || '')}</div>
+    <details style="margin-top:12px"><summary>Return assumptions and gaps</summary><ul>${(bridge.gaps || []).map(gap => `<li>${escapeHtml(gap)}</li>`).join('')}</ul></details>
+
+
+    <details style="margin-top:12px"><summary>What are we missing? (${(view.what_missing || []).length})</summary><ul>${missing}</ul></details>
+    ${(view.operating_conflicts || []).length ? '<p>Conflicting source observations require review; both sources are retained in the operating KPI store.</p>' : ''}
+  </div>`;
+}
+
 function renderPricingAnalysis(t) {
   const p = t.pricing_analysis;
   if (!p) return '';
   const values = p.component_value_per_share || {};
   const entry = p.entry_prices?.base || {};
+  const zones = p.buy_zones || {};
+  const zoneHtml = zones.status === 'available'
+    ? `<div class="metric-grid metric-grid-3" style="margin-top:12px">${(zones.zones || []).map(z => `<div class="metric"><div class="k">${escapeHtml(z.label)}${z.active ? ' · in band' : ''}</div><div class="v mono">≤ ${fmtQuote(z.price)}</div><div class="tier-sub">${(z.requirements || []).map(r => `${escapeHtml(r.case === 'low' ? 'Bear' : r.case)} ≥ ${escapeHtml(String(r.hurdle_pct))}%`).join(' and ')}</div></div>`).join('')}</div><div class="tier-sub">Research hurdle bands · owner review required. Royalty corroboration: ${escapeHtml(zones.royalty_corroboration?.status || 'unavailable')}.</div>`
+    : `<div class="tier-sub" style="margin-top:12px">Buy zones withheld: ${escapeHtml((zones.blockers || []).join(' ') || p.entry_price_unavailable_reason || 'Dated decision-grade economics are required.')}</div>`;
   const economic = p.economic_value_bridge || {};
   const grossNav = economic.gross_comparable_nav_per_share || {};
   const convergence = economic.nav_convergence_entry_prices?.base || {};
@@ -3163,16 +3219,12 @@ function renderPricingAnalysis(t) {
     <div class="detail-section component-value-card">
       <h3>Pricing cross-check <span class="badge badge-us">not the economic schedule</span> <span class="badge ${badgeClass}">${escapeHtml(decision)}</span></h3>
       <div class="metric-grid metric-grid-3">
-        <div class="metric"><div class="k">Current price</div><div class="v mono">${fmtQuote(p.price)}</div></div>
-        <div class="metric"><div class="k">Base component value</div><div class="v mono">${fmtQuote(values.base)}</div><div class="tier-sub">${fmtPct(p.upside_downside_pct?.base)} vs price</div></div>
-        <div class="metric"><div class="k">15% owner-cash entry</div><div class="v mono">${fmtQuote(p.entry_price_15pct_base)}</div></div>
+        <div class="metric"><div class="k">Snapshot price</div><div class="v mono">${fmtQuote(p.price)}</div></div>
+        ${values.base == null ? '' : `<div class="metric"><div class="k">Base component value</div><div class="v mono">${fmtQuote(values.base)}</div><div class="tier-sub">${fmtPct(p.upside_downside_pct?.base)} vs price</div></div>`}
+        ${p.entry_price_15pct_base == null ? '' : `<div class="metric"><div class="k">15% owner-cash entry (audit)</div><div class="v mono">${fmtQuote(p.entry_price_15pct_base)}</div></div>`}
       </div>
-      <div class="metric-grid" style="margin-top:10px">
-        <div class="metric"><div class="k">10% hurdle</div><div class="v mono">${fmtQuote(entry['10pct'])}</div></div>
-        <div class="metric"><div class="k">12% hurdle</div><div class="v mono">${fmtQuote(entry['12pct'])}</div></div>
-        <div class="metric"><div class="k">15% hurdle</div><div class="v mono">${fmtQuote(entry['15pct'])}</div></div>
-        <div class="metric"><div class="k">20% hurdle</div><div class="v mono">${fmtQuote(entry['20pct'])}</div></div>
-      </div>
+      ${Object.entries(entry).some(([,value]) => value != null) ? `<div class="metric-grid" style="margin-top:10px">${Object.entries(entry).filter(([,value]) => value != null).map(([hurdle,value]) => `<div class="metric"><div class="k">${escapeHtml(hurdle.replace('pct','%'))} hurdle</div><div class="v mono">${fmtQuote(value)}</div></div>`).join('')}</div>` : '<p class="rw-empty">Entry thresholds unavailable. Dated forward economics and a complete ownership map are required.</p>'}
+      ${zoneHtml}
       <div class="summary" style="margin-top:12px">${escapeHtml(p.conclusion || '')}</div>
       ${economicHtml}
       <div class="tier-sub" style="margin-top:8px"><strong>Price-implied owner-cash growth:</strong> ${fmtPct(p.implied_growth_pct)} · <strong>Current/contracted support:</strong> ${fmtQuote(p.current_supported_value)} · <strong>Price paid for growth/options:</strong> ${fmtQuote(p.market_price_above_supported_value)}</div>
@@ -3386,6 +3438,24 @@ window.addEventListener('energy-model-retry', async () => {
   renderInsights();
 });
 
+function renderLicensedSources(t, escapeHtml, linkHtml) {
+  const lic = t && t.licensed_sources;
+  if (!lic || (!lic.valueline && !(lic.expert_calls || []).length)) return '';
+  const lines = [];
+  if (lic.valueline && lic.valueline.label) {
+    lines.push(`<div class="hr-line">${lic.valueline.drive_url ? linkHtml(lic.valueline.drive_url, lic.valueline.label) : escapeHtml(lic.valueline.label)}</div>`);
+  }
+  (lic.expert_calls || []).forEach((call) => {
+    const label = call.label || (call.date ? `Expert call dated ${call.date}` : 'Expert call');
+    lines.push(`<div class="hr-line">${call.drive_url ? linkHtml(call.drive_url, label) : escapeHtml(label)}</div>`);
+  });
+  if (!lines.length) return '';
+  const extra = lic.expert_call_count > (lic.expert_calls || []).length
+    ? `<p class="tier-sub">${lic.expert_call_count} expert calls on file. Showing the latest.</p>`
+    : '';
+  return `<details class="detail-section"><summary>Licensed research</summary><div style="margin-top:8px">${lines.join('')}</div>${extra}<p class="tier-sub">Drive link only. Report text stays in the private vault.</p></details>`;
+}
+
 function loadLazyFile(key) {
   const loaders = {
     research_memory: () => loadShardOnce('file:research_memory', 'data/research_memory.json', (doc) => { data.research_memory = doc; }),
@@ -3400,6 +3470,7 @@ function loadLazyFile(key) {
     activist_feed: () => loadShardOnce('file:activist_feed', 'data/activist_feed.json', (doc) => { data.activist_feed = doc; }),
     activist_discovery: () => loadShardOnce('file:activist_discovery', 'data/activist_filer_discovery.json', (doc) => { data.activist_discovery = doc; }),
     darwin_cc: () => loadShardOnce('file:darwin_cc', 'data/darwin_cc.json', (doc) => { data.darwin_cc = doc; }),
+    licensed_sources: () => loadShardOnce('file:licensed_sources', 'data/licensed_sources.json', (doc) => { data.licensed_sources = doc; }),
   };
   return loaders[key] ? loaders[key]() : Promise.resolve();
 }
@@ -3462,12 +3533,15 @@ function loadTickerDetail(ticker) {
         data.tickers[idx] = Object.assign({}, data.tickers[idx], full, { __detail: true });
       }
     }),
-    loadLazyFile('technical_signals'),
+    loadLazyFile('technical_signals').catch(() => {}),
+    loadLazyFile('licensed_sources').catch(() => {}),
   ]).then(() => {
     const idx = data.tickers.findIndex((x) => x.ticker === ticker);
     if (idx >= 0) {
       const fullTechnical = data.technical_signals?.by_ticker?.[ticker];
       if (fullTechnical) data.tickers[idx].technicals = fullTechnical;
+      const licensed = data.licensed_sources?.by_ticker?.[ticker];
+      if (licensed) data.tickers[idx].licensed_sources = licensed;
       applyBuyback(data.tickers[idx]);
     }
     return data.tickers.find((x) => x.ticker === ticker);
@@ -3733,7 +3807,10 @@ function renderShortAlpha() {
     loading.style.display='none';
     content.style.display='block';
     content.innerHTML=ShortAlphaViz.renderBacktest();
-    mountReverseSplitsSection(content);
+    window.ThirdPlusStudyViz?.attach(content);
+    const earlier=content.querySelector('[data-third-plus-legacy]');
+    if(earlier)earlier.addEventListener('toggle',()=>{if(earlier.open)mountReverseSplitsSection(content);});
+    else mountReverseSplitsSection(content);
     return;
   }
   if (!shortAlphaData) {
@@ -3960,6 +4037,7 @@ function setView(view, opts = {}) {
     if (active) link.setAttribute('aria-current', 'page'); else link.removeAttribute('aria-current');
   });
   document.getElementById('holdings-view').classList.toggle('hidden', view !== 'holdings');
+  document.body.classList.toggle('research-focused-page', view === 'holdings' && !!selected);
   document.getElementById('portfolio-panel')?.classList.toggle('active', view === 'portfolio');
   document.getElementById('spx-0dte-panel')?.classList.toggle('active', view === 'spx-0dte');
   document.getElementById('letf-panel')?.classList.toggle('active', view === 'letf');
@@ -4167,6 +4245,8 @@ function renderActivist() {
     });
   }
   content.querySelectorAll('[data-activist-group]').forEach(btn => {
+    if (btn.dataset.rwWired) return;
+    btn.dataset.rwWired = 'true';
     btn.addEventListener('click', (e) => {
       e.stopPropagation();
       const key = btn.dataset.activistGroup || '';
@@ -5452,6 +5532,7 @@ function renderSummary() {
     { label: 'PDF store', value: Number(catalog?.uploaded_count || 0).toLocaleString(), sub: `${Number(catalog?.pending_upload_count || 0).toLocaleString()} pending` },
   ];
   document.getElementById('summary').innerHTML = `
+    <details class="rw-coverage"><summary><strong>${Number(s.ticker_count || data.tickers.length)} stocks in coverage</strong>${tier1} priority · ${dueNow} evidence due · ${stale} stale · Coverage health</summary><div class="rw-summary-grid">
     ${openNextCard}
     ${cards.map((c, index) => `
       <div class="summary-card decision-stage ${c.cls || ''}">
@@ -5467,7 +5548,7 @@ function renderSummary() {
           <div class="value">${escapeHtml(String(c.value))}</div>
           <div class="sub">${escapeHtml(c.sub)}</div>
         </div>`).join('')}</div>
-    </details>`;
+    </details></div></details>`;
   const openNextButton = document.querySelector('#summary [data-open-next]');
   if (openNextButton) {
     openNextButton.addEventListener('click', () => {
@@ -5543,10 +5624,8 @@ function filtered() {
     } else if (sortKey === 'classification.analysis_irr_pct') {
       // Old saved preferences map to the canonical forward-return sort.  Do
       // not revive classification IRRs as a fallback.
-      av = a.valuation_decision?.return_publishable
-        ? a.valuation_decision?.forward_return_at_price_pct?.base : null;
-      bv = b.valuation_decision?.return_publishable
-        ? b.valuation_decision?.forward_return_at_price_pct?.base : null;
+      av = window.ValuationViz?.displayReturn(a).pct ?? null;
+      bv = window.ValuationViz?.displayReturn(b).pct ?? null;
       av = av == null ? -Infinity : av;
       bv = bv == null ? -Infinity : bv;
     } else if (sortKey === 'classification.stance') {
@@ -5614,9 +5693,7 @@ function filtered() {
       sortKey === 'valuation_decision.forward_return_at_price_pct.base'
       || sortKey === 'valuation_decision.annualized_return_at_price_pct.base'
     ) {
-      const forwardOf = (t) => t.valuation_decision?.return_publishable
-        ? t.valuation_decision?.forward_return_at_price_pct?.base
-        : null;
+      const forwardOf = (t) => window.ValuationViz?.displayReturn(t).pct ?? null;
       av = forwardOf(a);
       bv = forwardOf(b);
       av = av == null ? -Infinity : av;
@@ -5643,8 +5720,12 @@ function filtered() {
 
 function renderHoldingsCell(colId, t) {
   switch (colId) {
+    case 'kpi_pulse': {
+      const trend = t.kpi_trends;
+      return `<td>${trend?.has_trend_data ? `<span>${escapeHtml(trend.business_momentum?.label || 'Trend snapshot available')}</span><span class="irr-sub">${Number(trend.summary?.confirmed || 0)} confirmed · review dates in Business &amp; KPIs</span>` : '<span class="tier-sub">No trend snapshot</span>'}</td>`;
+    }
     case 'ticker':
-      return `<td class="mono ticker-cell">${escapeHtml(t.display_ticker || t.ticker)}${t.quote_ticker && t.quote_ticker !== (t.display_ticker || t.ticker) ? `<span class="irr-sub" title="Quote symbol"> ${escapeHtml(t.quote_ticker)}</span>` : ''}${t.equity_model?.ready ? ` <span class="badge badge-ok" title="Earnings model ${t.equity_model.production_spec || 'v5'} ready">M</span>` : ''}${t.onboard?.phase && t.onboard.phase !== 'complete' ? `<span class="onboard-badge">${t.onboard.phase}</span>` : ''}${window.SeparationsViz && t.separation?.odd_lot?.eligible_owners?.length ? ` ${SeparationsViz.renderOddLotBadge(t.separation, { escapeHtml })}` : ''}${window.FundHoldings ? FundHoldings.badgeHtml(t.ticker) : ''}<button type="button" class="sleeve-jump" data-sleeve-jump="drew" data-ticker="${escapeHtml(t.ticker)}" title="Note on Drew tab">D</button><button type="button" class="sleeve-jump" data-sleeve-jump="michael" data-ticker="${escapeHtml(t.ticker)}" title="Note on Michael tab">M</button></td>`;
+      return `<td class="mono ticker-cell">${escapeHtml(t.display_ticker || t.ticker)}${t.quote_ticker && t.quote_ticker !== (t.display_ticker || t.ticker) ? `<span class="irr-sub" title="Quote symbol"> ${escapeHtml(t.quote_ticker)}</span>` : ''}${t.equity_model?.ready ? ` <span class="badge badge-ok" title="Earnings model ${t.equity_model.production_spec || 'v5'} ready">M</span>` : ''}${t.onboard?.phase && t.onboard.phase !== 'complete' ? `<span class="onboard-badge">${t.onboard.phase}</span>` : ''}${window.SeparationsViz && t.separation?.odd_lot?.eligible_owners?.length ? ` ${SeparationsViz.renderOddLotBadge(t.separation, { escapeHtml })}` : ''}${window.FundHoldings ? FundHoldings.badgeHtml(t.ticker) : ''}<button type="button" class="sleeve-jump" data-sleeve-jump="drew" data-ticker="${escapeHtml(t.ticker)}" title="Note on Drew tab">D</button><button type="button" class="sleeve-jump" data-sleeve-jump="michael" data-ticker="${escapeHtml(t.ticker)}" title="Note on Michael tab">M</button><span class="rw-stock-name">${escapeHtml(t.company || t.ticker)}</span></td>`;
     case 'company':
       return `<td class="company-cell" title="${escapeHtml(t.company)}">${escapeHtml(t.company)}</td>`;
     case 'market':
@@ -5861,6 +5942,27 @@ function renderFundNavPanel(t) {
 
 function renderTable() {
   const rows = filtered();
+  const grid = document.getElementById('main-grid');
+  const list = document.getElementById('research-stock-list');
+  const tableWrap = grid.querySelector('.table-wrap');
+  if (grid.classList.contains('research-focused')) coverageListScroll = tableWrap.scrollTop;
+  else coverageTableScroll = tableWrap.scrollTop;
+  grid.classList.toggle('research-focused', !!selected);
+  if (selected && !document.body.classList.contains('research-focused-page') && matchMedia('(min-width:721px)').matches) { coveragePageScroll = window.scrollY; window.scrollTo({ top:0, behavior:'instant' }); }
+  document.body.classList.toggle('research-focused-page', !!selected && activeView === 'holdings');
+  if (list) {
+    list.hidden = !selected;
+    if (selected) {
+      list.innerHTML = `<div class="rw-list-count">${rows.length} matching stocks</div>` + rows.map(t => `<a class="rw-stock-link" href="#/research/coverage/${encodeURIComponent(t.ticker)}" data-research-ticker="${escapeHtml(t.ticker)}" aria-current="${selected === t.ticker}"><strong>${escapeHtml(t.display_ticker || t.ticker)}</strong><span>${escapeHtml(t.company || '')}</span><small>${escapeHtml(t.classification?.stance || 'unassigned')} · ${escapeHtml(String(t.valuation_decision?.model_level || t.valuation_decision?.status || 'unmodeled').replace(/_/g, ' '))}</small></a>`).join('');
+      list.querySelectorAll('[data-research-ticker]').forEach(link => link.addEventListener('click', event => {
+        if (event.ctrlKey || event.metaKey || event.shiftKey || event.altKey) return;
+        event.preventDefault(); selectTicker(link.dataset.researchTicker);
+      }));
+      list.parentElement.scrollTop = coverageListScroll;
+      document.getElementById('empty').style.display = rows.length ? 'none' : 'block';
+      return;
+    }
+  }
   const cols = visibleHoldingsColumns();
   renderHoldingsThead();
   renderColumnGroupToggles();
@@ -5889,6 +5991,8 @@ function renderTable() {
       setView(owner);
     });
   });
+  tableWrap.scrollTop = coverageTableScroll;
+  if (!selected && activeView === 'holdings' && matchMedia('(min-width:721px)').matches) window.scrollTo({top:coveragePageScroll,behavior:'instant'});
 }
 
 function getEquityModelBundle(ticker) {
@@ -5898,6 +6002,8 @@ function getEquityModelBundle(ticker) {
 function wireDetailEvents(ticker) {
   const detail = document.getElementById('detail');
   detail.querySelectorAll('[data-lens-persona]').forEach(btn => {
+    if (btn.dataset.rwWired) return;
+    btn.dataset.rwWired = 'true';
     btn.addEventListener('click', (e) => {
       e.stopPropagation();
       const p = btn.dataset.lensPersona;
@@ -5939,27 +6045,21 @@ function wireDetailEvents(ticker) {
       }
     });
   });
-  if (valuationOpenEvidenceTab) {
-    valuationOpenEvidenceTab = false;
-    const evidenceBtn = detail.querySelector('[data-workbench-tab="evidence"]');
-    if (evidenceBtn) evidenceBtn.click();
-  }
+
 }
 
 function selectTicker(ticker, opts = {}) {
+  const requestVersion = ++detailRequestVersion;
+  window.ResearchWorkspace?.rememberScroll();
   selected = ticker;
   if (typeof EquityModelViz !== 'undefined') EquityModelViz.destroyCharts();
   renderTable();
-  const t = data.tickers.find(x => x.ticker === ticker);
-    if (!t) {
-      const buyback = window.BuybackViz?.company(ticker);
-      if (buyback) {
-        document.getElementById('main-grid').classList.remove('detail-closed');
-        document.getElementById('detail').innerHTML = '<h2>'+escapeHtml(ticker)+'</h2><p>'+escapeHtml(buyback.company)+'</p>'+BuybackViz.renderDetail({ticker,buyback});
-        if (opts.syncHash !== false) syncRouteHash();
-      }
-      return;
-    }
+  let t = data.tickers.find(x => x.ticker === ticker);
+  if (!t) {
+    const buyback = window.BuybackViz?.company(ticker);
+    if (!buyback) return;
+    t = { ticker, company: buyback.company, buyback, __detail: true, recent_files: [], links: {} };
+  }
     // Every per-share figure in the panels below is quoted in this listing's
   // currency. Publish it before any of them render.
   setActiveQuoteUnits(t);
@@ -5970,15 +6070,15 @@ function selectTicker(ticker, opts = {}) {
     document.getElementById('detail').innerHTML =
       `<div class="loading">Loading ${escapeHtml(ticker)} detail…</div>`;
     loadTickerDetail(ticker).then(
-      () => { if (selected === ticker) selectTicker(ticker, { ...opts, syncHash: false }); },
+      () => { if (selected === ticker && requestVersion === detailRequestVersion) selectTicker(ticker, opts); },
       () => {
-        if (selected === ticker) {
+        if (selected === ticker && requestVersion === detailRequestVersion) {
           document.getElementById('detail').innerHTML =
-            `<div class="loading">Failed to load detail shard for ${escapeHtml(ticker)}</div>`;
+            `<div class="loading" role="alert">Could not load ${escapeHtml(ticker)} research. <button type="button" data-retry-detail>Try again</button></div>`;
+          document.querySelector('[data-retry-detail]')?.addEventListener('click', () => selectTicker(ticker, opts));
         }
       },
     );
-    if (opts.syncHash !== false) syncRouteHash();
     return;
   }
   const modelBundle = getEquityModelBundle(ticker);
@@ -5987,9 +6087,6 @@ function selectTicker(ticker, opts = {}) {
   const grid = document.getElementById('main-grid');
   grid.classList.remove('detail-closed');
   grid.classList.toggle('model-expanded', !!hasModel || hasValuationWorkbench);
-  const modelHtml = (typeof EquityModelViz !== 'undefined' && hasModel)
-    ? EquityModelViz.renderSection(modelBundle, { escapeHtml, linkHtml })
-    : '';
   const developments = detailDevelopments(t);
   const iv = window.InsightsViz;
   const identityLine = iv ? iv.renderIdentityLine(t.classification, escapeHtml) : '';
@@ -6063,57 +6160,39 @@ function selectTicker(ticker, opts = {}) {
     ? `<details class="detail-section"><summary>Lens consensus</summary><div style="margin-top:10px">${iv.renderConsensusDetail(t.lenses, escapeHtml)}</div></details>`
     : '';
   const icSection = t.investment_committee ? renderInvestmentCommittee(t) : '';
-  const thesisLine = t.one_line_thesis
-    ? `<div class="detail-thesis">${escapeHtml(stripMd(t.one_line_thesis))}</div>`
-    : '';
-  const diveLink = t.deep_dive?.github_url
-    ? `<a class="research-link" href="${t.deep_dive.github_url}" target="_blank" rel="noopener" style="margin-left:8px">Dive →</a>`
-    : '';
-
-  document.getElementById('detail').innerHTML = `
-    <div class="detail-sticky-header">
-      <button type="button" class="detail-close" data-detail-close title="Close detail (Esc)">Close</button>
-      <h2 style="margin:0">${escapeHtml(t.display_ticker || t.ticker)}${t.quote_ticker && t.quote_ticker !== (t.display_ticker || t.ticker) ? `<span class="irr-sub"> (${escapeHtml(t.quote_ticker)})</span>` : ''}${diveLink}</h2>
-      <div class="subhead">${escapeHtml(t.company)} · ${escapeHtml(t.exchange || t.market || '')} · ${linkHtml(t.links?.folder, t.folder || t.ticker)}</div>
-      ${thesisLine}
-      ${renderTwoPhaseHeaderChip(t)}
-    </div>
-
-    ${window.OverlapViz ? OverlapViz.renderTicker(t.display_ticker || t.ticker, escapeHtml) : ''}
-    ${window.FundHoldings ? FundHoldings.renderTicker(t.ticker, escapeHtml) : ''}
-
-    ${window.FicoWatch && t.ticker === 'FICO' ? FicoWatch.renderDetail(data.fico_watch, escapeHtml) : ''}
-
-    ${window.ValuationViz ? ValuationViz.renderDecisionStrip(t, valuationHelpers()) : ''}
-
-    ${renderHumanReviewBanner(t)}
-    ${window.TechnicalViz ? TechnicalViz.renderPanel(t, {
-      escapeHtml,
-      marketContext: data.technical_signals_ref?.market_context || {},
-      trackRecord: data.signal_track_record || null,
-    }) : ''}
-
-    ${identityLine}
-    ${lensChips || ''}
-    ${renderFundNavPanel(t)}
-    ${renderCvrPanel(t)}
-    ${window.BuybackViz ? BuybackViz.renderDetail(t, escapeHtml) : ''}
-    ${window.SeparationsViz && t.separation ? SeparationsViz.renderTickerCard(t.separation, { escapeHtml }) : ''}
-
-    ${renderValuationWorkbench(t)}
-    ${window.ValuationViz ? ValuationViz.renderPropertiesPanel(t, valuationHelpers()) : ''}
-    ${renderPricingAnalysis(t)}
-    ${window.ValuationViz ? ValuationViz.renderLegacyComponentNote(t, escapeHtml) : ''}
-    ${t.valuation_workbench ? '' : renderComponentValuation(t)}
-
-    ${powerZoneSection}
-
-    ${renderReadNextCard(t)}
-
-    ${t.deep_dive ? `
+  const rw = window.ResearchWorkspace;
+  const helpers = { ...valuationHelpers(), developments, headerExtras: renderTwoPhaseHeaderChip(t), watch: t.ticker === 'FICO' ? { title: data.fico_watch?.verdict?.title || 'FICO monitoring file unavailable; do not treat this name as monitored.' } : null };
+  const section = rw.section;
+  const renderers = {
+    valuation: () => `
+      ${rw.range(t, helpers)}
+      ${rw.scenarios(t, helpers)}
+      ${rw.irrReadiness(t, helpers)}
+      ${section('Economic ownership & value', (window.ValuationViz ? ValuationViz.renderPropertiesPanel(t, valuationHelpers()) : '') + (t.valuation_workbench ? '' : renderComponentValuation(t)), true)}
+      ${section('Cash-flow return drivers & assumptions', renderCoreCompounder(t))}
+      ${section('Pricing & entry requirements', renderPricingAnalysis(t))}
+      ${section('Fund NAV', renderFundNavPanel(t), true)}
+      ${section('CVR economics', renderCvrPanel(t), true)}
+      ${section('Separation terms', window.SeparationsViz && t.separation ? SeparationsViz.renderTickerCard(t.separation, { escapeHtml }) : '', true)}
+      ${section('Earnings model', typeof EquityModelViz !== 'undefined' && hasModel ? EquityModelViz.renderSection(modelBundle, { escapeHtml, linkHtml }) : '', true)}
+      ${section('Historical performance', renderTotalReturnSection(t))}
+      ${section('Market setup', window.TechnicalViz ? TechnicalViz.renderPanel(t, { escapeHtml, marketContext: data.technical_signals_ref?.market_context || {}, trackRecord: data.signal_track_record || null }) : '')}
+      ${window.ValuationViz ? ValuationViz.renderLegacyComponentNote(t, escapeHtml) : ''}`,
+    business: () => `
+      <h3>Operating trends</h3>${rw.kpis(t, helpers)}
+      ${section('Historical operating series', rw.kpis(t, helpers, Infinity, true))}
+      ${section('Business quality & operating drivers', renderCoreCompounder(t, 'business'), true)}
+      ${identityLine}${dossierSection}${trendSection}
+      ${window.BuybackViz ? BuybackViz.renderDetail(t, escapeHtml) : ''}
+      ${window.FicoWatch && t.ticker === 'FICO' ? FicoWatch.renderDetail(data.fico_watch, escapeHtml) : ''}
+      ${renderTwoPhaseWatch(t)}
+      ${section('Activist context', window.ActivistViz ? ActivistViz.renderTickerActivistSection(t.activist, { escapeHtml }) : '')}`,
+    evidence: () => `
+      ${section('Reports & essential insights', renderReadNextCard(t) + `    ${t.deep_dive ? `
     <details class="detail-section">
-      <summary>Marvin deep dive · ${escapeHtml(t.deep_dive.date || '')}</summary>
+      <summary>Marvin deep dive · ${escapeHtml(t.deep_dive.date || '')} · historical model snapshot</summary>
       <div class="research-box" style="margin-top:10px">
+        ${t.valuation_decision?.return_publishable ? '' : '<p class="rw-meta">Historical research below may quote an earlier return estimate. The current forward IRR remains unavailable.</p>'}
         ${t.deep_dive.executive_summary
           ? `<div class="summary">${escapeHtml(stripMd(t.deep_dive.executive_summary))}</div>`
           : `<div class="summary" style="color:var(--text-muted)">Open the full report for the executive summary.</div>`}
@@ -6127,20 +6206,12 @@ function selectTicker(ticker, opts = {}) {
       </div>
     </details>` : ''}
 
-    ${((t.essential_insights || {}).bullets || []).length ? `<details class="detail-section"><summary>Essential insights</summary><div style="margin-top:10px">${essentialInsights}</div></details>` : ''}
-    ${trendSection}
-    ${dossierSection}
-    ${renderTwoPhaseWatch(t)}
-    ${(t.research_memory && t.research_memory.claim_count) ? `<details class="detail-section"><summary>Research memory</summary><div style="margin-top:10px">${researchMemory}</div></details>` : ''}
-    ${externalContext}
-    ${consensusDetail}
-    ${icSection}
-
-    ${renderTotalReturnSection(t)}
-    ${window.ActivistViz ? ActivistViz.renderTickerActivistSection(t.activist, { escapeHtml }) : ''}
-    ${modelHtml}
-
-    <details class="detail-section">
+${essentialInsights}`, true)}
+      ${section('Letter classification audit', rw.classificationAudit(t, helpers))}
+      ${section('Decision authority & valuation audit', renderHumanReviewBanner(t) + (window.ValuationViz ? ValuationViz.renderDecisionStrip(t, valuationHelpers()) : '') + renderValuationWorkbench(t) + icSection)}
+      ${section('Frameworks & research context', lensChips + powerZoneSection + researchMemory + externalContext + consensusDetail)}
+      ${section('Ownership context', (window.OverlapViz ? OverlapViz.renderTicker(t.display_ticker || t.ticker, escapeHtml) : '') + (window.FundHoldings ? FundHoldings.renderTicker(t.ticker, escapeHtml) : ''))}
+      ${section('History, source coverage & files', `    <details class="detail-section">
       <summary>Recent developments</summary>
       <ul class="dev-list" style="margin-top:8px">
         ${(developments.length ? developments : [{ date: '—', label: 'No developments tracked yet', source: '' }]).map(d => `
@@ -6151,9 +6222,10 @@ function selectTicker(ticker, opts = {}) {
           </li>`).join('')}
       </ul>
     </details>
+    ${renderLicensedSources(t, escapeHtml, linkHtml)}
 
     <details class="detail-section tier-4">
-      <summary>Infrastructure · ${t.completeness}% · ${Number(t.pdf_count || 0)} PDFs${t.sec_filings ? ` · ${t.sec_filings} SEC` : ''}</summary>
+      <summary>Infrastructure · ${Number(t.completeness || 0)}% · ${Number(t.pdf_count || 0)} PDFs${t.sec_filings ? ` · ${t.sec_filings} SEC` : ''}</summary>
       <div class="metric-grid" style="margin-top:10px">
         <div class="metric"><div class="k">README</div><div class="v">${t.readme ? '✓' : '✗'}</div></div>
         <div class="metric"><div class="k">Download script</div><div class="v">${t.download_script ? '✓' : '✗'}</div></div>
@@ -6164,34 +6236,53 @@ function selectTicker(ticker, opts = {}) {
       </div>
     </details>
 
-    ${t.recent_files.length ? `
+    ${(t.recent_files || []).length ? `
     <details class="detail-section">
       <summary>Recent files (${t.recent_files.length})</summary>
       <ul class="dev-list" style="margin-top:8px">
-        ${t.recent_files.map(f => `
+        ${(t.recent_files || []).map(f => `
           <li>
             <div class="dev-date">${f.date}</div>
             <div class="dev-label">${f.github_url ? linkHtml(f.github_url, f.name, 'mono') : `<span class="mono">${escapeHtml(f.name)}</span>`}</div>
           </li>`).join('')}
       </ul>
-    </details>` : ''}`;
-  if (window.OverlapViz) OverlapViz.fillTicker(t.display_ticker || t.ticker);
-  if (window.FundHoldings) FundHoldings.fillTicker(t.ticker);
-  if (hasModel && typeof EquityModelViz !== 'undefined') {
-    EquityModelViz.afterRender(modelBundle);
+    </details>` : ''}`)}
+    `,
+  };
+  const initialTab = valuationOpenEvidenceTab ? 'evidence' : opts.workspaceTab;
+  valuationOpenEvidenceTab = false;
+  rw.mount(document.getElementById('detail'), t, helpers, renderers, {
+    tab: initialTab,
+    onTab: (tab) => {
+      const hash = `#/research/coverage/${encodeURIComponent(ticker)}?section=${tab}`;
+      history.replaceState(null, '', `${location.pathname}${location.search}${hash}`);
+      try { sessionStorage.setItem(ROUTE_STORAGE_KEY, hash); } catch (_) { /* ignore quota */ }
+    },
+    afterRender: (tab) => {
+      if (tab === 'business') {
+        const params = new URLSearchParams(location.hash.split('?')[1] || '');
+        if (params.get('section') === 'buyback' || params.get('focus') === 'buyback') queueMicrotask(() => {
+          const target = document.querySelector('#detail [data-buyback-detail]');
+          if (target) { target.open = true; rw.scrollToTarget(document.getElementById('detail'), target); }
+        });
+      }
+      if (tab === 'evidence') {
+        if (window.OverlapViz) OverlapViz.fillTicker(t.display_ticker || t.ticker);
+        if (window.FundHoldings) FundHoldings.fillTicker(t.ticker);
+      }
+      if (tab === 'valuation' && hasModel && typeof EquityModelViz !== 'undefined') EquityModelViz.afterRender(modelBundle);
+      wireDetailEvents(ticker);
+    },
+  });
+  if (opts.workspaceTab === 'buyback') {
+    const hash = `#/research/coverage/${encodeURIComponent(ticker)}?section=business&focus=buyback`;
+    history.replaceState(null, '', `${location.pathname}${location.search}${hash}`);
   }
-  wireDetailEvents(ticker);
   const closeBtn = document.querySelector('#detail [data-detail-close]');
-  if (closeBtn) closeBtn.addEventListener('click', () => clearTickerSelection());
-  const tpChip = document.querySelector('#detail [data-open-two-phase]');
-  if (tpChip) {
-    tpChip.addEventListener('click', () => {
-      const el = document.getElementById('two-phase-watch');
-      if (!el) return;
-      el.open = true;
-      el.scrollIntoView({ behavior: 'smooth', block: 'start' });
-    });
-  }
+  closeBtn?.addEventListener('click', () => {
+    clearTickerSelection();
+    document.querySelector(`#tbody tr[data-ticker="${CSS.escape(ticker)}"]`)?.focus({ preventScroll: true });
+  });
   if (opts.syncHash !== false) syncRouteHash();
 }
 
@@ -6330,7 +6421,8 @@ document.getElementById('holdings-thead').addEventListener('click', (e) => {
 });
 document.addEventListener('keydown', (e) => {
   if (e.key === 'Escape' && selected && activeView === 'holdings') {
-    clearTickerSelection();
+    const close = document.querySelector('#detail [data-detail-close]');
+    if (close) close.click(); else clearTickerSelection();
   }
   if (e.key === 'Escape' && selectedIdeaId && activeView === 'watchlist') {
     selectedIdeaId = null;

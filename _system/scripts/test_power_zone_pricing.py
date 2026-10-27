@@ -65,7 +65,7 @@ class PowerZonePricingTests(unittest.TestCase):
                 result = pricing.build_contract_pricing("BLOCKED", "2026-08-30")
             finally:
                 pricing.ROOT = old_root
-        self.assertEqual(result["schema_version"], "3.0")
+        self.assertEqual(result["schema_version"], "3.1")
         self.assertEqual(result["proof_status"], "evidence_blocked")
         self.assertEqual(result["entry_price_status"], "unavailable")
         self.assertEqual(result["decision"], "screening_only")

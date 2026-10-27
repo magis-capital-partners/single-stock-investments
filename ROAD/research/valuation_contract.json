@@ -1814,7 +1814,7 @@
     ]
   },
   "change_control": {
-    "model_hash": "ef3e60cdcac07f942069677b0906a04f12c7a68706c77bb019dac7b0a9329857",
+    "model_hash": "5198aed05ea72d8f2d14201680b71bc8bc8576c3c0ca1ab91a3c522c11c2c97d",
     "method_versions": [
       "owner_earnings_reinvestment_dcf@1.0"
     ],
@@ -1822,6 +1822,104 @@
     "rule": "A source fact is locked. Every assumption change requires a reason, author, timestamp, and before/after value."
   },
   "decision_rule": "Proof status and investment readiness are separate. Every material claim must be valued exactly once by a valid calculation proof, every evidence blocker must be resolved, and the model must be stock-specific before committee review. Only a human decision can authorize capital.",
+  "shared_forecast": {
+    "schema_version": "1.0",
+    "method_version": "shared-valuation-forecast/1.1",
+    "ticker": "ROAD",
+    "status": "model_gap",
+    "research_only": true,
+    "requires_human_review": false,
+    "capital_actionable": false,
+    "as_of": "2026-09-08",
+    "model_as_of": "2026-09-08",
+    "quote": {
+      "value": null,
+      "as_of": null,
+      "source_url": null,
+      "currency": null
+    },
+    "forecast_hash": "cf046a642f949b537e9f185f7c7a454e38e76518e97e26cb27c4448d908ac53d",
+    "forward_irr_pct": {
+      "low": null,
+      "base": null,
+      "high": null
+    },
+    "present_value_today_per_share": {
+      "low": null,
+      "base": null,
+      "high": null
+    },
+    "model_present_value_per_share": {
+      "low": null,
+      "base": null,
+      "high": null
+    },
+    "required_return_pct": {
+      "low": null,
+      "base": null,
+      "high": null
+    },
+    "forward_cashflow_schedule": {},
+    "buy_prices": [],
+    "components": [
+      {
+        "component_id": "operating_business_and_net_assets",
+        "method": "owner_earnings_reinvestment_dcf",
+        "status": "available",
+        "present_value_per_share": {
+          "low": -2.0642,
+          "base": 19.1149,
+          "high": 62.1853
+        }
+      }
+    ],
+    "gaps": [
+      {
+        "code": "limited_liability_equity_waterfall_missing"
+      }
+    ],
+    "warnings": [],
+    "source_refs": [
+      {
+        "node_id": "owner_earnings",
+        "ref": "ROAD/research/evidence/sec_companyfacts.json",
+        "locator": "us-gaap:NetCashProvidedByUsedInOperatingActivities; accession 0001628280-25-053871; form 10-K",
+        "as_of": "2025-09-30",
+        "content_sha256": "b4d8be02529336b5889bcd885ca0a640e5fbc5faaba86206f9542d67e768712e",
+        "source_id": "96e2cf3fd9cd81e760a9b6d26f9f08d7d7297aed1f3ce7c087827a9019ea91ad"
+      },
+      {
+        "node_id": "cash",
+        "ref": "ROAD/research/evidence/sec_companyfacts.json",
+        "locator": "us-gaap:CashAndCashEquivalentsAtCarryingValue; accession 0001628280-26-054661; form 10-Q",
+        "as_of": "2026-06-30",
+        "content_sha256": "b4d8be02529336b5889bcd885ca0a640e5fbc5faaba86206f9542d67e768712e",
+        "source_id": "23e7659234666d6879c04e88b5e93b065e544ca633c3f5c3973be978725f32f1"
+      },
+      {
+        "node_id": "debt",
+        "ref": "ROAD/research/evidence/sec_companyfacts.json",
+        "locator": "us-gaap:DebtInstrumentCarryingAmount; accession 0001628280-26-054661; form 10-Q",
+        "as_of": "2026-06-30",
+        "content_sha256": "b4d8be02529336b5889bcd885ca0a640e5fbc5faaba86206f9542d67e768712e",
+        "source_id": "6603393be088766c65499f896f89bb01be396ef9d0d175442222b83b104ca7ac"
+      },
+      {
+        "node_id": "shares_m",
+        "ref": "ROAD/research/evidence/sec_companyfacts.json",
+        "locator": "us-gaap:WeightedAverageNumberOfDilutedSharesOutstanding; accession 0001628280-26-054661; form 10-Q",
+        "as_of": "2026-06-30",
+        "content_sha256": "b4d8be02529336b5889bcd885ca0a640e5fbc5faaba86206f9542d67e768712e",
+        "source_id": "2370d81f2709ce4f4ab6b9bb7937387d03502c810204b03a2995e71226d6db62"
+      }
+    ],
+    "next_action": "automatic_model_refresh",
+    "reconciliation": {
+      "passed": false
+    },
+    "settlement_policy": "Explicit cash/debt additions in an operating DCF are time-zero acquisition adjustments; hypothetical settlement, not declared dividends.",
+    "calculation_id": "8a3b4756e5c0a30dc26a3b2e17a702484bc9654b5a903c5e791ef428869cf034"
+  },
   "authority": "universal_valuation_contract",
   "legacy_reference_present": false,
   "falsifier_coverage": {

@@ -1,7 +1,7 @@
 # NFLX — Third-party source inventory
 
-**Date:** 2026-10-11
-**Sources:** 48 total (0 approved, 0 pending, 48 context)
+**Date:** 2026-10-25
+**Sources:** 49 total (0 approved, 0 pending, 49 context)
 
 | ID | Title | Path | Status | Use |
 |----|-------|------|--------|-----|
@@ -53,5 +53,6 @@
 | activist_long | acc0001065280 26 000211 | `NFLX/third-party-analyses/activist_reports/long/8-K_20260716_acc0001065280_26_000211.htm` | context | activist/long — local |
 | activist_long | acc0001193125 26 312575 | `NFLX/third-party-analyses/activist_reports/long/8-K_20260722_acc0001193125_26_312575.htm` | context | activist/long — local |
 | activist_long | acc0001065280 26 000214 | `NFLX/third-party-analyses/activist_reports/long/8-K_20260730_acc0001065280_26_000214.htm` | context | activist/long — local |
+| activist_long | acc0001065280 26 000290 | `NFLX/third-party-analyses/activist_reports/long/8-K_20261020_acc0001065280_26_000290.htm` | context | activist/long — local |
 
-Cross-check required: `NFLX/research/cross_check_third_party_2026-10-11.md`
+Cross-check required: `NFLX/research/cross_check_third_party_2026-10-25.md`

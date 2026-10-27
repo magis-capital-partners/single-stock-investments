@@ -40,6 +40,13 @@ def test_missing_reference_and_wrong_count_cannot_pass(tmp_path):
     assert any('count does not reconcile' in e for e in report['errors'])
 
 
+def test_core_over_the_boot_budget_cannot_pass(tmp_path):
+    fixture(tmp_path)
+    report = checker.check(tmp_path, core_max_mb=0)
+    assert report['status'] == 'invalid'
+    assert any('boot budget' in error for error in report['errors'])
+
+
 def test_missing_file_and_authority_are_not_success(tmp_path):
     folder,docs=fixture(tmp_path)
     (folder/'reverse_splits.json').unlink()

@@ -140,3 +140,8 @@ test('an overdue publication cannot retain positive rankings or active events',a
  assert.equal(h.api.projectShorts({}).buyback_issuance_signals.length,0);
  assert.match(h.api.renderHoldingsCell({buyback:b}),/snapshot overdue/);
 });
+
+test('workspace routes retain a legacy Buyback focus in the Business view',()=>{
+ let last; const c={activeView:'holdings',selected:'TEST',ResearchWorkspace:{activeTab:()=> 'business'},location:{hash:'#/research/coverage/TEST?section=buyback'},URLSearchParams,setAppHash:value=>{last=value;}};
+ vm.createContext(c);vm.runInContext(routeFunction('syncRouteHash'),c);c.syncRouteHash();assert.equal(last,'#/research/coverage/TEST?section=business&focus=buyback');
+});

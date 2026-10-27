@@ -1,10 +1,12 @@
 {
-  "schema_version": "3.0",
+  "schema_version": "3.1",
   "ticker": "ABMD.CVR",
-  "as_of": "2026-10-23",
+  "as_of": "2026-10-27",
+  "model_as_of": "2026-10-27",
   "authority": "valuation_contract",
   "contract_source": "valuation_contract.json",
   "contract_status": "evidence_blocked",
+  "contract_model_hash": "07653132f81aeaac153eda54d35b0a54abca734607d734a6c6169650f4f55079",
   "proof_status": "evidence_blocked",
   "model_level": "unmodeled",
   "price": null,
@@ -45,21 +47,27 @@
   },
   "entry_prices_by_hurdle_and_case": {
     "low": {
+      "8pct": null,
       "10pct": null,
       "12pct": null,
       "15pct": null,
+      "18pct": null,
       "20pct": null
     },
     "base": {
+      "8pct": null,
       "10pct": null,
       "12pct": null,
       "15pct": null,
+      "18pct": null,
       "20pct": null
     },
     "high": {
+      "8pct": null,
       "10pct": null,
       "12pct": null,
       "15pct": null,
+      "18pct": null,
       "20pct": null
     }
   },
@@ -84,6 +92,30 @@
   "power_zone": {
     "profile_id": "capital_cycle",
     "label": "Capital cycle and normalized industry economics",
-    "input_hash": "0db4fc8a25623066afd98cb77d11c7e6a2190c8a75fdb1a6f5cc6973dd73ce9e"
+    "input_hash": "805e27f9e2d6bac669872790fa7d7300b8a152e2cc38bbdcb00706a26b065a1d"
+  },
+  "evidence_blockers": [
+    "A complete economic ownership map has not been supplied.",
+    "Market price per share is missing or non-positive; cannot mark decision_grade or compare value with price."
+  ],
+  "buy_zones": {
+    "schema_version": "1.0",
+    "config_version": "2026-10-26.1",
+    "status": "withheld",
+    "research_only": true,
+    "capital_actionable": false,
+    "model_level": "unmodeled",
+    "blockers": [
+      "A complete economic ownership map has not been supplied.",
+      "Market price per share is missing or non-positive; cannot mark decision_grade or compare value with price.",
+      "The valuation workbench is evidence-blocked; hurdle prices are withheld until proof is decision-grade."
+    ],
+    "zones": [],
+    "deepest_active_zone": null,
+    "royalty_corroboration": {
+      "status": "unavailable",
+      "signal": null,
+      "role": "corroborating_only"
+    }
   }
 }

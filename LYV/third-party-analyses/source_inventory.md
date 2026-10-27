@@ -1,7 +1,7 @@
 # LYV — Third-party source inventory
 
-**Date:** 2026-10-11
-**Sources:** 86 total (0 approved, 0 pending, 86 context)
+**Date:** 2026-10-25
+**Sources:** 87 total (0 approved, 0 pending, 87 context)
 
 | ID | Title | Path | Status | Use |
 |----|-------|------|--------|-----|
@@ -91,5 +91,6 @@
 | activist_long | acc0001335258 26 000038 | `LYV/third-party-analyses/activist_reports/long/8-K_20260925_acc0001335258_26_000038.htm` | context | activist/long — local |
 | activist_long | acc0001335258 26 000041 | `LYV/third-party-analyses/activist_reports/long/8-K_20261002_acc0001335258_26_000041.htm` | context | activist/long — local |
 | activist_long | acc0001335258 26 000046 | `LYV/third-party-analyses/activist_reports/long/8-K_20261009_acc0001335258_26_000046.htm` | context | activist/long — local |
+| activist_long | acc0001335258 26 000048 | `LYV/third-party-analyses/activist_reports/long/8-K_20261016_acc0001335258_26_000048.htm` | context | activist/long — local |
 
-Cross-check required: `LYV/research/cross_check_third_party_2026-10-11.md`
+Cross-check required: `LYV/research/cross_check_third_party_2026-10-25.md`

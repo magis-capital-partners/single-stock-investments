@@ -1,11 +1,11 @@
 # HSIC — Third-party source inventory
 
-**Date:** 2026-10-11
+**Date:** 2026-10-25
 **Sources:** 108 total (0 approved, 0 pending, 108 context)
 
 | ID | Title | Path | Status | Use |
 |----|-------|------|--------|-----|
-| activist_short | Sep 26, 2018 | `_system/reference/activist-reports/spruce_point/spruce_point_2018-09-26_henry-schein-inc.html` | context | activist/short — publisher_site |
+| activist_long | Henry Schein, Inc. | `_system/reference/activist-reports/spruce_point/spruce_point_2018-09-26_henry-schein-inc.html` | context | activist/long — publisher_site |
 | activist_long | KKR Hawaii Holdings L.P — SC 13D/A | `HSIC/third-party-analyses/activist_reports/long/SC-13D/A_20260310_acc0001140361_26_008844.xml` | context | activist/long — sec_edgar |
 | activist_long | KKR Hawaii Holdings L.P — SC 13D/A | `HSIC/third-party-analyses/activist_reports/long/SC-13D/A_20251209_acc0001140361_25_045059.xml` | context | activist/long — sec_edgar |
 | activist_long | KKR Hawaii Holdings L.P — SC 13D/A | `HSIC/third-party-analyses/activist_reports/long/SC-13D/A_20251106_acc0001140361_25_040785.xml` | context | activist/long — sec_edgar |
@@ -114,4 +114,4 @@
 | activist_long | acc0001193125 26 397208 | `HSIC/third-party-analyses/activist_reports/long/8-K_20260922_acc0001193125_26_397208.htm` | context | activist/long — local |
 | activist_long | acc0001193125 26 417409 | `HSIC/third-party-analyses/activist_reports/long/8-K_20261008_acc0001193125_26_417409.htm` | context | activist/long — local |
 
-Cross-check required: `HSIC/research/cross_check_third_party_2026-10-11.md`
+Cross-check required: `HSIC/research/cross_check_third_party_2026-10-25.md`

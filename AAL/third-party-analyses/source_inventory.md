@@ -1,7 +1,7 @@
 # AAL — Third-party source inventory
 
-**Date:** 2026-10-11
-**Sources:** 202 total (0 approved, 0 pending, 202 context)
+**Date:** 2026-10-25
+**Sources:** 203 total (0 approved, 0 pending, 203 context)
 
 | ID | Title | Path | Status | Use |
 |----|-------|------|--------|-----|
@@ -207,5 +207,6 @@
 | activist_long | acc0000006201 26 000044 | `AAL/third-party-analyses/activist_reports/long/8-K_20260616_acc0000006201_26_000044.htm` | context | activist/long — local |
 | activist_long | acc0000006201 26 000046 | `AAL/third-party-analyses/activist_reports/long/8-K_20260715_acc0000006201_26_000046.htm` | context | activist/long — local |
 | activist_long | acc0000006201 26 000051 | `AAL/third-party-analyses/activist_reports/long/8-K_20260723_acc0000006201_26_000051.htm` | context | activist/long — local |
+| activist_long | acc0000006201 26 000064 | `AAL/third-party-analyses/activist_reports/long/8-K_20261022_acc0000006201_26_000064.htm` | context | activist/long — local |
 
-Cross-check required: `AAL/research/cross_check_third_party_2026-10-11.md`
+Cross-check required: `AAL/research/cross_check_third_party_2026-10-25.md`

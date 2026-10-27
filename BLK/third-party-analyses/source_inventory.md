@@ -1,7 +1,7 @@
 # BLK — Third-party source inventory
 
-**Date:** 2026-10-11
-**Sources:** 15 total (0 approved, 0 pending, 15 context)
+**Date:** 2026-10-25
+**Sources:** 16 total (0 approved, 0 pending, 16 context)
 
 | ID | Title | Path | Status | Use |
 |----|-------|------|--------|-----|
@@ -20,5 +20,6 @@
 | activist_long | acc0001193125 26 237027 | `BLK/third-party-analyses/activist_reports/long/8-K_20260522_acc0001193125_26_237027.htm` | context | activist/long — local |
 | activist_long | acc0001193125 26 290830 | `BLK/third-party-analyses/activist_reports/long/8-K_20260630_acc0001193125_26_290830.htm` | context | activist/long — local |
 | activist_long | acc0001193125 26 304013 | `BLK/third-party-analyses/activist_reports/long/8-K_20260715_acc0001193125_26_304013.htm` | context | activist/long — local |
+| activist_long | acc0001193125 26 420979 | `BLK/third-party-analyses/activist_reports/long/8-K_20261014_acc0001193125_26_420979.htm` | context | activist/long — local |
 
-Cross-check required: `BLK/research/cross_check_third_party_2026-10-11.md`
+Cross-check required: `BLK/research/cross_check_third_party_2026-10-25.md`

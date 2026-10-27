@@ -1,6 +1,6 @@
 # RCAT — Third-party source inventory
 
-**Date:** 2026-10-11
+**Date:** 2026-10-25
 **Sources:** 6 total (0 approved, 0 pending, 6 context)
 
 | ID | Title | Path | Status | Use |
@@ -10,6 +10,6 @@
 | activist_long | Jeffrey M. Thompson — SC 13D | `RCAT/third-party-analyses/activist_reports/long/SC-13D_20190516_acc0001554795_19_000155.htm` | context | activist/long — sec_edgar |
 | activist_long | Gregory French — SC 13D | `RCAT/third-party-analyses/activist_reports/long/SC-13D_20201112_acc0001554795_20_000300.htm` | context | activist/long — sec_edgar |
 | activist_long | Red Cat Holdings, Inc. — SC 13D | `RCAT/third-party-analyses/activist_reports/long/SC-13D_20240222_acc0001554795_24_000022.htm` | context | activist/long — sec_edgar |
-| activist_short | Red Cat (RCAT) – FOIAs Reveal Key Army Contract Way Smaller  | `_system/reference/activist-reports/fuzzy_panda/fuzzy_panda_2025-01-01_rcat-army-contract-smaller-than-claimed.html` | context | activist/short — publisher_site |
+| activist_short | Red Cat (RCAT) – FOIAs Reveal Key Army Contract Way Smaller  | `_system/reference/activist-reports/fuzzy_panda/fuzzy_panda_2025-10-10_rcat-army-contract-smaller-than-claimed.html` | context | activist/short — publisher_site |
 
-Cross-check required: `RCAT/research/cross_check_third_party_2026-10-11.md`
+Cross-check required: `RCAT/research/cross_check_third_party_2026-10-25.md`

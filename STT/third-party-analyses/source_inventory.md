@@ -1,7 +1,7 @@
 # STT — Third-party source inventory
 
-**Date:** 2026-10-11
-**Sources:** 29 total (0 approved, 0 pending, 29 context)
+**Date:** 2026-10-25
+**Sources:** 31 total (0 approved, 0 pending, 31 context)
 
 | ID | Title | Path | Status | Use |
 |----|-------|------|--------|-----|
@@ -34,5 +34,7 @@
 | activist_long | acc0001193125 26 340238 | `STT/third-party-analyses/activist_reports/long/8-K_20260807_acc0001193125_26_340238.htm` | context | activist/long — local |
 | activist_long | acc0001193125 26 346938 | `STT/third-party-analyses/activist_reports/long/8-K_20260812_acc0001193125_26_346938.htm` | context | activist/long — local |
 | activist_long | acc0000093751 26 000580 | `STT/third-party-analyses/activist_reports/long/8-K_20260914_acc0000093751_26_000580.htm` | context | activist/long — local |
+| activist_long | acc0000093751 26 000592 | `STT/third-party-analyses/activist_reports/long/8-K_20261014_acc0000093751_26_000592.htm` | context | activist/long — local |
+| activist_long | acc0001193125 26 426687 | `STT/third-party-analyses/activist_reports/long/8-K_20261020_acc0001193125_26_426687.htm` | context | activist/long — local |
 
-Cross-check required: `STT/research/cross_check_third_party_2026-10-11.md`
+Cross-check required: `STT/research/cross_check_third_party_2026-10-25.md`

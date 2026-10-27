@@ -3947,7 +3947,7 @@
     ]
   },
   "change_control": {
-    "model_hash": "b4542daca93e64fa290c31920638b295f4b53d77e05170170e677ef2658d66ba",
+    "model_hash": "61ad673b0dab8948dfef96e36165b965b8010fab77e23dd3994f639e09e0765a",
     "method_versions": [
       "net_asset_value@1.0",
       "owner_cash_or_dividend_discount@1.0"
@@ -3956,6 +3956,149 @@
     "rule": "A source fact is locked. Every assumption change requires a reason, author, timestamp, and before/after value."
   },
   "decision_rule": "Proof status and investment readiness are separate. Every material claim must be valued exactly once by a valid calculation proof, every evidence blocker must be resolved, and the model must be stock-specific before committee review. Only a human decision can authorize capital.",
+  "shared_forecast": {
+    "schema_version": "1.0",
+    "method_version": "shared-valuation-forecast/1.1",
+    "ticker": "AMD",
+    "status": "model_gap",
+    "research_only": true,
+    "requires_human_review": false,
+    "capital_actionable": false,
+    "as_of": "2026-08-31",
+    "model_as_of": "2026-07-24",
+    "quote": {
+      "value": 470.72,
+      "as_of": "2026-08-31",
+      "source_url": "Yahoo AMD close 2026-08-31",
+      "currency": null
+    },
+    "forecast_hash": "9cc6ccd8dc3e2f60a53884ecf3d905ee5fceb073bdebcbad8deaba29c693607c",
+    "forward_irr_pct": {
+      "low": null,
+      "base": null,
+      "high": null
+    },
+    "present_value_today_per_share": {
+      "low": null,
+      "base": null,
+      "high": null
+    },
+    "model_present_value_per_share": {
+      "low": null,
+      "base": null,
+      "high": null
+    },
+    "required_return_pct": {
+      "low": null,
+      "base": null,
+      "high": null
+    },
+    "forward_cashflow_schedule": {},
+    "buy_prices": [],
+    "components": [
+      {
+        "component_id": "data_center_owner_cash",
+        "method": "owner_cash_or_dividend_discount",
+        "status": "available",
+        "present_value_per_share": {
+          "low": 58.0,
+          "base": 72.5,
+          "high": 88.0
+        }
+      },
+      {
+        "component_id": "client_gaming_owner_cash",
+        "method": "owner_cash_or_dividend_discount",
+        "status": "available",
+        "present_value_per_share": {
+          "low": 16.0,
+          "base": 20.8,
+          "high": 26.0
+        }
+      },
+      {
+        "component_id": "embedded_owner_cash",
+        "method": "owner_cash_or_dividend_discount",
+        "status": "available",
+        "present_value_per_share": {
+          "low": 2.5,
+          "base": 3.2,
+          "high": 4.5
+        }
+      },
+      {
+        "component_id": "net_financial_claims",
+        "method": "net_asset_value",
+        "status": "model_gap",
+        "present_value_per_share": {}
+      },
+      {
+        "component_id": "ai_competition_and_capex_reserve",
+        "method": "net_asset_value",
+        "status": "model_gap",
+        "present_value_per_share": {
+          "high": 0.0
+        }
+      }
+    ],
+    "gaps": [
+      {
+        "component_id": "net_financial_claims",
+        "case": "low",
+        "code": "realization_timing_missing:net_cash_m"
+      },
+      {
+        "component_id": "net_financial_claims",
+        "case": "base",
+        "code": "realization_timing_missing:net_cash_m"
+      },
+      {
+        "component_id": "net_financial_claims",
+        "case": "high",
+        "code": "realization_timing_missing:net_cash_m"
+      },
+      {
+        "component_id": "ai_competition_and_capex_reserve",
+        "case": "low",
+        "code": "realization_timing_missing:value_per_share"
+      },
+      {
+        "component_id": "ai_competition_and_capex_reserve",
+        "case": "base",
+        "code": "realization_timing_missing:value_per_share"
+      }
+    ],
+    "warnings": [],
+    "source_refs": [
+      {
+        "node_id": "consolidated_fcf_m",
+        "ref": "AMD/investor-documents/sec-edgar/10-K_20260204_rpt20251227_acc0000002488_26_000018.htm",
+        "locator": "Continuing OCF $6490.0M less capex $970.0M = FCF $5520.0M",
+        "as_of": "2025-12-27",
+        "source_id": "bc994e398897925ee3699ef5c26380abcf4d1e5487a2a6b03451be56a946cad3"
+      },
+      {
+        "node_id": "shares_m",
+        "ref": "AMD/investor-documents/sec-edgar/10-K_20260204_rpt20251227_acc0000002488_26_000018.htm",
+        "locator": "WeightedAverageNumberOfDilutedSharesOutstanding 1636.0M (FY2025)",
+        "as_of": "2025-12-27",
+        "source_id": "a9553fd6741563291c5200424511816bf52da5af76d59f0fa0dfe5ead59a0740"
+      },
+      {
+        "node_id": "shares_m",
+        "ref": "AMD/investor-documents/sec-edgar/10-K_20260204_rpt20251227_acc0000002488_26_000018.htm",
+        "locator": "Diluted shares 1636.0M",
+        "as_of": "2025-12-27",
+        "source_id": "acbee794ea2fa1aa2af5545badb5899a5e0185788553042c9b90530db7656510"
+      }
+    ],
+    "next_action": "automatic_model_refresh",
+    "reconciliation": {
+      "passed": false
+    },
+    "settlement_policy": "Explicit cash/debt additions in an operating DCF are time-zero acquisition adjustments; hypothetical settlement, not declared dividends.",
+    "calculation_id": "5c436440cc56be29d111560dc707121947ee9d45fb09c7104cb68110a486ffb6"
+  },
   "authority": "universal_valuation_contract",
   "legacy_reference_present": true,
   "falsifier_coverage": {

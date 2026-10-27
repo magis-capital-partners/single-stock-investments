@@ -41,12 +41,15 @@ KPI_SUMMARY = ROOT / "dashboard" / "data" / "kpi_summary.json"
 
 def publish_views() -> None:
     """Put operating levels on the shards and the L0 summary without a full rebuild."""
+    # Parse the canonical stores once per publication, not once per shard.
+    operating = merge_operating_series({})
     if SHARD_DIR.is_dir():
         for path in sorted(SHARD_DIR.glob("*.json")):
             shard = json.loads(path.read_text(encoding="utf-8"))
             ticker = str(shard.get("ticker") or path.stem).upper()
-            merged = merge_operating_series({ticker: list(shard.get("kpi_series") or [])})
-            rows = merged.get(ticker) or []
+            issuer_rows = operating.get(ticker) or []
+            names = {row["metric"] for row in issuer_rows}
+            rows = issuer_rows + [row for row in shard.get("kpi_series") or [] if row.get("metric") not in names]
             if not any(row.get("tier") == "operating" for row in rows):
                 continue
             selected = select_shard_series(rows)
@@ -91,9 +94,24 @@ def main() -> int:
     parser.add_argument("--tickers", nargs="*", help="Limit to these tickers (OCC included)")
     parser.add_argument("--force", action="store_true", help="Ignored; the fetch always runs")
     parser.add_argument("--no-publish", action="store_true", help="Do not touch shards or kpi_summary")
+    parser.add_argument("--import-mirror", type=Path, help="Import dated observations only; executes no mirror code or network fetch")
     args = parser.parse_args()
     wanted = {ticker.upper() for ticker in args.tickers} if args.tickers else None
     fetched_at = utc_now()
+    if args.import_mirror:
+        from operating_kpis.mirror import import_mirror, royalty_signals
+        from buy_zones import load_config
+        from atomic_io import write_json_if_changed
+        config = load_config()
+        report = import_mirror(args.import_mirror, tickers=wanted or set(config["tickers"]), root=ROOT)
+        state_path = ROOT / "_system/data/core_compounder_state.json"
+        state = json.loads(state_path.read_text(encoding="utf-8")) if state_path.exists() else {}
+        state["royalty_signals"] = royalty_signals(args.import_mirror, set(config["tickers"]))
+        write_json_if_changed(state_path, state)
+        if not args.no_publish:
+            publish_views()
+        print(json.dumps(report))
+        return 0
     status_rows = []
     hard_failure = False
 
@@ -121,10 +139,12 @@ def main() -> int:
             print(f"{ticker}: no new points ({sources[0].get('status') if sources else 'empty'})")
 
     STORE_DIR.mkdir(parents=True, exist_ok=True)
-    (STORE_DIR / "_status.json").write_text(
-        json.dumps({"fetched_at": fetched_at, "adapters": status_rows}, indent=2) + "\n",
-        encoding="utf-8",
-    )
+    from atomic_io import write_json_if_changed
+    status_path = STORE_DIR / "_status.json"
+    previous_status = json.loads(status_path.read_text(encoding="utf-8")) if status_path.exists() else {}
+    if wanted:
+        status_rows = [r for r in previous_status.get("adapters") or [] if r.get("ticker") not in wanted] + status_rows
+    write_json_if_changed(status_path, {"fetched_at": fetched_at, "adapters": status_rows})
     if not args.no_publish and not hard_failure:
         publish_views()
     elif not args.no_publish and any(

@@ -1,7 +1,7 @@
 # TSLA — Third-party source inventory
 
-**Date:** 2026-10-11
-**Sources:** 139 total (0 approved, 0 pending, 139 context)
+**Date:** 2026-10-25
+**Sources:** 141 total (0 approved, 0 pending, 141 context)
 
 | ID | Title | Path | Status | Use |
 |----|-------|------|--------|-----|
@@ -16,6 +16,7 @@
 | activist_long | Strategic Organizing Center — PX14A6G | `TSLA/third-party-analyses/activist_reports/long/PX14A6G_20240520_acc0001214659_24_009597.htm` | context | activist/long — sec_edgar |
 | activist_long | Strategic Organizing Center — PX14A6G | `TSLA/third-party-analyses/activist_reports/long/PX14A6G_20240513_acc0001214659_24_008870.htm` | context | activist/long — sec_edgar |
 | activist_long | PX14A6G · TSLA · 2018-05-14 | `TSLA/third-party-analyses/activist_reports/long/PX14A6G_20180514_acc0001377739_18_000021.htm` | context | activist/long — sec_edgar |
+| activist_long | CIAM — DEFA14A | `TSLA/third-party-analyses/activist_reports/long/DEFA14A_20261019_acc0001104659_26_116948.htm` | context | activist/long — sec_edgar |
 | activist_long | acc0001564590 18 015129 | `TSLA/third-party-analyses/activist_reports/long/8-K_20180606_acc0001564590_18_015129.htm` | context | activist/long — local |
 | activist_long | acc0001564590 18 016465 | `TSLA/third-party-analyses/activist_reports/long/8-K_20180702_acc0001564590_18_016465.htm` | context | activist/long — local |
 | activist_long | acc0001564590 18 016494 | `TSLA/third-party-analyses/activist_reports/long/8-K_20180702_acc0001564590_18_016494.htm` | context | activist/long — local |
@@ -144,5 +145,6 @@
 | activist_long | acc0001628280 26 049213 | `TSLA/third-party-analyses/activist_reports/long/8-K_20260722_acc0001628280_26_049213.htm` | context | activist/long — local |
 | activist_long | acc0001628280 26 063820 | `TSLA/third-party-analyses/activist_reports/long/8-K_20260929_acc0001628280_26_063820.htm` | context | activist/long — local |
 | activist_long | acc0001628280 26 064366 | `TSLA/third-party-analyses/activist_reports/long/8-K_20261002_acc0001628280_26_064366.htm` | context | activist/long — local |
+| activist_long | acc0001628280 26 066738 | `TSLA/third-party-analyses/activist_reports/long/8-K_20261021_acc0001628280_26_066738.htm` | context | activist/long — local |
 
-Cross-check required: `TSLA/research/cross_check_third_party_2026-10-11.md`
+Cross-check required: `TSLA/research/cross_check_third_party_2026-10-25.md`
