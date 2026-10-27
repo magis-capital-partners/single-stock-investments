@@ -27,6 +27,7 @@ on:
       - "dashboard/data/kpi_summary.json"
       - "dashboard/data/document_catalog_summary.json"
       - "dashboard/data/agent_shards/**"
+      - "dashboard/private-assets.json"
       - "*/research/thesis_card.json"
       - "*/research/latest.json"
       - "GOOGL/research/valuation.json"
@@ -94,6 +95,7 @@ on:
       - "dashboard/data/kpi_summary.json"
       - "dashboard/data/document_catalog_summary.json"
       - "dashboard/data/agent_shards/**"
+      - "dashboard/private-assets.json"
       - "*/research/thesis_card.json"
       - "*/research/latest.json"
       - "GOOGL/research/valuation.json"
@@ -234,6 +236,8 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 20
     env:
+      RESEARCH_VAULT_ROOT: _external/research-vault
+      RESEARCH_VAULT_CLONE_TOKEN: ${{ secrets.RESEARCH_VAULT_CLONE_TOKEN }}
       # Empty after the publisher cadence assertion was reconciled with main.
       KNOWN_FAILURES: ""
       # Suites that live beside the scripts rather than under tests/. Missing
@@ -287,6 +291,7 @@ jobs:
             /dashboard/data/kpi_summary.json
             /dashboard/data/document_catalog_summary.json
             /dashboard/data/agent_shards/
+            /dashboard/private-assets.json
             /*/research/thesis_card.json
             /*/research/latest.json
             /GOOGL/research/valuation.json
@@ -357,6 +362,8 @@ jobs:
             "pytest==9.1.1" "PyYAML==6.0.3" "jsonschema==4.26.0" "numpy==2.3.3" "scipy==1.16.2" \
             "ruff==0.16.0" "pandas==3.0.3" "requests==2.34.2" \
             "beautifulsoup4==4.15.0" "lxml==6.1.1" "exchange-calendars==4.13.2"
+      - name: Restore authorized private architecture fixtures
+        uses: ./.github/actions/checkout-vault
       - name: Trading and script test suites
         run: |
           set -euo pipefail

@@ -141,3 +141,13 @@ def test_there_is_no_undefined_name_allowance():
     run = next(s["run"] for s in job["steps"] if "run" in s)
     assert "check_undefined_names.py _system/scripts _system/trading" in run
     assert "--exit-zero" not in run
+
+
+def test_private_architecture_inputs_are_restored_before_the_suite():
+    job = load()["jobs"]["unit-tests"]
+    steps = job["steps"]
+    restore = next(i for i, s in enumerate(steps) if s.get("uses") == "./.github/actions/checkout-vault")
+    suite = next(i for i, s in enumerate(steps) if s.get("name") == "Trading and script test suites")
+    assert restore < suite
+    assert "dashboard/private-assets.json" in sparse_entries()
+    assert job["env"]["RESEARCH_VAULT_CLONE_TOKEN"] == "${{ secrets.RESEARCH_VAULT_CLONE_TOKEN }}"
