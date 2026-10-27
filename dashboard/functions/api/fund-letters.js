@@ -27,7 +27,7 @@ export async function onRequestGet(context) {
   if (!viewer) return privateJson({ error: "Sign in through Cloudflare Access." }, 401);
   const params = new URL(context.request.url).searchParams;
   const action = params.get("action") || "funds";
-  if (action === "session") return privateJson({ role: viewer.role });
+  if (action === "session") return privateJson({ role: viewer.role, email: viewer.email || null });
   if (["review", "source", "document", "revisions", "draft"].includes(action) && viewer.role !== "owner") return privateJson({ error: "Owner access required." }, 403);
   try {
     const db = requireDatabase(context.env);

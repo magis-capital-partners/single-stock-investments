@@ -1,10 +1,54 @@
 const ACCESS_ASSERTION_HEADER = "cf-access-jwt-assertion";
 const CLOCK_SKEW_SECONDS = 60;
-// Verified by the owner, 2026-10-23. Names and client supplied headers never grant a role.
+// Verified addresses, 2026-10-23. A display name or a client-supplied header never grants a role.
+// The paper-order maps name the same two people when the Access email differs from these addresses.
 export const DASHBOARD_OWNERS = Object.freeze({
   "drew@magiscapitalpartners.com": "drew",
   "mike@magiscapitalpartners.com": "michael",
 });
+const SIGNED_EMAIL_CLAIMS = ["email", "common_name", "preferred_username", "upn", "unique_name"];
+
+export function canonicalEmail(value) {
+  const text = String(value ?? "").replace(/[\u200B-\u200D\uFEFF]/g, "").trim().toLowerCase();
+  if (!text) return "";
+  const wrapped = text.match(/<([^<>\s]+@[^<>\s]+)>/);
+  const candidate = (wrapped ? wrapped[1] : text).replace(/^mailto:/, "");
+  return /^[^\s@]+@[^\s@]+$/.test(candidate) ? candidate : "";
+}
+
+function collectEmails(value, into) {
+  const list = Array.isArray(value) ? value : [value];
+  for (const item of list) {
+    const email = canonicalEmail(item);
+    if (email && !into.includes(email)) into.push(email);
+  }
+}
+
+export function identityEmails(viewer) {
+  const found = [];
+  collectEmails(viewer?.email, found);
+  const claims = viewer?.claims || {};
+  for (const key of SIGNED_EMAIL_CLAIMS) collectEmails(claims[key], found);
+  return found;
+}
+
+function configuredOwners(env = {}) {
+  const map = new Map();
+  const add = (email, name) => {
+    if (!email) return;
+    const existing = map.get(email);
+    if (existing && existing !== name) map.set(email, "conflict");
+    else if (!existing) map.set(email, name);
+  };
+  for (const [email, name] of Object.entries(DASHBOARD_OWNERS)) add(canonicalEmail(email), name);
+  for (const [raw, name] of [
+    [env.PORTFOLIO_DREW_ACCESS_EMAILS, "drew"],
+    [env.PORTFOLIO_MICHAEL_ACCESS_EMAILS, "michael"],
+  ]) {
+    for (const part of String(raw || "").split(/[\s,;]+/)) add(canonicalEmail(part), name);
+  }
+  return map;
+}
 
 function decodeBase64Url(value) {
   const normalized = String(value || "").replace(/-/g, "+").replace(/_/g, "/");
@@ -87,13 +131,15 @@ export async function verifyAccessJwt(token, env, fetchImpl = fetch) {
 }
 
 export function viewerFromAccessPayload(payload) {
-  const email = String(payload?.email || "").trim().toLowerCase() || null;
+  const emails = [];
+  collectEmails(payload?.email, emails);
+  const email = emails[0] || null;
   const commonName = String(payload?.common_name || "").trim();
   // Human Access tokens include the person's name next to their email.
   // A service token has a name and no human email, or an explicit service-token id.
   const serviceToken = payload?.service_token_id || payload?.service_token_status
     ? (commonName || "service-token")
-    : (!email && commonName ? commonName : null);
+    : (!email && commonName && !canonicalEmail(commonName) ? commonName : null);
   return {
     email,
     subject: String(payload?.sub || "") || null,
@@ -108,12 +154,25 @@ function localDevelopmentBypass(request, env) {
   return hostname === "localhost" || hostname === "127.0.0.1";
 }
 
+export function recognizedOwnerEmail(viewer, env = {}) {
+  const owners = configuredOwners(env);
+  for (const email of identityEmails(viewer)) {
+    const name = owners.get(email);
+    if (name === "drew" || name === "michael") return email;
+  }
+  return null;
+}
+
 export function humanRole(viewer, env = {}) {
-  if (!viewer?.email || viewer.service_token) return null;
-  const email = viewer.email.trim().toLowerCase();
-  const revoked = String(env.CF_ACCESS_REVOKED_EMAILS || "").toLowerCase().split(/[\s,;]+/);
-  if (revoked.includes(email)) return null;
-  return DASHBOARD_OWNERS[email] ? "owner" : "reader";
+  if (viewer?.service_token || viewer?.claims?.service_token_id || viewer?.claims?.service_token_status) return null;
+  const emails = identityEmails(viewer);
+  if (!emails.length) return null;
+  const revoked = new Set(String(env.CF_ACCESS_REVOKED_EMAILS || "").toLowerCase().split(/[\s,;]+/).filter(Boolean));
+  if (emails.some((email) => revoked.has(email))) return null;
+  const owners = configuredOwners(env);
+  const names = emails.map((email) => owners.get(email)).filter(Boolean);
+  if (names.includes("conflict")) return "reader";
+  return names.some((name) => name === "drew" || name === "michael") ? "owner" : "reader";
 }
 
 export async function requireHumanViewer(context) {
@@ -129,7 +188,9 @@ export async function requireHumanViewer(context) {
   try {
     const viewer = await verifyAccessJwt(token, context.env);
     const role = humanRole(viewer, context.env);
-    return role ? { ...viewer, role } : null;
+    if (!role) return null;
+    const email = recognizedOwnerEmail(viewer, context.env) || identityEmails(viewer)[0] || viewer.email;
+    return { ...viewer, email, role };
   } catch (error) {
     console.error(JSON.stringify({
       message: "portfolio Access validation failed",

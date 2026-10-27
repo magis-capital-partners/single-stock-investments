@@ -155,7 +155,9 @@
       const [session,catalog]=await Promise.all([api({action:'session'}),api({action:'funds'})]);
       if(disposed)return;
       role=session.role;funds=catalog.funds;
-      if(role==='owner')root.querySelector('.fl-owner-tools').innerHTML=`<a href="/">Dashboard</a><button type="button" data-review-queue>Review queue</button>`;
+      const tools=root.querySelector('.fl-owner-tools');
+      if(role==='owner')tools.innerHTML=`<a href="/">Dashboard</a><button type="button" data-review-queue>Review queue</button>`;
+      else if(session.email)tools.innerHTML=`<span>Signed in as ${escape(session.email)}</span>`;
       await load();
       if(role==='owner'&&params.get('review'))await review(params.get('review'));
     }catch(error){showError(error);}

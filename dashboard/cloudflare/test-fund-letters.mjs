@@ -38,6 +38,15 @@ test('only the two verified identities become owners; service tokens and revoked
   assert.equal(humanRole(viewerFromAccessPayload({common_name:'ingest-token'})),null);
   assert.equal(humanRole({email:'reader@example.com',service_token:'machine'}),null);
   assert.equal(humanRole(reader,{CF_ACCESS_REVOKED_EMAILS:'reader@example.com'}),null);
+  assert.equal(humanRole({email:'Drew.Access@example.com'},{PORTFOLIO_DREW_ACCESS_EMAILS:'drew.access@example.com'}),'owner');
+  assert.equal(humanRole({email:'mike.access@example.com'},{PORTFOLIO_MICHAEL_ACCESS_EMAILS:'Mike.Access@example.com, other@example.com'}),'owner');
+  assert.equal(humanRole({email:'other@example.com'},{PORTFOLIO_DREW_ACCESS_EMAILS:'drew.access@example.com'}),'reader');
+  assert.equal(humanRole({email:'both@example.com'},{PORTFOLIO_DREW_ACCESS_EMAILS:'both@example.com',PORTFOLIO_MICHAEL_ACCESS_EMAILS:'both@example.com'}),'reader');
+  assert.equal(humanRole(viewerFromAccessPayload({email:'Drew Goldman <drew@magiscapitalpartners.com>'})),'owner');
+  assert.equal(humanRole(viewerFromAccessPayload({email:'personal@example.com',common_name:'drew@magiscapitalpartners.com'})),'owner');
+  assert.equal(humanRole(viewerFromAccessPayload({common_name:'drew@magiscapitalpartners.com'})),'owner');
+  assert.equal(humanRole(viewerFromAccessPayload({email:'drew@magiscapitalpartners.com',common_name:'Drew',service_token_id:'machine'})),null);
+  assert.equal(humanRole({email:'drew.access@example.com'},{PORTFOLIO_DREW_ACCESS_EMAILS:'drew.access@example.com',CF_ACCESS_REVOKED_EMAILS:'drew.access@example.com'}),null);
 });
 test('signed owners and readers, revocation, forged/expired tokens and cookie authentication exercise the actual boundary',async()=>{
   const env={CF_ACCESS_TEAM_DOMAIN:'https://test.cloudflareaccess.com',CF_ACCESS_AUD:'reader-audience'};
