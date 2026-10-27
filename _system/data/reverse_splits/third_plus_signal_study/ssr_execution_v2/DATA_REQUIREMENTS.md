@@ -1,4 +1,6 @@
-# Historical evidence required for account results
+# Historical evidence audit (separate from the assumed backtest)
+
+The primary dashboard now also publishes the user-requested [full assumption-based backtest](../assumed_execution_v1/REPORT.md). That mode assumes tradability and estimates unknown fills, borrowing and exits explicitly. The requirements below govern only the historical-evidence audit; they do not block the authorized assumption-based simulation or turn its missing inputs into exclusions.
 
 The v3 publication retires the former bar/proxy P&L. Historical account performance remains unavailable when any selected entry or subsequent position path is unsupported. A missing observation is neither zero P&L nor a failed execution. This is an evidence repair, not a claim that previously missing historical records have been obtained.
 
