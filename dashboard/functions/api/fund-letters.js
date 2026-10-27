@@ -48,11 +48,15 @@ export async function onRequestGet(context) {
       // Optional letter pin makes any search hit/deep link directly reachable, regardless of age.
       const pinned = params.get("letter");
       const rows = await all(db, `SELECT l.id,l.fund_id,f.name fund,l.reporting_period,l.letter_date,l.publication_date,
-        r.id revision_id,r.overview,r.created_at,r.published_at FROM fl_letters l JOIN fl_funds f ON f.id=l.fund_id
+        r.id revision_id,r.overview,r.created_at,r.published_at,r.content_json FROM fl_letters l JOIN fl_funds f ON f.id=l.fund_id
         JOIN fl_revisions r ON r.id=l.published_revision WHERE l.fund_id=? ${pinned ? "AND l.id=?" : ""}
         ORDER BY ${LETTER_SORT_SQL} DESC,l.id LIMIT ? OFFSET ?`, pinned ? [fund, pinned, limit+1, offset] : [fund, limit+1, offset]);
       const page = rows.slice(0, limit);
-      const letters = await Promise.all(page.map(async row => readerLetter(row, await all(db, "SELECT * FROM fl_ideas WHERE letter_id=? AND revision_id=? ORDER BY ordinal", [row.id, row.revision_id]))));
+      const letters = await Promise.all(page.map(async row => {
+        let stance = null;
+        try { stance = JSON.parse(row.content_json || "{}").stance || null; } catch { stance = null; }
+        return readerLetter(row, await all(db, "SELECT * FROM fl_ideas WHERE letter_id=? AND revision_id=? ORDER BY ordinal", [row.id, row.revision_id]), stance);
+      }));
       return privateJson({ letters, next_offset: rows.length > limit ? offset+limit : null });
     }
     if (action === "search") {

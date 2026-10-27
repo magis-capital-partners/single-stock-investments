@@ -42,6 +42,14 @@ python _system/scripts/fund_letters.py import-draft LETTER_ID PRIVATE_DRAFT.json
 
 Synthesis defaults to LM Studio’s native `/api/v1/chat` endpoint through the existing local transport, with reasoning disabled, no stored chats and no integrations. Start/load a suitable local model before running it. `--transport compatible` supports a compatible chat endpoint. Hidden reasoning and output exhausted at the token budget are rejected. The endpoint must be loopback. Large or scanned documents that cannot be processed must remain unresolved; do not sample away text, invent a thesis, or substitute the old extracts.
 
+A local reader-summary stage also runs over the private vault extracts. It reads every passage, asks the local model for detailed company-level notes (business, thesis, activity, size, valuation, catalyst, named risk) and, for macro or mixed letters, the fund's main stances with what it is leaning into or out of. Every figure must appear in a verbatim quote checked in code; calendar years and labels such as QE2 are not numerical claims. It writes private drafts plus dashboard-shaped draft files (overview, ideas, private evidence, completeness checklist, and a stance block the reader renders as “Leaning in / Leaning out”) under `superinvestor-letters/_reader_summaries/` in the private vault. It never publishes: import a draft with `import-draft`, review it in the owner interface, and publish only with the six editorial attestations.
+
+```powershell
+$env:RESEARCH_VAULT_ROOT = "PATH_TO_PRIVATE_RESEARCH_VAULT"
+python _system/scripts/summarize_fund_letter_reader.py --fund FUND_ID --period 2011Q1 --limit 1
+python _system/scripts/summarize_fund_letter_reader.py --all
+```
+
 For publication through the local pipeline, provide an explicit JSON object setting the six `EDITORIAL_CHECKS` keys to true after review:
 
 ```powershell

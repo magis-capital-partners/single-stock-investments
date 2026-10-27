@@ -124,6 +124,15 @@ test('full text coverage, exact evidence, originality, numeric support and histo
   const bad=draft();bad.ideas[0].summary+=' Target is 900.';assert.ok(validateDraft(bad,sourceSections(source)).some(e=>e.includes('900')));
   const long=source.repeat(100);assert.equal(sourceSections(long).map(p=>p.text).join(''),long);
 });
+test('years and labels are not numerical claims, and stance reaches readers without quotes',()=>{
+  const dated=draft();dated.overview+=' Written in 2011 after QE2 ended.';
+  assert.deepEqual(validateDraft(dated,sourceSections(source)),[]);
+  const row={id:'l0',fund_id:'fund',fund:'Fund',reporting_period:'2011Q1',letter_date:null,publication_date:null,published_at:'x',created_at:'y',revision_id:'r1',overview:'Overview'};
+  const letter=readerLetter(row,[{id:'i1',title:'Acme',ticker:null,idea_type:'long',activity:'new',summary:'Summary',evolution:null,compared_letter_id:null}],{focus:'macro',leaning_in:[{subject:'Equities',why:'Cash yields are low.',quote:'PRIVATE QUOTE'}],leaning_out:[{subject:'Cash',why:'Yields are low.',quote:'PRIVATE QUOTE 2'}]});
+  assert.equal(letter.stance.focus,'macro');
+  assert.deepEqual(letter.stance.leaning_in,[{subject:'Equities',why:'Cash yields are low.'}]);
+  assert.equal(JSON.stringify(letter).includes('PRIVATE QUOTE'),false);
+});
 test('owner edits create revisions and publication requires six explicit attestations',async()=>{
   const DB=database();seed(DB);
   async function post(payload,viewer=owner,origin='https://test.example') {

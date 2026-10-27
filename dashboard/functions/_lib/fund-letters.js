@@ -12,11 +12,20 @@ export function readerIdea(row) {
   return { id: safe(row.id), title: safe(row.title), ticker: safe(row.ticker), idea_type: safe(row.idea_type),
     activity: safe(row.activity), summary: safe(row.summary), evolution: safe(row.evolution), compared_letter_id: safe(row.compared_letter_id) };
 }
-export function readerLetter(row, ideas) {
+function readerStance(stance) {
+  if (!stance || typeof stance !== "object") return null;
+  const lean = (items) => (Array.isArray(items) ? items : [])
+    .filter(item => item && typeof item === "object" && safe(item.subject) && safe(item.why))
+    .map(item => ({ subject: safe(item.subject), why: safe(item.why) }));
+  const focus = safe(stance.focus);
+  const result = { focus: ["micro", "macro", "mixed"].includes(focus) ? focus : "micro", leaning_in: lean(stance.leaning_in), leaning_out: lean(stance.leaning_out) };
+  return result.leaning_in.length || result.leaning_out.length ? result : null;
+}
+export function readerLetter(row, ideas, stance = null) {
   return { id: safe(row.id), fund_id: safe(row.fund_id), fund: safe(row.fund), reporting_period: safe(row.reporting_period),
     letter_date: safe(row.letter_date) || null, publication_date: safe(row.publication_date) || null,
     summary_published_at: safe(row.published_at), summary_revised_at: safe(row.created_at),
-    revision_id: safe(row.revision_id), overview: safe(row.overview), ideas: ideas.map(readerIdea) };
+    revision_id: safe(row.revision_id), overview: safe(row.overview), stance: readerStance(stance), ideas: ideas.map(readerIdea) };
 }
 export function readerFund(row) {
   return { id: safe(row.id), name: safe(row.name), manager: safe(row.manager), strategy: safe(row.strategy), letter_count: Number(row.letter_count), latest: safe(row.latest) };
@@ -45,7 +54,10 @@ export function sourceSections(text) {
   return parts;
 }
 const words = (text) => String(text || "").toLowerCase().match(/[\p{L}\p{N}_]+/gu) || [];
-const numbers = text => String(text || "").match(/\d+(?:[,.]\d+)*(?:%|[xX])?/g) || [];
+// Calendar years and labels such as QE2 are dates or names, not numerical
+// claims; the historical_dates attestation covers those.
+const numbers = text => (String(text || "").replace(/\b[A-Za-z]+[0-9]+\b/g, " ").match(/\d+(?:[,.]\d+)*(?:%|[xX])?/g) || [])
+  .filter(number => !/^(?:19|20)\d{2}$/.test(number));
 export function validateDraft(draft, parts) {
   const errors = [];
   if (typeof draft?.overview !== "string" || !draft.overview.trim() || !Array.isArray(draft.ideas) || !Array.isArray(draft.checklist)) return ["Overview, ideas and completeness checklist are required."];
@@ -76,10 +88,12 @@ export function validateDraft(draft, parts) {
   }
   if (!parts.length || visited.length !== parts.length || new Set(visited).size !== parts.length || visited.some(id => !sections.has(id))) errors.push("Reconcile every source passage exactly once.");
   if (ids.some(id => !covered.has(id))) errors.push("Every idea must appear in the completeness checklist.");
+  const stanceText = [draft.stance?.leaning_in, draft.stance?.leaning_out].flatMap(items => (Array.isArray(items) ? items : []).flatMap(i => [i?.subject, i?.why]));
+  const stanceQuotes = [draft.stance?.leaning_in, draft.stance?.leaning_out].flatMap(items => (Array.isArray(items) ? items : []).map(i => i?.quote || ""));
   const sourceWords = words(parts.map(p => p.text).join(" "));
   const grams = new Set(sourceWords.slice(0, -11).map((_, i) => sourceWords.slice(i, i + 12).join(" ")));
-  const prose = [draft.overview, ...draft.ideas.flatMap(i => [i?.title, i?.summary, i?.evolution, i?.activity])].filter(Boolean).join(" ");
-  const allQuotes = draft.ideas.flatMap(i => (i?.evidence || []).map(e => e?.quote || "")).join(" ");
+  const prose = [draft.overview, ...draft.ideas.flatMap(i => [i?.title, i?.summary, i?.evolution, i?.activity]), ...stanceText].filter(Boolean).join(" ");
+  const allQuotes = [...draft.ideas.flatMap(i => (i?.evidence || []).map(e => e?.quote || "")), ...stanceQuotes].join(" ");
   for (const n of numbers(prose)) if (!allQuotes.includes(n)) errors.push(`Published numerical claim ${n} lacks cited evidence.`);
   if (safe(prose) !== prose) errors.push("Reader prose contains a source link or private reference.");
   const tokens = words(prose);
