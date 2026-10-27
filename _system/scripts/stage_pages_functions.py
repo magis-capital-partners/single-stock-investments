@@ -25,6 +25,8 @@ import shutil
 import sys
 from pathlib import Path
 
+from private_dashboard_assets import overlay_manifest, private_source
+
 ROOT = Path(__file__).resolve().parents[2]
 FUNCTION_JSON = (
     "overlap_holdings.json",
@@ -59,6 +61,8 @@ def stage(repo_root: Path, dest: Path) -> None:
     missing = [name for name in FUNCTION_JSON if not (data_src / name).is_file()]
     if missing:
         raise FileNotFoundError(f"missing Pages function data: {', '.join(missing)}")
+    private_manifest = overlay_manifest(repo_root / "dashboard")
+    copies = {name: private_source(repo_root / "dashboard", "data/" + name, private_manifest) for name in FUNCTION_JSON}
     dest.mkdir(parents=True, exist_ok=True)
     if functions_dest.exists():
         shutil.rmtree(functions_dest)
@@ -66,7 +70,7 @@ def stage(repo_root: Path, dest: Path) -> None:
     data_dest = dest / "data"
     data_dest.mkdir(parents=True, exist_ok=True)
     for name in FUNCTION_JSON:
-        shutil.copy2(data_src / name, data_dest / name)
+        shutil.copy2(copies[name], data_dest / name)
 
 
 def main(argv: list[str] | None = None) -> int:

@@ -23,6 +23,8 @@ def test_private_sleeve_snapshots_are_never_deployed(tmp_path: Path, monkeypatch
     _write_json(source / "data" / "sleeves_michael.json", {"positions": [{"ticker": "SECRET"}]})
     _write_json(source / "data" / "sleeves_future_owner.json", {"positions": [{"ticker": "SECRET"}]})
     _write_json(source / "data" / "portfolio" / "latest.json", {"positions": [{"ticker": "SECRET"}]})
+    (source / "original.pdf").write_bytes(b"private original")
+    (source / "extract.txt").write_text("private extract", encoding="utf-8")
 
     monkeypatch.setattr(builder, "ROOT", tmp_path)
     monkeypatch.setattr(builder, "DEFAULT_SOURCE", source)
@@ -35,6 +37,10 @@ def test_private_sleeve_snapshots_are_never_deployed(tmp_path: Path, monkeypatch
     reasons = {row["path"]: row["reason"] for row in report["excluded"]}
     assert reasons["data/sleeves_drew.json"] == "private account artifact"
     assert reasons["data/sleeves_michael.json"] == "private account artifact"
+    assert not (output / "original.pdf").exists()
+    assert not (output / "extract.txt").exists()
+    assert json.loads((output / "_routes.json").read_text()) == {"version": 1, "include": ["/*"], "exclude": []}
+    assert "public, max-age" not in (output / "_headers").read_text()
 
 
 def test_asset_versions_are_stamped_from_content(tmp_path: Path) -> None:

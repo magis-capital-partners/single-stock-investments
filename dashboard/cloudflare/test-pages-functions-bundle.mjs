@@ -7,7 +7,7 @@ import test from "node:test";
 import { fileURLToPath } from "node:url";
 
 const root = fileURLToPath(new URL("../..", import.meta.url));
-const wrangler = fileURLToPath(new URL("./node_modules/.bin/wrangler", import.meta.url));
+const wrangler = fileURLToPath(new URL("./node_modules/wrangler/bin/wrangler.js", import.meta.url));
 const stageScript = fileURLToPath(new URL("../../_system/scripts/stage_pages_functions.py", import.meta.url));
 
 function pythonBin() {
@@ -28,7 +28,7 @@ test("wrangler pages functions build resolves the staged routes", () => {
   const stage = spawnSync(pythonBin(), [stageScript, dest], { encoding: "utf8" });
   assert.equal(stage.status, 0, stage.stderr || stage.stdout);
   const outdir = join(dest, "out");
-  const build = spawnSync(wrangler, [
+  const build = spawnSync(process.execPath, [wrangler,
     "pages", "functions", "build", "functions",
     "--outdir", outdir,
     "--compatibility-date", "2026-08-17",
