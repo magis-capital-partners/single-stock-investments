@@ -1,4 +1,4 @@
-# CSCO — Insider conviction (2026-10-25)
+# CSCO — Insider conviction (2026-10-27)
 
 > Context only. Insider activity informs scenario confidence and stance discussion; it does not auto-inflate Lawrence base IRR. Promotion requires [HUMAN REVIEW].
 
@@ -12,9 +12,9 @@
 
 | Insider | Date | Shares | Price | Value | Contrib |
 |---------|------|--------|-------|-------|---------|
-| Weil Kevin | 2026-09-15 | 274 | $110.07 | $30159.18 | 2.034 |
-| JOHNSON KRISTINA M | 2026-09-15 | 417 | $110.07 | $45899.19 | 1.762 |
-| Tessel Marianna | 2026-09-15 | 274 | $110.07 | $30159.18 | 1.65 |
+| Weil Kevin | 2026-09-15 | 274 | $110.07 | $30159.18 | 2.0 |
+| JOHNSON KRISTINA M | 2026-09-15 | 417 | $110.07 | $45899.19 | 1.733 |
+| Tessel Marianna | 2026-09-15 | 274 | $110.07 | $30159.18 | 1.622 |
 | Weil Kevin | 2026-06-15 | 251 | $120.17 | $30162.67 | 1.268 |
 | JOHNSON KRISTINA M | 2026-06-15 | 351 | $120.17 | $42179.67 | 1.075 |
 
