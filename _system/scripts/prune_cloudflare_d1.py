@@ -213,6 +213,17 @@ def prune_realized_generations(execute: Execute, existing_tables: set[str], *, b
         else:
             raise RuntimeError("realized history retention exceeded the safety batch limit")
     deleted += execute(f"{candidates} DELETE FROM sleeve_realized_generations WHERE generation_id IN (SELECT generation_id FROM expired)")
+    if "sleeve_realized_pages" in existing_tables:
+        for _ in range(10_000):
+            changed = execute("DELETE FROM sleeve_realized_pages WHERE rowid IN ("
+                              "SELECT p.rowid FROM sleeve_realized_pages p WHERE NOT EXISTS ("
+                              "SELECT 1 FROM sleeve_realized_batches b WHERE b.content_sha=p.content_sha) "
+                              f"LIMIT {int(batch_size)})")
+            deleted += changed
+            if not changed:
+                break
+        else:
+            raise RuntimeError("realized page retention exceeded the safety batch limit")
     return deleted
 
 

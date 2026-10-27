@@ -84,6 +84,12 @@ must equal the source report ID. Normalized batches and manifests are archived
 there too, under `sleeves/realized/`.
 
 D1 stages normalized records and exact daily totals under an immutable generation.
+Validated records and daily totals are stored in bounded content-addressed pages,
+with generation membership stored separately. Unchanged historical pages are
+shared across daily generations, keeping both write usage and retained storage
+small. The 26,638-owner-record initial import occupies 333 pages; it does not
+rewrite 26,638 indexed rows every day. Whole-generation row counts and unique
+record IDs are checked before publication. Prior row-based versions remain readable.
 Its active pointer changes only after all expected batches, source archives and
 row counts are present. Interrupted uploads can replay safely. Requests use the
 existing sleeve HMAC, shared nonce replay protection, strict bounded bodies and
@@ -95,6 +101,13 @@ missing reports, stale files and account mismatch fail closed. A new calendar
 year retains prior years. Deployment retention removes only old derived
 generations, keeping at least three and a week of completed cursor versions;
 the active full history and source archives are retained.
+Retention deletes a shared page only after no retained generation references it.
+
+The account's D1 write quota was exhausted during rollout. The static deployment
+completed, but migrations/publication must wait for the daily reset at 00:00 UTC.
+The existing deployment retry applies pending migrations; the existing daily
+publisher then imports and publishes history. Do not bypass the quota guard or
+repeat failed write attempts. On quota failure the active generation stays intact.
 
 ## Accounting boundaries
 
@@ -107,6 +120,8 @@ the active full history and source archives are retained.
   alternative. Missing settlement dates cannot satisfy that date filter.
 - Missing lot matches, unsupported corporate actions and unreconciled summary
   differences are disclosed. No profit is invented from disappearing inventory.
+- Backdated activity in a later statement remains selectable in All available
+  history. The earliest observed date is separate from complete report coverage.
 - Broker summary reconciliation and owner allocation completeness are separate.
   The view does not claim NAV, account cash, time-weighted returns or tax advice.
 

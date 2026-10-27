@@ -216,7 +216,7 @@ class RealizedStore:
             if report["through"] > covered_through:
                 used_reports.add(report["report_id"])
                 covered_through = report["through"]
-        history.update({"account": account, "source_reports": [{k: r[k] for k in
+        history.update({"account": account, "storage_version": "packed_v1", "source_reports": [{k: r[k] for k in
                         ("report_id", "from", "through", "generated", "source_name", "has_executions")} for r in reports if r["report_id"] in used_reports]})
         history["generation_id"] = digest(history)
         return history

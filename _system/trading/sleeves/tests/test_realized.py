@@ -68,6 +68,13 @@ def test_nonzero_reported_realization_on_open_marked_record_is_preserved(tmp_pat
     assert row["realized_usd"] == "19"
 
 
+def test_backdated_broker_activity_is_retained_without_claiming_earlier_year_coverage(tmp_path):
+    result = history(write_report(tmp_path, [trade(tradeDate="20201217")], start="20230101"))
+    assert result["records"][0]["trade_date"] == "2020-12-17"
+    assert result["coverage"]["observed_from"] == "2020-12-17"
+    assert result["coverage"]["from"] == "2023-01-01"
+
+
 def test_reversal_does_not_claim_entire_fill_is_closed_quantity(tmp_path):
     row = history(write_report(tmp_path, [trade(openCloseIndicator="C;O", quantity="-30")]))["records"][0]
     assert row["quantity"] is None

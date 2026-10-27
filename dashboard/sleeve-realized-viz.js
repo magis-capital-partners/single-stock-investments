@@ -52,6 +52,7 @@
     if (payload.unresolved?.count) warnings.push(`${payload.unresolved.count} account records (${money(payload.unresolved.realized_usd)}) have unresolved ownership and are excluded from both owner totals.`);
     if (!coverage.closed_lots_available) warnings.push('Closed Lots detail has not been received. Shared holdings require broker lot matches before ownership can be assigned.');
     if (coverage.gaps?.length) warnings.push(`${coverage.gaps.length} gaps exist in the available report coverage.`);
+    if (coverage.observed_from && coverage.from && coverage.observed_from < coverage.from) warnings.push(`Broker restatements include activity dated back to ${coverage.observed_from}. Complete report coverage starts ${coverage.from}; earlier years are incomplete.`);
     if (payload.reconciliation?.unmatched_action_count) warnings.push(`${payload.reconciliation.unmatched_action_count} corporate or option actions lack a linked reported realization and require reconciliation.`);
     if (payload.reconciliation?.status === 'needs_review') warnings.push(`Account reconciliation needs review (${payload.reconciliation.difference_count || 0} differences; ${payload.reconciliation.exception_count || 0} exceptions). ${payload.reconciliation.owner_difference_counts?.[payload.owner] ?? 'Unknown'} differences involve this owner’s identified contracts. Results shown are reported amounts for the identified records.`);
     return `<div class="realized-totals"><div><span>Realized P&amp;L · selected period</span><strong class="mono ${color(summary.realized_usd)}">${money(summary.realized_usd)}</strong><small>${summary.count} records · commissions already included where reported by IBKR</small></div>
@@ -95,7 +96,7 @@
       const year = Number(payload.through.slice(0, 4));
       if (period === 'ytd') { field('from').value = `${year}-01-01`; field('to').value = payload.through; }
       if (period === 'previous') { field('from').value = `${year - 1}-01-01`; field('to').value = `${year - 1}-12-31`; }
-      if (period === 'all') { field('from').value = payload.coverage.from; field('to').value = payload.through; }
+      if (period === 'all') { field('from').value = payload.coverage.observed_from || payload.coverage.from; field('to').value = payload.through; }
     }
 
     async function load(next = false) {

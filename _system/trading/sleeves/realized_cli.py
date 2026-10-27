@@ -43,6 +43,7 @@ def publication(history: dict) -> tuple[dict, list[list[dict]]]:
     recon = history["reconciliation"]
     manifest = {k: history[k] for k in ("through", "coverage", "policy_version", "source_reports")}
     manifest.update({"row_count": len(rows), "batch_hashes": [digest(b) for b in batches],
+                     "storage": history.get("storage_version", "row_v1"),
                      "source_generated": max((r["generated"] for r in history["source_reports"]), default=history["through"] + "T00:00:00"),
                      "owner_counts": dict(Counter(r["owner"] for r in rows)),
                      "excluded_count": sum(r["owner"] == "excluded" for r in history["records"]),
