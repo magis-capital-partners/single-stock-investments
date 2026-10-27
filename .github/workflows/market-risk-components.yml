@@ -139,11 +139,18 @@ jobs:
         run: |
           set -euo pipefail
           source_root="$RUNNER_TEMP/ssi-source"
-          # Widen the sparse clone to the push helper and the committed
-          # fallback, then move off the detached SHA onto main so the helper
-          # can rebase and push.
+          # Widen the sparse clone to the push helper, the files it always
+          # runs (the fund-letter audit and its manifest, plus the dated-artifact
+          # guard), and the committed fallback. Then move off the detached SHA
+          # onto main so the helper can rebase and push. ci_push_main.sh also
+          # materializes PUSH_DEPENDENCY_PATHS itself, so a later dependency
+          # does not depend on this list staying complete.
           git -C "$source_root" sparse-checkout add \
             _system/scripts/ci_push_main.sh \
+            _system/scripts/audit_fund_letter_exposure.py \
+            _system/scripts/compact_dated_artifacts.py \
+            _system/scripts/atomic_io.py \
+            dashboard/private-assets.json \
             dashboard/data/market_risk_components.json
           git -C "$source_root" fetch --depth 1 origin main
           git -C "$source_root" checkout -B main origin/main
