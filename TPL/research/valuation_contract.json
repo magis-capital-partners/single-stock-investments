@@ -5449,7 +5449,7 @@
     ]
   },
   "change_control": {
-    "model_hash": "a24e715db0329acb43c7724d49366f08494e7f7a94263bc3ab602e2c7e5c601f",
+    "model_hash": "c1a44010ea2fb44cc1f19703858ed92fad9c5b692d8f54615cd2c50b69479491",
     "method_versions": [
       "balance_sheet_mark@1.0",
       "capital_free_produced_water_driver_dcf@1.0",
@@ -5468,6 +5468,331 @@
     "rule": "A source fact is locked. Every assumption change requires a reason, author, timestamp, and before/after value."
   },
   "decision_rule": "Proof status and investment readiness are separate. Every material claim must be valued exactly once by a valid calculation proof, every evidence blocker must be resolved, and the model must be stock-specific before committee review. Only a human decision can authorize capital.",
+  "shared_forecast": {
+    "schema_version": "1.0",
+    "method_version": "shared-valuation-forecast/1.1",
+    "ticker": "TPL",
+    "status": "model_gap",
+    "research_only": true,
+    "requires_human_review": false,
+    "capital_actionable": false,
+    "as_of": "2026-08-31",
+    "model_as_of": "2026-07-15",
+    "quote": {
+      "value": 414.22,
+      "as_of": "2026-08-31",
+      "source_url": "Market quote 2026-07-15 17:21 UTC",
+      "currency": null
+    },
+    "forecast_hash": "b2bc3f11f6c21e9bb3f0b6664a5c61f59a139c0dffc8e1725c642d2b55d793e3",
+    "forward_irr_pct": {
+      "low": null,
+      "base": null,
+      "high": null
+    },
+    "present_value_today_per_share": {
+      "low": null,
+      "base": null,
+      "high": null
+    },
+    "model_present_value_per_share": {
+      "low": null,
+      "base": null,
+      "high": null
+    },
+    "required_return_pct": {
+      "low": null,
+      "base": null,
+      "high": null
+    },
+    "forward_cashflow_schedule": {},
+    "buy_prices": [],
+    "components": [
+      {
+        "component_id": "producing_royalty_operations",
+        "method": "capital_free_revenue_driver_dcf",
+        "status": "model_gap",
+        "present_value_per_share": {}
+      },
+      {
+        "component_id": "existing_surface_and_easement_operations",
+        "method": "land_use_revenue_driver_dcf",
+        "status": "model_gap",
+        "present_value_per_share": {}
+      },
+      {
+        "component_id": "produced_water_royalties",
+        "method": "capital_free_produced_water_driver_dcf",
+        "status": "model_gap",
+        "present_value_per_share": {}
+      },
+      {
+        "component_id": "cash_and_investments",
+        "method": "balance_sheet_mark",
+        "status": "model_gap",
+        "present_value_per_share": {}
+      },
+      {
+        "component_id": "operated_water_sales",
+        "method": "reinvestment_return_driver_dcf",
+        "status": "model_gap",
+        "present_value_per_share": {}
+      },
+      {
+        "component_id": "contracted_data_center_receivable",
+        "method": "discounted_contract_value",
+        "status": "model_gap",
+        "present_value_per_share": {}
+      },
+      {
+        "component_id": "visible_royalty_inventory_option",
+        "method": "comparable_royalty_nav_residual",
+        "status": "model_gap",
+        "present_value_per_share": {}
+      },
+      {
+        "component_id": "dormant_royalty_inventory_option",
+        "method": "comparable_royalty_nav_residual",
+        "status": "model_gap",
+        "present_value_per_share": {}
+      },
+      {
+        "component_id": "residual_surface_land_option",
+        "method": "portfolio_discounted_unit_nav",
+        "status": "model_gap",
+        "present_value_per_share": {}
+      },
+      {
+        "component_id": "future_infrastructure_corridors",
+        "method": "milestone_probability_weighted_option",
+        "status": "model_gap",
+        "present_value_per_share": {}
+      },
+      {
+        "component_id": "data_center_power_water_option",
+        "method": "milestone_probability_weighted_option",
+        "status": "model_gap",
+        "present_value_per_share": {}
+      },
+      {
+        "component_id": "desalination_and_water_technology_option",
+        "method": "stage_gated_milestone_option",
+        "status": "model_gap",
+        "present_value_per_share": {}
+      },
+      {
+        "component_id": "realization_and_corporate_reserve",
+        "method": "conservative_reserve",
+        "status": "model_gap",
+        "present_value_per_share": {}
+      }
+    ],
+    "gaps": [
+      {
+        "component_id": "producing_royalty_operations",
+        "case": "low",
+        "code": "realization_timing_missing:after_tax_owner_cash_margin"
+      },
+      {
+        "component_id": "producing_royalty_operations",
+        "case": "base",
+        "code": "realization_timing_missing:after_tax_owner_cash_margin"
+      },
+      {
+        "component_id": "producing_royalty_operations",
+        "case": "high",
+        "code": "realization_timing_missing:after_tax_owner_cash_margin"
+      },
+      {
+        "component_id": "existing_surface_and_easement_operations",
+        "case": "low",
+        "code": "realization_timing_missing:after_tax_owner_cash_margin"
+      },
+      {
+        "component_id": "existing_surface_and_easement_operations",
+        "case": "base",
+        "code": "realization_timing_missing:after_tax_owner_cash_margin"
+      },
+      {
+        "component_id": "existing_surface_and_easement_operations",
+        "case": "high",
+        "code": "realization_timing_missing:after_tax_owner_cash_margin"
+      },
+      {
+        "component_id": "produced_water_royalties",
+        "case": "low",
+        "code": "realization_timing_missing:after_tax_owner_cash_margin"
+      },
+      {
+        "component_id": "produced_water_royalties",
+        "case": "base",
+        "code": "realization_timing_missing:after_tax_owner_cash_margin"
+      },
+      {
+        "component_id": "produced_water_royalties",
+        "case": "high",
+        "code": "realization_timing_missing:after_tax_owner_cash_margin"
+      },
+      {
+        "component_id": "cash_and_investments",
+        "case": "low",
+        "code": "realization_timing_missing:value_per_share"
+      },
+      {
+        "component_id": "cash_and_investments",
+        "case": "base",
+        "code": "realization_timing_missing:value_per_share"
+      },
+      {
+        "component_id": "cash_and_investments",
+        "case": "high",
+        "code": "realization_timing_missing:value_per_share"
+      },
+      {
+        "component_id": "operated_water_sales",
+        "case": "low",
+        "code": "realization_timing_missing:after_tax_owner_cash_margin"
+      },
+      {
+        "component_id": "operated_water_sales",
+        "case": "base",
+        "code": "realization_timing_missing:after_tax_owner_cash_margin"
+      },
+      {
+        "component_id": "operated_water_sales",
+        "case": "high",
+        "code": "realization_timing_missing:after_tax_owner_cash_margin"
+      },
+      {
+        "component_id": "contracted_data_center_receivable",
+        "case": "low",
+        "code": "realization_timing_missing:value_per_share"
+      },
+      {
+        "component_id": "contracted_data_center_receivable",
+        "case": "base",
+        "code": "realization_timing_missing:value_per_share"
+      },
+      {
+        "component_id": "contracted_data_center_receivable",
+        "case": "high",
+        "code": "realization_timing_missing:value_per_share"
+      },
+      {
+        "component_id": "visible_royalty_inventory_option",
+        "case": "low",
+        "code": "realization_timing_missing:value_per_share"
+      },
+      {
+        "component_id": "visible_royalty_inventory_option",
+        "case": "base",
+        "code": "realization_timing_missing:value_per_share"
+      },
+      {
+        "component_id": "visible_royalty_inventory_option",
+        "case": "high",
+        "code": "realization_timing_missing:value_per_share"
+      },
+      {
+        "component_id": "dormant_royalty_inventory_option",
+        "case": "low",
+        "code": "realization_timing_missing:value_per_share"
+      },
+      {
+        "component_id": "dormant_royalty_inventory_option",
+        "case": "base",
+        "code": "realization_timing_missing:value_per_share"
+      },
+      {
+        "component_id": "dormant_royalty_inventory_option",
+        "case": "high",
+        "code": "realization_timing_missing:value_per_share"
+      },
+      {
+        "component_id": "residual_surface_land_option",
+        "case": "low",
+        "code": "realization_timing_missing:value_per_share"
+      },
+      {
+        "component_id": "residual_surface_land_option",
+        "case": "base",
+        "code": "realization_timing_missing:value_per_share"
+      },
+      {
+        "component_id": "residual_surface_land_option",
+        "case": "high",
+        "code": "realization_timing_missing:value_per_share"
+      },
+      {
+        "component_id": "future_infrastructure_corridors",
+        "case": "low",
+        "code": "realization_timing_missing:value_per_share"
+      },
+      {
+        "component_id": "future_infrastructure_corridors",
+        "case": "base",
+        "code": "realization_timing_missing:value_per_share"
+      },
+      {
+        "component_id": "future_infrastructure_corridors",
+        "case": "high",
+        "code": "realization_timing_missing:value_per_share"
+      },
+      {
+        "component_id": "data_center_power_water_option",
+        "case": "low",
+        "code": "realization_timing_missing:value_per_share"
+      },
+      {
+        "component_id": "data_center_power_water_option",
+        "case": "base",
+        "code": "realization_timing_missing:value_per_share"
+      },
+      {
+        "component_id": "data_center_power_water_option",
+        "case": "high",
+        "code": "realization_timing_missing:value_per_share"
+      },
+      {
+        "component_id": "desalination_and_water_technology_option",
+        "case": "low",
+        "code": "realization_timing_missing:value_per_share"
+      },
+      {
+        "component_id": "desalination_and_water_technology_option",
+        "case": "base",
+        "code": "realization_timing_missing:value_per_share"
+      },
+      {
+        "component_id": "desalination_and_water_technology_option",
+        "case": "high",
+        "code": "realization_timing_missing:value_per_share"
+      },
+      {
+        "component_id": "realization_and_corporate_reserve",
+        "case": "low",
+        "code": "realization_timing_missing:reserve_per_share"
+      },
+      {
+        "component_id": "realization_and_corporate_reserve",
+        "case": "base",
+        "code": "realization_timing_missing:reserve_per_share"
+      },
+      {
+        "component_id": "realization_and_corporate_reserve",
+        "case": "high",
+        "code": "realization_timing_missing:reserve_per_share"
+      }
+    ],
+    "warnings": [],
+    "source_refs": [],
+    "next_action": "automatic_model_refresh",
+    "reconciliation": {
+      "passed": false
+    },
+    "settlement_policy": "Explicit cash/debt additions in an operating DCF are time-zero acquisition adjustments; hypothetical settlement, not declared dividends.",
+    "calculation_id": "e0c22e4afafb4f8867f61904fc17c5ce9bbb35054a6c55824379f16cf92bbec7"
+  },
   "cohort_expected_profile": "scarce_asset_optionality",
   "profile_match": true,
   "cohort_purpose": "Scarce royalties, land, water infrastructure, and long-duration options.",

@@ -571,12 +571,148 @@
     ]
   },
   "change_control": {
-    "model_hash": "396d8eccc9d112532a29886e646ba84805b658b964d30077d7dc57647cb80edb",
+    "model_hash": "bc2bc2e0726724a52b04339a278086fb0271a7cfb714433cd6dc9afd3f40e90f",
     "method_versions": [],
     "change_log": [],
     "rule": "A source fact is locked. Every assumption change requires a reason, author, timestamp, and before/after value."
   },
   "decision_rule": "Proof status and investment readiness are separate. Every material claim must be valued exactly once by a valid calculation proof, every evidence blocker must be resolved, and the model must be stock-specific before committee review. Only a human decision can authorize capital.",
+  "shared_forecast": {
+    "schema_version": "1.0",
+    "method_version": "shared-valuation-forecast/1.1",
+    "ticker": "INV",
+    "status": "model_gap",
+    "research_only": true,
+    "requires_human_review": false,
+    "capital_actionable": false,
+    "as_of": "2026-07-28",
+    "model_as_of": "2026-07-28",
+    "quote": {
+      "value": 2.96,
+      "as_of": "2026-07-28",
+      "source_url": "Yahoo INV close 2026-07-28",
+      "currency": null
+    },
+    "forecast_hash": "aaaeab614c5ef6b218e0765a3ae762fa9dfe4fcafe6b834019996c1b64e5ed67",
+    "forward_irr_pct": {
+      "low": null,
+      "base": null,
+      "high": null
+    },
+    "present_value_today_per_share": {
+      "low": null,
+      "base": null,
+      "high": null
+    },
+    "model_present_value_per_share": {
+      "low": null,
+      "base": null,
+      "high": null
+    },
+    "required_return_pct": {
+      "low": null,
+      "base": null,
+      "high": null
+    },
+    "forward_cashflow_schedule": {},
+    "buy_prices": [],
+    "components": [
+      {
+        "component_id": "net_cash_claims",
+        "method": "net_asset_value",
+        "status": "model_gap",
+        "present_value_per_share": {}
+      },
+      {
+        "component_id": "accelsius_claim",
+        "method": "probability_weighted_outcome",
+        "status": "model_gap",
+        "present_value_per_share": {}
+      },
+      {
+        "component_id": "other_ops_residual",
+        "method": "probability_weighted_outcome",
+        "status": "model_gap",
+        "present_value_per_share": {}
+      },
+      {
+        "component_id": "dilution_burn_reserve",
+        "method": "net_asset_value",
+        "status": "model_gap",
+        "present_value_per_share": {}
+      }
+    ],
+    "gaps": [
+      {
+        "component_id": "net_cash_claims",
+        "case": "low",
+        "code": "invalid_calculation_proof"
+      },
+      {
+        "component_id": "net_cash_claims",
+        "case": "base",
+        "code": "invalid_calculation_proof"
+      },
+      {
+        "component_id": "net_cash_claims",
+        "case": "high",
+        "code": "invalid_calculation_proof"
+      },
+      {
+        "component_id": "accelsius_claim",
+        "case": "low",
+        "code": "invalid_calculation_proof"
+      },
+      {
+        "component_id": "accelsius_claim",
+        "case": "base",
+        "code": "invalid_calculation_proof"
+      },
+      {
+        "component_id": "accelsius_claim",
+        "case": "high",
+        "code": "invalid_calculation_proof"
+      },
+      {
+        "component_id": "other_ops_residual",
+        "case": "low",
+        "code": "invalid_calculation_proof"
+      },
+      {
+        "component_id": "other_ops_residual",
+        "case": "base",
+        "code": "invalid_calculation_proof"
+      },
+      {
+        "component_id": "other_ops_residual",
+        "case": "high",
+        "code": "invalid_calculation_proof"
+      },
+      {
+        "component_id": "dilution_burn_reserve",
+        "case": "low",
+        "code": "invalid_calculation_proof"
+      },
+      {
+        "component_id": "dilution_burn_reserve",
+        "case": "base",
+        "code": "invalid_calculation_proof"
+      },
+      {
+        "component_id": "dilution_burn_reserve",
+        "case": "high",
+        "code": "invalid_calculation_proof"
+      }
+    ],
+    "warnings": [],
+    "source_refs": [],
+    "next_action": "automatic_model_refresh",
+    "reconciliation": {
+      "passed": false
+    },
+    "settlement_policy": "Explicit cash/debt additions in an operating DCF are time-zero acquisition adjustments; hypothetical settlement, not declared dividends.",
+    "calculation_id": "ec61a4b833f785850d2a48dfa9eface93693c59b5c7d497efb406c7e43e39b63"
+  },
   "authority": "universal_valuation_contract",
   "legacy_reference_present": true,
   "falsifier_coverage": {

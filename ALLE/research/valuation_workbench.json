@@ -1,7 +1,7 @@
 {
   "schema_version": "3.0",
   "ticker": "ALLE",
-  "as_of": "2026-10-26",
+  "as_of": "2026-10-27",
   "proof_status": "evidence_blocked",
   "model_level": "evidence_blocked",
   "model_level_reason": "Prospective falsifier coverage is incomplete.",
@@ -15,7 +15,9 @@
     "model_as_of": "2026-07-25",
     "latest_fact_as_of": "2026-07-25",
     "oldest_fact_as_of": "2025-12-31",
-    "price_as_of": "2026-07-20"
+    "price_as_of": "2026-07-20",
+    "forecast_as_of": "2026-07-25",
+    "calculation_as_of": "2026-07-20"
   },
   "legacy_audit": {
     "actionable": false,
@@ -70,18 +72,20 @@
       "high": null
     },
     "forward_return_status": "withheld",
-    "forward_return_reason": "model maturity is not eligible to publish a return",
+    "forward_return_reason": "shared_forecast_incomplete",
     "required_return_pct": 8.0,
     "downside_to_low_pct": -39.95,
     "unvalued_component_count": 0,
     "unresolved_evidence_count": 0,
     "proof_complete_pct": 100.0,
-    "model_hash": "129f0916ed57bdaee72dd764a740a218ab8501bd3236f56770e8ac575af67fca",
+    "model_hash": "f176f991b0ec4c6bd7fee0bb520cc0bcd18224331aecc931f7b96a1d46bf717e",
     "dates": {
       "model_as_of": "2026-07-25",
       "latest_fact_as_of": "2026-07-25",
       "oldest_fact_as_of": "2025-12-31",
-      "price_as_of": "2026-07-20"
+      "price_as_of": "2026-07-20",
+      "forecast_as_of": "2026-07-25",
+      "calculation_as_of": "2026-07-20"
     },
     "legacy_audit": {
       "actionable": false,
@@ -102,7 +106,11 @@
     },
     "primary_power_zone": "High-return compounder",
     "owner_decision": null,
-    "next_action": "Freeze the evidence packet and select three method-independent raters."
+    "next_action": "Freeze the evidence packet and select three method-independent raters.",
+    "forecast_id": null,
+    "calculation_status": "model_gap",
+    "research_return_available": false,
+    "calculation_reason": "forecast_date_missing_or_future"
   },
   "business": {
     "status": "complete",
@@ -1442,8 +1450,8 @@
                   "ref": "ALLE/research/valuation.json",
                   "locator": "inputs.price",
                   "as_of": "2026-07-25",
-                  "content_sha256": "5b0da6aaef5c86a4b19936788431a6e319ba0b5f273cf51815a880f0703a1d1a",
-                  "source_id": "ff66c5f8309b5e68851feb690caf6ee4414c752395031fbd4641065cab5d7926"
+                  "content_sha256": "1a245830cec769d77501dfc33e17731b0a7545ddadfaf5a223435ddc3b6573aa",
+                  "source_id": "bd89a942a1705d5dfdb225dc9636504fcf3b72b41f32bf3cfc7c502216982c80"
                 },
                 "rationale": null
               },
@@ -1482,8 +1490,8 @@
                   "ref": "ALLE/research/valuation.json",
                   "locator": "inputs.price",
                   "as_of": "2026-07-25",
-                  "content_sha256": "5b0da6aaef5c86a4b19936788431a6e319ba0b5f273cf51815a880f0703a1d1a",
-                  "source_id": "ff66c5f8309b5e68851feb690caf6ee4414c752395031fbd4641065cab5d7926"
+                  "content_sha256": "1a245830cec769d77501dfc33e17731b0a7545ddadfaf5a223435ddc3b6573aa",
+                  "source_id": "bd89a942a1705d5dfdb225dc9636504fcf3b72b41f32bf3cfc7c502216982c80"
                 },
                 "rationale": null
               },
@@ -1522,8 +1530,8 @@
                   "ref": "ALLE/research/valuation.json",
                   "locator": "inputs.price",
                   "as_of": "2026-07-25",
-                  "content_sha256": "5b0da6aaef5c86a4b19936788431a6e319ba0b5f273cf51815a880f0703a1d1a",
-                  "source_id": "ff66c5f8309b5e68851feb690caf6ee4414c752395031fbd4641065cab5d7926"
+                  "content_sha256": "1a245830cec769d77501dfc33e17731b0a7545ddadfaf5a223435ddc3b6573aa",
+                  "source_id": "bd89a942a1705d5dfdb225dc9636504fcf3b72b41f32bf3cfc7c502216982c80"
                 },
                 "rationale": null
               },
@@ -1558,8 +1566,8 @@
               "ref": "ALLE/research/valuation.json",
               "locator": "inputs.price",
               "as_of": "2026-07-25",
-              "content_sha256": "5b0da6aaef5c86a4b19936788431a6e319ba0b5f273cf51815a880f0703a1d1a",
-              "source_id": "ff66c5f8309b5e68851feb690caf6ee4414c752395031fbd4641065cab5d7926"
+              "content_sha256": "1a245830cec769d77501dfc33e17731b0a7545ddadfaf5a223435ddc3b6573aa",
+              "source_id": "bd89a942a1705d5dfdb225dc9636504fcf3b72b41f32bf3cfc7c502216982c80"
             },
             {
               "node_id": "normalized_owner_cash",
@@ -1573,7 +1581,7 @@
             "passed": true,
             "errors": []
           },
-          "proof_hash": "1af06c91e34377bf7a1caf650bef996109ddd59d9293585ab3fad888ae7aa03f"
+          "proof_hash": "3a1e53b59f156f9b077cfd983724f9e5c6170a397e035b685edd869cabe41e8d"
         },
         "evidence_tier": "primary_derived",
         "evidence_level": "primary_derived",
@@ -1650,7 +1658,9 @@
       "model_as_of": "2026-07-25",
       "latest_fact_as_of": "2026-07-25",
       "oldest_fact_as_of": "2025-12-31",
-      "price_as_of": "2026-07-20"
+      "price_as_of": "2026-07-20",
+      "forecast_as_of": "2026-07-25",
+      "calculation_as_of": "2026-07-20"
     },
     "legacy_audit": {
       "actionable": false,
@@ -3075,8 +3085,8 @@
                   "ref": "ALLE/research/valuation.json",
                   "locator": "inputs.price",
                   "as_of": "2026-07-25",
-                  "content_sha256": "5b0da6aaef5c86a4b19936788431a6e319ba0b5f273cf51815a880f0703a1d1a",
-                  "source_id": "ff66c5f8309b5e68851feb690caf6ee4414c752395031fbd4641065cab5d7926"
+                  "content_sha256": "1a245830cec769d77501dfc33e17731b0a7545ddadfaf5a223435ddc3b6573aa",
+                  "source_id": "bd89a942a1705d5dfdb225dc9636504fcf3b72b41f32bf3cfc7c502216982c80"
                 },
                 "rationale": null
               },
@@ -3115,8 +3125,8 @@
                   "ref": "ALLE/research/valuation.json",
                   "locator": "inputs.price",
                   "as_of": "2026-07-25",
-                  "content_sha256": "5b0da6aaef5c86a4b19936788431a6e319ba0b5f273cf51815a880f0703a1d1a",
-                  "source_id": "ff66c5f8309b5e68851feb690caf6ee4414c752395031fbd4641065cab5d7926"
+                  "content_sha256": "1a245830cec769d77501dfc33e17731b0a7545ddadfaf5a223435ddc3b6573aa",
+                  "source_id": "bd89a942a1705d5dfdb225dc9636504fcf3b72b41f32bf3cfc7c502216982c80"
                 },
                 "rationale": null
               },
@@ -3155,8 +3165,8 @@
                   "ref": "ALLE/research/valuation.json",
                   "locator": "inputs.price",
                   "as_of": "2026-07-25",
-                  "content_sha256": "5b0da6aaef5c86a4b19936788431a6e319ba0b5f273cf51815a880f0703a1d1a",
-                  "source_id": "ff66c5f8309b5e68851feb690caf6ee4414c752395031fbd4641065cab5d7926"
+                  "content_sha256": "1a245830cec769d77501dfc33e17731b0a7545ddadfaf5a223435ddc3b6573aa",
+                  "source_id": "bd89a942a1705d5dfdb225dc9636504fcf3b72b41f32bf3cfc7c502216982c80"
                 },
                 "rationale": null
               },
@@ -3191,8 +3201,8 @@
               "ref": "ALLE/research/valuation.json",
               "locator": "inputs.price",
               "as_of": "2026-07-25",
-              "content_sha256": "5b0da6aaef5c86a4b19936788431a6e319ba0b5f273cf51815a880f0703a1d1a",
-              "source_id": "ff66c5f8309b5e68851feb690caf6ee4414c752395031fbd4641065cab5d7926"
+              "content_sha256": "1a245830cec769d77501dfc33e17731b0a7545ddadfaf5a223435ddc3b6573aa",
+              "source_id": "bd89a942a1705d5dfdb225dc9636504fcf3b72b41f32bf3cfc7c502216982c80"
             },
             {
               "node_id": "normalized_owner_cash",
@@ -3206,7 +3216,7 @@
             "passed": true,
             "errors": []
           },
-          "proof_hash": "1af06c91e34377bf7a1caf650bef996109ddd59d9293585ab3fad888ae7aa03f"
+          "proof_hash": "3a1e53b59f156f9b077cfd983724f9e5c6170a397e035b685edd869cabe41e8d"
         },
         "evidence_tier": "primary_derived",
         "evidence_level": "primary_derived",
@@ -3273,7 +3283,7 @@
       },
       "all_material_components_priced": true,
       "calculation_errors": [],
-      "aggregate_proof_hash": "d20a13b1d5ab7e4dfc0b4ab74128825afc1646ba84278b95ea7b2ad664109586"
+      "aggregate_proof_hash": "02bb5c53c01b110343fd343d91493138c3ddbe3a68af699f86e76e43ba5d8504"
     },
     "model_checks": {
       "calculation_graphs_valid": true,
@@ -3349,8 +3359,8 @@
         "ref": "ALLE/research/valuation.json",
         "locator": "inputs.price",
         "as_of": "2026-07-25",
-        "content_sha256": "5b0da6aaef5c86a4b19936788431a6e319ba0b5f273cf51815a880f0703a1d1a",
-        "source_id": "ff66c5f8309b5e68851feb690caf6ee4414c752395031fbd4641065cab5d7926"
+        "content_sha256": "1a245830cec769d77501dfc33e17731b0a7545ddadfaf5a223435ddc3b6573aa",
+        "source_id": "bd89a942a1705d5dfdb225dc9636504fcf3b72b41f32bf3cfc7c502216982c80"
       },
       {
         "component_id": "cycle_reserve",
@@ -3362,7 +3372,7 @@
       }
     ],
     "change_control": {
-      "model_hash": "129f0916ed57bdaee72dd764a740a218ab8501bd3236f56770e8ac575af67fca",
+      "model_hash": "f176f991b0ec4c6bd7fee0bb520cc0bcd18224331aecc931f7b96a1d46bf717e",
       "method_versions": [
         "midcycle_capacity_value@1.0",
         "net_asset_value@1.0",
@@ -3569,17 +3579,19 @@
   },
   "freshness": {
     "status": "stale",
-    "as_of": "2026-10-26",
+    "as_of": "2026-10-27",
     "dates": {
       "model_as_of": "2026-07-25",
       "latest_fact_as_of": "2026-07-25",
       "oldest_fact_as_of": "2025-12-31",
-      "price_as_of": "2026-07-20"
+      "price_as_of": "2026-07-20",
+      "forecast_as_of": "2026-07-25",
+      "calculation_as_of": "2026-07-20"
     },
     "age_days": {
-      "model_as_of": 93,
-      "latest_fact_as_of": 93,
-      "price_as_of": 98
+      "model_as_of": 94,
+      "latest_fact_as_of": 94,
+      "price_as_of": 99
     },
     "review_threshold_days": {
       "model_as_of": 365,
@@ -3587,7 +3599,7 @@
       "price_as_of": 7
     },
     "warnings": [
-      "price_as_of is 98 days old (review threshold 7)"
+      "price_as_of is 99 days old (review threshold 7)"
     ],
     "rule": "Freshness is disclosed separately from proof completeness; stale or undated inputs require review before a new capital decision."
   }

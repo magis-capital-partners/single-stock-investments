@@ -15,7 +15,9 @@
     "model_as_of": "2026-07-28",
     "latest_fact_as_of": "2026-07-25",
     "oldest_fact_as_of": "2025-12-31",
-    "price_as_of": "2026-07-20"
+    "price_as_of": "2026-07-20",
+    "forecast_as_of": "2026-07-28",
+    "calculation_as_of": "2026-07-20"
   },
   "legacy_audit": {
     "actionable": false,
@@ -70,18 +72,20 @@
       "high": null
     },
     "forward_return_status": "withheld",
-    "forward_return_reason": "model maturity is not eligible to publish a return",
+    "forward_return_reason": "shared_forecast_incomplete",
     "required_return_pct": 8.0,
     "downside_to_low_pct": -78.52,
     "unvalued_component_count": 0,
     "unresolved_evidence_count": 0,
     "proof_complete_pct": 100.0,
-    "model_hash": "7a12534d5be716e904545e0c3340f75905639cf84078b5693c82d7c0805d7cc6",
+    "model_hash": "1ccb3a657972278fbfa4c879e484618c7e6bef48cbfcb48a51ec383eea5f7a2c",
     "dates": {
       "model_as_of": "2026-07-28",
       "latest_fact_as_of": "2026-07-25",
       "oldest_fact_as_of": "2025-12-31",
-      "price_as_of": "2026-07-20"
+      "price_as_of": "2026-07-20",
+      "forecast_as_of": "2026-07-28",
+      "calculation_as_of": "2026-07-20"
     },
     "legacy_audit": {
       "actionable": false,
@@ -102,7 +106,11 @@
     },
     "primary_power_zone": "High-return compounder",
     "owner_decision": null,
-    "next_action": "Freeze the evidence packet and select three method-independent raters."
+    "next_action": "Freeze the evidence packet and select three method-independent raters.",
+    "forecast_id": null,
+    "calculation_status": "model_gap",
+    "research_return_available": false,
+    "calculation_reason": "forecast_date_missing_or_future"
   },
   "business": {
     "status": "complete",
@@ -1442,8 +1450,8 @@
                   "ref": "APH/research/valuation.json",
                   "locator": "inputs.price",
                   "as_of": "2026-07-25",
-                  "content_sha256": "0d85bfc3736aa0914f8844c47a2a6efc4197e75a03035873a9186792df528ea4",
-                  "source_id": "f004a79091d7ffce6b540e2bb72fe9ce6da0f9d69c0e3f87f326501bcd31711c"
+                  "content_sha256": "0c5f97f6bc2d6bfe2050b1f78b019c714ad544e022c3ec7f080f98355209a8c1",
+                  "source_id": "7f92f740cc7b1149c0db1e7c8cf32882d1d68678d46a48b8429eb166798d7b77"
                 },
                 "rationale": null
               },
@@ -1482,8 +1490,8 @@
                   "ref": "APH/research/valuation.json",
                   "locator": "inputs.price",
                   "as_of": "2026-07-25",
-                  "content_sha256": "0d85bfc3736aa0914f8844c47a2a6efc4197e75a03035873a9186792df528ea4",
-                  "source_id": "f004a79091d7ffce6b540e2bb72fe9ce6da0f9d69c0e3f87f326501bcd31711c"
+                  "content_sha256": "0c5f97f6bc2d6bfe2050b1f78b019c714ad544e022c3ec7f080f98355209a8c1",
+                  "source_id": "7f92f740cc7b1149c0db1e7c8cf32882d1d68678d46a48b8429eb166798d7b77"
                 },
                 "rationale": null
               },
@@ -1522,8 +1530,8 @@
                   "ref": "APH/research/valuation.json",
                   "locator": "inputs.price",
                   "as_of": "2026-07-25",
-                  "content_sha256": "0d85bfc3736aa0914f8844c47a2a6efc4197e75a03035873a9186792df528ea4",
-                  "source_id": "f004a79091d7ffce6b540e2bb72fe9ce6da0f9d69c0e3f87f326501bcd31711c"
+                  "content_sha256": "0c5f97f6bc2d6bfe2050b1f78b019c714ad544e022c3ec7f080f98355209a8c1",
+                  "source_id": "7f92f740cc7b1149c0db1e7c8cf32882d1d68678d46a48b8429eb166798d7b77"
                 },
                 "rationale": null
               },
@@ -1558,8 +1566,8 @@
               "ref": "APH/research/valuation.json",
               "locator": "inputs.price",
               "as_of": "2026-07-25",
-              "content_sha256": "0d85bfc3736aa0914f8844c47a2a6efc4197e75a03035873a9186792df528ea4",
-              "source_id": "f004a79091d7ffce6b540e2bb72fe9ce6da0f9d69c0e3f87f326501bcd31711c"
+              "content_sha256": "0c5f97f6bc2d6bfe2050b1f78b019c714ad544e022c3ec7f080f98355209a8c1",
+              "source_id": "7f92f740cc7b1149c0db1e7c8cf32882d1d68678d46a48b8429eb166798d7b77"
             },
             {
               "node_id": "normalized_owner_cash",
@@ -1573,7 +1581,7 @@
             "passed": true,
             "errors": []
           },
-          "proof_hash": "be69ee364cf910539c5fc853a07feda8eb1ec252a1bb318eef4fbd11c5a68986"
+          "proof_hash": "3ce4a9b67016c123b36442dba32ea45e2533bba9edcaecf5518985826e7a1dd2"
         },
         "evidence_tier": "primary_derived",
         "evidence_level": "primary_derived",
@@ -1650,7 +1658,9 @@
       "model_as_of": "2026-07-28",
       "latest_fact_as_of": "2026-07-25",
       "oldest_fact_as_of": "2025-12-31",
-      "price_as_of": "2026-07-20"
+      "price_as_of": "2026-07-20",
+      "forecast_as_of": "2026-07-28",
+      "calculation_as_of": "2026-07-20"
     },
     "legacy_audit": {
       "actionable": false,
@@ -3075,8 +3085,8 @@
                   "ref": "APH/research/valuation.json",
                   "locator": "inputs.price",
                   "as_of": "2026-07-25",
-                  "content_sha256": "0d85bfc3736aa0914f8844c47a2a6efc4197e75a03035873a9186792df528ea4",
-                  "source_id": "f004a79091d7ffce6b540e2bb72fe9ce6da0f9d69c0e3f87f326501bcd31711c"
+                  "content_sha256": "0c5f97f6bc2d6bfe2050b1f78b019c714ad544e022c3ec7f080f98355209a8c1",
+                  "source_id": "7f92f740cc7b1149c0db1e7c8cf32882d1d68678d46a48b8429eb166798d7b77"
                 },
                 "rationale": null
               },
@@ -3115,8 +3125,8 @@
                   "ref": "APH/research/valuation.json",
                   "locator": "inputs.price",
                   "as_of": "2026-07-25",
-                  "content_sha256": "0d85bfc3736aa0914f8844c47a2a6efc4197e75a03035873a9186792df528ea4",
-                  "source_id": "f004a79091d7ffce6b540e2bb72fe9ce6da0f9d69c0e3f87f326501bcd31711c"
+                  "content_sha256": "0c5f97f6bc2d6bfe2050b1f78b019c714ad544e022c3ec7f080f98355209a8c1",
+                  "source_id": "7f92f740cc7b1149c0db1e7c8cf32882d1d68678d46a48b8429eb166798d7b77"
                 },
                 "rationale": null
               },
@@ -3155,8 +3165,8 @@
                   "ref": "APH/research/valuation.json",
                   "locator": "inputs.price",
                   "as_of": "2026-07-25",
-                  "content_sha256": "0d85bfc3736aa0914f8844c47a2a6efc4197e75a03035873a9186792df528ea4",
-                  "source_id": "f004a79091d7ffce6b540e2bb72fe9ce6da0f9d69c0e3f87f326501bcd31711c"
+                  "content_sha256": "0c5f97f6bc2d6bfe2050b1f78b019c714ad544e022c3ec7f080f98355209a8c1",
+                  "source_id": "7f92f740cc7b1149c0db1e7c8cf32882d1d68678d46a48b8429eb166798d7b77"
                 },
                 "rationale": null
               },
@@ -3191,8 +3201,8 @@
               "ref": "APH/research/valuation.json",
               "locator": "inputs.price",
               "as_of": "2026-07-25",
-              "content_sha256": "0d85bfc3736aa0914f8844c47a2a6efc4197e75a03035873a9186792df528ea4",
-              "source_id": "f004a79091d7ffce6b540e2bb72fe9ce6da0f9d69c0e3f87f326501bcd31711c"
+              "content_sha256": "0c5f97f6bc2d6bfe2050b1f78b019c714ad544e022c3ec7f080f98355209a8c1",
+              "source_id": "7f92f740cc7b1149c0db1e7c8cf32882d1d68678d46a48b8429eb166798d7b77"
             },
             {
               "node_id": "normalized_owner_cash",
@@ -3206,7 +3216,7 @@
             "passed": true,
             "errors": []
           },
-          "proof_hash": "be69ee364cf910539c5fc853a07feda8eb1ec252a1bb318eef4fbd11c5a68986"
+          "proof_hash": "3ce4a9b67016c123b36442dba32ea45e2533bba9edcaecf5518985826e7a1dd2"
         },
         "evidence_tier": "primary_derived",
         "evidence_level": "primary_derived",
@@ -3273,7 +3283,7 @@
       },
       "all_material_components_priced": true,
       "calculation_errors": [],
-      "aggregate_proof_hash": "6d3897803d4164b885286f10fdc8d881d34818ad94fdc14ae2d86eb83722c246"
+      "aggregate_proof_hash": "71dd9707d62af70eab325c6f4c8027f234bbc7720020f147570c6be569430c1c"
     },
     "model_checks": {
       "calculation_graphs_valid": true,
@@ -3349,8 +3359,8 @@
         "ref": "APH/research/valuation.json",
         "locator": "inputs.price",
         "as_of": "2026-07-25",
-        "content_sha256": "0d85bfc3736aa0914f8844c47a2a6efc4197e75a03035873a9186792df528ea4",
-        "source_id": "f004a79091d7ffce6b540e2bb72fe9ce6da0f9d69c0e3f87f326501bcd31711c"
+        "content_sha256": "0c5f97f6bc2d6bfe2050b1f78b019c714ad544e022c3ec7f080f98355209a8c1",
+        "source_id": "7f92f740cc7b1149c0db1e7c8cf32882d1d68678d46a48b8429eb166798d7b77"
       },
       {
         "component_id": "cycle_reserve",
@@ -3362,7 +3372,7 @@
       }
     ],
     "change_control": {
-      "model_hash": "7a12534d5be716e904545e0c3340f75905639cf84078b5693c82d7c0805d7cc6",
+      "model_hash": "1ccb3a657972278fbfa4c879e484618c7e6bef48cbfcb48a51ec383eea5f7a2c",
       "method_versions": [
         "midcycle_capacity_value@1.0",
         "net_asset_value@1.0",
@@ -3577,7 +3587,9 @@
       "model_as_of": "2026-07-28",
       "latest_fact_as_of": "2026-07-25",
       "oldest_fact_as_of": "2025-12-31",
-      "price_as_of": "2026-07-20"
+      "price_as_of": "2026-07-20",
+      "forecast_as_of": "2026-07-28",
+      "calculation_as_of": "2026-07-20"
     },
     "age_days": {
       "model_as_of": 91,

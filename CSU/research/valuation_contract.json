@@ -2422,7 +2422,7 @@
     ]
   },
   "change_control": {
-    "model_hash": "57e67f37ae418c87d015f2a407422759f811f93c50cb3f2b478e6ed99c3881d7",
+    "model_hash": "9d87839616dd5e753b36a6ee7d9f7ac2d9a4aa587c1f8be2d998386611f9bec6",
     "method_versions": [
       "net_asset_value@1.0",
       "owner_cash_or_dividend_discount@1.0",
@@ -2432,6 +2432,171 @@
     "rule": "A source fact is locked. Every assumption change requires a reason, author, timestamp, and before/after value."
   },
   "decision_rule": "Proof status and investment readiness are separate. Every material claim must be valued exactly once by a valid calculation proof, every evidence blocker must be resolved, and the model must be stock-specific before committee review. Only a human decision can authorize capital.",
+  "shared_forecast": {
+    "schema_version": "1.0",
+    "method_version": "shared-valuation-forecast/1.1",
+    "ticker": "CSU",
+    "status": "model_gap",
+    "research_only": true,
+    "requires_human_review": false,
+    "capital_actionable": false,
+    "as_of": "2026-08-31",
+    "model_as_of": "2026-07-21",
+    "quote": {
+      "value": 3138.72,
+      "as_of": "2026-08-31",
+      "source_url": "Yahoo CSU.TO close 2026-08-31",
+      "currency": null
+    },
+    "forecast_hash": "6348d016bfa9f7f7fd3bd3faa9fbcee003efaa801ac6ee0a60e8479bd89775b9",
+    "forward_irr_pct": {
+      "low": null,
+      "base": null,
+      "high": null
+    },
+    "present_value_today_per_share": {
+      "low": null,
+      "base": null,
+      "high": null
+    },
+    "model_present_value_per_share": {
+      "low": null,
+      "base": null,
+      "high": null
+    },
+    "required_return_pct": {
+      "low": null,
+      "base": null,
+      "high": null
+    },
+    "forward_cashflow_schedule": {},
+    "buy_prices": [],
+    "components": [
+      {
+        "component_id": "core_engine",
+        "method": "owner_cash_or_dividend_discount",
+        "status": "available",
+        "present_value_per_share": {
+          "low": 1198.3,
+          "base": 1546.19,
+          "high": 1971.39
+        }
+      },
+      {
+        "component_id": "reinvestment_or_assets",
+        "method": "owner_earnings_reinvestment_dcf",
+        "status": "model_gap",
+        "present_value_per_share": {}
+      },
+      {
+        "component_id": "net_financial_claims",
+        "method": "net_asset_value",
+        "status": "model_gap",
+        "present_value_per_share": {
+          "low": 0.0
+        }
+      },
+      {
+        "component_id": "downside_reserve",
+        "method": "net_asset_value",
+        "status": "model_gap",
+        "present_value_per_share": {}
+      }
+    ],
+    "gaps": [
+      {
+        "component_id": "reinvestment_or_assets",
+        "case": "low",
+        "code": "realization_timing_missing:reinvestment_value_per_share"
+      },
+      {
+        "component_id": "reinvestment_or_assets",
+        "case": "base",
+        "code": "realization_timing_missing:reinvestment_value_per_share"
+      },
+      {
+        "component_id": "reinvestment_or_assets",
+        "case": "high",
+        "code": "realization_timing_missing:reinvestment_value_per_share"
+      },
+      {
+        "component_id": "net_financial_claims",
+        "case": "base",
+        "code": "realization_timing_missing:value_per_share"
+      },
+      {
+        "component_id": "net_financial_claims",
+        "case": "high",
+        "code": "realization_timing_missing:value_per_share"
+      },
+      {
+        "component_id": "downside_reserve",
+        "case": "low",
+        "code": "realization_timing_missing:value_per_share"
+      },
+      {
+        "component_id": "downside_reserve",
+        "case": "base",
+        "code": "realization_timing_missing:value_per_share"
+      },
+      {
+        "component_id": "downside_reserve",
+        "case": "high",
+        "code": "realization_timing_missing:value_per_share"
+      }
+    ],
+    "warnings": [],
+    "source_refs": [
+      {
+        "node_id": "normalized_owner_cash",
+        "ref": "CSU/official-reports/Q4-2025-Shareholder-Report.pdf",
+        "locator": "FCFA2S $1683.0M \u00f7 21.19153M diluted shares",
+        "as_of": "2025-12-31",
+        "source_id": "96d3466adcd039f76e46da36e7c92ae578825c90c9b4301d09658b9eb3d0eac5"
+      },
+      {
+        "node_id": "owner_cash_m",
+        "ref": "CSU/official-reports/Q4-2025-Shareholder-Report.pdf",
+        "locator": "Free cash flow available to shareholders $1,683M for year ended December 31, 2025",
+        "as_of": "2025-12-31",
+        "source_id": "869cd85557a547250335eb316bb3551175e906c34f0b0b286da1dbcc0a93eca9"
+      },
+      {
+        "node_id": "shares_m",
+        "ref": "CSU/official-reports/Q4-2025-Shareholder-Report.pdf",
+        "locator": "Weighted average diluted shares 21,191,530 for year ended December 31, 2025",
+        "as_of": "2025-12-31",
+        "source_id": "8118f270c95e555187f9638dde69e8d272ca1ee7def860357b19377f166aa3a0"
+      },
+      {
+        "node_id": "cash_m",
+        "ref": "CSU/official-reports/Q4-2025-Shareholder-Report.pdf",
+        "locator": "Cash and cash equivalents $3,089M at December 31, 2025",
+        "as_of": "2025-12-31",
+        "source_id": "606d3cd4961aa8ab04821c7451e23ed7c904573304f9564adcd4cec5ee697007"
+      },
+      {
+        "node_id": "recourse_debt_m",
+        "ref": "CSU/official-reports/Q4-2025-Shareholder-Report.pdf",
+        "locator": "Debt with recourse to CSI $1,489M at December 31, 2025 (note 11)",
+        "as_of": "2025-12-31",
+        "source_id": "742394c1185574952a3251c5f72a222570aa6aa72820746da195555c51ee2a11"
+      },
+      {
+        "node_id": "contingent_m",
+        "ref": "CSU/official-reports/Q4-2025-Shareholder-Report.pdf",
+        "locator": "Contingent consideration $122M at December 31, 2025",
+        "as_of": "2025-12-31",
+        "source_id": "6133136025734c3919b3bb3770151271e6cbff12f939d1859baf683c7ded221b"
+      }
+    ],
+    "next_action": "automatic_model_refresh",
+    "reconciliation": {
+      "passed": false
+    },
+    "settlement_policy": "Explicit cash/debt additions in an operating DCF are time-zero acquisition adjustments; hypothetical settlement, not declared dividends.",
+    "calculation_id": "6c792ed53ecf8af53fd74961797caf700f67a5ddd9af86fb55bcb3672b2e66eb"
+  },
   "authority": "universal_valuation_contract",
   "legacy_reference_present": true,
   "falsifier_coverage": {

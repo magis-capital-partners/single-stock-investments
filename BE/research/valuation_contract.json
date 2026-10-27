@@ -374,12 +374,88 @@
     ]
   },
   "change_control": {
-    "model_hash": "79e42bbed2629ad49dffc3c2b6cc9e65ede268de6cd2779b2906eb32f3ea1c28",
+    "model_hash": "dba07f02e257ecaa8321c19f3aa8b89639988009b09bb2cf6f1f55c9684adb8a",
     "method_versions": [],
     "change_log": [],
     "rule": "A source fact is locked. Every assumption change requires a reason, author, timestamp, and before/after value."
   },
   "decision_rule": "Proof status and investment readiness are separate. Every material claim must be valued exactly once by a valid calculation proof, every evidence blocker must be resolved, and the model must be stock-specific before committee review. Only a human decision can authorize capital.",
+  "shared_forecast": {
+    "schema_version": "1.0",
+    "method_version": "shared-valuation-forecast/1.1",
+    "ticker": "BE",
+    "status": "model_gap",
+    "research_only": true,
+    "requires_human_review": false,
+    "capital_actionable": false,
+    "as_of": "2026-07-17",
+    "model_as_of": "2026-07-17",
+    "quote": {
+      "value": 221.89,
+      "as_of": "2026-07-17",
+      "source_url": "Yahoo BE close 2026-07-17",
+      "currency": null
+    },
+    "forecast_hash": "a9c8dd9f6e854ed3cc694bb1d3e1d2d3553b3e535fed2fbb8b44359e18fc18c7",
+    "forward_irr_pct": {
+      "low": null,
+      "base": null,
+      "high": null
+    },
+    "present_value_today_per_share": {
+      "low": null,
+      "base": null,
+      "high": null
+    },
+    "model_present_value_per_share": {
+      "low": null,
+      "base": null,
+      "high": null
+    },
+    "required_return_pct": {
+      "low": null,
+      "base": null,
+      "high": null
+    },
+    "forward_cashflow_schedule": {},
+    "buy_prices": [],
+    "components": [
+      {
+        "component_id": "operating_business_fallback",
+        "method": "owner_cash_dcf",
+        "status": "model_gap",
+        "present_value_per_share": {}
+      }
+    ],
+    "gaps": [
+      {
+        "code": "material_component_coverage_incomplete"
+      },
+      {
+        "component_id": "operating_business_fallback",
+        "case": "low",
+        "code": "invalid_calculation_proof"
+      },
+      {
+        "component_id": "operating_business_fallback",
+        "case": "base",
+        "code": "invalid_calculation_proof"
+      },
+      {
+        "component_id": "operating_business_fallback",
+        "case": "high",
+        "code": "invalid_calculation_proof"
+      }
+    ],
+    "warnings": [],
+    "source_refs": [],
+    "next_action": "automatic_model_refresh",
+    "reconciliation": {
+      "passed": false
+    },
+    "settlement_policy": "Explicit cash/debt additions in an operating DCF are time-zero acquisition adjustments; hypothetical settlement, not declared dividends.",
+    "calculation_id": "14ebd39107c39ce6c9619c6fb7285d22c043480de3d85ea65aedafceb169bbfe"
+  },
   "authority": "universal_valuation_contract",
   "legacy_reference_present": true,
   "falsifier_coverage": {

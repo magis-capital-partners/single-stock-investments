@@ -1,7 +1,7 @@
 {
   "schema_version": "3.0",
   "ticker": "APTV",
-  "as_of": "2026-10-26",
+  "as_of": "2026-10-27",
   "proof_status": "evidence_blocked",
   "model_level": "evidence_blocked",
   "model_level_reason": "Prospective falsifier coverage is incomplete.",
@@ -15,7 +15,9 @@
     "model_as_of": "2026-07-25",
     "latest_fact_as_of": "2026-07-25",
     "oldest_fact_as_of": "2025-12-31",
-    "price_as_of": "2026-07-09"
+    "price_as_of": "2026-07-09",
+    "forecast_as_of": "2026-07-25",
+    "calculation_as_of": "2026-07-09"
   },
   "legacy_audit": {
     "actionable": false,
@@ -70,18 +72,20 @@
       "high": null
     },
     "forward_return_status": "withheld",
-    "forward_return_reason": "model maturity is not eligible to publish a return",
+    "forward_return_reason": "shared_forecast_incomplete",
     "required_return_pct": 9.0,
     "downside_to_low_pct": -72.62,
     "unvalued_component_count": 0,
     "unresolved_evidence_count": 0,
     "proof_complete_pct": 100.0,
-    "model_hash": "8ca63288f10bc9a4a846fd7dad0657cc503d1776312c986ac26f602790b57e76",
+    "model_hash": "2cc1adfde98682b36ea2919431f84c8d4e7f6c0b153c41c3f4de65616aeafe32",
     "dates": {
       "model_as_of": "2026-07-25",
       "latest_fact_as_of": "2026-07-25",
       "oldest_fact_as_of": "2025-12-31",
-      "price_as_of": "2026-07-09"
+      "price_as_of": "2026-07-09",
+      "forecast_as_of": "2026-07-25",
+      "calculation_as_of": "2026-07-09"
     },
     "legacy_audit": {
       "actionable": false,
@@ -102,7 +106,11 @@
     },
     "primary_power_zone": "High-return compounder",
     "owner_decision": null,
-    "next_action": "Freeze the evidence packet and select three method-independent raters."
+    "next_action": "Freeze the evidence packet and select three method-independent raters.",
+    "forecast_id": null,
+    "calculation_status": "model_gap",
+    "research_return_available": false,
+    "calculation_reason": "forecast_date_missing_or_future"
   },
   "business": {
     "status": "complete",
@@ -1442,8 +1450,8 @@
                   "ref": "APTV/research/valuation.json",
                   "locator": "inputs.price",
                   "as_of": "2026-07-25",
-                  "content_sha256": "1f3113ea12f8056ea96a4bac9f88c37e07db80d0950125c5388d6d3c304365c4",
-                  "source_id": "8f9366538f3c550de25eb97bf90121b5c9f5a029142f86538acfdf07bede4508"
+                  "content_sha256": "46da03e856edf789bb212319b4a680c6d1468f77c10894658d8094404b98fd02",
+                  "source_id": "5000aaa27bf6effb5d3eb5702c53a7deffb63c06f739d8ec4842c231bd457c9a"
                 },
                 "rationale": null
               },
@@ -1482,8 +1490,8 @@
                   "ref": "APTV/research/valuation.json",
                   "locator": "inputs.price",
                   "as_of": "2026-07-25",
-                  "content_sha256": "1f3113ea12f8056ea96a4bac9f88c37e07db80d0950125c5388d6d3c304365c4",
-                  "source_id": "8f9366538f3c550de25eb97bf90121b5c9f5a029142f86538acfdf07bede4508"
+                  "content_sha256": "46da03e856edf789bb212319b4a680c6d1468f77c10894658d8094404b98fd02",
+                  "source_id": "5000aaa27bf6effb5d3eb5702c53a7deffb63c06f739d8ec4842c231bd457c9a"
                 },
                 "rationale": null
               },
@@ -1522,8 +1530,8 @@
                   "ref": "APTV/research/valuation.json",
                   "locator": "inputs.price",
                   "as_of": "2026-07-25",
-                  "content_sha256": "1f3113ea12f8056ea96a4bac9f88c37e07db80d0950125c5388d6d3c304365c4",
-                  "source_id": "8f9366538f3c550de25eb97bf90121b5c9f5a029142f86538acfdf07bede4508"
+                  "content_sha256": "46da03e856edf789bb212319b4a680c6d1468f77c10894658d8094404b98fd02",
+                  "source_id": "5000aaa27bf6effb5d3eb5702c53a7deffb63c06f739d8ec4842c231bd457c9a"
                 },
                 "rationale": null
               },
@@ -1558,8 +1566,8 @@
               "ref": "APTV/research/valuation.json",
               "locator": "inputs.price",
               "as_of": "2026-07-25",
-              "content_sha256": "1f3113ea12f8056ea96a4bac9f88c37e07db80d0950125c5388d6d3c304365c4",
-              "source_id": "8f9366538f3c550de25eb97bf90121b5c9f5a029142f86538acfdf07bede4508"
+              "content_sha256": "46da03e856edf789bb212319b4a680c6d1468f77c10894658d8094404b98fd02",
+              "source_id": "5000aaa27bf6effb5d3eb5702c53a7deffb63c06f739d8ec4842c231bd457c9a"
             },
             {
               "node_id": "normalized_owner_cash",
@@ -1573,7 +1581,7 @@
             "passed": true,
             "errors": []
           },
-          "proof_hash": "f5e346c8097ad0c547cef4700f6013d8a71a38816dfe3819564a64c37e2367b1"
+          "proof_hash": "0e81414c4b4be8964b8c83678b0bf871007b0d609be3268bb30d262d1f565362"
         },
         "evidence_tier": "primary_derived",
         "evidence_level": "primary_derived",
@@ -1650,7 +1658,9 @@
       "model_as_of": "2026-07-25",
       "latest_fact_as_of": "2026-07-25",
       "oldest_fact_as_of": "2025-12-31",
-      "price_as_of": "2026-07-09"
+      "price_as_of": "2026-07-09",
+      "forecast_as_of": "2026-07-25",
+      "calculation_as_of": "2026-07-09"
     },
     "legacy_audit": {
       "actionable": false,
@@ -3075,8 +3085,8 @@
                   "ref": "APTV/research/valuation.json",
                   "locator": "inputs.price",
                   "as_of": "2026-07-25",
-                  "content_sha256": "1f3113ea12f8056ea96a4bac9f88c37e07db80d0950125c5388d6d3c304365c4",
-                  "source_id": "8f9366538f3c550de25eb97bf90121b5c9f5a029142f86538acfdf07bede4508"
+                  "content_sha256": "46da03e856edf789bb212319b4a680c6d1468f77c10894658d8094404b98fd02",
+                  "source_id": "5000aaa27bf6effb5d3eb5702c53a7deffb63c06f739d8ec4842c231bd457c9a"
                 },
                 "rationale": null
               },
@@ -3115,8 +3125,8 @@
                   "ref": "APTV/research/valuation.json",
                   "locator": "inputs.price",
                   "as_of": "2026-07-25",
-                  "content_sha256": "1f3113ea12f8056ea96a4bac9f88c37e07db80d0950125c5388d6d3c304365c4",
-                  "source_id": "8f9366538f3c550de25eb97bf90121b5c9f5a029142f86538acfdf07bede4508"
+                  "content_sha256": "46da03e856edf789bb212319b4a680c6d1468f77c10894658d8094404b98fd02",
+                  "source_id": "5000aaa27bf6effb5d3eb5702c53a7deffb63c06f739d8ec4842c231bd457c9a"
                 },
                 "rationale": null
               },
@@ -3155,8 +3165,8 @@
                   "ref": "APTV/research/valuation.json",
                   "locator": "inputs.price",
                   "as_of": "2026-07-25",
-                  "content_sha256": "1f3113ea12f8056ea96a4bac9f88c37e07db80d0950125c5388d6d3c304365c4",
-                  "source_id": "8f9366538f3c550de25eb97bf90121b5c9f5a029142f86538acfdf07bede4508"
+                  "content_sha256": "46da03e856edf789bb212319b4a680c6d1468f77c10894658d8094404b98fd02",
+                  "source_id": "5000aaa27bf6effb5d3eb5702c53a7deffb63c06f739d8ec4842c231bd457c9a"
                 },
                 "rationale": null
               },
@@ -3191,8 +3201,8 @@
               "ref": "APTV/research/valuation.json",
               "locator": "inputs.price",
               "as_of": "2026-07-25",
-              "content_sha256": "1f3113ea12f8056ea96a4bac9f88c37e07db80d0950125c5388d6d3c304365c4",
-              "source_id": "8f9366538f3c550de25eb97bf90121b5c9f5a029142f86538acfdf07bede4508"
+              "content_sha256": "46da03e856edf789bb212319b4a680c6d1468f77c10894658d8094404b98fd02",
+              "source_id": "5000aaa27bf6effb5d3eb5702c53a7deffb63c06f739d8ec4842c231bd457c9a"
             },
             {
               "node_id": "normalized_owner_cash",
@@ -3206,7 +3216,7 @@
             "passed": true,
             "errors": []
           },
-          "proof_hash": "f5e346c8097ad0c547cef4700f6013d8a71a38816dfe3819564a64c37e2367b1"
+          "proof_hash": "0e81414c4b4be8964b8c83678b0bf871007b0d609be3268bb30d262d1f565362"
         },
         "evidence_tier": "primary_derived",
         "evidence_level": "primary_derived",
@@ -3273,7 +3283,7 @@
       },
       "all_material_components_priced": true,
       "calculation_errors": [],
-      "aggregate_proof_hash": "3d80ecaec09d4f0c7bf1c9a245f0b58aeb2dfb2716fae605b62a74ffd2672052"
+      "aggregate_proof_hash": "b3ed24b8a2e81905de16a4527b869ce56627fd24fdc7fa95a554cb1859d491f7"
     },
     "model_checks": {
       "calculation_graphs_valid": true,
@@ -3349,8 +3359,8 @@
         "ref": "APTV/research/valuation.json",
         "locator": "inputs.price",
         "as_of": "2026-07-25",
-        "content_sha256": "1f3113ea12f8056ea96a4bac9f88c37e07db80d0950125c5388d6d3c304365c4",
-        "source_id": "8f9366538f3c550de25eb97bf90121b5c9f5a029142f86538acfdf07bede4508"
+        "content_sha256": "46da03e856edf789bb212319b4a680c6d1468f77c10894658d8094404b98fd02",
+        "source_id": "5000aaa27bf6effb5d3eb5702c53a7deffb63c06f739d8ec4842c231bd457c9a"
       },
       {
         "component_id": "cycle_reserve",
@@ -3362,7 +3372,7 @@
       }
     ],
     "change_control": {
-      "model_hash": "8ca63288f10bc9a4a846fd7dad0657cc503d1776312c986ac26f602790b57e76",
+      "model_hash": "2cc1adfde98682b36ea2919431f84c8d4e7f6c0b153c41c3f4de65616aeafe32",
       "method_versions": [
         "midcycle_capacity_value@1.0",
         "net_asset_value@1.0",
@@ -3569,17 +3579,19 @@
   },
   "freshness": {
     "status": "stale",
-    "as_of": "2026-10-26",
+    "as_of": "2026-10-27",
     "dates": {
       "model_as_of": "2026-07-25",
       "latest_fact_as_of": "2026-07-25",
       "oldest_fact_as_of": "2025-12-31",
-      "price_as_of": "2026-07-09"
+      "price_as_of": "2026-07-09",
+      "forecast_as_of": "2026-07-25",
+      "calculation_as_of": "2026-07-09"
     },
     "age_days": {
-      "model_as_of": 93,
-      "latest_fact_as_of": 93,
-      "price_as_of": 109
+      "model_as_of": 94,
+      "latest_fact_as_of": 94,
+      "price_as_of": 110
     },
     "review_threshold_days": {
       "model_as_of": 365,
@@ -3587,7 +3599,7 @@
       "price_as_of": 7
     },
     "warnings": [
-      "price_as_of is 109 days old (review threshold 7)"
+      "price_as_of is 110 days old (review threshold 7)"
     ],
     "rule": "Freshness is disclosed separately from proof completeness; stale or undated inputs require review before a new capital decision."
   }

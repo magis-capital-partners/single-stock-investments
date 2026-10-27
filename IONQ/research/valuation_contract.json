@@ -390,12 +390,88 @@
     ]
   },
   "change_control": {
-    "model_hash": "40ee3b74b975ab116c4c09693bb65f170a50ba11b59312e463d1d7be494c4f0b",
+    "model_hash": "1e2b41f3e87bd40d155e451d4f8ed4e7f1209fe91cdf31d03e16cd378ad3de16",
     "method_versions": [],
     "change_log": [],
     "rule": "A source fact is locked. Every assumption change requires a reason, author, timestamp, and before/after value."
   },
   "decision_rule": "Proof status and investment readiness are separate. Every material claim must be valued exactly once by a valid calculation proof, every evidence blocker must be resolved, and the model must be stock-specific before committee review. Only a human decision can authorize capital.",
+  "shared_forecast": {
+    "schema_version": "1.0",
+    "method_version": "shared-valuation-forecast/1.1",
+    "ticker": "IONQ",
+    "status": "model_gap",
+    "research_only": true,
+    "requires_human_review": false,
+    "capital_actionable": false,
+    "as_of": "2026-07-18",
+    "model_as_of": "2026-07-18",
+    "quote": {
+      "value": 34.78,
+      "as_of": "2026-07-18",
+      "source_url": "Yahoo Finance IONQ close 2026-07-17",
+      "currency": null
+    },
+    "forecast_hash": "f229191218861db7d59d10a460140e193dae1e3affc31b0e18f4e934ba09aa16",
+    "forward_irr_pct": {
+      "low": null,
+      "base": null,
+      "high": null
+    },
+    "present_value_today_per_share": {
+      "low": null,
+      "base": null,
+      "high": null
+    },
+    "model_present_value_per_share": {
+      "low": null,
+      "base": null,
+      "high": null
+    },
+    "required_return_pct": {
+      "low": null,
+      "base": null,
+      "high": null
+    },
+    "forward_cashflow_schedule": {},
+    "buy_prices": [],
+    "components": [
+      {
+        "component_id": "operating_business_fallback",
+        "method": "owner_cash_dcf",
+        "status": "model_gap",
+        "present_value_per_share": {}
+      }
+    ],
+    "gaps": [
+      {
+        "code": "material_component_coverage_incomplete"
+      },
+      {
+        "component_id": "operating_business_fallback",
+        "case": "low",
+        "code": "invalid_calculation_proof"
+      },
+      {
+        "component_id": "operating_business_fallback",
+        "case": "base",
+        "code": "invalid_calculation_proof"
+      },
+      {
+        "component_id": "operating_business_fallback",
+        "case": "high",
+        "code": "invalid_calculation_proof"
+      }
+    ],
+    "warnings": [],
+    "source_refs": [],
+    "next_action": "automatic_model_refresh",
+    "reconciliation": {
+      "passed": false
+    },
+    "settlement_policy": "Explicit cash/debt additions in an operating DCF are time-zero acquisition adjustments; hypothetical settlement, not declared dividends.",
+    "calculation_id": "f8bb2e51356d3992aa36c91314418fd5d1d00a0a5f31e19d599888a1fdcf4345"
+  },
   "authority": "universal_valuation_contract",
   "legacy_reference_present": true,
   "falsifier_coverage": {
