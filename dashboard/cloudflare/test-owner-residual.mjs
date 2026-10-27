@@ -138,6 +138,72 @@ test("residual rows keep broker market value by allocating the full quantity", (
   assert.equal(base * allocated / brokerQty, 1200);
 });
 
+// etf-0dte: spx-0dte's SPY / QQQ 0DTE executors. The port must route exactly as
+// classify_positions.py / allocation_policy.py do. The live universe lists SPY
+// and QQQ, which is why these rules run before the LS rules.
+test("etf-0dte options and shares belong to no owner, ahead of the LS rules", () => {
+  const ls = lsUniverseSymbols();
+  assert.equal(ls.has("SPY") && ls.has("QQQ"), true);
+  const policy = (row) => classifyPolicyPosition(row, { lsSymbols: ls, drewSymbols: new Set(["SPY", "QQQ"]) });
+
+  for (const row of [
+    { symbol: "SPY", local_symbol: "SPY   261027P00570000", sec_type: "OPT" },
+    { symbol: "SPY   261027P00570000", local_symbol: "SPY   261027P00570000", sec_type: "OPT" },
+    { symbol: "QQQ   271217C00500000", local_symbol: "QQQ   271217C00500000", sec_type: "OPT" },
+  ]) {
+    assert.deepEqual(policy(row), {
+      owner: "unallocated", strategy: "etf_0dte", reason: "etf_0dte_option_exclusion", bucket: "etf_0dte",
+    });
+  }
+  // The edge has no delivery forecast: every SPY / QQQ share is unattributed.
+  assert.deepEqual(policy({ symbol: "SPY", local_symbol: "SPY", sec_type: "STK", quantity_decimal: "-100" }), {
+    owner: "unallocated", strategy: "etf_0dte", reason: "etf_0dte_unattributed_shares",
+    bucket: "etf_0dte_delivery_unattributed",
+  });
+  assert.equal(policy({ symbol: "QQQ", local_symbol: "QQQ", sec_type: "STK" }).strategy, "etf_0dte");
+  // Lookalikes and index options are untouched.
+  assert.equal(policy({ symbol: "SPYG", local_symbol: "SPYG", sec_type: "STK" }).owner, "michael");
+  assert.equal(policy({ symbol: "SPXW  260817P05000000", local_symbol: "SPXW  260817P05000000", sec_type: "OPT" }).strategy, "spx_0dte");
+  assert.equal(policy({ symbol: "XSP   270129P00540000", local_symbol: "XSP   270129P00540000", sec_type: "OPT" }).strategy, "ls_algo");
+});
+
+test("the port matches the Python share rule branch for branch", () => {
+  const cls = (pos, opts = {}) => classifyPosition(pos, { etfLsSymbols: ["SPY", "QQQ"], ...opts });
+  const shares = (qty, extra = {}) => ({ symbol: "SPY", secType: "STK", qty, ...extra });
+
+  assert.deepEqual(cls(shares(-100), { etf0dteDelivery: { SPY: -100 } }), {
+    ticker: "SPY", bucket: "etf_0dte_delivery", reason: "expected_delivery", owner: null,
+  });
+  assert.equal(cls(shares(40), { etf0dteDelivery: { SPY: 100 } }).bucket, "etf_0dte_delivery");
+  assert.equal(cls(shares(100)).reason, "no_forecast");
+  assert.equal(cls(shares(100), { etf0dteDelivery: { QQQ: 100 } }).reason, "no_forecast");
+  assert.equal(cls(shares(100), { etf0dteDelivery: { SPY: 0 } }).reason, "beyond_forecast");
+  assert.equal(cls(shares(100), { etf0dteDelivery: { SPY: -100 } }).reason, "beyond_forecast");
+  assert.equal(cls(shares(150), { etf0dteDelivery: { SPY: 100 } }).reason, "beyond_forecast");
+  assert.equal(cls({ symbol: "SPY", secType: "STK" }).reason, "quantity_unknown");
+  assert.equal(cls(shares(0)).reason, "flat");
+  // A known holding keeps its current bucket; shares beyond it do not.
+  assert.equal(cls(shares(500), { etf0dteKnownHoldings: { SPY: 500 } }).bucket, "etf_ls");
+  assert.equal(cls(shares(600), { etf0dteKnownHoldings: { SPY: 500 }, etf0dteDelivery: { SPY: 100 } }).bucket, "etf_0dte_delivery");
+  // Stamps: etf-0dte's beats everything; another system's keeps its rule.
+  assert.equal(cls(shares(100, { orderRef: "SPY0DTE|UNWIND|x" })).reason, "order_ref");
+  assert.equal(cls({ symbol: "XSP   270129P00540000", secType: "OPT", orderRef: "QQQ0DTE|x" }).bucket, "etf_0dte");
+  assert.equal(cls({ symbol: "SPY", secType: "OPT", orderRef: "ETF_LS|HEDGE|SPY" }).reason, "ls_algo_option_overlay");
+  assert.equal(cls(shares(100, { orderRef: "ETF_LS|ESTABLISH|SPY" })).bucket, "etf_ls");
+});
+
+test("etf-0dte rows never reach Michael's residual book", () => {
+  const rows = michaelResidualPositions([
+    position({ conid: 1, symbol: "CSU", local_symbol: "CSU", quantity_decimal: "12", market_value_base_decimal: "1200" }),
+    position({ conid: 2, symbol: "SPY", local_symbol: "SPY", quantity_decimal: "100", market_value_base_decimal: "58000" }),
+    position({
+      conid: 3, symbol: "QQQ   261027C00500000", local_symbol: "QQQ   261027C00500000",
+      sec_type: "OPT", quantity_decimal: "-2", market_value_base_decimal: "-300",
+    }),
+  ], { lsSymbols: new Set(), drewSymbols: [] });
+  assert.deepEqual(rows.map((row) => row.symbol), ["CSU"]);
+});
+
 function portfolioDb({
   ownerJoinRows = [],
   brokerRows = [],

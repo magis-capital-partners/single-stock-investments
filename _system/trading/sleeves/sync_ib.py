@@ -15,10 +15,17 @@ if str(ROOT) not in sys.path:
     sys.path.insert(0, str(ROOT))
 
 from _system.trading.sleeves.book import build_book, export_static_books
-from _system.trading.sleeves.classify_positions import classify_positions, expand_blacklist_symbols, norm_sym
+from _system.trading.sleeves.classify_positions import (
+    OTHER_SYSTEM_BUCKETS,
+    classify_positions,
+    expand_blacklist_symbols,
+    norm_sym,
+)
 from _system.trading.sleeves.config_loader import (
     load_blacklist,
     load_config,
+    load_etf_0dte_expected_delivery,
+    load_etf_0dte_known_holdings,
     load_etf_ls_universe,
     load_etf_to_under,
 )
@@ -219,17 +226,24 @@ def sync_holdings(
         norm_sym(symbol)
         for symbol in ((cfg.get("operators") or {}).get("drew") or {}).get("symbols") or []
     ]
+    # SPY / QQQ shares are attributed against spx-0dte's delivery forecast; with
+    # none configured or found they are etf_0dte_delivery_unattributed. Either
+    # way no sleeve owns them.
     classified = classify_positions(
         rows,
         blacklist_family=family,
         etf_ls_symbols=letf,
         drew_symbols=drew_symbols,
+        etf_0dte_delivery=load_etf_0dte_expected_delivery(dict(cfg)),
+        etf_0dte_known_holdings=load_etf_0dte_known_holdings(dict(cfg)),
     )
     tags = {int(t["con_id"]): t for t in store.sleeve_tags() if t.get("con_id")}
     tags_by_ticker = {(t.get("owner"), str(t.get("ticker") or "").upper()): t for t in store.sleeve_tags()}
     for row in classified:
         cls = row.get("classification") or {}
-        if cls.get("bucket") in {"spx_0dte", "etf_ls", "index_put_hedge"}:
+        # Another system's row is never re-owned by a sleeve tag. This is what
+        # keeps a Drew tag on SPY from claiming an etf-0dte delivery.
+        if cls.get("bucket") in OTHER_SYSTEM_BUCKETS:
             continue
         con_id = int(row.get("conId") or 0)
         tag = tags.get(con_id)
