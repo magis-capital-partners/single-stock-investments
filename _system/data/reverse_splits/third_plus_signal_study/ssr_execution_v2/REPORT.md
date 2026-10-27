@@ -69,4 +69,4 @@ node --test _system/scripts/third_plus_execution/*.test.cjs
 
 The normalizer uses existing receipt-verified files only and performs no downloads. Missing successor captures stay missing even when successor daily benchmark prices exist. Qualified replay inputs and historical lending/settlement evidence are required to produce an executable account estimate.
 
-Publication 758ef993102fe485b3aecff4870fa0981d198afac4f3fd93adc593dcd373234d.
+Publication fdcaffdc421d4e77c2aa8ca20a955d4523d91b1ad3becb37cc692f7637c88f64.
