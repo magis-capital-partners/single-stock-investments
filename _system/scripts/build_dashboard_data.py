@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import csv
 import json
+from atomic_io import _atomic_write_text
 import os
 import re
 import sys
@@ -213,7 +214,7 @@ def reconcile_onboard_status(ticker_dir: Path, pdf_count: int) -> dict | None:
         "deep_dive_pending": status.get("deep_dive_pending", True),
     }
     path = ticker_dir / ".onboard_status.json"
-    path.write_text(json.dumps(healed, indent=2) + "\n", encoding="utf-8")
+    _atomic_write_text(path, json.dumps(healed, indent=2) + "\n")
     return healed
 
 
@@ -721,7 +722,7 @@ def build_document_catalog(document_registry: dict | None) -> dict | None:
         "known_tickers": sorted(by_ticker.keys()),
         "documents": rows,
     }
-    DOCUMENT_CATALOG_PATH.write_text(json.dumps(catalog, indent=2, sort_keys=True) + "\n", encoding="utf-8")
+    _atomic_write_text(DOCUMENT_CATALOG_PATH, json.dumps(catalog, indent=2, sort_keys=True) + "\n")
     return catalog
 
 
@@ -3557,7 +3558,7 @@ def write_oauth_config() -> None:
             "Create a GitHub OAuth App; callback URL must match .../oauth/callback.html on Pages.",
         ),
     }
-    OAUTH_CONFIG.write_text(json.dumps(payload, indent=2) + "\n", encoding="utf-8")
+    _atomic_write_text(OAUTH_CONFIG, json.dumps(payload, indent=2) + "\n")
 
 
 def _load_json(path: Path) -> dict | None:
@@ -3746,8 +3747,7 @@ def main() -> None:
     learning_loop = build_learning_loop_summary()
     if memory_doc and learning_loop:
         memory_doc["learning_loop"] = learning_loop
-        RESEARCH_MEMORY_PATH.write_text(
-            json.dumps(memory_doc, separators=(",", ":")), encoding="utf-8")
+        _atomic_write_text(RESEARCH_MEMORY_PATH, json.dumps(memory_doc, separators=(",", ":")))
     # Restore and guards must judge against the same prior (shard-aware).
     payload = build(prior_by_ticker)
     if short_alpha:
@@ -3864,7 +3864,7 @@ def main() -> None:
     released = release_standalone_embeds(payload)
     if released:
         print(f"Left standalone embeds out of the monolith: {', '.join(released)}")
-    OUTPUT.write_text(json.dumps(payload, separators=(",", ":")), encoding="utf-8")
+    _atomic_write_text(OUTPUT, json.dumps(payload, separators=(",", ":")))
     print(f"Wrote {OUTPUT} ({payload['summary']['ticker_count']} tickers)")
     if UNRESOLVED_UNITS:
         # Not fatal: these render as bare numbers, which is honest. It is still a

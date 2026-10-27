@@ -349,7 +349,7 @@ jobs:
         timeout-minutes: 37
         name: "Activist scan: SEC filings (rotating, 30-minute budget)"
         continue-on-error: true
-        run: timeout --kill-after=60s 35m python _system/scripts/scan_activist_sources.py --phase sec --budget-min 30
+        run: timeout --kill-after=60s 35m python -u _system/scripts/scan_activist_sources.py --phase sec --budget-min 30 --workers 3
       - name: Commit SEC phase progress
         timeout-minutes: 8
         # Never on a failed/partial checkout: `git add -A` there could stage

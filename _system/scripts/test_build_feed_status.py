@@ -124,6 +124,14 @@ class FixtureTests(unittest.TestCase):
             "nol_screener": {"rows": [], "actionable_count": 0},
             "advantaged_banks_screener": {"rows": [{"is_low_cost": True}]},
         }), encoding="utf-8")
+        # Screens own their observation snapshots; a new core build must not
+        # supply a screen's timestamp or conceal its missing fields.
+        (core.parent/'nol_screener.json').write_text(json.dumps({
+            'built_at':'2026-10-06T12:00:00Z','rows':[],'actionable_count':0}),encoding='utf-8')
+        (core.parent/'advantaged_banks_screener.json').write_text(json.dumps({
+            'built_at':'2026-10-06T12:00:00Z','rows':[{
+                'deposits_total_usd':100,'dda_share_pct':40,
+                'cost_of_deposits_pct':1,'p_tbv':1,'is_low_cost':True}]}),encoding='utf-8')
         built = {row["id"]: row for row in feeds.build_feed_status(self.root, ClassifyTests.NOW)["surfaces"]}
         self.assertIn("The supervisor will retry this lane", built["coverage"]["next_action"])
         self.assertIn("A lane-failure issue is open.", built["valuation"]["next_action"])

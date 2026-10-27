@@ -37,7 +37,7 @@ jobs:
           restore-keys: aggregates-evidence-v1-
       - name: Refresh financial and operating evidence
         run: |
-          python _system/scripts/build_rock_aggregates_screener.py --refresh-operating --write
+          python -u _system/scripts/build_rock_aggregates_screener.py --refresh-operating --write
           python _system/scripts/build_rock_aggregates_screener.py --check
       - name: Publish validated aggregates snapshot
         uses: ./.github/actions/commit-main

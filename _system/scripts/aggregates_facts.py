@@ -17,6 +17,7 @@ FLOW_TAGS = {
     'interest_expense_usd':['InterestExpenseNonOperating','InterestAndDebtExpense','InterestExpense'],
     'income_tax_usd':['IncomeTaxExpenseBenefit'],
     'pretax_income_usd':['IncomeLossFromContinuingOperationsBeforeIncomeTaxesExtraordinaryItemsNoncontrollingInterest','IncomeLossFromContinuingOperationsBeforeIncomeTaxesMinorityInterestAndIncomeLossFromEquityMethodInvestments'],
+    'nonoperating_income_usd':['OtherNonoperatingIncomeExpense'],
 }
 BALANCE_TAGS={
     'cash_usd':['CashAndCashEquivalentsAtCarryingValue'],
@@ -34,6 +35,24 @@ BALANCE_TAGS={
     'reported_total_debt_usd':['LongTermDebtAndCapitalLeaseObligations','LongTermDebt','DebtAndCapitalLeaseObligations'],
 }
 FORMS={'10-K','10-K/A','10-Q','10-Q/A','20-F','20-F/A','40-F','40-F/A'}
+IFRS_TAGS={
+    'revenue_usd':['Revenue','RevenueFromContractsWithCustomers'],
+    'operating_income_usd':['ProfitLossFromOperatingActivities'],
+    'dda_usd':['DepreciationDepletionAndAmortisation','DepreciationAndAmortisationExpense'],
+    'cfo_usd':['CashFlowsFromUsedInOperatingActivities'],
+    'capex_usd':['PurchaseOfPropertyPlantAndEquipmentClassifiedAsInvestingActivities'],
+    'net_income_usd':['ProfitLossAttributableToOwnersOfParent','ProfitLoss'],
+    'cash_usd':['CashAndCashEquivalents'],
+    'equity_usd':['EquityAttributableToOwnersOfParent','Equity'],
+    'total_assets_usd':['Assets'],
+    'ppe_net_usd':['PropertyPlantAndEquipment'],
+    'goodwill_usd':['Goodwill'],
+    'intangibles_usd':['IntangibleAssetsOtherThanGoodwill'],
+    'current_debt_usd':['CurrentBorrowings','CurrentPortionOfLongtermBorrowings'],
+    'noncurrent_debt_usd':['NoncurrentBorrowings','LongtermBorrowings'],
+    'reported_total_debt_usd':['Borrowings'],
+    'noncontrolling_interest_usd':['NoncontrollingInterests'],
+}
 
 
 def finite(value):
@@ -53,14 +72,16 @@ def observation(ticker, cik, key, tag, unit, row, retrieved_at):
         'filed_at':row.get('filed'),'retrieved_at':retrieved_at,'business_segment':'corporate','geography':'consolidated','product':'all',
         'freight_basis':'reported','sales_scope':'consolidated','perimeter_basis':'reported','status':'reported','confidence':'high',
         'source_url':f"https://www.sec.gov/Archives/edgar/data/{int(cik)}/{accession.replace('-','')}/" if accession else f'https://data.sec.gov/api/xbrl/companyfacts/CIK{cik}.json',
-        'accession':accession,'locator':'us-gaap:'+tag,'version':'aggregates-financial-v1'}
+        'accession':accession,'locator':row.get('namespace','us-gaap')+':'+tag,'version':'aggregates-financial-v1'}
 
 
 def collect(facts, ticker, cik, retrieved_at, retain_vintages=False):
     selected={}
-    for key,tags in {**FLOW_TAGS,**BALANCE_TAGS}.items():
+    namespace='us-gaap' if facts.get('facts',{}).get('us-gaap') else 'ifrs-full'
+    mapping={**FLOW_TAGS,**BALANCE_TAGS} if namespace=='us-gaap' else IFRS_TAGS
+    for key,tags in mapping.items():
         for rank,tag in enumerate(tags):
-            for unit,rows in facts.get('facts',{}).get('us-gaap',{}).get(tag,{}).get('units',{}).items():
+            for unit,rows in facts.get('facts',{}).get(namespace,{}).get(tag,{}).get('units',{}).items():
                 if unit!='USD':continue
                 for row in rows:
                     if row.get('form') not in FORMS or not finite(row.get('val')) or not row.get('end'):continue
@@ -70,7 +91,7 @@ def collect(facts, ticker, cik, retrieved_at, retain_vintages=False):
                     old=selected.get(signature)
                     # Latest filing restatement wins; tag preference breaks ties.
                     priority=(str(row.get('filed') or ''),-rank)
-                    if not old or priority>old[0]:selected[signature]=(priority,observation(ticker,cik,key,tag,unit,row,retrieved_at))
+                    if not old or priority>old[0]:selected[signature]=(priority,observation(ticker,cik,key,tag,unit,{**row,'namespace':namespace},retrieved_at))
     return [v[1] for v in selected.values()]
 
 
@@ -87,7 +108,13 @@ def balance_at(observations, end):
         result['debt_basis']='noncurrent plus current debt; short-term borrowings scope unresolved' if 'short_term_borrowings_usd' in result else 'noncurrent plus current debt'
         current_is_total=found['current_debt_usd'].get('locator')=='us-gaap:DebtCurrent'
         if result.get('short_term_borrowings_usd',0)!=0 and not current_is_total:
-            result['total_debt_usd']=None
+            if found['current_debt_usd'].get('locator')=='us-gaap:LongTermDebtCurrent' and found['noncurrent_debt_usd'].get('locator')=='us-gaap:LongTermDebtNoncurrent':
+                # Current portion of long-term debt excludes the separately
+                # tagged short-term borrowing balance (AMRZ June 2026 cover).
+                result['total_debt_usd']+=result['short_term_borrowings_usd']
+                result['debt_basis']='noncurrent long-term debt + current long-term portion + separate short-term borrowings'
+            else:
+                result['total_debt_usd']=None
     else:
         result['total_debt_usd']=None
         result['debt_basis']='incomplete debt scope'

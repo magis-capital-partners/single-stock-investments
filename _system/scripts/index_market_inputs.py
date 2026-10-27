@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import json
 from pathlib import Path
+from datetime import datetime, timezone
 from typing import Any
 
 ROOT = Path(__file__).resolve().parents[2]
@@ -65,6 +66,15 @@ def load_fundamentals_cache() -> dict[str, dict]:
     return merged
 
 
+def current_usd_snapshot(row: dict, now: datetime | None = None) -> bool:
+    if row.get('currency')!='USD' or not row.get('market_cap_as_of'):return False
+    try:
+        stamp=datetime.fromisoformat(row['market_cap_as_of'].replace('Z','+00:00'))
+        age=((now or datetime.now(timezone.utc))-stamp).total_seconds()/86400
+        return 0<=age<=7
+    except (TypeError,ValueError):return False
+
+
 def market_inputs_for_ticker(
     ticker: str,
     *,
@@ -112,6 +122,12 @@ def market_inputs_for_ticker(
             mcap = None
 
     cache = (fundamentals_cache or {}).get(ticker.upper()) or {}
+    if current_usd_snapshot(cache):
+        # Market eligibility uses the current observation, even when a saved
+        # valuation still contains an older price and capitalization.
+        if cache.get('issuer_market_cap'):mcap=float(cache['issuer_market_cap'])
+        if cache.get('price'):price=float(cache['price'])
+        if cache.get('shares_outstanding'):shares=float(cache['shares_outstanding'])
     if mcap is None and cache.get("issuer_market_cap"):
         try:
             mcap = float(cache["issuer_market_cap"])
@@ -122,7 +138,7 @@ def market_inputs_for_ticker(
             shares = float(cache["shares_outstanding"])
         except (TypeError, ValueError):
             pass
-    if price is None and cache.get("price"):
+    if price is None and cache.get("price") and cache.get('currency', 'USD') == 'USD':
         try:
             price = float(cache["price"])
         except (TypeError, ValueError):
@@ -245,5 +261,6 @@ def market_inputs_for_ticker(
         "earnings_positive": earnings_positive,
         "earnings_note": earnings_note,
         "missing": missing,
-        "mcap_source": "valuation_or_price_x_shares" if mcap is not None else None,
+        "mcap_source": (cache.get('source') if cache.get('issuer_market_cap') == mcap else "valuation_or_price_x_shares") if mcap is not None else None,
+        "market_as_of": cache.get('market_cap_as_of') if cache.get('issuer_market_cap') == mcap else None,
     }

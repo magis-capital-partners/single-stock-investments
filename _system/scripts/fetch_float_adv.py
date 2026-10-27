@@ -130,6 +130,8 @@ def fetch_yahoo_float_adv(ticker: str) -> dict[str, Any]:
     price = None
     adv_shares = None
     mcap = None
+    currency = None
+    quote_time = None
     if chart:
         try:
             result = chart["chart"]["result"][0]
@@ -146,6 +148,8 @@ def fetch_yahoo_float_adv(ticker: str) -> dict[str, Any]:
                 adv_shares = sum(v for v, _ in pairs) / len(pairs)
                 price = float(pairs[-1][1])
             meta = result.get("meta") or {}
+            currency = meta.get("currency")
+            quote_time = meta.get("regularMarketTime")
             mpx = meta.get("regularMarketPrice")
             if isinstance(mpx, (int, float)) and mpx > 0:
                 price = float(mpx)
@@ -175,6 +179,7 @@ def fetch_yahoo_float_adv(ticker: str) -> dict[str, Any]:
             dks = res.get("defaultKeyStatistics") or {}
             sd = res.get("summaryDetail") or {}
             pr = res.get("price") or {}
+            currency = currency or pr.get('currency')
 
             def _raw(node, key):
                 v = (node.get(key) or {})
@@ -221,7 +226,7 @@ def fetch_yahoo_float_adv(ticker: str) -> dict[str, Any]:
             pass
 
     adv_dollar = None
-    if adv_shares is not None and price is not None:
+    if adv_shares is not None and price is not None and currency == 'USD':
         adv_dollar = float(adv_shares) * float(price)
 
     out.update(
@@ -242,7 +247,9 @@ def fetch_yahoo_float_adv(ticker: str) -> dict[str, Any]:
             "adv_shares": round(float(adv_shares), 2) if adv_shares else None,
             "price": round(float(price), 4) if price else None,
             "adv_dollar": round(float(adv_dollar), 2) if adv_dollar else None,
-            "market_cap_usd": round(float(mcap), 2) if mcap else None,
+            "issuer_market_cap": round(float(mcap), 2) if mcap and currency == 'USD' else None,
+            "currency": currency,
+            "market_cap_as_of": datetime.fromtimestamp(quote_time, timezone.utc).isoformat() if quote_time else None,
             "held_percent_insiders": insider_pct,
             "source": "yahoo_quoteSummary+chart",
             "as_of": date.today().isoformat(),
