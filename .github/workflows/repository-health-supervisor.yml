@@ -34,11 +34,17 @@ jobs:
   supervise:
     runs-on: ubuntu-latest
     timeout-minutes: 30
+    env:
+      RESEARCH_VAULT_REPO_URL: ${{ secrets.RESEARCH_VAULT_REPO_URL }}
+      RESEARCH_VAULT_CLONE_TOKEN: ${{ secrets.RESEARCH_VAULT_CLONE_TOKEN }}
+      RESEARCH_VAULT_ROOT: _external/research-vault
     steps:
       - uses: actions/checkout@v4
         with:
           sparse-checkout: |
             .github/actions/commit-main
+            .github/actions/preserve-private-dashboard
+            .github/actions/checkout-vault
             .github/workflows
             _system/scripts
             _system/graph/graph_sources.json
@@ -61,6 +67,8 @@ jobs:
             dashboard/data/buyback_manifest.json
           sparse-checkout-cone-mode: false
           fetch-depth: 1
+      - name: Checkout research vault
+        uses: ./.github/actions/checkout-vault
       - uses: actions/setup-python@v5
         with:
           python-version: "3.12"

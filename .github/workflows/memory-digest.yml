@@ -16,10 +16,16 @@ jobs:
   triage:
     runs-on: ubuntu-latest
     timeout-minutes: 20
+    env:
+      RESEARCH_VAULT_REPO_URL: ${{ secrets.RESEARCH_VAULT_REPO_URL }}
+      RESEARCH_VAULT_CLONE_TOKEN: ${{ secrets.RESEARCH_VAULT_CLONE_TOKEN }}
+      RESEARCH_VAULT_ROOT: _external/research-vault
     steps:
       - uses: actions/checkout@v4
         with:
           fetch-depth: 1
+      - name: Checkout research vault
+        uses: ./.github/actions/checkout-vault
       - uses: actions/setup-python@v5
         with:
           python-version: "3.12"

@@ -4,7 +4,7 @@ import { readFileSync } from 'node:fs';
 import test from 'node:test';
 import { humanRole, requireHumanViewer, viewerFromAccessPayload } from '../functions/_lib/auth.js';
 import { accessDecision, onRequest } from '../functions/_middleware.js';
-import { readerIdea, readerLetter, sourceSections, validateDraft } from '../functions/_lib/fund-letters.js';
+import { parseSearchTokens, readerIdea, readerLetter, sourceSections, validateDraft } from '../functions/_lib/fund-letters.js';
 import { onRequestGet, onRequestPost } from '../functions/api/fund-letters.js';
 
 function database() {
@@ -167,6 +167,40 @@ test('cross-fund letters feed, period catalog, and category/activity filters ret
   assert.equal(byAct.letters[0].id,'l0');
   const searchByAct=await(await onRequestGet(context({action:'search',activity:'new,add',period:'2020Q1',type:'long,short'},reader,DB))).json();
   assert.equal(searchByAct.results.length,1);
+});
+test('smart search tokens, multi-fund overlap, battleground signals, and owner portfolio scope work without leaking to readers',async()=>{
+  const DB=database();seed(DB,2);
+  DB.db.exec("INSERT INTO fl_funds(id,name) VALUES('bear-fund','Bear Fund');");
+  DB.db.prepare('INSERT INTO fl_letters(id,fund_id,content_hash,pipeline_version,reporting_period,ingested_at,source_ref,source_url,source_text,published_revision) VALUES(?,?,?,?,?,?,?,?,?,?)').run('lbear','bear-fund','hbear','v1','2020Q2','2026-10-23','private/path','https://drive.google.com/SECRET',source,'rbear');
+  DB.db.prepare('INSERT INTO fl_revisions(id,letter_id,created_at,author,status,overview,content_json,checks_json) VALUES(?,?,?,?,?,?,?,?)').run('rbear','lbear','2026-10-23','editor','published','Bearish view on Acme.','{"stance":{"focus":"macro"}}','{}');
+  DB.db.prepare('INSERT INTO fl_ideas(id,revision_id,letter_id,title,ticker,idea_type,activity,summary,ordinal) VALUES(?,?,?,?,?,?,?,?,?)').run('acme-short','rbear','lbear','Acme short thesis','ACME','short','short','Acme faces competitive pressure.',0);
+
+  const parsed = parseSearchTokens('ticker:ACME,MSFT type:short action:new focus:macro is:battleground recurring');
+  assert.deepEqual(parsed.tickers, ['ACME', 'MSFT']);
+  assert.deepEqual(parsed.types, ['short']);
+  assert.deepEqual(parsed.activities, ['new']);
+  assert.deepEqual(parsed.focuses, ['macro']);
+  assert.deepEqual(parsed.signals, ['battleground']);
+  assert.equal(parsed.freeText, 'recurring');
+
+  const catalog = await (await onRequestGet(context({action:'funds'},reader,DB))).json();
+  assert.equal(catalog.tickers.length, 1);
+  assert.equal(catalog.tickers[0].ticker, 'ACME');
+  assert.equal(catalog.tickers[0].fund_count, 2);
+  assert.equal(catalog.tickers[0].multi_fund, true);
+  assert.equal(catalog.tickers[0].battleground, true);
+
+  const battleIdeas = await (await onRequestGet(context({action:'search',signal:'battleground'},reader,DB))).json();
+  assert.equal(battleIdeas.results.length, 3);
+  const macroLetters = await (await onRequestGet(context({action:'letters',q:'focus:macro is:multi ticker:ACME'},reader,DB))).json();
+  assert.equal(macroLetters.letters.length, 1);
+  assert.equal(macroLetters.letters[0].id, 'lbear');
+
+  DB.db.exec("CREATE TABLE portfolio_positions (symbol TEXT, position REAL); INSERT INTO portfolio_positions VALUES ('ACME', 100);");
+  const readerSession = await (await onRequestGet(context({action:'session'},reader,DB))).json();
+  assert.equal('book_tickers' in readerSession, false);
+  const ownerSession = await (await onRequestGet(context({action:'session'},owner,DB))).json();
+  assert.deepEqual(ownerSession.book_tickers, ['ACME']);
 });
 test('owner edits create revisions and publication requires six explicit attestations',async()=>{
   const DB=database();seed(DB);

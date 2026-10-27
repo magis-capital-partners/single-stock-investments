@@ -1986,8 +1986,8 @@
 <script src="search-match.js"></script>
 <script src="energy-model-viz.js?v=20261015-energy"></script>
 <script src="insights-viz.js?v=20261020-relevance"></script>
-<link rel="stylesheet" href="fund-letters/reader.css?v=3">
-<script src="fund-letters/reader.js?v=3"></script>
+<link rel="stylesheet" href="fund-letters/reader.css?v=4">
+<script src="fund-letters/reader.js?v=4"></script>
 <script src="valuation-viz.js?v=20261027-market-sync"></script>
 <script src="market-sessions.js?v=20261023"></script>
 <script src="market-risk-data.js?v=20261023"></script>
@@ -4319,7 +4319,14 @@ function renderInsights(opts = {}) {
         syncRouteHash();
         renderInsights();
       }));
-      FundLettersReader.mount(content.querySelector('[data-reader-root]'), { embedded: true });
+      const allTickers = Array.isArray(data?.tickers) ? data.tickers : [];
+      const bookTickers = allTickers.filter(t => t && t.in_holdings).flatMap(t => [t.ticker, t.display_ticker, t.quote_ticker]).filter(Boolean);
+      const watchlistTickers = allTickers.filter(t => t && !t.in_holdings).flatMap(t => [t.ticker, t.display_ticker, t.quote_ticker]).filter(Boolean);
+      FundLettersReader.mount(content.querySelector('[data-reader-root]'), {
+        embedded: true,
+        bookTickers,
+        watchlistTickers,
+      });
     }
     return;
   }

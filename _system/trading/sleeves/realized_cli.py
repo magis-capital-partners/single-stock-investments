@@ -74,11 +74,23 @@ def publish(store: RealizedStore, history: dict, *, url: str, token: str) -> dic
     def send(body):
         for attempt in range(3):
             try:
-                return post_ingest(url, token, {**base, **body}, timeout=45)
+                response = post_ingest(url, token, {**base, **body}, timeout=45)
+                break
             except Exception:
                 if attempt == 2:
                     raise
                 time.sleep(2 ** attempt)
+        kind = body["kind"]
+        acknowledged = {
+            "begin": response.get("staged") is True,
+            "archive-status": isinstance(response.get("parts"), list),
+            "archive": response.get("archived") is True and response.get("part") == body.get("part"),
+            "batch": response.get("staged") is True or response.get("duplicate") is True,
+            "complete": response.get("complete") is True,
+        }.get(kind, False)
+        if not acknowledged:
+            raise RuntimeError(f"server did not acknowledge realized {kind}; verify the deployed endpoint before retrying")
+        return response
 
     send({"kind": "begin", "manifest": manifest})
     # Immutable original XML is archived as bounded gzip parts in private R2.
