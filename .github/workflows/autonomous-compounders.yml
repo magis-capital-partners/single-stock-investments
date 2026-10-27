@@ -4,10 +4,12 @@ on:
   push:
     branches: [main]
     paths:
+      - '.github/workflows/autonomous-compounders.yml'
       - '*/research/valuation.json'
       - '_system/portfolio/registry.json'
       - '_system/reference/valuation_listing_ratios.json'
       - '_system/reference/valuation_identity_aliases.json'
+      - '_system/reference/valuation_method_registry.json'
       - '_system/scripts/valuation_forecast.py'
       - '_system/scripts/automatic_forecast_model.py'
       - '_system/scripts/legacy_forecast_model.py'
@@ -44,6 +46,7 @@ jobs:
             _system/reference/core_compounders.json
             _system/reference/valuation_listing_ratios.json
             _system/reference/valuation_identity_aliases.json
+            _system/reference/valuation_method_registry.json
             _system/reference/market-data/compounders
             _system/reference/market-data/operating_kpis
             _system/data/autonomous_compounders.json
