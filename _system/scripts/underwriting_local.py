@@ -142,6 +142,9 @@ def publish_runtime(vault, home):
 
 def run_once(home, source=ROOT, tickers=None, launch=False):
     from underwriting_codex import preflight
+    owner = read(home/'runtime-owner.json')
+    require(owner.get('repository') == OPS and owner.get('purpose') == 'local-codex-underwriting',
+            'Initialize a fresh owned runtime with underwriting_local.ps1 first')
     with local_lock(home):
         preflight()
         vault = clone_vault(home)

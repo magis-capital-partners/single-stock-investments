@@ -13,7 +13,8 @@ New-Item -ItemType Directory -Force -Path $runtimeRoot | Out-Null
 $markerPath = Join-Path $runtimeRoot 'runtime-owner.json'
 if (Test-Path -LiteralPath $markerPath) {
     $marker = Get-Content -Raw -LiteralPath $markerPath | ConvertFrom-Json
-    if ($marker.repository -ne 'magis-capital-partners/single-stock-investments') { throw 'Unexpected runtime owner.' }
+    if ($marker.repository -ne 'magis-capital-partners/single-stock-investments' -or
+        $marker.purpose -ne 'local-codex-underwriting') { throw 'Unexpected runtime owner.' }
 } else {
     $existing = Get-ChildItem -LiteralPath $runtimeRoot -Force | Where-Object { $_.Name -ne 'launch.ps1' }
     if ($existing) { throw 'Use a fresh runtime directory.' }
