@@ -90,7 +90,9 @@ jobs:
         env:
           CURSOR_API_KEY: ${{ secrets.CURSOR_API_KEY }}
         run: node _system/scripts/underwriting_stage.mjs --catalog
-      - name: Build locally approved company valuations
+      # Stable step name is referenced by graph_sources health telemetry.
+      # Judgment now runs locally; this host executes only --phase build.
+      - name: Author, independently challenge and build company valuations
         env:
           CURSOR_API_KEY: ${{ secrets.CURSOR_API_KEY }}
           REQUESTED_TICKERS: ${{ github.event.client_payload.tickers }}
