@@ -63,6 +63,178 @@ async function stage(env, rows, suffix = '1', extra = {}) {
 const envFor = db => ({ DB: db, PRIVATE_ARTIFACTS: { objects: new Map(), async put(key, value) { this.objects.set(key, value); } } });
 const params = values => new URLSearchParams({ owner: 'drew', ...values });
 
+test('ticker view aggregates every matching lot, pins pagination, and keeps LS review rows out of Michael', async () => {
+  const db = database(), env = envFor(db);
+  const base = await stage(env, [
+    row('first', 'michael', { ticker: 'ASST', realized_usd: '0.1', trade_date: '2026-10-22' }),
+    row('second', 'michael', { ticker: 'ASST', realized_usd: '0.2' }),
+    row('option', 'michael', { ticker: 'ASST', contract_label: 'ASST option', realized_usd: '-0.01' }),
+    row('other', 'michael', { ticker: 'OTHER', realized_usd: '9' }),
+    row('ls-review', 'unallocated', { ticker: 'NBIZ', strategy: 'ownership_review' }),
+  ]);
+  await storeRealized(env, { ...base, kind: 'complete' });
+  const first = await loadRealized(db, params({ owner: 'michael', view: 'tickers', limit: '1' }));
+  assert.equal(first.view, 'tickers');
+  assert.equal(first.group_count, 2);
+  assert.equal(first.groups.length, 1);
+  assert.equal(first.groups[0].ticker, 'ASST');
+  assert.equal(first.groups[0].summary.realized_usd, '0.29');
+  assert.equal(first.groups[0].summary.count, 3);
+  assert.equal(first.groups[0].from, '2026-10-22');
+  assert.equal(first.groups[0].through, '2026-10-23');
+  assert.equal(first.summary.realized_usd, '9.29');
+  assert.equal(first.records.length, 0);
+  const next = await loadRealized(db, params({ owner: 'michael', view: 'tickers', limit: '1', cursor: first.next_cursor, generation: first.generation_id }));
+  assert.equal(next.groups[0].ticker, 'OTHER');
+  assert.equal(next.next_cursor, null);
+  const lots = await loadRealized(db, params({ owner: 'michael', ticker: 'ASST', generation: first.generation_id }));
+  assert.equal(lots.records.length, 3);
+  assert.equal(lots.summary.realized_usd, first.groups[0].summary.realized_usd);
+  await assert.rejects(loadRealized(db, params({ owner: 'michael', cursor: first.next_cursor })), /Cursor/);
+  assert.equal((await loadRealized(db, params({ owner: 'michael', ticker: 'NBIZ' }))).records.length, 0);
+  db.close();
+});
+
+test('realized view has a latest-data refresh and ticker rows expand into separately fetched lots', () => {
+  const window = {};
+  runInNewContext(readFileSync(new URL('../sleeve-realized-viz.js', import.meta.url), 'utf8'), { window, Intl, Number, String, Map });
+  assert.match(window.SleeveRealized.shell(), /data-realized-refresh/);
+  const html = window.SleeveRealized.renderResults({ view: 'tickers', groups: [{ ticker: 'SAME', summary: summarize([row('a'), row('b')]), from: '2026-10-23', through: '2026-10-23' }],
+    summary: summarize([row('a'), row('b')]), records: [], coverage: {}, through: '2026-10-26' });
+  assert.equal((html.match(/data-realized-ticker=/g) || []).length, 1);
+  assert.match(html, /2 lots/);
+  assert.match(html, /0\.20/);
+});
+
+test('a ticker click replaces an obsolete NBIZ result and loads every individual lot in the new generation', async () => {
+  const fields = new Map(['period', 'from', 'to', 'basis', 'settlement', 'ticker'].map(k => [k, { value: '', addEventListener() {} }]));
+  const element = () => ({ innerHTML: '', textContent: '', hidden: true, dataset: {}, handlers: {},
+    addEventListener(name, fn) { this.handlers[name] = fn; }, setAttribute(name, value) { this[name] = value; } });
+  const form = { elements: { namedItem: key => fields.get(key) }, addEventListener() {} };
+  const results = element(), refresh = element(), more = element(), status = element(), through = element();
+  const rows = new Map(), buttons = new Map();
+  const root = { dataset: {}, isConnected: true, querySelector(selector) {
+    if (selector === '[data-realized-form]') return form;
+    if (selector === '[data-realized-results]') return results;
+    if (selector === '[data-realized-status]') return status;
+    if (selector === '[data-realized-through]') return through;
+    if (selector === '[data-realized-refresh]') return refresh;
+    if (selector === '[data-realized-more]') return more;
+    if (selector === '[data-realized-export]') return element();
+    const match = selector.match(/^\[data-realized-(lots|ticker)="([^"]*)"\]$/);
+    if (match) {
+      const map = match[1] === 'lots' ? rows : buttons;
+      if (!map.has(match[2])) {
+        const el = element(), content = element(); el.querySelector = () => content;
+        el.dataset.realizedTicker = match[2]; el.dataset.realizedLotsMore = match[2]; map.set(match[2], el);
+      }
+      return map.get(match[2]);
+    }
+    return null;
+  } };
+  const calls = [], oldGeneration = 'a'.repeat(64), newGeneration = 'b'.repeat(64);
+  const three = [row('one', 'michael', { ticker: 'SAME' }), row('two', 'michael', { ticker: 'SAME' }), row('three', 'michael', { ticker: 'SAME' })];
+  let groupedCalls = 0, delayNextGroup = false, releaseGroup;
+  const common = { status: 'available', owner: 'michael', through: '2026-10-26', from: '2026-01-01', to: '2026-10-26',
+    basis: 'trade_date', settlement: 'all', ticker: '', coverage: {}, records: [], next_cursor: null, is_current: true };
+  const fetch = async url => {
+    const query = new URL(url, 'https://example.com').searchParams; calls.push(Object.fromEntries(query));
+    let body;
+    if (query.get('view') === 'tickers') {
+      const old = groupedCalls++ === 0 || delayNextGroup, ticker = old ? 'NBIZ' : 'SAME';
+      body = { ...common, view: 'tickers', generation_id: old ? oldGeneration : newGeneration, group_count: 1,
+        groups: [{ ticker, from: '2026-10-23', through: '2026-10-23', summary: summarize(three) }], summary: summarize(three) };
+    } else if (query.get('ticker') === 'NBIZ') {
+      body = { ...common, is_current: false, generation_id: oldGeneration, current_generation_id: newGeneration, records: [], summary: summarize([]) };
+    } else {
+      const next = query.has('cursor');
+      body = { ...common, ticker: 'SAME', view: 'lots', generation_id: newGeneration,
+        records: next ? three.slice(2) : three.slice(0, 2), summary: summarize(three), next_cursor: next ? null : 'page-two' };
+    }
+    const response = { ok: true, json: async () => body };
+    if (query.get('view') === 'tickers' && delayNextGroup) {
+      delayNextGroup = false;
+      return new Promise(resolve => { releaseGroup = () => resolve(response); });
+    }
+    return response;
+  };
+  const window = {};
+  runInNewContext(readFileSync(new URL('../sleeve-realized-viz.js', import.meta.url), 'utf8'), { window, fetch, URLSearchParams, AbortController, Intl, Number, String, Map });
+  await window.SleeveRealized.attach({ querySelector: () => root }, 'michael');
+  assert.match(results.innerHTML, /NBIZ/);
+  const click = async (selector, key) => {
+    const target = selector === 'ticker' ? root.querySelector(`[data-realized-ticker="${key}"]`) : { dataset: { realizedLotsMore: key } };
+    results.handlers.click({ target: { closest: s => s === `[data-realized-${selector === 'ticker' ? 'ticker' : 'lots-more'}]` ? target : null } });
+    await new Promise(resolve => setImmediate(resolve));
+  };
+  await click('ticker', 'NBIZ');
+  assert.doesNotMatch(results.innerHTML, /NBIZ/);
+  assert.match(results.innerHTML, /SAME/);
+  await click('ticker', 'SAME');
+  const content = root.querySelector('[data-realized-lots="SAME"]').querySelector();
+  assert.match(content.innerHTML, /2 of 3 shown/);
+  const detail = calls.at(-1);
+  assert.equal(detail.generation, newGeneration); assert.equal(detail.ticker, 'SAME'); assert.equal(detail.owner, 'michael');
+  assert.equal(detail.from, '2026-01-01'); assert.equal(detail.to, '2026-10-26');
+  assert.equal(detail.cursor, undefined);
+  await click('more', 'SAME');
+  assert.match(content.innerHTML, /3 of 3 shown/);
+  assert.equal(calls.at(-1).cursor, 'page-two');
+  const beforeCollapse = calls.length;
+  await click('ticker', 'SAME'); await click('ticker', 'SAME');
+  assert.equal(calls.length, beforeCollapse, 'reopening uses the loaded lots');
+  refresh.handlers.click(); await new Promise(resolve => setImmediate(resolve));
+  assert.equal(calls.at(-1).view, 'tickers');
+  assert.equal(calls.at(-1).generation, undefined); assert.equal(calls.at(-1).cursor, undefined);
+  delayNextGroup = true; refresh.handlers.click();
+  refresh.handlers.click(); await new Promise(resolve => setImmediate(resolve));
+  assert.match(results.innerHTML, /SAME/);
+  releaseGroup(); await new Promise(resolve => setImmediate(resolve));
+  assert.doesNotMatch(results.innerHTML, /NBIZ/, 'a slower obsolete response cannot replace freshly loaded results');
+});
+
+test('ticker grouping preserves date and settlement filters across batches and Unicode pagination', async () => {
+  const db = database(), env = envFor(db);
+  const a = [row('a', 'drew', { ticker: 'ÅBC' }), row('p', 'drew', { ticker: 'ÅBC', settlement_status: 'pending', settlement_date: '2026-10-28' })];
+  const b = [row('b', 'drew', { ticker: 'ÅBC', realized_usd: '0.20' }), row('c', 'drew', { ticker: '東京' })];
+  const base = { schema_version: 'sleeve_realized.v1', generation_id: '9'.repeat(64), account: 'TEST' };
+  await storeRealized(env, { ...base, kind: 'begin', manifest: { storage: 'packed_v1', through: '2026-10-26',
+    row_count: 4, batch_hashes: [hash(a), hash(b)], archives: [], coverage: {}, reconciliation: {} } });
+  await storeRealized(env, { ...base, kind: 'batch', batch_index: 0, records: a });
+  await storeRealized(env, { ...base, kind: 'batch', batch_index: 1, records: b });
+  await storeRealized(env, { ...base, kind: 'complete' });
+  const selected = { view: 'tickers', basis: 'settlement_date', settlement: 'date_reached', limit: '1' };
+  const first = await loadRealized(db, params(selected));
+  assert.equal(first.groups[0].summary.realized_usd, '0.3');
+  assert.equal(first.groups[0].summary.count, 2);
+  assert.equal(first.summary.count, 3);
+  const second = await loadRealized(db, params({ ...selected, cursor: first.next_cursor, generation: first.generation_id }));
+  assert.equal(second.groups[0].ticker, '東京');
+  assert.equal(second.next_cursor, null);
+  await assert.rejects(loadRealized(db, params({ view: 'invalid' })), /view/);
+  db.close();
+});
+
+test('pinned ticker pages identify newer history and empty selections remain empty', async () => {
+  const db = database(), env = envFor(db);
+  const old = await stage(env, [row('old', 'michael', { ticker: 'NBIZ' })], 'a');
+  await storeRealized(env, { ...old, kind: 'complete' });
+  const latest = await stage(env, [row('current', 'michael', { ticker: 'ASST' })], 'b');
+  await storeRealized(env, { ...latest, kind: 'complete' });
+  const pinned = await loadRealized(db, params({ owner: 'michael', view: 'tickers', generation: old.generation_id }));
+  assert.equal(pinned.is_current, false);
+  assert.equal(pinned.current_generation_id, latest.generation_id);
+  const refreshed = await loadRealized(db, params({ owner: 'michael', view: 'tickers' }));
+  assert.equal(refreshed.is_current, true);
+  assert.deepEqual(refreshed.groups.map(g => g.ticker), ['ASST']);
+  const none = await loadRealized(db, params({ owner: 'michael', view: 'tickers', ticker: 'NBIZ' }));
+  assert.deepEqual(none.groups, []); assert.equal(none.group_count, 0); assert.equal(none.summary.count, 0);
+  assert.equal(none.next_cursor, null);
+  const legacy = await loadRealized(db, params({ owner: 'michael', limit: '1' }));
+  assert.equal(legacy.view, 'lots'); assert.equal(legacy.records[0].ticker, 'ASST');
+  db.close();
+});
+
 test('financial totals preserve decimal cents and missing amounts', () => {
   assert.equal(addDecimal('0.1', '0.2'), '0.3');
   assert.equal(addDecimal('-0.01', '0.001'), '-0.009');

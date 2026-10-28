@@ -20,4 +20,12 @@
 .realized-detail > div { display: grid; grid-template-columns: 110px 1fr; gap: 8px; margin: 8px 0; }
 .realized-detail dt { color: var(--text-muted); }
 .realized-detail dd { margin: 0; overflow-wrap: anywhere; }
+.realized-tickers { min-width: 600px; }
+.realized-ticker-row .realized-ticker { border: 0; background: transparent; padding: 6px 0; color: var(--accent-cyan, #5ed3d8); text-align: left; }
+.realized-ticker[aria-expanded=true] > span { display: inline-block; transform: rotate(90deg); }
+.realized-ticker:focus-visible, .realized-lots-row button:focus-visible { outline: 2px solid var(--accent-cyan, #5ed3d8); outline-offset: 3px; }
+.realized-lots-row > td { padding: 14px 18px 22px; background: var(--bg-secondary, #151a22); border-left: 2px solid var(--accent-cyan, #5ed3d8); }
+.realized-lot-heading { display: flex; align-items: center; justify-content: space-between; gap: 14px; margin-bottom: 12px; font-size: 12px; }
+.realized-lot-heading span { color: var(--text-muted); }
+.realized-lots-row[hidden] { display: none; }
 @media (max-width: 700px) { .realized-totals { grid-template-columns: 1fr; } .realized-filters { align-items: stretch; } .realized-filters label { flex: 1 1 140px; } }
