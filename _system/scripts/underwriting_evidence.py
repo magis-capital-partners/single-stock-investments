@@ -109,9 +109,31 @@ def listing_ratio_from_documents(documents):
 
 def source_fingerprint(root, ticker):
     source = read(root/'_system/reference/market-data/valuation_fundamentals'/(ticker+'.json'))
-    kpis = read(root/'_system/reference/market-data/operating_kpis'/(ticker+'.json'))
+    points = primary_kpis(root, ticker)
+    kpis = {'points': points} if points else {}
     return semantic_json_sha256({'facts': source.get('facts') or [], 'latest_report': source.get('latest_report'), 'operating_kpis': kpis},
-                               volatile_keys={'retrieved_at', 'updated_at', 'generated_at', 'last_collected', 'attempted_at', 'checked_at'})
+                               volatile_keys={'retrieved_at', 'fetched_at', 'updated_at', 'generated_at', 'last_collected', 'attempted_at', 'checked_at'})
+
+
+def primary_kpis(root, ticker):
+    """Keep direct reported measurements; collection clocks and inferred ratios are not new evidence."""
+    data = read(root/'_system/reference/market-data/operating_kpis'/(ticker+'.json'))
+    rows = []
+    for p in data.get('points') or []:
+        if p.get('source_kind') != 'primary' or p.get('claim_type', 'fact') != 'fact':
+            continue
+        if not str(p.get('source_url') or '').startswith('https://') or not (p.get('doc') or p.get('locator')):
+            continue
+        if not p.get('kpi') or not p.get('unit') or not (p.get('fiscal_period_end') or p.get('period')):
+            continue
+        try:
+            numeric(p.get('value'))
+        except ContractError:
+            continue
+        rows.append({'kpi': p.get('kpi'), 'value': p['value'], 'unit': p.get('unit'),
+                     'period': p.get('fiscal_period_end') or p.get('period'), 'source_url': p['source_url'],
+                     'locator': p.get('doc') or p['locator']})
+    return sorted({digest(p): p for p in rows}.values(), key=lambda p: (p.get('period') or '', p['kpi'] or '', digest(p)))[-200:]
 
 
 def _share_observation(point, market, quote):
@@ -265,13 +287,13 @@ def prepare_packet(root: Path, ticker: str, as_of: str, *, collect=True, client=
                     break
         except (OSError, ValueError) as exc:
             errors.append({'source': 'sec_submissions', 'error': type(exc).__name__})
-    extracted_ratio = listing_ratio_from_documents(documents)
+    foreign_us_listing = '.' not in quote['symbol'] and any(d.get('form') in ('20-F', '6-K') for d in documents+observations)
+    extracted_ratio = listing_ratio_from_documents(documents) if foreign_us_listing or listing_ratio else None
     if listing_ratio and extracted_ratio:
         require(listing_ratio['ordinary_shares_per_listing_share'] == extracted_ratio['ordinary_shares_per_listing_share'],
                 'depositary_share_ratio_sources_disagree')
     listing_ratio = extracted_ratio or listing_ratio
-    foreign_us_listing = '.' not in quote['symbol'] and any(d.get('form') in ('20-F', '6-K') for d in documents)
-    require(listing_ratio or not (foreign_us_listing or any(p.get('field') == 'ordinary_shares' for p in data.get('facts') or [])),
+    require(listing_ratio or not foreign_us_listing,
             'ordinary_shares_require_verified_listing_ratio')
     if listing_ratio:
         share_periods = [o['period'] for o in observations if o['unit'] == 'shares']
@@ -280,6 +302,13 @@ def prepare_packet(root: Path, ticker: str, as_of: str, *, collect=True, client=
                     'ordinary_and_listing_share_actions_unreconciled')
     observations = list({o['id']: o for o in observations}.values())
     observations.sort(key=lambda o: (o['period'], o['id']))
+    metrics = primary_kpis(root, ticker)
+    for source in sorted({p['source_url'] for p in metrics}):
+        selected = [p for p in metrics if p['source_url'] == source and str(p.get('period') or '') <= as_of]
+        if selected:
+            documents.append({'id': 'doc_kpi_'+digest(selected)[:16], 'source_url': source,
+                              'content_hash': digest(selected), 'source_kind': 'primary_metric_extract',
+                              'contexts': [json.dumps(selected, ensure_ascii=False, sort_keys=True)]})
     require(any(o['unit'] == 'shares' for o in observations) and any(o['unit'] == reporting_currency for o in observations),
             'Sourced primary financials and a verified share count are required')
     require(history or annual, 'Primary financial period is unresolved')
