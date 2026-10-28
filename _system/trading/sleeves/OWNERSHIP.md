@@ -53,3 +53,11 @@ edit a completed generation or restore the old permissive residual publisher.
 The current realized pointer may also be returned to its previously verified
 generation by an authenticated operator after checking the corresponding source
 run. Reconcile both ownership versions before serving a combined view.
+
+Realized P&L opens with one row per ticker, aggregated from every matching daily
+summary in the selected period. Expanding a ticker retrieves the individual
+records from the same generation and filters, with separate pagination. CSV
+exports remain individual records. The latest-data refresh drops old cursors;
+clicking or paging an obsolete generation reloads the current one. The statement
+date and publication time are both shown because an ownership correction can
+change the results without changing the completed statement date.
