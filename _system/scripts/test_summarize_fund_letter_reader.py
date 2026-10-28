@@ -163,6 +163,27 @@ def test_repair_removes_sentences_about_what_the_letter_omits_but_keeps_real_neg
     assert "removed a sentence about what the letter does not say" in warnings
 
 
+def test_a_copy_spanning_sentences_is_removed_so_the_publication_gate_passes():
+    import fund_letters as fl
+
+    summary = ("The fund bought Acme for its recurring revenue. The stake gained as utilization rose. "
+               "Management plans to repay debt. Loss of customers is a risk.")
+    payload = base_payload(ideas=[{**base_payload()["ideas"][0], "summary": summary}])
+    copied = [s for s in summary.split(". ") if len(s.split()) >= 12]
+    assert not copied
+    draft_before, _ = s.to_archive_draft(payload, REPAIR_SOURCE)
+    assert any("twelve consecutive words" in e for e in fl.quality_errors(draft_before, fl.sections(REPAIR_SOURCE)))
+    errors, warnings = s.repair_payload(payload, REPAIR_SOURCE)
+    assert errors == []
+    kept = payload["ideas"][0]["summary"]
+    assert kept.startswith("The fund bought Acme for its recurring revenue.")
+    assert len(s.split_sentences(kept)) == 3
+    assert "removed a sentence in a twelve-word copy that spans sentences" in warnings
+    draft_after, draft_errors = s.to_archive_draft(payload, REPAIR_SOURCE)
+    assert draft_errors == []
+    assert not any("twelve consecutive words" in e for e in fl.quality_errors(draft_after, fl.sections(REPAIR_SOURCE)))
+
+
 def test_overview_paragraphs_are_kept_from_a_list_and_made_from_a_long_block():
     assert s.overview_text(["First paragraph.", "", " Second paragraph. "]) == "First paragraph.\n\nSecond paragraph."
     block = " ".join(f"Sentence {n} about the fund." for n in range(1, 13))

@@ -272,6 +272,73 @@ def _tokens(text: str) -> list[str]:
     return re.findall(r"[\w]+", (text or "").lower())
 
 
+def _rendered_units(payload: dict) -> list[dict]:
+    """Text in the order the publication gate joins it: overview, then each
+    idea's title, summary, evolution and activity, then each lean's subject
+    and reason. Only sentences of prose fields can be removed."""
+    units = []
+
+    def prose(field: tuple, text: str) -> None:
+        for index, sentence in enumerate(split_sentences(text)):
+            units.append({"tokens": _tokens(sentence), "field": field, "sentence": index})
+
+    def fixed(text) -> None:
+        units.append({"tokens": _tokens(str(text or "")), "field": None})
+
+    for index, paragraph in enumerate((payload.get("overview") or "").split("\n\n")):
+        prose(("overview", index), paragraph)
+    for index, idea in enumerate(payload.get("ideas") or []):
+        fixed(idea.get("title"))
+        prose(("idea", index), idea.get("summary") or "")
+        fixed(idea.get("evolution"))
+        fixed(idea.get("activity"))
+    stance = payload.get("stance") or {}
+    for side in ("leaning_in", "leaning_out"):
+        for index, lean in enumerate(stance.get(side) or []):
+            fixed(lean.get("subject"))
+            prose((side, index), lean.get("why") or "")
+    return units
+
+
+def _remove_sentence(payload: dict, field: tuple, sentence: int) -> None:
+    kind, index = field
+    if kind == "overview":
+        paragraphs = payload["overview"].split("\n\n")
+        kept = split_sentences(paragraphs[index])
+        del kept[sentence]
+        paragraphs[index] = " ".join(kept)
+        payload["overview"] = "\n\n".join(p for p in paragraphs if p.strip())
+        return
+    owner, key = (payload["ideas"][index], "summary") if kind == "idea" else (payload["stance"][kind][index], "why")
+    kept = split_sentences(owner.get(key) or "")
+    del kept[sentence]
+    owner[key] = " ".join(kept)
+
+
+def drop_cross_sentence_copies(payload: dict, grams: set) -> int:
+    """The publication gate looks for twelve copied words across the whole
+    rendered draft, so a run can span two sentences or two fields. Remove the
+    sentence carrying most of each such run until none is left."""
+    removed = 0
+    for _ in range(200):
+        units = _rendered_units(payload)
+        flat = [(token, number) for number, unit in enumerate(units) for token in unit["tokens"]]
+        tokens = [token for token, _ in flat]
+        hit = next((i for i in range(max(0, len(tokens) - 11)) if tuple(tokens[i:i + 12]) in grams), None)
+        if hit is None:
+            break
+        owners: dict[int, int] = {}
+        for _, number in flat[hit:hit + 12]:
+            owners[number] = owners.get(number, 0) + 1
+        removable = sorted((n for n in owners if units[n]["field"]), key=lambda n: -owners[n])
+        if not removable:
+            break
+        target = units[removable[0]]
+        _remove_sentence(payload, target["field"], target["sentence"])
+        removed += 1
+    return removed
+
+
 def repair_payload(payload: dict, source: str) -> tuple[list[str], list[str]]:
     """Deterministic verification and repair. No model call, no human gate.
 
@@ -453,6 +520,12 @@ def repair_payload(payload: dict, source: str) -> tuple[list[str], list[str]]:
     ideas = [idea for idea in ideas if idea["summary"].strip()]
     payload["ideas"] = ideas
     payload["stance"] = stance
+    if drop_cross_sentence_copies(payload, grams):
+        warnings.append("removed a sentence in a twelve-word copy that spans sentences")
+        ideas = [idea for idea in payload["ideas"] if (idea.get("summary") or "").strip()]
+        payload["ideas"] = ideas
+        for side in ("leaning_in", "leaning_out"):
+            stance[side] = [lean for lean in stance[side] if (lean.get("why") or "").strip()]
 
     errors: list[str] = []
     if not payload["overview"]:
