@@ -42,6 +42,12 @@ The challenger must cover every assumption and material claim. Deterministic
 sensitivity tests show which parameters drive value. A major challenge blocks
 publication and returns to the author within the call budget.
 
+Rejected drafts and complete critiques survive batch boundaries in the private
+runtime. The next attempt receives the previous contract and accumulated findings;
+it does not replay a rejected first draft. Approved author/challenger work resumes
+at the builder after a budget or provider interruption. New evidence packets,
+instructions or model-policy changes invalidate the matching checkpoint.
+
 The builder cannot change the sealed contract: its entire model is compared to
 the trusted compiler's output. Unit, source, share-basis, scenario, PV/IRR and
 current-price checks run before the active model is replaced. Missing evidence,
@@ -57,6 +63,13 @@ the model PR. Public company artifacts are `underwriting_contract.json`,
 The CI validator reads trusted code from main and candidate data separately;
 it recompiles the model from its exact private packet. It cannot execute agent
 code. Automatic merge retains the repository's existing exact-head checks.
+
+PR creation uses the existing research service credential only for the creation
+request; other operations keep the repository Actions token. Organization-wide
+Actions-token restrictions remain unchanged. To retry a preserved producer branch
+without paying for another underwriting run, dispatch `underwriting-publish-branch`
+with `client_payload.branch` equal to `codex/underwriting-<run id>`. Recovery verifies
+the source workflow and a data-only diff, then requests the same exact-head checks.
 
 After merge the publisher explicitly requests a price-only refresh because
 GitHub-token pushes do not chain ordinary push workflows. Repricing also runs

@@ -117,7 +117,8 @@ def build_queue(root=ROOT, as_of=None, states=None):
         rows.append({'ticker': ticker, 'company': source.get('company'), 'status': status,
                      'current_model_basis': audit.get('model_basis'), 'blockers': codes,
                      'last_attempt': state.get('last_attempt'), 'retry_after': state.get('retry_after'),
-                     'underwriting_gaps': state.get('gaps') or [], '_rank': rank})
+                     'underwriting_gaps': state.get('gaps') or [],
+                     'unresolved_findings': state.get('unresolved_findings') or [], '_rank': rank})
     rows.sort(key=lambda r: r['_rank'])
     for row in rows:
         row.pop('_rank')
@@ -133,12 +134,18 @@ class StageBlocked(ContractError):
     pass
 
 
+def stage_hash(root, stage, payload):
+    model = resolve_model(read(root/CALL_POLICY), STAGES[stage], reason='company_underwriting')
+    runbook = (root/'_system/prompts/valuation_underwriting.md').read_text(encoding='utf-8')
+    return digest({'stage': stage, 'model': model, 'payload': payload, 'instructions_hash': digest(runbook)})
+
+
 def call_stage(root, work, ticker, stage, payload, state, *, launch=True, execute=None):
     consumer = STAGES[stage]
     policies = read(root/CALL_POLICY)
     model = resolve_model(policies, consumer, reason='company_underwriting')
     runbook = (root/'_system/prompts/valuation_underwriting.md').read_text(encoding='utf-8')
-    base_hash = digest({'stage': stage, 'model': model, 'payload': payload, 'instructions_hash': digest(runbook)})
+    base_hash = stage_hash(root, stage, payload)
     cache = work/'cache'/ticker/base_hash
     output, receipt_path = cache/'output.json', cache/'receipt.json'
     if output.is_file() and receipt_path.is_file():
@@ -280,6 +287,72 @@ def validate_saved(root, ticker, vault):
     return receipt
 
 
+def challenge_payload(packet, author, canonical):
+    return {'packet': packet, 'contract': author, 'contract_hash': digest(author),
+            'deterministic_value_driver_tests': model_diagnostics(canonical)}
+
+
+def revision_feedback(author, challenger, error):
+    result = {'required_correction': str(error)[:2000]}
+    if author:
+        result['previous_contract'] = author
+    if challenger:
+        result['independent_challenge'] = challenger
+    return result
+
+
+def unresolved_findings(feedback):
+    return [f for f in ((feedback or {}).get('independent_challenge') or {}).get('findings') or []
+            if f.get('severity') in ('major', 'critical')]
+
+
+def load_progress(root, work, ticker, packet):
+    """Resume sealed work, including paid receipts from before checkpoints existed."""
+    scope = digest({'packet_hash': packet['packet_hash'],
+                    'instructions': (root/'_system/prompts/valuation_underwriting.md').read_text(encoding='utf-8'),
+                    'compiler': digest((root/'_system/scripts/underwriting_contract.py').read_text(encoding='utf-8'))
+                                if (root/'_system/scripts/underwriting_contract.py').is_file() else None,
+                    'models': {s: resolve_model(read(root/CALL_POLICY), STAGES[s], reason='company_underwriting') for s in STAGES}})
+    saved = read(work/'progress'/(ticker+'.json'))
+    if saved.get('scope') == scope:
+        return saved
+    result = {'scope': scope, 'packet_hash': packet['packet_hash'], 'history': [], 'feedback': None}
+    authors, reviews = {}, []
+    for path in (work/'cache'/ticker).glob('*/receipt.json'):
+        receipt, output = read(path), read(path.parent/'output.json')
+        if receipt.get('status') != 'finished' or not receipt.get('agent_id') or receipt.get('input_hash') != path.parent.name:
+            continue
+        if output.get('packet_hash') != packet['packet_hash']:
+            continue
+        if receipt.get('stage') == 'author':
+            authors[digest(output)] = (output, receipt)
+        elif receipt.get('stage') == 'challenger':
+            reviews.append((output, receipt))
+    for challenger, challenger_receipt in sorted(reviews, key=lambda r: (r[1].get('finished_at') or '', r[1]['input_hash'])):
+        author_pair = authors.get(challenger.get('contract_hash'))
+        if not author_pair:
+            continue
+        author, author_receipt = author_pair
+        try:
+            canonical = compile_contract(packet, author)
+            expected = stage_hash(root, 'challenger', challenge_payload(packet, author, canonical))
+            if challenger_receipt['input_hash'] != expected:
+                continue
+            validate_review(author, challenger)
+        except ContractError as exc:
+            result['feedback'] = revision_feedback(author, challenger, exc)
+            result['history'].append({'contract_hash': digest(author), 'findings': challenger.get('findings') or [],
+                                      'required_correction': str(exc)})
+            result.pop('approved', None)
+        else:
+            result['approved'] = {'author': author, 'review': challenger, 'canonical_hash': digest(canonical),
+                                  'receipts': {'author': author_receipt, 'challenger': challenger_receipt}}
+            result['feedback'] = None
+    if result.get('feedback'):
+        result['feedback']['prior_findings'] = [f for h in result['history'][:-1] for f in h.get('findings') or []]
+    return result
+
+
 def run_company(root, work, ticker, as_of, state, vault, *, prepare=prepare_packet, execute=None):
     packet = prepare(root, ticker, as_of)
     state['input_fingerprint'] = input_fingerprint(root, ticker)
@@ -291,21 +364,38 @@ def run_company(root, work, ticker, as_of, state, vault, *, prepare=prepare_pack
             packet = prior
     write(work/'packets'/(packet['packet_hash']+'.json'), packet)
     state.update(packet_hash=packet['packet_hash'], evidence_hash=packet['evidence_hash'])
-    feedback = None
+    progress = load_progress(root, work, ticker, packet)
+    feedback = progress.get('feedback')
+    def checkpoint():
+        state['unresolved_findings'] = unresolved_findings(progress.get('feedback'))
+        write(work/'progress'/(ticker+'.json'), progress)
+        write(work/'states'/(ticker+'.json'), state)
+    checkpoint()
     max_attempts = int(read(root/POLICY).get('maximum_author_attempts') or 2)
     for _ in range(max_attempts):
-        challenge_feedback = None
+        author, challenger = None, None
         try:
-            author, author_receipt = call_stage(root, work, ticker, 'author', {'packet': packet, 'revision_feedback': feedback}, state, execute=execute)
-            if author.get('status') == 'evidence_gap':
-                raise StageBlocked('primary_evidence_gap: '+json.dumps(author.get('gaps') or [])[:1200])
-            canonical = compile_contract(packet, author)
-            challenger, challenger_receipt = call_stage(root, work, ticker, 'challenger',
-                {'packet': packet, 'contract': author, 'contract_hash': digest(author),
-                 'deterministic_value_driver_tests': model_diagnostics(canonical)}, state, execute=execute)
-            challenge_feedback = {k: challenger.get(k) for k in ('verdict', 'independent_thesis', 'findings')}
-            validate_review(author, challenger)
-            builder_feedback = None
+            approved = progress.get('approved')
+            if approved:
+                author, challenger = approved['author'], approved['review']
+                author_receipt, challenger_receipt = (approved['receipts'][s] for s in ('author', 'challenger'))
+                canonical = compile_contract(packet, author)
+                require(digest(canonical) == approved['canonical_hash'], 'Compiler changed after independent approval')
+                validate_review(author, challenger)
+            else:
+                author, author_receipt = call_stage(root, work, ticker, 'author',
+                    {'packet': packet, 'revision_feedback': feedback}, state, execute=execute)
+                if author.get('status') == 'evidence_gap':
+                    raise StageBlocked('primary_evidence_gap: '+json.dumps(author.get('gaps') or [])[:1200])
+                canonical = compile_contract(packet, author)
+                challenger, challenger_receipt = call_stage(root, work, ticker, 'challenger',
+                    challenge_payload(packet, author, canonical), state, execute=execute)
+                validate_review(author, challenger)
+                progress['approved'] = {'author': author, 'review': challenger, 'canonical_hash': digest(canonical),
+                                        'receipts': {'author': author_receipt, 'challenger': challenger_receipt}}
+                progress['feedback'] = None
+                checkpoint()
+            builder_feedback = progress.get('builder_feedback')
             for _build_attempt in range(int(read(root/POLICY).get('maximum_builder_attempts') or 2)):
                 built, builder_receipt = call_stage(root, work, ticker, 'builder',
                     {'approved_contract': author, 'independent_review': challenger, 'canonical_model': canonical,
@@ -315,6 +405,8 @@ def run_company(root, work, ticker, as_of, state, vault, *, prepare=prepare_pack
                     break
                 except ContractError as exc:
                     builder_feedback = str(exc)
+                    progress['builder_feedback'] = builder_feedback
+                    checkpoint()
             else:
                 raise StageBlocked('builder_changed_sealed_model')
             return apply_validated(root, packet, author, challenger, built,
@@ -322,10 +414,17 @@ def run_company(root, work, ticker, as_of, state, vault, *, prepare=prepare_pack
         except StageBlocked:
             raise
         except (ContractError, subprocess.SubprocessError) as exc:
-            feedback = {'required_correction': str(exc)[:2000]}
-            if challenge_feedback:
-                feedback['independent_challenge'] = challenge_feedback
-    raise StageBlocked('author_or_challenger_unresolved: '+str(feedback))
+            if progress.get('approved'):
+                # A provider/build/publication failure does not revoke a valid review.
+                raise StageBlocked('approved_model_build_or_publication: '+str(exc)) from exc
+            feedback = revision_feedback(author, challenger, exc)
+            progress['feedback'] = feedback
+            progress['history'].append({'contract_hash': digest(author) if author else None,
+                                        'required_correction': str(exc), 'findings': unresolved_findings(feedback)})
+            feedback['prior_findings'] = [f for h in progress['history'][:-1] for f in h.get('findings') or []]
+            checkpoint()
+    details = '; '.join(json.dumps(f, ensure_ascii=False)[:650] for f in unresolved_findings(feedback))
+    raise StageBlocked('author_or_challenger_unresolved: '+(details or str((feedback or {}).get('required_correction'))))
 
 
 def run_batch(root=ROOT, *, limit=None, tickers=None, launch=False, work=None, vault=None, prepare=prepare_packet, execute=None):

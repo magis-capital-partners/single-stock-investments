@@ -8,7 +8,7 @@ on:
       - '*/research/valuation.json'
       - '*/research/underwriting_*.json'
   repository_dispatch:
-    types: [underwriting-validate-pr]
+    types: [underwriting-validate-pr, underwriting-publish-branch]
 
 permissions:
   contents: read
@@ -16,8 +16,32 @@ permissions:
   checks: write
 
 jobs:
+  recover-publication:
+    if: github.event_name == 'repository_dispatch' && github.event.action == 'underwriting-publish-branch'
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    permissions:
+      contents: write
+      pull-requests: read
+    steps:
+      - name: Read the trusted publication controller
+        uses: actions/checkout@v4
+        with:
+          ref: main
+          fetch-depth: 1
+          filter: blob:none
+          sparse-checkout: _system/scripts
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Resume a preserved data branch without calling a model
+        env:
+          GH_TOKEN: ${{ github.token }}
+          UNDERWRITING_PR_TOKEN: ${{ secrets.RESEARCH_VAULT_CLONE_TOKEN }}
+          PRODUCER_BRANCH: ${{ github.event.client_payload.branch }}
+        run: python _system/scripts/publish_underwriting.py --recover-branch "$PRODUCER_BRANCH"
   validate:
-    if: github.event_name != 'pull_request' || github.event.pull_request.head.repo.full_name == github.repository
+    if: github.event.action != 'underwriting-publish-branch' && (github.event_name != 'pull_request' || github.event.pull_request.head.repo.full_name == github.repository)
     runs-on: ubuntu-latest
     timeout-minutes: 15
     env:
