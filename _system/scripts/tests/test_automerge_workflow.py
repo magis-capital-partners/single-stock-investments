@@ -117,7 +117,7 @@ def test_python_tests_completing_is_a_retry():
     assert on["workflow_run"]["workflows"] == [
         "Research quality", "Python tests", "CI bootstrap smoke",
         "LLM Workflow Governance", "Energy model tests",
-        "Filing Sentinel gold set", "Agent context",
+        "Filing Sentinel gold set", "Agent context", "Underwriting contract validation",
     ]
 
 

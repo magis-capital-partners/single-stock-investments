@@ -405,11 +405,21 @@
       "job": "refresh",
       "work_step": "Verify every served PV and IRR against the same model",
       "cadence_cron": [
-        "23 8,18 * * 1-5"
+        "23 8,18 * * 1-5",
+        "37 16,20 * * 1-5"
       ],
       "timezone": "America/New_York",
       "freshness_hours": 96,
       "subject_regex": "^chore\\(research\\): refresh autonomous compounder IRRs"
+    },
+    {
+      "name": "company-underwriting",
+      "workflow_file": "valuation-underwriting.yml",
+      "job": "underwrite",
+      "work_step": "Author, independently challenge and build company valuations",
+      "cadence_cron": ["47 9,17,21 * * 1-5"],
+      "timezone": "America/New_York",
+      "freshness_hours": 96
     }
   ],
   "unmonitored_workflows": {},
