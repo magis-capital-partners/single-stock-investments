@@ -15,7 +15,7 @@ from datetime import date, timedelta
 
 from calculation_proof import evaluate_calculation_proof
 
-VERSION = 'shared-valuation-forecast/1.2'
+VERSION = 'shared-valuation-forecast/1.3'
 CASES = ('low', 'base', 'high')
 HURDLES = (8, 10, 12, 15, 18, 20)
 MAX_ASSUMPTION_AGE_DAYS = 180
@@ -215,9 +215,13 @@ def build_forecast(valuation, *, quote=None, as_of=None, fx=None, market=None, e
     inputs = valuation.get('inputs') or {}
     methodology = valuation.get('valuation_methodology') or {}
     model_day = _day(methodology.get('forecast_as_of') or valuation.get('as_of'))
-    quote = dict(quote or {**((valuation.get('market_snapshot') or {}).get('quote') or {}),
-                          'value': inputs.get('price'), 'as_of': inputs.get('price_as_of'),
-                          'source_url': inputs.get('price_source'), 'currency': inputs.get('currency')})
+    snapshot_quote = dict((valuation.get('market_snapshot') or {}).get('quote') or {})
+    for field, value in {'value': inputs.get('price'), 'as_of': inputs.get('price_as_of'),
+                         'source_url': inputs.get('price_source'), 'currency': inputs.get('currency')}.items():
+        if value is not None:
+            snapshot_quote[field] = value
+    quote = dict(quote or snapshot_quote)
+    fx = fx or (valuation.get('market_snapshot') or {}).get('fx')
     market = market or valuation.get('market_snapshot')
     today = _day(as_of) or _day(quote.get('as_of')) or model_day
     components = (valuation.get('component_valuation_results') or {}).get('additive_components') or []
@@ -250,6 +254,14 @@ def build_forecast(valuation, *, quote=None, as_of=None, fx=None, market=None, e
         except (ValueError, KeyError, IndexError, ImportError):
             sync_gaps.append('listing_calendar_or_completed_close_unverified')
     latest_report = (market or {}).get('latest_report') or {}
+    underwriting = valuation.get('underwriting') or {}
+    if underwriting:
+        result['underwriting'] = underwriting
+        verification = (market or {}).get('underwriting_validation') or {}
+        if verification.get('status') != 'verified' or verification.get('contract_hash') != underwriting.get('contract_hash'):
+            sync_gaps.append('underwriting_contract_unverified')
+        if _day(underwriting.get('review_due')) and today and today > _day(underwriting['review_due']):
+            sync_gaps.append('underwriting_review_due')
     result['market_sync']['latest_report'] = latest_report
     reviewed = _day(methodology.get('reviewed_as_of')) if methodology.get('review_source') else None
     assumptions_day = reviewed or model_day
@@ -406,6 +418,13 @@ def attach_forecast(row, forecast, *, detailed=True):
     if forecast.get('model_basis') == 'automatic_operating_first_pass':
         decision['model_level'] = 'screening_grade'
         decision['provisional'] = True
+    elif forecast.get('underwriting') and forecast['status'] == 'available':
+        decision['model_level'] = 'stock_specific'
+        decision['provisional'] = False
+        if forecast.get('method_profile'):
+            decision['method_profile'] = forecast['method_profile']
+        if forecast.get('underwriting_archetype'):
+            row.setdefault('classification', {})['archetype'] = forecast['underwriting_archetype']
     decision.update({'forecast_id': forecast.get('calculation_id') or forecast.get('forecast_hash'), 'calculation_status': forecast['status'],
                      'research_return_available': forecast['status'] == 'available',
                      'calculation_reason': '; '.join(dict.fromkeys(g['code'] for g in forecast.get('gaps') or [])),

@@ -64,6 +64,19 @@ def calculate(ticker, root, as_of, evaluated_at=None):
     facts = read(root/FUNDAMENTALS/(ticker+'.json')) or automatic
     if facts.get('latest_report'):
         market['latest_report'] = facts['latest_report']
+    if valuation.get('underwriting') or (root/ticker/'research/underwriting_receipt.json').is_file():
+        from underwriting_pipeline import validate_saved
+        from vault_paths import research_vault_root
+        try:
+            receipt = validate_saved(root, ticker, research_vault_root())
+            if not receipt:
+                raise ValueError('Underwriting receipt missing')
+            market['underwriting_validation'] = {'status': 'verified', 'contract_hash': receipt['contract_hash']}
+        except (ValueError, OSError, KeyError, TypeError):
+            market['underwriting_validation'] = {'status': 'unverified'}
+            # A stale receipt also blocks an overwritten source model that
+            # removed its underwriting marker, rather than falling back.
+            valuation.setdefault('underwriting', {'contract_hash': 'unverified'})
     if not (valuation.get('component_valuation_results') or {}).get('additive_components'):
         from automatic_forecast_model import build
         from legacy_forecast_model import build as legacy_model
@@ -104,7 +117,9 @@ def calculate(ticker, root, as_of, evaluated_at=None):
             forecast['gaps'].append({'code': 'quote_issuer_mismatch'})
         forecast['next_action'] = 'automatic_source_identity_refresh'
     forecast['model_level'] = 'screening_grade' if generated else (valuation.get('valuation_methodology') or {}).get('model_level')
-    forecast['model_basis'] = 'automatic_operating_first_pass' if generated else 'legacy_issuer_cashflow_forecast' if legacy else 'issuer_valuation'
+    forecast['model_basis'] = ('independent_underwriting' if valuation.get('underwriting') else
+                               'automatic_operating_first_pass' if generated else
+                               'legacy_issuer_cashflow_forecast' if legacy else 'issuer_valuation')
     if legacy:
         forecast['warnings'].append('Preserved full-model cash flows assume modeled FCF is distributable after reinvestment and the exit multiple is equity proceeds; no separate cash/debt addition.')
     if generated:
@@ -112,6 +127,10 @@ def calculate(ticker, root, as_of, evaluated_at=None):
         forecast['warnings'].append('Automatic operating first-pass model with explicit generic assumptions; not issuer-specific underwriting.')
     forecast['source_model_ref'] = (FUNDAMENTALS/(ticker+'.json')).as_posix() if generated else f'{ticker}/research/valuation.json'
     forecast['source_model_hash'] = semantic_json_sha256(valuation)
+    if forecast.get('underwriting'):
+        from valuation_method_router import route_valuation
+        forecast['method_profile'] = route_valuation(copy.deepcopy(valuation))['profile_id']
+        forecast['underwriting_archetype'] = (valuation.get('classification') or {}).get('archetype')
     return forecast
 
 
@@ -152,7 +171,7 @@ def quote_identity(ticker, row, quote, registry, aliases=None):
     return {**identity, 'status': 'mismatch'}
 
 
-def refresh_quote(ticker, row, root, as_of):
+def refresh_quote(ticker, row, root, as_of, *, model_currency=None):
     from autonomous_compounders import SYMBOLS, quote
     symbol = SYMBOLS.get(ticker) or row.get('quote_ticker') or ticker
     path = root/QUOTES/(ticker+'.json')
@@ -181,8 +200,8 @@ def refresh_quote(ticker, row, root, as_of):
         valuation = read(root/ticker/'research/valuation.json')
         components = (valuation.get('component_valuation_results') or {}).get('additive_components') or []
         currencies = {str((c.get('calculation_proof') or {}).get('output_unit') or '')[:3].upper() for c in components}
-        source_currency = next(iter(currencies)) if len(currencies) == 1 else None
-        if not components:
+        source_currency = model_currency or (next(iter(currencies)) if len(currencies) == 1 else None)
+        if not components and not model_currency:
             from autonomous_compounders import economics
             history = economics(read(root/FUNDAMENTALS/(ticker+'.json')))
             source_currency = history[-1]['currency'] if history else None
@@ -239,7 +258,7 @@ def publish(root, companies, as_of, evaluated_at=None):
     if set(rows) != set(companies):
         raise ValueError('Forecast report must account for the entire coverage universe')
     counts = dict(Counter(f['status'] for f in companies.values()))
-    gaps = Counter(g['code'].split(':')[0] for f in companies.values() for g in f.get('gaps') or [])
+    gaps = Counter(code for f in companies.values() for code in {g['code'].split(':')[0] for g in f.get('gaps') or []})
     summary = {'companies': len(companies), 'available': counts.get('available', 0), 'statuses': counts,
                'gap_counts': dict(gaps), 'requires_human_review': False,
                'verified_share_basis': sum(bool((f.get('market_sync') or {}).get('basis_id')) for f in companies.values()),
@@ -287,13 +306,13 @@ def publish(root, companies, as_of, evaluated_at=None):
 def audit_snapshot(forecast):
     fields = ('status', 'forecast_hash', 'calculation_id', 'source_model_hash', 'model_basis', 'gaps',
               'model_present_value_per_share', 'present_value_today_per_share', 'forward_irr_pct',
-              'financial_period', 'assumptions_as_of')
+              'financial_period', 'assumptions_as_of', 'underwriting')
     return {**{k: forecast.get(k) for k in fields}, 'market_sync': {
         k: (forecast.get('market_sync') or {}).get(k) for k in
         ('status', 'basis_id', 'price_as_of', 'financial_period', 'model_as_of', 'latest_report', 'valid_until')}}
 
 
-def run(root=ROOT, as_of=None, collect=False, workers=6):
+def run(root=ROOT, as_of=None, collect=False, workers=6, prices_only=False):
     as_of = as_of or datetime.now(timezone.utc).date().isoformat()
     rows = universe(root)
     if not rows:
@@ -301,7 +320,8 @@ def run(root=ROOT, as_of=None, collect=False, workers=6):
     if collect:
         registry = read(root/'_system/portfolio/registry.json').get('holdings') or {}
         with ThreadPoolExecutor(max_workers=workers) as pool:
-            list(pool.map(lambda t: refresh_missing_model_inputs(t, rows[t], root, as_of, registry), sorted(rows)))
+            if not prices_only:
+                list(pool.map(lambda t: refresh_missing_model_inputs(t, rows[t], root, as_of, registry), sorted(rows)))
             list(pool.map(lambda t: refresh_quote(t, rows[t], root, as_of), sorted(rows)))
     evaluated_at = datetime.now(timezone.utc).isoformat()
     companies = {t: calculate(t, root, as_of, evaluated_at=evaluated_at) for t in sorted(rows)}
@@ -360,9 +380,10 @@ def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument('--as-of', default=datetime.now(timezone.utc).date().isoformat())
     parser.add_argument('--collect', action='store_true')
+    parser.add_argument('--prices-only', action='store_true', help='Reprice from completed closes without recollecting financials')
     parser.add_argument('--check', action='store_true')
     args = parser.parse_args()
-    print(json.dumps(check() if args.check else run(as_of=args.as_of, collect=args.collect)['summary']))
+    print(json.dumps(check() if args.check else run(as_of=args.as_of, collect=args.collect or args.prices_only, prices_only=args.prices_only)['summary']))
 
 
 if __name__ == '__main__':
