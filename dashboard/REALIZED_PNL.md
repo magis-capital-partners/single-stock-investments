@@ -47,6 +47,11 @@ primary EOD service has finished, using its established Flex reporting token in
 a subprocess. It does not generate or rotate credentials. If this ID is absent,
 the dashboard states that Closed Lots have not been received.
 
+The wrapper sets `IBKR_FLEX_TOKEN_FILE` to the existing private reporting settings
+file. The client reads only its `IBKR_FLEX_TOKEN` assignment as data, preserving
+literal characters. Do not source the complete settings file: unrelated values
+can contain dollar signs that abort a shell running with `set -u`.
+
 ## Private runtime and commands
 
 Run from the SSI copy using the portfolio-hub Python environment. Set the account

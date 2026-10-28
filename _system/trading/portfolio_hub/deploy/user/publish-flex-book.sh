@@ -85,11 +85,11 @@ if [ -n "${SLEEVE_INGEST_TOKEN:-}" ]; then
        systemctl --user is-active --quiet ls-algo-daily.service ls-algo-eod-retry.service; then
       log "closed-lot refresh deferred: primary EOD producer is still active"
     else
-      (
-        set -a; . /home/spx/.config/ls-algo/.env; set +a
+      # Read only the Flex key as data. Sourcing the whole file under nounset
+      # can abort on unrelated literal dollar signs before Python even starts.
+      IBKR_FLEX_TOKEN_FILE=/home/spx/.config/ls-algo/.env \
         "$PY" -m _system.trading.sleeves.realized_cli --state "$REALIZED_STATE" --account "$ACCOUNT" refresh-detail \
           --positions "$POSITIONS" --query-id "$SLEEVE_CLOSED_LOTS_QUERY_ID"
-      )
       log "closed-lot refresh exit=$?"
     fi
   fi

@@ -2,6 +2,8 @@
 from __future__ import annotations
 
 import os
+import re
+import shlex
 import time
 import urllib.error
 import urllib.parse
@@ -15,6 +17,32 @@ from .realized import read_report
 
 BASE = "https://ndcdyn.interactivebrokers.com/AccountManagement/FlexWebService"
 PENDING = {"1001", "1004", "1005", "1006", "1007", "1008", "1009", "1018", "1019", "1021"}
+
+
+def reporting_token() -> str:
+    """Read only the reporting credential; never execute a dotenv file as shell.
+
+    An explicitly configured file takes precedence over an ambient token. Dollar
+    signs and unrelated credentials must not undergo shell interpolation.
+    """
+    filename = os.environ.get("IBKR_FLEX_TOKEN_FILE", "")
+    if not filename:
+        return os.environ.get("IBKR_FLEX_TOKEN", "")
+    try:
+        lines = Path(filename).read_text(encoding="utf-8-sig").splitlines()
+    except (OSError, UnicodeError):
+        raise ValueError("Flex reporting token file could not be read") from None
+    entries = [match.group(1) for line in lines
+               if (match := re.fullmatch(r"\s*(?:export\s+)?IBKR_FLEX_TOKEN\s*=\s*(.*?)\s*", line))]
+    if len(entries) != 1:
+        raise ValueError("Flex reporting token file must contain exactly one IBKR_FLEX_TOKEN entry")
+    try:
+        values = shlex.split(entries[0], comments=True, posix=True)
+    except ValueError:
+        raise ValueError("Flex reporting token entry has invalid quoting") from None
+    if len(values) != 1 or not values[0]:
+        raise ValueError("Flex reporting token entry must contain one nonempty value")
+    return values[0]
 
 
 @contextmanager
@@ -49,7 +77,7 @@ def fetch_report(*, query_id: str, account: str, start: str, through: str, desti
         raise ValueError("Flex requests require an inclusive interval of at most 365 days")
     if not str(query_id).isdigit():
         raise ValueError("a numeric supplemental Flex query ID is required")
-    token = token or os.environ.get("IBKR_FLEX_TOKEN", "")
+    token = token or reporting_token()
     if not token:
         raise ValueError("IBKR_FLEX_TOKEN is not configured")
     destination.parent.mkdir(parents=True, exist_ok=True)
