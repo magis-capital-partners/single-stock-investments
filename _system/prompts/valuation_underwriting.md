@@ -132,6 +132,13 @@ evidence_ids may reference primary document ids as well as numeric observation i
 Use verified share observations. If sufficient primary evidence is unavailable,
 return {"status":"evidence_gap","gaps":[{"code":"specific_missing_evidence","detail":"what is missing and where to obtain it"}]}.
 
+If the packet contains `listing_ratio`, all financial share observations are
+ordinary shares. Build cash flows per ordinary share. The trusted compiler
+multiplies every flow by ordinary_shares_per_listing_share exactly once to
+produce quoted ADR/ADS cash flows. Do not add this conversion to your drivers
+or assumptions. Verify this ordinary-share versus listing-unit boundary in
+the dilution checklist and independent challenge.
+
 ## Independent challenger output
 
 Work independently from the original packet. Try to falsify the framework,
