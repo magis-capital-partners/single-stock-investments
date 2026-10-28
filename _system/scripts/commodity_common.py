@@ -63,15 +63,19 @@ def provenance(config, panel, as_of):
 
 
 def shell(config, panel, as_of):
+    from commodity_inputs import readiness
     sources = provenance(config, panel, as_of)
+    inputs = readiness(config['id'], panel, as_of)
     status = 'source_review_due' if any(s['stale'] or s['changed_since_review'] for s in sources if s.get('required', True)) else 'research_scenarios'
+    if status!='source_review_due' and (not inputs['required_ready'] or any(s['fetch_status']=='fetch_failed' for s in sources if s.get('required',True))):
+        status='partial_inputs'
     return {'id': config['id'], 'title': config['title'], 'engine': config['engine'],
             'question': config['question'], 'in_base_irr': False, 'status': status,
             'unit': config['unit'], 'as_of': as_of.isoformat(), 'sources': sources,
             'config_sha256': digest(config), 'reference': config['reference'],
             'falsifiers': config['falsifiers'], 'limitations': config['limitations'],
             'related_tickers': config['related_tickers'], 'cost_floor': config['cost_floor'],
-            'validation': [], 'scenarios': [], 'history': []}
+            'input_coverage':inputs, 'validation': [], 'scenarios': [], 'history': []}
 
 
 def check(name, error, tolerance=0.011):

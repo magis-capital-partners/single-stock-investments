@@ -16,9 +16,10 @@ def refresh(offline=False):
         doc=build()
         errors=validate(doc)
         if errors:raise ValueError('; '.join(errors))
-        doc['refresh']={'status':'updated','attempted_at':date.today().isoformat()}
+        incomplete=[m['id'] for m in doc['models'] if not m['input_coverage']['required_ready'] or any(s['fetch_status']=='fetch_failed' for s in m['sources'] if s.get('required',True))]
+        doc['refresh']={'status':'partial' if incomplete else 'updated','attempted_at':date.today().isoformat(),'incomplete_models':incomplete}
         save(output,doc)
-        return True
+        return not incomplete
     except Exception as exc:
         if previous:
             previous['refresh']={'status':'failed','attempted_at':date.today().isoformat(),'reason':type(exc).__name__}

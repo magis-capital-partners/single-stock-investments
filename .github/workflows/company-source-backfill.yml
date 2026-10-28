@@ -1,0 +1,60 @@
+name: Complete company source backfill
+on:
+  workflow_dispatch:
+    inputs:
+      seconds:
+        description: Work budget; interrupted work resumes from the private checkpoint
+        default: '14400'
+      recover_scans:
+        description: Recover scanned pages instead of the normal extraction lane
+        type: boolean
+        default: false
+permissions:
+  contents: read
+concurrency:
+  group: company-source-backfill
+  cancel-in-progress: false
+jobs:
+  backfill:
+    runs-on: ubuntu-latest
+    timeout-minutes: 330
+    env:
+      RESEARCH_VAULT_CLONE_TOKEN: ${{ secrets.RESEARCH_VAULT_CLONE_TOKEN }}
+      GOOGLE_APPLICATION_CREDENTIALS_JSON: ${{ secrets.GOOGLE_APPLICATION_CREDENTIALS_JSON }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          filter: blob:none
+          sparse-checkout: |
+            _system
+            dashboard
+            .github
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - uses: ./.github/actions/checkout-vault
+        with:
+          hydrate: 'false'
+      - run: pip install pymupdf pypdf xlrd google-api-python-client google-auth
+      - name: Install scan language data
+        if: inputs.recover_scans
+        run: sudo apt-get update && sudo apt-get install -y tesseract-ocr-eng tesseract-ocr-jpn tesseract-ocr-chi-sim
+      - name: Restore private extraction results
+        run: python _system/scripts/company_source_cache.py restore --cache _private/company-research/cache --archive "$RESEARCH_VAULT_ROOT/dashboard-private/company-source-backfill"
+      - name: Resume bounded extraction
+        env:
+          BUDGET: ${{ inputs.seconds }}
+          SCANS: ${{ inputs.recover_scans }}
+        run: |
+          set -euo pipefail
+          args=()
+          if [ "$SCANS" = "true" ]; then args+=(--only-status needs_ocr --ocr); fi
+          python _system/scripts/backfill_company_sources.py --discover-drive --seconds "$BUDGET" "${args[@]}"
+      - name: Save private checkpoint and results
+        if: always()
+        run: python _system/scripts/company_source_cache.py pack --cache _private/company-research/cache --archive "$RESEARCH_VAULT_ROOT/dashboard-private/company-source-backfill"
+      - uses: ./.github/actions/commit-vault
+        if: always()
+        with:
+          message: Preserve resumable company source backfill
+          git_add: --force dashboard-private/company-source-backfill

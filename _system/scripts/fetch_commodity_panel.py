@@ -8,17 +8,11 @@ it never silently relabels an old forecast as a new vintage.
 from __future__ import annotations
 
 import argparse
-import csv
-import io
 from concurrent.futures import ThreadPoolExecutor
 from datetime import date
 from urllib.request import Request, urlopen
 
 from commodity_common import CONFIG_DIR, DEFAULT_PANEL, digest, load, save
-
-FRED = {'wti_spot':'DCOILWTICO', 'brent_spot':'DCOILBRENTEU', 'real_yield':'DFII10',
-        'broad_dollar':'DTWEXBGS', 'gold_bullion':'GOLDPMGBD228NLBM'}
-
 
 def download(url):
     request = Request(url, headers={'User-Agent':'MagisResearch/1.0 (public commodity research)'})
@@ -48,26 +42,19 @@ def refresh(output=DEFAULT_PANEL, as_of=None, history=True):
             return key, {**prior.get('sources',{}).get(key,{}),'status':'fetch_failed','last_attempt':as_of.isoformat(),'error':type(e).__name__}
     with ThreadPoolExecutor(max_workers=4) as pool:
         result['sources']=dict(pool.map(capture,refs.items()))
-    for key, sid in FRED.items():
-        previous = prior.get('series',{}).get(key,{})
-        if not history:
-            result['series'][key]=previous
-            continue
-        # CSV endpoint is explicit; no HTML/table parsing into invented observations.
-        csv_url=f'https://fred.stlouisfed.org/graph/graph.csv?id={sid}&cosd=2010-01-01&coed={as_of.isoformat()}'
-        try:
-            raw=download(csv_url)
-            records=list(csv.DictReader(io.StringIO(raw.decode('utf-8-sig'))))
-            rows=[]
-            for r in records:
-                when=r.get('observation_date') or r.get('DATE') or ''
-                try: value=float(r.get(sid,''))
-                except ValueError: continue
-                if len(when)==10 and when<=as_of.isoformat():rows.append({'date':when,'value':value})
-            if not rows:raise ValueError('No valid observations')
-            result['series'][key]={'source_url':csv_url,'source_id':sid,'sha256':digest(raw),'status':'fetched','fetched_at':as_of.isoformat(),'observations':rows}
-        except Exception as e:
-            result['series'][key]={**previous,'source_url':csv_url,'status':'fetch_failed','error':type(e).__name__,'observations':previous.get('observations',[])}
+    if history:
+        from commodity_history import collect
+        def capture_history(raw):
+            path=output.parent/'objects'/digest(raw)
+            path.parent.mkdir(parents=True,exist_ok=True)
+            if not path.exists():path.write_bytes(raw)
+        result['series'],failures=collect(download,prior.get('series',{}),as_of,capture_history)
+        result['history_refresh']={'status':'partial' if failures else 'complete','failed_series':failures}
+        # Archive every fetched vintage for later tests; do not overwrite history.
+        save(output.parent/'vintages'/(as_of.isoformat()+'-'+digest(result['series'])[:12]+'.json'),result['series'])
+    else:
+        result['series']=prior.get('series',{})
+        result['history_refresh']=prior.get('history_refresh',{'status':'not_requested'})
     save(output,result)
     return result
 

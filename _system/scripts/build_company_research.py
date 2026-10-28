@@ -46,7 +46,7 @@ def write(path: Path, value) -> None:
     body = json.dumps(value, ensure_ascii=False, separators=(",", ":")) + "\n"
     if path.is_file() and path.read_text(encoding="utf-8") == body:
         return
-    temp = path.with_suffix(path.suffix + ".tmp")
+    temp = path.with_suffix(path.suffix + f".{os.getpid()}.tmp")
     temp.write_text(body, encoding="utf-8")
     temp.replace(path)
 
@@ -258,10 +258,11 @@ class Builder:
         sha = digest(data)
         path = self.cache / "text" / f"{sha}.json"
         prior = load(path)
-        if prior.get("version") == 1 and prior.get("status") == "indexed":
+        if prior.get("version") == 1 and prior.get("status") in {"indexed", "needs_ocr", "needs_transcript", "empty_source"}:
             return prior["text"], prior["status"], sha
-        text, state = extract(data, suffix)
-        write(path, {"version": 1, "text": text, "status": state})
+        from backfill_company_sources import extract_complete
+        text, state, details = extract_complete(data, suffix)
+        write(path, {"version": 1, "text": text, "status": state, "extraction": details})
         return text, state, sha
 
     def local(self, path: Path, origin: str, *, explicit=(), relative=None):
@@ -282,9 +283,16 @@ class Builder:
             return
         data = actual.read_bytes()
         companion = next((path.with_suffix(s) for s in (".txt", ".md") if path.suffix.lower() == ".pdf" and path.with_suffix(s).is_file()), None)
+        media_cache = {}
+        if path.suffix.lower() in {'.mp3','.m4a','.mp4','.wav'}:
+            from backfill_company_sources import transcript_for
+            companion = transcript_for(path, self.vault)
+            media_cache = load(self.cache/'media'/(digest(path.name)+'.json'))
         if companion:
             text, state, _ = self.cached_extract(companion.read_bytes(), companion.suffix.lower())
             sha = digest(data)
+        elif media_cache.get('status') == 'indexed':
+            text, state, sha = media_cache['text'], 'indexed', digest(data)
         else:
             text, state, sha = self.cached_extract(data, ".txt" if rel in SHARED_MODELS and path.suffix == ".py" else path.suffix.lower())
         # Metadata-only placeholders are not evidence and never become "zero sources".
@@ -475,7 +483,8 @@ class Builder:
             locations = [{"kind":"repository","url":url,"label":"Research original"}]
             locations = self.refs.get(rel) or locations
             record = self.base("git:"+sha,path.stem.replace("_"," "),"git_inventory",text=cached.get("text", ""),explicit=[parts[0]],state=cached.get("status", "awaiting_extraction"),locations=locations,path=rel)
-            self.add(record,["git:"+sha,"path:"+rel])
+            if cached.get('content_md5'):record['content_md5']=cached['content_md5']
+            self.add(record,["git:"+sha,"path:"+rel]+(['md5:'+cached['content_md5']] if cached.get('content_md5') else []))
         self.receipt("git_inventory",count)
 
     def filings(self, ticker):
@@ -566,6 +575,7 @@ class Builder:
                 if not token:
                     break
         paths = build_folder_paths(list(items.values()), roots)
+        write(self.cache/'drive-inventory.json', {'items':list(items.values()), 'checked_at':self.now})
         download_start = time.monotonic()
         count = 0
         attempted = {p.stem for p in (self.cache / "drive").glob("*.json")}
@@ -783,6 +793,7 @@ def main():
     parser.add_argument("--drive", action="store_true")
     parser.add_argument("--download", action="store_true")
     parser.add_argument("--download-budget-seconds", type=int, default=300, help="Text extraction work budget; inventory is never capped. Zero means unlimited.")
+    parser.add_argument("--git-budget-seconds", type=int, default=300, help="Git extraction budget. Zero consumes existing backfill results only.")
     parser.add_argument("--tickers", nargs="+", help="Explicitly scoped verification run; omit to build the full universe")
     args = parser.parse_args()
     from vault_paths import research_vault_root
@@ -796,7 +807,7 @@ def main():
     build.registries()
     build.local_corpora()
     try:
-        build.git_inventory()
+        build.git_inventory(extraction_budget=args.git_budget_seconds)
     except Exception as exc:
         build.receipt("git_inventory", 0, "failed", type(exc).__name__)
     if args.drive:
