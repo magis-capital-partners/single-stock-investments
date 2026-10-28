@@ -5,6 +5,7 @@ import hashlib
 import json
 import re
 import subprocess
+from copy import deepcopy
 from collections import defaultdict
 from datetime import datetime, timedelta, timezone
 from pathlib import Path
@@ -174,6 +175,8 @@ def input_snapshot(candidate, financials, bars, now):
         'known_at': now.isoformat(), 'signals': {'S7': rally, 'burn': burn, 'S5': weak},
         'action_known_at': candidate['action_known_at'],
         'financial_status': financials.get('status') if financials else 'missing_companyfacts',
+        'financial_snapshot': deepcopy(financials),
+        'price_evidence': deepcopy(recent),
         'financial_period': financials.get('period') if financials else None,
         'financial_currency': financials.get('currency') if financials else None,
         'financial_evidence': financials.get('cfo_evidence', []) if financials else [],

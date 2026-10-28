@@ -83,7 +83,12 @@ Files committed by the workflow:
 - `dashboard/data/third_plus_forward.json` and its manifest: allowlisted view.
 
 Every enrollment binds the input snapshot, public-source hashes, issuer,
-decision, exact entry/cover schedule and requested budget. Each book reserves
+decision, exact entry/cover schedule and requested budget. The snapshot retains
+the six public daily price observations and the selected financial snapshot,
+including its cash anchor and operating-cash-flow components, so later provider
+revisions cannot erase the evidence used for a decision. These are new public
+research observations; licensed historical intraday inputs remain local.
+Each book reserves
 capacity independently. An unobserved entry remains unresolved until its order
 outcome is supplied; a small partial fill consumes one issuer slot. A sourced
 zero-fill terminal order releases its reservation after the entry window, never
