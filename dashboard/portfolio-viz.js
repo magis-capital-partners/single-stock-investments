@@ -1332,19 +1332,24 @@
 
   function reconciliationView(book) {
     const rows = book.reconciliation_breaks || [];
-    const quarantined = (book.positions || []).filter((row) => !(row.allocations || []).length);
+    const quarantined = (book.positions || []).filter((row) => !(row.allocations || []).length || row.allocations.some(lot => lot.strategy === 'ownership_review'));
     if (state.scope !== 'all') {
       const included = new Set((book.positions || []).map(positionKey));
-      const excluded = (state.allBook?.positions || []).filter((row) => !included.has(positionKey(row))).map((row) => {
+      const excluded = (state.allBook?.positions || []).flatMap((row) => {
+        if (book.ownership_version) return (row.allocations || []).filter(lot => lot.owner !== state.scope).map(lot => ({ ...row, ...lot.position,
+          quantity_decimal: lot.quantity_decimal, allocations: [lot] }));
+        return included.has(positionKey(row)) ? [] : [row];
+      }).map((row) => {
         const allocations = row.allocations || [];
         const strategies = allocations.map((lot) => String(lot.strategy || '').toLowerCase());
         let reason = `Assigned to ${allocations.map((lot) => lot.owner).filter(Boolean).join(', ') || 'another scope'}`;
-        if (strategies.some((strategy) => strategy.includes('index_put')) || allocations.some((lot) => lot.bucket === 'index_put_hedge')) reason = 'LS-algo index put hedge';
+        if (strategies.includes('ownership_review')) reason = 'Ownership needs review · excluded from confirmed owner totals';
+        else if (strategies.some((strategy) => strategy.includes('index_put')) || allocations.some((lot) => lot.bucket === 'index_put_hedge')) reason = 'LS-algo index put hedge';
         else if (strategies.some((strategy) => strategy.includes('spx'))) reason = 'SPX option · assigned to SPX 0DTE';
         else if (strategies.some((strategy) => strategy.includes('ls') || strategy.includes('letf') || strategy.includes('bucket'))) reason = 'LS-algo ETF / underlying universe';
         return { ...row, exclusion_reason: reason };
       });
-      return `<div class="ph-alert"><strong>Owner custody is rule-driven.</strong> ${state.scope === 'michael' ? 'Michael receives every residual position except SPX options and every instrument in the LS-algo ETF/underlying universe.' : 'The table below makes every position assigned outside this owner book explicit.'}</div><div class="ph-toolbar"><strong>Included positions · ${(book.positions || []).length}</strong><span class="ph-dim">Allocation-ledger result at the current watermark</span></div><div class="ph-toolbar"><strong>Excluded / assigned elsewhere · ${excluded.length}</strong><span class="ph-dim">No silent omission</span></div><div class="ph-table-wrap"><table class="ph-table ph-table--wide"><thead><tr><th>Position</th><th>Type</th><th>Quantity</th><th>Unit</th><th>Market value · base</th><th>Rule / reason</th></tr></thead><tbody>${excluded.map((row) => `<tr><td>${esc(row.local_symbol || row.symbol)}</td><td>${esc(row.sec_type)}</td><td>${quantity(row.quantity_decimal)}</td><td>${esc(row.quantity_unit || (['OPT', 'FOP'].includes(String(row.sec_type).toUpperCase()) ? 'contracts' : 'shares'))}</td><td>${signed(row.market_value_base_decimal ?? row.market_value_decimal, row.base_currency || book.snapshot?.base_currency || 'USD')}</td><td>${esc(row.exclusion_reason)}</td></tr>`).join('')}</tbody></table>${excluded.length ? '' : emptyState('true_zero', 'Nothing assigned elsewhere', 'Every broker position is included in this owner scope.', 'allocation ledger', 'No action required.')}</div>`;
+      return `<div class="ph-alert"><strong>Owner custody is rule-driven.</strong> ${state.scope === 'michael' ? 'Michael’s confirmed lots exclude LS-algo trades. Shared lots without opening evidence remain under review; excluded portions of shared holdings appear below.' : 'The table below makes every position assigned outside this owner book explicit.'}</div><div class="ph-toolbar"><strong>Included positions · ${(book.positions || []).length}</strong><span class="ph-dim">Allocation-ledger result at the current watermark</span></div><div class="ph-toolbar"><strong>Excluded / assigned elsewhere · ${excluded.length}</strong><span class="ph-dim">No silent omission</span></div><div class="ph-table-wrap"><table class="ph-table ph-table--wide"><thead><tr><th>Position</th><th>Type</th><th>Quantity</th><th>Unit</th><th>Market value · base</th><th>Rule / reason</th></tr></thead><tbody>${excluded.map((row) => `<tr><td>${esc(row.local_symbol || row.symbol)}</td><td>${esc(row.sec_type)}</td><td>${quantity(row.quantity_decimal)}</td><td>${esc(row.quantity_unit || (['OPT', 'FOP'].includes(String(row.sec_type).toUpperCase()) ? 'contracts' : 'shares'))}</td><td>${signed(row.market_value_base_decimal ?? row.market_value_decimal, row.base_currency || book.snapshot?.base_currency || 'USD')}</td><td>${esc(row.exclusion_reason)}</td></tr>`).join('')}</tbody></table>${excluded.length ? '' : emptyState('true_zero', 'Nothing assigned elsewhere', 'Every broker position is included in this owner scope.', 'allocation ledger', 'No action required.')}</div>`;
     }
     return `<div class="ph-alert"><strong>Quarantine is visible by default.</strong> Unresolved contracts and cash remain unallocated until their identity is complete.</div><div class="ph-toolbar"><strong>Unresolved positions · ${quarantined.length}</strong></div><div class="ph-table-wrap"><table class="ph-table"><thead><tr><th>Instrument</th><th>ConId / model</th><th>Qty</th><th>Market value · base</th><th>Status</th></tr></thead><tbody>${quarantined.map((row) => `<tr><td><button type="button" class="ph-symbol-link" data-ph-open-row="${esc(positionKey(row))}">${esc(row.local_symbol || row.symbol)}</button></td><td>${row.conid} / ${esc(row.model_code || 'default')}</td><td>${quantity(row.quantity_decimal)}</td><td>${money(row.market_value_base_decimal ?? row.market_value_decimal, false, row.base_currency || book.snapshot?.base_currency || 'USD')}</td><td>quarantined</td></tr>`).join('')}</tbody></table>${quarantined.length ? '' : emptyState('true_zero', 'No quarantined broker rows', 'Every conId has an allocation rule at this watermark.', 'allocation ledger', 'No action required.')}</div><div class="ph-table-wrap" style="margin-top:16px"><table class="ph-table"><thead><tr><th>Severity</th><th>Type</th><th>Instrument</th><th>Expected</th><th>Actual</th><th>Status</th></tr></thead><tbody>${rows.map((row) => `<tr><td>${esc(row.severity)}</td><td>${esc(row.break_type)}</td><td>${esc(row.conid || 'account')} ${esc(row.model_code || '')}</td><td>${esc(row.expected_decimal)}</td><td>${esc(row.actual_decimal)}</td><td>${esc(row.status)}</td></tr>`).join('')}</tbody></table>${rows.length ? '' : emptyState('true_zero', 'No open reconciliation breaks', 'The latest complete broker snapshot and allocation ledger agree within tolerance.', 'reconciliation ledger', 'No action required.')}</div>${positionDrawer((book.positions || []).find((row) => positionKey(row) === state.selectedPositionKey))}`;
   }
@@ -1386,7 +1391,7 @@
     const sectionAvailable = book?.status === 'complete' || ['orders', 'realized'].includes(state.section);
     root.innerHTML = `<div class="ph-shell">${shellHeader(book)}${sectionAvailable ? sectionView(book) : emptyState('upstream_absent', 'Waiting for the first complete IBKR snapshot', book?.reason || 'The private collector has not published broker truth yet.', 'Private IBKR collector · last checked on page load', 'Portfolio operations should publish a complete account summary and position watermark; Orders remains available for owner-scoped paper tickets.')}</div>`;
     bindCommon(root);
-    if (state.section === 'realized' && ['drew', 'michael'].includes(state.scope)) window.SleeveRealized?.attach(root, state.scope);
+    if (state.section === 'realized' && ['drew', 'michael'].includes(state.scope)) window.SleeveRealized?.attach(root, state.scope, book?.ownership_version);
     if (state.section === 'orders') bindOrderDesk(root);
     root.querySelector('[data-ph-search]')?.addEventListener('input', (event) => { state.query = event.target.value; renderPortfolio(); const input = root.querySelector('[data-ph-search]'); input?.focus(); input?.setSelectionRange(state.query.length, state.query.length); });
     root.querySelectorAll('[data-ph-filter]').forEach((button) => button.addEventListener('click', () => { state.positionFilter = button.dataset.phFilter; renderPortfolio(); }));
@@ -1458,6 +1463,7 @@
 
   async function overlayDrewSleeve(book) {
     if (state.scope !== 'drew' || !book) return book;
+    if (book.ownership_version) return book;
     let sleeve;
     try {
       sleeve = await getJson('/api/v1/sleeves/book?owner=drew');

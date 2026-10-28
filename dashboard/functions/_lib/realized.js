@@ -257,7 +257,8 @@ export async function loadRealized(db, params) {
     .bind(...sourceArgs, ...unresolvedArgs).all();
   return { status: 'available', owner, account: ref.account, generation_id: generationId, through,
     from, to, basis, settlement: status, ticker, summary, coverage: manifest.coverage,
-    reconciliation: manifest.reconciliation, unresolved: summarize(unresolved.results.map(r => JSON.parse(r.payload_json))),
+    reconciliation: manifest.reconciliation, ownership_version: manifest.ownership_version || null,
+    unresolved: summarize(unresolved.results.map(r => JSON.parse(r.payload_json))),
     records: rows.map(r => JSON.parse(r.payload_json)),
     next_cursor: more ? btoa(JSON.stringify({ filters, date: last.page_date, id: last.record_id })) : null };
 }

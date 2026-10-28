@@ -211,6 +211,22 @@ class PortfolioLedger:
     def _sync_policy_allocations(self, db: sqlite3.Connection, snapshot_id: str, payload: dict[str, Any], now: str) -> None:
         account_alias = payload["account_alias"]
         as_of = payload["as_of"]
+        ownership = (payload.get("completeness") or {}).get("ownership")
+        if "completeness" not in payload:
+            stored = db.execute("SELECT completeness_json FROM account_snapshots WHERE snapshot_id=?", (snapshot_id,)).fetchone()
+            ownership = json.loads(stored[0]).get("ownership") if stored else None
+        if ownership:
+            # Rebuild this projection from the broker lots atomically. Existing
+            # human corrections remain in the audit log; ticker-wide rows may
+            # not add a second claim on lots now attributed individually.
+            db.execute("UPDATE allocation_lots SET ended_at=? WHERE account_alias=? AND ended_at IS NULL", (as_of, account_alias))
+            for index, row in enumerate(ownership["allocations"]):
+                identity = f"{POLICY_SOURCE_PREFIX}:{snapshot_id}:{index}"
+                db.execute("""INSERT OR REPLACE INTO allocation_lots VALUES (?,?,?,?,?,?,?,?,?,NULL,?,?,?,?)""",
+                    (str(uuid.uuid5(uuid.NAMESPACE_URL, identity)), account_alias, row["conid"], row["model_code"],
+                     row["owner"], row["strategy"], None, row["quantity_decimal"], as_of, row["confidence"], identity,
+                     f"broker lot ownership {ownership['version']}", now))
+            return
         db.execute(
             "DELETE FROM allocation_lots WHERE account_alias=? AND source_event_id LIKE ?",
             (account_alias, f"{POLICY_SOURCE_PREFIX}%"),
@@ -406,6 +422,15 @@ class PortfolioLedger:
                 if not allocations:
                     continue
                 pos["quantity_decimal"] = decimal_text(sum((Decimal(a["quantity_decimal"]) for a in allocations), Decimal("0")))
+                ownership = json.loads(snap["completeness_json"]).get("ownership")
+                if ownership:
+                    parts = [a["position"] for a in ownership["allocations"] if a["conid"] == row["conid"]
+                             and a["model_code"] == row["model_code"] and a["owner"] == owner]
+                    for field in ("market_value_decimal", "market_value_native_decimal", "market_value_base_decimal",
+                                  "unrealized_pnl_decimal", "unrealized_pnl_base_decimal"):
+                        pos[field] = decimal_text(sum((Decimal(p[field]) for p in parts), Decimal(0))) if all(p[field] is not None for p in parts) else None
+                    if len(parts) == 1:
+                        pos.update({k: parts[0][k] for k in ("average_cost_decimal", "average_cost_native_decimal")})
             pos["allocations"] = allocations
             positions.append(pos)
         breaks = [dict(r) for r in self.connection.execute("SELECT * FROM reconciliation_breaks WHERE snapshot_id=? AND status='open'", (snap["snapshot_id"],))]

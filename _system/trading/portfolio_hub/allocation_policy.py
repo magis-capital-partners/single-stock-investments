@@ -158,6 +158,7 @@ def classify_policy_position(
             "tradingClass": row.get("trading_class"),
             "orderRef": row.get("order_ref"),
             "quantity": row.get("quantity_decimal", row.get("quantity")),
+            "openDateTime": row.get("openDateTime"),
         },
         blacklist_family=set(),
         etf_ls_symbols=set(ls_symbols),
@@ -172,6 +173,10 @@ def classify_policy_position(
         return PolicyAllocation("unallocated", "ls_algo", "index_put_hedge", "index_put_hedge")
     if classification.bucket == "spx_0dte":
         return PolicyAllocation("unallocated", "spx_0dte", "spx_option_strategy_exclusion")
+    if row.get("_ownership"):
+        evidence = row["_ownership"]
+        return PolicyAllocation("unallocated" if evidence["owner"] == "excluded" else evidence["owner"],
+                                evidence["strategy"], evidence["reason"])
     if classification.bucket == "etf_ls":
         return PolicyAllocation("unallocated", "letf", "ls_algo_universe_exclusion")
     if classification.bucket == "drew":
