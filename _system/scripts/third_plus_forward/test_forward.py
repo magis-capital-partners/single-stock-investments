@@ -284,6 +284,19 @@ class ForwardTests(unittest.TestCase):
         bars[-1].update(open=8, close=8, high=8, low=8)
         self.assertEqual(input_snapshot(self.candidate, None, bars, self.now)['signals']['S5'], 'unknown')
 
+    def test_frozen_snapshot_retains_price_and_filing_evidence_after_provider_revisions(self):
+        days = P.sessions('2026-10-20', '2026-10-27')
+        bars = [{'day': day, 'open': 10, 'high': 12, 'low': 8, 'close': 8.5, 'volume': 1000} for day in days]
+        financials = {'cfo': -100, 'status': 'source_bound', 'cash_fact': {'val': 200, 'accn': 'original'}, 'cfo_evidence': [{'val': -100, 'filed': '2026-08-01'}]}
+        snapshot = input_snapshot(self.candidate, financials, bars, self.now)
+        bars[-1]['close'] = 11; financials['cfo'] = 100; financials['cash_fact']['accn'] = 'revised'
+        self.assertEqual(snapshot['price_evidence'][-1]['close'], 8.5)
+        self.assertEqual(snapshot['financial_snapshot']['cfo'], -100)
+        self.assertEqual(snapshot['financial_snapshot']['cash_fact']['accn'], 'original')
+        # The retained prices reproduce both price decisions without querying a revised provider history.
+        replay = input_snapshot(self.candidate, snapshot['financial_snapshot'], snapshot['price_evidence'], self.now)
+        self.assertEqual(replay['signals'], snapshot['signals'])
+
     def test_public_endpoint_allowlist_rejects_local_broker_and_paid_hosts(self):
         public_url('https://data.sec.gov/api/xbrl/companyfacts/CIK0000000001.json')
         public_url('https://query1.finance.yahoo.com/v8/finance/chart/ABC?range=3mo&interval=1d')
