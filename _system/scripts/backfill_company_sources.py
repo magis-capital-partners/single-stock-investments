@@ -177,6 +177,7 @@ class Worker:
         self.service=None
         self.manifest=load(root/'dashboard/private-assets.json').get('repository_assets',{})
         self.git=None
+        self.drive_inventory=None
 
     def git_bytes(self, payload):
         relative,sha=payload['path'],payload['sha']
@@ -267,7 +268,11 @@ class Worker:
                 self.service=drive_service(readonly=True)
                 transport=getattr(self.service._http,'http',self.service._http)
                 transport.timeout=30
-            meta=execute_with_retry(self.service.files().get(fileId=p['id'],fields='id,name,mimeType,modifiedTime,md5Checksum,shortcutDetails',supportsAllDrives=True))
+            if self.drive_inventory is None:
+                self.drive_inventory={row['id']:row for row in load(self.cache/'drive-inventory.json').get('items',[])}
+            listed=self.drive_inventory.get(p['id'],{})
+            verified_revision = bool(listed.get('md5Checksum') and listed['md5Checksum']==p.get('revision') and listed.get('mimeType')!='application/vnd.google-apps.shortcut')
+            meta=listed if verified_revision else execute_with_retry(self.service.files().get(fileId=p['id'],fields='id,name,mimeType,modifiedTime,md5Checksum,shortcutDetails',supportsAllDrives=True))
             if meta['mimeType']=='application/vnd.google-apps.shortcut':
                 meta=execute_with_retry(self.service.files().get(fileId=meta['shortcutDetails']['targetId'],fields='id,name,mimeType,modifiedTime,md5Checksum',supportsAllDrives=True))
             revision=meta.get('md5Checksum') or meta.get('modifiedTime') or 'unknown'
@@ -294,6 +299,8 @@ class Worker:
                 if suffix in {'.mp3','.mp4','.m4a','.wav'}:
                     return 'needs_transcript',{},'Audio requires linked transcript'
                 data=execute_with_retry(self.service.files().get_media(fileId=meta['id'],supportsAllDrives=True))
+                if meta.get('md5Checksum') and hashlib.md5(data,usedforsecurity=False).hexdigest()!=meta['md5Checksum']:
+                    raise ValueError('Source revision changed during download; rediscover before indexing')
         else:
             raise ValueError('Unsupported queue kind')
         text,status,details=extract_complete(data,suffix,ocr=self.ocr)

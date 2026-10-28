@@ -31,6 +31,19 @@ def test_discovered_revision_can_reuse_verified_cache_without_drive_connection(t
     assert state=='indexed' and result['reused'] and worker.service is None
 
 
+def test_changed_drive_bytes_are_rejected_before_indexing(monkeypatch,tmp_path):
+    from types import SimpleNamespace
+    from backfill_company_sources import Worker
+    api=SimpleNamespace(_http=SimpleNamespace(timeout=0),files=lambda:SimpleNamespace(get_media=lambda **kwargs:b'new revision'))
+    monkeypatch.setitem(sys.modules,'drive_store_common',SimpleNamespace(drive_service=lambda **kwargs:api,execute_with_retry=lambda value:value))
+    revision='a'*32
+    (tmp_path/'drive-inventory.json').write_text(json.dumps({'items':[{'id':'id','name':'source.pdf','mimeType':'application/pdf','md5Checksum':revision}]}))
+    worker=Worker(tmp_path,tmp_path)
+    with pytest.raises(ValueError,match='revision changed'):
+        worker.run({'kind':'drive','payload':{'id':'id','revision':revision,'title':'source.pdf'}})
+    assert not list((tmp_path/'drive').glob('*.json'))
+
+
 def test_legacy_pdf_cache_is_reverified_but_complete_original_is_kept(tmp_path):
     q=SourceQueue(tmp_path/'work.sqlite')
     for name,detail in [('legacy',{}),('complete',{'pages':3,'missing_pages':[]})]:
