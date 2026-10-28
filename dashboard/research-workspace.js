@@ -158,7 +158,7 @@
     const risk=risks[0];
     const riskText=typeof risk==='string'?risk:risk?.falsifier||risk?.metric||t.investment_committee?.strongest_dissent;
     const changes=(h.developments||[]).filter(r=>r.label && !/unverified issuer|automatic repair|pending refresh/i.test(r.label)).slice(0,2);
-    return `<div class="rw-overview-bottom"><section><h3>Key operating metrics</h3>${kpis(t,h,3)}<button type="button" class="rw-text-button" data-rw-go="models">All models &amp; KPIs</button></section><section class="rw-brief"><h3>Recent developments</h3>${changes.length?`<ul>${changes.map(r=>`<li>${r.url?h.linkHtml(r.url,r.label):e(r.label)} <span class="rw-meta">${e(r.date||'Undated')}</span></li>`).join('')}</ul>`:'<p class="rw-empty">No verified recent development recorded.</p>'}<h3>Main open question</h3><p>${e(riskText||'Review the company sources to establish the key thesis risk.')}</p></section></div><section data-company-library="summary"></section>`;
+    return `${global.BuybackViz?.renderSummary?.(t)||''}<div class="rw-overview-bottom"><section><h3>Key operating metrics</h3>${kpis(t,h,3)}<button type="button" class="rw-text-button" data-rw-go="models">All models &amp; KPIs</button></section><section class="rw-brief"><h3>Recent developments</h3>${changes.length?`<ul>${changes.map(r=>`<li>${r.url?h.linkHtml(r.url,r.label):e(r.label)} <span class="rw-meta">${e(r.date||'Undated')}</span></li>`).join('')}</ul>`:'<p class="rw-empty">No verified recent development recorded.</p>'}<h3>Main open question</h3><p>${e(riskText||'Review the company sources to establish the key thesis risk.')}</p></section></div><section data-company-library="summary"></section>`;
   }
   function normalize(panel) {
     panel.querySelectorAll('details[data-buyback-detail]').forEach(el => { if (!el.dataset.rwInitialized) { el.open = false; el.dataset.rwInitialized = 'true'; } });
@@ -205,7 +205,7 @@
       root.querySelectorAll('.rw-panel').forEach(panel => { panel.hidden = panel.id !== `rw-panel-${id}`; });
       const panel = root.querySelector(`#rw-panel-${id}`);
       if (!rendered.has(id)) {
-        panel.innerHTML = id === 'overview' ? compactOverview(t,h) : id === 'sources' ? '<section data-company-library="sources"></section>' : `${section('Company valuation & assumptions',renderers.valuation?.() || '')}${section('Operating KPI history',renderers.business?.() || '')}<h3>Models &amp; supporting data</h3><section data-company-library="models"></section>${section('Research and decision history',renderers.evidence?.() || '')}`;
+        panel.innerHTML = id === 'overview' ? compactOverview(t,h) : id === 'sources' ? '<section data-company-library="sources"></section>' : `<section class="company-models" data-company-models></section><section data-company-commodities></section>${section('Company valuation & assumptions',renderers.valuation?.() || '')}${section('Operating KPI history',renderers.business?.() || '')}<h3>Models &amp; supporting data</h3><section data-company-library="models"></section>${section('Research and decision history',renderers.evidence?.() || '')}`;
         normalize(panel);
         if (state.open?.[id]) panel.querySelectorAll(':scope > details').forEach(el => { el.open = state.open[id].includes(el.querySelector(':scope > summary')?.textContent); });
         rendered.add(id); options.afterRender?.(id,panel);

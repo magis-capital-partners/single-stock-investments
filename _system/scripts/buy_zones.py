@@ -17,8 +17,10 @@ def load_config(path: Path = CONFIG_PATH) -> dict:
     thresholds = config["hurdles_pct"]
     if len(config["buy_zones"]) != 3 or len({zone["id"] for zone in config["buy_zones"]}) != 3:
         raise ValueError("Exactly three distinct buy-zone definitions are required")
-    if len(config["tickers"]) != 37 or len(set(config["tickers"])) != 37 or "TOI" in config["tickers"] or "BRK-B" in config["tickers"]:
-        raise ValueError("Core universe must preserve all 37 canonical issuer identities")
+    if not config["tickers"] or len(set(config["tickers"])) != len(config["tickers"]) or "TOI" in config["tickers"] or "BRK-B" in config["tickers"]:
+        raise ValueError("Core universe requires unique canonical issuer identities")
+    if any(t not in config["issuers"] for t in config["tickers"]):
+        raise ValueError("Every compounder requires issuer metadata")
     if any(number(v) is None or v <= 0 for v in thresholds):
         raise ValueError("Hurdles must be positive finite percentages")
     if not 0 < config["alerts"]["irr_delta_pp"]:

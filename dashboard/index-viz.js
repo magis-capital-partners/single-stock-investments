@@ -504,16 +504,19 @@
 
     return `<div class="index-watch-panel" data-show-style="${showStyleSubset ? '1' : '0'}">
       <p class="muted" style="margin-bottom:8px">${escapeHtml(caption)}</p>
-      <p class="muted" style="margin-bottom:8px"><a href="#/ideas/situations/forced-sellers">Index deletes and dividend cuts sit with the other forced sellers.</a></p>
+      ${options?.consolidated ? '' : '<p class="muted"><a href="#/ideas/situations/forced-sellers">Open Index &amp; forced flows</a></p>'}
       <p style="margin-bottom:8px">${stats}</p>
       <h3 style="margin:12px 0 4px;font-size:13px;text-transform:uppercase;letter-spacing:0.04em;color:var(--text-secondary)">Reconstitution calendar</h3>
       ${renderCalendarStrip(calendar, escapeHtml)}
+      ${options?.consolidated ? '<details class="research-fold"><summary>Estimated flows &amp; deletion risks</summary><div class="research-fold-body">' : ''}
       ${renderFloatImpactsTable(summary, byTicker, escapeHtml)}
       ${renderPredictorWatchlist(summary, escapeHtml)}
+      ${options?.consolidated ? '</div></details><details class="research-fold"><summary>Provider notices &amp; history</summary><div class="research-fold-body">' : ''}
       <h3 style="margin:12px 0 4px;font-size:13px;text-transform:uppercase;letter-spacing:0.04em;color:var(--text-secondary)">Index events</h3>
       <p class="muted" style="margin-bottom:6px">Size events = provider notices or headlines with an explicit parent-index add/delete cue. Style/subset notes (Growth/Value/Defensive/2500) are hidden by default and never drive float impact. % float = base-case net forced flow / company float (signed).</p>
       ${renderConfirmedTable(byTicker, escapeHtml, linkHtml)}
       ${renderNewsNotesTable(byTicker, escapeHtml, linkHtml, { showStyleSubset })}
+      ${options?.consolidated ? '</div></details>' : ''}
     </div>`;
   }
 

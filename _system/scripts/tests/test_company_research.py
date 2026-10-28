@@ -9,10 +9,28 @@ import pytest
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 from company_sources import Matcher, SourceIndex, extract, retain_previous
-from build_company_research import Builder
+from build_company_research import Builder, read_companies
 from stage_company_research import stage
 
 COMPANIES = {"CME": {"company": "CME Group Inc.", "market": "US"}, "MSB": {"company": "Mesabi Trust", "market": "US"}, "NEM": {"company": "Newmont Corporation", "market": "US"}, "CLSK": {"company": "CleanSpark Inc.", "market": "US"}, "MSTR": {"company": "MicroStrategy Inc.", "market": "US"}}
+
+
+def test_new_compounder_has_an_archive_before_valuation_coverage(tmp_path):
+    config=tmp_path/"_system/reference/core_compounders.json"
+    config.parent.mkdir(parents=True)
+    config.write_text(json.dumps({"tickers":["HEI"],"issuers":{"HEI":{"display_name":"HEICO Corporation"}}}))
+    assert read_companies(tmp_path)["HEI"]["company"]=="HEICO Corporation"
+
+
+def test_commodity_model_archive_uses_only_its_reviewed_company_scope(tmp_path):
+    config=tmp_path/"_system/scripts/commodity_configs/gold.json"
+    config.parent.mkdir(parents=True)
+    config.write_text(json.dumps({"id":"gold","version":"2026-10-28.1","question":"Gold monetary stock", "related_tickers":["NEM"],"scenarios":[],"description":"CME Group Inc. earns revenue from clearing contracts and its business has strong growth in customer demand."}))
+    b=Builder(tmp_path,None,tmp_path/"out",tmp_path/"cache",companies=COMPANIES)
+    b.shared_models()
+    row=next(iter(b.index.records.values()))
+    assert [r["ticker"] for r in row["relationships"]]==["NEM"]
+    assert row["relationships"][0]["relationship"]=="industry_context"
 
 
 def test_fund_acronym_is_not_company_research():
@@ -131,6 +149,33 @@ def test_drive_and_vault_renditions_reuse_full_text_matching(tmp_path):
     assert len(b.matches)==1
     assert original["title"]=="Fund commentary.pdf"
     assert original["relationships"]==local["relationships"]
+
+
+def test_drive_exact_copy_keeps_verified_passages_without_reprocessing_body(tmp_path,monkeypatch):
+    b=Builder(tmp_path,None,tmp_path/"out",tmp_path/"cache",companies=COMPANIES)
+    body="CME Group Inc. earns transaction revenue from clearing and futures. Customer demand and contract volumes grew significantly this year."
+    row=b.base("vault","Original commentary","vault",text=body)
+    b.add(row,["md5:exact"])
+    calls=[]
+    original=b.matcher.match
+    def track(title,text,explicit):
+        calls.append(text)
+        return original(title,text,explicit)
+    monkeypatch.setattr(b.matcher,"match",track)
+    class Request:
+        def __init__(self,result):self.result=result
+        def execute(self):return self.result
+    class Files:
+        def get(self,**kwargs):return Request({"id":"root","driveId":"drive","name":"Research"})
+        def list(self,**kwargs):return Request({"files":[{"id":"copy","name":"Renamed commentary.pdf","mimeType":"application/pdf","md5Checksum":"exact"}]})
+    monkeypatch.setitem(sys.modules,"drive_store_common",SimpleNamespace(drive_service=None,configured_root_ids=None,execute_with_retry=lambda r:r.execute(),build_folder_paths=lambda items,roots:{},FOLDER_MIME="folder"))
+    b.drive(service=SimpleNamespace(files=lambda:Files()),roots=["root"])
+    assert calls==[""]
+    assert len(b.index.records)==1
+    rec=next(iter(b.index.records.values()))
+    assert b.text(rec)==body
+    assert rec["relationships"][0]["passages"]
+    assert rec["locations"][0]["kind"]=="drive"
 
 
 def test_source_at_end_of_large_document_is_matched():

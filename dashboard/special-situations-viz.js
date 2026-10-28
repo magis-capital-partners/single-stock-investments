@@ -20,6 +20,7 @@
 
   function laneLabel(payload, id) {
     const lane = (payload.lanes || []).find((row) => row.id === id);
+    if(id==='forced_sellers')return 'Index & forced flows';
     return lane ? lane.label : String(id || '').replaceAll('_', ' ');
   }
 
@@ -166,16 +167,25 @@
     if (Object.prototype.hasOwnProperty.call(opts, 'focus')) state.focus = opts.focus || '';
     if (opts.gatesOpen) state.gatesOpen = true;
     const doc = payload || {};
-    const counts = (doc.counts && doc.counts.ranked) || {};
-    const ranked = selectRows(doc.rows, state.lane);
-    const discovery = selectRows(doc.discovery, state.lane);
-    const history = selectRows(doc.history, state.lane);
+    const today = new Date().toISOString().slice(0,10);
+    const activeRows=[], endedFlows=[], undatedFlows=[];
+    for(const row of doc.rows || []) {
+      if(!matchesLane(row,'forced_sellers')) { activeRows.push(row); continue; }
+      const end=row.flow?.window_end || row.ends;
+      if(['closed','ended','cancelled','expired'].includes(row.status) || /^\d{4}-\d{2}-\d{2}$/.test(end||'') && end<today) endedFlows.push(row);
+      else if(!/^\d{4}-\d{2}-\d{2}$/.test(end||'') || row.evidence_kind==='news') undatedFlows.push(row);
+      else activeRows.push(row);
+    }
+    const ranked = selectRows(activeRows, state.lane);
+    const discovery = selectRows([...(doc.discovery || []),...undatedFlows], state.lane);
+    const history = selectRows([...(doc.history || []),...endedFlows], state.lane);
+    if(state.focus && history.some(row=>row.ticker===state.focus))state.showHistory=true;
     if (state.focus && !ranked.some((row) => row.ticker === state.focus) && discovery.some((row) => row.ticker === state.focus)) {
       state.showDiscovery = true;
     }
     const shownDiscovery = state.showDiscovery ? discovery : discovery.slice(0, 12);
-    const chips = [{ id: 'all', label: 'All', count: (doc.rows || []).length }].concat(
-      (doc.lanes || []).map((lane) => ({ id: lane.id, label: lane.label, count: counts[lane.id] || 0 })),
+    const chips = [{ id: 'all', label: 'All', count: activeRows.length }].concat(
+      (doc.lanes || []).map((lane) => ({ id: lane.id, label: lane.id==='forced_sellers'?'Index & forced flows':lane.label, count: activeRows.filter(row=>matchesLane(row,lane.id)).length })),
     );
     const mentionRows = state.lane === 'buyback_events' ? (doc.buyback_mentions || []).filter(row => !state.query || `${row.ticker} ${row.line}`.toLowerCase().includes(state.query.toLowerCase())) : [];
     const mentionBlock = mentionRows.length
@@ -185,7 +195,7 @@
       ? `<details class="situation-gates" data-situation-gates ${state.gatesOpen ? 'open' : ''}><summary>Contract gates</summary><div data-situation-gates-host></div></details>`
       : '';
     const historyBlock = history.length
-      ? `<p class="form-hint"><label><input type="checkbox" data-situation-history ${state.showHistory ? 'checked' : ''}/> Show ${history.length} ended contract${history.length === 1 ? '' : 's'}</label></p>${state.showHistory ? `<div class="ideas-table-wrap"><table class="ideas-table"><tbody>${history.map((row) => rowHtml(row, doc)).join('')}</tbody></table></div>` : ''}`
+      ? `<p class="form-hint"><label><input type="checkbox" data-situation-history ${state.showHistory ? 'checked' : ''}/> Show ${history.length} ended situation${history.length === 1 ? '' : 's'}</label></p>${state.showHistory ? `<div class="ideas-table-wrap"><table class="ideas-table"><tbody>${history.map((row) => rowHtml(row, doc)).join('')}</tbody></table></div>` : ''}`
       : '';
     const discoveryBlock = discovery.length
       ? `<details class="situation-discovery" ${state.showDiscovery ? 'open' : ''}><summary>Unverified candidates · ${discovery.length}. Terms unknown. Not a position.</summary>
@@ -196,14 +206,15 @@
     return `<div class="ideas-shell">
       <header class="ideas-header"><div>
         <div class="warrant-kicker">Special situations</div>
-        <h2>The situation ends.</h2>
-        <p>${esc(doc.definition || '')}</p>
+        <h2>${state.lane==='forced_sellers'?'Index & forced flows':'Special situations'}</h2>
+        <p>${state.lane==='forced_sellers'?'One place for index changes, reconstitutions and forced selling. Compare the timing, estimated demand and original evidence.':esc(doc.definition || '')}</p>
         ${doc.caption && CAPTION_LANES.has(state.lane) ? `<p class="situation-caption" data-situation-caption>${esc(doc.caption)}</p>` : ''}
       </div><span class="ideas-asof">As of ${esc((doc.generated_at || '').slice(0, 10) || '—')}</span></header>
       <div class="screen-switcher" aria-label="Special situation lanes">${chips.map((chip) => `<button type="button" class="${state.lane === chip.id ? 'active' : ''}" data-situation-lane="${esc(chip.id)}">${esc(chip.label)} · ${chip.count}</button>`).join('')}</div>
       <div class="warrant-toolbar">
         <input class="search" data-situation-search aria-label="Search special situations" placeholder="Search ticker, company, or situation…" value="${esc(state.query)}">
       </div>
+      ${state.lane==='forced_sellers' ? `<section class="ideas-surface"><h3>Index calendar &amp; flow evidence</h3><p class="desk-caption">Provider notices, prospective flows and historical evidence. Dated situations follow below; missing timing and headlines remain in candidates.</p>${doc.index_membership && global.IndexViz ? global.IndexViz.renderIndexWatch(doc.index_membership,{escapeHtml:esc,consolidated:true}) : '<p class="desk-empty">Index evidence is unavailable in this snapshot.</p>'}</section>` : ''}
       <section class="ideas-surface"><div class="ideas-surface-head"><strong>${ranked.length} ranked</strong><span>Filing before headline · click a ticker for the clock and the next step</span></div>
         <div class="ideas-table-wrap"><table class="ideas-table"><thead><tr><th>Ticker</th><th>What</th><th>Lane</th><th>Ends</th><th>Evidence</th><th>Next</th></tr></thead><tbody>${ranked.length ? ranked.map((row) => rowHtml(row, doc)).join('') : '<tr><td colspan="6">Nothing ranked in this lane. Unverified candidates, when the screen has them, stay below.</td></tr>'}</tbody></table></div>
       </section>
