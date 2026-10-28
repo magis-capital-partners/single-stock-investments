@@ -319,6 +319,128 @@ def test_challenger_findings_are_returned_to_the_author_for_automatic_revision(t
     assert findings[0]['detail'] == 'Separate the captive finance debt claim.'
 
 
+def test_rejected_proposals_resume_with_full_critique_across_batches(tmp_path, monkeypatch):
+    import underwriting_pipeline as pipeline
+    company_root(tmp_path)
+    settings = pipeline.read(tmp_path/pipeline.POLICY)
+    settings['maximum_author_attempts'] = 1
+    pipeline.write(tmp_path/pipeline.POLICY, settings)
+    monkeypatch.setattr(pipeline, 'evaluate', lambda **kw: {'approved': True})
+    calls, payloads, state = [], [], {}
+    c = contract()
+    def execute(stage, payload, output, receipt_path):
+        calls.append(stage)
+        if stage == 'author':
+            payloads.append(payload)
+            answer = c
+        else:
+            answer = review(c)
+            answer.update(verdict='revise', independent_thesis='A long independent thesis. '*180,
+                          findings=[{'severity':'major','detail':'Retained cash must fund the merchant liability.'}])
+        pipeline.write(output, answer)
+        pipeline.write(receipt_path, {'agent_id':stage+str(len(calls)), 'status':'finished', 'finished_at':pipeline.now()})
+    for _ in range(2):
+        with pytest.raises(pipeline.StageBlocked):
+            pipeline.run_company(tmp_path,tmp_path/'work','TEST','2026-10-26',state,tmp_path/'vault',
+                                 prepare=lambda *a:packet(),execute=execute)
+    assert calls == ['author','challenger','author']  # Identical rejected proposal reuses its review.
+    assert payloads[1]['revision_feedback']['previous_contract'] == c
+    assert payloads[1]['revision_feedback']['independent_challenge']['findings'][0]['detail'].startswith('Retained cash')
+    assert pipeline.read(tmp_path/'work/progress/TEST.json')['history']
+
+
+def test_approved_strong_stages_resume_after_a_builder_budget_block(tmp_path, monkeypatch):
+    import refresh_shared_forecasts as refresh
+    import underwriting_pipeline as pipeline
+    company_root(tmp_path)
+    monkeypatch.setattr(pipeline,'today',lambda:'2026-10-26')
+    monkeypatch.setattr(refresh,'refresh_quote',lambda *a,**kw:None)
+    monkeypatch.setattr(refresh,'refresh_missing_model_inputs',lambda *a:None)
+    calls, state, c = [], {}, contract()
+    execute = mock_stages(c,calls)
+    def blocked(stage, *args):
+        if stage == 'builder':
+            raise pipeline.StageBlocked('model_call_daily_subject_budget')
+        execute(stage,*args)
+    with pytest.raises(pipeline.StageBlocked):
+        pipeline.run_company(tmp_path,tmp_path/'work','TEST','2026-10-26',state,tmp_path/'vault',
+                             prepare=lambda *a:packet(),execute=blocked)
+    result = pipeline.run_company(tmp_path,tmp_path/'work','TEST','2026-10-26',state,tmp_path/'vault',
+                                  prepare=lambda *a:packet(),execute=execute)
+    assert result['status'] == 'validated'
+    assert calls == ['author','challenger','builder']
+
+
+def test_only_pull_request_creation_uses_the_existing_service_credential(monkeypatch):
+    import json
+
+    import publish_underwriting as publisher
+    monkeypatch.setenv('GH_TOKEN','default-repository-token')
+    monkeypatch.setenv('UNDERWRITING_PR_TOKEN','existing-service-token')
+    used = []
+    def execute(args, **kw):
+        used.append((args,kw.get('env',{}).get('GH_TOKEN')))
+        return json.dumps({'number':1}).encode()
+    monkeypatch.setattr(publisher.subprocess,'check_output',execute)
+    publisher.github('example/test','pulls',{'title':'Data publication'})
+    publisher.github('example/test','dispatches',{'event_type':'underwriting-validate-pr'})
+    assert [token for _,token in used] == ['existing-service-token','default-repository-token']
+
+
+def test_pre_checkpoint_paid_reviews_are_recovered_with_the_latest_proposal(tmp_path, monkeypatch):
+    import underwriting_pipeline as pipeline
+    company_root(tmp_path)
+    monkeypatch.setattr(pipeline,'evaluate',lambda **kw:{'approved':True})
+    work, state, c = tmp_path/'work', {}, contract()
+    for index in range(2):
+        c = copy.deepcopy(c)
+        c['assumptions'][0]['value'] -= .05
+        def execute(stage,payload,output,receipt_path):
+            answer = c if stage == 'author' else {**review(c),'verdict':'revise',
+                        'findings':[{'severity':'major','detail':'Unresolved financing '+str(index)}]}
+            pipeline.write(output,answer)
+            pipeline.write(receipt_path,{'agent_id':stage+str(index),'status':'finished',
+                                        'finished_at':f'2026-10-26T0{index}:00:00+00:00'})
+        pipeline.call_stage(tmp_path,work,'TEST','author',{'packet':packet(),'attempt':index},state,execute=execute)
+        pipeline.call_stage(tmp_path,work,'TEST','challenger',
+                            pipeline.challenge_payload(packet(),c,compile_contract(packet(),c)),state,execute=execute)
+    saved = pipeline.load_progress(tmp_path,work,'TEST',packet())
+    assert len(saved['history']) == 2
+    assert saved['feedback']['previous_contract'] == c
+    assert saved['feedback']['independent_challenge']['findings'][0]['detail'].endswith('1')
+    changed = packet()
+    changed['packet_hash'] = 'f'*64
+    assert pipeline.load_progress(tmp_path,work,'TEST',changed)['feedback'] is None
+
+
+@pytest.mark.parametrize('unapproved',[False,True])
+def test_publication_recovery_checks_the_producer_and_the_data_only_diff(monkeypatch, unapproved):
+    import publish_underwriting as publisher
+    monkeypatch.setenv('GITHUB_REPOSITORY','example/test')
+    events = []
+    def api(repo,path,payload=None):
+        if path.startswith('actions/runs/'):
+            return {'path':'.github/workflows/valuation-underwriting.yml','head_repository':{'full_name':repo}}
+        if path.startswith('compare/'):
+            return {'files':[{'filename':'unexpected.py' if unapproved else '_system/data/underwriting_queue.json','status':'modified'}],
+                    'commits':[{'sha':'a'*40}]}
+        if path.startswith('pulls?'):
+            return []
+        events.append((path,payload))
+        return {'number':42,'html_url':'https://example.test/pull/42','head':{'sha':'a'*40}}
+    monkeypatch.setattr(publisher,'github',api)
+    if unapproved:
+        with pytest.raises(ContractError,match='unapproved changes'):
+            publisher.recover_publication('codex/underwriting-1234')
+        assert not events
+    else:
+        result = publisher.recover_publication('codex/underwriting-1234')
+        assert result['status'] == 'checks_requested'
+        assert [p['event_type'] for path,p in events if path == 'dispatches'] == ['research-quality-pr','underwriting-validate-pr']
+    with pytest.raises(ContractError,match='Not a producer branch'):
+        publisher.recover_publication('codex/untrusted-code')
+
+
 def test_supplemental_numbers_are_checked_against_the_exact_frozen_table():
     from underwriting_evidence import supplemental_observations
     p = packet()

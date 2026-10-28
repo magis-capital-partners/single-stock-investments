@@ -102,6 +102,8 @@ jobs:
             bash _system/scripts/ci_push_vault.sh "Preserve company underwriting evidence and provider receipts" "--force valuation-underwriting"
           fi
       - name: Publish validated models through pinned checks and automatic merge
+        env:
+          UNDERWRITING_PR_TOKEN: ${{ secrets.RESEARCH_VAULT_CLONE_TOKEN }}
         run: python -u _system/scripts/publish_underwriting.py --wait
       - name: Record actual completion and unresolved gaps
         if: always()
