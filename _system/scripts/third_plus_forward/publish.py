@@ -103,6 +103,7 @@ def project(frozen, rows, status, now, historical=None):
                           'signals': (e['input'] if e else snapshot)['signals'],
                           'input_sha256': e['input_sha256'] if e else candidate['input_sha256'],
                           'decision_recorded_at': e['observed_at'] if e else None,
+                          'snapshot_at': snapshot['known_at'],
                           'entry_at': e['entry_at'] if e else missed['entry_at'] if missed else candidate.get('entry_at'),
                           'cover_day': e['schedule']['cover_day'] if e else None,
                           'decision': e['decision'] if e else 'missed' if missed else candidate.get('status', 'waiting'),
