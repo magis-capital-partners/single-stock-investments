@@ -320,6 +320,27 @@ def test_an_overwritten_model_cannot_bypass_a_failed_underwriting_receipt():
     assert f['present_value_today_per_share']['base'] is None
 
 
+def test_routine_legacy_jobs_cannot_rewrite_sealed_company_economics(tmp_path, monkeypatch):
+    import automate_valuation_readiness as automation
+    import fetch_equity_prices as prices
+    import underwriting_pipeline as pipeline
+    from marvin_valuation import compute_valuation
+    sealed = compile_contract(packet(), contract())
+    original = copy.deepcopy(sealed)
+    path = tmp_path/'TEST/research/valuation.json'
+    pipeline.write(path, sealed)
+    saved = path.read_bytes()
+    monkeypatch.setattr(automation, 'ROOT', tmp_path)
+    monkeypatch.setattr(prices, 'ROOT', tmp_path)
+    monkeypatch.setattr(prices, 'fetch_price', lambda *a: pytest.fail('Legacy price injection must not run'))
+    assert prices.merge_ticker('TEST', force=True)
+    assert path.read_bytes() == saved
+    assert automation.compile_valuation('TEST', '2026-10-27', {}, {}) == original
+    assert automation.merge_compiled_model(original, {'as_of': '2026-10-27', 'inputs': {'price': 999}}) == original
+    assert compute_valuation(sealed) == original
+    assert sealed == original
+
+
 def test_paid_budget_is_enforced_before_a_provider_can_be_called(tmp_path):
     import underwriting_pipeline as pipeline
     from llm_call_gate import append_ledger
