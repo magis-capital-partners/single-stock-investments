@@ -2407,7 +2407,7 @@ function setAppHash(nextHash) {
 
 function parseRouteFromHashString(hash) {
   hash = String(hash || '').split('?')[0];
-  const portfolioMatch = /^#\/portfolio(?:\/(all|drew|michael))?(?:\/(positions|risk|margin|performance|orders|reconciliation))?$/i.exec(hash || '');
+  const portfolioMatch = /^#\/portfolio(?:\/(all|drew|michael))?(?:\/(positions|realized|risk|margin|performance|orders|reconciliation))?$/i.exec(hash || '');
   if (portfolioMatch) {
     return { view: 'portfolio', scope: (portfolioMatch[1] || 'all').toLowerCase(), section: (portfolioMatch[2] || 'positions').toLowerCase(), ticker: null, watchlistSub: null };
   }
