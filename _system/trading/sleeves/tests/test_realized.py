@@ -392,3 +392,32 @@ def test_unavailable_or_failed_flex_reports_cannot_enter_a_request_loop(tmp_path
                                   destination=tmp_path / "report.xml", token="test-token")
     assert len(calls) == expected_calls
     assert not (tmp_path / "report.xml").exists()
+
+
+def test_reporting_token_file_is_data_and_does_not_expand_other_credentials(tmp_path, monkeypatch):
+    from _system.trading.sleeves.realized_flex import reporting_token
+    path = tmp_path / "reporting.env"
+    content = "UNRELATED_PASSWORD=literal$9\nUNRELATED_COMMAND=$(exit 1)\nexport IBKR_FLEX_TOKEN='test$9#literal' # comment\n"
+    path.write_text(content)
+    monkeypatch.setenv("IBKR_FLEX_TOKEN_FILE", str(path))
+    monkeypatch.setenv("IBKR_FLEX_TOKEN", "stale-ambient-value")
+    assert reporting_token() == "test$9#literal"
+    assert path.read_text() == content
+
+
+@pytest.mark.parametrize("content", ["OTHER=value\n", "IBKR_FLEX_TOKEN=\n", "IBKR_FLEX_TOKEN=one\nIBKR_FLEX_TOKEN=two\n", 'IBKR_FLEX_TOKEN="unclosed-secret\n'])
+def test_ambiguous_or_missing_reporting_token_fails_without_echoing_credentials(tmp_path, monkeypatch, content):
+    from _system.trading.sleeves.realized_flex import reporting_token
+    path = tmp_path / "reporting.env"
+    path.write_text(content)
+    monkeypatch.setenv("IBKR_FLEX_TOKEN_FILE", str(path))
+    with pytest.raises(ValueError) as caught:
+        reporting_token()
+    assert "unclosed-secret" not in str(caught.value)
+
+
+def test_existing_reporting_token_environment_still_works(monkeypatch):
+    from _system.trading.sleeves.realized_flex import reporting_token
+    monkeypatch.delenv("IBKR_FLEX_TOKEN_FILE", raising=False)
+    monkeypatch.setenv("IBKR_FLEX_TOKEN", "test-existing-token")
+    assert reporting_token() == "test-existing-token"
