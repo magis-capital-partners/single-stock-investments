@@ -7,6 +7,7 @@ Synced from `_system/portfolio/registry.json`. Last sync: 2026-10-28.
 | Ticker | Folder | Company | Market | Last download | Last research | Archetype | Stance |
 |--------|--------|---------|--------|---------------|---------------|-----------|--------|
 | 0388.HK | 0388.HK/ | Hong Kong Exchanges and Clearing Ltd | EU | 2026-07-19 | 2026-10-28 | croupier | watch |
+| 1211.HK | 1211.HK/ | BYD Company Limited | EU | 2026-10-28 | 2026-10-28 | compounder | watch |
 | 319A.T | 319A.T/ | Next Generation Technology Group Inc. | JP | 2026-10-05 | 2026-10-28 | serial_acquirer | watch |
 | 3905.T | 3905.T/ | DataSection Co., Ltd. | JP | 2026-07-19 | 2026-10-28 | compounder | watch |
 | 7176.T | 7176.T/ | Simplex Financial Holdings Co., Ltd. | JP | 2026-07-19 | 2026-10-28 | unknown | watch |
@@ -873,4 +874,4 @@ Synced from `_system/portfolio/registry.json`. Last sync: 2026-10-28.
 | ZETA | ZETA/ | ZETA | US | 2026-07-28 | 2026-10-28 | unknown | watch |
 | ZTS | ZTS/ | Zoetis | US | 2026-07-10 | 2026-10-28 | unknown | watch |
 
-**866 holdings total.** Registry: `_system/portfolio/registry.json`
+**867 holdings total.** Registry: `_system/portfolio/registry.json`
