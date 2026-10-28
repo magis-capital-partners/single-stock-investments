@@ -82,6 +82,23 @@ def test_compiler_uses_frozen_observations_and_existing_forecast_engine():
     assert value['valuation_methodology']['automation'] == 'independent_underwriting'
 
 
+@pytest.mark.parametrize('archetype,framework,profile', [
+    ('compounder','operating_dcf','quality_reinvestment'),
+    ('cyclical','sum_of_parts','capital_cycle'),
+    ('financial_balance_sheet','financial_equity','credit_and_normalized_returns'),
+    ('pre_profit','inventory_runoff','catalyst_asset_value'),
+    ('utility','operating_dcf','predictable_cash_flow'),
+    ('resource','royalty_cashflow','scarce_asset_optionality'),
+])
+def test_reviewed_company_economics_route_from_fresh_classification(archetype, framework, profile):
+    from valuation_method_router import route_valuation
+    c = contract()
+    c.update(archetype=archetype,framework=framework)
+    model = compile_contract(packet(),c)
+    model['classification_inputs'] = {'archetype':'compounder'}
+    assert route_valuation(model)['profile_id'] == profile
+
+
 @pytest.mark.parametrize('ratio', [2, 5, .5])
 def test_listing_receipts_convert_ordinary_share_cashflows_exactly_once(ratio):
     from test_shared_valuation_forecast import sourced_market, sourced_quote
