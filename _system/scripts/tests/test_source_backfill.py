@@ -9,8 +9,19 @@ import pytest
 sys.path.insert(0,str(Path(__file__).resolve().parents[1]))
 from company_source_queue import SourceQueue
 from company_source_cache import pack,restore
-from backfill_company_sources import extract_complete,transcript_for,audit_cache
+from backfill_company_sources import extract_complete,transcript_for,audit_cache,preserve_outcome
 from company_sources import SourceIndex
+
+
+def test_access_failure_is_published_without_erasing_last_good_text(tmp_path):
+    from company_sources import digest
+    job={'kind':'drive','payload':{'id':'id','revision':'v1'}}
+    target=tmp_path/'drive'/(digest('idv1')+'.json')
+    preserve_outcome(tmp_path,job,'access_unavailable',{},'Publisher denied access')
+    assert json.loads(target.read_text())['status']=='access_unavailable'
+    target.write_text(json.dumps({'text':'existing original','status':'indexed'}))
+    preserve_outcome(tmp_path,job,'failed',{},'Temporary failure')
+    assert json.loads(target.read_text())['text']=='existing original'
 
 
 def test_model_source_is_read_as_text_without_execution():

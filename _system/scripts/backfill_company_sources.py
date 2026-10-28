@@ -29,6 +29,22 @@ def complete_cache(cached, suffix):
     return not required or bool(cached.get('extraction', {}).get(required))
 
 
+def preserve_outcome(cache, job, status, result, error):
+    """Expose failed originals to publication without erasing recovered text."""
+    if status == 'indexed' or job['kind'] not in {'git','drive'}:
+        return
+    payload=job['payload']
+    if job['kind']=='git':
+        target=cache/'git'/(payload['sha']+'.json')
+    else:
+        revision=payload.get('revision')
+        if not revision or revision in {'unknown','discover'}:return
+        target=cache/'drive'/(digest(payload['id']+revision)+'.json')
+    prior=load(target)
+    if not prior:
+        write(target,{'version':1,'text':'','status':status,'attempted_at':time.time(),'error':error})
+
+
 def audit_cache(queue, cache):
     """Requeue legacy PDF/ebook results that lack whole-document evidence."""
     reset = []
@@ -378,6 +394,7 @@ def main():
                 code=getattr(getattr(exc,'resp',None),'status',None)
                 status='access_unavailable' if code in {401,403,404} or isinstance(exc,(FileNotFoundError,SystemExit)) else 'retry' if job['attempts']<4 else 'failed'
                 result={};error=f'{type(exc).__name__}: '+str(exc)[:250]
+            preserve_outcome(args.cache,job,status,result,error)
             queue.finish(job['key'],status,result=result,error=error)
             count+=1
             if time.monotonic()-checkpointed>=300:
