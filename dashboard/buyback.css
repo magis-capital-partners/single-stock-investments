@@ -64,6 +64,7 @@
 .bb-radar-controls label { display:grid; justify-content:stretch; gap:6px; font-size:11px; color:var(--bb-soft); }
 .bb-radar-controls .bb-search { flex:1; min-width:180px; }
 .bb-radar-controls .bb-search input { width:100%; min-width:0; }
+.bb-radar-controls select { width:100%; min-width:0; max-width:100%; box-sizing:border-box; }
 .bb-radar input,.bb-radar select,.bb-radar button { font:inherit; background:var(--bg-input,#111827); color:var(--bb-ink); border:1px solid var(--border,#283449); border-radius:8px; min-height:38px; padding:9px 12px; font-size:12px; }
 .bb-radar button { cursor:pointer; }
 .bb-radar button:hover:not(:disabled) { border-color:var(--accent-green,#62c4b8); }
@@ -109,3 +110,6 @@
 .bb-headline-metrics { grid-template-columns:repeat(2,minmax(0,1fr)); }
 .bb-fold { padding:12px 0; border-bottom:1px solid var(--border); }
 .bb-fold > summary { color:var(--text-secondary); font-size:12px; cursor:pointer; }
+
+/* Leaderboards must also wrap when the radar is embedded on its own. */
+.bb-leaderboards{display:flex;gap:8px;flex-wrap:wrap;margin:18px 0}.bb-leaderboards button{color:inherit;background:transparent;border:1px solid var(--border,#293548);padding:10px 14px;border-radius:5px;cursor:pointer}.bb-leaderboards button.active{border-color:#65c5dc;color:#65c5dc}
