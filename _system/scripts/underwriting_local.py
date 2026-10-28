@@ -149,6 +149,7 @@ def run_once(home, source=ROOT, tickers=None, launch=False):
         preflight()
         vault = clone_vault(home)
         os.environ['RESEARCH_VAULT_ROOT'] = str(vault)
+        os.environ['UNDERWRITING_ARCHIVE_ROOT'] = str(source)
         root = data_root(source, home, vault)
         require(all(stage_model(root, stage)['provider'] == 'codex-local' for stage in ('author', 'challenger')),
                 'The local worker requires the signed-in Codex policy on main')

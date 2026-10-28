@@ -9,6 +9,7 @@ import copy
 import hashlib
 import html
 import json
+import os
 import re
 import subprocess
 from datetime import date
@@ -191,14 +192,15 @@ def rich_primary_observations(payload, url, as_of, market, quote, reporting_curr
 
 def filing_bytes(root, ticker, accession, client, url):
     """Reuse the exact accession already archived by our filing collectors."""
+    archive = Path(os.environ.get('UNDERWRITING_ARCHIVE_ROOT') or root)
     try:
         paths = subprocess.check_output(['git', 'ls-tree', '-r', '--name-only', 'HEAD', '--', ticker+'/investor-documents/sec-edgar'],
-                                        cwd=root, stderr=subprocess.DEVNULL, text=True, timeout=60).splitlines()
+                                        cwd=archive, stderr=subprocess.DEVNULL, text=True, timeout=60).splitlines()
         token = accession.replace('-', '_')
         cached = next((p for p in paths if token in p and p.lower().endswith(('.htm', '.html'))), None)
         if cached:
-            local = root/cached
-            return local.read_bytes() if local.is_file() else subprocess.check_output(['git', 'show', 'HEAD:'+cached], cwd=root, stderr=subprocess.DEVNULL, timeout=60)
+            local = archive/cached
+            return local.read_bytes() if local.is_file() else subprocess.check_output(['git', 'show', 'HEAD:'+cached], cwd=archive, stderr=subprocess.DEVNULL, timeout=60)
     except (OSError, subprocess.SubprocessError):
         pass
     return client.get_bytes(url, timeout=40)
