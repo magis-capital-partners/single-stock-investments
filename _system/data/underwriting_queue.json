@@ -2,10 +2,9 @@
   "schema_version": "underwriting-queue/1",
   "as_of": "2026-10-28",
   "summary": {
-    "companies": 865,
+    "companies": 866,
     "statuses": {
-      "automatic_retry_pending": 2,
-      "needs_underwriting": 863
+      "needs_underwriting": 866
     },
     "blocker_companies": {
       "newer_balance_sheet_inputs_available": 181,
@@ -20,10 +19,10 @@
       "realization_timing_missing": 27,
       "method_specific_forecast_missing": 30,
       "invalid_calculation_proof": 1,
-      "annual_capex_missing": 72,
-      "annual_diluted_share_count_missing": 50,
-      "annual_operating_cash_flow_missing": 44,
       "issuer_forecast_missing": 141,
+      "annual_diluted_share_count_missing": 50,
+      "annual_capex_missing": 72,
+      "annual_operating_cash_flow_missing": 44,
       "positive_normalized_owner_cash_not_established": 110,
       "parent_cashflow_attribution_missing": 40,
       "holding_company_component_forecast_missing": 2,
@@ -38,27 +37,18 @@
     {
       "ticker": "BKNG",
       "company": "Booking Holdings",
-      "status": "automatic_retry_pending",
+      "status": "needs_underwriting",
       "current_model_basis": "automatic_operating_first_pass",
       "blockers": [],
-      "last_attempt": "2026-10-28T06:07:52.559602+00:00",
+      "last_attempt": "2026-10-28T11:23:12.715757+00:00",
       "retry_after": "2026-10-29",
       "underwriting_gaps": [
         {
           "code": "StageBlocked",
-          "detail": "model_call_per_subject_daily_limit"
+          "detail": "model_call_daily_repo_limit"
         }
       ],
-      "unresolved_findings": [
-        {
-          "severity": "major",
-          "detail": "Capital-structure/leverage trajectory is not stress-tested as its own driver or scenario despite being the most material, clearly-evidenced and rapidly worsening risk in the packet: stockholders' deficit roughly doubled in two quarters (-$5,578M at 2025-12-31 to -$10,783M at 2026-06-30; obs_4b4ed38d3ec7bb7ece4c, obs_e1fe129600c28d6f0743), funded debt (LongTermDebtCurrent+Noncurrent) rose from $16,598M (2024-12-31, obs_37a5721f2fa1925223f5) to $20,180M (2026-06-30, obs_adfcbb12de95c81b7f32 + obs_3c6571d3fa50b4597424), and H1 2026 share repurchases alone ($7,814M per the equity-roll-forward table in doc_e85405405bdce342) are nearly 98% of the full 3-year-average annual normalized_owner_earnings_base ($7,993,333,333) used to anchor every forecast year. The discount_rate assumption references negative book equity and debt qualitatively but applies only a single static 8.5%-10.5% band across low/base/high with no explicit linkage of the band, or of a distinct scenario, to this specific accelerating trend; require either (a) a dedicated capital-structure-stress driver/scenario tying continued above-FCF buyback pace to a higher discount rate or reduced distributable cash, or (b) explicit sourced analysis showing why the current pace is expected to decelerate to sustainable levels within the horizon."
-        },
-        {
-          "severity": "major",
-          "detail": "terminal_growth_rate is the second-largest single value driver by the compiler's own one-way sensitivities (max_pv_change ~27.03 vs base PV 183.12, i.e. roughly 15% of value for a 1pp move; terminal value alone is ~76% of total base-case PV), yet its rationale and counterevidence are generic and qualitative ('mature marketplace compounder,' 'typical long-run global nominal GDP/travel-spend growth') and cite no company- or industry-specific quantitative anchor from the evidence (e.g., no cited online-travel-penetration statistic, remaining TAM commentary, or long-run realized growth floor distinct from the recurring_growth_rate assumption already covering the explicit horizon). Given this single assumption determines the majority of recognized value, its evidentiary rigor should be proportionate to the much more granular, well-cited support given to normalized_owner_earnings_base and recurring_growth_rate; request additional company-specific quantitative grounding for the 2%-4% terminal range before approval."
-        }
-      ]
+      "unresolved_findings": []
     },
     {
       "ticker": "F",
@@ -1328,7 +1318,7 @@
     {
       "ticker": "CPRT",
       "company": "Copart",
-      "status": "automatic_retry_pending",
+      "status": "needs_underwriting",
       "current_model_basis": "issuer_valuation",
       "blockers": [
         "new_financial_report_after_model",
@@ -10109,6 +10099,17 @@
       "blockers": [
         "limited_liability_equity_waterfall_missing"
       ],
+      "last_attempt": null,
+      "retry_after": null,
+      "underwriting_gaps": [],
+      "unresolved_findings": []
+    },
+    {
+      "ticker": "RX.V",
+      "company": "BioSyent Inc.",
+      "status": "needs_underwriting",
+      "current_model_basis": null,
+      "blockers": [],
       "last_attempt": null,
       "retry_after": null,
       "underwriting_gaps": [],
