@@ -19,9 +19,12 @@ def test_ls_algo_intake_restores_repository_snapshots_before_the_build():
         ".github", "workflows", "ls-algo-universe.yml").read_text(encoding="utf-8")
     checkout = text.index("Checkout research vault")
     restore = text.index("private_dashboard_assets.py --repository-only")
+    dashboard = text.index("private_dashboard_assets.py\n")
     build = text.index("build_dashboard_data.py")
-    assert "hydrate: \"false\"" in text
-    assert checkout < restore < build
+    redact = text.index("migrate_dashboard_sources.py")
+    stage = text.index("git add --sparse")
+    assert 'hydrate: "false"' in text
+    assert checkout < restore < dashboard < build < redact < stage
 
 
 def test_copart_sale_cannot_borrow_tjx_purchase_or_amazon_add():

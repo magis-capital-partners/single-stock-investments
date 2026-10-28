@@ -70,6 +70,11 @@ jobs:
           hydrate: "false"
       - name: Restore private repository inputs
         run: python _system/scripts/private_dashboard_assets.py --repository-only
+      # core.json and the other dashboard inputs are private placeholders too.
+      # The forecast refresh refuses to run on a placeholder. Hydrate them for
+      # the build; the commit step redacts managed assets before they are staged.
+      - name: Restore private dashboard inputs
+        run: python _system/scripts/private_dashboard_assets.py
       - name: Checkout LS-algo screener
         env:
           LS_ALGO_TOKEN: ${{ secrets.LS_ALGO_TOKEN || secrets.LS_ALGO_REPO_TOKEN }}
@@ -108,8 +113,13 @@ jobs:
           python _system/scripts/validate_dashboard_data.py
       - name: Commit the complete onboarding transaction
         run: |
+          # Put full snapshots back in the vault and leave public placeholders.
+          python _system/scripts/migrate_dashboard_sources.py
+          bash _system/scripts/ci_push_vault.sh \
+            "Preserve restricted dashboard source snapshots" \
+            "--force dashboard-private"
           git add --sparse -A -- _system/data/evidence_recovery_queue.json _system/reviews/pending \
-                         dashboard/data _system/portfolio
+                         dashboard/data dashboard/private-assets.json .gitattributes _system/portfolio
           shopt -s nullglob
           evidence_paths=(*/README.md */.onboard_status.json */research */third-party-analyses */investor-documents)
           if ((${#evidence_paths[@]})); then
