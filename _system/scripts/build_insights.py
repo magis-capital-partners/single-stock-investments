@@ -2512,6 +2512,16 @@ def _consensus_row_map(store: dict[str, dict]) -> dict[str, dict]:
     return {b["ticker"]: _finalize_consensus_row(b) for b in store.values()}
 
 
+def _cap_keep_book(rows: list[dict], cap: int) -> list[dict]:
+    """First ``cap`` rows plus every traded in-book row after them, in rank order.
+
+    A held name cut from one quarter's block reads as every fund dropping it when
+    the dashboard compares periods. Mention-only rows carry no fund votes, so
+    cutting those cannot fake a shift.
+    """
+    return [row for i, row in enumerate(rows) if i < cap or (row.get("in_book") and row.get("fund_count"))]
+
+
 def _compute_qoq_shifts(curr: dict[str, dict], prev: dict[str, dict]) -> list[dict]:
     """Quarter-over-quarter fund positioning shifts between two quarter stores."""
     curr_map = _consensus_row_map(curr)
@@ -2643,8 +2653,8 @@ def build_consensus(letters: list[dict], our_tickers: set[str], names: dict[str,
         )
         return {
             "letter_count": sum(1 for letter in letters if (q == "all" or letter.get("quarter") == q)),
-            "most_discussed": most[:80],
-            "biggest_changes": changes[:40],
+            "most_discussed": _cap_keep_book(most, 80),
+            "biggest_changes": _cap_keep_book(changes, 40),
             "activity": _collapse_consensus_rows(activity)[:20],
         }
 
