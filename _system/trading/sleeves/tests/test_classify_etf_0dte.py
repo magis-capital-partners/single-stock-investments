@@ -126,12 +126,11 @@ def test_lookalike_roots_are_not_captured():
 
 
 def test_another_systems_stamp_keeps_that_systems_classification():
-    # Only orders carry refs. An ls-algo order on a SPY option stays where the
-    # existing rules put it; the root rule is for ref-less (synced) rows only.
+    # Algorithmic option stamps are excluded; documented manual overlays keep Drew.
     got = cls(spy_opt(orderRef="ETF_LS|HEDGE|SPY"))
-    assert (got.bucket, got.reason) == ("drew", "ls_algo_option_overlay")
+    assert (got.bucket, got.reason) == ("etf_ls", "executed_ls_order_reference")
     stock = cls(shares(orderRef="ETF_LS|ESTABLISH|SPY"))
-    assert (stock.bucket, stock.reason) == ("etf_ls", "order_ref")
+    assert (stock.bucket, stock.reason) == ("etf_ls", "executed_ls_order_reference")
 
 
 # ---------------------------------------------------------- delivered shares

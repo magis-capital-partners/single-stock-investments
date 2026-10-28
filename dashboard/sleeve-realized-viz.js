@@ -47,6 +47,7 @@
     const summary = payload.summary;
     const coverage = payload.coverage || {};
     const warnings = [];
+    if (payload.ownership_mismatch) warnings.push('Positions and realized history are updating to the same ownership version. Compare them after the update completes.');
     if (summary.inferred_count) warnings.push(`${summary.inferred_count} records use historical ownership policy; expand a row to see its basis.`);
     if (summary.missing_usd) warnings.push(`${summary.missing_usd} records lack a USD amount and are excluded from the USD total.`);
     if (payload.unresolved?.count) warnings.push(`${payload.unresolved.count} account records (${money(payload.unresolved.realized_usd)}) have unresolved ownership and are excluded from both owner totals.`);
@@ -79,11 +80,11 @@
   }
 
   function csv(rows) {
-    const fields = ['ticker', 'contract_label', 'record_kind', 'trade_date', 'opening_date', 'quantity', 'settlement_date', 'settlement_status', 'currency', 'realized_native', 'fx_rate', 'realized_usd', 'confidence', 'allocation_reason', 'record_id', 'report_id'];
+    const fields = ['ticker', 'contract_label', 'record_kind', 'trade_date', 'opening_date', 'quantity', 'settlement_date', 'settlement_status', 'currency', 'realized_native', 'fx_rate', 'realized_usd', 'confidence', 'allocation_reason', 'record_id', 'report_id', 'ownership_version'];
     return [fields.join(','), ...rows.map(row => fields.map(k => csvCell(row[k])).join(','))].join('\r\n');
   }
 
-  async function attach(container, owner) {
+  async function attach(container, owner, ownershipVersion = null) {
     const root = container.querySelector('[data-sleeve-realized]');
     if (!root || root.dataset.attached) return;
     root.dataset.attached = 'true';
@@ -105,6 +106,7 @@
       try {
         const selected = next ? { ...params, generation: payload.generation_id, cursor: payload.next_cursor } : params;
         const nextPayload = await request(owner, selected, controller.signal);
+        nextPayload.ownership_mismatch = Boolean(ownershipVersion && nextPayload.ownership_version !== ownershipVersion);
         if (!root.isConnected) return;
         if (nextPayload.status !== 'available') {
           status.textContent = 'Realized history has not been published yet. Current holdings remain available.';

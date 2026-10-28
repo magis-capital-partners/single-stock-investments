@@ -270,7 +270,7 @@ def classify_position(
     None when none is available. `etf_0dte_known_holdings` is the signed SPY /
     QQQ shares other books are known to hold; those keep their current bucket.
     """
-    return _classify(
+    classification = _classify(
         pos,
         blacklist_family=blacklist_family,
         etf_ls_symbols=etf_ls_symbols,
@@ -279,6 +279,12 @@ def classify_position(
         etf_0dte_known_holdings=etf_0dte_known_holdings,
         share_rule=True,
     )
+    evidence = pos.get("_ownership")
+    if evidence and classification.bucket not in {"spx_0dte", "index_put_hedge", *ETF_0DTE_BUCKETS}:
+        owner = evidence["owner"]
+        bucket = "etf_ls" if owner == "excluded" else (owner if owner in {"drew", "michael"} else "ownership_review")
+        return Classification(classification.ticker, bucket, evidence["reason"], owner if owner in {"drew", "michael"} else None)
+    return classification
 
 
 def _classify(
@@ -331,6 +337,10 @@ def _classify(
             return Classification(etf_root, ETF_0DTE, "etf_0dte_root", None)
 
     strategy_name = under or ticker if sec in OPTION_SEC_TYPES else ticker
+    if ref.startswith(("ETF_LS|", "B5P|")) and not (
+        sec in OPTION_SEC_TYPES and re.match(r"^ETF_LS\|MANUAL\|SELL(?:PUT|CALL)\|", ref)
+    ):
+        return Classification(strategy_name or ticker, "etf_ls", "executed_ls_order_reference", None)
 
     # Options on the LS-algo universe are the manual overlays written against
     # its pair legs -- covered puts on the short ETF, covered calls on the long
