@@ -17,11 +17,20 @@ export function modelSelection(id, {catalog=[], reasoningEffort}={}) {
     return cost ? {id:router.id,params:[{id:cost.id,value:'cost'}]} : {id:'auto'};
   }
   const model=catalog.find(m=>m.id === id || m.aliases?.includes(id));
-  if (!model) throw new Error(`Requested model ${id} is unavailable in this Cursor account; no fallback permitted`);
+  if (!model) {
+    const explicitVariant=reasoningEffort && catalog.find(m=>m.id === `${id}-${reasoningEffort}` || m.aliases?.includes(`${id}-${reasoningEffort}`));
+    if (explicitVariant) return {id:explicitVariant.id};
+    throw new Error(`Requested model ${id} is unavailable in this Cursor account; no fallback permitted`);
+  }
   if (!reasoningEffort) return {id:model.id};
   const parameter=model.parameters?.find(p=>
     ['reasoning_effort','reasoningEffort','effort','reasoning'].includes(p.id) && p.values.some(v=>v.value === reasoningEffort));
-  if (!parameter) throw new Error(`Requested reasoning effort ${reasoningEffort} is unavailable for ${id}`);
+  if (!parameter) {
+    const variant=model.variants?.find(v=>v.params.some(p=>
+      ['reasoning_effort','reasoningEffort','effort','reasoning'].includes(p.id) && p.value === reasoningEffort));
+    if (variant) return {id:model.id,params:variant.params};
+    throw new Error(`Requested reasoning effort ${reasoningEffort} is unavailable for ${id}`);
+  }
   return {id:model.id,params:[{id:parameter.id,value:reasoningEffort}]};
 }
 

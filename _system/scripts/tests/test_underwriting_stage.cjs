@@ -16,6 +16,9 @@ test('requested Sol High and Cursor Auto resolve only through supported catalog 
  assert.throws(()=>modelSelection('gpt-6.1-sol',{catalog:[],reasoningEffort:'high'}),/unavailable/);
  assert.throws(()=>modelSelection('gpt-6.1-sol',{catalog:[{id:'gpt-6.1-sol'}],reasoningEffort:'high'}),/reasoning/);
  assert.deepEqual(modelSelection('auto',{catalog:[]}),{id:'auto'});
+ assert.deepEqual(modelSelection('gpt-6.1-sol',{reasoningEffort:'high',catalog:[{id:'gpt-6.1-sol-high'}]}),{id:'gpt-6.1-sol-high'});
+ assert.deepEqual(modelSelection('gpt-6.1-sol',{reasoningEffort:'high',catalog:[{id:'gpt-6.1-sol',
+   variants:[{params:[{id:'reasoning',value:'high'}]}]}]}),{id:'gpt-6.1-sol',params:[{id:'reasoning',value:'high'}]});
 });
 
 test('stage JSON parser rejects prose, arrays, oversized and missing output',async()=>{
