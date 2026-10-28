@@ -132,6 +132,15 @@ def test_after_close_publication_has_an_event_trigger_and_lightweight_fallbacks(
     assert '--prices-only' in str(doc)
 
 
+def test_production_underwriting_checkout_contains_the_approved_method_registry():
+    import yaml
+    root = Path(__file__).resolve().parents[3]
+    doc = yaml.safe_load((root/'.github/workflows/valuation-underwriting.yml').read_text())
+    checkout = next(s for s in doc['jobs']['underwrite']['steps'] if s.get('uses') == 'actions/checkout@v4')
+    paths = checkout['with']['sparse-checkout']
+    assert '/_system/reference/valuation_method_registry.json' in paths.splitlines()
+
+
 def company_root(root):
     import underwriting_pipeline as pipeline
     from test_shared_valuation_forecast import sourced_market, sourced_quote
