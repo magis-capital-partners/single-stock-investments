@@ -1847,6 +1847,7 @@
   }
 </style>
 <link rel="stylesheet" href="research-workspace.css?v=20261025">
+<link rel="stylesheet" href="company-research.css?v=20261028">
 </head>
 <body>
 <a class="skip-link" href="#main-content">Skip to dashboard</a>
@@ -1867,11 +1868,11 @@
   </section>
 
   <nav class="view-tabs primary-nav" id="view-tabs" aria-label="Primary">
-    <a class="view-tab active" data-view="portfolio" data-parent-view="portfolio" href="#/portfolio/all/positions" aria-current="page">Portfolio</a>
-    <a class="view-tab" data-view="spx-0dte" data-parent-view="strategies" href="#/strategies/spx-0dte/overview">Strategies</a>
-    <a class="view-tab" data-view="holdings" data-parent-view="research" href="#/research/coverage">Research</a>
+    <a class="view-tab active" data-view="holdings" data-parent-view="research" href="#/research/coverage" aria-current="page">Stock Research</a>
     <a class="view-tab" data-view="watchlist" data-parent-view="ideas" href="#/ideas/all">Ideas</a>
     <a class="view-tab" data-view="insights" data-parent-view="insights" href="#/insights/overview">Insights</a>
+    <a class="view-tab" data-view="portfolio" data-parent-view="portfolio" href="#/portfolio/all/positions">Portfolio</a>
+    <a class="view-tab" data-view="spx-0dte" data-parent-view="strategies" href="#/strategies/spx-0dte/overview">Strategies</a>
     <a class="view-tab" data-view="risk" data-parent-view="market-risk" href="#/market-risk">Market Risk</a>
   </nav>
   <nav class="view-tabs workspace-subnav" id="strategies-subnav" aria-label="Strategies" hidden>
@@ -1898,7 +1899,7 @@
   <main id="main-content">
   <section class="summary-strip" id="summary"></section>
 
-  <section class="portfolio-panel active" id="portfolio-panel" aria-label="IBKR portfolio"><div id="portfolio-content"></div></section>
+  <section class="portfolio-panel" id="portfolio-panel" aria-label="IBKR portfolio"><div id="portfolio-content"></div></section>
   <section class="portfolio-panel" id="spx-0dte-panel" aria-label="SPX 0DTE strategy"><div id="spx-0dte-content"></div></section>
   <section class="portfolio-panel" id="letf-panel" aria-label="Leveraged ETF strategies"><div id="letf-content"></div></section>
 
@@ -2086,6 +2087,7 @@
 <script src="portfolio-viz.js?v=20261008-michael-tail"></script>
 <script src="oauth.js"></script>
 <script src="research-workspace.js?v=20261027-market-sync"></script>
+<script src="company-research.js?v=20261028"></script>
 <script>
 const GH_REPO = 'magis-capital-partners/single-stock-investments';
 const GITHUB_REPO = GH_REPO;
@@ -2272,7 +2274,7 @@ function syncHoldingsQuery() {
   });
   window.history.replaceState(null, '', `${url.pathname}${url.search}${url.hash}`);
 }
-let activeView = 'portfolio';
+let activeView = 'holdings';
 let valuationOpenEvidenceTab = false;
 let expandedPersona = null;
 let activeInsightFilter = 'letters';
@@ -2552,11 +2554,7 @@ function parseRouteFromHashString(hash) {
 function parseRouteFromHash() {
   const fromUrl = parseRouteFromHashString(window.location.hash || '');
   if (fromUrl) return fromUrl;
-  try {
-    return parseRouteFromHashString(sessionStorage.getItem(ROUTE_STORAGE_KEY) || '');
-  } catch (_) {
-    return null;
-  }
+  return parseRouteFromHashString('#/research/coverage');
 }
 
 function syncRouteHash() {
@@ -2571,8 +2569,8 @@ function syncRouteHash() {
   } else if (activeView === 'holdings') {
     const params = new URLSearchParams(location.hash.split('?')[1] || '');
     const requested = params.get('section');
-    const section = typeof ResearchWorkspace !== 'undefined' ? ResearchWorkspace.activeTab() : ['overview','valuation','business','evidence','buyback'].includes(requested) ? requested : 'overview';
-    const focus = section === 'business' && (params.get('section') === 'buyback' || params.get('focus') === 'buyback') ? '&focus=buyback' : '';
+    const section = typeof ResearchWorkspace !== 'undefined' ? ResearchWorkspace.activeTab() : ['overview','sources','models','valuation','business','evidence','buyback'].includes(requested) ? requested : 'overview';
+    const focus = ['models','business'].includes(section) && (params.get('section') === 'buyback' || params.get('focus') === 'buyback') ? '&focus=buyback' : '';
     setAppHash(selected ? `#/research/coverage/${encodeURIComponent(selected)}?section=${section}${focus}` : '#/research/coverage');
   } else if (activeView === 'valuation') {
     setAppHash('#/research/valuation');
@@ -3784,7 +3782,7 @@ async function load() {
   renderInsights();
   renderActivist();
   renderMarketRiskView();
-  if (!applyRouteFromHash()) setView('portfolio');
+  if (!applyRouteFromHash()) setView('holdings');
   else if (activeView === 'watchlist') renderWatchlistTab();
 }
 
@@ -5702,7 +5700,7 @@ function renderSummary() {
 }
 
 function filtered() {
-  const q = document.getElementById('search').value.toLowerCase();
+  const q = document.getElementById('search').value.trim().toLowerCase();
   return data.tickers.filter(t => {
     if (marketFilter !== 'ALL' && t.market !== marketFilter) return false;
     if (sleeveFilter !== 'ALL') {
@@ -5733,26 +5731,20 @@ function filtered() {
       if (fearFilter === 'confirmed' && state !== 'confirmed_exhaustion') return false;
     }
     if (q) {
-      const e = t.essential_insights || {};
       const haystack = [
         t.ticker,
         t.company,
-        e.status?.label,
-        t.classification?.investment_sleeve_label,
-        t.fund_nav?.edge,
-        t.fund_nav?.edge_label,
-        t.fund_nav?.instrument_type,
-        t.cvr?.stage,
-        t.cvr?.stage_label,
-        t.cvr?.id,
-        ...(e.source_mix || []),
-        ...(e.needs_work_reasons || []),
-        ...((e.bullets || []).map(b => `${b.title || ''} ${b.summary || ''}`)),
+        t.display_ticker,
+        t.quote_ticker,
       ].join(' ').toLowerCase();
       if (!haystack.includes(q)) return false;
     }
     return true;
   }).sort((a, b) => {
+    if (q) {
+      const rank = t => [t.ticker,t.display_ticker,t.quote_ticker].some(v=>String(v||'').toLowerCase()===q) ? 0 : String(t.company||'').toLowerCase()===q ? 1 : 2;
+      if (rank(a)!==rank(b)) return rank(a)-rank(b);
+    }
     let av = a[sortKey], bv = b[sortKey];
     if (sortKey.includes('.')) {
       const parts = sortKey.split('.');
@@ -6415,23 +6407,23 @@ ${essentialInsights}`, true)}
       try { sessionStorage.setItem(ROUTE_STORAGE_KEY, hash); } catch (_) { /* ignore quota */ }
     },
     afterRender: (tab) => {
-      if (tab === 'business') {
+      if (tab === 'models') {
         const params = new URLSearchParams(location.hash.split('?')[1] || '');
         if (params.get('section') === 'buyback' || params.get('focus') === 'buyback') queueMicrotask(() => {
           const target = document.querySelector('#detail [data-buyback-detail]');
           if (target) { target.open = true; rw.scrollToTarget(document.getElementById('detail'), target); }
         });
       }
-      if (tab === 'evidence') {
+      if (tab === 'models') {
         if (window.OverlapViz) OverlapViz.fillTicker(t.display_ticker || t.ticker);
         if (window.FundHoldings) FundHoldings.fillTicker(t.ticker);
       }
-      if (tab === 'valuation' && hasModel && typeof EquityModelViz !== 'undefined') EquityModelViz.afterRender(modelBundle);
+      if (tab === 'models' && hasModel && typeof EquityModelViz !== 'undefined') EquityModelViz.afterRender(modelBundle);
       wireDetailEvents(ticker);
     },
   });
   if (opts.workspaceTab === 'buyback') {
-    const hash = `#/research/coverage/${encodeURIComponent(ticker)}?section=business&focus=buyback`;
+    const hash = `#/research/coverage/${encodeURIComponent(ticker)}?section=models&focus=buyback`;
     history.replaceState(null, '', `${location.pathname}${location.search}${hash}`);
   }
   const closeBtn = document.querySelector('#detail [data-detail-close]');

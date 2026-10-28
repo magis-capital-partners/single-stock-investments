@@ -1,12 +1,12 @@
 /* Stock research workspace. Presentation only: published economics and authority stay upstream. */
 (function (global) {
   'use strict';
-  const tabs = [['overview', 'Overview'], ['valuation', 'Valuation'], ['business', 'Business & KPIs'], ['evidence', 'Evidence']];
+  const tabs = [['overview', 'Overview'], ['sources', 'Sources'], ['models', 'Models & KPIs']];
   const states = new Map();
   let current = null;
   const number = value => value == null || value === '' || typeof value === 'boolean' || typeof value === 'object' ? null : Number.isFinite(Number(value)) ? Number(value) : null;
   const text = value => String(value ?? '').replace(/_/g, ' ');
-  const validTab = value => tabs.some(([key]) => key === value) ? value : value === 'buyback' ? 'business' : 'overview';
+  const validTab = value => tabs.some(([key]) => key === value) ? value : ['valuation','business','buyback'].includes(value) ? 'models' : value === 'evidence' ? 'sources' : 'overview';
   const pct = value => number(value) == null ? 'Unavailable' : `${new Intl.NumberFormat(undefined, { maximumFractionDigits: 1 }).format(Number(value))}%`;
   const date = value => value ? String(value).slice(0, 10) : 'date missing';
   const yearLabel = value => number(value)==null?'Unspecified':new Intl.NumberFormat(undefined,{maximumFractionDigits:1}).format(Number(value));
@@ -152,6 +152,14 @@
     return `<section class="rw-next"><div><h3>Next action</h3><p>${e(friendlyAction(d.next_action || d.next_gap_question))}</p>${blockers.length ? `<p class="rw-meta">${e(blockers.join(' '))}</p>` : ''}</div><button type="button" data-rw-go="evidence">Review evidence${Number(d.critical_gap_count) > 0 ? ` · ${Number(d.critical_gap_count)} critical` : ''}</button></section>${t.human_review?.override_reason ? `<p class="rw-review"><strong>Owner review:</strong> ${e(t.human_review.override_reason)}</p>` : ''}${range(t,h)}<div class="rw-overview-bottom"><section><div class="rw-value-heading"><h3>Operating pulse</h3><button type="button" class="rw-text-button" data-rw-go="business">All KPIs</button></div>${kpis(t,h,3)}</section><section class="rw-brief"><h3>What breaks the case</h3><p>${e(riskText)}</p><h3>Recent changes</h3>${changes.length ? `<ol class="rw-timeline">${changes.map(row => `<li><time>${e(row.date || 'Undated')}</time><span>${row.url ? h.linkHtml(row.url,row.label) : e(row.label || '')}</span></li>`).join('')}</ol>` : '<p class="rw-empty">No dated developments recorded.</p>'}</section></div>`;
   }
   function section(label, html, open = false) { return html ? `<details class="rw-section"${open ? ' open' : ''}><summary>${label}</summary><div class="rw-section-body">${html}</div></details>` : ''; }
+  function compactOverview(t, h) {
+    const e=h.escapeHtml;
+    const risks=t.valuation_workbench?.valuation?.monitoring?.falsifiers || [];
+    const risk=risks[0];
+    const riskText=typeof risk==='string'?risk:risk?.falsifier||risk?.metric||t.investment_committee?.strongest_dissent;
+    const changes=(h.developments||[]).filter(r=>r.label && !/unverified issuer|automatic repair|pending refresh/i.test(r.label)).slice(0,2);
+    return `<div class="rw-overview-bottom"><section><h3>Key operating metrics</h3>${kpis(t,h,3)}<button type="button" class="rw-text-button" data-rw-go="models">All models &amp; KPIs</button></section><section class="rw-brief"><h3>Recent developments</h3>${changes.length?`<ul>${changes.map(r=>`<li>${r.url?h.linkHtml(r.url,r.label):e(r.label)} <span class="rw-meta">${e(r.date||'Undated')}</span></li>`).join('')}</ul>`:'<p class="rw-empty">No verified recent development recorded.</p>'}<h3>Main open question</h3><p>${e(riskText||'Review the company sources to establish the key thesis risk.')}</p></section></div><section data-company-library="summary"></section>`;
+  }
   function normalize(panel) {
     panel.querySelectorAll('details[data-buyback-detail]').forEach(el => { if (!el.dataset.rwInitialized) { el.open = false; el.dataset.rwInitialized = 'true'; } });
     // Workbench's nested tab system becomes a single, fully retained audit document.
@@ -163,6 +171,7 @@
     });
     // Only the tab's section disclosures remain collapsible; evidence inside is readable in one layer.
     [...panel.querySelectorAll('details')].reverse().forEach(el => {
+      if (el.closest('[data-company-library]')) return;
       if (!el.parentElement.closest('details')) return;
       const replacement = document.createElement('section');
       [...el.attributes].forEach(a => { if (a.name !== 'open') replacement.setAttribute(a.name,a.value); });
@@ -173,6 +182,7 @@
     panel.querySelectorAll('img').forEach(img => { img.loading = 'lazy'; });
   }
   function scrollToTarget(root, target) {
+    for(let parent=target.parentElement;parent&&parent!==root;parent=parent.parentElement) if(parent.tagName==='DETAILS') parent.open=true;
     if (matchMedia('(max-width:720px)').matches) { target.scrollIntoView({block:'start'}); return; }
     const header = root.querySelector('.rw-header');
     root.scrollTo({top:Math.max(0,target.getBoundingClientRect().top - root.getBoundingClientRect().top + root.scrollTop - (header?.offsetHeight || 0)),behavior:'instant'});
@@ -185,7 +195,7 @@
     const initial = validTab(requested);
     current = {ticker:t.ticker, tab:initial, root, activate:null};
     root.classList.add('research-workspace');
-    root.innerHTML = `<header class="rw-header"><div class="rw-header-top"><div><h2>${h.escapeHtml(t.display_ticker || t.ticker)} <span>${h.escapeHtml(t.company || '')}</span></h2><p class="rw-meta">${h.escapeHtml(t.exchange || t.market || '')} · ${h.escapeHtml(t.quote_ticker || t.ticker)}${t.valuation_tier?.label ? ` · ${h.escapeHtml(t.valuation_tier.label)}` : ''}</p></div><button type="button" data-detail-close>Back to coverage</button></div><p class="rw-thesis">${h.escapeHtml(t.valuation_decision?.research_return_available ? String(t.one_line_thesis || 'Investment thesis not yet recorded.').replace('Forward IRR unavailable; dated cash flows and publication checks required.','PV and forward IRR use the shared valuation forecast below.') : t.one_line_thesis || 'Investment thesis not yet recorded.')}</p>${status(t,h)}${h.watch ? `<p class="rw-watch"><strong>${h.escapeHtml(h.watch.title)}</strong> <button type="button" class="rw-text-button" data-rw-go="business">Watch details</button></p>` : ''}${h.headerExtras || ''}<nav class="rw-tabs" role="tablist" aria-label="Stock research">${tabs.map(([id,label]) => `<button type="button" id="rw-tab-${id}" role="tab" data-rw-tab="${id}" aria-controls="rw-panel-${id}" aria-selected="false" tabindex="-1">${label}</button>`).join('')}</nav></header>${tabs.map(([id]) => `<section class="rw-panel" id="rw-panel-${id}" role="tabpanel" aria-labelledby="rw-tab-${id}" hidden></section>`).join('')}<p class="rw-sr" aria-live="polite" data-rw-announcement></p>`;
+    root.innerHTML = `<header class="rw-header"><div class="rw-header-top"><div><h2>${h.escapeHtml(t.display_ticker || t.ticker)} <span>${h.escapeHtml(t.company || '')}</span></h2><p class="rw-meta">${h.escapeHtml(t.exchange || t.market || '')} · ${h.escapeHtml(t.quote_ticker || t.ticker)}${t.valuation_tier?.label ? ` · ${h.escapeHtml(t.valuation_tier.label)}` : ''}</p></div><button type="button" data-detail-close>Back to coverage</button></div><p class="rw-thesis">${h.escapeHtml(t.valuation_decision?.research_return_available ? String(t.one_line_thesis || 'Investment thesis not yet recorded.').replace('Forward IRR unavailable; dated cash flows and publication checks required.','PV and forward IRR use the shared valuation forecast below.') : t.one_line_thesis || 'Investment thesis not yet recorded.')}</p><details class="rw-header-status"><summary>Research status &amp; dates</summary>${status(t,h)}</details>${h.watch ? `<p class="rw-watch"><strong>${h.escapeHtml(h.watch.title)}</strong> <button type="button" class="rw-text-button" data-rw-go="business">Watch details</button></p>` : ''}${h.headerExtras || ''}<nav class="rw-tabs" role="tablist" aria-label="Stock research">${tabs.map(([id,label]) => `<button type="button" id="rw-tab-${id}" role="tab" data-rw-tab="${id}" aria-controls="rw-panel-${id}" aria-selected="false" tabindex="-1">${label}</button>`).join('')}</nav></header>${tabs.map(([id]) => `<section class="rw-panel" id="rw-panel-${id}" role="tabpanel" aria-labelledby="rw-tab-${id}" hidden></section>`).join('')}<p class="rw-sr" aria-live="polite" data-rw-announcement></p>`;
     const rendered = new Set();
     const activate = (value, focus = false, route = true) => {
       const id = validTab(value), state = states.get(t.ticker) || saved;
@@ -195,10 +205,11 @@
       root.querySelectorAll('.rw-panel').forEach(panel => { panel.hidden = panel.id !== `rw-panel-${id}`; });
       const panel = root.querySelector(`#rw-panel-${id}`);
       if (!rendered.has(id)) {
-        panel.innerHTML = id === 'overview' ? overview(t,h) : renderers[id]?.() || '<p class="rw-empty">No research recorded in this view.</p>';
+        panel.innerHTML = id === 'overview' ? compactOverview(t,h) : id === 'sources' ? '<section data-company-library="sources"></section>' : `${section('Company valuation & assumptions',renderers.valuation?.() || '')}${section('Operating KPI history',renderers.business?.() || '')}<h3>Models &amp; supporting data</h3><section data-company-library="models"></section>${section('Research and decision history',renderers.evidence?.() || '')}`;
         normalize(panel);
         if (state.open?.[id]) panel.querySelectorAll(':scope > details').forEach(el => { el.open = state.open[id].includes(el.querySelector(':scope > summary')?.textContent); });
         rendered.add(id); options.afterRender?.(id,panel);
+        panel.querySelectorAll('[data-company-library]').forEach(host=>global.CompanyResearch?.mount(host,t.ticker,{summary:host.dataset.companyLibrary==='summary',models:host.dataset.companyLibrary==='models'}));
       }
       root.scrollTop = state.scroll[id] || 0;
       root.querySelector('[data-rw-announcement]').textContent = `${t.display_ticker || t.ticker}: ${tabs.find(([key]) => key === id)[1]}`;

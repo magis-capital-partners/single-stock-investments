@@ -58,8 +58,9 @@ test('a quote outside the valuation range is included in the ruler domain',()=>{
 test('missing model and sparse research produce useful next steps',()=>{
  const html=rw.overview({ticker:'TST'}, {...h,developments:[]}); assert.match(html,/primary evidence/);assert.match(html,/No dated developments/);assert.doesNotMatch(html,/NaN|undefined/);
 });
-test('legacy buyback routes resolve to the business view and unknown tabs to overview',()=>{
- assert.equal(rw.validTab('buyback'),'business'); assert.equal(rw.validTab('evidence'),'evidence');assert.equal(rw.validTab('bad'),'overview');
+test('legacy routes resolve to the simplified company workspace',()=>{
+ for(const tab of ['buyback','business','valuation']) assert.equal(rw.validTab(tab),'models');
+ assert.equal(rw.validTab('evidence'),'sources');assert.equal(rw.validTab('sources'),'sources');assert.equal(rw.validTab('bad'),'overview');
 });
 test('labels and source references are escaped',()=>{
  const html=rw.kpis({kpi_trends:{metrics:[{...metric,label:'<script>bad</script>',evidence_ref:'reports/test "file".json'}]}},h);

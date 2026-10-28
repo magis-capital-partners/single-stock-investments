@@ -20,6 +20,10 @@ on:
       - "_system/scripts/fetch_float_adv.py"
       - "_system/scripts/build_technical_signals.py"
       - "_system/scripts/build_cloudflare_pages_site.py"
+      - "_system/scripts/build_company_research.py"
+      - "_system/scripts/company_sources.py"
+      - "_system/scripts/company_research_themes.json"
+      - "_system/scripts/stage_company_research.py"
       - "_system/scripts/private_dashboard_assets.py"
       - "_system/scripts/stage_pages_functions.py"
       - "_system/scripts/export_dashboard_d1_seed.py"
@@ -269,11 +273,13 @@ jobs:
       group: dashboard-deploy
       cancel-in-progress: false
     runs-on: ubuntu-latest
-    timeout-minutes: 60
+    # The initial complete archive index is cold; later builds reuse private caches.
+    timeout-minutes: 120
     env:
       RESEARCH_VAULT_REPO_URL: ${{ secrets.RESEARCH_VAULT_REPO_URL }}
       RESEARCH_VAULT_CLONE_TOKEN: ${{ secrets.RESEARCH_VAULT_CLONE_TOKEN }}
       RESEARCH_VAULT_ROOT: _external/research-vault
+      GOOGLE_APPLICATION_CREDENTIALS_JSON: ${{ secrets.GOOGLE_APPLICATION_CREDENTIALS_JSON }}
     environment:
       name: cloudflare-pages
       url: ${{ steps.cloudflare.outputs.page_url }}
