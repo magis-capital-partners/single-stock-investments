@@ -15,6 +15,8 @@ def stage(source: Path, site: Path) -> dict:
         raise RuntimeError("Refusing to deploy an empty company library")
     destination = site / "data/company-research"
     required = {"manifest.json", "review.json"}
+    review = json.loads((source / "review.json").read_text(encoding="utf-8"))
+    required.update(review.get("parts", []))
     bundles = set()
     for ticker in manifest["tickers"]:
         company_path = f"companies/{ticker}.json"

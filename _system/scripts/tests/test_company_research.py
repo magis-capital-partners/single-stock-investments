@@ -18,10 +18,19 @@ COMPANIES = {"CME": {"company": "CME Group Inc.", "market": "US"}, "MSB": {"comp
 def test_fund_acronym_is_not_company_research():
     links, _ = Matcher(COMPANIES).match("CME Investor Letter October 2012", 'EMERGING SOVEREIGN GROUP. ESG Credit Macro Event Master Fund Ltd. ("CME") invests in sovereign debt. Our fund has delivered gains in emerging-market bonds.')
     assert not links
+    repeated = 'EMERGING SOVEREIGN GROUP, LLC ESG Credit Macro Event Master Fund Ltd. (CME) October 31, 2012. ' + 'CME increased our portfolio exposure to sovereign debt and earnings growth. CME returned 3% this month. ' * 12
+    links, _ = Matcher(COMPANIES).match("CME Investor Letter October 2012.pi", repeated)
+    assert not links
 
 
 def test_wrong_exchange_is_rejected_even_in_named_folder():
     links, _ = Matcher(COMPANIES).match("ASX:MSB Mesoblast company update", "", ["MSB"])
+    assert not links
+
+
+def test_quarantined_generic_security_names_cannot_override_company_identity():
+    matcher=Matcher({"DIS":{"company":"The Walt Disney Company"}}, {"DIS":{"name":"Software","aliases":["Software"],"source":"harvested","validation_status":"quarantined"}})
+    links,_=matcher.match("Fund commentary", "We purchased Software as our largest investment. Software has strong earnings growth and offers recurring revenue from its customers.")
     assert not links
 
 
@@ -104,6 +113,16 @@ def test_source_at_end_of_large_document_is_matched():
     assert {r["ticker"] for r in links} == {"CME"}
 
 
+def test_full_universe_candidate_selection_retains_names_and_share_classes():
+    companies={**COMPANIES, **{f"ZZ{i}":{"company":f"Fictional Issuer {i} Inc."} for i in range(30)}, "GOOG":{"company":"Alphabet Inc."},"GOOGL":{"company":"Alphabet Inc."}}
+    matcher=Matcher(companies)
+    assert matcher.selector is not None
+    links,_=matcher.match("Company research", "CME Group earns transaction revenue from its futures and clearing business, and its customer volumes expanded significantly this quarter.")
+    assert {r["ticker"] for r in links}=={"CME"}
+    links,_=matcher.match("Company research", "", ["GOOGL"])
+    assert {r["ticker"] for r in links}=={"GOOG","GOOGL"}
+
+
 def test_per_company_coverage_ignores_unrelated_checkout_gaps(tmp_path):
     b=Builder(tmp_path,None,tmp_path/"out",tmp_path/"cache",companies={"CME":COMPANIES["CME"]})
     b.receipt("company:CME",1)
@@ -153,14 +172,14 @@ def test_share_classes_receive_the_same_company_research():
 
 def test_large_source_and_search_shards_preserve_the_last_word(tmp_path):
     b=Builder(tmp_path,None,tmp_path/"out",tmp_path/"cache",companies={"CME":COMPANIES["CME"]})
-    body=" ".join(f"unique{i:06d}" for i in range(110000))
+    body=" ".join(f"unique{i:06d}" for i in range(300000))
     row=b.base("large","Large model","test",explicit=["CME"])
     row["text"]=body
     b.index.add(row,["large"]);b.publish()
     meta=json.loads((tmp_path/"out/companies/CME.json").read_text())
     search=json.loads((tmp_path/"out"/meta["search_path"]).read_text())
     assert len(search["__parts"])>1
-    assert any("unique109999" in json.loads((tmp_path/"out"/p).read_text()) for p in search["__parts"])
+    assert any("unique299999" in json.loads((tmp_path/"out"/p).read_text()) for p in search["__parts"])
     source=json.loads((tmp_path/"out"/meta["pages"][0]).read_text())[0]
     content=json.loads((tmp_path/"out"/source["content_path"]).read_text())[source["id"]]
     assert content["text_parts"]
@@ -179,6 +198,24 @@ def test_private_stage_copies_only_reachable_assets_and_requires_auth(tmp_path):
     (site/"_routes.json").write_text('{"include":["/*"],"exclude":["/data/*"]}')
     with pytest.raises(RuntimeError,match="authentication"):
         stage(out,site)
+
+
+def test_disk_backed_source_survives_publish_and_failed_refresh(tmp_path):
+    out,cache=tmp_path/"out",tmp_path/"cache"
+    b=Builder(tmp_path,None,out,cache,companies={"CME":COMPANIES["CME"]})
+    row=b.base("source","CME source","drive",text="The complete archived company research body.",explicit=["CME"])
+    sid=b.add(row,["source"])
+    assert "text" not in b.index.records[sid]
+    assert b.text(b.index.records[sid]).endswith("body.")
+    b.publish()
+    again=Builder(tmp_path,None,out,cache,companies={"CME":COMPANIES["CME"]})
+    again.receipt("drive",0,"failed")
+    again.publish()
+    meta=json.loads((out/"companies/CME.json").read_text())
+    source=json.loads((out/meta["pages"][0]).read_text())[0]
+    assert source["availability"]=="last_known"
+    content=json.loads((out/source["content_path"]).read_text())[sid]
+    assert content["text"].endswith("body.")
 
 
 @pytest.mark.skipif(not shutil.which("node"), reason="Node.js is required for dashboard tests")

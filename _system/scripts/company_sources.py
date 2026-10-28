@@ -140,7 +140,16 @@ class Matcher:
     def __init__(self, companies: dict, master: dict | None = None, *, narrow=True):
         registry = {"holdings": companies}
         self.companies = companies
-        self.master = SecurityMaster.from_dict(master or {}, registry)
+        clean_master = {}
+        for ticker, row in companies.items():
+            meta = dict((master or {}).get(ticker, {}))
+            trusted = meta.get("validation_status") in {"manual", "validated"} or meta.get("source") in {"book", "manual"}
+            aliases = list(meta.get("aliases") or []) if trusted else []
+            if trusted and meta.get("name") and meta["name"] != row.get("company"):
+                aliases.append(meta["name"])
+            meta.update(name=row.get("company") or (meta.get("name") if trusted else ""), aliases=aliases)
+            clean_master[ticker] = meta
+        self.master = SecurityMaster.from_dict(clean_master, registry)
         names = {row.get("company", "").casefold(): ticker for ticker, row in companies.items() if len(row.get("company", "").split()) >= 2}
         self.names = names
         self.name_pattern = re.compile(r"(?<!\w)(?:" + "|".join(re.escape(n) for n in sorted(names, key=len, reverse=True)) + r")(?!\w)", re.I) if names else None
@@ -153,6 +162,8 @@ class Matcher:
             if len(name.split()) >= 2:
                 self.title_names[name] = ticker
         self.title_pattern = re.compile(r"(?<!\w)(?:" + "|".join(re.escape(n) for n in sorted(self.title_names, key=len, reverse=True)) + r")(?!\w)", re.I) if self.title_names else None
+        self.names.update(self.title_names)
+        self.name_pattern = re.compile(r"(?<!\w)(?:" + "|".join(re.escape(n) for n in sorted(self.names, key=len, reverse=True)) + r")(?!\w)", re.I) if self.names else None
         self.issuer_siblings = {t: group for group in self.issuer_names.values() for t in group}
         self.selector = None
         self.scoped = {}
@@ -220,11 +231,13 @@ class Matcher:
             if ticker in linked:
                 continue
             boundary = text.rfind("\n\n", 0, hit.start())
-            start = boundary + 2 if boundary >= 0 else 0
+            start = max(boundary + 2 if boundary >= 0 else 0, hit.start() - 200)
             end = text.find("\n\n", hit.end())
-            evidence = text[max(0, start):end if end >= 0 else len(text)]
+            end = min(end if end >= 0 else len(text), hit.end() + 350)
+            evidence = text[start:end]
             substantive = re.search(r"\b(revenue|earnings|profit|margin|growth|business|production|costs?|valuation|cash.flow|competition|pricing|operates?|products?|demand|supply|forecast|dividend|risk|capital|debt|assets?|customers?)\b", evidence, re.I)
-            if len(evidence.split()) < 15 or not substantive or not identity_match_ok(evidence, ticker, company=name, market=row.get("market"), exchange=row.get("exchange")):
+            narrative = re.search(r"\b(is|are|was|were|has|have|earns?|operates?|grew|grown|increased|expanded|reduced|expect|believe|owns?|offers?|provides?|generates?|produces?|sells?|reported)\b", evidence, re.I)
+            if len(evidence.split()) < 15 or not substantive or not narrative or not identity_match_ok(evidence, ticker, company=name, market=row.get("market"), exchange=row.get("exchange")):
                 continue
             evidence = text[max(start, hit.start()-150):min(end if end >= 0 else len(text), hit.end()+350)]
             linked[ticker] = {"ticker": ticker, "relationship": "direct", "reason": f"Discusses {name}.", "match": "registered_company_name", "passages": [passage(text,evidence)]}
@@ -239,7 +252,8 @@ class Matcher:
             if ticker not in self.companies or ticker in linked:
                 continue
             evidence = hit.get("evidence") or ""
-            if hit.get("tier") == "C" or hit.get("in_holdings_table") or len(evidence.split()) < 12:
+            identifying_rules = {"company_name", "single_token_name", "raw_company_name", "dollar", "paren_exch", "exch_prefix", "paren_num_exch", "dotted"}
+            if hit.get("tier") == "C" or not identifying_rules.intersection(hit.get("rules", [])) or hit.get("in_holdings_table") or len(evidence.split()) < 12:
                 review.append({"ticker": ticker, "reason": "Weak or incidental mention"})
                 continue
             row = self.companies[ticker]
@@ -252,7 +266,8 @@ class Matcher:
             if found:
                 for ticker in tickers:
                     linked.setdefault(ticker, {**found, "ticker": ticker})
-        return list(linked.values()), review
+        unique_review = {(item["ticker"], item["reason"]):item for item in review}
+        return list(linked.values()), list(unique_review.values())
 
 
 class SourceIndex:
@@ -272,8 +287,14 @@ class SourceIndex:
                 for item in other.get(field, []):
                     if item not in current[field]:
                         current[field].append(item)
-            if len(other.get("text", "")) > len(current.get("text", "")):
-                current["text"] = other["text"]
+            other_size = other.get("text_length", len(other.get("text", "")))
+            if other_size > current.get("text_length", len(current.get("text", ""))):
+                for field in ("text", "text_cache"):
+                    if field in other:
+                        current[field] = other[field]
+                    else:
+                        current.pop(field, None)
+                current["text_length"] = other_size
                 current["processing_status"] = other["processing_status"]
             for field in ("date", "author", "period", "model_purpose", "assumptions", "source_refs", "content_hash", "content_md5", "format"):
                 if not current.get(field) and other.get(field):

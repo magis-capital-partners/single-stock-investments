@@ -43,6 +43,19 @@ def load(path: Path, default=None):
     return json.loads(path.read_text(encoding="utf-8-sig")) if path.is_file() else ({} if default is None else default)
 
 
+def write_mapping(root: Path, folder: str, values: dict) -> list[str]:
+    """Stable private cache shards also stay below GitHub's individual blob limit."""
+    groups = defaultdict(dict)
+    for key, value in values.items():
+        groups[digest(key)[:2]][key] = value
+    files = []
+    for prefix, group in sorted(groups.items()):
+        relative = f"{folder}/{prefix}.json"
+        write(root / relative, group)
+        files.append(relative)
+    return files
+
+
 def resolved(root: Path, relative: str):
     """Read private snapshots without hydrating or overwriting the user's files."""
     from private_dashboard_assets import private_source
@@ -109,9 +122,11 @@ class Builder:
         self.file_failures = Counter()
         self.now = datetime.now(timezone.utc).isoformat(timespec="seconds")
         self.previous = load(cache / "index.json")
-        for rec in self.previous.get("records", {}).values():
-            if rec.get("text_cache"):
-                rec["text"] = load(cache / "published-text" / (rec["text_cache"] + ".json")).get("text", "")
+        if self.previous.get("record_parts"):
+            self.previous["records"] = {}
+            for part in self.previous["record_parts"]:
+                self.previous["records"].update(load(cache / part))
+        self.previous_versions = {(r.get("family"), r.get("revision")):r for r in self.previous.get("records", {}).values() if r.get("revision")}
         self.themes = load(Path(__file__).with_name("company_research_themes.json"), [])
         # Consume the maintained business-driver map, with explicit issuer lists
         # and rationale. Portfolio-wide wildcards and the legacy unreviewed
@@ -128,7 +143,11 @@ class Builder:
         self.seen = set()
         identities = {t:{k:r.get(k) for k in ("company", "market", "exchange")} for t,r in self.companies.items()}
         self.match_version = digest(json.dumps(identities, sort_keys=True) + json.dumps(master, sort_keys=True) + digest(Path(__file__).with_name("company_sources.py").read_bytes()))
-        self.matches = load(cache / "matches.json")
+        match_manifest = load(cache / "matches.json")
+        self.matches = {}
+        if match_manifest.get("version") == self.match_version:
+            for part in match_manifest.get("parts", []):
+                self.matches.update(load(cache / part))
 
     def receipt(self, name, count, status="complete", detail=None):
         if self.file_failures[name]:
@@ -138,10 +157,61 @@ class Builder:
             self.good.add(name)
         print(f"Research inventory: {name}: {count} files ({status})", flush=True)
 
+    def add(self, record, anchors):
+        # Keep source bodies on disk. A full coverage run can contain many GB
+        # of filings; only the document currently being processed is resident.
+        body = record.pop("text", "")
+        record["text_length"] = len(body)
+        if body:
+            sha = digest(body)
+            path = self.cache / "published-text" / (sha + ".json")
+            if not path.is_file():
+                write(path, {"text": body})
+            record["text_cache"] = sha
+        return self.index.add(record, anchors)
+
+    def text(self, record):
+        if "text" in record:
+            return record["text"]
+        if record.get("text_cache"):
+            return load(self.cache / "published-text" / (record["text_cache"] + ".json")).get("text", "")
+        return ""
+
+    def source_words(self, record):
+        if not record.get("text_cache") and not record.get("text"):
+            return []
+        key = record.get("text_cache") or digest(record.get("text", ""))
+        path = self.cache / "words" / (key + ".json")
+        if path.is_file():
+            return load(path, [])
+        words = sorted(tokens(self.text(record)))
+        write(path, words)
+        return words
+
     def base(self, identity, title, origin, *, text="", state="indexed", date=None, author=None, period=None, explicit=(), locations=(), mime="", path=""):
-        match_key = digest(self.match_version + title + digest(text) + json.dumps(list(explicit)))
+        match_text = text
+        if explicit and Path(path).suffix.lower() in {".json", ".csv", ".tsv"}:
+            # Company-owned tables already have issuer identity. Discover other
+            # issuers only in narrative fields, never among numeric observations
+            # or schema keys. The full original remains indexed for search.
+            narratives = []
+            if Path(path).suffix.lower() == ".json":
+                try:
+                    pending = [json.loads(text)]
+                    while pending:
+                        value = pending.pop()
+                        if isinstance(value, dict):
+                            pending.extend(value.values())
+                        elif isinstance(value, list):
+                            pending.extend(value)
+                        elif isinstance(value, str) and len(value) >= 80 and len(value.split()) >= 15:
+                            narratives.append(value)
+                except ValueError:
+                    pass
+            match_text = "\n\n".join(narratives)
+        match_key = digest(self.match_version + title + digest(match_text) + json.dumps(list(explicit)))
         if match_key not in self.matches:
-            self.matches[match_key] = self.matcher.match(title, text, explicit)
+            self.matches[match_key] = self.matcher.match(title, match_text, explicit)
         links, review = self.matches[match_key]
         record = {"id": digest(identity)[:32], "title": title, "category": category(path or title, mime), "date": date or date_from(title), "author": author or "", "period": period,
                   "origins": [origin], "locations": list(locations), "text": text, "processing_status": state,
@@ -178,7 +248,7 @@ class Builder:
             rel = relative or path.relative_to(self.root).as_posix()
             record = self.base("unreadable:" + rel, path.stem, origin, explicit=explicit, path=rel, state="awaiting_extraction")
             record["availability"] = "unavailable"
-            self.index.add(record, ["path:" + rel])
+            self.add(record, ["path:" + rel])
 
     def _local(self, path: Path, origin: str, *, explicit=(), relative=None):
         rel = relative or path.relative_to(self.root).as_posix()
@@ -208,7 +278,7 @@ class Builder:
         for loc in self.refs[logical]:
             if loc not in locations:
                 locations.insert(0, loc)
-        record = self.base("sha256:" + sha, title, origin, text=text, state=state, date=meta.get("published") or md.get("date"), author=meta.get("show_title") or md.get("author"), explicit=explicit, locations=locations, path=rel)
+        record = self.base("sha256:" + sha, title, origin, text=text, state=state, date=meta.get("published") or md.get("date"), author=meta.get("show_title") or md.get("author"), period=meta.get("period") or md.get("period"), explicit=explicit, locations=locations, path=rel)
         record["content_hash"] = sha
         record["content_md5"] = hashlib.md5(data, usedforsecurity=False).hexdigest()
         record["format"] = path.suffix.lstrip(".")
@@ -229,7 +299,7 @@ class Builder:
         if path.suffix.lower() in {".pdf", ".txt", ".md"}:
             anchors.append("rendition:" + rendition)
         anchors.extend(url_anchor(loc["url"]) for loc in locations if loc["kind"] == "drive")
-        self.index.add(record, anchors)
+        self.add(record, anchors)
 
     def registries(self):
         for relative in ("dashboard/data/document_registry.json", "dashboard/data/document_catalog.json"):
@@ -254,12 +324,20 @@ class Builder:
                     anchors = (["path:" + ref] if ref else []) + ([url_anchor(url)] if url else [])
                     if row.get("sha256"):
                         anchors.append("sha:" + row["sha256"].removeprefix("sha256:"))
-                    self.index.add(record, anchors)
+                    self.add(record, anchors)
                 self.receipt(relative, len(rows), "complete" if doc else "unavailable")
             except Exception as exc:
                 self.receipt(relative, 0, "failed", type(exc).__name__)
 
     def local_corpora(self):
+        if self.vault:
+            try:
+                for row in load(self.vault / "superinvestor-letters/letters_index.json", []):
+                    for field in ("source_file", "source_document"):
+                        if row.get(field):
+                            self.metadata[row[field]] = {**self.metadata.get(row[field], {}), "author": row.get("fund") or row.get("manager"), "date": row.get("letter_date"), "period": row.get("quarter")}
+            except (OSError, ValueError, TypeError):
+                self.receipt("vault:letter_metadata", 0, "failed", "Fund names and dates could not be read")
         for ticker in sorted(self.companies):
             name = "company:" + ticker
             count = 0
@@ -348,7 +426,7 @@ class Builder:
             locations = [{"kind":"repository","url":url,"label":"Research original"}]
             locations = self.refs.get(rel) or locations
             record = self.base("git:"+sha,path.stem.replace("_"," "),"git_inventory",text=cached.get("text", ""),explicit=[parts[0]],state=cached.get("status", "awaiting_extraction"),locations=locations,path=rel)
-            self.index.add(record,["git:"+sha,"path:"+rel])
+            self.add(record,["git:"+sha,"path:"+rel])
         self.receipt("git_inventory",count)
 
     def filings(self, ticker):
@@ -375,7 +453,7 @@ class Builder:
             if ref:
                 self.refs[ref].append(location)
                 self.metadata[ref] = {"title": title, "date": filed}
-            self.index.add(rec, ["url:" + url] + (["path:" + ref] if ref else []))
+            self.add(rec, ["url:" + url] + (["path:" + ref] if ref else []))
 
     def company_inventory(self, ticker):
         relative = f"{ticker}/third-party-analyses/source_inventory.json"
@@ -389,7 +467,7 @@ class Builder:
             if ref:
                 self.refs[ref].extend(locations)
             rec = self.base(url or ref, row.get("title") or Path(ref or url).stem, "company:"+ticker, state="awaiting_extraction", date=row.get("date"), author=row.get("author"), explicit=[ticker] if row.get("status") in {"approved", "context", "verified"} else [], locations=locations, path=ref or url)
-            self.index.add(rec, (["path:"+ref] if ref else []) + (["url:"+url] if url else []))
+            self.add(rec, (["path:"+ref] if ref else []) + (["url:"+url] if url else []))
 
     def drive(self, service=None, roots=None, download=False, download_budget=300):
         """Enumerate all pages and all formats under configured research roots, including licensed folders."""
@@ -441,7 +519,11 @@ class Builder:
         paths = build_folder_paths(list(items.values()), roots)
         download_start = time.monotonic()
         count = 0
-        for item in sorted(items.values(), key=lambda x: (x.get("modifiedTime", ""), x["id"]), reverse=True):
+        attempted = {p.stem for p in (self.cache / "drive").glob("*.json")}
+        def priority(item):
+            revision = item.get("md5Checksum") or item.get("modifiedTime") or "unknown"
+            return digest(item["id"] + revision) not in attempted, item.get("modifiedTime", ""), item["id"]
+        for item in sorted(items.values(), key=priority, reverse=True):
             if item["mimeType"] == FOLDER_MIME:
                 continue
             count += 1
@@ -462,7 +544,10 @@ class Builder:
                 old["availability"] = "superseded"
                 self.index.anchors.pop(url_anchor(url), None)
                 old = {}
-            text, state = old.get("text", ""), old.get("processing_status", "awaiting_extraction")
+            text, state = self.text(old), old.get("processing_status", "awaiting_extraction")
+            prior = self.previous_versions.get(("drive:" + item["id"], revision), {})
+            if not text and prior.get("text_cache"):
+                text, state = self.text(prior), prior["processing_status"]
             cachefile = self.cache / "drive" / f"{digest(item['id'] + revision)}.json"
             cached = load(cachefile)
             if cached:
@@ -494,52 +579,54 @@ class Builder:
                 anchors.append("md5:" + item["md5Checksum"])
             if props.get("sha256"):
                 anchors.append("sha:" + props["sha256"])
-            self.index.add(rec, anchors)
+            self.add(rec, anchors)
         self.receipt("drive", count)
 
     def publish(self):
         records = retain_previous(self.index.records, self.previous.get("records", {}), self.good)
         by_ticker = defaultdict(list)
-        contents = {}
+        bundles, content_batch, content_size = {}, {}, 0
+        def flush_content():
+            nonlocal content_batch, content_size
+            if content_batch:
+                filename = "documents/" + digest(json.dumps(content_batch, sort_keys=True))[:24] + ".json"
+                write(self.output / filename, content_batch)
+                bundles.update({sid:filename for sid in content_batch})
+                content_batch, content_size = {}, 0
         review = []
         status_counts = Counter()
         for rec in records.values():
+            previous = self.previous.get("records", {}).get(rec["id"], {})
+            if previous.get("indexed_at"):
+                rec["indexed_at"] = previous["indexed_at"]
             status_counts[rec["processing_status"]] += 1
             review.extend({"source_id": rec["id"], **r} for r in rec.get("review", []))
             if not any(r["ticker"] in self.companies for r in rec.get("relationships", [])):
                 continue
-            full_text = rec.get("text", "")
+            full_text = self.text(rec)
             parts = []
             if len(full_text.encode("utf-8")) > 1_000_000:
-                for start in range(0,len(full_text),200_000):
-                    part = full_text[start:start+200_000]
+                for start in range(0,len(full_text),1_000_000):
+                    part = full_text[start:start+1_000_000]
                     filename = "text/" + digest(part) + ".json"
                     write(self.output / filename, {"text":part})
                     parts.append(filename)
-            contents[rec["id"]] = {"id": rec["id"], "title": rec["title"], "text": "" if parts else full_text, "text_parts":parts, "locations": rec.get("locations", []), "processing_status": rec["processing_status"]}
+            content = {"id": rec["id"], "title": rec["title"], "text": "" if parts else full_text, "text_parts":parts, "locations": rec.get("locations", []), "processing_status": rec["processing_status"]}
+            content_bytes = len(json.dumps(content, ensure_ascii=False).encode())
+            if content_batch and content_size + content_bytes > 4_000_000:
+                flush_content()
+            content_batch[rec["id"]] = content
+            content_size += content_bytes
             for relation in rec.get("relationships", []):
                 if relation["ticker"] not in self.companies:
                     continue
-                view = {k: v for k, v in rec.items() if k not in {"text", "relationships", "review"}}
+                view = {k: v for k, v in rec.items() if k not in {"text", "text_cache", "text_length", "relationships", "review"}}
                 view.update(relation)
                 by_ticker[relation["ticker"]].append(view)
-        # Bounded content bundles keep the number of static files and each asset size practical.
-        chunks, current, size = [], {}, 0
-        for key in sorted(contents):
-            value = contents[key]
-            n = len(json.dumps(value, ensure_ascii=False).encode())
-            if current and size + n > 4_000_000:
-                chunks.append(current); current, size = {}, 0
-            current[key] = value; size += n
-        if current:
-            chunks.append(current)
-        bundles = {}
-        for chunk in chunks:
-            key = digest(json.dumps(chunk, sort_keys=True))[:24]
-            filename = f"documents/{key}.json"
-            write(self.output / filename, chunk)
-            bundles.update({sid: filename for sid in chunk})
+        flush_content()
         summary = {}
+        review_counts = Counter(r.get("ticker") for r in review)
+        unassigned_pending = sum(r["processing_status"] != "indexed" and not r.get("relationships") for r in records.values())
         for ticker in sorted(self.companies):
             rows = sorted(by_ticker[ticker], key=lambda r: (r.get("relationship") == "direct", r.get("date") or "", r["title"]), reverse=True)
             # Multiple matching passages/locations still count as one document per company.
@@ -556,10 +643,11 @@ class Builder:
                     row["is_latest"] = i == 0
                     row["version_count"] = len(versions)
             index = defaultdict(list)
-            for row in rows:
+            source_ids = [r["id"] for r in rows]
+            for ordinal, row in enumerate(rows):
                 row["content_path"] = bundles[row["id"]]
-                for word in tokens(records[row["id"]].get("text", "") + " " + row["title"] + " " + row.get("author", "")):
-                    index[word].append(row["id"])
+                for word in set(self.source_words(records[row["id"]])) | tokens(row["title"] + " " + row.get("author", "")):
+                    index[word].append(ordinal)
             pages = []
             for i in range(0, len(rows), 100):
                 page = rows[i:i+100]
@@ -580,15 +668,15 @@ class Builder:
                 filename = f"search/{ticker}/{digest(json.dumps(search_chunk, sort_keys=True))[:24]}.json"
                 write(self.output / filename, search_chunk)
                 search_parts.append(filename)
-                write(self.output / search_path, {"__parts": search_parts})
+                write(self.output / search_path, {"__parts": search_parts, "__ids": source_ids})
             else:
-                write(self.output / search_path, search_chunk)
+                write(self.output / search_path, {**search_chunk, "__ids": source_ids})
             counts = dict(Counter(r["category"] for r in rows))
             pending = sum(r["processing_status"] != "indexed" for r in rows)
             receipts = [r for r in self.receipts if not r["collection"].startswith("company:") or r["collection"] == "company:" + ticker]
             incomplete = [r for r in receipts if r["status"] != "complete"]
-            review_count = sum(r.get("ticker") == ticker for r in review)
-            coverage = {"checked_at": self.now, "status": "partial" if incomplete or pending or review_count else "complete", "pending": pending, "review_count": review_count, "unavailable_collections": len(incomplete), "receipts": receipts}
+            review_count = review_counts[ticker]
+            coverage = {"checked_at": self.now, "status": "partial" if incomplete or pending or review_count or unassigned_pending else "complete", "pending": pending, "unassigned_pending": unassigned_pending, "review_count": review_count, "unavailable_collections": len(incomplete), "receipts": receipts}
             featured=[]
             for kind in ("analysis","calls","letters","filings","models"):
                 hit=next((r for r in rows if r["category"]==kind and r["relationship"]=="direct" and r.get("availability")=="available"),None)
@@ -599,16 +687,31 @@ class Builder:
             summary[ticker] = {"total": len(rows), "categories": counts, "pending": pending}
         report = {"schema_version": 1, "generated_at": self.now, "documents": len(records), "companies": len(summary), "linked_companies": sum(v["total"] > 0 for v in summary.values()), "processing": dict(status_counts), "review_count": len(review), "receipts": self.receipts, "tickers": summary}
         write(self.output / "manifest.json", report)
-        write(self.output / "review.json", {"items": review})
+        if len(json.dumps(review).encode()) > 4_000_000:
+            review_parts = []
+            for start in range(0, len(review), 1000):
+                chunk = review[start:start+1000]
+                relative = "review/" + digest(json.dumps(chunk, sort_keys=True))[:24] + ".json"
+                write(self.output / relative, {"items": chunk})
+                review_parts.append(relative)
+            write(self.output / "review.json", {"count": len(review), "parts": review_parts})
+        else:
+            write(self.output / "review.json", {"items": review})
         saved = {}
+        saved_text = set()
         for key, record in records.items():
-            text = record.get("text", "")
-            sha = digest(text)
-            write(self.cache / "published-text" / (sha + ".json"), {"text": text})
+            sha = record.get("text_cache")
+            if not sha and record.get("text"):
+                sha = digest(record["text"])
+                if sha not in saved_text:
+                    write(self.cache / "published-text" / (sha + ".json"), {"text": record["text"]})
+                    saved_text.add(sha)
             saved[key] = {k:v for k,v in record.items() if k != "text"}
-            saved[key]["text_cache"] = sha
-        write(self.cache / "index.json", {"records": saved, "receipts": self.receipts, "generated_at": self.now})
-        write(self.cache / "matches.json", self.matches)
+            if sha:
+                saved[key]["text_cache"] = sha
+        parts = write_mapping(self.cache, "records", saved)
+        write(self.cache / "index.json", {"record_parts": parts, "receipts": self.receipts, "generated_at": self.now})
+        write(self.cache / "matches.json", {"version": self.match_version, "parts": write_mapping(self.cache, "relationships", self.matches)})
         return report
 
 
