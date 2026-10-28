@@ -27,6 +27,7 @@ on:
       - "dashboard/data/kpi_summary.json"
       - "dashboard/data/document_catalog_summary.json"
       - "dashboard/data/agent_shards/**"
+      - "dashboard/private-assets.json"
       - "*/research/thesis_card.json"
       - "*/research/latest.json"
       - "GOOGL/research/valuation.json"
@@ -42,6 +43,7 @@ on:
       - "GOOGL/third-party-analyses/source_inventory.json"
       - "SOURCES.md"
       - ".gitignore"
+      - ".gitattributes"
       - "CONTRIBUTING.md"
       - "docs/WRITE_MAP.md"
       - "dashboard/index.html"
@@ -94,6 +96,7 @@ on:
       - "dashboard/data/kpi_summary.json"
       - "dashboard/data/document_catalog_summary.json"
       - "dashboard/data/agent_shards/**"
+      - "dashboard/private-assets.json"
       - "*/research/thesis_card.json"
       - "*/research/latest.json"
       - "GOOGL/research/valuation.json"
@@ -109,6 +112,7 @@ on:
       - "GOOGL/third-party-analyses/source_inventory.json"
       - "SOURCES.md"
       - ".gitignore"
+      - ".gitattributes"
       - "CONTRIBUTING.md"
       - "docs/WRITE_MAP.md"
       - "dashboard/index.html"
@@ -186,6 +190,9 @@ jobs:
   hub-payloads:
     runs-on: ubuntu-latest
     timeout-minutes: 5
+    env:
+      RESEARCH_VAULT_ROOT: _external/research-vault
+      RESEARCH_VAULT_CLONE_TOKEN: ${{ secrets.RESEARCH_VAULT_CLONE_TOKEN }}
     steps:
       - uses: actions/checkout@v4
         with:
@@ -194,6 +201,10 @@ jobs:
           filter: blob:none
           sparse-checkout: |
             /_system/scripts/check_hub_payloads.py
+            /_system/scripts/private_dashboard_assets.py
+            /_system/scripts/vault_paths.py
+            /.github/actions/checkout-vault/
+            /dashboard/private-assets.json
             /dashboard/data/core.json
             /dashboard/data/desk_briefs.json
             /dashboard/data/reverse_splits.json
@@ -205,6 +216,8 @@ jobs:
       - uses: actions/setup-python@v5
         with:
           python-version: "3.12"
+      - name: Restore authorized private hub inputs
+        uses: ./.github/actions/checkout-vault
       - name: Committed hub shards reconcile
         run: python _system/scripts/check_hub_payloads.py
 
@@ -234,6 +247,8 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 20
     env:
+      RESEARCH_VAULT_ROOT: _external/research-vault
+      RESEARCH_VAULT_CLONE_TOKEN: ${{ secrets.RESEARCH_VAULT_CLONE_TOKEN }}
       # Empty after the publisher cadence assertion was reconciled with main.
       KNOWN_FAILURES: ""
       # Suites that live beside the scripts rather than under tests/. Missing
@@ -287,6 +302,7 @@ jobs:
             /dashboard/data/kpi_summary.json
             /dashboard/data/document_catalog_summary.json
             /dashboard/data/agent_shards/
+            /dashboard/private-assets.json
             /*/research/thesis_card.json
             /*/research/latest.json
             /GOOGL/research/valuation.json
@@ -302,6 +318,7 @@ jobs:
             /GOOGL/third-party-analyses/source_inventory.json
             /SOURCES.md
             /.gitignore
+            /.gitattributes
             /CONTRIBUTING.md
             /docs/WRITE_MAP.md
             /dashboard/index.html
@@ -357,6 +374,8 @@ jobs:
             "pytest==9.1.1" "PyYAML==6.0.3" "jsonschema==4.26.0" "numpy==2.3.3" "scipy==1.16.2" \
             "ruff==0.16.0" "pandas==3.0.3" "requests==2.34.2" \
             "beautifulsoup4==4.15.0" "lxml==6.1.1" "exchange-calendars==4.13.2"
+      - name: Restore authorized private architecture fixtures
+        uses: ./.github/actions/checkout-vault
       - name: Trading and script test suites
         run: |
           set -euo pipefail

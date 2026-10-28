@@ -72,4 +72,37 @@ else
   log "sleeve-sync skipped: SLEEVE_INGEST_TOKEN not set"
 fi
 
+# Permanent realized history consumes the SAME archived reports. It has its own
+# failure status and never changes broker truth or an existing owner's holdings.
+# A missing/mismatched trade file preserves the previously published generation.
+if [ -n "${SLEEVE_INGEST_TOKEN:-}" ]; then
+  REALIZED_STATE=/home/spx/portfolio-hub/sleeve-realized
+  # Optional supplemental query uses the established reporting token, only once
+  # the primary fetch has finished. This creates no trading/API login. Keep the
+  # token in its current file and never rotate it for this feature.
+  if [ -n "${SLEEVE_CLOSED_LOTS_QUERY_ID:-}" ]; then
+    if systemctl is-active --quiet ls-algo-daily.service ls-algo-eod-retry.service ||
+       systemctl --user is-active --quiet ls-algo-daily.service ls-algo-eod-retry.service; then
+      log "closed-lot refresh deferred: primary EOD producer is still active"
+    else
+      # Read only the Flex key as data. Sourcing the whole file under nounset
+      # can abort on unrelated literal dollar signs before Python even starts.
+      IBKR_FLEX_TOKEN_FILE=/home/spx/.config/ls-algo/.env \
+        "$PY" -m _system.trading.sleeves.realized_cli --state "$REALIZED_STATE" --account "$ACCOUNT" refresh-detail \
+          --positions "$POSITIONS" --query-id "$SLEEVE_CLOSED_LOTS_QUERY_ID"
+      log "closed-lot refresh exit=$?"
+    fi
+  fi
+  CLOSED_LOTS="$REALIZED_STATE/downloads/closed-lots-latest.xml"
+  realized_args=()
+  if [ -s "$CLOSED_LOTS" ]; then realized_args+=(--closed-lots "$CLOSED_LOTS"); fi
+  "$PY" -m _system.trading.sleeves.realized_cli --state "$REALIZED_STATE" --account "$ACCOUNT" sync \
+    --positions "$POSITIONS" --stale-hours "$STALE_HOURS" --publish "${realized_args[@]}"
+  realized_rc=$?
+  log "realized-history exit=$realized_rc"
+  if [ "$realized_rc" -ne 0 ]; then
+    log "realized history retained its last valid generation; retry on the next daily run"
+  fi
+fi
+
 exit $rc

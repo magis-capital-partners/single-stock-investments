@@ -906,6 +906,10 @@ def merge_compiled_model(prior: dict, model: dict) -> dict:
     """
     if not isinstance(prior, dict) or not prior:
         return model
+    if prior.get('underwriting'):
+        # Only the independent underwriting pipeline may replace sealed economics.
+        # Source collection continues; shared repricing validates the receipt.
+        return copy.deepcopy(prior)
     merged = copy.deepcopy(prior)
     merged.update(model)
     automation = (model.get("valuation_methodology") or {}).get("automation")
@@ -1445,6 +1449,9 @@ def compile_existing_approved_proofs(ticker: str, as_of: str, identity: dict) ->
 
 def compile_valuation(ticker: str, as_of: str, identity: dict, ledger: dict) -> dict | None:
     """Dispatch only to the compiler selected by the canonical Power Zone route."""
+    prior = read_json(ROOT / ticker / "research" / "valuation.json")
+    if prior.get('underwriting'):
+        return copy.deepcopy(prior)
     existing = compile_existing_approved_proofs(ticker, as_of, identity)
     if existing:
         return existing

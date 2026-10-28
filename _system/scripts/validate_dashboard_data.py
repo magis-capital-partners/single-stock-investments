@@ -113,6 +113,47 @@ def pages_deploy_only() -> bool:
     return os.environ.get("CI_PAGES_DEPLOY_ONLY", "").lower() in {"1", "true", "yes"}
 
 
+def retained_event_count_issue(
+    summary: dict, event_count: int, *, deploy_only: bool
+) -> tuple[str, str] | None:
+    """Return (severity, message) when a triage summary lags its events list.
+
+    Media publishers have shipped this exact drift (a retained count of 1539
+    beside a longer events shard). The count is derived from the events list
+    before a publish. Deploy-only validation reports it as a warning so the
+    drift cannot block an unrelated boot-payload job; a full validation still
+    fails.
+    """
+    retained = int(summary.get("retained_event_count") or 0)
+    if retained == event_count:
+        return None
+    message = (
+        "event triage retained_event_count does not match events list "
+        f"({retained} vs {event_count})"
+    )
+    return ("warning" if deploy_only else "error", message)
+
+
+def load_dashboard_document(path: Path) -> dict:
+    """Read a dashboard JSON file, following a private snapshot without copying it.
+
+    Hydrated checkouts already hold the private bytes in the public path, so
+    this returns that file unchanged. A metadata placeholder is read from the
+    vault object and never written back.
+    """
+    document = json.loads(path.read_text(encoding="utf-8"))
+    if not isinstance(document, dict) or document.get("private_snapshot") is not True:
+        return document if isinstance(document, dict) else {}
+    relative = path.relative_to(ROOT / "dashboard").as_posix()
+    from private_dashboard_assets import read_resolved_json
+    resolved, _restored = read_resolved_json(ROOT / "dashboard", relative)
+    if resolved.get("private_snapshot") is True:
+        raise ValueError(
+            f"{relative} is a private snapshot. Check out the research vault before validating."
+        )
+    return resolved
+
+
 def resolve_payload_path(
     *,
     monolith: Path = DATA_PATH,
@@ -303,6 +344,11 @@ def main() -> int:
             errors.append(msg)
 
     payload = json.loads(payload_path.read_text(encoding="utf-8"))
+    if isinstance(payload, dict) and payload.get("private_snapshot") is True:
+        try:
+            payload = load_dashboard_document(payload_path)
+        except (OSError, RuntimeError, ValueError, json.JSONDecodeError) as exc:
+            errors.append(f"{payload_path.name} is a private snapshot and could not be read: {exc}")
     registry = json.loads(REGISTRY_PATH.read_text(encoding="utf-8"))
     if payload.get("insights"):
         errors.append(
@@ -349,9 +395,9 @@ def main() -> int:
                 errors.append(f"{path} contains unresolved git merge conflict markers")
                 continue
             try:
-                shard = json.loads(raw_shard)
-            except json.JSONDecodeError:
-                errors.append(f"{path} is invalid JSON")
+                shard = load_dashboard_document(path)
+            except (json.JSONDecodeError, OSError, RuntimeError, ValueError) as exc:
+                errors.append(f"{path} could not be read: {exc}")
                 continue
             if isinstance(shard, dict):
                 insights.update(shard)
@@ -618,8 +664,15 @@ def main() -> int:
                     errors.append("event triage summary missing history_start")
                 if events and not triage_summary.get("history_end"):
                     errors.append("event triage summary missing history_end")
-                if int(triage_summary.get("retained_event_count") or 0) != len(events):
-                    errors.append("event triage retained_event_count does not match events list")
+                issue = retained_event_count_issue(
+                    triage_summary, len(events), deploy_only=deploy_only
+                )
+                if issue is not None:
+                    severity, message = issue
+                    if severity == "warning":
+                        warnings.append(message)
+                    else:
+                        errors.append(message)
         if "records" in insights:
             errors.append("insights payload should not include raw records; use record_archive.path")
         archive = insights.get("record_archive") or {}

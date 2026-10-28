@@ -44,7 +44,7 @@
     contractSuggestions: [], contractChain: null, contractLookup: null, lookupPollTimer: null,
     columnSets: { default: loadColumns(COLUMN_STORAGE, DEFAULT_COLUMNS), michael: loadColumns(MICHAEL_COLUMN_STORAGE, MICHAEL_COLUMNS) }, savedViews: loadViews(),
   };
-  const sections = ['positions', 'risk', 'margin', 'performance', 'orders', 'reconciliation'];
+  const sections = ['positions', 'realized', 'risk', 'margin', 'performance', 'orders', 'reconciliation'];
   const strategySections = ['overview', 'positions', 'pnl', 'margin', 'risk', 'orders', 'reconciliation'];
   const buckets = ['all', 'b1', 'b2', 'b3', 'b4', 'b5', 'unbucketed'];
   const esc = (value) => String(value ?? '').replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
@@ -388,7 +388,8 @@
   }
 
   function shellHeader(book) {
-    return `<div class="ph-eyebrow">Private IBKR account · canonical ledger</div><div class="ph-title-row"><div><h2 class="ph-title">Portfolio book</h2><div class="ph-asof">${portfolioClock(book)}</div></div><div class="ph-scope-nav" aria-label="Portfolio scope">${['all', 'drew', 'michael'].map((scope) => `<button type="button" data-ph-scope="${scope}" class="${state.scope === scope ? 'active' : ''}">${scope === 'all' ? 'All positions' : scope[0].toUpperCase() + scope.slice(1)}</button>`).join('')}</div></div>${accountCockpit(book)}${accountFacts(book)}<div class="ph-section-nav" role="tablist">${sections.map((section) => `<button type="button" data-ph-section="${section}" class="${state.section === section ? 'active' : ''}">${section === 'margin' ? 'Margin & liquidity' : section[0].toUpperCase() + section.slice(1)}</button>`).join('')}</div>`;
+    const visibleSections = sections.filter((section) => section !== 'realized' || ['drew', 'michael'].includes(state.scope));
+    return `<div class="ph-eyebrow">Private IBKR account · canonical ledger</div><div class="ph-title-row"><div><h2 class="ph-title">Portfolio book</h2><div class="ph-asof">${portfolioClock(book)}</div></div><div class="ph-scope-nav" aria-label="Portfolio scope">${['all', 'drew', 'michael'].map((scope) => `<button type="button" data-ph-scope="${scope}" class="${state.scope === scope ? 'active' : ''}">${scope === 'all' ? 'All positions' : scope[0].toUpperCase() + scope.slice(1)}</button>`).join('')}</div></div>${accountCockpit(book)}${accountFacts(book)}<div class="ph-section-nav" role="tablist">${visibleSections.map((section) => `<button type="button" data-ph-section="${section}" class="${state.section === section ? 'active' : ''}">${section === 'realized' ? 'Realized P&amp;L' : section === 'margin' ? 'Margin & liquidity' : section[0].toUpperCase() + section.slice(1)}</button>`).join('')}</div>`;
   }
 
   function columnPicker() {
@@ -509,6 +510,10 @@
     return `<div class="ph-empty ph-empty--${esc(kind)}"><div><span class="ph-empty-kind">${esc(kind.replace(/_/g, ' '))}</span><b>${esc(title)}</b><p>${esc(detail)}</p>${source ? `<small>Source · ${esc(source)}</small>` : ''}${action ? `<small>Next · ${esc(action)}</small>` : ''}</div></div>`;
   }
   function sectionView(book) {
+    if (state.section === 'realized') {
+      if (!['drew', 'michael'].includes(state.scope)) return emptyState('unknown', 'Choose Drew or Michael', 'Realized history is shown separately for each owner.');
+      return window.SleeveRealized?.shell() || emptyState('unknown', 'Realized history is loading', 'Reload the dashboard to load the realized-history view.');
+    }
     if (state.section === 'positions') return positionsView(book);
     if (state.section === 'margin') return marginView(book);
     const values = valueMap(book);
@@ -1378,9 +1383,10 @@
   function renderPortfolio() {
     const root = document.getElementById('portfolio-content'); if (!root) return;
     const book = state.book;
-    const sectionAvailable = book?.status === 'complete' || state.section === 'orders';
+    const sectionAvailable = book?.status === 'complete' || ['orders', 'realized'].includes(state.section);
     root.innerHTML = `<div class="ph-shell">${shellHeader(book)}${sectionAvailable ? sectionView(book) : emptyState('upstream_absent', 'Waiting for the first complete IBKR snapshot', book?.reason || 'The private collector has not published broker truth yet.', 'Private IBKR collector · last checked on page load', 'Portfolio operations should publish a complete account summary and position watermark; Orders remains available for owner-scoped paper tickets.')}</div>`;
     bindCommon(root);
+    if (state.section === 'realized' && ['drew', 'michael'].includes(state.scope)) window.SleeveRealized?.attach(root, state.scope);
     if (state.section === 'orders') bindOrderDesk(root);
     root.querySelector('[data-ph-search]')?.addEventListener('input', (event) => { state.query = event.target.value; renderPortfolio(); const input = root.querySelector('[data-ph-search]'); input?.focus(); input?.setSelectionRange(state.query.length, state.query.length); });
     root.querySelectorAll('[data-ph-filter]').forEach((button) => button.addEventListener('click', () => { state.positionFilter = button.dataset.phFilter; renderPortfolio(); }));

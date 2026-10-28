@@ -14,9 +14,18 @@ on:
       - '_system/scripts/automatic_forecast_model.py'
       - '_system/scripts/legacy_forecast_model.py'
       - '_system/scripts/refresh_shared_forecasts.py'
+      - '_system/scripts/valuation_market_sync.py'
+      - '_system/scripts/valuation_share_basis.py'
+      - '_system/scripts/valuation_share_evidence.py'
   schedule:
     - cron: '23 8,18 * * 1-5'
       timezone: America/New_York
+    - cron: '37 16,20 * * 1-5'
+      timezone: America/New_York
+  workflow_run:
+    workflows: [Market Close]
+    types: [completed]
+    branches: [main]
   repository_dispatch:
     types: [refresh-autonomous-compounders]
 
@@ -29,8 +38,12 @@ concurrency:
 
 jobs:
   refresh:
+    if: github.event_name != 'workflow_run' || github.event.workflow_run.conclusion == 'success'
     runs-on: ubuntu-latest
-    timeout-minutes: 30
+    timeout-minutes: 45
+    env:
+      RESEARCH_VAULT_ROOT: _external/research-vault
+      RESEARCH_VAULT_CLONE_TOKEN: ${{ secrets.RESEARCH_VAULT_CLONE_TOKEN }}
     steps:
       - uses: actions/checkout@v4
         with:
@@ -52,20 +65,35 @@ jobs:
             _system/data/autonomous_compounders.json
             dashboard/data/core.json
             dashboard/data/tickers
+            dashboard/private-assets.json
+            .gitattributes
+            .github/actions/checkout-vault
+            .github/actions/preserve-private-dashboard
             .github/actions/commit-main
       - uses: actions/setup-python@v5
         with:
           python-version: '3.12'
       - name: Install parser and regression dependencies
-        run: pip install pytest pypdf
+        run: pip install pytest pypdf exchange_calendars==4.13.2
+      - name: Restore authorized private research inputs
+        uses: ./.github/actions/checkout-vault
       - name: Verify automatic publication checks
-        run: python -m pytest -q _system/scripts/tests/test_autonomous_compounders.py _system/scripts/tests/test_shared_valuation_forecast.py
+        run: python -m pytest -q _system/scripts/tests/test_autonomous_compounders.py _system/scripts/tests/test_shared_valuation_forecast.py _system/scripts/tests/test_valuation_market_sync.py
       - name: Collect, validate and publish every core compounder
+        if: github.event_name == 'push' || (github.event_name == 'schedule' && github.event.schedule == '23 8,18 * * 1-5') || (github.event_name == 'repository_dispatch' && github.event.client_payload.prices_only != true)
         run: python _system/scripts/autonomous_compounders.py --collect
       - name: Validate source-bound replay and complete universe
+        if: github.event_name == 'push' || (github.event_name == 'schedule' && github.event.schedule == '23 8,18 * * 1-5') || (github.event_name == 'repository_dispatch' && github.event.client_payload.prices_only != true)
         run: python _system/scripts/autonomous_compounders.py --check
       - name: Refresh shared forecasts for the complete coverage universe
-        run: python _system/scripts/refresh_shared_forecasts.py --collect
+        env:
+          FULL: ${{ github.event_name == 'push' || (github.event_name == 'schedule' && github.event.schedule == '23 8,18 * * 1-5') || (github.event_name == 'repository_dispatch' && github.event.client_payload.prices_only != true) }}
+        run: |
+          if [ "$FULL" = "true" ]; then
+            python _system/scripts/refresh_shared_forecasts.py --collect
+          else
+            python _system/scripts/refresh_shared_forecasts.py --prices-only
+          fi
       - name: Verify every served PV and IRR against the same model
         run: python _system/scripts/refresh_shared_forecasts.py --check
       - name: Publish dated research estimates

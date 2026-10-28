@@ -19,6 +19,10 @@ jobs:
   refresh:
     runs-on: ubuntu-latest
     timeout-minutes: 35
+    env:
+      RESEARCH_VAULT_REPO_URL: ${{ secrets.RESEARCH_VAULT_REPO_URL }}
+      RESEARCH_VAULT_CLONE_TOKEN: ${{ secrets.RESEARCH_VAULT_CLONE_TOKEN }}
+      RESEARCH_VAULT_ROOT: _external/research-vault
     steps:
       - uses: actions/checkout@v4
         with:
@@ -29,7 +33,11 @@ jobs:
             _system/data/vol_metrics_move_outage_backfill.csv
             dashboard/data
             .github/actions/commit-main
+            .github/actions/preserve-private-dashboard
+            .github/actions/checkout-vault
           fetch-depth: 1
+      - name: Checkout research vault
+        uses: ./.github/actions/checkout-vault
       - uses: actions/setup-python@v5
         with:
           python-version: "3.12"

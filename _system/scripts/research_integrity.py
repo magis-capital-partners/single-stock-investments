@@ -20,7 +20,16 @@ REVIEW_QUEUE = ROOT / "_system/reference/letter_classification_review_queue.json
 
 @lru_cache(maxsize=1)
 def correction_rules() -> tuple[dict, ...]:
-    return tuple(json.loads(CORRECTIONS.read_text(encoding="utf-8"))["rules"])
+    from private_dashboard_assets import read_resolved_json
+
+    document, _restored = read_resolved_json(ROOT, CORRECTIONS.relative_to(ROOT).as_posix())
+    rules = document.get("rules")
+    if not isinstance(rules, list):
+        raise RuntimeError(
+            "letter_classification_corrections.json is a private snapshot and was not restored. "
+            "Check out the research vault and run private_dashboard_assets.py --repository-only."
+        )
+    return tuple(rules)
 
 
 @lru_cache(maxsize=1)

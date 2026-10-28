@@ -4,9 +4,23 @@ on:
     branches: [main]
     paths: &paths
       - '_system/scripts/third_plus_signal/**'
+      - '_system/scripts/third_plus_forward/**'
+      - 'dashboard/third-plus-forward*'
+      - 'dashboard/data/third_plus_forward*'
+      - '_system/data/reverse_splits/third_plus_forward_v1/**'
+      - '.github/workflows/reverse-split-borrow-history.yml'
       - '_system/scripts/third_plus_execution/**'
       - 'dashboard/third-plus-execution.js'
       - 'dashboard/third-plus-venue.js'
+      - 'dashboard/third-plus-assumed.js'
+      - 'dashboard/third-plus-allocation.js'
+      - 'dashboard/third-plus-announcement*'
+      - 'dashboard/data/third_plus_announcement*'
+      - 'docs/THIRD_PLUS_ANNOUNCEMENT_BACKTEST.md'
+      - 'dashboard/short-alpha-viz.js'
+      - 'dashboard/index.html'
+      - 'dashboard/data/third_plus_allocation*'
+      - 'dashboard/data/third_plus_assumed*'
       - 'dashboard/data/third_plus_venue_execution*'
       - 'dashboard/data/third_plus_execution*'
       - '_system/scripts/third_plus_signal_study.cjs'
@@ -25,6 +39,7 @@ on:
       - 'dashboard/data/third_plus_requested_*.csv'
       - '_system/data/reverse_splits/third_plus_signal_study/**'
       - '_system/scripts/third_plus_fundamental*'
+      - '_system/scripts/build_short_quant_screen.py'
       - '_system/scripts/third_plus_reconciliation*'
       - '_system/scripts/test_third_plus_reconciliation.py'
       - '_system/scripts/third_plus_saved_screen.cjs'
@@ -47,9 +62,24 @@ jobs:
         with:
           sparse-checkout: |
             _system/scripts/third_plus_signal/
+            _system/scripts/third_plus_forward/
+            _system/scripts/reverse_splits/
+            _system/data/reverse_splits/third_plus_forward_v1/
+            dashboard/third-plus-forward*
+            dashboard/data/third_plus_forward*
+            .github/workflows/reverse-split-borrow-history.yml
             _system/scripts/third_plus_execution/
             dashboard/third-plus-execution.js
             dashboard/third-plus-venue.js
+            dashboard/third-plus-assumed.js
+            dashboard/third-plus-allocation.js
+            dashboard/third-plus-announcement*
+            dashboard/data/third_plus_announcement*
+            dashboard/short-alpha-viz.js
+            docs/THIRD_PLUS_ANNOUNCEMENT_BACKTEST.md
+            dashboard/index.html
+            dashboard/data/third_plus_allocation*
+            dashboard/data/third_plus_assumed*
             dashboard/data/third_plus_venue_execution*
             dashboard/data/third_plus_execution*
             _system/scripts/third_plus_signal_study.cjs
@@ -68,6 +98,7 @@ jobs:
             dashboard/data/third_plus_requested_*.csv
             _system/data/reverse_splits/third_plus_signal_study/
             _system/scripts/third_plus_fundamental*
+            _system/scripts/build_short_quant_screen.py
             _system/scripts/third_plus_reconciliation*
             _system/scripts/test_third_plus_reconciliation.py
             _system/scripts/third_plus_saved_screen.cjs
@@ -84,7 +115,12 @@ jobs:
         with:
           python-version: '3.12'
       - name: Install filing parser dependency
-        run: python -m pip install lxml==6.1.1
+        run: python -m pip install lxml==6.1.1 exchange-calendars==4.13.2
+      - name: Verify prospective clocks, evidence accounting and publication
+        run: |
+          python -m unittest discover -s _system/scripts/third_plus_forward -p 'test_*.py'
+          python -m _system.scripts.third_plus_forward check
+          node --test _system/scripts/third_plus_forward/dashboard.test.cjs
       - name: Verify offline filing extraction
         run: python -m unittest discover -s _system/scripts -p test_third_plus_reconciliation.py
       - name: Verify offline financial and execution invariants
@@ -100,4 +136,11 @@ jobs:
           node --test --test-reporter=tap _system/scripts/third_plus_execution/*.test.cjs
           node _system/scripts/third_plus_execution/publish.cjs --check
           python -m unittest discover -s _system/scripts/third_plus_execution -p test_venue_capture.py
+          python -m unittest discover -s _system/scripts/third_plus_execution -p test_announcement_scores.py
           node _system/scripts/third_plus_execution/venue_publish.cjs --check
+          node _system/scripts/third_plus_execution/assumed_study.cjs --check
+          node _system/scripts/third_plus_execution/assumed_publish.cjs --check
+          node _system/scripts/third_plus_execution/allocation_study.cjs --check
+          node _system/scripts/third_plus_execution/allocation_publish.cjs --check
+          node _system/scripts/third_plus_execution/announcement_study.cjs --check
+          node _system/scripts/third_plus_execution/announcement_report.cjs --check

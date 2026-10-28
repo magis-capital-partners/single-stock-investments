@@ -448,6 +448,91 @@ class InsightManifestSyncTests(unittest.TestCase):
             with self.assertRaises(RuntimeError):
                 lane._sync_insight_manifest(src / "manifest.json", dst / "manifest.json", videos=True, podcasts=False)
 
+    def test_sync_exports_a_managed_manifest_and_leaves_the_placeholder(self):
+        import migrate_dashboard_sources as migration
+
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp) / "repo"
+            vault = Path(tmp) / "vault"
+            (vault / ".git").mkdir(parents=True)
+            insights = root / "dashboard" / "data" / "insights"
+            insights.mkdir(parents=True)
+            full = {
+                "generated_at": "2026-10-20T09:30:36Z",
+                "event_count": 2,
+                "letter_count": 12,
+                "source_health": {"filing_facts": {"status": "ok"}, "videos": {"items": 1}},
+                "provenance": {"event_triage_summary": {"retained_event_count": 2}},
+                "shards": {"events": "data/insights/events.json"},
+            }
+            events = {"events": [
+                {"observed_at": "2026-01-01", "tier": "signal", "feed_eligible": True},
+                {"observed_at": "2026-01-02", "tier": "context", "feed_eligible": True},
+            ]}
+            manifest_path = insights / "manifest.json"
+            manifest_path.write_text(json.dumps(full), encoding="utf-8")
+            (insights / "events.json").write_text(json.dumps(events), encoding="utf-8")
+            with mock.patch.dict(os.environ, {"RESEARCH_VAULT_ROOT": str(vault)}):
+                migration.migrate(root, paths=["dashboard/data/insights/manifest.json"])
+                public = json.loads(manifest_path.read_text(encoding="utf-8"))
+                self.assertIs(public.get("private_snapshot"), True)
+                src = Path(tmp) / "src"
+                src.mkdir()
+                updated = {
+                    "source_health": {"podcasts": {"items": 9, "status": "ok"}},
+                    "shards": {"podcasts": "data/insights/podcasts.json"},
+                }
+                (src / "manifest.json").write_text(json.dumps(updated), encoding="utf-8")
+                before = manifest_path.read_text(encoding="utf-8")
+                lane._sync_insight_manifest(
+                    src / "manifest.json", manifest_path, videos=False, podcasts=True,
+                )
+                published = json.loads(manifest_path.read_text(encoding="utf-8"))
+                self.assertIs(published.get("private_snapshot"), True)
+                self.assertNotIn("podcasts", manifest_path.read_text(encoding="utf-8"))
+                self.assertNotEqual(manifest_path.read_text(encoding="utf-8"), json.dumps(full))
+                receipt = json.loads((root / "dashboard" / "private-assets.json").read_text(encoding="utf-8"))
+                entry = receipt["assets"]["data/insights/manifest.json"]
+                private = vault / "dashboard-private" / "objects" / entry["private_sha256"]
+                stored = json.loads(private.read_text(encoding="utf-8"))
+                self.assertEqual(stored["source_health"]["podcasts"]["items"], 9)
+                self.assertEqual(stored["letter_count"], 12)
+                self.assertIs(published.get("private_snapshot"), True)
+                self.assertNotIn("source_health", published)
+                # A drifted full file is refused instead of being committed.
+                manifest_path.write_text(json.dumps(full), encoding="utf-8")
+                with self.assertRaises(RuntimeError) as caught:
+                    lane._sync_insight_manifest(
+                        src / "manifest.json", manifest_path, videos=False, podcasts=True,
+                    )
+                self.assertIn("Managed dashboard asset changed", str(caught.exception))
+                self.assertEqual(json.loads(manifest_path.read_text(encoding="utf-8"))["letter_count"], 12)
+            self.assertTrue(before.startswith("{"))
+
+    def test_directory_sync_leaves_a_managed_episode_placeholder(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            repo = Path(tmp) / "repo"
+            episodes = repo / "dashboard" / "data" / "insights" / "podcast_episodes"
+            episodes.mkdir(parents=True)
+            name = "episode.json"
+            placeholder = '{"private_snapshot":true,"source_shape":"object","entry_count":1,"collection_counts":{}}\n'
+            (episodes / name).write_text(placeholder, encoding="utf-8")
+            receipt = {
+                "assets": {
+                    f"data/insights/podcast_episodes/{name}": {
+                        "public_sha256": "abc",
+                        "private_sha256": "def",
+                    }
+                }
+            }
+            (repo / "dashboard" / "private-assets.json").write_text(json.dumps(receipt), encoding="utf-8")
+            source = Path(tmp) / "src" / "dashboard" / "data" / "insights" / "podcast_episodes"
+            source.mkdir(parents=True)
+            (source / name).write_text('{"source_file": "secret"}\n', encoding="utf-8")
+            lane._sync_directory(source, episodes, repo)
+            self.assertEqual((episodes / name).read_text(encoding="utf-8"), placeholder)
+            self.assertNotIn("secret", (episodes / name).read_text(encoding="utf-8"))
+
 
 if __name__ == "__main__":
     unittest.main(verbosity=2)

@@ -1,14 +1,32 @@
 """Regression coverage for source-scoped corrections and IRR publication gates."""
 import copy
+import json
 import sys
 from datetime import date
 from pathlib import Path
+
+import pytest
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 
 from letter_matching import _relation_action
 from research_integrity import reconcile_letter, gate_return_claims
 from build_irr_readiness import assess_company
+
+
+def test_ls_algo_intake_restores_repository_snapshots_before_the_build():
+    text = Path(__file__).resolve().parents[3].joinpath(
+        ".github", "workflows", "ls-algo-universe.yml").read_text(encoding="utf-8")
+    checkout = text.index("Checkout research vault")
+    restore = text.index("private_dashboard_assets.py --repository-only")
+    dashboard = text.index("private_dashboard_assets.py\n")
+    build = text.index("build_dashboard_data.py")
+    redact = text.index("migrate_dashboard_sources.py")
+    stage = text.index("ci_stage_owned_paths.py")
+    commit = text.split("Commit the complete onboarding transaction", 1)[1]
+    assert "git add --sparse" not in commit
+    assert 'hydrate: "false"' in text
+    assert checkout < restore < dashboard < build < redact < stage
 
 
 def test_copart_sale_cannot_borrow_tjx_purchase_or_amazon_add():
@@ -35,6 +53,25 @@ def test_wrong_word_senses_do_not_erase_a_real_issuer_elsewhere():
             ("WMT", "We bought Walmart de Mexico shares.", "Walmart"),
             ("XYZ", "We sold a block of shares.", "block")]:
         assert _issuer_spans(text, ticker, [text.index(name)]) == []
+
+
+def test_placeholder_corrections_fail_clearly(tmp_path, monkeypatch):
+    import research_integrity as ri
+
+    root = tmp_path / "repo"
+    path = root / "_system" / "reference" / "letter_classification_corrections.json"
+    path.parent.mkdir(parents=True)
+    path.write_text(json.dumps({
+        "private_snapshot": True, "source_shape": "object", "entry_count": 1, "collection_counts": {},
+    }), encoding="utf-8")
+    monkeypatch.setattr(ri, "ROOT", root)
+    monkeypatch.setattr(ri, "CORRECTIONS", path)
+    ri.correction_rules.cache_clear()
+    try:
+        with pytest.raises(RuntimeError, match="[Pp]rivate snapshot"):
+            ri.correction_rules()
+    finally:
+        ri.correction_rules.cache_clear()
 
 
 def test_correction_requires_source_identity_and_does_not_mutate():
@@ -216,6 +253,138 @@ def test_readiness_check_detects_a_stale_served_detail(tmp_path):
         publish(tmp_path, tmp_path, date(2026, 10, 25), check=True)
     with pytest.raises(ValueError, match="nonempty universe"):
         build_report([], tmp_path, date(2026, 10, 25))
+
+
+def _stash_private(dashboard: Path, vault: Path, relative: str, payload: dict) -> tuple[str, str]:
+    import hashlib
+    import json
+    body = json.dumps(payload, separators=(",", ":")).encode()
+    private_sha = hashlib.sha256(body).hexdigest()
+    obj = vault / "dashboard-private" / "objects" / private_sha
+    obj.parent.mkdir(parents=True, exist_ok=True)
+    obj.write_bytes(body)
+    public = dashboard / relative
+    public.parent.mkdir(parents=True, exist_ok=True)
+    public.write_text(
+        json.dumps({"private_snapshot": True, "source_shape": "object", "entry_count": 1, "collection_counts": {}}),
+        encoding="utf-8",
+    )
+    return private_sha, hashlib.sha256(public.read_bytes()).hexdigest()
+
+
+def test_private_snapshot_universe_reads_shards_and_leaves_the_boot_file(tmp_path, monkeypatch):
+    import json
+    import pytest
+    import private_dashboard_assets as assets
+    from build_irr_readiness import publish
+    dashboard = tmp_path / "dashboard"
+    data = dashboard / "data"
+    (data / "tickers").mkdir(parents=True)
+    vault = tmp_path / "vault"
+    monkeypatch.setattr(assets, "research_vault_root", lambda **_kwargs: vault)
+    core_private, core_public = _stash_private(dashboard, vault, "data/core.json", {"tickers": [
+        {"ticker": "KEEP", "company": "Keep Co", "valuation_decision": {"model_level": "unmodeled"}},
+        {"ticker": "FILL", "company": "Fill Co"},
+    ]})
+    fill_private, fill_public = _stash_private(dashboard, vault, "data/tickers/FILL.json", {
+        "ticker": "FILL", "company": "Shard Co", "units": {"currency": "USD"},
+        "valuation_decision": {"model_level": "stock_specific"},
+    })
+    keep_private, keep_public = _stash_private(dashboard, vault, "data/tickers/KEEP.json", {
+        "ticker": "KEEP", "valuation_decision": {"model_level": "stock_specific"},
+    })
+    (dashboard / "private-assets.json").write_text(json.dumps({"assets": {
+        "data/core.json": {"private_sha256": core_private, "public_sha256": core_public},
+        "data/tickers/FILL.json": {"private_sha256": fill_private, "public_sha256": fill_public},
+        "data/tickers/KEEP.json": {"private_sha256": keep_private, "public_sha256": keep_public},
+    }}), encoding="utf-8")
+    new_shard = data / "tickers" / "NEW.json"
+    new_shard.write_text(json.dumps({
+        "ticker": "NEW", "company": "New Co", "valuation_decision": {"model_level": "committee_reviewed"},
+    }), encoding="utf-8")
+    before = {
+        "core": (data / "core.json").read_bytes(),
+        "fill": (data / "tickers" / "FILL.json").read_bytes(),
+        "keep": (data / "tickers" / "KEEP.json").read_bytes(),
+    }
+    report = publish(data, tmp_path, date(2026, 10, 27))
+    by_ticker = {company["ticker"]: company for company in report["companies"]}
+    assert set(by_ticker) == {"KEEP", "FILL", "NEW"}
+    assert by_ticker["KEEP"]["company"] == "Keep Co"
+    assert by_ticker["KEEP"]["model_level"] == "unmodeled"
+    assert by_ticker["FILL"]["company"] == "Fill Co"
+    assert by_ticker["FILL"]["model_level"] == "stock_specific"
+    assert by_ticker["NEW"]["company"] == "New Co"
+    assert by_ticker["NEW"]["model_level"] == "committee_reviewed"
+    assert (data / "core.json").read_bytes() == before["core"]
+    assert (data / "tickers" / "FILL.json").read_bytes() == before["fill"]
+    assert (data / "tickers" / "KEEP.json").read_bytes() == before["keep"]
+    assert (data / "core.json").stat().st_size < 6_000_000
+    written = json.loads(new_shard.read_text(encoding="utf-8"))
+    assert written["irr_readiness"]["ticker"] == "NEW"
+    publish(data, tmp_path, date(2026, 10, 27), check=True)
+    written.pop("irr_readiness")
+    new_shard.write_text(json.dumps(written), encoding="utf-8")
+    with pytest.raises(ValueError, match="detail IRR checklist is stale"):
+        publish(data, tmp_path, date(2026, 10, 27), check=True)
+
+
+def test_private_snapshot_without_a_vault_does_not_shrink_the_universe(tmp_path, monkeypatch):
+    import json
+    import pytest
+    import private_dashboard_assets as assets
+    from build_irr_readiness import publish
+    dashboard = tmp_path / "dashboard"
+    data = dashboard / "data"
+    (data / "tickers").mkdir(parents=True)
+    (data / "core.json").write_text(json.dumps({
+        "private_snapshot": True, "source_shape": "object", "entry_count": 1, "collection_counts": {"tickers": 2},
+    }), encoding="utf-8")
+    (data / "tickers" / "ONLY.json").write_text(json.dumps({"ticker": "ONLY", "company": "Only"}), encoding="utf-8")
+    (dashboard / "private-assets.json").write_text(json.dumps({"assets": {
+        "data/core.json": {"private_sha256": "a" * 64, "public_sha256": "b" * 64},
+    }}), encoding="utf-8")
+    monkeypatch.setattr(assets, "research_vault_root", lambda **_kwargs: None)
+    before = (data / "core.json").read_bytes()
+    with pytest.raises(ValueError, match="research vault"):
+        publish(data, tmp_path, date(2026, 10, 27))
+    assert (data / "core.json").read_bytes() == before
+    assert not (data / "irr_readiness.json").exists()
+
+
+def test_publish_leaves_core_when_it_would_pass_the_boot_budget(tmp_path, monkeypatch):
+    import json
+    import pytest
+    import build_irr_readiness as readiness
+    data = tmp_path
+    (data / "tickers").mkdir()
+    core_path = data / "core.json"
+    core_path.write_text(json.dumps({"tickers": [{"ticker": "TEST"}]}), encoding="utf-8")
+    (data / "tickers" / "TEST.json").write_text(json.dumps({"ticker": "TEST"}), encoding="utf-8")
+    before = core_path.read_bytes()
+    monkeypatch.setattr(readiness, "CORE_MAX_MB", 0.0)
+    with pytest.raises(ValueError, match="budget"):
+        readiness.publish(data, tmp_path, date(2026, 10, 27))
+    assert core_path.read_bytes() == before
+    assert not (data / "irr_readiness.json").exists()
+    assert json.loads((data / "tickers" / "TEST.json").read_text(encoding="utf-8")) == {"ticker": "TEST"}
+
+
+def test_power_zone_reads_the_vault_without_replacing_public_files():
+    import yaml
+    workflow = yaml.safe_load(
+        (Path(__file__).resolve().parents[3] / ".github/workflows/power-zone-universe.yml").read_text(encoding="utf-8")
+    )
+    job = workflow["jobs"]["route-value-gate"]
+    assert "secrets.RESEARCH_VAULT_CLONE_TOKEN" in str((job.get("env") or {}).get("RESEARCH_VAULT_CLONE_TOKEN"))
+    vault_steps = [step for step in job["steps"] if str(step.get("uses") or "").endswith("checkout-vault")]
+    assert len(vault_steps) == 1
+    assert str(vault_steps[0]["with"]["hydrate"]).lower() == "false"
+    commit = next(step["run"] for step in job["steps"] if "git add" in str(step.get("run") or ""))
+    assert "dashboard/data/irr_readiness.json" in commit
+    assert "dashboard/data/core.json" in commit
+    action = (Path(__file__).resolve().parents[3] / ".github/actions/checkout-vault/action.yml").read_text(encoding="utf-8")
+    assert "inputs.hydrate != 'false'" in action
 
 
 def test_targeted_refresh_reconciles_manifest_without_restamping_or_changing_events(tmp_path):

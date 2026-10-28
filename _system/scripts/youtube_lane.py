@@ -347,6 +347,86 @@ def _read_json(path: Path) -> dict:
     return value if isinstance(value, dict) else {}
 
 
+def _manifest_repo_root(path: Path) -> Path | None:
+    parts = path.parts
+    if "dashboard" not in parts:
+        return None
+    return Path(*parts[: parts.index("dashboard")])
+
+
+def _managed_manifest(path: Path) -> tuple[Path, str, dict] | None:
+    """Return repo root, dashboard-relative path, and receipt when this file is managed."""
+    root = _manifest_repo_root(path)
+    if root is None:
+        return None
+    relative = path.relative_to(root / "dashboard").as_posix()
+    receipt = root / "dashboard" / "private-assets.json"
+    if not receipt.is_file() and (root / ".git").exists():
+        run_git(root, "sparse-checkout", "add", "--skip-checks", "--",
+                "dashboard/private-assets.json", timeout=120, check=False)
+        run_git(root, "checkout", "HEAD", "--", "dashboard/private-assets.json",
+                timeout=120, check=False)
+    if not receipt.is_file():
+        return None
+    try:
+        manifest = json.loads(receipt.read_text(encoding="utf-8"))
+    except (OSError, json.JSONDecodeError):
+        return None
+    entry = (manifest.get("assets") or {}).get(relative)
+    if not isinstance(entry, dict) or "public_sha256" not in entry or "private_sha256" not in entry:
+        return None
+    return root, relative, entry
+
+
+def _resolved_manifest(path: Path) -> dict:
+    """The full manifest to patch. A public placeholder is read from the vault."""
+    from private_dashboard_assets import digest, read_resolved_json
+    from reconcile_insights_event_summary import is_publishable_manifest
+
+    managed = _managed_manifest(path)
+    doc = _read_json(path)
+    if managed is None:
+        if not is_publishable_manifest(doc):
+            raise RuntimeError(f"refusing to publish onto a stub insight manifest at {path}")
+        return doc
+    root, relative, entry = managed
+    current = digest(path) if path.is_file() else None
+    if current not in (entry["public_sha256"], entry["private_sha256"]):
+        raise RuntimeError(
+            "Managed dashboard asset changed; export its private snapshot before deployment: "
+            + relative
+        )
+    if doc.get("private_snapshot") is True:
+        resolved, _restored = read_resolved_json(root / "dashboard", relative)
+    else:
+        resolved = doc
+    if not is_publishable_manifest(resolved):
+        raise RuntimeError(f"refusing to publish onto a stub insight manifest at {path}")
+    return resolved
+
+
+def _republish_managed_manifest(path: Path, document: dict) -> None:
+    """Write a manifest. A managed asset is exported privately and the public file stays a placeholder."""
+    managed = _managed_manifest(path)
+    text = json.dumps(document, ensure_ascii=False, separators=(",", ":")) + "\n"
+    path.parent.mkdir(parents=True, exist_ok=True)
+    if managed is None:
+        path.write_text(text, encoding="utf-8")
+        return
+    root, relative, entry = managed
+    from migrate_dashboard_sources import migrate
+    from private_dashboard_assets import hydration_state, write_hydration
+
+    state = hydration_state(root)
+    state["dashboard/" + relative] = entry["private_sha256"]
+    write_hydration(root, state)
+    path.write_text(text, encoding="utf-8")
+    migrate(root, paths=["dashboard/" + relative])
+    published = _read_json(path)
+    if published.get("private_snapshot") is not True:
+        raise RuntimeError(f"Managed dashboard asset was published in full: {relative}")
+
+
 def _sync_insight_manifest(src: Path, dst: Path, *, videos: bool, podcasts: bool) -> None:
     """Patch this lane's media fields onto the manifest that already matches events.
 
@@ -354,27 +434,21 @@ def _sync_insight_manifest(src: Path, dst: Path, *, videos: bool, podcasts: bool
     onto origin/main put a retained_event_count of 1539 next to an events
     shard of 1530. The destination events list is the one this commit leaves
     in place, so the count is derived from it.
-    """
-    from reconcile_insights_event_summary import (
-        apply_media_fields,
-        is_publishable_manifest,
-        reconciled_manifest,
-    )
 
-    destination = _read_json(dst)
-    if not is_publishable_manifest(destination):
-        raise RuntimeError(f"refusing to publish onto a stub insight manifest at {dst}")
+    The public file is a managed private snapshot. Patching it in place and
+    committing the result published the full feed (08cf14351, de15a0e1d,
+    de5b8ff43). The updated document is stored as the vault object and the
+    public path is left as the metadata placeholder.
+    """
+    from reconcile_insights_event_summary import apply_media_fields, reconciled_manifest
+
+    destination = _resolved_manifest(dst)
     merged = apply_media_fields(destination, _read_json(src), videos=videos, podcasts=podcasts)
     events_doc = _read_json(dst.parent / "events.json")
     events = events_doc.get("events")
     if not isinstance(events, list):
         raise RuntimeError(f"insight events shard missing beside {dst}")
-    updated = reconciled_manifest(merged, events)
-    dst.parent.mkdir(parents=True, exist_ok=True)
-    dst.write_text(
-        json.dumps(updated, ensure_ascii=False, separators=(",", ":")) + "\n",
-        encoding="utf-8",
-    )
+    _republish_managed_manifest(dst, reconciled_manifest(merged, events))
 
 
 def _sync_published(src: Path, dst: Path, paths: tuple[str, ...] = MAIN_PATHS,
@@ -387,15 +461,75 @@ def _sync_published(src: Path, dst: Path, paths: tuple[str, ...] = MAIN_PATHS,
         if rel == INSIGHT_MANIFEST:
             _sync_insight_manifest(source, target, videos=videos, podcasts=podcasts)
             continue
+        if source.is_dir():
+            _sync_directory(source, target, dst)
+            continue
+        if source.is_file() and _managed_manifest(target) is not None:
+            # A managed public file stays the placeholder. Copying the lane's
+            # full document is how podcast episode shards landed in the public repo.
+            continue
         if target.is_dir():
             shutil.rmtree(target)
         elif target.exists():
             target.unlink()
-        if source.is_dir():
-            shutil.copytree(source, target)
-        elif source.is_file():
+        if source.is_file():
             target.parent.mkdir(parents=True, exist_ok=True)
             shutil.copy2(source, target)
+
+
+def _sync_directory(source: Path, target: Path, repo: Path) -> None:
+    """Copy a shard directory without replacing managed public placeholders."""
+    target.mkdir(parents=True, exist_ok=True)
+    incoming = {path.relative_to(source).as_posix() for path in source.rglob("*") if path.is_file()}
+    for existing in list(target.rglob("*")):
+        if not existing.is_file():
+            continue
+        child = existing.relative_to(target).as_posix()
+        if child in incoming:
+            continue
+        if _managed_manifest(existing) is not None:
+            continue
+        existing.unlink()
+    for path in source.rglob("*"):
+        if not path.is_file():
+            continue
+        dest = target / path.relative_to(source)
+        if _managed_manifest(dest) is not None:
+            continue
+        dest.parent.mkdir(parents=True, exist_ok=True)
+        shutil.copy2(path, dest)
+
+
+def _push_private_dashboard_objects(message: str) -> bool | None:
+    """Commit dashboard-private objects before the public receipt that names them."""
+    from vault_paths import research_vault_root
+
+    repo = research_vault_root()
+    if repo is None or not (repo / ".git").exists():
+        log("vault: no checkout; cannot preserve the insight manifest")
+        return False
+    try:
+        with vault_lock(repo, owner="youtube_lane", log=lambda m: log(m.strip())):
+            clear_stale_git_state(repo, log=lambda m: log(m.strip()))
+            run_git(repo, "add", "-A", "--", "dashboard-private", timeout=300)
+            staged = run_git(repo, "diff", "--cached", "--quiet", "--", "dashboard-private",
+                             check=False, timeout=120)
+            if staged.returncode == 0:
+                return None
+            run_git(repo, "commit", "-m", message, timeout=300)
+            run_git(repo, "-c", "rebase.autoStash=true", "pull", "--rebase",
+                    "origin", "main", timeout=900)
+            run_git(repo, "push", "origin", "HEAD:main", timeout=600)
+            log("vault: preserved dashboard snapshot")
+            return True
+    except (subprocess.CalledProcessError, subprocess.TimeoutExpired, OSError) as exc:
+        log(f"vault snapshot push failed: {describe_failure(exc)}")
+        try:
+            run_git(repo, "rebase", "--abort", check=False, timeout=120)
+            clear_stale_git_state(repo, log=lambda m: log(m.strip()))
+        except (subprocess.CalledProcessError, subprocess.TimeoutExpired, OSError) as undo:
+            log(f"vault unwind failed: {describe_failure(undo)}")
+        return False
 
 
 def _push_published_apart(message: str, paths: tuple[str, ...] = MAIN_PATHS,
@@ -403,9 +537,17 @@ def _push_published_apart(message: str, paths: tuple[str, ...] = MAIN_PATHS,
     """Commit the shard on a main checkout and push that, not the lane HEAD."""
     repo = _ensure_publish_worktree()
     _sync_published(ROOT, repo, paths, dirs)
+    if INSIGHT_MANIFEST in paths:
+        preserved = _push_private_dashboard_objects(
+            "Preserve restricted insights manifest snapshot")
+        if preserved is False:
+            return False
     present = [p for p in paths if (repo / p).is_file()]
+    receipt = "dashboard/private-assets.json"
+    if INSIGHT_MANIFEST in paths and (repo / receipt).is_file():
+        present.append(receipt)
     if present:
-        run_git(repo, "add", "--sparse", *present, timeout=300)
+        run_git(repo, "add", "--sparse", "--", *present, timeout=300)
     # Always stage the shard directory, including when the sync removed it.
     # Gating on the directory still existing left a deleted corpus in the index.
     for rel in dirs:

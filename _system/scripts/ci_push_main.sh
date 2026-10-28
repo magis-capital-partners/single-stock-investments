@@ -350,6 +350,47 @@ ensure_main_rebase_history() {
   fi
 }
 
+# Happy-path files besides this script. The audit is unconditional, and it
+# reads dashboard/private-assets.json (the staged blob, then the worktree
+# copy after rebase). compact_dated_artifacts.py imports atomic_io. A sparse
+# checkout that only named this script died with Errno 2 before it could
+# push (market-risk runs 40586235090 and 40587210458). Narrow callers should
+# list these same paths; this still checks them out if one is forgotten.
+PUSH_DEPENDENCY_PATHS=(
+  _system/scripts/audit_fund_letter_exposure.py
+  _system/scripts/compact_dated_artifacts.py
+  _system/scripts/atomic_io.py
+  dashboard/private-assets.json
+)
+
+materialize_push_dependencies() {
+  local sparse path
+  local -a missing=() present=()
+  sparse="$(git config --get core.sparseCheckout || true)"
+  [ "$sparse" = "true" ] || return 0
+  for path in "${PUSH_DEPENDENCY_PATHS[@]}"; do
+    if [ ! -e "$path" ]; then
+      missing+=("$path")
+    fi
+  done
+  [ "${#missing[@]}" -eq 0 ] && return 0
+  git sparse-checkout add --skip-checks -- "${missing[@]}"
+  for path in "${missing[@]}"; do
+    if git cat-file -e "HEAD:${path}" 2>/dev/null; then
+      present+=("$path")
+    fi
+  done
+  if [ "${#present[@]}" -gt 0 ]; then
+    git checkout HEAD -- "${present[@]}"
+  fi
+  for path in "${PUSH_DEPENDENCY_PATHS[@]}"; do
+    if [ ! -e "$path" ]; then
+      echo "::error::ci_push_main.sh still cannot see ${path} after widening the sparse checkout."
+      return 1
+    fi
+  done
+}
+
 clean_worktree_for_rebase() {
   # Rebuild steps may dirty files outside the staged commit set; rebase refuses
   # to start with unstaged changes. --keep-index preserves the commit payload.
@@ -363,6 +404,7 @@ clean_worktree_for_rebase() {
 ci_push_main() {
   local msg="${1:?commit message required}"
   sync_self_from_origin_main
+  materialize_push_dependencies
   # Inspect the actual index, so a sanitized worktree cannot conceal staged sources.
   "$PYTHON" _system/scripts/audit_fund_letter_exposure.py --staged --strict
   # A self-refresh updates this tracked helper in the worktree. Stage it so a

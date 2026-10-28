@@ -1,5 +1,6 @@
 import { failure, json, requestId, requireDatabase } from "../../../_lib/http.js";
 import { foldPositions, loadBook, verifySleeveHmac } from "../../../_lib/sleeves.js";
+import { storeRealized } from "../../../_lib/realized.js";
 
 const MAX_BODY_BYTES = 512_000;
 
@@ -31,6 +32,18 @@ export async function onRequestPost(context) {
     }
     // Nonce retention is deploy-time only (prune_cloudflare_d1.py). Per-request
     // DELETE scanned the whole table before idx_sleeve_nonce_received landed.
+
+    // Share the established machine-authenticated reporting path. This avoids
+    // widening Cloudflare Access exclusions just to publish a new read model.
+    if (payload.schema_version === "sleeve_realized.v1") {
+      try {
+        const result = await storeRealized(context.env, payload);
+        return json({ ok: true, ...result, request_id: id }, 200, { "cache-control": "no-store, private" });
+      } catch (error) {
+        if (error instanceof TypeError) return json({ error: error.message, request_id: id }, 400, { "cache-control": "no-store, private" });
+        throw error;
+      }
+    }
 
     const statements = [];
     const fill = payload.fill;

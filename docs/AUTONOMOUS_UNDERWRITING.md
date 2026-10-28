@@ -1,0 +1,126 @@
+# Autonomous company underwriting
+
+The underwriting queue covers the dashboard's complete company universe. It
+distinguishes reviewed assumptions from numerical screening estimates. Prices
+are not underwriting evidence and do not cause paid model work.
+
+The first priorities are BKNG, F and OPEN, followed by existing models with new
+financial reports and models still using generic assumptions. The initial limit
+is one company per run, up to three when explicitly requested. The shared model
+policy admits at most 18 paid stage calls per UTC day, with two calls per company
+per role, and at most 100 minutes of model work per run. Change limits in
+`_system/config/underwriting_policy.json` and `llm_usage_policy.json` together.
+
+```mermaid
+flowchart LR
+  A[Verified primary facts and filings] --> B[Isolated frontier underwriter]
+  B --> C[Sealed economic contract]
+  C --> D[Independent frontier challenger]
+  D --> E[Cheaper model builder]
+  E --> F[Trusted compiler and existing PV/IRR engine]
+  F --> G[Exact-head validation and automatic merge]
+  G --> H[Price refresh and private dashboard publication]
+```
+
+The owner's signed-in Codex CLI runs GPT-6.1 Sol with High reasoning locally
+for the author and a separate challenger session. Each invocation is ephemeral,
+has no repository, and disables commands, web search, hooks, plugins, connectors
+and additional agents. No API key is required or copied to GitHub. The CLI login
+and its model catalog are checked before starting. Each session's real thread ID,
+model, reasoning effort and usage are saved in its private receipt.
+
+Only independently approved contracts produce content-addressed private handoffs.
+The local controller pushes the handoff and paid receipts before dispatching
+GitHub Actions. GitHub runs Cursor Auto to build that exact contract, then applies
+the existing deterministic PV/IRR and publication checks. When available, Auto
+uses Cursor Router's Cost mode; otherwise it uses documented server-selected Auto.
+The GitHub runner never tries to launch the owner's Codex login. Providers own
+separate runtime directories and merge their ledgers to preserve the daily limits.
+
+The local controller uses an isolated runtime under
+`%LOCALAPPDATA%/Magis/valuation-underwriting`, with separate clean source, data,
+private vault and working-state folders. It never edits the owner's normal
+checkout or dirty research-vault. A single-worker lock prevents overlapping local
+runs. The scheduled local launcher requires the computer and Codex desktop app
+to remain available. Manual invocation, after installing the launcher:
+
+```powershell
+& "$env:LOCALAPPDATA/Magis/valuation-underwriting/launch.ps1" -Launch
+```
+
+The model service gets no repository, prior valuation, classification, current
+stock price, private account credentials, broker or ThetaData access. It receives
+a content-addressed primary-evidence packet. Numeric observations retain their
+period, units, scope and filing locator. Source tables and business/risk passages
+are frozen. Supplemental facts must match an actual frozen table, number, year
+and scale; an agent cannot overwrite a structured fact's value.
+
+Depositary receipts require a sourced ordinary-shares-per-receipt ratio. The
+collector extracts explicit representation from frozen filings or uses the
+verified listing registry; disagreements and unreconciled listing actions stay
+blocked. The compiler converts every ordinary-share cash flow to the quoted
+receipt exactly once, independently of currency conversion.
+
+The author chooses the economic framework, company classification, material
+claim inventory, assumptions, scenario drivers and realization dates. There
+are no automatic growth, retention, terminal, horizon or discount assumptions.
+The challenger must cover every assumption and material claim. Deterministic
+sensitivity tests show which parameters drive value. A major challenge blocks
+publication and returns to the author within the call budget.
+
+Rejected drafts and complete critiques survive batch boundaries in the private
+runtime. The next attempt receives the previous contract and accumulated findings;
+it does not replay a rejected first draft. Approved author/challenger work resumes
+at the builder after a budget or provider interruption. New evidence packets,
+instructions or model-policy changes invalidate the matching checkpoint.
+
+The builder cannot change the sealed contract: its entire model is compared to
+the trusted compiler's output. Unit, source, share-basis, scenario, PV/IRR and
+current-price checks run before the active model is replaced. Missing evidence,
+provider failures, unsupported economics or conflicting edits produce explicit
+gaps and automatic retries; they never activate a generic fallback or require a
+human approval. Capital decisions remain outside this research pipeline.
+
+Frozen packets, stage caches and paid-call ledgers live in the private research
+vault's `valuation-underwriting/` directory. They are preserved before opening
+the model PR. Public company artifacts are `underwriting_contract.json`,
+`underwriting_review.json`, `underwriting_receipt.json`, and the compiled
+`valuation.json`. The existing contract/route sidecars are refreshed together.
+The CI validator reads trusted code from main and candidate data separately;
+it recompiles the model from its exact private packet. It cannot execute agent
+code. Automatic merge retains the repository's existing exact-head checks.
+
+PR creation uses the existing research service credential only for the creation
+request; other operations keep the repository Actions token. Organization-wide
+Actions-token restrictions remain unchanged. To retry a preserved producer branch
+without paying for another underwriting run, dispatch `underwriting-publish-branch`
+with `client_payload.branch` equal to `codex/underwriting-<run id>`. Recovery verifies
+the source workflow and a data-only diff, then requests the same exact-head checks.
+
+After merge the publisher explicitly requests a price-only refresh because
+GitHub-token pushes do not chain ordinary push workflows. Repricing also runs
+after a successful Market Close workflow, with weekday 16:37/20:37 Eastern
+fallbacks. Financial collection retains the existing 08:23/18:23 Eastern runs.
+Exchange-calendar expiry continues withholding stale cached values.
+
+Inspect the queue without paid calls:
+
+```bash
+python _system/scripts/underwriting_pipeline.py queue
+python _system/scripts/underwriting_pipeline.py run --tickers BKNG,F,OPEN --limit 3
+```
+
+Local judgment uses `underwriting_local.ps1 -Launch`; without `-Launch` it only
+prepares the coverage queue and verifies local prerequisites. GitHub builds run
+through **Autonomous company underwriting**, using its configured
+schedule, source-refresh completion event or repository dispatch
+`valuation-underwriting-run` (`client_payload.tickers`, `client_payload.limit`).
+Only the explicit `--launch` path calls models. GitHub passes `--phase build`;
+the local worker passes `--phase author`. Local experiments should use an
+isolated vault rather than a user's dirty research-vault checkout.
+
+The batch summary reports selected, validated and blocked companies separately.
+Each reviewed model is invalidated by a changed economic source fingerprint,
+new primary report, model change or its review due date. Quote changes alone
+only reprice the existing dated cash flows. Company-specific review does not
+guarantee an investment outcome; screening-only estimates remain labelled.
