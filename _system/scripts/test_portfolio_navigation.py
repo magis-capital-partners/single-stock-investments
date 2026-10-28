@@ -4,12 +4,14 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parents[2]
 
 
-def test_portfolio_is_primary_and_owner_routes_are_nested() -> None:
+def test_research_is_primary_and_owner_routes_remain_nested() -> None:
     html = (ROOT / "dashboard" / "index.html").read_text(encoding="utf-8")
     assert 'data-view="portfolio"' in html
     assert '>SPX 0DTE<' in html
     assert '>LS Algo<' in html
-    assert '>Research<' in html
+    assert '>Stock Research<' in html
+    primary=html.split('id="view-tabs"')[1].split('</nav>')[0]
+    assert primary.index('>Stock Research<') < primary.index('>Ideas<') < primary.index('>Insights<') < primary.index('>Portfolio<')
     assert 'data-view="drew"' not in html
     assert 'data-view="michael"' not in html
     assert "#/portfolio/${window.PortfolioViz?.state.scope" in html

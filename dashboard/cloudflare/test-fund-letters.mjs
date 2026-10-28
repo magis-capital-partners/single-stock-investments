@@ -80,7 +80,11 @@ test('signed owners and readers, revocation, forged/expired tokens and cookie au
   }finally{globalThis.fetch=originalFetch;}
 });
 test('direct dashboard requests, private data, guessed files and source APIs are denied to readers',()=>{
-  for(const path of ['/data/core.json','/index-viz.js','/data/insights/letters.json','/api/v2/portfolio/book','/original.pdf','/fund-letters/../../data/core.json','/cloudflare-artifact-manifest.json']) assert.equal(accessDecision(path,'GET',reader),'forbidden',path);
+  for(const path of ['/data/core.json','/index-viz.js','/data/insights/letters.json','/data/company-research/companies/CME.json','/data/company-research/documents/original.json','/data/company-research/search/CME.json','/api/v2/portfolio/book','/original.pdf','/fund-letters/../../data/core.json','/cloudflare-artifact-manifest.json']) assert.equal(accessDecision(path,'GET',reader),'forbidden',path);
+  for(const path of ['/data/company-research/manifest.json','/data/company-research/documents/original.json']) {
+    assert.equal(accessDecision(path,'GET',null),'unauthenticated');
+    assert.equal(accessDecision(path,'GET',{role:'owner'}),'allow');
+  }
   assert.equal(accessDecision('/fund-letters/','GET',reader),'allow');
   assert.equal(accessDecision('/api/fund-letters','GET',reader),'allow');
   assert.equal(accessDecision('/','GET',reader),'reader-home');

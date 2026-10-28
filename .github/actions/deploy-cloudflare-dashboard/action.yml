@@ -94,6 +94,16 @@ runs:
           _system/scripts/tests/test_deploy_d1_sync.py \
           _system/scripts/tests/test_dashboard_deploy_workflow.py
 
+    - name: Build complete private company research libraries
+      shell: bash
+      run: |
+        set -euo pipefail
+        python -m pip install --disable-pip-version-check pypdf pymupdf xlrd google-api-python-client google-auth
+        python _system/scripts/build_company_research.py \
+          --vault "${RESEARCH_VAULT_ROOT:-_external/research-vault}" \
+          --cache "${RESEARCH_VAULT_ROOT:-_external/research-vault}/dashboard-private/company-research-cache" \
+          --drive --download
+
     - name: Preserve regenerated private inputs before deployment
       uses: ./.github/actions/preserve-private-dashboard
 
@@ -102,6 +112,7 @@ runs:
       run: |
         set -euo pipefail
         python _system/scripts/build_cloudflare_pages_site.py
+        python _system/scripts/stage_company_research.py
         python _system/scripts/validate_portfolio_private_boundary.py _cf_project/site
         python _system/scripts/stage_pages_functions.py _cf_project
 
