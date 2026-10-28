@@ -82,6 +82,22 @@ def test_gold_context_is_company_specific_and_mining_not_treasury(tmp_path):
     assert {r["ticker"] for r in gold["relationships"]}=={"NEM"}
     mining=b.base("btc","BTC hash power model","test",path="btc_hash_power.json")
     assert {r["ticker"] for r in mining["relationships"]}=={"CLSK"}
+    spot=b.base("spot","BTC spot data","test",path="crypto/btc_spot_usd.csv")
+    assert {r["ticker"] for r in spot["relationships"]}=={"CLSK","MSTR"}
+    gold_spot=b.base("gold-spot","Gold spot data","test",path="themes/gold_spot_usd.csv")
+    assert {r["ticker"] for r in gold_spot["relationships"]}=={"NEM"}
+
+
+def test_existing_shared_models_are_linked_without_executing_methodology(tmp_path):
+    method=tmp_path/"_system/scripts/btc_cost_of_production.py"
+    method.parent.mkdir(parents=True)
+    method.write_text("raise RuntimeError('This source must never be executed')")
+    b=Builder(tmp_path,None,tmp_path/"out",tmp_path/"cache",companies=COMPANIES)
+    b.shared_models()
+    source=next(iter(b.index.records.values()))
+    assert source["category"]=="models"
+    assert source["processing_status"]=="indexed"
+    assert {r["ticker"] for r in source["relationships"]}=={"CLSK"}
 
 
 def test_html_instructions_are_plain_data():
@@ -153,6 +169,12 @@ def test_drive_enumerates_all_pages_and_native_documents(monkeypatch,tmp_path):
     assert all(call["q"]=="trashed = false" for call in calls)
     assert len(b.index.records)==2  # Same titles do not deduplicate distinct originals.
     assert all(r["processing_status"]=="indexed" for r in b.index.records.values())
+    b.publish()
+    for cached in (tmp_path/"cache/drive").glob("*.json"):
+        cached.write_text('{"text":"","status":"awaiting_extraction"}')
+    again=Builder(tmp_path,None,tmp_path/"out",tmp_path/"cache",companies=COMPANIES)
+    again.drive(service=SimpleNamespace(files=lambda:Files()),roots=["root"],download=False)
+    assert all(r["processing_status"]=="indexed" and again.text(r) for r in again.index.records.values())
 
 
 def test_revision_identity_survives_catalog_deduplication():

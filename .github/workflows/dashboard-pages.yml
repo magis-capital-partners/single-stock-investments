@@ -273,7 +273,8 @@ jobs:
       group: dashboard-deploy
       cancel-in-progress: false
     runs-on: ubuntu-latest
-    timeout-minutes: 60
+    # The initial complete archive index is cold; later builds reuse private caches.
+    timeout-minutes: 120
     env:
       RESEARCH_VAULT_REPO_URL: ${{ secrets.RESEARCH_VAULT_REPO_URL }}
       RESEARCH_VAULT_CLONE_TOKEN: ${{ secrets.RESEARCH_VAULT_CLONE_TOKEN }}

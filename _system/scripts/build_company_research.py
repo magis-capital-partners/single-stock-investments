@@ -27,6 +27,14 @@ IGNORE_NAMES = {"README.md", "AGENTS.md", "SKILL.md", "INDEX.csv", "manifest.jso
                 "insights.json", "letters_index.json", "drive_import_manifest.json", "drive_import_log.jsonl", "fetch_log.jsonl",
                 "duplicate_audit.json", "funds_unresolved.json", "funds.json", "manifest.csv", "sources.json"}
 SKIP_PARTS = {".git", "_eval", "tests", "__pycache__", "node_modules", "dashboard-private", "sec-edgar"}
+SHARED_MODELS = {
+    "dashboard/data/energy_model.json": "Natural gas supply and demand model",
+    "dashboard/data/energy_btc_bridge.json": "Natural gas and Bitcoin mining sensitivity model",
+    "_system/scripts/energy_model_config.json": "Natural gas model assumptions and reference forecast",
+    "_system/scripts/btc_cost_of_production.py": "Bitcoin cost-of-production methodology",
+    "_system/scripts/energy_btc_bridge.py": "Natural gas and Bitcoin mining model methodology",
+    "_system/scripts/power_cost_model.py": "Electricity contract cost model methodology",
+}
 
 
 def write(path: Path, value) -> None:
@@ -262,7 +270,7 @@ class Builder:
             text, state, _ = self.cached_extract(companion.read_bytes(), companion.suffix.lower())
             sha = digest(data)
         else:
-            text, state, sha = self.cached_extract(data, path.suffix.lower())
+            text, state, sha = self.cached_extract(data, ".txt" if rel in SHARED_MODELS and path.suffix == ".py" else path.suffix.lower())
         # Metadata-only placeholders are not evidence and never become "zero sources".
         if '"private_snapshot":true' in text.replace(" ", ""):
             raise RuntimeError(f"Unresolved private snapshot: {rel}")
@@ -282,6 +290,8 @@ class Builder:
         record["content_hash"] = sha
         record["content_md5"] = hashlib.md5(data, usedforsecurity=False).hexdigest()
         record["format"] = path.suffix.lstrip(".")
+        if rel in SHARED_MODELS:
+            record["category"] = "models"
         if path.suffix.lower() == ".json":
             try:
                 body = json.loads(text)
@@ -289,7 +299,7 @@ class Builder:
                     record["date"] = body.get("as_of") or body.get("model_as_of") or record["date"]
                     record["model_purpose"] = body.get("description") or body.get("purpose")
                     record["assumptions"] = body.get("assumptions")
-                    record["source_refs"] = body.get("sources") or body.get("source_refs")
+                    record["source_refs"] = body.get("sources") or body.get("source_refs") or ([body["reference"]] if body.get("reference") else None)
             except ValueError:
                 pass
         rendition = str(Path(logical).with_suffix(""))
@@ -381,6 +391,17 @@ class Builder:
                 self.receipt("shared:" + collection, count, "complete" if folder.exists() else "unavailable")
             except Exception as exc:
                 self.receipt("shared:" + collection, count, "failed", type(exc).__name__)
+        self.shared_models()
+
+    def shared_models(self):
+        count = 0
+        for relative, title in SHARED_MODELS.items():
+            if not (self.root / relative).is_file():
+                continue
+            self.metadata[relative] = {"title": title, "author": "Internal research"}
+            self.local(self.root / relative, "shared:models")
+            count += 1
+        self.receipt("shared:models", count)
 
     def git_inventory(self, extraction_budget=300):
         """A sparse deploy still inventories historical company originals from the Git tree.
@@ -550,7 +571,7 @@ class Builder:
                 text, state = self.text(prior), prior["processing_status"]
             cachefile = self.cache / "drive" / f"{digest(item['id'] + revision)}.json"
             cached = load(cachefile)
-            if cached:
+            if cached and (cached.get("text") or not text):
                 text, state = cached.get("text", ""), cached["status"]
             retry_due = time.time() - cached.get("attempted_at", 0) >= 86400
             if not text and retry_due and download and (download_budget <= 0 or time.monotonic() - download_start < download_budget):

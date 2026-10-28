@@ -22,6 +22,16 @@
   }
   const manifest = ticker => asset(`companies/${encodeURIComponent(ticker)}.json`);
   const sourceURL = row => {const loc=(row.locations||[]).find(x=>safeURL(x.url)); return loc?safeURL(loc.url):'';};
+  function referencesHTML(refs) {
+    if(!refs)return '';
+    const values=(Array.isArray(refs)?refs:[refs]).filter(ref=>ref!==null&&ref!==undefined);
+    return `<details><summary>Model inputs and references</summary><ul>${values.map(ref=>{
+      const raw=typeof ref==='string'?ref:(ref.url||ref.href||'');
+      const url=/^https?:\/\//i.test(raw)?safeURL(raw):'';
+      const label=typeof ref==='string'?ref:(ref.title||ref.name||ref.label||JSON.stringify(ref));
+      return `<li>${url?`<a href="${esc(url)}" target="_blank" rel="noopener noreferrer">${esc(label)}</a>`:esc(label)}</li>`;
+    }).join('')}</ul></details>`;
+  }
   function filter(rows, state, index) {
     const terms=words(state.query||'');
     const matches=terms.length&&index?terms.map(t=>new Set(index[t]||[])):null;
@@ -39,7 +49,7 @@
     const url=sourceURL(row);
     const passages=(row.passages||[]).map(p=>`<blockquote><p>${esc(p.text)}</p><cite>${esc(p.locator)}${p.timestamp?` · ${esc(p.timestamp)}`:''}</cite></blockquote>`).join('');
     const links=(row.locations||[]).filter(l=>safeURL(l.url)).map(l=>`<a href="${esc(safeURL(l.url))}" target="_blank" rel="noopener noreferrer">${esc(l.label||l.kind)}</a>`).join(' · ');
-    return `<article class="cr-source"><div class="cr-source-main"><div><h4>${url?`<a href="${esc(url)}" target="_blank" rel="noopener noreferrer">${esc(row.title)}</a>`:esc(row.title)}</h4><p class="cr-meta">${row.author?`${esc(row.author)} · `:''}${esc(String(row.date||'Undated').slice(0,10))} · ${esc(categories[row.category]||row.category)}${row.version_count>1?` · ${row.version_count} versions`:''}${row.relationship!=='direct'?' · Related business research':''}</p>${row.relationship!=='direct'?`<p>${esc(row.reason)}</p>`:''}</div><button type="button" data-cr-read="${esc(row.id)}">Read${row.processing_status==='indexed'?' passage':' details'}</button></div><details><summary>Source details${row.availability!=='available'?` · ${esc(String(row.availability).replaceAll('_',' '))}`:''}</summary>${passages||'<p class="cr-meta">Company-specific collection or reviewed business-driver link. Open the original for context.</p>'}<p>${links||'Original link unavailable.'}</p>${row.period?`<p>Reporting period: ${esc(row.period)}</p>`:''}${row.revision?`<p>Version: ${esc(row.revision)}</p>`:''}${row.model_purpose?`<p>Purpose: ${esc(row.model_purpose)}</p>`:''}${row.assumptions?`<details><summary>Model assumptions</summary><pre>${esc(JSON.stringify(row.assumptions,null,2))}</pre></details>`:''}<p class="cr-meta">${row.processing_status==='indexed'?'Text indexed for search':esc(row.processing_status.replaceAll('_',' '))}</p></details></article>`;
+    return `<article class="cr-source"><div class="cr-source-main"><div><h4>${url?`<a href="${esc(url)}" target="_blank" rel="noopener noreferrer">${esc(row.title)}</a>`:esc(row.title)}</h4><p class="cr-meta">${row.author?`${esc(row.author)} · `:''}${esc(String(row.date||'Undated').slice(0,10))} · ${esc(categories[row.category]||row.category)}${row.version_count>1?` · ${row.version_count} versions`:''}${row.relationship!=='direct'?' · Related business research':''}</p>${row.relationship!=='direct'?`<p>${esc(row.reason)}</p>`:''}</div><button type="button" data-cr-read="${esc(row.id)}">Read${row.processing_status==='indexed'?' passage':' details'}</button></div><details><summary>Source details${row.availability!=='available'?` · ${esc(String(row.availability).replaceAll('_',' '))}`:''}</summary>${passages||'<p class="cr-meta">Company-specific collection or reviewed business-driver link. Open the original for context.</p>'}<p>${links||'Original link unavailable.'}</p>${row.period?`<p>Reporting period: ${esc(row.period)}</p>`:''}${row.revision?`<p>Version: ${esc(row.revision)}</p>`:''}${row.model_purpose?`<p>Purpose: ${esc(row.model_purpose)}</p>`:''}${row.assumptions?`<details><summary>Model assumptions</summary><pre>${esc(JSON.stringify(row.assumptions,null,2))}</pre></details>`:''}${referencesHTML(row.source_refs)}<p class="cr-meta">${row.processing_status==='indexed'?'Text indexed for search':esc(row.processing_status.replaceAll('_',' '))}</p></details></article>`;
   }
   async function read(row, host) {
     const request={};host._readRequest=request;

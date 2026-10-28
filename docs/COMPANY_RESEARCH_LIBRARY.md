@@ -29,6 +29,9 @@ uses explicit company lists and economic explanations in
 Portfolio-wide wildcard relationships are not company evidence. The old
 linkage graph is not an authority for issuer relevance. Adding a driver is a
 reviewed configuration change; it does not change valuation assumptions.
+Existing natural-gas forecasts, Bitcoin mining and electricity-cost models are
+included with their assumptions and references. Methodology files are read as
+source text, never executed by this library.
 
 Exact byte hashes, original Drive identity and explicit original/extract
 relationships combine duplicate copies. Equal filenames alone never do.

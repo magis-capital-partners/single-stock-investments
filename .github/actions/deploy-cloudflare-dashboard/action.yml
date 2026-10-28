@@ -383,7 +383,7 @@ runs:
           exit 1
         fi
         echo "Private portfolio boundary verified: book=$BOOK_STATUS static=$STATIC_STATUS"
-        for path in / /data/core.json /data/insights/letters.json /fund-letters/ /fund-letters/reader.js /api/fund-letters /cloudflare-artifact-manifest.json; do
+        for path in / /data/core.json /data/insights/letters.json /data/company-research/manifest.json /data/company-research/companies/CME.json /fund-letters/ /fund-letters/reader.js /api/fund-letters /cloudflare-artifact-manifest.json; do
           STATUS="$(curl -sS -o /dev/null -w '%{http_code}' "$PAGE_URL$path")"
           if [ "$STATUS" = "200" ]; then
             echo "Unauthenticated access boundary failed: $path" >&2

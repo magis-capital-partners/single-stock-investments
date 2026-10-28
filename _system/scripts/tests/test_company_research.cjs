@@ -13,9 +13,9 @@ test('category, author, date and company context filters combine',()=>{
  assert.equal(lib.filter(rows,{to:'2024-01-01'},null).length,0);
 });
 test('source text and URLs cannot execute markup',()=>{
- const html=lib.rowHTML({id:'1',title:'<script>alert(1)</script>',author:'<img src=x>',reason:'<b>read me</b>',category:'calls',processing_status:'indexed',availability:'available',locations:[{url:'javascript:alert(1)'}],passages:[{text:'<svg onload=x>',locator:'Page 1'}]});
+ const html=lib.rowHTML({id:'1',title:'<script>alert(1)</script>',author:'<img src=x>',reason:'<b>read me</b>',category:'calls',processing_status:'indexed',availability:'available',locations:[{url:'javascript:alert(1)'}],passages:[{text:'<svg onload=x>',locator:'Page 1'}],source_refs:[{title:'<img src=x>',url:'javascript:alert(1)'},{title:'Reference forecast',url:'https://example.com/model'}]});
  assert.doesNotMatch(html,/<script>|javascript:|<svg/);assert.match(html,/&lt;script&gt;/);
- assert.equal(lib.safeURL('javascript:alert(1)'),'');
+ assert.equal(lib.safeURL('javascript:alert(1)'),'');assert.match(html,/https:\/\/example.com\/model/);assert.match(html,/Model inputs and references/);
 });
 test('search normalization matches the builder tokenizer',()=>{
  assert.deepEqual(lib.words('Café: BTC / Supply-Demand'),['cafe','btc','supply','demand']);
