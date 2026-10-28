@@ -1,203 +1,213 @@
-# Live short executor: staged plan with SPX protected
+# Autonomous stock-short executor, starting with one share
 
-Status: design only. The implemented 20-session forward comparison has
-`production_authority: none`. This document does not authorize orders, change
-the client registry, permit a Gateway connection, or change the standing
-ThetaData and SPX rules.
+Updated 2026-10-28. The owner confirmed **one initial share per company**. The
+destination is automatic entry, management and covering without per-trade human
+approval. This is a design, not an order authorization or deployment. Existing
+research has `production_authority: none`; no credentials, Gateway configuration,
+registry allocation or SPX operating rules change here.
 
-## Decision: two execution paths, with different authority
+## IBKR connection and host
 
-**Initial path: a human-approved, bounded stock order ticket.** Research
-prepares the candidate, frozen policy and proposed maximum quantity/price.
-A human chooses the account and approves a specific entry ticket. Covering
-20 sessions later needs a fresh specific human action. An approved parent
-ticket may manage its bounded children only inside its expressly approved
-quantity, price, time and resource limits; it cannot create another issuer's
-order or a future cover authorization. The existing SSI bridge is the only
-candidate transport, using registry client 91 and owned `MAGIS|` references.
-No implementation or connection is added by this research change.
+Use an independent execution VM with its own broker connection and dedicated
+IBKR username. Prefer a separately funded stock account; have IBKR confirm
+whether its margin and liquidation exposure are actually independent of SPX.
+A separate machine isolates compute and operating failures. A separate username
+isolates brokerage sessions. Neither alone proves separate capital or lending
+capacity. Do not reuse the SPX username, credentials or NY4 Gateway.
 
-**Unattended path: a separately approved execution arrangement.** The standing
-repo contract permits only human-initiated tickets and prohibits repeating
-Gateway connections. Renaming a collector, moving it to a second machine,
-making it a signal scheduler or using another shared client ID does not make
-unattended execution permissible. A fully automatic executor needs an explicit
-future governance decision and separate implementation review. Prefer an
-independent stock-short account, broker connection/credentials, lending
-arrangement and market-data entitlement on infrastructure away from NY4. Verify
-actual isolation with the broker; a different machine or IBKR username alone
-does not prove isolation of margin, sessions or market-data pools.
-
-Until that decision exists, the actionable route is manually approved tickets
-or manual broker entry. There is no unattended fallback through the SPX
-Gateway, Web API session or credentials.
-
-## Invariants taken from the current operating contract
-
-- SPX is protected. No agent Gateway connect/probe/restart during market hours
-  without the user's specific authorization for that action in chat and an
-  explanation of why it cannot wait until after 16:15 Eastern.
-- `_system/trading/ib_gateway_client_registry.v1.json`, version `2026-09-09.1`,
-  hash `3d2ba10bda3a577696e8e85ae5a6efd1a934e33341ade782506b79f0bad82abd`,
-  is the allocation authority. Do not invent an ID. Assert the SSI role
-  immediately before any permitted connection. Client 81 stays disabled and
-  client 82 never connects. Client 91 is the sole SSI transmitter.
-- Idle SSI holds zero Gateway sessions. No scheduled or recurring Gateway
-  session, position poll, quote poll, reconnect loop or startup probe.
-- Never issue account-wide cancellation, bind other clients' orders, restart
-  the Gateway or change its global Read-Only setting. Off-hours refusal is
-  normal and does not authorize a repair.
-- Existing SSI snapshots remain bounded, one concurrent line, with cleanup
-  in `finally`. No streaming market-data subscription is added to the hub.
-- Never start another ThetaTerminal, use a credentialed ThetaClient or the
-  Theta API key. No Theta access 07:45–16:15 Eastern on market weekdays. The
-  forward observer needs no Theta access at all.
-- Research and public-source workloads stay on GitHub-hosted or independent
-  infrastructure. If any future non-broker batch work genuinely must run on
-  NY4, retain Nice ≥15, a CPU quota, idle I/O scheduling and bounded backoff.
-  Do not deploy this observer to NY4 merely for convenience.
-
-## Proposed component boundaries
+The ordinary implementation is a dedicated IB Gateway on the new VM, with the
+executor connecting to its local API over loopback. Bind the API locally, use a
+dedicated OS user and secret store, and expose no broker listener publicly. A
+separate execution project must define its own client-ID and ownership contract
+before connecting. This repo's registry remains unchanged.
 
 ```text
-Public disclosures + approved independent market references
-                     |
-Frozen policy -> candidate/decision ledger -> read-only dashboard
-                                             |
-                                  Specific human approval
-                                             |
-                       Durable ticket and account risk reservation
-                                             |
-                      Bounded owned-order execution adapter
-                                             |
-                       Own acknowledgements / own executions
-                                             |
-                           Release the ticket's connection
+SEC / issuer announcements + independent stock prices
+                   |
+Point-in-time signals -> automatic eligibility and account risk reservation
+                   |
+Independent execution VM -> local API -> own Gateway / IBKR username
+                   |                              |
+Durable private order ledger              Dedicated stock account
+                   |
+Own execution events + daily Flex HTTPS reconciliation
+                   |
+Redacted health and outcomes -> research dashboard
 
-IBKR Flex HTTPS -> private reconciliation ledger -> redacted outcome metrics
+NY4 / SPX Gateway: no dependency from this path
 ```
 
-The dashboard is a research and approval surface, not a streaming terminal.
-D1 HTTPS may carry a command inbox and published health. It must not become a
-reason to open a Gateway socket periodically. Flex is reporting, not a
-real-time emergency liquidation control. Active-ticket execution events,
-broker-native/manual risk alerts and an independently approved monitoring
-arrangement must cover intraday risk; a daily Flex report cannot do that job.
+IBKR permits one active brokerage session per username across its platforms.
+Changing an API client ID does not create another username or login session.
+Additional usernames may need their own data entitlements. Confirm account
+eligibility, permissions, shorting and subscribed data before implementation.
 
-## Build sequence and acceptance gates
+| Arrangement | Advantages | Disadvantages / decision |
+|---|---|---|
+| Existing NY4 SPX Gateway | Lowest additional hosting cost | Current SSI contract forbids an unattended session. Shares session, lines, capacity and outages. Do not use. |
+| NY4 with separate Gateway and username | Saves another VM; separates brokerage sessions | Shares a two-vCPU host, RAM, disk, OS maintenance and outages with SPX. Requires an approved independent arrangement and host resource contract. Inferior isolation. |
+| New VM remotely using the SPX Gateway | Separates strategy compute | Retains the brokerage failure point and adds network dependency. Does not solve coexistence. |
+| New VM with own Gateway and username | Independent deploys, restarts, resources and brokerage session; clear ownership | Extra hosting, monitoring and possibly data subscription. Recommended, preferably with separately isolated funding. |
 
-### A. Finish forward calibration
+Disclosure-driven trading with multi-session holdings does not require NY4
+colocation for a one-share pilot. Use a reliable ordinary always-on VM near
+IBKR connectivity, then measure latency before buying specialized hosting.
+Research and backfills should run away from NY4.
 
-Use the implemented policy comparison and private evidence importer. Collect
-fresh borrow terms, real executable price indications where available, actual
-paper order lifecycle evidence, fill fractions, cost changes, cover failures,
-corporate actions and loan returns. Preserve no-fills and missed discoveries.
-Paper fills and public shortable lists cannot prove an actual loan or exchange
-queue priority. Complete multiple independent issuers and holding periods.
+## Automatic trading and authentication operations
 
-Acceptance: the frozen research review criteria are inspectable; every
-observation has source bytes and clocks; no modeled completion is counted as
-an actual exit. Passing these checks permits a human review, never production.
+Automatic trading can run without approval on each trade. Standard TWS / IB
+Gateway still has an authentication limitation: IBKR documents weekly manual
+reauthentication after the Sunday token reset. Unscheduled session revocation
+is also possible. Daily auto-restart does not remove this requirement. IBKR
+does not officially support a GUI-free headless Gateway. Do not promise
+permanent unattended operation by scripting around security controls.
 
-### B. Specify the account and hard limits before writing a transmitter
+If zero routine human authentication is mandatory, obtain IBKR confirmation
+of eligibility for an approved direct API arrangement first. OAuth 2.0
+organizational access has eligibility requirements; an LLC name alone proves
+neither eligibility nor perpetual unattended access. FIX has materially higher
+integration and commercial requirements, disproportionate to a one-share pilot.
 
-Choose the actual account, owner, strategy identifier, borrowing route and
-pilot capital. Research's $100,000 target and $10 million reference NAV are
-not a live allocation. Rerun the backtest at the exact pilot ceiling because
-minimum fees and partial fills do not scale linearly.
+Detect expired sessions through the future executor's own authorized connection,
+disable new entries and follow its position-risk procedure. Never restart or
+borrow SPX's Gateway because of a stock-executor authentication outage.
 
-Specify per-issuer shares/notional, gross exposure, margin headroom, squeeze
-reserve, maximum accepted loan APR and locate fee, price collars, order count,
-message and connection budgets, maximum ticket lifetime, stale-data age,
-daily-loss review levels, overnight responsibility and recall/buy-in handling.
-Reserve shared-account risk before submission; release only on terminal proof.
-If the account is shared, available margin must include SPX and other systems'
-commitments. Separate account-level funding is the stronger isolation option.
+## Signals and availability
 
-Acceptance: versioned account/risk configuration with an owner; no ambiguous
-"trade everything" fallback. Universal tradability remains a research
-assumption, while actual orders require operationally valid stock-loan access.
+| Signal | Live source | Availability rule |
+|---|---|---|
+| Definite reverse-split announcement | SEC submissions/filings plus licensed issuer/news distribution | After receipt and parsing establish a definite action; shareholder authorization/proposal is a different event. |
+| Third or later split | Issuer identity and prior completed corporate-action ledger | Count only prior completed actions already known when the signal arrives. |
+| Cash burn | SEC CompanyFacts and source 10-Q/10-K/20-F filings | Negative trailing-12-month operating cash flow from filings already public. Unknown stays unknown. |
+| No 50% daily rally | Independent split-adjusted completed-session prices | No daily close-to-close gain of 50% or more in the previous five completed sessions. |
+| Weak split-day close | Completed regular-session OHLC | Available only after the effective-day close and data receipt. Cannot gate an immediate announcement short. |
+| Executable price / loan terms | Dedicated broker/data and stock-loan arrangement | Fresh references and actual permission to short at order time. Public lists are indications, not an approved loan. |
 
-### C. Implement a durable ticket state machine
+Cash burn uses annual CFO, or annual CFO plus current YTD minus matching
+prior-year YTD. Preserve periods, accession, filing/retrieval clocks, units and
+source bytes; reject inconsistent periods and reports older than the frozen
+200-day freshness limit. Historical date-only filings use conservative next-day
+availability. Production needs actual acceptance/retrieval clocks and latency.
 
-Suggested states:
+Weak close means close below open and `(close-low)/(high-low) <= 0.25`, with
+a positive range. An announcement policy must omit it or enter later. SEC-only
+discovery can lag an earlier issuer/news release: retain the earliest observed
+public source and receipt, resolve CIK/security/conId, deduplicate amendments
+and retain cancellations and changed effective dates. The existing public
+research monitor is not a latency-qualified production news feed.
 
-`proposed -> human_approved -> reserved -> submitting -> acknowledged -> partial/filled/cancelled/rejected`
+## Announcement versus the existing backtest
 
-`submitting -> uncertain -> human reconciliation` is a separate path.
-Persist intent and the idempotency key before transmission. A lost response
-must never trigger blind resubmission. Bind the exact contract identity,
-account alias, side, policy/input hashes, quantity, price collar, start/end,
-approval identity, expiry and nonce. A stale browser tab cannot approve a
-different security under the same ticker.
+The frozen post-effective policy enters 09:31–10:31 Eastern in the first
+eligible regular session after the effective split day and covers in session
+20. It can use the completed split-day weak close. It does **not** short
+immediately when the original announcement is released.
 
-Execution budgets and circuit state survive process restarts. A connection
-failure is handled in-process; it cannot crash into a service restart loop.
-After uncertainty, stop new entries and require owned-order reconciliation in
-an authorized bounded action. Never infer rejection from silence. Cancellations
-require the exact owned order reference, configured account and client 91.
+The separate `announcement_full_v2` experiment starts from the first qualifying
+captured definite scheduled-action disclosure. SEC acceptance is a publication
+proxy, not proof of the earliest press release or when a trader received it.
+It compares zero/five-minute delay and next-open entry, always in regular
+hours. It tests 20 sessions from entry and 20 sessions after the effective
+date stated in that announcement. Its source-covered disclosure cohort does
+not require a later completed split. The legacy completed-event cohort remains
+a separately labeled selected-universe control. Missing intraday prices and
+borrowing terms remain explicit assumptions.
 
-Acceptance: offline fault injection covers duplicate commands, repeated fills,
-partial fills, cancel/replace races, lost acknowledgements, disconnection and
-restart. Every scenario produces at most one intended parent position and no
-action against another system's order.
+The announcement backtest uses the full **$100,000 per-company target**, with
+actual modeled fills disclosed separately. It compares first, second and third
+or later documented splits and rebuilds every fundamental screen at announcement.
+**One initial share is solely the future live pilot size.** The pilot tests
+operations and cost calibration; backtest profit cannot scale linearly down to
+it. Freeze its live configuration separately; do not revise existing policies.
 
-### D. Protect SPX resources without probing SPX
+## Fully automatic behavior
 
-Consume only a health/lease signal already published by SPX's owner over an
-approved non-Gateway channel. Missing/stale health, a lease denial, resource
-budget exhaustion, stale prices or uncertain account state disables **new
-entries**. Do not diagnose by opening a SPX client, touching the Gateway or
-restarting a service. Set entry pacing materially below the shared broker
-ceiling; exact limits require account-wide coordination, not an assumption
-that the API's advertised maximum belongs to SSI.
+Start with **one whole share at initial entry**, one position per company and
+three concurrent company slots. Also configure dollar, margin, squeeze reserve,
+per-order and daily-loss limits: one share is not constant risk. Pending orders
+reserve slots and capital. Subsequent corporate actions change the owed quantity;
+cover the reconciled liability rather than a hardcoded one share.
 
-There must be a prearranged manual/broker route for reducing SSI risk while
-entries are disabled. A research kill switch cannot promise that a halted
-stock is executable. It must not cancel SPX orders or flatten the account.
-An emergency does not create an exception to the current Gateway rules.
+No per-trade approval appears in the target state machine:
 
-Acceptance: failure tests demonstrate zero idle sessions, zero leaked data
-lines, no churn, persistent connection/message caps, no startup probes and
-no effect on protected order ownership. Use synthetic broker adapters first;
-any broker-connected test requires its own specific authorized window.
+`signal_ready -> eligible -> reserved -> submitting -> acknowledged -> partial/filled/cancelled/rejected`
 
-### E. Make holding-period exceptions first-class
+Persist intent and idempotency key before transmission. Lost acknowledgements
+go to `uncertain`: block new entries and reconcile owned orders through the
+dedicated broker connection. Never blindly resubmit. Handle duplicate fills,
+cancel/replace races and reconnects in-process with persistent backoff and caps.
+Service restarts cannot become connection churn. Future independent recovery
+must not be implemented as an SSI Gateway poller.
 
-Track actual adjusted share quantity, settled loans, locate expiration, fee
-changes, dividends/payments in lieu, ticker/conId changes, mergers, delisting,
-halts, recalls and forced buy-ins. Use exchange sessions and early closes for
-entry and cover deadlines. The session-20 cover is a new human ticket under
-the current shared-Gateway policy.
+Bind contract identity, account, policy/input hashes, quantity, price collar,
+time window, loan limits and ownership on every order. Reject stale quotes,
+unknown identity, missing required signals, excessive loan costs, missing
+permissions or insufficient reserves. Universal tradability is a research
+assumption; it cannot make a broker accept an unavailable short.
 
-At the retry deadline, escalate residual shares to the named operator. Keep
-them open until broker confirmation; never replace them with the backtest's
-2% or missing/OTC closeout premium. Maintain both execution completion and
-settled-loan/cost reconciliation states. Use Flex HTTPS for broker truth and
-the private outcome ledger for audit.
+Use owned-order events on the dedicated connection, bounded recovery and daily
+Flex HTTPS reconciliation. Flex is reporting, not intraday emergency liquidation.
+Covers become automatic under the independent policy, including retry/escalation.
+Track halts, recalls, buy-ins, delisting, dividends/payments in lieu, mergers,
+split fractions, fee changes and settled loan returns. Never substitute a
+backtest closeout premium for a real fill. Exceptions can need operational
+intervention even when ordinary trades need no approval. Prearrange alerts,
+broker protections and owned-position recovery. Rollback disables new entries;
+it never flattens a shared account or touches another strategy's orders.
 
-Acceptance: test an entire 20-session lifecycle, including a subsequent split,
-partial covers, a halt through the cover deadline, a recall, delayed fees and
-loan-return settlement. Broker evidence must reconcile to zero quantity and
-settled obligations before final profit is labeled complete.
+## Current SSI contract and SPX protection
 
-### F. Pilot, review, then scale
+The existing SSI bridge stays human-triggered, bounded and idle with zero
+Gateway sockets. Client 91 remains its sole transmitter; 81 stays disabled
+and 82 cannot connect. Registry `2026-09-09.1`, SHA-256
+`3d2ba10bda3a577696e8e85ae5a6efd1a934e33341ade782506b79f0bad82abd`,
+remains authoritative. Do not repurpose these IDs for the future executor.
 
-Start with a small separately chosen budget and specific human approvals.
-Record actual fills and costs against the frozen pre-entry plans. Review
-deviations, missed fills, concentration, overnight operations and SPX resource
-behavior after complete holding periods. Rollback disables new SSI entries,
-retains the private ledger and follows the prearranged owned-position cover
-procedure; it never restarts or reconfigures the shared Gateway.
+No SSI Gateway polling, scheduled session, startup probe, streaming subscription,
+account-wide cancellation, foreign order binding, Gateway restart or global
+Read-Only change. Market-hours contact still requires the existing specific
+authorization. No new Theta login/terminal, and no Theta access 07:45–16:15
+Eastern on market weekdays. This research uses none of those resources.
 
-Any later unattended system is a new approved project with its own execution
-authority, isolation proof and operating contract. Merging this research work
-does not deploy a process to NY4 or authorize live capital.
+Autonomous execution needs a separate project/operating contract and independent
+broker arrangement. Renaming an SSI collector or moving it to a new VM that
+connects to NY4 does not meet that boundary. If approved non-broker work must
+run on NY4, preserve Nice at least 15, CPU quota, idle I/O and real backoff.
+
+## Implementation sequence
+
+1. Confirm account, username, permissions and authentication route with IBKR,
+   including actual margin isolation; select the independent VM. Document
+   ownership and limits without changing NY4.
+2. Freeze the announcement or post-effective one-share policy and cost limits.
+   Use the announcement replay and prospective comparison without choosing
+   solely by fitted historical profit.
+3. Build production announcement ingestion, point-in-time fundamentals,
+   price/loan adapters and private ledger independently. Measure discovery
+   latency, missed events and stale inputs in signal-only mode.
+4. Implement against a fake broker first. Fault-inject duplicate commands,
+   lost acknowledgements, reconnect/restart, partial covers, rejected loans,
+   recalls and fractional liabilities. Prove ownership and persistent limits.
+5. Test a complete lifecycle in an independent paper account. Paper fills
+   validate plumbing, not actual stock-loan access.
+6. Deploy the automatically managed **one-share live pilot** under an explicitly
+   configured account, policy and limits. Ordinary trades need no manual ticket.
+   Reconcile real fills, costs, loan returns and session/source exceptions.
+7. Scale only after reviewing completed real lifecycles, losses, cost/fill
+   error, concentration and operational reliability.
+
+The existing research sample of 50 completions across 30 companies concerns
+that frozen study. It neither authorizes orders nor prevents designing a
+separately approved operational pilot. A merge does not deploy an executor
+or commit capital.
 
 ## Primary references
 
-- [IBKR Flex report generation](https://www.interactivebrokers.com/docs/web-api/flex-web-service/using-flex-web-service/generate-the-report)
-- [IBKR securities financing and availability indications](https://www.interactivebrokers.com/en/trading/securities-financing.php)
-- [SEC Regulation SHO overview](https://www.sec.gov/investor/pubs/regsho.htm)
-- The current local `AGENTS.md` / committed `CLAUDE.md` and client registry take
-  precedence over older bridge deployment prose or generic broker examples.
+- [IBKR sessions and username permissions](https://www.interactivebrokers.com/docs/web-api/authentication/trading)
+- [IBKR multiple applications, subscriptions and Gateway operation](https://www.interactivebrokers.com/docs/third-party-integrations/general-third-party-frequently-asked-questions)
+- [IBKR auto-restart and weekly reauthentication](https://www.ibkrguides.com/traderworkstation/auto-restart-considerations.htm)
+- [IBKR OAuth 2.0 eligibility](https://www.interactivebrokers.com/docs/web-api/authentication/oauth-2/introduction)
+- [IBKR FIX requirements](https://ibkrcampus.com/docs/fix/requirements)
+- [SEC submissions and CompanyFacts](https://www.sec.gov/search-filings/edgar-application-programming-interfaces)
+- [IBKR securities financing indications](https://www.interactivebrokers.com/en/trading/securities-financing.php)
