@@ -175,3 +175,62 @@ def test_prompt_version_bump_invalidates_old_cache(tmp_path, monkeypatch):
     assert s.already_done("abc", False) is False
     path.write_text('{"prompt_version": "%s", "status": "needs_review", "chunks_covered": 2, "chunks_total": 2}' % s.PROMPT_VERSION, encoding="utf-8")
     assert s.already_done("abc", False) is True
+
+
+def write_saved(path, **fields):
+    path.write_text(__import__("json").dumps(fields), encoding="utf-8")
+
+
+def test_finished_v4_summaries_are_kept_and_its_failures_are_redone_in_v5(tmp_path, monkeypatch):
+    monkeypatch.setattr(s, "output_dir", lambda: tmp_path)
+    path = s.summary_path("abc")
+    assert s.PROMPT_VERSION != "letter_detail_v4" and "letter_detail_v4" in s.PUBLISHABLE_VERSIONS
+    write_saved(path, prompt_version="letter_detail_v4", status="draft", chunks_covered=3, chunks_total=3)
+    assert s.already_done("abc", True) is True
+    write_saved(path, prompt_version="letter_detail_v4", status="quarantine", chunks_covered=3, chunks_total=3, attempts=9)
+    assert s.already_done("abc", True) is False
+    assert s.attempts_so_far(s.load_saved("abc")) == 0
+    write_saved(path, prompt_version="letter_detail_v4", status="failed", chunks_covered=0, chunks_total=None)
+    assert s.already_done("abc", False) is False
+
+
+def test_a_letter_that_keeps_failing_is_parked_after_the_attempt_cap(tmp_path, monkeypatch):
+    monkeypatch.setattr(s, "output_dir", lambda: tmp_path)
+    path = s.summary_path("abc")
+    for attempts in range(1, s.MAX_ATTEMPTS):
+        write_saved(path, prompt_version=s.PROMPT_VERSION, status="failed", chunks_covered=0, chunks_total=None, attempts=attempts)
+        assert s.already_done("abc", True) is False
+        write_saved(path, prompt_version=s.PROMPT_VERSION, status="quarantine", chunks_covered=2, chunks_total=2, attempts=attempts)
+        assert s.already_done("abc", True) is False
+    write_saved(path, prompt_version=s.PROMPT_VERSION, status="failed", chunks_covered=0, chunks_total=None, attempts=s.MAX_ATTEMPTS)
+    assert s.already_done("abc", True) is True
+    write_saved(path, prompt_version=s.PROMPT_VERSION, status="quarantine", chunks_covered=2, chunks_total=2, attempts=s.MAX_ATTEMPTS)
+    assert s.already_done("abc", True) is True
+    assert s.attempts_so_far(s.load_saved("abc")) == s.MAX_ATTEMPTS
+
+
+def test_the_detail_targets_reach_the_consolidation_prompt():
+    content = s.reduce_messages({"fund": "F", "quarter": "2020Q1"}, "[]")[1]["content"]
+    assert s.OVERVIEW_TARGET in content and s.IDEA_TARGET in content
+    assert "{" not in s.OVERVIEW_TARGET and s.OVERVIEW_MIN_WORDS >= 300 and s.IDEA_MIN_WORDS >= 85
+
+
+def test_partials_too_large_for_the_context_are_joined_without_a_model_call(monkeypatch):
+    calls = []
+
+    def fake_call(messages, model, max_tokens):
+        calls.append(max_tokens)
+        index = len(calls)
+        return {"headline": f"Part {index}", "letter_focus": "micro", "leaning_in": [], "leaning_out": [],
+                "overview": f"Overview part {index}. " + "word " * 4000,
+                "ideas": [{"title": f"Idea {index}", "idea_type": "long", "activity": "hold",
+                           "summary": "The manager bought Acme.", "quote": "bought Acme at 10 times earnings"}]}
+
+    monkeypatch.setattr(s, "call_json", fake_call)
+    monkeypatch.setattr(s, "expand_thin_ideas", lambda ideas, notes, model: None)
+    notes = [{"subject": f"n{i}", "point": "p", "quote": "bought Acme at 10 times earnings"} for i in range(30)]
+    reduced = s.reduce_notes(notes, {"fund": "F"}, None, SOURCE)
+    assert calls[:3] == [s.REDUCE_TOKENS] * 3
+    assert reduced["headline"] == "Part 1"
+    assert "Overview part 1." in reduced["overview"] and "Overview part 3." in reduced["overview"]
+    assert len(reduced["ideas"]) == 3

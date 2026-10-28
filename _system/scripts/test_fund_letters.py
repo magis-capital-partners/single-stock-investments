@@ -188,6 +188,34 @@ def test_release_activation_and_rollback_preserve_intervening_publication(archiv
     assert replay.execute("SELECT published_revision FROM fl_letters").fetchone()[0] is None
 
 
+def test_drive_links_map_by_pdf_and_reach_rows_already_online(archive, tmp_path, monkeypatch):
+    row = record(tmp_path)
+    row["source_document"] = row["source_file"][:-4] + ".pdf"
+    manifest = tmp_path / "drive_import_manifest.json"
+    manifest.write_text(json.dumps({"files": {
+        "1AbCdEfGhIjK": {"drive_file_id": "1AbCdEfGhIjK", "local_pdf_path": row["source_document"]},
+        "bad": {"drive_file_id": "../x?y", "local_pdf_path": "other.pdf"},
+    }}), encoding="utf-8")
+    links = fl.drive_source_links([row, {"source_file": "other.txt"}], manifest)
+    assert links == {row["source_file"]: "https://drive.google.com/file/d/1AbCdEfGhIjK/view"}
+    fl.inventory(archive, [row])
+    archive.execute("UPDATE fl_letters SET source_url=NULL")
+    assert fl.attach_source_links(archive, links) == 1
+    assert fl.attach_source_links(archive, links) == 0
+    letter_id = archive.execute("SELECT id FROM fl_letters").fetchone()[0]
+    fl.save_draft(archive, letter_id, draft(), "editor")
+    monkeypatch.setattr(fl, "ROOT", tmp_path)
+    output = tmp_path / "_private/releases/links"
+    fl.export_release(archive, output)
+    replay = sqlite3.connect(":memory:")
+    replay.executescript(fl.SCHEMA.read_text(encoding="utf-8"))
+    replay.execute("INSERT INTO fl_funds(id,name) VALUES('test-capital','Test Capital')")
+    replay.execute("INSERT INTO fl_letters(id,fund_id,content_hash,pipeline_version,ingested_at,source_ref) VALUES(?,?,?,?,?,?)",
+                   (letter_id, "test-capital", "x", "v", "2026-10-28", "ref"))
+    replay.executescript((output / "archive.sql").read_text(encoding="utf-8"))
+    assert replay.execute("SELECT source_url FROM fl_letters").fetchone()[0] == links[row["source_file"]]
+
+
 def test_release_parser_handles_multiline_prose_and_semicolons():
     from sync_fund_letters_release import statements
     sql = "INSERT INTO t VALUES('line one;\nline two');\nINSERT INTO t VALUES('two');\n"

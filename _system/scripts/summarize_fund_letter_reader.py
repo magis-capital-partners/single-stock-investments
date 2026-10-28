@@ -26,8 +26,21 @@ sys.path.insert(0, str(ROOT / "_system" / "scripts"))
 
 from vault_paths import letters_root, resolve_ref_to_path  # noqa: E402
 
-PROMPT_VERSION = "letter_detail_v4"
-PIPELINE_VERSION = "fund-reader-local.3"
+PROMPT_VERSION = "letter_detail_v5"
+PIPELINE_VERSION = "fund-reader-local.4"
+# Finished summaries from these versions stay valid: they are not redone, and
+# a verified one may still publish. Only new or retried letters use v5.
+PUBLISHABLE_VERSIONS = frozenset({PROMPT_VERSION, "letter_detail_v4"})
+# A letter that fails or quarantines this many times under the current prompt
+# is parked, so the lane moves on instead of retrying it every cycle.
+MAX_ATTEMPTS = 3
+CONTEXT_TOKENS = int(os.environ.get("FUND_LETTERS_CONTEXT_TOKENS", "16384"))
+MAP_TOKENS = 2000
+REDUCE_TOKENS = 3200
+OVERVIEW_TARGET = "350-500 words in 4-6 short paragraphs"
+OVERVIEW_MIN_WORDS = 300
+IDEA_TARGET = "110-180 words"
+IDEA_MIN_WORDS = 85
 CHUNK_CHARS = 7000
 OUTPUT_NAME = "_reader_summaries"
 # Same vocabulary as the dashboard archive, so a draft needs no translation at import.
@@ -53,6 +66,8 @@ manager owns or shorts it, what was bought, added, trimmed or sold, position siz
 valuation paid or claimed, what has happened so far, the catalyst, and the risk the manager names.
 For macro, sector and portfolio passages, state the view, the reasoning, and what the fund is leaning
 into or out of because of it, with positioning figures only when the letter states them.
+Also keep the fund's own stated results for the period and against its benchmark, any mistake or
+lesson the manager admits, and what the manager says to watch next or what would change their mind.
 A holdings-table mention without a thesis is a factual_note, not a recommendation.
 "exit" means the position was closed. A reduced holding is a "trim", never an exit.
 Do not infer a sale because a holding is absent. Do not add today's prices or later events.
@@ -65,10 +80,12 @@ Return JSON: {{"passage_id":"{passage_id}","notes":[{{"kind":"long","subject":""
 kind is one of: long, short, update, postmortem, special_situation, credit, private, unnamed, sector, macro, portfolio, factual_note.
 activity is one of: new, add, trim, exit, hold, short, cover, watch. Use exit only for a closed position.
 ticker only when the passage itself states it, else "".
-Return at most 4 notes. Company detail is 3-5 original sentences: business, thesis, activity and size,
-valuation, evidence so far, catalyst and named risk, as far as the passage supports them. Macro detail
-states the view, why the manager holds it, and what the fund is leaning into or out of. Each quote is
-under 40 words, copied exactly from the passage, and contains every figure used in detail.
+Return at most 5 notes. Company detail is 4-6 original sentences: business, thesis, activity and size,
+valuation, evidence so far, catalyst, named risk, and what would change the manager's mind, as far as
+the passage supports them. Macro detail states the view, why the manager holds it, and what the fund is
+leaning into or out of. When the passage states the fund's return for the period or against a benchmark,
+add one portfolio note for it. Each quote is under 45 words, copied exactly from the passage, and
+contains every figure used in detail.
 Use [] when the passage is only a disclaimer or legal boilerplate, and say why in skip_reason.
 
 PASSAGE:
@@ -93,15 +110,16 @@ headline: one plain sentence on what the letter mainly does or argues.
 leaning_in / leaning_out: for macro and mixed letters, what the fund is moving towards or away from,
 each with the manager's reason and a quote copied from the notes. For a micro letter use [] unless the
 letter states a clear portfolio tilt.
-overview: 250-400 words in 3-6 short paragraphs a reader can rely on instead of the letter. Open with what the fund did
-and argued this period. Then the main company theses in detail, or the main macro stances and what they
-make the fund lean into or out of. Close with the risks or open questions the manager names. Write only
-figures that appear in an attached quote.
+overview: {overview_target} a reader can rely on instead of the letter. Open with the fund's
+stated results when the notes give them, then what the fund did and argued this period. Then the main
+company theses in detail, or the main macro stances and what they make the fund lean into or out of.
+Include any mistake or lesson the manager admits. Close with the risks, open questions and what the
+manager says to watch next. Write only figures that appear in an attached quote.
 ideas: one per company or topic, and one for every distinct note subject. Company summaries are
-80-150 words and detailed: what the business does, why the manager
-holds or shorts it, what changed this period, size and valuation when stated, what has happened, the
-catalyst and the risk. Macro summaries state the stance, the reasoning, and the positioning it drives.
-quote is copied exactly from the notes and supports the figures in that summary.
+{idea_target} and detailed: what the business does, why the manager holds or shorts it, what changed
+this period, size and valuation when stated, what has happened so far, the catalyst, the risk, and what
+would change the manager's mind when stated. Macro summaries state the stance, the reasoning, and the
+positioning it drives. quote is copied exactly from the notes and supports the figures in that summary.
 
 NOTES:
 {notes}"""
@@ -454,7 +472,7 @@ def map_passage(part: dict, record: dict, model: str | None) -> dict:
             )},
         ],
         model,
-        1300,
+        MAP_TOKENS,
     )
     notes = []
     for raw in document.get("notes") or []:
@@ -497,37 +515,107 @@ def inherit_quote(fields: str, model_quote: str, notes: list[dict], source: str)
     return None
 
 
-def reduce_notes(notes: list[dict], record: dict, model: str | None, source: str) -> dict:
-    # Keep the consolidation inside the loaded 16k context. Stage it when the notes are long.
-    groups = [notes[i:i + 12] for i in range(0, len(notes), 12)] or [[]]
-    partials = []
-    for group in groups:
-        partials.append(call_json(
+def expand_thin_ideas(ideas: list[dict], notes: list[dict], model: str | None) -> None:
+    """Lengthen short idea summaries from their own passage notes, in one call.
+    Nothing unsupported survives: repair_payload re-checks every figure and
+    removes copied sentences afterwards."""
+    thin = [idea for idea in ideas if len((idea.get("summary") or "").split()) < IDEA_MIN_WORDS][:6]
+    if not thin:
+        return
+
+    def related(idea: dict) -> list[dict]:
+        words = {w for w in re.findall(r"[a-z0-9]+", str(idea.get("title") or "").lower()) if w not in STOPWORDS and len(w) > 2}
+        return [
+            {"subject": note.get("subject"), "detail": note.get("point"), "quote": note.get("quote")}
+            for note in notes
+            if note.get("quote") == idea.get("quote")
+            or words & set(re.findall(r"[a-z0-9]+", str(note.get("subject") or "").lower()))
+        ][:3]
+
+    request = [
+        {"key": f"i{index}", "title": idea.get("title"), "summary": idea.get("summary"), "notes": related(idea)}
+        for index, idea in enumerate(thin)
+    ]
+    try:
+        reply = call_json(
             [
                 {"role": "system", "content": SYSTEM},
-                {"role": "user", "content": REDUCE_USER.format(
-                    fund=record.get("fund") or "",
-                    manager=record.get("manager") or "",
-                    period=record.get("quarter") or "",
-                    notes=json.dumps(group, ensure_ascii=False),
+                {"role": "user", "content": (
+                    f"Rewrite each idea summary below at {IDEA_TARGET}, using only its own summary and notes. "
+                    "Keep the meaning, add the business, thesis, activity, valuation, catalyst, risk and what to watch "
+                    "where the notes state them, and add no new facts, figures, tickers or later events. "
+                    'Return JSON: {"ideas":[{"key":"","summary":""}]}\n\nIDEAS:\n' + json.dumps(request, ensure_ascii=False)
                 )},
             ],
             model,
-            1800,
-        ))
-    document = partials[0] if len(partials) == 1 else call_json(
-        [
-            {"role": "system", "content": SYSTEM},
-            {"role": "user", "content": REDUCE_USER.format(
-                fund=record.get("fund") or "",
-                manager=record.get("manager") or "",
-                period=record.get("quarter") or "",
-                notes=json.dumps(partials, ensure_ascii=False),
-            )},
-        ],
-        model,
-        1800,
-    )
+            2400,
+        )
+    except Exception:
+        return
+    rewritten = {str(item.get("key")): str(item.get("summary") or "").strip()
+                 for item in reply.get("ideas") or [] if isinstance(item, dict)}
+    for index, idea in enumerate(thin):
+        candidate = rewritten.get(f"i{index}", "")
+        if len(candidate.split()) > len((idea.get("summary") or "").split()):
+            idea["summary"] = candidate
+
+
+def estimated_tokens(text: str) -> int:
+    """Deliberately high; JSON and figures tokenise densely."""
+    return len(text) // 3 + 1
+
+
+def reduce_messages(record: dict, notes_json: str) -> list[dict]:
+    return [
+        {"role": "system", "content": SYSTEM},
+        {"role": "user", "content": REDUCE_USER.format(
+            fund=record.get("fund") or "",
+            manager=record.get("manager") or "",
+            period=record.get("quarter") or "",
+            overview_target=OVERVIEW_TARGET,
+            idea_target=IDEA_TARGET,
+            notes=notes_json,
+        )},
+    ]
+
+
+def merge_partials(partials: list[dict]) -> dict:
+    """Join staged consolidations without a model call, for letters whose
+    partials would not fit back into the context window together."""
+    focuses = {str(p.get("letter_focus") or "micro").lower() for p in partials}
+
+    def leans(key: str) -> list[dict]:
+        seen, kept = set(), []
+        for partial in partials:
+            for lean in partial.get(key) or []:
+                subject = str((lean or {}).get("subject") or "").strip().lower()
+                if subject and subject not in seen:
+                    seen.add(subject)
+                    kept.append(lean)
+        return kept
+
+    return {
+        "headline": next((p.get("headline") for p in partials if p.get("headline")), ""),
+        "letter_focus": focuses.pop() if len(focuses) == 1 else "mixed",
+        "leaning_in": leans("leaning_in"),
+        "leaning_out": leans("leaning_out"),
+        "overview": "\n\n".join(str(p.get("overview") or "").strip() for p in partials if p.get("overview")),
+        "ideas": [idea for p in partials for idea in p.get("ideas") or []],
+    }
+
+
+def reduce_notes(notes: list[dict], record: dict, model: str | None, source: str) -> dict:
+    # Keep the consolidation inside the loaded context. Stage it when the notes are long.
+    groups = [notes[i:i + 12] for i in range(0, len(notes), 12)] or [[]]
+    partials = []
+    for group in groups:
+        partials.append(call_json(reduce_messages(record, json.dumps(group, ensure_ascii=False)), model, REDUCE_TOKENS))
+    if len(partials) == 1:
+        document = partials[0]
+    else:
+        messages = reduce_messages(record, json.dumps(partials, ensure_ascii=False))
+        room = CONTEXT_TOKENS - estimated_tokens("".join(m["content"] for m in messages)) - 256
+        document = call_json(messages, model, min(REDUCE_TOKENS, room)) if room >= 1500 else merge_partials(partials)
     ideas = []
     errors = []
     for index, raw in enumerate(document.get("ideas") or []):
@@ -573,21 +661,23 @@ def reduce_notes(notes: list[dict], record: dict, model: str | None, source: str
         errors.append("macro or mixed letter states no supported leaning in or out")
     overview = str(document.get("overview") or "").strip()
     headline = str(document.get("headline") or "").strip()
-    if overview and len(overview.split()) < 180 and ideas:
+    expand_thin_ideas(ideas, notes, model)
+    if overview and len(overview.split()) < OVERVIEW_MIN_WORDS and ideas:
         # One expansion pass from the verified ideas only. No new facts may enter.
         try:
             expanded = call_json(
                 [
                     {"role": "system", "content": SYSTEM},
                     {"role": "user", "content": (
-                        "Expand this letter overview to 250-400 words in 3-6 short paragraphs. "
+                        f"Expand this letter overview to {OVERVIEW_TARGET}. Open with the fund's stated results if the ideas give them, "
+                        "and close with the risks and what the manager says to watch next. "
                         "Use only the verified ideas and stance below. Add no new facts, figures, tickers or later events. "
                         'Return JSON: {"overview":""}\n\nOVERVIEW:\n' + overview
                         + "\n\nIDEAS AND STANCE:\n" + json.dumps({"ideas": ideas, "leaning_in": leaning_in, "leaning_out": leaning_out}, ensure_ascii=False)
                     )},
                 ],
                 model,
-                1200,
+                1600,
             )
             candidate = str(expanded.get("overview") or "").strip()
             if len(candidate.split()) > len(overview.split()):
@@ -604,11 +694,11 @@ def reduce_notes(notes: list[dict], record: dict, model: str | None, source: str
     errors.extend(public_text_errors(rendered))
     if not overview or not ideas:
         errors.append("summary is missing an overview or any verified idea")
-    if overview and len(overview.split()) < 180:
-        errors.append(f"overview is thin ({len(overview.split())} words; target 250-400)")
+    if overview and len(overview.split()) < OVERVIEW_MIN_WORDS:
+        errors.append(f"overview is thin ({len(overview.split())} words; target {OVERVIEW_TARGET})")
     for idea in ideas:
-        if len(idea["summary"].split()) < 50:
-            errors.append(f"idea {idea['title']} is thin ({len(idea['summary'].split())} words; target 80-150)")
+        if len(idea["summary"].split()) < IDEA_MIN_WORDS:
+            errors.append(f"idea {idea['title']} is thin ({len(idea['summary'].split())} words; target {IDEA_TARGET})")
     if len(ideas) * 2 < len(notes):
         errors.append(f"coverage: {len(ideas)} ideas from {len(notes)} passage notes; check for dropped discussions")
     return {
@@ -755,21 +845,36 @@ def summary_path(content_hash: str) -> Path:
     return output_dir() / f"{content_hash}.json"
 
 
-def already_done(content_hash: str, retry_failed: bool) -> bool:
+def load_saved(content_hash: str) -> dict | None:
     path = summary_path(content_hash)
     if not path.is_file():
-        return False
+        return None
     try:
         saved = json.loads(path.read_text(encoding="utf-8"))
     except (OSError, json.JSONDecodeError):
+        return None
+    return saved if isinstance(saved, dict) else None
+
+
+def attempts_so_far(saved: dict | None) -> int:
+    """Unsuccessful runs under the current prompt. Older prompts start afresh."""
+    if not saved or saved.get("prompt_version") != PROMPT_VERSION:
+        return 0
+    if saved.get("status") not in {"failed", "quarantine"}:
+        return 0
+    return int(saved.get("attempts") or 1)
+
+
+def already_done(content_hash: str, retry_failed: bool) -> bool:
+    saved = load_saved(content_hash)
+    if saved is None or saved.get("prompt_version") not in PUBLISHABLE_VERSIONS:
         return False
-    if saved.get("prompt_version") != PROMPT_VERSION:
-        return False
+    status = saved.get("status")
+    if status == "failed" or (status == "quarantine" and retry_failed):
+        return attempts_so_far(saved) >= MAX_ATTEMPTS
     if saved.get("chunks_covered") != saved.get("chunks_total"):
         return False
-    if retry_failed and saved.get("status") in {"failed", "quarantine"}:
-        return False
-    return saved.get("status") in {"draft", "quarantine", "needs_review", "blocked_extraction"}
+    return status in {"draft", "quarantine", "needs_review", "blocked_extraction"}
 
 
 def write_summary(content_hash: str, payload: dict) -> None:
@@ -835,6 +940,7 @@ def run(limit: int | None, retry_failed: bool, model: str | None, fund: str | No
             if already_done(content_hash, retry_failed):
                 counts["skipped"] += 1
                 continue
+            attempt = attempts_so_far(load_saved(content_hash)) + 1
             text = raw.decode("utf-8", errors="replace")
             if len(text.strip()) < 400:
                 write_summary(content_hash, {
@@ -850,6 +956,7 @@ def run(limit: int | None, retry_failed: bool, model: str | None, fund: str | No
                 payload = summarize_letter(record, text, selected)
                 payload["source_sha256"] = content_hash
                 payload["model"] = selected
+                payload["attempts"] = attempt
                 draft, draft_errors = to_archive_draft(payload, text)
                 payload["draft_errors"] = draft_errors
                 if draft_errors:
@@ -877,6 +984,7 @@ def run(limit: int | None, retry_failed: bool, model: str | None, fund: str | No
                     "source_sha256": content_hash, "source_ref": record.get("source_file"),
                     "fund_id": record.get("fund_id"), "reporting_period": record.get("quarter"),
                     "error": str(exc)[:300], "chunks_total": None, "chunks_covered": 0, "created_at": now(),
+                    "attempts": attempt,
                 })
                 append_index({"hash": content_hash, "status": "failed", "fund_id": record.get("fund_id"), "at": now()})
                 print(json.dumps({"status": "failed", "fund_id": record.get("fund_id"), "error": str(exc)[:180]}), flush=True)
@@ -910,7 +1018,7 @@ def repair_existing() -> dict:
             continue
         if not isinstance(payload, dict) or "overview" not in payload:
             continue
-        if payload.get("prompt_version") != PROMPT_VERSION:
+        if payload.get("prompt_version") not in PUBLISHABLE_VERSIONS:
             counts["skipped"] += 1
             continue
         source_path = by_ref.get(payload.get("source_ref"))

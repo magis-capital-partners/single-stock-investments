@@ -16,7 +16,7 @@ import sys
 import uuid
 from urllib.parse import urlparse
 from datetime import date, datetime, timezone
-from pathlib import Path
+from pathlib import Path, PurePosixPath
 
 ROOT = Path(__file__).resolve().parents[2]
 sys.path.insert(0, str(ROOT / "_system" / "scripts"))
@@ -33,6 +33,36 @@ EDITORIAL_CHECKS = ("complete_document", "idea_coverage", "claim_accuracy", "num
 NUMBER_RE = re.compile(r"\d+(?:[,.]\d+)*(?:%|[xX])?")
 LABEL_RE = re.compile(r"\b[A-Za-z]+[0-9]+\b")
 YEAR_RE = re.compile(r"^(?:19|20)\d{2}$")
+DRIVE_VIEW = "https://drive.google.com/file/d/{}/view"
+DRIVE_ID_RE = re.compile(r"[A-Za-z0-9_-]{10,}")
+
+
+def drive_source_links(records: list[dict], manifest_path: Path | None = None) -> dict[str, str]:
+    """source_ref -> Google Drive link to the original PDF, from the vault's
+    Drive import manifest. Owner-only; reader serializers never emit it."""
+    path = manifest_path or letters_root() / "drive_import_manifest.json"
+    if not path.is_file():
+        return {}
+    files = (json.loads(path.read_text(encoding="utf-8")).get("files") or {}).values()
+    by_pdf = {f.get("local_pdf_path"): f.get("drive_file_id") for f in files if isinstance(f, dict)}
+    links = {}
+    for row in records:
+        ref = row.get("source_file")
+        if not ref:
+            continue
+        file_id = by_pdf.get(row.get("source_document")) or by_pdf.get(str(PurePosixPath(ref).with_suffix(".pdf")))
+        if file_id and DRIVE_ID_RE.fullmatch(str(file_id)):
+            links[ref] = DRIVE_VIEW.format(file_id)
+    return links
+
+
+def attach_source_links(db, links: dict[str, str]) -> int:
+    """Fill missing original links. An existing link is never overwritten."""
+    missing = db.execute("SELECT id,source_ref FROM fl_letters WHERE COALESCE(source_url,'')=''").fetchall()
+    updates = [(links[ref], letter_id) for letter_id, ref in missing if links.get(ref)]
+    db.executemany("UPDATE fl_letters SET source_url=? WHERE id=?", updates)
+    db.commit()
+    return len(updates)
 
 
 def checkable_numbers(text: str) -> list[str]:
@@ -537,6 +567,7 @@ def export_release(db, output: Path) -> dict:
         counts[table] = len(rows)
         for row in rows:
             data = dict(row)
+            readable = False
             if table == "fl_letters":
                 folder = output / "sources"
                 folder.mkdir(exist_ok=True)
@@ -544,6 +575,7 @@ def export_release(db, output: Path) -> dict:
                 data["source_text"] = ""
                 if db.execute("SELECT 1 FROM fl_revisions WHERE letter_id=? LIMIT 1", (data["id"],)).fetchone():
                     source_objects.add(data["content_hash"])
+                    readable = True
                 # Publication is a separate, guarded activation after every object is uploaded.
                 data["published_revision"] = None
             if table == "fl_sections":
@@ -554,6 +586,10 @@ def export_release(db, output: Path) -> dict:
             cols = ",".join(data)
             vals = ",".join(quote(v) for v in data.values())
             sql.append(f"INSERT OR IGNORE INTO {table} ({cols}) VALUES ({vals});")
+            if readable and data.get("source_url"):
+                # Rows imported before the original link existed keep NULL under INSERT OR IGNORE.
+                link = quote(data["source_url"])
+                sql.append(f"UPDATE fl_letters SET source_url={link} WHERE id={quote(data['id'])} AND COALESCE(source_url,'')!={link};")
             if table == "fl_reviews" and data.get("status") == "resolved":
                 # Inventory imports leave open reviews remote; local publish may have
                 # resolved them. Upsert the status so activate.sql is not blocked.
@@ -627,6 +663,7 @@ def main() -> int:
             from private_dashboard_assets import private_source
             links_path = private_source(ROOT / "dashboard", "data/insights/letters.json")
         links = {r.get("source_file"): r.get("evidence_url") for r in json.loads(links_path.read_text(encoding="utf-8")).get("letter_index", [])} if links_path.exists() else {}
+        links.update(drive_source_links(records))
         result = inventory(db, records, links)
         report = args.db.parent / "inventory.json"
         report.write_text(dumps(result), encoding="utf-8")

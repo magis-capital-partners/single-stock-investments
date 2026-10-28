@@ -84,6 +84,31 @@ def test_orchestrator_never_publishes_an_old_prompt_version(tmp_path, monkeypatc
     assert db.execute("SELECT count(*) FROM fl_revisions").fetchone()[0] == 0
 
 
+def test_finished_v4_drafts_still_publish_after_the_v5_prompt(tmp_path, monkeypatch):
+    db, summaries = setup_lane(tmp_path, monkeypatch)
+    payload = json.loads((summaries / f"{HASH}.json").read_text(encoding="utf-8"))
+    payload["prompt_version"] = "letter_detail_v4"
+    (summaries / f"{HASH}.json").write_text(json.dumps(payload), encoding="utf-8")
+    write_draft(summaries, archive_draft())
+    assert auto.publish_verified(db, {})["published"] == 1
+
+
+def test_startup_links_every_letter_to_its_drive_original(tmp_path, monkeypatch):
+    db, _summaries = setup_lane(tmp_path, monkeypatch)
+    letters = tmp_path / "letters"
+    record = json.loads((letters / "insights.json").read_text(encoding="utf-8"))["letters"][0]
+    record["source_document"] = record["source_file"][:-4] + ".pdf"
+    (letters / "insights.json").write_text(json.dumps({"letters": [record]}), encoding="utf-8")
+    (letters / "drive_import_manifest.json").write_text(json.dumps({"files": {"1AbCdEfGhIjK": {
+        "drive_file_id": "1AbCdEfGhIjK", "local_pdf_path": record["source_document"]}}}), encoding="utf-8")
+    monkeypatch.setattr(fl, "letters_root", lambda: letters)
+    auto.ensure_inventory(db)
+    assert db.execute("SELECT source_url FROM fl_letters").fetchone()[0] == "https://drive.google.com/file/d/1AbCdEfGhIjK/view"
+    db.execute("UPDATE fl_letters SET source_url='https://example.com/kept'")
+    auto.ensure_inventory(db)
+    assert db.execute("SELECT source_url FROM fl_letters").fetchone()[0] == "https://example.com/kept"
+
+
 def test_wrangler_login_fills_budget_credentials(tmp_path, monkeypatch):
     config = tmp_path / "default.toml"
     config.write_text('oauth_token = "secret-token"\n', encoding="utf-8")

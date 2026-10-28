@@ -599,7 +599,8 @@
               ${hasBookOverlap ? badgeHtml('In our book', 'add') : ''}
             </div>
             <div class="fl-letter-card-actions">
-              ${role === 'owner' ? `<button type="button" class="fl-btn-ghost" data-source="${escape(letter.id)}">Edit</button>` : ''}
+              ${role === 'owner' ? `<button type="button" class="fl-btn-ghost" data-original="${escape(letter.id)}">Original</button>
+              <button type="button" class="fl-btn-ghost" data-source="${escape(letter.id)}">Edit</button>` : ''}
               <a class="fl-open-link"
                  href="${escape(link({ fund: letter.fund_id, letter: letter.id, idea: '' }))}"
                  data-open-letter="${escape(letter.id)}"
@@ -686,7 +687,10 @@
               </div>
               <h3>${escape(letter.headline || `${letter.fund} · ${letter.reporting_period || 'Letter'}`)}</h3>
             </div>
-            ${role === 'owner' ? `<button type="button" class="fl-btn-sm" data-source="${escape(letter.id)}">Source &amp; revisions</button>` : ''}
+            ${role === 'owner' ? `<div class="fl-letter-owner-actions">
+              <button type="button" class="fl-btn-sm" data-original="${escape(letter.id)}">Read original</button>
+              <button type="button" class="fl-btn-sm" data-source="${escape(letter.id)}">Source &amp; revisions</button>
+            </div>` : ''}
           </header>
 
           <div class="fl-overview">${paragraphs(letter.overview)}</div>
@@ -987,7 +991,54 @@
       }
     }
 
+    async function readOriginal(letterId) {
+      dialog.classList.add('fl-original-dialog');
+      dialog.innerHTML = '<p role="status">Loading the original letter…</p>';
+      if (!dialog.open) dialog.showModal();
+      try {
+        const data = await api({ action: 'original', letter: letterId });
+        const meta = data.letter || {};
+        const views = [data.text && ['text', 'Text'], data.preview_url && ['pdf', 'PDF']].filter(Boolean);
+        dialog.innerHTML = `
+          <header>
+            <div>
+              <div class="fl-meta">Original letter · ${escape(meta.reporting_period || 'Undated')}${meta.letter_date ? ` · dated ${escape(meta.letter_date)}` : ''}</div>
+              <h2 id="fl-review-title">${escape(meta.fund || 'Original letter')}</h2>
+            </div>
+            <div class="fl-dialog-actions">
+              ${views.length > 1 ? `<div class="fl-original-views" role="tablist">${views.map(([key, name], index) => `<button type="button" role="tab" class="fl-btn-sm" data-original-view="${key}" aria-selected="${index === 0}">${name}</button>`).join('')}</div>` : ''}
+              ${data.original_url ? `<a class="fl-btn-sm" href="${escape(data.original_url)}" target="_blank" rel="noopener noreferrer">${data.in_drive ? 'Open in Google Drive' : 'Open original'} ↗</a>` : ''}
+              <button type="button" class="fl-btn-sm" data-close>Close</button>
+            </div>
+          </header>
+          ${data.text ? `<div class="fl-original-pane" data-pane="text">
+            <p class="fl-notice">Full text extracted from the original letter. Tables and charts read best in the PDF.</p>
+            <div class="fl-original-text" tabindex="0"></div>
+          </div>` : ''}
+          ${data.preview_url ? `<div class="fl-original-pane" data-pane="pdf"${data.text ? ' hidden' : ''}>
+            <p class="fl-notice">Shown through Google Drive, so you need to be signed in to a Google account with access. If it does not load, use Open in Google Drive.</p>
+            <iframe class="fl-original-pdf" title="Original letter PDF" data-src="${escape(data.preview_url)}" referrerpolicy="no-referrer" allow="fullscreen"></iframe>
+          </div>` : ''}
+          ${!views.length ? `<p class="fl-notice">${data.original_url ? 'The extracted text is not available for this letter. Open the original instead.' : 'This letter is not linked to an original yet; it remains in the private research vault.'}</p>` : ''}`;
+        const text = dialog.querySelector('.fl-original-text');
+        if (text) text.textContent = String(data.text).replace(/\f/g, '\n\n');
+        const show = key => {
+          dialog.querySelectorAll('[data-pane]').forEach(pane => { pane.hidden = pane.dataset.pane !== key; });
+          dialog.querySelectorAll('[data-original-view]').forEach(tab => tab.setAttribute('aria-selected', String(tab.dataset.originalView === key)));
+          const frame = key === 'pdf' && dialog.querySelector('.fl-original-pdf');
+          if (frame && !frame.src) frame.src = frame.dataset.src;
+        };
+        dialog.querySelectorAll('[data-original-view]').forEach(tab => { tab.onclick = () => show(tab.dataset.originalView); });
+        if (views.length) show(views[0][0]);
+        dialog.querySelector('[data-close]').onclick = () => dialog.close();
+      } catch (error) {
+        dialog.innerHTML = `<h2 id="fl-review-title">Original unavailable</h2><p>${escape(error.message)}</p><button data-close type="button">Close</button>`;
+        dialog.querySelector('button').onclick = () => dialog.close();
+      }
+    }
+
     async function review(letterId, revisionId = '') {
+      dialog.classList.remove('fl-original-dialog');
       dialog.innerHTML = '<p role="status">Loading private review…</p>';
       if (!dialog.open) dialog.showModal();
       try {
@@ -1005,8 +1056,12 @@
             <div><div class="fl-meta">Owner review</div><h2 id="fl-review-title">Letter sources &amp; revisions</h2></div>
             <button type="button" data-close aria-label="Close review">Close</button>
           </header>
-          ${validUrl ? `<p><a href="${escape(sourceUrl)}" target="_blank" rel="noopener noreferrer">Open original letter</a></p>` : '<p>The original is available through the private research vault.</p>'}
-          <p><a href="/api/fund-letters?action=document&amp;letter=${encodeURIComponent(letterId)}" target="_blank" rel="noopener noreferrer">Read full source text</a></p>
+          <p class="fl-dialog-actions">
+            <button type="button" class="fl-btn-sm" data-original="${escape(letterId)}">Read original here</button>
+            ${validUrl ? `<a class="fl-btn-sm" href="${escape(sourceUrl)}" target="_blank" rel="noopener noreferrer">${/^https:\/\/drive\.google\.com\//.test(sourceUrl) ? 'Open in Google Drive' : 'Open original letter'} ↗</a>` : ''}
+            <a class="fl-btn-sm" href="/api/fund-letters?action=document&amp;letter=${encodeURIComponent(letterId)}" target="_blank" rel="noopener noreferrer">Plain text file ↗</a>
+          </p>
+          ${validUrl ? '' : '<p>The original PDF is not linked yet; it remains in the private research vault.</p>'}
           <details><summary>Private references &amp; evidence</summary><pre>${escape(JSON.stringify(source, null, 2))}</pre></details>
           <label>Revision
             <select data-revision>
@@ -1252,6 +1307,7 @@
       if (target.hasAttribute('data-retry')) load();
       if (target.hasAttribute('data-archive')) navigate({ letter: '', idea: '', stack: '' });
       if (target.hasAttribute('data-results')) navigate({ fund: '', letter: '', idea: '', stack: '' });
+      if (target.dataset.original) readOriginal(target.dataset.original);
       if (target.dataset.source) review(target.dataset.source);
       if (target.hasAttribute('data-review-queue')) navigate({ mode: params.get('mode') === 'review' ? '' : 'review', letter: '', idea: '' });
     });
