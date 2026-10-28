@@ -120,7 +120,9 @@ def test_successful_ocr_of_short_cover_is_indexed_as_unreviewed(monkeypatch):
         def get_images(self):return [1]
         def get_textpage_ocr(self,**kwargs):return object()
     class PDF:
-        def __enter__(self):return [Page()]
+        needs_pass=False
+        def __enter__(self):return self
+        def __iter__(self):return iter([Page()])
         def __exit__(self,*args):pass
     monkeypatch.setitem(sys.modules,'fitz',SimpleNamespace(open=lambda **kwargs:PDF()))
     text,state,detail=extract_complete(b'fixture','.pdf',ocr=True)
