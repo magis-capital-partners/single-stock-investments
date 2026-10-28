@@ -66,8 +66,10 @@ class OwnershipRegistry:
         self.version = digest({k: v for k, v in payload.items() if k != "prepared_at"})
 
     @classmethod
-    def build(cls, events, *, account, through, sources=(), universes=()):
-        identities, ls_contracts, moments = {}, {}, {}
+    def build(cls, events, *, account, through, sources=(), universes=(), previous=None):
+        if previous and (previous.payload['account'] != account or previous.payload['through'] > through):
+            raise ValueError('previous ownership registry account or period mismatch')
+        identities, ls_contracts, moments = {}, dict(previous.payload['ls_contracts']) if previous else {}, {}
         canceled = {("transaction", e["cancel_transaction_id"]) for e in events if e.get("cancel_transaction_id")}
         canceled |= {("trade", e["cancel_trade_id"]) for e in events if e.get("cancel_trade_id")}
         for event in events:
@@ -80,6 +82,15 @@ class OwnershipRegistry:
             evidence = {"ownership": ownership, "date": event.get("trade_date"),
                         "event_id": event.get("event_id"), "report_id": event.get("report_id"),
                         "quantity": event.get("quantity"), "canceled": invalid}
+            if previous and ownership is None and not invalid:
+                prior = [previous.payload['identities'].get(_key(account, conid, model, domain, event.get(field)))
+                         for domain, field in (("transaction", "transaction_id"), ("trade", "trade_id")) if event.get(field)]
+                prior = [p for p in prior if p and p.get('ownership') and not p.get('canceled')]
+                proven = {canonical(p['ownership']) for p in prior}
+                if len(proven) == 1:
+                    evidence = {**evidence, 'ownership': prior[0]['ownership'], 'report_id': prior[0]['report_id']}
+                elif len(proven) > 1:
+                    evidence = {**evidence, 'canceled': True, 'conflict': True}
             moment = _moment(event.get("trade_time"))
             if moment:
                 moments.setdefault(_key(account, conid, model, "moment", moment), []).append(evidence)

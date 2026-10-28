@@ -198,10 +198,13 @@ class RealizedStore:
             source = next(r for r in reports if r["report_id"] == action["_source_report_id"])
             action_events.append(normalize_event(raw, source))
         from .strategy_ownership import OwnershipRegistry, dated_universes
+        prior_path = self.root / 'ownership-current.json'
+        previous = OwnershipRegistry.load(prior_path, account=account) if prior_path.exists() else None
         registry = OwnershipRegistry.build(events, account=account,
             through=max(r["through"] for r in reports if r.get("has_executions")),
             sources=[r["report_id"] for r in reports if r["report_id"] in used_reports],
-            universes=dated_universes(os.environ.get("SLEEVE_LS_UNIVERSE_ROOT")))
+            universes=dated_universes(os.environ.get("SLEEVE_LS_UNIVERSE_ROOT")), previous=previous)
+        used_reports.update(e['report_id'] for e in registry.payload['identities'].values() if e.get('ownership'))
         history = build_history(events, lots, reports=reports, positions=positions,
                                 ls_symbols=ls_symbols, blacklist=blacklist, overrides=overrides, summaries=summaries, policies=policies, registry=registry)
         if action_events:

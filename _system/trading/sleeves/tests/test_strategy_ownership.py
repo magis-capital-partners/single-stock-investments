@@ -95,6 +95,15 @@ def test_timestamp_match_requires_unanimous_opening_evidence():
     assert reg.resolve(account="TEST", conid="101", opening_time="20261001;100000")["owner"] == "unallocated"
 
 
+def test_later_missing_reference_cannot_erase_proven_ls_ownership():
+    first = registry(event())
+    later = OwnershipRegistry.build([event(ref="")], account="TEST", through="2026-10-27", previous=first)
+    assert later.resolve(account="TEST", conid="101", transaction_id="open")["owner"] == "excluded"
+    canceled = OwnershipRegistry.build([event(ref=""), event("cancel", "", event_type="TradeCancel", cancel_transaction_id="open")],
+        account="TEST", through="2026-10-27", previous=first)
+    assert canceled.resolve(account="TEST", conid="101", transaction_id="open")["owner"] == "unallocated"
+
+
 def test_position_lots_conserve_costs_fx_and_shares_across_both_paths(tmp_path, monkeypatch):
     reg = registry(event(), event("human", "MICHAEL_SLEEVE"))
     registry_path = tmp_path / "registry.json"
