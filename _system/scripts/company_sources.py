@@ -113,7 +113,7 @@ def extract(data: bytes, suffix: str) -> tuple[str, str]:
             book = xlrd.open_workbook(file_contents=data)
             text = "\n".join(f"[{sheet.name}]\n" + "\n".join("\t".join(map(str, sheet.row_values(i))) for i in range(sheet.nrows)) for sheet in book.sheets())
         else:
-            return "", "awaiting_transcript"
+            return "", "awaiting_transcript" if suffix in {".mp3", ".mp4", ".m4a", ".wav"} else "awaiting_extraction"
         text = text.replace("\x00", "").strip()
         return text, "indexed" if text else "awaiting_extraction"
     except (Exception,):
@@ -153,6 +153,7 @@ class Matcher:
             if len(name.split()) >= 2:
                 self.title_names[name] = ticker
         self.title_pattern = re.compile(r"(?<!\w)(?:" + "|".join(re.escape(n) for n in sorted(self.title_names, key=len, reverse=True)) + r")(?!\w)", re.I) if self.title_names else None
+        self.issuer_siblings = {t: group for group in self.issuer_names.values() for t in group}
         self.selector = None
         self.scoped = {}
         if narrow and len(companies) > 24:
@@ -177,6 +178,8 @@ class Matcher:
             candidates = set(explicit)
             for word in tokens(title + " " + text):
                 candidates.update(self.selector.get(word, ()))
+            for ticker in tuple(candidates):
+                candidates.update(self.issuer_siblings.get(ticker, ()))
             candidates.intersection_update(self.companies)
             if not candidates:
                 return [], []
@@ -278,7 +281,7 @@ class SourceIndex:
             if other.get("revision"):
                 for field in ("revision", "family", "modified_at"):
                     current[field] = other.get(field)
-        if existing:
+        if any(k != key for k in existing):
             self.anchors = {a: key if k in existing else k for a, k in self.anchors.items()}
         for anchor in anchors:
             self.anchors[anchor] = key

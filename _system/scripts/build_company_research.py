@@ -396,6 +396,11 @@ class Builder:
         from drive_store_common import drive_service, configured_root_ids, execute_with_retry, build_folder_paths, FOLDER_MIME
         if service is None:
             service = drive_service(readonly=True)
+        # Bound a stalled transport as well as the batch's extraction budget.
+        http = getattr(service, "_http", None)
+        transport = getattr(http, "http", http)
+        if transport is not None and hasattr(transport, "timeout"):
+            transport.timeout = 30
         if roots is None:
             roots = configured_root_ids(document(self.root, "_system/reference/document-store/google_drive_config.json"))
         if not roots:
