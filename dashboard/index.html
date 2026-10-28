@@ -1296,9 +1296,7 @@
   .model-explainer-note { font-size: 11px; color: var(--text-muted); }
   .summary-card.metric-gate { border-color: rgba(16, 185, 129, 0.35); }
   .darwin-table tr.spec-row-active td { background: rgba(59, 130, 246, 0.06); }
-  .consensus-heat-cell { min-width: 44px; padding: 6px 4px !important; }
   .consensus-spark-dot { display: inline-block; width: 10px; height: 10px; border-radius: 2px; }
-  .consensus-heatmap { min-width: 720px; }
   .consensus-toolbar { padding: 8px 10px; }
   .consensus-toolbar-main { display: flex; flex-wrap: wrap; align-items: center; gap: 10px; }
   .consensus-toolbar-main > label:first-child { display: flex; align-items: center; gap: 7px; font-size: 10px; color: var(--text-muted); text-transform: uppercase; letter-spacing: .5px; }
@@ -1314,20 +1312,32 @@
   .consensus-brief strong { font-size: 14px; line-height: 1.45; }
   .consensus-brief > span { flex: 0 0 auto; font-size: 10px; color: var(--text-muted); }
   .consensus-eyebrow { font-size: 9px; font-weight: 700; text-transform: uppercase; letter-spacing: .8px; color: var(--accent-blue); }
-  .consensus-kpis { display: grid; grid-template-columns: repeat(4, minmax(130px, 1fr)); gap: 8px; margin-bottom: 10px; }
-  .consensus-kpis button { display: grid; gap: 3px; text-align: left; padding: 10px 12px; color: var(--text-primary); background: var(--bg-card); border: 1px solid var(--border); border-radius: 7px; cursor: pointer; }
-  .consensus-kpis button:hover { border-color: var(--accent-blue); background: rgba(59,130,246,.07); }
-  .consensus-kpis span, .consensus-kpis small { font-size: 9px; color: var(--text-muted); text-transform: uppercase; letter-spacing: .45px; }
-  .consensus-kpis strong { font: 700 18px/1.1 var(--font-mono, monospace); }
-  .consensus-view-tabs { margin: 0 0 12px; }
-  .consensus-section-heading { display: flex; justify-content: space-between; align-items: baseline; gap: 12px; margin: 12px 0 6px; font-size: 12px; color: var(--text-muted); }
+  .consensus-kpis { display: grid; grid-template-columns: repeat(auto-fit, minmax(170px, 1fr)); gap: 8px; margin-bottom: 14px; }
+  .consensus-kpi { display: grid; gap: 3px; text-align: left; padding: 10px 12px; color: var(--text-primary); background: var(--bg-card); border: 1px solid var(--border); border-radius: 7px; }
+  button.consensus-kpi { cursor: pointer; }
+  button.consensus-kpi:hover { border-color: var(--accent-blue); background: rgba(59,130,246,.07); }
+  .consensus-kpi.active { border-color: var(--accent-blue); background: rgba(59,130,246,.14); box-shadow: inset 0 0 0 1px var(--accent-blue); }
+  .consensus-kpi.is-empty strong { color: var(--text-muted); }
+  .consensus-kpi span, .consensus-kpi small { font-size: 9px; color: var(--text-muted); text-transform: uppercase; letter-spacing: .45px; }
+  .consensus-kpi strong { font: 700 18px/1.1 var(--font-mono, monospace); }
+  .consensus-split { display: grid; grid-template-columns: minmax(0, 1fr) 290px; gap: 18px; align-items: start; }
+  .consensus-main { min-width: 0; }
+  #consensus-ticker-drawer { scroll-margin-top: 72px; }
+  .consensus-section-heading { display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center; gap: 8px 12px; margin: 0 0 8px; font-size: 12px; color: var(--text-muted); }
   .consensus-section-heading strong { color: var(--text-primary); text-transform: uppercase; letter-spacing: .5px; }
-  .consensus-section-heading > span { font-size: 10px; }
+  .consensus-list-tools { display: flex; align-items: center; gap: 10px; font-size: 10px; }
+  .consensus-sort { display: inline-flex; gap: 4px; }
+  .consensus-sort .filter-btn { padding: 4px 9px; font-size: 10px; }
+  .consensus-active-filters { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; margin-bottom: 8px; font-size: 11px; color: var(--text-muted); }
+  .consensus-chip { display: inline-flex; align-items: center; gap: 6px; padding: 3px 10px; border: 1px solid rgba(59,130,246,.5); border-radius: 999px; background: rgba(59,130,246,.12); color: var(--text-primary); font: inherit; font-size: 11px; cursor: pointer; }
+  .consensus-chip:hover { border-color: var(--accent-blue); }
+  .consensus-chip span { color: var(--text-secondary); font-size: 13px; line-height: 1; }
   .consensus-signal-list { border-top: 1px solid var(--border); }
-  .consensus-signal-row { display: grid; grid-template-columns: minmax(300px, 1.5fr) minmax(150px, .7fr) minmax(110px, auto); align-items: center; gap: 14px; min-height: 58px; padding: 9px 12px; border-bottom: 1px solid var(--border); }
-  .consensus-signal-row:has(.consensus-rank) { grid-template-columns: 26px minmax(300px, 1.5fr) minmax(150px, .7fr) minmax(110px, auto); }
+  .consensus-signal-row { display: grid; grid-template-columns: minmax(0, 1.6fr) minmax(150px, .8fr) 200px; align-items: center; column-gap: 14px; row-gap: 6px; padding: 9px 12px; border-bottom: 1px solid var(--border); }
+  .consensus-signal-list.no-change .consensus-signal-row { grid-template-columns: minmax(0, 1fr) 200px; }
+  .consensus-list-divider { display: flex; flex-wrap: wrap; align-items: baseline; gap: 4px 10px; padding: 16px 12px 7px; border-bottom: 1px solid var(--border); font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: .5px; color: var(--text-secondary); }
+  .consensus-list-divider span { font-weight: 400; text-transform: none; letter-spacing: 0; color: var(--text-muted); }
   .consensus-signal-row.book-conflict { box-shadow: inset 2px 0 0 rgba(248,113,113,.68); background: rgba(248,113,113,.025); }
-  .consensus-rank { font: 11px var(--font-mono, monospace); color: var(--text-muted); }
   .consensus-signal-identity > div:first-child { display: flex; align-items: center; gap: 7px; font-size: 11px; }
   .consensus-signal-meta { margin-top: 5px; font-size: 10px; color: var(--text-muted); }
   .consensus-signal-change { display: grid; gap: 4px; font-size: 10px; }
@@ -1337,15 +1347,58 @@
   .consensus-signal-change.negative strong { color: var(--accent-red); }
   .consensus-signal-change.neutral strong { color: var(--text-secondary); }
   .consensus-signal-lean { justify-self: end; white-space: nowrap; }
-  .consensus-signal-evidence { grid-column: 1 / -1; margin-top: -6px; padding-left: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-size: 9px; color: var(--text-muted); }
-  .consensus-fund-picker { display: flex; align-items: center; gap: 8px; margin-bottom: 10px; }
-  .consensus-fund-picker input { width: min(460px, 70vw); }
+  .consensus-funds { grid-column: 1 / -1; }
+  .consensus-funds > summary { width: fit-content; list-style: none; cursor: pointer; font-size: 10px; color: var(--text-secondary); }
+  .consensus-funds > summary::-webkit-details-marker { display: none; }
+  .consensus-funds > summary::before { content: '\25B8'; display: inline-block; width: 12px; color: var(--text-muted); transition: transform .12s ease; }
+  .consensus-funds[open] > summary::before { transform: rotate(90deg); }
+  .consensus-funds > summary:hover { color: var(--accent-cyan); }
+  .consensus-funds-body { margin-top: 8px; padding: 10px 12px; border: 1px solid var(--border); border-radius: 7px; background: rgba(255,255,255,.02); }
+  .consensus-funds-scroll { overflow-x: auto; }
+  .consensus-funds-table { min-width: 640px; margin-top: 0; font-size: 11px; }
+  .consensus-funds-table.is-letters-only { min-width: 0; }
+  .consensus-funds-table th, .consensus-funds-table td { padding: 6px 8px; }
+  .consensus-funds-table .num { text-align: right; white-space: nowrap; font-family: 'JetBrains Mono', monospace; font-variant-numeric: tabular-nums; }
+  .consensus-funds-table th.num { font-family: inherit; }
+  .consensus-funds-group th { padding-top: 10px; background: rgba(255,255,255,.025); text-transform: none; }
+  .consensus-funds-group th span + span { margin-left: 8px; font-weight: 400; color: var(--text-muted); }
+  .consensus-funds-names td, .consensus-funds-pending, .consensus-funds-count { font-size: 10px; color: var(--text-muted); }
+  .consensus-funds-table td.consensus-funds-pending[colspan] { text-align: center; }
+  .consensus-funds-table .positive { color: var(--accent-green); }
+  .consensus-funds-table .negative { color: var(--accent-red); }
+  .consensus-funds-table .neutral { color: var(--text-muted); }
+  .consensus-funds-table .is-selected { font-weight: 700; }
+  .consensus-funds-note { margin-top: 8px; font-size: 10px; line-height: 1.5; color: var(--text-muted); }
+  .consensus-rail { display: grid; gap: 8px; padding: 12px; border: 1px solid var(--border); border-radius: 8px; background: var(--bg-card); }
+  .consensus-rail-head { display: flex; justify-content: space-between; align-items: baseline; gap: 8px; font-size: 10px; color: var(--text-muted); }
+  .consensus-rail-head strong { font-size: 12px; text-transform: uppercase; letter-spacing: .5px; color: var(--text-primary); }
+  .consensus-rail .search { width: 100%; min-width: 0; max-width: none; padding: 7px 10px; font-size: 12px; }
+  .consensus-rail-list { display: grid; gap: 2px; list-style: none; }
+  .consensus-rail-fund { display: grid; gap: 2px; width: 100%; padding: 6px 8px; border: 1px solid transparent; border-radius: 5px; background: none; color: var(--text-primary); font: inherit; font-size: 12px; text-align: left; cursor: pointer; }
+  .consensus-rail-fund:hover { background: rgba(59,130,246,.07); }
+  .consensus-rail-fund.is-selected { border-color: var(--accent-blue); background: rgba(59,130,246,.14); }
+  .consensus-rail-fund small { font-size: 10px; color: var(--text-muted); }
+  .consensus-rail-pager { display: flex; justify-content: space-between; align-items: center; gap: 8px; font-size: 10px; color: var(--text-muted); }
+  .consensus-rail-pager .filter-btn { padding: 4px 9px; font-size: 10px; }
+  .consensus-rail-pager .filter-btn:disabled { opacity: .4; cursor: default; }
+  .consensus-rail-selected { padding: 10px; border: 1px solid rgba(59,130,246,.4); border-radius: 7px; background: rgba(59,130,246,.07); }
+  .consensus-rail-selected-head { display: flex; justify-content: space-between; align-items: flex-start; gap: 8px; }
+  .consensus-rail-selected-head > div { display: grid; gap: 2px; }
+  .consensus-rail-selected-head strong { font-size: 13px; }
+  .consensus-rail-selected-head small { font-size: 10px; color: var(--text-muted); }
+  .consensus-rail-selected-head .filter-btn { padding: 3px 8px; font-size: 10px; }
+  .consensus-rail-selected .tier-sub { margin: 6px 0; }
+  .consensus-rail-positions { display: grid; gap: 4px; max-height: 260px; overflow-y: auto; list-style: none; font-size: 11px; }
+  .consensus-rail-positions li { display: flex; align-items: center; gap: 6px; }
+  .consensus-rail-positions li > span:last-child { margin-left: auto; font-size: 10px; color: var(--text-muted); }
+  @media (max-width: 1100px) {
+    .consensus-split { grid-template-columns: minmax(0, 1fr); }
+  }
   @media (max-width: 900px) {
-    .consensus-kpis { grid-template-columns: repeat(2, minmax(130px, 1fr)); }
-    .consensus-signal-row, .consensus-signal-row:has(.consensus-rank) { grid-template-columns: 26px 1fr auto; }
-    .consensus-signal-row:not(:has(.consensus-rank)) { grid-template-columns: 1fr auto; }
-    .consensus-signal-change { grid-column: 2; }
-    .consensus-signal-row:not(:has(.consensus-rank)) .consensus-signal-change { grid-column: 1; }
+    .consensus-signal-row, .consensus-signal-list.no-change .consensus-signal-row { grid-template-columns: minmax(0, 1fr) auto; }
+    .consensus-signal-identity { grid-column: 1; grid-row: 1; }
+    .consensus-signal-lean { grid-column: 2; grid-row: 1; }
+    .consensus-signal-change { grid-column: 1 / -1; grid-row: 2; }
     .consensus-brief { align-items: flex-start; flex-direction: column; }
   }
   .insight-compact { font-size: 11px; line-height: 1.4; }
@@ -1988,7 +2041,7 @@
 <script src="equity-model-viz.js"></script>
 <script src="search-match.js"></script>
 <script src="energy-model-viz.js?v=20261015-energy"></script>
-<script src="insights-viz.js?v=20261020-relevance"></script>
+<script src="insights-viz.js?v=20261028-investors"></script>
 <link rel="stylesheet" href="fund-letters/reader.css?v=4">
 <script src="fund-letters/reader.js?v=4"></script>
 <script src="valuation-viz.js?v=20261027-market-sync"></script>
@@ -2313,18 +2366,20 @@ let consensusQuarter = (() => {
     return 'last4';
   }
 })();
-let consensusViewMode = (() => {
-  try { return localStorage.getItem(CONSENSUS_VIEW_KEY) || 'shifted'; } catch (_) { return 'shifted'; }
-})();
+let consensusLens = 'all';
+let consensusSort = 'change';
 let consensusSelectedTicker = null;
 let consensusFundId = null;
+let consensusFundQuery = '';
+let consensusFundPage = 0;
+let consensusFundQueryDebounce = null;
+let consensusHoldingOpen = null;
 let darwinViewMode = 'overview';
 
 const ROUTE_STORAGE_KEY = 'ssp_dashboard_route_v1';
 const INSIGHTS_SECTION_KEY = 'ssp_insights_section_v1';
 const INSIGHTS_EVENT_TIER_KEY = 'ssp_insights_event_tier_v1';
 const CONSENSUS_QUARTER_KEY = 'ssp_consensus_quarter_v1';
-const CONSENSUS_VIEW_KEY = 'ssp_consensus_view_v1';
 const TICKER_VIEW_KEY = 'ssp_ticker_view_v1';
 const TICKER_SORT_KEY = 'ssp_ticker_sort_v1';
 const MEMORY_VIEW_KEY = 'ssp_memory_view_v1';
@@ -4397,9 +4452,13 @@ function renderInsights(opts = {}) {
     ghRepo: GH_REPO,
     quarter: insightsSection === 'consensus' ? consensusQuarter : insightsQuarter,
     consensusQuarter,
-    consensusViewMode,
+    consensusLens,
+    consensusSort,
     consensusSelectedTicker,
     consensusFundId,
+    consensusFundQuery,
+    consensusFundPage,
+    consensusHoldingOpen,
     fundSearch: fundRegistrySearch,
     bookOnly: insightsBookOnly,
     needsReviewOnly: insightsNeedsReviewOnly,
@@ -4485,6 +4544,7 @@ function renderInsights(opts = {}) {
   if (consensusPeriodSelect) {
     consensusPeriodSelect.addEventListener('change', () => {
       consensusQuarter = consensusPeriodSelect.value || 'last4';
+      consensusFundPage = 0;
       try { localStorage.setItem(CONSENSUS_QUARTER_KEY, consensusQuarter); } catch (_) { /* ignore */ }
       renderInsights();
     });
@@ -4507,8 +4567,12 @@ function renderInsights(opts = {}) {
         videoSort = 'date';
       }
       if (insightsSection !== 'consensus') {
+        consensusLens = 'all';
         consensusSelectedTicker = null;
         consensusFundId = null;
+        consensusFundQuery = '';
+        consensusFundPage = 0;
+        consensusHoldingOpen = null;
       }
       if (insightsSection !== 'tickers') {
         tickerInsightsSelectedTicker = null;
@@ -4556,6 +4620,7 @@ function renderInsights(opts = {}) {
   if (bookOnly) {
     bookOnly.addEventListener('change', () => {
       insightsBookOnly = bookOnly.checked;
+      consensusFundPage = 0;
       renderInsights();
     });
   }
@@ -4694,27 +4759,57 @@ function renderInsights(opts = {}) {
   if (window.InsightsViz && insightsSection === 'consensus') {
     const timeModel = InsightsViz.buildTimeModel(insights, data.document_catalog);
     InsightsViz.attachConsensusHandlers(content, insights, {
+      escapeHtml,
+      linkHtml,
+      ghRepo: GH_REPO,
       timeModel,
-      onViewMode(mode) {
-        consensusViewMode = mode || 'table';
-        try { localStorage.setItem(CONSENSUS_VIEW_KEY, consensusViewMode); } catch (_) { /* ignore */ }
+      quarter: consensusQuarter,
+      selectedFundId: consensusFundId,
+      onLens(lens) {
+        consensusLens = lens === consensusLens ? 'all' : (lens || 'all');
+        renderInsights();
+      },
+      onSort(mode) {
+        consensusSort = mode === 'breadth' ? 'breadth' : 'change';
         renderInsights();
       },
       onTickerSelect(ticker) {
         consensusSelectedTicker = ticker;
-        renderInsights();
+        renderInsights({ revealConsensusDrawer: true });
       },
       onFundSelect(id) {
-        consensusFundId = id || null;
-        consensusViewMode = 'fund';
-        try { localStorage.setItem(CONSENSUS_VIEW_KEY, consensusViewMode); } catch (_) { /* ignore */ }
+        consensusFundId = id && id !== consensusFundId ? id : null;
+        renderInsights();
+      },
+      onFundQuery(value) {
+        consensusFundQuery = value;
+        consensusFundPage = 0;
+        window.clearTimeout(consensusFundQueryDebounce);
+        consensusFundQueryDebounce = window.setTimeout(() => {
+          renderInsights({ refocusFundQuery: true });
+        }, 150);
+      },
+      onFundPage(page) {
+        consensusFundPage = Math.max(0, page);
         renderInsights();
       },
       onCloseDrawer() {
         consensusSelectedTicker = null;
         renderInsights();
       },
+      onHoldingToggle(ticker, open) {
+        if (open) consensusHoldingOpen = ticker;
+        else if (consensusHoldingOpen === ticker) consensusHoldingOpen = null;
+      },
     });
+    if (opts.revealConsensusDrawer) {
+      content.querySelector('#consensus-ticker-drawer')?.scrollIntoView({ block: 'start' });
+    }
+    const fundQuery = content.querySelector('#consensus-fund-query');
+    if (fundQuery && opts.refocusFundQuery) {
+      fundQuery.focus();
+      fundQuery.setSelectionRange(fundQuery.value.length, fundQuery.value.length);
+    }
   }
   if (window.InsightsViz && insightsSection === 'tickers') {
     if (InsightsViz.attachWorldModelHistoryHandlers) {
@@ -4750,7 +4845,9 @@ function renderInsights(opts = {}) {
       onGotoConsensus(ticker) {
         insightsSection = 'consensus';
         fundRegistrySearch = ticker;
+        consensusLens = 'all';
         consensusSelectedTicker = ticker;
+        consensusFundId = null;
         tickerInsightsSelectedTicker = null;
         try { localStorage.setItem(INSIGHTS_SECTION_KEY, 'consensus'); } catch (_) { /* ignore */ }
         renderInsights({ refocusSearch: true });

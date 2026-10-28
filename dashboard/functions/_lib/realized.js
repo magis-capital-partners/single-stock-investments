@@ -75,6 +75,8 @@ function assertEnvelope(payload) {
       || !/^[A-Za-z0-9_-]{1,64}$/.test(payload.account || '')) throw new TypeError('Invalid realized envelope');
 }
 
+function historyCursor(value) { return btoa(encodeURIComponent(JSON.stringify(value))); }
+
 export async function storeRealized(env, payload) {
   assertEnvelope(payload);
   const db = env.DB, archive = requirePrivateArchive(env);
@@ -216,7 +218,9 @@ export async function loadRealized(db, params) {
   const ticker = (params.get('ticker') || '').trim().toUpperCase();
   if (ticker.length > 100) throw new TypeError('Ticker is too long');
   const limit = Math.min(100, Math.max(1, Number.parseInt(params.get('limit') || '50', 10) || 50));
-  const filters = { generation: generationId, owner, from, to, basis, status, ticker };
+  const view = params.get('view') || 'lots';
+  if (!['lots', 'tickers'].includes(view)) throw new TypeError('Invalid history view');
+  const filters = { generation: generationId, owner, from, to, basis, status, ticker, view };
   const packed = manifest.storage === 'packed_v1';
   const range = basis === 'trade_date' ? 'trade' : 'settle';
   // SQLite expands only date-overlapping pages. The response contains the
@@ -239,25 +243,54 @@ export async function loadRealized(db, params) {
   const where = ['owner=?', `${basis}>=?`, `${basis}<=?`], args = [owner, from, to];
   if (status !== 'all') { where.push('settlement_status=?'); args.push(status); }
   if (ticker) { where.push('ticker=?'); args.push(ticker); }
-  const daily = await db.prepare(`SELECT payload_json FROM (${dailySource}) WHERE ${where.join(' AND ')}`).bind(...sourceArgs, ...args).all();
+  const daily = await db.prepare(`SELECT ticker,${basis} AS page_date,payload_json FROM (${dailySource}) WHERE ${where.join(' AND ')}`).bind(...sourceArgs, ...args).all();
   const summary = summarize(daily.results.map(r => JSON.parse(r.payload_json)));
-  const pageWhere = [...where], pageArgs = [...args];
+  const unresolvedArgs = [...args]; unresolvedArgs[0] = 'unallocated';
+  const unresolved = await db.prepare(`SELECT payload_json FROM (${dailySource}) WHERE ${where.join(' AND ')}`)
+    .bind(...sourceArgs, ...unresolvedArgs).all();
+  const shared = { status: 'available', owner, account: ref.account, generation_id: generationId, through,
+    current_generation_id: ref.generation_id, is_current: generationId === ref.generation_id,
+    published_at: generation.completed_at || ref.published_at || null,
+    from, to, basis, settlement: status, ticker, view, summary, coverage: manifest.coverage,
+    reconciliation: manifest.reconciliation, ownership_version: manifest.ownership_version || null,
+    unresolved: summarize(unresolved.results.map(r => JSON.parse(r.payload_json))) };
+  let cursor;
   if (params.get('cursor')) {
-    let cursor;
-    try { cursor = JSON.parse(atob(params.get('cursor'))); } catch { throw new TypeError('Invalid history cursor'); }
-    if (canonical(cursor.filters) !== canonical(filters) || !validDate(cursor.date) || typeof cursor.id !== 'string' || cursor.id.length > 180) throw new TypeError('Cursor does not match the selected history');
+    try {
+      const raw = atob(params.get('cursor'));
+      cursor = JSON.parse(raw.startsWith('%7B') ? decodeURIComponent(raw) : raw);
+      if (!cursor || typeof cursor !== 'object') throw new Error('Invalid cursor');
+    } catch { throw new TypeError('Invalid history cursor'); }
+    if (cursor.filters && !cursor.filters.view && view === 'lots') cursor.filters.view = 'lots';
+    if (canonical(cursor.filters) !== canonical(filters)) throw new TypeError('Cursor does not match the selected history');
+  }
+  if (view === 'tickers') {
+    const grouped = new Map();
+    for (const row of daily.results) {
+      if (!grouped.has(row.ticker)) grouped.set(row.ticker, { ticker: row.ticker, from: row.page_date, through: row.page_date, parts: [] });
+      const group = grouped.get(row.ticker);
+      group.from = group.from < row.page_date ? group.from : row.page_date;
+      group.through = group.through > row.page_date ? group.through : row.page_date;
+      group.parts.push(JSON.parse(row.payload_json));
+    }
+    if (cursor && (typeof cursor.ticker !== 'string' || cursor.ticker.length > 100)) throw new TypeError('Invalid ticker cursor');
+    const groups = [...grouped.values()].sort((a, b) => a.ticker < b.ticker ? -1 : a.ticker > b.ticker ? 1 : 0);
+    const remaining = cursor ? groups.filter(group => group.ticker > cursor.ticker) : groups;
+    const page = remaining.slice(0, limit), more = remaining.length > limit;
+    return { ...shared, records: [], group_count: groups.length,
+      groups: page.map(({ parts, ...group }) => ({ ...group, summary: summarize(parts) })),
+      next_cursor: more ? historyCursor({ filters, ticker: page.at(-1).ticker }) : null };
+  }
+  const pageWhere = [...where], pageArgs = [...args];
+  if (cursor) {
+    if (!validDate(cursor.date) || typeof cursor.id !== 'string' || cursor.id.length > 180) throw new TypeError('Cursor does not match the selected history');
     pageWhere.push(`(${basis}<? OR (${basis}=? AND record_id<?))`); pageArgs.push(cursor.date, cursor.date, cursor.id);
     if (packed && cursor.date < to) recordArgs[2] = cursor.date;
   }
   const page = await db.prepare(`SELECT record_id,${basis} AS page_date,payload_json FROM (${recordSource})
     WHERE ${pageWhere.join(' AND ')} ORDER BY ${basis} DESC,record_id DESC LIMIT ?`).bind(...recordArgs, ...pageArgs, limit + 1).all();
   const more = page.results.length > limit, rows = page.results.slice(0, limit), last = rows.at(-1);
-  const unresolvedArgs = [...args]; unresolvedArgs[0] = 'unallocated';
-  const unresolved = await db.prepare(`SELECT payload_json FROM (${dailySource}) WHERE ${where.join(' AND ')}`)
-    .bind(...sourceArgs, ...unresolvedArgs).all();
-  return { status: 'available', owner, account: ref.account, generation_id: generationId, through,
-    from, to, basis, settlement: status, ticker, summary, coverage: manifest.coverage,
-    reconciliation: manifest.reconciliation, unresolved: summarize(unresolved.results.map(r => JSON.parse(r.payload_json))),
+  return { ...shared,
     records: rows.map(r => JSON.parse(r.payload_json)),
-    next_cursor: more ? btoa(JSON.stringify({ filters, date: last.page_date, id: last.record_id })) : null };
+    next_cursor: more ? historyCursor({ filters, date: last.page_date, id: last.record_id }) : null };
 }

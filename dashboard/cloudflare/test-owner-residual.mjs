@@ -188,7 +188,7 @@ test("the port matches the Python share rule branch for branch", () => {
   // Stamps: etf-0dte's beats everything; another system's keeps its rule.
   assert.equal(cls(shares(100, { orderRef: "SPY0DTE|UNWIND|x" })).reason, "order_ref");
   assert.equal(cls({ symbol: "XSP   270129P00540000", secType: "OPT", orderRef: "QQQ0DTE|x" }).bucket, "etf_0dte");
-  assert.equal(cls({ symbol: "SPY", secType: "OPT", orderRef: "ETF_LS|HEDGE|SPY" }).reason, "ls_algo_option_overlay");
+  assert.equal(cls({ symbol: "SPY", secType: "OPT", orderRef: "ETF_LS|HEDGE|SPY" }).reason, "executed_ls_order_reference");
   assert.equal(cls(shares(100, { orderRef: "ETF_LS|ESTABLISH|SPY" })).bucket, "etf_ls");
 });
 

@@ -1,14 +1,12 @@
 {
   "ticker": "BN",
-  "as_of": "2026-09-17",
-  "method": "full",
+  "as_of": "2026-10-28",
+  "method": "owner_earnings_reinvestment_dcf",
   "lawrence_bucket": "multi_sided",
   "classification_inputs": {
     "archetype": "platform",
-    "moat": "stable",
-    "dhando": "partial",
-    "cycle": "-",
-    "payoff_lens": "operating"
+    "valuation_profile": "quality_reinvestment",
+    "method_source": "power_zone_route"
   },
   "inputs": {
     "price": 37.31,
@@ -494,9 +492,13 @@
   },
   "valuation_mode": "economic_value",
   "valuation_methodology": {
-    "mode": "component_economic_value",
-    "horizon_years": 7,
-    "decision_rule": "Use one complete non-overlapping component schedule. The legacy Lawrence return path remains a separate stance gate until the primary evidence bridges are complete."
+    "primary_method": "owner_earnings_reinvestment_dcf",
+    "method_version": "1.0",
+    "automation": "revalidated_existing_approved_proofs",
+    "component_methods": [
+      "net_asset_value",
+      "owner_earnings_reinvestment_dcf"
+    ]
   },
   "component_valuation": {
     "schema_version": "1.0",
@@ -1764,7 +1766,8 @@
       "low": -51.9,
       "base": 0.1,
       "high": 69.2
-    }
+    },
+    "as_of": "2026-10-28"
   },
   "economic_value_analysis": {
     "schema_version": "1.0",
@@ -4578,7 +4581,7 @@
   "human_review": {
     "live_price_confirmed": false
   },
-  "schema_version": "magis.valuation.v2",
+  "schema_version": "3.0",
   "returns": {
     "base_irr_pct": 17.32,
     "unit": "percent_per_year",

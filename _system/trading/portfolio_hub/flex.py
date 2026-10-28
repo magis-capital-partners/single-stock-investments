@@ -146,6 +146,9 @@ def parse_flex_xml(xml: bytes | str, *, account_alias: str, source_run_id: str |
             "right": _pick(row, "putCall"),
             "exchange": _pick(row, "listingExchange", "exchange"),
             "model_code": row.get("model") or "",
+            "originatingTransactionID": row.get("originatingTransactionID") or "",
+            "openTradeID": row.get("openTradeID") or "",
+            "openDateTime": row.get("openDateTime") or "",
         })
     trades = []
     for row in _rows(root, "Trade"):

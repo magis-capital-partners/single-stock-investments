@@ -16,6 +16,7 @@ from pathlib import Path
 from typing import Any
 
 from .classify_positions import classify_position, norm_sym
+from .strategy_ownership import OwnershipRegistry
 from ..portfolio_hub.flex import flex_date, slash_date_order
 
 VERSION = "sleeve_realized.v1"
@@ -264,7 +265,8 @@ def contract_label(event: dict) -> str:
 
 def build_history(events: list[dict], lots: list[dict], *, reports: list[dict], positions: list[dict],
                   ls_symbols: set[str], blacklist: set[str], overrides: list[dict] | None = None,
-                  summaries: list[dict] | None = None, policies: list[dict] | None = None) -> dict:
+                  summaries: list[dict] | None = None, policies: list[dict] | None = None,
+                  registry: OwnershipRegistry | None = None) -> dict:
     """Interpret current broker events without inventing missing lot matches."""
     canceled_trades = {e["cancel_trade_id"] for e in events if e.get("cancel_trade_id")}
     canceled_tx = {e["cancel_transaction_id"] for e in events if e.get("cancel_transaction_id")}
@@ -281,6 +283,8 @@ def build_history(events: list[dict], lots: list[dict], *, reports: list[dict], 
             event = {**event, "is_open": False, "is_close": False, "canceled_execution": True}
         effective.append(event)
     through = max((r["through"] for r in reports if r.get("has_executions")), default="")
+    registry = registry or OwnershipRegistry.build(events, account=events[0]["account"] if events else "", through=through,
+                                                   sources=[r["report_id"] for r in reports])
     lot_map: dict[str, list[dict]] = defaultdict(list)
     for lot in lots:
         key = identifier(pick(lot, "closingTransactionID")) or identifier(pick(lot, "closingTradeID", "closeTradeID", "tradeID"))
@@ -367,6 +371,14 @@ def build_history(events: list[dict], lots: list[dict], *, reports: list[dict], 
                 owner, reason, confidence = "unallocated", "multiple_opening_owners_without_linked_owner_evidence", "unallocated"
             elif owner not in {"excluded", "unallocated"} and len(explicit_owners) == 1 and "unknown" not in known and event["ticker"] != "3905.T":
                 owner, reason, confidence = next(iter(explicit_owners)), "consistent_opening_order_references", "opening_reference"
+            evidence = registry.resolve(account=event["account"], conid=event["conid"], model=event["model"],
+                                        transaction_id=row["opening_transaction_id"], trade_id=row["opening_trade_id"],
+                                        opening_date=opening, opening_time=pick(lot, "openDateTime") if lot else "",
+                                        symbol=event["ticker"], closing_ref=event["order_ref"], sec_type=event["sec_type"])
+            if evidence and (evidence["strategy"] in {"ls_algo", "ownership_review", "letf_option_overlay"}
+                             or strategy not in {"spx_0dte", "etf_0dte", "index_put_hedge"}):
+                owner, strategy, reason = (evidence[k] for k in ("owner", "strategy", "reason"))
+                confidence = "unallocated" if owner == "unallocated" else evidence.get("confidence", "opening_reference")
             applicable = [r for r in rules if r.get("account") == event["account"]
                           and (r.get("record_id") == row["record_id"] or (
                               r.get("conid") == event["conid"] and opening
@@ -385,7 +397,8 @@ def build_history(events: list[dict], lots: list[dict], *, reports: list[dict], 
                         "contract_held_now": event["conid"] in held,
                         "settlement_status": "unknown" if not event["settlement_date"] else (
                             "date_reached" if event["settlement_date"] <= through else "pending"),
-                        "policy_version": policy["policy_id"] if policy else POLICY_VERSION})
+                        "policy_version": policy["policy_id"] if policy else POLICY_VERSION,
+                        "ownership_version": registry.version})
             if owner == "unallocated" or row["realized_usd"] is None:
                 exceptions.append({"event_id": row["record_id"], "reason": reason if owner == "unallocated" else "missing_pnl_or_fx"})
             records.append(row)
@@ -425,4 +438,4 @@ def build_history(events: list[dict], lots: list[dict], *, reports: list[dict], 
                                "differences": comparisons, "exceptions": exceptions,
                                "owner_difference_counts": {owner: sum(owner in c["owners"] for c in comparisons) for owner in ("drew", "michael", "unallocated", "excluded")},
                                "cancellation_count": sum(e["event_type"] == "TradeCancel" for e in events)},
-            "policy_version": POLICY_VERSION}
+            "policy_version": POLICY_VERSION, "ownership_version": registry.version}

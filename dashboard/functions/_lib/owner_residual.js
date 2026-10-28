@@ -176,6 +176,10 @@ export function classifyPosition(pos, {
   }
 
   const strategyName = option ? (under || ticker) : ticker;
+  if ((ref.startsWith('ETF_LS|') || ref.startsWith('B5P|'))
+      && !(option && /^ETF_LS\|MANUAL\|SELL(?:PUT|CALL)\|/.test(ref))) {
+    return { ticker: strategyName || ticker, bucket: 'etf_ls', reason: 'executed_ls_order_reference', owner: null };
+  }
   if (option && (ETF_LS_REFS.some((tag) => ref.includes(tag)) || letf.has(strategyName))) {
     return { ticker: strategyName || ticker, bucket: "drew", reason: "ls_algo_option_overlay", owner: "drew" };
   }

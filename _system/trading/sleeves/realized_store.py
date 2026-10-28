@@ -4,6 +4,7 @@ from __future__ import annotations
 import gzip
 import hashlib
 import json
+import os
 import sqlite3
 from datetime import date, datetime, timezone
 from pathlib import Path
@@ -196,11 +197,19 @@ class RealizedStore:
                    "tradeDate": action.get("dateTime") or action.get("date") or action.get("reportDate"), "openCloseIndicator": "C"}
             source = next(r for r in reports if r["report_id"] == action["_source_report_id"])
             action_events.append(normalize_event(raw, source))
+        from .strategy_ownership import OwnershipRegistry, dated_universes
+        prior_path = self.root / 'ownership-current.json'
+        previous = OwnershipRegistry.load(prior_path, account=account) if prior_path.exists() else None
+        registry = OwnershipRegistry.build(events, account=account,
+            through=max(r["through"] for r in reports if r.get("has_executions")),
+            sources=[r["report_id"] for r in reports if r["report_id"] in used_reports],
+            universes=dated_universes(os.environ.get("SLEEVE_LS_UNIVERSE_ROOT")), previous=previous)
+        used_reports.update(e['report_id'] for e in registry.payload['identities'].values() if e.get('ownership'))
         history = build_history(events, lots, reports=reports, positions=positions,
-                                ls_symbols=ls_symbols, blacklist=blacklist, overrides=overrides, summaries=summaries, policies=policies)
+                                ls_symbols=ls_symbols, blacklist=blacklist, overrides=overrides, summaries=summaries, policies=policies, registry=registry)
         if action_events:
             history = build_history(events + action_events, lots, reports=reports, positions=positions,
-                                    ls_symbols=ls_symbols, blacklist=blacklist, overrides=overrides, summaries=summaries, policies=policies)
+                                    ls_symbols=ls_symbols, blacklist=blacklist, overrides=overrides, summaries=summaries, policies=policies, registry=registry)
         # Corporate actions/EAE without a linked trade stay visible as coverage
         # exceptions. No disappearance-based profit or synthetic sale is made.
         missing_action_pnl = sum(a.get("fifoPnlRealized") in (None, "") and a.get("realizedPnl") in (None, "") for a in unmatched_actions.values())
@@ -219,4 +228,5 @@ class RealizedStore:
         history.update({"account": account, "storage_version": "packed_v1", "source_reports": [{k: r[k] for k in
                         ("report_id", "from", "through", "generated", "source_name", "has_executions")} for r in reports if r["report_id"] in used_reports]})
         history["generation_id"] = digest(history)
+        registry.save(self.root / "ownership-current.json")
         return history

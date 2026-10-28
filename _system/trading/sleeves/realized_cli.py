@@ -8,6 +8,7 @@ from __future__ import annotations
 import argparse
 import base64
 import hashlib
+import gzip
 import json
 import os
 import sys
@@ -42,6 +43,7 @@ def publication(history: dict) -> tuple[dict, list[list[dict]]]:
     batches = partition(rows)
     recon = history["reconciliation"]
     manifest = {k: history[k] for k in ("through", "coverage", "policy_version", "source_reports")}
+    manifest["ownership_version"] = history.get("ownership_version")
     manifest.update({"row_count": len(rows), "batch_hashes": [digest(b) for b in batches],
                      "storage": history.get("storage_version", "row_v1"),
                      "source_generated": max((r["generated"] for r in history["source_reports"]), default=history["through"] + "T00:00:00"),
@@ -63,13 +65,23 @@ def publish(store: RealizedStore, history: dict, *, url: str, token: str) -> dic
         return {"duplicate": True, "generation_id": generation}
     base = {"schema_version": VERSION, "generation_id": generation, "account": history["account"]}
     archives = []
+    sources = []
     for source in history["source_reports"]:
         record = store.db.execute("SELECT archive_path FROM realized_reports WHERE report_id=?", (source["report_id"],)).fetchone()
+        sources.append({**source, "path": Path(record[0]), "format": "xml"})
+    if history.get("ownership_version"):
+        identity = history["ownership_version"]
+        registry_path = store.root / f"ownership-{identity}.json"
+        compressed = registry_path.with_suffix(".json.gz")
+        if not compressed.exists():
+            compressed.write_bytes(gzip.compress(registry_path.read_bytes(), mtime=0))
+        sources.append({"report_id": identity, "path": compressed, "format": "strategy_ownership.json"})
+    for source in sources:
         part_shas = []
-        with Path(record[0]).open("rb") as handle:
+        with source["path"].open("rb") as handle:
             while data := handle.read(180_000):
                 part_shas.append(hashlib.sha256(data).hexdigest())
-        archives.append({"report_id": source["report_id"], "part_shas": part_shas, "compression": "gzip"})
+        archives.append({"report_id": source["report_id"], "part_shas": part_shas, "compression": "gzip", "format": source["format"]})
     manifest["archives"] = archives
 
     def send(body):
@@ -96,12 +108,11 @@ def publish(store: RealizedStore, history: dict, *, url: str, token: str) -> dic
     send({"kind": "begin", "manifest": manifest})
     # Immutable original XML is archived as bounded gzip parts in private R2.
     # Each part carries its own checksum; the manifest records reconstruction.
-    for source in history["source_reports"]:
-        record = store.db.execute("SELECT archive_path FROM realized_reports WHERE report_id=?", (source["report_id"],)).fetchone()
+    for source in sources:
         known = send({"kind": "archive-status", "report_id": source["report_id"]}).get("parts", [])
         expected = next(a for a in archives if a["report_id"] == source["report_id"])["part_shas"]
         known_parts = {p["part"]: p["content_sha"] for p in known}
-        with Path(record[0]).open("rb") as handle:
+        with source["path"].open("rb") as handle:
             part = 0
             while data := handle.read(180_000):
                 if known_parts.get(part) != expected[part]:
@@ -190,6 +201,8 @@ def main(argv=None) -> int:
                     raise ValueError("trade report is missing; retaining last valid realized history")
                 if (time.time() - trades.stat().st_mtime) / 3600 > args.stale_hours:
                     raise ValueError("trade file is stale; retaining last valid realized history")
+                if (time.time() - args.positions.stat().st_mtime) / 3600 > args.stale_hours:
+                    raise ValueError("position file is stale; retaining last valid ownership registry")
                 trade_period = read_report(trades, account=args.account)
                 position_period = read_report(args.positions, account=args.account)
                 if trade_period["through"] != position_period["through"]:

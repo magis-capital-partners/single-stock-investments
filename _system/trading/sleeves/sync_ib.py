@@ -222,6 +222,13 @@ def sync_holdings(
     rows, source = load_positions(cfg, supplied=positions, flex_path=flex_path, flex_marks=flex_marks)
     family = expand_blacklist_symbols(load_blacklist(cfg), load_etf_to_under(cfg))
     letf = load_etf_ls_universe(cfg)
+    from .strategy_ownership import annotate_lots, configured_registry
+    from _system.trading.portfolio_hub.flex import flex_date
+    account = str(rows[0].get("account") or "") if rows else str(cfg.get("account") or "")
+    session = max((flex_date(r.get("reportDate")) or "" for r in rows), default="")
+    registry = configured_registry(account=account or None, through=session or None)
+    if registry:
+        rows = annotate_lots([dict(r) for r in rows], registry, account=registry.payload["account"])
     drew_symbols = [
         norm_sym(symbol)
         for symbol in ((cfg.get("operators") or {}).get("drew") or {}).get("symbols") or []
@@ -241,6 +248,8 @@ def sync_holdings(
     tags_by_ticker = {(t.get("owner"), str(t.get("ticker") or "").upper()): t for t in store.sleeve_tags()}
     for row in classified:
         cls = row.get("classification") or {}
+        if row.get("_ownership"):
+            continue  # A ticker tag cannot overwrite broker-linked lot ownership.
         # Another system's row is never re-owned by a sleeve tag. This is what
         # keeps a Drew tag on SPY from claiming an etf-0dte delivery.
         if cls.get("bucket") in OTHER_SYSTEM_BUCKETS:
