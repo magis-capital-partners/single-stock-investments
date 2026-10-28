@@ -13,6 +13,7 @@ import csv
 import io
 import json
 import shutil
+import subprocess
 from pathlib import Path
 
 from audit_fund_letter_exposure import audit
@@ -35,20 +36,63 @@ def is_placeholder(value):
     return isinstance(value, dict) and value.get("private_snapshot") is True or isinstance(value, list) and len(value) == 1 and is_placeholder(value[0])
 
 
+ATTRIBUTE_MARKER = "# Checksum-protected public counterparts of private Fund Letters assets."
+ATTRIBUTE_END = "# End private Fund Letters asset rules."
+
+
+def _attribute_outside(text: str) -> tuple[str, str]:
+    """Lines before the managed block and after its end marker.
+
+    One newline that terminates the end marker is not part of the trailer.
+    Further blank lines are. They were dropped when lstrip ate every leading
+    newline.
+    """
+    if not text or ATTRIBUTE_MARKER not in text:
+        return text or "", ""
+    before, rest = text.split(ATTRIBUTE_MARKER, 1)
+    if ATTRIBUTE_END not in rest:
+        return before, ""
+    after = rest.split(ATTRIBUTE_END, 1)[1]
+    if after.startswith("\r\n"):
+        after = after[2:]
+    elif after.startswith("\n"):
+        after = after[1:]
+    return before, after
+
+
+def _head_attributes(root: Path) -> str:
+    try:
+        shown = subprocess.run(
+            ["git", "-C", str(root), "show", "HEAD:.gitattributes"],
+            capture_output=True, text=True, check=False,
+        )
+    except OSError:
+        return ""
+    return shown.stdout if shown.returncode == 0 else ""
+
+
+def _preserved_outside(worktree: str, committed: str) -> tuple[str, str]:
+    """Keep every non-managed line. A sparse checkout that never had the file
+    must not replace HEAD with only the managed section.
+    """
+    before_work, after_work = _attribute_outside(worktree)
+    before_head, after_head = _attribute_outside(committed)
+    work_lines = (before_work + after_work).splitlines()
+    missing = [line for line in (before_head + after_head).splitlines() if line.strip() and line not in work_lines]
+    if not worktree or missing:
+        return before_head, after_head
+    return before_work, after_work
+
+
 def write_public_attributes(root: Path, manifest: dict) -> None:
     attributes = root / ".gitattributes"
-    prior = attributes.read_text(encoding="utf-8") if attributes.exists() else ""
-    marker = "# Checksum-protected public counterparts of private Fund Letters assets."
-    end_marker = "# End private Fund Letters asset rules."
+    worktree = attributes.read_text(encoding="utf-8") if attributes.is_file() else ""
+    before, after = _preserved_outside(worktree, _head_attributes(root))
     rules = ["/dashboard/private-assets.json text eol=lf"] + [json.dumps("/dashboard/" + p) + " text eol=lf" for p in sorted(manifest.get("assets", {}))] + [json.dumps("/" + p) + " text eol=lf" for p in sorted(manifest.get("repository_assets", {}))]
-    section = marker + "\n" + "\n".join(rules) + "\n" + end_marker + "\n"
-    if marker in prior:
-        before, old = prior.split(marker, 1)
-        after = old.split(end_marker, 1)[1].lstrip("\r\n") if end_marker in old else ""
-        updated = before + section + after
-    else:
-        updated = prior.rstrip() + "\n" + section
-    attributes.write_text(updated, encoding="utf-8")
+    section = ATTRIBUTE_MARKER + "\n" + "\n".join(rules) + "\n" + ATTRIBUTE_END + "\n"
+    if not before and not after and worktree and ATTRIBUTE_MARKER not in worktree:
+        before = worktree if worktree.endswith("\n") else worktree + "\n"
+    attributes.write_text(before + section + after, encoding="utf-8")
 
 
 def migrate(root: Path = ROOT, *, paths: list[str] | None = None) -> dict:
