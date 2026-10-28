@@ -27,19 +27,19 @@
     {
       "edge_id": "gold_spot_to_royalty_sentiment",
       "theme_id": "gold_royalties",
-      "label": "Gold spot / GDX-GLD → royalty sentiment",
+      "label": "Gold futures (USD/troy oz) → gold royalty context",
       "from": {
-        "metric": "gold_spot_usd",
-        "unit": "usd_oz_or_gld_proxy",
+        "metric": "gold_futures_usd_oz",
+        "unit": "usd_oz",
         "source": "theme"
       },
       "to": {
-        "tickers": ["RGLD", "MSB"],
-        "kpi_ids": ["gold_spot_proxy"]
+        "tickers": ["FNV", "WPM", "RGLD", "TFPM", "OR"],
+        "kpi_ids": ["gold_futures_usd_oz"]
       },
       "formula": {
         "type": "passthrough_theme",
-        "theme_series": "gold_spot_usd"
+        "theme_series": "gold_futures_usd_oz"
       },
       "evidence_tier": "market",
       "writes": "derived_metrics",

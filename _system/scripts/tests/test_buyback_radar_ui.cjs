@@ -123,12 +123,21 @@ test('Coverage and Shorts routes accept focus parameters',()=>{
  assert.equal(c.parseRouteFromHashString('#/ideas/situations/buyback-events/TEST').situationFocus,'TEST');
 });
 test('route normalization preserves Buyback detail and Shorts focus',()=>{
- let last;const c={activeView:'holdings',selected:'TEST',location:{hash:'#/research/coverage/TEST?section=buyback'},URLSearchParams,setAppHash:x=>{last=x;}};
+ let last;const c={activeView:'holdings',researchScope:'coverage',selected:'TEST',location:{hash:'#/research/coverage/TEST?section=buyback'},URLSearchParams,setAppHash:x=>{last=x;}};
  vm.createContext(c);vm.runInContext(routeFunction('syncRouteHash'),c);c.syncRouteHash();assert.equal(last,'#/research/coverage/TEST?section=buyback');
  c.activeView='short-alpha';c.shortAlphaSection='ideas';c.location.hash='#/ideas/short-alpha?buyback=TEST';c.syncRouteHash();assert.equal(last,'#/ideas/short-alpha?buyback=TEST');
 });
 test('every inline dashboard script compiles',()=>{
  let count=0;for(const m of index.matchAll(/<script\b([^>]*)>([\s\S]*?)<\/script>/g)){if(/\bsrc=/.test(m[1]) || /application\/(?:json|ld\+json)/.test(m[1]))continue;new vm.Script(m[2]);count++;}assert.ok(count>0);
+});
+test('observed-peak sorting does not silently use one-year reduction',async()=>{
+ const h=harness();await h.api.load();
+ const sample=h.api.company('TEST');
+ const a={ticker:'A',buyback:{...sample,metrics:{...sample.metrics,net_reduction_1y:{value:1,status:'verified'},since_peak:{value:70,status:'verified'}}}};
+ const b={ticker:'B',buyback:{...sample,metrics:{...sample.metrics,net_reduction_1y:{value:20,status:'verified'},since_peak:{value:30,status:'verified'}}}};
+ assert.ok(h.api.compareRows(a,b,'since_peak',false)<0);
+ assert.ok(h.api.compareRows(a,b,'retired_since_peak_pct',false)<0);
+ assert.ok(h.api.compareRows(a,b,'net_reduction_1y',false)>0);
 });
 
 test('an overdue publication cannot retain positive rankings or active events',async()=>{
@@ -142,6 +151,6 @@ test('an overdue publication cannot retain positive rankings or active events',a
 });
 
 test('workspace routes retain a legacy Buyback focus in the Business view',()=>{
- let last; const c={activeView:'holdings',selected:'TEST',ResearchWorkspace:{activeTab:()=> 'business'},location:{hash:'#/research/coverage/TEST?section=buyback'},URLSearchParams,setAppHash:value=>{last=value;}};
+ let last; const c={activeView:'holdings',researchScope:'coverage',selected:'TEST',ResearchWorkspace:{activeTab:()=> 'business'},location:{hash:'#/research/coverage/TEST?section=buyback'},URLSearchParams,setAppHash:value=>{last=value;}};
  vm.createContext(c);vm.runInContext(routeFunction('syncRouteHash'),c);c.syncRouteHash();assert.equal(last,'#/research/coverage/TEST?section=business&focus=buyback');
 });

@@ -28,6 +28,10 @@ IGNORE_NAMES = {"README.md", "AGENTS.md", "SKILL.md", "INDEX.csv", "manifest.jso
                 "duplicate_audit.json", "funds_unresolved.json", "funds.json", "manifest.csv", "sources.json"}
 SKIP_PARTS = {".git", "_eval", "tests", "__pycache__", "node_modules", "dashboard-private", "sec-edgar"}
 SHARED_MODELS = {
+    "_system/scripts/commodity_configs/crude.json": "Oil supply demand and inventory model assumptions",
+    "_system/scripts/commodity_configs/copper.json": "Copper supply demand and concentrate model assumptions",
+    "_system/scripts/commodity_configs/gold.json": "Gold monetary stock and price model assumptions",
+    "_system/scripts/commodity_configs/silver.json": "Silver supply demand and gold-linked price model assumptions",
     "dashboard/data/energy_model.json": "Natural gas supply and demand model",
     "dashboard/data/energy_btc_bridge.json": "Natural gas and Bitcoin mining sensitivity model",
     "_system/scripts/energy_model_config.json": "Natural gas model assumptions and reference forecast",
@@ -110,6 +114,13 @@ def read_companies(root: Path) -> dict:
     for row in core.get("tickers", []):
         if row.get("ticker"):
             companies[row["ticker"]] = {**companies.get(row["ticker"], {}), **{k: row[k] for k in ("company", "market", "exchange", "display_ticker") if row.get(k)}}
+    # A new watchlist member must receive an archive before its valuation or
+    # ordinary coverage row is ready. Existing issuer identities take precedence.
+    compounders = load(root / "_system/reference/core_compounders.json")
+    for ticker in compounders.get("tickers", []):
+        name = compounders.get("issuers", {}).get(ticker, {}).get("display_name")
+        if name:
+            companies.setdefault(ticker, {"company": name})
     if not companies:
         raise RuntimeError("No company universe; refusing to publish an empty library")
     return companies
@@ -305,6 +316,18 @@ class Builder:
                     record["model_purpose"] = body.get("description") or body.get("purpose")
                     record["assumptions"] = body.get("assumptions")
                     record["source_refs"] = body.get("sources") or body.get("source_refs") or ([body["reference"]] if body.get("reference") else None)
+                    if rel.startswith("_system/scripts/commodity_configs/") and rel in SHARED_MODELS:
+                        # The reviewed issuer list defines model relevance. A
+                        # company name inside generic assumptions is not a
+                        # direct company discussion and must not broaden scope.
+                        record["relationships"] = [{"ticker": ticker, "relationship": "industry_context",
+                            "reason": body.get("question") or title, "match": "reviewed_business_driver",
+                            "passages": [], "theme": body["id"] + "-market"}
+                            for ticker in body.get("related_tickers", []) if ticker in self.companies]
+                        record["review"] = []
+                        record["model_purpose"] = body.get("question")
+                        record["assumptions"] = body.get("scenarios")
+                        record["date"] = body.get("version", "").rsplit(".", 1)[0] or record["date"]
             except ValueError:
                 pass
         rendition = str(Path(logical).with_suffix(""))
@@ -570,7 +593,8 @@ class Builder:
                 old["availability"] = "superseded"
                 self.index.anchors.pop(url_anchor(url), None)
                 old = {}
-            text, state = self.text(old), old.get("processing_status", "awaiting_extraction")
+            old_text = self.text(old)
+            text, state = old_text, old.get("processing_status", "awaiting_extraction")
             prior = self.previous_versions.get(("drive:" + item["id"], revision), {})
             if not text and prior.get("text_cache"):
                 text, state = self.text(prior), prior["processing_status"]
@@ -596,7 +620,14 @@ class Builder:
                     state = "access_unavailable" if getattr(getattr(exc, "resp", None), "status", None) in {403, 404} else "awaiting_extraction"
                 write(cachefile, {"text": text, "status": state, "attempted_at": time.time()})
             identity = "md5:" + item["md5Checksum"] if item.get("md5Checksum") else "drive:" + item["id"] + ":" + revision
-            rec = self.base(identity, name, "drive", text=text, state=state, explicit=explicit, locations=[{"kind": "drive", "url": url, "label": "Open original"}], mime=item["mimeType"], path=full)
+            # Exact originals already matched in this run retain all their
+            # verified passages when SourceIndex merges their Drive location.
+            # Recheck the new title/folder, not a second copy of the same body.
+            # Changed revisions, newly extracted text and prior-run-only records
+            # still receive the complete full-text match.
+            already_matched = bool(old_text and text == old_text and old.get("processing_status") == "indexed")
+            rec = self.base(identity, name, "drive", text="" if already_matched else text, state=state, explicit=explicit, locations=[{"kind": "drive", "url": url, "label": "Open original"}], mime=item["mimeType"], path=full)
+            rec["text"] = text
             rec.update({"family": "drive:" + item["id"], "revision": revision, "modified_at": item.get("modifiedTime"), "format": item["mimeType"]})
             if state == "access_unavailable":
                 rec["availability"] = "access_unavailable"
@@ -606,6 +637,8 @@ class Builder:
             if props.get("sha256"):
                 anchors.append("sha:" + props["sha256"])
             self.add(rec, anchors)
+            if count % 5000 == 0:
+                print(f"Research inventory: drive: {count} originals processed", flush=True)
         self.receipt("drive", count)
 
     def publish(self):

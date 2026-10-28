@@ -124,6 +124,8 @@ PROFILES: dict[str, list[list[str]]] = {
         ["_system/scripts/fetch_crypto_panel.py", "--skip-snowball"],
         ["_system/scripts/build_hk_snowball_model.py"],
         ["_system/scripts/refresh_energy_model.py", "--optional"],
+        ["_system/scripts/refresh_commodity_models.py", "--optional"],
+        ["_system/scripts/build_compounder_roster.py"],
         ["_system/scripts/scaffold_industry_kpi_ledgers.py", "--write"],
         ["_system/scripts/resolve_linkages.py", "--update-ledgers"],
         [

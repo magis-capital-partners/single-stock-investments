@@ -1,0 +1,318 @@
+{
+  "id": "crude",
+  "title": "WTI & Brent",
+  "engine": "physical_inventory",
+  "question": "Are inventories rebuilding, and how quickly can supply respond?",
+  "unit": "USD/barrel",
+  "in_base_irr": false,
+  "version": "2026-10-28.1",
+  "related_tickers": [
+    "XOM",
+    "CVX",
+    "OXY",
+    "COP",
+    "EOG",
+    "DVN",
+    "PXD",
+    "FANG",
+    "TPL",
+    "PSK.TO",
+    "DMLP",
+    "SJT",
+    "PBT",
+    "SBR",
+    "KRP",
+    "BSM",
+    "VNOM"
+  ],
+  "sources": [
+    {
+      "id": "eia_oil_balance",
+      "label": "EIA October 2026 STEO · Table 3a",
+      "url": "https://www.eia.gov/outlooks/steo/tables/pdf/3atab.pdf",
+      "published_at": "2026-10-06",
+      "max_age_days": 45,
+      "required": true,
+      "capture_kind": "publisher_bytes",
+      "sha256": "f174709271fba854d64ce21b28a5cb74881a1d418dd9fabdfd6404a255f471c3",
+      "reviewed_at": "2026-10-28"
+    },
+    {
+      "id": "eia_oil_price",
+      "label": "EIA October 2026 STEO · Table 2",
+      "url": "https://www.eia.gov/outlooks/steo/tables/pdf/2tab.pdf",
+      "published_at": "2026-10-06",
+      "max_age_days": 45,
+      "required": true,
+      "capture_kind": "publisher_bytes",
+      "sha256": "abb88242710b6418ee486b537d4e1345a1b3cb985e9d2ad3be464db644ffcfd2",
+      "reviewed_at": "2026-10-28"
+    },
+    {
+      "id": "dallas_cost",
+      "label": "Dallas Fed Q1 2026 new-well survey",
+      "url": "https://www.dallasfed.org/research/surveys/des/2026/2601",
+      "published_at": "2026-03-25",
+      "max_age_days": 400,
+      "required": false,
+      "capture_kind": "publisher_bytes",
+      "sha256": "6422b2b7dfae651d27ab9fe8f18a01946e7617ae5ca6ea81a1fe22eea59b8cf1",
+      "reviewed_at": "2026-10-28"
+    }
+  ],
+  "reference": {
+    "forecast_start": "2026-Q4",
+    "published_forecast_end": "2027-Q4",
+    "starting_oecd_stock_mb": 2683,
+    "seasonal_oecd_stock_mb": [
+      2741,
+      2779,
+      2858,
+      2832
+    ],
+    "normal_basis": "2025 same-quarter comparison; five-year seasonal normal unavailable",
+    "quarterly": [
+      {
+        "period": "2025-Q1",
+        "production_mbd": 103.58,
+        "consumption_mbd": 102.66,
+        "world_draw_mbd": -0.92,
+        "opec_mbd": 28.67,
+        "oecd_consumption_mbd": 45.66,
+        "oecd_stock_mb": 2741,
+        "brent": 75.83,
+        "wti": 71.85
+      },
+      {
+        "period": "2025-Q2",
+        "production_mbd": 105.19,
+        "consumption_mbd": 104.45,
+        "world_draw_mbd": -0.74,
+        "opec_mbd": 29.11,
+        "oecd_consumption_mbd": 46.17,
+        "oecd_stock_mb": 2779,
+        "brent": 68.01,
+        "wti": 64.63
+      },
+      {
+        "period": "2025-Q3",
+        "production_mbd": 107.9,
+        "consumption_mbd": 105.37,
+        "world_draw_mbd": -2.53,
+        "opec_mbd": 29.53,
+        "oecd_consumption_mbd": 46.95,
+        "oecd_stock_mb": 2858,
+        "brent": 69,
+        "wti": 65.78
+      },
+      {
+        "period": "2025-Q4",
+        "production_mbd": 108.42,
+        "consumption_mbd": 105.1,
+        "world_draw_mbd": -3.32,
+        "opec_mbd": 30.01,
+        "oecd_consumption_mbd": 46.51,
+        "oecd_stock_mb": 2832,
+        "brent": 63.63,
+        "wti": 59.64
+      },
+      {
+        "period": "2026-Q1",
+        "production_mbd": 103.66,
+        "consumption_mbd": 102.87,
+        "world_draw_mbd": -0.79,
+        "opec_mbd": 27.46,
+        "oecd_consumption_mbd": 45.91,
+        "oecd_stock_mb": 2798,
+        "brent": 81.11,
+        "wti": 72.74
+      },
+      {
+        "period": "2026-Q2",
+        "production_mbd": 96.49,
+        "consumption_mbd": 100.04,
+        "world_draw_mbd": 3.55,
+        "opec_mbd": 20.35,
+        "oecd_consumption_mbd": 44.57,
+        "oecd_stock_mb": 2730,
+        "brent": 102.93,
+        "wti": 95.48
+      },
+      {
+        "period": "2026-Q3",
+        "production_mbd": 101.25,
+        "consumption_mbd": 103.12,
+        "world_draw_mbd": 1.87,
+        "opec_mbd": 23.58,
+        "oecd_consumption_mbd": 46.18,
+        "oecd_stock_mb": 2683,
+        "brent": 95.95,
+        "wti": 87.02
+      },
+      {
+        "period": "2026-Q4",
+        "production_mbd": 102.97,
+        "consumption_mbd": 103.66,
+        "world_draw_mbd": 0.69,
+        "opec_mbd": 24.38,
+        "oecd_consumption_mbd": 46.05,
+        "oecd_stock_mb": 2645,
+        "brent": 104.69,
+        "wti": 97
+      },
+      {
+        "period": "2027-Q1",
+        "production_mbd": 106.11,
+        "consumption_mbd": 103.08,
+        "world_draw_mbd": -3.03,
+        "opec_mbd": 26.87,
+        "oecd_consumption_mbd": 45.72,
+        "oecd_stock_mb": 2710,
+        "brent": 94.9,
+        "wti": 90.9
+      },
+      {
+        "period": "2027-Q2",
+        "production_mbd": 109.55,
+        "consumption_mbd": 104.6,
+        "world_draw_mbd": -4.95,
+        "opec_mbd": 29.49,
+        "oecd_consumption_mbd": 45.79,
+        "oecd_stock_mb": 2849,
+        "brent": 87,
+        "wti": 83
+      },
+      {
+        "period": "2027-Q3",
+        "production_mbd": 110.92,
+        "consumption_mbd": 105.54,
+        "world_draw_mbd": -5.38,
+        "opec_mbd": 30.1,
+        "oecd_consumption_mbd": 46.74,
+        "oecd_stock_mb": 2972,
+        "brent": 80.03,
+        "wti": 76.03
+      },
+      {
+        "period": "2027-Q4",
+        "production_mbd": 111.55,
+        "consumption_mbd": 105.33,
+        "world_draw_mbd": -6.23,
+        "opec_mbd": 30.21,
+        "oecd_consumption_mbd": 46.41,
+        "oecd_stock_mb": 3102,
+        "brent": 73.94,
+        "wti": 69.94
+      }
+    ],
+    "spare_capacity_mbd": null,
+    "cushing_stocks_mb": null,
+    "east_coast_distillate_days": null
+  },
+  "scenarios": [
+    {
+      "id": "steo",
+      "label": "Published outlook → extension",
+      "production_growth_pct": 0.4,
+      "demand_growth_pct": 1,
+      "supply_shock_mbd": 0,
+      "demand_shock_mbd": 0,
+      "shock_decay_per_year": 0.65,
+      "shale_response_mbd": 0,
+      "shale_lag_quarters": 4,
+      "oecd_shock_share": 0.25,
+      "anchor_brent": 80,
+      "usd_per_inventory_day": 0.8,
+      "disruption_premium": 0,
+      "brent_wti_spread": 4,
+      "assumption_basis": "Analyst sensitivities, not calibrated price forecasts. Shale responds after four above-cost quarters; lag is 12 months."
+    },
+    {
+      "id": "disruption_persists",
+      "label": "Disruption persists",
+      "production_growth_pct": 0.4,
+      "demand_growth_pct": 1,
+      "supply_shock_mbd": -2,
+      "demand_shock_mbd": 0,
+      "shock_decay_per_year": 0.65,
+      "shale_response_mbd": 0,
+      "shale_lag_quarters": 4,
+      "oecd_shock_share": 0.25,
+      "anchor_brent": 80,
+      "usd_per_inventory_day": 0.8,
+      "disruption_premium": 18,
+      "brent_wti_spread": 8,
+      "assumption_basis": "Analyst sensitivities, not calibrated price forecasts. Shale responds after four above-cost quarters; lag is 12 months."
+    },
+    {
+      "id": "flows_normalize",
+      "label": "Flows normalize",
+      "production_growth_pct": 0.4,
+      "demand_growth_pct": 1,
+      "supply_shock_mbd": 0.75,
+      "demand_shock_mbd": 0,
+      "shock_decay_per_year": 0.65,
+      "shale_response_mbd": 0,
+      "shale_lag_quarters": 4,
+      "oecd_shock_share": 0.25,
+      "anchor_brent": 74,
+      "usd_per_inventory_day": 0.8,
+      "disruption_premium": 0,
+      "brent_wti_spread": 4,
+      "assumption_basis": "Analyst sensitivities, not calibrated price forecasts. Shale responds after four above-cost quarters; lag is 12 months."
+    },
+    {
+      "id": "shale_response",
+      "label": "Delayed shale response",
+      "production_growth_pct": 0.4,
+      "demand_growth_pct": 1,
+      "supply_shock_mbd": 0,
+      "demand_shock_mbd": 0,
+      "shock_decay_per_year": 0.65,
+      "shale_response_mbd": 0.5,
+      "shale_lag_quarters": 4,
+      "oecd_shock_share": 0.25,
+      "anchor_brent": 80,
+      "usd_per_inventory_day": 0.8,
+      "disruption_premium": 0,
+      "brent_wti_spread": 4,
+      "assumption_basis": "Analyst sensitivities, not calibrated price forecasts. Shale responds after four above-cost quarters; lag is 12 months."
+    }
+  ],
+  "falsifiers": [
+    {
+      "metric": "OPEC liquids recovery",
+      "threshold": "At least 29 million barrels/day for two quarters",
+      "source_id": "eia_oil_balance"
+    },
+    {
+      "metric": "OECD inventory normalization",
+      "threshold": "Above the 2025 seasonal comparison for two quarters",
+      "source_id": "eia_oil_balance"
+    },
+    {
+      "metric": "New-well breakeven",
+      "threshold": "Change of more than $10/barrel",
+      "source_id": "dallas_cost"
+    },
+    {
+      "metric": "East Coast distillates",
+      "threshold": "Within 10% of seasonal normal; series currently unavailable",
+      "source_id": "eia_oil_balance"
+    }
+  ],
+  "limitations": [
+    "Quarterly EIA anchors are retained at their native frequency. Monthly historical prices are a separate series.",
+    "Post-2027 production, demand, inventory allocation and price coefficients are analyst assumptions.",
+    "OECD stocks do not measure world stocks. Cushing, spare capacity and regional distillates remain explicit data gaps.",
+    "No cost curve percentiles or claimed forecasting accuracy. A single vintage cannot establish a backtest."
+  ],
+  "cost_floor": {
+    "value": 66,
+    "unit": "WTI USD/barrel",
+    "status": "supply_response_band",
+    "binding": false,
+    "note": "Average new-well breakeven, not a spot price floor. Permian 67; large firms 59.",
+    "source_id": "dallas_cost"
+  }
+}

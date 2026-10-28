@@ -1848,6 +1848,7 @@
 </style>
 <link rel="stylesheet" href="research-workspace.css?v=20261025">
 <link rel="stylesheet" href="company-research.css?v=20261028">
+<link rel="stylesheet" href="research-desk.css?v=20261028">
 </head>
 <body>
 <a class="skip-link" href="#main-content">Skip to dashboard</a>
@@ -1881,7 +1882,8 @@
     <a class="view-tab" data-view="darwin" href="#/strategies/darwin/overview">Darwin CC <span class="nav-badge">SIGNAL</span></a>
   </nav>
   <nav class="view-tabs workspace-subnav" id="research-subnav" aria-label="Research" hidden>
-    <a class="view-tab" data-view="holdings" href="#/research/coverage">Coverage</a>
+    <a class="view-tab compounder-tab" data-view="holdings" data-research-scope="compounders" href="#/research/compounders">Long Term Compounders</a>
+    <a class="view-tab" data-view="holdings" data-research-scope="coverage" href="#/research/coverage">All coverage</a>
     <a class="view-tab" data-view="valuation" href="#/research/valuation">Decision Queue</a>
   </nav>
   <nav class="view-tabs workspace-subnav" id="ideas-subnav" aria-label="Ideas" hidden>
@@ -1904,6 +1906,8 @@
   <section class="portfolio-panel" id="letf-panel" aria-label="Leveraged ETF strategies"><div id="letf-content"></div></section>
 
   <div class="holdings-view" id="holdings-view">
+  <a class="compounder-entry" id="compounder-entry" href="#/research/compounders"><div><strong>Long Term Compounders</strong><span>Your quality-business watchlist · track valuations, entry prices and share buybacks</span></div><b aria-hidden="true">→</b></a>
+  <div id="compounders-home" hidden></div>
   <div class="toolbar">
     <label class="sr-only" for="search">Search ticker or company</label>
     <input class="search" id="search" name="portfolio_search" autocomplete="off" spellcheck="false" placeholder="Search ticker or company…" aria-label="Search ticker or company" />
@@ -2086,6 +2090,9 @@
 <script src="ui-format.js?v=20260819-currency"></script>
 <script src="portfolio-viz.js?v=20261008-michael-tail"></script>
 <script src="oauth.js"></script>
+<script src="compounders.js?v=20261028"></script>
+<script src="company-models.js?v=20261028"></script>
+<script src="commodity-model-viz.js?v=20261028"></script>
 <script src="research-workspace.js?v=20261027-market-sync"></script>
 <script src="company-research.js?v=20261028"></script>
 <script>
@@ -2275,6 +2282,7 @@ function syncHoldingsQuery() {
   window.history.replaceState(null, '', `${url.pathname}${url.search}${url.hash}`);
 }
 let activeView = 'holdings';
+let researchScope = 'coverage';
 let valuationOpenEvidenceTab = false;
 let expandedPersona = null;
 let activeInsightFilter = 'letters';
@@ -2481,8 +2489,8 @@ function parseRouteFromHashString(hash) {
       watchlistSub: null,
     };
   }
-  const researchMatch = /^#\/research\/(coverage|valuation)(?:\/([^/?#]+))?$/i.exec(hash || '');
-  if (researchMatch) return { view: researchMatch[1].toLowerCase() === 'valuation' ? 'valuation' : 'holdings', ticker: researchMatch[2] ? decodeURIComponent(researchMatch[2]).toUpperCase() : null, watchlistSub: null };
+  const researchMatch = /^#\/research\/(coverage|valuation|compounders)(?:\/([^/?#]+))?$/i.exec(hash || '');
+  if (researchMatch) return { researchScope: researchMatch[1].toLowerCase(), view: researchMatch[1].toLowerCase() === 'valuation' ? 'valuation' : 'holdings', ticker: researchMatch[2] ? decodeURIComponent(researchMatch[2]).toUpperCase() : null, watchlistSub: null };
   if (/^#\/(?:ideas\/)?warrants$/i.test(hash || '')) {
     return { view: 'situations', ticker: null, watchlistSub: null, situationLane: 'warrants', situationFocus: '', situationGatesOpen: true };
   }
@@ -2510,6 +2518,7 @@ function parseRouteFromHashString(hash) {
   if (/^#\/data-status$/i.test(hash || '')) return {view:'insights',insightsSection:'sources',ticker:null,watchlistSub:null};
   const investorMatch=/^#\/insights\/investors(?:\/(signals|directory))?$/i.exec(hash || '');
   if (investorMatch) return {view:'insights',insightsSection:investorMatch[1]==='directory'?'managers':'consensus',ticker:null,watchlistSub:null};
+  if (/^#\/insights\/index-watch$/i.test(hash)) return {view:'situations',situationLane:'forced_sellers',ticker:null,watchlistSub:null};
   const insightsMatch = /^#\/insights\/(overview|activism|data-health|letters|podcasts|videos|inflections|events|index-watch|consensus|funds|documents|tickers|memory|sources|managers)$/i.exec(hash || '');
   if (insightsMatch) {
     const section = insightsMatch[1].toLowerCase();
@@ -2571,7 +2580,7 @@ function syncRouteHash() {
     const requested = params.get('section');
     const section = typeof ResearchWorkspace !== 'undefined' ? ResearchWorkspace.activeTab() : ['overview','sources','models','valuation','business','evidence','buyback'].includes(requested) ? requested : 'overview';
     const focus = ['models','business'].includes(section) && (params.get('section') === 'buyback' || params.get('focus') === 'buyback') ? '&focus=buyback' : '';
-    setAppHash(selected ? `#/research/coverage/${encodeURIComponent(selected)}?section=${section}${focus}` : '#/research/coverage');
+    setAppHash(selected ? `#/research/${researchScope}/${encodeURIComponent(selected)}?section=${section}${focus}` : `#/research/${researchScope}`);
   } else if (activeView === 'valuation') {
     setAppHash('#/research/valuation');
   } else if (activeView === 'watchlist') {
@@ -2601,6 +2610,7 @@ function applyRouteFromHash() {
   if (!data) return false;
   const route = parseRouteFromHash();
   if (!route) return false;
+  if (route.view === 'holdings') researchScope = route.researchScope === 'compounders' ? 'compounders' : 'coverage';
   if (route.view === 'watchlist' && route.watchlistSub && WATCHLIST_VIEWS.has(route.watchlistSub)) {
     watchlistViewMode = route.watchlistSub === 'queue' ? 'all' : route.watchlistSub;
     try { localStorage.setItem(WATCHLIST_VIEW_KEY, watchlistViewMode); } catch (_) { /* ignore */ }
@@ -2622,7 +2632,7 @@ function applyRouteFromHash() {
   setView(route.view, { syncHash: false });
   if (route.view === 'holdings' && route.ticker) {
     const hit = data.tickers.find(x => x.ticker === route.ticker);
-    if (hit || window.BuybackViz?.company(route.ticker)) {
+    if (hit || window.BuybackViz?.company(route.ticker) || window.Compounders?.member(route.ticker)) {
       selectTicker(route.ticker, { syncHash: false, workspaceTab: new URLSearchParams(location.hash.split('?')[1] || '').get('section') || 'overview' });
       return true;
     }
@@ -3528,7 +3538,8 @@ function loadLazyFile(key) {
     index_membership: () => loadShardOnce('file:index_membership', 'data/index_membership.json', (doc) => { data.index_membership = doc; }),
     kpi_trends: () => loadShardOnce('file:kpi_trends', 'data/kpi_trends.json', (doc) => { data.kpi_trends = doc; }),
     technical_signals: () => loadShardOnce('file:technical_signals', 'data/technical_signals.json', (doc) => { data.technical_signals = doc; }),
-    world_model: () => loadShardOnce('file:world_model', 'data/world_model.json', (doc) => { data.world_model = doc; }),
+    commodity_models: () => loadShardOnce('file:commodity_models','data/commodity_models.json',doc=>{data.commodity_models=doc;}),
+    world_model: () => loadShardOnce('file:world_model', 'data/world_model.json', (doc) => { data.world_model = CommodityModelViz.cleanLegacyGold(doc); }),
     energy: loadEnergyFiles,
     hk_snowball: () => loadShardOnce('file:hk_snowball', 'data/hk_snowball_model.json', (doc) => { data.hk_snowball_model = doc; }),
     respiratory_model: () => loadShardOnce('file:respiratory_model', 'data/respiratory_model.json', (doc) => { data.respiratory_model = doc; }),
@@ -3554,11 +3565,11 @@ const INSIGHTS_SECTION_SHARDS = {
 };
 // Insights section -> standalone lazy files it needs.
 const INSIGHTS_SECTION_FILES = {
-  inflections: ['kpi_trends', 'respiratory_model'],
+  inflections: ['kpi_trends'],
   index_watch: ['index_membership'],
   documents: ['document_catalog'],
   memory: ['research_memory'],
-  tickers: ['world_model', 'hk_snowball', 'energy'],
+  tickers: ['world_model', 'hk_snowball', 'energy', 'commodity_models'],
 };
 
 function insightsSectionReady(section) {
@@ -3782,6 +3793,7 @@ async function load() {
   renderInsights();
   renderActivist();
   renderMarketRiskView();
+  await Compounders.load().catch(()=>{});
   if (!applyRouteFromHash()) setView('holdings');
   else if (activeView === 'watchlist') renderWatchlistTab();
 }
@@ -3967,6 +3979,8 @@ async function loadSituations() {
         return response.json();
       })
       .then(async value => {
+        await loadLazyFile('index_membership');
+        value.index_membership = data.index_membership || null;
         if (window.BuybackViz) { await BuybackViz.load(); value = BuybackViz.projectSituations(value); }
         situationData = value; return value;
       })
@@ -4019,6 +4033,7 @@ function renderSituations() {
     focus: situationFocus,
     gatesOpen: situationGatesOpen,
   });
+  if(situationLane==='forced_sellers' && data.index_membership && window.IndexViz) IndexViz.bindIndexWatchToggles(content,data.index_membership,{escapeHtml,linkHtml,consolidated:true});
   SpecialSituationsViz.attach(content, situationData, {
     onLane: (lane) => {
       situationLane = lane || 'all';
@@ -4099,6 +4114,7 @@ function setView(view, opts = {}) {
     view = 'portfolio';
   }
   activeView = view;
+  if(view === 'holdings') Compounders.load().then(()=>{if(activeView==='holdings')renderTable();}).catch(()=>{});
   const parentView = ['spx-0dte', 'letf', 'darwin'].includes(view) ? 'strategies'
     : ['holdings', 'valuation'].includes(view) ? 'research'
       : ['watchlist', 'short-alpha', 'warrants', 'situations'].includes(view) ? 'ideas'
@@ -4112,7 +4128,7 @@ function setView(view, opts = {}) {
   document.querySelectorAll('.workspace-subnav').forEach((nav) => { nav.hidden = nav.id !== `${parentView}-subnav`; });
   document.querySelectorAll('.workspace-subnav .view-tab').forEach((link) => {
     const ideasGroupMatch = link.dataset.ideasGroup === 'screens' && view === 'watchlist' && ['nol', 'banks', 'rock', 'buybacks'].includes(watchlistViewMode);
-    const active = ideasGroupMatch || (link.dataset.view === view && (!link.dataset.watchlistRoute || link.dataset.watchlistRoute === watchlistViewMode));
+    const active = ideasGroupMatch || (link.dataset.view === view && (!link.dataset.researchScope || link.dataset.researchScope === researchScope) && (!link.dataset.watchlistRoute || link.dataset.watchlistRoute === watchlistViewMode));
     link.classList.toggle('active', active);
     if (active) link.setAttribute('aria-current', 'page'); else link.removeAttribute('aria-current');
   });
@@ -4375,7 +4391,7 @@ function renderInsights(opts = {}) {
     if (content) {
       content.style.display = 'block';
       const navGroups = [
-        ['Signals', [['events', 'What changed'], ['inflections', 'Inflections'], ['index_watch', 'Index Watch']]],
+        ['Signals', [['events', 'What changed'], ['inflections', 'Inflections']]],
         ['Sources', [['letters', 'Letters'], ['podcasts', 'Podcasts'], ['videos', 'Videos'], ['funds', 'Funds'], ['documents', 'PDF library']]],
         ['Synthesis', [['consensus', 'Consensus'], ['managers', 'Managers'], ['tickers', 'Ticker insights']]],
         ['Memory & health', [['memory', 'Research memory'], ['sources', 'Pipeline status']]],
@@ -4482,6 +4498,7 @@ function renderInsights(opts = {}) {
     pdfTimeMode: insightsPdfTimeMode,
     portfolioMacro: data.portfolio_macro || [],
     portfolioMacroRegime: data.portfolio_macro_regime || null,
+    commodityModels: data.commodity_models || null,
     worldModel: data.world_model || null,
     hkSnowball: data.hk_snowball_model || null,
     energyModel: data.energy_model || null,
@@ -4514,6 +4531,9 @@ function renderInsights(opts = {}) {
   });
   if (insightsSection === 'consensus' && window.WorkspaceTools) content.insertAdjacentHTML('afterbegin',WorkspaceTools.investorNav(false));
   if (window.EnergyModelViz) EnergyModelViz.bind(content);
+  content.classList.toggle('insights-condensed',['tickers','memory'].includes(insightsSection));
+  CommodityModelViz.bind(content);
+  content.querySelectorAll('[data-memory-page]').forEach(b=>b.addEventListener('click',()=>{InsightsViz.setMemoryPage(Number(b.dataset.memoryPage));renderInsights();}));
   if (window.IndexViz && IndexViz.bindIndexWatchToggles && data.index_membership) {
     IndexViz.bindIndexWatchToggles(content, data.index_membership, {
       escapeHtml,
@@ -6076,7 +6096,16 @@ function renderFundNavPanel(t) {
 }
 
 function renderTable() {
-  const rows = filtered();
+  const compounders = researchScope === 'compounders';
+  const host = document.getElementById('compounders-home');
+  host.hidden = !compounders || !!selected;
+  document.getElementById('compounder-entry').hidden = compounders || !!selected;
+  document.querySelector('#holdings-view > .toolbar').hidden = compounders && !selected;
+  document.getElementById('main-grid').style.display = compounders && !selected ? 'none' : '';
+  document.getElementById('summary').style.display = activeView==='holdings' && !compounders ? '' : 'none';
+  document.getElementById('watchlist-wrap').style.display = activeView==='holdings' && !compounders && (data.watchlist||[]).length ? '' : 'none';
+  if(activeView==='holdings' && compounders && !selected) Compounders.mount(host,data.tickers,loadTickerDetail);
+  const rows = compounders ? Compounders.rows(data.tickers).map(r=>({...r.record,ticker:r.ticker,company:r.name})) : filtered();
   const grid = document.getElementById('main-grid');
   const list = document.getElementById('research-stock-list');
   const tableWrap = grid.querySelector('.table-wrap');
@@ -6088,7 +6117,7 @@ function renderTable() {
   if (list) {
     list.hidden = !selected;
     if (selected) {
-      list.innerHTML = `<div class="rw-list-count">${rows.length} matching stocks</div>` + rows.map(t => `<a class="rw-stock-link" href="#/research/coverage/${encodeURIComponent(t.ticker)}" data-research-ticker="${escapeHtml(t.ticker)}" aria-current="${selected === t.ticker}"><strong>${escapeHtml(t.display_ticker || t.ticker)}</strong><span>${escapeHtml(t.company || '')}</span><small>${escapeHtml(t.classification?.stance || 'unassigned')} · ${escapeHtml(String(t.valuation_decision?.model_level || t.valuation_decision?.status || 'unmodeled').replace(/_/g, ' '))}</small></a>`).join('');
+      list.innerHTML = `<div class="rw-list-count">${rows.length} matching stocks</div>` + rows.map(t => `<a class="rw-stock-link" href="#/research/${researchScope}/${encodeURIComponent(t.ticker)}" data-research-ticker="${escapeHtml(t.ticker)}" aria-current="${selected === t.ticker}"><strong>${escapeHtml(t.display_ticker || t.ticker)}</strong><span>${escapeHtml(t.company || '')}</span><small>${escapeHtml(t.classification?.stance || 'unassigned')} · ${escapeHtml(String(t.valuation_decision?.model_level || t.valuation_decision?.status || 'unmodeled').replace(/_/g, ' '))}</small></a>`).join('');
       list.querySelectorAll('[data-research-ticker]').forEach(link => link.addEventListener('click', event => {
         if (event.ctrlKey || event.metaKey || event.shiftKey || event.altKey) return;
         event.preventDefault(); selectTicker(link.dataset.researchTicker);
@@ -6205,8 +6234,9 @@ function selectTicker(ticker, opts = {}) {
   let t = data.tickers.find(x => x.ticker === ticker);
   if (!t) {
     const buyback = window.BuybackViz?.company(ticker);
-    if (!buyback) return;
-    t = { ticker, company: buyback.company, buyback, __detail: true, recent_files: [], links: {} };
+    const compounder = window.Compounders?.member(ticker);
+    if (!buyback && !compounder) return;
+    t = { ticker, company: buyback?.company || compounder.name, buyback, __detail: true, recent_files: [], links: {} };
   }
     // Every per-share figure in the panels below is quoted in this listing's
   // currency. Publish it before any of them render.
@@ -6402,12 +6432,14 @@ ${essentialInsights}`, true)}
   rw.mount(document.getElementById('detail'), t, helpers, renderers, {
     tab: initialTab,
     onTab: (tab) => {
-      const hash = `#/research/coverage/${encodeURIComponent(ticker)}?section=${tab}`;
+      const hash = `#/research/${researchScope}/${encodeURIComponent(ticker)}?section=${tab}`;
       history.replaceState(null, '', `${location.pathname}${location.search}${hash}`);
       try { sessionStorage.setItem(ROUTE_STORAGE_KEY, hash); } catch (_) { /* ignore quota */ }
     },
     afterRender: (tab) => {
       if (tab === 'models') {
+        CompanyModels.mount(document.querySelector('#detail [data-company-models]'),ticker,loadLazyFile,data,{escapeHtml,linkHtml});
+        CommodityModelViz.mountCompany(document.querySelector('#detail [data-company-commodities]'),ticker);
         const params = new URLSearchParams(location.hash.split('?')[1] || '');
         if (params.get('section') === 'buyback' || params.get('focus') === 'buyback') queueMicrotask(() => {
           const target = document.querySelector('#detail [data-buyback-detail]');
@@ -6680,6 +6712,7 @@ document.getElementById('device-cancel').addEventListener('click', closeDeviceMo
 document.querySelectorAll('#view-tabs .view-tab, .workspace-subnav .view-tab').forEach(link => {
   link.addEventListener('click', (event) => {
     event.preventDefault();
+    if(link.dataset.view==='holdings') researchScope=link.dataset.researchScope || 'coverage';
     if (link.dataset.watchlistRoute) watchlistViewMode = link.dataset.watchlistRoute;
     if (link.getAttribute('href') === '#/ideas/all') watchlistViewMode = 'all';
     if (link.getAttribute('href') === '#/ideas/situations') {

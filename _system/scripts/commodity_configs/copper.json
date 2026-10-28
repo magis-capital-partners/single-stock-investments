@@ -1,0 +1,196 @@
+{
+  "id": "copper",
+  "title": "Copper",
+  "engine": "dual_balance",
+  "question": "Can a refined surplus coexist with scarce concentrate?",
+  "unit": "USD/tonne",
+  "in_base_irr": false,
+  "version": "2026-10-28.1",
+  "related_tickers": [
+    "FCX",
+    "SCCO",
+    "TECK",
+    "BHP",
+    "RIO",
+    "ANTO.L",
+    "CS.TO",
+    "IVN.TO",
+    "HBM"
+  ],
+  "sources": [
+    {
+      "id": "icsg_forecast",
+      "label": "ICSG October 2026 forecast",
+      "url": "https://icsg.org/download/2026-10-14-press-release-icsg-copper-market-forecast-2026-2027/",
+      "published_at": "2026-10-14",
+      "max_age_days": 45,
+      "required": true,
+      "capture_kind": "publisher_bytes",
+      "sha256": "bd5acbbc67633d43fa291e0c556a5e5a07cd075c0d2954f96b0f5aeadc6a0e32",
+      "reviewed_at": "2026-10-28"
+    },
+    {
+      "id": "icsg_monthly",
+      "label": "ICSG monthly statistics, October 2026",
+      "url": "https://icsg.org/press-releases/",
+      "published_at": "2026-10-23",
+      "max_age_days": 45,
+      "required": false,
+      "capture_kind": "publisher_bytes",
+      "sha256": "e42040cb75830a079a783bfbf65e9ecfddb56870c3a258af77e061420c4d62de",
+      "reviewed_at": "2026-10-28"
+    }
+  ],
+  "reference": {
+    "annual": [
+      {
+        "year": 2025,
+        "mine_kt": 23180,
+        "refined_kt": 28578,
+        "use_kt": 28159,
+        "balance_kt": 419
+      },
+      {
+        "year": 2026,
+        "mine_kt": 23485,
+        "refined_kt": 28693,
+        "use_kt": 28590,
+        "balance_kt": 104
+      },
+      {
+        "year": 2027,
+        "mine_kt": 24217,
+        "refined_kt": 29673,
+        "use_kt": 29305,
+        "balance_kt": 368
+      }
+    ],
+    "history": [
+      {
+        "period": "2026-08",
+        "price": 14353,
+        "basis": "reviewed_monthly_reference"
+      }
+    ],
+    "price_anchor_usd_tonne": 14353,
+    "china_share_pct": 59,
+    "bonded_stock_adjustment_kt": -37,
+    "apparent_jan_jul_balance_kt": 32,
+    "exchange_stocks": {
+      "period": "2026-08",
+      "total_t": 997600,
+      "year_to_date_change_t": 253000,
+      "COMEX": {
+        "stock_t": null,
+        "ytd_change_t": 238000
+      },
+      "SHFE": {
+        "stock_t": null,
+        "ytd_change_t": -73000
+      },
+      "LME": {
+        "stock_t": null,
+        "ytd_change_t": null
+      },
+      "days_cover": null,
+      "status": "reviewed_reference_levels_incomplete"
+    },
+    "treatment_charge": {
+      "value": null,
+      "status": "headline_not_a_series",
+      "note": "Zero contract-TC report in proposal requires a dated primary-source confirmation before becoming an observation."
+    }
+  },
+  "scenarios": [
+    {
+      "id": "refined_surplus",
+      "label": "Refined surplus dominates",
+      "refined_growth_pct": 2,
+      "demand_growth_pct": 2.2,
+      "mine_growth_pct": 2,
+      "concentrate_disruption_kt": 0,
+      "unreported_china_absorption_kt": 0,
+      "scrap_response_kt": 400,
+      "price_path": [
+        14353,
+        13000,
+        12000,
+        11500,
+        11500,
+        11800,
+        12000
+      ],
+      "assumption_basis": "Prices are analyst paths; disruption applies to refined output once, and price-induced scrap is incremental. No AI demand term is added to ICSG usage."
+    },
+    {
+      "id": "concentrate_scarcity",
+      "label": "Concentrate scarcity persists",
+      "refined_growth_pct": 2,
+      "demand_growth_pct": 2.2,
+      "mine_growth_pct": 2,
+      "concentrate_disruption_kt": 400,
+      "unreported_china_absorption_kt": 0,
+      "scrap_response_kt": 400,
+      "price_path": [
+        14353,
+        15000,
+        15500,
+        15000,
+        14500,
+        14000,
+        14000
+      ],
+      "assumption_basis": "Prices are analyst paths; disruption applies to refined output once, and price-induced scrap is incremental. No AI demand term is added to ICSG usage."
+    },
+    {
+      "id": "china_unreported",
+      "label": "Unreported Chinese absorption",
+      "refined_growth_pct": 2,
+      "demand_growth_pct": 2.2,
+      "mine_growth_pct": 2,
+      "concentrate_disruption_kt": 0,
+      "unreported_china_absorption_kt": 350,
+      "scrap_response_kt": 400,
+      "price_path": [
+        14353,
+        14500,
+        14750,
+        14500,
+        14000,
+        14000,
+        14000
+      ],
+      "assumption_basis": "Prices are analyst paths; disruption applies to refined output once, and price-induced scrap is incremental. No AI demand term is added to ICSG usage."
+    }
+  ],
+  "falsifiers": [
+    {
+      "metric": "Concentrate availability",
+      "threshold": "Positive treatment charges sustained for two quarters; verified time series required",
+      "source_id": "icsg_monthly"
+    },
+    {
+      "metric": "Exchange inventory geography",
+      "threshold": "COMEX build reverses while SHFE stocks rise",
+      "source_id": "icsg_monthly"
+    },
+    {
+      "metric": "Refined balance",
+      "threshold": "Two updates show a deficit instead of the published surplus",
+      "source_id": "icsg_forecast"
+    }
+  ],
+  "limitations": [
+    "Published refined totals differ by 1kt from the rounded 2026 balance; residual is visible.",
+    "Concentrate supply, SX-EW and smelter intake are not interchangeable. Missing split prevents a numerical concentrate balance.",
+    "COMEX, LME and SHFE are separate locations; incomplete stock levels cannot produce days of cover.",
+    "Copper monthly reference figures are reviewed proposal transcriptions, separate from the verified forecast PDF. No price is inferred mechanically from a surplus."
+  ],
+  "cost_floor": {
+    "value": null,
+    "unit": "USD/tonne",
+    "status": "unavailable",
+    "binding": null,
+    "note": "No public project incentive-price estimate selected; no invented mine-cost percentile."
+  }
+}
