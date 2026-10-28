@@ -22,7 +22,9 @@ def test_ls_algo_intake_restores_repository_snapshots_before_the_build():
     dashboard = text.index("private_dashboard_assets.py\n")
     build = text.index("build_dashboard_data.py")
     redact = text.index("migrate_dashboard_sources.py")
-    stage = text.index("git add --sparse")
+    stage = text.index("ci_stage_owned_paths.py")
+    commit = text.split("Commit the complete onboarding transaction", 1)[1]
+    assert "git add --sparse" not in commit
     assert 'hydrate: "false"' in text
     assert checkout < restore < dashboard < build < redact < stage
 

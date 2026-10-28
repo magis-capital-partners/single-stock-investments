@@ -461,15 +461,43 @@ def _sync_published(src: Path, dst: Path, paths: tuple[str, ...] = MAIN_PATHS,
         if rel == INSIGHT_MANIFEST:
             _sync_insight_manifest(source, target, videos=videos, podcasts=podcasts)
             continue
+        if source.is_dir():
+            _sync_directory(source, target, dst)
+            continue
+        if source.is_file() and _managed_manifest(target) is not None:
+            # A managed public file stays the placeholder. Copying the lane's
+            # full document is how podcast episode shards landed in the public repo.
+            continue
         if target.is_dir():
             shutil.rmtree(target)
         elif target.exists():
             target.unlink()
-        if source.is_dir():
-            shutil.copytree(source, target)
-        elif source.is_file():
+        if source.is_file():
             target.parent.mkdir(parents=True, exist_ok=True)
             shutil.copy2(source, target)
+
+
+def _sync_directory(source: Path, target: Path, repo: Path) -> None:
+    """Copy a shard directory without replacing managed public placeholders."""
+    target.mkdir(parents=True, exist_ok=True)
+    incoming = {path.relative_to(source).as_posix() for path in source.rglob("*") if path.is_file()}
+    for existing in list(target.rglob("*")):
+        if not existing.is_file():
+            continue
+        child = existing.relative_to(target).as_posix()
+        if child in incoming:
+            continue
+        if _managed_manifest(existing) is not None:
+            continue
+        existing.unlink()
+    for path in source.rglob("*"):
+        if not path.is_file():
+            continue
+        dest = target / path.relative_to(source)
+        if _managed_manifest(dest) is not None:
+            continue
+        dest.parent.mkdir(parents=True, exist_ok=True)
+        shutil.copy2(path, dest)
 
 
 def _push_private_dashboard_objects(message: str) -> bool | None:

@@ -509,6 +509,30 @@ class InsightManifestSyncTests(unittest.TestCase):
                 self.assertEqual(json.loads(manifest_path.read_text(encoding="utf-8"))["letter_count"], 12)
             self.assertTrue(before.startswith("{"))
 
+    def test_directory_sync_leaves_a_managed_episode_placeholder(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            repo = Path(tmp) / "repo"
+            episodes = repo / "dashboard" / "data" / "insights" / "podcast_episodes"
+            episodes.mkdir(parents=True)
+            name = "episode.json"
+            placeholder = '{"private_snapshot":true,"source_shape":"object","entry_count":1,"collection_counts":{}}\n'
+            (episodes / name).write_text(placeholder, encoding="utf-8")
+            receipt = {
+                "assets": {
+                    f"data/insights/podcast_episodes/{name}": {
+                        "public_sha256": "abc",
+                        "private_sha256": "def",
+                    }
+                }
+            }
+            (repo / "dashboard" / "private-assets.json").write_text(json.dumps(receipt), encoding="utf-8")
+            source = Path(tmp) / "src" / "dashboard" / "data" / "insights" / "podcast_episodes"
+            source.mkdir(parents=True)
+            (source / name).write_text('{"source_file": "secret"}\n', encoding="utf-8")
+            lane._sync_directory(source, episodes, repo)
+            self.assertEqual((episodes / name).read_text(encoding="utf-8"), placeholder)
+            self.assertNotIn("secret", (episodes / name).read_text(encoding="utf-8"))
+
 
 if __name__ == "__main__":
     unittest.main(verbosity=2)
