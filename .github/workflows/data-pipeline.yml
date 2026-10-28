@@ -39,6 +39,22 @@ permissions:
 # Each committing job opts into data-commit-main below.
 
 jobs:
+  company-source-backfill:
+    needs: decide
+    if: needs.decide.outputs.drive == 'true'
+    uses: ./.github/workflows/company-source-backfill.yml
+    with:
+      seconds: '1200'
+    secrets: inherit
+
+  company-source-scans:
+    needs: company-source-backfill
+    uses: ./.github/workflows/company-source-backfill.yml
+    with:
+      seconds: '1200'
+      recover_scans: true
+    secrets: inherit
+
   decide:
     runs-on: ubuntu-latest
     timeout-minutes: 5

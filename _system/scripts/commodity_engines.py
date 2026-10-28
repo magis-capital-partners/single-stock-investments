@@ -15,6 +15,7 @@ def crude(config, panel, as_of):
     history = ref['quarterly']
     out['history'] = [{**r, 'basis': 'published_estimate' if r['period'] >= '2026-Q1' else 'published_history'} for r in history if r['period'] < ref['forecast_start']]
     out['observed_prices'] = {k: series(panel, k, as_of) for k in ['wti_spot', 'brent_spot']}
+    out['publisher_forecast_validation']=panel.get('oil_forecast_validation',{})
     out['inventory_basis'] = 'OECD commercial inventories; world flows are accounted for separately. World absolute stocks unavailable.'
     for r in history:
         out['validation'].append(check(r['period'] + ' world flow', r['production_mbd'] - r['consumption_mbd'] + r['world_draw_mbd'], .025))
@@ -76,7 +77,7 @@ def crude(config, panel, as_of):
                     break
                 stock, previous = next_stock, base
         out['scenarios'].append({**scenario, 'rows':rows})
-    out['validation'].append({'check':'forecast holdout', 'passed':None, 'reason':'One forecast vintage; out-of-sample price accuracy is not yet established.'})
+    out['validation'].append({'check':'scenario forecast holdout', 'passed':None, 'reason':'Archived publisher forecasts are evaluated separately. The dashboard stress coefficients have not been validated as forecasts.'})
     return out
 
 

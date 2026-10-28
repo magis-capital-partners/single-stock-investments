@@ -38,6 +38,28 @@ def transcript_for(path, vault):
 
 
 def extract_complete(data, suffix, *, ocr=False):
+    if suffix == '.epub':
+        import io,posixpath,zipfile
+        from xml.etree import ElementTree as ET
+        try:
+            with zipfile.ZipFile(io.BytesIO(data)) as z:
+                container=ET.fromstring(z.read('META-INF/container.xml'))
+                package=next(e.attrib['full-path'] for e in container.iter() if e.tag.endswith('rootfile'))
+                root=ET.fromstring(z.read(package));directory=posixpath.dirname(package)
+                items={e.attrib['id']:e.attrib for e in root.iter() if e.tag.endswith('}item')}
+                ordered=[items[e.attrib['idref']] for e in root.iter() if e.tag.endswith('}itemref')]
+                paths=[posixpath.normpath(posixpath.join(directory,unquote(item['href']).split('#')[0])) for item in ordered]
+                if 'META-INF/encryption.xml' in z.namelist():
+                    encrypted=ET.fromstring(z.read('META-INF/encryption.xml'))
+                    if any(e.attrib.get('URI') in paths for e in encrypted.iter()):
+                        return '', 'access_unavailable', {'reason':'Encrypted book content requires an authorized readable edition'}
+                bodies=[];missing=[]
+                for path in paths:
+                    raw=z.read(path);body,state=extract(raw,'.html')
+                    if not body.strip() and re.search(br'<(?:img|svg|image)\b',raw,re.I):missing.append(path)
+                    bodies.append(body)
+                return '\n\f\n'.join(bodies),'needs_ocr' if missing else 'indexed' if any(bodies) else 'empty_source',{'chapters':len(paths),'missing_chapters':missing}
+        except Exception as exc:return '', 'failed', {'error':type(exc).__name__}
     if suffix != '.pdf':
         text, state = extract(data, suffix)
         return text, state, {}
@@ -259,7 +281,7 @@ def main():
     parser.add_argument('--retry-status',nargs='*',default=[])
     parser.add_argument('--skip-seed',action='store_true')
     parser.add_argument('--discover-drive',action='store_true',help='Enumerate current Drive revisions before resuming the queue')
-    parser.add_argument('--only-status',nargs='+',help='Process an explicit recovery lane, e.g. needs_ocr. Does not reset other workers.')
+    parser.add_argument('--only-status',nargs='+',choices=['needs_ocr','needs_transcript','access_unavailable','unsupported','failed','empty_source'],help='Process an explicit recovery lane, e.g. needs_ocr. Does not reset other workers.')
     args=parser.parse_args()
     from vault_paths import research_vault_root
     vault=args.vault or research_vault_root()
@@ -284,7 +306,9 @@ def main():
             queue.finish(job['key'],status,result=result,error=error)
             count+=1
             if time.monotonic()-checkpointed>=300:
-                queue.checkpoint(args.cache/'queue-checkpoints');checkpointed=time.monotonic()
+                try:queue.checkpoint(args.cache/'queue-checkpoints')
+                except OSError:print('Portable checkpoint deferred; durable queue is intact.',flush=True)
+                checkpointed=time.monotonic()
             if count%250==0:print(json.dumps({'processed':count,'elapsed_seconds':round(time.monotonic()-started),**queue.report()}),flush=True)
     finally:
         report={**queue.report(),'processed_this_run':count,'elapsed_seconds':round(time.monotonic()-started)}

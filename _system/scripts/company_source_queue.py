@@ -62,7 +62,7 @@ class SourceQueue:
         if status not in {'indexed','needs_ocr','needs_transcript','access_unavailable','unsupported','empty_source','retry','failed'}:
             raise ValueError('Unknown source outcome: '+status)
         row = self.db.execute('SELECT attempts FROM jobs WHERE key=?', (key,)).fetchone()
-        delay = min(86400, 60 * 2**min(row['attempts'], 10)) if status == 'retry' else 86400 if status=='needs_ocr' and row['attempts']>1 else 0
+        delay = min(86400, 60 * 2**min(row['attempts'], 10)) if status == 'retry' else 86400 if status!='indexed' and row['attempts']>1 else 0
         self.db.execute('UPDATE jobs SET status=?,result=?,error=?,retry_at=?,lease_until=0,updated_at=? WHERE key=?',
                         (status, json.dumps(result or {}), error, time.time()+delay, time.time(), key))
         self.db.commit()
@@ -87,7 +87,13 @@ class SourceQueue:
             body=json.dumps(rows,ensure_ascii=False,separators=(',',':'))+'\n'
             if target.exists() and target.read_text(encoding='utf-8')==body:continue
             temp=target.with_suffix('.'+str(os.getpid())+'.tmp')
-            temp.write_text(body,encoding='utf-8');temp.replace(target)
+            temp.write_text(body,encoding='utf-8')
+            for attempt in range(10):
+                try:
+                    temp.replace(target);break
+                except PermissionError:
+                    if attempt==9:raise
+                    time.sleep(.05*(attempt+1))
 
     def restore(self, directory):
         for path in Path(directory).glob('*.json'):

@@ -10,6 +10,25 @@ sys.path.insert(0,str(Path(__file__).resolve().parents[1]))
 from company_source_queue import SourceQueue
 from company_source_cache import pack,restore
 from backfill_company_sources import extract_complete,transcript_for
+from company_sources import SourceIndex
+
+
+def test_empty_scan_outcome_survives_metadata_union():
+    index=SourceIndex()
+    index.add({'id':'a','processing_status':'awaiting_extraction','text':''},['original'])
+    index.add({'id':'b','processing_status':'needs_ocr','text':''},['original'])
+    assert index.records['a']['processing_status']=='needs_ocr'
+
+
+def test_retry_status_is_scoped_to_selected_collection(tmp_path):
+    q=SourceQueue(tmp_path/'work.sqlite')
+    q.enqueue([{'key':kind,'kind':kind,'payload':{}} for kind in ['git','media']])
+    for kind in ['git','media']:
+        job=q.claim([kind]);q.finish(job['key'],'indexed')
+    q.reset(['indexed'],['media'])
+    assert q.report()['by_kind']['git']=={'indexed':1}
+    assert q.report()['by_kind']['media']=={'pending':1}
+    q.close()
 
 
 def test_queue_resume_revision_retry_and_private_checkpoint(tmp_path):
@@ -48,6 +67,18 @@ def test_partial_pdf_is_not_indexed():
     page.insert_image(fitz.Rect(0,0,200,200),pixmap=image)
     text,state,detail=extract_complete(pdf.tobytes(),'.pdf')
     assert 'research' in text and state=='needs_ocr' and detail['missing_pages']==[2]
+
+
+def test_epub_reads_spine_order_and_preserves_scan_gap():
+    b=io.BytesIO()
+    with zipfile.ZipFile(b,'w') as z:
+        z.writestr('META-INF/container.xml','<container><rootfile full-path="book/package.opf"/></container>')
+        z.writestr('book/package.opf','<package xmlns="http://www.idpf.org/2007/opf"><manifest><item id="a" href="a.xhtml"/><item id="b" href="b.xhtml"/></manifest><spine><itemref idref="b"/><itemref idref="a"/></spine></package>')
+        z.writestr('book/b.xhtml','<html><body>Company discussion in chapter one.</body></html>')
+        z.writestr('book/a.xhtml','<html><body><img src="scan.png"/></body></html>')
+    text,state,details=extract_complete(b.getvalue(),'.epub')
+    assert text.startswith('Company discussion') and state=='needs_ocr'
+    assert details['missing_chapters']==['book/a.xhtml']
 
 
 def test_transcript_companion_and_cache_archive_portability(tmp_path):

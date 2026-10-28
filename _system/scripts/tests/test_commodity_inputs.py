@@ -66,3 +66,15 @@ def test_failed_refresh_preserves_last_good_provenance():
     assert values['gold_bullion']['source_url']=='https://original.example/data'
     assert values['gold_bullion']['observations']==old['gold_bullion']['observations']
     assert values['gold_bullion']['status']=='fetch_failed' and 'gold_bullion' in errors
+
+
+def test_archived_forecasts_use_only_prior_vintage_baseline_and_complete_actual_months():
+    from commodity_vintages import score
+    vintage={'published_at':'2025-01-15','source_url':'https://eia.gov/vintage','sha256':'x',
+             'prices':{'wti_spot':{'2024-12':70,'2025-01':900,'2025-02':75,'2025-04':78}}}
+    panel={'wti_spot':{'observations':[{'date':'2025-02-03','value':80},{'date':'2025-02-04','value':82},{'date':'2025-04-01','value':999}]}}
+    result=score([vintage],panel,date(2025,4,15))
+    assert len(result['rows'])==1
+    row=result['rows'][0]
+    assert row['baseline']==70 and row['forecast']==75 and row['actual']==81
+    assert result['summary'][0]['rmse']==6

@@ -48,7 +48,12 @@ def write(path: Path, value) -> None:
         return
     temp = path.with_suffix(path.suffix + f".{os.getpid()}.tmp")
     temp.write_text(body, encoding="utf-8")
-    temp.replace(path)
+    for attempt in range(10):
+        try:
+            temp.replace(path);break
+        except PermissionError:
+            if attempt==9:raise
+            time.sleep(.05*(attempt+1))
 
 
 def load(path: Path, default=None):

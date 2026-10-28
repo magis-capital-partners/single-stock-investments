@@ -25,7 +25,7 @@ CATEGORIES = {
     "media": "Other relevant sources",
 }
 TEXT_SUFFIXES = {".txt", ".md", ".csv", ".tsv", ".json", ".jsonl", ".htm", ".html", ".xml"}
-SOURCE_SUFFIXES = TEXT_SUFFIXES | {".pdf", ".xlsx", ".xls", ".docx", ".pptx", ".mp3", ".mp4", ".m4a", ".wav"}
+SOURCE_SUFFIXES = TEXT_SUFFIXES | {".pdf", ".epub", ".xlsx", ".xls", ".docx", ".pptx", ".mp3", ".mp4", ".m4a", ".wav"}
 
 
 def digest(value: str | bytes) -> str:
@@ -288,7 +288,10 @@ class SourceIndex:
                     if item not in current[field]:
                         current[field].append(item)
             other_size = other.get("text_length", len(other.get("text", "")))
-            if other_size > current.get("text_length", len(current.get("text", ""))):
+            rank={'indexed':6,'needs_ocr':5,'needs_transcript':5,'empty_source':4,'unsupported':3,'access_unavailable':2,'failed':1,'awaiting_extraction':0,'awaiting_transcript':0}
+            current_rank=rank.get(current.get('processing_status'),0)
+            other_rank=rank.get(other.get('processing_status'),0)
+            if other_rank>current_rank or (other_rank==current_rank and other_size > current.get("text_length", len(current.get("text", "")))):
                 for field in ("text", "text_cache"):
                     if field in other:
                         current[field] = other[field]

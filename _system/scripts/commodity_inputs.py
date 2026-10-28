@@ -12,7 +12,7 @@ REQUIRED={
 }
 GAPS={
     'crude':[
-        ('forecast_vintages','validation_required','Historical STEO forecast vintages and a preregistered holdout are required before claiming forecast skill.','https://www.eia.gov/outlooks/steo/outlook.php'),
+        ('scenario_calibration','validation_required','Archived STEO publisher forecasts are evaluated separately. Stress coefficients and post-2027 scenarios still require independent validation.','https://www.eia.gov/outlooks/steo/outlook.php'),
         ('global_storage_capacity','not_publicly_observable','Regional tank capacity does not establish a global inventory ceiling.','https://www.eia.gov/petroleum/storagecapacity/')],
     'copper':[
         ('concentrate_balance','licensed_or_manual_source','Aligned concentrate supply, SX-EW and smelter intake are needed; total refined copper is not a substitute.','https://icsg.org/statistical/'),
@@ -40,6 +40,10 @@ def readiness(name,panel,as_of):
         rows.append({'id':key,'status':status,'source_url':item.get('source_url'),'unit':item.get('unit'),'frequency':item.get('frequency'),
                      'last_observation':observations[-1]['date'] if observations else None,'observations':len(observations),'required':key in REQUIRED[name]})
     rows.extend({'id':key,'status':state,'reason':reason,'source_url':url,'required':False} for key,state,reason,url in GAPS[name])
+    if name=='crude':
+        validation=panel.get('oil_forecast_validation',{})
+        rows.append({'id':'publisher_forecast_vintages','status':'available' if validation.get('complete') and validation.get('rows') else 'partial' if validation.get('rows') else 'missing',
+                     'observations':validation.get('vintages',0),'source_url':'https://www.eia.gov/outlooks/steo/outlook.php','required':False})
     return {'available':sum(r['status']=='available' for r in rows),'total':len(rows),'items':rows,
             'required_ready':all(r['status']=='available' for r in rows if r['required'])}
 
