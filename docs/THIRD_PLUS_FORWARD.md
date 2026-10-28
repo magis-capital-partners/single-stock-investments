@@ -156,9 +156,9 @@ loan-return or cost reconciliation prevents a completed result. Later cost
 adjustments require renewed closure reconciliation.
 
 The screen measures actual entered size versus requested size, entry/cover
-shortfall against available preceding quotes, borrowing indications versus the
+shortfall against quotes available at order submission, borrowing indications versus the
 50% base, cover delays and concentration. Quotes must have been known by fill
-time and no more than two minutes old to measure shortfall. Quotes imported
+submission and no more than two minutes old to measure shortfall. Quotes imported
 later can have an earlier documented availability; their import time remains
 separate and auditable.
 

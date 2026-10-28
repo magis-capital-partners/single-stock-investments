@@ -331,6 +331,23 @@ class ForwardTests(unittest.TestCase):
         with self.assertRaisesRegex(ValueError, 'differs from signals'):
             self.add(e)
 
+    def test_later_quote_cannot_erase_order_arrival_shortfall(self):
+        e = self.enroll()
+        initial = self.observation('quote', at='2026-10-28T13:30:59Z', bid=10, ask=10.2)
+        later = self.observation('quote', at='2026-10-28T13:31:01Z', bid=9.9, ask=10.1)
+        self.add(initial, later); self.entry()
+        d = trade_diagnostics(J.load(self.path), e, P.stamp('2026-10-29T20:00:00Z'))
+        self.assertAlmostEqual(d['entry_shortfall_bps'], (10.1-10)/10.1*10000)
+
+    def test_one_cancelled_child_does_not_clear_an_uncertain_order(self):
+        self.enroll()
+        cancelled = self.observation('order', at='2026-10-28T14:31:00Z', environment='paper', phase='entry',
+                                     order_id='cancelled', requested_shares=100, limit_price=10, status='cancelled')
+        uncertain = self.observation('order', at='2026-10-28T14:31:00Z', environment='paper', phase='entry',
+                                     order_id='uncertain', requested_shares=100, limit_price=10, status='uncertain')
+        self.add(cancelled, uncertain)
+        self.assertEqual(len(reservations(J.load(self.path), self.policy['policy']['id'], P.stamp('2026-10-29T12:00:00Z'))[0]), 1)
+
 
 if __name__ == '__main__':
     unittest.main()

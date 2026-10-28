@@ -141,8 +141,11 @@ def trade_diagnostics(rows, e, now, environment='paper'):
     covers = [r for r in fills if r['phase'] == 'cover']
     shortfalls = {'entry': [], 'cover': []}
     for fill in fills:
-        available = [q for q in quotes if 0 <= (stamp(fill['observed_at'])-stamp(q['observed_at'])).total_seconds() <= 120
-                     and stamp(q['known_at']) <= stamp(fill['observed_at'])]
+        attempts = [r for r in subset if r['kind'] == 'order' and r.get('environment') == environment and r.get('order_id') == fill['order_id']
+                    and r['status'] == 'submitted' and stamp(r['observed_at']) <= stamp(fill['observed_at'])]
+        arrival = min((stamp(r['observed_at']) for r in attempts), default=stamp(fill['observed_at']))
+        available = [q for q in quotes if 0 <= (arrival-stamp(q['observed_at'])).total_seconds() <= 120
+                     and stamp(q['known_at']) <= arrival]
         if available:
             q = max(available, key=lambda q: q['observed_at'])
             mid = (q['bid']+q['ask'])/2
