@@ -107,13 +107,15 @@ def save_state(state: dict) -> None:
 
 
 def ensure_inventory(db) -> None:
-    count = db.execute("SELECT COUNT(*) FROM fl_letters").fetchone()[0]
-    if count:
-        return
     records = json.loads((letters_root() / "insights.json").read_text(encoding="utf-8")).get("letters") or []
-    result = fl.inventory(db, records, None)
-    result.pop("identity_audit", None)
-    print(json.dumps({"inventory": result}), flush=True)
+    links = fl.drive_source_links(records)
+    if not db.execute("SELECT COUNT(*) FROM fl_letters").fetchone()[0]:
+        result = fl.inventory(db, records, links)
+        result.pop("identity_audit", None)
+        print(json.dumps({"inventory": result}), flush=True)
+    linked = fl.attach_source_links(db, links)
+    if linked:
+        print(json.dumps({"original_links_added": linked}), flush=True)
 
 
 def publish_verified(db, state: dict) -> dict:
@@ -130,7 +132,7 @@ def publish_verified(db, state: dict) -> dict:
             continue
         if not isinstance(payload, dict) or payload.get("status") != "draft":
             continue
-        if payload.get("prompt_version") != summarizer.PROMPT_VERSION:
+        if payload.get("prompt_version") not in summarizer.PUBLISHABLE_VERSIONS:
             continue
         content_hash = path.stem
         draft_file = output_dir() / f"{content_hash}.draft.json"
