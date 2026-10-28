@@ -541,10 +541,49 @@ def test_reasoning_changes_cannot_reuse_a_different_effort_assumption_call(tmp_p
 def test_live_underwriting_roles_pin_sol_high_and_auto_without_changing_other_lanes():
     import underwriting_pipeline as pipeline
     root = Path(__file__).resolve().parents[3]
-    assert pipeline.stage_model(root,'author') == {'id':'gpt-6.1-sol','reasoning_effort':'high'}
-    assert pipeline.stage_model(root,'challenger') == {'id':'gpt-6.1-sol','reasoning_effort':'high'}
-    assert pipeline.stage_model(root,'builder') == {'id':'auto','reasoning_effort':None}
+    assert pipeline.stage_model(root,'author') == {'id':'gpt-6.1-sol','reasoning_effort':'high','provider':'codex-local'}
+    assert pipeline.stage_model(root,'challenger') == {'id':'gpt-6.1-sol','reasoning_effort':'high','provider':'codex-local'}
+    assert pipeline.stage_model(root,'builder') == {'id':'auto','reasoning_effort':None,'provider':'cursor'}
     assert pipeline.read(root/pipeline.CALL_POLICY)['model_ladder']['default_model'] == 'composer-2.5'
+
+
+def test_local_judgment_handoff_builds_on_another_host_without_repeating_judgment(tmp_path, monkeypatch):
+    import refresh_shared_forecasts as refresh
+    import underwriting_pipeline as pipeline
+    company_root(tmp_path)
+    monkeypatch.setattr(pipeline,'today',lambda:'2026-10-26')
+    monkeypatch.setattr(refresh,'refresh_quote',lambda *a,**kw:None)
+    monkeypatch.setattr(refresh,'refresh_missing_model_inputs',lambda *a:None)
+    c,calls = contract(),[]
+    vault = tmp_path/'vault'
+    authored = pipeline.run_batch(tmp_path,launch=True,phase='author',work=tmp_path/'local-work',vault=vault,
+                                  prepare=lambda *a:packet(),execute=mock_stages(c,calls))
+    assert authored['approved'] == ['TEST'] and authored['completed'] == []
+    assert calls == ['author','challenger']
+    assert not (tmp_path/'TEST/research/valuation.json').exists()
+    built = pipeline.run_batch(tmp_path,launch=True,phase='build',work=tmp_path/'remote-work',vault=vault,
+                               prepare=lambda *a:pytest.fail('The builder must use the frozen handoff'),execute=mock_stages(c,calls))
+    assert built['completed'] == ['TEST']
+    assert calls == ['author','challenger','builder']
+    assert pipeline.validate_saved(tmp_path,'TEST',vault)['status'] == 'validated'
+    assert not pipeline.run_batch(tmp_path,launch=True,phase='build',work=tmp_path/'third-work',vault=vault,
+                                  execute=lambda *a:pytest.fail('An accepted handoff was repeated'))['selected']
+
+
+def test_changed_handoff_cannot_reach_the_remote_builder(tmp_path, monkeypatch):
+    import underwriting_pipeline as pipeline
+    company_root(tmp_path)
+    monkeypatch.setattr(pipeline,'today',lambda:'2026-10-26')
+    vault = tmp_path/'vault'
+    pipeline.run_batch(tmp_path,launch=True,phase='author',work=tmp_path/'local',vault=vault,
+                       prepare=lambda *a:packet(),execute=mock_stages(contract(),[]))
+    path = next((vault/'valuation-underwriting/handoffs').glob('*.json'))
+    value = pipeline.read(path)
+    value['contract']['assumptions'][0]['value'] = .9
+    pipeline.write(path,value)
+    result = pipeline.run_batch(tmp_path,launch=True,phase='build',work=tmp_path/'remote',vault=vault,
+                                 execute=lambda *a:pytest.fail('Tampered assumptions reached a model'))
+    assert not result['completed'] and result['blocked']
 
 
 def test_saved_review_binding_is_required_even_when_the_old_arithmetic_still_works(tmp_path, monkeypatch):

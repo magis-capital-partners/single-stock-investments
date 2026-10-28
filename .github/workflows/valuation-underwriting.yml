@@ -90,13 +90,15 @@ jobs:
         env:
           CURSOR_API_KEY: ${{ secrets.CURSOR_API_KEY }}
         run: node _system/scripts/underwriting_stage.mjs --catalog
+      # Stable step name is referenced by graph_sources health telemetry.
+      # Judgment now runs locally; this host executes only --phase build.
       - name: Author, independently challenge and build company valuations
         env:
           CURSOR_API_KEY: ${{ secrets.CURSOR_API_KEY }}
           REQUESTED_TICKERS: ${{ github.event.client_payload.tickers }}
           REQUESTED_LIMIT: ${{ github.event.client_payload.limit }}
         run: |
-          ARGS=(run --launch)
+          ARGS=(run --phase build --launch)
           if [ -n "$REQUESTED_TICKERS" ]; then ARGS+=(--tickers "$REQUESTED_TICKERS"); fi
           if [ -n "$REQUESTED_LIMIT" ]; then ARGS+=(--limit "$REQUESTED_LIMIT"); fi
           python -u _system/scripts/underwriting_pipeline.py "${ARGS[@]}"
@@ -121,7 +123,7 @@ jobs:
           d=json.loads(p.read_text()) if p.is_file() else {}
           with open(os.environ['GITHUB_STEP_SUMMARY'],'a') as out:
               out.write('### Company underwriting results\n\n')
-              out.write(f"Selected: {len(d.get('selected',[]))}; validated models: {len(d.get('completed',[]))}; automatic retries: {len(d.get('blocked',[]))}.\n\n")
+              out.write(f"Build handoffs selected: {len(d.get('selected',[]))}; validated models: {len(d.get('completed',[]))}; automatic retries: {len(d.get('blocked',[]))}.\n\n")
               for r in d.get('blocked',[]):
                   out.write(f"- {r['ticker']}: "+'; '.join(g['detail'] for g in r.get('gaps',[]))+'\n')
           PY
