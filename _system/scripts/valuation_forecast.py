@@ -255,9 +255,11 @@ def build_forecast(valuation, *, quote=None, as_of=None, fx=None, market=None, e
             sync_gaps.append('listing_calendar_or_completed_close_unverified')
     latest_report = (market or {}).get('latest_report') or {}
     underwriting = valuation.get('underwriting') or {}
+    verification = (market or {}).get('underwriting_validation') or {}
+    if not underwriting and verification.get('status') == 'unverified':
+        sync_gaps.append('underwriting_contract_unverified')
     if underwriting:
         result['underwriting'] = underwriting
-        verification = (market or {}).get('underwriting_validation') or {}
         if verification.get('status') != 'verified' or verification.get('contract_hash') != underwriting.get('contract_hash'):
             sync_gaps.append('underwriting_contract_unverified')
         if _day(underwriting.get('review_due')) and today and today > _day(underwriting['review_due']):

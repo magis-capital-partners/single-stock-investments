@@ -309,6 +309,17 @@ def test_missing_model_price_does_not_erase_a_verified_snapshot_quote():
     assert f['quote']['value'] == 100
 
 
+def test_an_overwritten_model_cannot_bypass_a_failed_underwriting_receipt():
+    from test_shared_valuation_forecast import model
+    from valuation_forecast import build_forecast
+    v = model()
+    v['market_snapshot']['underwriting_validation'] = {'status': 'unverified'}
+    f = build_forecast(v)
+    assert f['status'] != 'available'
+    assert 'underwriting_contract_unverified' in {g['code'] for g in f['gaps']}
+    assert f['present_value_today_per_share']['base'] is None
+
+
 def test_paid_budget_is_enforced_before_a_provider_can_be_called(tmp_path):
     import underwriting_pipeline as pipeline
     from llm_call_gate import append_ledger
