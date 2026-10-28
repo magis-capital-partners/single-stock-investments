@@ -359,6 +359,70 @@ def test_bridge_never_binds_orders_created_by_other_clients():
     assert not re.search(r"\.reqAutoOpenOrders\s*\(", inspect.getsource(ib_bridge))
 
 
+# etf-0dte (spx-0dte's SPY / QQQ 0DTE executors, clients 50/51, and their
+# dead-executor watchdogs 130/131) stamps every order SPY0DTE| or QQQ0DTE|.
+# Rule 7: an order is the hub's only with a MAGIS| ref, client 91 and the
+# configured account. These pin that every etf-0dte order is foreign to the
+# bridge -- visible, never modified, never cancelled, never resolved as ours --
+# with no etf-0dte special case in the bridge to drift.
+ETF_0DTE_ORDERS = [
+    ("SPY0DTE|ORB|2026-10-27|t1", 50),
+    ("QQQ0DTE|ORB|2026-10-27|t1", 51),
+    ("SPY0DTE|CLOSEOUT|2026-10-27|1557", 130),
+    ("QQQ0DTE|WATCHDOG|2026-10-27", 131),
+    ("SPY0DTE|UNWIND|2026-10-28", 50),
+]
+
+
+def test_recovery_lists_every_etf_0dte_order_as_foreign():
+    trades = [FakeTrade(FakeOrder(ref, client_id=cid, order_id=6000 + i)) for i, (ref, cid) in enumerate(ETF_0DTE_ORDERS)]
+    # Even one on the bridge's own client id: the stamp, not the id, decides.
+    trades.append(FakeTrade(FakeOrder("SPY0DTE|ORB|odd", client_id=91, order_id=6999)))
+    result = bridge(FakeIB(open_orders=trades), recovered=False).recover()
+    assert result["hub_orders"] == []
+    assert result["foreign_orders"] == [ref for ref, _ in ETF_0DTE_ORDERS] + ["SPY0DTE|ORB|odd"]
+
+
+def test_an_etf_0dte_order_is_never_cancelled_even_by_its_own_ids():
+    trades = [FakeTrade(FakeOrder(ref, client_id=cid, order_id=6000 + i)) for i, (ref, cid) in enumerate(ETF_0DTE_ORDERS)]
+    ib = FakeIB(open_orders=trades)
+    b = bridge(ib)
+    for i, (ref, cid) in enumerate(ETF_0DTE_ORDERS):
+        for client_id in (cid, DEFAULT_BRIDGE_CLIENT_ID):
+            with pytest.raises(OrderOwnershipError):
+                b.cancel_owned_order(ref, client_id, 6000 + i)
+    assert ib.cancelled == []
+    assert ib.global_cancels == 0
+
+
+def test_an_etf_0dte_order_is_never_resolved_or_transmitted_as_the_hubs():
+    completed = [FakeTrade(FakeOrder(ref, client_id=cid), FakeStatus("Filled", filled="1", remaining="0"))
+                 for ref, cid in ETF_0DTE_ORDERS]
+    ib = FakeIB(open_orders=list(completed), completed=completed)
+    b = bridge(ib)
+    for ref, _ in ETF_0DTE_ORDERS:
+        with pytest.raises(OrderOwnershipError):
+            b.find_owned_order(ref)
+        with pytest.raises(OrderOwnershipError):
+            b.place_limit(ticket(order_ref=ref))
+    # A MAGIS| prefix is required at the start, so an etf-0dte ref that merely
+    # contains it is still foreign.
+    with pytest.raises(OrderOwnershipError):
+        b.place_limit(ticket(order_ref="SPY0DTE|MAGIS|single_stock|drew|x"))
+    assert ib.placed == []
+
+
+def test_the_hub_service_only_ever_stamps_its_own_prefix():
+    # The bridge refuses anything without MAGIS|; this is why it never sees one:
+    # GuardedOrderService.create overwrites whatever ref a ticket arrives with.
+    import inspect
+
+    from _system.trading.portfolio_hub import orders
+
+    source = inspect.getsource(orders.GuardedOrderService.create)
+    assert 'ticket["order_ref"] = f"MAGIS|' in source
+
+
 def test_start_limit_keys_live_in_the_unit_section_where_systemd_reads_them():
     """A restart brake in the wrong section is not a brake, and says so quietly.
 
