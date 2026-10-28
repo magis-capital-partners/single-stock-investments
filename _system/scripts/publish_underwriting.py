@@ -14,14 +14,15 @@ from vault_paths import research_vault_root
 
 
 def git(root, *args, data=None, env=None):
-    return subprocess.check_output(['git', *args], cwd=root, input=data, env=env).decode().strip()
+    print('Publication: git '+args[0], flush=True)
+    return subprocess.check_output(['git', *args], cwd=root, input=data, env=env, timeout=120).decode().strip()
 
 
 def github(repo, path, payload=None):
     args = ['gh', 'api', f'repos/{repo}/'+path]
     if payload is not None:
         args += ['--method', 'POST', '--input', '-']
-    raw = subprocess.check_output(args, input=None if payload is None else json.dumps(payload).encode())
+    raw = subprocess.check_output(args, input=None if payload is None else json.dumps(payload).encode(), timeout=90)
     return json.loads(raw) if raw.strip() else None
 
 
@@ -70,7 +71,9 @@ def publish(root=ROOT, *, batch_path=None, wait=False):
         changed.append(relative)
     if not changed:
         return {'status': 'unchanged', 'completed': completed}
-    tree = git(root, 'write-tree', env=env)
+    # All unchanged objects come from main and already exist on the server.
+    # A sparse clone must not hydrate the entire archive to verify those blobs.
+    tree = git(root, 'write-tree', '--missing-ok', env=env)
     message = 'Update independently underwritten company models' if completed else 'Record autonomous underwriting gaps and retries'
     commit_env = {**env, 'GIT_AUTHOR_NAME': 'github-actions[bot]', 'GIT_COMMITTER_NAME': 'github-actions[bot]',
                   'GIT_AUTHOR_EMAIL': '41898282+github-actions[bot]@users.noreply.github.com',

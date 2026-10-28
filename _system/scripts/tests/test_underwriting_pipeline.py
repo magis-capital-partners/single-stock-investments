@@ -315,13 +315,14 @@ def test_supplemental_numbers_are_checked_against_the_exact_frozen_table():
             supplemental_observations(p, [{**row, **changed}])
 
 
-def test_packet_is_cold_and_a_financial_company_does_not_need_compounder_cash_inputs(tmp_path):
+@pytest.mark.parametrize('share_field', ['shares', 'ordinary_shares'])
+def test_packet_is_cold_and_a_financial_company_does_not_need_compounder_cash_inputs(tmp_path, share_field):
     import underwriting_pipeline as pipeline
     from underwriting_evidence import prepare_packet
     company_root(tmp_path)
     pipeline.write(tmp_path/'TEST/research/valuation.json', {'inputs': {'price': 987654321}, 'classification': {'archetype': 'old_wrong_label'}})
     rows = []
-    for field, value, currency in [('net_income', 1000, 'USD'), ('equity', 5000, 'USD'), ('shares', 100, 'USD')]:
+    for field, value, currency in [('net_income', 1000, 'USD'), ('equity', 5000, 'USD'), (share_field, 100, 'USD')]:
         rows.append({'field': field, 'value': value, 'currency': currency, 'period': '2025-12-31',
                      'source_kind': 'primary', 'source_url': 'https://issuer.test/annual', 'locator': field})
     pipeline.write(tmp_path/'_system/reference/market-data/valuation_fundamentals/TEST.json', {'facts': rows})
@@ -330,7 +331,54 @@ def test_packet_is_cold_and_a_financial_company_does_not_need_compounder_cash_in
     assert '987654321' not in rendered and 'old_wrong_label' not in rendered
     assert 'quote' not in p and 'classification' not in p and 'valuation' not in p
     assert p['financial_period'] == '2025-12-31'
-    assert {'net_income', 'equity', 'shares'} <= {o['field'] for o in p['observations']}
+    assert {'net_income', 'equity', share_field} <= {o['field'] for o in p['observations']}
+
+
+def test_changed_primary_kpis_reach_the_packet_but_collection_clocks_do_not_trigger_paid_work(tmp_path):
+    import underwriting_pipeline as pipeline
+    from underwriting_evidence import prepare_packet
+    company_root(tmp_path)
+    facts = [{'field': f, 'value': v, 'currency': 'USD', 'period': '2025-12-31', 'source_kind': 'primary',
+              'source_url': 'https://issuer.test/annual', 'locator': f} for f,v in [('net_income',1000),('shares',100)]]
+    pipeline.write(tmp_path/'_system/reference/market-data/valuation_fundamentals/TEST.json', {'facts': facts})
+    path = tmp_path/'_system/reference/market-data/operating_kpis/TEST.json'
+    point = {'kpi': 'monthly_volume', 'value': 100, 'unit': 'vehicles', 'period': '2026-09-30',
+             'source_url': 'https://issuer.test/traffic', 'doc': 'September volumes', 'source_kind': 'primary', 'claim_type': 'fact'}
+    pipeline.write(path, {'points': [point], 'fetched_at': '2026-10-25'})
+    before = pipeline.input_fingerprint(tmp_path, 'TEST')
+    packet_before = prepare_packet(tmp_path, 'TEST', '2026-10-26', collect=False)
+    assert any('monthly_volume' in ' '.join(d['contexts']) for d in packet_before['documents'])
+    pipeline.write(path, {'points': [{**point,'fetched_at':'2026-10-26T22:00:00Z'},
+                                    {**point,'kpi':'derived_price_ratio','claim_type':'inference','value':9999}],
+                         'fetched_at': '2026-10-26'})
+    assert pipeline.input_fingerprint(tmp_path, 'TEST') == before
+    assert prepare_packet(tmp_path, 'TEST', '2026-10-26', collect=False)['evidence_hash'] == packet_before['evidence_hash']
+    pipeline.write(path, {'points': [{**point,'value':101}]})
+    assert pipeline.input_fingerprint(tmp_path, 'TEST') != before
+    assert prepare_packet(tmp_path, 'TEST', '2026-10-26', collect=False)['evidence_hash'] != packet_before['evidence_hash']
+
+
+def test_corrected_processing_code_releases_a_failed_case_without_waiting_until_tomorrow(tmp_path):
+    import underwriting_pipeline as pipeline
+    company_root(tmp_path)
+    state = {'TEST': {'retry_after':'2026-10-29', 'input_fingerprint':pipeline.input_fingerprint(tmp_path,'TEST'),
+                      'processing_version':pipeline.processing_version(tmp_path)}}
+    assert pipeline.build_queue(tmp_path,'2026-10-26',state)['companies'][0]['status'] == 'automatic_retry_pending'
+    (tmp_path/'_system/prompts/valuation_underwriting.md').write_text('Corrected processing instructions.',encoding='utf-8')
+    assert pipeline.build_queue(tmp_path,'2026-10-26',state)['companies'][0]['status'] == 'needs_underwriting'
+
+
+def test_instruction_changes_invalidate_model_cache_without_repeating_unchanged_calls(tmp_path):
+    import underwriting_pipeline as pipeline
+    company_root(tmp_path)
+    state,calls,payload = {},[],{'packet':packet()}
+    execute = mock_stages(contract(),calls)
+    first = pipeline.call_stage(tmp_path,tmp_path/'work','TEST','author',payload,state,execute=execute)[1]
+    assert pipeline.call_stage(tmp_path,tmp_path/'work','TEST','author',payload,state,execute=execute)[1]['input_hash'] == first['input_hash']
+    (tmp_path/'_system/prompts/valuation_underwriting.md').write_text('New complete underwriting instructions.',encoding='utf-8')
+    changed = pipeline.call_stage(tmp_path,tmp_path/'work','TEST','author',payload,state,execute=execute)[1]
+    assert changed['input_hash'] != first['input_hash']
+    assert calls == ['author','author']
 
 
 def test_saved_review_binding_is_required_even_when_the_old_arithmetic_still_works(tmp_path, monkeypatch):
@@ -424,6 +472,9 @@ def test_publisher_builds_a_data_only_commit_and_explicitly_starts_head_checks(t
     root, remote, vault = tmp_path/'repo', tmp_path/'remote.git', tmp_path/'vault'
     root.mkdir()
     company_root(root)
+    archive = root/'archive/already-published-primary.txt'
+    archive.parent.mkdir()
+    archive.write_text('The remote already owns this unchanged primary archive object.')
     def git(*args, cwd=root):
         return subprocess.check_output(['git', *args], cwd=cwd, stderr=subprocess.DEVNULL, text=True).strip()
     git('init', '-q', '-b', 'main')
@@ -434,6 +485,13 @@ def test_publisher_builds_a_data_only_commit_and_explicitly_starts_head_checks(t
     git('init', '-q', '--bare', str(remote))
     git('remote', 'add', 'origin', str(remote))
     git('push', '-q', 'origin', 'main')
+    # Model the sparse producer: the server has an unchanged archive object
+    # that the local job must not need to hydrate to publish selected data.
+    blob = git('rev-parse', 'main:archive/already-published-primary.txt')
+    local_object = root/'.git/objects'/blob[:2]/blob[2:]
+    assert local_object.resolve().is_relative_to(root.resolve())
+    local_object.chmod(0o600)
+    local_object.unlink()
     monkeypatch.setattr(pipeline, 'today', lambda: '2026-10-26')
     monkeypatch.setattr(refresh, 'refresh_quote', lambda *a, **kw: None)
     monkeypatch.setattr(refresh, 'refresh_missing_model_inputs', lambda *a: None)
