@@ -58,13 +58,35 @@ def restore_copy(private: Path, public: Path, root: Path) -> None:
         temporary.unlink(missing_ok=True)
 
 
+def _receipt_manifest(source: Path) -> dict:
+    if (source / MANIFEST_NAME).is_file():
+        return overlay_manifest(source)
+    nested = source / "dashboard" / MANIFEST_NAME
+    if nested.is_file():
+        return overlay_manifest(source / "dashboard")
+    return {"assets": {}}
+
+
+def _manifest_view(source: Path, relative: str) -> dict:
+    """assets view for a dashboard file, or repository_assets for a repo file."""
+    manifest = _receipt_manifest(source)
+    if relative in (manifest.get("assets") or {}):
+        return manifest
+    repository = manifest.get("repository_assets") or {}
+    if relative in repository:
+        return {"assets": repository}
+    return {"assets": {}}
+
+
 def read_resolved_json(source: Path, relative: str) -> tuple[dict, bool]:
-    """Read a dashboard JSON file, following a private snapshot without copying it.
+    """Read a JSON file, following a private snapshot without copying it.
 
     The second value is true when the bytes came from the vault object. A
     hydrated checkout returns the public file and false, because that file
     already holds the private bytes. Callers must not write the resolved
-    document back over a public placeholder.
+    document back over a public placeholder. A placeholder with no vault
+    receipt, or a placeholder whose vault object is missing, raises rather
+    than handing back the metadata stub.
     """
     safe_relative(relative)
     public = source / relative
@@ -73,12 +95,17 @@ def read_resolved_json(source: Path, relative: str) -> tuple[dict, bool]:
     document = json.loads(public.read_text(encoding="utf-8"))
     if not isinstance(document, dict) or document.get("private_snapshot") is not True:
         return document if isinstance(document, dict) else {}, False
-    resolved = private_source(source, relative)
+    view = _manifest_view(source, relative)
+    if relative not in view.get("assets", {}):
+        raise RuntimeError(f"Private snapshot placeholder has no vault receipt: {relative}")
+    resolved = private_source(source, relative, view)
     if resolved == public:
         return document, False
     loaded = json.loads(resolved.read_text(encoding="utf-8"))
     if not isinstance(loaded, dict):
         raise ValueError(f"Private snapshot is not a JSON object: {relative}")
+    if loaded.get("private_snapshot") is True:
+        raise RuntimeError(f"Private snapshot was not restored: {relative}")
     return loaded, True
 
 

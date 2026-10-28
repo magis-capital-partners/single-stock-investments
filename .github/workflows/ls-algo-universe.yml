@@ -50,6 +50,9 @@ jobs:
       # when the push hits a rebase conflict on dashboard/data, and that
       # rebuild refuses without the opt-in (marvin-pick carries every tree).
       DASHBOARD_PRESERVE_DOCUMENT_REGISTRY: "1"
+      RESEARCH_VAULT_REPO_URL: ${{ secrets.RESEARCH_VAULT_REPO_URL }}
+      RESEARCH_VAULT_CLONE_TOKEN: ${{ secrets.RESEARCH_VAULT_CLONE_TOKEN }}
+      RESEARCH_VAULT_ROOT: _external/research-vault
     steps:
       - uses: actions/checkout@v4
         with:
@@ -61,6 +64,12 @@ jobs:
           fetch-depth: 1
       - name: Checkout workspace
         run: bash _system/scripts/ci_checkout_workspace.sh marvin-pick
+      - name: Checkout research vault
+        uses: ./.github/actions/checkout-vault
+        with:
+          hydrate: "false"
+      - name: Restore private repository inputs
+        run: python _system/scripts/private_dashboard_assets.py --repository-only
       - name: Checkout LS-algo screener
         env:
           LS_ALGO_TOKEN: ${{ secrets.LS_ALGO_TOKEN || secrets.LS_ALGO_REPO_TOKEN }}

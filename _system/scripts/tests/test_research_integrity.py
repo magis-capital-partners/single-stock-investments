@@ -1,14 +1,27 @@
 """Regression coverage for source-scoped corrections and IRR publication gates."""
 import copy
+import json
 import sys
 from datetime import date
 from pathlib import Path
+
+import pytest
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 
 from letter_matching import _relation_action
 from research_integrity import reconcile_letter, gate_return_claims
 from build_irr_readiness import assess_company
+
+
+def test_ls_algo_intake_restores_repository_snapshots_before_the_build():
+    text = Path(__file__).resolve().parents[3].joinpath(
+        ".github", "workflows", "ls-algo-universe.yml").read_text(encoding="utf-8")
+    checkout = text.index("Checkout research vault")
+    restore = text.index("private_dashboard_assets.py --repository-only")
+    build = text.index("build_dashboard_data.py")
+    assert "hydrate: \"false\"" in text
+    assert checkout < restore < build
 
 
 def test_copart_sale_cannot_borrow_tjx_purchase_or_amazon_add():
@@ -35,6 +48,25 @@ def test_wrong_word_senses_do_not_erase_a_real_issuer_elsewhere():
             ("WMT", "We bought Walmart de Mexico shares.", "Walmart"),
             ("XYZ", "We sold a block of shares.", "block")]:
         assert _issuer_spans(text, ticker, [text.index(name)]) == []
+
+
+def test_placeholder_corrections_fail_clearly(tmp_path, monkeypatch):
+    import research_integrity as ri
+
+    root = tmp_path / "repo"
+    path = root / "_system" / "reference" / "letter_classification_corrections.json"
+    path.parent.mkdir(parents=True)
+    path.write_text(json.dumps({
+        "private_snapshot": True, "source_shape": "object", "entry_count": 1, "collection_counts": {},
+    }), encoding="utf-8")
+    monkeypatch.setattr(ri, "ROOT", root)
+    monkeypatch.setattr(ri, "CORRECTIONS", path)
+    ri.correction_rules.cache_clear()
+    try:
+        with pytest.raises(RuntimeError, match="[Pp]rivate snapshot"):
+            ri.correction_rules()
+    finally:
+        ri.correction_rules.cache_clear()
 
 
 def test_correction_requires_source_identity_and_does_not_mutate():
