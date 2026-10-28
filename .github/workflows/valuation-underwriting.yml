@@ -10,6 +10,7 @@ on:
       - '_system/scripts/publish_underwriting.py'
       - '_system/prompts/valuation_underwriting.md'
       - '_system/config/underwriting_policy.json'
+      - '_system/config/llm_usage_policy.json'
   repository_dispatch:
     types: [valuation-underwriting-run]
   schedule:
@@ -84,6 +85,11 @@ jobs:
         run: |
           python -m pytest -q _system/scripts/tests/test_underwriting_pipeline.py
           node --test _system/scripts/tests/test_underwriting_stage.cjs
+      - name: Verify exact model and reasoning availability before paid work
+        timeout-minutes: 2
+        env:
+          CURSOR_API_KEY: ${{ secrets.CURSOR_API_KEY }}
+        run: node _system/scripts/underwriting_stage.mjs --catalog
       - name: Author, independently challenge and build company valuations
         env:
           CURSOR_API_KEY: ${{ secrets.CURSOR_API_KEY }}

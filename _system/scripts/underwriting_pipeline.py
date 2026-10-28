@@ -134,8 +134,15 @@ class StageBlocked(ContractError):
     pass
 
 
+def stage_model(root, stage):
+    policy = read(root/CALL_POLICY)
+    config = ((policy.get('model_ladder') or {}).get('consumers') or {}).get(STAGES[stage]) or {}
+    return {'id': resolve_model(policy, STAGES[stage], reason='company_underwriting'),
+            'reasoning_effort': config.get('reasoning_effort')}
+
+
 def stage_hash(root, stage, payload):
-    model = resolve_model(read(root/CALL_POLICY), STAGES[stage], reason='company_underwriting')
+    model = stage_model(root, stage)
     runbook = (root/'_system/prompts/valuation_underwriting.md').read_text(encoding='utf-8')
     return digest({'stage': stage, 'model': model, 'payload': payload, 'instructions_hash': digest(runbook)})
 
@@ -144,6 +151,7 @@ def call_stage(root, work, ticker, stage, payload, state, *, launch=True, execut
     consumer = STAGES[stage]
     policies = read(root/CALL_POLICY)
     model = resolve_model(policies, consumer, reason='company_underwriting')
+    effort = stage_model(root, stage)['reasoning_effort']
     runbook = (root/'_system/prompts/valuation_underwriting.md').read_text(encoding='utf-8')
     base_hash = stage_hash(root, stage, payload)
     cache = work/'cache'/ticker/base_hash
@@ -181,6 +189,7 @@ def call_stage(root, work, ticker, stage, payload, state, *, launch=True, execut
               'run_id': os.environ.get('GITHUB_RUN_ID') or str(os.getpid()), 'timestamp': now()}
     append_ledger(ledger, {**record, 'status': 'reserved'})
     env = {**os.environ, 'UNDERWRITING_MODEL': model, 'UNDERWRITING_STAGE': stage,
+           'UNDERWRITING_REASONING_EFFORT': effort or '',
            'UNDERWRITING_PROMPT': str(prompt_path), 'UNDERWRITING_OUTPUT': str(output), 'UNDERWRITING_RECEIPT': str(receipt_path)}
     deadline = state.get('batch_deadline')
     if deadline:
@@ -207,7 +216,7 @@ def call_stage(root, work, ticker, stage, payload, state, *, launch=True, execut
             raise StageBlocked('provider_run_incomplete: '+str(receipt.get('agent_id'))) from error
         raise ContractError('Provider stage failed to return valid JSON') from error
     require(receipt.get('agent_id') and receipt.get('status') == 'finished', 'Model call has no complete provider receipt')
-    receipt.update(input_hash=base_hash, call_hash=call_hash, stage=stage, model=model, consumer=consumer)
+    receipt.update(input_hash=base_hash, call_hash=call_hash, stage=stage, model=model, reasoning_effort=effort, consumer=consumer)
     write(receipt_path, receipt)
     return read(output), receipt
 
@@ -312,7 +321,7 @@ def load_progress(root, work, ticker, packet):
                     'instructions': (root/'_system/prompts/valuation_underwriting.md').read_text(encoding='utf-8'),
                     'compiler': digest((root/'_system/scripts/underwriting_contract.py').read_text(encoding='utf-8'))
                                 if (root/'_system/scripts/underwriting_contract.py').is_file() else None,
-                    'models': {s: resolve_model(read(root/CALL_POLICY), STAGES[s], reason='company_underwriting') for s in STAGES}})
+                    'models': {s: stage_model(root, s) for s in STAGES}})
     saved = read(work/'progress'/(ticker+'.json'))
     if saved.get('scope') == scope:
         return saved

@@ -520,6 +520,33 @@ def test_instruction_changes_invalidate_model_cache_without_repeating_unchanged_
     assert calls == ['author','author']
 
 
+def test_reasoning_changes_cannot_reuse_a_different_effort_assumption_call(tmp_path):
+    import underwriting_pipeline as pipeline
+    company_root(tmp_path)
+    policy = pipeline.read(tmp_path/pipeline.CALL_POLICY)
+    role = policy['model_ladder']['consumers']['valuation_underwriter']
+    role.update(model='gpt-6.1-sol',reasoning_effort='high')
+    pipeline.write(tmp_path/pipeline.CALL_POLICY,policy)
+    calls,state,payload = [],{}, {'packet':packet()}
+    first = pipeline.call_stage(tmp_path,tmp_path/'work','TEST','author',payload,state,execute=mock_stages(contract(),calls))[1]
+    role['reasoning_effort'] = 'medium'
+    pipeline.write(tmp_path/pipeline.CALL_POLICY,policy)
+    second = pipeline.call_stage(tmp_path,tmp_path/'work','TEST','author',payload,state,execute=mock_stages(contract(),calls))[1]
+    assert first['model'] == second['model'] == 'gpt-6.1-sol'
+    assert first['reasoning_effort'] == 'high' and second['reasoning_effort'] == 'medium'
+    assert first['input_hash'] != second['input_hash']
+    assert calls == ['author','author']
+
+
+def test_live_underwriting_roles_pin_sol_high_and_auto_without_changing_other_lanes():
+    import underwriting_pipeline as pipeline
+    root = Path(__file__).resolve().parents[3]
+    assert pipeline.stage_model(root,'author') == {'id':'gpt-6.1-sol','reasoning_effort':'high'}
+    assert pipeline.stage_model(root,'challenger') == {'id':'gpt-6.1-sol','reasoning_effort':'high'}
+    assert pipeline.stage_model(root,'builder') == {'id':'auto','reasoning_effort':None}
+    assert pipeline.read(root/pipeline.CALL_POLICY)['model_ladder']['default_model'] == 'composer-2.5'
+
+
 def test_saved_review_binding_is_required_even_when_the_old_arithmetic_still_works(tmp_path, monkeypatch):
     import refresh_shared_forecasts as refresh
     import underwriting_pipeline as pipeline

@@ -22,6 +22,16 @@ flowchart LR
   G --> H[Price refresh and private dashboard publication]
 ```
 
+GitHub Actions schedules and controls the workflow. Cursor's cloud SDK runs the
+AI sessions: GPT-6.1 Sol with High reasoning authors the company assumptions;
+a fresh GPT-6.1 Sol High session independently challenges them; Cursor Auto
+builds only the approved contract. When available, Auto uses Cursor Router's
+Cost mode; otherwise it uses the documented server-selected Auto. The preflight
+checks the account's actual model catalog before any paid work and stops if the
+exact GPT model or High reasoning is unavailable. There is no GPT fallback.
+Requested selections, reasoning effort and provider-reported resolved selections
+are saved in the stage receipts. Each role receives a separate cloud agent.
+
 The model service gets no repository, prior valuation, classification, current
 stock price, private account credentials, broker or ThetaData access. It receives
 a content-addressed primary-evidence packet. Numeric observations retain their
