@@ -22,15 +22,31 @@ flowchart LR
   G --> H[Price refresh and private dashboard publication]
 ```
 
-GitHub Actions schedules and controls the workflow. Cursor's cloud SDK runs the
-AI sessions: GPT-6.1 Sol with High reasoning authors the company assumptions;
-a fresh GPT-6.1 Sol High session independently challenges them; Cursor Auto
-builds only the approved contract. When available, Auto uses Cursor Router's
-Cost mode; otherwise it uses the documented server-selected Auto. The preflight
-checks the account's actual model catalog before any paid work and stops if the
-exact GPT model or High reasoning is unavailable. There is no GPT fallback.
-Requested selections, reasoning effort and provider-reported resolved selections
-are saved in the stage receipts. Each role receives a separate cloud agent.
+The owner's signed-in Codex CLI runs GPT-6.1 Sol with High reasoning locally
+for the author and a separate challenger session. Each invocation is ephemeral,
+has no repository, and disables commands, web search, hooks, plugins, connectors
+and additional agents. No API key is required or copied to GitHub. The CLI login
+and its model catalog are checked before starting. Each session's real thread ID,
+model, reasoning effort and usage are saved in its private receipt.
+
+Only independently approved contracts produce content-addressed private handoffs.
+The local controller pushes the handoff and paid receipts before dispatching
+GitHub Actions. GitHub runs Cursor Auto to build that exact contract, then applies
+the existing deterministic PV/IRR and publication checks. When available, Auto
+uses Cursor Router's Cost mode; otherwise it uses documented server-selected Auto.
+The GitHub runner never tries to launch the owner's Codex login. Providers own
+separate runtime directories and merge their ledgers to preserve the daily limits.
+
+The local controller uses an isolated runtime under
+`%LOCALAPPDATA%/Magis/valuation-underwriting`, with separate clean source, data,
+private vault and working-state folders. It never edits the owner's normal
+checkout or dirty research-vault. A single-worker lock prevents overlapping local
+runs. The scheduled local launcher requires the computer and Codex desktop app
+to remain available. Manual invocation, after installing the launcher:
+
+```powershell
+& "$env:LOCALAPPDATA/Magis/valuation-underwriting/launch.ps1" -Launch
+```
 
 The model service gets no repository, prior valuation, classification, current
 stock price, private account credentials, broker or ThetaData access. It receives
@@ -94,10 +110,13 @@ python _system/scripts/underwriting_pipeline.py queue
 python _system/scripts/underwriting_pipeline.py run --tickers BKNG,F,OPEN --limit 3
 ```
 
-Execution is through **Autonomous company underwriting**, using its configured
+Local judgment uses `underwriting_local.ps1 -Launch`; without `-Launch` it only
+prepares the coverage queue and verifies local prerequisites. GitHub builds run
+through **Autonomous company underwriting**, using its configured
 schedule, source-refresh completion event or repository dispatch
 `valuation-underwriting-run` (`client_payload.tickers`, `client_payload.limit`).
-Only the explicit `--launch` path calls models. Local experiments should use an
+Only the explicit `--launch` path calls models. GitHub passes `--phase build`;
+the local worker passes `--phase author`. Local experiments should use an
 isolated vault rather than a user's dirty research-vault checkout.
 
 The batch summary reports selected, validated and blocked companies separately.

@@ -70,7 +70,7 @@ def input_fingerprint(root, ticker):
 def processing_version(root):
     paths = [CALL_POLICY, POLICY, Path('_system/prompts/valuation_underwriting.md')]
     paths += [Path('_system/scripts')/name for name in ('underwriting_pipeline.py', 'underwriting_contract.py',
-                                                      'underwriting_evidence.py', 'underwriting_stage.mjs')]
+                                                      'underwriting_evidence.py', 'underwriting_stage.mjs', 'underwriting_codex.py')]
     return digest({str(p): (root/p).read_text(encoding='utf-8') if (root/p).is_file() else None for p in paths})
 
 
@@ -107,6 +107,10 @@ def build_queue(root=ROOT, as_of=None, states=None):
         require(re.fullmatch(r'[A-Za-z0-9][A-Za-z0-9._-]{0,30}', ticker), 'Unsafe coverage ticker')
         audit, state = companies.get(ticker) or {}, states.get(ticker) or {}
         status = receipt_status(root, ticker, audit, as_of)
+        if (status != 'reviewed' and state.get('status') == 'approved_for_build'
+                and state.get('input_fingerprint') == input_fingerprint(root, ticker)
+                and state.get('review_due', '') >= as_of):
+            status = 'waiting_for_build'
         codes = sorted({g['code'].split(':')[0] for g in audit.get('gaps') or []})
         if (status != 'reviewed' and (state.get('retry_after') or '') > as_of
                 and state.get('processing_version') == version and state.get('input_fingerprint') == input_fingerprint(root, ticker)):
@@ -138,7 +142,7 @@ def stage_model(root, stage):
     policy = read(root/CALL_POLICY)
     config = ((policy.get('model_ladder') or {}).get('consumers') or {}).get(STAGES[stage]) or {}
     return {'id': resolve_model(policy, STAGES[stage], reason='company_underwriting'),
-            'reasoning_effort': config.get('reasoning_effort')}
+            'reasoning_effort': config.get('reasoning_effort'), 'provider': config.get('provider') or 'cursor'}
 
 
 def stage_hash(root, stage, payload):
@@ -202,9 +206,15 @@ def call_stage(root, work, ticker, stage, payload, state, *, launch=True, execut
     try:
         if execute:
             execute(stage, payload, output, receipt_path)
+        elif stage_model(root, stage)['provider'] == 'codex-local':
+            require(not os.environ.get('GITHUB_ACTIONS'), 'Signed-in Codex stages run only on the owner computer')
+            from underwriting_codex import execute_stage
+            execute_stage(model=model, effort=effort, stage=stage, prompt_path=prompt_path,
+                          output_path=output, receipt_path=receipt_path,
+                          timeout=int(env.get('UNDERWRITING_TIMEOUT_MS', 1200000))/1000)
         else:
             subprocess.run(['node', str(root/'_system/scripts/underwriting_stage.mjs')], env=env, check=True, timeout=1260)
-    except subprocess.SubprocessError as exc:
+    except (ContractError, subprocess.SubprocessError) as exc:
         error = exc
     finally:
         receipt = read(receipt_path)
@@ -216,7 +226,8 @@ def call_stage(root, work, ticker, stage, payload, state, *, launch=True, execut
             raise StageBlocked('provider_run_incomplete: '+str(receipt.get('agent_id'))) from error
         raise ContractError('Provider stage failed to return valid JSON') from error
     require(receipt.get('agent_id') and receipt.get('status') == 'finished', 'Model call has no complete provider receipt')
-    receipt.update(input_hash=base_hash, call_hash=call_hash, stage=stage, model=model, reasoning_effort=effort, consumer=consumer)
+    receipt.update(input_hash=base_hash, call_hash=call_hash, stage=stage, model=model, reasoning_effort=effort,
+                   provider=stage_model(root, stage)['provider'], consumer=consumer)
     write(receipt_path, receipt)
     return read(output), receipt
 
@@ -362,11 +373,58 @@ def load_progress(root, work, ticker, packet):
     return result
 
 
-def run_company(root, work, ticker, as_of, state, vault, *, prepare=prepare_packet, execute=None):
+def save_handoff(root, vault, packet, approved):
+    author, review = approved['author'], approved['review']
+    validate_review(author, review)
+    require(digest(compile_contract(packet, author)) == approved['canonical_hash'], 'Handoff compiler binding changed')
+    payload = {'schema_version': 'underwriting-handoff/1', 'ticker': packet['ticker'], 'packet': packet,
+               'contract': author, 'review': review, 'receipts': approved['receipts']}
+    identity = digest(payload)
+    path = vault/'valuation-underwriting/handoffs'/(identity+'.json')
+    if path.is_file():
+        require(read(path) == payload, 'An immutable local handoff changed')
+    else:
+        write(path, payload)
+    write(vault/'valuation-underwriting/handoffs/latest'/(packet['ticker']+'.json'),
+          {'ticker': packet['ticker'], 'handoff_hash': identity, 'contract_hash': digest(author),
+           'approved_at': max(r.get('finished_at') or author['as_of'] for r in approved['receipts'].values())})
+    return {'status': 'approved_for_build', 'handoff_hash': identity, 'contract_hash': digest(author),
+            'review_due': author['review_due']}
+
+
+def validate_handoff(root, payload, identity):
+    require(digest(payload) == identity and payload.get('schema_version') == 'underwriting-handoff/1', 'Handoff hash changed')
+    packet, author, review = payload['packet'], payload['contract'], payload['review']
+    require(payload['ticker'] == packet['ticker'] == author['ticker'], 'Handoff issuer binding changed')
+    validate_review(author, review)
+    canonical = compile_contract(packet, author)
+    receipts = payload['receipts']
+    require(set(receipts) == {'author', 'challenger'}, 'Handoff needs both judgment receipts')
+    for stage, receipt in receipts.items():
+        selected = stage_model(root, stage)
+        require(receipt.get('agent_id') and receipt.get('status') == 'finished' and receipt.get('stage') == stage
+                and receipt.get('model') == selected['id'] and receipt.get('reasoning_effort') == selected['reasoning_effort']
+                and receipt.get('provider') == selected['provider'], 'Handoff provider policy changed: '+stage)
+    require(receipts['author']['agent_id'] != receipts['challenger']['agent_id'], 'Handoff sessions are not independent')
+    return canonical
+
+
+def run_company(root, work, ticker, as_of, state, vault, *, prepare=prepare_packet, execute=None, phase='all', handoff=None):
+    if phase == 'build':
+        identity, payload = handoff
+        require(payload.get('ticker') == ticker, 'Handoff pointer belongs to another issuer')
+        canonical = validate_handoff(root, payload, identity)
+        packet = payload['packet']
+        require(payload['contract']['review_due'] >= as_of, 'Handoff independent review expired')
+        approved = {'author': payload['contract'], 'review': payload['review'], 'receipts': payload['receipts'],
+                    'canonical_hash': digest(canonical)}
+        prepare = lambda *args: packet
+    else:
+        approved = None
     packet = prepare(root, ticker, as_of)
     state['input_fingerprint'] = input_fingerprint(root, ticker)
     prior_path = work/'packets'/(str(state.get('packet_hash'))+'.json')
-    if prior_path.is_file():
+    if prior_path.is_file() and phase != 'build':
         prior = read(prior_path)
         if (prior.get('evidence_hash') == packet['evidence_hash'] and prior.get('input_fingerprint') == packet.get('input_fingerprint')
                 and (datetime.fromisoformat(as_of)-datetime.fromisoformat(prior['as_of'])).days <= 7):
@@ -374,6 +432,8 @@ def run_company(root, work, ticker, as_of, state, vault, *, prepare=prepare_pack
     write(work/'packets'/(packet['packet_hash']+'.json'), packet)
     state.update(packet_hash=packet['packet_hash'], evidence_hash=packet['evidence_hash'])
     progress = load_progress(root, work, ticker, packet)
+    if approved:
+        progress['approved'] = approved
     feedback = progress.get('feedback')
     def checkpoint():
         state['unresolved_findings'] = unresolved_findings(progress.get('feedback'))
@@ -404,6 +464,8 @@ def run_company(root, work, ticker, as_of, state, vault, *, prepare=prepare_pack
                                         'receipts': {'author': author_receipt, 'challenger': challenger_receipt}}
                 progress['feedback'] = None
                 checkpoint()
+            if phase == 'author':
+                return save_handoff(root, vault, packet, progress['approved'])
             builder_feedback = progress.get('builder_feedback')
             for _build_attempt in range(int(read(root/POLICY).get('maximum_builder_attempts') or 2)):
                 built, builder_receipt = call_stage(root, work, ticker, 'builder',
@@ -436,37 +498,81 @@ def run_company(root, work, ticker, as_of, state, vault, *, prepare=prepare_pack
     raise StageBlocked('author_or_challenger_unresolved: '+(details or str((feedback or {}).get('required_correction'))))
 
 
-def run_batch(root=ROOT, *, limit=None, tickers=None, launch=False, work=None, vault=None, prepare=prepare_packet, execute=None):
+def run_batch(root=ROOT, *, limit=None, tickers=None, launch=False, work=None, vault=None, prepare=prepare_packet, execute=None, phase='all'):
     from vault_paths import research_vault_root
     as_of = today()
     work = work or root/'.underwriting-work'
     work.mkdir(parents=True, exist_ok=True)
     vault = vault or research_vault_root()
     require(vault is not None, 'Private evidence storage is required')
-    runtime = vault/'valuation-underwriting/runtime'
+    runtime = vault/('valuation-underwriting/local-runtime' if phase == 'author' else 'valuation-underwriting/runtime')
     if runtime.is_dir():
         shutil.copytree(runtime, work, dirs_exist_ok=True)
+    # Each provider owns its role, while the combined ledger preserves the
+    # same repository-wide budget across local sessions and GitHub builds.
+    ledger_rows = read_ledger(work/'ledger.jsonl')
+    known = {digest(row) for row in ledger_rows}
+    for name in ('runtime', 'local-runtime'):
+        for row in read_ledger(vault/'valuation-underwriting'/name/'ledger.jsonl'):
+            if digest(row) not in known:
+                append_ledger(work/'ledger.jsonl', row)
+                known.add(digest(row))
     states = {p.stem: read(p) for p in (work/'states').glob('*.json')} if (work/'states').is_dir() else {}
+    if phase == 'build':
+        for path in (vault/'valuation-underwriting/local-runtime/states').glob('*.json'):
+            incoming = read(path)
+            if incoming.get('last_attempt', '') > (states.get(path.stem) or {}).get('last_attempt', ''):
+                states[path.stem] = incoming
     queue = build_queue(root, as_of, states)
     configured = int(read(root/POLICY).get('maximum_companies_per_run') or 1)
     limit = limit or configured
     require(1 <= limit <= int(read(root/POLICY).get('maximum_batch_size') or 3), 'Batch limit is outside the configured bound')
-    candidates = [r for r in queue['companies'] if r['status'] not in ('reviewed', 'automatic_retry_pending') and (not tickers or r['ticker'] in tickers)][:limit]
+    candidates = [r for r in queue['companies'] if r['status'] not in ('reviewed', 'automatic_retry_pending', 'waiting_for_build') and (not tickers or r['ticker'] in tickers)][:limit]
+    handoffs = {}
+    if phase == 'build':
+        covered = {r['ticker'] for r in queue['companies']}
+        pointers = [read(p) for p in (vault/'valuation-underwriting/handoffs/latest').glob('*.json')]
+        for pointer in sorted(pointers, key=lambda r:r.get('approved_at') or '', reverse=True):
+            ticker, identity = pointer.get('ticker'), pointer.get('handoff_hash') or ''
+            require(ticker in covered and re.fullmatch(r'[0-9a-f]{64}', identity), 'Unsafe handoff pointer')
+            if ticker in handoffs or (tickers and ticker not in tickers):
+                continue
+            receipt = read(root/str(ticker)/'research/underwriting_receipt.json')
+            if receipt.get('status') == 'validated' and receipt.get('contract_hash') == pointer.get('contract_hash'):
+                continue
+            state = states.get(ticker) or {}
+            if (state.get('handoff_hash') == identity and state.get('processing_version') == processing_version(root)
+                    and (state.get('retry_after') or '') > as_of):
+                continue
+            handoffs[ticker] = (identity, read(vault/'valuation-underwriting/handoffs'/(identity+'.json')))
+        candidates = [{'ticker':t} for t in handoffs][:limit]
     result = {'schema_version': 'underwriting-batch/1', 'as_of': as_of, 'started_at': now(),
-              'selected': [r['ticker'] for r in candidates], 'completed': [], 'blocked': [], 'launched': launch}
+              'selected': [r['ticker'] for r in candidates], 'completed': [], 'approved': [], 'blocked': [], 'launched': launch, 'phase': phase}
     if not launch:
         return result
-    require(not candidates or execute or os.environ.get('CURSOR_API_KEY'), 'CURSOR_API_KEY is required before starting the batch')
+    if candidates and not execute:
+        if phase == 'author':
+            from underwriting_codex import preflight
+            preflight()
+        else:
+            require(os.environ.get('CURSOR_API_KEY'), 'CURSOR_API_KEY is required before starting the batch')
     deadline = (datetime.now(timezone.utc)+timedelta(minutes=int(read(root/POLICY).get('maximum_model_minutes_per_run') or 100))).isoformat()
     for row in candidates:
         ticker = row['ticker']
         state = states.setdefault(ticker, {})
         state.update(last_attempt=now(), status='running', batch_deadline=deadline, processing_version=processing_version(root))
+        if ticker in handoffs:
+            state['handoff_hash'] = handoffs[ticker][0]
         print('Underwriting '+ticker+' from primary evidence', flush=True)
         try:
-            receipt = run_company(root, work, ticker, as_of, state, vault, prepare=prepare, execute=execute)
-            state.update(status='validated', contract_hash=receipt['contract_hash'], gaps=[], retry_after=None)
-            result['completed'].append(ticker)
+            receipt = run_company(root, work, ticker, as_of, state, vault, prepare=prepare, execute=execute,
+                                  phase=phase, handoff=handoffs.get(ticker))
+            state.update(status=receipt['status'], contract_hash=receipt['contract_hash'], gaps=[], retry_after=None)
+            if phase == 'author':
+                state.update(handoff_hash=receipt['handoff_hash'], review_due=receipt['review_due'])
+                result['approved'].append(ticker)
+            else:
+                result['completed'].append(ticker)
         except (ValueError, OSError, KeyError, TypeError, subprocess.SubprocessError) as exc:
             gap = {'code': type(exc).__name__, 'detail': str(exc)[:1800]}
             state.update(status='automatic_retry_pending', gaps=[gap], retry_after=(datetime.fromisoformat(as_of)+timedelta(days=1)).date().isoformat())
@@ -482,6 +588,8 @@ def run_batch(root=ROOT, *, limit=None, tickers=None, launch=False, work=None, v
     queue = build_queue(root, as_of, states)
     result.update(finished_at=now(), queue_summary=queue['summary'])
     write(work/'batch.json', result)
+    if launch:
+        shutil.copytree(work, runtime, dirs_exist_ok=True, ignore=shutil.ignore_patterns('prompt.txt'))
     return result
 
 
@@ -492,6 +600,7 @@ def main():
     parser.add_argument('--limit', type=int)
     parser.add_argument('--tickers', default='')
     parser.add_argument('--root', type=Path, default=ROOT)
+    parser.add_argument('--phase', choices=('all', 'author', 'build'), default='all')
     args = parser.parse_args()
     root = args.root.resolve()
     if args.command == 'queue':
@@ -505,7 +614,7 @@ def main():
         require(all(read(root/t/'research/underwriting_receipt.json') for t in selected), 'Underwritten model is missing its review receipt')
         result = {'validated': [t for t in selected if validate_saved(root, t, vault)]}
     else:
-        result = run_batch(root, limit=args.limit, tickers=args.tickers.split(',') if args.tickers else None, launch=args.launch)
+        result = run_batch(root, limit=args.limit, tickers=args.tickers.split(',') if args.tickers else None, launch=args.launch, phase=args.phase)
     print(json.dumps(result))
 
 

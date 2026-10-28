@@ -43,11 +43,13 @@ export async function verifyCatalog({apiKey, policy, listModels}) {
     for (const [stage,role] of Object.entries({author:'valuation_underwriter',challenger:'valuation_challenger',builder:'valuation_builder'})) {
       const config=consumers[role];
       if (!config?.model) throw new Error(`Missing explicit model policy for ${role}`);
-      selections[stage]=modelSelection(config.model,{catalog,reasoningEffort:config.reasoning_effort});
+      selections[stage]=config.provider === 'codex-local' ?
+        {provider:'codex-local',id:config.model,reasoning_effort:config.reasoning_effort,availability:'local_preflight_required'} :
+        modelSelection(config.model,{catalog,reasoningEffort:config.reasoning_effort});
     }
   } catch (error) {
     // Catalog metadata contains no credentials or issuer evidence.
-    console.log(JSON.stringify({available_requested_models:catalog.filter(m=>/gpt-6|auto/.test(m.id))}));
+    console.log(JSON.stringify({available_models:catalog}));
     throw error;
   }
   return {provider:'cursor',selections,verified_at:new Date().toISOString()};
