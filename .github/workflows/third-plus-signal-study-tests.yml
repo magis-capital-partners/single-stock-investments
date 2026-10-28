@@ -14,6 +14,10 @@ on:
       - 'dashboard/third-plus-venue.js'
       - 'dashboard/third-plus-assumed.js'
       - 'dashboard/third-plus-allocation.js'
+      - 'dashboard/third-plus-announcement*'
+      - 'dashboard/data/third_plus_announcement*'
+      - 'docs/THIRD_PLUS_ANNOUNCEMENT_BACKTEST.md'
+      - 'dashboard/short-alpha-viz.js'
       - 'dashboard/index.html'
       - 'dashboard/data/third_plus_allocation*'
       - 'dashboard/data/third_plus_assumed*'
@@ -35,6 +39,7 @@ on:
       - 'dashboard/data/third_plus_requested_*.csv'
       - '_system/data/reverse_splits/third_plus_signal_study/**'
       - '_system/scripts/third_plus_fundamental*'
+      - '_system/scripts/build_short_quant_screen.py'
       - '_system/scripts/third_plus_reconciliation*'
       - '_system/scripts/test_third_plus_reconciliation.py'
       - '_system/scripts/third_plus_saved_screen.cjs'
@@ -68,6 +73,10 @@ jobs:
             dashboard/third-plus-venue.js
             dashboard/third-plus-assumed.js
             dashboard/third-plus-allocation.js
+            dashboard/third-plus-announcement*
+            dashboard/data/third_plus_announcement*
+            dashboard/short-alpha-viz.js
+            docs/THIRD_PLUS_ANNOUNCEMENT_BACKTEST.md
             dashboard/index.html
             dashboard/data/third_plus_allocation*
             dashboard/data/third_plus_assumed*
@@ -89,6 +98,7 @@ jobs:
             dashboard/data/third_plus_requested_*.csv
             _system/data/reverse_splits/third_plus_signal_study/
             _system/scripts/third_plus_fundamental*
+            _system/scripts/build_short_quant_screen.py
             _system/scripts/third_plus_reconciliation*
             _system/scripts/test_third_plus_reconciliation.py
             _system/scripts/third_plus_saved_screen.cjs
@@ -126,8 +136,11 @@ jobs:
           node --test --test-reporter=tap _system/scripts/third_plus_execution/*.test.cjs
           node _system/scripts/third_plus_execution/publish.cjs --check
           python -m unittest discover -s _system/scripts/third_plus_execution -p test_venue_capture.py
+          python -m unittest discover -s _system/scripts/third_plus_execution -p test_announcement_scores.py
           node _system/scripts/third_plus_execution/venue_publish.cjs --check
           node _system/scripts/third_plus_execution/assumed_study.cjs --check
           node _system/scripts/third_plus_execution/assumed_publish.cjs --check
           node _system/scripts/third_plus_execution/allocation_study.cjs --check
           node _system/scripts/third_plus_execution/allocation_publish.cjs --check
+          node _system/scripts/third_plus_execution/announcement_study.cjs --check
+          node _system/scripts/third_plus_execution/announcement_report.cjs --check
