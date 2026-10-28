@@ -143,6 +143,9 @@ class Builder:
         self.good = set()
         self.refs = defaultdict(list)
         self.metadata = {}
+        self.company_metadata = {}
+        self.company_metadata_failed = set()
+        self.git_entries = None
         self.file_failures = Counter()
         self.now = datetime.now(timezone.utc).isoformat(timespec="seconds")
         self.previous = load(cache / "index.json")
@@ -192,7 +195,10 @@ class Builder:
             if not path.is_file():
                 write(path, {"text": body})
             record["text_cache"] = sha
-        return self.index.add(record, anchors)
+        key = self.index.add(record, anchors)
+        if record.get("extraction_review"):
+            self.index.records[key]["extraction_review"] = record["extraction_review"]
+        return key
 
     def text(self, record):
         if "text" in record:
@@ -274,11 +280,14 @@ class Builder:
     def local(self, path: Path, origin: str, *, explicit=(), relative=None):
         try:
             return self._local(path, origin, explicit=explicit, relative=relative)
-        except (OSError, ValueError, RuntimeError):
+        except (OSError, ValueError, RuntimeError) as exc:
             self.file_failures[origin] += 1
             rel = relative or path.relative_to(self.root).as_posix()
-            record = self.base("unreadable:" + rel, path.stem, origin, explicit=explicit, path=rel, state="awaiting_extraction")
+            repo = "research-vault" if rel.startswith("vault/") else "single-stock-investments"
+            url = f"https://github.com/magis-capital-partners/{repo}/blob/main/{quote(rel.removeprefix('vault/'), safe='/')}"
+            record = self.base("unreadable:" + rel, path.stem, origin, explicit=explicit, path=rel, state="awaiting_extraction", locations=[{"kind":"source","url":url,"label":"Original source"}])
             record["availability"] = "unavailable"
+            record["extraction_error"] = type(exc).__name__
             self.add(record, ["path:" + rel])
 
     def _local(self, path: Path, origin: str, *, explicit=(), relative=None):
@@ -320,6 +329,11 @@ class Builder:
         record["content_hash"] = sha
         record["content_md5"] = hashlib.md5(data, usedforsecurity=False).hexdigest()
         record["format"] = path.suffix.lstrip(".")
+        extraction = load(self.cache / "text" / (sha + ".json")).get("extraction", {}) if path.suffix.lower() == ".pdf" else {}
+        if extraction.get("ocr_pages"):
+            record["extraction_review"] = "Automatic OCR; verify against the original"
+        elif media_cache.get("transcript_kind") == "automatic":
+            record["extraction_review"] = "Automatic transcript; verify against the original"
         if rel in SHARED_MODELS:
             record["category"] = "models"
         if path.suffix.lower() == ".json":
@@ -382,6 +396,7 @@ class Builder:
                 self.receipt(relative, 0, "failed", type(exc).__name__)
 
     def local_corpora(self):
+        self.prepare_company_metadata()
         if self.vault:
             try:
                 for row in load(self.vault / "superinvestor-letters/letters_index.json", []):
@@ -445,19 +460,57 @@ class Builder:
             count += 1
         self.receipt("shared:models", count)
 
+    def git_tree(self):
+        if self.git_entries is None:
+            result = subprocess.run(["git", "ls-tree", "-r", "-z", "HEAD"], cwd=self.root, capture_output=True, check=True)
+            self.git_entries = [entry.split("\t", 1) for entry in result.stdout.decode("utf-8").split("\0") if "\t" in entry]
+        return self.git_entries
+
+    def prepare_company_metadata(self):
+        """Preserve filing URLs and inventory links even in sparse deployments."""
+        try:
+            entries = self.git_tree()
+        except subprocess.CalledProcessError:
+            return  # Local-only fixtures and full, unversioned research exports.
+        from backfill_company_sources import Worker
+        local = os.environ.get("COMPANY_SOURCE_LOCAL_ROOT")
+        worker = Worker(self.root, self.cache, self.vault, Path(local) if local else None)
+        try:
+            for header, relative in entries:
+                parts = relative.split("/")
+                if parts[0] not in self.companies or "/".join(parts[1:]) not in {
+                    "investor-documents/DOWNLOAD_MANIFEST.json", "third-party-analyses/source_inventory.json"
+                }:
+                    continue
+                if (self.root / relative).is_file():
+                    continue
+                sha = header.split()[-1]
+                cached = self.cache / "metadata" / (sha + ".json")
+                try:
+                    if cached.is_file():
+                        doc = load(cached)
+                    else:
+                        raw = worker.git_bytes({"path": relative, "sha": sha})
+                        doc = json.loads(raw.decode("utf-8-sig"))
+                        if isinstance(doc, dict) and doc.get("private_snapshot"):
+                            raise ValueError("Unresolved private inventory")
+                        write(cached, doc)
+                    self.company_metadata[relative] = doc
+                except (OSError, ValueError, subprocess.SubprocessError):
+                    self.company_metadata_failed.add(parts[0])
+        finally:
+            worker.close()
+
     def git_inventory(self, extraction_budget=300):
         """A sparse deploy still inventories historical company originals from the Git tree.
 
         Missing file bytes are honestly marked awaiting extraction, never hidden.
         Live local files take precedence; Git IDs also detect renames and copies.
         """
-        result = subprocess.run(["git", "ls-tree", "-r", "-z", "HEAD"], cwd=self.root, capture_output=True, check=True)
         count = 0
+        by_company = Counter()
         started = time.monotonic()
-        for entry in result.stdout.decode("utf-8").split("\0"):
-            if not entry or "\t" not in entry:
-                continue
-            header, rel = entry.split("\t", 1)
+        for header, rel in self.git_tree():
             parts = rel.split("/")
             if len(parts) < 3 or parts[0] not in self.companies or parts[1] not in {"research", "third-party-analyses", "investor-documents", "models", "transcripts", "financials"}:
                 continue
@@ -469,6 +522,7 @@ class Builder:
             if re.search(r"(?:source_inventory|activist_reports_index|latest|security_identity|classification|human_decision|download|readiness|audit|committee_packet)", path.stem, re.I):
                 continue
             count += 1
+            by_company[parts[0]] += 1
             existing = self.index.records.get(self.index.anchors.get("path:" + rel), {})
             if existing.get("processing_status") == "indexed":
                 continue
@@ -489,13 +543,25 @@ class Builder:
             locations = [{"kind":"repository","url":url,"label":"Research original"}]
             locations = self.refs.get(rel) or locations
             record = self.base("git:"+sha,path.stem.replace("_"," "),"git_inventory",text=cached.get("text", ""),explicit=[parts[0]],state=cached.get("status", "awaiting_extraction"),locations=locations,path=rel)
+            if cached.get("extraction", {}).get("ocr_pages"):
+                record["extraction_review"] = "Automatic OCR; verify against the original"
             if cached.get('content_md5'):record['content_md5']=cached['content_md5']
             self.add(record,["git:"+sha,"path:"+rel]+(['md5:'+cached['content_md5']] if cached.get('content_md5') else []))
         self.receipt("git_inventory",count)
+        # Discovery is complete when the committed tree and its metadata have
+        # been read. Extraction status remains separate on each original.
+        for receipt in self.receipts:
+            ticker = receipt["collection"].removeprefix("company:")
+            if receipt["collection"].startswith("company:") and receipt["status"] == "unavailable" and ticker not in self.company_metadata_failed:
+                receipt.update(status="complete", discovered=by_company[ticker], detail="Committed company tree and filing inventories scanned")
+                self.good.add(receipt["collection"])
+            elif ticker in self.company_metadata_failed:
+                receipt.update(status="partial", detail="Some committed source metadata could not be read")
+                self.good.discard(receipt["collection"])
 
     def filings(self, ticker):
         path = self.root / ticker / "investor-documents/DOWNLOAD_MANIFEST.json"
-        doc = load(path)
+        doc = load(path) if path.is_file() else self.company_metadata.get(path.relative_to(self.root).as_posix(), {})
         def rows(value):
             if isinstance(value, list):
                 for x in value:
@@ -521,7 +587,7 @@ class Builder:
 
     def company_inventory(self, ticker):
         relative = f"{ticker}/third-party-analyses/source_inventory.json"
-        doc = document(self.root, relative)
+        doc = document(self.root, relative) if (self.root / relative).is_file() else self.company_metadata.get(relative, {})
         for row in doc.get("sources", []):
             ref = row.get("path") or row.get("source_ref")
             url = row.get("url") or row.get("source_url") or row.get("drive_url")
@@ -652,6 +718,8 @@ class Builder:
             already_matched = bool(old_text and text == old_text and old.get("processing_status") == "indexed")
             rec = self.base(identity, name, "drive", text="" if already_matched else text, state=state, explicit=explicit, locations=[{"kind": "drive", "url": url, "label": "Open original"}], mime=item["mimeType"], path=full)
             rec["text"] = text
+            if cached.get("extraction", {}).get("ocr_pages"):
+                rec["extraction_review"] = "Automatic OCR; verify against the original"
             rec.update({"family": "drive:" + item["id"], "revision": revision, "modified_at": item.get("modifiedTime"), "format": item["mimeType"]})
             if state == "access_unavailable":
                 rec["availability"] = "access_unavailable"

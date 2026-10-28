@@ -5,7 +5,8 @@ import json
 from pathlib import Path
 import zipfile
 
-FOLDERS=('git','drive','media','transcripts','queue-checkpoints','md5')
+FOLDERS=('git','drive','media','transcripts','queue-checkpoints','md5','metadata','relationships')
+ROOT_FILES=('matches.json',)
 
 
 def pack(cache,destination):
@@ -24,12 +25,13 @@ def pack(cache,destination):
         if target.exists():temporary.unlink()
         else:temporary.replace(target)
         parts.append({'file':name,'sha256':sha,'files':len(files)});files=[];size=0
-    for folder in FOLDERS:
-        for path in sorted((cache/folder).rglob('*')):
-            if not path.is_file() or path.suffix not in {'.json','.txt','.md'}:continue
-            if size+path.stat().st_size>32_000_000:flush()
-            if path.stat().st_size>90_000_000:raise ValueError('Oversized extraction cache entry')
-            files.append(path);size+=path.stat().st_size
+    paths=[cache/name for name in ROOT_FILES]
+    for folder in FOLDERS:paths.extend(sorted((cache/folder).rglob('*')))
+    for path in paths:
+        if not path.is_file() or path.suffix not in {'.json','.txt','.md'}:continue
+        if size+path.stat().st_size>32_000_000:flush()
+        if path.stat().st_size>90_000_000:raise ValueError('Oversized extraction cache entry')
+        files.append(path);size+=path.stat().st_size
     flush()
     (destination/'manifest.json').write_text(json.dumps({'schema_version':1,'parts':parts},indent=2)+'\n',encoding='utf-8')
     # Old immutable parts may belong to another publication; leave retention to
@@ -48,7 +50,7 @@ def restore(source,cache):
         with zipfile.ZipFile(path) as z:
             for item in z.infolist():
                 target=cache/item.filename
-                if not target.resolve().is_relative_to(cache.resolve()) or Path(item.filename).parts[0] not in FOLDERS:
+                if not target.resolve().is_relative_to(cache.resolve()) or (Path(item.filename).parts[0] not in FOLDERS and item.filename not in ROOT_FILES):
                     raise ValueError('Unsafe cache path')
                 target.parent.mkdir(parents=True,exist_ok=True)
                 target.write_bytes(z.read(item))

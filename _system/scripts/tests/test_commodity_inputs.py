@@ -68,6 +68,19 @@ def test_failed_refresh_preserves_last_good_provenance():
     assert values['gold_bullion']['status']=='fetch_failed' and 'gold_bullion' in errors
 
 
+def test_private_snapshot_preserves_originals_but_excludes_probes(tmp_path):
+    from preserve_commodity_inputs import preserve
+    source=tmp_path/'source';source.mkdir()
+    (source/'observations.json').write_text('{"series":{}}')
+    (source/'probe').mkdir();(source/'probe/private-helper.py').write_text('private')
+    (source/'objects').mkdir();(source/'objects/raw').write_bytes(b'publisher bytes')
+    vault=tmp_path/'vault'
+    assert preserve(source,vault)==1
+    saved=vault/'dashboard-private/commodity-inputs'
+    assert (saved/'objects/raw').read_bytes()==b'publisher bytes'
+    assert not (saved/'probe').exists()
+
+
 def test_archived_forecasts_use_only_prior_vintage_baseline_and_complete_actual_months():
     from commodity_vintages import score
     vintage={'published_at':'2025-01-15','source_url':'https://eia.gov/vintage','sha256':'x',
