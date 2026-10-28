@@ -6,6 +6,13 @@ approval. This is a design, not an order authorization or deployment. Existing
 research has `production_authority: none`; no credentials, Gateway configuration,
 registry allocation or SPX operating rules change here.
 
+The [saved pilot contract](../_system/data/reverse_splits/third_plus_forward_v1/live_pilot_plan.v1.json)
+fixes the initial order at exactly one share, caps initial size at one share and
+prevents pyramiding an existing issuer. Its account and endpoint are empty and
+it is disabled. The independent executor must enforce this contract before
+activation. Corporate actions still change the actual owed units; they must
+never be clipped to one. Historical study sizing remains $100,000 per company.
+
 ## IBKR connection and host
 
 Use an independent execution VM with its own broker connection and dedicated
@@ -104,7 +111,7 @@ eligible regular session after the effective split day and covers in session
 20. It can use the completed split-day weak close. It does **not** short
 immediately when the original announcement is released.
 
-The separate `announcement_full_v2` experiment starts from the first qualifying
+The separate `announcement_full_v8` experiment starts from the first qualifying
 captured definite scheduled-action disclosure. SEC acceptance is a publication
 proxy, not proof of the earliest press release or when a trader received it.
 It compares zero/five-minute delay and next-open entry, always in regular
