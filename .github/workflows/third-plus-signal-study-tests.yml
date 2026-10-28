@@ -8,6 +8,9 @@ on:
       - 'dashboard/third-plus-execution.js'
       - 'dashboard/third-plus-venue.js'
       - 'dashboard/third-plus-assumed.js'
+      - 'dashboard/third-plus-allocation.js'
+      - 'dashboard/index.html'
+      - 'dashboard/data/third_plus_allocation*'
       - 'dashboard/data/third_plus_assumed*'
       - 'dashboard/data/third_plus_venue_execution*'
       - 'dashboard/data/third_plus_execution*'
@@ -53,6 +56,9 @@ jobs:
             dashboard/third-plus-execution.js
             dashboard/third-plus-venue.js
             dashboard/third-plus-assumed.js
+            dashboard/third-plus-allocation.js
+            dashboard/index.html
+            dashboard/data/third_plus_allocation*
             dashboard/data/third_plus_assumed*
             dashboard/data/third_plus_venue_execution*
             dashboard/data/third_plus_execution*
@@ -107,3 +113,5 @@ jobs:
           node _system/scripts/third_plus_execution/venue_publish.cjs --check
           node _system/scripts/third_plus_execution/assumed_study.cjs --check
           node _system/scripts/third_plus_execution/assumed_publish.cjs --check
+          node _system/scripts/third_plus_execution/allocation_study.cjs --check
+          node _system/scripts/third_plus_execution/allocation_publish.cjs --check
