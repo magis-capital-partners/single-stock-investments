@@ -24,7 +24,27 @@ def test_ls_algo_intake_restores_repository_snapshots_before_the_build():
     redact = text.index("migrate_dashboard_sources.py")
     stage = text.index("ci_stage_owned_paths.py")
     commit = text.split("Commit the complete onboarding transaction", 1)[1]
-    assert "git add --sparse" not in commit
+    script = "\n".join(line for line in commit.splitlines() if not line.strip().startswith("#"))
+    assert "git add --sparse" not in script
+    assert "git status" not in script
+    step_head = commit.split("migrate_dashboard_sources.py", 1)[0]
+    assert "timeout-minutes: 20" in step_head
+    assert "Vault push returned. Staging owned paths." in commit
+    for pathspec in (
+        "_system/data/evidence_recovery_queue.json",
+        "_system/reviews/pending",
+        "dashboard/data",
+        "dashboard/private-assets.json",
+        ".gitattributes",
+        "_system/portfolio",
+        ":(glob)**/README.md",
+        ":(glob)**/.onboard_status.json",
+        ":(glob)**/research/**",
+        ":(glob)**/third-party-analyses/**",
+        ":(glob)**/investor-documents/**",
+        "ci_push_main.sh",
+    ):
+        assert pathspec in commit
     assert 'hydrate: "false"' in text
     assert checkout < restore < dashboard < build < redact < stage
 
