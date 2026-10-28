@@ -13,7 +13,11 @@ from pathlib import Path
 
 
 def _git(repo: Path, *args: str, check: bool = True) -> subprocess.CompletedProcess[bytes]:
-    return subprocess.run(["git", "-C", str(repo), *args], check=check, capture_output=True)
+    result = subprocess.run(["git", "-C", str(repo), *args], check=False, capture_output=True)
+    if check and result.returncode != 0:
+        sys.stderr.buffer.write(result.stderr)
+        raise subprocess.CalledProcessError(result.returncode, result.args, result.stdout, result.stderr)
+    return result
 
 
 def _sparse(repo: Path) -> bool:
@@ -52,34 +56,50 @@ def _skip_worktree(repo: Path) -> set[str]:
     return found
 
 
+def _changed(repo: Path, pathspecs: list[str]) -> list[tuple[str, str]]:
+    shown = _git(repo, "status", "--porcelain=v1", "-z", "-uall", "--", *pathspecs)
+    parts = shown.stdout.split(b"\0")
+    found: list[tuple[str, str]] = []
+    index = 0
+    while index < len(parts):
+        record = parts[index]
+        index += 1
+        if len(record) < 4:
+            continue
+        status = record[:2].decode("ascii", errors="replace")
+        path = record[3:].decode("utf-8", errors="surrogateescape")
+        if "R" in status or "C" in status:
+            renamed = parts[index].decode("utf-8", errors="surrogateescape") if index < len(parts) else path
+            index += 1
+            found.append(("D ", path))
+            found.append(("A ", renamed))
+            continue
+        found.append((status, path))
+    return found
+
+
 def stage_owned(repo: Path, pathspecs: list[str]) -> list[str]:
-    """Stage pathspecs. Return paths that were left unstaged because they are outside the sparse checkout."""
+    """Stage pathspecs that are in the checkout. Return paths left unstaged.
+
+    Never calls ``git add --sparse -A``. That command tries to delete tracked
+    files the sparse checkout did not materialize and exits 128 on
+    ``not uptodate; will not remove from working tree``.
+    """
     if not pathspecs:
         return []
-    skipped = _skip_worktree(repo) if _sparse(repo) else set()
-    patterns = _patterns(repo) if _sparse(repo) else None
-    _git(repo, "add", "--sparse", "-A", "--", *pathspecs)
+    sparse = _sparse(repo)
+    skipped = _skip_worktree(repo) if sparse else set()
+    patterns = _patterns(repo) if sparse else None
     refused: list[str] = []
-    if patterns is None:
-        return refused
-    deleted = _git(repo, "diff", "--cached", "--name-only", "--diff-filter=D", "-z").stdout.split(b"\0")
-    added = _git(repo, "diff", "--cached", "--name-only", "--diff-filter=A", "-z").stdout.split(b"\0")
-    unstage = []
-    for raw in deleted:
-        if not raw:
+    for status, path in _changed(repo, pathspecs):
+        outside = path in skipped or (patterns is not None and not _in_sparse(path, patterns))
+        if outside:
+            refused.append(path)
             continue
-        path = raw.decode("utf-8", errors="surrogateescape")
-        if path in skipped:
-            unstage.append(path)
-    for raw in added:
-        if not raw:
-            continue
-        path = raw.decode("utf-8", errors="surrogateescape")
-        if not _in_sparse(path, patterns):
-            unstage.append(path)
-    if unstage:
-        _git(repo, "restore", "--staged", "--", *unstage)
-        refused.extend(unstage)
+        if "D" in status:
+            _git(repo, "add", "-u", "--", path)
+        else:
+            _git(repo, "add", "--", path)
     return refused
 
 
