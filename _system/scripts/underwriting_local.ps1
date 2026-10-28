@@ -1,6 +1,7 @@
 param(
     [string]$RuntimeHome = (Join-Path $env:LOCALAPPDATA 'Magis/valuation-underwriting'),
     [switch]$Launch,
+    [switch]$PrepareOnly,
     [string]$Tickers = ''
 )
 $ErrorActionPreference = 'Stop'
@@ -28,7 +29,7 @@ function Run-Git {
 }
 $newSource = -not (Test-Path -LiteralPath (Join-Path $sourceRoot '.git'))
 if ($newSource) {
-    Run-Git clone --filter=blob:none --sparse --no-checkout https://github.com/magis-capital-partners/single-stock-investments.git $sourceRoot
+    Run-Git clone --depth 1 --filter=blob:none --sparse --no-checkout https://github.com/magis-capital-partners/single-stock-investments.git $sourceRoot
 } else {
     $dirty = & git -C $sourceRoot status --porcelain --untracked-files=no
     if ($dirty) { throw 'The owned source has edits; preserve them before updating it.' }
@@ -47,6 +48,7 @@ $remote = & git -C $sourceRoot remote get-url origin
 if ($remote -ne 'https://github.com/magis-capital-partners/single-stock-investments.git') { throw 'Unexpected runtime source remote.' }
 Run-Git -C $sourceRoot fetch -q origin main
 Run-Git -C $sourceRoot checkout -q --detach origin/main
+if ($PrepareOnly) { return }
 $workerArgs = @((Join-Path $sourceRoot '_system/scripts/underwriting_local.py'), '--home', $runtimeRoot)
 if ($Launch) { $workerArgs += '--launch' }
 if ($Tickers) { $workerArgs += @('--tickers', $Tickers) }

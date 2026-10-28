@@ -51,7 +51,7 @@ def clone_vault(home):
     vault = home/'vault'
     if not (vault/'.git').is_dir():
         require(not vault.exists(), 'Choose a new isolated local vault directory')
-        subprocess.run(['git', 'clone', '--filter=blob:none', '--sparse', 'https://github.com/'+VAULT+'.git', str(vault)], check=True, timeout=180)
+        subprocess.run(['git', 'clone', '--depth', '1', '--filter=blob:none', '--sparse', 'https://github.com/'+VAULT+'.git', str(vault)], check=True, timeout=180)
         git(vault, 'sparse-checkout', 'set', 'valuation-underwriting')
     require(git(vault, 'remote', 'get-url', 'origin').decode().strip().removesuffix('.git').endswith('/'+VAULT),
             'Local runtime vault remote does not match')
