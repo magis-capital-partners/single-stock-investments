@@ -32,12 +32,21 @@ def refresh(output=DEFAULT_PANEL, as_of=None, history=True):
         key, ref = item
         try:
             raw = download(ref['url'])
+            resolved_url=ref['url']
+            if ref.get('download_label'):
+                from bs4 import BeautifulSoup
+                soup=BeautifulSoup(raw,'html.parser')
+                title=soup.find(string=lambda t:t and ref['download_label'] in t)
+                link=title.parent.parent.select_one('[data-downloadurl]') if title else None
+                if not link:raise ValueError('Requested publication download missing')
+                resolved_url=link['data-downloadurl'];raw=download(resolved_url)
+                if not raw.startswith(b'%PDF'):raise ValueError('Expected publisher PDF')
             if len(raw)<500 or (b'<html' in raw[:1000].lower() and b'access denied' in raw.lower()):
                 raise ValueError('No publication content')
             path = output.parent/'objects'/digest(raw)
             path.parent.mkdir(parents=True,exist_ok=True)
             if not path.exists(): path.write_bytes(raw)
-            return key, {'url':ref['url'],'sha256':digest(raw),'fetched_at':as_of.isoformat(),'status':'fetched','bytes':len(raw)}
+            return key, {'url':ref['url'],'resolved_url':resolved_url,'sha256':digest(raw),'fetched_at':as_of.isoformat(),'status':'fetched','bytes':len(raw)}
         except Exception as e:
             return key, {**prior.get('sources',{}).get(key,{}),'status':'fetch_failed','last_attempt':as_of.isoformat(),'error':type(e).__name__}
     with ThreadPoolExecutor(max_workers=4) as pool:

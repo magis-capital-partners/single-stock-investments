@@ -17,7 +17,7 @@ def discover_drive(root,cache,queue):
         token=None
         while True:
             page=execute_with_retry(service.files().list(**parameters,pageToken=token,pageSize=1000,supportsAllDrives=True,includeItemsFromAllDrives=True,
-                 fields='nextPageToken,files(id,name,mimeType,md5Checksum,modifiedTime,parents,appProperties)'))
+                 fields='nextPageToken,files(id,name,mimeType,md5Checksum,modifiedTime,parents,appProperties,shortcutDetails)'))
             for item in page.get('files',[]):
                 items[item['id']]=item
                 if item['mimeType']==FOLDER_MIME and 'driveId' not in parameters:folders.append(item['id'])
@@ -32,6 +32,9 @@ def discover_drive(root,cache,queue):
     jobs=[]
     for item in items.values():
         if item['mimeType']==FOLDER_MIME:continue
+        if item['mimeType']=='application/vnd.google-apps.shortcut' and item.get('shortcutDetails',{}).get('targetId'):
+            target=execute_with_retry(service.files().get(fileId=item['shortcutDetails']['targetId'],fields='id,name,mimeType,modifiedTime,md5Checksum',supportsAllDrives=True))
+            item={**item,**target,'id':item['id']}
         revision=item.get('md5Checksum') or item.get('modifiedTime') or 'unknown'
         jobs.append({'key':'drive:'+item['id']+':'+revision,'kind':'drive',
                      'priority':100 if item.get('appProperties',{}).get('ticker') in preferred else 0,

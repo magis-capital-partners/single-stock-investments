@@ -200,7 +200,7 @@ class Worker:
         if kind=='git':
             target=self.cache/'git'/(p['sha']+'.json');suffix=Path(p['path']).suffix.lower()
             cached=load(target)
-            if cached.get('status')=='indexed' and cached.get('text'):
+            if cached.get('status')=='indexed' and cached.get('text') and (suffix!='.pdf' or cached.get('extraction',{}).get('pages')):
                 if cached.get('content_md5'):
                     write(self.cache/'md5'/(cached['content_md5']+'.json'),{'path':target.relative_to(self.cache).as_posix()})
                 return 'indexed',{'cache':str(target),'reused':True},None

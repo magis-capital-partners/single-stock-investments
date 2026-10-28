@@ -263,7 +263,8 @@ class Builder:
         sha = digest(data)
         path = self.cache / "text" / f"{sha}.json"
         prior = load(path)
-        if prior.get("version") == 1 and prior.get("status") in {"indexed", "needs_ocr", "needs_transcript", "empty_source"}:
+        verified_pages = suffix != '.pdf' or prior.get('status') != 'indexed' or prior.get('extraction',{}).get('pages')
+        if prior.get("version") == 1 and verified_pages and prior.get("status") in {"indexed", "needs_ocr", "needs_transcript", "empty_source"}:
             return prior["text"], prior["status"], sha
         from backfill_company_sources import extract_complete
         text, state, details = extract_complete(data, suffix)
@@ -590,6 +591,14 @@ class Builder:
         for item in sorted(items.values(), key=priority, reverse=True):
             if item["mimeType"] == FOLDER_MIME:
                 continue
+            if item['mimeType']=='application/vnd.google-apps.shortcut':
+                target_id=(item.get('shortcutDetails') or {}).get('targetId')
+                if target_id:
+                    try:
+                        target=execute_with_retry(service.files().get(fileId=target_id,fields='id,name,mimeType,modifiedTime,md5Checksum,webViewLink',supportsAllDrives=True))
+                        item={**item,**target,'id':item['id'],'parents':item.get('parents',[]),'download_id':target_id}
+                    except Exception:
+                        self.file_failures['drive']+=1
             count += 1
             name = item["name"]
             parent = "/".join(paths.get(p, "") for p in item.get("parents", []))
@@ -624,10 +633,10 @@ class Builder:
                     exports = {"application/vnd.google-apps.document": ("text/plain", ".txt"), "application/vnd.google-apps.spreadsheet": ("application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", ".xlsx"), "application/vnd.google-apps.presentation": ("application/vnd.openxmlformats-officedocument.presentationml.presentation", ".pptx")}
                     if mime in exports:
                         export_mime, suffix = exports[mime]
-                        data = execute_with_retry(service.files().export_media(fileId=item["id"], mimeType=export_mime))
+                        data = execute_with_retry(service.files().export_media(fileId=item.get('download_id',item["id"]), mimeType=export_mime))
                     elif Path(name).suffix.lower() in SOURCE_SUFFIXES and not mime.startswith(("audio/", "video/")):
                         suffix = Path(name).suffix.lower()
-                        data = execute_with_retry(service.files().get_media(fileId=item["id"], supportsAllDrives=True))
+                        data = execute_with_retry(service.files().get_media(fileId=item.get('download_id',item["id"]), supportsAllDrives=True))
                     else:
                         data, suffix = b"", ".unsupported"
                     text, state, _ = self.cached_extract(data, suffix)

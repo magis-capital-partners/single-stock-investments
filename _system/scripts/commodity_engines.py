@@ -96,6 +96,11 @@ def copper(config, panel, as_of):
     use_kt = next(r['use_kt'] for r in ref['annual'] if r['year']==2026)
     out['exchange_stocks'] = {**out['exchange_stocks'], 'aggregate_global_use_days': ref['exchange_stocks']['total_t']/1000/use_kt*365}
     out['validation'] = [check(str(r['year'])+' refined accounting',r['refined_kt']-r['use_kt']-r['balance_kt'],1.01) for r in ref['annual']]
+    for row in ref.get('monthly_balances',[]):
+        out['validation'].append(check(row['period']+' monthly refined accounting',row['refined_kt']-row['use_kt']-row['balance_kt'],1.01))
+    exchange=ref['exchange_stocks']
+    changes=[exchange[k].get('ytd_change_t') for k in ['COMEX','SHFE','LME']]
+    if all(finite(v) for v in changes):out['validation'].append(check('exchange stock change geography',sum(changes)-exchange['year_to_date_change_t'],1))
     for s in config['scenarios']:
         rows=[]
         previous=ref['annual'][0]
