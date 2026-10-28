@@ -82,6 +82,54 @@ def test_compiler_uses_frozen_observations_and_existing_forecast_engine():
     assert value['valuation_methodology']['automation'] == 'independent_underwriting'
 
 
+@pytest.mark.parametrize('ratio', [2, 5, .5])
+def test_listing_receipts_convert_ordinary_share_cashflows_exactly_once(ratio):
+    from test_shared_valuation_forecast import sourced_market, sourced_quote
+    from valuation_forecast import build_forecast
+    p = packet()
+    p['listing_ratio'] = {'ordinary_shares_per_listing_share': ratio, 'source_url': 'https://issuer.test/depositary',
+                          'source_as_of': '2025-12-31', 'locator': 'Common shares represented by one depositary receipt'}
+    p['packet_hash'] = digest({k: v for k, v in p.items() if k != 'packet_hash'})
+    c = contract(p)
+    model = compile_contract(p, c)
+    f = build_forecast(model, quote=sourced_quote(value=100*ratio),
+                       market=sourced_market(underwriting_validation={'status': 'verified', 'contract_hash': digest(c)}),
+                       as_of='2026-10-26', evaluated_at='2026-10-26T23:00:00+00:00')
+    assert f['status'] == 'available', f['gaps']
+    assert f['present_value_today_per_share']['base'] == pytest.approx(100*ratio)
+    assert f['forward_irr_pct']['base'] == pytest.approx(10, abs=.001)
+    assert compile_contract(p, c) == model
+    assert sum(i['id'] == 'compiled_listing_ratio' for i in model['component_valuation_results']['additive_components'][0]['calculation_proof']['inputs']) == 1
+
+
+@pytest.mark.parametrize('text,expected', [
+    ('American depositary shares, each representing five common shares.', 5),
+    ('Each ADS represents two Class A ordinary shares.', 2),
+    ('Two American depositary shares represent one ordinary share.', .5),
+    ('American depositary shares each of which represents eight Class A ordinary shares.', 8),
+    ('Each ADS represents five (5) common shares.', 5),
+])
+def test_listing_ratio_is_extracted_from_frozen_primary_disclosure(text, expected):
+    from underwriting_evidence import listing_ratio_from_documents
+    doc = {'contexts': [text], 'filed': '2026-08-01', 'period': '2026-06-30',
+           'source_url': 'https://issuer.test/filing', 'content_hash': 'a'*64}
+    ratio = listing_ratio_from_documents([doc])
+    assert ratio['ordinary_shares_per_listing_share'] == expected
+    assert ratio['locator'] in text
+    assert ratio['document_hash'] == doc['content_hash']
+    with pytest.raises(ContractError, match='ambiguous'):
+        listing_ratio_from_documents([{**doc, 'contexts': [text, 'Each ADS represents three ordinary shares.']}])
+
+
+def test_frozen_contexts_keep_the_first_depositary_representation():
+    from underwriting_evidence import document_record, listing_ratio_from_documents
+    raw = ('<html>Each ADS represents five (5) common shares. '+('Business disclosure. '*250)
+           +'Each ADS or common share purchased under the employee program.</html>').encode()
+    doc = document_record('https://issuer.test/annual', raw)
+    doc.update(period='2025-12-31', filed='2026-04-16')
+    assert listing_ratio_from_documents([doc])['ordinary_shares_per_listing_share'] == 5
+
+
 @pytest.mark.parametrize('mutate', [
     lambda c: c.update(packet_hash='b'*64),
     lambda c: c['facts'][0].update(value=99999),
@@ -139,6 +187,8 @@ def test_production_underwriting_checkout_contains_the_approved_method_registry(
     checkout = next(s for s in doc['jobs']['underwrite']['steps'] if s.get('uses') == 'actions/checkout@v4')
     paths = checkout['with']['sparse-checkout']
     assert '/_system/reference/valuation_method_registry.json' in paths.splitlines()
+    assert '/.github/workflows/autonomous-compounders.yml' in paths.splitlines()
+    assert '/.github/workflows/valuation-underwriting.yml' in paths.splitlines()
 
 
 def company_root(root):

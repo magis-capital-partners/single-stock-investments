@@ -29,6 +29,12 @@ period, units, scope and filing locator. Source tables and business/risk passage
 are frozen. Supplemental facts must match an actual frozen table, number, year
 and scale; an agent cannot overwrite a structured fact's value.
 
+Depositary receipts require a sourced ordinary-shares-per-receipt ratio. The
+collector extracts explicit representation from frozen filings or uses the
+verified listing registry; disagreements and unreconciled listing actions stay
+blocked. The compiler converts every ordinary-share cash flow to the quoted
+receipt exactly once, independently of currency conversion.
+
 The author chooses the economic framework, company classification, material
 claim inventory, assumptions, scenario drivers and realization dates. There
 are no automatic growth, retention, terminal, horizon or discount assumptions.

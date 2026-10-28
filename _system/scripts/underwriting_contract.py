@@ -146,6 +146,14 @@ def compile_contract(packet, contract):
         assumptions.append(row)
         ids.add(node_id)
     require(assumptions, 'Economic assumptions missing')
+    listing_ratio = packet.get('listing_ratio')
+    if listing_ratio:
+        ratio = numeric(listing_ratio.get('ordinary_shares_per_listing_share'))
+        require(ratio > 0 and listing_ratio.get('source_url') and listing_ratio.get('locator')
+                and date.fromisoformat(listing_ratio.get('source_as_of') or '') <= date.fromisoformat(packet['as_of']),
+                'Verified listing ratio evidence is incomplete')
+        facts.append({'id': 'compiled_listing_ratio', 'kind': 'fact', 'locked': True, 'value': ratio, 'unit': 'ratio',
+                      'source': {'ref': listing_ratio['source_url'], 'locator': listing_ratio['locator'], 'as_of': listing_ratio['source_as_of']}})
     components, used, component_ids, years, totals = [], set(), set(), [], dict.fromkeys(CASES, 0.0)
     for component in contract.get('components') or []:
         cid = identifier(component.get('id'))
@@ -215,6 +223,13 @@ def compile_contract(packet, contract):
         require(any(f['id'] in reachable and f['unit'] == currency for f in facts), 'Every component must connect to primary financial evidence')
         used.update(reachable)
         require(pairs, 'Explicit shareholder cash flows required')
+        if listing_ratio:
+            converted = []
+            for index in range(0, len(pairs), 2):
+                node_id = 'compiled_listing_flow_'+str(index//2)
+                calculations.append({'id': node_id, 'op': 'multiply', 'args': [pairs[index], 'compiled_listing_ratio'], 'unit': currency+' per share'})
+                converted.extend((node_id, pairs[index+1]))
+            pairs = converted
         calculations.append({'id': 'compiled_value', 'op': 'present_value', 'args': pairs+[rate], 'unit': currency+' per share'})
         proof = {'schema_version': '1.0', 'method_id': 'dated_forward_cashflow_schedule_per_share', 'method_version': '1.0',
                  'output_unit': currency+' per share', 'inputs': facts, 'assumptions': assumptions,
