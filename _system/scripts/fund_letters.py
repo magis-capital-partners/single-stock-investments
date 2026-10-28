@@ -551,7 +551,18 @@ def export_release(db, output: Path) -> dict:
                 continue
             quote = lambda x: "NULL" if x is None else str(x) if isinstance(x, (int, float)) else "'" + str(x).replace("'", "''") + "'"
             # Never overwrite an online published pointer during an incremental inventory import.
-            sql.append(f"INSERT OR IGNORE INTO {table} ({','.join(data)}) VALUES ({','.join(quote(v) for v in data.values())});")
+            cols = ",".join(data)
+            vals = ",".join(quote(v) for v in data.values())
+            sql.append(f"INSERT OR IGNORE INTO {table} ({cols}) VALUES ({vals});")
+            if table == "fl_reviews" and data.get("status") == "resolved":
+                # Inventory imports leave open reviews remote; local publish may have
+                # resolved them. Upsert the status so activate.sql is not blocked.
+                sql.append(
+                    "UPDATE fl_reviews SET status='resolved', detail=" + quote(data.get("detail"))
+                    + " WHERE letter_id=" + quote(data.get("letter_id"))
+                    + " AND kind=" + quote(data.get("kind"))
+                    + " AND status='open';"
+                )
     payload = "\n".join(sql) + "\n"
     release_id = hashlib.sha256(payload.encode()).hexdigest()[:24]
     (output / "archive.sql").write_text(payload, encoding="utf-8")
@@ -564,7 +575,10 @@ def export_release(db, output: Path) -> dict:
         quote = lambda value: "NULL" if value is None else "'" + value.replace("'", "''") + "'"
         prior = quote(previous)
         lid, rid = quote(letter_id), quote(revision_id)
-        activation.append(f"UPDATE fl_letters SET published_revision={rid},status='published' WHERE id={lid} AND published_revision IS {prior} AND EXISTS(SELECT 1 FROM fl_revisions WHERE id={rid} AND status='published') AND NOT EXISTS(SELECT 1 FROM fl_reviews WHERE letter_id={lid} AND status='open' AND kind IN ('identity','extraction','duplicate_sources'));")
+        # Allow first remote activation even when local history already has a
+        # previous_revision (common after multiple local publishes before sync).
+        prior_guard = f"(published_revision IS {prior} OR ({prior} IS NOT NULL AND published_revision IS NULL))"
+        activation.append(f"UPDATE fl_letters SET published_revision={rid},status='published' WHERE id={lid} AND {prior_guard} AND EXISTS(SELECT 1 FROM fl_revisions WHERE id={rid} AND status='published') AND NOT EXISTS(SELECT 1 FROM fl_reviews WHERE letter_id={lid} AND status='open' AND kind IN ('identity','extraction','duplicate_sources'));")
         prior_status = "'published'" if previous else "'pending'"
         rollback.append(f"UPDATE fl_letters SET published_revision={prior},status={prior_status} WHERE id={lid} AND published_revision IS {rid};")
     (output / "activate.sql").write_text("\n".join(activation) + "\n", encoding="utf-8")
