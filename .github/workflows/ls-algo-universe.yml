@@ -118,13 +118,21 @@ jobs:
           bash _system/scripts/ci_push_vault.sh \
             "Preserve restricted dashboard source snapshots" \
             "--force dashboard-private"
-          git add --sparse -A -- _system/data/evidence_recovery_queue.json _system/reviews/pending \
-                         dashboard/data dashboard/private-assets.json .gitattributes _system/portfolio
-          shopt -s nullglob
-          evidence_paths=(*/README.md */.onboard_status.json */research */third-party-analyses */investor-documents)
-          if ((${#evidence_paths[@]})); then
-            git add --sparse -A -- "${evidence_paths[@]}"
-          fi
+          # Stage only paths this job owns. --sparse -A would record deletions of
+          # tracked files the checkout never materialized, and it force-adds
+          # new blobs outside the sparse patterns.
+          python _system/scripts/ci_stage_owned_paths.py \
+            _system/data/evidence_recovery_queue.json \
+            _system/reviews/pending \
+            dashboard/data \
+            dashboard/private-assets.json \
+            .gitattributes \
+            _system/portfolio \
+            ':(glob)**/README.md' \
+            ':(glob)**/.onboard_status.json' \
+            ':(glob)**/research/**' \
+            ':(glob)**/third-party-analyses/**' \
+            ':(glob)**/investor-documents/**'
           if ! git diff --cached --quiet; then
             bash _system/scripts/ci_push_main.sh "chore(ls-algo): onboard, evidence, and valuation authority"
           fi
