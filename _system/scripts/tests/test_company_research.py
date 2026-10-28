@@ -15,6 +15,32 @@ from stage_company_research import stage
 COMPANIES = {"CME": {"company": "CME Group Inc.", "market": "US"}, "MSB": {"company": "Mesabi Trust", "market": "US"}, "NEM": {"company": "Newmont Corporation", "market": "US"}, "CLSK": {"company": "CleanSpark Inc.", "market": "US"}, "MSTR": {"company": "MicroStrategy Inc.", "market": "US"}}
 
 
+def test_sparse_company_preserves_official_filing_links_and_inventory_receipts(tmp_path):
+    def git(*args):
+        return subprocess.check_output(['git',*args],cwd=tmp_path).decode().strip()
+    git('init','--quiet')
+    manifest=tmp_path/'CME/investor-documents/DOWNLOAD_MANIFEST.json'
+    manifest.parent.mkdir(parents=True)
+    original=manifest.parent/'sec-edgar/annual.htm';original.parent.mkdir()
+    original.write_text('<p>CME Group annual financial results</p>')
+    ref=original.relative_to(tmp_path).as_posix()
+    url='https://www.sec.gov/Archives/example.htm'
+    manifest.write_text(json.dumps([{'form':'10-K','url':url,'local':ref}]))
+    git('add','.')
+    git('-c','user.name=Test','-c','user.email=test@example.com','commit','-qm','fixture')
+    sha=git('rev-parse','HEAD:'+ref)
+    original.unlink();manifest.unlink()
+    b=Builder(tmp_path,None,tmp_path/'out',tmp_path/'cache',companies={'CME':COMPANIES['CME']})
+    target=b.cache/'git'/(sha+'.json');target.parent.mkdir(parents=True)
+    target.write_text(json.dumps({'status':'indexed','text':'CME Group annual financial results'}))
+    b.local_corpora();b.git_inventory(extraction_budget=0)
+    row=b.index.records[b.index.anchors['path:'+ref]]
+    assert row['processing_status']=='indexed'
+    assert any(loc['url']==url for loc in row['locations'])
+    assert next(r for r in b.receipts if r['collection']=='company:CME')['status']=='complete'
+    assert list((b.cache/'metadata').glob('*.json'))
+
+
 def test_new_compounder_has_an_archive_before_valuation_coverage(tmp_path):
     config=tmp_path/"_system/reference/core_compounders.json"
     config.parent.mkdir(parents=True)

@@ -33,8 +33,13 @@ def discover_drive(root,cache,queue):
     for item in items.values():
         if item['mimeType']==FOLDER_MIME:continue
         if item['mimeType']=='application/vnd.google-apps.shortcut' and item.get('shortcutDetails',{}).get('targetId'):
-            target=execute_with_retry(service.files().get(fileId=item['shortcutDetails']['targetId'],fields='id,name,mimeType,modifiedTime,md5Checksum',supportsAllDrives=True))
-            item={**item,**target,'id':item['id']}
+            try:
+                target=execute_with_retry(service.files().get(fileId=item['shortcutDetails']['targetId'],fields='id,name,mimeType,modifiedTime,md5Checksum',supportsAllDrives=True))
+                item={**item,**target,'id':item['id']}
+            except Exception:
+                # Keep the inaccessible original in the queue. One broken
+                # shortcut must not discard every other discovered document.
+                pass
         revision=item.get('md5Checksum') or item.get('modifiedTime') or 'unknown'
         jobs.append({'key':'drive:'+item['id']+':'+revision,'kind':'drive',
                      'priority':100 if item.get('appProperties',{}).get('ticker') in preferred else 0,

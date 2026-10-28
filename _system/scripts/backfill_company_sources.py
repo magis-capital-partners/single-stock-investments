@@ -22,6 +22,31 @@ from company_sources import SOURCE_SUFFIXES, digest, extract
 from build_company_research import ROOT, IGNORE_NAMES, load, read_companies, write
 
 
+def complete_cache(cached, suffix):
+    if cached.get('status') != 'indexed' or not cached.get('text'):
+        return False
+    required = {'.pdf': 'pages', '.epub': 'chapters'}.get(suffix)
+    return not required or bool(cached.get('extraction', {}).get(required))
+
+
+def audit_cache(queue, cache):
+    """Requeue legacy PDF/ebook results that lack whole-document evidence."""
+    reset = []
+    for row in queue.db.execute("SELECT key,kind,payload,result FROM jobs WHERE status='indexed' AND kind IN ('git','drive')"):
+        payload = json.loads(row['payload'])
+        suffix = Path(payload.get('path') or payload.get('title') or '').suffix.lower()
+        if suffix not in {'.pdf', '.epub'}:
+            continue
+        result = json.loads(row['result'] or '{}')
+        name = Path(result.get('cache', '').replace('\\', '/')).name
+        path = cache / row['kind'] / name
+        if not name or not complete_cache(load(path), suffix):
+            reset.append((row['key'],))
+    queue.db.executemany("UPDATE jobs SET status='pending',retry_at=0 WHERE key=? AND status='indexed'", reset)
+    queue.db.commit()
+    return len(reset)
+
+
 def transcript_for(path, vault):
     if path.suffix.lower() not in {'.mp3','.m4a','.mp4','.wav'}:
         return None
@@ -38,6 +63,10 @@ def transcript_for(path, vault):
 
 
 def extract_complete(data, suffix, *, ocr=False):
+    if suffix in {'.py', '.r', '.sql'}:
+        # Model source is searchable text; never import or execute it.
+        text, state = extract(data, '.txt')
+        return text, state, {'format': 'model_source_text'}
     if suffix == '.epub':
         import io,posixpath,zipfile
         from xml.etree import ElementTree as ET
@@ -66,20 +95,26 @@ def extract_complete(data, suffix, *, ocr=False):
     import fitz
     try:
         with fitz.open(stream=data, filetype='pdf') as pdf:
-            pages, missing = [], []
+            pages, missing, ocr_pages = [], [], []
             for i, page in enumerate(pdf):
                 body = page.get_text().strip()
                 # A scan can have a small footer/header but no body text.
                 scan = len(body) < 80 and bool(page.get_images())
+                ocr_complete = False
                 if scan and ocr:
                     try:
                         body = page.get_text(textpage=page.get_textpage_ocr(language='eng',dpi=200,full=True)).strip()
+                        ocr_complete = True
+                        ocr_pages.append(i+1)
                     except Exception:
                         pass
-                if scan and len(body) < 80:
+                # Short covers and image-only closing pages are legitimate.
+                # A completed OCR pass is indexed as automatic, unreviewed
+                # extraction; failed OCR stays pending, regardless of length.
+                if scan and not ocr_complete:
                     missing.append(i+1)
                 pages.append(body)
-            return '\n\f\n'.join(pages), 'needs_ocr' if missing else ('indexed' if any(pages) else 'empty_source'), {'pages':len(pages),'missing_pages':missing}
+            return '\n\f\n'.join(pages), 'needs_ocr' if missing else ('indexed' if any(pages) else 'empty_source'), {'pages':len(pages),'missing_pages':missing,'ocr_pages':ocr_pages,'ocr_review':'unreviewed' if ocr_pages else None}
     except Exception as exc:
         return '', 'failed', {'error':type(exc).__name__}
 
@@ -200,7 +235,7 @@ class Worker:
         if kind=='git':
             target=self.cache/'git'/(p['sha']+'.json');suffix=Path(p['path']).suffix.lower()
             cached=load(target)
-            if cached.get('status')=='indexed' and cached.get('text') and (suffix!='.pdf' or cached.get('extraction',{}).get('pages')):
+            if complete_cache(cached, suffix):
                 if cached.get('content_md5'):
                     write(self.cache/'md5'/(cached['content_md5']+'.json'),{'path':target.relative_to(self.cache).as_posix()})
                 return 'indexed',{'cache':str(target),'reused':True},None
@@ -212,6 +247,21 @@ class Worker:
                 except ValueError:
                     pass
         elif kind=='drive':
+            # The discovery revision is immutable cache identity. Reuse it
+            # before an API round trip; subsequent discovery queues any change.
+            revision=p.get('revision')
+            suffix=Path(p.get('title','')).suffix.lower()
+            if revision and revision not in {'discover','unknown'}:
+                target=self.cache/'drive'/(digest(p['id']+revision)+'.json')
+                cached=load(target)
+                if complete_cache(cached,suffix):
+                    return 'indexed',{'cache':str(target),'reused':True},None
+                if re.fullmatch(r'[a-fA-F0-9]{32}',revision):
+                    pointer=load(self.cache/'md5'/(revision+'.json'))
+                    linked=load(self.cache/pointer['path']) if pointer.get('path') and (self.cache/pointer['path']).resolve().is_relative_to(self.cache.resolve()) else {}
+                    if complete_cache(linked,suffix) and linked.get('content_md5', revision)==revision:
+                        write(target,linked)
+                        return 'indexed',{'cache':str(target),'reused':True,'exact_original':True},None
             from drive_store_common import drive_service,execute_with_retry
             if self.service is None:
                 self.service=drive_service(readonly=True)
@@ -221,14 +271,15 @@ class Worker:
             if meta['mimeType']=='application/vnd.google-apps.shortcut':
                 meta=execute_with_retry(self.service.files().get(fileId=meta['shortcutDetails']['targetId'],fields='id,name,mimeType,modifiedTime,md5Checksum',supportsAllDrives=True))
             revision=meta.get('md5Checksum') or meta.get('modifiedTime') or 'unknown'
+            suffix=Path(meta['name']).suffix.lower()
             target=self.cache/'drive'/(digest(p['id']+revision)+'.json')
             cached=load(target)
-            if cached.get('text') and cached.get('status')=='indexed':
+            if complete_cache(cached, suffix):
                 return 'indexed',{'cache':str(target),'reused':True},None
             if meta.get('md5Checksum'):
                 pointer=load(self.cache/'md5'/(meta['md5Checksum']+'.json'))
                 linked=load(self.cache/pointer['path']) if pointer.get('path') and (self.cache/pointer['path']).resolve().is_relative_to(self.cache.resolve()) else {}
-                if (linked.get('status') or pointer.get('status'))=='indexed' and linked.get('text'):
+                if complete_cache(linked, suffix):
                     linked['status']='indexed'
                     write(target,linked)
                     return 'indexed',{'cache':str(target),'reused':True,'exact_original':True},None
@@ -238,7 +289,7 @@ class Worker:
                 data=execute_with_retry(self.service.files().export_media(fileId=meta['id'],mimeType=mime))
             else:
                 suffix=Path(meta['name']).suffix.lower()
-                if suffix not in SOURCE_SUFFIXES:
+                if suffix not in SOURCE_SUFFIXES | {'.py', '.r', '.sql'}:
                     return 'unsupported',{},'Unsupported original format: '+meta['mimeType']
                 if suffix in {'.mp3','.mp4','.m4a','.wav'}:
                     return 'needs_transcript',{},'Audio requires linked transcript'
@@ -281,6 +332,7 @@ def main():
     parser.add_argument('--retry-status',nargs='*',default=[])
     parser.add_argument('--skip-seed',action='store_true')
     parser.add_argument('--discover-drive',action='store_true',help='Enumerate current Drive revisions before resuming the queue')
+    parser.add_argument('--audit-cache',action='store_true',help='Reprocess legacy scan/ebook caches without complete extraction evidence')
     parser.add_argument('--only-status',nargs='+',choices=['needs_ocr','needs_transcript','access_unavailable','unsupported','failed','empty_source'],help='Process an explicit recovery lane, e.g. needs_ocr. Does not reset other workers.')
     args=parser.parse_args()
     from vault_paths import research_vault_root
@@ -291,6 +343,7 @@ def main():
         from discover_company_sources import discover_drive
         print('Current Drive revisions:',discover_drive(args.source_root,args.cache,queue),flush=True)
     if not args.skip_seed:print('Inventoried work:',seed(args.source_root,args.cache,queue,vault,args.kind),flush=True)
+    if args.audit_cache:print('Legacy documents queued for verification:',audit_cache(queue,args.cache),flush=True)
     if args.retry_status:queue.reset(args.retry_status,args.kind)
     worker=Worker(args.source_root,args.cache,vault,args.local_source,args.ocr,args.transcribe)
     started=time.monotonic();checkpointed=started;count=0

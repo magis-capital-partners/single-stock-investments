@@ -8,6 +8,7 @@ it never silently relabels an old forecast as a new vintage.
 from __future__ import annotations
 
 import argparse
+import shutil
 from concurrent.futures import ThreadPoolExecutor
 from datetime import date
 from urllib.request import Request, urlopen
@@ -26,6 +27,13 @@ def download(url):
 def refresh(output=DEFAULT_PANEL, as_of=None, history=True):
     as_of = as_of or date.today()
     prior = load(output, {})
+    from vault_paths import research_vault_root
+    vault=research_vault_root()
+    preserved=vault/'dashboard-private/commodity-inputs' if vault else None
+    if not prior and preserved:
+        prior=load(preserved/'observations.json',{})
+        if (preserved/'forecast-vintages').is_dir():
+            shutil.copytree(preserved/'forecast-vintages',output.parent/'forecast-vintages',dirs_exist_ok=True)
     refs = {s['id']:s for p in CONFIG_DIR.glob('*.json') for s in load(p)['sources']}
     result = {'as_of':as_of.isoformat(), 'sources':{}, 'series':{}}
     def capture(item):

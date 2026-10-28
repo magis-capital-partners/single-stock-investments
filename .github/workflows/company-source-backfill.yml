@@ -55,7 +55,7 @@ jobs:
           set -euo pipefail
           args=()
           if [ "$SCANS" = "true" ]; then args+=(--only-status needs_ocr --ocr); fi
-          python _system/scripts/backfill_company_sources.py --discover-drive --seconds "$BUDGET" "${args[@]}"
+          python _system/scripts/backfill_company_sources.py --discover-drive --audit-cache --seconds "$BUDGET" "${args[@]}"
       - name: Save private checkpoint and results
         if: always()
         run: python _system/scripts/company_source_cache.py pack --cache _private/company-research/cache --archive "$RESEARCH_VAULT_ROOT/dashboard-private/company-source-backfill"
