@@ -4941,6 +4941,7 @@
         sell: new Set(),
         short: new Set(),
         all: new Set(),
+        mentioned: new Set(),
       };
       row.name = row.name || r.name || ticker;
       row.in_book = row.in_book || Boolean(r.in_book);
@@ -4948,6 +4949,7 @@
       sets.sell.forEach(f => row.sell.add(f));
       sets.short.forEach(f => row.short.add(f));
       sets.all.forEach(f => row.all.add(f));
+      (r.mentioned_funds || []).forEach(f => row.mentioned.add(f));
       byTicker.set(ticker, row);
     });
     return Array.from(byTicker.values()).map(row => {
@@ -4967,6 +4969,7 @@
         short_funds: shortNames.length,
         net,
         sentiment: consensusSentimentFromCounts(buyNames.length, sellNames.length, shortNames.length),
+        mentioned_count: row.mentioned.size,
         funds,
         buy_fund_names: buyNames,
         sell_fund_names: sellNames,
@@ -5006,19 +5009,6 @@
       },
       scope: period.label,
     };
-  }
-
-  function consensusHeatmapCell(row) {
-    if (!row) return '<td class="consensus-heat-cell" style="text-align:center;color:var(--text-muted)">·</td>';
-    const colors = {
-      accumulating: 'rgba(74,222,128,0.35)',
-      reducing: 'rgba(248,113,113,0.35)',
-      mixed: 'rgba(245,158,11,0.28)',
-      discussed: 'rgba(148,163,184,0.18)',
-    };
-    const bg = colors[row.sentiment] || colors.discussed;
-    const net = row.net > 0 ? `+${row.net}` : String(row.net || 0);
-    return `<td class="consensus-heat-cell" title="${row.fund_count || 0} funds · net ${net}" style="text-align:center;background:${bg};font-size:10px">${net}</td>`;
   }
 
   function consensusQuarterlyRows(consensus, ticker, quarterIds) {
@@ -5080,135 +5070,405 @@
       </div>`;
   }
 
-  function renderConsensusShifted(shifts, priorLabel, escapeHtml) {
-    if (!shifts.length) {
-      return '<p class="subhead">No meaningful shifts vs the prior period for this filter.</p>';
-    }
-    const rows = shifts.slice(0, 48).map(r => {
-      const direction = r.delta_net > 0 ? 'strengthening' : r.delta_net < 0 ? 'weakening' : 'coverage changed';
-      const directionClass = r.delta_net > 0 ? 'positive' : r.delta_net < 0 ? 'negative' : 'neutral';
-      const fundChanges = [
-        r.new_funds?.length ? `Added: ${r.new_funds.map(f => escapeHtml(f)).join(', ')}` : '',
-        r.dropped_funds?.length ? `Dropped: ${r.dropped_funds.map(f => escapeHtml(f)).join(', ')}` : '',
-      ].filter(Boolean).join(' &middot; ');
-      return `<article class="consensus-signal-row${r.in_book ? ' book-conflict' : ''}">
-        <div class="consensus-signal-identity">
-          <div>${consensusTickerCell(r, escapeHtml)} <strong>${escapeHtml((r.name || '').slice(0, 42))}</strong></div>
-          <div class="consensus-signal-meta">${r.prior_fund_count ?? 0} &rarr; ${r.fund_count ?? 0} funds &middot; net ${r.prior_net > 0 ? '+' : ''}${r.prior_net ?? 0} &rarr; ${r.net > 0 ? '+' : ''}${r.net ?? 0}</div>
-        </div>
-        <div class="consensus-signal-change ${directionClass}">
-          <strong>${r.delta_net > 0 ? '&uarr;' : r.delta_net < 0 ? '&darr;' : '&rarr;'} ${direction}</strong>
-          <span>${formatConsensusDelta(r.delta_net)} net &middot; ${formatConsensusDelta(r.delta_funds)} funds</span>
-        </div>
-        <div class="consensus-signal-lean">${r.lean_flip ? `${consensusSentimentChip(r.prior_sentiment, escapeHtml)} &rarr; ${consensusSentimentChip(r.sentiment, escapeHtml)}` : consensusSentimentChip(r.sentiment, escapeHtml)}</div>
-        ${fundChanges ? `<div class="consensus-signal-evidence">${fundChanges}</div>` : ''}
-      </article>`;
-    }).join('');
-    return `
-      <div class="consensus-section-heading"><div><strong>What changed</strong><span> versus ${escapeHtml(priorLabel || 'the prior period')}</span></div><span>${shifts.length} material shifts</span></div>
-      <div class="consensus-signal-list">${rows}</div>`;
+  const CONSENSUS_ACTION_GROUP = { new: 'adding', add: 'adding', buy: 'adding', trim: 'reducing', exit: 'reducing', short: 'short' };
+  const CONSENSUS_FUND_GROUPS = [
+    { id: 'adding', label: 'Adding', badge: 'badge-ok' },
+    { id: 'reducing', label: 'Reducing', badge: 'badge-bad' },
+    { id: 'short', label: 'Short', badge: 'badge-bad' },
+    { id: 'discussed', label: 'Discussed, no trade', badge: 'badge-us' },
+  ];
+  const CONSENSUS_NAME_SUFFIXES = new Set([
+    'management', 'investments', 'investment', 'partners', 'capital', 'advisors', 'advisers', 'holdings',
+    'group', 'funds', 'fund', 'company', 'trust', 'asset', 'assets', 'corp', 'llc', 'inc', 'ltd', 'lp', 'co', 'l', 'p',
+  ]);
+  const CONSENSUS_QUIET_LEANS = new Set(['discussed', 'mentioned']);
+  const CONSENSUS_FUND_PAGE_SIZE = 25;
+  const CONSENSUS_FILING_ONLY_LIMIT = 10;
+  const CONSENSUS_DISCUSSED_NAME_LIMIT = 12;
+  const consensusMentionIndex = new WeakMap();
+  const consensusHolderFiles = new Map();
+
+  function consensusGroupBadge(group) {
+    return CONSENSUS_FUND_GROUPS.find(g => g.id === group)?.badge || 'badge-us';
   }
 
-  function renderConsensusHeatmap(consensus, escapeHtml, opts) {
-    const { period, timeModel, bookOnly, search, knownTickers, quarterIds } = opts || {};
-    const heatQuarters = (quarterIds || timeModel?.quarters?.slice(0, 8) || []).map(q => q.id || q);
-    const byQuarter = consensus?.by_quarter || {};
-    const tickerSet = new Map();
-    heatQuarters.forEach(qid => {
-      (byQuarter[qid]?.most_discussed || []).forEach(r => {
-        if (bookOnly && !r.in_book) return;
-        if (search && !SearchMatch.matchConsensusRow(r, search, knownTickers)) return;
-        const prev = tickerSet.get(r.ticker) || { ticker: r.ticker, name: r.name, in_book: r.in_book, total: 0 };
-        prev.total += r.fund_count || 0;
-        tickerSet.set(r.ticker, prev);
+  // A fund's stance for the period is its latest trade. A later letter that only
+  // discusses the name does not undo that trade.
+  function consensusPreferMention(current, mention) {
+    if (!current) return true;
+    const traded = mention.group !== 'discussed';
+    if (traded !== (current.group !== 'discussed')) return traded;
+    return mention.date > current.date;
+  }
+
+  function consensusMention(letter, position) {
+    return {
+      group: CONSENSUS_ACTION_GROUP[position.action] || 'discussed',
+      action: position.action || 'discussed',
+      date: String(letter.letter_date || letter.quarter || ''),
+      commentary: String(position.commentary || position.thesis || ''),
+      evidence_url: letter.evidence_url,
+      evidence_label: letter.evidence_label,
+    };
+  }
+
+  function consensusMentionsByTicker(fundProfiles) {
+    if (!fundProfiles) return new Map();
+    let index = consensusMentionIndex.get(fundProfiles);
+    if (index) return index;
+    index = new Map();
+    Object.values(fundProfiles).forEach(profile => {
+      (profile.letters || []).forEach(letter => {
+        (letter.positions || []).forEach(position => {
+          const ticker = String(position.ticker || '').toUpperCase();
+          if (!ticker) return;
+          if (!index.has(ticker)) index.set(ticker, []);
+          index.get(ticker).push({ profile, letter, position });
+        });
       });
     });
-    const tickers = Array.from(tickerSet.values())
-      .sort((a, b) => b.total - a.total || String(a.ticker).localeCompare(String(b.ticker)))
-      .slice(0, 50);
-    if (!tickers.length) return '<p class="subhead">No securities match this filter.</p>';
-    const head = heatQuarters.map(qid => `<th class="mono" style="font-size:10px">${escapeHtml(quarterLabel(qid))}</th>`).join('');
-    const body = tickers.map(t => {
-      const cells = heatQuarters.map(qid => {
-        const row = (byQuarter[qid]?.most_discussed || []).find(r => r.ticker === t.ticker) || null;
-        return consensusHeatmapCell(row);
-      }).join('');
-      return `<tr>
-        <td>${consensusTickerCell(t, escapeHtml)}</td>
-        <td style="font-size:11px">${escapeHtml((t.name || '').slice(0, 28))}</td>
-        ${cells}
-      </tr>`;
+    consensusMentionIndex.set(fundProfiles, index);
+    return index;
+  }
+
+  function consensusFundTrades(ticker, fundProfiles, period) {
+    const byFund = new Map();
+    (consensusMentionsByTicker(fundProfiles).get(ticker) || []).forEach(({ profile, letter, position }) => {
+      if (!periodMatchesRecord(letter, period, ['quarter', 'letter_date'])) return;
+      const id = profile.fund_id || profile.fund;
+      const fund = byFund.get(id) || {
+        fund_id: profile.fund_id,
+        fund: profile.fund || profile.fund_id,
+        manager: profile.manager || '',
+        letters: 0,
+        latest: null,
+        holder: null,
+      };
+      const mention = consensusMention(letter, position);
+      fund.letters += 1;
+      if (consensusPreferMention(fund.latest, mention)) fund.latest = mention;
+      byFund.set(id, fund);
+    });
+    return [...byFund.values()];
+  }
+
+  function consensusFundPositions(profile, period) {
+    const byTicker = new Map();
+    (profile?.letters || []).forEach(letter => {
+      if (!periodMatchesRecord(letter, period, ['quarter', 'letter_date'])) return;
+      (letter.positions || []).forEach(position => {
+        const ticker = String(position.ticker || '').toUpperCase();
+        if (!ticker) return;
+        const mention = { ticker, ...consensusMention(letter, position) };
+        if (consensusPreferMention(byTicker.get(ticker), mention)) byTicker.set(ticker, mention);
+      });
+    });
+    return [...byTicker.values()].sort((a, b) => Number(b.group !== 'discussed') - Number(a.group !== 'discussed')
+      || b.date.localeCompare(a.date)
+      || a.ticker.localeCompare(b.ticker));
+  }
+
+  function consensusNameKey(value) {
+    const words = String(value || '').toLowerCase().match(/[a-z0-9]+/g) || [];
+    while (words.length > 1 && CONSENSUS_NAME_SUFFIXES.has(words[words.length - 1])) words.pop();
+    const key = words.join('');
+    return key.length >= 3 ? key : '';
+  }
+
+  function consensusAttachHolders(funds, holders) {
+    const byKey = new Map();
+    holders.forEach(holder => [holder.manager_id, holder.name].forEach(value => {
+      const key = consensusNameKey(value);
+      if (key && !byKey.has(key)) byKey.set(key, holder);
+    }));
+    const matched = new Set();
+    funds.forEach(fund => {
+      fund.holder = [fund.fund_id, fund.fund, fund.manager]
+        .map(consensusNameKey)
+        .filter(Boolean)
+        .map(key => byKey.get(key))
+        .find(Boolean) || null;
+      if (fund.holder) matched.add(fund.holder);
+    });
+    return holders.filter(holder => !matched.has(holder));
+  }
+
+  function consensusHolderFile(ticker) {
+    return consensusHolderFiles.get(ticker) || { status: 'idle', payload: null };
+  }
+
+  function loadConsensusHolderFile(ticker) {
+    const known = consensusHolderFiles.get(ticker);
+    if (known) return known.promise;
+    const entry = { status: 'loading', payload: null, promise: null };
+    const summary = global.FundHoldings?.ensureSummary ? global.FundHoldings.ensureSummary() : null;
+    entry.promise = Promise.resolve(summary)
+      .then(index => {
+        if (index?.tickers && !index.tickers[ticker]) return null;
+        return fetch(`data/holdings/by_ticker/${encodeURIComponent(ticker)}.json`)
+          .then(res => (res.ok ? res.json() : null));
+      })
+      .catch(() => null)
+      .then(payload => {
+        entry.status = 'ready';
+        entry.payload = payload;
+        return entry;
+      });
+    consensusHolderFiles.set(ticker, entry);
+    return entry.promise;
+  }
+
+  function formatConsensusBookWeight(value) {
+    const pct = Number(value);
+    if (value == null || !Number.isFinite(pct)) return '—';
+    if (pct > 0 && pct < 0.01) return '&lt;0.01%';
+    return `${pct.toFixed(pct >= 1 ? 1 : 2)}%`;
+  }
+
+  function formatConsensusUsd(value) {
+    const usd = Number(value);
+    if (!Number.isFinite(usd) || usd <= 0) return '—';
+    if (usd >= 1e9) return `$${(usd / 1e9).toFixed(1)}B`;
+    if (usd >= 1e6) return `$${(usd / 1e6).toFixed(usd >= 1e8 ? 0 : 1)}M`;
+    return `$${Math.max(1, Math.round(usd / 1e3)).toLocaleString('en-US')}K`;
+  }
+
+  function formatConsensusShareChange(holder) {
+    if (holder.change_type === 'new') return '<span class="positive">New position</span>';
+    const pct = Number(holder.shares_delta_pct);
+    if (holder.shares_delta_pct == null || !Number.isFinite(pct) || !pct) return '<span class="neutral">Unchanged</span>';
+    const size = Math.abs(pct) >= 10 ? Math.round(Math.abs(pct)) : Math.abs(pct).toFixed(1);
+    return `<span class="${pct > 0 ? 'positive' : 'negative'}">${pct > 0 ? '+' : '&minus;'}${size}%</span>`;
+  }
+
+  function renderConsensusFundsBody(ticker, ctx) {
+    const { fundProfiles, period, escapeHtml, linkHtml, ghRepo, selectedFundId } = ctx;
+    const funds = consensusFundTrades(ticker, fundProfiles, period);
+    const file = consensusHolderFile(ticker);
+    const holders = file.status === 'ready' ? (file.payload?.holders || []) : null;
+    const filingOnly = holders
+      ? consensusAttachHolders(funds, holders)
+        .sort((a, b) => Number(b.weight_pct || 0) - Number(a.weight_pct || 0))
+        .slice(0, CONSENSUS_FILING_ONLY_LIMIT)
+      : [];
+    const periodLabel = escapeHtml(period?.label || 'this period');
+    if (!funds.length && !filingOnly.length) {
+      return holders
+        ? `<p class="consensus-funds-note">No fund letter in ${periodLabel} names ${escapeHtml(ticker)}, and no tracked 13F filer holds it.</p>`
+        : '<p class="consensus-funds-note">Loading 13F positions…</p>';
+    }
+    const noFile = Boolean(holders && !file.payload);
+    const cols = noFile ? 2 : 5;
+    const sizeCells = holder => {
+      if (noFile) return '';
+      if (!holders) return '<td class="consensus-funds-pending" colspan="3">Loading 13F…</td>';
+      if (!holder) return '<td class="consensus-funds-pending" colspan="3">No 13F size on file</td>';
+      return `<td class="num">${formatConsensusBookWeight(holder.weight_pct)}</td>
+        <td class="num">${formatConsensusUsd(holder.value_usd)}</td>
+        <td class="num">${formatConsensusShareChange(holder)}</td>`;
+    };
+    const fundCell = fund => (fund.fund_id
+      ? `<button type="button" class="linkish${fund.fund_id === selectedFundId ? ' is-selected' : ''}" data-consensus-fund-id="${escapeHtml(fund.fund_id)}" title="Show every name in this fund's letters">${escapeHtml(fund.fund)}</button>`
+      : escapeHtml(fund.fund));
+    const letterCell = fund => {
+      const { latest } = fund;
+      const source = latest.evidence_url ? ` ${recordEvidenceLink(latest, linkHtml, ghRepo)}` : '';
+      const count = fund.letters > 1 ? ` <span class="consensus-funds-count">${fund.letters} letters</span>` : '';
+      return `<td title="${escapeHtml(latest.commentary.slice(0, 280))}"><span class="badge ${consensusGroupBadge(latest.group)}">${escapeHtml(latest.action)}</span> <span class="mono">${escapeHtml(latest.date || '—')}</span>${count}${source}</td>`;
+    };
+    const bySize = (a, b) => Number(b.holder?.weight_pct || 0) - Number(a.holder?.weight_pct || 0)
+      || b.latest.date.localeCompare(a.latest.date)
+      || String(a.fund).localeCompare(String(b.fund));
+    const groupHead = (label, badge, detail) => `<tr class="consensus-funds-group"><th colspan="${cols}"><span class="badge ${badge}">${label}</span><span>${detail}</span></th></tr>`;
+    const sections = CONSENSUS_FUND_GROUPS.map(group => {
+      const rows = funds.filter(f => f.latest.group === group.id).sort(bySize);
+      if (!rows.length) return '';
+      const sized = group.id === 'discussed' ? rows.filter(f => f.holder) : rows;
+      const unsized = rows.filter(f => !sized.includes(f));
+      const names = unsized.slice(0, CONSENSUS_DISCUSSED_NAME_LIMIT).map(f => escapeHtml(f.fund)).join(', ');
+      const more = unsized.length > CONSENSUS_DISCUSSED_NAME_LIMIT ? ` and ${unsized.length - CONSENSUS_DISCUSSED_NAME_LIMIT} more` : '';
+      return groupHead(group.label, group.badge, `${rows.length} fund${rows.length === 1 ? '' : 's'}`)
+        + sized.map(f => `<tr><td>${fundCell(f)}</td>${letterCell(f)}${sizeCells(f.holder)}</tr>`).join('')
+        + (unsized.length ? `<tr class="consensus-funds-names"><td colspan="${cols}">${sized.length ? 'Also ' : ''}${names}${more}</td></tr>` : '');
     }).join('');
-    return `
-      <p class="tier-sub" style="margin-bottom:8px">Net fund lean by quarter (cell = net buy−sell funds; color = lean)</p>
-      <div style="overflow-x:auto">
-        <table class="darwin-table consensus-heatmap">
-          <thead><tr><th>Ticker</th><th>Name</th>${head}</tr></thead>
-          <tbody>${body}</tbody>
+    const filingRows = filingOnly.length
+      ? groupHead('13F only', 'badge-purple', `no letter on ${escapeHtml(ticker)} in ${periodLabel}; largest ${filingOnly.length} by share of book`)
+        + filingOnly.map(h => `<tr><td>${escapeHtml(h.name)}</td><td class="consensus-funds-pending">No letter</td>${sizeCells(h)}</tr>`).join('')
+      : '';
+    const filed = holders?.find(h => h.filed_at)?.filed_at;
+    const asOf = file.payload?.period_end;
+    const note = !holders
+      ? 'Loading 13F positions.'
+      : file.payload
+        ? `13F figures are long US positions for the quarter ending ${escapeHtml(asOf || 'the latest filing')}${filed ? `, filed ${escapeHtml(filed)}` : ''}. They are context, not a trade signal. The holdings file has no share-of-float figure, so none is shown.`
+        : `No 13F holdings file covers ${escapeHtml(ticker)}, so position size is not available. Share of float is not tracked.`;
+    return `<div class="consensus-funds-scroll">
+        <table class="darwin-table consensus-funds-table${noFile ? ' is-letters-only' : ''}">
+          <thead><tr>
+            <th>Fund</th>
+            <th>Latest letter in ${periodLabel}</th>
+            ${noFile ? '' : `<th class="num">Share of their 13F book</th>
+            <th class="num">Position value</th>
+            <th class="num">Shares vs prior 13F</th>`}
+          </tr></thead>
+          <tbody>${sections}${filingRows}</tbody>
         </table>
+      </div>
+      <p class="consensus-funds-note">${note} The row counts distinct letter passages, so a fund that added and later sold counts on both sides. This table lists each fund once, at its latest trade.</p>`;
+  }
+
+  function consensusIsReversal(shift) {
+    return Boolean(shift?.lean_flip
+      && !CONSENSUS_QUIET_LEANS.has(shift.sentiment)
+      && !CONSENSUS_QUIET_LEANS.has(shift.prior_sentiment));
+  }
+
+  function consensusRowFromShift(shift) {
+    return {
+      ticker: shift.ticker,
+      name: shift.name,
+      in_book: shift.in_book,
+      fund_count: shift.fund_count || 0,
+      net: shift.net || 0,
+      sentiment: shift.fund_count ? shift.sentiment : 'discussed',
+      partial: true,
+    };
+  }
+
+  function consensusDisplayRows(most, shifts, sortMode) {
+    const items = new Map((most || []).map(row => [row.ticker, { row, shift: null }]));
+    (shifts || []).forEach(shift => {
+      const item = items.get(shift.ticker);
+      if (item) item.shift = shift;
+      else items.set(shift.ticker, { row: consensusRowFromShift(shift), shift });
+    });
+    const change = item => Math.abs(item.shift?.delta_net || 0);
+    const coverage = item => Math.abs(item.shift?.delta_funds || 0);
+    const traded = item => Number((item.row.fund_count || 0) > 0);
+    return [...items.values()].sort((a, b) => traded(b) - traded(a)
+      || Number(Boolean(b.row.in_book)) - Number(Boolean(a.row.in_book))
+      || (sortMode === 'change' ? (change(b) - change(a)) || (coverage(b) - coverage(a)) : 0)
+      || (b.row.fund_count || 0) - (a.row.fund_count || 0)
+      || Math.abs(b.row.net || 0) - Math.abs(a.row.net || 0)
+      || String(a.row.ticker).localeCompare(String(b.row.ticker)));
+  }
+
+  function consensusRowCounts(row) {
+    if (!row.fund_count) {
+      return row.mentioned_count
+        ? `${row.mentioned_count} fund${row.mentioned_count === 1 ? '' : 's'} mentioned it, no trades`
+        : 'No funds trading it this period';
+    }
+    const parts = [`${row.fund_count} fund${row.fund_count === 1 ? '' : 's'}`];
+    if (!row.partial) {
+      parts.push(`${row.buy_funds || 0} adding`, `${row.sell_funds || 0} reducing`);
+      if (row.short_funds) parts.push(`${row.short_funds} short`);
+    }
+    parts.push(`net ${row.net > 0 ? '+' : ''}${row.net || 0}`);
+    return parts.join(' &middot; ');
+  }
+
+  function renderConsensusChange(shift) {
+    if (!shift) {
+      return '<div class="consensus-signal-change neutral"><strong>&rarr; stable</strong><span>no change vs prior</span></div>';
+    }
+    const stopped = !shift.fund_count && shift.prior_fund_count > 0;
+    const tone = stopped ? 'neutral' : shift.delta_net > 0 ? 'positive' : shift.delta_net < 0 ? 'negative' : 'neutral';
+    const label = stopped ? '&rarr; trading stopped'
+      : shift.delta_net > 0 ? '&uarr; strengthening'
+        : shift.delta_net < 0 ? '&darr; weakening'
+          : '&rarr; funds changed';
+    return `<div class="consensus-signal-change ${tone}">
+        <strong>${label}</strong>
+        <span>${formatConsensusDelta(shift.delta_net)} net &middot; ${shift.prior_fund_count ?? 0} &rarr; ${shift.fund_count ?? 0} funds</span>
       </div>`;
   }
 
-  function renderConsensusFundTrajectory(fundProfiles, letterIndex, escapeHtml, opts) {
-    const { search, bookOnly, period, knownTickers, selectedFundId } = opts || {};
-    let funds = Object.values(fundProfiles || {});
-    if (search) {
-      funds = funds.filter(f => SearchMatch.matchFundRegistryRow({
-        fund: f.fund,
-        fund_id: f.fund_id,
-        manager: f.manager,
-        quarter: (f.letters || [])[0]?.quarter,
-        tickers: f.our_tickers,
-      }, search, knownTickers));
-    }
-    if (bookOnly) {
-      funds = funds.filter(f => (f.our_tickers || []).length > 0);
-    }
-    funds.sort((a, b) => String(a.fund || '').localeCompare(String(b.fund || '')));
-    const profile = selectedFundId ? fundProfiles[selectedFundId] : null;
-    const fundOptions = funds.map(f => {
-      const label = `${f.fund || f.fund_id}${f.manager ? ` - ${f.manager}` : ''}`;
-      return `<option value="${escapeHtml(label)}" data-fund-id="${escapeHtml(f.fund_id)}"></option>`;
+  function renderConsensusRow(item, ctx) {
+    const { row, shift } = item;
+    const { escapeHtml, changesAvailable, holdingOpen } = ctx;
+    const open = holdingOpen === row.ticker;
+    const lean = consensusIsReversal(shift)
+      ? `${consensusSentimentChip(shift.prior_sentiment, escapeHtml)} &rarr; ${consensusSentimentChip(shift.sentiment, escapeHtml)}`
+      : consensusSentimentChip(row.sentiment, escapeHtml);
+    return `<article class="consensus-signal-row${row.in_book && row.sentiment === 'reducing' ? ' book-conflict' : ''}">
+        <div class="consensus-signal-identity">
+          <div>${consensusTickerCell(row, escapeHtml)} <strong>${escapeHtml((row.name || '').slice(0, 44))}</strong></div>
+          <div class="consensus-signal-meta">${consensusRowCounts(row)}</div>
+        </div>
+        ${changesAvailable ? renderConsensusChange(shift) : ''}
+        <div class="consensus-signal-lean">${lean}</div>
+        <details class="consensus-funds" data-consensus-holding="${escapeHtml(row.ticker)}"${open ? ' open' : ''}>
+          <summary>Which funds, and how much</summary>
+          <div class="consensus-funds-body">${open ? renderConsensusFundsBody(row.ticker, ctx) : ''}</div>
+        </details>
+      </article>`;
+  }
+
+  function consensusRailFunds(fundProfiles, period, bookOnly, query) {
+    const tokens = String(query || '').toLowerCase().split(/\s+/).filter(Boolean);
+    return Object.values(fundProfiles || {})
+      .filter(f => fundMatchesPeriod(f, period))
+      .filter(f => !bookOnly || (f.our_tickers || []).length)
+      .filter(f => {
+        if (!tokens.length) return true;
+        const hay = [f.fund, f.manager, f.fund_id, ...(f.our_tickers || [])].join(' ').toLowerCase();
+        return tokens.every(token => hay.includes(token));
+      })
+      .sort((a, b) => (b.our_tickers || []).length - (a.our_tickers || []).length
+        || String(a.fund || '').localeCompare(String(b.fund || '')));
+  }
+
+  function renderConsensusSelectedFund(profile, positions, ctx) {
+    const { period, escapeHtml } = ctx;
+    const letters = (profile.letters || []).filter(l => periodMatchesRecord(l, period, ['quarter', 'letter_date'])).length;
+    const items = positions.map(p => `<li>
+          <button type="button" class="linkish mono" data-consensus-ticker="${escapeHtml(p.ticker)}">${escapeHtml(p.ticker)}</button>
+          <span class="badge ${consensusGroupBadge(p.group)}">${escapeHtml(p.action)}</span>
+          <span class="mono">${escapeHtml(p.date)}</span>
+        </li>`).join('');
+    return `<section class="consensus-rail-selected">
+        <div class="consensus-rail-selected-head">
+          <div>
+            <span class="consensus-eyebrow">Selected fund</span>
+            <strong>${escapeHtml(profile.fund || profile.fund_id)}</strong>
+            ${profile.manager ? `<small>${escapeHtml(profile.manager)}</small>` : ''}
+          </div>
+          <button type="button" class="filter-btn" data-consensus-fund-id="">Clear</button>
+        </div>
+        <p class="tier-sub">${letters} letter${letters === 1 ? '' : 's'} &middot; ${positions.length} name${positions.length === 1 ? '' : 's'} in ${escapeHtml(period?.label || 'this period')}</p>
+        ${items ? `<ul class="consensus-rail-positions">${items}</ul>` : ''}
+      </section>`;
+  }
+
+  function renderConsensusFundRail(ctx) {
+    const { fundProfiles, period, bookOnly, fundQuery, fundPage, selectedFundId, selectedPositions, escapeHtml } = ctx;
+    const funds = consensusRailFunds(fundProfiles, period, bookOnly, fundQuery);
+    const pages = Math.max(1, Math.ceil(funds.length / CONSENSUS_FUND_PAGE_SIZE));
+    const page = Math.min(Math.max(0, Number(fundPage) || 0), pages - 1);
+    const selected = selectedFundId ? fundProfiles?.[selectedFundId] : null;
+    const list = funds.slice(page * CONSENSUS_FUND_PAGE_SIZE, (page + 1) * CONSENSUS_FUND_PAGE_SIZE).map(f => {
+      const held = (f.our_tickers || []).length;
+      const active = f.fund_id === selectedFundId;
+      return `<li><button type="button" class="consensus-rail-fund${active ? ' is-selected' : ''}" data-consensus-fund-id="${escapeHtml(f.fund_id)}" aria-pressed="${active}">
+          <span>${escapeHtml(f.fund || f.fund_id)}</span>
+          <small>${held ? `${held} of our holdings` : 'none of our holdings'}${f.latest_quarter ? ` &middot; latest ${escapeHtml(quarterLabel(f.latest_quarter))}` : ''}</small>
+        </button></li>`;
     }).join('');
-    let trajectory = '';
-    if (profile) {
-      const letters = (profile.letters || []).filter(l => {
-        if (period && !period.all && period.quarterSet?.size) {
-          return period.quarterSet.has(l.quarter);
-        }
-        return true;
-      });
-      const rows = letters.flatMap(letter => {
-        const positions = (letter.positions || []).filter(p => p.ticker && (!bookOnly || (profile.our_tickers || []).includes(String(p.ticker).toUpperCase())));
-        return positions.map(p => ({
-          quarter: letter.quarter,
-          letter_date: letter.letter_date,
-          ticker: p.ticker,
-          action: p.action,
-          commentary: p.commentary || p.thesis,
-        }));
-      }).sort((a, b) => String(b.letter_date || b.quarter || '').localeCompare(String(a.letter_date || a.quarter || '')));
-      trajectory = rows.length ? `<table class="darwin-table">
-        <thead><tr><th>Quarter</th><th>Date</th><th>Ticker</th><th>Action</th><th>Commentary</th></tr></thead>
-        <tbody>${rows.slice(0, 150).map(r => `
-          <tr>
-            <td class="mono" style="font-size:11px">${escapeHtml(r.quarter || '—')}</td>
-            <td class="mono" style="font-size:11px">${escapeHtml(r.letter_date || '—')}</td>
-            <td><button type="button" class="linkish mono" data-consensus-ticker="${escapeHtml(r.ticker)}">${escapeHtml(r.ticker)}</button></td>
-            <td><span class="badge ${STANCE_BADGE[r.action] || 'badge-us'}">${escapeHtml(r.action || '—')}</span></td>
-            <td style="font-size:11px">${escapeHtml((r.commentary || '').slice(0, 160))}</td>
-          </tr>`).join('')}</tbody>
-      </table>` : '<p class="subhead">No position commentary for this fund in the selected period.</p>';
-    }
-    return `
-      <div class="consensus-section-heading"><div><strong>Fund trajectory</strong><span> one canonical fund across every letter and alias</span></div><span>${funds.length} funds</span></div>
-      <label class="tier-sub consensus-fund-picker">
-        <span>Find a fund</span>
-        <input id="consensus-fund-search" class="search" list="consensus-fund-options" autocomplete="off" placeholder="Type a fund name..." value="${escapeHtml(profile?.fund || '')}" />
-        <datalist id="consensus-fund-options">${fundOptions}</datalist>
-      </label>
-      ${profile ? `<p class="tier-sub" style="margin-bottom:10px"><strong>${escapeHtml(profile.fund || profile.fund_id)}</strong> &middot; ${profile.letters?.length || 0} letters &middot; ${profile.latest_quarter ? `latest ${escapeHtml(profile.latest_quarter)}` : 'no dated letters'}</p>` : '<p class="tier-sub" style="margin-bottom:10px">Quarter-stamped aliases are consolidated into one continuous history.</p>'}
-      ${trajectory}`;
+    return `<aside class="consensus-rail" aria-label="Funds">
+        ${selected ? renderConsensusSelectedFund(selected, selectedPositions || [], ctx) : ''}
+        <div class="consensus-rail-head">
+          <strong>Funds</strong>
+          <span>${funds.length.toLocaleString('en-US')} &middot; ${escapeHtml(period?.label || 'all history')}</span>
+        </div>
+        <input id="consensus-fund-query" class="search" type="search" autocomplete="off" placeholder="Find a fund…" aria-label="Find a fund" value="${escapeHtml(fundQuery || '')}" />
+        ${list ? `<ul class="consensus-rail-list">${list}</ul>` : '<p class="tier-sub">No fund matches.</p>'}
+        ${pages > 1 ? `<div class="consensus-rail-pager">
+          <button type="button" class="filter-btn" data-consensus-fund-page="${Math.max(0, page - 1)}"${page === 0 ? ' disabled' : ''}>Previous</button>
+          <span>${page + 1} of ${pages}</span>
+          <button type="button" class="filter-btn" data-consensus-fund-page="${Math.min(pages - 1, page + 1)}"${page >= pages - 1 ? ' disabled' : ''}>Next</button>
+        </div>` : ''}
+      </aside>`;
   }
 
   function buildConsensusCsv(ticker, consensus, timeModel) {
@@ -5251,63 +5511,82 @@
     return lines.join('\n');
   }
 
+  function exportConsensusCsv(ticker, consensus, timeModel) {
+    if (!ticker || !consensus) return;
+    const csv = buildConsensusCsv(ticker, consensus, timeModel);
+    const blob = new Blob([csv], { type: 'text/csv;charset=utf-8' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `consensus_${ticker}.csv`;
+    a.click();
+    URL.revokeObjectURL(url);
+  }
+
   function attachConsensusHandlers(container, insights, options) {
     const {
       escapeHtml,
+      linkHtml,
+      ghRepo,
       timeModel,
-      onViewMode,
-      onFundSelect,
+      quarter,
+      selectedFundId,
+      onLens,
+      onSort,
       onTickerSelect,
+      onFundSelect,
+      onFundQuery,
+      onFundPage,
       onCloseDrawer,
+      onHoldingToggle,
     } = options || {};
-    if (!container) return;
-    container.querySelectorAll('[data-consensus-view]').forEach(btn => {
-      btn.addEventListener('click', () => {
-        if (onViewMode) onViewMode(btn.dataset.consensusView || 'table');
+    const root = container?.querySelector('[data-consensus-root]');
+    if (!root) return;
+    const ctx = {
+      fundProfiles: insights?.fund_profiles || {},
+      period: timeModel ? periodFromSelection(quarter || 'last4', timeModel, { indexedOnly: true }) : null,
+      escapeHtml,
+      linkHtml,
+      ghRepo,
+      selectedFundId,
+    };
+    const fillFunds = details => {
+      const ticker = details.dataset.consensusHolding;
+      const body = details.querySelector('.consensus-funds-body');
+      if (!ticker || !body) return;
+      body.innerHTML = renderConsensusFundsBody(ticker, ctx);
+      if (consensusHolderFile(ticker).status === 'ready') return;
+      loadConsensusHolderFile(ticker).then(() => {
+        if (details.isConnected && details.open) body.innerHTML = renderConsensusFundsBody(ticker, ctx);
       });
+    };
+    root.addEventListener('click', e => {
+      const target = e.target.closest('[data-consensus-lens], [data-consensus-sort], [data-consensus-ticker], [data-consensus-fund-id], [data-consensus-fund-page], #consensus-drawer-close, #consensus-export-csv');
+      if (!target || !root.contains(target)) return;
+      if (target.matches('[data-consensus-lens]')) onLens?.(target.dataset.consensusLens || 'all');
+      else if (target.matches('[data-consensus-sort]')) onSort?.(target.dataset.consensusSort);
+      else if (target.matches('[data-consensus-ticker]')) onTickerSelect?.(target.dataset.consensusTicker);
+      else if (target.matches('[data-consensus-fund-id]')) onFundSelect?.(target.dataset.consensusFundId || null);
+      else if (target.matches('[data-consensus-fund-page]')) onFundPage?.(Number(target.dataset.consensusFundPage) || 0);
+      else if (target.id === 'consensus-drawer-close') onCloseDrawer?.();
+      else if (target.id === 'consensus-export-csv') exportConsensusCsv(target.dataset.exportTicker, insights?.consensus, timeModel);
     });
-    container.querySelectorAll('[data-consensus-ticker]').forEach(btn => {
-      btn.addEventListener('click', (e) => {
-        e.stopPropagation();
-        const ticker = btn.dataset.consensusTicker;
-        if (ticker && onTickerSelect) onTickerSelect(ticker);
-      });
+    root.addEventListener('input', e => {
+      if (e.target.id === 'consensus-fund-query') onFundQuery?.(e.target.value);
     });
-    container.querySelectorAll('[data-consensus-fund-id]').forEach(btn => {
-      btn.addEventListener('click', (e) => {
-        e.stopPropagation();
-        const id = btn.dataset.consensusFundId;
-        if (id && onFundSelect) onFundSelect(id, 'fund');
-      });
-    });
-    const closeBtn = container.querySelector('#consensus-drawer-close');
-    if (closeBtn) closeBtn.addEventListener('click', () => { if (onCloseDrawer) onCloseDrawer(); });
-    const exportBtn = container.querySelector('#consensus-export-csv');
-    if (exportBtn) {
-      exportBtn.addEventListener('click', () => {
-        const ticker = exportBtn.dataset.exportTicker;
-        if (!ticker || !insights?.consensus) return;
-        const csv = buildConsensusCsv(ticker, insights.consensus, timeModel);
-        const blob = new Blob([csv], { type: 'text/csv;charset=utf-8' });
-        const url = URL.createObjectURL(blob);
-        const a = document.createElement('a');
-        a.href = url;
-        a.download = `consensus_${ticker}.csv`;
-        a.click();
-        URL.revokeObjectURL(url);
-      });
-    }
-    const fundSearch = container.querySelector('#consensus-fund-search');
-    if (fundSearch) {
-      const selectExactFund = () => {
-        const options = Array.from(container.querySelectorAll('#consensus-fund-options option'));
-        const value = fundSearch.value.trim().toLowerCase();
-        const match = options.find(option => option.value.trim().toLowerCase() === value);
-        if (match && onFundSelect) onFundSelect(match.dataset.fundId || null, 'fund');
-      };
-      fundSearch.addEventListener('input', selectExactFund);
-      fundSearch.addEventListener('change', selectExactFund);
-    }
+    // `toggle` does not bubble, so listen in the capture phase.
+    root.addEventListener('toggle', e => {
+      const details = e.target;
+      if (!details.matches?.('details[data-consensus-holding]')) return;
+      if (details.open) {
+        root.querySelectorAll('details[data-consensus-holding][open]').forEach(other => {
+          if (other !== details) other.open = false;
+        });
+        fillFunds(details);
+      }
+      onHoldingToggle?.(details.dataset.consensusHolding, details.open);
+    }, true);
+    root.querySelectorAll('details[data-consensus-holding][open]').forEach(fillFunds);
   }
 
   function renderConsensus(consensus, escapeHtml, linkHtml, ghRepo, opts) {
@@ -5318,128 +5597,131 @@
       period = null,
       knownTickers = [],
       timeModel = null,
-      viewMode = 'table',
+      lens = 'all',
+      sortMode = 'change',
       selectedTicker = null,
       selectedFundId = null,
       fundProfiles = null,
-      letterIndex = null,
+      fundQuery = '',
+      fundPage = 0,
+      holdingOpen = null,
     } = opts || {};
     if (!consensus || !consensus.by_quarter) {
       return '<p class="subhead">No consensus built yet. Run <span class="mono">python _system/scripts/build_insights.py</span>.</p>';
     }
     const { block, scope } = consensusBlockForPeriod(consensus, period, quarter);
+    const scopeLabel = String(scope || '').replace(/^./, c => c.toUpperCase());
     const matchRow = r => !search || SearchMatch.matchConsensusRow(r, search, knownTickers);
     const bookRow = r => !bookOnly || r.in_book;
     const most = (block.most_discussed || []).filter(r => bookRow(r) && matchRow(r));
-    const changes = (block.biggest_changes || []).filter(r => bookRow(r) && matchRow(r));
-    const activity = (block.activity || []).filter(r => bookRow(r) && matchRow(r));
     const summary = consensus.summary || {};
 
     const priorPeriod = priorConsensusPeriod(period, timeModel);
     let qoqShifts = [];
-    let priorLabel = '';
+    let changesAvailable = false;
     if (priorPeriod) {
       const priorBlock = consensusBlockForPeriod(consensus, priorPeriod, quarter).block;
       qoqShifts = computeConsensusQoqShifts(block.most_discussed, priorBlock.most_discussed)
         .filter(r => bookRow(r) && matchRow(r));
-      priorLabel = priorPeriod.label;
+      changesAvailable = true;
     } else if (period?.quarters?.length === 1 && consensus.qoq_by_quarter?.[period.quarters[0]]?.shifts?.length) {
       qoqShifts = (consensus.qoq_by_quarter[period.quarters[0]].shifts || [])
         .filter(r => bookRow(r) && matchRow(r));
-      priorLabel = quarterLabel(consensus.qoq_by_quarter[period.quarters[0]].prior_quarter);
+      changesAvailable = true;
     }
 
-    const qoqByTicker = consensusRowsToMap(qoqShifts);
-    const showDelta = viewMode === 'table' && qoqShifts.length > 0;
+    const activeSort = changesAvailable && sortMode !== 'breadth' ? 'change' : 'breadth';
+    const activeLens = !changesAvailable && lens === 'reversals' ? 'all' : lens;
+    const allItems = consensusDisplayRows(most, qoqShifts, activeSort);
+    const selectedProfile = selectedFundId ? fundProfiles?.[selectedFundId] || null : null;
+    const selectedPositions = selectedProfile ? consensusFundPositions(selectedProfile, period) : [];
+    const fundTickers = selectedProfile ? new Set(selectedPositions.map(p => p.ticker)) : null;
+    const items = allItems.filter(({ row, shift }) => {
+      if (activeLens === 'reducing' && !(row.in_book && row.sentiment === 'reducing')) return false;
+      if (activeLens === 'reversals' && !consensusIsReversal(shift)) return false;
+      return !fundTickers || fundTickers.has(row.ticker);
+    });
 
-    const viewTabs = [
-      { id: 'shifted', label: 'Changes' },
-      { id: 'table', label: 'Current' },
-      { id: 'heatmap', label: 'History' },
-      { id: 'fund', label: 'By fund' },
-    ];
-
-    const mostRows = most.slice(0, 60).map((r, i) => {
-      const qoq = qoqByTicker.get(r.ticker);
-      const delta = qoq ? `${qoq.delta_net > 0 ? '&uarr;' : qoq.delta_net < 0 ? '&darr;' : '&rarr;'} ${formatConsensusDelta(qoq.delta_net)} net` : '&rarr; stable';
-      return `<article class="consensus-signal-row${r.in_book && r.sentiment === 'reducing' ? ' book-conflict' : ''}">
-        <div class="consensus-rank">${i + 1}</div>
-        <div class="consensus-signal-identity">
-          <div>${consensusTickerCell(r, escapeHtml)} <strong>${escapeHtml((r.name || '').slice(0, 44))}</strong></div>
-          <div class="consensus-signal-meta">${r.fund_count} funds &middot; ${r.buy_funds || 0} adding &middot; ${(r.sell_funds || 0) + (r.short_funds || 0)} reducing &middot; net ${r.net > 0 ? '+' : ''}${r.net}</div>
-        </div>
-        <div class="consensus-signal-change ${qoq?.delta_net > 0 ? 'positive' : qoq?.delta_net < 0 ? 'negative' : 'neutral'}"><strong>${delta}</strong><span>${qoq ? `${formatConsensusDelta(qoq.delta_funds)} funds vs prior` : 'no prior comparison'}</span></div>
-        <div class="consensus-signal-lean">${consensusSentimentChip(r.sentiment, escapeHtml)}</div>
-      </article>`;
-    }).join('');
-
-    const activityRows = activity.slice(0, 120).map(r => `
-      <tr>
-        <td class="mono" style="font-size:11px">${escapeHtml(r.letter_date || '—')}</td>
-        <td>${r.fund_id ? `<button type="button" class="linkish" data-consensus-fund-id="${escapeHtml(r.fund_id)}">${escapeHtml(r.fund)}</button>` : escapeHtml(r.fund)}</td>
-        <td><span class="badge ${STANCE_BADGE[r.action] || 'badge-us'}">${escapeHtml(r.action)}</span></td>
-        <td>${consensusTickerCell(r, escapeHtml)}</td>
-        <td style="font-size:11px;max-width:340px">${escapeHtml((r.commentary || '').slice(0, 180))}</td>
-        <td>${recordEvidenceLink(r, linkHtml, ghRepo)}</td>
-      </tr>`).join('');
-
-    const changesRows = changes.slice(0, 24).map(r => `
-      <tr>
-        <td>${consensusTickerCell(r, escapeHtml)}</td>
-        <td style="font-size:11px">${escapeHtml((r.name || '').slice(0, 32))}</td>
-        <td class="mono" style="text-align:center;color:${r.net >= 0 ? 'var(--accent-green,#4ade80)' : 'var(--accent-red,#f87171)'}">${r.net > 0 ? '+' : ''}${r.net}</td>
-        <td>${consensusSentimentChip(r.sentiment, escapeHtml)}</td>
-      </tr>`).join('');
-
-    const drawer = selectedTicker
-      ? renderConsensusTickerDrawer(selectedTicker, consensus, escapeHtml, linkHtml, ghRepo, timeModel)
-      : '';
-
-    let body = '';
-    if (viewMode === 'shifted') {
-      body = renderConsensusShifted(qoqShifts, priorLabel, escapeHtml);
-    } else if (viewMode === 'heatmap') {
-      body = renderConsensusHeatmap(consensus, escapeHtml, {
-        period, timeModel, bookOnly, search, knownTickers,
-        quarterIds: timeModel?.quarters?.slice(0, 8),
-      });
-    } else if (viewMode === 'fund') {
-      body = renderConsensusFundTrajectory(fundProfiles, letterIndex, escapeHtml, {
-        search, bookOnly, period, knownTickers, selectedFundId,
-      });
-    } else {
-      body = `
-      <div class="consensus-section-heading"><div><strong>Current consensus</strong><span> ranked by breadth and conviction</span></div><span>${most.length} securities</span></div>
-      ${most.length ? `<div class="consensus-signal-list">${mostRows}</div>` : '<p class="subhead">No securities match this filter.</p>'}`;
-    }
-
-    const reducingBook = most.filter(r => r.in_book && r.sentiment === 'reducing').length;
-    const reversals = qoqShifts.filter(r => r.lean_flip).length;
-    const largestDrop = qoqShifts.slice().sort((a, b) => a.delta_net - b.delta_net)[0];
-    const disagreement = most.filter(r => (r.buy_funds || 0) > 0 && ((r.sell_funds || 0) + (r.short_funds || 0)) > 0)
-      .sort((a, b) => ((b.buy_funds || 0) + (b.sell_funds || 0) + (b.short_funds || 0)) - ((a.buy_funds || 0) + (a.sell_funds || 0) + (a.short_funds || 0)))[0];
+    const reducingCount = r => (r.sell_funds || 0) + (r.short_funds || 0);
+    const reducingBook = allItems.filter(({ row }) => row.in_book && row.sentiment === 'reducing').length;
+    const reversals = qoqShifts.filter(consensusIsReversal).length;
+    const largestDrop = qoqShifts.filter(r => r.delta_net < 0 && r.fund_count > 0).sort((a, b) => a.delta_net - b.delta_net)[0] || null;
+    const disagreement = most.filter(r => (r.buy_funds || 0) > 0 && reducingCount(r) > 0)
+      .sort((a, b) => ((b.buy_funds || 0) + reducingCount(b)) - ((a.buy_funds || 0) + reducingCount(a)))[0] || null;
     const brief = reducingBook
       ? `${reducingBook} portfolio holding${reducingBook === 1 ? ' is' : 's are'} being reduced by outside investors${largestDrop ? `; ${largestDrop.ticker} weakened most versus the prior period` : ''}.`
       : largestDrop
         ? `${largestDrop.ticker} showed the largest deterioration versus the prior period; no portfolio-wide reduction signal is present.`
         : 'No material portfolio conflict is visible in the selected period.';
 
-    return `
-      ${drawer}
+    const lensTile = (id, label, value, note) => `<button type="button" class="consensus-kpi${activeLens === id ? ' active' : ''}" data-consensus-lens="${id}" aria-pressed="${activeLens === id}">
+        <span>${label}</span><strong>${value}</strong><small>${note}</small>
+      </button>`;
+    const tickerTile = (label, ticker, note) => (ticker
+      ? `<button type="button" class="consensus-kpi" data-consensus-ticker="${escapeHtml(ticker)}">
+        <span>${label}</span><strong>${escapeHtml(ticker)}</strong><small>${note}</small>
+      </button>`
+      : `<div class="consensus-kpi is-empty"><span>${label}</span><strong>None</strong><small>${note}</small></div>`);
+    const tiles = [
+      lensTile('reducing', 'Holdings reducing', reducingBook, 'our names funds are selling'),
+      changesAvailable ? lensTile('reversals', 'Lean reversals', reversals, 'lean flipped vs prior period') : '',
+      changesAvailable ? tickerTile('Largest deterioration', largestDrop?.ticker, largestDrop ? `net ${largestDrop.delta_net} vs prior period` : 'nothing weakened') : '',
+      tickerTile('Most disputed', disagreement?.ticker, disagreement ? `${disagreement.buy_funds || 0} adding / ${reducingCount(disagreement)} reducing` : 'no two-way action'),
+    ].filter(Boolean).join('');
+
+    const lensTitle = { reducing: 'Holdings funds are reducing', reversals: 'Lean reversals' }[activeLens] || 'Fund activity';
+    const sortButton = (id, label) => `<button type="button" class="filter-btn${activeSort === id ? ' active' : ''}" data-consensus-sort="${id}" aria-pressed="${activeSort === id}">${label}</button>`;
+    const heading = `<div class="consensus-section-heading">
+        <div><strong>${lensTitle}</strong><span> &middot; ${escapeHtml(scopeLabel)}${changesAvailable ? ' vs prior period' : ''}</span></div>
+        <div class="consensus-list-tools">
+          <span>${items.length.toLocaleString('en-US')} securit${items.length === 1 ? 'y' : 'ies'}</span>
+          ${changesAvailable ? `<div class="consensus-sort" role="group" aria-label="Sort the list">${sortButton('change', 'Biggest change')}${sortButton('breadth', 'Most funds')}</div>` : ''}
+        </div>
+      </div>`;
+    const chips = [
+      activeLens !== 'all' ? `<button type="button" class="consensus-chip" data-consensus-lens="all" aria-label="Clear the ${lensTitle} filter">${lensTitle} <span aria-hidden="true">&times;</span></button>` : '',
+      selectedProfile ? `<button type="button" class="consensus-chip" data-consensus-fund-id="" aria-label="Clear the fund filter">Named by ${escapeHtml(selectedProfile.fund || selectedFundId)} <span aria-hidden="true">&times;</span></button>` : '',
+    ].filter(Boolean).join('');
+    const fundNote = selectedProfile
+      ? `<span>Its letters name ${fundTickers.size} securit${fundTickers.size === 1 ? 'y' : 'ies'} in this period; ${items.length} ${items.length === 1 ? 'is' : 'are'} in this list.</span>`
+      : '';
+    const filters = chips ? `<div class="consensus-active-filters">${chips}${fundNote}</div>` : '';
+    const empty = activeLens === 'reducing' ? 'No holding is being reduced in this period.'
+      : activeLens === 'reversals' ? 'No lean flipped versus the prior period.'
+        : selectedProfile ? 'None of the names in this fund’s letters match these filters.'
+          : 'No securities match these filters.';
+    const rowCtx = { escapeHtml, linkHtml, ghRepo, fundProfiles, period, selectedFundId, changesAvailable, holdingOpen };
+    const quiet = items.filter(({ row }) => !row.fund_count);
+    const quietDivider = quiet.length && quiet.length < items.length
+      ? `<div class="consensus-list-divider">No fund trades this period<span>${quiet.length.toLocaleString('en-US')} name${quiet.length === 1 ? '' : 's'} only discussed, or traded before and quiet now</span></div>`
+      : '';
+    const list = items.length
+      ? `<div class="consensus-signal-list${changesAvailable ? '' : ' no-change'}">${items.map(item => (item === quiet[0] ? quietDivider : '') + renderConsensusRow(item, rowCtx)).join('')}</div>`
+      : `<p class="subhead">${empty}</p>`;
+
+    const drawer = selectedTicker
+      ? renderConsensusTickerDrawer(selectedTicker, consensus, escapeHtml, linkHtml, ghRepo, timeModel)
+      : '';
+    const rail = renderConsensusFundRail({
+      fundProfiles, period, bookOnly, fundQuery, fundPage, selectedFundId, selectedPositions, escapeHtml,
+    });
+
+    return `<div class="consensus-root" data-consensus-root>
       <section class="consensus-brief">
         <div><span class="consensus-eyebrow">Investor brief</span><strong>${escapeHtml(brief)}</strong></div>
-        <span>${summary.fund_count || 0} canonical funds &middot; ${escapeHtml(scope)}${bookOnly ? ' &middot; our book only' : ''}</span>
+        <span>${summary.fund_count || 0} canonical funds &middot; ${escapeHtml(scopeLabel)}${bookOnly ? ' &middot; our book only' : ''}</span>
       </section>
-      <div class="consensus-kpis">
-        <button type="button" data-consensus-view="table"><span>Holdings reducing</span><strong>${reducingBook}</strong><small>current conflicts</small></button>
-        <button type="button" data-consensus-view="shifted"><span>Lean reversals</span><strong>${reversals}</strong><small>vs prior period</small></button>
-        <button type="button" data-consensus-view="shifted"><span>Largest deterioration</span><strong>${escapeHtml(largestDrop?.ticker || 'None')}</strong><small>${largestDrop ? `net ${largestDrop.delta_net > 0 ? '+' : ''}${largestDrop.delta_net}` : 'no material shift'}</small></button>
-        <button type="button" data-consensus-view="table"><span>Most disputed</span><strong>${escapeHtml(disagreement?.ticker || 'None')}</strong><small>${disagreement ? `${disagreement.buy_funds || 0} adding / ${(disagreement.sell_funds || 0) + (disagreement.short_funds || 0)} reducing` : 'no two-way action'}</small></button>
+      <div class="consensus-kpis">${tiles}</div>
+      <div class="consensus-split">
+        <div class="consensus-main">
+          ${drawer}
+          ${heading}
+          ${filters}
+          ${list}
+        </div>
+        ${rail}
       </div>
-      <nav class="source-pills consensus-view-tabs" id="consensus-view-tabs">
-        ${viewTabs.map(t => `<button type="button" class="filter-btn source-pill${viewMode === t.id ? ' active' : ''}" data-consensus-view="${escapeHtml(t.id)}">${escapeHtml(t.label)}</button>`).join('')}
-      </nav>
-      ${body}`;
+    </div>`;
   }
 
   function renderInsightsPanel(insights, options) {
@@ -5607,11 +5889,14 @@
         search: fundSearch,
         knownTickers,
         timeModel,
-        viewMode: options?.consensusViewMode || 'table',
+        lens: options?.consensusLens || 'all',
+        sortMode: options?.consensusSort || 'change',
         selectedTicker: options?.consensusSelectedTicker || null,
         selectedFundId: options?.consensusFundId || null,
         fundProfiles: insights?.fund_profiles || {},
-        letterIndex,
+        fundQuery: options?.consensusFundQuery || '',
+        fundPage: options?.consensusFundPage || 0,
+        holdingOpen: options?.consensusHoldingOpen || null,
       });
     } else if (activeSection === 'letters') {
       const prov = insights?.provenance || {};
@@ -5725,20 +6010,20 @@
     const bookLabel = activeSection === 'tickers' ? 'Holdings only' : 'Our book overlap';
 
     return `
-      ${activeSection === 'consensus' ? '' : '<h2 style="font-size:18px;margin-bottom:6px">Insights</h2>'}
+      ${activeSection === 'consensus' ? '' : `<h2 style="font-size:18px;margin-bottom:6px">Insights</h2>
       <p class="subhead" style="margin-bottom:14px">
         Portfolio context only · ${insights?.event_count || 0} events · ${insights?.letter_count || 0} letters · ${insights?.podcast_count || 0} podcasts · ${insights?.video_count || 0} videos · ${insights?.front_record_count || 0} front records · ${insights?.archived_record_count || 0} archived
       </p>
       <nav class="insights-section-groups" id="insights-section-tabs" aria-label="Insights workbench" style="margin-bottom:10px">
         ${sectionGroups.map(group => `<div class="insights-section-group"><span>${group.label}</span><div>${group.ids.map(id => sections.find(section => section.id === id)).filter(Boolean).map(s => `<button type="button" class="view-tab${activeSection === s.id ? ' active' : ''}" data-insights-section="${s.id}">${s.label}</button>`).join('')}</div></div>`).join('')}
-      </nav>
+      </nav>`}
       <div class="detail-section${activeSection === 'consensus' ? ' consensus-toolbar' : ''}" style="display:grid;gap:8px;margin-bottom:12px">
         ${activeSection === 'consensus' ? `<div class="consensus-toolbar-main">
           <label><span>Period</span><select id="consensus-period-select" class="search">
             ${[...rangeTabs, ...yearTabs, ...quarterTabs.filter(t => t.id !== `year:${selectedYear}`)].map(t => `<option value="${escapeHtml(t.id)}"${period.id === t.id ? ' selected' : ''}>${escapeHtml(t.label)}</option>`).join('')}
           </select></label>
           <label class="tier-sub consensus-book-toggle"><input type="checkbox" id="insights-book-only" ${bookOnly ? 'checked' : ''} /> Our book only</label>
-          <input class="search consensus-search" id="fund-registry-search" placeholder="Search ticker or fund..." value="${escapeHtml(fundSearch)}" />
+          <input class="search consensus-search" id="fund-registry-search" placeholder="Search ticker or company…" value="${escapeHtml(fundSearch)}" />
           <details class="consensus-coverage"><summary>Coverage</summary><div>Viewing ${escapeHtml(period.label)} &middot; ${coverage.quarters} quarter(s) &middot; ${coverage.letters} indexed letters &middot; ${coverage.funds} fund rows</div></details>
         </div>` : ''}
         ${showPeriodControls && activeSection !== 'consensus' ? `<nav class="source-pills" id="insights-range-tabs" style="margin-bottom:0">
@@ -5796,6 +6081,11 @@
     attachWorldModelHistoryHandlers,
     buildConsensusCsv,
     buildTimeModel,
+    renderConsensus,
+    renderConsensusFundsBody,
+    consensusFundTrades,
+    consensusAttachHolders,
+    loadConsensusHolderFile,
     podcastEpisodeShardPath,
     videoDetailShardPath,
     STANCE_BADGE,
