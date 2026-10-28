@@ -123,6 +123,16 @@ def test_company_title_is_discoverable_before_transcription():
     assert [r["ticker"] for r in links] == ["CME"]
 
 
+def test_drive_and_vault_renditions_reuse_full_text_matching(tmp_path):
+    b=Builder(tmp_path,None,tmp_path/"out",tmp_path/"cache",companies=COMPANIES)
+    text="CME Group earns transaction revenue from clearing and futures. Its customer demand and contract volumes grew significantly this year."
+    local=b.base("local","Fund commentary","vault",text=text)
+    original=b.base("drive","Fund commentary.pdf","drive",text=text)
+    assert len(b.matches)==1
+    assert original["title"]=="Fund commentary.pdf"
+    assert original["relationships"]==local["relationships"]
+
+
 def test_source_at_end_of_large_document_is_matched():
     text = "Unrelated economic background. " * 1500 + "\n\nCME Group Inc. earns transaction revenue from clearing and futures. Its customer demand and contract volumes grew significantly this year."
     links, _ = Matcher(COMPANIES).match("Manager commentary", text)

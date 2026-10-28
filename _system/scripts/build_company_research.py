@@ -217,9 +217,14 @@ class Builder:
                 except ValueError:
                     pass
             match_text = "\n\n".join(narratives)
-        match_key = digest(self.match_version + title + digest(match_text) + json.dumps(list(explicit)))
+        # A Drive filename and its vault rendition often differ only by the
+        # extension. Reuse issuer matching for their identical complete text;
+        # original titles and locations remain distinct source metadata.
+        suffix = Path(title).suffix.lower()
+        match_title = title[:-len(suffix)] if suffix in SOURCE_SUFFIXES else title
+        match_key = digest(self.match_version + match_title + digest(match_text) + json.dumps(list(explicit)))
         if match_key not in self.matches:
-            self.matches[match_key] = self.matcher.match(title, match_text, explicit)
+            self.matches[match_key] = self.matcher.match(match_title, match_text, explicit)
         links, review = self.matches[match_key]
         record = {"id": digest(identity)[:32], "title": title, "category": category(path or title, mime), "date": date or date_from(title), "author": author or "", "period": period,
                   "origins": [origin], "locations": list(locations), "text": text, "processing_status": state,
