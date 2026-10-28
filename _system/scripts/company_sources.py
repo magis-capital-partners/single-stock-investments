@@ -260,6 +260,7 @@ class SourceIndex:
     def __init__(self):
         self.records = {}
         self.anchors = {}
+        self.record_anchors = defaultdict(set)
 
     def add(self, record: dict, anchors: list[str]) -> str:
         existing = sorted({self.anchors[a] for a in anchors if a in self.anchors})
@@ -281,10 +282,15 @@ class SourceIndex:
             if other.get("revision"):
                 for field in ("revision", "family", "modified_at"):
                     current[field] = other.get(field)
-        if any(k != key for k in existing):
-            self.anchors = {a: key if k in existing else k for a, k in self.anchors.items()}
+        for other_key in existing:
+            if other_key != key:
+                moved = self.record_anchors.pop(other_key, set())
+                for anchor in moved:
+                    self.anchors[anchor] = key
+                self.record_anchors[key].update(moved)
         for anchor in anchors:
             self.anchors[anchor] = key
+            self.record_anchors[key].add(anchor)
         return key
 
 
