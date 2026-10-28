@@ -82,3 +82,23 @@ def test_orchestrator_never_publishes_an_old_prompt_version(tmp_path, monkeypatc
     write_draft(summaries, archive_draft())
     assert auto.publish_verified(db, {}) == {"published": 0, "quarantined": 0, "already": 0}
     assert db.execute("SELECT count(*) FROM fl_revisions").fetchone()[0] == 0
+
+
+def test_wrangler_login_fills_budget_credentials(tmp_path, monkeypatch):
+    config = tmp_path / "default.toml"
+    config.write_text('oauth_token = "secret-token"\n', encoding="utf-8")
+    (tmp_path / "wrangler.js").write_text("", encoding="utf-8")
+    monkeypatch.delenv("CLOUDFLARE_API_TOKEN", raising=False)
+    monkeypatch.delenv("CLOUDFLARE_ACCOUNT_ID", raising=False)
+    monkeypatch.setattr(auto, "wrangler_js", lambda: tmp_path / "wrangler.js")
+
+    class Completed:
+        returncode = 0
+        stdout = "Account ID e1cac493b315c8fd7398500dd1bfd687\n"
+        stderr = ""
+
+    monkeypatch.setattr(auto.subprocess, "run", lambda *args, **kwargs: Completed())
+    env = {"WRANGLER_OAUTH_CONFIG": str(config)}
+    assert auto.apply_wrangler_login(env) is None
+    assert env["CLOUDFLARE_ACCOUNT_ID"] == "e1cac493b315c8fd7398500dd1bfd687"
+    assert env["CLOUDFLARE_API_TOKEN"] == "secret-token"

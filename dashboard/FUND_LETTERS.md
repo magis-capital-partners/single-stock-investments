@@ -4,7 +4,7 @@ The shared reader lives at `/fund-letters/` and in the dashboard’s Fund Letter
 
 ## Access boundary
 
-The verified owner identities are `drew@magiscapitalpartners.com` and `mike@magiscapitalpartners.com`. Those two logins, and no others, can load the main dashboard. Every other admitted human identity is a reader. Service tokens cannot become human readers or owners.
+The verified owner identities are `drew@magiscapitalpartners.com` and `mike@magiscapitalpartners.com`. A login is also an owner when its address is listed in `PORTFOLIO_DREW_ACCESS_EMAILS` or `PORTFOLIO_MICHAEL_ACCESS_EMAILS`. An address listed for both is not an owner. Those two people, and no others, can load the main dashboard. Every other admitted human identity is a reader. Service tokens cannot become human readers or owners. A human Access token may include the person's name beside the email; that name does not remove ownership. An owner who opens `/fund-letters/` is sent back to the portfolio dashboard at `/`.
 
 Root Pages middleware runs on **every path**, including static assets, guessed filenames, manifests, preview hosts and APIs. `_routes.json` has no exclusions. Only the Fund Letters reader shell, its two assets and its API are reader-accessible. A reader opening `/` or `/index.html` is redirected to `/fund-letters/`, the Fund Letters tab, and every other dashboard path is denied before the asset or API is read. Owner APIs also check ownership themselves. Exact POST ingestion routes retain their existing cryptographic machine authentication; there is no ingestion-prefix exemption.
 

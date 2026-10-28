@@ -16,6 +16,7 @@ import argparse
 import hashlib
 import json
 import os
+import re
 import subprocess
 import sys
 import time
@@ -32,6 +33,39 @@ from vault_paths import letters_root, resolve_ref_to_path  # noqa: E402
 
 SUMMARIZER = ROOT / "_system/scripts/summarize_fund_letter_reader.py"
 SYNC = ROOT / "_system/scripts/sync_fund_letters_release.py"
+ACCOUNT_ID_RE = re.compile(r"\b([0-9a-f]{32})\b")
+OAUTH_TOKEN_RE = re.compile(r'(?m)^oauth_token\s*=\s*"([^"]+)"\s*$')
+
+
+def wrangler_js() -> Path:
+    return ROOT / "dashboard/cloudflare/node_modules/wrangler/bin/wrangler.js"
+
+
+def apply_wrangler_login(env: dict) -> str | None:
+    """Use `wrangler login` for the D1 budget check when no API token is configured.
+
+    A token already exported in the process environment is kept. The OAuth
+    token is refreshed by `wrangler whoami` and is never written to the log.
+    """
+    if os.environ.get("CLOUDFLARE_API_TOKEN") and os.environ.get("CLOUDFLARE_ACCOUNT_ID"):
+        env["CLOUDFLARE_API_TOKEN"] = os.environ["CLOUDFLARE_API_TOKEN"]
+        env["CLOUDFLARE_ACCOUNT_ID"] = os.environ["CLOUDFLARE_ACCOUNT_ID"]
+        return None
+    wrangler = wrangler_js()
+    if not wrangler.is_file():
+        return "local wrangler install missing"
+    proc = subprocess.run(
+        ["node", str(wrangler), "whoami"],
+        env=env, text=True, capture_output=True, encoding="utf-8",
+    )
+    config = Path(env.get("WRANGLER_OAUTH_CONFIG") or (Path.home() / "Library/Preferences/.wrangler/config/default.toml"))
+    token = OAUTH_TOKEN_RE.search(config.read_text(encoding="utf-8")) if config.is_file() else None
+    account = ACCOUNT_ID_RE.search(proc.stdout or "")
+    if proc.returncode or not account or not token:
+        return "wrangler login is missing or expired"
+    env["CLOUDFLARE_ACCOUNT_ID"] = account.group(1)
+    env["CLOUDFLARE_API_TOKEN"] = token.group(1)
+    return None
 
 
 def now() -> str:
@@ -153,8 +187,9 @@ def export_and_sync(db, env: dict, sync_remote: bool) -> dict:
     if not config.is_file() or not wrangler.is_file():
         out["sync"] = "pending: wrangler config or local wrangler install missing"
         return out
-    if not (os.environ.get("CLOUDFLARE_API_TOKEN") and os.environ.get("CLOUDFLARE_ACCOUNT_ID")):
-        out["sync"] = "pending: CLOUDFLARE_API_TOKEN and CLOUDFLARE_ACCOUNT_ID must be in the environment for the D1 budget check"
+    login_problem = apply_wrangler_login(env)
+    if not (env.get("CLOUDFLARE_API_TOKEN") and env.get("CLOUDFLARE_ACCOUNT_ID")):
+        out["sync"] = "pending: " + (login_problem or "CLOUDFLARE_API_TOKEN and CLOUDFLARE_ACCOUNT_ID must be in the environment for the D1 budget check")
         return out
     settings = json.loads(config.read_text(encoding="utf-8"))
     database = next((d for d in settings.get("d1_databases", []) if d.get("binding") == "DB"), None)
@@ -163,7 +198,7 @@ def export_and_sync(db, env: dict, sync_remote: bool) -> dict:
         return out
     code = run_step("sync-release", [sys.executable, str(SYNC), str(release), "--config", str(config),
                                      "--remote", "--target-database-id", database["database_id"],
-                                     "--activate", "--max-batches", "100"], env)
+                                     "--activate", "--max-batches", "2000"], env)
     out["synced"] = code == 0
     if code:
         out["sync"] = "sync step failed; rerun resumes from the release progress file"

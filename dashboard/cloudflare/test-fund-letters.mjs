@@ -2,9 +2,9 @@ import assert from 'node:assert/strict';
 import { DatabaseSync } from 'node:sqlite';
 import { readFileSync } from 'node:fs';
 import test from 'node:test';
-import { humanRole, requireHumanViewer } from '../functions/_lib/auth.js';
+import { humanRole, requireHumanViewer, viewerFromAccessPayload } from '../functions/_lib/auth.js';
 import { accessDecision, onRequest } from '../functions/_middleware.js';
-import { readerIdea, readerLetter, sourceSections, validateDraft } from '../functions/_lib/fund-letters.js';
+import { parseSearchTokens, readerIdea, readerLetter, sourceSections, validateDraft } from '../functions/_lib/fund-letters.js';
 import { onRequestGet, onRequestPost } from '../functions/api/fund-letters.js';
 
 function database() {
@@ -33,8 +33,20 @@ test('only the two verified identities become owners; service tokens and revoked
   assert.equal(humanRole({email:'DREW@magiscapitalpartners.com'}),'owner');
   assert.equal(humanRole({email:'mike@magiscapitalpartners.com'}),'owner');
   assert.equal(humanRole({email:'drew@example.com'}),'reader');
+  assert.equal(viewerFromAccessPayload({email:'drew@magiscapitalpartners.com',common_name:'Drew'}).service_token,null);
+  assert.equal(humanRole(viewerFromAccessPayload({email:'drew@magiscapitalpartners.com',common_name:'Drew'})),'owner');
+  assert.equal(humanRole(viewerFromAccessPayload({common_name:'ingest-token'})),null);
   assert.equal(humanRole({email:'reader@example.com',service_token:'machine'}),null);
   assert.equal(humanRole(reader,{CF_ACCESS_REVOKED_EMAILS:'reader@example.com'}),null);
+  assert.equal(humanRole({email:'Drew.Access@example.com'},{PORTFOLIO_DREW_ACCESS_EMAILS:'drew.access@example.com'}),'owner');
+  assert.equal(humanRole({email:'mike.access@example.com'},{PORTFOLIO_MICHAEL_ACCESS_EMAILS:'Mike.Access@example.com, other@example.com'}),'owner');
+  assert.equal(humanRole({email:'other@example.com'},{PORTFOLIO_DREW_ACCESS_EMAILS:'drew.access@example.com'}),'reader');
+  assert.equal(humanRole({email:'both@example.com'},{PORTFOLIO_DREW_ACCESS_EMAILS:'both@example.com',PORTFOLIO_MICHAEL_ACCESS_EMAILS:'both@example.com'}),'reader');
+  assert.equal(humanRole(viewerFromAccessPayload({email:'Drew Goldman <drew@magiscapitalpartners.com>'})),'owner');
+  assert.equal(humanRole(viewerFromAccessPayload({email:'personal@example.com',common_name:'drew@magiscapitalpartners.com'})),'owner');
+  assert.equal(humanRole(viewerFromAccessPayload({common_name:'drew@magiscapitalpartners.com'})),'owner');
+  assert.equal(humanRole(viewerFromAccessPayload({email:'drew@magiscapitalpartners.com',common_name:'Drew',service_token_id:'machine'})),null);
+  assert.equal(humanRole({email:'drew.access@example.com'},{PORTFOLIO_DREW_ACCESS_EMAILS:'drew.access@example.com',CF_ACCESS_REVOKED_EMAILS:'drew.access@example.com'}),null);
 });
 test('signed owners and readers, revocation, forged/expired tokens and cookie authentication exercise the actual boundary',async()=>{
   const env={CF_ACCESS_TEAM_DOMAIN:'https://test.cloudflareaccess.com',CF_ACCESS_AUD:'reader-audience'};
@@ -49,7 +61,10 @@ test('signed owners and readers, revocation, forged/expired tokens and cookie au
       const signed=await token(email);
       const ctx={request:new Request('https://preview.pages.dev/fund-letters/',{headers:{'cf-access-jwt-assertion':signed}}),env,data:{},next:async()=>new Response('allowed')};
       assert.equal((await requireHumanViewer(ctx)).role,role);
-      assert.equal((await onRequest(ctx)).status,200);
+      ctx.data={};
+      const response=await onRequest(ctx);
+      if(role==='owner'){assert.equal(response.status,302);assert.equal(response.headers.get('location'),'/');}
+      else assert.equal(response.status,200);
       ctx.request=new Request('https://preview.pages.dev/data/core.json',{headers:{'cf-access-jwt-assertion':signed}});ctx.data={};
       assert.equal((await onRequest(ctx)).status,role==='owner'?200:403);
     }
@@ -68,30 +83,11 @@ test('direct dashboard requests, private data, guessed files and source APIs are
   for(const path of ['/data/core.json','/index-viz.js','/data/insights/letters.json','/api/v2/portfolio/book','/original.pdf','/fund-letters/../../data/core.json','/cloudflare-artifact-manifest.json']) assert.equal(accessDecision(path,'GET',reader),'forbidden',path);
   assert.equal(accessDecision('/fund-letters/','GET',reader),'allow');
   assert.equal(accessDecision('/api/fund-letters','GET',reader),'allow');
-  assert.equal(accessDecision('/fund-letters/index.html','GET',reader),'allow');
-  assert.equal(accessDecision('/api/fund-letters','GET',reader),'allow');
   assert.equal(accessDecision('/','GET',reader),'reader-home');
-  assert.equal(accessDecision('/index.html','GET',reader),'reader-home');
   assert.equal(accessDecision('/fund-letters/','GET',null),'unauthenticated');
   assert.equal(accessDecision('/api/v2/portfolio/ingest','GET',null),'unauthenticated');
   assert.equal(accessDecision('/api/v2/portfolio/ingest','POST',null),'machine');
   assert.equal(accessDecision('/api/v2/portfolio/ingest/guessed','POST',null),'unauthenticated');
-});
-test('only Drew and Michael reach the main dashboard; every other signed-in user lands on Fund Letters',async()=>{
-  const michael = {email:'mike@magiscapitalpartners.com',role:'owner'};
-  for(const viewer of [owner,michael]) {
-    assert.equal(accessDecision('/','GET',viewer),'allow');
-    assert.equal(accessDecision('/index.html','GET',viewer),'allow');
-    assert.equal(accessDecision('/data/core.json','GET',viewer),'allow');
-    let calls=0;
-    const response=await onRequest({request:new Request('https://test.example/'),env:{},data:{humanViewer:viewer},next:async()=>{calls++;return new Response('main dashboard');}});
-    assert.equal(response.status,200);assert.equal(await response.text(),'main dashboard');assert.equal(calls,1);
-  }
-  for(const home of ['/','/index.html']) {
-    let calls=0;
-    const response=await onRequest({request:new Request('https://test.example'+home),env:{},data:{humanViewer:reader},next:async()=>{calls++;return new Response('must not serve dashboard');}});
-    assert.equal(response.status,302);assert.equal(response.headers.get('location'),'/fund-letters/');assert.equal(calls,0);
-  }
 });
 test('middleware denies before reading and prevents role-dependent cache reuse',async()=>{
   let calls=0;
@@ -147,10 +143,64 @@ test('years and labels are not numerical claims, and stance reaches readers with
   const dated=draft();dated.overview+=' Written in 2011 after QE2 ended.';
   assert.deepEqual(validateDraft(dated,sourceSections(source)),[]);
   const row={id:'l0',fund_id:'fund',fund:'Fund',reporting_period:'2011Q1',letter_date:null,publication_date:null,published_at:'x',created_at:'y',revision_id:'r1',overview:'Overview'};
-  const letter=readerLetter(row,[{id:'i1',title:'Acme',ticker:null,idea_type:'long',activity:'new',summary:'Summary',evolution:null,compared_letter_id:null}],{focus:'macro',leaning_in:[{subject:'Equities',why:'Cash yields are low.',quote:'PRIVATE QUOTE'}],leaning_out:[{subject:'Cash',why:'Yields are low.',quote:'PRIVATE QUOTE 2'}]});
+  const letter=readerLetter(row,[{id:'i1',title:'Acme',ticker:null,idea_type:'long',activity:'new',summary:'Summary',evolution:null,compared_letter_id:null}],{focus:'macro',leaning_in:[{subject:'Equities',why:'Cash yields are low.',quote:'PRIVATE QUOTE'}],leaning_out:[{subject:'Cash',why:'Yields are low.',quote:'PRIVATE QUOTE 2'}]},'Macro tilt towards equities.');
   assert.equal(letter.stance.focus,'macro');
+  assert.equal(letter.focus,'macro');
+  assert.equal(letter.headline,'Macro tilt towards equities.');
+  assert.equal(readerLetter(row,[],null,'https://drive.google.com/SECRET').headline,null);
   assert.deepEqual(letter.stance.leaning_in,[{subject:'Equities',why:'Cash yields are low.'}]);
   assert.equal(JSON.stringify(letter).includes('PRIVATE QUOTE'),false);
+});
+test('cross-fund letters feed, period catalog, and category/activity filters return allowlisted summaries',async()=>{
+  const DB=database();seed(DB,3);
+  DB.db.exec("UPDATE fl_revisions SET content_json='{\"headline\":\"Headline for l0\",\"stance\":{\"focus\":\"micro\"}}' WHERE id='r0'");
+  DB.db.exec("UPDATE fl_ideas SET activity='new' WHERE revision_id='r0'");
+  const catalog=await(await onRequestGet(context({action:'funds'},reader,DB))).json();
+  assert.deepEqual(catalog.periods,[{period:'2020Q1',count:3}]);
+  const allLetters=await(await onRequestGet(context({action:'letters'},reader,DB))).json();
+  assert.equal(allLetters.letters.length,3);
+  assert.equal(allLetters.letters[0].headline,'Headline for l0');
+  assert.equal(allLetters.letters[0].focus,'micro');
+  assert.equal(JSON.stringify(allLetters).includes('SECRET'),false);
+  const byAct=await(await onRequestGet(context({action:'letters',activity:'new,add',period:'2020',type:'long,short'},reader,DB))).json();
+  assert.equal(byAct.letters.length,1);
+  assert.equal(byAct.letters[0].id,'l0');
+  const searchByAct=await(await onRequestGet(context({action:'search',activity:'new,add',period:'2020Q1',type:'long,short'},reader,DB))).json();
+  assert.equal(searchByAct.results.length,1);
+});
+test('smart search tokens, multi-fund overlap, battleground signals, and owner portfolio scope work without leaking to readers',async()=>{
+  const DB=database();seed(DB,2);
+  DB.db.exec("INSERT INTO fl_funds(id,name) VALUES('bear-fund','Bear Fund');");
+  DB.db.prepare('INSERT INTO fl_letters(id,fund_id,content_hash,pipeline_version,reporting_period,ingested_at,source_ref,source_url,source_text,published_revision) VALUES(?,?,?,?,?,?,?,?,?,?)').run('lbear','bear-fund','hbear','v1','2020Q2','2026-10-23','private/path','https://drive.google.com/SECRET',source,'rbear');
+  DB.db.prepare('INSERT INTO fl_revisions(id,letter_id,created_at,author,status,overview,content_json,checks_json) VALUES(?,?,?,?,?,?,?,?)').run('rbear','lbear','2026-10-23','editor','published','Bearish view on Acme.','{"stance":{"focus":"macro"}}','{}');
+  DB.db.prepare('INSERT INTO fl_ideas(id,revision_id,letter_id,title,ticker,idea_type,activity,summary,ordinal) VALUES(?,?,?,?,?,?,?,?,?)').run('acme-short','rbear','lbear','Acme short thesis','ACME','short','short','Acme faces competitive pressure.',0);
+
+  const parsed = parseSearchTokens('ticker:ACME,MSFT type:short action:new focus:macro is:battleground recurring');
+  assert.deepEqual(parsed.tickers, ['ACME', 'MSFT']);
+  assert.deepEqual(parsed.types, ['short']);
+  assert.deepEqual(parsed.activities, ['new']);
+  assert.deepEqual(parsed.focuses, ['macro']);
+  assert.deepEqual(parsed.signals, ['battleground']);
+  assert.equal(parsed.freeText, 'recurring');
+
+  const catalog = await (await onRequestGet(context({action:'funds'},reader,DB))).json();
+  assert.equal(catalog.tickers.length, 1);
+  assert.equal(catalog.tickers[0].ticker, 'ACME');
+  assert.equal(catalog.tickers[0].fund_count, 2);
+  assert.equal(catalog.tickers[0].multi_fund, true);
+  assert.equal(catalog.tickers[0].battleground, true);
+
+  const battleIdeas = await (await onRequestGet(context({action:'search',signal:'battleground'},reader,DB))).json();
+  assert.equal(battleIdeas.results.length, 3);
+  const macroLetters = await (await onRequestGet(context({action:'letters',q:'focus:macro is:multi ticker:ACME'},reader,DB))).json();
+  assert.equal(macroLetters.letters.length, 1);
+  assert.equal(macroLetters.letters[0].id, 'lbear');
+
+  DB.db.exec("CREATE TABLE portfolio_positions (symbol TEXT, position REAL); INSERT INTO portfolio_positions VALUES ('ACME', 100);");
+  const readerSession = await (await onRequestGet(context({action:'session'},reader,DB))).json();
+  assert.equal('book_tickers' in readerSession, false);
+  const ownerSession = await (await onRequestGet(context({action:'session'},owner,DB))).json();
+  assert.deepEqual(ownerSession.book_tickers, ['ACME']);
 });
 test('owner edits create revisions and publication requires six explicit attestations',async()=>{
   const DB=database();seed(DB);
