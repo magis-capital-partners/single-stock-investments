@@ -12,6 +12,7 @@
 <link href="insights-events.css" rel="stylesheet">
 <link href="short-alpha.css?v=20261015-results" rel="stylesheet">
 <link href="third-plus-study.css?v=20261025-ssr-replay" rel="stylesheet">
+<link href="third-plus-forward.css?v=20261028-forward20" rel="stylesheet">
 <link href="reverse-splits-portfolio.css?v=20261015-results" rel="stylesheet">
 <link href="shorts-net-edge.css?v=20261015-v2" rel="stylesheet">
 <link href="shorts-edge-v3.css?v=20261018-fundamentals" rel="stylesheet">
@@ -2004,6 +2005,7 @@
 <script src="activist-viz.js?v=20260819-dashboard-rebuild"></script>
 <script src="third-plus-study-details.js?v=20261025-ssr-replay"></script>
 <script src="third-plus-allocation.js?v=20261027-allocation"></script>
+<script src="third-plus-forward.js?v=20261028-forward20"></script>
 <script src="third-plus-assumed.js?v=20261027-full-assumed"></script>
 <script src="third-plus-venue.js?v=20261027-full-assumed"></script>
 <script src="third-plus-execution.js?v=20261025-ssr-replay"></script>
@@ -2439,6 +2441,7 @@ function parseRouteFromHashString(hash) {
   }
   const shortBacktestMatch = /^#\/ideas\/short-alpha\/backtest$/i.test(hash || '');
   if (shortBacktestMatch) return { view:'short-alpha', shortAlphaSection:'backtest', ticker:null, watchlistSub:null };
+  if (/^#\/ideas\/short-alpha\/forward$/i.test(hash || '')) return { view:'short-alpha', shortAlphaSection:'forward', ticker:null, watchlistSub:null };
   const ideasMatch = /^#\/ideas\/(all|queue|nol|banks|rock|buybacks|short-alpha)$/i.exec(hash || '');
   if (ideasMatch) {
     const sub = ideasMatch[1].toLowerCase();
@@ -2520,7 +2523,7 @@ function syncRouteHash() {
     setAppHash(`#/ideas/${sub}`);
   } else if (activeView === 'short-alpha') {
     const focusQuery = new URLSearchParams(location.hash.split('?')[1] || '').get('buyback');
-    setAppHash(`#/ideas/${activeView}${shortAlphaSection==='backtest' ? '/backtest' : ''}${focusQuery ? '?buyback='+encodeURIComponent(focusQuery) : ''}`);
+    setAppHash(`#/ideas/${activeView}${['backtest','forward'].includes(shortAlphaSection) ? '/'+shortAlphaSection : ''}${focusQuery ? '?buyback='+encodeURIComponent(focusQuery) : ''}`);
   } else if (activeView === 'situations') {
     const slug = SITUATION_LANE_SLUG[situationLane] || '';
     const focus = situationFocus ? `/${encodeURIComponent(situationFocus)}` : '';
@@ -3810,6 +3813,13 @@ function renderShortAlpha() {
   const loading = document.getElementById('short-alpha-loading');
   const content = document.getElementById('short-alpha-content');
   if (!loading || !content) return;
+  if (shortAlphaSection==='forward' && window.ThirdPlusForward) {
+    loading.style.display='none';
+    content.style.display='block';
+    content.innerHTML='<p><a href="#/ideas/short-alpha">← Short Alpha</a></p>'+ThirdPlusForward.render();
+    ThirdPlusForward.attach(content);
+    return;
+  }
   if (shortAlphaSection==='backtest' && window.ShortAlphaViz) {
     loading.style.display='none';
     content.style.display='block';
