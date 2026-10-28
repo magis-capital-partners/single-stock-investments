@@ -41,6 +41,7 @@ def test_unknown_shared_lot_reviews_but_predating_algo_is_residual():
     assert reg.resolve(account="TEST", conid="101", transaction_id="unknown")["owner"] == "unallocated"
     assert reg.resolve(account="TEST", conid="101", transaction_id="old") is None
     assert reg.resolve(account="TEST", conid="101")["owner"] == "unallocated"
+    assert reg.resolve(account="TEST", conid="101", closing_ref="MICHAEL_SLEEVE")["owner"] == "unallocated"
 
 
 def test_canceled_opening_and_cross_strategy_exit_require_review():

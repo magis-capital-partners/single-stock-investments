@@ -134,7 +134,7 @@ class OwnershipRegistry:
             if result["owner"] != "excluded" and closing and closing["owner"] == "excluded":
                 return {**review, "reason": "cross_strategy_close"}
             return {**result, "reason": "broker_matched_opening_order_reference"}
-        if closing:
+        if closing and closing['owner'] == 'excluded':
             return closing
         first_ls = self.payload["ls_contracts"].get(_key(account, conid, model, "contract", ""))
         dates = [m.get("date") for m in matches if m.get("date")]
@@ -149,7 +149,7 @@ class OwnershipRegistry:
                 return {**review, "reason": "shared_security_missing_opening_date"}
             return {"owner": "drew" if opening_date >= "2026-09-13" else "michael", "strategy": "single_stock",
                     "reason": "dated_3905_lot_policy", "confidence": "legacy_inferred"}
-        return None
+        return closing
 
     def save(self, path):
         path = Path(path)
