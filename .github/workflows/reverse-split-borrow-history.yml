@@ -9,6 +9,8 @@ on:
     branches: [main]
     paths:
       - '_system/scripts/reverse_splits/profit_borrow.py'
+      - '_system/scripts/third_plus_forward/**'
+      - '_system/data/reverse_splits/third_plus_forward_v1/policies.json'
       - '.github/workflows/reverse-split-borrow-history.yml'
 permissions:
   contents: write
@@ -45,6 +47,8 @@ jobs:
             /dashboard/data/short_profit_program/
             /dashboard/data/short_borrow/
             /dashboard/data/short_forward/
+            /dashboard/data/third_plus_forward*
+            /dashboard/data/third_plus_allocation.json
             /dashboard/cloudflare/
             /.github/actions/deploy-cloudflare-dashboard/
           sparse-checkout-cone-mode: false
@@ -93,6 +97,12 @@ jobs:
         if: always()
         with:
           node-version: '24'
+      - name: Observe the frozen 20-session comparison without broker access
+        if: always()
+        timeout-minutes: 5
+        run: |
+          python -m _system.scripts.third_plus_forward monitor --max-requests 30
+          python -m _system.scripts.third_plus_forward check
       - name: Prepare bounded database history synchronization
         if: always()
         run: |
@@ -157,6 +167,7 @@ jobs:
           git add dashboard/data/reverse_splits.json
           git add _system/data/reverse_splits/borrow_monitor dashboard/data/short_borrow
           if [ -d dashboard/data/short_forward ]; then git add _system/data/reverse_splits/profit_forward dashboard/data/short_forward; fi
+          if [ -f dashboard/data/third_plus_forward.json ]; then git add _system/data/reverse_splits/third_plus_forward_v1 dashboard/data/third_plus_forward.json dashboard/data/third_plus_forward_manifest.json; fi
           git add dashboard/data/net_edge_audits_v3 dashboard/data/shorts_net_edge_v3.json
           if [ -f dashboard/data/shorts_calmar_research.json ]; then git add dashboard/data/shorts_calmar_research.json; fi
           if [ -f dashboard/data/shorts_coverage_research.json ]; then git add dashboard/data/shorts_coverage_research.json dashboard/data/shorts_coverage_packets dashboard/data/shorts_coverage_audits; fi

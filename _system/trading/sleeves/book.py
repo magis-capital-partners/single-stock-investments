@@ -8,7 +8,7 @@ from pathlib import Path
 from typing import Any, Mapping
 
 from . import PKG_DIR
-from .classify_positions import norm_sym
+from .classify_positions import ETF_0DTE_BUCKETS, norm_sym
 from .config_loader import load_config, operator_config
 from .performance import scorecard
 from .store import SleeveStore
@@ -89,6 +89,7 @@ def build_book(owner: str, store: SleeveStore, cfg: Mapping[str, Any] | None = N
     )
     ideas = store.ideas(owner)
     excluded = {"etf_ls": 0, "spx_0dte": 0, "index_put_hedge": 0, "ignored": 0}
+    excluded.update({bucket: 0 for bucket in sorted(ETF_0DTE_BUCKETS)})
     for pos in store.positions():
         bucket = (pos.get("classification") or {}).get("bucket")
         if bucket in excluded:
