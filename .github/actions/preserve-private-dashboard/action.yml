@@ -57,13 +57,22 @@ runs:
         PY
         vault="${RESEARCH_VAULT_ROOT:-_external/research-vault}"
         if [ -d "$vault/dashboard-private" ]; then
+          cache="$vault/dashboard-private/company-research-cache"
+          if [ -d "$cache/git" ] || [ -d "$cache/drive" ]; then
+            python _system/scripts/company_source_cache.py pack --cache "$cache" --archive "$vault/dashboard-private/company-source-backfill"
+          fi
           # Persist only these immutable objects; other vault work belongs to its lane.
-          git -C "$vault" add --force -- dashboard-private
+          exclusions=()
+          for folder in git drive media transcripts md5 queue-checkpoints; do
+            exclusions+=(":(exclude)dashboard-private/company-research-cache/$folder")
+          done
+          exclusions+=(':(exclude)**/work.sqlite*' ':(exclude)**/*.tmp')
+          git -C "$vault" add --force -- dashboard-private "${exclusions[@]}"
           if ! git -C "$vault" diff --cached --quiet -- dashboard-private; then
             if [ -n "$(git -C "$vault" diff --cached --name-only -- . ':!dashboard-private')" ]; then
               echo "::error::Unrelated vault files are staged; publish those before preserving dashboard snapshots."
               exit 1
             fi
-            bash _system/scripts/ci_push_vault.sh "Preserve restricted dashboard source snapshots" "--force dashboard-private"
+            bash _system/scripts/ci_push_vault.sh "Preserve restricted dashboard source snapshots" "--force dashboard-private ${exclusions[*]}"
           fi
         fi

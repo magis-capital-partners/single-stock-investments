@@ -4,9 +4,10 @@ from pathlib import Path
 import argparse
 import json
 import shutil
+import os
 
 
-def stage(source: Path, site: Path) -> dict:
+def stage(source: Path, site: Path, *, hardlink=False) -> dict:
     manifest = json.loads((source / "manifest.json").read_text(encoding="utf-8"))
     routes = json.loads((site / "_routes.json").read_text(encoding="utf-8"))
     if routes.get("include") != ["/*"] or routes.get("exclude"):
@@ -40,7 +41,11 @@ def stage(source: Path, site: Path) -> dict:
             raise RuntimeError(f"Research asset needs further sharding: {path.name}")
         target = destination / relative
         target.parent.mkdir(parents=True, exist_ok=True)
-        shutil.copy2(path, target)
+        if hardlink and not target.exists():
+            try:os.link(path,target)
+            except OSError:shutil.copy2(path,target)
+        else:
+            shutil.copy2(path, target)
         count += 1
     for ticker in manifest["tickers"]:
         company = json.loads((destination / f"companies/{ticker}.json").read_text(encoding="utf-8"))
@@ -53,5 +58,6 @@ if __name__ == "__main__":
     parser=argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--source",type=Path,default=Path("_private/company-research/site"))
     parser.add_argument("--site",type=Path,default=Path("_cf_project/site"))
+    parser.add_argument("--hardlink",action="store_true",help="Link immutable generated assets for local validation without duplicating their bytes")
     args=parser.parse_args()
-    print(json.dumps(stage(args.source,args.site)))
+    print(json.dumps(stage(args.source,args.site,hardlink=args.hardlink)))

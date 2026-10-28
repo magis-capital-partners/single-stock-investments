@@ -5,14 +5,17 @@ import math
 from datetime import date
 
 from commodity_common import LB_PER_TONNE, check, finite, series, shell
+from commodity_inputs import crude_inputs, ratio_history
 
 
 def crude(config, panel, as_of):
     out = shell(config, panel, as_of)
-    ref = config['reference']
+    ref = {**config['reference'], **crude_inputs(panel,as_of)}
+    out['reference'] = ref
     history = ref['quarterly']
     out['history'] = [{**r, 'basis': 'published_estimate' if r['period'] >= '2026-Q1' else 'published_history'} for r in history if r['period'] < ref['forecast_start']]
     out['observed_prices'] = {k: series(panel, k, as_of) for k in ['wti_spot', 'brent_spot']}
+    out['publisher_forecast_validation']=panel.get('oil_forecast_validation',{})
     out['inventory_basis'] = 'OECD commercial inventories; world flows are accounted for separately. World absolute stocks unavailable.'
     for r in history:
         out['validation'].append(check(r['period'] + ' world flow', r['production_mbd'] - r['consumption_mbd'] + r['world_draw_mbd'], .025))
@@ -74,7 +77,7 @@ def crude(config, panel, as_of):
                     break
                 stock, previous = next_stock, base
         out['scenarios'].append({**scenario, 'rows':rows})
-    out['validation'].append({'check':'forecast holdout', 'passed':None, 'reason':'One forecast vintage; out-of-sample price accuracy is not yet established.'})
+    out['validation'].append({'check':'scenario forecast holdout', 'passed':None, 'reason':'Archived publisher forecasts are evaluated separately. The dashboard stress coefficients have not been validated as forecasts.'})
     return out
 
 
@@ -82,6 +85,7 @@ def copper(config, panel, as_of):
     out = shell(config, panel, as_of)
     ref = config['reference']
     out['history'] = ref['history']
+    out['observed_prices']={'copper_spot':series(panel,'copper_spot',as_of)}
     supply, intake = ref.get('concentrate_supply_kt'), ref.get('smelter_intake_kt')
     concentrate_balance = supply-intake if finite(supply) and finite(intake) else None
     out['concentrate'] = {'mine_supply_kt': ref['annual'][0]['mine_kt'], 'sxew_kt':ref.get('sxew_kt'), 'concentrate_supply_kt':supply,
@@ -92,6 +96,11 @@ def copper(config, panel, as_of):
     use_kt = next(r['use_kt'] for r in ref['annual'] if r['year']==2026)
     out['exchange_stocks'] = {**out['exchange_stocks'], 'aggregate_global_use_days': ref['exchange_stocks']['total_t']/1000/use_kt*365}
     out['validation'] = [check(str(r['year'])+' refined accounting',r['refined_kt']-r['use_kt']-r['balance_kt'],1.01) for r in ref['annual']]
+    for row in ref.get('monthly_balances',[]):
+        out['validation'].append(check(row['period']+' monthly refined accounting',row['refined_kt']-row['use_kt']-row['balance_kt'],1.01))
+    exchange=ref['exchange_stocks']
+    changes=[exchange[k].get('ytd_change_t') for k in ['COMEX','SHFE','LME']]
+    if all(finite(v) for v in changes):out['validation'].append(check('exchange stock change geography',sum(changes)-exchange['year_to_date_change_t'],1))
     for s in config['scenarios']:
         rows=[]
         previous=ref['annual'][0]
@@ -133,8 +142,14 @@ def gold_residual(panel, as_of):
     X=lambda d:[1, monthly['real_yield'][d], math.log(monthly['broad_dollar'][d])]
     coef,_,rank,_=np.linalg.lstsq(np.array([X(d) for d in training]), np.array([math.log(monthly['gold_bullion'][d]) for d in training]),rcond=None)
     if rank<3:return {'status':'unavailable','reason':'Training inputs have insufficient independent variation.','rows':[]}
-    return {'status':'historical_diagnostic','train_end':'2021-12','training_months':len(training),'coefficients':coef.tolist(),
-            'rows':[{'period':d,'observed':monthly['gold_bullion'][d],'fitted':math.exp(float(np.dot(coef,X(d)))), 'residual_usd_oz':monthly['gold_bullion'][d]-math.exp(float(np.dot(coef,X(d))))} for d in dates],
+    rows=[{'period':d,'observed':monthly['gold_bullion'][d],'fitted':math.exp(float(np.dot(coef,X(d)))), 'residual_usd_oz':monthly['gold_bullion'][d]-math.exp(float(np.dot(coef,X(d))))} for d in dates]
+    holdout=[r for r in rows if r['period']>'2021-12']
+    anchor=monthly['gold_bullion'][training[-1]]
+    diagnostics={'months':len(holdout),'rmse_usd_oz':math.sqrt(sum(r['residual_usd_oz']**2 for r in holdout)/len(holdout)) if holdout else None,
+                 'constant_2021_price_rmse_usd_oz':math.sqrt(sum((r['observed']-anchor)**2 for r in holdout)/len(holdout)) if holdout else None,
+                 'basis':'Post-training residuals using realized contemporaneous inputs and latest revised history. Not an investable forecast backtest.'}
+    return {'status':'historical_diagnostic','train_end':'2021-12','training_months':len(training),'coefficients':coef.tolist(),'holdout_diagnostic':diagnostics,
+            'rows':rows,
             'note':'Diagnostic only. The post-2021 residual may reflect omitted drivers; it does not identify a causal central-bank premium.'}
 
 
@@ -142,6 +157,7 @@ def gold(config, panel, as_of):
     out=shell(config,panel,as_of)
     ref=config['reference']
     out['history']=ref['history']
+    out['observed_prices']={'gold_bullion':series(panel,'gold_bullion',as_of)}
     out['residual_diagnostic']=gold_residual(panel,as_of)
     out['validation']=[check('above-ground categories',sum(ref['stock_categories_t'].values())-ref['above_ground_t'],100),
                        check('quarterly supply',ref['mine_q2_t']+ref['hedging_q2_t']+ref['recycling_q2_t']-ref['supply_q2_t'],.11),
@@ -175,6 +191,10 @@ def silver(config, panel, as_of, gold_model):
     out=shell(config,panel,as_of)
     ref=config['reference']
     out['history']=ref['annual']
+    out['observed_prices']={'silver_bullion':series(panel,'silver_bullion',as_of)}
+    out['observed_gold_silver_ratio']=ratio_history(panel,as_of)
+    out['warehouse_inventory']={'london':series(panel,'london_silver_stocks',as_of),'unit':'million troy oz','available_inventory_moz':None,
+                               'note':'London vault stocks already contain ETF metal. ETF ownership is not added to physical stocks. Gross holdings do not establish available inventory.'}
     out['gold_dependency_hash']=gold_model['config_sha256']
     out['validation']=[check(str(r['year'])+' physical balance',r['supply_moz']-r['demand_moz']-r['balance_moz'],.11) for r in ref['annual']]
     for s in config['scenarios']:

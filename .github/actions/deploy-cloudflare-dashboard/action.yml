@@ -99,6 +99,9 @@ runs:
       run: |
         set -euo pipefail
         python -m pip install --disable-pip-version-check pypdf pymupdf xlrd google-api-python-client google-auth
+        python _system/scripts/company_source_cache.py restore \
+          --cache "$RESEARCH_VAULT_ROOT/dashboard-private/company-research-cache" \
+          --archive "$RESEARCH_VAULT_ROOT/dashboard-private/company-source-backfill"
         python _system/scripts/build_company_research.py \
           --vault "${RESEARCH_VAULT_ROOT:-_external/research-vault}" \
           --cache "${RESEARCH_VAULT_ROOT:-_external/research-vault}/dashboard-private/company-research-cache" \
