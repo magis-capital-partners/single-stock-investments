@@ -720,6 +720,8 @@ class Builder:
             rec["text"] = text
             if cached.get("extraction", {}).get("ocr_pages"):
                 rec["extraction_review"] = "Automatic OCR; verify against the original"
+            elif cached.get("extraction", {}).get("transcript_kind") == "automatic":
+                rec["extraction_review"] = "Automatic transcript; verify against the original"
             rec.update({"family": "drive:" + item["id"], "revision": revision, "modified_at": item.get("modifiedTime"), "format": item["mimeType"]})
             if state == "access_unavailable":
                 rec["availability"] = "access_unavailable"

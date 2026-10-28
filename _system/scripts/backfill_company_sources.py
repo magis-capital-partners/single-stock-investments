@@ -63,6 +63,8 @@ def transcript_for(path, vault):
 
 
 def extract_complete(data, suffix, *, ocr=False):
+    if suffix == '.epu':
+        suffix = '.epub'
     if suffix in {'.py', '.r', '.sql'}:
         # Model source is searchable text; never import or execute it.
         text, state = extract(data, '.txt')
@@ -95,11 +97,13 @@ def extract_complete(data, suffix, *, ocr=False):
     import fitz
     try:
         with fitz.open(stream=data, filetype='pdf') as pdf:
+            if pdf.needs_pass:
+                return '', 'access_unavailable', {'reason':'Original PDF requires a password'}
             pages, missing, ocr_pages = [], [], []
             for i, page in enumerate(pdf):
                 body = page.get_text().strip()
                 # A scan can have a small footer/header but no body text.
-                scan = len(body) < 80 and bool(page.get_images())
+                scan = len(body) < 80 and (bool(page.get_images()) or (ocr and not body))
                 ocr_complete = False
                 if scan and ocr:
                     try:
@@ -294,16 +298,27 @@ class Worker:
                 data=execute_with_retry(self.service.files().export_media(fileId=meta['id'],mimeType=mime))
             else:
                 suffix=Path(meta['name']).suffix.lower()
-                if suffix not in SOURCE_SUFFIXES | {'.py', '.r', '.sql'}:
+                if suffix not in SOURCE_SUFFIXES | {'.py', '.r', '.sql', '.epu'}:
                     return 'unsupported',{},'Unsupported original format: '+meta['mimeType']
-                if suffix in {'.mp3','.mp4','.m4a','.wav'}:
+                if suffix in {'.mp3','.mp4','.m4a','.wav'} and not self.transcribe:
                     return 'needs_transcript',{},'Audio requires linked transcript'
                 data=execute_with_retry(self.service.files().get_media(fileId=meta['id'],supportsAllDrives=True))
                 if meta.get('md5Checksum') and hashlib.md5(data,usedforsecurity=False).hexdigest()!=meta['md5Checksum']:
                     raise ValueError('Source revision changed during download; rediscover before indexing')
         else:
             raise ValueError('Unsupported queue kind')
-        text,status,details=extract_complete(data,suffix,ocr=self.ocr)
+        if suffix in {'.mp3','.mp4','.m4a','.wav'} and self.transcribe:
+            from fetch_podcast_transcript import whisper_transcribe
+            audio=self.cache/'transcripts'/(kind+'-'+(p.get('id') or p['sha'])+suffix)
+            audio.parent.mkdir(parents=True,exist_ok=True)
+            audio.write_bytes(data)
+            transcript=audio.with_suffix('.txt')
+            text=transcript.read_text(encoding='utf-8') if transcript.is_file() else whisper_transcribe(audio,{'title':p.get('title','')}) or ''
+            status='indexed' if len(text.split())>=40 else 'needs_transcript'
+            if status=='indexed':transcript.write_text(text,encoding='utf-8')
+            details={'transcript_kind':'automatic','review_status':'unreviewed'}
+        else:
+            text,status,details=extract_complete(data,suffix,ocr=self.ocr)
         if status=='awaiting_extraction':status='empty_source' if not data else 'failed'
         if status=='awaiting_transcript':status='needs_transcript'
         md5=hashlib.md5(data,usedforsecurity=False).hexdigest()
