@@ -148,6 +148,30 @@ def test_repair_drops_a_sentence_whose_number_is_nowhere_in_the_source():
     assert "77%" not in payload["overview"]
 
 
+def test_repair_removes_sentences_about_what_the_letter_omits_but_keeps_real_negatives():
+    payload = base_payload(
+        overview="The fund bought Acme for its recurring revenue.\n\nThe letter does not specify a catalyst or valuation.",
+        ideas=[{**base_payload()["ideas"][0], "summary": (
+            "The fund bought Acme for its recurring revenue. The manager does not expect customers to leave. "
+            "No specific figures are provided on position size. The fund holds it, though details are thin in the provided text."
+        )}],
+    )
+    errors, warnings = s.repair_payload(payload, REPAIR_SOURCE)
+    assert errors == []
+    assert payload["overview"] == "The fund bought Acme for its recurring revenue."
+    assert payload["ideas"][0]["summary"] == "The fund bought Acme for its recurring revenue. The manager does not expect customers to leave."
+    assert "removed a sentence about what the letter does not say" in warnings
+
+
+def test_overview_paragraphs_are_kept_from_a_list_and_made_from_a_long_block():
+    assert s.overview_text(["First paragraph.", "", " Second paragraph. "]) == "First paragraph.\n\nSecond paragraph."
+    block = " ".join(f"Sentence {n} about the fund." for n in range(1, 13))
+    paragraphs = s.overview_text(block).split("\n\n")
+    assert len(paragraphs) == 4 and " ".join(paragraphs) == block
+    assert s.overview_text("Short. Overview.") == "Short. Overview."
+    assert s.overview_text("One.\n\nTwo. Three. Four. Five. Six. Seven.") == "One.\n\nTwo. Three. Four. Five. Six. Seven."
+
+
 def test_repair_restores_an_uncovered_passage_note_as_an_idea():
     note = {"kind": "credit", "subject": "PrivateCo credit", "ticker": None, "activity": "hold",
             "point": "The fund holds PrivateCo credit and expects repayment from operating cash flow.",

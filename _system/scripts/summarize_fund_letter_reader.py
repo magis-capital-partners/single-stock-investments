@@ -37,7 +37,7 @@ MAX_ATTEMPTS = 3
 CONTEXT_TOKENS = int(os.environ.get("FUND_LETTERS_CONTEXT_TOKENS", "16384"))
 MAP_TOKENS = 2000
 REDUCE_TOKENS = 3200
-OVERVIEW_TARGET = "350-500 words in 4-6 short paragraphs"
+OVERVIEW_TARGET = "350-500 words in 4-6 paragraphs of 60-100 words each"
 OVERVIEW_MIN_WORDS = 300
 IDEA_TARGET = "110-180 words"
 IDEA_MIN_WORDS = 85
@@ -53,6 +53,14 @@ NUMBER_RE = re.compile(r"\d+(?:[,.]\d+)*(?:%|[xX])?")
 LABEL_RE = re.compile(r"\b[A-Za-z]+[0-9]+\b")
 YEAR_RE = re.compile(r"^(?:19|20)\d{2}$")
 URL_RE = re.compile(r"https?://|drive\.google", re.I)
+# Sentences about what the letter leaves out are filler, not detail.
+PADDING_RE = re.compile(
+    r"\b(?:the|this) (?:letter|text|passage|document|excerpt|notes?)\b[^.!?]{0,60}?"
+    r"\b(?:does not|doesn't|do not|did not|provides? no|gives? no|offers? no|makes? no|is silent)\b"
+    r"|\b(?:in|from|within) the (?:provided|available|given) (?:text|passage|notes|excerpt|material)\b"
+    r"|\bno (?:specific )?(?:figures|details|information) (?:are|is|were|was) (?:provided|given|stated|disclosed)\b",
+    re.I,
+)
 
 SYSTEM = """You are an investment research editor writing a detailed private summary of one fund letter.
 The goal is that a reader learns everything important in the letter without reading the original,
@@ -71,6 +79,7 @@ lesson the manager admits, and what the manager says to watch next or what would
 A holdings-table mention without a thesis is a factual_note, not a recommendation.
 "exit" means the position was closed. A reduced holding is a "trim", never an exit.
 Do not infer a sale because a holding is absent. Do not add today's prices or later events.
+Never write about what the letter does not say, mention or specify; leave the point out instead.
 Use original connected prose. Preserve the manager's numbers, units, currencies, dates, and uncertainty.
 Every figure you write must appear in the quote you attach to that note.
 Reply with one JSON object and no other text. Evidence quotes are exact contiguous source words."""
@@ -103,18 +112,19 @@ First decide the letter's centre of gravity:
 
 Return JSON:
 {{"headline":"","letter_focus":"micro","leaning_in":[{{"subject":"","why":"","quote":""}}],
-"leaning_out":[{{"subject":"","why":"","quote":""}}],"overview":"",
+"leaning_out":[{{"subject":"","why":"","quote":""}}],"overview":["",""],
 "ideas":[{{"title":"","ticker":"","idea_type":"long","activity":"hold","summary":"","quote":""}}]}}
 
 headline: one plain sentence on what the letter mainly does or argues.
 leaning_in / leaning_out: for macro and mixed letters, what the fund is moving towards or away from,
 each with the manager's reason and a quote copied from the notes. For a micro letter use [] unless the
 letter states a clear portfolio tilt.
-overview: {overview_target} a reader can rely on instead of the letter. Open with the fund's
-stated results when the notes give them, then what the fund did and argued this period. Then the main
-company theses in detail, or the main macro stances and what they make the fund lean into or out of.
-Include any mistake or lesson the manager admits. Close with the risks, open questions and what the
-manager says to watch next. Write only figures that appear in an attached quote.
+overview: a list of paragraphs, {overview_target}, that a reader can rely on instead of the letter.
+Open with the fund's stated results when the notes give them, then what the fund did and argued this
+period. Then the main company theses, or the main macro stances and what they make the fund lean into
+or out of, connected to each other rather than repeated from the idea summaries. Include any mistake or
+lesson the manager admits. Close with the risks, open questions and what the manager says to watch
+next. Write only figures that appear in an attached quote.
 ideas: one per company or topic, and one for every distinct note subject. Company summaries are
 {idea_target} and detailed: what the business does, why the manager holds or shorts it, what changed
 this period, size and valuation when stated, what has happened so far, the catalyst, the risk, and what
@@ -227,6 +237,20 @@ def number_errors(prose: str, quotes: list[str]) -> list[str]:
 
 def split_sentences(text: str) -> list[str]:
     return [piece for piece in re.split(r"(?<=[.!?])\s+", text or "") if piece.strip()]
+
+
+def overview_text(raw) -> str:
+    """The model returns overview paragraphs as a list, or sometimes one
+    string. A long single block is split every few sentences so it reads as
+    paragraphs."""
+    if isinstance(raw, list):
+        return "\n\n".join(str(part).strip() for part in raw if str(part or "").strip())
+    text = str(raw or "").strip()
+    sentences = split_sentences(text)
+    if "\n\n" in text or len(sentences) < 6:
+        return text
+    size = max(3, -(-len(sentences) // 4))
+    return "\n\n".join(" ".join(sentences[i:i + size]) for i in range(0, len(sentences), size))
 
 
 def source_sentence_for_number(number: str, source: str) -> str | None:
@@ -392,10 +416,24 @@ def repair_payload(payload: dict, source: str) -> tuple[list[str], list[str]]:
             kept.append(sentence)
         return " ".join(kept)
 
-    payload["overview"] = "\n\n".join(drop_copied(p) for p in payload["overview"].split("\n\n")).strip()
+    def drop_padding(text: str) -> str:
+        kept = []
+        for sentence in split_sentences(text or ""):
+            if PADDING_RE.search(sentence):
+                warnings.append("removed a sentence about what the letter does not say")
+                continue
+            kept.append(sentence)
+        return " ".join(kept)
+
+    paragraphs = (drop_copied(drop_padding(p)) for p in payload["overview"].split("\n\n"))
+    payload["overview"] = "\n\n".join(p for p in paragraphs if p.strip()).strip()
     for idea in ideas:
-        idea["summary"] = drop_copied(idea.get("summary") or "")
+        idea["summary"] = drop_copied(drop_padding(idea.get("summary") or ""))
     ideas = [idea for idea in ideas if idea["summary"].strip()]
+    for lean in stance["leaning_in"] + stance["leaning_out"]:
+        lean["why"] = drop_padding(lean.get("why") or "")
+    stance["leaning_in"] = [lean for lean in stance["leaning_in"] if lean["why"].strip()]
+    stance["leaning_out"] = [lean for lean in stance["leaning_out"] if lean["why"].strip()]
 
     # Evidence only counts where the archive can cite it: inside one of its
     # own 6,000-character sections. Quotes that span a boundary are replaced
@@ -541,9 +579,11 @@ def expand_thin_ideas(ideas: list[dict], notes: list[dict], model: str | None) -
             [
                 {"role": "system", "content": SYSTEM},
                 {"role": "user", "content": (
-                    f"Rewrite each idea summary below at {IDEA_TARGET}, using only its own summary and notes. "
+                    f"Rewrite each idea summary below at up to {IDEA_TARGET}, using only its own summary and notes. "
                     "Keep the meaning, add the business, thesis, activity, valuation, catalyst, risk and what to watch "
                     "where the notes state them, and add no new facts, figures, tickers or later events. "
+                    "Lengthen only with what the notes state; when they support less, return a shorter summary. "
+                    "Never write about what the letter does not say, mention or specify. "
                     'Return JSON: {"ideas":[{"key":"","summary":""}]}\n\nIDEAS:\n' + json.dumps(request, ensure_ascii=False)
                 )},
             ],
@@ -599,7 +639,7 @@ def merge_partials(partials: list[dict]) -> dict:
         "letter_focus": focuses.pop() if len(focuses) == 1 else "mixed",
         "leaning_in": leans("leaning_in"),
         "leaning_out": leans("leaning_out"),
-        "overview": "\n\n".join(str(p.get("overview") or "").strip() for p in partials if p.get("overview")),
+        "overview": "\n\n".join(overview_text(p.get("overview")) for p in partials if p.get("overview")),
         "ideas": [idea for p in partials for idea in p.get("ideas") or []],
     }
 
@@ -659,7 +699,7 @@ def reduce_notes(notes: list[dict], record: dict, model: str | None, source: str
         focus = "macro" if kinds and all(kind in {"macro", "portfolio", "sector"} for kind in kinds) else "micro"
     if focus != "micro" and not (leaning_in or leaning_out):
         errors.append("macro or mixed letter states no supported leaning in or out")
-    overview = str(document.get("overview") or "").strip()
+    overview = overview_text(document.get("overview"))
     headline = str(document.get("headline") or "").strip()
     expand_thin_ideas(ideas, notes, model)
     if overview and len(overview.split()) < OVERVIEW_MIN_WORDS and ideas:
@@ -670,16 +710,17 @@ def reduce_notes(notes: list[dict], record: dict, model: str | None, source: str
                     {"role": "system", "content": SYSTEM},
                     {"role": "user", "content": (
                         f"Expand this letter overview to {OVERVIEW_TARGET}. Open with the fund's stated results if the ideas give them, "
-                        "and close with the risks and what the manager says to watch next. "
-                        "Use only the verified ideas and stance below. Add no new facts, figures, tickers or later events. "
-                        'Return JSON: {"overview":""}\n\nOVERVIEW:\n' + overview
+                        "connect the ideas instead of repeating their sentences, and close with the risks and what the manager says to watch next. "
+                        "Use only the verified ideas and stance below. Add no new facts, figures, tickers or later events, "
+                        "and never write about what the letter does not say. "
+                        'Return JSON: {"overview":["",""]}\n\nOVERVIEW:\n' + overview
                         + "\n\nIDEAS AND STANCE:\n" + json.dumps({"ideas": ideas, "leaning_in": leaning_in, "leaning_out": leaning_out}, ensure_ascii=False)
                     )},
                 ],
                 model,
                 1600,
             )
-            candidate = str(expanded.get("overview") or "").strip()
+            candidate = overview_text(expanded.get("overview"))
             if len(candidate.split()) > len(overview.split()):
                 overview = candidate
         except Exception:
