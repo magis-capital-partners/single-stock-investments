@@ -276,6 +276,81 @@ class ResolverTests(unittest.TestCase):
         calibration = json.loads((self.root / resolver.CALIBRATION_REL).read_text(encoding="utf-8"))
         self.assertEqual(calibration["resolved_outcomes"], 3)
 
+    def test_unresolvable_then_hit_appends_a_superseding_row(self):
+        resolver.run(self.root, TODAY, apply=True)
+        ledger = self.root / resolver.OUTCOMES_REL
+        before = ledger.read_text(encoding="utf-8")
+        unresolvable = next(row for row in self.outcomes() if row["verdict"] == "unresolvable")
+        # The missing concept is filed later; 10M is below the 50M floor.
+        facts = json.loads((self.root / "TST/research/evidence/sec_companyfacts.json")
+                           .read_text(encoding="utf-8"))
+        facts["facts"]["us-gaap"]["DoesNotExist"] = {"units": {"USD": [
+            {"end": "2026-06-30", "val": 10000000, "form": "10-Q", "filed": "2026-08-11"}]}}
+        self.write("TST/research/evidence/sec_companyfacts.json", facts)
+
+        later = date(2026, 8, 12)
+        result = resolver.run(self.root, later, apply=True)
+        self.assertEqual(len(result["new_rows"]), 1)
+        self.assertEqual(result["counts"]["superseding"], 1)
+        self.assertEqual(result["counts"]["already_resolved"], 2)
+        text = ledger.read_text(encoding="utf-8")
+        self.assertTrue(text.startswith(before), "existing rows must not change")
+        row = self.outcomes()[-1]
+        self.assertEqual(row["component_id"], "pe_liability")
+        self.assertEqual(row["verdict"], "hit")
+        self.assertEqual(row["resolved_value"], 10000000)
+        self.assertEqual(row["resolved_on"], "2026-08-12")
+        self.assertEqual(row["supersedes_outcome_ids"], [resolver.outcome_id(unresolvable)])
+        state = resolver.load_outcomes(self.root / resolver.STATE_EVENTS_REL)[-1]
+        self.assertEqual(state["state"], "resolved_hit")
+        self.assertEqual(state["outcome_id"], resolver.outcome_id(row))
+        self.assertEqual(state["supersedes_outcome_ids"], row["supersedes_outcome_ids"])
+
+        calibration = json.loads((self.root / resolver.CALIBRATION_REL).read_text(encoding="utf-8"))
+        self.assertEqual(calibration["resolved_outcomes"], 3)
+        self.assertEqual(calibration["scored_outcomes"], 3)
+        nav = calibration["buckets"]["net_asset_value|capital_cycle"]
+        self.assertEqual((nav["hit"], nav["miss"], nav["unresolvable"]), (2, 0, 0))
+
+        # The superseding hit is now final.
+        again = resolver.run(self.root, date(2026, 8, 13), apply=True)
+        self.assertEqual(again["new_rows"], [])
+        self.assertEqual(again["counts"]["already_resolved"], 3)
+        self.assertEqual(ledger.read_text(encoding="utf-8"), text)
+
+    def test_hit_and_miss_still_block_re_resolution(self):
+        resolver.run(self.root, TODAY, apply=True)
+        before = (self.root / resolver.OUTCOMES_REL).read_text(encoding="utf-8")
+        # Evidence that would flip both scored verdicts must change nothing.
+        self.write("TST/research/evidence/sec_companyfacts.json", {
+            "facts": {"us-gaap": {"CashAndCashEquivalentsAtCarryingValue": {"units": {"USD": [
+                {"end": "2026-06-30", "val": 90000000, "form": "10-Q/A", "filed": "2026-08-11"},
+            ]}}}},
+        })
+        self.write("TST/research/valuation_fact_ledger.json", {"facts": [
+            {"field_id": "owner_cash_m", "value": 500.0, "unit": "USD millions", "locked": True,
+             "source": {"as_of": "2026-06-30"}},
+        ]})
+        result = resolver.run(self.root, date(2026, 8, 12), apply=True)
+        self.assertEqual(result["new_rows"], [])
+        self.assertEqual(result["counts"]["already_resolved"], 3)
+        self.assertEqual(result["counts"]["superseding"], 0)
+        self.assertEqual((self.root / resolver.OUTCOMES_REL).read_text(encoding="utf-8"), before)
+
+    def test_calibration_counts_a_superseded_forecast_once(self):
+        resolver.run(self.root, TODAY, apply=True)
+        rows = self.outcomes()
+        unresolvable = next(row for row in rows if row["verdict"] == "unresolvable")
+        superseding = {**unresolvable, "verdict": "miss", "resolved_value": 90000000,
+                       "evidence_ref": "TST/research/evidence/sec_companyfacts.json#x",
+                       "resolved_on": "2026-08-12",
+                       "supersedes_outcome_ids": [resolver.outcome_id(unresolvable)]}
+        calibration = resolver.build_calibration(rows + [superseding], self.root)
+        self.assertEqual(calibration["resolved_outcomes"], 3)
+        self.assertEqual(calibration["scored_outcomes"], 3)
+        nav = calibration["buckets"]["net_asset_value|capital_cycle"]
+        self.assertEqual((nav["hit"], nav["miss"], nav["unresolvable"]), (1, 1, 0))
+
     def test_dry_run_writes_nothing(self):
         result = resolver.run(self.root, TODAY, apply=False)
         self.assertEqual(len(result["new_rows"]), 3)
@@ -415,6 +490,41 @@ class ResolverTests(unittest.TestCase):
         self.assertEqual(rows[0]["resolved_as_of"], "2026-06-30")
         self.assertEqual(rows[0]["verdict"], "hit")
         self.assertIn("sec_companyfacts.json", rows[0]["evidence_ref"])
+
+
+class OutcomeSupersedeHistoryTests(unittest.TestCase):
+    def rows(self):
+        from check_falsifier_history import outcome_supersede_errors
+        frozen = spec(spec_id="tst-1", spec_revision=1)
+        base = {"ticker": "TST", "component_id": "cash_and_liquidity", "spec_id": "tst-1",
+                "spec_revision": 1, "spec": frozen}
+        unresolvable = {**base, "verdict": "unresolvable", "resolved_on": "2026-08-10"}
+        hit = {**base, "verdict": "hit", "resolved_on": "2026-08-12",
+               "supersedes_outcome_ids": [resolver.outcome_id(unresolvable)]}
+        return outcome_supersede_errors, base, unresolvable, hit
+
+    def test_a_later_hit_may_supersede_an_unresolvable(self):
+        check, _base, unresolvable, hit = self.rows()
+        self.assertEqual(check([unresolvable, hit]), [])
+
+    def test_a_final_verdict_cannot_be_superseded(self):
+        check, base, _unresolvable, _hit = self.rows()
+        miss = {**base, "verdict": "miss", "resolved_on": "2026-08-10"}
+        flip = {**base, "verdict": "hit", "resolved_on": "2026-08-12",
+                "supersedes_outcome_ids": [resolver.outcome_id(miss)]}
+        self.assertIn("a final 'miss' verdict", " ".join(check([miss, flip])))
+
+    def test_backdated_unknown_foreign_or_repeated_supersedes_fail(self):
+        check, base, unresolvable, hit = self.rows()
+        backdated = {**hit, "resolved_on": "2026-08-01"}
+        self.assertIn("precedes", " ".join(check([unresolvable, backdated])))
+        self.assertIn("not an earlier outcome row", " ".join(check([hit, unresolvable])))
+        foreign = {**hit, "spec_id": "tst-2", "spec": spec(spec_id="tst-2", spec_revision=1)}
+        self.assertIn("different forecast", " ".join(check([unresolvable, foreign])))
+        twice = {**hit, "resolved_on": "2026-08-13", "verdict": "miss"}
+        self.assertIn("already superseded", " ".join(check([unresolvable, hit, twice])))
+        unresolvable_again = {**hit, "verdict": "unresolvable"}
+        self.assertIn("only a hit or miss", " ".join(check([unresolvable, unresolvable_again])))
 
 
 if __name__ == "__main__":

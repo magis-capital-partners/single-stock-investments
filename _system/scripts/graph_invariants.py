@@ -336,9 +336,15 @@ def inv_e2(conn, root, today) -> Result:
         explicit_deadline = _parse_due(data.get("resolution_deadline"))
         deadline = (explicit_deadline or
                     (due_date + timedelta(days=E2_GRACE_DAYS))).isoformat()
+        # Judge the outcome that stands: a verdict superseded by a later
+        # re-resolution no longer speaks for the falsifier, so the timeliness
+        # of the replacement is what counts.
         outcome = conn.execute(
             "SELECT n.as_of FROM edges e JOIN nodes n ON n.id=e.dst"
-            " WHERE e.src=? AND e.type='RESOLVED_BY' LIMIT 1",
+            " WHERE e.src=? AND e.type='RESOLVED_BY'"
+            " AND NOT EXISTS (SELECT 1 FROM edges s"
+            "   WHERE s.dst=n.id AND s.type='SUPERSEDES')"
+            " ORDER BY n.as_of DESC LIMIT 1",
             (row["id"],)).fetchone()
         # The falsifier lane runs once a day, so the first run that can see
         # deadline-day evidence may be the one on deadline + 1: resolve_
@@ -546,7 +552,7 @@ def inv_e8(conn, root, today) -> Result:
 
 
 def inv_e9(conn, root, today) -> Result:
-    from falsifier_specs import calibration_eligibility, spec_payload_hash
+    from falsifier_specs import calibration_eligibility, effective_outcomes, spec_payload_hash
     outcomes_path = root / "_system/research/falsifier_outcomes.jsonl"
     rows = []
     if outcomes_path.exists():
@@ -557,6 +563,7 @@ def inv_e9(conn, root, today) -> Result:
                 rows.append(json.loads(line))
             except json.JSONDecodeError:
                 continue
+    rows = effective_outcomes(rows)
     violations = []
     eligible = []
     for row in rows:
