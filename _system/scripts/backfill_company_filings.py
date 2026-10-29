@@ -82,7 +82,7 @@ def recover(cache, url, client):
         suffix = '.pdf' if raw.startswith(b'%PDF') else Path(urlparse(url).path).suffix.lower()
         if suffix not in ('.pdf','.html','.htm','.txt','.xml') and b'<html' in raw[:2000].lower():
             suffix = '.html'
-        if suffix == '.pdf':
+        if suffix in ('.pdf','.jpg','.jpeg','.png'):
             from backfill_company_sources import extract_complete
             text, status, detail = extract_complete(raw, suffix, ocr=True)
         else:
