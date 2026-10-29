@@ -159,3 +159,34 @@ def test_release_supplements_cannot_crowd_the_annual_report_out_of_the_packet(tm
     result = prepare_packet(tmp_path, 'BKNG', '2026-10-29', collect=False, client=client)
     assert {'10-K', '10-Q', '8-K'} <= {d['form'] for d in result['documents']}
     assert result['latest_report']['period'] == '2026-09-30'
+
+
+def test_scheduled_refresh_declares_every_input_needed_to_validate_a_real_approved_model(tmp_path, monkeypatch):
+    import shutil
+    import yaml
+    import underwriting_pipeline as pipeline
+    import refresh_shared_forecasts as refresh
+    import vault_paths
+    from test_underwriting_pipeline import company_root, contract, mock_stages
+    source, checkout, vault = tmp_path/'source', tmp_path/'checkout', tmp_path/'vault'
+    company_root(source)
+    monkeypatch.setattr(pipeline, 'today', lambda: '2026-10-26')
+    monkeypatch.setattr(refresh, 'refresh_quote', lambda *args, **kwargs: None)
+    monkeypatch.setattr(refresh, 'refresh_missing_model_inputs', lambda *args: None)
+    monkeypatch.setattr(vault_paths, 'research_vault_root', lambda: vault)
+    result = pipeline.run_batch(source, launch=True, work=tmp_path/'work', vault=vault,
+                                prepare=lambda *args: packet(), execute=mock_stages(contract(), []))
+    assert result['completed'] == ['TEST']
+    workflow = Path(__file__).resolve().parents[3]/'.github/workflows/autonomous-compounders.yml'
+    steps = yaml.safe_load(workflow.read_text(encoding='utf-8'))['jobs']['refresh']['steps']
+    patterns = steps[0]['with']['sparse-checkout'].split()
+    for item in source.rglob('*'):
+        relative = item.relative_to(source).as_posix()
+        if item.is_file() and any(relative == p.lstrip('/') or relative.startswith(p.strip('/')+'/')
+                                  or item.relative_to(source).match(p.lstrip('/')) for p in patterns):
+            target = checkout/relative
+            target.parent.mkdir(parents=True, exist_ok=True)
+            shutil.copyfile(item, target)
+    forecast = refresh.calculate('TEST', checkout, '2026-10-26')
+    assert forecast['status'] == 'available', forecast['gaps']
+    assert forecast['model_basis'] == 'independent_underwriting'
