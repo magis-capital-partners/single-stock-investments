@@ -1,287 +1,827 @@
 {
   "ticker": "MA",
-  "as_of": "2026-07-20",
-  "method": "price_stub",
-  "inputs": {
-    "price": 547.44,
-    "price_as_of": "2026-07-20",
-    "price_source": "Yahoo MA close 2026-07-20"
+  "as_of": "2026-10-29",
+  "financial_period": "2025-12-31",
+  "share_basis": {
+    "as_of": "2026-10-28",
+    "symbol": "MA",
+    "source_url": "https://query1.finance.yahoo.com/v8/finance/chart/MA?period1=946684800&period2=1793318400&interval=1mo&events=splits",
+    "basis_id": "2dbe9d4a242be52ec69fe49562adab976d44f8868220d3641e48d86021fbdf0e"
   },
-  "notes": "Price stub created by fetch_equity_prices.py --create-stub; replace with a real model before decision-grade.",
-  "human_review": {
-    "live_price_confirmed": false
+  "method": "dated_forward_cashflow_schedule_per_share",
+  "classification": {
+    "archetype": "compounder",
+    "rationale": "Mastercard operates an interdependent payments network and services franchise, rather than a loan book or inventory liquidation business. Network interoperability, transaction data and services distribution support growth without proportionate physical capital investment. Revenue, operating income and operating cash flow increased across 2023–2025, while property purchases and capitalized software remained much smaller than operating cash generation. This classification remains conditional: customer incentives consume capital, acquisitions supplement organic capabilities, and settlement guarantees, competition and litigation can impair returns. The decline in operating cash flow during the latest nine months despite earnings growth prevents treating reported earnings growth as automatic owner-cash growth."
   },
-  "context_overlay": {
-    "as_of": "2026-10-26",
-    "disclaimer": "Context only. Tailwinds inform stance and overlay sizing; they do not auto-inflate Lawrence base IRR. Promotion to base case requires [HUMAN REVIEW].",
-    "themes": [
+  "valuation_methodology": {
+    "model_level": "stock_specific",
+    "automation": "independent_underwriting",
+    "forecast_as_of": "2026-10-29",
+    "horizon_years": 5,
+    "framework": "operating_dcf",
+    "reviewed_as_of": "2026-10-29",
+    "review_source": "MA/research/underwriting_review.json"
+  },
+  "underwriting": {
+    "contract_hash": "eaf6a621e0f0c9d416af4e5bb15bd03bb22711023e89952bff4dcf5f5a8576c4",
+    "evidence_hash": "a7e5fd57c7391bfca81257d94bab244373d5cdcbb41cc54346b7807f29748952",
+    "packet_hash": "e3afdfe8c03733bca272a03bd802f34d6dbb5fdf81addf8bb73e256b0b09e5f7",
+    "framework": "operating_dcf",
+    "review_due": "2027-02-12",
+    "assumptions_count": 13
+  },
+  "inputs": {},
+  "component_valuation_results": {
+    "all_material_components_identified": true,
+    "additive_components": [
       {
-        "theme_id": "macro_regime",
-        "label": "Macro risk regime",
-        "indicators": [
-          {
-            "id": "hy_oas",
-            "label": "High-yield OAS credit spread (%)",
-            "latest": -1.61,
-            "as_of": "2026-10-26",
-            "yoy_pct": -25.8,
-            "direction": "down",
-            "good_for": "risk_regime",
-            "source": "spread:HYG-LQD:21d (HYG-LQD 1m spread proxy, not OAS)",
-            "stale": false,
-            "in_base_irr": false
-          },
-          {
-            "id": "ust_10y",
-            "label": "US Treasury 10Y yield (%)",
-            "latest": 4.98199987411499,
-            "as_of": "2026-10-26",
-            "yoy_pct": 24.6,
-            "direction": "up",
-            "good_for": "rates_regime",
-            "source": "yahoo:^TNX",
-            "stale": false,
-            "in_base_irr": false
-          },
-          {
-            "id": "ust_2y",
-            "label": "US Treasury 2Y yield (%)",
-            "latest": 4.818999767303467,
-            "as_of": "2026-10-26",
-            "yoy_pct": 33.3,
-            "direction": "up",
-            "good_for": "rates_regime",
-            "source": "yahoo:^FVX",
-            "stale": false,
-            "in_base_irr": false
-          },
-          {
-            "id": "dxy_broad",
-            "label": "Trade-weighted USD index (broad)",
-            "latest": 101.9469985961914,
-            "as_of": "2026-10-26",
-            "yoy_pct": 3.2,
-            "direction": "up",
-            "good_for": "dollar_regime",
-            "source": "yahoo:DX-Y.NYB",
-            "stale": false,
-            "in_base_irr": false
-          },
-          {
-            "id": "vix_level",
-            "label": "VIX index level",
-            "latest": 18.389999389648438,
-            "as_of": "2026-10-26",
-            "yoy_pct": 16.5,
-            "direction": "up",
-            "good_for": "vol_regime",
-            "source": "yahoo:^VIX",
-            "stale": false,
-            "in_base_irr": false
-          },
-          {
-            "id": "credit_impulse_1m",
-            "label": "HYG vs TLT 1-month return spread (%)",
-            "latest": -3.77,
-            "as_of": "2026-10-26",
-            "yoy_pct": -26.1,
-            "direction": "down",
-            "good_for": "credit_impulse",
-            "source": "spread:HYG-TLT:21d",
-            "stale": false,
-            "in_base_irr": false
-          },
-          {
-            "id": "spy_20d_realized_vol",
-            "label": "SPY 20-day realized vol (annualized %)",
-            "latest": 9.51,
-            "as_of": "2026-10-26",
-            "yoy_pct": -32.0,
-            "direction": "down",
-            "good_for": "equity_vol",
-            "source": "realized_vol:SPY:20d",
-            "stale": false,
-            "in_base_irr": false
-          },
-          {
-            "id": "agi_years_ahead",
-            "label": "AGI expert-horizon years ahead (public quotes)",
-            "latest": 5.0,
-            "as_of": "2026-06-01",
-            "yoy_pct": 0.0,
-            "direction": "flat",
-            "good_for": "horizon_orientation",
-            "source": "expert_horizon:agi",
-            "stale": false,
-            "in_base_irr": false
-          },
-          {
-            "id": "robotaxi_years_ahead",
-            "label": "Robotaxi expert-horizon years ahead (public quotes)",
-            "latest": 2.0,
-            "as_of": "2026-06-01",
-            "yoy_pct": 0.0,
-            "direction": "flat",
-            "good_for": "horizon_orientation",
-            "source": "expert_horizon:robotaxi",
-            "stale": false,
-            "in_base_irr": false
+        "id": "business",
+        "category": "operating_business",
+        "treatment": "additive",
+        "method": "dated_forward_cashflow_schedule_per_share",
+        "claim_scope": "Distributions and end-year-5 realization proceeds attributable to existing Mastercard parent common equity, per verified diluted common share, after operating investment, compensation funding, existing interest and taxes, acquisition spending, additional financing costs and minority or residual financing reserves.",
+        "calculation_proof": {
+          "schema_version": "1.0",
+          "method_id": "dated_forward_cashflow_schedule_per_share",
+          "method_version": "1.0",
+          "output_unit": "USD per share",
+          "inputs": [
+            {
+              "id": "ocf_2025",
+              "kind": "fact",
+              "locked": true,
+              "value": 17648000000.0,
+              "unit": "USD",
+              "source": {
+                "ref": "https://data.sec.gov/api/xbrl/companyfacts/CIK0001141391.json",
+                "locator": "us-gaap:NetCashProvidedByUsedInOperatingActivities; 0001141391-26-000013",
+                "as_of": "2025-12-31"
+              }
+            },
+            {
+              "id": "ocf_2026_ytd",
+              "kind": "fact",
+              "locked": true,
+              "value": 11859000000.0,
+              "unit": "USD",
+              "source": {
+                "ref": "https://data.sec.gov/api/xbrl/companyfacts/CIK0001141391.json",
+                "locator": "us-gaap:NetCashProvidedByUsedInOperatingActivities; 0001141391-26-000124",
+                "as_of": "2026-09-30"
+              }
+            },
+            {
+              "id": "ocf_2025_ytd",
+              "kind": "fact",
+              "locked": true,
+              "value": 12646000000.0,
+              "unit": "USD",
+              "source": {
+                "ref": "https://data.sec.gov/api/xbrl/companyfacts/CIK0001141391.json",
+                "locator": "us-gaap:NetCashProvidedByUsedInOperatingActivities; 0001141391-26-000124",
+                "as_of": "2025-09-30"
+              }
+            },
+            {
+              "id": "ppe_2025",
+              "kind": "fact",
+              "locked": true,
+              "value": 489000000.0,
+              "unit": "USD",
+              "source": {
+                "ref": "https://data.sec.gov/api/xbrl/companyfacts/CIK0001141391.json",
+                "locator": "us-gaap:PaymentsToAcquirePropertyPlantAndEquipment; 0001141391-26-000013",
+                "as_of": "2025-12-31"
+              }
+            },
+            {
+              "id": "ppe_2026_ytd",
+              "kind": "fact",
+              "locked": true,
+              "value": 667000000.0,
+              "unit": "USD",
+              "source": {
+                "ref": "https://data.sec.gov/api/xbrl/companyfacts/CIK0001141391.json",
+                "locator": "us-gaap:PaymentsToAcquirePropertyPlantAndEquipment; 0001141391-26-000124",
+                "as_of": "2026-09-30"
+              }
+            },
+            {
+              "id": "ppe_2025_ytd",
+              "kind": "fact",
+              "locked": true,
+              "value": 377000000.0,
+              "unit": "USD",
+              "source": {
+                "ref": "https://data.sec.gov/api/xbrl/companyfacts/CIK0001141391.json",
+                "locator": "us-gaap:PaymentsToAcquirePropertyPlantAndEquipment; 0001141391-26-000124",
+                "as_of": "2025-09-30"
+              }
+            },
+            {
+              "id": "sbc_2025",
+              "kind": "fact",
+              "locked": true,
+              "value": 597000000.0,
+              "unit": "USD",
+              "source": {
+                "ref": "https://data.sec.gov/api/xbrl/companyfacts/CIK0001141391.json",
+                "locator": "us-gaap:ShareBasedCompensation; 0001141391-26-000013",
+                "as_of": "2025-12-31"
+              }
+            },
+            {
+              "id": "sbc_2026_ytd",
+              "kind": "fact",
+              "locked": true,
+              "value": 525000000.0,
+              "unit": "USD",
+              "source": {
+                "ref": "https://data.sec.gov/api/xbrl/companyfacts/CIK0001141391.json",
+                "locator": "us-gaap:ShareBasedCompensation; 0001141391-26-000124",
+                "as_of": "2026-09-30"
+              }
+            },
+            {
+              "id": "sbc_2025_ytd",
+              "kind": "fact",
+              "locked": true,
+              "value": 485000000.0,
+              "unit": "USD",
+              "source": {
+                "ref": "https://data.sec.gov/api/xbrl/companyfacts/CIK0001141391.json",
+                "locator": "us-gaap:ShareBasedCompensation; 0001141391-26-000124",
+                "as_of": "2025-09-30"
+              }
+            },
+            {
+              "id": "shares",
+              "kind": "fact",
+              "locked": true,
+              "value": 876000000.0,
+              "unit": "shares",
+              "source": {
+                "ref": "https://data.sec.gov/api/xbrl/companyfacts/CIK0001141391.json",
+                "locator": "us-gaap:WeightedAverageNumberOfDilutedSharesOutstanding; 0001141391-26-000124",
+                "as_of": "2026-09-30"
+              },
+              "share_basis": {
+                "as_of": "2026-10-28",
+                "symbol": "MA",
+                "source_url": "https://query1.finance.yahoo.com/v8/finance/chart/MA?period1=946684800&period2=1793318400&interval=1mo&events=splits",
+                "basis_id": "2dbe9d4a242be52ec69fe49562adab976d44f8868220d3641e48d86021fbdf0e"
+              },
+              "observation_type": "annual_weighted_average"
+            }
+          ],
+          "assumptions": [
+            {
+              "id": "software_investment",
+              "unit": "USD",
+              "value": 750000000,
+              "allowed_range": {
+                "min": 600000000,
+                "max": 1200000000
+              },
+              "rationale": "Deduct an annual software investment reserve above trailing spending of USD 652 million and slightly above 2025 spending of USD 726 million. Software amortization is rising with business growth, so the model funds both replacement and expansion rather than treating capitalized development as free cash.",
+              "evidence_ids": [
+                "doc_71a50355bce001d0",
+                "doc_14480323856a489b"
+              ],
+              "counterevidence": "Nine-month software capitalization declined to USD 474 million from USD 548 million, so the reserve could exceed near-term needs; conversely, security or platform replacement could require substantially more.",
+              "falsifier": "Trailing software capitalization exceeds USD 1,200 million, or repeated impairments show that capitalized development is failing to sustain service economics.",
+              "review_trigger": "Review the next annual cash-flow statement and software amortization discussion; reconsider if trailing capitalization exceeds USD 900 million.",
+              "kind": "judgment"
+            },
+            {
+              "id": "sbc_cash_funding",
+              "unit": "ratio",
+              "value": 1,
+              "allowed_range": {
+                "min": 0.8,
+                "max": 1.5
+              },
+              "rationale": "Charge the entire reported trailing SBC amount as a cash-equivalent compensation requirement. This funds replacement cash compensation or dilution-offset purchases before distributions, permitting a constant diluted denominator without crediting buyback-driven per-share growth.",
+              "evidence_ids": [
+                "obs_df253d924f73aed7e942",
+                "obs_352a2102d8679ca98a41",
+                "obs_d687d0fcda14ec55f544",
+                "obs_8b44072d133d23006e6d"
+              ],
+              "counterevidence": "Grant-date compensation expense need not equal the future cash cost of neutralizing awards. Employee-plan proceeds and withholding settlements further complicate that correspondence.",
+              "falsifier": "Net share issuance persists despite compensation-offset spending equal to the reserve, or subsequent award disclosures imply a materially larger economic cost.",
+              "review_trigger": "Review each annual equity-compensation note and any increase in diluted shares despite continuing repurchases.",
+              "kind": "judgment"
+            },
+            {
+              "id": "customer_funding_exclusion",
+              "unit": "USD",
+              "value": 250000000,
+              "allowed_range": {
+                "min": 193000000,
+                "max": 600000000
+              },
+              "rationale": "Trailing customer security-deposit inflows are USD 193 million, derived from the annual and comparative interim cash-flow tables. Exclude USD 250 million annually so customer collateral accumulation does not become recurring shareholder earnings. Settlement asset and obligation movements are otherwise retained rather than assumed to release.",
+              "evidence_ids": [
+                "doc_71a50355bce001d0",
+                "doc_14480323856a489b",
+                "obs_f2bfe4c7c915316d8cab"
+              ],
+              "counterevidence": "Customer collateral can reverse and require cash outflows. A constant exclusion does not reproduce every daily settlement fluctuation.",
+              "falsifier": "Restricted customer funding becomes a sustained cash outflow or operating cash generation depends on collateral inflows larger than the exclusion.",
+              "review_trigger": "Review restricted deposits and settlement cash movements each quarter, especially after a customer settlement failure.",
+              "kind": "judgment"
+            },
+            {
+              "id": "normalization",
+              "unit": "ratio",
+              "values": {
+                "low": 0.75,
+                "base": 0.95,
+                "high": 1.02
+              },
+              "allowed_range": {
+                "min": 0.6,
+                "max": 1.1
+              },
+              "rationale": "Apply normalization to trailing cash after physical capital, software, SBC and customer-funding exclusions. The base haircut recognizes that favorable accrued-expense timing and uncertain incentive renewals can overstate sustainable cash. The low case assumes lasting pricing, legal and incentive pressure; the high case permits only modest conversion improvement. Latest nine-month earnings increased while operating cash flow declined, opposing an unqualified earnings-based uplift.",
+              "evidence_ids": [
+                "obs_92795c4ae0c9a567a175",
+                "obs_a2b08db3c26c74f12c17",
+                "obs_fa80375151a28dc3909e",
+                "doc_71a50355bce001d0",
+                "doc_14480323856a489b"
+              ],
+              "counterevidence": "Higher incentive payments may secure profitable future volumes, and stronger operating margins may eventually restore cash conversion. Conversely, reported prepaid movements do not establish the ultimate return on those commitments.",
+              "falsifier": "Over successive annual periods, cash after the specified capital and compensation charges persistently falls below the low normalization despite stable payment activity, or exceeds the high normalization without temporary liability growth.",
+              "review_trigger": "Reconsider on the 2026 annual filing, with particular attention to customer incentive assets, accrued expenses and operating cash conversion.",
+              "kind": "judgment"
+            },
+            {
+              "id": "acquisition_budget",
+              "unit": "USD",
+              "value": 1300000000,
+              "allowed_range": {
+                "min": 500000000,
+                "max": 4500000000
+              },
+              "rationale": "Deduct a recurring acquisition budget reflecting USD 2,511 million spent in 2024, no spending in 2025 and USD 1,372 million during the latest nine months. Services and new payment capabilities have an inorganic component. The forecast therefore purchases capability renewal before distributing residual cash.",
+              "evidence_ids": [
+                "obs_56fa6f8a727f2da2d200",
+                "obs_1fa5bb362d12352e10f4",
+                "obs_de1066544165082c0fd0",
+                "doc_14480323856a489b"
+              ],
+              "counterevidence": "Acquisitions are discretionary and lumpy; organic development might sustain the franchise with less spending. Larger strategic purchases could instead consume much more.",
+              "falsifier": "Multi-year acquisition spending materially exceeds the budget without corresponding residual cash growth, or acquired capabilities require sustained impairment charges.",
+              "review_trigger": "Review every material acquisition announcement and annual purchase-accounting disclosure.",
+              "kind": "judgment"
+            },
+            {
+              "id": "other_parent_claims",
+              "unit": "USD",
+              "value": 150000000,
+              "allowed_range": {
+                "min": 100000000,
+                "max": 400000000
+              },
+              "rationale": "Reserve USD 150 million for minority distributions and other residual financing outflows. Other financing activities consumed USD 100 million in 2025 and USD 108 million in the latest nine months. The reserve prevents allocating all consolidated operating cash automatically to parent common shareholders.",
+              "evidence_ids": [
+                "doc_14480323856a489b",
+                "doc_71a50355bce001d0",
+                "obs_3e6662be86ed3e344771",
+                "obs_8fa9a39d349abc954c95"
+              ],
+              "counterevidence": "The packet does not identify those financing outflows entirely as minority distributions. Negative minority book equity does not limit contractual distribution or redemption rights.",
+              "falsifier": "Disclosed recurring minority and residual financing payments exceed USD 400 million annually or a material redeemable minority claim emerges.",
+              "review_trigger": "Review annual subsidiary, minority-interest and other-financing disclosures and any acquisition with retained outside ownership.",
+              "kind": "judgment"
+            },
+            {
+              "id": "refinancing_drag",
+              "unit": "USD",
+              "values": {
+                "low": 600000000,
+                "base": 200000000,
+                "high": 150000000
+              },
+              "allowed_range": {
+                "min": 0,
+                "max": 1500000000
+              },
+              "rationale": "Reserve additional annual cash financing costs beyond interest already embedded in operating cash flow. Latest debt totals USD 23,938 million versus USD 19,000 million at December 2025, and quarterly interest expense increased to USD 250 million from USD 186 million. Principal is assumed refinanced at unchanged nominal balances, with no new borrowing used for distributions. The adverse reserve allows materially worse funding and settlement-liquidity costs; favorable cases still recognize the higher debt burden.",
+              "evidence_ids": [
+                "obs_f195301d7f0c5814bb70",
+                "obs_a631c8fa2b1b5cde7163",
+                "doc_71a50355bce001d0"
+              ],
+              "counterevidence": "The company had no commercial-paper or revolving-credit borrowings and remained covenant compliant. Existing debt terms may delay repricing. Conversely, the packet does not guarantee refinancing during a severe settlement or legal shock.",
+              "falsifier": "Refinancing becomes unavailable, debt principal rises to fund ordinary distributions, or incremental annual cash financing costs exceed USD 1,500 million.",
+              "review_trigger": "Review each debt issuance, credit-facility change and annual maturity schedule; immediately reconsider after a material rating, covenant or settlement-liquidity event.",
+              "kind": "judgment"
+            },
+            {
+              "id": "first_year_growth",
+              "unit": "ratio",
+              "values": {
+                "low": -0.15,
+                "base": 0.08,
+                "high": 0.12
+              },
+              "allowed_range": {
+                "min": -0.35,
+                "max": 0.18
+              },
+              "rationale": "Forecast growth of residual cash after all modeled reinvestment and claim reserves. Base growth is below latest nine-month revenue and operating-income growth because cash conversion weakened. High growth requires improved conversion alongside network and services growth. Low growth imposes a further cash contraction on already impaired normalized economics, reflecting weaker spending, cross-border activity and operating leverage.",
+              "evidence_ids": [
+                "obs_9fa2f93baf4ef5ef4aec",
+                "obs_fa80375151a28dc3909e",
+                "obs_92795c4ae0c9a567a175",
+                "obs_72390aa5c7ab3dac866f",
+                "obs_8d842be20b4b4af169d6",
+                "doc_14480323856a489b"
+              ],
+              "counterevidence": "Current revenue growth could support faster residual cash growth; a severe disruption, adverse judgment or competitive repricing could produce a larger decline than modeled.",
+              "falsifier": "Trailing residual cash falls outside the allowed growth range after comparable treatment of incentives, compensation, software and acquisitions.",
+              "review_trigger": "Review each quarterly revenue, margin and cash-conversion update, with immediate review following a sustained cross-border or transaction decline.",
+              "kind": "judgment"
+            },
+            {
+              "id": "second_year_growth",
+              "unit": "ratio",
+              "values": {
+                "low": 0.02,
+                "base": 0.08,
+                "high": 0.11
+              },
+              "allowed_range": {
+                "min": -0.2,
+                "max": 0.18
+              },
+              "rationale": "The low case recovers slowly because incentive commitments and service costs do not immediately reverse with payment volumes. Base and high cases sustain cash displacement and services distribution while remaining below the latest reported earnings growth.",
+              "evidence_ids": [
+                "doc_14480323856a489b",
+                "doc_71a50355bce001d0",
+                "obs_04124eaebcdcf491275d",
+                "obs_c20dc1ad3d7e713dd304"
+              ],
+              "counterevidence": "Post-downturn payment recovery can be faster than this low path. Structural payment-rail substitution or adverse regulation could prevent recovery.",
+              "falsifier": "Payment activity recovers but residual cash continues declining because incentives or operating costs absorb the recovery.",
+              "review_trigger": "Review the first annual filing after an observed downturn and the associated incentive and services disclosures.",
+              "kind": "judgment"
+            },
+            {
+              "id": "later_growth",
+              "unit": "ratio",
+              "values": {
+                "low": 0.04,
+                "base": 0.07,
+                "high": 0.09
+              },
+              "allowed_range": {
+                "min": -0.05,
+                "max": 0.12
+              },
+              "rationale": "Years 3–5 moderate cash growth as the network becomes larger and competition for issuer portfolios, domestic rails and account-based payments limits incremental pricing. Growth is explicitly net of the physical-capital, software, acquisition, compensation and financing requirements embedded in the residual-cash starting point.",
+              "evidence_ids": [
+                "doc_14480323856a489b",
+                "obs_c68fd2e342b42efd346c",
+                "obs_683de8ae361a9dc337d2",
+                "obs_5d3a199797352c8e16cd"
+              ],
+              "counterevidence": "Services sold through existing distribution may sustain faster growth. Governments promoting local switching or customers demanding larger incentives may produce much weaker returns.",
+              "falsifier": "Multi-year residual cash growth falls below the range despite stable payment volumes, or preserving growth requires investment materially beyond the charged budgets.",
+              "review_trigger": "Reassess annually and after a material change in domestic-routing regulation, services mix or incentive intensity.",
+              "kind": "judgment"
+            },
+            {
+              "id": "residual_distribution",
+              "unit": "ratio",
+              "value": 1,
+              "allowed_range": {
+                "min": 1,
+                "max": 1
+              },
+              "rationale": "Forecast all residual cash as cash distributions after funding every modeled investment and claim reserve. Historical dividends and repurchases demonstrate a substantial capital-return mechanism, but latest debt-supported returns are not extrapolated. This is an explicit owner-distribution policy assumption, not a forecast of announced dividends. No separate share-count benefit is credited.",
+              "evidence_ids": [
+                "doc_14480323856a489b",
+                "doc_71a50355bce001d0"
+              ],
+              "counterevidence": "Management may retain residual cash or pursue acquisitions beyond the charged budget, delaying shareholder realization.",
+              "falsifier": "Persistent accumulation of discretionary cash or spending beyond the modeled budgets prevents residual cash reaching shareholders.",
+              "review_trigger": "Review annual capital allocation and any material suspension of capital returns.",
+              "kind": "judgment"
+            },
+            {
+              "id": "terminal_growth",
+              "unit": "ratio",
+              "values": {
+                "low": 0,
+                "base": 0.02,
+                "high": 0.03
+              },
+              "allowed_range": {
+                "min": -0.02,
+                "max": 0.04
+              },
+              "rationale": "Terminal growth applies to distributable cash after recurring investment, incentive funding, compensation, minority reserves and financing costs. Base and high growth allow continued digital-payment adoption but are substantially below explicit-period growth because routing competition and customer bargaining constrain mature economics. Low terminal cash is flat after a depressed cycle and incomplete recovery.",
+              "evidence_ids": [
+                "doc_14480323856a489b",
+                "doc_71a50355bce001d0"
+              ],
+              "counterevidence": "A durable services advantage could support higher mature growth, while regulated pricing or migration to competing rails could make even flat cash optimistic.",
+              "falsifier": "Mature organic cash growth requires shrinking the investment reserves, rising leverage or persistent market-share losses.",
+              "review_trigger": "Reconsider annually, after material payment-rail regulation, or when services growth stops reinforcing network economics.",
+              "kind": "judgment"
+            },
+            {
+              "id": "discount_rate",
+              "unit": "ratio",
+              "values": {
+                "low": 0.12,
+                "base": 0.095,
+                "high": 0.08
+              },
+              "allowed_range": {
+                "min": 0.07,
+                "max": 0.18
+              },
+              "rationale": "These are declared required returns for levered parent common equity, not an imported market benchmark. High margins, diversified transaction activity and low physical-capital intensity support the favorable hurdle. The base requires additional compensation for debt-funded capital returns, incentive capital and terminal dependence. The adverse hurdle reflects correlated payment weakness, refinancing pressure, settlement guarantees and litigation risk.",
+              "evidence_ids": [
+                "doc_14480323856a489b",
+                "doc_71a50355bce001d0",
+                "obs_a631c8fa2b1b5cde7163",
+                "obs_92795c4ae0c9a567a175"
+              ],
+              "counterevidence": "Network resilience and available liquidity could make these hurdles demanding; a systemic settlement failure or adverse regulatory change could require a higher hurdle and different cash-flow scenarios.",
+              "falsifier": "The business becomes dependent on external equity, loses reliable refinancing access, or suffers a durable impairment of network pricing or interoperability.",
+              "review_trigger": "Reassess on every new primary annual report and any material financing, legal or network-structure change.",
+              "kind": "judgment"
+            }
+          ],
+          "calculations": [
+            {
+              "id": "ocf_annual_plus_current",
+              "op": "add",
+              "args": [
+                "ocf_2025",
+                "ocf_2026_ytd"
+              ],
+              "unit": "USD"
+            },
+            {
+              "id": "ocf_ttm",
+              "op": "subtract",
+              "args": [
+                "ocf_annual_plus_current",
+                "ocf_2025_ytd"
+              ],
+              "unit": "USD"
+            },
+            {
+              "id": "ppe_annual_plus_current",
+              "op": "add",
+              "args": [
+                "ppe_2025",
+                "ppe_2026_ytd"
+              ],
+              "unit": "USD"
+            },
+            {
+              "id": "ppe_ttm",
+              "op": "subtract",
+              "args": [
+                "ppe_annual_plus_current",
+                "ppe_2025_ytd"
+              ],
+              "unit": "USD"
+            },
+            {
+              "id": "sbc_annual_plus_current",
+              "op": "add",
+              "args": [
+                "sbc_2025",
+                "sbc_2026_ytd"
+              ],
+              "unit": "USD"
+            },
+            {
+              "id": "sbc_ttm",
+              "op": "subtract",
+              "args": [
+                "sbc_annual_plus_current",
+                "sbc_2025_ytd"
+              ],
+              "unit": "USD"
+            },
+            {
+              "id": "compensation_funding",
+              "op": "multiply",
+              "args": [
+                "sbc_ttm",
+                "sbc_cash_funding"
+              ],
+              "unit": "USD"
+            },
+            {
+              "id": "capital_compensation_and_customer_funding",
+              "op": "sum",
+              "args": [
+                "ppe_ttm",
+                "software_investment",
+                "compensation_funding",
+                "customer_funding_exclusion"
+              ],
+              "unit": "USD"
+            },
+            {
+              "id": "cash_before_normalization",
+              "op": "subtract",
+              "args": [
+                "ocf_ttm",
+                "capital_compensation_and_customer_funding"
+              ],
+              "unit": "USD"
+            },
+            {
+              "id": "normalized_cash",
+              "op": "multiply",
+              "args": [
+                "cash_before_normalization",
+                "normalization"
+              ],
+              "unit": "USD"
+            },
+            {
+              "id": "additional_investment_and_claims",
+              "op": "sum",
+              "args": [
+                "acquisition_budget",
+                "other_parent_claims",
+                "refinancing_drag"
+              ],
+              "unit": "USD"
+            },
+            {
+              "id": "initial_residual_cash",
+              "op": "subtract",
+              "args": [
+                "normalized_cash",
+                "additional_investment_and_claims"
+              ],
+              "unit": "USD"
+            },
+            {
+              "id": "first_year_factor",
+              "op": "add",
+              "args": [
+                1,
+                "first_year_growth"
+              ],
+              "unit": "ratio"
+            },
+            {
+              "id": "second_year_factor",
+              "op": "add",
+              "args": [
+                1,
+                "second_year_growth"
+              ],
+              "unit": "ratio"
+            },
+            {
+              "id": "later_year_factor",
+              "op": "add",
+              "args": [
+                1,
+                "later_growth"
+              ],
+              "unit": "ratio"
+            },
+            {
+              "id": "residual_y1",
+              "op": "multiply",
+              "args": [
+                "initial_residual_cash",
+                "first_year_factor"
+              ],
+              "unit": "USD"
+            },
+            {
+              "id": "residual_y2",
+              "op": "multiply",
+              "args": [
+                "residual_y1",
+                "second_year_factor"
+              ],
+              "unit": "USD"
+            },
+            {
+              "id": "residual_y3",
+              "op": "multiply",
+              "args": [
+                "residual_y2",
+                "later_year_factor"
+              ],
+              "unit": "USD"
+            },
+            {
+              "id": "residual_y4",
+              "op": "multiply",
+              "args": [
+                "residual_y3",
+                "later_year_factor"
+              ],
+              "unit": "USD"
+            },
+            {
+              "id": "residual_y5",
+              "op": "multiply",
+              "args": [
+                "residual_y4",
+                "later_year_factor"
+              ],
+              "unit": "USD"
+            },
+            {
+              "id": "distribution_y1",
+              "op": "multiply",
+              "args": [
+                "residual_y1",
+                "residual_distribution"
+              ],
+              "unit": "USD"
+            },
+            {
+              "id": "distribution_y2",
+              "op": "multiply",
+              "args": [
+                "residual_y2",
+                "residual_distribution"
+              ],
+              "unit": "USD"
+            },
+            {
+              "id": "distribution_y3",
+              "op": "multiply",
+              "args": [
+                "residual_y3",
+                "residual_distribution"
+              ],
+              "unit": "USD"
+            },
+            {
+              "id": "distribution_y4",
+              "op": "multiply",
+              "args": [
+                "residual_y4",
+                "residual_distribution"
+              ],
+              "unit": "USD"
+            },
+            {
+              "id": "distribution_y5",
+              "op": "multiply",
+              "args": [
+                "residual_y5",
+                "residual_distribution"
+              ],
+              "unit": "USD"
+            },
+            {
+              "id": "distribution_ps_y1",
+              "op": "divide",
+              "args": [
+                "distribution_y1",
+                "shares"
+              ],
+              "unit": "USD per share"
+            },
+            {
+              "id": "distribution_ps_y2",
+              "op": "divide",
+              "args": [
+                "distribution_y2",
+                "shares"
+              ],
+              "unit": "USD per share"
+            },
+            {
+              "id": "distribution_ps_y3",
+              "op": "divide",
+              "args": [
+                "distribution_y3",
+                "shares"
+              ],
+              "unit": "USD per share"
+            },
+            {
+              "id": "distribution_ps_y4",
+              "op": "divide",
+              "args": [
+                "distribution_y4",
+                "shares"
+              ],
+              "unit": "USD per share"
+            },
+            {
+              "id": "distribution_ps_y5",
+              "op": "divide",
+              "args": [
+                "distribution_y5",
+                "shares"
+              ],
+              "unit": "USD per share"
+            },
+            {
+              "id": "terminal_growth_factor",
+              "op": "add",
+              "args": [
+                1,
+                "terminal_growth"
+              ],
+              "unit": "ratio"
+            },
+            {
+              "id": "terminal_next_distribution",
+              "op": "multiply",
+              "args": [
+                "distribution_y5",
+                "terminal_growth_factor"
+              ],
+              "unit": "USD"
+            },
+            {
+              "id": "terminal_capitalization_spread",
+              "op": "subtract",
+              "args": [
+                "discount_rate",
+                "terminal_growth"
+              ],
+              "unit": "ratio"
+            },
+            {
+              "id": "continuing_equity_proceeds",
+              "op": "divide",
+              "args": [
+                "terminal_next_distribution",
+                "terminal_capitalization_spread"
+              ],
+              "unit": "USD"
+            },
+            {
+              "id": "limited_liability_equity_proceeds",
+              "op": "maximum",
+              "args": [
+                0,
+                "continuing_equity_proceeds"
+              ],
+              "unit": "USD"
+            },
+            {
+              "id": "equity_realization_ps",
+              "op": "divide",
+              "args": [
+                "limited_liability_equity_proceeds",
+                "shares"
+              ],
+              "unit": "USD per share"
+            },
+            {
+              "id": "total_realization_year_ps",
+              "op": "add",
+              "args": [
+                "distribution_ps_y5",
+                "equity_realization_ps"
+              ],
+              "unit": "USD per share"
+            },
+            {
+              "id": "compiled_value",
+              "op": "present_value",
+              "args": [
+                "distribution_ps_y1",
+                1,
+                "distribution_ps_y2",
+                2,
+                "distribution_ps_y3",
+                3,
+                "distribution_ps_y4",
+                4,
+                "total_realization_year_ps",
+                5,
+                "discount_rate"
+              ],
+              "unit": "USD per share"
+            }
+          ],
+          "outputs": {
+            "low": "compiled_value",
+            "base": "compiled_value",
+            "high": "compiled_value"
           }
-        ]
+        }
       }
     ]
-  },
-  "insider_signal": {
-    "as_of": "2026-10-19",
-    "disclaimer": "Context only. Insider activity informs scenario confidence and stance discussion; it does not auto-inflate Lawrence base IRR. Promotion requires [HUMAN REVIEW].",
-    "in_base_irr": false,
-    "window_days": 365,
-    "ics": 7.96,
-    "band": "strong",
-    "bull_case_support": "moderate",
-    "scenario_confidence": {
-      "priors": {
-        "bear": 0.2,
-        "base": 0.55,
-        "bull": 0.25
-      },
-      "tilted": {
-        "bear": 0.2,
-        "base": 0.451,
-        "bull": 0.349
-      },
-      "bull_delta": 0.099,
-      "bear_delta": 0.0,
-      "note": "Scenario weights are qualitative confidence only; Lawrence base IRR unchanged."
-    },
-    "factors": {
-      "buy_score": 7.917,
-      "sell_score": -1.0,
-      "cluster_bonus": 0.0,
-      "net_buy_usd": 8936128.75,
-      "net_sell_usd": 58930281.8,
-      "price_today": 547.44
-    },
-    "top_buys": [
-      {
-        "insider": "McLaughlin Edward Grunde",
-        "date": "2026-07-15",
-        "shares": 19800,
-        "price": 227.25,
-        "value_usd": 4499550.0,
-        "shares_owned_after": 58539,
-        "contrib": 1.452
-      },
-      {
-        "insider": "McLaughlin Edward Grunde",
-        "date": "2026-07-01",
-        "shares": 14260,
-        "price": 173.49,
-        "value_usd": 2473967.4,
-        "shares_owned_after": 52999,
-        "contrib": 1.404
-      },
-      {
-        "insider": "Ling Hai",
-        "date": "2026-02-24",
-        "shares": 4485,
-        "price": 90.1,
-        "value_usd": 404098.5,
-        "shares_owned_after": 30152,
-        "contrib": 1.297
-      },
-      {
-        "insider": "Ling Hai",
-        "date": "2026-02-23",
-        "shares": 4486,
-        "price": 90.1,
-        "value_usd": 404188.6,
-        "shares_owned_after": 30153,
-        "contrib": 1.297
-      },
-      {
-        "insider": "Seshadri Raj",
-        "date": "2026-07-02",
-        "shares": 1977,
-        "price": 290.25,
-        "value_usd": 573824.25,
-        "shares_owned_after": 18406,
-        "contrib": 1.244
-      }
-    ],
-    "top_sells": [
-      {
-        "insider": "Huntsman Jon M Jr",
-        "date": "2026-03-01",
-        "shares": 652,
-        "price": 512.76,
-        "value_usd": 334319.52,
-        "is_10b5_1": false,
-        "contrib": -0.129
-      },
-      {
-        "insider": "Matsumoto Oki",
-        "date": "2026-06-21",
-        "shares": 98,
-        "price": 492.45,
-        "value_usd": 48260.1,
-        "is_10b5_1": false,
-        "contrib": -0.113
-      },
-      {
-        "insider": "Qureshi Rima",
-        "date": "2026-06-16",
-        "shares": 1641,
-        "price": 495.51,
-        "value_usd": 813131.91,
-        "is_10b5_1": false,
-        "contrib": -0.113
-      },
-      {
-        "insider": "Qureshi Rima",
-        "date": "2026-02-05",
-        "shares": 12083,
-        "price": 0.0,
-        "value_usd": 0.0,
-        "is_10b5_1": false,
-        "contrib": -0.113
-      },
-      {
-        "insider": "GENACHOWSKI JULIUS",
-        "date": "2025-10-31",
-        "shares": 45,
-        "price": 0.0,
-        "value_usd": 0.0,
-        "is_10b5_1": false,
-        "contrib": -0.113
-      }
-    ],
-    "narrative_hooks": [],
-    "transaction_count": 106
-  },
-  "lens_consensus": {
-    "as_of": "2026-07-20",
-    "shared_inputs_ref": "valuation.json@2026-07-20",
-    "valuation_richness": 0.0,
-    "blended_return_pct": null,
-    "band_pct": null,
-    "weighted_median_pct": null,
-    "median_mean_flag": false,
-    "stance": "pending",
-    "agreement_pct": 0,
-    "dissent_count": 0,
-    "lawrence_divergence": false,
-    "top_dissents": [],
-    "contributor_count": 0,
-    "in_base_irr": false,
-    "disclaimer": "Advisory lens blend only. Does not replace Lawrence total-synthesis stance gate without [HUMAN REVIEW]."
-  },
-  "schema_version": "magis.valuation.v2",
-  "returns": {
-    "base_irr_pct": null,
-    "unit": "percent_per_year",
-    "label": null,
-    "display": null,
-    "scenarios_pct": {}
   }
 }
