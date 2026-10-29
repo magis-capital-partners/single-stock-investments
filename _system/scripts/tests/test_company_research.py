@@ -15,6 +15,20 @@ from stage_company_research import stage
 COMPANIES = {"CME": {"company": "CME Group Inc.", "market": "US"}, "MSB": {"company": "Mesabi Trust", "market": "US"}, "NEM": {"company": "Newmont Corporation", "market": "US"}, "CLSK": {"company": "CleanSpark Inc.", "market": "US"}, "MSTR": {"company": "MicroStrategy Inc.", "market": "US"}}
 
 
+def test_import_reconciliation_remains_archived_without_company_card(tmp_path):
+    b=Builder(tmp_path,None,tmp_path/'out',tmp_path/'cache',companies={'CME':COMPANIES['CME']})
+    for name in ['activist_reconcile.md','activist_reconcile_2026-07-01.md','activist_analysis.md']:
+        record=b.base(name,name,'company:CME',text='CME Group research',state='indexed',explicit=['CME'],
+                      locations=[{'url':'https://github.com/magis-capital-partners/single-stock-investments/blob/main/CME/research/'+name}])
+        b.add(record,[])
+    b.publish()
+    company=json.loads((b.output/'companies/CME.json').read_text())
+    assert company['total']==1
+    rows=json.loads((b.output/company['pages'][0]).read_text())
+    assert rows[0]['title']=='activist_analysis.md'
+    assert len(b.index.records)==3
+
+
 def test_sparse_company_preserves_official_filing_links_and_inventory_receipts(tmp_path):
     def git(*args):
         return subprocess.check_output(['git',*args],cwd=tmp_path).decode().strip()
@@ -76,6 +90,45 @@ def test_captured_commodity_originals_are_searchable_only_for_reviewed_owners(tm
     assert record['locations'][0]['url']=='https://gold.example/report.html'
 
 
+def test_shared_numeric_company_files_belong_only_to_their_issuer(tmp_path):
+    from build_company_research import market_data_owner
+    path=tmp_path/'_system/reference/market-data/operating_kpis/CME.json'
+    path.parent.mkdir(parents=True)
+    path.write_text(json.dumps({'ticker':'CME','volume':25000,'comment':'Newmont Corporation operates gold mines and has expanded production while reducing costs and improving earnings.'}))
+    b=Builder(tmp_path,tmp_path/'vault',tmp_path/'out',tmp_path/'cache',companies=COMPANIES)
+    b.local_corpora()
+    record=b.index.records[b.index.anchors['path:'+path.relative_to(tmp_path).as_posix()]]
+    assert [r['ticker'] for r in record['relationships']]==['CME']
+    assert record['category']=='models' and '25000' in b.text(record)
+    assert market_data_owner(Path('insider/CME_transactions.csv'),COMPANIES)==['CME']
+    assert market_data_owner(Path('macro/CME.json'),COMPANIES)==[]
+    assert market_data_owner(Path('returns/BRK_B.csv'),{'BRK.B':{}})==['BRK.B']
+
+
+@pytest.mark.parametrize('path',['CME/third-party-analyses/activist_reports/long/SC-13G.htm','CME/research/evidence/_text/mgmt/annual.pdf.txt'])
+def test_issuer_disclosure_renditions_do_not_become_peer_research(tmp_path,path):
+    b=Builder(tmp_path,None,tmp_path/'out',tmp_path/'cache',companies=COMPANIES)
+    row=b.base('filing','Institutional ownership disclosure','git',explicit=['CME'],path=path,
+               text='Newmont Corporation operates gold mines and has expanded production while reducing costs and improving earnings.')
+    assert [r['ticker'] for r in row['relationships']]==['CME']
+    assert 'Newmont' in row['text']
+
+
+def test_restored_original_extraction_reuses_full_ocr_for_local_rendition(tmp_path):
+    import hashlib
+    from company_sources import digest
+    b=Builder(tmp_path,None,tmp_path/'out',tmp_path/'cache',companies=COMPANIES)
+    data=b'exact original PDF fixture';sha=digest(data)
+    target=b.cache/'drive/original.json';target.parent.mkdir(parents=True)
+    target.write_text(json.dumps({'version':1,'status':'indexed','text':'Recovered full scan','content_sha256':sha,'extraction':{'pages':1,'ocr_pages':[1]}}))
+    pointer=b.cache/'md5'/(hashlib.md5(data).hexdigest()+'.json');pointer.parent.mkdir()
+    pointer.write_text(json.dumps({'path':'drive/original.json'}))
+    assert b.cached_extract(data,'.pdf')==('Recovered full scan','indexed',sha)
+    reference=json.loads((b.cache/'text'/(sha+'.json')).read_text())
+    assert reference['source_cache_path']=='drive/original.json' and 'text' not in reference
+    assert b.cached_extract(data,'.pdf')==('Recovered full scan','indexed',sha)
+
+
 def test_fund_acronym_is_not_company_research():
     links, _ = Matcher(COMPANIES).match("CME Investor Letter October 2012", 'EMERGING SOVEREIGN GROUP. ESG Credit Macro Event Master Fund Ltd. ("CME") invests in sovereign debt. Our fund has delivered gains in emerging-market bonds.')
     assert not links
@@ -128,7 +181,8 @@ def test_failed_scan_retains_previous_and_successful_absence_is_visible():
     assert result["b"]["availability"]=="removed_or_unavailable"
 
 
-def test_all_sources_are_paginated_and_full_text_search_has_no_insight_cap(tmp_path):
+def test_all_sources_are_paginated_and_full_text_search_has_no_insight_cap(tmp_path,monkeypatch):
+    monkeypatch.setattr('build_company_research.COMPANY_PAGE_ROWS',100)
     b=Builder(tmp_path,None,tmp_path/"output",tmp_path/"cache",companies={"CME":COMPANIES["CME"]})
     for n in range(351):
         row=b.base(str(n),f"Report {n}","test",text=f"The needle{n} appears in this full source body.",explicit=["CME"],locations=[{"kind":"repository","url":f"https://example.test/{n}"}])
@@ -299,7 +353,35 @@ def test_share_classes_receive_the_same_company_research():
     assert {r["ticker"] for r in links}=={"GOOG","GOOGL"}
 
 
-def test_large_source_and_search_shards_preserve_the_last_word(tmp_path):
+def test_large_duplicate_bodies_share_text_despite_larger_transport_chunks(tmp_path,monkeypatch):
+    monkeypatch.setattr('build_company_research.TEXT_INLINE_BYTES',100)
+    monkeypatch.setattr('build_company_research.TEXT_CHUNK_CHARS',1000)
+    b=Builder(tmp_path,None,tmp_path/'out',tmp_path/'cache',companies={'CME':COMPANIES['CME']})
+    for i in range(2):
+        row=b.base(str(i),f'Edition {i}','test',text='Complete body. '*20,explicit=['CME'])
+        b.index.add(row,[str(i)])
+    b.publish()
+    docs=[d for p in (b.output/'documents').glob('*.json') for d in json.loads(p.read_text()).values()]
+    assert len(docs)==2 and docs[0]['text_parts']==docs[1]['text_parts']
+    assert len(list((b.output/'text').glob('*.json')))==1
+
+
+def test_company_pages_respect_byte_budget_without_dropping_rows(tmp_path,monkeypatch):
+    monkeypatch.setattr('build_company_research.COMPANY_PAGE_BYTES',3000)
+    b=Builder(tmp_path,None,tmp_path/'out',tmp_path/'cache',companies={'CME':COMPANIES['CME']})
+    for i in range(7):
+        row=b.base(str(i),f'Report {i}','test',text='Complete source text',explicit=['CME'])
+        row['assumptions']='Detail '*200
+        b.index.add(row,[str(i)])
+    b.publish()
+    company=json.loads((b.output/'companies/CME.json').read_text())
+    pages=[b.output/p for p in company['pages']]
+    assert len(pages)>1 and all(p.stat().st_size<3000 for p in pages)
+    assert sum(len(json.loads(p.read_text())) for p in pages)==7
+
+
+def test_large_source_and_search_shards_preserve_the_last_word(tmp_path,monkeypatch):
+    monkeypatch.setattr('build_company_research.TEXT_CHUNK_CHARS',1_000_000)
     b=Builder(tmp_path,None,tmp_path/"out",tmp_path/"cache",companies={"CME":COMPANIES["CME"]})
     body=" ".join(f"unique{i:06d}" for i in range(300000))
     row=b.base("large","Large model","test",explicit=["CME"])
@@ -315,14 +397,18 @@ def test_large_source_and_search_shards_preserve_the_last_word(tmp_path):
     assert "".join(json.loads((tmp_path/"out"/p).read_text())["text"] for p in content["text_parts"])==body
 
 
-def test_private_stage_copies_only_reachable_assets_and_requires_auth(tmp_path):
+@pytest.mark.parametrize('hardlink', [False, True])
+def test_private_stage_copies_only_reachable_assets_and_requires_auth(tmp_path, hardlink):
     out,site=tmp_path/"out",tmp_path/"site"
     b=Builder(tmp_path,None,out,tmp_path/"cache",companies={"CME":COMPANIES["CME"]})
     row=b.base("source","CME source","test",text="Company original",explicit=["CME"])
     b.index.add(row,["id:source"]);b.publish()
     (out/"old-unused.json").write_text('{}')
     site.mkdir();(site/"_routes.json").write_text('{"include":["/*"],"exclude":[]}')
-    assert stage(out,site)["documents"]==1
+    with pytest.raises(RuntimeError,match="hosting limit"):
+        stage(out,site,max_files=1)
+    assert stage(out,site,hardlink=hardlink)["documents"]==1
+    assert stage(out,site,hardlink=hardlink)["documents"]==1
     assert not (site/"data/company-research/old-unused.json").exists()
     (site/"_routes.json").write_text('{"include":["/*"],"exclude":["/data/*"]}')
     with pytest.raises(RuntimeError,match="authentication"):
@@ -351,3 +437,59 @@ def test_disk_backed_source_survives_publish_and_failed_refresh(tmp_path):
 def test_source_browser_contracts():
     result=subprocess.run(["node","--test",str(Path(__file__).with_suffix(".cjs"))],capture_output=True,text=True,timeout=30)
     assert result.returncode==0,result.stdout+result.stderr
+
+
+def test_recovered_drive_copy_does_not_resurrect_old_git_placeholder(tmp_path):
+    cache,out=tmp_path/'cache',tmp_path/'out'
+    first=Builder(tmp_path,None,out,cache,companies={"CME":COMPANIES["CME"]})
+    old=first.base("git:original","CME filing","git_inventory",state="awaiting_extraction",explicit=["CME"])
+    first.add(old,["git:original"]);first.publish()
+    again=Builder(tmp_path,None,out,cache,companies={"CME":COMPANIES["CME"]})
+    recovered=again.base("git:original","CME filing","git_inventory",text="Complete company filing text.",explicit=["CME"])
+    again.add(recovered,["git:original","md5:exact-original"])
+    drive=again.base("md5:exact-original","CME filing.pdf","drive",text="Complete company filing text.",explicit=["CME"])
+    drive.update(family="drive:file",revision="v1")
+    again.add(drive,["md5:exact-original","drive:file"])
+    report=again.publish()
+    company=json.loads((out/'companies/CME.json').read_text())
+    assert report['documents']==1 and company['total']==1 and company['coverage']['pending']==0
+    source=json.loads((out/company['pages'][0]).read_text())[0]
+    assert set(source['origins'])=={'drive','git_inventory'}
+def test_preserved_commodity_ocr_verifies_original_and_extracted_text(monkeypatch, tmp_path):
+    import company_commodity_sources as sources
+    from build_company_research import Builder, digest, write
+    raw=b'%PDF commodity original';original=tmp_path/'report.pdf';original.write_bytes(raw)
+    sha=digest(raw);cache=tmp_path/'cache';text='Complete extracted commodity report including its scanned pages.'
+    monkeypatch.setattr(sources,'originals',lambda *args:iter([{'path':original,'sha256':sha,'tickers':['FNV'],'models':['gold'],'title':'Gold report','date':None,'url':'https://publisher.example/report.pdf'}]))
+    saved=cache/'commodity-text'/(sha+'.json')
+    write(saved,{'status':'indexed','original_sha256':sha,'text':text,'text_sha256':digest(text),'extraction':{'ocr_pages':[1]}})
+    def build():
+        b=Builder(tmp_path,None,tmp_path/'site',cache,companies={'FNV':{'company':'Franco-Nevada'}})
+        monkeypatch.setattr(b,'cached_extract',lambda *args:('native partial','needs_ocr',sha))
+        sources.build(b)
+        return b,next(iter(b.index.records.values()))
+    b,record=build()
+    assert record['processing_status']=='indexed' and b.text(record)==text
+    assert 'Automatic OCR' in record['extraction_review']
+    write(saved,{'status':'indexed','original_sha256':sha,'text':'changed','text_sha256':digest(text)})
+    b,record=build()
+    assert record['processing_status']=='needs_ocr' and b.text(record)=='native partial'
+
+def test_resumed_publication_reuses_unchanged_documents_despite_inventory_order(tmp_path):
+    from build_company_research import Builder, load
+    companies={'AAA':{'company':'Example Company'}}
+    def publish(order,first):
+        b=Builder(tmp_path,None,tmp_path/'site',tmp_path/'cache',companies=companies)
+        for name in order:
+            body=first if name=='one' else 'Unchanged second document.'
+            b.add(b.base(name,name,'company:AAA',text=body,explicit=['AAA']),['url:'+name])
+        b.publish()
+        manifest=load(tmp_path/'site/companies/AAA.json')
+        return {r['title']:r for p in manifest['pages'] for r in load(tmp_path/'site'/p)}
+    original=publish(['one','two'],'First version.')
+    changed=publish(['two','one'],'Updated first document.')
+    assert changed['two']['content_path']==original['two']['content_path']
+    assert changed['one']['content_path']!=original['one']['content_path']
+    content=load(tmp_path/'site'/changed['one']['content_path'])
+    assert content[changed['one']['id']]['text']=='Updated first document.'
+

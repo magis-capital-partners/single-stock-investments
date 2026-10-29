@@ -23,6 +23,12 @@ from company_sources import CATEGORIES, SOURCE_SUFFIXES, Matcher, SourceIndex, c
 from company_extract_formats import EXTRA_SUFFIXES
 
 ROOT = Path(__file__).resolve().parents[2]
+PUBLICATION_LAYOUT = 2
+CONTENT_BUNDLE_BYTES = 16_000_000
+TEXT_INLINE_BYTES = 1_000_000
+TEXT_CHUNK_CHARS = 4_000_000
+COMPANY_PAGE_ROWS = 1000
+COMPANY_PAGE_BYTES = 8_000_000
 VAULT_COLLECTIONS = ("superinvestor-letters", "vic-research", "sumzero-research", "investment-wisdom", "manager-meetings", "expert-calls", "expert_calls", "valueline", "podcasts", "videos", "dropbox-ingestion", "short-research", "activist-research", "filings-extracts")
 IGNORE_NAMES = {"README.md", "AGENTS.md", "SKILL.md", "INDEX.csv", "manifest.json", "catalog_manifest.jsonl", "DOWNLOAD_MANIFEST.json",
                 "insights.json", "letters_index.json", "drive_import_manifest.json", "drive_import_log.jsonl", "fetch_log.jsonl",
@@ -40,6 +46,18 @@ SHARED_MODELS = {
     "_system/scripts/energy_btc_bridge.py": "Natural gas and Bitcoin mining model methodology",
     "_system/scripts/power_cost_model.py": "Electricity contract cost model methodology",
 }
+COMPANY_DATA_FOLDERS = {'fundamentals', 'operating_kpis', 'valuation_fundamentals', 'valuation_quotes', 'compounders', 'insider', 'returns', 'equity'}
+
+
+def market_data_owner(path: Path, companies: dict) -> list[str]:
+    """Only known ticker-file conventions establish ownership of numeric data."""
+    if path.parent.name not in COMPANY_DATA_FOLDERS:
+        return []
+    name = path.stem.upper()
+    if path.parent.name == 'insider':name = name.removesuffix('_TRANSACTIONS')
+    if path.parent.name == 'returns':name = name.replace('_', '.')
+    if path.parent.name == 'equity':name = re.sub(r'_(?:DAILY|WEEKLY|MONTHLY)_[A-Z]{3}$', '', name)
+    return [name] if name in companies else []
 
 
 def write(path: Path, value) -> None:
@@ -57,7 +75,17 @@ def write(path: Path, value) -> None:
             time.sleep(.05*(attempt+1))
 
 
+def io_path(path: Path):
+    # Long imported titles can exceed Windows' legacy path limit even though
+    # directory enumeration finds them. Preserve the logical path in links.
+    if os.name == 'nt' and len(str(path.absolute())) >= 248 and not str(path).startswith('\\\\?\\'):
+        absolute = str(path.absolute())
+        return Path('\\\\?\\UNC\\' + absolute[2:] if absolute.startswith('\\\\') else '\\\\?\\' + absolute)
+    return path
+
+
 def load(path: Path, default=None):
+    path = io_path(path)
     return json.loads(path.read_text(encoding="utf-8-sig")) if path.is_file() else ({} if default is None else default)
 
 
@@ -221,7 +249,13 @@ class Builder:
 
     def base(self, identity, title, origin, *, text="", state="indexed", date=None, author=None, period=None, explicit=(), locations=(), mime="", path=""):
         match_text = text
-        issuer_owned = bool(explicit) and any('/'+folder+'/' in '/'+path.replace('\\','/') for folder in ('investor-documents','financials','models'))
+        normalized_path = '/' + path.replace('\\','/')
+        issuer_owned = bool(explicit) and (
+            normalized_path.startswith('/_system/reference/market-data/')
+            or '/third-party-analyses/activist_reports/' in normalized_path
+            or '/research/evidence/_text/mgmt/' in normalized_path
+            or any('/'+folder+'/' in normalized_path for folder in ('investor-documents','financials','models'))
+        )
         if issuer_owned:
             # An issuer's filings and operating data belong to that issuer.
             # Incidental banks, vendors and peers in its disclosures should not
@@ -283,6 +317,26 @@ class Builder:
         sha = digest(data)
         path = self.cache / "text" / f"{sha}.json"
         prior = load(path)
+        if prior.get('source_cache_path'):
+            target = (self.cache / prior['source_cache_path']).resolve()
+            recovered = load(target) if target.is_relative_to(self.cache.resolve()) else {}
+            from backfill_company_sources import complete_cache
+            prior = recovered if recovered.get('content_sha256') == sha and complete_cache(recovered, suffix) else {}
+        if prior.get('status') != 'indexed':
+            md5 = hashlib.md5(data, usedforsecurity=False).hexdigest()
+            pointer = load(self.cache / 'md5' / (md5 + '.json'))
+            target = self.cache / pointer.get('path', '')
+            if pointer.get('path') and target.resolve().is_relative_to(self.cache.resolve()):
+                recovered = load(target)
+                from backfill_company_sources import complete_cache
+                if recovered.get('content_sha256') == sha and complete_cache(recovered, suffix):
+                    prior = recovered
+                    # The portable recovery cache already owns the full text.
+                    # Keep only a verified reference and extraction metadata
+                    # here instead of duplicating the corpus during deployment.
+                    write(path, {'version': 1, 'source_cache_path': pointer['path'],
+                                 'content_sha256': sha, 'status': prior['status'],
+                                 'extraction': prior.get('extraction', {})})
         verified_pages = suffix != '.pdf' or prior.get('status') != 'indexed' or prior.get('extraction',{}).get('pages')
         if prior.get("version") == 1 and verified_pages and prior.get("status") in {"indexed", "needs_ocr", "needs_transcript", "empty_source"}:
             return prior["text"], prior["status"], sha
@@ -310,15 +364,15 @@ class Builder:
         actual = resolved(self.root, rel) if not rel.startswith("vault/") else path
         if actual is None:
             return
-        data = actual.read_bytes()
-        companion = next((path.with_suffix(s) for s in (".txt", ".md") if path.suffix.lower() == ".pdf" and path.with_suffix(s).is_file()), None)
+        data = io_path(actual).read_bytes()
+        companion = next((path.with_suffix(s) for s in (".txt", ".md") if path.suffix.lower() == ".pdf" and io_path(path.with_suffix(s)).is_file()), None)
         media_cache = {}
         if path.suffix.lower() in {'.mp3','.m4a','.mp4','.wav'}:
             from backfill_company_sources import transcript_for
             companion = transcript_for(path, self.vault)
             media_cache = load(self.cache/'media'/(digest(path.name)+'.json'))
         if companion:
-            text, state, _ = self.cached_extract(companion.read_bytes(), companion.suffix.lower())
+            text, state, _ = self.cached_extract(io_path(companion).read_bytes(), companion.suffix.lower())
             sha = digest(data)
         elif media_cache.get('status') == 'indexed':
             text, state, sha = media_cache['text'], 'indexed', digest(data)
@@ -340,6 +394,8 @@ class Builder:
             if loc not in locations:
                 locations.insert(0, loc)
         record = self.base("sha256:" + sha, title, origin, text=text, state=state, date=meta.get("published") or md.get("date"), author=meta.get("show_title") or md.get("author"), period=meta.get("period") or md.get("period"), explicit=explicit, locations=locations, path=rel)
+        if explicit and rel.startswith('_system/reference/market-data/'):
+            record['category'] = 'models'
         record["content_hash"] = sha
         record["content_md5"] = hashlib.md5(data, usedforsecurity=False).hexdigest()
         record["format"] = path.suffix.lstrip(".")
@@ -457,7 +513,8 @@ class Builder:
             count = 0
             try:
                 for path in safe_files(folder):
-                    self.local(path, "shared:" + collection)
+                    owners = market_data_owner(path, self.companies) if collection == 'market-data' else []
+                    self.local(path, "shared:" + collection, explicit=owners)
                     count += 1
                 self.receipt("shared:" + collection, count, "complete" if folder.exists() else "unavailable")
             except Exception as exc:
@@ -594,14 +651,21 @@ class Builder:
                             yield from rows(x)
         for row, url in rows(doc):
             filed = row.get("filing_date") or row.get("filingDate") or row.get("date")
-            title = " · ".join(str(v) for v in [row.get("form") or row.get("type"), filed, row.get("primary_document") or row.get("primary")] if v) or Path(url).name
+            title = " \u00b7 ".join(str(v) for v in [row.get("form") or row.get("type"), filed, row.get("primary_document") or row.get("primary")] if v) or Path(url).name
             location = {"kind": "filing", "url": url, "label": "Official filing"}
-            rec = self.base(url, title, "company:" + ticker, state="awaiting_extraction", explicit=[ticker], date=filed, period=row.get("report"), locations=[location], path="filings/" + title)
+            from backfill_company_filings import cached_filing
+            recovered = cached_filing(self.cache, url)
+            rec = self.base(url, title, "company:" + ticker, text=recovered.get("text", ""), state=recovered.get("status", "awaiting_extraction"), explicit=[ticker], date=filed, period=row.get("report"), locations=[location], path="investor-documents/" + title)
+            if recovered.get("original_sha256"):
+                rec["revision"] = recovered["original_sha256"]
+                rec["content_hash"] = recovered["original_sha256"]
+            if recovered.get("extraction", {}).get("ocr_pages"):
+                rec["extraction_review"] = "Automatic OCR; verify against the original"
             ref = row.get("local") or row.get("local_path")
             if ref:
                 self.refs[ref].append(location)
                 self.metadata[ref] = {"title": title, "date": filed}
-            self.add(rec, ["url:" + url] + (["path:" + ref] if ref else []))
+            self.add(rec, ["url:" + url] + (["path:" + ref] if ref else []) + (["sha:" + recovered["original_sha256"]] if recovered.get("original_sha256") else []))
 
     def company_inventory(self, ticker):
         relative = f"{ticker}/third-party-analyses/source_inventory.json"
@@ -754,9 +818,43 @@ class Builder:
         self.receipt("drive", count)
 
     def publish(self):
-        records = retain_previous(self.index.records, self.previous.get("records", {}), self.good)
+        # A recovered Git original can acquire a Drive revision identity when
+        # exact-byte copies merge. Do not resurrect its old empty placeholder
+        # under the former ID; preserve genuinely different historical bodies.
+        aliases = {}
+        for anchor, current_id in self.index.anchors.items():
+            identity = ("sha256:" + anchor[4:] if anchor.startswith("sha:") else
+                        anchor[4:] if anchor.startswith("url:") else
+                        anchor if anchor.startswith(("git:", "md5:")) else None)
+            if identity:
+                aliases[digest(identity)[:32]] = current_id
+        previous = {}
+        for key, old in self.previous.get("records", {}).items():
+            current = self.index.records.get(aliases.get(key), {})
+            has_body = bool(old.get("text_cache") or old.get("text") or old.get("text_length"))
+            same_body = bool(old.get("text_cache") and old.get("text_cache") == current.get("text_cache"))
+            distinct_revision = old.get("revision") and current.get("revision") and old["revision"] != current["revision"]
+            if current and not distinct_revision and (not has_body or same_body):
+                continue
+            previous[key] = old
+        records = retain_previous(self.index.records, previous, self.good)
         by_ticker = defaultdict(list)
         bundles, content_batch, content_size = {}, {}, 0
+        # A resumed build may discover the same originals in a different order.
+        # Reuse verified immutable bundles so that this does not duplicate the
+        # entire corpus on disk. Changed documents get a new bundle; unchanged
+        # documents may continue sharing their previous one.
+        reusable = {}
+        if load(self.output / "manifest.json").get("layout_version") == PUBLICATION_LAYOUT:
+            for path in (self.output / "documents").glob("*.json"):
+                try:
+                    prior = load(path)
+                    if path.stem != digest(json.dumps(prior, sort_keys=True))[:24]:
+                        continue
+                    for sid, content in prior.items():
+                        reusable[(sid, digest(json.dumps(content, sort_keys=True)))] = path.relative_to(self.output).as_posix()
+                except (OSError, ValueError, AttributeError):
+                    continue
         def flush_content():
             nonlocal content_batch, content_size
             if content_batch:
@@ -772,22 +870,31 @@ class Builder:
                 rec["indexed_at"] = previous["indexed_at"]
             status_counts[rec["processing_status"]] += 1
             review.extend({"source_id": rec["id"], **r} for r in rec.get("review", []))
+            # Preserve import reconciliation logs in the archive, but do not
+            # present these administrative inventories as company research.
+            if any(re.search(r"/research/activist_reconcile(?:_\d{4}-\d{2}-\d{2})?\.md(?:$|[?#])", loc.get("url", ""), re.I)
+                   for loc in rec.get("locations", [])):
+                continue
             if not any(r["ticker"] in self.companies for r in rec.get("relationships", [])):
                 continue
             full_text = self.text(rec)
             parts = []
-            if len(full_text.encode("utf-8")) > 1_000_000:
-                for start in range(0,len(full_text),1_000_000):
-                    part = full_text[start:start+1_000_000]
+            if len(full_text.encode("utf-8")) > TEXT_INLINE_BYTES:
+                for start in range(0,len(full_text),TEXT_CHUNK_CHARS):
+                    part = full_text[start:start+TEXT_CHUNK_CHARS]
                     filename = "text/" + digest(part) + ".json"
                     write(self.output / filename, {"text":part})
                     parts.append(filename)
             content = {"id": rec["id"], "title": rec["title"], "text": "" if parts else full_text, "text_parts":parts, "locations": rec.get("locations", []), "processing_status": rec["processing_status"]}
-            content_bytes = len(json.dumps(content, ensure_ascii=False).encode())
-            if content_batch and content_size + content_bytes > 4_000_000:
-                flush_content()
-            content_batch[rec["id"]] = content
-            content_size += content_bytes
+            reused = reusable.get((rec["id"], digest(json.dumps(content, sort_keys=True)))) if reusable else None
+            if reused:
+                bundles[rec["id"]] = reused
+            else:
+                content_bytes = len(json.dumps(content, ensure_ascii=False).encode())
+                if content_batch and content_size + content_bytes > CONTENT_BUNDLE_BYTES:
+                    flush_content()
+                content_batch[rec["id"]] = content
+                content_size += content_bytes
             for relation in rec.get("relationships", []):
                 if relation["ticker"] not in self.companies:
                     continue
@@ -820,10 +927,20 @@ class Builder:
                 for word in set(self.source_words(records[row["id"]])) | tokens(row["title"] + " " + row.get("author", "")):
                     index[word].append(ordinal)
             pages = []
-            for i in range(0, len(rows), 100):
-                page = rows[i:i+100]
-                filename = f"companies/{ticker}/{digest(json.dumps(page, sort_keys=True))[:24]}.json"
-                write(self.output / filename, page); pages.append(filename)
+            page, page_size = [], 2
+            def emit_page(items):
+                filename = f"companies/{ticker}/{digest(json.dumps(items, sort_keys=True))[:24]}.json"
+                write(self.output / filename, items)
+                pages.append(filename)
+            for row in rows:
+                row_size = len(json.dumps(row, ensure_ascii=False).encode("utf-8")) + 1
+                if page and (len(page) >= COMPANY_PAGE_ROWS or page_size + row_size > COMPANY_PAGE_BYTES):
+                    emit_page(page)
+                    page, page_size = [], 2
+                page.append(row)
+                page_size += row_size
+            if page:
+                emit_page(page)
             search_path = f"search/{ticker}.json"
             search_parts, search_chunk, search_size = [], {}, 0
             for word, ids in sorted(index.items()):
@@ -856,12 +973,12 @@ class Builder:
             manifest = {"schema_version": 1, "ticker": ticker, "company": self.companies[ticker].get("company"), "total": len(rows), "categories": counts, "coverage": coverage, "pages": pages, "search_path": search_path, "featured": featured}
             write(self.output / f"companies/{ticker}.json", manifest)
             summary[ticker] = {"total": len(rows), "categories": counts, "pending": pending}
-        report = {"schema_version": 1, "generated_at": self.now, "documents": len(records), "companies": len(summary), "linked_companies": sum(v["total"] > 0 for v in summary.values()), "processing": dict(status_counts), "review_count": len(review), "receipts": self.receipts, "tickers": summary}
+        report = {"schema_version": 1, "layout_version": PUBLICATION_LAYOUT, "generated_at": self.now, "documents": len(records), "companies": len(summary), "linked_companies": sum(v["total"] > 0 for v in summary.values()), "processing": dict(status_counts), "review_count": len(review), "receipts": self.receipts, "tickers": summary}
         write(self.output / "manifest.json", report)
         if len(json.dumps(review).encode()) > 4_000_000:
             review_parts = []
-            for start in range(0, len(review), 1000):
-                chunk = review[start:start+1000]
+            for start in range(0, len(review), 5000):
+                chunk = review[start:start+5000]
                 relative = "review/" + digest(json.dumps(chunk, sort_keys=True))[:24] + ".json"
                 write(self.output / relative, {"items": chunk})
                 review_parts.append(relative)

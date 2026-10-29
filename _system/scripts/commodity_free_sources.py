@@ -74,6 +74,18 @@ def copper_weekly(text):
     return row
 
 
+def copper_publication(raw, reviewed=None):
+    """Read native tables first, then a checksum-bound, visually reviewed OCR rendition."""
+    try:
+        return copper_weekly(pdf_text(raw))
+    except ValueError:
+        if not reviewed or reviewed.get('review_status') != 'visually_verified':raise
+        if reviewed.get('source_sha256') != digest(raw) or reviewed.get('text_sha256') != digest(reviewed.get('text','')):raise ValueError('Reviewed extraction checksum mismatch')
+        row=copper_weekly(reviewed['text'])
+        if row['period'] != reviewed.get('period'):raise ValueError('Reviewed publication date mismatch')
+        return {**row,'basis':'publisher table; OCR visually checked, exchange totals reconciled','extraction_method':'reviewed_ocr'}
+
+
 def copper_monthly(raw, as_of):
     import openpyxl
     book = openpyxl.load_workbook(io.BytesIO(raw), read_only=True, data_only=True)
@@ -161,7 +173,9 @@ def collect(download, prior, as_of, root):
         if not urls: raise ValueError('No weekly inventory publications')
         def weekly(url):
             try:
-                data = raw(url, immutable=True); row = copper_weekly(pdf_text(data))
+                data = raw(url, immutable=True)
+                reviewed=load(root/'free-extractions'/(digest(data)+'.json'),{})
+                row = copper_publication(data,reviewed)
                 return {**row, 'source_url': url, 'sha256': digest(data)}, None
             except Exception as exc: return None, {'source_url': url, 'error': str(exc)[:120]}
         with ThreadPoolExecutor(max_workers=4) as pool: parsed = list(pool.map(weekly, urls))

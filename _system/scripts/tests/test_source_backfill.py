@@ -19,6 +19,8 @@ def test_access_failure_is_published_without_erasing_last_good_text(tmp_path):
     target=tmp_path/'drive'/(digest('idv1')+'.json')
     preserve_outcome(tmp_path,job,'access_unavailable',{},'Publisher denied access')
     assert json.loads(target.read_text())['status']=='access_unavailable'
+    preserve_outcome(tmp_path,job,'empty_source',{},'Original is empty')
+    assert json.loads(target.read_text())['status']=='empty_source'
     target.write_text(json.dumps({'text':'existing original','status':'indexed'}))
     preserve_outcome(tmp_path,job,'failed',{},'Temporary failure')
     assert json.loads(target.read_text())['text']=='existing original'
@@ -200,9 +202,63 @@ def test_transcript_companion_and_cache_archive_portability(tmp_path):
     assert transcript_for(audio,tmp_path)==transcript
     cache=tmp_path/'cache';(cache/'git').mkdir(parents=True);(cache/'git/a.json').write_text('{"text":"private"}')
     (cache/'work.sqlite').write_bytes(b'not portable')
-    archive=tmp_path/'archive';assert pack(cache,archive)['files']==1
+    (cache/'index.json').write_text('{"record_parts":["records/a.json"]}')
+    (cache/'records').mkdir();(cache/'records/a.json').write_text('{"source":{"text_cache":"body"}}')
+    (cache/'published-text').mkdir();(cache/'published-text/body.json').write_text('{"text":"last good body"}')
+    (cache/'words').mkdir();(cache/'words/body.json').write_text('["complete","search","text"]')
+    archive=tmp_path/'archive';assert pack(cache,archive)['files']==5
     target=tmp_path/'restored';restore(archive,target)
     assert json.loads((target/'git/a.json').read_text())['text']=='private'
     assert not (target/'work.sqlite').exists()
+    assert json.loads((target/'words/body.json').read_text())==['complete','search','text']
+    assert json.loads((target/'published-text/body.json').read_text())['text']=='last good body'
+    assert json.loads((target/'index.json').read_text())['record_parts']==['records/a.json']
     part=next(archive.glob('*.zip'));part.write_bytes(b'corrupt')
     with pytest.raises(ValueError,match='checksum'):restore(archive,tmp_path/'corrupt')
+
+
+def test_empty_original_is_not_a_parser_failure():
+    for suffix in ('.pdf','.epub','.doc','.txt'):
+        assert extract_complete(b'  \n',suffix)[1] == 'empty_source'
+
+
+def test_temporary_download_name_requires_an_intact_pdf():
+    import fitz
+    pdf=fitz.open();page=pdf.new_page();page.insert_text((72,72),'Company earnings and business research original.')
+    raw=pdf.tobytes();pdf.close()
+    text,status,details=extract_complete(raw,'.crdownload')
+    assert status=='indexed' and 'business research' in text
+    assert details['pages']==1 and details['integrity']=='Complete unrepaired PDF'
+    assert extract_complete(raw[:-40],'.crdownload')[1]=='failed'
+    assert extract_complete(b'not a PDF','.crdownload')[1]=='unsupported'
+
+
+def test_cache_inventory_changes_do_not_reupload_unrelated_originals(tmp_path):
+    cache=tmp_path/'cache';(cache/'git').mkdir(parents=True)
+    (cache/'git/aa01.json').write_text('{"text":"first original"}')
+    (cache/'git/bb01.json').write_text('{"text":"second original"}')
+    (cache/'index.json').write_text('{"generated_at":"before"}')
+    archive=tmp_path/'archive';pack(cache,archive)
+    before={p['file'] for p in json.loads((archive/'manifest.json').read_text())['parts']}
+    (cache/'index.json').write_text('{"generated_at":"a different metadata length"}')
+    pack(cache,archive)
+    after={p['file'] for p in json.loads((archive/'manifest.json').read_text())['parts']}
+    assert len(before & after)==2
+    restored=tmp_path/'restored';restore(archive,restored)
+    assert json.loads((restored/'index.json').read_text())['generated_at']=='a different metadata length'
+    assert (restored/'git/aa01.json').read_bytes()==(cache/'git/aa01.json').read_bytes()
+
+
+def test_unchanged_archive_reuses_verified_parts_and_repairs_corruption(tmp_path,monkeypatch):
+    import company_source_cache as module
+    cache=tmp_path/'cache';(cache/'git').mkdir(parents=True)
+    (cache/'git/aa.json').write_text('{"text":"complete original"}')
+    archive=tmp_path/'archive';pack(cache,archive)
+    original=module.zipfile.ZipFile
+    def should_not_compress(*args,**kwargs):raise AssertionError('Unchanged original was recompressed')
+    with monkeypatch.context() as patch:
+        patch.setattr(module.zipfile,'ZipFile',should_not_compress)
+        assert pack(cache,archive)['files']==1
+    part=next(archive.glob('*.zip'));part.write_bytes(b'corrupted archive')
+    pack(cache,archive);restore(archive,tmp_path/'restored')
+    assert (tmp_path/'restored/git/aa.json').read_bytes()==(cache/'git/aa.json').read_bytes()

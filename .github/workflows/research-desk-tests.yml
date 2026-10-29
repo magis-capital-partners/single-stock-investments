@@ -5,6 +5,8 @@ on:
     paths:
       - '_system/scripts/*commodity*'
       - '_system/scripts/*company_source*'
+      - '_system/scripts/backfill_company_filings.py'
+      - '_system/scripts/tests/test_company_filings.py'
       - '_system/scripts/tests/test_source_backfill.py'
       - '_system/scripts/tests/test_commodity_inputs.py'
       - '_system/scripts/tests/test_commodity_free_sources.py'
@@ -22,6 +24,8 @@ on:
     paths:
       - '_system/scripts/*commodity*'
       - '_system/scripts/*company_source*'
+      - '_system/scripts/backfill_company_filings.py'
+      - '_system/scripts/tests/test_company_filings.py'
       - '_system/scripts/tests/test_source_backfill.py'
       - '_system/scripts/tests/test_commodity_inputs.py'
       - '_system/scripts/tests/test_commodity_free_sources.py'
@@ -54,7 +58,7 @@ jobs:
           node-version: '22'
       - run: pip install pytest numpy openpyxl xlrd beautifulsoup4 pymupdf
       - name: Balance identities, source guards and owner roster
-        run: python -m pytest -q _system/scripts/tests/test_commodity_models.py _system/scripts/tests/test_commodity_inputs.py _system/scripts/tests/test_commodity_free_sources.py _system/scripts/tests/test_source_backfill.py
+        run: python -m pytest -q _system/scripts/tests/test_commodity_models.py _system/scripts/tests/test_commodity_inputs.py _system/scripts/tests/test_commodity_free_sources.py _system/scripts/tests/test_source_backfill.py _system/scripts/tests/test_company_filings.py
       - name: Company scope, valuation expiry and UI contracts
         run: node --test _system/scripts/tests/test_research_desk_ui.cjs _system/scripts/tests/test_buyback_radar_ui.cjs
       - name: Validate published context models

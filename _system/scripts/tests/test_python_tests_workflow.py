@@ -151,3 +151,35 @@ def test_private_architecture_inputs_are_restored_before_the_suite():
     assert restore < suite
     assert "dashboard/private-assets.json" in sparse_entries()
     assert job["env"]["RESEARCH_VAULT_CLONE_TOKEN"] == "${{ secrets.RESEARCH_VAULT_CLONE_TOKEN }}"
+
+
+def test_fixture_checkout_omits_only_the_large_extraction_archive(tmp_path):
+    import re
+    import subprocess
+
+    action = yaml.safe_load((ROOT / ".github/actions/checkout-vault/action.yml").read_text(encoding="utf-8"))
+    assert action["inputs"]["include-source-archive"]["default"] == "true"
+    checkout = next(s for s in action["runs"]["steps"] if str(s.get("uses", "")).startswith("actions/checkout"))
+    assert "blob:none" in checkout["with"]["filter"]
+    patterns = re.findall(r"&& '([^']+)'", checkout["with"]["sparse-checkout"])
+    assert patterns
+    for name in ("hub-payloads", "unit-tests"):
+        restore = next(s for s in load()["jobs"][name]["steps"] if s.get("uses") == "./.github/actions/checkout-vault")
+        assert restore["with"]["include-source-archive"] == "false"
+
+    preserved = ["dashboard-private/objects/snapshot", "dashboard-private/originals/filing.pdf", "dashboard-private/commodity-inputs/source.json", "superinvestor-letters/fund/letter.md"]
+    archived = "dashboard-private/company-source-backfill-v2/part.zip"
+    for relative in [*preserved, archived]:
+        path = tmp_path / relative
+        path.parent.mkdir(parents=True, exist_ok=True)
+        path.write_text("fixture", encoding="utf-8")
+
+    def git(*args, **kwargs):
+        return subprocess.run(["git", "-C", str(tmp_path), *args], check=True, capture_output=True, **kwargs)
+
+    git("init")
+    git("add", ".")
+    git("-c", "user.name=Fixture", "-c", "user.email=fixture@example.invalid", "commit", "-m", "fixture")
+    git("sparse-checkout", "set", "--no-cone", "--stdin", input=("\n".join(patterns) + "\n").encode())
+    assert all((tmp_path / path).is_file() for path in preserved)
+    assert not (tmp_path / archived).exists()

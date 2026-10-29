@@ -21,6 +21,19 @@ def test_exchange_totals_units_date_and_regional_identity():
         copper_weekly(text.replace('(TM)', '(short tons)'))
 
 
+def test_reviewed_ocr_is_bound_to_original_bytes_and_publication_date(monkeypatch):
+    import commodity_free_sources as sources
+    from commodity_common import digest
+    raw=b'original scanned report'
+    monkeypatch.setattr(sources,'pdf_text',lambda data:'Reporte al viernes 23 de octubre de 2026')
+    text='Reporte al viernes 23 de octubre de 2026\nStock Actual (TM)\nBML-Londres\n273.750\nCOMEX-EE.UU\n723.791\nSHFE-Shanghai\n54.356\nTOTAL GLOBAL\n1.051.897\n'
+    review={'review_status':'visually_verified','source_sha256':digest(raw),'text_sha256':digest(text),'text':text,'period':'2026-10-23'}
+    assert sources.copper_publication(raw,review)['extraction_method']=='reviewed_ocr'
+    with pytest.raises(ValueError,match='checksum'):sources.copper_publication(b'changed original',review)
+    with pytest.raises(ValueError,match='date'):sources.copper_publication(raw,{**review,'period':'2026-10-22'})
+    with pytest.raises(ValueError):sources.copper_publication(raw,{**review,'review_status':'unreviewed'})
+
+
 def test_monthly_missing_exchange_is_unknown_not_zero():
     import openpyxl
     b = openpyxl.Workbook(); s = b.active

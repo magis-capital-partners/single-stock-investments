@@ -26,7 +26,7 @@ from build_company_research import ROOT, IGNORE_NAMES, load, read_companies, wri
 def complete_cache(cached, suffix):
     if cached.get('status') != 'indexed' or not cached.get('text'):
         return False
-    required = {'.pdf': 'pages', '.epub': 'chapters'}.get(suffix)
+    required = {'.pdf': 'pages', '.crdownload': 'pages', '.epub': 'chapters'}.get(suffix)
     return not required or bool(cached.get('extraction', {}).get(required))
 
 
@@ -42,8 +42,8 @@ def preserve_outcome(cache, job, status, result, error):
         if not revision or revision in {'unknown','discover'}:return
         target=cache/'drive'/(digest(payload['id']+revision)+'.json')
     prior=load(target)
-    if not prior:
-        write(target,{'version':1,'text':'','status':status,'attempted_at':time.time(),'error':error})
+    if not prior.get('text'):
+        write(target,{**prior,'version':1,'text':'','status':status,'attempted_at':time.time(),'error':error})
 
 
 def audit_cache(queue, cache):
@@ -52,7 +52,7 @@ def audit_cache(queue, cache):
     for row in queue.db.execute("SELECT key,kind,payload,result FROM jobs WHERE status='indexed' AND kind IN ('git','drive')"):
         payload = json.loads(row['payload'])
         suffix = Path(payload.get('path') or payload.get('title') or '').suffix.lower()
-        if suffix not in {'.pdf', '.epub'}:
+        if suffix not in {'.pdf', '.crdownload', '.epub'}:
             continue
         result = json.loads(row['result'] or '{}')
         name = Path(result.get('cache', '').replace('\\', '/')).name
@@ -80,6 +80,24 @@ def transcript_for(path, vault):
 
 
 def extract_complete(data, suffix, *, ocr=False):
+    if not data.strip():
+        return '', 'empty_source', {'reason':'Original contains no bytes or only whitespace'}
+    if suffix == '.crdownload':
+        # Some imported originals retained Chrome's temporary filename. Only a
+        # complete, unrepaired PDF qualifies; never call a truncated download indexed.
+        if not data.startswith(b'%PDF'):
+            return '', 'unsupported', {'reason':'Download is not a readable PDF original'}
+        if not data.rstrip().endswith(b'%%EOF'):
+            return '', 'failed', {'reason':'Incomplete PDF download; publisher original required'}
+        import fitz
+        try:
+            with fitz.open(stream=data,filetype='pdf') as pdf:
+                if pdf.is_repaired:
+                    return '', 'failed', {'reason':'Damaged PDF download; publisher original required'}
+        except Exception as exc:
+            return '', 'failed', {'error':type(exc).__name__}
+        text,status,details=extract_complete(data,'.pdf',ocr=ocr)
+        return text,status,{**details,'original_format':'crdownload','integrity':'Complete unrepaired PDF'}
     if suffix == '.epu':
         suffix = '.epub'
     if suffix in {'.py', '.r', '.sql'}:
@@ -393,7 +411,7 @@ class Worker:
             details={'transcript_kind':'automatic','review_status':'unreviewed'}
         else:
             text,status,details=extract_complete(data,suffix,ocr=self.ocr)
-        if status=='awaiting_extraction':status='empty_source' if not data else 'failed'
+        if status=='awaiting_extraction':status='empty_source' if not data.strip() else 'failed'
         if status=='awaiting_transcript':status='needs_transcript'
         md5=hashlib.md5(data,usedforsecurity=False).hexdigest()
         write(target,{'version':1,'text':text,'status':status,'attempted_at':time.time(),'content_sha256':digest(data),'content_md5':md5,'extraction':details})
