@@ -11,6 +11,7 @@ from __future__ import annotations
 
 import argparse
 import json
+import re
 import sys
 from pathlib import Path
 
@@ -39,6 +40,7 @@ def audit() -> dict:
     meta_status: dict[str, int] = {}
     meta_basis: dict[str, int] = {}
     meta_errors: dict[str, list[str]] = {}
+    meta_recordings: dict[str, str] = {}
     if vault:
         for path in (vault / "episodes").rglob("*.meta.json"):
             doc = load_json(path)
@@ -47,6 +49,7 @@ def audit() -> dict:
                 continue
             summary = doc.get("reader_summary") if isinstance(doc.get("reader_summary"), dict) else {}
             meta_by_id[eid] = summary
+            meta_recordings[eid] = str(doc.get('enclosure_hash') or '')
             _count(meta_status, str(summary.get("status") or "missing"))
             _count(meta_basis, str(summary.get("source_basis") or "missing"))
             errors = reader_summary_errors(summary) if summary else ["missing reader_summary"]
@@ -55,11 +58,15 @@ def audit() -> dict:
 
     catalog = load_json(vault / "insights.json") if vault else {}
     catalog_by_id: dict[str, dict] = {}
+    canonical_recordings: dict[str, set[str]] = {}
     for ep in catalog.get("episodes") or []:
         if isinstance(ep, dict) and ep.get("episode_id"):
             catalog_by_id[str(ep["episode_id"])] = (
                 ep.get("reader_summary") if isinstance(ep.get("reader_summary"), dict) else {}
             )
+            recording = str(ep.get('enclosure_hash') or '')
+            if recording:
+                canonical_recordings.setdefault(recording, set()).add(str(ep['episode_id']))
 
     dashboard_path = ROOT / "dashboard" / "data" / "insights" / "podcasts.json"
     dashboard = load_json(dashboard_path)
@@ -80,13 +87,22 @@ def audit() -> dict:
                 )
 
     all_ids = set(meta_by_id) | set(catalog_by_id) | set(index_by_id) | set(shard_by_id)
+    # The catalog deduplicates the same audio recording under multiple feed
+    # IDs. Only a source-only ID with exactly one retained recording match is
+    # an alias. Every unique source and every actually served ID remains gated.
+    source_only = set(meta_by_id) - (set(catalog_by_id) | set(index_by_id) | set(shard_by_id))
+    aliases = {}
+    for eid in sorted(source_only):
+        retained = canonical_recordings.get(meta_recordings[eid]) or set()
+        if re.fullmatch(r'[0-9a-f]{40}', meta_recordings[eid]) and len(retained) == 1:
+            aliases[eid] = next(iter(retained))
 
     def missing_from(source: dict[str, dict]) -> list[str]:
         return sorted(eid for eid in all_ids if not source.get(eid))
 
     published_missing = sorted(
         eid
-        for eid in all_ids
+        for eid in all_ids - set(aliases)
         if not (index_by_id.get(eid) or {}).get("summary_preview")
         or not (index_by_id.get(eid) or {}).get("summary_source_label")
         or not shard_by_id.get(eid)
@@ -104,6 +120,7 @@ def audit() -> dict:
 
     return {
         "episodes": len(all_ids),
+        "deduplicated_aliases": aliases,
         "meta": {
             "with_reader_summary": sum(1 for s in meta_by_id.values() if s),
             "missing": missing_from(meta_by_id)[:20],
@@ -192,6 +209,7 @@ def main() -> int:
             "basis "
             + ", ".join(f"{k}={v}" for k, v in sorted(report["meta"]["by_basis"].items()))
         )
+        print(f"verified duplicate recording aliases: {len(report['deduplicated_aliases'])}")
         for problem in problems:
             print(f"ERROR: {problem}")
         if not problems:
