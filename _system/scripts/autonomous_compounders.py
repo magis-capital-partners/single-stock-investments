@@ -719,7 +719,7 @@ def check(root=ROOT):
         # Active PV/IRR publication has moved to the full-universe shared lane.
         # Its separate --check verifies served rows after this historical source
         # collector completes; do not demand the retired UI fallback here.
-        if (core.get(ticker, {}).get('valuation_decision') or {}).get('calculation_status'):
+        if ticker not in core or (core.get(ticker, {}).get('valuation_decision') or {}).get('calculation_status'):
             continue
         served = read(root / 'dashboard/data/tickers' / shard_filename(ticker)).get('autonomous_irr')
         if served != row:

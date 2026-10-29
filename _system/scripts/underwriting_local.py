@@ -19,7 +19,8 @@ VAULT = 'magis-capital-partners/research-vault'
 
 
 def git(directory, *args, data=None, env=None):
-    return subprocess.check_output(['git', *args], cwd=directory, input=data, env=env, timeout=180)
+    return subprocess.check_output(['git', '-c', 'fetch.recurseSubmodules=false', '-c', 'submodule.recurse=false', *args],
+                                   cwd=directory, input=data, env=env, timeout=180)
 
 
 @contextmanager

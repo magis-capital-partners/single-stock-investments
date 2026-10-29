@@ -3,6 +3,8 @@ import json
 import sys
 from pathlib import Path
 
+import pytest
+
 sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 
 import autonomous_compounders as ac
@@ -44,3 +46,20 @@ def test_collection_discovers_new_report_without_waiting_for_ocf_tag(tmp_path, m
     result = ac.collect('F', {'download': {'cik': '37996'}}, '2026-10-28', tmp_path)
     assert result['latest_report']['period'] == '2026-06-30'
     assert result['latest_report']['filed'] == '2026-07-29'
+
+
+def test_archival_core_name_without_a_served_row_still_replays_its_source(tmp_path):
+    save(tmp_path, '_system/reference/core_compounders.json', {'tickers': ['MA', 'HEI']})
+    for ticker in ['MA', 'HEI']:
+        save(tmp_path, ac.INPUTS/(ticker+'.json'), inputs())
+    save(tmp_path, 'dashboard/data/core.json', {'tickers': [{'ticker': 'MA'}]})
+    save(tmp_path, 'dashboard/data/tickers/MA.json', {'ticker': 'MA'})
+    ac.run(tmp_path, '2026-10-26')
+    assert ac.check(tmp_path)['companies'] == 2
+    source = inputs()
+    for point in source['facts']:
+        if point['field'] == 'ocf':
+            point['value'] *= 100
+    save(tmp_path, ac.INPUTS/'HEI.json', source)
+    with pytest.raises(ValueError, match='HEI: estimate does not replay'):
+        ac.check(tmp_path)
