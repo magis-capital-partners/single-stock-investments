@@ -298,8 +298,8 @@ jobs:
         run: |
           bash _system/scripts/ci_dashboard_deploy_mode.sh
           echo "Deploy mode: $(cat "$GITHUB_OUTPUT")"
+      # The complete private research cache expands during every deploy mode.
       - uses: jlumbroso/free-disk-space@54081f138730dfa15788a46383842cd2f914a1be # v1.3.1
-        if: steps.mode.outputs.needs_disk_cleanup == 'true'
         with:
           tool-cache: false
           android: true

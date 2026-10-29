@@ -1,5 +1,6 @@
 """Portable compressed extraction cache, stored only in the private research vault."""
 import argparse
+from collections import defaultdict
 import hashlib
 import json
 from pathlib import Path
@@ -12,27 +13,49 @@ ROOT_FILES=('matches.json','index.json','drive-inventory.json','backfill-report.
 def pack(cache,destination):
     destination.mkdir(parents=True,exist_ok=True)
     parts=[];files=[];size=0
+    manifest=destination/'manifest.json'
+    previous=json.loads(manifest.read_text(encoding='utf-8')).get('parts',[]) if manifest.is_file() else []
+    reusable={p['input_sha256']:p for p in previous if p.get('input_sha256')}
     def flush():
         nonlocal files,size
         if not files:return
+        payload=[(p.relative_to(cache).as_posix(),p.read_bytes()) for p in files]
+        fingerprint=hashlib.sha256()
+        for name,data in payload:
+            fingerprint.update(name.encode()+b'\0'+hashlib.sha256(data).digest())
+        signature=fingerprint.hexdigest();prior=reusable.get(signature)
+        if prior:
+            path=destination/prior['file']
+            if path.parent.resolve()==destination.resolve() and path.is_file() and hashlib.sha256(path.read_bytes()).hexdigest()==prior['sha256']:
+                parts.append(prior);files=[];size=0;return
         temporary=destination/'building.zip'
         with zipfile.ZipFile(temporary,'w',zipfile.ZIP_DEFLATED,compresslevel=6) as z:
-            for p in files:
-                info=zipfile.ZipInfo(p.relative_to(cache).as_posix());info.compress_type=zipfile.ZIP_DEFLATED
-                z.writestr(info,p.read_bytes())
+            for name,data in payload:
+                info=zipfile.ZipInfo(name);info.compress_type=zipfile.ZIP_DEFLATED
+                z.writestr(info,data)
         sha=hashlib.sha256(temporary.read_bytes()).hexdigest();name=sha+'.zip'
         target=destination/name
-        if target.exists():temporary.unlink()
+        if target.exists() and hashlib.sha256(target.read_bytes()).hexdigest()==sha:temporary.unlink()
         else:temporary.replace(target)
-        parts.append({'file':name,'sha256':sha,'files':len(files)});files=[];size=0
+        parts.append({'file':name,'sha256':sha,'files':len(files),'input_sha256':signature});files=[];size=0
     paths=[cache/name for name in ROOT_FILES]
     for folder in FOLDERS:paths.extend(sorted((cache/folder).rglob('*')))
+    # Keep unrelated source buckets stable when inventory metadata or one
+    # document changes. A rolling archive over the whole cache can otherwise
+    # rewrite gigabytes of unchanged parts after a small insertion.
+    buckets=defaultdict(list)
     for path in paths:
         if not path.is_file() or path.suffix not in {'.json','.txt','.md'}:continue
-        if size+path.stat().st_size>32_000_000:flush()
-        if path.stat().st_size>90_000_000:raise ValueError('Oversized extraction cache entry')
-        files.append(path);size+=path.stat().st_size
-    flush()
+        relative=path.relative_to(cache)
+        bucket=(relative.parts[0],path.stem[:2]) if len(relative.parts)>1 else ('root',relative.name)
+        buckets[bucket].append(path)
+    for bucket in sorted(buckets):
+        for path in sorted(buckets[bucket]):
+            length=path.stat().st_size
+            if size+length>32_000_000:flush()
+            if length>90_000_000:raise ValueError('Oversized extraction cache entry')
+            files.append(path);size+=length
+        flush()
     (destination/'manifest.json').write_text(json.dumps({'schema_version':1,'parts':parts},indent=2)+'\n',encoding='utf-8')
     # Old immutable parts may belong to another publication; leave retention to
     # the private vault owner. Only manifest-listed parts are restored.

@@ -101,7 +101,7 @@ runs:
         python -m pip install --disable-pip-version-check pypdf pymupdf xlrd google-api-python-client google-auth legacy-doc mobi
         python _system/scripts/company_source_cache.py restore \
           --cache "$RESEARCH_VAULT_ROOT/dashboard-private/company-research-cache" \
-          --archive "$RESEARCH_VAULT_ROOT/dashboard-private/company-source-backfill"
+          --archive "$RESEARCH_VAULT_ROOT/dashboard-private/company-source-backfill-v2"
         python _system/scripts/build_company_research.py \
           --vault "${RESEARCH_VAULT_ROOT:-_external/research-vault}" \
           --cache "${RESEARCH_VAULT_ROOT:-_external/research-vault}/dashboard-private/company-research-cache" \
@@ -276,7 +276,7 @@ runs:
           echo "Portfolio owner login maps are not fully provisioned; paper order entry stays fail-closed."
         fi
         # An address in BOTH owner maps is a configuration error that
-        # portfolioOrderOwner() raises on — but only at request time, which means
+        # portfolioOrderOwner() raises on â€” but only at request time, which means
         # the first person to find it is the operator who cannot place an order.
         # Catch it here instead. Prints no addresses: these are secrets, and the
         # count is enough to act on.

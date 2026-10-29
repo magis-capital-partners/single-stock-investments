@@ -38,6 +38,15 @@ jobs:
       - uses: actions/setup-python@v5
         with:
           python-version: '3.12'
+      - name: Make room for the complete private source archive
+        uses: jlumbroso/free-disk-space@54081f138730dfa15788a46383842cd2f914a1be # v1.3.1
+        with:
+          tool-cache: false
+          android: true
+          dotnet: true
+          haskell: true
+          docker-images: true
+          swap-storage: true
       - uses: ./.github/actions/checkout-vault
         with:
           hydrate: 'false'
@@ -45,8 +54,9 @@ jobs:
       - name: Install scan language data
         if: inputs.recover_scans
         run: sudo apt-get update && sudo apt-get install -y tesseract-ocr-eng tesseract-ocr-jpn tesseract-ocr-chi-sim
+      # Isolate the complete archive from older jobs with narrower cache schemas.
       - name: Restore private extraction results
-        run: python _system/scripts/company_source_cache.py restore --cache _private/company-research/cache --archive "$RESEARCH_VAULT_ROOT/dashboard-private/company-source-backfill"
+        run: python _system/scripts/company_source_cache.py restore --cache _private/company-research/cache --archive "$RESEARCH_VAULT_ROOT/dashboard-private/company-source-backfill-v2"
       - name: Resume bounded extraction
         env:
           BUDGET: ${{ inputs.seconds }}
@@ -76,9 +86,9 @@ jobs:
           python _system/scripts/backfill_company_sources.py --skip-seed --only-status needs_transcript --transcribe --seconds 600
       - name: Save private checkpoint and results
         if: always()
-        run: python _system/scripts/company_source_cache.py pack --cache _private/company-research/cache --archive "$RESEARCH_VAULT_ROOT/dashboard-private/company-source-backfill"
+        run: python _system/scripts/company_source_cache.py pack --cache _private/company-research/cache --archive "$RESEARCH_VAULT_ROOT/dashboard-private/company-source-backfill-v2"
       - uses: ./.github/actions/commit-vault
         if: always()
         with:
           message: Preserve resumable company source backfill
-          git_add: --force dashboard-private/company-source-backfill
+          git_add: --force dashboard-private/company-source-backfill-v2

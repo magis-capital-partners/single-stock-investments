@@ -231,3 +231,34 @@ def test_temporary_download_name_requires_an_intact_pdf():
     assert details['pages']==1 and details['integrity']=='Complete unrepaired PDF'
     assert extract_complete(raw[:-40],'.crdownload')[1]=='failed'
     assert extract_complete(b'not a PDF','.crdownload')[1]=='unsupported'
+
+
+def test_cache_inventory_changes_do_not_reupload_unrelated_originals(tmp_path):
+    cache=tmp_path/'cache';(cache/'git').mkdir(parents=True)
+    (cache/'git/aa01.json').write_text('{"text":"first original"}')
+    (cache/'git/bb01.json').write_text('{"text":"second original"}')
+    (cache/'index.json').write_text('{"generated_at":"before"}')
+    archive=tmp_path/'archive';pack(cache,archive)
+    before={p['file'] for p in json.loads((archive/'manifest.json').read_text())['parts']}
+    (cache/'index.json').write_text('{"generated_at":"a different metadata length"}')
+    pack(cache,archive)
+    after={p['file'] for p in json.loads((archive/'manifest.json').read_text())['parts']}
+    assert len(before & after)==2
+    restored=tmp_path/'restored';restore(archive,restored)
+    assert json.loads((restored/'index.json').read_text())['generated_at']=='a different metadata length'
+    assert (restored/'git/aa01.json').read_bytes()==(cache/'git/aa01.json').read_bytes()
+
+
+def test_unchanged_archive_reuses_verified_parts_and_repairs_corruption(tmp_path,monkeypatch):
+    import company_source_cache as module
+    cache=tmp_path/'cache';(cache/'git').mkdir(parents=True)
+    (cache/'git/aa.json').write_text('{"text":"complete original"}')
+    archive=tmp_path/'archive';pack(cache,archive)
+    original=module.zipfile.ZipFile
+    def should_not_compress(*args,**kwargs):raise AssertionError('Unchanged original was recompressed')
+    with monkeypatch.context() as patch:
+        patch.setattr(module.zipfile,'ZipFile',should_not_compress)
+        assert pack(cache,archive)['files']==1
+    part=next(archive.glob('*.zip'));part.write_bytes(b'corrupted archive')
+    pack(cache,archive);restore(archive,tmp_path/'restored')
+    assert (tmp_path/'restored/git/aa.json').read_bytes()==(cache/'git/aa.json').read_bytes()
