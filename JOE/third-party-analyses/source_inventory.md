@@ -1,6 +1,6 @@
 # JOE — Third-party source inventory
 
-**Date:** 2026-10-11
+**Date:** 2026-10-27
 **Sources:** 147 total (0 approved, 0 pending, 147 context)
 
 | ID | Title | Path | Status | Use |
@@ -153,4 +153,4 @@
 | activist_long | acc0001104659 26 061171 | `JOE/third-party-analyses/activist_reports/long/8-K_20260514_acc0001104659_26_061171.htm` | context | activist/long — local |
 | activist_long | acc0001104659 26 088142 | `JOE/third-party-analyses/activist_reports/long/8-K_20260729_acc0001104659_26_088142.htm` | context | activist/long — local |
 
-Cross-check required: `JOE/research/cross_check_third_party_2026-10-11.md`
+Cross-check required: `JOE/research/cross_check_third_party_2026-10-27.md`

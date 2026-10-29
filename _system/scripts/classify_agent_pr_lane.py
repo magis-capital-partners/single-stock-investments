@@ -5,8 +5,11 @@ A cursor branch that touches a ticker research tree stays on the research
 lane. The provenance gate then requires a research manifest or committee
 packet, so a research diff that forgot those artifacts still fails closed.
 A cursor branch that does not touch ticker research is a code change and
-must pass every CI check. ``_system/research`` is the control plane, not a
-ticker packet. codex and claude branches are always code.
+must pass every CI check. ``kpi_ledger.json`` and ``book_estimate.json`` are
+mechanical refreshes, not a deep dive or a committee packet, so they stay
+on the code lane unless the same diff also touches another research file.
+``_system/research`` is the control plane, not a ticker packet. codex and
+claude branches are always code.
 
 A grok branch (``grok/<desk>/<yyyy-mm-dd>-<slug>``) is a desk bot. When every
 changed path is on the bot data allowlist it is a ``data`` PR: the data guard
@@ -28,12 +31,25 @@ except ImportError:  # an old branch head without the guard: grok PRs are code
     is_allowlisted = None  # type: ignore[assignment]
 
 
+# Refreshed by scripts. A cursor diff that only touches these, plus code,
+# is a ledger fix and uses the code lane. Any other research path in the
+# same diff still selects the research lane.
+MECHANICAL_RESEARCH_FILES = frozenset({
+    "kpi_ledger.json",
+    "book_estimate.json",
+})
+
+
 def is_ticker_research(path: str) -> bool:
     """True for ``{TICKER}/research/...``, not ``_system/research/...``."""
     if path.startswith("_system/") or path.startswith("."):
         return False
     parts = path.split("/")
-    return len(parts) >= 3 and parts[1] == "research"
+    if len(parts) < 3 or parts[1] != "research":
+        return False
+    if len(parts) == 3 and parts[-1] in MECHANICAL_RESEARCH_FILES:
+        return False
+    return True
 
 
 def classify(head_ref: str, files: list[str]) -> str:

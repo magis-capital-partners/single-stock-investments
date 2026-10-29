@@ -142,6 +142,40 @@ def test_a_conid_that_disagrees_with_the_declared_sec_type_is_refused():
     assert "is a OPT, not the STK" in update["reject_reason"]
 
 
+class _RecordingService(_Service):
+    def __init__(self, broker):
+        super().__init__(broker)
+        self.created = []
+
+    def create(self, intent, **_):
+        self.created.append(intent)
+        raise AssertionError("nothing may be drafted for an etf-0dte contract")
+
+
+@pytest.mark.parametrize("sec_type,identity", [
+    ("STK", {"symbol": "SPY", "sec_type": "STK", "local_symbol": "SPY", "exchange": "ARCA"}),
+    ("STK", {"symbol": "QQQ", "sec_type": "STK", "local_symbol": "QQQ", "exchange": "NASDAQ"}),
+    ("OPT", {"symbol": "SPY", "sec_type": "OPT", "local_symbol": "SPY   261027C00580000", "trading_class": "SPY",
+             "strike": 580.0, "right": "C", "expiry": "20261027", "multiplier": "100"}),
+])
+def test_a_spy_or_qqq_ticket_is_refused_before_anything_is_drafted(sec_type, identity):
+    """etf-0dte's options and delivered shares are never the hub's to ticket.
+
+    The reduce-only check reads the account-wide position, so a hub SELL of SPY
+    would pass against an overnight delivery and sell it out from under the
+    09:30 unwind. The refusal is judged on IBKR's identity, not on the form, and
+    the paper route is refused just like live.
+    """
+    service = _RecordingService(PaperOrderBroker(_quotes, contracts={907480285: identity}))
+    channel = _Channel(requests=[_option_row(sec_type=sec_type, owner="michael", action="SELL")])
+    OrderCommandLoop(service, channel, account_alias="U123", live_enabled=False, options_enabled=True).tick()
+    assert service.created == []
+    [(_, update)] = channel.published
+    assert update["state"] == "rejected"
+    assert "etf-0dte" in update["reject_reason"]
+    assert identity["symbol"] in update["reject_reason"]
+
+
 # ------------------------------------------------------------ lookup pumping
 
 def test_lookups_are_resolved_and_published():

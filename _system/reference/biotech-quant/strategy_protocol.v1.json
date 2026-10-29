@@ -1,0 +1,47 @@
+{
+  "authority": "research_and_paper_only",
+  "costs": {
+    "hedge_borrow_apr": 0.03,
+    "one_way_bps": 25,
+    "stock_borrow": "observed_only"
+  },
+  "factors": {
+    "specialist_consensus": 0.5,
+    "spend_value": 0.5
+  },
+  "hypothesis": "Specialist ownership and spend value improve diversified biotech selection after costs.",
+  "id": "biotech-baseline-v1",
+  "max_age_days": {
+    "insider_non_ceo": 100,
+    "peer_momentum": 45,
+    "short_interest": 45,
+    "specialist_consensus": 200,
+    "spend_value": 180
+  },
+  "optional_experiments": [
+    "insider_non_ceo",
+    "peer_momentum",
+    "short_interest"
+  ],
+  "portfolio": {
+    "capital": 100000,
+    "hedge": "XBI",
+    "max_name_weight": 0.04,
+    "max_names": 25,
+    "rebalance": "monthly",
+    "selection_fraction": 0.2
+  },
+  "required": [
+    "specialist_consensus",
+    "spend_value"
+  ],
+  "status": "research",
+  "validation": {
+    "maximum_drawdown": 0.3,
+    "maximum_variants": 12,
+    "minimum_forward_days": 90,
+    "minimum_validation_months": 12,
+    "minimum_years": 5,
+    "net_excess_return_minimum": 0
+  }
+}

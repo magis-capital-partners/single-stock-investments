@@ -1,6 +1,6 @@
 # LCID — Third-party source inventory
 
-**Date:** 2026-10-11
+**Date:** 2026-10-27
 **Sources:** 139 total (0 approved, 0 pending, 139 context)
 
 | ID | Title | Path | Status | Use |
@@ -21,10 +21,6 @@
 | activist_long | Elliott Management — DEFA14A | `LCID/third-party-analyses/activist_reports/long/DEFA14A_20230313_acc0001104659_23_031537.htm` | context | activist/long — sec_edgar |
 | activist_long | acc0001628280 26 041205 | `LCID/third-party-analyses/activist_reports/long/8-K_20260605_acc0001628280_26_041205.htm` | context | activist/long — local |
 | activist_long | acc0001628280 25 029985 | `LCID/third-party-analyses/activist_reports/long/8-K_20250606_acc0001628280_25_029985.htm` | context | activist/long — local |
-| activist_long | acc0001104659 24 069080 | `LCID/third-party-analyses/activist_reports/long/8-K_20240606_acc0001104659_24_069080.htm` | context | activist/long — local |
-| activist_long | acc0001104659 23 049685 | `LCID/third-party-analyses/activist_reports/long/8-K_20230425_acc0001104659_23_049685.htm` | context | activist/long — local |
-| activist_long | acc0001104659 22 070525 | `LCID/third-party-analyses/activist_reports/long/8-K_20220613_acc0001104659_22_070525.htm` | context | activist/long — local |
-| activist_long | acc0001104659 21 095842 | `LCID/third-party-analyses/activist_reports/long/8-K_20210726_acc0001104659_21_095842.htm` | context | activist/long — local |
 | activist_long | acc0001104659 20 090379 | `LCID/third-party-analyses/activist_reports/long/8-K_20200804_acc0001104659_20_090379.htm` | context | activist/long — local |
 | activist_long | acc0001104659 20 092126 | `LCID/third-party-analyses/activist_reports/long/8-K_20200807_acc0001104659_20_092126.htm` | context | activist/long — local |
 | activist_long | acc0000950142 20 002250 | `LCID/third-party-analyses/activist_reports/long/8-K_20200917_acc0000950142_20_002250.htm` | context | activist/long — local |
@@ -38,6 +34,7 @@
 | activist_long | acc0001104659 21 085486 | `LCID/third-party-analyses/activist_reports/long/8-K_20210625_acc0001104659_21_085486.htm` | context | activist/long — local |
 | activist_long | acc0001104659 21 090481 | `LCID/third-party-analyses/activist_reports/long/8-K_20210709_acc0001104659_21_090481.htm` | context | activist/long — local |
 | activist_long | acc0001104659 21 092504 | `LCID/third-party-analyses/activist_reports/long/8-K_20210715_acc0001104659_21_092504.htm` | context | activist/long — local |
+| activist_long | acc0001104659 21 095842 | `LCID/third-party-analyses/activist_reports/long/8-K_20210726_acc0001104659_21_095842.htm` | context | activist/long — local |
 | activist_long | acc0001104659 21 113635 | `LCID/third-party-analyses/activist_reports/long/8-K_20210908_acc0001104659_21_113635.htm` | context | activist/long — local |
 | activist_long | acc0000950103 21 014319 | `LCID/third-party-analyses/activist_reports/long/8-K_20210921_acc0000950103_21_014319.htm` | context | activist/long — local |
 | activist_long | acc0001104659 21 120301 | `LCID/third-party-analyses/activist_reports/long/8-K_20210928_acc0001104659_21_120301.htm` | context | activist/long — local |
@@ -55,6 +52,7 @@
 | activist_long | acc0001104659 22 050370 | `LCID/third-party-analyses/activist_reports/long/8-K_20220426_acc0001104659_22_050370.htm` | context | activist/long — local |
 | activist_long | acc0001628280 22 012646 | `LCID/third-party-analyses/activist_reports/long/8-K_20220505_acc0001628280_22_012646.htm` | context | activist/long — local |
 | activist_long | acc0001104659 22 067703 | `LCID/third-party-analyses/activist_reports/long/8-K_20220602_acc0001104659_22_067703.htm` | context | activist/long — local |
+| activist_long | acc0001104659 22 070525 | `LCID/third-party-analyses/activist_reports/long/8-K_20220613_acc0001104659_22_070525.htm` | context | activist/long — local |
 | activist_long | acc0001104659 22 071262 | `LCID/third-party-analyses/activist_reports/long/8-K_20220615_acc0001104659_22_071262.htm` | context | activist/long — local |
 | activist_long | acc0001628280 22 020599 | `LCID/third-party-analyses/activist_reports/long/8-K_20220803_acc0001628280_22_020599.htm` | context | activist/long — local |
 | activist_long | acc0001104659 22 107954 | `LCID/third-party-analyses/activist_reports/long/8-K_20221012_acc0001104659_22_107954.htm` | context | activist/long — local |
@@ -70,6 +68,7 @@
 | activist_long | acc0001104659 23 028423 | `LCID/third-party-analyses/activist_reports/long/8-K_20230303_acc0001104659_23_028423.htm` | context | activist/long — local |
 | activist_long | acc0001104659 23 037708 | `LCID/third-party-analyses/activist_reports/long/8-K_20230328_acc0001104659_23_037708.htm` | context | activist/long — local |
 | activist_long | acc0001104659 23 045027 | `LCID/third-party-analyses/activist_reports/long/8-K_20230413_acc0001104659_23_045027.htm` | context | activist/long — local |
+| activist_long | acc0001104659 23 049685 | `LCID/third-party-analyses/activist_reports/long/8-K_20230425_acc0001104659_23_049685.htm` | context | activist/long — local |
 | activist_long | acc0001104659 23 054825 | `LCID/third-party-analyses/activist_reports/long/8-K_20230502_acc0001104659_23_054825.htm` | context | activist/long — local |
 | activist_long | acc0001628280 23 016400 | `LCID/third-party-analyses/activist_reports/long/8-K_20230508_acc0001628280_23_016400.htm` | context | activist/long — local |
 | activist_long | acc0001104659 23 066270 | `LCID/third-party-analyses/activist_reports/long/8-K_20230531_acc0001104659_23_066270.htm` | context | activist/long — local |
@@ -93,6 +92,7 @@
 | activist_long | acc0001104659 24 045021 | `LCID/third-party-analyses/activist_reports/long/8-K_20240409_acc0001104659_24_045021.htm` | context | activist/long — local |
 | activist_long | acc0001628280 24 020614 | `LCID/third-party-analyses/activist_reports/long/8-K_20240506_acc0001628280_24_020614.htm` | context | activist/long — local |
 | activist_long | acc0001104659 24 064914 | `LCID/third-party-analyses/activist_reports/long/8-K_20240524_acc0001104659_24_064914.htm` | context | activist/long — local |
+| activist_long | acc0001104659 24 069080 | `LCID/third-party-analyses/activist_reports/long/8-K_20240606_acc0001104659_24_069080.htm` | context | activist/long — local |
 | activist_long | acc0001104659 24 078210 | `LCID/third-party-analyses/activist_reports/long/8-K_20240708_acc0001104659_24_078210.htm` | context | activist/long — local |
 | activist_long | acc0001628280 24 034724 | `LCID/third-party-analyses/activist_reports/long/8-K_20240805_acc0001628280_24_034724.htm` | context | activist/long — local |
 | activist_long | acc0001628280 24 034728 | `LCID/third-party-analyses/activist_reports/long/8-K_20240805_acc0001628280_24_034728.htm` | context | activist/long — local |
@@ -145,4 +145,4 @@
 | activist_long | acc0001628280 26 064910 | `LCID/third-party-analyses/activist_reports/long/8-K_20261005_acc0001628280_26_064910.htm` | context | activist/long — local |
 | activist_long | acc0001628280 26 065525 | `LCID/third-party-analyses/activist_reports/long/8-K_20261009_acc0001628280_26_065525.htm` | context | activist/long — local |
 
-Cross-check required: `LCID/research/cross_check_third_party_2026-10-11.md`
+Cross-check required: `LCID/research/cross_check_third_party_2026-10-27.md`

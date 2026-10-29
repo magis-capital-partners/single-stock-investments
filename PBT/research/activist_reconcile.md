@@ -1,16 +1,27 @@
 # PBT — Activist reconciliation (Milly mechanical)
 
-**Date:** 2026-10-01
-**Reports processed:** 3
-**Human review:** 0
+**Date:** 2026-10-25
+**Reports processed:** 1
+**Human review:** 1
 
 ## Summary
 
 | Firm | Side | Date | Class | Triage | Verdict | Path |
 |------|------|------|-------|--------|---------|------|
-| SoftVest Advisors, LLC | long | 2026-05-18 | activist_13d | auto_context | context | `PBT/third-party-analyses/activist_reports/long/SC-13D/A_20260518_acc0001104659_26_063048.xml` |
-| SoftVest Advisors, LLC | long | 2025-10-10 | activist_13d | auto_context | context | `PBT/third-party-analyses/activist_reports/long/SC-13D/A_20251010_acc0001104659_25_098799.xml` |
-| SoftVest Advisors, LLC | long | 2025-10-10 | activist_13d | auto_context | context | `PBT/third-party-analyses/activist_reports/long/SC-13D_20251010_acc0001104659_25_098559.xml` |
+| Unresolved SEC filer | long | 2026-10-23 | activist_proxy | human_review | needs_human | `PBT/third-party-analyses/activist_reports/long/DEFN14A_20261023_acc0001213900_26_112106.htm` |
+
+## Notes (human review)
+
+**Unresolved SEC filer** (2026-10-23): <DOCUMENT>
+<TYPE>DEFN14A
+<SEQUENCE>1
+<FILENAME>ea0309484-01.htm
+<DESCRIPTION>PROXY STATEMENT
+<TEXT>
+<HTML>
+<HEAD><TITLE></TITLE></HEAD>
+<BODY STYLE="margin:0;padding:0;border-width:0;text-justify-trim: punctuation; margin: 0; padding: 10pt;"><DIV STYLE="margin:0;padding:0;border-…
+
 ## [HUMAN REVIEW]
 
 - Confirm activist 13D intent vs passive 13G before stance changes.

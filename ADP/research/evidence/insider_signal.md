@@ -1,28 +1,24 @@
-# ADP — Insider conviction (2026-10-19)
+# ADP — Insider conviction (2026-09-04)
 
 > Context only. Insider activity informs scenario confidence and stance discussion; it does not auto-inflate Lawrence base IRR. Promotion requires [HUMAN REVIEW].
 
-**ICS:** 9.73 (exceptional) · **Bull case support:** moderate
+**ICS:** 1.62 (negligible) · **Bull case support:** none
 
 | Scenario | Prior weight | Tilted weight |
 |----------|--------------|---------------|
-| Bear | 20% | 20% |
-| Base | 55% | 41% |
-| Bull | 25% | 39% |
+| Bear | 20% | 25% |
+| Base | 55% | 50% |
+| Bull | 25% | 25% |
 
 | Insider | Date | Shares | Price | Value | Contrib |
 |---------|------|--------|-------|-------|---------|
 | SWAN ROBERT HOLMES | 2026-05-07 | 3619 | $206.05 | $745694.95 | 1.721 |
-| Kwon David | 2026-08-20 | 967 | $169.84 | $164235.28 | 1.469 |
-| Kwon David | 2026-07-30 | 887 | $138.53 | $122876.11 | 1.197 |
-| Kwon David | 2026-01-06 | 1137 | $138.53 | $157508.61 | 1.12 |
-| Kwon David | 2026-07-31 | 250 | $138.53 | $34632.5 | 0.866 |
 
 **Routine / planned sales (context):**
 
-- Rodriguez Carlos A: 13471 @ $283.49 on 2026-09-01
-- Hadley Peter J: 1650 @ $283.49 on 2026-09-01
-- Orihuela Samantha D: 154 @ $283.49 on 2026-09-01
+- DeSilva Joseph: 631 @ $282.87 on 2026-09-03 (10b5-1)
+- Foskett David: 1529 @ $283.0 on 2026-09-02 (10b5-1)
+- DeSilva Joseph: 6512 @ $283.0 on 2026-09-02 (10b5-1)
 
 Source: `_system/reference/market-data/insider/ADP_transactions.csv`.
 Lawrence base IRR unchanged (`in_base_irr: False`).

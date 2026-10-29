@@ -1,4 +1,4 @@
-# AMR — Insider conviction (2026-10-19)
+# AMR — Insider conviction (2026-09-08)
 
 > Context only. Insider activity informs scenario confidence and stance discussion; it does not auto-inflate Lawrence base IRR. Promotion requires [HUMAN REVIEW].
 
@@ -12,17 +12,17 @@
 
 | Insider | Date | Shares | Price | Value | Contrib |
 |---------|------|--------|-------|-------|---------|
-| Courtis Kenneth S. | 2026-09-08 | 2891 | $226.92 | $656025.72 | 2.316 |
-| Courtis Kenneth S. | 2026-09-08 | 2749 | $226.13 | $621631.37 | 2.312 |
-| Courtis Kenneth S. | 2026-09-08 | 2109 | $225.21 | $474967.89 | 2.293 |
-| Courtis Kenneth S. | 2026-09-08 | 1847 | $223.85 | $413450.95 | 2.284 |
-| Gorzynski Michael | 2026-08-21 | 10000 | $208.9169 | $2089169.0 | 2.222 |
+| Gorzynski Michael | 2026-08-21 | 10000 | $208.9169 | $2089169.0 | 2.725 |
+| Gorzynski Michael | 2025-12-15 | 23688 | $188.8778 | $4474137.33 | 2.334 |
+| Gorzynski Michael | 2025-12-15 | 14347 | $187.7077 | $2693042.37 | 2.205 |
+| Courtis Kenneth S. | 2026-09-08 | 2891 | $226.92 | $656025.72 | 2.185 |
+| Courtis Kenneth S. | 2026-09-08 | 2749 | $226.13 | $621631.37 | 2.181 |
 
 **Routine / planned sales (context):**
 
-- Eidson Charles Andrew: 3662 @ $231.15 on 2026-01-25
-- Eidson Charles Andrew: 452 @ $231.15 on 2026-01-24
-- Eidson Charles Andrew: 882 @ $234.89 on 2026-01-22
+- Munsey Joshua Todd: 2523 @ $183.24 on 2026-03-04
+- Whitehead Jason E.: 1694 @ $211.56 on 2026-06-03
+- Whitehead Jason E.: 1388 @ $212.52 on 2026-06-03
 
 Source: `_system/reference/market-data/insider/AMR_transactions.csv`.
 Lawrence base IRR unchanged (`in_base_irr: False`).

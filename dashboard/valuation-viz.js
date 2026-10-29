@@ -6,7 +6,20 @@
   'use strict';
 
   function decisionOf(t) {
-    return t.valuation_decision || {};
+    const d = t.valuation_decision || {};
+    if (d.calculation_status && d.research_return_available === true) {
+      const expiry = Date.parse(d.market_sync?.valid_until || '');
+      if (d.market_sync?.status !== 'verified' || !Number.isFinite(expiry) || Date.now() >= expiry) {
+        const empty = {low:null,base:null,high:null};
+        return {...d,calculation_status:'sync_gap',research_return_available:false,
+          value_per_share:empty,present_value_today_per_share:empty,margin_of_safety_pct:empty,
+          upside_to_value_pct:empty,upside_downside_pct:empty,forward_return_at_price_pct:empty,
+          annualized_return_at_price_pct:empty,forward_return_status:'withheld',
+          calculation_reason:Number.isFinite(expiry)?'completed_session_quote_missing':'market_sync_expiry_unverified',
+          market_sync:{...d.market_sync,status:'updating'}};
+      }
+    }
+    return d;
   }
 
   function statusMeta(status) {
@@ -67,6 +80,7 @@
 
   function renderValueRangeCell(t, fmtNum, units) {
     const d = decisionOf(t);
+    if (d.calculation_status && d.research_return_available !== true) return '<span class="mono" style="color:var(--text-muted)">Model updating</span>';
     const r = d.value_per_share || t.component_valuation?.total_equity_value_per_share;
     if (!r || r.low == null || r.base == null || r.high == null) {
       return '<span class="mono" style="color:var(--text-muted)">incomplete</span>';
@@ -77,6 +91,7 @@
 
   function renderPriceToBaseCell(t, fmtPct) {
     const d = decisionOf(t);
+    if (d.calculation_status && d.research_return_available !== true) return '<span class="mono" style="color:var(--text-muted)">—</span>';
     const pct = d.margin_of_safety_pct?.base;
     if (pct == null) {
       return '<span class="mono" style="color:var(--text-muted)">—</span>';
@@ -96,27 +111,67 @@
     }).join('')}</ul>`;
   }
 
+  function forecastGapLabel(reason) {
+    const labels = {
+      realization_timing_missing:'Asset or business cash flows need a realization date.',
+      annual_operating_cash_flow_missing:'Annual operating cash flow is unavailable.',
+      annual_capex_missing:'Annual capital spending is unavailable.',
+      annual_diluted_share_count_missing:'A matching diluted share count is missing.',
+      positive_normalized_owner_cash_not_established:'A cash-flow recovery model is needed.',
+      parent_cashflow_attribution_missing:'Parent shareholder cash flow needs reconciliation.',
+      annual_financial_inputs_expired:'Financial inputs need an update.',
+      annual_period_or_currency_reconciliation_missing:'Financial periods or currencies need reconciliation.',
+      holding_company_component_forecast_missing:'Holding-company assets need a cash-flow forecast.',
+      method_specific_forecast_missing:'This business needs a model suited to its economics.',
+      instrument_cashflow_schedule_missing:'The security needs a dated payment schedule.',
+      issuer_forecast_missing:'An issuer cash-flow forecast is missing.',
+      invalid_calculation_proof:'Valuation calculations need repair.',
+      material_component_coverage_incomplete:'The valuation omits a material business or asset.',
+      limited_liability_equity_waterfall_missing:'Debt and equity recoveries need a settlement model.',
+      unique_shareholder_irr_unavailable:'Cash flows do not give a unique annual return.',
+      fresh_sourced_quote_missing:'A recent sourced quote is unavailable.',
+      corporate_action_history_unverified:'Split history is being refreshed.',
+      corporate_action_history_invalid:'The corporate-action source needs reconciliation.',
+      source_share_basis_unverified:'The source share basis needs verification.',
+      pre_listing_share_basis_unverified:'Pre-listing shares need reconciliation with the listed security.',
+      share_basis_date_outside_verified_history:'Split history does not yet cover every model input.',
+      completed_session_quote_missing:'The latest completed market close is being refreshed.',
+      market_sync_expiry_unverified:'Price freshness is being verified.',
+      listing_calendar_or_completed_close_unverified:'The listing calendar or completed close needs verification.',
+      financial_inputs_expired_or_undated:'The financial inputs need a dated source update.',
+      model_assumptions_expired:'The model assumptions need a source-backed refresh.',
+      new_financial_report_after_model:'A newer financial report needs to be incorporated into the model.',
+      newer_balance_sheet_inputs_available:'Newer reported balance-sheet inputs need to be incorporated.',
+      ordinary_and_listing_share_actions_unreconciled:'The ordinary-share and depositary-share adjustments need reconciliation.',
+      quote_issuer_mismatch:'The price source identifies a different company.',
+      dated_reporting_to_listing_fx_missing:'A recent currency conversion is unavailable.',
+      forecast_date_missing_or_future:'The forecast date needs correction.',
+      overlapping_additive_components:'The valuation counts an asset more than once.',
+      proof_cashflow_reconciliation_failed:'Cash flows do not reconcile to the valuation.'
+    };
+    return [...new Set(String(reason||'').split(';').map(x=>x.trim()).filter(Boolean).map(x=>labels[x.split(':')[0]]||x.replace(/_/g,' ')))].join(' ');
+  }
+
   function displayReturn(t) {
     const d = decisionOf(t);
-    const atPrice = d.forward_return_at_price_pct?.base;
-    if (d.return_publishable && atPrice != null && Number.isFinite(Number(atPrice))) {
-      return {
-        pct: Number(atPrice),
-        label: 'Forward return',
-        source: 'contract_forward_return',
-        sub: d.forward_return_reason || 'Dated payoff or cash-flow return at the current price',
-      };
+    const value = d.forward_return_at_price_pct?.base;
+    // New rows are exclusively governed by the shared forecast. A stale
+    // legacy/automatic estimate cannot bypass a missing schedule or quote.
+    const shared = Object.prototype.hasOwnProperty.call(d, 'calculation_status');
+    const available = shared ? d.research_return_available === true : d.return_publishable === true;
+    if (available && value != null && Number.isFinite(Number(value))) {
+      return {pct:Number(value), label:'Forward IRR', source:shared ? 'shared_valuation_forecast' : 'contract_forward_return',
+        sub:shared ? 'PV, IRR and entry prices use the same valuation forecast' : d.forward_return_reason || 'Dated shareholder cash flows'};
     }
-    return {
-      pct: null,
-      label: 'Forward return',
-      source: 'missing',
-      sub: d.forward_return_reason || (
-        d.model_level === 'screening_grade'
-          ? 'Withheld: generic screening model'
-          : 'Not modeled from dated forward cash flows'
-      ),
-    };
+    return {pct:null, label:'Forward return', source:'missing',
+      sub:forecastGapLabel(d.calculation_reason) || d.forward_return_reason || 'Dated shareholder forecast unavailable'};
+  }
+
+  function renderMarketSyncCell(t, escapeHtml) {
+    const d = decisionOf(t), dates = d.dates || {};
+    const good = d.research_return_available === true && d.market_sync?.status === 'verified';
+    const title = `Completed close ${dates.price_as_of || 'unavailable'}; financial inputs ${dates.financial_period || 'undated'}; model assumptions ${dates.model_as_of || 'undated'}. ${good ? 'Listing, currency and share basis verified.' : forecastGapLabel(d.calculation_reason)}`;
+    return `<span class="badge ${good ? 'badge-ok' : 'badge-warn'}" title="${escapeHtml(title)}">${good ? 'Synced' : 'Model updating'}</span><div class="irr-sub">Close ${escapeHtml(dates.price_as_of || 'missing')}</div><div class="irr-sub">Model ${escapeHtml(dates.model_as_of || 'undated')}</div>`;
   }
 
   function primaryPowerZone(t, personaMeta) {
@@ -280,7 +335,7 @@
       <div class="metric-grid metric-grid-3 decision-band" style="margin-top:9px">
         <div class="metric"><div class="k">${escapeHtml(ret.label)}</div><div class="v mono">${escapeHtml(retDisplay)}<div class="tier-sub">${escapeHtml(ret.sub)}</div></div></div>
         <div class="metric"><div class="k">Required return</div><div class="v mono">${d.required_return_pct == null ? '—' : fmtPct(d.required_return_pct)}<div class="tier-sub">${escapeHtml(String(d.output_basis || 'basis not declared').replace(/_/g, ' '))}</div></div></div>
-        <div class="metric"><div class="k">Model / fact / price dates</div><div class="v mono" style="font-size:11px">${escapeHtml(asOf)} / ${escapeHtml(dates.latest_fact_as_of || '—')} / ${escapeHtml(dates.price_as_of || '—')}</div></div>
+        <div class="metric"><div class="k">Model / fact / price dates</div><div class="v mono" style="font-size:var(--font-caption,12px)">${escapeHtml(asOf)} / ${escapeHtml(dates.latest_fact_as_of || '—')} / ${escapeHtml(dates.price_as_of || '—')}</div></div>
       </div>
       <div class="metric-grid metric-grid-3 decision-band" style="margin-top:9px">
         ${gapsHtml}
@@ -424,7 +479,7 @@
       <div class="metric-grid metric-grid-3" style="margin-top:9px">
         <div class="metric"><div class="k">Calculation proof</div><div class="v mono">${fmtNum(decision.proof_complete_pct ?? proofSummary.proof_complete_pct ?? 0)}%</div></div>
         <div class="metric"><div class="k">Priced components</div><div class="v mono">${Number(proofSummary.priced_component_count || 0)} / ${Number(proofSummary.component_count || 0)}</div></div>
-        <div class="metric"><div class="k">Model hash</div><div class="v mono" style="font-size:11px">${escapeHtml(String(decision.model_hash || valuation.change_control?.model_hash || '—').slice(0, 12))}</div></div>
+        <div class="metric"><div class="k">Model hash</div><div class="v mono" style="font-size:var(--font-caption,12px)">${escapeHtml(String(decision.model_hash || valuation.change_control?.model_hash || '—').slice(0, 12))}</div></div>
       </div>
       <div class="tier-sub" style="margin-top:8px">Model / latest fact / price dates: ${escapeHtml(modelDates.model_as_of || wb.as_of || '—')} / ${escapeHtml(modelDates.latest_fact_as_of || '—')} / ${escapeHtml(modelDates.price_as_of || '—')}</div>
       <div class="workbench-callout"><strong>Power zone:</strong> ${escapeHtml(decision.primary_power_zone || 'review required')}<br><strong>Next:</strong> ${escapeHtml(decision.next_action || 'Complete evidence and committee gates.')}</div>`;
@@ -479,8 +534,8 @@
     const methodPage = `
       <div class="metric-grid metric-grid-3">
         <div class="metric"><div class="k">Primary power zone</div><div class="v">${escapeHtml(method.label || 'Unclassified')}</div></div>
-        <div class="metric"><div class="k">Primary personas</div><div class="v" style="font-size:11px">${(method.primary_personas || []).map((x) => escapeHtml(String(x).replace(/_/g, ' '))).join(' · ') || '—'}</div></div>
-        <div class="metric"><div class="k">Cross-check personas</div><div class="v" style="font-size:11px">${(method.cross_check_personas || []).map((x) => escapeHtml(String(x).replace(/_/g, ' '))).join(' · ') || '—'}</div></div>
+        <div class="metric"><div class="k">Primary personas</div><div class="v" style="font-size:var(--font-caption,12px)">${(method.primary_personas || []).map((x) => escapeHtml(String(x).replace(/_/g, ' '))).join(' · ') || '—'}</div></div>
+        <div class="metric"><div class="k">Cross-check personas</div><div class="v" style="font-size:var(--font-caption,12px)">${(method.cross_check_personas || []).map((x) => escapeHtml(String(x).replace(/_/g, ' '))).join(' · ') || '—'}</div></div>
       </div>
       <div class="workbench-callout">${escapeHtml(method.rule || '')}</div>
       ${(method.routing_reasons || []).length ? `<div class="workbench-item" style="margin-top:10px"><div class="workbench-item-title">Routing reasons</div><ul class="workbench-checks">${method.routing_reasons.map((x) => `<li>${escapeHtml(x)}</li>`).join('')}</ul></div>` : ''}
@@ -749,6 +804,8 @@
     modelLevelMeta,
     tierMeta,
     displayReturn,
+    forecastGapLabel,
+    renderMarketSyncCell,
     primaryPowerZone,
     renderPowerZoneCell,
     renderValuationStatusCell,

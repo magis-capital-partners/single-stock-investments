@@ -1,0 +1,255 @@
+{
+  "schema_version": "desk_briefs.v1",
+  "desk": "tape_index",
+  "as_of": "2026-10-22",
+  "author": "grok-drew-tape-index",
+  "owner": "drew",
+  "inputs_read": [
+    {
+      "path": "dashboard/data/technical_summary.json",
+      "generated_at": "2026-10-22T07:46:12Z"
+    },
+    {
+      "path": "dashboard/data/capitulation_daily.json",
+      "generated_at": "2026-10-22T07:48:18.556032+00:00"
+    },
+    {
+      "path": "dashboard/data/index_membership.json",
+      "generated_at": "2026-10-22T09:43:41Z"
+    },
+    {
+      "path": "dashboard/data/portfolio_news.json",
+      "generated_at": "2026-10-22T06:12:26.180111+00:00"
+    },
+    {
+      "path": "_system/portfolio/registry.json",
+      "generated_at": "2026-10-22T09:51:47Z"
+    },
+    {
+      "path": "dashboard/data/agent_shards/DHR.json",
+      "generated_at": "2026-10-16T20:26:21Z"
+    },
+    {
+      "path": "_system/data/desk_briefs/schema.json",
+      "generated_at": null
+    }
+  ],
+  "items": [
+    {
+      "ticker": "NFLX",
+      "headline": "Netflix moved from stress_building to capitulation_candidate on 2.76x relative volume, with CMF showing distribution.",
+      "one_number": "rvol 2.76 (capitulation_candidate; 5d -7.8%)",
+      "lane": "capitulation",
+      "evidence": [
+        {
+          "kind": "dashboard",
+          "ref": "dashboard/data/technical_summary.json by_ticker.NFLX capitulation.state=capitulation_candidate; rvol_20d=2.76; cmf_20d=-0.17; stretch_z=-1.645; rsi_14=41.6 (as_of 2026-10-21)",
+          "url": null
+        }
+      ],
+      "confidence": "provider",
+      "next": "Agent shard not built for NFLX.",
+      "handoff": null
+    },
+    {
+      "ticker": "T",
+      "headline": "AT&T jumped from normal to capitulation_candidate with stretch_z under -2 and a washed_out regime; TMUS and VZ moved to panic.",
+      "one_number": "stretch_z -2.05 vs -2 (capitulation_candidate; rvol 1.89)",
+      "lane": "capitulation",
+      "evidence": [
+        {
+          "kind": "dashboard",
+          "ref": "dashboard/data/technical_summary.json by_ticker.T stretch_z=-2.045, trend_z=-1.576; regime.setup=washed_out; cmf_20d=-0.295; rvol_20d=1.89 (as_of 2026-10-21)",
+          "url": null
+        },
+        {
+          "kind": "dashboard",
+          "ref": "dashboard/data/technical_summary.json by_ticker.TMUS cap=panic trend_z=-1.419; by_ticker.VZ cap=panic trend_z=-1.249 (as_of 2026-10-21)",
+          "url": null
+        }
+      ],
+      "confidence": "provider",
+      "next": "Telecom cluster; agent shard not built for T.",
+      "handoff": null
+    },
+    {
+      "ticker": "ACMR",
+      "headline": "ACM Research, a Russell 2000 likely_add 2.62% from the boundary, fell further to RSI 9.9 from 16.2.",
+      "one_number": "RSI 9.9 vs 25 (R2000 add watch -2.62%)",
+      "lane": "index_event",
+      "evidence": [
+        {
+          "kind": "dashboard",
+          "ref": "dashboard/data/index_membership.json portfolio_summary.predictor_watch ACMR (russell_2000 likely_add, -2.62%, semi-recon 2026-12-11; unchanged)",
+          "url": null
+        },
+        {
+          "kind": "dashboard",
+          "ref": "dashboard/data/technical_summary.json by_ticker.ACMR rsi_14=9.9 (prior 16.2); return_5d_pct=-10.52; cap=stress_building (as_of 2026-10-21)",
+          "url": null
+        }
+      ],
+      "confidence": "provider",
+      "next": "Distance is from the rank-day snapshot; re-read after 2026-10-31.",
+      "handoff": null
+    },
+    {
+      "ticker": "MOS",
+      "headline": "Mosaic moved from stress_building to panic and its regime turned washed_out, with RSI at 12.7.",
+      "one_number": "RSI 12.7 vs 25 (panic; stretch_z -2.00)",
+      "lane": "oversold",
+      "evidence": [
+        {
+          "kind": "dashboard",
+          "ref": "dashboard/data/technical_summary.json by_ticker.MOS rsi_14=12.7; stretch_z=-2.002; regime.setup=washed_out; cap=panic; cmf_20d=-0.281 (as_of 2026-10-21)",
+          "url": null
+        }
+      ],
+      "confidence": "provider",
+      "next": "Agent shard not built for MOS.",
+      "handoff": null
+    },
+    {
+      "ticker": "9984.T",
+      "headline": "SoftBank Group moved from stress_building to panic as RSI fell to 12.6 from 21.4 on an 11% five-day drop.",
+      "one_number": "RSI 12.6 vs 25 (panic; 5d -11.3%)",
+      "lane": "oversold",
+      "evidence": [
+        {
+          "kind": "dashboard",
+          "ref": "dashboard/data/technical_summary.json by_ticker.9984.T rsi_14=12.6 (prior 21.4); cap=panic; return_5d_pct=-11.27; price_vs_50d=-24.37 (as_of 2026-10-22)",
+          "url": null
+        }
+      ],
+      "confidence": "provider",
+      "next": "TOPIX periodic review 2026-10-31 on the index calendar.",
+      "handoff": null
+    },
+    {
+      "ticker": "GE",
+      "headline": "GE Aerospace moved from capitulation_candidate to panic as trend_z deepened to -1.77; HWM stays panic with stretch_z -2.92.",
+      "one_number": "trend_z -1.77 vs -1.25 (panic; RSI 32.5)",
+      "lane": "capitulation",
+      "evidence": [
+        {
+          "kind": "dashboard",
+          "ref": "dashboard/data/technical_summary.json by_ticker.GE trend_z=-1.766 (prior -1.63); cap=panic; rsi_14=32.5; rvol_20d=1.72 (as_of 2026-10-21)",
+          "url": null
+        },
+        {
+          "kind": "dashboard",
+          "ref": "dashboard/data/technical_summary.json by_ticker.HWM stretch_z=-2.924; cap=panic; regime=washed_out (as_of 2026-10-21)",
+          "url": null
+        }
+      ],
+      "confidence": "provider",
+      "next": "RSI now under the 35 line.",
+      "handoff": null
+    },
+    {
+      "ticker": "COHR",
+      "headline": "Coherent crossed under RSI 25 from 35.1 after a 9.8% five-day drop.",
+      "one_number": "RSI 24.9 vs 25 (5d -9.8%)",
+      "lane": "oversold",
+      "evidence": [
+        {
+          "kind": "dashboard",
+          "ref": "dashboard/data/technical_summary.json by_ticker.COHR rsi_14=24.9 (prior 35.1); return_5d_pct=-9.79; cap=stress_building (as_of 2026-10-21)",
+          "url": null
+        }
+      ],
+      "confidence": "provider",
+      "next": "Sits right on the line; one print.",
+      "handoff": null
+    },
+    {
+      "ticker": "LCID",
+      "headline": "Lucid crossed under RSI 25 while staying in panic, 27.9% below its 50-day average.",
+      "one_number": "RSI 23.2 vs 25 (panic)",
+      "lane": "oversold",
+      "evidence": [
+        {
+          "kind": "dashboard",
+          "ref": "dashboard/data/technical_summary.json by_ticker.LCID rsi_14=23.2 (prior 28.8); cap=panic; trend_z=-1.429; price_vs_50d=-27.87 (as_of 2026-10-21)",
+          "url": null
+        }
+      ],
+      "confidence": "provider",
+      "next": null,
+      "handoff": null
+    },
+    {
+      "ticker": "ACHR",
+      "headline": "Archer Aviation crossed under RSI 25 with CMF at -0.27, 28.1% below its 50-day average.",
+      "one_number": "RSI 23.4 vs 25 (CMF -0.27)",
+      "lane": "oversold",
+      "evidence": [
+        {
+          "kind": "dashboard",
+          "ref": "dashboard/data/technical_summary.json by_ticker.ACHR rsi_14=23.4 (prior 26.8); cmf_20d=-0.274; cap=stress_building (as_of 2026-10-21)",
+          "url": null
+        }
+      ],
+      "confidence": "provider",
+      "next": null,
+      "handoff": null
+    },
+    {
+      "ticker": "CRL",
+      "headline": "Charles River Labs pushed stretch_z above +2 on 2.8x relative volume after a 14.2% five-day gain; regime now extended.",
+      "one_number": "stretch_z 2.15 vs +2 (rvol 2.80)",
+      "lane": "extended",
+      "evidence": [
+        {
+          "kind": "dashboard",
+          "ref": "dashboard/data/technical_summary.json by_ticker.CRL stretch_z=2.15 (prior 1.373); trend_z=2.17; rvol_20d=2.8; cmf_20d=0.28; rsi_14=78.5 (as_of 2026-10-21)",
+          "url": null
+        }
+      ],
+      "confidence": "provider",
+      "next": "Also meets the stored breakout definition.",
+      "handoff": null
+    },
+    {
+      "ticker": "HAS",
+      "headline": "Hasbro, a new breakout at the 2026-10-21 post, pushed stretch_z above +2 with RSI 90.5.",
+      "one_number": "stretch_z 2.06 vs +2 (RSI 90.5)",
+      "lane": "extended",
+      "evidence": [
+        {
+          "kind": "dashboard",
+          "ref": "dashboard/data/technical_summary.json by_ticker.HAS stretch_z=2.061 (prior 1.607); rsi_14=90.5; rvol_20d=2.41; cmf_20d=0.36; 5d +19.4% (as_of 2026-10-21)",
+          "url": null
+        }
+      ],
+      "confidence": "provider",
+      "next": "Regime moved from improving to extended.",
+      "handoff": null
+    },
+    {
+      "ticker": "DHR",
+      "headline": "Danaher newly meets the stored breakout definition on 1.94x relative volume; COP, CVX, MPC also newly qualify.",
+      "one_number": "breakout CMF 0.137 vs 0.10 (rvol 1.94)",
+      "lane": "breakout",
+      "evidence": [
+        {
+          "kind": "dashboard",
+          "ref": "dashboard/data/technical_summary.json by_ticker.DHR direction=leading_uptrend; cmf_20d=0.137; rvol_20d=1.94; price_vs_50d=8.84; rsi_14=72.2 (as_of 2026-10-21)",
+          "url": null
+        }
+      ],
+      "confidence": "provider",
+      "next": "RSI 72.2 is overbought.",
+      "handoff": null
+    }
+  ],
+  "screens_empty": [
+    "index_adds_new",
+    "index_deletes_new",
+    "confirmed_next_30d"
+  ],
+  "notes": "technical_summary SPY stress_building pressure 75.7→62.3, exhaustion 93.3; panic 62→29, capitulation_candidate 5→4. capitulation_daily SPY observe drawdown -0.77%; XLK -6.66% IWM -9.14% stress. Eased: IREN ONTO BAC FIX panic→stress_building; TSEM FLEX off capitulation_candidate; V XP lost breakout rvol<1. no new index adds, deletes/confirmed; predictor_watch same; BE/CSGP float impacts news_unconfirmed. Held: HKHC; thin/limited IDA.AX KEWL LIF.TO SEVN LMNR ASPN; panic RSI>45 or uptrend ABT RTX SBAC RYN GPC BKNG XPEV DXCM. No shard NFLX T MOS CRL; no _envelope on L0; 42 rows not on 2026-10-21.",
+  "research_only": true,
+  "in_base_irr": false,
+  "authority": "none"
+}

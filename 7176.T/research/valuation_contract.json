@@ -2217,7 +2217,7 @@
     ]
   },
   "change_control": {
-    "model_hash": "1fb36c1f0f34e4f2783b80eb89c37ff0d5060263a0f0aa25442669c1ec52845c",
+    "model_hash": "04ed8b829264f940d16c5f67b08525b63c37e5bf1ac13728c63dadb8aa45387f",
     "method_versions": [
       "midcycle_capacity_value@1.0",
       "net_asset_value@1.0",
@@ -2228,6 +2228,164 @@
     "rule": "A source fact is locked. Every assumption change requires a reason, author, timestamp, and before/after value."
   },
   "decision_rule": "Proof status and investment readiness are separate. Every material claim must be valued exactly once by a valid calculation proof, every evidence blocker must be resolved, and the model must be stock-specific before committee review. Only a human decision can authorize capital.",
+  "shared_forecast": {
+    "schema_version": "1.0",
+    "method_version": "shared-valuation-forecast/1.1",
+    "ticker": "7176.T",
+    "status": "model_gap",
+    "research_only": true,
+    "requires_human_review": false,
+    "capital_actionable": false,
+    "as_of": "2026-08-31",
+    "model_as_of": "2026-07-24",
+    "quote": {
+      "value": 757.0,
+      "as_of": "2026-08-31",
+      "source_url": "Yahoo 7176.T close 2026-08-31",
+      "currency": null
+    },
+    "forecast_hash": "15b6dfa853a78cab3f24d156ba6e500787528ba72047a2c0cc51fd17f8dc59a5",
+    "forward_irr_pct": {
+      "low": null,
+      "base": null,
+      "high": null
+    },
+    "present_value_today_per_share": {
+      "low": null,
+      "base": null,
+      "high": null
+    },
+    "model_present_value_per_share": {
+      "low": null,
+      "base": null,
+      "high": null
+    },
+    "required_return_pct": {
+      "low": null,
+      "base": null,
+      "high": null
+    },
+    "forward_cashflow_schedule": {},
+    "buy_prices": [],
+    "components": [
+      {
+        "component_id": "core_fee_engine",
+        "method": "owner_cash_or_dividend_discount",
+        "status": "available",
+        "present_value_per_share": {
+          "low": 1455.8351,
+          "base": 2239.3693,
+          "high": 3670.823
+        }
+      },
+      {
+        "component_id": "etf_product_pipeline",
+        "method": "owner_earnings_reinvestment_dcf",
+        "status": "model_gap",
+        "present_value_per_share": {}
+      },
+      {
+        "component_id": "net_financial_claims",
+        "method": "net_asset_value",
+        "status": "model_gap",
+        "present_value_per_share": {
+          "low": 0.0
+        }
+      },
+      {
+        "component_id": "performance_fee_cycle_reserve",
+        "method": "midcycle_capacity_value",
+        "status": "model_gap",
+        "present_value_per_share": {}
+      }
+    ],
+    "gaps": [
+      {
+        "component_id": "etf_product_pipeline",
+        "case": "low",
+        "code": "realization_timing_missing:pipeline_value_per_share"
+      },
+      {
+        "component_id": "etf_product_pipeline",
+        "case": "base",
+        "code": "realization_timing_missing:pipeline_value_per_share"
+      },
+      {
+        "component_id": "etf_product_pipeline",
+        "case": "high",
+        "code": "realization_timing_missing:pipeline_value_per_share"
+      },
+      {
+        "component_id": "net_financial_claims",
+        "case": "base",
+        "code": "realization_timing_missing:net_financial_per_share"
+      },
+      {
+        "component_id": "net_financial_claims",
+        "case": "high",
+        "code": "realization_timing_missing:net_financial_per_share"
+      },
+      {
+        "component_id": "performance_fee_cycle_reserve",
+        "case": "low",
+        "code": "realization_timing_missing:normalized_owner_cash"
+      },
+      {
+        "component_id": "performance_fee_cycle_reserve",
+        "case": "base",
+        "code": "realization_timing_missing:normalized_owner_cash"
+      },
+      {
+        "component_id": "performance_fee_cycle_reserve",
+        "case": "high",
+        "code": "realization_timing_missing:normalized_owner_cash"
+      }
+    ],
+    "warnings": [],
+    "source_refs": [
+      {
+        "node_id": "normalized_owner_cash",
+        "ref": "7176.T/02_Quarterly/Earnings_Releases/20260528_2026\u5e743_\u6708\u671f_\u6c7a\u7b97\u77ed\u4fe1_\u65e5\u672c\u57fa\u6e96_\u9023\u7d50__finfo2026.pdf",
+        "locator": "FY2025 split-adjusted parent EPS \u00a5137.14; FY2026 peak \u00a5317.33 excluded from croupier anchor",
+        "as_of": "2026-03-31",
+        "source_id": "f69967d29aae624737cfc46624a1ec8ac370c4a3296e4efb582f082c5107bf99"
+      },
+      {
+        "node_id": "base_fee_jpy_m",
+        "ref": "7176.T/02_Quarterly/Earnings_Variance_Notices/20260528_\u524d\u5e74\u540c\u671f\u5b9f\u7e3e_\u9023\u7d50_\u3068\u306e\u5dee\u7570\u306b\u95a2\u3059\u308b\u304a\u77e5\u3089\u305b__Pnotice2026-1.pdf",
+        "locator": "Base fees \u00a57.869B (+17.1% YoY); recurring fee stack",
+        "as_of": "2026-03-31",
+        "source_id": "25d8960f4400b286b4ad9387dd401e30b7bf9862fb1a6b7cfa763a328ffd7f68"
+      },
+      {
+        "node_id": "performance_fee_jpy_m",
+        "ref": "7176.T/02_Quarterly/Earnings_Variance_Notices/20260528_\u524d\u5e74\u540c\u671f\u5b9f\u7e3e_\u9023\u7d50_\u3068\u306e\u5dee\u7570\u306b\u95a2\u3059\u308b\u304a\u77e5\u3089\u305b__Pnotice2026-1.pdf",
+        "locator": "Success fees \u00a514.316B (+53.6% YoY); cyclical tail",
+        "as_of": "2026-03-31",
+        "source_id": "76adc9aa8b772a8bbea56376b03a16e6850a82d46e3770183ee50566c2a526e4"
+      },
+      {
+        "node_id": "book_value_per_share",
+        "ref": "7176.T/02_Quarterly/Earnings_Releases/20260528_2026\u5e743_\u6708\u671f_\u6c7a\u7b97\u77ed\u4fe1_\u65e5\u672c\u57fa\u6e96_\u9023\u7d50__finfo2026.pdf",
+        "locator": "BVPS \u00a5757.01; asset-light manager cross-check only",
+        "as_of": "2026-03-31",
+        "source_id": "54498f12043043756a04476676e85324fe131495bfbef4530036175008ceb2f4"
+      },
+      {
+        "node_id": "shares_m",
+        "ref": "7176.T/03_Events/Timely_Disclosures/20250924_\u682a\u5f0f\u5206\u5272\u53ca\u3073\u5b9a\u6b3e\u306e\u4e00\u90e8\u5909\u66f4\u306b\u95a2\u3059\u308b\u304a\u77e5\u3089\u305b__irnews20250924.pdf",
+        "locator": "27,120,000 shares outstanding after 1-for-20 split",
+        "as_of": "2025-11-01",
+        "source_id": "0405d1d48df7f41c8d27c776f1dd2b1758a79291da02d7ceccb364fcd0bce18d"
+      }
+    ],
+    "next_action": "automatic_model_refresh",
+    "reconciliation": {
+      "passed": false
+    },
+    "settlement_policy": "Explicit cash/debt additions in an operating DCF are time-zero acquisition adjustments; hypothetical settlement, not declared dividends.",
+    "calculation_id": "4720a827d5b7904801a1a612f5d6f31fd3269f39a702212cd1a6237ad34a2848"
+  },
   "authority": "universal_valuation_contract",
   "legacy_reference_present": true,
   "falsifier_coverage": {

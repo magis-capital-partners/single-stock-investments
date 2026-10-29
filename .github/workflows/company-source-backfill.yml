@@ -1,0 +1,114 @@
+name: Complete company source backfill
+on:
+  workflow_call:
+    inputs:
+      seconds:
+        description: Work budget; interrupted work resumes from the private checkpoint
+        type: string
+        default: '1200'
+      recover_scans:
+        description: Recover scanned pages instead of the normal extraction lane
+        type: boolean
+        default: false
+    secrets:
+      RESEARCH_VAULT_CLONE_TOKEN:
+        required: true
+      GOOGLE_APPLICATION_CREDENTIALS_JSON:
+        required: true
+permissions:
+  contents: read
+concurrency:
+  group: company-source-backfill
+  cancel-in-progress: false
+jobs:
+  backfill:
+    runs-on: ubuntu-latest
+    timeout-minutes: 300
+    env:
+      RESEARCH_VAULT_CLONE_TOKEN: ${{ secrets.RESEARCH_VAULT_CLONE_TOKEN }}
+      GOOGLE_APPLICATION_CREDENTIALS_JSON: ${{ secrets.GOOGLE_APPLICATION_CREDENTIALS_JSON }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          filter: blob:none
+          sparse-checkout: |
+            _system
+            dashboard
+            .github
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Make room for the complete private source archive
+        uses: jlumbroso/free-disk-space@54081f138730dfa15788a46383842cd2f914a1be # v1.3.1
+        with:
+          tool-cache: false
+          android: true
+          dotnet: true
+          haskell: true
+          docker-images: true
+          swap-storage: true
+      - uses: ./.github/actions/checkout-vault
+        with:
+          hydrate: 'false'
+      - run: pip install pymupdf pypdf xlrd google-api-python-client google-auth legacy-doc mobi
+      - name: Install scan language data
+        run: |
+          sudo apt-get update && sudo apt-get install -y tesseract-ocr-eng tesseract-ocr-jpn tesseract-ocr-chi-sim
+          python - <<'PY'
+          import os, pathlib, subprocess
+          files = subprocess.check_output(['dpkg-query', '-L', 'tesseract-ocr-eng'], text=True).splitlines()
+          directory = next(pathlib.Path(p).parent for p in files if p.endswith('/eng.traineddata'))
+          with open(os.environ['GITHUB_ENV'], 'a') as output:
+              print('TESSDATA_PREFIX=' + str(directory), file=output)
+          PY
+      # Isolate the complete archive from older jobs with narrower cache schemas.
+      - name: Restore private extraction results
+        run: python _system/scripts/company_source_cache.py restore --cache _private/company-research/cache --archive "$RESEARCH_VAULT_ROOT/dashboard-private/company-source-backfill-v2"
+      - name: Resume bounded extraction
+        env:
+          BUDGET: ${{ inputs.seconds }}
+          SCANS: ${{ inputs.recover_scans }}
+        run: |
+          set -euo pipefail
+          args=()
+          if [ "$SCANS" = "true" ]; then args+=(--only-status needs_ocr --ocr); fi
+          python _system/scripts/backfill_company_sources.py --discover-drive --audit-cache --seconds "$BUDGET" "${args[@]}"
+      - name: Recover catalogued official filings
+        if: ${{ !inputs.recover_scans }}
+        run: python _system/scripts/backfill_company_filings.py --seconds 1200
+      - name: Check for transcripts to recover
+        if: ${{ !inputs.recover_scans }}
+        id: media
+        run: |
+          python - <<'PY'
+          import os, sqlite3
+          db = sqlite3.connect('_private/company-research/cache/work.sqlite')
+          pending = db.execute("SELECT COUNT(*) FROM jobs WHERE status='needs_transcript'").fetchone()[0]
+          with open(os.environ['GITHUB_OUTPUT'], 'a') as output:
+              print('pending=' + str(bool(pending)).lower(), file=output)
+          PY
+      - name: Recover newly discovered recordings
+        if: steps.media.outputs.pending == 'true'
+        env:
+          WHISPER_THREADS: '2'
+        run: |
+          pip install faster-whisper
+          python _system/scripts/backfill_company_sources.py --skip-seed --only-status needs_transcript --transcribe --seconds 600
+      - name: Refresh the complete publication snapshot
+        run: |
+          python _system/scripts/build_company_research.py --drive --download \
+            --cache _private/company-research/cache \
+            --vault "$RESEARCH_VAULT_ROOT"
+      - name: Save private checkpoint and results
+        id: archive
+        if: always()
+        run: python _system/scripts/company_source_cache.py pack --cache _private/company-research/cache --archive "$RESEARCH_VAULT_ROOT/dashboard-private/company-source-backfill-v2"
+      - name: Upload immutable archive parts in bounded batches
+        id: parts
+        if: ${{ always() && steps.archive.outcome == 'success' }}
+        run: python _system/scripts/push_company_source_parts.py --vault "$RESEARCH_VAULT_ROOT"
+      - uses: ./.github/actions/commit-vault
+        if: ${{ always() && steps.parts.outcome == 'success' }}
+        with:
+          message: Preserve resumable company source backfill
+          git_add: --force dashboard-private/company-source-backfill-v2

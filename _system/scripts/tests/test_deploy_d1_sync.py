@@ -190,6 +190,27 @@ def test_budget_thresholds(read, written, over):
     assert d1_budget.Budget(True, rows_read=read, rows_written=written).over is over
 
 
+def test_sync_deferral_warns_above_the_same_write_threshold():
+    # Exactly 70,000 is still under the limit. The next row, or a 40,000-row
+    # reserve that would cross it, waits. 219,299 is the 27 October reading.
+    assert d1_budget.sync_blocked(d1_budget.Budget(True, rows_written=70_000)) is None
+    assert d1_budget.sync_blocked(d1_budget.Budget(True, rows_written=30_000), reserve=40_000) is None
+    for written, reserve in ((70_001, 0), (30_001, 40_000), (219_299, 40_000)):
+        message = d1_budget.sync_blocked(
+            d1_budget.Budget(True, rows_written=written, rows_read=908_659), reserve=reserve,
+        )
+        assert message is not None
+        assert "deferred" in message
+        assert "70,000" in message
+        assert f"{written:,}" in message
+    assert d1_budget.sync_blocked(d1_budget.Budget(True, rows_read=3_500_001)) is not None
+    assert d1_budget.sync_blocked(d1_budget.Budget(False, reason="analytics down")) is None
+    workflow = (ROOT / ".github/workflows/reverse-split-borrow-history.yml").read_text(encoding="utf-8")
+    assert "sync_blocked(budget, reserve=40_000)" in workflow
+    assert "::warning::" in workflow
+    assert "SystemExit('Database sync deferred" not in workflow
+
+
 def _raises(error: BaseException):
     def post(url, headers, body):
         raise error

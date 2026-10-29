@@ -1,6 +1,6 @@
 # TMUS — Third-party source inventory
 
-**Date:** 2026-10-11
+**Date:** 2026-10-27
 **Sources:** 197 total (0 approved, 0 pending, 197 context)
 
 | ID | Title | Path | Status | Use |
@@ -203,4 +203,4 @@
 | activist_long | acc0001283699 26 000100 | `TMUS/third-party-analyses/activist_reports/long/8-K_20260723_acc0001283699_26_000100.htm` | context | activist/long — local |
 | activist_long | acc0001193125 26 381901 | `TMUS/third-party-analyses/activist_reports/long/8-K_20260903_acc0001193125_26_381901.htm` | context | activist/long — local |
 
-Cross-check required: `TMUS/research/cross_check_third_party_2026-10-11.md`
+Cross-check required: `TMUS/research/cross_check_third_party_2026-10-27.md`

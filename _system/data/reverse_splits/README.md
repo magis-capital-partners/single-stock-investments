@@ -1,5 +1,51 @@
 # Reverse-split research data
 
+### Shared backtest, shadow and order-review framework on 23 October 2026
+
+The [shared short framework](FRAMEWORK.md) reuses the existing event, as-filed
+fundamental and execution research with one browser/Node decision engine. Its
+new dashboard Framework tab retains all 180 matched comparisons and exposes
+missing evidence. Private source reviews, broker imports, frozen forecasts,
+position/loan accounting and content-bound handoffs feed the existing human
+order desk. Current cached evidence admits zero verified entries; live evidence
+and policy approval remain outstanding. The older studies are unchanged.
+
+### Strategy lab and expanded event dataset on 22 October 2026
+
+The [short alpha strategy lab](PROFIT_PROGRAM.md) joins financing discoveries,
+listing deficiencies and reverse splits with source links, availability clocks
+and as-filed financial features. The dashboard retains all 420 declared daily
+holding/cost/sizing/exit comparisons, funding estimates, conditional Monte Carlo
+and source-study return distributions. A separate replay repairs the older
+patient model's unsupported covers as persistent short obligations. Extracted
+contexts and conditional fills are not verified financing terms or broker fills;
+source review, observed execution and prospective validation remain explicit gates.
+
+### Patient entries, SSR and $25k–$50k targets on 20 October 2026
+
+The [patient execution sensitivity](patient_execution_2026-10-20.md) now tests all
+551 priced 2023–2026 primary events, partial SSR fills and 30-minute to four-hour
+entry windows. H21 retains 48 declared variants; H22 adds 48 separately declared
+10%/20% participation sensitivities after observing H21. All results remain in
+[aggregate research](patient_execution_2026-10-20.json). The dashboard shows dollar
+profit, actual filled size, drawdown, margin, collateral and unsupported covers;
+its smaller chart payload preserves every daily-calculated risk statistic.
+
+Base one-hour flow estimates at 5% participation produce about $10.4k/$21.1k annual
+trading profit at $25k/$50k targets, averaging only $3.2k/$4.4k filled. At 20%,
+mean fills grow to $7.0k/$9.7k, but profit falls to $6.7k/$18.2k and drawdown rises.
+Assumed larger fills across the entire universe lose money; additional execution
+time generally gives up price edge. These are conditional modeled returns before
+overhead and locate charges, not demonstrated executable business income.
+
+The opening full-depth gate, fixed opening-price anchor, forecast-profit cutoff,
+blanket SSR exclusion and three-name cap are removed in this sensitivity. Dynamic
+status also captures nine SSR triggers during the first second after the open.
+Additional one-second Nasdaq/Arca/EDGX bars cost $0; three individual feed requests
+still failed and nine event sessions have a provider day-quality flag on at least
+one planned feed. Missing venues, actual queue fills, approved borrows, own impact
+and difficult covers remain unvalidated. No production rules or live authority change.
+
 ### Dollar profit and smaller targets on 20 October 2026
 
 The [business sizing sensitivity](business_sizing_2026-10-20.md) reports annual
@@ -17,8 +63,9 @@ proposal and new event families are not included.
 The [entry-capacity explanation and intraday algorithm proposal](intraday_execution_research_2026-10-20.md)
 reproduces the $2,587.48 median opening bid capacity and specifies a test of partial
 positions, incoming buying flow, alpha decay and cover liquidity. It is a research
-proposal, not a newly backtested or live execution strategy. The existing backtests
-retain their frozen entry and exit rules.
+proposal. The new H21/H22 sensitivities implement partial fills and time-spread
+entry assumptions; signed-flow, queue and measured-impact tests remain future work.
+The earlier backtests retain their frozen entry and exit rules.
 
 Eight free research PDFs were downloaded into ignored local literature storage.
 The [bibliography and checksums](intraday_execution_literature_2026-10-20.json)

@@ -73,13 +73,22 @@ def publish(root: Path | None = None) -> dict:
             "summary_sources": details.get("by_summary_source") or {},
         }
 
-    events_doc = load_json(INSIGHTS_DIR / "events.json")
-    events = events_doc.get("events")
+    import youtube_lane
+
+    events = youtube_lane._events_beside(MANIFEST_PATH)
     try:
-        manifest = prepare_published_manifest(load_json(MANIFEST_PATH), events, mutate)
+        base = youtube_lane._resolved_manifest(MANIFEST_PATH)
+    except RuntimeError:
+        base = load_json(MANIFEST_PATH)
+    try:
+        manifest = prepare_published_manifest(base, events, mutate)
     except ValueError as exc:
         raise SystemExit(str(exc)) from exc
     write_json(MANIFEST_PATH, manifest)
+    try:
+        youtube_lane.seal_insights_manifest(MANIFEST_PATH, videos=True, podcasts=False)
+    except RuntimeError as exc:
+        raise SystemExit(str(exc)) from exc
     catalog["details"] = details
     return catalog
 

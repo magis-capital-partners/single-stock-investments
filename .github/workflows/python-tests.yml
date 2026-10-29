@@ -22,11 +22,14 @@ on:
       - "dashboard/functions/**"
       - "dashboard/oauth-proxy/**"
       - "dashboard/data/criticality_summary.json"
+      - "dashboard/data/compounders.json"
+      - "dashboard/data/commodity_models.json"
       - "dashboard/data/portfolio_summary.json"
       - "dashboard/data/research_manifest.json"
       - "dashboard/data/kpi_summary.json"
       - "dashboard/data/document_catalog_summary.json"
       - "dashboard/data/agent_shards/**"
+      - "dashboard/private-assets.json"
       - "*/research/thesis_card.json"
       - "*/research/latest.json"
       - "GOOGL/research/valuation.json"
@@ -42,13 +45,41 @@ on:
       - "GOOGL/third-party-analyses/source_inventory.json"
       - "SOURCES.md"
       - ".gitignore"
+      - ".gitattributes"
       - "CONTRIBUTING.md"
       - "docs/WRITE_MAP.md"
+      - "dashboard/activist-viz.js"
+      - "dashboard/criticality-viz.js"
+      - "dashboard/darwin-cc-viz.js"
+      - "dashboard/fund-letters/reader.js"
+      - "dashboard/portfolio-viz.js"
+      - "dashboard/reverse-split-strategy.js"
+      - "dashboard/workspace-tools.js"
+      - "dashboard/display-system.js"
+      - "dashboard/display-system.css"
+      - "dashboard/display-registry.json"
+      - "dashboard/ui-format.js"
       - "dashboard/index.html"
+      - "dashboard/company-research.js"
+      - "dashboard/company-research.css"
+      - "dashboard/compounders.js"
+      - "dashboard/company-models.js"
+      - "dashboard/commodity-model-viz.js"
+      - "dashboard/research-desk.css"
+      - "dashboard/research-workspace.js"
+      - "dashboard/research-workspace.css"
+      - "dashboard/valuation-viz.js"
+      - "dashboard/insights-viz.js"
+      - "dashboard/strategy-workbench.js"
+      - "dashboard/strategy-workbench.css"
       - "dashboard/index-viz.js"
       - "dashboard/special-situations-viz.js"
       - "dashboard/separations-viz.js"
+      - "dashboard/search-match.js"
       - "dashboard/buyback-viz.js"
+      - "dashboard/buyback.css"
+      - "dashboard/data/buyback_manifest.json"
+      - "dashboard/data/buyback_snapshots/**"
       - "dashboard/desk-briefs-viz.js"
       - "dashboard/overlap-viz.js"
       - "dashboard/short-alpha-viz.js"
@@ -73,6 +104,9 @@ on:
       - "dashboard/data/capitulation_daily.json"
       - "dashboard/data/index_membership.json"
       - "dashboard/data/portfolio_news.json"
+      - "dashboard/data/warrants.json"
+      - "dashboard/data/activist_feed.json"
+      - "dashboard/data/document_catalog.json"
   push:
     branches: [main]
     paths:
@@ -82,11 +116,14 @@ on:
       - "dashboard/functions/**"
       - "dashboard/oauth-proxy/**"
       - "dashboard/data/criticality_summary.json"
+      - "dashboard/data/compounders.json"
+      - "dashboard/data/commodity_models.json"
       - "dashboard/data/portfolio_summary.json"
       - "dashboard/data/research_manifest.json"
       - "dashboard/data/kpi_summary.json"
       - "dashboard/data/document_catalog_summary.json"
       - "dashboard/data/agent_shards/**"
+      - "dashboard/private-assets.json"
       - "*/research/thesis_card.json"
       - "*/research/latest.json"
       - "GOOGL/research/valuation.json"
@@ -102,13 +139,41 @@ on:
       - "GOOGL/third-party-analyses/source_inventory.json"
       - "SOURCES.md"
       - ".gitignore"
+      - ".gitattributes"
       - "CONTRIBUTING.md"
       - "docs/WRITE_MAP.md"
+      - "dashboard/activist-viz.js"
+      - "dashboard/criticality-viz.js"
+      - "dashboard/darwin-cc-viz.js"
+      - "dashboard/fund-letters/reader.js"
+      - "dashboard/portfolio-viz.js"
+      - "dashboard/reverse-split-strategy.js"
+      - "dashboard/workspace-tools.js"
+      - "dashboard/display-system.js"
+      - "dashboard/display-system.css"
+      - "dashboard/display-registry.json"
+      - "dashboard/ui-format.js"
       - "dashboard/index.html"
+      - "dashboard/company-research.js"
+      - "dashboard/company-research.css"
+      - "dashboard/compounders.js"
+      - "dashboard/company-models.js"
+      - "dashboard/commodity-model-viz.js"
+      - "dashboard/research-desk.css"
+      - "dashboard/research-workspace.js"
+      - "dashboard/research-workspace.css"
+      - "dashboard/valuation-viz.js"
+      - "dashboard/insights-viz.js"
+      - "dashboard/strategy-workbench.js"
+      - "dashboard/strategy-workbench.css"
       - "dashboard/index-viz.js"
       - "dashboard/special-situations-viz.js"
       - "dashboard/separations-viz.js"
+      - "dashboard/search-match.js"
       - "dashboard/buyback-viz.js"
+      - "dashboard/buyback.css"
+      - "dashboard/data/buyback_manifest.json"
+      - "dashboard/data/buyback_snapshots/**"
       - "dashboard/desk-briefs-viz.js"
       - "dashboard/overlap-viz.js"
       - "dashboard/short-alpha-viz.js"
@@ -133,6 +198,9 @@ on:
       - "dashboard/data/capitulation_daily.json"
       - "dashboard/data/index_membership.json"
       - "dashboard/data/portfolio_news.json"
+      - "dashboard/data/warrants.json"
+      - "dashboard/data/activist_feed.json"
+      - "dashboard/data/document_catalog.json"
   # Bot pushes (GITHUB_TOKEN) start no workflow, so main is also tested daily.
   schedule:
     - cron: "23 5 * * *"
@@ -172,6 +240,9 @@ jobs:
   hub-payloads:
     runs-on: ubuntu-latest
     timeout-minutes: 5
+    env:
+      RESEARCH_VAULT_ROOT: _external/research-vault
+      RESEARCH_VAULT_CLONE_TOKEN: ${{ secrets.RESEARCH_VAULT_CLONE_TOKEN }}
     steps:
       - uses: actions/checkout@v4
         with:
@@ -180,6 +251,10 @@ jobs:
           filter: blob:none
           sparse-checkout: |
             /_system/scripts/check_hub_payloads.py
+            /_system/scripts/private_dashboard_assets.py
+            /_system/scripts/vault_paths.py
+            /.github/actions/checkout-vault/
+            /dashboard/private-assets.json
             /dashboard/data/core.json
             /dashboard/data/desk_briefs.json
             /dashboard/data/reverse_splits.json
@@ -191,6 +266,10 @@ jobs:
       - uses: actions/setup-python@v5
         with:
           python-version: "3.12"
+      - name: Restore authorized private hub inputs
+        uses: ./.github/actions/checkout-vault
+        with:
+          include-source-archive: "false"
       - name: Committed hub shards reconcile
         run: python _system/scripts/check_hub_payloads.py
 
@@ -220,6 +299,8 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 20
     env:
+      RESEARCH_VAULT_ROOT: _external/research-vault
+      RESEARCH_VAULT_CLONE_TOKEN: ${{ secrets.RESEARCH_VAULT_CLONE_TOKEN }}
       # Empty after the publisher cadence assertion was reconciled with main.
       KNOWN_FAILURES: ""
       # Suites that live beside the scripts rather than under tests/. Missing
@@ -237,11 +318,13 @@ jobs:
         _system/scripts/test_separation_flow_impact.py
         _system/scripts/test_separation_wiring.py
         _system/scripts/test_separation_falsifier_adapter.py
+        _system/scripts/test_epistemic_integrity.py
         _system/scripts/test_lint_deep_dive_separation.py
         _system/scripts/test_separations_ui.py
         _system/scripts/test_cvr_discovery.py
         _system/scripts/test_generalized_valuation_system.py
         _system/scripts/test_activist_attribution.py
+        _system/scripts/test_activist_subject.py
     steps:
       - uses: actions/checkout@v4
         with:
@@ -268,11 +351,14 @@ jobs:
             /dashboard/functions/
             /dashboard/oauth-proxy/
             /dashboard/data/criticality_summary.json
+            /dashboard/data/compounders.json
+            /dashboard/data/commodity_models.json
             /dashboard/data/portfolio_summary.json
             /dashboard/data/research_manifest.json
             /dashboard/data/kpi_summary.json
             /dashboard/data/document_catalog_summary.json
             /dashboard/data/agent_shards/
+            /dashboard/private-assets.json
             /*/research/thesis_card.json
             /*/research/latest.json
             /GOOGL/research/valuation.json
@@ -288,13 +374,41 @@ jobs:
             /GOOGL/third-party-analyses/source_inventory.json
             /SOURCES.md
             /.gitignore
+            /.gitattributes
             /CONTRIBUTING.md
             /docs/WRITE_MAP.md
+            /dashboard/activist-viz.js
+            /dashboard/criticality-viz.js
+            /dashboard/darwin-cc-viz.js
+            /dashboard/fund-letters/reader.js
+            /dashboard/portfolio-viz.js
+            /dashboard/reverse-split-strategy.js
+            /dashboard/workspace-tools.js
+            /dashboard/display-system.js
+            /dashboard/display-system.css
+            /dashboard/display-registry.json
+            /dashboard/ui-format.js
             /dashboard/index.html
+            /dashboard/company-research.js
+            /dashboard/company-research.css
+            /dashboard/compounders.js
+            /dashboard/company-models.js
+            /dashboard/commodity-model-viz.js
+            /dashboard/research-desk.css
+            /dashboard/research-workspace.js
+            /dashboard/research-workspace.css
+            /dashboard/valuation-viz.js
+            /dashboard/insights-viz.js
+            /dashboard/strategy-workbench.js
+            /dashboard/strategy-workbench.css
             /dashboard/index-viz.js
             /dashboard/special-situations-viz.js
             /dashboard/separations-viz.js
+            /dashboard/search-match.js
             /dashboard/buyback-viz.js
+            /dashboard/buyback.css
+            /dashboard/data/buyback_manifest.json
+            /dashboard/data/buyback_snapshots/
             /dashboard/desk-briefs-viz.js
             /dashboard/overlap-viz.js
             /dashboard/short-alpha-viz.js
@@ -317,6 +431,9 @@ jobs:
             /dashboard/data/capitulation_daily.json
             /dashboard/data/index_membership.json
             /dashboard/data/portfolio_news.json
+            /dashboard/data/warrants.json
+            /dashboard/data/activist_feed.json
+            /dashboard/data/document_catalog.json
           sparse-checkout-cone-mode: false
       - uses: actions/setup-python@v5
         with:
@@ -335,7 +452,11 @@ jobs:
           python -m pip install --disable-pip-version-check --quiet \
             "pytest==9.1.1" "PyYAML==6.0.3" "jsonschema==4.26.0" "numpy==2.3.3" "scipy==1.16.2" \
             "ruff==0.16.0" "pandas==3.0.3" "requests==2.34.2" \
-            "beautifulsoup4==4.15.0" "lxml==6.1.1"
+            "beautifulsoup4==4.15.0" "lxml==6.1.1" "exchange-calendars==4.13.2" "openpyxl==3.1.5" "pymupdf==1.28.0"
+      - name: Restore authorized private architecture fixtures
+        uses: ./.github/actions/checkout-vault
+        with:
+          include-source-archive: "false"
       - name: Trading and script test suites
         run: |
           set -euo pipefail

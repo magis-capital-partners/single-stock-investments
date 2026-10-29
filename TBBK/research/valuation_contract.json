@@ -4353,7 +4353,7 @@
     ]
   },
   "change_control": {
-    "model_hash": "7b6bf6246831efbb1d5716ba8c2e3dcb3468633ea65aa482a82b67320c41beed",
+    "model_hash": "a5f5e45b6471646be8fe2bd5bfc71954238fac8cba5e84d6c7d25afb04ef9b96",
     "method_versions": [
       "capital_structure_and_excess_return@1.0",
       "net_asset_value@1.0",
@@ -4363,6 +4363,201 @@
     "rule": "A source fact is locked. Every assumption change requires a reason, author, timestamp, and before/after value."
   },
   "decision_rule": "Proof status and investment readiness are separate. Every material claim must be valued exactly once by a valid calculation proof, every evidence blocker must be resolved, and the model must be stock-specific before committee review. Only a human decision can authorize capital.",
+  "shared_forecast": {
+    "schema_version": "1.0",
+    "method_version": "shared-valuation-forecast/1.1",
+    "ticker": "TBBK",
+    "status": "model_gap",
+    "research_only": true,
+    "requires_human_review": false,
+    "capital_actionable": false,
+    "as_of": "2026-08-06",
+    "model_as_of": "2026-08-06",
+    "quote": {
+      "value": 72.095,
+      "as_of": "2026-08-06",
+      "source_url": "Yahoo TBBK close 2026-08-06",
+      "currency": null
+    },
+    "forecast_hash": "366adf5947ac03db8b9ad1f49c0f0d848a601062daf6958528c59527eb78b839",
+    "forward_irr_pct": {
+      "low": null,
+      "base": null,
+      "high": null
+    },
+    "present_value_today_per_share": {
+      "low": null,
+      "base": null,
+      "high": null
+    },
+    "model_present_value_per_share": {
+      "low": null,
+      "base": null,
+      "high": null
+    },
+    "required_return_pct": {
+      "low": null,
+      "base": null,
+      "high": null
+    },
+    "forward_cashflow_schedule": {},
+    "buy_prices": [],
+    "components": [
+      {
+        "component_id": "fintech_solutions_franchise",
+        "method": "owner_earnings_reinvestment_dcf",
+        "status": "available",
+        "present_value_per_share": {
+          "low": 36.4567,
+          "base": 66.3044,
+          "high": 111.3966
+        }
+      },
+      {
+        "component_id": "credit_solutions_lending_book",
+        "method": "capital_structure_and_excess_return",
+        "status": "available",
+        "present_value_per_share": {
+          "low": 12.2356,
+          "base": 19.2727,
+          "high": 27.8138
+        }
+      },
+      {
+        "component_id": "corporate_and_securities",
+        "method": "capital_structure_and_excess_return",
+        "status": "available",
+        "present_value_per_share": {
+          "low": 1.3891,
+          "base": 2.0808,
+          "high": 2.8517
+        }
+      },
+      {
+        "component_id": "fintech_credit_enhancement_reserve",
+        "method": "net_asset_value",
+        "status": "model_gap",
+        "present_value_per_share": {}
+      }
+    ],
+    "gaps": [
+      {
+        "component_id": "fintech_credit_enhancement_reserve",
+        "case": "low",
+        "code": "realization_timing_missing:value_per_share"
+      },
+      {
+        "component_id": "fintech_credit_enhancement_reserve",
+        "case": "base",
+        "code": "realization_timing_missing:value_per_share"
+      },
+      {
+        "component_id": "fintech_credit_enhancement_reserve",
+        "case": "high",
+        "code": "realization_timing_missing:value_per_share"
+      }
+    ],
+    "warnings": [],
+    "source_refs": [
+      {
+        "node_id": "fintech_h1_2026_net_income_m",
+        "ref": "TBBK/investor-documents/ir-tbbk/tbbk-investor-presentation-q2-2026.pdf",
+        "locator": "Segment results table, six months ended Jun 30 2026: Fintech net income $71,322 thousand",
+        "as_of": "2026-06-30",
+        "source_id": "5c3e3cb818480f4ff20dab25313e77a021f5882b15ed5a5688fe06aaa4207540"
+      },
+      {
+        "node_id": "fintech_fy2025_net_income_m",
+        "ref": "TBBK/investor-documents/ir-tbbk/tbbk-investor-presentation-q2-2026.pdf",
+        "locator": "Segment results table, year ended Dec 31 2025: Fintech net income $115,835 thousand",
+        "as_of": "2025-12-31",
+        "source_id": "e962c2396ffb85ed93a68aeb5bfb5a1c87ee0222233dad5e438c22dbc647cd09"
+      },
+      {
+        "node_id": "fintech_fee_revenue_adjusted_fy2025_m",
+        "ref": "TBBK/investor-documents/ir-tbbk/tbbk-investor-presentation-q2-2026.pdf",
+        "locator": "Non-GAAP reconciliation: FTS fee revenue, adjusted $141,261 thousand FY2025",
+        "as_of": "2025-12-31",
+        "source_id": "4fb8c02ea2810bde0a20cd630bf4750fd9f32257afe75add6c5cc24323fedbb9"
+      },
+      {
+        "node_id": "gross_dollar_volume_fy2025_m",
+        "ref": "TBBK/investor-documents/ir-tbbk/tbbk-investor-presentation-q2-2026.pdf",
+        "locator": "Non-GAAP reconciliation: GDV $178,211,647 thousand FY2025",
+        "as_of": "2025-12-31",
+        "source_id": "93781e07f8d36d00a0d110ac80381d2ef2ef1360f08968f77f9dd29bf6d42d2e"
+      },
+      {
+        "node_id": "shares_m",
+        "ref": "TBBK/investor-documents/sec-edgar/10-Q_20260506_rpt20260331_acc0001295401_26_000004.htm",
+        "locator": "dei:EntityCommonStockSharesOutstanding 41,634,439; Form 10-Q cover page",
+        "as_of": "2026-04-27",
+        "source_id": "656d34eb07e0485922faf2b94c3b9975d930ac2302df645c8f0c8f0ac07a0a28"
+      },
+      {
+        "node_id": "rebl_h1_2026_net_income_m",
+        "ref": "TBBK/investor-documents/ir-tbbk/tbbk-investor-presentation-q2-2026.pdf",
+        "locator": "Segment results table, six months ended Jun 30 2026: REBL net income $29,275 thousand",
+        "as_of": "2026-06-30",
+        "source_id": "bf92483fc9a004aa33482c5439e01da6bafbfeae7175112bcc2c71bab11aacf4"
+      },
+      {
+        "node_id": "institutional_h1_2026_net_income_m",
+        "ref": "TBBK/investor-documents/ir-tbbk/tbbk-investor-presentation-q2-2026.pdf",
+        "locator": "Segment results table, six months ended Jun 30 2026: Institutional Banking net income $6,994 thousand",
+        "as_of": "2026-06-30",
+        "source_id": "5c9c2d379c29222973190808bc35f9ac2f14ce0b387b165aec84a4cfd77add79"
+      },
+      {
+        "node_id": "commercial_h1_2026_net_income_m",
+        "ref": "TBBK/investor-documents/ir-tbbk/tbbk-investor-presentation-q2-2026.pdf",
+        "locator": "Segment results table, six months ended Jun 30 2026: Commercial net income $8,077 thousand",
+        "as_of": "2026-06-30",
+        "source_id": "c05c11e168a2dde37da289d8f9a0c18bbb3ecfcf1305a7e3fd15b07dcea4e128"
+      },
+      {
+        "node_id": "stockholders_equity_fy2025_m",
+        "ref": "TBBK/investor-documents/sec-edgar/10-K_20260225_rpt20251231_acc0001295401_26_000002.htm",
+        "locator": "us-gaap:StockholdersEquity $689,796 thousand",
+        "as_of": "2025-12-31",
+        "source_id": "fac149ad25cdf5deda43f7a378c91734c7033e308e6c42a7e75f7a7094aa3e06"
+      },
+      {
+        "node_id": "total_assets_fy2025_m",
+        "ref": "TBBK/investor-documents/sec-edgar/10-K_20260225_rpt20251231_acc0001295401_26_000002.htm",
+        "locator": "us-gaap:Assets $9,352,425 thousand",
+        "as_of": "2025-12-31",
+        "source_id": "48e71f6ec3ecbdb0b139526fac4571d02758274fde249bd26175b6deeae0186b"
+      },
+      {
+        "node_id": "corporate_h1_2026_net_income_m",
+        "ref": "TBBK/investor-documents/ir-tbbk/tbbk-investor-presentation-q2-2026.pdf",
+        "locator": "Segment results table, six months ended Jun 30 2026: Corporate net income $5,057 thousand",
+        "as_of": "2026-06-30",
+        "source_id": "78da1e19c7c9b03d89b287a17a5fc9bacdf0d755c330a6aafee4c1fe7913cee3"
+      },
+      {
+        "node_id": "corporate_fy2025_net_income_m",
+        "ref": "TBBK/investor-documents/ir-tbbk/tbbk-investor-presentation-q2-2026.pdf",
+        "locator": "Segment results table, year ended Dec 31 2025: Corporate net income $22,854 thousand",
+        "as_of": "2025-12-31",
+        "source_id": "afc69e96243199380c5eb26ae2a03b415088a731c818f35aeca13888b611991f"
+      },
+      {
+        "node_id": "securities_fair_value_q2_2026_m",
+        "ref": "TBBK/investor-documents/ir-tbbk/tbbk-investor-presentation-q2-2026.pdf",
+        "locator": "Securities portfolio page: fair value $1,615 million at Jun-26, 4.3 year modified duration",
+        "as_of": "2026-06-30",
+        "source_id": "53dd20c83d1166d2b7480abaa4d94f00a1807aa497907012140fc02d77b85e42"
+      }
+    ],
+    "next_action": "automatic_model_refresh",
+    "reconciliation": {
+      "passed": false
+    },
+    "settlement_policy": "Explicit cash/debt additions in an operating DCF are time-zero acquisition adjustments; hypothetical settlement, not declared dividends.",
+    "calculation_id": "cc4a26e491fbc152b3c3390a6a8aa150ee8750dd77757d27c751cb2ae0d2dd3d"
+  },
   "authority": "universal_valuation_contract",
   "legacy_reference_present": true,
   "falsifier_coverage": {

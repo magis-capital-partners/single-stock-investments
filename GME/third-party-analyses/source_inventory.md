@@ -1,7 +1,7 @@
 # GME — Third-party source inventory
 
-**Date:** 2026-10-11
-**Sources:** 187 total (0 approved, 0 pending, 187 context)
+**Date:** 2026-10-25
+**Sources:** 189 total (0 approved, 0 pending, 189 context)
 
 | ID | Title | Path | Status | Use |
 |----|-------|------|--------|-----|
@@ -63,6 +63,7 @@
 | activist_long | Cohen Ryan — SC 13D/A | `GME/third-party-analyses/activist_reports/long/SC-13D/A_20261002_acc0000921895_26_002718.xml` | context | activist/long — sec_edgar |
 | activist_long | Cohen Ryan — SC 13D/A | `GME/third-party-analyses/activist_reports/long/SC-13D/A_20260929_acc0000921895_26_002679.xml` | context | activist/long — sec_edgar |
 | activist_long | Cohen Ryan — SC 13D/A | `GME/third-party-analyses/activist_reports/long/SC-13D/A_20260929_acc0000921895_26_002669.xml` | context | activist/long — sec_edgar |
+| activist_long | Cohen Ryan — SC 13D/A | `GME/third-party-analyses/activist_reports/long/SC-13D/A_20261013_acc0000921895_26_002783.xml` | context | activist/long — sec_edgar |
 | activist_long | acc0001326380 18 000003 | `GME/third-party-analyses/activist_reports/long/8-K_20180112_acc0001326380_18_000003.htm` | context | activist/long — local |
 | activist_long | acc0001326380 18 000007 | `GME/third-party-analyses/activist_reports/long/8-K_20180205_acc0001326380_18_000007.htm` | context | activist/long — local |
 | activist_long | acc0001326380 18 000010 | `GME/third-party-analyses/activist_reports/long/8-K_20180206_acc0001326380_18_000010.htm` | context | activist/long — local |
@@ -192,5 +193,6 @@
 | activist_long | acc0001326380 26 000042 | `GME/third-party-analyses/activist_reports/long/8-K_20260803_acc0001326380_26_000042.htm` | context | activist/long — local |
 | activist_long | acc0001326380 26 000046 | `GME/third-party-analyses/activist_reports/long/8-K_20260831_acc0001326380_26_000046.htm` | context | activist/long — local |
 | activist_long | acc0001326380 26 000050 | `GME/third-party-analyses/activist_reports/long/8-K_20260908_acc0001326380_26_000050.htm` | context | activist/long — local |
+| activist_long | acc0001326380 26 000064 | `GME/third-party-analyses/activist_reports/long/8-K_20261019_acc0001326380_26_000064.htm` | context | activist/long — local |
 
-Cross-check required: `GME/research/cross_check_third_party_2026-10-11.md`
+Cross-check required: `GME/research/cross_check_third_party_2026-10-25.md`

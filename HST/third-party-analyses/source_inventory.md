@@ -1,19 +1,10 @@
 # HST — Third-party source inventory
 
-**Date:** 2026-10-11
-**Sources:** 10 total (0 approved, 0 pending, 10 context)
+**Date:** 2026-10-25
+**Sources:** 0 total (0 approved, 0 pending, 0 context)
 
 | ID | Title | Path | Status | Use |
 |----|-------|------|--------|-----|
-| activist_short | Chris Drose 1/17/24 Chris Drose 1/17/24 | `_system/reference/activist-reports/bleecker_street/bleecker_street_2026-09-26_luxurban-hotels-luxh-the-bed-sheets-shou.html` | context | activist/short — publisher_site |
-| activist_short | Chris Drose 1/17/24 Chris Drose 1/17/24 | `_system/reference/activist-reports/bleecker_street/bleecker_street_2026-09-27_luxurban-hotels-luxh-the-bed-sheets-shou.html` | context | activist/short — publisher_site |
-| activist_short | Chris Drose 1/17/24 Chris Drose 1/17/24 | `_system/reference/activist-reports/bleecker_street/bleecker_street_2026-09-28_luxurban-hotels-luxh-the-bed-sheets-shou.html` | context | activist/short — publisher_site |
-| activist_short | Chris Drose 1/17/24 Chris Drose 1/17/24 | `_system/reference/activist-reports/bleecker_street/bleecker_street_2026-09-30_luxurban-hotels-luxh-the-bed-sheets-shou.html` | context | activist/short — publisher_site |
-| activist_short | Chris Drose 1/17/24 Chris Drose 1/17/24 | `_system/reference/activist-reports/bleecker_street/bleecker_street_2026-10-01_luxurban-hotels-luxh-the-bed-sheets-shou.html` | context | activist/short — publisher_site |
-| activist_short | Chris Drose 1/17/24 Chris Drose 1/17/24 | `_system/reference/activist-reports/bleecker_street/bleecker_street_2026-10-02_luxurban-hotels-luxh-the-bed-sheets-shou.html` | context | activist/short — publisher_site |
-| activist_short | Chris Drose 1/17/24 Chris Drose 1/17/24 | `_system/reference/activist-reports/bleecker_street/bleecker_street_2026-10-03_luxurban-hotels-luxh-the-bed-sheets-shou.html` | context | activist/short — publisher_site |
-| activist_short | Chris Drose 1/17/24 Chris Drose 1/17/24 | `_system/reference/activist-reports/bleecker_street/bleecker_street_2026-10-04_luxurban-hotels-luxh-the-bed-sheets-shou.html` | context | activist/short — publisher_site |
-| activist_short | Chris Drose 1/17/24 Chris Drose 1/17/24 | `_system/reference/activist-reports/bleecker_street/bleecker_street_2026-10-10_luxurban-hotels-luxh-the-bed-sheets-shou.html` | context | activist/short — publisher_site |
-| activist_short | Chris Drose 1/17/24 Chris Drose 1/17/24 | `_system/reference/activist-reports/bleecker_street/bleecker_street_2026-10-11_luxurban-hotels-luxh-the-bed-sheets-shou.html` | context | activist/short — publisher_site |
+| (none) | — | — | — | Primary filings only |
 
-Cross-check required: `HST/research/cross_check_third_party_2026-10-11.md`
+Cross-check required: `HST/research/cross_check_third_party_2026-10-25.md`

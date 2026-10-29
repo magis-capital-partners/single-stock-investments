@@ -436,8 +436,10 @@ def test_library_lists_the_playbook_and_paper_note() -> None:
 RENDER_JS = """
 global.window = global;
 require(%(viz)s);
+require(require('node:path').join(require('node:path').dirname(%(viz)s), 'strategy-workbench.js'));
 const payload = %(payload)s;
 const out = { html: ShortAlphaViz.render(payload), strip: ShortAlphaViz.lensStrip(payload.candidates[1].lens_reviews),
+  strategy: StrategyWorkbench.renderShort('backtest'),
   vault: ShortAlphaViz.noteRefHtml('research-vault/short-research/FAKE/2026-10-10-lockup-into-atm.md'),
   ssi: ShortAlphaViz.noteRefHtml('FAKE/research/short_note.md'), unsafe: ShortAlphaViz.noteRefHtml('../x.md'),
   mount: typeof ShortAlphaViz.mountReverseSplits };
@@ -477,7 +479,11 @@ def test_shorts_tab_renders_entry_fields_and_lens_strip(tmp_path: Path) -> None:
     assert out["vault"].startswith('<span class="short-note-ref is-vault"') and "href" not in out["vault"]
     assert out["ssi"].startswith('<a class="short-note-ref" href="https://github.com/magis-capital-partners/single-stock-investments/blob/main/FAKE/research/short_note.md"')
     assert "href" not in out["unsafe"]
-    assert 'data-short-reverse-splits hidden' in html and ">Reverse splits<" in html
+    assert 'data-short-reverse-splits' not in html
+    assert 'href="#/strategies/systematic-shorts/backtest"' in html
+    assert 'Short backtest selection' in out["strategy"]
+    assert 'Earlier research' in out["strategy"]
+    assert 'Strategy</a>' in out["strategy"]
     assert out["mount"] == "function"
 
 

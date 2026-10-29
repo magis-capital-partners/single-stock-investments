@@ -7,7 +7,7 @@ from datetime import datetime, timedelta, timezone
 import numpy as np
 import pytest
 
-from conftest import ROOT
+from conftest import ROOT, assert_contiguous_hypothesis_ids
 
 import check_reverse_splits
 from reverse_splits import execution_realism as er
@@ -452,9 +452,9 @@ def test_mark_measured_updates_status_and_result_ref_only(fixture_ledger):
     assert hyp.registry_errors(load_jsonl(fixture_ledger / hyp.REGISTRY_NAME)) == []
 
 
-def test_registry_still_has_seventeen_rows_and_workstream_a_cites_registered_ids():
+def test_registry_ids_are_contiguous_and_workstream_a_cites_registered_ids():
     rows = load_jsonl(LEDGER / hyp.REGISTRY_NAME)
-    assert [r["id"] for r in rows] == [f"H{i}" for i in range(1, 20)]
+    assert_contiguous_hypothesis_ids(rows)
     assert hyp.registry_errors(rows) == []
     assert hyp.declared_before(rows, list(er.HYPOTHESES), datetime.now(timezone.utc))
     by = {r["id"]: r for r in rows}

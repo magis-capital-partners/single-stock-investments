@@ -1,7 +1,7 @@
 {
   "schema_version": "3.0",
   "ticker": "8697.T",
-  "as_of": "2026-10-19",
+  "as_of": "2026-10-27",
   "proof_status": "decision_grade",
   "model_level": "stock_specific",
   "model_level_reason": "The proof-complete model uses stock-specific components and assumptions.",
@@ -15,7 +15,9 @@
     "model_as_of": "2026-08-04",
     "latest_fact_as_of": "2026-03-31",
     "oldest_fact_as_of": "2026-03-31",
-    "price_as_of": "2026-09-01"
+    "price_as_of": "2026-09-01",
+    "forecast_as_of": "2026-08-04",
+    "calculation_as_of": "2026-09-01"
   },
   "legacy_audit": {
     "actionable": false,
@@ -70,18 +72,20 @@
       "high": null
     },
     "forward_return_status": "withheld",
-    "forward_return_reason": "present_value_today cannot be annualized as a future payoff",
+    "forward_return_reason": "shared_forecast_incomplete",
     "required_return_pct": 10.0,
     "downside_to_low_pct": -55.25,
     "unvalued_component_count": 0,
     "unresolved_evidence_count": 0,
     "proof_complete_pct": 100.0,
-    "model_hash": "28952ffe06a46aa4bfdce5904165501a9eceb91d9c8fd0f5839e7cebd2113dc4",
+    "model_hash": "ddd51092ae4d03d2a6891cce88876977f38a325b5d5351614a50a7da98da088c",
     "dates": {
       "model_as_of": "2026-08-04",
       "latest_fact_as_of": "2026-03-31",
       "oldest_fact_as_of": "2026-03-31",
-      "price_as_of": "2026-09-01"
+      "price_as_of": "2026-09-01",
+      "forecast_as_of": "2026-08-04",
+      "calculation_as_of": "2026-09-01"
     },
     "legacy_audit": {
       "actionable": false,
@@ -102,7 +106,11 @@
     },
     "primary_power_zone": "High-return compounder",
     "owner_decision": null,
-    "next_action": "Replace stale or unbound outputs (pre_mortem.json, evidence_tribunal.json, research_response.json) against the frozen packet; keep each rater isolated from peer votes."
+    "next_action": "Replace stale or unbound outputs (pre_mortem.json, evidence_tribunal.json, research_response.json) against the frozen packet; keep each rater isolated from peer votes.",
+    "forecast_id": "92933b71fb559b634036bd7388affbc99f7d0c2d8fb70a6eaa6a95104613bc07",
+    "calculation_status": "model_gap",
+    "research_return_available": false,
+    "calculation_reason": "realization_timing_missing:reinvestment_value_per_share; realization_timing_missing:net_financial_per_share; realization_timing_missing:normalized_owner_cash"
   },
   "business": {
     "status": "complete",
@@ -2027,7 +2035,9 @@
       "model_as_of": "2026-08-04",
       "latest_fact_as_of": "2026-03-31",
       "oldest_fact_as_of": "2026-03-31",
-      "price_as_of": "2026-09-01"
+      "price_as_of": "2026-09-01",
+      "forecast_as_of": "2026-08-04",
+      "calculation_as_of": "2026-09-01"
     },
     "legacy_audit": {
       "actionable": false,
@@ -4139,7 +4149,7 @@
       }
     ],
     "change_control": {
-      "model_hash": "28952ffe06a46aa4bfdce5904165501a9eceb91d9c8fd0f5839e7cebd2113dc4",
+      "model_hash": "ddd51092ae4d03d2a6891cce88876977f38a325b5d5351614a50a7da98da088c",
       "method_versions": [
         "midcycle_capacity_value@1.0",
         "net_asset_value@1.0",
@@ -4378,21 +4388,35 @@
     "drivers": [],
     "category_totals_per_share": {},
     "unexplained_per_share": 0.0,
-    "explanation": "Component changes are classified from observable differences in quantity, comparable method, probability, timing, capital, evidence, and schedule scope."
+    "explanation": "Component changes are classified from observable differences in quantity, comparable method, probability, timing, capital, evidence, and schedule scope.",
+    "tci_irr": {
+      "status": "available",
+      "method": "price_then_fcf_then_growth_then_multiple",
+      "unit": "percentage_points_per_year",
+      "total_delta_pp": -0.45557559604102194,
+      "price_pp": -0.45557559604102194,
+      "fcf_pp": 0.0,
+      "growth_pp": 0.0,
+      "multiple_pp": 0.0,
+      "residual_pp": 0.0,
+      "prior_snapshot": "valuation_history/valuation_2026-08-04.json"
+    }
   },
   "freshness": {
     "status": "stale",
-    "as_of": "2026-10-19",
+    "as_of": "2026-10-27",
     "dates": {
       "model_as_of": "2026-08-04",
       "latest_fact_as_of": "2026-03-31",
       "oldest_fact_as_of": "2026-03-31",
-      "price_as_of": "2026-09-01"
+      "price_as_of": "2026-09-01",
+      "forecast_as_of": "2026-08-04",
+      "calculation_as_of": "2026-09-01"
     },
     "age_days": {
-      "model_as_of": 76,
-      "latest_fact_as_of": 202,
-      "price_as_of": 48
+      "model_as_of": 84,
+      "latest_fact_as_of": 210,
+      "price_as_of": 56
     },
     "review_threshold_days": {
       "model_as_of": 365,
@@ -4400,7 +4424,7 @@
       "price_as_of": 7
     },
     "warnings": [
-      "price_as_of is 48 days old (review threshold 7)"
+      "price_as_of is 56 days old (review threshold 7)"
     ],
     "rule": "Freshness is disclosed separately from proof completeness; stale or undated inputs require review before a new capital decision."
   }

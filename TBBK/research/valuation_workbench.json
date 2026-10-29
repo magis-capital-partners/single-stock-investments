@@ -1,7 +1,7 @@
 {
   "schema_version": "3.0",
   "ticker": "TBBK",
-  "as_of": "2026-10-19",
+  "as_of": "2026-10-27",
   "proof_status": "decision_grade",
   "model_level": "stock_specific",
   "model_level_reason": "The proof-complete model uses stock-specific components and assumptions.",
@@ -15,7 +15,9 @@
     "model_as_of": "2026-08-06",
     "latest_fact_as_of": "2026-06-30",
     "oldest_fact_as_of": "2025-12-31",
-    "price_as_of": "2026-08-06"
+    "price_as_of": "2026-08-06",
+    "forecast_as_of": "2026-08-06",
+    "calculation_as_of": "2026-08-06"
   },
   "legacy_audit": {
     "actionable": false,
@@ -70,18 +72,20 @@
       "high": null
     },
     "forward_return_status": "withheld",
-    "forward_return_reason": "present_value_today cannot be annualized as a future payoff",
+    "forward_return_reason": "shared_forecast_incomplete",
     "required_return_pct": null,
     "downside_to_low_pct": -32.73,
     "unvalued_component_count": 0,
     "unresolved_evidence_count": 0,
     "proof_complete_pct": 100.0,
-    "model_hash": "7b6bf6246831efbb1d5716ba8c2e3dcb3468633ea65aa482a82b67320c41beed",
+    "model_hash": "a5f5e45b6471646be8fe2bd5bfc71954238fac8cba5e84d6c7d25afb04ef9b96",
     "dates": {
       "model_as_of": "2026-08-06",
       "latest_fact_as_of": "2026-06-30",
       "oldest_fact_as_of": "2025-12-31",
-      "price_as_of": "2026-08-06"
+      "price_as_of": "2026-08-06",
+      "forecast_as_of": "2026-08-06",
+      "calculation_as_of": "2026-08-06"
     },
     "legacy_audit": {
       "actionable": false,
@@ -102,7 +106,11 @@
     },
     "primary_power_zone": "High-return compounder",
     "owner_decision": null,
-    "next_action": "Freeze the evidence packet and select three method-independent raters."
+    "next_action": "Freeze the evidence packet and select three method-independent raters.",
+    "forecast_id": "cc4a26e491fbc152b3c3390a6a8aa150ee8750dd77757d27c751cb2ae0d2dd3d",
+    "calculation_status": "model_gap",
+    "research_return_available": false,
+    "calculation_reason": "realization_timing_missing:value_per_share"
   },
   "business": {
     "status": "complete",
@@ -3910,7 +3918,9 @@
       "model_as_of": "2026-08-06",
       "latest_fact_as_of": "2026-06-30",
       "oldest_fact_as_of": "2025-12-31",
-      "price_as_of": "2026-08-06"
+      "price_as_of": "2026-08-06",
+      "forecast_as_of": "2026-08-06",
+      "calculation_as_of": "2026-08-06"
     },
     "legacy_audit": {
       "actionable": false,
@@ -7973,7 +7983,7 @@
       }
     ],
     "change_control": {
-      "model_hash": "7b6bf6246831efbb1d5716ba8c2e3dcb3468633ea65aa482a82b67320c41beed",
+      "model_hash": "a5f5e45b6471646be8fe2bd5bfc71954238fac8cba5e84d6c7d25afb04ef9b96",
       "method_versions": [
         "capital_structure_and_excess_return@1.0",
         "net_asset_value@1.0",
@@ -8171,21 +8181,27 @@
     "drivers": [],
     "category_totals_per_share": {},
     "unexplained_per_share": null,
-    "explanation": "The current component schedule is the first decision-grade baseline; attribution begins with the next dated valuation snapshot."
+    "explanation": "The current component schedule is the first decision-grade baseline; attribution begins with the next dated valuation snapshot.",
+    "tci_irr": {
+      "status": "waiting_for_comparable_baseline",
+      "unit": "percentage_points_per_year"
+    }
   },
   "freshness": {
     "status": "stale",
-    "as_of": "2026-10-19",
+    "as_of": "2026-10-27",
     "dates": {
       "model_as_of": "2026-08-06",
       "latest_fact_as_of": "2026-06-30",
       "oldest_fact_as_of": "2025-12-31",
-      "price_as_of": "2026-08-06"
+      "price_as_of": "2026-08-06",
+      "forecast_as_of": "2026-08-06",
+      "calculation_as_of": "2026-08-06"
     },
     "age_days": {
-      "model_as_of": 74,
-      "latest_fact_as_of": 111,
-      "price_as_of": 74
+      "model_as_of": 82,
+      "latest_fact_as_of": 119,
+      "price_as_of": 82
     },
     "review_threshold_days": {
       "model_as_of": 365,
@@ -8193,7 +8209,7 @@
       "price_as_of": 7
     },
     "warnings": [
-      "price_as_of is 74 days old (review threshold 7)"
+      "price_as_of is 82 days old (review threshold 7)"
     ],
     "rule": "Freshness is disclosed separately from proof completeness; stale or undated inputs require review before a new capital decision."
   }

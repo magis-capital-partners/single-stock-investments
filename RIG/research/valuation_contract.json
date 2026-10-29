@@ -1193,7 +1193,7 @@
     ]
   },
   "change_control": {
-    "model_hash": "9b40c069acde68c74b8df200a6fb1cde2e101b405103a150386a1a26241c5c58",
+    "model_hash": "918f770eb3f0fc5f6d897f5df8d13446331017348b274dc99ab5bfc0c426e6ef",
     "method_versions": [
       "midcycle_capacity_value@1.0",
       "net_asset_value@1.0",
@@ -1203,6 +1203,121 @@
     "rule": "A source fact is locked. Every assumption change requires a reason, author, timestamp, and before/after value."
   },
   "decision_rule": "Proof status and investment readiness are separate. Every material claim must be valued exactly once by a valid calculation proof, every evidence blocker must be resolved, and the model must be stock-specific before committee review. Only a human decision can authorize capital.",
+  "shared_forecast": {
+    "schema_version": "1.0",
+    "method_version": "shared-valuation-forecast/1.1",
+    "ticker": "RIG",
+    "status": "model_gap",
+    "research_only": true,
+    "requires_human_review": false,
+    "capital_actionable": false,
+    "as_of": "2026-08-18",
+    "model_as_of": "2026-08-18",
+    "quote": {
+      "value": 5.855,
+      "as_of": "2026-08-18",
+      "source_url": "yahoo:RIG close 2026-08-18",
+      "currency": null
+    },
+    "forecast_hash": "7534e8f79384880ec54511cbdb0f97f44fb4df38d3efd312ca48af7e331c63fe",
+    "forward_irr_pct": {
+      "low": null,
+      "base": null,
+      "high": null
+    },
+    "present_value_today_per_share": {
+      "low": null,
+      "base": null,
+      "high": null
+    },
+    "model_present_value_per_share": {
+      "low": null,
+      "base": null,
+      "high": null
+    },
+    "required_return_pct": {
+      "low": null,
+      "base": null,
+      "high": null
+    },
+    "forward_cashflow_schedule": {},
+    "buy_prices": [],
+    "components": [
+      {
+        "component_id": "midcycle_offshore_drilling",
+        "method": "midcycle_capacity_value",
+        "status": "model_gap",
+        "present_value_per_share": {}
+      },
+      {
+        "component_id": "net_debt_position",
+        "method": "net_asset_value",
+        "status": "model_gap",
+        "present_value_per_share": {}
+      },
+      {
+        "component_id": "valaris_merger_option",
+        "method": "risk_adjusted_milestone_value",
+        "status": "model_gap",
+        "present_value_per_share": {}
+      }
+    ],
+    "gaps": [
+      {
+        "component_id": "midcycle_offshore_drilling",
+        "case": "low",
+        "code": "realization_timing_missing:value_per_share"
+      },
+      {
+        "component_id": "midcycle_offshore_drilling",
+        "case": "base",
+        "code": "realization_timing_missing:value_per_share"
+      },
+      {
+        "component_id": "midcycle_offshore_drilling",
+        "case": "high",
+        "code": "realization_timing_missing:value_per_share"
+      },
+      {
+        "component_id": "net_debt_position",
+        "case": "low",
+        "code": "realization_timing_missing:debt_m"
+      },
+      {
+        "component_id": "net_debt_position",
+        "case": "base",
+        "code": "realization_timing_missing:debt_m"
+      },
+      {
+        "component_id": "net_debt_position",
+        "case": "high",
+        "code": "realization_timing_missing:debt_m"
+      },
+      {
+        "component_id": "valaris_merger_option",
+        "case": "low",
+        "code": "invalid_calculation_proof"
+      },
+      {
+        "component_id": "valaris_merger_option",
+        "case": "base",
+        "code": "invalid_calculation_proof"
+      },
+      {
+        "component_id": "valaris_merger_option",
+        "case": "high",
+        "code": "invalid_calculation_proof"
+      }
+    ],
+    "warnings": [],
+    "source_refs": [],
+    "next_action": "automatic_model_refresh",
+    "reconciliation": {
+      "passed": false
+    },
+    "settlement_policy": "Explicit cash/debt additions in an operating DCF are time-zero acquisition adjustments; hypothetical settlement, not declared dividends.",
+    "calculation_id": "e4e8b358c5fec3656cb8d559ea40428fea4ad015a173e95a0170d124bf8dad1b"
+  },
   "authority": "universal_valuation_contract",
   "legacy_reference_present": true,
   "falsifier_coverage": {

@@ -1,7 +1,7 @@
 # PSKY — Third-party source inventory
 
-**Date:** 2026-10-11
-**Sources:** 72 total (0 approved, 0 pending, 72 context)
+**Date:** 2026-10-25
+**Sources:** 74 total (0 approved, 0 pending, 74 context)
 
 | ID | Title | Path | Status | Use |
 |----|-------|------|--------|-----|
@@ -77,5 +77,7 @@
 | activist_long | acc0001104659 26 113076 | `PSKY/third-party-analyses/activist_reports/long/8-K_20261002_acc0001104659_26_113076.htm` | context | activist/long — local |
 | activist_long | acc0001104659 26 113913 | `PSKY/third-party-analyses/activist_reports/long/8-K_20261006_acc0001104659_26_113913.htm` | context | activist/long — local |
 | activist_long | acc0001104659 26 114113 | `PSKY/third-party-analyses/activist_reports/long/8-K_20261006_acc0001104659_26_114113.htm` | context | activist/long — local |
+| activist_long | acc0001104659 26 115294 | `PSKY/third-party-analyses/activist_reports/long/8-K_20261013_acc0001104659_26_115294.htm` | context | activist/long — local |
+| activist_long | acc0001104659 26 116333 | `PSKY/third-party-analyses/activist_reports/long/8-K_20261016_acc0001104659_26_116333.htm` | context | activist/long — local |
 
-Cross-check required: `PSKY/research/cross_check_third_party_2026-10-11.md`
+Cross-check required: `PSKY/research/cross_check_third_party_2026-10-25.md`

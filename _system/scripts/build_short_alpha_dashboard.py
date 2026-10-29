@@ -1011,6 +1011,7 @@ def build(
             "buyback_issuance": "Names whose share count rose over the last year after a multi-year shrink. Candidate signals for the dilution / financing lens. Not ranked shorts.",
         },
         "buyback_issuance_signals": _buyback_issuance_signals(),
+        "buyback_snapshot": __import__("build_buyback_radar").load_shared_snapshot().get("manifest",{}),
         "category_lenses": CATEGORY_LENSES,
     }
 
@@ -1068,5 +1069,21 @@ def main() -> None:
     )
 
 
+def refresh_buyback_projection():
+    """The Shorts producer owns its projection; the radar never stamps this file."""
+    from build_buyback_radar import load_shared_snapshot
+    from atomic_io import write_json_if_changed
+    path=ROOT/"dashboard/data/short_alpha.json"
+    doc=_read_json(path)
+    shared=load_shared_snapshot()
+    if not doc or not shared:
+        raise SystemExit("Shorts or verified buyback snapshot is unavailable")
+    doc["buyback_issuance_signals"]=shared["companies"].get("issuance_signals",[])
+    doc["buyback_snapshot"]={k:shared["manifest"].get(k) for k in ("snapshot_id","as_of","health")}
+    write_json_if_changed(path,doc)
+
 if __name__ == "__main__":
-    main()
+    if sys.argv[1:] == ["--refresh-buyback-projection"]:
+        refresh_buyback_projection()
+    else:
+        main()

@@ -96,71 +96,61 @@
   "method_route": {
     "schema_version": "2.0",
     "status": "routed",
-    "profile_id": "quality_reinvestment",
-    "label": "High-return compounder",
-    "score": 16.0,
+    "profile_id": "catalyst_asset_value",
+    "label": "Catalyst-backed asset value",
+    "score": 18.0,
     "reasons": [
-      "archetype=compounder",
+      "archetype=holding_company",
+      "component categories=dated_payoff",
+      "existing methods=dated_payoff",
       "explicit reviewed profile"
     ],
     "primary_methods": [
-      "owner_earnings_reinvestment_dcf"
+      "probability_weighted_catalyst_nav"
     ],
     "corroborating_methods": [
-      "reverse_dcf",
-      "incremental_roic_runway"
+      "break_value",
+      "timing_adjusted_payoff"
     ],
     "primary_personas": [
-      "buffett_weschler",
-      "hohn"
+      "klarman_asset_value",
+      "greenblatt"
     ],
     "cross_check_personas": [
-      "munger",
-      "marathon_capital_cycle"
+      "pabrai",
+      "marks_credit_cycle"
     ],
     "silent_personas": [
-      "greenblatt",
+      "buffett_weschler",
       "hk",
-      "klarman_asset_value",
+      "hohn",
       "lawrence",
-      "marks_credit_cycle",
+      "marathon_capital_cycle",
       "moi",
-      "pabrai",
+      "munger",
       "stahl"
     ],
     "required_evidence": [
-      "normalized owner earnings",
-      "incremental return on capital",
-      "reinvestment runway",
-      "diluted share count",
-      "competitive-advantage mechanism"
+      "finite event tree",
+      "catalyst control and timing",
+      "break value",
+      "tax and legal claims",
+      "financing through realization"
     ],
     "failure_modes": [
-      "growth projected without its capital cost",
-      "stock compensation or acquisitions omitted",
-      "terminal value unsupported by a durable mechanism"
+      "catalyst assumed rather than evidenced",
+      "delay and break cases omitted",
+      "gross proceeds used before tax and senior claims"
     ],
-    "secondary_profiles": [
-      {
-        "profile_id": "catalyst_asset_value",
-        "score": 2.0,
-        "reasons": [
-          "component categories=dated_payoff",
-          "existing methods=dated_payoff"
-        ]
-      }
-    ],
+    "secondary_profiles": [],
     "scorecard": {
       "scarce_asset_optionality": {
         "score": 0.0,
         "reasons": []
       },
       "quality_reinvestment": {
-        "score": 16.0,
-        "reasons": [
-          "archetype=compounder",
-          "explicit reviewed profile"
-        ]
+        "score": 0.0,
+        "reasons": []
       },
       "capital_cycle": {
         "score": 0.0,
@@ -171,10 +161,12 @@
         "reasons": []
       },
       "catalyst_asset_value": {
-        "score": 2.0,
+        "score": 18.0,
         "reasons": [
+          "archetype=holding_company",
           "component categories=dated_payoff",
-          "existing methods=dated_payoff"
+          "existing methods=dated_payoff",
+          "explicit reviewed profile"
         ]
       },
       "predictable_cash_flow": {
@@ -188,12 +180,12 @@
     },
     "decision_rule": "Power Zones select the fitting economic method and eligible independent reviewers; they never choose the valuation answer or capital decision.",
     "ticker": "ETHA",
-    "as_of": "2026-10-19",
+    "as_of": "2026-10-29",
     "route_source": "canonical_power_zone_router",
     "config_path": "_system/frameworks/power_zones.json",
     "config_updated": "2026-07-14",
     "classification": {
-      "archetype": "compounder",
+      "archetype": "holding_company",
       "moat": "n/a",
       "dhando": "partial",
       "stance": "watch",
@@ -203,49 +195,32 @@
       "investment_sleeve": "ls_algo_underlying",
       "predictive_attribute": "wrapper_tracking_basis"
     },
-    "specialist_power_zones": [
-      {
-        "persona": "lawrence",
-        "label": "Bryan Lawrence",
-        "independence_group": "quality_reinvestment",
-        "in_power_zone": true,
-        "fit": 0.667,
-        "matched": 2,
-        "known_fields": 2,
-        "matched_fields": [
-          "archetype",
-          "dhando"
-        ],
-        "excluded_by": null,
-        "match_rate": null,
-        "score": 57
-      }
-    ],
+    "specialist_power_zones": [],
     "committee": {
       "candidate_count": 4,
-      "independence_group_count": 3,
+      "independence_group_count": 4,
       "committee_seatable": true,
       "candidates": [
         {
-          "persona": "buffett_weschler",
-          "independence_group": "quality_reinvestment"
+          "persona": "klarman_asset_value",
+          "independence_group": "asset_realization"
         },
         {
-          "persona": "hohn",
-          "independence_group": "competitive_advantage"
+          "persona": "greenblatt",
+          "independence_group": "special_situations"
         },
         {
-          "persona": "munger",
-          "independence_group": "quality_reinvestment"
+          "persona": "pabrai",
+          "independence_group": "asymmetry_downside"
         },
         {
-          "persona": "marathon_capital_cycle",
-          "independence_group": "capital_cycle"
+          "persona": "marks_credit_cycle",
+          "independence_group": "credit_cycle"
         }
       ]
     },
-    "input_hash": "8b67b62dd3cf24c81559bd3baa80b70f99d75fc2f608eb1c0ac2b07d4bf18cbb",
-    "generated_at": "2026-10-19T08:10:40.860924+00:00"
+    "input_hash": "9aeba3f7a567565f83aeb3745bdf0f6449b40ad6bef0cef9a918c42785d3e1b4",
+    "generated_at": "2026-10-29T09:16:39.149144+00:00"
   },
   "market": {
     "price_per_share": 20.37,
@@ -402,12 +377,85 @@
     ]
   },
   "change_control": {
-    "model_hash": "461b05d2754f80f733cc236bab4314399ed0bc48b9841d49f6a671d4268d1790",
+    "model_hash": "6758ee6212c29582c0790ba1b564e0527471b7fcf663e1f7f2f1ab9a935e552e",
     "method_versions": [],
     "change_log": [],
     "rule": "A source fact is locked. Every assumption change requires a reason, author, timestamp, and before/after value."
   },
   "decision_rule": "Proof status and investment readiness are separate. Every material claim must be valued exactly once by a valid calculation proof, every evidence blocker must be resolved, and the model must be stock-specific before committee review. Only a human decision can authorize capital.",
+  "shared_forecast": {
+    "schema_version": "1.0",
+    "method_version": "shared-valuation-forecast/1.3",
+    "ticker": "ETHA",
+    "status": "sync_gap",
+    "research_only": true,
+    "requires_human_review": false,
+    "capital_actionable": false,
+    "as_of": "2026-10-01",
+    "model_as_of": "2026-10-02",
+    "quote": {
+      "value": 20.37,
+      "as_of": "2026-10-01",
+      "source_url": "Yahoo ETHA close 2026-10-01"
+    },
+    "forecast_hash": null,
+    "forward_irr_pct": {
+      "low": null,
+      "base": null,
+      "high": null
+    },
+    "present_value_today_per_share": {
+      "low": null,
+      "base": null,
+      "high": null
+    },
+    "model_present_value_per_share": {
+      "low": null,
+      "base": null,
+      "high": null
+    },
+    "required_return_pct": {
+      "low": null,
+      "base": null,
+      "high": null
+    },
+    "forward_cashflow_schedule": {},
+    "buy_prices": [],
+    "components": [],
+    "gaps": [
+      {
+        "code": "listing_calendar_or_completed_close_unverified"
+      },
+      {
+        "code": "model_assumptions_expired"
+      },
+      {
+        "code": "corporate_action_history_unverified"
+      },
+      {
+        "code": "financial_inputs_expired_or_undated"
+      }
+    ],
+    "warnings": [],
+    "source_refs": [],
+    "next_action": "automatic_source_refresh",
+    "reconciliation": {
+      "passed": false
+    },
+    "settlement_policy": "Explicit cash/debt additions in an operating DCF are time-zero acquisition adjustments; hypothetical settlement, not declared dividends.",
+    "financial_period": null,
+    "market_sync": {
+      "status": "updating",
+      "price_as_of": "2026-10-01",
+      "financial_period": null,
+      "model_as_of": "2026-10-02",
+      "price_policy": "latest_completed_exchange_session",
+      "basis_id": null,
+      "latest_report": {}
+    },
+    "assumptions_as_of": "2026-10-02",
+    "calculation_id": "737a68cf4d878477aa1b1786e9dfb03cd17d20945d29eb10b4b23542eaf715c6"
+  },
   "authority": "universal_valuation_contract",
   "legacy_reference_present": true,
   "falsifier_coverage": {

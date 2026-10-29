@@ -1640,7 +1640,7 @@
     ]
   },
   "change_control": {
-    "model_hash": "19635840f60becd99dee9932d4c02227b2a64ecc5f76fc227dd00d294a908e97",
+    "model_hash": "572d019d43758dff887b163e1041b960d3385e7380bff16fedbe107140cdc305",
     "method_versions": [
       "net_asset_value@1.0",
       "probability_weighted_catalyst_nav@1.0",
@@ -1650,6 +1650,154 @@
     "rule": "A source fact is locked. Every assumption change requires a reason, author, timestamp, and before/after value."
   },
   "decision_rule": "Proof status and investment readiness are separate. Every material claim must be valued exactly once by a valid calculation proof, every evidence blocker must be resolved, and the model must be stock-specific before committee review. Only a human decision can authorize capital.",
+  "shared_forecast": {
+    "schema_version": "1.0",
+    "method_version": "shared-valuation-forecast/1.1",
+    "ticker": "CRML",
+    "status": "model_gap",
+    "research_only": true,
+    "requires_human_review": false,
+    "capital_actionable": false,
+    "as_of": "2026-08-31",
+    "model_as_of": "2026-07-23",
+    "quote": {
+      "value": 7.21,
+      "as_of": "2026-08-31",
+      "source_url": "Yahoo CRML close 2026-08-31",
+      "currency": null
+    },
+    "forecast_hash": "25cca654aa10cfce748262fbedfca27c4cab87b89003f473d4e1ef5f99eb85b4",
+    "forward_irr_pct": {
+      "low": null,
+      "base": null,
+      "high": null
+    },
+    "present_value_today_per_share": {
+      "low": null,
+      "base": null,
+      "high": null
+    },
+    "model_present_value_per_share": {
+      "low": null,
+      "base": null,
+      "high": null
+    },
+    "required_return_pct": {
+      "low": null,
+      "base": null,
+      "high": null
+    },
+    "forward_cashflow_schedule": {},
+    "buy_prices": [],
+    "components": [
+      {
+        "component_id": "corporate_cash",
+        "method": "net_asset_value",
+        "status": "model_gap",
+        "present_value_per_share": {}
+      },
+      {
+        "component_id": "tanbreez_risked_nav",
+        "method": "probability_weighted_catalyst_nav",
+        "status": "model_gap",
+        "present_value_per_share": {}
+      },
+      {
+        "component_id": "wolfsberg_option",
+        "method": "risk_adjusted_milestone_value",
+        "status": "model_gap",
+        "present_value_per_share": {
+          "low": 0.0
+        }
+      },
+      {
+        "component_id": "dilution_reserve",
+        "method": "net_asset_value",
+        "status": "model_gap",
+        "present_value_per_share": {}
+      }
+    ],
+    "gaps": [
+      {
+        "component_id": "corporate_cash",
+        "case": "low",
+        "code": "realization_timing_missing:cash_m"
+      },
+      {
+        "component_id": "corporate_cash",
+        "case": "base",
+        "code": "realization_timing_missing:cash_m"
+      },
+      {
+        "component_id": "corporate_cash",
+        "case": "high",
+        "code": "realization_timing_missing:cash_m"
+      },
+      {
+        "component_id": "tanbreez_risked_nav",
+        "case": "low",
+        "code": "realization_timing_missing:value_per_share"
+      },
+      {
+        "component_id": "tanbreez_risked_nav",
+        "case": "base",
+        "code": "realization_timing_missing:value_per_share"
+      },
+      {
+        "component_id": "tanbreez_risked_nav",
+        "case": "high",
+        "code": "realization_timing_missing:value_per_share"
+      },
+      {
+        "component_id": "wolfsberg_option",
+        "case": "base",
+        "code": "realization_timing_missing:value_per_share"
+      },
+      {
+        "component_id": "wolfsberg_option",
+        "case": "high",
+        "code": "realization_timing_missing:value_per_share"
+      },
+      {
+        "component_id": "dilution_reserve",
+        "case": "low",
+        "code": "realization_timing_missing:dilution_reserve_per_share"
+      },
+      {
+        "component_id": "dilution_reserve",
+        "case": "base",
+        "code": "realization_timing_missing:dilution_reserve_per_share"
+      },
+      {
+        "component_id": "dilution_reserve",
+        "case": "high",
+        "code": "realization_timing_missing:dilution_reserve_per_share"
+      }
+    ],
+    "warnings": [],
+    "source_refs": [
+      {
+        "node_id": "bmw_advance_m",
+        "ref": "CRML/investor-documents/sec-edgar/20-F_20251006_rpt20250630_acc0001213900_25_096254.htm",
+        "locator": "BMW offtake advance payment US$15.0 million on June 5, 2024; restricted until production",
+        "as_of": "2025-06-30",
+        "source_id": "9a8f12ea6087384007fd194e6efeefb6193bd5d54b36a912682a35e5a5324ba8"
+      },
+      {
+        "node_id": "shares_m",
+        "ref": "CRML/investor-documents/sec-edgar/20-F_20251006_rpt20250630_acc0001213900_25_096254.htm",
+        "locator": "Cover page: 104,912,853 ordinary shares outstanding at June 30, 2025",
+        "as_of": "2025-06-30",
+        "source_id": "d1c84476a06478fa9fd28c77b080ce535e99afd588c0395feb97f67dacc49524"
+      }
+    ],
+    "next_action": "automatic_model_refresh",
+    "reconciliation": {
+      "passed": false
+    },
+    "settlement_policy": "Explicit cash/debt additions in an operating DCF are time-zero acquisition adjustments; hypothetical settlement, not declared dividends.",
+    "calculation_id": "cb80c4bc75e82fb1c01b06bad3eddf11f6675c71828310fb2e7474f093a872dc"
+  },
   "authority": "universal_valuation_contract",
   "legacy_reference_present": true,
   "falsifier_coverage": {

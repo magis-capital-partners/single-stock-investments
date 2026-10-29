@@ -2,9 +2,9 @@ name: Short sleeve research
 on:
   push:
     branches: [main]
-    paths: ['dashboard/short-sleeve*', 'dashboard/data/short_sleeve.json', 'dashboard/data/short_execution_audit.json', 'dashboard/data/short_adaptive_sizing.json', '_system/scripts/short_sleeve_research.py', '_system/scripts/short_execution_audit.py', '_system/scripts/short_adaptive_sizing.py', '_system/scripts/tests/test_short_sleeve*', '_system/scripts/tests/test_short_execution_audit.py', '_system/scripts/tests/test_short_adaptive_sizing.py', '.github/workflows/short-sleeve-tests.yml']
+    paths: ['dashboard/short-sleeve*', 'dashboard/data/short_sleeve.json', 'dashboard/data/short_execution_audit.json', 'dashboard/data/short_adaptive_sizing.json', 'dashboard/data/short_patient_execution.json', '_system/scripts/short_patient_execution.py', '_system/scripts/tests/test_short_patient_execution.py', '_system/scripts/short_sleeve_research.py', '_system/scripts/short_execution_audit.py', '_system/scripts/short_adaptive_sizing.py', '_system/scripts/tests/test_short_sleeve*', '_system/scripts/tests/test_short_execution_audit.py', '_system/scripts/tests/test_short_adaptive_sizing.py', '.github/workflows/short-sleeve-tests.yml']
   pull_request:
-    paths: ['dashboard/short-sleeve*', 'dashboard/data/short_sleeve.json', 'dashboard/data/short_execution_audit.json', 'dashboard/data/short_adaptive_sizing.json', '_system/scripts/short_sleeve_research.py', '_system/scripts/short_execution_audit.py', '_system/scripts/short_adaptive_sizing.py', '_system/scripts/tests/test_short_sleeve*', '_system/scripts/tests/test_short_execution_audit.py', '_system/scripts/tests/test_short_adaptive_sizing.py', '.github/workflows/short-sleeve-tests.yml']
+    paths: ['dashboard/short-sleeve*', 'dashboard/data/short_sleeve.json', 'dashboard/data/short_execution_audit.json', 'dashboard/data/short_adaptive_sizing.json', 'dashboard/data/short_patient_execution.json', '_system/scripts/short_patient_execution.py', '_system/scripts/tests/test_short_patient_execution.py', '_system/scripts/short_sleeve_research.py', '_system/scripts/short_execution_audit.py', '_system/scripts/short_adaptive_sizing.py', '_system/scripts/tests/test_short_sleeve*', '_system/scripts/tests/test_short_execution_audit.py', '_system/scripts/tests/test_short_adaptive_sizing.py', '.github/workflows/short-sleeve-tests.yml']
 permissions:
   contents: read
 jobs:
@@ -28,6 +28,10 @@ jobs:
             dashboard/data/short_sleeve.json
             dashboard/data/short_execution_audit.json
             dashboard/data/short_adaptive_sizing.json
+            dashboard/data/short_patient_execution.json
+            _system/scripts/short_patient_execution.py
+            _system/scripts/short_business_sizing.py
+            _system/scripts/tests/test_short_patient_execution.py
           sparse-checkout-cone-mode: false
       - uses: actions/setup-python@v5
         with:
@@ -36,6 +40,6 @@ jobs:
         with:
           node-version: '24'
       - run: python -m pip install pytest numpy
-      - run: python -m pytest _system/scripts/tests/test_short_sleeve_research.py _system/scripts/tests/test_short_execution_audit.py _system/scripts/tests/test_short_adaptive_sizing.py -q
+      - run: python -m pytest _system/scripts/tests/test_short_sleeve_research.py _system/scripts/tests/test_short_execution_audit.py _system/scripts/tests/test_short_adaptive_sizing.py _system/scripts/tests/test_short_patient_execution.py -q
       - run: node --test _system/scripts/tests/test_short_sleeve_engine.cjs
       - run: node --check dashboard/short-sleeve-viz.js && node --check dashboard/short-sleeve-worker.js

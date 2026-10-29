@@ -90,17 +90,21 @@ def merge_rows(*groups: list[dict]) -> dict[str, dict]:
     return by_filename
 
 
-def fetch_drive_pdf_rows() -> list[dict]:
+def fetch_drive_pdf_rows() -> tuple[list[dict], int]:
+    """Return public PDFs and how many licensed-folder PDFs were left out."""
     if not os.environ.get("GOOGLE_APPLICATION_CREDENTIALS"):
-        return []
+        return [], 0
     from drive_store_common import CONFIG_PATH as DRIVE_CONFIG_PATH
-    from drive_store_common import configured_root_ids, drive_service, list_drive_items
+    from drive_store_common import build_folder_paths, configured_root_ids, drive_service, list_drive_items
+    from licensed_drive_common import drop_private_rows
 
     config = load_json(DRIVE_CONFIG_PATH, {})
     service = drive_service(readonly=True)
     root_ids = configured_root_ids(config)
+    items = list_drive_items(service, root_ids)
+    folder_paths = build_folder_paths(items, root_ids)
     rows: list[dict] = []
-    for item in list_drive_items(service, root_ids):
+    for item in items:
         if item.get("mimeType") != "application/pdf":
             continue
         link = item.get("webViewLink") or item.get("webContentLink")
@@ -115,18 +119,24 @@ def fetch_drive_pdf_rows() -> list[dict]:
                 "source": "drive_api",
             }
         )
-    return rows
+    kept, dropped = drop_private_rows(rows, folder_paths)
+    return kept, len(dropped)
 
 
 def build() -> dict:
+    from licensed_drive_common import drop_private_rows
+
     audit = load_json(AUDIT_PATH, {})
     registry = load_json(REGISTRY_PATH, {})
-    drive_rows = fetch_drive_pdf_rows()
-    by_filename = merge_rows(drive_rows, audit_pdf_rows(audit), registry_pdf_rows(registry))
+    drive_rows, excluded_live = fetch_drive_pdf_rows()
+    audit_rows, excluded_audit = drop_private_rows(audit_pdf_rows(audit))
+    registry_rows, excluded_registry = drop_private_rows(registry_pdf_rows(registry))
+    by_filename = merge_rows(drive_rows, audit_rows, registry_rows)
     return {
         "generated_at": now_iso(),
         "source": "drive_api" if drive_rows else "merged_audit_registry",
         "pdf_count": len(by_filename),
+        "private_pdfs_excluded": excluded_live + len(excluded_audit) + len(excluded_registry),
         "by_filename": by_filename,
     }
 
@@ -136,7 +146,8 @@ def main() -> int:
     write_json(OUTPUT_PATH, payload)
     print(
         f"Wrote {OUTPUT_PATH.relative_to(ROOT)} "
-        f"({payload['pdf_count']} PDFs via {payload['source']})"
+        f"({payload['pdf_count']} public PDFs via {payload['source']}; "
+        f"private folders excluded {payload.get('private_pdfs_excluded', 0)})"
     )
     return 0
 

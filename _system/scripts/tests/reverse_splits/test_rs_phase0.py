@@ -6,7 +6,7 @@ from datetime import datetime, timedelta, timezone
 
 import pytest
 
-from conftest import ROOT
+from conftest import ROOT, assert_contiguous_hypothesis_ids
 
 import check_reverse_splits
 from reverse_splits import hypotheses as hyp
@@ -25,10 +25,13 @@ def _registry_rows(declared_at: str, hid: str = "H1") -> list[dict]:
 
 def test_registry_is_valid_and_complete():
     rows = load_jsonl(REGISTRY)
-    assert [r["id"] for r in rows] == [f"H{i}" for i in range(1, 20)]
+    by_id = {r["id"]: r for r in rows}
+    assert_contiguous_hypothesis_ids(rows)
     assert hyp.registry_errors(rows) == []
-    assert all(r["declared_in"].endswith("shorts_alpha_program_2026-10-18.md") for r in rows[:17])
-    assert all("README.md" in r["declared_in"] for r in rows[17:])   # H18/H19: the free-data redesign of H2/H3
+    # H1-H17 stay the original pre-registration in the program note.
+    assert all(by_id[f"H{n}"]["declared_in"].endswith("shorts_alpha_program_2026-10-18.md") for n in range(1, 18))
+    # H18 and H19 stay the free-data redesign of H2 and H3. Later rows are not that redesign.
+    assert all("README.md" in by_id[hid]["declared_in"] for hid in ("H18", "H19"))
     assert {r["family"] for r in rows} >= {"split", "fade", "financing", "notice", "conditioning", "fee", "portfolio"}
 
 

@@ -10,7 +10,9 @@ from datetime import date, datetime, timezone
 from pathlib import Path
 
 from event_materiality import load_rules, materiality_score, materiality_tier
-from filing_review import FILING_SKIP_FLAGS
+from filing_review import FILING_SKIP_FLAGS, values_in_thousands
+from event_relevance import assess_relevance, enforce_eligibility
+from security_profiles import canonical_symbol, security_profile
 
 ROOT = Path(__file__).resolve().parents[2]
 PENDING_DIR = ROOT / "_system" / "reviews" / "pending"
@@ -50,11 +52,15 @@ def event_template_id(event: dict) -> str:
 
 
 def event_story_id(event: dict) -> str:
+    if event.get('economic_event_id'):
+        return hashlib.sha1(f"{canonical_symbol(event.get('ticker'))}|{event['economic_event_id']}".encode()).hexdigest()[:16]
+    verification = event.get('verification') or {}
     raw = "|".join(
         [
             str(event.get("ticker") or "portfolio"),
             str(event.get("event_kind") or "observed"),
             _normalized_story_text(event),
+            str(verification.get('period_end') or event.get('effective_at') or ''),
         ]
     )
     return hashlib.sha1(raw.encode("utf-8")).hexdigest()[:16]
@@ -215,6 +221,7 @@ def _prior_abs(event: dict) -> float | None:
 
 
 def triage_event(event: dict, *, rules: dict, activist_tickers: set[str]) -> dict:
+    event = assess_relevance(dict(event))
     thresholds = rules.get("thresholds") or {}
     promote: list[str] = []
     demote: list[str] = []
@@ -225,6 +232,8 @@ def triage_event(event: dict, *, rules: dict, activist_tickers: set[str]) -> dic
     metric = event.get("metric_name") or ""
     change = _change_pct(event)
     prior_abs = _prior_abs(event) or 0
+    scaled_prior, scaled_current = values_in_thousands(event.get('prior_value'), event.get('current_value'), (event.get('verification') or {}).get('unit'))
+    prior_abs = abs(scaled_prior)
     parser_conf = _parser_conf(event)
     flags = set((event.get("verification") or {}).get("parser_flags") or [])
 
@@ -250,7 +259,7 @@ def triage_event(event: dict, *, rules: dict, activist_tickers: set[str]) -> dic
         min_delta = float(thresholds.get("balance_abs_delta_usd_k_min") or 5000)
         current = event.get("current_value")
         try:
-            abs_delta = abs(float(current or 0) - float(event.get("prior_value") or 0))
+            abs_delta = abs(scaled_current - scaled_prior)
         except (TypeError, ValueError):
             abs_delta = 0
         if change is not None and abs(change) >= min_pct and abs_delta >= min_delta:
@@ -439,7 +448,7 @@ def triage_event(event: dict, *, rules: dict, activist_tickers: set[str]) -> dic
             "score": score,
         }
     )
-    return event
+    return enforce_eligibility(event)
 
 
 def _source_priority(source: str, rules: dict) -> int:
@@ -493,7 +502,7 @@ def cross_source_dedupe(events: list[dict], *, rules: dict) -> list[dict]:
             for item in _evidence_items(row):
                 if item not in evidence:
                     evidence.append(item)
-        winner["corroboration_count"] = len(ranked)
+        winner["corroboration_count"] = len(sources)
         winner["corroborating_sources"] = sources
         winner["corroborating_event_ids"] = [row.get("id") for row in ranked[1:] if row.get("id")]
         winner["evidence_items"] = evidence
@@ -509,7 +518,7 @@ def cross_source_dedupe(events: list[dict], *, rules: dict) -> list[dict]:
 def triage_events(events: list[dict], *, activist_tickers: set[str] | None = None) -> tuple[list[dict], dict]:
     rules = load_rules()
     activist_tickers = activist_tickers if activist_tickers is not None else activist_signal_tickers()
-    staged = cross_source_dedupe([dict(e) for e in events], rules=rules)
+    staged = cross_source_dedupe([assess_relevance(dict(e, security_profile=security_profile(e.get('ticker') or ''))) for e in events], rules=rules)
     triaged: list[dict] = []
     for event in staged:
         triaged.append(triage_event(event, rules=rules, activist_tickers=activist_tickers))

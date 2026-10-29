@@ -73,11 +73,23 @@ ENTITY_SUFFIX_RE = re.compile(
     r")\b",
     re.I,
 )
+# Cover labels often carry a non-breaking space (&#x00a0;) where the form has a
+# normal space, and the registrant line says "Name of the Registrant".
+_COVER_GAP = r"(?:\s|&#x0*a0;|&nbsp;|&#160;)+"
 PROXY_FILER_LABEL_RE = re.compile(
-    r"\(Name of Person\(s\) Filing Proxy Statement[^)]*\)",
+    rf"\(Name of Person\(s\){_COVER_GAP}Filing Proxy Statement[^)]*\)",
     re.I,
 )
-PROXY_REGISTRANT_LABEL_RE = re.compile(r"Name of Registrant as Specified in Its Charter", re.I)
+PROXY_REGISTRANT_LABEL_RE = re.compile(
+    r"Name of (?:the )?Registrant as Specified in Its Charter",
+    re.I,
+)
+# Dissident covers put the filer in a centered <FONT>, with <BR> between names.
+# The direct-text centered-P pattern above never sees those.
+COVER_CENTERED_INNER_RE = re.compile(
+    r"<P[^>]*text-align:\s*center[^>]*>(.*?)</P>",
+    re.I | re.S,
+)
 CENTERED_P_RE = re.compile(
     r"<P[^>]*text-align:\s*center[^>]*>\s*(?:<B>)?\s*([^<]{3,120}?)\s*(?:</B>)?\s*</P>",
     re.I,
@@ -266,6 +278,11 @@ def extract_proxy_filing_persons(text: str, limit: int = 200_000) -> list[str]:
     seen: set[str] = set()
     for match in CENTERED_P_RE.finditer(block):
         _add_name(names, seen, strip_html(match.group(1)))
+
+    if not names:
+        for match in COVER_CENTERED_INNER_RE.finditer(block):
+            for part in re.split(r"<BR\s*/?>", match.group(1), flags=re.I):
+                _add_name(names, seen, strip_html(part))
 
     if names:
         return names[:8]

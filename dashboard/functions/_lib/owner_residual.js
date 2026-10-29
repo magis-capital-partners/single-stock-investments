@@ -4,13 +4,17 @@
  * This is the owner-custody rule in
  * `_system/trading/portfolio_hub/allocation_policy.py` and
  * `_system/trading/sleeves/classify_positions.py`: Michael is every broker
- * position except LS Algo, SPX 0DTE, and Drew. It is a read-model fallback
- * only. A published projection is never rewritten here.
+ * position except LS Algo, SPX 0DTE, etf-0dte (SPY / QQQ 0DTE options and
+ * their delivered shares), and Drew. It is a read-model fallback only. A
+ * published projection is never rewritten here.
  *
  * Flex stores an option's OCC local symbol in `symbol` and does not keep
  * `underlyingSymbol`. The classifier already reads `underlying`; for OPT/FOP
  * the OCC root is supplied as that field so the same overlay and index rules
  * fire.
+ *
+ * The edge has no spx-0dte delivery forecast, so every SPY / QQQ share here is
+ * `etf_0dte_delivery_unattributed` -- owned by nobody, like the attributed kind.
  */
 import universeFile from "../../data/etf_ls_universe.json" with { type: "json" };
 
@@ -23,6 +27,15 @@ const DREW_LOTS_OPENED_ON_OR_AFTER = { "3905.T": "20260913" };
 const MICHAEL_REF = "MICHAEL_SLEEVE";
 const DREW_HOLDING_REASONS = new Set(["drew_new", "drew_sleeve_holding", "sleeve_tag"]);
 const OCC_ROOT = /^([A-Z0-9.]{1,6})\s+\d{6}[CP]\d/;
+// etf-0dte: spx-0dte's SPY / QQQ 0DTE executors (clients 50/51, watchdogs 130/131).
+const ETF_0DTE_ROOTS = new Set(["SPY", "QQQ"]);
+const ETF_0DTE_REF_PREFIXES = ["SPY0DTE|", "QQQ0DTE|"];
+const ETF_0DTE_OCC_ROOT = /^([A-Z0-9.]{1,6})[\s-]+\d{6}[CP]\d/;
+const ETF_0DTE_POLICY_REASONS = {
+  etf_0dte: "etf_0dte_option_exclusion",
+  etf_0dte_delivery: "etf_0dte_expected_delivery",
+  etf_0dte_delivery_unattributed: "etf_0dte_unattributed_shares",
+};
 
 export function normSym(symbol) {
   const raw = String(symbol || "").trim().toUpperCase();
@@ -43,6 +56,74 @@ function occRoot(raw) {
   return match ? match[1] : "";
 }
 
+function etfOccRoot(raw) {
+  const match = String(raw || "").trim().toUpperCase().match(ETF_0DTE_OCC_ROOT);
+  return match ? match[1] : "";
+}
+
+/** Port of etf_0dte_root: "SPY" / "QQQ" for a share or option on those roots, else "". */
+export function etf0dteRoot(pos) {
+  const sec = String(pos.secType || pos.sec_type || "STK").trim().toUpperCase();
+  let name = "";
+  if (sec === "OPT" || sec === "FOP") {
+    name = normSym(pos.underlyingSymbol || pos.underlying || "")
+      || etfOccRoot(pos.localSymbol || pos.local_symbol)
+      || etfOccRoot(pos.symbol)
+      || String(pos.tradingClass || pos.trading_class || "").trim().toUpperCase()
+      || normSym(pos.symbol || pos.ticker || "");
+  } else if (sec === "STK") {
+    name = normSym(pos.symbol || pos.ticker || pos.localSymbol || "");
+  }
+  return ETF_0DTE_ROOTS.has(name) ? name : "";
+}
+
+function quantityOf(pos) {
+  for (const key of ["qty", "position", "quantity", "quantity_decimal"]) {
+    const raw = pos[key];
+    if (raw === null || raw === undefined || raw === "") continue;
+    const value = Number(raw);
+    return Number.isFinite(value) ? value : null;
+  }
+  return null;
+}
+
+function sameSignMin(value, budget) {
+  if (!value || !budget || (value > 0) !== (budget > 0)) return 0;
+  return Math.abs(value) <= Math.abs(budget) ? value : budget;
+}
+
+function upperKeys(values) {
+  const out = {};
+  for (const [key, value] of Object.entries(values || {})) {
+    const number = Number(value);
+    if (Number.isFinite(number)) out[normSym(key)] = number;
+  }
+  return out;
+}
+
+/** Port of _etf_0dte_share_classification; null = every share is a known holding. */
+function etf0dteShareClassification(pos, root, delivery, knownHoldings) {
+  const quantity = quantityOf(pos);
+  if (quantity === null) {
+    return { ticker: root, bucket: "etf_0dte_delivery_unattributed", reason: "quantity_unknown", owner: null };
+  }
+  const kept = sameSignMin(quantity, upperKeys(knownHoldings)[root] || 0);
+  const excess = quantity - kept;
+  if (!excess) {
+    if (kept) return null;
+    return { ticker: root, bucket: "etf_0dte_delivery_unattributed", reason: "flat", owner: null };
+  }
+  const forecasts = delivery == null ? null : upperKeys(delivery);
+  if (!forecasts || !(root in forecasts)) {
+    return { ticker: root, bucket: "etf_0dte_delivery_unattributed", reason: "no_forecast", owner: null };
+  }
+  const delivered = sameSignMin(excess, forecasts[root]);
+  if (excess - delivered) {
+    return { ticker: root, bucket: "etf_0dte_delivery_unattributed", reason: "beyond_forecast", owner: null };
+  }
+  return { ticker: root, bucket: "etf_0dte_delivery", reason: "expected_delivery", owner: null };
+}
+
 function withOptionUnderlying(row) {
   const sec = String(row.sec_type || row.secType || "STK").trim().toUpperCase();
   const underlying = row.underlying || row.underlyingSymbol || row.underlying_symbol || "";
@@ -59,6 +140,8 @@ export function classifyPosition(pos, {
   blacklistFamily = [],
   etfLsSymbols = [],
   drewSymbols = [],
+  etf0dteDelivery = null,
+  etf0dteKnownHoldings = {},
 } = {}) {
   const under = normSym(pos.underlyingSymbol || pos.underlying || "");
   const ticker = normSym(pos.symbol || pos.ticker || pos.localSymbol || "");
@@ -70,6 +153,13 @@ export function classifyPosition(pos, {
   const drew = asSet([...drewSymbols].map(normSym));
   const indexName = under || ticker || tclass;
   const option = sec === "OPT" || sec === "FOP";
+  const etfRoot = etf0dteRoot(pos);
+
+  // etf-0dte's own stamp beats every symbol rule below.
+  if (ETF_0DTE_REF_PREFIXES.some((prefix) => ref.startsWith(prefix))) {
+    if (option) return { ticker: etfRoot || under || ticker, bucket: "etf_0dte", reason: "order_ref", owner: null };
+    return { ticker: etfRoot || ticker, bucket: "etf_0dte_delivery", reason: "order_ref", owner: null };
+  }
 
   if (option) {
     const local = String(pos.localSymbol || pos.symbol || "").toUpperCase();
@@ -79,14 +169,28 @@ export function classifyPosition(pos, {
     if (SPX_NAMES.has(indexName) || local.includes("SPXW")) {
       return { ticker: indexName || "SPX", bucket: "spx_0dte", reason: "spxw_option", owner: null };
     }
+    // Ref-less SPY / QQQ options are etf-0dte's, before the LS overlay rule.
+    if (etfRoot && !ref) {
+      return { ticker: etfRoot, bucket: "etf_0dte", reason: "etf_0dte_root", owner: null };
+    }
   }
 
   const strategyName = option ? (under || ticker) : ticker;
+  if ((ref.startsWith('ETF_LS|') || ref.startsWith('B5P|'))
+      && !(option && /^ETF_LS\|MANUAL\|SELL(?:PUT|CALL)\|/.test(ref))) {
+    return { ticker: strategyName || ticker, bucket: 'etf_ls', reason: 'executed_ls_order_reference', owner: null };
+  }
   if (option && (ETF_LS_REFS.some((tag) => ref.includes(tag)) || letf.has(strategyName))) {
     return { ticker: strategyName || ticker, bucket: "drew", reason: "ls_algo_option_overlay", owner: "drew" };
   }
   if (ETF_LS_REFS.some((tag) => ref.includes(tag))) {
     return { ticker: under || ticker, bucket: "etf_ls", reason: "order_ref", owner: null };
+  }
+  // Ref-less SPY / QQQ shares are etf-0dte's deliveries unless another book is
+  // known to hold them, before the universe and owner rules.
+  if (etfRoot && sec === "STK" && !ref) {
+    const found = etf0dteShareClassification(pos, etfRoot, etf0dteDelivery, etf0dteKnownHoldings);
+    if (found) return found;
   }
   if (letf.has(strategyName)) {
     return { ticker: strategyName, bucket: "etf_ls", reason: "etf_ls_universe", owner: null };
@@ -132,8 +236,17 @@ export function classifyPolicyPosition(row, { lsSymbols = [], drewSymbols = [] }
     underlying: prepared.underlying,
     tradingClass: prepared.trading_class || prepared.tradingClass,
     orderRef: prepared.order_ref || prepared.orderRef,
+    quantity: prepared.quantity_decimal ?? prepared.quantity,
   }, { etfLsSymbols: lsSymbols, drewSymbols, blacklistFamily: [] });
 
+  if (Object.hasOwn(ETF_0DTE_POLICY_REASONS, classification.bucket)) {
+    return {
+      owner: "unallocated",
+      strategy: "etf_0dte",
+      reason: ETF_0DTE_POLICY_REASONS[classification.bucket],
+      bucket: classification.bucket,
+    };
+  }
   if (classification.bucket === "index_put_hedge") {
     return { owner: "unallocated", strategy: "ls_algo", reason: "index_put_hedge", bucket: "index_put_hedge" };
   }

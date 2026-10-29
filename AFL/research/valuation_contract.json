@@ -3261,7 +3261,7 @@
     ]
   },
   "change_control": {
-    "model_hash": "b7acca688e929f1656593ba3b8f8d48892f038899f8a7f9d4151815e8d540aac",
+    "model_hash": "64962e9b93844889e87569a4a80a04e99c05ddbb76a64a08beb20de9f919742e",
     "method_versions": [
       "net_asset_value@1.0",
       "owner_cash_or_dividend_discount@1.0"
@@ -3270,6 +3270,149 @@
     "rule": "A source fact is locked. Every assumption change requires a reason, author, timestamp, and before/after value."
   },
   "decision_rule": "Proof status and investment readiness are separate. Every material claim must be valued exactly once by a valid calculation proof, every evidence blocker must be resolved, and the model must be stock-specific before committee review. Only a human decision can authorize capital.",
+  "shared_forecast": {
+    "schema_version": "1.0",
+    "method_version": "shared-valuation-forecast/1.1",
+    "ticker": "AFL",
+    "status": "model_gap",
+    "research_only": true,
+    "requires_human_review": false,
+    "capital_actionable": false,
+    "as_of": "2026-07-21",
+    "model_as_of": "2026-07-21",
+    "quote": {
+      "value": 122.62,
+      "as_of": "2026-07-21",
+      "source_url": "Yahoo AFL close 2026-07-21",
+      "currency": null
+    },
+    "forecast_hash": "d09995162c44bccf6ddd9b388a5d0c433ba9372bba965143b3354d1ae31f57ab",
+    "forward_irr_pct": {
+      "low": null,
+      "base": null,
+      "high": null
+    },
+    "present_value_today_per_share": {
+      "low": null,
+      "base": null,
+      "high": null
+    },
+    "model_present_value_per_share": {
+      "low": null,
+      "base": null,
+      "high": null
+    },
+    "required_return_pct": {
+      "low": null,
+      "base": null,
+      "high": null
+    },
+    "forward_cashflow_schedule": {},
+    "buy_prices": [],
+    "components": [
+      {
+        "component_id": "japan_supplemental_engine",
+        "method": "owner_cash_or_dividend_discount",
+        "status": "available",
+        "present_value_per_share": {
+          "low": 64.0008,
+          "base": 78.001,
+          "high": 94.0012
+        }
+      },
+      {
+        "component_id": "us_worksite_engine",
+        "method": "owner_cash_or_dividend_discount",
+        "status": "available",
+        "present_value_per_share": {
+          "low": 41.9992,
+          "base": 49.999,
+          "high": 61.9988
+        }
+      },
+      {
+        "component_id": "net_financial_claims",
+        "method": "net_asset_value",
+        "status": "model_gap",
+        "present_value_per_share": {}
+      },
+      {
+        "component_id": "investment_and_currency_reserve",
+        "method": "net_asset_value",
+        "status": "model_gap",
+        "present_value_per_share": {}
+      }
+    ],
+    "gaps": [
+      {
+        "component_id": "net_financial_claims",
+        "case": "low",
+        "code": "realization_timing_missing:net_debt_claim_m"
+      },
+      {
+        "component_id": "net_financial_claims",
+        "case": "base",
+        "code": "realization_timing_missing:net_debt_claim_m"
+      },
+      {
+        "component_id": "net_financial_claims",
+        "case": "high",
+        "code": "realization_timing_missing:net_debt_claim_m"
+      },
+      {
+        "component_id": "investment_and_currency_reserve",
+        "case": "low",
+        "code": "realization_timing_missing:value_per_share"
+      },
+      {
+        "component_id": "investment_and_currency_reserve",
+        "case": "base",
+        "code": "realization_timing_missing:value_per_share"
+      },
+      {
+        "component_id": "investment_and_currency_reserve",
+        "case": "high",
+        "code": "realization_timing_missing:value_per_share"
+      }
+    ],
+    "warnings": [],
+    "source_refs": [
+      {
+        "node_id": "segment_premium_revenue_m",
+        "ref": "AFL/investor-documents/sec-edgar/10-K_20260225_rpt20251231_acc0001628280_26_011402.htm",
+        "locator": "Aflac Japan earned premium revenue $10664.0M FY2025",
+        "as_of": "2025-12-31",
+        "source_id": "73826bbf28fcd1784117cbe210c5cdd80235084f8619e2c8f6a5a7705ad37959"
+      },
+      {
+        "node_id": "consolidated_owner_cash_m",
+        "ref": "AFL/investor-documents/sec-edgar/10-K_20260225_rpt20251231_acc0001628280_26_011402.htm",
+        "locator": "Operating income $3440.0M plus normalized investment contribution; $5.85/sh on 534.878M shares",
+        "as_of": "2025-12-31",
+        "source_id": "1a804752311f7afacd7067ebdd34dc78054231b17b38d858c76664240b939182"
+      },
+      {
+        "node_id": "shares_m",
+        "ref": "AFL/investor-documents/sec-edgar/10-K_20260225_rpt20251231_acc0001628280_26_011402.htm",
+        "locator": "WeightedAverageNumberOfDilutedSharesOutstanding 534.878M FY2025",
+        "as_of": "2025-12-31",
+        "source_id": "89fa3ba011142958b5259de5181522f4af6e4c1673696935c33860306a7f4dda"
+      },
+      {
+        "node_id": "segment_premium_revenue_m",
+        "ref": "AFL/investor-documents/sec-edgar/10-K_20260225_rpt20251231_acc0001628280_26_011402.htm",
+        "locator": "Aflac U.S. earned premium revenue $6900.0M FY2025",
+        "as_of": "2025-12-31",
+        "source_id": "1f7475799c483881b8ca0a1fa2f8b80d515064689c100ea5de52d543ebe0903f"
+      }
+    ],
+    "next_action": "automatic_model_refresh",
+    "reconciliation": {
+      "passed": false
+    },
+    "settlement_policy": "Explicit cash/debt additions in an operating DCF are time-zero acquisition adjustments; hypothetical settlement, not declared dividends.",
+    "calculation_id": "6e498014074029fd052fdb2247c5e58b9b40e835b53d84c05fc79ea351ee9789"
+  },
   "authority": "universal_valuation_contract",
   "legacy_reference_present": true,
   "falsifier_coverage": {

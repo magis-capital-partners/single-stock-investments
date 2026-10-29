@@ -1,16 +1,16 @@
-# NVR - Thematic context (2026-10-19)
+# NVR - Thematic context (2026-10-26)
 
 > Context only. Tailwinds inform stance and overlay sizing; they do not auto-inflate Lawrence base IRR. Promotion to base case requires [HUMAN REVIEW].
 
 | Indicator | Latest | As of | YoY | Direction | In base IRR? |
 |-----------|--------|-------|-----|-----------|--------------|
-| High-yield OAS credit spread (%) | -0.35 | 2026-10-19 | +70.3% | up | no (context) |
-| US Treasury 10Y yield (%) | 5.13100004196167 | 2026-10-19 | +28.7% | up | no (context) |
-| US Treasury 2Y yield (%) | 4.925999641418457 | 2026-10-19 | +37.7% | up | no (context) |
-| Trade-weighted USD index (broad) | 101.97699737548828 | 2026-10-19 | +3.4% | up | no (context) |
-| VIX index level | 18.280000686645508 | 2026-10-19 | +0.3% | flat | no (context) |
-| HYG vs TLT 1-month return spread (%) | 0.09 | 2026-10-19 | +102.7% | up | no (context) |
-| SPY 20-day realized vol (annualized %) | 8.84 | 2026-10-19 | -33.2% | down | no (context) |
+| High-yield OAS credit spread (%) | -1.61 | 2026-10-26 | -25.8% | down | no (context) |
+| US Treasury 10Y yield (%) | 4.98199987411499 | 2026-10-26 | +24.6% | up | no (context) |
+| US Treasury 2Y yield (%) | 4.818999767303467 | 2026-10-26 | +33.3% | up | no (context) |
+| Trade-weighted USD index (broad) | 101.9469985961914 | 2026-10-26 | +3.2% | up | no (context) |
+| VIX index level | 18.389999389648438 | 2026-10-26 | +16.5% | up | no (context) |
+| HYG vs TLT 1-month return spread (%) | -3.77 | 2026-10-26 | -26.1% | down | no (context) |
+| SPY 20-day realized vol (annualized %) | 9.51 | 2026-10-26 | -32.0% | down | no (context) |
 | AGI expert-horizon years ahead (public quotes) | 5.0 | 2026-06-01 | +0.0% | flat | no (context) |
 | Robotaxi expert-horizon years ahead (public quotes) | 2.0 | 2026-06-01 | +0.0% | flat | no (context) |
 | PPI: crushed and broken limestone mining (index) | 528.827 | 2026-08-01 | +6.1% | up | no (context) |
@@ -19,10 +19,10 @@
 | PPI: hydraulic cement (index) | 355.665 | 2026-08-01 | -1.2% | down | no (context) |
 | PPI: ready-mix concrete manufacturing (index) | 402.65 | 2026-08-01 | +2.3% | up | no (context) |
 | PPI: asphalt paving mixture and block manufacturing (index) | 442.492 | 2026-08-01 | +7.5% | up | no (context) |
-| US housing starts (thousands, SAAR) | 1275.0 | 2026-08-01 | -1.2% | down | no (context) |
-| US single-family housing starts (thousands, SAAR) | 918.0 | 2026-08-01 | +5.2% | up | no (context) |
-| US building permits (thousands, SAAR) | 1403.0 | 2026-08-01 | +4.2% | up | no (context) |
-| US single-family building permits (thousands, SAAR) | 880.0 | 2026-08-01 | +1.5% | up | no (context) |
+| US housing starts (thousands, SAAR) | 1275.0 (stale) | 2026-08-01 | -1.2% | down | no (context) |
+| US single-family housing starts (thousands, SAAR) | 918.0 (stale) | 2026-08-01 | +5.2% | up | no (context) |
+| US building permits (thousands, SAAR) | 1403.0 (stale) | 2026-08-01 | +4.2% | up | no (context) |
+| US single-family building permits (thousands, SAAR) | 880.0 (stale) | 2026-08-01 | +1.5% | up | no (context) |
 | US total construction spending (USD m, SAAR) | 2203129.0 | 2026-08-01 | -1.7% | down | no (context) |
 | US private residential construction spending (USD m, SAAR) | 882270.0 | 2026-08-01 | -4.8% | down | no (context) |
 | US private nonresidential construction spending (USD m, SAAR) | 773010.0 | 2026-08-01 | -1.0% | flat | no (context) |
@@ -32,7 +32,7 @@
 | US manufacturing construction spending (USD m, SAAR) | 170701.0 | 2026-08-01 | -19.2% | down | no (context) |
 | US power construction spending (USD m, SAAR) | 185973.0 | 2026-08-01 | +8.5% | up | no (context) |
 | US 30-year fixed mortgage rate (%) | 7.4 | 2026-10-08 | +17.5% | up | no (context) |
-| US Treasury 10Y yield (%) | 5.136000156402588 | 2026-10-19 | +28.9% | up | no (context) |
+| US Treasury 10Y yield (%) | 4.986000061035156 | 2026-10-26 | +24.7% | up | no (context) |
 | US construction employment (thousands) | 8364.0 | 2026-09-01 | +1.3% | up | no (context) |
 | US heavy and civil engineering construction employment (thousands) | 1210.8 | 2026-09-01 | +2.2% | up | no (context) |
 | US retail diesel price (USD/gal) | 6.199 | 2026-10-05 | +67.0% | up | no (context) |

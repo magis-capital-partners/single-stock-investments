@@ -1,7 +1,7 @@
 # APO — Third-party source inventory
 
-**Date:** 2026-10-11
-**Sources:** 153 total (0 approved, 0 pending, 153 context)
+**Date:** 2026-10-25
+**Sources:** 154 total (0 approved, 0 pending, 154 context)
 
 | ID | Title | Path | Status | Use |
 |----|-------|------|--------|-----|
@@ -158,5 +158,6 @@
 | activist_long | acc0001858681 26 000048 | `APO/third-party-analyses/activist_reports/long/8-K_20260824_acc0001858681_26_000048.htm` | context | activist/long — local |
 | activist_long | acc0001858681 26 000051 | `APO/third-party-analyses/activist_reports/long/8-K_20260921_acc0001858681_26_000051.htm` | context | activist/long — local |
 | activist_long | acc0001858681 26 000054 | `APO/third-party-analyses/activist_reports/long/8-K_20261005_acc0001858681_26_000054.htm` | context | activist/long — local |
+| activist_long | acc0000950142 26 002794 | `APO/third-party-analyses/activist_reports/long/8-K_20261020_acc0000950142_26_002794.htm` | context | activist/long — local |
 
-Cross-check required: `APO/research/cross_check_third_party_2026-10-11.md`
+Cross-check required: `APO/research/cross_check_third_party_2026-10-25.md`

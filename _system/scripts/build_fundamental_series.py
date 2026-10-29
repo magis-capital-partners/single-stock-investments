@@ -6,6 +6,10 @@ ticker with a CIK. Each datapoint carries a real fiscal period end and fiscal
 period label (Q1-Q4/FY) straight from the XBRL filing, which eliminates the
 extraction-date/scope-mixing artifacts that plagued filing_facts series.
 
+US issuers are read from ``us-gaap``. Foreign private issuers that file
+IFRS in a 40-F or 20-F (Franco-Nevada, Wheaton, Brookfield) are read from
+``ifrs-full`` when that series is newer than the US-GAAP series.
+
 Output: _system/reference/market-data/fundamentals/{TICKER}.json
         _system/reference/market-data/fundamentals/_index.json (coverage)
 
@@ -53,6 +57,20 @@ METRIC_TAGS: dict[str, list[str]] = {
         "StockholdersEquityIncludingPortionAttributableToNoncontrollingInterest",
     ],
     "long_term_debt": ["LongTermDebtNoncurrent", "LongTermDebt"],
+}
+
+# Same canonical metrics on the IFRS taxonomy used by 40-F and 20-F filers.
+# Within a namespace the newest period still wins, then the longer series.
+IFRS_METRIC_TAGS: dict[str, list[str]] = {
+    "revenues": ["Revenue", "RevenueFromContractsWithCustomers"],
+    "operating_income": ["ProfitLossFromOperatingActivities"],
+    "net_income": ["ProfitLossAttributableToOwnersOfParent", "ProfitLoss"],
+    "eps_basic": ["BasicEarningsLossPerShare"],
+    "cfo": ["CashFlowsFromUsedInOperatingActivities"],
+    "cash": ["CashAndCashEquivalents"],
+    "total_assets": ["Assets"],
+    "stockholders_equity": ["EquityAttributableToOwnersOfParent", "Equity"],
+    "long_term_debt": ["LongtermBorrowings", "NoncurrentBorrowings"],
 }
 
 # Flow metrics come from duration facts; balance metrics from instant facts.
@@ -212,73 +230,203 @@ def derive_quarters(classes: dict[str, dict[str, dict]], *, additive: bool = Tru
     return quarters
 
 
-def series_for_tag(gaap: dict, tag: str, *, is_flow: bool, additive: bool = True) -> dict[str, dict]:
-    """Extract one us-gaap tag into period -> point dict.
+def _unit_rank(unit: str, *, per_share: bool) -> tuple[int, int, str]:
+    """USD before CAD. Per-share metrics prefer a ``/shares`` unit."""
+    key = str(unit or "").upper().replace(" ", "")
+    is_share = key.endswith("/SHARES") or key == "SHARES"
+    currency = key.split("/")[0]
+    currency_rank = {"USD": 0, "CAD": 1, "EUR": 2}.get(currency, 9)
+    kind_rank = 0 if is_share == per_share else 1
+    return (kind_rank, currency_rank, key)
 
-    Balance metrics keep instant values. Flow metrics keep every duration
-    class and are reduced to quarters by ``derive_quarters``.
-    """
-    node = gaap.get(tag)
-    if not node:
-        return {}
+
+def _currency_name(unit: str) -> str:
+    return str(unit or "").split("/")[0].upper()
+
+
+def _series_from_facts(
+    facts: list,
+    tag: str,
+    *,
+    is_flow: bool,
+    additive: bool,
+) -> dict[str, dict]:
     classes: dict[str, dict[str, dict]] = {name: {} for name, _, _ in DURATION_CLASSES}
     by_period: dict[str, dict] = {}
-    for unit_vals in (node.get("units") or {}).values():
-        for fact in unit_vals:
-            form = str(fact.get("form") or "")
-            if form not in ACCEPTED_FORMS:
+    for fact in facts:
+        form = str(fact.get("form") or "")
+        if form not in ACCEPTED_FORMS:
+            continue
+        end = str(fact.get("end") or "")[:10]
+        if not end:
+            continue
+        val = fact.get("val")
+        if val is None:
+            continue
+        bucket = by_period
+        if is_flow:
+            klass = _duration_class(duration_days(fact.get("start"), fact.get("end")))
+            if klass is None:
                 continue
-            end = str(fact.get("end") or "")[:10]
-            if not end:
-                continue
-            val = fact.get("val")
-            if val is None:
-                continue
-            bucket = by_period
-            if is_flow:
-                klass = _duration_class(duration_days(fact.get("start"), fact.get("end")))
-                if klass is None:
-                    continue
-                bucket = classes[klass]
-            filed = str(fact.get("filed") or "")
-            prev = bucket.get(end)
-            if prev is None or filed > prev["filed"]:
-                bucket[end] = {
-                    "period": end,
-                    "value": float(val),
-                    "fy": fact.get("fy"),
-                    "fp": fact.get("fp"),
-                    "form": form,
-                    "filed": filed,
-                    "tag": tag,
-                }
+            bucket = classes[klass]
+        filed = str(fact.get("filed") or "")
+        prev = bucket.get(end)
+        if prev is None or filed > prev["filed"]:
+            bucket[end] = {
+                "period": end,
+                "value": float(val),
+                "fy": fact.get("fy"),
+                "fp": fact.get("fp"),
+                "form": form,
+                "filed": filed,
+                "tag": tag,
+            }
     if is_flow:
         return derive_quarters(classes, additive=additive)
     return by_period
 
 
-def extract_metric_series(facts: dict, metric: str) -> list[dict]:
-    """Quarterly series for one metric from a companyfacts us-gaap block.
+def series_for_tag(
+    gaap: dict,
+    tag: str,
+    *,
+    is_flow: bool,
+    additive: bool = True,
+    prefer_one_unit: bool = False,
+    per_share: bool = False,
+) -> dict[str, dict]:
+    """Extract one tag into period -> point dict.
 
-    Flow metrics keep only ~quarter-length durations (70-100 days) so YTD and
-    annual figures never mix into the series. Balance metrics keep instant
-    values at each period end. When multiple tags carry the same metric, pick
-    the tag whose series extends to the latest fiscal period (avoids stale
-    tags like legacy Revenues blocking RevenueFromContractWithCustomer*).
+    Balance metrics keep instant values. Flow metrics keep every duration
+    class and are reduced to quarters by ``derive_quarters``.
+
+    ``prefer_one_unit`` (IFRS) keeps a single currency so USD and CAD facts
+    are not mixed. US-GAAP leaves this off and keeps the prior tie-break.
     """
-    gaap = (facts.get("facts") or {}).get("us-gaap") or {}
-    is_flow = metric in FLOW_METRICS
+    node = gaap.get(tag)
+    if not node:
+        return {}
+    units = node.get("units") or {}
+    if prefer_one_unit:
+        ordered = sorted(units, key=lambda unit: _unit_rank(unit, per_share=per_share))
+        chosen = None
+        for unit in ordered:
+            parsed = _series_from_facts(
+                units[unit], tag, is_flow=is_flow, additive=additive
+            )
+            if parsed:
+                chosen = (unit, parsed)
+                break
+        if chosen is None:
+            return {}
+        unit_name, parsed = chosen
+        currency = _currency_name(unit_name)
+        if currency and currency != "USD":
+            for point in parsed.values():
+                point["currency"] = currency
+        return parsed
+    merged: list = []
+    for unit_vals in units.values():
+        merged.extend(unit_vals)
+    return _series_from_facts(merged, tag, is_flow=is_flow, additive=additive)
+
+
+def _best_tag_series(
+    block: dict,
+    tags: list[str],
+    *,
+    is_flow: bool,
+    additive: bool,
+    prefer_one_unit: bool,
+    per_share: bool,
+) -> dict[str, dict]:
+    """Newest period wins, then the longer series. Same rule as before."""
     best: dict[str, dict] = {}
     best_latest = ""
-    for tag in METRIC_TAGS[metric]:
-        by_period = series_for_tag(gaap, tag, is_flow=is_flow, additive=metric not in NON_ADDITIVE_METRICS)
+    for tag in tags:
+        by_period = series_for_tag(
+            block,
+            tag,
+            is_flow=is_flow,
+            additive=additive,
+            prefer_one_unit=prefer_one_unit,
+            per_share=per_share,
+        )
         if not by_period:
             continue
         latest = max(by_period)
         if latest > best_latest or (latest == best_latest and len(by_period) > len(best)):
             best_latest = latest
             best = by_period
-    return [best[k] for k in sorted(best)]
+    return best
+
+
+def extract_metric_series(facts: dict, metric: str) -> list[dict]:
+    """Quarterly series for one metric from companyfacts.
+
+    Flow metrics keep only ~quarter-length durations (70-100 days) so YTD and
+    annual figures never mix into the series. Balance metrics keep instant
+    values at each period end. When multiple tags carry the same metric, pick
+    the tag whose series extends to the latest fiscal period (avoids stale
+    tags like legacy Revenues blocking RevenueFromContractWithCustomer*).
+
+    An IFRS series is used when it has no US-GAAP counterpart, or when its
+    latest period is newer (then longer). A non-USD series records ``currency``.
+    """
+    root = facts.get("facts") or {}
+    is_flow = metric in FLOW_METRICS
+    additive = metric not in NON_ADDITIVE_METRICS
+    per_share = metric in NON_ADDITIVE_METRICS
+    gaap = _best_tag_series(
+        root.get("us-gaap") or {},
+        METRIC_TAGS[metric],
+        is_flow=is_flow,
+        additive=additive,
+        prefer_one_unit=False,
+        per_share=per_share,
+    )
+    ifrs = _best_tag_series(
+        root.get("ifrs-full") or {},
+        IFRS_METRIC_TAGS.get(metric) or [],
+        is_flow=is_flow,
+        additive=additive,
+        prefer_one_unit=True,
+        per_share=per_share,
+    )
+    chosen = gaap
+    taxonomy = "us-gaap"
+    if ifrs:
+        gaap_latest = max(gaap) if gaap else ""
+        ifrs_latest = max(ifrs)
+        if (
+            not gaap
+            or ifrs_latest > gaap_latest
+            or (ifrs_latest == gaap_latest and len(ifrs) > len(gaap))
+        ):
+            chosen = ifrs
+            taxonomy = "ifrs-full"
+    rows = [chosen[key] for key in sorted(chosen)]
+    if taxonomy == "ifrs-full":
+        for row in rows:
+            row["taxonomy"] = "ifrs-full"
+    return rows
+
+
+def drop_discontinued_series(metrics: dict[str, list[dict]]) -> dict[str, list[dict]]:
+    """Drop a tag whose last fact is more than two years behind the rest.
+
+    FNV's long-term borrowings tag stops in 2019 while revenue and cash are
+    current. A metric that is one quarter behind the balance sheet stays.
+    """
+    if not metrics:
+        return metrics
+    freshest = max(series[-1]["period"] for series in metrics.values() if series)
+    fresh_dt = datetime.strptime(freshest, "%Y-%m-%d")
+    return {
+        name: series
+        for name, series in metrics.items()
+        if series and (fresh_dt - datetime.strptime(series[-1]["period"], "%Y-%m-%d")).days <= 730
+    }
 
 
 def build_ticker(ticker: str, cik: str) -> dict | None:
@@ -290,12 +438,19 @@ def build_ticker(ticker: str, cik: str) -> dict | None:
         series = extract_metric_series(facts, metric)
         if len(series) >= 2:
             metrics[metric] = series[-24:]
+    metrics = drop_discontinued_series(metrics)
     if not metrics:
         return None
+    taxonomy = "ifrs-full" if any(
+        point.get("taxonomy") == "ifrs-full"
+        for series in metrics.values()
+        for point in series
+    ) else "us-gaap"
     return {
         "ticker": ticker,
         "cik": cik,
         "source": "sec_companyfacts",
+        "taxonomy": taxonomy,
         "fetched_at": datetime.now(timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ"),
         "metrics": metrics,
     }
