@@ -19,6 +19,7 @@ from urllib.parse import unquote, urlparse
 
 from company_source_queue import SourceQueue
 from company_sources import SOURCE_SUFFIXES, digest, extract
+from company_extract_formats import EXTRA_SUFFIXES
 from build_company_research import ROOT, IGNORE_NAMES, load, read_companies, write
 
 
@@ -27,6 +28,22 @@ def complete_cache(cached, suffix):
         return False
     required = {'.pdf': 'pages', '.epub': 'chapters'}.get(suffix)
     return not required or bool(cached.get('extraction', {}).get(required))
+
+
+def preserve_outcome(cache, job, status, result, error):
+    """Expose failed originals to publication without erasing recovered text."""
+    if status == 'indexed' or job['kind'] not in {'git','drive'}:
+        return
+    payload=job['payload']
+    if job['kind']=='git':
+        target=cache/'git'/(payload['sha']+'.json')
+    else:
+        revision=payload.get('revision')
+        if not revision or revision in {'unknown','discover'}:return
+        target=cache/'drive'/(digest(payload['id']+revision)+'.json')
+    prior=load(target)
+    if not prior:
+        write(target,{'version':1,'text':'','status':status,'attempted_at':time.time(),'error':error})
 
 
 def audit_cache(queue, cache):
@@ -63,10 +80,42 @@ def transcript_for(path, vault):
 
 
 def extract_complete(data, suffix, *, ocr=False):
+    if suffix == '.epu':
+        suffix = '.epub'
     if suffix in {'.py', '.r', '.sql'}:
         # Model source is searchable text; never import or execute it.
         text, state = extract(data, '.txt')
         return text, state, {'format': 'model_source_text'}
+    if suffix == '.doc':
+        from legacy_doc import extract_text
+        try:
+            result=extract_text(data)
+            return result.text,'indexed' if result.text.strip() else 'empty_source',{'format':'legacy_word','parser':result.parser,'warnings':result.warnings}
+        except Exception as exc:
+            return '', 'access_unavailable' if 'encrypt' in str(exc).lower() else 'failed', {'error':str(exc)[:180]}
+    if suffix in {'.mobi','.azw3'}:
+        from tempfile import TemporaryDirectory
+        from mobi.kindleunpack import unpackBook
+        # The unpacker supports unencrypted ebooks only. No DRM removal.
+        try:
+            with TemporaryDirectory(prefix='ssi-ebook-') as directory:
+                temporary=Path(directory);original=temporary/('original'+suffix);original.write_bytes(data)
+                destination=temporary/'unpacked';destination.mkdir()
+                unpackBook(str(original),str(destination),epubver='A')
+                candidates=[destination/'mobi8/original.epub',destination/'mobi7/book.html',destination/'original.001.pdf']
+                converted=next((p for p in candidates if p.is_file()),None)
+                if not converted:return '', 'failed', {'error':'No readable book rendition'}
+                text,status,details=extract_complete(converted.read_bytes(),converted.suffix,ocr=ocr)
+                return text,status,{'format':suffix.lstrip('.'),'conversion':'unencrypted Kindle unpack',**details}
+        except (Exception,SystemExit) as exc:
+            return '', 'access_unavailable' if re.search(r'DRM|encrypt',str(exc),re.I) else 'failed', {'error':str(exc)[:180]}
+    if suffix in {'.png','.jpg','.jpeg','.jpg_large'}:
+        if not ocr:return '', 'needs_ocr', {'format':'image'}
+        try:
+            import fitz
+            with fitz.open(stream=data) as image:
+                return extract_complete(image.convert_to_pdf(),'.pdf',ocr=True)
+        except Exception as exc:return '', 'needs_ocr', {'error':type(exc).__name__}
     if suffix == '.epub':
         import io,posixpath,zipfile
         from xml.etree import ElementTree as ET
@@ -82,12 +131,35 @@ def extract_complete(data, suffix, *, ocr=False):
                     encrypted=ET.fromstring(z.read('META-INF/encryption.xml'))
                     if any(e.attrib.get('URI') in paths for e in encrypted.iter()):
                         return '', 'access_unavailable', {'reason':'Encrypted book content requires an authorized readable edition'}
-                bodies=[];missing=[]
+                bodies=[];missing=[];ocr_chapters=[]
                 for path in paths:
                     raw=z.read(path);body,state=extract(raw,'.html')
-                    if not body.strip() and re.search(br'<(?:img|svg|image)\b',raw,re.I):missing.append(path)
+                    if not body.strip() and re.search(br'<(?:img|svg|image)\b',raw,re.I):
+                        recovered=False
+                        if ocr:
+                            from html.parser import HTMLParser
+                            class Images(HTMLParser):
+                                def __init__(self):super().__init__();self.refs=[]
+                                def handle_starttag(self,tag,attrs):
+                                    if tag in {'img','image'}:
+                                        attrs=dict(attrs)
+                                        ref=attrs.get('src') or attrs.get('href') or attrs.get('xlink:href')
+                                        if ref:self.refs.append(ref)
+                            parser=Images();parser.feed(raw.decode('utf-8',errors='replace'))
+                            recovered=bool(parser.refs);parts=[]
+                            for ref in dict.fromkeys(parser.refs):
+                                uri=urlparse(ref)
+                                image_path=posixpath.normpath(posixpath.join(posixpath.dirname(path),unquote(uri.path)))
+                                if uri.scheme or uri.netloc or image_path.startswith(('../','/')) or image_path not in z.namelist():
+                                    recovered=False;continue
+                                image_text,image_state,details=extract_complete(z.read(image_path),'.png',ocr=True)
+                                if image_state not in {'indexed','empty_source'}:recovered=False
+                                parts.append(image_text)
+                            body='\n'.join(parts)
+                        if recovered:ocr_chapters.append(path)
+                        else:missing.append(path)
                     bodies.append(body)
-                return '\n\f\n'.join(bodies),'needs_ocr' if missing else 'indexed' if any(bodies) else 'empty_source',{'chapters':len(paths),'missing_chapters':missing}
+                return '\n\f\n'.join(bodies),'needs_ocr' if missing else 'indexed' if any(bodies) else 'empty_source',{'chapters':len(paths),'missing_chapters':missing,'ocr_chapters':ocr_chapters,'ocr_review':'unreviewed' if ocr_chapters else None}
         except Exception as exc:return '', 'failed', {'error':type(exc).__name__}
     if suffix != '.pdf':
         text, state = extract(data, suffix)
@@ -95,11 +167,13 @@ def extract_complete(data, suffix, *, ocr=False):
     import fitz
     try:
         with fitz.open(stream=data, filetype='pdf') as pdf:
+            if pdf.needs_pass:
+                return '', 'access_unavailable', {'reason':'Original PDF requires a password'}
             pages, missing, ocr_pages = [], [], []
             for i, page in enumerate(pdf):
                 body = page.get_text().strip()
                 # A scan can have a small footer/header but no body text.
-                scan = len(body) < 80 and bool(page.get_images())
+                scan = len(body) < 80 and (bool(page.get_images()) or (ocr and not body))
                 ocr_complete = False
                 if scan and ocr:
                     try:
@@ -143,7 +217,7 @@ def seed(root, cache, queue, vault=None, kinds=('git','drive','media')):
             path = Path(relative)
             if len(bits)<3 or bits[0] not in companies or bits[1] not in {'research','third-party-analyses','investor-documents','models','transcripts','financials'}:
                 continue
-            if path.suffix.lower() not in SOURCE_SUFFIXES or path.name in IGNORE_NAMES or re.search(r'(?:source_inventory|activist_reports_index|latest|security_identity|classification|human_decision|download|readiness|audit|committee_packet)',path.stem,re.I):
+            if path.suffix.lower() not in SOURCE_SUFFIXES | EXTRA_SUFFIXES or path.name in IGNORE_NAMES or re.search(r'(?:source_inventory|activist_reports_index|latest|security_identity|classification|human_decision|download|readiness|audit|committee_packet)',path.stem,re.I):
                 continue
             sha=header.split()[-1]
             jobs.append({'key':'git:'+sha,'kind':'git','priority':100 if bits[0] in preferred else 0,'payload':{'sha':sha,'path':relative}})
@@ -294,16 +368,31 @@ class Worker:
                 data=execute_with_retry(self.service.files().export_media(fileId=meta['id'],mimeType=mime))
             else:
                 suffix=Path(meta['name']).suffix.lower()
-                if suffix not in SOURCE_SUFFIXES | {'.py', '.r', '.sql'}:
+                if suffix not in SOURCE_SUFFIXES | EXTRA_SUFFIXES | {'.py', '.r', '.sql'}:
                     return 'unsupported',{},'Unsupported original format: '+meta['mimeType']
-                if suffix in {'.mp3','.mp4','.m4a','.wav'}:
+                if suffix in {'.mp3','.mp4','.m4a','.wav'} and not self.transcribe:
                     return 'needs_transcript',{},'Audio requires linked transcript'
-                data=execute_with_retry(self.service.files().get_media(fileId=meta['id'],supportsAllDrives=True))
+                request=self.service.files().get_media(fileId=meta['id'],supportsAllDrives=True)
+                # Some text-heavy PDFs compress over 100:1 over HTTP. Request
+                # original bytes rather than relaxing transport decode limits.
+                if hasattr(request,'headers'):request.headers['accept-encoding']='identity'
+                data=execute_with_retry(request)
                 if meta.get('md5Checksum') and hashlib.md5(data,usedforsecurity=False).hexdigest()!=meta['md5Checksum']:
                     raise ValueError('Source revision changed during download; rediscover before indexing')
         else:
             raise ValueError('Unsupported queue kind')
-        text,status,details=extract_complete(data,suffix,ocr=self.ocr)
+        if suffix in {'.mp3','.mp4','.m4a','.wav'} and self.transcribe:
+            from fetch_podcast_transcript import whisper_transcribe
+            audio=self.cache/'transcripts'/(kind+'-'+(p.get('id') or p['sha'])+suffix)
+            audio.parent.mkdir(parents=True,exist_ok=True)
+            audio.write_bytes(data)
+            transcript=audio.with_suffix('.txt')
+            text=transcript.read_text(encoding='utf-8') if transcript.is_file() else whisper_transcribe(audio,{'title':p.get('title','')}) or ''
+            status='indexed' if len(text.split())>=40 else 'needs_transcript'
+            if status=='indexed':transcript.write_text(text,encoding='utf-8')
+            details={'transcript_kind':'automatic','review_status':'unreviewed'}
+        else:
+            text,status,details=extract_complete(data,suffix,ocr=self.ocr)
         if status=='awaiting_extraction':status='empty_source' if not data else 'failed'
         if status=='awaiting_transcript':status='needs_transcript'
         md5=hashlib.md5(data,usedforsecurity=False).hexdigest()
@@ -363,6 +452,7 @@ def main():
                 code=getattr(getattr(exc,'resp',None),'status',None)
                 status='access_unavailable' if code in {401,403,404} or isinstance(exc,(FileNotFoundError,SystemExit)) else 'retry' if job['attempts']<4 else 'failed'
                 result={};error=f'{type(exc).__name__}: '+str(exc)[:250]
+            preserve_outcome(args.cache,job,status,result,error)
             queue.finish(job['key'],status,result=result,error=error)
             count+=1
             if time.monotonic()-checkpointed>=300:

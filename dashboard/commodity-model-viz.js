@@ -30,6 +30,16 @@
     if(m.id==='crude')extra+=`<p>East Coast distillate coverage: ${fmt(m.reference.east_coast_distillate_days)} days · ${esc(m.reference.distillate_basis?.use_period)}. ${esc(m.reference.distillate_basis?.note)}</p>`;
     if(m.id==='crude' && m.publisher_forecast_validation?.summary?.length){const v=m.publisher_forecast_validation;extra+=`<details><summary>Historical publisher forecasts · ${fmt(v.vintages)} vintages</summary><p>${esc(v.design)}</p>${table(v.summary.map(r=>({...r,period:human(r.series),basis:'archived EIA forecast'})),[['period','Benchmark'],['horizon_months','Months ahead'],['observations','Forecasts'],['rmse','Forecast RMSE $/bbl'],['baseline_rmse','Unchanged-price RMSE $/bbl']])}<p>${esc(v.limitation)}</p></details>`;}
     if(m.id==='silver' && m.warehouse_inventory?.london?.length){const latest=m.warehouse_inventory.london.at(-1);extra+=`<p>London silver: ${fmt(latest.value)} million oz · ${esc(latest.date)}. ${esc(m.warehouse_inventory.note)}</p>`;}
+    const free=m.free_evidence||{};
+    const freeColumns={copper_exchange_stocks:[['period','Date'],['lme_t','LME tonnes'],['comex_t','COMEX tonnes'],['shfe_t','SHFE tonnes'],['total_t','Total tonnes']],gold_regional_cost_curve:[['period','Operation'],['aisc_aud_oz','AISC A$/oz'],['production_oz','Gold oz']],gold_global_average_cost:[['period','Quarter'],['aisc_usd_oz','AISC US$/oz']],copper_concentrate_report:[['period','Year'],['concentrate_supply_kt_cu','Contained copper kt']],silver_liquidity_report:[['period','Month'],['non_etp_share_pct','London holdings outside ETPs %']]};
+    for(const [key,item] of Object.entries(free)){
+      extra+=`<details><summary>${esc(item.title)} · ${esc(item.period)} · ${esc(human(item.status))}</summary><p>${esc(item.note)}</p>${source({url:item.source_url,label:'Open original publication'})}${table((item.rows||[]).slice(key==='gold_regional_cost_curve'?0:-12),freeColumns[key]||[['period','Period']])}`;
+      if(item.history?.length)extra+=table(item.history.map(r=>({...r,basis:'regional sample; simple average'})),[['period','Quarter'],['simple_average_aud_oz','Average A$/oz']]);
+      if(item.monthly_rows?.length)extra+=`<p>${fmt(item.monthly_rows.length)} month-end observations · ${esc(item.monthly_rows[0].period)} to ${esc(item.monthly_rows.at(-1).period)}. ${fmt(item.rows.length)} weekly observations. ${source({url:item.monthly_source_url,label:'Download monthly history'})}</p>`;
+      if(item.lease_observation){const r=item.lease_observation;extra+=`<p>Lease-rate range: ${fmt(r.low_pct)}–${fmt(r.high_pct)}% · ${esc(r.period)}. Tenor: ${esc(r.tenor)}.</p>`;}
+      if(item.parse_failures?.length)extra+=`<p>${fmt(item.parse_failures.length)} additional publications need extraction review; they are not silently treated as empty.</p>`;
+      extra+='</details>';
+    }
     return extra;
   }
   function card(m){

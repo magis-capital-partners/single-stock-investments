@@ -63,7 +63,7 @@ def provenance(config, panel, as_of):
 
 
 def shell(config, panel, as_of):
-    from commodity_inputs import readiness
+    from commodity_inputs import readiness, FREE_INPUTS
     sources = provenance(config, panel, as_of)
     inputs = readiness(config['id'], panel, as_of)
     status = 'source_review_due' if any(s['stale'] or s['changed_since_review'] for s in sources if s.get('required', True)) else 'research_scenarios'
@@ -75,7 +75,10 @@ def shell(config, panel, as_of):
             'config_sha256': digest(config), 'reference': config['reference'],
             'falsifiers': config['falsifiers'], 'limitations': config['limitations'],
             'related_tickers': config['related_tickers'], 'cost_floor': config['cost_floor'],
-            'input_coverage':inputs, 'validation': [], 'scenarios': [], 'history': []}
+            'input_coverage':inputs,
+            'free_evidence':{key:panel['free_inputs'][key] for key,_ in FREE_INPUTS[config['id']]
+                             if key in panel.get('free_inputs',{}) and panel['free_inputs'][key].get('period','9999')<=as_of.isoformat()},
+            'validation': [], 'scenarios': [], 'history': []}
 
 
 def check(name, error, tolerance=0.011):

@@ -9,8 +9,19 @@ import pytest
 sys.path.insert(0,str(Path(__file__).resolve().parents[1]))
 from company_source_queue import SourceQueue
 from company_source_cache import pack,restore
-from backfill_company_sources import extract_complete,transcript_for,audit_cache
+from backfill_company_sources import extract_complete,transcript_for,audit_cache,preserve_outcome
 from company_sources import SourceIndex
+
+
+def test_access_failure_is_published_without_erasing_last_good_text(tmp_path):
+    from company_sources import digest
+    job={'kind':'drive','payload':{'id':'id','revision':'v1'}}
+    target=tmp_path/'drive'/(digest('idv1')+'.json')
+    preserve_outcome(tmp_path,job,'access_unavailable',{},'Publisher denied access')
+    assert json.loads(target.read_text())['status']=='access_unavailable'
+    target.write_text(json.dumps({'text':'existing original','status':'indexed'}))
+    preserve_outcome(tmp_path,job,'failed',{},'Temporary failure')
+    assert json.loads(target.read_text())['text']=='existing original'
 
 
 def test_model_source_is_read_as_text_without_execution():
@@ -120,7 +131,9 @@ def test_successful_ocr_of_short_cover_is_indexed_as_unreviewed(monkeypatch):
         def get_images(self):return [1]
         def get_textpage_ocr(self,**kwargs):return object()
     class PDF:
-        def __enter__(self):return [Page()]
+        needs_pass=False
+        def __enter__(self):return self
+        def __iter__(self):return iter([Page()])
         def __exit__(self,*args):pass
     monkeypatch.setitem(sys.modules,'fitz',SimpleNamespace(open=lambda **kwargs:PDF()))
     text,state,detail=extract_complete(b'fixture','.pdf',ocr=True)
@@ -138,6 +151,47 @@ def test_epub_reads_spine_order_and_preserves_scan_gap():
     text,state,details=extract_complete(b.getvalue(),'.epub')
     assert text.startswith('Company discussion') and state=='needs_ocr'
     assert details['missing_chapters']==['book/a.xhtml']
+
+
+def test_epub_recovers_image_chapter_without_fetching_external_content(monkeypatch):
+    import backfill_company_sources as module
+    original=module.extract_complete
+    def extract_image(data,suffix,**kwargs):
+        if suffix=='.png':return 'Scanned company discussion','indexed',{'ocr_pages':[1]}
+        return original(data,suffix,**kwargs)
+    monkeypatch.setattr(module,'extract_complete',extract_image)
+    def book(ref):
+        b=io.BytesIO()
+        with zipfile.ZipFile(b,'w') as z:
+            z.writestr('META-INF/container.xml','<container><rootfile full-path="book/package.opf"/></container>')
+            z.writestr('book/package.opf','<package xmlns="http://www.idpf.org/2007/opf"><manifest><item id="a" href="a.xhtml"/></manifest><spine><itemref idref="a"/></spine></package>')
+            z.writestr('book/a.xhtml','<html><body><img src="'+ref+'"/></body></html>')
+            z.writestr('book/scan.png',b'original image')
+        return b.getvalue()
+    text,state,details=original(book('scan.png'),'.epub',ocr=True)
+    assert text=='Scanned company discussion' and state=='indexed'
+    assert details['ocr_chapters']==['book/a.xhtml'] and details['ocr_review']=='unreviewed'
+    assert original(book('https://example.com/scan.png'),'.epub',ocr=True)[1]=='needs_ocr'
+
+
+def test_legacy_word_reader_does_not_execute_embedded_content(monkeypatch):
+    from types import SimpleNamespace
+    monkeypatch.setitem(sys.modules,'legacy_doc',SimpleNamespace(extract_text=lambda data:SimpleNamespace(text='Company earnings discussion',parser='piece-table',warnings=[])))
+    text,state,details=extract_complete(b'legacy-fixture','.doc')
+    assert text=='Company earnings discussion' and state=='indexed' and details['parser']=='piece-table'
+    def encrypted(data):raise ValueError('Encrypted document')
+    monkeypatch.setitem(sys.modules,'legacy_doc',SimpleNamespace(extract_text=encrypted))
+    assert extract_complete(b'private','.doc')[1]=='access_unavailable'
+
+
+def test_source_code_is_indexed_as_text_and_never_executed():
+    text,state,details=extract_complete(b'raise RuntimeError("do not run this research file")','.py')
+    assert text.startswith('raise RuntimeError') and state=='indexed'
+    assert details['format']=='model_source_text'
+
+
+def test_image_requires_ocr_before_indexing():
+    assert extract_complete(b'original','.jpeg')[1]=='needs_ocr'
 
 
 def test_transcript_companion_and_cache_archive_portability(tmp_path):

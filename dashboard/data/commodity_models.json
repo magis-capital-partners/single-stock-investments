@@ -404,6 +404,7 @@
         ],
         "required_ready": true
       },
+      "free_evidence": {},
       "validation": [
         {
           "check": "2025-Q1 world flow",
@@ -89932,7 +89933,7 @@
       },
       "input_coverage": {
         "available": 1,
-        "total": 4,
+        "total": 5,
         "items": [
           {
             "id": "copper_spot",
@@ -89946,27 +89947,4220 @@
           },
           {
             "id": "concentrate_balance",
-            "status": "licensed_or_manual_source",
-            "reason": "Aligned concentrate supply, SX-EW and smelter intake are needed; total refined copper is not a substitute.",
-            "source_url": "https://icsg.org/statistical/",
-            "required": false
-          },
-          {
-            "id": "regional_exchange_stocks",
-            "status": "source_integration_required",
-            "reason": "Separate dated LME, COMEX and SHFE stocks; warrants and warehouse stocks must not be double counted.",
-            "source_url": "https://www.lme.com/en/Market-Data/Reports-and-data/Warehouse-and-stocks-reports/Warehouse-and-queue-data",
+            "status": "partial_public_evidence",
+            "reason": "Cochilco publishes concentrate supply and a custom-market outlook. A matching global smelter-intake table is still absent; integrated and custom supply are different markets.",
+            "source_url": "https://www.cochilco.cl/web/cochilco-publica-estudio-sobre-el-mercado-de-concentrados-y-la-industria-mundial-de-fundiciones/",
             "required": false
           },
           {
             "id": "treatment_charge_history",
-            "status": "licensed_or_manual_source",
-            "reason": "A comparable dated spot TC series is required; one press-release observation is not a time series.",
-            "source_url": "https://icsg.org/publications-list/",
+            "status": "partial_public_evidence",
+            "reason": "Free Cochilco reports show spot versus benchmark TC/RC charts. Exact consistently dated observations are not exposed as a full public series; chart precision is not fabricated.",
+            "source_url": "https://www.cochilco.cl/web/cochilco-publica-estudio-sobre-el-mercado-de-concentrados-y-la-industria-mundial-de-fundiciones/",
+            "required": false
+          },
+          {
+            "id": "copper_exchange_stocks",
+            "status": "partial",
+            "last_observation": "2026-10-23",
+            "observations": 67,
+            "source_url": "https://www.cochilco.cl/web/informe-semanal-del-cobre/",
+            "unit": "metric tonnes",
+            "reason": "Cochilco reports LME, COMEX and SHFE separately. Exchange location is not warehouse geography or freely available metal. Monthly history and weekly observations remain separate; gaps are not interpolated.",
+            "required": false
+          },
+          {
+            "id": "copper_concentrate_report",
+            "status": "partial",
+            "last_observation": "2025-12-31",
+            "observations": 1,
+            "source_url": "https://www.cochilco.cl/web/download/1030/2026/16832/mercado-de-concentrados-e-industria-de-fundiciones-2026.pdf",
+            "unit": "thousand tonnes contained copper",
+            "reason": "2026 report: 2025 global concentrate output is 18,723 kt of contained copper. Custom concentrate availability differs from integrated supply. The report supplies TC/RC and custom-balance charts, but no complete machine-readable, dated spot TC tape or matching global intake table. Chart values are not invented or mixed with refined copper balances.",
             "required": false
           }
         ],
         "required_ready": true
+      },
+      "free_evidence": {
+        "copper_exchange_stocks": {
+          "title": "Copper inventories by exchange",
+          "source_url": "https://www.cochilco.cl/web/informe-semanal-del-cobre/",
+          "status": "partial",
+          "fetched_at": "2026-10-28",
+          "period": "2026-10-23",
+          "unit": "metric tonnes",
+          "rows": [
+            {
+              "period": "2025-02-14",
+              "basis": "exchange stocks reported by Cochilco",
+              "lme_t": 255225,
+              "comex_t": 91321,
+              "shfe_t": 230281,
+              "total_t": 576827,
+              "source_url": "https://www.cochilco.cl/web/download/969/2025/13137/informe-del-mercado-internacional-del-cobre-semana-del-10-al-14-de-febrero-de-2025.pdf",
+              "sha256": "b5692df92ba59ef199d4bbb5c1e74fa70cf16ac4d541ac6fd52e8e21b9ff95b7"
+            },
+            {
+              "period": "2025-02-21",
+              "basis": "exchange stocks reported by Cochilco",
+              "lme_t": 267750,
+              "comex_t": 88594,
+              "shfe_t": 260091,
+              "total_t": 616435,
+              "source_url": "https://www.cochilco.cl/web/download/969/2025/13153/informe-del-mercado-internacional-del-cobre-semana-del-17-al-21-de-febrero-de-2025.pdf",
+              "sha256": "dfd8cbf587532a58f8f403a8baee8f1aecdb0aed162f638ec402febc75bf7786"
+            },
+            {
+              "period": "2025-05-02",
+              "basis": "exchange stocks reported by Cochilco",
+              "lme_t": 197300,
+              "comex_t": 132948,
+              "shfe_t": 89307,
+              "total_t": 419555,
+              "source_url": "https://www.cochilco.cl/web/download/969/2025/13431/informe-del-mercado-internacional-del-cobre-semana-del-28-de-abril-al-2-de-mayo-de-2025.pdf",
+              "sha256": "9509b043bd3fb063fe790e9bd9e6a580d1a3fd6063b5bd285034160f308e1367"
+            },
+            {
+              "period": "2025-05-30",
+              "basis": "exchange stocks reported by Cochilco",
+              "lme_t": 149875,
+              "shfe_t": 105791,
+              "comex_t": 163748,
+              "total_t": 419414,
+              "source_url": "https://www.cochilco.cl/web/download/969/2025/13569/informe-del-mercado-internacional-del-cobre-semana-del-26-al-30-de-mayo-de-2025.pdf",
+              "sha256": "9e54bd4bd152657191732c909d746a6290595a6525004a89dd25bda5f8fd39f9"
+            },
+            {
+              "period": "2025-06-06",
+              "basis": "exchange stocks reported by Cochilco",
+              "lme_t": 132400,
+              "shfe_t": 107404,
+              "comex_t": 169537,
+              "total_t": 409341,
+              "source_url": "https://www.cochilco.cl/web/download/969/2025/13600/informe-del-mercado-internacional-del-cobre-semana-del-02-al-06-de-junio-de-2025.pdf",
+              "sha256": "e2ce14de92d37e205062c589c529840e293f06c7bf6ccdeab50b61d9b8506dd0"
+            },
+            {
+              "period": "2025-06-13",
+              "basis": "exchange stocks reported by Cochilco",
+              "lme_t": 114475,
+              "shfe_t": 101943,
+              "comex_t": 175952,
+              "total_t": 392370,
+              "source_url": "https://www.cochilco.cl/web/download/969/2025/13633/informe-del-mercado-internacional-del-cobre-semana-del-09-al-13-de-junio-de-2025.pdf",
+              "sha256": "a76413ef26bb2770217d9a37b1c512ee4f778af933b91935e26b34d1e3aa6c0e"
+            },
+            {
+              "period": "2025-06-27",
+              "basis": "exchange stocks reported by Cochilco",
+              "lme_t": 91275,
+              "shfe_t": 81550,
+              "comex_t": 188596,
+              "total_t": 361421,
+              "source_url": "https://www.cochilco.cl/web/download/969/2025/13693/informe-del-mercado-internacional-del-cobre-semana-del-23-al-27-de-junio-de-2025.pdf",
+              "sha256": "f216a5faa73e500d81432e6a7b9c3235b95b187ece1042426b6ab201501ac0db"
+            },
+            {
+              "period": "2025-07-04",
+              "basis": "exchange stocks reported by Cochilco",
+              "lme_t": 95275,
+              "shfe_t": 84589,
+              "comex_t": 200446,
+              "total_t": 380310,
+              "source_url": "https://www.cochilco.cl/web/download/969/2025/13785/informe-del-mercado-internacional-del-cobre-semana-del-30-de-junio-al-4-de-julio-de-2025.pdf",
+              "sha256": "7bd07232a55ae350cf435dbce0d23aa98d5c870e40d7df5c263cf282a6ab99b0"
+            },
+            {
+              "period": "2025-07-18",
+              "basis": "exchange stocks reported by Cochilco",
+              "lme_t": 122175,
+              "shfe_t": 84556,
+              "comex_t": 219370,
+              "total_t": 426101,
+              "source_url": "https://www.cochilco.cl/web/download/969/2025/14094/informe-del-mercado-internacional-del-cobre-semana-del-14-al-18-de-julio-de-2025.pdf",
+              "sha256": "5127e0e61fe8eb0c5ce2e409ebf4161948545749ce6abe50641ba45b71aa91bc"
+            },
+            {
+              "period": "2025-07-25",
+              "basis": "exchange stocks reported by Cochilco",
+              "lme_t": 128475,
+              "shfe_t": 73423,
+              "comex_t": 224854,
+              "total_t": 426752,
+              "source_url": "https://www.cochilco.cl/web/download/969/2025/14129/informe-del-mercado-internacional-del-cobre-semana-del-21-al-25-de-julio-de-2025.pdf",
+              "sha256": "a338de5b8fd991d1e35d45d8a7b5e5c2eb00c8ff1297453fff9b4a4505e21665"
+            },
+            {
+              "period": "2025-08-01",
+              "basis": "exchange stocks reported by Cochilco",
+              "lme_t": 141750,
+              "shfe_t": 72543,
+              "comex_t": 233977,
+              "total_t": 448270,
+              "source_url": "https://www.cochilco.cl/web/download/969/2025/14145/informe-del-mercado-internacional-del-cobre-semana-del-28-de-julio-al-1-de-agosto-de-2025.pdf",
+              "sha256": "68b283d2083d49ed38bc421ef7f1e6b905e11d7379e56991e356c993cfd95afb"
+            },
+            {
+              "period": "2025-08-08",
+              "basis": "exchange stocks reported by Cochilco",
+              "lme_t": 155850,
+              "shfe_t": 81933,
+              "comex_t": 238858,
+              "total_t": 476641,
+              "source_url": "https://www.cochilco.cl/web/download/969/2025/14179/informe-del-mercado-internacional-del-cobre-semana-del-4-a-8-de-agosto-de-2025.pdf",
+              "sha256": "cec2d41d3664013b535be75748e47bd5d8d1679da0507663521f23ca45c3d5d1"
+            },
+            {
+              "period": "2025-08-14",
+              "basis": "exchange stocks reported by Cochilco",
+              "lme_t": 155850,
+              "shfe_t": 81933,
+              "comex_t": 242032,
+              "total_t": 479815,
+              "source_url": "https://www.cochilco.cl/web/download/969/2025/14226/informe-del-mercado-internacional-del-cobre-semana-del-11-al-14-de-agosto-de-2025.pdf",
+              "sha256": "e078d7b184802d3a144970550f199c486917f6e721f5b256cb3c6e58dd4b955c"
+            },
+            {
+              "period": "2025-08-22",
+              "basis": "exchange stocks reported by Cochilco",
+              "lme_t": 155975,
+              "shfe_t": 81698,
+              "comex_t": 246479,
+              "total_t": 484152,
+              "source_url": "https://www.cochilco.cl/web/download/969/2025/14502/informe-del-mercado-internacional-del-cobre-semana-del-18-al-22-de-agosto-de-2025.pdf",
+              "sha256": "ab1c84a6fe06229793f1e37f7d77ed47cdceb1aa1d9854ebe73479c8dd74e493"
+            },
+            {
+              "period": "2025-08-29",
+              "basis": "exchange stocks reported by Cochilco",
+              "lme_t": 158900,
+              "shfe_t": 79748,
+              "comex_t": 249681,
+              "total_t": 488329,
+              "source_url": "https://www.cochilco.cl/web/download/969/2025/14584/informe-del-mercado-internacional-del-cobre-semana-del-25-al-29-de-agosto-de-2025.pdf",
+              "sha256": "b32ea3e9542bde856b61f282b99bf80e98296967eadb6feb49a0329e5ef1fd1d"
+            },
+            {
+              "period": "2025-09-05",
+              "basis": "exchange stocks reported by Cochilco",
+              "lme_t": 157950,
+              "shfe_t": 81851,
+              "comex_t": 274645,
+              "total_t": 514446,
+              "source_url": "https://www.cochilco.cl/web/download/969/2025/14808/informe-del-mercado-internacional-del-cobre-semana-del-1-al-5-de-septiembre-de-2025.pdf",
+              "sha256": "ef6287913af7e6d46cb8a0593e5344c2fc05d99eefcbf3f02def6ea9b059d206"
+            },
+            {
+              "period": "2025-09-17",
+              "basis": "exchange stocks reported by Cochilco",
+              "lme_t": 149775,
+              "shfe_t": 94054,
+              "comex_t": 283829,
+              "total_t": 527658,
+              "source_url": "https://www.cochilco.cl/web/download/969/2025/14880/informe-del-mercado-internacional-del-cobre-semana-del-15-al-17-de-septiembre-de-2025-2.pdf",
+              "sha256": "0ba9f4d85dda198688ca1430ef0cc8a6d5491219b46f332381f21b97537c5070"
+            },
+            {
+              "period": "2025-09-26",
+              "basis": "exchange stocks reported by Cochilco",
+              "lme_t": 144400,
+              "shfe_t": 98779,
+              "comex_t": 291257,
+              "total_t": 534436,
+              "source_url": "https://www.cochilco.cl/web/download/969/2025/14901/informe-del-mercado-internacional-del-cobre-semana-del-22-al-26-de-septiembre-de-2025.pdf",
+              "sha256": "68a1b4b09ce9f2207155dd37d962693a778892b731d6e2620a744d75cb91a20a"
+            },
+            {
+              "period": "2025-10-03",
+              "basis": "exchange stocks reported by Cochilco",
+              "lme_t": 140475,
+              "comex_t": 294789,
+              "shfe_t": 95034,
+              "total_t": 530298,
+              "source_url": "https://www.cochilco.cl/web/download/969/2025/14912/informe-del-mercado-internacional-del-cobre-semana-del-29-de-septiembre-al-3-de-octubre-de-2025.pdf",
+              "sha256": "37fa23e7407ba54d603b3ddb950c4d9335468dfb9bd023191a33bd005422f49d"
+            },
+            {
+              "period": "2025-10-09",
+              "basis": "exchange stocks reported by Cochilco",
+              "lme_t": 139475,
+              "shfe_t": 95034,
+              "comex_t": 304380,
+              "total_t": 538889,
+              "source_url": "https://www.cochilco.cl/web/download/969/2025/14926/informe-del-mercado-internacional-del-cobre-semana-del-6-a-9-de-octubre-de-2025.pdf",
+              "sha256": "0f50259e5e0d6a829a54deacc2959cf84cff0d9ffc630d8954ba73db34f1b9c1"
+            },
+            {
+              "period": "2025-10-17",
+              "basis": "exchange stocks reported by Cochilco",
+              "lme_t": 137225,
+              "shfe_t": 110240,
+              "comex_t": 312663,
+              "total_t": 560128,
+              "source_url": "https://www.cochilco.cl/web/download/969/2025/14953/informe-del-mercado-internacional-del-cobre-semana-del-13-a-17-de-octubre-de-2025.pdf",
+              "sha256": "ffc40749cd9ec847bf954159bd9df043422ecf5a487956f42e624e221f8bde84"
+            },
+            {
+              "period": "2025-10-24",
+              "basis": "exchange stocks reported by Cochilco",
+              "lme_t": 136100,
+              "shfe_t": 104792,
+              "comex_t": 315245,
+              "total_t": 556137,
+              "source_url": "https://www.cochilco.cl/web/download/969/2025/14997/informe-del-mercado-internacional-del-cobre-semana-del-20-al-24-de-octubre-de-2025.pdf",
+              "sha256": "93bdd5e1f2735a2124cb19344a87fb2d8d2736bec05433ffb74f6871813a6238"
+            },
+            {
+              "period": "2025-10-30",
+              "basis": "exchange stocks reported by Cochilco",
+              "lme_t": 134950,
+              "shfe_t": 104792,
+              "comex_t": 314487,
+              "total_t": 554229,
+              "source_url": "https://www.cochilco.cl/web/download/969/2025/15020/informe-del-mercado-internacional-del-cobre-semana-del-27-al-30-de-octubre-de-2025.pdf",
+              "sha256": "3f87acf495e5c9f460ad7e841c3bcb972fcfc4ff1b16f0c93870c86ebddc9914"
+            },
+            {
+              "period": "2025-11-07",
+              "basis": "exchange stocks reported by Cochilco",
+              "lme_t": 135900,
+              "shfe_t": 115035,
+              "comex_t": 332410,
+              "total_t": 583345,
+              "source_url": "https://www.cochilco.cl/web/download/969/2025/15065/informe-del-mercado-internacional-del-cobre-semana-del-3-al-7-de-noviembre-de-2025.pdf",
+              "sha256": "c38e2c988053d7dde133b056d38ed3badbed6616068fda7732d84dedb2c86a83"
+            },
+            {
+              "period": "2025-11-14",
+              "basis": "exchange stocks reported by Cochilco",
+              "lme_t": 135725,
+              "shfe_t": 109407,
+              "comex_t": 344221,
+              "total_t": 589353,
+              "source_url": "https://www.cochilco.cl/web/download/969/2025/15085/informe-del-mercado-internacional-del-cobre-semana-del-10-al-14-de-noviembre-de-2025.pdf",
+              "sha256": "0b8157b3efe6d7e9f3dbb24dda8375c0f9af1a5c74aa1fa1ed0ea46ecab74275"
+            },
+            {
+              "period": "2025-11-21",
+              "basis": "exchange stocks reported by Cochilco",
+              "lme_t": 155025,
+              "comex_t": 361525,
+              "shfe_t": 110603,
+              "total_t": 627153,
+              "source_url": "https://www.cochilco.cl/web/download/969/2025/15111/informe-del-mercado-internacional-del-cobre-semana-del-17-al-21-de-noviembre-de-2025.pdf",
+              "sha256": "694056f7c2179fb02c9a2e03a0c994f42526005e2f4c752f1075b22041d2fc2a"
+            },
+            {
+              "period": "2025-11-28",
+              "basis": "exchange stocks reported by Cochilco",
+              "lme_t": 159425,
+              "comex_t": 378900,
+              "shfe_t": 97930,
+              "total_t": 636255,
+              "source_url": "https://www.cochilco.cl/web/download/969/2025/15154/informe-del-mercado-internacional-del-cobre-semana-del-24-al-28-de-noviembre-de-2025.pdf",
+              "sha256": "a135c3c73a0af1a25d88da8089d69e1868a4c756337cc278904918039084c463"
+            },
+            {
+              "period": "2025-12-05",
+              "basis": "exchange stocks reported by Cochilco",
+              "lme_t": 162550,
+              "comex_t": 395379,
+              "shfe_t": 88905,
+              "total_t": 646834,
+              "source_url": "https://www.cochilco.cl/web/download/969/2025/15174/informe-del-mercado-internacional-del-cobre-semana-del-01-al-05-de-diciembre-de-2025.pdf",
+              "sha256": "f27f92467295779ef3d5e6229944e5f35f81f815210eb0895d0ac5dba86ac308"
+            },
+            {
+              "period": "2025-12-12",
+              "basis": "exchange stocks reported by Cochilco",
+              "lme_t": 165900,
+              "comex_t": 405782,
+              "shfe_t": 89389,
+              "total_t": 661071,
+              "source_url": "https://www.cochilco.cl/web/download/969/2025/15217/informe-del-mercado-internacional-del-cobre-semana-del-8-al-12-de-diciembre-de-2025.pdf",
+              "sha256": "b27866098e8111b92b497323a5c0ce0b6362c8fdbc7add99748e7d221f6731ed"
+            },
+            {
+              "period": "2025-12-19",
+              "basis": "exchange stocks reported by Cochilco",
+              "lme_t": 160400,
+              "comex_t": 416910,
+              "shfe_t": 95805,
+              "total_t": 673115,
+              "source_url": "https://www.cochilco.cl/web/download/969/2025/15237/informe-del-mercado-internacional-del-cobre-semana-del-15-al-19-de-diciembre-de-2025.pdf",
+              "sha256": "419734587a2cada00cc92bfe1b383a58d08c5c0fb05984f4d27f54d6c63111f2"
+            },
+            {
+              "period": "2025-12-24",
+              "basis": "exchange stocks reported by Cochilco",
+              "lme_t": 157025,
+              "comex_t": 427431,
+              "shfe_t": 95805,
+              "total_t": 680261,
+              "source_url": "https://www.cochilco.cl/web/download/969/2025/15246/informe-del-mercado-internacional-del-cobre-semana-del-22-al-24-de-diciembre-de-2025.pdf",
+              "sha256": "b70ab0de067caa972e35cbc8e6aa7763e548997d8bdf1e6733e22558035efe3c"
+            },
+            {
+              "period": "2026-01-02",
+              "basis": "exchange stocks reported by Cochilco",
+              "lme_t": 145325,
+              "comex_t": 451833,
+              "shfe_t": 111703,
+              "total_t": 708861,
+              "source_url": "https://www.cochilco.cl/web/download/1006/2026/15256/informe-del-mercado-internacional-del-cobre-semana-del-29-de-diciembre-de-2025-al-2-de-enero-de-2026.pdf",
+              "sha256": "9af3fd6d5582d509acf186056c5bafd3712091a0a0dee68c6a25084b2cf12d20"
+            },
+            {
+              "period": "2026-01-09",
+              "basis": "exchange stocks reported by Cochilco",
+              "lme_t": 138975,
+              "comex_t": 467161,
+              "shfe_t": 180543,
+              "total_t": 786679,
+              "source_url": "https://www.cochilco.cl/web/download/1006/2026/15289/informe-del-mercado-internacional-del-cobre-semana-del-5-al-9-de-enero-de-2026.pdf",
+              "sha256": "c7aee9a77aa2ade9d2bba1ddb5a36c253544df4b52e7106c7e6a7d7ab17969cd"
+            },
+            {
+              "period": "2026-01-16",
+              "basis": "exchange stocks reported by Cochilco",
+              "lme_t": 143575,
+              "comex_t": 488716,
+              "shfe_t": 213515,
+              "total_t": 845806,
+              "source_url": "https://www.cochilco.cl/web/download/1006/2026/15311/informe-del-mercado-internacional-del-cobre-semana-del-12-al-16-de-enero-de-2026.pdf",
+              "sha256": "94406951da952098ca1aeee7190bb4ad648bd881d1ae189d2f92736b8c507652"
+            },
+            {
+              "period": "2026-01-23",
+              "basis": "exchange stocks reported by Cochilco",
+              "lme_t": 171700,
+              "comex_t": 507432,
+              "shfe_t": 225937,
+              "total_t": 905069,
+              "source_url": "https://www.cochilco.cl/web/download/1006/2026/15340/informe-del-mercado-internacional-del-cobre-semana-del-19-al-23-de-enero-de-2026.pdf",
+              "sha256": "4d96866dee41b4180b35b493d31386700f8f2c477901895452c1c2f6f9034682"
+            },
+            {
+              "period": "2026-01-30",
+              "basis": "exchange stocks reported by Cochilco",
+              "lme_t": 174975,
+              "comex_t": 521752,
+              "shfe_t": 233004,
+              "total_t": 929731,
+              "source_url": "https://www.cochilco.cl/web/download/1006/2026/15360/informe-del-mercado-internacional-del-cobre-semana-del-26-al-30-de-enero-de-2026.pdf",
+              "sha256": "fb0cdf252756de6fe0e810a1363e933aec326abc28508099a5a3a602279155e9"
+            },
+            {
+              "period": "2026-02-06",
+              "basis": "exchange stocks reported by Cochilco",
+              "lme_t": 183275,
+              "comex_t": 532000,
+              "shfe_t": 248911,
+              "total_t": 964186,
+              "source_url": "https://www.cochilco.cl/web/download/1006/2026/15393/informe-del-mercado-internacional-del-cobre-semana-del-2-al-6-de-febrero-de-2026.pdf",
+              "sha256": "11a8cb6f114baf45dcc199b1ca766d16702c70d1c10783e025233480c691919f"
+            },
+            {
+              "period": "2026-02-13",
+              "basis": "exchange stocks reported by Cochilco",
+              "lme_t": 203875,
+              "comex_t": 535715,
+              "shfe_t": 272475,
+              "total_t": 1012065,
+              "source_url": "https://www.cochilco.cl/web/download/1006/2026/15424/informe-del-mercado-internacional-del-cobre-semana-del-9-al-13-de-febrero-de-2026.pdf",
+              "sha256": "b317f9c47428c0ea68fd383e921494c66826bfcc4f9d457347bb1c2dbc24fe21"
+            },
+            {
+              "period": "2026-02-20",
+              "basis": "exchange stocks reported by Cochilco",
+              "lme_t": 235150,
+              "comex_t": 541780,
+              "shfe_t": 272475,
+              "total_t": 1049405,
+              "source_url": "https://www.cochilco.cl/web/download/1006/2026/15432/informe-del-mercado-internacional-del-cobre-semana-del-16-al-20-de-febrero-de-2026.pdf",
+              "sha256": "b65de40218ecbd5e83fb8c952ce439d8927b8eb46ec5828b8333b12c9e7b88e8"
+            },
+            {
+              "period": "2026-03-13",
+              "basis": "exchange stocks reported by Cochilco",
+              "lme_t": 311825,
+              "comex_t": 537274,
+              "shfe_t": 433458,
+              "total_t": 1282557,
+              "source_url": "https://www.cochilco.cl/web/download/1006/2026/15556/informe-del-mercado-internacional-del-cobre-semana-del-09-al-13-de-marzo-de-2026.pdf",
+              "sha256": "c4fec25ef4647d76865298f3daa6d1b171fcdfdf714b91a04281645319f447a8"
+            },
+            {
+              "period": "2026-03-20",
+              "basis": "exchange stocks reported by Cochilco",
+              "lme_t": 342350,
+              "comex_t": 534154,
+              "shfe_t": 411121,
+              "total_t": 1287625,
+              "source_url": "https://www.cochilco.cl/web/download/1006/2026/15577/informe-del-mercado-internacional-del-cobre-semana-del-16-al-20-de-marzo-de-2026.pdf",
+              "sha256": "1ec28fa53945e64bcf9cd956d1fb6ffcdae92940946b07b6bca05fc7ced647b6"
+            },
+            {
+              "period": "2026-03-27",
+              "basis": "exchange stocks reported by Cochilco",
+              "lme_t": 360250,
+              "comex_t": 534981,
+              "shfe_t": 359135,
+              "total_t": 1254366,
+              "source_url": "https://www.cochilco.cl/web/download/1006/2026/15630/informe-del-mercado-internacional-del-cobre-semana-del-23-al-27-de-marzo-de-2026.pdf",
+              "sha256": "60dd701331d1a7103b2cb5a1e44ddb763a55053339294d6754e91278267fa0df"
+            },
+            {
+              "period": "2026-04-02",
+              "basis": "exchange stocks reported by Cochilco",
+              "lme_t": 364450,
+              "comex_t": 533641,
+              "shfe_t": 359135,
+              "total_t": 1257226,
+              "source_url": "https://www.cochilco.cl/web/download/1006/2026/15645/informe-del-mercado-internacional-del-cobre-semana-del-30-de-marzo-al-02-de-abril-de-2026.pdf",
+              "sha256": "19b392a56e32cbbacbad509e3103d42c63476d500735fa7ec00192daa8102501"
+            },
+            {
+              "period": "2026-05-08",
+              "basis": "exchange stocks reported by Cochilco",
+              "lme_t": 399400,
+              "comex_t": 562333,
+              "shfe_t": 181333,
+              "total_t": 1143066,
+              "source_url": "https://www.cochilco.cl/web/download/1006/2026/15750/informe-del-mercado-internacional-del-cobre-semana-del-4-al-8-de-mayo-de-2026.pdf",
+              "sha256": "0488a16a90d9d81ea8a7932e758a6543179e2e7964b547677dfbb412caac1b9a"
+            },
+            {
+              "period": "2026-05-15",
+              "basis": "exchange stocks reported by Cochilco",
+              "lme_t": 395725,
+              "comex_t": 567305,
+              "shfe_t": 180643,
+              "total_t": 1143673,
+              "source_url": "https://www.cochilco.cl/web/download/1006/2026/15762/informe-del-mercado-internacional-del-cobre-semana-del-11-al-15-de-mayo-de-2026.pdf",
+              "sha256": "24d04a259a1fd11097752c0c30b8bdf37753f264e94730b84b0bb6bb4e6f207b"
+            },
+            {
+              "period": "2026-05-29",
+              "basis": "exchange stocks reported by Cochilco",
+              "lme_t": 389425,
+              "comex_t": 578987,
+              "shfe_t": 176414,
+              "total_t": 1144826,
+              "source_url": "https://www.cochilco.cl/web/download/1006/2026/15817/informe-del-mercado-internacional-del-cobre-semana-del-25-al-29-de-mayo-de-2026.pdf",
+              "sha256": "df815bcc0fd1519a5d9713f2429f1464863b82b707e5c752a902dda0cc552d0c"
+            },
+            {
+              "period": "2026-06-05",
+              "basis": "exchange stocks reported by Cochilco",
+              "lme_t": 379225,
+              "comex_t": 583056,
+              "shfe_t": 169512,
+              "total_t": 1131793,
+              "source_url": "https://www.cochilco.cl/web/download/1006/2026/16538/informe-del-mercado-internacional-del-cobre-semana-del-01-al-05-de-junio-de-2026.pdf",
+              "sha256": "d75f823648a9f3a11792b6bc331cd4a9c739cb6e5b35b64c69120b5bf6fa858f"
+            },
+            {
+              "period": "2026-06-12",
+              "basis": "exchange stocks reported by Cochilco",
+              "lme_t": 364100,
+              "comex_t": 589462,
+              "shfe_t": 188247,
+              "total_t": 1141809,
+              "source_url": "https://www.cochilco.cl/web/download/1006/2026/16563/informe-del-mercado-internacional-del-cobre-semana-del-08-al-12-junio-de-2026.pdf",
+              "sha256": "7ea843865a5878c946b0402a12e19e2f15f0fcecbe3f70455eef96b2f1fe3235"
+            },
+            {
+              "period": "2026-06-19",
+              "basis": "exchange stocks reported by Cochilco",
+              "lme_t": 352150,
+              "comex_t": 591663,
+              "shfe_t": 143875,
+              "total_t": 1087688,
+              "source_url": "https://www.cochilco.cl/web/download/1006/2026/16591/informe-del-mercado-internacional-del-cobre-semana-del-15-al-19-de-junio-de-2026.pdf",
+              "sha256": "0e943c91373da4093dfa607d5bb73b401d02e2f5caa3c48733b8dd26b835afcc"
+            },
+            {
+              "period": "2026-06-26",
+              "basis": "exchange stocks reported by Cochilco",
+              "lme_t": 336475,
+              "comex_t": 599439,
+              "shfe_t": 135732,
+              "total_t": 1071646,
+              "source_url": "https://www.cochilco.cl/web/download/1006/2026/16633/informe-del-mercado-internacional-del-cobre-semana-del-22-al-26-de-junio-de-2026.pdf",
+              "sha256": "ffbb56a9c48e0cb859c6f24d4fde61443ca0accf3df573bc15e0268199ffdea3"
+            },
+            {
+              "period": "2026-07-03",
+              "basis": "exchange stocks reported by Cochilco",
+              "lme_t": 318900,
+              "comex_t": 606626,
+              "shfe_t": 122677,
+              "total_t": 1048203,
+              "source_url": "https://www.cochilco.cl/web/download/1006/2026/16643/informe-del-mercado-internacional-del-cobre-semana-del-29-de-junio-a-3-de-julio-de-2026.pdf",
+              "sha256": "97ea4c22148be6fcf37d3b05921f66c4f9904eaac2e59be0bd137d61b384582d"
+            },
+            {
+              "period": "2026-07-10",
+              "basis": "exchange stocks reported by Cochilco",
+              "lme_t": 306500,
+              "comex_t": 613160,
+              "shfe_t": 100271,
+              "total_t": 1019931,
+              "source_url": "https://www.cochilco.cl/web/download/1006/2026/16661/informe-del-mercado-internacional-del-cobre-semana-del-6-a-10-de-julio-de-2026.pdf",
+              "sha256": "3532632d23afb40c6f3575cc007a1b19e5b18050510eb98702d70659a8da2c39"
+            },
+            {
+              "period": "2026-07-17",
+              "basis": "exchange stocks reported by Cochilco",
+              "lme_t": 296625,
+              "comex_t": 626736,
+              "shfe_t": 79909,
+              "total_t": 1003270,
+              "source_url": "https://www.cochilco.cl/web/download/1006/2026/16676/informe-del-mercado-internacional-del-cobre-semana-del-13-al-17-de-julio-de-2026-2.pdf",
+              "sha256": "e2672ed82ff92b16fa0a09fd90ede90d0f78ffc05110e6f995d67f608556a944"
+            },
+            {
+              "period": "2026-07-24",
+              "basis": "exchange stocks reported by Cochilco",
+              "lme_t": 276775,
+              "comex_t": 639147,
+              "shfe_t": 69610,
+              "total_t": 985532,
+              "source_url": "https://www.cochilco.cl/web/download/1006/2026/16703/informe-del-mercado-internacional-del-cobre-semana-del-20-a-24-de-julio-de-2026.pdf",
+              "sha256": "44b66c6c24a634973e1d666ed2e32d45b2e3f7cc257875c0f8058defdad77945"
+            },
+            {
+              "period": "2026-07-31",
+              "basis": "exchange stocks reported by Cochilco",
+              "lme_t": 249850,
+              "comex_t": 647684,
+              "shfe_t": 69334,
+              "total_t": 966868,
+              "source_url": "https://www.cochilco.cl/web/download/1006/2026/16719/informe-del-mercado-internacional-del-cobre-semana-del-27-a-31-de-julio-de-2026.pdf",
+              "sha256": "cabf7a368d70128401a9c0409c3e1758c00747b5ff214ae5ce87e385d4f52995"
+            },
+            {
+              "period": "2026-08-07",
+              "basis": "exchange stocks reported by Cochilco",
+              "lme_t": 222975,
+              "comex_t": 653571,
+              "shfe_t": 70116,
+              "total_t": 946662,
+              "source_url": "https://www.cochilco.cl/web/download/1006/2026/16730/informe-del-mercado-internacional-del-cobre-semana-del-3-a-7-de-agosto-de-2026.pdf",
+              "sha256": "8bbf13cc34ba56782d6e682823707654e9ef273b0c300cfaf29474cf652e967c"
+            },
+            {
+              "period": "2026-08-14",
+              "basis": "exchange stocks reported by Cochilco",
+              "lme_t": 204975,
+              "comex_t": 665559,
+              "shfe_t": 69731,
+              "total_t": 940265,
+              "source_url": "https://www.cochilco.cl/web/download/1006/2026/16753/informe-del-mercado-internacional-del-cobre-semana-del-10-a-14-de-agosto-de-2026.pdf",
+              "sha256": "b584414787b0ee89c8097bf7bfe88cb41cb18a2001052ba49d2c5f9edff9cce8"
+            },
+            {
+              "period": "2026-08-21",
+              "basis": "exchange stocks reported by Cochilco",
+              "lme_t": 238575,
+              "comex_t": 672943,
+              "shfe_t": 89548,
+              "total_t": 1001066,
+              "source_url": "https://www.cochilco.cl/web/download/1006/2026/16765/informe-del-mercado-internacional-del-cobre-semana-del-17-a-21-de-agosto-de-2026.pdf",
+              "sha256": "8039c7024be9d0f2dfc46743016ba1e2b14eb376e44e42373a7a1ba94c40f598"
+            },
+            {
+              "period": "2026-08-28",
+              "basis": "exchange stocks reported by Cochilco",
+              "lme_t": 234275,
+              "comex_t": 681226,
+              "shfe_t": 72428,
+              "total_t": 987929,
+              "source_url": "https://www.cochilco.cl/web/download/1006/2026/16781/informe-del-mercado-internacional-del-cobre-semana-del-24-a-28-de-agosto-de-2026.pdf",
+              "sha256": "c87d49896c6137b52e15b2795b6b5f6baa93994c60839a09363662039b86c490"
+            },
+            {
+              "period": "2026-09-04",
+              "basis": "exchange stocks reported by Cochilco",
+              "lme_t": 234175,
+              "comex_t": 694674,
+              "shfe_t": 63000,
+              "total_t": 991849,
+              "source_url": "https://www.cochilco.cl/web/download/1006/2026/16825/informe-del-mercado-internacional-del-cobre-semana-del-31-de-agosto-a-4-de-septiembre-de-2026.pdf",
+              "sha256": "ded581e3c2ed5f6c971077a910adc90451de9212f268fd0bd1cba4f284acb3df"
+            },
+            {
+              "period": "2026-09-11",
+              "basis": "exchange stocks reported by Cochilco",
+              "lme_t": 234475,
+              "comex_t": 696413,
+              "shfe_t": 54780,
+              "total_t": 985668,
+              "source_url": "https://www.cochilco.cl/web/download/1006/2026/16871/informe-del-mercado-internacional-del-cobre-semana-del-7-a-11-de-septiembre-de-2026.pdf",
+              "sha256": "3f257786b63f9f7f2450a9a95425876f84f4bfb9d6bfc15f5630c006e8fe7491"
+            },
+            {
+              "period": "2026-09-17",
+              "basis": "exchange stocks reported by Cochilco",
+              "lme_t": 255900,
+              "comex_t": 696880,
+              "shfe_t": 54780,
+              "total_t": 1007560,
+              "source_url": "https://www.cochilco.cl/web/download/1006/2026/16891/informe-del-mercado-internacional-del-cobre-semana-del-14-a-17-de-septiembre-de-2026.pdf",
+              "sha256": "981d0db7e2b6a53b6ce7ef0e0435454a78269c3599ebb8bc5a5f015cd660ffa4"
+            },
+            {
+              "period": "2026-09-25",
+              "basis": "exchange stocks reported by Cochilco",
+              "lme_t": 251500,
+              "comex_t": 698504,
+              "shfe_t": 47147,
+              "total_t": 997151,
+              "source_url": "https://www.cochilco.cl/web/download/1006/2026/16905/informe-del-mercado-internacional-del-cobre-semana-del-21-al-25-de-septiembre-de-2026.pdf",
+              "sha256": "d3f604a555a5f975867d8ffd4d54430e874bba9d25dcd8314f4228a0102929d0"
+            },
+            {
+              "period": "2026-10-02",
+              "basis": "exchange stocks reported by Cochilco",
+              "lme_t": 248650,
+              "comex_t": 706047,
+              "shfe_t": 38744,
+              "total_t": 993441,
+              "source_url": "https://www.cochilco.cl/web/download/1006/2026/16924/informe-del-mercado-internacional-del-cobre-semana-del-28-de-septiembre-a-2-de-octubre-de-2026.pdf",
+              "sha256": "6976674177b1e02b83a532d6925f3b46fefd181a183f8108b6cd1126d2c94da1"
+            },
+            {
+              "period": "2026-10-09",
+              "basis": "exchange stocks reported by Cochilco",
+              "lme_t": 233025,
+              "comex_t": 711610,
+              "shfe_t": 58744,
+              "total_t": 1003379,
+              "source_url": "https://www.cochilco.cl/web/download/1006/2026/16972/informe-del-mercado-internacional-del-cobre-semana-del-5-a-9-de-octubre-de-2026.pdf",
+              "sha256": "a98d4ea579b1aad2638935d9fff39362fb69045f2f73a49d41d59fb25c7b52da"
+            },
+            {
+              "period": "2026-10-16",
+              "basis": "exchange stocks reported by Cochilco",
+              "lme_t": 225425,
+              "comex_t": 716765,
+              "shfe_t": 73962,
+              "total_t": 1016152,
+              "source_url": "https://www.cochilco.cl/web/download/1006/2026/16982/informe-del-mercado-internacional-del-cobre-semana-del-12-a-16-de-octubre-de-2026.pdf",
+              "sha256": "d64c47ce87577196a9deca68c6d4f261df8153a3cca97eed07701b8049a7e051"
+            },
+            {
+              "period": "2026-10-23",
+              "basis": "exchange stocks reported by Cochilco",
+              "lme_t": 273750,
+              "comex_t": 723791,
+              "shfe_t": 54356,
+              "total_t": 1051897,
+              "source_url": "https://www.cochilco.cl/web/download/1006/2026/17005/informe-del-mercado-internacional-del-cobre-semana-del-19-a-23-de-octubre-de-2026.pdf",
+              "sha256": "f5d87c771b9a96a8e2100a24903db69804702d0a4a8de1b93a4914a3ac567f1a"
+            }
+          ],
+          "monthly_rows": [
+            {
+              "period": "1990-01-31",
+              "basis": "month end; unavailable exchanges remain blank",
+              "lme_t": 104150.0,
+              "comex_t": 7920.0,
+              "shfe_t": null,
+              "total_t": 112070.0
+            },
+            {
+              "period": "1990-02-28",
+              "basis": "month end; unavailable exchanges remain blank",
+              "lme_t": 83350.0,
+              "comex_t": 3382.0,
+              "shfe_t": null,
+              "total_t": 86732.0
+            },
+            {
+              "period": "1990-03-31",
+              "basis": "month end; unavailable exchanges remain blank",
+              "lme_t": 59125.0,
+              "comex_t": 4108.0,
+              "shfe_t": null,
+              "total_t": 63233.0
+            },
+            {
+              "period": "1990-04-30",
+              "basis": "month end; unavailable exchanges remain blank",
+              "lme_t": 62675.0,
+              "comex_t": 6005.0,
+              "shfe_t": null,
+              "total_t": 68680.0
+            },
+            {
+              "period": "1990-05-31",
+              "basis": "month end; unavailable exchanges remain blank",
+              "lme_t": 77100.0,
+              "comex_t": 11844.0,
+              "shfe_t": null,
+              "total_t": 88944.0
+            },
+            {
+              "period": "1990-06-30",
+              "basis": "month end; unavailable exchanges remain blank",
+              "lme_t": 59400.0,
+              "comex_t": 17289.0,
+              "shfe_t": null,
+              "total_t": 76689.0
+            },
+            {
+              "period": "1990-07-31",
+              "basis": "month end; unavailable exchanges remain blank",
+              "lme_t": 94275.0,
+              "comex_t": 10368.0,
+              "shfe_t": null,
+              "total_t": 104643.0
+            },
+            {
+              "period": "1990-08-31",
+              "basis": "month end; unavailable exchanges remain blank",
+              "lme_t": 133075.0,
+              "comex_t": 8051.0,
+              "shfe_t": null,
+              "total_t": 141126.0
+            },
+            {
+              "period": "1990-09-30",
+              "basis": "month end; unavailable exchanges remain blank",
+              "lme_t": 187575.0,
+              "comex_t": 6065.0,
+              "shfe_t": null,
+              "total_t": 193640.0
+            },
+            {
+              "period": "1990-10-31",
+              "basis": "month end; unavailable exchanges remain blank",
+              "lme_t": 182525.0,
+              "comex_t": 7563.0,
+              "shfe_t": null,
+              "total_t": 190088.0
+            },
+            {
+              "period": "1990-11-30",
+              "basis": "month end; unavailable exchanges remain blank",
+              "lme_t": 168400.0,
+              "comex_t": 8411.0,
+              "shfe_t": null,
+              "total_t": 176811.0
+            },
+            {
+              "period": "1990-12-31",
+              "basis": "month end; unavailable exchanges remain blank",
+              "lme_t": 178650.0,
+              "comex_t": 19078.0,
+              "shfe_t": null,
+              "total_t": 197728.0
+            },
+            {
+              "period": "1991-01-31",
+              "basis": "month end; unavailable exchanges remain blank",
+              "lme_t": 188525.0,
+              "comex_t": 13411.0,
+              "shfe_t": null,
+              "total_t": 201936.0
+            },
+            {
+              "period": "1991-02-28",
+              "basis": "month end; unavailable exchanges remain blank",
+              "lme_t": 196850.0,
+              "comex_t": 13982.0,
+              "shfe_t": null,
+              "total_t": 210832.0
+            },
+            {
+              "period": "1991-03-31",
+              "basis": "month end; unavailable exchanges remain blank",
+              "lme_t": 211300.0,
+              "comex_t": 25415.0,
+              "shfe_t": null,
+              "total_t": 236715.0
+            },
+            {
+              "period": "1991-04-30",
+              "basis": "month end; unavailable exchanges remain blank",
+              "lme_t": 232075.0,
+              "comex_t": 28029.0,
+              "shfe_t": null,
+              "total_t": 260104.0
+            },
+            {
+              "period": "1991-05-31",
+              "basis": "month end; unavailable exchanges remain blank",
+              "lme_t": 279800.0,
+              "comex_t": 22630.0,
+              "shfe_t": null,
+              "total_t": 302430.0
+            },
+            {
+              "period": "1991-06-30",
+              "basis": "month end; unavailable exchanges remain blank",
+              "lme_t": 263350.0,
+              "comex_t": 24315.0,
+              "shfe_t": null,
+              "total_t": 287665.0
+            },
+            {
+              "period": "1991-07-31",
+              "basis": "month end; unavailable exchanges remain blank",
+              "lme_t": 261600.0,
+              "comex_t": 32525.0,
+              "shfe_t": null,
+              "total_t": 294125.0
+            },
+            {
+              "period": "1991-08-31",
+              "basis": "month end; unavailable exchanges remain blank",
+              "lme_t": 303250.0,
+              "comex_t": 30139.0,
+              "shfe_t": null,
+              "total_t": 333389.0
+            },
+            {
+              "period": "1991-09-30",
+              "basis": "month end; unavailable exchanges remain blank",
+              "lme_t": 309300.0,
+              "comex_t": 22144.0,
+              "shfe_t": null,
+              "total_t": 331444.0
+            },
+            {
+              "period": "1991-10-31",
+              "basis": "month end; unavailable exchanges remain blank",
+              "lme_t": 293675.0,
+              "comex_t": 24314.0,
+              "shfe_t": null,
+              "total_t": 317989.0
+            },
+            {
+              "period": "1991-11-30",
+              "basis": "month end; unavailable exchanges remain blank",
+              "lme_t": 302325.0,
+              "comex_t": 26578.0,
+              "shfe_t": null,
+              "total_t": 328903.0
+            },
+            {
+              "period": "1991-12-31",
+              "basis": "month end; unavailable exchanges remain blank",
+              "lme_t": 327425.0,
+              "comex_t": 30603.0,
+              "shfe_t": null,
+              "total_t": 358028.0
+            },
+            {
+              "period": "1992-01-31",
+              "basis": "month end; unavailable exchanges remain blank",
+              "lme_t": 305575.0,
+              "comex_t": 31561.0,
+              "shfe_t": null,
+              "total_t": 337136.0
+            },
+            {
+              "period": "1992-02-29",
+              "basis": "month end; unavailable exchanges remain blank",
+              "lme_t": 302725.0,
+              "comex_t": 31956.0,
+              "shfe_t": null,
+              "total_t": 334681.0
+            },
+            {
+              "period": "1992-03-31",
+              "basis": "month end; unavailable exchanges remain blank",
+              "lme_t": 298700.0,
+              "comex_t": 25602.0,
+              "shfe_t": null,
+              "total_t": 324302.0
+            },
+            {
+              "period": "1992-04-30",
+              "basis": "month end; unavailable exchanges remain blank",
+              "lme_t": 281100.0,
+              "comex_t": 27182.0,
+              "shfe_t": null,
+              "total_t": 308282.0
+            },
+            {
+              "period": "1992-05-31",
+              "basis": "month end; unavailable exchanges remain blank",
+              "lme_t": 264750.0,
+              "comex_t": 29351.0,
+              "shfe_t": null,
+              "total_t": 294101.0
+            },
+            {
+              "period": "1992-06-30",
+              "basis": "month end; unavailable exchanges remain blank",
+              "lme_t": 260250.0,
+              "comex_t": 28820.0,
+              "shfe_t": null,
+              "total_t": 289070.0
+            },
+            {
+              "period": "1992-07-31",
+              "basis": "month end; unavailable exchanges remain blank",
+              "lme_t": 251350.0,
+              "comex_t": 32645.0,
+              "shfe_t": null,
+              "total_t": 283995.0
+            },
+            {
+              "period": "1992-08-31",
+              "basis": "month end; unavailable exchanges remain blank",
+              "lme_t": 268550.0,
+              "comex_t": 35900.0,
+              "shfe_t": null,
+              "total_t": 304450.0
+            },
+            {
+              "period": "1992-09-30",
+              "basis": "month end; unavailable exchanges remain blank",
+              "lme_t": 291875.0,
+              "comex_t": 46289.0,
+              "shfe_t": null,
+              "total_t": 338164.0
+            },
+            {
+              "period": "1992-10-31",
+              "basis": "month end; unavailable exchanges remain blank",
+              "lme_t": 314400.0,
+              "comex_t": 63617.0,
+              "shfe_t": null,
+              "total_t": 378017.0
+            },
+            {
+              "period": "1992-11-30",
+              "basis": "month end; unavailable exchanges remain blank",
+              "lme_t": 327000.0,
+              "comex_t": 64399.0,
+              "shfe_t": null,
+              "total_t": 391399.0
+            },
+            {
+              "period": "1992-12-31",
+              "basis": "month end; unavailable exchanges remain blank",
+              "lme_t": 342400.0,
+              "comex_t": 84870.0,
+              "shfe_t": null,
+              "total_t": 427270.0
+            },
+            {
+              "period": "1993-01-31",
+              "basis": "month end; unavailable exchanges remain blank",
+              "lme_t": 311325.0,
+              "comex_t": 112475.0,
+              "shfe_t": null,
+              "total_t": 423800.0
+            },
+            {
+              "period": "1993-02-28",
+              "basis": "month end; unavailable exchanges remain blank",
+              "lme_t": 328125.0,
+              "comex_t": 104156.0,
+              "shfe_t": null,
+              "total_t": 432281.0
+            },
+            {
+              "period": "1993-03-31",
+              "basis": "month end; unavailable exchanges remain blank",
+              "lme_t": 356250.0,
+              "comex_t": 97175.0,
+              "shfe_t": null,
+              "total_t": 453425.0
+            },
+            {
+              "period": "1993-04-30",
+              "basis": "month end; unavailable exchanges remain blank",
+              "lme_t": 392325.0,
+              "comex_t": 100527.0,
+              "shfe_t": null,
+              "total_t": 492852.0
+            },
+            {
+              "period": "1993-05-31",
+              "basis": "month end; unavailable exchanges remain blank",
+              "lme_t": 420400.0,
+              "comex_t": 98239.0,
+              "shfe_t": null,
+              "total_t": 518639.0
+            },
+            {
+              "period": "1993-06-30",
+              "basis": "month end; unavailable exchanges remain blank",
+              "lme_t": 448225.0,
+              "comex_t": 94922.0,
+              "shfe_t": null,
+              "total_t": 543147.0
+            },
+            {
+              "period": "1993-07-31",
+              "basis": "month end; unavailable exchanges remain blank",
+              "lme_t": 463250.0,
+              "comex_t": 103241.0,
+              "shfe_t": null,
+              "total_t": 566491.0
+            },
+            {
+              "period": "1993-08-31",
+              "basis": "month end; unavailable exchanges remain blank",
+              "lme_t": 517250.0,
+              "comex_t": 92461.0,
+              "shfe_t": null,
+              "total_t": 609711.0
+            },
+            {
+              "period": "1993-09-30",
+              "basis": "month end; unavailable exchanges remain blank",
+              "lme_t": 591225.0,
+              "comex_t": 84040.0,
+              "shfe_t": null,
+              "total_t": 675265.0
+            },
+            {
+              "period": "1993-10-31",
+              "basis": "month end; unavailable exchanges remain blank",
+              "lme_t": 613600.0,
+              "comex_t": 87666.0,
+              "shfe_t": null,
+              "total_t": 701266.0
+            },
+            {
+              "period": "1993-11-30",
+              "basis": "month end; unavailable exchanges remain blank",
+              "lme_t": 590500.0,
+              "comex_t": 73065.0,
+              "shfe_t": null,
+              "total_t": 663565.0
+            },
+            {
+              "period": "1993-12-31",
+              "basis": "month end; unavailable exchanges remain blank",
+              "lme_t": 599500.0,
+              "comex_t": 67153.0,
+              "shfe_t": null,
+              "total_t": 666653.0
+            },
+            {
+              "period": "1994-01-31",
+              "basis": "month end; unavailable exchanges remain blank",
+              "lme_t": 600775.0,
+              "comex_t": 51861.0,
+              "shfe_t": null,
+              "total_t": 652636.0
+            },
+            {
+              "period": "1994-02-28",
+              "basis": "month end; unavailable exchanges remain blank",
+              "lme_t": 558950.0,
+              "comex_t": 45524.0,
+              "shfe_t": null,
+              "total_t": 604474.0
+            },
+            {
+              "period": "1994-03-31",
+              "basis": "month end; unavailable exchanges remain blank",
+              "lme_t": 508875.0,
+              "comex_t": 35001.0,
+              "shfe_t": null,
+              "total_t": 543876.0
+            },
+            {
+              "period": "1994-04-30",
+              "basis": "month end; unavailable exchanges remain blank",
+              "lme_t": 473450.0,
+              "comex_t": 28651.0,
+              "shfe_t": null,
+              "total_t": 502101.0
+            },
+            {
+              "period": "1994-05-31",
+              "basis": "month end; unavailable exchanges remain blank",
+              "lme_t": 387000.0,
+              "comex_t": 26921.0,
+              "shfe_t": null,
+              "total_t": 413921.0
+            },
+            {
+              "period": "1994-06-30",
+              "basis": "month end; unavailable exchanges remain blank",
+              "lme_t": 355650.0,
+              "comex_t": 31153.0,
+              "shfe_t": null,
+              "total_t": 386803.0
+            },
+            {
+              "period": "1994-07-31",
+              "basis": "month end; unavailable exchanges remain blank",
+              "lme_t": 338650.0,
+              "comex_t": 33934.0,
+              "shfe_t": null,
+              "total_t": 372584.0
+            },
+            {
+              "period": "1994-08-31",
+              "basis": "month end; unavailable exchanges remain blank",
+              "lme_t": 360450.0,
+              "comex_t": 27987.0,
+              "shfe_t": null,
+              "total_t": 388437.0
+            },
+            {
+              "period": "1994-09-30",
+              "basis": "month end; unavailable exchanges remain blank",
+              "lme_t": 360800.0,
+              "comex_t": 16252.0,
+              "shfe_t": null,
+              "total_t": 377052.0
+            },
+            {
+              "period": "1994-10-31",
+              "basis": "month end; unavailable exchanges remain blank",
+              "lme_t": 335075.0,
+              "comex_t": 18268.0,
+              "shfe_t": null,
+              "total_t": 353343.0
+            },
+            {
+              "period": "1994-11-30",
+              "basis": "month end; unavailable exchanges remain blank",
+              "lme_t": 318725.0,
+              "comex_t": 19554.0,
+              "shfe_t": null,
+              "total_t": 338279.0
+            },
+            {
+              "period": "1994-12-31",
+              "basis": "month end; unavailable exchanges remain blank",
+              "lme_t": 301850.0,
+              "comex_t": 24215.0,
+              "shfe_t": null,
+              "total_t": 326065.0
+            },
+            {
+              "period": "1995-01-31",
+              "basis": "month end; unavailable exchanges remain blank",
+              "lme_t": 309700.0,
+              "comex_t": 17005.0,
+              "shfe_t": null,
+              "total_t": 326705.0
+            },
+            {
+              "period": "1995-02-28",
+              "basis": "month end; unavailable exchanges remain blank",
+              "lme_t": 280925.0,
+              "comex_t": 16045.0,
+              "shfe_t": null,
+              "total_t": 296970.0
+            },
+            {
+              "period": "1995-03-31",
+              "basis": "month end; unavailable exchanges remain blank",
+              "lme_t": 239900.0,
+              "comex_t": 8208.0,
+              "shfe_t": null,
+              "total_t": 248108.0
+            },
+            {
+              "period": "1995-04-30",
+              "basis": "month end; unavailable exchanges remain blank",
+              "lme_t": 204750.0,
+              "comex_t": 10408.0,
+              "shfe_t": null,
+              "total_t": 215158.0
+            },
+            {
+              "period": "1995-05-31",
+              "basis": "month end; unavailable exchanges remain blank",
+              "lme_t": 197950.0,
+              "comex_t": 8078.0,
+              "shfe_t": null,
+              "total_t": 206028.0
+            },
+            {
+              "period": "1995-06-30",
+              "basis": "month end; unavailable exchanges remain blank",
+              "lme_t": 166425.0,
+              "comex_t": 11875.0,
+              "shfe_t": null,
+              "total_t": 178300.0
+            },
+            {
+              "period": "1995-07-31",
+              "basis": "month end; unavailable exchanges remain blank",
+              "lme_t": 154075.0,
+              "comex_t": 14449.0,
+              "shfe_t": null,
+              "total_t": 168524.0
+            },
+            {
+              "period": "1995-08-31",
+              "basis": "month end; unavailable exchanges remain blank",
+              "lme_t": 162750.0,
+              "comex_t": 14529.0,
+              "shfe_t": null,
+              "total_t": 177279.0
+            },
+            {
+              "period": "1995-09-30",
+              "basis": "month end; unavailable exchanges remain blank",
+              "lme_t": 178100.0,
+              "comex_t": 10146.0,
+              "shfe_t": null,
+              "total_t": 188246.0
+            },
+            {
+              "period": "1995-10-31",
+              "basis": "month end; unavailable exchanges remain blank",
+              "lme_t": 193450.0,
+              "comex_t": 5540.0,
+              "shfe_t": null,
+              "total_t": 198990.0
+            },
+            {
+              "period": "1995-11-30",
+              "basis": "month end; unavailable exchanges remain blank",
+              "lme_t": 217800.0,
+              "comex_t": 5016.0,
+              "shfe_t": null,
+              "total_t": 222816.0
+            },
+            {
+              "period": "1995-12-31",
+              "basis": "month end; unavailable exchanges remain blank",
+              "lme_t": 296425.0,
+              "comex_t": 21740.0,
+              "shfe_t": null,
+              "total_t": 318165.0
+            },
+            {
+              "period": "1996-01-31",
+              "basis": "month end; unavailable exchanges remain blank",
+              "lme_t": 353500.0,
+              "comex_t": 10955.0,
+              "shfe_t": null,
+              "total_t": 364455.0
+            },
+            {
+              "period": "1996-02-29",
+              "basis": "month end; unavailable exchanges remain blank",
+              "lme_t": 350925.0,
+              "comex_t": 10096.0,
+              "shfe_t": null,
+              "total_t": 361021.0
+            },
+            {
+              "period": "1996-03-31",
+              "basis": "month end; unavailable exchanges remain blank",
+              "lme_t": 322025.0,
+              "comex_t": 12632.0,
+              "shfe_t": null,
+              "total_t": 334657.0
+            },
+            {
+              "period": "1996-04-30",
+              "basis": "month end; unavailable exchanges remain blank",
+              "lme_t": 303575.0,
+              "comex_t": 18772.0,
+              "shfe_t": null,
+              "total_t": 322347.0
+            },
+            {
+              "period": "1996-05-31",
+              "basis": "month end; unavailable exchanges remain blank",
+              "lme_t": 309450.0,
+              "comex_t": 12005.0,
+              "shfe_t": null,
+              "total_t": 321455.0
+            },
+            {
+              "period": "1996-06-30",
+              "basis": "month end; unavailable exchanges remain blank",
+              "lme_t": 262625.0,
+              "comex_t": 6726.0,
+              "shfe_t": null,
+              "total_t": 269351.0
+            },
+            {
+              "period": "1996-07-31",
+              "basis": "month end; unavailable exchanges remain blank",
+              "lme_t": 227300.0,
+              "comex_t": 15507.0,
+              "shfe_t": null,
+              "total_t": 242807.0
+            },
+            {
+              "period": "1996-08-31",
+              "basis": "month end; unavailable exchanges remain blank",
+              "lme_t": 275275.0,
+              "comex_t": 20052.0,
+              "shfe_t": null,
+              "total_t": 295327.0
+            },
+            {
+              "period": "1996-09-30",
+              "basis": "month end; unavailable exchanges remain blank",
+              "lme_t": 247325.0,
+              "comex_t": 19794.0,
+              "shfe_t": null,
+              "total_t": 267119.0
+            },
+            {
+              "period": "1996-10-31",
+              "basis": "month end; unavailable exchanges remain blank",
+              "lme_t": 132350.0,
+              "comex_t": 26194.0,
+              "shfe_t": null,
+              "total_t": 158544.0
+            },
+            {
+              "period": "1996-11-30",
+              "basis": "month end; unavailable exchanges remain blank",
+              "lme_t": 92475.0,
+              "comex_t": 34887.0,
+              "shfe_t": null,
+              "total_t": 127362.0
+            },
+            {
+              "period": "1996-12-31",
+              "basis": "month end; unavailable exchanges remain blank",
+              "lme_t": 125350.0,
+              "comex_t": 26750.0,
+              "shfe_t": null,
+              "total_t": 152100.0
+            },
+            {
+              "period": "1997-01-31",
+              "basis": "month end; unavailable exchanges remain blank",
+              "lme_t": 191750.0,
+              "comex_t": 17210.0,
+              "shfe_t": null,
+              "total_t": 208960.0
+            },
+            {
+              "period": "1997-02-28",
+              "basis": "month end; unavailable exchanges remain blank",
+              "lme_t": 216575.0,
+              "comex_t": 22466.0,
+              "shfe_t": null,
+              "total_t": 239041.0
+            },
+            {
+              "period": "1997-03-31",
+              "basis": "month end; unavailable exchanges remain blank",
+              "lme_t": 183475.0,
+              "comex_t": 38265.0,
+              "shfe_t": null,
+              "total_t": 221740.0
+            },
+            {
+              "period": "1997-04-30",
+              "basis": "month end; unavailable exchanges remain blank",
+              "lme_t": 143750.0,
+              "comex_t": 44924.0,
+              "shfe_t": null,
+              "total_t": 188674.0
+            },
+            {
+              "period": "1997-05-31",
+              "basis": "month end; unavailable exchanges remain blank",
+              "lme_t": 133225.0,
+              "comex_t": 38984.0,
+              "shfe_t": null,
+              "total_t": 172209.0
+            },
+            {
+              "period": "1997-06-30",
+              "basis": "month end; unavailable exchanges remain blank",
+              "lme_t": 125150.0,
+              "comex_t": 41975.0,
+              "shfe_t": null,
+              "total_t": 167125.0
+            },
+            {
+              "period": "1997-07-31",
+              "basis": "month end; unavailable exchanges remain blank",
+              "lme_t": 227800.0,
+              "comex_t": 27236.0,
+              "shfe_t": null,
+              "total_t": 255036.0
+            },
+            {
+              "period": "1997-08-31",
+              "basis": "month end; unavailable exchanges remain blank",
+              "lme_t": 275150.0,
+              "comex_t": 42183.0,
+              "shfe_t": null,
+              "total_t": 317333.0
+            },
+            {
+              "period": "1997-09-30",
+              "basis": "month end; unavailable exchanges remain blank",
+              "lme_t": 329100.0,
+              "comex_t": 55800.0,
+              "shfe_t": null,
+              "total_t": 384900.0
+            },
+            {
+              "period": "1997-10-31",
+              "basis": "month end; unavailable exchanges remain blank",
+              "lme_t": 341225.0,
+              "comex_t": 61510.0,
+              "shfe_t": null,
+              "total_t": 402735.0
+            },
+            {
+              "period": "1997-11-30",
+              "basis": "month end; unavailable exchanges remain blank",
+              "lme_t": 339600.0,
+              "comex_t": 72374.0,
+              "shfe_t": null,
+              "total_t": 411974.0
+            },
+            {
+              "period": "1997-12-31",
+              "basis": "month end; unavailable exchanges remain blank",
+              "lme_t": 335025.0,
+              "comex_t": 83010.0,
+              "shfe_t": null,
+              "total_t": 418035.0
+            },
+            {
+              "period": "1998-01-31",
+              "basis": "month end; unavailable exchanges remain blank",
+              "lme_t": 361525.0,
+              "comex_t": 91370.0,
+              "shfe_t": null,
+              "total_t": 452895.0
+            },
+            {
+              "period": "1998-02-28",
+              "basis": "month end; unavailable exchanges remain blank",
+              "lme_t": 378075.0,
+              "comex_t": 101859.0,
+              "shfe_t": null,
+              "total_t": 479934.0
+            },
+            {
+              "period": "1998-03-31",
+              "basis": "month end; unavailable exchanges remain blank",
+              "lme_t": 340025.0,
+              "comex_t": 102114.0,
+              "shfe_t": null,
+              "total_t": 442139.0
+            },
+            {
+              "period": "1998-04-30",
+              "basis": "month end; unavailable exchanges remain blank",
+              "lme_t": 264875.0,
+              "comex_t": 97650.0,
+              "shfe_t": null,
+              "total_t": 362525.0
+            },
+            {
+              "period": "1998-05-31",
+              "basis": "month end; unavailable exchanges remain blank",
+              "lme_t": 263575.0,
+              "comex_t": 76895.0,
+              "shfe_t": null,
+              "total_t": 340470.0
+            },
+            {
+              "period": "1998-06-30",
+              "basis": "month end; unavailable exchanges remain blank",
+              "lme_t": 247650.0,
+              "comex_t": 57633.0,
+              "shfe_t": null,
+              "total_t": 305283.0
+            },
+            {
+              "period": "1998-07-31",
+              "basis": "month end; unavailable exchanges remain blank",
+              "lme_t": 260160.0,
+              "comex_t": 50547.0,
+              "shfe_t": null,
+              "total_t": 310707.0
+            },
+            {
+              "period": "1998-08-31",
+              "basis": "month end; unavailable exchanges remain blank",
+              "lme_t": 303200.0,
+              "comex_t": 51372.0,
+              "shfe_t": 85269.0,
+              "total_t": 439841.0
+            },
+            {
+              "period": "1998-09-30",
+              "basis": "month end; unavailable exchanges remain blank",
+              "lme_t": 409525.0,
+              "comex_t": 61443.0,
+              "shfe_t": 96755.0,
+              "total_t": 567723.0
+            },
+            {
+              "period": "1998-10-31",
+              "basis": "month end; unavailable exchanges remain blank",
+              "lme_t": 457675.0,
+              "comex_t": 62959.0,
+              "shfe_t": 103167.0,
+              "total_t": 623801.0
+            },
+            {
+              "period": "1998-11-30",
+              "basis": "month end; unavailable exchanges remain blank",
+              "lme_t": 507025.0,
+              "comex_t": 67735.0,
+              "shfe_t": 95492.0,
+              "total_t": 670252.0
+            },
+            {
+              "period": "1998-12-31",
+              "basis": "month end; unavailable exchanges remain blank",
+              "lme_t": 589925.0,
+              "comex_t": 85192.0,
+              "shfe_t": 82396.0,
+              "total_t": 757513.0
+            },
+            {
+              "period": "1999-01-31",
+              "basis": "month end; unavailable exchanges remain blank",
+              "lme_t": 643900.0,
+              "comex_t": 92393.0,
+              "shfe_t": 60334.0,
+              "total_t": 796627.0
+            },
+            {
+              "period": "1999-02-28",
+              "basis": "month end; unavailable exchanges remain blank",
+              "lme_t": 694075.0,
+              "comex_t": 101850.0,
+              "shfe_t": 59283.0,
+              "total_t": 855208.0
+            },
+            {
+              "period": "1999-03-31",
+              "basis": "month end; unavailable exchanges remain blank",
+              "lme_t": 714050.0,
+              "comex_t": 111704.0,
+              "shfe_t": 65769.0,
+              "total_t": 891523.0
+            },
+            {
+              "period": "1999-04-30",
+              "basis": "month end; unavailable exchanges remain blank",
+              "lme_t": 746225.0,
+              "comex_t": 120313.0,
+              "shfe_t": 78622.0,
+              "total_t": 945160.0
+            },
+            {
+              "period": "1999-05-31",
+              "basis": "month end; unavailable exchanges remain blank",
+              "lme_t": 776275.0,
+              "comex_t": 119454.0,
+              "shfe_t": 67324.0,
+              "total_t": 963053.0
+            },
+            {
+              "period": "1999-06-30",
+              "basis": "month end; unavailable exchanges remain blank",
+              "lme_t": 755625.0,
+              "comex_t": 121272.0,
+              "shfe_t": 80480.0,
+              "total_t": 957377.0
+            },
+            {
+              "period": "1999-07-31",
+              "basis": "month end; unavailable exchanges remain blank",
+              "lme_t": 770425.0,
+              "comex_t": 109007.0,
+              "shfe_t": 85539.0,
+              "total_t": 964971.0
+            },
+            {
+              "period": "1999-08-31",
+              "basis": "month end; unavailable exchanges remain blank",
+              "lme_t": 789200.0,
+              "comex_t": 98689.0,
+              "shfe_t": 86723.0,
+              "total_t": 974612.0
+            },
+            {
+              "period": "1999-09-30",
+              "basis": "month end; unavailable exchanges remain blank",
+              "lme_t": 771050.0,
+              "comex_t": 88460.0,
+              "shfe_t": 61012.0,
+              "total_t": 920522.0
+            },
+            {
+              "period": "1999-10-31",
+              "basis": "month end; unavailable exchanges remain blank",
+              "lme_t": 794050.0,
+              "comex_t": 82423.0,
+              "shfe_t": 56945.0,
+              "total_t": 933418.0
+            },
+            {
+              "period": "1999-11-30",
+              "basis": "month end; unavailable exchanges remain blank",
+              "lme_t": 777675.0,
+              "comex_t": 82423.0,
+              "shfe_t": 55933.0,
+              "total_t": 916031.0
+            },
+            {
+              "period": "1999-12-31",
+              "basis": "month end; unavailable exchanges remain blank",
+              "lme_t": 789975.0,
+              "comex_t": 83097.0,
+              "shfe_t": 63213.0,
+              "total_t": 936285.0
+            },
+            {
+              "period": "2000-01-31",
+              "basis": "month end; unavailable exchanges remain blank",
+              "lme_t": 810900.0,
+              "comex_t": 86715.0,
+              "shfe_t": 79815.0,
+              "total_t": 977430.0
+            },
+            {
+              "period": "2000-02-29",
+              "basis": "month end; unavailable exchanges remain blank",
+              "lme_t": 819950.0,
+              "comex_t": 86760.0,
+              "shfe_t": 79414.0,
+              "total_t": 986124.0
+            },
+            {
+              "period": "2000-03-31",
+              "basis": "month end; unavailable exchanges remain blank",
+              "lme_t": 757975.0,
+              "comex_t": 86955.0,
+              "shfe_t": 76543.0,
+              "total_t": 921473.0
+            },
+            {
+              "period": "2000-04-30",
+              "basis": "month end; unavailable exchanges remain blank",
+              "lme_t": 703975.0,
+              "comex_t": 78487.0,
+              "shfe_t": 68334.0,
+              "total_t": 850796.0
+            },
+            {
+              "period": "2000-05-31",
+              "basis": "month end; unavailable exchanges remain blank",
+              "lme_t": 607150.0,
+              "comex_t": 68062.0,
+              "shfe_t": 69254.0,
+              "total_t": 744466.0
+            },
+            {
+              "period": "2000-06-30",
+              "basis": "month end; unavailable exchanges remain blank",
+              "lme_t": 556700.0,
+              "comex_t": 66810.0,
+              "shfe_t": 76539.0,
+              "total_t": 700049.0
+            },
+            {
+              "period": "2000-07-31",
+              "basis": "month end; unavailable exchanges remain blank",
+              "lme_t": 492350.0,
+              "comex_t": 66376.0,
+              "shfe_t": 93395.0,
+              "total_t": 652121.0
+            },
+            {
+              "period": "2000-08-31",
+              "basis": "month end; unavailable exchanges remain blank",
+              "lme_t": 448150.0,
+              "comex_t": 57001.0,
+              "shfe_t": 92829.0,
+              "total_t": 597980.0
+            },
+            {
+              "period": "2000-09-30",
+              "basis": "month end; unavailable exchanges remain blank",
+              "lme_t": 402675.0,
+              "comex_t": 56473.0,
+              "shfe_t": 98306.0,
+              "total_t": 557454.0
+            },
+            {
+              "period": "2000-10-31",
+              "basis": "month end; unavailable exchanges remain blank",
+              "lme_t": 381700.0,
+              "comex_t": 57486.0,
+              "shfe_t": 94601.0,
+              "total_t": 533787.0
+            },
+            {
+              "period": "2000-11-30",
+              "basis": "month end; unavailable exchanges remain blank",
+              "lme_t": 349350.0,
+              "comex_t": 58908.0,
+              "shfe_t": 86622.0,
+              "total_t": 494880.0
+            },
+            {
+              "period": "2000-12-31",
+              "basis": "month end; unavailable exchanges remain blank",
+              "lme_t": 357225.0,
+              "comex_t": 58669.0,
+              "shfe_t": 107816.0,
+              "total_t": 523710.0
+            },
+            {
+              "period": "2001-01-31",
+              "basis": "month end; unavailable exchanges remain blank",
+              "lme_t": 350075.0,
+              "comex_t": 71919.0,
+              "shfe_t": 111193.0,
+              "total_t": 533187.0
+            },
+            {
+              "period": "2001-02-28",
+              "basis": "month end; unavailable exchanges remain blank",
+              "lme_t": 329200.0,
+              "comex_t": 81611.0,
+              "shfe_t": 97821.0,
+              "total_t": 508632.0
+            },
+            {
+              "period": "2001-03-31",
+              "basis": "month end; unavailable exchanges remain blank",
+              "lme_t": 397350.0,
+              "comex_t": 95378.0,
+              "shfe_t": 91856.0,
+              "total_t": 584584.0
+            },
+            {
+              "period": "2001-04-30",
+              "basis": "month end; unavailable exchanges remain blank",
+              "lme_t": 445500.0,
+              "comex_t": 114773.0,
+              "shfe_t": 81161.0,
+              "total_t": 641434.0
+            },
+            {
+              "period": "2001-05-31",
+              "basis": "month end; unavailable exchanges remain blank",
+              "lme_t": 431350.0,
+              "comex_t": 136911.0,
+              "shfe_t": 70993.0,
+              "total_t": 639254.0
+            },
+            {
+              "period": "2001-06-30",
+              "basis": "month end; unavailable exchanges remain blank",
+              "lme_t": 453550.0,
+              "comex_t": 149760.0,
+              "shfe_t": 62305.0,
+              "total_t": 665615.0
+            },
+            {
+              "period": "2001-07-31",
+              "basis": "month end; unavailable exchanges remain blank",
+              "lme_t": 651500.0,
+              "comex_t": 159712.0,
+              "shfe_t": 64949.0,
+              "total_t": 876161.0
+            },
+            {
+              "period": "2001-08-31",
+              "basis": "month end; unavailable exchanges remain blank",
+              "lme_t": 662825.0,
+              "comex_t": 169504.0,
+              "shfe_t": 68299.0,
+              "total_t": 900628.0
+            },
+            {
+              "period": "2001-09-30",
+              "basis": "month end; unavailable exchanges remain blank",
+              "lme_t": 727950.0,
+              "comex_t": 181060.0,
+              "shfe_t": 60979.0,
+              "total_t": 969989.0
+            },
+            {
+              "period": "2001-10-31",
+              "basis": "month end; unavailable exchanges remain blank",
+              "lme_t": 738000.0,
+              "comex_t": 191377.0,
+              "shfe_t": 48381.0,
+              "total_t": 977758.0
+            },
+            {
+              "period": "2001-11-30",
+              "basis": "month end; unavailable exchanges remain blank",
+              "lme_t": 755075.0,
+              "comex_t": 214555.0,
+              "shfe_t": 46842.0,
+              "total_t": 1016472.0
+            },
+            {
+              "period": "2001-12-31",
+              "basis": "month end; unavailable exchanges remain blank",
+              "lme_t": 798675.0,
+              "comex_t": 243806.0,
+              "shfe_t": 94487.0,
+              "total_t": 1136968.0
+            },
+            {
+              "period": "2002-01-31",
+              "basis": "month end; unavailable exchanges remain blank",
+              "lme_t": 853600.0,
+              "comex_t": 258060.0,
+              "shfe_t": 129350.0,
+              "total_t": 1241010.0
+            },
+            {
+              "period": "2002-02-28",
+              "basis": "month end; unavailable exchanges remain blank",
+              "lme_t": 904625.0,
+              "comex_t": 275391.0,
+              "shfe_t": 181875.0,
+              "total_t": 1361891.0
+            },
+            {
+              "period": "2002-03-31",
+              "basis": "month end; unavailable exchanges remain blank",
+              "lme_t": 948350.0,
+              "comex_t": 283497.0,
+              "shfe_t": 218139.0,
+              "total_t": 1449986.0
+            },
+            {
+              "period": "2002-04-30",
+              "basis": "month end; unavailable exchanges remain blank",
+              "lme_t": 974925.0,
+              "comex_t": 295568.0,
+              "shfe_t": 246132.0,
+              "total_t": 1516625.0
+            },
+            {
+              "period": "2002-05-31",
+              "basis": "month end; unavailable exchanges remain blank",
+              "lme_t": 961450.0,
+              "comex_t": 305513.0,
+              "shfe_t": 229318.0,
+              "total_t": 1496281.0
+            },
+            {
+              "period": "2002-06-30",
+              "basis": "month end; unavailable exchanges remain blank",
+              "lme_t": 889250.0,
+              "comex_t": 322298.0,
+              "shfe_t": 233379.0,
+              "total_t": 1444927.0
+            },
+            {
+              "period": "2002-07-31",
+              "basis": "month end; unavailable exchanges remain blank",
+              "lme_t": 884100.0,
+              "comex_t": 339707.0,
+              "shfe_t": 226859.0,
+              "total_t": 1450666.0
+            },
+            {
+              "period": "2002-08-31",
+              "basis": "month end; unavailable exchanges remain blank",
+              "lme_t": 892500.0,
+              "comex_t": 340799.0,
+              "shfe_t": 191519.0,
+              "total_t": 1424818.0
+            },
+            {
+              "period": "2002-09-30",
+              "basis": "month end; unavailable exchanges remain blank",
+              "lme_t": 872075.0,
+              "comex_t": 344714.0,
+              "shfe_t": 161652.0,
+              "total_t": 1378441.0
+            },
+            {
+              "period": "2002-10-31",
+              "basis": "month end; unavailable exchanges remain blank",
+              "lme_t": 863325.0,
+              "comex_t": 346054.0,
+              "shfe_t": 119924.0,
+              "total_t": 1329303.0
+            },
+            {
+              "period": "2002-11-30",
+              "basis": "month end; unavailable exchanges remain blank",
+              "lme_t": 860300.0,
+              "comex_t": 347167.0,
+              "shfe_t": 97503.0,
+              "total_t": 1304970.0
+            },
+            {
+              "period": "2002-12-31",
+              "basis": "month end; unavailable exchanges remain blank",
+              "lme_t": 856400.0,
+              "comex_t": 362276.0,
+              "shfe_t": 75087.0,
+              "total_t": 1293763.0
+            },
+            {
+              "period": "2003-01-31",
+              "basis": "month end; unavailable exchanges remain blank",
+              "lme_t": 836025.0,
+              "comex_t": 359683.0,
+              "shfe_t": 67156.0,
+              "total_t": 1262864.0
+            },
+            {
+              "period": "2003-02-28",
+              "basis": "month end; unavailable exchanges remain blank",
+              "lme_t": 820950.0,
+              "comex_t": 339929.0,
+              "shfe_t": 82859.0,
+              "total_t": 1243738.0
+            },
+            {
+              "period": "2003-03-31",
+              "basis": "month end; unavailable exchanges remain blank",
+              "lme_t": 814700.0,
+              "comex_t": 329966.0,
+              "shfe_t": 74292.0,
+              "total_t": 1218958.0
+            },
+            {
+              "period": "2003-04-30",
+              "basis": "month end; unavailable exchanges remain blank",
+              "lme_t": 769825.0,
+              "comex_t": 318426.0,
+              "shfe_t": 53133.0,
+              "total_t": 1141384.0
+            },
+            {
+              "period": "2003-05-31",
+              "basis": "month end; unavailable exchanges remain blank",
+              "lme_t": 744600.0,
+              "comex_t": 305475.0,
+              "shfe_t": 54684.0,
+              "total_t": 1104759.0
+            },
+            {
+              "period": "2003-06-30",
+              "basis": "month end; unavailable exchanges remain blank",
+              "lme_t": 665675.0,
+              "comex_t": 291283.0,
+              "shfe_t": 81102.0,
+              "total_t": 1038060.0
+            },
+            {
+              "period": "2003-07-31",
+              "basis": "month end; unavailable exchanges remain blank",
+              "lme_t": 614900.0,
+              "comex_t": 282334.0,
+              "shfe_t": 95225.0,
+              "total_t": 992459.0
+            },
+            {
+              "period": "2003-08-31",
+              "basis": "month end; unavailable exchanges remain blank",
+              "lme_t": 621050.0,
+              "comex_t": 275815.0,
+              "shfe_t": 93441.0,
+              "total_t": 990306.0
+            },
+            {
+              "period": "2003-09-30",
+              "basis": "month end; unavailable exchanges remain blank",
+              "lme_t": 580025.0,
+              "comex_t": 271248.0,
+              "shfe_t": 84764.0,
+              "total_t": 936037.0
+            },
+            {
+              "period": "2003-10-31",
+              "basis": "month end; unavailable exchanges remain blank",
+              "lme_t": 519300.0,
+              "comex_t": 267095.0,
+              "shfe_t": 116240.0,
+              "total_t": 902635.0
+            },
+            {
+              "period": "2003-11-30",
+              "basis": "month end; unavailable exchanges remain blank",
+              "lme_t": 466900.0,
+              "comex_t": 262410.0,
+              "shfe_t": 110011.0,
+              "total_t": 839321.0
+            },
+            {
+              "period": "2003-12-31",
+              "basis": "month end; unavailable exchanges remain blank",
+              "lme_t": 432975.0,
+              "comex_t": 254863.0,
+              "shfe_t": 110596.0,
+              "total_t": 798434.0
+            },
+            {
+              "period": "2004-01-31",
+              "basis": "month end; unavailable exchanges remain blank",
+              "lme_t": 363000.0,
+              "comex_t": 238717.0,
+              "shfe_t": 114131.0,
+              "total_t": 715848.0
+            },
+            {
+              "period": "2004-02-29",
+              "basis": "month end; unavailable exchanges remain blank",
+              "lme_t": 285100.0,
+              "comex_t": 219181.0,
+              "shfe_t": 130333.0,
+              "total_t": 634614.0
+            },
+            {
+              "period": "2004-03-31",
+              "basis": "month end; unavailable exchanges remain blank",
+              "lme_t": 189125.0,
+              "comex_t": 193492.0,
+              "shfe_t": 120808.0,
+              "total_t": 503425.0
+            },
+            {
+              "period": "2004-04-30",
+              "basis": "month end; unavailable exchanges remain blank",
+              "lme_t": 152625.0,
+              "comex_t": 155755.0,
+              "shfe_t": 98667.0,
+              "total_t": 407047.0
+            },
+            {
+              "period": "2004-05-31",
+              "basis": "month end; unavailable exchanges remain blank",
+              "lme_t": 133775.0,
+              "comex_t": 119583.0,
+              "shfe_t": 64935.0,
+              "total_t": 318293.0
+            },
+            {
+              "period": "2004-06-30",
+              "basis": "month end; unavailable exchanges remain blank",
+              "lme_t": 104575.0,
+              "comex_t": 86257.0,
+              "shfe_t": 69981.0,
+              "total_t": 260813.0
+            },
+            {
+              "period": "2004-07-31",
+              "basis": "month end; unavailable exchanges remain blank",
+              "lme_t": 88450.0,
+              "comex_t": 71681.0,
+              "shfe_t": 43865.0,
+              "total_t": 203996.0
+            },
+            {
+              "period": "2004-08-31",
+              "basis": "month end; unavailable exchanges remain blank",
+              "lme_t": 104950.0,
+              "comex_t": 56530.0,
+              "shfe_t": 30012.0,
+              "total_t": 191492.0
+            },
+            {
+              "period": "2004-09-30",
+              "basis": "month end; unavailable exchanges remain blank",
+              "lme_t": 93550.0,
+              "comex_t": 44886.0,
+              "shfe_t": 20493.0,
+              "total_t": 158929.0
+            },
+            {
+              "period": "2004-10-31",
+              "basis": "month end; unavailable exchanges remain blank",
+              "lme_t": 78850.0,
+              "comex_t": 41272.0,
+              "shfe_t": 29720.0,
+              "total_t": 149842.0
+            },
+            {
+              "period": "2004-11-30",
+              "basis": "month end; unavailable exchanges remain blank",
+              "lme_t": 59975.0,
+              "comex_t": 38465.0,
+              "shfe_t": 23258.0,
+              "total_t": 121698.0
+            },
+            {
+              "period": "2004-12-31",
+              "basis": "month end; unavailable exchanges remain blank",
+              "lme_t": 48875.0,
+              "comex_t": 43729.0,
+              "shfe_t": 31685.0,
+              "total_t": 124289.0
+            },
+            {
+              "period": "2005-01-31",
+              "basis": "month end; unavailable exchanges remain blank",
+              "lme_t": 45675.0,
+              "comex_t": 41564.0,
+              "shfe_t": 19463.0,
+              "total_t": 106702.0
+            },
+            {
+              "period": "2005-02-28",
+              "basis": "month end; unavailable exchanges remain blank",
+              "lme_t": 53975.0,
+              "comex_t": 42470.0,
+              "shfe_t": 44225.0,
+              "total_t": 140670.0
+            },
+            {
+              "period": "2005-03-31",
+              "basis": "month end; unavailable exchanges remain blank",
+              "lme_t": 44775.0,
+              "comex_t": 39325.0,
+              "shfe_t": 16327.0,
+              "total_t": 100427.0
+            },
+            {
+              "period": "2005-04-30",
+              "basis": "month end; unavailable exchanges remain blank",
+              "lme_t": 59975.0,
+              "comex_t": 27321.0,
+              "shfe_t": 17265.0,
+              "total_t": 104561.0
+            },
+            {
+              "period": "2005-05-31",
+              "basis": "month end; unavailable exchanges remain blank",
+              "lme_t": 45225.0,
+              "comex_t": 20194.0,
+              "shfe_t": 28411.0,
+              "total_t": 93830.0
+            },
+            {
+              "period": "2005-06-30",
+              "basis": "month end; unavailable exchanges remain blank",
+              "lme_t": 29525.0,
+              "comex_t": 13877.0,
+              "shfe_t": 28669.0,
+              "total_t": 72071.0
+            },
+            {
+              "period": "2005-07-31",
+              "basis": "month end; unavailable exchanges remain blank",
+              "lme_t": 30900.0,
+              "comex_t": 9972.0,
+              "shfe_t": 34387.0,
+              "total_t": 75259.0
+            },
+            {
+              "period": "2005-08-31",
+              "basis": "month end; unavailable exchanges remain blank",
+              "lme_t": 65675.0,
+              "comex_t": 8424.0,
+              "shfe_t": 42899.0,
+              "total_t": 116998.0
+            },
+            {
+              "period": "2005-09-30",
+              "basis": "month end; unavailable exchanges remain blank",
+              "lme_t": 83250.0,
+              "comex_t": 6533.0,
+              "shfe_t": 29452.0,
+              "total_t": 119235.0
+            },
+            {
+              "period": "2005-10-31",
+              "basis": "month end; unavailable exchanges remain blank",
+              "lme_t": 62575.0,
+              "comex_t": 3348.0,
+              "shfe_t": 47350.0,
+              "total_t": 113273.0
+            },
+            {
+              "period": "2005-11-30",
+              "basis": "month end; unavailable exchanges remain blank",
+              "lme_t": 71175.0,
+              "comex_t": 3339.0,
+              "shfe_t": 74160.0,
+              "total_t": 148674.0
+            },
+            {
+              "period": "2005-12-31",
+              "basis": "month end; unavailable exchanges remain blank",
+              "lme_t": 89575.0,
+              "comex_t": 6182.0,
+              "shfe_t": 57844.0,
+              "total_t": 153601.0
+            },
+            {
+              "period": "2006-01-31",
+              "basis": "month end; unavailable exchanges remain blank",
+              "lme_t": 97600.0,
+              "comex_t": 10571.0,
+              "shfe_t": 51343.0,
+              "total_t": 159514.0
+            },
+            {
+              "period": "2006-02-28",
+              "basis": "month end; unavailable exchanges remain blank",
+              "lme_t": 108900.0,
+              "comex_t": 28146.0,
+              "shfe_t": 56154.0,
+              "total_t": 193200.0
+            },
+            {
+              "period": "2006-03-31",
+              "basis": "month end; unavailable exchanges remain blank",
+              "lme_t": 121925.0,
+              "comex_t": 32010.0,
+              "shfe_t": 32097.0,
+              "total_t": 186032.0
+            },
+            {
+              "period": "2006-04-30",
+              "basis": "month end; unavailable exchanges remain blank",
+              "lme_t": 117725.0,
+              "comex_t": 15542.0,
+              "shfe_t": 31117.0,
+              "total_t": 164384.0
+            },
+            {
+              "period": "2006-05-31",
+              "basis": "month end; unavailable exchanges remain blank",
+              "lme_t": 112175.0,
+              "comex_t": 8658.0,
+              "shfe_t": 45320.0,
+              "total_t": 166153.0
+            },
+            {
+              "period": "2006-06-30",
+              "basis": "month end; unavailable exchanges remain blank",
+              "lme_t": 93575.0,
+              "comex_t": 7169.0,
+              "shfe_t": 60709.0,
+              "total_t": 161453.0
+            },
+            {
+              "period": "2006-07-31",
+              "basis": "month end; unavailable exchanges remain blank",
+              "lme_t": 97450.0,
+              "comex_t": 6129.0,
+              "shfe_t": 49553.0,
+              "total_t": 153132.0
+            },
+            {
+              "period": "2006-08-31",
+              "basis": "month end; unavailable exchanges remain blank",
+              "lme_t": 125350.0,
+              "comex_t": 11228.0,
+              "shfe_t": 48193.0,
+              "total_t": 184771.0
+            },
+            {
+              "period": "2006-09-30",
+              "basis": "month end; unavailable exchanges remain blank",
+              "lme_t": 117575.0,
+              "comex_t": 18470.0,
+              "shfe_t": 33549.0,
+              "total_t": 169594.0
+            },
+            {
+              "period": "2006-10-31",
+              "basis": "month end; unavailable exchanges remain blank",
+              "lme_t": 130500.0,
+              "comex_t": 21087.0,
+              "shfe_t": 34796.0,
+              "total_t": 186383.0
+            },
+            {
+              "period": "2006-11-30",
+              "basis": "month end; unavailable exchanges remain blank",
+              "lme_t": 155350.0,
+              "comex_t": 28692.0,
+              "shfe_t": 22731.0,
+              "total_t": 206773.0
+            },
+            {
+              "period": "2006-12-31",
+              "basis": "month end; unavailable exchanges remain blank",
+              "lme_t": 182800.0,
+              "comex_t": 30915.0,
+              "shfe_t": 31300.0,
+              "total_t": 245015.0
+            },
+            {
+              "period": "2007-01-31",
+              "basis": "month end; unavailable exchanges remain blank",
+              "lme_t": 211825.0,
+              "comex_t": 32631.0,
+              "shfe_t": 24071.0,
+              "total_t": 268527.0
+            },
+            {
+              "period": "2007-02-28",
+              "basis": "month end; unavailable exchanges remain blank",
+              "lme_t": 207975.0,
+              "comex_t": 33560.0,
+              "shfe_t": 31007.0,
+              "total_t": 272542.0
+            },
+            {
+              "period": "2007-03-31",
+              "basis": "month end; unavailable exchanges remain blank",
+              "lme_t": 178075.0,
+              "comex_t": 33056.0,
+              "shfe_t": 59364.0,
+              "total_t": 270495.0
+            },
+            {
+              "period": "2007-04-30",
+              "basis": "month end; unavailable exchanges remain blank",
+              "lme_t": 157200.0,
+              "comex_t": 30072.0,
+              "shfe_t": 67820.0,
+              "total_t": 255092.0
+            },
+            {
+              "period": "2007-05-31",
+              "basis": "month end; unavailable exchanges remain blank",
+              "lme_t": 128925.0,
+              "comex_t": 24948.0,
+              "shfe_t": 95254.0,
+              "total_t": 249127.0
+            },
+            {
+              "period": "2007-06-30",
+              "basis": "month end; unavailable exchanges remain blank",
+              "lme_t": 114700.0,
+              "comex_t": 20070.0,
+              "shfe_t": 90617.0,
+              "total_t": 225387.0
+            },
+            {
+              "period": "2007-07-31",
+              "basis": "month end; unavailable exchanges remain blank",
+              "lme_t": 101750.0,
+              "comex_t": 19848.0,
+              "shfe_t": 90089.0,
+              "total_t": 211687.0
+            },
+            {
+              "period": "2007-08-31",
+              "basis": "month end; unavailable exchanges remain blank",
+              "lme_t": 139425.0,
+              "comex_t": 18783.0,
+              "shfe_t": 66793.0,
+              "total_t": 225001.0
+            },
+            {
+              "period": "2007-09-30",
+              "basis": "month end; unavailable exchanges remain blank",
+              "lme_t": 130775.0,
+              "comex_t": 18248.0,
+              "shfe_t": 47791.0,
+              "total_t": 196814.0
+            },
+            {
+              "period": "2007-10-31",
+              "basis": "month end; unavailable exchanges remain blank",
+              "lme_t": 166975.0,
+              "comex_t": 17742.0,
+              "shfe_t": 56931.0,
+              "total_t": 241648.0
+            },
+            {
+              "period": "2007-11-30",
+              "basis": "month end; unavailable exchanges remain blank",
+              "lme_t": 189200.0,
+              "comex_t": 16312.0,
+              "shfe_t": 34438.0,
+              "total_t": 239950.0
+            },
+            {
+              "period": "2007-12-31",
+              "basis": "month end; unavailable exchanges remain blank",
+              "lme_t": 197450.0,
+              "comex_t": 13816.0,
+              "shfe_t": 25597.0,
+              "total_t": 236863.0
+            },
+            {
+              "period": "2008-01-31",
+              "basis": "month end; unavailable exchanges remain blank",
+              "lme_t": 178775.0,
+              "comex_t": 12681.0,
+              "shfe_t": 20245.0,
+              "total_t": 211701.0
+            },
+            {
+              "period": "2008-02-29",
+              "basis": "month end; unavailable exchanges remain blank",
+              "lme_t": 143650.0,
+              "comex_t": 11866.0,
+              "shfe_t": 48885.0,
+              "total_t": 204401.0
+            },
+            {
+              "period": "2008-03-31",
+              "basis": "month end; unavailable exchanges remain blank",
+              "lme_t": 112500.0,
+              "comex_t": 10824.0,
+              "shfe_t": 55607.0,
+              "total_t": 178931.0
+            },
+            {
+              "period": "2008-04-30",
+              "basis": "month end; unavailable exchanges remain blank",
+              "lme_t": 110525.0,
+              "comex_t": 9822.0,
+              "shfe_t": 49417.0,
+              "total_t": 169764.0
+            },
+            {
+              "period": "2008-05-31",
+              "basis": "month end; unavailable exchanges remain blank",
+              "lme_t": 124950.0,
+              "comex_t": 10004.0,
+              "shfe_t": 44554.0,
+              "total_t": 179508.0
+            },
+            {
+              "period": "2008-06-30",
+              "basis": "month end; unavailable exchanges remain blank",
+              "lme_t": 122600.0,
+              "comex_t": 10015.0,
+              "shfe_t": 32401.0,
+              "total_t": 165016.0
+            },
+            {
+              "period": "2008-07-31",
+              "basis": "month end; unavailable exchanges remain blank",
+              "lme_t": 142400.0,
+              "comex_t": 5736.0,
+              "shfe_t": 36839.0,
+              "total_t": 184975.0
+            },
+            {
+              "period": "2008-08-31",
+              "basis": "month end; unavailable exchanges remain blank",
+              "lme_t": 173375.0,
+              "comex_t": 4890.0,
+              "shfe_t": 17625.0,
+              "total_t": 195890.0
+            },
+            {
+              "period": "2008-09-30",
+              "basis": "month end; unavailable exchanges remain blank",
+              "lme_t": 198600.0,
+              "comex_t": 9000.0,
+              "shfe_t": 16130.0,
+              "total_t": 223730.0
+            },
+            {
+              "period": "2008-10-31",
+              "basis": "month end; unavailable exchanges remain blank",
+              "lme_t": 230680.0,
+              "comex_t": 8974.0,
+              "shfe_t": 24788.0,
+              "total_t": 264442.0
+            },
+            {
+              "period": "2008-11-30",
+              "basis": "month end; unavailable exchanges remain blank",
+              "lme_t": 291650.0,
+              "comex_t": 15223.0,
+              "shfe_t": 16335.0,
+              "total_t": 323208.0
+            },
+            {
+              "period": "2008-12-31",
+              "basis": "month end; unavailable exchanges remain blank",
+              "lme_t": 339775.0,
+              "comex_t": 31075.0,
+              "shfe_t": 17822.0,
+              "total_t": 388672.0
+            },
+            {
+              "period": "2009-01-31",
+              "basis": "month end; unavailable exchanges remain blank",
+              "lme_t": 491525.0,
+              "comex_t": 36505.0,
+              "shfe_t": 16567.0,
+              "total_t": 544597.0
+            },
+            {
+              "period": "2009-02-28",
+              "basis": "month end; unavailable exchanges remain blank",
+              "lme_t": 542300.0,
+              "comex_t": 41100.0,
+              "shfe_t": 28332.0,
+              "total_t": 611732.0
+            },
+            {
+              "period": "2009-03-31",
+              "basis": "month end; unavailable exchanges remain blank",
+              "lme_t": 499625.0,
+              "comex_t": 41899.0,
+              "shfe_t": 25181.0,
+              "total_t": 566705.0
+            },
+            {
+              "period": "2009-04-30",
+              "basis": "month end; unavailable exchanges remain blank",
+              "lme_t": 405775.0,
+              "comex_t": 43596.0,
+              "shfe_t": 19064.0,
+              "total_t": 468435.0
+            },
+            {
+              "period": "2009-05-31",
+              "basis": "month end; unavailable exchanges remain blank",
+              "lme_t": 312275.0,
+              "comex_t": 50498.0,
+              "shfe_t": 30217.0,
+              "total_t": 392990.0
+            },
+            {
+              "period": "2009-06-30",
+              "basis": "month end; unavailable exchanges remain blank",
+              "lme_t": 265950.0,
+              "comex_t": 54245.0,
+              "shfe_t": 56088.0,
+              "total_t": 376283.0
+            },
+            {
+              "period": "2009-07-31",
+              "basis": "month end; unavailable exchanges remain blank",
+              "lme_t": 280875.0,
+              "comex_t": 49856.0,
+              "shfe_t": 51135.0,
+              "total_t": 381866.0
+            },
+            {
+              "period": "2009-08-31",
+              "basis": "month end; unavailable exchanges remain blank",
+              "lme_t": 298925.0,
+              "comex_t": 48270.0,
+              "shfe_t": 86625.0,
+              "total_t": 433820.0
+            },
+            {
+              "period": "2009-09-30",
+              "basis": "month end; unavailable exchanges remain blank",
+              "lme_t": 345650.0,
+              "comex_t": 48519.0,
+              "shfe_t": 96719.0,
+              "total_t": 490888.0
+            },
+            {
+              "period": "2009-10-31",
+              "basis": "month end; unavailable exchanges remain blank",
+              "lme_t": 372200.0,
+              "comex_t": 56199.0,
+              "shfe_t": 102835.0,
+              "total_t": 531234.0
+            },
+            {
+              "period": "2009-11-30",
+              "basis": "month end; unavailable exchanges remain blank",
+              "lme_t": 438525.0,
+              "comex_t": 77738.0,
+              "shfe_t": 101277.0,
+              "total_t": 617540.0
+            },
+            {
+              "period": "2009-12-31",
+              "basis": "month end; unavailable exchanges remain blank",
+              "lme_t": 502325.0,
+              "comex_t": 89976.0,
+              "shfe_t": 95315.0,
+              "total_t": 687616.0
+            },
+            {
+              "period": "2010-01-31",
+              "basis": "month end; unavailable exchanges remain blank",
+              "lme_t": 541050.0,
+              "comex_t": 94003.0,
+              "shfe_t": 101210.0,
+              "total_t": 736263.0
+            },
+            {
+              "period": "2010-02-28",
+              "basis": "month end; unavailable exchanges remain blank",
+              "lme_t": 549725.0,
+              "comex_t": 93676.0,
+              "shfe_t": 149478.0,
+              "total_t": 792879.0
+            },
+            {
+              "period": "2010-03-31",
+              "basis": "month end; unavailable exchanges remain blank",
+              "lme_t": 514325.0,
+              "comex_t": 91719.0,
+              "shfe_t": 155465.0,
+              "total_t": 761509.0
+            },
+            {
+              "period": "2010-04-30",
+              "basis": "month end; unavailable exchanges remain blank",
+              "lme_t": 499300.0,
+              "comex_t": 91763.0,
+              "shfe_t": 189441.0,
+              "total_t": 780504.0
+            },
+            {
+              "period": "2010-05-31",
+              "basis": "month end; unavailable exchanges remain blank",
+              "lme_t": 476725.0,
+              "comex_t": 92343.0,
+              "shfe_t": 157698.0,
+              "total_t": 726766.0
+            },
+            {
+              "period": "2010-06-30",
+              "basis": "month end; unavailable exchanges remain blank",
+              "lme_t": 451100.0,
+              "comex_t": 92465.0,
+              "shfe_t": 123939.0,
+              "total_t": 667504.0
+            },
+            {
+              "period": "2010-07-31",
+              "basis": "month end; unavailable exchanges remain blank",
+              "lme_t": 413500.0,
+              "comex_t": 91378.0,
+              "shfe_t": 104507.0,
+              "total_t": 609385.0
+            },
+            {
+              "period": "2010-08-31",
+              "basis": "month end; unavailable exchanges remain blank",
+              "lme_t": 398525.0,
+              "comex_t": 86496.0,
+              "shfe_t": 110582.0,
+              "total_t": 595603.0
+            },
+            {
+              "period": "2010-09-30",
+              "basis": "month end; unavailable exchanges remain blank",
+              "lme_t": 374150.0,
+              "comex_t": 77005.0,
+              "shfe_t": 87447.0,
+              "total_t": 538602.0
+            },
+            {
+              "period": "2010-10-31",
+              "basis": "month end; unavailable exchanges remain blank",
+              "lme_t": 368500.0,
+              "comex_t": 68130.0,
+              "shfe_t": 106091.0,
+              "total_t": 542721.0
+            },
+            {
+              "period": "2010-11-30",
+              "basis": "month end; unavailable exchanges remain blank",
+              "lme_t": 355750.0,
+              "comex_t": 65060.0,
+              "shfe_t": 122612.0,
+              "total_t": 543422.0
+            },
+            {
+              "period": "2010-12-31",
+              "basis": "month end; unavailable exchanges remain blank",
+              "lme_t": 377550.0,
+              "comex_t": 58616.0,
+              "shfe_t": 131891.0,
+              "total_t": 568057.0
+            },
+            {
+              "period": "2011-01-31",
+              "basis": "month end; unavailable exchanges remain blank",
+              "lme_t": 394025.0,
+              "comex_t": 64111.0,
+              "shfe_t": 129250.0,
+              "total_t": 587386.0
+            },
+            {
+              "period": "2011-02-28",
+              "basis": "month end; unavailable exchanges remain blank",
+              "lme_t": 421000.0,
+              "comex_t": 75237.0,
+              "shfe_t": 158101.0,
+              "total_t": 654338.0
+            },
+            {
+              "period": "2011-03-31",
+              "basis": "month end; unavailable exchanges remain blank",
+              "lme_t": 439850.0,
+              "comex_t": 76861.0,
+              "shfe_t": 161916.0,
+              "total_t": 678627.0
+            },
+            {
+              "period": "2011-04-30",
+              "basis": "month end; unavailable exchanges remain blank",
+              "lme_t": 463650.0,
+              "comex_t": 75469.0,
+              "shfe_t": 128268.0,
+              "total_t": 667387.0
+            },
+            {
+              "period": "2011-05-31",
+              "basis": "month end; unavailable exchanges remain blank",
+              "lme_t": 467775.0,
+              "comex_t": 73492.0,
+              "shfe_t": 82309.0,
+              "total_t": 623576.0
+            },
+            {
+              "period": "2011-06-30",
+              "basis": "month end; unavailable exchanges remain blank",
+              "lme_t": 465250.0,
+              "comex_t": 72670.0,
+              "shfe_t": 90089.0,
+              "total_t": 628009.0
+            },
+            {
+              "period": "2011-07-31",
+              "basis": "month end; unavailable exchanges remain blank",
+              "lme_t": 466550.0,
+              "comex_t": 75072.0,
+              "shfe_t": 117067.0,
+              "total_t": 658689.0
+            },
+            {
+              "period": "2011-08-31",
+              "basis": "month end; unavailable exchanges remain blank",
+              "lme_t": 463825.0,
+              "comex_t": 77547.0,
+              "shfe_t": 102258.0,
+              "total_t": 643630.0
+            },
+            {
+              "period": "2011-09-30",
+              "basis": "month end; unavailable exchanges remain blank",
+              "lme_t": 473700.0,
+              "comex_t": 79392.0,
+              "shfe_t": 97911.0,
+              "total_t": 651003.0
+            },
+            {
+              "period": "2011-10-31",
+              "basis": "month end; unavailable exchanges remain blank",
+              "lme_t": 429375.0,
+              "comex_t": 81571.0,
+              "shfe_t": 73768.0,
+              "total_t": 584714.0
+            },
+            {
+              "period": "2011-11-30",
+              "basis": "month end; unavailable exchanges remain blank",
+              "lme_t": 386625.0,
+              "comex_t": 78961.0,
+              "shfe_t": 65205.0,
+              "total_t": 530791.0
+            },
+            {
+              "period": "2011-12-31",
+              "basis": "month end; unavailable exchanges remain blank",
+              "lme_t": 370900.0,
+              "comex_t": 79817.0,
+              "shfe_t": 93219.0,
+              "total_t": 543936.0
+            },
+            {
+              "period": "2012-01-31",
+              "basis": "month end; unavailable exchanges remain blank",
+              "lme_t": 330825.0,
+              "comex_t": 80794.0,
+              "shfe_t": 131645.0,
+              "total_t": 543264.0
+            },
+            {
+              "period": "2012-02-29",
+              "basis": "month end; unavailable exchanges remain blank",
+              "lme_t": 296425.0,
+              "comex_t": 83124.0,
+              "shfe_t": 216086.0,
+              "total_t": 595635.0
+            },
+            {
+              "period": "2012-03-31",
+              "basis": "month end; unavailable exchanges remain blank",
+              "lme_t": 256275.0,
+              "comex_t": 78492.0,
+              "shfe_t": 218814.0,
+              "total_t": 553581.0
+            },
+            {
+              "period": "2012-04-30",
+              "basis": "month end; unavailable exchanges remain blank",
+              "lme_t": 241550.0,
+              "comex_t": 68950.0,
+              "shfe_t": 204762.0,
+              "total_t": 515262.0
+            },
+            {
+              "period": "2012-05-31",
+              "basis": "month end; unavailable exchanges remain blank",
+              "lme_t": 230675.0,
+              "comex_t": 54206.0,
+              "shfe_t": 147044.0,
+              "total_t": 431925.0
+            },
+            {
+              "period": "2012-06-30",
+              "basis": "month end; unavailable exchanges remain blank",
+              "lme_t": 257150.0,
+              "comex_t": 48385.0,
+              "shfe_t": 139442.0,
+              "total_t": 444977.0
+            },
+            {
+              "period": "2012-07-31",
+              "basis": "month end; unavailable exchanges remain blank",
+              "lme_t": 248825.0,
+              "comex_t": 43662.0,
+              "shfe_t": 156510.0,
+              "total_t": 448997.0
+            },
+            {
+              "period": "2012-08-31",
+              "basis": "month end; unavailable exchanges remain blank",
+              "lme_t": 229900.0,
+              "comex_t": 46140.0,
+              "shfe_t": 158065.0,
+              "total_t": 434105.0
+            },
+            {
+              "period": "2012-09-30",
+              "basis": "month end; unavailable exchanges remain blank",
+              "lme_t": 219400.0,
+              "comex_t": 45664.0,
+              "shfe_t": 162547.0,
+              "total_t": 427611.0
+            },
+            {
+              "period": "2012-10-31",
+              "basis": "month end; unavailable exchanges remain blank",
+              "lme_t": 239775.0,
+              "comex_t": 51302.0,
+              "shfe_t": 192761.0,
+              "total_t": 483838.0
+            },
+            {
+              "period": "2012-11-30",
+              "basis": "month end; unavailable exchanges remain blank",
+              "lme_t": 248150.0,
+              "comex_t": 58399.0,
+              "shfe_t": 197088.0,
+              "total_t": 503637.0
+            },
+            {
+              "period": "2012-12-31",
+              "basis": "month end; unavailable exchanges remain blank",
+              "lme_t": 320050.0,
+              "comex_t": 64149.0,
+              "shfe_t": 204773.0,
+              "total_t": 588972.0
+            },
+            {
+              "period": "2013-01-31",
+              "basis": "month end; unavailable exchanges remain blank",
+              "lme_t": 371750.0,
+              "comex_t": 67232.0,
+              "shfe_t": 197091.0,
+              "total_t": 636073.0
+            },
+            {
+              "period": "2013-02-28",
+              "basis": "month end; unavailable exchanges remain blank",
+              "lme_t": 446700.0,
+              "comex_t": 68062.0,
+              "shfe_t": 226201.0,
+              "total_t": 740963.0
+            },
+            {
+              "period": "2013-03-31",
+              "basis": "month end; unavailable exchanges remain blank",
+              "lme_t": 569775.0,
+              "comex_t": 69165.0,
+              "shfe_t": 247591.0,
+              "total_t": 886531.0
+            },
+            {
+              "period": "2013-04-30",
+              "basis": "month end; unavailable exchanges remain blank",
+              "lme_t": 618600.0,
+              "comex_t": 77621.0,
+              "shfe_t": 217180.0,
+              "total_t": 913401.0
+            },
+            {
+              "period": "2013-05-31",
+              "basis": "month end; unavailable exchanges remain blank",
+              "lme_t": 608450.0,
+              "comex_t": 72428.0,
+              "shfe_t": 179317.0,
+              "total_t": 860195.0
+            },
+            {
+              "period": "2013-06-30",
+              "basis": "month end; unavailable exchanges remain blank",
+              "lme_t": 665775.0,
+              "comex_t": 66008.0,
+              "shfe_t": 182493.0,
+              "total_t": 914276.0
+            },
+            {
+              "period": "2013-07-31",
+              "basis": "month end; unavailable exchanges remain blank",
+              "lme_t": 612800.0,
+              "comex_t": 58572.0,
+              "shfe_t": 161564.0,
+              "total_t": 832936.0
+            },
+            {
+              "period": "2013-08-31",
+              "basis": "month end; unavailable exchanges remain blank",
+              "lme_t": 588000.0,
+              "comex_t": 33129.0,
+              "shfe_t": 156568.0,
+              "total_t": 777697.0
+            },
+            {
+              "period": "2013-09-30",
+              "basis": "month end; unavailable exchanges remain blank",
+              "lme_t": 538025.0,
+              "comex_t": 28213.0,
+              "shfe_t": 150994.0,
+              "total_t": 717232.0
+            },
+            {
+              "period": "2013-10-31",
+              "basis": "month end; unavailable exchanges remain blank",
+              "lme_t": 476150.0,
+              "comex_t": 23902.0,
+              "shfe_t": 178343.0,
+              "total_t": 678395.0
+            },
+            {
+              "period": "2013-11-30",
+              "basis": "month end; unavailable exchanges remain blank",
+              "lme_t": 423825.0,
+              "comex_t": 17305.0,
+              "shfe_t": 148670.0,
+              "total_t": 589800.0
+            },
+            {
+              "period": "2013-12-31",
+              "basis": "month end; unavailable exchanges remain blank",
+              "lme_t": 366425.0,
+              "comex_t": 14955.0,
+              "shfe_t": 125849.0,
+              "total_t": 507229.0
+            },
+            {
+              "period": "2014-01-31",
+              "basis": "month end; unavailable exchanges remain blank",
+              "lme_t": 314525.0,
+              "comex_t": 17195.0,
+              "shfe_t": 148581.0,
+              "total_t": 480301.0
+            },
+            {
+              "period": "2014-02-28",
+              "basis": "month end; unavailable exchanges remain blank",
+              "lme_t": 276225.0,
+              "comex_t": 12328.0,
+              "shfe_t": 198286.0,
+              "total_t": 486839.0
+            },
+            {
+              "period": "2014-03-31",
+              "basis": "month end; unavailable exchanges remain blank",
+              "lme_t": 265175.0,
+              "comex_t": 18114.0,
+              "shfe_t": 193725.0,
+              "total_t": 477014.0
+            },
+            {
+              "period": "2014-04-30",
+              "basis": "month end; unavailable exchanges remain blank",
+              "lme_t": 233325.0,
+              "comex_t": 16594.0,
+              "shfe_t": 105156.0,
+              "total_t": 355075.0
+            },
+            {
+              "period": "2014-05-31",
+              "basis": "month end; unavailable exchanges remain blank",
+              "lme_t": 171350.0,
+              "comex_t": 14841.0,
+              "shfe_t": 91947.0,
+              "total_t": 278138.0
+            },
+            {
+              "period": "2014-06-30",
+              "basis": "month end; unavailable exchanges remain blank",
+              "lme_t": 154675.0,
+              "comex_t": 17829.0,
+              "shfe_t": 78975.0,
+              "total_t": 251479.0
+            },
+            {
+              "period": "2014-07-31",
+              "basis": "month end; unavailable exchanges remain blank",
+              "lme_t": 146750.0,
+              "comex_t": 21693.0,
+              "shfe_t": 108393.0,
+              "total_t": 276836.0
+            },
+            {
+              "period": "2014-08-31",
+              "basis": "month end; unavailable exchanges remain blank",
+              "lme_t": 148150.0,
+              "comex_t": 25387.0,
+              "shfe_t": 79778.0,
+              "total_t": 253315.0
+            },
+            {
+              "period": "2014-09-30",
+              "basis": "month end; unavailable exchanges remain blank",
+              "lme_t": 152550.0,
+              "comex_t": 30991.0,
+              "shfe_t": 81554.0,
+              "total_t": 265095.0
+            },
+            {
+              "period": "2014-10-31",
+              "basis": "month end; unavailable exchanges remain blank",
+              "lme_t": 162600.0,
+              "comex_t": 27927.0,
+              "shfe_t": 95824.0,
+              "total_t": 286351.0
+            },
+            {
+              "period": "2014-11-30",
+              "basis": "month end; unavailable exchanges remain blank",
+              "lme_t": 164300.0,
+              "comex_t": 25525.0,
+              "shfe_t": 88278.0,
+              "total_t": 278103.0
+            },
+            {
+              "period": "2014-12-31",
+              "basis": "month end; unavailable exchanges remain blank",
+              "lme_t": 177025.0,
+              "comex_t": 24150.0,
+              "shfe_t": 105522.0,
+              "total_t": 306697.0
+            },
+            {
+              "period": "2015-01-31",
+              "basis": "month end; unavailable exchanges remain blank",
+              "lme_t": 248125.0,
+              "comex_t": 19353.0,
+              "shfe_t": 137042.0,
+              "total_t": 404520.0
+            },
+            {
+              "period": "2015-02-28",
+              "basis": "month end; unavailable exchanges remain blank",
+              "lme_t": 296375.0,
+              "comex_t": 16197.0,
+              "shfe_t": 205146.0,
+              "total_t": 517718.0
+            },
+            {
+              "period": "2015-03-31",
+              "basis": "month end; unavailable exchanges remain blank",
+              "lme_t": 332300.0,
+              "comex_t": 24371.0,
+              "shfe_t": 243592.0,
+              "total_t": 600263.0
+            },
+            {
+              "period": "2015-04-30",
+              "basis": "month end; unavailable exchanges remain blank",
+              "lme_t": 337925.0,
+              "comex_t": 21477.0,
+              "shfe_t": 188165.0,
+              "total_t": 547567.0
+            },
+            {
+              "period": "2015-05-31",
+              "basis": "month end; unavailable exchanges remain blank",
+              "lme_t": 322150.0,
+              "comex_t": 20428.0,
+              "shfe_t": 156053.0,
+              "total_t": 498631.0
+            },
+            {
+              "period": "2015-06-30",
+              "basis": "month end; unavailable exchanges remain blank",
+              "lme_t": 324100.0,
+              "comex_t": 27324.0,
+              "shfe_t": 112921.0,
+              "total_t": 464345.0
+            },
+            {
+              "period": "2015-07-31",
+              "basis": "month end; unavailable exchanges remain blank",
+              "lme_t": 345475.0,
+              "comex_t": 33823.0,
+              "shfe_t": 103117.0,
+              "total_t": 482415.0
+            },
+            {
+              "period": "2015-08-31",
+              "basis": "month end; unavailable exchanges remain blank",
+              "lme_t": 371250.0,
+              "comex_t": 33439.0,
+              "shfe_t": 123223.0,
+              "total_t": 527912.0
+            },
+            {
+              "period": "2015-09-30",
+              "basis": "month end; unavailable exchanges remain blank",
+              "lme_t": 323800.0,
+              "comex_t": 36426.0,
+              "shfe_t": 150371.0,
+              "total_t": 510597.0
+            },
+            {
+              "period": "2015-10-31",
+              "basis": "month end; unavailable exchanges remain blank",
+              "lme_t": 267775.0,
+              "comex_t": 48636.0,
+              "shfe_t": 180157.0,
+              "total_t": 496568.0
+            },
+            {
+              "period": "2015-11-30",
+              "basis": "month end; unavailable exchanges remain blank",
+              "lme_t": 244375.0,
+              "comex_t": 65997.0,
+              "shfe_t": 187152.0,
+              "total_t": 497524.0
+            },
+            {
+              "period": "2015-12-31",
+              "basis": "month end; unavailable exchanges remain blank",
+              "lme_t": 236225.0,
+              "comex_t": 63279.0,
+              "shfe_t": 177854.0,
+              "total_t": 477358.0
+            },
+            {
+              "period": "2016-01-31",
+              "basis": "month end; unavailable exchanges remain blank",
+              "lme_t": 242375.0,
+              "comex_t": 59525.0,
+              "shfe_t": 211965.0,
+              "total_t": 513865.0
+            },
+            {
+              "period": "2016-02-29",
+              "basis": "month end; unavailable exchanges remain blank",
+              "lme_t": 195625.0,
+              "comex_t": 61237.0,
+              "shfe_t": 276023.0,
+              "total_t": 532885.0
+            },
+            {
+              "period": "2016-03-31",
+              "basis": "month end; unavailable exchanges remain blank",
+              "lme_t": 144750.0,
+              "comex_t": 65309.0,
+              "shfe_t": 368725.0,
+              "total_t": 578784.0
+            },
+            {
+              "period": "2016-04-30",
+              "basis": "month end; unavailable exchanges remain blank",
+              "lme_t": 149500.0,
+              "comex_t": 59416.0,
+              "shfe_t": 311894.0,
+              "total_t": 520810.0
+            },
+            {
+              "period": "2016-05-31",
+              "basis": "month end; unavailable exchanges remain blank",
+              "lme_t": 151725.0,
+              "comex_t": 55378.0,
+              "shfe_t": 221212.0,
+              "total_t": 428315.0
+            },
+            {
+              "period": "2016-06-30",
+              "basis": "month end; unavailable exchanges remain blank",
+              "lme_t": 191525.0,
+              "comex_t": 56649.0,
+              "shfe_t": 161894.0,
+              "total_t": 410068.0
+            },
+            {
+              "period": "2016-07-31",
+              "basis": "month end; unavailable exchanges remain blank",
+              "lme_t": 209450.0,
+              "comex_t": 59344.0,
+              "shfe_t": 165468.0,
+              "total_t": 434262.0
+            },
+            {
+              "period": "2016-08-31",
+              "basis": "month end; unavailable exchanges remain blank",
+              "lme_t": 293525.0,
+              "comex_t": 61037.0,
+              "shfe_t": 165803.0,
+              "total_t": 520365.0
+            },
+            {
+              "period": "2016-09-30",
+              "basis": "month end; unavailable exchanges remain blank",
+              "lme_t": 372225.0,
+              "comex_t": 64025.0,
+              "shfe_t": 107058.0,
+              "total_t": 543308.0
+            },
+            {
+              "period": "2016-10-31",
+              "basis": "month end; unavailable exchanges remain blank",
+              "lme_t": 320825.0,
+              "comex_t": 65282.0,
+              "shfe_t": 102548.0,
+              "total_t": 488655.0
+            },
+            {
+              "period": "2016-11-30",
+              "basis": "month end; unavailable exchanges remain blank",
+              "lme_t": 234825.0,
+              "comex_t": 70619.0,
+              "shfe_t": 144063.0,
+              "total_t": 449507.0
+            },
+            {
+              "period": "2016-12-31",
+              "basis": "month end; unavailable exchanges remain blank",
+              "lme_t": 322225.0,
+              "comex_t": 80112.0,
+              "shfe_t": 146598.0,
+              "total_t": 548935.0
+            },
+            {
+              "period": "2017-01-31",
+              "basis": "month end; unavailable exchanges remain blank",
+              "lme_t": 261325.0,
+              "comex_t": 92598.0,
+              "shfe_t": 212925.0,
+              "total_t": 566848.0
+            },
+            {
+              "period": "2017-02-28",
+              "basis": "month end; unavailable exchanges remain blank",
+              "lme_t": 203100.0,
+              "comex_t": 114168.0,
+              "shfe_t": 289899.0,
+              "total_t": 607167.0
+            },
+            {
+              "period": "2017-03-31",
+              "basis": "month end; unavailable exchanges remain blank",
+              "lme_t": 291175.0,
+              "comex_t": 130068.0,
+              "shfe_t": 307376.0,
+              "total_t": 728619.0
+            },
+            {
+              "period": "2017-04-30",
+              "basis": "month end; unavailable exchanges remain blank",
+              "lme_t": 259725.0,
+              "comex_t": 140840.0,
+              "shfe_t": 229361.0,
+              "total_t": 629926.0
+            },
+            {
+              "period": "2017-05-31",
+              "basis": "month end; unavailable exchanges remain blank",
+              "lme_t": 311150.0,
+              "comex_t": 143264.0,
+              "shfe_t": 198585.0,
+              "total_t": 652999.0
+            },
+            {
+              "period": "2017-06-30",
+              "basis": "month end; unavailable exchanges remain blank",
+              "lme_t": 249700.0,
+              "comex_t": 147720.0,
+              "shfe_t": 176620.0,
+              "total_t": 574040.0
+            },
+            {
+              "period": "2017-07-31",
+              "basis": "month end; unavailable exchanges remain blank",
+              "lme_t": 296975.0,
+              "comex_t": 155413.0,
+              "shfe_t": 178783.0,
+              "total_t": 631171.0
+            },
+            {
+              "period": "2017-08-31",
+              "basis": "month end; unavailable exchanges remain blank",
+              "lme_t": 228450.0,
+              "comex_t": 165041.0,
+              "shfe_t": 183582.0,
+              "total_t": 577073.0
+            },
+            {
+              "period": "2017-09-30",
+              "basis": "month end; unavailable exchanges remain blank",
+              "lme_t": 297250.0,
+              "comex_t": 177348.0,
+              "shfe_t": 103151.0,
+              "total_t": 577749.0
+            },
+            {
+              "period": "2017-10-31",
+              "basis": "month end; unavailable exchanges remain blank",
+              "lme_t": 274625.0,
+              "comex_t": 186970.0,
+              "shfe_t": 107892.0,
+              "total_t": 569487.0
+            },
+            {
+              "period": "2017-11-30",
+              "basis": "month end; unavailable exchanges remain blank",
+              "lme_t": 188525.0,
+              "comex_t": 189731.0,
+              "shfe_t": 168987.0,
+              "total_t": 547243.0
+            },
+            {
+              "period": "2017-12-31",
+              "basis": "month end; unavailable exchanges remain blank",
+              "lme_t": 201725.0,
+              "comex_t": 191572.0,
+              "shfe_t": 150489.0,
+              "total_t": 543786.0
+            },
+            {
+              "period": "2018-01-31",
+              "basis": "month end; unavailable exchanges remain blank",
+              "lme_t": 305575.0,
+              "comex_t": 200521.0,
+              "shfe_t": 164206.0,
+              "total_t": 670302.0
+            },
+            {
+              "period": "2018-02-28",
+              "basis": "month end; unavailable exchanges remain blank",
+              "lme_t": 330822.0,
+              "comex_t": 208740.0,
+              "shfe_t": 218532.0,
+              "total_t": 758094.0
+            },
+            {
+              "period": "2018-03-31",
+              "basis": "month end; unavailable exchanges remain blank",
+              "lme_t": 383075.0,
+              "comex_t": 212215.0,
+              "shfe_t": 306211.0,
+              "total_t": 901501.0
+            },
+            {
+              "period": "2018-04-30",
+              "basis": "month end; unavailable exchanges remain blank",
+              "lme_t": 334650.0,
+              "comex_t": 225657.0,
+              "shfe_t": 249732.0,
+              "total_t": 810039.0
+            },
+            {
+              "period": "2018-05-31",
+              "basis": "month end; unavailable exchanges remain blank",
+              "lme_t": 311525.0,
+              "comex_t": 209890.0,
+              "shfe_t": 272254.0,
+              "total_t": 793669.0
+            },
+            {
+              "period": "2018-06-30",
+              "basis": "month end; unavailable exchanges remain blank",
+              "lme_t": 294525.0,
+              "comex_t": 203192.0,
+              "shfe_t": 263968.0,
+              "total_t": 761685.0
+            },
+            {
+              "period": "2018-07-31",
+              "basis": "month end; unavailable exchanges remain blank",
+              "lme_t": 254425.0,
+              "comex_t": 186886.0,
+              "shfe_t": 197068.0,
+              "total_t": 638379.0
+            },
+            {
+              "period": "2018-08-31",
+              "basis": "month end; unavailable exchanges remain blank",
+              "lme_t": 264925.0,
+              "comex_t": 172874.0,
+              "shfe_t": 138001.0,
+              "total_t": 575800.0
+            },
+            {
+              "period": "2018-09-30",
+              "basis": "month end; unavailable exchanges remain blank",
+              "lme_t": 202400.0,
+              "comex_t": 157596.0,
+              "shfe_t": 111995.0,
+              "total_t": 471991.0
+            },
+            {
+              "period": "2018-10-31",
+              "basis": "month end; unavailable exchanges remain blank",
+              "lme_t": 137625.0,
+              "comex_t": 142822.0,
+              "shfe_t": 148943.0,
+              "total_t": 429390.0
+            },
+            {
+              "period": "2018-11-30",
+              "basis": "month end; unavailable exchanges remain blank",
+              "lme_t": 136175.0,
+              "comex_t": 124489.0,
+              "shfe_t": 131042.0,
+              "total_t": 391706.0
+            },
+            {
+              "period": "2018-12-31",
+              "basis": "month end; unavailable exchanges remain blank",
+              "lme_t": 132175.0,
+              "comex_t": 99868.0,
+              "shfe_t": 118686.0,
+              "total_t": 350729.0
+            },
+            {
+              "period": "2019-01-31",
+              "basis": "month end; unavailable exchanges remain blank",
+              "lme_t": 149200.0,
+              "comex_t": 77991.0,
+              "shfe_t": 142727.0,
+              "total_t": 369918.0
+            },
+            {
+              "period": "2019-02-28",
+              "basis": "month end; unavailable exchanges remain blank",
+              "lme_t": 128475.0,
+              "comex_t": 52280.0,
+              "shfe_t": 227049.0,
+              "total_t": 407804.0
+            },
+            {
+              "period": "2019-03-31",
+              "basis": "month end; unavailable exchanges remain blank",
+              "lme_t": 168525.0,
+              "comex_t": 39519.0,
+              "shfe_t": 261412.0,
+              "total_t": 469456.0
+            },
+            {
+              "period": "2019-04-30",
+              "basis": "month end; unavailable exchanges remain blank",
+              "lme_t": 229175.0,
+              "comex_t": 31116.0,
+              "shfe_t": 211630.0,
+              "total_t": 471921.0
+            },
+            {
+              "period": "2019-05-31",
+              "basis": "month end; unavailable exchanges remain blank",
+              "lme_t": 212000.0,
+              "comex_t": 28700.0,
+              "shfe_t": 165439.0,
+              "total_t": 406139.0
+            },
+            {
+              "period": "2019-06-30",
+              "basis": "month end; unavailable exchanges remain blank",
+              "lme_t": 241400.0,
+              "comex_t": 30314.0,
+              "shfe_t": 146019.0,
+              "total_t": 417733.0
+            },
+            {
+              "period": "2019-07-31",
+              "basis": "month end; unavailable exchanges remain blank",
+              "lme_t": 290500.0,
+              "comex_t": 35926.0,
+              "shfe_t": 149971.0,
+              "total_t": 476397.0
+            },
+            {
+              "period": "2019-08-31",
+              "basis": "month end; unavailable exchanges remain blank",
+              "lme_t": 337675.0,
+              "comex_t": 39761.0,
+              "shfe_t": 143876.0,
+              "total_t": 521312.0
+            },
+            {
+              "period": "2019-09-30",
+              "basis": "month end; unavailable exchanges remain blank",
+              "lme_t": 264425.0,
+              "comex_t": 36032.0,
+              "shfe_t": 118108.0,
+              "total_t": 418565.0
+            },
+            {
+              "period": "2019-10-31",
+              "basis": "month end; unavailable exchanges remain blank",
+              "lme_t": 263400.0,
+              "comex_t": 32917.0,
+              "shfe_t": 149911.0,
+              "total_t": 446228.0
+            },
+            {
+              "period": "2019-11-30",
+              "basis": "month end; unavailable exchanges remain blank",
+              "lme_t": 208625.0,
+              "comex_t": 36375.0,
+              "shfe_t": 120192.0,
+              "total_t": 365192.0
+            },
+            {
+              "period": "2019-12-31",
+              "basis": "month end; unavailable exchanges remain blank",
+              "lme_t": 145700.0,
+              "comex_t": 34065.0,
+              "shfe_t": 123647.0,
+              "total_t": 303412.0
+            },
+            {
+              "period": "2020-01-31",
+              "basis": "month end; unavailable exchanges remain blank",
+              "lme_t": 180725.0,
+              "comex_t": 28499.0,
+              "shfe_t": 155839.0,
+              "total_t": 365063.0
+            },
+            {
+              "period": "2020-02-29",
+              "basis": "month end; unavailable exchanges remain blank",
+              "lme_t": 218175.0,
+              "comex_t": 26257.0,
+              "shfe_t": 310760.0,
+              "total_t": 555192.0
+            },
+            {
+              "period": "2020-03-31",
+              "basis": "month end; unavailable exchanges remain blank",
+              "lme_t": 222225.0,
+              "comex_t": 29259.0,
+              "shfe_t": 364040.0,
+              "total_t": 615524.0
+            },
+            {
+              "period": "2020-04-30",
+              "basis": "month end; unavailable exchanges remain blank",
+              "lme_t": 253700.0,
+              "comex_t": 38345.0,
+              "shfe_t": 230956.0,
+              "total_t": 523001.0
+            },
+            {
+              "period": "2020-05-31",
+              "basis": "month end; unavailable exchanges remain blank",
+              "lme_t": 261800.0,
+              "comex_t": 54889.0,
+              "shfe_t": 144988.0,
+              "total_t": 461677.0
+            },
+            {
+              "period": "2020-06-30",
+              "basis": "month end; unavailable exchanges remain blank",
+              "lme_t": 216600.0,
+              "comex_t": 72913.0,
+              "shfe_t": 99971.0,
+              "total_t": 389484.0
+            },
+            {
+              "period": "2020-07-31",
+              "basis": "month end; unavailable exchanges remain blank",
+              "lme_t": 128125.0,
+              "comex_t": 80784.0,
+              "shfe_t": 159513.0,
+              "total_t": 368422.0
+            },
+            {
+              "period": "2020-08-31",
+              "basis": "month end; unavailable exchanges remain blank",
+              "lme_t": 89350.0,
+              "comex_t": 77496.0,
+              "shfe_t": 170086.0,
+              "total_t": 336932.0
+            },
+            {
+              "period": "2020-09-30",
+              "basis": "month end; unavailable exchanges remain blank",
+              "lme_t": 165600.0,
+              "comex_t": 72432.0,
+              "shfe_t": 155071.0,
+              "total_t": 393103.0
+            },
+            {
+              "period": "2020-10-31",
+              "basis": "month end; unavailable exchanges remain blank",
+              "lme_t": 171300.0,
+              "comex_t": 72357.0,
+              "shfe_t": 139657.0,
+              "total_t": 383314.0
+            },
+            {
+              "period": "2020-11-30",
+              "basis": "month end; unavailable exchanges remain blank",
+              "lme_t": 149800.0,
+              "comex_t": 74019.0,
+              "shfe_t": 92912.0,
+              "total_t": 316731.0
+            },
+            {
+              "period": "2020-12-31",
+              "basis": "month end; unavailable exchanges remain blank",
+              "lme_t": 107950.0,
+              "comex_t": 70397.0,
+              "shfe_t": 86679.0,
+              "total_t": 265026.0
+            },
+            {
+              "period": "2021-01-31",
+              "basis": "month end; unavailable exchanges remain blank",
+              "lme_t": 74575.0,
+              "comex_t": 67348.0,
+              "shfe_t": 66565.0,
+              "total_t": 208488.0
+            },
+            {
+              "period": "2021-02-28",
+              "basis": "month end; unavailable exchanges remain blank",
+              "lme_t": 76225.0,
+              "comex_t": 63100.0,
+              "shfe_t": 147958.0,
+              "total_t": 287283.0
+            },
+            {
+              "period": "2021-03-31",
+              "basis": "month end; unavailable exchanges remain blank",
+              "lme_t": 144500.0,
+              "comex_t": 64805.0,
+              "shfe_t": 188359.0,
+              "total_t": 397664.0
+            },
+            {
+              "period": "2021-04-30",
+              "basis": "month end; unavailable exchanges remain blank",
+              "lme_t": 143725.0,
+              "comex_t": 60360.0,
+              "shfe_t": 199870.0,
+              "total_t": 403955.0
+            },
+            {
+              "period": "2021-05-31",
+              "basis": "month end; unavailable exchanges remain blank",
+              "lme_t": 122425.0,
+              "comex_t": 55232.0,
+              "shfe_t": 207821.0,
+              "total_t": 385478.0
+            },
+            {
+              "period": "2021-06-30",
+              "basis": "month end; unavailable exchanges remain blank",
+              "lme_t": 211525.0,
+              "comex_t": 45099.0,
+              "shfe_t": 153804.0,
+              "total_t": 410428.0
+            },
+            {
+              "period": "2021-07-31",
+              "basis": "month end; unavailable exchanges remain blank",
+              "lme_t": 239650.0,
+              "comex_t": 41626.0,
+              "shfe_t": 94090.0,
+              "total_t": 375366.0
+            },
+            {
+              "period": "2021-08-31",
+              "basis": "month end; unavailable exchanges remain blank",
+              "lme_t": 253000.0,
+              "comex_t": 46095.0,
+              "shfe_t": 82390.0,
+              "total_t": 381485.0
+            },
+            {
+              "period": "2021-09-30",
+              "basis": "month end; unavailable exchanges remain blank",
+              "lme_t": 219525.0,
+              "comex_t": 51226.0,
+              "shfe_t": 43525.0,
+              "total_t": 314276.0
+            },
+            {
+              "period": "2021-10-31",
+              "basis": "month end; unavailable exchanges remain blank",
+              "lme_t": 140175.0,
+              "comex_t": 51923.0,
+              "shfe_t": 49327.0,
+              "total_t": 241425.0
+            },
+            {
+              "period": "2021-11-30",
+              "basis": "month end; unavailable exchanges remain blank",
+              "lme_t": 76450.0,
+              "comex_t": 53225.0,
+              "shfe_t": 41862.0,
+              "total_t": 171537.0
+            },
+            {
+              "period": "2021-12-31",
+              "basis": "month end; unavailable exchanges remain blank",
+              "lme_t": 88950.0,
+              "comex_t": 63201.0,
+              "shfe_t": 38182.0,
+              "total_t": 190333.0
+            },
+            {
+              "period": "2022-01-31",
+              "basis": "month end; unavailable exchanges remain blank",
+              "lme_t": 87650.0,
+              "comex_t": 73542.0,
+              "shfe_t": 40359.0,
+              "total_t": 201551.0
+            },
+            {
+              "period": "2022-02-28",
+              "basis": "month end; unavailable exchanges remain blank",
+              "lme_t": 73025.0,
+              "comex_t": 64307.0,
+              "shfe_t": 159023.0,
+              "total_t": 296355.0
+            },
+            {
+              "period": "2022-03-31",
+              "basis": "month end; unavailable exchanges remain blank",
+              "lme_t": 91400.0,
+              "comex_t": 67797.0,
+              "shfe_t": 93121.0,
+              "total_t": 252318.0
+            },
+            {
+              "period": "2022-04-30",
+              "basis": "month end; unavailable exchanges remain blank",
+              "lme_t": 156050.0,
+              "comex_t": 76216.0,
+              "shfe_t": 48363.0,
+              "total_t": 280629.0
+            },
+            {
+              "period": "2022-05-31",
+              "basis": "month end; unavailable exchanges remain blank",
+              "lme_t": 149200.0,
+              "comex_t": 72259.0,
+              "shfe_t": 41546.0,
+              "total_t": 263005.0
+            },
+            {
+              "period": "2022-06-30",
+              "basis": "month end; unavailable exchanges remain blank",
+              "lme_t": 124275.0,
+              "comex_t": 67445.0,
+              "shfe_t": 66661.0,
+              "total_t": 258381.0
+            },
+            {
+              "period": "2022-07-31",
+              "basis": "month end; unavailable exchanges remain blank",
+              "lme_t": 130575.0,
+              "comex_t": 55239.0,
+              "shfe_t": 37025.0,
+              "total_t": 222839.0
+            },
+            {
+              "period": "2022-08-31",
+              "basis": "month end; unavailable exchanges remain blank",
+              "lme_t": 118500.0,
+              "comex_t": 46336.0,
+              "shfe_t": 34898.0,
+              "total_t": 199734.0
+            },
+            {
+              "period": "2022-09-30",
+              "basis": "month end; unavailable exchanges remain blank",
+              "lme_t": 135250.0,
+              "comex_t": 40761.0,
+              "shfe_t": 30459.0,
+              "total_t": 206470.0
+            },
+            {
+              "period": "2022-10-31",
+              "basis": "month end; unavailable exchanges remain blank",
+              "lme_t": 113125.0,
+              "comex_t": 33540.0,
+              "shfe_t": 63440.0,
+              "total_t": 210105.0
+            },
+            {
+              "period": "2022-11-30",
+              "basis": "month end; unavailable exchanges remain blank",
+              "lme_t": 89700.0,
+              "comex_t": 33427.0,
+              "shfe_t": 70249.0,
+              "total_t": 193376.0
+            },
+            {
+              "period": "2022-12-31",
+              "basis": "month end; unavailable exchanges remain blank",
+              "lme_t": 88925.0,
+              "comex_t": 31834.0,
+              "shfe_t": 69268.0,
+              "total_t": 190027.0
+            },
+            {
+              "period": "2023-01-31",
+              "basis": "month end; unavailable exchanges remain blank",
+              "lme_t": 75225.0,
+              "comex_t": 25894.0,
+              "shfe_t": 139967.0,
+              "total_t": 241086.0
+            },
+            {
+              "period": "2023-02-28",
+              "basis": "month end; unavailable exchanges remain blank",
+              "lme_t": 64100.0,
+              "comex_t": 15487.0,
+              "shfe_t": 252455.0,
+              "total_t": 332042.0
+            },
+            {
+              "period": "2023-03-31",
+              "basis": "month end; unavailable exchanges remain blank",
+              "lme_t": 64725.0,
+              "comex_t": 15008.0,
+              "shfe_t": 156576.0,
+              "total_t": 236309.0
+            },
+            {
+              "period": "2023-04-30",
+              "basis": "month end; unavailable exchanges remain blank",
+              "lme_t": 64550.0,
+              "comex_t": 25081.0,
+              "shfe_t": 137095.0,
+              "total_t": 226726.0
+            },
+            {
+              "period": "2023-05-31",
+              "basis": "month end; unavailable exchanges remain blank",
+              "lme_t": 99150.0,
+              "comex_t": 25131.0,
+              "shfe_t": 86648.0,
+              "total_t": 210929.0
+            },
+            {
+              "period": "2023-06-30",
+              "basis": "month end; unavailable exchanges remain blank",
+              "lme_t": 72975.0,
+              "comex_t": 30780.0,
+              "shfe_t": 68313.0,
+              "total_t": 172068.0
+            },
+            {
+              "period": "2023-07-31",
+              "basis": "month end; unavailable exchanges remain blank",
+              "lme_t": 68350.0,
+              "comex_t": 39426.0,
+              "shfe_t": 61290.0,
+              "total_t": 169066.0
+            },
+            {
+              "period": "2023-08-31",
+              "basis": "month end; unavailable exchanges remain blank",
+              "lme_t": 102900.0,
+              "comex_t": 29396.0,
+              "shfe_t": 46591.0,
+              "total_t": 178887.0
+            },
+            {
+              "period": "2023-09-30",
+              "basis": "month end; unavailable exchanges remain blank",
+              "lme_t": 167825.0,
+              "comex_t": 22987.0,
+              "shfe_t": 38996.0,
+              "total_t": 229808.0
+            },
+            {
+              "period": "2023-10-31",
+              "basis": "month end; unavailable exchanges remain blank",
+              "lme_t": 176475.0,
+              "comex_t": 19886.0,
+              "shfe_t": 36408.0,
+              "total_t": 232769.0
+            },
+            {
+              "period": "2023-11-30",
+              "basis": "month end; unavailable exchanges remain blank",
+              "lme_t": 175250.0,
+              "comex_t": 17831.0,
+              "shfe_t": 26149.0,
+              "total_t": 219230.0
+            },
+            {
+              "period": "2023-12-31",
+              "basis": "month end; unavailable exchanges remain blank",
+              "lme_t": 167300.0,
+              "comex_t": 17064.0,
+              "shfe_t": 30905.0,
+              "total_t": 215269.0
+            },
+            {
+              "period": "2024-01-31",
+              "basis": "month end; unavailable exchanges remain blank",
+              "lme_t": 146475.0,
+              "comex_t": 21993.0,
+              "shfe_t": 50532.0,
+              "total_t": 219000.0
+            },
+            {
+              "period": "2024-02-29",
+              "basis": "month end; unavailable exchanges remain blank",
+              "lme_t": 122675.0,
+              "comex_t": 26336.0,
+              "shfe_t": 214487.0,
+              "total_t": 363498.0
+            },
+            {
+              "period": "2024-03-31",
+              "basis": "month end; unavailable exchanges remain blank",
+              "lme_t": 112475.0,
+              "comex_t": 27269.0,
+              "shfe_t": 290228.0,
+              "total_t": 429972.0
+            },
+            {
+              "period": "2024-04-30",
+              "basis": "month end; unavailable exchanges remain blank",
+              "lme_t": 116126.0,
+              "comex_t": 22135.0,
+              "shfe_t": 287498.0,
+              "total_t": 425759.0
+            },
+            {
+              "period": "2024-05-31",
+              "basis": "month end; unavailable exchanges remain blank",
+              "lme_t": 116475.0,
+              "comex_t": 15066.0,
+              "shfe_t": 321695.0,
+              "total_t": 453236.0
+            },
+            {
+              "period": "2024-06-30",
+              "basis": "month end; unavailable exchanges remain blank",
+              "lme_t": 180125.0,
+              "comex_t": 8206.0,
+              "shfe_t": 319521.0,
+              "total_t": 507852.0
+            },
+            {
+              "period": "2024-07-31",
+              "basis": "month end; unavailable exchanges remain blank",
+              "lme_t": 239275.0,
+              "comex_t": 13354.0,
+              "shfe_t": 301203.0,
+              "total_t": 553832.0
+            },
+            {
+              "period": "2024-08-31",
+              "basis": "month end; unavailable exchanges remain blank",
+              "lme_t": 320925.0,
+              "comex_t": 36394.0,
+              "shfe_t": 241745.0,
+              "total_t": 599064.0
+            },
+            {
+              "period": "2024-09-30",
+              "basis": "month end; unavailable exchanges remain blank",
+              "lme_t": 300600.0,
+              "comex_t": 57647.0,
+              "shfe_t": 141625.0,
+              "total_t": 499872.0
+            },
+            {
+              "period": "2024-10-31",
+              "basis": "month end; unavailable exchanges remain blank",
+              "lme_t": 271375.0,
+              "comex_t": 80485.0,
+              "shfe_t": 153221.0,
+              "total_t": 505081.0
+            },
+            {
+              "period": "2024-11-30",
+              "basis": "month end; unavailable exchanges remain blank",
+              "lme_t": 271000.0,
+              "comex_t": 82278.0,
+              "shfe_t": 108775.0,
+              "total_t": 462053.0
+            },
+            {
+              "period": "2024-12-31",
+              "basis": "month end; unavailable exchanges remain blank",
+              "lme_t": 271400.0,
+              "comex_t": 84514.0,
+              "shfe_t": 74172.0,
+              "total_t": 430086.0
+            }
+          ],
+          "monthly_source_url": "https://www.cochilco.cl/web/download/138/estadisticas-historico-inventarios-mundiales-de-cobre/13744/inventarios-mundiales-del-cobre-mensual-2.xlsx",
+          "monthly_sha256": "ab54732e57e47b66ac170f7845be143fdd2734b17cca9004fd0a1a183d489b3b",
+          "sha256": "9d61874b08eed0b79071be144b726dae3a3c2bbbeb75f28e3839f8fcf37ca5c2",
+          "parse_failures": [
+            {
+              "source_url": "https://www.cochilco.cl/web/download/1006/2026/15806/informe-del-mercado-internacional-del-cobre-semana-del-18-al-22-de-mayo-de-2026.pdf",
+              "error": "Exact inventory rows/units unavailable"
+            },
+            {
+              "source_url": "https://www.cochilco.cl/web/download/1006/2026/15712/informe-del-mercado-internacional-del-cobre-semana-del-27-al-30-de-abril-de-2026.pdf",
+              "error": "Exact inventory rows/units unavailable"
+            },
+            {
+              "source_url": "https://www.cochilco.cl/web/download/1006/2026/15700/informe-del-mercado-internacional-del-cobre-semana-del-20-al-24-de-abril-de-2026.pdf",
+              "error": "Exact inventory rows/units unavailable"
+            },
+            {
+              "source_url": "https://www.cochilco.cl/web/download/1006/2026/15685/informe-del-mercado-internacional-del-cobre-semana-del-13-al-17-de-abril-de-2026.pdf",
+              "error": "Exact inventory rows/units unavailable"
+            },
+            {
+              "source_url": "https://www.cochilco.cl/web/download/1006/2026/15661/informe-del-mercado-internacional-del-cobre-semana-del-06-al-10-de-abril-de-2026.pdf",
+              "error": "Exact inventory rows/units unavailable"
+            },
+            {
+              "source_url": "https://www.cochilco.cl/web/download/1006/2026/15468/informe-del-mercado-internacional-del-cobre-semana-02-al-06-de-marzo-de-2026.pdf",
+              "error": "Exact inventory rows/units unavailable"
+            },
+            {
+              "source_url": "https://www.cochilco.cl/web/download/1006/2026/15445/informe-del-mercado-internacional-del-cobre-semana-del-23-al-27-de-febrero-de-2026.pdf",
+              "error": "Exact inventory rows/units unavailable"
+            },
+            {
+              "source_url": "https://www.cochilco.cl/web/download/969/2025/14862/informe-del-mercado-internacional-del-cobre-semana-del-8-al-12-de-septiembre-de-2025.pdf",
+              "error": "Exact inventory rows/units unavailable"
+            },
+            {
+              "source_url": "https://www.cochilco.cl/web/download/969/2025/14076/informe-del-mercado-internacional-del-cobre-semana-del-7-al-11-de-julio-de-2025.pdf",
+              "error": "Exact inventory rows/units unavailable"
+            },
+            {
+              "source_url": "https://www.cochilco.cl/web/download/969/2025/13660/informe-del-mercado-internacional-del-cobre-semana-del-16-al-19-de-junio-de-2025.pdf",
+              "error": "Exact inventory rows/units unavailable"
+            },
+            {
+              "source_url": "https://www.cochilco.cl/web/download/969/2025/13534/informe-del-mercado-internacional-del-cobre-semana-del-19-al-23-de-mayo-de-2025.pdf",
+              "error": "Exact inventory rows/units unavailable"
+            },
+            {
+              "source_url": "https://www.cochilco.cl/web/download/969/2025/13515/informe-del-mercado-internacional-del-cobre-semana-del-12-al-16-de-mayo-de-2025.pdf",
+              "error": "Exact inventory rows/units unavailable"
+            },
+            {
+              "source_url": "https://www.cochilco.cl/web/download/969/2025/13483/informe-del-mercado-internacional-del-cobre-semana-del-5-al-9-de-mayo-de-2025.pdf",
+              "error": "Exact inventory rows/units unavailable"
+            },
+            {
+              "source_url": "https://www.cochilco.cl/web/download/969/2025/13419/informe-del-mercado-internacional-del-cobre-semana-del-21-al-25-de-abril-de-2025.pdf",
+              "error": "Exact inventory rows/units unavailable"
+            },
+            {
+              "source_url": "https://www.cochilco.cl/web/download/969/2025/13396/informe-del-mercado-internacional-del-cobre-semana-del-14-al-17-de-abril-de-2025.pdf",
+              "error": "Exact inventory rows/units unavailable"
+            },
+            {
+              "source_url": "https://www.cochilco.cl/web/download/969/2025/13372/informe-del-mercado-internacional-del-cobre-semana-del-7-al-11-de-abril-de-2025.pdf",
+              "error": "Exact inventory rows/units unavailable"
+            },
+            {
+              "source_url": "https://www.cochilco.cl/web/download/969/2025/13360/informe-del-mercado-internacional-del-cobre-semana-del-31-de-marzo-al-4-de-abril-de-2025.pdf",
+              "error": "Exact inventory rows/units unavailable"
+            },
+            {
+              "source_url": "https://www.cochilco.cl/web/download/969/2025/13288/informe-del-mercado-internacional-del-cobre-semana-del-24-al-28-de-marzo-de-2025.pdf",
+              "error": "Exact inventory rows/units unavailable"
+            },
+            {
+              "source_url": "https://www.cochilco.cl/web/download/969/2025/13266/informe-del-mercado-internacional-del-cobre-semana-del-17-al-21-de-marzo-de-2025.pdf",
+              "error": "Exact inventory rows/units unavailable"
+            },
+            {
+              "source_url": "https://www.cochilco.cl/web/download/969/2025/13241/informe-del-mercado-internacional-del-cobre-semana-del-10-al-14-de-marzo-de-2025.pdf",
+              "error": "Exact inventory rows/units unavailable"
+            },
+            {
+              "source_url": "https://www.cochilco.cl/web/download/969/2025/13218/informe-del-mercado-internacional-del-cobre-semana-del-03-al-07-de-marzo-de-2025.pdf",
+              "error": "Exact inventory rows/units unavailable"
+            },
+            {
+              "source_url": "https://www.cochilco.cl/web/download/969/2025/13171/informe-del-mercado-internacional-del-cobre-semana-del-24-al-28-de-febrero-de-2025.pdf",
+              "error": "Exact inventory rows/units unavailable"
+            },
+            {
+              "source_url": "https://www.cochilco.cl/web/download/969/2025/13117/informe-del-mercado-internacional-del-cobre-semana-del-03-al-07-de-febrero-de-2025.pdf",
+              "error": "Exact inventory rows/units unavailable"
+            },
+            {
+              "source_url": "https://www.cochilco.cl/web/download/969/2025/13088/informe-del-mercado-internacional-del-cobre-semana-del-27-al-31-de-enero-de-2025.pdf",
+              "error": "Exact inventory rows/units unavailable"
+            },
+            {
+              "source_url": "https://www.cochilco.cl/web/download/969/2025/13065/informe-del-mercado-internacional-del-cobre-semana-del-20-al-24-de-enero-de-2025.pdf",
+              "error": "Exact inventory rows/units unavailable"
+            },
+            {
+              "source_url": "https://www.cochilco.cl/web/download/969/2025/13043/informe-del-mercado-internacional-del-cobre-semana-del-13-al-17-de-enero-de-2025.pdf",
+              "error": "Exact inventory rows/units unavailable"
+            },
+            {
+              "source_url": "https://www.cochilco.cl/web/download/969/2025/13008/informe-del-mercado-internacional-del-cobre-semana-del-06-al-10-de-enero-de-2025.pdf",
+              "error": "Exact inventory rows/units unavailable"
+            },
+            {
+              "source_url": "https://www.cochilco.cl/web/download/969/2025/12979/informe-del-mercado-internacional-del-cobre-semana-del-30-de-diciembre-del-2024-al-03-de-enero-de-2025.pdf",
+              "error": "Exact inventory rows/units unavailable"
+            }
+          ],
+          "note": "Cochilco reports LME, COMEX and SHFE separately. Exchange location is not warehouse geography or freely available metal. Monthly history and weekly observations remain separate; gaps are not interpolated."
+        },
+        "copper_concentrate_report": {
+          "title": "Concentrate supply and smelter conditions",
+          "source_url": "https://www.cochilco.cl/web/download/1030/2026/16832/mercado-de-concentrados-e-industria-de-fundiciones-2026.pdf",
+          "status": "partial",
+          "fetched_at": "2026-10-28",
+          "sha256": "cd5e31eadaf0a7723212d482d11f1b08ad8f4d1cc46336daa5519e11b1183f73",
+          "period": "2025-12-31",
+          "publication_period": "2026-08",
+          "unit": "thousand tonnes contained copper",
+          "rows": [
+            {
+              "period": "2025",
+              "concentrate_supply_kt_cu": 18723,
+              "basis": "Cochilco / WMS published estimate"
+            }
+          ],
+          "note": "2026 report: 2025 global concentrate output is 18,723 kt of contained copper. Custom concentrate availability differs from integrated supply. The report supplies TC/RC and custom-balance charts, but no complete machine-readable, dated spot TC tape or matching global intake table. Chart values are not invented or mixed with refined copper balances."
+        }
       },
       "validation": [
         {
@@ -93925,8 +98119,8 @@
         "note": "FY2025 issuer AISC is shown separately. Three producers do not establish a global cost curve or a binding bullion price floor."
       },
       "input_coverage": {
-        "available": 3,
-        "total": 4,
+        "available": 5,
+        "total": 6,
         "items": [
           {
             "id": "gold_bullion",
@@ -93960,13 +98154,509 @@
           },
           {
             "id": "global_miner_cost_curve",
-            "status": "licensed_or_manual_source",
-            "reason": "FY2025 Newmont, Barrick and Agnico Eagle costs are attached. Broader standardized mine coverage is still needed for global percentiles; the three-company panel is not a bullion floor.",
-            "source_url": "https://www.gold.org/goldhub/data",
+            "status": "partial_public_evidence",
+            "reason": "Free Aurum regional mine curves, WGC global averages and company disclosures are attached below. The regional sample does not establish standardized global mine percentiles or a bullion price floor.",
+            "source_url": "https://www.aurumanalytics.com.au/reports_and_media",
+            "required": false
+          },
+          {
+            "id": "gold_regional_cost_curve",
+            "status": "available",
+            "last_observation": "2026-06-30",
+            "observations": 41,
+            "source_url": "https://www.aurumanalytics.com.au/pdf/2026_Q2_Aurum_Analytics_Quarterly_Gold_Report.pdf",
+            "unit": "AUD/oz",
+            "reason": "Australia/New Zealand reporting mines only. Costs retain AUD/oz and by-product credits, including negative values. Production is generally on a 100% basis, with publisher exceptions; this sample is not a global cost curve or a bullion price floor.",
+            "required": false
+          },
+          {
+            "id": "gold_global_average_cost",
+            "status": "available",
+            "last_observation": "2026-03-31",
+            "observations": 1,
+            "source_url": "https://www.gold.org/goldhub/gold-focus/2026/08/record-gold-prices-outpace-rising-mining-costs-q126",
+            "unit": "USD/oz",
+            "reason": "Limited public extract from WGC / Metals Focus. A global average does not supply mine-level global percentiles. Historical quarter, not current mining costs.",
             "required": false
           }
         ],
         "required_ready": true
+      },
+      "free_evidence": {
+        "gold_regional_cost_curve": {
+          "title": "Australia/New Zealand mine costs",
+          "source_url": "https://www.aurumanalytics.com.au/pdf/2026_Q2_Aurum_Analytics_Quarterly_Gold_Report.pdf",
+          "status": "available",
+          "fetched_at": "2026-10-28",
+          "period": "2026-06-30",
+          "rows": [
+            {
+              "period": "Northparkes",
+              "company": "Evolution Mining Limited",
+              "rank": 1,
+              "mine_type": "UG",
+              "aisc_aud_oz": -10696,
+              "production_oz": 5708,
+              "grade_g_t": 0.17,
+              "basis": "reported AISC; may include by-product credits"
+            },
+            {
+              "period": "Ernest Henry",
+              "company": "Evolution Mining Limited",
+              "rank": 2,
+              "mine_type": "UG",
+              "aisc_aud_oz": -4046,
+              "production_oz": 16714,
+              "grade_g_t": 0.44,
+              "basis": "reported AISC; may include by-product credits"
+            },
+            {
+              "period": "Karlawinda",
+              "company": "Capricorn Metals Limited",
+              "rank": 3,
+              "mine_type": "OP",
+              "aisc_aud_oz": 1648,
+              "production_oz": 30437,
+              "grade_g_t": 0.91,
+              "basis": "reported AISC; may include by-product credits"
+            },
+            {
+              "period": "Mt Magnet Operations",
+              "company": "Ramelius Resources Limited",
+              "rank": 4,
+              "mine_type": "OP/UG",
+              "aisc_aud_oz": 1973,
+              "production_oz": 55304,
+              "grade_g_t": 3.59,
+              "basis": "reported AISC; may include by-product credits"
+            },
+            {
+              "period": "Tropicana",
+              "company": "JV AngloGold/Regis Resources",
+              "rank": 5,
+              "mine_type": "OP/UG",
+              "aisc_aud_oz": 2226,
+              "production_oz": 130290,
+              "grade_g_t": 1.96,
+              "basis": "reported AISC; may include by-product credits"
+            },
+            {
+              "period": "Boddington",
+              "company": "Newmont Corporation",
+              "rank": 6,
+              "mine_type": "OP",
+              "aisc_aud_oz": 2285,
+              "production_oz": 160000,
+              "grade_g_t": 0.6,
+              "basis": "reported AISC; may include by-product credits"
+            },
+            {
+              "period": "Telfer",
+              "company": "Greatland Resources Limited",
+              "rank": 7,
+              "mine_type": "OP/UG",
+              "aisc_aud_oz": 2312,
+              "production_oz": 79100,
+              "grade_g_t": 0.53,
+              "basis": "reported AISC; may include by-product credits"
+            },
+            {
+              "period": "KCGM",
+              "company": "Northern Star Resources Limited",
+              "rank": 8,
+              "mine_type": "OP/UG",
+              "aisc_aud_oz": 2411,
+              "production_oz": 133972,
+              "grade_g_t": 2.2,
+              "basis": "reported AISC; may include by-product credits"
+            },
+            {
+              "period": "Cowal",
+              "company": "Evolution Mining Limited",
+              "rank": 9,
+              "mine_type": "OP/UG",
+              "aisc_aud_oz": 2473,
+              "production_oz": 74945,
+              "grade_g_t": 1.34,
+              "basis": "reported AISC; may include by-product credits"
+            },
+            {
+              "period": "Tomingley",
+              "company": "Alkane Resources Limited",
+              "rank": 10,
+              "mine_type": "UG",
+              "aisc_aud_oz": 2481,
+              "production_oz": 20896,
+              "grade_g_t": 2.27,
+              "basis": "reported AISC; may include by-product credits"
+            },
+            {
+              "period": "King of the Hills",
+              "company": "Vault Mineral Limited",
+              "rank": 11,
+              "mine_type": "OP/UG",
+              "aisc_aud_oz": 2556,
+              "production_oz": 48899,
+              "grade_g_t": 1.2,
+              "basis": "reported AISC; may include by-product credits"
+            },
+            {
+              "period": "Murchison1",
+              "company": "Westgold Resources Limited",
+              "rank": 12,
+              "mine_type": "UG",
+              "aisc_aud_oz": 2567,
+              "production_oz": 57591,
+              "grade_g_t": 2.3,
+              "basis": "reported AISC; may include by-product credits"
+            },
+            {
+              "period": "Costerfield",
+              "company": "Alkane Resources Limited",
+              "rank": 13,
+              "mine_type": "UG",
+              "aisc_aud_oz": 2568,
+              "production_oz": 10117,
+              "grade_g_t": 9.32,
+              "basis": "reported AISC; may include by-product credits"
+            },
+            {
+              "period": "Kalgoorlie Operations",
+              "company": "Northern Star Resources Limited",
+              "rank": 14,
+              "mine_type": "OP/UG",
+              "aisc_aud_oz": 2580,
+              "production_oz": 43368,
+              "grade_g_t": 3.3,
+              "basis": "reported AISC; may include by-product credits"
+            },
+            {
+              "period": "Bellevue",
+              "company": "Bellevue Gold Limited",
+              "rank": 15,
+              "mine_type": "UG",
+              "aisc_aud_oz": 2604,
+              "production_oz": 41643,
+              "grade_g_t": 4.5,
+              "basis": "reported AISC; may include by-product credits"
+            },
+            {
+              "period": "Plutonic",
+              "company": "Catalyst Metals Limited",
+              "rank": 16,
+              "mine_type": "OP/UG",
+              "aisc_aud_oz": 2666,
+              "production_oz": 31886,
+              "grade_g_t": 2.9,
+              "basis": "reported AISC; may include by-product credits"
+            },
+            {
+              "period": "Macraes",
+              "company": "OceanaGold Corporation",
+              "rank": 17,
+              "mine_type": "OP/UG",
+              "aisc_aud_oz": 2722,
+              "production_oz": 41400,
+              "grade_g_t": 0.95,
+              "basis": "reported AISC; may include by-product credits"
+            },
+            {
+              "period": "Mungari",
+              "company": "Evolution Mining Limited",
+              "rank": 18,
+              "mine_type": "OP/UG",
+              "aisc_aud_oz": 2732,
+              "production_oz": 45521,
+              "grade_g_t": 2.01,
+              "basis": "reported AISC; may include by-product credits"
+            },
+            {
+              "period": "Gwalia & Laverton",
+              "company": "Genesis Minerals Limited",
+              "rank": 19,
+              "mine_type": "OP/UG",
+              "aisc_aud_oz": 2797,
+              "production_oz": 70766,
+              "grade_g_t": 2.1,
+              "basis": "reported AISC; may include by-product credits"
+            },
+            {
+              "period": "Granny Smith",
+              "company": "Gold Fields Limited",
+              "rank": 20,
+              "mine_type": "UG",
+              "aisc_aud_oz": 2841,
+              "production_oz": 69400,
+              "grade_g_t": 6.03,
+              "basis": "reported AISC; may include by-product credits"
+            },
+            {
+              "period": "Tanami",
+              "company": "Newmont Corporation",
+              "rank": 21,
+              "mine_type": "UG",
+              "aisc_aud_oz": 2864,
+              "production_oz": 90000,
+              "grade_g_t": 4.59,
+              "basis": "reported AISC; may include by-product credits"
+            },
+            {
+              "period": "Agnew Lawlers",
+              "company": "Gold Fields Limited",
+              "rank": 22,
+              "mine_type": "UG",
+              "aisc_aud_oz": 3068,
+              "production_oz": 57500,
+              "grade_g_t": 5.46,
+              "basis": "reported AISC; may include by-product credits"
+            },
+            {
+              "period": "Carosue Dam",
+              "company": "Northern Star Resources Limited",
+              "rank": 23,
+              "mine_type": "OP/UG",
+              "aisc_aud_oz": 3082,
+              "production_oz": 47283,
+              "grade_g_t": 1.8,
+              "basis": "reported AISC; may include by-product credits"
+            },
+            {
+              "period": "Mount Monger",
+              "company": "Vault Mineral Limited",
+              "rank": 24,
+              "mine_type": "OP/UG",
+              "aisc_aud_oz": 3143,
+              "production_oz": 21338,
+              "grade_g_t": 2.2,
+              "basis": "reported AISC; may include by-product credits"
+            },
+            {
+              "period": "Thunderbox",
+              "company": "Northern Star Resources Limited",
+              "rank": 25,
+              "mine_type": "OP/UG",
+              "aisc_aud_oz": 3176,
+              "production_oz": 71706,
+              "grade_g_t": 1.5,
+              "basis": "reported AISC; may include by-product credits"
+            },
+            {
+              "period": "Jundee",
+              "company": "Northern Star Resources Limited",
+              "rank": 26,
+              "mine_type": "UG",
+              "aisc_aud_oz": 3288,
+              "production_oz": 55799,
+              "grade_g_t": 2.8,
+              "basis": "reported AISC; may include by-product credits"
+            },
+            {
+              "period": "Southern Goldfields",
+              "company": "Westgold Resources Limited",
+              "rank": 27,
+              "mine_type": "OP/UG",
+              "aisc_aud_oz": 3331,
+              "production_oz": 24758,
+              "grade_g_t": 2.0,
+              "basis": "reported AISC; may include by-product credits"
+            },
+            {
+              "period": "Crown Prince",
+              "company": "New Murchison Gold Limited",
+              "rank": 28,
+              "mine_type": "OP",
+              "aisc_aud_oz": 3448,
+              "production_oz": 16505,
+              "grade_g_t": 3.1,
+              "basis": "reported AISC; may include by-product credits"
+            },
+            {
+              "period": "St Ives",
+              "company": "Gold Fields Limited",
+              "rank": 29,
+              "mine_type": "OP/UG",
+              "aisc_aud_oz": 3495,
+              "production_oz": 86100,
+              "grade_g_t": 2.63,
+              "basis": "reported AISC; may include by-product credits"
+            },
+            {
+              "period": "Murchison",
+              "company": "Meeka Metals Limited",
+              "rank": 30,
+              "mine_type": "OP/UG",
+              "aisc_aud_oz": 3589,
+              "production_oz": 6424,
+              "grade_g_t": 1.7,
+              "basis": "reported AISC; may include by-product credits"
+            },
+            {
+              "period": "Duketon South",
+              "company": "Regis Resources Limited",
+              "rank": 31,
+              "mine_type": "OP/UG",
+              "aisc_aud_oz": 3642,
+              "production_oz": 62454,
+              "grade_g_t": 1.12,
+              "basis": "reported AISC; may include by-product credits"
+            },
+            {
+              "period": "Deflector",
+              "company": "Vault Mineral Limited",
+              "rank": 32,
+              "mine_type": "UG",
+              "aisc_aud_oz": 3761,
+              "production_oz": 19101,
+              "grade_g_t": 3.1,
+              "basis": "reported AISC; may include by-product credits"
+            },
+            {
+              "period": "Cracow",
+              "company": "Aeris Resources Limited",
+              "rank": 33,
+              "mine_type": "UG",
+              "aisc_aud_oz": 3812,
+              "production_oz": 10500,
+              "grade_g_t": 2.2,
+              "basis": "reported AISC; may include by-product credits"
+            },
+            {
+              "period": "Sunrise Dam",
+              "company": "AngloGold Ashanti Limited",
+              "rank": 34,
+              "mine_type": "OP/UG",
+              "aisc_aud_oz": 3863,
+              "production_oz": 49000,
+              "grade_g_t": 1.93,
+              "basis": "reported AISC; may include by-product credits"
+            },
+            {
+              "period": "Davyhurst",
+              "company": "Ora Banda Mining Limited",
+              "rank": 35,
+              "mine_type": "OP/UG",
+              "aisc_aud_oz": 3870,
+              "production_oz": 39552,
+              "grade_g_t": 2.41,
+              "basis": "reported AISC; may include by-product credits"
+            },
+            {
+              "period": "Waihi",
+              "company": "OceanaGold Corporation",
+              "rank": 36,
+              "mine_type": "UG",
+              "aisc_aud_oz": 4001,
+              "production_oz": 16500,
+              "grade_g_t": 2.61,
+              "basis": "reported AISC; may include by-product credits"
+            },
+            {
+              "period": "Norseman",
+              "company": "Pantoro Limited",
+              "rank": 37,
+              "mine_type": "OP/UG",
+              "aisc_aud_oz": 4107,
+              "production_oz": 18082,
+              "grade_g_t": 2.32,
+              "basis": "reported AISC; may include by-product credits"
+            },
+            {
+              "period": "Gruyere",
+              "company": "Gold Fields Limited",
+              "rank": 38,
+              "mine_type": "OP",
+              "aisc_aud_oz": 4419,
+              "production_oz": 66500,
+              "grade_g_t": 0.89,
+              "basis": "reported AISC; may include by-product credits"
+            },
+            {
+              "period": "Cadia Valley",
+              "company": "Newmont Corporation",
+              "rank": 39,
+              "mine_type": "UG",
+              "aisc_aud_oz": 4439,
+              "production_oz": 34000,
+              "grade_g_t": 0.47,
+              "basis": "reported AISC; may include by-product credits"
+            },
+            {
+              "period": "Henty",
+              "company": "Kaiser Reef Limited",
+              "rank": 40,
+              "mine_type": "UG",
+              "aisc_aud_oz": 5674,
+              "production_oz": 5563,
+              "grade_g_t": 3.0,
+              "basis": "reported AISC; may include by-product credits"
+            },
+            {
+              "period": "A1 & Maldon",
+              "company": "Kaiser Reef Limited",
+              "rank": 41,
+              "mine_type": "NM",
+              "aisc_aud_oz": 9719,
+              "production_oz": 437,
+              "grade_g_t": 0.59,
+              "basis": "reported AISC; may include by-product credits"
+            }
+          ],
+          "simple_average_aud_oz": 2768,
+          "sha256": "679ac3cd4ae209d828326357ca5b453c00f03a2e7b0c3c1df3bf19fc45bab53c",
+          "unit": "AUD/oz",
+          "history": [
+            {
+              "period": "2025-06-30",
+              "simple_average_aud_oz": 2335,
+              "source_url": "https://www.aurumanalytics.com.au/pdf/2025_Q2_Aurum_Analytics_Quarterly_Gold_Report_Final.pdf",
+              "sha256": "0c960228e59f0a5930a625c5cd0fd4c31e0d03aefaefa0d13d568599e88dde97"
+            },
+            {
+              "period": "2025-09-30",
+              "simple_average_aud_oz": 2494,
+              "source_url": "https://www.aurumanalytics.com.au/pdf/2025_Q3_Aurum_Analytics_Quarterly_Gold_Report_Final.pdf",
+              "sha256": "d83c5d651be20024faad43c0d0b1ef9afda72e30570961d5ff2c9ced20a45d0f"
+            },
+            {
+              "period": "2025-12-31",
+              "simple_average_aud_oz": 2239,
+              "source_url": "https://www.aurumanalytics.com.au/pdf/2025_Q4_Aurum_Analytics_Quarterly_Gold_Report_Final.pdf",
+              "sha256": "bddf7108a3e1049169b6c2291bf761fd0b991ec1e4e0810976f5ad51bd9f68c3"
+            },
+            {
+              "period": "2026-03-31",
+              "simple_average_aud_oz": 2870,
+              "source_url": "https://www.aurumanalytics.com.au/pdf/2026_Q1_Aurum_Analytics_Quarterly_Gold_Report_Final.pdf",
+              "sha256": "ac9c58e884280a97313744289d4a4c7a88d2ae96fc8a1c30f1d19ee0c9c69814"
+            },
+            {
+              "period": "2026-06-30",
+              "simple_average_aud_oz": 2768,
+              "source_url": "https://www.aurumanalytics.com.au/pdf/2026_Q2_Aurum_Analytics_Quarterly_Gold_Report.pdf",
+              "sha256": "679ac3cd4ae209d828326357ca5b453c00f03a2e7b0c3c1df3bf19fc45bab53c"
+            }
+          ],
+          "parse_failures": [],
+          "note": "Australia/New Zealand reporting mines only. Costs retain AUD/oz and by-product credits, including negative values. Production is generally on a 100% basis, with publisher exceptions; this sample is not a global cost curve or a bullion price floor."
+        },
+        "gold_global_average_cost": {
+          "title": "Global gold mining cost reference",
+          "source_url": "https://www.gold.org/goldhub/gold-focus/2026/08/record-gold-prices-outpace-rising-mining-costs-q126",
+          "status": "available",
+          "fetched_at": "2026-10-28",
+          "period": "2026-03-31",
+          "published_at": "2026-08-24",
+          "unit": "USD/oz",
+          "sha256": "763063482d7642be2525cea3d788e0aef3d5fac1698d9f1f711bff3df7a2bee3",
+          "rows": [
+            {
+              "period": "2026-Q1",
+              "aisc_usd_oz": 1785,
+              "basis": "WGC / Metals Focus published global average"
+            }
+          ],
+          "note": "Limited public extract from WGC / Metals Focus. A global average does not supply mine-level global percentiles. Historical quarter, not current mining costs."
+        }
       },
       "validation": [
         {
@@ -99238,7 +103928,7 @@
       },
       "input_coverage": {
         "available": 3,
-        "total": 6,
+        "total": 7,
         "items": [
           {
             "id": "gold_bullion",
@@ -99279,9 +103969,9 @@
           },
           {
             "id": "lease_rates",
-            "status": "licensed_or_manual_source",
-            "reason": "A dated consistent lease-rate history is needed for financing stress.",
-            "source_url": "https://www.lbma.org.uk/prices-and-data",
+            "status": "partial_public_evidence",
+            "reason": "World Silver Survey provides historical lease-rate ranges. A continuous series with a consistent tenor remains unavailable; isolated ranges are not current quotes.",
+            "source_url": "https://silverinstitute.org/silver-supply-demand/",
             "required": false
           },
           {
@@ -99290,9 +103980,55 @@
             "reason": "Technology adoption and silver intensity beyond published survey years remain explicit scenarios.",
             "source_url": "https://silverinstitute.org/silver-supply-demand/",
             "required": false
+          },
+          {
+            "id": "silver_liquidity_report",
+            "status": "partial",
+            "last_observation": "2026-02-28",
+            "observations": 3,
+            "source_url": "https://silverinstitute.org/wp-content/uploads/2026/04/World-Silver-Survey-2026.pdf",
+            "unit": "percent",
+            "reason": "World Silver Survey 2026, page 43. Lease rates were reported around 2–3% in mid-Q1; no exact day or consistent tenor is assigned. Non-ETP holdings remain privately owned: these percentages are not available float. Neither observation is a current financing quote.",
+            "required": false
           }
         ],
         "required_ready": true
+      },
+      "free_evidence": {
+        "silver_liquidity_report": {
+          "title": "Silver liquidity observations",
+          "source_url": "https://silverinstitute.org/wp-content/uploads/2026/04/World-Silver-Survey-2026.pdf",
+          "status": "partial",
+          "fetched_at": "2026-10-28",
+          "sha256": "dc7a35277822a20498319fc6737f17b9e8f8fa93e5ce49b6a6565967ae220383",
+          "period": "2026-02-28",
+          "publication_period": "2026-04",
+          "unit": "percent",
+          "rows": [
+            {
+              "period": "2024-12",
+              "non_etp_share_pct": 35,
+              "basis": "approximately; reported by Metals Focus"
+            },
+            {
+              "period": "2025-09",
+              "non_etp_share_pct": 17,
+              "basis": "reported by Metals Focus"
+            },
+            {
+              "period": "2026-02",
+              "non_etp_share_pct": 24,
+              "basis": "reported by Metals Focus"
+            }
+          ],
+          "lease_observation": {
+            "period": "mid-Q1 2026",
+            "low_pct": 2,
+            "high_pct": 3,
+            "tenor": "not specified in the cited paragraph"
+          },
+          "note": "World Silver Survey 2026, page 43. Lease rates were reported around 2–3% in mid-Q1; no exact day or consistent tenor is assigned. Non-ETP holdings remain privately owned: these percentages are not available float. Neither observation is a current financing quote."
+        }
       },
       "validation": [
         {

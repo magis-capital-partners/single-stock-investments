@@ -34,6 +34,10 @@ def refresh(output=DEFAULT_PANEL, as_of=None, history=True):
         prior=load(preserved/'observations.json',{})
         if (preserved/'forecast-vintages').is_dir():
             shutil.copytree(preserved/'forecast-vintages',output.parent/'forecast-vintages',dirs_exist_ok=True)
+        if (preserved/'free-vintages').is_dir():
+            shutil.copytree(preserved/'free-vintages',output.parent/'free-vintages',dirs_exist_ok=True)
+        if (preserved/'objects').is_dir():
+            shutil.copytree(preserved/'objects',output.parent/'objects',dirs_exist_ok=True)
     refs = {s['id']:s for p in CONFIG_DIR.glob('*.json') for s in load(p)['sources']}
     result = {'as_of':as_of.isoformat(), 'sources':{}, 'series':{}}
     def capture(item):
@@ -70,12 +74,17 @@ def refresh(output=DEFAULT_PANEL, as_of=None, history=True):
         from commodity_vintages import collect as collect_vintages
         try:result['oil_forecast_validation']=collect_vintages(download,result['series'],output.parent/'forecast-vintages',as_of)
         except Exception as exc:result['oil_forecast_validation']={**prior.get('oil_forecast_validation',{}),'status':'fetch_failed','error':type(exc).__name__}
+        from commodity_free_sources import collect as collect_free
+        result['free_inputs'],free_failures=collect_free(download,prior.get('free_inputs',{}),as_of,output.parent)
+        result['free_input_refresh']={'status':'partial' if free_failures else 'complete','failed_datasets':free_failures}
         # Archive every fetched vintage for later tests; do not overwrite history.
         save(output.parent/'vintages'/(as_of.isoformat()+'-'+digest(result['series'])[:12]+'.json'),result['series'])
     else:
         result['series']=prior.get('series',{})
         result['history_refresh']=prior.get('history_refresh',{'status':'not_requested'})
         result['oil_forecast_validation']=prior.get('oil_forecast_validation',{})
+        result['free_inputs']=prior.get('free_inputs',{})
+        result['free_input_refresh']=prior.get('free_input_refresh',{'status':'not_requested'})
     save(output,result)
     return result
 

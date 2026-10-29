@@ -41,7 +41,7 @@ jobs:
       - uses: ./.github/actions/checkout-vault
         with:
           hydrate: 'false'
-      - run: pip install pymupdf pypdf xlrd google-api-python-client google-auth
+      - run: pip install pymupdf pypdf xlrd google-api-python-client google-auth legacy-doc mobi
       - name: Install scan language data
         if: inputs.recover_scans
         run: sudo apt-get update && sudo apt-get install -y tesseract-ocr-eng tesseract-ocr-jpn tesseract-ocr-chi-sim
@@ -56,6 +56,24 @@ jobs:
           args=()
           if [ "$SCANS" = "true" ]; then args+=(--only-status needs_ocr --ocr); fi
           python _system/scripts/backfill_company_sources.py --discover-drive --audit-cache --seconds "$BUDGET" "${args[@]}"
+      - name: Check for transcripts to recover
+        if: ${{ !inputs.recover_scans }}
+        id: media
+        run: |
+          python - <<'PY'
+          import os, sqlite3
+          db = sqlite3.connect('_private/company-research/cache/work.sqlite')
+          pending = db.execute("SELECT COUNT(*) FROM jobs WHERE status='needs_transcript'").fetchone()[0]
+          with open(os.environ['GITHUB_OUTPUT'], 'a') as output:
+              print('pending=' + str(bool(pending)).lower(), file=output)
+          PY
+      - name: Recover newly discovered recordings
+        if: steps.media.outputs.pending == 'true'
+        env:
+          WHISPER_THREADS: '2'
+        run: |
+          pip install faster-whisper
+          python _system/scripts/backfill_company_sources.py --skip-seed --only-status needs_transcript --transcribe --seconds 600
       - name: Save private checkpoint and results
         if: always()
         run: python _system/scripts/company_source_cache.py pack --cache _private/company-research/cache --archive "$RESEARCH_VAULT_ROOT/dashboard-private/company-source-backfill"

@@ -20,6 +20,7 @@ import time
 from urllib.parse import quote
 
 from company_sources import CATEGORIES, SOURCE_SUFFIXES, Matcher, SourceIndex, category, date_from, digest, extract, retain_previous, tokens
+from company_extract_formats import EXTRA_SUFFIXES
 
 ROOT = Path(__file__).resolve().parents[2]
 VAULT_COLLECTIONS = ("superinvestor-letters", "vic-research", "sumzero-research", "investment-wisdom", "manager-meetings", "expert-calls", "expert_calls", "valueline", "podcasts", "videos", "dropbox-ingestion", "short-research", "activist-research", "filings-extracts")
@@ -108,7 +109,7 @@ def safe_files(directory: Path):
         subdirs[:] = sorted(d for d in subdirs if d not in SKIP_PARTS and not d.startswith("."))
         for name in sorted(names):
             path = Path(folder) / name
-            if path.suffix.lower() in SOURCE_SUFFIXES and name not in IGNORE_NAMES and not name.endswith(".meta.json"):
+            if path.suffix.lower() in SOURCE_SUFFIXES | EXTRA_SUFFIXES and name not in IGNORE_NAMES and not name.endswith(".meta.json"):
                 yield path
 
 
@@ -220,7 +221,13 @@ class Builder:
 
     def base(self, identity, title, origin, *, text="", state="indexed", date=None, author=None, period=None, explicit=(), locations=(), mime="", path=""):
         match_text = text
-        if explicit and Path(path).suffix.lower() in {".json", ".csv", ".tsv"}:
+        issuer_owned = bool(explicit) and any('/'+folder+'/' in '/'+path.replace('\\','/') for folder in ('investor-documents','financials','models'))
+        if issuer_owned:
+            # An issuer's filings and operating data belong to that issuer.
+            # Incidental banks, vendors and peers in its disclosures should not
+            # flood other company libraries. The complete body remains searchable.
+            match_text = ""
+        elif explicit and Path(path).suffix.lower() in {".json", ".csv", ".tsv"}:
             # Company-owned tables already have issuer identity. Discover other
             # issuers only in narrative fields, never among numeric observations
             # or schema keys. The full original remains indexed for search.
@@ -246,8 +253,15 @@ class Builder:
         match_title = title[:-len(suffix)] if suffix in SOURCE_SUFFIXES else title
         match_key = digest(self.match_version + match_title + digest(match_text) + json.dumps(list(explicit)))
         if match_key not in self.matches:
-            self.matches[match_key] = self.matcher.match(match_title, match_text, explicit)
+            checkpoint = self.cache / "match-work" / match_key[:2] / (match_key + ".json")
+            matched = load(checkpoint, None) if checkpoint.is_file() else None
+            if not isinstance(matched, list) or len(matched) != 2:
+                matched = self.matcher.match(match_title, match_text, explicit)
+                write(checkpoint, matched)
+            self.matches[match_key] = matched
         links, review = self.matches[match_key]
+        if issuer_owned:
+            links = [item for item in links if item['ticker'] in explicit]
         record = {"id": digest(identity)[:32], "title": title, "category": category(path or title, mime), "date": date or date_from(title), "author": author or "", "period": period,
                   "origins": [origin], "locations": list(locations), "text": text, "processing_status": state,
                   "relationships": list(links), "review": list(review), "availability": "available", "indexed_at": self.now,
@@ -329,8 +343,8 @@ class Builder:
         record["content_hash"] = sha
         record["content_md5"] = hashlib.md5(data, usedforsecurity=False).hexdigest()
         record["format"] = path.suffix.lstrip(".")
-        extraction = load(self.cache / "text" / (sha + ".json")).get("extraction", {}) if path.suffix.lower() == ".pdf" else {}
-        if extraction.get("ocr_pages"):
+        extraction = load(self.cache / "text" / (sha + ".json")).get("extraction", {})
+        if extraction.get("ocr_pages") or extraction.get("ocr_chapters"):
             record["extraction_review"] = "Automatic OCR; verify against the original"
         elif media_cache.get("transcript_kind") == "automatic":
             record["extraction_review"] = "Automatic transcript; verify against the original"
@@ -449,6 +463,8 @@ class Builder:
             except Exception as exc:
                 self.receipt("shared:" + collection, count, "failed", type(exc).__name__)
         self.shared_models()
+        from company_commodity_sources import build as commodity_originals
+        commodity_originals(self)
 
     def shared_models(self):
         count = 0
@@ -515,7 +531,7 @@ class Builder:
             if len(parts) < 3 or parts[0] not in self.companies or parts[1] not in {"research", "third-party-analyses", "investor-documents", "models", "transcripts", "financials"}:
                 continue
             path = Path(rel)
-            if path.suffix.lower() not in SOURCE_SUFFIXES or path.name in IGNORE_NAMES:
+            if path.suffix.lower() not in SOURCE_SUFFIXES | EXTRA_SUFFIXES or path.name in IGNORE_NAMES:
                 continue
             if "sec-edgar" in parts and path.suffix.lower() not in {".htm", ".html", ".txt", ".pdf"}:
                 continue
@@ -543,10 +559,12 @@ class Builder:
             locations = [{"kind":"repository","url":url,"label":"Research original"}]
             locations = self.refs.get(rel) or locations
             record = self.base("git:"+sha,path.stem.replace("_"," "),"git_inventory",text=cached.get("text", ""),explicit=[parts[0]],state=cached.get("status", "awaiting_extraction"),locations=locations,path=rel)
-            if cached.get("extraction", {}).get("ocr_pages"):
+            if cached.get("extraction", {}).get("ocr_pages") or cached.get("extraction", {}).get("ocr_chapters"):
                 record["extraction_review"] = "Automatic OCR; verify against the original"
             if cached.get('content_md5'):record['content_md5']=cached['content_md5']
             self.add(record,["git:"+sha,"path:"+rel]+(['md5:'+cached['content_md5']] if cached.get('content_md5') else []))
+            if count % 5000 == 0:
+                print(f"Research inventory: git: {count} originals processed", flush=True)
         self.receipt("git_inventory",count)
         # Discovery is complete when the committed tree and its metadata have
         # been read. Extraction status remains separate on each original.
@@ -700,7 +718,7 @@ class Builder:
                     if mime in exports:
                         export_mime, suffix = exports[mime]
                         data = execute_with_retry(service.files().export_media(fileId=item.get('download_id',item["id"]), mimeType=export_mime))
-                    elif Path(name).suffix.lower() in SOURCE_SUFFIXES and not mime.startswith(("audio/", "video/")):
+                    elif Path(name).suffix.lower() in SOURCE_SUFFIXES | EXTRA_SUFFIXES and not mime.startswith(("audio/", "video/")):
                         suffix = Path(name).suffix.lower()
                         data = execute_with_retry(service.files().get_media(fileId=item.get('download_id',item["id"]), supportsAllDrives=True))
                     else:
@@ -718,8 +736,10 @@ class Builder:
             already_matched = bool(old_text and text == old_text and old.get("processing_status") == "indexed")
             rec = self.base(identity, name, "drive", text="" if already_matched else text, state=state, explicit=explicit, locations=[{"kind": "drive", "url": url, "label": "Open original"}], mime=item["mimeType"], path=full)
             rec["text"] = text
-            if cached.get("extraction", {}).get("ocr_pages"):
+            if cached.get("extraction", {}).get("ocr_pages") or cached.get("extraction", {}).get("ocr_chapters"):
                 rec["extraction_review"] = "Automatic OCR; verify against the original"
+            elif cached.get("extraction", {}).get("transcript_kind") == "automatic":
+                rec["extraction_review"] = "Automatic transcript; verify against the original"
             rec.update({"family": "drive:" + item["id"], "revision": revision, "modified_at": item.get("modifiedTime"), "format": item["mimeType"]})
             if state == "access_unavailable":
                 rec["availability"] = "access_unavailable"
