@@ -113,8 +113,11 @@ def source_fingerprint(root, ticker):
     source = read(root/'_system/reference/market-data/valuation_fundamentals'/(ticker+'.json'))
     points = primary_kpis(root, ticker)
     kpis = {'points': points} if points else {}
-    return semantic_json_sha256({'facts': source.get('facts') or [], 'primary_observations': source.get('primary_observations') or [],
-                                'latest_report': source.get('latest_report'), 'operating_kpis': kpis},
+    payload = {'facts': source.get('facts') or [], 'primary_observations': source.get('primary_observations') or [],
+               'latest_report': source.get('latest_report'), 'operating_kpis': kpis}
+    if source.get('latest_disclosure'):
+        payload['latest_disclosure'] = source['latest_disclosure']
+    return semantic_json_sha256(payload,
                                volatile_keys={'retrieved_at', 'fetched_at', 'updated_at', 'generated_at', 'last_collected', 'attempted_at', 'checked_at'})
 
 
@@ -263,7 +266,18 @@ def prepare_packet(root: Path, ticker: str, as_of: str, *, collect=True, client=
             observations.append(observation)
         except (BasisGap, ContractError):
             continue
-    documents, errors = [], []
+    documents, errors = copy.deepcopy(data.get('primary_documents') or []), []
+    if focus_keywords and documents:
+        from valuation_earnings import primary_document
+        for index, document in enumerate(documents):
+            try:
+                reader = client or SecClient(max_attempts=2)
+                raw = reader.get_bytes(document['source_url'], timeout=40)
+                focused = primary_document(document['source_url'], raw, {k: document[k] for k in ('form', 'filed', 'accession', 'as_of')}, focus_keywords)
+                focused.setdefault('period', document.get('period'))
+                documents[index] = focused
+            except (OSError, ValueError, KeyError, TypeError):
+                pass
     cik = (registry.get(ticker, {}).get('download') or {}).get('cik')
     if cik:
         client = client or SecClient(max_attempts=2)
@@ -292,7 +306,7 @@ def prepare_packet(root: Path, ticker: str, as_of: str, *, collect=True, client=
                     chosen.add(form)
                 except (OSError, ValueError) as exc:
                     errors.append({'source': url, 'error': type(exc).__name__})
-                if len(documents) >= 2:
+                if len(chosen) >= 2:
                     break
         except (OSError, ValueError) as exc:
             errors.append({'source': 'sec_submissions', 'error': type(exc).__name__})
@@ -329,7 +343,7 @@ def prepare_packet(root: Path, ticker: str, as_of: str, *, collect=True, client=
               'observations': observations, 'documents': documents, 'collection_errors': errors,
               'split_events': [{'date': e['date'], 'ratio': e['ratio']} for e in market['events']]}
     for document in documents:
-        if document.get('period') and document.get('filed', '') > packet['latest_report'].get('filed', ''):
+        if document.get('period') and (document['period'], document.get('filed', '')) > (packet['latest_report'].get('period', ''), packet['latest_report'].get('filed', '')):
             packet['latest_report'] = {'period': document['period'], 'filed': document['filed'], 'source_url': document['source_url']}
     # The packet and every downstream consumer share the discovered report marker.
     # This is source metadata, never a new economic-model review date.
@@ -364,7 +378,7 @@ def evidence_readiness(packet, *, require_documents=False):
         gaps.append({'code': 'latest_primary_document_missing', 'detail': 'Retrieve the newly discovered report, including financial tables.'})
     if require_documents and not any(d.get('form') in ('10-K', '20-F', '40-F') for d in docs):
         gaps.append({'code': 'annual_primary_document_missing', 'detail': 'Retrieve the annual report and business/financing disclosures.'})
-    if require_documents and packet.get('source_discovery', {}).get('status') == 'failed':
+    if require_documents and packet.get('source_discovery', {}).get('status') in ('failed', 'earnings_unresolved'):
         gaps.append({'code': 'report_discovery_failed', 'detail': 'Retry primary submissions; old cached reports do not prove freshness.'})
     return {'status': 'ready' if not gaps else 'evidence_gap', 'gaps': gaps,
             'primary_observations': len(primary), 'documents': len(docs),

@@ -56,12 +56,13 @@ def calculate(ticker, root, as_of, evaluated_at=None):
     cached = read(root/QUOTES/(ticker+'.json'))
     automatic = read(root/'_system/reference/market-data/compounders'/(ticker+'.json'))
     quote = cached.get('quote') or automatic.get('quote')
-    market = copy.deepcopy(cached.get('corporate_actions') or {})
+    market = copy.deepcopy(cached.get('corporate_actions') or valuation.get('market_snapshot') or {})
     if cached.get('identity', {}).get('status') == 'mismatch' and quote:
         quote = {**quote, 'value': None, 'identity_status': 'mismatch', 'identity': cached['identity']}
     generated = False
     legacy = False
     facts = read(root/FUNDAMENTALS/(ticker+'.json')) or automatic
+    market['source_discovery'] = facts.get('report_discovery') or {}
     if facts.get('latest_report'):
         market['latest_report'] = facts['latest_report']
     if valuation.get('underwriting') or (root/ticker/'research/underwriting_receipt.json').is_file():
@@ -71,7 +72,9 @@ def calculate(ticker, root, as_of, evaluated_at=None):
             receipt = validate_saved(root, ticker, research_vault_root())
             if not receipt:
                 raise ValueError('Underwriting receipt missing')
-            market['underwriting_validation'] = {'status': 'verified', 'contract_hash': receipt['contract_hash']}
+            from underwriting_evidence import source_fingerprint
+            market['underwriting_validation'] = {'status': 'verified', 'contract_hash': receipt['contract_hash'],
+                'input_fingerprint_matches': receipt.get('input_fingerprint') == source_fingerprint(root, ticker)}
         except (ValueError, OSError, KeyError, TypeError):
             market['underwriting_validation'] = {'status': 'unverified'}
             # A stale receipt also blocks an overwritten source model that
@@ -232,11 +235,12 @@ def refresh_missing_model_inputs(ticker, row, root, as_of, registry):
     unchanged = financial_signature(prior, cached) == financial_signature(data, cached)
     anchor = prior.get('model_anchor') if unchanged else as_of
     def evidence_signature(value):
-        return semantic_json_sha256({k: value.get(k) for k in ('facts', 'primary_observations', 'latest_report')},
+        return semantic_json_sha256({k: value.get(k) for k in ('facts', 'primary_observations', 'latest_report', 'latest_disclosure')},
                                     volatile_keys={'retrieved_at', 'attempted_at', 'collected_at'})
     collected_at = prior.get('collected_at') if evidence_signature(prior) == evidence_signature(data) else None
     saved = {'facts': data.get('facts') or [], 'quote': data.get('quote'), 'model_anchor': anchor or as_of,
              'primary_observations': data.get('primary_observations') or [], 'report_discovery': data.get('report_discovery') or {},
+             'primary_documents': data.get('primary_documents') or [], 'latest_disclosure': data.get('latest_disclosure'),
              'collected_at': collected_at or data.get('attempted_at'),
              'latest_report': data.get('latest_report') or prior.get('latest_report'),
              'financial_hash': financial_hash, 'last_collected': as_of, 'fx': data.get('fx'), 'errors': data.get('errors') or []}
