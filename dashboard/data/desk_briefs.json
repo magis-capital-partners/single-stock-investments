@@ -1,6 +1,6 @@
 {
   "schema_version": "desk_briefs.v1",
-  "generated_at": "2026-10-29T19:11:20Z",
+  "generated_at": "2026-10-29T19:28:19Z",
   "caption": "Ranked output from the Magis desk bots, one brief per desk per day, filed by pull request and checked by schema. A brief is research only: it carries no authority, sizes nothing, and never enters a base IRR. The one number on each row is the dashboard's or the filing's, not the bot's.",
   "desks": [
     {
@@ -9,7 +9,7 @@
       "owner": "drew",
       "author": "grok-drew-special-situations",
       "as_of": "2026-10-29",
-      "age_hours": 19.2,
+      "age_hours": 19.5,
       "stale": false,
       "path": "_system/data/desk_briefs/special_situations/2026-10-29.json",
       "items": [
@@ -142,7 +142,7 @@
       "owner": "drew",
       "author": "grok-drew-activism",
       "as_of": "2026-10-29",
-      "age_hours": 19.2,
+      "age_hours": 19.5,
       "stale": false,
       "path": "_system/data/desk_briefs/activism/2026-10-29.json",
       "items": [
@@ -221,7 +221,7 @@
       "owner": "drew",
       "author": "codex-core-compounders",
       "as_of": "2026-10-27",
-      "age_hours": 67.2,
+      "age_hours": 67.5,
       "stale": false,
       "path": "_system/data/desk_briefs/fundamentals/2026-10-27.json",
       "items": [
@@ -430,12 +430,197 @@
       "notes": null
     },
     {
+      "desk": "nol_tax_assets",
+      "desk_label": "NOL and Tax Assets",
+      "owner": "drew",
+      "author": "grok-drew-nol-tax-assets",
+      "as_of": "2026-10-29",
+      "age_hours": 19.5,
+      "stale": false,
+      "path": "_system/data/desk_briefs/nol_tax_assets/2026-10-29.json",
+      "items": [
+        {
+          "ticker": "unresolved",
+          "headline": "VNDA: the Q3 10-Q maintains a valuation allowance against all net deferred tax assets.",
+          "one_number": "full valuation allowance at 2026-09-30",
+          "lane": "needs_review",
+          "evidence": [
+            {
+              "kind": "filing",
+              "ref": "10-Q accession 0001347178-26-000002, heading 11. Income Taxes",
+              "url": "https://www.sec.gov/Archives/edgar/data/1347178/000134717826000002/0001347178-26-000002.txt"
+            }
+          ],
+          "confidence": "filing",
+          "next": "Fact: allowance against all net DTAs at 2026-09-30 and 2025-12-31; Q4 2025 non-cash charge $113.7 million. Not cash. No 382 dollar limit in that passage.",
+          "handoff": null
+        },
+        {
+          "ticker": "unresolved",
+          "headline": "SIRI: the Q3 exhibit shows income before income taxes of 416 and tax expense of (99).",
+          "one_number": "416 pretax and tax (99), in millions",
+          "lane": "actionable",
+          "evidence": [
+            {
+              "kind": "filing",
+              "ref": "8-K accession 0000908937-26-000027, exhibit in millions",
+              "url": "https://www.sec.gov/Archives/edgar/data/908937/000090893726000027/0000908937-26-000027.txt"
+            }
+          ],
+          "confidence": "filing",
+          "next": "Fact: parentheses are the filing's. No NOL or Section 382 dollar limit in those lines. Not a buy case.",
+          "handoff": null
+        },
+        {
+          "ticker": "unresolved",
+          "headline": "NWL: Beade's Form 4 reports a 129,390-share award on 2026-10-26.",
+          "one_number": "129,390 shares, code A (Form 4)",
+          "lane": "ownership_change_risk",
+          "evidence": [
+            {
+              "kind": "filing",
+              "ref": "Form 4 accession 0002160533-26-000008",
+              "url": "https://www.sec.gov/Archives/edgar/data/2160533/000216053326000008/0002160533-26-000008.txt"
+            }
+          ],
+          "confidence": "filing",
+          "next": "Fact: transaction code A, 129390 shares. Inference: an insider award is not itself a Section 382 ownership change. Form 3 0002160533-26-000006 did not contain that share count.",
+          "handoff": null
+        },
+        {
+          "ticker": "unresolved",
+          "headline": "SIRI: still on the screener actionable list. That is not a reason to buy.",
+          "one_number": "screener actionable (not a buy case)",
+          "lane": "actionable",
+          "evidence": [
+            {
+              "kind": "dashboard",
+              "ref": "nol_screener.json SIRI material_after_382. built 2026-10-29T09:19:37Z",
+              "url": null
+            }
+          ],
+          "confidence": "provider",
+          "next": "Fact: screener usability is material_after_382. An NOL is not the buy thesis. No present value.",
+          "handoff": null
+        },
+        {
+          "ticker": "unresolved",
+          "headline": "WYY: still on the screener actionable list. That is not a reason to buy.",
+          "one_number": "screener actionable (not a buy case)",
+          "lane": "actionable",
+          "evidence": [
+            {
+              "kind": "dashboard",
+              "ref": "nol_screener.json WYY material_after_382. built 2026-10-29T09:19:37Z",
+              "url": null
+            }
+          ],
+          "confidence": "provider",
+          "next": "Fact: screener usability is material_after_382. An NOL is not the buy thesis. No present value.",
+          "handoff": null
+        },
+        {
+          "ticker": "unresolved",
+          "headline": "NWL: still on the screener actionable list. That is not a reason to buy.",
+          "one_number": "screener actionable (not a buy case)",
+          "lane": "actionable",
+          "evidence": [
+            {
+              "kind": "dashboard",
+              "ref": "nol_screener.json NWL material_after_382. built 2026-10-29T09:19:37Z",
+              "url": null
+            }
+          ],
+          "confidence": "provider",
+          "next": "Fact: screener usability is material_after_382. An NOL is not the buy thesis. No present value.",
+          "handoff": null
+        },
+        {
+          "ticker": "BIIB",
+          "headline": "BIIB: the screener's 283.4 percent allowance ratio mixes two different DTA tags.",
+          "one_number": "283.4% allowance ratio (data error)",
+          "lane": "needs_review",
+          "evidence": [
+            {
+              "kind": "dashboard",
+              "ref": "nol_screener.json BIIB allowance_pct 283.4; dta_gross_usd 293700000; allowance 832200000",
+              "url": null
+            },
+            {
+              "kind": "filing",
+              "ref": "10-Q accession 0000875045-26-000096 DeferredIncomeTaxAssetsNet 293700000 at 2026-09-30",
+              "url": "https://www.sec.gov/Archives/edgar/data/875045/000087504526000096/0000875045-26-000096.txt"
+            },
+            {
+              "kind": "filing",
+              "ref": "10-K accession 0000875045-26-000013 valuation allowance 832200000 at 2025-12-31",
+              "url": "https://www.sec.gov/Archives/edgar/data/875045/000087504526000013/0000875045-26-000013.txt"
+            }
+          ],
+          "confidence": "filing",
+          "next": "Fact: net DTA at 2025-12-31 is 2305100000. Do not use 283.4 percent. Correction proposal, not a screener edit. Not a buy case.",
+          "handoff": null
+        },
+        {
+          "ticker": "unresolved",
+          "headline": "ATNM: the screener's 26932 percent allowance ratio uses net DTA in the gross field.",
+          "one_number": "26932% allowance ratio (data error)",
+          "lane": "needs_review",
+          "evidence": [
+            {
+              "kind": "dashboard",
+              "ref": "nol_screener.json ATNM dta_gross_usd 431000; allowance 116077000; allowance_pct 26932",
+              "url": null
+            },
+            {
+              "kind": "filing",
+              "ref": "10-K accession 0001213900-26-036504 gross DTA 116508000; net DTA 431000; allowance 116077000",
+              "url": "https://www.sec.gov/Archives/edgar/data/1388320/000121390026036504/0001213900-26-036504.txt"
+            }
+          ],
+          "confidence": "filing",
+          "next": "Fact: same period, three tags. Inference: dividing the allowance by gross DTA is about 99.6 percent, not 26932. Not a filed percentage. Not a buy case.",
+          "handoff": null
+        }
+      ],
+      "inputs_read": [
+        {
+          "path": "dashboard/data/nol_screener.json",
+          "generated_at": "2026-10-29T09:19:37Z",
+          "age_hours_at_read": 14.7,
+          "exists": true
+        },
+        {
+          "path": "dashboard/data/nol_382_facts.json",
+          "generated_at": "2026-10-29T16:47:08Z",
+          "age_hours_at_read": 7.2,
+          "exists": true
+        },
+        {
+          "path": "_system/portfolio/registry.json",
+          "generated_at": "2026-10-29T09:17:36Z",
+          "age_hours_at_read": 14.7,
+          "exists": true
+        },
+        {
+          "path": "_system/data/desk_briefs/schema.json",
+          "generated_at": null,
+          "age_hours_at_read": null,
+          "exists": true
+        }
+      ],
+      "screens_empty": [
+        "rights_plan"
+      ],
+      "notes": "Facts file rebuilt from EDGAR in this commit; the draft had read 2026-08-12 (78 days). Blocker tally, fact, matches nol_screener.json built 2026-10-29: fully reserved 61; prior ownership change 2; carryforward above the screener model 8; DTA mostly timing 16; rights plan 1; needs review 1; no NOL component 13; no market cap 21; stale CIK 4. No present value. No control premium. A deferred tax asset is not cash. No Section 382 dollar limit unless an item names an accession."
+    },
+    {
       "desk": "tape_index",
       "desk_label": "Index, forced flow and tape",
       "owner": "drew",
       "author": "grok-drew-tape-index",
       "as_of": "2026-10-29",
-      "age_hours": 19.2,
+      "age_hours": 19.5,
       "stale": false,
       "path": "_system/data/desk_briefs/tape_index/2026-10-29.json",
       "items": [
@@ -1097,6 +1282,189 @@
       "stale": false
     },
     {
+      "ticker": "unresolved",
+      "headline": "VNDA: the Q3 10-Q maintains a valuation allowance against all net deferred tax assets.",
+      "one_number": "full valuation allowance at 2026-09-30",
+      "lane": "needs_review",
+      "evidence": [
+        {
+          "kind": "filing",
+          "ref": "10-Q accession 0001347178-26-000002, heading 11. Income Taxes",
+          "url": "https://www.sec.gov/Archives/edgar/data/1347178/000134717826000002/0001347178-26-000002.txt"
+        }
+      ],
+      "confidence": "filing",
+      "next": "Fact: allowance against all net DTAs at 2026-09-30 and 2025-12-31; Q4 2025 non-cash charge $113.7 million. Not cash. No 382 dollar limit in that passage.",
+      "handoff": null,
+      "desk": "nol_tax_assets",
+      "owner": "drew",
+      "as_of": "2026-10-29",
+      "author": "grok-drew-nol-tax-assets",
+      "stale": false
+    },
+    {
+      "ticker": "unresolved",
+      "headline": "SIRI: the Q3 exhibit shows income before income taxes of 416 and tax expense of (99).",
+      "one_number": "416 pretax and tax (99), in millions",
+      "lane": "actionable",
+      "evidence": [
+        {
+          "kind": "filing",
+          "ref": "8-K accession 0000908937-26-000027, exhibit in millions",
+          "url": "https://www.sec.gov/Archives/edgar/data/908937/000090893726000027/0000908937-26-000027.txt"
+        }
+      ],
+      "confidence": "filing",
+      "next": "Fact: parentheses are the filing's. No NOL or Section 382 dollar limit in those lines. Not a buy case.",
+      "handoff": null,
+      "desk": "nol_tax_assets",
+      "owner": "drew",
+      "as_of": "2026-10-29",
+      "author": "grok-drew-nol-tax-assets",
+      "stale": false
+    },
+    {
+      "ticker": "unresolved",
+      "headline": "NWL: Beade's Form 4 reports a 129,390-share award on 2026-10-26.",
+      "one_number": "129,390 shares, code A (Form 4)",
+      "lane": "ownership_change_risk",
+      "evidence": [
+        {
+          "kind": "filing",
+          "ref": "Form 4 accession 0002160533-26-000008",
+          "url": "https://www.sec.gov/Archives/edgar/data/2160533/000216053326000008/0002160533-26-000008.txt"
+        }
+      ],
+      "confidence": "filing",
+      "next": "Fact: transaction code A, 129390 shares. Inference: an insider award is not itself a Section 382 ownership change. Form 3 0002160533-26-000006 did not contain that share count.",
+      "handoff": null,
+      "desk": "nol_tax_assets",
+      "owner": "drew",
+      "as_of": "2026-10-29",
+      "author": "grok-drew-nol-tax-assets",
+      "stale": false
+    },
+    {
+      "ticker": "unresolved",
+      "headline": "SIRI: still on the screener actionable list. That is not a reason to buy.",
+      "one_number": "screener actionable (not a buy case)",
+      "lane": "actionable",
+      "evidence": [
+        {
+          "kind": "dashboard",
+          "ref": "nol_screener.json SIRI material_after_382. built 2026-10-29T09:19:37Z",
+          "url": null
+        }
+      ],
+      "confidence": "provider",
+      "next": "Fact: screener usability is material_after_382. An NOL is not the buy thesis. No present value.",
+      "handoff": null,
+      "desk": "nol_tax_assets",
+      "owner": "drew",
+      "as_of": "2026-10-29",
+      "author": "grok-drew-nol-tax-assets",
+      "stale": false
+    },
+    {
+      "ticker": "unresolved",
+      "headline": "WYY: still on the screener actionable list. That is not a reason to buy.",
+      "one_number": "screener actionable (not a buy case)",
+      "lane": "actionable",
+      "evidence": [
+        {
+          "kind": "dashboard",
+          "ref": "nol_screener.json WYY material_after_382. built 2026-10-29T09:19:37Z",
+          "url": null
+        }
+      ],
+      "confidence": "provider",
+      "next": "Fact: screener usability is material_after_382. An NOL is not the buy thesis. No present value.",
+      "handoff": null,
+      "desk": "nol_tax_assets",
+      "owner": "drew",
+      "as_of": "2026-10-29",
+      "author": "grok-drew-nol-tax-assets",
+      "stale": false
+    },
+    {
+      "ticker": "unresolved",
+      "headline": "NWL: still on the screener actionable list. That is not a reason to buy.",
+      "one_number": "screener actionable (not a buy case)",
+      "lane": "actionable",
+      "evidence": [
+        {
+          "kind": "dashboard",
+          "ref": "nol_screener.json NWL material_after_382. built 2026-10-29T09:19:37Z",
+          "url": null
+        }
+      ],
+      "confidence": "provider",
+      "next": "Fact: screener usability is material_after_382. An NOL is not the buy thesis. No present value.",
+      "handoff": null,
+      "desk": "nol_tax_assets",
+      "owner": "drew",
+      "as_of": "2026-10-29",
+      "author": "grok-drew-nol-tax-assets",
+      "stale": false
+    },
+    {
+      "ticker": "BIIB",
+      "headline": "BIIB: the screener's 283.4 percent allowance ratio mixes two different DTA tags.",
+      "one_number": "283.4% allowance ratio (data error)",
+      "lane": "needs_review",
+      "evidence": [
+        {
+          "kind": "dashboard",
+          "ref": "nol_screener.json BIIB allowance_pct 283.4; dta_gross_usd 293700000; allowance 832200000",
+          "url": null
+        },
+        {
+          "kind": "filing",
+          "ref": "10-Q accession 0000875045-26-000096 DeferredIncomeTaxAssetsNet 293700000 at 2026-09-30",
+          "url": "https://www.sec.gov/Archives/edgar/data/875045/000087504526000096/0000875045-26-000096.txt"
+        },
+        {
+          "kind": "filing",
+          "ref": "10-K accession 0000875045-26-000013 valuation allowance 832200000 at 2025-12-31",
+          "url": "https://www.sec.gov/Archives/edgar/data/875045/000087504526000013/0000875045-26-000013.txt"
+        }
+      ],
+      "confidence": "filing",
+      "next": "Fact: net DTA at 2025-12-31 is 2305100000. Do not use 283.4 percent. Correction proposal, not a screener edit. Not a buy case.",
+      "handoff": null,
+      "desk": "nol_tax_assets",
+      "owner": "drew",
+      "as_of": "2026-10-29",
+      "author": "grok-drew-nol-tax-assets",
+      "stale": false
+    },
+    {
+      "ticker": "unresolved",
+      "headline": "ATNM: the screener's 26932 percent allowance ratio uses net DTA in the gross field.",
+      "one_number": "26932% allowance ratio (data error)",
+      "lane": "needs_review",
+      "evidence": [
+        {
+          "kind": "dashboard",
+          "ref": "nol_screener.json ATNM dta_gross_usd 431000; allowance 116077000; allowance_pct 26932",
+          "url": null
+        },
+        {
+          "kind": "filing",
+          "ref": "10-K accession 0001213900-26-036504 gross DTA 116508000; net DTA 431000; allowance 116077000",
+          "url": "https://www.sec.gov/Archives/edgar/data/1388320/000121390026036504/0001213900-26-036504.txt"
+        }
+      ],
+      "confidence": "filing",
+      "next": "Fact: same period, three tags. Inference: dividing the allowance by gross DTA is about 99.6 percent, not 26932. Not a filed percentage. Not a buy case.",
+      "handoff": null,
+      "desk": "nol_tax_assets",
+      "owner": "drew",
+      "as_of": "2026-10-29",
+      "author": "grok-drew-nol-tax-assets",
+      "stale": false
+    },
+    {
       "ticker": "FFIV",
       "headline": "F5 jumped from normal to capitulation_candidate on 6.1x volume after FQ4 results; RSI 46.5 to 25.2, 5d -20.3%.",
       "one_number": "rvol 6.08 (capitulation_candidate; close 365.53 vs 459.36)",
@@ -1375,7 +1743,6 @@
     }
   ],
   "desks_without_brief": [
-    "nol_tax_assets",
     "stahl",
     "short_selling"
   ],
@@ -1389,17 +1756,18 @@
     "short_selling": "Short Selling"
   },
   "counts": {
-    "briefs": 4,
-    "items": 29,
-    "files": 12,
+    "briefs": 5,
+    "items": 37,
+    "files": 21,
     "by_desk": {
       "special_situations": 4,
       "activism": 1,
       "fundamentals": 12,
+      "nol_tax_assets": 8,
       "tape_index": 12
     },
     "by_owner": {
-      "drew": 29
+      "drew": 37
     }
   },
   "health": {
@@ -1408,6 +1776,25 @@
     "problems": [],
     "warnings": [
       "_system/data/desk_briefs/activism/2026-10-29.json: items[0].evidence[2] (MGM): filing without a URL",
+      "_system/data/desk_briefs/nol_tax_assets/2026-10-19.json: inputs_read[2] (_system/portfolio/registry.json) carries no stamp",
+      "_system/data/desk_briefs/nol_tax_assets/2026-10-19.json: inputs_read[3] (_system/data/desk_briefs/schema.json) carries no stamp",
+      "_system/data/desk_briefs/nol_tax_assets/2026-10-20.json: inputs_read[2] (_system/portfolio/registry.json) carries no stamp",
+      "_system/data/desk_briefs/nol_tax_assets/2026-10-20.json: inputs_read[3] (_system/data/desk_briefs/schema.json) carries no stamp",
+      "_system/data/desk_briefs/nol_tax_assets/2026-10-21.json: inputs_read[2] (_system/portfolio/registry.json) carries no stamp",
+      "_system/data/desk_briefs/nol_tax_assets/2026-10-21.json: inputs_read[3] (_system/data/desk_briefs/schema.json) carries no stamp",
+      "_system/data/desk_briefs/nol_tax_assets/2026-10-22.json: inputs_read[2] (_system/portfolio/registry.json) carries no stamp",
+      "_system/data/desk_briefs/nol_tax_assets/2026-10-22.json: inputs_read[3] (_system/data/desk_briefs/schema.json) carries no stamp",
+      "_system/data/desk_briefs/nol_tax_assets/2026-10-23.json: inputs_read[2] (_system/portfolio/registry.json) carries no stamp",
+      "_system/data/desk_briefs/nol_tax_assets/2026-10-23.json: inputs_read[3] (_system/data/desk_briefs/schema.json) carries no stamp",
+      "_system/data/desk_briefs/nol_tax_assets/2026-10-26.json: inputs_read[0] (dashboard/data/nol_screener.json) carries no stamp",
+      "_system/data/desk_briefs/nol_tax_assets/2026-10-26.json: inputs_read[2] (_system/portfolio/registry.json) carries no stamp",
+      "_system/data/desk_briefs/nol_tax_assets/2026-10-26.json: inputs_read[3] (_system/data/desk_briefs/schema.json) carries no stamp",
+      "_system/data/desk_briefs/nol_tax_assets/2026-10-27.json: inputs_read[0] (dashboard/data/nol_screener.json) carries no stamp",
+      "_system/data/desk_briefs/nol_tax_assets/2026-10-27.json: inputs_read[2] (_system/portfolio/registry.json) carries no stamp",
+      "_system/data/desk_briefs/nol_tax_assets/2026-10-27.json: inputs_read[3] (_system/data/desk_briefs/schema.json) carries no stamp",
+      "_system/data/desk_briefs/nol_tax_assets/2026-10-28.json: inputs_read[2] (_system/portfolio/registry.json) carries no stamp",
+      "_system/data/desk_briefs/nol_tax_assets/2026-10-28.json: inputs_read[3] (_system/data/desk_briefs/schema.json) carries no stamp",
+      "_system/data/desk_briefs/nol_tax_assets/2026-10-29.json: inputs_read[3] (_system/data/desk_briefs/schema.json) carries no stamp",
       "_system/data/desk_briefs/special_situations/2026-10-29.json: inputs_read[6] (_system/data/special_situations/situations.jsonl) carries no stamp",
       "_system/data/desk_briefs/tape_index/2026-10-19.json: inputs_read[11] (_system/data/desk_briefs/schema.json) carries no stamp",
       "_system/data/desk_briefs/tape_index/2026-10-19.json: inputs_read[12] (_system/agents/DESKS.md) carries no stamp",
@@ -1420,7 +1807,7 @@
       "_system/data/desk_briefs/tape_index/2026-10-29.json: inputs_read[5] (_system/data/desk_briefs/schema.json) carries no stamp"
     ],
     "stale_days": 7,
-    "checked_at": "2026-10-29T19:11:20Z"
+    "checked_at": "2026-10-29T19:28:19Z"
   },
   "research_only": true,
   "in_base_irr": false,
@@ -1428,10 +1815,10 @@
   "_envelope": {
     "schema_version": "magis.feed.v2",
     "feed_id": "dashboard-desk-briefs",
-    "generated_at": "2026-10-29T19:11:20Z",
+    "generated_at": "2026-10-29T19:28:19Z",
     "as_of": "2026-10-29",
-    "content_sha256": "sha256:e81198d034b44a0c62cf2a5b95b481cc624932bfd0ea7da434cad202ff5d69a0",
-    "row_count": 29,
+    "content_sha256": "sha256:92682f0481a9079cc8eb8cd64b9099c894eab4ad2bd8f10690d51456cfe9ea96",
+    "row_count": 37,
     "upstream_inputs": [],
     "health": {
       "status": "healthy",

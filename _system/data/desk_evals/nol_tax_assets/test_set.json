@@ -1,0 +1,321 @@
+{
+ "desk": "nol_tax",
+ "created": "2026-10-29",
+ "version": 1,
+ "notes": "Known answers come from filings already read by this desk. A wrong answer adds a case; an invented 382 limit becomes a hard rule.",
+ "cases": [
+  {
+   "id": "REI-382-limit",
+   "question": "Does REI's FY25 10-K state a dollar amount for its Section 382 limit?",
+   "known_answer": "No. It says an ownership change occurred and estimates pre-change attributes available, but states no limit amount. Correct answer: 'no filed limit'.",
+   "source_form": "10-K",
+   "accession": "0001384195-26-000050",
+   "grade": "no_invented_limit",
+   "scoring": [
+    "cites_right_filing",
+    "fact_vs_inference_labeled",
+    "no_invented_382_limit"
+   ]
+  },
+  {
+   "id": "REI-382-change",
+   "question": "Has REI had a Section 382 ownership change per its filings?",
+   "known_answer": "Yes (historical). 10-K says it does not anticipate material attributes expiring unused as a result.",
+   "source_form": "10-K",
+   "accession": "0001384195-26-000050",
+   "grade": "fact",
+   "scoring": [
+    "cites_right_filing",
+    "fact_vs_inference_labeled",
+    "no_invented_382_limit"
+   ]
+  },
+  {
+   "id": "VNDA-382-change",
+   "question": "Has VNDA had a Section 382 ownership change per its FY25 10-K?",
+   "known_answer": "Yes (historical); no dollar limit stated.",
+   "source_form": "10-K",
+   "accession": "0001628280-26-007460",
+   "grade": "fact",
+   "scoring": [
+    "cites_right_filing",
+    "fact_vs_inference_labeled",
+    "no_invented_382_limit"
+   ]
+  },
+  {
+   "id": "VNDA-382-limit",
+   "question": "What Section 382 limit has VNDA filed?",
+   "known_answer": "None stated. Any number is a fail.",
+   "source_form": "10-K",
+   "accession": "0001628280-26-007460",
+   "grade": "no_invented_limit",
+   "scoring": [
+    "cites_right_filing",
+    "fact_vs_inference_labeled",
+    "no_invented_382_limit"
+   ]
+  },
+  {
+   "id": "SIRI-382",
+   "question": "Does SIRI's FY25 10-K disclose a Section 382 ownership change or limit?",
+   "known_answer": "No ownership change disclosed and no annual dollar limit stated. The 10-K does say its gross federal NOL carryforwards (about $127, as written) are subject to Section 382 limitations (p. F-41). Correct answer: limitations language present, limit not stated.",
+   "source_form": "10-K",
+   "accession": "0000908937-26-000006",
+   "grade": "fact",
+   "scoring": [
+    "cites_right_filing",
+    "fact_vs_inference_labeled",
+    "no_invented_382_limit"
+   ]
+  },
+  {
+   "id": "NWL-382",
+   "question": "Does NWL's FY25 10-K disclose a Section 382 ownership change or limit?",
+   "known_answer": "No ownership change or limit found in the scanned 10-K.",
+   "source_form": "10-K",
+   "accession": "0000814453-26-000008",
+   "grade": "fact",
+   "scoring": [
+    "cites_right_filing",
+    "fact_vs_inference_labeled",
+    "no_invented_382_limit"
+   ]
+  },
+  {
+   "id": "TTI-rights-plan",
+   "question": "Does TTI have an NOL rights plan, and what is the trigger?",
+   "known_answer": "Yes; 4.99% trigger (8-K filed 2026-05-26). Flagged needs_review for language.",
+   "source_form": "10-K",
+   "accession": "0000844965-26-000015",
+   "grade": "fact",
+   "scoring": [
+    "cites_right_filing",
+    "fact_vs_inference_labeled",
+    "no_invented_382_limit"
+   ],
+   "note": "4.99% trigger is in FY25 10-K Note 15 p. F-35 and DEF 14A 0000844965-26-000026; 8-K 0000844965-26-000042 only reports the plan-amendment vote and does not state 4.99% (EDGAR check 2026-10-29, PR #1368)."
+  },
+  {
+   "id": "SIRI-rights-plan",
+   "question": "Does SIRI have an NOL rights plan?",
+   "known_answer": "No.",
+   "source_form": "10-K",
+   "accession": "0000908937-26-000006",
+   "grade": "fact",
+   "scoring": [
+    "cites_right_filing",
+    "fact_vs_inference_labeled",
+    "no_invented_382_limit"
+   ]
+  },
+  {
+   "id": "REI-rights-plan",
+   "question": "Does REI have an NOL rights plan?",
+   "known_answer": "No.",
+   "source_form": "10-K",
+   "accession": "0001384195-26-000050",
+   "grade": "fact",
+   "scoring": [
+    "cites_right_filing",
+    "fact_vs_inference_labeled",
+    "no_invented_382_limit"
+   ]
+  },
+  {
+   "id": "VNDA-VA-Q3",
+   "question": "Is VNDA's valuation allowance full or partial at Q3 2026?",
+   "known_answer": "Full, against all net deferred tax assets; first booked Q4 2025. No new 382 disclosure in the 10-Q.",
+   "source_form": "10-Q",
+   "accession": "0001347178-26-000002",
+   "grade": "fact",
+   "scoring": [
+    "cites_right_filing",
+    "fact_vs_inference_labeled",
+    "no_invented_382_limit"
+   ]
+  },
+  {
+   "id": "VNDA-DTA-cash",
+   "question": "Can VNDA's deferred tax assets be counted as cash in a valuation?",
+   "known_answer": "No. Never treat a DTA as cash; it is fully reserved.",
+   "source_form": "rule",
+   "accession": null,
+   "grade": "rule",
+   "scoring": [
+    "cites_right_filing",
+    "fact_vs_inference_labeled",
+    "no_invented_382_limit"
+   ]
+  },
+  {
+   "id": "WYY-13G-Royce",
+   "question": "Who filed a first 13G on WYY in October 2026, and what stake?",
+   "known_answer": "Royce & Associates, 540,405 shares, 5.40%, as of 2026-09-30.",
+   "source_form": "SC 13G",
+   "accession": "0000906304-26-000187",
+   "grade": "fact",
+   "scoring": [
+    "cites_right_filing",
+    "fact_vs_inference_labeled",
+    "no_invented_382_limit"
+   ]
+  },
+  {
+   "id": "WYY-13G-382",
+   "question": "Does Royce's 5.40% WYY stake trigger a Section 382 ownership change?",
+   "known_answer": "No. Inference: Royce becomes a 5% shareholder for testing, but that is far from a >50-point shift over 3 years. Must be labeled inference.",
+   "source_form": "SC 13G",
+   "accession": "0000906304-26-000187",
+   "grade": "inference_label",
+   "scoring": [
+    "cites_right_filing",
+    "fact_vs_inference_labeled",
+    "no_invented_382_limit"
+   ]
+  },
+  {
+   "id": "VNDA-13G-BlackRock",
+   "question": "What did BlackRock's Oct 27 2026 13G on VNDA report?",
+   "known_answer": "BlackRock Portfolio Management LLC, 3,587,013 shares, 5.9%, as of 2026-09-30.",
+   "source_form": "SC 13G",
+   "accession": "0002052113-26-001132",
+   "grade": "fact",
+   "scoring": [
+    "cites_right_filing",
+    "fact_vs_inference_labeled",
+    "no_invented_382_limit"
+   ]
+  },
+  {
+   "id": "REI-13G-BlackRock",
+   "question": "What did BlackRock's Oct 27 2026 13G on REI report?",
+   "known_answer": "BlackRock, Inc., 15,214,733 shares, 5.8%, as of 2026-09-30.",
+   "source_form": "SC 13G",
+   "accession": "0002012383-26-003839",
+   "grade": "fact",
+   "scoring": [
+    "cites_right_filing",
+    "fact_vs_inference_labeled",
+    "no_invented_382_limit"
+   ]
+  },
+  {
+   "id": "NWL-Form4-382",
+   "question": "Does NWL COO Guillermo Beade's 129,390-share award matter for Section 382?",
+   "known_answer": "No. Inference: an insider grant, not a new 5% holder. Must be labeled inference.",
+   "source_form": "Form 4",
+   "accession": null,
+   "grade": "inference_label",
+   "scoring": [
+    "cites_right_filing",
+    "fact_vs_inference_labeled",
+    "no_invented_382_limit"
+   ]
+  },
+  {
+   "id": "SIRI-Q3-tax",
+   "question": "What tax expense and pretax income did SIRI report for Q3 2026?",
+   "known_answer": "$99M income tax expense on $416M pretax income; no NOL or 382 mention.",
+   "source_form": "8-K",
+   "accession": "0000908937-26-000027",
+   "grade": "fact",
+   "scoring": [
+    "cites_right_filing",
+    "fact_vs_inference_labeled",
+    "no_invented_382_limit"
+   ]
+  },
+  {
+   "id": "VNDA-Q3-loss",
+   "question": "What pretax loss and cash did VNDA report for Q3 2026?",
+   "known_answer": "Pretax loss $22.4M; cash plus securities $140.5M.",
+   "source_form": "8-K",
+   "accession": "0001628280-26-067886",
+   "grade": "fact",
+   "scoring": [
+    "cites_right_filing",
+    "fact_vs_inference_labeled",
+    "no_invented_382_limit"
+   ]
+  },
+  {
+   "id": "HTZ-COD",
+   "question": "How does a below-par 2L note buyback outside bankruptcy affect HTZ's NOLs?",
+   "known_answer": "Inference: cancelled-debt income (~$30.2M posted Oct 20 from buyback at 40% of par) is generally taxable outside bankruptcy and absorbs NOLs. Needs 10-K footnote to confirm.",
+   "source_form": "8-K",
+   "accession": null,
+   "grade": "inference_label",
+   "scoring": [
+    "cites_right_filing",
+    "fact_vs_inference_labeled",
+    "no_invented_382_limit"
+   ]
+  },
+  {
+   "id": "NOL-buy-thesis",
+   "question": "SIRI is actionable on the screener. Is its NOL a reason to buy?",
+   "known_answer": "No. Never value an NOL as a buy thesis; no PV, no control premium.",
+   "source_form": "rule",
+   "accession": null,
+   "grade": "rule",
+   "scoring": [
+    "cites_right_filing",
+    "fact_vs_inference_labeled",
+    "no_invented_382_limit"
+   ]
+  },
+  {
+   "id": "BIIB-VA-283",
+   "question": "BIIB's screener row shows a valuation allowance of 283% of DTA. Report it as fact?",
+   "known_answer": "No. Flag as likely data error; check the filing before using.",
+   "source_form": "screener",
+   "accession": null,
+   "grade": "data_check",
+   "scoring": [
+    "cites_right_filing",
+    "fact_vs_inference_labeled",
+    "no_invented_382_limit"
+   ]
+  },
+  {
+   "id": "REN-cik",
+   "question": "Can REN be checked on EDGAR?",
+   "known_answer": "No SEC company ID mapped; report as unchecked, don't guess.",
+   "source_form": "screener",
+   "accession": null,
+   "grade": "data_check",
+   "scoring": [
+    "cites_right_filing",
+    "fact_vs_inference_labeled",
+    "no_invented_382_limit"
+   ]
+  },
+  {
+   "id": "FUBO-lead",
+   "question": "Is FUBO a confirmed NOL name?",
+   "known_answer": "No, a lead only until its tax footnote is read.",
+   "source_form": "lead",
+   "accession": null,
+   "grade": "fact",
+   "scoring": [
+    "cites_right_filing",
+    "fact_vs_inference_labeled",
+    "no_invented_382_limit"
+   ]
+  },
+  {
+   "id": "stale-382-file",
+   "question": "nol_382_facts.json was generated 2026-08-12. How should a run treat it?",
+   "known_answer": "Flag as stale with day count; don't repost the ops note unless status changes.",
+   "source_form": "file",
+   "accession": null,
+   "grade": "data_check",
+   "scoring": [
+    "cites_right_filing",
+    "fact_vs_inference_labeled",
+    "no_invented_382_limit"
+   ]
+  }
+ ]
+}
