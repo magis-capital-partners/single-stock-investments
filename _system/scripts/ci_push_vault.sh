@@ -46,9 +46,13 @@ while [ "$attempt" -le "$MAX_ATTEMPTS" ]; do
   BRANCH=$(git symbolic-ref --short HEAD 2>/dev/null || echo main)
   if git show-ref --verify --quiet "refs/remotes/origin/$BRANCH"; then
     if ! git rebase "origin/$BRANCH"; then
-      echo "::error::Vault rebase failed (attempt $attempt/$MAX_ATTEMPTS)."
-      git rebase --abort 2>/dev/null || true
-      exit 1
+      if python "$SCRIPT_DIR/resolve_vault_manifest_conflict.py" "$PWD" && GIT_EDITOR=true git rebase --continue; then
+        echo "Preserved independent private receipts and newer upstream pointers."
+      else
+        echo "::error::Vault rebase failed (attempt $attempt/$MAX_ATTEMPTS)."
+        git rebase --abort 2>/dev/null || true
+        exit 1
+      fi
     fi
   fi
   if git push "$AUTH_URL" "HEAD:$BRANCH"; then

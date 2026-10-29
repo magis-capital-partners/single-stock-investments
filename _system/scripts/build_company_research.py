@@ -817,6 +817,24 @@ class Builder:
                 print(f"Research inventory: drive: {count} originals processed", flush=True)
         self.receipt("drive", count)
 
+    def publish_cached(self):
+        """Publish the completed recovery snapshot without rediscovering sources."""
+        records = self.previous.get("records", {})
+        if not records or not self.previous.get("generated_at"):
+            raise RuntimeError("A completed private company-source snapshot is required")
+        if load(self.cache / "matches.json").get("version") != self.match_version:
+            raise RuntimeError("Company identities or matching rules changed; refresh the source snapshot first")
+        for sha in {r.get("text_cache") for r in records.values()} - {None, ""}:
+            if not re.fullmatch(r"[a-f0-9]{64}", sha) or not (self.cache / "published-text" / (sha + ".json")).is_file():
+                raise RuntimeError("The private source snapshot is missing a recovered text body")
+        self.index.records = dict(records)
+        self.receipts = self.previous.get("receipts", [])
+        self.good = {r["collection"] for r in self.receipts if r.get("status") == "complete"}
+        # Keep the actual source observation time visible; deployment is not a
+        # new Drive sync and must not refresh its coverage timestamps.
+        self.now = self.previous["generated_at"]
+        return self.publish()
+
     def publish(self):
         # A recovered Git original can acquire a Drive revision identity when
         # exact-byte copies merge. Do not resurrect its old empty placeholder
@@ -829,6 +847,21 @@ class Builder:
             if identity:
                 aliases[digest(identity)[:32]] = current_id
         previous = {}
+        # Git normalizes text-file line endings between Windows and Linux.
+        # The same original URL and unchanged text is not a historical edition.
+        text_formats = {"txt", "md", "json", "csv", "tsv", "html", "htm"}
+        current_locations = defaultdict(list)
+        normalized = {}
+        for current in self.index.records.values():
+            if current.get("format") in text_formats:
+                for location in current.get("locations", []):
+                    if location.get("url"):
+                        current_locations[(location["url"], current["format"])].append(current)
+        def normalized_body(record):
+            key = record.get("text_cache") or record["id"]
+            if key not in normalized:
+                normalized[key] = digest(self.text(record).replace("\r\n", "\n").replace("\r", "\n"))
+            return normalized[key]
         for key, old in self.previous.get("records", {}).items():
             current = self.index.records.get(aliases.get(key), {})
             has_body = bool(old.get("text_cache") or old.get("text") or old.get("text_length"))
@@ -836,6 +869,11 @@ class Builder:
             distinct_revision = old.get("revision") and current.get("revision") and old["revision"] != current["revision"]
             if current and not distinct_revision and (not has_body or same_body):
                 continue
+            if key not in self.index.records and has_body and old.get("format") in text_formats:
+                candidates = [r for loc in old.get("locations", []) for r in current_locations.get((loc.get("url"), old["format"]), [])]
+                if any(not (old.get("revision") and r.get("revision") and old["revision"] != r["revision"])
+                       and normalized_body(old) == normalized_body(r) for r in candidates):
+                    continue
             previous[key] = old
         records = retain_previous(self.index.records, previous, self.good)
         by_ticker = defaultdict(list)
@@ -1011,10 +1049,13 @@ def main():
     parser.add_argument("--cache", type=Path, default=ROOT / "_private/company-research/cache")
     parser.add_argument("--drive", action="store_true")
     parser.add_argument("--download", action="store_true")
+    parser.add_argument("--publish-cached", action="store_true", help="Publish the completed private snapshot without live source discovery")
     parser.add_argument("--download-budget-seconds", type=int, default=300, help="Text extraction work budget; inventory is never capped. Zero means unlimited.")
     parser.add_argument("--git-budget-seconds", type=int, default=300, help="Git extraction budget. Zero consumes existing backfill results only.")
     parser.add_argument("--tickers", nargs="+", help="Explicitly scoped verification run; omit to build the full universe")
     args = parser.parse_args()
+    if args.publish_cached and (args.drive or args.download or args.tickers):
+        parser.error("--publish-cached requires the complete snapshot and cannot run live discovery")
     from vault_paths import research_vault_root
     vault = args.vault or research_vault_root()
     if vault:
@@ -1023,6 +1064,10 @@ def main():
     if args.tickers:
         companies = {t:companies[t] for t in args.tickers}
     build = Builder(args.source_root, vault, args.output, args.cache, companies=companies if args.tickers else None)
+    if args.publish_cached:
+        report = build.publish_cached()
+        print(json.dumps({k: v for k, v in report.items() if k not in {"tickers", "receipts"}}))
+        return
     build.registries()
     build.local_corpora()
     try:
