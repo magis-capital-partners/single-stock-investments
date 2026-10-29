@@ -3,6 +3,7 @@ from __future__ import annotations
 
 import hashlib
 import json
+import subprocess
 import sys
 from pathlib import Path
 
@@ -17,7 +18,6 @@ import private_dashboard_assets as assets  # noqa: E402
 
 ROOT = Path(__file__).resolve().parents[3]
 RELATIVE = drive_config.CONFIG_RELATIVE
-PUBLIC = ROOT / RELATIVE
 WORKFLOW = ROOT / ".github/workflows/letter-backfill.yml"
 
 
@@ -101,11 +101,20 @@ def test_private_snapshot_restores_the_letters_folder_without_writing_it_back(tm
     assert b"letters-root" not in before
 
 
-def test_public_drive_config_stays_a_placeholder_without_a_folder_id() -> None:
-    assert PUBLIC.is_file(), "google_drive_config.json is missing from this checkout"
-    document = json.loads(PUBLIC.read_text(encoding="utf-8"))
-    assert document.get("private_snapshot") is True
-    text = PUBLIC.read_text(encoding="utf-8")
+def test_committed_drive_config_stays_a_placeholder_without_a_folder_id() -> None:
+    # Read the git blob, not the worktree. A vault hydrate replaces the
+    # working file with the private config, and that copy must not be what
+    # this check prints or treats as the public file.
+    result = subprocess.run(
+        ["git", "show", f"HEAD:{RELATIVE}"],
+        cwd=ROOT,
+        capture_output=True,
+        text=True,
+        check=False,
+    )
+    assert result.returncode == 0, "committed google_drive_config.json could not be read"
+    text = result.stdout
+    assert '"private_snapshot":true' in text or '"private_snapshot": true' in text
     assert "folder_id" not in text
     assert "hedge_fund_letters" not in text
 
