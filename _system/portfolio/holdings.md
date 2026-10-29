@@ -385,6 +385,7 @@ Synced from `_system/portfolio/registry.json`. Last sync: 2026-10-29.
 | HD | HD/ | Home Depot (The) | US | 2026-07-29 | 2026-10-29 | unknown | watch |
 | HE | HE/ | Hawaiian Electric Industries | US | 2026-07-09 | 2026-10-29 | unknown | watch |
 | HEE | HEE/ | Hellenic Exchanges - Athens Stock Exchange S.A. | EU | 2026-07-09 | 2026-10-29 | unknown | watch |
+| HEI | HEI/ | HEICO Corporation | US | 2026-10-29 | 2026-10-29 | unknown | watch |
 | HEI.A | HEI.A/ | HEICO Corporation (Class A) | US | 2026-07-29 | 2026-10-29 | unknown | watch |
 | HGBL | HGBL/ | Heritage Global Inc. | US | 2026-07-16 | 2026-10-29 | unknown | watch |
 | HIG | HIG/ | Hartford (The) | US | 2026-07-29 | 2026-10-29 | unknown | watch |
@@ -873,4 +874,4 @@ Synced from `_system/portfolio/registry.json`. Last sync: 2026-10-29.
 | ZETA | ZETA/ | ZETA | US | 2026-07-28 | 2026-10-29 | unknown | watch |
 | ZTS | ZTS/ | Zoetis | US | 2026-07-10 | 2026-10-29 | unknown | watch |
 
-**866 holdings total.** Registry: `_system/portfolio/registry.json`
+**867 holdings total.** Registry: `_system/portfolio/registry.json`
