@@ -156,11 +156,32 @@ def listing_ratio_from_documents(documents):
     return None
 
 
+def fingerprint_facts(source):
+    """Pin a provider's rolling request end to the disclosed financial epoch.
+
+    Keep the actual fetched URLs in evidence. Only the comparison ignores this
+    known collection clock; issuer, metric, value, period and filing still bind.
+    """
+    facts = copy.deepcopy(source.get('facts') or [])
+    anchor = (source.get('latest_report') or {}).get('filed') or max(
+        (str(p.get('filed') or p.get('period') or '') for p in facts), default='')
+    try:
+        end = str((date.fromisoformat(anchor)-date(1970, 1, 1)).days*86400)
+    except (ValueError, TypeError):
+        return facts
+    for point in facts:
+        url = point.get('source_url') or ''
+        if (point.get('source_kind') == 'provider_reported'
+                and re.match(r'^https://query[12]\.finance\.yahoo\.com/ws/fundamentals-timeseries/v1/finance/timeseries/', url)):
+            point['source_url'] = re.sub(r'([?&]period2=)\d+(?=&|$)', lambda m: m[1]+end, url, count=1)
+    return facts
+
+
 def source_fingerprint(root, ticker):
     source = read(root/'_system/reference/market-data/valuation_fundamentals'/(ticker+'.json'))
     points = primary_kpis(root, ticker)
     kpis = {'points': points} if points else {}
-    payload = {'facts': source.get('facts') or [], 'primary_observations': source.get('primary_observations') or [],
+    payload = {'facts': fingerprint_facts(source), 'primary_observations': source.get('primary_observations') or [],
                'latest_report': source.get('latest_report'), 'operating_kpis': kpis}
     if source.get('latest_disclosure'):
         payload['latest_disclosure'] = source['latest_disclosure']
