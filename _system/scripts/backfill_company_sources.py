@@ -19,6 +19,7 @@ from urllib.parse import unquote, urlparse
 
 from company_source_queue import SourceQueue
 from company_sources import SOURCE_SUFFIXES, digest, extract
+from company_extract_formats import EXTRA_SUFFIXES
 from build_company_research import ROOT, IGNORE_NAMES, load, read_companies, write
 
 
@@ -109,9 +110,9 @@ def extract_complete(data, suffix, *, ocr=False):
         except (Exception,SystemExit) as exc:
             return '', 'access_unavailable' if re.search(r'DRM|encrypt',str(exc),re.I) else 'failed', {'error':str(exc)[:180]}
     if suffix in {'.png','.jpg','.jpeg','.jpg_large'}:
-        import fitz
         if not ocr:return '', 'needs_ocr', {'format':'image'}
         try:
+            import fitz
             with fitz.open(stream=data) as image:
                 return extract_complete(image.convert_to_pdf(),'.pdf',ocr=True)
         except Exception as exc:return '', 'needs_ocr', {'error':type(exc).__name__}
@@ -130,12 +131,35 @@ def extract_complete(data, suffix, *, ocr=False):
                     encrypted=ET.fromstring(z.read('META-INF/encryption.xml'))
                     if any(e.attrib.get('URI') in paths for e in encrypted.iter()):
                         return '', 'access_unavailable', {'reason':'Encrypted book content requires an authorized readable edition'}
-                bodies=[];missing=[]
+                bodies=[];missing=[];ocr_chapters=[]
                 for path in paths:
                     raw=z.read(path);body,state=extract(raw,'.html')
-                    if not body.strip() and re.search(br'<(?:img|svg|image)\b',raw,re.I):missing.append(path)
+                    if not body.strip() and re.search(br'<(?:img|svg|image)\b',raw,re.I):
+                        recovered=False
+                        if ocr:
+                            from html.parser import HTMLParser
+                            class Images(HTMLParser):
+                                def __init__(self):super().__init__();self.refs=[]
+                                def handle_starttag(self,tag,attrs):
+                                    if tag in {'img','image'}:
+                                        attrs=dict(attrs)
+                                        ref=attrs.get('src') or attrs.get('href') or attrs.get('xlink:href')
+                                        if ref:self.refs.append(ref)
+                            parser=Images();parser.feed(raw.decode('utf-8',errors='replace'))
+                            recovered=bool(parser.refs);parts=[]
+                            for ref in dict.fromkeys(parser.refs):
+                                uri=urlparse(ref)
+                                image_path=posixpath.normpath(posixpath.join(posixpath.dirname(path),unquote(uri.path)))
+                                if uri.scheme or uri.netloc or image_path.startswith(('../','/')) or image_path not in z.namelist():
+                                    recovered=False;continue
+                                image_text,image_state,details=extract_complete(z.read(image_path),'.png',ocr=True)
+                                if image_state not in {'indexed','empty_source'}:recovered=False
+                                parts.append(image_text)
+                            body='\n'.join(parts)
+                        if recovered:ocr_chapters.append(path)
+                        else:missing.append(path)
                     bodies.append(body)
-                return '\n\f\n'.join(bodies),'needs_ocr' if missing else 'indexed' if any(bodies) else 'empty_source',{'chapters':len(paths),'missing_chapters':missing}
+                return '\n\f\n'.join(bodies),'needs_ocr' if missing else 'indexed' if any(bodies) else 'empty_source',{'chapters':len(paths),'missing_chapters':missing,'ocr_chapters':ocr_chapters,'ocr_review':'unreviewed' if ocr_chapters else None}
         except Exception as exc:return '', 'failed', {'error':type(exc).__name__}
     if suffix != '.pdf':
         text, state = extract(data, suffix)
@@ -193,7 +217,7 @@ def seed(root, cache, queue, vault=None, kinds=('git','drive','media')):
             path = Path(relative)
             if len(bits)<3 or bits[0] not in companies or bits[1] not in {'research','third-party-analyses','investor-documents','models','transcripts','financials'}:
                 continue
-            if path.suffix.lower() not in SOURCE_SUFFIXES or path.name in IGNORE_NAMES or re.search(r'(?:source_inventory|activist_reports_index|latest|security_identity|classification|human_decision|download|readiness|audit|committee_packet)',path.stem,re.I):
+            if path.suffix.lower() not in SOURCE_SUFFIXES | EXTRA_SUFFIXES or path.name in IGNORE_NAMES or re.search(r'(?:source_inventory|activist_reports_index|latest|security_identity|classification|human_decision|download|readiness|audit|committee_packet)',path.stem,re.I):
                 continue
             sha=header.split()[-1]
             jobs.append({'key':'git:'+sha,'kind':'git','priority':100 if bits[0] in preferred else 0,'payload':{'sha':sha,'path':relative}})
@@ -344,11 +368,15 @@ class Worker:
                 data=execute_with_retry(self.service.files().export_media(fileId=meta['id'],mimeType=mime))
             else:
                 suffix=Path(meta['name']).suffix.lower()
-                if suffix not in SOURCE_SUFFIXES | {'.py', '.r', '.sql', '.epu', '.doc', '.mobi', '.azw3', '.png', '.jpg', '.jpeg', '.jpg_large'}:
+                if suffix not in SOURCE_SUFFIXES | EXTRA_SUFFIXES | {'.py', '.r', '.sql'}:
                     return 'unsupported',{},'Unsupported original format: '+meta['mimeType']
                 if suffix in {'.mp3','.mp4','.m4a','.wav'} and not self.transcribe:
                     return 'needs_transcript',{},'Audio requires linked transcript'
-                data=execute_with_retry(self.service.files().get_media(fileId=meta['id'],supportsAllDrives=True))
+                request=self.service.files().get_media(fileId=meta['id'],supportsAllDrives=True)
+                # Some text-heavy PDFs compress over 100:1 over HTTP. Request
+                # original bytes rather than relaxing transport decode limits.
+                if hasattr(request,'headers'):request.headers['accept-encoding']='identity'
+                data=execute_with_retry(request)
                 if meta.get('md5Checksum') and hashlib.md5(data,usedforsecurity=False).hexdigest()!=meta['md5Checksum']:
                     raise ValueError('Source revision changed during download; rediscover before indexing')
         else:

@@ -153,6 +153,27 @@ def test_epub_reads_spine_order_and_preserves_scan_gap():
     assert details['missing_chapters']==['book/a.xhtml']
 
 
+def test_epub_recovers_image_chapter_without_fetching_external_content(monkeypatch):
+    import backfill_company_sources as module
+    original=module.extract_complete
+    def extract_image(data,suffix,**kwargs):
+        if suffix=='.png':return 'Scanned company discussion','indexed',{'ocr_pages':[1]}
+        return original(data,suffix,**kwargs)
+    monkeypatch.setattr(module,'extract_complete',extract_image)
+    def book(ref):
+        b=io.BytesIO()
+        with zipfile.ZipFile(b,'w') as z:
+            z.writestr('META-INF/container.xml','<container><rootfile full-path="book/package.opf"/></container>')
+            z.writestr('book/package.opf','<package xmlns="http://www.idpf.org/2007/opf"><manifest><item id="a" href="a.xhtml"/></manifest><spine><itemref idref="a"/></spine></package>')
+            z.writestr('book/a.xhtml','<html><body><img src="'+ref+'"/></body></html>')
+            z.writestr('book/scan.png',b'original image')
+        return b.getvalue()
+    text,state,details=original(book('scan.png'),'.epub',ocr=True)
+    assert text=='Scanned company discussion' and state=='indexed'
+    assert details['ocr_chapters']==['book/a.xhtml'] and details['ocr_review']=='unreviewed'
+    assert original(book('https://example.com/scan.png'),'.epub',ocr=True)[1]=='needs_ocr'
+
+
 def test_legacy_word_reader_does_not_execute_embedded_content(monkeypatch):
     from types import SimpleNamespace
     monkeypatch.setitem(sys.modules,'legacy_doc',SimpleNamespace(extract_text=lambda data:SimpleNamespace(text='Company earnings discussion',parser='piece-table',warnings=[])))

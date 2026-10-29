@@ -25,7 +25,7 @@ CATEGORIES = {
     "media": "Other relevant sources",
 }
 TEXT_SUFFIXES = {".txt", ".md", ".csv", ".tsv", ".json", ".jsonl", ".htm", ".html", ".xml"}
-SOURCE_SUFFIXES = TEXT_SUFFIXES | {".pdf", ".epub", ".epu", ".mobi", ".azw3", ".xlsx", ".xls", ".doc", ".docx", ".pptx", ".mp3", ".mp4", ".m4a", ".wav", ".png", ".jpg", ".jpeg", ".jpg_large"}
+SOURCE_SUFFIXES = TEXT_SUFFIXES | {".pdf", ".epub", ".xlsx", ".xls", ".docx", ".pptx", ".mp3", ".mp4", ".m4a", ".wav"}
 
 
 def digest(value: str | bytes) -> str:

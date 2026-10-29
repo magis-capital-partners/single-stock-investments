@@ -59,6 +59,23 @@ def test_commodity_model_archive_uses_only_its_reviewed_company_scope(tmp_path):
     assert row["relationships"][0]["relationship"]=="industry_context"
 
 
+def test_captured_commodity_originals_are_searchable_only_for_reviewed_owners(tmp_path):
+    from company_commodity_sources import build
+    from company_sources import digest
+    config=tmp_path/'_system/scripts/commodity_configs/gold.json';config.parent.mkdir(parents=True)
+    config.write_text(json.dumps({'id':'gold','related_tickers':['NEM'],'sources':[{'id':'gold_report','url':'https://gold.example/report.html','label':'Gold original','published_at':'2026-08-01'}]}))
+    body=b'<p>Mine costs and gold demand. CME Group earns revenue and profit from the business of clearing derivative contracts.</p>'
+    panel=tmp_path/'_private/commodity';(panel/'objects').mkdir(parents=True)
+    (panel/'objects'/digest(body)).write_bytes(body)
+    (panel/'observations.json').write_text(json.dumps({'sources':{'gold_report':{'sha256':digest(body)}}}))
+    b=Builder(tmp_path,None,tmp_path/'out',tmp_path/'cache',companies=COMPANIES)
+    build(b)
+    record=next(iter(b.index.records.values()))
+    assert [r['ticker'] for r in record['relationships']]==['NEM']
+    assert 'Mine costs' in b.text(record) and record['processing_status']=='indexed'
+    assert record['locations'][0]['url']=='https://gold.example/report.html'
+
+
 def test_fund_acronym_is_not_company_research():
     links, _ = Matcher(COMPANIES).match("CME Investor Letter October 2012", 'EMERGING SOVEREIGN GROUP. ESG Credit Macro Event Master Fund Ltd. ("CME") invests in sovereign debt. Our fund has delivered gains in emerging-market bonds.')
     assert not links
