@@ -12,7 +12,7 @@ def preserve(source,vault):
     # exact publisher bytes even when Git has Windows newline conversion on.
     (destination/'.gitattributes').write_text('objects/* binary\nforecast-vintages/*.xlsx binary\n',encoding='utf-8')
     shutil.copy2(source/'observations.json',destination/'observations.json')
-    for folder in ['objects','vintages','forecast-vintages','free-vintages']:
+    for folder in ['objects','vintages','forecast-vintages','free-vintages','free-extractions']:
         if (source/folder).is_dir():shutil.copytree(source/folder,destination/folder,dirs_exist_ok=True)
     return 1
 

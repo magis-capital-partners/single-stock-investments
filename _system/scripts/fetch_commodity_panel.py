@@ -36,6 +36,8 @@ def refresh(output=DEFAULT_PANEL, as_of=None, history=True):
             shutil.copytree(preserved/'forecast-vintages',output.parent/'forecast-vintages',dirs_exist_ok=True)
         if (preserved/'free-vintages').is_dir():
             shutil.copytree(preserved/'free-vintages',output.parent/'free-vintages',dirs_exist_ok=True)
+        if (preserved/'free-extractions').is_dir():
+            shutil.copytree(preserved/'free-extractions',output.parent/'free-extractions',dirs_exist_ok=True)
         if (preserved/'objects').is_dir():
             shutil.copytree(preserved/'objects',output.parent/'objects',dirs_exist_ok=True)
     refs = {s['id']:s for p in CONFIG_DIR.glob('*.json') for s in load(p)['sources']}

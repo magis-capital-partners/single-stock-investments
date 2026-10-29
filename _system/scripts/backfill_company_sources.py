@@ -42,8 +42,8 @@ def preserve_outcome(cache, job, status, result, error):
         if not revision or revision in {'unknown','discover'}:return
         target=cache/'drive'/(digest(payload['id']+revision)+'.json')
     prior=load(target)
-    if not prior:
-        write(target,{'version':1,'text':'','status':status,'attempted_at':time.time(),'error':error})
+    if not prior.get('text'):
+        write(target,{**prior,'version':1,'text':'','status':status,'attempted_at':time.time(),'error':error})
 
 
 def audit_cache(queue, cache):
@@ -393,7 +393,7 @@ class Worker:
             details={'transcript_kind':'automatic','review_status':'unreviewed'}
         else:
             text,status,details=extract_complete(data,suffix,ocr=self.ocr)
-        if status=='awaiting_extraction':status='empty_source' if not data else 'failed'
+        if status=='awaiting_extraction':status='empty_source' if not data.strip() else 'failed'
         if status=='awaiting_transcript':status='needs_transcript'
         md5=hashlib.md5(data,usedforsecurity=False).hexdigest()
         write(target,{'version':1,'text':text,'status':status,'attempted_at':time.time(),'content_sha256':digest(data),'content_md5':md5,'extraction':details})

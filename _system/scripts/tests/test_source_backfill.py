@@ -19,6 +19,8 @@ def test_access_failure_is_published_without_erasing_last_good_text(tmp_path):
     target=tmp_path/'drive'/(digest('idv1')+'.json')
     preserve_outcome(tmp_path,job,'access_unavailable',{},'Publisher denied access')
     assert json.loads(target.read_text())['status']=='access_unavailable'
+    preserve_outcome(tmp_path,job,'empty_source',{},'Original is empty')
+    assert json.loads(target.read_text())['status']=='empty_source'
     target.write_text(json.dumps({'text':'existing original','status':'indexed'}))
     preserve_outcome(tmp_path,job,'failed',{},'Temporary failure')
     assert json.loads(target.read_text())['text']=='existing original'
