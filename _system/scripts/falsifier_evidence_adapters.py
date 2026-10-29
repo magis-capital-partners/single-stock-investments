@@ -16,7 +16,13 @@ from falsifier_specs import forecast_dates, is_v3_spec, parse_due, read_json
 ROOT = Path(__file__).resolve().parents[2]
 DEFINITIONS_REL = Path("_system/research/metric_definitions.json")
 ISSUER_ADAPTERS_REL = Path("_system/research/issuer_kpi_adapters.json")
-BASE_SUPPORTED_ADAPTERS = {"fact_ledger", "sec_companyfacts", "sec_companyfacts_ttm", "separation_register"}
+BASE_SUPPORTED_ADAPTERS = {
+    "fact_ledger",
+    "sec_companyfacts",
+    "sec_companyfacts_ttm",
+    "separation_register",
+    "fundamental_analyst_observation",
+}
 SEPARATIONS_REL = Path("_system/data/separations")
 
 
@@ -544,6 +550,67 @@ def _resolve_issuer_bridge(ticker: str, spec: dict, root: Path, today: date,
     }
 
 
+def _resolve_analyst_observation(ticker: str, spec: dict, root: Path, today: date,
+                                plan: dict) -> dict:
+    """Read one numeric row from the Fundamental Analyst observation log.
+
+    The weekly process appends rows. It does not rewrite them. A call-date
+    row can witness the file format without satisfying a later review date:
+    the measurement date still has to fall inside the plan's end-date window.
+    """
+    adapter = "fundamental_analyst_observation"
+    relative = f"{ticker}/research/fundamental_analyst/observations.jsonl"
+    path = root / relative
+    if not path.is_file():
+        return _empty("evidence_missing", adapter, path=relative)
+    measurement, _observable, _deadline = forecast_dates(spec)
+    if measurement is None:
+        return _empty("measurement_period_missing", adapter)
+    hint = str(spec.get("source_hint") or "")
+    tolerance = int(plan.get("end_date_tolerance_days") or 7)
+    unit = spec.get("unit")
+    candidates = []
+    for line_number, line in enumerate(path.read_text(encoding="utf-8").splitlines(), start=1):
+        if not line.strip():
+            continue
+        try:
+            row = json.loads(line)
+        except json.JSONDecodeError:
+            continue
+        if not isinstance(row, dict) or str(row.get("metric_id") or "") != hint:
+            continue
+        if row.get("unit") != unit:
+            continue
+        value = row.get("value")
+        if not isinstance(value, (int, float)) or isinstance(value, bool):
+            continue
+        observed = parse_due(row.get("date"))
+        if observed is None or observed > today:
+            continue
+        if abs((observed - measurement).days) > tolerance:
+            continue
+        candidates.append((observed, line_number, row))
+    if not candidates:
+        return _empty("evidence_missing", adapter, path=relative, metric_id=hint,
+                      measurement_period_end=measurement.isoformat())
+    observed, line_number, row = max(candidates, key=lambda item: (item[0], item[1]))
+    return {
+        "value": row["value"],
+        "unit": unit,
+        "as_of": observed.isoformat(),
+        "evidence_ref": f"{relative}#{hint}@{observed.isoformat()}",
+        "adapter": adapter,
+        "blocker_reason": None,
+        "raw_observation": {
+            "line": line_number,
+            "metric_id": hint,
+            "date": observed.isoformat(),
+            "source": row.get("source"),
+            "claim_type": row.get("claim_type"),
+        },
+    }
+
+
 def resolve_spec(ticker: str, spec: dict, root: Path, today: date) -> dict:
     """Resolve a v3 spec through its frozen adapter plan."""
     check = preflight_spec(ticker, spec, root)
@@ -554,6 +621,8 @@ def resolve_spec(ticker: str, spec: dict, root: Path, today: date) -> dict:
     adapter = plan["source_adapter"]
     if adapter not in BASE_SUPPORTED_ADAPTERS:
         return _resolve_issuer_bridge(ticker, spec, root, today, adapter, plan)
+    if adapter == "fundamental_analyst_observation":
+        return _resolve_analyst_observation(ticker, spec, root, today, plan)
     if adapter == "fact_ledger":
         return _resolve_ledger(ticker, spec, root, today, plan)
     if adapter == "separation_register":
