@@ -25,6 +25,7 @@ from company_extract_formats import EXTRA_SUFFIXES
 ROOT = Path(__file__).resolve().parents[2]
 PUBLICATION_LAYOUT = 2
 CONTENT_BUNDLE_BYTES = 16_000_000
+TEXT_INLINE_BYTES = 1_000_000
 TEXT_CHUNK_CHARS = 4_000_000
 COMPANY_PAGE_ROWS = 1000
 COMPANY_PAGE_BYTES = 8_000_000
@@ -868,7 +869,7 @@ class Builder:
                 continue
             full_text = self.text(rec)
             parts = []
-            if len(full_text.encode("utf-8")) > TEXT_CHUNK_CHARS:
+            if len(full_text.encode("utf-8")) > TEXT_INLINE_BYTES:
                 for start in range(0,len(full_text),TEXT_CHUNK_CHARS):
                     part = full_text[start:start+TEXT_CHUNK_CHARS]
                     filename = "text/" + digest(part) + ".json"

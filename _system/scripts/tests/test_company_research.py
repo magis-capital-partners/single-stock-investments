@@ -350,6 +350,19 @@ def test_share_classes_receive_the_same_company_research():
     assert {r["ticker"] for r in links}=={"GOOG","GOOGL"}
 
 
+def test_large_duplicate_bodies_share_text_despite_larger_transport_chunks(tmp_path,monkeypatch):
+    monkeypatch.setattr('build_company_research.TEXT_INLINE_BYTES',100)
+    monkeypatch.setattr('build_company_research.TEXT_CHUNK_CHARS',1000)
+    b=Builder(tmp_path,None,tmp_path/'out',tmp_path/'cache',companies={'CME':COMPANIES['CME']})
+    for i in range(2):
+        row=b.base(str(i),f'Edition {i}','test',text='Complete body. '*20,explicit=['CME'])
+        b.index.add(row,[str(i)])
+    b.publish()
+    docs=[d for p in (b.output/'documents').glob('*.json') for d in json.loads(p.read_text()).values()]
+    assert len(docs)==2 and docs[0]['text_parts']==docs[1]['text_parts']
+    assert len(list((b.output/'text').glob('*.json')))==1
+
+
 def test_company_pages_respect_byte_budget_without_dropping_rows(tmp_path,monkeypatch):
     monkeypatch.setattr('build_company_research.COMPANY_PAGE_BYTES',3000)
     b=Builder(tmp_path,None,tmp_path/'out',tmp_path/'cache',companies={'CME':COMPANIES['CME']})
