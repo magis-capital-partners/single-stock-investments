@@ -76,6 +76,21 @@ def test_captured_commodity_originals_are_searchable_only_for_reviewed_owners(tm
     assert record['locations'][0]['url']=='https://gold.example/report.html'
 
 
+def test_shared_numeric_company_files_belong_only_to_their_issuer(tmp_path):
+    from build_company_research import market_data_owner
+    path=tmp_path/'_system/reference/market-data/operating_kpis/CME.json'
+    path.parent.mkdir(parents=True)
+    path.write_text(json.dumps({'ticker':'CME','volume':25000,'comment':'Newmont Corporation operates gold mines and has expanded production while reducing costs and improving earnings.'}))
+    b=Builder(tmp_path,tmp_path/'vault',tmp_path/'out',tmp_path/'cache',companies=COMPANIES)
+    b.local_corpora()
+    record=b.index.records[b.index.anchors['path:'+path.relative_to(tmp_path).as_posix()]]
+    assert [r['ticker'] for r in record['relationships']]==['CME']
+    assert record['category']=='models' and '25000' in b.text(record)
+    assert market_data_owner(Path('insider/CME_transactions.csv'),COMPANIES)==['CME']
+    assert market_data_owner(Path('macro/CME.json'),COMPANIES)==[]
+    assert market_data_owner(Path('returns/BRK_B.csv'),{'BRK.B':{}})==['BRK.B']
+
+
 def test_fund_acronym_is_not_company_research():
     links, _ = Matcher(COMPANIES).match("CME Investor Letter October 2012", 'EMERGING SOVEREIGN GROUP. ESG Credit Macro Event Master Fund Ltd. ("CME") invests in sovereign debt. Our fund has delivered gains in emerging-market bonds.')
     assert not links
