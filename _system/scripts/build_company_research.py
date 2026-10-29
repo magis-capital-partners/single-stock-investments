@@ -40,6 +40,18 @@ SHARED_MODELS = {
     "_system/scripts/energy_btc_bridge.py": "Natural gas and Bitcoin mining model methodology",
     "_system/scripts/power_cost_model.py": "Electricity contract cost model methodology",
 }
+COMPANY_DATA_FOLDERS = {'fundamentals', 'operating_kpis', 'valuation_fundamentals', 'valuation_quotes', 'compounders', 'insider', 'returns', 'equity'}
+
+
+def market_data_owner(path: Path, companies: dict) -> list[str]:
+    """Only known ticker-file conventions establish ownership of numeric data."""
+    if path.parent.name not in COMPANY_DATA_FOLDERS:
+        return []
+    name = path.stem.upper()
+    if path.parent.name == 'insider':name = name.removesuffix('_TRANSACTIONS')
+    if path.parent.name == 'returns':name = name.replace('_', '.')
+    if path.parent.name == 'equity':name = re.sub(r'_(?:DAILY|WEEKLY|MONTHLY)_[A-Z]{3}$', '', name)
+    return [name] if name in companies else []
 
 
 def write(path: Path, value) -> None:
@@ -221,7 +233,7 @@ class Builder:
 
     def base(self, identity, title, origin, *, text="", state="indexed", date=None, author=None, period=None, explicit=(), locations=(), mime="", path=""):
         match_text = text
-        issuer_owned = bool(explicit) and any('/'+folder+'/' in '/'+path.replace('\\','/') for folder in ('investor-documents','financials','models'))
+        issuer_owned = bool(explicit) and (path.replace('\\','/').startswith('_system/reference/market-data/') or any('/'+folder+'/' in '/'+path.replace('\\','/') for folder in ('investor-documents','financials','models')))
         if issuer_owned:
             # An issuer's filings and operating data belong to that issuer.
             # Incidental banks, vendors and peers in its disclosures should not
@@ -340,6 +352,8 @@ class Builder:
             if loc not in locations:
                 locations.insert(0, loc)
         record = self.base("sha256:" + sha, title, origin, text=text, state=state, date=meta.get("published") or md.get("date"), author=meta.get("show_title") or md.get("author"), period=meta.get("period") or md.get("period"), explicit=explicit, locations=locations, path=rel)
+        if explicit and rel.startswith('_system/reference/market-data/'):
+            record['category'] = 'models'
         record["content_hash"] = sha
         record["content_md5"] = hashlib.md5(data, usedforsecurity=False).hexdigest()
         record["format"] = path.suffix.lstrip(".")
@@ -457,7 +471,8 @@ class Builder:
             count = 0
             try:
                 for path in safe_files(folder):
-                    self.local(path, "shared:" + collection)
+                    owners = market_data_owner(path, self.companies) if collection == 'market-data' else []
+                    self.local(path, "shared:" + collection, explicit=owners)
                     count += 1
                 self.receipt("shared:" + collection, count, "complete" if folder.exists() else "unavailable")
             except Exception as exc:
