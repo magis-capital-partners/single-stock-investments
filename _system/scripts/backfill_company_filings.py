@@ -1,22 +1,28 @@
-"""Recover catalogued official SEC originals over HTTPS, with resumable receipts.
+"""Recover catalogued official filing originals over HTTPS, with resumable receipts.
 
-Only EDGAR archive URLs already in the private company index are eligible.
+Only EDGAR and reviewed issuer filing hosts already in the private index are eligible.
 This deliberately does not crawl third-party links or bypass access restrictions.
 """
 from __future__ import annotations
 
 import argparse
 import base64
+from concurrent.futures import ThreadPoolExecutor
 from datetime import datetime, timezone
 import hashlib
 import json
 from pathlib import Path
 import time
+import threading
 from urllib.parse import urlparse
 from urllib.error import HTTPError
 
 from company_sources import extract
 from sec_client import SecClient
+
+ISSUER_HOSTS = frozenset({'wcsecure.weblink.com.au','www.se.com','download.se.com',
+                         'plc.rightmove.co.uk','consensusmining.com',
+                         'investorrelations.sgx.com','assets-finance.hermes.com','www.otcmarkets.com'})
 
 
 def fingerprint(value):
@@ -25,7 +31,7 @@ def fingerprint(value):
 
 def eligible(url):
     parsed = urlparse(url)
-    return parsed.scheme == 'https' and parsed.netloc == 'www.sec.gov' and parsed.path.startswith('/Archives/edgar/data/')
+    return parsed.scheme == 'https' and (parsed.netloc in ISSUER_HOSTS or parsed.netloc == 'www.sec.gov' and parsed.path.startswith('/Archives/edgar/data/'))
 
 
 def cached_filing(cache, url):
@@ -70,6 +76,8 @@ def recover(cache, url, client):
         if any(x in raw[:20000].lower() for x in (b'undeclared automated tool', b'request rate threshold exceeded', b'your request originates from an undeclared')):
             raise PermissionError('SEC access policy response')
         suffix = '.pdf' if raw.startswith(b'%PDF') else Path(urlparse(url).path).suffix.lower()
+        if suffix not in ('.pdf','.html','.htm','.txt','.xml') and b'<html' in raw[:2000].lower():
+            suffix = '.html'
         if suffix == '.pdf':
             from backfill_company_sources import extract_complete
             text, status, detail = extract_complete(raw, suffix, ocr=True)
@@ -92,22 +100,30 @@ def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument('--cache', type=Path, default=Path('_private/company-research/cache'))
     parser.add_argument('--seconds', type=int, default=1200)
+    parser.add_argument('--workers', type=int, choices=(1,2,3), default=3)
     args = parser.parse_args()
-    client = SecClient(min_interval=.25, max_attempts=1)
+    local = threading.local()
+    def fetch(url):
+        if not hasattr(local, 'client'):
+            # At most three requests at once, below three per second in steady
+            # state across the workers; each client uses SEC backoff rules.
+            local.client = SecClient(min_interval=args.workers*.4, max_attempts=1)
+        return url, recover(args.cache, url, local.client)
     end = time.monotonic() + args.seconds
     counts = {}
-    for i, url in enumerate(candidates(args.cache)):
-        if time.monotonic() >= end:
-            break
-        status = recover(args.cache, url, client)
-        counts[status] = counts.get(status, 0) + 1
-        if (i+1) % 50 == 0:
-            print(json.dumps({'processed': i+1, 'outcomes': counts}), flush=True)
-        if status == 'access_unavailable':
-            # Avoid repeatedly probing a blocked host. Resume on a later run.
-            doc = cached_filing(args.cache, url)
-            if '403' in doc.get('error', '') or 'policy' in doc.get('error', ''):
+    urls = candidates(args.cache)
+    blocked = False
+    with ThreadPoolExecutor(max_workers=args.workers) as pool:
+        for start in range(0,len(urls),args.workers):
+            if time.monotonic() >= end or blocked:
                 break
+            for url,status in pool.map(fetch, urls[start:start+args.workers]):
+                counts[status] = counts.get(status, 0) + 1
+                if sum(counts.values()) % 50 == 0:
+                    print(json.dumps({'processed':sum(counts.values()),'outcomes':counts}),flush=True)
+                if status == 'access_unavailable':
+                    doc = cached_filing(args.cache,url)
+                    blocked = blocked or '403' in doc.get('error','') or 'policy' in doc.get('error','')
     print(json.dumps(counts), flush=True)
 
 
