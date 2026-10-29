@@ -40,6 +40,7 @@ DRIVE_API_STEPS = frozenset(
 
 # Each entry is argv after `python` (script path relative to repo root + args).
 PROFILES: dict[str, list[list[str]]] = {
+    "biotech-strategy": [["_system/scripts/build_biotech_strategy.py", "--record-paper"]],
     "minimal": [
         ["_system/scripts/build_dashboard_data.py"],
     ],
@@ -50,6 +51,7 @@ PROFILES: dict[str, list[list[str]]] = {
         ["_system/scripts/build_biotech_insider_scores.py"],
         ["_system/scripts/build_biotech_peer_short_stub.py"],
         ["_system/scripts/build_biotech_composite.py"],
+        ["_system/scripts/build_biotech_strategy.py", "--record-paper"],
         ["_system/scripts/repair_letter_dates.py", "--apply"],
         ["_system/scripts/build_index_membership.py"],
         ["_system/scripts/build_insights.py"],
@@ -106,6 +108,7 @@ PROFILES: dict[str, list[list[str]]] = {
         ["_system/scripts/build_biotech_insider_scores.py"],
         ["_system/scripts/build_biotech_peer_short_stub.py"],
         ["_system/scripts/build_biotech_composite.py"],
+        ["_system/scripts/build_biotech_strategy.py", "--record-paper"],
         ["_system/scripts/build_research_memory.py"],
         # Backfill compact agent-context cards for the whole universe.
         ["_system/scripts/refresh_core_compounders.py", "--write", "--propose"],
@@ -295,6 +298,10 @@ def expand_steps(steps: list[list[str]]) -> list[list[str]]:
             # re-joins them so the Inbox shows the latest file per desk.
             out.append(["_system/scripts/check_desk_briefs.py", "--warn-only"])
             out.append(["_system/scripts/build_desk_briefs.py"])
+            # Warn-only: a quiet discovery list or a catalog pointer with an old
+            # stamp would otherwise fail intake-full. The strict command is what
+            # a desk run uses. Activism calls the same script for activist_feed.
+            out.append(["_system/scripts/check_desk_feed_age.py", "--desk", "special_situations", "--warn-only"])
         out.append(step)
     return out
 

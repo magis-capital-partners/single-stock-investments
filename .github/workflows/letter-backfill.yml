@@ -119,6 +119,20 @@ jobs:
       - name: Checkout workspace (minimal + scripts)
         run: bash _system/scripts/ci_checkout_workspace.sh minimal
 
+      # minimal does not include dashboard/, so checkout-vault's restore step
+      # sees no private-assets.json and leaves the public drive-config
+      # placeholder in place. The letters folder id lives in the vault object
+      # named by that receipt. Materialize the receipt only. Do not hydrate
+      # the rest of the private catalog into this job.
+      - name: Materialize private-asset receipt
+        run: |
+          set -euo pipefail
+          git sparse-checkout add /dashboard/private-assets.json
+          if [ ! -f dashboard/private-assets.json ]; then
+            git checkout HEAD -- dashboard/private-assets.json
+          fi
+          test -f dashboard/private-assets.json
+
       - name: Check Google credentials secret
         env:
           GOOGLE_APPLICATION_CREDENTIALS_JSON: ${{ secrets.GOOGLE_APPLICATION_CREDENTIALS_JSON }}
@@ -137,6 +151,8 @@ jobs:
 
       - name: Checkout research vault
         uses: ./.github/actions/checkout-vault
+        with:
+          hydrate: "false"
 
       - name: Configure Google credentials
         env:

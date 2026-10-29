@@ -1,0 +1,269 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "magis.situation_row.v1",
+  "title": "Special situations situation row",
+  "description": "One versioned row in _system/data/special_situations/situations.jsonl. Append a new line to change status, Drew's verdict, or the outcome. Do not rewrite an earlier line. Validated by _system/scripts/check_situation_rows.py.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "situation_id",
+    "version",
+    "recorded_at",
+    "tickers",
+    "company",
+    "situation_type",
+    "status",
+    "catalyst",
+    "forced_seller_or_ignored_buyer",
+    "screens_hit",
+    "primary_filing",
+    "one_number",
+    "pass_if",
+    "field_tags",
+    "statements",
+    "inputs_read",
+    "drew_verdict",
+    "outcome",
+    "cross_desk_tags",
+    "research_only",
+    "in_base_irr",
+    "authority"
+  ],
+  "properties": {
+    "situation_id": {
+      "type": "string",
+      "pattern": "^sit:[a-z0-9]+(?:-[a-z0-9]+)+$"
+    },
+    "version": {
+      "type": "integer",
+      "minimum": 1
+    },
+    "recorded_at": {
+      "type": "string",
+      "minLength": 20,
+      "maxLength": 40
+    },
+    "tickers": {
+      "type": "array",
+      "minItems": 1,
+      "maxItems": 6,
+      "items": {
+        "type": "string",
+        "pattern": "^[A-Z0-9][A-Z0-9.\\-]{0,15}$"
+      }
+    },
+    "company": {
+      "type": "string",
+      "minLength": 2,
+      "maxLength": 160
+    },
+    "situation_type": {
+      "description": "The desk's situation type. merger is a cash or stock acquisition that is not a CVR, a no-vote deal, or a topping bid.",
+      "enum": [
+        "spinoff_orphan",
+        "cvr_merger_security",
+        "tender_odd_lot",
+        "no_vote_deal",
+        "topping_bid",
+        "warrant_terms",
+        "capital_structure_shock",
+        "post_reorg",
+        "rights_offering",
+        "recap_stub",
+        "merger"
+      ]
+    },
+    "status": {
+      "enum": ["open", "closed", "passed", "wrong"]
+    },
+    "lane": {
+      "description": "Dashboard lane when this row is projected into special_situations.json. Defaults from screens_hit.",
+      "enum": [
+        "spinoffs",
+        "split_offs",
+        "mergers",
+        "warrants",
+        "restructurings",
+        "forced_sellers",
+        "buyback_events"
+      ]
+    },
+    "catalyst": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["date", "what_ends_it"],
+      "properties": {
+        "date": {
+          "type": ["string", "null"],
+          "pattern": "^\\d{4}-\\d{2}-\\d{2}$"
+        },
+        "what_ends_it": {
+          "type": "string",
+          "minLength": 8,
+          "maxLength": 500
+        }
+      }
+    },
+    "forced_seller_or_ignored_buyer": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["text"],
+      "properties": {
+        "text": {
+          "type": ["string", "null"],
+          "maxLength": 500
+        }
+      }
+    },
+    "screens_hit": {
+      "type": "array",
+      "minItems": 1,
+      "maxItems": 8,
+      "uniqueItems": true,
+      "items": {
+        "type": "string",
+        "pattern": "^[a-z0-9_]+$",
+        "maxLength": 40
+      }
+    },
+    "primary_filing": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["form", "accession", "url", "filed"],
+      "properties": {
+        "form": {"type": "string", "minLength": 2, "maxLength": 40},
+        "accession": {
+          "type": "string",
+          "pattern": "^\\d{10}-\\d{2}-\\d{6}$"
+        },
+        "url": {"type": "string", "pattern": "^https://", "maxLength": 300},
+        "filed": {"type": "string", "pattern": "^\\d{4}-\\d{2}-\\d{2}$"}
+      }
+    },
+    "supporting_filings": {
+      "type": "array",
+      "maxItems": 8,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["form", "accession", "url", "filed"],
+        "properties": {
+          "form": {"type": "string", "minLength": 2, "maxLength": 40},
+          "accession": {"type": "string", "pattern": "^\\d{10}-\\d{2}-\\d{6}$"},
+          "url": {"type": "string", "pattern": "^https://", "maxLength": 300},
+          "filed": {"type": "string", "pattern": "^\\d{4}-\\d{2}-\\d{2}$"},
+          "note": {"type": "string", "maxLength": 240}
+        }
+      }
+    },
+    "one_number": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["text"],
+      "properties": {
+        "text": {"type": "string", "minLength": 1, "maxLength": 120}
+      }
+    },
+    "pass_if": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["text"],
+      "properties": {
+        "text": {"type": "string", "minLength": 8, "maxLength": 400}
+      }
+    },
+    "field_tags": {
+      "description": "fact or inference for each substantive field. A fact needs an accession on primary_filing or on the statement.",
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "situation_type",
+        "catalyst",
+        "forced_seller_or_ignored_buyer",
+        "primary_filing",
+        "one_number",
+        "pass_if"
+      ],
+      "properties": {
+        "situation_type": {"enum": ["fact", "inference"]},
+        "catalyst": {"enum": ["fact", "inference"]},
+        "forced_seller_or_ignored_buyer": {"enum": ["fact", "inference"]},
+        "primary_filing": {"enum": ["fact", "inference"]},
+        "one_number": {"enum": ["fact", "inference"]},
+        "pass_if": {"enum": ["fact", "inference"]},
+        "outcome": {"enum": ["fact", "inference"]}
+      }
+    },
+    "statements": {
+      "description": "Atomic sentences. A fact must name an accession. These are the claims proposed through agent_proposals.py.",
+      "type": "array",
+      "minItems": 1,
+      "maxItems": 12,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["statement_id", "text", "tag"],
+        "properties": {
+          "statement_id": {"type": "string", "pattern": "^[a-z0-9_]+$", "maxLength": 60},
+          "text": {"type": "string", "minLength": 8, "maxLength": 600},
+          "tag": {"enum": ["fact", "inference"]},
+          "form": {"type": "string", "maxLength": 40},
+          "accession": {"type": "string", "pattern": "^\\d{10}-\\d{2}-\\d{6}$"},
+          "filed": {"type": "string", "pattern": "^\\d{4}-\\d{2}-\\d{2}$"}
+        }
+      }
+    },
+    "inputs_read": {
+      "type": "array",
+      "minItems": 1,
+      "maxItems": 12,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["feed", "path", "generated_at", "envelope_generated_at", "health"],
+        "properties": {
+          "feed": {"type": "string", "pattern": "^[a-z0-9_]+$", "maxLength": 40},
+          "path": {"type": "string", "minLength": 3, "maxLength": 200},
+          "generated_at": {"type": ["string", "null"], "maxLength": 40},
+          "envelope_generated_at": {"type": ["string", "null"], "maxLength": 40},
+          "health": {"type": ["string", "null"], "maxLength": 40}
+        }
+      }
+    },
+    "drew_verdict": {
+      "description": "Null until Drew writes a verdict. A later line copies the row and fills this. A bot does not invent it.",
+      "type": ["object", "null"],
+      "additionalProperties": false,
+      "required": ["by", "at", "text"],
+      "properties": {
+        "by": {"const": "drew"},
+        "at": {"type": "string", "minLength": 10, "maxLength": 40},
+        "text": {"type": "string", "minLength": 1, "maxLength": 400}
+      }
+    },
+    "outcome": {
+      "description": "Null until the situation ends or the filing states the result. A later line records it.",
+      "type": ["object", "null"],
+      "additionalProperties": false,
+      "required": ["as_of", "text", "tag"],
+      "properties": {
+        "as_of": {"type": "string", "pattern": "^\\d{4}-\\d{2}-\\d{2}$"},
+        "text": {"type": "string", "minLength": 8, "maxLength": 500},
+        "tag": {"enum": ["fact", "inference"]},
+        "accession": {"type": "string", "pattern": "^\\d{10}-\\d{2}-\\d{6}$"}
+      }
+    },
+    "cross_desk_tags": {
+      "type": "array",
+      "maxItems": 6,
+      "uniqueItems": true,
+      "items": {
+        "enum": ["nol_tax_assets", "activism", "tape_index", "fundamental"]
+      }
+    },
+    "notes": {"type": "string", "maxLength": 600},
+    "research_only": {"const": true},
+    "in_base_irr": {"const": false},
+    "authority": {"const": "none"}
+  }
+}

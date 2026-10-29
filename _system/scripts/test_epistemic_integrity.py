@@ -194,6 +194,125 @@ class PeriodAdapterTests(unittest.TestCase):
         self.assertIn("legacy_diagnostic", result["adapter"])
         self.assertEqual(falsifier_specs.calibration_eligibility(legacy)[0], False)
 
+    def _write_facts(self, facts: dict) -> None:
+        evidence = self.root / "TST/research/evidence/sec_companyfacts.json"
+        evidence.parent.mkdir(parents=True, exist_ok=True)
+        evidence.write_text(json.dumps({"facts": {"us-gaap": facts}}), encoding="utf-8")
+
+    def test_dg_q2_fy2026_uses_nearest_period_and_v2_capex(self):
+        # Dollar General's Q2 ends 2026-07-31. The legacy spec dates the
+        # measurement 2026-08-01, and the issuer files capex as
+        # PaymentsToAcquireProductiveAssets, which the v1 concept list omits.
+        self._write_facts({
+            "NetCashProvidedByUsedInOperatingActivities": {"units": {"USD": [
+                {"start": "2026-01-31", "end": "2026-07-31", "val": 1496705000,
+                 "fp": "Q2", "fy": 2026, "form": "10-Q", "filed": "2026-08-27"},
+                {"start": "2025-02-01", "end": "2026-01-30", "val": 3634500000,
+                 "fp": "FY", "fy": 2025, "form": "10-K", "filed": "2026-03-20"},
+                {"start": "2025-02-01", "end": "2025-08-01", "val": 1814855000,
+                 "fp": "Q2", "fy": 2026, "form": "10-Q", "filed": "2026-08-27"},
+            ]}},
+            "PaymentsToAcquireProductiveAssets": {"units": {"USD": [
+                {"start": "2026-01-31", "end": "2026-07-31", "val": 758450000,
+                 "fp": "Q2", "fy": 2026, "form": "10-Q", "filed": "2026-08-27"},
+                {"start": "2025-02-01", "end": "2026-01-30", "val": 1241162000,
+                 "fp": "FY", "fy": 2025, "form": "10-K", "filed": "2026-03-20"},
+                {"start": "2025-02-01", "end": "2025-08-01", "val": 693918000,
+                 "fp": "Q2", "fy": 2026, "form": "10-Q", "filed": "2026-08-27"},
+            ]}},
+        })
+        legacy = {
+            "spec_id": "dg-4b3bc3eb0bf6ccce71ee", "spec_revision": 1,
+            "component_id": "operating_business_and_net_assets",
+            "metric": "normalized_owner_earnings", "comparator": "lt",
+            "threshold": 2393.338, "unit": "USD millions",
+            "measurement_period_end": "2026-08-01", "observable_after": "2026-08-28",
+            "resolution_deadline": "2026-10-27",
+            "source_hint": "normalized_owner_earnings_m",
+            "calibration_eligible": False, "untestable": False,
+        }
+        result = resolve_legacy_spec("TST", legacy, self.root, date(2026, 10, 29))
+        self.assertEqual(result["value"], 2010.656)
+        self.assertEqual(result["as_of"], "2026-07-31")
+        self.assertIsNone(result["blocker_reason"])
+        self.assertEqual(result["unit"], "USD millions")
+        self.assertNotEqual((result.get("details") or {}).get("fiscal_period"), "ANY")
+
+    def test_v1_capex_rows_are_not_replaced_by_v2(self):
+        self._write_facts({
+            "NetCashProvidedByUsedInOperatingActivities": {"units": {"USD": [
+                {"start": "2026-01-01", "end": "2026-06-30", "val": 300,
+                 "fp": "Q2", "fy": 2026, "form": "10-Q", "filed": "2026-07-30"},
+                {"start": "2025-01-01", "end": "2025-12-31", "val": 1000,
+                 "fp": "FY", "fy": 2025, "form": "10-K", "filed": "2026-02-10"},
+                {"start": "2025-01-01", "end": "2025-06-30", "val": 200,
+                 "fp": "Q2", "fy": 2025, "form": "10-Q", "filed": "2025-07-30"},
+            ]}},
+            "PaymentsToAcquirePropertyPlantAndEquipment": {"units": {"USD": [
+                {"start": "2026-01-01", "end": "2026-06-30", "val": 40,
+                 "fp": "Q2", "fy": 2026, "form": "10-Q", "filed": "2026-07-30"},
+                {"start": "2025-01-01", "end": "2025-12-31", "val": 100,
+                 "fp": "FY", "fy": 2025, "form": "10-K", "filed": "2026-02-10"},
+                {"start": "2025-01-01", "end": "2025-06-30", "val": 20,
+                 "fp": "Q2", "fy": 2025, "form": "10-Q", "filed": "2025-07-30"},
+            ]}},
+            "PaymentsToAcquireProductiveAssets": {"units": {"USD": [
+                {"start": "2026-01-01", "end": "2026-06-30", "val": 9_999,
+                 "fp": "Q2", "fy": 2026, "form": "10-Q", "filed": "2026-07-30"},
+                {"start": "2025-01-01", "end": "2025-12-31", "val": 9_999,
+                 "fp": "FY", "fy": 2025, "form": "10-K", "filed": "2026-02-10"},
+                {"start": "2025-01-01", "end": "2025-06-30", "val": 9_999,
+                 "fp": "Q2", "fy": 2025, "form": "10-Q", "filed": "2025-07-30"},
+            ]}},
+        })
+        legacy = {
+            "spec_id": "calendar-q2", "spec_revision": 1,
+            "component_id": "core", "metric": "normalized_owner_earnings",
+            "comparator": "lt", "threshold": 1, "unit": "USD millions",
+            "measurement_period_end": "2026-06-30", "observable_after": "2026-07-30",
+            "resolution_deadline": "2026-09-30",
+            "source_hint": "normalized_owner_earnings_m",
+            "calibration_eligible": False, "untestable": False,
+        }
+        result = resolve_legacy_spec("TST", legacy, self.root, date(2026, 10, 29))
+        # TTM owner earnings = (1000 + 300 - 200) - (100 + 40 - 20) = 980 dollars.
+        self.assertEqual(result["value"], 0.00098)
+        self.assertIsNone(result["blocker_reason"])
+
+    def test_unmatched_measurement_does_not_use_fiscal_period_any(self):
+        self._write_facts({
+            "NetCashProvidedByUsedInOperatingActivities": {"units": {"USD": [
+                {"start": "2026-01-01", "end": "2026-03-31", "val": 10,
+                 "fp": "Q1", "fy": 2026, "form": "10-Q", "filed": "2026-05-01"},
+            ]}},
+        })
+        legacy = {
+            "spec_id": "no-nearby-period", "spec_revision": 1,
+            "component_id": "core", "metric": "normalized_owner_earnings",
+            "comparator": "lt", "threshold": 1, "unit": "USD millions",
+            "measurement_period_end": "2026-08-01", "observable_after": "2026-08-28",
+            "resolution_deadline": "2026-10-27",
+            "source_hint": "normalized_owner_earnings_m",
+            "calibration_eligible": False, "untestable": False,
+        }
+        result = resolve_legacy_spec("TST", legacy, self.root, date(2026, 10, 29))
+        self.assertIsNone(result["value"])
+        self.assertEqual(result["blocker_reason"], "ttm_period_inputs_missing")
+        self.assertNotEqual(result["details"]["fiscal_period"], "ANY")
+
+    def test_live_dg_q2_fy2026_spec_resolves_to_the_approved_hit(self):
+        root = Path(__file__).resolve().parents[2]
+        facts = root / "DG/research/evidence/sec_companyfacts.json"
+        sidecar = root / "DG/research/falsifier_specs.json"
+        if not facts.is_file() or not sidecar.is_file():
+            self.skipTest("DG companyfacts are not in this checkout")
+        spec = next(row for row in json.loads(sidecar.read_text(encoding="utf-8"))["specs"]
+                    if row.get("spec_id") == "dg-4b3bc3eb0bf6ccce71ee")
+        result = resolve_legacy_spec("DG", spec, root, date(2026, 10, 29))
+        self.assertEqual(result["value"], 2010.656)
+        self.assertEqual(result["as_of"], "2026-07-31")
+        self.assertIsNone(result["blocker_reason"])
+
 
 class HistoryTests(unittest.TestCase):
     def test_edit_and_delete_are_rejected_but_supersession_passes(self):
