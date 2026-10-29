@@ -91,6 +91,18 @@ def test_shared_numeric_company_files_belong_only_to_their_issuer(tmp_path):
     assert market_data_owner(Path('returns/BRK_B.csv'),{'BRK.B':{}})==['BRK.B']
 
 
+def test_restored_original_extraction_reuses_full_ocr_for_local_rendition(tmp_path):
+    import hashlib
+    from company_sources import digest
+    b=Builder(tmp_path,None,tmp_path/'out',tmp_path/'cache',companies=COMPANIES)
+    data=b'exact original PDF fixture';sha=digest(data)
+    target=b.cache/'drive/original.json';target.parent.mkdir(parents=True)
+    target.write_text(json.dumps({'version':1,'status':'indexed','text':'Recovered full scan','content_sha256':sha,'extraction':{'pages':1,'ocr_pages':[1]}}))
+    pointer=b.cache/'md5'/(hashlib.md5(data).hexdigest()+'.json');pointer.parent.mkdir()
+    pointer.write_text(json.dumps({'path':'drive/original.json'}))
+    assert b.cached_extract(data,'.pdf')==('Recovered full scan','indexed',sha)
+
+
 def test_fund_acronym_is_not_company_research():
     links, _ = Matcher(COMPANIES).match("CME Investor Letter October 2012", 'EMERGING SOVEREIGN GROUP. ESG Credit Macro Event Master Fund Ltd. ("CME") invests in sovereign debt. Our fund has delivered gains in emerging-market bonds.')
     assert not links

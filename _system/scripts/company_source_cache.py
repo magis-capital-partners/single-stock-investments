@@ -5,8 +5,8 @@ import json
 from pathlib import Path
 import zipfile
 
-FOLDERS=('git','drive','media','transcripts','queue-checkpoints','md5','metadata','relationships')
-ROOT_FILES=('matches.json',)
+FOLDERS=('git','drive','media','transcripts','queue-checkpoints','md5','metadata','relationships','match-work','records','published-text')
+ROOT_FILES=('matches.json','index.json','drive-inventory.json','backfill-report.json')
 
 
 def pack(cache,destination):

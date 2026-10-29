@@ -295,6 +295,16 @@ class Builder:
         sha = digest(data)
         path = self.cache / "text" / f"{sha}.json"
         prior = load(path)
+        if prior.get('status') != 'indexed':
+            md5 = hashlib.md5(data, usedforsecurity=False).hexdigest()
+            pointer = load(self.cache / 'md5' / (md5 + '.json'))
+            target = self.cache / pointer.get('path', '')
+            if pointer.get('path') and target.resolve().is_relative_to(self.cache.resolve()):
+                recovered = load(target)
+                from backfill_company_sources import complete_cache
+                if recovered.get('content_sha256') == sha and complete_cache(recovered, suffix):
+                    prior = recovered
+                    write(path, prior)
         verified_pages = suffix != '.pdf' or prior.get('status') != 'indexed' or prior.get('extraction',{}).get('pages')
         if prior.get("version") == 1 and verified_pages and prior.get("status") in {"indexed", "needs_ocr", "needs_transcript", "empty_source"}:
             return prior["text"], prior["status"], sha

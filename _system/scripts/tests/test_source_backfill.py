@@ -200,9 +200,14 @@ def test_transcript_companion_and_cache_archive_portability(tmp_path):
     assert transcript_for(audio,tmp_path)==transcript
     cache=tmp_path/'cache';(cache/'git').mkdir(parents=True);(cache/'git/a.json').write_text('{"text":"private"}')
     (cache/'work.sqlite').write_bytes(b'not portable')
-    archive=tmp_path/'archive';assert pack(cache,archive)['files']==1
+    (cache/'index.json').write_text('{"record_parts":["records/a.json"]}')
+    (cache/'records').mkdir();(cache/'records/a.json').write_text('{"source":{"text_cache":"body"}}')
+    (cache/'published-text').mkdir();(cache/'published-text/body.json').write_text('{"text":"last good body"}')
+    archive=tmp_path/'archive';assert pack(cache,archive)['files']==4
     target=tmp_path/'restored';restore(archive,target)
     assert json.loads((target/'git/a.json').read_text())['text']=='private'
     assert not (target/'work.sqlite').exists()
+    assert json.loads((target/'published-text/body.json').read_text())['text']=='last good body'
+    assert json.loads((target/'index.json').read_text())['record_parts']==['records/a.json']
     part=next(archive.glob('*.zip'));part.write_bytes(b'corrupt')
     with pytest.raises(ValueError,match='checksum'):restore(archive,tmp_path/'corrupt')
