@@ -254,6 +254,8 @@ def build_forecast(valuation, *, quote=None, as_of=None, fx=None, market=None, e
         except (ValueError, KeyError, IndexError, ImportError):
             sync_gaps.append('listing_calendar_or_completed_close_unverified')
     latest_report = (market or {}).get('latest_report') or {}
+    if ((market or {}).get('source_discovery') or {}).get('status') == 'earnings_unresolved':
+        sync_gaps.append('new_earnings_disclosure_unresolved')
     underwriting = valuation.get('underwriting') or {}
     verification = (market or {}).get('underwriting_validation') or {}
     if not underwriting and verification.get('status') == 'unverified':
@@ -262,6 +264,8 @@ def build_forecast(valuation, *, quote=None, as_of=None, fx=None, market=None, e
         result['underwriting'] = underwriting
         if verification.get('status') != 'verified' or verification.get('contract_hash') != underwriting.get('contract_hash'):
             sync_gaps.append('underwriting_contract_unverified')
+        if verification.get('input_fingerprint_matches') is False:
+            sync_gaps.append('new_economic_evidence_after_underwriting')
         if _day(underwriting.get('review_due')) and today and today > _day(underwriting['review_due']):
             sync_gaps.append('underwriting_review_due')
     result['market_sync']['latest_report'] = latest_report
