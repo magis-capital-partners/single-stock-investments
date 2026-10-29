@@ -865,11 +865,11 @@ class Builder:
                     write(self.output / filename, {"text":part})
                     parts.append(filename)
             content = {"id": rec["id"], "title": rec["title"], "text": "" if parts else full_text, "text_parts":parts, "locations": rec.get("locations", []), "processing_status": rec["processing_status"]}
-            content_bytes = len(json.dumps(content, ensure_ascii=False).encode())
-            reused = reusable.get((rec["id"], digest(json.dumps(content, sort_keys=True))))
+            reused = reusable.get((rec["id"], digest(json.dumps(content, sort_keys=True)))) if reusable else None
             if reused:
                 bundles[rec["id"]] = reused
             else:
+                content_bytes = len(json.dumps(content, ensure_ascii=False).encode())
                 if content_batch and content_size + content_bytes > 4_000_000:
                     flush_content()
                 content_batch[rec["id"]] = content
