@@ -15,6 +15,14 @@ same company fundamentals record. Quarterly or year-to-date observations never
 silently replace annual cash-flow inputs. The underwriting packet and shared
 forecast consume the same report marker and semantic source fingerprint.
 
+Between formal reports, newly filed SEC item 2.02 earnings releases are also
+collected with their financial supplements. The financial period comes from an
+explicit completed-period heading in the release, never the 8-K event date.
+An unresolved release blocks judgment and current PV/IRR until collection repairs
+it. A new accession or revised primary facts invalidate the accepted source
+fingerprint even when a filing's date predates the model. Quote and collection
+clock changes leave that fingerprint unchanged.
+
 Primary financial evidence, verified share units, a current annual baseline and
 the latest discovered SEC report plus annual disclosures are checked before any
 judgment call. Financial companies do not have a compulsory industrial capex/FCF

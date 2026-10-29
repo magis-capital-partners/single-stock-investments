@@ -47,19 +47,50 @@ def text_of(raw):
     return ' '.join(html.unescape(re.sub(r'<[^>]+>', ' ', raw)).split())
 
 
+def requested_keywords(gaps):
+    """Balance explicit disclosure requests; model text never chooses URLs/tools."""
+    groups = []
+    excluded = {'missing', 'evidence', 'primary', 'source', 'required', 'financial', 'report',
+                'statement', 'company', 'specific', 'retrieve', 'contexts', 'expanded', 'still',
+                'omit', 'from', 'with', 'that', 'these', 'this', 'have', 'need', 'needed'}
+    for gap in gaps[:12]:
+        detail = str(gap.get('detail') or '')[:8000]
+        search = re.split(r'search terms\s*:', detail, maxsplit=1, flags=re.I)[-1]
+        quoted = re.findall(r"['\u2018\u2019\"\u201c\u201d]([^'\u2018\u2019\"\u201c\u201d\n]{2,120})['\u2018\u2019\"\u201c\u201d]", search)
+        terms = [' '.join(t.lower().split()) for t in quoted
+                 if re.fullmatch(r"[A-Za-z][A-Za-z0-9 ()/,&.'-]{1,119}", t)]
+        if not terms:
+            terms = [w.lower() for w in re.findall(r'[A-Za-z]{4,35}', str(gap.get('code') or '')+' '+detail)
+                     if w.lower() not in excluded]
+        groups.append(list(dict.fromkeys(terms))[:12])
+    terms = []
+    for index in range(12):
+        for group in groups:
+            if index < len(group) and group[index] not in terms:
+                terms.append(group[index])
+                if len(terms) == 18:
+                    return terms
+    return terms
+
+
 def document_record(url, raw, focus_keywords=()):
     require(len(raw) <= 20_000_000, 'Primary filing exceeds the bounded evidence size')
     source = raw.decode('utf-8', errors='replace')
     words = ('cash', 'debt', 'assets', 'liabilities', 'inventory', 'capital', 'operating', 'shares',
              'revenue', 'credit', 'receivables', 'segment', 'net income', 'financing')
-    focus = tuple(w.lower() for w in focus_keywords if re.fullmatch(r'[A-Za-z_]{4,35}', w))[:12]
+    focus = tuple(' '.join(w.lower().split()) for w in focus_keywords
+                  if re.fullmatch(r"[A-Za-z][A-Za-z0-9_ ()/,&.'-]{1,119}", w))[:18]
     tables = []
-    for table in re.findall(r'<table\b.*?</table>', source, flags=re.IGNORECASE | re.DOTALL):
-        text = text_of(table)
+    for table in re.finditer(r'<table\b.*?</table>', source, flags=re.IGNORECASE | re.DOTALL):
+        text = text_of(table.group())
         if 80 <= len(text) <= 16000:
             score = sum(w in text.lower() for w in words)+5*sum(w in text.lower() for w in focus)
             if score >= 3:
-                tables.append((score, text))
+                # Scale, title and period often sit just outside the table.
+                # Keep adjacent primary text so supplemental facts can quote
+                # an actual scale header rather than infer a multiplier.
+                prefix = text_of(source[max(0, table.start()-15000):table.start()])[-1000:]
+                tables.append((score, (prefix+' '+text).strip()))
     contexts, seen, size = [], set(), 0
     for _, text in sorted(tables, key=lambda item: (-item[0], len(item[1]))):
         if text in seen or size+len(text) > 85000:
@@ -70,16 +101,32 @@ def document_record(url, raw, focus_keywords=()):
         if len(contexts) >= 30:
             break
     body = text_of(source)
+    def add_context(text):
+        nonlocal size
+        if text and text not in seen and size+len(text) <= 150000:
+            contexts.append(text)
+            seen.add(text)
+            size += len(text)
     # Business economics and risks are not limited to financial tables.
-    for phrase in ('our business', 'business overview', 'competition', 'working capital',
+    defaults = ('our business', 'business overview', 'competition', 'working capital',
                    'liquidity', 'regulatory capital', 'credit', 'clinical', 'inventory', 'warrant', 'dilution',
-                   'depositary', 'each ads')+focus:
+                   'depositary', 'each ads')
+    for phrase in defaults:
         matches = list(re.finditer(re.escape(phrase), body, flags=re.IGNORECASE))
         if matches:
             selected = matches[:3] if phrase in ('depositary', 'each ads') else [matches[min(1, len(matches)-1)]]
             for match in selected:
                 start = match.start()
-                contexts.append(body[max(0, start-250):start+2300])
+                add_context(body[max(0, start-250):start+2300])
+    for phrase in focus:
+        matches = list(re.finditer(re.escape(phrase), body, flags=re.IGNORECASE))
+        # A contents mention is not the disclosure. Prefer the occurrence
+        # surrounded by other requested concepts, with a stable document order.
+        matches.sort(key=lambda m: (-sum(w in body[max(0, m.start()-400):m.start()+2300].lower()
+                                            for w in focus), m.start()))
+        if matches:
+            start = matches[0].start()
+            add_context(body[max(0, start-400):start+2600])
     require(contexts, 'No financial tables could be frozen from '+url)
     return {'id': 'doc_'+digest(url)[:16], 'source_url': url,
             'content_hash': hashlib.sha256(raw).hexdigest(), 'contexts': contexts}
@@ -109,12 +156,36 @@ def listing_ratio_from_documents(documents):
     return None
 
 
+def fingerprint_facts(source):
+    """Pin a provider's rolling request end to the disclosed financial epoch.
+
+    Keep the actual fetched URLs in evidence. Only the comparison ignores this
+    known collection clock; issuer, metric, value, period and filing still bind.
+    """
+    facts = copy.deepcopy(source.get('facts') or [])
+    anchor = (source.get('latest_report') or {}).get('filed') or max(
+        (str(p.get('filed') or p.get('period') or '') for p in facts), default='')
+    try:
+        end = str((date.fromisoformat(anchor)-date(1970, 1, 1)).days*86400)
+    except (ValueError, TypeError):
+        return facts
+    for point in facts:
+        url = point.get('source_url') or ''
+        if (point.get('source_kind') == 'provider_reported'
+                and re.match(r'^https://query[12]\.finance\.yahoo\.com/ws/fundamentals-timeseries/v1/finance/timeseries/', url)):
+            point['source_url'] = re.sub(r'([?&]period2=)\d+(?=&|$)', lambda m: m[1]+end, url, count=1)
+    return facts
+
+
 def source_fingerprint(root, ticker):
     source = read(root/'_system/reference/market-data/valuation_fundamentals'/(ticker+'.json'))
     points = primary_kpis(root, ticker)
     kpis = {'points': points} if points else {}
-    return semantic_json_sha256({'facts': source.get('facts') or [], 'primary_observations': source.get('primary_observations') or [],
-                                'latest_report': source.get('latest_report'), 'operating_kpis': kpis},
+    payload = {'facts': fingerprint_facts(source), 'primary_observations': source.get('primary_observations') or [],
+               'latest_report': source.get('latest_report'), 'operating_kpis': kpis}
+    if source.get('latest_disclosure'):
+        payload['latest_disclosure'] = source['latest_disclosure']
+    return semantic_json_sha256(payload,
                                volatile_keys={'retrieved_at', 'fetched_at', 'updated_at', 'generated_at', 'last_collected', 'attempted_at', 'checked_at'})
 
 
@@ -263,7 +334,18 @@ def prepare_packet(root: Path, ticker: str, as_of: str, *, collect=True, client=
             observations.append(observation)
         except (BasisGap, ContractError):
             continue
-    documents, errors = [], []
+    documents, errors = copy.deepcopy(data.get('primary_documents') or []), []
+    if focus_keywords and documents:
+        from valuation_earnings import primary_document
+        for index, document in enumerate(documents):
+            try:
+                reader = client or SecClient(max_attempts=2)
+                raw = reader.get_bytes(document['source_url'], timeout=40)
+                focused = primary_document(document['source_url'], raw, {k: document[k] for k in ('form', 'filed', 'accession', 'as_of')}, focus_keywords)
+                focused.setdefault('period', document.get('period'))
+                documents[index] = focused
+            except (OSError, ValueError, KeyError, TypeError):
+                pass
     cik = (registry.get(ticker, {}).get('download') or {}).get('cik')
     if cik:
         client = client or SecClient(max_attempts=2)
@@ -292,7 +374,7 @@ def prepare_packet(root: Path, ticker: str, as_of: str, *, collect=True, client=
                     chosen.add(form)
                 except (OSError, ValueError) as exc:
                     errors.append({'source': url, 'error': type(exc).__name__})
-                if len(documents) >= 2:
+                if len(chosen) >= 2:
                     break
         except (OSError, ValueError) as exc:
             errors.append({'source': 'sec_submissions', 'error': type(exc).__name__})
@@ -329,7 +411,7 @@ def prepare_packet(root: Path, ticker: str, as_of: str, *, collect=True, client=
               'observations': observations, 'documents': documents, 'collection_errors': errors,
               'split_events': [{'date': e['date'], 'ratio': e['ratio']} for e in market['events']]}
     for document in documents:
-        if document.get('period') and document.get('filed', '') > packet['latest_report'].get('filed', ''):
+        if document.get('period') and (document['period'], document.get('filed', '')) > (packet['latest_report'].get('period', ''), packet['latest_report'].get('filed', '')):
             packet['latest_report'] = {'period': document['period'], 'filed': document['filed'], 'source_url': document['source_url']}
     # The packet and every downstream consumer share the discovered report marker.
     # This is source metadata, never a new economic-model review date.
@@ -364,7 +446,7 @@ def evidence_readiness(packet, *, require_documents=False):
         gaps.append({'code': 'latest_primary_document_missing', 'detail': 'Retrieve the newly discovered report, including financial tables.'})
     if require_documents and not any(d.get('form') in ('10-K', '20-F', '40-F') for d in docs):
         gaps.append({'code': 'annual_primary_document_missing', 'detail': 'Retrieve the annual report and business/financing disclosures.'})
-    if require_documents and packet.get('source_discovery', {}).get('status') == 'failed':
+    if require_documents and packet.get('source_discovery', {}).get('status') in ('failed', 'earnings_unresolved'):
         gaps.append({'code': 'report_discovery_failed', 'detail': 'Retry primary submissions; old cached reports do not prove freshness.'})
     return {'status': 'ready' if not gaps else 'evidence_gap', 'gaps': gaps,
             'primary_observations': len(primary), 'documents': len(docs),

@@ -321,7 +321,7 @@ def collect(ticker, entry, as_of, root=ROOT, inputs_dir=INPUTS):
     prior = read(path)
     result = {'schema_version': '1.0', 'ticker': ticker, 'attempted_at': stamp(),
               'quote': prior.get('quote'), 'facts': prior.get('facts') or [],
-              'primary_observations': prior.get('primary_observations') or [], 'errors': []}
+              'primary_observations': prior.get('primary_observations') or [], 'primary_documents': [], 'errors': []}
     symbol = SYMBOLS.get(ticker, ticker)
     for kind, fn in [('quote', lambda: quote(symbol, as_of)), ('facts', lambda: frmo_report_facts(as_of) if ticker == 'FRMO' else provider_facts(symbol, as_of))]:
         try:
@@ -331,6 +331,7 @@ def collect(ticker, entry, as_of, root=ROOT, inputs_dir=INPUTS):
     cik = (entry.get('download') or {}).get('cik')
     if cik and ticker != 'FRMO':
         url = f'https://data.sec.gov/api/xbrl/companyfacts/CIK{int(cik):010d}.json'
+        payload = {}
         try:
             with _PRIMARY_SEC_LOCK:
                 payload = _PRIMARY_SEC_CLIENT.get_json(url, timeout=30)
@@ -352,9 +353,33 @@ def collect(ticker, entry, as_of, root=ROOT, inputs_dir=INPUTS):
                 result['latest_report'] = max(candidates, key=lambda r: (r['period'], r['filed']))
             result['report_discovery'] = {'status': 'verified' if reports else 'no_reports',
                                           'source_url': discovery_url, 'checked_at': as_of}
+            from valuation_earnings import collect_earnings, latest_disclosure
+            formal_candidates = reports+[r for r in [latest_primary_report(payload, url, as_of)] if r]
+            formal = max(formal_candidates, key=lambda r: (r['period'], r['filed'])) if formal_candidates else {}
+            disclosure = latest_disclosure(submissions, cik, as_of, formal)
+            if disclosure:
+                result['latest_disclosure'] = disclosure
+                try:
+                    with _PRIMARY_SEC_LOCK:
+                        _, documents = collect_earnings(submissions, cik, as_of, formal, _PRIMARY_SEC_CLIENT,
+                                                       prior.get('primary_documents') or [])
+                    result['primary_documents'] = documents
+                    resolved = [d for d in documents if d.get('period')]
+                    if not resolved:
+                        raise ValueError('New earnings disclosure needs a verified reporting period and financial tables')
+                    latest = max(resolved, key=lambda d: (d['period'], d['filed']))
+                    earnings_report = {k: latest[k] for k in ('period', 'filed', 'accession', 'form', 'source_url')}
+                    result['latest_report'] = max([result.get('latest_report') or earnings_report, earnings_report],
+                                                key=lambda r: (r['period'], r['filed']))
+                except (OSError, ValueError, KeyError, TypeError) as exc:
+                    result['report_discovery']['status'] = 'earnings_unresolved'
+                    result['errors'].append({'collector': 'sec_earnings', 'error': str(exc), 'retry': 'next_scheduled_run'})
         except (OSError, ValueError, KeyError, TypeError) as exc:
             result['report_discovery'] = {'status': 'failed', 'source_url': discovery_url, 'checked_at': as_of}
             result['latest_report'] = result.get('latest_report') or prior.get('latest_report')
+            if prior.get('latest_disclosure'):
+                result['latest_disclosure'] = prior['latest_disclosure']
+                result['primary_documents'] = prior.get('primary_documents') or []
             result['errors'].append({'collector': 'sec_submissions', 'error': str(exc), 'retry': 'next_scheduled_run'})
     currencies = {p['currency'] for p in result['facts'] if p['field'] in {'ocf', 'equity', 'dividends'} and p.get('currency')}
     if len(currencies) == 1 and result.get('quote'):
