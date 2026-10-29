@@ -25,6 +25,7 @@ GROK = "grok/special_situations/2026-10-12-mdt-mmed"
         "_system/memory-hub/research-equity/CONTEXT.md",
         "_system/data/separations/separation_registry.jsonl",
         "_system/data/separations/separation_amendments.jsonl",
+        "_system/data/special_situations/situations.jsonl",
         "_system/research/short-alpha/candidates.json",
         "_system/reference/activist-reports/short_scorecard/Fugazi.csv",
         "MDT/third-party-analyses/vic/vic_2026-10-12_note_ab12.md",

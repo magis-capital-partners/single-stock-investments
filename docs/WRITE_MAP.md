@@ -22,6 +22,7 @@ Branch prefixes: humans use any branch; Cursor research agents keep `cursor/`; G
 | `_system/memory-hub/research-equity/daily/<YYYY-MM-DD>.md` | `[PROPOSED]` bullets, at most three per session | Hub README | Human promotion |
 | `_system/memory-hub/research-equity/CONTEXT.md` | One desk line under `## Desk` per session | Hub README | Humans and bots at session start |
 | `_system/data/separations/separation_registry.jsonl`, `_system/data/separations/separation_amendments.jsonl` | Append-only rows with filing accessions | `check_separation_universe.py --strict` | Separations lane, Special Situations desk |
+| `_system/data/special_situations/situations.jsonl` | Append-only situation rows with filing accessions | `check_situation_rows.py` | Special Situations desk, Ideas book |
 | `_system/research/short-alpha/candidates.json` | Rows with `origin: desk_note` or `reverse_split_research` | `build_short_alpha_dashboard.py --check` | Shorts tab |
 | `_system/reference/activist-reports/short_scorecard/` | Folder README | Folder README | Short Alpha leads |
 | `{TICKER}/third-party-analyses/vic/*.md` | GROK.md text-only VIC | `third_party_inventory.py` | Ticker folder, Insights |

@@ -31,6 +31,8 @@ GROK_DATA_ALLOWLIST: tuple[str, ...] = (
     "_system/memory-hub/research-equity/CONTEXT.md",
     "_system/data/separations/separation_registry.jsonl",
     "_system/data/separations/separation_amendments.jsonl",
+    # Weekly verdicts append a line. The schema and the checker stay human-gated.
+    "_system/data/special_situations/situations.jsonl",
     "_system/research/short-alpha/candidates.json",
     "_system/reference/activist-reports/short_scorecard/*",
     "*/third-party-analyses/vic/*.md",
