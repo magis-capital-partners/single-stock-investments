@@ -386,7 +386,8 @@ def test_committed_dashboard_payload_matches_the_committed_briefs():
     assert doc["health"]["structural_errors"] == []
     assert doc["authority"] == "none"
     paths = {d["path"] for d in doc["desks"]}
-    assert "_system/data/desk_briefs/special_situations/2026-10-12.json" in paths
+    latest_special = max((ROOT / "_system" / "data" / "desk_briefs" / "special_situations").glob("????-??-??.json"))
+    assert f"_system/data/desk_briefs/special_situations/{latest_special.name}" in paths
     now = datetime.now(timezone.utc)
     fresh = builder.build(now=now)
     assert [d["path"] for d in fresh["desks"]] == [d["path"] for d in doc["desks"]], "rebuild dashboard/data/desk_briefs.json"

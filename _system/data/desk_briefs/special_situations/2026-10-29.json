@@ -1,0 +1,92 @@
+{
+  "schema_version": "desk_briefs.v1",
+  "desk": "special_situations",
+  "as_of": "2026-10-29",
+  "author": "grok-drew-special-situations",
+  "owner": "drew",
+  "inputs_read": [
+    {"path": "dashboard/data/portfolio_news.json", "generated_at": "2026-10-28T15:17:56.502197+00:00"},
+    {"path": "dashboard/data/warrants.json", "generated_at": "2026-10-27T13:57:56Z"},
+    {"path": "dashboard/data/activist_feed.json", "generated_at": "2026-10-27T13:55:22Z"},
+    {"path": "dashboard/data/document_catalog_summary.json", "generated_at": "2026-10-16T16:17:11Z"},
+    {"path": "dashboard/data/special_situations.json", "generated_at": "2026-10-27T13:58:22Z"},
+    {"path": "dashboard/data/separations.json", "generated_at": "2026-10-27T13:57:57Z"},
+    {"path": "_system/data/special_situations/situations.jsonl", "generated_at": null},
+    {"path": "_system/portfolio/registry.json", "generated_at": "2026-10-29T09:17:36Z"}
+  ],
+  "items": [
+    {
+      "ticker": "ABT",
+      "headline": "Abbott plans a tax-free spin of Nutrition into its own public company, expected by the end of 2027.",
+      "one_number": "about $8.5 billion annual sales",
+      "lane": "spinoffs",
+      "evidence": [
+        {
+          "kind": "filing",
+          "ref": "8-K 0001104659-26-117587 filed 2026-10-21",
+          "url": "https://www.sec.gov/Archives/edgar/data/1800/000110465926117587/tm2627971d1_8k.htm",
+          "claim_type": "fact"
+        }
+      ],
+      "confidence": "filing",
+      "next": "Pass until a Form 10 states a ratio, a record date, or who must sell.",
+      "handoff": "nol_tax_assets"
+    },
+    {
+      "ticker": "FDX",
+      "headline": "FedEx kept a 19.9% FedEx Freight stake and expects to monetize it within 12 months of September 30, 2026.",
+      "one_number": "19.9% stake; 12 months from 2026-09-30",
+      "lane": "forced_sellers",
+      "evidence": [
+        {
+          "kind": "filing",
+          "ref": "10-Q 0001048911-26-000131 filed 2026-10-28",
+          "url": "https://www.sec.gov/Archives/edgar/data/1048911/000104891126000131/fdx-20260930.htm",
+          "claim_type": "fact"
+        }
+      ],
+      "confidence": "filing",
+      "next": "The 10-Q says expects, subject to market conditions. It does not say FedEx must sell.",
+      "handoff": "tape_index"
+    },
+    {
+      "ticker": "DASH",
+      "headline": "DoorDash agreed to buy Maplebear (Instacart) for $65.00 a share, at least 75% cash and up to 25% stock.",
+      "one_number": "$65.00 per share",
+      "lane": "mergers",
+      "evidence": [
+        {
+          "kind": "filing",
+          "ref": "425 0001792789-26-000065 filed 2026-10-29",
+          "url": "https://www.sec.gov/Archives/edgar/data/1792789/000179278926000065/dashform425combined.htm",
+          "claim_type": "fact"
+        }
+      ],
+      "confidence": "filing",
+      "next": "The 425 states no closing date and no vote. Do not call it a no-vote deal until a filing does.",
+      "handoff": "fundamentals"
+    },
+    {
+      "ticker": "MDT",
+      "headline": "MiniMed exchange offer expired October 9, 2026. Final proration is 18.289133%. Odd lots were accepted in full.",
+      "one_number": "proration 18.289133%; odd lots in full",
+      "lane": "split_offs",
+      "evidence": [
+        {
+          "kind": "filing",
+          "ref": "425 0001628280-26-065819 filed 2026-10-14",
+          "url": "https://www.sec.gov/Archives/edgar/data/1613103/000162828026065819/a425-finalresultsofexchang.htm",
+          "claim_type": "fact"
+        }
+      ],
+      "confidence": "filing",
+      "next": "The offer is over. Medtronic said it will keep no MiniMed shares. The results release does not state the settlement date.",
+      "handoff": null
+    }
+  ],
+  "screens_empty": ["topping_bid", "rights_offering", "recap_stub", "no_vote_deal"],
+  "notes": "SKYA, KBR, and ARI are in _system/data/special_situations/situations.jsonl. They are not registry holdings, so this brief cannot list them. SKYA's tender now expires November 12, 2026. KBR targets a Trinzic spin on January 4, 2027. ARI expects its last NYSE day on November 6, 2026.",
+  "research_only": true,
+  "in_base_irr": false,
+  "authority": "none"
+}

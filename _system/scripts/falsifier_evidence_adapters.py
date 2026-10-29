@@ -632,6 +632,30 @@ def resolve_spec(ticker: str, spec: dict, root: Path, today: date) -> dict:
     return _resolve_companyfacts(ticker, spec, root, today, definition, plan)
 
 
+def _nearest_fiscal_period(rows: list[dict], target: date, tolerance: int) -> str | None:
+    """SEC fiscal-period label whose period end is closest to ``target``.
+
+    ``ANY`` is not a companyfacts ``fp``. The TTM selector matches that token
+    literally, so a 52/53-week quarter (DG Q2 ends 2026-07-31; the spec's
+    measurement date is 2026-08-01) used to miss every row. Ties keep the
+    latest filing.
+    """
+    candidates = []
+    for row in rows:
+        label = str(row.get("fp") or "").upper()
+        if label not in {"Q1", "Q2", "Q3", "FY"}:
+            continue
+        distance = _date_distance(str(row.get("end") or ""), target.isoformat())
+        if distance is None or distance > tolerance:
+            continue
+        candidates.append((distance, str(row.get("filed") or ""), label))
+    if not candidates:
+        return None
+    nearest = min(item[0] for item in candidates)
+    return max((item for item in candidates if item[0] == nearest),
+               key=lambda item: item[1])[2]
+
+
 def resolve_legacy_spec(ticker: str, spec: dict, root: Path, today: date) -> dict:
     """Resolve migrated diagnostics with v3 period semantics, never eligibility.
 
@@ -652,9 +676,28 @@ def resolve_legacy_spec(ticker: str, spec: dict, root: Path, today: date) -> dic
         "expected_publication_date": (observable or measurement).isoformat(),
     }
     if hint == "normalized_owner_earnings_m":
-        definition = metric_definitions(root).get("normalized_owner_earnings_ttm_m") or {}
-        plan = {**common, "source_adapter": "sec_companyfacts_ttm",
-                "source_unit": "USD", "observation_type": "duration"}
+        # TTM matching treats ANY as a literal fp, which no SEC row has.
+        # Read the period from the filing instead of the calendar month.
+        definitions = metric_definitions(root)
+        definition = dict(definitions.get("normalized_owner_earnings_ttm_m") or {})
+        v2 = definitions.get("normalized_owner_earnings_ttm_m_v2") or {}
+        doc = read_json(root / ticker / "research/evidence/sec_companyfacts.json")
+        tolerance = int(common["end_date_tolerance_days"])
+        ocf_rows = _duration_rows(
+            doc, list(definition.get("operating_cash_flow_concepts") or []),
+            "USD", today)
+        capex_concepts = list(definition.get("capital_expenditure_concepts") or [])
+        if not _duration_rows(doc, capex_concepts, "USD", today):
+            # DG files PaymentsToAcquireProductiveAssets, which only v2 lists.
+            definition["capital_expenditure_concepts"] = list(
+                v2.get("capital_expenditure_concepts") or [])
+        plan = {
+            **common,
+            "fiscal_period": _nearest_fiscal_period(ocf_rows, measurement, tolerance) or "",
+            "source_adapter": "sec_companyfacts_ttm",
+            "source_unit": "USD",
+            "observation_type": "duration",
+        }
         result = _resolve_owner_earnings_ttm(ticker, spec, root, today, definition, plan)
         result["adapter"] = "legacy_diagnostic_sec_companyfacts_ttm"
         return result

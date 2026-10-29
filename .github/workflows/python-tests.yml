@@ -104,6 +104,9 @@ on:
       - "dashboard/data/capitulation_daily.json"
       - "dashboard/data/index_membership.json"
       - "dashboard/data/portfolio_news.json"
+      - "dashboard/data/warrants.json"
+      - "dashboard/data/activist_feed.json"
+      - "dashboard/data/document_catalog.json"
   push:
     branches: [main]
     paths:
@@ -195,6 +198,9 @@ on:
       - "dashboard/data/capitulation_daily.json"
       - "dashboard/data/index_membership.json"
       - "dashboard/data/portfolio_news.json"
+      - "dashboard/data/warrants.json"
+      - "dashboard/data/activist_feed.json"
+      - "dashboard/data/document_catalog.json"
   # Bot pushes (GITHUB_TOKEN) start no workflow, so main is also tested daily.
   schedule:
     - cron: "23 5 * * *"
@@ -312,6 +318,7 @@ jobs:
         _system/scripts/test_separation_flow_impact.py
         _system/scripts/test_separation_wiring.py
         _system/scripts/test_separation_falsifier_adapter.py
+        _system/scripts/test_epistemic_integrity.py
         _system/scripts/test_lint_deep_dive_separation.py
         _system/scripts/test_separations_ui.py
         _system/scripts/test_cvr_discovery.py
@@ -424,6 +431,9 @@ jobs:
             /dashboard/data/capitulation_daily.json
             /dashboard/data/index_membership.json
             /dashboard/data/portfolio_news.json
+            /dashboard/data/warrants.json
+            /dashboard/data/activist_feed.json
+            /dashboard/data/document_catalog.json
           sparse-checkout-cone-mode: false
       - uses: actions/setup-python@v5
         with:
