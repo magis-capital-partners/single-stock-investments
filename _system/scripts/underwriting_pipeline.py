@@ -645,8 +645,14 @@ def usage_summary(work):
     summary = {'sessions': 0, 'sessions_with_usage': 0, 'input_tokens': 0, 'cached_input_tokens': 0,
                'output_tokens': 0, 'approved_companies': 0, 'by_role': {}, 'by_model': {}}
     seen = set()
-    for path in work.glob('cache/*/*/receipt.json'):
-        row = read(path)
+    records = [(str(path), read(path)) for path in work.glob('cache/*/*/receipt.json')]
+    def quality(record):
+        path, row = record
+        usage = row.get('usage') if isinstance(row.get('usage'), dict) else {}
+        return (sum(type(usage.get(k)) is int for k in ('input_tokens', 'output_tokens', 'cached_input_tokens')),
+                row.get('finished_at') or '', path)
+    # A final receipt wins over a partial copy regardless of filesystem order.
+    for _, row in sorted(records, key=quality, reverse=True):
         session = row.get('agent_id')
         if not session or session in seen:
             continue

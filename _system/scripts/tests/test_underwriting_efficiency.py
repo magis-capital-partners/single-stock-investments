@@ -56,12 +56,16 @@ def test_deterministic_assembly_needs_no_provider_and_rejects_a_forged_receipt()
         validate_stage_receipts(receipts, model)
 
 
-def test_usage_never_treats_unreported_tokens_as_zero_cost(tmp_path):
+def test_usage_never_treats_unreported_tokens_as_zero_cost(tmp_path, monkeypatch):
     write(tmp_path/'cache/T/a/receipt.json', {'agent_id': 'one', 'stage': 'author',
           'usage': {'input_tokens': 100, 'cached_input_tokens': 80, 'output_tokens': 20}})
     write(tmp_path/'cache/T/b/receipt.json', {'agent_id': 'one', 'stage': 'author', 'usage': {'input_tokens': 999}})
     write(tmp_path/'cache/T/c/receipt.json', {'agent_id': 'two', 'stage': 'challenger'})
     write(tmp_path/'progress/T.json', {'approved': {'contract': 'frozen'}})
+    original_glob = Path.glob
+    def reverse_discovery(path, pattern):
+        return iter(sorted(original_glob(path, pattern), reverse=True))
+    monkeypatch.setattr(Path, 'glob', reverse_discovery)
     result = usage_summary(tmp_path)
     assert result['sessions'] == 2 and result['sessions_without_usage'] == 1
     assert result['input_tokens'] == 100 and result['output_tokens'] == 20
