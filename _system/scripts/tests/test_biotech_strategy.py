@@ -107,6 +107,14 @@ def test_verified_dated_marks_can_start_a_simulated_paper_portfolio(tmp_path):
     assert all(not row["observed_fill"] for row in doc["paper"]["positions"])
 
 
+def test_paper_decisions_do_not_assume_a_same_day_publication_preceded_the_close(tmp_path):
+    observed = [{**r, "known_at":"2026-01-02"} for r in features()]
+    marks = [{"date":"2026-01-02", "ticker":"AAA", "close":10}]
+    doc = build(tmp_path, "2026-01-02", observations=observed, marks=marks, protocol=protocol())
+    assert doc["paper"]["positions"] == []
+    assert doc["paper"]["status"] == "awaiting_verified_inputs_and_marks"
+
+
 def test_registered_rules_cannot_change_under_the_same_identifier(tmp_path):
     path = tmp_path / "registry.json"
     register_protocol(path, protocol(), "2026-01-01")

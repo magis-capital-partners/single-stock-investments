@@ -139,7 +139,7 @@ def build(root, as_of, *, observations=None, marks=None, protocol=None, ledger=N
     previous_events = read_paper(ledger) if ledger else []
     prior_events = [r for r in previous_events if r.get("as_of", "") < as_of]
     prior = prior_events[-1] if prior_events else None
-    verified, rejected = available_rows(observations, (day(as_of) + timedelta(days=1)).isoformat(), protocol)
+    verified, rejected = available_rows(observations, as_of, protocol)
     verified = [r for r in verified if r.get("identity_status") == "verified"]
     closing = {r["ticker"]: number(r.get("close")) for r in marks if str(r.get("date"))[:10] == as_of and number(r.get("close")) and number(r.get("close")) > 0}
     paper = paper_snapshot(verified or rows, as_of, protocol, prices=closing, previous=prior)

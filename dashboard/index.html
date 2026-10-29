@@ -2472,7 +2472,7 @@ function setAppHash(nextHash) {
 }
 
 function parseRouteFromHashString(hash) {
-  const researchStrategy = window.StrategyWorkbench?.parseRoute(hash);
+  const researchStrategy = typeof StrategyWorkbench === 'undefined' ? null : StrategyWorkbench.parseRoute(hash);
   if (researchStrategy) return researchStrategy;
   hash = String(hash || '').split('?')[0];
   const portfolioMatch = /^#\/portfolio(?:\/(all|drew|michael))?(?:\/(positions|realized|risk|margin|performance|orders|reconciliation))?$/i.exec(hash || '');
