@@ -10,14 +10,14 @@
     "automated_and_generic_models": "screening only; never authorize capital"
   },
   "summary": {
-    "security_count": 866,
+    "security_count": 867,
     "tier_counts": {
       "tier_1": 40,
       "tier_2": 12,
-      "tier_3": 814
+      "tier_3": 815
     },
     "owner_override_count": 0,
-    "automatic_assignment_count": 866
+    "automatic_assignment_count": 867
   },
   "source_health": {
     "status": "healthy",
@@ -31398,6 +31398,41 @@
     },
     "ZTS": {
       "ticker": "ZTS",
+      "tier": 3,
+      "tier_id": "tier_3",
+      "label": "Broad screening universe",
+      "research_depth": "automated screening and lightweight monitoring only",
+      "actionability_cap": "screening_only",
+      "assignment_source": "automatic",
+      "automatic_tier": 3,
+      "override_reason": null,
+      "review_by": null,
+      "review_overdue": false,
+      "assignment_reasons": [
+        {
+          "qualifying_tier": 3,
+          "code": "research_universe_member",
+          "detail": "Registry membership establishes research coverage only; it is not evidence of ownership.",
+          "source_ref": "_system/portfolio/registry.json"
+        }
+      ],
+      "promotion_gates": [
+        "Promote to Tier 2 when a curated follow-up, watchlist entry, priority stance, or proposed target allocation appears.",
+        "Promote to Tier 1 only through a Tier 1 qualifying signal or documented owner override."
+      ],
+      "demotion_conditions": [
+        "Remove from the valuation universe only through an explicit universe-governance change; absence of a model is not a deletion signal."
+      ],
+      "workflow_policy": {
+        "committee_auto_start": false,
+        "committee_requires_stock_specific_model": true,
+        "automated_screen_can_authorize_capital": false,
+        "generic_screen_can_authorize_capital": false,
+        "capital_authority": "human_decision_only"
+      }
+    },
+    "AXR": {
+      "ticker": "AXR",
       "tier": 3,
       "tier_id": "tier_3",
       "label": "Broad screening universe",
