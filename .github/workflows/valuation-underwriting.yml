@@ -75,6 +75,8 @@ jobs:
           python -m pip install pytest pypdf PyYAML exchange-calendars==4.13.2
       - name: Restore primary research and paid-call receipts
         uses: ./.github/actions/checkout-vault
+        with:
+          include-source-archive: 'false'
       - name: Verify underwriting gates before calling a model
         run: |
           python -m pytest -q _system/scripts/tests/test_underwriting_pipeline.py
