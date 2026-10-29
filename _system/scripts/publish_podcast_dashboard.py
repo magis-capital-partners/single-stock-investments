@@ -127,6 +127,8 @@ def publish() -> dict:
         youtube_lane.seal_insights_manifest(MANIFEST_PATH, videos=False, podcasts=True)
     except RuntimeError as exc:
         raise SystemExit(str(exc)) from exc
+    from build_feed_status import write_feed_status
+    write_feed_status(ROOT)
     return {
         "episode_count": len(rows),
         "with_analysis": analysed,

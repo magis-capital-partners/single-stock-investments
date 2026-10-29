@@ -1220,19 +1220,19 @@
               : escapeHtml(r.fund);
             const docLabel = letterDocumentLabel(r);
             const fundBlock = docLabel
-              ? `${fundCell}<div class="tier-sub" style="font-size:10px;margin-top:2px">${escapeHtml(docLabel)}</div>`
+              ? `${fundCell}<div class="tier-sub" style="font-size:var(--font-caption,12px);margin-top:2px">${escapeHtml(docLabel)}</div>`
               : fundCell;
             return `
             <tr class="clickable-row" data-fund-id="${escapeHtml(r.fund_id || '')}">
               <td class="mono">${escapeHtml(r.letter_date || '—')}</td>
               <td>${fundBlock}</td>
               <td class="mono">${escapeHtml(r.quarter || '—')}</td>
-              <td style="font-size:11px">${(r.themes || []).slice(0, 2).join(', ') || '—'}</td>
-              <td class="mono" style="font-size:11px">${fmtTickers(tickerList)}</td>
-              <td class="mono" style="font-size:11px;color:var(--accent-green)">${fmtTickers(r.adds)}</td>
-              <td class="mono" style="font-size:11px;color:var(--accent-amber)">${fmtTickers([...(r.trims || []), ...(r.exits || [])])}</td>
-              <td class="mono" style="font-size:11px;color:var(--accent-cyan)">${fmtTickers(r.our_overlap)}</td>
-              <td style="font-size:11px;max-width:240px">${escapeHtml((r.lead_summary || '').slice(0, 120))}</td>
+              <td style="font-size:var(--font-caption,12px)">${(r.themes || []).slice(0, 2).join(', ') || '—'}</td>
+              <td class="mono" style="font-size:var(--font-caption,12px)">${fmtTickers(tickerList)}</td>
+              <td class="mono" style="font-size:var(--font-caption,12px);color:var(--accent-green)">${fmtTickers(r.adds)}</td>
+              <td class="mono" style="font-size:var(--font-caption,12px);color:var(--accent-amber)">${fmtTickers([...(r.trims || []), ...(r.exits || [])])}</td>
+              <td class="mono" style="font-size:var(--font-caption,12px);color:var(--accent-cyan)">${fmtTickers(r.our_overlap)}</td>
+              <td style="font-size:var(--font-caption,12px);max-width:240px">${escapeHtml((r.lead_summary || '').slice(0, 120))}</td>
               <td>${recordEvidenceLink(r, linkHtml, ghRepo)}</td>
             </tr>`;
           }).join('')}
@@ -1263,7 +1263,7 @@
               <td class="mono">${escapeHtml(String(f.letter_count != null ? f.letter_count : ((f.letters || []).length || f.quarter || '—')))}</td>
               <td class="mono">${(f.our_tickers || []).slice(0, 6).join(', ') || '—'}</td>
               <td class="mono">${f.duplicate_count != null ? f.duplicate_count : (f.near_dup_count != null ? f.near_dup_count : '—')}</td>
-              <td style="font-size:11px">${(f.maps_to_persona || []).join(', ') || '—'}</td>
+              <td style="font-size:var(--font-caption,12px)">${(f.maps_to_persona || []).join(', ') || '—'}</td>
               <td>${recordEvidenceLink(f, linkHtml, ghRepo)}</td>
             </tr>`).join('')}
         </tbody>
@@ -1790,7 +1790,7 @@
         <span class="badge ${confClass}" title="Parser confidence">${escapeHtml(confLabel)}</span>
         ${flags}
         ${review}
-        ${v.extract_snippet ? `<button type="button" class="filter-btn source-pill filing-verify-btn" data-verify-event="${escapeHtml(event.id || '')}" style="margin-left:6px;padding:2px 8px;font-size:11px">Verify</button>` : ''}
+        ${v.extract_snippet ? `<button type="button" class="filter-btn source-pill filing-verify-btn" data-verify-event="${escapeHtml(event.id || '')}" style="margin-left:6px;padding:2px 8px;font-size:var(--font-caption,12px)">Verify</button>` : ''}
       </div>`;
   }
 
@@ -1816,11 +1816,11 @@
       <p class="tier-sub">${escapeHtml((v.filing_form || 'Filing') + (v.filing_date ? ` filed ${v.filing_date}` : '') + (v.period_end ? ` · period ${v.period_end}` : ''))}</p>
       <div style="display:grid;gap:10px;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));margin-top:10px">
         <div class="research-box" style="margin:0">
-          <div class="label" style="font-size:11px;color:var(--text-muted);margin-bottom:6px">Extract lines used</div>
+          <div class="label" style="font-size:var(--font-caption,12px);color:var(--text-muted);margin-bottom:6px">Extract lines used</div>
           <pre style="white-space:pre-wrap;margin:0;font-size:12px">${snippet || '—'}</pre>
         </div>
         <div class="research-box" style="margin:0">
-          <div class="label" style="font-size:11px;color:var(--text-muted);margin-bottom:6px">Parser context</div>
+          <div class="label" style="font-size:var(--font-caption,12px);color:var(--text-muted);margin-bottom:6px">Parser context</div>
           <div class="tier-sub">Tag: <span class="mono">${escapeHtml(v.xbrl_tag || '—')}</span></div>
           <div class="tier-sub">Confidence: <span class="badge ${parserConfidenceBadge(v.parser_confidence)}">${escapeHtml(String(v.parser_confidence || 'low').toUpperCase())}</span></div>
           <div class="tier-sub">Flags: ${escapeHtml((v.parser_flags || []).join(', ') || 'none')}</div>
@@ -3948,9 +3948,9 @@
             <button type="button" class="linkish mono" data-ticker-insight="${escapeHtml(t.ticker)}">${escapeHtml(t.ticker)}</button>
             <div class="tier-sub">${escapeHtml((t.company || '').slice(0, 32))}</div>
           </td>
-          <td style="font-size:11px">${escapeHtml(fund)}</td>
+          <td style="font-size:var(--font-caption,12px)">${escapeHtml(fund)}</td>
           <td><span class="badge ${STANCE_BADGE[action] || 'badge-us'}">${escapeHtml(action)}</span></td>
-          <td class="mono" style="font-size:11px">${escapeHtml(quarter)}</td>
+          <td class="mono" style="font-size:var(--font-caption,12px)">${escapeHtml(quarter)}</td>
           <td class="mono ${fresh.cls}">${escapeHtml(fresh.label)}</td>
           <td class="insight-cell">${renderInsightCompact(owner, escapeHtml, linkHtml)}${commentary && !owner ? `<div class="tier-sub">${escapeHtml(commentary.slice(0, 100))}</div>` : ''}</td>
         </tr>`;
@@ -4004,7 +4004,7 @@
             <button type="button" class="linkish mono" data-ticker-insight="${escapeHtml(t.ticker)}">${escapeHtml(t.ticker)}</button>
             <div class="tier-sub">${escapeHtml((t.company || '').slice(0, 32))}</div>
           </td>
-          <td style="font-size:11px">${reasons.length ? reasons.map(r => `<span class="badge badge-warn">${escapeHtml(r)}</span>`).join(' ') : '<span class="tier-sub">—</span>'}</td>
+          <td style="font-size:var(--font-caption,12px)">${reasons.length ? reasons.map(r => `<span class="badge badge-warn">${escapeHtml(r)}</span>`).join(' ') : '<span class="tier-sub">—</span>'}</td>
           <td class="mono ${fresh.cls}">${escapeHtml(fresh.label)}</td>
           <td class="insight-cell">${renderInsightCompact(primary, escapeHtml, linkHtml)}</td>
         </tr>`;
@@ -4558,11 +4558,11 @@
         : escapeHtml(r.fund);
       return `
       <tr>
-        <td class="mono" style="font-size:11px">${escapeHtml(r.letter_date || '—')}</td>
-        <td class="mono" style="font-size:11px">${escapeHtml(r.quarter || '—')}</td>
+        <td class="mono" style="font-size:var(--font-caption,12px)">${escapeHtml(r.letter_date || '—')}</td>
+        <td class="mono" style="font-size:var(--font-caption,12px)">${escapeHtml(r.quarter || '—')}</td>
         <td>${fundCell}</td>
         <td><span class="badge ${STANCE_BADGE[r.action] || 'badge-us'}">${escapeHtml(r.action || '—')}</span></td>
-        <td style="font-size:11px;max-width:300px">${escapeHtml((r.commentary || '').slice(0, 200))}</td>
+        <td style="font-size:var(--font-caption,12px);max-width:300px">${escapeHtml((r.commentary || '').slice(0, 200))}</td>
         <td>${recordEvidenceLink(r, linkHtml, ghRepo)}</td>
       </tr>`;
     }).join('');

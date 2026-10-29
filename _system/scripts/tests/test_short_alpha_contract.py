@@ -481,8 +481,9 @@ def test_shorts_tab_renders_entry_fields_and_lens_strip(tmp_path: Path) -> None:
     assert "href" not in out["unsafe"]
     assert 'data-short-reverse-splits' not in html
     assert 'href="#/strategies/systematic-shorts/backtest"' in html
-    assert 'data-short-reverse-splits' in out["strategy"]
-    assert 'Earlier portfolio, execution, and event studies' in out["strategy"]
+    assert 'Short backtest selection' in out["strategy"]
+    assert 'Earlier research' in out["strategy"]
+    assert 'Strategy</a>' in out["strategy"]
     assert out["mount"] == "function"
 
 

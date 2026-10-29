@@ -1,12 +1,13 @@
 """Exercise strategy routing and the actual Insights renderers without a broker."""
 import subprocess
+import re
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[3]
 
 
 def node(source):
-    result = subprocess.run(["node", "-"], input=source, text=True, encoding="utf-8", capture_output=True, cwd=ROOT)
+    result = subprocess.run(["node", "-"], input="global.window=global;require('./dashboard/ui-format.js');\n"+source, text=True, encoding="utf-8", capture_output=True, cwd=ROOT)
     assert result.returncode == 0, result.stderr
 
 
@@ -29,9 +30,10 @@ assert.equal(S.stateFromHash(S.route('biotech-quant','signals',{query:'A & B',pa
 def test_five_strategy_navigation_has_the_requested_order_and_active_parent():
     html = (ROOT / "dashboard/index.html").read_text(encoding="utf-8")
     nav = html.split('id="strategies-subnav"', 1)[1].split('</nav>', 1)[0]
-    labels = ['>SPX 0DTE<', '>LS Algo<', '>Systematic Shorts<', '>Darwin CC ', '>Biotech Quant<']
+    labels = ['>SPX 0DTE<', '>LS Algo<', '>Systematic Shorts<', '>Darwin CC ', '>Reverse-split short ', '>Biotech Quant<']
     assert [nav.index(label) for label in labels] == sorted(nav.index(label) for label in labels)
-    assert "['spx-0dte', 'letf', 'systematic-shorts', 'darwin', 'biotech-quant'].includes(view)" in html
+    parents = html.split("const parentView = [", 1)[1].split("].includes(view)", 1)[0]
+    assert set(re.findall(r"'([^']+)'", parents)) == {"spx-0dte", "letf", "systematic-shorts", "darwin", "reverse-split-strategy", "biotech-quant"}
 
 
 def test_memory_filters_review_scope_and_biotech_extraction():

@@ -99,6 +99,16 @@ def build(root, as_of, *, observations=None, marks=None, protocol=None, ledger=N
         value = {**row, "ticker": ticker, "legacy_composite_score": row.get("composite_score"),
                  "identity_status": identity, "as_of": as_of, "known_at": signals.get("generated_at"),
                  "eligible": identity not in {"unresolved", "quarantined", "out_of_scope"}}
+        value["factor_dates"] = {}
+        value["factor_evidence"] = {}
+        for factor, source in sources.items():
+            observation = (source.get("by_ticker") or {}).get(ticker) or {}
+            stamp = observation.get("observed_at") or observation.get("settlement_ymd") or observation.get("as_of")
+            value["factor_dates"][factor] = day(stamp).isoformat() if day(stamp) else None
+            value["factor_evidence"][factor] = {
+                "source": observation.get("source_ref") or observation.get("source_file") or observation.get("source"),
+                "reason": observation.get("spend_missing_reason") or observation.get("missing_reason"),
+                "status": observation.get("spend_status") or observation.get("data_status")}
         inputs.append(value)
     rows = score_rows(inputs, protocol)
     coverage = []
@@ -114,6 +124,9 @@ def build(root, as_of, *, observations=None, marks=None, protocol=None, ledger=N
                 observed = f"{q[:4]}-{month:02d}-" + ("30" if month in (6, 9) else "31")
         observed = day(observed).isoformat() if day(observed) else None
         values = [r for r in rows if number(r.get(field)) is not None]
+        dated = [r["factor_dates"][factor] for r in values if r["factor_dates"].get(factor)]
+        if factor != "specialist_consensus":
+            observed = min(dated) if len(dated) == len(values) and dated else None
         valid = len(values)
         state = source_state(1 if valid else None, observed, as_of, protocol["max_age_days"][factor])
         coverage.append({"id": factor, "label": factors_by_id.get(factor, {}).get("label", factor.replace("_", " ")),

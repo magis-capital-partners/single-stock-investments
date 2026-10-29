@@ -82,6 +82,7 @@ MAIN_DIRS = ("dashboard/data/insights/video_details",)
 # video shard, so a podcast push rewrites it and must start from the copy
 # already on main rather than an empty file.
 PODCAST_PATHS = (
+    "dashboard/data/feed_status.json",
     "dashboard/data/insights/manifest.json",
     "dashboard/data/insights/podcasts.json",
     "_system/reference/podcasts/insights_index_mirror.json",

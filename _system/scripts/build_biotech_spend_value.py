@@ -44,7 +44,7 @@ def assign_quintiles(values: dict[str, float], higher_is_better: bool) -> dict[s
     n = len(ordered)
     out: dict[str, int] = {}
     for i, (ticker, _) in enumerate(ordered):
-        out[ticker] = 5 - min(4, int(i * 5 / max(n, 1))) if higher_is_better else 1 + min(4, int(i * 5 / max(n, 1)))
+        out[ticker] = 5 - min(4, int(i * 5 / max(n, 1)))
     return out
 
 
@@ -123,7 +123,7 @@ def cumulative_sum(points: list[dict], key: str = "value") -> float | None:
 
 
 def market_cap_proxy(ticker: str, signals: dict) -> float | None:
-    """Prefer issuer market cap (SEC×Yahoo), then valuation, then 13F MV sum."""
+    """Issuer capitalization only; fund position value is not issuer size."""
     from ownership_common import FUNDAMENTALS_PATH, load_json as own_load  # noqa: WPS433
 
     funda = (own_load(FUNDAMENTALS_PATH, {"by_ticker": {}}).get("by_ticker") or {}).get(ticker) or {}
@@ -152,10 +152,6 @@ def market_cap_proxy(ticker: str, signals: dict) -> float | None:
                 return float(price) * float(shares)
         except (TypeError, ValueError):
             pass
-    # Last resort: specialist-reported MV sum (position liquidity, not issuer size)
-    mv = row.get("total_market_value_usd")
-    if mv:
-        return float(mv)
     return None
 
 
@@ -172,7 +168,8 @@ def build(*, fetch_missing: bool = True, max_fetch: int = 80) -> dict:
             or m.get("biotech_watchlist")
         ]
 
-    by_ticker: dict[str, dict] = {}
+    previous = load_json(FUNDAMENTALS_PATH, {})
+    by_ticker: dict[str, dict] = {t: dict(r) for t, r in (previous.get("by_ticker") or {}).items()}
     spend_values: dict[str, float] = {}
     cik_map = sec_cik_map() if fetch_missing else load_json(SEC_CIK_MAP, {})
     fetched = 0
@@ -180,6 +177,11 @@ def build(*, fetch_missing: bool = True, max_fetch: int = 80) -> dict:
     for ticker in tickers:
         if ":" in ticker or ticker.startswith("CUSIP"):
             continue
+        # This file is shared with issuer-capitalization enrichment. Preserve
+        # those observations and explicitly clear only this factor's fields.
+        base = by_ticker.setdefault(ticker, {"ticker": ticker})
+        base.update(spend_value=None, spend_value_quintile=None,
+                    spend_status="missing", spend_missing_reason="Aligned revenue and cash-flow periods, issuer capitalization and dates are required.")
         do_fetch = fetch_missing and fetched < max_fetch
         series, newly = ensure_series(ticker, cik_map, fetch=do_fetch)
         if newly:
@@ -190,8 +192,12 @@ def build(*, fetch_missing: bool = True, max_fetch: int = 80) -> dict:
 
         rev_ttm = ttm_sum(rev_pts) if rev_pts else None
         cfo_ttm = ttm_sum(cfo_pts) if cfo_pts else None
-        # spend = revenue - CFO; when both missing, skip
-        if rev_ttm is None and cfo_ttm is None:
+        # Missing reported revenue is not reported zero revenue. The two series
+        # must describe the same periods before they can be subtracted.
+        if rev_ttm is None or cfo_ttm is None or len(rev_pts) < 4 or len(cfo_pts) < 4:
+            continue
+        if [p.get("period") for p in rev_pts] != [p.get("period") for p in cfo_pts]:
+            base["spend_missing_reason"] = "Revenue and operating cash-flow periods do not align."
             continue
         rev = rev_ttm or 0.0
         cfo = cfo_ttm or 0.0
@@ -206,12 +212,10 @@ def build(*, fetch_missing: bool = True, max_fetch: int = 80) -> dict:
             continue
         mcap = market_cap_proxy(ticker, signals)
         if not mcap or mcap <= 0:
-            # Fall back to specialist-reported MV sum as rough proxy
-            mcap = float(((signals.get("by_ticker") or {}).get(ticker) or {}).get("total_market_value_usd") or 0)
-        if not mcap or mcap <= 0:
+            base["spend_missing_reason"] = "Issuer market capitalization is unavailable; specialist holdings value cannot replace it."
             continue
         spend_value = mcap / cumulative_spend
-        by_ticker[ticker] = {
+        by_ticker[ticker] = {**base,
             "ticker": ticker,
             "revenue_ttm": rev_ttm,
             "cfo_ttm": cfo_ttm,
@@ -219,8 +223,20 @@ def build(*, fetch_missing: bool = True, max_fetch: int = 80) -> dict:
             "cumulative_spend": cumulative_spend,
             "market_cap_proxy": mcap,
             "spend_value": round(spend_value, 4),
+            "spend_status": "period_basis_review",
+            "spend_missing_reason": "Verify annual versus quarterly cash-flow durations and reporting currency before decision use.",
+            "observed_at": min(rev_pts[-1]["period"], cfo_pts[-1]["period"]),
+            "source_ref": str((FUND_SERIES_DIR / f"{ticker}.json").relative_to(ROOT)).replace("\\", "/"),
         }
-        spend_values[ticker] = spend_value
+        # Legacy series can mix annual CFO with quarterly revenue. Preserve the
+        # diagnostic, but only an explicit reviewed period/currency contract
+        # can supply the ranking factor.
+        if series.get("period_basis_verified") is True and series.get("currency") == "USD":
+            by_ticker[ticker].update(spend_status="verified", spend_missing_reason=None)
+            spend_values[ticker] = spend_value
+        else:
+            by_ticker[ticker]["spend_value_diagnostic"] = by_ticker[ticker]["spend_value"]
+            by_ticker[ticker]["spend_value"] = None
 
     # Lower spend_value = cheaper = better → higher quintile
     quintiles = assign_quintiles(spend_values, higher_is_better=False)
@@ -229,7 +245,7 @@ def build(*, fetch_missing: bool = True, max_fetch: int = 80) -> dict:
 
     return {
         "generated_at": now_iso(),
-        "ticker_count": len(by_ticker),
+        "ticker_count": len(by_ticker), "factor_populated": len(spend_values),
         "by_ticker": by_ticker,
         "notes": "spend_value = market_cap_proxy / cumulative_spend; Q5 = cheapest on spend.",
     }
