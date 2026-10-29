@@ -48,6 +48,17 @@ on:
       - ".gitattributes"
       - "CONTRIBUTING.md"
       - "docs/WRITE_MAP.md"
+      - "dashboard/activist-viz.js"
+      - "dashboard/criticality-viz.js"
+      - "dashboard/darwin-cc-viz.js"
+      - "dashboard/fund-letters/reader.js"
+      - "dashboard/portfolio-viz.js"
+      - "dashboard/reverse-split-strategy.js"
+      - "dashboard/workspace-tools.js"
+      - "dashboard/display-system.js"
+      - "dashboard/display-system.css"
+      - "dashboard/display-registry.json"
+      - "dashboard/ui-format.js"
       - "dashboard/index.html"
       - "dashboard/company-research.js"
       - "dashboard/company-research.css"
@@ -93,6 +104,9 @@ on:
       - "dashboard/data/capitulation_daily.json"
       - "dashboard/data/index_membership.json"
       - "dashboard/data/portfolio_news.json"
+      - "dashboard/data/warrants.json"
+      - "dashboard/data/activist_feed.json"
+      - "dashboard/data/document_catalog.json"
   push:
     branches: [main]
     paths:
@@ -128,6 +142,17 @@ on:
       - ".gitattributes"
       - "CONTRIBUTING.md"
       - "docs/WRITE_MAP.md"
+      - "dashboard/activist-viz.js"
+      - "dashboard/criticality-viz.js"
+      - "dashboard/darwin-cc-viz.js"
+      - "dashboard/fund-letters/reader.js"
+      - "dashboard/portfolio-viz.js"
+      - "dashboard/reverse-split-strategy.js"
+      - "dashboard/workspace-tools.js"
+      - "dashboard/display-system.js"
+      - "dashboard/display-system.css"
+      - "dashboard/display-registry.json"
+      - "dashboard/ui-format.js"
       - "dashboard/index.html"
       - "dashboard/company-research.js"
       - "dashboard/company-research.css"
@@ -173,6 +198,9 @@ on:
       - "dashboard/data/capitulation_daily.json"
       - "dashboard/data/index_membership.json"
       - "dashboard/data/portfolio_news.json"
+      - "dashboard/data/warrants.json"
+      - "dashboard/data/activist_feed.json"
+      - "dashboard/data/document_catalog.json"
   # Bot pushes (GITHUB_TOKEN) start no workflow, so main is also tested daily.
   schedule:
     - cron: "23 5 * * *"
@@ -296,6 +324,7 @@ jobs:
         _system/scripts/test_cvr_discovery.py
         _system/scripts/test_generalized_valuation_system.py
         _system/scripts/test_activist_attribution.py
+        _system/scripts/test_activist_subject.py
     steps:
       - uses: actions/checkout@v4
         with:
@@ -348,6 +377,17 @@ jobs:
             /.gitattributes
             /CONTRIBUTING.md
             /docs/WRITE_MAP.md
+            /dashboard/activist-viz.js
+            /dashboard/criticality-viz.js
+            /dashboard/darwin-cc-viz.js
+            /dashboard/fund-letters/reader.js
+            /dashboard/portfolio-viz.js
+            /dashboard/reverse-split-strategy.js
+            /dashboard/workspace-tools.js
+            /dashboard/display-system.js
+            /dashboard/display-system.css
+            /dashboard/display-registry.json
+            /dashboard/ui-format.js
             /dashboard/index.html
             /dashboard/company-research.js
             /dashboard/company-research.css
@@ -391,6 +431,9 @@ jobs:
             /dashboard/data/capitulation_daily.json
             /dashboard/data/index_membership.json
             /dashboard/data/portfolio_news.json
+            /dashboard/data/warrants.json
+            /dashboard/data/activist_feed.json
+            /dashboard/data/document_catalog.json
           sparse-checkout-cone-mode: false
       - uses: actions/setup-python@v5
         with:

@@ -24,7 +24,8 @@ def test_portfolio_browser_only_writes_to_the_paper_order_route() -> None:
     assert "method: 'POST'" in javascript
     assert "/api/v2/portfolio/paper-orders" in javascript
     assert "x-paper-order-mode" in javascript
-    assert "Queue paper order" in javascript
+    assert "Request preview" in javascript
+    assert "I understand this will not place a broker order." in javascript
 
 
 def test_portfolio_has_brokerage_grade_overview_and_position_controls() -> None:
@@ -49,7 +50,7 @@ def test_portfolio_has_deeper_read_only_workflows() -> None:
     assert "data-ph-linked-symbol" in javascript
     assert "Metric lineage" in javascript
     assert "Factor drill-down" in javascript
-    assert "NAV vs" in javascript
+    assert "Account value" in javascript
     assert "quarantined" in javascript
     assert "PAPER · NEVER TRANSMITTED" in javascript
     assert ".ph-drawer" in css

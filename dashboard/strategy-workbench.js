@@ -2,9 +2,9 @@
 (function (global) {
   'use strict';
   const esc = value => String(value ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
-  const num = value => Number.isFinite(Number(value)) && value !== null && value !== '' ? new Intl.NumberFormat('en-US', {maximumFractionDigits: 2}).format(Number(value)) : 'Unknown';
-  const pct = value => typeof value === 'number' && Number.isFinite(value) ? new Intl.NumberFormat('en-US', {style:'percent', maximumFractionDigits:1}).format(value) : 'Awaiting evidence';
-  const date = value => value && !Number.isNaN(Date.parse(value)) ? new Intl.DateTimeFormat('en-US', {month:'short',day:'numeric',year:'numeric',timeZone:'UTC'}).format(new Date(String(value).length===10 ? value+'T12:00:00Z' : value)) : 'Undated';
+  const num = value => global.DashboardFormat.number(value,{maximumFractionDigits:2});
+  const pct = value => global.DashboardFormat.percent(value);
+  const date = value => global.DashboardFormat.date(value,{timeZone:'UTC'});
   const BIO = 'biotech-quant', SHORT = 'systematic-shorts';
   const sections = {
     [BIO]: [['overview','Overview'],['signals','Signals'],['portfolio','Portfolio'],['backtest','Backtest'],['risk','Risk & data'],['research','Research']],
@@ -16,7 +16,7 @@
     if (!cache.has(path)) cache.set(path, global.fetch(path, {cache:'no-cache'}).then(r => {
       if (!r.ok) throw Error(`Publication unavailable (${r.status})`);
       return r.json();
-    }).then(doc => { if (doc.private_snapshot) throw Error('The authorized publication is unavailable in this preview.'); return doc; }).catch(error => {cache.delete(path);throw error;}));
+    }).then(doc => { global.DashboardDisplay?.record(path,doc); if (doc.private_snapshot) throw Error('The authorized publication is unavailable in this preview.'); return doc; }).catch(error => {global.DashboardDisplay?.record(path,null,error);cache.delete(path);throw error;}));
     return cache.get(path);
   }
   function parseRoute(hash) {
@@ -107,7 +107,10 @@
     return header(BIO,state.section,doc.as_of) + (views[state.section]||bioOverview)(doc,state);
   }
   function shortBacktest() {
-    return `<div class="strategy-study-links"><a href="${route(SHORT,'announcement')}">Compare announcement-time entries →</a><a href="${route(SHORT,'forward')}">Follow frozen forward policies →</a></div>${global.ThirdPlusStudyViz?.render() || empty('The current short-study renderer is unavailable.')}<details class="strategy-disclosure" data-third-plus-legacy><summary>Earlier portfolio, execution, and event studies</summary><section data-short-reverse-splits><p data-short-reverse-status role="status">Open this section to load the preserved studies.</p><div data-short-reverse-splits-body></div></section></details>`;
+    const earlier = new URLSearchParams(String(global.location?.hash || '').split('?')[1] || '').get('study') === 'earlier';
+    const nav = `<nav class="strategy-tabs" aria-label="Short backtest selection"><a href="${route(SHORT,'backtest')}"${!earlier?' aria-current="page"':''}>Strategy</a><a href="${route(SHORT,'backtest',{study:'earlier'})}"${earlier?' aria-current="page"':''}>Earlier research</a></nav>`;
+    if (!earlier) return nav + (global.ReverseSplitStrategyViz?.render() || empty('The selected strategy publication is unavailable.'));
+    return nav + `<div class="strategy-study-links"><a href="${route(SHORT,'announcement')}">Compare announcement-time entries →</a><a href="${route(SHORT,'forward')}">Follow frozen forward policies →</a></div>${global.ThirdPlusStudyViz?.render() || empty('The current short-study renderer is unavailable.')}<details class="strategy-disclosure" data-third-plus-legacy><summary>Earlier portfolio, execution, and event studies</summary><section data-short-reverse-splits><p data-short-reverse-status role="status">Open this section to load the preserved studies.</p><div data-short-reverse-splits-body></div></section></details>`;
   }
   function shortOverview(summary, forward) {
     return `<div class="strategy-overview"><section class="strategy-thesis"><p class="strategy-eyebrow">From selection to net results</p><h2>Which short rules survive costs and portfolio risk?</h2><p>Compare financing, listing stress, reverse splits, and the announcement-time studies. Every version keeps its own universe, entry clock, execution assumptions, and unresolved liabilities.</p><a class="strategy-primary" href="${route(SHORT,'backtest')}">Explore the backtests →</a></section><aside class="strategy-readiness"><h2>Independent evidence</h2><dl><div><dt>Forward observations</dt><dd>${num(forward?.independent_forward_outcomes)}</dd></div><div><dt>Coverage</dt><dd>${forward?.coverage_complete===true?'Complete within declared scope':'Incomplete / review required'}</dd></div><div><dt>Recorded source events</dt><dd>${num(Object.values(summary?.counts||{}).reduce((a,b)=>a+Number(b),0))}</dd></div></dl><a href="${route(SHORT,'forward')}">Inspect forward paper policies →</a></aside></div><section class="strategy-section"><h2>Research workspaces</h2><div class="strategy-directory"><a href="${route(SHORT,'signals')}"><strong>Signals</strong><span>Quant screens and systematic candidate selection</span></a><a href="${route(SHORT,'portfolio')}"><strong>Portfolio & risk</strong><span>Account replays, execution costs, capacity, and borrow</span></a><a href="${route(SHORT,'research')}"><strong>Research & data</strong><span>Registered hypotheses, evidence, and source events</span></a></div></section><p class="strategy-note">Company theses and discretionary positions remain in <a href="#/ideas/short-alpha">Fundamental Shorts</a>.</p>`;
@@ -149,7 +152,9 @@
         if (!current()) return;
         container.innerHTML=renderShort(state.section,summary,forward);
         if(state.section==='backtest') {
-          global.ThirdPlusStudyViz?.attach(container);
+          const earlierStudy = new URLSearchParams(String(global.location?.hash || '').split('?')[1] || '').get('study') === 'earlier';
+          if(earlierStudy)global.ThirdPlusStudyViz?.attach(container);
+          else global.ReverseSplitStrategyViz?.attach(container);
           const earlier=container.querySelector('[data-third-plus-legacy]');
           earlier?.addEventListener('toggle',()=>{if(earlier.open)helpers.mountLegacy?.(container);});
         }

@@ -32,7 +32,7 @@ test("a lagging feed gets its own amber label, not the unavailable style", () =>
   assert.doesNotMatch(html, /<b class="is-unavailable">lagging<\/b>/);
   assert.match(html, /1 lagging · /, "the coverage line counts it");
   const css = readFileSync(join(HERE, "..", "index.html"), "utf8");
-  assert.match(css, /\.risk-component-head \.is-delayed, \.risk-component-head \.is-lagging \{ color: #f5b942; \}/, "amber, like delayed");
+  assert.match(css, /\.risk-component-head \.is-delayed, \.risk-component-head \.is-lagging \{ color: var\(--warning\); \}/, "amber, like delayed");
 });
 
 test("unknown states still fall through to the unavailable style", () => {

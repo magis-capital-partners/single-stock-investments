@@ -252,7 +252,7 @@
         <th>Index</th><th>Dir</th><th>Weight</th><th>Base $</th><th>Reason</th>
       </tr></thead><tbody>${body}</tbody></table>
       ${cliff}
-      <p class="muted" style="margin-top:6px;font-size:11px">Negative % float = net forced selling. Both sides of Russell 1000/2000 migrations are modeled (HK 2013). BMI (high) is scenario-only.</p>
+      <p class="muted" style="margin-top:6px;font-size:var(--font-caption,12px)">Negative % float = net forced selling. Both sides of Russell 1000/2000 migrations are modeled (HK 2013). BMI (high) is scenario-only.</p>
     </details>`;
   }
 
@@ -288,7 +288,7 @@
           r.fi && r.fi.is_russell_breakpoint_migration
             ? renderFlowBridge(r.fi, e)
             : r.fi
-              ? `<span class="muted" title="${esc(pctFloatTooltip(r.fi))}" style="font-size:11px">hover % for band</span>`
+              ? `<span class="muted" title="${esc(pctFloatTooltip(r.fi))}" style="font-size:var(--font-caption,12px)">hover % for band</span>`
               : '';
         return `<tr>
           <td class="mono">${e(r.ticker)}</td>
