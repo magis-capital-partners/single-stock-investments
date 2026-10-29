@@ -218,3 +218,14 @@ def test_transcript_companion_and_cache_archive_portability(tmp_path):
 def test_empty_original_is_not_a_parser_failure():
     for suffix in ('.pdf','.epub','.doc','.txt'):
         assert extract_complete(b'  \n',suffix)[1] == 'empty_source'
+
+
+def test_temporary_download_name_requires_an_intact_pdf():
+    import fitz
+    pdf=fitz.open();page=pdf.new_page();page.insert_text((72,72),'Company earnings and business research original.')
+    raw=pdf.tobytes();pdf.close()
+    text,status,details=extract_complete(raw,'.crdownload')
+    assert status=='indexed' and 'business research' in text
+    assert details['pages']==1 and details['integrity']=='Complete unrepaired PDF'
+    assert extract_complete(raw[:-40],'.crdownload')[1]=='failed'
+    assert extract_complete(b'not a PDF','.crdownload')[1]=='unsupported'
