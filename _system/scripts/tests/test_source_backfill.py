@@ -205,10 +205,12 @@ def test_transcript_companion_and_cache_archive_portability(tmp_path):
     (cache/'index.json').write_text('{"record_parts":["records/a.json"]}')
     (cache/'records').mkdir();(cache/'records/a.json').write_text('{"source":{"text_cache":"body"}}')
     (cache/'published-text').mkdir();(cache/'published-text/body.json').write_text('{"text":"last good body"}')
-    archive=tmp_path/'archive';assert pack(cache,archive)['files']==4
+    (cache/'words').mkdir();(cache/'words/body.json').write_text('["complete","search","text"]')
+    archive=tmp_path/'archive';assert pack(cache,archive)['files']==5
     target=tmp_path/'restored';restore(archive,target)
     assert json.loads((target/'git/a.json').read_text())['text']=='private'
     assert not (target/'work.sqlite').exists()
+    assert json.loads((target/'words/body.json').read_text())==['complete','search','text']
     assert json.loads((target/'published-text/body.json').read_text())['text']=='last good body'
     assert json.loads((target/'index.json').read_text())['record_parts']==['records/a.json']
     part=next(archive.glob('*.zip'));part.write_bytes(b'corrupt')

@@ -5,7 +5,7 @@ import json
 from pathlib import Path
 import zipfile
 
-FOLDERS=('git','drive','media','transcripts','queue-checkpoints','md5','metadata','relationships','match-work','records','published-text')
+FOLDERS=('git','drive','media','transcripts','queue-checkpoints','md5','metadata','relationships','match-work','records','published-text','words')
 ROOT_FILES=('matches.json','index.json','drive-inventory.json','backfill-report.json')
 
 
