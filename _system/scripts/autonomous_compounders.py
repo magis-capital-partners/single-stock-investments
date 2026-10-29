@@ -220,6 +220,54 @@ def latest_primary_report(payload, url, as_of):
     return {'period': row['end'], 'filed': row['filed'], 'accession': row.get('accn'), 'source_url': url}
 
 
+def submission_reports(payload, cik, as_of):
+    """Discover reports independently of whether a particular XBRL tag exists."""
+    recent = (payload.get('filings') or {}).get('recent') or {}
+    result = []
+    for i, form in enumerate(recent.get('form') or []):
+        if form not in {'10-K', '10-Q', '20-F', '40-F', '6-K', '10-K/A', '10-Q/A', '20-F/A', '40-F/A'}:
+            continue
+        def value(key):
+            rows = recent.get(key) or []
+            return rows[i] if i < len(rows) else ''
+        period, filed, accession, document = (value(k) for k in ('reportDate', 'filingDate', 'accessionNumber', 'primaryDocument'))
+        if not period or not filed or period > as_of or filed > as_of:
+            continue
+        if not re.fullmatch(r'\d{10}-\d{2}-\d{6}', accession) or not re.fullmatch(r'[A-Za-z0-9_.-]+', document):
+            continue
+        result.append({'period': period, 'filed': filed, 'accession': accession, 'form': form,
+                       'source_url': f'https://www.sec.gov/Archives/edgar/data/{int(cik)}/{accession.replace("-", "")}/{document}'})
+    return sorted(result, key=lambda r: (r['period'], r['filed']), reverse=True)
+
+
+def primary_observations(payload, url, as_of):
+    """Keep dated quarterly/annual/instant evidence separate from annual economics."""
+    from underwriting_evidence import EXTRA_TAGS
+    selected = {}
+    cutoff = date.fromisoformat(as_of).year-10
+    for namespace in ('us-gaap', 'ifrs-full', 'dei'):
+        tags = set(EXTRA_TAGS) | {t for rows in SEC_TAGS.values() for t in rows}
+        tags |= {'CashAndCashEquivalents', 'Assets', 'Liabilities', 'Equity', 'CommonStockSharesOutstanding', 'EntityCommonStockSharesOutstanding'}
+        for tag in sorted(tags):
+            item = ((payload.get('facts') or {}).get(namespace) or {}).get(tag) or {}
+            for unit, rows in (item.get('units') or {}).items():
+                if unit != 'shares' and not re.fullmatch('[A-Z]{3}', unit):
+                    continue
+                for raw in rows:
+                    period, filed = raw.get('end'), raw.get('filed')
+                    if not period or not filed or period > as_of or filed > as_of or int(period[:4]) < cutoff or number(raw.get('val')) is None:
+                        continue
+                    key = (namespace, tag, unit, raw.get('start'), period)
+                    if key in selected and selected[key]['filed'] >= filed:
+                        continue
+                    field = ('shares' if tag in SEC_TAGS['shares'] else 'balance_shares') if unit == 'shares' else tag
+                    selected[key] = {'field': field, 'tag': tag, 'value': float(raw['val']), 'currency': unit,
+                                     'start': raw.get('start'), 'period': period, 'filed': filed, 'form': raw.get('form'),
+                                     'source_url': url, 'source_kind': 'primary', 'locator': namespace+':'+tag+'; '+str(raw.get('accn')),
+                                     'measurement_type': 'flow' if raw.get('start') else 'balance', 'scope': 'reported consolidated'}
+    return sorted(selected.values(), key=lambda r: (r['period'], r['locator'], r.get('start') or ''))
+
+
 def frmo_report_facts(as_of):
     """Discover the newest issuer report and validate its explicit table scale."""
     from io import BytesIO
@@ -272,7 +320,8 @@ def collect(ticker, entry, as_of, root=ROOT, inputs_dir=INPUTS):
     path = root / inputs_dir / (ticker + '.json')
     prior = read(path)
     result = {'schema_version': '1.0', 'ticker': ticker, 'attempted_at': stamp(),
-              'quote': prior.get('quote'), 'facts': prior.get('facts') or [], 'errors': []}
+              'quote': prior.get('quote'), 'facts': prior.get('facts') or [],
+              'primary_observations': prior.get('primary_observations') or [], 'errors': []}
     symbol = SYMBOLS.get(ticker, ticker)
     for kind, fn in [('quote', lambda: quote(symbol, as_of)), ('facts', lambda: frmo_report_facts(as_of) if ticker == 'FRMO' else provider_facts(symbol, as_of))]:
         try:
@@ -287,11 +336,26 @@ def collect(ticker, entry, as_of, root=ROOT, inputs_dir=INPUTS):
                 payload = _PRIMARY_SEC_CLIENT.get_json(url, timeout=30)
             primary = primary_facts(payload, url, as_of)
             result['latest_report'] = latest_primary_report(payload, url, as_of)
+            result['primary_observations'] = primary_observations(payload, url, as_of)
             # Replace only the same field, period AND currency. Preserve other history.
             keys = {(p['field'], p['period'], p['currency']) for p in primary}
             result['facts'] = [p for p in result['facts'] if (p['field'], p['period'], p['currency']) not in keys] + primary
         except (OSError, ValueError) as exc:
             result['errors'].append({'collector': 'sec_primary', 'error': str(exc), 'retry': 'next_scheduled_run'})
+        discovery_url = f'https://data.sec.gov/submissions/CIK{int(cik):010d}.json'
+        try:
+            with _PRIMARY_SEC_LOCK:
+                submissions = _PRIMARY_SEC_CLIENT.get_json(discovery_url, timeout=30)
+            reports = submission_reports(submissions, cik, as_of)
+            candidates = reports + [r for r in (result.get('latest_report'), prior.get('latest_report')) if r]
+            if candidates:
+                result['latest_report'] = max(candidates, key=lambda r: (r['period'], r['filed']))
+            result['report_discovery'] = {'status': 'verified' if reports else 'no_reports',
+                                          'source_url': discovery_url, 'checked_at': as_of}
+        except (OSError, ValueError, KeyError, TypeError) as exc:
+            result['report_discovery'] = {'status': 'failed', 'source_url': discovery_url, 'checked_at': as_of}
+            result['latest_report'] = result.get('latest_report') or prior.get('latest_report')
+            result['errors'].append({'collector': 'sec_submissions', 'error': str(exc), 'retry': 'next_scheduled_run'})
     currencies = {p['currency'] for p in result['facts'] if p['field'] in {'ocf', 'equity', 'dividends'} and p.get('currency')}
     if len(currencies) == 1 and result.get('quote'):
         source_currency = next(iter(currencies))
@@ -621,7 +685,7 @@ def run(root=ROOT, as_of=None, collect_inputs=False, tickers=None):
     selected = tickers or config['tickers']
     if set(selected) - set(config['tickers']):
         raise ValueError('Unknown core compounder')
-    prior = read(root / STATE).get('companies') or {}
+    prior = {t: r for t, r in (read(root / STATE).get('companies') or {}).items() if t in config['tickers']}
     for ticker in selected:
         data = collect(ticker, registry.get(ticker) or {}, as_of, root) if collect_inputs else read(root / INPUTS / (ticker + '.json'))
         prior[ticker] = estimate(ticker, data, as_of)
