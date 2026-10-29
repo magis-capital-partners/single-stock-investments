@@ -387,3 +387,21 @@ def test_disk_backed_source_survives_publish_and_failed_refresh(tmp_path):
 def test_source_browser_contracts():
     result=subprocess.run(["node","--test",str(Path(__file__).with_suffix(".cjs"))],capture_output=True,text=True,timeout=30)
     assert result.returncode==0,result.stdout+result.stderr
+
+
+def test_recovered_drive_copy_does_not_resurrect_old_git_placeholder(tmp_path):
+    cache,out=tmp_path/'cache',tmp_path/'out'
+    first=Builder(tmp_path,None,out,cache,companies={"CME":COMPANIES["CME"]})
+    old=first.base("git:original","CME filing","git_inventory",state="awaiting_extraction",explicit=["CME"])
+    first.add(old,["git:original"]);first.publish()
+    again=Builder(tmp_path,None,out,cache,companies={"CME":COMPANIES["CME"]})
+    recovered=again.base("git:original","CME filing","git_inventory",text="Complete company filing text.",explicit=["CME"])
+    again.add(recovered,["git:original","md5:exact-original"])
+    drive=again.base("md5:exact-original","CME filing.pdf","drive",text="Complete company filing text.",explicit=["CME"])
+    drive.update(family="drive:file",revision="v1")
+    again.add(drive,["md5:exact-original","drive:file"])
+    report=again.publish()
+    company=json.loads((out/'companies/CME.json').read_text())
+    assert report['documents']==1 and company['total']==1 and company['coverage']['pending']==0
+    source=json.loads((out/company['pages'][0]).read_text())[0]
+    assert set(source['origins'])=={'drive','git_inventory'}

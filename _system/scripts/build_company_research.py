@@ -69,7 +69,17 @@ def write(path: Path, value) -> None:
             time.sleep(.05*(attempt+1))
 
 
+def io_path(path: Path):
+    # Long imported titles can exceed Windows' legacy path limit even though
+    # directory enumeration finds them. Preserve the logical path in links.
+    if os.name == 'nt' and len(str(path.absolute())) >= 248 and not str(path).startswith('\\\\?\\'):
+        absolute = str(path.absolute())
+        return Path('\\\\?\\UNC\\' + absolute[2:] if absolute.startswith('\\\\') else '\\\\?\\' + absolute)
+    return path
+
+
 def load(path: Path, default=None):
+    path = io_path(path)
     return json.loads(path.read_text(encoding="utf-8-sig")) if path.is_file() else ({} if default is None else default)
 
 
@@ -338,15 +348,15 @@ class Builder:
         actual = resolved(self.root, rel) if not rel.startswith("vault/") else path
         if actual is None:
             return
-        data = actual.read_bytes()
-        companion = next((path.with_suffix(s) for s in (".txt", ".md") if path.suffix.lower() == ".pdf" and path.with_suffix(s).is_file()), None)
+        data = io_path(actual).read_bytes()
+        companion = next((path.with_suffix(s) for s in (".txt", ".md") if path.suffix.lower() == ".pdf" and io_path(path.with_suffix(s)).is_file()), None)
         media_cache = {}
         if path.suffix.lower() in {'.mp3','.m4a','.mp4','.wav'}:
             from backfill_company_sources import transcript_for
             companion = transcript_for(path, self.vault)
             media_cache = load(self.cache/'media'/(digest(path.name)+'.json'))
         if companion:
-            text, state, _ = self.cached_extract(companion.read_bytes(), companion.suffix.lower())
+            text, state, _ = self.cached_extract(io_path(companion).read_bytes(), companion.suffix.lower())
             sha = digest(data)
         elif media_cache.get('status') == 'indexed':
             text, state, sha = media_cache['text'], 'indexed', digest(data)
@@ -625,14 +635,21 @@ class Builder:
                             yield from rows(x)
         for row, url in rows(doc):
             filed = row.get("filing_date") or row.get("filingDate") or row.get("date")
-            title = " · ".join(str(v) for v in [row.get("form") or row.get("type"), filed, row.get("primary_document") or row.get("primary")] if v) or Path(url).name
+            title = " Â· ".join(str(v) for v in [row.get("form") or row.get("type"), filed, row.get("primary_document") or row.get("primary")] if v) or Path(url).name
             location = {"kind": "filing", "url": url, "label": "Official filing"}
-            rec = self.base(url, title, "company:" + ticker, state="awaiting_extraction", explicit=[ticker], date=filed, period=row.get("report"), locations=[location], path="filings/" + title)
+            from backfill_company_filings import cached_filing
+            recovered = cached_filing(self.cache, url)
+            rec = self.base(url, title, "company:" + ticker, text=recovered.get("text", ""), state=recovered.get("status", "awaiting_extraction"), explicit=[ticker], date=filed, period=row.get("report"), locations=[location], path="investor-documents/" + title)
+            if recovered.get("original_sha256"):
+                rec["revision"] = recovered["original_sha256"]
+                rec["content_hash"] = recovered["original_sha256"]
+            if recovered.get("extraction", {}).get("ocr_pages"):
+                rec["extraction_review"] = "Automatic OCR; verify against the original"
             ref = row.get("local") or row.get("local_path")
             if ref:
                 self.refs[ref].append(location)
                 self.metadata[ref] = {"title": title, "date": filed}
-            self.add(rec, ["url:" + url] + (["path:" + ref] if ref else []))
+            self.add(rec, ["url:" + url] + (["path:" + ref] if ref else []) + (["sha:" + recovered["original_sha256"]] if recovered.get("original_sha256") else []))
 
     def company_inventory(self, ticker):
         relative = f"{ticker}/third-party-analyses/source_inventory.json"
@@ -785,7 +802,26 @@ class Builder:
         self.receipt("drive", count)
 
     def publish(self):
-        records = retain_previous(self.index.records, self.previous.get("records", {}), self.good)
+        # A recovered Git original can acquire a Drive revision identity when
+        # exact-byte copies merge. Do not resurrect its old empty placeholder
+        # under the former ID; preserve genuinely different historical bodies.
+        aliases = {}
+        for anchor, current_id in self.index.anchors.items():
+            identity = ("sha256:" + anchor[4:] if anchor.startswith("sha:") else
+                        anchor[4:] if anchor.startswith("url:") else
+                        anchor if anchor.startswith(("git:", "md5:")) else None)
+            if identity:
+                aliases[digest(identity)[:32]] = current_id
+        previous = {}
+        for key, old in self.previous.get("records", {}).items():
+            current = self.index.records.get(aliases.get(key), {})
+            has_body = bool(old.get("text_cache") or old.get("text") or old.get("text_length"))
+            same_body = bool(old.get("text_cache") and old.get("text_cache") == current.get("text_cache"))
+            distinct_revision = old.get("revision") and current.get("revision") and old["revision"] != current["revision"]
+            if current and not distinct_revision and (not has_body or same_body):
+                continue
+            previous[key] = old
+        records = retain_previous(self.index.records, previous, self.good)
         by_ticker = defaultdict(list)
         bundles, content_batch, content_size = {}, {}, 0
         def flush_content():

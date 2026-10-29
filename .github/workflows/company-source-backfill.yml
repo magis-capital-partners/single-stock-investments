@@ -66,6 +66,9 @@ jobs:
           args=()
           if [ "$SCANS" = "true" ]; then args+=(--only-status needs_ocr --ocr); fi
           python _system/scripts/backfill_company_sources.py --discover-drive --audit-cache --seconds "$BUDGET" "${args[@]}"
+      - name: Recover catalogued official filings
+        if: ${{ !inputs.recover_scans }}
+        run: python _system/scripts/backfill_company_filings.py --seconds 1200
       - name: Check for transcripts to recover
         if: ${{ !inputs.recover_scans }}
         id: media
