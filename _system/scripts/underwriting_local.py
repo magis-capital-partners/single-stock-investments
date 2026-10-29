@@ -76,6 +76,11 @@ def data_root(source, home, vault):
         safe_relative,
     )
     root = home/'data'
+    retained = {}
+    for path in (root/'_system/reference/market-data/valuation_fundamentals').glob('*.json'):
+        value = read(path)
+        if value.get('collected_at') and value.get('primary_observations'):
+            retained[path.name] = value
     workflow = yaml.safe_load((source/'.github/workflows/valuation-underwriting.yml').read_text(encoding='utf-8'))
     checkout = next(s for s in workflow['jobs']['underwrite']['steps'] if s.get('uses') == 'actions/checkout@v4')
     for pattern in checkout['with']['sparse-checkout'].splitlines():
@@ -102,7 +107,32 @@ def data_root(source, home, vault):
                 target.write_bytes(raw)
     hydrate_repository(root)
     hydrate(root/'dashboard')
+    for receipt_path in root.glob('*/research/underwriting_receipt.json'):
+        identity = read(receipt_path).get('packet_hash') or ''
+        if len(identity) != 64 or any(c not in '0123456789abcdef' for c in identity):
+            continue
+        destination = vault/'valuation-underwriting/packets'/(identity+'.json')
+        if not destination.is_file():
+            try:
+                raw = git(vault, 'show', 'origin/main:valuation-underwriting/packets/'+identity+'.json')
+                require(json.loads(raw).get('packet_hash') == identity, 'Approved baseline evidence identity changed')
+                destination.parent.mkdir(parents=True, exist_ok=True)
+                destination.write_bytes(raw)
+            except subprocess.CalledProcessError:
+                pass  # Missing private proof means cold underwriting, never unchecked reuse.
+    for name, value in retained.items():
+        path = root/'_system/reference/market-data/valuation_fundamentals'/name
+        if prefer_local_facts(value, read(path)):
+            write(path, value)
     return root
+
+
+def prefer_local_facts(local, incoming):
+    """A source checkout update must not erase fresher privately collected facts."""
+    local_report, incoming_report = local.get('latest_report') or {}, incoming.get('latest_report') or {}
+    return (str(local.get('collected_at') or '') > str(incoming.get('collected_at') or '')
+            and (local_report.get('period') or '', local_report.get('filed') or '')
+                >= (incoming_report.get('period') or '', incoming_report.get('filed') or ''))
 
 
 def publish_runtime(vault, home):

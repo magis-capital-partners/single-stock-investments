@@ -132,6 +132,16 @@ evidence_ids may reference primary document ids as well as numeric observation i
 Use verified share observations. If sufficient primary evidence is unavailable,
 return {"status":"evidence_gap","gaps":[{"code":"specific_missing_evidence","detail":"what is missing and where to obtain it"}]}.
 
+Evidence gaps trigger bounded, programmatic retrieval of additional contexts in
+the independently discovered primary reports. Name the specific missing claim,
+table and useful search terms. Do not request commands or invent source URLs.
+If `approved_baseline` is provided, trusted code has verified that prior contract
+and identified changed evidence. It contains economic assumptions, never old
+price targets. Reconsider the flagged judgments, justify retained assumptions,
+and return a complete contract bound to the CURRENT packet. A new primary report
+requires reconsidering the framework and every assumption. An unchanged quote or
+collection timestamp is not new economic evidence.
+
 If the packet contains `listing_ratio`, all financial share observations are
 ordinary shares. Build cash flows per ordinary share. The trusted compiler
 multiplies every flow by ordinary_shares_per_listing_share exactly once to
@@ -162,13 +172,12 @@ Approval cannot contain major/critical findings, even marked resolved. Request a
 revision instead. Do not approve merely because arithmetic passes. The review
 must bind the exact packet and contract hash supplied by trusted code.
 
-## Builder output
+## Deterministic assembly
 
-The builder receives only the approved contract, the trusted compiler's canonical
-model and the review. Return the canonical model as ONE JSON object. Check its
-assembly and references against the contract; do not change assumptions, facts,
-units, scope, timing or add an asset/terminal claim. Trusted code compares the
-entire economic output before it can become a saved valuation.
+There is no builder model session. Trusted code compiles the approved contract,
+checks its proof and exact model hash, then calculates all PV, IRR and buy-price
+outputs from the same shareholder cash flows. Author and challenger must be
+separate signed-in local GPT-6.1 Sol High sessions. No model API execution is used.
 
 Inventory every material business, captive finance entity, financial asset,
 debt/cash claim and minority interest. Each inventory row is modeled or embedded

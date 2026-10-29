@@ -35,9 +35,11 @@ export function modelSelection(id, {catalog=[], reasoningEffort}={}) {
 }
 
 export async function verifyCatalog({apiKey, policy, listModels}) {
-  if (!apiKey) throw new Error('CURSOR_API_KEY is required for model discovery');
-  const catalog=await (listModels || (await import('@cursor/sdk')).Cursor.models.list)({apiKey});
   const consumers=policy.model_ladder?.consumers || {};
+  const cloud=['valuation_underwriter','valuation_challenger','valuation_builder']
+    .map(role=>consumers[role]).some(c=>c?.model && !['codex-local','deterministic'].includes(c.provider));
+  if (cloud && !apiKey) throw new Error('CURSOR_API_KEY is required for model discovery');
+  const catalog=cloud ? await (listModels || (await import('@cursor/sdk')).Cursor.models.list)({apiKey}) : [];
   const selections={};
   try {
     for (const [stage,role] of Object.entries({author:'valuation_underwriter',challenger:'valuation_challenger',builder:'valuation_builder'})) {
@@ -45,6 +47,7 @@ export async function verifyCatalog({apiKey, policy, listModels}) {
       if (!config?.model) throw new Error(`Missing explicit model policy for ${role}`);
       selections[stage]=config.provider === 'codex-local' ?
         {provider:'codex-local',id:config.model,reasoning_effort:config.reasoning_effort,availability:'local_preflight_required'} :
+        config.provider === 'deterministic' ? {provider:'deterministic',id:config.model,model_calls:0} :
         modelSelection(config.model,{catalog,reasoningEffort:config.reasoning_effort});
     }
   } catch (error) {
@@ -52,7 +55,7 @@ export async function verifyCatalog({apiKey, policy, listModels}) {
     console.log(JSON.stringify({available_models:catalog}));
     throw error;
   }
-  return {provider:'cursor',selections,verified_at:new Date().toISOString()};
+  return {provider:cloud?'cursor':'local',selections,verified_at:new Date().toISOString()};
 }
 
 export async function executeStage({apiKey, model, reasoningEffort, stage, prompt, outputPath, receiptPath, create,
