@@ -399,6 +399,51 @@ class InsightManifestGuardTests(unittest.TestCase):
             shard = json.loads((data / "insights" / "events.json").read_text(encoding="utf-8"))
             self.assertEqual(len(shard["events"]), 1)
 
+    def _podcast_shard(self, stamp: str, rows: int) -> dict:
+        return {
+            "generated_at": stamp,
+            "episode_count": rows,
+            "podcast_index": [{"id": f"ep{i}"} for i in range(rows)],
+            "podcast_by_show": {"s": list(range(rows))},
+        }
+
+    def test_rebuild_never_regresses_a_fresher_podcast_shard(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            data = Path(tmp)
+            insight = data / "insights"
+            insight.mkdir()
+            manifest = self._publishable(0)
+            manifest["generated_at"] = "2026-10-15T09:13:13Z"
+            (insight / "manifest.json").write_text(json.dumps(manifest), encoding="utf-8")
+            (insight / "events.json").write_text(json.dumps({"events": [], "events_by_ticker": {}}), encoding="utf-8")
+            (insight / "podcasts.json").write_text(
+                json.dumps(self._podcast_shard("2026-10-29T17:41:26Z", 3)), encoding="utf-8"
+            )
+            before = (insight / "podcasts.json").read_bytes()
+            # What build_dashboard_data hands over: the shards merged back
+            # under the older manifest stamp.
+            doc = bds.merge_insight_shards(insight)
+            self.assertEqual(doc["generated_at"], "2026-10-15T09:13:13Z")
+            bds.write_insights_shards(doc, data)
+            self.assertEqual((insight / "podcasts.json").read_bytes(), before)
+
+    def test_newer_doc_still_replaces_an_older_podcast_shard(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            data = Path(tmp)
+            insight = data / "insights"
+            insight.mkdir()
+            (insight / "podcasts.json").write_text(
+                json.dumps(self._podcast_shard("2026-10-15T09:13:13Z", 1)), encoding="utf-8"
+            )
+            doc = self._publishable(0)
+            doc["generated_at"] = "2026-10-29T21:19:55Z"
+            doc.update({"events": [], "events_by_ticker": {}})
+            doc.update({k: v for k, v in self._podcast_shard("ignored", 4).items() if k != "generated_at"})
+            bds.write_insights_shards(doc, data)
+            shard = json.loads((insight / "podcasts.json").read_text(encoding="utf-8"))
+            self.assertEqual(shard["generated_at"], "2026-10-29T21:19:55Z")
+            self.assertEqual(len(shard["podcast_index"]), 4)
+
     def test_merge_does_not_let_the_video_shard_replace_the_manifest(self):
         with tempfile.TemporaryDirectory() as tmp:
             insight = Path(tmp)
