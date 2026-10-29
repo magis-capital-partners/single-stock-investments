@@ -11,6 +11,8 @@ import uuid
 
 FOLDERS=('git','drive','filings','commodity-text','media','transcripts','queue-checkpoints','md5','metadata','relationships','match-work','records','published-text','words')
 ROOT_FILES=('matches.json','index.json','drive-inventory.json','backfill-report.json')
+PUBLICATION_FOLDERS={'records','relationships','published-text','words'}
+PUBLICATION_ROOT_FILES={'matches.json','index.json'}
 
 
 def pack(cache,destination):
@@ -81,7 +83,7 @@ def pack(cache,destination):
     return {'parts':len(parts),'files':sum(p['files'] for p in parts)}
 
 
-def restore(source,cache):
+def restore(source,cache,publication_only=False):
     manifest=source/'manifest.json'
     if not manifest.is_file():return {'parts':0}
     parts=json.loads(manifest.read_text(encoding='utf-8'))['parts']
@@ -94,6 +96,8 @@ def restore(source,cache):
                 target=cache/item.filename
                 if not target.resolve().is_relative_to(cache.resolve()) or (Path(item.filename).parts[0] not in FOLDERS and item.filename not in ROOT_FILES):
                     raise ValueError('Unsafe cache path')
+                if publication_only and Path(item.filename).parts[0] not in PUBLICATION_FOLDERS and item.filename not in PUBLICATION_ROOT_FILES:
+                    continue
                 target.parent.mkdir(parents=True,exist_ok=True)
                 target.write_bytes(z.read(item))
     return {'parts':len(parts)}
@@ -104,5 +108,7 @@ if __name__=='__main__':
     parser.add_argument('action',choices=['pack','restore'])
     parser.add_argument('--cache',type=Path,required=True)
     parser.add_argument('--archive',type=Path,required=True)
+    parser.add_argument('--publication-only',action='store_true',help='Restore verified publication records, full text and search tokens only')
     args=parser.parse_args()
-    print(pack(args.cache,args.archive) if args.action=='pack' else restore(args.archive,args.cache))
+    if args.publication_only and args.action!='restore':parser.error('--publication-only is a restore option')
+    print(pack(args.cache,args.archive) if args.action=='pack' else restore(args.archive,args.cache,args.publication_only))
