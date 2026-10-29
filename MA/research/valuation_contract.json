@@ -3,20 +3,20 @@
   "status": "evidence_blocked",
   "proof_status": "evidence_blocked",
   "model_level": "evidence_blocked",
-  "model_level_reason": "Curated primary-evidence follow-ups remain open.",
+  "model_level_reason": "Required evidence, calculation, or component coverage remains open.",
   "decision_eligibility": {
     "committee_eligible": false,
     "capital_actionable": false,
     "capital_authority_required": "human_decision",
-    "reason": "Close curated evidence gaps before committee review."
+    "reason": "Model must be stock-specific and evidence-clear before committee review."
   },
   "ticker": "MA",
-  "as_of": "2026-07-20",
+  "as_of": "2026-10-29",
   "dates": {
-    "model_as_of": "2026-07-20",
-    "latest_fact_as_of": null,
-    "oldest_fact_as_of": null,
-    "price_as_of": "2026-07-20"
+    "model_as_of": "2026-10-29",
+    "latest_fact_as_of": "2026-09-30",
+    "oldest_fact_as_of": "2025-09-30",
+    "price_as_of": null
   },
   "legacy_audit": {
     "actionable": false,
@@ -29,28 +29,2591 @@
     "formula": "((present_value_or_output + undated_distributions) / price) ** (1 / horizon_years) - 1",
     "reason_non_actionable": "This legacy calculation treated a present value as a future payoff and cannot be used as a forward return, hurdle entry price, ranking signal, or capital decision."
   },
-  "economic_ownership_map": [],
+  "economic_ownership_map": [
+    {
+      "component_id": "business",
+      "label": null,
+      "category": "operating_business",
+      "treatment": "additive",
+      "included_in_component_id": null,
+      "ownership_claim": null,
+      "ownership_percentage": 1.0,
+      "quantity": null,
+      "method": "dated_forward_cashflow_schedule_per_share",
+      "method_version": "1.0",
+      "method_provenance": {
+        "method_id": "dated_forward_cashflow_schedule_per_share",
+        "version": "1.0",
+        "label": "Dated forward per-share cash-flow schedule",
+        "output_basis": "forward_cashflow_schedule",
+        "power_zones": [
+          "scarce_asset_optionality",
+          "quality_reinvestment",
+          "capital_cycle",
+          "credit_and_normalized_returns",
+          "catalyst_asset_value",
+          "predictable_cash_flow",
+          "binary_milestone"
+        ],
+        "equation": "present_value_today = sum(cashflow_t / (1 + required_return)^t); forward_return_at_price = unique IRR(-price, dated_cashflows)",
+        "sources": [
+          {
+            "ref": "_system/frameworks/proof_first_valuation.md",
+            "locator": "Output basis and dated forward economics"
+          }
+        ]
+      },
+      "comparable_ids": [],
+      "range_per_share": {
+        "low": 78.7409,
+        "base": 235.5363,
+        "high": 418.7845
+      },
+      "output_basis": "forward_cashflow_schedule",
+      "legacy_range_per_share": null,
+      "valuation_status": "bounded_estimate",
+      "calculation_proof": {
+        "status": "valid",
+        "method_id": "dated_forward_cashflow_schedule_per_share",
+        "method_version": "1.0",
+        "outputs": {
+          "low": 78.7409,
+          "base": 235.5363,
+          "high": 418.7845
+        },
+        "output_unit": "USD per share",
+        "traces": {
+          "low": [
+            {
+              "id": "ocf_2025",
+              "label": "ocf_2025",
+              "kind": "fact",
+              "value": 17648000000.0,
+              "unit": "USD",
+              "source": {
+                "ref": "https://data.sec.gov/api/xbrl/companyfacts/CIK0001141391.json",
+                "locator": "us-gaap:NetCashProvidedByUsedInOperatingActivities; 0001141391-26-000013",
+                "as_of": "2025-12-31",
+                "source_id": "f533154a968364d3b9f162189c0c98167e2e83dba66a736bea5f84e16042df36"
+              },
+              "rationale": null
+            },
+            {
+              "id": "ocf_2026_ytd",
+              "label": "ocf_2026_ytd",
+              "kind": "fact",
+              "value": 11859000000.0,
+              "unit": "USD",
+              "source": {
+                "ref": "https://data.sec.gov/api/xbrl/companyfacts/CIK0001141391.json",
+                "locator": "us-gaap:NetCashProvidedByUsedInOperatingActivities; 0001141391-26-000124",
+                "as_of": "2026-09-30",
+                "source_id": "3ea4ec9e905a2cc45efd2efab1fe7de097db349e58f126fb6501ba2c1114fcc5"
+              },
+              "rationale": null
+            },
+            {
+              "id": "ocf_2025_ytd",
+              "label": "ocf_2025_ytd",
+              "kind": "fact",
+              "value": 12646000000.0,
+              "unit": "USD",
+              "source": {
+                "ref": "https://data.sec.gov/api/xbrl/companyfacts/CIK0001141391.json",
+                "locator": "us-gaap:NetCashProvidedByUsedInOperatingActivities; 0001141391-26-000124",
+                "as_of": "2025-09-30",
+                "source_id": "7740e1aa1070571db12b1a682214f8040539b6add3d4eae93fce6378b7bf9c4e"
+              },
+              "rationale": null
+            },
+            {
+              "id": "ppe_2025",
+              "label": "ppe_2025",
+              "kind": "fact",
+              "value": 489000000.0,
+              "unit": "USD",
+              "source": {
+                "ref": "https://data.sec.gov/api/xbrl/companyfacts/CIK0001141391.json",
+                "locator": "us-gaap:PaymentsToAcquirePropertyPlantAndEquipment; 0001141391-26-000013",
+                "as_of": "2025-12-31",
+                "source_id": "9e6a057789dea45518a37a39531634b61dd6066f65d6218f28685e79d0ebc432"
+              },
+              "rationale": null
+            },
+            {
+              "id": "ppe_2026_ytd",
+              "label": "ppe_2026_ytd",
+              "kind": "fact",
+              "value": 667000000.0,
+              "unit": "USD",
+              "source": {
+                "ref": "https://data.sec.gov/api/xbrl/companyfacts/CIK0001141391.json",
+                "locator": "us-gaap:PaymentsToAcquirePropertyPlantAndEquipment; 0001141391-26-000124",
+                "as_of": "2026-09-30",
+                "source_id": "fef8e12611d610cfa636a77ff384fe0806816d5e2beb6951f5796160d998bd14"
+              },
+              "rationale": null
+            },
+            {
+              "id": "ppe_2025_ytd",
+              "label": "ppe_2025_ytd",
+              "kind": "fact",
+              "value": 377000000.0,
+              "unit": "USD",
+              "source": {
+                "ref": "https://data.sec.gov/api/xbrl/companyfacts/CIK0001141391.json",
+                "locator": "us-gaap:PaymentsToAcquirePropertyPlantAndEquipment; 0001141391-26-000124",
+                "as_of": "2025-09-30",
+                "source_id": "fb21eecedb35acadac6010c5ff496643319e7c51534a70dd8ca697b6dd403503"
+              },
+              "rationale": null
+            },
+            {
+              "id": "sbc_2025",
+              "label": "sbc_2025",
+              "kind": "fact",
+              "value": 597000000.0,
+              "unit": "USD",
+              "source": {
+                "ref": "https://data.sec.gov/api/xbrl/companyfacts/CIK0001141391.json",
+                "locator": "us-gaap:ShareBasedCompensation; 0001141391-26-000013",
+                "as_of": "2025-12-31",
+                "source_id": "132d62c9981d0efe7b68231d28fd0731d9f3761f95f41c354883734f0b0fa1e2"
+              },
+              "rationale": null
+            },
+            {
+              "id": "sbc_2026_ytd",
+              "label": "sbc_2026_ytd",
+              "kind": "fact",
+              "value": 525000000.0,
+              "unit": "USD",
+              "source": {
+                "ref": "https://data.sec.gov/api/xbrl/companyfacts/CIK0001141391.json",
+                "locator": "us-gaap:ShareBasedCompensation; 0001141391-26-000124",
+                "as_of": "2026-09-30",
+                "source_id": "3594ed908abafa3212229d4356c60e56487f0a013143661385c5d8167d5652e8"
+              },
+              "rationale": null
+            },
+            {
+              "id": "sbc_2025_ytd",
+              "label": "sbc_2025_ytd",
+              "kind": "fact",
+              "value": 485000000.0,
+              "unit": "USD",
+              "source": {
+                "ref": "https://data.sec.gov/api/xbrl/companyfacts/CIK0001141391.json",
+                "locator": "us-gaap:ShareBasedCompensation; 0001141391-26-000124",
+                "as_of": "2025-09-30",
+                "source_id": "09f435e44467f899514d64448592f86f6a22dc4e90406f166044d48886b8f649"
+              },
+              "rationale": null
+            },
+            {
+              "id": "shares",
+              "label": "shares",
+              "kind": "fact",
+              "value": 876000000.0,
+              "unit": "shares",
+              "source": {
+                "ref": "https://data.sec.gov/api/xbrl/companyfacts/CIK0001141391.json",
+                "locator": "us-gaap:WeightedAverageNumberOfDilutedSharesOutstanding; 0001141391-26-000124",
+                "as_of": "2026-09-30",
+                "source_id": "4c1aba0f717ef810113fab53efb0580f55f0c1bf50def83dc0618b01d1e32713"
+              },
+              "rationale": null
+            },
+            {
+              "id": "software_investment",
+              "label": "software_investment",
+              "kind": "judgment",
+              "value": 750000000.0,
+              "unit": "USD",
+              "source": null,
+              "rationale": "Deduct an annual software investment reserve above trailing spending of USD 652 million and slightly above 2025 spending of USD 726 million. Software amortization is rising with business growth, so the model funds both replacement and expansion rather than treating capitalized development as free cash."
+            },
+            {
+              "id": "sbc_cash_funding",
+              "label": "sbc_cash_funding",
+              "kind": "judgment",
+              "value": 1.0,
+              "unit": "ratio",
+              "source": null,
+              "rationale": "Charge the entire reported trailing SBC amount as a cash-equivalent compensation requirement. This funds replacement cash compensation or dilution-offset purchases before distributions, permitting a constant diluted denominator without crediting buyback-driven per-share growth."
+            },
+            {
+              "id": "customer_funding_exclusion",
+              "label": "customer_funding_exclusion",
+              "kind": "judgment",
+              "value": 250000000.0,
+              "unit": "USD",
+              "source": null,
+              "rationale": "Trailing customer security-deposit inflows are USD 193 million, derived from the annual and comparative interim cash-flow tables. Exclude USD 250 million annually so customer collateral accumulation does not become recurring shareholder earnings. Settlement asset and obligation movements are otherwise retained rather than assumed to release."
+            },
+            {
+              "id": "normalization",
+              "label": "normalization",
+              "kind": "judgment",
+              "value": 0.75,
+              "unit": "ratio",
+              "source": null,
+              "rationale": "Apply normalization to trailing cash after physical capital, software, SBC and customer-funding exclusions. The base haircut recognizes that favorable accrued-expense timing and uncertain incentive renewals can overstate sustainable cash. The low case assumes lasting pricing, legal and incentive pressure; the high case permits only modest conversion improvement. Latest nine-month earnings increased while operating cash flow declined, opposing an unqualified earnings-based uplift."
+            },
+            {
+              "id": "acquisition_budget",
+              "label": "acquisition_budget",
+              "kind": "judgment",
+              "value": 1300000000.0,
+              "unit": "USD",
+              "source": null,
+              "rationale": "Deduct a recurring acquisition budget reflecting USD 2,511 million spent in 2024, no spending in 2025 and USD 1,372 million during the latest nine months. Services and new payment capabilities have an inorganic component. The forecast therefore purchases capability renewal before distributing residual cash."
+            },
+            {
+              "id": "other_parent_claims",
+              "label": "other_parent_claims",
+              "kind": "judgment",
+              "value": 150000000.0,
+              "unit": "USD",
+              "source": null,
+              "rationale": "Reserve USD 150 million for minority distributions and other residual financing outflows. Other financing activities consumed USD 100 million in 2025 and USD 108 million in the latest nine months. The reserve prevents allocating all consolidated operating cash automatically to parent common shareholders."
+            },
+            {
+              "id": "refinancing_drag",
+              "label": "refinancing_drag",
+              "kind": "judgment",
+              "value": 600000000.0,
+              "unit": "USD",
+              "source": null,
+              "rationale": "Reserve additional annual cash financing costs beyond interest already embedded in operating cash flow. Latest debt totals USD 23,938 million versus USD 19,000 million at December 2025, and quarterly interest expense increased to USD 250 million from USD 186 million. Principal is assumed refinanced at unchanged nominal balances, with no new borrowing used for distributions. The adverse reserve allows materially worse funding and settlement-liquidity costs; favorable cases still recognize the higher debt burden."
+            },
+            {
+              "id": "first_year_growth",
+              "label": "first_year_growth",
+              "kind": "judgment",
+              "value": -0.15,
+              "unit": "ratio",
+              "source": null,
+              "rationale": "Forecast growth of residual cash after all modeled reinvestment and claim reserves. Base growth is below latest nine-month revenue and operating-income growth because cash conversion weakened. High growth requires improved conversion alongside network and services growth. Low growth imposes a further cash contraction on already impaired normalized economics, reflecting weaker spending, cross-border activity and operating leverage."
+            },
+            {
+              "id": "second_year_growth",
+              "label": "second_year_growth",
+              "kind": "judgment",
+              "value": 0.02,
+              "unit": "ratio",
+              "source": null,
+              "rationale": "The low case recovers slowly because incentive commitments and service costs do not immediately reverse with payment volumes. Base and high cases sustain cash displacement and services distribution while remaining below the latest reported earnings growth."
+            },
+            {
+              "id": "later_growth",
+              "label": "later_growth",
+              "kind": "judgment",
+              "value": 0.04,
+              "unit": "ratio",
+              "source": null,
+              "rationale": "Years 3–5 moderate cash growth as the network becomes larger and competition for issuer portfolios, domestic rails and account-based payments limits incremental pricing. Growth is explicitly net of the physical-capital, software, acquisition, compensation and financing requirements embedded in the residual-cash starting point."
+            },
+            {
+              "id": "residual_distribution",
+              "label": "residual_distribution",
+              "kind": "judgment",
+              "value": 1.0,
+              "unit": "ratio",
+              "source": null,
+              "rationale": "Forecast all residual cash as cash distributions after funding every modeled investment and claim reserve. Historical dividends and repurchases demonstrate a substantial capital-return mechanism, but latest debt-supported returns are not extrapolated. This is an explicit owner-distribution policy assumption, not a forecast of announced dividends. No separate share-count benefit is credited."
+            },
+            {
+              "id": "terminal_growth",
+              "label": "terminal_growth",
+              "kind": "judgment",
+              "value": 0.0,
+              "unit": "ratio",
+              "source": null,
+              "rationale": "Terminal growth applies to distributable cash after recurring investment, incentive funding, compensation, minority reserves and financing costs. Base and high growth allow continued digital-payment adoption but are substantially below explicit-period growth because routing competition and customer bargaining constrain mature economics. Low terminal cash is flat after a depressed cycle and incomplete recovery."
+            },
+            {
+              "id": "discount_rate",
+              "label": "discount_rate",
+              "kind": "judgment",
+              "value": 0.12,
+              "unit": "ratio",
+              "source": null,
+              "rationale": "These are declared required returns for levered parent common equity, not an imported market benchmark. High margins, diversified transaction activity and low physical-capital intensity support the favorable hurdle. The base requires additional compensation for debt-funded capital returns, incentive capital and terminal dependence. The adverse hurdle reflects correlated payment weakness, refinancing pressure, settlement guarantees and litigation risk."
+            },
+            {
+              "id": "ocf_annual_plus_current",
+              "label": "ocf_annual_plus_current",
+              "kind": "calculation",
+              "value": 29507000000.0,
+              "unit": "USD",
+              "operation": "add",
+              "formula": "ocf_2025 + ocf_2026_ytd",
+              "substituted_formula": "1.7648e+10 + 1.1859e+10",
+              "dependencies": [
+                "ocf_2025",
+                "ocf_2026_ytd"
+              ]
+            },
+            {
+              "id": "ocf_ttm",
+              "label": "ocf_ttm",
+              "kind": "calculation",
+              "value": 16861000000.0,
+              "unit": "USD",
+              "operation": "subtract",
+              "formula": "ocf_annual_plus_current - ocf_2025_ytd",
+              "substituted_formula": "2.9507e+10 - 1.2646e+10",
+              "dependencies": [
+                "ocf_annual_plus_current",
+                "ocf_2025_ytd"
+              ]
+            },
+            {
+              "id": "ppe_annual_plus_current",
+              "label": "ppe_annual_plus_current",
+              "kind": "calculation",
+              "value": 1156000000.0,
+              "unit": "USD",
+              "operation": "add",
+              "formula": "ppe_2025 + ppe_2026_ytd",
+              "substituted_formula": "4.89e+08 + 6.67e+08",
+              "dependencies": [
+                "ppe_2025",
+                "ppe_2026_ytd"
+              ]
+            },
+            {
+              "id": "ppe_ttm",
+              "label": "ppe_ttm",
+              "kind": "calculation",
+              "value": 779000000.0,
+              "unit": "USD",
+              "operation": "subtract",
+              "formula": "ppe_annual_plus_current - ppe_2025_ytd",
+              "substituted_formula": "1.156e+09 - 3.77e+08",
+              "dependencies": [
+                "ppe_annual_plus_current",
+                "ppe_2025_ytd"
+              ]
+            },
+            {
+              "id": "sbc_annual_plus_current",
+              "label": "sbc_annual_plus_current",
+              "kind": "calculation",
+              "value": 1122000000.0,
+              "unit": "USD",
+              "operation": "add",
+              "formula": "sbc_2025 + sbc_2026_ytd",
+              "substituted_formula": "5.97e+08 + 5.25e+08",
+              "dependencies": [
+                "sbc_2025",
+                "sbc_2026_ytd"
+              ]
+            },
+            {
+              "id": "sbc_ttm",
+              "label": "sbc_ttm",
+              "kind": "calculation",
+              "value": 637000000.0,
+              "unit": "USD",
+              "operation": "subtract",
+              "formula": "sbc_annual_plus_current - sbc_2025_ytd",
+              "substituted_formula": "1.122e+09 - 4.85e+08",
+              "dependencies": [
+                "sbc_annual_plus_current",
+                "sbc_2025_ytd"
+              ]
+            },
+            {
+              "id": "compensation_funding",
+              "label": "compensation_funding",
+              "kind": "calculation",
+              "value": 637000000.0,
+              "unit": "USD",
+              "operation": "multiply",
+              "formula": "sbc_ttm × sbc_cash_funding",
+              "substituted_formula": "6.37e+08 × 1",
+              "dependencies": [
+                "sbc_ttm",
+                "sbc_cash_funding"
+              ]
+            },
+            {
+              "id": "capital_compensation_and_customer_funding",
+              "label": "capital_compensation_and_customer_funding",
+              "kind": "calculation",
+              "value": 2416000000.0,
+              "unit": "USD",
+              "operation": "sum",
+              "formula": "sum(ppe_ttm, software_investment, compensation_funding, customer_funding_exclusion)",
+              "substituted_formula": "sum(7.79e+08, 7.5e+08, 6.37e+08, 2.5e+08)",
+              "dependencies": [
+                "ppe_ttm",
+                "software_investment",
+                "compensation_funding",
+                "customer_funding_exclusion"
+              ]
+            },
+            {
+              "id": "cash_before_normalization",
+              "label": "cash_before_normalization",
+              "kind": "calculation",
+              "value": 14445000000.0,
+              "unit": "USD",
+              "operation": "subtract",
+              "formula": "ocf_ttm - capital_compensation_and_customer_funding",
+              "substituted_formula": "1.6861e+10 - 2.416e+09",
+              "dependencies": [
+                "ocf_ttm",
+                "capital_compensation_and_customer_funding"
+              ]
+            },
+            {
+              "id": "normalized_cash",
+              "label": "normalized_cash",
+              "kind": "calculation",
+              "value": 10833750000.0,
+              "unit": "USD",
+              "operation": "multiply",
+              "formula": "cash_before_normalization × normalization",
+              "substituted_formula": "1.4445e+10 × 0.75",
+              "dependencies": [
+                "cash_before_normalization",
+                "normalization"
+              ]
+            },
+            {
+              "id": "additional_investment_and_claims",
+              "label": "additional_investment_and_claims",
+              "kind": "calculation",
+              "value": 2050000000.0,
+              "unit": "USD",
+              "operation": "sum",
+              "formula": "sum(acquisition_budget, other_parent_claims, refinancing_drag)",
+              "substituted_formula": "sum(1.3e+09, 1.5e+08, 6e+08)",
+              "dependencies": [
+                "acquisition_budget",
+                "other_parent_claims",
+                "refinancing_drag"
+              ]
+            },
+            {
+              "id": "initial_residual_cash",
+              "label": "initial_residual_cash",
+              "kind": "calculation",
+              "value": 8783750000.0,
+              "unit": "USD",
+              "operation": "subtract",
+              "formula": "normalized_cash - additional_investment_and_claims",
+              "substituted_formula": "1.083375e+10 - 2.05e+09",
+              "dependencies": [
+                "normalized_cash",
+                "additional_investment_and_claims"
+              ]
+            },
+            {
+              "id": "first_year_factor",
+              "label": "first_year_factor",
+              "kind": "calculation",
+              "value": 0.85,
+              "unit": "ratio",
+              "operation": "add",
+              "formula": "1 + first_year_growth",
+              "substituted_formula": "1 + -0.15",
+              "dependencies": [
+                1,
+                "first_year_growth"
+              ]
+            },
+            {
+              "id": "second_year_factor",
+              "label": "second_year_factor",
+              "kind": "calculation",
+              "value": 1.02,
+              "unit": "ratio",
+              "operation": "add",
+              "formula": "1 + second_year_growth",
+              "substituted_formula": "1 + 0.02",
+              "dependencies": [
+                1,
+                "second_year_growth"
+              ]
+            },
+            {
+              "id": "later_year_factor",
+              "label": "later_year_factor",
+              "kind": "calculation",
+              "value": 1.04,
+              "unit": "ratio",
+              "operation": "add",
+              "formula": "1 + later_growth",
+              "substituted_formula": "1 + 0.04",
+              "dependencies": [
+                1,
+                "later_growth"
+              ]
+            },
+            {
+              "id": "residual_y1",
+              "label": "residual_y1",
+              "kind": "calculation",
+              "value": 7466187500.0,
+              "unit": "USD",
+              "operation": "multiply",
+              "formula": "initial_residual_cash × first_year_factor",
+              "substituted_formula": "8.78375e+09 × 0.85",
+              "dependencies": [
+                "initial_residual_cash",
+                "first_year_factor"
+              ]
+            },
+            {
+              "id": "residual_y2",
+              "label": "residual_y2",
+              "kind": "calculation",
+              "value": 7615511250.0,
+              "unit": "USD",
+              "operation": "multiply",
+              "formula": "residual_y1 × second_year_factor",
+              "substituted_formula": "7.4661875e+09 × 1.02",
+              "dependencies": [
+                "residual_y1",
+                "second_year_factor"
+              ]
+            },
+            {
+              "id": "residual_y3",
+              "label": "residual_y3",
+              "kind": "calculation",
+              "value": 7920131700.0,
+              "unit": "USD",
+              "operation": "multiply",
+              "formula": "residual_y2 × later_year_factor",
+              "substituted_formula": "7.6155112e+09 × 1.04",
+              "dependencies": [
+                "residual_y2",
+                "later_year_factor"
+              ]
+            },
+            {
+              "id": "residual_y4",
+              "label": "residual_y4",
+              "kind": "calculation",
+              "value": 8236936968.0,
+              "unit": "USD",
+              "operation": "multiply",
+              "formula": "residual_y3 × later_year_factor",
+              "substituted_formula": "7.9201317e+09 × 1.04",
+              "dependencies": [
+                "residual_y3",
+                "later_year_factor"
+              ]
+            },
+            {
+              "id": "residual_y5",
+              "label": "residual_y5",
+              "kind": "calculation",
+              "value": 8566414446.72,
+              "unit": "USD",
+              "operation": "multiply",
+              "formula": "residual_y4 × later_year_factor",
+              "substituted_formula": "8.236937e+09 × 1.04",
+              "dependencies": [
+                "residual_y4",
+                "later_year_factor"
+              ]
+            },
+            {
+              "id": "distribution_y1",
+              "label": "distribution_y1",
+              "kind": "calculation",
+              "value": 7466187500.0,
+              "unit": "USD",
+              "operation": "multiply",
+              "formula": "residual_y1 × residual_distribution",
+              "substituted_formula": "7.4661875e+09 × 1",
+              "dependencies": [
+                "residual_y1",
+                "residual_distribution"
+              ]
+            },
+            {
+              "id": "distribution_y2",
+              "label": "distribution_y2",
+              "kind": "calculation",
+              "value": 7615511250.0,
+              "unit": "USD",
+              "operation": "multiply",
+              "formula": "residual_y2 × residual_distribution",
+              "substituted_formula": "7.6155112e+09 × 1",
+              "dependencies": [
+                "residual_y2",
+                "residual_distribution"
+              ]
+            },
+            {
+              "id": "distribution_y3",
+              "label": "distribution_y3",
+              "kind": "calculation",
+              "value": 7920131700.0,
+              "unit": "USD",
+              "operation": "multiply",
+              "formula": "residual_y3 × residual_distribution",
+              "substituted_formula": "7.9201317e+09 × 1",
+              "dependencies": [
+                "residual_y3",
+                "residual_distribution"
+              ]
+            },
+            {
+              "id": "distribution_y4",
+              "label": "distribution_y4",
+              "kind": "calculation",
+              "value": 8236936968.0,
+              "unit": "USD",
+              "operation": "multiply",
+              "formula": "residual_y4 × residual_distribution",
+              "substituted_formula": "8.236937e+09 × 1",
+              "dependencies": [
+                "residual_y4",
+                "residual_distribution"
+              ]
+            },
+            {
+              "id": "distribution_y5",
+              "label": "distribution_y5",
+              "kind": "calculation",
+              "value": 8566414446.72,
+              "unit": "USD",
+              "operation": "multiply",
+              "formula": "residual_y5 × residual_distribution",
+              "substituted_formula": "8.5664144e+09 × 1",
+              "dependencies": [
+                "residual_y5",
+                "residual_distribution"
+              ]
+            },
+            {
+              "id": "distribution_ps_y1",
+              "label": "distribution_ps_y1",
+              "kind": "calculation",
+              "value": 8.52304509,
+              "unit": "USD per share",
+              "operation": "divide",
+              "formula": "distribution_y1 ÷ shares",
+              "substituted_formula": "7.4661875e+09 ÷ 8.76e+08",
+              "dependencies": [
+                "distribution_y1",
+                "shares"
+              ]
+            },
+            {
+              "id": "distribution_ps_y2",
+              "label": "distribution_ps_y2",
+              "kind": "calculation",
+              "value": 8.69350599,
+              "unit": "USD per share",
+              "operation": "divide",
+              "formula": "distribution_y2 ÷ shares",
+              "substituted_formula": "7.6155112e+09 ÷ 8.76e+08",
+              "dependencies": [
+                "distribution_y2",
+                "shares"
+              ]
+            },
+            {
+              "id": "distribution_ps_y3",
+              "label": "distribution_ps_y3",
+              "kind": "calculation",
+              "value": 9.04124623,
+              "unit": "USD per share",
+              "operation": "divide",
+              "formula": "distribution_y3 ÷ shares",
+              "substituted_formula": "7.9201317e+09 ÷ 8.76e+08",
+              "dependencies": [
+                "distribution_y3",
+                "shares"
+              ]
+            },
+            {
+              "id": "distribution_ps_y4",
+              "label": "distribution_ps_y4",
+              "kind": "calculation",
+              "value": 9.40289608,
+              "unit": "USD per share",
+              "operation": "divide",
+              "formula": "distribution_y4 ÷ shares",
+              "substituted_formula": "8.236937e+09 ÷ 8.76e+08",
+              "dependencies": [
+                "distribution_y4",
+                "shares"
+              ]
+            },
+            {
+              "id": "distribution_ps_y5",
+              "label": "distribution_ps_y5",
+              "kind": "calculation",
+              "value": 9.77901193,
+              "unit": "USD per share",
+              "operation": "divide",
+              "formula": "distribution_y5 ÷ shares",
+              "substituted_formula": "8.5664144e+09 ÷ 8.76e+08",
+              "dependencies": [
+                "distribution_y5",
+                "shares"
+              ]
+            },
+            {
+              "id": "terminal_growth_factor",
+              "label": "terminal_growth_factor",
+              "kind": "calculation",
+              "value": 1.0,
+              "unit": "ratio",
+              "operation": "add",
+              "formula": "1 + terminal_growth",
+              "substituted_formula": "1 + 0",
+              "dependencies": [
+                1,
+                "terminal_growth"
+              ]
+            },
+            {
+              "id": "terminal_next_distribution",
+              "label": "terminal_next_distribution",
+              "kind": "calculation",
+              "value": 8566414446.72,
+              "unit": "USD",
+              "operation": "multiply",
+              "formula": "distribution_y5 × terminal_growth_factor",
+              "substituted_formula": "8.5664144e+09 × 1",
+              "dependencies": [
+                "distribution_y5",
+                "terminal_growth_factor"
+              ]
+            },
+            {
+              "id": "terminal_capitalization_spread",
+              "label": "terminal_capitalization_spread",
+              "kind": "calculation",
+              "value": 0.12,
+              "unit": "ratio",
+              "operation": "subtract",
+              "formula": "discount_rate - terminal_growth",
+              "substituted_formula": "0.12 - 0",
+              "dependencies": [
+                "discount_rate",
+                "terminal_growth"
+              ]
+            },
+            {
+              "id": "continuing_equity_proceeds",
+              "label": "continuing_equity_proceeds",
+              "kind": "calculation",
+              "value": 71386787056.0,
+              "unit": "USD",
+              "operation": "divide",
+              "formula": "terminal_next_distribution ÷ terminal_capitalization_spread",
+              "substituted_formula": "8.5664144e+09 ÷ 0.12",
+              "dependencies": [
+                "terminal_next_distribution",
+                "terminal_capitalization_spread"
+              ]
+            },
+            {
+              "id": "limited_liability_equity_proceeds",
+              "label": "limited_liability_equity_proceeds",
+              "kind": "calculation",
+              "value": 71386787056.0,
+              "unit": "USD",
+              "operation": "maximum",
+              "formula": "maximum(0, continuing_equity_proceeds)",
+              "substituted_formula": "maximum(0, 7.1386787e+10)",
+              "dependencies": [
+                0,
+                "continuing_equity_proceeds"
+              ]
+            },
+            {
+              "id": "equity_realization_ps",
+              "label": "equity_realization_ps",
+              "kind": "calculation",
+              "value": 81.49176605,
+              "unit": "USD per share",
+              "operation": "divide",
+              "formula": "limited_liability_equity_proceeds ÷ shares",
+              "substituted_formula": "7.1386787e+10 ÷ 8.76e+08",
+              "dependencies": [
+                "limited_liability_equity_proceeds",
+                "shares"
+              ]
+            },
+            {
+              "id": "total_realization_year_ps",
+              "label": "total_realization_year_ps",
+              "kind": "calculation",
+              "value": 91.27077797,
+              "unit": "USD per share",
+              "operation": "add",
+              "formula": "distribution_ps_y5 + equity_realization_ps",
+              "substituted_formula": "9.7790119 + 81.491766",
+              "dependencies": [
+                "distribution_ps_y5",
+                "equity_realization_ps"
+              ]
+            },
+            {
+              "id": "compiled_value",
+              "label": "compiled_value",
+              "kind": "calculation",
+              "value": 78.74085294,
+              "unit": "USD per share",
+              "operation": "present_value",
+              "formula": "present_value(distribution_ps_y1, 1, distribution_ps_y2, 2, distribution_ps_y3, 3, distribution_ps_y4, 4, total_realization_year_ps, 5, discount_rate)",
+              "substituted_formula": "present_value(8.5230451, 1, 8.693506, 2, 9.0412462, 3, 9.4028961, 4, 91.270778, 5, 0.12)",
+              "dependencies": [
+                "distribution_ps_y1",
+                1,
+                "distribution_ps_y2",
+                2,
+                "distribution_ps_y3",
+                3,
+                "distribution_ps_y4",
+                4,
+                "total_realization_year_ps",
+                5,
+                "discount_rate"
+              ]
+            }
+          ],
+          "base": [
+            {
+              "id": "ocf_2025",
+              "label": "ocf_2025",
+              "kind": "fact",
+              "value": 17648000000.0,
+              "unit": "USD",
+              "source": {
+                "ref": "https://data.sec.gov/api/xbrl/companyfacts/CIK0001141391.json",
+                "locator": "us-gaap:NetCashProvidedByUsedInOperatingActivities; 0001141391-26-000013",
+                "as_of": "2025-12-31",
+                "source_id": "f533154a968364d3b9f162189c0c98167e2e83dba66a736bea5f84e16042df36"
+              },
+              "rationale": null
+            },
+            {
+              "id": "ocf_2026_ytd",
+              "label": "ocf_2026_ytd",
+              "kind": "fact",
+              "value": 11859000000.0,
+              "unit": "USD",
+              "source": {
+                "ref": "https://data.sec.gov/api/xbrl/companyfacts/CIK0001141391.json",
+                "locator": "us-gaap:NetCashProvidedByUsedInOperatingActivities; 0001141391-26-000124",
+                "as_of": "2026-09-30",
+                "source_id": "3ea4ec9e905a2cc45efd2efab1fe7de097db349e58f126fb6501ba2c1114fcc5"
+              },
+              "rationale": null
+            },
+            {
+              "id": "ocf_2025_ytd",
+              "label": "ocf_2025_ytd",
+              "kind": "fact",
+              "value": 12646000000.0,
+              "unit": "USD",
+              "source": {
+                "ref": "https://data.sec.gov/api/xbrl/companyfacts/CIK0001141391.json",
+                "locator": "us-gaap:NetCashProvidedByUsedInOperatingActivities; 0001141391-26-000124",
+                "as_of": "2025-09-30",
+                "source_id": "7740e1aa1070571db12b1a682214f8040539b6add3d4eae93fce6378b7bf9c4e"
+              },
+              "rationale": null
+            },
+            {
+              "id": "ppe_2025",
+              "label": "ppe_2025",
+              "kind": "fact",
+              "value": 489000000.0,
+              "unit": "USD",
+              "source": {
+                "ref": "https://data.sec.gov/api/xbrl/companyfacts/CIK0001141391.json",
+                "locator": "us-gaap:PaymentsToAcquirePropertyPlantAndEquipment; 0001141391-26-000013",
+                "as_of": "2025-12-31",
+                "source_id": "9e6a057789dea45518a37a39531634b61dd6066f65d6218f28685e79d0ebc432"
+              },
+              "rationale": null
+            },
+            {
+              "id": "ppe_2026_ytd",
+              "label": "ppe_2026_ytd",
+              "kind": "fact",
+              "value": 667000000.0,
+              "unit": "USD",
+              "source": {
+                "ref": "https://data.sec.gov/api/xbrl/companyfacts/CIK0001141391.json",
+                "locator": "us-gaap:PaymentsToAcquirePropertyPlantAndEquipment; 0001141391-26-000124",
+                "as_of": "2026-09-30",
+                "source_id": "fef8e12611d610cfa636a77ff384fe0806816d5e2beb6951f5796160d998bd14"
+              },
+              "rationale": null
+            },
+            {
+              "id": "ppe_2025_ytd",
+              "label": "ppe_2025_ytd",
+              "kind": "fact",
+              "value": 377000000.0,
+              "unit": "USD",
+              "source": {
+                "ref": "https://data.sec.gov/api/xbrl/companyfacts/CIK0001141391.json",
+                "locator": "us-gaap:PaymentsToAcquirePropertyPlantAndEquipment; 0001141391-26-000124",
+                "as_of": "2025-09-30",
+                "source_id": "fb21eecedb35acadac6010c5ff496643319e7c51534a70dd8ca697b6dd403503"
+              },
+              "rationale": null
+            },
+            {
+              "id": "sbc_2025",
+              "label": "sbc_2025",
+              "kind": "fact",
+              "value": 597000000.0,
+              "unit": "USD",
+              "source": {
+                "ref": "https://data.sec.gov/api/xbrl/companyfacts/CIK0001141391.json",
+                "locator": "us-gaap:ShareBasedCompensation; 0001141391-26-000013",
+                "as_of": "2025-12-31",
+                "source_id": "132d62c9981d0efe7b68231d28fd0731d9f3761f95f41c354883734f0b0fa1e2"
+              },
+              "rationale": null
+            },
+            {
+              "id": "sbc_2026_ytd",
+              "label": "sbc_2026_ytd",
+              "kind": "fact",
+              "value": 525000000.0,
+              "unit": "USD",
+              "source": {
+                "ref": "https://data.sec.gov/api/xbrl/companyfacts/CIK0001141391.json",
+                "locator": "us-gaap:ShareBasedCompensation; 0001141391-26-000124",
+                "as_of": "2026-09-30",
+                "source_id": "3594ed908abafa3212229d4356c60e56487f0a013143661385c5d8167d5652e8"
+              },
+              "rationale": null
+            },
+            {
+              "id": "sbc_2025_ytd",
+              "label": "sbc_2025_ytd",
+              "kind": "fact",
+              "value": 485000000.0,
+              "unit": "USD",
+              "source": {
+                "ref": "https://data.sec.gov/api/xbrl/companyfacts/CIK0001141391.json",
+                "locator": "us-gaap:ShareBasedCompensation; 0001141391-26-000124",
+                "as_of": "2025-09-30",
+                "source_id": "09f435e44467f899514d64448592f86f6a22dc4e90406f166044d48886b8f649"
+              },
+              "rationale": null
+            },
+            {
+              "id": "shares",
+              "label": "shares",
+              "kind": "fact",
+              "value": 876000000.0,
+              "unit": "shares",
+              "source": {
+                "ref": "https://data.sec.gov/api/xbrl/companyfacts/CIK0001141391.json",
+                "locator": "us-gaap:WeightedAverageNumberOfDilutedSharesOutstanding; 0001141391-26-000124",
+                "as_of": "2026-09-30",
+                "source_id": "4c1aba0f717ef810113fab53efb0580f55f0c1bf50def83dc0618b01d1e32713"
+              },
+              "rationale": null
+            },
+            {
+              "id": "software_investment",
+              "label": "software_investment",
+              "kind": "judgment",
+              "value": 750000000.0,
+              "unit": "USD",
+              "source": null,
+              "rationale": "Deduct an annual software investment reserve above trailing spending of USD 652 million and slightly above 2025 spending of USD 726 million. Software amortization is rising with business growth, so the model funds both replacement and expansion rather than treating capitalized development as free cash."
+            },
+            {
+              "id": "sbc_cash_funding",
+              "label": "sbc_cash_funding",
+              "kind": "judgment",
+              "value": 1.0,
+              "unit": "ratio",
+              "source": null,
+              "rationale": "Charge the entire reported trailing SBC amount as a cash-equivalent compensation requirement. This funds replacement cash compensation or dilution-offset purchases before distributions, permitting a constant diluted denominator without crediting buyback-driven per-share growth."
+            },
+            {
+              "id": "customer_funding_exclusion",
+              "label": "customer_funding_exclusion",
+              "kind": "judgment",
+              "value": 250000000.0,
+              "unit": "USD",
+              "source": null,
+              "rationale": "Trailing customer security-deposit inflows are USD 193 million, derived from the annual and comparative interim cash-flow tables. Exclude USD 250 million annually so customer collateral accumulation does not become recurring shareholder earnings. Settlement asset and obligation movements are otherwise retained rather than assumed to release."
+            },
+            {
+              "id": "normalization",
+              "label": "normalization",
+              "kind": "judgment",
+              "value": 0.95,
+              "unit": "ratio",
+              "source": null,
+              "rationale": "Apply normalization to trailing cash after physical capital, software, SBC and customer-funding exclusions. The base haircut recognizes that favorable accrued-expense timing and uncertain incentive renewals can overstate sustainable cash. The low case assumes lasting pricing, legal and incentive pressure; the high case permits only modest conversion improvement. Latest nine-month earnings increased while operating cash flow declined, opposing an unqualified earnings-based uplift."
+            },
+            {
+              "id": "acquisition_budget",
+              "label": "acquisition_budget",
+              "kind": "judgment",
+              "value": 1300000000.0,
+              "unit": "USD",
+              "source": null,
+              "rationale": "Deduct a recurring acquisition budget reflecting USD 2,511 million spent in 2024, no spending in 2025 and USD 1,372 million during the latest nine months. Services and new payment capabilities have an inorganic component. The forecast therefore purchases capability renewal before distributing residual cash."
+            },
+            {
+              "id": "other_parent_claims",
+              "label": "other_parent_claims",
+              "kind": "judgment",
+              "value": 150000000.0,
+              "unit": "USD",
+              "source": null,
+              "rationale": "Reserve USD 150 million for minority distributions and other residual financing outflows. Other financing activities consumed USD 100 million in 2025 and USD 108 million in the latest nine months. The reserve prevents allocating all consolidated operating cash automatically to parent common shareholders."
+            },
+            {
+              "id": "refinancing_drag",
+              "label": "refinancing_drag",
+              "kind": "judgment",
+              "value": 200000000.0,
+              "unit": "USD",
+              "source": null,
+              "rationale": "Reserve additional annual cash financing costs beyond interest already embedded in operating cash flow. Latest debt totals USD 23,938 million versus USD 19,000 million at December 2025, and quarterly interest expense increased to USD 250 million from USD 186 million. Principal is assumed refinanced at unchanged nominal balances, with no new borrowing used for distributions. The adverse reserve allows materially worse funding and settlement-liquidity costs; favorable cases still recognize the higher debt burden."
+            },
+            {
+              "id": "first_year_growth",
+              "label": "first_year_growth",
+              "kind": "judgment",
+              "value": 0.08,
+              "unit": "ratio",
+              "source": null,
+              "rationale": "Forecast growth of residual cash after all modeled reinvestment and claim reserves. Base growth is below latest nine-month revenue and operating-income growth because cash conversion weakened. High growth requires improved conversion alongside network and services growth. Low growth imposes a further cash contraction on already impaired normalized economics, reflecting weaker spending, cross-border activity and operating leverage."
+            },
+            {
+              "id": "second_year_growth",
+              "label": "second_year_growth",
+              "kind": "judgment",
+              "value": 0.08,
+              "unit": "ratio",
+              "source": null,
+              "rationale": "The low case recovers slowly because incentive commitments and service costs do not immediately reverse with payment volumes. Base and high cases sustain cash displacement and services distribution while remaining below the latest reported earnings growth."
+            },
+            {
+              "id": "later_growth",
+              "label": "later_growth",
+              "kind": "judgment",
+              "value": 0.07,
+              "unit": "ratio",
+              "source": null,
+              "rationale": "Years 3–5 moderate cash growth as the network becomes larger and competition for issuer portfolios, domestic rails and account-based payments limits incremental pricing. Growth is explicitly net of the physical-capital, software, acquisition, compensation and financing requirements embedded in the residual-cash starting point."
+            },
+            {
+              "id": "residual_distribution",
+              "label": "residual_distribution",
+              "kind": "judgment",
+              "value": 1.0,
+              "unit": "ratio",
+              "source": null,
+              "rationale": "Forecast all residual cash as cash distributions after funding every modeled investment and claim reserve. Historical dividends and repurchases demonstrate a substantial capital-return mechanism, but latest debt-supported returns are not extrapolated. This is an explicit owner-distribution policy assumption, not a forecast of announced dividends. No separate share-count benefit is credited."
+            },
+            {
+              "id": "terminal_growth",
+              "label": "terminal_growth",
+              "kind": "judgment",
+              "value": 0.02,
+              "unit": "ratio",
+              "source": null,
+              "rationale": "Terminal growth applies to distributable cash after recurring investment, incentive funding, compensation, minority reserves and financing costs. Base and high growth allow continued digital-payment adoption but are substantially below explicit-period growth because routing competition and customer bargaining constrain mature economics. Low terminal cash is flat after a depressed cycle and incomplete recovery."
+            },
+            {
+              "id": "discount_rate",
+              "label": "discount_rate",
+              "kind": "judgment",
+              "value": 0.095,
+              "unit": "ratio",
+              "source": null,
+              "rationale": "These are declared required returns for levered parent common equity, not an imported market benchmark. High margins, diversified transaction activity and low physical-capital intensity support the favorable hurdle. The base requires additional compensation for debt-funded capital returns, incentive capital and terminal dependence. The adverse hurdle reflects correlated payment weakness, refinancing pressure, settlement guarantees and litigation risk."
+            },
+            {
+              "id": "ocf_annual_plus_current",
+              "label": "ocf_annual_plus_current",
+              "kind": "calculation",
+              "value": 29507000000.0,
+              "unit": "USD",
+              "operation": "add",
+              "formula": "ocf_2025 + ocf_2026_ytd",
+              "substituted_formula": "1.7648e+10 + 1.1859e+10",
+              "dependencies": [
+                "ocf_2025",
+                "ocf_2026_ytd"
+              ]
+            },
+            {
+              "id": "ocf_ttm",
+              "label": "ocf_ttm",
+              "kind": "calculation",
+              "value": 16861000000.0,
+              "unit": "USD",
+              "operation": "subtract",
+              "formula": "ocf_annual_plus_current - ocf_2025_ytd",
+              "substituted_formula": "2.9507e+10 - 1.2646e+10",
+              "dependencies": [
+                "ocf_annual_plus_current",
+                "ocf_2025_ytd"
+              ]
+            },
+            {
+              "id": "ppe_annual_plus_current",
+              "label": "ppe_annual_plus_current",
+              "kind": "calculation",
+              "value": 1156000000.0,
+              "unit": "USD",
+              "operation": "add",
+              "formula": "ppe_2025 + ppe_2026_ytd",
+              "substituted_formula": "4.89e+08 + 6.67e+08",
+              "dependencies": [
+                "ppe_2025",
+                "ppe_2026_ytd"
+              ]
+            },
+            {
+              "id": "ppe_ttm",
+              "label": "ppe_ttm",
+              "kind": "calculation",
+              "value": 779000000.0,
+              "unit": "USD",
+              "operation": "subtract",
+              "formula": "ppe_annual_plus_current - ppe_2025_ytd",
+              "substituted_formula": "1.156e+09 - 3.77e+08",
+              "dependencies": [
+                "ppe_annual_plus_current",
+                "ppe_2025_ytd"
+              ]
+            },
+            {
+              "id": "sbc_annual_plus_current",
+              "label": "sbc_annual_plus_current",
+              "kind": "calculation",
+              "value": 1122000000.0,
+              "unit": "USD",
+              "operation": "add",
+              "formula": "sbc_2025 + sbc_2026_ytd",
+              "substituted_formula": "5.97e+08 + 5.25e+08",
+              "dependencies": [
+                "sbc_2025",
+                "sbc_2026_ytd"
+              ]
+            },
+            {
+              "id": "sbc_ttm",
+              "label": "sbc_ttm",
+              "kind": "calculation",
+              "value": 637000000.0,
+              "unit": "USD",
+              "operation": "subtract",
+              "formula": "sbc_annual_plus_current - sbc_2025_ytd",
+              "substituted_formula": "1.122e+09 - 4.85e+08",
+              "dependencies": [
+                "sbc_annual_plus_current",
+                "sbc_2025_ytd"
+              ]
+            },
+            {
+              "id": "compensation_funding",
+              "label": "compensation_funding",
+              "kind": "calculation",
+              "value": 637000000.0,
+              "unit": "USD",
+              "operation": "multiply",
+              "formula": "sbc_ttm × sbc_cash_funding",
+              "substituted_formula": "6.37e+08 × 1",
+              "dependencies": [
+                "sbc_ttm",
+                "sbc_cash_funding"
+              ]
+            },
+            {
+              "id": "capital_compensation_and_customer_funding",
+              "label": "capital_compensation_and_customer_funding",
+              "kind": "calculation",
+              "value": 2416000000.0,
+              "unit": "USD",
+              "operation": "sum",
+              "formula": "sum(ppe_ttm, software_investment, compensation_funding, customer_funding_exclusion)",
+              "substituted_formula": "sum(7.79e+08, 7.5e+08, 6.37e+08, 2.5e+08)",
+              "dependencies": [
+                "ppe_ttm",
+                "software_investment",
+                "compensation_funding",
+                "customer_funding_exclusion"
+              ]
+            },
+            {
+              "id": "cash_before_normalization",
+              "label": "cash_before_normalization",
+              "kind": "calculation",
+              "value": 14445000000.0,
+              "unit": "USD",
+              "operation": "subtract",
+              "formula": "ocf_ttm - capital_compensation_and_customer_funding",
+              "substituted_formula": "1.6861e+10 - 2.416e+09",
+              "dependencies": [
+                "ocf_ttm",
+                "capital_compensation_and_customer_funding"
+              ]
+            },
+            {
+              "id": "normalized_cash",
+              "label": "normalized_cash",
+              "kind": "calculation",
+              "value": 13722750000.0,
+              "unit": "USD",
+              "operation": "multiply",
+              "formula": "cash_before_normalization × normalization",
+              "substituted_formula": "1.4445e+10 × 0.95",
+              "dependencies": [
+                "cash_before_normalization",
+                "normalization"
+              ]
+            },
+            {
+              "id": "additional_investment_and_claims",
+              "label": "additional_investment_and_claims",
+              "kind": "calculation",
+              "value": 1650000000.0,
+              "unit": "USD",
+              "operation": "sum",
+              "formula": "sum(acquisition_budget, other_parent_claims, refinancing_drag)",
+              "substituted_formula": "sum(1.3e+09, 1.5e+08, 2e+08)",
+              "dependencies": [
+                "acquisition_budget",
+                "other_parent_claims",
+                "refinancing_drag"
+              ]
+            },
+            {
+              "id": "initial_residual_cash",
+              "label": "initial_residual_cash",
+              "kind": "calculation",
+              "value": 12072750000.0,
+              "unit": "USD",
+              "operation": "subtract",
+              "formula": "normalized_cash - additional_investment_and_claims",
+              "substituted_formula": "1.372275e+10 - 1.65e+09",
+              "dependencies": [
+                "normalized_cash",
+                "additional_investment_and_claims"
+              ]
+            },
+            {
+              "id": "first_year_factor",
+              "label": "first_year_factor",
+              "kind": "calculation",
+              "value": 1.08,
+              "unit": "ratio",
+              "operation": "add",
+              "formula": "1 + first_year_growth",
+              "substituted_formula": "1 + 0.08",
+              "dependencies": [
+                1,
+                "first_year_growth"
+              ]
+            },
+            {
+              "id": "second_year_factor",
+              "label": "second_year_factor",
+              "kind": "calculation",
+              "value": 1.08,
+              "unit": "ratio",
+              "operation": "add",
+              "formula": "1 + second_year_growth",
+              "substituted_formula": "1 + 0.08",
+              "dependencies": [
+                1,
+                "second_year_growth"
+              ]
+            },
+            {
+              "id": "later_year_factor",
+              "label": "later_year_factor",
+              "kind": "calculation",
+              "value": 1.07,
+              "unit": "ratio",
+              "operation": "add",
+              "formula": "1 + later_growth",
+              "substituted_formula": "1 + 0.07",
+              "dependencies": [
+                1,
+                "later_growth"
+              ]
+            },
+            {
+              "id": "residual_y1",
+              "label": "residual_y1",
+              "kind": "calculation",
+              "value": 13038570000.0,
+              "unit": "USD",
+              "operation": "multiply",
+              "formula": "initial_residual_cash × first_year_factor",
+              "substituted_formula": "1.207275e+10 × 1.08",
+              "dependencies": [
+                "initial_residual_cash",
+                "first_year_factor"
+              ]
+            },
+            {
+              "id": "residual_y2",
+              "label": "residual_y2",
+              "kind": "calculation",
+              "value": 14081655600.0,
+              "unit": "USD",
+              "operation": "multiply",
+              "formula": "residual_y1 × second_year_factor",
+              "substituted_formula": "1.303857e+10 × 1.08",
+              "dependencies": [
+                "residual_y1",
+                "second_year_factor"
+              ]
+            },
+            {
+              "id": "residual_y3",
+              "label": "residual_y3",
+              "kind": "calculation",
+              "value": 15067371492.0,
+              "unit": "USD",
+              "operation": "multiply",
+              "formula": "residual_y2 × later_year_factor",
+              "substituted_formula": "1.4081656e+10 × 1.07",
+              "dependencies": [
+                "residual_y2",
+                "later_year_factor"
+              ]
+            },
+            {
+              "id": "residual_y4",
+              "label": "residual_y4",
+              "kind": "calculation",
+              "value": 16122087496.44,
+              "unit": "USD",
+              "operation": "multiply",
+              "formula": "residual_y3 × later_year_factor",
+              "substituted_formula": "1.5067371e+10 × 1.07",
+              "dependencies": [
+                "residual_y3",
+                "later_year_factor"
+              ]
+            },
+            {
+              "id": "residual_y5",
+              "label": "residual_y5",
+              "kind": "calculation",
+              "value": 17250633621.1908,
+              "unit": "USD",
+              "operation": "multiply",
+              "formula": "residual_y4 × later_year_factor",
+              "substituted_formula": "1.6122087e+10 × 1.07",
+              "dependencies": [
+                "residual_y4",
+                "later_year_factor"
+              ]
+            },
+            {
+              "id": "distribution_y1",
+              "label": "distribution_y1",
+              "kind": "calculation",
+              "value": 13038570000.0,
+              "unit": "USD",
+              "operation": "multiply",
+              "formula": "residual_y1 × residual_distribution",
+              "substituted_formula": "1.303857e+10 × 1",
+              "dependencies": [
+                "residual_y1",
+                "residual_distribution"
+              ]
+            },
+            {
+              "id": "distribution_y2",
+              "label": "distribution_y2",
+              "kind": "calculation",
+              "value": 14081655600.0,
+              "unit": "USD",
+              "operation": "multiply",
+              "formula": "residual_y2 × residual_distribution",
+              "substituted_formula": "1.4081656e+10 × 1",
+              "dependencies": [
+                "residual_y2",
+                "residual_distribution"
+              ]
+            },
+            {
+              "id": "distribution_y3",
+              "label": "distribution_y3",
+              "kind": "calculation",
+              "value": 15067371492.0,
+              "unit": "USD",
+              "operation": "multiply",
+              "formula": "residual_y3 × residual_distribution",
+              "substituted_formula": "1.5067371e+10 × 1",
+              "dependencies": [
+                "residual_y3",
+                "residual_distribution"
+              ]
+            },
+            {
+              "id": "distribution_y4",
+              "label": "distribution_y4",
+              "kind": "calculation",
+              "value": 16122087496.44,
+              "unit": "USD",
+              "operation": "multiply",
+              "formula": "residual_y4 × residual_distribution",
+              "substituted_formula": "1.6122087e+10 × 1",
+              "dependencies": [
+                "residual_y4",
+                "residual_distribution"
+              ]
+            },
+            {
+              "id": "distribution_y5",
+              "label": "distribution_y5",
+              "kind": "calculation",
+              "value": 17250633621.1908,
+              "unit": "USD",
+              "operation": "multiply",
+              "formula": "residual_y5 × residual_distribution",
+              "substituted_formula": "1.7250634e+10 × 1",
+              "dependencies": [
+                "residual_y5",
+                "residual_distribution"
+              ]
+            },
+            {
+              "id": "distribution_ps_y1",
+              "label": "distribution_ps_y1",
+              "kind": "calculation",
+              "value": 14.88421233,
+              "unit": "USD per share",
+              "operation": "divide",
+              "formula": "distribution_y1 ÷ shares",
+              "substituted_formula": "1.303857e+10 ÷ 8.76e+08",
+              "dependencies": [
+                "distribution_y1",
+                "shares"
+              ]
+            },
+            {
+              "id": "distribution_ps_y2",
+              "label": "distribution_ps_y2",
+              "kind": "calculation",
+              "value": 16.07494932,
+              "unit": "USD per share",
+              "operation": "divide",
+              "formula": "distribution_y2 ÷ shares",
+              "substituted_formula": "1.4081656e+10 ÷ 8.76e+08",
+              "dependencies": [
+                "distribution_y2",
+                "shares"
+              ]
+            },
+            {
+              "id": "distribution_ps_y3",
+              "label": "distribution_ps_y3",
+              "kind": "calculation",
+              "value": 17.20019577,
+              "unit": "USD per share",
+              "operation": "divide",
+              "formula": "distribution_y3 ÷ shares",
+              "substituted_formula": "1.5067371e+10 ÷ 8.76e+08",
+              "dependencies": [
+                "distribution_y3",
+                "shares"
+              ]
+            },
+            {
+              "id": "distribution_ps_y4",
+              "label": "distribution_ps_y4",
+              "kind": "calculation",
+              "value": 18.40420947,
+              "unit": "USD per share",
+              "operation": "divide",
+              "formula": "distribution_y4 ÷ shares",
+              "substituted_formula": "1.6122087e+10 ÷ 8.76e+08",
+              "dependencies": [
+                "distribution_y4",
+                "shares"
+              ]
+            },
+            {
+              "id": "distribution_ps_y5",
+              "label": "distribution_ps_y5",
+              "kind": "calculation",
+              "value": 19.69250413,
+              "unit": "USD per share",
+              "operation": "divide",
+              "formula": "distribution_y5 ÷ shares",
+              "substituted_formula": "1.7250634e+10 ÷ 8.76e+08",
+              "dependencies": [
+                "distribution_y5",
+                "shares"
+              ]
+            },
+            {
+              "id": "terminal_growth_factor",
+              "label": "terminal_growth_factor",
+              "kind": "calculation",
+              "value": 1.02,
+              "unit": "ratio",
+              "operation": "add",
+              "formula": "1 + terminal_growth",
+              "substituted_formula": "1 + 0.02",
+              "dependencies": [
+                1,
+                "terminal_growth"
+              ]
+            },
+            {
+              "id": "terminal_next_distribution",
+              "label": "terminal_next_distribution",
+              "kind": "calculation",
+              "value": 17595646293.614616,
+              "unit": "USD",
+              "operation": "multiply",
+              "formula": "distribution_y5 × terminal_growth_factor",
+              "substituted_formula": "1.7250634e+10 × 1.02",
+              "dependencies": [
+                "distribution_y5",
+                "terminal_growth_factor"
+              ]
+            },
+            {
+              "id": "terminal_capitalization_spread",
+              "label": "terminal_capitalization_spread",
+              "kind": "calculation",
+              "value": 0.075,
+              "unit": "ratio",
+              "operation": "subtract",
+              "formula": "discount_rate - terminal_growth",
+              "substituted_formula": "0.095 - 0.02",
+              "dependencies": [
+                "discount_rate",
+                "terminal_growth"
+              ]
+            },
+            {
+              "id": "continuing_equity_proceeds",
+              "label": "continuing_equity_proceeds",
+              "kind": "calculation",
+              "value": 234608617248.1949,
+              "unit": "USD",
+              "operation": "divide",
+              "formula": "terminal_next_distribution ÷ terminal_capitalization_spread",
+              "substituted_formula": "1.7595646e+10 ÷ 0.075",
+              "dependencies": [
+                "terminal_next_distribution",
+                "terminal_capitalization_spread"
+              ]
+            },
+            {
+              "id": "limited_liability_equity_proceeds",
+              "label": "limited_liability_equity_proceeds",
+              "kind": "calculation",
+              "value": 234608617248.1949,
+              "unit": "USD",
+              "operation": "maximum",
+              "formula": "maximum(0, continuing_equity_proceeds)",
+              "substituted_formula": "maximum(0, 2.3460862e+11)",
+              "dependencies": [
+                0,
+                "continuing_equity_proceeds"
+              ]
+            },
+            {
+              "id": "equity_realization_ps",
+              "label": "equity_realization_ps",
+              "kind": "calculation",
+              "value": 267.81805622,
+              "unit": "USD per share",
+              "operation": "divide",
+              "formula": "limited_liability_equity_proceeds ÷ shares",
+              "substituted_formula": "2.3460862e+11 ÷ 8.76e+08",
+              "dependencies": [
+                "limited_liability_equity_proceeds",
+                "shares"
+              ]
+            },
+            {
+              "id": "total_realization_year_ps",
+              "label": "total_realization_year_ps",
+              "kind": "calculation",
+              "value": 287.51056035,
+              "unit": "USD per share",
+              "operation": "add",
+              "formula": "distribution_ps_y5 + equity_realization_ps",
+              "substituted_formula": "19.692504 + 267.81806",
+              "dependencies": [
+                "distribution_ps_y5",
+                "equity_realization_ps"
+              ]
+            },
+            {
+              "id": "compiled_value",
+              "label": "compiled_value",
+              "kind": "calculation",
+              "value": 235.53632435,
+              "unit": "USD per share",
+              "operation": "present_value",
+              "formula": "present_value(distribution_ps_y1, 1, distribution_ps_y2, 2, distribution_ps_y3, 3, distribution_ps_y4, 4, total_realization_year_ps, 5, discount_rate)",
+              "substituted_formula": "present_value(14.884212, 1, 16.074949, 2, 17.200196, 3, 18.404209, 4, 287.51056, 5, 0.095)",
+              "dependencies": [
+                "distribution_ps_y1",
+                1,
+                "distribution_ps_y2",
+                2,
+                "distribution_ps_y3",
+                3,
+                "distribution_ps_y4",
+                4,
+                "total_realization_year_ps",
+                5,
+                "discount_rate"
+              ]
+            }
+          ],
+          "high": [
+            {
+              "id": "ocf_2025",
+              "label": "ocf_2025",
+              "kind": "fact",
+              "value": 17648000000.0,
+              "unit": "USD",
+              "source": {
+                "ref": "https://data.sec.gov/api/xbrl/companyfacts/CIK0001141391.json",
+                "locator": "us-gaap:NetCashProvidedByUsedInOperatingActivities; 0001141391-26-000013",
+                "as_of": "2025-12-31",
+                "source_id": "f533154a968364d3b9f162189c0c98167e2e83dba66a736bea5f84e16042df36"
+              },
+              "rationale": null
+            },
+            {
+              "id": "ocf_2026_ytd",
+              "label": "ocf_2026_ytd",
+              "kind": "fact",
+              "value": 11859000000.0,
+              "unit": "USD",
+              "source": {
+                "ref": "https://data.sec.gov/api/xbrl/companyfacts/CIK0001141391.json",
+                "locator": "us-gaap:NetCashProvidedByUsedInOperatingActivities; 0001141391-26-000124",
+                "as_of": "2026-09-30",
+                "source_id": "3ea4ec9e905a2cc45efd2efab1fe7de097db349e58f126fb6501ba2c1114fcc5"
+              },
+              "rationale": null
+            },
+            {
+              "id": "ocf_2025_ytd",
+              "label": "ocf_2025_ytd",
+              "kind": "fact",
+              "value": 12646000000.0,
+              "unit": "USD",
+              "source": {
+                "ref": "https://data.sec.gov/api/xbrl/companyfacts/CIK0001141391.json",
+                "locator": "us-gaap:NetCashProvidedByUsedInOperatingActivities; 0001141391-26-000124",
+                "as_of": "2025-09-30",
+                "source_id": "7740e1aa1070571db12b1a682214f8040539b6add3d4eae93fce6378b7bf9c4e"
+              },
+              "rationale": null
+            },
+            {
+              "id": "ppe_2025",
+              "label": "ppe_2025",
+              "kind": "fact",
+              "value": 489000000.0,
+              "unit": "USD",
+              "source": {
+                "ref": "https://data.sec.gov/api/xbrl/companyfacts/CIK0001141391.json",
+                "locator": "us-gaap:PaymentsToAcquirePropertyPlantAndEquipment; 0001141391-26-000013",
+                "as_of": "2025-12-31",
+                "source_id": "9e6a057789dea45518a37a39531634b61dd6066f65d6218f28685e79d0ebc432"
+              },
+              "rationale": null
+            },
+            {
+              "id": "ppe_2026_ytd",
+              "label": "ppe_2026_ytd",
+              "kind": "fact",
+              "value": 667000000.0,
+              "unit": "USD",
+              "source": {
+                "ref": "https://data.sec.gov/api/xbrl/companyfacts/CIK0001141391.json",
+                "locator": "us-gaap:PaymentsToAcquirePropertyPlantAndEquipment; 0001141391-26-000124",
+                "as_of": "2026-09-30",
+                "source_id": "fef8e12611d610cfa636a77ff384fe0806816d5e2beb6951f5796160d998bd14"
+              },
+              "rationale": null
+            },
+            {
+              "id": "ppe_2025_ytd",
+              "label": "ppe_2025_ytd",
+              "kind": "fact",
+              "value": 377000000.0,
+              "unit": "USD",
+              "source": {
+                "ref": "https://data.sec.gov/api/xbrl/companyfacts/CIK0001141391.json",
+                "locator": "us-gaap:PaymentsToAcquirePropertyPlantAndEquipment; 0001141391-26-000124",
+                "as_of": "2025-09-30",
+                "source_id": "fb21eecedb35acadac6010c5ff496643319e7c51534a70dd8ca697b6dd403503"
+              },
+              "rationale": null
+            },
+            {
+              "id": "sbc_2025",
+              "label": "sbc_2025",
+              "kind": "fact",
+              "value": 597000000.0,
+              "unit": "USD",
+              "source": {
+                "ref": "https://data.sec.gov/api/xbrl/companyfacts/CIK0001141391.json",
+                "locator": "us-gaap:ShareBasedCompensation; 0001141391-26-000013",
+                "as_of": "2025-12-31",
+                "source_id": "132d62c9981d0efe7b68231d28fd0731d9f3761f95f41c354883734f0b0fa1e2"
+              },
+              "rationale": null
+            },
+            {
+              "id": "sbc_2026_ytd",
+              "label": "sbc_2026_ytd",
+              "kind": "fact",
+              "value": 525000000.0,
+              "unit": "USD",
+              "source": {
+                "ref": "https://data.sec.gov/api/xbrl/companyfacts/CIK0001141391.json",
+                "locator": "us-gaap:ShareBasedCompensation; 0001141391-26-000124",
+                "as_of": "2026-09-30",
+                "source_id": "3594ed908abafa3212229d4356c60e56487f0a013143661385c5d8167d5652e8"
+              },
+              "rationale": null
+            },
+            {
+              "id": "sbc_2025_ytd",
+              "label": "sbc_2025_ytd",
+              "kind": "fact",
+              "value": 485000000.0,
+              "unit": "USD",
+              "source": {
+                "ref": "https://data.sec.gov/api/xbrl/companyfacts/CIK0001141391.json",
+                "locator": "us-gaap:ShareBasedCompensation; 0001141391-26-000124",
+                "as_of": "2025-09-30",
+                "source_id": "09f435e44467f899514d64448592f86f6a22dc4e90406f166044d48886b8f649"
+              },
+              "rationale": null
+            },
+            {
+              "id": "shares",
+              "label": "shares",
+              "kind": "fact",
+              "value": 876000000.0,
+              "unit": "shares",
+              "source": {
+                "ref": "https://data.sec.gov/api/xbrl/companyfacts/CIK0001141391.json",
+                "locator": "us-gaap:WeightedAverageNumberOfDilutedSharesOutstanding; 0001141391-26-000124",
+                "as_of": "2026-09-30",
+                "source_id": "4c1aba0f717ef810113fab53efb0580f55f0c1bf50def83dc0618b01d1e32713"
+              },
+              "rationale": null
+            },
+            {
+              "id": "software_investment",
+              "label": "software_investment",
+              "kind": "judgment",
+              "value": 750000000.0,
+              "unit": "USD",
+              "source": null,
+              "rationale": "Deduct an annual software investment reserve above trailing spending of USD 652 million and slightly above 2025 spending of USD 726 million. Software amortization is rising with business growth, so the model funds both replacement and expansion rather than treating capitalized development as free cash."
+            },
+            {
+              "id": "sbc_cash_funding",
+              "label": "sbc_cash_funding",
+              "kind": "judgment",
+              "value": 1.0,
+              "unit": "ratio",
+              "source": null,
+              "rationale": "Charge the entire reported trailing SBC amount as a cash-equivalent compensation requirement. This funds replacement cash compensation or dilution-offset purchases before distributions, permitting a constant diluted denominator without crediting buyback-driven per-share growth."
+            },
+            {
+              "id": "customer_funding_exclusion",
+              "label": "customer_funding_exclusion",
+              "kind": "judgment",
+              "value": 250000000.0,
+              "unit": "USD",
+              "source": null,
+              "rationale": "Trailing customer security-deposit inflows are USD 193 million, derived from the annual and comparative interim cash-flow tables. Exclude USD 250 million annually so customer collateral accumulation does not become recurring shareholder earnings. Settlement asset and obligation movements are otherwise retained rather than assumed to release."
+            },
+            {
+              "id": "normalization",
+              "label": "normalization",
+              "kind": "judgment",
+              "value": 1.02,
+              "unit": "ratio",
+              "source": null,
+              "rationale": "Apply normalization to trailing cash after physical capital, software, SBC and customer-funding exclusions. The base haircut recognizes that favorable accrued-expense timing and uncertain incentive renewals can overstate sustainable cash. The low case assumes lasting pricing, legal and incentive pressure; the high case permits only modest conversion improvement. Latest nine-month earnings increased while operating cash flow declined, opposing an unqualified earnings-based uplift."
+            },
+            {
+              "id": "acquisition_budget",
+              "label": "acquisition_budget",
+              "kind": "judgment",
+              "value": 1300000000.0,
+              "unit": "USD",
+              "source": null,
+              "rationale": "Deduct a recurring acquisition budget reflecting USD 2,511 million spent in 2024, no spending in 2025 and USD 1,372 million during the latest nine months. Services and new payment capabilities have an inorganic component. The forecast therefore purchases capability renewal before distributing residual cash."
+            },
+            {
+              "id": "other_parent_claims",
+              "label": "other_parent_claims",
+              "kind": "judgment",
+              "value": 150000000.0,
+              "unit": "USD",
+              "source": null,
+              "rationale": "Reserve USD 150 million for minority distributions and other residual financing outflows. Other financing activities consumed USD 100 million in 2025 and USD 108 million in the latest nine months. The reserve prevents allocating all consolidated operating cash automatically to parent common shareholders."
+            },
+            {
+              "id": "refinancing_drag",
+              "label": "refinancing_drag",
+              "kind": "judgment",
+              "value": 150000000.0,
+              "unit": "USD",
+              "source": null,
+              "rationale": "Reserve additional annual cash financing costs beyond interest already embedded in operating cash flow. Latest debt totals USD 23,938 million versus USD 19,000 million at December 2025, and quarterly interest expense increased to USD 250 million from USD 186 million. Principal is assumed refinanced at unchanged nominal balances, with no new borrowing used for distributions. The adverse reserve allows materially worse funding and settlement-liquidity costs; favorable cases still recognize the higher debt burden."
+            },
+            {
+              "id": "first_year_growth",
+              "label": "first_year_growth",
+              "kind": "judgment",
+              "value": 0.12,
+              "unit": "ratio",
+              "source": null,
+              "rationale": "Forecast growth of residual cash after all modeled reinvestment and claim reserves. Base growth is below latest nine-month revenue and operating-income growth because cash conversion weakened. High growth requires improved conversion alongside network and services growth. Low growth imposes a further cash contraction on already impaired normalized economics, reflecting weaker spending, cross-border activity and operating leverage."
+            },
+            {
+              "id": "second_year_growth",
+              "label": "second_year_growth",
+              "kind": "judgment",
+              "value": 0.11,
+              "unit": "ratio",
+              "source": null,
+              "rationale": "The low case recovers slowly because incentive commitments and service costs do not immediately reverse with payment volumes. Base and high cases sustain cash displacement and services distribution while remaining below the latest reported earnings growth."
+            },
+            {
+              "id": "later_growth",
+              "label": "later_growth",
+              "kind": "judgment",
+              "value": 0.09,
+              "unit": "ratio",
+              "source": null,
+              "rationale": "Years 3–5 moderate cash growth as the network becomes larger and competition for issuer portfolios, domestic rails and account-based payments limits incremental pricing. Growth is explicitly net of the physical-capital, software, acquisition, compensation and financing requirements embedded in the residual-cash starting point."
+            },
+            {
+              "id": "residual_distribution",
+              "label": "residual_distribution",
+              "kind": "judgment",
+              "value": 1.0,
+              "unit": "ratio",
+              "source": null,
+              "rationale": "Forecast all residual cash as cash distributions after funding every modeled investment and claim reserve. Historical dividends and repurchases demonstrate a substantial capital-return mechanism, but latest debt-supported returns are not extrapolated. This is an explicit owner-distribution policy assumption, not a forecast of announced dividends. No separate share-count benefit is credited."
+            },
+            {
+              "id": "terminal_growth",
+              "label": "terminal_growth",
+              "kind": "judgment",
+              "value": 0.03,
+              "unit": "ratio",
+              "source": null,
+              "rationale": "Terminal growth applies to distributable cash after recurring investment, incentive funding, compensation, minority reserves and financing costs. Base and high growth allow continued digital-payment adoption but are substantially below explicit-period growth because routing competition and customer bargaining constrain mature economics. Low terminal cash is flat after a depressed cycle and incomplete recovery."
+            },
+            {
+              "id": "discount_rate",
+              "label": "discount_rate",
+              "kind": "judgment",
+              "value": 0.08,
+              "unit": "ratio",
+              "source": null,
+              "rationale": "These are declared required returns for levered parent common equity, not an imported market benchmark. High margins, diversified transaction activity and low physical-capital intensity support the favorable hurdle. The base requires additional compensation for debt-funded capital returns, incentive capital and terminal dependence. The adverse hurdle reflects correlated payment weakness, refinancing pressure, settlement guarantees and litigation risk."
+            },
+            {
+              "id": "ocf_annual_plus_current",
+              "label": "ocf_annual_plus_current",
+              "kind": "calculation",
+              "value": 29507000000.0,
+              "unit": "USD",
+              "operation": "add",
+              "formula": "ocf_2025 + ocf_2026_ytd",
+              "substituted_formula": "1.7648e+10 + 1.1859e+10",
+              "dependencies": [
+                "ocf_2025",
+                "ocf_2026_ytd"
+              ]
+            },
+            {
+              "id": "ocf_ttm",
+              "label": "ocf_ttm",
+              "kind": "calculation",
+              "value": 16861000000.0,
+              "unit": "USD",
+              "operation": "subtract",
+              "formula": "ocf_annual_plus_current - ocf_2025_ytd",
+              "substituted_formula": "2.9507e+10 - 1.2646e+10",
+              "dependencies": [
+                "ocf_annual_plus_current",
+                "ocf_2025_ytd"
+              ]
+            },
+            {
+              "id": "ppe_annual_plus_current",
+              "label": "ppe_annual_plus_current",
+              "kind": "calculation",
+              "value": 1156000000.0,
+              "unit": "USD",
+              "operation": "add",
+              "formula": "ppe_2025 + ppe_2026_ytd",
+              "substituted_formula": "4.89e+08 + 6.67e+08",
+              "dependencies": [
+                "ppe_2025",
+                "ppe_2026_ytd"
+              ]
+            },
+            {
+              "id": "ppe_ttm",
+              "label": "ppe_ttm",
+              "kind": "calculation",
+              "value": 779000000.0,
+              "unit": "USD",
+              "operation": "subtract",
+              "formula": "ppe_annual_plus_current - ppe_2025_ytd",
+              "substituted_formula": "1.156e+09 - 3.77e+08",
+              "dependencies": [
+                "ppe_annual_plus_current",
+                "ppe_2025_ytd"
+              ]
+            },
+            {
+              "id": "sbc_annual_plus_current",
+              "label": "sbc_annual_plus_current",
+              "kind": "calculation",
+              "value": 1122000000.0,
+              "unit": "USD",
+              "operation": "add",
+              "formula": "sbc_2025 + sbc_2026_ytd",
+              "substituted_formula": "5.97e+08 + 5.25e+08",
+              "dependencies": [
+                "sbc_2025",
+                "sbc_2026_ytd"
+              ]
+            },
+            {
+              "id": "sbc_ttm",
+              "label": "sbc_ttm",
+              "kind": "calculation",
+              "value": 637000000.0,
+              "unit": "USD",
+              "operation": "subtract",
+              "formula": "sbc_annual_plus_current - sbc_2025_ytd",
+              "substituted_formula": "1.122e+09 - 4.85e+08",
+              "dependencies": [
+                "sbc_annual_plus_current",
+                "sbc_2025_ytd"
+              ]
+            },
+            {
+              "id": "compensation_funding",
+              "label": "compensation_funding",
+              "kind": "calculation",
+              "value": 637000000.0,
+              "unit": "USD",
+              "operation": "multiply",
+              "formula": "sbc_ttm × sbc_cash_funding",
+              "substituted_formula": "6.37e+08 × 1",
+              "dependencies": [
+                "sbc_ttm",
+                "sbc_cash_funding"
+              ]
+            },
+            {
+              "id": "capital_compensation_and_customer_funding",
+              "label": "capital_compensation_and_customer_funding",
+              "kind": "calculation",
+              "value": 2416000000.0,
+              "unit": "USD",
+              "operation": "sum",
+              "formula": "sum(ppe_ttm, software_investment, compensation_funding, customer_funding_exclusion)",
+              "substituted_formula": "sum(7.79e+08, 7.5e+08, 6.37e+08, 2.5e+08)",
+              "dependencies": [
+                "ppe_ttm",
+                "software_investment",
+                "compensation_funding",
+                "customer_funding_exclusion"
+              ]
+            },
+            {
+              "id": "cash_before_normalization",
+              "label": "cash_before_normalization",
+              "kind": "calculation",
+              "value": 14445000000.0,
+              "unit": "USD",
+              "operation": "subtract",
+              "formula": "ocf_ttm - capital_compensation_and_customer_funding",
+              "substituted_formula": "1.6861e+10 - 2.416e+09",
+              "dependencies": [
+                "ocf_ttm",
+                "capital_compensation_and_customer_funding"
+              ]
+            },
+            {
+              "id": "normalized_cash",
+              "label": "normalized_cash",
+              "kind": "calculation",
+              "value": 14733900000.0,
+              "unit": "USD",
+              "operation": "multiply",
+              "formula": "cash_before_normalization × normalization",
+              "substituted_formula": "1.4445e+10 × 1.02",
+              "dependencies": [
+                "cash_before_normalization",
+                "normalization"
+              ]
+            },
+            {
+              "id": "additional_investment_and_claims",
+              "label": "additional_investment_and_claims",
+              "kind": "calculation",
+              "value": 1600000000.0,
+              "unit": "USD",
+              "operation": "sum",
+              "formula": "sum(acquisition_budget, other_parent_claims, refinancing_drag)",
+              "substituted_formula": "sum(1.3e+09, 1.5e+08, 1.5e+08)",
+              "dependencies": [
+                "acquisition_budget",
+                "other_parent_claims",
+                "refinancing_drag"
+              ]
+            },
+            {
+              "id": "initial_residual_cash",
+              "label": "initial_residual_cash",
+              "kind": "calculation",
+              "value": 13133900000.0,
+              "unit": "USD",
+              "operation": "subtract",
+              "formula": "normalized_cash - additional_investment_and_claims",
+              "substituted_formula": "1.47339e+10 - 1.6e+09",
+              "dependencies": [
+                "normalized_cash",
+                "additional_investment_and_claims"
+              ]
+            },
+            {
+              "id": "first_year_factor",
+              "label": "first_year_factor",
+              "kind": "calculation",
+              "value": 1.12,
+              "unit": "ratio",
+              "operation": "add",
+              "formula": "1 + first_year_growth",
+              "substituted_formula": "1 + 0.12",
+              "dependencies": [
+                1,
+                "first_year_growth"
+              ]
+            },
+            {
+              "id": "second_year_factor",
+              "label": "second_year_factor",
+              "kind": "calculation",
+              "value": 1.11,
+              "unit": "ratio",
+              "operation": "add",
+              "formula": "1 + second_year_growth",
+              "substituted_formula": "1 + 0.11",
+              "dependencies": [
+                1,
+                "second_year_growth"
+              ]
+            },
+            {
+              "id": "later_year_factor",
+              "label": "later_year_factor",
+              "kind": "calculation",
+              "value": 1.09,
+              "unit": "ratio",
+              "operation": "add",
+              "formula": "1 + later_growth",
+              "substituted_formula": "1 + 0.09",
+              "dependencies": [
+                1,
+                "later_growth"
+              ]
+            },
+            {
+              "id": "residual_y1",
+              "label": "residual_y1",
+              "kind": "calculation",
+              "value": 14709968000.000002,
+              "unit": "USD",
+              "operation": "multiply",
+              "formula": "initial_residual_cash × first_year_factor",
+              "substituted_formula": "1.31339e+10 × 1.12",
+              "dependencies": [
+                "initial_residual_cash",
+                "first_year_factor"
+              ]
+            },
+            {
+              "id": "residual_y2",
+              "label": "residual_y2",
+              "kind": "calculation",
+              "value": 16328064480.000004,
+              "unit": "USD",
+              "operation": "multiply",
+              "formula": "residual_y1 × second_year_factor",
+              "substituted_formula": "1.4709968e+10 × 1.11",
+              "dependencies": [
+                "residual_y1",
+                "second_year_factor"
+              ]
+            },
+            {
+              "id": "residual_y3",
+              "label": "residual_y3",
+              "kind": "calculation",
+              "value": 17797590283.200005,
+              "unit": "USD",
+              "operation": "multiply",
+              "formula": "residual_y2 × later_year_factor",
+              "substituted_formula": "1.6328064e+10 × 1.09",
+              "dependencies": [
+                "residual_y2",
+                "later_year_factor"
+              ]
+            },
+            {
+              "id": "residual_y4",
+              "label": "residual_y4",
+              "kind": "calculation",
+              "value": 19399373408.688007,
+              "unit": "USD",
+              "operation": "multiply",
+              "formula": "residual_y3 × later_year_factor",
+              "substituted_formula": "1.779759e+10 × 1.09",
+              "dependencies": [
+                "residual_y3",
+                "later_year_factor"
+              ]
+            },
+            {
+              "id": "residual_y5",
+              "label": "residual_y5",
+              "kind": "calculation",
+              "value": 21145317015.46993,
+              "unit": "USD",
+              "operation": "multiply",
+              "formula": "residual_y4 × later_year_factor",
+              "substituted_formula": "1.9399373e+10 × 1.09",
+              "dependencies": [
+                "residual_y4",
+                "later_year_factor"
+              ]
+            },
+            {
+              "id": "distribution_y1",
+              "label": "distribution_y1",
+              "kind": "calculation",
+              "value": 14709968000.000002,
+              "unit": "USD",
+              "operation": "multiply",
+              "formula": "residual_y1 × residual_distribution",
+              "substituted_formula": "1.4709968e+10 × 1",
+              "dependencies": [
+                "residual_y1",
+                "residual_distribution"
+              ]
+            },
+            {
+              "id": "distribution_y2",
+              "label": "distribution_y2",
+              "kind": "calculation",
+              "value": 16328064480.000004,
+              "unit": "USD",
+              "operation": "multiply",
+              "formula": "residual_y2 × residual_distribution",
+              "substituted_formula": "1.6328064e+10 × 1",
+              "dependencies": [
+                "residual_y2",
+                "residual_distribution"
+              ]
+            },
+            {
+              "id": "distribution_y3",
+              "label": "distribution_y3",
+              "kind": "calculation",
+              "value": 17797590283.200005,
+              "unit": "USD",
+              "operation": "multiply",
+              "formula": "residual_y3 × residual_distribution",
+              "substituted_formula": "1.779759e+10 × 1",
+              "dependencies": [
+                "residual_y3",
+                "residual_distribution"
+              ]
+            },
+            {
+              "id": "distribution_y4",
+              "label": "distribution_y4",
+              "kind": "calculation",
+              "value": 19399373408.688007,
+              "unit": "USD",
+              "operation": "multiply",
+              "formula": "residual_y4 × residual_distribution",
+              "substituted_formula": "1.9399373e+10 × 1",
+              "dependencies": [
+                "residual_y4",
+                "residual_distribution"
+              ]
+            },
+            {
+              "id": "distribution_y5",
+              "label": "distribution_y5",
+              "kind": "calculation",
+              "value": 21145317015.46993,
+              "unit": "USD",
+              "operation": "multiply",
+              "formula": "residual_y5 × residual_distribution",
+              "substituted_formula": "2.1145317e+10 × 1",
+              "dependencies": [
+                "residual_y5",
+                "residual_distribution"
+              ]
+            },
+            {
+              "id": "distribution_ps_y1",
+              "label": "distribution_ps_y1",
+              "kind": "calculation",
+              "value": 16.79220091,
+              "unit": "USD per share",
+              "operation": "divide",
+              "formula": "distribution_y1 ÷ shares",
+              "substituted_formula": "1.4709968e+10 ÷ 8.76e+08",
+              "dependencies": [
+                "distribution_y1",
+                "shares"
+              ]
+            },
+            {
+              "id": "distribution_ps_y2",
+              "label": "distribution_ps_y2",
+              "kind": "calculation",
+              "value": 18.63934301,
+              "unit": "USD per share",
+              "operation": "divide",
+              "formula": "distribution_y2 ÷ shares",
+              "substituted_formula": "1.6328064e+10 ÷ 8.76e+08",
+              "dependencies": [
+                "distribution_y2",
+                "shares"
+              ]
+            },
+            {
+              "id": "distribution_ps_y3",
+              "label": "distribution_ps_y3",
+              "kind": "calculation",
+              "value": 20.31688388,
+              "unit": "USD per share",
+              "operation": "divide",
+              "formula": "distribution_y3 ÷ shares",
+              "substituted_formula": "1.779759e+10 ÷ 8.76e+08",
+              "dependencies": [
+                "distribution_y3",
+                "shares"
+              ]
+            },
+            {
+              "id": "distribution_ps_y4",
+              "label": "distribution_ps_y4",
+              "kind": "calculation",
+              "value": 22.14540343,
+              "unit": "USD per share",
+              "operation": "divide",
+              "formula": "distribution_y4 ÷ shares",
+              "substituted_formula": "1.9399373e+10 ÷ 8.76e+08",
+              "dependencies": [
+                "distribution_y4",
+                "shares"
+              ]
+            },
+            {
+              "id": "distribution_ps_y5",
+              "label": "distribution_ps_y5",
+              "kind": "calculation",
+              "value": 24.13848974,
+              "unit": "USD per share",
+              "operation": "divide",
+              "formula": "distribution_y5 ÷ shares",
+              "substituted_formula": "2.1145317e+10 ÷ 8.76e+08",
+              "dependencies": [
+                "distribution_y5",
+                "shares"
+              ]
+            },
+            {
+              "id": "terminal_growth_factor",
+              "label": "terminal_growth_factor",
+              "kind": "calculation",
+              "value": 1.03,
+              "unit": "ratio",
+              "operation": "add",
+              "formula": "1 + terminal_growth",
+              "substituted_formula": "1 + 0.03",
+              "dependencies": [
+                1,
+                "terminal_growth"
+              ]
+            },
+            {
+              "id": "terminal_next_distribution",
+              "label": "terminal_next_distribution",
+              "kind": "calculation",
+              "value": 21779676525.93403,
+              "unit": "USD",
+              "operation": "multiply",
+              "formula": "distribution_y5 × terminal_growth_factor",
+              "substituted_formula": "2.1145317e+10 × 1.03",
+              "dependencies": [
+                "distribution_y5",
+                "terminal_growth_factor"
+              ]
+            },
+            {
+              "id": "terminal_capitalization_spread",
+              "label": "terminal_capitalization_spread",
+              "kind": "calculation",
+              "value": 0.05,
+              "unit": "ratio",
+              "operation": "subtract",
+              "formula": "discount_rate - terminal_growth",
+              "substituted_formula": "0.08 - 0.03",
+              "dependencies": [
+                "discount_rate",
+                "terminal_growth"
+              ]
+            },
+            {
+              "id": "continuing_equity_proceeds",
+              "label": "continuing_equity_proceeds",
+              "kind": "calculation",
+              "value": 435593530518.68054,
+              "unit": "USD",
+              "operation": "divide",
+              "formula": "terminal_next_distribution ÷ terminal_capitalization_spread",
+              "substituted_formula": "2.1779677e+10 ÷ 0.05",
+              "dependencies": [
+                "terminal_next_distribution",
+                "terminal_capitalization_spread"
+              ]
+            },
+            {
+              "id": "limited_liability_equity_proceeds",
+              "label": "limited_liability_equity_proceeds",
+              "kind": "calculation",
+              "value": 435593530518.68054,
+              "unit": "USD",
+              "operation": "maximum",
+              "formula": "maximum(0, continuing_equity_proceeds)",
+              "substituted_formula": "maximum(0, 4.3559353e+11)",
+              "dependencies": [
+                0,
+                "continuing_equity_proceeds"
+              ]
+            },
+            {
+              "id": "equity_realization_ps",
+              "label": "equity_realization_ps",
+              "kind": "calculation",
+              "value": 497.25288872,
+              "unit": "USD per share",
+              "operation": "divide",
+              "formula": "limited_liability_equity_proceeds ÷ shares",
+              "substituted_formula": "4.3559353e+11 ÷ 8.76e+08",
+              "dependencies": [
+                "limited_liability_equity_proceeds",
+                "shares"
+              ]
+            },
+            {
+              "id": "total_realization_year_ps",
+              "label": "total_realization_year_ps",
+              "kind": "calculation",
+              "value": 521.39137846,
+              "unit": "USD per share",
+              "operation": "add",
+              "formula": "distribution_ps_y5 + equity_realization_ps",
+              "substituted_formula": "24.13849 + 497.25289",
+              "dependencies": [
+                "distribution_ps_y5",
+                "equity_realization_ps"
+              ]
+            },
+            {
+              "id": "compiled_value",
+              "label": "compiled_value",
+              "kind": "calculation",
+              "value": 418.78450788,
+              "unit": "USD per share",
+              "operation": "present_value",
+              "formula": "present_value(distribution_ps_y1, 1, distribution_ps_y2, 2, distribution_ps_y3, 3, distribution_ps_y4, 4, total_realization_year_ps, 5, discount_rate)",
+              "substituted_formula": "present_value(16.792201, 1, 18.639343, 2, 20.316884, 3, 22.145403, 4, 521.39138, 5, 0.08)",
+              "dependencies": [
+                "distribution_ps_y1",
+                1,
+                "distribution_ps_y2",
+                2,
+                "distribution_ps_y3",
+                3,
+                "distribution_ps_y4",
+                4,
+                "total_realization_year_ps",
+                5,
+                "discount_rate"
+              ]
+            }
+          ]
+        },
+        "source_lineage": [
+          {
+            "node_id": "ocf_2025",
+            "ref": "https://data.sec.gov/api/xbrl/companyfacts/CIK0001141391.json",
+            "locator": "us-gaap:NetCashProvidedByUsedInOperatingActivities; 0001141391-26-000013",
+            "as_of": "2025-12-31",
+            "source_id": "f533154a968364d3b9f162189c0c98167e2e83dba66a736bea5f84e16042df36"
+          },
+          {
+            "node_id": "ocf_2026_ytd",
+            "ref": "https://data.sec.gov/api/xbrl/companyfacts/CIK0001141391.json",
+            "locator": "us-gaap:NetCashProvidedByUsedInOperatingActivities; 0001141391-26-000124",
+            "as_of": "2026-09-30",
+            "source_id": "3ea4ec9e905a2cc45efd2efab1fe7de097db349e58f126fb6501ba2c1114fcc5"
+          },
+          {
+            "node_id": "ocf_2025_ytd",
+            "ref": "https://data.sec.gov/api/xbrl/companyfacts/CIK0001141391.json",
+            "locator": "us-gaap:NetCashProvidedByUsedInOperatingActivities; 0001141391-26-000124",
+            "as_of": "2025-09-30",
+            "source_id": "7740e1aa1070571db12b1a682214f8040539b6add3d4eae93fce6378b7bf9c4e"
+          },
+          {
+            "node_id": "ppe_2025",
+            "ref": "https://data.sec.gov/api/xbrl/companyfacts/CIK0001141391.json",
+            "locator": "us-gaap:PaymentsToAcquirePropertyPlantAndEquipment; 0001141391-26-000013",
+            "as_of": "2025-12-31",
+            "source_id": "9e6a057789dea45518a37a39531634b61dd6066f65d6218f28685e79d0ebc432"
+          },
+          {
+            "node_id": "ppe_2026_ytd",
+            "ref": "https://data.sec.gov/api/xbrl/companyfacts/CIK0001141391.json",
+            "locator": "us-gaap:PaymentsToAcquirePropertyPlantAndEquipment; 0001141391-26-000124",
+            "as_of": "2026-09-30",
+            "source_id": "fef8e12611d610cfa636a77ff384fe0806816d5e2beb6951f5796160d998bd14"
+          },
+          {
+            "node_id": "ppe_2025_ytd",
+            "ref": "https://data.sec.gov/api/xbrl/companyfacts/CIK0001141391.json",
+            "locator": "us-gaap:PaymentsToAcquirePropertyPlantAndEquipment; 0001141391-26-000124",
+            "as_of": "2025-09-30",
+            "source_id": "fb21eecedb35acadac6010c5ff496643319e7c51534a70dd8ca697b6dd403503"
+          },
+          {
+            "node_id": "sbc_2025",
+            "ref": "https://data.sec.gov/api/xbrl/companyfacts/CIK0001141391.json",
+            "locator": "us-gaap:ShareBasedCompensation; 0001141391-26-000013",
+            "as_of": "2025-12-31",
+            "source_id": "132d62c9981d0efe7b68231d28fd0731d9f3761f95f41c354883734f0b0fa1e2"
+          },
+          {
+            "node_id": "sbc_2026_ytd",
+            "ref": "https://data.sec.gov/api/xbrl/companyfacts/CIK0001141391.json",
+            "locator": "us-gaap:ShareBasedCompensation; 0001141391-26-000124",
+            "as_of": "2026-09-30",
+            "source_id": "3594ed908abafa3212229d4356c60e56487f0a013143661385c5d8167d5652e8"
+          },
+          {
+            "node_id": "sbc_2025_ytd",
+            "ref": "https://data.sec.gov/api/xbrl/companyfacts/CIK0001141391.json",
+            "locator": "us-gaap:ShareBasedCompensation; 0001141391-26-000124",
+            "as_of": "2025-09-30",
+            "source_id": "09f435e44467f899514d64448592f86f6a22dc4e90406f166044d48886b8f649"
+          },
+          {
+            "node_id": "shares",
+            "ref": "https://data.sec.gov/api/xbrl/companyfacts/CIK0001141391.json",
+            "locator": "us-gaap:WeightedAverageNumberOfDilutedSharesOutstanding; 0001141391-26-000124",
+            "as_of": "2026-09-30",
+            "source_id": "4c1aba0f717ef810113fab53efb0580f55f0c1bf50def83dc0618b01d1e32713"
+          }
+        ],
+        "checks": {
+          "passed": true,
+          "errors": []
+        },
+        "proof_hash": "47e8751469b0c67dd55ea97ee427175a234cf8630770f293d8dfe9f0a91255ad"
+      },
+      "evidence_tier": null,
+      "evidence_level": "analyst_estimated",
+      "evidence": null,
+      "scenario_assumptions": null,
+      "probability_and_timing": null,
+      "tax_and_realization_adjustments": null,
+      "falsifier": null,
+      "overlap_key": "business",
+      "assumption_type": "judgment"
+    }
+  ],
   "component_coverage": {
-    "all_material_components_identified": false,
-    "material_component_count": 0,
-    "additive_component_count": 0,
+    "all_material_components_identified": true,
+    "material_component_count": 1,
+    "additive_component_count": 1,
     "embedded_component_count": 0,
-    "unvalued_component_count": 1,
+    "unvalued_component_count": 0,
     "double_counting_flags": []
   },
   "input_classification": {
     "facts": [],
     "estimates": [],
-    "judgments": []
+    "judgments": [
+      {
+        "component_id": "business",
+        "label": null,
+        "kind": "judgment",
+        "evidence_tier": null,
+        "evidence": null,
+        "method": "dated_forward_cashflow_schedule_per_share",
+        "valuation_status": "bounded_estimate"
+      }
+    ]
   },
   "method_route": {
-    "schema_version": "2.0",
-    "status": "default_needs_review",
+    "schema_version": "1.0",
+    "status": "routed",
     "profile_id": "quality_reinvestment",
     "label": "High-return compounder",
-    "score": 0.0,
+    "score": 7.0,
     "reasons": [
-      "No decisive classification was supplied; owner-earnings is the conservative operating default."
+      "archetype=compounder",
+      "component categories=operating_business"
     ],
     "primary_methods": [
       "owner_earnings_reinvestment_dcf"
@@ -71,7 +2634,9 @@
       "greenblatt",
       "hk",
       "klarman_asset_value",
+      "lawrence",
       "marks_credit_cycle",
+      "moi",
       "pabrai",
       "stahl"
     ],
@@ -87,19 +2652,39 @@
       "stock compensation or acquisitions omitted",
       "terminal value unsupported by a durable mechanism"
     ],
-    "secondary_profiles": [],
+    "secondary_profiles": [
+      {
+        "profile_id": "capital_cycle",
+        "score": 1.0,
+        "reasons": [
+          "component categories=operating_business"
+        ]
+      },
+      {
+        "profile_id": "predictable_cash_flow",
+        "score": 1.0,
+        "reasons": [
+          "component categories=operating_business"
+        ]
+      }
+    ],
     "scorecard": {
       "scarce_asset_optionality": {
         "score": 0.0,
         "reasons": []
       },
       "quality_reinvestment": {
-        "score": 0.0,
-        "reasons": []
+        "score": 7.0,
+        "reasons": [
+          "archetype=compounder",
+          "component categories=operating_business"
+        ]
       },
       "capital_cycle": {
-        "score": 0.0,
-        "reasons": []
+        "score": 1.0,
+        "reasons": [
+          "component categories=operating_business"
+        ]
       },
       "credit_and_normalized_returns": {
         "score": 0.0,
@@ -110,72 +2695,33 @@
         "reasons": []
       },
       "predictable_cash_flow": {
-        "score": 0.0,
-        "reasons": []
+        "score": 1.0,
+        "reasons": [
+          "component categories=operating_business"
+        ]
       },
       "binary_milestone": {
         "score": 0.0,
         "reasons": []
       }
     },
-    "decision_rule": "Power Zones select the fitting economic method and eligible independent reviewers; they never choose the valuation answer or capital decision.",
-    "ticker": "MA",
-    "as_of": "2026-07-20",
-    "route_source": "canonical_power_zone_router",
-    "config_path": "_system/frameworks/power_zones.json",
-    "config_updated": "2026-07-14",
-    "classification": {
-      "archetype": "unknown",
-      "moat": "unproven",
-      "dhando": "pending",
-      "stance": "watch",
-      "cycle": "-",
-      "moi_bucket": "pending",
-      "payoff_lens": "pending",
-      "investment_sleeve": "-"
-    },
-    "specialist_power_zones": [],
-    "committee": {
-      "candidate_count": 4,
-      "independence_group_count": 3,
-      "committee_seatable": true,
-      "candidates": [
-        {
-          "persona": "buffett_weschler",
-          "independence_group": "quality_reinvestment"
-        },
-        {
-          "persona": "hohn",
-          "independence_group": "competitive_advantage"
-        },
-        {
-          "persona": "munger",
-          "independence_group": "quality_reinvestment"
-        },
-        {
-          "persona": "marathon_capital_cycle",
-          "independence_group": "capital_cycle"
-        }
-      ]
-    },
-    "input_hash": "d9ecf73b524aeaca141beac9f0872a90653fa6a5464e69bddfc834ed56c684e3",
-    "generated_at": "2026-07-20T17:13:55.645240+00:00"
+    "decision_rule": "Use one primary method and no more than two corroborating methods; irrelevant methods and personas remain silent."
   },
   "market": {
-    "price_per_share": 547.44,
+    "price_per_share": null,
     "fully_diluted_shares": null,
     "market_cap_m": null,
     "enterprise_value_m": null,
-    "price_source": "Yahoo MA close 2026-07-20",
-    "price_as_of": "2026-07-20"
+    "price_source": null,
+    "price_as_of": null
   },
   "valuation": {
-    "output_basis": "present_value_today",
-    "output_basis_status": "defaulted_for_legacy_safety",
+    "output_basis": "forward_cashflow_schedule",
+    "output_basis_status": "method_declared",
     "output_range_per_share": {
-      "low": null,
-      "base": null,
-      "high": null
+      "low": 78.7409,
+      "base": 235.5363,
+      "high": 418.7845
     },
     "value_per_share": {
       "low": null,
@@ -194,11 +2740,15 @@
     },
     "future_payoff_date": null,
     "future_payoff_horizon_years": null,
-    "forward_cashflow_schedule": null,
+    "forward_cashflow_schedule": {
+      "low": [],
+      "base": [],
+      "high": []
+    },
     "priced_components_per_share": {
-      "low": 0,
-      "base": 0,
-      "high": 0
+      "low": 78.7409,
+      "base": 235.5363,
+      "high": 418.7845
     },
     "legacy_value_per_share": null,
     "probability_weighted_value_per_share": null,
@@ -209,14 +2759,14 @@
       "high": null
     },
     "forward_return_status": "withheld",
-    "forward_return_reason": "present_value_today cannot be annualized as a future payoff",
+    "forward_return_reason": "dated forward economics are incomplete",
     "annualized_return_at_price_pct": {
       "low": null,
       "base": null,
       "high": null
     },
     "annualized_return_field_status": "compatibility_alias_of_forward_return",
-    "required_return_pct": null,
+    "required_return_pct": 9.5,
     "margin_of_safety_pct": {
       "low": null,
       "base": null,
@@ -229,47 +2779,140 @@
       "high": null
     },
     "downside_to_low_pct": null,
-    "horizon_years": 7,
+    "horizon_years": 5,
     "equity_liability_floor": 0.0,
     "interpretation": "output_basis states what the proof produced. value_per_share and present_value_today_per_share are intrinsic values today and are withheld while any material additive component is unpriced or dated future economics cannot be discounted at an explicit required return. priced_components_per_share is the raw proof-output sum. A present value is never annualized or discounted again."
   },
   "scenario_contract": {
-    "rule": "Cases must change cited causal operating, capital, probability, timing, or financing drivers\u2014not only a terminal multiple.",
-    "top_value_drivers": [],
+    "rule": "Cases must change cited causal operating, capital, probability, timing, or financing drivers—not only a terminal multiple.",
+    "top_value_drivers": [
+      {
+        "component_id": "business",
+        "label": null,
+        "valuation_status": "bounded_estimate",
+        "base_per_share": 235.5363,
+        "legacy_base_per_share": null,
+        "range_width_per_share": 340.0436,
+        "scenario_assumptions": null
+      }
+    ],
     "reverse_expectations": null
   },
   "calculation_proof_summary": {
-    "component_count": 0,
-    "priced_component_count": 0,
-    "proof_complete_pct": 0.0,
+    "component_count": 1,
+    "priced_component_count": 1,
+    "proof_complete_pct": 100.0,
     "status_counts": {
-      "bounded_estimate": 0,
+      "bounded_estimate": 1,
       "calculated": 0,
       "legacy_sensitivity": 0,
       "unpriced": 0
     },
-    "all_material_components_priced": false,
+    "all_material_components_priced": true,
     "calculation_errors": [],
-    "aggregate_proof_hash": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945"
+    "aggregate_proof_hash": "a29df03922cb114047106ab69f27f3de898e493f05b3494d50db004d788fa6c3"
   },
-  "source_lineage": [],
+  "source_lineage": [
+    {
+      "component_id": "business",
+      "node_id": "ocf_2025",
+      "ref": "https://data.sec.gov/api/xbrl/companyfacts/CIK0001141391.json",
+      "locator": "us-gaap:NetCashProvidedByUsedInOperatingActivities; 0001141391-26-000013",
+      "as_of": "2025-12-31",
+      "source_id": "f533154a968364d3b9f162189c0c98167e2e83dba66a736bea5f84e16042df36"
+    },
+    {
+      "component_id": "business",
+      "node_id": "ocf_2026_ytd",
+      "ref": "https://data.sec.gov/api/xbrl/companyfacts/CIK0001141391.json",
+      "locator": "us-gaap:NetCashProvidedByUsedInOperatingActivities; 0001141391-26-000124",
+      "as_of": "2026-09-30",
+      "source_id": "3ea4ec9e905a2cc45efd2efab1fe7de097db349e58f126fb6501ba2c1114fcc5"
+    },
+    {
+      "component_id": "business",
+      "node_id": "ocf_2025_ytd",
+      "ref": "https://data.sec.gov/api/xbrl/companyfacts/CIK0001141391.json",
+      "locator": "us-gaap:NetCashProvidedByUsedInOperatingActivities; 0001141391-26-000124",
+      "as_of": "2025-09-30",
+      "source_id": "7740e1aa1070571db12b1a682214f8040539b6add3d4eae93fce6378b7bf9c4e"
+    },
+    {
+      "component_id": "business",
+      "node_id": "ppe_2025",
+      "ref": "https://data.sec.gov/api/xbrl/companyfacts/CIK0001141391.json",
+      "locator": "us-gaap:PaymentsToAcquirePropertyPlantAndEquipment; 0001141391-26-000013",
+      "as_of": "2025-12-31",
+      "source_id": "9e6a057789dea45518a37a39531634b61dd6066f65d6218f28685e79d0ebc432"
+    },
+    {
+      "component_id": "business",
+      "node_id": "ppe_2026_ytd",
+      "ref": "https://data.sec.gov/api/xbrl/companyfacts/CIK0001141391.json",
+      "locator": "us-gaap:PaymentsToAcquirePropertyPlantAndEquipment; 0001141391-26-000124",
+      "as_of": "2026-09-30",
+      "source_id": "fef8e12611d610cfa636a77ff384fe0806816d5e2beb6951f5796160d998bd14"
+    },
+    {
+      "component_id": "business",
+      "node_id": "ppe_2025_ytd",
+      "ref": "https://data.sec.gov/api/xbrl/companyfacts/CIK0001141391.json",
+      "locator": "us-gaap:PaymentsToAcquirePropertyPlantAndEquipment; 0001141391-26-000124",
+      "as_of": "2025-09-30",
+      "source_id": "fb21eecedb35acadac6010c5ff496643319e7c51534a70dd8ca697b6dd403503"
+    },
+    {
+      "component_id": "business",
+      "node_id": "sbc_2025",
+      "ref": "https://data.sec.gov/api/xbrl/companyfacts/CIK0001141391.json",
+      "locator": "us-gaap:ShareBasedCompensation; 0001141391-26-000013",
+      "as_of": "2025-12-31",
+      "source_id": "132d62c9981d0efe7b68231d28fd0731d9f3761f95f41c354883734f0b0fa1e2"
+    },
+    {
+      "component_id": "business",
+      "node_id": "sbc_2026_ytd",
+      "ref": "https://data.sec.gov/api/xbrl/companyfacts/CIK0001141391.json",
+      "locator": "us-gaap:ShareBasedCompensation; 0001141391-26-000124",
+      "as_of": "2026-09-30",
+      "source_id": "3594ed908abafa3212229d4356c60e56487f0a013143661385c5d8167d5652e8"
+    },
+    {
+      "component_id": "business",
+      "node_id": "sbc_2025_ytd",
+      "ref": "https://data.sec.gov/api/xbrl/companyfacts/CIK0001141391.json",
+      "locator": "us-gaap:ShareBasedCompensation; 0001141391-26-000124",
+      "as_of": "2025-09-30",
+      "source_id": "09f435e44467f899514d64448592f86f6a22dc4e90406f166044d48886b8f649"
+    },
+    {
+      "component_id": "business",
+      "node_id": "shares",
+      "ref": "https://data.sec.gov/api/xbrl/companyfacts/CIK0001141391.json",
+      "locator": "us-gaap:WeightedAverageNumberOfDilutedSharesOutstanding; 0001141391-26-000124",
+      "as_of": "2026-09-30",
+      "source_id": "4c1aba0f717ef810113fab53efb0580f55f0c1bf50def83dc0618b01d1e32713"
+    }
+  ],
   "model_checks": {
     "calculation_graphs_valid": true,
-    "component_sum_reconciles": false,
+    "component_sum_reconciles": true,
     "no_double_counting": true,
-    "all_material_components_priced": false,
-    "positive_base_or_explicit_zero_value": false,
+    "all_material_components_priced": true,
+    "positive_base_or_explicit_zero_value": true,
     "low_base_high_ordered": true,
     "source_identity_and_freshness_valid": true,
     "extreme_return_validated": true,
     "output_basis_valid": true,
-    "dated_forward_economics_valid": true,
+    "dated_forward_economics_valid": false,
     "present_value_is_not_treated_as_future_payoff": true
   },
   "evidence": {
-    "unresolved_count": 1,
+    "unresolved_count": 3,
     "blockers": [
-      "A complete economic ownership map has not been supplied."
+      "Market price per share is missing or non-positive; cannot mark decision_grade or compare value with price.",
+      "forward return is not uniquely computable for every scenario from the supplied dated economics",
+      "forward_cashflow_schedule requires low/base/high per-share cash-flow arrays"
     ],
     "validation_errors": []
   },
@@ -283,79 +2926,420 @@
     ]
   },
   "change_control": {
-    "model_hash": "60d453584a6eb95b5bf11f36f0bbfaa5fe71933d6962ca01ef2bf682f7b81efc",
-    "method_versions": [],
+    "model_hash": "70ac77c4fef8315a93aca85e7c9de1f4e86b1f9be8b13f87e32a946d64ce76fd",
+    "method_versions": [
+      "dated_forward_cashflow_schedule_per_share@1.0"
+    ],
     "change_log": [],
     "rule": "A source fact is locked. Every assumption change requires a reason, author, timestamp, and before/after value."
   },
   "decision_rule": "Proof status and investment readiness are separate. Every material claim must be valued exactly once by a valid calculation proof, every evidence blocker must be resolved, and the model must be stock-specific before committee review. Only a human decision can authorize capital.",
   "shared_forecast": {
     "schema_version": "1.0",
-    "method_version": "shared-valuation-forecast/1.1",
+    "method_version": "shared-valuation-forecast/1.3",
     "ticker": "MA",
-    "status": "model_gap",
+    "status": "available",
     "research_only": true,
     "requires_human_review": false,
     "capital_actionable": false,
-    "as_of": "2026-07-20",
-    "model_as_of": "2026-07-20",
+    "as_of": "2026-10-29",
+    "model_as_of": "2026-10-29",
     "quote": {
-      "value": 547.44,
-      "as_of": "2026-07-20",
-      "source_url": "Yahoo MA close 2026-07-20",
-      "currency": null
+      "value": 635.7000122070312,
+      "currency": "USD",
+      "as_of": "2026-10-29",
+      "symbol": "MA",
+      "company_name": "Mastercard Incorporated",
+      "source_url": "https://query1.finance.yahoo.com/v8/finance/chart/MA?range=1mo&interval=1d",
+      "retrieved_at": "2026-10-29T20:24:39.857034+00:00",
+      "checked_at": "2026-10-29T20:24:39.857034+00:00",
+      "price_type": "completed_session_close",
+      "calendar": "XNYS",
+      "exchange": "NYQ",
+      "exchange_timezone": "America/New_York",
+      "expected_close": "2026-10-29",
+      "claim_type": "provider_observation"
     },
-    "forecast_hash": "1ebec4edf252b32e9bffb71121e06ed60c7272e51bfeb72f3d9e1a8c68cd6a39",
+    "forecast_hash": "7dc5aaa125bccb3efc669b854975f031a233ca378ca9a71c89899e5809d766f2",
     "forward_irr_pct": {
-      "low": null,
-      "base": null,
-      "high": null
+      "low": -29.93465738,
+      "base": -11.91993232,
+      "high": -1.2486038
     },
     "present_value_today_per_share": {
-      "low": null,
-      "base": null,
-      "high": null
+      "low": 78.74085293,
+      "base": 235.53632435,
+      "high": 418.784507866
     },
     "model_present_value_per_share": {
-      "low": null,
-      "base": null,
-      "high": null
+      "low": 78.7409,
+      "base": 235.5363,
+      "high": 418.7845
     },
     "required_return_pct": {
-      "low": null,
-      "base": null,
-      "high": null
+      "low": 12.0,
+      "base": 9.5,
+      "high": 8.0
     },
-    "forward_cashflow_schedule": {},
-    "buy_prices": [],
-    "components": [],
-    "gaps": [
+    "forward_cashflow_schedule": {
+      "low": [
+        {
+          "year": 1.0,
+          "amount_per_share": 8.52304509,
+          "discount_rate": 0.12,
+          "proof_node": "distribution_ps_y1",
+          "component_id": "business",
+          "timing": "dated_forecast",
+          "model_year": 1.0,
+          "date": "2027-10-29"
+        },
+        {
+          "year": 2.0,
+          "amount_per_share": 8.69350599,
+          "discount_rate": 0.12,
+          "proof_node": "distribution_ps_y2",
+          "component_id": "business",
+          "timing": "dated_forecast",
+          "model_year": 2.0,
+          "date": "2028-10-28"
+        },
+        {
+          "year": 3.0,
+          "amount_per_share": 9.04124623,
+          "discount_rate": 0.12,
+          "proof_node": "distribution_ps_y3",
+          "component_id": "business",
+          "timing": "dated_forecast",
+          "model_year": 3.0,
+          "date": "2029-10-29"
+        },
+        {
+          "year": 4.0,
+          "amount_per_share": 9.40289608,
+          "discount_rate": 0.12,
+          "proof_node": "distribution_ps_y4",
+          "component_id": "business",
+          "timing": "dated_forecast",
+          "model_year": 4.0,
+          "date": "2030-10-29"
+        },
+        {
+          "year": 5.0,
+          "amount_per_share": 91.27077797,
+          "discount_rate": 0.12,
+          "proof_node": "total_realization_year_ps",
+          "component_id": "business",
+          "timing": "dated_forecast",
+          "model_year": 5.0,
+          "date": "2031-10-29"
+        }
+      ],
+      "base": [
+        {
+          "year": 1.0,
+          "amount_per_share": 14.88421233,
+          "discount_rate": 0.095,
+          "proof_node": "distribution_ps_y1",
+          "component_id": "business",
+          "timing": "dated_forecast",
+          "model_year": 1.0,
+          "date": "2027-10-29"
+        },
+        {
+          "year": 2.0,
+          "amount_per_share": 16.07494932,
+          "discount_rate": 0.095,
+          "proof_node": "distribution_ps_y2",
+          "component_id": "business",
+          "timing": "dated_forecast",
+          "model_year": 2.0,
+          "date": "2028-10-28"
+        },
+        {
+          "year": 3.0,
+          "amount_per_share": 17.20019577,
+          "discount_rate": 0.095,
+          "proof_node": "distribution_ps_y3",
+          "component_id": "business",
+          "timing": "dated_forecast",
+          "model_year": 3.0,
+          "date": "2029-10-29"
+        },
+        {
+          "year": 4.0,
+          "amount_per_share": 18.40420947,
+          "discount_rate": 0.095,
+          "proof_node": "distribution_ps_y4",
+          "component_id": "business",
+          "timing": "dated_forecast",
+          "model_year": 4.0,
+          "date": "2030-10-29"
+        },
+        {
+          "year": 5.0,
+          "amount_per_share": 287.51056035,
+          "discount_rate": 0.095,
+          "proof_node": "total_realization_year_ps",
+          "component_id": "business",
+          "timing": "dated_forecast",
+          "model_year": 5.0,
+          "date": "2031-10-29"
+        }
+      ],
+      "high": [
+        {
+          "year": 1.0,
+          "amount_per_share": 16.79220091,
+          "discount_rate": 0.08,
+          "proof_node": "distribution_ps_y1",
+          "component_id": "business",
+          "timing": "dated_forecast",
+          "model_year": 1.0,
+          "date": "2027-10-29"
+        },
+        {
+          "year": 2.0,
+          "amount_per_share": 18.63934301,
+          "discount_rate": 0.08,
+          "proof_node": "distribution_ps_y2",
+          "component_id": "business",
+          "timing": "dated_forecast",
+          "model_year": 2.0,
+          "date": "2028-10-28"
+        },
+        {
+          "year": 3.0,
+          "amount_per_share": 20.31688388,
+          "discount_rate": 0.08,
+          "proof_node": "distribution_ps_y3",
+          "component_id": "business",
+          "timing": "dated_forecast",
+          "model_year": 3.0,
+          "date": "2029-10-29"
+        },
+        {
+          "year": 4.0,
+          "amount_per_share": 22.14540343,
+          "discount_rate": 0.08,
+          "proof_node": "distribution_ps_y4",
+          "component_id": "business",
+          "timing": "dated_forecast",
+          "model_year": 4.0,
+          "date": "2030-10-29"
+        },
+        {
+          "year": 5.0,
+          "amount_per_share": 521.39137846,
+          "discount_rate": 0.08,
+          "proof_node": "total_realization_year_ps",
+          "component_id": "business",
+          "timing": "dated_forecast",
+          "model_year": 5.0,
+          "date": "2031-10-29"
+        }
+      ]
+    },
+    "buy_prices": [
       {
-        "code": "issuer_forecast_missing"
+        "hurdle_pct": 8,
+        "prices": {
+          "low": 91.5509885309,
+          "base": 250.419925845,
+          "high": 418.784507866
+        }
+      },
+      {
+        "hurdle_pct": 10,
+        "prices": {
+          "low": 84.8200373703,
+          "base": 230.830706091,
+          "high": 384.803061531
+        }
+      },
+      {
+        "hurdle_pct": 12,
+        "prices": {
+          "low": 78.74085293,
+          "base": 213.184507164,
+          "high": 354.238638011
+        }
+      },
+      {
+        "hurdle_pct": 15,
+        "prices": {
+          "low": 70.6834929861,
+          "base": 189.873400636,
+          "high": 313.939985599
+        }
+      },
+      {
+        "hurdle_pct": 18,
+        "prices": {
+          "low": 63.7144492084,
+          "base": 169.793289928,
+          "high": 279.309976947
+        }
+      },
+      {
+        "hurdle_pct": 20,
+        "prices": {
+          "low": 59.5861514944,
+          "base": 157.940019264,
+          "high": 258.910135309
+        }
       }
     ],
+    "components": [
+      {
+        "component_id": "business",
+        "method": "dated_forward_cashflow_schedule_per_share",
+        "status": "available",
+        "present_value_per_share": {
+          "low": 78.7409,
+          "base": 235.5363,
+          "high": 418.7845
+        }
+      }
+    ],
+    "gaps": [],
     "warnings": [],
-    "source_refs": [],
-    "next_action": "automatic_model_refresh",
+    "source_refs": [
+      {
+        "node_id": "ocf_2025",
+        "ref": "https://data.sec.gov/api/xbrl/companyfacts/CIK0001141391.json",
+        "locator": "us-gaap:NetCashProvidedByUsedInOperatingActivities; 0001141391-26-000013",
+        "as_of": "2025-12-31",
+        "source_id": "f533154a968364d3b9f162189c0c98167e2e83dba66a736bea5f84e16042df36"
+      },
+      {
+        "node_id": "ocf_2026_ytd",
+        "ref": "https://data.sec.gov/api/xbrl/companyfacts/CIK0001141391.json",
+        "locator": "us-gaap:NetCashProvidedByUsedInOperatingActivities; 0001141391-26-000124",
+        "as_of": "2026-09-30",
+        "source_id": "3ea4ec9e905a2cc45efd2efab1fe7de097db349e58f126fb6501ba2c1114fcc5"
+      },
+      {
+        "node_id": "ocf_2025_ytd",
+        "ref": "https://data.sec.gov/api/xbrl/companyfacts/CIK0001141391.json",
+        "locator": "us-gaap:NetCashProvidedByUsedInOperatingActivities; 0001141391-26-000124",
+        "as_of": "2025-09-30",
+        "source_id": "7740e1aa1070571db12b1a682214f8040539b6add3d4eae93fce6378b7bf9c4e"
+      },
+      {
+        "node_id": "ppe_2025",
+        "ref": "https://data.sec.gov/api/xbrl/companyfacts/CIK0001141391.json",
+        "locator": "us-gaap:PaymentsToAcquirePropertyPlantAndEquipment; 0001141391-26-000013",
+        "as_of": "2025-12-31",
+        "source_id": "9e6a057789dea45518a37a39531634b61dd6066f65d6218f28685e79d0ebc432"
+      },
+      {
+        "node_id": "ppe_2026_ytd",
+        "ref": "https://data.sec.gov/api/xbrl/companyfacts/CIK0001141391.json",
+        "locator": "us-gaap:PaymentsToAcquirePropertyPlantAndEquipment; 0001141391-26-000124",
+        "as_of": "2026-09-30",
+        "source_id": "fef8e12611d610cfa636a77ff384fe0806816d5e2beb6951f5796160d998bd14"
+      },
+      {
+        "node_id": "ppe_2025_ytd",
+        "ref": "https://data.sec.gov/api/xbrl/companyfacts/CIK0001141391.json",
+        "locator": "us-gaap:PaymentsToAcquirePropertyPlantAndEquipment; 0001141391-26-000124",
+        "as_of": "2025-09-30",
+        "source_id": "fb21eecedb35acadac6010c5ff496643319e7c51534a70dd8ca697b6dd403503"
+      },
+      {
+        "node_id": "sbc_2025",
+        "ref": "https://data.sec.gov/api/xbrl/companyfacts/CIK0001141391.json",
+        "locator": "us-gaap:ShareBasedCompensation; 0001141391-26-000013",
+        "as_of": "2025-12-31",
+        "source_id": "132d62c9981d0efe7b68231d28fd0731d9f3761f95f41c354883734f0b0fa1e2"
+      },
+      {
+        "node_id": "sbc_2026_ytd",
+        "ref": "https://data.sec.gov/api/xbrl/companyfacts/CIK0001141391.json",
+        "locator": "us-gaap:ShareBasedCompensation; 0001141391-26-000124",
+        "as_of": "2026-09-30",
+        "source_id": "3594ed908abafa3212229d4356c60e56487f0a013143661385c5d8167d5652e8"
+      },
+      {
+        "node_id": "sbc_2025_ytd",
+        "ref": "https://data.sec.gov/api/xbrl/companyfacts/CIK0001141391.json",
+        "locator": "us-gaap:ShareBasedCompensation; 0001141391-26-000124",
+        "as_of": "2025-09-30",
+        "source_id": "09f435e44467f899514d64448592f86f6a22dc4e90406f166044d48886b8f649"
+      },
+      {
+        "node_id": "shares",
+        "ref": "https://data.sec.gov/api/xbrl/companyfacts/CIK0001141391.json",
+        "locator": "us-gaap:WeightedAverageNumberOfDilutedSharesOutstanding; 0001141391-26-000124",
+        "as_of": "2026-09-30",
+        "source_id": "4c1aba0f717ef810113fab53efb0580f55f0c1bf50def83dc0618b01d1e32713"
+      }
+    ],
+    "next_action": "scheduled_refresh",
     "reconciliation": {
-      "passed": false
+      "passed": true,
+      "method": "component_proof_to_dated_cashflows",
+      "model_present_value_per_share": {
+        "low": 78.7409,
+        "base": 235.5363,
+        "high": 418.7845
+      }
     },
     "settlement_policy": "Explicit cash/debt additions in an operating DCF are time-zero acquisition adjustments; hypothetical settlement, not declared dividends.",
-    "calculation_id": "4fbc7b5945e343b46628bbc5b13a1da2b29ff051055e4c59e9878281cf1eb522"
+    "financial_period": "2025-12-31",
+    "market_sync": {
+      "status": "verified",
+      "price_as_of": "2026-10-29",
+      "financial_period": "2025-12-31",
+      "model_as_of": "2026-10-29",
+      "price_policy": "latest_completed_exchange_session",
+      "basis_id": "417b7225422d1aaa06cd8472092b1e83eb79f6a0d16835f3c8e7690142de578a",
+      "valid_until": "2026-10-30T20:10:00+00:00",
+      "latest_report": {
+        "period": "2026-09-30",
+        "filed": "2026-10-29",
+        "accession": "0001141391-26-000124",
+        "form": "10-Q",
+        "source_url": "https://www.sec.gov/Archives/edgar/data/1141391/000114139126000124/ma-20260930.htm"
+      },
+      "share_basis_as_of": "2026-10-29",
+      "actions": [
+        {
+          "date": "2014-01-22",
+          "ratio": 10.0,
+          "source_url": "https://query1.finance.yahoo.com/v8/finance/chart/MA?period1=946684800&period2=1793318400&interval=1mo&events=splits",
+          "numerator": 10.0,
+          "denominator": 1.0
+        }
+      ],
+      "adjustments": [
+        {
+          "component_id": "business",
+          "input_id": "shares",
+          "factor": 1,
+          "source_basis": {
+            "as_of": "2026-10-28",
+            "symbol": "MA",
+            "source_url": "https://query1.finance.yahoo.com/v8/finance/chart/MA?period1=946684800&period2=1793318400&interval=1mo&events=splits",
+            "basis_id": "2dbe9d4a242be52ec69fe49562adab976d44f8868220d3641e48d86021fbdf0e"
+          }
+        }
+      ],
+      "source_url": "https://query1.finance.yahoo.com/v8/finance/chart/MA?period1=946684800&period2=1793318400&interval=1mo&events=splits",
+      "coverage_start": "2006-05-25"
+    },
+    "underwriting": {
+      "contract_hash": "eaf6a621e0f0c9d416af4e5bb15bd03bb22711023e89952bff4dcf5f5a8576c4",
+      "evidence_hash": "a7e5fd57c7391bfca81257d94bab244373d5cdcbb41cc54346b7807f29748952",
+      "packet_hash": "e3afdfe8c03733bca272a03bd802f34d6dbb5fdf81addf8bb73e256b0b09e5f7",
+      "framework": "operating_dcf",
+      "review_due": "2027-02-12",
+      "assumptions_count": 13
+    },
+    "assumptions_as_of": "2026-10-29",
+    "calculation_id": "972433ea6bf9fe046eec7e8a2f51abe94774091403ee72073f7f81dd9c9b8934",
+    "horizon_years": 5.0
   },
-  "authority": "universal_valuation_contract",
-  "legacy_reference_present": false,
-  "falsifier_coverage": {
-    "typed": 0,
-    "prose_only": 0,
-    "untestable": 0,
-    "invalid": 0,
-    "unanchored": 0,
-    "resolvable": 0,
-    "unresolvable": 0,
-    "calibration_eligible": 0,
-    "diagnostic_only": 0,
-    "spec_ref": null,
-    "enforcement_enabled": false
-  }
+  "capital_actionable": false,
+  "requires_human_review": false
 }
