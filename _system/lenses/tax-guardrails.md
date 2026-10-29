@@ -17,7 +17,7 @@ Written 2026-10-29 by the NOL and Tax Assets desk. Scope: what any desk may say 
 | TAX-03 | Does every cited 382 limit carry a filing accession that states the dollar amount? No → write "limit not stated". | 26 U.S.C. §382; REI FY25 10-K 0001384195-26-000050; VNDA FY25 10-K 0001628280-26-007460 | a filing later shows the desk's "not stated" answer missed a stated limit in a document it read | untested | REI-382-limit, VNDA-382-limit, REI-382-change, VNDA-382-change, SIRI-382, NWL-382 |
 | TAX-04 | Is the VA full? Yes → treat the losses as not expected to be used; flag, don't add. | VNDA Q3 2026 10-Q 0001347178-26-000002 | full-VA names release the VA within 4 quarters in most graded cases | untested | VNDA-VA-Q3 |
 | TAX-05 | Is a 13G/13D or Form 4 being called an ownership change? Yes → relabel as a test input [I]. | 26 U.S.C. §382(g); WYY 0000906304-26-000187; VNDA 0002052113-26-001132; REI 0002012383-26-003839 | — (definitional; a stated ownership change in a later filing is a new fact, not a rule failure) | untested | WYY-13G-382, NWL-Form4-382, WYY-13G-Royce, VNDA-13G-BlackRock, REI-13G-BlackRock |
-| TAX-06 | Is a rights-plan trigger quoted from the 8-K, with its effect labeled inference? | TTI 8-K 0000844965-26-000042 (4.99%) | — (citation rule) | untested | TTI-rights-plan, SIRI-rights-plan, REI-rights-plan |
+| TAX-06 | Is a rights-plan trigger quoted from the filing that states it (10-K or proxy), with its effect labeled inference? | TTI FY25 10-K 0000844965-26-000015 Note 15 p. F-35 (4.99%); plan-amendment vote 8-K 0000844965-26-000042 | — (citation rule) | untested | TTI-rights-plan, SIRI-rights-plan, REI-rights-plan |
 | TAX-07 | Is a screener tax field implausible (e.g. VA > 100% of DTA) or a source stale/unresolvable? Yes → report it as a data error, don't use it. | nol_screener.json (BIIB VA 283%); nol_382_facts.json generated 2026-08-12 | flagged fields turn out correct on checking the filing | untested | BIIB-VA-283, stale-382-file, REN-cik, FUBO-lead |
 | TAX-08 | Is each tax claim labeled fact [F] or inference [I], with filing numbers as [F] and owner-shift or COD effects as [I]? | Desk rule | — (labeling rule) | untested | HTZ-COD, SIRI-Q3-tax, VNDA-Q3-loss |
 
@@ -38,5 +38,3 @@ Written 2026-10-29 by the NOL and Tax Assets desk. Scope: what any desk may say 
 
 ## 6. Change log
 - 2026-10-29: written as a guardrail lens; same day restructured into LENS_FORMAT.md (rules TAX-01 to TAX-08, all untested), reason: shared format and scoring. Mirrored in CHANGELOG.md.
-
-Repo copy of the graded test set: `_system/data/desk_evals/nol_tax_assets/test_set.json`. The path above is the desk working copy.
