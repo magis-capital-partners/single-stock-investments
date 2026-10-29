@@ -1,242 +1,219 @@
 {
   "schema_version": "desk_briefs.v1",
-  "generated_at": "2026-10-29T16:47:30Z",
+  "generated_at": "2026-10-29T19:28:19Z",
   "caption": "Ranked output from the Magis desk bots, one brief per desk per day, filed by pull request and checked by schema. A brief is research only: it carries no authority, sizes nothing, and never enters a base IRR. The one number on each row is the dashboard's or the filing's, not the bot's.",
   "desks": [
     {
       "desk": "special_situations",
       "desk_label": "Special Situations",
       "owner": "drew",
-      "author": "claude-drew-special-situations",
-      "as_of": "2026-10-12",
-      "age_hours": 424.8,
-      "stale": true,
-      "path": "_system/data/desk_briefs/special_situations/2026-10-12.json",
+      "author": "grok-drew-special-situations",
+      "as_of": "2026-10-29",
+      "age_hours": 19.5,
+      "stale": false,
+      "path": "_system/data/desk_briefs/special_situations/2026-10-29.json",
       "items": [
         {
-          "ticker": "MDT",
-          "headline": "MiniMed (MMED) exchange offer expired 2026-10-09 with the upper limit in effect; final ratio 4.5939 MMED per MDT; final-results 8-K not yet filed.",
-          "one_number": "final exchange ratio 4.5939 (upper limit binding)",
-          "lane": "split_offs",
-          "evidence": [
-            {
-              "kind": "filing",
-              "ref": "SC TO-I/A 0001628280-26-065406 (filed 2026-10-08)",
-              "url": "https://www.sec.gov/Archives/edgar/data/1613103/000162828026065406/mdt-amendedno2scheduleissu.htm"
-            },
-            {
-              "kind": "filing",
-              "ref": "424B3 0001628280-26-064932 (7% discount, upper limit 4.5939, expires 2026-10-09, odd-lot priority)",
-              "url": "https://www.sec.gov/Archives/edgar/data/2062583/000162828026064932/minimedgroupinc-424b3.htm"
-            },
-            {
-              "kind": "dashboard",
-              "ref": "dashboard/data/separations.json row sep:mdt-mmed-2026",
-              "url": null
-            }
-          ],
-          "confidence": "filing",
-          "next": "Read the final-results 8-K (accepted and tendered MDT shares, proration factor, settlement date) and append a version-2 row to separation_registry.jsonl; then the unwind flow can be modelled.",
-          "handoff": null
-        },
-        {
-          "ticker": "MDT",
-          "headline": "Capped ratio gave a 2.33% realized discount on 2026-10-09 closes (MDT 88.48 / MMED 19.71); odd-lot payoff $195.55 per 99 shares; no sleeve odd lot.",
-          "one_number": "realized discount 2.33% vs 7% headline",
-          "lane": "split_offs",
-          "evidence": [
-            {
-              "kind": "dashboard",
-              "ref": "dashboard/data/separations.json spread (basis final_filed, quotes as_of 2026-10-09)",
-              "url": null
-            },
-            {
-              "kind": "provider",
-              "ref": "Yahoo delayed closes via _system/data/separations/separation_market.json (market_as_of 2026-10-11T18:04:51Z)",
-              "url": null
-            }
-          ],
-          "confidence": "provider",
-          "next": "Nothing to tender; the offer has expired. Record the realized discount beside the filed proration factor once the 8-K prints, so the reference set gains a fifth data point.",
-          "handoff": null
-        },
-        {
-          "ticker": "unresolved",
-          "headline": "MiniMed (MMED, not in registry): modelled post-settlement selling 27.7% of float over 13.7 ADV days, 2026-10-09 to 2027-10-09 (estimate).",
-          "one_number": "-27.7% of float (estimate)",
-          "lane": "forced_sellers",
-          "evidence": [
-            {
-              "kind": "dashboard",
-              "ref": "dashboard/data/separations.json forced_seller_rows (sep:mdt-mmed-2026, side spinco, run 2026-10-12)",
-              "url": null
-            },
-            {
-              "kind": "filing",
-              "ref": "SC TO-I 0001628280-26-061683 (225,361,295 MiniMed shares offered, 80.1% of outstanding)",
-              "url": "https://www.sec.gov/Archives/edgar/data/1613103/000162828026061683/kangaroo-scheduleto.htm"
-            }
-          ],
-          "confidence": "provider",
-          "next": "Onboard MMED so the row can carry a registry ticker; rerun the flow model when the accepted share count is filed. A modelled flow is a timing input, not a value.",
-          "handoff": "tape_index"
-        },
-        {
-          "ticker": "HON",
-          "headline": "Honeywell Aerospace spin-off: Form 10 on file (10-12B/A 2026-06-08); ratio, record and distribution dates not yet read; row stays in discovery.",
-          "one_number": "10-12B/A filed 2026-06-08",
+          "ticker": "ABT",
+          "headline": "Abbott plans a tax-free spin of Nutrition into its own public company, expected by the end of 2027.",
+          "one_number": "about $8.5 billion annual sales",
           "lane": "spinoffs",
           "evidence": [
             {
               "kind": "filing",
-              "ref": "10-12B/A 0001628280-26-041399",
-              "url": "https://www.sec.gov/Archives/edgar/data/773840/000162828026041399"
-            },
-            {
-              "kind": "dashboard",
-              "ref": "dashboard/data/separations.json row sep:hon-hona-2026 (gates.terms missing distribution_ratio, dates.distribution)",
-              "url": null
+              "ref": "8-K 0001104659-26-117587 filed 2026-10-21",
+              "url": "https://www.sec.gov/Archives/edgar/data/1800/000110465926117587/tm2627971d1_8k.htm"
             }
           ],
           "confidence": "filing",
-          "next": "Read the Form 10 for the ratio, record and distribution dates, SpinCo debt and insider equity; the identity and terms gates can then rank it and the flow model can ask who must sell.",
-          "handoff": null
+          "next": "Pass until a Form 10 states a ratio, a record date, or who must sell.",
+          "handoff": "nol_tax_assets"
         },
         {
           "ticker": "FDX",
-          "headline": "FedEx Freight (FDXF) spin-off: Form 10 on file (10-12B/A 2026-04-10); terms not extracted; row held in discovery until the ratio and the dates are read.",
-          "one_number": "10-12B/A filed 2026-04-10",
-          "lane": "spinoffs",
-          "evidence": [
-            {
-              "kind": "filing",
-              "ref": "10-12B/A 0001104659-26-041977",
-              "url": "https://www.sec.gov/Archives/edgar/data/2082247/000110465926041977"
-            },
-            {
-              "kind": "dashboard",
-              "ref": "dashboard/data/separations.json row sep:fdx-fdxf-2026",
-              "url": null
-            }
-          ],
-          "confidence": "filing",
-          "next": "Read the Form 10: distribution ratio, record and distribution dates, SpinCo debt, insider equity. Then ask who must sell.",
-          "handoff": null
-        },
-        {
-          "ticker": "CTVA",
-          "headline": "Corteva's Vylor (VYLR) spin-off: Form 10 amended 2026-09-21 (10-12B/A); distribution ratio and dates not yet read; row in discovery.",
-          "one_number": "10-12B/A filed 2026-09-21",
-          "lane": "spinoffs",
-          "evidence": [
-            {
-              "kind": "filing",
-              "ref": "10-12B/A 0001193125-26-396054",
-              "url": "https://www.sec.gov/Archives/edgar/data/2128626/000119312526396054"
-            },
-            {
-              "kind": "dashboard",
-              "ref": "dashboard/data/separations.json row sep:ctva-vylr-2026",
-              "url": null
-            }
-          ],
-          "confidence": "filing",
-          "next": "Read the Form 10: distribution ratio, record and distribution dates, SpinCo debt, insider equity. Then ask who must sell.",
-          "handoff": null
-        },
-        {
-          "ticker": "APTV",
-          "headline": "Aptiv's Versigent spin-off: Form 10 amended 2026-03-06 (10-12B/A); no SpinCo ticker in the register yet; ratio and dates not yet read.",
-          "one_number": "10-12B/A filed 2026-03-06",
-          "lane": "spinoffs",
-          "evidence": [
-            {
-              "kind": "filing",
-              "ref": "10-12B/A 0001193125-26-096776",
-              "url": "https://www.sec.gov/Archives/edgar/data/2078008/000119312526096776"
-            },
-            {
-              "kind": "dashboard",
-              "ref": "dashboard/data/separations.json row sep:aptv-versigent-2026",
-              "url": null
-            }
-          ],
-          "confidence": "filing",
-          "next": "Read the Form 10 for the ratio and the dates, and record the SpinCo ticker when the listing notice names it.",
-          "handoff": null
-        },
-        {
-          "ticker": "CSGP",
-          "headline": "Nasdaq-100 deletion flagged from a headline dated 2026-05-11, not a provider notice; the selling is not mechanical until the notice is confirmed.",
-          "one_number": "announced 2026-05-11 (headline)",
+          "headline": "FedEx kept a 19.9% FedEx Freight stake and expects to monetize it within 12 months of September 30, 2026.",
+          "one_number": "19.9% stake; 12 months from 2026-09-30",
           "lane": "forced_sellers",
           "evidence": [
             {
-              "kind": "dashboard",
-              "ref": "dashboard/data/special_situations.json row ss:27d427fca304 (source_feed index_membership, evidence_kind news)",
-              "url": null
-            },
-            {
-              "kind": "news",
-              "ref": "Index note via Google News RSS, 2026-05-11",
-              "url": "https://news.google.com/rss/articles/CBMi8wFBVV95cUxOWEQ3cjN1MU13cjZ0cEM3NEN5d1NwQU5Zd3VWVmdXNkhiY2I5ZXVpbFNCNEFCZE4xaGRfZG0yWnZRMkhiVTMtY2Z6R001dGE2S3dtRnhPa2NnRmx6ZllDdjMzTGc2eVlQSUJkSnF6ZDlTSHZYQUZWMDdpNjJ0ZGV6UUt3bGNjNVBiTDN5Y0pfdHFTc2d5bXdfazlLWVZzd3FkQTJudXl1RFQ2MDFwakxlUmFoLWIxNFY3MUxyLXZhSy11U1JOZ1ZqVGhRN1BsV0NpZGt1LWtjenliNmRqUUllN056dmttTk1Na1pKRWJyV01xdUXSAfgBQVVfeXFMTWxORFlzeDlqckJ0cWFQbUwzT0s4ZGZDdWRtWmpMUHA0cVV1Ui1MZE1tVF9SMFJycTQ2cmZkcjdybUszUzZiWHRzUDR4SmZZNVk5bS1DSTRZV1VRaHdRd0FYV0NDYUo2RzlMdnk3QlhhaFFKUC03ZkNsT2dXamZGQUR3NS1GY1AwdnBjQWxlLXY2ZXp5UGs1ajJwQ0VGVktLbllBLTBYREVxdGxVTlFDYVZ3b01GZjExMUp2MFVabEY1SHJ2TnJqNU1Rbm43T3FMZEMyM0dVTDF3Snh1MXFGUVRaSnRUMWVfTm1XTGwtWHVjQWN6TDVvT3M?oc=5"
+              "kind": "filing",
+              "ref": "10-Q 0001048911-26-000131 filed 2026-10-28",
+              "url": "https://www.sec.gov/Archives/edgar/data/1048911/000104891126000131/fdx-20260930.htm"
             }
           ],
-          "confidence": "news",
-          "next": "Confirm the Nasdaq provider notice (announced and effective dates) in index_membership before treating the selling as mechanical; until then this is a headline.",
+          "confidence": "filing",
+          "next": "The 10-Q says expects, subject to market conditions. It does not say FedEx must sell.",
           "handoff": "tape_index"
         },
         {
-          "ticker": "TAP",
-          "headline": "S&P 500 deletion flagged from a headline dated 2026-09-21, not a provider notice; no confirmed_event in index_membership as of this run.",
-          "one_number": "announced 2026-09-21 (headline)",
-          "lane": "forced_sellers",
+          "ticker": "DASH",
+          "headline": "DoorDash agreed to buy Maplebear (Instacart) for $65.00 a share, at least 75% cash and up to 25% stock.",
+          "one_number": "$65.00 per share",
+          "lane": "mergers",
           "evidence": [
             {
-              "kind": "dashboard",
-              "ref": "dashboard/data/special_situations.json row ss:255a109bb35d (source_feed index_membership, evidence_kind news)",
-              "url": null
-            },
-            {
-              "kind": "news",
-              "ref": "Index note via Google News RSS, 2026-09-21",
-              "url": "https://news.google.com/rss/articles/CBMixgFBVV95cUxPQ3dydU5xWFVKSjZRU29UeERNeW9IMm91SERmR2NqS045S2xFMGQ1eHN4S19MdmZ5VE5LWEYtNmpNWThYY29VR0xzR2trZ3JFQWUtVjVjZFdtNUJERU1raVE0N25leEJkMTB1NE14N2FRclBjR0N0bjN4bzczVHRSc2JlbGVVSjU1T2JKMlo5ejZnN2I2QktxMXVOcXBmR0w0ZDMtVVVQZHhJT3NRcmZ4Nm9aLW5JSTVmM01GQVZYOTk1MHh2WEE?oc=5"
+              "kind": "filing",
+              "ref": "425 0001792789-26-000065 filed 2026-10-29",
+              "url": "https://www.sec.gov/Archives/edgar/data/1792789/000179278926000065/dashform425combined.htm"
             }
           ],
-          "confidence": "news",
-          "next": "Confirm the S&P provider notice and the effective date before treating the selling as mechanical.",
-          "handoff": "tape_index"
+          "confidence": "filing",
+          "next": "The 425 states no closing date and no vote. Do not call it a no-vote deal until a filing does.",
+          "handoff": "fundamentals"
+        },
+        {
+          "ticker": "MDT",
+          "headline": "MiniMed exchange offer expired October 9, 2026. Final proration is 18.289133%. Odd lots were accepted in full.",
+          "one_number": "proration 18.289133%; odd lots in full",
+          "lane": "split_offs",
+          "evidence": [
+            {
+              "kind": "filing",
+              "ref": "425 0001628280-26-065819 filed 2026-10-14",
+              "url": "https://www.sec.gov/Archives/edgar/data/1613103/000162828026065819/a425-finalresultsofexchang.htm"
+            }
+          ],
+          "confidence": "filing",
+          "next": "The offer is over. Medtronic said it will keep no MiniMed shares. The results release does not state the settlement date.",
+          "handoff": null
         }
       ],
       "inputs_read": [
         {
-          "path": "dashboard/data/separations.json",
-          "generated_at": "2026-10-12T00:04:30Z",
-          "age_hours_at_read": 23.9,
+          "path": "dashboard/data/portfolio_news.json",
+          "generated_at": "2026-10-28T15:17:56.502197+00:00",
+          "age_hours_at_read": 32.7,
+          "exists": true
+        },
+        {
+          "path": "dashboard/data/warrants.json",
+          "generated_at": "2026-10-27T13:57:56Z",
+          "age_hours_at_read": 58.0,
+          "exists": true
+        },
+        {
+          "path": "dashboard/data/activist_feed.json",
+          "generated_at": "2026-10-27T13:55:22Z",
+          "age_hours_at_read": 58.1,
+          "exists": true
+        },
+        {
+          "path": "dashboard/data/document_catalog_summary.json",
+          "generated_at": "2026-10-16T16:17:11Z",
+          "age_hours_at_read": 319.7,
           "exists": true
         },
         {
           "path": "dashboard/data/special_situations.json",
-          "generated_at": "2026-10-11T23:08:15Z",
-          "age_hours_at_read": 24.9,
+          "generated_at": "2026-10-27T13:58:22Z",
+          "age_hours_at_read": 58.0,
+          "exists": true
+        },
+        {
+          "path": "dashboard/data/separations.json",
+          "generated_at": "2026-10-27T13:57:57Z",
+          "age_hours_at_read": 58.0,
+          "exists": true
+        },
+        {
+          "path": "_system/data/special_situations/situations.jsonl",
+          "generated_at": null,
+          "age_hours_at_read": null,
           "exists": true
         },
         {
           "path": "_system/portfolio/registry.json",
-          "generated_at": "2026-10-11T20:17:50Z",
-          "age_hours_at_read": 27.7,
+          "generated_at": "2026-10-29T09:17:36Z",
+          "age_hours_at_read": 14.7,
           "exists": true
         }
       ],
       "screens_empty": [
-        "odd_lot_alerts",
+        "topping_bid",
         "rights_offering",
-        "carve_out_ipo",
-        "clean_up_spin",
-        "retained_stake_sale",
-        "reverse_morris_trust"
+        "recap_stub",
+        "no_vote_deal"
       ],
-      "notes": "Seed brief built by Claude for Drew on 2026-10-12 from the committed dashboard files only: no web, Drive or email reads this run, and the Greenblatt PDF was unread. Every figure is the dashboard's or the filing's; nothing was recomputed. Screens listed as empty come from separations.json (odd_lot_alerts is empty; counts.by_kind holds only split_off and spin_off) and the restructurings lane (post-reorganization warrants only, no rights offering)."
+      "notes": "SKYA, KBR, and ARI are in _system/data/special_situations/situations.jsonl. They are not registry holdings, so this brief cannot list them. SKYA's tender now expires November 12, 2026. KBR targets a Trinzic spin on January 4, 2027. ARI expects its last NYSE day on November 6, 2026."
+    },
+    {
+      "desk": "activism",
+      "desk_label": "Activism",
+      "owner": "drew",
+      "author": "grok-drew-activism",
+      "as_of": "2026-10-29",
+      "age_hours": 19.5,
+      "stale": false,
+      "path": "_system/data/desk_briefs/activism/2026-10-29.json",
+      "items": [
+        {
+          "ticker": "MGM",
+          "headline": "People Inc (Diller) 13D/A No.10: 26.5% of MGM; voting pact amended to cap at 29.9% and vote with board on any change of control",
+          "one_number": "26.5% (66,822,350 shares); standstill cap 29.9%; excess-vote threshold 25.73%",
+          "lane": "13d",
+          "evidence": [
+            {
+              "kind": "filing",
+              "ref": "SCHEDULE 13D/A 0001104659-26-119439",
+              "url": "https://www.sec.gov/Archives/edgar/data/789570/000110465926119439/0001104659-26-119439-index.htm"
+            },
+            {
+              "kind": "filing",
+              "ref": "MGM 8-K Item 1.01 0000789570-26-000104",
+              "url": "https://www.sec.gov/Archives/edgar/data/789570/000078957026000104/0000789570-26-000104-index.htm"
+            },
+            {
+              "kind": "filing",
+              "ref": "Dropped CORZ: MFN Partners SCHEDULE 13G (13d-1(c) passive) 7.6% incl. 7.79M option shares, event 2026-10-13, 0001193125-26-436502; passive, below bar",
+              "url": null
+            },
+            {
+              "kind": "filing",
+              "ref": "Dropped NG: Company DEFA14A 0001104659-26-119230: comp-committee letter rebutting ISS on equity plans ahead of Nov 3 special meeting; company-only",
+              "url": "https://www.sec.gov/Archives/edgar/data/1173420/000110465926119230/0001104659-26-119230-index.htm"
+            },
+            {
+              "kind": "filing",
+              "ref": "Dropped MSFT: PX14A6G 0000921895-26-002869 (JLens) and 0001214659-26-013276; shareholder-proposal ESG solicitations, below bar",
+              "url": "https://www.sec.gov/Archives/edgar/data/789019/000092189526002869/0000921895-26-002869-index.htm"
+            },
+            {
+              "kind": "filing",
+              "ref": "Dropped SATS: Strive Inc 13D/A 0000950103-26-016309 (Ramaswamy) matched SATS only via SEC company_tickers CIK collision for Strive (ASST/SATA); Strive not in universe. Ticker-mapping caution.",
+              "url": "https://www.sec.gov/Archives/edgar/data/1920406/000095010326016309/0000950103-26-016309-index.htm"
+            },
+            {
+              "kind": "web",
+              "ref": "Also read: /workspace/shared/magis/status.json (2026-10-29); leads.json (2026-10-29, no activism-tagged leads); posted_state.json.",
+              "url": null
+            },
+            {
+              "kind": "web",
+              "ref": "Also read: EDGAR daily-index form.20261028.idx; current feeds (13D, 13D/A, 13G, DFAN14A, PX14A6G, DEFC14A, PREC14A, DEFA14A) to ~08:30 ET 2026-10-29.",
+              "url": "https://www.sec.gov/Archives/edgar/daily-index/2026/QTR4/form.20261028.idx"
+            }
+          ],
+          "confidence": "filing",
+          "next": "Large-holder governance agreement (not a campaign). People Inc (formerly IAC Inc.). Materiality 75. Run 2026-10-29T08:35:00-04:00. Activist feed stale: build 2026-10-27T13:55:22Z, blob unchanged since Oct 28; EDGAR fallback (Oct 28 daily index plus current feeds to ~08:30 ET Oct 29).",
+          "handoff": null
+        }
+      ],
+      "inputs_read": [
+        {
+          "path": "dashboard/data/activist_feed.json",
+          "generated_at": "2026-10-27T13:55:22Z",
+          "age_hours_at_read": 58.1,
+          "exists": true
+        },
+        {
+          "path": "_system/portfolio/registry.json",
+          "generated_at": "2026-10-28T17:46:14Z",
+          "age_hours_at_read": 30.2,
+          "exists": true
+        }
+      ],
+      "screens_empty": [],
+      "notes": "Amendment dated Oct 27, 2026 to the Apr 3, 2026 voting agreement among MGM, People Inc and Barry Diller. Covered entities won't buy above 29.9% (issuer buybacks pushing them over are not a breach). On non-change-of-control votes, shares above 25.73% of voting power are voted pro rata with the unaffiliated majority. On change-of-control votes, all shares vote per the MGM board recommendation if People's designees sit on the transaction committee, the counterparty is unaffiliated, and People gets the same per-share consideration. No transactions in the past 60 days."
     },
     {
       "desk": "fundamentals",
@@ -244,7 +221,7 @@
       "owner": "drew",
       "author": "codex-core-compounders",
       "as_of": "2026-10-27",
-      "age_hours": 64.8,
+      "age_hours": 67.5,
       "stale": false,
       "path": "_system/data/desk_briefs/fundamentals/2026-10-27.json",
       "items": [
@@ -458,7 +435,7 @@
       "owner": "drew",
       "author": "grok-drew-nol-tax-assets",
       "as_of": "2026-10-29",
-      "age_hours": 16.8,
+      "age_hours": 19.5,
       "stale": false,
       "path": "_system/data/desk_briefs/nol_tax_assets/2026-10-29.json",
       "items": [
@@ -643,7 +620,7 @@
       "owner": "drew",
       "author": "grok-drew-tape-index",
       "as_of": "2026-10-29",
-      "age_hours": 16.8,
+      "age_hours": 19.5,
       "stale": false,
       "path": "_system/data/desk_briefs/tape_index/2026-10-29.json",
       "items": [
@@ -913,243 +890,144 @@
   ],
   "items_flat": [
     {
-      "ticker": "MDT",
-      "headline": "MiniMed (MMED) exchange offer expired 2026-10-09 with the upper limit in effect; final ratio 4.5939 MMED per MDT; final-results 8-K not yet filed.",
-      "one_number": "final exchange ratio 4.5939 (upper limit binding)",
-      "lane": "split_offs",
-      "evidence": [
-        {
-          "kind": "filing",
-          "ref": "SC TO-I/A 0001628280-26-065406 (filed 2026-10-08)",
-          "url": "https://www.sec.gov/Archives/edgar/data/1613103/000162828026065406/mdt-amendedno2scheduleissu.htm"
-        },
-        {
-          "kind": "filing",
-          "ref": "424B3 0001628280-26-064932 (7% discount, upper limit 4.5939, expires 2026-10-09, odd-lot priority)",
-          "url": "https://www.sec.gov/Archives/edgar/data/2062583/000162828026064932/minimedgroupinc-424b3.htm"
-        },
-        {
-          "kind": "dashboard",
-          "ref": "dashboard/data/separations.json row sep:mdt-mmed-2026",
-          "url": null
-        }
-      ],
-      "confidence": "filing",
-      "next": "Read the final-results 8-K (accepted and tendered MDT shares, proration factor, settlement date) and append a version-2 row to separation_registry.jsonl; then the unwind flow can be modelled.",
-      "handoff": null,
-      "desk": "special_situations",
-      "owner": "drew",
-      "as_of": "2026-10-12",
-      "author": "claude-drew-special-situations",
-      "stale": true
-    },
-    {
-      "ticker": "MDT",
-      "headline": "Capped ratio gave a 2.33% realized discount on 2026-10-09 closes (MDT 88.48 / MMED 19.71); odd-lot payoff $195.55 per 99 shares; no sleeve odd lot.",
-      "one_number": "realized discount 2.33% vs 7% headline",
-      "lane": "split_offs",
-      "evidence": [
-        {
-          "kind": "dashboard",
-          "ref": "dashboard/data/separations.json spread (basis final_filed, quotes as_of 2026-10-09)",
-          "url": null
-        },
-        {
-          "kind": "provider",
-          "ref": "Yahoo delayed closes via _system/data/separations/separation_market.json (market_as_of 2026-10-11T18:04:51Z)",
-          "url": null
-        }
-      ],
-      "confidence": "provider",
-      "next": "Nothing to tender; the offer has expired. Record the realized discount beside the filed proration factor once the 8-K prints, so the reference set gains a fifth data point.",
-      "handoff": null,
-      "desk": "special_situations",
-      "owner": "drew",
-      "as_of": "2026-10-12",
-      "author": "claude-drew-special-situations",
-      "stale": true
-    },
-    {
-      "ticker": "unresolved",
-      "headline": "MiniMed (MMED, not in registry): modelled post-settlement selling 27.7% of float over 13.7 ADV days, 2026-10-09 to 2027-10-09 (estimate).",
-      "one_number": "-27.7% of float (estimate)",
-      "lane": "forced_sellers",
-      "evidence": [
-        {
-          "kind": "dashboard",
-          "ref": "dashboard/data/separations.json forced_seller_rows (sep:mdt-mmed-2026, side spinco, run 2026-10-12)",
-          "url": null
-        },
-        {
-          "kind": "filing",
-          "ref": "SC TO-I 0001628280-26-061683 (225,361,295 MiniMed shares offered, 80.1% of outstanding)",
-          "url": "https://www.sec.gov/Archives/edgar/data/1613103/000162828026061683/kangaroo-scheduleto.htm"
-        }
-      ],
-      "confidence": "provider",
-      "next": "Onboard MMED so the row can carry a registry ticker; rerun the flow model when the accepted share count is filed. A modelled flow is a timing input, not a value.",
-      "handoff": "tape_index",
-      "desk": "special_situations",
-      "owner": "drew",
-      "as_of": "2026-10-12",
-      "author": "claude-drew-special-situations",
-      "stale": true
-    },
-    {
-      "ticker": "HON",
-      "headline": "Honeywell Aerospace spin-off: Form 10 on file (10-12B/A 2026-06-08); ratio, record and distribution dates not yet read; row stays in discovery.",
-      "one_number": "10-12B/A filed 2026-06-08",
+      "ticker": "ABT",
+      "headline": "Abbott plans a tax-free spin of Nutrition into its own public company, expected by the end of 2027.",
+      "one_number": "about $8.5 billion annual sales",
       "lane": "spinoffs",
       "evidence": [
         {
           "kind": "filing",
-          "ref": "10-12B/A 0001628280-26-041399",
-          "url": "https://www.sec.gov/Archives/edgar/data/773840/000162828026041399"
-        },
-        {
-          "kind": "dashboard",
-          "ref": "dashboard/data/separations.json row sep:hon-hona-2026 (gates.terms missing distribution_ratio, dates.distribution)",
-          "url": null
+          "ref": "8-K 0001104659-26-117587 filed 2026-10-21",
+          "url": "https://www.sec.gov/Archives/edgar/data/1800/000110465926117587/tm2627971d1_8k.htm"
         }
       ],
       "confidence": "filing",
-      "next": "Read the Form 10 for the ratio, record and distribution dates, SpinCo debt and insider equity; the identity and terms gates can then rank it and the flow model can ask who must sell.",
-      "handoff": null,
+      "next": "Pass until a Form 10 states a ratio, a record date, or who must sell.",
+      "handoff": "nol_tax_assets",
       "desk": "special_situations",
       "owner": "drew",
-      "as_of": "2026-10-12",
-      "author": "claude-drew-special-situations",
-      "stale": true
+      "as_of": "2026-10-29",
+      "author": "grok-drew-special-situations",
+      "stale": false
     },
     {
       "ticker": "FDX",
-      "headline": "FedEx Freight (FDXF) spin-off: Form 10 on file (10-12B/A 2026-04-10); terms not extracted; row held in discovery until the ratio and the dates are read.",
-      "one_number": "10-12B/A filed 2026-04-10",
-      "lane": "spinoffs",
-      "evidence": [
-        {
-          "kind": "filing",
-          "ref": "10-12B/A 0001104659-26-041977",
-          "url": "https://www.sec.gov/Archives/edgar/data/2082247/000110465926041977"
-        },
-        {
-          "kind": "dashboard",
-          "ref": "dashboard/data/separations.json row sep:fdx-fdxf-2026",
-          "url": null
-        }
-      ],
-      "confidence": "filing",
-      "next": "Read the Form 10: distribution ratio, record and distribution dates, SpinCo debt, insider equity. Then ask who must sell.",
-      "handoff": null,
-      "desk": "special_situations",
-      "owner": "drew",
-      "as_of": "2026-10-12",
-      "author": "claude-drew-special-situations",
-      "stale": true
-    },
-    {
-      "ticker": "CTVA",
-      "headline": "Corteva's Vylor (VYLR) spin-off: Form 10 amended 2026-09-21 (10-12B/A); distribution ratio and dates not yet read; row in discovery.",
-      "one_number": "10-12B/A filed 2026-09-21",
-      "lane": "spinoffs",
-      "evidence": [
-        {
-          "kind": "filing",
-          "ref": "10-12B/A 0001193125-26-396054",
-          "url": "https://www.sec.gov/Archives/edgar/data/2128626/000119312526396054"
-        },
-        {
-          "kind": "dashboard",
-          "ref": "dashboard/data/separations.json row sep:ctva-vylr-2026",
-          "url": null
-        }
-      ],
-      "confidence": "filing",
-      "next": "Read the Form 10: distribution ratio, record and distribution dates, SpinCo debt, insider equity. Then ask who must sell.",
-      "handoff": null,
-      "desk": "special_situations",
-      "owner": "drew",
-      "as_of": "2026-10-12",
-      "author": "claude-drew-special-situations",
-      "stale": true
-    },
-    {
-      "ticker": "APTV",
-      "headline": "Aptiv's Versigent spin-off: Form 10 amended 2026-03-06 (10-12B/A); no SpinCo ticker in the register yet; ratio and dates not yet read.",
-      "one_number": "10-12B/A filed 2026-03-06",
-      "lane": "spinoffs",
-      "evidence": [
-        {
-          "kind": "filing",
-          "ref": "10-12B/A 0001193125-26-096776",
-          "url": "https://www.sec.gov/Archives/edgar/data/2078008/000119312526096776"
-        },
-        {
-          "kind": "dashboard",
-          "ref": "dashboard/data/separations.json row sep:aptv-versigent-2026",
-          "url": null
-        }
-      ],
-      "confidence": "filing",
-      "next": "Read the Form 10 for the ratio and the dates, and record the SpinCo ticker when the listing notice names it.",
-      "handoff": null,
-      "desk": "special_situations",
-      "owner": "drew",
-      "as_of": "2026-10-12",
-      "author": "claude-drew-special-situations",
-      "stale": true
-    },
-    {
-      "ticker": "CSGP",
-      "headline": "Nasdaq-100 deletion flagged from a headline dated 2026-05-11, not a provider notice; the selling is not mechanical until the notice is confirmed.",
-      "one_number": "announced 2026-05-11 (headline)",
+      "headline": "FedEx kept a 19.9% FedEx Freight stake and expects to monetize it within 12 months of September 30, 2026.",
+      "one_number": "19.9% stake; 12 months from 2026-09-30",
       "lane": "forced_sellers",
       "evidence": [
         {
-          "kind": "dashboard",
-          "ref": "dashboard/data/special_situations.json row ss:27d427fca304 (source_feed index_membership, evidence_kind news)",
-          "url": null
-        },
-        {
-          "kind": "news",
-          "ref": "Index note via Google News RSS, 2026-05-11",
-          "url": "https://news.google.com/rss/articles/CBMi8wFBVV95cUxOWEQ3cjN1MU13cjZ0cEM3NEN5d1NwQU5Zd3VWVmdXNkhiY2I5ZXVpbFNCNEFCZE4xaGRfZG0yWnZRMkhiVTMtY2Z6R001dGE2S3dtRnhPa2NnRmx6ZllDdjMzTGc2eVlQSUJkSnF6ZDlTSHZYQUZWMDdpNjJ0ZGV6UUt3bGNjNVBiTDN5Y0pfdHFTc2d5bXdfazlLWVZzd3FkQTJudXl1RFQ2MDFwakxlUmFoLWIxNFY3MUxyLXZhSy11U1JOZ1ZqVGhRN1BsV0NpZGt1LWtjenliNmRqUUllN056dmttTk1Na1pKRWJyV01xdUXSAfgBQVVfeXFMTWxORFlzeDlqckJ0cWFQbUwzT0s4ZGZDdWRtWmpMUHA0cVV1Ui1MZE1tVF9SMFJycTQ2cmZkcjdybUszUzZiWHRzUDR4SmZZNVk5bS1DSTRZV1VRaHdRd0FYV0NDYUo2RzlMdnk3QlhhaFFKUC03ZkNsT2dXamZGQUR3NS1GY1AwdnBjQWxlLXY2ZXp5UGs1ajJwQ0VGVktLbllBLTBYREVxdGxVTlFDYVZ3b01GZjExMUp2MFVabEY1SHJ2TnJqNU1Rbm43T3FMZEMyM0dVTDF3Snh1MXFGUVRaSnRUMWVfTm1XTGwtWHVjQWN6TDVvT3M?oc=5"
+          "kind": "filing",
+          "ref": "10-Q 0001048911-26-000131 filed 2026-10-28",
+          "url": "https://www.sec.gov/Archives/edgar/data/1048911/000104891126000131/fdx-20260930.htm"
         }
       ],
-      "confidence": "news",
-      "next": "Confirm the Nasdaq provider notice (announced and effective dates) in index_membership before treating the selling as mechanical; until then this is a headline.",
+      "confidence": "filing",
+      "next": "The 10-Q says expects, subject to market conditions. It does not say FedEx must sell.",
       "handoff": "tape_index",
       "desk": "special_situations",
       "owner": "drew",
-      "as_of": "2026-10-12",
-      "author": "claude-drew-special-situations",
-      "stale": true
+      "as_of": "2026-10-29",
+      "author": "grok-drew-special-situations",
+      "stale": false
     },
     {
-      "ticker": "TAP",
-      "headline": "S&P 500 deletion flagged from a headline dated 2026-09-21, not a provider notice; no confirmed_event in index_membership as of this run.",
-      "one_number": "announced 2026-09-21 (headline)",
-      "lane": "forced_sellers",
+      "ticker": "DASH",
+      "headline": "DoorDash agreed to buy Maplebear (Instacart) for $65.00 a share, at least 75% cash and up to 25% stock.",
+      "one_number": "$65.00 per share",
+      "lane": "mergers",
       "evidence": [
         {
-          "kind": "dashboard",
-          "ref": "dashboard/data/special_situations.json row ss:255a109bb35d (source_feed index_membership, evidence_kind news)",
+          "kind": "filing",
+          "ref": "425 0001792789-26-000065 filed 2026-10-29",
+          "url": "https://www.sec.gov/Archives/edgar/data/1792789/000179278926000065/dashform425combined.htm"
+        }
+      ],
+      "confidence": "filing",
+      "next": "The 425 states no closing date and no vote. Do not call it a no-vote deal until a filing does.",
+      "handoff": "fundamentals",
+      "desk": "special_situations",
+      "owner": "drew",
+      "as_of": "2026-10-29",
+      "author": "grok-drew-special-situations",
+      "stale": false
+    },
+    {
+      "ticker": "MDT",
+      "headline": "MiniMed exchange offer expired October 9, 2026. Final proration is 18.289133%. Odd lots were accepted in full.",
+      "one_number": "proration 18.289133%; odd lots in full",
+      "lane": "split_offs",
+      "evidence": [
+        {
+          "kind": "filing",
+          "ref": "425 0001628280-26-065819 filed 2026-10-14",
+          "url": "https://www.sec.gov/Archives/edgar/data/1613103/000162828026065819/a425-finalresultsofexchang.htm"
+        }
+      ],
+      "confidence": "filing",
+      "next": "The offer is over. Medtronic said it will keep no MiniMed shares. The results release does not state the settlement date.",
+      "handoff": null,
+      "desk": "special_situations",
+      "owner": "drew",
+      "as_of": "2026-10-29",
+      "author": "grok-drew-special-situations",
+      "stale": false
+    },
+    {
+      "ticker": "MGM",
+      "headline": "People Inc (Diller) 13D/A No.10: 26.5% of MGM; voting pact amended to cap at 29.9% and vote with board on any change of control",
+      "one_number": "26.5% (66,822,350 shares); standstill cap 29.9%; excess-vote threshold 25.73%",
+      "lane": "13d",
+      "evidence": [
+        {
+          "kind": "filing",
+          "ref": "SCHEDULE 13D/A 0001104659-26-119439",
+          "url": "https://www.sec.gov/Archives/edgar/data/789570/000110465926119439/0001104659-26-119439-index.htm"
+        },
+        {
+          "kind": "filing",
+          "ref": "MGM 8-K Item 1.01 0000789570-26-000104",
+          "url": "https://www.sec.gov/Archives/edgar/data/789570/000078957026000104/0000789570-26-000104-index.htm"
+        },
+        {
+          "kind": "filing",
+          "ref": "Dropped CORZ: MFN Partners SCHEDULE 13G (13d-1(c) passive) 7.6% incl. 7.79M option shares, event 2026-10-13, 0001193125-26-436502; passive, below bar",
           "url": null
         },
         {
-          "kind": "news",
-          "ref": "Index note via Google News RSS, 2026-09-21",
-          "url": "https://news.google.com/rss/articles/CBMixgFBVV95cUxPQ3dydU5xWFVKSjZRU29UeERNeW9IMm91SERmR2NqS045S2xFMGQ1eHN4S19MdmZ5VE5LWEYtNmpNWThYY29VR0xzR2trZ3JFQWUtVjVjZFdtNUJERU1raVE0N25leEJkMTB1NE14N2FRclBjR0N0bjN4bzczVHRSc2JlbGVVSjU1T2JKMlo5ejZnN2I2QktxMXVOcXBmR0w0ZDMtVVVQZHhJT3NRcmZ4Nm9aLW5JSTVmM01GQVZYOTk1MHh2WEE?oc=5"
+          "kind": "filing",
+          "ref": "Dropped NG: Company DEFA14A 0001104659-26-119230: comp-committee letter rebutting ISS on equity plans ahead of Nov 3 special meeting; company-only",
+          "url": "https://www.sec.gov/Archives/edgar/data/1173420/000110465926119230/0001104659-26-119230-index.htm"
+        },
+        {
+          "kind": "filing",
+          "ref": "Dropped MSFT: PX14A6G 0000921895-26-002869 (JLens) and 0001214659-26-013276; shareholder-proposal ESG solicitations, below bar",
+          "url": "https://www.sec.gov/Archives/edgar/data/789019/000092189526002869/0000921895-26-002869-index.htm"
+        },
+        {
+          "kind": "filing",
+          "ref": "Dropped SATS: Strive Inc 13D/A 0000950103-26-016309 (Ramaswamy) matched SATS only via SEC company_tickers CIK collision for Strive (ASST/SATA); Strive not in universe. Ticker-mapping caution.",
+          "url": "https://www.sec.gov/Archives/edgar/data/1920406/000095010326016309/0000950103-26-016309-index.htm"
+        },
+        {
+          "kind": "web",
+          "ref": "Also read: /workspace/shared/magis/status.json (2026-10-29); leads.json (2026-10-29, no activism-tagged leads); posted_state.json.",
+          "url": null
+        },
+        {
+          "kind": "web",
+          "ref": "Also read: EDGAR daily-index form.20261028.idx; current feeds (13D, 13D/A, 13G, DFAN14A, PX14A6G, DEFC14A, PREC14A, DEFA14A) to ~08:30 ET 2026-10-29.",
+          "url": "https://www.sec.gov/Archives/edgar/daily-index/2026/QTR4/form.20261028.idx"
         }
       ],
-      "confidence": "news",
-      "next": "Confirm the S&P provider notice and the effective date before treating the selling as mechanical.",
-      "handoff": "tape_index",
-      "desk": "special_situations",
+      "confidence": "filing",
+      "next": "Large-holder governance agreement (not a campaign). People Inc (formerly IAC Inc.). Materiality 75. Run 2026-10-29T08:35:00-04:00. Activist feed stale: build 2026-10-27T13:55:22Z, blob unchanged since Oct 28; EDGAR fallback (Oct 28 daily index plus current feeds to ~08:30 ET Oct 29).",
+      "handoff": null,
+      "desk": "activism",
       "owner": "drew",
-      "as_of": "2026-10-12",
-      "author": "claude-drew-special-situations",
-      "stale": true
+      "as_of": "2026-10-29",
+      "author": "grok-drew-activism",
+      "stale": false
     },
     {
       "ticker": "PSK.TO",
@@ -1865,7 +1743,6 @@
     }
   ],
   "desks_without_brief": [
-    "activism",
     "stahl",
     "short_selling"
   ],
@@ -1879,26 +1756,26 @@
     "short_selling": "Short Selling"
   },
   "counts": {
-    "briefs": 4,
-    "items": 41,
-    "files": 19,
+    "briefs": 5,
+    "items": 37,
+    "files": 21,
     "by_desk": {
-      "special_situations": 9,
+      "special_situations": 4,
+      "activism": 1,
       "fundamentals": 12,
       "nol_tax_assets": 8,
       "tape_index": 12
     },
     "by_owner": {
-      "drew": 41
+      "drew": 37
     }
   },
   "health": {
-    "status": "degraded",
+    "status": "healthy",
     "structural_errors": [],
-    "problems": [
-      "special_situations brief is 18 days old (2026-10-12)"
-    ],
+    "problems": [],
     "warnings": [
+      "_system/data/desk_briefs/activism/2026-10-29.json: items[0].evidence[2] (MGM): filing without a URL",
       "_system/data/desk_briefs/nol_tax_assets/2026-10-19.json: inputs_read[2] (_system/portfolio/registry.json) carries no stamp",
       "_system/data/desk_briefs/nol_tax_assets/2026-10-19.json: inputs_read[3] (_system/data/desk_briefs/schema.json) carries no stamp",
       "_system/data/desk_briefs/nol_tax_assets/2026-10-20.json: inputs_read[2] (_system/portfolio/registry.json) carries no stamp",
@@ -1918,6 +1795,7 @@
       "_system/data/desk_briefs/nol_tax_assets/2026-10-28.json: inputs_read[2] (_system/portfolio/registry.json) carries no stamp",
       "_system/data/desk_briefs/nol_tax_assets/2026-10-28.json: inputs_read[3] (_system/data/desk_briefs/schema.json) carries no stamp",
       "_system/data/desk_briefs/nol_tax_assets/2026-10-29.json: inputs_read[3] (_system/data/desk_briefs/schema.json) carries no stamp",
+      "_system/data/desk_briefs/special_situations/2026-10-29.json: inputs_read[6] (_system/data/special_situations/situations.jsonl) carries no stamp",
       "_system/data/desk_briefs/tape_index/2026-10-19.json: inputs_read[11] (_system/data/desk_briefs/schema.json) carries no stamp",
       "_system/data/desk_briefs/tape_index/2026-10-19.json: inputs_read[12] (_system/agents/DESKS.md) carries no stamp",
       "_system/data/desk_briefs/tape_index/2026-10-21.json: inputs_read[12] (_system/data/desk_briefs/schema.json) carries no stamp",
@@ -1929,7 +1807,7 @@
       "_system/data/desk_briefs/tape_index/2026-10-29.json: inputs_read[5] (_system/data/desk_briefs/schema.json) carries no stamp"
     ],
     "stale_days": 7,
-    "checked_at": "2026-10-29T16:47:30Z"
+    "checked_at": "2026-10-29T19:28:19Z"
   },
   "research_only": true,
   "in_base_irr": false,
@@ -1937,13 +1815,13 @@
   "_envelope": {
     "schema_version": "magis.feed.v2",
     "feed_id": "dashboard-desk-briefs",
-    "generated_at": "2026-10-29T16:47:30Z",
+    "generated_at": "2026-10-29T19:28:19Z",
     "as_of": "2026-10-29",
-    "content_sha256": "sha256:1cf36733882a092e6f011d626b5493c430f9209c552bdc9b5fcc16182b9d150e",
-    "row_count": 41,
+    "content_sha256": "sha256:92682f0481a9079cc8eb8cd64b9099c894eab4ad2bd8f10690d51456cfe9ea96",
+    "row_count": 37,
     "upstream_inputs": [],
     "health": {
-      "status": "degraded",
+      "status": "healthy",
       "structural_errors": 0
     }
   }

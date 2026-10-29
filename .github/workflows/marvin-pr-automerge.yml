@@ -542,6 +542,7 @@ jobs:
           git sparse-checkout add --skip-checks \
             /_system/data/desk_briefs/ \
             /_system/data/separations/ \
+            /_system/data/special_situations/ \
             /_system/research/short-alpha/ \
             /_system/memory-hub/ \
             /_system/portfolio/registry.json \
@@ -557,6 +558,7 @@ jobs:
           overlay _system/data/desk_briefs
           overlay dashboard/data/desk_briefs.json
           overlay _system/data/separations
+          overlay _system/data/special_situations
           overlay _system/research/short-alpha
           overlay _system/memory-hub
           overlay _system/portfolio/registry.json
@@ -601,6 +603,7 @@ jobs:
           FILES="$RUNNER_TEMP/pr-files.txt"
           if grep -q '^_system/data/desk_briefs/' "$FILES"; then python _system/scripts/check_desk_briefs.py; fi
           if grep -q '^_system/data/separations/' "$FILES"; then python _system/scripts/check_separation_universe.py --strict; fi
+          if grep -q '^_system/data/special_situations/situations.jsonl$' "$FILES"; then python _system/scripts/check_situation_rows.py; fi
           if grep -q '^_system/research/short-alpha/' "$FILES"; then python _system/scripts/build_short_alpha_dashboard.py --check; fi
           if grep -Eq '^(SOURCES.md|_system/sources.json)$' "$FILES"; then python _system/scripts/validate_sources.py; fi
           echo "data guard passed for PR #$PR at $HEAD_SHA"

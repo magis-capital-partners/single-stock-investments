@@ -1,0 +1,146 @@
+{
+  "schema_version": "3.0",
+  "ticker": "NU",
+  "specs": [
+    {
+      "spec_schema_version": "3.0",
+      "spec_id": "nu-stahl-hk-credit-spread-share-2027-04-28",
+      "spec_revision": 1,
+      "forecast_class": "ex_ante",
+      "forecast_role": "diagnostic",
+      "authored_at": "2026-10-29T18:00:00Z",
+      "information_cutoff_at": "2026-10-28T12:00:00Z",
+      "registered_at": "2026-10-29T18:00:00Z",
+      "registration_commit": "3a170ca50936df6724b5165c083246f19a676c08",
+      "analysis_run_id": "fundamental-analyst-2026-10-29",
+      "author": "fundamental-analyst",
+      "model_id": "fundamental-analyst-weekly-v1",
+      "prompt_version": "case-log-table-v1",
+      "contract_hash": "dc3b08f9a377ead8f3d412b2821c2ba6e5075e8998e2f2cedc5b795391dc726e",
+      "component_fingerprint": "3c2bc20b0b9c43fe697a8b7659e904a24442e165ea796007f596dcc9a973e13b",
+      "method_id": "owner_cash_dcf",
+      "power_zone": "quality_reinvestment",
+      "component_id": "operating_business_fallback",
+      "correlation_group": "nu-fundamental-analyst-2026-10-28",
+      "metric": "credit-spread share of earnings",
+      "comparator": "lt",
+      "threshold": 50,
+      "threshold_basis": {
+        "source_ref": "_system/research/fundamental_analyst/CASE_LOG_2026-10-28.md",
+        "rule": "Fire when credit-spread earnings are under 50% of earnings. [Assumption] The case log does not state a cutoff. Fifty percent is the boundary used here for 'it's a bank' versus a fee franchise. A hit means the Stahl/HK classification failed that split. Deposit-versus-wholesale funding is named in the evidence notes and is not a separate spec.",
+        "claim_type": "inference"
+      },
+      "unit": "percent",
+      "measurement_period_end": "2027-04-28",
+      "observable_after": "2027-04-28",
+      "resolution_deadline": "2027-04-28",
+      "source_hint": "credit_spread_share_of_earnings_pct",
+      "observation_plan": {
+        "metric_definition_id": "fundamental_analyst_observation",
+        "metric_definition_version": "1.0",
+        "source_adapter": "fundamental_analyst_observation",
+        "fiscal_period": "EVENT",
+        "observation_type": "instant",
+        "duration_basis": "point",
+        "canonical_unit": "percent",
+        "expected_publication_date": "2027-04-28",
+        "accepted_forms": [
+          "analyst_observation"
+        ],
+        "maximum_source_lag_days": 14,
+        "end_date_tolerance_days": 7,
+        "historical_replay": {
+          "status": "passed",
+          "evidence_ref": "NU/research/fundamental_analyst/replay_2026-10-28.json"
+        },
+        "outcome_unavailable_at_registration": true
+      },
+      "probability_fires": null,
+      "calibration_eligible": false,
+      "severity": 3,
+      "derived_from": "Poor fit: it's a bank (Stahl / HK)",
+      "rationale": "Call (2026-10-28, Stahl / HK): Poor fit: it's a bank Reason: A balance-sheet lender, not a croupier or scarce-asset toll (murray-stahl.md §1). Repo base IRR 17.9%; ~14.2–15.1% after bank adjustment. Source: _system/research/fundamental_analyst/CASE_LOG_2026-10-28.md. Registered test: Fire when credit-spread earnings are under 50% of earnings. [Assumption] The case log does not state a cutoff. Fifty percent is the boundary used here for 'it's a bank' versus a fee franchise. A hit means the Stahl/HK classification failed that split. Deposit-versus-wholesale funding is named in the evidence notes and is not a separate spec. Probability was not stated, so this spec is diagnostic and is not Brier-scored.",
+      "untestable": false,
+      "supersedes_spec_id": null,
+      "call": "Poor fit: it's a bank",
+      "lens": "Stahl / HK",
+      "case_log_ref": "_system/research/fundamental_analyst/CASE_LOG_2026-10-28.md",
+      "source": {
+        "case_log": "_system/research/fundamental_analyst/CASE_LOG_2026-10-28.md",
+        "lens": "Stahl / HK",
+        "call_date": "2026-10-28",
+        "ticker_cell": "NU"
+      }
+    },
+    {
+      "spec_schema_version": "3.0",
+      "spec_id": "nu-hohn-bank-adjusted-irr-2027-04-28",
+      "spec_revision": 1,
+      "forecast_class": "ex_ante",
+      "forecast_role": "diagnostic",
+      "authored_at": "2026-10-29T18:00:00Z",
+      "information_cutoff_at": "2026-10-28T12:00:00Z",
+      "registered_at": "2026-10-29T18:00:00Z",
+      "registration_commit": "3a170ca50936df6724b5165c083246f19a676c08",
+      "analysis_run_id": "fundamental-analyst-2026-10-29",
+      "author": "fundamental-analyst",
+      "model_id": "fundamental-analyst-weekly-v1",
+      "prompt_version": "case-log-table-v1",
+      "contract_hash": "dc3b08f9a377ead8f3d412b2821c2ba6e5075e8998e2f2cedc5b795391dc726e",
+      "component_fingerprint": "3c2bc20b0b9c43fe697a8b7659e904a24442e165ea796007f596dcc9a973e13b",
+      "method_id": "owner_cash_dcf",
+      "power_zone": "quality_reinvestment",
+      "component_id": "operating_business_fallback",
+      "correlation_group": "nu-fundamental-analyst-2026-10-28",
+      "metric": "bank-adjusted IRR",
+      "comparator": "gt",
+      "threshold": 15,
+      "threshold_basis": {
+        "source_ref": "_system/research/fundamental_analyst/CASE_LOG_2026-10-28.md",
+        "rule": "Fire when the bank-adjusted IRR at the review price is above 15% per year. The 2026-10-28 Hohn row says the adjusted return is about 14.2% to 15.1% per year, at or below the hurdle. A hit means that hurdle reason failed.",
+        "claim_type": "inference"
+      },
+      "unit": "percent",
+      "measurement_period_end": "2027-04-28",
+      "observable_after": "2027-04-28",
+      "resolution_deadline": "2027-04-28",
+      "source_hint": "bank_adjusted_irr_pct",
+      "observation_plan": {
+        "metric_definition_id": "fundamental_analyst_observation",
+        "metric_definition_version": "1.0",
+        "source_adapter": "fundamental_analyst_observation",
+        "fiscal_period": "EVENT",
+        "observation_type": "instant",
+        "duration_basis": "point",
+        "canonical_unit": "percent",
+        "expected_publication_date": "2027-04-28",
+        "accepted_forms": [
+          "analyst_observation"
+        ],
+        "maximum_source_lag_days": 14,
+        "end_date_tolerance_days": 7,
+        "historical_replay": {
+          "status": "passed",
+          "evidence_ref": "NU/research/fundamental_analyst/replay_2026-10-28.json"
+        },
+        "outcome_unavailable_at_registration": true
+      },
+      "probability_fires": null,
+      "calibration_eligible": false,
+      "severity": 4,
+      "derived_from": "Likely pass: banks are on the avoid list (Hohn)",
+      "rationale": "Call (2026-10-28, Hohn): Likely pass: banks are on the avoid list Reason: TCI's stated avoid list includes banks (opaque, levered) (chris-hohn.md §2; PRINCIPLES A2). Also fails the Klarman MoS ch. 11 and Pabrai Apr 2020 financials gates. Bank-adjusted IRR ~14.2–15.1% is at or below the 15% hurdle. Source: _system/research/fundamental_analyst/CASE_LOG_2026-10-28.md. Registered test: Fire when the bank-adjusted IRR at the review price is above 15% per year. The 2026-10-28 Hohn row says the adjusted return is about 14.2% to 15.1% per year, at or below the hurdle. A hit means that hurdle reason failed. Probability was not stated, so this spec is diagnostic and is not Brier-scored.",
+      "untestable": false,
+      "supersedes_spec_id": null,
+      "call": "Likely pass: banks are on the avoid list",
+      "lens": "Hohn",
+      "case_log_ref": "_system/research/fundamental_analyst/CASE_LOG_2026-10-28.md",
+      "source": {
+        "case_log": "_system/research/fundamental_analyst/CASE_LOG_2026-10-28.md",
+        "lens": "Hohn",
+        "call_date": "2026-10-28",
+        "ticker_cell": "NU"
+      }
+    }
+  ]
+}

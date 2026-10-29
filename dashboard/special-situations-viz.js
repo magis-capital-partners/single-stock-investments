@@ -161,6 +161,30 @@
     </tr>${detail}`;
   }
 
+  function registerBlock(doc) {
+    const rows = Array.isArray(doc.situation_rows) ? doc.situation_rows : [];
+    if (!rows.length) return '';
+    const shown = rows.filter((row) => matchesQuery({
+      ticker: (row.tickers || []).join(' '),
+      company: row.company,
+      what: (row.catalyst || {}).what_ends_it || '',
+      ends_label: '',
+      lane: row.situation_type,
+      terms_summary: (row.one_number || {}).text || '',
+    }));
+    if (!shown.length) return '';
+    const body = shown.map((row) => {
+      const filing = row.primary_filing || {};
+      const number = (row.one_number || {}).text || '';
+      const tag = (row.field_tags || {}).one_number || '';
+      const href = filing.url
+        ? `<a href="${esc(filing.url)}" target="_blank" rel="noopener">${esc(filing.form || 'filing')} ${esc(filing.accession || '')}</a>`
+        : esc(filing.accession || '—');
+      return `<tr><td>${esc((row.tickers || []).join(' / '))}</td><td>${esc(row.situation_type || '')}</td><td>${esc(row.status || '')}</td><td>${esc(number)} <span class="muted">${esc(tag)}</span></td><td>${esc((row.catalyst || {}).date || '—')}</td><td>${href}</td><td>${esc(row.drew_verdict ? row.drew_verdict.text : '—')}</td></tr>`;
+    }).join('');
+    return `<section class="ideas-surface"><div class="ideas-surface-head"><strong>Situation register</strong><span>${shown.length} filing-backed row${shown.length === 1 ? '' : 's'}. Research only. Verdicts append; they do not rewrite.</span></div><div class="ideas-table-wrap"><table class="ideas-table"><thead><tr><th>Tickers</th><th>Type</th><th>Status</th><th>One number</th><th>Ends</th><th>Filing</th><th>Drew</th></tr></thead><tbody>${body}</tbody></table></div></section>`;
+  }
+
   function render(payload, options) {
     const opts = options || {};
     if (opts.lane) state.lane = opts.lane;
@@ -215,6 +239,7 @@
         <input class="search" data-situation-search aria-label="Search special situations" placeholder="Search ticker, company, or situation…" value="${esc(state.query)}">
       </div>
       ${state.lane==='forced_sellers' ? `<section class="ideas-surface"><h3>Index calendar &amp; flow evidence</h3><p class="desk-caption">Provider notices, prospective flows and historical evidence. Dated situations follow below; missing timing and headlines remain in candidates.</p>${doc.index_membership && global.IndexViz ? global.IndexViz.renderIndexWatch(doc.index_membership,{escapeHtml:esc,consolidated:true}) : '<p class="desk-empty">Index evidence is unavailable in this snapshot.</p>'}</section>` : ''}
+      ${registerBlock(doc)}
       <section class="ideas-surface"><div class="ideas-surface-head"><strong>${ranked.length} ranked</strong><span>Filing before headline · click a ticker for the clock and the next step</span></div>
         <div class="ideas-table-wrap"><table class="ideas-table"><thead><tr><th>Ticker</th><th>What</th><th>Lane</th><th>Ends</th><th>Evidence</th><th>Next</th></tr></thead><tbody>${ranked.length ? ranked.map((row) => rowHtml(row, doc)).join('') : '<tr><td colspan="6">Nothing ranked in this lane. Unverified candidates, when the screen has them, stay below.</td></tr>'}</tbody></table></div>
       </section>

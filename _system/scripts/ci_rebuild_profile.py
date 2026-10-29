@@ -298,6 +298,10 @@ def expand_steps(steps: list[list[str]]) -> list[list[str]]:
             # re-joins them so the Inbox shows the latest file per desk.
             out.append(["_system/scripts/check_desk_briefs.py", "--warn-only"])
             out.append(["_system/scripts/build_desk_briefs.py"])
+            # Warn-only: a quiet discovery list or a catalog pointer with an old
+            # stamp would otherwise fail intake-full. The strict command is what
+            # a desk run uses. Activism calls the same script for activist_feed.
+            out.append(["_system/scripts/check_desk_feed_age.py", "--desk", "special_situations", "--warn-only"])
         out.append(step)
     return out
 

@@ -70,7 +70,15 @@ INSIGHTS_PATH = ROOT / "dashboard" / "data" / "insights.json"
 INSIGHTS_DIR = ROOT / "dashboard" / "data" / "insights"
 ACTIVIST_FEED_PATH = ROOT / "dashboard" / "data" / "activist_feed.json"
 INDEX_MEMBERSHIP_PATH = ROOT / "dashboard" / "data" / "index_membership.json"
-INDEX_STATUS_ENUM = {"member", "inclusion_candidate", "deletion_risk", "ineligible", "n_a"}
+INDEX_STATUS_ENUM = {
+    "member",
+    "inclusion_candidate",
+    "deletion_risk",
+    "banding_hold",
+    "committee_watch",
+    "ineligible",
+    "n_a",
+}
 CONFLICT_MARKERS = ("<<<<<<<", "=======", ">>>>>>>")
 MIN_LETTER_CORPUS = 15000
 MIN_LETTER_LINKS_RATIO = 0.99

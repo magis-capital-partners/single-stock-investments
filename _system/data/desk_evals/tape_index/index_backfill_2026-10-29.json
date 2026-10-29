@@ -1,0 +1,578 @@
+{
+  "generated_at": "2026-10-29T12:28:20-04:00",
+  "method": "Point-in-time. Every snapshot is dashboard/data/index_membership.json as committed, from git log --follow. The file at HEAD is not used to judge a past date. The before snapshot is the last commit whose America/New_York committer date is on or before the date ten NYSE sessions prior to the effective date (the effective date is not counted; weekends and the 2026 NYSE full-day holidays are not sessions). The after snapshot is the first commit whose America/New_York committer date is after the effective date. A known answer is a change in current_memberships for an index in that event's family, among tickers present in both snapshots. A flag is a before-snapshot scorecard status on that index: inclusion_candidate (candidate, expects an add), banding_hold or committee_watch (near-miss, expects an add), or deletion_risk (expects a removal). Hit means the membership changed in the flagged direction. Miss means it was flagged and did not change in that direction. Unflagged change means the membership changed with no such flag. Catch rate is hits / (hits + unflagged changes), and is null when that denominator is 0. A Russell promotion is a ticker that leaves russell_2000 and enters russell_1000 between the two snapshots; a demotion is the reverse. A calendar event with no commit on or before the ten-session cutoff, or with no commit after the effective date, is listed with grade insufficient_history and is not scored. July 2026 membership edits are not assigned to the June Russell reconstitution, because no commit is ten sessions before 2026-06-26.",
+  "source_file": "dashboard/data/index_membership.json",
+  "history": {
+    "commits": 253,
+    "first": {
+      "sha": "116db32893ac21ba03506d62f89742e3e59b265f",
+      "date": "2026-07-09"
+    },
+    "last": {
+      "sha": "f561f2891315aed335386fc6c245d7b5d24f01b8",
+      "date": "2026-10-29"
+    },
+    "nyse_holidays_2026": [
+      "2026-01-01",
+      "2026-01-19",
+      "2026-02-16",
+      "2026-04-03",
+      "2026-05-25",
+      "2026-06-19",
+      "2026-07-03",
+      "2026-09-07",
+      "2026-11-26",
+      "2026-12-25"
+    ]
+  },
+  "russell_1000_2000": {
+    "promotions_in_graded_events": [],
+    "demotions_in_graded_events": [],
+    "promotions_in_full_history": [],
+    "demotions_in_full_history": [],
+    "note": "No ticker moved from Russell 2000 to Russell 1000, or the reverse, in current_memberships in any commit of this file."
+  },
+  "off_calendar_membership_edits": {
+    "commits": [
+      {
+        "date": "2026-07-09",
+        "sha": "c6fff9aa18cf1309a6abc02a543dfbd4a5afd179",
+        "tickers_changed": 2
+      },
+      {
+        "date": "2026-07-16",
+        "sha": "f3ac70043f7ce78adf279bd56d4e0aba3964f67d",
+        "tickers_changed": 1
+      },
+      {
+        "date": "2026-07-16",
+        "sha": "ccfd17e905dc0a9d2b6e31cf47215858021f629e",
+        "tickers_changed": 56
+      },
+      {
+        "date": "2026-07-17",
+        "sha": "73a5a1e8716f38406e960c4fffabf3f84eb2b06c",
+        "tickers_changed": 3
+      }
+    ],
+    "note": "These commits changed current_memberships, but none of them is the after snapshot of a graded event. They are recorded so a later reader can see that the file does change, and that those changes were not graded as the June Russell reconstitution."
+  },
+  "events": [
+    {
+      "id": "russell_annual_2026",
+      "label": "Russell annual reconstitution",
+      "index_family": "russell",
+      "indices": [
+        "russell_1000",
+        "russell_2000"
+      ],
+      "kind": "annual_recon",
+      "effective": "2026-06-26",
+      "cutoff_date": "2026-06-11",
+      "grade": "insufficient_history",
+      "reason": "no commit on or before 2026-06-11 (10 NYSE sessions before 2026-06-26)",
+      "before_commit": null,
+      "earliest_commit": {
+        "sha": "116db32893ac21ba03506d62f89742e3e59b265f",
+        "date": "2026-07-09",
+        "committed_at": "2026-07-09T14:11:16-04:00"
+      },
+      "after_commit": {
+        "sha": "116db32893ac21ba03506d62f89742e3e59b265f",
+        "date": "2026-07-09",
+        "committed_at": "2026-07-09T14:11:16-04:00"
+      },
+      "cases": [],
+      "summary": {
+        "hits": null,
+        "misses": null,
+        "unflagged_changes": null,
+        "catch_rate": null
+      }
+    },
+    {
+      "id": "sp_share_update_2026q3",
+      "label": "S&P DJI quarterly share update",
+      "index_family": "sp_dji",
+      "indices": [
+        "sp500",
+        "sp400",
+        "sp600"
+      ],
+      "kind": "quarterly_share_update",
+      "effective": "2026-09-19",
+      "cutoff_date": "2026-09-04",
+      "before_commit": {
+        "sha": "83ff91a967720c5b96329a2643824d5258156ec1",
+        "date": "2026-09-04",
+        "committed_at": "2026-09-04T08:56:39+00:00",
+        "file_as_of": "2026-09-04",
+        "file_generated": "2026-09-04T08:50:35Z",
+        "nyse_sessions_before_effective": 10
+      },
+      "after_commit": {
+        "sha": "c3ccc9a95c1d8e01564fa91dc10ccab31724a74d",
+        "date": "2026-09-23",
+        "committed_at": "2026-09-23T09:21:13+00:00",
+        "file_as_of": "2026-09-23",
+        "file_generated": "2026-09-23T09:15:29Z"
+      },
+      "before_portfolio_summary": {
+        "inclusion_candidates": [
+          "ACMR",
+          "APLD",
+          "DMLP",
+          "LB",
+          "RIG",
+          "RYN",
+          "XP"
+        ],
+        "deletion_risks": [],
+        "provider_confirmed_events": 0
+      },
+      "grade": "graded",
+      "cases": [
+        {
+          "ticker": "APLD",
+          "index": "sp400",
+          "flagged_status": "inclusion_candidate",
+          "mcap_before": 8936010000,
+          "rank_before": null,
+          "outcome": "unchanged",
+          "grade": "miss"
+        },
+        {
+          "ticker": "DMLP",
+          "index": "sp600",
+          "flagged_status": "inclusion_candidate",
+          "mcap_before": 1316880000,
+          "rank_before": null,
+          "outcome": "unchanged",
+          "grade": "miss"
+        },
+        {
+          "ticker": "XP",
+          "index": "sp400",
+          "flagged_status": "inclusion_candidate",
+          "mcap_before": 8133580000,
+          "rank_before": null,
+          "outcome": "unchanged",
+          "grade": "miss"
+        }
+      ],
+      "summary": {
+        "hits": 0,
+        "misses": 3,
+        "unflagged_changes": 0,
+        "catch_rate": null
+      }
+    },
+    {
+      "id": "ftse_uk_sep_2026",
+      "label": "FTSE UK quarterly review",
+      "index_family": "ftse",
+      "indices": [
+        "ftse_100",
+        "ftse_250"
+      ],
+      "kind": "quarterly_review",
+      "effective": "2026-09-19",
+      "cutoff_date": "2026-09-04",
+      "before_commit": {
+        "sha": "83ff91a967720c5b96329a2643824d5258156ec1",
+        "date": "2026-09-04",
+        "committed_at": "2026-09-04T08:56:39+00:00",
+        "file_as_of": "2026-09-04",
+        "file_generated": "2026-09-04T08:50:35Z",
+        "nyse_sessions_before_effective": 10
+      },
+      "after_commit": {
+        "sha": "c3ccc9a95c1d8e01564fa91dc10ccab31724a74d",
+        "date": "2026-09-23",
+        "committed_at": "2026-09-23T09:21:13+00:00",
+        "file_as_of": "2026-09-23",
+        "file_generated": "2026-09-23T09:15:29Z"
+      },
+      "before_portfolio_summary": {
+        "inclusion_candidates": [
+          "ACMR",
+          "APLD",
+          "DMLP",
+          "LB",
+          "RIG",
+          "RYN",
+          "XP"
+        ],
+        "deletion_risks": [],
+        "provider_confirmed_events": 0
+      },
+      "grade": "graded",
+      "cases": [],
+      "summary": {
+        "hits": 0,
+        "misses": 0,
+        "unflagged_changes": 0,
+        "catch_rate": null
+      }
+    },
+    {
+      "id": "tsx_sep_2026",
+      "label": "S&P/TSX quarterly rebalance",
+      "index_family": "tsx",
+      "indices": [
+        "tsx_composite"
+      ],
+      "kind": "quarterly_rebalance",
+      "effective": "2026-09-19",
+      "cutoff_date": "2026-09-04",
+      "before_commit": {
+        "sha": "83ff91a967720c5b96329a2643824d5258156ec1",
+        "date": "2026-09-04",
+        "committed_at": "2026-09-04T08:56:39+00:00",
+        "file_as_of": "2026-09-04",
+        "file_generated": "2026-09-04T08:50:35Z",
+        "nyse_sessions_before_effective": 10
+      },
+      "after_commit": {
+        "sha": "c3ccc9a95c1d8e01564fa91dc10ccab31724a74d",
+        "date": "2026-09-23",
+        "committed_at": "2026-09-23T09:21:13+00:00",
+        "file_as_of": "2026-09-23",
+        "file_generated": "2026-09-23T09:15:29Z"
+      },
+      "before_portfolio_summary": {
+        "inclusion_candidates": [
+          "ACMR",
+          "APLD",
+          "DMLP",
+          "LB",
+          "RIG",
+          "RYN",
+          "XP"
+        ],
+        "deletion_risks": [],
+        "provider_confirmed_events": 0
+      },
+      "grade": "graded",
+      "cases": [],
+      "summary": {
+        "hits": 0,
+        "misses": 0,
+        "unflagged_changes": 0,
+        "catch_rate": null
+      }
+    },
+    {
+      "id": "asx200_sep_2026",
+      "label": "S&P/ASX 200 quarterly rebalance",
+      "index_family": "asx",
+      "indices": [
+        "asx_200"
+      ],
+      "kind": "quarterly_rebalance",
+      "effective": "2026-09-19",
+      "cutoff_date": "2026-09-04",
+      "before_commit": {
+        "sha": "83ff91a967720c5b96329a2643824d5258156ec1",
+        "date": "2026-09-04",
+        "committed_at": "2026-09-04T08:56:39+00:00",
+        "file_as_of": "2026-09-04",
+        "file_generated": "2026-09-04T08:50:35Z",
+        "nyse_sessions_before_effective": 10
+      },
+      "after_commit": {
+        "sha": "c3ccc9a95c1d8e01564fa91dc10ccab31724a74d",
+        "date": "2026-09-23",
+        "committed_at": "2026-09-23T09:21:13+00:00",
+        "file_as_of": "2026-09-23",
+        "file_generated": "2026-09-23T09:15:29Z"
+      },
+      "before_portfolio_summary": {
+        "inclusion_candidates": [
+          "ACMR",
+          "APLD",
+          "DMLP",
+          "LB",
+          "RIG",
+          "RYN",
+          "XP"
+        ],
+        "deletion_risks": [],
+        "provider_confirmed_events": 0
+      },
+      "grade": "graded",
+      "cases": [],
+      "summary": {
+        "hits": 0,
+        "misses": 0,
+        "unflagged_changes": 0,
+        "catch_rate": null
+      }
+    },
+    {
+      "id": "nzx50_sep_2026",
+      "label": "S&P/NZX 50 quarterly rebalance",
+      "index_family": "nzx",
+      "indices": [
+        "nzx_50"
+      ],
+      "kind": "quarterly_rebalance",
+      "effective": "2026-09-19",
+      "cutoff_date": "2026-09-04",
+      "before_commit": {
+        "sha": "83ff91a967720c5b96329a2643824d5258156ec1",
+        "date": "2026-09-04",
+        "committed_at": "2026-09-04T08:56:39+00:00",
+        "file_as_of": "2026-09-04",
+        "file_generated": "2026-09-04T08:50:35Z",
+        "nyse_sessions_before_effective": 10
+      },
+      "after_commit": {
+        "sha": "c3ccc9a95c1d8e01564fa91dc10ccab31724a74d",
+        "date": "2026-09-23",
+        "committed_at": "2026-09-23T09:21:13+00:00",
+        "file_as_of": "2026-09-23",
+        "file_generated": "2026-09-23T09:15:29Z"
+      },
+      "before_portfolio_summary": {
+        "inclusion_candidates": [
+          "ACMR",
+          "APLD",
+          "DMLP",
+          "LB",
+          "RIG",
+          "RYN",
+          "XP"
+        ],
+        "deletion_risks": [],
+        "provider_confirmed_events": 0
+      },
+      "grade": "graded",
+      "cases": [],
+      "summary": {
+        "hits": 0,
+        "misses": 0,
+        "unflagged_changes": 0,
+        "catch_rate": null
+      }
+    },
+    {
+      "id": "stoxx_sep_2026",
+      "label": "STOXX Europe 600 quarterly review",
+      "index_family": "stoxx",
+      "indices": [
+        "stoxx_europe_600"
+      ],
+      "kind": "quarterly_review",
+      "effective": "2026-09-22",
+      "cutoff_date": "2026-09-08",
+      "before_commit": {
+        "sha": "80b5597989334bb91766c062ea5134f11547e284",
+        "date": "2026-09-08",
+        "committed_at": "2026-09-08T18:34:44+00:00",
+        "file_as_of": "2026-09-08",
+        "file_generated": "2026-09-08T18:28:01Z",
+        "nyse_sessions_before_effective": 10
+      },
+      "after_commit": {
+        "sha": "c3ccc9a95c1d8e01564fa91dc10ccab31724a74d",
+        "date": "2026-09-23",
+        "committed_at": "2026-09-23T09:21:13+00:00",
+        "file_as_of": "2026-09-23",
+        "file_generated": "2026-09-23T09:15:29Z"
+      },
+      "before_portfolio_summary": {
+        "inclusion_candidates": [
+          "ACMR",
+          "APLD",
+          "DMLP",
+          "LB",
+          "RIG",
+          "RYN",
+          "XP"
+        ],
+        "deletion_risks": [],
+        "provider_confirmed_events": 0
+      },
+      "grade": "graded",
+      "cases": [],
+      "summary": {
+        "hits": 0,
+        "misses": 0,
+        "unflagged_changes": 0,
+        "catch_rate": null
+      }
+    },
+    {
+      "id": "topix_oct_2026",
+      "label": "TOPIX periodic review",
+      "index_family": "jpx",
+      "indices": [
+        "topix"
+      ],
+      "kind": "periodic_review",
+      "effective": "2026-10-31",
+      "cutoff_date": "2026-10-19",
+      "grade": "insufficient_history",
+      "reason": "no commit after 2026-10-31",
+      "before_commit": {
+        "sha": "3dce5da7dec136c33cb916706fbddff6cc5480e9",
+        "date": "2026-10-19",
+        "committed_at": "2026-10-19T09:53:07+00:00"
+      },
+      "after_commit": null,
+      "cases": [],
+      "summary": {
+        "hits": null,
+        "misses": null,
+        "unflagged_changes": null,
+        "catch_rate": null
+      }
+    },
+    {
+      "id": "msci_nov_2026",
+      "label": "MSCI semi-annual index review",
+      "index_family": "msci",
+      "indices": [
+        "msci_usa",
+        "msci_acwi"
+      ],
+      "kind": "semi_annual_review",
+      "effective": "2026-11-30",
+      "cutoff_date": "2026-11-13",
+      "grade": "insufficient_history",
+      "reason": "no commit after 2026-11-30",
+      "before_commit": {
+        "sha": "f561f2891315aed335386fc6c245d7b5d24f01b8",
+        "date": "2026-10-29",
+        "committed_at": "2026-10-29T12:27:07-04:00"
+      },
+      "after_commit": null,
+      "cases": [],
+      "summary": {
+        "hits": null,
+        "misses": null,
+        "unflagged_changes": null,
+        "catch_rate": null
+      }
+    },
+    {
+      "id": "russell_semi_2026",
+      "label": "Russell semi-annual reconstitution",
+      "index_family": "russell",
+      "indices": [
+        "russell_1000",
+        "russell_2000"
+      ],
+      "kind": "semi_recon",
+      "effective": "2026-12-11",
+      "cutoff_date": "2026-11-27",
+      "grade": "insufficient_history",
+      "reason": "no commit after 2026-12-11",
+      "before_commit": {
+        "sha": "f561f2891315aed335386fc6c245d7b5d24f01b8",
+        "date": "2026-10-29",
+        "committed_at": "2026-10-29T12:27:07-04:00"
+      },
+      "after_commit": null,
+      "cases": [],
+      "summary": {
+        "hits": null,
+        "misses": null,
+        "unflagged_changes": null,
+        "catch_rate": null
+      }
+    },
+    {
+      "id": "sp_share_update_2026q4",
+      "label": "S&P DJI quarterly share update",
+      "index_family": "sp_dji",
+      "indices": [
+        "sp500",
+        "sp400",
+        "sp600"
+      ],
+      "kind": "quarterly_share_update",
+      "effective": "2026-12-19",
+      "cutoff_date": "2026-12-07",
+      "grade": "insufficient_history",
+      "reason": "no commit after 2026-12-19",
+      "before_commit": {
+        "sha": "f561f2891315aed335386fc6c245d7b5d24f01b8",
+        "date": "2026-10-29",
+        "committed_at": "2026-10-29T12:27:07-04:00"
+      },
+      "after_commit": null,
+      "cases": [],
+      "summary": {
+        "hits": null,
+        "misses": null,
+        "unflagged_changes": null,
+        "catch_rate": null
+      }
+    },
+    {
+      "id": "nasdaq100_2026",
+      "label": "Nasdaq-100 annual reconstitution",
+      "index_family": "nasdaq",
+      "indices": [
+        "nasdaq_100"
+      ],
+      "kind": "annual_recon",
+      "effective": "2026-12-19",
+      "cutoff_date": "2026-12-07",
+      "grade": "insufficient_history",
+      "reason": "no commit after 2026-12-19",
+      "before_commit": {
+        "sha": "f561f2891315aed335386fc6c245d7b5d24f01b8",
+        "date": "2026-10-29",
+        "committed_at": "2026-10-29T12:27:07-04:00"
+      },
+      "after_commit": null,
+      "cases": [],
+      "summary": {
+        "hits": null,
+        "misses": null,
+        "unflagged_changes": null,
+        "catch_rate": null
+      }
+    },
+    {
+      "id": "ftse_uk_dec_2026",
+      "label": "FTSE UK quarterly review",
+      "index_family": "ftse",
+      "indices": [
+        "ftse_100",
+        "ftse_250"
+      ],
+      "kind": "quarterly_review",
+      "effective": "2026-12-19",
+      "cutoff_date": "2026-12-07",
+      "grade": "insufficient_history",
+      "reason": "no commit after 2026-12-19",
+      "before_commit": {
+        "sha": "f561f2891315aed335386fc6c245d7b5d24f01b8",
+        "date": "2026-10-29",
+        "committed_at": "2026-10-29T12:27:07-04:00"
+      },
+      "after_commit": null,
+      "cases": [],
+      "summary": {
+        "hits": null,
+        "misses": null,
+        "unflagged_changes": null,
+        "catch_rate": null
+      }
+    }
+  ],
+  "summary": {
+    "events_graded": 6,
+    "events_insufficient_history": 7,
+    "hits": 0,
+    "misses": 3,
+    "unflagged_changes": 0,
+    "catch_rate": null,
+    "catch_rate_formula": "hits / (hits + unflagged_changes)",
+    "catch_rate_denominator": 0
+  }
+}

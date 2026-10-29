@@ -63,6 +63,76 @@
         "source_ref": "GOOGL/research/valuation_fact_ledger.json#normalized_owner_earnings_m",
         "rule": "Fire when the future TTM owner-earnings bridge is below the locked valuation anchor."
       }
+    },
+    {
+      "spec_schema_version": "3.0",
+      "spec_id": "googl-multilens-listing-close-2027-04-28",
+      "spec_revision": 1,
+      "forecast_class": "ex_ante",
+      "forecast_role": "diagnostic",
+      "authored_at": "2026-10-29T18:00:00Z",
+      "information_cutoff_at": "2026-10-28T12:00:00Z",
+      "registered_at": "2026-10-29T18:00:00Z",
+      "registration_commit": "3a170ca50936df6724b5165c083246f19a676c08",
+      "analysis_run_id": "fundamental-analyst-2026-10-29",
+      "author": "fundamental-analyst",
+      "model_id": "fundamental-analyst-weekly-v1",
+      "prompt_version": "case-log-table-v1",
+      "contract_hash": "c92c023a018dfcdf52adbefe90a07020978730e87014bb6e851b1b0f85ce8408",
+      "component_fingerprint": "dd90aea56d5dc5f2eb16c86271d6778b90d19b0daea7411a8fef315d3d971923",
+      "method_id": "owner_cash_or_dividend_discount",
+      "power_zone": "predictable_cash_flow",
+      "component_id": "primary_operating_segment",
+      "correlation_group": "googl-fundamental-analyst-2026-10-28",
+      "metric": "listing close",
+      "comparator": "lte",
+      "threshold": 118,
+      "threshold_basis": {
+        "source_ref": "_system/research/fundamental_analyst/CASE_LOG_2026-10-28.md",
+        "rule": "Fire when the GOOGL close is at or below $118, the buy zone in the 2026-10-28 multi-lens row. The same row mentions about $140 if net cash and stakes are counted. That wider band is not the registered threshold.",
+        "claim_type": "fact"
+      },
+      "unit": "USD",
+      "measurement_period_end": "2027-04-28",
+      "observable_after": "2027-04-28",
+      "resolution_deadline": "2027-04-28",
+      "source_hint": "listing_close",
+      "observation_plan": {
+        "metric_definition_id": "fundamental_analyst_observation",
+        "metric_definition_version": "1.0",
+        "source_adapter": "fundamental_analyst_observation",
+        "fiscal_period": "EVENT",
+        "observation_type": "instant",
+        "duration_basis": "point",
+        "canonical_unit": "USD",
+        "expected_publication_date": "2027-04-28",
+        "accepted_forms": [
+          "analyst_observation"
+        ],
+        "maximum_source_lag_days": 14,
+        "end_date_tolerance_days": 7,
+        "historical_replay": {
+          "status": "passed",
+          "evidence_ref": "GOOGL/research/fundamental_analyst/replay_2026-10-28.json"
+        },
+        "outcome_unavailable_at_registration": true
+      },
+      "probability_fires": null,
+      "calibration_eligible": false,
+      "severity": 4,
+      "derived_from": "Wait; buy zone ≤ $118 (to ~$140 with net cash + non-marketable stakes) (Multi-lens (Buffett, Munger, Hohn, Pabrai, Tarasoff, Begg, PRINCIPLES))",
+      "rationale": "Call (2026-10-28, Multi-lens (Buffett, Munger, Hohn, Pabrai, Tarasoff, Begg, PRINCIPLES)): Wait; buy zone ≤ $118 (to ~$140 with net cash + non-marketable stakes) Reason: Q3'26 print (8-K 0001652044-26-000080): Cloud +103%, 36.2% margin; Search +12%. But capex was $51.4B (40% of revenue), FCF −$9.1B, TTM FCF−SBC −$10.7B, no buybacks, ~$62B of common + preferred issued YTD. Fails Buffett owner-earnings / great-good-gruesome tests, Munger cash-take-out test and PRINCIPLES A7 (asset-light turning capital-intensive); A4 serial-issuer flag. My engine: OE0 $4.44 (OCF − SBC − capex at 20% of revenue), 13%/8%/25x. Base IRR −0.3% (bear −17.0%, bull 10.1%) < 15% (A13); 15% price $118 (repo prior $143). Call transcript not yet available; Q3 backlog and 2027 capex guide unknown. Source: _system/research/fundamental_analyst/CASE_LOG_2026-10-28.md. Registered test: Fire when the GOOGL close is at or below $118, the buy zone in the 2026-10-28 multi-lens row. The same row mentions about $140 if net cash and stakes are counted. That wider band is not the registered threshold. Probability was not stated, so this spec is diagnostic and is not Brier-scored.",
+      "untestable": false,
+      "supersedes_spec_id": null,
+      "call": "Wait; buy zone ≤ $118 (to ~$140 with net cash + non-marketable stakes)",
+      "lens": "Multi-lens (Buffett, Munger, Hohn, Pabrai, Tarasoff, Begg, PRINCIPLES)",
+      "case_log_ref": "_system/research/fundamental_analyst/CASE_LOG_2026-10-28.md",
+      "source": {
+        "case_log": "_system/research/fundamental_analyst/CASE_LOG_2026-10-28.md",
+        "lens": "Multi-lens (Buffett, Munger, Hohn, Pabrai, Tarasoff, Begg, PRINCIPLES)",
+        "call_date": "2026-10-28",
+        "ticker_cell": "GOOGL"
+      }
     }
   ]
 }
