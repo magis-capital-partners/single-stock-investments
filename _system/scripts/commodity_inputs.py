@@ -15,15 +15,20 @@ GAPS={
         ('scenario_calibration','validation_required','Archived STEO publisher forecasts are evaluated separately. Stress coefficients and post-2027 scenarios still require independent validation.','https://www.eia.gov/outlooks/steo/outlook.php'),
         ('global_storage_capacity','not_publicly_observable','Regional tank capacity does not establish a global inventory ceiling.','https://www.eia.gov/petroleum/storagecapacity/')],
     'copper':[
-        ('concentrate_balance','licensed_or_manual_source','Aligned concentrate supply, SX-EW and smelter intake are needed; total refined copper is not a substitute.','https://icsg.org/statistical/'),
-        ('regional_exchange_stocks','source_integration_required','Separate dated LME, COMEX and SHFE stocks; warrants and warehouse stocks must not be double counted.','https://www.lme.com/en/Market-Data/Reports-and-data/Warehouse-and-stocks-reports/Warehouse-and-queue-data'),
-        ('treatment_charge_history','licensed_or_manual_source','A comparable dated spot TC series is required; one press-release observation is not a time series.','https://icsg.org/publications-list/')],
+        ('concentrate_balance','partial_public_evidence','Cochilco publishes concentrate supply and a custom-market outlook. A matching global smelter-intake table is still absent; integrated and custom supply are different markets.','https://www.cochilco.cl/web/cochilco-publica-estudio-sobre-el-mercado-de-concentrados-y-la-industria-mundial-de-fundiciones/'),
+        ('treatment_charge_history','partial_public_evidence','Free Cochilco reports show spot versus benchmark TC/RC charts. Exact consistently dated observations are not exposed as a full public series; chart precision is not fabricated.','https://www.cochilco.cl/web/cochilco-publica-estudio-sobre-el-mercado-de-concentrados-y-la-industria-mundial-de-fundiciones/')],
     'gold':[
-        ('global_miner_cost_curve','licensed_or_manual_source','FY2025 Newmont, Barrick and Agnico Eagle costs are attached. Broader standardized mine coverage is still needed for global percentiles; the three-company panel is not a bullion floor.','https://www.gold.org/goldhub/data')],
+        ('global_miner_cost_curve','partial_public_evidence','Free Aurum regional mine curves, WGC global averages and company disclosures are attached below. The regional sample does not establish standardized global mine percentiles or a bullion price floor.','https://www.aurumanalytics.com.au/reports_and_media')],
     'silver':[
         ('available_inventory','not_publicly_observable','Warehouse metal includes ETF holdings and unavailable private ownership. Do not infer an exhaustion date from gross stocks.','https://www.lbma.org.uk/prices-and-data/london-vault-data'),
-        ('lease_rates','licensed_or_manual_source','A dated consistent lease-rate history is needed for financing stress.','https://www.lbma.org.uk/prices-and-data'),
+        ('lease_rates','partial_public_evidence','World Silver Survey provides historical lease-rate ranges. A continuous series with a consistent tenor remains unavailable; isolated ranges are not current quotes.','https://silverinstitute.org/silver-supply-demand/'),
         ('pv_technology_path','scenario_assumption','Technology adoption and silver intensity beyond published survey years remain explicit scenarios.','https://silverinstitute.org/silver-supply-demand/')],
+}
+FREE_INPUTS={
+    'crude':[],
+    'copper':[('copper_exchange_stocks',21),('copper_concentrate_report',550)],
+    'gold':[('gold_regional_cost_curve',210),('gold_global_average_cost',365)],
+    'silver':[('silver_liquidity_report',365)],
 }
 
 
@@ -40,6 +45,14 @@ def readiness(name,panel,as_of):
         rows.append({'id':key,'status':status,'source_url':item.get('source_url'),'unit':item.get('unit'),'frequency':item.get('frequency'),
                      'last_observation':observations[-1]['date'] if observations else None,'observations':len(observations),'required':key in REQUIRED[name]})
     rows.extend({'id':key,'status':state,'reason':reason,'source_url':url,'required':False} for key,state,reason,url in GAPS[name])
+    for key,age in FREE_INPUTS[name]:
+        item=panel.get('free_inputs',{}).get(key,{})
+        state=item.get('status','missing')
+        period=item.get('period')
+        if period and period>as_of.isoformat():state='missing'
+        elif period and state=='available' and (as_of-date.fromisoformat(period)).days>age:state='stale'
+        rows.append({'id':key,'status':state,'last_observation':period,'observations':len(item.get('rows',[])),
+                     'source_url':item.get('source_url'),'unit':item.get('unit'),'reason':item.get('note'),'required':False})
     if name=='crude':
         validation=panel.get('oil_forecast_validation',{})
         rows.append({'id':'publisher_forecast_vintages','status':'available' if validation.get('complete') and validation.get('rows') else 'partial' if validation.get('rows') else 'missing',

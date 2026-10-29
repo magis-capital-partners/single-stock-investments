@@ -85,6 +85,15 @@ def test_multi_company_letter_retains_specific_passages():
     assert links[0]["passages"] != links[1]["passages"]
 
 
+def test_owned_filing_keeps_complete_text_without_linking_its_vendors(tmp_path):
+    b=Builder(tmp_path,None,tmp_path/'out',tmp_path/'cache',companies=COMPANIES)
+    text='Newmont Corporation operates gold mines and has expanded production while reducing unit costs at its key assets.'
+    row=b.base('filing','Annual report','company:CME',text=text,explicit=['CME'],path='CME/investor-documents/annual.htm')
+    assert row['text']==text
+    assert [r['ticker'] for r in row['relationships']]==['CME']
+    assert list((b.cache/'match-work').rglob('*.json'))
+
+
 def test_exact_copies_and_explicit_renditions_merge_but_names_do_not():
     index = SourceIndex()
     a={"id":"first","title":"Report.pdf","text":"body","processing_status":"indexed","locations":[],"relationships":[],"origins":["vault"]}

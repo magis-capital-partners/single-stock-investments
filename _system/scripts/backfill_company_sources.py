@@ -85,6 +85,36 @@ def extract_complete(data, suffix, *, ocr=False):
         # Model source is searchable text; never import or execute it.
         text, state = extract(data, '.txt')
         return text, state, {'format': 'model_source_text'}
+    if suffix == '.doc':
+        from legacy_doc import extract_text
+        try:
+            result=extract_text(data)
+            return result.text,'indexed' if result.text.strip() else 'empty_source',{'format':'legacy_word','parser':result.parser,'warnings':result.warnings}
+        except Exception as exc:
+            return '', 'access_unavailable' if 'encrypt' in str(exc).lower() else 'failed', {'error':str(exc)[:180]}
+    if suffix in {'.mobi','.azw3'}:
+        from tempfile import TemporaryDirectory
+        from mobi.kindleunpack import unpackBook
+        # The unpacker supports unencrypted ebooks only. No DRM removal.
+        try:
+            with TemporaryDirectory(prefix='ssi-ebook-') as directory:
+                temporary=Path(directory);original=temporary/('original'+suffix);original.write_bytes(data)
+                destination=temporary/'unpacked';destination.mkdir()
+                unpackBook(str(original),str(destination),epubver='A')
+                candidates=[destination/'mobi8/original.epub',destination/'mobi7/book.html',destination/'original.001.pdf']
+                converted=next((p for p in candidates if p.is_file()),None)
+                if not converted:return '', 'failed', {'error':'No readable book rendition'}
+                text,status,details=extract_complete(converted.read_bytes(),converted.suffix,ocr=ocr)
+                return text,status,{'format':suffix.lstrip('.'),'conversion':'unencrypted Kindle unpack',**details}
+        except (Exception,SystemExit) as exc:
+            return '', 'access_unavailable' if re.search(r'DRM|encrypt',str(exc),re.I) else 'failed', {'error':str(exc)[:180]}
+    if suffix in {'.png','.jpg','.jpeg','.jpg_large'}:
+        import fitz
+        if not ocr:return '', 'needs_ocr', {'format':'image'}
+        try:
+            with fitz.open(stream=data) as image:
+                return extract_complete(image.convert_to_pdf(),'.pdf',ocr=True)
+        except Exception as exc:return '', 'needs_ocr', {'error':type(exc).__name__}
     if suffix == '.epub':
         import io,posixpath,zipfile
         from xml.etree import ElementTree as ET
@@ -314,7 +344,7 @@ class Worker:
                 data=execute_with_retry(self.service.files().export_media(fileId=meta['id'],mimeType=mime))
             else:
                 suffix=Path(meta['name']).suffix.lower()
-                if suffix not in SOURCE_SUFFIXES | {'.py', '.r', '.sql', '.epu'}:
+                if suffix not in SOURCE_SUFFIXES | {'.py', '.r', '.sql', '.epu', '.doc', '.mobi', '.azw3', '.png', '.jpg', '.jpeg', '.jpg_large'}:
                     return 'unsupported',{},'Unsupported original format: '+meta['mimeType']
                 if suffix in {'.mp3','.mp4','.m4a','.wav'} and not self.transcribe:
                     return 'needs_transcript',{},'Audio requires linked transcript'

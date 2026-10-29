@@ -41,7 +41,7 @@ jobs:
       - uses: ./.github/actions/checkout-vault
         with:
           hydrate: 'false'
-      - run: pip install pymupdf pypdf xlrd google-api-python-client google-auth
+      - run: pip install pymupdf pypdf xlrd google-api-python-client google-auth legacy-doc mobi
       - name: Install scan language data
         if: inputs.recover_scans
         run: sudo apt-get update && sudo apt-get install -y tesseract-ocr-eng tesseract-ocr-jpn tesseract-ocr-chi-sim

@@ -9,7 +9,7 @@ def preserve(source,vault):
     if not (source/'observations.json').is_file():return 0
     destination.mkdir(parents=True,exist_ok=True)
     shutil.copy2(source/'observations.json',destination/'observations.json')
-    for folder in ['objects','vintages','forecast-vintages']:
+    for folder in ['objects','vintages','forecast-vintages','free-vintages']:
         if (source/folder).is_dir():shutil.copytree(source/folder,destination/folder,dirs_exist_ok=True)
     return 1
 

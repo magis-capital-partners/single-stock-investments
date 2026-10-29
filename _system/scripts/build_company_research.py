@@ -220,7 +220,13 @@ class Builder:
 
     def base(self, identity, title, origin, *, text="", state="indexed", date=None, author=None, period=None, explicit=(), locations=(), mime="", path=""):
         match_text = text
-        if explicit and Path(path).suffix.lower() in {".json", ".csv", ".tsv"}:
+        issuer_owned = bool(explicit) and any('/'+folder+'/' in '/'+path.replace('\\','/') for folder in ('investor-documents','financials','models'))
+        if issuer_owned:
+            # An issuer's filings and operating data belong to that issuer.
+            # Incidental banks, vendors and peers in its disclosures should not
+            # flood other company libraries. The complete body remains searchable.
+            match_text = ""
+        elif explicit and Path(path).suffix.lower() in {".json", ".csv", ".tsv"}:
             # Company-owned tables already have issuer identity. Discover other
             # issuers only in narrative fields, never among numeric observations
             # or schema keys. The full original remains indexed for search.
@@ -246,8 +252,15 @@ class Builder:
         match_title = title[:-len(suffix)] if suffix in SOURCE_SUFFIXES else title
         match_key = digest(self.match_version + match_title + digest(match_text) + json.dumps(list(explicit)))
         if match_key not in self.matches:
-            self.matches[match_key] = self.matcher.match(match_title, match_text, explicit)
+            checkpoint = self.cache / "match-work" / match_key[:2] / (match_key + ".json")
+            matched = load(checkpoint, None) if checkpoint.is_file() else None
+            if not isinstance(matched, list) or len(matched) != 2:
+                matched = self.matcher.match(match_title, match_text, explicit)
+                write(checkpoint, matched)
+            self.matches[match_key] = matched
         links, review = self.matches[match_key]
+        if issuer_owned:
+            links = [item for item in links if item['ticker'] in explicit]
         record = {"id": digest(identity)[:32], "title": title, "category": category(path or title, mime), "date": date or date_from(title), "author": author or "", "period": period,
                   "origins": [origin], "locations": list(locations), "text": text, "processing_status": state,
                   "relationships": list(links), "review": list(review), "availability": "available", "indexed_at": self.now,
@@ -547,6 +560,8 @@ class Builder:
                 record["extraction_review"] = "Automatic OCR; verify against the original"
             if cached.get('content_md5'):record['content_md5']=cached['content_md5']
             self.add(record,["git:"+sha,"path:"+rel]+(['md5:'+cached['content_md5']] if cached.get('content_md5') else []))
+            if count % 5000 == 0:
+                print(f"Research inventory: git: {count} originals processed", flush=True)
         self.receipt("git_inventory",count)
         # Discovery is complete when the committed tree and its metadata have
         # been read. Extraction status remains separate on each original.

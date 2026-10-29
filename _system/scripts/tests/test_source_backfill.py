@@ -153,6 +153,26 @@ def test_epub_reads_spine_order_and_preserves_scan_gap():
     assert details['missing_chapters']==['book/a.xhtml']
 
 
+def test_legacy_word_reader_does_not_execute_embedded_content(monkeypatch):
+    from types import SimpleNamespace
+    monkeypatch.setitem(sys.modules,'legacy_doc',SimpleNamespace(extract_text=lambda data:SimpleNamespace(text='Company earnings discussion',parser='piece-table',warnings=[])))
+    text,state,details=extract_complete(b'legacy-fixture','.doc')
+    assert text=='Company earnings discussion' and state=='indexed' and details['parser']=='piece-table'
+    def encrypted(data):raise ValueError('Encrypted document')
+    monkeypatch.setitem(sys.modules,'legacy_doc',SimpleNamespace(extract_text=encrypted))
+    assert extract_complete(b'private','.doc')[1]=='access_unavailable'
+
+
+def test_source_code_is_indexed_as_text_and_never_executed():
+    text,state,details=extract_complete(b'raise RuntimeError("do not run this research file")','.py')
+    assert text.startswith('raise RuntimeError') and state=='indexed'
+    assert details['format']=='model_source_text'
+
+
+def test_image_requires_ocr_before_indexing():
+    assert extract_complete(b'original','.jpeg')[1]=='needs_ocr'
+
+
 def test_transcript_companion_and_cache_archive_portability(tmp_path):
     audio=tmp_path/'podcasts/audio-cache/episode.mp3';audio.parent.mkdir(parents=True);audio.write_bytes(b'audio')
     transcript=tmp_path/'podcasts/episodes/show/episode.txt';transcript.parent.mkdir(parents=True);transcript.write_text('Transcript')
