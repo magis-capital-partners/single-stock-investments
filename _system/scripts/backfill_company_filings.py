@@ -69,12 +69,16 @@ def recover(cache, url, client):
     prior = cached_filing(cache, url)
     if prior.get('status') == 'indexed':
         return 'reused'
+    if prior.get('status') == 'access_unavailable' and prior.get('fetched_at'):
+        age = (datetime.now(timezone.utc)-datetime.fromisoformat(prior['fetched_at'])).total_seconds()
+        if age < 86400:
+            return 'access_unavailable'
     doc = {'url': url, 'fetched_at': datetime.now(timezone.utc).isoformat(), 'text': ''}
     try:
         raw = client.get_bytes(url, timeout=30)
         # Some upstream failures arrive as HTML with status 200. Never index them.
-        if any(x in raw[:20000].lower() for x in (b'undeclared automated tool', b'request rate threshold exceeded', b'your request originates from an undeclared')):
-            raise PermissionError('SEC access policy response')
+        if any(x in raw[:20000].lower() for x in (b'undeclared automated tool', b'request rate threshold exceeded', b'your request originates from an undeclared', b'permission to view this headline')):
+            raise PermissionError('Publisher access policy response')
         suffix = '.pdf' if raw.startswith(b'%PDF') else Path(urlparse(url).path).suffix.lower()
         if suffix not in ('.pdf','.html','.htm','.txt','.xml') and b'<html' in raw[:2000].lower():
             suffix = '.html'
@@ -112,18 +116,20 @@ def main():
     end = time.monotonic() + args.seconds
     counts = {}
     urls = candidates(args.cache)
-    blocked = False
+    blocked_hosts = set()
     with ThreadPoolExecutor(max_workers=args.workers) as pool:
         for start in range(0,len(urls),args.workers):
-            if time.monotonic() >= end or blocked:
+            if time.monotonic() >= end:
                 break
-            for url,status in pool.map(fetch, urls[start:start+args.workers]):
+            batch = [url for url in urls[start:start+args.workers] if urlparse(url).netloc not in blocked_hosts]
+            for url,status in pool.map(fetch, batch):
                 counts[status] = counts.get(status, 0) + 1
                 if sum(counts.values()) % 50 == 0:
                     print(json.dumps({'processed':sum(counts.values()),'outcomes':counts}),flush=True)
                 if status == 'access_unavailable':
                     doc = cached_filing(args.cache,url)
-                    blocked = blocked or '403' in doc.get('error','') or 'policy' in doc.get('error','')
+                    if '403' in doc.get('error','') or 'policy' in doc.get('error',''):
+                        blocked_hosts.add(urlparse(url).netloc)
     print(json.dumps(counts), flush=True)
 
 
