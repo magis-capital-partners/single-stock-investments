@@ -1,0 +1,945 @@
+{
+  "schema_version": "underwriting-contract/1",
+  "ticker": "MA",
+  "as_of": "2026-10-29",
+  "packet_hash": "e3afdfe8c03733bca272a03bd802f34d6dbb5fdf81addf8bb73e256b0b09e5f7",
+  "evidence_hash": "a7e5fd57c7391bfca81257d94bab244373d5cdcbb41cc54346b7807f29748952",
+  "currency": "USD",
+  "financial_period": "2025-12-31",
+  "framework": "operating_dcf",
+  "archetype": "compounder",
+  "archetype_rationale": "Mastercard operates an interdependent payments network and services franchise, rather than a loan book or inventory liquidation business. Network interoperability, transaction data and services distribution support growth without proportionate physical capital investment. Revenue, operating income and operating cash flow increased across 2023–2025, while property purchases and capitalized software remained much smaller than operating cash generation. This classification remains conditional: customer incentives consume capital, acquisitions supplement organic capabilities, and settlement guarantees, competition and litigation can impair returns. The decline in operating cash flow during the latest nine months despite earnings growth prevents treating reported earnings growth as automatic owner-cash growth.",
+  "framework_rationale": "An operating DCF can explicitly charge customer funding, software, physical capital, acquisitions and compensation before forecasting shareholder distributions. The modeled claim is levered parent common equity: reported operating cash flow already includes interest and taxes, additional refinancing costs are reserved, and terminal proceeds capitalize cash remaining after financing costs. Consequently, neither debt nor cash is added or subtracted again. The strongest alternative is sum_of_parts, because services, acquired capabilities and financial assets are identifiable. It loses because the primary report describes the capabilities as fundamentally interdependent, and the packet does not establish separable distributable earnings or independent disposal economics that would justify additive franchise valuations.",
+  "alternatives_considered": [
+    {
+      "framework": "sum_of_parts",
+      "reason_rejected": "The strongest alternative would separately value network operations, services and acquired capabilities. Their shared data, customer relationships and distribution make stand-alone earnings allocations judgment-heavy and create a substantial double-counting risk. One consolidated cash-flow bridge captures their combined investment requirements."
+    },
+    {
+      "framework": "financial_equity",
+      "reason_rejected": "Settlement assets, customer collateral and guarantees create financial risks, but Mastercard explicitly states that it does not issue cards or extend account-holder credit. Book equity and loan-loss economics do not describe the principal earnings engine."
+    },
+    {
+      "framework": "asset_nav",
+      "reason_rejected": "Goodwill, acquired intangibles and financial investments do not independently measure the network's earning power. Liquidating customer incentives, software and settlement infrastructure would impair the cash flows being valued."
+    }
+  ],
+  "horizon_years": 5,
+  "horizon_rationale": "Five annual periods allow an adverse spending and cross-border cycle, recovery, and subsequent moderation to affect distributions before realization. Longer detailed forecasts would imply unsupported precision about payment-rail competition and incentive renewals. Year 1 represents the twelve months following the underwriting date; subsequent flows occur annually, with sale of the continuing equity claim at the end of year 5. The sale is a valuation realization assumption, not an announced transaction.",
+  "review_due": "2027-02-12",
+  "facts": [
+    {
+      "id": "ocf_2025",
+      "observation_id": "obs_0599c47f4af30758e285"
+    },
+    {
+      "id": "ocf_2026_ytd",
+      "observation_id": "obs_92795c4ae0c9a567a175"
+    },
+    {
+      "id": "ocf_2025_ytd",
+      "observation_id": "obs_a2b08db3c26c74f12c17"
+    },
+    {
+      "id": "ppe_2025",
+      "observation_id": "obs_17fdb6149440bbba935a"
+    },
+    {
+      "id": "ppe_2026_ytd",
+      "observation_id": "obs_89487e196fc1eca0100e"
+    },
+    {
+      "id": "ppe_2025_ytd",
+      "observation_id": "obs_776b556107f80017a656"
+    },
+    {
+      "id": "sbc_2025",
+      "observation_id": "obs_df253d924f73aed7e942"
+    },
+    {
+      "id": "sbc_2026_ytd",
+      "observation_id": "obs_352a2102d8679ca98a41"
+    },
+    {
+      "id": "sbc_2025_ytd",
+      "observation_id": "obs_d687d0fcda14ec55f544"
+    },
+    {
+      "id": "shares",
+      "observation_id": "obs_8b44072d133d23006e6d"
+    }
+  ],
+  "component_inventory": [
+    {
+      "id": "payments_network_and_services",
+      "treatment": "modeled",
+      "component_ids": [
+        "business"
+      ],
+      "rationale": "Includes consolidated consumer payments, commercial and new payment flows, services, processing, security, authentication and account-based payment capabilities. Shared infrastructure and distribution are valued together.",
+      "evidence_ids": [
+        "doc_14480323856a489b",
+        "obs_9fa2f93baf4ef5ef4aec",
+        "obs_fa80375151a28dc3909e"
+      ]
+    },
+    {
+      "id": "acquired_businesses_and_intangibles",
+      "treatment": "embedded",
+      "component_ids": [
+        "business"
+      ],
+      "rationale": "Acquired operations contribute to consolidated cash flow. Their goodwill and intangible carrying amounts receive no separate addition. An explicit recurring acquisition budget reduces distributions, so forecast growth does not receive acquisitions for free.",
+      "evidence_ids": [
+        "obs_de1066544165082c0fd0",
+        "obs_56fa6f8a727f2da2d200",
+        "doc_71a50355bce001d0"
+      ]
+    },
+    {
+      "id": "customer_incentives_receivables_and_operating_working_capital",
+      "treatment": "embedded",
+      "component_ids": [
+        "business"
+      ],
+      "rationale": "Customer incentives, receivables, deferred revenue, payables and accruals remain operating assets and obligations. Their cash movements enter reported operating cash flow; normalization reduces reliance on favorable accrual timing. Incentive assets receive no liquidation value.",
+      "evidence_ids": [
+        "obs_7c27d9ee1737950afb91",
+        "doc_71a50355bce001d0",
+        "doc_14480323856a489b"
+      ]
+    },
+    {
+      "id": "settlement_assets_obligations_and_guarantees",
+      "treatment": "embedded",
+      "component_ids": [
+        "business"
+      ],
+      "rationale": "Settlement assets and obligations belong to the operating network, not a separately valued lending subsidiary. Their observed net cash movement remains in the baseline. Operating liquidity is retained, and the adverse scenario reduces earning power and increases financing costs to reflect settlement and customer stress. No guarantee receivable or unused credit facility is added to equity value.",
+      "evidence_ids": [
+        "doc_71a50355bce001d0",
+        "doc_14480323856a489b"
+      ]
+    },
+    {
+      "id": "restricted_cash_and_customer_security_deposits",
+      "treatment": "embedded",
+      "component_ids": [
+        "business"
+      ],
+      "rationale": "September 2026 restricted cash and restricted equivalents of USD 564 million and customer security deposits of USD 2,231 million are unavailable as excess shareholder cash. A recurring exclusion removes customer-funding inflows from the cash-generation bridge. Neither restricted balance is distributed or added at exit.",
+      "evidence_ids": [
+        "obs_f2bfe4c7c915316d8cab",
+        "doc_71a50355bce001d0"
+      ]
+    },
+    {
+      "id": "unrestricted_cash_and_liquid_investments",
+      "treatment": "embedded",
+      "component_ids": [
+        "business"
+      ],
+      "rationale": "Latest unrestricted cash of USD 10,147 million and current investments of USD 317 million remain operating and settlement liquidity. Their income is already reflected in consolidated cash generation. No initial excess-cash distribution or additional terminal principal recovery is assumed.",
+      "evidence_ids": [
+        "obs_c6a9d9d2d4f6e58c318d",
+        "doc_71a50355bce001d0"
+      ]
+    },
+    {
+      "id": "equity_investments_and_other_financial_assets",
+      "treatment": "embedded",
+      "component_ids": [
+        "business"
+      ],
+      "rationale": "Latest equity investments of USD 1,671 million remain with the consolidated enterprise. Operating cash flow reverses noncash investment gains and losses. No separate NAV uplift, assumed monetization or sale proceeds are added; the continuing equity realization includes the retained portfolio.",
+      "evidence_ids": [
+        "doc_71a50355bce001d0"
+      ]
+    },
+    {
+      "id": "parent_debt_and_refinancing",
+      "treatment": "embedded",
+      "component_ids": [
+        "business"
+      ],
+      "rationale": "Latest current debt of USD 1,749 million and noncurrent debt of USD 22,189 million are parent financing claims. Existing interest is already paid before modeled cash flow. Additional financing drag is deducted. Principal is refinanced without an increase in nominal net borrowing; terminal proceeds value the equity subject to this debt, so a second principal deduction would mismatch the levered cash-flow scope.",
+      "evidence_ids": [
+        "obs_f195301d7f0c5814bb70",
+        "obs_a631c8fa2b1b5cde7163",
+        "doc_71a50355bce001d0"
+      ]
+    },
+    {
+      "id": "other_liabilities_litigation_taxes_and_leases",
+      "treatment": "embedded",
+      "component_ids": [
+        "business"
+      ],
+      "rationale": "Ordinary cash taxes, operating lease payments, accrued operating obligations and legal payments remain in consolidated cash generation. No litigation expense addback is made. Normalization and the adverse cash-growth path allow persistent competitive and legal pressure; they do not assert that the accrued litigation balance caps possible losses.",
+      "evidence_ids": [
+        "obs_f1f28fd2bd9ac6da996c",
+        "doc_71a50355bce001d0",
+        "doc_14480323856a489b"
+      ]
+    },
+    {
+      "id": "noncontrolling_and_other_residual_claims",
+      "treatment": "embedded",
+      "component_ids": [
+        "business"
+      ],
+      "rationale": "Consolidated cash flow is reduced by an explicit reserve for minority distributions and other residual financing outflows. Latest noncontrolling book equity is negative USD 13 million, which is not treated as proof of a zero economic claim or added to parent value. The reserve is a judgment, not a reported minority earnings amount.",
+      "evidence_ids": [
+        "obs_3e6662be86ed3e344771",
+        "obs_8fa9a39d349abc954c95",
+        "doc_71a50355bce001d0"
+      ]
+    },
+    {
+      "id": "employee_equity_and_common_share_classes",
+      "treatment": "embedded",
+      "component_ids": [
+        "business"
+      ],
+      "rationale": "The verified latest quarterly diluted denominator covers common-share participation and existing dilutive awards. Future compensation is charged at the trailing reported SBC amount through a cash-equivalent funding reserve. Repurchases receive no additional forecast denominator reduction.",
+      "evidence_ids": [
+        "obs_8b44072d133d23006e6d",
+        "obs_352a2102d8679ca98a41",
+        "doc_71a50355bce001d0"
+      ]
+    },
+    {
+      "id": "captive_finance_boundary",
+      "treatment": "embedded",
+      "component_ids": [
+        "business"
+      ],
+      "rationale": "The annual report expressly distinguishes Mastercard from an issuer or account-holder lender. No separate captive-finance loan book or earnings component is established by the packet. Network settlement guarantees remain included as operating and liquidity risks.",
+      "evidence_ids": [
+        "doc_14480323856a489b"
+      ]
+    }
+  ],
+  "assumptions": [
+    {
+      "id": "software_investment",
+      "unit": "USD",
+      "value": 750000000,
+      "allowed_range": {
+        "min": 600000000,
+        "max": 1200000000
+      },
+      "rationale": "Deduct an annual software investment reserve above trailing spending of USD 652 million and slightly above 2025 spending of USD 726 million. Software amortization is rising with business growth, so the model funds both replacement and expansion rather than treating capitalized development as free cash.",
+      "evidence_ids": [
+        "doc_71a50355bce001d0",
+        "doc_14480323856a489b"
+      ],
+      "counterevidence": "Nine-month software capitalization declined to USD 474 million from USD 548 million, so the reserve could exceed near-term needs; conversely, security or platform replacement could require substantially more.",
+      "falsifier": "Trailing software capitalization exceeds USD 1,200 million, or repeated impairments show that capitalized development is failing to sustain service economics.",
+      "review_trigger": "Review the next annual cash-flow statement and software amortization discussion; reconsider if trailing capitalization exceeds USD 900 million."
+    },
+    {
+      "id": "sbc_cash_funding",
+      "unit": "ratio",
+      "value": 1,
+      "allowed_range": {
+        "min": 0.8,
+        "max": 1.5
+      },
+      "rationale": "Charge the entire reported trailing SBC amount as a cash-equivalent compensation requirement. This funds replacement cash compensation or dilution-offset purchases before distributions, permitting a constant diluted denominator without crediting buyback-driven per-share growth.",
+      "evidence_ids": [
+        "obs_df253d924f73aed7e942",
+        "obs_352a2102d8679ca98a41",
+        "obs_d687d0fcda14ec55f544",
+        "obs_8b44072d133d23006e6d"
+      ],
+      "counterevidence": "Grant-date compensation expense need not equal the future cash cost of neutralizing awards. Employee-plan proceeds and withholding settlements further complicate that correspondence.",
+      "falsifier": "Net share issuance persists despite compensation-offset spending equal to the reserve, or subsequent award disclosures imply a materially larger economic cost.",
+      "review_trigger": "Review each annual equity-compensation note and any increase in diluted shares despite continuing repurchases."
+    },
+    {
+      "id": "customer_funding_exclusion",
+      "unit": "USD",
+      "value": 250000000,
+      "allowed_range": {
+        "min": 193000000,
+        "max": 600000000
+      },
+      "rationale": "Trailing customer security-deposit inflows are USD 193 million, derived from the annual and comparative interim cash-flow tables. Exclude USD 250 million annually so customer collateral accumulation does not become recurring shareholder earnings. Settlement asset and obligation movements are otherwise retained rather than assumed to release.",
+      "evidence_ids": [
+        "doc_71a50355bce001d0",
+        "doc_14480323856a489b",
+        "obs_f2bfe4c7c915316d8cab"
+      ],
+      "counterevidence": "Customer collateral can reverse and require cash outflows. A constant exclusion does not reproduce every daily settlement fluctuation.",
+      "falsifier": "Restricted customer funding becomes a sustained cash outflow or operating cash generation depends on collateral inflows larger than the exclusion.",
+      "review_trigger": "Review restricted deposits and settlement cash movements each quarter, especially after a customer settlement failure."
+    },
+    {
+      "id": "normalization",
+      "unit": "ratio",
+      "values": {
+        "low": 0.75,
+        "base": 0.95,
+        "high": 1.02
+      },
+      "allowed_range": {
+        "min": 0.6,
+        "max": 1.1
+      },
+      "rationale": "Apply normalization to trailing cash after physical capital, software, SBC and customer-funding exclusions. The base haircut recognizes that favorable accrued-expense timing and uncertain incentive renewals can overstate sustainable cash. The low case assumes lasting pricing, legal and incentive pressure; the high case permits only modest conversion improvement. Latest nine-month earnings increased while operating cash flow declined, opposing an unqualified earnings-based uplift.",
+      "evidence_ids": [
+        "obs_92795c4ae0c9a567a175",
+        "obs_a2b08db3c26c74f12c17",
+        "obs_fa80375151a28dc3909e",
+        "doc_71a50355bce001d0",
+        "doc_14480323856a489b"
+      ],
+      "counterevidence": "Higher incentive payments may secure profitable future volumes, and stronger operating margins may eventually restore cash conversion. Conversely, reported prepaid movements do not establish the ultimate return on those commitments.",
+      "falsifier": "Over successive annual periods, cash after the specified capital and compensation charges persistently falls below the low normalization despite stable payment activity, or exceeds the high normalization without temporary liability growth.",
+      "review_trigger": "Reconsider on the 2026 annual filing, with particular attention to customer incentive assets, accrued expenses and operating cash conversion."
+    },
+    {
+      "id": "acquisition_budget",
+      "unit": "USD",
+      "value": 1300000000,
+      "allowed_range": {
+        "min": 500000000,
+        "max": 4500000000
+      },
+      "rationale": "Deduct a recurring acquisition budget reflecting USD 2,511 million spent in 2024, no spending in 2025 and USD 1,372 million during the latest nine months. Services and new payment capabilities have an inorganic component. The forecast therefore purchases capability renewal before distributing residual cash.",
+      "evidence_ids": [
+        "obs_56fa6f8a727f2da2d200",
+        "obs_1fa5bb362d12352e10f4",
+        "obs_de1066544165082c0fd0",
+        "doc_14480323856a489b"
+      ],
+      "counterevidence": "Acquisitions are discretionary and lumpy; organic development might sustain the franchise with less spending. Larger strategic purchases could instead consume much more.",
+      "falsifier": "Multi-year acquisition spending materially exceeds the budget without corresponding residual cash growth, or acquired capabilities require sustained impairment charges.",
+      "review_trigger": "Review every material acquisition announcement and annual purchase-accounting disclosure."
+    },
+    {
+      "id": "other_parent_claims",
+      "unit": "USD",
+      "value": 150000000,
+      "allowed_range": {
+        "min": 100000000,
+        "max": 400000000
+      },
+      "rationale": "Reserve USD 150 million for minority distributions and other residual financing outflows. Other financing activities consumed USD 100 million in 2025 and USD 108 million in the latest nine months. The reserve prevents allocating all consolidated operating cash automatically to parent common shareholders.",
+      "evidence_ids": [
+        "doc_14480323856a489b",
+        "doc_71a50355bce001d0",
+        "obs_3e6662be86ed3e344771",
+        "obs_8fa9a39d349abc954c95"
+      ],
+      "counterevidence": "The packet does not identify those financing outflows entirely as minority distributions. Negative minority book equity does not limit contractual distribution or redemption rights.",
+      "falsifier": "Disclosed recurring minority and residual financing payments exceed USD 400 million annually or a material redeemable minority claim emerges.",
+      "review_trigger": "Review annual subsidiary, minority-interest and other-financing disclosures and any acquisition with retained outside ownership."
+    },
+    {
+      "id": "refinancing_drag",
+      "unit": "USD",
+      "values": {
+        "low": 600000000,
+        "base": 200000000,
+        "high": 150000000
+      },
+      "allowed_range": {
+        "min": 0,
+        "max": 1500000000
+      },
+      "rationale": "Reserve additional annual cash financing costs beyond interest already embedded in operating cash flow. Latest debt totals USD 23,938 million versus USD 19,000 million at December 2025, and quarterly interest expense increased to USD 250 million from USD 186 million. Principal is assumed refinanced at unchanged nominal balances, with no new borrowing used for distributions. The adverse reserve allows materially worse funding and settlement-liquidity costs; favorable cases still recognize the higher debt burden.",
+      "evidence_ids": [
+        "obs_f195301d7f0c5814bb70",
+        "obs_a631c8fa2b1b5cde7163",
+        "doc_71a50355bce001d0"
+      ],
+      "counterevidence": "The company had no commercial-paper or revolving-credit borrowings and remained covenant compliant. Existing debt terms may delay repricing. Conversely, the packet does not guarantee refinancing during a severe settlement or legal shock.",
+      "falsifier": "Refinancing becomes unavailable, debt principal rises to fund ordinary distributions, or incremental annual cash financing costs exceed USD 1,500 million.",
+      "review_trigger": "Review each debt issuance, credit-facility change and annual maturity schedule; immediately reconsider after a material rating, covenant or settlement-liquidity event."
+    },
+    {
+      "id": "first_year_growth",
+      "unit": "ratio",
+      "values": {
+        "low": -0.15,
+        "base": 0.08,
+        "high": 0.12
+      },
+      "allowed_range": {
+        "min": -0.35,
+        "max": 0.18
+      },
+      "rationale": "Forecast growth of residual cash after all modeled reinvestment and claim reserves. Base growth is below latest nine-month revenue and operating-income growth because cash conversion weakened. High growth requires improved conversion alongside network and services growth. Low growth imposes a further cash contraction on already impaired normalized economics, reflecting weaker spending, cross-border activity and operating leverage.",
+      "evidence_ids": [
+        "obs_9fa2f93baf4ef5ef4aec",
+        "obs_fa80375151a28dc3909e",
+        "obs_92795c4ae0c9a567a175",
+        "obs_72390aa5c7ab3dac866f",
+        "obs_8d842be20b4b4af169d6",
+        "doc_14480323856a489b"
+      ],
+      "counterevidence": "Current revenue growth could support faster residual cash growth; a severe disruption, adverse judgment or competitive repricing could produce a larger decline than modeled.",
+      "falsifier": "Trailing residual cash falls outside the allowed growth range after comparable treatment of incentives, compensation, software and acquisitions.",
+      "review_trigger": "Review each quarterly revenue, margin and cash-conversion update, with immediate review following a sustained cross-border or transaction decline."
+    },
+    {
+      "id": "second_year_growth",
+      "unit": "ratio",
+      "values": {
+        "low": 0.02,
+        "base": 0.08,
+        "high": 0.11
+      },
+      "allowed_range": {
+        "min": -0.2,
+        "max": 0.18
+      },
+      "rationale": "The low case recovers slowly because incentive commitments and service costs do not immediately reverse with payment volumes. Base and high cases sustain cash displacement and services distribution while remaining below the latest reported earnings growth.",
+      "evidence_ids": [
+        "doc_14480323856a489b",
+        "doc_71a50355bce001d0",
+        "obs_04124eaebcdcf491275d",
+        "obs_c20dc1ad3d7e713dd304"
+      ],
+      "counterevidence": "Post-downturn payment recovery can be faster than this low path. Structural payment-rail substitution or adverse regulation could prevent recovery.",
+      "falsifier": "Payment activity recovers but residual cash continues declining because incentives or operating costs absorb the recovery.",
+      "review_trigger": "Review the first annual filing after an observed downturn and the associated incentive and services disclosures."
+    },
+    {
+      "id": "later_growth",
+      "unit": "ratio",
+      "values": {
+        "low": 0.04,
+        "base": 0.07,
+        "high": 0.09
+      },
+      "allowed_range": {
+        "min": -0.05,
+        "max": 0.12
+      },
+      "rationale": "Years 3–5 moderate cash growth as the network becomes larger and competition for issuer portfolios, domestic rails and account-based payments limits incremental pricing. Growth is explicitly net of the physical-capital, software, acquisition, compensation and financing requirements embedded in the residual-cash starting point.",
+      "evidence_ids": [
+        "doc_14480323856a489b",
+        "obs_c68fd2e342b42efd346c",
+        "obs_683de8ae361a9dc337d2",
+        "obs_5d3a199797352c8e16cd"
+      ],
+      "counterevidence": "Services sold through existing distribution may sustain faster growth. Governments promoting local switching or customers demanding larger incentives may produce much weaker returns.",
+      "falsifier": "Multi-year residual cash growth falls below the range despite stable payment volumes, or preserving growth requires investment materially beyond the charged budgets.",
+      "review_trigger": "Reassess annually and after a material change in domestic-routing regulation, services mix or incentive intensity."
+    },
+    {
+      "id": "residual_distribution",
+      "unit": "ratio",
+      "value": 1,
+      "allowed_range": {
+        "min": 1,
+        "max": 1
+      },
+      "rationale": "Forecast all residual cash as cash distributions after funding every modeled investment and claim reserve. Historical dividends and repurchases demonstrate a substantial capital-return mechanism, but latest debt-supported returns are not extrapolated. This is an explicit owner-distribution policy assumption, not a forecast of announced dividends. No separate share-count benefit is credited.",
+      "evidence_ids": [
+        "doc_14480323856a489b",
+        "doc_71a50355bce001d0"
+      ],
+      "counterevidence": "Management may retain residual cash or pursue acquisitions beyond the charged budget, delaying shareholder realization.",
+      "falsifier": "Persistent accumulation of discretionary cash or spending beyond the modeled budgets prevents residual cash reaching shareholders.",
+      "review_trigger": "Review annual capital allocation and any material suspension of capital returns."
+    },
+    {
+      "id": "terminal_growth",
+      "unit": "ratio",
+      "values": {
+        "low": 0,
+        "base": 0.02,
+        "high": 0.03
+      },
+      "allowed_range": {
+        "min": -0.02,
+        "max": 0.04
+      },
+      "rationale": "Terminal growth applies to distributable cash after recurring investment, incentive funding, compensation, minority reserves and financing costs. Base and high growth allow continued digital-payment adoption but are substantially below explicit-period growth because routing competition and customer bargaining constrain mature economics. Low terminal cash is flat after a depressed cycle and incomplete recovery.",
+      "evidence_ids": [
+        "doc_14480323856a489b",
+        "doc_71a50355bce001d0"
+      ],
+      "counterevidence": "A durable services advantage could support higher mature growth, while regulated pricing or migration to competing rails could make even flat cash optimistic.",
+      "falsifier": "Mature organic cash growth requires shrinking the investment reserves, rising leverage or persistent market-share losses.",
+      "review_trigger": "Reconsider annually, after material payment-rail regulation, or when services growth stops reinforcing network economics."
+    },
+    {
+      "id": "discount_rate",
+      "unit": "ratio",
+      "values": {
+        "low": 0.12,
+        "base": 0.095,
+        "high": 0.08
+      },
+      "allowed_range": {
+        "min": 0.07,
+        "max": 0.18
+      },
+      "rationale": "These are declared required returns for levered parent common equity, not an imported market benchmark. High margins, diversified transaction activity and low physical-capital intensity support the favorable hurdle. The base requires additional compensation for debt-funded capital returns, incentive capital and terminal dependence. The adverse hurdle reflects correlated payment weakness, refinancing pressure, settlement guarantees and litigation risk.",
+      "evidence_ids": [
+        "doc_14480323856a489b",
+        "doc_71a50355bce001d0",
+        "obs_a631c8fa2b1b5cde7163",
+        "obs_92795c4ae0c9a567a175"
+      ],
+      "counterevidence": "Network resilience and available liquidity could make these hurdles demanding; a systemic settlement failure or adverse regulatory change could require a higher hurdle and different cash-flow scenarios.",
+      "falsifier": "The business becomes dependent on external equity, loses reliable refinancing access, or suffers a durable impairment of network pricing or interoperability.",
+      "review_trigger": "Reassess on every new primary annual report and any material financing, legal or network-structure change."
+    }
+  ],
+  "checklist": {
+    "normalization": {
+      "conclusion": "Trailing operating cash flow is USD 16,861 million, calculated from 2025 plus current nine-month cash flow less the comparative nine months. This is below full-year 2025 cash flow despite stronger latest earnings. The model deducts capital, software, SBC and customer-funding exclusions before applying scenario normalization; it does not substitute adjusted earnings or add back recurring legal costs. Historical 2020 operating-income and cash-flow declines demonstrate cycle sensitivity, while the adverse normalization also allows structural impairment.",
+      "evidence_ids": [
+        "obs_0599c47f4af30758e285",
+        "obs_92795c4ae0c9a567a175",
+        "obs_a2b08db3c26c74f12c17",
+        "obs_72390aa5c7ab3dac866f",
+        "obs_8d842be20b4b4af169d6",
+        "obs_04124eaebcdcf491275d",
+        "obs_30cb5f8e95ea0a280552",
+        "doc_71a50355bce001d0"
+      ]
+    },
+    "working_capital": {
+      "conclusion": "Latest nine-month prepaid cash outflows of USD 4,688 million substantially exceed incentive amortization of USD 2,030 million; accrued expenses contribute USD 1,660 million of cash. Those movements are not interchangeable with recurring earnings. Current and noncurrent incentive assets total USD 11,624 million versus USD 10,401 million at December 2025. The model keeps actual incentive funding inside cash flow, excludes customer-deposit inflows, and applies a normalization haircut rather than assuming an incentive-asset release. Trailing settlement asset and obligation cash movements together consume approximately USD 23 million and remain in the baseline.",
+      "evidence_ids": [
+        "doc_71a50355bce001d0",
+        "doc_14480323856a489b",
+        "obs_7c27d9ee1737950afb91"
+      ]
+    },
+    "maintenance_and_growth_capex": {
+      "conclusion": "Trailing property purchases are USD 779 million. All are deducted because the packet does not establish a reliable maintenance/growth split. Software receives an additional USD 750 million annual reserve, above trailing capitalization of USD 652 million. A USD 1,300 million acquisition budget funds inorganic capability renewal. Growth assumptions describe residual cash after these requirements; neither goodwill nor the funded investment budgets are added separately at realization.",
+      "evidence_ids": [
+        "obs_17fdb6149440bbba935a",
+        "obs_89487e196fc1eca0100e",
+        "obs_776b556107f80017a656",
+        "obs_de1066544165082c0fd0",
+        "obs_56fa6f8a727f2da2d200",
+        "doc_71a50355bce001d0",
+        "doc_14480323856a489b"
+      ]
+    },
+    "financing_scope": {
+      "conclusion": "Cash flows are levered equity residuals, not unlevered enterprise cash flows. Latest debt is USD 23,938 million; its existing interest is already included in operating cash flow, and additional financing drag is reserved. Refinancing maintains principal rather than generating distributable borrowing proceeds. Latest unrestricted cash of USD 10,147 million and current investments remain operating liquidity, with their income embedded and no separate cash addition. Restricted cash and customer deposits are unavailable. Minority and other residual financing outflows receive a separate reserve. Mastercard is not an account-holder lender, but settlement guarantees remain a material liquidity risk. Latest buybacks and dividends exceed operating cash after physical and software investment, so those actual returns are not directly extrapolated.",
+      "evidence_ids": [
+        "obs_f195301d7f0c5814bb70",
+        "obs_a631c8fa2b1b5cde7163",
+        "obs_c6a9d9d2d4f6e58c318d",
+        "obs_f2bfe4c7c915316d8cab",
+        "doc_71a50355bce001d0",
+        "doc_14480323856a489b"
+      ]
+    },
+    "dilution": {
+      "conclusion": "Use the verified 2026 third-quarter diluted weighted-average denominator of 876 million shares, newer than the annual baseline and consistent with the packet's verified split basis. Trailing SBC of USD 637 million is charged as a cash-equivalent funding requirement. Future repurchases do not also reduce the denominator. This assumes compensation dilution is neutralized through the charged reserve or equivalent cash compensation. The packet has no listing ratio: these are Mastercard common-share cash flows, with no ADR or ADS conversion.",
+      "evidence_ids": [
+        "obs_8b44072d133d23006e6d",
+        "obs_df253d924f73aed7e942",
+        "obs_352a2102d8679ca98a41",
+        "obs_d687d0fcda14ec55f544",
+        "doc_71a50355bce001d0"
+      ]
+    },
+    "terminal": {
+      "conclusion": "End-year-5 realization sells the continuing parent equity claim for next-year distributable cash divided by the equity hurdle less mature growth. This is an equity capitalization after interest and recurring investment, so debt is not deducted again. Cash, investments and acquired intangibles receive no separate proceeds. All residual cash is distributed during the explicit period; investment budgets remain deducted and are not accumulated as an additional exit asset. Terminal cash growth slows materially and the low case never restores current cash earning power. Terminal proceeds are the largest uncertain driver and depend on continued network relevance and refinancing access.",
+      "evidence_ids": [
+        "doc_14480323856a489b",
+        "doc_71a50355bce001d0",
+        "obs_a631c8fa2b1b5cde7163"
+      ]
+    },
+    "method_selection": {
+      "conclusion": "Consolidated operating cash economics best describe an interdependent payments and services franchise. Sum-of-parts is the strongest alternative, but separate valuations would require unsupported allocations of shared customers, data and distribution. Financial-equity valuation would misclassify settlement infrastructure as a credit-issuing business; asset NAV would miss the network's principal economic claim.",
+      "evidence_ids": [
+        "doc_14480323856a489b",
+        "doc_71a50355bce001d0"
+      ]
+    },
+    "scenario_coherence": {
+      "conclusion": "The low case combines a permanent normalization haircut, an additional first-year cash contraction, slow recovery, higher financing costs and flat terminal growth. It therefore reduces earning power and distributions, not merely an exit multiple on peak earnings. All three modeled paths remain cash-positive after investment and financing reserves, so none requires external equity in the explicit period. No debt issuance finances distributions. Common shareholders receive the residual after operating, financing and minority claims and have no contractual obligation to fund creditor shortfalls; terminal equity is floored at zero. A shock that exhausts liquidity or prevents refinancing falsifies this going-concern model and requires explicit funding, dilution and creditor-waterfall scenarios rather than silently flooring annual funding needs.",
+      "evidence_ids": [
+        "obs_92795c4ae0c9a567a175",
+        "obs_04124eaebcdcf491275d",
+        "obs_30cb5f8e95ea0a280552",
+        "doc_71a50355bce001d0",
+        "doc_14480323856a489b"
+      ]
+    }
+  },
+  "components": [
+    {
+      "id": "business",
+      "category": "operating_business",
+      "claim_scope": "Distributions and end-year-5 realization proceeds attributable to existing Mastercard parent common equity, per verified diluted common share, after operating investment, compensation funding, existing interest and taxes, acquisition spending, additional financing costs and minority or residual financing reserves.",
+      "scope_reconciliation": "Start with consolidated reported operating cash flow and update the annual baseline to the latest trailing period. Deduct all physical investment, software investment, cash-equivalent SBC, customer-funding inflows, acquisitions and residual nonparent claims. Existing debt interest and cash investment income remain embedded. Maintain existing financing principal through refinancing without distributing new net borrowing; reserve additional financing costs and allow those costs to grow within the residual-cash forecast. Retain existing cash and financial assets as operating liquidity and portfolio assets, without separate principal additions. Forecast residual distributions as cash payments with a constant diluted denominator. The terminal claim is levered equity after continuing financing costs, not enterprise value. Creditors and outside owners have priority; common shareholders have limited liability. All modeled annual residuals are positive, and terminal equity realization is floored at zero.",
+      "drivers": [
+        {
+          "id": "ocf_annual_plus_current",
+          "op": "add",
+          "args": [
+            "ocf_2025",
+            "ocf_2026_ytd"
+          ],
+          "unit": "USD"
+        },
+        {
+          "id": "ocf_ttm",
+          "op": "subtract",
+          "args": [
+            "ocf_annual_plus_current",
+            "ocf_2025_ytd"
+          ],
+          "unit": "USD"
+        },
+        {
+          "id": "ppe_annual_plus_current",
+          "op": "add",
+          "args": [
+            "ppe_2025",
+            "ppe_2026_ytd"
+          ],
+          "unit": "USD"
+        },
+        {
+          "id": "ppe_ttm",
+          "op": "subtract",
+          "args": [
+            "ppe_annual_plus_current",
+            "ppe_2025_ytd"
+          ],
+          "unit": "USD"
+        },
+        {
+          "id": "sbc_annual_plus_current",
+          "op": "add",
+          "args": [
+            "sbc_2025",
+            "sbc_2026_ytd"
+          ],
+          "unit": "USD"
+        },
+        {
+          "id": "sbc_ttm",
+          "op": "subtract",
+          "args": [
+            "sbc_annual_plus_current",
+            "sbc_2025_ytd"
+          ],
+          "unit": "USD"
+        },
+        {
+          "id": "compensation_funding",
+          "op": "multiply",
+          "args": [
+            "sbc_ttm",
+            "sbc_cash_funding"
+          ],
+          "unit": "USD"
+        },
+        {
+          "id": "capital_compensation_and_customer_funding",
+          "op": "sum",
+          "args": [
+            "ppe_ttm",
+            "software_investment",
+            "compensation_funding",
+            "customer_funding_exclusion"
+          ],
+          "unit": "USD"
+        },
+        {
+          "id": "cash_before_normalization",
+          "op": "subtract",
+          "args": [
+            "ocf_ttm",
+            "capital_compensation_and_customer_funding"
+          ],
+          "unit": "USD"
+        },
+        {
+          "id": "normalized_cash",
+          "op": "multiply",
+          "args": [
+            "cash_before_normalization",
+            "normalization"
+          ],
+          "unit": "USD"
+        },
+        {
+          "id": "additional_investment_and_claims",
+          "op": "sum",
+          "args": [
+            "acquisition_budget",
+            "other_parent_claims",
+            "refinancing_drag"
+          ],
+          "unit": "USD"
+        },
+        {
+          "id": "initial_residual_cash",
+          "op": "subtract",
+          "args": [
+            "normalized_cash",
+            "additional_investment_and_claims"
+          ],
+          "unit": "USD"
+        },
+        {
+          "id": "first_year_factor",
+          "op": "add",
+          "args": [
+            1,
+            "first_year_growth"
+          ],
+          "unit": "ratio"
+        },
+        {
+          "id": "second_year_factor",
+          "op": "add",
+          "args": [
+            1,
+            "second_year_growth"
+          ],
+          "unit": "ratio"
+        },
+        {
+          "id": "later_year_factor",
+          "op": "add",
+          "args": [
+            1,
+            "later_growth"
+          ],
+          "unit": "ratio"
+        },
+        {
+          "id": "residual_y1",
+          "op": "multiply",
+          "args": [
+            "initial_residual_cash",
+            "first_year_factor"
+          ],
+          "unit": "USD"
+        },
+        {
+          "id": "residual_y2",
+          "op": "multiply",
+          "args": [
+            "residual_y1",
+            "second_year_factor"
+          ],
+          "unit": "USD"
+        },
+        {
+          "id": "residual_y3",
+          "op": "multiply",
+          "args": [
+            "residual_y2",
+            "later_year_factor"
+          ],
+          "unit": "USD"
+        },
+        {
+          "id": "residual_y4",
+          "op": "multiply",
+          "args": [
+            "residual_y3",
+            "later_year_factor"
+          ],
+          "unit": "USD"
+        },
+        {
+          "id": "residual_y5",
+          "op": "multiply",
+          "args": [
+            "residual_y4",
+            "later_year_factor"
+          ],
+          "unit": "USD"
+        },
+        {
+          "id": "distribution_y1",
+          "op": "multiply",
+          "args": [
+            "residual_y1",
+            "residual_distribution"
+          ],
+          "unit": "USD"
+        },
+        {
+          "id": "distribution_y2",
+          "op": "multiply",
+          "args": [
+            "residual_y2",
+            "residual_distribution"
+          ],
+          "unit": "USD"
+        },
+        {
+          "id": "distribution_y3",
+          "op": "multiply",
+          "args": [
+            "residual_y3",
+            "residual_distribution"
+          ],
+          "unit": "USD"
+        },
+        {
+          "id": "distribution_y4",
+          "op": "multiply",
+          "args": [
+            "residual_y4",
+            "residual_distribution"
+          ],
+          "unit": "USD"
+        },
+        {
+          "id": "distribution_y5",
+          "op": "multiply",
+          "args": [
+            "residual_y5",
+            "residual_distribution"
+          ],
+          "unit": "USD"
+        },
+        {
+          "id": "distribution_ps_y1",
+          "op": "divide",
+          "args": [
+            "distribution_y1",
+            "shares"
+          ],
+          "unit": "USD per share"
+        },
+        {
+          "id": "distribution_ps_y2",
+          "op": "divide",
+          "args": [
+            "distribution_y2",
+            "shares"
+          ],
+          "unit": "USD per share"
+        },
+        {
+          "id": "distribution_ps_y3",
+          "op": "divide",
+          "args": [
+            "distribution_y3",
+            "shares"
+          ],
+          "unit": "USD per share"
+        },
+        {
+          "id": "distribution_ps_y4",
+          "op": "divide",
+          "args": [
+            "distribution_y4",
+            "shares"
+          ],
+          "unit": "USD per share"
+        },
+        {
+          "id": "distribution_ps_y5",
+          "op": "divide",
+          "args": [
+            "distribution_y5",
+            "shares"
+          ],
+          "unit": "USD per share"
+        },
+        {
+          "id": "terminal_growth_factor",
+          "op": "add",
+          "args": [
+            1,
+            "terminal_growth"
+          ],
+          "unit": "ratio"
+        },
+        {
+          "id": "terminal_next_distribution",
+          "op": "multiply",
+          "args": [
+            "distribution_y5",
+            "terminal_growth_factor"
+          ],
+          "unit": "USD"
+        },
+        {
+          "id": "terminal_capitalization_spread",
+          "op": "subtract",
+          "args": [
+            "discount_rate",
+            "terminal_growth"
+          ],
+          "unit": "ratio"
+        },
+        {
+          "id": "continuing_equity_proceeds",
+          "op": "divide",
+          "args": [
+            "terminal_next_distribution",
+            "terminal_capitalization_spread"
+          ],
+          "unit": "USD"
+        },
+        {
+          "id": "limited_liability_equity_proceeds",
+          "op": "maximum",
+          "args": [
+            0,
+            "continuing_equity_proceeds"
+          ],
+          "unit": "USD"
+        },
+        {
+          "id": "equity_realization_ps",
+          "op": "divide",
+          "args": [
+            "limited_liability_equity_proceeds",
+            "shares"
+          ],
+          "unit": "USD per share"
+        },
+        {
+          "id": "total_realization_year_ps",
+          "op": "add",
+          "args": [
+            "distribution_ps_y5",
+            "equity_realization_ps"
+          ],
+          "unit": "USD per share"
+        }
+      ],
+      "discount_rate_ref": "discount_rate",
+      "cashflows": [
+        {
+          "year": 1,
+          "amount_ref": "distribution_ps_y1"
+        },
+        {
+          "year": 2,
+          "amount_ref": "distribution_ps_y2"
+        },
+        {
+          "year": 3,
+          "amount_ref": "distribution_ps_y3"
+        },
+        {
+          "year": 4,
+          "amount_ref": "distribution_ps_y4"
+        },
+        {
+          "year": 5,
+          "amount_ref": "total_realization_year_ps"
+        }
+      ]
+    }
+  ]
+}
