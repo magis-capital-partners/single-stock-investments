@@ -47,19 +47,50 @@ def text_of(raw):
     return ' '.join(html.unescape(re.sub(r'<[^>]+>', ' ', raw)).split())
 
 
+def requested_keywords(gaps):
+    """Balance explicit disclosure requests; model text never chooses URLs/tools."""
+    groups = []
+    excluded = {'missing', 'evidence', 'primary', 'source', 'required', 'financial', 'report',
+                'statement', 'company', 'specific', 'retrieve', 'contexts', 'expanded', 'still',
+                'omit', 'from', 'with', 'that', 'these', 'this', 'have', 'need', 'needed'}
+    for gap in gaps[:12]:
+        detail = str(gap.get('detail') or '')[:8000]
+        search = re.split(r'search terms\s*:', detail, maxsplit=1, flags=re.I)[-1]
+        quoted = re.findall(r"['\u2018\u2019\"\u201c\u201d]([^'\u2018\u2019\"\u201c\u201d\n]{2,120})['\u2018\u2019\"\u201c\u201d]", search)
+        terms = [' '.join(t.lower().split()) for t in quoted
+                 if re.fullmatch(r"[A-Za-z][A-Za-z0-9 ()/,&.'-]{1,119}", t)]
+        if not terms:
+            terms = [w.lower() for w in re.findall(r'[A-Za-z]{4,35}', str(gap.get('code') or '')+' '+detail)
+                     if w.lower() not in excluded]
+        groups.append(list(dict.fromkeys(terms))[:12])
+    terms = []
+    for index in range(12):
+        for group in groups:
+            if index < len(group) and group[index] not in terms:
+                terms.append(group[index])
+                if len(terms) == 18:
+                    return terms
+    return terms
+
+
 def document_record(url, raw, focus_keywords=()):
     require(len(raw) <= 20_000_000, 'Primary filing exceeds the bounded evidence size')
     source = raw.decode('utf-8', errors='replace')
     words = ('cash', 'debt', 'assets', 'liabilities', 'inventory', 'capital', 'operating', 'shares',
              'revenue', 'credit', 'receivables', 'segment', 'net income', 'financing')
-    focus = tuple(w.lower() for w in focus_keywords if re.fullmatch(r'[A-Za-z_]{4,35}', w))[:12]
+    focus = tuple(' '.join(w.lower().split()) for w in focus_keywords
+                  if re.fullmatch(r"[A-Za-z][A-Za-z0-9_ ()/,&.'-]{1,119}", w))[:18]
     tables = []
-    for table in re.findall(r'<table\b.*?</table>', source, flags=re.IGNORECASE | re.DOTALL):
-        text = text_of(table)
+    for table in re.finditer(r'<table\b.*?</table>', source, flags=re.IGNORECASE | re.DOTALL):
+        text = text_of(table.group())
         if 80 <= len(text) <= 16000:
             score = sum(w in text.lower() for w in words)+5*sum(w in text.lower() for w in focus)
             if score >= 3:
-                tables.append((score, text))
+                # Scale, title and period often sit just outside the table.
+                # Keep adjacent primary text so supplemental facts can quote
+                # an actual scale header rather than infer a multiplier.
+                prefix = text_of(source[max(0, table.start()-15000):table.start()])[-1000:]
+                tables.append((score, (prefix+' '+text).strip()))
     contexts, seen, size = [], set(), 0
     for _, text in sorted(tables, key=lambda item: (-item[0], len(item[1]))):
         if text in seen or size+len(text) > 85000:
@@ -70,16 +101,32 @@ def document_record(url, raw, focus_keywords=()):
         if len(contexts) >= 30:
             break
     body = text_of(source)
+    def add_context(text):
+        nonlocal size
+        if text and text not in seen and size+len(text) <= 150000:
+            contexts.append(text)
+            seen.add(text)
+            size += len(text)
     # Business economics and risks are not limited to financial tables.
-    for phrase in ('our business', 'business overview', 'competition', 'working capital',
+    defaults = ('our business', 'business overview', 'competition', 'working capital',
                    'liquidity', 'regulatory capital', 'credit', 'clinical', 'inventory', 'warrant', 'dilution',
-                   'depositary', 'each ads')+focus:
+                   'depositary', 'each ads')
+    for phrase in defaults:
         matches = list(re.finditer(re.escape(phrase), body, flags=re.IGNORECASE))
         if matches:
             selected = matches[:3] if phrase in ('depositary', 'each ads') else [matches[min(1, len(matches)-1)]]
             for match in selected:
                 start = match.start()
-                contexts.append(body[max(0, start-250):start+2300])
+                add_context(body[max(0, start-250):start+2300])
+    for phrase in focus:
+        matches = list(re.finditer(re.escape(phrase), body, flags=re.IGNORECASE))
+        # A contents mention is not the disclosure. Prefer the occurrence
+        # surrounded by other requested concepts, with a stable document order.
+        matches.sort(key=lambda m: (-sum(w in body[max(0, m.start()-400):m.start()+2300].lower()
+                                            for w in focus), m.start()))
+        if matches:
+            start = matches[0].start()
+            add_context(body[max(0, start-400):start+2600])
     require(contexts, 'No financial tables could be frozen from '+url)
     return {'id': 'doc_'+digest(url)[:16], 'source_url': url,
             'content_hash': hashlib.sha256(raw).hexdigest(), 'contexts': contexts}
