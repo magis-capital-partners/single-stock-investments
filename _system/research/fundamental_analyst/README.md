@@ -49,6 +49,13 @@ The script is additive.
 Probability was not stated on the 2026-10-28 calls, so those specs are
 diagnostic. They are not calibration-eligible and they are not Brier-scored.
 
+The automerge gate rejects a Cursor pull request that does not add
+`{TICKER}/research/research_agent_manifest.json` or committee artifacts.
+The script writes that manifest and a matching `agent_run_state.json` when
+the ticker has primary evidence and does not already have the pair. A ticker
+with no primary evidence, including 1211.HK until PR #1332 lands its
+documents, is skipped so the gate is not handed a manifest it would reject.
+
 ## What this refresh does not do
 
 It does not delete or rewrite existing research. It does not touch broker,

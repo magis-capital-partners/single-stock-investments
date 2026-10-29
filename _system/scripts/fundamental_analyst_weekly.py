@@ -40,7 +40,9 @@ if str(SCRIPTS) not in sys.path:
 
 from agent_proposals import submit  # noqa: E402
 from agent_schema import validate  # noqa: E402
+from build_research_agent_manifest import build_manifest  # noqa: E402
 from falsifier_specs import spec_errors  # noqa: E402
+from validate_research_pr_provenance import validate as validate_provenance  # noqa: E402
 
 REL_DIR = Path("_system/research/fundamental_analyst")
 OBS_NAME = "observations.jsonl"
@@ -535,6 +537,39 @@ def _write_if_absent(path: Path, text: str) -> bool:
     return True
 
 
+def write_provenance(ticker: str, root: Path, as_of: str) -> str | None:
+    """Add the pair the automerge gate requires, without replacing one that exists.
+
+    The gate fails a Cursor pull request that does not add
+    ``research_agent_manifest.json`` or committee artifacts. A ticker with no
+    primary evidence cannot set ``primary_evidence_ready``, so it is skipped
+    rather than written in a form the gate would reject.
+    """
+    manifest_path = root / ticker / "research" / "research_agent_manifest.json"
+    state_path = root / ticker / "research" / "agent_run_state.json"
+    if manifest_path.exists() or state_path.exists():
+        return None
+    built = build_manifest(ticker, "fundamental_analyst_case_log")
+    if not built.get("primary_evidence_ready"):
+        return None
+    manifest_path.parent.mkdir(parents=True, exist_ok=True)
+    manifest_path.write_text(json.dumps(built, indent=2) + "\n", encoding="utf-8")
+    state = {
+        "schema_version": "1.0",
+        "consumer": "marvin_research",
+        "ticker": ticker,
+        "evidence_hash": built["evidence_hash"],
+        "reason": "fundamental_analyst_case_log",
+        "manifest_path": manifest_path.relative_to(root).as_posix(),
+        "completed_at": f"{as_of}T18:00:00+00:00",
+    }
+    state_path.write_text(json.dumps(state, indent=2) + "\n", encoding="utf-8")
+    problems = validate_provenance(built, state, ticker)
+    if problems:
+        raise ValueError(f"{ticker} provenance: {problems}")
+    return manifest_path.relative_to(root).as_posix()
+
+
 def _thesis_card(ticker: str, calls: list[dict[str, Any]]) -> dict[str, Any]:
     meta = CARD_IRR[ticker]
     base = meta["base_irr_pct"]
@@ -768,6 +803,12 @@ def materialize(calls: list[dict[str, Any]], *, root: Path, as_of: str, case_log
         if _write_if_absent(root / rel, json.dumps(card, indent=2, ensure_ascii=False) + "\n"):
             cards.append(rel)
 
+    provenance = []
+    for ticker in by_ticker:
+        rel = write_provenance(ticker, root, as_of)
+        if rel:
+            provenance.append(rel)
+
     proposal_ids = []
     if submit_proposals and not errors:
         for proposal in _proposals(calls, rank_rows, case_log_rel, rank_json_rel, as_of):
@@ -783,6 +824,7 @@ def materialize(calls: list[dict[str, Any]], *, root: Path, as_of: str, case_log
         "spec_ids_written": written_specs,
         "spec_ids_already_present": skipped_specs,
         "thesis_cards_written": cards,
+        "provenance_manifests": provenance,
         "proposal_ids": proposal_ids,
         "core_list_tickers_absent_from_rank": missing_from_rank,
         "evidence_notes_not_separate_specs": EVIDENCE_NOT_SEPARATE_SPECS,
@@ -834,6 +876,7 @@ def main(argv: list[str] | None = None) -> int:
         "spec_ids_written": result["spec_ids_written"],
         "spec_ids_already_present": result["spec_ids_already_present"],
         "thesis_cards_written": result["thesis_cards_written"],
+        "provenance_manifests": result["provenance_manifests"],
         "proposal_ids": result["proposal_ids"],
         "core_list_tickers_absent_from_rank": result["core_list_tickers_absent_from_rank"],
     }, indent=2))
