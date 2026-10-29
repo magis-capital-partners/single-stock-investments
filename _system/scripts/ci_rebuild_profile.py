@@ -40,6 +40,7 @@ DRIVE_API_STEPS = frozenset(
 
 # Each entry is argv after `python` (script path relative to repo root + args).
 PROFILES: dict[str, list[list[str]]] = {
+    "biotech-strategy": [["_system/scripts/build_biotech_strategy.py", "--record-paper"]],
     "minimal": [
         ["_system/scripts/build_dashboard_data.py"],
     ],
@@ -50,6 +51,7 @@ PROFILES: dict[str, list[list[str]]] = {
         ["_system/scripts/build_biotech_insider_scores.py"],
         ["_system/scripts/build_biotech_peer_short_stub.py"],
         ["_system/scripts/build_biotech_composite.py"],
+        ["_system/scripts/build_biotech_strategy.py", "--record-paper"],
         ["_system/scripts/repair_letter_dates.py", "--apply"],
         ["_system/scripts/build_index_membership.py"],
         ["_system/scripts/build_insights.py"],
@@ -106,6 +108,7 @@ PROFILES: dict[str, list[list[str]]] = {
         ["_system/scripts/build_biotech_insider_scores.py"],
         ["_system/scripts/build_biotech_peer_short_stub.py"],
         ["_system/scripts/build_biotech_composite.py"],
+        ["_system/scripts/build_biotech_strategy.py", "--record-paper"],
         ["_system/scripts/build_research_memory.py"],
         # Backfill compact agent-context cards for the whole universe.
         ["_system/scripts/refresh_core_compounders.py", "--write", "--propose"],

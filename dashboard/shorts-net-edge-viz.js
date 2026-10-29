@@ -77,7 +77,7 @@
     const d=doc?.net_edge_research;
     if(!d)return '';
     const c=d.cases.find(r=>r.id===d.primary_case);
-    return `<aside class="rsp-teaser"><div><p class="rsp-kicker">Shorts backtest · RSI-2.0</p><h2>Conviction, costs and position size.</h2><p>${num(d.coverage.events,0)} priced events · evidence frozen at announcement · conditional research</p></div><dl><div><dt>Fundamental ratings</dt><dd>${num(d.coverage.numeric_conviction,0)}</dd></div><div><dt>Names passing net-edge sizing</dt><dd>${num(c?.trades,0)}</dd></div></dl><a class="rsp-action" href="#/ideas/short-alpha/backtest">Open shorts backtest <span aria-hidden="true">↗</span></a></aside>`;
+    return `<aside class="rsp-teaser"><div><p class="rsp-kicker">Shorts backtest · RSI-2.0</p><h2>Conviction, costs and position size.</h2><p>${num(d.coverage.events,0)} priced events · evidence frozen at announcement · conditional research</p></div><dl><div><dt>Fundamental ratings</dt><dd>${num(d.coverage.numeric_conviction,0)}</dd></div><div><dt>Names passing net-edge sizing</dt><dd>${num(c?.trades,0)}</dd></div></dl><a class="rsp-action" href="#/strategies/systematic-shorts/backtest">Open shorts backtest <span aria-hidden="true">↗</span></a></aside>`;
   }
   global.ShortsNetEdgeViz={render,change,inspect,teaser};
 })(window);

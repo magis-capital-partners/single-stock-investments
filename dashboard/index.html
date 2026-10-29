@@ -10,6 +10,7 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600;700&family=DM+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
 <link href="insights-events.css" rel="stylesheet">
+<link href="strategy-workbench.css" rel="stylesheet">
 <link href="short-alpha.css?v=20261015-results" rel="stylesheet">
 <link href="third-plus-study.css?v=20261025-ssr-replay" rel="stylesheet">
 <link href="third-plus-forward.css?v=20261028-forward20" rel="stylesheet">
@@ -1879,7 +1880,9 @@
   <nav class="view-tabs workspace-subnav" id="strategies-subnav" aria-label="Strategies" hidden>
     <a class="view-tab" data-view="spx-0dte" href="#/strategies/spx-0dte/overview">SPX 0DTE</a>
     <a class="view-tab" data-view="letf" href="#/strategies/ls-algo/overview">LS Algo</a>
+    <a class="view-tab" data-view="systematic-shorts" href="#/strategies/systematic-shorts/overview">Systematic Shorts</a>
     <a class="view-tab" data-view="darwin" href="#/strategies/darwin/overview">Darwin CC <span class="nav-badge">SIGNAL</span></a>
+    <a class="view-tab" data-view="biotech-quant" href="#/strategies/biotech-quant/overview">Biotech Quant</a>
   </nav>
   <nav class="view-tabs workspace-subnav" id="research-subnav" aria-label="Research" hidden>
     <a class="view-tab compounder-tab" data-view="holdings" data-research-scope="compounders" href="#/research/compounders">Long Term Compounders</a>
@@ -1904,6 +1907,8 @@
   <section class="portfolio-panel" id="portfolio-panel" aria-label="IBKR portfolio"><div id="portfolio-content"></div></section>
   <section class="portfolio-panel" id="spx-0dte-panel" aria-label="SPX 0DTE strategy"><div id="spx-0dte-content"></div></section>
   <section class="portfolio-panel" id="letf-panel" aria-label="Leveraged ETF strategies"><div id="letf-content"></div></section>
+  <section class="strategy-panel" id="systematic-shorts-panel" data-strategy-panel aria-label="Systematic Shorts"><div class="strategy-workbench" id="systematic-shorts-content"></div></section>
+  <section class="strategy-panel" id="biotech-quant-panel" data-strategy-panel aria-label="Biotech Quant"><div class="strategy-workbench" id="biotech-quant-content"></div></section>
 
   <div class="holdings-view" id="holdings-view">
   <a class="compounder-entry" id="compounder-entry" href="#/research/compounders"><div><strong>Long Term Compounders</strong><span>Your quality-business watchlist · track valuations, entry prices and share buybacks</span></div><b aria-hidden="true">→</b></a>
@@ -2046,6 +2051,7 @@
 <script src="search-match.js"></script>
 <script src="energy-model-viz.js?v=20261015-energy"></script>
 <script src="insights-viz.js?v=20261028-investors"></script>
+<script src="strategy-workbench.js?v=20261029"></script>
 <link rel="stylesheet" href="fund-letters/reader.css?v=5">
 <script src="fund-letters/reader.js?v=5"></script>
 <script src="valuation-viz.js?v=20261027-market-sync"></script>
@@ -2161,6 +2167,11 @@ let data = null;
 let shortAlphaData = null;
 let shortAlphaPromise = null;
 let shortAlphaSection = 'ideas';
+const researchStrategyRoutes = {};
+let insightsTickerPage = 0;
+let memorySourceFilter = 'all';
+let memoryLifecycleFilter = 'current';
+let memoryReviewed = (() => { try { return JSON.parse(localStorage.getItem('ssp_memory_review_v2') || '{}'); } catch (_) { return {}; } })();
 let warrantData = null;
 let situationData = null;
 let situationPromise = null;
@@ -2313,7 +2324,7 @@ let insightsEventLastSeenAt = (() => {
 })();
 const INSIGHTS_LIVE_SECTIONS = new Set([
   'letters', 'podcasts', 'videos', 'inflections', 'events', 'index_watch', 'consensus',
-  'funds', 'documents', 'tickers', 'memory', 'sources', 'managers',
+  'funds', 'documents', 'tickers', 'memory', 'context', 'sources', 'managers',
 ]);
 let insightsSection = (() => {
   try {
@@ -2331,7 +2342,7 @@ let insightsEventTier = (() => {
     return 'signal';
   }
 })();
-let insightsTickerSourceFilter = 'ownership';
+let insightsTickerSourceFilter = 'all';
 let insightsTickerViewMode = (() => {
   try { return localStorage.getItem(TICKER_VIEW_KEY) || 'scan'; } catch (_) { return 'scan'; }
 })();
@@ -2339,7 +2350,7 @@ let insightsTickerSortMode = (() => {
   try { return localStorage.getItem(TICKER_SORT_KEY) || 'attention'; } catch (_) { return 'attention'; }
 })();
 let insightsTickerGapsMode = 'attention';
-let insightsTickerInsiderTier = 'signal';
+let insightsTickerInsiderTier = 'all';
 let tickerInsightsSelectedTicker = null;
 let insightsPdfSourceTab = 'all';
 let insightsPdfTimeMode = 'period';
@@ -2392,7 +2403,6 @@ const TICKER_VIEW_KEY = 'ssp_ticker_view_v1';
 const TICKER_SORT_KEY = 'ssp_ticker_sort_v1';
 const MEMORY_VIEW_KEY = 'ssp_memory_view_v1';
 const MEMORY_TYPE_KEY = 'ssp_memory_type_v1';
-const BIOTECH_SCOPE_KEY = 'ssp_biotech_scope_v1';
 const WATCHLIST_VIEW_KEY = 'ssp_watchlist_view_v1';
 const WATCHLIST_VIEWS = new Set(['all', 'queue', 'nol', 'banks', 'rock', 'buybacks']);
 const SITUATION_LANE_IDS = {
@@ -2442,17 +2452,6 @@ let memoryViewMode = (() => {
 let memoryTypeFilter = (() => {
   try { return localStorage.getItem(MEMORY_TYPE_KEY) || 'all'; } catch (_) { return 'all'; }
 })();
-let memoryBiotechOnly = false;
-let biotechScope = (() => {
-  try { return localStorage.getItem(BIOTECH_SCOPE_KEY) || 'book'; } catch (_) { return 'book'; }
-})();
-let biotechConvergenceOnly = false;
-let biotechSpendQ4 = false;
-let biotechSizeFilter = 'all';
-let biotechIssuerSizeFilter = 'all';
-let biotechSearch = '';
-let biotechShowLimit = 40;
-
 function normalizeAppHash(nextHash) {
   if (nextHash == null || nextHash === '') return '';
   return nextHash.startsWith('#') ? nextHash : `#${nextHash}`;
@@ -2473,6 +2472,8 @@ function setAppHash(nextHash) {
 }
 
 function parseRouteFromHashString(hash) {
+  const researchStrategy = typeof StrategyWorkbench === 'undefined' ? null : StrategyWorkbench.parseRoute(hash);
+  if (researchStrategy) return researchStrategy;
   hash = String(hash || '').split('?')[0];
   const portfolioMatch = /^#\/portfolio(?:\/(all|drew|michael))?(?:\/(positions|realized|risk|margin|performance|orders|reconciliation))?$/i.exec(hash || '');
   if (portfolioMatch) {
@@ -2519,7 +2520,7 @@ function parseRouteFromHashString(hash) {
   const investorMatch=/^#\/insights\/investors(?:\/(signals|directory))?$/i.exec(hash || '');
   if (investorMatch) return {view:'insights',insightsSection:investorMatch[1]==='directory'?'managers':'consensus',ticker:null,watchlistSub:null};
   if (/^#\/insights\/index-watch$/i.test(hash)) return {view:'situations',situationLane:'forced_sellers',ticker:null,watchlistSub:null};
-  const insightsMatch = /^#\/insights\/(overview|activism|data-health|letters|podcasts|videos|inflections|events|index-watch|consensus|funds|documents|tickers|memory|sources|managers)$/i.exec(hash || '');
+  const insightsMatch = /^#\/insights\/(overview|activism|data-health|letters|podcasts|videos|inflections|events|index-watch|consensus|funds|documents|tickers|memory|context|sources|managers)$/i.exec(hash || '');
   if (insightsMatch) {
     const section = insightsMatch[1].toLowerCase();
     return { view: section === 'activism' ? 'activist' : 'insights', insightsSection: section === 'data-health' ? 'sources' : section === 'overview' ? 'events' : section.replace('-', '_'), ticker: null, watchlistSub: null };
@@ -2573,6 +2574,8 @@ function syncRouteHash() {
     setAppHash(`#/strategies/spx-0dte/${window.PortfolioViz?.state.strategySection || 'overview'}`);
   } else if (activeView === 'letf') {
     setAppHash(`#/strategies/ls-algo/${window.PortfolioViz?.state.strategySection || 'overview'}`);
+  } else if (['systematic-shorts', 'biotech-quant'].includes(activeView)) {
+    setAppHash(researchStrategyRoutes[activeView] || `#/strategies/${activeView}/overview`);
   } else if (activeView === 'darwin') {
     setAppHash(`#/strategies/darwin/${darwinViewMode || 'overview'}`);
   } else if (activeView === 'holdings') {
@@ -2596,7 +2599,7 @@ function syncRouteHash() {
   } else if (activeView === 'activist') {
     setAppHash('#/insights/activism');
   } else if (activeView === 'insights') {
-    setAppHash(insightsSection === 'sources' ? '#/data-status' : insightsSection === 'managers' ? '#/insights/investors/directory' : insightsSection === 'consensus' ? '#/insights/investors/signals' : `#/insights/${String(insightsSection || 'events').replace('_', '-')}`);
+    setAppHash(insightsSection === 'sources' ? '#/data-status' : insightsSection === 'managers' ? '#/insights/investors/directory' : insightsSection === 'consensus' ? '#/insights/investors/signals' : `#/insights/${String(insightsSection || 'events').replace('_', '-')}${location.hash.split('?')[1] ? '?' + location.hash.split('?')[1] : ''}`);
   } else if (activeView === 'risk') {
     setAppHash('#/market-risk');
   } else if ((activeView === 'drew' || activeView === 'michael') && sleevePrefill[activeView]) {
@@ -2610,6 +2613,30 @@ function applyRouteFromHash() {
   if (!data) return false;
   const route = parseRouteFromHash();
   if (!route) return false;
+  if (['systematic-shorts', 'biotech-quant'].includes(route.view)) {
+    researchStrategyRoutes[route.view] = StrategyWorkbench.route(route.view, route.strategySection, Object.fromEntries(new URLSearchParams(route.query || '')));
+    if (route.canonical) setAppHash(researchStrategyRoutes[route.view]);
+  }
+  if (route.view === 'insights' && route.insightsSection === 'memory' && memoryViewMode === 'biotech') {
+    memoryViewMode = 'ledger';
+    try { localStorage.setItem(MEMORY_VIEW_KEY, 'ledger'); } catch (_) {}
+    setAppHash('#/strategies/biotech-quant/overview');
+    return applyRouteFromHash();
+  }
+  if (route.view === 'insights') {
+    const filters = new URLSearchParams(location.hash.split('?')[1] || '');
+    if (filters.has('q')) fundRegistrySearch = filters.get('q') || '';
+    if (filters.has('ticker')) tickerInsightsSelectedTicker = filters.get('ticker') || null;
+    if (filters.has('page')) insightsTickerPage = Math.max(0, Number(filters.get('page')) || 0);
+    if (filters.has('scan')) insightsTickerViewMode = filters.get('scan');
+    if (filters.has('sort')) insightsTickerSortMode = filters.get('sort');
+    if (filters.has('source')) insightsTickerSourceFilter = filters.get('source');
+    if (filters.has('book')) insightsBookOnly = filters.get('book') === '1';
+    if (filters.has('memory')) memoryViewMode = filters.get('memory');
+    if (filters.has('topic')) memoryTypeFilter = filters.get('topic');
+    if (filters.has('claim-source')) memorySourceFilter = filters.get('claim-source');
+    if (filters.has('claim-state')) memoryLifecycleFilter = filters.get('claim-state');
+  }
   if (route.view === 'holdings') researchScope = route.researchScope === 'compounders' ? 'compounders' : 'coverage';
   if (route.view === 'watchlist' && route.watchlistSub && WATCHLIST_VIEWS.has(route.watchlistSub)) {
     watchlistViewMode = route.watchlistSub === 'queue' ? 'all' : route.watchlistSub;
@@ -3569,7 +3596,8 @@ const INSIGHTS_SECTION_FILES = {
   index_watch: ['index_membership'],
   documents: ['document_catalog'],
   memory: ['research_memory'],
-  tickers: ['world_model', 'hk_snowball', 'energy', 'commodity_models'],
+  tickers: [],
+  context: ['world_model', 'hk_snowball', 'energy', 'commodity_models'],
 };
 
 function insightsSectionReady(section) {
@@ -3922,7 +3950,6 @@ function renderShortAlpha() {
   const rerender = () => renderShortAlpha();
   content.innerHTML = ShortAlphaViz.render(shortAlphaData);
   ShortAlphaViz.attach(content, shortAlphaData, rerender);
-  mountReverseSplitsSection(content);
 }
 
 // `dashboard/data/reverse_splits.json` (reverse-splits lane; Phase 3 of
@@ -4115,7 +4142,7 @@ function setView(view, opts = {}) {
   }
   activeView = view;
   if(view === 'holdings') Compounders.load().then(()=>{if(activeView==='holdings')renderTable();}).catch(()=>{});
-  const parentView = ['spx-0dte', 'letf', 'darwin'].includes(view) ? 'strategies'
+  const parentView = ['spx-0dte', 'letf', 'systematic-shorts', 'darwin', 'biotech-quant'].includes(view) ? 'strategies'
     : ['holdings', 'valuation'].includes(view) ? 'research'
       : ['watchlist', 'short-alpha', 'warrants', 'situations'].includes(view) ? 'ideas'
         : ['insights', 'activist'].includes(view) ? 'insights'
@@ -4167,6 +4194,13 @@ function setView(view, opts = {}) {
   if (view === 'insights') renderInsights();
   if (view === 'activist') renderActivist();
   if (view === 'darwin') renderDarwin();
+  for (const kind of ['systematic-shorts', 'biotech-quant']) {
+    document.getElementById(`${kind}-panel`)?.classList.toggle('active', view === kind);
+    if (view === kind) {
+      if (opts.syncHash !== false) syncRouteHash();
+      StrategyWorkbench.open(kind, document.getElementById(`${kind}-content`), {mountLegacy: mountReverseSplitsSection, loadShortSignals: loadShortAlpha});
+    }
+  }
   if (view === 'drew' || view === 'michael') renderSleeveTab(view);
   if (view === 'portfolio' && window.PortfolioViz) PortfolioViz.openPortfolio(() => syncRouteHash());
   if (view === 'spx-0dte' && window.PortfolioViz) PortfolioViz.openStrategy('spx_0dte', () => syncRouteHash());
@@ -4438,6 +4472,9 @@ function renderInsights(opts = {}) {
     return;
   }
   const refocusSearch = Boolean(opts.refocusSearch);
+  const routeFilters = new URLSearchParams(location.hash.split('?')[1] || '');
+  if (routeFilters.has('q')) fundRegistrySearch = routeFilters.get('q') || '';
+  if (routeFilters.has('ticker')) tickerInsightsSelectedTicker = routeFilters.get('ticker');
   const loading = document.getElementById('insights-loading');
   const content = document.getElementById('insights-content');
   if (!insightsSectionReady(insightsSection)) {
@@ -4510,6 +4547,7 @@ function renderInsights(opts = {}) {
     tickerGapsMode: insightsTickerGapsMode,
     tickerInsiderTier: insightsTickerInsiderTier,
     tickerSelectedTicker: tickerInsightsSelectedTicker,
+    tickerPage: insightsTickerPage,
     kpiTrends: data.kpi_trends || null,
     respiratoryModel: data.respiratory_model || null,
     indexMembership: data.index_membership || null,
@@ -4520,20 +4558,34 @@ function renderInsights(opts = {}) {
     eventLastSeenAt: insightsEventLastSeenAt,
     memoryViewMode,
     memoryTypeFilter,
-    memoryBiotechOnly,
-    biotechScope,
-    biotechConvergenceOnly,
-    biotechSpendQ4,
-    biotechSizeFilter,
-    biotechIssuerSizeFilter,
-    biotechSearch,
-    biotechShowLimit,
+    memorySourceFilter,
+    memoryLifecycleFilter,
+    memoryReviewed,
   });
+  if (activeView === 'insights' && ['tickers','memory'].includes(insightsSection)) {
+    const filters = new URLSearchParams();
+    if (fundRegistrySearch) filters.set('q', fundRegistrySearch);
+    filters.set('book', insightsBookOnly ? '1' : '0');
+    if (insightsSection === 'tickers') {
+      filters.set('scan', insightsTickerViewMode); filters.set('sort', insightsTickerSortMode); filters.set('source', insightsTickerSourceFilter);
+      if (insightsTickerPage) filters.set('page', insightsTickerPage);
+      if (tickerInsightsSelectedTicker) filters.set('ticker', tickerInsightsSelectedTicker);
+    } else {
+      filters.set('memory', memoryViewMode); filters.set('topic', memoryTypeFilter); filters.set('claim-source', memorySourceFilter); filters.set('claim-state', memoryLifecycleFilter);
+    }
+    history.replaceState(null, '', location.hash.split('?')[0] + '?' + filters);
+  }
   if (insightsSection === 'consensus' && window.WorkspaceTools) content.insertAdjacentHTML('afterbegin',WorkspaceTools.investorNav(false));
   if (window.EnergyModelViz) EnergyModelViz.bind(content);
   content.classList.toggle('insights-condensed',['tickers','memory'].includes(insightsSection));
   CommodityModelViz.bind(content);
   content.querySelectorAll('[data-memory-page]').forEach(b=>b.addEventListener('click',()=>{InsightsViz.setMemoryPage(Number(b.dataset.memoryPage));renderInsights();}));
+  content.querySelectorAll('[data-ticker-page]').forEach(button => button.addEventListener('click', () => { insightsTickerPage = Math.max(0, Number(button.dataset.tickerPage) || 0); renderInsights(); }));
+  content.querySelectorAll('[data-memory-source]').forEach(el => el.addEventListener('change', () => { memorySourceFilter = el.value; InsightsViz.setMemoryPage(0); renderInsights(); }));
+  content.querySelector('[data-memory-type-select]')?.addEventListener('change', event => { memoryTypeFilter = event.target.value; InsightsViz.setMemoryPage(0); renderInsights(); });
+  content.querySelectorAll('[data-memory-reviewed]').forEach(button => button.addEventListener('click', () => { const ticker = button.dataset.memoryReviewed; if (memoryReviewed[ticker]) delete memoryReviewed[ticker]; else memoryReviewed[ticker] = new Date().toISOString(); try { localStorage.setItem('ssp_memory_review_v2', JSON.stringify(memoryReviewed)); } catch (_) {} renderInsights(); }));
+  content.querySelectorAll('[data-memory-lifecycle]').forEach(el => el.addEventListener('change', () => { memoryLifecycleFilter = el.value; InsightsViz.setMemoryPage(0); renderInsights(); }));
+  content.querySelectorAll('[data-insights-reset]').forEach(button => button.addEventListener('click', () => { fundRegistrySearch = ''; insightsTickerSourceFilter = 'all'; insightsTickerPage = 0; memoryTypeFilter = 'all'; memorySourceFilter = 'all'; memoryLifecycleFilter = 'current'; history.replaceState(null, '', location.hash.split('?')[0]); renderInsights(); }));
   if (window.IndexViz && IndexViz.bindIndexWatchToggles && data.index_membership) {
     IndexViz.bindIndexWatchToggles(content, data.index_membership, {
       escapeHtml,
@@ -4624,6 +4676,10 @@ function renderInsights(opts = {}) {
     });
     search.addEventListener('input', () => {
       fundRegistrySearch = search.value;
+      insightsTickerPage = 0;
+      const params = new URLSearchParams(location.hash.split('?')[1] || '');
+      if (fundRegistrySearch) params.set('q', fundRegistrySearch); else params.delete('q');
+      history.replaceState(null, '', location.hash.split('?')[0] + (params.size ? '?' + params : ''));
       insightsSearchFocused = true;
       window.clearTimeout(insightsSearchDebounce);
       insightsSearchDebounce = window.setTimeout(() => {
@@ -4654,6 +4710,7 @@ function renderInsights(opts = {}) {
   content.querySelectorAll('[data-memory-view]').forEach(btn => {
     btn.addEventListener('click', () => {
       memoryViewMode = btn.dataset.memoryView || 'ledger';
+      if (memoryViewMode === 'biotech') { location.hash = '#/strategies/biotech-quant/overview'; return; }
       try { localStorage.setItem(MEMORY_VIEW_KEY, memoryViewMode); } catch (_) { /* ignore */ }
       renderInsights();
     });
@@ -4665,68 +4722,6 @@ function renderInsights(opts = {}) {
       renderInsights();
     });
   });
-  const memoryBiotech = content.querySelector('#memory-biotech-only');
-  if (memoryBiotech) {
-    memoryBiotech.addEventListener('change', () => {
-      memoryBiotechOnly = memoryBiotech.checked;
-      renderInsights();
-    });
-  }
-  content.querySelectorAll('[data-biotech-scope]').forEach(btn => {
-    btn.addEventListener('click', () => {
-      biotechScope = btn.dataset.biotechScope || 'book';
-      try { localStorage.setItem(BIOTECH_SCOPE_KEY, biotechScope); } catch (_) { /* ignore */ }
-      renderInsights();
-    });
-  });
-  const biotechConv = content.querySelector('#biotech-convergence-only');
-  if (biotechConv) {
-    biotechConv.addEventListener('change', () => {
-      biotechConvergenceOnly = biotechConv.checked;
-      renderInsights();
-    });
-  }
-  const biotechSpend = content.querySelector('#biotech-spend-q4');
-  if (biotechSpend) {
-    biotechSpend.addEventListener('change', () => {
-      biotechSpendQ4 = biotechSpend.checked;
-      renderInsights();
-    });
-  }
-  const biotechSize = content.querySelector('#biotech-size-filter');
-  if (biotechSize) {
-    biotechSize.addEventListener('change', () => {
-      biotechSizeFilter = biotechSize.value || 'all';
-      renderInsights();
-    });
-  }
-  const biotechIssuerSize = content.querySelector('#biotech-issuer-size-filter');
-  if (biotechIssuerSize) {
-    biotechIssuerSize.addEventListener('change', () => {
-      biotechIssuerSizeFilter = biotechIssuerSize.value || 'all';
-      renderInsights();
-    });
-  }
-  const biotechSearchEl = content.querySelector('#biotech-search');
-  if (biotechSearchEl) {
-    biotechSearchEl.addEventListener('keydown', (ev) => {
-      if (ev.key === 'Enter') {
-        biotechSearch = biotechSearchEl.value || '';
-        renderInsights();
-      }
-    });
-    biotechSearchEl.addEventListener('change', () => {
-      biotechSearch = biotechSearchEl.value || '';
-      renderInsights();
-    });
-  }
-  const biotechMore = content.querySelector('#biotech-show-more');
-  if (biotechMore) {
-    biotechMore.addEventListener('click', () => {
-      biotechShowLimit += 40;
-      renderInsights();
-    });
-  }
   if (window.InsightsViz && insightsSection === 'events') {
     InsightsViz.attachEventHandlers(content, insights?.events || [], escapeHtml, linkHtml, GITHUB_REPO, {
       reviewState: insightsEventWorkflow,
@@ -4771,6 +4766,7 @@ function renderInsights(opts = {}) {
         if (!ticker) return;
         insightsSection = 'tickers';
         tickerInsightsSelectedTicker = ticker;
+        const params = new URLSearchParams(location.hash.split('?')[1] || ''); params.set('ticker', ticker); history.replaceState(null, '', location.hash.split('?')[0] + '?' + params);
         try { localStorage.setItem(INSIGHTS_SECTION_KEY, insightsSection); } catch (_) { /* ignore */ }
         renderInsights();
       },
@@ -4836,12 +4832,15 @@ function renderInsights(opts = {}) {
       InsightsViz.attachWorldModelHistoryHandlers(content);
     }
     InsightsViz.attachTickerInsightsHandlers(content, data.tickers || [], {
+      onSourceFilter(source) { insightsTickerSourceFilter = source || 'all'; insightsTickerPage = 0; renderInsights(); },
       onViewMode(mode) {
+        insightsTickerPage = 0;
         insightsTickerViewMode = mode || 'scan';
         try { localStorage.setItem(TICKER_VIEW_KEY, insightsTickerViewMode); } catch (_) { /* ignore */ }
         renderInsights();
       },
       onSortMode(mode) {
+        insightsTickerPage = 0;
         insightsTickerSortMode = mode || 'attention';
         try { localStorage.setItem(TICKER_SORT_KEY, insightsTickerSortMode); } catch (_) { /* ignore */ }
         renderInsights();
@@ -4856,10 +4855,12 @@ function renderInsights(opts = {}) {
       },
       onTickerSelect(ticker) {
         tickerInsightsSelectedTicker = ticker;
+        const params = new URLSearchParams(location.hash.split('?')[1] || ''); params.set('ticker', ticker); history.replaceState(null, '', location.hash.split('?')[0] + '?' + params);
         renderInsights();
       },
       onCloseDrawer() {
         tickerInsightsSelectedTicker = null;
+        const params = new URLSearchParams(location.hash.split('?')[1] || ''); params.delete('ticker'); history.replaceState(null, '', location.hash.split('?')[0] + (params.size ? '?' + params : ''));
         renderInsights();
       },
       onGotoConsensus(ticker) {

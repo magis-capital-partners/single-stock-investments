@@ -458,7 +458,7 @@ def build() -> tuple[dict, dict]:
         if mem["claim_count"] and not mem["source_count"]:
             review_queue.append({"ticker": ticker, "reason": "claims without source", "priority": "high"})
         if mem["disconfirming_count"] > 0:
-            review_queue.append({"ticker": ticker, "reason": "disconfirming evidence present", "priority": "high"})
+            review_queue.append({"ticker": ticker, "reason": "counter-evidence to review", "priority": "medium", "next_action": "Determine whether the evidence materially changes a current thesis claim."})
         if mem["claim_count"] == 0 and ticker in book:
             review_queue.append({"ticker": ticker, "reason": "no claims in memory", "priority": "medium"})
         if mem["biotech"]["in_biotech_quant_universe"] and not mem["biotech"]["ownership_records"]:
