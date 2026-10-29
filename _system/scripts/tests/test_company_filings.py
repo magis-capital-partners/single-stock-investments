@@ -48,6 +48,19 @@ def test_policy_response_is_not_research_text(tmp_path):
     assert not cached_filing(tmp_path, URL)['text']
 
 
+def test_rate_limit_response_is_cooled_down_without_another_request(tmp_path):
+    from urllib.error import HTTPError
+    class Limited:
+        calls=0
+        def get_bytes(self,*args,**kwargs):
+            self.calls+=1
+            raise HTTPError(URL,429,'Too Many Requests',{},None)
+    client=Limited()
+    assert recover(tmp_path,URL,client)=='access_unavailable'
+    assert recover(tmp_path,URL,client)=='access_unavailable'
+    assert client.calls==1
+
+
 def test_recovered_filings_stay_with_issuer(tmp_path):
     from build_company_research import Builder
     cache=tmp_path/'cache'

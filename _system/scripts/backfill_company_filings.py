@@ -82,16 +82,17 @@ def recover(cache, url, client):
         suffix = '.pdf' if raw.startswith(b'%PDF') else Path(urlparse(url).path).suffix.lower()
         if suffix not in ('.pdf','.html','.htm','.txt','.xml') and b'<html' in raw[:2000].lower():
             suffix = '.html'
-        if suffix in ('.pdf','.jpg','.jpeg','.png'):
+        if suffix in ('.pdf','.jpg','.jpeg','.png','.gif'):
             from backfill_company_sources import extract_complete
-            text, status, detail = extract_complete(raw, suffix, ocr=True)
+            text, status, detail = extract_complete(raw, '.png' if suffix == '.gif' else suffix, ocr=True)
+            detail['original_format'] = suffix
         else:
             text, status = extract(raw, suffix)
             detail = {'format': suffix}
         doc.update(text=text, status=status, extraction=detail, original_sha256=fingerprint(raw),
                    original_base64=base64.b64encode(raw).decode(), text_sha256=fingerprint(text))
     except Exception as exc:
-        doc.update(status='access_unavailable' if isinstance(exc, PermissionError) or isinstance(exc, HTTPError) and exc.code in (401,403,404) else 'failed', error=str(exc)[:240])
+        doc.update(status='access_unavailable' if isinstance(exc, PermissionError) or isinstance(exc, HTTPError) and exc.code in (401,403,404,429) else 'failed', error=str(exc)[:240])
     path = cache / 'filings' / (fingerprint(url) + '.json')
     path.parent.mkdir(parents=True, exist_ok=True)
     temporary = path.with_suffix('.tmp')
@@ -126,9 +127,9 @@ def main():
                 counts[status] = counts.get(status, 0) + 1
                 if sum(counts.values()) % 50 == 0:
                     print(json.dumps({'processed':sum(counts.values()),'outcomes':counts}),flush=True)
-                if status == 'access_unavailable':
+                if status in ('access_unavailable','failed'):
                     doc = cached_filing(args.cache,url)
-                    if '403' in doc.get('error','') or 'policy' in doc.get('error',''):
+                    if any(reason in doc.get('error','') for reason in ('403','429','503','policy')):
                         blocked_hosts.add(urlparse(url).netloc)
     print(json.dumps(counts), flush=True)
 
