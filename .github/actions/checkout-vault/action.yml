@@ -10,6 +10,10 @@ inputs:
     description: Copy private objects over public placeholders. false leaves the public files in place so a later commit cannot publish private bytes.
     required: false
     default: "true"
+  include-source-archive:
+    description: Include the complete extraction archive. Test fixtures can omit it while retaining all originals and dashboard snapshots.
+    required: false
+    default: "true"
 
 runs:
   using: composite
@@ -32,6 +36,11 @@ runs:
         path: _external/research-vault
         token: ${{ env.RESEARCH_VAULT_CLONE_TOKEN }}
         fetch-depth: 1
+        filter: ${{ inputs.include-source-archive == 'false' && 'blob:none' || '' }}
+        sparse-checkout: |
+          ${{ inputs.include-source-archive == 'false' && '/*' || '' }}
+          ${{ inputs.include-source-archive == 'false' && '!/dashboard-private/company-source-backfill-v2/' || '' }}
+        sparse-checkout-cone-mode: false
 
     - name: Export RESEARCH_VAULT_ROOT
       shell: bash
