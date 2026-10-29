@@ -178,7 +178,8 @@ def test_failed_scan_retains_previous_and_successful_absence_is_visible():
     assert result["b"]["availability"]=="removed_or_unavailable"
 
 
-def test_all_sources_are_paginated_and_full_text_search_has_no_insight_cap(tmp_path):
+def test_all_sources_are_paginated_and_full_text_search_has_no_insight_cap(tmp_path,monkeypatch):
+    monkeypatch.setattr('build_company_research.COMPANY_PAGE_ROWS',100)
     b=Builder(tmp_path,None,tmp_path/"output",tmp_path/"cache",companies={"CME":COMPANIES["CME"]})
     for n in range(351):
         row=b.base(str(n),f"Report {n}","test",text=f"The needle{n} appears in this full source body.",explicit=["CME"],locations=[{"kind":"repository","url":f"https://example.test/{n}"}])
@@ -349,7 +350,8 @@ def test_share_classes_receive_the_same_company_research():
     assert {r["ticker"] for r in links}=={"GOOG","GOOGL"}
 
 
-def test_large_source_and_search_shards_preserve_the_last_word(tmp_path):
+def test_large_source_and_search_shards_preserve_the_last_word(tmp_path,monkeypatch):
+    monkeypatch.setattr('build_company_research.TEXT_CHUNK_CHARS',1_000_000)
     b=Builder(tmp_path,None,tmp_path/"out",tmp_path/"cache",companies={"CME":COMPANIES["CME"]})
     body=" ".join(f"unique{i:06d}" for i in range(300000))
     row=b.base("large","Large model","test",explicit=["CME"])
@@ -373,6 +375,8 @@ def test_private_stage_copies_only_reachable_assets_and_requires_auth(tmp_path, 
     b.index.add(row,["id:source"]);b.publish()
     (out/"old-unused.json").write_text('{}')
     site.mkdir();(site/"_routes.json").write_text('{"include":["/*"],"exclude":[]}')
+    with pytest.raises(RuntimeError,match="hosting limit"):
+        stage(out,site,max_files=1)
     assert stage(out,site,hardlink=hardlink)["documents"]==1
     assert stage(out,site,hardlink=hardlink)["documents"]==1
     assert not (site/"data/company-research/old-unused.json").exists()

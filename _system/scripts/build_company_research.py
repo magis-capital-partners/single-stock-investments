@@ -23,6 +23,11 @@ from company_sources import CATEGORIES, SOURCE_SUFFIXES, Matcher, SourceIndex, c
 from company_extract_formats import EXTRA_SUFFIXES
 
 ROOT = Path(__file__).resolve().parents[2]
+PUBLICATION_LAYOUT = 2
+CONTENT_BUNDLE_BYTES = 16_000_000
+TEXT_CHUNK_CHARS = 4_000_000
+COMPANY_PAGE_ROWS = 1000
+COMPANY_PAGE_BYTES = 8_000_000
 VAULT_COLLECTIONS = ("superinvestor-letters", "vic-research", "sumzero-research", "investment-wisdom", "manager-meetings", "expert-calls", "expert_calls", "valueline", "podcasts", "videos", "dropbox-ingestion", "short-research", "activist-research", "filings-extracts")
 IGNORE_NAMES = {"README.md", "AGENTS.md", "SKILL.md", "INDEX.csv", "manifest.json", "catalog_manifest.jsonl", "DOWNLOAD_MANIFEST.json",
                 "insights.json", "letters_index.json", "drive_import_manifest.json", "drive_import_log.jsonl", "fetch_log.jsonl",
@@ -829,7 +834,7 @@ class Builder:
         # entire corpus on disk. Changed documents get a new bundle; unchanged
         # documents may continue sharing their previous one.
         reusable = {}
-        if (self.output / "manifest.json").is_file():
+        if load(self.output / "manifest.json").get("layout_version") == PUBLICATION_LAYOUT:
             for path in (self.output / "documents").glob("*.json"):
                 try:
                     prior = load(path)
@@ -863,9 +868,9 @@ class Builder:
                 continue
             full_text = self.text(rec)
             parts = []
-            if len(full_text.encode("utf-8")) > 1_000_000:
-                for start in range(0,len(full_text),1_000_000):
-                    part = full_text[start:start+1_000_000]
+            if len(full_text.encode("utf-8")) > TEXT_CHUNK_CHARS:
+                for start in range(0,len(full_text),TEXT_CHUNK_CHARS):
+                    part = full_text[start:start+TEXT_CHUNK_CHARS]
                     filename = "text/" + digest(part) + ".json"
                     write(self.output / filename, {"text":part})
                     parts.append(filename)
@@ -875,7 +880,7 @@ class Builder:
                 bundles[rec["id"]] = reused
             else:
                 content_bytes = len(json.dumps(content, ensure_ascii=False).encode())
-                if content_batch and content_size + content_bytes > 4_000_000:
+                if content_batch and content_size + content_bytes > CONTENT_BUNDLE_BYTES:
                     flush_content()
                 content_batch[rec["id"]] = content
                 content_size += content_bytes
@@ -911,10 +916,20 @@ class Builder:
                 for word in set(self.source_words(records[row["id"]])) | tokens(row["title"] + " " + row.get("author", "")):
                     index[word].append(ordinal)
             pages = []
-            for i in range(0, len(rows), 100):
-                page = rows[i:i+100]
-                filename = f"companies/{ticker}/{digest(json.dumps(page, sort_keys=True))[:24]}.json"
-                write(self.output / filename, page); pages.append(filename)
+            page, page_size = [], 2
+            def emit_page(items):
+                filename = f"companies/{ticker}/{digest(json.dumps(items, sort_keys=True))[:24]}.json"
+                write(self.output / filename, items)
+                pages.append(filename)
+            for row in rows:
+                row_size = len(json.dumps(row, ensure_ascii=False).encode("utf-8")) + 1
+                if page and (len(page) >= COMPANY_PAGE_ROWS or page_size + row_size > COMPANY_PAGE_BYTES):
+                    emit_page(page)
+                    page, page_size = [], 2
+                page.append(row)
+                page_size += row_size
+            if page:
+                emit_page(page)
             search_path = f"search/{ticker}.json"
             search_parts, search_chunk, search_size = [], {}, 0
             for word, ids in sorted(index.items()):
@@ -947,12 +962,12 @@ class Builder:
             manifest = {"schema_version": 1, "ticker": ticker, "company": self.companies[ticker].get("company"), "total": len(rows), "categories": counts, "coverage": coverage, "pages": pages, "search_path": search_path, "featured": featured}
             write(self.output / f"companies/{ticker}.json", manifest)
             summary[ticker] = {"total": len(rows), "categories": counts, "pending": pending}
-        report = {"schema_version": 1, "generated_at": self.now, "documents": len(records), "companies": len(summary), "linked_companies": sum(v["total"] > 0 for v in summary.values()), "processing": dict(status_counts), "review_count": len(review), "receipts": self.receipts, "tickers": summary}
+        report = {"schema_version": 1, "layout_version": PUBLICATION_LAYOUT, "generated_at": self.now, "documents": len(records), "companies": len(summary), "linked_companies": sum(v["total"] > 0 for v in summary.values()), "processing": dict(status_counts), "review_count": len(review), "receipts": self.receipts, "tickers": summary}
         write(self.output / "manifest.json", report)
         if len(json.dumps(review).encode()) > 4_000_000:
             review_parts = []
-            for start in range(0, len(review), 1000):
-                chunk = review[start:start+1000]
+            for start in range(0, len(review), 5000):
+                chunk = review[start:start+5000]
                 relative = "review/" + digest(json.dumps(chunk, sort_keys=True))[:24] + ".json"
                 write(self.output / relative, {"items": chunk})
                 review_parts.append(relative)
