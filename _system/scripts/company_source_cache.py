@@ -9,7 +9,7 @@ from pathlib import Path
 import zipfile
 import uuid
 
-FOLDERS=('git','drive','filings','media','transcripts','queue-checkpoints','md5','metadata','relationships','match-work','records','published-text','words')
+FOLDERS=('git','drive','filings','commodity-text','media','transcripts','queue-checkpoints','md5','metadata','relationships','match-work','records','published-text','words')
 ROOT_FILES=('matches.json','index.json','drive-inventory.json','backfill-report.json')
 
 

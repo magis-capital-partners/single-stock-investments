@@ -55,7 +55,7 @@ def build(builder):
     for item in originals(builder.root,builder.vault):
         owners=[t for t in item['tickers'] if t in builder.companies]
         if not owners:continue
-        state='awaiting_extraction';text=''
+        state='awaiting_extraction';text='';recovered={}
         try:
             data=item['path'].read_bytes()
             from company_sources import digest
@@ -69,7 +69,12 @@ def build(builder):
             elif data.startswith(bytes.fromhex('d0cf11e0a1b11ae1')):suffix='.xls'
             elif b'<html' in data[:2000].lower() or b'<!doctype html' in data[:2000].lower():suffix='.html'
             elif suffix=='.csv':suffix='.csv'
-            text,state,_=builder.cached_extract(data,suffix)
+            recovered=load(builder.cache/'commodity-text'/(item['sha256']+'.json'),{})
+            if recovered.get('status')=='indexed' and recovered.get('original_sha256')==item['sha256'] and digest(recovered.get('text',''))==recovered.get('text_sha256'):
+                text,state=recovered['text'],'indexed'
+            else:
+                recovered={}
+                text,state,_=builder.cached_extract(data,suffix)
         except (OSError,ValueError):
             builder.file_failures['shared:commodity_originals']+=1
             state='access_unavailable'
@@ -81,5 +86,7 @@ def build(builder):
                       'reason':'Source for the '+', '.join(item['models'])+' model relevant to this company.',
                       'match':'reviewed_commodity_scope','passages':[]} for t in owners],review=[])
         record['content_sha256']=item['sha256']
+        if state=='indexed' and recovered.get('extraction',{}).get('ocr_pages'):
+            record['extraction_review']='Automatic OCR; verify against the original'
         builder.add(record,['sha:'+item['sha256'],'url:'+item['url']]);count+=1
     builder.receipt('shared:commodity_originals',count)

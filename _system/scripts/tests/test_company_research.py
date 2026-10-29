@@ -405,3 +405,23 @@ def test_recovered_drive_copy_does_not_resurrect_old_git_placeholder(tmp_path):
     assert report['documents']==1 and company['total']==1 and company['coverage']['pending']==0
     source=json.loads((out/company['pages'][0]).read_text())[0]
     assert set(source['origins'])=={'drive','git_inventory'}
+def test_preserved_commodity_ocr_verifies_original_and_extracted_text(monkeypatch, tmp_path):
+    import company_commodity_sources as sources
+    from build_company_research import Builder, digest, write
+    raw=b'%PDF commodity original';original=tmp_path/'report.pdf';original.write_bytes(raw)
+    sha=digest(raw);cache=tmp_path/'cache';text='Complete extracted commodity report including its scanned pages.'
+    monkeypatch.setattr(sources,'originals',lambda *args:iter([{'path':original,'sha256':sha,'tickers':['FNV'],'models':['gold'],'title':'Gold report','date':None,'url':'https://publisher.example/report.pdf'}]))
+    saved=cache/'commodity-text'/(sha+'.json')
+    write(saved,{'status':'indexed','original_sha256':sha,'text':text,'text_sha256':digest(text),'extraction':{'ocr_pages':[1]}})
+    def build():
+        b=Builder(tmp_path,None,tmp_path/'site',cache,companies={'FNV':{'company':'Franco-Nevada'}})
+        monkeypatch.setattr(b,'cached_extract',lambda *args:('native partial','needs_ocr',sha))
+        sources.build(b)
+        return b,next(iter(b.index.records.values()))
+    b,record=build()
+    assert record['processing_status']=='indexed' and b.text(record)==text
+    assert 'Automatic OCR' in record['extraction_review']
+    write(saved,{'status':'indexed','original_sha256':sha,'text':'changed','text_sha256':digest(text)})
+    b,record=build()
+    assert record['processing_status']=='needs_ocr' and b.text(record)=='native partial'
+
