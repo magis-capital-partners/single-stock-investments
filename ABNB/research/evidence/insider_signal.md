@@ -1,4 +1,4 @@
-# ABNB — Insider conviction (2026-10-19)
+# ABNB — Insider conviction (2026-10-28)
 
 > Context only. Insider activity informs scenario confidence and stance discussion; it does not auto-inflate Lawrence base IRR. Promotion requires [HUMAN REVIEW].
 
@@ -15,9 +15,9 @@
 
 **Routine / planned sales (context):**
 
-- Bernstein David C: 1369 @ $168.01 on 2026-10-15
-- Blecharczyk Nathan: 2852 @ $163.4469 on 2026-10-12
-- Blecharczyk Nathan: 4267 @ $164.7228 on 2026-10-12
+- Blecharczyk Nathan: 2500 @ $169.7044 on 2026-10-26
+- Blecharczyk Nathan: 5401 @ $170.6529 on 2026-10-26
+- Blecharczyk Nathan: 5614 @ $171.44 on 2026-10-26
 
 Source: `_system/reference/market-data/insider/ABNB_transactions.csv`.
 Lawrence base IRR unchanged (`in_base_irr: False`).

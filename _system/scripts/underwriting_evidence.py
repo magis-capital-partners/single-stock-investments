@@ -47,16 +47,17 @@ def text_of(raw):
     return ' '.join(html.unescape(re.sub(r'<[^>]+>', ' ', raw)).split())
 
 
-def document_record(url, raw):
+def document_record(url, raw, focus_keywords=()):
     require(len(raw) <= 20_000_000, 'Primary filing exceeds the bounded evidence size')
     source = raw.decode('utf-8', errors='replace')
     words = ('cash', 'debt', 'assets', 'liabilities', 'inventory', 'capital', 'operating', 'shares',
              'revenue', 'credit', 'receivables', 'segment', 'net income', 'financing')
+    focus = tuple(w.lower() for w in focus_keywords if re.fullmatch(r'[A-Za-z_]{4,35}', w))[:12]
     tables = []
     for table in re.findall(r'<table\b.*?</table>', source, flags=re.IGNORECASE | re.DOTALL):
         text = text_of(table)
         if 80 <= len(text) <= 16000:
-            score = sum(w in text.lower() for w in words)
+            score = sum(w in text.lower() for w in words)+5*sum(w in text.lower() for w in focus)
             if score >= 3:
                 tables.append((score, text))
     contexts, seen, size = [], set(), 0
@@ -72,7 +73,7 @@ def document_record(url, raw):
     # Business economics and risks are not limited to financial tables.
     for phrase in ('our business', 'business overview', 'competition', 'working capital',
                    'liquidity', 'regulatory capital', 'credit', 'clinical', 'inventory', 'warrant', 'dilution',
-                   'depositary', 'each ads'):
+                   'depositary', 'each ads')+focus:
         matches = list(re.finditer(re.escape(phrase), body, flags=re.IGNORECASE))
         if matches:
             selected = matches[:3] if phrase in ('depositary', 'each ads') else [matches[min(1, len(matches)-1)]]
@@ -112,7 +113,8 @@ def source_fingerprint(root, ticker):
     source = read(root/'_system/reference/market-data/valuation_fundamentals'/(ticker+'.json'))
     points = primary_kpis(root, ticker)
     kpis = {'points': points} if points else {}
-    return semantic_json_sha256({'facts': source.get('facts') or [], 'latest_report': source.get('latest_report'), 'operating_kpis': kpis},
+    return semantic_json_sha256({'facts': source.get('facts') or [], 'primary_observations': source.get('primary_observations') or [],
+                                'latest_report': source.get('latest_report'), 'operating_kpis': kpis},
                                volatile_keys={'retrieved_at', 'fetched_at', 'updated_at', 'generated_at', 'last_collected', 'attempted_at', 'checked_at'})
 
 
@@ -151,6 +153,7 @@ def _share_observation(point, market, quote):
 
 def _observation(point):
     row = {k: point.get(k) for k in ('field', 'value', 'period', 'source_url', 'locator', 'filed', 'source_kind')}
+    row.update({k: point[k] for k in ('start', 'form', 'tag', 'scope', 'measurement_type') if k in point})
     row['unit'] = 'shares' if point['field'] in ('shares', 'ordinary_shares', 'balance_shares') else point.get('currency')
     if point.get('share_basis'):
         row['share_basis'] = point['share_basis']
@@ -178,7 +181,8 @@ def rich_primary_observations(payload, url, as_of, market, quote, reporting_curr
         for row in selected.values():
             field = 'shares' if tag == 'WeightedAverageNumberOfDilutedSharesOutstanding' else 'balance_shares' if row['unit'] == 'shares' else tag
             point = {'field': field, 'value': row['val'], 'period': row['end'], 'currency': row['unit'],
-                     'source_url': url, 'locator': tag+'; '+str(row.get('accn')), 'filed': row.get('filed'), 'source_kind': 'primary'}
+                     'source_url': url, 'locator': tag+'; '+str(row.get('accn')), 'filed': row.get('filed'), 'source_kind': 'primary',
+                     'start': row.get('start'), 'form': row.get('form'), 'tag': tag, 'scope': 'reported consolidated'}
             try:
                 if row['unit'] == 'shares':
                     point = _share_observation(point, market, quote)
@@ -206,7 +210,7 @@ def filing_bytes(root, ticker, accession, client, url):
     return client.get_bytes(url, timeout=40)
 
 
-def prepare_packet(root: Path, ticker: str, as_of: str, *, collect=True, client=None):
+def prepare_packet(root: Path, ticker: str, as_of: str, *, collect=True, client=None, focus_keywords=()):
     from refresh_shared_forecasts import (
         FUNDAMENTALS,
         QUOTES,
@@ -247,14 +251,16 @@ def prepare_packet(root: Path, ticker: str, as_of: str, *, collect=True, client=
     annual.sort(key=lambda p: p['period'])
     reporting_currency = history[-1]['currency'] if history else annual[-1]['currency'] if annual else quote['currency']
     observations = []
-    for raw in normalized.get('facts') or []:
+    for raw in (normalized.get('facts') or [])+(data.get('primary_observations') or []):
         if raw.get('source_kind') != 'primary' or raw.get('period', '9999') > as_of:
             continue
         if raw.get('currency') not in (reporting_currency, None, 'shares'):
             continue
         try:
-            point = _share_observation(raw, market, quote) if raw['field'] in ('shares', 'ordinary_shares') else raw
-            observations.append(_observation(point))
+            point = _share_observation(raw, market, quote) if raw['field'] in ('shares', 'ordinary_shares', 'balance_shares') else raw
+            observation = _observation(point)
+            observation.update({k: point[k] for k in ('start', 'form', 'tag', 'scope', 'measurement_type') if k in point})
+            observations.append(observation)
         except (BasisGap, ContractError):
             continue
     documents, errors = [], []
@@ -262,24 +268,25 @@ def prepare_packet(root: Path, ticker: str, as_of: str, *, collect=True, client=
     if cik:
         client = client or SecClient(max_attempts=2)
         base = f'https://data.sec.gov/api/xbrl/companyfacts/CIK{int(cik):010d}.json'
-        try:
-            payload = client.get_json(base, timeout=30)
-            observations += rich_primary_observations(payload, base, as_of, market, quote, reporting_currency)
-        except (OSError, ValueError) as exc:
-            errors.append({'source': 'sec_companyfacts', 'error': type(exc).__name__})
+        if not data.get('primary_observations'):
+            try:
+                payload = client.get_json(base, timeout=30)
+                observations += rich_primary_observations(payload, base, as_of, market, quote, reporting_currency)
+            except (OSError, ValueError) as exc:
+                errors.append({'source': 'sec_companyfacts', 'error': type(exc).__name__})
         try:
             submission = client.get_json(f'https://data.sec.gov/submissions/CIK{int(cik):010d}.json', timeout=30)
             recent = (submission.get('filings') or {}).get('recent') or {}
             chosen = set()
             for i, form in enumerate(recent.get('form') or []):
-                if form not in ('10-K', '10-Q', '20-F', '6-K') or form in chosen or recent['filingDate'][i] > as_of:
+                if form not in ('10-K', '10-Q', '20-F', '40-F', '6-K') or form in chosen or recent['filingDate'][i] > as_of:
                     continue
                 filename = recent['primaryDocument'][i]
                 if not re.fullmatch(r'[A-Za-z0-9_.-]+', filename):
                     continue
                 url = f"https://www.sec.gov/Archives/edgar/data/{int(cik)}/{recent['accessionNumber'][i].replace('-', '')}/{filename}"
                 try:
-                    document = document_record(url, filing_bytes(root, ticker, recent['accessionNumber'][i], client, url))
+                    document = document_record(url, filing_bytes(root, ticker, recent['accessionNumber'][i], client, url), focus_keywords)
                     document.update(form=form, filed=recent['filingDate'][i], period=(recent.get('reportDate') or ['']*len(recent['form']))[i])
                     documents.append(document)
                     chosen.add(form)
@@ -324,12 +331,44 @@ def prepare_packet(root: Path, ticker: str, as_of: str, *, collect=True, client=
     for document in documents:
         if document.get('period') and document.get('filed', '') > packet['latest_report'].get('filed', ''):
             packet['latest_report'] = {'period': document['period'], 'filed': document['filed'], 'source_url': document['source_url']}
+    # The packet and every downstream consumer share the discovered report marker.
+    # This is source metadata, never a new economic-model review date.
+    if collect and packet['latest_report'] != data.get('latest_report'):
+        from atomic_io import write_json_if_changed
+        data['latest_report'] = packet['latest_report']
+        write_json_if_changed(root/FUNDAMENTALS/(ticker+'.json'), data)
+        packet['input_fingerprint'] = source_fingerprint(root, ticker)
+    packet['source_discovery'] = data.get('report_discovery') or {}
+    packet['readiness'] = evidence_readiness(packet, require_documents=bool(cik))
     packet['evidence_hash'] = digest({'observations': [{k: v for k, v in o.items() if k != 'share_basis'} for o in observations],
-                                      'documents': [{k: d[k] for k in ('source_url', 'content_hash')} for d in documents],
+                                      'documents': [{**{k: d[k] for k in ('source_url', 'content_hash')}, 'contexts_hash': digest(d['contexts'])} for d in documents],
                                       'latest_report': packet['latest_report'], 'split_events': packet['split_events'],
                                       'listing_ratio': listing_ratio})
     packet['packet_hash'] = digest(packet)
     return packet
+
+
+def evidence_readiness(packet, *, require_documents=False):
+    """Facts/documents readiness is checked before admitting any judgment call."""
+    gaps = []
+    day = date.fromisoformat(packet['as_of'])
+    financial = date.fromisoformat(packet['financial_period'])
+    if not 0 <= (day-financial).days <= 550:
+        gaps.append({'code': 'financial_baseline_stale', 'detail': 'Collect a current annual financial baseline.'})
+    primary = [o for o in packet.get('observations') or [] if o.get('source_kind') == 'primary']
+    if not any(o.get('unit') == 'shares' and numeric(o.get('value')) > 0 and o['period'] >= packet['financial_period'] for o in primary):
+        gaps.append({'code': 'verified_denominator_missing', 'detail': 'Collect primary shares on the verified listing basis.'})
+    latest = packet.get('latest_report') or {}
+    docs = packet.get('documents') or []
+    if require_documents and (not latest.get('period') or not any(d.get('period') == latest['period'] for d in docs)):
+        gaps.append({'code': 'latest_primary_document_missing', 'detail': 'Retrieve the newly discovered report, including financial tables.'})
+    if require_documents and not any(d.get('form') in ('10-K', '20-F', '40-F') for d in docs):
+        gaps.append({'code': 'annual_primary_document_missing', 'detail': 'Retrieve the annual report and business/financing disclosures.'})
+    if require_documents and packet.get('source_discovery', {}).get('status') == 'failed':
+        gaps.append({'code': 'report_discovery_failed', 'detail': 'Retry primary submissions; old cached reports do not prove freshness.'})
+    return {'status': 'ready' if not gaps else 'evidence_gap', 'gaps': gaps,
+            'primary_observations': len(primary), 'documents': len(docs),
+            'history_periods': len({o['period'] for o in primary})}
 
 
 def supplemental_observations(packet, rows):

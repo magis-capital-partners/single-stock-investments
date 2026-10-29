@@ -231,7 +231,13 @@ def refresh_missing_model_inputs(ticker, row, root, as_of, registry):
     cached = read(root/QUOTES/(ticker+'.json'))
     unchanged = financial_signature(prior, cached) == financial_signature(data, cached)
     anchor = prior.get('model_anchor') if unchanged else as_of
+    def evidence_signature(value):
+        return semantic_json_sha256({k: value.get(k) for k in ('facts', 'primary_observations', 'latest_report')},
+                                    volatile_keys={'retrieved_at', 'attempted_at', 'collected_at'})
+    collected_at = prior.get('collected_at') if evidence_signature(prior) == evidence_signature(data) else None
     saved = {'facts': data.get('facts') or [], 'quote': data.get('quote'), 'model_anchor': anchor or as_of,
+             'primary_observations': data.get('primary_observations') or [], 'report_discovery': data.get('report_discovery') or {},
+             'collected_at': collected_at or data.get('attempted_at'),
              'latest_report': data.get('latest_report') or prior.get('latest_report'),
              'financial_hash': financial_hash, 'last_collected': as_of, 'fx': data.get('fx'), 'errors': data.get('errors') or []}
     write_json_if_changed(path, saved, volatile_keys={'retrieved_at'})
@@ -264,7 +270,8 @@ def publish(root, companies, as_of, evaluated_at=None):
                'verified_share_basis': sum(bool((f.get('market_sync') or {}).get('basis_id')) for f in companies.values()),
                'split_adjusted_companies': sum(any(p.get('factor', 1) != 1 for p in
                    (f.get('market_sync') or {}).get('adjustments', [])+(f.get('market_sync') or {}).get('fundamental_adjustments', [])) for f in companies.values()),
-               'available_by_model_basis': dict(Counter(f.get('model_basis') for f in companies.values() if f['status'] == 'available'))}
+               'available_by_model_basis': dict(Counter(f.get('model_basis') for f in companies.values() if f['status'] == 'available')),
+               'data_collection': collection_summary(root, companies)}
     # Full dated schedules live once, in the detail shards. The all-universe
     # audit remains compact enough to commit and inspect.
     audit = {t: {**audit_snapshot(f),
@@ -301,6 +308,22 @@ def publish(root, companies, as_of, evaluated_at=None):
         bundle.setdefault('summary', {})['shared_valuation_forecasts'] = summary
         write_json_if_changed(bundle_path, bundle, indent=None)
     return report
+
+
+def collection_summary(root, tickers):
+    """Source collection coverage is distinct from available or approved models."""
+    counts = Counter(companies=len(tickers))
+    for ticker in tickers:
+        source = read(root/FUNDAMENTALS/(ticker+'.json'))
+        facts, primary = source.get('facts') or [], source.get('primary_observations') or []
+        counts['with_financial_observations'] += bool(facts or primary)
+        counts['with_primary_observations'] += bool(primary or any(p.get('source_kind') == 'primary' for p in facts))
+        counts['without_financial_observations'] += not bool(facts or primary)
+        counts['with_collector_errors'] += bool(source.get('errors'))
+        counts['with_current_and_interim_observations'] += bool(primary)
+        counts['report_discovery_verified'] += (source.get('report_discovery') or {}).get('status') == 'verified'
+        counts['report_discovery_failed'] += (source.get('report_discovery') or {}).get('status') == 'failed'
+    return dict(counts)
 
 
 def audit_snapshot(forecast):

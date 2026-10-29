@@ -1,6 +1,6 @@
 {
   "schema_version": "desk_briefs.v1",
-  "generated_at": "2026-10-29T16:44:30Z",
+  "generated_at": "2026-10-29T19:11:20Z",
   "caption": "Ranked output from the Magis desk bots, one brief per desk per day, filed by pull request and checked by schema. A brief is research only: it carries no authority, sizes nothing, and never enters a base IRR. The one number on each row is the dashboard's or the filing's, not the bot's.",
   "desks": [
     {
@@ -9,7 +9,7 @@
       "owner": "drew",
       "author": "grok-drew-special-situations",
       "as_of": "2026-10-29",
-      "age_hours": 16.7,
+      "age_hours": 19.2,
       "stale": false,
       "path": "_system/data/desk_briefs/special_situations/2026-10-29.json",
       "items": [
@@ -137,12 +137,91 @@
       "notes": "SKYA, KBR, and ARI are in _system/data/special_situations/situations.jsonl. They are not registry holdings, so this brief cannot list them. SKYA's tender now expires November 12, 2026. KBR targets a Trinzic spin on January 4, 2027. ARI expects its last NYSE day on November 6, 2026."
     },
     {
+      "desk": "activism",
+      "desk_label": "Activism",
+      "owner": "drew",
+      "author": "grok-drew-activism",
+      "as_of": "2026-10-29",
+      "age_hours": 19.2,
+      "stale": false,
+      "path": "_system/data/desk_briefs/activism/2026-10-29.json",
+      "items": [
+        {
+          "ticker": "MGM",
+          "headline": "People Inc (Diller) 13D/A No.10: 26.5% of MGM; voting pact amended to cap at 29.9% and vote with board on any change of control",
+          "one_number": "26.5% (66,822,350 shares); standstill cap 29.9%; excess-vote threshold 25.73%",
+          "lane": "13d",
+          "evidence": [
+            {
+              "kind": "filing",
+              "ref": "SCHEDULE 13D/A 0001104659-26-119439",
+              "url": "https://www.sec.gov/Archives/edgar/data/789570/000110465926119439/0001104659-26-119439-index.htm"
+            },
+            {
+              "kind": "filing",
+              "ref": "MGM 8-K Item 1.01 0000789570-26-000104",
+              "url": "https://www.sec.gov/Archives/edgar/data/789570/000078957026000104/0000789570-26-000104-index.htm"
+            },
+            {
+              "kind": "filing",
+              "ref": "Dropped CORZ: MFN Partners SCHEDULE 13G (13d-1(c) passive) 7.6% incl. 7.79M option shares, event 2026-10-13, 0001193125-26-436502; passive, below bar",
+              "url": null
+            },
+            {
+              "kind": "filing",
+              "ref": "Dropped NG: Company DEFA14A 0001104659-26-119230: comp-committee letter rebutting ISS on equity plans ahead of Nov 3 special meeting; company-only",
+              "url": "https://www.sec.gov/Archives/edgar/data/1173420/000110465926119230/0001104659-26-119230-index.htm"
+            },
+            {
+              "kind": "filing",
+              "ref": "Dropped MSFT: PX14A6G 0000921895-26-002869 (JLens) and 0001214659-26-013276; shareholder-proposal ESG solicitations, below bar",
+              "url": "https://www.sec.gov/Archives/edgar/data/789019/000092189526002869/0000921895-26-002869-index.htm"
+            },
+            {
+              "kind": "filing",
+              "ref": "Dropped SATS: Strive Inc 13D/A 0000950103-26-016309 (Ramaswamy) matched SATS only via SEC company_tickers CIK collision for Strive (ASST/SATA); Strive not in universe. Ticker-mapping caution.",
+              "url": "https://www.sec.gov/Archives/edgar/data/1920406/000095010326016309/0000950103-26-016309-index.htm"
+            },
+            {
+              "kind": "web",
+              "ref": "Also read: /workspace/shared/magis/status.json (2026-10-29); leads.json (2026-10-29, no activism-tagged leads); posted_state.json.",
+              "url": null
+            },
+            {
+              "kind": "web",
+              "ref": "Also read: EDGAR daily-index form.20261028.idx; current feeds (13D, 13D/A, 13G, DFAN14A, PX14A6G, DEFC14A, PREC14A, DEFA14A) to ~08:30 ET 2026-10-29.",
+              "url": "https://www.sec.gov/Archives/edgar/daily-index/2026/QTR4/form.20261028.idx"
+            }
+          ],
+          "confidence": "filing",
+          "next": "Large-holder governance agreement (not a campaign). People Inc (formerly IAC Inc.). Materiality 75. Run 2026-10-29T08:35:00-04:00. Activist feed stale: build 2026-10-27T13:55:22Z, blob unchanged since Oct 28; EDGAR fallback (Oct 28 daily index plus current feeds to ~08:30 ET Oct 29).",
+          "handoff": null
+        }
+      ],
+      "inputs_read": [
+        {
+          "path": "dashboard/data/activist_feed.json",
+          "generated_at": "2026-10-27T13:55:22Z",
+          "age_hours_at_read": 58.1,
+          "exists": true
+        },
+        {
+          "path": "_system/portfolio/registry.json",
+          "generated_at": "2026-10-28T17:46:14Z",
+          "age_hours_at_read": 30.2,
+          "exists": true
+        }
+      ],
+      "screens_empty": [],
+      "notes": "Amendment dated Oct 27, 2026 to the Apr 3, 2026 voting agreement among MGM, People Inc and Barry Diller. Covered entities won't buy above 29.9% (issuer buybacks pushing them over are not a breach). On non-change-of-control votes, shares above 25.73% of voting power are voted pro rata with the unaffiliated majority. On change-of-control votes, all shares vote per the MGM board recommendation if People's designees sit on the transaction committee, the counterparty is unaffiliated, and People gets the same per-share consideration. No transactions in the past 60 days."
+    },
+    {
       "desk": "fundamentals",
       "desk_label": "Fundamentals",
       "owner": "drew",
       "author": "codex-core-compounders",
       "as_of": "2026-10-27",
-      "age_hours": 64.7,
+      "age_hours": 67.2,
       "stale": false,
       "path": "_system/data/desk_briefs/fundamentals/2026-10-27.json",
       "items": [
@@ -356,7 +435,7 @@
       "owner": "drew",
       "author": "grok-drew-tape-index",
       "as_of": "2026-10-29",
-      "age_hours": 16.7,
+      "age_hours": 19.2,
       "stale": false,
       "path": "_system/data/desk_briefs/tape_index/2026-10-29.json",
       "items": [
@@ -707,6 +786,62 @@
       "owner": "drew",
       "as_of": "2026-10-29",
       "author": "grok-drew-special-situations",
+      "stale": false
+    },
+    {
+      "ticker": "MGM",
+      "headline": "People Inc (Diller) 13D/A No.10: 26.5% of MGM; voting pact amended to cap at 29.9% and vote with board on any change of control",
+      "one_number": "26.5% (66,822,350 shares); standstill cap 29.9%; excess-vote threshold 25.73%",
+      "lane": "13d",
+      "evidence": [
+        {
+          "kind": "filing",
+          "ref": "SCHEDULE 13D/A 0001104659-26-119439",
+          "url": "https://www.sec.gov/Archives/edgar/data/789570/000110465926119439/0001104659-26-119439-index.htm"
+        },
+        {
+          "kind": "filing",
+          "ref": "MGM 8-K Item 1.01 0000789570-26-000104",
+          "url": "https://www.sec.gov/Archives/edgar/data/789570/000078957026000104/0000789570-26-000104-index.htm"
+        },
+        {
+          "kind": "filing",
+          "ref": "Dropped CORZ: MFN Partners SCHEDULE 13G (13d-1(c) passive) 7.6% incl. 7.79M option shares, event 2026-10-13, 0001193125-26-436502; passive, below bar",
+          "url": null
+        },
+        {
+          "kind": "filing",
+          "ref": "Dropped NG: Company DEFA14A 0001104659-26-119230: comp-committee letter rebutting ISS on equity plans ahead of Nov 3 special meeting; company-only",
+          "url": "https://www.sec.gov/Archives/edgar/data/1173420/000110465926119230/0001104659-26-119230-index.htm"
+        },
+        {
+          "kind": "filing",
+          "ref": "Dropped MSFT: PX14A6G 0000921895-26-002869 (JLens) and 0001214659-26-013276; shareholder-proposal ESG solicitations, below bar",
+          "url": "https://www.sec.gov/Archives/edgar/data/789019/000092189526002869/0000921895-26-002869-index.htm"
+        },
+        {
+          "kind": "filing",
+          "ref": "Dropped SATS: Strive Inc 13D/A 0000950103-26-016309 (Ramaswamy) matched SATS only via SEC company_tickers CIK collision for Strive (ASST/SATA); Strive not in universe. Ticker-mapping caution.",
+          "url": "https://www.sec.gov/Archives/edgar/data/1920406/000095010326016309/0000950103-26-016309-index.htm"
+        },
+        {
+          "kind": "web",
+          "ref": "Also read: /workspace/shared/magis/status.json (2026-10-29); leads.json (2026-10-29, no activism-tagged leads); posted_state.json.",
+          "url": null
+        },
+        {
+          "kind": "web",
+          "ref": "Also read: EDGAR daily-index form.20261028.idx; current feeds (13D, 13D/A, 13G, DFAN14A, PX14A6G, DEFC14A, PREC14A, DEFA14A) to ~08:30 ET 2026-10-29.",
+          "url": "https://www.sec.gov/Archives/edgar/daily-index/2026/QTR4/form.20261028.idx"
+        }
+      ],
+      "confidence": "filing",
+      "next": "Large-holder governance agreement (not a campaign). People Inc (formerly IAC Inc.). Materiality 75. Run 2026-10-29T08:35:00-04:00. Activist feed stale: build 2026-10-27T13:55:22Z, blob unchanged since Oct 28; EDGAR fallback (Oct 28 daily index plus current feeds to ~08:30 ET Oct 29).",
+      "handoff": null,
+      "desk": "activism",
+      "owner": "drew",
+      "as_of": "2026-10-29",
+      "author": "grok-drew-activism",
       "stale": false
     },
     {
@@ -1240,7 +1375,6 @@
     }
   ],
   "desks_without_brief": [
-    "activism",
     "nol_tax_assets",
     "stahl",
     "short_selling"
@@ -1255,16 +1389,17 @@
     "short_selling": "Short Selling"
   },
   "counts": {
-    "briefs": 3,
-    "items": 28,
-    "files": 11,
+    "briefs": 4,
+    "items": 29,
+    "files": 12,
     "by_desk": {
       "special_situations": 4,
+      "activism": 1,
       "fundamentals": 12,
       "tape_index": 12
     },
     "by_owner": {
-      "drew": 28
+      "drew": 29
     }
   },
   "health": {
@@ -1272,6 +1407,7 @@
     "structural_errors": [],
     "problems": [],
     "warnings": [
+      "_system/data/desk_briefs/activism/2026-10-29.json: items[0].evidence[2] (MGM): filing without a URL",
       "_system/data/desk_briefs/special_situations/2026-10-29.json: inputs_read[6] (_system/data/special_situations/situations.jsonl) carries no stamp",
       "_system/data/desk_briefs/tape_index/2026-10-19.json: inputs_read[11] (_system/data/desk_briefs/schema.json) carries no stamp",
       "_system/data/desk_briefs/tape_index/2026-10-19.json: inputs_read[12] (_system/agents/DESKS.md) carries no stamp",
@@ -1284,7 +1420,7 @@
       "_system/data/desk_briefs/tape_index/2026-10-29.json: inputs_read[5] (_system/data/desk_briefs/schema.json) carries no stamp"
     ],
     "stale_days": 7,
-    "checked_at": "2026-10-29T16:44:30Z"
+    "checked_at": "2026-10-29T19:11:20Z"
   },
   "research_only": true,
   "in_base_irr": false,
@@ -1292,10 +1428,10 @@
   "_envelope": {
     "schema_version": "magis.feed.v2",
     "feed_id": "dashboard-desk-briefs",
-    "generated_at": "2026-10-29T16:44:30Z",
+    "generated_at": "2026-10-29T19:11:20Z",
     "as_of": "2026-10-29",
-    "content_sha256": "sha256:70086cd79cd9d9215f6ee4773f951f2dd2196ec4f1e117e59b6bc637fe596402",
-    "row_count": 28,
+    "content_sha256": "sha256:e81198d034b44a0c62cf2a5b95b481cc624932bfd0ea7da434cad202ff5d69a0",
+    "row_count": 29,
     "upstream_inputs": [],
     "health": {
       "status": "healthy",

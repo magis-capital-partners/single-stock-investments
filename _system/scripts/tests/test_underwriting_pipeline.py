@@ -255,10 +255,12 @@ def test_end_to_end_writes_only_independently_reviewed_models_and_replays_privat
     result = pipeline.run_batch(tmp_path, launch=True, work=tmp_path/'work', vault=tmp_path/'vault',
                                 prepare=lambda *a: p, execute=mock_stages(c, calls))
     assert result['completed'] == ['TEST'] and result['blocked'] == []
-    assert calls == ['author', 'challenger', 'builder']
+    assert calls == ['author', 'challenger']
     receipt = pipeline.validate_saved(tmp_path, 'TEST', tmp_path/'vault')
     assert receipt['requires_human_review'] is False
-    assert len({r['agent_id'] for r in receipt['stages'].values()}) == 3
+    assert len({receipt['stages'][s]['agent_id'] for s in ('author', 'challenger')}) == 2
+    assert receipt['stages']['builder']['provider'] == 'deterministic'
+    assert receipt['stages']['builder']['model_calls'] == 0
     assert pipeline.build_queue(tmp_path, '2026-10-26')['summary']['statuses'] == {'reviewed': 1}
 
 
@@ -273,6 +275,13 @@ def test_failed_challenge_or_builder_cannot_replace_an_existing_model(tmp_path, 
     monkeypatch.setattr(refresh, 'refresh_quote', lambda *a, **kw: None)
     monkeypatch.setattr(refresh, 'refresh_missing_model_inputs', lambda *a: None)
     calls = []
+    if bad_builder:
+        original_compiler = pipeline.compiled_build
+        def corrupt(*args):
+            value, receipt = original_compiler(*args)
+            value['inputs']['price'] = 12345
+            return value, receipt
+        monkeypatch.setattr(pipeline, 'compiled_build', corrupt)
     result = pipeline.run_batch(tmp_path, launch=True, work=tmp_path/'work', vault=tmp_path/'vault', prepare=lambda *a: packet(),
                                 execute=mock_stages(contract(), calls, bad_review=bad_review, bad_builder=bad_builder))
     assert not result['completed'] and result['blocked'][0]['ticker'] == 'TEST'
@@ -349,7 +358,7 @@ def test_rejected_proposals_resume_with_full_critique_across_batches(tmp_path, m
     assert pipeline.read(tmp_path/'work/progress/TEST.json')['history']
 
 
-def test_approved_strong_stages_resume_after_a_builder_budget_block(tmp_path, monkeypatch):
+def test_approved_strong_stages_resume_after_a_compiler_interruption(tmp_path, monkeypatch):
     import refresh_shared_forecasts as refresh
     import underwriting_pipeline as pipeline
     company_root(tmp_path)
@@ -358,17 +367,16 @@ def test_approved_strong_stages_resume_after_a_builder_budget_block(tmp_path, mo
     monkeypatch.setattr(refresh,'refresh_missing_model_inputs',lambda *a:None)
     calls, state, c = [], {}, contract()
     execute = mock_stages(c,calls)
-    def blocked(stage, *args):
-        if stage == 'builder':
-            raise pipeline.StageBlocked('model_call_daily_subject_budget')
-        execute(stage,*args)
+    compiler = pipeline.compiled_build
+    monkeypatch.setattr(pipeline, 'compiled_build', lambda *args: (_ for _ in ()).throw(pipeline.StageBlocked('interrupted assembly')))
     with pytest.raises(pipeline.StageBlocked):
         pipeline.run_company(tmp_path,tmp_path/'work','TEST','2026-10-26',state,tmp_path/'vault',
-                             prepare=lambda *a:packet(),execute=blocked)
+                             prepare=lambda *a:packet(),execute=execute)
+    monkeypatch.setattr(pipeline, 'compiled_build', compiler)
     result = pipeline.run_company(tmp_path,tmp_path/'work','TEST','2026-10-26',state,tmp_path/'vault',
                                   prepare=lambda *a:packet(),execute=execute)
     assert result['status'] == 'validated'
-    assert calls == ['author','challenger','builder']
+    assert calls == ['author','challenger']
 
 
 def test_only_pull_request_creation_uses_the_existing_service_credential(monkeypatch):
@@ -543,7 +551,7 @@ def test_live_underwriting_roles_pin_sol_high_and_auto_without_changing_other_la
     root = Path(__file__).resolve().parents[3]
     assert pipeline.stage_model(root,'author') == {'id':'gpt-6.1-sol','reasoning_effort':'high','provider':'codex-local'}
     assert pipeline.stage_model(root,'challenger') == {'id':'gpt-6.1-sol','reasoning_effort':'high','provider':'codex-local'}
-    assert pipeline.stage_model(root,'builder') == {'id':'auto','reasoning_effort':None,'provider':'cursor'}
+    assert pipeline.stage_model(root,'builder') == {'id':'underwriting-compiler/1','reasoning_effort':None,'provider':'deterministic'}
     assert pipeline.read(root/pipeline.CALL_POLICY)['model_ladder']['default_model'] == 'composer-2.5'
 
 
@@ -564,7 +572,7 @@ def test_local_judgment_handoff_builds_on_another_host_without_repeating_judgmen
     built = pipeline.run_batch(tmp_path,launch=True,phase='build',work=tmp_path/'remote-work',vault=vault,
                                prepare=lambda *a:pytest.fail('The builder must use the frozen handoff'),execute=mock_stages(c,calls))
     assert built['completed'] == ['TEST']
-    assert calls == ['author','challenger','builder']
+    assert calls == ['author','challenger']
     assert pipeline.validate_saved(tmp_path,'TEST',vault)['status'] == 'validated'
     assert not pipeline.run_batch(tmp_path,launch=True,phase='build',work=tmp_path/'third-work',vault=vault,
                                   execute=lambda *a:pytest.fail('An accepted handoff was repeated'))['selected']
