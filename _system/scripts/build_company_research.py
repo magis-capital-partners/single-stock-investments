@@ -233,7 +233,13 @@ class Builder:
 
     def base(self, identity, title, origin, *, text="", state="indexed", date=None, author=None, period=None, explicit=(), locations=(), mime="", path=""):
         match_text = text
-        issuer_owned = bool(explicit) and (path.replace('\\','/').startswith('_system/reference/market-data/') or any('/'+folder+'/' in '/'+path.replace('\\','/') for folder in ('investor-documents','financials','models')))
+        normalized_path = '/' + path.replace('\\','/')
+        issuer_owned = bool(explicit) and (
+            normalized_path.startswith('/_system/reference/market-data/')
+            or '/third-party-analyses/activist_reports/' in normalized_path
+            or '/research/evidence/_text/mgmt/' in normalized_path
+            or any('/'+folder+'/' in normalized_path for folder in ('investor-documents','financials','models'))
+        )
         if issuer_owned:
             # An issuer's filings and operating data belong to that issuer.
             # Incidental banks, vendors and peers in its disclosures should not

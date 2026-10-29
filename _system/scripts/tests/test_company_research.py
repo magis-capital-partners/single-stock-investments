@@ -91,6 +91,15 @@ def test_shared_numeric_company_files_belong_only_to_their_issuer(tmp_path):
     assert market_data_owner(Path('returns/BRK_B.csv'),{'BRK.B':{}})==['BRK.B']
 
 
+@pytest.mark.parametrize('path',['CME/third-party-analyses/activist_reports/long/SC-13G.htm','CME/research/evidence/_text/mgmt/annual.pdf.txt'])
+def test_issuer_disclosure_renditions_do_not_become_peer_research(tmp_path,path):
+    b=Builder(tmp_path,None,tmp_path/'out',tmp_path/'cache',companies=COMPANIES)
+    row=b.base('filing','Institutional ownership disclosure','git',explicit=['CME'],path=path,
+               text='Newmont Corporation operates gold mines and has expanded production while reducing costs and improving earnings.')
+    assert [r['ticker'] for r in row['relationships']]==['CME']
+    assert 'Newmont' in row['text']
+
+
 def test_restored_original_extraction_reuses_full_ocr_for_local_rendition(tmp_path):
     import hashlib
     from company_sources import digest
