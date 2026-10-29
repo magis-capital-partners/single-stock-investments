@@ -1008,9 +1008,11 @@ def write_book(path: Path | None = None) -> Path | None:
         separations=_load(SEPARATIONS_PATH),
         buyback=__import__("build_buyback_radar").load_buyback_projection(),
     )
+    from situation_rows import attach_to_book
+    attach_to_book(payload)
     target = path or OUT_PATH
     target.parent.mkdir(parents=True, exist_ok=True)
-    target.write_text(json.dumps(payload, indent=2) + "\n", encoding="utf-8")
+    target.write_text(json.dumps(payload, indent=2, ensure_ascii=False) + "\n", encoding="utf-8")
     ranked = payload["counts"]["ranked"]
     print(
         f"Wrote {target} ranked={sum(ranked.values())} "
@@ -1029,7 +1031,7 @@ def refresh_buyback_projection(path=None):
     projection=load_buyback_projection()
     if not projection.get("snapshot_id"):raise ValueError("Verified buyback snapshot unavailable")
     for key,book in (("rows","ranked"),("discovery","discovery"),("history","history")):
-        rows=[r for r in doc.get(key,[]) if r.get("lane")!="buyback_events"]
+        rows=[r for r in doc.get(key,[]) if r.get("lane")!="buyback_events" or r.get("source_feed")=="situation_register"]
         rows.extend(r for r in buyback_event_rows(projection) if r["book"]==book)
         doc[key]=sorted(rows,key=_sort_key)
         counts=doc.setdefault("counts",{}).setdefault(book,{})

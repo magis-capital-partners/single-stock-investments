@@ -124,6 +124,10 @@ def build(source: Path, output: Path, max_file_bytes: int = MAX_FILE_BYTES) -> d
         shutil.copy2(copy_source, target)
         included.append(rel_posix)
 
+    # Build status from the actual restored/shipped files, after every source
+    # has been copied. A podcast-only publication must not ship an old clock.
+    from build_feed_status import write_feed_status
+    write_feed_status(ROOT, dashboard=output)
     stamped = stamp_asset_versions(output)
 
     core_path = output / "data" / "core.json"
