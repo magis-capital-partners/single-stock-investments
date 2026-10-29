@@ -54,6 +54,14 @@ def test_snapshot_refuses_missing_bodies_and_changed_identity_rules(tmp_path):
         b.publish_cached()
 
 
+def test_snapshot_refuses_a_missing_record_partition(tmp_path):
+    old = snapshot(tmp_path)
+    b = Builder(tmp_path, None, tmp_path / "second", old.cache, companies=COMPANIES)
+    b.previous["record_parts"].append("records/missing.json")
+    with pytest.raises(RuntimeError, match="missing a record partition"):
+        b.publish_cached()
+
+
 def test_publication_restore_preserves_full_text_without_unpacking_originals(tmp_path):
     old = snapshot(tmp_path)
     (old.cache / "git").mkdir()

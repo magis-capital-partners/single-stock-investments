@@ -819,6 +819,10 @@ class Builder:
 
     def publish_cached(self):
         """Publish the completed recovery snapshot without rediscovering sources."""
+        for part in self.previous.get("record_parts", []):
+            path = (self.cache / part).resolve()
+            if not path.is_relative_to(self.cache.resolve()) or not path.is_file():
+                raise RuntimeError("The private source snapshot is missing a record partition")
         records = self.previous.get("records", {})
         if not records or not self.previous.get("generated_at"):
             raise RuntimeError("A completed private company-source snapshot is required")
