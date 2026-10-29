@@ -139,8 +139,16 @@ def build_report(rows: list[dict], root: Path, as_of: date) -> dict:
     tickers = [r.get("ticker") for r in rows]
     if not tickers or not all(tickers) or len(set(tickers)) != len(tickers):
         raise ValueError("IRR coverage requires a nonempty universe of unique tickers.")
-    companies = [assess_company(row, read_json(root / row["ticker"] / "research/valuation.json"),
-        read_json(root / row["ticker"] / "research/valuation_contract.json"), as_of=as_of) for row in rows]
+    def evidence(relative):
+        document=read_json(root / relative)
+        if document.get("private_snapshot"):
+            # A private pointer is an access/restore issue, never an empty
+            # issuer model. Fail before replacing the last valid readiness run.
+            from private_dashboard_assets import read_resolved_json
+            document, _=read_resolved_json(root, relative)
+        return document
+    companies = [assess_company(row, evidence(f'{row["ticker"]}/research/valuation.json'),
+        evidence(f'{row["ticker"]}/research/valuation_contract.json'), as_of=as_of) for row in rows]
     return report_for_companies(companies, as_of)
 
 

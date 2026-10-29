@@ -226,6 +226,7 @@ def holdings_from_xml(
 def main() -> int:
     parser = argparse.ArgumentParser()
     parser.add_argument("--offline", action="store_true", help="Use cached XML only; do not fetch SEC")
+    parser.add_argument("--history-only", action="store_true", help="Extend full dated history without replacing the current book overlay")
     parser.add_argument("--max-funds", type=int, default=0, help="Limit funds for testing")
     parser.add_argument(
         "--backfill-quarters",
@@ -234,6 +235,8 @@ def main() -> int:
         help="Number of recent 13F filings per fund to write under records/full (default 1)",
     )
     args = parser.parse_args()
+    if args.offline and args.history_only:
+        parser.error("--history-only requires SEC filing metadata; the legacy XML-only offline mode has no reliable quarter clocks")
 
     if args.offline and not CACHE_DIR.exists():
         print("No cache directory; run without --offline first")
@@ -332,6 +335,7 @@ def main() -> int:
                 newest_acc
                 and saved.get("accession") == newest_acc
                 and saved_rows
+                and len(prior_full_quarters(fund["fund_id"])) >= min(backfill_n, len(groups))
                 and all(row.get("shares") is not None for row in saved_rows)
             ):
                 print(f"{fund['fund_id']}: unchanged")
@@ -341,6 +345,9 @@ def main() -> int:
                 latest_classification = saved.get("classification") or {}
                 groups = []
             for group in groups:
+                period_quarter = quarter_from_period(group[0].get("report_date"))
+                if args.history_only and period_quarter and (FULL_RECORDS_DIR / fund["fund_id"] / f"{period_quarter}.json").is_file():
+                    continue
                 built = build_period(
                     group,
                     fund_id=fund["fund_id"],
@@ -355,7 +362,7 @@ def main() -> int:
                     "filing_date": built["filing_date"],
                     "accession": built["accession"],
                 }
-                existing_qs = prior_full_quarters(fund["fund_id"], exclude=quarter)
+                existing_qs = [q for q in prior_full_quarters(fund["fund_id"], exclude=quarter) if q < quarter]
                 prior_full_map = load_prior_full_by_cusip(fund["fund_id"], existing_qs[-1]) if existing_qs else {}
                 full_rows, book_rows, cusip_map, classification = holdings_from_xml(
                     fund,
@@ -397,7 +404,8 @@ def main() -> int:
                 latest_full_rows = full_rows
                 latest_book_rows = book_rows
                 latest_classification = classification
-                save_json(fund_dir / "latest.json", full_payload)
+                if not args.history_only:
+                    save_json(fund_dir / "latest.json", full_payload)
 
         if latest_quarter_for_fund is None:
             continue
@@ -418,6 +426,10 @@ def main() -> int:
             f"{fund['fund_id']}: {len(latest_book_rows)} book / {len(latest_full_rows)} full "
             f"(biotech_mv_share={latest_classification.get('biotech_mv_share')}, q={latest_quarter_for_fund})"
         )
+
+    if args.history_only:
+        print("Extended dated ownership history; current book overlay preserved")
+        return 0
 
     save_json(
         FULL_RECORDS_DIR / "fund_classifications_latest.json",
