@@ -1,7 +1,7 @@
 {
-  "generated_at": "2026-08-12T01:25:46Z",
+  "generated_at": "2026-10-29T16:47:08Z",
   "source": "SEC EDGAR submissions + primary documents",
-  "method": "Deterministic regex retrieval over the latest 10-K / DEF 14A / recent 8-Ks, then tense classification. Prospective risk-factor boilerplate is NOT an ownership change; ambiguous hits set needs_review rather than being resolved.",
+  "method": "Deterministic regex retrieval over the latest 10-K, latest 10-Q, latest DEF 14A, and 8-Ks whose items or description point at a rights plan or tax disclosure, then tense classification. Each row carries the income-tax note accession and section. page is set only when a page marker sits just before the heading; HTML filings often have none, and a missing page is left null. A Section 382 dollar limit is recorded only when the sentence states an annual limitation or a Section 382 limitation. Prospective risk-factor boilerplate is NOT an ownership change; ambiguous hits set needs_review rather than being resolved. Public EDGAR only; no path outside this repo.",
   "not_extractable": [
     "NUBIG / NUBIL -- requires asset-level tax basis versus fair value, which is not disclosed in any filing. Flag candidates qualitatively; never model a number."
   ],
@@ -13,6 +13,7 @@
         "occurred": true,
         "years": [],
         "limited_amount_usd": null,
+        "dollar_limit_stated": false,
         "evidence": {
           "kind": "ownership_change",
           "tense": "historical",
@@ -23,8 +24,11 @@
           "form": "10-K",
           "accession": "0001384195-26-000050",
           "filed": "2026-03-04",
+          "section": null,
+          "page": "F-41",
           "url": "https://www.sec.gov/Archives/edgar/data/1384195/000138419526000050/rei-20251231.htm",
           "limited_amount_usd": null,
+          "dollar_limit_stated": false,
           "years_mentioned": []
         },
         "hit_counts": {
@@ -46,8 +50,39 @@
       "reviewed_forms": [
         "10-K"
       ],
+      "section_382_limitations_phrase": null,
       "cik": "0001384195",
+      "income_tax_note": {
+        "form": "10-K",
+        "accession": "0001384195-26-000050",
+        "filed": "2026-03-04",
+        "section": "NOTE 14 INCOME TAXES",
+        "page": "F-39",
+        "url": "https://www.sec.gov/Archives/edgar/data/1384195/000138419526000050/rei-20251231.htm",
+        "section_found": true
+      },
+      "accession": "0001384195-26-000050",
+      "section": "NOTE 14 INCOME TAXES",
+      "page": "F-39",
       "filings_scanned": [
+        {
+          "form": "10-K",
+          "accession": "0001384195-26-000050",
+          "filed": "2026-03-04",
+          "url": "https://www.sec.gov/Archives/edgar/data/1384195/000138419526000050/rei-20251231.htm"
+        },
+        {
+          "form": "10-Q",
+          "accession": "0001384195-26-000080",
+          "filed": "2026-08-05",
+          "url": "https://www.sec.gov/Archives/edgar/data/1384195/000138419526000080/rei-20260630.htm"
+        },
+        {
+          "form": "DEF 14A",
+          "accession": "0001384195-26-000068",
+          "filed": "2026-04-10",
+          "url": "https://www.sec.gov/Archives/edgar/data/1384195/000138419526000068/rei-20260410.htm"
+        },
         {
           "form": "8-K",
           "accession": "0001384195-26-000083",
@@ -73,12 +108,6 @@
           "url": "https://www.sec.gov/Archives/edgar/data/1384195/000138419526000075/rei-20260506.htm"
         },
         {
-          "form": "DEF 14A",
-          "accession": "0001384195-26-000068",
-          "filed": "2026-04-10",
-          "url": "https://www.sec.gov/Archives/edgar/data/1384195/000138419526000068/rei-20260410.htm"
-        },
-        {
           "form": "8-K",
           "accession": "0001384195-26-000057",
           "filed": "2026-03-06",
@@ -91,10 +120,40 @@
           "url": "https://www.sec.gov/Archives/edgar/data/1384195/000138419526000053/rei-20260304.htm"
         },
         {
-          "form": "10-K",
-          "accession": "0001384195-26-000050",
-          "filed": "2026-03-04",
-          "url": "https://www.sec.gov/Archives/edgar/data/1384195/000138419526000050/rei-20251231.htm"
+          "form": "8-K",
+          "accession": "0001628280-25-032605",
+          "filed": "2025-06-23",
+          "url": "https://www.sec.gov/Archives/edgar/data/1384195/000162828025032605/rei-20250618.htm"
+        },
+        {
+          "form": "8-K",
+          "accession": "0001628280-25-016778",
+          "filed": "2025-04-04",
+          "url": "https://www.sec.gov/Archives/edgar/data/1384195/000162828025016778/rei-20250331.htm"
+        },
+        {
+          "form": "8-K",
+          "accession": "0001628280-25-009049",
+          "filed": "2025-02-28",
+          "url": "https://www.sec.gov/Archives/edgar/data/1384195/000162828025009049/rei-20250225.htm"
+        },
+        {
+          "form": "8-K",
+          "accession": "0001628280-24-005338",
+          "filed": "2024-02-16",
+          "url": "https://www.sec.gov/Archives/edgar/data/1384195/000162828024005338/rei-20240212.htm"
+        },
+        {
+          "form": "8-K",
+          "accession": "0001628280-23-024921",
+          "filed": "2023-07-14",
+          "url": "https://www.sec.gov/Archives/edgar/data/1384195/000162828023024921/rei-20230710.htm"
+        },
+        {
+          "form": "8-K",
+          "accession": "0001628280-23-019933",
+          "filed": "2023-05-26",
+          "url": "https://www.sec.gov/Archives/edgar/data/1384195/000162828023019933/rei-20230525.htm"
         }
       ]
     },
@@ -104,6 +163,7 @@
         "occurred": false,
         "years": [],
         "limited_amount_usd": null,
+        "dollar_limit_stated": false,
         "evidence": null,
         "hit_counts": {
           "historical": 0,
@@ -120,10 +180,57 @@
         "mentioned": false,
         "evidence": null
       },
-      "needs_review": false,
+      "needs_review": true,
       "reviewed_forms": [],
+      "section_382_limitations_phrase": {
+        "quote": "for state and federal tax credits, respectively. As of December 31, 2025, our gross federal net operating loss carryforwards were approximately $ 127 which are subject to Section 382 limitations. As of December 31, 2025 and 2024, we had a valuation allowance related to defe",
+        "form": "10-K",
+        "accession": "0000908937-26-000006",
+        "filed": "2026-02-05",
+        "section": null,
+        "page": "F-41",
+        "url": "https://www.sec.gov/Archives/edgar/data/908937/000090893726000006/siri-20251231.htm",
+        "dollar_limit_stated": false
+      },
+      "needs_review_reason": "The filing says tax attributes are subject to Section 382 limitations and states no annual dollar limit. No dollar limit is inferred.",
       "cik": "0000908937",
+      "income_tax_note": {
+        "form": "10-Q",
+        "accession": "0000908937-26-000028",
+        "filed": "2026-10-29",
+        "section": "(15) Income Taxes",
+        "page": null,
+        "url": "https://www.sec.gov/Archives/edgar/data/908937/000090893726000028/siri-20260930.htm",
+        "section_found": true
+      },
+      "accession": "0000908937-26-000028",
+      "section": "(15) Income Taxes",
+      "page": null,
       "filings_scanned": [
+        {
+          "form": "10-K",
+          "accession": "0000908937-26-000006",
+          "filed": "2026-02-05",
+          "url": "https://www.sec.gov/Archives/edgar/data/908937/000090893726000006/siri-20251231.htm"
+        },
+        {
+          "form": "10-Q",
+          "accession": "0000908937-26-000028",
+          "filed": "2026-10-29",
+          "url": "https://www.sec.gov/Archives/edgar/data/908937/000090893726000028/siri-20260930.htm"
+        },
+        {
+          "form": "DEF 14A",
+          "accession": "0001104659-26-041777",
+          "filed": "2026-04-10",
+          "url": "https://www.sec.gov/Archives/edgar/data/908937/000110465926041777/tm261591-1_def14a.htm"
+        },
+        {
+          "form": "8-K",
+          "accession": "0000908937-26-000027",
+          "filed": "2026-10-29",
+          "url": "https://www.sec.gov/Archives/edgar/data/908937/000090893726000027/siri-20261029.htm"
+        },
         {
           "form": "8-K",
           "accession": "0000908937-26-000020",
@@ -149,12 +256,6 @@
           "url": "https://www.sec.gov/Archives/edgar/data/908937/000090893726000010/siri-20260430.htm"
         },
         {
-          "form": "DEF 14A",
-          "accession": "0001104659-26-041777",
-          "filed": "2026-04-10",
-          "url": "https://www.sec.gov/Archives/edgar/data/908937/000110465926041777/tm261591-1_def14a.htm"
-        },
-        {
           "form": "8-K",
           "accession": "0001104659-26-025845",
           "filed": "2026-03-10",
@@ -167,10 +268,34 @@
           "url": "https://www.sec.gov/Archives/edgar/data/908937/000110465926023858/tm267872d2_8k.htm"
         },
         {
-          "form": "10-K",
-          "accession": "0000908937-26-000006",
-          "filed": "2026-02-05",
-          "url": "https://www.sec.gov/Archives/edgar/data/908937/000090893726000006/siri-20251231.htm"
+          "form": "8-K",
+          "accession": "0001104659-25-081401",
+          "filed": "2025-08-21",
+          "url": "https://www.sec.gov/Archives/edgar/data/908937/000110465925081401/tm2523769d1_8k.htm"
+        },
+        {
+          "form": "8-K",
+          "accession": "0001104659-24-071939",
+          "filed": "2024-06-17",
+          "url": "https://www.sec.gov/Archives/edgar/data/908937/000110465924071939/tm2417346d1_8k.htm"
+        },
+        {
+          "form": "8-K",
+          "accession": "0000930413-24-000436",
+          "filed": "2024-01-29",
+          "url": "https://www.sec.gov/Archives/edgar/data/908937/000093041324000436/c107879_8k-ixbrl.htm"
+        },
+        {
+          "form": "8-K",
+          "accession": "0000930413-24-000434",
+          "filed": "2024-01-29",
+          "url": "https://www.sec.gov/Archives/edgar/data/908937/000093041324000434/c107877_8k-ixbrl.htm"
+        },
+        {
+          "form": "8-K",
+          "accession": "0000930413-24-000019",
+          "filed": "2024-01-03",
+          "url": "https://www.sec.gov/Archives/edgar/data/908937/000093041324000019/c107555_8k-ixbrl.htm"
         }
       ]
     },
@@ -183,6 +308,7 @@
           "2025"
         ],
         "limited_amount_usd": null,
+        "dollar_limit_stated": false,
         "evidence": {
           "kind": "ownership_change",
           "tense": "historical",
@@ -193,8 +319,11 @@
           "form": "10-K",
           "accession": "0001628280-26-007460",
           "filed": "2026-02-12",
+          "section": null,
+          "page": null,
           "url": "https://www.sec.gov/Archives/edgar/data/1347178/000162828026007460/vnda-20251231.htm",
           "limited_amount_usd": null,
+          "dollar_limit_stated": false,
           "years_mentioned": [
             "2014"
           ]
@@ -218,8 +347,45 @@
       "reviewed_forms": [
         "10-K"
       ],
+      "section_382_limitations_phrase": null,
       "cik": "0001347178",
+      "income_tax_note": {
+        "form": "10-Q",
+        "accession": "0001347178-26-000002",
+        "filed": "2026-10-29",
+        "section": "11. Income Taxes",
+        "page": null,
+        "url": "https://www.sec.gov/Archives/edgar/data/1347178/000134717826000002/vnda-20260930.htm",
+        "section_found": true
+      },
+      "accession": "0001347178-26-000002",
+      "section": "11. Income Taxes",
+      "page": null,
       "filings_scanned": [
+        {
+          "form": "10-K",
+          "accession": "0001628280-26-007460",
+          "filed": "2026-02-12",
+          "url": "https://www.sec.gov/Archives/edgar/data/1347178/000162828026007460/vnda-20251231.htm"
+        },
+        {
+          "form": "10-Q",
+          "accession": "0001347178-26-000002",
+          "filed": "2026-10-29",
+          "url": "https://www.sec.gov/Archives/edgar/data/1347178/000134717826000002/vnda-20260930.htm"
+        },
+        {
+          "form": "DEF 14A",
+          "accession": "0001628280-26-026893",
+          "filed": "2026-04-23",
+          "url": "https://www.sec.gov/Archives/edgar/data/1347178/000162828026026893/vnda-20260423.htm"
+        },
+        {
+          "form": "8-K",
+          "accession": "0001628280-26-067886",
+          "filed": "2026-10-28",
+          "url": "https://www.sec.gov/Archives/edgar/data/1347178/000162828026067886/vnda-20261028.htm"
+        },
         {
           "form": "8-K",
           "accession": "0001628280-26-053308",
@@ -239,12 +405,6 @@
           "url": "https://www.sec.gov/Archives/edgar/data/1347178/000162828026031241/vnda-20260506.htm"
         },
         {
-          "form": "DEF 14A",
-          "accession": "0001628280-26-026893",
-          "filed": "2026-04-23",
-          "url": "https://www.sec.gov/Archives/edgar/data/1347178/000162828026026893/vnda-20260423.htm"
-        },
-        {
           "form": "8-K",
           "accession": "0001628280-26-026642",
           "filed": "2026-04-22",
@@ -258,15 +418,39 @@
         },
         {
           "form": "8-K",
-          "accession": "0001628280-26-016516",
-          "filed": "2026-03-10",
-          "url": "https://www.sec.gov/Archives/edgar/data/1347178/000162828026016516/vnda-20260310.htm"
+          "accession": "0001193125-24-232306",
+          "filed": "2024-10-03",
+          "url": "https://www.sec.gov/Archives/edgar/data/1347178/000119312524232306/d828148d8k.htm"
         },
         {
-          "form": "10-K",
-          "accession": "0001628280-26-007460",
-          "filed": "2026-02-12",
-          "url": "https://www.sec.gov/Archives/edgar/data/1347178/000162828026007460/vnda-20251231.htm"
+          "form": "8-K",
+          "accession": "0001193125-24-196481",
+          "filed": "2024-08-08",
+          "url": "https://www.sec.gov/Archives/edgar/data/1347178/000119312524196481/d862724d8k.htm"
+        },
+        {
+          "form": "8-K",
+          "accession": "0001193125-24-130668",
+          "filed": "2024-05-03",
+          "url": "https://www.sec.gov/Archives/edgar/data/1347178/000119312524130668/d833979d8k.htm"
+        },
+        {
+          "form": "8-K",
+          "accession": "0001193125-24-099251",
+          "filed": "2024-04-17",
+          "url": "https://www.sec.gov/Archives/edgar/data/1347178/000119312524099251/d795618d8k.htm"
+        },
+        {
+          "form": "8-K",
+          "accession": "0001193125-23-296659",
+          "filed": "2023-12-15",
+          "url": "https://www.sec.gov/Archives/edgar/data/1347178/000119312523296659/d35023d8k.htm"
+        },
+        {
+          "form": "8-K",
+          "accession": "0001193125-23-290779",
+          "filed": "2023-12-07",
+          "url": "https://www.sec.gov/Archives/edgar/data/1347178/000119312523290779/d635973d8k.htm"
         }
       ]
     },
@@ -276,6 +460,7 @@
         "occurred": false,
         "years": [],
         "limited_amount_usd": null,
+        "dollar_limit_stated": false,
         "evidence": null,
         "hit_counts": {
           "historical": 0,
@@ -294,8 +479,57 @@
       },
       "needs_review": false,
       "reviewed_forms": [],
+      "section_382_limitations_phrase": null,
       "cik": "0000814453",
+      "income_tax_note": {
+        "form": "10-Q",
+        "accession": "0000814453-26-000029",
+        "filed": "2026-07-31",
+        "section": "note 10 Income Taxes",
+        "page": null,
+        "url": "https://www.sec.gov/Archives/edgar/data/814453/000081445326000029/nwl-20260630.htm",
+        "section_found": true
+      },
+      "accession": "0000814453-26-000029",
+      "section": "note 10 Income Taxes",
+      "page": null,
       "filings_scanned": [
+        {
+          "form": "10-K",
+          "accession": "0000814453-26-000008",
+          "filed": "2026-02-13",
+          "url": "https://www.sec.gov/Archives/edgar/data/814453/000081445326000008/nwl-20251231.htm"
+        },
+        {
+          "form": "10-Q",
+          "accession": "0000814453-26-000029",
+          "filed": "2026-07-31",
+          "url": "https://www.sec.gov/Archives/edgar/data/814453/000081445326000029/nwl-20260630.htm"
+        },
+        {
+          "form": "DEF 14A",
+          "accession": "0001193125-26-126289",
+          "filed": "2026-03-26",
+          "url": "https://www.sec.gov/Archives/edgar/data/814453/000119312526126289/d52719ddef14a.htm"
+        },
+        {
+          "form": "8-K",
+          "accession": "0001193125-26-425735",
+          "filed": "2026-10-20",
+          "url": "https://www.sec.gov/Archives/edgar/data/814453/000119312526425735/d166303d8k.htm"
+        },
+        {
+          "form": "8-K",
+          "accession": "0001193125-26-412401",
+          "filed": "2026-10-02",
+          "url": "https://www.sec.gov/Archives/edgar/data/814453/000119312526412401/d163339d8k.htm"
+        },
+        {
+          "form": "8-K",
+          "accession": "0001193125-26-356986",
+          "filed": "2026-08-19",
+          "url": "https://www.sec.gov/Archives/edgar/data/814453/000119312526356986/d184060d8k.htm"
+        },
         {
           "form": "8-K",
           "accession": "0001193125-26-335521",
@@ -316,33 +550,39 @@
         },
         {
           "form": "8-K",
-          "accession": "0001193125-26-221779",
-          "filed": "2026-05-13",
-          "url": "https://www.sec.gov/Archives/edgar/data/814453/000119312526221779/d92625d8k.htm"
+          "accession": "0000950170-25-076419",
+          "filed": "2025-05-22",
+          "url": "https://www.sec.gov/Archives/edgar/data/814453/000095017025076419/nwl-20250522.htm"
         },
         {
           "form": "8-K",
-          "accession": "0000814453-26-000013",
-          "filed": "2026-05-01",
-          "url": "https://www.sec.gov/Archives/edgar/data/814453/000081445326000013/nwl-20260501.htm"
-        },
-        {
-          "form": "DEF 14A",
-          "accession": "0001193125-26-126289",
-          "filed": "2026-03-26",
-          "url": "https://www.sec.gov/Archives/edgar/data/814453/000119312526126289/d52719ddef14a.htm"
-        },
-        {
-          "form": "10-K",
-          "accession": "0000814453-26-000008",
-          "filed": "2026-02-13",
-          "url": "https://www.sec.gov/Archives/edgar/data/814453/000081445326000008/nwl-20251231.htm"
+          "accession": "0001193125-24-256691",
+          "filed": "2024-11-13",
+          "url": "https://www.sec.gov/Archives/edgar/data/814453/000119312524256691/d853098d8k.htm"
         },
         {
           "form": "8-K",
-          "accession": "0001193125-26-051284",
-          "filed": "2026-02-13",
-          "url": "https://www.sec.gov/Archives/edgar/data/814453/000119312526051284/d110612d8k.htm"
+          "accession": "0001193125-24-042851",
+          "filed": "2024-02-22",
+          "url": "https://www.sec.gov/Archives/edgar/data/814453/000119312524042851/d760670d8k.htm"
+        },
+        {
+          "form": "8-K/A",
+          "accession": "0001193125-24-032079",
+          "filed": "2024-02-12",
+          "url": "https://www.sec.gov/Archives/edgar/data/814453/000119312524032079/d775997d8ka.htm"
+        },
+        {
+          "form": "8-K",
+          "accession": "0001193125-24-029292",
+          "filed": "2024-02-09",
+          "url": "https://www.sec.gov/Archives/edgar/data/814453/000119312524029292/d664568d8k.htm"
+        },
+        {
+          "form": "8-K",
+          "accession": "0001193125-23-251560",
+          "filed": "2023-10-05",
+          "url": "https://www.sec.gov/Archives/edgar/data/814453/000119312523251560/d548738d8k.htm"
         }
       ]
     },
@@ -352,6 +592,7 @@
         "occurred": false,
         "years": [],
         "limited_amount_usd": null,
+        "dollar_limit_stated": false,
         "evidence": null,
         "hit_counts": {
           "historical": 0,
@@ -372,8 +613,45 @@
       "reviewed_forms": [
         "10-K"
       ],
+      "section_382_limitations_phrase": null,
       "cik": "0001009829",
+      "income_tax_note": {
+        "form": "10-Q",
+        "accession": "0001437749-26-033558",
+        "filed": "2026-10-27",
+        "section": "Note 6 Income Taxes",
+        "page": null,
+        "url": "https://www.sec.gov/Archives/edgar/data/1009829/000143774926033558/jakk20260930_10q.htm",
+        "section_found": true
+      },
+      "accession": "0001437749-26-033558",
+      "section": "Note 6 Income Taxes",
+      "page": null,
       "filings_scanned": [
+        {
+          "form": "10-K",
+          "accession": "0001185185-26-000723",
+          "filed": "2026-03-02",
+          "url": "https://www.sec.gov/Archives/edgar/data/1009829/000118518526000723/jakk10k123125.htm"
+        },
+        {
+          "form": "10-Q",
+          "accession": "0001437749-26-033558",
+          "filed": "2026-10-27",
+          "url": "https://www.sec.gov/Archives/edgar/data/1009829/000143774926033558/jakk20260930_10q.htm"
+        },
+        {
+          "form": "DEF 14A",
+          "accession": "0001185185-26-001465",
+          "filed": "2026-04-22",
+          "url": "https://www.sec.gov/Archives/edgar/data/1009829/000118518526001465/jakkdef14a042126.htm"
+        },
+        {
+          "form": "8-K",
+          "accession": "0001437749-26-033328",
+          "filed": "2026-10-23",
+          "url": "https://www.sec.gov/Archives/edgar/data/1009829/000143774926033328/jakk20261021_8k.htm"
+        },
         {
           "form": "8-K",
           "accession": "0001185185-26-003108",
@@ -393,22 +671,10 @@
           "url": "https://www.sec.gov/Archives/edgar/data/1009829/000118518526001663/jakk8k043026.htm"
         },
         {
-          "form": "DEF 14A",
-          "accession": "0001185185-26-001465",
-          "filed": "2026-04-22",
-          "url": "https://www.sec.gov/Archives/edgar/data/1009829/000118518526001465/jakkdef14a042126.htm"
-        },
-        {
           "form": "8-K",
           "accession": "0001185185-26-001082",
           "filed": "2026-03-27",
           "url": "https://www.sec.gov/Archives/edgar/data/1009829/000118518526001082/jakk8k032626.htm"
-        },
-        {
-          "form": "10-K",
-          "accession": "0001185185-26-000723",
-          "filed": "2026-03-02",
-          "url": "https://www.sec.gov/Archives/edgar/data/1009829/000118518526000723/jakk10k123125.htm"
         },
         {
           "form": "8-K",
@@ -418,9 +684,39 @@
         },
         {
           "form": "8-K",
-          "accession": "0001185185-25-001594",
-          "filed": "2025-10-31",
-          "url": "https://www.sec.gov/Archives/edgar/data/1009829/000118518525001594/jakk8k102925.htm"
+          "accession": "0001185185-25-000688",
+          "filed": "2025-06-25",
+          "url": "https://www.sec.gov/Archives/edgar/data/1009829/000118518525000688/jakk8k062525.htm"
+        },
+        {
+          "form": "8-K",
+          "accession": "0001185185-25-000237",
+          "filed": "2025-03-28",
+          "url": "https://www.sec.gov/Archives/edgar/data/1009829/000118518525000237/jakk8k032725.htm"
+        },
+        {
+          "form": "8-K",
+          "accession": "0001185185-24-000235",
+          "filed": "2024-03-14",
+          "url": "https://www.sec.gov/Archives/edgar/data/1009829/000118518524000235/jakkspacif20240313_8k.htm"
+        },
+        {
+          "form": "8-K",
+          "accession": "0001185185-23-001335",
+          "filed": "2023-12-21",
+          "url": "https://www.sec.gov/Archives/edgar/data/1009829/000118518523001335/jakkspacif20231220c_8k.htm"
+        },
+        {
+          "form": "8-K",
+          "accession": "0001185185-22-001313",
+          "filed": "2022-11-15",
+          "url": "https://www.sec.gov/Archives/edgar/data/1009829/000118518522001313/jakkspacif20221114_8k.htm"
+        },
+        {
+          "form": "8-K",
+          "accession": "0001185185-22-000888",
+          "filed": "2022-08-04",
+          "url": "https://www.sec.gov/Archives/edgar/data/1009829/000118518522000888/jakkspacif20220804_8k.htm"
         }
       ]
     },
@@ -430,10 +726,11 @@
         "occurred": false,
         "years": [],
         "limited_amount_usd": null,
+        "dollar_limit_stated": false,
         "evidence": null,
         "hit_counts": {
           "historical": 0,
-          "prospective": 6,
+          "prospective": 11,
           "ambiguous": 0
         }
       },
@@ -448,10 +745,48 @@
       },
       "needs_review": false,
       "reviewed_forms": [
-        "10-K"
+        "10-K",
+        "10-Q"
       ],
+      "section_382_limitations_phrase": null,
       "cik": "0001438533",
+      "income_tax_note": {
+        "form": "10-K",
+        "accession": "0001438533-26-000014",
+        "filed": "2026-02-19",
+        "section": "NOTE 14. INCOME TAXES",
+        "page": "F-33",
+        "url": "https://www.sec.gov/Archives/edgar/data/1438533/000143853326000014/tvtx-20251231.htm",
+        "section_found": true
+      },
+      "accession": "0001438533-26-000014",
+      "section": "NOTE 14. INCOME TAXES",
+      "page": "F-33",
       "filings_scanned": [
+        {
+          "form": "10-K",
+          "accession": "0001438533-26-000014",
+          "filed": "2026-02-19",
+          "url": "https://www.sec.gov/Archives/edgar/data/1438533/000143853326000014/tvtx-20251231.htm"
+        },
+        {
+          "form": "10-Q",
+          "accession": "0001438533-26-000063",
+          "filed": "2026-08-04",
+          "url": "https://www.sec.gov/Archives/edgar/data/1438533/000143853326000063/tvtx-20260630.htm"
+        },
+        {
+          "form": "DEF 14A",
+          "accession": "0001438533-26-000027",
+          "filed": "2026-04-06",
+          "url": "https://www.sec.gov/Archives/edgar/data/1438533/000143853326000027/tvtx-20260404.htm"
+        },
+        {
+          "form": "8-K",
+          "accession": "0001438533-26-000068",
+          "filed": "2026-09-21",
+          "url": "https://www.sec.gov/Archives/edgar/data/1438533/000143853326000068/tvtx-20260921.htm"
+        },
         {
           "form": "8-K",
           "accession": "0001438533-26-000062",
@@ -489,16 +824,34 @@
           "url": "https://www.sec.gov/Archives/edgar/data/1438533/000119312526217100/d38424d8k.htm"
         },
         {
-          "form": "DEF 14A",
-          "accession": "0001438533-26-000027",
-          "filed": "2026-04-06",
-          "url": "https://www.sec.gov/Archives/edgar/data/1438533/000143853326000027/tvtx-20260404.htm"
+          "form": "8-K",
+          "accession": "0001193125-23-187704",
+          "filed": "2023-07-17",
+          "url": "https://www.sec.gov/Archives/edgar/data/1438533/000119312523187704/d508610d8k.htm"
         },
         {
-          "form": "10-K",
-          "accession": "0001438533-26-000014",
-          "filed": "2026-02-19",
-          "url": "https://www.sec.gov/Archives/edgar/data/1438533/000143853326000014/tvtx-20251231.htm"
+          "form": "8-K",
+          "accession": "0001193125-22-073387",
+          "filed": "2022-03-11",
+          "url": "https://www.sec.gov/Archives/edgar/data/1438533/000119312522073387/d230850d8k.htm"
+        },
+        {
+          "form": "8-K",
+          "accession": "0001438533-21-000058",
+          "filed": "2021-12-22",
+          "url": "https://www.sec.gov/Archives/edgar/data/1438533/000143853321000058/tvtx-20211221.htm"
+        },
+        {
+          "form": "8-K",
+          "accession": "0001438533-21-000043",
+          "filed": "2021-09-15",
+          "url": "https://www.sec.gov/Archives/edgar/data/1438533/000143853321000043/tvtx-20210915.htm"
+        },
+        {
+          "form": "8-K",
+          "accession": "0001628280-21-012044",
+          "filed": "2021-06-10",
+          "url": "https://www.sec.gov/Archives/edgar/data/1438533/000162828021012044/tvtx-20210609.htm"
         }
       ]
     },
@@ -508,6 +861,7 @@
         "occurred": false,
         "years": [],
         "limited_amount_usd": null,
+        "dollar_limit_stated": false,
         "evidence": null,
         "hit_counts": {
           "historical": 0,
@@ -522,12 +876,14 @@
           "kind": "rights_plan",
           "tense": "ambiguous",
           "markers": [],
-          "quote": "of the Company s named executive officers as disclosed in the Proxy Statement; Item 3 ratification of the approval of the appointment of Grant Thornton LLP as the Company s independent registered public accounting firm for the fiscal year ending December 31, 2026; and Item 4 approval of the amendment to the Company s Tax Benefits Preservation Plan. The matters listed above are described in detail in the Proxy Statement. Item 1 - Election of Directors the nominees listed below were elected directors with the respective votes set forth opposite their names: Votes For Votes Withheld Broker Non-votes Thomas R. Bates, Jr. 100,229,609 1,664,544 14,168,346 Christian A. Garcia 101,608,971 285,182 14,168,346 John F. Glick 100,324,738 1,569,415 14,168,346 Angela D. John 100,616,750 1,277,403 14,168,346 Sharon B. McGee 99,865,325 2,028,828 14,168,346 Brady M. Murphy 1",
-          "form": "8-K",
-          "accession": "0000844965-26-000042",
-          "filed": "2026-05-26",
-          "url": "https://www.sec.gov/Archives/edgar/data/844965/000084496526000042/tti-20260522.htm",
-          "trigger_pct": null
+          "quote": "ship change under Section 382 occurs if one or more stockholders (or group of stockholders) who are each deemed to own at least 5% of the Company s stock (such holders, 5-percent stockholders ) change their ownership by more than 50 percentage points over their lowest percentage within a rolling three-year period. The Tax Plan contributes to the preservation of the Company s Tax Attributes by reducing the risk that an ownership change under Section 382 occurs. The Board of Directors adopted the Tax Plan to reduce the risk of an ownership change under Section 382. The Tax Plan deters any person or group from becoming, or obtaining the right to become, a 5-percent stockholder for purposes of Section 382 or, in certain cases, from increasing such person s or group s ownership of shares of the Company s common stock beyond 4.99%, in each case, without first obtaining the approval of the Boar",
+          "form": "DEF 14A",
+          "accession": "0000844965-26-000026",
+          "filed": "2026-04-09",
+          "section": null,
+          "page": null,
+          "url": "https://www.sec.gov/Archives/edgar/data/844965/000084496526000026/tti-20260407.htm",
+          "trigger_pct": 4.99
         }
       },
       "bankruptcy_382_exception": {
@@ -540,8 +896,45 @@
         "8-K",
         "DEF 14A"
       ],
+      "section_382_limitations_phrase": null,
       "cik": "0000844965",
+      "income_tax_note": {
+        "form": "10-K",
+        "accession": "0000844965-26-000015",
+        "filed": "2026-02-25",
+        "section": "NOTE 15 INCOME TAXES",
+        "page": "F-35",
+        "url": "https://www.sec.gov/Archives/edgar/data/844965/000084496526000015/tti-20251231.htm",
+        "section_found": true
+      },
+      "accession": "0000844965-26-000015",
+      "section": "NOTE 15 INCOME TAXES",
+      "page": "F-35",
       "filings_scanned": [
+        {
+          "form": "10-K",
+          "accession": "0000844965-26-000015",
+          "filed": "2026-02-25",
+          "url": "https://www.sec.gov/Archives/edgar/data/844965/000084496526000015/tti-20251231.htm"
+        },
+        {
+          "form": "10-Q",
+          "accession": "0000844965-26-000058",
+          "filed": "2026-08-04",
+          "url": "https://www.sec.gov/Archives/edgar/data/844965/000084496526000058/tti-20260630.htm"
+        },
+        {
+          "form": "DEF 14A",
+          "accession": "0000844965-26-000026",
+          "filed": "2026-04-09",
+          "url": "https://www.sec.gov/Archives/edgar/data/844965/000084496526000026/tti-20260407.htm"
+        },
+        {
+          "form": "8-K",
+          "accession": "0000844965-26-000061",
+          "filed": "2026-10-08",
+          "url": "https://www.sec.gov/Archives/edgar/data/844965/000084496526000061/tti-20261002.htm"
+        },
         {
           "form": "8-K",
           "accession": "0000844965-26-000056",
@@ -573,22 +966,40 @@
           "url": "https://www.sec.gov/Archives/edgar/data/844965/000084496526000042/tti-20260522.htm"
         },
         {
+          "form": "8-K/A",
+          "accession": "0000844965-24-000054",
+          "filed": "2024-05-20",
+          "url": "https://www.sec.gov/Archives/edgar/data/844965/000084496524000054/tti-20240513.htm"
+        },
+        {
           "form": "8-K",
-          "accession": "0000844965-26-000039",
-          "filed": "2026-04-29",
-          "url": "https://www.sec.gov/Archives/edgar/data/844965/000084496526000039/tti-20260429.htm"
+          "accession": "0000844965-24-000053",
+          "filed": "2024-05-17",
+          "url": "https://www.sec.gov/Archives/edgar/data/844965/000084496524000053/tti-20240513.htm"
         },
         {
-          "form": "DEF 14A",
-          "accession": "0000844965-26-000026",
-          "filed": "2026-04-09",
-          "url": "https://www.sec.gov/Archives/edgar/data/844965/000084496526000026/tti-20260407.htm"
+          "form": "8-K",
+          "accession": "0000844965-24-000010",
+          "filed": "2024-01-18",
+          "url": "https://www.sec.gov/Archives/edgar/data/844965/000084496524000010/tti-20240112.htm"
         },
         {
-          "form": "10-K",
-          "accession": "0000844965-26-000015",
-          "filed": "2026-02-25",
-          "url": "https://www.sec.gov/Archives/edgar/data/844965/000084496526000015/tti-20251231.htm"
+          "form": "8-K",
+          "accession": "0000950170-23-029677",
+          "filed": "2023-06-23",
+          "url": "https://www.sec.gov/Archives/edgar/data/844965/000095017023029677/tti-20230619.htm"
+        },
+        {
+          "form": "8-K",
+          "accession": "0000950170-23-025345",
+          "filed": "2023-05-31",
+          "url": "https://www.sec.gov/Archives/edgar/data/844965/000095017023025345/tti-20230525.htm"
+        },
+        {
+          "form": "8-K",
+          "accession": "0000950170-23-024254",
+          "filed": "2023-05-25",
+          "url": "https://www.sec.gov/Archives/edgar/data/844965/000095017023024254/tti-20230524.htm"
         }
       ]
     },
@@ -598,6 +1009,7 @@
         "occurred": false,
         "years": [],
         "limited_amount_usd": null,
+        "dollar_limit_stated": false,
         "evidence": null,
         "hit_counts": {
           "historical": 0,
@@ -616,8 +1028,45 @@
       },
       "needs_review": false,
       "reviewed_forms": [],
+      "section_382_limitations_phrase": null,
       "cik": "0001386278",
+      "income_tax_note": {
+        "form": "10-Q",
+        "accession": "0001386278-26-000045",
+        "filed": "2026-08-10",
+        "section": "Note 10 Income Taxes",
+        "page": null,
+        "url": "https://www.sec.gov/Archives/edgar/data/1386278/000138627826000045/gdot-20260630.htm",
+        "section_found": true
+      },
+      "accession": "0001386278-26-000045",
+      "section": "Note 10 Income Taxes",
+      "page": null,
       "filings_scanned": [
+        {
+          "form": "10-K/A",
+          "accession": "0001386278-26-000023",
+          "filed": "2026-04-30",
+          "url": "https://www.sec.gov/Archives/edgar/data/1386278/000138627826000023/gdot-20251231.htm"
+        },
+        {
+          "form": "10-Q",
+          "accession": "0001386278-26-000045",
+          "filed": "2026-08-10",
+          "url": "https://www.sec.gov/Archives/edgar/data/1386278/000138627826000045/gdot-20260630.htm"
+        },
+        {
+          "form": "DEF 14A",
+          "accession": "0001386278-25-000020",
+          "filed": "2025-04-11",
+          "url": "https://www.sec.gov/Archives/edgar/data/1386278/000138627825000020/gdot-20250411.htm"
+        },
+        {
+          "form": "8-K",
+          "accession": "0001386278-26-000048",
+          "filed": "2026-10-14",
+          "url": "https://www.sec.gov/Archives/edgar/data/1386278/000138627826000048/gdot-20261008.htm"
+        },
         {
           "form": "8-K",
           "accession": "0001386278-26-000042",
@@ -649,22 +1098,40 @@
           "url": "https://www.sec.gov/Archives/edgar/data/1386278/000138627826000018/gdot-20260406.htm"
         },
         {
-          "form": "10-K",
-          "accession": "0001386278-26-000015",
-          "filed": "2026-03-16",
-          "url": "https://www.sec.gov/Archives/edgar/data/1386278/000138627826000015/gdot-20251231.htm"
+          "form": "8-K",
+          "accession": "0001140361-25-043544",
+          "filed": "2025-11-26",
+          "url": "https://www.sec.gov/Archives/edgar/data/1386278/000114036125043544/ef20059936_8k.htm"
         },
         {
           "form": "8-K",
-          "accession": "0001386278-26-000011",
-          "filed": "2026-03-16",
-          "url": "https://www.sec.gov/Archives/edgar/data/1386278/000138627826000011/gdot-20260316.htm"
+          "accession": "0001386278-25-000026",
+          "filed": "2025-05-01",
+          "url": "https://www.sec.gov/Archives/edgar/data/1386278/000138627825000026/gdot-20250429.htm"
         },
         {
-          "form": "DEF 14A",
-          "accession": "0001386278-25-000020",
-          "filed": "2025-04-11",
-          "url": "https://www.sec.gov/Archives/edgar/data/1386278/000138627825000020/gdot-20250411.htm"
+          "form": "8-K",
+          "accession": "0001386278-24-000071",
+          "filed": "2024-09-06",
+          "url": "https://www.sec.gov/Archives/edgar/data/1386278/000138627824000071/gdot-20240906.htm"
+        },
+        {
+          "form": "8-K",
+          "accession": "0001386278-20-000025",
+          "filed": "2020-03-06",
+          "url": "https://www.sec.gov/Archives/edgar/data/1386278/000138627820000025/a2020-03x04amendmentto.htm"
+        },
+        {
+          "form": "8-K",
+          "accession": "0001386278-19-000060",
+          "filed": "2019-10-30",
+          "url": "https://www.sec.gov/Archives/edgar/data/1386278/000138627819000060/a2019-10x29entryintoam.htm"
+        },
+        {
+          "form": "8-K",
+          "accession": "0001386278-17-000059",
+          "filed": "2017-05-31",
+          "url": "https://www.sec.gov/Archives/edgar/data/1386278/000138627817000059/a2017-05x252017annualmeeti.htm"
         }
       ]
     }

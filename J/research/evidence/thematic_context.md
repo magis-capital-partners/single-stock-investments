@@ -1,16 +1,16 @@
-# J - Thematic context (2026-10-26)
+# J - Thematic context (2026-10-29)
 
 > Context only. Tailwinds inform stance and overlay sizing; they do not auto-inflate Lawrence base IRR. Promotion to base case requires [HUMAN REVIEW].
 
 | Indicator | Latest | As of | YoY | Direction | In base IRR? |
 |-----------|--------|-------|-----|-----------|--------------|
-| High-yield OAS credit spread (%) | -1.61 | 2026-10-26 | -25.8% | down | no (context) |
-| US Treasury 10Y yield (%) | 4.98199987411499 | 2026-10-26 | +24.6% | up | no (context) |
-| US Treasury 2Y yield (%) | 4.818999767303467 | 2026-10-26 | +33.3% | up | no (context) |
-| Trade-weighted USD index (broad) | 101.9469985961914 | 2026-10-26 | +3.2% | up | no (context) |
-| VIX index level | 18.389999389648438 | 2026-10-26 | +16.5% | up | no (context) |
-| HYG vs TLT 1-month return spread (%) | -3.77 | 2026-10-26 | -26.1% | down | no (context) |
-| SPY 20-day realized vol (annualized %) | 9.51 | 2026-10-26 | -32.0% | down | no (context) |
+| High-yield OAS credit spread (%) | -1.55 | 2026-10-29 | -52.0% | down | no (context) |
+| US Treasury 10Y yield (%) | 4.991000175476074 | 2026-10-29 | +23.0% | up | no (context) |
+| US Treasury 2Y yield (%) | 4.804999828338623 | 2026-10-29 | +30.0% | up | no (context) |
+| Trade-weighted USD index (broad) | 102.0250015258789 | 2026-10-29 | +2.8% | up | no (context) |
+| VIX index level | 17.059999465942383 | 2026-10-29 | +0.8% | flat | no (context) |
+| HYG vs TLT 1-month return spread (%) | -4.27 | 2026-10-29 | -92.3% | down | no (context) |
+| SPY 20-day realized vol (annualized %) | 10.02 | 2026-10-29 | -27.9% | down | no (context) |
 | AGI expert-horizon years ahead (public quotes) | 5.0 | 2026-06-01 | +0.0% | flat | no (context) |
 | Robotaxi expert-horizon years ahead (public quotes) | 2.0 | 2026-06-01 | +0.0% | flat | no (context) |
 | PPI: crushed and broken limestone mining (index) | 528.827 | 2026-08-01 | +6.1% | up | no (context) |
@@ -32,10 +32,10 @@
 | US manufacturing construction spending (USD m, SAAR) | 170701.0 | 2026-08-01 | -19.2% | down | no (context) |
 | US power construction spending (USD m, SAAR) | 185973.0 | 2026-08-01 | +8.5% | up | no (context) |
 | US 30-year fixed mortgage rate (%) | 7.4 | 2026-10-08 | +17.5% | up | no (context) |
-| US Treasury 10Y yield (%) | 4.986000061035156 | 2026-10-26 | +24.7% | up | no (context) |
+| US Treasury 10Y yield (%) | 4.991000175476074 | 2026-10-29 | +23.0% | up | no (context) |
 | US construction employment (thousands) | 8364.0 | 2026-09-01 | +1.3% | up | no (context) |
 | US heavy and civil engineering construction employment (thousands) | 1210.8 | 2026-09-01 | +2.2% | up | no (context) |
-| US retail diesel price (USD/gal) | 6.199 | 2026-10-05 | +67.0% | up | no (context) |
+| US retail diesel price (USD/gal) | 6.199 (stale) | 2026-10-05 | +67.0% | up | no (context) |
 | VMC aggregates cash gross profit per ton (USD) | 11.33 | 2025-12-31 | +19.8% | up | no (context) |
 | VMC freight-adjusted aggregates price per ton (USD) | 21.98 | 2025-12-31 | n/a | flat | no (context) |
 | VMC aggregates shipments (million tons, FY) | 226.8 | 2025-12-31 | n/a | flat | no (context) |

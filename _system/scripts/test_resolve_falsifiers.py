@@ -527,5 +527,67 @@ class OutcomeSupersedeHistoryTests(unittest.TestCase):
         self.assertIn("only a hit or miss", " ".join(check([unresolvable, unresolvable_again])))
 
 
+class FundamentalAnalystObservationTests(unittest.TestCase):
+    def test_review_window_does_not_use_the_call_date_row(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            obs = root / "GOOGL/research/fundamental_analyst/observations.jsonl"
+            obs.parent.mkdir(parents=True)
+            obs.write_text(json.dumps({
+                "metric_id": "listing_close", "date": "2026-10-28",
+                "value": 295.03, "unit": "USD", "claim_type": "fact",
+            }) + "\n", encoding="utf-8")
+            replay = root / "GOOGL/research/fundamental_analyst/replay_2026-10-28.json"
+            replay.write_text("{}", encoding="utf-8")
+            (root / "_system/research").mkdir(parents=True)
+            (root / "_system/research/metric_definitions.json").write_text(json.dumps({
+                "definitions": {
+                    "fundamental_analyst_observation": {
+                        "version": "1.0",
+                        "source_adapters": ["fundamental_analyst_observation"],
+                    }
+                }
+            }), encoding="utf-8")
+            plan = {
+                "metric_definition_id": "fundamental_analyst_observation",
+                "metric_definition_version": "1.0",
+                "source_adapter": "fundamental_analyst_observation",
+                "fiscal_period": "EVENT",
+                "observation_type": "instant",
+                "duration_basis": "point",
+                "canonical_unit": "USD",
+                "expected_publication_date": "2027-04-28",
+                "accepted_forms": ["analyst_observation"],
+                "maximum_source_lag_days": 14,
+                "end_date_tolerance_days": 7,
+                "historical_replay": {
+                    "status": "passed",
+                    "evidence_ref": "GOOGL/research/fundamental_analyst/replay_2026-10-28.json",
+                },
+            }
+            spec = {
+                "spec_schema_version": "3.0",
+                "spec_id": "googl-listing-close-test",
+                "unit": "USD",
+                "source_hint": "listing_close",
+                "measurement_period_end": "2027-04-28",
+                "observable_after": "2027-04-28",
+                "resolution_deadline": "2027-04-28",
+                "observation_plan": plan,
+            }
+            pending = adapters.resolve_spec("GOOGL", spec, root, date(2026, 10, 29))
+            self.assertIsNone(pending["value"])
+            self.assertEqual(pending["blocker_reason"], "evidence_missing")
+            with obs.open("a", encoding="utf-8") as handle:
+                handle.write(json.dumps({
+                    "metric_id": "listing_close", "date": "2027-04-28",
+                    "value": 110.0, "unit": "USD",
+                }) + "\n")
+            resolved = adapters.resolve_spec("GOOGL", spec, root, date(2027, 4, 28))
+            self.assertEqual(resolved["value"], 110.0)
+            self.assertEqual(resolved["as_of"], "2027-04-28")
+            self.assertEqual(resolved["adapter"], "fundamental_analyst_observation")
+
+
 if __name__ == "__main__":
     unittest.main()

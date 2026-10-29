@@ -87,3 +87,14 @@ test('catalog preflight independently resolves all three roles without an agent 
  assert.equal(report.selections.challenger.params[0].value,'high');
  assert.equal(report.selections.builder.id,'auto-smart');
 });
+
+test('local Sol and compiler policy never contacts a model API for discovery',async()=>{
+ const {verifyCatalog}=await load();
+ const report=await verifyCatalog({policy:{model_ladder:{consumers:{
+   valuation_underwriter:{model:'gpt-6.1-sol',reasoning_effort:'high',provider:'codex-local'},
+   valuation_challenger:{model:'gpt-6.1-sol',reasoning_effort:'high',provider:'codex-local'},
+   valuation_builder:{model:'underwriting-compiler/1',provider:'deterministic'},
+ }}},listModels:async()=>{throw new Error('Unexpected model API request');}});
+ assert.equal(report.provider,'local');
+ assert.equal(report.selections.builder.model_calls,0);
+});

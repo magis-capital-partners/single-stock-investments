@@ -77,6 +77,8 @@ jobs:
         run: pip install pytest pypdf exchange_calendars==4.13.2
       - name: Restore authorized private research inputs
         uses: ./.github/actions/checkout-vault
+        with:
+          include-source-archive: 'false'
       - name: Verify automatic publication checks
         run: python -m pytest -q _system/scripts/tests/test_autonomous_compounders.py _system/scripts/tests/test_shared_valuation_forecast.py _system/scripts/tests/test_valuation_market_sync.py
       - name: Collect, validate and publish every core compounder
