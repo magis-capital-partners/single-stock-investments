@@ -534,5 +534,120 @@ class InsightManifestSyncTests(unittest.TestCase):
             self.assertNotIn("secret", (episodes / name).read_text(encoding="utf-8"))
 
 
+class InPlaceManagedManifestTests(unittest.TestCase):
+    """The Mac Mini lane commits on a checkout of main.
+
+    ed7a50a16bb and the publishes after it replaced the public insights
+    manifest with the full document. That path never called the off-main
+    worktree export. A managed file staged here has to be exported, and the
+    public commit has to stay the placeholder.
+    """
+
+    def test_push_from_main_exports_the_manifest_and_keeps_the_placeholder(self):
+        import hashlib
+
+        import migrate_dashboard_sources as migration
+        from private_dashboard_assets import private_object
+
+        with tempfile.TemporaryDirectory() as tmp:
+            base = Path(tmp)
+            origin = base / "origin.git"
+            repo = base / "ops"
+            vault_origin = base / "vault.git"
+            vault = base / "vault"
+            subprocess.run(["git", "init", "-q", "--bare", "-b", "main", str(origin)], check=True)
+            subprocess.run(["git", "init", "-q", "-b", "main", str(repo)], check=True)
+            _configure(repo)
+            _git(repo, "remote", "add", "origin", str(origin))
+            subprocess.run(["git", "init", "-q", "--bare", "-b", "main", str(vault_origin)], check=True)
+            subprocess.run(["git", "init", "-q", "-b", "main", str(vault)], check=True)
+            _configure(vault)
+            _git(vault, "remote", "add", "origin", str(vault_origin))
+
+            private_doc = {
+                "generated_at": "2026-10-20T09:30:36Z",
+                "event_count": 2,
+                "letter_count": 12,
+                "source_health": {"filing_facts": {"status": "ok"}, "videos": {"items": 1}},
+                "provenance": {"event_triage_summary": {"retained_event_count": 2}},
+                "shards": {"events": "data/insights/events.json"},
+            }
+            episode = {"episode_id": "kept", "summary": "private episode text", "tickers": ["A"], "positions": ["A"]}
+            episode_rel = "data/insights/podcast_episodes/episode.json"
+            with mock.patch.dict(os.environ, {"RESEARCH_VAULT_ROOT": str(vault)}):
+                private_text = json.dumps(private_doc, ensure_ascii=False, separators=(",", ":")) + "\n"
+                private_hash = hashlib.sha256(private_text.encode()).hexdigest()
+                private_path = private_object(vault, private_hash)
+                private_path.parent.mkdir(parents=True, exist_ok=True)
+                private_path.write_text(private_text, encoding="utf-8")
+                episode_text = json.dumps(episode, ensure_ascii=False, separators=(",", ":")) + "\n"
+                episode_hash = hashlib.sha256(episode_text.encode()).hexdigest()
+                private_object(vault, episode_hash).write_text(episode_text, encoding="utf-8")
+                placeholder = json.dumps(migration.public_snapshot(private_doc), separators=(",", ":")) + "\n"
+                episode_placeholder = json.dumps(migration.public_snapshot(episode), separators=(",", ":")) + "\n"
+                manifest_rel = "dashboard/data/insights/manifest.json"
+                _write(repo / manifest_rel, placeholder)
+                _write(repo / "dashboard" / episode_rel, episode_placeholder)
+                _write(repo / "dashboard/data/insights/events.json", json.dumps({
+                    "events": [
+                        {"observed_at": "2026-01-01", "tier": "signal", "feed_eligible": True},
+                        {"observed_at": "2026-01-02", "tier": "context", "feed_eligible": True},
+                    ]
+                }))
+                _write(repo / "dashboard/data/insights/podcasts.json", "{}\n")
+                receipt = {
+                    "assets": {
+                        "data/insights/manifest.json": {
+                            "private_sha256": private_hash,
+                            "public_sha256": hashlib.sha256(placeholder.encode()).hexdigest(),
+                        },
+                        episode_rel: {
+                            "private_sha256": episode_hash,
+                            "public_sha256": hashlib.sha256(episode_placeholder.encode()).hexdigest(),
+                        },
+                    }
+                }
+                _write(repo / "dashboard/private-assets.json",
+                       json.dumps(receipt, sort_keys=True, separators=(",", ":")) + "\n")
+                _git(repo, "add", "-A")
+                _git(repo, "commit", "-qm", "seed")
+                _git(repo, "push", "-q", "origin", "main")
+                _git(vault, "add", "-A")
+                _git(vault, "commit", "-qm", "seed vault")
+                _git(vault, "push", "-q", "origin", "main")
+
+                leaked = dict(private_doc)
+                leaked["letter_count"] = 1
+                leaked["source_health"] = {
+                    "filing_facts": {"status": "ok"},
+                    "videos": {"items": 1},
+                    "podcasts": {"items": 9, "note": "SECRET"},
+                }
+                _write(repo / manifest_rel, json.dumps(leaked, separators=(",", ":")) + "\n")
+                _write(repo / "dashboard" / episode_rel, episode_text)
+                lines: list[str] = []
+                with mock.patch.object(lane, "ROOT", repo), mock.patch.object(lane, "log", side_effect=lines.append):
+                    pushed = lane.push_main(
+                        "chore(podcasts): publish analysed episodes test",
+                        paths=lane.PODCAST_PATHS,
+                        dirs=lane.PODCAST_DIRS,
+                    )
+                self.assertIs(pushed, True, lines)
+                published = json.loads(_git(origin, "show", "main:dashboard/data/insights/manifest.json"))
+                self.assertIs(published.get("private_snapshot"), True)
+                committed_manifest = _git(origin, "show", "main:dashboard/data/insights/manifest.json")
+                self.assertNotIn("SECRET", committed_manifest)
+                committed_episode = _git(origin, "show", f"main:dashboard/{episode_rel}")
+                self.assertNotIn("private episode text", committed_episode)
+                self.assertIn("private_snapshot", committed_episode)
+                updated = json.loads(_git(origin, "show", "main:dashboard/private-assets.json"))
+                new_hash = updated["assets"]["data/insights/manifest.json"]["private_sha256"]
+                self.assertNotEqual(new_hash, private_hash)
+                stored = json.loads((vault / "dashboard-private" / "objects" / new_hash).read_text(encoding="utf-8"))
+                self.assertEqual(stored["source_health"]["podcasts"]["note"], "SECRET")
+                self.assertEqual(stored["letter_count"], 12)
+                self.assertEqual(stored["event_count"], 2)
+
+
 if __name__ == "__main__":
     unittest.main(verbosity=2)
