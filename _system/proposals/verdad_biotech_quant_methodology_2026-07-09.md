@@ -4,6 +4,8 @@
 **Source:** [Investing in Biotech with Verdad Capital](https://www.buysidedigest.com/podcast/investing-in-biotech-with-verdad-capital/) (Yet Another Value Podcast, Feb 2026) + Verdad *Investing in Biotech* paper (linked from show notes)  
 **Status:** Implemented Phases A–D (2026-07-09) + Full Improvement Roadmap Phases 0–7 (2026-07-09). Source of truth: `_system/reference/biotech-quant/` (`SYNTHESIS.md`, `FACTOR_SPEC.json`).
 
+**Planning amendment 2026-10-29:** Biotech Quant will become its own strategy immediately right of Darwin CC, with its library, factors, signals, paper portfolio, and validation work together. The [updated plan](research_insights_strategy_reorganization_2026-10-29.md) records current data coverage and the path to a validated strategy. Historical `live` factor labels below describe implementation status, not proof of populated inputs, validated returns, or trading readiness. The dashboard move remains to be implemented.
+
 **Roadmap ship (2026-07-09):** Book/Universe Biotech tab; issuer mcap buckets; universe Form 4; FINRA SI; ClinicalTrials peers; multi-quarter 13F `--backfill-quarters`; composite v2 + `paper_book_latest.json` (no Darwin); knowledge delta + validate gates.
 
 ---
