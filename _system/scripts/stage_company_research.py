@@ -41,7 +41,9 @@ def stage(source: Path, site: Path, *, hardlink=False) -> dict:
             raise RuntimeError(f"Research asset needs further sharding: {path.name}")
         target = destination / relative
         target.parent.mkdir(parents=True, exist_ok=True)
-        if hardlink and not target.exists():
+        if target.exists() and os.path.samefile(path, target):
+            pass
+        elif hardlink and not target.exists():
             try:os.link(path,target)
             except OSError:shutil.copy2(path,target)
         else:

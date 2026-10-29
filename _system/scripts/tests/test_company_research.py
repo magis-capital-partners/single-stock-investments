@@ -365,14 +365,16 @@ def test_large_source_and_search_shards_preserve_the_last_word(tmp_path):
     assert "".join(json.loads((tmp_path/"out"/p).read_text())["text"] for p in content["text_parts"])==body
 
 
-def test_private_stage_copies_only_reachable_assets_and_requires_auth(tmp_path):
+@pytest.mark.parametrize('hardlink', [False, True])
+def test_private_stage_copies_only_reachable_assets_and_requires_auth(tmp_path, hardlink):
     out,site=tmp_path/"out",tmp_path/"site"
     b=Builder(tmp_path,None,out,tmp_path/"cache",companies={"CME":COMPANIES["CME"]})
     row=b.base("source","CME source","test",text="Company original",explicit=["CME"])
     b.index.add(row,["id:source"]);b.publish()
     (out/"old-unused.json").write_text('{}')
     site.mkdir();(site/"_routes.json").write_text('{"include":["/*"],"exclude":[]}')
-    assert stage(out,site)["documents"]==1
+    assert stage(out,site,hardlink=hardlink)["documents"]==1
+    assert stage(out,site,hardlink=hardlink)["documents"]==1
     assert not (site/"data/company-research/old-unused.json").exists()
     (site/"_routes.json").write_text('{"include":["/*"],"exclude":["/data/*"]}')
     with pytest.raises(RuntimeError,match="authentication"):
