@@ -213,3 +213,8 @@ def test_transcript_companion_and_cache_archive_portability(tmp_path):
     assert json.loads((target/'index.json').read_text())['record_parts']==['records/a.json']
     part=next(archive.glob('*.zip'));part.write_bytes(b'corrupt')
     with pytest.raises(ValueError,match='checksum'):restore(archive,tmp_path/'corrupt')
+
+
+def test_empty_original_is_not_a_parser_failure():
+    for suffix in ('.pdf','.epub','.doc','.txt'):
+        assert extract_complete(b'  \n',suffix)[1] == 'empty_source'

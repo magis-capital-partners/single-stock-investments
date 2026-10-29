@@ -80,6 +80,8 @@ def transcript_for(path, vault):
 
 
 def extract_complete(data, suffix, *, ocr=False):
+    if not data.strip():
+        return '', 'empty_source', {'reason':'Original contains no bytes or only whitespace'}
     if suffix == '.epu':
         suffix = '.epub'
     if suffix in {'.py', '.r', '.sql'}:
