@@ -350,6 +350,20 @@ def test_share_classes_receive_the_same_company_research():
     assert {r["ticker"] for r in links}=={"GOOG","GOOGL"}
 
 
+def test_company_pages_respect_byte_budget_without_dropping_rows(tmp_path,monkeypatch):
+    monkeypatch.setattr('build_company_research.COMPANY_PAGE_BYTES',3000)
+    b=Builder(tmp_path,None,tmp_path/'out',tmp_path/'cache',companies={'CME':COMPANIES['CME']})
+    for i in range(7):
+        row=b.base(str(i),f'Report {i}','test',text='Complete source text',explicit=['CME'])
+        row['assumptions']='Detail '*200
+        b.index.add(row,[str(i)])
+    b.publish()
+    company=json.loads((b.output/'companies/CME.json').read_text())
+    pages=[b.output/p for p in company['pages']]
+    assert len(pages)>1 and all(p.stat().st_size<3000 for p in pages)
+    assert sum(len(json.loads(p.read_text())) for p in pages)==7
+
+
 def test_large_source_and_search_shards_preserve_the_last_word(tmp_path,monkeypatch):
     monkeypatch.setattr('build_company_research.TEXT_CHUNK_CHARS',1_000_000)
     b=Builder(tmp_path,None,tmp_path/"out",tmp_path/"cache",companies={"CME":COMPANIES["CME"]})
