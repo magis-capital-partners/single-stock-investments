@@ -824,6 +824,21 @@ class Builder:
         records = retain_previous(self.index.records, previous, self.good)
         by_ticker = defaultdict(list)
         bundles, content_batch, content_size = {}, {}, 0
+        # A resumed build may discover the same originals in a different order.
+        # Reuse verified immutable bundles so that this does not duplicate the
+        # entire corpus on disk. Changed documents get a new bundle; unchanged
+        # documents may continue sharing their previous one.
+        reusable = {}
+        if (self.output / "manifest.json").is_file():
+            for path in (self.output / "documents").glob("*.json"):
+                try:
+                    prior = load(path)
+                    if path.stem != digest(json.dumps(prior, sort_keys=True))[:24]:
+                        continue
+                    for sid, content in prior.items():
+                        reusable[(sid, digest(json.dumps(content, sort_keys=True)))] = path.relative_to(self.output).as_posix()
+                except (OSError, ValueError, AttributeError):
+                    continue
         def flush_content():
             nonlocal content_batch, content_size
             if content_batch:
@@ -851,10 +866,14 @@ class Builder:
                     parts.append(filename)
             content = {"id": rec["id"], "title": rec["title"], "text": "" if parts else full_text, "text_parts":parts, "locations": rec.get("locations", []), "processing_status": rec["processing_status"]}
             content_bytes = len(json.dumps(content, ensure_ascii=False).encode())
-            if content_batch and content_size + content_bytes > 4_000_000:
-                flush_content()
-            content_batch[rec["id"]] = content
-            content_size += content_bytes
+            reused = reusable.get((rec["id"], digest(json.dumps(content, sort_keys=True))))
+            if reused:
+                bundles[rec["id"]] = reused
+            else:
+                if content_batch and content_size + content_bytes > 4_000_000:
+                    flush_content()
+                content_batch[rec["id"]] = content
+                content_size += content_bytes
             for relation in rec.get("relationships", []):
                 if relation["ticker"] not in self.companies:
                     continue

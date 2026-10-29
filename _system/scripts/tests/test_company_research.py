@@ -425,3 +425,21 @@ def test_preserved_commodity_ocr_verifies_original_and_extracted_text(monkeypatc
     b,record=build()
     assert record['processing_status']=='needs_ocr' and b.text(record)=='native partial'
 
+def test_resumed_publication_reuses_unchanged_documents_despite_inventory_order(tmp_path):
+    from build_company_research import Builder, load
+    companies={'AAA':{'company':'Example Company'}}
+    def publish(order,first):
+        b=Builder(tmp_path,None,tmp_path/'site',tmp_path/'cache',companies=companies)
+        for name in order:
+            body=first if name=='one' else 'Unchanged second document.'
+            b.add(b.base(name,name,'company:AAA',text=body,explicit=['AAA']),['url:'+name])
+        b.publish()
+        manifest=load(tmp_path/'site/companies/AAA.json')
+        return {r['title']:r for p in manifest['pages'] for r in load(tmp_path/'site'/p)}
+    original=publish(['one','two'],'First version.')
+    changed=publish(['two','one'],'Updated first document.')
+    assert changed['two']['content_path']==original['two']['content_path']
+    assert changed['one']['content_path']!=original['one']['content_path']
+    content=load(tmp_path/'site'/changed['one']['content_path'])
+    assert content[changed['one']['id']]['text']=='Updated first document.'
+
