@@ -15,6 +15,20 @@ from stage_company_research import stage
 COMPANIES = {"CME": {"company": "CME Group Inc.", "market": "US"}, "MSB": {"company": "Mesabi Trust", "market": "US"}, "NEM": {"company": "Newmont Corporation", "market": "US"}, "CLSK": {"company": "CleanSpark Inc.", "market": "US"}, "MSTR": {"company": "MicroStrategy Inc.", "market": "US"}}
 
 
+def test_import_reconciliation_remains_archived_without_company_card(tmp_path):
+    b=Builder(tmp_path,None,tmp_path/'out',tmp_path/'cache',companies={'CME':COMPANIES['CME']})
+    for name in ['activist_reconcile.md','activist_reconcile_2026-07-01.md','activist_analysis.md']:
+        record=b.base(name,name,'company:CME',text='CME Group research',state='indexed',explicit=['CME'],
+                      locations=[{'url':'https://github.com/magis-capital-partners/single-stock-investments/blob/main/CME/research/'+name}])
+        b.add(record,[])
+    b.publish()
+    company=json.loads((b.output/'companies/CME.json').read_text())
+    assert company['total']==1
+    rows=json.loads((b.output/company['pages'][0]).read_text())
+    assert rows[0]['title']=='activist_analysis.md'
+    assert len(b.index.records)==3
+
+
 def test_sparse_company_preserves_official_filing_links_and_inventory_receipts(tmp_path):
     def git(*args):
         return subprocess.check_output(['git',*args],cwd=tmp_path).decode().strip()

@@ -635,7 +635,7 @@ class Builder:
                             yield from rows(x)
         for row, url in rows(doc):
             filed = row.get("filing_date") or row.get("filingDate") or row.get("date")
-            title = " Â· ".join(str(v) for v in [row.get("form") or row.get("type"), filed, row.get("primary_document") or row.get("primary")] if v) or Path(url).name
+            title = " \u00b7 ".join(str(v) for v in [row.get("form") or row.get("type"), filed, row.get("primary_document") or row.get("primary")] if v) or Path(url).name
             location = {"kind": "filing", "url": url, "label": "Official filing"}
             from backfill_company_filings import cached_filing
             recovered = cached_filing(self.cache, url)
@@ -854,6 +854,11 @@ class Builder:
                 rec["indexed_at"] = previous["indexed_at"]
             status_counts[rec["processing_status"]] += 1
             review.extend({"source_id": rec["id"], **r} for r in rec.get("review", []))
+            # Preserve import reconciliation logs in the archive, but do not
+            # present these administrative inventories as company research.
+            if any(re.search(r"/research/activist_reconcile(?:_\d{4}-\d{2}-\d{2})?\.md(?:$|[?#])", loc.get("url", ""), re.I)
+                   for loc in rec.get("locations", [])):
+                continue
             if not any(r["ticker"] in self.companies for r in rec.get("relationships", [])):
                 continue
             full_text = self.text(rec)

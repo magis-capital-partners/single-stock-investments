@@ -20,3 +20,13 @@ test('source text and URLs cannot execute markup',()=>{
 test('search normalization matches the builder tokenizer',()=>{
  assert.deepEqual(lib.words('Café: BTC / Supply-Demand'),['cafe','btc','supply','demand']);
 });
+
+test('legacy filing titles display clean separators',()=>{
+ const html=lib.rowHTML({id:'1',title:'10-K \u00c2\u00b7 2026-03-01',category:'filings',processing_status:'indexed',availability:'available',relationship:'direct'});
+ assert.match(html,/10-K \u00b7 2026-03-01/);assert.doesNotMatch(html,/\u00c2\u00b7/);
+});
+
+test('administrative import logs do not crowd the company library',()=>{
+ const rows=[{id:'log',title:'activist reconcile',locations:[{url:'https://github.com/magis-capital-partners/single-stock-investments/blob/main/CME/research/activist_reconcile_2026-07-01.md'}]},{id:'research',title:'Activist investment analysis',locations:[{url:'https://example.com/research/activist-investment.pdf'}]}];
+ assert.deepEqual(lib.filter(rows,{},null).map(r=>r.id),['research']);
+});
