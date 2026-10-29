@@ -175,3 +175,15 @@ def test_equal_quarter_and_ytd_values_keep_distinct_observation_identities():
     point = {'field': 'NetIncomeLoss', 'value': 0, 'currency': 'USD', 'period': '2026-06-30',
              'source_url': 'https://issuer.test/filing', 'locator': 'Income statement', 'start': '2026-01-01'}
     assert _observation(point)['id'] != _observation({**point, 'start': '2026-04-01'})['id']
+
+
+def test_sol_pilot_measurements_remain_separate_from_unknown_legacy_usage(tmp_path):
+    write(tmp_path/'cache/OLD/a/receipt.json', {'agent_id': 'legacy', 'stage': 'author', 'model': 'old-model'})
+    for role in ('author', 'challenger'):
+        write(tmp_path/f'cache/T/{role}/receipt.json', {'agent_id': role, 'stage': role, 'model': 'gpt-6.1-sol',
+              'usage': {'input_tokens': 100, 'output_tokens': 20}})
+    write(tmp_path/'progress/T.json', {'approved': {'receipts': {role: {'model': 'gpt-6.1-sol'} for role in ('author', 'challenger')}}})
+    result = usage_summary(tmp_path)
+    assert result['tokens_per_approved_company'] is None
+    assert result['by_model']['gpt-6.1-sol']['tokens_per_approved_company'] == 240
+    assert result['by_model']['old-model']['sessions_without_usage'] == 1

@@ -643,7 +643,7 @@ def run_batch(root=ROOT, *, limit=None, tickers=None, launch=False, work=None, v
 def usage_summary(work):
     """Actual provider receipts, deduplicated by session; unknown usage stays unknown."""
     summary = {'sessions': 0, 'sessions_with_usage': 0, 'input_tokens': 0, 'cached_input_tokens': 0,
-               'output_tokens': 0, 'approved_companies': 0, 'by_role': {}}
+               'output_tokens': 0, 'approved_companies': 0, 'by_role': {}, 'by_model': {}}
     seen = set()
     for path in work.glob('cache/*/*/receipt.json'):
         row = read(path)
@@ -654,18 +654,36 @@ def usage_summary(work):
         summary['sessions'] += 1
         role = summary['by_role'].setdefault(row.get('stage') or 'unknown', {'sessions': 0, 'input_tokens': 0, 'output_tokens': 0})
         role['sessions'] += 1
+        model = summary['by_model'].setdefault(row.get('model') or 'unknown',
+                 {'sessions': 0, 'sessions_with_usage': 0, 'input_tokens': 0, 'cached_input_tokens': 0,
+                  'output_tokens': 0, 'approved_companies': 0})
+        model['sessions'] += 1
         usage = row.get('usage')
         if not isinstance(usage, dict):
             continue
         summary['sessions_with_usage'] += 1
+        model['sessions_with_usage'] += 1
         for key in ('input_tokens', 'cached_input_tokens', 'output_tokens'):
             value = usage.get(key)
             if type(value) is int and value >= 0:
                 summary[key] += value
+                model[key] += value
                 if key in role:
                     role[key] += value
     summary['sessions_without_usage'] = summary['sessions']-summary['sessions_with_usage']
     summary['approved_companies'] = sum(bool(read(p).get('approved')) for p in (work/'progress').glob('*.json'))
+    for path in (work/'progress').glob('*.json'):
+        approved = read(path).get('approved') or {}
+        receipts = approved.get('receipts') or {}
+        models = {receipts.get(s, {}).get('model') for s in ('author', 'challenger')}
+        if len(models) == 1:
+            model = summary['by_model'].get(next(iter(models)))
+            if model:
+                model['approved_companies'] += 1
+    for model in summary['by_model'].values():
+        model['sessions_without_usage'] = model['sessions']-model['sessions_with_usage']
+        model['tokens_per_approved_company'] = ((model['input_tokens']+model['output_tokens'])/model['approved_companies']
+                     if model['approved_companies'] and not model['sessions_without_usage'] else None)
     denominator = summary['approved_companies']
     summary['tokens_per_approved_company'] = ((summary['input_tokens']+summary['output_tokens'])/denominator
                                                if denominator and not summary['sessions_without_usage'] else None)
