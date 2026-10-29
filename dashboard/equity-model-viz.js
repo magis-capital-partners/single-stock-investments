@@ -108,7 +108,7 @@
     <div class="liquidity-banner">
       <strong>${escapeHtml(liq.exchange || 'Illiquid')}</strong>
       ${liq.warning ? `<p>${escapeHtml(liq.warning)}</p>` : ''}
-      ${lp.date ? `<p class="mono" style="margin-top:6px;font-size:11px">Last print: ¥${lp.price_jpy} × ${lp.volume_shares} sh (${lp.date})</p>` : ''}
+      ${lp.date ? `<p class="mono" style="margin-top:6px;font-size:var(--font-caption,12px)">Last print: ¥${lp.price_jpy} × ${lp.volume_shares} sh (${lp.date})</p>` : ''}
     </div>`;
   }
 
@@ -186,7 +186,7 @@
         <td class="mono">${r.revenue_oos_r2 != null ? Number(r.revenue_oos_r2).toFixed(3) : '—'}</td>
         <td class="mono">${r.perf_fee_h2_oos_rmse != null ? fmtYenM(r.perf_fee_h2_oos_rmse) : '—'}</td>
         <td>${r.production_default ? '<span class="badge badge-ok">yes</span>' : '—'}</td>
-        <td style="font-size:11px;color:var(--text-secondary)">${escapeHtml(r.note || '')}</td>
+        <td style="font-size:var(--font-caption,12px);color:var(--text-secondary)">${escapeHtml(r.note || '')}</td>
       </tr>`).join('')}</tbody>
     </table>`;
   }
@@ -201,7 +201,7 @@
         <td class="mono">${fmtYenM(r.actual)}</td>
         <td class="mono">${fmtYenM(r.fitted)}</td>
         <td class="mono" style="color:var(--accent-amber)">${fmtYenM(r.residual)}</td>
-        <td style="font-size:11px">${escapeHtml(r.note || '')}</td>
+        <td style="font-size:var(--font-caption,12px)">${escapeHtml(r.note || '')}</td>
       </tr>`).join('')}</tbody>
     </table>`;
   }
@@ -256,14 +256,14 @@
     const v1 = bundle.spec_v1 || {};
     const v1pf = v1.perf_fee || {};
     const splitRow = split.rate_nonlisted_ann != null ? `
-        <tr><td>Split base (v5)</td><td class="mono" style="font-size:11px">non-listed ${(split.rate_nonlisted_ann * 100).toFixed(3)}%/yr · ETF ${(split.rate_etf_ann * 100).toFixed(3)}%/yr</td></tr>` : '';
+        <tr><td>Split base (v5)</td><td class="mono" style="font-size:var(--font-caption,12px)">non-listed ${(split.rate_nonlisted_ann * 100).toFixed(3)}%/yr · ETF ${(split.rate_etf_ann * 100).toFixed(3)}%/yr</td></tr>` : '';
     return `
     <table class="darwin-table">
       <thead><tr><th>Block</th><th>Form (${escapeHtml(spec)} production)</th></tr></thead>
       <tbody>
-        <tr><td>Base fees</td><td class="mono" style="font-size:11px">${escapeHtml(bf.form || '')}</td></tr>
+        <tr><td>Base fees</td><td class="mono" style="font-size:var(--font-caption,12px)">${escapeHtml(bf.form || '')}</td></tr>
         ${splitRow}
-        <tr><td>Performance fees</td><td class="mono" style="font-size:11px">${escapeHtml(pf.form || '')}</td></tr>
+        <tr><td>Performance fees</td><td class="mono" style="font-size:var(--font-caption,12px)">${escapeHtml(pf.form || '')}</td></tr>
         <tr><td>k scale / H1·H2</td><td class="mono">${pf.k_scale != null ? 'k_scale ' + pf.k_scale : (v1pf.k_H1 ?? '—') + ' / ' + (v1pf.k_H2 ?? '—')}</td></tr>
         <tr><td>March window</td><td class="mono">${pf.use_march === true ? 'yes (H2 crystallization)' : pf.use_march === false ? 'no' : '—'}</td></tr>
       </tbody>

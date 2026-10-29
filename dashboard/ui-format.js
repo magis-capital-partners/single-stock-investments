@@ -3,7 +3,7 @@
 
   const locale = (navigator.languages && navigator.languages[0]) || navigator.language || 'en-US';
   const finite = (value) => {
-    if (value == null || value === '') return null;
+    if (value == null || typeof value === 'boolean' || typeof value === 'object' || (typeof value === 'string' && !value.trim())) return null;
     const number = Number(value);
     return Number.isFinite(number) ? number : null;
   };
@@ -73,7 +73,7 @@
       if (exists === false) return 'missing';
       const at = stampMs(stamp);
       const limit = Number(maxAgeHours);
-      if (at == null || !Number.isFinite(limit) || limit <= 0) return 'unreadable';
+      if (at == null || !Number.isFinite(limit) || limit <= 0 || at > now + 300_000) return 'unreadable';
       if (now - at > limit * 3_600_000) return 'stale';
       return empty ? 'empty' : 'fresh';
     },
@@ -85,13 +85,24 @@
       if (state === 'fresh') return 'Fresh';
       if (state === 'degraded') return 'Review required';
       if (state === 'empty') return 'Current, no actionable rows';
-      if (state === 'api') return 'Live API';
+      if (state === 'api') return 'Check observation dates';
+      if (state === 'partial') return 'Partial coverage';
+      if (state === 'processing') return 'Processing';
+      if (state === 'unauthorized') return 'Sign-in required';
+      if (state === 'not_applicable') return 'Not applicable';
+      if (state === 'failed') return 'Source request failed';
       return 'Unknown';
     },
 
     number(value, options = {}) {
       const number = finite(value);
       return number == null ? '—' : formatter({ maximumFractionDigits: 4, ...options }).format(number);
+    },
+
+    sum(values) {
+      if (!Array.isArray(values) || !values.length) return null;
+      const numbers=values.map(finite);
+      return numbers.some(value=>value==null) ? null : numbers.reduce((total,value)=>total+value,0);
     },
 
     currency(value, currency = 'USD', options = {}) {
@@ -106,17 +117,43 @@
       return number == null ? '—' : formatter({ style: 'percent', maximumFractionDigits: 1, ...options }).format(number);
     },
 
+    // Explicit boundary for producers that store 12.5 rather than 0.125.
+    percentValue(value, options = {}) {
+      const number = finite(value);
+      return number == null ? '—' : this.percent(number / 100, options);
+    },
+
+    points(value, options = {}) {
+      return finite(value) == null ? '—' : `${this.number(value, {maximumFractionDigits: 1, ...options})} pp`;
+    },
+
+    multiple(value, options = {}) {
+      return finite(value) == null ? '—' : `${this.number(value, {maximumFractionDigits: 1, ...options})}×`;
+    },
+
+    timestamp(value) {
+      const stamp = stampMs(value);
+      if (stamp == null) return 'Unavailable';
+      return new Intl.DateTimeFormat(locale, {year:'numeric',month:'short',day:'2-digit',hour:'2-digit',minute:'2-digit',timeZone:'America/New_York',timeZoneName:'short'}).format(new Date(stamp));
+    },
+
     date(value, options = {}) {
       if (!value) return 'Unavailable';
+      const raw = String(value).trim();
+      if (/^\d{4}$/.test(raw)) return raw;
+      const quarter = /^(\d{4})Q([1-4])$/.exec(raw);
+      if (quarter) return `Q${quarter[2]} ${quarter[1]}`;
+      const month = /^(\d{4})-(\d{2})$/.exec(raw);
+      if (month && Number(month[2]) >= 1 && Number(month[2]) <= 12) return new Intl.DateTimeFormat(locale, {year:'numeric',month:'short',timeZone:'UTC'}).format(new Date(Date.UTC(Number(month[1]),Number(month[2])-1,15)));
       // "2026-08-19" is a calendar date, but Date parses a bare date-only string as
       // UTC midnight and Intl then renders it in the viewer's zone -- which shows
       // the previous day for everyone west of UTC. Read those parts literally.
       const dateOnly = /^(\d{4})-(\d{2})-(\d{2})$/.exec(String(value).trim());
       const date = dateOnly
-        ? new Date(Number(dateOnly[1]), Number(dateOnly[2]) - 1, Number(dateOnly[3]))
+        ? new Date(Date.UTC(Number(dateOnly[1]), Number(dateOnly[2]) - 1, Number(dateOnly[3])))
         : new Date(value);
       return Number.isNaN(date.getTime()) ? String(value) : new Intl.DateTimeFormat(locale, {
-        year: 'numeric', month: 'short', day: '2-digit', ...options,
+        year: 'numeric', month: 'short', day: '2-digit', ...options, ...(dateOnly?{timeZone:'UTC'}:{}),
       }).format(date);
     },
 
@@ -131,6 +168,9 @@
     quote(value, units, options = {}) {
       const number = finite(value);
       if (number == null) return '—';
+      // Dense views may request whole dollars; never round a nonzero penny
+      // security down to an apparently observed zero price.
+      if (number !== 0 && Math.abs(number) < 1) options={...options,maximumFractionDigits:Math.max(options.maximumFractionDigits ?? 2,Math.min(10,Math.max(2,1-Math.floor(Math.log10(Math.abs(number))))))};
       const currency = units && units.currency;
       if (!currency) return formatter({ maximumFractionDigits: 2, ...options }).format(number);
       if (isMinorUnit(units)) {

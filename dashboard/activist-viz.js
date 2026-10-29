@@ -307,7 +307,7 @@
       const isOpen = expanded.has(group.key);
       let expander = '';
       if (rest.length) {
-        expander = ` <button type="button" class="filter-btn" style="padding:1px 8px;font-size:11px" data-activist-group="${state.escapeHtml(group.key)}" title="${rest.length} more filing(s) from this campaign">${isOpen ? '− collapse' : `+${rest.length} more`}</button>`;
+        expander = ` <button type="button" class="filter-btn" style="padding:1px 8px;font-size:var(--font-caption,12px)" data-activist-group="${state.escapeHtml(group.key)}" title="${rest.length} more filing(s) from this campaign">${isOpen ? '− collapse' : `+${rest.length} more`}</button>`;
       }
       bodyHtml.push(renderFeedRow(primary, state, { expander }));
       rendered += 1;
@@ -400,7 +400,7 @@
             <tr>
               <td class="mono">${esc(r.filing_date || '—')}</td>
               <td>${esc(r.firm_name || r.firm_id || '—')}</td>
-              <td class="mono" style="font-size:11px">${esc(r.form || '—')}</td>
+              <td class="mono" style="font-size:var(--font-caption,12px)">${esc(r.form || '—')}</td>
               <td>${esc(r.issuer_name || '—')}</td>
               <td class="mono">${r.stake_percent != null ? `${Number(r.stake_percent).toFixed(1)}%` : '—'}</td>
               <td>${r.index_url ? state.linkHtml(r.index_url, 'EDGAR', 'source-open-link') : ''}</td>

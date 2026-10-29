@@ -4,7 +4,7 @@
   const filters = {group:'all', status:'all', sort:'distance', query:''};
   const esc = s => String(s ?? '').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
   const num = n => typeof n === 'number' && Number.isFinite(n) ? n : null;
-  const pct = n => num(n) === null ? '—' : n.toFixed(1)+'%';
+  const pct = n => global.DashboardFormat.percentValue(n);
   function load() {
     if (!pending) pending = fetch('data/compounders.json').then(r=>{if(!r.ok)throw Error('Company list unavailable');return r.json();}).then(d=>{roster=d;return d;}).catch(e=>{pending=null;throw e;});
     return pending;
