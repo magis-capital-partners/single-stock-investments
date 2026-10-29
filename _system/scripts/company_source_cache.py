@@ -3,6 +3,7 @@ import argparse
 from collections import defaultdict
 import hashlib
 import json
+import os
 from pathlib import Path
 import zipfile
 
@@ -38,20 +39,28 @@ def pack(cache,destination):
         if target.exists() and hashlib.sha256(target.read_bytes()).hexdigest()==sha:temporary.unlink()
         else:temporary.replace(target)
         parts.append({'file':name,'sha256':sha,'files':len(files),'input_sha256':signature});files=[];size=0
-    paths=[cache/name for name in ROOT_FILES]
-    for folder in FOLDERS:paths.extend(sorted((cache/folder).rglob('*')))
+    def entries(directory):
+        if not directory.is_dir():return
+        with os.scandir(directory) as listing:
+            for item in listing:
+                if item.is_dir(follow_symlinks=False):
+                    yield from entries(Path(item.path))
+                elif item.is_file(follow_symlinks=False) and Path(item.name).suffix in {'.json','.txt','.md'}:
+                    # Directory enumeration already supplies size/type on
+                    # Windows; avoid two extra filesystem probes per original.
+                    yield Path(item.path),item.stat(follow_symlinks=False).st_size
+    paths=[(cache/name,(cache/name).stat().st_size) for name in ROOT_FILES if (cache/name).is_file()]
+    for folder in FOLDERS:paths.extend(entries(cache/folder))
     # Keep unrelated source buckets stable when inventory metadata or one
     # document changes. A rolling archive over the whole cache can otherwise
     # rewrite gigabytes of unchanged parts after a small insertion.
     buckets=defaultdict(list)
-    for path in paths:
-        if not path.is_file() or path.suffix not in {'.json','.txt','.md'}:continue
+    for path,length in paths:
         relative=path.relative_to(cache)
         bucket=(relative.parts[0],path.stem[:2]) if len(relative.parts)>1 else ('root',relative.name)
-        buckets[bucket].append(path)
+        buckets[bucket].append((path,length))
     for bucket in sorted(buckets):
-        for path in sorted(buckets[bucket]):
-            length=path.stat().st_size
+        for path,length in sorted(buckets[bucket]):
             if size+length>32_000_000:flush()
             if length>90_000_000:raise ValueError('Oversized extraction cache entry')
             files.append(path);size+=length
