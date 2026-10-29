@@ -1,0 +1,75 @@
+name: Reverse-split live service
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'dashboard/cloudflare/reverse-split-live/**'
+      - 'dashboard/cloudflare/test-reverse-split-live.mjs'
+      - '.github/workflows/reverse-split-live.yml'
+  workflow_dispatch:
+    inputs:
+      reconcile:
+        description: Repair recent daily-index coverage
+        type: boolean
+        default: false
+  schedule:
+    # Off the top of the hour; GitHub may delay or skip scheduled runs.
+    - cron: '3-58/5 * * * *'
+permissions:
+  contents: read
+concurrency:
+  group: reverse-split-live-${{ github.event_name == 'push' && 'deploy' || 'collect' }}
+  cancel-in-progress: false
+jobs:
+  deploy:
+    if: github.event_name == 'push'
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          sparse-checkout: |
+            dashboard/cloudflare
+            dashboard/functions
+            _system/scripts
+          sparse-checkout-cone-mode: true
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - run: npm ci --prefix dashboard/cloudflare
+      - run: python -m pip install requests
+      - run: node --test dashboard/cloudflare/test-reverse-split-live.mjs
+      - name: Apply the isolated research schema and deploy the monitor
+        env:
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+        run: |
+          node dashboard/cloudflare/node_modules/wrangler/bin/wrangler.js d1 migrations apply single-stock-reverse-splits --remote --config dashboard/cloudflare/reverse-split-live/wrangler.jsonc
+          node dashboard/cloudflare/node_modules/wrangler/bin/wrangler.js deploy --config dashboard/cloudflare/reverse-split-live/wrangler.jsonc
+  collect:
+    if: github.event_name == 'schedule' || github.event_name == 'workflow_dispatch'
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          sparse-checkout: dashboard/cloudflare/reverse-split-live
+          sparse-checkout-cone-mode: true
+          fetch-depth: 1
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+      - name: Detect announcements and analyze every company
+        env:
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          CLOUDFLARE_ACCOUNT_ID: e1cac493b315c8fd7398500dd1bfd687
+          RECONCILE: ${{ inputs.reconcile || false }}
+        run: |
+          if [ "$RECONCILE" = 'true' ]; then
+            node dashboard/cloudflare/reverse-split-live/collector.mjs --reconcile
+          else
+            node dashboard/cloudflare/reverse-split-live/collector.mjs
+          fi
