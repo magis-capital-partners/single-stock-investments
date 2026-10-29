@@ -124,6 +124,9 @@ def test_restored_original_extraction_reuses_full_ocr_for_local_rendition(tmp_pa
     pointer=b.cache/'md5'/(hashlib.md5(data).hexdigest()+'.json');pointer.parent.mkdir()
     pointer.write_text(json.dumps({'path':'drive/original.json'}))
     assert b.cached_extract(data,'.pdf')==('Recovered full scan','indexed',sha)
+    reference=json.loads((b.cache/'text'/(sha+'.json')).read_text())
+    assert reference['source_cache_path']=='drive/original.json' and 'text' not in reference
+    assert b.cached_extract(data,'.pdf')==('Recovered full scan','indexed',sha)
 
 
 def test_fund_acronym_is_not_company_research():

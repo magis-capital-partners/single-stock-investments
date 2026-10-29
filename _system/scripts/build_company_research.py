@@ -317,6 +317,11 @@ class Builder:
         sha = digest(data)
         path = self.cache / "text" / f"{sha}.json"
         prior = load(path)
+        if prior.get('source_cache_path'):
+            target = (self.cache / prior['source_cache_path']).resolve()
+            recovered = load(target) if target.is_relative_to(self.cache.resolve()) else {}
+            from backfill_company_sources import complete_cache
+            prior = recovered if recovered.get('content_sha256') == sha and complete_cache(recovered, suffix) else {}
         if prior.get('status') != 'indexed':
             md5 = hashlib.md5(data, usedforsecurity=False).hexdigest()
             pointer = load(self.cache / 'md5' / (md5 + '.json'))
@@ -326,7 +331,12 @@ class Builder:
                 from backfill_company_sources import complete_cache
                 if recovered.get('content_sha256') == sha and complete_cache(recovered, suffix):
                     prior = recovered
-                    write(path, prior)
+                    # The portable recovery cache already owns the full text.
+                    # Keep only a verified reference and extraction metadata
+                    # here instead of duplicating the corpus during deployment.
+                    write(path, {'version': 1, 'source_cache_path': pointer['path'],
+                                 'content_sha256': sha, 'status': prior['status'],
+                                 'extraction': prior.get('extraction', {})})
         verified_pages = suffix != '.pdf' or prior.get('status') != 'indexed' or prior.get('extraction',{}).get('pages')
         if prior.get("version") == 1 and verified_pages and prior.get("status") in {"indexed", "needs_ocr", "needs_transcript", "empty_source"}:
             return prior["text"], prior["status"], sha
