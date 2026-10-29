@@ -92,6 +92,11 @@ def test_eight_calls_become_valid_specs_and_a_second_run_adds_none(tmp_path: Pat
     assert len(second["spec_ids_already_present"]) == 8
     nu_again = json.loads((root / "NU/research/falsifier_specs.json").read_text(encoding="utf-8"))
     assert len(nu_again["specs"]) == 2
+    from validate_research_pr_provenance import validate as validate_provenance
+    manifest = json.loads((root / "B3SA3.SA/research/research_agent_manifest.json").read_text(encoding="utf-8"))
+    state = json.loads((root / "B3SA3.SA/research/agent_run_state.json").read_text(encoding="utf-8"))
+    assert validate_provenance(manifest, state, "B3SA3.SA") == []
+    assert not (root / "1211.HK/research/research_agent_manifest.json").exists()
 
 
 def test_an_already_due_review_date_is_refused(tmp_path: Path):
