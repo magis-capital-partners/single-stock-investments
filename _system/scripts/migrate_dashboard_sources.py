@@ -17,7 +17,7 @@ import subprocess
 from pathlib import Path
 
 from audit_fund_letter_exposure import audit
-from private_dashboard_assets import ROOT, digest, hydration_state, write_hydration, overlay_manifest, private_object, safe_relative
+from private_dashboard_assets import ROOT, digest, hydration_state, write_hydration, overlay_manifest, private_object, preserve_object, safe_relative
 from vault_paths import research_vault_root
 
 def public_snapshot(value):
@@ -188,11 +188,8 @@ def migrate(root: Path = ROOT, *, paths: list[str] | None = None) -> dict:
             writer = csv.DictWriter(stream, fieldnames=["private_snapshot", "entry_count"], lineterminator="\n")
             writer.writeheader(); writer.writerow({"private_snapshot": "true", "entry_count": len(rows)})
             text = stream.getvalue()
-        private_hash = digest(payload_path)
+        private_hash = preserve_object(vault, payload_path)
         private = private_object(vault, private_hash)
-        private.parent.mkdir(parents=True, exist_ok=True)
-        if not private.exists():
-            shutil.copy2(payload_path, private)
         if private_hash != digest(private) or private_hash != digest(payload_path):
             raise RuntimeError(f"Private copy failed verification: {key}")
         # Journal the recovery mapping before redacting the local public copy.
