@@ -335,7 +335,7 @@
       <div class="metric-grid metric-grid-3 decision-band" style="margin-top:9px">
         <div class="metric"><div class="k">${escapeHtml(ret.label)}</div><div class="v mono">${escapeHtml(retDisplay)}<div class="tier-sub">${escapeHtml(ret.sub)}</div></div></div>
         <div class="metric"><div class="k">Required return</div><div class="v mono">${d.required_return_pct == null ? '—' : fmtPct(d.required_return_pct)}<div class="tier-sub">${escapeHtml(String(d.output_basis || 'basis not declared').replace(/_/g, ' '))}</div></div></div>
-        <div class="metric"><div class="k">Model / fact / price dates</div><div class="v mono" style="font-size:11px">${escapeHtml(asOf)} / ${escapeHtml(dates.latest_fact_as_of || '—')} / ${escapeHtml(dates.price_as_of || '—')}</div></div>
+        <div class="metric"><div class="k">Model / fact / price dates</div><div class="v mono" style="font-size:var(--font-caption,12px)">${escapeHtml(asOf)} / ${escapeHtml(dates.latest_fact_as_of || '—')} / ${escapeHtml(dates.price_as_of || '—')}</div></div>
       </div>
       <div class="metric-grid metric-grid-3 decision-band" style="margin-top:9px">
         ${gapsHtml}
@@ -479,7 +479,7 @@
       <div class="metric-grid metric-grid-3" style="margin-top:9px">
         <div class="metric"><div class="k">Calculation proof</div><div class="v mono">${fmtNum(decision.proof_complete_pct ?? proofSummary.proof_complete_pct ?? 0)}%</div></div>
         <div class="metric"><div class="k">Priced components</div><div class="v mono">${Number(proofSummary.priced_component_count || 0)} / ${Number(proofSummary.component_count || 0)}</div></div>
-        <div class="metric"><div class="k">Model hash</div><div class="v mono" style="font-size:11px">${escapeHtml(String(decision.model_hash || valuation.change_control?.model_hash || '—').slice(0, 12))}</div></div>
+        <div class="metric"><div class="k">Model hash</div><div class="v mono" style="font-size:var(--font-caption,12px)">${escapeHtml(String(decision.model_hash || valuation.change_control?.model_hash || '—').slice(0, 12))}</div></div>
       </div>
       <div class="tier-sub" style="margin-top:8px">Model / latest fact / price dates: ${escapeHtml(modelDates.model_as_of || wb.as_of || '—')} / ${escapeHtml(modelDates.latest_fact_as_of || '—')} / ${escapeHtml(modelDates.price_as_of || '—')}</div>
       <div class="workbench-callout"><strong>Power zone:</strong> ${escapeHtml(decision.primary_power_zone || 'review required')}<br><strong>Next:</strong> ${escapeHtml(decision.next_action || 'Complete evidence and committee gates.')}</div>`;
@@ -534,8 +534,8 @@
     const methodPage = `
       <div class="metric-grid metric-grid-3">
         <div class="metric"><div class="k">Primary power zone</div><div class="v">${escapeHtml(method.label || 'Unclassified')}</div></div>
-        <div class="metric"><div class="k">Primary personas</div><div class="v" style="font-size:11px">${(method.primary_personas || []).map((x) => escapeHtml(String(x).replace(/_/g, ' '))).join(' · ') || '—'}</div></div>
-        <div class="metric"><div class="k">Cross-check personas</div><div class="v" style="font-size:11px">${(method.cross_check_personas || []).map((x) => escapeHtml(String(x).replace(/_/g, ' '))).join(' · ') || '—'}</div></div>
+        <div class="metric"><div class="k">Primary personas</div><div class="v" style="font-size:var(--font-caption,12px)">${(method.primary_personas || []).map((x) => escapeHtml(String(x).replace(/_/g, ' '))).join(' · ') || '—'}</div></div>
+        <div class="metric"><div class="k">Cross-check personas</div><div class="v" style="font-size:var(--font-caption,12px)">${(method.cross_check_personas || []).map((x) => escapeHtml(String(x).replace(/_/g, ' '))).join(' · ') || '—'}</div></div>
       </div>
       <div class="workbench-callout">${escapeHtml(method.rule || '')}</div>
       ${(method.routing_reasons || []).length ? `<div class="workbench-item" style="margin-top:10px"><div class="workbench-item-title">Routing reasons</div><ul class="workbench-checks">${method.routing_reasons.map((x) => `<li>${escapeHtml(x)}</li>`).join('')}</ul></div>` : ''}

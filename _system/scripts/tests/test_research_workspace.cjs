@@ -7,7 +7,8 @@ const root = path.resolve(__dirname,'../../..');
 const clock = class extends Date { static now(){ return Date.parse('2026-10-26T23:00:00Z'); } };
 const liveSync = {status:'verified',valid_until:'2026-10-27T20:10:00+00:00'};
 const context = vm.createContext({Intl,Map,Set,Date:clock,URLSearchParams,module:{exports:{}}});
-for(const file of ['valuation-viz.js','research-workspace.js']) vm.runInContext(fs.readFileSync(path.join(root,'dashboard',file),'utf8'),context);
+context.window=context;context.navigator={language:'en-US'};
+for(const file of ['ui-format.js','valuation-viz.js','research-workspace.js']) vm.runInContext(fs.readFileSync(path.join(root,'dashboard',file),'utf8'),context);
 const rw = context.ResearchWorkspace;
 const escapeHtml = s => String(s ?? '').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 const h = {escapeHtml,quoteUnitsOf:()=>({}),fmtQuote:n=>n==null?'—':`EUR ${n}`,linkHtml:(url,label)=>`<a href="${escapeHtml(url)}">${escapeHtml(label)}</a>`};
@@ -25,7 +26,7 @@ test('current charts respect upstream signal exclusions and do not mutate data',
 });
 test('current observations retain period, unit and source without inventing a trend',()=>{
  const html=rw.kpis({compounder_monitor:{kpi_coverage:[{kpi_id:'adv',status:'current',value:0,unit:'contracts_per_day',period:'2026-09',source:{ref:'https://example.com/source'}}]}},h,3);
- assert.match(html,/2026-09/); assert.match(html,/contracts per day/); assert.match(html,/trend unavailable/); assert.match(html,/https:\/\/example.com\/source/); assert.doesNotMatch(html,/<svg/);
+ assert.match(html,/Sep 2026/); assert.match(html,/contracts per day/); assert.match(html,/trend unavailable/); assert.match(html,/https:\/\/example.com\/source/); assert.doesNotMatch(html,/<svg/);
 });
 test('historical series are explicitly separated from current signals',()=>{
  const t={kpi_trends:{metrics:[{...metric,display:false,stale:true}]}};
@@ -58,8 +59,9 @@ test('a quote outside the valuation range is included in the ruler domain',()=>{
 test('missing model and sparse research produce useful next steps',()=>{
  const html=rw.overview({ticker:'TST'}, {...h,developments:[]}); assert.match(html,/primary evidence/);assert.match(html,/No dated developments/);assert.doesNotMatch(html,/NaN|undefined/);
 });
-test('legacy buyback routes resolve to the business view and unknown tabs to overview',()=>{
- assert.equal(rw.validTab('buyback'),'business'); assert.equal(rw.validTab('evidence'),'evidence');assert.equal(rw.validTab('bad'),'overview');
+test('legacy routes resolve to the simplified company workspace',()=>{
+ for(const tab of ['buyback','business','valuation']) assert.equal(rw.validTab(tab),'models');
+ assert.equal(rw.validTab('evidence'),'sources');assert.equal(rw.validTab('sources'),'sources');assert.equal(rw.validTab('bad'),'overview');
 });
 test('labels and source references are escaped',()=>{
  const html=rw.kpis({kpi_trends:{metrics:[{...metric,label:'<script>bad</script>',evidence_ref:'reports/test "file".json'}]}},h);

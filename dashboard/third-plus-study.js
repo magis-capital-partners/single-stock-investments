@@ -38,7 +38,7 @@
     const doc=validate(JSON.parse(text));if(doc.data_version!==manifest.data_version)throw new Error('Mixed study versions.');return doc;
   }
   function render(){return '<section class="tps" data-third-plus-study aria-label="Third-plus reverse-split backtest"><p class="tps-loading" role="status">Loading the research path and backtest…</p></section>';}
-  function teaser(){return '<a class="tps-teaser" href="#/ideas/short-alpha/backtest"><span><strong>How the reverse-split backtest came together</strong><small>Research path, filter comparisons, costs and what remains unproven</small></span><span aria-hidden="true">Explore →</span></a>';}
+  function teaser(){return '<a class="tps-teaser" href="#/strategies/systematic-shorts/backtest"><span><strong>How the reverse-split backtest came together</strong><small>Research path, filter comparisons, costs and what remains unproven</small></span><span aria-hidden="true">Explore →</span></a>';}
   const metric=(label,value,note='',cls='')=>'<div class="tps-metric"><dt>'+esc(label)+'</dt><dd class="'+cls+'">'+esc(value)+'</dd><small>'+esc(note)+'</small></div>';
   function option(key,label,values,current){return '<label class="tps-select">'+esc(label)+'<select data-tps-control="'+key+'">'+values.map(v=>'<option value="'+esc(v.id)+'"'+(v.id===current?' selected':'')+'>'+esc(v.label)+'</option>').join('')+'</select></label>';}
   function model(doc,rule,caseId){return doc.models[caseId][rule];}

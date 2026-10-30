@@ -80,7 +80,11 @@ test('signed owners and readers, revocation, forged/expired tokens and cookie au
   }finally{globalThis.fetch=originalFetch;}
 });
 test('direct dashboard requests, private data, guessed files and source APIs are denied to readers',()=>{
-  for(const path of ['/data/core.json','/index-viz.js','/data/insights/letters.json','/api/v2/portfolio/book','/original.pdf','/fund-letters/../../data/core.json','/cloudflare-artifact-manifest.json']) assert.equal(accessDecision(path,'GET',reader),'forbidden',path);
+  for(const path of ['/data/core.json','/index-viz.js','/data/insights/letters.json','/data/company-research/companies/CME.json','/data/company-research/documents/original.json','/data/company-research/search/CME.json','/api/v2/portfolio/book','/original.pdf','/fund-letters/../../data/core.json','/cloudflare-artifact-manifest.json']) assert.equal(accessDecision(path,'GET',reader),'forbidden',path);
+  for(const path of ['/data/company-research/manifest.json','/data/company-research/documents/original.json']) {
+    assert.equal(accessDecision(path,'GET',null),'unauthenticated');
+    assert.equal(accessDecision(path,'GET',{role:'owner'}),'allow');
+  }
   assert.equal(accessDecision('/fund-letters/','GET',reader),'allow');
   assert.equal(accessDecision('/api/fund-letters','GET',reader),'allow');
   assert.equal(accessDecision('/','GET',reader),'reader-home');
@@ -114,7 +118,7 @@ test('the whole archive is reachable beyond eighty letters; search pins any date
 });
 test('drafts never enter reader search or fund counts; source/evidence/review require ownership',async()=>{
   const DB=database();seed(DB);DB.db.exec("UPDATE fl_letters SET published_revision=NULL");
-  for(const action of ['source','document','draft','revisions','review']) assert.equal((await onRequestGet(context({action,letter:'l0'},reader,DB))).status,403);
+  for(const action of ['source','document','original','draft','revisions','review']) assert.equal((await onRequestGet(context({action,letter:'l0'},reader,DB))).status,403);
   assert.deepEqual((await(await onRequestGet(context({action:'funds'},reader,DB))).json()).funds,[]);
   assert.deepEqual((await(await onRequestGet(context({action:'search',q:'Acme'},reader,DB))).json()).results,[]);
   const owned=await(await onRequestGet(context({action:'source',letter:'l0'},owner,DB))).json();assert.equal(owned.source.source_url,'https://drive.google.com/SECRET');
@@ -131,6 +135,26 @@ test('complete source text is owner-only and private R2 streams stay private',as
   ctx.data.humanViewer=reader;assert.equal((await onRequestGet(ctx)).status,403);assert.equal(reads,1);
   DB.db.exec("UPDATE fl_letters SET reporting_period='https://drive.google.com/SECRET'");
   assert.equal(JSON.stringify(await(await onRequestGet(context({action:'archive',fund:'fund'},reader,DB))).json()).includes('SECRET'),false);
+});
+test('owners read the original in-site, with a Drive link and preview; readers cannot',async()=>{
+  const DB=database();seed(DB);
+  DB.db.exec("UPDATE fl_letters SET source_url='https://drive.google.com/file/d/1AbCdEfGhIjKlMnOp_q-r/view'");
+  const data=await(await onRequestGet(context({action:'original',letter:'l0'},owner,DB))).json();
+  assert.equal(data.text,source);assert.equal(data.letter.fund,'Test Fund');assert.equal(data.in_drive,true);
+  assert.equal(data.original_url,'https://drive.google.com/file/d/1AbCdEfGhIjKlMnOp_q-r/view');
+  assert.equal(data.preview_url,'https://drive.google.com/file/d/1AbCdEfGhIjKlMnOp_q-r/preview');
+  assert.equal('content_hash' in data.letter||'source_ref' in data.letter,false);
+  DB.db.exec("UPDATE fl_letters SET source_text='',source_url='javascript:alert(1)'");
+  const ctx=context({action:'original',letter:'l0'},owner,DB);let reads=0;
+  ctx.env.PRIVATE_ARTIFACTS={async get(key){reads++;assert.equal(key,'fund-letters/source/hash0.txt');return {size:24,async text(){return 'full private R2 source';}};}};
+  const fallback=await(await onRequestGet(ctx)).json();
+  assert.equal(fallback.text,'full private R2 source');assert.equal(fallback.original_url,null);assert.equal(fallback.preview_url,null);assert.equal(reads,1);
+  ctx.env.PRIVATE_ARTIFACTS={async get(){return {size:30_000_000,async text(){throw new Error('must not load an oversized source');}};}};
+  DB.db.exec("UPDATE fl_letters SET source_url='https://example.com/letter.pdf'");
+  const linkOnly=await(await onRequestGet(ctx)).json();
+  assert.equal(linkOnly.text,'');assert.equal(linkOnly.original_url,'https://example.com/letter.pdf');assert.equal(linkOnly.in_drive,false);
+  ctx.data.humanViewer=reader;assert.equal((await onRequestGet(ctx)).status,403);
+  assert.equal((await onRequestGet(context({action:'original',letter:'missing'},owner,DB))).status,404);
 });
 test('full text coverage, exact evidence, originality, numeric support and historical evolution are gated',()=>{
   assert.deepEqual(validateDraft(draft(),sourceSections(source)),[]);

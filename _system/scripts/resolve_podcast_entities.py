@@ -211,8 +211,12 @@ class PodcastEntityResolver:
                 if key in seen:
                     continue
                 seen.add(key)
-                # Prefer corroboration with company alias in same text
+                # Prefer corroboration with company alias in same text.
+                # require_company_alias is for a name that also belongs to
+                # someone else (Daniel Zhang at Teqnion, and the Alibaba CEO).
                 company_hit = any(_norm(c) in n for c in (off.get("company_aliases") or []) if c)
+                if off.get("require_company_alias") and not company_hit:
+                    continue
                 score = 0.9 if company_hit else 0.7
                 hits.append(
                     {

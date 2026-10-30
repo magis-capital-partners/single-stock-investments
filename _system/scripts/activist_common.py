@@ -615,6 +615,53 @@ def ticker_meta(ticker: str) -> dict:
     return _ticker_meta_cached(ticker.upper(), _registry_stamp())
 
 
+def _cik_key(value: str | None) -> str:
+    return str(value or "").strip().lstrip("0")
+
+
+def subject_cik_matches_ticker(
+    issuer_cik: str | None,
+    ticker: str,
+    *,
+    external_cik_to_ticker: dict | None = None,
+) -> bool:
+    """True when the filing's subject CIK is this holding's registry CIK.
+
+    The filer's CIK is not the subject. ``external_cik_to_ticker`` is accepted
+    and ignored: SEC company_tickers lists the symbol SATS under Strive, Inc.,
+    and the registry's SATS row is a different CIK. A ticker-to-CIK table must
+    not place that filing on SATS.
+    """
+    _ = external_cik_to_ticker
+    want = _cik_key(issuer_cik)
+    have = _cik_key((ticker_meta(ticker) or {}).get("cik"))
+    return bool(want and have and want == have)
+
+
+def portfolio_ticker_for_subject_cik(
+    issuer_cik: str | None,
+    *,
+    external_cik_to_ticker: dict | None = None,
+) -> str | None:
+    """Portfolio ticker for a subject issuer CIK, or None when we do not hold it.
+
+    One registry CIK shared by two tickers (ECHO and SATS both carry EchoStar)
+    is ambiguous and returns None. An external CIK-to-ticker map is not read.
+    """
+    _ = external_cik_to_ticker
+    want = _cik_key(issuer_cik)
+    if not want:
+        return None
+    hits = [
+        ticker
+        for ticker in portfolio_tickers()
+        if _cik_key((ticker_meta(ticker) or {}).get("cik")) == want
+    ]
+    if len(hits) == 1:
+        return hits[0]
+    return None
+
+
 def _build_ticker_meta(ticker: str) -> dict:
     ticker = ticker.upper()
     reg = load_json(PORTFOLIO_REGISTRY, {})

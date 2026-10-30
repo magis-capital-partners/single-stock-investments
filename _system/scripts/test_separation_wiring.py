@@ -41,7 +41,7 @@ class WorkflowTests(unittest.TestCase):
     def test_job_exists_with_the_per_job_concurrency_group(self):
         job = self.doc["jobs"][JOB]
         self.assertEqual(job["if"], "needs.decide.outputs.separation_discover == 'true'")
-        self.assertEqual(job["concurrency"]["group"], "data-commit-main-${{ github.job }}")
+        self.assertEqual(job["concurrency"]["group"], "data-commit-main-separation-discover")
         self.assertFalse(job["concurrency"]["cancel-in-progress"])
         self.assertIn("decide", job["needs"] if isinstance(job["needs"], list) else [job["needs"]])
         self.assertIn(JOB, self.doc["jobs"]["pipeline-summary"]["needs"])

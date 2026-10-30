@@ -5,6 +5,15 @@ import { EDITORIAL_CHECKS, LETTER_SORT_SQL, letterWhere, pageArgs, readerArchive
 const all = async (db, sql, args = []) => (await db.prepare(sql).bind(...args).all()).results || [];
 const first = (db, sql, args = []) => db.prepare(sql).bind(...args).first();
 const run = (db, sql, args = []) => db.prepare(sql).bind(...args).run();
+const ORIGINAL_TEXT_BYTES = 20_000_000;
+function httpsLink(value) {
+  try {
+    const url = new URL(String(value || ""));
+    return url.protocol === "https:" ? url.href : null;
+  } catch {
+    return null;
+  }
+}
 async function boundedBody(request, maximum = 2_000_000) {
   const reader = request.body?.getReader();
   if (!reader) return "";
@@ -39,7 +48,7 @@ export async function onRequestGet(context) {
     }
     return privateJson({ role: viewer.role, email: viewer.email || null, ...(viewer.role === "owner" ? { book_tickers } : {}) });
   }
-  if (["review", "source", "document", "revisions", "draft"].includes(action) && viewer.role !== "owner") return privateJson({ error: "Owner access required." }, 403);
+  if (["review", "source", "document", "original", "revisions", "draft"].includes(action) && viewer.role !== "owner") return privateJson({ error: "Owner access required." }, 403);
   try {
     const db = requireDatabase(context.env);
     const { offset, limit } = pageArgs(params);
@@ -119,6 +128,24 @@ export async function onRequestGet(context) {
         "content-disposition": `inline; filename="${String(letter.id).replace(/[^a-zA-Z0-9_-]/g,'')}.txt"`,
         "content-security-policy": "sandbox; default-src 'none'", "x-content-type-options": "nosniff", "referrer-policy": "no-referrer",
       }});
+    }
+    if (action === "original") {
+      const letter = await first(db, `SELECT l.id,l.content_hash,l.source_text,l.source_url,l.reporting_period,l.letter_date,f.name fund
+        FROM fl_letters l JOIN fl_funds f ON f.id=l.fund_id WHERE l.id=?`, [params.get("letter")]);
+      if (!letter) return privateJson({ error: "Letter not found." }, 404);
+      let text = letter.source_text || "";
+      if (!text) {
+        const object = await context.env.PRIVATE_ARTIFACTS?.get(`fund-letters/source/${letter.content_hash}.txt`);
+        if (object && !(object.size > ORIGINAL_TEXT_BYTES)) text = await object.text();
+      }
+      const original_url = httpsLink(letter.source_url);
+      const driveFile = original_url && new URL(original_url).hostname === "drive.google.com"
+        ? (original_url.match(/^(.+\/file\/d\/[A-Za-z0-9_-]{10,})/) || [])[1] : null;
+      return privateJson({
+        letter: { id: letter.id, fund: letter.fund, reporting_period: letter.reporting_period, letter_date: letter.letter_date },
+        text, original_url, in_drive: Boolean(driveFile),
+        preview_url: driveFile ? `${driveFile}/preview` : null,
+      });
     }
     if (["source", "revisions", "draft"].includes(action)) {
       const letterId = params.get("letter");

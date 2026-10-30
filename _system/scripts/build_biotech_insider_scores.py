@@ -55,7 +55,8 @@ def score_ticker(csv_path: Path, as_of: datetime) -> dict:
     cfo_buys = 0
     non_ceo_buys = 0
     if not csv_path.exists():
-        return {"insider_buy_count_90d": 0, "insider_cfo_buys": 0, "insider_score": 0}
+        return {"insider_buy_count_90d": None, "insider_cfo_buys": None, "insider_score": None,
+                "data_status": "missing", "data_reason": "Transaction history has not been collected."}
     with csv_path.open(encoding="utf-8", newline="") as fh:
         reader = csv.DictReader(fh)
         for row in reader:
@@ -67,7 +68,7 @@ def score_ticker(csv_path: Path, as_of: datetime) -> dict:
             if acquired == "D":
                 continue
             dt = parse_date(row.get("transaction_date") or row.get("filing_date"))
-            if not dt or dt < cutoff:
+            if not dt or dt < cutoff or dt > as_of:
                 continue
             title = row.get("title") or ""
             if is_ceo_title(title):
@@ -106,16 +107,18 @@ def main() -> int:
             scored = score_ticker(csv_path, as_of)
         elif ticker in quant:
             # Live factor keys must exist on universe even before Form 4 harvest
-            scored = {"insider_buy_count_90d": 0, "insider_cfo_buys": 0, "insider_score": 0}
+            scored = score_ticker(csv_path, as_of)
         else:
             continue
-        by_ticker[ticker] = {"ticker": ticker, **scored}
+        observed = meta.get("as_of") or meta.get("fetched_at") or meta.get("updated_at")
+        by_ticker[ticker] = {"ticker": ticker, **scored, "observed_at": observed,
+                             "source_ref": str(csv_path.relative_to(ROOT)).replace("\\", "/") if csv_path.is_file() else None}
 
     # Universe quintiles among quant names with scores
     score_inputs = {
-        t: float(row.get("insider_score") or 0)
+        t: float(row["insider_score"])
         for t, row in by_ticker.items()
-        if t in quant
+        if t in quant and row.get("insider_score") is not None
     }
     quintiles = assign_quintiles(score_inputs, higher_is_better=True)
     for ticker, row in by_ticker.items():

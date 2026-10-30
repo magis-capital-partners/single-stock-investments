@@ -18,6 +18,7 @@ from __future__ import annotations
 import argparse
 import hashlib
 import json
+import re
 import sys
 from pathlib import Path
 from typing import Any
@@ -31,6 +32,16 @@ from agent_schema import validate  # noqa: E402
 from atomic_io import now_iso  # noqa: E402
 
 INBOX = ROOT / "_system" / "data" / "agent_proposals" / "inbox.jsonl"
+# SEC accession numbers and filing URLs are provenance, not repo paths.
+_ACCESSION_RE = re.compile(r"^\d{10}-\d{2}-\d{6}$")
+
+
+def external_provenance(source: str) -> bool:
+    """True when a provenance entry is an SEC URL or accession, not a repo file."""
+    text = str(source).strip()
+    if text.startswith("https://") or text.startswith("http://"):
+        return True
+    return bool(_ACCESSION_RE.fullmatch(text))
 
 
 def normalize_proposal(raw: dict[str, Any]) -> dict[str, Any]:
@@ -48,6 +59,8 @@ def validate_proposal(raw: dict[str, Any], *, root: Path = ROOT) -> list[str]:
     errors = validate(normalize_proposal(raw), "agent_proposal")
     provenance = raw.get("provenance") or {}
     for source in provenance.get("source_paths") or []:
+        if external_provenance(str(source)):
+            continue
         if not (root / str(source)).exists():
             errors.append(f"provenance source path does not exist: {source}")
     payload = raw.get("payload")

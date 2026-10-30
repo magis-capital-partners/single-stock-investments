@@ -2,9 +2,12 @@
 from __future__ import annotations
 
 import hashlib
+import gzip
+import io
 import json
 import re
 import shutil
+import tempfile
 import uuid
 from pathlib import Path
 
@@ -12,6 +15,9 @@ from vault_paths import research_vault_root
 
 ROOT = Path(__file__).resolve().parents[2]
 MANIFEST_NAME = "private-assets.json"
+COMPRESS_AFTER_BYTES = 80 * 1024 * 1024
+MAX_STORED_BYTES = 99 * 1024 * 1024
+MAX_UNPACKED_BYTES = 512 * 1024 * 1024
 
 
 def safe_relative(relative: str) -> Path:
@@ -20,10 +26,77 @@ def safe_relative(relative: str) -> Path:
     return Path(relative)
 
 
-def private_object(vault: Path, sha256: str) -> Path:
+def stored_object(vault: Path, sha256: str) -> Path:
     if not re.fullmatch(r"[0-9a-f]{64}", sha256):
         raise ValueError("Invalid private object digest")
     return vault / "dashboard-private" / "objects" / sha256
+
+
+def decode_object_bytes(raw: bytes, sha256: str) -> bytes:
+    """The object name always identifies the exact original, unpacked bytes."""
+    if raw.startswith(b'\x1f\x8b'):
+        with gzip.GzipFile(fileobj=io.BytesIO(raw)) as stream:
+            raw = stream.read(MAX_UNPACKED_BYTES+1)
+    if len(raw) > MAX_UNPACKED_BYTES:
+        raise RuntimeError('Private snapshot exceeds the unpacked size bound')
+    if hashlib.sha256(raw).hexdigest() != sha256:
+        raise RuntimeError('Private snapshot hash mismatch')
+    return raw
+
+
+def private_object(vault: Path, sha256: str) -> Path:
+    stored = stored_object(vault, sha256)
+    if not stored.is_file():
+        return stored
+    with stored.open('rb') as stream:
+        compressed = stream.read(2) == b'\x1f\x8b'
+    if not compressed:
+        return stored
+    # Never stage unpacked bytes in the vault. This is a disposable, per-vault
+    # temporary cache; all consumers still verify the original content hash.
+    identity = hashlib.sha256(str(vault.resolve()).encode()).hexdigest()[:20]
+    cache = Path(tempfile.gettempdir())/'magis-private-snapshots'/identity
+    cache.mkdir(parents=True, exist_ok=True, mode=0o700)
+    target = cache/sha256
+    if target.is_file() and digest(target) == sha256:
+        return target
+    data = decode_object_bytes(stored.read_bytes(), sha256)
+    temporary = None
+    try:
+        with tempfile.NamedTemporaryFile(dir=cache, delete=False) as stream:
+            temporary = Path(stream.name)
+            stream.write(data)
+        temporary.replace(target)
+    finally:
+        if temporary:
+            temporary.unlink(missing_ok=True)
+    return target
+
+
+def preserve_object(vault: Path, source: Path) -> str:
+    raw = source.read_bytes()
+    if len(raw) > MAX_UNPACKED_BYTES:
+        raise RuntimeError('Private snapshot exceeds the unpacked size bound')
+    sha256 = hashlib.sha256(raw).hexdigest()
+    stored = stored_object(vault, sha256)
+    if stored.is_file():
+        if digest(private_object(vault, sha256)) != sha256:
+            raise RuntimeError('Existing private snapshot hash mismatch')
+        if stored.stat().st_size < MAX_STORED_BYTES:
+            return sha256
+    encoded = gzip.compress(raw, compresslevel=6, mtime=0) if len(raw) > COMPRESS_AFTER_BYTES else raw
+    if len(encoded) >= MAX_STORED_BYTES:
+        raise RuntimeError('Private snapshot exceeds the GitHub object limit after lossless compression; split the source before publishing')
+    stored.parent.mkdir(parents=True, exist_ok=True)
+    temporary = stored.with_name(stored.name+'.'+uuid.uuid4().hex+'.tmp')
+    try:
+        temporary.write_bytes(encoded)
+        if hashlib.sha256(decode_object_bytes(temporary.read_bytes(), sha256)).hexdigest() != sha256:
+            raise RuntimeError('Private snapshot preservation hash mismatch')
+        temporary.replace(stored)
+    finally:
+        temporary.unlink(missing_ok=True)
+    return sha256
 
 
 def digest(path: Path) -> str:

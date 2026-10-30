@@ -1,0 +1,191 @@
+{
+  "schema_version": "desk_briefs.v2",
+  "desk": "nol_tax_assets",
+  "as_of": "2026-10-29",
+  "author": "grok-drew-nol-tax-assets",
+  "owner": "drew",
+  "inputs_read": [
+    {
+      "path": "dashboard/data/nol_screener.json",
+      "generated_at": "2026-10-29T09:19:37Z"
+    },
+    {
+      "path": "dashboard/data/nol_382_facts.json",
+      "generated_at": "2026-10-29T16:47:08Z"
+    },
+    {
+      "path": "_system/portfolio/registry.json",
+      "generated_at": "2026-10-29T09:17:36Z"
+    },
+    {
+      "path": "_system/data/desk_briefs/schema.json",
+      "generated_at": null
+    }
+  ],
+  "items": [
+    {
+      "ticker": "unresolved",
+      "headline": "VNDA: the Q3 10-Q maintains a valuation allowance against all net deferred tax assets.",
+      "one_number": "full valuation allowance at 2026-09-30",
+      "evidence": [
+        {
+          "kind": "filing",
+          "ref": "10-Q accession 0001347178-26-000002, heading 11. Income Taxes",
+          "url": "https://www.sec.gov/Archives/edgar/data/1347178/000134717826000002/0001347178-26-000002.txt",
+          "as_of": "2026-09-30",
+          "claim_type": "fact"
+        }
+      ],
+      "confidence": "filing",
+      "next": "Fact: allowance against all net DTAs at 2026-09-30 and 2025-12-31; Q4 2025 non-cash charge $113.7 million. Not cash. No 382 dollar limit in that passage.",
+      "lane": "needs_review"
+    },
+    {
+      "ticker": "unresolved",
+      "headline": "SIRI: the Q3 exhibit shows income before income taxes of 416 and tax expense of (99).",
+      "one_number": "416 pretax and tax (99), in millions",
+      "evidence": [
+        {
+          "kind": "filing",
+          "ref": "8-K accession 0000908937-26-000027, exhibit in millions",
+          "url": "https://www.sec.gov/Archives/edgar/data/908937/000090893726000027/0000908937-26-000027.txt",
+          "as_of": "2026-10-29",
+          "claim_type": "fact"
+        }
+      ],
+      "confidence": "filing",
+      "next": "Fact: parentheses are the filing's. No NOL or Section 382 dollar limit in those lines. Not a buy case.",
+      "lane": "actionable"
+    },
+    {
+      "ticker": "unresolved",
+      "headline": "NWL: Beade's Form 4 reports a 129,390-share award on 2026-10-26.",
+      "one_number": "129,390 shares, code A (Form 4)",
+      "evidence": [
+        {
+          "kind": "filing",
+          "ref": "Form 4 accession 0002160533-26-000008",
+          "url": "https://www.sec.gov/Archives/edgar/data/2160533/000216053326000008/0002160533-26-000008.txt",
+          "as_of": "2026-10-26",
+          "claim_type": "fact"
+        }
+      ],
+      "confidence": "filing",
+      "next": "Fact: transaction code A, 129390 shares. Inference: an insider award is not itself a Section 382 ownership change. Form 3 0002160533-26-000006 did not contain that share count.",
+      "lane": "ownership_change_risk"
+    },
+    {
+      "ticker": "unresolved",
+      "headline": "SIRI: still on the screener actionable list. That is not a reason to buy.",
+      "one_number": "screener actionable (not a buy case)",
+      "evidence": [
+        {
+          "kind": "dashboard",
+          "ref": "nol_screener.json SIRI material_after_382. built 2026-10-29T09:19:37Z",
+          "url": null,
+          "as_of": "2026-10-29",
+          "claim_type": "fact"
+        }
+      ],
+      "confidence": "provider",
+      "next": "Fact: screener usability is material_after_382. An NOL is not the buy thesis. No present value.",
+      "lane": "actionable"
+    },
+    {
+      "ticker": "unresolved",
+      "headline": "WYY: still on the screener actionable list. That is not a reason to buy.",
+      "one_number": "screener actionable (not a buy case)",
+      "evidence": [
+        {
+          "kind": "dashboard",
+          "ref": "nol_screener.json WYY material_after_382. built 2026-10-29T09:19:37Z",
+          "url": null,
+          "as_of": "2026-10-29",
+          "claim_type": "fact"
+        }
+      ],
+      "confidence": "provider",
+      "next": "Fact: screener usability is material_after_382. An NOL is not the buy thesis. No present value.",
+      "lane": "actionable"
+    },
+    {
+      "ticker": "unresolved",
+      "headline": "NWL: still on the screener actionable list. That is not a reason to buy.",
+      "one_number": "screener actionable (not a buy case)",
+      "evidence": [
+        {
+          "kind": "dashboard",
+          "ref": "nol_screener.json NWL material_after_382. built 2026-10-29T09:19:37Z",
+          "url": null,
+          "as_of": "2026-10-29",
+          "claim_type": "fact"
+        }
+      ],
+      "confidence": "provider",
+      "next": "Fact: screener usability is material_after_382. An NOL is not the buy thesis. No present value.",
+      "lane": "actionable"
+    },
+    {
+      "ticker": "BIIB",
+      "headline": "BIIB: the screener's 283.4 percent allowance ratio mixes two different DTA tags.",
+      "one_number": "283.4% allowance ratio (data error)",
+      "evidence": [
+        {
+          "kind": "dashboard",
+          "ref": "nol_screener.json BIIB allowance_pct 283.4; dta_gross_usd 293700000; allowance 832200000",
+          "url": null,
+          "as_of": "2026-10-29",
+          "claim_type": "fact"
+        },
+        {
+          "kind": "filing",
+          "ref": "10-Q accession 0000875045-26-000096 DeferredIncomeTaxAssetsNet 293700000 at 2026-09-30",
+          "url": "https://www.sec.gov/Archives/edgar/data/875045/000087504526000096/0000875045-26-000096.txt",
+          "as_of": "2026-09-30",
+          "claim_type": "fact"
+        },
+        {
+          "kind": "filing",
+          "ref": "10-K accession 0000875045-26-000013 valuation allowance 832200000 at 2025-12-31",
+          "url": "https://www.sec.gov/Archives/edgar/data/875045/000087504526000013/0000875045-26-000013.txt",
+          "as_of": "2025-12-31",
+          "claim_type": "fact"
+        }
+      ],
+      "confidence": "filing",
+      "next": "Fact: net DTA at 2025-12-31 is 2305100000. Do not use 283.4 percent. Correction proposal, not a screener edit. Not a buy case.",
+      "lane": "needs_review"
+    },
+    {
+      "ticker": "unresolved",
+      "headline": "ATNM: the screener's 26932 percent allowance ratio uses net DTA in the gross field.",
+      "one_number": "26932% allowance ratio (data error)",
+      "evidence": [
+        {
+          "kind": "dashboard",
+          "ref": "nol_screener.json ATNM dta_gross_usd 431000; allowance 116077000; allowance_pct 26932",
+          "url": null,
+          "as_of": "2025-12-31",
+          "claim_type": "fact"
+        },
+        {
+          "kind": "filing",
+          "ref": "10-K accession 0001213900-26-036504 gross DTA 116508000; net DTA 431000; allowance 116077000",
+          "url": "https://www.sec.gov/Archives/edgar/data/1388320/000121390026036504/0001213900-26-036504.txt",
+          "as_of": "2025-12-31",
+          "claim_type": "fact"
+        }
+      ],
+      "confidence": "filing",
+      "next": "Fact: same period, three tags. Inference: dividing the allowance by gross DTA is about 99.6 percent, not 26932. Not a filed percentage. Not a buy case.",
+      "lane": "needs_review"
+    }
+  ],
+  "screens_empty": [
+    "rights_plan"
+  ],
+  "notes": "Facts file rebuilt from EDGAR in this commit; the draft had read 2026-08-12 (78 days). Blocker tally, fact, matches nol_screener.json built 2026-10-29: fully reserved 61; prior ownership change 2; carryforward above the screener model 8; DTA mostly timing 16; rights plan 1; needs review 1; no NOL component 13; no market cap 21; stale CIK 4. No present value. No control premium. A deferred tax asset is not cash. No Section 382 dollar limit unless an item names an accession.",
+  "research_only": true,
+  "in_base_irr": false,
+  "authority": "none"
+}

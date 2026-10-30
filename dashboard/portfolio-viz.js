@@ -28,7 +28,7 @@
     scope: 'all', section: 'positions', strategySection: 'overview', strategyBucket: 'all', book: null, allBook: null,
     orders: null, paperOrders: null, performance: null, accountPerformance: null, margin: null, risk: null,
     strategy: null, query: '', positionFilter: 'all', sortKey: 'market_value_decimal',
-    sortDirection: 'desc', density: localStorage.getItem('portfolio-density') || 'comfortable', onRoute: null,
+    sortDirection: 'desc', density: localStorage.getItem('ssi-display-density') || localStorage.getItem('portfolio-density') || 'comfortable', onRoute: null,
     selectedPositionKey: null, lineage: null, showColumns: false, savedViewName: '', orderNotice: null,
     // Guarded order desk. `orderRequests` is the owner's recent tickets from the
     // command channel; `activeRequest` is the one being worked right now.
@@ -49,12 +49,15 @@
   const buckets = ['all', 'b1', 'b2', 'b3', 'b4', 'b5', 'unbucketed'];
   const esc = (value) => String(value ?? '').replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
   const format = window.DashboardFormat;
-  const num = (value) => format?.finite(value) ?? (() => { if (value == null || value === '') return null; const n = Number(value); return Number.isFinite(n) ? n : null; })();
+  const num = (value) => format ? format.finite(value) : (() => { if (value == null || value === '') return null; const n = Number(value); return Number.isFinite(n) ? n : null; })();
   const money = (value, compact = false, currency = 'USD') => format ? format.currency(value, currency, { maximumFractionDigits: compact ? 0 : 2, notation: compact ? 'compact' : 'standard' }) : '—';
   const signed = (value, currency = 'USD') => { const n = num(value); return n == null ? '—' : `${n > 0 ? '+' : ''}${money(n, false, currency)}`; };
   const quantity = (value) => format ? format.number(value, { maximumFractionDigits: 4 }) : '—';
-  const pct = (value, digits = 1) => { const n = num(value); return n == null ? '—' : `${(n * 100).toFixed(digits)}%`; };
-  const valueMap = (book) => Object.fromEntries((book?.account_values || []).map((row) => [row.tag, row.value_decimal]));
+  const pct = (value, digits = 1) => format.percent(value, {maximumFractionDigits:digits});
+  const valueMap = (book) => Object.fromEntries((book?.account_values || [])
+    .filter(row=>!row.currency || row.currency==='BASE' || row.currency===(book?.snapshot?.base_currency || 'USD'))
+    .slice().sort((a,b)=>Number(a.currency==='BASE')-Number(b.currency==='BASE'))
+    .map((row) => [row.tag, row.value_decimal]));
   const positionKey = (row) => `${row.account_alias || ''}:${row.conid}:${row.model_code || ''}`;
   const columnSetKey = () => (state.scope === 'michael' ? 'michael' : 'default');
   const getColumns = () => state.columnSets[columnSetKey()];
@@ -185,9 +188,13 @@
   function persistViews() { localStorage.setItem(VIEW_STORAGE, JSON.stringify(state.savedViews)); localStorage.setItem(COLUMN_STORAGE, JSON.stringify(state.columnSets.default)); localStorage.setItem(MICHAEL_COLUMN_STORAGE, JSON.stringify(state.columnSets.michael)); }
 
   async function getJson(url) {
-    const response = await fetch(url, { credentials: 'same-origin', cache: 'no-store', headers: { accept: 'application/json' } });
-    if (!response.ok) throw new Error(response.status === 401 ? 'Sign in through Cloudflare Access to view the IBKR book.' : `Portfolio API ${response.status}`);
-    return response.json();
+    try {
+      const response = await fetch(url, { credentials: 'same-origin', cache: 'no-store', headers: { accept: 'application/json' } });
+      if (!response.ok) throw Object.assign(new Error(response.status === 401 ? 'Sign in through Cloudflare Access to view the IBKR book.' : `Portfolio API ${response.status}`),{status:response.status});
+      const doc=await response.json();
+      window.DashboardDisplay?.record(url,doc);
+      return doc;
+    } catch(error) { window.DashboardDisplay?.record(url,null,error);throw error; }
   }
 
   async function sendJson(url, options) {
@@ -334,7 +341,7 @@
       ? `<span class="ph-na" title="Daily P&amp;L is ${NOT_IN_FLEX}">—</span><small>as of ${esc(eodDate(book))} · daily P&amp;L ${NOT_IN_FLEX}</small>`
       : `<span>${signed(daily)}</span><small>today</small>`;
     const runway = (value) => (eod ? `<b title="${NOT_IN_FLEX}">— <small class="ph-dim">${NOT_IN_FLEX}</small></b>` : `<b>${value}</b>`);
-    return `<section class="ph-cockpit" aria-label="Account overview"><div class="ph-cockpit-value"><button type="button" class="ph-lineage-target" data-ph-lineage="Net liquidation" data-ph-source="${esc(navSource)}" data-ph-detail="${esc(navDetail)}"><div class="ph-kicker">Net liquidation value</div><div class="ph-hero-value">${money(nav)}</div></button><div class="ph-daily ${daily < 0 ? 'ph-negative' : 'ph-positive'}">${dailyCell}</div><div class="ph-feed-state ${stale ? 'stale' : ''}"><i class="${book?.status === 'complete' && !stale && !eod ? 'live' : ''}"></i>${esc(dataState)}</div></div><div class="ph-cockpit-chart"><div class="ph-chart-head"><span>Account value</span><b>${state.accountPerformance?.nav_series?.length || 0} observations</b></div>${portfolioSparkline(state.accountPerformance?.nav_series, state.accountPerformance?.benchmark)}</div><div class="ph-cockpit-safety"><div class="ph-kicker">Liquidity runway</div><div class="ph-safety-line"><span>Excess liquidity</span>${runway(money(excess, true))}</div><div class="ph-safety-line"><span>Margin load</span>${runway(pct(marginLoad))}</div><div class="ph-meter"><i style="width:${marginLoad == null ? 0 : (marginLoad * 100).toFixed(1)}%"></i></div><div class="ph-safety-line"><span>Broker cushion</span>${runway(cushion == null ? '—' : pct(cushion))}</div><div class="ph-readonly"><span>BROKER READ ONLY</span> Paper tickets never route to IBKR.</div></div></section>`;
+    return `<section class="ph-cockpit" aria-label="Account overview"><div class="ph-cockpit-value"><button type="button" class="ph-lineage-target" data-ph-lineage="Net liquidation" data-ph-source="${esc(navSource)}" data-ph-detail="${esc(navDetail)}"><div class="ph-kicker">Net liquidation value</div><div class="ph-hero-value">${money(nav)}</div></button><div class="ph-daily ${daily == null ? '' : daily < 0 ? 'ph-negative' : 'ph-positive'}">${dailyCell}</div><div class="ph-feed-state ${stale ? 'stale' : ''}"><i class="${book?.status === 'complete' && !stale && !eod ? 'live' : ''}"></i>${esc(dataState)}</div></div><div class="ph-cockpit-chart"><div class="ph-chart-head"><span>Account value</span><b>${state.accountPerformance?.nav_series?.length || 0} observations</b></div>${portfolioSparkline(state.accountPerformance?.nav_series, state.accountPerformance?.benchmark)}</div><div class="ph-cockpit-safety"><div class="ph-kicker">Liquidity runway</div><div class="ph-safety-line"><span>Excess liquidity</span>${runway(money(excess, true))}</div><div class="ph-safety-line"><span>Margin load</span>${runway(pct(marginLoad))}</div><div class="ph-meter"><i style="width:${marginLoad == null ? 0 : (marginLoad * 100).toFixed(1)}%"></i></div><div class="ph-safety-line"><span>Broker cushion</span>${runway(cushion == null ? '—' : pct(cushion))}</div><div class="ph-readonly"><span>BROKER READ ONLY</span> Paper tickets never route to IBKR.</div></div></section>`;
   }
 
   function accountFacts(book) {
@@ -359,16 +366,17 @@
 
   function scopeStrip(book) {
     const positions = book?.positions || [];
-    const gross = positions.reduce((sum, row) => sum + Math.abs(scopedValue(row, 'market_value_decimal') || 0), 0);
-    const net = positions.reduce((sum, row) => sum + (scopedValue(row, 'market_value_decimal') || 0), 0);
-    const pnl = positions.reduce((sum, row) => sum + (scopedValue(row, 'daily_pnl_decimal') || 0), 0);
-    const cash = (book?.cash_events || []).reduce((sum, row) => sum + (num(row.amount_decimal) || 0), 0);
+    const values=positions.map(row=>scopedValue(row,'market_value_decimal'));
+    const gross = values.length ? format.sum(values.map(value=>value==null?null:Math.abs(value))) : book?.status==='complete'?0:null;
+    const net = values.length ? format.sum(values) : book?.status==='complete'?0:null;
+    const pnl = isEodFeed(book) ? null : format.sum(positions.map(row=>scopedValue(row,'daily_pnl_decimal')));
+    const cash = state.scope==='all' ? num(valueMap(book).TotalCashValue) : format.sum((book?.cash_events || []).map(row=>row.amount_base_decimal ?? (row.currency===baseCurrencyOf() ? row.amount_decimal : null)));
     const unresolved = (book?.reconciliation_breaks || []).length;
     const quarantined = (book?.positions || []).filter((row) => !(row.allocations || []).length).length;
     const label = state.scope === 'all' ? 'Whole account'
       : book?.allocation_status === 'residual_fallback' ? 'Michael residual'
         : `${state.scope[0].toUpperCase()}${state.scope.slice(1)} allocation`;
-    return `<div class="ph-scope-strip"><div class="ph-scope-name"><strong>${esc(label)}</strong><span>Selected scope · account facts above stay fixed</span></div><div class="ph-scope-metric"><span>Allocated cash</span><b>${money(cash, true)}</b></div><div class="ph-scope-metric"><span>Gross exposure</span><b>${money(gross, true)}</b></div><div class="ph-scope-metric"><span>Net exposure</span><b>${money(net, true)}</b></div><div class="ph-scope-metric"><span>Daily attributable P&L</span><b class="${pnl < 0 ? 'ph-negative' : 'ph-positive'}">${signed(pnl)}</b></div><div class="ph-scope-metric"><span>Orders / breaks / quarantine</span><b>${book?.broker_open_order_count || 0} / ${unresolved} / ${quarantined}</b></div></div>`;
+    return `<div class="ph-scope-strip"><div class="ph-scope-name"><strong>${esc(label)}</strong><span>Selected scope · account facts above stay fixed</span></div><div class="ph-scope-metric"><span>${state.scope==='all'?'Broker cash':'Allocated cash'}</span><b>${money(cash, true)}</b></div><div class="ph-scope-metric"><span>Gross exposure</span><b>${money(gross, true)}</b></div><div class="ph-scope-metric"><span>Net exposure</span><b>${money(net, true)}</b></div><div class="ph-scope-metric"><span>Daily attributable P&L</span><b class="${pnl==null ? '' : pnl < 0 ? 'ph-negative' : 'ph-positive'}">${signed(pnl)}</b></div><div class="ph-scope-metric"><span>Orders / breaks / quarantine</span><b>${book?.broker_open_order_count || 0} / ${unresolved} / ${quarantined}</b></div></div>`;
   }
 
   function portfolioClock(book) {
@@ -1389,14 +1397,14 @@
     const root = document.getElementById('portfolio-content'); if (!root) return;
     const book = state.book;
     const sectionAvailable = book?.status === 'complete' || ['orders', 'realized'].includes(state.section);
-    root.innerHTML = `<div class="ph-shell">${shellHeader(book)}${sectionAvailable ? sectionView(book) : emptyState('upstream_absent', 'Waiting for the first complete IBKR snapshot', book?.reason || 'The private collector has not published broker truth yet.', 'Private IBKR collector · last checked on page load', 'Portfolio operations should publish a complete account summary and position watermark; Orders remains available for owner-scoped paper tickets.')}</div>`;
+    root.innerHTML = `<div class="ph-shell">${shellHeader(book)}${sectionAvailable ? sectionView(book) : emptyState('upstream_absent', 'Waiting for the first complete IBKR snapshot', book?.reason || 'The Flex report publisher has not published a complete account snapshot yet.', 'IBKR Flex report · checked on page load', 'Portfolio operations should publish a complete account summary and position watermark; Orders remains available for owner-scoped paper tickets.')}</div>`;
     bindCommon(root);
     if (state.section === 'realized' && ['drew', 'michael'].includes(state.scope)) window.SleeveRealized?.attach(root, state.scope, book?.ownership_version);
     if (state.section === 'orders') bindOrderDesk(root);
     root.querySelector('[data-ph-search]')?.addEventListener('input', (event) => { state.query = event.target.value; renderPortfolio(); const input = root.querySelector('[data-ph-search]'); input?.focus(); input?.setSelectionRange(state.query.length, state.query.length); });
     root.querySelectorAll('[data-ph-filter]').forEach((button) => button.addEventListener('click', () => { state.positionFilter = button.dataset.phFilter; renderPortfolio(); }));
     root.querySelectorAll('[data-ph-sort]').forEach((button) => button.addEventListener('click', () => { const key = button.dataset.phSort; state.sortDirection = state.sortKey === key && state.sortDirection === 'desc' ? 'asc' : 'desc'; state.sortKey = key; renderPortfolio(); }));
-    root.querySelector('[data-ph-density]')?.addEventListener('click', () => { state.density = state.density === 'compact' ? 'comfortable' : 'compact'; localStorage.setItem('portfolio-density', state.density); renderPortfolio(); });
+    root.querySelector('[data-ph-density]')?.addEventListener('click', () => { state.density = state.density === 'compact' ? 'comfortable' : 'compact'; localStorage.setItem('portfolio-density', state.density); window.DashboardDisplay?.setDensity(state.density); renderPortfolio(); });
     root.querySelector('[data-ph-columns]')?.addEventListener('click', () => { state.showColumns = !state.showColumns; renderPortfolio(); });
     root.querySelectorAll('[data-ph-column]').forEach((input) => input.addEventListener('change', () => {
       const key = input.dataset.phColumn;
@@ -1414,7 +1422,7 @@
     root.querySelectorAll('[data-ph-load-view]').forEach((button) => button.addEventListener('click', () => {
       const view = state.savedViews.find((item) => item.name === button.dataset.phLoadView);
       if (!view) return;
-      setColumns(view.columns.slice()); state.positionFilter = view.filter; state.sortKey = view.sortKey; state.sortDirection = view.sortDirection; state.density = view.density;
+      setColumns(view.columns.slice()); state.positionFilter = view.filter; state.sortKey = view.sortKey; state.sortDirection = view.sortDirection; state.density = view.density; window.DashboardDisplay?.setDensity(view.density);
       persistViews(); renderPortfolio();
     }));
   }

@@ -33,3 +33,6 @@ jobs:
           python _system/scripts/build_rock_aggregates_screener.py --check
       - name: Screen and risk rendering contracts
         run: node --test dashboard/cloudflare/test-dashboard-expansion.mjs dashboard/cloudflare/test-spa-risk-quality.mjs _system/scripts/tests/test_buyback_radar_ui.cjs
+
+      - name: Selected reverse-split strategy and complete trade ledger
+        run: node --test _system/scripts/tests/test_reverse_split_strategy.cjs _system/scripts/tests/test_short_profit_program.cjs

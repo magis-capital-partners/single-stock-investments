@@ -35,6 +35,15 @@ test('rally and weak-close screens cannot see the unfinished announcement-day cl
  assert.equal(s.S7,'pass');assert.equal(s.S5,'unknown');assert.equal(s.last_completed_price_day,'2023-01-10');
  assert.equal(s.S5,'unknown');
 });
+test('an unverified UTC-day candle cannot supply a close or range before the UTC day ends',()=>{
+ const F=require('./announcement_features.cjs'),{ctx}=fixture();ctx.auction=()=>({});
+ assert.equal(F.closeObservation(ctx,'X','2023-01-03',Date.parse('2023-01-03T22:00:00Z')),null);
+ assert.equal(F.closeObservation(ctx,'X','2023-01-03',Date.parse('2023-01-04T00:01:00Z')).price,10);
+});
+test('the legal effective-day close is not the future split-trading-day close',()=>{
+ const {ctx}=fixture(),e={id:'x',issuer:'cik/1',cik:'1',ticker:'X',event_date:'2023-01-03',announced_trading_day:'2023-01-04'};
+ assert.equal(S.signal(ctx,e,E.clock('2023-01-03',18,0),null).S5,'unknown');
+});
 test('cash burn excludes a later filing and does not reuse an effective-day feature',()=>{
  const {ctx}=fixture(),e={ticker:'X',event_date:'2023-01-19'};
  const raw={facts:{'us-gaap':{CashAndCashEquivalentsAtCarryingValue:{units:{USD:[{end:'2022-12-31',filed:'2023-01-10',accn:'1',val:100}]}},NetCashProvidedByUsedInOperatingActivities:{units:{USD:[{start:'2022-01-01',end:'2022-12-31',filed:'2023-01-10',accn:'1',val:-10}]}}}}};
@@ -51,6 +60,12 @@ test('a late disclosure cannot count the current split as its own predecessor',(
  assert.equal(S.ordinal(past,'cik/1','2023-01-05T15:00:00Z','2023-01-04'),1);
  assert.deepEqual(S.protocol().sizes,['usd100k']);assert.equal(S.protocol().live_initial_shares,1);
  assert.deepEqual(S.protocol().ordinal_groups,['all','first','second','third_plus']);
+});
+
+test('a reviewed legal restructuring and later trading transition count as one prior split',()=>{
+ const ctx={events:[{family:'split',issuer:'cik/1',event_date:'2026-02-23',known_at:'2026-02-20T12:00Z'}],catalogue:[],announcementActionLedger:[{issuer:'cik/1',declared_date:'2026-02-23',ex_date:'2026-03-13'}],announcementActionHistory:[{issuer:'cik/1',day:'2026-03-13',known:'2026-03-10T12:00Z'}]};
+ const history=S.history(ctx);assert.equal(history.length,1);assert.equal(S.ordinal(history,'cik/1','2026-03-20T12:00Z'),2);
+ ctx.announcementActionLedger=[{issuer:'cik/1',declared_date:'2026-03-13',ex_date:'2026-03-13',superseded_dates:['2026-02-23']}];assert.equal(S.history(ctx).length,1);
 });
 test('all fundamental screens are recomputed before versus after a new filing becomes public',()=>{
  const {ctx}=fixture(),e={id:'x',issuer:'cik/1',cik:'1',ticker:'X',event_date:'2023-01-19'};
@@ -96,4 +111,36 @@ test('the announced-date holding rule has its own later deadline, not the entry-
  const b=S.executeTrade(ctx,new Map(),e,'announce_now','one_share','base',null,'scheduled_split20');
  assert.equal(a.planned_exit,'2023-01-31');assert.equal(b.planned_exit,'2023-02-06');
  assert.equal(b.holding,'scheduled_split20');assert.notEqual(a.close_day,b.close_day);
+});
+
+test('an uncaptured afternoon cover cannot use the later official close',()=>{const C=require('./announcement_accounting.cjs'),x={auction:()=>({open:10,close:100}),prices:{days:['2024-01-02'],point:()=>({close:100})},factor:()=>1};assert.deepEqual(C.coverPrice(x,{ticker:'X',issuer:'cik/1',day:'2024-01-02'},'2024-01-02',null,100),{price:10,basis:'known_official_open_proxy'});});
+
+test('whole-share overbuy cleanup cannot mint a gain from the later daily mark',()=>{const C=require('./announcement_accounting.cjs'),days=['2024-01-02','2024-01-03','2024-01-04'],ctx={prices:{days,index:new Map(days.map((d,i)=>[d,i])),last:days.at(-1),point:(_t,d)=>({open:d===days[0]?1:10,close:d===days[0]?1:1000,high:d===days[0]?1:1000})},auction:(_t,d)=>({open:d===days[0]?1:10,close:d===days[0]?1:1000}),factor:(_t,a,b)=>a<'2024-01-03'&&b>='2024-01-03'?10:1,settlement:d=>new Date(Date.parse(d+'T12:00Z')+86400000).toISOString().slice(0,10)};const t=C.trade(ctx,{get:()=>null},{id:'cleanup',issuer:'cik/1',ticker:'TEST',day:days[0],entry_price:1,adv_shares:100000000},{quantity:1,horizon:2,borrow_apr:0,locate_min:0,locate_per_share:0,capture:1});assert.equal(t.entry.filled_shares,1);assert.equal(t.close_day,days[1]);assert.ok(t.net_pnl<=t.entry.notional);assert.ok(t.proxy_exit);});
+
+test('an incomplete window retains observed prices and trading-halt evidence but stays a proxy',()=>{const index=S.indexSessions({sessions:new Map([['p',{issuer:'cik/1',source_ticker:'TEST',date:'2024-01-02',open_ms:1,close_ms:10000,capture_start_ms:1,capture_end_ms:5000,bars:[[1,10,10,10,10,100]],quotes:[],statuses:[{available_ms:1000,trading:'N'}],data_gaps:[]}]])}),e={issuer:'cik/1',ticker:'TEST'};assert.equal(S.sessionAt(index,e,'2024-01-02',1,9000),null);const partial=S.sessionAt(index,e,'2024-01-02',1,9000,true);assert.equal(partial.statuses[0].trading,'N');assert.equal(partial.bars.length,1);assert.ok(partial.data_gaps.length);});
+test('known halted cover evidence blocks synthetic residual liquidation',()=>{const C=require('./announcement_accounting.cjs'),date='2024-01-02',close=Date.parse(date+'T21:00Z');assert.equal(C.knownHalt({close_ms:close,statuses:[{available_ms:close-7200000,trading:'N'}]},date),true);assert.equal(C.knownHalt({close_ms:close,statuses:[{available_ms:close-7200000,trading:'N'},{available_ms:close-3600000,trading:'Y'}]},date),false);});
+
+test('repeat history uses inclusive calendar days rather than the release hour',()=>{const F=require('./announcement_features.cjs'),ctx={prices:{days:[],point:()=>null},actions:new Map(),auction:()=>({})},e={id:'repeat',issuer:'cik/1',cik:'1',ticker:'TEST',event_date:'2024-07-01'},past=[{issuer:'cik/1',day:'2024-01-01',known:'2023-12-20T12:00Z'}];assert.equal(F.snapshot(ctx,e,Date.parse('2024-06-29T23:00Z'),null,past).S3,'pass');assert.equal(F.snapshot(ctx,e,Date.parse('2024-06-30T23:00Z'),null,past).S3,'fail');});
+
+test('a later-price estimate is labeled, expressed in entry units, and never becomes a selection signal',()=>{
+ const {ctx,days,data}=fixture(),clock=S.arrival(ctx,'2023-01-03T12:00Z');ctx.auction=()=>({});ctx.prices.point=(_t,d)=>d===days[1]?{close:100}:null;ctx.factor=(_t,a,b)=>a<b?10:1;
+ const p=S.price(ctx,{ticker:'X'},clock,null);assert.equal(p.price,10);assert.equal(p.imputed,true);assert.equal(p.imputation_source_day,days[1]);
+ const signals=S.signal(ctx,{ticker:'X',event_date:days[1]},clock.at,null);assert.equal(signals.S7,'unknown');assert.equal(signals.weak_prior_close,'unknown');
+});
+test('capital repayment offsets a mechanical consolidation gain and the event allowance is charged once',()=>{
+ const C=require('./announcement_accounting.cjs'),{ctx,days,data}=fixture();ctx.factor=(_t,a,b)=>a<days[1]&&b>=days[1]?1.1:1;
+ const c={id:'cash-return',issuer:'cik/1',ticker:'X',day:days[0],entry_price:10,adv_shares:100000000},o={quantity:110,horizon:2,borrow_apr:0,locate_min:0,locate_per_share:0,capture:1,event_allowance:.01};
+ const without=C.trade(ctx,{get:()=>null},c,o),withCash=C.trade(ctx,{get:()=>null},c,{...o,cash_return_days:[days[1]]});
+ assert.ok(withCash.costs.capital_repayment>0);assert.ok(Math.abs(without.net_pnl-withCash.net_pnl-withCash.costs.capital_repayment)<1e-7);assert.equal(withCash.costs.event_allowance,withCash.entry.notional*.01);
+ withCash.arrival_ms=1;withCash.price_imputed=true;const r=S.admit(ctx,[withCash],'unlimited').summary;assert.equal(r.pnl_without_price_imputation,0);assert.equal(r.price_imputed_entries,1);assert.ok(Math.abs(r.gross_before_costs-Object.values(r.costs).reduce((s,x)=>s+x,0)-r.net_pnl)<1e-7);
+});
+
+test('a paired spin-off uses the same explicit cash-equivalent liability estimate for a two-for-one consolidation',()=>{
+ const C=require('./announcement_accounting.cjs'),{ctx,days}=fixture();ctx.factor=(_t,a,b)=>a<days[1]&&b>=days[1]?2:1;
+ const c={id:'spin',issuer:'cik/1',ticker:'X',day:days[0],entry_price:10,adv_shares:100000000},o={quantity:100,horizon:2,borrow_apr:0,locate_min:0,locate_per_share:0,capture:1};const plain=C.trade(ctx,{get:()=>null},c,o),paired=C.trade(ctx,{get:()=>null},c,{...o,cash_return_days:[days[1]]});assert.equal(paired.costs.capital_repayment,500);assert.ok(Math.abs(plain.net_pnl-paired.net_pnl-500)<1e-7);
+});
+
+test('a source-specified repayment uses dollars per old share instead of a fitted neutral estimate',()=>{
+ const C=require('./announcement_accounting.cjs'),{ctx,days}=fixture();ctx.factor=(_t,a,b)=>a<days[1]&&b>=days[1]?36/35:1;
+ const c={id:'source-cash',issuer:'cik/1',ticker:'X',day:days[0],entry_price:10,adv_shares:100000000};const t=C.trade(ctx,{get:()=>null},c,{quantity:360,horizon:2,borrow_apr:0,locate_min:0,locate_per_share:0,capture:1,cash_return_days:[days[1]],distribution_actions:[{day:days[1],cash_per_old_share:1.26}]});assert.equal(t.costs.capital_repayment,453.6);assert.ok(Math.abs(t.returns.reduce((s,r)=>s+r.units,0)-360)<1e-8);
 });

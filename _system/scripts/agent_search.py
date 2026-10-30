@@ -68,7 +68,8 @@ def restored_private_rows(root: Path, public_path: Path) -> list[dict[str, Any]]
     vault = research_vault_root()
     if vault is None:
         return None
-    private = vault / "dashboard-private" / "objects" / digest
+    from private_dashboard_assets import private_object
+    private = private_object(vault, digest)
     if not private.is_file():
         return None
     payload = private.read_bytes()

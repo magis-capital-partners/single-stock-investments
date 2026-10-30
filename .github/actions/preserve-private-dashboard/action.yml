@@ -1,10 +1,16 @@
 name: Preserve private dashboard snapshots
 description: Export immutable source snapshots privately before any public artifact is staged or deployed
+inputs:
+  preserve-company-cache:
+    description: Archive new recovery work. Snapshot-only deployment leaves the verified source archive unchanged.
+    default: "true"
 runs:
   using: composite
   steps:
     - name: Preserve restricted dashboard sources before public staging
       shell: bash
+      env:
+        PRESERVE_COMPANY_CACHE: ${{ inputs.preserve-company-cache }}
       run: |
         set -euo pipefail
         # A sparse job can see restricted files and still omit the publication
@@ -57,13 +63,26 @@ runs:
         PY
         vault="${RESEARCH_VAULT_ROOT:-_external/research-vault}"
         if [ -d "$vault/dashboard-private" ]; then
+          python _system/scripts/preserve_commodity_inputs.py --vault "$vault"
+          cache="$vault/dashboard-private/company-research-cache"
+          if [ "$PRESERVE_COMPANY_CACHE" = "true" ] && { [ -d "$cache/git" ] || [ -d "$cache/drive" ]; }; then
+            python _system/scripts/company_source_cache.py pack --cache "$cache" --archive "$vault/dashboard-private/company-source-backfill-v2"
+            python _system/scripts/push_company_source_parts.py --vault "$vault"
+          fi
           # Persist only these immutable objects; other vault work belongs to its lane.
-          git -C "$vault" add --force -- dashboard-private
+          # The portable archive owns all recovery state. Do not also commit
+          # hundreds of thousands of loose cache files beside it.
+          exclusions=(':(exclude)dashboard-private/company-research-cache')
+          exclusions+=(':(exclude)**/work.sqlite*' ':(exclude)**/*.tmp')
+          if [ "$PRESERVE_COMPANY_CACHE" != "true" ]; then
+            exclusions+=(':(exclude)dashboard-private/company-source-backfill-v2')
+          fi
+          git -C "$vault" add --force -- dashboard-private "${exclusions[@]}"
           if ! git -C "$vault" diff --cached --quiet -- dashboard-private; then
             if [ -n "$(git -C "$vault" diff --cached --name-only -- . ':!dashboard-private')" ]; then
               echo "::error::Unrelated vault files are staged; publish those before preserving dashboard snapshots."
               exit 1
             fi
-            bash _system/scripts/ci_push_vault.sh "Preserve restricted dashboard source snapshots" "--force dashboard-private"
+            bash _system/scripts/ci_push_vault.sh "Preserve restricted dashboard source snapshots" "--force dashboard-private ${exclusions[*]}"
           fi
         fi
