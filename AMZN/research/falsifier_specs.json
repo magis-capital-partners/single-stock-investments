@@ -294,6 +294,84 @@
       "untestable": false,
       "calibration_eligible": true,
       "supersedes_spec_id": null
+    },
+    {
+      "spec_schema_version": "3.0",
+      "spec_id": "amzn-multilens-base-irr-2027-04-29",
+      "spec_revision": 1,
+      "forecast_class": "ex_ante",
+      "forecast_role": "diagnostic",
+      "authored_at": "2026-10-30T18:00:00Z",
+      "information_cutoff_at": "2026-10-29T12:00:00Z",
+      "registered_at": "2026-10-30T18:00:00Z",
+      "registration_commit": "3ccf28bdc308209762b05617d82396eabf171208",
+      "analysis_run_id": "fundamental-analyst-2026-10-30",
+      "author": "fundamental-analyst",
+      "model_id": "fundamental-analyst-weekly-v1",
+      "prompt_version": "case-log-table-v1",
+      "contract_hash": "3e72397dec315a626c5e028ff971475b8a3a0dec24a5cf32f972f7ae27c43f70",
+      "component_fingerprint": "1fb112a7b9fa6e120c3a7d8193b809b0b229c4003bb5cf47b504f031f21f8c6d",
+      "method_id": "owner_cash_or_dividend_discount",
+      "power_zone": "quality_reinvestment",
+      "component_id": "core_engine",
+      "correlation_group": "amzn-fundamental-analyst-2026-10-29",
+      "metric": "base IRR at the review price",
+      "comparator": "gte",
+      "threshold": 15,
+      "threshold_basis": {
+        "source_ref": "_system/research/fundamental_analyst/CASE_LOG_2026-10-29.md",
+        "rule": "Fire when the base IRR at the review price is at least 15% per year. The 2026-10-29 Q3'26 call holds AMZN as a core compounder with no new money because the base IRR is 4.2% at $243.79, below the 15% hurdle (15% price about $130). A hit means that hurdle reason failed. The probability column scores the same event: base IRR still below 15% at review. research/AMZN_Q3_2026_update.md carries the arithmetic.",
+        "claim_type": "inference"
+      },
+      "unit": "percent",
+      "measurement_period_end": "2027-04-29",
+      "observable_after": "2027-04-29",
+      "resolution_deadline": "2027-04-29",
+      "source_hint": "base_irr_pct",
+      "observation_plan": {
+        "metric_definition_id": "fundamental_analyst_observation",
+        "metric_definition_version": "1.0",
+        "source_adapter": "fundamental_analyst_observation",
+        "fiscal_period": "EVENT",
+        "observation_type": "instant",
+        "duration_basis": "point",
+        "canonical_unit": "percent",
+        "expected_publication_date": "2027-04-29",
+        "accepted_forms": [
+          "analyst_observation"
+        ],
+        "maximum_source_lag_days": 14,
+        "end_date_tolerance_days": 7,
+        "historical_replay": {
+          "status": "passed",
+          "evidence_ref": "AMZN/research/fundamental_analyst/replay_2026-10-29.json"
+        },
+        "outcome_unavailable_at_registration": true
+      },
+      "probability_fires": 0.4,
+      "calibration_eligible": false,
+      "severity": 4,
+      "derived_from": "Hold as core; no new money; base 15% price ~$130 (Multi-lens (Buffett, Munger, Hohn, Pabrai, Li Lu, Stahl/HK, Tarasoff, PRINCIPLES))",
+      "rationale": "Call (2026-10-29, Multi-lens (Buffett, Munger, Hohn, Pabrai, Li Lu, Stahl/HK, Tarasoff, PRINCIPLES)): Hold as core; no new money; base 15% price ~$130 Reason: Q3'26 8-K (0001018724-26-000038): AWS +39.3%, 38.7% margin, $578B backlog; record 13.9% op margin; but TTM FCF -$42.4B, Q3 capex $77.3B, 2027 capex 'meaningfully more' than ~$220B, LTD $65.6B to $173.1B. Base IRR 4.2% (OC $4.82, capex at 12% of rev, 13%/9%, 25x); bear -9.8%, bull 14.5% (PRINCIPLES A13, B3/E hold rule, TS21). research/AMZN_Q3_2026_update.md Source: _system/research/fundamental_analyst/CASE_LOG_2026-10-29.md. Registered test: Fire when the base IRR at the review price is at least 15% per year. The 2026-10-29 Q3'26 call holds AMZN as a core compounder with no new money because the base IRR is 4.2% at $243.79, below the 15% hurdle (15% price about $130). A hit means that hurdle reason failed. The probability column scores the same event: base IRR still below 15% at review. research/AMZN_Q3_2026_update.md carries the arithmetic. Stated probability the call is right at review: 60%. Probability this falsifier fires (the call is wrong on its own terms) = 0.4. Recorded as diagnostic; calibration promotion needs an independent human review.",
+      "untestable": false,
+      "supersedes_spec_id": null,
+      "call": "Hold as core; no new money; base 15% price ~$130",
+      "lens": "Multi-lens (Buffett, Munger, Hohn, Pabrai, Li Lu, Stahl/HK, Tarasoff, PRINCIPLES)",
+      "case_log_ref": "_system/research/fundamental_analyst/CASE_LOG_2026-10-29.md",
+      "source": {
+        "case_log": "_system/research/fundamental_analyst/CASE_LOG_2026-10-29.md",
+        "lens": "Multi-lens (Buffett, Munger, Hohn, Pabrai, Li Lu, Stahl/HK, Tarasoff, PRINCIPLES)",
+        "call_date": "2026-10-29",
+        "ticker_cell": "AMZN"
+      },
+      "probability_basis": {
+        "stated_probability_call_right": 0.6,
+        "stated_text": "60% (base IRR still < 15% at review price)",
+        "probability_fires_derivation": "probability_fires = 1 - stated_probability_call_right; the falsifier fires when the call is wrong on its own terms.",
+        "calibration_status": "recorded_not_yet_eligible",
+        "calibration_note": "Diagnostic until a human promotes it. v3 calibration eligibility needs forecast_role=primary, an independent review record, and the economic-impact fields (see falsifier_specs.calibration_eligibility). Recording the probability does not promote it.",
+        "brier_basis": "At review, Brier = (stated_probability_call_right - outcome_right)^2, with outcome_right = 1 if the call held, i.e. this falsifier missed."
+      }
     }
   ]
 }
