@@ -56,6 +56,9 @@ def build():
     grid = read('sizing_timing_study_20261029/grid.json')
     study = read('third_plus_signal_study/summary.json')
     dictionary = read('third_plus_signal_study/feature_dictionary.json')
+    # Retain fundamental and repeat-count arms only; price weakness and rally vetoes belong to the retired lab.
+    fundamental_signals = {'S1','S2','S3','S4','score60'}
+    fundamental_arms = {r['id'] for r in dictionary['arms'] if set(r['requires']) <= fundamental_signals}
     def metrics(row):
         return {k: row.get(k) for k in METRICS}
     # Fixed size only: exclude score multipliers and rally rules from the selected strategy's filter comparisons.
@@ -70,11 +73,11 @@ def build():
                    'costs': protocol['costs'], 'price_asof': repeat['price_asof']},
         'filter_cases': filters,
         'announcement': announcement_comparisons(sources),
-        'third_plus': {'signals': dictionary['signals'], 'coverage': study['coverage'],
+        'third_plus': {'signals': [r for r in dictionary['signals'] if r['id'] in fundamental_signals], 'coverage': study['coverage'],
                        'primary': [{'arm': r['arm'], 'summary': metrics(r['summary']), 'decision': r.get('decision'),
-                                    'holm_p': r.get('holm_p'), 'vs_covered': r.get('vs_covered')} for r in study['primary']],
-                       'replication': [{'arm': r['arm'], 'summary': metrics(r)} for r in study['replication']],
-                       'ordinal': study['ordinal_diagnostics'], 'price_asof': study['price_asof'],
+                                    'holm_p': r.get('holm_p'), 'vs_covered': r.get('vs_covered')} for r in study['primary'] if r['arm'] in fundamental_arms],
+                       'replication': [{'arm': r['arm'], 'summary': metrics(r)} for r in study['replication'] if r['arm'] in fundamental_arms],
+                       'ordinal': [r for r in study['ordinal_diagnostics'] if r['arm'] in fundamental_arms], 'price_asof': study['price_asof'],
                        'timing': 'Separate third-plus post-split study; primary 20 sessions, replication 10 sessions.'},
         'limits': ['Historical completed-event coverage is incomplete; cancelled announcements are not a complete population.',
                    'Repeat-event returns describe post-split price moves before trading costs, not announcement-entry returns.',
