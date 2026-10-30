@@ -276,6 +276,8 @@ def validate_economics(contract, expanded, model, evidence_ids):
         require(f['unit'] == unit, 'Forecast unit disagrees with the model metric')
         try:
             require(date.fromisoformat(f['period']) > date.fromisoformat(contract['as_of']), 'Forecast must precede its observation')
+            if f.get('start'):
+                require(date.fromisoformat(f['start']) < date.fromisoformat(f['period']), 'Forecast measurement interval is invalid')
         except (KeyError, TypeError, ValueError) as exc:
             raise ContractError('Invalid forecast period') from exc
     tests = a.get('structural_tests') or []
@@ -443,7 +445,10 @@ def grade_commitments(model, observations, as_of):
     for f in freeze_commitments(model):
         matches = [o for o in observations if o.get('field') == f['observation_field'] and o.get('unit') == f['unit']
                    and o.get('issuer_ticker',model['ticker']) == f.get('issuer_ticker',model['ticker'])
-                   and o.get('period') == f['period'] and o.get('source_kind', 'primary') == 'primary'
+                   and o.get('period') == f['period'] and o.get('source_kind') == 'primary'
+                   and (not f.get('start') or o.get('start') == f['start'])
+                   and (not f.get('scope') or o.get('scope') == f['scope'])
+                   and (not o.get('filed') or o['filed'] <= as_of)
                    and o['period'] <= as_of and isinstance(o.get('value'), (int, float)) and isfinite(o['value'])]
         row = {**f, 'status': 'not_due' if f['period'] > as_of else 'awaiting_observation'}
         if matches:

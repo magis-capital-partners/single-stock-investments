@@ -85,7 +85,7 @@ def requested_keywords(gaps):
     return terms
 
 
-def document_record(url, raw, focus_keywords=()):
+def document_record(url, raw, focus_keywords=(), *, form=None):
     require(len(raw) <= 20_000_000, 'Primary filing exceeds the bounded evidence size')
     source = raw.decode('utf-8', errors='replace')
     words = ('cash', 'debt', 'assets', 'liabilities', 'inventory', 'capital', 'operating', 'shares',
@@ -113,6 +113,11 @@ def document_record(url, raw, focus_keywords=()):
         if len(contexts) >= 30:
             break
     body = text_of(source)
+    if form == '10-Q' and 500 <= len(body) <= 350000 and sum(w in body.lower() for w in words) >= 3:
+        # A bounded complete interim report avoids serial gaps caused by notes
+        # or contractual footnotes falling just outside selected text windows.
+        return {'id':'doc_'+digest(url)[:16],'source_url':url,'content_hash':hashlib.sha256(raw).hexdigest(),
+                'contexts':[body],'coverage':'complete_quarterly_filing'}
     budget = 350000 if focus else 150000
     def add_context(text):
         nonlocal size
@@ -154,11 +159,11 @@ def document_record(url, raw, focus_keywords=()):
         matches = list(re.finditer(re.escape(phrase), body, flags=re.IGNORECASE))
         # A contents mention is not the disclosure. Prefer the occurrence
         # surrounded by other requested concepts, with a stable document order.
-        matches.sort(key=lambda m: (-sum(w in body[max(0, m.start()-400):m.start()+2300].lower()
+        matches.sort(key=lambda m: (-sum(w in body[max(0, m.start()-1500):m.start()+8500].lower()
                                             for w in focus), m.start()))
         if matches:
             start = matches[0].start()
-            add_context(body[max(0, start-400):start+2600])
+            add_context(body[max(0, start-1500):start+8500])
     # All original text survives; overlapping note windows need not repeat the
     # same table/narrative again and consume the judgment session's context.
     contexts = [c for i,c in enumerate(contexts) if not any(i != j and c in other for j,other in enumerate(contexts))]
@@ -412,7 +417,7 @@ def prepare_packet(root: Path, ticker: str, as_of: str, *, collect=True, client=
                     continue
                 url = f"https://www.sec.gov/Archives/edgar/data/{int(cik)}/{recent['accessionNumber'][i].replace('-', '')}/{filename}"
                 try:
-                    document = document_record(url, filing_bytes(root, ticker, recent['accessionNumber'][i], client, url), focus_keywords)
+                    document = document_record(url, filing_bytes(root, ticker, recent['accessionNumber'][i], client, url), focus_keywords, form=form)
                     document.update(form=form, filed=recent['filingDate'][i], period=(recent.get('reportDate') or ['']*len(recent['form']))[i])
                     documents.append(document)
                     chosen.add(form)
