@@ -108,6 +108,8 @@ def connect(path=ARCHIVE / "archive.sqlite"):
     db.execute(
         "UPDATE filings SET status='seed' WHERE status!='seed' AND json_extract(metadata,'$.saved_merged_book')=1"
     )
+    db.execute("DELETE FROM filings WHERE accession LIKE 'discovery:%'")
+    db.execute("DELETE FROM position_books WHERE accession LIKE 'discovery:%'")
     db.commit()
     return db
 
