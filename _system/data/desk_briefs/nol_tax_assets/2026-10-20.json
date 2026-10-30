@@ -1,0 +1,70 @@
+{
+  "schema_version": "desk_briefs.v2",
+  "desk": "nol_tax_assets",
+  "as_of": "2026-10-20",
+  "author": "grok-drew-nol-tax-assets",
+  "owner": "drew",
+  "inputs_read": [
+    {
+      "path": "dashboard/data/nol_screener.json",
+      "generated_at": "2026-10-20T09:35:05Z"
+    },
+    {
+      "path": "dashboard/data/nol_382_facts.json",
+      "generated_at": "2026-08-12T01:25:46Z"
+    },
+    {
+      "path": "_system/portfolio/registry.json",
+      "generated_at": null
+    },
+    {
+      "path": "_system/data/desk_briefs/schema.json",
+      "generated_at": null
+    }
+  ],
+  "items": [
+    {
+      "ticker": "unresolved",
+      "headline": "NWL: the 8-K names Guillermo Beade chief operating officer effective 2026-10-26.",
+      "one_number": "base salary $830,000 (not a 5% stake)",
+      "evidence": [
+        {
+          "kind": "filing",
+          "ref": "8-K accession 0001193125-26-425735, issuer CIK 814453",
+          "url": "https://www.sec.gov/Archives/edgar/data/814453/000119312526425735/0001193125-26-425735.txt",
+          "as_of": "2026-10-20",
+          "claim_type": "fact"
+        }
+      ],
+      "confidence": "filing",
+      "next": "Fact: annual base salary $830,000. Inference: an officer appointment is not a Section 382 ownership change.",
+      "lane": "ownership_change_risk"
+    },
+    {
+      "ticker": "unresolved",
+      "headline": "ATNM: the 2026-10-20 draft recorded a price-driven screener years-to-absorb move, still blocked.",
+      "one_number": "model years-to-absorb 56.1 (not a filed limit)",
+      "evidence": [
+        {
+          "kind": "dashboard",
+          "ref": "2026-10-20 draft of nol_screener.json built 2026-10-20T09:35:05Z: years-to-absorb 56.1 vs 65.5",
+          "url": null,
+          "as_of": "2026-10-20",
+          "claim_type": "fact"
+        }
+      ],
+      "confidence": "provider",
+      "next": "The 56.1 figure is that draft's model, not a Section 382 dollar limit a filing states. Row stayed fully reserved.",
+      "lane": "blocker_changed"
+    }
+  ],
+  "screens_empty": [
+    "prior_382_change",
+    "rights_plan",
+    "needs_review"
+  ],
+  "notes": "Facts file read at 2026-08-12 (69 days). Blocker tally, fact, matches nol_screener.json built 2026-10-29: fully reserved 61; prior ownership change 2; carryforward above the screener model 8; DTA mostly timing 16; rights plan 1; needs review 1; no NOL component 13; no market cap 21; stale CIK 4. No present value. No control premium. A deferred tax asset is not cash. No Section 382 dollar limit unless an item names an accession.",
+  "research_only": true,
+  "in_base_irr": false,
+  "authority": "none"
+}

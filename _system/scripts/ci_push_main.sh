@@ -397,7 +397,40 @@ clean_worktree_for_rebase() {
   git update-index -q --refresh || true
   if ! git diff --quiet || [ -n "$(git ls-files --others --exclude-standard | head -n 1)" ]; then
     echo "Stashing unstaged/untracked worktree dirt before rebase..."
-    git stash push -u --keep-index -m "ci_push_main-pre-rebase" || true
+    local before after file expected actual
+    local -a remaining=()
+    before=$(git rev-parse -q --verify refs/stash || true)
+    git stash push -u --keep-index -m "ci_push_main-pre-rebase" || return 1
+    after=$(git rev-parse -q --verify refs/stash || true)
+    if ! git diff --quiet; then
+      # Some sparse/hydrated worktrees retain tracked dirt after stash. Restore
+      # only regular files whose exact Git content is in the new stash. Never
+      # discard unbacked edits, symlinks, submodules, or a local user's work.
+      if [ "${GITHUB_ACTIONS:-}" != "true" ] || [ -z "$after" ] || [ "$before" = "$after" ]; then
+        echo "::error::Rebase cleanup left unsaved tracked changes."
+        return 1
+      fi
+      while IFS= read -r -d '' file; do
+        if [ ! -f "$file" ] || [ -L "$file" ]; then
+          echo "::error::Cannot safely restore residual path: $file"
+          return 1
+        fi
+        expected=$(git rev-parse --verify "${after}:${file}") || return 1
+        actual=$(git hash-object --path="$file" -- "$file") || return 1
+        if [ "$expected" != "$actual" ]; then
+          echo "::error::Residual changes are not in the saved backup: $file"
+          return 1
+        fi
+        remaining+=("$file")
+      done < <(git diff --name-only -z)
+      if [ "${#remaining[@]}" -gt 0 ]; then
+        git -c submodule.recurse=false restore --worktree -- "${remaining[@]}" || return 1
+      fi
+      if ! git diff --quiet; then
+        echo "::error::Verified backup cleanup could not produce a clean index. Check committed source line endings; the saved backup was preserved."
+        return 1
+      fi
+    fi
   fi
 }
 
@@ -430,6 +463,10 @@ ci_push_main() {
     ensure_main_rebase_history
     clean_worktree_for_rebase
     if ! git rebase origin/main; then
+      if ! rebase_in_progress; then
+        echo "::error::Rebase did not start; publication has not advanced onto main."
+        exit 1
+      fi
       while rebase_in_progress && try_resolve_rebase_conflicts; do
         echo "Resolved regenerable rebase conflicts; continuing rebase (attempt $attempt/$MAX_ATTEMPTS)."
       done
@@ -445,7 +482,7 @@ ci_push_main() {
       exit 1
     fi
     # Rebase conflict regeneration can introduce fresh private source fields.
-    "$PYTHON" _system/scripts/audit_fund_letter_exposure.py --strict
+    "$PYTHON" _system/scripts/audit_fund_letter_exposure.py --strict --verify-public-snapshots
     if git push origin HEAD:main; then
       echo "Pushed to main (attempt $attempt)."
       exit 0

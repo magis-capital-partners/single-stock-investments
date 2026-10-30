@@ -2,18 +2,18 @@
 
 > Context only. Insider activity informs scenario confidence and stance discussion; it does not auto-inflate Lawrence base IRR. Promotion requires [HUMAN REVIEW].
 
-**ICS:** 5.12 (moderate) · **Bull case support:** moderate
+**ICS:** 4.97 (moderate) · **Bull case support:** moderate
 
 | Scenario | Prior weight | Tilted weight |
 |----------|--------------|---------------|
 | Bear | 20% | 20% |
-| Base | 55% | 52% |
-| Bull | 25% | 28% |
+| Base | 55% | 53% |
+| Bull | 25% | 27% |
 
 | Insider | Date | Shares | Price | Value | Contrib |
 |---------|------|--------|-------|-------|---------|
-| Zhang Jason Gechen | 2026-10-16 | 300000 | $18.86 | $5658000.0 | 2.539 |
-| Cummins Wes | 2026-10-16 | 55803 | $18.04 | $1006686.12 | 2.511 |
+| Zhang Jason Gechen | 2026-10-16 | 300000 | $18.86 | $5658000.0 | 2.477 |
+| Cummins Wes | 2026-10-16 | 55803 | $18.04 | $1006686.12 | 2.449 |
 
 **Routine / planned sales (context):**
 

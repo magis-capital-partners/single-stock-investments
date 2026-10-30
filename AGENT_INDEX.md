@@ -71,3 +71,7 @@ python _system/scripts/agent_proposals.py submit proposal.json
 Proposals land in `_system/data/agent_proposals/inbox.jsonl` with status
 `pending_human_review`. Nothing becomes final without a file in
 `_system/reviews/approved/`.
+
+Special-situations rows live in `_system/data/special_situations/situations.jsonl`
+(one versioned line per update; `check_situation_rows.py`). The Ideas book
+projects the latest line onto `dashboard/data/special_situations.json`.

@@ -26,7 +26,7 @@ test('public experiment contains only aggregated returns and derived allocation 
 test('dashboard distinguishes historical leaders from chronological selection and controls change results',()=>{
  const s={scenario:'base',capacity:'three',budget:'matched'},html=V.view(d,s);assert.match(html,/Historical profit leader/);assert.match(html,/Chronological selection/);assert.match(html,/Unknown overlays receive no bonus/);assert.match(html,/24-session/);assert.equal(V.selected(d,s).length,38);
  assert.notEqual(V.view(d,{...s,scenario:'stress'}),html);const c=structuredClone(d);c.protocol.policies[0].label='<script>bad</script>';assert.ok(!V.view(c,s).includes('<script>bad'));
- const index=fs.readFileSync(path.resolve(__dirname,'../../../dashboard/index.html'),'utf8');assert.ok(index.indexOf('src="third-plus-allocation.js')<index.indexOf('src="third-plus-study.js'));
+ const index=fs.readFileSync(path.resolve(__dirname,'../../../dashboard/index.html'),'utf8');assert.doesNotMatch(index,/<script src="third-plus-(?:allocation|study)\.js/);assert.match(index,/reverse-split-research\.js/);
 });
 test('publication hashes and complete report reproduce without private caches or network',()=>{Study.check();require('./allocation_publish.cjs').publish(true);});
 test('the browser loader rejects mixed publications and accepts correctly bound bytes',async()=>{
