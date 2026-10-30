@@ -7,7 +7,7 @@ from __future__ import annotations
 
 import copy
 from datetime import date
-from math import isfinite
+from math import ceil, isfinite
 
 from calculation_proof import evaluate_calculation_proof
 from underwriting_contract import CASES, ContractError, digest, numeric, require
@@ -41,7 +41,8 @@ def terminal_nodes(terminal, currency):
     for year, growth in enumerate(terminal['growth_refs'], 1):
         gf = node(f'growth_{year}', 'add', [1, growth], 'ratio')
         earnings = node(f'earnings_{year}', 'multiply', [earnings, gf])
-        reinvestment = node(f'reinvestment_fraction_{year}', 'divide', [growth, roi], 'ratio')
+        funded_growth = node(f'funded_growth_{year}', 'maximum', [growth, 0], 'ratio')
+        reinvestment = node(f'reinvestment_fraction_{year}', 'divide', [funded_growth, roi], 'ratio')
         payout = node(f'payout_fraction_{year}', 'subtract', [1, reinvestment], 'ratio')
         cash = node(f'cash_{year}', 'multiply', [earnings, payout])
         discount = node(f'discount_{year}', 'multiply', [discount, factor], 'ratio')
@@ -49,7 +50,8 @@ def terminal_nodes(terminal, currency):
     g = terminal['terminal_growth_ref']
     gf = node('mature_growth', 'add', [1, g], 'ratio')
     next_earnings = node('mature_earnings', 'multiply', [earnings, gf])
-    reinvestment = node('mature_reinvestment', 'divide', [g, roi], 'ratio')
+    funded_growth = node('mature_funded_growth', 'maximum', [g, 0], 'ratio')
+    reinvestment = node('mature_reinvestment', 'divide', [funded_growth, roi], 'ratio')
     payout = node('mature_payout', 'subtract', [1, reinvestment], 'ratio')
     cash = node('mature_cash', 'multiply', [next_earnings, payout])
     spread = node('spread', 'subtract', [rate, g], 'ratio')
@@ -97,6 +99,57 @@ def traces(model):
     return result
 
 
+def failure_events(analysis, cid, case, values, units, currency):
+    """Execute creditor priority and stop common-owner flows after default."""
+    events = []
+    for rule in analysis.get('failure_states') or []:
+        if rule['component_id'] != cid:
+            continue
+        refs = ('resources_ref','senior_due_ref','senior_paid_ref','unpaid_ref','equity_residual_ref')
+        require(all(units.get(rule.get(k)) == currency for k in refs), 'Failure waterfall needs whole-currency graph references')
+        resources,due,paid,unpaid,residual = (values[rule[k]] for k in refs)
+        tolerance = max(.0001,abs(resources)*1e-7,abs(due)*1e-7)
+        require(min(resources,due,paid,unpaid,residual) >= -tolerance, 'Failure waterfall has negative resources or claims')
+        require(abs(paid-min(resources,due)) <= tolerance and abs(unpaid-(due-paid)) <= tolerance
+                and abs(residual-(resources-paid)) <= tolerance, 'Failure waterfall does not honor creditor priority')
+        time = numeric(rule['year'])
+        year = max(1,ceil(time))
+        bridge = next(b for b in analysis['bridges'] if b['component_id'] == cid and b['year'] == year)
+        funded_claims = values[bridge['other_claims_ref']]+max(0,-values[bridge['net_financing_ref']])
+        require(paid <= funded_claims+tolerance, 'Creditor payments are absent from cash allocation')
+        if due <= resources+tolerance:
+            continue
+        for flow in analysis['cashflow_specs'][cid]:
+            if flow['year'] >= time:
+                require(abs(values[flow['amount_ref']]) <= 1e-8,
+                        'Common-owner distributions, capital calls and continuation must cease after default')
+        for b in analysis['bridges']:
+            if b['component_id'] == cid and b['year'] >= year:
+                require(abs(values[b['distributions_ref']])+abs(values[b['buybacks_ref']]) <= tolerance,
+                        'Common payouts cannot continue after default')
+        events.append({'id':rule['id'],'component_id':cid,'case':case,'year':time,'resources':resources,
+                       'senior_due':due,'senior_paid':paid,'unpaid_senior_claims':unpaid,'common_residual':residual})
+    return events
+
+
+def zero_loss_outcomes(model, schedules):
+    """A complete loss is an outcome, not a fabricated numerical IRR root."""
+    a = model.get('economic_analysis') or {}
+    if not a.get('failure_states'):
+        return {}
+    active = set()
+    lookup = traces(model)
+    for component in model['component_valuation_results']['additive_components']:
+        proof,cid = component['calculation_proof'],component['id']
+        units = {n['id']:n['unit'] for k in ('inputs','assumptions','calculations') for n in proof[k]}
+        for case in CASES:
+            if failure_events(a,cid,case,lookup[cid][case],units,a['currency']):
+                active.add(case)
+    return {case:{'outcome':'complete_loss','total_return_pct':-100,'irr_defined':False,
+                  'reason':'No remaining common-owner proceeds after an executed financing failure.'}
+            for case in active if schedules.get(case) and all(abs(r['amount_per_share']) <= 1e-8 for r in schedules[case])}
+
+
 def validate_economics(contract, expanded, model, evidence_ids):
     a = contract['economic_analysis']
     lookup = traces(model)
@@ -111,6 +164,19 @@ def validate_economics(contract, expanded, model, evidence_ids):
         require(set(row.get('driver_refs') or []) <= all_refs, 'Economic mechanism references an unknown driver')
         require(row.get('driver_refs') or len(row.get('not_applicable_reason') or '') >= 20, 'Connect mechanisms to the graph or explain inapplicability')
     seen = set()
+    failures = a.get('failure_states') or []
+    require(len({f.get('id') for f in failures}) == len(failures), 'Duplicate failure-state identifier')
+    for f in failures:
+        require(f.get('id') and f.get('component_id') in lookup and 0 <= numeric(f.get('year')) <= contract['horizon_years'],
+                'Invalid failure-state component or timing')
+        require(all(len(f.get(k) or '') >= 20 for k in ('rationale','payment_timing')), 'Explain default timing and financing access')
+        evidence(f)
+    defaults = {}
+    for cid in lookup:
+        proof = next(c['calculation_proof'] for c in model['component_valuation_results']['additive_components'] if c['id'] == cid)
+        units = {n['id']:n['unit'] for k in ('inputs','assumptions','calculations') for n in proof[k]}
+        for case in CASES:
+            defaults[cid,case] = failure_events(model['economic_analysis'],cid,case,lookup[cid][case],units,contract['currency'])
     for bridge in a.get('bridges') or []:
         cid, year = bridge.get('component_id'), bridge.get('year')
         require(cid in lookup and type(year) is int and 1 <= year <= contract['horizon_years'], 'Invalid annual bridge')
@@ -169,7 +235,8 @@ def validate_economics(contract, expanded, model, evidence_ids):
                 require(abs(revenue*margin-earnings) <= max(tolerance, abs(earnings)*1e-7), f'{cid}.{year}.{case}: earnings do not reconcile to revenue and margin')
                 require(abs(earnings*conversion-b['cash_generation_ref']) <= tolerance, f'{cid}.{year}.{case}: cash conversion does not reconcile')
             require(abs(sources-uses) <= tolerance, f'{cid}.{year}.{case}: capital allocation does not reconcile')
-            require(b['liquidity_ref']+tolerance >= b['minimum_liquidity_ref'], f'{cid}.{year}.{case}: financing survival liquidity shortfall')
+            defaulted = any(max(1,ceil(e['year'])) <= year for e in defaults[cid,case])
+            require(defaulted or b['liquidity_ref']+tolerance >= b['minimum_liquidity_ref'], f'{cid}.{year}.{case}: financing survival liquidity shortfall')
             require(all(b[k] >= -tolerance for k in ('reinvestment_ref', 'distributions_ref', 'buybacks_ref', 'liquidity_ref', 'minimum_liquidity_ref')),
                     'Negative investment/distribution/liquidity needs an explicit financing treatment')
             # Expanded flows are ordinary-share amounts; listing conversion occurs later.
@@ -231,7 +298,7 @@ def validate_economics(contract, expanded, model, evidence_ids):
 
 
 def _perturbed(model, overrides, runway_scale=None):
-    totals, errors = dict.fromkeys(CASES, 0.), []
+    totals, errors, defaults = dict.fromkeys(CASES, 0.), [], []
     for component in model['component_valuation_results']['additive_components']:
         proof = copy.deepcopy(component['calculation_proof'])
         for a in proof['assumptions']:
@@ -253,6 +320,13 @@ def _perturbed(model, overrides, runway_scale=None):
         else:
             for case in CASES:
                 v = {r['id']: r['value'] for r in e['traces'][case]}
+                units = {n['id']:n['unit'] for k in ('inputs','assumptions','calculations') for n in proof[k]}
+                events = []
+                try:
+                    events = failure_events(model['economic_analysis'],component['id'],case,v,units,model['economic_analysis']['currency'])
+                    defaults += events
+                except ContractError as exc:
+                    errors.append(str(exc))
                 for b in model.get('economic_analysis', {}).get('bridges', []):
                     if b['component_id'] != component['id']:
                         continue
@@ -260,7 +334,8 @@ def _perturbed(model, overrides, runway_scale=None):
                     uses = sum(v[b[k]] for k in ('reinvestment_ref','other_claims_ref','distributions_ref','buybacks_ref','retained_cash_ref'))
                     if abs(sources-uses) > max(.0001, abs(sources)*1e-7, abs(uses)*1e-7):
                         errors.append(f"{component['id']}.{case}: alternative capital allocation does not reconcile")
-                    if v[b['liquidity_ref']] < v[b['minimum_liquidity_ref']]-max(.0001, abs(v[b['minimum_liquidity_ref']])*1e-7):
+                    defaulted = any(max(1,ceil(event['year'])) <= b['year'] for event in events)
+                    if not defaulted and v[b['liquidity_ref']] < v[b['minimum_liquidity_ref']]-max(.0001, abs(v[b['minimum_liquidity_ref']])*1e-7):
                         errors.append(f"{component['id']}.{case}: alternative liquidity shortfall")
                     tolerance = max(.0001, abs(sources)*1e-7, abs(uses)*1e-7)
                     previous = next((p for p in model['economic_analysis']['bridges'] if p['component_id'] == b['component_id'] and p['year'] == b['year']-1), None)
@@ -293,7 +368,7 @@ def _perturbed(model, overrides, runway_scale=None):
                         errors.append(f"{component['id']}.{case}: alternative terminal economics are not funded")
             for case in CASES:
                 totals[case] += e['outputs'][case]
-    return {'values': totals if not errors else None, 'errors': errors}
+    return {'values': totals if not errors else None, 'errors': errors, 'financing_failures': defaults}
 
 
 def economic_diagnostics(model):
@@ -327,8 +402,15 @@ def economic_diagnostics(model):
         case: {**{k.removesuffix('_ref'): lookup[b['component_id']][case][b[k]] for k in MONEY_REFS},
                'shares': lookup[b['component_id']][case][b['share_count_ref']]}
         for case in CASES}} for b in a['bridges']]
+    failures = []
+    for component in model['component_valuation_results']['additive_components']:
+        proof,cid = component['calculation_proof'],component['id']
+        units = {n['id']:n['unit'] for k in ('inputs','assumptions','calculations') for n in proof[k]}
+        for case in CASES:
+            failures += failure_events(a,cid,case,lookup[cid][case],units,a['currency'])
     return {'status': 'economic_checks_complete', 'currency': a['currency'], 'annual_bridges': annual,
             'bridges_reconciled': len(a['bridges']), 'structural_tests': tests,
+            'financing_failures': failures,
             'flags': flags, 'hypotheses': a['hypotheses'], 'forecast_commitments': freeze_commitments(model)}
 
 

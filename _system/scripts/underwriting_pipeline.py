@@ -29,7 +29,7 @@ from underwriting_contract import (
     validate_build,
     validate_review,
 )
-from underwriting_evidence import prepare_packet, requested_keywords, source_fingerprint
+from underwriting_evidence import prepare_packet, requested_keywords, source_fingerprint, merge_evidence_requests
 
 ROOT = Path(__file__).resolve().parents[2]
 QUEUE = Path('_system/data/underwriting_queue.json')
@@ -236,7 +236,7 @@ def call_stage(root, work, ticker, stage, payload, state, *, launch=True, execut
     if error:
         if receipt.get('status') in ('created', 'running', 'timeout_cancel_requested'):
             raise StageBlocked('provider_run_incomplete: '+str(receipt.get('agent_id'))) from error
-        raise ContractError('Provider stage failed to return valid JSON') from error
+        raise ContractError('Provider stage failed to return valid JSON: '+str(error)) from error
     require(receipt.get('agent_id') and receipt.get('status') == 'finished', 'Model call has no complete provider receipt')
     receipt.update(input_hash=base_hash, call_hash=call_hash, stage=stage, model=model, reasoning_effort=effort,
                    provider=stage_model(root, stage)['provider'], consumer=consumer,
@@ -397,6 +397,13 @@ def load_progress(root, work, ticker, packet):
     if saved.get('scope') == scope:
         return saved
     result = {'scope': scope, 'packet_hash': packet['packet_hash'], 'history': [], 'feedback': None}
+    if saved.get('feedback'):
+        # New evidence/code invalidates approvals, not unresolved criticism.
+        # The next independent review must still earn a fresh approval.
+        result['history'] = copy.deepcopy(saved.get('history') or [])
+        result['feedback'] = copy.deepcopy(saved['feedback'])
+        result['feedback']['required_correction'] = ('Evidence or process changed; reassess the prior criticism against the CURRENT packet. '
+                                                     +str(saved['feedback'].get('required_correction') or ''))
     authors, reviews = {}, []
     for path in (work/'cache'/ticker).glob('*/receipt.json'):
         receipt, output = read(path), read(path.parent/'output.json')
@@ -483,12 +490,13 @@ def run_company(root, work, ticker, as_of, state, vault, *, prepare=prepare_pack
     else:
         approved = None
     if prepare is prepare_packet and state.get('evidence_requests'):
-        state['evidence_keywords'] = requested_keywords(state['evidence_requests'])
+        state['evidence_request_history'] = merge_evidence_requests(state.get('evidence_request_history'),state['evidence_requests'])
+        state['evidence_keywords'] = requested_keywords(state['evidence_request_history'])
     packet = (prepare(root, ticker, as_of, focus_keywords=state.get('evidence_keywords') or [])
               if prepare is prepare_packet else prepare(root, ticker, as_of))
     if prepare is prepare_packet and state.get('evidence_requests'):
         from underwriting_related_evidence import augment_requested_targets
-        packet = augment_requested_targets(root,packet,state['evidence_requests'],as_of)
+        packet = augment_requested_targets(root,packet,state['evidence_request_history'],as_of)
     readiness = packet.get('readiness') or {}
     if readiness.get('status') == 'evidence_gap':
         state['evidence_readiness'] = readiness
@@ -534,14 +542,15 @@ def run_company(root, work, ticker, as_of, state, vault, *, prepare=prepare_pack
                 if author.get('status') == 'evidence_gap':
                     gaps = author.get('gaps') or []
                     state['evidence_requests'] = gaps
+                    state['evidence_request_history'] = merge_evidence_requests(state.get('evidence_request_history'),gaps)
                     # Requests choose bounded search terms, never destinations or tools.
                     # Re-read the same independently discovered primary documents.
-                    keywords = requested_keywords(gaps)
+                    keywords = requested_keywords(state['evidence_request_history'])
                     state['evidence_keywords'] = keywords
                     if prepare is prepare_packet and keywords:
                         repaired = prepare(root, ticker, as_of, focus_keywords=keywords)
                         from underwriting_related_evidence import augment_requested_targets
-                        repaired = augment_requested_targets(root,repaired,gaps,as_of)
+                        repaired = augment_requested_targets(root,repaired,state['evidence_request_history'],as_of)
                         if repaired['evidence_hash'] != packet['evidence_hash'] and repaired.get('readiness', {}).get('status') != 'evidence_gap':
                             packet = repaired
                             write(work/'packets'/(packet['packet_hash']+'.json'), packet)

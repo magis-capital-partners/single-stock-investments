@@ -310,6 +310,24 @@ For several components, allocate financing and payouts once, without overlap.
 Any mechanism that is inapplicable needs a >=20-character not_applicable_reason,
 assessment and frozen evidence; an applicable mechanism needs driver_refs.
 
+Do not assume unlimited owner funding or automatic debt rollover. If financing
+access can fail, execute that alternative. Optional `failure_states` rows contain
+id, component_id, year (fractional timing allowed), rationale, payment_timing,
+evidence_ids, and whole-currency graph references resources_ref, senior_due_ref,
+senior_paid_ref, unpaid_ref and equity_residual_ref. The graph must implement
+senior_paid=min(resources,senior_due), unpaid=senior_due-senior_paid and
+equity_residual=resources-senior_paid. Resources include only funds available
+before the specified payment deadline; justify credit access and timing. When
+senior_due exceeds resources, all common distributions, capital calls and exit
+proceeds at/after that time must be zero, and senior payments must be included
+in annual other claims or negative net financing, counted once. Common
+payouts/buybacks then cease. Such
+an executed failure can fall below operating minimum liquidity; an unexplained
+shortfall still fails validation. All cash and share reconciliations still apply.
+Use graph min/max gates to extinguish the common claim in default while allowing
+funded cases to continue. Test unavailable refinancing/owner funding, rather than
+merely describing a possible wipeout outside the executable scenarios.
+
 Provide at least THREE distinct hypotheses, TWO measurable forecast commitments,
 and TWO structural alternatives. Tests may combine assumption_overrides, or vary
 the trusted continuation runway with runway_scale in [0,4]. Override values must
@@ -325,6 +343,10 @@ driver; trusted code adds the price afterward and solves only within its bounds.
 
 Each component requires ONE `terminal` declaration. horizon_years is the holding
 or realization horizon, separate from the subsequent competitive runway:
+Negative continuation growth reduces earnings but does not automatically release
+invested capital. The trusted continuation charges max(growth,0)/incremental
+equity return. Any actual recoverable working capital or asset proceeds require
+their own supported cash-flow claim, counted once.
 
 * `type: reinvestment_fade` for a continuing parent-equity claim. Required fields:
   earnings_ref (whole-company equity earnings AFTER maintenance, interest, taxes,

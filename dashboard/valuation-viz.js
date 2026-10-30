@@ -366,15 +366,18 @@
     const reverse = pricing.reverse_expectations;
     const implied = reverse?.unit === 'ratio' ? number(reverse.implied_value*100)+'%' : number(reverse?.implied_value);
     const expectations = reverse ? `<p><strong>Price-implied ${esc(String(reverse.driver_ref).replace(/_/g, ' '))}:</strong> ${reverse.status === 'solved' ? implied : esc(String(reverse.status).replace(/_/g, ' '))}<span class="tier-sub"> · within declared evidence bounds</span></p>` : '';
-    const tests = (d.structural_tests || []).map(x => `<tr><td>${esc(x.rationale || x.id)}</td><td>${x.values ? number(x.values.base) : 'incomplete'}</td></tr>`).join('');
+    const tests = (d.structural_tests || []).map(x => `<tr><td>${esc(x.rationale || x.id)}</td><td>${x.values ? number(x.values.base) : 'incomplete'}</td><td>${esc([...new Set((x.financing_failures || []).map(f=>f.case))].join(', ')) || '—'}</td></tr>`).join('');
+    const failures = (d.financing_failures || []).map(f=>`<li>${esc(f.case)} · ${esc(f.component_id)} · year ${number(f.year)}: ${number(f.resources/1e6)} million available against ${number(f.senior_due/1e6)} million due; ${number(f.unpaid_senior_claims/1e6)} million unpaid. Common ownership is extinguished.</li>`).join('');
+    const outcomes = Object.entries(t.shared_forecast?.return_outcomes || {}).filter(([,v])=>v.outcome==='complete_loss').map(([c])=>`<p><strong>${esc(c)} case: complete loss of capital (−100% total return).</strong> IRR is undefined because no future cash is received.</p>`).join('');
     const hypotheses = (d.hypotheses || []).map(x => `<li><strong>${esc(x.explanation)}</strong><br>${esc(x.discriminating_observation)}</li>`).join('');
     const commitments = (d.forecast_commitments || []).map(x => `<tr><td>${esc(x.observation_field)}</td><td>${esc(x.period)}</td><td>${number(x.values?.low)} / ${number(x.values?.base)} / ${number(x.values?.high)} ${esc(x.unit)}</td></tr>`).join('');
     const allocations = (d.annual_bridges || []).map(x => { const b=x.cases?.base||{}; return `<tr><td>${esc(x.component_id)} · ${Number(x.year)}</td>${['cash_generation','maintenance','organic_growth','acquisitions','sbc_funding','distributions','retained_cash'].map(k=>`<td>${number(b[k] == null ? null : b[k]/1e6)}</td>`).join('')}</tr>`; }).join('');
     return `<div class="card" data-economic-review="passed"><h3>Economic assumptions and return drivers</h3>
       <p>Cash sources, capital allocation and liquidity reconcile across ${Number(d.bridges_reconciled || 0)} annual component bridges. Independent economic review passed; forecasts remain uncertain.</p>
-      ${bridge}${expectations}
+      ${bridge}${expectations}${outcomes}
+      ${failures ? `<details><summary>Financing failure paths</summary><p class="tier-sub">Amounts in ${esc(d.currency)}.</p><ul>${failures}</ul></details>` : ''}
       ${allocations ? `<details><summary>Annual cash allocation</summary><p class="tier-sub">Base case, millions of ${esc(d.currency)}. Compensation funding includes only amounts not already deducted from cash generation.</p><div style="overflow-x:auto"><table class="workbench-table"><thead><tr><th>Year</th><th>Cash generated</th><th>Maintenance</th><th>Organic growth</th><th>Acquisitions</th><th>Compensation</th><th>Distributions</th><th>Retained</th></tr></thead><tbody>${allocations}</tbody></table></div></details>` : ''}
-      ${tests ? `<details><summary>Structural alternatives</summary><table class="workbench-table"><thead><tr><th>Alternative</th><th>Base value per share</th></tr></thead><tbody>${tests}</tbody></table></details>` : ''}
+      ${tests ? `<details><summary>Structural alternatives</summary><table class="workbench-table"><thead><tr><th>Alternative</th><th>Base value per share</th><th>Cases with equity loss from financing failure</th></tr></thead><tbody>${tests}</tbody></table></details>` : ''}
       ${hypotheses ? `<details><summary>Competing explanations and observations to watch</summary><ul>${hypotheses}</ul></details>` : ''}
       ${commitments ? `<details><summary>Operating forecasts to check later</summary><table class="workbench-table"><thead><tr><th>Metric</th><th>Period</th><th>Low / base / high</th></tr></thead><tbody>${commitments}</tbody></table></details>` : ''}
       </div>`;

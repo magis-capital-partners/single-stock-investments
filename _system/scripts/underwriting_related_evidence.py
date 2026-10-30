@@ -146,8 +146,8 @@ def refresh_related_sources(root, ticker, as_of):
         require(re.fullmatch(r'[A-Za-z0-9][A-Za-z0-9._-]{0,30}',symbol), 'Unsafe linked issuer')
         path = root/'_system/reference/market-data/valuation_related_evidence'/(symbol+'.json')
         cached = read(path)
-        if cached.get('as_of') == as_of:
-            continue
+        # An acquired issuer can file after the morning refresh on the same day.
+        # Recheck on each scheduled collection, just as for the parent issuer.
         try:
             target = collect_target(root,symbol,metadata['cik'],as_of,(model.get('economic_analysis') or {})['currency'])
         except (ValueError,OSError,KeyError,TypeError):

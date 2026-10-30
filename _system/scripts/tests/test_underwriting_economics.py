@@ -119,12 +119,14 @@ def test_review_binds_the_actual_diagnostics_and_structural_tests():
         validate_review(c, r, m)
 
 
-def test_compiler_derives_a_growth_runway_after_the_holding_period():
+@pytest.mark.parametrize('first_growth', [.06, -.06])
+@pytest.mark.parametrize('mature_growth', [.02, -.02])
+def test_compiler_derives_a_growth_runway_without_inventing_capital_release(first_growth, mature_growth):
     c = economic_contract()
     a = copy.deepcopy(c['assumptions'][0])
     c['assumptions'] = [x for x in c['assumptions'] if x['id'] != 'terminal_multiple']
-    for name, value in [('growth_next', .06), ('growth_later', .04), ('terminal_growth', .02), ('new_equity_return', .2)]:
-        c['assumptions'].append({**a, 'id': name, 'value': value})
+    for name, value in [('growth_next', first_growth), ('growth_later', .04), ('terminal_growth', mature_growth), ('new_equity_return', .2)]:
+        c['assumptions'].append({**a, 'id': name, 'value': value, 'allowed_range': {'min': -.1, 'max': 1}})
     b = c['components'][0]
     b['drivers'] = [x for x in b['drivers'] if x['id'] != 'terminal_ps']
     b['terminal'] = {'type': 'reinvestment_fade', 'earnings_ref': 'normalized_cash', 'share_count_ref': 'shares',
@@ -136,8 +138,9 @@ def test_compiler_derives_a_growth_runway_after_the_holding_period():
     m = compile_contract(packet(), c)
     from calculation_proof import evaluate_calculation_proof
     t = {x['id']: x['value'] for x in evaluate_calculation_proof(m['component_valuation_results']['additive_components'][0]['calculation_proof'])['traces']['base']}
-    e1, e2 = 1000*1.06, 1000*1.06*1.04
-    expected = (e1*(1-.06/.2)/1.1 + e2*(1-.04/.2)/1.1**2 + e2*1.02*(1-.02/.2)/(.1-.02)/1.1**2)/100
+    e1, e2 = 1000*(1+first_growth), 1000*(1+first_growth)*1.04
+    expected = (e1*(1-max(0,first_growth)/.2)/1.1 + e2*(1-.04/.2)/1.1**2
+                + e2*(1+mature_growth)*(1-max(0,mature_growth)/.2)/(.1-mature_growth)/1.1**2)/100
     assert t['terminal_generated_exit_ps'] == pytest.approx(expected)
     assert m['valuation_methodology']['horizon_years'] == 2
     assert b['terminal']['growth_refs'] == ['growth_next', 'growth_later']
@@ -180,17 +183,20 @@ def test_price_is_added_after_underwriting_and_return_bridge_ties_out():
     assert pricing_diagnostics(model, {'value': 100000, 'currency': 'USD'})['reverse_expectations']['status'] == 'not_bracketed'
 
 
-def test_v2_runs_the_complete_pipeline_and_preserves_its_economic_receipts(tmp_path, monkeypatch):
+@pytest.mark.parametrize('with_default', [False, True])
+def test_v2_runs_the_complete_pipeline_and_preserves_its_economic_receipts(tmp_path, monkeypatch, with_default):
     from test_underwriting_pipeline import company_root
     import underwriting_pipeline as pipeline
     import refresh_shared_forecasts as refresh
+    import vault_paths
     company_root(tmp_path)
     policy = pipeline.read(tmp_path/pipeline.POLICY)
     pipeline.write(tmp_path/pipeline.POLICY, {**policy, 'required_contract_schema': 'underwriting-contract/2'})
     monkeypatch.setattr(pipeline, 'today', lambda: '2026-10-26')
     monkeypatch.setattr(refresh, 'refresh_quote', lambda *a, **kw: None)
     monkeypatch.setattr(refresh, 'refresh_missing_model_inputs', lambda *a, **kw: None)
-    c = economic_contract()
+    monkeypatch.setattr(vault_paths,'research_vault_root',lambda:tmp_path/'vault')
+    c = default_contract() if with_default else economic_contract()
     def execute(stage, payload, output, receipt_path):
         answer = c if stage == 'author' else economic_review(c, compile_contract(packet(), c))
         pipeline.write(output, answer)
@@ -203,6 +209,12 @@ def test_v2_runs_the_complete_pipeline_and_preserves_its_economic_receipts(tmp_p
     assert diagnostics['pricing']['status'] == 'available'
     assert len(pipeline.read(tmp_path/'TEST/research/underwriting_outcomes.json')['models'][0]['results']) == 2
     assert pipeline.receipt_status(tmp_path, 'TEST', {}, '2026-10-26') == 'reviewed'
+    if with_default:
+        forecast=refresh.calculate('TEST',tmp_path,'2026-10-26')
+        assert forecast['status']=='available',forecast['gaps']
+        assert forecast['forward_irr_pct']['low'] is None
+        assert forecast['return_outcomes']['low']['total_return_pct']==-100
+        assert forecast['forward_irr_pct']['base'] is not None
 
 
 def test_old_arithmetic_receipt_is_queued_for_economic_review_under_current_policy(tmp_path, monkeypatch):
@@ -236,6 +248,44 @@ def test_free_share_count_reduction_cannot_pass_the_actual_compiler():
     c['economic_analysis']['bridges'][0]['share_count_ref'] = 'closing_shares'
     with pytest.raises(ContractError, match='Share-count reduction'):
         compile_contract(packet(), c)
+
+
+def default_contract():
+    c = economic_contract()
+    c['assumptions'][0].pop('value')
+    c['assumptions'][0]['values'] = {'low':0,'base':1,'high':1}
+    c['components'][0]['drivers'].append({'id':'unpaid_senior','op':'subtract','args':['reported_cash','normalized_cash'],'unit':'USD'})
+    for b in c['economic_analysis']['bridges']:
+        b['minimum_liquidity_ref']='reported_cash'
+    c['economic_analysis']['failure_states']=[{'id':'funding_failure','component_id':'business','year':.5,
+        'resources_ref':'normalized_cash','senior_due_ref':'unpaid_senior','senior_paid_ref':'zero_cash',
+        'unpaid_ref':'unpaid_senior','equity_residual_ref':'normalized_cash','evidence_ids':['cash_obs'],
+        'rationale':'Lenders cannot fund the stressed claim, and common ownership is extinguished.',
+        'payment_timing':'Resources must arrive before the claim falls due halfway through the first year.'}]
+    for t in c['economic_analysis']['structural_tests']:
+        t['assumption_overrides']['normalization']=0
+    return c
+
+
+def test_an_executed_funding_failure_has_zero_common_proceeds_in_scenarios_and_stress_tests():
+    from underwriting_contract import model_diagnostics,validate_build
+    c=default_contract()
+    m=compile_contract(packet(),c)
+    d=model_diagnostics(m)['economic_diagnostics']
+    assert len(d['financing_failures'])==1 and d['financing_failures'][0]['case']=='low'
+    assert d['financing_failures'][0]['unpaid_senior_claims']==1000
+    assert all(not t['errors'] and t['values']['base']==0 and len(t['financing_failures'])==3 for t in d['structural_tests'])
+    validate_build(packet(),c,economic_review(c,m),m)
+
+
+@pytest.mark.parametrize('change,match',[
+    (lambda c:c['economic_analysis']['failure_states'][0].update(unpaid_ref='zero_cash'),'creditor priority'),
+    (lambda c:next(n for n in c['components'][0]['drivers'] if n['id']=='cash_ps').update(args=['reported_cash','shares']),'cease after default'),
+])
+def test_default_cannot_leave_unpaid_claims_or_common_exit_value_out_of_the_waterfall(change,match):
+    c=default_contract()
+    change(c)
+    with pytest.raises(ContractError,match=match):compile_contract(packet(),c)
 
 
 def test_an_approved_handoff_from_an_old_process_cannot_skip_reunderwriting(tmp_path):

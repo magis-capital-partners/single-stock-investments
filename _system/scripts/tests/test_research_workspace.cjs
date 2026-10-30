@@ -31,6 +31,15 @@ test('null, blank and non-finite observations never become zero',()=>{
  assert.equal(rw.number(0),0);
  assert.equal(rw.number(-2),-2);
 });
+
+test('executed financing failure is shown as complete loss with an undefined IRR',()=>{
+ const t={shared_forecast:{status:'available',economic_review_status:'passed',market_sync:liveSync,
+  return_outcomes:{low:{outcome:'complete_loss',total_return_pct:-100,irr_defined:false}},
+  economic_diagnostics:{currency:'USD',financing_failures:[{case:'low',component_id:'<bad>',year:1,resources:1e6,senior_due:2e6,unpaid_senior_claims:1e6}]}}};
+ const html=context.ValuationViz.renderEconomicDiagnostics(t,h);
+ assert.match(html,/complete loss of capital/);assert.match(html,/IRR is undefined/);
+ assert.match(html,/Common ownership is extinguished/);assert.match(html,/&lt;bad&gt;/);
+});
 test('current charts respect upstream signal exclusions and do not mutate data',()=>{
  const metrics=[metric,{...metric,display:false},{...metric,artifact:true},{...metric,stale:true},{...metric,tier:'excluded'}];
  const original=JSON.stringify(metrics);

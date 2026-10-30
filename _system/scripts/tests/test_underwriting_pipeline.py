@@ -421,6 +421,19 @@ def test_pre_checkpoint_paid_reviews_are_recovered_with_the_latest_proposal(tmp_
     assert pipeline.load_progress(tmp_path,work,'TEST',changed)['feedback'] is None
 
 
+def test_new_evidence_preserves_saved_unresolved_criticism_without_reusing_approval(tmp_path):
+    import underwriting_pipeline as pipeline
+    company_root(tmp_path)
+    work=tmp_path/'work'
+    pipeline.write(work/'progress/TEST.json',{'scope':'old','packet_hash':'old','history':[],
+        'feedback':{'required_correction':'Funding access is unsupported.',
+                    'independent_challenge':{'findings':[{'severity':'major','detail':'Execute unavailable owner funding.'}]}}})
+    result=pipeline.load_progress(tmp_path,work,'TEST',packet())
+    assert 'approved' not in result
+    assert 'CURRENT packet' in result['feedback']['required_correction']
+    assert pipeline.unresolved_findings(result['feedback'])[0]['detail']=='Execute unavailable owner funding.'
+
+
 @pytest.mark.parametrize('unapproved',[False,True])
 def test_publication_recovery_checks_the_producer_and_the_data_only_diff(monkeypatch, unapproved):
     import publish_underwriting as publisher

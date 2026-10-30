@@ -215,6 +215,8 @@ def compile_contract(packet, contract):
             roots += [v for b in analysis.get('bridges', []) if b.get('component_id') == cid
                       for k, v in (b.get('operating_bridge') or {}).items() if k.endswith('_ref') and isinstance(v, str)]
             roots += [f['metric_ref'] for f in analysis.get('forecast_commitments', []) if f.get('component_id') == cid]
+            roots += [v for f in analysis.get('failure_states', []) if f.get('component_id') == cid
+                      for k,v in f.items() if k.endswith('_ref') and isinstance(v,str)]
         for flow in component.get('cashflows') or []:
             year, amount = flow.get('year'), flow.get('amount_ref')
             require(isinstance(year, (int, float)) and not isinstance(year, bool) and 0 <= year <= horizon, 'Cash flow outside declared horizon')
@@ -287,6 +289,7 @@ def compile_contract(packet, contract):
         from underwriting_economics import VERSION
         model['economic_analysis'] = {**copy.deepcopy(original['economic_analysis']), 'currency': currency,
                                       'holding_horizon_years': horizon,
+                                      'cashflow_specs': {c['id']:copy.deepcopy(c['cashflows']) for c in contract['components']},
                                       'terminal_specs': {c['id']: copy.deepcopy(c['terminal']) for c in original['components']}}
         model['underwriting']['economic_process_version'] = VERSION
         validate_economics(original, contract, model, evidence_ids)

@@ -20,9 +20,28 @@ def test_a_requested_note_keeps_its_disclosure_not_just_a_contents_mention():
     assert any('principal 1749 million' in c for c in d['contexts'])
 
 
+def test_adjacent_note_windows_keep_their_source_text_once():
+    raw=('<html><p>Note 4. Guarantees</p>'+('Guarantee obligations. '*400)
+         +'<p>Note 5. Borrowing</p>'+('Borrowing terms and collateral. '*400)
+         +'<p>Final maturity in 2030.</p></html>').encode()
+    d=document_record('https://issuer.test/report',raw,['note 4','note 5'])
+    assert any('Guarantee obligations.' in c and 'Final maturity in 2030.' in c for c in d['contexts'])
+    assert not any(a in b for i,a in enumerate(d['contexts']) for j,b in enumerate(d['contexts']) if i!=j)
+
+
 def test_note_numbers_in_gap_details_become_explicit_retrieval_terms():
     terms = requested_keywords([{'code':'missing_debt','detail':"Retrieve Note 9, Debt and Note 15, Settlement Risk. Search terms: 'maturity', 'collateral'."}])
     assert {'note 9','note 15','maturity','collateral'} <= set(terms)
+
+
+def test_new_disclosure_requests_retain_earlier_debt_and_settlement_sections():
+    from underwriting_evidence import merge_evidence_requests
+    old = [{'code':'debt','detail':'Retrieve Note 9, Debt.'}, {'code':'settlement','detail':'Retrieve Note 15, Settlement.'}]
+    new = [{'code':'litigation','detail':'Retrieve Note 14, Litigation and annual Note 19.'}]
+    merged = merge_evidence_requests(old,new)
+    assert {'note 9','note 15','note 14','note 19'} <= set(requested_keywords(merged))
+    revised = merge_evidence_requests(merged,[{'code':'debt','detail':'Retrieve updated Note 9, Debt.'}])
+    assert len(revised)==3 and revised[-1]['detail'].startswith('Retrieve updated')
 
 
 def related_packet():
@@ -83,6 +102,22 @@ def test_changed_or_failed_target_collection_invalidates_parent_source_freshness
     assert source_fingerprint(tmp_path,'TEST') != baseline
     write(cache,{'source_hash':'original','status':'collection_failed','as_of':'2026-10-30'})
     assert source_fingerprint(tmp_path,'TEST') != baseline
+
+
+def test_acquired_issuer_reports_are_rechecked_within_the_same_day(tmp_path,monkeypatch):
+    import underwriting_related_evidence as related
+    from underwriting_pipeline import write,read
+    write(tmp_path/'TEST/research/valuation.json',{'underwriting':{'related_issuers':{'TARGET':{'cik':'123'}}},
+                                               'economic_analysis':{'currency':'USD'}})
+    calls=[]
+    def collect(*args):
+        calls.append(args)
+        return {'as_of':'2026-10-30','source_hash':str(len(calls)),'status':'ready'}
+    monkeypatch.setattr(related,'collect_target',collect)
+    related.refresh_related_sources(tmp_path,'TEST','2026-10-30')
+    related.refresh_related_sources(tmp_path,'TEST','2026-10-30')
+    assert len(calls)==2
+    assert read(tmp_path/'_system/reference/market-data/valuation_related_evidence/TARGET.json')['source_hash']=='2'
 
 
 def test_target_discovery_uses_sec_identity_and_parent_transaction_evidence(tmp_path,monkeypatch):
