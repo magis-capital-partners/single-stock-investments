@@ -2,6 +2,7 @@
 from __future__ import annotations
 
 import json
+import hashlib
 import os
 import shutil
 import subprocess
@@ -13,6 +14,7 @@ import yaml
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 from retry_validated_refresh import MAX_PUBLICATION_RETRIES, request_retry
+from audit_fund_letter_exposure import audit
 
 ROOT = Path(__file__).resolve().parents[3]
 PUSH = ROOT / '_system/scripts/ci_push_main.sh'
@@ -160,3 +162,28 @@ ci_push_main 'validated test candidate'
     assert 'Rebase did not start' in result.stdout
     assert 'conflicts resolved' not in result.stdout
     assert not (repo / 'pushed').exists()
+
+
+@pytest.mark.parametrize('changed', [False, True])
+def test_post_rebase_publication_rejects_changed_managed_snapshots(repo, changed):
+    public = b'{"private_snapshot":true}\n'
+    target = repo / 'dashboard/data/example.json'
+    target.parent.mkdir(parents=True)
+    target.write_bytes(public)
+    manifest = {'assets': {'data/example.json': {
+        'public_sha256': hashlib.sha256(public).hexdigest(), 'private_sha256': '0'*64}}}
+    (repo / 'dashboard/private-assets.json').write_text(json.dumps(manifest))
+    git(repo, 'add', 'dashboard')
+    git(repo, 'commit', '-qm', 'published snapshot')
+    if changed:
+        # A benign regenerated payload can evade source-pattern checks while
+        # still breaking exact snapshot restoration on the next checkout.
+        target.write_text('{"count":23}\n')
+    report = audit(repo, verify_public_snapshots=True)
+    assert report['source_restriction_ready'] is (not changed)
+    assert bool([f for f in report['findings'] if f['kind'] == 'managed_private_snapshot_not_sanitized']) is changed
+
+
+def test_push_verifies_snapshot_receipts_again_after_rebase():
+    body = PUSH.read_text().split('ci_push_main()', 1)[1]
+    assert body.index('--strict --verify-public-snapshots') < body.index('git push origin HEAD:main')

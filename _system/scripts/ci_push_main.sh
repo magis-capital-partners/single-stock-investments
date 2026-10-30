@@ -482,7 +482,7 @@ ci_push_main() {
       exit 1
     fi
     # Rebase conflict regeneration can introduce fresh private source fields.
-    "$PYTHON" _system/scripts/audit_fund_letter_exposure.py --strict
+    "$PYTHON" _system/scripts/audit_fund_letter_exposure.py --strict --verify-public-snapshots
     if git push origin HEAD:main; then
       echo "Pushed to main (attempt $attempt)."
       exit 0
