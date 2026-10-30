@@ -8,7 +8,7 @@ from html.parser import HTMLParser
 
 from thirteenf_core import parse_amount
 
-PARSER_VERSION = "legacy-6"
+PARSER_VERSION = "legacy-7"
 
 
 class LegacyParseError(ValueError):
@@ -137,7 +137,7 @@ def _primary(full, rows):
         result["table_entry_total"] = parse_amount(entry[1])
     if total:
         reported = parse_amount(total[1])
-        actual = sum(row["value_usd"] for row in rows)
+        actual = sum(row["value_usd"] or 0 for row in rows)
         dollars = abs(actual - reported) <= max(1, reported * 0.01)
         result["table_value_total_usd"] = reported if dollars else reported * 1000
         result["cover_total_units"] = "dollars" if dollars else "thousands"
@@ -173,12 +173,16 @@ def parse_legacy_document(raw):
         flags=re.IGNORECASE,
     )
     pattern = re.compile(
-        r"^(?P<head>.*?)\s+(?P<cusip>(?=[A-Z0-9*@#]*[0-9])[A-Z0-9*@#]{8,9})\s+"
+        r"^(?P<head>.*?)\s+\"?(?P<cusip>(?=[A-Z0-9*@#]*[0-9])[A-Z0-9*@#]{8,9})\"?\s+"
         r"\$?\s*(?P<value>[\d,]+(?:\.\d*)?)\s+(?P<shares>[\d,]+(?:\.\d*)?)"
         r"\s*(?P<unit>SHS?|PRN)?\b(?P<tail>.*)$",
         re.IGNORECASE,
     )
     rows, candidates = [], []
+    missing_value = re.compile(
+        r"^(?P<head>.*?)\s+(?P<cusip>(?=[A-Z0-9*@#]*[0-9])[A-Z0-9*@#]{8,9})\s{10,}(?P<shares>[\d,]+(?:\.\d*)?)\s+(?P<unit>SHS?|PRN)\b(?P<tail>.*)$",
+        re.IGNORECASE,
+    )
     pending = ""
     previous = None
     lines = body.splitlines()
@@ -206,7 +210,11 @@ def parse_legacy_document(raw):
             )
         ):
             line = f"{previous['issuer']}  {previous['title_of_class']}  {previous['cusip']}  {line}"
-        if re.search(r"\b[A-Z0-9*@#]{8,9}\s+[\d,]+", line) and not pattern.match(line):
+        if (
+            re.search(r"\b[A-Z0-9*@#]{8,9}\s+[\d,]+", line)
+            and not pattern.match(line)
+            and not missing_value.match(line)
+        ):
             while (
                 index < len(lines)
                 and re.match(r"^\s*[\d,.]+\b", lines[index])
@@ -215,6 +223,8 @@ def parse_legacy_document(raw):
                 line += " " + lines[index].strip()
                 index += 1
         match = pattern.match(line)
+        if not match and (unvalued := missing_value.match(line)):
+            match = {**unvalued.groupdict(), "value": None}
         if not match:
             if re.search(r"\b(?=[A-Z0-9*@#]*[0-9])[A-Z0-9*@#]{8,9}\s+[\d,]+", line):
                 candidates.append(line)
@@ -247,7 +257,7 @@ def parse_legacy_document(raw):
         title = " ".join(fields[1:]) if len(fields) > 1 else ""
         if not title:
             split = re.match(
-                r"^(.*?)\s+((?:COM(?:MON(?:\s+STOCK)?)?|ORD(?:INARY)?|CL(?:ASS)?\s+[A-Z0-9]+|NOTE.*|BOND.*|DEB.*|ADR.*|PFD.*|SHS.*))$",
+                r"^(.*?)\s+((?:COM(?:MON(?:\s+STOCK)?)?|ORD(?:INARY)?|CL(?:ASS)?\s+[A-Z0-9]+|NOTE.*|BOND.*|DEB.*|ADR.*|PFD.*|SHS.*|PUT|CALL))$",
                 head,
                 re.IGNORECASE,
             )
@@ -262,7 +272,12 @@ def parse_legacy_document(raw):
             len(match["cusip"]) == 9
             and complete_cusip(match["cusip"][:8]) == match["cusip"]
         )
-        if not match["unit"] and not known_class and not verified_cusip:
+        if (
+            not match["unit"]
+            and not known_class
+            and not verified_cusip
+            and not head.endswith(("COM", "com"))
+        ):
             candidates.append(line)
             continue
         tail = match["tail"]
@@ -277,12 +292,14 @@ def parse_legacy_document(raw):
         )
         rows.append(
             {
-                "cusip": complete_cusip(match["cusip"].upper()),
+                "cusip": match["cusip"].upper(),
                 "raw_cusip": match["cusip"].upper(),
                 "issuer": issuer,
                 "title_of_class": title,
                 "shares": parse_amount(match["shares"]),
-                "value_usd": parse_amount(match["value"]) * 1000,
+                "value_usd": parse_amount(match["value"]) * 1000
+                if match["value"] is not None
+                else None,
                 "sh_prn": "SH" if unit.upper() == "SHS" else unit.upper(),
                 "put_call": option[1].upper() if option else None,
                 "discretion": discretion[1].upper() if discretion else "",

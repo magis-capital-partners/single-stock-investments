@@ -784,7 +784,7 @@ def export(db, managers, data=DATA):
                 for f in filings
             )
             for row in positions:
-                if parser_gap:
+                if parser_gap or row.get("value_usd") is None:
                     row["weight_pct"] = None
                 row.pop("as_filed", None)
                 row["ticker"] = symbols.get(row.get("cusip")) or row.get("ticker") or ""

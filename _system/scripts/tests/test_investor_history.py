@@ -175,6 +175,14 @@ def test_legacy_issuer_word_is_not_a_cusip_and_trailing_decimal_is_valid():
     assert rows[1]["sh_prn"] == "PRN"
 
 
+def test_blank_legacy_market_value_is_preserved_as_unknown():
+    rows, _ = parse_legacy_document(b"""Table Entry Total: 1
+    <TABLE>NAME  CLASS  CUSIP  VALUE  SHARES
+    AMERICA WEST HLDG CORP  CL B  023657208                 10 SH DEFINED
+    </TABLE>""")
+    assert len(rows) == 1 and rows[0]["shares"] == 10 and rows[0]["value_usd"] is None
+
+
 def test_public_document_survives_a_later_run_without_network(tmp_path, monkeypatch):
     monkeypatch.setattr(disclosures, "ARCHIVE", tmp_path)
     path = tmp_path / "original.xml"
@@ -256,7 +264,7 @@ def test_legacy_eight_character_cusip_and_dollar_cover_total():
 Form 13F Information Table Entry Total: 1
 Form 13F Information Table Value Total: 5053000
 APPLE COMPUTER  COM  03783310  5053  140600 SH SOLE 140600 0 0""")
-    assert rows[0]["cusip"] == "037833100"
+    assert rows[0]["cusip"] == "03783310"
     assert rows[0]["raw_cusip"] == "03783310"
     assert primary["table_value_total_usd"] == 5053000
 
@@ -551,7 +559,7 @@ def test_durable_checkpoint_restores_a_live_wal_database_and_rejects_corruption(
     with archive.connect(restored / "archive.sqlite") as other:
         assert other.execute("select count(*) from filings").fetchone()[0] == 1
         assert archive.filing_rows(other, "a")[0]["shares"] == 2
-    file = parts / manifest["identity"] / manifest["parts"][0]["name"]
+    file = checkpoint.part_path(parts, manifest, manifest["parts"][0])
     file.write_bytes(b"corrupt")
     with pytest.raises(ValueError, match="checksum"):
         checkpoint.restore(parts, tmp_path / "broken")
@@ -592,6 +600,24 @@ def test_parallel_download_connections_close_after_transactions(tmp_path, monkey
     assert archive.main() == 0
     with archive.connect(tmp_path / "a.sqlite") as db:
         assert db.execute("select count(*) from downloads").fetchone()[0] == 2
+
+
+def test_checkpoint_reuses_unchanged_content_between_publications(tmp_path):
+    cache = tmp_path / "cache"
+    db = archive.connect(cache / "archive.sqlite")
+    db.close()
+    archive.write_json(cache / "universe.json", {"managers": []})
+    first = checkpoint.pack(cache, tmp_path / "snapshots", part_bytes=1024)
+    archive.write_json(cache / "disclosures.json", {"disclosures": []})
+    second = checkpoint.pack(cache, tmp_path / "snapshots", part_bytes=1024)
+    assert first["identity"] != second["identity"]
+    a = {part["name"] for part in first["parts"]}
+    b = {part["name"] for part in second["parts"]}
+    assert a & b
+    assert checkpoint.restore(
+        tmp_path / "snapshots", tmp_path / "old", identity=first["identity"]
+    )
+    assert not (tmp_path / "old/disclosures.json").exists()
 
 
 def test_parallel_history_workers_preserve_every_notice_and_close_databases(
