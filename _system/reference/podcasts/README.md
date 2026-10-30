@@ -4,7 +4,7 @@ Committed registries for the Podcast agent (see `_system/agents/PODCAST.md`).
 
 | File | Role |
 |------|------|
-| `show_registry.json` | Watchlist feeds (+ The Synopsis) |
+| `show_registry.json` | Watchlist feeds, including The Synopsis, Behind the Balance Sheet, Far From The Finishing Post, and Stock Spin-off Investing |
 | `podcast_guest_registry.json` | Tier A Power Zone + Tier B Oakcliff-extended guests |
 | `company_alias_overrides.json` | Manual company→ticker (Evolution Gaming → `EVO.ST`, in book) |
 | `officer_directory.json` | Person ↔ company ↔ ticker |
