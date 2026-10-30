@@ -94,6 +94,39 @@ def test_eight_calls_become_valid_specs_and_a_second_run_adds_none(tmp_path: Pat
     assert len(nu_again["specs"]) == 2
 
 
+def test_provenance_is_written_only_when_primary_evidence_is_ready(tmp_path: Path, monkeypatch: pytest.MonkeyPatch):
+    from validate_research_pr_provenance import validate as validate_provenance
+
+    root = tmp_path / "repo"
+    ready = {
+        "schema_version": "2.0",
+        "ticker": "B3SA3.SA",
+        "evidence": [],
+        "reason": "fundamental_analyst_case_log",
+        "evidence_hash": "a" * 64,
+        "primary_evidence_hash": "b" * 64,
+        "artifact_count": 1,
+        "ready": True,
+        "primary_evidence_ready": True,
+    }
+    monkeypatch.setattr(weekly, "build_manifest", lambda ticker, reason: dict(ready))
+    written = weekly.write_provenance("B3SA3.SA", root, "2026-10-29")
+    assert written == "B3SA3.SA/research/research_agent_manifest.json"
+    manifest = json.loads((root / written).read_text(encoding="utf-8"))
+    state = json.loads((root / "B3SA3.SA/research/agent_run_state.json").read_text(encoding="utf-8"))
+    assert validate_provenance(manifest, state, "B3SA3.SA") == []
+    ready["evidence_hash"] = "c" * 64
+    assert weekly.write_provenance("B3SA3.SA", root, "2026-10-29") is None
+    assert state["evidence_hash"] == "a" * 64
+
+    def not_ready(ticker, reason):
+        return {**ready, "ticker": ticker, "primary_evidence_ready": False, "ready": False}
+
+    monkeypatch.setattr(weekly, "build_manifest", not_ready)
+    assert weekly.write_provenance("1211.HK", root, "2026-10-29") is None
+    assert not (root / "1211.HK/research/research_agent_manifest.json").exists()
+
+
 def test_an_already_due_review_date_is_refused(tmp_path: Path):
     text = CASE_LOG.replace("2027-04-28", "2026-10-01")
     rows = weekly.parse_case_log(text)

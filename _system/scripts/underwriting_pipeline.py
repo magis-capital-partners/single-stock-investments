@@ -29,7 +29,7 @@ from underwriting_contract import (
     validate_build,
     validate_review,
 )
-from underwriting_evidence import prepare_packet, source_fingerprint
+from underwriting_evidence import prepare_packet, requested_keywords, source_fingerprint
 
 ROOT = Path(__file__).resolve().parents[2]
 QUEUE = Path('_system/data/underwriting_queue.json')
@@ -70,7 +70,9 @@ def input_fingerprint(root, ticker):
 def processing_version(root):
     paths = [CALL_POLICY, POLICY, Path('_system/prompts/valuation_underwriting.md')]
     paths += [Path('_system/scripts')/name for name in ('underwriting_pipeline.py', 'underwriting_contract.py',
-                                                      'underwriting_evidence.py', 'underwriting_transport.py', 'underwriting_updates.py', 'underwriting_codex.py')]
+                                                      'underwriting_evidence.py', 'underwriting_transport.py', 'underwriting_updates.py', 'underwriting_codex.py',
+                                                      'valuation_market_sync.py', 'valuation_earnings.py', 'autonomous_compounders.py',
+                                                      'refresh_shared_forecasts.py', 'private_dashboard_assets.py')]
     return digest({str(p): (root/p).read_text(encoding='utf-8') if (root/p).is_file() else None for p in paths})
 
 
@@ -495,9 +497,7 @@ def run_company(root, work, ticker, as_of, state, vault, *, prepare=prepare_pack
                     state['evidence_requests'] = gaps
                     # Requests choose bounded search terms, never destinations or tools.
                     # Re-read the same independently discovered primary documents.
-                    words = re.findall(r'[A-Za-z_]{4,35}', json.dumps(gaps))
-                    excluded = {'code', 'detail', 'missing', 'evidence', 'primary', 'source', 'required', 'financial', 'report', 'statement', 'company', 'specific'}
-                    keywords = list(dict.fromkeys(w.lower() for w in words if w.lower() not in excluded))[:12]
+                    keywords = requested_keywords(gaps)
                     state['evidence_keywords'] = keywords
                     if prepare is prepare_packet and keywords:
                         repaired = prepare(root, ticker, as_of, focus_keywords=keywords)

@@ -74,6 +74,39 @@ def promotion_errors(ticker: str, committed: dict, working: dict, spec: dict) ->
     return [error for error in history_errors(base, {ticker: candidate}) if error not in before]
 
 
+def outcome_supersede_errors(rows: list[dict]) -> list[str]:
+    """A superseding outcome may replace only earlier ``unresolvable`` rows of
+    the same immutable forecast, only with a hit or miss, never dated before
+    the row it replaces, and each row is replaced at most once."""
+    from falsifier_specs import outcome_id
+    from resolve_falsifiers import outcome_key
+    errors = []
+    earlier: dict[str, dict] = {}
+    claimed: set[str] = set()
+    for index, row in enumerate(rows):
+        refs = row.get("supersedes_outcome_ids") or []
+        label = f"outcome line {index + 1} ({row.get('ticker')}:{row.get('spec_id')})"
+        if refs and row.get("verdict") not in {"hit", "miss"}:
+            errors.append(f"{label}: only a hit or miss may supersede, not {row.get('verdict')!r}")
+        for ref in refs:
+            ref = str(ref)
+            old = earlier.get(ref)
+            if old is None:
+                errors.append(f"{label}: supersedes {ref}, which is not an earlier outcome row")
+                continue
+            if old.get("verdict") != "unresolvable":
+                errors.append(f"{label}: supersedes {ref}, a final {old.get('verdict')!r} verdict")
+            if outcome_key(old) != outcome_key(row):
+                errors.append(f"{label}: supersedes {ref}, an outcome of a different forecast")
+            if str(row.get("resolved_on") or "") < str(old.get("resolved_on") or ""):
+                errors.append(f"{label}: resolved_on precedes the outcome {ref} it supersedes")
+            if ref in claimed:
+                errors.append(f"{label}: outcome {ref} is already superseded")
+            claimed.add(ref)
+        earlier[outcome_id(row)] = row
+    return errors
+
+
 def _git(root: Path, *args: str) -> str:
     # Git object payloads are UTF-8. Pin the decoder so immutable hashes are
     # identical on Windows hosts whose process locale is otherwise cp1252.
@@ -184,6 +217,8 @@ def main() -> int:
     current = _current_docs(args.root)
     errors = history_errors(_base_docs(args.root, args.base_ref), current)
     errors += simulated_promotion_errors(args.root, args.base_ref, current)
+    from resolve_falsifiers import OUTCOMES_REL, load_outcomes
+    errors += outcome_supersede_errors(load_outcomes(args.root / OUTCOMES_REL))
     for error in errors:
         print(f"ERROR: {error}")
     print(f"falsifier history: {len(errors)} violation(s)")

@@ -3,7 +3,6 @@ from __future__ import annotations
 
 import argparse
 import glob
-import hashlib
 import json
 import os
 import shutil
@@ -71,6 +70,7 @@ def clone_vault(home):
 def data_root(source, home, vault):
     import yaml
     from private_dashboard_assets import (
+        decode_object_bytes,
         hydrate,
         hydrate_repository,
         private_object,
@@ -103,7 +103,7 @@ def data_root(source, home, vault):
             target = private_object(vault, sha)
             if not target.is_file():
                 raw = git(vault, 'show', 'origin/main:dashboard-private/objects/'+sha)
-                require(hashlib.sha256(raw).hexdigest() == sha, 'Local private input hash changed')
+                decode_object_bytes(raw, sha)
                 target.parent.mkdir(parents=True, exist_ok=True)
                 target.write_bytes(raw)
     hydrate_repository(root)
