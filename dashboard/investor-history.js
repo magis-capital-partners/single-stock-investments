@@ -13,16 +13,17 @@
       if(source==='review' ? !pending : pending) return [];
       const record = quarter === 'latest' ? history.at(-1) : history.find(row => row.quarter === quarter);
       const disclosed = (manager.disclosure_quarters || []).includes(quarter) || quarter === 'latest' && manager.disclosure_count > 0;
-      if (quarter !== 'latest' && !record && !disclosed) return [];
-      if (source === '13f' && !record || source === 'disclosures' && !disclosed) return [];
-      const row = {...manager,...record};
+      const gap=quarter!=='latest' && (manager.filing_gaps || []).some(row=>quarterOf(row.period_end)===quarter);
+      if (quarter !== 'latest' && !record && !disclosed && !gap) return [];
+      if (source === '13f' && !record && !gap || source === 'disclosures' && !disclosed) return [];
+      const row = {...manager,...record,...(quarter!=='latest' && !record ? {quarter,positions:null,ssi_overlap:null,period_end:null} : {})};
       if (overlap && !(row.ssi_overlap > 0)) return [];
       if (!`${row.name} ${row.manager_id}`.toLowerCase().includes(query.toLowerCase())) return [];
       return [row];
     }).sort((a,b) => Number(Boolean(historyFor(b).length || b.disclosure_count))-Number(Boolean(historyFor(a).length || a.disclosure_count)) || (b.ssi_overlap || 0)-(a.ssi_overlap || 0) || a.name.localeCompare(b.name));
   }
   function availablePeriods(manager, source='all') {
-    return [...new Set([...(source==='disclosures' ? [] : historyFor(manager).map(row=>row.quarter)),...(source==='13f' ? [] : manager.disclosure_quarters || [])])].filter(Boolean).sort().reverse();
+    return [...new Set([...(source==='disclosures' ? [] : [...historyFor(manager).map(row=>row.quarter),...(manager.filing_gaps || []).map(row=>quarterOf(row.period_end))]),...(source==='13f' ? [] : manager.disclosure_quarters || [])])].filter(Boolean).sort().reverse();
   }
   function sourceLink(href, label) {
     try {
@@ -34,10 +35,10 @@
   function positionsTable(rows, {basis=''}={}) {
     if (!rows.length) return '<p>No disclosed positions for this snapshot.</p>';
     return `<div class="workspace-scroll"><table class="workspace-table"><thead><tr><th>Position</th><th>Weight${basis ? `<small>${esc(basis)}</small>` : ''}</th><th>Value (USD)</th></tr></thead><tbody>${[...rows].sort((a,b)=>(b.value_usd || 0)-(a.value_usd || 0) || (b.weight_pct || 0)-(a.weight_pct || 0)).map(row => {
-      const kind = [row.title_of_class,row.put_call,(row.sh_prn === 'PRN' ? 'Principal amount' : '')].filter(Boolean).join(' · ');
+      const kind = [row.title_of_class,row.put_call,(row.position_side==='Short' ? 'Short position' : ''),(row.sh_prn === 'PRN' ? 'Principal amount' : '')].filter(Boolean).join(' · ');
       const weight = row.weight_pct == null ? '—' : `${Number(row.weight_pct).toFixed(2)}%`;
       const weightBasis = {fund_net_assets:'Fund NAV',reported_13f_equities:'13F equity book',unspecified_disclosed_weight:'As disclosed; basis unspecified'}[row.weight_basis] || '';
-      return `<tr><td>${esc(row.ticker || row.issuer || row.isin || row.cusip)}<small>${esc(row.issuer || '')}</small>${kind ? `<small>${esc(kind)}</small>` : ''}${row.country || row.currency ? `<small>${esc([row.country,row.currency].filter(Boolean).join(' · '))}</small>` : ''}</td><td>${weight}${weightBasis ? `<small>${esc(weightBasis)}</small>` : ''}</td><td>${money(row.value_usd)}</td></tr>`;
+      return `<tr><td>${esc(row.ticker || row.issuer || row.isin || row.cusip)}${row.ticker && row.issuer && row.ticker!==row.issuer ? `<small>${esc(row.issuer)}</small>` : ''}${kind ? `<small>${esc(kind)}</small>` : ''}${row.country || row.currency ? `<small>${esc([row.country,row.currency].filter(Boolean).join(' · '))}</small>` : ''}</td><td>${weight}${weightBasis ? `<small>${esc(weightBasis)}</small>` : ''}</td><td>${money(row.value_usd)}</td></tr>`;
     }).join('')}</tbody></table></div>`;
   }
   async function read(path) {
@@ -55,7 +56,7 @@
     catch { index = await read('data/holdings/managers_index.json'); legacy = true; }
     if (!root.isConnected) return;
     const managers = index.managers || [];
-    const quarters = [...new Set(managers.flatMap(m => [...historyFor(m).map(r => r.quarter),...(m.disclosure_quarters || [])]))].filter(Boolean).sort().reverse();
+    const quarters = [...new Set(managers.flatMap(m => availablePeriods(m)))].filter(Boolean).sort().reverse();
     let quarter='latest',query='',overlap=false,source='all',page=0,ticket=0,selected=null;
     root.innerHTML = `<p class="investor-context">Explore dated public filings and fund disclosures. A 13F covers reportable US-listed securities. International disclosures may cover only part of a fund and use different reporting dates.</p>
       <div class="workspace-filter"><label class="workspace-search">Find an investor<input type="search" data-history-search placeholder="Manager name"></label>
@@ -101,7 +102,7 @@
           }));
           if (requested==='latest') {
             const dates=new Map();
-            const key=d=>(d.quarter || quarterOf(d.period_end) || quarterOf(d.disclosed_at))+(d.period_end || d.disclosed_at || '');
+            const key=d=>(d.quarter || quarterOf(d.period_end) || quarterOf(d.disclosed_at))+(d.period_end || d.disclosed_at || '')+(d.filed_at || '')+(d.source_kind==='nport' ? d.id : '');
             for(const d of snapshots) dates.set(d.vehicle_id, [dates.get(d.vehicle_id) || '',key(d)].sort().at(-1));
             return {snapshots:snapshots.filter(d=>key(d)===dates.get(d.vehicle_id))};
           }

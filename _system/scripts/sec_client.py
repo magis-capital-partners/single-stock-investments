@@ -10,6 +10,7 @@ import json
 import os
 import random
 import time
+from threading import Lock
 import urllib.error
 import urllib.request
 
@@ -31,14 +32,16 @@ class SecClient:
         self.min_interval = min_interval
         self.max_attempts = max_attempts
         self._last = 0.0
+        self._rate_lock = Lock()
 
     def _pause(self) -> None:
-        elapsed = time.monotonic() - self._last
-        wait = self.min_interval - elapsed
-        if wait > 0:
-            time.sleep(wait)
-        time.sleep(random.uniform(0.0, 0.04))
-        self._last = time.monotonic()
+        with self._rate_lock:
+            elapsed = time.monotonic() - self._last
+            wait = self.min_interval - elapsed
+            if wait > 0:
+                time.sleep(wait)
+            time.sleep(random.uniform(0.0, 0.04))
+            self._last = time.monotonic()
 
     def get_bytes(self, url: str, *, accept: str | None = None, timeout: int = 120) -> bytes:
         headers = {"User-Agent": sec_user_agent()}

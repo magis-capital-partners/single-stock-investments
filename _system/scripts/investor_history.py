@@ -245,6 +245,52 @@ def store_raw_documents(db, accession, parsed):
                 )
 
 
+def store_parse_failure(db, meta, exc):
+    if getattr(exc, "raw_documents", None):
+        store_raw_documents(db, meta["accession"], exc.raw_documents)
+    if getattr(exc, "raw_document", None):
+        store_raw_documents(db, meta["accession"], {"raw_info_bytes": exc.raw_document})
+    rows = getattr(exc, "partial_rows", None) or []
+    if rows:
+        meta.update(exc.primary or {})
+        meta["partial_rows"] = True
+        meta["reconciliation"] = reconcile(len(rows), rows, exc.primary)
+    store_filing(db, meta, rows, status="review" if rows else "error", error=str(exc))
+
+
+def restore_filing_cache(db, meta, cache):
+    """Recover original documents from a durable checkpoint without HTTP."""
+    from thirteenf_period import _cache_paths
+
+    info, primary, receipt = _cache_paths(cache, meta["manager_id"], meta["accession"])
+    if info.exists() and receipt.exists():
+        return
+    documents = db.execute(
+        "SELECT role,sha256,content_gzip FROM raw_documents WHERE accession=?",
+        (meta["accession"],),
+    ).fetchall()
+    for document in documents:
+        path = info if document["role"] == "information_table" else primary
+        raw = gzip.decompress(document["content_gzip"])
+        if hashlib.sha256(raw).hexdigest() != document["sha256"]:
+            raise ValueError("Preserved filing checksum mismatch")
+        path.parent.mkdir(parents=True, exist_ok=True)
+        temporary = path.with_suffix(path.suffix + ".tmp")
+        temporary.write_bytes(raw)
+        temporary.replace(path)
+    if documents:
+        write_json(
+            receipt,
+            {
+                "info_url": meta.get("source_url") or meta.get("index_url"),
+                "primary_url": None,
+                "form": meta.get("form"),
+                "report_date": meta.get("period_end") or meta.get("report_date"),
+                "filing_date": meta.get("filed_at") or meta.get("filing_date"),
+            },
+        )
+
+
 def cik_map(managers):
     mapping = {}
     for manager in managers:
@@ -520,6 +566,7 @@ def backfill_filings(
                     continue
                 store_filing(db, meta, status="discovered")
                 try:
+                    restore_filing_cache(db, meta, cache)
                     parsed = fetch_filing_tables(
                         filing,
                         fund_id=manager["manager_id"],
@@ -568,15 +615,7 @@ def backfill_filings(
                     ET.ParseError,
                     zipfile.BadZipFile,
                 ) as exc:
-                    if getattr(exc, "raw_documents", None):
-                        store_raw_documents(db, filing["accession"], exc.raw_documents)
-                    if getattr(exc, "raw_document", None):
-                        store_raw_documents(
-                            db,
-                            filing["accession"],
-                            {"raw_info_bytes": exc.raw_document},
-                        )
-                    store_filing(db, meta, status="error", error=str(exc))
+                    store_parse_failure(db, meta, exc)
                     errors += 1
                     print(
                         f"{manager['manager_id']} {filing['accession']}: {exc}",
@@ -603,6 +642,7 @@ def reparse_cached(db, cache=ARCHIVE / "filings"):
     for record in records:
         meta = json.loads(record["metadata"])
         try:
+            restore_filing_cache(db, meta, cache)
             parsed = fetch_filing_tables(
                 meta, fund_id=record["manager_id"], cache_dir=cache, offline=True
             )
@@ -639,18 +679,27 @@ def reparse_cached(db, cache=ARCHIVE / "filings"):
             store_raw_documents(db, record["accession"], parsed)
             count += int(report["ok"])
         except (OSError, ValueError, KeyError, ET.ParseError) as exc:
-            if getattr(exc, "raw_documents", None):
-                store_raw_documents(db, record["accession"], exc.raw_documents)
-            if getattr(exc, "raw_document", None):
-                store_raw_documents(
-                    db, record["accession"], {"raw_info_bytes": exc.raw_document}
-                )
+            if getattr(exc, "raw_documents", None) or getattr(
+                exc, "raw_document", None
+            ):
                 meta["parser_version"] = PARSER_VERSION
-                store_filing(db, meta, status="error", error=str(exc))
+                store_parse_failure(db, meta, exc)
             pending += 1  # Original source error remains visible.
     if pending:
         print(f"Cached filings still awaiting parser review: {pending}", flush=True)
     return count
+
+
+def backfill_parallel(database, managers, *, workers=2, before=None, deadline=None):
+    """Bounded HTTPS concurrency, with one SQLite owner per worker."""
+    batches = [managers[offset::workers] for offset in range(workers)]
+
+    def run(batch):
+        with closing(connect(database)) as connection:
+            return backfill_filings(connection, batch, before=before, deadline=deadline)
+
+    with ThreadPoolExecutor(max_workers=workers) as pool:
+        return sum(pool.map(run, [batch for batch in batches if batch]))
 
 
 def export(db, managers, data=DATA):
@@ -700,14 +749,15 @@ def export(db, managers, data=DATA):
         bundle = {}
         for period, filings in sorted(periods.items()):
             if not any(
-                f["status"] in {"loaded", "seed", "as_filed_warning"} for f in filings
+                f["status"] in {"loaded", "seed", "review", "as_filed_warning"}
+                for f in filings
             ):
                 continue
             if any(f["status"] == "loaded" for f in filings):
                 filings = [f for f in filings if f["status"] != "seed"]
             parts = []
             for f in filings:
-                if f["status"] not in {"loaded", "seed", "as_filed_warning"}:
+                if f["status"] not in {"loaded", "seed", "review", "as_filed_warning"}:
                     continue
                 if f["form"].endswith("/A") and f["amendment_type"] not in {
                     "NEW HOLDINGS",
@@ -725,9 +775,19 @@ def export(db, managers, data=DATA):
                     }
                 )
             positions = annotate_weights(merge_filings(parts))
+            parser_gap = any(
+                f["status"] in {"error", "review", "seed", "discovered"}
+                or (
+                    f["form"].endswith("/A")
+                    and f["amendment_type"] not in {"NEW HOLDINGS", "RESTATEMENT"}
+                )
+                for f in filings
+            )
             for row in positions:
+                if parser_gap:
+                    row["weight_pct"] = None
                 row.pop("as_filed", None)
-                row["ticker"] = row.get("ticker") or symbols.get(row.get("cusip"), "")
+                row["ticker"] = symbols.get(row.get("cusip")) or row.get("ticker") or ""
                 row["weight_basis"] = (
                     "reported_13f_equities"
                     if row.get("weight_pct") is not None
@@ -910,15 +970,20 @@ def export(db, managers, data=DATA):
 def main():
     from sec_client import _DEFAULT
 
-    _DEFAULT.min_interval = max(_DEFAULT.min_interval, 0.4)
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--download-only", action="store_true")
     parser.add_argument(
         "--workers",
         type=int,
-        choices=[1, 2, 3],
+        choices=[1, 2, 3, 4, 6],
         default=2,
-        help="Bounded parallel archive downloads",
+        help="Bounded parallel archive downloads or filing-history workers",
+    )
+    parser.add_argument(
+        "--request-interval",
+        type=float,
+        default=0.4,
+        help="Minimum SEC request interval across all workers; at least 0.2 seconds",
     )
     parser.add_argument("--bulk", action="store_true")
     parser.add_argument("--all-filings", action="store_true")
@@ -948,6 +1013,7 @@ def main():
     parser.add_argument("--database", type=Path, default=ARCHIVE / "archive.sqlite")
     parser.add_argument("--registry", type=Path, default=OWNERSHIP / "managers.json")
     args = parser.parse_args()
+    _DEFAULT.min_interval = max(0.2, args.request_interval)
     db = connect(args.database)
     deadline = time.monotonic() + args.seconds
     managers = json.loads(args.registry.read_text(encoding="utf-8"))["managers"]
@@ -1040,9 +1106,10 @@ def main():
     if not args.download_only:
         import_saved_books(db, selected)
     if args.all_filings or args.legacy:
-        backfill_filings(
-            db,
+        backfill_parallel(
+            args.database,
             selected,
+            workers=args.workers,
             before="2013-05-01" if args.legacy else None,
             deadline=deadline,
         )
