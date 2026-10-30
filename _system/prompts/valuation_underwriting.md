@@ -336,6 +336,9 @@ operating and financing/competitive risks; test structural alternatives, not jus
 small parameter nudges. For a finite-life claim, use relevant joint assumptions
 instead of a runway test. Use actual future reporting period ends in commitments;
 do not choose as_of + 365 days when the company reports on a different calendar.
+For flow measurements, include `start` as the actual future measurement-period
+start; include `scope` when comparable parent/segment observations need separation.
+An annual forecast must not be graded against a quarter with the same end date.
 Optional scenario_probabilities must explicitly contain low/base/high and sum to
 one. These weight values, never an arithmetic average of IRRs. Unsupported
 probabilities stay absent. reverse_driver_ref selects a meaningful uncertain

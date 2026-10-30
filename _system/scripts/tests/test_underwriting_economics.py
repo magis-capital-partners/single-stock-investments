@@ -159,11 +159,26 @@ def test_forecast_grading_waits_for_the_exact_period_and_unit():
     c = economic_contract()
     m = compile_contract(packet(), c)
     observations = [{'id': 'too_early', 'field': 'ocf', 'unit': 'USD', 'period': '2027-07-26', 'value': 10},
-                    {'id': 'right_period', 'field': 'ocf', 'unit': 'USD', 'period': '2027-10-26', 'value': 1100}]
+                    {'id': 'right_period', 'field': 'ocf', 'unit': 'USD', 'period': '2027-10-26', 'value': 1100,'source_kind':'primary'}]
     results = grade_commitments(m, observations, '2027-10-26')
     assert results[0]['actual_observation_id'] == 'right_period'
     assert results[0]['base_error'] == pytest.approx(-100)
     assert results[1]['status'] == 'awaiting_observation'
+
+
+def test_forecast_feedback_distinguishes_annual_and_quarterly_measurements_and_requires_primary_evidence():
+    from underwriting_economics import grade_commitments
+    c=economic_contract()
+    c['economic_analysis']['forecast_commitments'][0].update(start='2026-10-27',scope='parent consolidated')
+    m=compile_contract(packet(),c)
+    base={'field':'ocf','unit':'USD','period':'2027-10-26','scope':'parent consolidated','source_kind':'primary'}
+    rows=[{**base,'id':'quarter','start':'2027-07-27','value':200},
+          {**base,'id':'annual','start':'2026-10-27','value':1100},
+          {**base,'id':'segment','start':'2026-10-27','scope':'segment','value':400},
+          {**base,'id':'provider','start':'2026-10-27','source_kind':'provider_reported','value':999}]
+    result=grade_commitments(m,rows,'2027-10-26')[0]
+    assert result['status']=='measured' and result['actual_observation_id']=='annual'
+    assert grade_commitments(m,[{**rows[1],'source_kind':None}],'2027-10-26')[0]['status']=='awaiting_observation'
 
 
 def test_price_is_added_after_underwriting_and_return_bridge_ties_out():

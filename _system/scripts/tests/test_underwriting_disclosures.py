@@ -29,6 +29,16 @@ def test_adjacent_note_windows_keep_their_source_text_once():
     assert not any(a in b for i,a in enumerate(d['contexts']) for j,b in enumerate(d['contexts']) if i!=j)
 
 
+def test_a_bounded_quarterly_filing_keeps_every_note_and_contractual_footnote():
+    from underwriting_evidence import text_of
+    raw=('<html><p>Quarterly cash, debt and capital disclosures.</p>'+('Detailed report text. '*1000)
+         +'<p>Supplier receivables and restricted investments: exact funding conditions.</p>'
+         +('Contractual obligation detail. '*400)+'<p>Final commitment footnote.</p></html>').encode()
+    d=document_record('https://issuer.test/quarter',raw,form='10-Q')
+    assert d['coverage']=='complete_quarterly_filing'
+    assert d['contexts']==[text_of(raw.decode())]
+
+
 def test_note_numbers_in_gap_details_become_explicit_retrieval_terms():
     terms = requested_keywords([{'code':'missing_debt','detail':"Retrieve Note 9, Debt and Note 15, Settlement Risk. Search terms: 'maturity', 'collateral'."}])
     assert {'note 9','note 15','maturity','collateral'} <= set(terms)

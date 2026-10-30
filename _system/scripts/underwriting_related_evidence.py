@@ -80,7 +80,7 @@ def collect_target(root, ticker, cik, as_of, currency, keywords=(), client=None)
         require(re.fullmatch(r'[A-Za-z0-9_.-]+',filename), 'Unsafe SEC document path')
         accession = recent['accessionNumber'][i]
         url = f"https://www.sec.gov/Archives/edgar/data/{int(cik)}/{accession.replace('-','')}/{filename}"
-        doc = document_record(url,filing_bytes(root,ticker,accession,client,url),keywords)
+        doc = document_record(url,filing_bytes(root,ticker,accession,client,url),keywords,form=form)
         doc.update(form=form,filed=recent['filingDate'][i],period=recent['reportDate'][i])
         documents.append(doc)
     require(documents, 'Related issuer primary reports are unavailable')
