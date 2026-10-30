@@ -116,10 +116,10 @@ test('EPS scenario includes issuance and independent earnings assumptions',()=>{
 test('tender terms never assume odd-lot priority',()=>{
  const h=harness();assert.match(h.api.renderEventDetails({event_type:'issuer_tender',price_low:20,price_high:23}),/Unverified/);
 });
-test('Coverage and Shorts routes accept focus parameters',()=>{
+test('Coverage focus and retired Shorts redirects are preserved',()=>{
  const c={SITUATION_LANE_IDS:{'buyback-events':'buyback_events'},WATCHLIST_VIEWS:new Set()};vm.createContext(c);vm.runInContext(routeFunction('parseRouteFromHashString'),c);
  assert.equal(c.parseRouteFromHashString('#/research/coverage/TEST?section=buyback').ticker,'TEST');
- assert.equal(c.parseRouteFromHashString('#/ideas/short-alpha?buyback=TEST').view,'short-alpha');
+ assert.equal(c.parseRouteFromHashString('#/ideas/short-alpha?buyback=TEST').view,'reverse-split-strategy');
  assert.equal(c.parseRouteFromHashString('#/ideas/situations/buyback-events/TEST').situationFocus,'TEST');
 });
 test('route normalization preserves Buyback detail and Shorts focus',()=>{

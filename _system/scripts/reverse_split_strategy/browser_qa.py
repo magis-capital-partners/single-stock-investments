@@ -89,9 +89,18 @@ async def check(base_url, output, chrome):
         assert page.url.endswith('/strategies/reverse-split/research')
         assert await page.locator('[data-spp-tab]').count() == 0
         assert await page.locator('#ideas-subnav a[data-view="short-alpha"]').count() == 0
+        assert await page.locator('#strategies-subnav a[data-view="systematic-shorts"]').count() == 0
+        await research.locator('[data-rsr-control="annTiming"]').select_option('announce_5m')
+        await research.locator('[data-rsr-control="annFilter"]').select_option('only_S4')
+        await research.locator('[data-rsr-control="annCost"]').select_option('stress')
+        announcement_table = research.locator('table').filter(has=page.locator('caption',has_text='Announcement-entry results by documented split count'))
+        assert await announcement_table.locator('tbody tr').count() == 4
+        assert 'Net excluding imputed-price entries' in await announcement_table.text_content()
         await research.locator('[data-rsr-control="cost"]').select_option('stress')
         assert await research.locator('tbody tr').count() > 20
         await page.screenshot(path=str(output / 'research-comparisons.png'),full_page=True)
+        await page.goto(base_url + '/#/strategies/systematic-shorts/forward')
+        await page.wait_for_url('**/strategies/reverse-split/live')
         await host.locator('[data-rss-section="live"]').click()
         live = page.locator('[data-rsl-live]')
         await live.locator('[data-rsl-event="qa-event"]').wait_for(timeout=15000)

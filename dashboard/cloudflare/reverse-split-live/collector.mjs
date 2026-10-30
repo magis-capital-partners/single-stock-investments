@@ -28,7 +28,7 @@ export async function runOnce(env,{maximumMs=210000,reconcile=false}={}){
   const acquired=await env.DB.prepare("UPDATE rs_state SET value=?,updated_at=? WHERE key='collector_lease' AND CAST(value AS INTEGER)<=? RETURNING value").bind(lease,new Date().toISOString(),now).first();
   if(!acquired)return {skipped:true,reason:'Another collector owns the bounded lease'};
   const usageKey='collector_usage:'+new Date(now).toISOString().slice(0,10),priorUsage=JSON.parse((await env.DB.prepare('SELECT value FROM rs_state WHERE key=?').bind(usageKey).first())?.value||'{}');
-  const withinBudget=()=>Number(priorUsage.rows_read||0)+(env.usage?.rows_read||0)<500000&&Number(priorUsage.rows_written||0)+(env.usage?.rows_written||0)<10000;
+  const withinBudget=()=>Number(priorUsage.rows_read||0)+(env.usage?.rows_read||0)<500000&&Number(priorUsage.rows_written||0)+(env.usage?.rows_written||0)<50000;
   const counts={jobs:0,started_at:new Date(now).toISOString(),mode:'external_collector'};let checkpoint,lastSave=counts.started_at;
   try{
     if(!withinBudget())return {skipped:true,reason:'Research daily database budget reached; preserving headroom for the existing dashboard'};

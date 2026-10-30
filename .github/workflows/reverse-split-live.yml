@@ -6,12 +6,8 @@ on:
       - 'dashboard/cloudflare/reverse-split-live/**'
       - 'dashboard/cloudflare/test-reverse-split-live.mjs'
       - '.github/workflows/reverse-split-live.yml'
-  workflow_dispatch:
-    inputs:
-      reconcile:
-        description: Repair recent daily-index coverage
-        type: boolean
-        default: false
+  repository_dispatch:
+    types: [reverse-split-source-ready, reverse-split-reconcile]
   schedule:
     # Off the top of the hour; GitHub may delay or skip scheduled runs.
     - cron: '3-58/5 * * * *'
@@ -45,12 +41,12 @@ jobs:
       - name: Apply the isolated research schema and deploy the monitor
         env:
           CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
-          CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+          CLOUDFLARE_ACCOUNT_ID: e1cac493b315c8fd7398500dd1bfd687
         run: |
           node dashboard/cloudflare/node_modules/wrangler/bin/wrangler.js d1 migrations apply single-stock-reverse-splits --remote --config dashboard/cloudflare/reverse-split-live/wrangler.jsonc
           node dashboard/cloudflare/node_modules/wrangler/bin/wrangler.js deploy --config dashboard/cloudflare/reverse-split-live/wrangler.jsonc
   collect:
-    if: github.event_name == 'schedule' || github.event_name == 'workflow_dispatch'
+    if: github.event_name == 'schedule' || github.event_name == 'repository_dispatch'
     runs-on: ubuntu-latest
     timeout-minutes: 5
     steps:
@@ -66,7 +62,7 @@ jobs:
         env:
           CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
           CLOUDFLARE_ACCOUNT_ID: e1cac493b315c8fd7398500dd1bfd687
-          RECONCILE: ${{ inputs.reconcile || false }}
+          RECONCILE: ${{ github.event.action == 'reverse-split-reconcile' }}
         run: |
           if [ "$RECONCILE" = 'true' ]; then
             node dashboard/cloudflare/reverse-split-live/collector.mjs --reconcile
