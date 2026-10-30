@@ -22,7 +22,8 @@ export function remoteEnvironment({token,account,database,bucket,fetcher=fetch,c
 }
 
 export async function runOnce(env,{maximumMs=210000,reconcile=false}={}){
-  const now=Date.now(),token=crypto.randomUUID(),lease=String(now+maximumMs+90000)+':'+token,remote=env.controlDB;
+  const now=Date.now(),token=crypto.randomUUID(),lease=String(now+Math.max(600000,maximumMs+180000))+':'+token,remote=env.controlDB;
+  env.deadline=now+maximumMs;
   env.DB=remote;Object.assign(env.usage,{rows_read:0,rows_written:0,queries:0});
   await env.DB.prepare("INSERT OR IGNORE INTO rs_state(key,value,updated_at) VALUES('collector_lease','0',?)").bind(new Date().toISOString()).run();
   const acquired=await env.DB.prepare("UPDATE rs_state SET value=?,updated_at=? WHERE key='collector_lease' AND CAST(value AS INTEGER)<=? RETURNING value").bind(lease,new Date().toISOString(),now).first();

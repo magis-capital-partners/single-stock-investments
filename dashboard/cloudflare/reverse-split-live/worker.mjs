@@ -20,8 +20,9 @@ export async function boundedBody(response,maximum){
   const bytes=new Uint8Array(size);let at=0;for(const c of chunks){bytes.set(c,at);at+=c.length;}return bytes;
 }
 async function state(env,key,value){if(value===undefined)return env.DB.prepare('SELECT value FROM rs_state WHERE key=?').bind(key).first().then(r=>r?.value);await env.DB.prepare('INSERT INTO rs_state(key,value,updated_at) VALUES(?,?,?) ON CONFLICT(key) DO UPDATE SET value=excluded.value,updated_at=excluded.updated_at').bind(key,String(value),stamp()).run();}
-async function limitedFetch(env,value,{maximum=24*1024*1024,redirects=0}={}){
+export async function limitedFetch(env,value,{maximum=24*1024*1024,redirects=0}={}){
   const url=sourceURL(value),sec=SEC_HOSTS.has(url.hostname);
+  if(env.deadline&&Date.now()>=env.deadline)throw new Error('Collector source deadline reached; work will retry');
   if(sec){
     if(Number(await state(env,'sec_cooldown'))>Date.now())throw new Error('SEC access is in backoff');
     await env.DB.prepare("INSERT OR IGNORE INTO rs_state(key,value,updated_at) VALUES('sec_slot','0',?)").bind(stamp()).run();
@@ -29,7 +30,9 @@ async function limitedFetch(env,value,{maximum=24*1024*1024,redirects=0}={}){
     for(let i=0;i<12&&!slot;i++){const now=Date.now();slot=await env.DB.prepare("UPDATE rs_state SET value=?,updated_at=? WHERE key='sec_slot' AND CAST(value AS INTEGER)<=? RETURNING value").bind(String(now+650),stamp(),now).first();if(!slot)await sleep(250);}
     if(!slot)throw new Error('SEC request budget occupied');
   }
-  const response=await fetch(url,{redirect:'manual',headers:{'user-agent':env.SEC_USER_AGENT,'accept':'application/atom+xml, application/rss+xml, application/json, text/html, text/plain, */*'},signal:AbortSignal.timeout(18000)});
+  const remaining=env.deadline?env.deadline-Date.now():18000;
+  if(remaining<=0)throw new Error('Collector source deadline reached; work will retry');
+  const response=await fetch(url,{redirect:'manual',headers:{'user-agent':env.SEC_USER_AGENT,'accept':'application/atom+xml, application/rss+xml, application/json, text/html, text/plain, */*'},signal:AbortSignal.timeout(Math.min(18000,remaining))});
   if(response.status>=300&&response.status<400){await response.body?.cancel();if(redirects>=3)throw new Error('Source redirect limit');const next=new URL(response.headers.get('location'),url);sourceURL(next);return limitedFetch(env,next.href,{maximum,redirects:redirects+1});}
   if(!response.ok){await response.body?.cancel();if(sec&&[403,429].includes(response.status))await state(env,'sec_cooldown',Date.now()+Math.min(3600000,Math.max(300000,Number(response.headers.get('retry-after')||0)*1000)));throw new Error(`Source returned HTTP ${response.status}`);}
   return {bytes:await boundedBody(response,maximum),content_type:response.headers.get('content-type')||'',url:url.href};
