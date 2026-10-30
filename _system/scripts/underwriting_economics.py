@@ -41,7 +41,8 @@ def terminal_nodes(terminal, currency):
     for year, growth in enumerate(terminal['growth_refs'], 1):
         gf = node(f'growth_{year}', 'add', [1, growth], 'ratio')
         earnings = node(f'earnings_{year}', 'multiply', [earnings, gf])
-        reinvestment = node(f'reinvestment_fraction_{year}', 'divide', [growth, roi], 'ratio')
+        funded_growth = node(f'funded_growth_{year}', 'maximum', [growth, 0], 'ratio')
+        reinvestment = node(f'reinvestment_fraction_{year}', 'divide', [funded_growth, roi], 'ratio')
         payout = node(f'payout_fraction_{year}', 'subtract', [1, reinvestment], 'ratio')
         cash = node(f'cash_{year}', 'multiply', [earnings, payout])
         discount = node(f'discount_{year}', 'multiply', [discount, factor], 'ratio')
@@ -49,7 +50,8 @@ def terminal_nodes(terminal, currency):
     g = terminal['terminal_growth_ref']
     gf = node('mature_growth', 'add', [1, g], 'ratio')
     next_earnings = node('mature_earnings', 'multiply', [earnings, gf])
-    reinvestment = node('mature_reinvestment', 'divide', [g, roi], 'ratio')
+    funded_growth = node('mature_funded_growth', 'maximum', [g, 0], 'ratio')
+    reinvestment = node('mature_reinvestment', 'divide', [funded_growth, roi], 'ratio')
     payout = node('mature_payout', 'subtract', [1, reinvestment], 'ratio')
     cash = node('mature_cash', 'multiply', [next_earnings, payout])
     spread = node('spread', 'subtract', [rate, g], 'ratio')

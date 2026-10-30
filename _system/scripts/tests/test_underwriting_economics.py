@@ -119,12 +119,14 @@ def test_review_binds_the_actual_diagnostics_and_structural_tests():
         validate_review(c, r, m)
 
 
-def test_compiler_derives_a_growth_runway_after_the_holding_period():
+@pytest.mark.parametrize('first_growth', [.06, -.06])
+@pytest.mark.parametrize('mature_growth', [.02, -.02])
+def test_compiler_derives_a_growth_runway_without_inventing_capital_release(first_growth, mature_growth):
     c = economic_contract()
     a = copy.deepcopy(c['assumptions'][0])
     c['assumptions'] = [x for x in c['assumptions'] if x['id'] != 'terminal_multiple']
-    for name, value in [('growth_next', .06), ('growth_later', .04), ('terminal_growth', .02), ('new_equity_return', .2)]:
-        c['assumptions'].append({**a, 'id': name, 'value': value})
+    for name, value in [('growth_next', first_growth), ('growth_later', .04), ('terminal_growth', mature_growth), ('new_equity_return', .2)]:
+        c['assumptions'].append({**a, 'id': name, 'value': value, 'allowed_range': {'min': -.1, 'max': 1}})
     b = c['components'][0]
     b['drivers'] = [x for x in b['drivers'] if x['id'] != 'terminal_ps']
     b['terminal'] = {'type': 'reinvestment_fade', 'earnings_ref': 'normalized_cash', 'share_count_ref': 'shares',
@@ -136,8 +138,9 @@ def test_compiler_derives_a_growth_runway_after_the_holding_period():
     m = compile_contract(packet(), c)
     from calculation_proof import evaluate_calculation_proof
     t = {x['id']: x['value'] for x in evaluate_calculation_proof(m['component_valuation_results']['additive_components'][0]['calculation_proof'])['traces']['base']}
-    e1, e2 = 1000*1.06, 1000*1.06*1.04
-    expected = (e1*(1-.06/.2)/1.1 + e2*(1-.04/.2)/1.1**2 + e2*1.02*(1-.02/.2)/(.1-.02)/1.1**2)/100
+    e1, e2 = 1000*(1+first_growth), 1000*(1+first_growth)*1.04
+    expected = (e1*(1-max(0,first_growth)/.2)/1.1 + e2*(1-.04/.2)/1.1**2
+                + e2*(1+mature_growth)*(1-max(0,mature_growth)/.2)/(.1-mature_growth)/1.1**2)/100
     assert t['terminal_generated_exit_ps'] == pytest.approx(expected)
     assert m['valuation_methodology']['horizon_years'] == 2
     assert b['terminal']['growth_refs'] == ['growth_next', 'growth_later']

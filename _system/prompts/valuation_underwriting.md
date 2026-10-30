@@ -325,6 +325,10 @@ driver; trusted code adds the price afterward and solves only within its bounds.
 
 Each component requires ONE `terminal` declaration. horizon_years is the holding
 or realization horizon, separate from the subsequent competitive runway:
+Negative continuation growth reduces earnings but does not automatically release
+invested capital. The trusted continuation charges max(growth,0)/incremental
+equity return. Any actual recoverable working capital or asset proceeds require
+their own supported cash-flow claim, counted once.
 
 * `type: reinvestment_fade` for a continuing parent-equity claim. Required fields:
   earnings_ref (whole-company equity earnings AFTER maintenance, interest, taxes,

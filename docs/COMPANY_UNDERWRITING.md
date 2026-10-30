@@ -163,7 +163,8 @@ Unknown provider usage is counted as unknown, not zero. Reasoning is included in
 the provider's output count; an actual per-approved-company estimate is withheld
 when receipts lack usage. Subscription allowance and credits are not inferred
 from API token prices.
-# Liquidity in the economic bridge
+
+## Liquidity in the economic bridge
 
 Every annual path rolls opening usable liquidity through retained cash and an
 explicit adjustment for facilities, restrictions or collateral to closing usable

@@ -47,6 +47,16 @@ def text_of(raw):
     return ' '.join(html.unescape(re.sub(r'<[^>]+>', ' ', raw)).split())
 
 
+def merge_evidence_requests(previous, incoming):
+    """Keep recent disclosure requests across bounded repair/retry rounds."""
+    rows = {}
+    for row in list(previous or [])+list(incoming or []):
+        key = str(row.get('code') or digest(row))
+        rows.pop(key, None)
+        rows[key] = row
+    return list(rows.values())[-12:]
+
+
 def requested_keywords(gaps):
     """Balance explicit disclosure requests; model text never chooses URLs/tools."""
     groups = []
