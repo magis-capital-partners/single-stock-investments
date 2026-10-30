@@ -1,0 +1,613 @@
+"""Public archive, identity, provenance and historical selection contracts."""
+
+from __future__ import annotations
+
+import csv
+import io
+import json
+import shutil
+import subprocess
+import sys
+import zipfile
+from pathlib import Path
+
+import pytest
+
+sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
+import discover_public_funds as public_funds
+import global_disclosures as disclosures
+import investor_history as archive
+import investor_history_checkpoint as checkpoint
+import investor_universe as universe
+import ownership_common as ownership
+import stage_investor_history as staging
+from thirteenf_legacy import parse_legacy_document
+from thirteenf_core import merge_filings
+
+
+def test_legacy_preserves_classes_options_and_principal_amounts():
+    raw = b"""CONFORMED PERIOD OF REPORT: 20001231
+Form 13F Information Table Entry Total: 3
+Form 13F Information Table Value Total: 150
+<TABLE>
+ALPHABET INC  CL A  02079K305  100  20 SH SOLE 20 0 0
+ALPHABET INC  CL C  02079K107  40  10 SH CALL SOLE 10 0 0
+EXAMPLE BOND  NOTE  123456789  10  1000 PRN SOLE 1000 0 0
+</TABLE>"""
+    rows, primary = parse_legacy_document(raw)
+    assert primary["period_end"] == "2000-12-31"
+    assert primary["table_entry_total"] == 3
+    assert sum(r["value_usd"] for r in rows) == 150_000
+    assert rows[1]["put_call"] == "CALL"
+    assert rows[2]["sh_prn"] == "PRN"
+    assert rows[0]["cusip"] != rows[1]["cusip"]
+
+
+def test_legacy_unreadable_table_is_not_an_empty_portfolio():
+    with pytest.raises(ValueError, match="requires review"):
+        parse_legacy_document(b"<TABLE>unrecognized format</TABLE>")
+
+
+def test_legacy_cover_dates_are_excluded_and_wrapped_spaced_cusip_is_parsed():
+    raw = b"""CONFORMED PERIOD OF REPORT: 20010331
+CONFIDENTIAL TREATMENT IS NO LONGER WARRANTED OR EXPIRED ON 20020515 1234 5678
+Information Table Entry Total: 2
+Information Table Value Total: 700617
+[X] adds new holdings entries
+<TABLE>
+NAME OF ISSUER  TITLE OF CLASS  CUSIP  VALUE  SHARES
+Costco Wholesale
+Corp.              Com    22160K 10 5  664,777   16,937,000  X
+Dover Corp.        Com    260003 10 8   35,840    1,000,000  X
+</TABLE>"""
+    rows, primary = parse_legacy_document(raw)
+    assert [row["cusip"] for row in rows] == ["22160K105", "260003108"]
+    assert rows[0]["issuer"] == "Costco Wholesale Corp."
+    assert primary["amendment_type"] == "NEW HOLDINGS"
+    assert primary["table_value_total_usd"] == 700617000
+
+
+def test_legacy_html_paragraphs_within_cells_stay_in_the_same_row():
+    rows, primary = parse_legacy_document(b"""<html><p>Table Entry Total: 1</p>
+    <table><tr><td>Name of Issuer</td><td>Title of Class</td><td>CUSIP</td></tr>
+    <tr><td><p>APPLE INC</p></td><td><p>COM</p></td><td>037833100</td>
+    <td>100</td><td>20</td><td>SH</td></tr></table></html>""")
+    assert len(rows) == 1
+    assert rows[0]["issuer"] == "APPLE INC"
+    assert rows[0]["value_usd"] == 100000
+    assert primary["table_entry_total"] == 1
+
+
+def test_secondary_zero_entry_cover_does_not_erase_the_main_report():
+    rows, primary = parse_legacy_document(b"""Table Entry Total: 1
+    Confidential Information has been omitted from the public Form 13F
+    Other included manager: Table Entry Total: 0
+    <TABLE>Name of Issuer  Class  CUSIP
+    APPLE INC  COM  037833100  100  20 SH SOLE
+    </TABLE>""")
+    assert len(rows) == 1 and primary["table_entry_total"] == 1
+    assert primary["confidential_omitted"]
+
+
+def test_new_holdings_amendment_adds_omitted_rows_of_an_existing_cusip():
+    rows = merge_filings(
+        [
+            {
+                "form": "13F-HR",
+                "rows": [
+                    {"cusip": "1", "shares": 10, "value_usd": 100, "sh_prn": "SH"}
+                ],
+            },
+            {
+                "form": "13F-HR/A",
+                "amendment_type": "NEW HOLDINGS",
+                "rows": [{"cusip": "1", "shares": 2, "value_usd": 20, "sh_prn": "SH"}],
+            },
+        ]
+    )
+    assert len(rows) == 1 and rows[0]["shares"] == 12 and rows[0]["value_usd"] == 120
+
+
+def test_public_document_survives_a_later_run_without_network(tmp_path, monkeypatch):
+    monkeypatch.setattr(disclosures, "ARCHIVE", tmp_path)
+    path = tmp_path / "original.xml"
+    path.write_bytes(b"<edgarSubmission><original>public</original></edgarSubmission>")
+    url = "https://www.sec.gov/Archives/example.xml"
+    assert disclosures.public_document(url, path) == path.read_bytes()
+    path.unlink()
+
+    def fail(url):
+        raise AssertionError("Preserved public XML must not be downloaded again")
+
+    monkeypatch.setattr(disclosures, "get_bytes", fail)
+    assert b"<original>public</original>" in disclosures.public_document(url, path)
+
+
+def test_unknown_amendment_does_not_replace_the_original_book(tmp_path, monkeypatch):
+    db = archive.connect(tmp_path / "archive.sqlite")
+    manager = {"manager_id": "example", "display_name": "Example", "cik": "1"}
+    monkeypatch.setattr(ownership, "load_cusip_map", dict)
+    monkeypatch.setattr(ownership, "portfolio_universe", lambda: (set(), {}))
+    for accession, form, filed, value in [
+        ("a", "13F-HR", "2000-02-01", 100),
+        ("b", "13F-HR/A", "2000-03-01", 1),
+    ]:
+        archive.store_filing(
+            db,
+            {
+                "accession": accession,
+                "manager_id": "example",
+                "form": form,
+                "period_end": "1999-12-31",
+                "filed_at": filed,
+            },
+            [{"cusip": accession, "value_usd": value, "shares": 1, "sh_prn": "SH"}],
+        )
+    archive.export(db, [manager], tmp_path / "site")
+    book = json.loads((tmp_path / "site/history/example/1999.json").read_text())[
+        "quarters"
+    ]["1999Q4"]
+    assert [row["cusip"] for row in book["positions"]] == ["a"]
+    assert book["partial"]
+
+
+def test_legacy_eight_character_cusip_and_dollar_cover_total():
+    rows, primary = parse_legacy_document(b"""CONFORMED PERIOD OF REPORT: 19990331
+Form 13F Information Table Entry Total: 1
+Form 13F Information Table Value Total: 5053000
+APPLE COMPUTER  COM  03783310  5053  140600 SH SOLE 140600 0 0""")
+    assert rows[0]["cusip"] == "037833100"
+    assert rows[0]["raw_cusip"] == "03783310"
+    assert primary["table_value_total_usd"] == 5053000
+
+
+def test_full_discovery_follows_all_pages_and_preserves_amendments(monkeypatch):
+    def block(accession, form="13F-HR"):
+        return {
+            "form": [form],
+            "filingDate": ["2000-02-01"],
+            "reportDate": ["1999-12-31"],
+            "accessionNumber": [accession],
+            "primaryDocument": ["a.txt"],
+        }
+
+    monkeypatch.setattr(
+        ownership,
+        "fetch_submissions",
+        lambda cik: {
+            "filings": {"recent": block("new"), "files": [{"name": "older.json"}]}
+        },
+    )
+    monkeypatch.setattr(
+        ownership, "sec_fetch_json", lambda url: block("old", "13F-E/A")
+    )
+    rows = ownership.list_13f_filings("1", limit=None, strict=True)
+    assert {r["accession"] for r in rows} == {"new", "old"}
+
+    def fail(url):
+        raise TimeoutError("page unavailable")
+
+    monkeypatch.setattr(ownership, "sec_fetch_json", fail)
+    with pytest.raises(TimeoutError):
+        ownership.list_13f_filings("1", limit=None, strict=True)
+
+
+def make_zip(path, tables):
+    with zipfile.ZipFile(path, "w") as zipped:
+        for name, rows in tables.items():
+            output = io.StringIO()
+            writer = csv.DictWriter(
+                output, fieldnames=list(rows[0]), delimiter="\t", lineterminator="\n"
+            )
+            writer.writeheader()
+            writer.writerows(rows)
+            zipped.writestr(name, output.getvalue())
+
+
+def test_bulk_uses_reporting_period_and_historical_dollar_units(tmp_path):
+    path = tmp_path / "bulk.zip"
+    accession = "0000000001-13-000001"
+    make_zip(
+        path,
+        {
+            "SUBMISSION.tsv": [
+                {
+                    "ACCESSION_NUMBER": accession,
+                    "CIK": "1",
+                    "PERIODOFREPORT": "31-DEC-2012",
+                    "FILING_DATE": "31-MAY-2013",
+                    "SUBMISSIONTYPE": "13F-HR",
+                }
+            ],
+            "COVERPAGE.tsv": [
+                {
+                    "ACCESSION_NUMBER": accession,
+                    "REPORTCALENDARORQUARTER": "31-DEC-2012",
+                    "FILINGMANAGER_NAME": "Example Capital",
+                    "AMENDMENTTYPE": "",
+                }
+            ],
+            "SUMMARYPAGE.tsv": [
+                {
+                    "ACCESSION_NUMBER": accession,
+                    "TABLEENTRYTOTAL": "1",
+                    "TABLEVALUETOTAL": "25",
+                    "ISCONFIDENTIALOMITTED": "N",
+                }
+            ],
+            "INFOTABLE.tsv": [
+                {
+                    "ACCESSION_NUMBER": accession,
+                    "NAMEOFISSUER": "Untracked issuer",
+                    "CUSIP": "123456789",
+                    "VALUE": "25",
+                    "SSHPRNAMT": "100",
+                    "SSHPRNAMTTYPE": "SH",
+                    "PUTCALL": "",
+                }
+            ],
+        },
+    )
+    db = archive.connect(tmp_path / "a.sqlite")
+    assert archive.ingest_bulk(db, path, [{"manager_id": "example", "cik": "1"}]) == 1
+    filing = db.execute("select * from filings").fetchone()
+    assert filing["period_end"] == "2012-12-31"
+    assert filing["status"] == "loaded"
+    assert archive.filing_rows(db, accession)[0]["value_usd"] == 25_000
+
+
+def test_history_merges_new_holdings_but_keeps_each_as_filed_record(
+    tmp_path, monkeypatch
+):
+    db = archive.connect(tmp_path / "a.sqlite")
+    managers = [
+        {"manager_id": "example", "display_name": "Example", "cik": "1"},
+        {"manager_id": "nonfiler", "display_name": "Non filer"},
+    ]
+    for accession, form, amendment, rows in [
+        (
+            "a",
+            "13F-HR",
+            None,
+            [{"cusip": "000000001", "shares": 10, "value_usd": 100, "sh_prn": "SH"}],
+        ),
+        (
+            "b",
+            "13F-HR/A",
+            "NEW HOLDINGS",
+            [{"cusip": "000000002", "shares": 5, "value_usd": 50, "sh_prn": "SH"}],
+        ),
+    ]:
+        archive.store_filing(
+            db,
+            {
+                "accession": accession,
+                "manager_id": "example",
+                "period_end": "2012-12-31",
+                "filed_at": "2013-05-01",
+                "form": form,
+                "amendment_type": amendment,
+            },
+            rows,
+        )
+    archive.store_filing(
+        db,
+        {
+            "accession": "later",
+            "manager_id": "example",
+            "period_end": "2026-06-30",
+            "filed_at": "2026-08-01",
+            "form": "13F-HR",
+        },
+        [],
+    )
+    monkeypatch.setattr(ownership, "load_cusip_map", dict)
+    monkeypatch.setattr(ownership, "portfolio_universe", lambda: ([], {}))
+    coverage = archive.export(db, managers, tmp_path / "data")
+    book = json.loads((tmp_path / "data/history/example/2012.json").read_text())[
+        "quarters"
+    ]["2012Q4"]
+    assert len(book["positions"]) == 2
+    assert len(book["filings"]) == 2
+    assert not coverage["complete"]  # Discovery has not yet exhausted EDGAR.
+    index = json.loads((tmp_path / "data/directory_index.json").read_text())
+    assert len(index["managers"]) == 2
+    assert index["managers"][0]["history"][0]["quarter"] == "2012Q4"
+    assert index["managers"][0]["history"][1]["positions"] == 0
+
+
+def test_nport_keeps_fund_vehicle_currency_and_nav_denominator():
+    xml = b"""<edgarSubmission xmlns="http://www.sec.gov/edgar/nport"><genInfo>
+    <seriesId>S00001</seriesId><seriesName>Global Equity</seriesName><repPdDate>2020-03-31</repPdDate></genInfo>
+    <invstOrSec><name>Tencent</name><title>Ordinary</title><cusip>000000000</cusip>
+    <identifiers><isin value="KYG875721634"/><ticker value="0700.HK"/></identifiers>
+    <balance>200</balance><units>NS</units><curCd>HKD</curCd><valUSD>10000</valUSD><pctVal>4.2</pctVal><invCountry>KY</invCountry></invstOrSec></edgarSubmission>"""
+    parsed = disclosures.parse_nport(
+        xml, "example", source_url="https://www.sec.gov/a.xml"
+    )
+    row = parsed["positions"][0]
+    assert parsed["vehicle_id"] == "S00001"
+    assert row["currency"] == "HKD"
+    assert row["weight_basis"] == "fund_net_assets"
+    assert row["isin"] == "KYG875721634"
+
+
+def test_letters_include_untracked_foreign_holdings_and_exclude_discussion_and_exits():
+    text = "Top ten holdings\nTencent (700 HK) 8.2%\nUnlisted Local Company 2.4%\nIndex return 14.5%\n"
+    mentions = [
+        {
+            "ticker": "OWN",
+            "action": "add",
+            "commentary": "We own OWN as a long position.",
+        },
+        {
+            "ticker": "OLD",
+            "action": "exit",
+            "commentary": "We exited our position in OLD.",
+        },
+        {
+            "ticker": "PEER",
+            "action": "discussed",
+            "commentary": "The competitor PEER grew quickly.",
+        },
+    ]
+    rows = disclosures.extract_document_positions(text, mentions)
+    assert {r["ticker"] for r in rows} == {"OWN", "0700.HK", ""}
+    assert (
+        next(r for r in rows if r["ticker"] == "0700.HK")["weight_basis"]
+        == "unspecified_disclosed_weight"
+    )
+    assert next(r for r in rows if r["ticker"] == "OWN")["weight_pct"] is None
+
+
+def test_identity_does_not_merge_similarly_named_different_firms():
+    catalog = {
+        "Analog Century Management LP": {"0000000001"},
+        "Century Management LLC": {"0000000002"},
+    }
+    assert universe.match_cik(["Century Management"], catalog) == (
+        "0000000002",
+        "Century Management LLC",
+    )
+    assert (
+        universe.match_cik(
+            ["Century Management"], {"Century Management LLC": {"1", "2"}}
+        )
+        is None
+    )
+
+
+def test_non_letters_never_expand_manager_universe(tmp_path):
+    path = tmp_path / "insights.json"
+    path.write_text(
+        json.dumps(
+            {
+                "letters": [
+                    {
+                        "fund_id": "research",
+                        "fund": "Broker Research",
+                        "document_type": "sell_side_research",
+                        "letter_eligible": False,
+                    },
+                    {
+                        "fund_id": "real",
+                        "fund": "Real Capital",
+                        "document_type": "investor_letter",
+                        "letter_eligible": True,
+                    },
+                ]
+            }
+        )
+    )
+    profiles = universe.eligible_profiles(path)
+    assert len(profiles) == 1
+    assert next(iter(profiles.values()))["name"] == "Real Capital"
+
+
+def test_published_csv_requires_a_real_snapshot_date():
+    source = {
+        "columns": {"issuer": "Name", "weight_pct": "Weight"},
+        "manager_id": "example",
+        "vehicle_id": "fund",
+        "vehicle_name": "Fund",
+        "url": "https://fund.example/holdings.csv",
+    }
+    with pytest.raises(ValueError, match="as-of date"):
+        disclosures.parse_holdings_csv(b"Name,Weight\nCompany,4.2\n", source)
+
+
+def test_history_ui_contracts():
+    node = shutil.which("node")
+    if not node:
+        pytest.skip("Node runtime required")
+    suite = Path(__file__).with_name("test_investor_history_ui.cjs")
+    result = subprocess.run(
+        [node, "--test", str(suite)], capture_output=True, text=True, check=False
+    )
+    assert result.returncode == 0, result.stdout + result.stderr
+
+
+def test_durable_checkpoint_restores_a_live_wal_database_and_rejects_corruption(
+    tmp_path,
+):
+    cache = tmp_path / "cache"
+    db = archive.connect(cache / "archive.sqlite")
+    archive.store_filing(
+        db,
+        {"accession": "a", "manager_id": "example", "period_end": "2000-12-31"},
+        [{"cusip": "1", "shares": 2}],
+    )
+    (cache / "universe.json").write_text('{"managers":[]}')
+    parts = tmp_path / "parts"
+    manifest = checkpoint.pack(cache, parts, part_bytes=200)
+    assert len(manifest["parts"]) > 1
+    restored = tmp_path / "restored"
+    assert checkpoint.restore(parts, restored)
+    with archive.connect(restored / "archive.sqlite") as other:
+        assert other.execute("select count(*) from filings").fetchone()[0] == 1
+        assert archive.filing_rows(other, "a")[0]["shares"] == 2
+    file = parts / manifest["identity"] / manifest["parts"][0]["name"]
+    file.write_bytes(b"corrupt")
+    with pytest.raises(ValueError, match="checksum"):
+        checkpoint.restore(parts, tmp_path / "broken")
+    db.close()
+
+
+def test_parallel_download_connections_close_after_transactions(tmp_path, monkeypatch):
+    registry = tmp_path / "registry.json"
+    registry.write_text('{"managers":[]}')
+    monkeypatch.setattr(
+        archive,
+        "bulk_urls",
+        lambda: ["https://www.sec.gov/a.zip", "https://www.sec.gov/b.zip"],
+    )
+
+    def fake_download(db, url):
+        with db:
+            db.execute(
+                "INSERT OR REPLACE INTO downloads VALUES(?,?,?,?,?,?)",
+                (url, "digest", 1, "loaded", None, archive.now()),
+            )
+
+    monkeypatch.setattr(archive, "download", fake_download)
+    monkeypatch.setattr(
+        sys,
+        "argv",
+        [
+            "archive",
+            "--download-only",
+            "--workers",
+            "2",
+            "--database",
+            str(tmp_path / "a.sqlite"),
+            "--registry",
+            str(registry),
+        ],
+    )
+    assert archive.main() == 0
+    with archive.connect(tmp_path / "a.sqlite") as db:
+        assert db.execute("select count(*) from downloads").fetchone()[0] == 2
+
+
+def test_public_fund_discovery_requires_principal_adviser_and_keeps_dates(tmp_path):
+    path = tmp_path / "ncen.zip"
+    make_zip(
+        path,
+        {
+            "SUBMISSION.tsv": [
+                {
+                    "ACCESSION_NUMBER": "a",
+                    "CIK": "12",
+                    "REPORT_ENDING_PERIOD": "2020-12-31",
+                }
+            ],
+            "FUND_REPORTED_INFO.tsv": [
+                {
+                    "ACCESSION_NUMBER": "a",
+                    "FUND_ID": "f",
+                    "SERIES_ID": "S1",
+                    "FUND_NAME": "Global Fund",
+                }
+            ],
+            "ADVISER.tsv": [
+                {
+                    "FUND_ID": "f",
+                    "ADVISER_TYPE": "Advisor",
+                    "ADVISER_NAME": "Harris Associates L P",
+                    "ADVISOR_START_DATE": "2019-01-01",
+                    "ADVISOR_TERMINATED_DATE": "N/A",
+                },
+                {
+                    "FUND_ID": "f",
+                    "ADVISER_TYPE": "Subadvisor",
+                    "ADVISER_NAME": "Other Capital",
+                    "ADVISOR_START_DATE": "2018-01-01",
+                    "ADVISOR_TERMINATED_DATE": "N/A",
+                },
+            ],
+        },
+    )
+    rows = public_funds.discover_from_zip(
+        path,
+        [
+            {"manager_id": "harris", "display_name": "Harris Associates L.P."},
+            {"manager_id": "other", "display_name": "Other Capital"},
+        ],
+    )
+    assert len(rows) == 1
+    assert rows[0]["manager_id"] == "harris"
+    assert rows[0]["series_id"] == "S1"
+    assert rows[0]["appointment_start"] == "2019-01-01"
+    assert rows[0]["appointment_end"] == ""
+
+
+def test_pinned_deploy_restores_history_without_private_letter_evidence(
+    tmp_path, monkeypatch
+):
+    cache = tmp_path / "original"
+    db = archive.connect(cache / "archive.sqlite")
+    manager = {"manager_id": "example", "display_name": "Example", "cik": "1"}
+    archive.store_filing(
+        db,
+        {
+            "accession": "a",
+            "manager_id": "example",
+            "cik": "1",
+            "form": "13F-HR",
+            "period_end": "1999-12-31",
+            "filed_at": "2000-02-01",
+        },
+        [{"cusip": "1", "value_usd": 100, "shares": 2, "sh_prn": "SH"}],
+    )
+    db.close()
+    archive.write_json(
+        cache / "universe.json",
+        {"managers": [manager], "source_ids": {"private-fund": "example"}},
+    )
+    archive.write_json(
+        cache / "disclosures.json",
+        {
+            "disclosures": [
+                {
+                    "id": "doc",
+                    "manager_id": "example",
+                    "vehicle_id": "fund",
+                    "source_ref": "private.txt",
+                    "period_end": None,
+                    "disclosed_at": "2020-01-01",
+                    "quarter": "2020Q1",
+                    "source_kind": "fund_disclosure",
+                    "positions": [
+                        {
+                            "issuer": "Foreign Company",
+                            "ticker": "1234.HK",
+                            "evidence_quote": "private original quotation",
+                        }
+                    ],
+                }
+            ]
+        },
+    )
+    vault = tmp_path / "vault"
+    parts = vault / "dashboard-private/investor-history"
+    manifest = checkpoint.pack(cache, parts)
+    receipt = tmp_path / "receipt.json"
+    archive.write_json(receipt, {"identity": manifest["identity"]})
+    monkeypatch.setattr(ownership, "load_cusip_map", dict)
+    monkeypatch.setattr(ownership, "portfolio_universe", lambda: (set(), {}))
+    result = staging.stage(
+        tmp_path / "site", vault=vault, receipt=receipt, cache=tmp_path / "restored"
+    )
+    assert result["identity"] == manifest["identity"]
+    generated = "".join(
+        path.read_text(encoding="utf-8") for path in (tmp_path / "site").rglob("*.json")
+    )
+    assert "1999Q4" in generated and "1234.HK" in generated
+    assert (
+        "private original quotation" not in generated and "private.txt" not in generated
+    )
+    receipt.write_text('{"identity":"' + "0" * 64 + '"}')
+    with pytest.raises(RuntimeError, match="missing"):
+        staging.stage(
+            tmp_path / "missing", vault=vault, receipt=receipt, cache=tmp_path / "new"
+        )
