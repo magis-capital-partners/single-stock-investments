@@ -34,7 +34,7 @@ waterfall/limited-liability treatment and coherent downside scenarios.
 Required structure (all strings below are explanatory placeholders):
 
     {
-      "schema_version":"underwriting-contract/1",
+      "schema_version":"underwriting-contract/2",
       "ticker":"COPY_PACKET_TICKER",
       "as_of":"COPY_PACKET_DATE",
       "packet_hash":"COPY_PACKET_HASH",
@@ -88,7 +88,8 @@ Required structure (all strings below are explanatory placeholders):
           {"id":"cash_ps","op":"divide","args":["normalized_cash","shares"],"unit":"USD per share"}
         ],
         "discount_rate_ref":"discount_rate",
-        "cashflows":[{"year":1,"amount_ref":"cash_ps"},{"year":2,"amount_ref":"cash_ps"}]
+        "cashflows":[{"year":1,"amount_ref":"cash_ps","kind":"distribution"},{"year":2,"amount_ref":"cash_ps","kind":"distribution"}],
+        "terminal":{"type":"finite_life","rationale":"Explain why this claim ends after its final explicit cash flow","evidence_ids":["AN_ACTUAL_PACKET_OBSERVATION_ID"]}
       }]
     }
 
@@ -151,6 +152,193 @@ the dilution checklist and independent challenge.
 
 ## Independent challenger output
 
+## Mandatory economic process (contract/2)
+
+The syntax example above is incomplete until you add ALL the following fields.
+The deterministic compiler rejects an economic narrative disconnected from the
+cash-flow graph. Do not copy assumptions from a famous investor or force a
+positive return. The author remains blind to the current price.
+
+1. Existing returns, incremental returns and deployment capacity are separate.
+   A high accounting ROIC does not establish the return on a new acquisition.
+   Expensed intangibles and old asset costs can distort the denominator. Estimate
+   incremental after-tax earnings / incremental invested capital, not its inverse;
+   reconcile investment lags and the parent-equity versus enterprise boundary.
+2. Current weak cash can be an investment phase or economic deterioration. Test
+   cohort retention, acquisition payback and later cash generation before calling
+   spending growth investment. Do not blindly add it back or deduct it twice.
+3. Model customer value: higher prices can damage retention, incentives or future
+   bargaining power. High current margins alone do not prove a widening moat.
+4. Test competitive supply and capital inflows, not only demand: new capacity,
+   switching, closures, utilization, deployment constraints and industry response.
+5. Equity must survive the path. Funding shortfalls require lower payouts, new
+   financing, asset sales, dilution or an explicit failure state. A higher discount
+   rate does not model bankruptcy. Financial businesses require capital/funding
+   economics; operating OCF is not automatically distributable bank earnings.
+6. Reconcile maintenance, organic growth, acquisitions, dividends, buybacks,
+   retention, net financing, SBC/net dilution and minority claims. Buybacks depend
+   on price; do not forecast share shrinkage as free or pay the same cash twice.
+7. The economic claim determines the method. Finite resources deplete; continuing
+   ownership rights do not guarantee perpetual production. Holding-company assets
+   need upstream cash, taxes and realization. Workouts need timing/failure cases.
+8. Inflation flows through pricing, wages, working capital and replacement cost.
+   Keep nominal/real and currency assumptions consistent. A royalty and its
+   operator need different operating models. Do not import a macro uplift.
+9. Scenarios are coherent causal paths, including correlated shocks and permanent
+   loss. A favorable expected value can coexist with unacceptable ruin risk.
+10. Compare competing hypotheses using evidence that distinguishes them, freeze
+    measurable forward commitments and learn from subsequent operating outcomes.
+    Two sessions agreeing is not proof. Historical trading multiples are context,
+    never valuation floors. A compounder label grants no minimum runway. Scenarios
+    may change capitalization rates only with a distinct, supported pricing-risk
+    mechanism; explain interaction with adverse cash flows to avoid duplicate risk.
+
+Add top-level `economic_analysis` with:
+
+    {
+      "mechanisms": {
+        "earning_power":{"assessment":"...","evidence_ids":["..."],"driver_refs":["..."]},
+        "reinvestment":{"assessment":"...","evidence_ids":["..."],"driver_refs":["..."]},
+        "competitive_response":{"assessment":"...","evidence_ids":["..."],"driver_refs":["..."]},
+        "customer_value":{"assessment":"...","evidence_ids":["..."],"driver_refs":["..."]},
+        "capital_allocation":{"assessment":"...","evidence_ids":["..."],"driver_refs":["..."]},
+        "financing_survival":{"assessment":"...","evidence_ids":["..."],"driver_refs":["..."]},
+        "inflation":{"assessment":"...","evidence_ids":["..."],"driver_refs":["..."]},
+        "realization":{"assessment":"...","evidence_ids":["..."],"driver_refs":["..."]}
+      },
+      "bridges":[{
+        "component_id":"business","year":1,
+        "cash_generation_ref":"cash_after_operating_expenses",
+        "reinvestment_ref":"maintenance_plus_growth_investment",
+        "other_claims_ref":"other_parent_claims",
+        "distributions_ref":"cash_distributed",
+        "buybacks_ref":"buyback_cash",
+        "retained_cash_ref":"cash_retained",
+        "net_financing_ref":"net_cash_from_financing",
+        "share_count_ref":"shares_y1",
+        "liquidity_ref":"available_liquidity_y1",
+        "minimum_liquidity_ref":"minimum_liquidity_y1"
+      }],
+      "hypotheses":[{
+        "id":"durable_growth","explanation":"Causal economic explanation",
+        "evidence_ids":["..."],"counterevidence":"Strongest evidence against it",
+        "discriminating_observation":"Specific future observation distinguishing this explanation"
+      }],
+      "forecast_commitments":[{
+        "id":"next_annual_cash","component_id":"business","metric_ref":"cash_y1",
+        "observation_field":"EXACT packet observation field to compare later",
+        "unit":"USD","period":"ACTUAL future fiscal period end"
+      }],
+      "structural_tests":[{
+        "id":"joint_operating_and_funding_shock","rationale":"Test these assumptions together because...",
+        "assumption_overrides":{"growth":0.01,"refinancing_cost":1000000}
+      },{
+        "id":"shorter_competitive_runway","rationale":"Why a shorter runway is economically possible",
+        "runway_scale":0.5
+      }],
+      "reverse_driver_ref":"AN_ACTUAL_ASSUMPTION_ID"
+    }
+
+The numbers above are SYNTAX EXAMPLES, never economic defaults. Every *_ref must
+name an actual graph node, fact or assumption with the correct unit. There must
+be one bridge for EVERY integer year 1..horizon_years in EVERY component.
+For each case, in whole reporting currency:
+
+    cash_generation + net_financing = reinvestment + other_claims
+        + distributions + buybacks + retained_cash
+    available_liquidity >= minimum_liquidity; diluted shares > 0
+
+The bridge's distributions must equal the component distribution cash flows times
+its same-year ordinary share denominator. A zero currency node can be formed as
+reported_money * 0; do not invent a fact for zero. Cash generation may already
+deduct certain charges, but disclose that boundary and never charge them again.
+EVERY annual bridge additionally requires whole-currency maintenance_ref,
+organic_growth_ref, acquisitions_ref, sbc_funding_ref and residual_claims_ref.
+maintenance + organic_growth + acquisitions must equal reinvestment_ref;
+sbc_funding + residual_claims must equal other_claims_ref. When a charge is already
+embedded in cash generation, its additional funding amount is zero with an explicit
+scope explanation; do not silently classify growth investment as maintenance.
+For operating_dcf, financial_equity and royalty_cashflow, EVERY bridge also needs
+operating_bridge: {revenue_ref, earnings_ref, margin_ref, cash_conversion_ref}.
+Revenue times the declared margin must equal earnings; earnings times cash
+conversion must equal cash_generation_ref. These are parent after-tax/financing
+earnings and a reconciled cash conversion, not enterprise profit mixed with equity
+cash. For other frameworks, supply this bridge or a >=20-character
+not_applicable_reason explaining the nonoperating asset/event claim.
+Capital calls additionally require owner_contributions_ref (whole currency),
+which is an additional cash source and must match negative owner cash flows.
+EVERY bridge also requires opening_share_count_ref and net_share_issuance_ref,
+both in shares. Opening shares must roll from the preceding year's ending shares.
+If buybacks_ref is positive, repurchase_price_ref must name a positive derived
+CURRENCY per share node. Ending shares must equal opening shares + net issuance
+- buyback cash / repurchase price. No free buyback-driven share reduction is
+allowed. Explain and test the assumed repurchase valuation while remaining blind
+to today's quote; cash-equivalent pro-rata distributions with constant shares are
+acceptable when the compensation funding and capital policy justify that basis.
+For fractional-year flows, reconcile them in their containing annual bridge;
+flows may specify share_count_ref when their denominator changes within the year.
+Growth in capital requirements and released capital must be explicit. For banks,
+explain distributable equity capital, regulatory buffers and deposit funding.
+For several components, allocate financing and payouts once, without overlap.
+Any mechanism that is inapplicable needs a >=20-character not_applicable_reason,
+assessment and frozen evidence; an applicable mechanism needs driver_refs.
+
+Provide at least THREE distinct hypotheses, TWO measurable forecast commitments,
+and TWO structural alternatives. Tests may combine assumption_overrides, or vary
+the trusted continuation runway with runway_scale in [0,4]. Override values must
+be inside the declared allowed_range. At least one test should combine the main
+operating and financing/competitive risks; test structural alternatives, not just
+small parameter nudges. For a finite-life claim, use relevant joint assumptions
+instead of a runway test. Use actual future reporting period ends in commitments;
+do not choose as_of + 365 days when the company reports on a different calendar.
+Optional scenario_probabilities must explicitly contain low/base/high and sum to
+one. These weight values, never an arithmetic average of IRRs. Unsupported
+probabilities stay absent. reverse_driver_ref selects a meaningful uncertain
+driver; trusted code adds the price afterward and solves only within its bounds.
+
+Each component requires ONE `terminal` declaration. horizon_years is the holding
+or realization horizon, separate from the subsequent competitive runway:
+
+* `type: reinvestment_fade` for a continuing parent-equity claim. Required fields:
+  earnings_ref (whole-company equity earnings AFTER maintenance, interest, taxes,
+  SBC and outside claims, BEFORE growth reinvestment); share_count_ref;
+  growth_refs (one declared assumption ID per additional competitive-runway year,
+  possibly empty when justified); terminal_growth_ref; return_on_new_equity_ref;
+  capitalization_rate_ref; return_basis: incremental_parent_equity;
+  rationale; evidence_ids. The return and earnings MUST use the same equity basis.
+  Enterprise ROIC/NOPAT requires an explicit enterprise-to-equity reconciliation
+  before this boundary; do not combine enterprise returns with levered cash.
+  Trusted code projects later earnings, deducts growth/return_on_new_equity as
+  reinvestment, then capitalizes mature distributable cash at rate - growth. It
+  discounts all subsequent cash back to the HOLDING date and adds a single exit
+  realization per share. Do not add terminal nodes or an exit cash flow yourself.
+  The growth investment is charged here; it must not also be deducted from the
+  earnings_ref. Mature growth must be below capitalization rate, funded growth
+  cannot exceed incremental return, and no chosen runway follows from a label.
+* `type: finite_life` or `none`: rationale and evidence_ids. Model the claim's
+  complete distributions/capital calls explicitly; no perpetual value is added.
+* `type: asset_realization`: amount_ref (per ordinary share), rationale and
+  evidence_ids. Trusted code adds that specific asset sale/recovery at the holding
+  date. This is for reconciled asset proceeds, not a way to hide a hand-built
+  operating perpetuity. Explain taxes, debt, minorities and who receives cash.
+
+Every explicit cashflows row needs kind: distribution, capital_call or realization.
+Do not manually append realization when using reinvestment_fade or asset_realization.
+
+### Additional mandatory challenger fields (review/2)
+
+Copy diagnostics_hash supplied by trusted code. Add economic_assessments with
+EXACTLY the eight mechanism keys, each {rating: adequate|weak, reason: ...}.
+Add largest_drivers: [{assumption_id, rating: adequate|weak, reason: ...}], covering
+the top THREE one_way_sensitivities. Add structural_test_coverage containing every
+structural-test ID. Add diagnostic_resolutions: [{id, reason}] for EVERY flag in
+economic_diagnostics.flags, including a source-backed explanation and alternatives
+tested. Approval requires every rating adequate and no unresolved flags or invalid
+structural alternatives. If the largest driver is weak, verdict MUST be revise.
+Do not relabel unsupported assumptions as adequate merely to pass validation.
+
+## Independent challenger output (continued)
+
 Work independently from the original packet. Try to falsify the framework,
 normalization, parent/captive financing bridge, working-capital sustainability,
 dilution, terminal assumptions and scenario coherence. Trace the largest value
@@ -159,7 +347,7 @@ scale and business scope. A plausible narrative cannot cure a mismatched claim.
 
 Return:
 
-    {"schema_version":"underwriting-review/1","ticker":"TICKER",
+    {"schema_version":"underwriting-review/2","ticker":"TICKER",
      "packet_hash":"PACKET_HASH","contract_hash":"THE_PROVIDED_CONTRACT_HASH",
      "verdict":"approve OR revise","framework_accepted":true,
      "assumption_coverage":["EVERY ASSUMPTION ID"],

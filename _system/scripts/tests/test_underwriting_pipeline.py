@@ -216,7 +216,7 @@ def company_root(root):
     save(Path('dashboard/data/core.json'), {'tickers': [{'ticker': 'TEST', 'company': 'Test business'}]})
     save(Path('_system/reference/market-data/valuation_quotes/TEST.json'),
          {'quote': sourced_quote(), 'corporate_actions': sourced_market()})
-    save(pipeline.POLICY, {'maximum_companies_per_run': 1, 'maximum_batch_size': 3, 'maximum_author_attempts': 2})
+    save(pipeline.POLICY, {'required_contract_schema': 'underwriting-contract/1', 'maximum_companies_per_run': 1, 'maximum_batch_size': 3, 'maximum_author_attempts': 2})
     save(pipeline.CALL_POLICY, {'default': {'daily_repo_limit': 6, 'per_subject_daily_limit': 2, 'cooldown_hours': 0},
                               'model_ladder': {'default_model': 'cheap', 'frontier_model': 'strong', 'consumers': {
                                   role: {'frontier_reasons': ['company_underwriting']} for role in ('valuation_underwriter', 'valuation_challenger')}}})

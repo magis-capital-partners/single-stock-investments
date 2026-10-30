@@ -62,7 +62,9 @@ def values(row):
 
 
 def _bound_evidence(packet, contract):
-    require(contract.get('schema_version') == 'underwriting-contract/1', 'Unknown underwriting schema')
+    require(contract.get('schema_version') in ('underwriting-contract/1', 'underwriting-contract/2'), 'Unknown underwriting schema')
+    if contract['schema_version'] == 'underwriting-contract/2':
+        require(isinstance(contract.get('economic_analysis'), dict), 'economic_analysis is required')
     require(packet.get('packet_hash') == digest({k: v for k, v in packet.items() if k != 'packet_hash'}), 'Evidence packet changed')
     for key in ('ticker', 'packet_hash', 'evidence_hash', 'as_of'):
         require(contract.get(key) == packet.get(key), 'Evidence binding mismatch: '+key)
@@ -101,6 +103,9 @@ def _bound_evidence(packet, contract):
 def compile_contract(packet, contract):
     """Compile a sealed economic graph into the established proof representation."""
     observations, currency, horizon, evidence_ids = _bound_evidence(packet, contract)
+    original = contract
+    from underwriting_economics import expand_contract, validate_economics
+    contract = expand_contract(contract)
     facts, dimensions, ids = [], {}, set()
     for row in contract.get('facts') or []:
         require(set(row) == {'id', 'observation_id'}, 'Facts may only bind an observation; values cannot be rewritten')
@@ -199,6 +204,13 @@ def compile_contract(packet, contract):
         used.add(rate)
         pairs = []
         roots = [rate]
+        if original.get('schema_version') == 'underwriting-contract/2':
+            analysis = original['economic_analysis']
+            roots += [v for b in analysis.get('bridges', []) if b.get('component_id') == cid
+                      for k, v in b.items() if k.endswith('_ref') and isinstance(v, str)]
+            roots += [v for b in analysis.get('bridges', []) if b.get('component_id') == cid
+                      for k, v in (b.get('operating_bridge') or {}).items() if k.endswith('_ref') and isinstance(v, str)]
+            roots += [f['metric_ref'] for f in analysis.get('forecast_commitments', []) if f.get('component_id') == cid]
         for flow in component.get('cashflows') or []:
             year, amount = flow.get('year'), flow.get('amount_ref')
             require(isinstance(year, (int, float)) and not isinstance(year, bool) and 0 <= year <= horizon, 'Cash flow outside declared horizon')
@@ -235,7 +247,7 @@ def compile_contract(packet, contract):
                  'output_unit': currency+' per share', 'inputs': facts, 'assumptions': assumptions,
                  'calculations': calculations, 'outputs': {c: 'compiled_value' for c in CASES}}
         evaluated = evaluate_calculation_proof(proof)
-        require(evaluated.get('status') == 'valid', 'Calculation proof failed: '+str(evaluated.get('errors')))
+        require(evaluated.get('status') == 'valid', 'Calculation proof failed: '+str(evaluated.get('checks', {}).get('errors') or evaluated.get('errors')))
         for case in CASES:
             totals[case] += evaluated['outputs'][case]
         components.append({'id': cid, 'category': component['category'], 'treatment': 'additive',
@@ -256,21 +268,30 @@ def compile_contract(packet, contract):
     require(inventoried == component_ids, 'Every modeled component needs a material-claim inventory entry')
     require({a['id'] for a in assumptions} <= used, 'Every assumption must affect the economic model')
     require(0 <= totals['low'] <= totals['base'] <= totals['high'], 'Scenarios need ordered nonnegative equity values and an explicit limited-liability treatment')
-    return {'ticker': contract['ticker'], 'as_of': contract['as_of'], 'financial_period': contract['financial_period'],
+    model = {'ticker': contract['ticker'], 'as_of': contract['as_of'], 'financial_period': contract['financial_period'],
             'share_basis': copy.deepcopy(packet['share_basis']), 'method': 'dated_forward_cashflow_schedule_per_share',
             'classification': {'archetype': contract['archetype'], 'rationale': contract['archetype_rationale']},
             'valuation_methodology': {'model_level': 'stock_specific', 'automation': 'independent_underwriting',
                                      'forecast_as_of': contract['as_of'], 'horizon_years': horizon,
                                      'framework': contract['framework'], 'reviewed_as_of': contract['as_of'],
                                      'review_source': contract['ticker']+'/research/underwriting_review.json'},
-            'underwriting': {'contract_hash': digest(contract), 'evidence_hash': contract['evidence_hash'],
+            'underwriting': {'contract_hash': digest(original), 'evidence_hash': contract['evidence_hash'],
                              'packet_hash': packet['packet_hash'], 'framework': contract['framework'],
                              'review_due': contract['review_due'], 'assumptions_count': len(assumptions)},
             'inputs': {}, 'component_valuation_results': {'all_material_components_identified': True, 'additive_components': components}}
+    if original.get('schema_version') == 'underwriting-contract/2':
+        from underwriting_economics import VERSION
+        model['economic_analysis'] = {**copy.deepcopy(original['economic_analysis']), 'currency': currency,
+                                      'holding_horizon_years': horizon,
+                                      'terminal_specs': {c['id']: copy.deepcopy(c['terminal']) for c in original['components']}}
+        model['underwriting']['economic_process_version'] = VERSION
+        validate_economics(original, contract, model, evidence_ids)
+    return model
 
 
-def validate_review(contract, review):
-    require(review.get('schema_version') == 'underwriting-review/1', 'Unknown review schema')
+def validate_review(contract, review, model=None):
+    expected = 'underwriting-review/2' if contract.get('schema_version') == 'underwriting-contract/2' else 'underwriting-review/1'
+    require(review.get('schema_version') == expected, 'Unknown review schema')
     for key in ('ticker', 'packet_hash'):
         require(review.get(key) == contract.get(key), 'Review binding mismatch: '+key)
     require(review.get('contract_hash') == digest(contract), 'Review belongs to another contract')
@@ -283,6 +304,9 @@ def validate_review(contract, review):
     require(isinstance(review.get('findings'), list), 'Review findings required')
     require(not any(f.get('severity') in ('critical', 'major') for f in review['findings']),
             'Material challenge findings remain unresolved')
+    if expected == 'underwriting-review/2':
+        from underwriting_economics import validate_economic_review
+        validate_economic_review(contract, review, model)
 
 
 def model_diagnostics(model):
@@ -312,7 +336,7 @@ def model_diagnostics(model):
                 target['value'] = point
                 evaluated = evaluate_calculation_proof(proof)
                 if evaluated['status'] != 'valid':
-                    errors.extend(evaluated.get('errors') or [])
+                    errors.extend(evaluated.get('checks', {}).get('errors') or evaluated.get('errors') or ['Invalid sensitivity proof'])
                 else:
                     total += evaluated['outputs']['base']
             results.append({'assumption_value': point, 'base_pv': total if not errors else None, 'errors': errors})
@@ -320,11 +344,15 @@ def model_diagnostics(model):
         sensitivities.append({'assumption_id': assumption['id'], 'base_assumption': base,
                               'one_way_tests': results, 'maximum_pv_change': max(impacts) if impacts else None})
     sensitivities.sort(key=lambda r: -(r['maximum_pv_change'] or 0))
-    return {'present_values_in_model_currency': totals, 'components': component_values, 'one_way_sensitivities': sensitivities}
+    result = {'present_values_in_model_currency': totals, 'components': component_values, 'one_way_sensitivities': sensitivities}
+    if model.get('economic_analysis'):
+        from underwriting_economics import economic_diagnostics
+        result['economic_diagnostics'] = economic_diagnostics(model)
+    return result
 
 
 def validate_build(packet, contract, review, build):
-    validate_review(contract, review)
     expected = compile_contract(packet, contract)
+    validate_review(contract, review, expected)
     require(build == expected, 'Builder changed sealed assumptions, facts, timing or model structure')
     return expected

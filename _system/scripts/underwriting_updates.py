@@ -33,6 +33,11 @@ def approved_baseline(root, ticker, vault, packet):
             return None
         previous_packet = read(vault/'valuation-underwriting/packets'/(receipt['packet_hash']+'.json'))
         previous_contract = read(root/ticker/'research/underwriting_contract.json')
-        return change_context(previous_packet, previous_contract, packet)
+        context = change_context(previous_packet, previous_contract, packet)
+        previous_model = read(root/ticker/'research/valuation.json')
+        if previous_model.get('economic_analysis'):
+            from underwriting_economics import grade_commitments
+            context['operating_forecast_feedback'] = grade_commitments(previous_model, packet['observations'], packet['as_of'])
+        return context
     except (ValueError, OSError, KeyError, TypeError):
         return None  # An unverified legacy valuation is never an assumption baseline.

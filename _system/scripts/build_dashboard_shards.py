@@ -156,6 +156,7 @@ _IRR_READINESS_CORE_FIELDS = (
 )
 
 _VALUATION_DECISION_CORE_FIELDS = (
+    "economic_review_status",
     "market_sync",
     "forecast_id",
     "calculation_status",
