@@ -130,6 +130,20 @@ def calculate(ticker, root, as_of, evaluated_at=None):
         forecast['warnings'].append('Automatic operating first-pass model with explicit generic assumptions; not issuer-specific underwriting.')
     forecast['source_model_ref'] = (FUNDAMENTALS/(ticker+'.json')).as_posix() if generated else f'{ticker}/research/valuation.json'
     forecast['source_model_hash'] = semantic_json_sha256(valuation)
+    if valuation.get('economic_analysis') and market.get('underwriting_validation', {}).get('status') == 'verified':
+        from underwriting_economics import economic_diagnostics, pricing_diagnostics
+        forecast['economic_diagnostics'] = economic_diagnostics(valuation)
+        forecast['economic_diagnostics']['pricing'] = pricing_diagnostics(valuation, quote)
+        forecast['economic_review_status'] = 'passed'
+    elif valuation.get('economic_analysis'):
+        forecast['economic_review_status'] = 'unverified'
+    elif valuation.get('underwriting') and read(root/'_system/config/underwriting_policy.json').get('required_contract_schema', 'underwriting-contract/2') == 'underwriting-contract/2':
+        forecast['economic_review_status'] = 'reproducible_only'
+        if forecast['status'] == 'available':
+            forecast['audit_only_forward_irr_pct'] = forecast['forward_irr_pct']
+            forecast.update(status='economic_review_required', forward_irr_pct=dict.fromkeys(('low', 'base', 'high')),
+                            buy_prices=[], next_action='automatic_economic_underwriting_refresh')
+            forecast['gaps'].append({'code': 'economic_review_required'})
     if forecast.get('underwriting'):
         from valuation_method_router import route_valuation
         forecast['method_profile'] = route_valuation(copy.deepcopy(valuation))['profile_id']
@@ -244,7 +258,12 @@ def refresh_missing_model_inputs(ticker, row, root, as_of, registry):
              'collected_at': collected_at or data.get('attempted_at'),
              'latest_report': data.get('latest_report') or prior.get('latest_report'),
              'financial_hash': financial_hash, 'last_collected': as_of, 'fx': data.get('fx'), 'errors': data.get('errors') or []}
+    if prior.get('underwriting_related_issuers'):
+        saved['underwriting_related_issuers'] = prior['underwriting_related_issuers']
     write_json_if_changed(path, saved, volatile_keys={'retrieved_at'})
+    if (read(root/ticker/'research/valuation.json').get('underwriting') or {}).get('related_issuers'):
+        from underwriting_related_evidence import refresh_related_sources
+        refresh_related_sources(root,ticker,as_of)
 
 
 def financial_signature(data, cached):
@@ -333,7 +352,7 @@ def collection_summary(root, tickers):
 def audit_snapshot(forecast):
     fields = ('status', 'forecast_hash', 'calculation_id', 'source_model_hash', 'model_basis', 'gaps',
               'model_present_value_per_share', 'present_value_today_per_share', 'forward_irr_pct',
-              'financial_period', 'assumptions_as_of', 'underwriting')
+              'financial_period', 'assumptions_as_of', 'underwriting', 'economic_review_status')
     return {**{k: forecast.get(k) for k in fields}, 'market_sync': {
         k: (forecast.get('market_sync') or {}).get(k) for k in
         ('status', 'basis_id', 'price_as_of', 'financial_period', 'model_as_of', 'latest_report', 'valid_until')}}

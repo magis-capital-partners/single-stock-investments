@@ -13,6 +13,19 @@ const rw = context.ResearchWorkspace;
 const escapeHtml = s => String(s ?? '').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 const h = {escapeHtml,quoteUnitsOf:()=>({}),fmtQuote:n=>n==null?'—':`EUR ${n}`,linkHtml:(url,label)=>`<a href="${escapeHtml(url)}">${escapeHtml(label)}</a>`};
 const metric = {...{metric:'revenue',label:'Revenue',display:true,tier:'primary',latest_period:'2026-06-30',level_latest:25,growth_latest:.25,basis:'yoy',points:[{period:'2025-06-30',value:20},{period:'2026-06-30',value:25}]}};
+
+test('economic assumptions reach the live shared-forecast view and stale prices hide attribution',()=>{
+ const t={valuation_decision:{research_return_available:true,calculation_status:'available',forward_return_at_price_pct:{base:12},market_sync:liveSync},
+  shared_forecast:{status:'available',economic_review_status:'passed',forward_irr_pct:{base:12},market_sync:liveSync,buy_prices:[],
+   economic_diagnostics:{bridges_reconciled:5,pricing:{cases:{base:{flat_cash_return_pct:3,cash_growth_effect_pp:10,valuation_change_effect_pp:-1,irr_pct:12}},reverse_expectations:{driver_ref:'growth',unit:'ratio',status:'solved',implied_value:.15}},
+    hypotheses:[{explanation:'<script>bad</script>',discriminating_observation:'Retention reveals the mechanism.'}],structural_tests:[],forecast_commitments:[]}}};
+ const html=rw.irrReadiness(t,h);
+ assert.match(html,/Valuation change contribution/);assert.match(html,/Price-implied growth/);assert.match(html,/15\.00%/);
+ assert.match(html,/&lt;script&gt;/);assert.doesNotMatch(html,/<script>/);
+ t.valuation_decision.market_sync={status:'verified',valid_until:'2020-01-01'};
+ const stale=rw.irrReadiness(t,h);
+ assert.doesNotMatch(stale,/Valuation change contribution/);assert.doesNotMatch(stale,/Price-implied growth/);
+});
 test('null, blank and non-finite observations never become zero',()=>{
  for(const value of [null,undefined,'',false,true,NaN,Infinity,'bad',[],{}]) assert.equal(rw.number(value),null);
  assert.equal(rw.number(0),0);

@@ -62,6 +62,8 @@ def requested_keywords(gaps):
         if not terms:
             terms = [w.lower() for w in re.findall(r'[A-Za-z]{4,35}', str(gap.get('code') or '')+' '+detail)
                      if w.lower() not in excluded]
+        notes = ['note '+n for n in re.findall(r'\bNote\s+(\d{1,2})\b', detail, re.I)]
+        terms = notes+terms
         groups.append(list(dict.fromkeys(terms))[:12])
     terms = []
     for index in range(12):
@@ -101,12 +103,23 @@ def document_record(url, raw, focus_keywords=()):
         if len(contexts) >= 30:
             break
     body = text_of(source)
+    budget = 350000 if focus else 150000
     def add_context(text):
         nonlocal size
-        if text and text not in seen and size+len(text) <= 150000:
+        if text and text not in seen and size+len(text) <= budget:
             contexts.append(text)
             seen.add(text)
             size += len(text)
+    # Note requests need the disclosure, not a table-of-contents hit or a small
+    # keyword window. Keep bounded complete sections with original source text.
+    for phrase in focus:
+        if not re.fullmatch(r'note \d{1,2}', phrase):
+            continue
+        number = phrase.split()[-1]
+        matches = list(re.finditer(r'\bNote\s+'+number+r'\b\s*[.:-]?', body, re.I))
+        matches.sort(key=lambda m: (bool(re.search(r'[.:-]',m.group())), bool(re.match(r'\s*[A-Z]',body[m.end():m.end()+20])),m.start()),reverse=True)
+        for match in matches[:2]:
+            add_context(body[max(0,match.start()-200):match.start()+22000])
     # Business economics and risks are not limited to financial tables.
     defaults = ('our business', 'business overview', 'competition', 'working capital',
                    'liquidity', 'regulatory capital', 'credit', 'clinical', 'inventory', 'warrant', 'dilution',
@@ -183,6 +196,15 @@ def source_fingerprint(root, ticker):
     kpis = {'points': points} if points else {}
     payload = {'facts': fingerprint_facts(source), 'primary_observations': source.get('primary_observations') or [],
                'latest_report': source.get('latest_report'), 'operating_kpis': kpis}
+    related = source.get('underwriting_related_issuers') or (read(root/ticker/'research/valuation.json').get('underwriting') or {}).get('related_issuers') or {}
+    if related:
+        payload['related_issuers'] = {}
+        for symbol,metadata in related.items():
+            if not re.fullmatch(r'[A-Za-z0-9][A-Za-z0-9._-]{0,30}',symbol):
+                continue
+            cached = read(root/'_system/reference/market-data/valuation_related_evidence'/(symbol+'.json'))
+            payload['related_issuers'][symbol] = {'source_hash':cached.get('source_hash') or metadata.get('source_hash'),
+                                                 'status':cached.get('status','ready')}
     if source.get('latest_disclosure'):
         payload['latest_disclosure'] = source['latest_disclosure']
     return semantic_json_sha256(payload,
@@ -485,5 +507,7 @@ def supplemental_observations(packet, rows):
         out.append({'id': row['id'], 'value': raw*scale, 'unit': row['unit'], 'period': period,
                     'source_url': source['source_url'], 'source_kind': 'primary', 'field': row.get('field') or 'supplemental',
                     'locator': row['locator'], 'scope': row['scope'], 'measurement_type': row['measurement_type'], 'document_hash': source['content_hash']})
+        if source.get('issuer_ticker'):
+            out[-1]['issuer_ticker'] = source['issuer_ticker']
         known.add(row['id'])
     return out

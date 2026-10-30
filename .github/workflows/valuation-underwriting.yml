@@ -79,14 +79,15 @@ jobs:
           include-source-archive: 'false'
       - name: Verify underwriting gates before calling a model
         run: |
-          python -m pytest -q _system/scripts/tests/test_underwriting_pipeline.py
+          python -m pytest -q _system/scripts/tests/test_underwriting_pipeline.py _system/scripts/tests/test_underwriting_economics.py
       - name: Verify local judgment policy and deterministic assembly
         timeout-minutes: 2
         run: |
           python - <<'PY'
           import sys
           sys.path.insert(0, '_system/scripts')
-          from underwriting_pipeline import ROOT, stage_model
+          from underwriting_pipeline import ROOT, POLICY, read, stage_model
+          assert read(ROOT/POLICY)['required_contract_schema'] == 'underwriting-contract/2'
           for role in ('author', 'challenger'):
               assert stage_model(ROOT, role) == {'id':'gpt-6.1-sol','reasoning_effort':'high','provider':'codex-local'}
           assert stage_model(ROOT, 'builder')['provider'] == 'deterministic'

@@ -58,9 +58,12 @@ def now():
 
 
 def economic_hash(value):
-    return digest({k: value.get(k) for k in ('ticker', 'as_of', 'financial_period', 'share_basis',
+    keys = ('ticker', 'as_of', 'financial_period', 'share_basis',
                                            'method', 'classification', 'valuation_methodology',
-                                           'underwriting', 'inputs', 'component_valuation_results')})
+                                           'underwriting', 'inputs', 'component_valuation_results')
+    if 'economic_analysis' in value:
+        keys += ('economic_analysis',)
+    return digest({k: value.get(k) for k in keys})
 
 
 def input_fingerprint(root, ticker):
@@ -70,7 +73,7 @@ def input_fingerprint(root, ticker):
 def processing_version(root):
     paths = [CALL_POLICY, POLICY, Path('_system/prompts/valuation_underwriting.md')]
     paths += [Path('_system/scripts')/name for name in ('underwriting_pipeline.py', 'underwriting_contract.py',
-                                                      'underwriting_evidence.py', 'underwriting_transport.py', 'underwriting_updates.py', 'underwriting_codex.py',
+                                                      'underwriting_evidence.py', 'underwriting_related_evidence.py', 'underwriting_economics.py', 'underwriting_transport.py', 'underwriting_updates.py', 'underwriting_codex.py',
                                                       'valuation_market_sync.py', 'valuation_earnings.py', 'autonomous_compounders.py',
                                                       'refresh_shared_forecasts.py', 'private_dashboard_assets.py')]
     return digest({str(p): (root/p).read_text(encoding='utf-8') if (root/p).is_file() else None for p in paths})
@@ -83,6 +86,8 @@ def receipt_status(root, ticker, audit, as_of):
     value = read(root/ticker/'research/valuation.json')
     if receipt.get('model_hash') != economic_hash(value):
         return 'model_changed'
+    if read(root/POLICY).get('required_contract_schema', 'underwriting-contract/2') == 'underwriting-contract/2' and not value.get('economic_analysis'):
+        return 'economic_review_required'
     if any(g.get('code') == 'underwriting_contract_unverified' for g in audit.get('gaps') or []):
         return 'underwriting_validation_failed'
     if receipt.get('input_fingerprint') != input_fingerprint(root, ticker):
@@ -110,6 +115,7 @@ def build_queue(root=ROOT, as_of=None, states=None):
         audit, state = companies.get(ticker) or {}, states.get(ticker) or {}
         status = receipt_status(root, ticker, audit, as_of)
         if (status != 'reviewed' and state.get('status') == 'approved_for_build'
+                and state.get('processing_version') == version
                 and state.get('input_fingerprint') == input_fingerprint(root, ticker)
                 and state.get('review_due', '') >= as_of):
             status = 'waiting_for_build'
@@ -247,10 +253,17 @@ def apply_validated(root, packet, contract, review, build, receipts, vault):
         universe,
     )
     from valuation_forecast import build_forecast
+    require(contract.get('schema_version') == read(root/POLICY).get('required_contract_schema', 'underwriting-contract/2'),
+            'Current economic underwriting process is required before publication')
     expected = validate_build(packet, contract, review, build)
     require(set(receipts) == set(STAGES), 'All three provider stage receipts are required')
     validate_stage_receipts(receipts, build)
     ticker = packet['ticker']
+    if packet.get('related_issuers'):
+        related_path = root/'_system/reference/market-data/valuation_fundamentals'/(ticker+'.json')
+        related_inputs = read(related_path)
+        related_inputs['underwriting_related_issuers'] = packet['related_issuers']
+        write(related_path,related_inputs)
     registry = read(root/'_system/portfolio/registry.json').get('holdings') or {}
     refresh_missing_model_inputs(ticker, universe(root)[ticker], root, today(), registry)
     require(not packet.get('input_fingerprint') or packet['input_fingerprint'] == input_fingerprint(root, ticker),
@@ -275,6 +288,18 @@ def apply_validated(root, packet, contract, review, build, receipts, vault):
                'contract_hash': digest(contract), 'review_hash': digest(review), 'model_hash': economic_hash(expected),
                'stages': receipts, 'input_fingerprint': input_fingerprint(root, ticker),
                'requires_human_review': False, 'capital_actionable': False}
+    if expected.get('economic_analysis'):
+        from underwriting_economics import VERSION, economic_diagnostics, grade_commitments, merge_grades, pricing_diagnostics
+        diagnostics = economic_diagnostics(expected)
+        diagnostics['pricing'] = pricing_diagnostics(expected, cached.get('quote'))
+        receipt.update(economic_process_version=VERSION, reproducibility_status='passed', economic_validation_status='passed',
+                       diagnostics_hash=digest(model_diagnostics(expected)), economic_report_hash=digest(diagnostics))
+        outcomes = read(root/ticker/'research/underwriting_outcomes.json').get('models') or []
+        for item in outcomes:
+            item['results'] = merge_grades(item.get('results') or [], grade_commitments(item['model'], packet['observations'], packet['as_of']))
+        if not any(item.get('contract_hash') == digest(contract) for item in outcomes):
+            outcomes.append({'contract_hash': digest(contract), 'model': expected, 'results': grade_commitments(expected, packet['observations'], packet['as_of'])})
+        outcome_doc = {'schema_version': 'underwriting-outcomes/1', 'ticker': ticker, 'as_of': packet['as_of'], 'models': outcomes}
     research = root/ticker/'research'
     from universal_valuation_contract import build_universal_valuation_contract
     from valuation_method_router import route_valuation
@@ -289,6 +314,9 @@ def apply_validated(root, packet, contract, review, build, receipts, vault):
     write(research/'valuation_contract.json', universal)
     write(research/'valuation_route.json', route_valuation(copy.deepcopy(expected)))
     write(research/'valuation.json', expected)
+    if expected.get('economic_analysis'):
+        write(research/'underwriting_outcomes.json', outcome_doc)
+        write(research/'underwriting_diagnostics.json', diagnostics)
     return receipt
 
 
@@ -305,6 +333,9 @@ def validate_saved(root, ticker, vault):
     validate_build(packet, contract, review, model)
     require(receipt.get('contract_hash') == digest(contract) and receipt.get('review_hash') == digest(review)
             and receipt.get('model_hash') == economic_hash(model), 'Saved underwriting hashes do not reconcile')
+    if model.get('economic_analysis'):
+        require(receipt.get('economic_report_hash') == digest(read(research/'underwriting_diagnostics.json')),
+                'Saved economic report changed or is missing')
     require(set(receipt.get('stages') or {}) == set(STAGES)
             and all(r.get('stage') == s and r.get('status') == 'finished' for s, r in receipt['stages'].items()),
             'Provider stage roles are incomplete')
@@ -326,8 +357,8 @@ def validate_stage_receipts(receipts, model, *, legacy=False):
 
 def compiled_build(packet, contract, review):
     """An approved graph is already executable; assembly needs no inference."""
-    validate_review(contract, review)
     model = compile_contract(packet, contract)
+    validate_review(contract, review, model)
     validate_build(packet, contract, review, model)
     return model, {'stage': 'builder', 'provider': 'deterministic', 'model': 'underwriting-compiler/1',
                    'status': 'finished', 'model_hash': digest(model), 'contract_hash': digest(contract),
@@ -335,8 +366,9 @@ def compiled_build(packet, contract, review):
 
 
 def challenge_payload(packet, author, canonical):
+    diagnostics = model_diagnostics(canonical)
     return {'packet': packet, 'contract': author, 'contract_hash': digest(author),
-            'deterministic_value_driver_tests': model_diagnostics(canonical)}
+            'deterministic_value_driver_tests': diagnostics, 'diagnostics_hash': digest(diagnostics)}
 
 
 def revision_feedback(author, challenger, error):
@@ -357,8 +389,9 @@ def load_progress(root, work, ticker, packet):
     """Resume sealed work, including paid receipts from before checkpoints existed."""
     scope = digest({'packet_hash': packet['packet_hash'],
                     'instructions': (root/'_system/prompts/valuation_underwriting.md').read_text(encoding='utf-8'),
-                    'compiler': digest((root/'_system/scripts/underwriting_contract.py').read_text(encoding='utf-8'))
-                                if (root/'_system/scripts/underwriting_contract.py').is_file() else None,
+                    'compiler': digest({name: (root/'_system/scripts'/name).read_text(encoding='utf-8')
+                                        if (root/'_system/scripts'/name).is_file() else None
+                                        for name in ('underwriting_contract.py', 'underwriting_economics.py')}),
                     'models': {s: stage_model(root, s) for s in STAGES}})
     saved = read(work/'progress'/(ticker+'.json'))
     if saved.get('scope') == scope:
@@ -385,7 +418,7 @@ def load_progress(root, work, ticker, packet):
             expected = stage_hash(root, 'challenger', challenge_payload(packet, author, canonical))
             if challenger_receipt['input_hash'] != expected:
                 continue
-            validate_review(author, challenger)
+            validate_review(author, challenger, canonical)
         except ContractError as exc:
             result['feedback'] = revision_feedback(author, challenger, exc)
             result['history'].append({'contract_hash': digest(author), 'findings': challenger.get('findings') or [],
@@ -402,8 +435,9 @@ def load_progress(root, work, ticker, packet):
 
 def save_handoff(root, vault, packet, approved):
     author, review = approved['author'], approved['review']
-    validate_review(author, review)
-    require(digest(compile_contract(packet, author)) == approved['canonical_hash'], 'Handoff compiler binding changed')
+    canonical = compile_contract(packet, author)
+    validate_review(author, review, canonical)
+    require(digest(canonical) == approved['canonical_hash'], 'Handoff compiler binding changed')
     payload = {'schema_version': 'underwriting-handoff/1', 'ticker': packet['ticker'], 'packet': packet,
                'contract': author, 'review': review, 'receipts': approved['receipts']}
     identity = digest(payload)
@@ -423,8 +457,8 @@ def validate_handoff(root, payload, identity):
     require(digest(payload) == identity and payload.get('schema_version') == 'underwriting-handoff/1', 'Handoff hash changed')
     packet, author, review = payload['packet'], payload['contract'], payload['review']
     require(payload['ticker'] == packet['ticker'] == author['ticker'], 'Handoff issuer binding changed')
-    validate_review(author, review)
     canonical = compile_contract(packet, author)
+    validate_review(author, review, canonical)
     receipts = payload['receipts']
     require(set(receipts) == {'author', 'challenger'}, 'Handoff needs both judgment receipts')
     for stage, receipt in receipts.items():
@@ -448,8 +482,13 @@ def run_company(root, work, ticker, as_of, state, vault, *, prepare=prepare_pack
         prepare = lambda *args: packet
     else:
         approved = None
+    if prepare is prepare_packet and state.get('evidence_requests'):
+        state['evidence_keywords'] = requested_keywords(state['evidence_requests'])
     packet = (prepare(root, ticker, as_of, focus_keywords=state.get('evidence_keywords') or [])
               if prepare is prepare_packet else prepare(root, ticker, as_of))
+    if prepare is prepare_packet and state.get('evidence_requests'):
+        from underwriting_related_evidence import augment_requested_targets
+        packet = augment_requested_targets(root,packet,state['evidence_requests'],as_of)
     readiness = packet.get('readiness') or {}
     if readiness.get('status') == 'evidence_gap':
         state['evidence_readiness'] = readiness
@@ -486,7 +525,7 @@ def run_company(root, work, ticker, as_of, state, vault, *, prepare=prepare_pack
                 author_receipt, challenger_receipt = (approved['receipts'][s] for s in ('author', 'challenger'))
                 canonical = compile_contract(packet, author)
                 require(digest(canonical) == approved['canonical_hash'], 'Compiler changed after independent approval')
-                validate_review(author, challenger)
+                validate_review(author, challenger, canonical)
             else:
                 payload = {'packet': packet, 'revision_feedback': feedback}
                 if baseline:
@@ -501,6 +540,8 @@ def run_company(root, work, ticker, as_of, state, vault, *, prepare=prepare_pack
                     state['evidence_keywords'] = keywords
                     if prepare is prepare_packet and keywords:
                         repaired = prepare(root, ticker, as_of, focus_keywords=keywords)
+                        from underwriting_related_evidence import augment_requested_targets
+                        repaired = augment_requested_targets(root,repaired,gaps,as_of)
                         if repaired['evidence_hash'] != packet['evidence_hash'] and repaired.get('readiness', {}).get('status') != 'evidence_gap':
                             packet = repaired
                             write(work/'packets'/(packet['packet_hash']+'.json'), packet)
@@ -511,10 +552,12 @@ def run_company(root, work, ticker, as_of, state, vault, *, prepare=prepare_pack
                             checkpoint()
                             continue
                     raise StageBlocked('primary_evidence_gap: '+json.dumps(gaps)[:1200])
+                require(author.get('schema_version') == read(root/POLICY).get('required_contract_schema', 'underwriting-contract/2'),
+                        'Author must use the current economic underwriting contract')
                 canonical = compile_contract(packet, author)
                 challenger, challenger_receipt = call_stage(root, work, ticker, 'challenger',
                     challenge_payload(packet, author, canonical), state, execute=execute)
-                validate_review(author, challenger)
+                validate_review(author, challenger, canonical)
                 progress['approved'] = {'author': author, 'review': challenger, 'canonical_hash': digest(canonical),
                                         'receipts': {'author': author_receipt, 'challenger': challenger_receipt}}
                 progress['feedback'] = None
@@ -583,11 +626,14 @@ def run_batch(root=ROOT, *, limit=None, tickers=None, launch=False, work=None, v
             receipt = read(root/str(ticker)/'research/underwriting_receipt.json')
             if receipt.get('status') == 'validated' and receipt.get('contract_hash') == pointer.get('contract_hash'):
                 continue
+            payload = read(vault/'valuation-underwriting/handoffs'/(identity+'.json'))
+            if (payload.get('contract') or {}).get('schema_version') != read(root/POLICY).get('required_contract_schema', 'underwriting-contract/2'):
+                continue
             state = states.get(ticker) or {}
             if (state.get('handoff_hash') == identity and state.get('processing_version') == processing_version(root)
                     and (state.get('retry_after') or '') > as_of):
                 continue
-            handoffs[ticker] = (identity, read(vault/'valuation-underwriting/handoffs'/(identity+'.json')))
+            handoffs[ticker] = (identity, payload)
         candidates = [{'ticker':t} for t in handoffs][:limit]
     result = {'schema_version': 'underwriting-batch/1', 'as_of': as_of, 'started_at': now(),
               'selected': [r['ticker'] for r in candidates], 'completed': [], 'approved': [], 'blocked': [], 'launched': launch, 'phase': phase}

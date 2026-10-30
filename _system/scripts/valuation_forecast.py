@@ -432,6 +432,7 @@ def attach_forecast(row, forecast, *, detailed=True):
         if forecast.get('underwriting_archetype'):
             row.setdefault('classification', {})['archetype'] = forecast['underwriting_archetype']
     decision.update({'forecast_id': forecast.get('calculation_id') or forecast.get('forecast_hash'), 'calculation_status': forecast['status'],
+                     'economic_review_status': forecast.get('economic_review_status'),
                      'research_return_available': forecast['status'] == 'available',
                      'calculation_reason': '; '.join(dict.fromkeys(g['code'] for g in forecast.get('gaps') or [])),
                      'forward_return_at_price_pct': forecast['forward_irr_pct'],

@@ -103,6 +103,9 @@ def test_revised_old_facts_invalidate_the_receipt_but_quote_and_clock_changes_do
     from test_shared_valuation_forecast import model, sourced_market, sourced_quote
     from underwriting_evidence import source_fingerprint
     current = model()
+    # This test isolates freshness of archived v1 economics. Production requires
+    # v2, whose complete publication path is exercised below.
+    save(tmp_path, underwriting_pipeline.POLICY, {'required_contract_schema': 'underwriting-contract/1'})
     current['underwriting'] = {'contract_hash': 'bound', 'review_due': '2027-01-24'}
     save(tmp_path, 'TEST/research/valuation.json', current)
     save(tmp_path, '_system/reference/market-data/valuation_quotes/TEST.json',
@@ -167,15 +170,22 @@ def test_scheduled_refresh_declares_every_input_needed_to_validate_a_real_approv
     import underwriting_pipeline as pipeline
     import refresh_shared_forecasts as refresh
     import vault_paths
-    from test_underwriting_pipeline import company_root, contract, mock_stages
+    from test_underwriting_pipeline import company_root
+    from test_underwriting_economics import economic_contract, economic_review
+    from underwriting_contract import compile_contract
     source, checkout, vault = tmp_path/'source', tmp_path/'checkout', tmp_path/'vault'
     company_root(source)
+    pipeline.write(source/pipeline.POLICY, {'required_contract_schema': 'underwriting-contract/2'})
     monkeypatch.setattr(pipeline, 'today', lambda: '2026-10-26')
     monkeypatch.setattr(refresh, 'refresh_quote', lambda *args, **kwargs: None)
     monkeypatch.setattr(refresh, 'refresh_missing_model_inputs', lambda *args: None)
     monkeypatch.setattr(vault_paths, 'research_vault_root', lambda: vault)
+    c = economic_contract()
+    def execute(stage, payload, output, receipt_path):
+        pipeline.write(output,c if stage == 'author' else economic_review(c,compile_contract(packet(),c)))
+        pipeline.write(receipt_path, {'agent_id':stage+'-v2','run_id':stage+'-v2','status':'finished'})
     result = pipeline.run_batch(source, launch=True, work=tmp_path/'work', vault=vault,
-                                prepare=lambda *args: packet(), execute=mock_stages(contract(), []))
+                                prepare=lambda *args: packet(), execute=execute)
     assert result['completed'] == ['TEST']
     workflow = Path(__file__).resolve().parents[3]/'.github/workflows/autonomous-compounders.yml'
     steps = yaml.safe_load(workflow.read_text(encoding='utf-8'))['jobs']['refresh']['steps']
@@ -190,3 +200,4 @@ def test_scheduled_refresh_declares_every_input_needed_to_validate_a_real_approv
     forecast = refresh.calculate('TEST', checkout, '2026-10-26')
     assert forecast['status'] == 'available', forecast['gaps']
     assert forecast['model_basis'] == 'independent_underwriting'
+    assert forecast['economic_review_status'] == 'passed'

@@ -113,6 +113,7 @@
 
   function forecastGapLabel(reason) {
     const labels = {
+      economic_review_required:'Economic assumptions need the updated independent review.',
       realization_timing_missing:'Asset or business cash flows need a realization date.',
       annual_operating_cash_flow_missing:'Annual operating cash flow is unavailable.',
       annual_capex_missing:'Annual capital spending is unavailable.',
@@ -349,6 +350,36 @@
     </div>`;
   }
 
+  function renderEconomicDiagnostics(t, helpers) {
+    const d = t.shared_forecast?.economic_diagnostics;
+    if (!d || t.shared_forecast?.economic_review_status !== 'passed') return '';
+    const esc = helpers.escapeHtml;
+    const number = (v) => v == null || !Number.isFinite(Number(v)) ? '—' : Number(v).toFixed(2);
+    const pricing = displayReturn(t).pct == null ? {} : d.pricing || {};
+    const base = pricing.cases?.base || {};
+    const bridge = base.flat_cash_return_pct == null ? '' : `<table class="workbench-table"><tbody>
+      <tr><th>Flat cash, unchanged valuation</th><td>${number(base.flat_cash_return_pct)}%</td></tr>
+      <tr><th>Cash growth contribution</th><td>${number(base.cash_growth_effect_pp)} percentage points</td></tr>
+      <tr><th>Valuation change contribution</th><td>${number(base.valuation_change_effect_pp)} percentage points</td></tr>
+      <tr><th>Modeled forward return</th><td>${number(base.irr_pct)}%</td></tr>
+      </tbody></table><p class="tier-sub">Sequential return scenarios: flat cash, forecast cash at unchanged valuation, then modeled exit valuation. Attribution depends on this order.</p>`;
+    const reverse = pricing.reverse_expectations;
+    const implied = reverse?.unit === 'ratio' ? number(reverse.implied_value*100)+'%' : number(reverse?.implied_value);
+    const expectations = reverse ? `<p><strong>Price-implied ${esc(String(reverse.driver_ref).replace(/_/g, ' '))}:</strong> ${reverse.status === 'solved' ? implied : esc(String(reverse.status).replace(/_/g, ' '))}<span class="tier-sub"> · within declared evidence bounds</span></p>` : '';
+    const tests = (d.structural_tests || []).map(x => `<tr><td>${esc(x.rationale || x.id)}</td><td>${x.values ? number(x.values.base) : 'incomplete'}</td></tr>`).join('');
+    const hypotheses = (d.hypotheses || []).map(x => `<li><strong>${esc(x.explanation)}</strong><br>${esc(x.discriminating_observation)}</li>`).join('');
+    const commitments = (d.forecast_commitments || []).map(x => `<tr><td>${esc(x.observation_field)}</td><td>${esc(x.period)}</td><td>${number(x.values?.low)} / ${number(x.values?.base)} / ${number(x.values?.high)} ${esc(x.unit)}</td></tr>`).join('');
+    const allocations = (d.annual_bridges || []).map(x => { const b=x.cases?.base||{}; return `<tr><td>${esc(x.component_id)} · ${Number(x.year)}</td>${['cash_generation','maintenance','organic_growth','acquisitions','sbc_funding','distributions','retained_cash'].map(k=>`<td>${number(b[k] == null ? null : b[k]/1e6)}</td>`).join('')}</tr>`; }).join('');
+    return `<div class="card" data-economic-review="passed"><h3>Economic assumptions and return drivers</h3>
+      <p>Cash sources, capital allocation and liquidity reconcile across ${Number(d.bridges_reconciled || 0)} annual component bridges. Independent economic review passed; forecasts remain uncertain.</p>
+      ${bridge}${expectations}
+      ${allocations ? `<details><summary>Annual cash allocation</summary><p class="tier-sub">Base case, millions of ${esc(d.currency)}. Compensation funding includes only amounts not already deducted from cash generation.</p><div style="overflow-x:auto"><table class="workbench-table"><thead><tr><th>Year</th><th>Cash generated</th><th>Maintenance</th><th>Organic growth</th><th>Acquisitions</th><th>Compensation</th><th>Distributions</th><th>Retained</th></tr></thead><tbody>${allocations}</tbody></table></div></details>` : ''}
+      ${tests ? `<details><summary>Structural alternatives</summary><table class="workbench-table"><thead><tr><th>Alternative</th><th>Base value per share</th></tr></thead><tbody>${tests}</tbody></table></details>` : ''}
+      ${hypotheses ? `<details><summary>Competing explanations and observations to watch</summary><ul>${hypotheses}</ul></details>` : ''}
+      ${commitments ? `<details><summary>Operating forecasts to check later</summary><table class="workbench-table"><thead><tr><th>Metric</th><th>Period</th><th>Low / base / high</th></tr></thead><tbody>${commitments}</tbody></table></details>` : ''}
+      </div>`;
+  }
+
   function renderValuationWorkbench(t, helpers) {
     const { escapeHtml, fmtNum, fmtPct, fmtSignedDollar, linkHtml } = helpers;
     // Per-share figures below are quoted in this listing's currency, not USD.
@@ -356,7 +387,7 @@
     const fmtQuote = (v, d) => helpers.fmtQuote(v, units, d);
     const fmtSignedQuote = (v) => helpers.fmtSignedQuote(v, units);
     const wb = t.valuation_workbench;
-    if (!wb) return '';
+    if (!wb) return renderEconomicDiagnostics(t, helpers);
     const published = decisionOf(t);
     const decision = wb.decision || {};
     const business = wb.business || {};
@@ -465,7 +496,7 @@
         </div>
       </div>`).join('');
 
-    const decisionPage = `
+    const decisionPage = `${renderEconomicDiagnostics(t, helpers)}
       <div class="metric-grid metric-grid-3">
         <div class="metric"><div class="k">Model readiness</div><div class="v"><span class="badge ${readiness.cls}">${escapeHtml(readiness.label)}</span></div></div>
         <div class="metric"><div class="k">Price / PV today</div><div class="v mono">${fmtQuote(published.price_per_share ?? decision.price_per_share)} / ${fmtQuote(published.present_value_today_per_share?.base ?? published.value_per_share?.base ?? decision.value_per_share?.base)}</div></div>
@@ -813,6 +844,7 @@
     renderPriceToBaseCell,
     renderDecisionStrip,
     renderValuationWorkbench,
+    renderEconomicDiagnostics,
     renderLegacyComponentNote,
     renderPropertiesPanel,
     renderQueuePanel,

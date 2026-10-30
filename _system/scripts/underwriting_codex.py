@@ -98,9 +98,13 @@ def execute_stage(*, model, effort, stage, prompt_path, output_path, receipt_pat
                         ('command_execution', 'file_change', 'mcp_tool_call', 'web_search') for r in rows)
         receipt['status'] = ('timeout_cancel_requested' if timed_out else
                              'finished' if code == 0 and finished and receipt['agent_id'] and not forbidden else 'failed')
+        if receipt['status'] != 'finished':
+            receipt['failure_events'] = [r for r in rows if r.get('type') in ('error', 'turn.failed')][-3:]
+            receipt['process_exit_code'] = code
         receipt['finished_at'] = datetime.now(timezone.utc).isoformat()
         write(receipt_path, receipt)
-        require(receipt['status'] == 'finished', 'Local Codex stage did not finish without tools: '+receipt['status'])
+        require(receipt['status'] == 'finished', 'Local Codex stage did not finish without tools: '+receipt['status']
+                +' '+json.dumps(receipt.get('failure_events') or [],ensure_ascii=False)[:1500])
         text = answer.read_text(encoding='utf-8')
         require(len(text) <= 500_000, 'Oversized local stage JSON')
         text = re.sub(r'^```(?:json)?\s*\n([\s\S]*)\n```$', r'\1', text.strip())

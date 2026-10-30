@@ -53,3 +53,16 @@ def test_local_timeout_retains_a_started_session(tmp_path,monkeypatch):
         codex.execute_stage(model='gpt-6.1-sol',effort='high',stage='challenger',prompt_path=prompt,
                              output_path=tmp_path/'out.json',receipt_path=tmp_path/'receipt.json',run=run)
     assert json.loads((tmp_path/'receipt.json').read_text())['agent_id'] == 'slow-session'
+
+
+def test_failed_local_session_retains_provider_failure_in_its_receipt(tmp_path,monkeypatch):
+    monkeypatch.setattr(codex,'executable',lambda:'codex')
+    prompt = tmp_path/'prompt.txt'
+    prompt.write_text('Evidence',encoding='utf-8')
+    def run(args,**kw):
+        return subprocess.CompletedProcess(args,1,json.dumps({'type':'turn.failed','error':{'message':'Provider temporarily unavailable'}}),'')
+    with pytest.raises(ValueError,match='Provider temporarily unavailable'):
+        codex.execute_stage(model='gpt-6.1-sol',effort='high',stage='author',prompt_path=prompt,
+                            output_path=tmp_path/'out.json',receipt_path=tmp_path/'receipt.json',run=run)
+    saved=json.loads((tmp_path/'receipt.json').read_text(encoding='utf-8'))
+    assert saved['process_exit_code']==1 and saved['failure_events'][0]['type']=='turn.failed'
