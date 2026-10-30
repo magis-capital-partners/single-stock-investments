@@ -96,6 +96,7 @@
   }
 
   async function fillManagersPage() {
+    if (window.InvestorHistory) return window.InvestorHistory.fill();
     const root=document.getElementById('managers-page'); if(!root)return;
     try {
       const response=await fetch(dataUrl('data/holdings/managers_index.json'));

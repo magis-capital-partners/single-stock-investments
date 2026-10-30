@@ -3,6 +3,8 @@
 from __future__ import annotations
 
 import json
+import re
+from functools import lru_cache
 from pathlib import Path
 
 from ownership_common import filing_document_urls, sec_fetch_bytes, sleep
@@ -33,10 +35,28 @@ def _read_cached(path: Path) -> bytes | None:
     return None
 
 
+@lru_cache(maxsize=8)
+def _accession_paths(cache_dir):
+    paths = {}
+    for path in cache_dir.glob('*.xml'):
+        match = re.search(r'_(\d{18})\.xml$', path.name)
+        if match:
+            paths.setdefault(match[1], []).append(path)
+    return paths
+
+
 def fetch_filing_tables(filing: dict, *, fund_id: str, cache_dir: Path, offline: bool) -> dict | None:
     """Return parsed rows plus cover-page fields for one accession."""
     accession = filing.get("accession") or "unknown"
     info_path, primary_path, meta_path = _cache_paths(cache_dir, fund_id, accession)
+    if not info_path.exists():
+        # An accession is globally unique. Registry alias corrections must not
+        # make already preserved original filings disappear from the cache.
+        previous=_accession_paths(cache_dir).get(accession.replace('-', ''), [])
+        if len(previous)==1:
+            info_path=previous[0]
+            primary_path=info_path.with_name(info_path.stem+'.primary.xml')
+            meta_path=info_path.with_name(info_path.stem+'.meta.json')
     meta = {}
     if meta_path.exists():
         try:
@@ -50,12 +70,22 @@ def fetch_filing_tables(filing: dict, *, fund_id: str, cache_dir: Path, offline:
     if info_bytes is None:
         if offline:
             return None
-        urls = filing_document_urls(filing)
-        sleep()
-        info_url = urls.get("info_table")
-        primary_url = urls.get("primary")
+        filed_at = filing.get('filing_date') or filing.get('filed_at') or ''
+        if filed_at and filed_at < '2013-05-20':
+            # The complete pre-XML submission contains both cover and table.
+            # One request preserves all original bytes and avoids fetching the
+            # same text again as a primary document.
+            info_url = filing['index_url'].rsplit('/',1)[0] + '/' + accession + '.txt'
+            primary_url = None
+        else:
+            urls = filing_document_urls(filing)
+            sleep()
+            info_url = urls.get("info_table")
+            primary_url = urls.get("primary")
         if not info_url:
-            return None
+            # Complete submissions preserve pre-2013 text/HTML information tables.
+            base = filing["index_url"].rsplit("/", 1)[0]
+            info_url = f"{base}/{accession}.txt"
         info_bytes = sec_fetch_bytes(info_url)
         info_path.parent.mkdir(parents=True, exist_ok=True)
         info_path.write_bytes(info_bytes)
@@ -73,9 +103,23 @@ def fetch_filing_tables(filing: dict, *, fund_id: str, cache_dir: Path, offline:
         primary_bytes = sec_fetch_bytes(primary_url)
         primary_path.write_bytes(primary_bytes)
         sleep()
+    if not re.search(br'<(?:[\w]+:)?(?:informationTable|infoTable)(?:\s|>)',info_bytes):
+        from thirteenf_legacy import parse_legacy_document
+
+        rows, primary = parse_legacy_document(info_bytes)
+        return {
+            "form": filing.get("form"), "filing_date": filing.get("filing_date") or meta.get("filing_date"),
+            "report_date": filing.get("report_date") or meta.get("report_date") or primary.get("period_end"),
+            "accession": accession, "info_url": info_url, "rows": rows,
+            "raw_count": primary["raw_row_count"], "amendment_type": primary.get("amendment_type"),
+            "primary": primary,
+            "raw_info_bytes":info_bytes,"raw_primary_bytes":primary_bytes,
+        }
     raw = parse_info_table_xml(info_bytes)
     filing_date = filing.get("filing_date") or meta.get("filing_date")
     rows = normalize_info_rows(raw, filing_date=filing_date)
+    for normalized, original in zip(rows,raw):
+        normalized['as_filed']=original
     primary = parse_primary_doc_xml(primary_bytes) if primary_bytes else {}
     if primary.get("table_value_total_usd") is not None and filing_date:
         # Cover-page total uses the same units as the info-table value column.
@@ -93,6 +137,7 @@ def fetch_filing_tables(filing: dict, *, fund_id: str, cache_dir: Path, offline:
         "raw_count": len(raw),
         "amendment_type": primary.get("amendment_type"),
         "primary": primary,
+        "raw_info_bytes":info_bytes,"raw_primary_bytes":primary_bytes,
     }
 
 
