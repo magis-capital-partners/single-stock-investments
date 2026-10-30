@@ -45,6 +45,7 @@ EXCHANGE_META = {
     "EVO.ST": "Nasdaq Stockholm",
     "WBI": "NYSE",
     "HE": "NYSE",
+    "HEI": "NYSE",
     "MIAX": "NYSE",
     "FNV": "NYSE",
     "WPM": "NYSE",
