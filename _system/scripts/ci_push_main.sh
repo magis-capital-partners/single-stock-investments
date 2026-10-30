@@ -426,7 +426,10 @@ clean_worktree_for_rebase() {
       if [ "${#remaining[@]}" -gt 0 ]; then
         git -c submodule.recurse=false restore --worktree -- "${remaining[@]}" || return 1
       fi
-      git diff --quiet || return 1
+      if ! git diff --quiet; then
+        echo "::error::Verified backup cleanup could not produce a clean index. Check committed source line endings; the saved backup was preserved."
+        return 1
+      fi
     fi
   fi
 }

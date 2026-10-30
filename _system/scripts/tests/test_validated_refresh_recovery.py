@@ -52,6 +52,20 @@ def test_only_a_validated_failed_publication_can_request_retry():
     assert 'publication_retry_count' in retry['env']['PUBLICATION_RETRY_COUNT']
 
 
+def test_tracked_sources_with_lf_policy_have_normalized_git_blobs():
+    # An index blob containing CRLF under an explicit LF policy becomes dirty
+    # again immediately after restore, even on a fresh Linux CI checkout.
+    entries = subprocess.check_output(['git', 'ls-files', '--eol', '-z', '--', '_system/scripts'], cwd=ROOT).split(b'\0')
+    candidates = [entry.partition(b'\t')[2] for entry in entries
+        if entry.split(b' ', 1)[0] in {b'i/crlf', b'i/mixed'}]
+    if not candidates:
+        return
+    attrs = subprocess.run(['git', 'check-attr', '--cached', '-z', '--stdin', 'eol'],
+        input=b'\0'.join(candidates)+b'\0', cwd=ROOT, check=True, capture_output=True).stdout.split(b'\0')
+    violations = [attrs[i].decode() for i in range(0, len(attrs)-1, 3) if attrs[i+2] == b'lf']
+    assert not violations, 'Committed blobs violate their LF policy: '+', '.join(violations)
+
+
 def git(repo, *args):
     return subprocess.run(['git', '-C', str(repo), *args], check=True, capture_output=True, text=True).stdout
 
