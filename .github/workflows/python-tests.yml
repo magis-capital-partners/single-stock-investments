@@ -447,6 +447,38 @@ jobs:
             /dashboard/data/nol_screener.json
             /dashboard/data/document_catalog.json
           sparse-checkout-cone-mode: false
+      - name: Materialize every path the desk briefs cite
+        # check_desk_briefs.py requires each inputs_read path to exist, and a
+        # brief may cite a file outside the list above (AGENT_INDEX.md on
+        # 2026-10-30). Same path collection as the marvin-pr-automerge data
+        # guard. Only plain paths are added, so a cited name cannot act as a
+        # sparse pattern.
+        run: |
+          set -euo pipefail
+          python3 - <<'PY' > "$RUNNER_TEMP/brief-inputs.txt"
+          import json
+          import re
+          from pathlib import Path
+          root = Path("_system/data/desk_briefs")
+          plain = re.compile(r"^[A-Za-z0-9._/-]+$")
+          paths = set()
+          for path in root.rglob("*.json") if root.is_dir() else []:
+              if path.name == "schema.json":
+                  continue
+              try:
+                  payload = json.loads(path.read_text(encoding="utf-8"))
+              except (OSError, json.JSONDecodeError):
+                  continue
+              for entry in payload.get("inputs_read") or []:
+                  rel = entry.get("path") if isinstance(entry, dict) else None
+                  if isinstance(rel, str) and plain.match(rel) and not rel.startswith("/") and ".." not in Path(rel).parts:
+                      paths.add(rel)
+          for rel in sorted(paths):
+              print(f"/{rel}")
+          PY
+          if [ -s "$RUNNER_TEMP/brief-inputs.txt" ]; then
+            xargs git sparse-checkout add --skip-checks < "$RUNNER_TEMP/brief-inputs.txt"
+          fi
       - uses: actions/setup-python@v5
         with:
           python-version: "3.12"
