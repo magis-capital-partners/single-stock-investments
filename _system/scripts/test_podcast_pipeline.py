@@ -71,6 +71,17 @@ class PodcastRegistryTests(unittest.TestCase):
 
 
 class PodcastResolveGoldTests(unittest.TestCase):
+    def test_daniel_zhang_needs_teqnion_in_the_text(self):
+        # The same name ran Alibaba. A bare mention must not become TEQ.ST.
+        bare = resolve_text("Daniel Zhang on the Alibaba cloud spinoff", "Former Alibaba CEO")
+        self.assertNotIn("TEQ.ST", bare["tickers"])
+        self.assertFalse(any(o.get("ticker") == "TEQ.ST" for o in bare["officers"]))
+        hit = resolve_text(
+            "Daniel Zhang, Deputy CEO of Teqnion",
+            "Teqnion AB serial acquirer",
+        )
+        self.assertIn("TEQ.ST", hit["tickers"])
+
     def test_evolution_officer_true_positive(self):
         r = resolve_text(
             "Martin Carlesund, CEO of Evolution Gaming on live casino",
