@@ -20,6 +20,15 @@ def test_a_requested_note_keeps_its_disclosure_not_just_a_contents_mention():
     assert any('principal 1749 million' in c for c in d['contexts'])
 
 
+def test_adjacent_note_windows_keep_their_source_text_once():
+    raw=('<html><p>Note 4. Guarantees</p>'+('Guarantee obligations. '*400)
+         +'<p>Note 5. Borrowing</p>'+('Borrowing terms and collateral. '*400)
+         +'<p>Final maturity in 2030.</p></html>').encode()
+    d=document_record('https://issuer.test/report',raw,['note 4','note 5'])
+    assert any('Guarantee obligations.' in c and 'Final maturity in 2030.' in c for c in d['contexts'])
+    assert not any(a in b for i,a in enumerate(d['contexts']) for j,b in enumerate(d['contexts']) if i!=j)
+
+
 def test_note_numbers_in_gap_details_become_explicit_retrieval_terms():
     terms = requested_keywords([{'code':'missing_debt','detail':"Retrieve Note 9, Debt and Note 15, Settlement Risk. Search terms: 'maturity', 'collateral'."}])
     assert {'note 9','note 15','maturity','collateral'} <= set(terms)

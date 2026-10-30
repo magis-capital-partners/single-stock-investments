@@ -406,7 +406,13 @@ def build_forecast(valuation, *, quote=None, as_of=None, fx=None, market=None, e
         result['next_action'] = 'automatic_source_refresh'
         return result
     returns = {c: _irr(price, schedules[c]) for c in CASES}
-    if any(v is None for v in returns.values()):
+    from underwriting_economics import zero_loss_outcomes
+    try:
+        result['return_outcomes'] = zero_loss_outcomes(valuation, schedules)
+    except (ValueError,KeyError,TypeError):
+        result['gaps'].append({'code':'financing_failure_waterfall_invalid'})
+        return result
+    if any(v is None and c not in result['return_outcomes'] for c,v in returns.items()):
         result['gaps'].append({'code': 'unique_shareholder_irr_unavailable'})
         return result
     result['forward_irr_pct'] = returns

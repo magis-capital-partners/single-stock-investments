@@ -171,3 +171,13 @@ explicit adjustment for facilities, restrictions or collateral to closing usable
 liquidity. Closing resources carry to the next opening and must cover the stated
 minimum. Independent structural alternatives repeat this check; a constant
 liquidity assumption cannot conceal an unfunded cash deficit.
+
+The first full Mastercard challenger run rejected automatic owner contributions
+and assumed debt rollover in the joint legal/settlement shock. Funding access
+must be an explicit judgment with a tested unavailable-funding alternative.
+Optional failure-state graphs pay senior claims first, record unpaid claims,
+and stop common-owner proceeds and further capital calls after the deadline.
+An executed default can breach minimum operating liquidity; an unexplained
+shortfall still fails. A scenario with no remaining common proceeds reports
+complete loss of capital and an undefined IRR, rather than inventing a root or
+withholding the funded scenarios. The dashboard exposes these failure paths.

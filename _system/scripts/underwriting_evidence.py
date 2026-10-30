@@ -122,6 +122,7 @@ def document_record(url, raw, focus_keywords=()):
             size += len(text)
     # Note requests need the disclosure, not a table-of-contents hit or a small
     # keyword window. Keep bounded complete sections with original source text.
+    note_spans = []
     for phrase in focus:
         if not re.fullmatch(r'note \d{1,2}', phrase):
             continue
@@ -129,7 +130,15 @@ def document_record(url, raw, focus_keywords=()):
         matches = list(re.finditer(r'\bNote\s+'+number+r'\b\s*[.:-]?', body, re.I))
         matches.sort(key=lambda m: (bool(re.search(r'[.:-]',m.group())), bool(re.match(r'\s*[A-Z]',body[m.end():m.end()+20])),m.start()),reverse=True)
         for match in matches[:2]:
-            add_context(body[max(0,match.start()-200):match.start()+22000])
+            note_spans.append((max(0,match.start()-200),min(len(body),match.start()+22000)))
+    merged = []
+    for start,end in sorted(note_spans):
+        if merged and start <= merged[-1][1]:
+            merged[-1] = (merged[-1][0],max(end,merged[-1][1]))
+        else:
+            merged.append((start,end))
+    for start,end in merged:
+        add_context(body[start:end])
     # Business economics and risks are not limited to financial tables.
     defaults = ('our business', 'business overview', 'competition', 'working capital',
                    'liquidity', 'regulatory capital', 'credit', 'clinical', 'inventory', 'warrant', 'dilution',
@@ -150,6 +159,9 @@ def document_record(url, raw, focus_keywords=()):
         if matches:
             start = matches[0].start()
             add_context(body[max(0, start-400):start+2600])
+    # All original text survives; overlapping note windows need not repeat the
+    # same table/narrative again and consume the judgment session's context.
+    contexts = [c for i,c in enumerate(contexts) if not any(i != j and c in other for j,other in enumerate(contexts))]
     require(contexts, 'No financial tables could be frozen from '+url)
     return {'id': 'doc_'+digest(url)[:16], 'source_url': url,
             'content_hash': hashlib.sha256(raw).hexdigest(), 'contexts': contexts}

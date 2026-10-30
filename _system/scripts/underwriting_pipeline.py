@@ -397,6 +397,13 @@ def load_progress(root, work, ticker, packet):
     if saved.get('scope') == scope:
         return saved
     result = {'scope': scope, 'packet_hash': packet['packet_hash'], 'history': [], 'feedback': None}
+    if saved.get('feedback'):
+        # New evidence/code invalidates approvals, not unresolved criticism.
+        # The next independent review must still earn a fresh approval.
+        result['history'] = copy.deepcopy(saved.get('history') or [])
+        result['feedback'] = copy.deepcopy(saved['feedback'])
+        result['feedback']['required_correction'] = ('Evidence or process changed; reassess the prior criticism against the CURRENT packet. '
+                                                     +str(saved['feedback'].get('required_correction') or ''))
     authors, reviews = {}, []
     for path in (work/'cache'/ticker).glob('*/receipt.json'):
         receipt, output = read(path), read(path.parent/'output.json')
