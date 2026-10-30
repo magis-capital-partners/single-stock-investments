@@ -426,7 +426,10 @@ clean_worktree_for_rebase() {
       if [ "${#remaining[@]}" -gt 0 ]; then
         git -c submodule.recurse=false restore --worktree -- "${remaining[@]}" || return 1
       fi
-      git diff --quiet || return 1
+      if ! git diff --quiet; then
+        echo "::error::Verified backup cleanup could not produce a clean index. Check committed source line endings; the saved backup was preserved."
+        return 1
+      fi
     fi
   fi
 }
@@ -479,7 +482,7 @@ ci_push_main() {
       exit 1
     fi
     # Rebase conflict regeneration can introduce fresh private source fields.
-    "$PYTHON" _system/scripts/audit_fund_letter_exposure.py --strict
+    "$PYTHON" _system/scripts/audit_fund_letter_exposure.py --strict --verify-public-snapshots
     if git push origin HEAD:main; then
       echo "Pushed to main (attempt $attempt)."
       exit 0

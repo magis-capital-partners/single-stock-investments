@@ -2,6 +2,7 @@
 from __future__ import annotations
 
 import json
+import hashlib
 import os
 import shutil
 import subprocess
@@ -13,6 +14,7 @@ import yaml
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 from retry_validated_refresh import MAX_PUBLICATION_RETRIES, request_retry
+from audit_fund_letter_exposure import audit
 
 ROOT = Path(__file__).resolve().parents[3]
 PUSH = ROOT / '_system/scripts/ci_push_main.sh'
@@ -50,6 +52,20 @@ def test_only_a_validated_failed_publication_can_request_retry():
     assert retry['if'] == "failure() && steps.verified_forecasts.outcome == 'success' && steps.publish.outcome == 'failure'"
     assert retry['run'] == 'python _system/scripts/retry_validated_refresh.py'
     assert 'publication_retry_count' in retry['env']['PUBLICATION_RETRY_COUNT']
+
+
+def test_tracked_sources_with_lf_policy_have_normalized_git_blobs():
+    # An index blob containing CRLF under an explicit LF policy becomes dirty
+    # again immediately after restore, even on a fresh Linux CI checkout.
+    entries = subprocess.check_output(['git', 'ls-files', '--eol', '-z', '--', '_system/scripts'], cwd=ROOT).split(b'\0')
+    candidates = [entry.partition(b'\t')[2] for entry in entries
+        if entry.split(b' ', 1)[0] in {b'i/crlf', b'i/mixed'}]
+    if not candidates:
+        return
+    attrs = subprocess.run(['git', 'check-attr', '--cached', '-z', '--stdin', 'eol'],
+        input=b'\0'.join(candidates)+b'\0', cwd=ROOT, check=True, capture_output=True).stdout.split(b'\0')
+    violations = [attrs[i].decode() for i in range(0, len(attrs)-1, 3) if attrs[i+2] == b'lf']
+    assert not violations, 'Committed blobs violate their LF policy: '+', '.join(violations)
 
 
 def git(repo, *args):
@@ -146,3 +162,28 @@ ci_push_main 'validated test candidate'
     assert 'Rebase did not start' in result.stdout
     assert 'conflicts resolved' not in result.stdout
     assert not (repo / 'pushed').exists()
+
+
+@pytest.mark.parametrize('changed', [False, True])
+def test_post_rebase_publication_rejects_changed_managed_snapshots(repo, changed):
+    public = b'{"private_snapshot":true}\n'
+    target = repo / 'dashboard/data/example.json'
+    target.parent.mkdir(parents=True)
+    target.write_bytes(public)
+    manifest = {'assets': {'data/example.json': {
+        'public_sha256': hashlib.sha256(public).hexdigest(), 'private_sha256': '0'*64}}}
+    (repo / 'dashboard/private-assets.json').write_text(json.dumps(manifest))
+    git(repo, 'add', 'dashboard')
+    git(repo, 'commit', '-qm', 'published snapshot')
+    if changed:
+        # A benign regenerated payload can evade source-pattern checks while
+        # still breaking exact snapshot restoration on the next checkout.
+        target.write_text('{"count":23}\n')
+    report = audit(repo, verify_public_snapshots=True)
+    assert report['source_restriction_ready'] is (not changed)
+    assert bool([f for f in report['findings'] if f['kind'] == 'managed_private_snapshot_not_sanitized']) is changed
+
+
+def test_push_verifies_snapshot_receipts_again_after_rebase():
+    body = PUSH.read_text().split('ci_push_main()', 1)[1]
+    assert body.index('--strict --verify-public-snapshots') < body.index('git push origin HEAD:main')
