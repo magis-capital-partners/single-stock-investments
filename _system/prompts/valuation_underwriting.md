@@ -242,11 +242,38 @@ Add top-level `economic_analysis` with:
 The numbers above are SYNTAX EXAMPLES, never economic defaults. Every *_ref must
 name an actual graph node, fact or assumption with the correct unit. There must
 be one bridge for EVERY integer year 1..horizon_years in EVERY component.
+
+Separate missing facts from uncertain judgments. Future growth, maintenance versus
+growth spending, incremental investment returns and operating liquidity needs
+normally require estimates. They are not facts that another filing can reveal
+exactly. When primary evidence supports defensible bounds, underwrite an explicit
+judgment, explain its limitations, and stress those bounds. Do not turn every
+unreported allocation into an impossible evidence request. Material unbounded
+claims, unverifiable financial facts or unresolved security units remain gaps.
+For a small uncertain asset, giving the asset no proceeds while reserving a
+source-supported adverse funding obligation can be valid; state both sides and
+materiality relative to cash generation. Never invent a legal liability cap.
+
+Additional acquisition-target evidence, when present, is explicitly namespaced by
+issuer_ticker. Its reporting calendar and claims belong to that entity. Target
+shares are excluded and cannot inherit the parent's split/listing basis. Reconcile
+target obligations and acquired cash to parent consideration and funding, then
+use the parent's verified denominator. Supplemental facts from a target document
+retain that document's issuer scope. The controller refreshes linked source hashes;
+changed target reports can invalidate the parent underwriting.
 For each case, in whole reporting currency:
 
     cash_generation + net_financing = reinvestment + other_claims
         + distributions + buybacks + retained_cash
     available_liquidity >= minimum_liquidity; diluted shares > 0
+
+EVERY bridge also requires whole-currency opening_liquidity_ref and
+liquidity_adjustment_ref. Closing liquidity equals opening liquidity plus
+retained_cash_ref plus liquidity_adjustment_ref; next year's opening must equal
+the previous closing. Start from source-supported usable resources. Any change
+to undrawn committed facilities, restrictions or eligible collateral belongs in
+the explicit adjustment with supporting terms. Do not count a borrowed dollar
+as both cash and an undrawn facility, or create arbitrary constant liquidity.
 
 The bridge's distributions must equal the component distribution cash flows times
 its same-year ordinary share denominator. A zero currency node can be formed as

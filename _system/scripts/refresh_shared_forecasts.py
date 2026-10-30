@@ -258,7 +258,12 @@ def refresh_missing_model_inputs(ticker, row, root, as_of, registry):
              'collected_at': collected_at or data.get('attempted_at'),
              'latest_report': data.get('latest_report') or prior.get('latest_report'),
              'financial_hash': financial_hash, 'last_collected': as_of, 'fx': data.get('fx'), 'errors': data.get('errors') or []}
+    if prior.get('underwriting_related_issuers'):
+        saved['underwriting_related_issuers'] = prior['underwriting_related_issuers']
     write_json_if_changed(path, saved, volatile_keys={'retrieved_at'})
+    if (read(root/ticker/'research/valuation.json').get('underwriting') or {}).get('related_issuers'):
+        from underwriting_related_evidence import refresh_related_sources
+        refresh_related_sources(root,ticker,as_of)
 
 
 def financial_signature(data, cached):

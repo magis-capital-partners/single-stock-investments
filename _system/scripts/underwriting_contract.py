@@ -117,6 +117,10 @@ def compile_contract(packet, contract):
         require(obs.get('source_url') and obs.get('locator') and obs.get('period'), 'Observation source is incomplete')
         require(obs.get('source_kind') == 'primary', 'Company underwriting requires primary facts')
         latest_period = (packet.get('latest_report') or {}).get('period') or packet['financial_period']
+        if obs.get('issuer_ticker'):
+            related = packet.get('related_issuers') or {}
+            require(obs['issuer_ticker'] in related, 'Unknown related-issuer financial scope')
+            latest_period = related[obs['issuer_ticker']]['latest_report']['period']
         balance_prefixes = ('CashAndCashEquivalents', 'CashCashEquivalents', 'LongTermDebt', 'ShortTermBorrowings',
                             'CommercialPaper', 'StockholdersEquity', 'Inventory', 'AccountsReceivable', 'FinancingReceivable')
         field = obs.get('field') or ''
@@ -286,6 +290,8 @@ def compile_contract(packet, contract):
                                       'terminal_specs': {c['id']: copy.deepcopy(c['terminal']) for c in original['components']}}
         model['underwriting']['economic_process_version'] = VERSION
         validate_economics(original, contract, model, evidence_ids)
+    if packet.get('related_issuers'):
+        model['underwriting']['related_issuers'] = copy.deepcopy(packet['related_issuers'])
     return model
 
 

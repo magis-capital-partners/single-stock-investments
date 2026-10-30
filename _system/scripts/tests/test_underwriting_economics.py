@@ -28,6 +28,7 @@ def economic_contract():
                      'share_count_ref': 'shares', 'liquidity_ref': 'normalized_cash',
                      'opening_share_count_ref': 'shares', 'net_share_issuance_ref': 'zero_shares',
                      'minimum_liquidity_ref': 'zero_cash', 'maintenance_ref': 'zero_cash',
+                     'opening_liquidity_ref': 'normalized_cash', 'liquidity_adjustment_ref': 'zero_cash',
                      'organic_growth_ref': 'zero_cash', 'acquisitions_ref': 'zero_cash',
                      'sbc_funding_ref': 'zero_cash', 'residual_claims_ref': 'zero_cash',
                      'operating_bridge': {'revenue_ref': 'reported_cash', 'earnings_ref': 'normalized_cash',
@@ -84,8 +85,10 @@ def test_full_economic_compiler_and_challenge_reconcile():
 
 
 @pytest.mark.parametrize('change,match', [
-    (lambda c: c['economic_analysis']['bridges'][0].update(retained_cash_ref='normalized_cash'), 'allocation'),
+    (lambda c: c['economic_analysis']['bridges'][0].update(retained_cash_ref='normalized_cash'), 'reconcile'),
     (lambda c: c['economic_analysis']['bridges'][0].update(liquidity_ref='zero_cash', minimum_liquidity_ref='normalized_cash'), 'liquidity'),
+    (lambda c: c['economic_analysis']['bridges'][0].update(opening_liquidity_ref='zero_cash'), 'liquidity'),
+    (lambda c: c['economic_analysis']['bridges'][1].update(opening_liquidity_ref='zero_cash', liquidity_adjustment_ref='normalized_cash'), 'roll forward'),
     (lambda c: c['economic_analysis']['bridges'][0].update(share_count_ref='zero_cash'), 'share'),
     (lambda c: c['economic_analysis']['bridges'].pop(), 'annual bridge'),
     (lambda c: c['economic_analysis']['mechanisms']['competitive_response'].update(evidence_ids=['invented']), 'evidence'),

@@ -36,6 +36,14 @@ reports. Model output cannot choose arbitrary destinations or execute tools. A
 repaired evidence packet gets a new hash and review binding. Requests, incomplete
 attempts and unresolved critiques persist privately and retry automatically
 within the existing call limits; unchanged cached outputs are reused.
+Requests naming a financial note retain bounded note sections, including adjoining
+tables and footnotes. A material acquisition can add SEC target evidence only
+after the parent disclosure identifies the transaction and the SEC identity matches.
+Target monetary observations retain issuer scope and their own reporting calendar;
+target share counts never inherit the parent listing basis. Linked primary source
+hashes participate in the parent's freshness checks. Unreported future quantities
+are bounded judgments when the evidence supports them, not demands for perfect
+facts; genuinely unbounded material claims remain blocked.
 
 ## Author, challenge and compile
 
@@ -155,3 +163,10 @@ Unknown provider usage is counted as unknown, not zero. Reasoning is included in
 the provider's output count; an actual per-approved-company estimate is withheld
 when receipts lack usage. Subscription allowance and credits are not inferred
 from API token prices.
+# Liquidity in the economic bridge
+
+Every annual path rolls opening usable liquidity through retained cash and an
+explicit adjustment for facilities, restrictions or collateral to closing usable
+liquidity. Closing resources carry to the next opening and must cover the stated
+minimum. Independent structural alternatives repeat this check; a constant
+liquidity assumption cannot conceal an unfunded cash deficit.

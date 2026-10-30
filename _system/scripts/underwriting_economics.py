@@ -17,7 +17,8 @@ MECHANISMS = ('earning_power', 'reinvestment', 'competitive_response', 'customer
               'capital_allocation', 'financing_survival', 'inflation', 'realization')
 MONEY_REFS = ('cash_generation_ref', 'reinvestment_ref', 'other_claims_ref', 'distributions_ref',
               'buybacks_ref', 'retained_cash_ref', 'net_financing_ref', 'liquidity_ref', 'minimum_liquidity_ref',
-              'maintenance_ref', 'organic_growth_ref', 'acquisitions_ref', 'sbc_funding_ref', 'residual_claims_ref')
+              'maintenance_ref', 'organic_growth_ref', 'acquisitions_ref', 'sbc_funding_ref', 'residual_claims_ref',
+              'opening_liquidity_ref', 'liquidity_adjustment_ref')
 PREFIX = 'terminal_generated_'
 
 
@@ -153,6 +154,12 @@ def validate_economics(contract, expanded, model, evidence_ids):
             sources = b['cash_generation_ref']+b['net_financing_ref']+contributions
             uses = sum(b[k] for k in ('reinvestment_ref', 'other_claims_ref', 'distributions_ref', 'buybacks_ref', 'retained_cash_ref'))
             tolerance = max(.0001, abs(sources)*1e-7, abs(uses)*1e-7)
+            require(b['opening_liquidity_ref'] >= 0, 'Opening liquidity must be nonnegative')
+            if previous:
+                require(abs(b['opening_liquidity_ref']-v[previous['liquidity_ref']]) <= tolerance,
+                        'Annual opening liquidity does not roll forward')
+            require(abs(b['opening_liquidity_ref']+b['retained_cash_ref']+b['liquidity_adjustment_ref']-b['liquidity_ref']) <= tolerance,
+                    f'{cid}.{year}.{case}: liquidity does not reconcile to retained cash and explicit adjustments')
             reinvestment = b['maintenance_ref']+b['organic_growth_ref']+b['acquisitions_ref']
             require(abs(reinvestment-b['reinvestment_ref']) <= tolerance, f'{cid}.{year}.{case}: maintenance, growth and acquisitions do not reconcile')
             require(abs(b['sbc_funding_ref']+b['residual_claims_ref']-b['other_claims_ref']) <= tolerance,
@@ -256,6 +263,11 @@ def _perturbed(model, overrides, runway_scale=None):
                     if v[b['liquidity_ref']] < v[b['minimum_liquidity_ref']]-max(.0001, abs(v[b['minimum_liquidity_ref']])*1e-7):
                         errors.append(f"{component['id']}.{case}: alternative liquidity shortfall")
                     tolerance = max(.0001, abs(sources)*1e-7, abs(uses)*1e-7)
+                    previous = next((p for p in model['economic_analysis']['bridges'] if p['component_id'] == b['component_id'] and p['year'] == b['year']-1), None)
+                    if (v[b['opening_liquidity_ref']] < 0 or
+                            abs(v[b['opening_liquidity_ref']]+v[b['retained_cash_ref']]+v[b['liquidity_adjustment_ref']]-v[b['liquidity_ref']]) > tolerance or
+                            previous and abs(v[b['opening_liquidity_ref']]-v[previous['liquidity_ref']]) > tolerance):
+                        errors.append(f"{component['id']}.{case}: alternative liquidity roll-forward does not reconcile")
                     if abs(sum(v[b[k]] for k in ('maintenance_ref','organic_growth_ref','acquisitions_ref'))-v[b['reinvestment_ref']]) > tolerance:
                         errors.append(f"{component['id']}.{case}: alternative reinvestment split does not reconcile")
                     if abs(v[b['sbc_funding_ref']]+v[b['residual_claims_ref']]-v[b['other_claims_ref']]) > tolerance:
@@ -348,6 +360,7 @@ def grade_commitments(model, observations, as_of):
     results = []
     for f in freeze_commitments(model):
         matches = [o for o in observations if o.get('field') == f['observation_field'] and o.get('unit') == f['unit']
+                   and o.get('issuer_ticker',model['ticker']) == f.get('issuer_ticker',model['ticker'])
                    and o.get('period') == f['period'] and o.get('source_kind', 'primary') == 'primary'
                    and o['period'] <= as_of and isinstance(o.get('value'), (int, float)) and isfinite(o['value'])]
         row = {**f, 'status': 'not_due' if f['period'] > as_of else 'awaiting_observation'}

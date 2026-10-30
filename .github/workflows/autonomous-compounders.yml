@@ -17,6 +17,9 @@ on:
       - '_system/scripts/valuation_market_sync.py'
       - '_system/scripts/valuation_share_basis.py'
       - '_system/scripts/valuation_share_evidence.py'
+      - '_system/scripts/underwriting_economics.py'
+      - '_system/scripts/underwriting_related_evidence.py'
+      - '_system/config/underwriting_policy.json'
   schedule:
     - cron: '23 8,18 * * 1-5'
       timezone: America/New_York
@@ -58,8 +61,12 @@ jobs:
             /*/research/underwriting_contract.json
             /*/research/underwriting_review.json
             /*/research/underwriting_receipt.json
+            /*/research/underwriting_diagnostics.json
+            /*/research/underwriting_outcomes.json
+            /_system/config/underwriting_policy.json
             /_system/reference/market-data/valuation_quotes/
             /_system/reference/market-data/valuation_fundamentals/
+            /_system/reference/market-data/valuation_related_evidence/
             /_system/data/shared_valuation_forecasts.json
             _system/portfolio/registry.json
             _system/reference/core_compounders.json
@@ -115,6 +122,7 @@ jobs:
             _system/data/shared_valuation_forecasts.json
             _system/reference/market-data/valuation_quotes
             _system/reference/market-data/valuation_fundamentals
+            _system/reference/market-data/valuation_related_evidence
             _system/reference/market-data/compounders
             _system/reference/market-data/operating_kpis
             dashboard/data/core.json dashboard/data/tickers

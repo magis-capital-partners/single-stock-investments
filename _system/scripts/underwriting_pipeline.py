@@ -73,7 +73,7 @@ def input_fingerprint(root, ticker):
 def processing_version(root):
     paths = [CALL_POLICY, POLICY, Path('_system/prompts/valuation_underwriting.md')]
     paths += [Path('_system/scripts')/name for name in ('underwriting_pipeline.py', 'underwriting_contract.py',
-                                                      'underwriting_evidence.py', 'underwriting_economics.py', 'underwriting_transport.py', 'underwriting_updates.py', 'underwriting_codex.py',
+                                                      'underwriting_evidence.py', 'underwriting_related_evidence.py', 'underwriting_economics.py', 'underwriting_transport.py', 'underwriting_updates.py', 'underwriting_codex.py',
                                                       'valuation_market_sync.py', 'valuation_earnings.py', 'autonomous_compounders.py',
                                                       'refresh_shared_forecasts.py', 'private_dashboard_assets.py')]
     return digest({str(p): (root/p).read_text(encoding='utf-8') if (root/p).is_file() else None for p in paths})
@@ -259,6 +259,11 @@ def apply_validated(root, packet, contract, review, build, receipts, vault):
     require(set(receipts) == set(STAGES), 'All three provider stage receipts are required')
     validate_stage_receipts(receipts, build)
     ticker = packet['ticker']
+    if packet.get('related_issuers'):
+        related_path = root/'_system/reference/market-data/valuation_fundamentals'/(ticker+'.json')
+        related_inputs = read(related_path)
+        related_inputs['underwriting_related_issuers'] = packet['related_issuers']
+        write(related_path,related_inputs)
     registry = read(root/'_system/portfolio/registry.json').get('holdings') or {}
     refresh_missing_model_inputs(ticker, universe(root)[ticker], root, today(), registry)
     require(not packet.get('input_fingerprint') or packet['input_fingerprint'] == input_fingerprint(root, ticker),
@@ -477,8 +482,13 @@ def run_company(root, work, ticker, as_of, state, vault, *, prepare=prepare_pack
         prepare = lambda *args: packet
     else:
         approved = None
+    if prepare is prepare_packet and state.get('evidence_requests'):
+        state['evidence_keywords'] = requested_keywords(state['evidence_requests'])
     packet = (prepare(root, ticker, as_of, focus_keywords=state.get('evidence_keywords') or [])
               if prepare is prepare_packet else prepare(root, ticker, as_of))
+    if prepare is prepare_packet and state.get('evidence_requests'):
+        from underwriting_related_evidence import augment_requested_targets
+        packet = augment_requested_targets(root,packet,state['evidence_requests'],as_of)
     readiness = packet.get('readiness') or {}
     if readiness.get('status') == 'evidence_gap':
         state['evidence_readiness'] = readiness
@@ -530,6 +540,8 @@ def run_company(root, work, ticker, as_of, state, vault, *, prepare=prepare_pack
                     state['evidence_keywords'] = keywords
                     if prepare is prepare_packet and keywords:
                         repaired = prepare(root, ticker, as_of, focus_keywords=keywords)
+                        from underwriting_related_evidence import augment_requested_targets
+                        repaired = augment_requested_targets(root,repaired,gaps,as_of)
                         if repaired['evidence_hash'] != packet['evidence_hash'] and repaired.get('readiness', {}).get('status') != 'evidence_gap':
                             packet = repaired
                             write(work/'packets'/(packet['packet_hash']+'.json'), packet)
