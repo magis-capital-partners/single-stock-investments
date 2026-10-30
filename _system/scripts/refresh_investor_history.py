@@ -62,10 +62,10 @@ def refresh(*, seconds=14400, corpus=None, public=True):
     # Discover every older submissions page and every accession, not just a
     # fixed number of periods. Unknown layouts and missing pages stay visible.
     history.import_saved_books(db, managers)
+    history.reparse_cached(db)
     history.backfill_parallel(
         history.ARCHIVE / "archive.sqlite", managers, deadline=deadline
     )
-    history.reparse_cached(db)
     coverage = history.export(db, managers)
     db.close()
     documents, review = (

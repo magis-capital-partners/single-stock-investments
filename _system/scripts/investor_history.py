@@ -1105,6 +1105,8 @@ def main():
                 print(f"Archive failed: {exc}", flush=True)
     if not args.download_only:
         import_saved_books(db, selected)
+    if args.reparse:
+        print(f"Reparsed {reparse_cached(db)} cached filings", flush=True)
     if args.all_filings or args.legacy:
         backfill_parallel(
             args.database,
@@ -1113,8 +1115,6 @@ def main():
             before="2013-05-01" if args.legacy else None,
             deadline=deadline,
         )
-    if args.reparse:
-        print(f"Reparsed {reparse_cached(db)} cached filings", flush=True)
     if args.export:
         result = export(db, managers)
         print(
