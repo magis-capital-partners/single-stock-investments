@@ -21,6 +21,9 @@
       return [row];
     }).sort((a,b) => Number(Boolean(historyFor(b).length || b.disclosure_count))-Number(Boolean(historyFor(a).length || a.disclosure_count)) || (b.ssi_overlap || 0)-(a.ssi_overlap || 0) || a.name.localeCompare(b.name));
   }
+  function availablePeriods(manager, source='all') {
+    return [...new Set([...(source==='disclosures' ? [] : historyFor(manager).map(row=>row.quarter)),...(source==='13f' ? [] : manager.disclosure_quarters || [])])].filter(Boolean).sort().reverse();
+  }
   function sourceLink(href, label) {
     try {
       const resolved = new URL(href, window.location?.origin || 'https://localhost');
@@ -75,7 +78,7 @@
         const history=historyFor(manager);
         const period=requested==='latest' ? history.at(-1)?.quarter : requested;
         const filingMeta=history.find(row=>row.quarter===period);
-        const booksPromise=filingMeta ? read(legacy ? `data/holdings/by_manager/${encodeURIComponent(id)}.json` : `data/holdings/${filingMeta.book_path || `history/${encodeURIComponent(period)}/${encodeURIComponent(id)}.json`}`).then(async value=>{
+        const booksPromise=filingMeta && source!=='disclosures' ? read(legacy ? `data/holdings/by_manager/${encodeURIComponent(id)}.json` : `data/holdings/${filingMeta.book_path || `history/${encodeURIComponent(period)}/${encodeURIComponent(id)}.json`}`).then(async value=>{
           const book=value.quarters ? value.quarters[period] : value;
           if (!book) throw new Error('Selected historical quarter is unavailable.');
           if (book.positions_parts) {
@@ -84,7 +87,7 @@
           }
           return book;
         }) : Promise.resolve(null);
-        const disclosurePromise=manager.disclosure_count ? read(`data/holdings/disclosures/${encodeURIComponent(id)}.json`).then(async manifest=>{
+        const disclosurePromise=manager.disclosure_count && source!=='13f' ? read(`data/holdings/disclosures/${encodeURIComponent(id)}.json`).then(async manifest=>{
           if (!manifest.quarters) return manifest;
           const wanted=requested==='latest' ? [...manifest.latest_quarters,'undated'] : [requested];
           const paths=[...new Set(wanted.flatMap(q=>manifest.quarters[q] || []))];
@@ -110,13 +113,13 @@
         const disclosures=results[1].status==='fulfilled' ? results[1].value.snapshots || [] : [];
         const targetDisclosure=requested==='latest' ? disclosures.map(d=>d.quarter || quarterOf(d.period_end) || quarterOf(d.disclosed_at)).filter(Boolean).sort().at(-1) : requested;
         const visible=requested==='latest' ? disclosures : disclosures.filter(d=>(d.quarter || quarterOf(d.period_end) || quarterOf(d.disclosed_at))===targetDisclosure);
-        const periods=[...new Set([...history.map(r=>r.quarter),...disclosures.map(d=>d.quarter || quarterOf(d.period_end) || quarterOf(d.disclosed_at))])].filter(Boolean).sort().reverse();
-        detail.innerHTML=`<h3>${esc(manager.name)}</h3><label>Reporting quarter<select data-detail-quarter><option value="latest">Latest available by source</option>${periods.map(q=>`<option value="${esc(q)}" ${q===requested?'selected':''}>${esc(q)}</option>`).join('')}</select></label>
+        const periods=availablePeriods(manager,source);
+        detail.innerHTML=`<h3>${esc(manager.name)}</h3><div class="workspace-filter"><label>Reporting quarter<select data-detail-quarter><option value="latest">Latest available by source</option>${periods.map(q=>`<option value="${esc(q)}" ${q===requested?'selected':''}>${esc(q)}</option>`).join('')}</select></label></div>
           ${manager.identity_status==='unverified_document_identity' ? '<p class="investor-context">Document identity awaits reconciliation with a public manager. No similarly named adviser has been assumed.</p>' : ''}
           <p class="investor-context">${history.length} 13F quarters${history.length ? ` · ${esc(history[0].quarter)}–${esc(history.at(-1).quarter)}` : ''} · ${manager.disclosure_count || 0} fund disclosures</p>
           ${(manager.fund_ids || []).map(fund=>sourceLink(`/fund-letters/?fund=${encodeURIComponent(fund)}`,'Read fund letters')).join(' · ')}
           ${results[0].status==='rejected' ? '<p>The selected historical filing could not be loaded. Try again.</p>' : ''}
-          ${book ? `<h4>13F holdings · ${esc(book.period_end || period)}</h4><p>Filed ${esc(book.filed_at || 'date unavailable')}${book.partial ? ' · Partial or awaiting reconciliation' : ''}${book.confidential_omitted ? ' · Confidential positions omitted' : ''}</p>${positionsTable(book.positions || [],{basis:'Reported 13F equity book'})}<details class="workspace-fold"><summary>Filing sources and amendments</summary>${(book.filings || []).map(f=>`<p>${esc(f.form)} · ${esc(f.filed_at)} · ${sourceLink(f.source_url,f.accession)}</p>`).join('')}</details>` : '<p>No 13F book is available for this selection. This does not mean the investor held no positions.</p>'}
+          ${source==='disclosures' ? '' : book ? `<h4>13F holdings · ${esc(book.period_end || period)}</h4><p>Filed ${esc(book.filed_at || 'date unavailable')}${book.partial ? ' · Partial or awaiting reconciliation' : ''}${book.confidential_omitted ? ' · Confidential positions omitted' : ''}</p>${positionsTable(book.positions || [],{basis:'Reported 13F equity book'})}<details class="workspace-fold"><summary>Filing sources and amendments</summary>${(book.filings || []).map(f=>`<p>${esc(f.form)} · ${esc(f.filed_at)} · ${sourceLink(f.source_url,f.accession)}</p>`).join('')}</details>` : '<p>No 13F book is available for this selection. This does not mean the investor held no positions.</p>'}
           ${(manager.filing_gaps || []).length ? `<details class="workspace-fold"><summary>${manager.filing_gaps.length} historical filing records await review</summary>${manager.filing_gaps.map(f=>`<p>${esc(f.period_end || 'Reporting date unavailable')} · ${sourceLink(f.source_url,f.accession)} · ${esc(f.reason)}</p>`).join('')}</details>` : ''}
           <h4>Fund disclosures</h4><p class="investor-context">Each fund and date is shown separately. Disclosed positions do not establish a complete manager portfolio.</p>
           ${results[1].status==='rejected' ? '<p>Fund disclosures could not be loaded. Try again.</p>' : visible.map(d=>`<details class="workspace-fold" open><summary>${esc(d.vehicle_name || manager.name)} · ${esc(d.period_end || d.disclosed_at || d.quarter || 'date unavailable')}</summary><p>${d.partial ? 'Partial disclosure' : 'Registered fund portfolio'}${!d.period_end ? ' · Holdings as-of date not established' : ''}${d.filed_at ? ` · Filed ${esc(d.filed_at)}` : ''} ${d.source_url ? sourceLink(d.source_url,'Source disclosure') : ''}</p>${positionsTable(d.positions || [])}</details>`).join('') || '<p>No fund disclosure is available for this selection.</p>'}`;
@@ -142,10 +145,10 @@
     root.querySelector('[data-history-search]').addEventListener('input',event=>{query=event.target.value;page=0;paint();});
     root.querySelector('[data-history-quarter]').addEventListener('change',event=>{quarter=event.target.value;page=0;paint();if(selected)select(selected);});
     root.querySelector('[data-history-overlap]').addEventListener('change',event=>{overlap=event.target.value==='book';page=0;paint();});
-    root.querySelector('[data-history-source]').addEventListener('change',event=>{source=event.target.value;page=0;paint();});
+    root.querySelector('[data-history-source]').addEventListener('change',event=>{source=event.target.value;page=0;paint();if(selected)select(selected);});
     root.querySelector('[data-history-prev]').addEventListener('click',()=>{page--;paint();});
     root.querySelector('[data-history-next]').addEventListener('click',()=>{page++;paint();});
     paint();
   }
-  window.InvestorHistory = {fill:()=>fill().catch(error=>{const root=document.getElementById('managers-page');if(root)root.textContent=error.message;}),directoryRows,positionsTable,sourceLink};
+  window.InvestorHistory = {fill:()=>fill().catch(error=>{const root=document.getElementById('managers-page');if(root)root.textContent=error.message;}),directoryRows,positionsTable,sourceLink,availablePeriods};
 })();
