@@ -14,7 +14,7 @@ The Investors directory defaults to all investors and the latest available date 
 
 ## Data integrity
 
-The private SQLite archive preserves each accession, individual as-filed rows, reconciliation results, downloaded document bytes and checksums. New-holdings amendments add to a book; restatements replace it. An amendment with an unknown type cannot replace the original. Unrecognized legacy layouts are quarantined, retained and reported instead of becoming empty or fabricated portfolios. Coverage reports distinguish discovery, imports, source warnings and pending parser work. They do not claim complete coverage while a required source is missing.
+The private SQLite archive preserves each accession, individual as-filed rows, reconciliation results, downloaded document bytes and checksums. New-holdings amendments add to a book; restatements replace it. An amendment with an unknown type cannot replace the original. Unrecognized legacy layouts are retained and reported. Successfully parsed rows remain available as partial data; portfolio weights stay unknown while a parser gap could change the denominator. Unreadable reports never become empty or fabricated portfolios. Coverage reports distinguish discovery, imports, source warnings and pending parser work. They do not claim complete coverage while a required source is missing.
 
 ## Refresh and recovery
 

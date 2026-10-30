@@ -21,8 +21,8 @@ import investor_history_checkpoint as checkpoint
 import investor_universe as universe
 import ownership_common as ownership
 import stage_investor_history as staging
-from thirteenf_legacy import parse_legacy_document
 from thirteenf_core import merge_filings
+from thirteenf_legacy import parse_legacy_document
 
 
 def test_legacy_preserves_classes_options_and_principal_amounts():
@@ -46,6 +46,62 @@ EXAMPLE BOND  NOTE  123456789  10  1000 PRN SOLE 1000 0 0
 def test_legacy_unreadable_table_is_not_an_empty_portfolio():
     with pytest.raises(ValueError, match="requires review"):
         parse_legacy_document(b"<TABLE>unrecognized format</TABLE>")
+
+
+def test_partial_original_rows_remain_available_without_invented_portfolio_weights(
+    tmp_path, monkeypatch
+):
+    db = archive.connect(tmp_path / "archive.sqlite")
+    raw = b"""Table Entry Total: 2
+    <TABLE>Name of Issuer  Title  CUSIP
+    APPLE INC  COM  037833100  100  20 SH SOLE
+    UNKNOWN  COM  123456789  99UNKNOWN
+    </TABLE>"""
+    with pytest.raises(ValueError) as failure:
+        parse_legacy_document(raw)
+    meta = {
+        "accession": "a",
+        "manager_id": "example",
+        "form": "13F-HR",
+        "period_end": "2000-03-31",
+        "filed_at": "2000-05-01",
+    }
+    archive.store_parse_failure(db, meta, failure.value)
+    assert archive.filing_rows(db, "a")[0]["cusip"] == "037833100"
+    monkeypatch.setattr(ownership, "load_cusip_map", dict)
+    monkeypatch.setattr(ownership, "portfolio_universe", lambda: (set(), {}))
+    archive.export(
+        db, [{"manager_id": "example", "display_name": "Example"}], tmp_path / "site"
+    )
+    book = json.loads((tmp_path / "site/history/example/2000.json").read_text())[
+        "quarters"
+    ]["2000Q1"]
+    assert book["partial"] and book["positions"][0]["weight_pct"] is None
+
+
+def test_preserved_original_can_be_reparsed_without_the_download_cache(tmp_path):
+    db = archive.connect(tmp_path / "archive.sqlite")
+    raw = b"""CONFORMED PERIOD OF REPORT: 20000331
+    Table Entry Total: 1
+    <TABLE>CUSIP
+    APPLE INC  COM  037833100  100  20 SH SOLE
+    </TABLE>"""
+    meta = {
+        "accession": "a",
+        "manager_id": "example",
+        "form": "13F-HR",
+        "period_end": "2000-03-31",
+        "filed_at": "2000-05-01",
+        "source_url": "https://www.sec.gov/original.txt",
+    }
+    archive.store_filing(db, meta, status="error", error="Old parser")
+    archive.store_raw_documents(db, "a", {"raw_info_bytes": raw})
+    assert archive.reparse_cached(db, tmp_path / "empty-cache") == 1
+    assert (
+        db.execute("SELECT status FROM filings WHERE accession='a'").fetchone()[0]
+        == "loaded"
+    )
+    assert archive.filing_rows(db, "a")[0]["value_usd"] == 100000
 
 
 def test_legacy_cover_dates_are_excluded_and_wrapped_spaced_cusip_is_parsed():
@@ -108,6 +164,17 @@ def test_new_holdings_amendment_adds_omitted_rows_of_an_existing_cusip():
     assert len(rows) == 1 and rows[0]["shares"] == 12 and rows[0]["value_usd"] == 120
 
 
+def test_legacy_issuer_word_is_not_a_cusip_and_trailing_decimal_is_valid():
+    rows, _ = parse_legacy_document(b"""Table Entry Total: 2
+    <TABLE>Name of Issuer  Title of Class  CUSIP
+    FIFTH THIRD BANCOPCOM            316773100      739     20,000 SH X
+    ANNALY CAPITAL MGMT  NOTE 4.00% 2/15  035710AA0  6067500.  6000  S None
+    </TABLE>""")
+    assert [row["cusip"] for row in rows] == ["316773100", "035710AA0"]
+    assert rows[0]["value_usd"] == 739000
+    assert rows[1]["sh_prn"] == "PRN"
+
+
 def test_public_document_survives_a_later_run_without_network(tmp_path, monkeypatch):
     monkeypatch.setattr(disclosures, "ARCHIVE", tmp_path)
     path = tmp_path / "original.xml"
@@ -121,6 +188,39 @@ def test_public_document_survives_a_later_run_without_network(tmp_path, monkeypa
 
     monkeypatch.setattr(disclosures, "get_bytes", fail)
     assert b"<original>public</original>" in disclosures.public_document(url, path)
+
+
+def test_nport_queries_include_amendments_and_paginate(monkeypatch):
+    from urllib.parse import parse_qs, urlparse
+
+    def search(url):
+        parameters = parse_qs(urlparse(url).query)
+        form = parameters["forms"][0]
+        offset = int(parameters["from"][0])
+        if offset:
+            return {"hits": {"hits": [], "total": 1}}
+        accession = "original" if form == "NPORT-P" else "amendment"
+        return {
+            "hits": {
+                "hits": [
+                    {
+                        "_source": {
+                            "file_type": form,
+                            "ciks": ["0000000001"],
+                            "adsh": accession,
+                            "file_date": "2020-02-01",
+                        }
+                    }
+                ],
+                "total": 1,
+            }
+        }
+
+    monkeypatch.setattr(disclosures, "get_json", search)
+    assert {row["form"] for row in disclosures.nport_filings("1", "Global Fund")} == {
+        "NPORT-P",
+        "NPORT-P/A",
+    }
 
 
 def test_unknown_amendment_does_not_replace_the_original_book(tmp_path, monkeypatch):
@@ -443,6 +543,11 @@ def test_durable_checkpoint_restores_a_live_wal_database_and_rejects_corruption(
     assert len(manifest["parts"]) > 1
     restored = tmp_path / "restored"
     assert checkpoint.restore(parts, restored)
+    fake = "0" * 64
+    shutil.copytree(parts / manifest["identity"], parts / fake)
+    archive.write_json(parts / fake / "manifest.json", {**manifest, "identity": fake})
+    with pytest.raises(ValueError, match="payload identity"):
+        checkpoint.restore(parts, tmp_path / "tampered", identity=fake)
     with archive.connect(restored / "archive.sqlite") as other:
         assert other.execute("select count(*) from filings").fetchone()[0] == 1
         assert archive.filing_rows(other, "a")[0]["shares"] == 2
@@ -487,6 +592,39 @@ def test_parallel_download_connections_close_after_transactions(tmp_path, monkey
     assert archive.main() == 0
     with archive.connect(tmp_path / "a.sqlite") as db:
         assert db.execute("select count(*) from downloads").fetchone()[0] == 2
+
+
+def test_parallel_history_workers_preserve_every_notice_and_close_databases(
+    tmp_path, monkeypatch
+):
+    path = tmp_path / "archive.sqlite"
+    monkeypatch.setattr(
+        ownership,
+        "list_13f_filings",
+        lambda cik, **kwargs: [
+            {
+                "accession": "a" + cik,
+                "form": "13F-NT",
+                "report_date": "2000-03-31",
+                "filing_date": "2000-05-01",
+                "index_url": "https://www.sec.gov/" + cik,
+            }
+        ],
+    )
+    managers = [{"manager_id": "m" + str(i), "cik": str(i)} for i in range(1, 7)]
+    assert archive.backfill_parallel(path, managers, workers=2) == 0
+    db = archive.connect(path)
+    assert (
+        db.execute("SELECT count(*) FROM filings WHERE status='notice'").fetchone()[0]
+        == 6
+    )
+    assert (
+        db.execute("SELECT count(*) FROM discovery WHERE status='loaded'").fetchone()[0]
+        == 6
+    )
+    db.execute("BEGIN EXCLUSIVE")
+    db.rollback()
+    db.close()
 
 
 def test_public_fund_discovery_requires_principal_adviser_and_keeps_dates(tmp_path):

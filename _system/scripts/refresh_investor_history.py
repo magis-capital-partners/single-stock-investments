@@ -62,7 +62,9 @@ def refresh(*, seconds=14400, corpus=None, public=True):
     # Discover every older submissions page and every accession, not just a
     # fixed number of periods. Unknown layouts and missing pages stay visible.
     history.import_saved_books(db, managers)
-    history.backfill_filings(db, managers, deadline=deadline)
+    history.backfill_parallel(
+        history.ARCHIVE / "archive.sqlite", managers, deadline=deadline
+    )
     history.reparse_cached(db)
     coverage = history.export(db, managers)
     db.close()
@@ -87,12 +89,12 @@ def refresh(*, seconds=14400, corpus=None, public=True):
     retained = {}
     if previous.exists():
         retained = {
-            d["id"]: d
+            (d["manager_id"], d["id"]): d
             for d in json.loads(previous.read_text(encoding="utf-8")).get(
                 "disclosures", []
             )
         }
-    retained.update({d["id"]: d for d in documents})
+    retained.update({(d["manager_id"], d["id"]): d for d in documents})
     disclosure_coverage = global_disclosures.publish(
         list(retained.values()), universe, review=review
     )

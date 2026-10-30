@@ -27,6 +27,13 @@ test('a non-filer can select every historical disclosure quarter',()=>{
   assert.deepEqual(ui.availablePeriods({history:[],disclosure_quarters:['2001Q1','2026Q2']},'disclosures'),['2026Q2','2001Q1']);
   assert.deepEqual(ui.availablePeriods(managers[0],'13f'),['2026Q2','2001Q1']);
 });
+
+test('an old disclosure or source gap never displays a newer US book',()=>{
+  const manager={manager_id:'a',name:'Alpha',quarter:'2026Q2',positions:20,ssi_overlap:5,history:[{quarter:'2026Q2',positions:20,ssi_overlap:5}],disclosure_quarters:['2001Q1'],disclosure_count:1,filing_gaps:[{period_end:'2000-03-31'}]};
+  assert.equal(ui.directoryRows([manager],{quarter:'2001Q1'})[0].positions,null);
+  assert.equal(ui.directoryRows([manager],{quarter:'2000Q1',source:'13f'})[0].ssi_overlap,null);
+  assert.ok(ui.availablePeriods(manager).includes('2000Q1'));
+});
 test('holdings preserve classes, option types, unknown weights and safe strings',()=>{
   const html=ui.positionsTable([{ticker:'GOOG',issuer:'<script>',title_of_class:'CL C',put_call:'CALL',weight_pct:null,value_usd:0}]);
   assert.match(html,/CL C · CALL/);

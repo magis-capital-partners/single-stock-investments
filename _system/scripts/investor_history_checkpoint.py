@@ -198,19 +198,27 @@ def restore(source, destination, *, identity=None):
             dir=destination, prefix="restore-"
         ) as temporary:
             temporary = Path(temporary)
+            seen = set()
             with tarfile.open(fileobj=reader, mode="r|gz") as archive:
                 for item in archive:
                     if (
                         item.name not in FILES
                         or not item.isfile()
                         or item.size > 50 * 1024**3
+                        or item.name in seen
                     ):
                         raise ValueError("Unexpected checkpoint member")
+                    seen.add(item.name)
                     with (
                         archive.extractfile(item) as incoming,
                         (temporary / item.name).open("wb") as outgoing,
                     ):
                         shutil.copyfileobj(incoming, outgoing)
+            actual_identity = hashlib.sha256(
+                "".join(name + sha(temporary / name) for name in sorted(seen)).encode()
+            ).hexdigest()
+            if actual_identity != identity:
+                raise ValueError("Checkpoint payload identity mismatch")
             for name in (
                 n for n in FILES if n.endswith(".sqlite") and (temporary / n).exists()
             ):

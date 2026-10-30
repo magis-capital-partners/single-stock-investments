@@ -133,6 +133,7 @@ def parse_nport(raw, manager_id, *, source_url):
                 "weight_basis": "fund_net_assets",
                 "country": child_text(node, "invCountry"),
                 "asset_category": child_text(node, "assetCat"),
+                "position_side": child_text(node, "payOffProf") or None,
                 "source_kind": "nport",
             }
         )
@@ -349,14 +350,14 @@ def corpus_disclosures(corpus, universe):
     return output, review
 
 
-def nport_filings(cik, query=None):
+def nport_filings(cik, query=None, *, form="NPORT-P"):
     if query:
         found = {}
         offset = 0
         while True:
             params = {
                 "q": f'"{query}"',
-                "forms": "NPORT-P",
+                "forms": form,
                 "ciks": f"{int(cik):010d}",
                 "dateRange": "custom",
                 "startdt": "2019-01-01",
@@ -388,6 +389,13 @@ def nport_filings(cik, query=None):
             total = total.get("value", offset) if isinstance(total, dict) else total
             if offset >= total:
                 break
+        if form == "NPORT-P":
+            found.update(
+                {
+                    filing["accession"]: filing
+                    for filing in nport_filings(cik, query, form="NPORT-P/A")
+                }
+            )
         return sorted(found.values(), key=lambda r: (r["filed_at"], r["accession"]))
     main = get_json(f"https://data.sec.gov/submissions/CIK{int(cik):010d}.json")
     block = main.get("filings", {})
@@ -396,8 +404,8 @@ def nport_filings(cik, query=None):
         blocks.append(get_json("https://data.sec.gov/submissions/" + page["name"]))
     filings = {}
     for part in blocks:
-        for i, form in enumerate(part.get("form", [])):
-            if form not in {"NPORT-P", "NPORT-P/A"}:
+        for i, filing_form in enumerate(part.get("form", [])):
+            if filing_form not in {"NPORT-P", "NPORT-P/A"}:
                 continue
             accession = part["accessionNumber"][i]
             primary = part["primaryDocument"][i]
@@ -406,7 +414,7 @@ def nport_filings(cik, query=None):
             filings[accession] = {
                 "accession": accession,
                 "filed_at": part["filingDate"][i],
-                "form": form,
+                "form": filing_form,
                 "url": f"https://www.sec.gov/Archives/edgar/data/{int(cik)}/{accession.replace('-', '')}/{primary}",
             }
     return sorted(filings.values(), key=lambda r: (r["filed_at"], r["accession"]))
@@ -508,7 +516,11 @@ def public_disclosures(sources, *, deadline=None):
                                 "source_url"
                             ]
                         parsed.update(
-                            {"id": filing["accession"], "filed_at": filing["filed_at"]}
+                            {
+                                "id": filing["accession"],
+                                "filed_at": filing["filed_at"],
+                                "form": filing["form"],
+                            }
                         )
                         output.append(parsed)
                     except (OSError, ValueError, KeyError, ET.ParseError) as exc:
@@ -546,6 +558,12 @@ def publish(
     preserve=True,
     save_archive=True,
 ):
+    disclosures = list(
+        {
+            (document["manager_id"], document["id"]): document
+            for document in disclosures
+        }.values()
+    )
     private = ARCHIVE / "disclosures.json"
     if save_archive:
         write_json(

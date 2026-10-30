@@ -8,13 +8,15 @@ from html.parser import HTMLParser
 
 from thirteenf_core import parse_amount
 
-PARSER_VERSION = "legacy-4"
+PARSER_VERSION = "legacy-6"
 
 
 class LegacyParseError(ValueError):
-    def __init__(self, message, raw):
+    def __init__(self, message, raw, rows=None, primary=None):
         super().__init__(message)
         self.raw_document = raw
+        self.partial_rows = rows
+        self.primary = primary
 
 
 class TableText(HTMLParser):
@@ -171,9 +173,9 @@ def parse_legacy_document(raw):
         flags=re.IGNORECASE,
     )
     pattern = re.compile(
-        r"^(?P<head>.*?)\s+(?P<cusip>[A-Z0-9*@#]{8,9})\s+"
-        r"\$?\s*(?P<value>[\d,]+(?:\.\d+)?)\s+(?P<shares>[\d,]+(?:\.\d+)?)"
-        r"\s*(?P<unit>SH|PRN)?\b(?P<tail>.*)$",
+        r"^(?P<head>.*?)\s+(?P<cusip>(?=[A-Z0-9*@#]*[0-9])[A-Z0-9*@#]{8,9})\s+"
+        r"\$?\s*(?P<value>[\d,]+(?:\.\d*)?)\s+(?P<shares>[\d,]+(?:\.\d*)?)"
+        r"\s*(?P<unit>SHS?|PRN)?\b(?P<tail>.*)$",
         re.IGNORECASE,
     )
     rows, candidates = [], []
@@ -214,7 +216,7 @@ def parse_legacy_document(raw):
                 index += 1
         match = pattern.match(line)
         if not match:
-            if re.search(r"\b[A-Z0-9*@#]{8,9}\s+[\d,]+", line):
+            if re.search(r"\b(?=[A-Z0-9*@#]*[0-9])[A-Z0-9*@#]{8,9}\s+[\d,]+", line):
                 candidates.append(line)
                 pending = ""
             elif (
@@ -252,20 +254,26 @@ def parse_legacy_document(raw):
             if split:
                 issuer, title = split[1], split[2]
         known_class = re.search(
-            r"\bCOM|COMMON|ORD|ADR|C[1L][A-Z]?\b|CLASS|SHS|PFD|PREF|NOTE|BOND|DEB|STOCK",
+            r"\bCOM|COMMON|ORD|ADR|C[1L][A-Z]?\b|CLASS|SHS|PFD|PREF|NOTE|BOND|DEB|STOCK|UNIT|RIGHT|DEP\s+RCPT|ISHARES|BEN\s+INT|ETF|SBI|SDCV|DBCV|ZONES|PUT|CALL",
             title,
             re.IGNORECASE,
         )
-        if not match["unit"] and not known_class:
+        verified_cusip = (
+            len(match["cusip"]) == 9
+            and complete_cusip(match["cusip"][:8]) == match["cusip"]
+        )
+        if not match["unit"] and not known_class and not verified_cusip:
             candidates.append(line)
             continue
         tail = match["tail"]
-        option = re.search(r"\b(PUT|CALL)\b", tail, re.IGNORECASE)
+        option = re.search(r"\b(PUT|CALL)\b", tail + " " + title, re.IGNORECASE)
         discretion = re.search(
             r"\b(SOLE|SHARED|DEFINED|OTHER|DFND)\b", tail, re.IGNORECASE
         )
         unit = match["unit"] or (
-            "PRN" if re.search(r"NOTE|BOND|DEB|DEBT", title, re.IGNORECASE) else "SH"
+            "PRN"
+            if re.search(r"NOTE|BOND|DEB|DEBT|SDCV|DBCV", title, re.IGNORECASE)
+            else "SH"
         )
         rows.append(
             {
@@ -275,7 +283,7 @@ def parse_legacy_document(raw):
                 "title_of_class": title,
                 "shares": parse_amount(match["shares"]),
                 "value_usd": parse_amount(match["value"]) * 1000,
-                "sh_prn": unit.upper(),
+                "sh_prn": "SH" if unit.upper() == "SHS" else unit.upper(),
                 "put_call": option[1].upper() if option else None,
                 "discretion": discretion[1].upper() if discretion else "",
                 "as_filed": {"line": original_line},
@@ -286,5 +294,7 @@ def parse_legacy_document(raw):
         raise LegacyParseError(
             f"Legacy table requires review: parsed={len(rows)}, unmatched={len(candidates)}; {candidates[:2]}",
             raw,
+            rows,
+            _primary(full, rows),
         )
     return rows, _primary(full, rows)
