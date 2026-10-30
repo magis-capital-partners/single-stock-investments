@@ -6,6 +6,7 @@ import json
 import re
 from functools import lru_cache
 from pathlib import Path
+from xml.etree import ElementTree as ET
 
 from ownership_common import filing_document_urls, sec_fetch_bytes, sleep
 from thirteenf_core import (
@@ -115,12 +116,16 @@ def fetch_filing_tables(filing: dict, *, fund_id: str, cache_dir: Path, offline:
             "primary": primary,
             "raw_info_bytes":info_bytes,"raw_primary_bytes":primary_bytes,
         }
-    raw = parse_info_table_xml(info_bytes)
+    try:
+        raw = parse_info_table_xml(info_bytes)
+        primary = parse_primary_doc_xml(primary_bytes) if primary_bytes else {}
+    except (ET.ParseError, ValueError) as exc:
+        exc.raw_documents = {'raw_info_bytes':info_bytes,'raw_primary_bytes':primary_bytes}
+        raise
     filing_date = filing.get("filing_date") or meta.get("filing_date")
     rows = normalize_info_rows(raw, filing_date=filing_date)
     for normalized, original in zip(rows,raw):
         normalized['as_filed']=original
-    primary = parse_primary_doc_xml(primary_bytes) if primary_bytes else {}
     if primary.get("table_value_total_usd") is not None and filing_date:
         # Cover-page total uses the same units as the info-table value column.
         from thirteenf_core import value_to_usd

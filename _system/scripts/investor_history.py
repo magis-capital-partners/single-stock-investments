@@ -514,9 +514,11 @@ def backfill_filings(
                 if filing["form"] in {"13F-NT", "13F-NT/A"}:
                     store_filing(db, meta, status="notice")
                     continue
-                store_filing(db, meta, status="discovered")
                 if before and (filing.get("filing_date") or "9999") >= before:
+                    if not existing:
+                        store_filing(db, meta, status="discovered")
                     continue
+                store_filing(db, meta, status="discovered")
                 try:
                     parsed = fetch_filing_tables(
                         filing,
@@ -566,6 +568,8 @@ def backfill_filings(
                     ET.ParseError,
                     zipfile.BadZipFile,
                 ) as exc:
+                    if getattr(exc, "raw_documents", None):
+                        store_raw_documents(db, filing["accession"], exc.raw_documents)
                     if getattr(exc, "raw_document", None):
                         store_raw_documents(
                             db,
@@ -635,6 +639,8 @@ def reparse_cached(db, cache=ARCHIVE / "filings"):
             store_raw_documents(db, record["accession"], parsed)
             count += int(report["ok"])
         except (OSError, ValueError, KeyError, ET.ParseError) as exc:
+            if getattr(exc, "raw_documents", None):
+                store_raw_documents(db, record["accession"], exc.raw_documents)
             if getattr(exc, "raw_document", None):
                 store_raw_documents(
                     db, record["accession"], {"raw_info_bytes": exc.raw_document}
