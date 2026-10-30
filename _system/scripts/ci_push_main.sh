@@ -397,7 +397,37 @@ clean_worktree_for_rebase() {
   git update-index -q --refresh || true
   if ! git diff --quiet || [ -n "$(git ls-files --others --exclude-standard | head -n 1)" ]; then
     echo "Stashing unstaged/untracked worktree dirt before rebase..."
-    git stash push -u --keep-index -m "ci_push_main-pre-rebase" || true
+    local before after file expected actual
+    local -a remaining=()
+    before=$(git rev-parse -q --verify refs/stash || true)
+    git stash push -u --keep-index -m "ci_push_main-pre-rebase" || return 1
+    after=$(git rev-parse -q --verify refs/stash || true)
+    if ! git diff --quiet; then
+      # Some sparse/hydrated worktrees retain tracked dirt after stash. Restore
+      # only regular files whose exact Git content is in the new stash. Never
+      # discard unbacked edits, symlinks, submodules, or a local user's work.
+      if [ "${GITHUB_ACTIONS:-}" != "true" ] || [ -z "$after" ] || [ "$before" = "$after" ]; then
+        echo "::error::Rebase cleanup left unsaved tracked changes."
+        return 1
+      fi
+      while IFS= read -r -d '' file; do
+        if [ ! -f "$file" ] || [ -L "$file" ]; then
+          echo "::error::Cannot safely restore residual path: $file"
+          return 1
+        fi
+        expected=$(git rev-parse --verify "${after}:${file}") || return 1
+        actual=$(git hash-object --path="$file" -- "$file") || return 1
+        if [ "$expected" != "$actual" ]; then
+          echo "::error::Residual changes are not in the saved backup: $file"
+          return 1
+        fi
+        remaining+=("$file")
+      done < <(git diff --name-only -z)
+      if [ "${#remaining[@]}" -gt 0 ]; then
+        git -c submodule.recurse=false restore --worktree -- "${remaining[@]}" || return 1
+      fi
+      git diff --quiet || return 1
+    fi
   fi
 }
 
@@ -430,6 +460,10 @@ ci_push_main() {
     ensure_main_rebase_history
     clean_worktree_for_rebase
     if ! git rebase origin/main; then
+      if ! rebase_in_progress; then
+        echo "::error::Rebase did not start; publication has not advanced onto main."
+        exit 1
+      fi
       while rebase_in_progress && try_resolve_rebase_conflicts; do
         echo "Resolved regenerable rebase conflicts; continuing rebase (attempt $attempt/$MAX_ATTEMPTS)."
       done
