@@ -25,6 +25,35 @@ from thirteenf_core import merge_filings
 from thirteenf_legacy import parse_legacy_document
 
 
+def test_archived_publishers_survive_corpus_rotation_without_reviving_rejected_ciks():
+    from refresh_investor_history import retain_archived_identities
+
+    current = {
+        "managers": [{"manager_id": "new", "cik": "1"}],
+        "source_ids": {"renamed": "new"},
+    }
+    previous = {
+        "managers": [
+            {"manager_id": "old", "cik": None},
+            {"manager_id": "rejected", "cik": "2"},
+        ],
+        "source_ids": {"historic": "old", "renamed": "old", "bad": "rejected"},
+    }
+    result = retain_archived_identities(current, previous)
+    assert {m["manager_id"] for m in result["managers"]} == {"old", "new"}
+    assert result["source_ids"] == {"historic": "old", "renamed": "new"}
+
+
+def test_retained_letter_identity_follows_an_explicit_source_correction():
+    from refresh_investor_history import current_disclosure_identity
+
+    universe = {"source_ids": {"fund": "correct"}}
+    old = {"manager_id": "old", "vehicle_id": "fund", "source_kind": "fund_disclosure"}
+    assert current_disclosure_identity(old, universe)["manager_id"] == "correct"
+    nport = {**old, "source_kind": "nport"}
+    assert current_disclosure_identity(nport, universe)["manager_id"] == "old"
+
+
 def test_unchanged_originals_and_books_do_not_rewrite_archive_pages(tmp_path):
     db = archive.connect(tmp_path / "a.sqlite")
     meta = {"accession": "a", "manager_id": "example", "cik": "1", "form": "13F-HR"}
@@ -52,6 +81,35 @@ def test_zero_asset_registered_fund_report_is_explicitly_empty():
     assert not result["partial"]
 
 
+def test_foreign_currency_attributes_upgrade_from_preserved_xml_without_http(
+    tmp_path, monkeypatch
+):
+    monkeypatch.setattr(disclosures, "ARCHIVE", tmp_path)
+    raw = b"""<nport><genInfo><repPdDate>2021-06-30</repPdDate><seriesId>S1</seriesId><seriesName>Global Fund</seriesName></genInfo><invstOrSecs><invstOrSec><name>Foreign Company</name><balance>1000</balance><currencyConditional curCd="HKD" exchangeRt="7.8"/><valUSD>5000</valUSD><pctVal>3</pctVal></invstOrSec></invstOrSecs></nport>"""
+    source = tmp_path / "source.xml"
+    source.write_bytes(raw)
+    url = "https://www.sec.gov/example.xml"
+    disclosures.public_document(url, source)
+    snapshot = disclosures.parse_nport(raw, "example", source_url=url)
+    assert snapshot["positions"][0]["currency"] == "HKD"
+    snapshot.pop("parser_version")
+    snapshot["positions"][0]["currency"] = ""
+    monkeypatch.setattr(
+        disclosures,
+        "get_bytes",
+        lambda *_: pytest.fail("Upgrades must use the pinned originals"),
+    )
+    disclosures.upgrade_nport_snapshots([snapshot], tmp_path / "public-cache.sqlite")
+    assert snapshot["positions"][0]["currency"] == "HKD"
+    assert snapshot["parser_version"] == disclosures.NPORT_PARSER_VERSION
+    snapshot.pop("parser_version")
+    snapshot["vehicle_id"] = "different-fund"
+    with pytest.raises(ValueError, match="identity mismatch"):
+        disclosures.upgrade_nport_snapshots(
+            [snapshot], tmp_path / "public-cache.sqlite"
+        )
+
+
 def test_letter_allocations_and_financial_abbreviations_are_not_stock_holdings():
     rows = disclosures.extract_document_positions("""Top 10 holdings
     United States 47%
@@ -73,6 +131,21 @@ def test_public_boundary_checks_fields_without_treating_fund_names_as_field_name
     path = Path("directory_index.json")
     assert not _json_issues(path, {"manager_id": "letter"})
     assert _json_issues(path, {"nested": {"letter_source": "private"}})
+
+
+def test_missing_required_letters_cannot_publish_a_reduced_universe(
+    tmp_path, monkeypatch
+):
+    import refresh_investor_history as refresh
+
+    def unexpected_network():
+        raise AssertionError("Required inputs must be checked before any refresh")
+
+    monkeypatch.setattr(refresh.investor_universe, "fetch_roster", unexpected_network)
+    with pytest.raises(
+        FileNotFoundError, match="retain the previous complete snapshot"
+    ):
+        refresh.refresh(corpus=tmp_path / "missing.json")
 
 
 def test_letter_holdings_table_has_no_arbitrary_row_limit():

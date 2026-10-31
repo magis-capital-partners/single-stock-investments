@@ -16,18 +16,55 @@ import investor_universe
 from vault_paths import letters_root
 
 
+def retain_archived_identities(current, previous):
+    """Keep historical letter publishers when a source corpus rotates."""
+    managers = {m["manager_id"]: m for m in current["managers"]}
+    historical = {m["manager_id"]: m for m in previous.get("managers", [])}
+    identities = current.setdefault("source_ids", {})
+    for fund_id, manager_id in previous.get("source_ids", {}).items():
+        if fund_id in identities:
+            continue
+        old = historical.get(manager_id)
+        if manager_id not in managers and old and not old.get("cik"):
+            managers[manager_id] = old
+        if manager_id in managers:
+            identities[fund_id] = manager_id
+    current["managers"] = list(managers.values())
+    return current
+
+
+def current_disclosure_identity(document, universe):
+    if document.get("source_kind") == "fund_disclosure":
+        owner = universe.get("source_ids", {}).get(document.get("vehicle_id"))
+        if owner:
+            return {**document, "manager_id": owner}
+    return document
+
+
 def refresh(*, seconds=14400, corpus=None, public=True):
     deadline = time.monotonic() + seconds
     corpus = corpus or letters_root() / "insights.json"
+    if not corpus.is_file():
+        raise FileNotFoundError(
+            "The private letter corpus is required; retain the previous complete snapshot."
+        )
     try:
         history.write_json(investor_universe.ROSTER, investor_universe.fetch_roster())
     except (OSError, ValueError, KeyError, zipfile.BadZipFile) as exc:
         print(
             f"Public roster refresh pending; dated snapshot retained: {exc}", flush=True
         )
+    saved_universe = history.ARCHIVE / "universe.json"
+    previous_universe = (
+        json.loads(saved_universe.read_text(encoding="utf-8"))
+        if saved_universe.exists()
+        else {}
+    )
     universe = investor_universe.compile_universe(
         corpus_path=corpus, resolve_public=True
     )
+    universe = retain_archived_identities(universe, previous_universe)
+    history.write_json(saved_universe, universe)
     managers = json.loads(
         (history.OWNERSHIP / "managers.json").read_text(encoding="utf-8")
     )["managers"]
@@ -90,11 +127,15 @@ def refresh(*, seconds=14400, corpus=None, public=True):
     if previous.exists():
         retained = {
             (d["manager_id"], d["id"]): d
-            for d in json.loads(previous.read_text(encoding="utf-8")).get(
+            for raw in json.loads(previous.read_text(encoding="utf-8")).get(
                 "disclosures", []
             )
+            for d in [current_disclosure_identity(raw, universe)]
         }
     retained.update({(d["manager_id"], d["id"]): d for d in documents})
+    global_disclosures.upgrade_nport_snapshots(
+        list(retained.values()), history.ARCHIVE / "public-cache.sqlite"
+    )
     disclosure_coverage = global_disclosures.publish(
         list(retained.values()), universe, review=review
     )

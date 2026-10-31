@@ -32,6 +32,7 @@ from sec_client import get_bytes, get_json
 from vault_paths import letters_root, resolve_ref_to_path
 
 SOURCES = ROOT / "_system/reference/investors/disclosure_sources.json"
+NPORT_PARSER_VERSION = "nport-2"
 EXCHANGES = {
     "HK": ".HK",
     "LN": ".L",
@@ -120,6 +121,14 @@ def parse_nport(raw, manager_id, *, source_url):
     for node in root.iter():
         if local(node) != "invstOrSec":
             continue
+        currency = child_text(node, "curCd") or next(
+            (
+                item.attrib.get("curCd", "")
+                for item in node.iter()
+                if local(item) == "currencyConditional"
+            ),
+            "",
+        )
         identifiers = {}
         for item in node.iter():
             if local(item) in {"isin", "ticker", "other"}:
@@ -135,7 +144,7 @@ def parse_nport(raw, manager_id, *, source_url):
                 "ticker": identifiers.get("ticker", ""),
                 "shares": number(child_text(node, "balance")),
                 "unit": child_text(node, "units"),
-                "currency": child_text(node, "curCd"),
+                "currency": currency,
                 "value_usd": number(child_text(node, "valUSD")),
                 "weight_pct": number(child_text(node, "pctVal")),
                 "weight_basis": "fund_net_assets",
@@ -165,11 +174,51 @@ def parse_nport(raw, manager_id, *, source_url):
         "period_end": period,
         "filed_at": None,
         "source_kind": "nport",
+        "parser_version": NPORT_PARSER_VERSION,
         "source_url": source_url,
         "partial": False,
         "scope": "single_registered_fund",
         "positions": positions,
     }
+
+
+def upgrade_nport_snapshots(documents, original_database):
+    pending = [
+        d
+        for d in documents
+        if d.get("source_kind") == "nport"
+        and d.get("parser_version") != NPORT_PARSER_VERSION
+    ]
+    if not pending:
+        return
+    if not original_database.is_file():
+        raise RuntimeError(
+            "Original public fund reports are required for the parser upgrade"
+        )
+    with closing(sqlite3.connect(original_database)) as db:
+        for document in pending:
+            original = db.execute(
+                "SELECT sha256,content_gzip FROM documents WHERE url=?",
+                (document["source_url"],),
+            ).fetchone()
+            if not original:
+                raise ValueError(
+                    "Original public fund report missing from the pinned archive"
+                )
+            raw = gzip.decompress(original[1])
+            if hashlib.sha256(raw).hexdigest() != original[0]:
+                raise ValueError("Original public fund report checksum mismatch")
+            parsed = parse_nport(
+                raw, document["manager_id"], source_url=document["source_url"]
+            )
+            if (
+                parsed["vehicle_id"] != document["vehicle_id"]
+                or parsed["period_end"] != document["period_end"]
+            ):
+                raise ValueError("Original public fund report identity mismatch")
+            document.update(
+                positions=parsed["positions"], parser_version=NPORT_PARSER_VERSION
+            )
 
 
 def parse_holdings_csv(raw, source):

@@ -87,6 +87,9 @@ def stage(site, *, vault=None, receipt=None, cache=None):
     finally:
         db.close()
     disclosures = json.loads((cache / "disclosures.json").read_text(encoding="utf-8"))
+    global_disclosures.upgrade_nport_snapshots(
+        disclosures["disclosures"], cache / "public-cache.sqlite"
+    )
     result = global_disclosures.publish(
         disclosures["disclosures"],
         universe,
