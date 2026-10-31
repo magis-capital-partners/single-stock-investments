@@ -1,0 +1,148 @@
+{
+  "schema_version": "3.0",
+  "ticker": "FRMI",
+  "specs": [
+    {
+      "spec_schema_version": "3.0",
+      "spec_id": "frmi-stahl-hk-underlying-value-2027-04-28",
+      "spec_revision": 1,
+      "forecast_class": "ex_ante",
+      "forecast_role": "diagnostic",
+      "authored_at": "2026-10-29T18:00:00Z",
+      "information_cutoff_at": "2026-10-28T12:00:00Z",
+      "registered_at": "2026-10-29T18:00:00Z",
+      "registration_commit": "3a170ca50936df6724b5165c083246f19a676c08",
+      "analysis_run_id": "fundamental-analyst-2026-10-29",
+      "author": "fundamental-analyst",
+      "model_id": "fundamental-analyst-weekly-v1",
+      "prompt_version": "case-log-table-v1",
+      "contract_hash": "8cefd3e802872cee47d77caf7c1df80c6416d7324b78aebf5adc46adfe0b3f78",
+      "component_fingerprint": "6fd3a8b3760d79a496e317fc5162b77ec42830ff24046a66c3bb5d81667bf7c3",
+      "method_id": "component_owner_cash_and_unit_nav",
+      "power_zone": "scarce_asset_optionality",
+      "component_id": "monitoring",
+      "correlation_group": "frmi-fundamental-analyst-2026-10-28",
+      "metric": "underlying business value change since the call",
+      "comparator": "lt",
+      "threshold": 0,
+      "threshold_basis": {
+        "source_ref": "_system/research/fundamental_analyst/CASE_LOG_2026-10-28.md",
+        "rule": "Fire when underlying business value has fallen since the call. The 2026-10-28 Klarman evidence note names this as the review test: stable or growing versus eroding. A hit means erosion was observed.",
+        "claim_type": "inference"
+      },
+      "unit": "percent",
+      "measurement_period_end": "2027-04-28",
+      "observable_after": "2027-04-28",
+      "resolution_deadline": "2027-04-28",
+      "source_hint": "underlying_value_change_pct",
+      "observation_plan": {
+        "metric_definition_id": "fundamental_analyst_observation",
+        "metric_definition_version": "1.0",
+        "source_adapter": "fundamental_analyst_observation",
+        "fiscal_period": "EVENT",
+        "observation_type": "instant",
+        "duration_basis": "point",
+        "canonical_unit": "percent",
+        "expected_publication_date": "2027-04-28",
+        "accepted_forms": [
+          "analyst_observation"
+        ],
+        "maximum_source_lag_days": 14,
+        "end_date_tolerance_days": 7,
+        "historical_replay": {
+          "status": "passed",
+          "evidence_ref": "FRMI/research/fundamental_analyst/replay_2026-10-28.json"
+        },
+        "outcome_unavailable_at_registration": true
+      },
+      "probability_fires": null,
+      "calibration_eligible": false,
+      "severity": 3,
+      "derived_from": "No as a core holding (Stahl / HK)",
+      "rationale": "Call (2026-10-28, Stahl / HK): No as a core holding Reason: Not a core-position fit for the lens. The repo-corrected/new model is below the hurdle at $2.665. Source: _system/research/fundamental_analyst/CASE_LOG_2026-10-28.md. Registered test: Fire when underlying business value has fallen since the call. The 2026-10-28 Klarman evidence note names this as the review test: stable or growing versus eroding. A hit means erosion was observed. Probability was not stated, so this spec is diagnostic and is not Brier-scored.",
+      "untestable": false,
+      "supersedes_spec_id": null,
+      "call": "No as a core holding",
+      "lens": "Stahl / HK",
+      "case_log_ref": "_system/research/fundamental_analyst/CASE_LOG_2026-10-28.md",
+      "source": {
+        "case_log": "_system/research/fundamental_analyst/CASE_LOG_2026-10-28.md",
+        "lens": "Stahl / HK",
+        "call_date": "2026-10-28",
+        "ticker_cell": "FRMI"
+      },
+      "typed_blocker": "FRMI has no economic_ownership_map component named monitoring. The graph withholds typed status until a contract component exists, so E2 does not count this spec yet. resolve_falsifiers.py still scores it after the review date because the spec itself is valid."
+    },
+    {
+      "spec_schema_version": "3.0",
+      "spec_id": "frmi-hohn-base-irr-2027-04-28",
+      "spec_revision": 1,
+      "forecast_class": "ex_ante",
+      "forecast_role": "diagnostic",
+      "authored_at": "2026-10-29T18:00:00Z",
+      "information_cutoff_at": "2026-10-28T12:00:00Z",
+      "registered_at": "2026-10-29T18:00:00Z",
+      "registration_commit": "3a170ca50936df6724b5165c083246f19a676c08",
+      "analysis_run_id": "fundamental-analyst-2026-10-29",
+      "author": "fundamental-analyst",
+      "model_id": "fundamental-analyst-weekly-v1",
+      "prompt_version": "case-log-table-v1",
+      "contract_hash": "8cefd3e802872cee47d77caf7c1df80c6416d7324b78aebf5adc46adfe0b3f78",
+      "component_fingerprint": "6fd3a8b3760d79a496e317fc5162b77ec42830ff24046a66c3bb5d81667bf7c3",
+      "method_id": "component_owner_cash_and_unit_nav",
+      "power_zone": "scarce_asset_optionality",
+      "component_id": "monitoring",
+      "correlation_group": "frmi-fundamental-analyst-2026-10-28",
+      "metric": "base IRR at the review price",
+      "comparator": "gte",
+      "threshold": 15,
+      "threshold_basis": {
+        "source_ref": "_system/research/fundamental_analyst/CASE_LOG_2026-10-28.md",
+        "rule": "Fire when a base IRR at the review price is at least 15% per year. The 2026-10-28 Hohn row says the model is below the hurdle at $2.665. The case log does not state a 15% price. A hit means the hurdle reason failed.",
+        "claim_type": "inference"
+      },
+      "unit": "percent",
+      "measurement_period_end": "2027-04-28",
+      "observable_after": "2027-04-28",
+      "resolution_deadline": "2027-04-28",
+      "source_hint": "base_irr_pct",
+      "observation_plan": {
+        "metric_definition_id": "fundamental_analyst_observation",
+        "metric_definition_version": "1.0",
+        "source_adapter": "fundamental_analyst_observation",
+        "fiscal_period": "EVENT",
+        "observation_type": "instant",
+        "duration_basis": "point",
+        "canonical_unit": "percent",
+        "expected_publication_date": "2027-04-28",
+        "accepted_forms": [
+          "analyst_observation"
+        ],
+        "maximum_source_lag_days": 14,
+        "end_date_tolerance_days": 7,
+        "historical_replay": {
+          "status": "passed",
+          "evidence_ref": "FRMI/research/fundamental_analyst/replay_2026-10-28.json"
+        },
+        "outcome_unavailable_at_registration": true
+      },
+      "probability_fires": null,
+      "calibration_eligible": false,
+      "severity": 4,
+      "derived_from": "Pass (Hohn)",
+      "rationale": "Call (2026-10-28, Hohn): Pass Reason: Not a quality monopoly/oligopoly with a proven barrier; the model is below the hurdle at $2.665 (PRINCIPLES A5, A13). Source: _system/research/fundamental_analyst/CASE_LOG_2026-10-28.md. Registered test: Fire when a base IRR at the review price is at least 15% per year. The 2026-10-28 Hohn row says the model is below the hurdle at $2.665. The case log does not state a 15% price. A hit means the hurdle reason failed. Probability was not stated, so this spec is diagnostic and is not Brier-scored.",
+      "untestable": false,
+      "supersedes_spec_id": null,
+      "call": "Pass",
+      "lens": "Hohn",
+      "case_log_ref": "_system/research/fundamental_analyst/CASE_LOG_2026-10-28.md",
+      "source": {
+        "case_log": "_system/research/fundamental_analyst/CASE_LOG_2026-10-28.md",
+        "lens": "Hohn",
+        "call_date": "2026-10-28",
+        "ticker_cell": "FRMI"
+      },
+      "typed_blocker": "FRMI has no economic_ownership_map component named monitoring. The graph withholds typed status until a contract component exists, so E2 does not count this spec yet. resolve_falsifiers.py still scores it after the review date because the spec itself is valid."
+    }
+  ]
+}

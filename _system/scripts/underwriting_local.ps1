@@ -22,16 +22,34 @@ if (Test-Path -LiteralPath $markerPath) {
     @{ repository = 'magis-capital-partners/single-stock-investments'; purpose = 'local-codex-underwriting' } |
         ConvertTo-Json | Set-Content -Encoding utf8 -LiteralPath $markerPath
 }
+$workerProbe = $null
+try {
+    $workerProbe = [IO.File]::Open((Join-Path $runtimeRoot 'worker.lock'), 'OpenOrCreate', 'ReadWrite', 'ReadWrite')
+    $workerProbe.Lock(0, 1)
+    $workerProbe.Unlock(0, 1)
+} catch [IO.IOException] {
+    Write-Output 'The local underwriting worker is already running; leaving its source and evidence alone.'
+    return
+} finally {
+    if ($workerProbe) { $workerProbe.Dispose() }
+}
+try {
+    $launcherHandle = [IO.File]::Open((Join-Path $runtimeRoot 'launcher.lock'), 'OpenOrCreate', 'ReadWrite', 'None')
+} catch [IO.IOException] {
+    Write-Output 'The local underwriting launcher is already running; leaving it alone.'
+    return
+}
+try {
 $env:GIT_TERMINAL_PROMPT = '0'
 function Run-Git {
-    & git @args
+    & git -c fetch.recurseSubmodules=false -c submodule.recurse=false @args
     if ($LASTEXITCODE -ne 0) { throw 'The isolated source update failed.' }
 }
 $newSource = -not (Test-Path -LiteralPath (Join-Path $sourceRoot '.git'))
 if ($newSource) {
     Run-Git clone --depth 1 --filter=blob:none --sparse --no-checkout https://github.com/magis-capital-partners/single-stock-investments.git $sourceRoot
 } else {
-    $dirty = & git -C $sourceRoot status --porcelain --untracked-files=no
+    $dirty = Run-Git -C $sourceRoot status --porcelain --untracked-files=no
     if ($dirty) { throw 'The owned source has edits; preserve them before updating it.' }
 }
 $patterns = @('/_system/scripts/', '/_system/config/llm_usage_policy.json', '/_system/config/underwriting_policy.json',
@@ -44,13 +62,23 @@ $patterns = @('/_system/scripts/', '/_system/config/llm_usage_policy.json', '/_s
         '/*/research/underwriting_*.json', '/.github/workflows/valuation-underwriting.yml',
         '/.github/workflows/autonomous-compounders.yml')
 Run-Git -C $sourceRoot sparse-checkout set --no-cone @patterns
-$remote = & git -C $sourceRoot remote get-url origin
+$remote = Run-Git -C $sourceRoot remote get-url origin
 if ($remote -ne 'https://github.com/magis-capital-partners/single-stock-investments.git') { throw 'Unexpected runtime source remote.' }
-Run-Git -C $sourceRoot fetch -q origin main
+Run-Git -C $sourceRoot fetch --no-recurse-submodules -q origin main
 Run-Git -C $sourceRoot checkout -q --detach origin/main
+$installedBootstrap = Join-Path $runtimeRoot 'launch.ps1'
+$trustedBootstrap = Join-Path $sourceRoot '_system/scripts/underwriting_local.ps1'
+if ([String]::Equals([IO.Path]::GetFullPath($PSCommandPath), $installedBootstrap, [StringComparison]::OrdinalIgnoreCase) -and
+    (Test-Path -LiteralPath $trustedBootstrap) -and
+    (Get-FileHash -LiteralPath $installedBootstrap).Hash -ne (Get-FileHash -LiteralPath $trustedBootstrap).Hash) {
+    Copy-Item -LiteralPath $trustedBootstrap -Destination $installedBootstrap -Force
+}
 if ($PrepareOnly) { return }
 $workerArgs = @((Join-Path $sourceRoot '_system/scripts/underwriting_local.py'), '--home', $runtimeRoot)
 if ($Launch) { $workerArgs += '--launch' }
 if ($Tickers) { $workerArgs += @('--tickers', $Tickers) }
 & python @workerArgs
 if ($LASTEXITCODE -ne 0) { throw 'Local underwriting did not finish; saved receipts remain in the runtime.' }
+} finally {
+    $launcherHandle.Dispose()
+}

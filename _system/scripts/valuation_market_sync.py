@@ -85,6 +85,21 @@ def collect_market(symbol, as_of, history_start, get_json, *, now=None):
             for t, v in zip(data.get('timestamp') or [], close)
             if isinstance(v, (float, int)) and not isinstance(v, bool) and math.isfinite(v) and v > 0]
     rows = [(d, v) for d, v in bars if d <= expected]
+    closing_evidence = None
+    if not any(d == expected for d, _ in rows):
+        # A daily close can remain null after the regular closing auction.
+        # Accept metadata only when its regular-session tick is at the actual
+        # exchange close, after the same ten-minute settlement policy above.
+        # Never relabel an intraday, stale or extended-hours price as a close.
+        tick, price = meta.get('regularMarketTime'), meta.get('regularMarketPrice')
+        numeric = lambda value: isinstance(value, (int, float)) and not isinstance(value, bool) and math.isfinite(value)
+        session_close = exchange_calendar(calendar, date.fromisoformat(expected).year).session_close(expected).timestamp()
+        if (numeric(tick) and numeric(price) and price > 0
+                and 0 <= tick-session_close <= 120
+                and tick <= datetime.fromisoformat(checked).timestamp()):
+            rows.append((expected, price))
+            closing_evidence = {'regular_market_time': tick, 'session_close': session_close,
+                                'price_field': 'meta.regularMarketPrice', 'time_field': 'meta.regularMarketTime'}
     if not rows:
         raise ValueError('No positive completed session close')
     day, value = max(rows)
@@ -97,6 +112,9 @@ def collect_market(symbol, as_of, history_start, get_json, *, now=None):
              'price_type': 'completed_session_close', 'calendar': calendar,
              'exchange': meta.get('exchangeName'), 'exchange_timezone': str(tz),
              'expected_close': expected, 'claim_type': 'provider_observation'}
+    quote['close_basis'] = 'provider_regular_closing_tick' if closing_evidence else 'daily_bar'
+    if closing_evidence:
+        quote['closing_tick_evidence'] = closing_evidence
     start = int(datetime.combine(date.fromisoformat(history_start), time.min, timezone.utc).timestamp())
     end = int(datetime.combine(date.fromisoformat(as_of)+timedelta(days=1), time.min, timezone.utc).timestamp())
     url = base + f'?period1={start}&period2={end}&interval=1mo&events=splits'

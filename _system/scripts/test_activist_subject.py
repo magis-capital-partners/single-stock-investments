@@ -28,8 +28,11 @@ from sec_filer_parse import (  # noqa: E402
 )
 
 FIXTURES = ROOT / "_system" / "scripts" / "fixtures" / "activism"
-# SEC company_tickers on 2026-10-29: symbol SATS belongs to Strive, Inc.
+# Strive, Inc. is CIK 1920406. EDGAR's ticker list leads with ASST and also
+# carries SATS and SATA. EchoStar is CIK 1415404, EDGAR ticker ECHO.
+# The desk's mistake was to follow the SATS symbol onto this filing.
 STRIVE_CIK = "1920406"
+ECHOSTAR_CIK = "1415404"
 COMPANY_TICKERS_SAYS_SATS = {STRIVE_CIK: "SATS", "0001920406": "SATS"}
 
 
@@ -75,6 +78,9 @@ class FilerIsNotTheSubjectTests(unittest.TestCase):
         facts = parse_schedule_13_xml((FIXTURES / "sats_strive_13da.xml").read_text(encoding="utf-8"))
         self.assertEqual(facts["issuer_name"], "Strive, Inc.")
         self.assertEqual(facts["issuer_cik"], STRIVE_CIK)
+        # EDGAR ticker ASST. Not EchoStar, whose EDGAR ticker is ECHO.
+        self.assertFalse(subject_cik_matches_ticker(facts["issuer_cik"], "ECHO"))
+        self.assertTrue(subject_cik_matches_ticker(ECHOSTAR_CIK, "ECHO"))
         # The collision the desk followed. The registry must win.
         self.assertEqual(COMPANY_TICKERS_SAYS_SATS[STRIVE_CIK], "SATS")
         self.assertFalse(

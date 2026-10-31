@@ -97,6 +97,9 @@
     return `<section class="rw-value"><div class="rw-value-heading"><h3>Automatic research IRR</h3><span class="rw-meta">${e(text(a.model_route))} · ${e(a.method_version)}</span></div>${(a.warnings||[]).length?`<p class="rw-meta">${e(a.warnings.join(' '))}</p>`:''}<p>Bear <strong>${pct(a.forward_irr_pct?.low)}</strong> · Base <strong>${pct(a.forward_irr_pct?.base)}</strong> · Bull <strong>${pct(a.forward_irr_pct?.high)}</strong></p><p class="rw-meta">7-year scenarios · research estimates from versioned rules · no human approval queue</p><p>Purchase price ${new Intl.NumberFormat(undefined,{maximumFractionDigits:2}).format(a.quote?.value)} ${e(a.quote?.currency||'')} · ${e(date(a.quote?.as_of))} · ${sourceLink(a.quote?.source_url,h)}</p><p class="rw-meta">Financial period ${e(date(a.latest_fact_as_of))}. Automatic refresh ${e(date(a.as_of))}.</p><details class="rw-section"><summary>Assumptions, cash flows, sources &amp; entry prices</summary><ul>${assumptions}</ul><div style="overflow-x:auto"><table class="component-table"><thead><tr><th>Date</th><th>Bear</th><th>Base</th><th>Bull</th></tr></thead><tbody>${rows}</tbody></table></div><p class="rw-meta">Per share in ${e(a.quote?.currency||'listing currency')}; final cash flow includes terminal sale proceeds.</p><p>${(a.buy_prices||[]).map(z=>`${e(z.hurdle_pct)}% hurdle: ${new Intl.NumberFormat(undefined,{maximumFractionDigits:2}).format(z.price)}`).join(' · ')}</p><p>${refs.map(ref=>sourceLink(ref,h)).join(' · ')}${a.fx?.source_url?' · FX '+sourceLink(a.fx.source_url,h):''}</p></details></section>`;
   }
   function sharedForecast(t,h) {
+    return sharedForecastBody(t,h)+(global.ValuationViz?.renderEconomicDiagnostics?.(t,h)||'');
+  }
+  function sharedForecastBody(t,h) {
     let f=t.shared_forecast; const e=h.escapeHtml, d=decision(t);
     if (!f) return '';
     if (f.status==='available' && d.calculation_status && !d.research_return_available) f={...f,status:'sync_gap',

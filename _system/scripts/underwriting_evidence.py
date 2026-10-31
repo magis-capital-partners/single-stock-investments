@@ -47,18 +47,62 @@ def text_of(raw):
     return ' '.join(html.unescape(re.sub(r'<[^>]+>', ' ', raw)).split())
 
 
-def document_record(url, raw):
+def merge_evidence_requests(previous, incoming):
+    """Keep recent disclosure requests across bounded repair/retry rounds."""
+    rows = {}
+    for row in list(previous or [])+list(incoming or []):
+        key = str(row.get('code') or digest(row))
+        rows.pop(key, None)
+        rows[key] = row
+    return list(rows.values())[-12:]
+
+
+def requested_keywords(gaps):
+    """Balance explicit disclosure requests; model text never chooses URLs/tools."""
+    groups = []
+    excluded = {'missing', 'evidence', 'primary', 'source', 'required', 'financial', 'report',
+                'statement', 'company', 'specific', 'retrieve', 'contexts', 'expanded', 'still',
+                'omit', 'from', 'with', 'that', 'these', 'this', 'have', 'need', 'needed'}
+    for gap in gaps[:12]:
+        detail = str(gap.get('detail') or '')[:8000]
+        search = re.split(r'search terms\s*:', detail, maxsplit=1, flags=re.I)[-1]
+        quoted = re.findall(r"['\u2018\u2019\"\u201c\u201d]([^'\u2018\u2019\"\u201c\u201d\n]{2,120})['\u2018\u2019\"\u201c\u201d]", search)
+        terms = [' '.join(t.lower().split()) for t in quoted
+                 if re.fullmatch(r"[A-Za-z][A-Za-z0-9 ()/,&.'-]{1,119}", t)]
+        if not terms:
+            terms = [w.lower() for w in re.findall(r'[A-Za-z]{4,35}', str(gap.get('code') or '')+' '+detail)
+                     if w.lower() not in excluded]
+        notes = ['note '+n for n in re.findall(r'\bNote\s+(\d{1,2})\b', detail, re.I)]
+        terms = notes+terms
+        groups.append(list(dict.fromkeys(terms))[:12])
+    terms = []
+    for index in range(12):
+        for group in groups:
+            if index < len(group) and group[index] not in terms:
+                terms.append(group[index])
+                if len(terms) == 18:
+                    return terms
+    return terms
+
+
+def document_record(url, raw, focus_keywords=(), *, form=None):
     require(len(raw) <= 20_000_000, 'Primary filing exceeds the bounded evidence size')
     source = raw.decode('utf-8', errors='replace')
     words = ('cash', 'debt', 'assets', 'liabilities', 'inventory', 'capital', 'operating', 'shares',
              'revenue', 'credit', 'receivables', 'segment', 'net income', 'financing')
+    focus = tuple(' '.join(w.lower().split()) for w in focus_keywords
+                  if re.fullmatch(r"[A-Za-z][A-Za-z0-9_ ()/,&.'-]{1,119}", w))[:18]
     tables = []
-    for table in re.findall(r'<table\b.*?</table>', source, flags=re.IGNORECASE | re.DOTALL):
-        text = text_of(table)
+    for table in re.finditer(r'<table\b.*?</table>', source, flags=re.IGNORECASE | re.DOTALL):
+        text = text_of(table.group())
         if 80 <= len(text) <= 16000:
-            score = sum(w in text.lower() for w in words)
+            score = sum(w in text.lower() for w in words)+5*sum(w in text.lower() for w in focus)
             if score >= 3:
-                tables.append((score, text))
+                # Scale, title and period often sit just outside the table.
+                # Keep adjacent primary text so supplemental facts can quote
+                # an actual scale header rather than infer a multiplier.
+                prefix = text_of(source[max(0, table.start()-15000):table.start()])[-1000:]
+                tables.append((score, (prefix+' '+text).strip()))
     contexts, seen, size = [], set(), 0
     for _, text in sorted(tables, key=lambda item: (-item[0], len(item[1]))):
         if text in seen or size+len(text) > 85000:
@@ -69,16 +113,60 @@ def document_record(url, raw):
         if len(contexts) >= 30:
             break
     body = text_of(source)
+    if form == '10-Q' and 500 <= len(body) <= 350000 and sum(w in body.lower() for w in words) >= 3:
+        # A bounded complete interim report avoids serial gaps caused by notes
+        # or contractual footnotes falling just outside selected text windows.
+        return {'id':'doc_'+digest(url)[:16],'source_url':url,'content_hash':hashlib.sha256(raw).hexdigest(),
+                'contexts':[body],'coverage':'complete_quarterly_filing'}
+    budget = 350000 if focus else 150000
+    def add_context(text):
+        nonlocal size
+        if text and text not in seen and size+len(text) <= budget:
+            contexts.append(text)
+            seen.add(text)
+            size += len(text)
+    # Note requests need the disclosure, not a table-of-contents hit or a small
+    # keyword window. Keep bounded complete sections with original source text.
+    note_spans = []
+    for phrase in focus:
+        if not re.fullmatch(r'note \d{1,2}', phrase):
+            continue
+        number = phrase.split()[-1]
+        matches = list(re.finditer(r'\bNote\s+'+number+r'\b\s*[.:-]?', body, re.I))
+        matches.sort(key=lambda m: (bool(re.search(r'[.:-]',m.group())), bool(re.match(r'\s*[A-Z]',body[m.end():m.end()+20])),m.start()),reverse=True)
+        for match in matches[:2]:
+            note_spans.append((max(0,match.start()-200),min(len(body),match.start()+22000)))
+    merged = []
+    for start,end in sorted(note_spans):
+        if merged and start <= merged[-1][1]:
+            merged[-1] = (merged[-1][0],max(end,merged[-1][1]))
+        else:
+            merged.append((start,end))
+    for start,end in merged:
+        add_context(body[start:end])
     # Business economics and risks are not limited to financial tables.
-    for phrase in ('our business', 'business overview', 'competition', 'working capital',
+    defaults = ('our business', 'business overview', 'competition', 'working capital',
                    'liquidity', 'regulatory capital', 'credit', 'clinical', 'inventory', 'warrant', 'dilution',
-                   'depositary', 'each ads'):
+                   'depositary', 'each ads')
+    for phrase in defaults:
         matches = list(re.finditer(re.escape(phrase), body, flags=re.IGNORECASE))
         if matches:
             selected = matches[:3] if phrase in ('depositary', 'each ads') else [matches[min(1, len(matches)-1)]]
             for match in selected:
                 start = match.start()
-                contexts.append(body[max(0, start-250):start+2300])
+                add_context(body[max(0, start-250):start+2300])
+    for phrase in focus:
+        matches = list(re.finditer(re.escape(phrase), body, flags=re.IGNORECASE))
+        # A contents mention is not the disclosure. Prefer the occurrence
+        # surrounded by other requested concepts, with a stable document order.
+        matches.sort(key=lambda m: (-sum(w in body[max(0, m.start()-1500):m.start()+8500].lower()
+                                            for w in focus), m.start()))
+        if matches:
+            start = matches[0].start()
+            add_context(body[max(0, start-1500):start+8500])
+    # All original text survives; overlapping note windows need not repeat the
+    # same table/narrative again and consume the judgment session's context.
+    contexts = [c for i,c in enumerate(contexts) if not any(i != j and c in other for j,other in enumerate(contexts))]
     require(contexts, 'No financial tables could be frozen from '+url)
     return {'id': 'doc_'+digest(url)[:16], 'source_url': url,
             'content_hash': hashlib.sha256(raw).hexdigest(), 'contexts': contexts}
@@ -108,11 +196,45 @@ def listing_ratio_from_documents(documents):
     return None
 
 
+def fingerprint_facts(source):
+    """Pin a provider's rolling request end to the disclosed financial epoch.
+
+    Keep the actual fetched URLs in evidence. Only the comparison ignores this
+    known collection clock; issuer, metric, value, period and filing still bind.
+    """
+    facts = copy.deepcopy(source.get('facts') or [])
+    anchor = (source.get('latest_report') or {}).get('filed') or max(
+        (str(p.get('filed') or p.get('period') or '') for p in facts), default='')
+    try:
+        end = str((date.fromisoformat(anchor)-date(1970, 1, 1)).days*86400)
+    except (ValueError, TypeError):
+        return facts
+    for point in facts:
+        url = point.get('source_url') or ''
+        if (point.get('source_kind') == 'provider_reported'
+                and re.match(r'^https://query[12]\.finance\.yahoo\.com/ws/fundamentals-timeseries/v1/finance/timeseries/', url)):
+            point['source_url'] = re.sub(r'([?&]period2=)\d+(?=&|$)', lambda m: m[1]+end, url, count=1)
+    return facts
+
+
 def source_fingerprint(root, ticker):
     source = read(root/'_system/reference/market-data/valuation_fundamentals'/(ticker+'.json'))
     points = primary_kpis(root, ticker)
     kpis = {'points': points} if points else {}
-    return semantic_json_sha256({'facts': source.get('facts') or [], 'latest_report': source.get('latest_report'), 'operating_kpis': kpis},
+    payload = {'facts': fingerprint_facts(source), 'primary_observations': source.get('primary_observations') or [],
+               'latest_report': source.get('latest_report'), 'operating_kpis': kpis}
+    related = source.get('underwriting_related_issuers') or (read(root/ticker/'research/valuation.json').get('underwriting') or {}).get('related_issuers') or {}
+    if related:
+        payload['related_issuers'] = {}
+        for symbol,metadata in related.items():
+            if not re.fullmatch(r'[A-Za-z0-9][A-Za-z0-9._-]{0,30}',symbol):
+                continue
+            cached = read(root/'_system/reference/market-data/valuation_related_evidence'/(symbol+'.json'))
+            payload['related_issuers'][symbol] = {'source_hash':cached.get('source_hash') or metadata.get('source_hash'),
+                                                 'status':cached.get('status','ready')}
+    if source.get('latest_disclosure'):
+        payload['latest_disclosure'] = source['latest_disclosure']
+    return semantic_json_sha256(payload,
                                volatile_keys={'retrieved_at', 'fetched_at', 'updated_at', 'generated_at', 'last_collected', 'attempted_at', 'checked_at'})
 
 
@@ -151,6 +273,7 @@ def _share_observation(point, market, quote):
 
 def _observation(point):
     row = {k: point.get(k) for k in ('field', 'value', 'period', 'source_url', 'locator', 'filed', 'source_kind')}
+    row.update({k: point[k] for k in ('start', 'form', 'tag', 'scope', 'measurement_type') if k in point})
     row['unit'] = 'shares' if point['field'] in ('shares', 'ordinary_shares', 'balance_shares') else point.get('currency')
     if point.get('share_basis'):
         row['share_basis'] = point['share_basis']
@@ -178,7 +301,8 @@ def rich_primary_observations(payload, url, as_of, market, quote, reporting_curr
         for row in selected.values():
             field = 'shares' if tag == 'WeightedAverageNumberOfDilutedSharesOutstanding' else 'balance_shares' if row['unit'] == 'shares' else tag
             point = {'field': field, 'value': row['val'], 'period': row['end'], 'currency': row['unit'],
-                     'source_url': url, 'locator': tag+'; '+str(row.get('accn')), 'filed': row.get('filed'), 'source_kind': 'primary'}
+                     'source_url': url, 'locator': tag+'; '+str(row.get('accn')), 'filed': row.get('filed'), 'source_kind': 'primary',
+                     'start': row.get('start'), 'form': row.get('form'), 'tag': tag, 'scope': 'reported consolidated'}
             try:
                 if row['unit'] == 'shares':
                     point = _share_observation(point, market, quote)
@@ -206,7 +330,7 @@ def filing_bytes(root, ticker, accession, client, url):
     return client.get_bytes(url, timeout=40)
 
 
-def prepare_packet(root: Path, ticker: str, as_of: str, *, collect=True, client=None):
+def prepare_packet(root: Path, ticker: str, as_of: str, *, collect=True, client=None, focus_keywords=()):
     from refresh_shared_forecasts import (
         FUNDAMENTALS,
         QUOTES,
@@ -247,45 +371,59 @@ def prepare_packet(root: Path, ticker: str, as_of: str, *, collect=True, client=
     annual.sort(key=lambda p: p['period'])
     reporting_currency = history[-1]['currency'] if history else annual[-1]['currency'] if annual else quote['currency']
     observations = []
-    for raw in normalized.get('facts') or []:
+    for raw in (normalized.get('facts') or [])+(data.get('primary_observations') or []):
         if raw.get('source_kind') != 'primary' or raw.get('period', '9999') > as_of:
             continue
         if raw.get('currency') not in (reporting_currency, None, 'shares'):
             continue
         try:
-            point = _share_observation(raw, market, quote) if raw['field'] in ('shares', 'ordinary_shares') else raw
-            observations.append(_observation(point))
+            point = _share_observation(raw, market, quote) if raw['field'] in ('shares', 'ordinary_shares', 'balance_shares') else raw
+            observation = _observation(point)
+            observation.update({k: point[k] for k in ('start', 'form', 'tag', 'scope', 'measurement_type') if k in point})
+            observations.append(observation)
         except (BasisGap, ContractError):
             continue
-    documents, errors = [], []
+    documents, errors = copy.deepcopy(data.get('primary_documents') or []), []
+    if focus_keywords and documents:
+        from valuation_earnings import primary_document
+        for index, document in enumerate(documents):
+            try:
+                reader = client or SecClient(max_attempts=2)
+                raw = reader.get_bytes(document['source_url'], timeout=40)
+                focused = primary_document(document['source_url'], raw, {k: document[k] for k in ('form', 'filed', 'accession', 'as_of')}, focus_keywords)
+                focused.setdefault('period', document.get('period'))
+                documents[index] = focused
+            except (OSError, ValueError, KeyError, TypeError):
+                pass
     cik = (registry.get(ticker, {}).get('download') or {}).get('cik')
     if cik:
         client = client or SecClient(max_attempts=2)
         base = f'https://data.sec.gov/api/xbrl/companyfacts/CIK{int(cik):010d}.json'
-        try:
-            payload = client.get_json(base, timeout=30)
-            observations += rich_primary_observations(payload, base, as_of, market, quote, reporting_currency)
-        except (OSError, ValueError) as exc:
-            errors.append({'source': 'sec_companyfacts', 'error': type(exc).__name__})
+        if not data.get('primary_observations'):
+            try:
+                payload = client.get_json(base, timeout=30)
+                observations += rich_primary_observations(payload, base, as_of, market, quote, reporting_currency)
+            except (OSError, ValueError) as exc:
+                errors.append({'source': 'sec_companyfacts', 'error': type(exc).__name__})
         try:
             submission = client.get_json(f'https://data.sec.gov/submissions/CIK{int(cik):010d}.json', timeout=30)
             recent = (submission.get('filings') or {}).get('recent') or {}
             chosen = set()
             for i, form in enumerate(recent.get('form') or []):
-                if form not in ('10-K', '10-Q', '20-F', '6-K') or form in chosen or recent['filingDate'][i] > as_of:
+                if form not in ('10-K', '10-Q', '20-F', '40-F', '6-K') or form in chosen or recent['filingDate'][i] > as_of:
                     continue
                 filename = recent['primaryDocument'][i]
                 if not re.fullmatch(r'[A-Za-z0-9_.-]+', filename):
                     continue
                 url = f"https://www.sec.gov/Archives/edgar/data/{int(cik)}/{recent['accessionNumber'][i].replace('-', '')}/{filename}"
                 try:
-                    document = document_record(url, filing_bytes(root, ticker, recent['accessionNumber'][i], client, url))
+                    document = document_record(url, filing_bytes(root, ticker, recent['accessionNumber'][i], client, url), focus_keywords, form=form)
                     document.update(form=form, filed=recent['filingDate'][i], period=(recent.get('reportDate') or ['']*len(recent['form']))[i])
                     documents.append(document)
                     chosen.add(form)
                 except (OSError, ValueError) as exc:
                     errors.append({'source': url, 'error': type(exc).__name__})
-                if len(documents) >= 2:
+                if len(chosen) >= 2:
                     break
         except (OSError, ValueError) as exc:
             errors.append({'source': 'sec_submissions', 'error': type(exc).__name__})
@@ -322,14 +460,46 @@ def prepare_packet(root: Path, ticker: str, as_of: str, *, collect=True, client=
               'observations': observations, 'documents': documents, 'collection_errors': errors,
               'split_events': [{'date': e['date'], 'ratio': e['ratio']} for e in market['events']]}
     for document in documents:
-        if document.get('period') and document.get('filed', '') > packet['latest_report'].get('filed', ''):
+        if document.get('period') and (document['period'], document.get('filed', '')) > (packet['latest_report'].get('period', ''), packet['latest_report'].get('filed', '')):
             packet['latest_report'] = {'period': document['period'], 'filed': document['filed'], 'source_url': document['source_url']}
+    # The packet and every downstream consumer share the discovered report marker.
+    # This is source metadata, never a new economic-model review date.
+    if collect and packet['latest_report'] != data.get('latest_report'):
+        from atomic_io import write_json_if_changed
+        data['latest_report'] = packet['latest_report']
+        write_json_if_changed(root/FUNDAMENTALS/(ticker+'.json'), data)
+        packet['input_fingerprint'] = source_fingerprint(root, ticker)
+    packet['source_discovery'] = data.get('report_discovery') or {}
+    packet['readiness'] = evidence_readiness(packet, require_documents=bool(cik))
     packet['evidence_hash'] = digest({'observations': [{k: v for k, v in o.items() if k != 'share_basis'} for o in observations],
-                                      'documents': [{k: d[k] for k in ('source_url', 'content_hash')} for d in documents],
+                                      'documents': [{**{k: d[k] for k in ('source_url', 'content_hash')}, 'contexts_hash': digest(d['contexts'])} for d in documents],
                                       'latest_report': packet['latest_report'], 'split_events': packet['split_events'],
                                       'listing_ratio': listing_ratio})
     packet['packet_hash'] = digest(packet)
     return packet
+
+
+def evidence_readiness(packet, *, require_documents=False):
+    """Facts/documents readiness is checked before admitting any judgment call."""
+    gaps = []
+    day = date.fromisoformat(packet['as_of'])
+    financial = date.fromisoformat(packet['financial_period'])
+    if not 0 <= (day-financial).days <= 550:
+        gaps.append({'code': 'financial_baseline_stale', 'detail': 'Collect a current annual financial baseline.'})
+    primary = [o for o in packet.get('observations') or [] if o.get('source_kind') == 'primary']
+    if not any(o.get('unit') == 'shares' and numeric(o.get('value')) > 0 and o['period'] >= packet['financial_period'] for o in primary):
+        gaps.append({'code': 'verified_denominator_missing', 'detail': 'Collect primary shares on the verified listing basis.'})
+    latest = packet.get('latest_report') or {}
+    docs = packet.get('documents') or []
+    if require_documents and (not latest.get('period') or not any(d.get('period') == latest['period'] for d in docs)):
+        gaps.append({'code': 'latest_primary_document_missing', 'detail': 'Retrieve the newly discovered report, including financial tables.'})
+    if require_documents and not any(d.get('form') in ('10-K', '20-F', '40-F') for d in docs):
+        gaps.append({'code': 'annual_primary_document_missing', 'detail': 'Retrieve the annual report and business/financing disclosures.'})
+    if require_documents and packet.get('source_discovery', {}).get('status') in ('failed', 'earnings_unresolved'):
+        gaps.append({'code': 'report_discovery_failed', 'detail': 'Retry primary submissions; old cached reports do not prove freshness.'})
+    return {'status': 'ready' if not gaps else 'evidence_gap', 'gaps': gaps,
+            'primary_observations': len(primary), 'documents': len(docs),
+            'history_periods': len({o['period'] for o in primary})}
 
 
 def supplemental_observations(packet, rows):
@@ -364,5 +534,7 @@ def supplemental_observations(packet, rows):
         out.append({'id': row['id'], 'value': raw*scale, 'unit': row['unit'], 'period': period,
                     'source_url': source['source_url'], 'source_kind': 'primary', 'field': row.get('field') or 'supplemental',
                     'locator': row['locator'], 'scope': row['scope'], 'measurement_type': row['measurement_type'], 'document_hash': source['content_hash']})
+        if source.get('issuer_ticker'):
+            out[-1]['issuer_ticker'] = source['issuer_ticker']
         known.add(row['id'])
     return out

@@ -130,7 +130,7 @@ jobs:
     timeout-minutes: 180
     concurrency:
       # Per-job queue - see the concurrency note at the top of this file.
-      group: data-commit-main-${{ github.job }}
+      group: data-commit-main-intake-full
       cancel-in-progress: false
     env:
       RESEARCH_VAULT_REPO_URL: ${{ secrets.RESEARCH_VAULT_REPO_URL }}
@@ -206,7 +206,7 @@ jobs:
     timeout-minutes: 75
     concurrency:
       # Per-job queue - see the concurrency note at the top of this file.
-      group: data-commit-main-${{ github.job }}
+      group: data-commit-main-technicals
       cancel-in-progress: false
     env:
       RESEARCH_VAULT_REPO_URL: ${{ secrets.RESEARCH_VAULT_REPO_URL }}
@@ -325,7 +325,7 @@ jobs:
     timeout-minutes: 297
     concurrency:
       # Per-job queue - see the concurrency note at the top of this file.
-      group: data-commit-main-${{ github.job }}
+      group: data-commit-main-activist
       cancel-in-progress: false
     env:
       RESEARCH_VAULT_REPO_URL: ${{ secrets.RESEARCH_VAULT_REPO_URL }}
@@ -486,7 +486,7 @@ jobs:
     timeout-minutes: 270
     concurrency:
       # Per-job queue - see the concurrency note at the top of this file.
-      group: data-commit-main-${{ github.job }}
+      group: data-commit-main-downloads
       cancel-in-progress: false
     env:
       RESEARCH_VAULT_REPO_URL: ${{ secrets.RESEARCH_VAULT_REPO_URL }}
@@ -544,7 +544,7 @@ jobs:
     timeout-minutes: 60
     concurrency:
       # Per-job queue - see the concurrency note at the top of this file.
-      group: data-commit-main-${{ github.job }}
+      group: data-commit-main-drive
       cancel-in-progress: false
     outputs:
       imported: ${{ steps.import.outputs.imported }}
@@ -764,7 +764,7 @@ jobs:
     timeout-minutes: 65
     concurrency:
       # Per-job queue - see the concurrency note at the top of this file.
-      group: data-commit-main-${{ github.job }}
+      group: data-commit-main-news
       cancel-in-progress: false
     env:
       POLYGON_API_KEY: ${{ secrets.POLYGON_API_KEY || secrets.POLYGON_IO_API_KEY }}
@@ -825,7 +825,7 @@ jobs:
     timeout-minutes: 30
     concurrency:
       # Per-job queue - see the concurrency note at the top of this file.
-      group: data-commit-main-${{ github.job }}
+      group: data-commit-main-cvr-discover
       cancel-in-progress: false
     env:
       RESEARCH_VAULT_REPO_URL: ${{ secrets.RESEARCH_VAULT_REPO_URL }}
@@ -918,7 +918,7 @@ jobs:
     timeout-minutes: 30
     concurrency:
       # Per-job queue - see the concurrency note at the top of this file.
-      group: data-commit-main-${{ github.job }}
+      group: data-commit-main-warrant-discover
       cancel-in-progress: false
     env:
       RESEARCH_VAULT_REPO_URL: ${{ secrets.RESEARCH_VAULT_REPO_URL }}
@@ -985,7 +985,7 @@ jobs:
     timeout-minutes: 30
     concurrency:
       # Per-job queue - see the concurrency note at the top of this file.
-      group: data-commit-main-${{ github.job }}
+      group: data-commit-main-separation-discover
       cancel-in-progress: false
     env:
       RESEARCH_VAULT_REPO_URL: ${{ secrets.RESEARCH_VAULT_REPO_URL }}
@@ -1047,7 +1047,7 @@ jobs:
     timeout-minutes: 60
     concurrency:
       # Per-job queue - see the concurrency note at the top of this file.
-      group: data-commit-main-${{ github.job }}
+      group: data-commit-main-reverse-splits
       cancel-in-progress: false
     env:
       RESEARCH_VAULT_REPO_URL: ${{ secrets.RESEARCH_VAULT_REPO_URL }}
@@ -1119,7 +1119,7 @@ jobs:
     timeout-minutes: 45
     concurrency:
       # Per-job queue - see the concurrency note at the top of this file.
-      group: data-commit-main-${{ github.job }}
+      group: data-commit-main-world-model
       cancel-in-progress: false
     env:
       RESEARCH_VAULT_REPO_URL: ${{ secrets.RESEARCH_VAULT_REPO_URL }}
@@ -1160,7 +1160,7 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 90
     concurrency:
-      group: data-commit-main-${{ github.job }}
+      group: data-commit-main-buyback-radar
       cancel-in-progress: false
     env:
       RESEARCH_VAULT_REPO_URL: ${{ secrets.RESEARCH_VAULT_REPO_URL }}
@@ -1232,7 +1232,7 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 90
     concurrency:
-      group: data-commit-main-${{ github.job }}
+      group: data-commit-main-thirteen-f
       cancel-in-progress: false
     env:
       SEC_USER_AGENT: ${{ vars.SEC_USER_AGENT }}

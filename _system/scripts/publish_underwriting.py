@@ -36,7 +36,8 @@ def approved_paths(completed):
     paths = ['_system/data/underwriting_queue.json']
     for ticker in completed:
         paths += [ticker+'/research/'+name for name in ('valuation.json', 'valuation_contract.json', 'valuation_route.json',
-                                                       'underwriting_contract.json', 'underwriting_review.json', 'underwriting_receipt.json')]
+                                                       'underwriting_contract.json', 'underwriting_review.json', 'underwriting_receipt.json',
+                                                       'underwriting_diagnostics.json', 'underwriting_outcomes.json')]
         paths += ['_system/reference/market-data/'+folder+'/'+ticker+'.json' for folder in ('valuation_quotes', 'valuation_fundamentals')]
     return paths
 

@@ -12,15 +12,6 @@
 <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600;700&family=DM+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
 <link href="insights-events.css" rel="stylesheet">
 <link href="strategy-workbench.css" rel="stylesheet">
-<link href="short-alpha.css?v=20261015-results" rel="stylesheet">
-<link href="third-plus-study.css?v=20261025-ssr-replay" rel="stylesheet">
-<link href="third-plus-forward.css?v=20261028-forward20" rel="stylesheet">
-<link href="third-plus-announcement.css?v=20261028-announcement" rel="stylesheet">
-<link href="reverse-splits-portfolio.css?v=20261015-results" rel="stylesheet">
-<link href="shorts-net-edge.css?v=20261015-v2" rel="stylesheet">
-<link href="shorts-edge-v3.css?v=20261018-fundamentals" rel="stylesheet">
-<link href="short-sleeve.css?v=20261019-portfolio" rel="stylesheet">
-<link href="short-profit-program.css?v=20261022-framework-v1" rel="stylesheet">
 <link href="reverse-split-strategy.css?v=20261029-announcement-v1" rel="stylesheet">
 <link href="warrants.css" rel="stylesheet">
 <link href="portfolio.css?v=20261008-michael-tail" rel="stylesheet">
@@ -1861,20 +1852,18 @@
   <nav class="view-tabs workspace-subnav" id="strategies-subnav" aria-label="Strategies" hidden>
     <a class="view-tab" data-view="spx-0dte" href="#/strategies/spx-0dte/overview">SPX 0DTE</a>
     <a class="view-tab" data-view="letf" href="#/strategies/ls-algo/overview">LS Algo</a>
-    <a class="view-tab" data-view="systematic-shorts" href="#/strategies/systematic-shorts/overview">Systematic Shorts</a>
     <a class="view-tab" data-view="darwin" href="#/strategies/darwin/overview">Darwin CC <span class="nav-badge">SIGNAL</span></a>
     <a class="view-tab" data-view="reverse-split-strategy" href="#/strategies/reverse-split/overview">Reverse-split short <span class="nav-badge">RESEARCH</span></a>
     <a class="view-tab" data-view="biotech-quant" href="#/strategies/biotech-quant/overview">Biotech Quant</a>
   </nav>
   <nav class="view-tabs workspace-subnav" id="research-subnav" aria-label="Research" hidden>
-    <a class="view-tab compounder-tab" data-view="holdings" data-research-scope="compounders" href="#/research/compounders">Long Term Compounders</a>
+    <a class="view-tab compounder-tab" data-view="holdings" data-research-scope="compounders" href="#/research/compounders">Core compounders</a>
     <a class="view-tab" data-view="holdings" data-research-scope="coverage" href="#/research/coverage">All coverage</a>
     <a class="view-tab" data-view="valuation" href="#/research/valuation">Decision Queue</a>
   </nav>
   <nav class="view-tabs workspace-subnav" id="ideas-subnav" aria-label="Ideas" hidden>
     <a class="view-tab" data-view="watchlist" data-ideas-group="inbox" data-watchlist-route="all" href="#/ideas/all">Inbox</a>
     <a class="view-tab" data-view="watchlist" data-ideas-group="screens" data-watchlist-route="nol" href="#/ideas/nol">Screens</a>
-    <a class="view-tab" data-view="short-alpha" href="#/ideas/short-alpha">Shorts</a>
     <a class="view-tab" data-view="situations" href="#/ideas/situations">Special Situations</a>
   </nav>
   <nav class="view-tabs workspace-subnav" id="insights-subnav" aria-label="Insights" hidden>
@@ -1891,11 +1880,10 @@
   <section class="portfolio-panel" id="spx-0dte-panel" aria-label="SPX 0DTE strategy"><div id="spx-0dte-content"></div></section>
   <section class="portfolio-panel" id="letf-panel" aria-label="Leveraged ETF strategies"><div id="letf-content"></div></section>
   <section class="portfolio-panel" id="reverse-split-strategy-panel" aria-label="Announcement-first reverse-split strategy"><div id="reverse-split-strategy-content"></div></section>
-  <section class="strategy-panel" id="systematic-shorts-panel" data-strategy-panel aria-label="Systematic Shorts"><div class="strategy-workbench" id="systematic-shorts-content"></div></section>
   <section class="strategy-panel" id="biotech-quant-panel" data-strategy-panel aria-label="Biotech Quant"><div class="strategy-workbench" id="biotech-quant-content"></div></section>
 
   <div class="holdings-view" id="holdings-view">
-  <a class="compounder-entry" id="compounder-entry" href="#/research/compounders"><div><strong>Long Term Compounders</strong><span>Your quality-business watchlist · track valuations, entry prices and share buybacks</span></div><b aria-hidden="true">→</b></a>
+  <a class="compounder-entry" id="compounder-entry" href="#/research/compounders"><div><strong>Core compounders</strong><span>Your quality-business watchlist · track valuations, entry prices and share buybacks</span></div><b aria-hidden="true">→</b></a>
   <div id="compounders-home" hidden></div>
   <div class="toolbar">
     <label class="sr-only" for="search">Search ticker or company</label>
@@ -1955,10 +1943,7 @@
     <div id="risk-content" style="display:none"></div>
   </section>
 
-  <section class="short-alpha-panel" id="short-alpha-panel">
-    <div class="loading" id="short-alpha-loading">Loading hypothesis ledger…</div>
-    <div id="short-alpha-content" style="display:none"></div>
-  </section>
+
 
   <section class="warrants-panel" id="warrants-panel">
     <div class="loading" id="warrants-loading">Loading warrant contracts…</div>
@@ -2052,25 +2037,9 @@
 <script src="holdings-viz.js?v=20261018-held-by"></script>
 <script src="index-viz.js"></script>
 <script src="activist-viz.js?v=20260819-dashboard-rebuild"></script>
-<script src="third-plus-study-details.js?v=20261025-ssr-replay"></script>
-<script src="third-plus-allocation.js?v=20261027-allocation"></script>
-<script src="third-plus-forward.js?v=20261028-forward20"></script>
-<script src="third-plus-announcement.js?v=20261028-announcement-full-v8"></script>
-<script src="third-plus-assumed.js?v=20261027-full-assumed"></script>
-<script src="third-plus-venue.js?v=20261027-full-assumed"></script>
-<script src="third-plus-execution.js?v=20261025-ssr-replay"></script>
-  <script src="third-plus-study.js?v=20261025-ssr-replay"></script>
-<script src="short-alpha-viz.js?v=20261028-announcement"></script>
-<script src="reverse-splits-portfolio-viz.js?v=20261015-results"></script>
-<script src="shorts-net-edge-viz.js?v=20261015-v2"></script>
-<script src="shorts-edge-v3-viz.js?v=20261018-fundamentals"></script>
-<script src="short-sleeve-engine.js?v=20261019-portfolio"></script>
-<script src="short-sleeve-viz.js?v=20261020-patient"></script>
-<script src="short-framework-engine.js?v=20261022-framework-v1"></script>
-<script src="short-framework-viz.js?v=20261022-framework-v1"></script>
-<script src="short-profit-program.js?v=20261029-strategy"></script>
+<script src="reverse-split-live.js?v=20261029-live"></script>
+<script src="reverse-split-research.js?v=20261029-research"></script>
 <script src="reverse-split-strategy.js?v=20261029-announcement-v1"></script>
-<script src="reverse-splits-viz.js?v=20261022-profit-program"></script>
 <script src="warrant-viz.js"></script>
 <script src="special-situations-viz.js?v=20261018-buyback"></script>
 <script src="buyback-viz.js?v=20261022-radar"></script>
@@ -2082,7 +2051,7 @@
 <script src="display-system.js?v=20261029"></script>
 <script src="portfolio-viz.js?v=20261008-michael-tail"></script>
 <script src="oauth.js"></script>
-<script src="compounders.js?v=20261028"></script>
+<script src="compounders.js?v=20261029"></script>
 <script src="company-models.js?v=20261028"></script>
 <script src="commodity-model-viz.js?v=20261028"></script>
 <script src="research-workspace.js?v=20261027-market-sync"></script>
@@ -2460,10 +2429,17 @@ function setAppHash(nextHash) {
 }
 
 function parseRouteFromHashString(hash) {
+  const path = String(hash || '').split('?')[0];
+  const retiredShorts = /^#\/(?:strategies\/systematic-shorts|(?:ideas\/)?short-alpha)(?:\/([^/?#]+))?$/i.exec(path);
+  if (retiredShorts) {
+    const section = (retiredShorts[1] || 'overview').toLowerCase();
+    const destination = ['forward', 'live'].includes(section) ? 'live' : ['backtest', 'announcement', 'research'].includes(section) ? 'research' : ['risk', 'execution'].includes(section) ? 'assumptions' : 'overview';
+    return {view:'reverse-split-strategy',reverseSplitStrategySection:destination,ticker:null,watchlistSub:null};
+  }
   const researchStrategy = typeof StrategyWorkbench === 'undefined' ? null : StrategyWorkbench.parseRoute(hash);
   if (researchStrategy) return researchStrategy;
-  hash = String(hash || '').split('?')[0];
-  const reverseSplitStrategyMatch = /^#\/strategies\/reverse-split(?:\/(overview|trades|metrics|assumptions|comparisons|screen|provenance))?$/i.exec(hash);
+  hash = path;
+  const reverseSplitStrategyMatch = /^#\/strategies\/reverse-split(?:\/(overview|trades|research|live|metrics|assumptions|comparisons|screen|provenance))?$/i.exec(hash);
   if (reverseSplitStrategyMatch) return { view:'reverse-split-strategy', reverseSplitStrategySection:(reverseSplitStrategyMatch[1]||'overview').toLowerCase(), ticker:null, watchlistSub:null };
   const portfolioMatch = /^#\/portfolio(?:\/(all|drew|michael))?(?:\/(positions|realized|risk|margin|performance|orders|reconciliation))?$/i.exec(hash || '');
   if (portfolioMatch) {
@@ -2564,7 +2540,7 @@ function syncRouteHash() {
     setAppHash(`#/strategies/spx-0dte/${window.PortfolioViz?.state.strategySection || 'overview'}`);
   } else if (activeView === 'letf') {
     setAppHash(`#/strategies/ls-algo/${window.PortfolioViz?.state.strategySection === 'positions' && window.PortfolioViz?.state.strategyBucket !== 'all' ? window.PortfolioViz.state.strategyBucket : window.PortfolioViz?.state.strategySection || 'overview'}`);
-  } else if (['systematic-shorts', 'biotech-quant'].includes(activeView)) {
+  } else if (['biotech-quant'].includes(activeView)) {
     setAppHash(researchStrategyRoutes[activeView] || `#/strategies/${activeView}/overview`);
   } else if (activeView === 'darwin') {
     setAppHash(`#/strategies/darwin/${darwinViewMode || 'overview'}`);
@@ -2612,7 +2588,7 @@ function applyParsedRouteFromHash() {
   if (!data) return false;
   const route = parseRouteFromHash();
   if (!route) return false;
-  if (['systematic-shorts', 'biotech-quant'].includes(route.view)) {
+  if (['biotech-quant'].includes(route.view)) {
     researchStrategyRoutes[route.view] = StrategyWorkbench.route(route.view, route.strategySection, Object.fromEntries(new URLSearchParams(route.query || '')));
     if (route.canonical) setAppHash(researchStrategyRoutes[route.view]);
   }
@@ -4156,13 +4132,14 @@ function renderReverseSplitStrategy() {
 }
 
 function setView(view, opts = {}) {
+  if (view === 'short-alpha' || view === 'systematic-shorts') { view = 'reverse-split-strategy'; reverseSplitStrategySection = 'overview'; }
   if (view === 'drew' || view === 'michael') {
     if (window.PortfolioViz) PortfolioViz.setRoute(view, 'positions');
     view = 'portfolio';
   }
   activeView = view;
   if(view === 'holdings') Compounders.load().then(()=>{if(activeView==='holdings')renderTable();}).catch(()=>{});
-  const parentView = ['reverse-split-strategy', 'spx-0dte', 'letf', 'systematic-shorts', 'darwin', 'biotech-quant'].includes(view) ? 'strategies'
+  const parentView = ['reverse-split-strategy', 'spx-0dte', 'letf', 'darwin', 'biotech-quant'].includes(view) ? 'strategies'
     : ['holdings', 'valuation'].includes(view) ? 'research'
       : ['watchlist', 'short-alpha', 'warrants', 'situations'].includes(view) ? 'ideas'
         : ['insights', 'activist'].includes(view) ? 'insights'
@@ -4216,7 +4193,7 @@ function setView(view, opts = {}) {
   if (view === 'insights') renderInsights();
   if (view === 'activist') renderActivist();
   if (view === 'darwin') renderDarwin();
-  for (const kind of ['systematic-shorts', 'biotech-quant']) {
+  for (const kind of ['biotech-quant']) {
     document.getElementById(`${kind}-panel`)?.classList.toggle('active', view === kind);
     if (view === kind) {
       if (opts.syncHash !== false) syncRouteHash();

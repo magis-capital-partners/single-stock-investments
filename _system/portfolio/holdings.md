@@ -7,6 +7,7 @@ Synced from `_system/portfolio/registry.json`. Last sync: 2026-10-29.
 | Ticker | Folder | Company | Market | Last download | Last research | Archetype | Stance |
 |--------|--------|---------|--------|---------------|---------------|-----------|--------|
 | 0388.HK | 0388.HK/ | Hong Kong Exchanges and Clearing Ltd | EU | 2026-07-19 | 2026-10-29 | croupier | watch |
+| 1211.HK | 1211.HK/ | BYD Company Limited | EU | 2026-10-28 | 2026-10-28 | compounder | watch |
 | 319A.T | 319A.T/ | Next Generation Technology Group Inc. | JP | 2026-10-05 | 2026-10-29 | serial_acquirer | watch |
 | 3905.T | 3905.T/ | DataSection Co., Ltd. | JP | 2026-07-19 | 2026-10-29 | compounder | watch |
 | 7176.T | 7176.T/ | Simplex Financial Holdings Co., Ltd. | JP | 2026-07-19 | 2026-10-29 | unknown | watch |
@@ -91,6 +92,7 @@ Synced from `_system/portfolio/registry.json`. Last sync: 2026-10-29.
 | AWK | AWK/ | American Water Works | US | 2026-08-19 | 2026-10-29 | unknown | watch |
 | AXON | AXON/ | Axon Enterprise, Inc. | US | 2026-08-19 | 2026-10-29 | unknown | watch |
 | AXP | AXP/ | American Express | US | 2026-08-19 | 2026-10-29 | unknown | watch |
+| AXR | AXR/ | AMREP Corporation | US | 2026-10-23 | 2026-10-23 | optionality | watch |
 | AXTI | AXTI/ | AXTI | US | 2026-08-23 | 2026-10-29 | cyclical | watch |
 | AZLCZ | AZLCZ/ | Aztec Land and Cattle Company | US | 2026-08-23 | 2026-10-29 | unknown | watch |
 | AZO | AZO/ | AutoZone | US | 2026-08-23 | 2026-10-29 | unknown | watch |
@@ -385,6 +387,7 @@ Synced from `_system/portfolio/registry.json`. Last sync: 2026-10-29.
 | HD | HD/ | Home Depot (The) | US | 2026-07-29 | 2026-10-29 | unknown | watch |
 | HE | HE/ | Hawaiian Electric Industries | US | 2026-07-09 | 2026-10-29 | unknown | watch |
 | HEE | HEE/ | Hellenic Exchanges - Athens Stock Exchange S.A. | EU | 2026-07-09 | 2026-10-29 | unknown | watch |
+| HEI | HEI/ | HEICO Corporation | US | 2026-10-29 | 2026-10-29 | unknown | watch |
 | HEI.A | HEI.A/ | HEICO Corporation (Class A) | US | 2026-07-29 | 2026-10-29 | unknown | watch |
 | HGBL | HGBL/ | Heritage Global Inc. | US | 2026-07-16 | 2026-10-29 | unknown | watch |
 | HIG | HIG/ | Hartford (The) | US | 2026-07-29 | 2026-10-29 | unknown | watch |
@@ -873,4 +876,4 @@ Synced from `_system/portfolio/registry.json`. Last sync: 2026-10-29.
 | ZETA | ZETA/ | ZETA | US | 2026-07-28 | 2026-10-29 | unknown | watch |
 | ZTS | ZTS/ | Zoetis | US | 2026-07-10 | 2026-10-29 | unknown | watch |
 
-**866 holdings total.** Registry: `_system/portfolio/registry.json`
+**869 holdings total.** Registry: `_system/portfolio/registry.json`

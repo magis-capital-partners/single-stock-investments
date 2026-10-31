@@ -136,13 +136,35 @@ def test_source_staleness_is_visible():
     assert result['sources'][0]['stale']
 
 
+def test_missing_issuer_row_is_filled_from_the_registry(tmp_path):
+    src=json.loads((SCRIPTS.parents[1]/'_system/reference/core_compounders.json').read_text())
+    src['issuers'].pop('LB')
+    config_dir=tmp_path/'_system'/'reference'
+    config_dir.mkdir(parents=True)
+    portfolio=tmp_path/'_system'/'portfolio'
+    portfolio.mkdir()
+    (portfolio/'registry.json').write_text(json.dumps({'holdings':{'LB':{'company':'LandBridge Company LLC'}}}))
+    path=config_dir/'core_compounders.json'
+    path.write_text(json.dumps(src))
+    filled=load_config(path)
+    assert filled['issuers']['LB']['display_name']=='LandBridge Company LLC'
+    assert filled['issuers']['LB']['watchlist_group']=='unassigned'
+    assert filled['issuers']['LB']['driver_to_fcf']
+    assert any(g['id']=='unassigned' for g in filled['groups'])
+
+
 def test_compounder_roster_matches_owner_and_single_source():
-    expected='MA V AXP MCO SPGI MSCI CME ICE CBOE LSEG DB1.DE MIAX B3SA3.SA 8697.T CSU TOI.V LMN LIFCO.ST TEQ.ST HEI BRK.B BN MKL FRMO FNV WPM RGLD TPL PSK.TO DRR.AX TFPM OR CP FER AENA.MC WCN GOOGL AMZN META ASML RMS.PA RACE COST CPRT'.split()
+    expected='MA V AXP MCO SPGI MSCI CME ICE CBOE LSEG DB1.DE MIAX B3SA3.SA 8697.T CSU TOI.V LMN LIFCO.ST TEQ.ST HEI BRK.B BN MKL FRMO FNV WPM RGLD TPL PSK.TO DRR.AX TFPM OR PBT LB CP FER AENA.MC WCN GOOGL AMZN META ASML RMS.PA RACE COST CPRT'.split()
     doc=roster();cfg=load_config()
     assert [r['ticker'] for r in doc['companies']]==expected==cfg['tickers']
-    assert len(expected)==44
+    assert len(expected)==46
+    assert 'TDG' not in expected and 'TOI' not in expected and 'BRK-B' not in expected
     assert doc==load(SCRIPTS.parents[1]/'dashboard/data/compounders.json')
-    assert all('driver_to_fcf' in cfg['issuers'][t] for t in expected)
+    assert all('driver_to_fcf' in cfg['issuers'][t] and cfg['issuers'][t].get('display_name') for t in expected)
+    registry=SCRIPTS.parents[1]/'_system/portfolio/registry.json'
+    if registry.is_file():
+        holdings=set(load(registry)['holdings'])
+        assert set(expected)<=holdings
 
 
 def test_gold_theme_uses_new_history_and_correct_units():

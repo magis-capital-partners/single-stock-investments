@@ -1,35 +1,73 @@
-# Tape and index desk eval set
+# tape_index index backfill
 
-Point-in-time record for the Technical Analyst (tape_index) desk. Research only. Nothing here is a position, a price target, or an input to a base return.
+Known-answer set for the index desk. Each row compares `dashboard/data/index_membership.json` as it was committed before an index review with the same file as it was committed after that review. The comparison is point-in-time. The file at HEAD is not used to judge a past date.
 
-`grok/tape_index/index-backfill` was not on origin when this folder was added. File names below are the contract if that branch lands later.
+This folder is research only. It is not a dashboard feed, and nothing here is a position or a stance.
 
-## Files
+## File
 
-- `run_log.jsonl` is one JSON object per posted flag.
-- `test_set.json` holds forward index cases, known-answer backtests, and held names.
-- `tape_snapshots/YYYY-MM-DD.json` is the technical print stored for that run date. `2026-10-29.json` is the first snapshot.
+```
+_system/data/desk_evals/tape_index/index_backfill_<YYYY-MM-DD>.json
+```
 
-## Run log
+The date is the day the set was generated. A later generation is a new file.
 
-Each row has `run_date`, `ticker`, `kind`, `flag`, `source`, `verdict`, `verdict_by`, `graded_on`, and `grade`.
+## How the two snapshots are chosen
 
-`kind` is `tape` or `index`. `verdict`, `verdict_by`, `graded_on`, and `grade` stay null until the flag is graded.
+Commit date is the America/New_York calendar date of the committer timestamp. A trading day is an NYSE session. Weekends and the 2026 full-day NYSE holidays listed in `history.nyse_holidays_2026` are not sessions. An early close still counts as a session.
 
-New rows also carry the source file's `generated_at`, `owner_desk`, and the lens rule ids used for that flag. Rows already in this file predate those fields and do not have them.
+- **Before.** The last commit on or before the date that is ten NYSE sessions prior to the effective date. The effective date itself is not counted.
+- **After.** The first commit after the effective date.
 
-## Test set
+Events come from the `calendar` array inside the historical files. A known answer is a change in `current_memberships` for an index in that event's family, and only for a ticker present in both snapshots. A ticker that exists in only one snapshot is not graded.
 
-`forward_index_cases` are names logged before the provider announces. `known_answer` stays null until the grade window closes.
+## Grades
 
-`backtest_known_answers` are cases whose answer is already known.
+On a case:
 
-`held_names` are names the desk refused to rank, with the reason, and a verdict that stays null until graded.
+| Grade | Meaning |
+|---|---|
+| `hit` | The before scorecard flagged that index, and membership changed in the flagged direction. |
+| `miss` | The before scorecard flagged that index, and membership did not change in the flagged direction. |
+| `unflagged_change` | Membership changed, and the before scorecard had no candidate, near-miss, or deletion-risk flag on that index. |
 
-## Grading
+On an event, `grade` is `graded` or `insufficient_history`. Insufficient history means there is no commit on or before the ten-session cutoff, or no commit after the effective date. Those events are listed and not scored.
 
-Grade each flag point-in-time against the feeds as committed on `run_date`. A later refresh of a feed is not evidence the desk had that day.
+## Flags
 
-The primary metric is index catch rate: index events on book names flagged before the provider announcement, divided by all such events announced. False flags count against the desk.
+The flag is the before snapshot's scorecard `status` for that index.
 
-Secondary metrics are tape-flag persistence (the share of tape flags still over the stored threshold in the next `technical_summary`) and held-name verdict accuracy. Scoring is weekly, on Fridays. A correction becomes a memory note, a threshold or hold-rule change in the digest routine, or a new case in `test_set.json`.
+| Status | Role | Direction that counts as a hit |
+|---|---|---|
+| `inclusion_candidate` | candidate | index was added to `current_memberships` |
+| `banding_hold` | near-miss | index was added |
+| `committee_watch` | near-miss | index was added |
+| `deletion_risk` | deletion risk | index was removed |
+
+`flagged_status` is that status, or null when the case is an unflagged change.
+
+`mcap_before` is the scorecard market-cap check value. `rank_before` is `rank_estimate` when the file stored one, otherwise the rank check value. Both are null when that scorecard did not store them.
+
+## Case outcomes
+
+`outcome` is `added`, `removed`, or `unchanged`, except for a Russell 1000/2000 migration:
+
+- `promoted_into_russell_1000` and `promoted_out_of_russell_2000` when a ticker leaves Russell 2000 and enters Russell 1000
+- `demoted_into_russell_2000` and `demoted_out_of_russell_1000` for the reverse
+
+`russell_1000_2000` at the top of the file lists every such migration in the graded windows and in the whole history of this file.
+
+## Catch rate
+
+`hits / (hits + unflagged_changes)`.
+
+Misses stay in the summary and stay out of the denominator. The rate is null when the denominator is 0, which means the two snapshots show no membership change for that family.
+
+## Other fields
+
+- `generated_at` is when this file was built.
+- `method` is the point-in-time rule in one paragraph.
+- `before_commit` and `after_commit` carry `sha` and `date`. Graded rows also carry `committed_at`, the file's own `as_of`, and, on the before commit, `nyse_sessions_before_effective`.
+- `before_portfolio_summary` is the before file's `inclusion_candidates`, `deletion_risks`, and `provider_confirmed_events`. The last of those is the count stored on `portfolio_summary`, not a list of events. The candidate list is the whole book. A case is opened only when the flag is on an index in this event's family.
+- `off_calendar_membership_edits` lists commits that changed `current_memberships` outside a graded before/after pair, so those edits are not silently treated as the June Russell reconstitution.
+- `summary` on each event, and the top-level `summary`, count hits, misses, unflagged changes, and the catch rate. Insufficient events store null counts and are not added into the top-level totals.

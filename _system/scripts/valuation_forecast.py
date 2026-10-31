@@ -254,6 +254,8 @@ def build_forecast(valuation, *, quote=None, as_of=None, fx=None, market=None, e
         except (ValueError, KeyError, IndexError, ImportError):
             sync_gaps.append('listing_calendar_or_completed_close_unverified')
     latest_report = (market or {}).get('latest_report') or {}
+    if ((market or {}).get('source_discovery') or {}).get('status') == 'earnings_unresolved':
+        sync_gaps.append('new_earnings_disclosure_unresolved')
     underwriting = valuation.get('underwriting') or {}
     verification = (market or {}).get('underwriting_validation') or {}
     if not underwriting and verification.get('status') == 'unverified':
@@ -262,6 +264,8 @@ def build_forecast(valuation, *, quote=None, as_of=None, fx=None, market=None, e
         result['underwriting'] = underwriting
         if verification.get('status') != 'verified' or verification.get('contract_hash') != underwriting.get('contract_hash'):
             sync_gaps.append('underwriting_contract_unverified')
+        if verification.get('input_fingerprint_matches') is False:
+            sync_gaps.append('new_economic_evidence_after_underwriting')
         if _day(underwriting.get('review_due')) and today and today > _day(underwriting['review_due']):
             sync_gaps.append('underwriting_review_due')
     result['market_sync']['latest_report'] = latest_report
@@ -402,7 +406,13 @@ def build_forecast(valuation, *, quote=None, as_of=None, fx=None, market=None, e
         result['next_action'] = 'automatic_source_refresh'
         return result
     returns = {c: _irr(price, schedules[c]) for c in CASES}
-    if any(v is None for v in returns.values()):
+    from underwriting_economics import zero_loss_outcomes
+    try:
+        result['return_outcomes'] = zero_loss_outcomes(valuation, schedules)
+    except (ValueError,KeyError,TypeError):
+        result['gaps'].append({'code':'financing_failure_waterfall_invalid'})
+        return result
+    if any(v is None and c not in result['return_outcomes'] for c,v in returns.items()):
         result['gaps'].append({'code': 'unique_shareholder_irr_unavailable'})
         return result
     result['forward_irr_pct'] = returns
@@ -428,6 +438,7 @@ def attach_forecast(row, forecast, *, detailed=True):
         if forecast.get('underwriting_archetype'):
             row.setdefault('classification', {})['archetype'] = forecast['underwriting_archetype']
     decision.update({'forecast_id': forecast.get('calculation_id') or forecast.get('forecast_hash'), 'calculation_status': forecast['status'],
+                     'economic_review_status': forecast.get('economic_review_status'),
                      'research_return_available': forecast['status'] == 'available',
                      'calculation_reason': '; '.join(dict.fromkeys(g['code'] for g in forecast.get('gaps') or [])),
                      'forward_return_at_price_pct': forecast['forward_irr_pct'],

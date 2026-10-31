@@ -1,6 +1,6 @@
 # Core compounder research workflow
 
-The canonical 37 names and configurable hurdle bands are in
+The canonical names and configurable hurdle bands are in
 `_system/reference/core_compounders.json`. `TOI.V` is Topicus; `TOI` is a
 different issuer. `BRK.B` is the registry key. Sleeve or stance changes are
 separate owner decisions.

@@ -45,6 +45,7 @@ EXCHANGE_META = {
     "EVO.ST": "Nasdaq Stockholm",
     "WBI": "NYSE",
     "HE": "NYSE",
+    "HEI": "NYSE",
     "MIAX": "NYSE",
     "FNV": "NYSE",
     "WPM": "NYSE",
@@ -124,6 +125,7 @@ EXCHANGE_META = {
     "XP": "NASDAQ",
     "TOI.V": "TSXV",
     "RX.V": "TSXV",
+    "1211.HK": "HKEX",
     "LIFCO.ST": "Nasdaq Stockholm",
     "RACE": "NYSE",
     "WCN": "NYSE",
@@ -163,6 +165,7 @@ DOWNLOAD_TYPE_OVERRIDES = {
     "X.TO": "uk_ir",
     "ASX.AX": "au_asx",
     "RX.V": "uk_ir",
+    "1211.HK": "uk_ir",
 }
 
 

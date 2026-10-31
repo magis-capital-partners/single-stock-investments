@@ -264,6 +264,25 @@ def spec_payload_hash(spec: dict) -> str:
     return hashlib.sha256(raw.encode("utf-8")).hexdigest()
 
 
+def outcome_id(row: dict) -> str:
+    """Stable id of one outcome-ledger row (the state events' ``outcome_id``)."""
+    return hashlib.sha256(json.dumps(row, sort_keys=True).encode()).hexdigest()[:24]
+
+
+def effective_outcomes(rows: list[dict]) -> list[dict]:
+    """Outcome rows not superseded by a later row's ``supersedes_outcome_ids``.
+
+    The ledger is append-only, so a re-resolution of an ``unresolvable``
+    verdict is a new row naming the rows it replaces. Anything that counts
+    outcomes must count this view, or the spec is scored twice.
+    """
+    superseded = {str(ref) for row in rows
+                  for ref in (row.get("supersedes_outcome_ids") or [])}
+    if not superseded:
+        return list(rows)
+    return [row for row in rows if outcome_id(row) not in superseded]
+
+
 def _is_number(value) -> bool:
     return isinstance(value, (int, float)) and not isinstance(value, bool)
 

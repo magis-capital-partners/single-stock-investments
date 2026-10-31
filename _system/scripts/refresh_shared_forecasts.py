@@ -56,12 +56,13 @@ def calculate(ticker, root, as_of, evaluated_at=None):
     cached = read(root/QUOTES/(ticker+'.json'))
     automatic = read(root/'_system/reference/market-data/compounders'/(ticker+'.json'))
     quote = cached.get('quote') or automatic.get('quote')
-    market = copy.deepcopy(cached.get('corporate_actions') or {})
+    market = copy.deepcopy(cached.get('corporate_actions') or valuation.get('market_snapshot') or {})
     if cached.get('identity', {}).get('status') == 'mismatch' and quote:
         quote = {**quote, 'value': None, 'identity_status': 'mismatch', 'identity': cached['identity']}
     generated = False
     legacy = False
     facts = read(root/FUNDAMENTALS/(ticker+'.json')) or automatic
+    market['source_discovery'] = facts.get('report_discovery') or {}
     if facts.get('latest_report'):
         market['latest_report'] = facts['latest_report']
     if valuation.get('underwriting') or (root/ticker/'research/underwriting_receipt.json').is_file():
@@ -71,7 +72,9 @@ def calculate(ticker, root, as_of, evaluated_at=None):
             receipt = validate_saved(root, ticker, research_vault_root())
             if not receipt:
                 raise ValueError('Underwriting receipt missing')
-            market['underwriting_validation'] = {'status': 'verified', 'contract_hash': receipt['contract_hash']}
+            from underwriting_evidence import source_fingerprint
+            market['underwriting_validation'] = {'status': 'verified', 'contract_hash': receipt['contract_hash'],
+                'input_fingerprint_matches': receipt.get('input_fingerprint') == source_fingerprint(root, ticker)}
         except (ValueError, OSError, KeyError, TypeError):
             market['underwriting_validation'] = {'status': 'unverified'}
             # A stale receipt also blocks an overwritten source model that
@@ -127,6 +130,20 @@ def calculate(ticker, root, as_of, evaluated_at=None):
         forecast['warnings'].append('Automatic operating first-pass model with explicit generic assumptions; not issuer-specific underwriting.')
     forecast['source_model_ref'] = (FUNDAMENTALS/(ticker+'.json')).as_posix() if generated else f'{ticker}/research/valuation.json'
     forecast['source_model_hash'] = semantic_json_sha256(valuation)
+    if valuation.get('economic_analysis') and market.get('underwriting_validation', {}).get('status') == 'verified':
+        from underwriting_economics import economic_diagnostics, pricing_diagnostics
+        forecast['economic_diagnostics'] = economic_diagnostics(valuation)
+        forecast['economic_diagnostics']['pricing'] = pricing_diagnostics(valuation, quote)
+        forecast['economic_review_status'] = 'passed'
+    elif valuation.get('economic_analysis'):
+        forecast['economic_review_status'] = 'unverified'
+    elif valuation.get('underwriting') and read(root/'_system/config/underwriting_policy.json').get('required_contract_schema', 'underwriting-contract/2') == 'underwriting-contract/2':
+        forecast['economic_review_status'] = 'reproducible_only'
+        if forecast['status'] == 'available':
+            forecast['audit_only_forward_irr_pct'] = forecast['forward_irr_pct']
+            forecast.update(status='economic_review_required', forward_irr_pct=dict.fromkeys(('low', 'base', 'high')),
+                            buy_prices=[], next_action='automatic_economic_underwriting_refresh')
+            forecast['gaps'].append({'code': 'economic_review_required'})
     if forecast.get('underwriting'):
         from valuation_method_router import route_valuation
         forecast['method_profile'] = route_valuation(copy.deepcopy(valuation))['profile_id']
@@ -231,10 +248,22 @@ def refresh_missing_model_inputs(ticker, row, root, as_of, registry):
     cached = read(root/QUOTES/(ticker+'.json'))
     unchanged = financial_signature(prior, cached) == financial_signature(data, cached)
     anchor = prior.get('model_anchor') if unchanged else as_of
+    def evidence_signature(value):
+        return semantic_json_sha256({k: value.get(k) for k in ('facts', 'primary_observations', 'latest_report', 'latest_disclosure')},
+                                    volatile_keys={'retrieved_at', 'attempted_at', 'collected_at'})
+    collected_at = prior.get('collected_at') if evidence_signature(prior) == evidence_signature(data) else None
     saved = {'facts': data.get('facts') or [], 'quote': data.get('quote'), 'model_anchor': anchor or as_of,
+             'primary_observations': data.get('primary_observations') or [], 'report_discovery': data.get('report_discovery') or {},
+             'primary_documents': data.get('primary_documents') or [], 'latest_disclosure': data.get('latest_disclosure'),
+             'collected_at': collected_at or data.get('attempted_at'),
              'latest_report': data.get('latest_report') or prior.get('latest_report'),
              'financial_hash': financial_hash, 'last_collected': as_of, 'fx': data.get('fx'), 'errors': data.get('errors') or []}
+    if prior.get('underwriting_related_issuers'):
+        saved['underwriting_related_issuers'] = prior['underwriting_related_issuers']
     write_json_if_changed(path, saved, volatile_keys={'retrieved_at'})
+    if (read(root/ticker/'research/valuation.json').get('underwriting') or {}).get('related_issuers'):
+        from underwriting_related_evidence import refresh_related_sources
+        refresh_related_sources(root,ticker,as_of)
 
 
 def financial_signature(data, cached):
@@ -264,7 +293,8 @@ def publish(root, companies, as_of, evaluated_at=None):
                'verified_share_basis': sum(bool((f.get('market_sync') or {}).get('basis_id')) for f in companies.values()),
                'split_adjusted_companies': sum(any(p.get('factor', 1) != 1 for p in
                    (f.get('market_sync') or {}).get('adjustments', [])+(f.get('market_sync') or {}).get('fundamental_adjustments', [])) for f in companies.values()),
-               'available_by_model_basis': dict(Counter(f.get('model_basis') for f in companies.values() if f['status'] == 'available'))}
+               'available_by_model_basis': dict(Counter(f.get('model_basis') for f in companies.values() if f['status'] == 'available')),
+               'data_collection': collection_summary(root, companies)}
     # Full dated schedules live once, in the detail shards. The all-universe
     # audit remains compact enough to commit and inspect.
     audit = {t: {**audit_snapshot(f),
@@ -303,10 +333,26 @@ def publish(root, companies, as_of, evaluated_at=None):
     return report
 
 
+def collection_summary(root, tickers):
+    """Source collection coverage is distinct from available or approved models."""
+    counts = Counter(companies=len(tickers))
+    for ticker in tickers:
+        source = read(root/FUNDAMENTALS/(ticker+'.json'))
+        facts, primary = source.get('facts') or [], source.get('primary_observations') or []
+        counts['with_financial_observations'] += bool(facts or primary)
+        counts['with_primary_observations'] += bool(primary or any(p.get('source_kind') == 'primary' for p in facts))
+        counts['without_financial_observations'] += not bool(facts or primary)
+        counts['with_collector_errors'] += bool(source.get('errors'))
+        counts['with_current_and_interim_observations'] += bool(primary)
+        counts['report_discovery_verified'] += (source.get('report_discovery') or {}).get('status') == 'verified'
+        counts['report_discovery_failed'] += (source.get('report_discovery') or {}).get('status') == 'failed'
+    return dict(counts)
+
+
 def audit_snapshot(forecast):
     fields = ('status', 'forecast_hash', 'calculation_id', 'source_model_hash', 'model_basis', 'gaps',
               'model_present_value_per_share', 'present_value_today_per_share', 'forward_irr_pct',
-              'financial_period', 'assumptions_as_of', 'underwriting')
+              'financial_period', 'assumptions_as_of', 'underwriting', 'economic_review_status')
     return {**{k: forecast.get(k) for k in fields}, 'market_sync': {
         k: (forecast.get('market_sync') or {}).get(k) for k in
         ('status', 'basis_id', 'price_as_of', 'financial_period', 'model_as_of', 'latest_report', 'valid_until')}}

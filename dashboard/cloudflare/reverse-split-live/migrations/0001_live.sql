@@ -1,0 +1,18 @@
+CREATE TABLE IF NOT EXISTS rs_state (key TEXT PRIMARY KEY, value TEXT NOT NULL, updated_at TEXT NOT NULL);
+CREATE TABLE IF NOT EXISTS rs_sources (id TEXT PRIMARY KEY, kind TEXT NOT NULL, url TEXT NOT NULL, last_attempt TEXT, last_success TEXT, watermark TEXT, status TEXT NOT NULL DEFAULT 'new', error TEXT, failures INTEGER NOT NULL DEFAULT 0, next_attempt INTEGER NOT NULL DEFAULT 0, coverage_gap INTEGER NOT NULL DEFAULT 0, items INTEGER NOT NULL DEFAULT 0);
+CREATE TABLE IF NOT EXISTS rs_jobs (id TEXT PRIMARY KEY, kind TEXT NOT NULL, payload TEXT NOT NULL, priority INTEGER NOT NULL DEFAULT 0, state TEXT NOT NULL DEFAULT 'pending', attempts INTEGER NOT NULL DEFAULT 0, available_at INTEGER NOT NULL DEFAULT 0, lease_until INTEGER NOT NULL DEFAULT 0, token TEXT, error TEXT, created_at TEXT NOT NULL, updated_at TEXT NOT NULL);
+CREATE INDEX IF NOT EXISTS rs_jobs_ready ON rs_jobs(state,available_at,priority);
+CREATE INDEX IF NOT EXISTS rs_jobs_lease ON rs_jobs(state,lease_until);
+CREATE TABLE IF NOT EXISTS rs_documents (sha256 TEXT PRIMARY KEY, url TEXT NOT NULL, object_key TEXT NOT NULL, captured_at TEXT NOT NULL, bytes INTEGER NOT NULL, content_type TEXT);
+CREATE TABLE IF NOT EXISTS rs_filings (accession TEXT PRIMARY KEY, cik TEXT NOT NULL, form TEXT, published_at TEXT, first_seen_at TEXT NOT NULL, source_url TEXT NOT NULL, source_sha256 TEXT, state TEXT NOT NULL DEFAULT 'pending', event_id TEXT);
+CREATE INDEX IF NOT EXISTS rs_filings_issuer ON rs_filings(cik,published_at);
+CREATE TABLE IF NOT EXISTS rs_events (id TEXT PRIMARY KEY, cik TEXT, ticker TEXT, company TEXT, effective_date TEXT, published_at TEXT, first_seen_at TEXT NOT NULL, analyzed_at TEXT, result TEXT NOT NULL DEFAULT 'analyzing', score REAL, ordinal_min INTEGER, revision INTEGER NOT NULL DEFAULT 1, payload TEXT NOT NULL);
+CREATE INDEX IF NOT EXISTS rs_events_recent ON rs_events(first_seen_at DESC,id);
+CREATE INDEX IF NOT EXISTS rs_events_issuer ON rs_events(cik,effective_date);
+CREATE TABLE IF NOT EXISTS rs_decisions (id TEXT PRIMARY KEY, event_id TEXT NOT NULL, recorded_at TEXT NOT NULL, policy TEXT NOT NULL, payload TEXT NOT NULL);
+CREATE INDEX IF NOT EXISTS rs_decisions_event ON rs_decisions(event_id,recorded_at);
+CREATE TABLE IF NOT EXISTS rs_history (id TEXT PRIMARY KEY, cik TEXT NOT NULL, effective_date TEXT NOT NULL, known_at TEXT NOT NULL, verified INTEGER NOT NULL DEFAULT 0, payload TEXT NOT NULL);
+CREATE INDEX IF NOT EXISTS rs_history_issuer ON rs_history(cik,effective_date);
+CREATE TABLE IF NOT EXISTS rs_issuers (cik TEXT PRIMARY KEY, ticker TEXT, company TEXT, cache_key TEXT, facts_captured_at TEXT, submissions_key TEXT, refreshed_at TEXT, history_status TEXT NOT NULL DEFAULT 'unsearched');
+CREATE TABLE IF NOT EXISTS rs_alerts (id TEXT PRIMARY KEY, event_id TEXT NOT NULL, created_at TEXT NOT NULL, kind TEXT NOT NULL, payload TEXT NOT NULL);
+CREATE INDEX IF NOT EXISTS rs_alerts_recent ON rs_alerts(created_at DESC);

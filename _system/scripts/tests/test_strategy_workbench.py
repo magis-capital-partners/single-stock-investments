@@ -30,10 +30,11 @@ assert.equal(S.stateFromHash(S.route('biotech-quant','signals',{query:'A & B',pa
 def test_five_strategy_navigation_has_the_requested_order_and_active_parent():
     html = (ROOT / "dashboard/index.html").read_text(encoding="utf-8")
     nav = html.split('id="strategies-subnav"', 1)[1].split('</nav>', 1)[0]
-    labels = ['>SPX 0DTE<', '>LS Algo<', '>Systematic Shorts<', '>Darwin CC ', '>Reverse-split short ', '>Biotech Quant<']
+    labels = ['>SPX 0DTE<', '>LS Algo<', '>Darwin CC ', '>Reverse-split short ', '>Biotech Quant<']
     assert [nav.index(label) for label in labels] == sorted(nav.index(label) for label in labels)
+    assert 'data-view="systematic-shorts"' not in nav
     parents = html.split("const parentView = [", 1)[1].split("].includes(view)", 1)[0]
-    assert set(re.findall(r"'([^']+)'", parents)) == {"spx-0dte", "letf", "systematic-shorts", "darwin", "reverse-split-strategy", "biotech-quant"}
+    assert set(re.findall(r"'([^']+)'", parents)) == {"spx-0dte", "letf", "darwin", "reverse-split-strategy", "biotech-quant"}
 
 
 def test_memory_filters_review_scope_and_biotech_extraction():

@@ -70,31 +70,32 @@ jobs:
       - uses: actions/setup-python@v5
         with:
           python-version: '3.12'
-      - uses: actions/setup-node@v4
-        with:
-          node-version: '22'
-          cache: npm
-          cache-dependency-path: _system/scripts/package-lock.json
       - name: Install bounded research dependencies
         run: |
           python -m pip install pytest pypdf PyYAML exchange-calendars==4.13.2
-          npm ci --ignore-scripts --no-audit --no-fund --prefix _system/scripts
       - name: Restore primary research and paid-call receipts
         uses: ./.github/actions/checkout-vault
+        with:
+          include-source-archive: 'false'
       - name: Verify underwriting gates before calling a model
         run: |
-          python -m pytest -q _system/scripts/tests/test_underwriting_pipeline.py
-          node --test _system/scripts/tests/test_underwriting_stage.cjs
-      - name: Verify exact model and reasoning availability before paid work
+          python -m pytest -q _system/scripts/tests/test_underwriting_pipeline.py _system/scripts/tests/test_underwriting_economics.py
+      - name: Verify local judgment policy and deterministic assembly
         timeout-minutes: 2
-        env:
-          CURSOR_API_KEY: ${{ secrets.CURSOR_API_KEY }}
-        run: node _system/scripts/underwriting_stage.mjs --catalog
+        run: |
+          python - <<'PY'
+          import sys
+          sys.path.insert(0, '_system/scripts')
+          from underwriting_pipeline import ROOT, POLICY, read, stage_model
+          assert read(ROOT/POLICY)['required_contract_schema'] == 'underwriting-contract/2'
+          for role in ('author', 'challenger'):
+              assert stage_model(ROOT, role) == {'id':'gpt-6.1-sol','reasoning_effort':'high','provider':'codex-local'}
+          assert stage_model(ROOT, 'builder')['provider'] == 'deterministic'
+          PY
       # Stable step name is referenced by graph_sources health telemetry.
-      # Judgment now runs locally; this host executes only --phase build.
+      # Judgment runs through signed-in local Codex; assembly uses no model API.
       - name: Author, independently challenge and build company valuations
         env:
-          CURSOR_API_KEY: ${{ secrets.CURSOR_API_KEY }}
           REQUESTED_TICKERS: ${{ github.event.client_payload.tickers }}
           REQUESTED_LIMIT: ${{ github.event.client_payload.limit }}
         run: |

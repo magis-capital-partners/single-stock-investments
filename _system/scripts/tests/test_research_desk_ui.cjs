@@ -8,7 +8,8 @@ function harness(files){
 test('compounders retain every member, respect withholding and valid quote expiry',async()=>{
  const w=harness(['valuation-viz.js','compounders.js']);await w.Compounders.load();
  const base={ticker:'MA',valuation_decision:{research_return_available:true,calculation_status:'complete',price_per_share:100,market_sync:{status:'verified',valid_until:'2099-01-01'},forward_return_at_price_pct:{base:15}},shared_forecast:{status:'available',buy_prices:[{hurdle_pct:12,prices:{base:110}}]}};
- let rows=w.Compounders.rows([base]);assert.equal(rows.length,44);assert.equal(rows.find(r=>r.ticker==='MA').status,'entry_zone');
+  let rows=w.Compounders.rows([base]);assert.equal(rows.length,46);assert.equal(rows.find(r=>r.ticker==='MA').status,'entry_zone');
+  assert.ok(rows.some(r=>r.ticker==='PBT'&&r.name==='Permian Basin Royalty Trust'));assert.ok(rows.some(r=>r.ticker==='LB'&&r.name==='LandBridge'));assert.ok(rows.some(r=>r.ticker==='HEI'));
  base.valuation_decision.market_sync.valid_until='2020-01-01';rows=w.Compounders.rows([base]);assert.equal(rows[0].target,null);assert.equal(rows[0].irr,null);
  base.valuation_decision.research_return_available=false;base.valuation_decision.market_sync.valid_until='2099-01-01';assert.equal(w.Compounders.rows([base])[0].status,'needs_evidence');
 });

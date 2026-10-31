@@ -34,8 +34,8 @@ test('loader checks exact manifest bytes and publication version',async()=>{
   manifest.sha256='0'.repeat(64);await assert.rejects(()=>V.load(fetcher,crypto.webcrypto),/different publications/);
   manifest.sha256=crypto.createHash('sha256').update(body).digest('hex');manifest.data_version='bad';await assert.rejects(()=>V.load(fetcher,crypto.webcrypto),/Mixed forward/);
 });
-test('dashboard route, source assets and research workflow are connected',()=>{
+test('retired forward UI redirects to consolidated live research while the offline workflow remains verified',()=>{
   const html=fs.readFileSync(path.join(ROOT,'dashboard/index.html'),'utf8'),workflow=fs.readFileSync(path.join(ROOT,'.github/workflows/reverse-split-borrow-history.yml'),'utf8');
-  assert.match(html,/short-alpha\\\/forward/);assert.match(html,/third-plus-forward\.js/);assert.match(html,/ThirdPlusForward\.attach\(content\)/);
+  assert.match(html,/short-alpha\\\/forward/);assert.doesNotMatch(html,/<script src="third-plus-forward\.js/);assert.match(html,/reverse-split-live\.js/);assert.match(html,/retiredShorts/);
   assert.match(workflow,/third_plus_forward monitor --max-requests 30/);assert.match(workflow,/third_plus_forward check/);assert.match(workflow,/git add _system\/data\/reverse_splits\/third_plus_forward_v1/);
 });

@@ -417,9 +417,21 @@
       "workflow_file": "valuation-underwriting.yml",
       "job": "underwrite",
       "work_step": "Author, independently challenge and build company valuations",
-      "cadence_cron": ["47 9,17,21 * * 1-5"],
+      "cadence_cron": [
+        "47 9,17,21 * * 1-5"
+      ],
       "timezone": "America/New_York",
       "freshness_hours": 96
+    },
+    {
+      "name": "reverse-split-announcement-monitor",
+      "workflow_file": "reverse-split-live.yml",
+      "job": "collect",
+      "work_step": "Detect announcements and analyze every company",
+      "cadence_cron": [
+        "3-58/5 * * * *"
+      ],
+      "freshness_hours": 7
     }
   ],
   "unmonitored_workflows": {},

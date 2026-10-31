@@ -18,7 +18,7 @@ PATTERNS = {
 }
 
 
-def audit(root: Path = ROOT, *, staged=False) -> dict:
+def audit(root: Path = ROOT, *, staged=False, verify_public_snapshots=False) -> dict:
     command = ["git", "diff", "--cached", "--name-only", "--diff-filter=ACMR", "-z"] if staged else ["git", "ls-files", "-z"]
     tracked = subprocess.run(command + ["--"], cwd=root, check=True, capture_output=True).stdout.decode("utf-8").split("\0")
     tracked = [p for p in tracked if p and Path(p).suffix.lower() in {".json", ".jsonl", ".csv", ".js", ".html", ".md", ".pdf", ".txt"} and (p.startswith("dashboard/") or Path(p).suffix.lower() in {".json", ".jsonl", ".csv"} or (Path(p).suffix.lower() == ".md" and "/research/" in p) or p.startswith("_system/reference/superinvestor-letters/"))]
@@ -48,7 +48,7 @@ def audit(root: Path = ROOT, *, staged=False) -> dict:
             continue
         data = blobs[relative] if staged else path.read_bytes()
         entry = manifest.get("assets", {}).get(relative.removeprefix("dashboard/")) if relative.startswith("dashboard/") else manifest.get("repository_assets", {}).get(relative)
-        if staged and entry and hashlib.sha256(data).hexdigest() != entry["public_sha256"]:
+        if (staged or verify_public_snapshots) and entry and hashlib.sha256(data).hexdigest() != entry["public_sha256"]:
             findings.append({"path": relative, "kind": "managed_private_snapshot_not_sanitized", "matches": 1})
         if relative.startswith("_system/reference/superinvestor-letters/") and path.suffix.lower() in {".pdf", ".txt", ".md"}:
             findings.append({"path": relative, "kind": "tracked_original_or_extract", "matches": 1})
@@ -76,8 +76,9 @@ def main() -> int:
     parser.add_argument("--report", type=Path, default=ROOT / "_private/fund_letters/exposure.json")
     parser.add_argument("--strict", action="store_true")
     parser.add_argument("--staged", action="store_true", help="Inspect only staged blobs, including the staged snapshot manifest")
+    parser.add_argument("--verify-public-snapshots", action="store_true", help="Require every present managed public asset to match its publication receipt")
     args = parser.parse_args()
-    report = audit(staged=args.staged)
+    report = audit(staged=args.staged, verify_public_snapshots=args.verify_public_snapshots)
     args.report.parent.mkdir(parents=True, exist_ok=True)
     args.report.write_text(json.dumps(report, indent=2), encoding="utf-8")
     print(json.dumps({key: value for key, value in report.items() if key != "findings"}))
