@@ -183,6 +183,67 @@ def test_blank_legacy_market_value_is_preserved_as_unknown():
     assert len(rows) == 1 and rows[0]["shares"] == 10 and rows[0]["value_usd"] is None
 
 
+def test_confidential_cover_is_unavailable_data_instead_of_a_parser_failure():
+    rows, primary = parse_legacy_document(b"""CONFORMED PERIOD OF REPORT: 20120331
+    Norges Bank has submitted its Form 13F pursuant to a request for confidential treatment.
+    Table Entry Total: 2136
+    Table Value Total: 125797751
+    <TABLE>FORM 13F INFORMATIONAL TABLE</TABLE>""")
+    assert rows == [] and primary["confidential_omitted"]
+
+
+def test_full_restatement_supersedes_earlier_confidentiality_and_source_gaps(
+    tmp_path, monkeypatch
+):
+    db = archive.connect(tmp_path / "archive.sqlite")
+    archive.store_filing(
+        db,
+        {
+            "accession": "a",
+            "manager_id": "example",
+            "form": "13F-HR",
+            "period_end": "2000-03-31",
+            "filed_at": "2000-05-01",
+            "confidential_omitted": True,
+        },
+        status="confidential",
+    )
+    archive.store_filing(
+        db,
+        {
+            "accession": "b",
+            "manager_id": "example",
+            "form": "13F-HR/A",
+            "amendment_type": "RESTATEMENT",
+            "period_end": "2000-03-31",
+            "filed_at": "2001-05-01",
+            "confidential_omitted": False,
+        },
+        [{"cusip": "1", "value_usd": 100, "shares": 1, "sh_prn": "SH"}],
+    )
+    monkeypatch.setattr(ownership, "load_cusip_map", dict)
+    monkeypatch.setattr(ownership, "portfolio_universe", lambda: (set(), {}))
+    archive.export(
+        db, [{"manager_id": "example", "display_name": "Example"}], tmp_path / "data"
+    )
+    book = json.loads((tmp_path / "data/history/example/2000.json").read_text())[
+        "quarters"
+    ]["2000Q1"]
+    assert not book["partial"] and not book["confidential_omitted"]
+    assert book["positions"][0]["weight_pct"] == 100
+    assert len(book["filings"]) == 2
+
+
+def test_legacy_fund_class_numbers_and_foreign_identifiers_are_preserved():
+    rows, _ = parse_legacy_document(b"""Table Entry Total: 2
+    <TABLE>NAME  CLASS  CUSIP  VALUE  SHARES
+    ISHARES TR  S&P MIDCAP400  464287507  371  4619 SH DEFINED
+    CHINA SHIPPING CONTAINER  COM  B018L76  7878 21651200 SH SOLE
+    </TABLE>""")
+    assert [row["cusip"] for row in rows] == ["464287507", "B018L76"]
+    assert rows[0]["value_usd"] == 371000 and rows[1]["shares"] == 21651200
+
+
 def test_public_document_survives_a_later_run_without_network(tmp_path, monkeypatch):
     monkeypatch.setattr(disclosures, "ARCHIVE", tmp_path)
     path = tmp_path / "original.xml"
@@ -229,6 +290,36 @@ def test_nport_queries_include_amendments_and_paginate(monkeypatch):
         "NPORT-P",
         "NPORT-P/A",
     }
+
+
+def test_public_portfolio_collection_keeps_other_filings_after_one_bad_source(
+    monkeypatch,
+    tmp_path,
+):
+    monkeypatch.setattr(disclosures, "ARCHIVE", tmp_path)
+    filings = [
+        {
+            "accession": key,
+            "form": form,
+            "filed_at": "2020-05-01",
+            "url": "https://www.sec.gov/" + key,
+        }
+        for key, form in [("a", "NPORT-P"), ("b", "NPORT-P/A"), ("bad", "NPORT-P")]
+    ]
+    monkeypatch.setattr(disclosures, "nport_filings", lambda *args, **kwargs: filings)
+    raw = b"""<edgarSubmission><repPdDate>2020-03-31</repPdDate><seriesId>S1</seriesId><seriesName>Global Fund</seriesName><invstOrSecs><invstOrSec><name>Foreign Company</name><curCd>HKD</curCd><valUSD>100</valUSD><pctVal>1</pctVal><invCountry>HK</invCountry></invstOrSec></invstOrSecs></edgarSubmission>"""
+    monkeypatch.setattr(
+        disclosures,
+        "public_document",
+        lambda url, path: b"bad XML" if url.endswith("/bad") else raw,
+    )
+    books, errors = disclosures.public_disclosures(
+        [{"kind": "nport", "manager_id": "example", "cik": "1", "series_ids": ["S1"]}],
+        workers=2,
+    )
+    assert [book["id"] for book in books] == ["a", "b"]
+    assert len(errors) == 1 and errors[0]["accession"] == "bad"
+    assert books[0]["positions"][0]["country"] == "HK"
 
 
 def test_unknown_amendment_does_not_replace_the_original_book(tmp_path, monkeypatch):
@@ -651,6 +742,88 @@ def test_parallel_history_workers_preserve_every_notice_and_close_databases(
     db.execute("BEGIN EXCLUSIVE")
     db.rollback()
     db.close()
+
+
+def test_deadline_cannot_hide_unvisited_accessions(tmp_path, monkeypatch):
+    db = archive.connect(tmp_path / "archive.sqlite")
+    monkeypatch.setattr(
+        ownership,
+        "list_13f_filings",
+        lambda *args, **kwargs: [
+            {
+                "accession": str(i),
+                "form": "13F-HR",
+                "report_date": "2000-03-31",
+                "filing_date": "2000-05-01",
+                "index_url": "https://www.sec.gov/" + str(i),
+            }
+            for i in range(3)
+        ],
+    )
+    times = iter([0, 2])
+    monkeypatch.setattr(archive.time, "monotonic", lambda: next(times, 2))
+    archive.backfill_filings(db, [{"manager_id": "example", "cik": "1"}], deadline=1)
+    assert (
+        db.execute("SELECT count(*) FROM filings WHERE status='discovered'").fetchone()[
+            0
+        ]
+        == 3
+    )
+
+
+def test_deployment_bundles_retain_distinct_historical_books_and_disclosures(
+    tmp_path, monkeypatch
+):
+    data = tmp_path / "data"
+    db = archive.connect(tmp_path / "archive.sqlite")
+    manager = {"manager_id": "example", "display_name": "Example"}
+    for year, value in [("2000", 100), ("2020", 200)]:
+        archive.store_filing(
+            db,
+            {
+                "accession": year,
+                "manager_id": "example",
+                "form": "13F-HR",
+                "period_end": year + "-03-31",
+                "filed_at": year + "-05-01",
+            },
+            [{"cusip": "1", "value_usd": value, "shares": 1, "sh_prn": "SH"}],
+        )
+    monkeypatch.setattr(ownership, "load_cusip_map", dict)
+    monkeypatch.setattr(ownership, "portfolio_universe", lambda: (set(), {}))
+    archive.export(db, [manager], data)
+    documents = [
+        {
+            "id": year,
+            "manager_id": "example",
+            "vehicle_id": "fund",
+            "period_end": year + "-03-31",
+            "positions": [{"ticker": "FOREIGN", "weight_pct": value}],
+        }
+        for year, value in [("2000", 1), ("2020", 2)]
+    ]
+    disclosures.publish(
+        documents,
+        {"managers": [manager]},
+        data=data,
+        preserve=False,
+        save_archive=False,
+    )
+    staging.compact_history(data)
+    staging.compact_disclosures(data)
+    records = json.loads((data / "directory_index.json").read_text())["managers"][0][
+        "history"
+    ]
+    assert records[0]["book_path"] == records[1]["book_path"]
+    books = json.loads((data / records[0]["book_path"]).read_text())["quarters"]
+    assert books["2000Q1"]["positions"][0]["value_usd"] == 100
+    assert books["2020Q1"]["positions"][0]["value_usd"] == 200
+    manifest = json.loads((data / "disclosures/example.json").read_text())
+    assert manifest["quarters"]["2000Q1"] == manifest["quarters"]["2020Q1"]
+    snapshots = json.loads((data / manifest["quarters"]["2000Q1"][0]).read_text())[
+        "snapshots"
+    ]
+    assert {d["period_end"] for d in snapshots} == {"2000-03-31", "2020-03-31"}
 
 
 def test_public_fund_discovery_requires_principal_adviser_and_keeps_dates(tmp_path):

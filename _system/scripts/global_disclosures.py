@@ -18,7 +18,8 @@ import sqlite3
 import sys
 import time
 from collections import defaultdict
-from contextlib import closing
+from concurrent.futures import ThreadPoolExecutor
+from contextlib import closing, contextmanager
 from pathlib import Path
 from urllib.parse import urlencode, urlparse
 from xml.etree import ElementTree as ET
@@ -71,8 +72,8 @@ def normalize_symbol(symbol, exchange=""):
     return symbol if not suffix or symbol.endswith(suffix) else symbol + suffix
 
 
-def public_document(url, path):
-    """Preserve original public XML across checkpoint/CI continuations."""
+@contextmanager
+def public_cache():
     archive = ARCHIVE / "public-cache.sqlite"
     archive.parent.mkdir(parents=True, exist_ok=True)
     with closing(sqlite3.connect(archive, timeout=60)) as db:
@@ -81,6 +82,12 @@ def public_document(url, path):
         db.execute(
             "CREATE TABLE IF NOT EXISTS documents (url TEXT PRIMARY KEY,sha256 TEXT NOT NULL,content_gzip BLOB NOT NULL)"
         )
+        yield db
+
+
+def public_document(url, path):
+    """Preserve original public XML across checkpoint/CI continuations."""
+    with public_cache() as db:
         found = db.execute(
             "SELECT sha256,content_gzip FROM documents WHERE url=?", (url,)
         ).fetchone()
@@ -420,8 +427,60 @@ def nport_filings(cik, query=None, *, form="NPORT-P"):
     return sorted(filings.values(), key=lambda r: (r["filed_at"], r["accession"]))
 
 
-def public_disclosures(sources, *, deadline=None):
+def load_nport(source, filing):
+    cache = ARCHIVE / "nport" / (filing["accession"] + ".xml")
+    parsed = parse_nport(
+        public_document(filing["url"], cache),
+        source["manager_id"],
+        source_url=filing["url"],
+    )
+    if source.get("series_ids") and parsed["vehicle_id"] not in source["series_ids"]:
+        return None
+    if (
+        source.get("series_name_contains")
+        and source["series_name_contains"].lower() not in parsed["vehicle_name"].lower()
+    ):
+        return None
+    links = source.get("series_links", {}).get(parsed["vehicle_id"], [])
+    eligible = [
+        link
+        for link in links
+        if (
+            not link["appointment_start"]
+            or link["appointment_start"] <= parsed["period_end"]
+        )
+        and (
+            not link["appointment_end"]
+            or parsed["period_end"] <= link["appointment_end"]
+        )
+    ]
+    if links and (not eligible):
+        return None
+    if eligible:
+        before = [
+            link for link in eligible if link["observed_at"] <= parsed["period_end"]
+        ]
+        relationship = (
+            max(before, key=lambda row: row["observed_at"])
+            if before
+            else min(eligible, key=lambda row: row["observed_at"])
+        )
+        parsed["adviser_relationship_observed_at"] = relationship["observed_at"]
+        parsed["adviser_relationship_source"] = relationship["source_url"]
+    parsed.update(
+        {
+            "id": filing["accession"],
+            "filed_at": filing["filed_at"],
+            "form": filing["form"],
+        }
+    )
+    return parsed
+
+
+def public_disclosures(sources, *, deadline=None, workers=4):
     output, review = [], []
+    with public_cache():
+        pass  # Initialize WAL before parallel downloads open their connections.
     for source in sources:
         print(
             f"Reading public funds: {source['manager_id']} ({source.get('cik', source['kind'])})",
@@ -454,83 +513,32 @@ def public_disclosures(sources, *, deadline=None):
                     raise ValueError(
                         "No registered-fund filings discovered for configured source"
                     )
-                for filing in filings:
+
+                def read_one(filing, source=source):
                     if deadline and time.monotonic() >= deadline:
-                        review.append(
-                            {
-                                "manager_id": source["manager_id"],
-                                "reason": "Public source awaits next checkpoint continuation",
-                            }
-                        )
-                        break
-                    cache = ARCHIVE / "nport" / (filing["accession"] + ".xml")
+                        return None, None
                     try:
-                        parsed = parse_nport(
-                            public_document(filing["url"], cache),
-                            source["manager_id"],
-                            source_url=filing["url"],
-                        )
-                        if (
-                            source.get("series_ids")
-                            and parsed["vehicle_id"] not in source["series_ids"]
-                        ):
-                            continue
-                        if (
-                            source.get("series_name_contains")
-                            and source["series_name_contains"].lower()
-                            not in parsed["vehicle_name"].lower()
-                        ):
-                            continue
-                        links = source.get("series_links", {}).get(
-                            parsed["vehicle_id"], []
-                        )
-                        eligible = [
-                            link
-                            for link in links
-                            if (
-                                not link["appointment_start"]
-                                or link["appointment_start"] <= parsed["period_end"]
-                            )
-                            and (
-                                not link["appointment_end"]
-                                or parsed["period_end"] <= link["appointment_end"]
-                            )
-                        ]
-                        if links and not eligible:
-                            continue
-                        if eligible:
-                            before = [
-                                link
-                                for link in eligible
-                                if link["observed_at"] <= parsed["period_end"]
-                            ]
-                            relationship = (
-                                max(before, key=lambda row: row["observed_at"])
-                                if before
-                                else min(eligible, key=lambda row: row["observed_at"])
-                            )
-                            parsed["adviser_relationship_observed_at"] = relationship[
-                                "observed_at"
-                            ]
-                            parsed["adviser_relationship_source"] = relationship[
-                                "source_url"
-                            ]
-                        parsed.update(
-                            {
-                                "id": filing["accession"],
-                                "filed_at": filing["filed_at"],
-                                "form": filing["form"],
-                            }
-                        )
-                        output.append(parsed)
+                        return load_nport(source, filing), None
                     except (OSError, ValueError, KeyError, ET.ParseError) as exc:
-                        review.append(
-                            {
-                                "manager_id": source["manager_id"],
-                                "accession": filing["accession"],
-                                "reason": str(exc),
-                            }
-                        )
+                        return None, {
+                            "manager_id": source["manager_id"],
+                            "accession": filing["accession"],
+                            "reason": str(exc),
+                        }
+
+                with ThreadPoolExecutor(max_workers=workers) as pool:
+                    for parsed, error in pool.map(read_one, filings):
+                        if error:
+                            review.append(error)
+                        elif parsed:
+                            output.append(parsed)
+                if deadline and time.monotonic() >= deadline:
+                    review.append(
+                        {
+                            "manager_id": source["manager_id"],
+                            "reason": "Public source awaits next checkpoint continuation",
+                        }
+                    )
             elif source["kind"] == "csv":
                 url = source["url"]
                 if urlparse(url).scheme != "https":
@@ -619,11 +627,11 @@ def publish(
                 if length > 1500000:
                     positions = snapshot["positions"]
                     snapshot = {**snapshot, "positions": [], "positions_parts": []}
-                    for part, start in enumerate(range(0, len(positions), 2000)):
+                    for part, start in enumerate(range(0, len(positions), 10000)):
                         relative = f"disclosures/{manager_id}/{snapshot['id']}-positions-{part}.json"
                         write_json(
                             data / relative,
-                            {"positions": positions[start : start + 2000]},
+                            {"positions": positions[start : start + 10000]},
                         )
                         snapshot["positions_parts"].append(relative)
                     length = len(json.dumps(snapshot).encode())

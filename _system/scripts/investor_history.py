@@ -532,6 +532,38 @@ def backfill_filings(
                         now(),
                     ),
                 )
+                # Persist the entire accession manifest before the work budget
+                # can interrupt downloads. An unvisited filing must remain a
+                # visible queued record, even for the last manager in a run.
+                db.executemany(
+                    "INSERT OR IGNORE INTO filings VALUES(?,?,?,?,?,?,?,?,?,?,?,?)",
+                    [
+                        (
+                            filing["accession"],
+                            manager["manager_id"],
+                            str(cik),
+                            filing.get("report_date"),
+                            filing.get("filing_date"),
+                            filing["form"],
+                            None,
+                            "discovered",
+                            filing.get("index_url"),
+                            json.dumps(
+                                {
+                                    **filing,
+                                    "manager_id": manager["manager_id"],
+                                    "cik": cik,
+                                    "period_end": filing.get("report_date"),
+                                    "filed_at": filing.get("filing_date"),
+                                    "source_url": filing.get("index_url"),
+                                }
+                            ),
+                            None,
+                            now(),
+                        )
+                        for filing in filings
+                    ],
+                )
             db.execute(
                 "DELETE FROM filings WHERE accession=?",
                 (f"discovery:{manager['manager_id']}:{cik}",),
@@ -547,6 +579,7 @@ def backfill_filings(
                     "loaded",
                     "notice",
                     "as_filed_warning",
+                    "confidential",
                 }:
                     continue
                 meta = {
@@ -591,7 +624,9 @@ def backfill_filings(
                     ).hexdigest()
                     meta["authoritative_filing_parsed"] = True
                     status = (
-                        "loaded"
+                        "confidential"
+                        if primary.get("confidential_omitted") and not parsed["rows"]
+                        else "loaded"
                         if report["ok"]
                         else "review"
                         if primary.get("parser") == "legacy-text"
@@ -661,7 +696,9 @@ def reparse_cached(db, cache=ARCHIVE / "filings"):
             meta["reconciliation"] = report
             meta["authoritative_filing_parsed"] = True
             status = (
-                "loaded"
+                "confidential"
+                if primary.get("confidential_omitted") and not parsed["rows"]
+                else "loaded"
                 if report["ok"]
                 else "review"
                 if primary.get("parser") == "legacy-text" and not report["rows_match"]
@@ -692,6 +729,8 @@ def reparse_cached(db, cache=ARCHIVE / "filings"):
 
 def backfill_parallel(database, managers, *, workers=2, before=None, deadline=None):
     """Bounded HTTPS concurrency, with one SQLite owner per worker."""
+    with closing(connect(database)):
+        pass  # Establish WAL and the schema before worker connections race.
     batches = [managers[offset::workers] for offset in range(workers)]
 
     def run(batch):
@@ -749,7 +788,8 @@ def export(db, managers, data=DATA):
         bundle = {}
         for period, filings in sorted(periods.items()):
             if not any(
-                f["status"] in {"loaded", "seed", "review", "as_filed_warning"}
+                f["status"]
+                in {"loaded", "seed", "review", "as_filed_warning", "confidential"}
                 for f in filings
             ):
                 continue
@@ -757,7 +797,13 @@ def export(db, managers, data=DATA):
                 filings = [f for f in filings if f["status"] != "seed"]
             parts = []
             for f in filings:
-                if f["status"] not in {"loaded", "seed", "review", "as_filed_warning"}:
+                if f["status"] not in {
+                    "loaded",
+                    "seed",
+                    "review",
+                    "as_filed_warning",
+                    "confidential",
+                }:
                     continue
                 if f["form"].endswith("/A") and f["amendment_type"] not in {
                     "NEW HOLDINGS",
@@ -774,6 +820,16 @@ def export(db, managers, data=DATA):
                         "rows": positions,
                     }
                 )
+            anchors = [
+                i
+                for i, f in enumerate(filings)
+                if f["status"]
+                in {"loaded", "review", "seed", "as_filed_warning", "confidential"}
+                and (
+                    not f["form"].endswith("/A") or f["amendment_type"] == "RESTATEMENT"
+                )
+            ]
+            effective = filings[anchors[-1] :] if anchors else filings
             positions = annotate_weights(merge_filings(parts))
             parser_gap = any(
                 f["status"] in {"error", "review", "seed", "discovered"}
@@ -781,7 +837,7 @@ def export(db, managers, data=DATA):
                     f["form"].endswith("/A")
                     and f["amendment_type"] not in {"NEW HOLDINGS", "RESTATEMENT"}
                 )
-                for f in filings
+                for f in effective
             )
             for row in positions:
                 if parser_gap or row.get("value_usd") is None:
@@ -789,7 +845,7 @@ def export(db, managers, data=DATA):
                 row.pop("as_filed", None)
                 row["ticker"] = symbols.get(row.get("cusip")) or row.get("ticker") or ""
                 row["weight_basis"] = (
-                    "reported_13f_equities"
+                    "reported_13f_non_option_book"
                     if row.get("weight_pct") is not None
                     else None
                 )
@@ -804,10 +860,10 @@ def export(db, managers, data=DATA):
                     f["form"].endswith("/A")
                     and f["amendment_type"] not in {"NEW HOLDINGS", "RESTATEMENT"}
                 )
-                for f in filings
+                for f in effective
             )
             confidential = any(
-                json.loads(f["metadata"]).get("confidential_omitted") for f in filings
+                json.loads(f["metadata"]).get("confidential_omitted") for f in effective
             )
             metadata = {
                 "quarter": quarter,
@@ -851,10 +907,10 @@ def export(db, managers, data=DATA):
             # Bound both asset size and browser response size for large advisers.
             if len(json.dumps(payload, ensure_ascii=False).encode("utf-8")) > 1500000:
                 payload["positions_parts"] = []
-                for part, start in enumerate(range(0, len(positions), 2000)):
+                for part, start in enumerate(range(0, len(positions), 10000)):
                     relative = f"history/{manager['manager_id']}/{quarter}-positions-{part}.json"
                     path = data / relative
-                    write_json(path, {"positions": positions[start : start + 2000]})
+                    write_json(path, {"positions": positions[start : start + 10000]})
                     published.add(path)
                     payload["positions_parts"].append(relative)
                 payload["positions"] = []
@@ -925,6 +981,12 @@ def export(db, managers, data=DATA):
         "undiscovered_ciks": undiscovered,
         "missing_bulk_archives": missing_downloads,
         "unimported_bulk_archives": missing_imports,
+        "backfill_processed": not undiscovered
+        and bool(expected_downloads)
+        and not missing_imports
+        and not missing_downloads
+        and not counts.get("discovered")
+        and not counts.get("seed"),
         "discovery_errors": [
             dict(row)
             for row in db.execute(

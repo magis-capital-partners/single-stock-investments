@@ -10,7 +10,7 @@ The Investors directory defaults to all investors and the latest available date 
 * Principal-adviser records in all available SEC N-CEN archives discover registered fund series. Only exact legal identities link vehicles; subadvisers do not receive a whole fund portfolio. Appointment dates and the dated relationship evidence remain attached. N-CEN bulk coverage has a schema 3.1 gap disclosed by the SEC, so explicit verified sources supplement discovery.
 * N-PORT supplies complete disclosed portfolios of individual registered funds, including international securities, currencies and identifiers. Letters supply only positions explicitly described as held. Historical letter tables can include issuers outside our stock universe. Mentions, benchmarks, short positions and stated exits are excluded from long holdings.
 
-13F weights describe the reported equity book, N-PORT weights describe fund net assets, and letter weights retain their disclosed or unspecified basis. These denominators are never combined. Letters without a verified holdings date show the disclosure date and explicitly leave the holdings date unknown.
+13F weights describe reported holdings excluding options, N-PORT weights describe fund net assets, and letter weights retain their disclosed or unspecified basis. These denominators are never combined. Letters without a verified holdings date show the disclosure date and explicitly leave the holdings date unknown.
 
 ## Data integrity
 
@@ -34,6 +34,6 @@ python _system/scripts/investor_history.py --cached-bulk --all-filings --reparse
 python _system/scripts/global_disclosures.py --public --publish
 ```
 
-The private corpus can be selected with `--corpus` on the refresh or disclosure command. Original quotes and source references stay private. Private checkpoints use immutable SHA-addressed parts smaller than GitHub's object limit. The public `archive_receipt.json` pins an exact checkpoint. Deployment fails if that checkpoint is unavailable or corrupt. Generated yearly history and disclosure shards are restored at build time; all assets remain below the deployment size bound.
+The private corpus can be selected with `--corpus` on the refresh or disclosure command. Original quotes and source references stay private. Private checkpoints use immutable SHA-addressed parts smaller than GitHub's object limit. Each compressed block is stored once and reused across publications. The public `archive_receipt.json` pins an exact checkpoint. Deployment fails if that checkpoint is unavailable or corrupt. Generated yearly history and disclosure shards are restored at build time; all assets remain below the deployment size bound.
 
 All collection is HTTPS research-data work. No Gateway socket, broker session, ThetaData terminal, or market-data subscription is involved.

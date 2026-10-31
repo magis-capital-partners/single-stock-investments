@@ -89,7 +89,7 @@ def _information_text(raw, full):
         if re.search(r"\bCUSIP\b", text, re.IGNORECASE):
             started = True
         if started or re.search(
-            r"\b[A-Z0-9*@#]{8,9}\s+[\d,]+\s+[\d,]+\s+(?:SH|PRN)\b", text, re.IGNORECASE
+            r"\b[A-Z0-9*@#]{7,9}\s+[\d,]+\s+[\d,]+\s+(?:SH|PRN)\b", text, re.IGNORECASE
         ):
             selected.append(text)
     if selected:
@@ -114,7 +114,9 @@ def _primary(full, rows):
     }
     result["confidential_omitted"] = bool(
         re.search(
-            r"Confidential\s+Information\s+has\s+been\s+omitted", full, re.IGNORECASE
+            r"Confidential\s+Information\s+has\s+been\s+omitted|pursuant\s+to\s+(?:a\s+)?request\s+for\s+confidential\s+treatment",
+            full,
+            re.IGNORECASE,
         )
     )
     period = re.search(
@@ -173,14 +175,18 @@ def parse_legacy_document(raw):
         flags=re.IGNORECASE,
     )
     pattern = re.compile(
-        r"^(?P<head>.*?)\s+\"?(?P<cusip>(?=[A-Z0-9*@#]*[0-9])[A-Z0-9*@#]{8,9})\"?\s+"
+        r"^(?P<head>.*?)\s+\"?(?P<cusip>(?=[A-Z0-9*@#]*[0-9])[A-Z0-9*@#]{7,9})\"?\s+"
         r"\$?\s*(?P<value>[\d,]+(?:\.\d*)?)\s+(?P<shares>[\d,]+(?:\.\d*)?)"
         r"\s*(?P<unit>SHS?|PRN)?\b(?P<tail>.*)$",
         re.IGNORECASE,
     )
+    strong_pattern = re.compile(
+        pattern.pattern.replace("(?=[A-Z0-9*@#]*[0-9])", "(?=[A-Z0-9*@#]{0,5}[0-9])"),
+        re.IGNORECASE,
+    )
     rows, candidates = [], []
     missing_value = re.compile(
-        r"^(?P<head>.*?)\s+(?P<cusip>(?=[A-Z0-9*@#]*[0-9])[A-Z0-9*@#]{8,9})\s{10,}(?P<shares>[\d,]+(?:\.\d*)?)\s+(?P<unit>SHS?|PRN)\b(?P<tail>.*)$",
+        r"^(?P<head>.*?)\s+(?P<cusip>(?=[A-Z0-9*@#]*[0-9])[A-Z0-9*@#]{7,9})\s{10,}(?P<shares>[\d,]+(?:\.\d*)?)\s+(?P<unit>SHS?|PRN)\b(?P<tail>.*)$",
         re.IGNORECASE,
     )
     pending = ""
@@ -211,7 +217,7 @@ def parse_legacy_document(raw):
         ):
             line = f"{previous['issuer']}  {previous['title_of_class']}  {previous['cusip']}  {line}"
         if (
-            re.search(r"\b[A-Z0-9*@#]{8,9}\s+[\d,]+", line)
+            re.search(r"\b[A-Z0-9*@#]{7,9}\s+[\d,]+", line)
             and not pattern.match(line)
             and not missing_value.match(line)
         ):
@@ -223,10 +229,14 @@ def parse_legacy_document(raw):
                 line += " " + lines[index].strip()
                 index += 1
         match = pattern.match(line)
+        if match and not match["unit"]:
+            stronger = strong_pattern.match(line)
+            if stronger and stronger["unit"]:
+                match = stronger
         if not match and (unvalued := missing_value.match(line)):
             match = {**unvalued.groupdict(), "value": None}
         if not match:
-            if re.search(r"\b(?=[A-Z0-9*@#]*[0-9])[A-Z0-9*@#]{8,9}\s+[\d,]+", line):
+            if re.search(r"\b(?=[A-Z0-9*@#]*[0-9])[A-Z0-9*@#]{7,9}\s+[\d,]+", line):
                 candidates.append(line)
                 pending = ""
             elif (
@@ -307,6 +317,8 @@ def parse_legacy_document(raw):
             }
         )
         previous = rows[-1]
+    if not rows and not candidates and cover.get("confidential_omitted"):
+        return [], cover
     if not rows or candidates:
         raise LegacyParseError(
             f"Legacy table requires review: parsed={len(rows)}, unmatched={len(candidates)}; {candidates[:2]}",
