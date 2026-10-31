@@ -36,6 +36,6 @@ python _system/scripts/investor_history.py --cached-bulk --all-filings --reparse
 python _system/scripts/global_disclosures.py --public --publish
 ```
 
-The private corpus can be selected with `--corpus` on the refresh or disclosure command. Original quotes and source references stay private. Private checkpoints use immutable SHA-addressed parts smaller than GitHub's object limit. Each compressed block is stored once and reused across publications. The public `archive_receipt.json` pins an exact checkpoint. Deployment fails if that checkpoint is unavailable or corrupt. Generated yearly history and disclosure shards are restored at build time; all assets remain below the deployment size bound.
+The private corpus can be selected with `--corpus` on the refresh or disclosure command. Original quotes and source references stay private. Private checkpoints use immutable SHA-addressed parts smaller than GitHub's object limit. Each compressed block is stored once and reused across publications. The public `archive_receipt.json` pins an exact checkpoint. Deployment fails if that checkpoint is unavailable or corrupt. The generated investor directory, yearly history and disclosure shards are restored at build time; all assets remain below the deployment size bound.
 
 All collection is HTTPS research-data work. No Gateway socket, broker session, ThetaData terminal, or market-data subscription is involved.
