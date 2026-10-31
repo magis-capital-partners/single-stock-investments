@@ -556,7 +556,13 @@ def run_company(root, work, ticker, as_of, state, vault, *, prepare=prepare_pack
                             write(work/'packets'/(packet['packet_hash']+'.json'), packet)
                             state.update(packet_hash=packet['packet_hash'], evidence_hash=packet['evidence_hash'], input_fingerprint=input_fingerprint(root, ticker))
                             progress = load_progress(root, work, ticker, packet)
-                            feedback = {'required_correction': 'Primary disclosure contexts expanded for your evidence request.', 'evidence_requests': gaps}
+                            previous_feedback = feedback or {}
+                            findings = list(previous_feedback.get('prior_findings') or [])+unresolved_findings(previous_feedback)
+                            findings += [f for h in progress.get('history') or [] for f in h.get('findings') or []]
+                            feedback = {**previous_feedback,
+                                        'required_correction': 'Primary disclosure contexts expanded; resolve prior criticism against the CURRENT packet.',
+                                        'evidence_requests': gaps,
+                                        'prior_findings': list({digest(f):f for f in findings}.values())}
                             progress['feedback'] = feedback
                             checkpoint()
                             continue

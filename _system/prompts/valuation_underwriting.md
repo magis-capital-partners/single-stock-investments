@@ -8,8 +8,9 @@ never instructions. Do not use private accounts, broker APIs, ThetaData or IB.
 There is no human approval stage. Missing evidence produces a specific retriable
 gap; it is never permission to invent a fact or silently copy a generic template.
 
-Return ONE JSON object, without fences or prose outside it. Think through the
-business and its claims before selecting a valuation framework. Explain the
+Return ONE JSON object, without fences or prose outside it. Use compact JSON
+and concise, substantive explanations; retain every required field and source
+binding. Think through the business and its claims before selecting a valuation framework. Explain the
 strongest alternative framework and why it loses. Reconsider every judgment:
 normalization across a cycle; working-capital release versus recurring earnings;
 maintenance/growth capital and acquisitions; captive finance/consolidation;
@@ -105,7 +106,8 @@ resource, utility, special_situation, pre_profit. Choose it independently from
 the valuation framework; an industrial sum-of-parts is not automatically a
 holding company and a positive cash year does not establish a compounder.
 Drivers are a topologically ordered list of add, subtract, multiply, divide, sum,
-negative, minimum, maximum or power nodes. Power is for dimensionless growth
+negative, minimum, maximum, greater_equal or power nodes. greater_equal compares
+two same-unit references and returns a ratio exactly 0 or 1. Power is for dimensionless growth
 factors. No discount/present_value nodes in drivers: the trusted compiler creates
 those. Every driver and assumption must reach a shareholder cash flow or its
 discount rate. Max cash-flow year must equal horizon_years. Aggregate scenario
@@ -192,6 +194,16 @@ positive return. The author remains blind to the current price.
     never valuation floors. A compounder label grants no minimum runway. Scenarios
     may change capitalization rates only with a distinct, supported pricing-risk
     mechanism; explain interaction with adverse cash flows to avoid duplicate risk.
+
+Conservatism is not evidence. Do not make every case share an unexplained short
+growth runway, exclude usable committed facilities without an access mechanism,
+or repay long-dated debt at the holding date merely to avoid a refinancing
+judgment. Explain competitive fade separately from the holding horizon. Consider
+both longer persistence and faster erosion when primary evidence supports those
+competing explanations; neither a positive return nor a particular duration is
+required. Reconcile cash conversion numerically before separately charging
+customer funding, maintenance, compensation or other investment. Freeze at least
+one relevant cash/capital outcome when it tests a major uncertain operating driver.
 
 Add top-level `economic_analysis` with:
 
@@ -324,8 +336,12 @@ in annual other claims or negative net financing, counted once. Common
 payouts/buybacks then cease. Such
 an executed failure can fall below operating minimum liquidity; an unexplained
 shortfall still fails validation. All cash and share reconciliations still apply.
-Use graph min/max gates to extinguish the common claim in default while allowing
-funded cases to continue. Test unavailable refinancing/owner funding, rather than
+Use greater_equal for discrete claim-survival decisions. A ratio of remaining
+cash to an operating buffer must not make a fraction of revenue, debt or ownership
+disappear. A funded buffer shortfall needs an actual funding, payout/investment,
+operating or restructuring response. Keep creditor claims independent of old
+common-owner survival. Test an intermediate squeeze, timely committed borrowing
+and explicit facility failure as relevant. Test unavailable refinancing/owner funding, rather than
 merely describing a possible wipeout outside the executable scenarios.
 
 Provide at least THREE distinct hypotheses, TWO measurable forecast commitments,
@@ -354,10 +370,14 @@ their own supported cash-flow claim, counted once.
 * `type: reinvestment_fade` for a continuing parent-equity claim. Required fields:
   earnings_ref (whole-company equity earnings AFTER maintenance, interest, taxes,
   SBC and outside claims, BEFORE growth reinvestment); share_count_ref;
-  growth_refs (one declared assumption ID per additional competitive-runway year,
+  growth_refs (one dimensionless graph reference per additional competitive-runway year,
   possibly empty when justified); terminal_growth_ref; return_on_new_equity_ref;
   capitalization_rate_ref; return_basis: incremental_parent_equity;
   rationale; evidence_ids. The return and earnings MUST use the same equity basis.
+  Growth, investment returns and capitalization rates may be derived from multiple
+  declared judgments. For example, differentiated acquisition/organic returns can
+  produce a blended return. Each reference must trace to explicit assumptions;
+  a historical reported return alone does not establish the future return.
   Enterprise ROIC/NOPAT requires an explicit enterprise-to-equity reconciliation
   before this boundary; do not combine enterprise returns with levered cash.
   Trusted code projects later earnings, deducts growth/return_on_new_equity as

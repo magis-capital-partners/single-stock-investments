@@ -36,7 +36,7 @@ def terminal_nodes(terminal, currency):
         return ref
     rate = terminal['capitalization_rate_ref']
     roi = terminal['return_on_new_equity_ref']
-    factor = node('discount_factor', 'add', [1, rate], 'ratio')
+    factor = node('discount_factor', 'add', [1, rate], 'ratio') if terminal['growth_refs'] else 1
     earnings, discount = terminal['earnings_ref'], 1
     for year, growth in enumerate(terminal['growth_refs'], 1):
         gf = node(f'growth_{year}', 'add', [1, growth], 'ratio')
@@ -234,9 +234,13 @@ def validate_economics(contract, expanded, model, evidence_ids):
                 revenue, earnings, margin, conversion = (v[operating[k]] for k in ('revenue_ref','earnings_ref','margin_ref','cash_conversion_ref'))
                 require(abs(revenue*margin-earnings) <= max(tolerance, abs(earnings)*1e-7), f'{cid}.{year}.{case}: earnings do not reconcile to revenue and margin')
                 require(abs(earnings*conversion-b['cash_generation_ref']) <= tolerance, f'{cid}.{year}.{case}: cash conversion does not reconcile')
-            require(abs(sources-uses) <= tolerance, f'{cid}.{year}.{case}: capital allocation does not reconcile')
+            require(abs(sources-uses) <= tolerance, f'{cid}.{year}.{case}: capital allocation does not reconcile; '
+                    f'sources={sources:.12g}, uses={uses:.12g} {contract["currency"]}')
             defaulted = any(max(1,ceil(e['year'])) <= year for e in defaults[cid,case])
-            require(defaulted or b['liquidity_ref']+tolerance >= b['minimum_liquidity_ref'], f'{cid}.{year}.{case}: financing survival liquidity shortfall')
+            require(defaulted or b['liquidity_ref']+tolerance >= b['minimum_liquidity_ref'],
+                    f'{cid}.{year}.{case}: financing survival liquidity shortfall; available={b["liquidity_ref"]:.12g}, '
+                    f'minimum={b["minimum_liquidity_ref"]:.12g}, opening={b["opening_liquidity_ref"]:.12g}, '
+                    f'retained={b["retained_cash_ref"]:.12g}, adjustment={b["liquidity_adjustment_ref"]:.12g} {contract["currency"]}')
             require(all(b[k] >= -tolerance for k in ('reinvestment_ref', 'distributions_ref', 'buybacks_ref', 'liquidity_ref', 'minimum_liquidity_ref')),
                     'Negative investment/distribution/liquidity needs an explicit financing treatment')
             # Expanded flows are ordinary-share amounts; listing conversion occurs later.
@@ -253,8 +257,17 @@ def validate_economics(contract, expanded, model, evidence_ids):
         if t['type'] == 'reinvestment_fade':
             for key in ('earnings_ref', 'share_count_ref', 'capitalization_rate_ref', 'terminal_growth_ref', 'return_on_new_equity_ref'):
                 require(t.get(key) in lookup[component['id']]['base'], 'Unknown continuation reference: '+key)
-            require(all(r in assumptions for r in t['growth_refs']+[t['terminal_growth_ref'], t['return_on_new_equity_ref'], t['capitalization_rate_ref']]),
-                    'Continuation growth, return and capitalization must be explicit assumptions')
+            proof = next(c['calculation_proof'] for c in model['component_valuation_results']['additive_components'] if c['id'] == component['id'])
+            units = {n['id']:n['unit'] for k in ('inputs','assumptions','calculations') for n in proof[k]}
+            parents = {n['id']:[arg for arg in n.get('args',[]) if isinstance(arg,str)] for n in proof['calculations']}
+            memo = {}
+            def declared_judgment(ref):
+                if ref not in memo:
+                    memo[ref] = ref in assumptions or any(declared_judgment(p) for p in parents.get(ref,[]))
+                return memo[ref]
+            refs = t['growth_refs']+[t['terminal_growth_ref'],t['return_on_new_equity_ref'],t['capitalization_rate_ref']]
+            require(all(units.get(r) in ('ratio','multiple','pure') and declared_judgment(r) for r in refs),
+                    'Continuation growth, return and capitalization must trace to declared dimensionless judgments')
             for case in CASES:
                 v = lookup[component['id']][case]
                 rate, g, roi = (v[t[k]] for k in ('capitalization_rate_ref', 'terminal_growth_ref', 'return_on_new_equity_ref'))

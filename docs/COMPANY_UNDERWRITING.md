@@ -181,3 +181,14 @@ An executed default can breach minimum operating liquidity; an unexplained
 shortfall still fails. A scenario with no remaining common proceeds reports
 complete loss of capital and an undefined IRR, rather than inventing a root or
 withholding the funded scenarios. The dashboard exposes these failure paths.
+
+Survival decisions use same-unit comparisons returning exactly zero or one;
+remaining cash divided by an operating buffer does not extinguish a fraction of
+the business or its debts. Intermediate funding squeezes need an executable
+response. Continuation growth, capitalization and incremental returns may be
+derived from declared assumptions, including differentiated organic/acquisition
+returns. Reported historical returns alone cannot establish the forecast.
+
+The private publisher merges call ledgers, preserves newer issuer checkpoints
+and approved pointers, and writes the index once per batch. A fresh temporary
+index permits recovery after interruption without deleting prior paid work.

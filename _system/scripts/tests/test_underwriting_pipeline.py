@@ -198,12 +198,19 @@ def test_after_close_publication_has_an_event_trigger_and_lightweight_fallbacks(
 
 
 def test_production_underwriting_checkout_contains_the_approved_method_registry():
+    import subprocess
+
     import yaml
     root = Path(__file__).resolve().parents[3]
     doc = yaml.safe_load((root/'.github/workflows/valuation-underwriting.yml').read_text())
     checkout = next(s for s in doc['jobs']['underwrite']['steps'] if s.get('uses') == 'actions/checkout@v4')
     paths = checkout['with']['sparse-checkout']
     assert '/_system/reference/valuation_method_registry.json' in paths.splitlines()
+    related = '/_system/reference/market-data/valuation_related_evidence/'
+    assert related in paths.splitlines()
+    assert related in (root/'_system/scripts/underwriting_local.ps1').read_text()
+    marker = related.strip('/')+'/README.md'
+    assert subprocess.check_output(['git', 'ls-files', '--error-unmatch', '--', marker], cwd=root, text=True).strip() == marker
     assert '/.github/workflows/autonomous-compounders.yml' in paths.splitlines()
     assert '/.github/workflows/valuation-underwriting.yml' in paths.splitlines()
 
@@ -432,6 +439,42 @@ def test_new_evidence_preserves_saved_unresolved_criticism_without_reusing_appro
     assert 'approved' not in result
     assert 'CURRENT packet' in result['feedback']['required_correction']
     assert pipeline.unresolved_findings(result['feedback'])[0]['detail']=='Execute unavailable owner funding.'
+
+
+def test_retrieving_more_context_keeps_the_rejected_contract_and_its_major_findings(tmp_path,monkeypatch):
+    import underwriting_pipeline as pipeline
+    company_root(tmp_path)
+    policy=pipeline.read(tmp_path/pipeline.POLICY)
+    pipeline.write(tmp_path/pipeline.POLICY,{**policy,'maximum_author_attempts':3})
+    monkeypatch.setattr(pipeline,'evaluate',lambda **kw:{'approved':True})
+    monkeypatch.setattr(pipeline,'today',lambda:'2026-10-26')
+    first,expanded=packet(),packet()
+    expanded['evidence_hash']='e'*64
+    expanded['packet_hash']=digest({k:v for k,v in expanded.items() if k!='packet_hash'})
+    def prepare(*args,focus_keywords=()):return expanded if focus_keywords else first
+    monkeypatch.setattr(pipeline,'prepare_packet',prepare)
+    old,new=contract(first),contract(expanded)
+    counts={'author':0,'challenger':0}
+    finding={'severity':'major','detail':'Funding is not established before senior payments fall due.'}
+    def execute(stage,payload,output,receipt_path):
+        counts[stage]+=1
+        if stage=='author':
+            if counts[stage]==1:answer=old
+            elif counts[stage]==2:answer={'status':'evidence_gap','gaps':[{'code':'funding_terms','detail':"Retrieve Note 9 and search terms: 'maturity'."}]}
+            else:
+                feedback=payload['revision_feedback']
+                assert feedback['previous_contract']==old
+                assert finding in feedback['prior_findings']
+                assert feedback['independent_challenge']['findings']==[finding]
+                answer=new
+        else:
+            answer=review(old if counts[stage]==1 else new)
+            if counts[stage]==1:answer.update(verdict='revise',findings=[finding])
+        pipeline.write(output,answer)
+        pipeline.write(receipt_path,{'agent_id':stage+str(counts[stage]),'status':'finished'})
+    result=pipeline.run_batch(tmp_path,launch=True,work=tmp_path/'work',vault=tmp_path/'vault',phase='author',prepare=prepare,execute=execute)
+    assert result['approved']==['TEST'],result
+    assert counts=={'author':3,'challenger':2}
 
 
 @pytest.mark.parametrize('unapproved',[False,True])
