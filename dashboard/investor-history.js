@@ -85,19 +85,31 @@
     if (result.private_snapshot) throw new Error('The authorized holdings snapshot has not been restored.');
     return result;
   }
-  function createReader(index, fetchAsset=fetchJson) {
+  async function fetchBinary(path) {
+    const response=await fetch(url(path));
+    if(!response.ok) throw new Error(`Holdings data unavailable (${response.status})`);
+    return new Uint8Array(await response.arrayBuffer());
+  }
+  function createReader(index, fetchAsset=fetchJson, fetchBytes=fetchBinary) {
     const cache=new Map();
     return async path=>{
       const relative=decodeURIComponent(path.replace(/^data\/holdings\//,''));
-      const bundle=index.asset_bundles?.[relative];
-      if(!bundle) return fetchAsset(path);
+      const location=index.asset_bundles?.[relative];
+      if(!location) return fetchAsset(path);
+      const compressed=Array.isArray(location),bundle=compressed ? location[0] : location;
       if(!cache.has(bundle)) {
-        const pending=fetchAsset(`data/holdings/${bundle}`).catch(error=>{if(cache.get(bundle)===pending)cache.delete(bundle);throw error;});
+        const pending=(compressed ? fetchBytes : fetchAsset)(`data/holdings/${bundle}`).catch(error=>{if(cache.get(bundle)===pending)cache.delete(bundle);throw error;});
         cache.set(bundle,pending);
         // Bound retained bundle memory when browsing many investors.
         while(cache.size>4) cache.delete(cache.keys().next().value);
       }
       const value=await cache.get(bundle);
+      if(compressed) {
+        const [,offset,length]=location;
+        if(!Number.isSafeInteger(offset)||!Number.isSafeInteger(length)||offset<0||length<=0||offset+length>value.byteLength) throw new Error('The requested holdings member range is invalid.');
+        const stream=new Blob([value.subarray(offset,offset+length)]).stream().pipeThrough(new DecompressionStream('gzip'));
+        return new Response(stream).json();
+      }
       if(!Object.hasOwn(value.assets || {},relative)) throw new Error('The requested holdings asset is missing from its bundle.');
       return value.assets[relative];
     };
