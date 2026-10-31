@@ -100,7 +100,7 @@ def test_missing_input_restore_requires_valid_private_bytes(workspace):
     assert not path.exists()
 
 
-def test_cold_investor_export_can_publish_a_managed_ignored_directory(workspace, monkeypatch):
+def test_cold_investor_export_can_publish_and_build_a_managed_ignored_directory(workspace, monkeypatch):
     import global_disclosures as disclosures
     import investor_history as history
     import ownership_common as ownership
@@ -122,6 +122,16 @@ def test_cold_investor_export_can_publish_a_managed_ignored_directory(workspace,
     restored = json.loads(assets.private_source(source, "data/holdings/directory_index.json").read_text())
     assert restored["managers"][0]["fund_ids"] == ["private-fund"]
     assert "private-fund" not in path.read_text()
+    path.unlink()  # A subsequent deployment starts from another fresh checkout.
+    (source / "index.html").write_text("<!doctype html>", encoding="utf-8")
+    write(source / "data/core.json", {"tickers": []})
+    write(source / "data/insights/manifest.json", {"schema": 1})
+    monkeypatch.setattr(builder, "ROOT", root)
+    output = root / "site"
+    builder.build(source, output)
+    shipped = json.loads((output / "data/holdings/directory_index.json").read_text())
+    assert shipped["managers"][0]["fund_ids"] == ["private-fund"]
+    assert json.loads((output / "_routes.json").read_text())["exclude"] == []
 
 
 def test_changed_public_snapshot_cannot_replace_private_copy(workspace):

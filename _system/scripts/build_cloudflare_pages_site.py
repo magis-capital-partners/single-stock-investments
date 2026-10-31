@@ -9,7 +9,7 @@ import re
 import shutil
 from pathlib import Path
 
-from private_dashboard_assets import overlay_manifest, private_source
+from private_dashboard_assets import overlay_manifest, private_source, restore_managed_input
 
 ROOT = Path(__file__).resolve().parents[2]
 DEFAULT_SOURCE = ROOT / "dashboard"
@@ -90,6 +90,7 @@ def build(source: Path, output: Path, max_file_bytes: int = MAX_FILE_BYTES) -> d
     output = output.resolve()
     if not (source / "index.html").is_file():
         raise FileNotFoundError(f"missing dashboard index: {source / 'index.html'}")
+    restore_managed_input(source, "data/holdings/directory_index.json", include_missing=True)
     private_manifest = overlay_manifest(source)
     # Validate private snapshots before removing any previous deploy artifact.
     restored = {name: private_source(source, name, private_manifest) for name in private_manifest.get("assets", {})}
