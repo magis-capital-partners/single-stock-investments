@@ -234,9 +234,13 @@ def validate_economics(contract, expanded, model, evidence_ids):
                 revenue, earnings, margin, conversion = (v[operating[k]] for k in ('revenue_ref','earnings_ref','margin_ref','cash_conversion_ref'))
                 require(abs(revenue*margin-earnings) <= max(tolerance, abs(earnings)*1e-7), f'{cid}.{year}.{case}: earnings do not reconcile to revenue and margin')
                 require(abs(earnings*conversion-b['cash_generation_ref']) <= tolerance, f'{cid}.{year}.{case}: cash conversion does not reconcile')
-            require(abs(sources-uses) <= tolerance, f'{cid}.{year}.{case}: capital allocation does not reconcile')
+            require(abs(sources-uses) <= tolerance, f'{cid}.{year}.{case}: capital allocation does not reconcile; '
+                    f'sources={sources:.12g}, uses={uses:.12g} {contract["currency"]}')
             defaulted = any(max(1,ceil(e['year'])) <= year for e in defaults[cid,case])
-            require(defaulted or b['liquidity_ref']+tolerance >= b['minimum_liquidity_ref'], f'{cid}.{year}.{case}: financing survival liquidity shortfall')
+            require(defaulted or b['liquidity_ref']+tolerance >= b['minimum_liquidity_ref'],
+                    f'{cid}.{year}.{case}: financing survival liquidity shortfall; available={b["liquidity_ref"]:.12g}, '
+                    f'minimum={b["minimum_liquidity_ref"]:.12g}, opening={b["opening_liquidity_ref"]:.12g}, '
+                    f'retained={b["retained_cash_ref"]:.12g}, adjustment={b["liquidity_adjustment_ref"]:.12g} {contract["currency"]}')
             require(all(b[k] >= -tolerance for k in ('reinvestment_ref', 'distributions_ref', 'buybacks_ref', 'liquidity_ref', 'minimum_liquidity_ref')),
                     'Negative investment/distribution/liquidity needs an explicit financing treatment')
             # Expanded flows are ordinary-share amounts; listing conversion occurs later.

@@ -239,7 +239,7 @@ def compile_contract(packet, contract):
                     visit(arg)
         for root in roots:
             visit(root)
-        require(set(graph) <= reachable, 'Unused economic drivers cannot hide assumptions')
+        require(set(graph) <= reachable, 'Unused economic drivers cannot hide assumptions: '+', '.join(sorted(set(graph)-reachable)))
         require(any(f['id'] in reachable and f['unit'] == 'shares' for f in facts), 'Every component must use its verified share denominator')
         require(any(f['id'] in reachable and f['unit'] == currency for f in facts), 'Every component must connect to primary financial evidence')
         used.update(reachable)
