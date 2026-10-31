@@ -54,17 +54,25 @@ def test_zero_asset_registered_fund_report_is_explicitly_empty():
 
 def test_letter_allocations_and_financial_abbreviations_are_not_stock_holdings():
     rows = disclosures.extract_document_positions("""Top 10 holdings
-    United States 18%
-    United Kingdom 17%
-    Countries(a) 16%
-    Liabilities (Net)(b) 8%
-    Information Technology 7%
-    Foreign Company PLC 6%
+    United States 47%
+    United Kingdom 22%
+    Countries(a) 13%
+    Liabilities (Net)(b) 5%
+    Information Technology 4%
+    Foreign Company PLC 3%
     We hold an investment whose net asset value (NAV) increased.
     """)
     assert len(rows) == 1
     assert rows[0]["issuer"] == "Foreign Company PLC"
-    assert rows[0]["weight_pct"] == 6
+    assert rows[0]["weight_pct"] == 3
+
+
+def test_public_boundary_checks_fields_without_treating_fund_names_as_field_names():
+    from check_holdings_confidentiality import _json_issues
+
+    path = Path("directory_index.json")
+    assert not _json_issues(path, {"manager_id": "letter"})
+    assert _json_issues(path, {"nested": {"letter_source": "private"}})
 
 
 def test_letter_holdings_table_has_no_arbitrary_row_limit():
