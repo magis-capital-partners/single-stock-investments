@@ -181,6 +181,52 @@ def prune_portfolio_history(
     raise RuntimeError("portfolio retention exceeded the safety batch limit")
 
 
+def prune_realized_generations(execute: Execute, existing_tables: set[str], *, batch_size: int = 500) -> int:
+    """Retire old *versions*, preserving full history in the active generation.
+
+    Original report archives and the private SQLite event history are permanent.
+    Keep a week of cursor-pinned versions and at least three completed versions.
+    These tables intentionally have no FK to short-lived portfolio snapshots.
+    """
+    if not {"sleeve_realized_generations", "sleeve_realized_current"} <= existing_tables:
+        return 0
+    candidates = """WITH ranked AS (
+      SELECT generation_id,account,state,created_at,completed_at,
+        ROW_NUMBER() OVER (PARTITION BY account,state ORDER BY completed_at DESC,generation_id DESC) AS keep_rank
+      FROM sleeve_realized_generations
+    ), expired AS (
+      SELECT generation_id FROM ranked r WHERE
+        NOT EXISTS (SELECT 1 FROM sleeve_realized_current c WHERE c.generation_id=r.generation_id)
+        AND ((state='complete' AND keep_rank>3 AND completed_at<datetime('now','-7 days'))
+          OR (state='staging' AND created_at<datetime('now','-2 days')))
+    )"""
+    deleted = 0
+    for table in ("sleeve_realized_records", "sleeve_realized_daily", "sleeve_realized_batches"):
+        if table not in existing_tables:
+            continue
+        for _ in range(10_000):
+            changed = execute(f"{candidates} DELETE FROM {table} WHERE rowid IN ("
+                              f"SELECT rowid FROM {table} WHERE generation_id IN (SELECT generation_id FROM expired) LIMIT {int(batch_size)})")
+            deleted += changed
+            if not changed:
+                break
+        else:
+            raise RuntimeError("realized history retention exceeded the safety batch limit")
+    deleted += execute(f"{candidates} DELETE FROM sleeve_realized_generations WHERE generation_id IN (SELECT generation_id FROM expired)")
+    if "sleeve_realized_pages" in existing_tables:
+        for _ in range(10_000):
+            changed = execute("DELETE FROM sleeve_realized_pages WHERE rowid IN ("
+                              "SELECT p.rowid FROM sleeve_realized_pages p WHERE NOT EXISTS ("
+                              "SELECT 1 FROM sleeve_realized_batches b WHERE b.content_sha=p.content_sha) "
+                              f"LIMIT {int(batch_size)})")
+            deleted += changed
+            if not changed:
+                break
+        else:
+            raise RuntimeError("realized page retention exceeded the safety batch limit")
+    return deleted
+
+
 def prune_time_series(
     execute: Execute,
     existing_tables: set[str],
@@ -367,11 +413,12 @@ def run_retention(
         batch_size=max(1, min(batch_size, 250)),
     )
     time_deleted = prune_time_series(client.execute, tables, batch_size=max(1, batch_size))
+    realized_deleted = prune_realized_generations(client.execute, tables, batch_size=max(1, batch_size))
     if "ops_state" in tables:
         record_prune_date(client.execute, today, now)
     return {
         "status": "ran",
-        "deleted": portfolio_deleted + sum(time_deleted.values()),
+        "deleted": portfolio_deleted + sum(time_deleted.values()) + realized_deleted,
         "portfolio_source_runs": portfolio_deleted,
         "tables": {table: count for table, count in time_deleted.items() if count},
     }

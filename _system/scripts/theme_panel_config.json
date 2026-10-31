@@ -43,9 +43,9 @@
     },
     "gold_royalties": {
       "label": "Gold royalty sentiment",
-      "description": "Gold spot and royalty-ETF sentiment for precious-metals royalty compounders.",
+      "description": "Gold futures per troy ounce and miner/ETF sentiment for precious-metals royalty compounders.",
       "series": [
-        {"id": "gold_spot_usd", "label": "Gold spot (USD/oz)", "source": "fred", "fred_id": "GOLDAMGBD228NLBM", "good_for": "gold_price", "fallback": {"source": "yahoo_daily", "yahoo_symbol": "GLD", "scale_note": "GLD price proxy when London fix unavailable"}},
+        {"id": "gold_futures_usd_oz", "label": "Gold futures (GC, USD/troy oz)", "source": "yahoo_daily", "yahoo_symbol": "GC=F", "good_for": "gold_price", "staleness_max_days": 10, "unit": "USD/troy oz", "price_basis": "continuous_front_month_futures"},
         {"id": "gdx_etf", "label": "GDX miners ETF (USD)", "source": "yahoo_daily", "yahoo_symbol": "GDX", "good_for": "royalty_sentiment"},
         {"id": "gdx_gld_ratio", "label": "GDX / GLD ratio (miners vs bullion)", "source": "computed_ratio", "numerator": "GDX", "denominator": "GLD", "good_for": "royalty_multiple_sentiment"}
       ]

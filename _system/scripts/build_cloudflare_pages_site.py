@@ -9,12 +9,15 @@ import re
 import shutil
 from pathlib import Path
 
+from private_dashboard_assets import overlay_manifest, private_source
+
 ROOT = Path(__file__).resolve().parents[2]
 DEFAULT_SOURCE = ROOT / "dashboard"
 DEFAULT_OUTPUT = ROOT / "_cf_project" / "site"
 MAX_FILE_BYTES = 20 * 1024 * 1024
 SKIP_DIRS = {"oauth-proxy", "functions", "cloudflare"}
 SKIP_SUFFIXES = {".parquet", ".arrow"}
+ALLOWED_SUFFIXES = {".html", ".js", ".css", ".json", ".svg", ".png", ".jpg", ".jpeg", ".webp", ".ico", ".woff", ".woff2", ".csv", ".xml"}
 PRIVATE_STATIC_PATHS = {
     "data/sleeves_drew.json",
     "data/sleeves_michael.json",
@@ -87,6 +90,9 @@ def build(source: Path, output: Path, max_file_bytes: int = MAX_FILE_BYTES) -> d
     output = output.resolve()
     if not (source / "index.html").is_file():
         raise FileNotFoundError(f"missing dashboard index: {source / 'index.html'}")
+    private_manifest = overlay_manifest(source)
+    # Validate private snapshots before removing any previous deploy artifact.
+    restored = {name: private_source(source, name, private_manifest) for name in private_manifest.get("assets", {})}
     _clean_output(output)
 
     included: list[str] = []
@@ -102,18 +108,26 @@ def build(source: Path, output: Path, max_file_bytes: int = MAX_FILE_BYTES) -> d
         if _private_static_path(rel_posix):
             excluded.append({"path": rel_posix, "reason": "private account artifact"})
             continue
+        if path.name.startswith(".") or path.suffix.lower() not in ALLOWED_SUFFIXES:
+            excluded.append({"path": rel_posix, "reason": "outside deliberate static asset allowlist"})
+            continue
         if path.suffix.lower() in SKIP_SUFFIXES:
             excluded.append({"path": rel.as_posix(), "reason": "unsupported large-data format"})
             continue
-        size = path.stat().st_size
+        copy_source = restored.get(rel_posix, path)
+        size = copy_source.stat().st_size
         if size >= max_file_bytes:
             excluded.append({"path": rel.as_posix(), "reason": f"{size} bytes exceeds artifact limit"})
             continue
         target = output / rel
         target.parent.mkdir(parents=True, exist_ok=True)
-        shutil.copy2(path, target)
+        shutil.copy2(copy_source, target)
         included.append(rel_posix)
 
+    # Build status from the actual restored/shipped files, after every source
+    # has been copied. A podcast-only publication must not ship an old clock.
+    from build_feed_status import write_feed_status
+    write_feed_status(ROOT, dashboard=output)
     stamped = stamp_asset_versions(output)
 
     core_path = output / "data" / "core.json"
@@ -138,9 +152,11 @@ def build(source: Path, output: Path, max_file_bytes: int = MAX_FILE_BYTES) -> d
         "  Permissions-Policy: camera=(), microphone=(), geolocation=()\n"
         "\n"
         "/data/*\n"
-        "  Cache-Control: public, max-age=60, stale-while-revalidate=300\n"
+        "  Cache-Control: private, no-store\n"
     )
     (output / "_headers").write_text(headers, encoding="utf-8")
+    # Static data, JS bundles, guessed paths and preview hosts MUST all invoke middleware.
+    (output / "_routes.json").write_text(json.dumps({"version": 1, "include": ["/*"], "exclude": []}) + "\n", encoding="utf-8")
 
     report = {
         "source": source.as_posix(),
@@ -150,6 +166,7 @@ def build(source: Path, output: Path, max_file_bytes: int = MAX_FILE_BYTES) -> d
         "included_file_count": len(included),
         "excluded_file_count": len(excluded),
         "asset_versions_stamped": stamped,
+        "restored_private_assets": len(restored),
         "private_static_paths": sorted(PRIVATE_STATIC_PATHS),
         "excluded": excluded,
     }

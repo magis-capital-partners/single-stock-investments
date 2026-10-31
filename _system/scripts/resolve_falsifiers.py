@@ -48,9 +48,11 @@ from falsifier_specs import (  # noqa: E402
     active_specs,
     anchor_errors,
     calibration_eligibility,
+    effective_outcomes,
     forecast_dates,
     is_v2_spec,
     is_v3_spec,
+    outcome_id,
     parse_due,
     read_json,
     spec_errors,
@@ -294,6 +296,7 @@ def _effective_rows(rows: list[dict]) -> list[dict]:
 
 
 def build_calibration(rows: list[dict], root: Path = ROOT) -> dict:
+    rows = effective_outcomes(rows)
     policy = _policy(root)
     minimum = int(policy.get("minimum_effective_outcomes") or 20)
     min_probabilistic = int(policy.get("minimum_probabilistic_outcomes") or minimum)
@@ -429,7 +432,9 @@ def run(root: Path, today: date, apply: bool) -> dict:
     outcomes_path = root / OUTCOMES_REL
     calibration_path = root / CALIBRATION_REL
     existing = load_outcomes(outcomes_path)
-    seen = {outcome_key(row) for row in existing}
+    recorded: dict[tuple, list[dict]] = {}
+    for row in effective_outcomes(existing):
+        recorded.setdefault(outcome_key(row), []).append(row)
     # Fail closed if the ledger looks missing while calibration says outcomes
     # exist: rebuilding from an absent file would silently zero the store
     # (the sparse-checkout / validator-that-looks-at-nothing trap).
@@ -445,7 +450,7 @@ def run(root: Path, today: date, apply: bool) -> dict:
     state_rows: list[dict] = []
     counts = {"sidecars": 0, "specs": 0, "invalid": 0, "untestable": 0,
               "unmatured": 0, "already_resolved": 0, "hit": 0, "miss": 0,
-              "unresolvable": 0, "pending_evidence": 0}
+              "unresolvable": 0, "pending_evidence": 0, "superseding": 0}
     for ticker, _path in find_sidecars(root):
         counts["sidecars"] += 1
         doc = read_json(root / ticker / "research" / "falsifier_specs.json")
@@ -478,10 +483,17 @@ def run(root: Path, today: date, apply: bool) -> dict:
                 continue
             component_id = str(spec.get("component_id"))
             key = dedupe_key(ticker, component_id, spec)
-            if key in seen:
+            prior = recorded.get(key) or []
+            # A hit or miss is final. An unresolvable verdict only records that
+            # evidence was missing at the deadline, so it is retried and, if
+            # the evidence now scores, replaced by an appended superseding row.
+            if any(row.get("verdict") != "unresolvable" for row in prior):
                 counts["already_resolved"] += 1
                 continue
             resolved = resolve_metric(ticker, spec, root, today)
+            if prior and resolved["value"] is None:
+                counts["already_resolved"] += 1
+                continue
             if resolved["value"] is None:
                 deadline = terminal_deadline or (observable + timedelta(days=14))
                 if today <= deadline:
@@ -548,6 +560,9 @@ def run(root: Path, today: date, apply: bool) -> dict:
                 "event_cluster_id": str(spec.get("correlation_group") or
                                         f"{ticker}|{component_id}|{measurement.isoformat() if measurement else ''}"),
             }
+            if prior:
+                row["supersedes_outcome_ids"] = [outcome_id(old) for old in prior]
+                counts["superseding"] += 1
             new_rows.append(row)
             state_rows.append({
                 "event_id": hashlib.sha256(
@@ -561,9 +576,12 @@ def run(root: Path, today: date, apply: bool) -> dict:
                 "outcome_id": hashlib.sha256(json.dumps(row, sort_keys=True).encode()).hexdigest()[:24],
                 "recorded_at": datetime.combine(today, datetime.min.time(), tzinfo=timezone.utc).isoformat(),
             })
-            seen.add(key)
+            if prior:
+                state_rows[-1]["supersedes_outcome_ids"] = row["supersedes_outcome_ids"]
+            recorded[key] = [row]
             print(f"{verdict.upper()}: {ticker} {component_id} {spec.get('metric')} "
-                  f"{spec.get('comparator')} {spec.get('threshold')} -> {resolved['value']}")
+                  f"{spec.get('comparator')} {spec.get('threshold')} -> {resolved['value']}"
+                  + (f" (supersedes {', '.join(row['supersedes_outcome_ids'])})" if prior else ""))
     calibration = build_calibration(existing + new_rows, root)
     if apply:
         # Always create the ledger file, even with zero new rows: the first
@@ -584,7 +602,8 @@ def run(root: Path, today: date, apply: bool) -> dict:
     mode = "apply" if apply else "dry-run (pass --apply to write)"
     print(f"resolver [{mode}]: {counts['sidecars']} sidecars, {counts['specs']} specs, "
           f"{len(new_rows)} new outcomes ({counts['hit']} hit, {counts['miss']} miss, "
-          f"{counts['unresolvable']} unresolvable), {counts['already_resolved']} already resolved, "
+          f"{counts['unresolvable']} unresolvable; {counts['superseding']} supersede an "
+          f"unresolvable), {counts['already_resolved']} already resolved, "
           f"{counts['unmatured']} unmatured, {counts['pending_evidence']} pending evidence, "
           f"{counts['untestable']} untestable, "
           f"{counts['invalid']} invalid")

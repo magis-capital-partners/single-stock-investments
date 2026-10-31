@@ -349,7 +349,7 @@ def mentions_to_positions(mentions: list[dict]) -> list[dict]:
                 "direction": ACTION_DIRECTION.get(action, "neutral"),
             }
         )
-    return positions[:30]
+    return positions
 
 
 def build_letter_record(
@@ -366,7 +366,7 @@ def build_letter_record(
     if letter_eligible:
         all_mentions = lm.match_letter(text, master, as_of=meta.get("letter_date"))
         emitted = lm.emitted_mentions(all_mentions, EMIT_MIN_TIER)
-        tickers = [m["ticker"] for m in emitted][:40]
+        tickers = [m["ticker"] for m in emitted]
         positions = mentions_to_positions(emitted)
         themes = extract_themes(text, tickers)
         sections = extract_sections(text)

@@ -14,6 +14,8 @@
 //     stopped".
 
 import assert from "node:assert/strict";
+import { readFileSync } from "node:fs";
+import vm from "node:vm";
 import test from "node:test";
 
 import { FakeClock, loadScripts, settle } from "./spa-harness.mjs";
@@ -64,6 +66,57 @@ async function openPortfolio(page, section = "positions", scope = "all") {
   await settle();
   return page.element("portfolio-content").innerHTML;
 }
+
+for (const owner of ['drew', 'michael']) {
+  test(`${owner}'s active Portfolio page exposes and mounts the realized-history view`, async () => {
+    const page = loadScripts([...SCRIPTS, 'sleeve-realized-viz.js'], { routes: routesFor({ bookBody: eodBook() }) });
+    const mounted = [];
+    page.window.SleeveRealized.attach = (root, selectedOwner) => mounted.push({ root, selectedOwner });
+    const positions = await openPortfolio(page, 'positions', owner);
+    assert.match(positions, /data-ph-section="realized"[^>]*>Realized P&amp;L<\/button>/);
+    const realized = await openPortfolio(page, 'realized', owner);
+    assert.match(realized, /data-sleeve-realized/);
+    assert.match(realized, /Realized P&amp;L \/ Closed positions/);
+    assert.equal(mounted.length, 1);
+    assert.equal(mounted[0].selectedOwner, owner);
+    assert.equal(mounted[0].root, page.element('portfolio-content'));
+  });
+}
+
+test('realized history remains accessible without a current open-position snapshot', async () => {
+  const page = loadScripts([...SCRIPTS, 'sleeve-realized-viz.js'], {
+    routes: routesFor({ bookBody: { status: 'unknown', positions: [], account_values: [] } }),
+  });
+  let mounted = false;
+  page.window.SleeveRealized.attach = () => { mounted = true; };
+  const html = await openPortfolio(page, 'realized', 'michael');
+  assert.match(html, /data-sleeve-realized/);
+  assert.equal(mounted, true);
+  assert.doesNotMatch(html, /Waiting for the first complete IBKR snapshot/);
+});
+
+test('the All positions scope never requests owner-specific realized data', async () => {
+  const page = loadScripts([...SCRIPTS, 'sleeve-realized-viz.js'], { routes: routesFor({ bookBody: eodBook() }) });
+  let mounted = false;
+  page.window.SleeveRealized.attach = () => { mounted = true; };
+  const html = await openPortfolio(page, 'realized', 'all');
+  assert.doesNotMatch(html, /data-sleeve-realized/);
+  assert.equal(mounted, false);
+});
+
+test('owner-specific realized views have working direct dashboard routes', () => {
+  const index = readFileSync(new URL('../index.html', import.meta.url), 'utf8');
+  const start = index.indexOf('function parseRouteFromHashString(');
+  const end = index.indexOf('\nfunction parseRouteFromHash()', start);
+  assert.ok(start >= 0 && end > start);
+  const parse = vm.runInNewContext(`${index.slice(start, end)};parseRouteFromHashString`);
+  for (const owner of ['drew', 'michael']) {
+    const route = parse(`#/portfolio/${owner}/realized`);
+    assert.equal(route.view, 'portfolio');
+    assert.equal(route.scope, owner);
+    assert.equal(route.section, 'realized');
+  }
+});
 
 // ------------------------------------------------------------ Flex EOD cockpit
 

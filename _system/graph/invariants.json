@@ -1,8 +1,8 @@
 {
- "run_date": "2026-10-26",
- "git_head": "480ab17f8e41c1b3e050167a677690dc85f85645",
- "nodes": 8426,
- "edges": 7343,
+ "run_date": "2026-10-27",
+ "git_head": "306e2194ecf9001e69b1b1bac42c8372e70e0449",
+ "nodes": 8430,
+ "edges": 7346,
  "exit_code": 0,
  "ratchet": {
   "armed": [
@@ -86,14 +86,15 @@
    "id": "P5",
    "severity": "report",
    "base_severity": "report",
-   "count": 23,
-   "delta": "0",
+   "count": 24,
+   "delta": "+1",
    "status": "VIOLATIONS",
-   "note": "34/57 validators referenced by CI",
+   "note": "34/58 validators referenced by CI",
    "violations": [
     "audit_dashboard_availability.py",
     "audit_document_registry.py",
     "audit_drive_pdf_store.py",
+    "audit_fund_letter_exposure.py",
     "audit_letter_dates.py",
     "audit_research_anomalies.py",
     "calibrate_letter_matching.py",
@@ -109,10 +110,9 @@
     "scan_hk_sources.py",
     "scan_third_party_sources.py",
     "test_build_review_queue_rollup.py",
-    "test_committee_livelock.py",
-    "test_contract_backfill_lane.py"
+    "test_committee_livelock.py"
    ],
-   "violations_total": 23,
+   "violations_total": 24,
    "waived": []
   },
   {
@@ -122,7 +122,7 @@
    "count": 0,
    "delta": "0",
    "status": "OK",
-   "note": "14/14 feeds fresh (buyback_radar 68h, capitulation_daily 8h, criticality_summary 8h, desk_briefs 4h, market_risk_components_committed 64h, podcast_catalog 31h, reverse_splits 27h, separations 8h, short_alpha 40h, special_situations 27h, spx_surface 8h, technical_summary 8h, vol_metrics 8h, warrant_monitor 27h)",
+   "note": "14/14 feeds fresh (buyback_radar 97h, capitulation_daily 14h, criticality_summary 14h, desk_briefs 8h, market_risk_components_committed 20h, podcast_catalog 1h, reverse_splits 3h, separations 8h, short_alpha 22h, special_situations 8h, spx_surface 14h, technical_summary 14h, vol_metrics 14h, warrant_monitor 8h)",
    "violations": [],
    "violations_total": 0,
    "waived": []
@@ -143,16 +143,17 @@
    "id": "P8",
    "severity": "report",
    "base_severity": "report",
-   "count": 3,
+   "count": 4,
    "delta": "+1",
    "status": "VIOLATIONS",
-   "note": "36 lanes fresh; stale lanes alert through the repository-health supervisor, never through this gate",
+   "note": "35 lanes fresh; stale lanes alert through the repository-health supervisor, never through this gate",
    "violations": [
-    "data-pipeline-world-model: last work-done receipt 356.0h old (window 342h)",
+    "data-pipeline-world-model: last work-done receipt 385.3h old (window 342h)",
     "licensed-research: no work-done receipt",
-    "research-watchdog: last work-done receipt 134.6h old (window 54h)"
+    "research-watchdog: last work-done receipt 163.9h old (window 54h)",
+    "supervisor: last work-done receipt 13.3h old (window 12h)"
    ],
-   "violations_total": 3,
+   "violations_total": 4,
    "waived": []
   },
   {
@@ -242,8 +243,8 @@
    "id": "E6",
    "severity": "report",
    "base_severity": "report",
-   "count": 249,
-   "delta": "0",
+   "count": 248,
+   "delta": "-1",
    "status": "VIOLATIONS",
    "note": "",
    "violations": [
@@ -268,7 +269,7 @@
     "2026-05-21 For exchanges, analyze **handled volume** alongside market share ? share loss an",
     "2026-05-21 Invest only in simple, understandable businesses with durable economics and hone"
    ],
-   "violations_total": 249,
+   "violations_total": 248,
    "waived": []
   },
   {
@@ -314,7 +315,7 @@
    "count": 545,
    "delta": "0",
    "status": "VIOLATIONS",
-   "note": "189/734 tickers resolve (top-level 51, classification_inputs 136, registry 2)",
+   "note": "190/735 tickers resolve (top-level 52, classification_inputs 136, registry 2)",
    "violations": [
     "3905.T: no payoff_lens on any surface (top-level, classification_inputs, registry)",
     "8697.T: no payoff_lens on any surface (top-level, classification_inputs, registry)",
@@ -367,7 +368,7 @@
    "count": 34,
    "delta": "0",
    "status": "VIOLATIONS",
-   "note": "34 stale, 0 missing where required, 0 undatable, over 734 tickers x 2 artifacts",
+   "note": "34 stale, 0 missing where required, 0 undatable, over 735 tickers x 2 artifacts",
    "violations": [
     "AAOI: research/valuation_route.json behind research/valuation.json -- heal: python _system/scripts/power_zone_router.py --scope valued (power-zone-universe cron 30 5 * * 1; ls-algo lane daily)",
     "ABX: research/valuation_route.json behind research/valuation.json -- heal: python _system/scripts/power_zone_router.py --scope valued (power-zone-universe cron 30 5 * * 1; ls-algo lane daily)",

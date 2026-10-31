@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "updated": "2026-09-03",
+  "updated": "2026-10-20",
   "user_agent": "SSI-VideoAgent/1.0 (+research; contact=research@local)",
   "notes": "YouTube channel registry, the video analogue of show_registry.json. Precision comes from this list, not from search. tier: duplicate=already in the podcast corpus; guest=a registered guest's own channel; native=video-only source. trust: high=on-topic by construction; broad=channel is only sometimes relevant and the transcript gate must carry the decision. ingest=false means discovered but never fetched. All feed_* fields are live probe results, not assertions -- refresh with resolve_youtube_channel.py --verify. playlists[] scopes ingestion inside a channel: `ingest` on the channel governs its RSS feed only, and each playlist carries its own, so a noisy channel can stay off while one playlist on it is read. Playlists are read through playlistItems.list (1 unit per 50 videos) rather than RSS, which caps at 15 entries and cannot see history. analysis_role selects the extraction prompt in analyze_video_episode.py: operator=the guest runs the business (claims are self-reported and marked as such), allocator=an outside investor discussing positions, pitch=a single-name pitch with a target and catalyst, broad=may carry no investable view at all. Unset falls back to allocator for tier=guest and broad otherwise.",
   "channels": [
@@ -342,6 +342,187 @@
       "feed_days_stale": 4957,
       "rate_limit_seconds": 1.0,
       "playlists": []
+    },
+    {
+      "channel_id": "UC_ri3Dcch5ZKslG7Wa-8Kaw",
+      "title": "Behind the Balance Sheet",
+      "handle": "@BehindTheBalanceSheet",
+      "rss_url": "https://www.youtube.com/feeds/videos.xml?channel_id=UC_ri3Dcch5ZKslG7Wa-8Kaw",
+      "uploads_playlist_id": "UU_ri3Dcch5ZKslG7Wa-8Kaw",
+      "tier": "duplicate",
+      "trust": "broad",
+      "ingest": false,
+      "dedupe_against_show_id": "behind_the_balance_sheet",
+      "guest_ids": [],
+      "notes": "Probed 2026-10-20. Latest 15 are clips and a trailer, not the hour-long interviews. The podcast feed is the source.",
+      "verified_at": "2026-10-20",
+      "feed_title": "Behind the Balance Sheet",
+      "feed_entry_count": 15,
+      "feed_last_published": "2026-10-17",
+      "feed_days_stale": 3,
+      "rate_limit_seconds": 1.0
+    },
+    {
+      "channel_id": "UCxvWYkbVv4cDOmAHqikNT0g",
+      "title": "Markel Group",
+      "handle": "",
+      "rss_url": "https://www.youtube.com/feeds/videos.xml?channel_id=UCxvWYkbVv4cDOmAHqikNT0g",
+      "uploads_playlist_id": "UUxvWYkbVv4cDOmAHqikNT0g",
+      "tier": "native",
+      "trust": "high",
+      "ingest": true,
+      "dedupe_against_show_id": null,
+      "guest_ids": [],
+      "notes": "Shareholder reunion and Omaha brunch. Channel id taken from the 2025 Omaha brunch video. @MarkelGroup is a 404. Latest 15 on 2026-10-20 run from the 2024 reunion through the 2026 reunion.",
+      "verified_at": "2026-10-20",
+      "feed_title": "Markel Group",
+      "feed_entry_count": 15,
+      "feed_last_published": "2026-06-05",
+      "feed_days_stale": 137,
+      "rate_limit_seconds": 1.0,
+      "analysis_role": "operator"
+    },
+    {
+      "channel_id": "UCVQqnwSap9-WmNWzx7pX4Bw",
+      "title": "Brookfield",
+      "handle": "@BrookfieldCorporation",
+      "rss_url": "https://www.youtube.com/feeds/videos.xml?channel_id=UCVQqnwSap9-WmNWzx7pX4Bw",
+      "uploads_playlist_id": "UUVQqnwSap9-WmNWzx7pX4Bw",
+      "tier": "native",
+      "trust": "high",
+      "ingest": true,
+      "dedupe_against_show_id": null,
+      "guest_ids": [],
+      "notes": "Core hold BN. Latest 15 on 2026-10-20 are the 2026 investor day, including Bruce Flatt with Howard Marks. @brookfield is a 404. @BrookfieldAssetManagement resolves to this same channel.",
+      "verified_at": "2026-10-20",
+      "feed_title": "Brookfield",
+      "feed_entry_count": 15,
+      "feed_last_published": "2026-10-16",
+      "feed_days_stale": 4,
+      "rate_limit_seconds": 1.0,
+      "analysis_role": "operator"
+    },
+    {
+      "channel_id": "UCJ27FwJZ3hsMrPCviG5gCFg",
+      "title": "The Acquirers Podcast",
+      "handle": "@TheAcquirersPodcast",
+      "rss_url": "https://www.youtube.com/feeds/videos.xml?channel_id=UCJ27FwJZ3hsMrPCviG5gCFg",
+      "uploads_playlist_id": "UUJ27FwJZ3hsMrPCviG5gCFg",
+      "tier": "native",
+      "trust": "high",
+      "ingest": true,
+      "dedupe_against_show_id": null,
+      "guest_ids": [],
+      "notes": "Forward window only. The RSS podcast is 450 episodes (https://anchor.fm/s/9603714/podcast/rss) and stays off the show registry. Publishes about one video a day, so the 15-slot feed is about two weeks.",
+      "verified_at": "2026-10-20",
+      "feed_title": "The Acquirers Podcast",
+      "feed_entry_count": 15,
+      "feed_last_published": "2026-10-18",
+      "feed_days_stale": 2,
+      "rate_limit_seconds": 1.0,
+      "analysis_role": "allocator"
+    },
+    {
+      "channel_id": "UCzX4HLkD7eXBgzVwHMZlhmg",
+      "title": "MicroCapClub",
+      "handle": "@MicroCapClub",
+      "rss_url": "https://www.youtube.com/feeds/videos.xml?channel_id=UCzX4HLkD7eXBgzVwHMZlhmg",
+      "uploads_playlist_id": "UUzX4HLkD7eXBgzVwHMZlhmg",
+      "tier": "native",
+      "trust": "high",
+      "ingest": true,
+      "dedupe_against_show_id": null,
+      "guest_ids": [],
+      "notes": "Forward window only. Podcast feed is 129 episodes (https://anchor.fm/s/fa8b8aa8/podcast/rss) and stays off. 2026-10-19 upload is James Davolos on exchanges.",
+      "verified_at": "2026-10-20",
+      "feed_title": "MicroCapClub",
+      "feed_entry_count": 15,
+      "feed_last_published": "2026-10-19",
+      "feed_days_stale": 1,
+      "rate_limit_seconds": 1.0,
+      "analysis_role": "allocator"
+    },
+    {
+      "channel_id": "UCBywIfdQy7Nyb2RfRb_Z0eg",
+      "title": "The Business Brew",
+      "handle": "@TheBusinessBrew",
+      "rss_url": "https://www.youtube.com/feeds/videos.xml?channel_id=UCBywIfdQy7Nyb2RfRb_Z0eg",
+      "uploads_playlist_id": "UUBywIfdQy7Nyb2RfRb_Z0eg",
+      "tier": "native",
+      "trust": "high",
+      "ingest": true,
+      "dedupe_against_show_id": null,
+      "guest_ids": [],
+      "notes": "Forward window only. Podcast feed is 204 episodes (https://anchor.fm/s/8d780590/podcast/rss) and stays off. Includes Revisiting Fairfax Financial.",
+      "verified_at": "2026-10-20",
+      "feed_title": "The Business Brew",
+      "feed_entry_count": 15,
+      "feed_last_published": "2026-10-09",
+      "feed_days_stale": 11,
+      "rate_limit_seconds": 1.0,
+      "analysis_role": "allocator"
+    },
+    {
+      "channel_id": "UCfzbRPUn_YvJCl6npbZKXJA",
+      "title": "Oaktree",
+      "handle": "@OaktreeCapital",
+      "rss_url": "https://www.youtube.com/feeds/videos.xml?channel_id=UCfzbRPUn_YvJCl6npbZKXJA",
+      "uploads_playlist_id": "UUfzbRPUn_YvJCl6npbZKXJA",
+      "tier": "guest",
+      "trust": "high",
+      "ingest": true,
+      "dedupe_against_show_id": "memo_howard_marks",
+      "guest_ids": [
+        "marks_credit_cycle"
+      ],
+      "notes": "Memos plus the 2026 Oaktree conference. Item-level dedupe against The Memo. A memo whose video title differs from the podcast title can still arrive twice.",
+      "verified_at": "2026-10-20",
+      "feed_title": "Oaktree",
+      "feed_entry_count": 15,
+      "feed_last_published": "2026-10-03",
+      "feed_days_stale": 17,
+      "rate_limit_seconds": 1.0,
+      "analysis_role": "allocator"
+    },
+    {
+      "channel_id": "UC5Z-C01O2VlpeD1rMs_HS2Q",
+      "title": "Good Investing Talks",
+      "handle": "",
+      "rss_url": "https://www.youtube.com/feeds/videos.xml?channel_id=UC5Z-C01O2VlpeD1rMs_HS2Q",
+      "uploads_playlist_id": "UU5Z-C01O2VlpeD1rMs_HS2Q",
+      "tier": "native",
+      "trust": "broad",
+      "ingest": true,
+      "dedupe_against_show_id": null,
+      "guest_ids": [],
+      "notes": "European and US compounder interviews, plus Omaha travel guides in the same window. trust=broad so the transcript gate drops the packing tips. @GoodInvesting (UCOv_nc2p0bt5jIr1D78VqFg) is a different feed and is not ingested. The podcast (100 episodes) stays off until a harvested episode page is confirmed to be the interview.",
+      "verified_at": "2026-10-20",
+      "feed_title": "Good Investing Talks",
+      "feed_entry_count": 15,
+      "feed_last_published": "2026-10-16",
+      "feed_days_stale": 4,
+      "rate_limit_seconds": 1.0,
+      "analysis_role": "allocator"
+    },
+    {
+      "channel_id": "UCLvnJL8htRR1T9cbSccaoVw",
+      "title": "Aswath Damodaran",
+      "handle": "@AswathDamodaranonValuation",
+      "rss_url": "https://www.youtube.com/feeds/videos.xml?channel_id=UCLvnJL8htRR1T9cbSccaoVw",
+      "uploads_playlist_id": "UULvnJL8htRR1T9cbSccaoVw",
+      "tier": "native",
+      "trust": "broad",
+      "ingest": true,
+      "dedupe_against_show_id": null,
+      "guest_ids": [],
+      "notes": "Rolling essays only. The course archive is about 1,200 videos and is not an ingesting playlist. Two course sessions were inside the latest 15 on 2026-10-20.",
+      "verified_at": "2026-10-20",
+      "feed_title": "Aswath Damodaran",
+      "feed_entry_count": 15,
+      "feed_last_published": "2026-10-08",
+      "feed_days_stale": 12,
+      "rate_limit_seconds": 1.0,
+      "analysis_role": "broad"
     }
   ],
   "unresolved": [
@@ -359,6 +540,51 @@
       "wanted": "Value Investing with Legends",
       "show_id": "value_investing_legends",
       "note": "No channel found under any handle form tried."
+    },
+    {
+      "wanted": "S&P Global",
+      "show_id": null,
+      "note": "2026-10-20: @SPGlobal resolved to UC8vA4fMscu0RvZfPXNe7NCQ. Feed title is SP Global, but the latest videos are a Holi celebration and Har Har Mahadev. Rejected. The real issuer channel was not this one."
+    },
+    {
+      "wanted": "Danaher Corporation investor days",
+      "show_id": null,
+      "note": "2026-10-20: @DanaherCorporation (UCe7s1LMEO8Gh6cEEGKQQbDw) is the real company. Latest titles are partnership and sustainability films from June 2026. Channel feed stays off. An investor-day playlist would be the add."
+    },
+    {
+      "wanted": "Intercontinental Exchange investor days",
+      "show_id": null,
+      "note": "2026-10-20: @ICE_Markets (UCXworEv4y9w9AAG2768RKGg) is the real company. The window is product spots, plus one conversation with Apollo. Channel feed stays off."
+    },
+    {
+      "wanted": "Pershing Square",
+      "show_id": null,
+      "note": "2026-10-20: @PershingSquare (UClzpNnkgqmmgz-zxPVDV2-w) is dormant about 17 years. Target-era videos. Rejected."
+    },
+    {
+      "wanted": "Robin Hood Investors Conference",
+      "show_id": null,
+      "note": "2026-10-20: @RobinHoodNYC page title is ROBIN HOOD and the feed title is Fair Housing Justice Center (UCJnQ326mtBO5XwsjOWeX8DQ). The 2016 Druckenmiller video is a reupload on a dormant personal channel. Rejected."
+    },
+    {
+      "wanted": "Baillie Gifford",
+      "show_id": null,
+      "note": "2026-10-20: @BaillieGifford (UC8i_Ax5b8DD2lpkiYpGY4Kg) feed title came back Scottish Mortgage. Growth-trust marketing. Rejected."
+    },
+    {
+      "wanted": "London Value Investor Conference",
+      "show_id": null,
+      "note": "2026-10-20: @LondonValueInvestor (UC4nTULG32JLzP-REvNI_YTg) last upload is the 2022 overview. Dormant. Rejected."
+    },
+    {
+      "wanted": "Fairfax Financial annual meeting",
+      "show_id": null,
+      "note": "2026-10-20: no public channel under @Fairfax, @FairfaxFinancial, or @FairfaxFinancialHoldings. @FairfaxIndia is an empty feed."
+    },
+    {
+      "wanted": "Horizon Kinetics",
+      "show_id": null,
+      "note": "2026-10-20: no public channel under @HorizonKinetics or @MurrayStahl. @FRMO and @frmo resolved to an unrelated empty channel."
     }
   ]
 }

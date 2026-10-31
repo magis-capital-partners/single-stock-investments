@@ -10,7 +10,18 @@ from decimal import Decimal
 from pathlib import Path
 from typing import Any, Iterator
 
-from .allocation_policy import POLICY_SOURCE_PREFIX, classify_policy_position, load_drew_symbols, load_ls_universe, residual_quantity
+from _system.trading.sleeves.classify_positions import ETF_0DTE, etf_0dte_root, split_etf_0dte_shares
+
+from .allocation_policy import (
+    ETF_0DTE_POLICY_REASONS,
+    ETF_0DTE_STRATEGY,
+    POLICY_SOURCE_PREFIX,
+    classify_policy_position,
+    load_drew_symbols,
+    load_etf_0dte_expected_delivery,
+    load_ls_universe,
+    residual_quantity,
+)
 
 # Stable namespace for content-derived projection ids. Fixed forever: changing it
 # would remint every projection id and cost one full delete-and-reinsert cycle.
@@ -200,19 +211,46 @@ class PortfolioLedger:
     def _sync_policy_allocations(self, db: sqlite3.Connection, snapshot_id: str, payload: dict[str, Any], now: str) -> None:
         account_alias = payload["account_alias"]
         as_of = payload["as_of"]
+        ownership = (payload.get("completeness") or {}).get("ownership")
+        if "completeness" not in payload:
+            stored = db.execute("SELECT completeness_json FROM account_snapshots WHERE snapshot_id=?", (snapshot_id,)).fetchone()
+            ownership = json.loads(stored[0]).get("ownership") if stored else None
+        if ownership:
+            # Rebuild this projection from the broker lots atomically. Existing
+            # human corrections remain in the audit log; ticker-wide rows may
+            # not add a second claim on lots now attributed individually.
+            db.execute("UPDATE allocation_lots SET ended_at=? WHERE account_alias=? AND ended_at IS NULL", (as_of, account_alias))
+            for index, row in enumerate(ownership["allocations"]):
+                identity = f"{POLICY_SOURCE_PREFIX}:{snapshot_id}:{index}"
+                db.execute("""INSERT OR REPLACE INTO allocation_lots VALUES (?,?,?,?,?,?,?,?,?,NULL,?,?,?,?)""",
+                    (str(uuid.uuid5(uuid.NAMESPACE_URL, identity)), account_alias, row["conid"], row["model_code"],
+                     row["owner"], row["strategy"], None, row["quantity_decimal"], as_of, row["confidence"], identity,
+                     f"broker lot ownership {ownership['version']}", now))
+            return
         db.execute(
             "DELETE FROM allocation_lots WHERE account_alias=? AND source_event_id LIKE ?",
             (account_alias, f"{POLICY_SOURCE_PREFIX}%"),
         )
         ls_symbols = load_ls_universe()
         drew_symbols = load_drew_symbols()
+        expected_delivery = load_etf_0dte_expected_delivery(account_alias, as_of=as_of)
         positions = db.execute(
             "SELECT * FROM position_snapshot_rows WHERE snapshot_id=? ORDER BY conid,model_code",
             (snapshot_id,),
         ).fetchall()
         for position in positions:
-            policy = classify_policy_position(dict(position), ls_symbols=ls_symbols, drew_symbols=drew_symbols)
-            if policy.strategy in {"letf", "spx_0dte", "ls_algo"}:
+            policy = classify_policy_position(
+                dict(position), ls_symbols=ls_symbols, drew_symbols=drew_symbols,
+                etf_0dte_delivery=expected_delivery,
+            )
+            # etf-0dte's SPY / QQQ shares: an explicit Drew/Michael lot is another
+            # book's KNOWN holding and keeps its owner; only the remainder is
+            # attributed against spx-0dte's delivery forecast. Its options are
+            # nobody's here, like SPX's.
+            etf_0dte_shares = policy.strategy == ETF_0DTE_STRATEGY and policy.bucket != ETF_0DTE
+            if policy.strategy in {"letf", "spx_0dte", "ls_algo"} or (
+                policy.strategy == ETF_0DTE_STRATEGY and not etf_0dte_shares
+            ):
                 db.execute(
                     """UPDATE allocation_lots SET ended_at=?
                     WHERE account_alias=? AND conid=? AND model_code=? AND owner IN ('drew','michael')
@@ -231,20 +269,34 @@ class PortfolioLedger:
             if remainder == 0:
                 continue
             source_event_id = f"{POLICY_SOURCE_PREFIX}:{account_alias}:{position['conid']}:{position['model_code']}"
-            allocation_id = str(uuid.uuid5(uuid.NAMESPACE_URL, source_event_id))
-            db.execute(
-                """INSERT INTO allocation_lots
-                (allocation_id,account_alias,conid,model_code,owner,strategy,bucket,quantity_decimal,effective_at,ended_at,
-                 confidence,source_event_id,note,created_at)
-                VALUES (?,?,?,?,?,?,?,?,?,NULL,'authoritative',?,?,?)""",
-                (
-                    allocation_id, account_alias, position["conid"], position["model_code"], policy.owner,
-                    policy.strategy, policy.bucket, decimal_text(remainder), as_of, source_event_id, policy.reason, now,
-                ),
-            )
-            self._put_outbox(db, "allocation.changed.v1", f"{allocation_id}:{snapshot_id}", {
-                "allocation_id": allocation_id, "rule": policy.reason, "snapshot_id": snapshot_id,
-            }, now)
+            if etf_0dte_shares:
+                # One lot per bucket: the forecast part, then whatever it does
+                # not explain. The suffix keeps the two allocation ids apart.
+                root = etf_0dte_root({
+                    "symbol": position["symbol"], "localSymbol": position["local_symbol"],
+                    "secType": position["sec_type"],
+                })
+                lots = [
+                    (quantity, bucket, f"{ETF_0DTE_POLICY_REASONS[bucket]}:{reason}", f"{source_event_id}:{bucket}")
+                    for quantity, bucket, reason in split_etf_0dte_shares(root, remainder, expected_delivery)
+                ]
+            else:
+                lots = [(remainder, policy.bucket, policy.reason, source_event_id)]
+            for quantity, bucket, reason, event_id in lots:
+                allocation_id = str(uuid.uuid5(uuid.NAMESPACE_URL, event_id))
+                db.execute(
+                    """INSERT INTO allocation_lots
+                    (allocation_id,account_alias,conid,model_code,owner,strategy,bucket,quantity_decimal,effective_at,ended_at,
+                     confidence,source_event_id,note,created_at)
+                    VALUES (?,?,?,?,?,?,?,?,?,NULL,'authoritative',?,?,?)""",
+                    (
+                        allocation_id, account_alias, position["conid"], position["model_code"], policy.owner,
+                        policy.strategy, bucket, decimal_text(quantity), as_of, event_id, reason, now,
+                    ),
+                )
+                self._put_outbox(db, "allocation.changed.v1", f"{allocation_id}:{snapshot_id}", {
+                    "allocation_id": allocation_id, "rule": reason, "snapshot_id": snapshot_id,
+                }, now)
 
     def add_allocation(self, *, account_alias: str, conid: int, model_code: str = "", owner: str,
                        strategy: str, quantity: Any, bucket: str | None = None,
@@ -370,6 +422,15 @@ class PortfolioLedger:
                 if not allocations:
                     continue
                 pos["quantity_decimal"] = decimal_text(sum((Decimal(a["quantity_decimal"]) for a in allocations), Decimal("0")))
+                ownership = json.loads(snap["completeness_json"]).get("ownership")
+                if ownership:
+                    parts = [a["position"] for a in ownership["allocations"] if a["conid"] == row["conid"]
+                             and a["model_code"] == row["model_code"] and a["owner"] == owner]
+                    for field in ("market_value_decimal", "market_value_native_decimal", "market_value_base_decimal",
+                                  "unrealized_pnl_decimal", "unrealized_pnl_base_decimal"):
+                        pos[field] = decimal_text(sum((Decimal(p[field]) for p in parts), Decimal(0))) if all(p[field] is not None for p in parts) else None
+                    if len(parts) == 1:
+                        pos.update({k: parts[0][k] for k in ("average_cost_decimal", "average_cost_native_decimal")})
             pos["allocations"] = allocations
             positions.append(pos)
         breaks = [dict(r) for r in self.connection.execute("SELECT * FROM reconciliation_breaks WHERE snapshot_id=? AND status='open'", (snap["snapshot_id"],))]

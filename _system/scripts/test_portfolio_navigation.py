@@ -4,12 +4,14 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parents[2]
 
 
-def test_portfolio_is_primary_and_owner_routes_are_nested() -> None:
+def test_research_is_primary_and_owner_routes_remain_nested() -> None:
     html = (ROOT / "dashboard" / "index.html").read_text(encoding="utf-8")
     assert 'data-view="portfolio"' in html
     assert '>SPX 0DTE<' in html
     assert '>LS Algo<' in html
-    assert '>Research<' in html
+    assert '>Stock Research<' in html
+    primary=html.split('id="view-tabs"')[1].split('</nav>')[0]
+    assert primary.index('>Stock Research<') < primary.index('>Ideas<') < primary.index('>Insights<') < primary.index('>Portfolio<')
     assert 'data-view="drew"' not in html
     assert 'data-view="michael"' not in html
     assert "#/portfolio/${window.PortfolioViz?.state.scope" in html
@@ -22,7 +24,8 @@ def test_portfolio_browser_only_writes_to_the_paper_order_route() -> None:
     assert "method: 'POST'" in javascript
     assert "/api/v2/portfolio/paper-orders" in javascript
     assert "x-paper-order-mode" in javascript
-    assert "Queue paper order" in javascript
+    assert "Request preview" in javascript
+    assert "I understand this will not place a broker order." in javascript
 
 
 def test_portfolio_has_brokerage_grade_overview_and_position_controls() -> None:
@@ -47,7 +50,7 @@ def test_portfolio_has_deeper_read_only_workflows() -> None:
     assert "data-ph-linked-symbol" in javascript
     assert "Metric lineage" in javascript
     assert "Factor drill-down" in javascript
-    assert "NAV vs" in javascript
+    assert "Account value" in javascript
     assert "quarantined" in javascript
     assert "PAPER · NEVER TRANSMITTED" in javascript
     assert ".ph-drawer" in css

@@ -8,6 +8,13 @@ v=importlib.util.module_from_spec(spec);spec.loader.exec_module(v)
 
 
 class CaptureTests(unittest.TestCase):
+    def test_dated_symbol_and_venue_resolution_is_issuer_bound(self):
+        row=dict(ticker='TNFA',issuer='cik/1321834',date='2025-09-30')
+        self.assertEqual(v.security_for(row)[0],'QCLS')
+        self.assertEqual(v.security_for({**row,'issuer':'cik/999'})[0],'TNFA')
+        self.assertEqual(v.security_for(dict(ticker='DBGI',issuer='cik/1668010',date='2025-01-15'))[1],'OTC')
+        self.assertEqual(v.security_for(dict(ticker='DBGI',issuer='cik/1668010',date='2025-08-20'))[1],'NASDAQ')
+
     def test_classifier_uses_pretrade_quote_and_does_not_claim_nbbo(self):
         r=dict(ts_ms=1000,available_ms=1001,action='A',side='N',price=10.04,size=100,flags=0,sequence=1,bid=10.,ask=10.04,ask_size=100)
         rows=[r,{**r,'ts_ms':2000,'available_ms':2001,'action':'T','price':10.04,'size':30,'sequence':2,'ask':10.05}]

@@ -4,16 +4,41 @@ const vm = require('node:vm');
 const fs = require('node:fs');
 const path = require('node:path');
 const root = path.resolve(__dirname,'../../..');
-const context = vm.createContext({Intl,Map,Set,URLSearchParams,module:{exports:{}}});
-for(const file of ['valuation-viz.js','research-workspace.js']) vm.runInContext(fs.readFileSync(path.join(root,'dashboard',file),'utf8'),context);
+const clock = class extends Date { static now(){ return Date.parse('2026-10-26T23:00:00Z'); } };
+const liveSync = {status:'verified',valid_until:'2026-10-27T20:10:00+00:00'};
+const context = vm.createContext({Intl,Map,Set,Date:clock,URLSearchParams,module:{exports:{}}});
+context.window=context;context.navigator={language:'en-US'};
+for(const file of ['ui-format.js','valuation-viz.js','research-workspace.js']) vm.runInContext(fs.readFileSync(path.join(root,'dashboard',file),'utf8'),context);
 const rw = context.ResearchWorkspace;
 const escapeHtml = s => String(s ?? '').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 const h = {escapeHtml,quoteUnitsOf:()=>({}),fmtQuote:n=>n==null?'—':`EUR ${n}`,linkHtml:(url,label)=>`<a href="${escapeHtml(url)}">${escapeHtml(label)}</a>`};
 const metric = {...{metric:'revenue',label:'Revenue',display:true,tier:'primary',latest_period:'2026-06-30',level_latest:25,growth_latest:.25,basis:'yoy',points:[{period:'2025-06-30',value:20},{period:'2026-06-30',value:25}]}};
+
+test('economic assumptions reach the live shared-forecast view and stale prices hide attribution',()=>{
+ const t={valuation_decision:{research_return_available:true,calculation_status:'available',forward_return_at_price_pct:{base:12},market_sync:liveSync},
+  shared_forecast:{status:'available',economic_review_status:'passed',forward_irr_pct:{base:12},market_sync:liveSync,buy_prices:[],
+   economic_diagnostics:{bridges_reconciled:5,pricing:{cases:{base:{flat_cash_return_pct:3,cash_growth_effect_pp:10,valuation_change_effect_pp:-1,irr_pct:12}},reverse_expectations:{driver_ref:'growth',unit:'ratio',status:'solved',implied_value:.15}},
+    hypotheses:[{explanation:'<script>bad</script>',discriminating_observation:'Retention reveals the mechanism.'}],structural_tests:[],forecast_commitments:[]}}};
+ const html=rw.irrReadiness(t,h);
+ assert.match(html,/Valuation change contribution/);assert.match(html,/Price-implied growth/);assert.match(html,/15\.00%/);
+ assert.match(html,/&lt;script&gt;/);assert.doesNotMatch(html,/<script>/);
+ t.valuation_decision.market_sync={status:'verified',valid_until:'2020-01-01'};
+ const stale=rw.irrReadiness(t,h);
+ assert.doesNotMatch(stale,/Valuation change contribution/);assert.doesNotMatch(stale,/Price-implied growth/);
+});
 test('null, blank and non-finite observations never become zero',()=>{
  for(const value of [null,undefined,'',false,true,NaN,Infinity,'bad',[],{}]) assert.equal(rw.number(value),null);
  assert.equal(rw.number(0),0);
  assert.equal(rw.number(-2),-2);
+});
+
+test('executed financing failure is shown as complete loss with an undefined IRR',()=>{
+ const t={shared_forecast:{status:'available',economic_review_status:'passed',market_sync:liveSync,
+  return_outcomes:{low:{outcome:'complete_loss',total_return_pct:-100,irr_defined:false}},
+  economic_diagnostics:{currency:'USD',financing_failures:[{case:'low',component_id:'<bad>',year:1,resources:1e6,senior_due:2e6,unpaid_senior_claims:1e6}]}}};
+ const html=context.ValuationViz.renderEconomicDiagnostics(t,h);
+ assert.match(html,/complete loss of capital/);assert.match(html,/IRR is undefined/);
+ assert.match(html,/Common ownership is extinguished/);assert.match(html,/&lt;bad&gt;/);
 });
 test('current charts respect upstream signal exclusions and do not mutate data',()=>{
  const metrics=[metric,{...metric,display:false},{...metric,artifact:true},{...metric,stale:true},{...metric,tier:'excluded'}];
@@ -23,7 +48,7 @@ test('current charts respect upstream signal exclusions and do not mutate data',
 });
 test('current observations retain period, unit and source without inventing a trend',()=>{
  const html=rw.kpis({compounder_monitor:{kpi_coverage:[{kpi_id:'adv',status:'current',value:0,unit:'contracts_per_day',period:'2026-09',source:{ref:'https://example.com/source'}}]}},h,3);
- assert.match(html,/2026-09/); assert.match(html,/contracts per day/); assert.match(html,/trend unavailable/); assert.match(html,/https:\/\/example.com\/source/); assert.doesNotMatch(html,/<svg/);
+ assert.match(html,/Sep 2026/); assert.match(html,/contracts per day/); assert.match(html,/trend unavailable/); assert.match(html,/https:\/\/example.com\/source/); assert.doesNotMatch(html,/<svg/);
 });
 test('historical series are explicitly separated from current signals',()=>{
  const t={kpi_trends:{metrics:[{...metric,display:false,stale:true}]}};
@@ -56,8 +81,9 @@ test('a quote outside the valuation range is included in the ruler domain',()=>{
 test('missing model and sparse research produce useful next steps',()=>{
  const html=rw.overview({ticker:'TST'}, {...h,developments:[]}); assert.match(html,/primary evidence/);assert.match(html,/No dated developments/);assert.doesNotMatch(html,/NaN|undefined/);
 });
-test('legacy buyback routes resolve to the business view and unknown tabs to overview',()=>{
- assert.equal(rw.validTab('buyback'),'business'); assert.equal(rw.validTab('evidence'),'evidence');assert.equal(rw.validTab('bad'),'overview');
+test('legacy routes resolve to the simplified company workspace',()=>{
+ for(const tab of ['buyback','business','valuation']) assert.equal(rw.validTab(tab),'models');
+ assert.equal(rw.validTab('evidence'),'sources');assert.equal(rw.validTab('sources'),'sources');assert.equal(rw.validTab('bad'),'overview');
 });
 test('labels and source references are escaped',()=>{
  const html=rw.kpis({kpi_trends:{metrics:[{...metric,label:'<script>bad</script>',evidence_ref:'reports/test "file".json'}]}},h);
@@ -98,7 +124,7 @@ test('a failed automatic refresh withdraws returns and describes its automatic r
 
 
 test('a shared model supplies the displayed return without committee approval',()=>{
- const t={valuation_decision:{return_publishable:false,research_return_available:true,calculation_status:'available',forward_return_at_price_pct:{low:-2,base:8,high:15}},autonomous_irr:{status:'available',forward_irr_pct:{base:99}}};
+ const t={valuation_decision:{return_publishable:false,research_return_available:true,market_sync:liveSync,calculation_status:'available',forward_return_at_price_pct:{low:-2,base:8,high:15}},autonomous_irr:{status:'available',forward_irr_pct:{base:99}}};
  assert.equal(context.ValuationViz.displayReturn(t).pct,8);
  assert.equal(context.ValuationViz.displayReturn(t).source,'shared_valuation_forecast');
  assert.match(rw.scenarios(t,h),/8%/);
@@ -107,4 +133,40 @@ test('a shared model supplies the displayed return without committee approval',(
  t.valuation_decision.calculation_status='model_gap';
  assert.equal(context.ValuationViz.displayReturn(t).pct,null);
  assert.doesNotMatch(rw.scenarios(t,h),/99%/);
+});
+
+
+test('sync badges separate prices, financial dates and models without a today claim',()=>{
+ const d={calculation_status:'available',research_return_available:true,market_sync:liveSync,dates:{price_as_of:'2026-10-26',model_as_of:'2026-07-20',financial_period:'2025-12-31'}};
+ const html=context.ValuationViz.renderMarketSyncCell({valuation_decision:d},escapeHtml);
+ assert.match(html,/Synced/);assert.match(html,/2026-10-26/);assert.match(html,/2026-07-20/);assert.match(html,/2025-12-31/);assert.doesNotMatch(html,/today/);
+ const blocked={valuation_decision:{...d,calculation_status:'sync_gap',research_return_available:false,calculation_reason:'source_share_basis_unverified'}};
+ assert.match(context.ValuationViz.renderMarketSyncCell(blocked,escapeHtml),/Model updating/);
+ assert.match(context.ValuationViz.renderValueRangeCell({...blocked,component_valuation:{total_equity_value_per_share:{low:10,base:20,high:30}}},String,{}),/Model updating/);
+ assert.equal(context.ValuationViz.displayReturn(blocked).pct,null);
+});
+
+
+test('an expired cached quote cannot retain PV, IRR, entry thresholds or a green badge',()=>{
+ const t={valuation_decision:{calculation_status:'available',research_return_available:true,
+  market_sync:{status:'verified',valid_until:'2026-10-26T20:10:00Z'},price_per_share:100,
+  value_per_share:{low:100,base:120,high:150},forward_return_at_price_pct:{low:2,base:8,high:15},margin_of_safety_pct:{base:20}},
+  shared_forecast:{status:'available',forward_irr_pct:{low:2,base:8,high:15},buy_prices:[{hurdle_pct:10,prices:{base:99}}]},
+  pricing_analysis:{buy_zones:{status:'available',zones:[{label:'Old threshold',price:99}]}}};
+ const before=JSON.stringify(t);
+ const d=context.ValuationViz.decisionOf(t);
+ assert.equal(d.research_return_available,false); assert.equal(d.value_per_share.base,null);
+ assert.equal(context.ValuationViz.displayReturn(t).pct,null);
+ assert.match(context.ValuationViz.renderMarketSyncCell(t,escapeHtml),/Model updating/);
+ assert.doesNotMatch(rw.range(t,h),/Old threshold|EUR 120/);
+ assert.doesNotMatch(rw.scenarios(t,h),/8%/);
+ const detail=rw.irrReadiness(t,h);assert.doesNotMatch(detail,/<strong>8%|10% hurdle/);
+ assert.match(detail,/latest completed market close/);
+ assert.equal(JSON.stringify(t),before);
+});
+
+test('a cached shared forecast without verified expiry fails closed',()=>{
+ const t={valuation_decision:{calculation_status:'available',research_return_available:true,forward_return_at_price_pct:{base:143}}};
+ assert.equal(context.ValuationViz.displayReturn(t).pct,null);
+ assert.match(context.ValuationViz.renderValueRangeCell(t,String,{}),/Model updating/);
 });

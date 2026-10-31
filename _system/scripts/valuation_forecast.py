@@ -15,9 +15,10 @@ from datetime import date, timedelta
 
 from calculation_proof import evaluate_calculation_proof
 
-VERSION = 'shared-valuation-forecast/1.1'
+VERSION = 'shared-valuation-forecast/1.3'
 CASES = ('low', 'base', 'high')
 HURDLES = (8, 10, 12, 15, 18, 20)
+MAX_ASSUMPTION_AGE_DAYS = 180
 
 
 def number(value):
@@ -135,7 +136,6 @@ def _proof_rows(component, case):
     output = proof['outputs'][case]
     if isinstance(output, dict):
         output = output.get('node') or output.get('ref')
-    assumptions = {r['id']: r for r in proof.get('assumptions') or []}
     sources = evaluated.get('source_lineage') or []
     operating = any(r.get('op') in ('discount', 'present_value') for r in nodes.values())
 
@@ -210,13 +210,19 @@ def _proof_rows(component, case):
     return rows, expected, rate, sources
 
 
-def build_forecast(valuation, *, quote=None, as_of=None, fx=None):
+def build_forecast(valuation, *, quote=None, as_of=None, fx=None, market=None, evaluated_at=None):
     """Compile all additive components; never fall back around an issuer model."""
     inputs = valuation.get('inputs') or {}
     methodology = valuation.get('valuation_methodology') or {}
     model_day = _day(methodology.get('forecast_as_of') or valuation.get('as_of'))
-    quote = dict(quote or {'value': inputs.get('price'), 'as_of': inputs.get('price_as_of'),
-                          'source_url': inputs.get('price_source'), 'currency': inputs.get('currency')})
+    snapshot_quote = dict((valuation.get('market_snapshot') or {}).get('quote') or {})
+    for field, value in {'value': inputs.get('price'), 'as_of': inputs.get('price_as_of'),
+                         'source_url': inputs.get('price_source'), 'currency': inputs.get('currency')}.items():
+        if value is not None:
+            snapshot_quote[field] = value
+    quote = dict(quote or snapshot_quote)
+    fx = fx or (valuation.get('market_snapshot') or {}).get('fx')
+    market = market or valuation.get('market_snapshot')
     today = _day(as_of) or _day(quote.get('as_of')) or model_day
     components = (valuation.get('component_valuation_results') or {}).get('additive_components') or []
     result = {'schema_version': '1.0', 'method_version': VERSION, 'ticker': valuation.get('ticker'),
@@ -229,6 +235,88 @@ def build_forecast(valuation, *, quote=None, as_of=None, fx=None):
               'components': [], 'gaps': [], 'warnings': [], 'source_refs': [],
               'next_action': 'automatic_model_refresh', 'reconciliation': {'passed': False},
               'settlement_policy': 'Explicit cash/debt additions in an operating DCF are time-zero acquisition adjustments; hypothetical settlement, not declared dividends.'}
+    from valuation_market_sync import close_valid_until, quote_gaps
+    from valuation_share_basis import (
+        BasisGap,
+        basis_id,
+        history_start,
+        normalize_model,
+        validate_market,
+    )
+    sync_gaps = quote_gaps(quote, today.isoformat(), evaluated_at) if today else ['completed_session_quote_missing']
+    result['financial_period'] = valuation.get('financial_period')
+    result['market_sync'] = {'status': 'updating', 'price_as_of': quote.get('as_of'),
+        'financial_period': result['financial_period'], 'model_as_of': result['model_as_of'],
+        'price_policy': 'latest_completed_exchange_session', 'basis_id': None}
+    if not sync_gaps:
+        try:
+            result['market_sync']['valid_until'] = close_valid_until(quote['calendar'], quote['as_of'])
+        except (ValueError, KeyError, IndexError, ImportError):
+            sync_gaps.append('listing_calendar_or_completed_close_unverified')
+    latest_report = (market or {}).get('latest_report') or {}
+    if ((market or {}).get('source_discovery') or {}).get('status') == 'earnings_unresolved':
+        sync_gaps.append('new_earnings_disclosure_unresolved')
+    underwriting = valuation.get('underwriting') or {}
+    verification = (market or {}).get('underwriting_validation') or {}
+    if not underwriting and verification.get('status') == 'unverified':
+        sync_gaps.append('underwriting_contract_unverified')
+    if underwriting:
+        result['underwriting'] = underwriting
+        if verification.get('status') != 'verified' or verification.get('contract_hash') != underwriting.get('contract_hash'):
+            sync_gaps.append('underwriting_contract_unverified')
+        if verification.get('input_fingerprint_matches') is False:
+            sync_gaps.append('new_economic_evidence_after_underwriting')
+        if _day(underwriting.get('review_due')) and today and today > _day(underwriting['review_due']):
+            sync_gaps.append('underwriting_review_due')
+    result['market_sync']['latest_report'] = latest_report
+    reviewed = _day(methodology.get('reviewed_as_of')) if methodology.get('review_source') else None
+    assumptions_day = reviewed or model_day
+    result['assumptions_as_of'] = assumptions_day.isoformat() if assumptions_day else None
+    if components and assumptions_day and today and not 0 <= (today-assumptions_day).days <= MAX_ASSUMPTION_AGE_DAYS:
+        sync_gaps.append('model_assumptions_expired')
+    if components and latest_report.get('filed') and assumptions_day and _day(latest_report['filed']) > assumptions_day:
+        sync_gaps.append('new_financial_report_after_model')
+    latest_period = _day(latest_report.get('period'))
+    balance_dates = [_day((p.get('source') or {}).get('as_of')) for c in components
+                     for p in (c.get('calculation_proof') or {}).get('inputs') or []
+                     if re.fullmatch(r'(?:net_)?(?:cash|debt|shares)(?:_m|_b|_outstanding)?', str(p.get('id') or ''))
+                     and not (p.get('id') == 'shares' and p.get('observation_type') == 'annual_weighted_average'
+                              and (p.get('source') or {}).get('as_of') == valuation.get('financial_period'))]
+    if latest_period and any(d is None or d < latest_period for d in balance_dates):
+        sync_gaps.append('newer_balance_sheet_inputs_available')
+    try:
+        validate_market(market, quote, history_start(valuation, {}))
+        if market.get('normalization_error'):
+            raise BasisGap(market['normalization_error'])
+        valuation, adjustments = normalize_model(valuation, market, quote)
+        components = (valuation.get('component_valuation_results') or {}).get('additive_components') or []
+        methodology = valuation.get('valuation_methodology') or {}
+        result['market_sync'].update({'basis_id': basis_id(market, quote), 'share_basis_as_of': quote.get('as_of'),
+            'actions': market['events'], 'adjustments': adjustments,
+            'source_url': market['source_url'], 'coverage_start': market['coverage_start']})
+    except BasisGap as exc:
+        sync_gaps.append(str(exc))
+    # A quotation date or a successful refresh is never a new financial period.
+    source_days = [(p.get('source') or {}).get('as_of') for c in components
+                   for p in (c.get('calculation_proof') or {}).get('inputs') or []
+                   if p.get('id') != 'ordinary_shares_per_listing_share']
+    financial_day = _day(result['financial_period']) or max((_day(d) for d in source_days if _day(d)), default=None)
+    result['financial_period'] = financial_day.isoformat() if financial_day else None
+    result['market_sync']['financial_period'] = result['financial_period']
+    if components and (not financial_day or not today or not 0 <= (today-financial_day).days <= 550):
+        sync_gaps.append('financial_inputs_expired_or_undated')
+    if today and any(_day(d) and _day(d) > today for d in source_days):
+        sync_gaps.append('future_dated_source')
+    if sync_gaps:
+        if quote.get('identity_status') == 'mismatch':
+            sync_gaps.append('quote_issuer_mismatch')
+        result['gaps'] = [{'code': c} for c in dict.fromkeys(sync_gaps)]
+        result['status'] = 'identity_gap' if quote.get('identity_status') == 'mismatch' else 'sync_gap'
+        result['next_action'] = 'automatic_source_refresh'
+        result['calculation_id'] = fingerprint({'model': valuation, 'quote': quote, 'market': market,
+                                                 'as_of': result['as_of'], 'version': VERSION})
+        return result
+    result['market_sync']['status'] = 'verified'
     if not model_day or not today or today < model_day:
         result['gaps'].append({'code': 'forecast_date_missing_or_future' if components else 'issuer_forecast_missing'})
         return result
@@ -268,11 +356,16 @@ def build_forecast(valuation, *, quote=None, as_of=None, fx=None):
                 summary['status'] = 'model_gap'
                 result['gaps'].append({'component_id': component_id, 'case': case, 'code': str(exc)})
         result['components'].append(summary)
-    economics = {'model_as_of': result['model_as_of'], 'components': components,
-                 'methodology': {k: v for k, v in methodology.items() if k not in ('reviewed_as_of',)},
+    def economics_only(value):
+        if isinstance(value, dict):
+            return {k: economics_only(v) for k, v in value.items() if k != 'share_basis'}
+        return [economics_only(v) for v in value] if isinstance(value, list) else value
+    economics = {'model_as_of': result['model_as_of'], 'components': economics_only(components),
+                 'methodology': {k: v for k, v in methodology.items() if k not in ('reviewed_as_of', 'review_source')},
                  'method_version': VERSION}
     result['forecast_hash'] = fingerprint(economics)
-    result['calculation_id'] = fingerprint({'forecast_hash': result['forecast_hash'], 'quote': quote, 'as_of': result['as_of'], 'fx': fx})
+    result['calculation_id'] = fingerprint({'forecast_hash': result['forecast_hash'], 'quote': quote, 'as_of': result['as_of'], 'fx': fx,
+                                           'basis_id': result['market_sync']['basis_id']})
     if result['gaps']:
         return result
     if any(model_pv[c] < 0 for c in CASES):
@@ -313,7 +406,13 @@ def build_forecast(valuation, *, quote=None, as_of=None, fx=None):
         result['next_action'] = 'automatic_source_refresh'
         return result
     returns = {c: _irr(price, schedules[c]) for c in CASES}
-    if any(v is None for v in returns.values()):
+    from underwriting_economics import zero_loss_outcomes
+    try:
+        result['return_outcomes'] = zero_loss_outcomes(valuation, schedules)
+    except (ValueError,KeyError,TypeError):
+        result['gaps'].append({'code':'financing_failure_waterfall_invalid'})
+        return result
+    if any(v is None and c not in result['return_outcomes'] for c,v in returns.items()):
         result['gaps'].append({'code': 'unique_shareholder_irr_unavailable'})
         return result
     result['forward_irr_pct'] = returns
@@ -331,14 +430,24 @@ def attach_forecast(row, forecast, *, detailed=True):
     if forecast.get('model_basis') == 'automatic_operating_first_pass':
         decision['model_level'] = 'screening_grade'
         decision['provisional'] = True
+    elif forecast.get('underwriting') and forecast['status'] == 'available':
+        decision['model_level'] = 'stock_specific'
+        decision['provisional'] = False
+        if forecast.get('method_profile'):
+            decision['method_profile'] = forecast['method_profile']
+        if forecast.get('underwriting_archetype'):
+            row.setdefault('classification', {})['archetype'] = forecast['underwriting_archetype']
     decision.update({'forecast_id': forecast.get('calculation_id') or forecast.get('forecast_hash'), 'calculation_status': forecast['status'],
+                     'economic_review_status': forecast.get('economic_review_status'),
                      'research_return_available': forecast['status'] == 'available',
                      'calculation_reason': '; '.join(dict.fromkeys(g['code'] for g in forecast.get('gaps') or [])),
                      'forward_return_at_price_pct': forecast['forward_irr_pct'],
                      'annualized_return_at_price_pct': forecast['forward_irr_pct'],
                      'forward_return_status': 'available' if forecast['status'] == 'available' else 'withheld',
                      'forward_return_reason': 'shared_valuation_forecast' if forecast['status'] == 'available' else 'shared_forecast_incomplete'})
+    decision['market_sync'] = {k: (forecast.get('market_sync') or {}).get(k) for k in ('status', 'valid_until')}
     quote = forecast.get('quote') or {}
+    decision['price_per_share'] = None
     if quote.get('identity_status') == 'mismatch':
         decision['price_per_share'] = None
         decision['margin_of_safety_pct'] = _nulls()
@@ -348,13 +457,23 @@ def attach_forecast(row, forecast, *, detailed=True):
         decision['quote_currency'] = quote['currency']
         row['units'] = {'currency': quote['currency'], 'minor_unit_factor': 1,
                         'source': 'shared_forecast_major_currency'}
-    if number(quote.get('value')) is not None:
+    if (number(quote.get('value')) is not None and quote.get('identity_status') != 'mismatch'
+            and quote.get('currency') and quote.get('as_of') and quote.get('source_url')):
         decision['price_per_share'] = quote['value']
     decision.setdefault('dates', {}).update({'price_as_of': quote.get('as_of'), 'forecast_as_of': forecast.get('model_as_of'),
-                                            'calculation_as_of': forecast.get('as_of')})
+                                            'calculation_as_of': forecast.get('as_of'), 'financial_period': forecast.get('financial_period'),
+                                            'assumptions_as_of': forecast.get('assumptions_as_of'),
+                                            'share_basis_as_of': (forecast.get('market_sync') or {}).get('share_basis_as_of')})
     if forecast.get('model_as_of'):
         decision['dates']['model_as_of'] = forecast['model_as_of']
-    if forecast['reconciliation'].get('passed'):
+    if forecast['status'] != 'available':
+        # Clear old active comparisons as well as returns. Historical models
+        # remain accessible as evidence, never as a fallback to this gate.
+        for key in ('value_per_share', 'present_value_today_per_share', 'margin_of_safety_pct',
+                    'upside_to_value_pct', 'upside_downside_pct', 'target_price_per_share'):
+            decision[key] = _nulls()
+        decision['horizon_years'] = None
+    elif forecast['reconciliation'].get('passed'):
         pv = forecast['present_value_today_per_share']
         decision.update({'value_per_share': pv, 'present_value_today_per_share': pv,
                          'horizon_years': forecast.get('horizon_years')})
@@ -363,13 +482,24 @@ def attach_forecast(row, forecast, *, detailed=True):
             decision['upside_to_value_pct'] = {c: round((v/p-1)*100, 2) if v is not None else None for c, v in pv.items()}
             decision['margin_of_safety_pct'] = {c: round((v-p)/v*100, 2) if v else None for c, v in pv.items()}
     if detailed:
+        cv = row.get('component_valuation')
+        if isinstance(cv, dict) and 'valuation_evidence' not in row:
+            row['valuation_evidence'] = {'historical_component_comparison': {
+                k: cv.get(k) for k in ('as_of', 'market_price_per_share', 'total_equity_value_per_share', 'upside_downside_pct')},
+                'source_model_ref': forecast.get('source_model_ref')}
         row['shared_forecast'] = forecast
         wb = row.get('valuation_workbench')
         if wb:
             wb['decision'] = dict(decision)
-        row['pricing_analysis'] = {'as_of': forecast.get('as_of'), 'price': quote.get('value'),
+        row['pricing_analysis'] = {'as_of': forecast.get('as_of'), 'price': decision.get('price_per_share'),
             'component_value_per_share': forecast['present_value_today_per_share'],
             'entry_prices': {str(z['hurdle_pct']): z['prices'] for z in forecast['buy_prices']},
             'entry_price_status': 'available' if forecast['status'] == 'available' else 'unavailable',
             'entry_price_unavailable_reason': decision['calculation_reason'], 'forecast_id': forecast.get('forecast_hash')}
+    cv = row.get('component_valuation')
+    if isinstance(cv, dict):
+        cv.update({'market_price_per_share': decision.get('price_per_share'),
+                   'total_equity_value_per_share': decision.get('value_per_share', _nulls()),
+                   'upside_downside_pct': decision.get('upside_to_value_pct', _nulls()),
+                   'calculation_status': forecast['status']})
     return row

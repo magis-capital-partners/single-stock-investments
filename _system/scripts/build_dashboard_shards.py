@@ -18,6 +18,7 @@ import json
 import re
 import subprocess
 import sys
+from datetime import datetime, timezone
 from pathlib import Path
 
 from reconcile_insights_event_summary import (
@@ -30,6 +31,7 @@ CORE_VERSION = 1
 
 # Row fields only needed once a ticker is opened in the detail pane.
 DETAIL_ONLY_FIELDS = (
+    "valuation_evidence",
     "shared_forecast",
     "download_script_path",
     "two_phase_watch",
@@ -154,6 +156,8 @@ _IRR_READINESS_CORE_FIELDS = (
 )
 
 _VALUATION_DECISION_CORE_FIELDS = (
+    "economic_review_status",
+    "market_sync",
     "forecast_id",
     "calculation_status",
     "research_return_available",
@@ -219,7 +223,7 @@ def slim_valuation_decision(decision: dict | None) -> dict:
     # in the detail strip, which loads the full decision from the ticker shard.
     dates = decision.get("dates")
     if isinstance(dates, dict) and dates.get("model_as_of") is not None:
-        slim["dates"] = {k: dates[k] for k in ("model_as_of", "price_as_of", "forecast_as_of", "calculation_as_of") if dates.get(k) is not None}
+        slim["dates"] = {k: dates[k] for k in ("model_as_of", "price_as_of", "forecast_as_of", "calculation_as_of", "financial_period", "share_basis_as_of", "assumptions_as_of") if dates.get(k) is not None}
     else:
         slim.pop("dates", None)
     tier = slim_valuation_tier(decision.get("universe_tier"))
@@ -491,9 +495,33 @@ def merge_insight_shards(shard_dir: Path) -> dict | None:
     return merged or None
 
 
+def _stamp_time(value) -> datetime | None:
+    if not isinstance(value, str) or not value.strip():
+        return None
+    try:
+        when = datetime.fromisoformat(value.strip().replace("Z", "+00:00"))
+    except ValueError:
+        return None
+    return when if when.tzinfo else when.replace(tzinfo=timezone.utc)
+
+
 def _shard_payload(insights_doc: dict, insights_dir: Path, name: str, keys: tuple[str, ...], stamp) -> dict | None:
-    """Rows this doc actually has. Missing keys must not null an existing shard."""
+    """Rows this doc actually has. Missing keys must not null an existing shard.
+
+    A shard stamped later than this doc belongs to a lane that published it
+    on its own (podcasts, videos). Re-slicing it under the manifest stamp
+    walked podcasts.json back from 2026-10-29 to 2026-10-15 in every lane
+    that rebuilt the dashboard, and P6 then failed podcast_catalog.
+    """
     existing = _read_json_object(insights_dir / f"{name}.json") or {}
+    incoming = _stamp_time(stamp)
+    current = _stamp_time(existing.get("generated_at"))
+    if incoming is not None and current is not None and incoming < current:
+        print(
+            f"keeping {name}.json: on-disk stamp {existing['generated_at']} is newer than {stamp}",
+            file=sys.stderr,
+        )
+        return None
     if any(key not in insights_doc or insights_doc[key] is None for key in keys):
         if not any(key in insights_doc and insights_doc[key] is not None for key in keys):
             return None

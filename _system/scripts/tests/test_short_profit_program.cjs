@@ -32,12 +32,12 @@ test('dataset build mismatch is rejected',async()=>{
   await assert.rejects(api.checked('summary.json','wrong-hash'),/different builds/);
 });
 
-test('dashboard mounts the new lab and preserves older comparisons',()=>{
+test('dashboard consolidates relevant reverse-split research and retires the broad lab',()=>{
   const html=fs.readFileSync('dashboard/index.html','utf8');
-  const reverse=fs.readFileSync('dashboard/reverse-splits-viz.js','utf8');
-  assert.match(html,/short-profit-program\.js/);assert.match(html,/short-profit-program\.css/);
-  assert.match(reverse,/ShortProfitProgram\.render/);assert.match(reverse,/ShortProfitProgram\.attach/);
-  assert.match(reverse,/Earlier reverse-split portfolio and execution studies/);
+  assert.doesNotMatch(html,/<script src="(?:short-profit-program|short-framework-viz|reverse-splits-viz|third-plus-[^"]+)\.js/);
+  assert.doesNotMatch(html,/data-view="(?:short-alpha|systematic-shorts)"/);
+  assert.match(html,/reverse-split-research\.js/);assert.match(html,/reverse-split-live\.js/);
+  assert.match(html,/data-view="reverse-split-strategy"/);
 });
 
 test('public snapshot has complete expected contracts when present',()=>{

@@ -1,0 +1,138 @@
+name: Autonomous company underwriting
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - '.github/workflows/valuation-underwriting.yml'
+      - '_system/scripts/underwriting_*.py'
+      - '_system/scripts/underwriting_stage.mjs'
+      - '_system/scripts/publish_underwriting.py'
+      - '_system/prompts/valuation_underwriting.md'
+      - '_system/config/underwriting_policy.json'
+      - '_system/config/llm_usage_policy.json'
+  repository_dispatch:
+    types: [valuation-underwriting-run]
+  schedule:
+    - cron: '47 9,17,21 * * 1-5'
+      timezone: America/New_York
+  workflow_run:
+    workflows: [Autonomous compounder IRRs]
+    types: [completed]
+    branches: [main]
+
+permissions:
+  contents: write
+  pull-requests: write
+
+concurrency:
+  group: company-underwriting
+  cancel-in-progress: false
+
+jobs:
+  underwrite:
+    if: github.event_name != 'workflow_run' || github.event.workflow_run.conclusion == 'success'
+    runs-on: ubuntu-latest
+    timeout-minutes: 180
+    env:
+      RESEARCH_VAULT_ROOT: _external/research-vault
+      RESEARCH_VAULT_CLONE_TOKEN: ${{ secrets.RESEARCH_VAULT_CLONE_TOKEN }}
+      GH_TOKEN: ${{ github.token }}
+      GITHUB_REPOSITORY: ${{ github.repository }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: main
+          fetch-depth: 1
+          filter: blob:none
+          sparse-checkout-cone-mode: false
+          sparse-checkout: |
+            /_system/scripts/
+            /_system/config/llm_usage_policy.json
+            /_system/config/underwriting_policy.json
+            /_system/prompts/valuation_underwriting.md
+            /_system/portfolio/registry.json
+            /_system/reference/valuation_identity_aliases.json
+            /_system/reference/valuation_method_registry.json
+            /_system/reference/valuation_listing_ratios.json
+            /_system/reference/market-data/valuation_quotes/
+            /_system/reference/market-data/valuation_fundamentals/
+            /_system/reference/market-data/operating_kpis/
+            /_system/data/shared_valuation_forecasts.json
+            /_system/data/underwriting_queue.json
+            /dashboard/data/core.json
+            /dashboard/private-assets.json
+            /*/research/valuation.json
+            /*/research/underwriting_*.json
+            /.github/actions/checkout-vault/
+            /.github/workflows/autonomous-compounders.yml
+            /.github/workflows/valuation-underwriting.yml
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Install bounded research dependencies
+        run: |
+          python -m pip install pytest pypdf PyYAML exchange-calendars==4.13.2
+      - name: Restore primary research and paid-call receipts
+        uses: ./.github/actions/checkout-vault
+        with:
+          include-source-archive: 'false'
+      - name: Verify underwriting gates before calling a model
+        run: |
+          python -m pytest -q _system/scripts/tests/test_underwriting_pipeline.py _system/scripts/tests/test_underwriting_economics.py
+      - name: Verify local judgment policy and deterministic assembly
+        timeout-minutes: 2
+        run: |
+          python - <<'PY'
+          import sys
+          sys.path.insert(0, '_system/scripts')
+          from underwriting_pipeline import ROOT, POLICY, read, stage_model
+          assert read(ROOT/POLICY)['required_contract_schema'] == 'underwriting-contract/2'
+          for role in ('author', 'challenger'):
+              assert stage_model(ROOT, role) == {'id':'gpt-6.1-sol','reasoning_effort':'high','provider':'codex-local'}
+          assert stage_model(ROOT, 'builder')['provider'] == 'deterministic'
+          PY
+      # Stable step name is referenced by graph_sources health telemetry.
+      # Judgment runs through signed-in local Codex; assembly uses no model API.
+      - name: Author, independently challenge and build company valuations
+        env:
+          REQUESTED_TICKERS: ${{ github.event.client_payload.tickers }}
+          REQUESTED_LIMIT: ${{ github.event.client_payload.limit }}
+        run: |
+          ARGS=(run --phase build --launch)
+          if [ -n "$REQUESTED_TICKERS" ]; then ARGS+=(--tickers "$REQUESTED_TICKERS"); fi
+          if [ -n "$REQUESTED_LIMIT" ]; then ARGS+=(--limit "$REQUESTED_LIMIT"); fi
+          python -u _system/scripts/underwriting_pipeline.py "${ARGS[@]}"
+      - name: Preserve frozen evidence and paid-call audit before any public model
+        if: always()
+        run: |
+          vault="${RESEARCH_VAULT_ROOT}"
+          if [ -d "$vault/valuation-underwriting" ]; then
+            bash _system/scripts/ci_push_vault.sh "Preserve company underwriting evidence and provider receipts" "--force valuation-underwriting"
+          fi
+      - name: Publish validated models through pinned checks and automatic merge
+        env:
+          UNDERWRITING_PR_TOKEN: ${{ secrets.RESEARCH_VAULT_CLONE_TOKEN }}
+        run: python -u _system/scripts/publish_underwriting.py --wait
+      - name: Record actual completion and unresolved gaps
+        if: always()
+        run: |
+          python - <<'PY'
+          import json,os
+          from pathlib import Path
+          p=Path('.underwriting-work/batch.json')
+          d=json.loads(p.read_text()) if p.is_file() else {}
+          with open(os.environ['GITHUB_STEP_SUMMARY'],'a') as out:
+              out.write('### Company underwriting results\n\n')
+              out.write(f"Build handoffs selected: {len(d.get('selected',[]))}; validated models: {len(d.get('completed',[]))}; automatic retries: {len(d.get('blocked',[]))}.\n\n")
+              for r in d.get('blocked',[]):
+                  out.write(f"- {r['ticker']}: "+'; '.join(g['detail'] for g in r.get('gaps',[]))+'\n')
+          PY
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: underwriting-batch-${{ github.run_id }}
+          path: .underwriting-work/batch.json
+          if-no-files-found: ignore
+          retention-days: 7
+          include-hidden-files: true

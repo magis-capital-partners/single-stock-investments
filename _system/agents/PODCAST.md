@@ -14,7 +14,7 @@ records for the dashboard.
 4. **Match** — build episode insights (`build_podcast_insights.py`)
 5. **Summarize for readers** — every episode gets a short, plain-English `reader_summary` in its `*.meta.json`; investment relevance is **not** a gate (see the plan below)
 6. **Analyse for claims** — local-model claims, figures and thesis for episodes with real speech (`analyze_podcast_batch.py`, writes `llm_analysis` to `*.meta.json`). This is a deeper, slower pass and must never block step 5
-7. **Publish** — vault catalog → episode detail shards → merge via `build_insights.py` → Insights Podcasts panel, with a coverage check that the published shards — not just the vault meta — carry a summary for every episode
+7. **Publish** — vault catalog → episode detail shards → `publish_podcast_dashboard.py` (podcast shard and manifest fields only; fund-letter shards are left to the intake rebuild) → Insights Podcasts panel, with a coverage check that the published shards — not just the vault meta — carry a summary for every episode
 
 ## Product goal
 
@@ -37,7 +37,7 @@ make podcasts-backfill
 # WHISPER_BATCH=50 make podcasts-backfill
 ```
 
-Pipeline: discover `--all-watchlist --paginate-capped-feeds` → fetch (published / backlog) → whisper-batch → officer directory → **build insights** → summarize (meta; in CI this writes Tier B/C fallbacks and marks transcript episodes `pending_model`, since no local model runs there) → **build insights again** (pull `reader_summary` + detail shards) → `build_insights.py` → summary-coverage check on the published shards.
+Pipeline: discover `--all-watchlist --paginate-capped-feeds` → fetch (published / backlog) → whisper-batch → officer directory → **build insights** → summarize (meta; in CI this writes Tier B/C fallbacks and marks transcript episodes `pending_model`, since no local model runs there) → **build insights again** (pull `reader_summary` + detail shards) → `publish_podcast_dashboard.py` → summary-coverage check on the published shards.
 
 Capped feeds (e.g. Capital Allocators at 1000): set `PODCASTINDEX_API_KEY` + `PODCASTINDEX_API_SECRET` (or `PODCAST_INDEX_*`).
 

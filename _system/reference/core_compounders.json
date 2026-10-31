@@ -1,45 +1,55 @@
 {
   "schema_version": "magis.core_compounders.v1",
-  "version": "2026-10-26.1",
-  "universe_source": "Drew canonical list 2026-10-22; supplied implementation brief 2026-10-23",
+  "version": "2026-10-29.1",
+  "universe_source": "Drew canonical list 2026-10-29",
+  "edit": "Membership is the tickers array, one symbol per line. A missing issuers row is filled from the registry on build (dashboard name from the holding, group unassigned until set). Then run python _system/scripts/build_compounder_roster.py.",
   "tickers": [
     "MA",
     "V",
-    "CSU",
+    "AXP",
     "MCO",
     "SPGI",
-    "BRK.B",
     "MSCI",
     "CME",
     "ICE",
-    "FNV",
-    "TDG",
-    "CPRT",
-    "BN",
-    "TPL",
+    "CBOE",
+    "LSEG",
+    "DB1.DE",
+    "MIAX",
+    "B3SA3.SA",
+    "8697.T",
+    "CSU",
     "TOI.V",
     "LMN",
     "LIFCO.ST",
+    "TEQ.ST",
+    "HEI",
+    "BRK.B",
+    "BN",
+    "MKL",
+    "FRMO",
+    "FNV",
     "WPM",
     "RGLD",
+    "TPL",
     "PSK.TO",
-    "MIAX",
-    "TEQ.ST",
-    "FRMO",
-    "RMS.PA",
-    "COST",
-    "GOOGL",
-    "RACE",
-    "AMZN",
+    "DRR.AX",
+    "TFPM",
+    "OR",
+    "PBT",
+    "LB",
     "CP",
-    "LSEG",
-    "DB1.DE",
-    "CBOE",
-    "AENA.MC",
     "FER",
+    "AENA.MC",
     "WCN",
-    "MKL",
-    "DRR.AX"
+    "GOOGL",
+    "AMZN",
+    "META",
+    "ASML",
+    "RMS.PA",
+    "RACE",
+    "COST",
+    "CPRT"
   ],
   "hurdles_pct": [
     8,
@@ -122,7 +132,10 @@
       "primary_source": "CME/research/evidence/filing_facts.json",
       "cadence": "monthly_and_quarterly",
       "non_us_ingestion_gap": false,
-      "classification_source": "_system/portfolio/registry.json#/holdings/CME/classification"
+      "classification_source": "_system/portfolio/registry.json#/holdings/CME/classification",
+      "watchlist_group": "exchanges",
+      "display_name": "CME Group",
+      "aliases": []
     },
     "ICE": {
       "sector": "exchanges",
@@ -152,7 +165,10 @@
       "primary_source": "ICE/research/evidence/filing_facts.json",
       "cadence": "monthly_and_quarterly",
       "non_us_ingestion_gap": false,
-      "classification_source": "_system/portfolio/registry.json#/holdings/ICE/classification"
+      "classification_source": "_system/portfolio/registry.json#/holdings/ICE/classification",
+      "watchlist_group": "exchanges",
+      "display_name": "Intercontinental Exchange",
+      "aliases": []
     },
     "CBOE": {
       "sector": "exchanges",
@@ -188,7 +204,10 @@
       "primary_source": "CBOE/research/evidence/filing_facts.json",
       "cadence": "monthly_and_quarterly",
       "non_us_ingestion_gap": false,
-      "classification_source": "_system/portfolio/registry.json#/holdings/CBOE/classification"
+      "classification_source": "_system/portfolio/registry.json#/holdings/CBOE/classification",
+      "watchlist_group": "exchanges",
+      "display_name": "Cboe Global Markets",
+      "aliases": []
     },
     "MIAX": {
       "sector": "exchanges",
@@ -221,7 +240,10 @@
       "primary_source": "MIAX/research/evidence/filing_facts.json",
       "cadence": "monthly_and_quarterly",
       "non_us_ingestion_gap": false,
-      "classification_source": "_system/portfolio/registry.json#/holdings/MIAX/classification"
+      "classification_source": "_system/portfolio/registry.json#/holdings/MIAX/classification",
+      "watchlist_group": "exchanges",
+      "display_name": "Miami International Holdings",
+      "aliases": []
     },
     "LSEG": {
       "sector": "exchanges",
@@ -234,7 +256,12 @@
       "primary_source": "LSEG/research/evidence/filing_facts.json",
       "cadence": "monthly_and_quarterly",
       "non_us_ingestion_gap": true,
-      "classification_source": "_system/portfolio/registry.json#/holdings/LSEG/classification"
+      "classification_source": "_system/portfolio/registry.json#/holdings/LSEG/classification",
+      "watchlist_group": "exchanges",
+      "display_name": "London Stock Exchange Group",
+      "aliases": [
+        "LSEG.L"
+      ]
     },
     "DB1.DE": {
       "sector": "exchanges",
@@ -247,7 +274,10 @@
       "primary_source": "DB1.DE/research/evidence/filing_facts.json",
       "cadence": "monthly_and_quarterly",
       "non_us_ingestion_gap": true,
-      "classification_source": "_system/portfolio/registry.json#/holdings/DB1.DE/classification"
+      "classification_source": "_system/portfolio/registry.json#/holdings/DB1.DE/classification",
+      "watchlist_group": "exchanges",
+      "display_name": "Deutsche Börse",
+      "aliases": []
     },
     "MA": {
       "sector": "payments",
@@ -262,7 +292,10 @@
       "primary_source": "MA/research/evidence/filing_facts.json",
       "cadence": "quarterly_or_issuer_reporting",
       "non_us_ingestion_gap": false,
-      "classification_source": "_system/portfolio/registry.json#/holdings/MA/classification"
+      "classification_source": "_system/portfolio/registry.json#/holdings/MA/classification",
+      "watchlist_group": "payments",
+      "display_name": "Mastercard",
+      "aliases": []
     },
     "V": {
       "sector": "payments",
@@ -277,7 +310,10 @@
       "primary_source": "V/research/evidence/filing_facts.json",
       "cadence": "quarterly_or_issuer_reporting",
       "non_us_ingestion_gap": false,
-      "classification_source": "_system/portfolio/registry.json#/holdings/V/classification"
+      "classification_source": "_system/portfolio/registry.json#/holdings/V/classification",
+      "watchlist_group": "payments",
+      "display_name": "Visa",
+      "aliases": []
     },
     "MCO": {
       "sector": "ratings_data",
@@ -296,7 +332,10 @@
       "cadence": "quarterly_or_issuer_reporting",
       "non_us_ingestion_gap": false,
       "classification_source": "_system/portfolio/registry.json#/holdings/MCO/classification",
-      "kpi_role": "monitoring; missing optional operating drivers do not prevent a sourced mechanical return estimate"
+      "kpi_role": "monitoring; missing optional operating drivers do not prevent a sourced mechanical return estimate",
+      "watchlist_group": "payments",
+      "display_name": "Moody’s",
+      "aliases": []
     },
     "SPGI": {
       "sector": "ratings_data",
@@ -316,7 +355,10 @@
       "primary_source": "SPGI/research/evidence/filing_facts.json",
       "cadence": "quarterly_or_issuer_reporting",
       "non_us_ingestion_gap": false,
-      "classification_source": "_system/portfolio/registry.json#/holdings/SPGI/classification"
+      "classification_source": "_system/portfolio/registry.json#/holdings/SPGI/classification",
+      "watchlist_group": "payments",
+      "display_name": "S&P Global",
+      "aliases": []
     },
     "MSCI": {
       "sector": "ratings_data",
@@ -335,7 +377,10 @@
       "cadence": "quarterly_or_issuer_reporting",
       "non_us_ingestion_gap": false,
       "classification_source": "_system/portfolio/registry.json#/holdings/MSCI/classification",
-      "kpi_role": "monitoring; missing optional operating drivers do not prevent a sourced mechanical return estimate"
+      "kpi_role": "monitoring; missing optional operating drivers do not prevent a sourced mechanical return estimate",
+      "watchlist_group": "payments",
+      "display_name": "MSCI",
+      "aliases": []
     },
     "FNV": {
       "sector": "royalties",
@@ -353,7 +398,10 @@
       "primary_source": "FNV/research/evidence/filing_facts.json",
       "cadence": "quarterly_or_issuer_reporting",
       "non_us_ingestion_gap": false,
-      "classification_source": "_system/portfolio/registry.json#/holdings/FNV/classification"
+      "classification_source": "_system/portfolio/registry.json#/holdings/FNV/classification",
+      "watchlist_group": "royalties",
+      "display_name": "Franco-Nevada",
+      "aliases": []
     },
     "WPM": {
       "sector": "royalties",
@@ -370,7 +418,10 @@
       "primary_source": "WPM/research/evidence/filing_facts.json",
       "cadence": "quarterly_or_issuer_reporting",
       "non_us_ingestion_gap": false,
-      "classification_source": "_system/portfolio/registry.json#/holdings/WPM/classification"
+      "classification_source": "_system/portfolio/registry.json#/holdings/WPM/classification",
+      "watchlist_group": "royalties",
+      "display_name": "Wheaton Precious Metals",
+      "aliases": []
     },
     "RGLD": {
       "sector": "royalties",
@@ -389,7 +440,10 @@
       "primary_source": "RGLD/research/evidence/filing_facts.json",
       "cadence": "quarterly_or_issuer_reporting",
       "non_us_ingestion_gap": false,
-      "classification_source": "_system/portfolio/registry.json#/holdings/RGLD/classification"
+      "classification_source": "_system/portfolio/registry.json#/holdings/RGLD/classification",
+      "watchlist_group": "royalties",
+      "display_name": "Royal Gold",
+      "aliases": []
     },
     "DRR.AX": {
       "sector": "royalties",
@@ -401,7 +455,10 @@
       "primary_source": "DRR.AX/research/evidence/filing_facts.json",
       "cadence": "quarterly_or_issuer_reporting",
       "non_us_ingestion_gap": true,
-      "classification_source": "_system/portfolio/registry.json#/holdings/DRR.AX/classification"
+      "classification_source": "_system/portfolio/registry.json#/holdings/DRR.AX/classification",
+      "watchlist_group": "royalties",
+      "display_name": "Deterra Royalties",
+      "aliases": []
     },
     "PSK.TO": {
       "sector": "royalties",
@@ -418,7 +475,10 @@
       "primary_source": "PSK.TO/research/evidence/filing_facts.json",
       "cadence": "quarterly_or_issuer_reporting",
       "non_us_ingestion_gap": true,
-      "classification_source": "_system/portfolio/registry.json#/holdings/PSK.TO/classification"
+      "classification_source": "_system/portfolio/registry.json#/holdings/PSK.TO/classification",
+      "watchlist_group": "royalties",
+      "display_name": "PrairieSky Royalty",
+      "aliases": []
     },
     "TPL": {
       "sector": "royalties",
@@ -441,7 +501,10 @@
       "primary_source": "TPL/research/evidence/filing_facts.json",
       "cadence": "quarterly_or_issuer_reporting",
       "non_us_ingestion_gap": false,
-      "classification_source": "_system/portfolio/registry.json#/holdings/TPL/classification"
+      "classification_source": "_system/portfolio/registry.json#/holdings/TPL/classification",
+      "watchlist_group": "royalties",
+      "display_name": "Texas Pacific Land",
+      "aliases": []
     },
     "CSU": {
       "sector": "serial_acquirers",
@@ -457,7 +520,12 @@
       "primary_source": "CSU/research/evidence/filing_facts.json",
       "cadence": "quarterly_or_issuer_reporting",
       "non_us_ingestion_gap": true,
-      "classification_source": "_system/portfolio/registry.json#/holdings/CSU/classification"
+      "classification_source": "_system/portfolio/registry.json#/holdings/CSU/classification",
+      "watchlist_group": "acquirers",
+      "display_name": "Constellation Software",
+      "aliases": [
+        "CSU.TO"
+      ]
     },
     "TOI.V": {
       "sector": "serial_acquirers",
@@ -473,7 +541,10 @@
       "primary_source": "TOI.V/research/evidence/filing_facts.json",
       "cadence": "quarterly_or_issuer_reporting",
       "non_us_ingestion_gap": true,
-      "classification_source": "_system/portfolio/registry.json#/holdings/TOI.V/classification"
+      "classification_source": "_system/portfolio/registry.json#/holdings/TOI.V/classification",
+      "watchlist_group": "acquirers",
+      "display_name": "Topicus",
+      "aliases": []
     },
     "LMN": {
       "sector": "serial_acquirers",
@@ -489,7 +560,12 @@
       "primary_source": "LMN/research/evidence/filing_facts.json",
       "cadence": "quarterly_or_issuer_reporting",
       "non_us_ingestion_gap": true,
-      "classification_source": "_system/portfolio/registry.json#/holdings/LMN/classification"
+      "classification_source": "_system/portfolio/registry.json#/holdings/LMN/classification",
+      "watchlist_group": "acquirers",
+      "display_name": "Lumine Group",
+      "aliases": [
+        "LMN.V"
+      ]
     },
     "LIFCO.ST": {
       "sector": "serial_acquirers",
@@ -505,7 +581,10 @@
       "primary_source": "LIFCO.ST/research/evidence/filing_facts.json",
       "cadence": "quarterly_or_issuer_reporting",
       "non_us_ingestion_gap": true,
-      "classification_source": "_system/portfolio/registry.json#/holdings/LIFCO.ST/classification"
+      "classification_source": "_system/portfolio/registry.json#/holdings/LIFCO.ST/classification",
+      "watchlist_group": "acquirers",
+      "display_name": "Lifco",
+      "aliases": []
     },
     "TEQ.ST": {
       "sector": "serial_acquirers",
@@ -521,7 +600,10 @@
       "primary_source": "TEQ.ST/research/evidence/filing_facts.json",
       "cadence": "quarterly_or_issuer_reporting",
       "non_us_ingestion_gap": true,
-      "classification_source": "_system/portfolio/registry.json#/holdings/TEQ.ST/classification"
+      "classification_source": "_system/portfolio/registry.json#/holdings/TEQ.ST/classification",
+      "watchlist_group": "acquirers",
+      "display_name": "Teqnion",
+      "aliases": []
     },
     "TDG": {
       "sector": "serial_acquirers",
@@ -552,7 +634,10 @@
       "cadence": "quarterly_or_issuer_reporting",
       "non_us_ingestion_gap": false,
       "classification_source": "_system/portfolio/registry.json#/holdings/CPRT/classification",
-      "kpi_role": "monitoring; missing optional operating drivers do not prevent a sourced mechanical return estimate"
+      "kpi_role": "monitoring; missing optional operating drivers do not prevent a sourced mechanical return estimate",
+      "watchlist_group": "platforms",
+      "display_name": "Copart",
+      "aliases": []
     },
     "BRK.B": {
       "sector": "holdcos",
@@ -568,7 +653,12 @@
       "primary_source": "BRK.B/research/evidence/filing_facts.json",
       "cadence": "quarterly_or_issuer_reporting",
       "non_us_ingestion_gap": true,
-      "classification_source": "_system/portfolio/registry.json#/holdings/BRK.B/classification"
+      "classification_source": "_system/portfolio/registry.json#/holdings/BRK.B/classification",
+      "watchlist_group": "holdings",
+      "display_name": "Berkshire Hathaway",
+      "aliases": [
+        "BRK-B"
+      ]
     },
     "BN": {
       "sector": "holdcos",
@@ -583,7 +673,10 @@
       "cadence": "quarterly_or_issuer_reporting",
       "non_us_ingestion_gap": true,
       "classification_source": "_system/portfolio/registry.json#/holdings/BN/classification",
-      "kpi_role": "monitoring; missing optional operating drivers do not prevent a sourced mechanical return estimate"
+      "kpi_role": "monitoring; missing optional operating drivers do not prevent a sourced mechanical return estimate",
+      "watchlist_group": "holdings",
+      "display_name": "Brookfield",
+      "aliases": []
     },
     "MKL": {
       "sector": "holdcos",
@@ -599,7 +692,10 @@
       "primary_source": "MKL/research/evidence/filing_facts.json",
       "cadence": "quarterly_or_issuer_reporting",
       "non_us_ingestion_gap": false,
-      "classification_source": "_system/portfolio/registry.json#/holdings/MKL/classification"
+      "classification_source": "_system/portfolio/registry.json#/holdings/MKL/classification",
+      "watchlist_group": "holdings",
+      "display_name": "Markel",
+      "aliases": []
     },
     "FRMO": {
       "sector": "holdcos",
@@ -614,7 +710,10 @@
       "cadence": "quarterly_or_issuer_reporting",
       "non_us_ingestion_gap": false,
       "classification_source": "_system/portfolio/registry.json#/holdings/FRMO/classification",
-      "kpi_role": "monitoring; missing optional operating drivers do not prevent a sourced mechanical return estimate"
+      "kpi_role": "monitoring; missing optional operating drivers do not prevent a sourced mechanical return estimate",
+      "watchlist_group": "holdings",
+      "display_name": "FRMO",
+      "aliases": []
     },
     "AENA.MC": {
       "sector": "infrastructure",
@@ -630,7 +729,10 @@
       "cadence": "quarterly_or_issuer_reporting",
       "non_us_ingestion_gap": true,
       "classification_source": "_system/portfolio/registry.json#/holdings/AENA.MC/classification",
-      "kpi_role": "monitoring; missing optional operating drivers do not prevent a sourced mechanical return estimate"
+      "kpi_role": "monitoring; missing optional operating drivers do not prevent a sourced mechanical return estimate",
+      "watchlist_group": "infrastructure",
+      "display_name": "Aena",
+      "aliases": []
     },
     "FER": {
       "sector": "infrastructure",
@@ -646,7 +748,10 @@
       "cadence": "quarterly_or_issuer_reporting",
       "non_us_ingestion_gap": false,
       "classification_source": "_system/portfolio/registry.json#/holdings/FER/classification",
-      "kpi_role": "monitoring; missing optional operating drivers do not prevent a sourced mechanical return estimate"
+      "kpi_role": "monitoring; missing optional operating drivers do not prevent a sourced mechanical return estimate",
+      "watchlist_group": "infrastructure",
+      "display_name": "Ferrovial",
+      "aliases": []
     },
     "CP": {
       "sector": "infrastructure",
@@ -662,7 +767,10 @@
       "cadence": "quarterly_or_issuer_reporting",
       "non_us_ingestion_gap": true,
       "classification_source": "_system/portfolio/registry.json#/holdings/CP/classification",
-      "kpi_role": "monitoring; missing optional operating drivers do not prevent a sourced mechanical return estimate"
+      "kpi_role": "monitoring; missing optional operating drivers do not prevent a sourced mechanical return estimate",
+      "watchlist_group": "infrastructure",
+      "display_name": "Canadian Pacific Kansas City",
+      "aliases": []
     },
     "WCN": {
       "sector": "infrastructure",
@@ -679,7 +787,10 @@
       "cadence": "quarterly_or_issuer_reporting",
       "non_us_ingestion_gap": true,
       "classification_source": "_system/portfolio/registry.json#/holdings/WCN/classification",
-      "kpi_role": "monitoring; missing optional operating drivers do not prevent a sourced mechanical return estimate"
+      "kpi_role": "monitoring; missing optional operating drivers do not prevent a sourced mechanical return estimate",
+      "watchlist_group": "infrastructure",
+      "display_name": "Waste Connections",
+      "aliases": []
     },
     "COST": {
       "sector": "consumer_platforms",
@@ -696,7 +807,10 @@
       "primary_source": "COST/research/evidence/filing_facts.json",
       "cadence": "quarterly_or_issuer_reporting",
       "non_us_ingestion_gap": false,
-      "classification_source": "_system/portfolio/registry.json#/holdings/COST/classification"
+      "classification_source": "_system/portfolio/registry.json#/holdings/COST/classification",
+      "watchlist_group": "platforms",
+      "display_name": "Costco",
+      "aliases": []
     },
     "RMS.PA": {
       "sector": "consumer_platforms",
@@ -712,7 +826,10 @@
       "cadence": "quarterly_or_issuer_reporting",
       "non_us_ingestion_gap": true,
       "classification_source": "_system/portfolio/registry.json#/holdings/RMS.PA/classification",
-      "kpi_role": "monitoring; missing optional operating drivers do not prevent a sourced mechanical return estimate"
+      "kpi_role": "monitoring; missing optional operating drivers do not prevent a sourced mechanical return estimate",
+      "watchlist_group": "platforms",
+      "display_name": "Hermès",
+      "aliases": []
     },
     "RACE": {
       "sector": "consumer_platforms",
@@ -729,7 +846,10 @@
       "cadence": "quarterly_or_issuer_reporting",
       "non_us_ingestion_gap": false,
       "classification_source": "_system/portfolio/registry.json#/holdings/RACE/classification",
-      "kpi_role": "monitoring; missing optional operating drivers do not prevent a sourced mechanical return estimate"
+      "kpi_role": "monitoring; missing optional operating drivers do not prevent a sourced mechanical return estimate",
+      "watchlist_group": "platforms",
+      "display_name": "Ferrari",
+      "aliases": []
     },
     "GOOGL": {
       "sector": "consumer_platforms",
@@ -747,7 +867,10 @@
       "primary_source": "GOOGL/research/evidence/filing_facts.json",
       "cadence": "quarterly_or_issuer_reporting",
       "non_us_ingestion_gap": false,
-      "classification_source": "_system/portfolio/registry.json#/holdings/GOOGL/classification"
+      "classification_source": "_system/portfolio/registry.json#/holdings/GOOGL/classification",
+      "watchlist_group": "platforms",
+      "display_name": "Alphabet",
+      "aliases": []
     },
     "AMZN": {
       "sector": "consumer_platforms",
@@ -765,7 +888,160 @@
       "primary_source": "AMZN/research/evidence/filing_facts.json",
       "cadence": "quarterly_or_issuer_reporting",
       "non_us_ingestion_gap": false,
-      "classification_source": "_system/portfolio/registry.json#/holdings/AMZN/classification"
+      "classification_source": "_system/portfolio/registry.json#/holdings/AMZN/classification",
+      "watchlist_group": "platforms",
+      "display_name": "Amazon",
+      "aliases": []
+    },
+    "AXP": {
+      "sector": "payments",
+      "kpi_ids": [],
+      "existing_kpi_ids": [],
+      "cadence": "quarterly",
+      "non_us_ingestion_gap": false,
+      "primary_source": "AXP/research/evidence/filing_facts.json",
+      "watchlist_group": "payments",
+      "display_name": "American Express",
+      "aliases": [],
+      "driver_to_fcf": "Operating cash generation less reinvestment, allocated across fully diluted shares; dated issuer inputs required"
+    },
+    "B3SA3.SA": {
+      "sector": "exchanges",
+      "kpi_ids": [],
+      "existing_kpi_ids": [],
+      "cadence": "quarterly",
+      "non_us_ingestion_gap": true,
+      "primary_source": "B3SA3.SA/research/evidence/filing_facts.json",
+      "watchlist_group": "exchanges",
+      "display_name": "B3",
+      "aliases": [],
+      "driver_to_fcf": "Operating cash generation less reinvestment, allocated across fully diluted shares; dated issuer inputs required"
+    },
+    "8697.T": {
+      "sector": "exchanges",
+      "kpi_ids": [],
+      "existing_kpi_ids": [],
+      "cadence": "quarterly",
+      "non_us_ingestion_gap": true,
+      "primary_source": "8697.T/research/evidence/filing_facts.json",
+      "watchlist_group": "exchanges",
+      "display_name": "Japan Exchange Group",
+      "aliases": [],
+      "driver_to_fcf": "Operating cash generation less reinvestment, allocated across fully diluted shares; dated issuer inputs required"
+    },
+    "HEI": {
+      "sector": "acquirers",
+      "kpi_ids": [],
+      "existing_kpi_ids": [],
+      "cadence": "quarterly",
+      "non_us_ingestion_gap": false,
+      "primary_source": "HEI/research/evidence/filing_facts.json",
+      "watchlist_group": "acquirers",
+      "display_name": "HEICO",
+      "aliases": [],
+      "driver_to_fcf": "Operating cash generation less reinvestment, allocated across fully diluted shares; dated issuer inputs required"
+    },
+    "TFPM": {
+      "sector": "royalties",
+      "kpi_ids": [],
+      "existing_kpi_ids": [],
+      "cadence": "quarterly",
+      "non_us_ingestion_gap": false,
+      "primary_source": "TFPM/research/evidence/filing_facts.json",
+      "watchlist_group": "royalties",
+      "display_name": "Triple Flag Precious Metals",
+      "aliases": [],
+      "driver_to_fcf": "Operating cash generation less reinvestment, allocated across fully diluted shares; dated issuer inputs required"
+    },
+    "OR": {
+      "sector": "royalties",
+      "kpi_ids": [],
+      "existing_kpi_ids": [],
+      "cadence": "quarterly",
+      "non_us_ingestion_gap": false,
+      "primary_source": "OR/research/evidence/filing_facts.json",
+      "watchlist_group": "royalties",
+      "display_name": "OR Royalties",
+      "aliases": [],
+      "driver_to_fcf": "Operating cash generation less reinvestment, allocated across fully diluted shares; dated issuer inputs required"
+    },
+    "PBT": {
+      "sector": "royalties",
+      "kpi_ids": [],
+      "existing_kpi_ids": [],
+      "cadence": "quarterly",
+      "non_us_ingestion_gap": false,
+      "primary_source": "PBT/research/evidence/filing_facts.json",
+      "watchlist_group": "royalties",
+      "display_name": "Permian Basin Royalty Trust",
+      "aliases": [],
+      "driver_to_fcf": "Operating cash generation less reinvestment, allocated across fully diluted shares; dated issuer inputs required"
+    },
+    "LB": {
+      "sector": "royalties",
+      "kpi_ids": [],
+      "existing_kpi_ids": [],
+      "cadence": "quarterly",
+      "non_us_ingestion_gap": false,
+      "primary_source": "LB/research/evidence/filing_facts.json",
+      "watchlist_group": "royalties",
+      "display_name": "LandBridge",
+      "aliases": [],
+      "driver_to_fcf": "Operating cash generation less reinvestment, allocated across fully diluted shares; dated issuer inputs required"
+    },
+    "META": {
+      "sector": "platforms",
+      "kpi_ids": [],
+      "existing_kpi_ids": [],
+      "cadence": "quarterly",
+      "non_us_ingestion_gap": false,
+      "primary_source": "META/research/evidence/filing_facts.json",
+      "watchlist_group": "platforms",
+      "display_name": "Meta Platforms",
+      "aliases": [],
+      "driver_to_fcf": "Operating cash generation less reinvestment, allocated across fully diluted shares; dated issuer inputs required"
+    },
+    "ASML": {
+      "sector": "platforms",
+      "kpi_ids": [],
+      "existing_kpi_ids": [],
+      "cadence": "quarterly",
+      "non_us_ingestion_gap": false,
+      "primary_source": "ASML/research/evidence/filing_facts.json",
+      "watchlist_group": "platforms",
+      "display_name": "ASML",
+      "aliases": [],
+      "driver_to_fcf": "Operating cash generation less reinvestment, allocated across fully diluted shares; dated issuer inputs required"
     }
-  }
+  },
+  "groups": [
+    {
+      "id": "payments",
+      "label": "Payments, ratings & indexes"
+    },
+    {
+      "id": "exchanges",
+      "label": "Exchanges"
+    },
+    {
+      "id": "acquirers",
+      "label": "Serial acquirers"
+    },
+    {
+      "id": "holdings",
+      "label": "Holding companies"
+    },
+    {
+      "id": "royalties",
+      "label": "Royalties"
+    },
+    {
+      "id": "infrastructure",
+      "label": "Infrastructure"
+    },
+    {
+      "id": "platforms",
+      "label": "Platforms, tech & brands"
+    }
+  ]
 }

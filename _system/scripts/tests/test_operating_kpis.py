@@ -295,8 +295,9 @@ class TemplateExclusionTests(unittest.TestCase):
         gyro = {row["kpi_id"] for row in merge_template_kpis(["water_surface"], ticker="GYRO")}
         water = {row["kpi_id"] for row in merge_template_kpis(["water_surface"], ticker="TPL")}
         self.assertNotIn("gold_spot_proxy", msb)
+        self.assertNotIn("gold_futures_usd_oz", msb)
         self.assertNotIn("gdx_gld_ratio", msb)
-        self.assertIn("gold_spot_proxy", peer)
+        self.assertIn("gold_futures_usd_oz", peer)
         self.assertNotIn("tpl_water_revenue_m", gyro)
         self.assertIn("tpl_water_revenue_m", water)
 

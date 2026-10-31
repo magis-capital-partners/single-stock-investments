@@ -1,0 +1,65 @@
+name: Research desk and commodity models
+on:
+  pull_request:
+    branches: [main]
+    paths:
+      - '_system/scripts/*commodity*'
+      - '_system/scripts/*company_source*'
+      - '_system/scripts/backfill_company_filings.py'
+      - '_system/scripts/tests/test_company_filings.py'
+      - '_system/scripts/tests/test_source_backfill.py'
+      - '_system/scripts/tests/test_commodity_inputs.py'
+      - '_system/scripts/tests/test_commodity_free_sources.py'
+      - '.github/workflows/company-source-backfill.yml'
+      - '_system/scripts/commodity_configs/**'
+      - '_system/scripts/build_compounder_roster.py'
+      - '_system/scripts/buy_zones.py'
+      - '_system/reference/core_compounders.json'
+      - '_system/scripts/tests/test_commodity_models.py'
+      - '_system/scripts/tests/test_research_desk_ui.cjs'
+      - 'dashboard/**'
+      - '.github/workflows/research-desk-tests.yml'
+  push:
+    branches: [main]
+    paths:
+      - '_system/scripts/*commodity*'
+      - '_system/scripts/*company_source*'
+      - '_system/scripts/backfill_company_filings.py'
+      - '_system/scripts/tests/test_company_filings.py'
+      - '_system/scripts/tests/test_source_backfill.py'
+      - '_system/scripts/tests/test_commodity_inputs.py'
+      - '_system/scripts/tests/test_commodity_free_sources.py'
+      - '.github/workflows/company-source-backfill.yml'
+      - '_system/scripts/commodity_configs/**'
+      - '_system/reference/core_compounders.json'
+      - 'dashboard/compounders.js'
+      - 'dashboard/company-models.js'
+      - 'dashboard/commodity-model-viz.js'
+      - '.github/workflows/research-desk-tests.yml'
+permissions:
+  contents: read
+jobs:
+  contracts:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          sparse-checkout: |
+            /_system/scripts/
+            /_system/reference/core_compounders.json
+            /dashboard/
+          sparse-checkout-cone-mode: false
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - run: pip install pytest numpy openpyxl xlrd beautifulsoup4 pymupdf
+      - name: Balance identities, source guards and owner roster
+        run: python -m pytest -q _system/scripts/tests/test_commodity_models.py _system/scripts/tests/test_commodity_inputs.py _system/scripts/tests/test_commodity_free_sources.py _system/scripts/tests/test_source_backfill.py _system/scripts/tests/test_company_filings.py
+      - name: Company scope, valuation expiry and UI contracts
+        run: node --test _system/scripts/tests/test_research_desk_ui.cjs _system/scripts/tests/test_buyback_radar_ui.cjs
+      - name: Validate published context models
+        run: python _system/scripts/validate_commodity_models.py

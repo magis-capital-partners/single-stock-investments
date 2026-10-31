@@ -7,14 +7,28 @@ import pytest
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 from universal_valuation_contract import build_universal_valuation_contract
-from valuation_forecast import build_forecast, _irr, _npv, attach_forecast
+from valuation_forecast import _irr, _npv, attach_forecast, build_forecast
+
+
+def sourced_quote(**changes):
+    return {'value': 100, 'as_of': '2026-10-26', 'currency': 'USD',
+            'source_url': 'https://provider.test/quote', 'symbol': 'TEST',
+            'price_type': 'completed_session_close', 'calendar': 'XNYS', **changes}
+
+
+def sourced_market(**changes):
+    return {'status': 'verified', 'symbol': 'TEST', 'currency': 'USD', 'first_trade_date': None,
+            'coverage_start': '2000-01-01', 'coverage_end': '2027-12-31',
+            'source_url': 'https://provider.test/actions', 'events': [],
+            'quote': sourced_quote(), **changes}
 
 
 def model():
     """A small owner-cash proof with scenario rates and excess cash."""
     return {
         'ticker': 'TEST', 'as_of': '2026-10-26',
-        'inputs': {'price': 100, 'price_as_of': '2026-10-26', 'price_source': 'https://issuer.test/quote'},
+        'market_snapshot': sourced_market(),
+        'inputs': {'price': 100, 'price_as_of': '2026-10-26', 'price_source': 'https://issuer.test/quote', 'currency': 'USD'},
         'valuation_methodology': {'horizon_years': 2},
         'component_valuation_results': {'all_material_components_identified': True,
             'additive_components': [{'id': 'business', 'method': 'owner_earnings_reinvestment_dcf',
@@ -92,7 +106,9 @@ def test_subcent_models_preserve_calculation_precision_before_display_rounding()
 
 def test_later_quote_rolls_remaining_forecast_without_moving_cash_dates():
     original = build_forecast(model())
-    later = build_forecast(model(), quote={'value': 100, 'as_of': '2027-10-27', 'source_url': 'https://provider.test'}, as_of='2027-10-27')
+    reviewed = model()
+    reviewed['valuation_methodology'].update(reviewed_as_of='2027-10-26', review_source='https://issuer.test/review-evidence')
+    later = build_forecast(reviewed, quote=sourced_quote(as_of='2027-10-27'), as_of='2027-10-27', evaluated_at='2027-10-27T23:00:00+00:00')
     assert later['status'] == 'available'
     assert later['forecast_hash'] == original['forecast_hash']
     assert later['model_present_value_per_share'] == original['model_present_value_per_share']
@@ -140,15 +156,15 @@ def test_multiple_component_rates_are_not_flattened_to_one_base_rate():
     assert f['present_value_today_per_share']['base'] == pytest.approx(126.52892562 + 10 + 10/1.13 + 130/1.13**2, abs=.0002)
 
 
-@pytest.mark.parametrize('change,reason', [('stale_quote', 'fresh_sourced_quote_missing'), ('future_source', 'future_dated_source'), ('currency', 'dated_reporting_to_listing_fx_missing'), ('coverage', 'material_component_coverage_incomplete')])
+@pytest.mark.parametrize('change,reason', [('stale_quote', 'completed_session_quote_missing'), ('future_source', 'future_dated_source'), ('currency', 'dated_reporting_to_listing_fx_missing'), ('coverage', 'material_component_coverage_incomplete')])
 def test_invalid_inputs_withhold_research_returns_automatically(change, reason):
     value = model()
-    quote = {'value': 100, 'as_of': '2026-10-26', 'currency': 'USD', 'source_url': 'https://issuer.test/quote'}
+    quote = sourced_quote()
     if change == 'stale_quote': quote['as_of'] = '2026-09-01'
     if change == 'future_source': value['component_valuation_results']['additive_components'][0]['calculation_proof']['inputs'][0]['source']['as_of'] = '2027-01-01'
     if change == 'currency': quote['currency'] = 'EUR'
     if change == 'coverage': value['component_valuation_results']['all_material_components_identified'] = False
-    f = build_forecast(value, quote=quote, as_of='2026-10-26')
+    f = build_forecast(value, quote=quote, as_of='2026-10-26', market=sourced_market(currency=quote['currency']))
     assert f['status'] != 'available'
     assert any(g['code'] == reason for g in f['gaps'])
     assert f['requires_human_review'] is False
@@ -164,6 +180,7 @@ def test_research_publication_is_independent_of_committee_status():
 
 def test_full_universe_publication_replays_and_rejects_served_tampering(tmp_path):
     import json
+
     import refresh_shared_forecasts as refresh
     def save(path, obj):
         path.parent.mkdir(parents=True, exist_ok=True)
@@ -188,7 +205,7 @@ def test_legacy_full_model_keeps_issuer_growth_multiple_and_distributions():
         'inputs': {'price': 100, 'price_as_of': '2026-10-26', 'price_source': 'https://provider.test', 'fcf_per_share': 4, 'fcf_source': 'Issuer normalized owner cash'},
         'scenarios': {name: {'growth_y1_5': .07, 'growth_y6_10': .04, 'exit_pfcf_y10': 22} for name in ('bear', 'base', 'bull')}}
     adapted = build(value, currency='USD')
-    f = build_forecast(adapted)
+    f = build_forecast(adapted, quote=sourced_quote(), market=sourced_market())
     expected = cashflows_full(100, 4, .07, .04, 22, years=7)
     assert f['status'] == 'available'
     assert f['forward_cashflow_schedule']['base'][-1]['amount_per_share'] == pytest.approx(expected[-1]-expected[-1]/23)  # Terminal is a separate flow.
@@ -203,15 +220,16 @@ def test_automatic_model_uses_one_proof_and_source_bound_listing_ratio():
     ordinary = build('TEST', facts, {}, '2026-10-26')
     ratio = {'ordinary_shares_per_listing_share': 5, 'source_url': 'https://issuer.test/adr', 'locator': '5 ordinary shares per ADS', 'source_as_of': '2026-01-01'}
     adr = build('TEST', facts, {}, '2026-10-26', share_basis=ratio)
-    q = {'value': 100, 'as_of': '2026-10-26', 'currency': 'USD', 'source_url': 'https://provider.test'}
-    f1, f5 = build_forecast(ordinary, quote=q), build_forecast(adr, quote=q)
+    q = sourced_quote()
+    f1, f5 = build_forecast(ordinary, quote=q, market=sourced_market()), build_forecast(adr, quote=q, market=sourced_market())
     assert f1['status'] == f5['status'] == 'available'
     assert f5['present_value_today_per_share']['base'] == pytest.approx(f1['present_value_today_per_share']['base']*5, abs=.001)
 
 
 def test_quote_without_close_array_requires_a_dated_regular_price(monkeypatch):
-    import autonomous_compounders as ac
     from datetime import datetime, timezone
+
+    import autonomous_compounders as ac
     timestamp = int(datetime(2026, 10, 26, tzinfo=timezone.utc).timestamp())
     data = {'chart': {'result': [{'meta': {'symbol': 'TEST', 'currency': 'USD', 'regularMarketTime': timestamp, 'regularMarketPrice': 100}, 'indicators': {'quote': [{}]}}]}}
     monkeypatch.setattr(ac, 'get_json', lambda url: data)
@@ -260,6 +278,7 @@ def test_missing_model_reports_the_actual_missing_financial_input():
 def test_replay_reads_served_content_even_when_its_timestamp_is_reused(tmp_path):
     import json
     import os
+
     import refresh_shared_forecasts as refresh
     core = tmp_path/'dashboard/data/core.json'
     core.parent.mkdir(parents=True)

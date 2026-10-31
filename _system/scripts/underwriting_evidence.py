@@ -1,0 +1,540 @@
+"""Cold-start primary evidence. Old valuations, classifications and prices stay out.
+
+Only HTTPS SEC endpoints are fetched here. The research model receives frozen
+observations and filing tables, without credentials or repository access.
+"""
+from __future__ import annotations
+
+import copy
+import hashlib
+import html
+import json
+import os
+import re
+import subprocess
+from datetime import date
+from pathlib import Path
+
+from atomic_io import semantic_json_sha256
+from sec_client import SecClient
+from underwriting_contract import ContractError, digest, numeric, require
+from valuation_share_basis import (
+    BasisGap,
+    declaration,
+    factor,
+    normalize_fundamentals,
+    validate_market,
+)
+
+EXTRA_TAGS = ('CashAndCashEquivalentsAtCarryingValue', 'CashCashEquivalentsRestrictedCashAndRestrictedCashEquivalents',
+              'ShortTermInvestments', 'LongTermDebtCurrent', 'LongTermDebtNoncurrent', 'LongTermDebt',
+              'LongTermDebtAndCapitalLeaseObligationsCurrent', 'LongTermDebtAndCapitalLeaseObligations',
+              'LongTermDebtAndFinanceLeaseObligationsCurrent', 'LongTermDebtAndFinanceLeaseObligationsNoncurrent',
+              'CommercialPaper', 'ShortTermBorrowings', 'InventoryNet', 'Assets', 'Liabilities',
+              'StockholdersEquity', 'StockholdersEquityIncludingPortionAttributableToNoncontrollingInterest',
+              'AccountsReceivableNetCurrent', 'FinancingReceivableRecordedInvestmentExcludingAccruedInterestAfterAllowanceForCreditLoss',
+              'OperatingIncomeLoss', 'NetIncomeLoss', 'IncomeTaxExpenseBenefit', 'RevenueFromContractWithCustomerExcludingAssessedTax',
+              'NetCashProvidedByUsedInOperatingActivities', 'PaymentsToAcquirePropertyPlantAndEquipment',
+              'ShareBasedCompensation', 'WeightedAverageNumberOfDilutedSharesOutstanding', 'CommonStockSharesOutstanding')
+
+
+def read(path):
+    return json.loads(path.read_text(encoding='utf-8')) if path.is_file() else {}
+
+
+def text_of(raw):
+    raw = re.sub(r'<(?:script|style|ix:header)\b.*?</(?:script|style|ix:header)>', ' ', raw, flags=re.IGNORECASE | re.DOTALL)
+    return ' '.join(html.unescape(re.sub(r'<[^>]+>', ' ', raw)).split())
+
+
+def merge_evidence_requests(previous, incoming):
+    """Keep recent disclosure requests across bounded repair/retry rounds."""
+    rows = {}
+    for row in list(previous or [])+list(incoming or []):
+        key = str(row.get('code') or digest(row))
+        rows.pop(key, None)
+        rows[key] = row
+    return list(rows.values())[-12:]
+
+
+def requested_keywords(gaps):
+    """Balance explicit disclosure requests; model text never chooses URLs/tools."""
+    groups = []
+    excluded = {'missing', 'evidence', 'primary', 'source', 'required', 'financial', 'report',
+                'statement', 'company', 'specific', 'retrieve', 'contexts', 'expanded', 'still',
+                'omit', 'from', 'with', 'that', 'these', 'this', 'have', 'need', 'needed'}
+    for gap in gaps[:12]:
+        detail = str(gap.get('detail') or '')[:8000]
+        search = re.split(r'search terms\s*:', detail, maxsplit=1, flags=re.I)[-1]
+        quoted = re.findall(r"['\u2018\u2019\"\u201c\u201d]([^'\u2018\u2019\"\u201c\u201d\n]{2,120})['\u2018\u2019\"\u201c\u201d]", search)
+        terms = [' '.join(t.lower().split()) for t in quoted
+                 if re.fullmatch(r"[A-Za-z][A-Za-z0-9 ()/,&.'-]{1,119}", t)]
+        if not terms:
+            terms = [w.lower() for w in re.findall(r'[A-Za-z]{4,35}', str(gap.get('code') or '')+' '+detail)
+                     if w.lower() not in excluded]
+        notes = ['note '+n for n in re.findall(r'\bNote\s+(\d{1,2})\b', detail, re.I)]
+        terms = notes+terms
+        groups.append(list(dict.fromkeys(terms))[:12])
+    terms = []
+    for index in range(12):
+        for group in groups:
+            if index < len(group) and group[index] not in terms:
+                terms.append(group[index])
+                if len(terms) == 18:
+                    return terms
+    return terms
+
+
+def document_record(url, raw, focus_keywords=(), *, form=None):
+    require(len(raw) <= 20_000_000, 'Primary filing exceeds the bounded evidence size')
+    source = raw.decode('utf-8', errors='replace')
+    words = ('cash', 'debt', 'assets', 'liabilities', 'inventory', 'capital', 'operating', 'shares',
+             'revenue', 'credit', 'receivables', 'segment', 'net income', 'financing')
+    focus = tuple(' '.join(w.lower().split()) for w in focus_keywords
+                  if re.fullmatch(r"[A-Za-z][A-Za-z0-9_ ()/,&.'-]{1,119}", w))[:18]
+    tables = []
+    for table in re.finditer(r'<table\b.*?</table>', source, flags=re.IGNORECASE | re.DOTALL):
+        text = text_of(table.group())
+        if 80 <= len(text) <= 16000:
+            score = sum(w in text.lower() for w in words)+5*sum(w in text.lower() for w in focus)
+            if score >= 3:
+                # Scale, title and period often sit just outside the table.
+                # Keep adjacent primary text so supplemental facts can quote
+                # an actual scale header rather than infer a multiplier.
+                prefix = text_of(source[max(0, table.start()-15000):table.start()])[-1000:]
+                tables.append((score, (prefix+' '+text).strip()))
+    contexts, seen, size = [], set(), 0
+    for _, text in sorted(tables, key=lambda item: (-item[0], len(item[1]))):
+        if text in seen or size+len(text) > 85000:
+            continue
+        seen.add(text)
+        contexts.append(text)
+        size += len(text)
+        if len(contexts) >= 30:
+            break
+    body = text_of(source)
+    if form == '10-Q' and 500 <= len(body) <= 350000 and sum(w in body.lower() for w in words) >= 3:
+        # A bounded complete interim report avoids serial gaps caused by notes
+        # or contractual footnotes falling just outside selected text windows.
+        return {'id':'doc_'+digest(url)[:16],'source_url':url,'content_hash':hashlib.sha256(raw).hexdigest(),
+                'contexts':[body],'coverage':'complete_quarterly_filing'}
+    budget = 350000 if focus else 150000
+    def add_context(text):
+        nonlocal size
+        if text and text not in seen and size+len(text) <= budget:
+            contexts.append(text)
+            seen.add(text)
+            size += len(text)
+    # Note requests need the disclosure, not a table-of-contents hit or a small
+    # keyword window. Keep bounded complete sections with original source text.
+    note_spans = []
+    for phrase in focus:
+        if not re.fullmatch(r'note \d{1,2}', phrase):
+            continue
+        number = phrase.split()[-1]
+        matches = list(re.finditer(r'\bNote\s+'+number+r'\b\s*[.:-]?', body, re.I))
+        matches.sort(key=lambda m: (bool(re.search(r'[.:-]',m.group())), bool(re.match(r'\s*[A-Z]',body[m.end():m.end()+20])),m.start()),reverse=True)
+        for match in matches[:2]:
+            note_spans.append((max(0,match.start()-200),min(len(body),match.start()+22000)))
+    merged = []
+    for start,end in sorted(note_spans):
+        if merged and start <= merged[-1][1]:
+            merged[-1] = (merged[-1][0],max(end,merged[-1][1]))
+        else:
+            merged.append((start,end))
+    for start,end in merged:
+        add_context(body[start:end])
+    # Business economics and risks are not limited to financial tables.
+    defaults = ('our business', 'business overview', 'competition', 'working capital',
+                   'liquidity', 'regulatory capital', 'credit', 'clinical', 'inventory', 'warrant', 'dilution',
+                   'depositary', 'each ads')
+    for phrase in defaults:
+        matches = list(re.finditer(re.escape(phrase), body, flags=re.IGNORECASE))
+        if matches:
+            selected = matches[:3] if phrase in ('depositary', 'each ads') else [matches[min(1, len(matches)-1)]]
+            for match in selected:
+                start = match.start()
+                add_context(body[max(0, start-250):start+2300])
+    for phrase in focus:
+        matches = list(re.finditer(re.escape(phrase), body, flags=re.IGNORECASE))
+        # A contents mention is not the disclosure. Prefer the occurrence
+        # surrounded by other requested concepts, with a stable document order.
+        matches.sort(key=lambda m: (-sum(w in body[max(0, m.start()-1500):m.start()+8500].lower()
+                                            for w in focus), m.start()))
+        if matches:
+            start = matches[0].start()
+            add_context(body[max(0, start-1500):start+8500])
+    # All original text survives; overlapping note windows need not repeat the
+    # same table/narrative again and consume the judgment session's context.
+    contexts = [c for i,c in enumerate(contexts) if not any(i != j and c in other for j,other in enumerate(contexts))]
+    require(contexts, 'No financial tables could be frozen from '+url)
+    return {'id': 'doc_'+digest(url)[:16], 'source_url': url,
+            'content_hash': hashlib.sha256(raw).hexdigest(), 'contexts': contexts}
+
+
+def listing_ratio_from_documents(documents):
+    """Extract explicit depositary representation; ambiguity is a gap, never 1:1."""
+    words = dict(one=1, two=2, three=3, four=4, five=5, six=6, seven=7, eight=8, nine=9, ten=10)
+    number = r'(?:[0-9]+(?:\.[0-9]+)?|one|two|three|four|five|six|seven|eight|nine|ten)'
+    pattern = re.compile(r'\b(?:(?P<receipts>'+number+r')\s+)?(?:American\s+depositary\s+shares?|ADSs?)\b'
+                         r'[^.;]{0,90}?represent(?:s|ing)?\s+(?P<ordinary>'+number+r')'
+                         r'(?:\s*\((?P<confirmation>'+number+r')\))?\s+'
+                         r'(?:Class\s+[A-Z]\s+)?(?:ordinary|common)\s+shares?\b', re.IGNORECASE)
+    def value(token):
+        return words[token.lower()] if token.lower() in words else float(token)
+    for document in sorted(documents, key=lambda d: d.get('filed', ''), reverse=True):
+        matches = [m for context in document.get('contexts') or [] for m in pattern.finditer(context)]
+        require(all(not m['confirmation'] or value(m['ordinary']) == value(m['confirmation']) for m in matches),
+                'depositary_share_ratio_ambiguous')
+        ratios = {value(m['ordinary'])/value(m['receipts'] or 'one') for m in matches if value(m['receipts'] or 'one') > 0}
+        if not ratios:
+            continue
+        require(len(ratios) == 1 and next(iter(ratios)) > 0, 'depositary_share_ratio_ambiguous')
+        return {'ordinary_shares_per_listing_share': next(iter(ratios)), 'source_url': document['source_url'],
+                'source_as_of': document.get('period') or document.get('filed'), 'locator': matches[0].group(),
+                'document_hash': document['content_hash']}
+    return None
+
+
+def fingerprint_facts(source):
+    """Pin a provider's rolling request end to the disclosed financial epoch.
+
+    Keep the actual fetched URLs in evidence. Only the comparison ignores this
+    known collection clock; issuer, metric, value, period and filing still bind.
+    """
+    facts = copy.deepcopy(source.get('facts') or [])
+    anchor = (source.get('latest_report') or {}).get('filed') or max(
+        (str(p.get('filed') or p.get('period') or '') for p in facts), default='')
+    try:
+        end = str((date.fromisoformat(anchor)-date(1970, 1, 1)).days*86400)
+    except (ValueError, TypeError):
+        return facts
+    for point in facts:
+        url = point.get('source_url') or ''
+        if (point.get('source_kind') == 'provider_reported'
+                and re.match(r'^https://query[12]\.finance\.yahoo\.com/ws/fundamentals-timeseries/v1/finance/timeseries/', url)):
+            point['source_url'] = re.sub(r'([?&]period2=)\d+(?=&|$)', lambda m: m[1]+end, url, count=1)
+    return facts
+
+
+def source_fingerprint(root, ticker):
+    source = read(root/'_system/reference/market-data/valuation_fundamentals'/(ticker+'.json'))
+    points = primary_kpis(root, ticker)
+    kpis = {'points': points} if points else {}
+    payload = {'facts': fingerprint_facts(source), 'primary_observations': source.get('primary_observations') or [],
+               'latest_report': source.get('latest_report'), 'operating_kpis': kpis}
+    related = source.get('underwriting_related_issuers') or (read(root/ticker/'research/valuation.json').get('underwriting') or {}).get('related_issuers') or {}
+    if related:
+        payload['related_issuers'] = {}
+        for symbol,metadata in related.items():
+            if not re.fullmatch(r'[A-Za-z0-9][A-Za-z0-9._-]{0,30}',symbol):
+                continue
+            cached = read(root/'_system/reference/market-data/valuation_related_evidence'/(symbol+'.json'))
+            payload['related_issuers'][symbol] = {'source_hash':cached.get('source_hash') or metadata.get('source_hash'),
+                                                 'status':cached.get('status','ready')}
+    if source.get('latest_disclosure'):
+        payload['latest_disclosure'] = source['latest_disclosure']
+    return semantic_json_sha256(payload,
+                               volatile_keys={'retrieved_at', 'fetched_at', 'updated_at', 'generated_at', 'last_collected', 'attempted_at', 'checked_at'})
+
+
+def primary_kpis(root, ticker):
+    """Keep direct reported measurements; collection clocks and inferred ratios are not new evidence."""
+    data = read(root/'_system/reference/market-data/operating_kpis'/(ticker+'.json'))
+    rows = []
+    for p in data.get('points') or []:
+        if p.get('source_kind') != 'primary' or p.get('claim_type', 'fact') != 'fact':
+            continue
+        if not str(p.get('source_url') or '').startswith('https://') or not (p.get('doc') or p.get('locator')):
+            continue
+        if not p.get('kpi') or not p.get('unit') or not (p.get('fiscal_period_end') or p.get('period')):
+            continue
+        try:
+            numeric(p.get('value'))
+        except ContractError:
+            continue
+        rows.append({'kpi': p.get('kpi'), 'value': p['value'], 'unit': p.get('unit'),
+                     'period': p.get('fiscal_period_end') or p.get('period'), 'source_url': p['source_url'],
+                     'locator': p.get('doc') or p['locator']})
+    return sorted({digest(p): p for p in rows}.values(), key=lambda p: (p.get('period') or '', p['kpi'] or '', digest(p)))[-200:]
+
+
+def _share_observation(point, market, quote):
+    point = copy.deepcopy(point)
+    if point.get('share_basis'):
+        return point
+    accn = re.search(r'\d{10}-\d{2}-\d{6}', point.get('locator') or '')
+    known = ((market.get('share_evidence') or {}).get('accessions') or {}).get(accn.group() if accn else '')
+    basis = declaration(point, market, observation_day=point['period'], default=known)
+    point['value'] *= factor(market, basis['as_of'], quote['as_of'])
+    point['share_basis'] = {'as_of': quote['as_of'], 'symbol': quote['symbol'], 'source_url': basis['source_url']}
+    return point
+
+
+def _observation(point):
+    row = {k: point.get(k) for k in ('field', 'value', 'period', 'source_url', 'locator', 'filed', 'source_kind')}
+    row.update({k: point[k] for k in ('start', 'form', 'tag', 'scope', 'measurement_type') if k in point})
+    row['unit'] = 'shares' if point['field'] in ('shares', 'ordinary_shares', 'balance_shares') else point.get('currency')
+    if point.get('share_basis'):
+        row['share_basis'] = point['share_basis']
+    require(row['unit'] and row['source_url'] and row['locator'], 'Incomplete source observation')
+    numeric(row['value'])
+    row['id'] = 'obs_'+digest({k: v for k, v in row.items() if k != 'share_basis'})[:20]
+    return row
+
+
+def rich_primary_observations(payload, url, as_of, market, quote, reporting_currency=None):
+    out = []
+    cutoff = date.fromisoformat(as_of).year-10
+    for tag in EXTRA_TAGS:
+        item = (payload.get('facts', {}).get('us-gaap') or {}).get(tag) or {}
+        selected = {}
+        for unit, rows in (item.get('units') or {}).items():
+            if unit not in ('shares', reporting_currency or quote.get('currency')):
+                continue
+            for row in rows:
+                if not row.get('end') or row['end'] > as_of or int(row['end'][:4]) < cutoff or str(row.get('filed') or '9999') > as_of:
+                    continue
+                key = (row.get('start'), row['end'], unit)
+                if key not in selected or (row.get('filed') or '') > (selected[key].get('filed') or ''):
+                    selected[key] = {**row, 'unit': unit}
+        for row in selected.values():
+            field = 'shares' if tag == 'WeightedAverageNumberOfDilutedSharesOutstanding' else 'balance_shares' if row['unit'] == 'shares' else tag
+            point = {'field': field, 'value': row['val'], 'period': row['end'], 'currency': row['unit'],
+                     'source_url': url, 'locator': tag+'; '+str(row.get('accn')), 'filed': row.get('filed'), 'source_kind': 'primary',
+                     'start': row.get('start'), 'form': row.get('form'), 'tag': tag, 'scope': 'reported consolidated'}
+            try:
+                if row['unit'] == 'shares':
+                    point = _share_observation(point, market, quote)
+                obs = _observation(point)
+                obs.update(tag=tag, start=row.get('start'), form=row.get('form'), scope='reported consolidated')
+                out.append(obs)
+            except (BasisGap, ContractError):
+                continue
+    return out
+
+
+def filing_bytes(root, ticker, accession, client, url):
+    """Reuse the exact accession already archived by our filing collectors."""
+    archive = Path(os.environ.get('UNDERWRITING_ARCHIVE_ROOT') or root)
+    try:
+        paths = subprocess.check_output(['git', 'ls-tree', '-r', '--name-only', 'HEAD', '--', ticker+'/investor-documents/sec-edgar'],
+                                        cwd=archive, stderr=subprocess.DEVNULL, text=True, timeout=60).splitlines()
+        token = accession.replace('-', '_')
+        cached = next((p for p in paths if token in p and p.lower().endswith(('.htm', '.html'))), None)
+        if cached:
+            local = archive/cached
+            return local.read_bytes() if local.is_file() else subprocess.check_output(['git', 'show', 'HEAD:'+cached], cwd=archive, stderr=subprocess.DEVNULL, timeout=60)
+    except (OSError, subprocess.SubprocessError):
+        pass
+    return client.get_bytes(url, timeout=40)
+
+
+def prepare_packet(root: Path, ticker: str, as_of: str, *, collect=True, client=None, focus_keywords=()):
+    from refresh_shared_forecasts import (
+        FUNDAMENTALS,
+        QUOTES,
+        refresh_missing_model_inputs,
+        refresh_quote,
+        universe,
+    )
+    rows = universe(root)
+    require(ticker in rows, 'Unknown coverage ticker')
+    registry = read(root/'_system/portfolio/registry.json').get('holdings') or {}
+    if collect:
+        refresh_quote(ticker, rows[ticker], root, as_of)
+        refresh_missing_model_inputs(ticker, rows[ticker], root, as_of, registry)
+    cached, data = read(root/QUOTES/(ticker+'.json')), read(root/FUNDAMENTALS/(ticker+'.json'))
+    require(cached.get('identity', {}).get('status') != 'mismatch', 'Listing identity unresolved')
+    quote, market = cached.get('quote') or {}, cached.get('corporate_actions') or {}
+    listing_ratio = (read(root/'_system/reference/valuation_listing_ratios.json').get('listings') or {}).get(ticker)
+    if listing_ratio:
+        require(numeric(listing_ratio.get('ordinary_shares_per_listing_share')) > 0 and listing_ratio.get('source_url')
+                and listing_ratio.get('source_as_of') and listing_ratio.get('locator'), 'Listing ratio needs verified depositary evidence')
+        market = {**market, 'listing_ratio': listing_ratio}
+        share_periods = [p['period'] for p in data.get('facts') or [] if p.get('field') in ('shares', 'ordinary_shares', 'balance_shares')]
+        require(not any(e['date'] >= min(share_periods) for e in market.get('events') or []) if share_periods else True,
+                'ordinary_and_listing_share_actions_unreconciled')
+    validate_market(market, quote, quote.get('as_of') or as_of)
+    require(quote.get('currency') and quote.get('symbol'), 'Listing currency and symbol required')
+    try:
+        normalized, _ = normalize_fundamentals(data, market, quote)
+    except BasisGap:
+        # A problematic old comparative must not exclude a verified current
+        # denominator. Keep money observations; verify each share epoch below.
+        normalized = copy.deepcopy(data)
+        normalized['normalized_share_basis'] = {'as_of': quote['as_of'], 'symbol': quote['symbol'], 'source_url': market['source_url']}
+    from autonomous_compounders import economics
+    history = economics(normalized)
+    annual = [p for p in normalized.get('facts') or [] if p.get('source_kind') == 'primary'
+              and p.get('field') in ('ocf', 'net_income', 'revenue', 'equity') and p.get('period', '9999') <= as_of]
+    annual.sort(key=lambda p: p['period'])
+    reporting_currency = history[-1]['currency'] if history else annual[-1]['currency'] if annual else quote['currency']
+    observations = []
+    for raw in (normalized.get('facts') or [])+(data.get('primary_observations') or []):
+        if raw.get('source_kind') != 'primary' or raw.get('period', '9999') > as_of:
+            continue
+        if raw.get('currency') not in (reporting_currency, None, 'shares'):
+            continue
+        try:
+            point = _share_observation(raw, market, quote) if raw['field'] in ('shares', 'ordinary_shares', 'balance_shares') else raw
+            observation = _observation(point)
+            observation.update({k: point[k] for k in ('start', 'form', 'tag', 'scope', 'measurement_type') if k in point})
+            observations.append(observation)
+        except (BasisGap, ContractError):
+            continue
+    documents, errors = copy.deepcopy(data.get('primary_documents') or []), []
+    if focus_keywords and documents:
+        from valuation_earnings import primary_document
+        for index, document in enumerate(documents):
+            try:
+                reader = client or SecClient(max_attempts=2)
+                raw = reader.get_bytes(document['source_url'], timeout=40)
+                focused = primary_document(document['source_url'], raw, {k: document[k] for k in ('form', 'filed', 'accession', 'as_of')}, focus_keywords)
+                focused.setdefault('period', document.get('period'))
+                documents[index] = focused
+            except (OSError, ValueError, KeyError, TypeError):
+                pass
+    cik = (registry.get(ticker, {}).get('download') or {}).get('cik')
+    if cik:
+        client = client or SecClient(max_attempts=2)
+        base = f'https://data.sec.gov/api/xbrl/companyfacts/CIK{int(cik):010d}.json'
+        if not data.get('primary_observations'):
+            try:
+                payload = client.get_json(base, timeout=30)
+                observations += rich_primary_observations(payload, base, as_of, market, quote, reporting_currency)
+            except (OSError, ValueError) as exc:
+                errors.append({'source': 'sec_companyfacts', 'error': type(exc).__name__})
+        try:
+            submission = client.get_json(f'https://data.sec.gov/submissions/CIK{int(cik):010d}.json', timeout=30)
+            recent = (submission.get('filings') or {}).get('recent') or {}
+            chosen = set()
+            for i, form in enumerate(recent.get('form') or []):
+                if form not in ('10-K', '10-Q', '20-F', '40-F', '6-K') or form in chosen or recent['filingDate'][i] > as_of:
+                    continue
+                filename = recent['primaryDocument'][i]
+                if not re.fullmatch(r'[A-Za-z0-9_.-]+', filename):
+                    continue
+                url = f"https://www.sec.gov/Archives/edgar/data/{int(cik)}/{recent['accessionNumber'][i].replace('-', '')}/{filename}"
+                try:
+                    document = document_record(url, filing_bytes(root, ticker, recent['accessionNumber'][i], client, url), focus_keywords, form=form)
+                    document.update(form=form, filed=recent['filingDate'][i], period=(recent.get('reportDate') or ['']*len(recent['form']))[i])
+                    documents.append(document)
+                    chosen.add(form)
+                except (OSError, ValueError) as exc:
+                    errors.append({'source': url, 'error': type(exc).__name__})
+                if len(chosen) >= 2:
+                    break
+        except (OSError, ValueError) as exc:
+            errors.append({'source': 'sec_submissions', 'error': type(exc).__name__})
+    foreign_us_listing = '.' not in quote['symbol'] and any(d.get('form') in ('20-F', '6-K') for d in documents+observations)
+    extracted_ratio = listing_ratio_from_documents(documents) if foreign_us_listing or listing_ratio else None
+    if listing_ratio and extracted_ratio:
+        require(listing_ratio['ordinary_shares_per_listing_share'] == extracted_ratio['ordinary_shares_per_listing_share'],
+                'depositary_share_ratio_sources_disagree')
+    listing_ratio = extracted_ratio or listing_ratio
+    require(listing_ratio or not foreign_us_listing,
+            'ordinary_shares_require_verified_listing_ratio')
+    if listing_ratio:
+        share_periods = [o['period'] for o in observations if o['unit'] == 'shares']
+        if share_periods:
+            require(not any(e['date'] >= min(share_periods) for e in market.get('events') or []),
+                    'ordinary_and_listing_share_actions_unreconciled')
+    observations = list({o['id']: o for o in observations}.values())
+    observations.sort(key=lambda o: (o['period'], o['id']))
+    metrics = primary_kpis(root, ticker)
+    for source in sorted({p['source_url'] for p in metrics}):
+        selected = [p for p in metrics if p['source_url'] == source and str(p.get('period') or '') <= as_of]
+        if selected:
+            documents.append({'id': 'doc_kpi_'+digest(selected)[:16], 'source_url': source,
+                              'content_hash': digest(selected), 'source_kind': 'primary_metric_extract',
+                              'contexts': [json.dumps(selected, ensure_ascii=False, sort_keys=True)]})
+    require(any(o['unit'] == 'shares' for o in observations) and any(o['unit'] == reporting_currency for o in observations),
+            'Sourced primary financials and a verified share count are required')
+    require(history or annual, 'Primary financial period is unresolved')
+    packet = {'schema_version': 'underwriting-evidence/1', 'ticker': ticker, 'company': rows[ticker].get('company') or ticker,
+              'as_of': as_of, 'currency': reporting_currency, 'financial_period': history[-1]['period'] if history else annual[-1]['period'],
+              'share_basis': normalized['normalized_share_basis'], 'latest_report': data.get('latest_report') or {},
+              'listing_ratio': listing_ratio,
+              'input_fingerprint': source_fingerprint(root, ticker),
+              'observations': observations, 'documents': documents, 'collection_errors': errors,
+              'split_events': [{'date': e['date'], 'ratio': e['ratio']} for e in market['events']]}
+    for document in documents:
+        if document.get('period') and (document['period'], document.get('filed', '')) > (packet['latest_report'].get('period', ''), packet['latest_report'].get('filed', '')):
+            packet['latest_report'] = {'period': document['period'], 'filed': document['filed'], 'source_url': document['source_url']}
+    # The packet and every downstream consumer share the discovered report marker.
+    # This is source metadata, never a new economic-model review date.
+    if collect and packet['latest_report'] != data.get('latest_report'):
+        from atomic_io import write_json_if_changed
+        data['latest_report'] = packet['latest_report']
+        write_json_if_changed(root/FUNDAMENTALS/(ticker+'.json'), data)
+        packet['input_fingerprint'] = source_fingerprint(root, ticker)
+    packet['source_discovery'] = data.get('report_discovery') or {}
+    packet['readiness'] = evidence_readiness(packet, require_documents=bool(cik))
+    packet['evidence_hash'] = digest({'observations': [{k: v for k, v in o.items() if k != 'share_basis'} for o in observations],
+                                      'documents': [{**{k: d[k] for k in ('source_url', 'content_hash')}, 'contexts_hash': digest(d['contexts'])} for d in documents],
+                                      'latest_report': packet['latest_report'], 'split_events': packet['split_events'],
+                                      'listing_ratio': listing_ratio})
+    packet['packet_hash'] = digest(packet)
+    return packet
+
+
+def evidence_readiness(packet, *, require_documents=False):
+    """Facts/documents readiness is checked before admitting any judgment call."""
+    gaps = []
+    day = date.fromisoformat(packet['as_of'])
+    financial = date.fromisoformat(packet['financial_period'])
+    if not 0 <= (day-financial).days <= 550:
+        gaps.append({'code': 'financial_baseline_stale', 'detail': 'Collect a current annual financial baseline.'})
+    primary = [o for o in packet.get('observations') or [] if o.get('source_kind') == 'primary']
+    if not any(o.get('unit') == 'shares' and numeric(o.get('value')) > 0 and o['period'] >= packet['financial_period'] for o in primary):
+        gaps.append({'code': 'verified_denominator_missing', 'detail': 'Collect primary shares on the verified listing basis.'})
+    latest = packet.get('latest_report') or {}
+    docs = packet.get('documents') or []
+    if require_documents and (not latest.get('period') or not any(d.get('period') == latest['period'] for d in docs)):
+        gaps.append({'code': 'latest_primary_document_missing', 'detail': 'Retrieve the newly discovered report, including financial tables.'})
+    if require_documents and not any(d.get('form') in ('10-K', '20-F', '40-F') for d in docs):
+        gaps.append({'code': 'annual_primary_document_missing', 'detail': 'Retrieve the annual report and business/financing disclosures.'})
+    if require_documents and packet.get('source_discovery', {}).get('status') in ('failed', 'earnings_unresolved'):
+        gaps.append({'code': 'report_discovery_failed', 'detail': 'Retry primary submissions; old cached reports do not prove freshness.'})
+    return {'status': 'ready' if not gaps else 'evidence_gap', 'gaps': gaps,
+            'primary_observations': len(primary), 'documents': len(docs),
+            'history_periods': len({o['period'] for o in primary})}
+
+
+def supplemental_observations(packet, rows):
+    """Validate extraction against the frozen filing table, before it becomes a fact."""
+    documents = {d['id']: d for d in packet.get('documents') or []}
+    known = {o['id'] for o in packet['observations']}
+    out = []
+    for row in rows:
+        require(row.get('id') and row['id'] not in known, 'Supplemental observation id collides')
+        source = documents.get(row.get('document_id'))
+        require(source is not None, 'Supplemental fact must come from a frozen primary filing')
+        quote = ' '.join(str(row.get('quote') or '').split())
+        require(30 <= len(quote) <= 8000 and any(quote in context for context in source['contexts']), 'Fact quotation does not match a frozen filing table')
+        token = str(row.get('numeric_token') or '')
+        require(token and re.search(r'(?<![\d,.])'+re.escape(token)+r'(?!\d|,\d|\.\d)', quote), 'Reported number is absent from its quoted table')
+        require(re.fullmatch(r'\(?-?\$?[0-9]+(?:,[0-9]{3})*(?:\.[0-9]+)?\)?', token), 'Reported numeric token is invalid')
+        raw = float(token.replace(',', '').replace('$', '').replace('(', '-').replace(')', ''))
+        scale = row.get('scale')
+        require(scale in (1, 1000, 1_000_000, 1_000_000_000), 'Scale must be explicit')
+        if scale != 1:
+            scale_word = {1000: 'thousand', 1_000_000: 'million', 1_000_000_000: 'billion'}[scale]
+            require(scale_word in quote.lower(), 'The quotation must include its scale header')
+        period = row.get('period') or ''
+        try:
+            require(date.fromisoformat(period) <= date.fromisoformat(packet['as_of']), 'Fact period is in the future')
+        except ValueError as exc:
+            raise ContractError('Supplemental fact period is invalid') from exc
+        require(period[:4] in quote, 'The quoted table must identify its reporting year')
+        require(row.get('unit') == packet['currency'], 'Supplemental shares/currency conversions need separately verified listing evidence')
+        require(len(row.get('scope') or '') >= 10 and row.get('locator'), 'Fact needs table locator and business scope')
+        require(row.get('measurement_type') in ('balance', 'flow'), 'Specify whether the observation is a stock balance or a period flow')
+        out.append({'id': row['id'], 'value': raw*scale, 'unit': row['unit'], 'period': period,
+                    'source_url': source['source_url'], 'source_kind': 'primary', 'field': row.get('field') or 'supplemental',
+                    'locator': row['locator'], 'scope': row['scope'], 'measurement_type': row['measurement_type'], 'document_hash': source['content_hash']})
+        if source.get('issuer_ticker'):
+            out[-1]['issuer_ticker'] = source['issuer_ticker']
+        known.add(row['id'])
+    return out

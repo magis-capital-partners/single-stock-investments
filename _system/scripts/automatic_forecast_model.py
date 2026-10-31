@@ -7,8 +7,9 @@ from __future__ import annotations
 
 import statistics
 from datetime import date
+from itertools import pairwise
 
-from autonomous_compounders import economics, observed_rows, HOLDINGS
+from autonomous_compounders import HOLDINGS, economics, observed_rows
 
 
 def missing_inputs(ticker, data, row, as_of):
@@ -59,7 +60,7 @@ def build(ticker, data, row, as_of, share_basis=None):
     if latest['owner_cash'] <= 0 or not 0 <= (date.fromisoformat(as_of)-date.fromisoformat(latest['period'])).days <= 550:
         return None
     growth = []
-    for a, b in zip(history, history[1:]):
+    for a, b in pairwise(history):
         years = (date.fromisoformat(b['period'])-date.fromisoformat(a['period'])).days/365.25
         if a['owner_cash'] > 0 and b['owner_cash'] > 0 and a['currency'] == b['currency'] and .8 <= years <= 1.2:
             growth.append((b['owner_cash']/a['owner_cash'])**(1/years)-1)
@@ -73,6 +74,8 @@ def build(ticker, data, row, as_of, share_basis=None):
         fields[field] = point['value']
         proof_inputs.append({'id': field, 'kind': 'fact', 'value': point['value'], 'locked': True,
             'unit': 'shares' if field == 'shares' else currency,
+            'share_basis': point.get('share_basis'),
+            'observation_type': 'annual_weighted_average' if field == 'shares' else 'annual_cash_flow',
             'source': {'ref': point['source_url'], 'locator': point['locator'], 'as_of': point['period']}})
     # Normalize the reported capex sign once; both outputs see the same anchor.
     for p in proof_inputs:
@@ -124,6 +127,7 @@ def build(ticker, data, row, as_of, share_basis=None):
         {'id': 'value_per_share', 'op': 'add', 'args': ['cash_pv', 'terminal_pv'], 'unit': money},
     ])
     return {'ticker': ticker, 'as_of': data.get('model_anchor') or as_of,
+        'share_basis': data.get('normalized_share_basis'), 'financial_period': latest['period'],
         'method': 'owner_earnings_reinvestment_dcf',
         'inputs': {}, 'valuation_methodology': {'model_level': 'screening_grade', 'automation': 'source_locked_first_pass', 'horizon_years': 7},
         'component_valuation_results': {'all_material_components_identified': True, 'additive_components': [{

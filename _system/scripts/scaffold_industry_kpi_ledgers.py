@@ -221,15 +221,15 @@ def exchange_market_kpis(ticker: str) -> list[dict]:
 
     return out or [VIX, SPYVOL]
 GOLD = _kpi(
-    "gold_spot_proxy",
-    "Gold spot proxy (shared · GLD when London fix unavailable)",
-    unit="usd_gld",
+    "gold_futures_usd_oz",
+    "Gold futures (USD/troy oz · shared context)",
+    unit="usd_oz",
     op="gte",
-    value=200,
-    source="theme:gold_spot_usd",
+    value=0,
+    source="theme:gold_futures_usd_oz",
     role="orientation",
-    note="Bullion floor for royalty compounders (shared theme)",
-    horizon="bullion_floor",
+    note="Nonnegative quote sanity check only; no economic price floor or issuer return is implied. The retired GLD-share threshold does not apply to bullion units.",
+    horizon="quote_validity",
 )
 GDX = _kpi(
     "gdx_gld_ratio",
@@ -401,7 +401,7 @@ def themes_for_industries(industry_ids: list[str]) -> list[str]:
 # Names that were linked to the wrong industry. Even if membership is
 # restored, these shared proxies stay off the ledger.
 TEMPLATE_KPI_EXCLUSIONS: dict[str, set[str]] = {
-    "MSB": {"gold_spot_proxy", "gdx_gld_ratio"},
+    "MSB": {"gold_spot_proxy", "gold_futures_usd_oz", "gdx_gld_ratio"},
     "GYRO": {"tpl_water_revenue_m", "hyperscaler_capex_guide_bn", "wti_crude_usd"},
 }
 
