@@ -187,6 +187,9 @@ def test_scheduled_refresh_declares_every_input_needed_to_validate_a_real_approv
     result = pipeline.run_batch(source, launch=True, work=tmp_path/'work', vault=vault,
                                 prepare=lambda *args: packet(), execute=execute)
     assert result['completed'] == ['TEST']
+    pipeline.write(source/'_system/data/underwriting_queue.json', {'companies': [
+        {'ticker': 'TEST', 'status': 'automatic_retry_pending', 'last_attempt': '2026-10-25T10:00:00+00:00',
+         'underwriting_gaps': [{'code': 'ContractError', 'detail': 'An older draft failed review'}]}]})
     workflow = Path(__file__).resolve().parents[3]/'.github/workflows/autonomous-compounders.yml'
     steps = yaml.safe_load(workflow.read_text(encoding='utf-8'))['jobs']['refresh']['steps']
     patterns = steps[0]['with']['sparse-checkout'].split()
@@ -197,6 +200,7 @@ def test_scheduled_refresh_declares_every_input_needed_to_validate_a_real_approv
             target = checkout/relative
             target.parent.mkdir(parents=True, exist_ok=True)
             shutil.copyfile(item, target)
+    assert pipeline.read(checkout/'_system/data/underwriting_queue.json')['companies'][0]['underwriting_gaps']
     forecast = refresh.calculate('TEST', checkout, '2026-10-26')
     assert forecast['status'] == 'available', forecast['gaps']
     assert forecast['model_basis'] == 'independent_underwriting'

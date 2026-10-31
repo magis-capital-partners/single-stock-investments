@@ -55,6 +55,30 @@ def test_real_calculate_seam_preserves_irr_through_a_split(tmp_path):
     assert after['forward_irr_pct'] == pytest.approx(before['forward_irr_pct'], abs=1e-6)
 
 
+@pytest.mark.parametrize('status,gaps', [
+    ('needs_underwriting', [{'code': 'StageBlocked', 'detail': 'Parent liquidity terms unresolved'}]),
+    ('automatic_retry_pending', [{'code': 'ContractError', 'detail': 'Independent challenge unresolved'}]),
+    ('waiting_for_build', []),
+])
+def test_an_attempted_issuer_review_cannot_fall_back_to_a_generic_return(tmp_path, status, gaps):
+    fixture(tmp_path, ratio=1)
+    before = calculate('BKNG', tmp_path, '2026-10-26')
+    assert before['status'] == 'available'
+    queue_path = '_system/data/underwriting_queue.json'
+    row = {'ticker': 'BKNG', 'status': status, 'last_attempt': '2026-10-26T10:00:00+00:00', 'underwriting_gaps': gaps}
+    save(tmp_path, queue_path, {'companies': [row]})
+    blocked = calculate('BKNG', tmp_path, '2026-10-26')
+    assert blocked['status'] == 'underwriting_revision_required'
+    assert blocked['economic_review_status'] == 'revision_required'
+    for name in ('forward_irr_pct', 'present_value_today_per_share', 'model_present_value_per_share'):
+        assert all(value is None for value in blocked[name].values())
+        assert blocked['audit_only_'+name] == before[name]
+    assert blocked['buy_prices'] == []
+    # Ordinary screening remains available before an issuer review is attempted.
+    save(tmp_path, queue_path, {'companies': [{'ticker': 'BKNG', 'status': 'needs_underwriting'}]})
+    assert calculate('BKNG', tmp_path, '2026-10-26')['forward_irr_pct'] == before['forward_irr_pct']
+
+
 def test_restated_observations_are_not_adjusted_twice(tmp_path):
     original = fixture(tmp_path)
     once = calculate('BKNG', tmp_path, '2026-10-26')
