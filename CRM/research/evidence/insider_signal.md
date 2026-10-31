@@ -1,4 +1,4 @@
-# CRM — Insider conviction (2026-10-27)
+# CRM — Insider conviction (2026-10-31)
 
 > Context only. Insider activity informs scenario confidence and stance discussion; it does not auto-inflate Lawrence base IRR. Promotion requires [HUMAN REVIEW].
 
@@ -12,7 +12,7 @@
 
 | Insider | Date | Shares | Price | Value | Contrib |
 |---------|------|--------|-------|-------|---------|
-| Kirk David Blair | 2026-09-18 | 4176 | $239.3321 | $999450.85 | 2.87 |
+| Kirk David Blair | 2026-09-18 | 4176 | $239.3321 | $999450.85 | 3.47 |
 | Kirk David Blair | 2025-12-17 | 1936 | $258.6375 | $500722.2 | 2.174 |
 | Morfit G Mason | 2025-12-05 | 96000 | $260.58 | $25015680.0 | 1.763 |
 | Harris Parker | 2025-12-02 | 134662 | $161.5 | $21747913.0 | 1.545 |
