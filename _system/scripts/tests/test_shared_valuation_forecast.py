@@ -23,6 +23,23 @@ def sourced_market(**changes):
             'quote': sourced_quote(), **changes}
 
 
+def test_boot_decision_keeps_values_and_expiry_but_details_keep_the_source_proof():
+    from build_dashboard_shards import slim_valuation_decision
+    decision = {'research_return_available': True, 'forward_return_at_price_pct': {'low': 2, 'base': 5, 'high': 9},
+                'value_per_share': {'low': 80, 'base': 110, 'high': 150},
+                'market_sync': {'status': 'verified', 'valid_until': '2026-10-27T20:10:00+00:00',
+                    'share_basis_as_of': '2026-10-26', 'basis_id': 'a'*64,
+                    'latest_report': {'accession': '123', 'source_url': 'https://issuer.test/'+'filing/'*100}}}
+    original = copy.deepcopy(decision)
+    slim = slim_valuation_decision(decision)
+    assert slim['forward_return_at_price_pct'] == decision['forward_return_at_price_pct']
+    assert slim['value_per_share'] == decision['value_per_share']
+    assert slim['market_sync'] == {key: decision['market_sync'][key] for key in ('status', 'valid_until', 'share_basis_as_of')}
+    assert decision == original
+    import json
+    assert len(json.dumps(slim)) < len(json.dumps(decision))-500
+
+
 def model():
     """A small owner-cash proof with scenario rates and excess cash."""
     return {
