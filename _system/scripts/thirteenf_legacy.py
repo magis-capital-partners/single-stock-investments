@@ -161,6 +161,14 @@ def parse_legacy_document(raw):
     if cover.get("table_entry_total") == 0:
         return [], cover
     body = _information_text(raw, full)
+    # The SGML column markers define fixed-width fields. Large values and
+    # quantities can completely fill adjacent columns with no separating
+    # space; those boundaries are still explicitly present in the source.
+    layouts = {
+        tuple(match.start() for match in re.finditer(r"<[SC]>", line))
+        for line in raw.decode("utf-8", errors="replace").splitlines()
+        if re.match(r"\s*<S>\s*<C>", line)
+    }
     # Legacy filers sometimes separate issuer, issue and check-digit groups.
     body = re.sub(
         r"\b([A-Z0-9*@#]{6})[\s-]+([A-Z0-9*@#]{2})[\s-]+([A-Z0-9])(?=\s+\$?\s*[\d,]+)",
@@ -176,7 +184,7 @@ def parse_legacy_document(raw):
     )
     pattern = re.compile(
         r"^(?P<head>.*?)\s+\"?(?P<cusip>(?=[A-Z0-9*@#]*[0-9])[A-Z0-9*@#]{7,9})\"?\s+"
-        r"\$?\s*(?P<value>[\d,]+(?:\.\d*)?)\s+(?P<shares>[\d,]+(?:\.\d*)?)"
+        r"\$?\s*(?P<value>[\d,]+(?:\.\d*)?(?:[Ee][+-]?\d+)?)\s+(?P<shares>[\d,]+(?:\.\d*)?)"
         r"\s*(?P<unit>SHS?|PRN)?(?=\b|X)(?P<tail>.*)$",
         re.IGNORECASE,
     )
@@ -203,7 +211,7 @@ def parse_legacy_document(raw):
             if identifier_first
             else r"^(?P<issuer>.*)\s+(?P<cusip>(?=[A-Z0-9*@#]*[0-9])[A-Z0-9*@#]{7,9})\s+(?P<class>[A-Z*].*?)"
         )
-        + r"\s+(?P<shares>[\d,]+(?:\.\d*)?)\s+(?P<value>[\d,]+(?:\.\d*)?)\s*(?P<unit>SHS?|PRN)\b(?P<tail>.*)$",
+        + r"\s+(?P<shares>[\d,]+(?:\.\d*)?)\s+\$?\s*(?P<value>[\d,]+(?:\.\d*)?(?:[Ee][+-]?\d+)?)\s*(?P<unit>SHS?|PRN)\b(?P<tail>.*)$",
         re.IGNORECASE,
     )
     pending = ""
@@ -211,11 +219,28 @@ def parse_legacy_document(raw):
     lines = body.splitlines()
     index = 0
     while index < len(lines):
-        line = lines[index].strip()
+        physical = lines[index]
+        line = physical.strip()
         index += 1
         if not line:
             continue
         original_line = line
+        if not shares_first and not typed_pattern.match(line):
+            for columns in layouts:
+                if len(columns) < 7:
+                    continue
+                identifier = physical[columns[2] : columns[3]].strip()
+                value = physical[columns[3] : columns[4]].strip()
+                shares = physical[columns[4] : columns[5]].strip()
+                unit = physical[columns[5] : columns[6]].strip()
+                if (
+                    re.fullmatch(r"(?=[A-Z0-9*@#]*[0-9])[A-Z0-9*@#]{7,9}", identifier)
+                    and re.fullmatch(r"[\d,]+(?:\.\d*)?(?:[Ee][+-]?\d+)?", value)
+                    and re.fullmatch(r"[\d,]+(?:\.\d*)?", shares)
+                    and unit in {"SH", "PRN"}
+                ):
+                    line = f"{physical[: columns[2]].rstrip()}  {identifier}  {value}  {shares} {unit} {physical[columns[6] :]}"
+                    break
         if shares_first and (ordered := alternate.match(line)):
             fields = ordered.groupdict()
             head = fields.get("head") or fields["issuer"] + "  " + fields["class"]

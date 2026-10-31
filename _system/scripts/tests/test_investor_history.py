@@ -60,6 +60,18 @@ def test_legacy_typed_identifier_wins_over_numeric_class_annotations():
     assert [r["shares"] for r in rows] == [144815, 5876395, 622600]
 
 
+def test_legacy_fixed_width_fields_recover_adjacent_large_amounts():
+    rows, _ = parse_legacy_document(b"""Table Entry Total: 2
+    <TABLE>NAME OF ISSUER TITLE OF CLASS CUSIP VALUE SHARES
+<S>                      <C>            <C>       <C>      <C>      <C> <C>  <C>     <C>    <C>    <C>    <C>
+BANK OF AMERICA CORP         COMMON     060505104   1805519137794296 SH      DEFINED   01   137794296
+EXXON MOBIL CORP  COM  30231G102  1E+07 182550682 SH SOLE
+    </TABLE>""")
+    assert rows[0]["shares"] == 137794296
+    assert rows[0]["value_usd"] == 1_805_519_000
+    assert rows[1]["value_usd"] == 10_000_000_000
+
+
 def test_legacy_discretion_preserves_as_filed_identifier_without_check_digit_repair():
     rows, _ = parse_legacy_document(b"""Table Entry Total: 1
     <TABLE>NAME  CUSIP  VALUE  SHARES
@@ -301,11 +313,16 @@ def test_public_document_survives_a_later_run_without_network(tmp_path, monkeypa
     assert b"<original>public</original>" in disclosures.public_document(url, path)
 
 
-def test_nport_queries_include_amendments_and_paginate(monkeypatch):
+@pytest.mark.parametrize(
+    ("query", "expression"),
+    [("Global Fund", '"Global Fund"'), (["S0001", "S0002"], '"S0001" OR "S0002"')],
+)
+def test_nport_queries_include_amendments_and_paginate(monkeypatch, query, expression):
     from urllib.parse import parse_qs, urlparse
 
     def search(url):
         parameters = parse_qs(urlparse(url).query)
+        assert parameters["q"] == [expression]
         form = parameters["forms"][0]
         offset = int(parameters["from"][0])
         if offset:
@@ -328,7 +345,7 @@ def test_nport_queries_include_amendments_and_paginate(monkeypatch):
         }
 
     monkeypatch.setattr(disclosures, "get_json", search)
-    assert {row["form"] for row in disclosures.nport_filings("1", "Global Fund")} == {
+    assert {row["form"] for row in disclosures.nport_filings("1", query)} == {
         "NPORT-P",
         "NPORT-P/A",
     }
@@ -811,6 +828,29 @@ def test_deadline_cannot_hide_unvisited_accessions(tmp_path, monkeypatch):
         ]
         == 3
     )
+
+
+def test_cached_manager_does_not_hold_writer_during_the_next_network_request(
+    tmp_path, monkeypatch
+):
+    db = archive.connect(tmp_path / "archive.sqlite")
+    filing = {
+        "accession": "a",
+        "form": "13F-HR",
+        "report_date": "2000-03-31",
+        "filing_date": "2000-05-01",
+        "index_url": "https://www.sec.gov/a",
+    }
+    archive.store_filing(db, {**filing, "manager_id": "example", "cik": "1"})
+
+    def listing(cik, **kwargs):
+        assert not db.in_transaction
+        return [filing]
+
+    monkeypatch.setattr(ownership, "list_13f_filings", listing)
+    archive.backfill_filings(db, [{"manager_id": "example", "cik": "1"}])
+    assert not db.in_transaction
+    db.close()
 
 
 def test_deployment_bundles_retain_distinct_historical_books_and_disclosures(

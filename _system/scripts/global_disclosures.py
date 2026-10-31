@@ -359,11 +359,15 @@ def corpus_disclosures(corpus, universe):
 
 def nport_filings(cik, query=None, *, form="NPORT-P"):
     if query:
+        terms = query if isinstance(query, (list, tuple)) else [query]
+        expression = " OR ".join(
+            '"' + str(term).replace('"', "") + '"' for term in terms
+        )
         found = {}
         offset = 0
         while True:
             params = {
-                "q": f'"{query}"',
+                "q": expression,
                 "forms": form,
                 "ciks": f"{int(cik):010d}",
                 "dateRange": "custom",
@@ -496,7 +500,13 @@ def public_disclosures(sources, *, deadline=None, workers=4):
             continue
         try:
             if source["kind"] == "nport":
-                if source.get("queries"):
+                if source.get("series_ids"):
+                    # A trust can register thousands of unrelated portfolios.
+                    # Series IDs survive fund name changes and identify only
+                    # the verified vehicles; every result is checked again
+                    # against the original XML and adviser appointment dates.
+                    filings = nport_filings(source["cik"], source["series_ids"])
+                elif source.get("queries"):
                     discovered = {}
                     for query in source["queries"]:
                         if deadline and time.monotonic() >= deadline:

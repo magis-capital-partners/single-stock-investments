@@ -564,10 +564,14 @@ def backfill_filings(
                         for filing in filings
                     ],
                 )
-            db.execute(
-                "DELETE FROM filings WHERE accession=?",
-                (f"discovery:{manager['manager_id']}:{cik}",),
-            )
+            # Even a no-op DELETE starts a write transaction. Release it
+            # before the next HTTPS request or an already-loaded book can
+            # hold the SQLite writer while every other worker waits.
+            with db:
+                db.execute(
+                    "DELETE FROM filings WHERE accession=?",
+                    (f"discovery:{manager['manager_id']}:{cik}",),
+                )
             for filing in reversed(filings):
                 if deadline and time.monotonic() >= deadline:
                     break
