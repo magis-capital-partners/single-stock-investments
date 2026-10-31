@@ -28,6 +28,7 @@ jobs:
       SEC_USER_AGENT: ${{ vars.SEC_USER_AGENT }}
       RESEARCH_VAULT_CLONE_TOKEN: ${{ secrets.RESEARCH_VAULT_CLONE_TOKEN }}
       RESEARCH_VAULT_ROOT: _external/research-vault
+      CI_PUSH_NO_THIN: '1'
     steps:
       - uses: actions/checkout@v4
         with:
@@ -46,6 +47,10 @@ jobs:
         with:
           hydrate: 'false'
           include-source-archive: 'false'
+      - name: Keep compressed archive pushes bounded
+        run: |
+          git -C "$RESEARCH_VAULT_ROOT" config pack.window 0
+          git -C "$RESEARCH_VAULT_ROOT" config push.negotiate true
       - name: Restore durable private holdings checkpoint
         run: python _system/scripts/investor_history_checkpoint.py restore --archive "$RESEARCH_VAULT_ROOT/dashboard-private/investor-history"
       - name: Restore selected authorized directory inputs
