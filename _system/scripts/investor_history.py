@@ -754,11 +754,26 @@ def export(db, managers, data=DATA):
     quarters = defaultdict(int)
     failures = []
     published = set()
+    owners = defaultdict(set)
+    for cik, manager_id in cik_map(managers).items():
+        owners[manager_id].add(cik)
+
+    def belongs(record):
+        # A corrected or unlinked identity may leave older cache rows behind.
+        # A matching display ID alone must never attach another filer's book.
+        return (
+            not record["cik"] or str(int(record["cik"])) in owners[record["manager_id"]]
+        )
+
     for manager in managers:
-        records = db.execute(
-            "SELECT * FROM filings WHERE manager_id=? ORDER BY period_end,filed_at,accession",
-            (manager["manager_id"],),
-        ).fetchall()
+        records = [
+            record
+            for record in db.execute(
+                "SELECT * FROM filings WHERE manager_id=? ORDER BY period_end,filed_at,accession",
+                (manager["manager_id"],),
+            )
+            if belongs(record)
+        ]
         periods = defaultdict(list)
         for record in records:
             unknown_amendment = (
@@ -949,9 +964,9 @@ def export(db, managers, data=DATA):
     counts = defaultdict(int)
     manager_ids = {manager["manager_id"] for manager in managers}
     for row in db.execute(
-        "SELECT manager_id,status,count(*) AS count FROM filings GROUP BY manager_id,status"
+        "SELECT manager_id,cik,status,count(*) AS count FROM filings GROUP BY manager_id,cik,status"
     ):
-        if row["manager_id"] in manager_ids:
+        if row["manager_id"] in manager_ids and belongs(row):
             counts[row["status"]] += row["count"]
     discovered = {
         r["cik"] for r in db.execute("SELECT cik FROM discovery WHERE status='loaded'")
@@ -996,7 +1011,7 @@ def export(db, managers, data=DATA):
             for row in db.execute(
                 "SELECT manager_id,cik,error FROM discovery WHERE status='error'"
             )
-            if row["manager_id"] in manager_ids
+            if row["manager_id"] in manager_ids and belongs(row)
         ],
         "downloads": [
             dict(r)

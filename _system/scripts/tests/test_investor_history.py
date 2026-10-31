@@ -574,6 +574,47 @@ def test_history_merges_new_holdings_but_keeps_each_as_filed_record(
     assert index["managers"][0]["history"][1]["positions"] == 0
 
 
+def test_corrected_identity_cannot_inherit_an_old_filers_cached_book(
+    tmp_path, monkeypatch
+):
+    db = archive.connect(tmp_path / "a.sqlite")
+    managers = [
+        {"manager_id": "example", "display_name": "Example", "cik": "1"},
+        {"manager_id": "nonfiler", "display_name": "Non filer"},
+    ]
+    for accession, manager_id, cik in [
+        ("good", "example", "1"),
+        ("stale", "example", "2"),
+        ("unlinked", "nonfiler", "3"),
+    ]:
+        archive.store_filing(
+            db,
+            {
+                "accession": accession,
+                "manager_id": manager_id,
+                "cik": cik,
+                "period_end": "2000-03-31",
+                "filed_at": "2000-05-01",
+                "form": "13F-HR",
+            },
+            [{"cusip": accession, "shares": 1, "value_usd": 1, "sh_prn": "SH"}],
+        )
+    monkeypatch.setattr(ownership, "load_cusip_map", dict)
+    monkeypatch.setattr(ownership, "portfolio_universe", lambda: ([], {}))
+    result = archive.export(db, managers, tmp_path / "data")
+    assert result["filings"]["loaded"] == 1
+    book = json.loads((tmp_path / "data/history/example/2000.json").read_text())[
+        "quarters"
+    ]["2000Q1"]
+    assert [p["cusip"] for p in book["positions"]] == ["good"]
+    index = json.loads((tmp_path / "data/directory_index.json").read_text())
+    assert (
+        next(m for m in index["managers"] if m["manager_id"] == "nonfiler")["history"]
+        == []
+    )
+    assert db.execute("select count(*) from filings").fetchone()[0] == 3
+
+
 def test_nport_keeps_fund_vehicle_currency_and_nav_denominator():
     xml = b"""<edgarSubmission xmlns="http://www.sec.gov/edgar/nport"><genInfo>
     <seriesId>S00001</seriesId><seriesName>Global Equity</seriesName><repPdDate>2020-03-31</repPdDate></genInfo>
