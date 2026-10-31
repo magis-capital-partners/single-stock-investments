@@ -26,6 +26,7 @@ from fund_identity import identity_core
 from investor_history import (
     ARCHIVE,
     OWNERSHIP,
+    cik_map,
     now,
     table,
     write_json,
@@ -281,7 +282,9 @@ def compile_universe(
         else {}
     )
     by_id = {r["manager_id"]: r for r in public}
-    by_cik = {str(int(r["cik"])): r for r in public if r.get("cik")}
+    # A declared former filer is owned by the same canonical manager. Searching
+    # older legal names must not create a second owner for that historical CIK.
+    by_cik = {cik: by_id[owner] for cik, owner in cik_map(public).items()}
     public_candidates = json.loads(roster_path.read_text(encoding="utf-8"))["managers"]
     preferred = {}
     if resolve_public:
