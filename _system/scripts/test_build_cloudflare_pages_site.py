@@ -78,6 +78,56 @@ def test_asset_versions_are_stamped_from_content(tmp_path: Path) -> None:
     assert (site / "index.html").read_text(encoding="utf-8") != first
 
 
+def test_published_buyback_histories_are_bundled_and_old_snapshots_are_omitted(tmp_path: Path) -> None:
+    site = tmp_path / "site"
+    current = "a" * 20
+    retired = "b" * 20
+    _write_json(site / "data" / "buyback_manifest.json", {"snapshot_id": current})
+    first = {"issuer_id": "cik:1", "series": {"actual": [1]}}
+    second = {"issuer_id": "cik:2", "series": {"actual": [2]}}
+    _write_json(site / "data" / "buyback_snapshots" / current / "companies.json", {"companies": []})
+    _write_json(site / "data" / "buyback_snapshots" / current / "details" / "cik_1.json", first)
+    _write_json(site / "data" / "buyback_snapshots" / current / "details" / "cik_2.json", second)
+    _write_json(site / "data" / "buyback_snapshots" / retired / "companies.json", {"companies": ["retired"]})
+    _write_json(site / "data" / "buyback_snapshots" / retired / "details" / "cik_9.json", {"issuer_id": "cik:9"})
+
+    packed = builder.pack_published_buyback_details(site, max_bytes=180)
+
+    assert packed["packed_details"] == 2
+    assert packed["detail_bundles"] == 2
+    assert packed["omitted_snapshots"] == [retired]
+    assert not (site / "data" / "buyback_snapshots" / retired).exists()
+    assert not (site / "data" / "buyback_snapshots" / current / "details").exists()
+    assert (site / "data" / "buyback_snapshots" / current / "companies.json").is_file()
+    mapping = json.loads((site / "data" / "buyback_snapshots" / current / "detail_bundles.json").read_text())
+    assert set(mapping) == {
+        f"buyback_snapshots/{current}/details/cik_1.json",
+        f"buyback_snapshots/{current}/details/cik_2.json",
+    }
+    restored = {}
+    for relative, bundle in mapping.items():
+        body = json.loads((site / "data" / bundle).read_text(encoding="utf-8"))
+        restored[relative] = body["assets"][relative]
+        assert (site / "data" / bundle).stat().st_size <= 180
+    assert restored[f"buyback_snapshots/{current}/details/cik_1.json"] == first
+    assert restored[f"buyback_snapshots/{current}/details/cik_2.json"] == second
+
+
+def test_buyback_detail_names_outside_the_reader_pattern_stop_the_build(tmp_path: Path) -> None:
+    site = tmp_path / "site"
+    current = "c" * 20
+    _write_json(site / "data" / "buyback_manifest.json", {"snapshot_id": current})
+    (site / "data" / "buyback_snapshots" / current / "details").mkdir(parents=True)
+    (site / "data" / "buyback_snapshots" / current / "details" / "notes.txt").write_text("no", encoding="utf-8")
+
+    try:
+        builder.pack_published_buyback_details(site)
+    except RuntimeError as exc:
+        assert "published name pattern" in str(exc)
+    else:
+        raise AssertionError("unexpected detail names were packed")
+
+
 def test_stamping_leaves_missing_assets_alone(tmp_path: Path) -> None:
     site = tmp_path / "site"
     site.mkdir()

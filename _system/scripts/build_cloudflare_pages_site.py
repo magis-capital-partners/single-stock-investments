@@ -36,6 +36,86 @@ ASSET_QUERY_RE = re.compile(
 )
 
 
+_SNAPSHOT_ID = re.compile(r"[a-f0-9]{20}")
+_DETAIL_NAME = re.compile(r"[A-Za-z0-9_-]+\.json")
+
+
+def pack_published_buyback_details(output: Path, *, max_bytes: int = 8 * 1024 * 1024) -> dict:
+    """Ship one snapshot's issuer histories in bounded bundles.
+
+    The reader loads ``detail_bundles.json`` and then the named bundle. Older
+    snapshot directories stay in git for the local dashboard, but Pages only
+    has room for the snapshot named by the published manifest.
+    """
+    manifest_path = output / "data" / "buyback_manifest.json"
+    root = output / "data" / "buyback_snapshots"
+    empty = {"packed_details": 0, "detail_bundles": 0, "omitted_snapshots": []}
+    if not manifest_path.is_file() or not root.is_dir():
+        return empty
+    manifest = json.loads(manifest_path.read_text(encoding="utf-8"))
+    snapshot_id = manifest.get("snapshot_id")
+    if not isinstance(snapshot_id, str) or _SNAPSHOT_ID.fullmatch(snapshot_id) is None:
+        raise RuntimeError("Buyback manifest snapshot id is not a published snapshot")
+    omitted = []
+    for child in sorted(path for path in root.iterdir() if path.is_dir()):
+        if child.name == snapshot_id:
+            continue
+        shutil.rmtree(child)
+        omitted.append(child.name)
+
+    details = root / snapshot_id / "details"
+    if not details.is_dir():
+        return {"packed_details": 0, "detail_bundles": 0, "omitted_snapshots": omitted}
+    paths = sorted(path for path in details.glob("*.json") if path.is_file())
+    unexpected = [path.name for path in details.iterdir() if path.name not in {item.name for item in paths} or _DETAIL_NAME.fullmatch(path.name) is None]
+    if unexpected:
+        raise RuntimeError("Buyback detail directory has files outside the published name pattern")
+
+    def bundle_bytes(assets: dict) -> int:
+        body = json.dumps({"assets": assets}, ensure_ascii=False, separators=(",", ":")).encode("utf-8")
+        return len(body)
+
+    groups: list[dict] = []
+    current: dict = {}
+    for path in paths:
+        relative = f"buyback_snapshots/{snapshot_id}/details/{path.name}"
+        payload = json.loads(path.read_text(encoding="utf-8"))
+        trial = {**current, relative: payload}
+        if bundle_bytes({relative: payload}) > max_bytes:
+            raise RuntimeError(f"Buyback detail exceeds bundle size bound: {relative}")
+        if current and bundle_bytes(trial) > max_bytes:
+            groups.append(current)
+            current = {relative: payload}
+        else:
+            current = trial
+    if current:
+        groups.append(current)
+
+    mapping = {}
+    for group in groups:
+        body = json.dumps({"assets": group}, ensure_ascii=False, separators=(",", ":")).encode("utf-8")
+        if len(body) > max_bytes:
+            raise RuntimeError("Buyback detail bundle exceeds size bound")
+        relative = f"buyback_snapshots/{snapshot_id}/bundles/{hashlib.sha256(body).hexdigest()}.json"
+        target = output / "data" / relative
+        target.parent.mkdir(parents=True, exist_ok=True)
+        target.write_bytes(body)
+        mapping.update(dict.fromkeys(group, relative))
+    (root / snapshot_id / "detail_bundles.json").write_text(
+        json.dumps(mapping, ensure_ascii=False, sort_keys=True),
+        encoding="utf-8",
+    )
+    for path in paths:
+        path.unlink()
+    if not any(details.iterdir()):
+        details.rmdir()
+    return {
+        "packed_details": len(mapping),
+        "detail_bundles": len(groups),
+        "omitted_snapshots": omitted,
+    }
+
+
 def stamp_asset_versions(output: Path) -> int:
     """Rewrite ``?v=`` on local js/css to a hash of each file's own contents.
 
@@ -158,6 +238,7 @@ def build(source: Path, output: Path, max_file_bytes: int = MAX_FILE_BYTES) -> d
     (output / "_headers").write_text(headers, encoding="utf-8")
     # Static data, JS bundles, guessed paths and preview hosts MUST all invoke middleware.
     (output / "_routes.json").write_text(json.dumps({"version": 1, "include": ["/*"], "exclude": []}) + "\n", encoding="utf-8")
+    buyback = pack_published_buyback_details(output)
 
     report = {
         "source": source.as_posix(),
@@ -169,15 +250,21 @@ def build(source: Path, output: Path, max_file_bytes: int = MAX_FILE_BYTES) -> d
         "asset_versions_stamped": stamped,
         "restored_private_assets": len(restored),
         "private_static_paths": sorted(PRIVATE_STATIC_PATHS),
+        "packed_buyback_details": buyback["packed_details"],
+        "buyback_detail_bundles": buyback["detail_bundles"],
+        "omitted_buyback_snapshots": buyback["omitted_snapshots"],
         "excluded": excluded,
     }
     (output / "cloudflare-artifact-manifest.json").write_text(
         json.dumps(report, indent=2) + "\n",
         encoding="utf-8",
     )
+    final_files = sum(1 for path in output.rglob("*") if path.is_file())
     print(
-        f"Cloudflare Pages artifact: {len(included)} files, "
+        f"Cloudflare Pages artifact: {final_files} files, "
         f"{ticker_count} tickers, {len(excluded)} oversized/control files omitted, "
+        f"{buyback['packed_details']} buyback histories in {buyback['detail_bundles']} bundles, "
+        f"{len(buyback['omitted_snapshots'])} unpublished buyback snapshots omitted, "
         f"{stamped} asset versions content-stamped"
     )
     return report

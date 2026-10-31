@@ -40,8 +40,27 @@
     if (!r.ok) throw new Error('Buyback data unavailable (' + r.status + ')');
     return r.json();
   }
+  function historyBundle(snapshotId, bundle) {
+    return typeof bundle === 'string'
+      && bundle === 'buyback_snapshots/' + snapshotId + '/bundles/' + bundle.slice(bundle.lastIndexOf('/') + 1)
+      && /^buyback_snapshots\/[a-f0-9]{20}\/bundles\/[a-f0-9]{64}\.json$/.test(bundle);
+  }
+  async function loadDetail(ref) {
+    if (!/^buyback_snapshots\/[a-f0-9]{20}\/details\/[A-Za-z0-9_-]+\.json$/.test(ref)) throw new Error('Invalid history reference');
+    var snapshotId = ref.split('/')[1], mapKey = 'buyback_snapshots/' + snapshotId + '/detail_bundles.json';
+    if (!state.bundleMaps) state.bundleMaps = new Map();
+    if (!state.bundleMaps.has(mapKey)) state.bundleMaps.set(mapKey, json(mapKey).catch(function() { return null; }));
+    var map = await state.bundleMaps.get(mapKey), bundle = map && map[ref];
+    if (!bundle) return json(ref);
+    if (!historyBundle(snapshotId, bundle)) throw new Error('Invalid history bundle');
+    if (!state.packed) state.packed = new Map();
+    if (!state.packed.has(bundle)) state.packed.set(bundle, json(bundle));
+    var packed = await state.packed.get(bundle), detail = packed && packed.assets && packed.assets[ref];
+    if (!detail) throw new Error('History bundle is missing this issuer');
+    return detail;
+  }
   async function load(force, retry) {
-    if (force) { state.promise = null; state.snapshot = null; state.details.clear(); }
+    if (force) { state.promise = null; state.snapshot = null; state.details.clear(); state.bundleMaps = null; state.packed = null; }
     if (!state.promise) state.promise = (async function() {
       try {
         var manifest = await json('buyback_manifest.json');
@@ -191,8 +210,7 @@
       host.dataset.loaded = 'true';
       if (!b || !b.detail_ref) { host.textContent = 'Normalized history is unavailable. ' + label(b && b.data_reason); continue; }
       try {
-        if (!/^buyback_snapshots\/[a-f0-9]{20}\/details\/[A-Za-z0-9_-]+\.json$/.test(b.detail_ref)) throw new Error('Invalid history reference');
-        if (!state.details.has(b.detail_ref)) state.details.set(b.detail_ref,json(b.detail_ref));
+        if (!state.details.has(b.detail_ref)) state.details.set(b.detail_ref, loadDetail(b.detail_ref));
         var d = await state.details.get(b.detail_ref);
         if (d.snapshot_id !== b.snapshot_id || d.issuer_id !== b.issuer_id) throw new Error('History does not match the selected snapshot');
         if (!host.isConnected) continue;

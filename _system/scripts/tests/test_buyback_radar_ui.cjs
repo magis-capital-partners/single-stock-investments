@@ -154,3 +154,44 @@ test('workspace routes retain a legacy Buyback focus in the Business view',()=>{
  let last; const c={activeView:'holdings',researchScope:'coverage',selected:'TEST',ResearchWorkspace:{activeTab:()=> 'business'},location:{hash:'#/research/coverage/TEST?section=buyback'},URLSearchParams,setAppHash:value=>{last=value;}};
  vm.createContext(c);vm.runInContext(routeFunction('syncRouteHash'),c);c.syncRouteHash();assert.equal(last,'#/research/coverage/TEST?section=business&focus=buyback');
 });
+
+function historyHost(){
+ const host={dataset:{},isConnected:true,innerHTML:'',textContent:'',closest(){return {dataset:{bbTicker:'TEST'},open:false,scrollIntoView(){}};}};
+ return host;
+}
+function withHistory(h,host){
+ h.context.document={querySelectorAll(sel){return sel==='[data-bb-history]'?[host]:[];}};
+}
+test('share history reads the published bundle and not the loose detail file',async()=>{
+ const docs=fixture(), ref=prefix+'details/cik_1.json', bundle=prefix+'bundles/'+'ab'.repeat(32)+'.json';
+ docs[prefix+'detail_bundles.json']={[ref]:bundle};
+ docs[bundle]={assets:{[ref]:docs[ref]}};
+ delete docs[ref];
+ const h=harness(docs), host=historyHost();
+ withHistory(h,host);
+ await h.api.load();
+ await h.api.hydrateAll();
+ assert.match(host.innerHTML,/Actual outstanding shares/);
+ assert.ok(h.calls.some(x=>x.endsWith('/detail_bundles.json')));
+ assert.ok(h.calls.some(x=>x.includes('/bundles/')));
+ assert.ok(!h.calls.some(x=>x.includes('/details/')));
+});
+test('share history still reads a loose detail when no bundle map is published',async()=>{
+ const h=harness(), host=historyHost();
+ withHistory(h,host);
+ await h.api.load();
+ await h.api.hydrateAll();
+ assert.match(host.innerHTML,/Actual outstanding shares/);
+ assert.ok(h.calls.some(x=>x.includes('/details/cik_1.json')));
+});
+test('a bundle path outside the snapshot is never fetched',async()=>{
+ const docs=fixture(), ref=prefix+'details/cik_1.json';
+ docs[prefix+'detail_bundles.json']={[ref]:'../private.json'};
+ delete docs[ref];
+ const h=harness(docs), host=historyHost();
+ withHistory(h,host);
+ await h.api.load();
+ await h.api.hydrateAll();
+ assert.match(host.textContent,/Invalid history bundle/);
+ assert.ok(!h.calls.some(x=>x.includes('private')));
+});
