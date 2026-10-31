@@ -24,6 +24,11 @@ jobs:
           fetch-depth: 1
       - name: Checkout research vault
         uses: ./.github/actions/checkout-vault
+        with:
+          # Forecasts and total-return inputs live in this repo and on the
+          # price vendor. The vault checkout only hydrates private snapshots
+          # for the publication guard.
+          publication-only: "true"
       - uses: actions/setup-python@v5
         with:
           python-version: "3.12"
@@ -46,6 +51,7 @@ jobs:
       - name: Commit forecasts, observations, and monitoring
         uses: ./.github/actions/commit-main
         with:
+          preserve-company-cache: "false"
           message: "chore(epistemic): refresh committee outcome loop"
           git_add: >-
             _system/research/committee_forecasts.jsonl
