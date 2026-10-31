@@ -782,6 +782,10 @@ def backfill_parallel(database, managers, *, workers=2, before=None, deadline=No
 def export(db, managers, data=DATA):
     from ownership_common import load_cusip_map, portfolio_universe
 
+    if data.resolve() == (ROOT / "dashboard/data/holdings").resolve():
+        from private_dashboard_assets import restore_managed_input
+
+        restore_managed_input(ROOT / "dashboard", "data/holdings/directory_index.json", include_missing=True)
     symbols = load_cusip_map()
     _universe, names = portfolio_universe()
     index = []

@@ -62,6 +62,68 @@ def test_public_snapshot_is_an_allowlist_even_for_unknown_extract_fields():
     assert "secret" not in json.dumps(clean) and "verbatim" not in json.dumps(clean)
 
 
+def test_explicit_missing_input_restore_preserves_verified_source_and_other_assets(workspace):
+    root, source, vault = workspace
+    relative = "data/holdings/directory_index.json"
+    path = source / relative
+    original = {"fund_ids": ["private-fund"], "managers": []}
+    write(path, original)
+    other = source / "data/other.json"
+    write(other, {"fund": "Other private source"})
+    migration.migrate(root, paths=["dashboard/" + relative, "dashboard/data/other.json"])
+    receipt = assets.overlay_manifest(source)["assets"][relative]
+    path.unlink()  # The generated, ignored index is absent in a fresh checkout.
+    assert assets.restore_managed_input(source, relative) == 0
+    assert not path.exists()
+    assert assets.restore_managed_input(source, relative, include_missing=True) == 1
+    assert json.loads(path.read_text()) == original
+    assert json.loads(other.read_text())["private_snapshot"] is True
+    write(path, {**original, "updated": True})
+    # An already restored build input keeps legitimate edits on a second pass.
+    assert assets.restore_managed_input(source, relative, include_missing=True) == 0
+    migration.migrate(root, paths=["dashboard/" + relative])
+    assert json.loads(assets.private_source(source, relative).read_text())["updated"]
+    assert assets.digest(assets.private_object(vault, receipt["private_sha256"])) == receipt["private_sha256"]
+
+
+def test_missing_input_restore_requires_valid_private_bytes(workspace):
+    _, source, vault = workspace
+    relative = "data/holdings/directory_index.json"
+    path = source / relative
+    write(path, {"fund_ids": ["private-fund"]})
+    migration.migrate(source.parent, paths=["dashboard/" + relative])
+    receipt = assets.overlay_manifest(source)["assets"][relative]
+    path.unlink()
+    assets.private_object(vault, receipt["private_sha256"]).write_text("corrupt")
+    with pytest.raises(RuntimeError, match="mismatched"):
+        assets.restore_managed_input(source, relative, include_missing=True)
+    assert not path.exists()
+
+
+def test_cold_investor_export_can_publish_a_managed_ignored_directory(workspace, monkeypatch):
+    import global_disclosures as disclosures
+    import investor_history as history
+    import ownership_common as ownership
+
+    root, source, _ = workspace
+    data = source / "data/holdings"
+    path = data / "directory_index.json"
+    write(path, {"fund_ids": ["old-source"], "managers": []})
+    migration.migrate(root, paths=["dashboard/data/holdings/directory_index.json"])
+    path.unlink()
+    monkeypatch.setattr(history, "ROOT", root)
+    monkeypatch.setattr(disclosures, "ROOT", root)
+    monkeypatch.setattr(ownership, "load_cusip_map", dict)
+    monkeypatch.setattr(ownership, "portfolio_universe", lambda: (set(), {}))
+    db = history.connect(root / "archive.sqlite")
+    history.export(db, [], data)
+    universe = {"managers": [{"manager_id": "example", "display_name": "Example"}], "source_ids": {"private-fund": "example"}}
+    disclosures.publish([], universe, data=data, save_archive=False)
+    restored = json.loads(assets.private_source(source, "data/holdings/directory_index.json").read_text())
+    assert restored["managers"][0]["fund_ids"] == ["private-fund"]
+    assert "private-fund" not in path.read_text()
+
+
 def test_changed_public_snapshot_cannot_replace_private_copy(workspace):
     root, source, vault = workspace
     path = source / "data/letter.json"
@@ -73,6 +135,8 @@ def test_changed_public_snapshot_cannot_replace_private_copy(workspace):
         migration.migrate(root, paths=[])
     with pytest.raises(RuntimeError, match="changed"):
         assets.private_source(source, "data/letter.json")
+    with pytest.raises(RuntimeError, match="changed"):
+        assets.restore_managed_input(source, "data/letter.json", include_missing=True)
     assert "source_file" in json.loads(private.read_text())
 
 

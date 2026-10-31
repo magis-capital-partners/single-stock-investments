@@ -202,6 +202,36 @@ def private_source(source: Path, relative: str, manifest: dict | None = None) ->
     return private
 
 
+def restore_managed_input(source: Path, relative: str, *, include_missing=False) -> int:
+    """Restore one explicitly selected build input, retaining its write receipt."""
+    public = source / safe_relative(relative)
+    manifest = overlay_manifest(source)
+    entry = manifest.get("assets", {}).get(relative)
+    if not entry or (not public.exists() and not include_missing):
+        return 0
+    if public.exists() and not public.is_file():
+        raise RuntimeError(f"Managed dashboard input is not a file: {relative}")
+    vault = research_vault_root()
+    if vault is None:
+        raise RuntimeError(f"Private research vault required to restore {relative}")
+    private = private_object(vault, entry["private_sha256"])
+    if not private.is_file() or digest(private) != entry["private_sha256"]:
+        raise RuntimeError(f"Private snapshot is missing or mismatched: {relative}")
+    state = hydration_state(source.parent)
+    key = source.name + "/" + relative
+    if public.is_file():
+        if state.get(key) == entry["private_sha256"] and digest(public) != entry["public_sha256"]:
+            return 0  # This verified input already contains the build's edits.
+        private = private_source(source, relative, manifest)
+    changed = private != public
+    if changed:
+        public.parent.mkdir(parents=True, exist_ok=True)
+        restore_copy(private, public, source.parent)
+    state[key] = entry["private_sha256"]
+    write_hydration(source.parent, state)
+    return int(changed)
+
+
 def hydrate(source: Path) -> int:
     import shutil
     manifest = overlay_manifest(source)
