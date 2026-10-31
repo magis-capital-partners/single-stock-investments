@@ -30,6 +30,11 @@ jobs:
           fetch-depth: 1
       - name: Checkout research vault
         uses: ./.github/actions/checkout-vault
+        with:
+          # In-repo memory and graph files are the inputs. The vault checkout
+          # only hydrates private snapshots so the publication guard can redact
+          # them again before the push.
+          publication-only: "true"
       - uses: actions/setup-python@v5
         with:
           python-version: "3.12"
@@ -69,6 +74,7 @@ jobs:
       - name: Commit disposition truth, queue, and loop status
         uses: ./.github/actions/commit-main
         with:
+          preserve-company-cache: "false"
           message: "chore(memory): daily canonical triage and routing"
           git_add: >-
             _system/memory/triage_events.jsonl

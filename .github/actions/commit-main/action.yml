@@ -9,12 +9,18 @@ inputs:
     description: Arguments to git add
     required: false
     default: "-A"
+  preserve-company-cache:
+    description: Forwarded to preserve-private-dashboard. False leaves the extraction archive on its own lane.
+    required: false
+    default: "true"
 
 runs:
   using: composite
   steps:
     - name: Preserve restricted dashboard sources before public staging
       uses: ./.github/actions/preserve-private-dashboard
+      with:
+        preserve-company-cache: ${{ inputs.preserve-company-cache }}
 
     - name: Stage and push
       shell: bash

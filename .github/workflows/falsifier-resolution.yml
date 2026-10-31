@@ -26,6 +26,10 @@ jobs:
           fetch-depth: 0
       - name: Checkout research vault
         uses: ./.github/actions/checkout-vault
+        with:
+          # Evidence is SEC companyfacts and in-repo falsifier files. The vault
+          # checkout only hydrates private snapshots for the publication guard.
+          publication-only: "true"
       - uses: actions/setup-python@v5
         with:
           python-version: "3.12"
@@ -93,6 +97,7 @@ jobs:
         id: commit
         uses: ./.github/actions/commit-main
         with:
+          preserve-company-cache: "false"
           message: |
             chore(epistemic): daily evidence resolution and control-plane refresh
 
