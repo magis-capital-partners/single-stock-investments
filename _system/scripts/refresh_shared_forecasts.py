@@ -13,7 +13,7 @@ from datetime import datetime, timezone
 from functools import lru_cache
 from pathlib import Path
 
-from atomic_io import semantic_json_sha256, write_json_if_changed
+from atomic_io import semantic_json_sha256, write_json_if_changed, write_text_if_changed
 from build_dashboard_shards import (
     shard_filename,
     slim_ticker_row,
@@ -342,7 +342,9 @@ def publish(root, companies, as_of, evaluated_at=None):
         write_json_if_changed(path, detail, indent=None)
     core.setdefault('summary', {})['shared_valuation_forecasts'] = summary
     core['tickers'] = [slim_ticker_row(row) for row in core['tickers']]
-    write_json_if_changed(core_path, core, indent=None)
+    # This boot payload has a fixed byte budget. indent=None still inserts
+    # spaces; also repair formatting-only drift when the JSON data is equal.
+    write_text_if_changed(core_path, json.dumps(core, separators=(',', ':'), ensure_ascii=False))
     _universe.cache_clear()
     # Some build lanes still consume the monolithic bundle before sharding.
     bundle_path = root/'dashboard/data/dashboard_data.json'

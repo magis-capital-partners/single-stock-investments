@@ -97,6 +97,19 @@ def test_a_manual_component_model_cannot_bypass_an_unresolved_issuer_review(tmp_
     assert after['audit_only_forward_irr_pct'] == before['forward_irr_pct']
 
 
+def test_refresh_keeps_boot_json_compact_even_when_only_formatting_changes(tmp_path):
+    import refresh_shared_forecasts as refresh
+    fixture(tmp_path, ratio=1)
+    path = tmp_path/'dashboard/data/core.json'
+    for attempt in range(2):
+        if attempt:
+            path.write_text(json.dumps(json.loads(path.read_bytes()), ensure_ascii=False)+'\n', encoding='utf-8')
+        refresh.run(tmp_path, '2026-10-26', collect=False)
+        raw = path.read_bytes()
+        compact = (json.dumps(json.loads(raw), separators=(',', ':'), ensure_ascii=False)+'\n').encode()
+        assert raw == compact
+
+
 def test_restated_observations_are_not_adjusted_twice(tmp_path):
     original = fixture(tmp_path)
     once = calculate('BKNG', tmp_path, '2026-10-26')
