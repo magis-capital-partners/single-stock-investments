@@ -8,7 +8,7 @@ from html.parser import HTMLParser
 
 from thirteenf_core import parse_amount
 
-PARSER_VERSION = "legacy-8"
+PARSER_VERSION = "legacy-9"
 
 
 class LegacyParseError(ValueError):
@@ -86,7 +86,7 @@ def _information_text(raw, full):
     started = False
     for block in tables:
         text = plain_text(block)
-        if re.search(r"\bCUSIP\b", text, re.IGNORECASE):
+        if re.search(r"(?:\b|_)CUSIP\b", text, re.IGNORECASE):
             started = True
         if started or re.search(
             r"\b[A-Z0-9*@#]{7,9}\s+[\d,]+\s+[\d,]+\s+(?:SH|PRN)\b", text, re.IGNORECASE
@@ -94,13 +94,23 @@ def _information_text(raw, full):
             selected.append(text)
     if selected:
         return "\n".join(selected)
-    heading = re.search(r"(?im)^.*\bCUSIP\b.*$", full)
+    heading = re.search(r"(?im)^.*(?:\b|_)CUSIP\b.*$", full)
     if heading:
         return full[heading.start() :]
-    # Some minimal electronic reports omit column headings. An explicit entry
-    # count and typed stock rows are still required; cover-page dates are not rows.
+    # Headerless originals need an explicit count or multiple typed holdings.
+    # Dates and numeric cover-page fields cannot establish a table by themselves.
     if re.search(r"Table Entry Total", full, re.IGNORECASE):
         return full
+    typed_rows = list(
+        re.finditer(
+            r"(?im)^[^\n]{1,300}?[ \t]+(?=[A-Z0-9*@#]*[0-9])[A-Z0-9*@#]{7,9}[ \t]+"
+            r"[\d,]+(?:\.\d*)?\s+[\d,]+(?:\.\d*)?\s+(?:SHS?|PRN)\s+"
+            r"(?:SOLE|SHARED|DEFINED|OTHER|DFND)\b",
+            full,
+        )
+    )
+    if len(typed_rows) >= 2:
+        return full[typed_rows[0].start() :]
     raise LegacyParseError(
         "Legacy table requires review: information-table header is missing", raw
     )
@@ -205,6 +215,12 @@ def parse_legacy_document(raw):
     # the identifier either first or between the issuer and security class.
     shares_first = bool(re.search(r"\bSHARES\b[^\n]*\bMV\b", body, re.IGNORECASE))
     identifier_first = bool(re.search(r"(?im)^\s*CUSIP\s+SECURITY DESCRIPTION", body))
+    class_after_identifier = bool(
+        re.search(
+            r"(?im)^.*(?:ISSUER|SECURITY DESCRIPTION).*\bCUSIP\b.*\b(?:CLASS|TITLE)\b",
+            body,
+        )
+    )
     alternate = re.compile(
         (
             r"^(?P<cusip>(?=[A-Z0-9*@#]*[0-9])[A-Z0-9*@#]{7,9})\s+(?P<head>.*?)"
@@ -212,6 +228,12 @@ def parse_legacy_document(raw):
             else r"^(?P<issuer>.*)\s+(?P<cusip>(?=[A-Z0-9*@#]*[0-9])[A-Z0-9*@#]{7,9})\s+(?P<class>[A-Z*].*?)"
         )
         + r"\s+(?P<shares>[\d,]+(?:\.\d*)?)\s+\$?\s*(?P<value>[\d,]+(?:\.\d*)?(?:[Ee][+-]?\d+)?)\s*(?P<unit>SHS?|PRN)\b(?P<tail>.*)$",
+        re.IGNORECASE,
+    )
+    value_first_alternate = re.compile(
+        r"^(?P<issuer>.*?)\s+(?P<cusip>(?=[A-Z0-9*@#]*[0-9])[A-Z0-9*@#]{7,9})\s+"
+        r"(?P<class>[A-Z*].*?)\s+\$?\s*(?P<value>[\d,]+(?:\.\d*)?(?:[Ee][+-]?\d+)?)\s+"
+        r"(?P<shares>[\d,]+(?:\.\d*)?)\s*(?P<unit>SHS?|PRN)\b(?P<tail>.*)$",
         re.IGNORECASE,
     )
     pending = ""
@@ -245,8 +267,14 @@ def parse_legacy_document(raw):
             fields = ordered.groupdict()
             head = fields.get("head") or fields["issuer"] + "  " + fields["class"]
             line = f"{head}  {ordered['cusip']}  {ordered['value']}  {ordered['shares']} {ordered['unit']} {ordered['tail']}"
+        elif (
+            not shares_first
+            and class_after_identifier
+            and (ordered := value_first_alternate.match(line))
+        ):
+            line = f"{ordered['issuer']}  {ordered['class']}  {ordered['cusip']}  {ordered['value']}  {ordered['shares']} {ordered['unit']} {ordered['tail']}"
         if re.search(
-            r"\bCUSIP\b|Column\s+\d|Name\s+of\s+Issuer|Title\s+of|Thousands|Voting\s+Authority|REPORT\s+SUMMARY.*DATA\s+RECORDS",
+            r"(?:\b|_)CUSIP\b|Column\s+\d|Name\s+of\s+Issuer|Title\s+of|Thousands|Voting\s+Authority|REPORT\s+SUMMARY.*DATA\s+RECORDS",
             line,
             re.IGNORECASE,
         ) and not typed_pattern.match(line):
@@ -285,7 +313,14 @@ def parse_legacy_document(raw):
         if not match and (unvalued := missing_value.match(line)):
             match = {**unvalued.groupdict(), "value": None}
         if not match:
-            if re.search(r"\b(?=[A-Z0-9*@#]*[0-9])[A-Z0-9*@#]{7,9}\s+[\d,]+", line):
+            if re.search(
+                r"\b(?=[A-Z0-9*@#]*[0-9])[A-Z0-9*@#]{7,9}\s+[\d,]+", line
+            ) or re.search(
+                r"\S{1,80}[ \t]+[\d,]+(?:\.\d*)?\s+[\d,]+(?:\.\d*)?\s+"
+                r"(?:SHS?|PRN)\s+(?:SOLE|SHARED|DEFINED|OTHER|DFND)\b",
+                line,
+                re.IGNORECASE,
+            ):
                 candidates.append(line)
                 pending = ""
             elif (

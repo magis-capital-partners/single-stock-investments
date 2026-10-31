@@ -234,6 +234,49 @@ def test_legacy_unreadable_table_is_not_an_empty_portfolio():
         parse_legacy_document(b"<TABLE>unrecognized format</TABLE>")
 
 
+def test_legacy_headerless_typed_rows_preserve_original_identifiers():
+    # Acadian, 2000Q4: the electronic original has no table headings.
+    rows, _ = parse_legacy_document(b"""CONFORMED PERIOD OF REPORT: 20001231
+ADVANTA CORP\tCL A\t00794210\t201\t22800\tSH\t Sole\t22800\t0\t0
+AFLAC INSURANCE\tCOM\t00105510\t318\t4400\tSH\t Sole\t4400\t0\t0
+""")
+    assert [(r["cusip"], r["shares"], r["value_usd"]) for r in rows] == [
+        ("00794210", 22800, 201000),
+        ("00105510", 4400, 318000),
+    ]
+
+
+def test_legacy_identifier_then_class_then_value_uses_header_order():
+    # Alkeon, 2004Q2: value precedes shares, but class follows the identifier.
+    rows, _ = parse_legacy_document(b"""<TABLE>
+ISSUER NAME              CUSIP      CLASS       (X $1000)  PRN AMT
+ACTIVISION INC NEW       004930202  COM NEW     8,784      552,430 SH SHARED 1
+ADV MICRO DEVICES INC    7903907    OPTIONS - CALL 148     7,422 SH CALL SOLE
+</TABLE>""")
+    assert rows[0]["issuer"] == "ACTIVISION INC NEW"
+    assert rows[0]["title_of_class"] == "COM NEW"
+    assert rows[0]["value_usd"] == 8784000
+    assert rows[0]["shares"] == 552430
+    assert rows[1]["put_call"] == "CALL"
+
+
+@pytest.mark.parametrize("heading", ["Name of Issuer  Title of Class ID_CUSIP (x$1000) Shares", "ID_CUSIP VALUE SHARES"])
+def test_legacy_prefixed_cusip_header_is_a_table_heading(heading):
+    rows, _ = parse_legacy_document((heading + "\nAgrium Inc  Common Share  008916108  10,985  500000 YES None Sole\n").encode())
+    assert rows[0]["cusip"] == "008916108"
+    assert rows[0]["value_usd"] == 10985000
+    assert rows[0]["issuer"] == "Agrium Inc"
+
+
+def test_headerless_unrecognized_typed_row_keeps_book_partial():
+    with pytest.raises(ValueError, match="unmatched=1") as failure:
+        parse_legacy_document(b"""APPLE INC  COM  037833100  100 20 SH SOLE
+ALPHABET INC  CL A  02079K305  200 30 SH SOLE
+UNRESOLVED INC  COM  UNKNOWN  300 40 SH SOLE
+""")
+    assert len(failure.value.partial_rows) == 2
+
+
 def test_legacy_typed_identifier_wins_over_numeric_class_annotations():
     rows, _ = parse_legacy_document(b"""Table Entry Total: 3
     <TABLE>NAME  CLASS  CUSIP  VALUE  SHARES
