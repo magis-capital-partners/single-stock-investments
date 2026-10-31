@@ -14,6 +14,10 @@ inputs:
     description: Include the complete extraction archive. Test fixtures can omit it while retaining all originals and dashboard snapshots.
     required: false
     default: "true"
+  include-investor-history:
+    description: Include the immutable investor holdings checkpoint for refresh or deployment.
+    required: false
+    default: "false"
 
 runs:
   using: composite
@@ -36,10 +40,11 @@ runs:
         path: _external/research-vault
         token: ${{ env.RESEARCH_VAULT_CLONE_TOKEN }}
         fetch-depth: 1
-        filter: ${{ inputs.include-source-archive == 'false' && 'blob:none' || '' }}
+        filter: ${{ (inputs.include-source-archive == 'false' || inputs.include-investor-history != 'true') && 'blob:none' || '' }}
         sparse-checkout: |
-          ${{ inputs.include-source-archive == 'false' && '/*' || '' }}
+          ${{ (inputs.include-source-archive == 'false' || inputs.include-investor-history != 'true') && '/*' || '' }}
           ${{ inputs.include-source-archive == 'false' && '!/dashboard-private/company-source-backfill-v2/' || '' }}
+          ${{ inputs.include-investor-history != 'true' && '!/dashboard-private/investor-history/' || '' }}
         sparse-checkout-cone-mode: false
 
     - name: Export RESEARCH_VAULT_ROOT
