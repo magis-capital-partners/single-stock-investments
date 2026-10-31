@@ -195,6 +195,16 @@ positive return. The author remains blind to the current price.
     may change capitalization rates only with a distinct, supported pricing-risk
     mechanism; explain interaction with adverse cash flows to avoid duplicate risk.
 
+Conservatism is not evidence. Do not make every case share an unexplained short
+growth runway, exclude usable committed facilities without an access mechanism,
+or repay long-dated debt at the holding date merely to avoid a refinancing
+judgment. Explain competitive fade separately from the holding horizon. Consider
+both longer persistence and faster erosion when primary evidence supports those
+competing explanations; neither a positive return nor a particular duration is
+required. Reconcile cash conversion numerically before separately charging
+customer funding, maintenance, compensation or other investment. Freeze at least
+one relevant cash/capital outcome when it tests a major uncertain operating driver.
+
 Add top-level `economic_analysis` with:
 
     {
