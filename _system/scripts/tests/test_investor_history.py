@@ -48,6 +48,48 @@ def test_legacy_unreadable_table_is_not_an_empty_portfolio():
         parse_legacy_document(b"<TABLE>unrecognized format</TABLE>")
 
 
+def test_legacy_typed_identifier_wins_over_numeric_class_annotations():
+    rows, _ = parse_legacy_document(b"""Table Entry Total: 3
+    <TABLE>NAME  CLASS  CUSIP  VALUE  SHARES
+    D FALCONBRIDGE LTD  NEW2005  306104100  5076  144815 SH DEFINED
+    D LIBERTY MEDIA CORP SEE 53071MCOM  530718105  48245  5876395 SH DEFINED
+    GABLES RESIDENTIAL TR  SH BN IN  362418105  18429  622600SHX 546350 0 76250
+    S REPORT SUMMARY 3 DATA RECORDS 71750 0 OTHER MANAGERS
+    </TABLE>""")
+    assert [r["cusip"] for r in rows] == ["306104100", "530718105", "362418105"]
+    assert [r["shares"] for r in rows] == [144815, 5876395, 622600]
+
+
+def test_legacy_discretion_preserves_as_filed_identifier_without_check_digit_repair():
+    rows, _ = parse_legacy_document(b"""Table Entry Total: 1
+    <TABLE>NAME  CUSIP  VALUE  SHARES
+    MCI Worldcom Inc.  58268B106  8528 96304 Sole Sole
+    </TABLE>""")
+    assert rows[0]["cusip"] == "58268B106"
+    assert rows[0]["shares"] == 96304
+
+
+@pytest.mark.parametrize("identifier_first", [False, True])
+def test_legacy_reordered_columns_follow_reported_header(identifier_first):
+    heading = (
+        "CUSIP SECURITY DESCRIPTION CLASS SHARES MV(*1000)"
+        if identifier_first
+        else "SECURITY DESCRIPTION CUSIP CLASS SHARES MV(*1000)"
+    )
+    line = (
+        "000400101  ABC Bancorp  COM  84490 1083 SH Sole"
+        if identifier_first
+        else "ABC Bancorp  000400101  COM  84490 1083 SH Sole"
+    )
+    rows, _ = parse_legacy_document(
+        f"Table Entry Total: 1\n<TABLE>{heading}\n{line}\n</TABLE>".encode()
+    )
+    assert rows[0]["issuer"] == "ABC Bancorp"
+    assert rows[0]["cusip"] == "000400101"
+    assert rows[0]["shares"] == 84490
+    assert rows[0]["value_usd"] == 1_083_000
+
+
 def test_partial_original_rows_remain_available_without_invented_portfolio_weights(
     tmp_path, monkeypatch
 ):

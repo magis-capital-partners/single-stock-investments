@@ -65,7 +65,12 @@ jobs:
         uses: ./.github/actions/commit-vault
         with:
           message: 'Preserve resumable investor holdings history'
-          git_add: 'dashboard-private/investor-history'
+          git_add: >-
+            dashboard-private/investor-history
+            dashboard-private/objects
+            dashboard-private/manifest.json
+            dashboard-private/migration-journal.jsonl
+            dashboard-private/.gitattributes
       - name: Publish dated holdings and coverage
         if: steps.history.outcome == 'success'
         uses: ./.github/actions/commit-main
@@ -75,6 +80,8 @@ jobs:
             _system/reference/market-data/ownership/managers.json
             _system/reference/investors/
             dashboard/data/holdings/
+            dashboard/private-assets.json
+            .gitattributes
       - name: Report a failed source processing run
         if: steps.history.outcome == 'failure'
         run: exit 1

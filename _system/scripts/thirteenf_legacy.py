@@ -8,7 +8,7 @@ from html.parser import HTMLParser
 
 from thirteenf_core import parse_amount
 
-PARSER_VERSION = "legacy-7"
+PARSER_VERSION = "legacy-8"
 
 
 class LegacyParseError(ValueError):
@@ -131,7 +131,7 @@ def _primary(full, rows):
         re.IGNORECASE,
     )
     total = re.search(
-        r"(?:Information Table Value Total|Table Value Total)\s*:?\s*\$?\s*([\d,]+)",
+        r"(?:Information Table Value Total|Table Value Total|Information Table Total Value)\s*:?\s*\$?\s*([\d,]+)",
         full,
         re.IGNORECASE,
     )
@@ -177,16 +177,33 @@ def parse_legacy_document(raw):
     pattern = re.compile(
         r"^(?P<head>.*?)\s+\"?(?P<cusip>(?=[A-Z0-9*@#]*[0-9])[A-Z0-9*@#]{7,9})\"?\s+"
         r"\$?\s*(?P<value>[\d,]+(?:\.\d*)?)\s+(?P<shares>[\d,]+(?:\.\d*)?)"
-        r"\s*(?P<unit>SHS?|PRN)?\b(?P<tail>.*)$",
+        r"\s*(?P<unit>SHS?|PRN)?(?=\b|X)(?P<tail>.*)$",
         re.IGNORECASE,
     )
     strong_pattern = re.compile(
         pattern.pattern.replace("(?=[A-Z0-9*@#]*[0-9])", "(?=[A-Z0-9*@#]{0,5}[0-9])"),
         re.IGNORECASE,
     )
+    typed_pattern = re.compile(
+        pattern.pattern.replace("(?P<unit>SHS?|PRN)?", "(?P<unit>SHS?|PRN)"),
+        re.IGNORECASE,
+    )
     rows, candidates = [], []
     missing_value = re.compile(
         r"^(?P<head>.*?)\s+(?P<cusip>(?=[A-Z0-9*@#]*[0-9])[A-Z0-9*@#]{7,9})\s{10,}(?P<shares>[\d,]+(?:\.\d*)?)\s+(?P<unit>SHS?|PRN)\b(?P<tail>.*)$",
+        re.IGNORECASE,
+    )
+    # Some legacy reports explicitly put shares before market value, with
+    # the identifier either first or between the issuer and security class.
+    shares_first = bool(re.search(r"\bSHARES\b[^\n]*\bMV\b", body, re.IGNORECASE))
+    identifier_first = bool(re.search(r"(?im)^\s*CUSIP\s+SECURITY DESCRIPTION", body))
+    alternate = re.compile(
+        (
+            r"^(?P<cusip>(?=[A-Z0-9*@#]*[0-9])[A-Z0-9*@#]{7,9})\s+(?P<head>.*?)"
+            if identifier_first
+            else r"^(?P<issuer>.*)\s+(?P<cusip>(?=[A-Z0-9*@#]*[0-9])[A-Z0-9*@#]{7,9})\s+(?P<class>[A-Z*].*?)"
+        )
+        + r"\s+(?P<shares>[\d,]+(?:\.\d*)?)\s+(?P<value>[\d,]+(?:\.\d*)?)\s*(?P<unit>SHS?|PRN)\b(?P<tail>.*)$",
         re.IGNORECASE,
     )
     pending = ""
@@ -199,11 +216,15 @@ def parse_legacy_document(raw):
         if not line:
             continue
         original_line = line
+        if shares_first and (ordered := alternate.match(line)):
+            fields = ordered.groupdict()
+            head = fields.get("head") or fields["issuer"] + "  " + fields["class"]
+            line = f"{head}  {ordered['cusip']}  {ordered['value']}  {ordered['shares']} {ordered['unit']} {ordered['tail']}"
         if re.search(
-            r"\bCUSIP\b|Column\s+\d|Name\s+of\s+Issuer|Title\s+of|Thousands|Voting\s+Authority",
+            r"\bCUSIP\b|Column\s+\d|Name\s+of\s+Issuer|Title\s+of|Thousands|Voting\s+Authority|REPORT\s+SUMMARY.*DATA\s+RECORDS",
             line,
             re.IGNORECASE,
-        ):
+        ) and not typed_pattern.match(line):
             pending = ""
             continue
         if (
@@ -228,7 +249,10 @@ def parse_legacy_document(raw):
             ):
                 line += " " + lines[index].strip()
                 index += 1
-        match = pattern.match(line)
+        # A class or issuer annotation can itself resemble an identifier
+        # (for example NEW2005 or SEE 53071MCOM). Prefer the actual identifier
+        # followed by the explicitly reported share/principal unit.
+        match = typed_pattern.match(line) or pattern.match(line)
         if match and not match["unit"]:
             stronger = strong_pattern.match(line)
             if stronger and stronger["unit"]:
@@ -274,7 +298,7 @@ def parse_legacy_document(raw):
             if split:
                 issuer, title = split[1], split[2]
         known_class = re.search(
-            r"\bCOM|COMMON|ORD|ADR|C[1L][A-Z]?\b|CLASS|SHS|PFD|PREF|NOTE|BOND|DEB|STOCK|UNIT|RIGHT|DEP\s+RCPT|ISHARES|BEN\s+INT|ETF|SBI|SDCV|DBCV|ZONES|PUT|CALL",
+            r"\bCOM|COMMON|ORD|ADR|C[1L][A-Z]?\b|CLASS|SHS|PFD|PREF|NOTE|BOND|DEB|STOCK|UNIT|RIGHT|DEP\s+RCPT|ISHARES|BEN\s+INT|ETF|SBI|SDCV|DBCV|ZONES|PUT|CALL|OPT",
             title,
             re.IGNORECASE,
         )
@@ -286,6 +310,9 @@ def parse_legacy_document(raw):
             not match["unit"]
             and not known_class
             and not verified_cusip
+            and not re.search(
+                r"\b(?:SOLE|SHARED|DEFINED|OTHER)\b", match["tail"], re.IGNORECASE
+            )
             and not head.endswith(("COM", "com"))
         ):
             candidates.append(line)
