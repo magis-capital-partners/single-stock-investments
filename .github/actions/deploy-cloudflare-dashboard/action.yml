@@ -67,6 +67,8 @@ runs:
     - name: Checkout private snapshots for deployment
       if: steps.private-snapshots.outputs.checkout == 'true'
       uses: ./.github/actions/checkout-vault
+      with:
+        include-investor-history: 'true'
 
     - name: Install pinned Cloudflare tooling
       shell: bash
@@ -117,6 +119,12 @@ runs:
         set -euo pipefail
         python _system/scripts/build_cloudflare_pages_site.py
         python _system/scripts/stage_company_research.py --hardlink
+        # Reuse an existing processing checkout without cleaning its new objects.
+        # Only deployment needs to materialize the complete holdings checkpoint.
+        if [ -f dashboard/data/holdings/archive_receipt.json ] && [ "$(git -C "$RESEARCH_VAULT_ROOT" config --bool core.sparseCheckout)" = "true" ]; then
+          git -C "$RESEARCH_VAULT_ROOT" sparse-checkout add /dashboard-private/investor-history/
+        fi
+        python _system/scripts/stage_investor_history.py
         python _system/scripts/validate_portfolio_private_boundary.py _cf_project/site
         python _system/scripts/stage_pages_functions.py _cf_project
 

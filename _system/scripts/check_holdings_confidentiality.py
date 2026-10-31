@@ -13,7 +13,7 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parents[2]
 sys.path.insert(0, str(ROOT / "_system" / "scripts"))
 
-from thirteenf_core import (  # noqa: E402
+from thirteenf_core import (
     FORBIDDEN_MANAGER_KEYS,
     licensed_path,
     manager_confidentiality_issues,
@@ -40,10 +40,17 @@ def _json_issues(path: Path, payload) -> list[str]:
     issues = []
     if path.name == "managers.json" and isinstance(payload, dict):
         issues.extend(manager_confidentiality_issues(payload))
-    blob = json.dumps(payload)
-    for key in FORBIDDEN_MANAGER_KEYS:
-        if f'"{key}"' in blob:
-            issues.append(f"{path}: contains forbidden field {key}")
+    def fields(value):
+        if isinstance(value, dict):
+            for key, child in value.items():
+                yield str(key).lower()
+                yield from fields(child)
+        elif isinstance(value, list):
+            for child in value:
+                yield from fields(child)
+
+    for key in FORBIDDEN_MANAGER_KEYS.intersection(fields(payload)):
+        issues.append(f"{path}: contains forbidden field {key}")
     return issues
 
 

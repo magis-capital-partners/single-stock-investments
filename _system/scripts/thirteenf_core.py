@@ -317,7 +317,8 @@ def merge_filings(filings: list[dict]) -> list[dict]:
         amendment = (filing.get("amendment_type") or "").upper() or None
         if form == "13F-HR/A" and amendment == "NEW HOLDINGS":
             for row in rows:
-                book[position_key(row)] = row
+                key = position_key(row)
+                book[key] = aggregate_positions([book[key],row])[0] if key in book else row
             continue
         if form == "13F-HR/A" and amendment not in {None, "RESTATEMENT"}:
             for row in rows:

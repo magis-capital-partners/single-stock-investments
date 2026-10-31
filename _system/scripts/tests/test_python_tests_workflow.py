@@ -153,12 +153,13 @@ def test_private_architecture_inputs_are_restored_before_the_suite():
     assert job["env"]["RESEARCH_VAULT_CLONE_TOKEN"] == "${{ secrets.RESEARCH_VAULT_CLONE_TOKEN }}"
 
 
-def test_fixture_checkout_omits_only_the_large_extraction_archive(tmp_path):
+def test_fixture_checkout_omits_batch_archives_and_deploy_can_select_history(tmp_path):
     import re
     import subprocess
 
     action = yaml.safe_load((ROOT / ".github/actions/checkout-vault/action.yml").read_text(encoding="utf-8"))
     assert action["inputs"]["include-source-archive"]["default"] == "true"
+    assert action["inputs"]["include-investor-history"]["default"] == "false"
     checkout = next(s for s in action["runs"]["steps"] if str(s.get("uses", "")).startswith("actions/checkout"))
     assert "blob:none" in checkout["with"]["filter"]
     patterns = re.findall(r"&& '([^']+)'", checkout["with"]["sparse-checkout"])
@@ -169,7 +170,8 @@ def test_fixture_checkout_omits_only_the_large_extraction_archive(tmp_path):
 
     preserved = ["dashboard-private/objects/snapshot", "dashboard-private/originals/filing.pdf", "dashboard-private/commodity-inputs/source.json", "superinvestor-letters/fund/letter.md"]
     archived = "dashboard-private/company-source-backfill-v2/part.zip"
-    for relative in [*preserved, archived]:
+    history = "dashboard-private/investor-history/objects/part.gz"
+    for relative in [*preserved, archived, history]:
         path = tmp_path / relative
         path.parent.mkdir(parents=True, exist_ok=True)
         path.write_text("fixture", encoding="utf-8")
@@ -183,3 +185,12 @@ def test_fixture_checkout_omits_only_the_large_extraction_archive(tmp_path):
     git("sparse-checkout", "set", "--no-cone", "--stdin", input=("\n".join(patterns) + "\n").encode())
     assert all((tmp_path / path).is_file() for path in preserved)
     assert not (tmp_path / archived).exists()
+    assert not (tmp_path / history).exists()
+    git("sparse-checkout", "add", "/dashboard-private/investor-history/")
+    assert (tmp_path / history).is_file()
+    assert all((tmp_path / path).is_file() for path in preserved)
+    assert not (tmp_path / archived).exists()
+
+    refresh = yaml.safe_load((ROOT / ".github/workflows/investor-history.yml").read_text(encoding="utf-8"))
+    restore = next(s for s in refresh["jobs"]["refresh"]["steps"] if s.get("uses") == "./.github/actions/checkout-vault")
+    assert restore["with"]["include-investor-history"] == "true"

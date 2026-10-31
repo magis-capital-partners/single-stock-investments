@@ -38,8 +38,8 @@ SEC_TICKER_CIK_PATH = ROOT / "_system" / "reference" / "market-data" / "fundamen
 # Declared contact. SEC_USER_AGENT overrides this. The fetch client paces at ~5/s.
 SEC_UA = sec_user_agent()
 SLEEP_SEC = 0.0
-FORM_13F = {"13F-HR", "13F-HR/A", "13F-NT", "13F-NT/A"}
-HOLDINGS_FORMS = {"13F-HR", "13F-HR/A"}
+FORM_13F = {"13F-HR", "13F-HR/A", "13F-NT", "13F-NT/A", "13F-E", "13F-E/A"}
+HOLDINGS_FORMS = {"13F-HR", "13F-HR/A", "13F-E", "13F-E/A"}
 
 
 def load_json(path: Path, default=None):
@@ -128,17 +128,19 @@ def latest_13f_filings(cik: str, limit: int = 4) -> list[dict]:
     return rows[:limit]
 
 
-def list_13f_filings(cik: str, limit: int = 40) -> list[dict]:
+def list_13f_filings(cik: str, limit: int | None = 40, *, strict: bool = False) -> list[dict]:
     """Enough 13F rows for a multi-year backfill, including older submission pages."""
     try:
         submissions = fetch_submissions(cik)
     except (urllib.error.HTTPError, urllib.error.URLError, TimeoutError, json.JSONDecodeError):
+        if strict:
+            raise
         return []
     filings = submissions.get("filings") or {}
     rows = _filings_from_block(cik, filings)
     for page in filings.get("files") or []:
         periods = {row.get("report_date") for row in rows if row.get("form") in HOLDINGS_FORMS}
-        if len(periods) >= limit:
+        if limit is not None and len(periods) >= limit:
             break
         name = page.get("name") if isinstance(page, dict) else None
         if not name:
@@ -146,6 +148,8 @@ def list_13f_filings(cik: str, limit: int = 40) -> list[dict]:
         try:
             extra = sec_fetch_json(f"https://data.sec.gov/submissions/{name}")
         except (urllib.error.HTTPError, urllib.error.URLError, TimeoutError, json.JSONDecodeError):
+            if strict:
+                raise
             continue
         rows.extend(_filings_from_block(cik, extra))
     rows.sort(key=lambda f: (f.get("filing_date") or "", f.get("accession") or ""), reverse=True)
@@ -156,7 +160,7 @@ def list_13f_filings(cik: str, limit: int = 40) -> list[dict]:
             continue
         seen.add(row["accession"])
         deduped.append(row)
-    return deduped[:limit]
+    return deduped if limit is None else deduped[:limit]
 
 
 def filing_document_urls(filing: dict) -> dict[str, str | None]:
