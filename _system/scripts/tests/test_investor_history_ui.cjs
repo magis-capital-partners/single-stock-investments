@@ -3,6 +3,27 @@ const assert = require('node:assert/strict');
 global.window=global;
 require('../../../dashboard/investor-history.js');
 const ui=global.InvestorHistory;
+test('compressed books and position parts independently decode from one binary fetch',async()=>{
+  const {gzipSync}=require('node:zlib');
+  const assets={'history/a.json':{quarters:{'2000Q1':{positions_parts:['history/p.json']}}},'history/p.json':{positions:[{ticker:'NESTLE',currency:'CHF',value_usd:1.25}]}};
+  const members=Object.values(assets).map(value=>gzipSync(JSON.stringify(value)));
+  const mapping={};let offset=0;
+  Object.keys(assets).forEach((path,i)=>{mapping[path]=['bundles/a.bin',offset,members[i].length];offset+=members[i].length;});
+  let calls=0;
+  const read=ui.createReader({asset_bundles:mapping},async()=>{throw new Error('Unexpected uncompressed fetch');},async()=>{calls++;return Buffer.concat(members);});
+  const results=await Promise.all(Object.keys(assets).map(path=>read(`data/holdings/${path}`)));
+  assert.deepEqual(results,Object.values(assets));
+  assert.equal(calls,1);
+});
+test('invalid compressed ranges and corrupt gzip members fail visibly',async()=>{
+  const {gzipSync}=require('node:zlib');
+  const bytes=gzipSync('{"positions":[]}');
+  const invalid=ui.createReader({asset_bundles:{'history/a.json':['bundles/a.bin',0,bytes.length+1]}},undefined,async()=>bytes);
+  await assert.rejects(invalid('data/holdings/history/a.json'),/member range is invalid/);
+  bytes[bytes.length-1]^=1;
+  const corrupt=ui.createReader({asset_bundles:{'history/a.json':['bundles/a.bin',0,bytes.length]}},undefined,async()=>bytes);
+  await assert.rejects(corrupt('data/holdings/history/a.json'));
+});
 test('logical books, manifests and positions share one physical fetch',async()=>{
   const assets={
     'history/a/2000.json':{quarters:{'2000Q1':{positions_parts:['history/a/p.json']}}},

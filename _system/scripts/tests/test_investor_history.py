@@ -1291,6 +1291,12 @@ def test_pinned_deploy_restores_history_without_private_letter_evidence(
     generated = "".join(
         path.read_text(encoding="utf-8") for path in (tmp_path / "site").rglob("*.json")
     )
+    from holdings_asset_bundles import iter_packed_assets
+
+    generated += "".join(
+        body.decode("utf-8")
+        for _, body in iter_packed_assets(tmp_path / "site/data/holdings")
+    )
     assert "1999Q4" in generated and "1234.HK" in generated
     assert (
         "private original quotation" not in generated and "private.txt" not in generated
