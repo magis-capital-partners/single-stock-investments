@@ -79,6 +79,37 @@ def test_an_attempted_issuer_review_cannot_fall_back_to_a_generic_return(tmp_pat
     assert calculate('BKNG', tmp_path, '2026-10-26')['forward_irr_pct'] == before['forward_irr_pct']
 
 
+def test_a_manual_component_model_cannot_bypass_an_unresolved_issuer_review(tmp_path):
+    from test_shared_valuation_forecast import model
+    fixture(tmp_path, ratio=1)
+    manual = model()
+    manual['ticker'] = 'BKNG'
+    save(tmp_path, 'BKNG/research/valuation.json', manual)
+    before = calculate('BKNG', tmp_path, '2026-10-26')
+    assert before['status'] == 'available'
+    assert before['model_basis'] == 'issuer_valuation'
+    save(tmp_path, '_system/data/underwriting_queue.json', {'companies': [
+        {'ticker': 'BKNG', 'last_attempt': '2026-10-26T10:00:00+00:00',
+         'underwriting_gaps': [{'code': 'ContractError', 'detail': 'Funding is not established'}]}]})
+    after = calculate('BKNG', tmp_path, '2026-10-26')
+    assert after['status'] == 'underwriting_revision_required'
+    assert all(value is None for value in after['forward_irr_pct'].values())
+    assert after['audit_only_forward_irr_pct'] == before['forward_irr_pct']
+
+
+def test_refresh_keeps_boot_json_compact_even_when_only_formatting_changes(tmp_path):
+    import refresh_shared_forecasts as refresh
+    fixture(tmp_path, ratio=1)
+    path = tmp_path/'dashboard/data/core.json'
+    for attempt in range(2):
+        if attempt:
+            path.write_text(json.dumps(json.loads(path.read_bytes()), ensure_ascii=False)+'\n', encoding='utf-8')
+        refresh.run(tmp_path, '2026-10-26', collect=False)
+        raw = path.read_bytes()
+        compact = (json.dumps(json.loads(raw), separators=(',', ':'), ensure_ascii=False)+'\n').encode()
+        assert raw == compact
+
+
 def test_restated_observations_are_not_adjusted_twice(tmp_path):
     original = fixture(tmp_path)
     once = calculate('BKNG', tmp_path, '2026-10-26')
