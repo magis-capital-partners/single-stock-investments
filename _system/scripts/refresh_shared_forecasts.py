@@ -46,6 +46,18 @@ def universe(root):
 
 
 @lru_cache(maxsize=2)
+def _underwriting_rows(path, mtime):
+    return {r['ticker']: r for r in read(Path(path)).get('companies') or []}
+
+
+def unresolved_underwriting(root, ticker):
+    path = root/'_system/data/underwriting_queue.json'
+    row = _underwriting_rows(str(path), path.stat().st_mtime_ns).get(ticker, {}) if path.is_file() else {}
+    return bool(row.get('last_attempt') and (row.get('underwriting_gaps') or row.get('unresolved_findings')
+                or row.get('status') == 'waiting_for_build'))
+
+
+@lru_cache(maxsize=2)
 def _registry(path, mtime):
     return read(Path(path)).get('holdings') or {}
 
@@ -144,6 +156,15 @@ def calculate(ticker, root, as_of, evaluated_at=None):
             forecast.update(status='economic_review_required', forward_irr_pct=dict.fromkeys(('low', 'base', 'high')),
                             buy_prices=[], next_action='automatic_economic_underwriting_refresh')
             forecast['gaps'].append({'code': 'economic_review_required'})
+    if (generated or legacy) and unresolved_underwriting(root, ticker):
+        forecast['economic_review_status'] = 'revision_required'
+        for name in ('forward_irr_pct', 'present_value_today_per_share', 'model_present_value_per_share'):
+            forecast['audit_only_'+name] = forecast.get(name)
+            forecast[name] = dict.fromkeys(('low', 'base', 'high'))
+        forecast['buy_prices'] = []
+        forecast['gaps'].append({'code': 'underwriting_revision_required'})
+        if forecast['status'] == 'available':
+            forecast.update(status='underwriting_revision_required', next_action='automatic_economic_underwriting_refresh')
     if forecast.get('underwriting'):
         from valuation_method_router import route_valuation
         forecast['method_profile'] = route_valuation(copy.deepcopy(valuation))['profile_id']

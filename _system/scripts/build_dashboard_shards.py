@@ -219,6 +219,13 @@ def slim_valuation_decision(decision: dict | None) -> dict:
         for key in _VALUATION_DECISION_CORE_FIELDS
         if key in decision
     }
+    # Pre-selection freshness checks need the verdict and its expiry. Filing
+    # URLs, accessions and the source-basis proof remain in the full ticker.
+    market = decision.get('market_sync')
+    if isinstance(market, dict):
+        slim['market_sync'] = {key: market[key] for key in
+                              ('status', 'valid_until', 'price_as_of', 'financial_period', 'model_as_of', 'share_basis_as_of')
+                              if key in market}
     # The holdings IRR tooltip reads model_as_of. Fact and price dates render
     # in the detail strip, which loads the full decision from the ticker shard.
     dates = decision.get("dates")
