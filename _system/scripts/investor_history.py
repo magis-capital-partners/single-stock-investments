@@ -246,6 +246,7 @@ def store_raw_documents(db, accession, parsed):
 
 
 def store_parse_failure(db, meta, exc):
+    meta.pop("normalized_rows_sha256", None)
     if getattr(exc, "raw_documents", None):
         store_raw_documents(db, meta["accession"], exc.raw_documents)
     if getattr(exc, "raw_document", None):
@@ -687,6 +688,11 @@ def reparse_cached(db, cache=ARCHIVE / "filings"):
             )
             if parsed is None:
                 continue
+            # A previous parser's derived-row checksum and partial flag do
+            # not describe this new parse. Original-document SHA checksums
+            # remain immutable in raw_documents.
+            meta.pop("normalized_rows_sha256", None)
+            meta.pop("partial_rows", None)
             primary = parsed.get("primary") or {}
             meta.update(primary)
             meta.update(
