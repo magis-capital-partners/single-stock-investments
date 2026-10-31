@@ -921,6 +921,10 @@ def publish(
     preserve=True,
     save_archive=True,
 ):
+    if data.resolve() == (ROOT / "dashboard/data/holdings").resolve():
+        from private_dashboard_assets import restore_managed_input
+
+        restore_managed_input(ROOT / "dashboard", "data/holdings/directory_index.json", include_missing=True)
     disclosures = list(
         {
             (document["manager_id"], document["id"]): document
