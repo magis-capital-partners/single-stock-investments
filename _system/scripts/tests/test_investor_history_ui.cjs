@@ -34,6 +34,17 @@ test('an old disclosure or source gap never displays a newer US book',()=>{
   assert.equal(ui.directoryRows([manager],{quarter:'2000Q1',source:'13f'})[0].ssi_overlap,null);
   assert.ok(ui.availablePeriods(manager).includes('2000Q1'));
 });
+
+test('bundled disclosures select dates and amendments before loading position parts',()=>{
+  const snapshots=[
+    {id:'old',vehicle_id:'fund',period_end:'2000-03-31',source_kind:'nport',filed_at:'2000-05-01',positions_parts:['old.json']},
+    {id:'new',vehicle_id:'fund',period_end:'2020-03-31',source_kind:'nport',filed_at:'2020-05-01',positions_parts:['new.json']},
+    {id:'amended',vehicle_id:'fund',period_end:'2020-03-31',source_kind:'nport',filed_at:'2020-06-01',positions_parts:['amended.json']},
+    {id:'other',vehicle_id:'second-fund',period_end:'2010-03-31',source_kind:'nport',filed_at:'2010-05-01',positions_parts:['other.json']},
+  ];
+  assert.deepEqual(ui.selectDisclosureSnapshots(snapshots,'2000Q1').map(d=>d.id),['old']);
+  assert.deepEqual(ui.selectDisclosureSnapshots(snapshots,'latest').map(d=>d.id),['amended','other']);
+});
 test('holdings preserve classes, option types, unknown weights and safe strings',()=>{
   const html=ui.positionsTable([{ticker:'GOOG',issuer:'<script>',title_of_class:'CL C',put_call:'CALL',weight_pct:null,value_usd:0}]);
   assert.match(html,/CL C · CALL/);

@@ -25,6 +25,14 @@
   function availablePeriods(manager, source='all') {
     return [...new Set([...(source==='disclosures' ? [] : [...historyFor(manager).map(row=>row.quarter),...(manager.filing_gaps || []).map(row=>quarterOf(row.period_end))]),...(source==='13f' ? [] : manager.disclosure_quarters || [])])].filter(Boolean).sort().reverse();
   }
+  function selectDisclosureSnapshots(snapshots, requested) {
+    const quarter=d=>d.quarter || quarterOf(d.period_end) || quarterOf(d.disclosed_at);
+    if(requested!=='latest') return snapshots.filter(d=>quarter(d)===requested);
+    const dates=new Map();
+    const key=d=>quarter(d)+(d.period_end || d.disclosed_at || '')+(d.filed_at || '')+(d.source_kind==='nport' ? d.id : '');
+    for(const d of snapshots) dates.set(d.vehicle_id,[dates.get(d.vehicle_id) || '',key(d)].sort().at(-1));
+    return snapshots.filter(d=>key(d)===dates.get(d.vehicle_id));
+  }
   function sourceLink(href, label) {
     try {
       const resolved = new URL(href, window.location?.origin || 'https://localhost');
@@ -93,19 +101,13 @@
           const wanted=requested==='latest' ? [...manifest.latest_quarters,'undated'] : [requested];
           const paths=[...new Set(wanted.flatMap(q=>manifest.quarters[q] || []))];
           const parts=await Promise.all(paths.map(path=>read(`data/holdings/${path}`)));
-          const snapshots=parts.flatMap(part=>part.snapshots || []);
+          const snapshots=selectDisclosureSnapshots(parts.flatMap(part=>part.snapshots || []),requested);
           await Promise.all(snapshots.map(async snapshot=>{
             if (snapshot.positions_parts) {
               const positions=await Promise.all(snapshot.positions_parts.map(path=>read(`data/holdings/${path}`)));
               snapshot.positions=positions.flatMap(part=>part.positions || []);
             }
           }));
-          if (requested==='latest') {
-            const dates=new Map();
-            const key=d=>(d.quarter || quarterOf(d.period_end) || quarterOf(d.disclosed_at))+(d.period_end || d.disclosed_at || '')+(d.filed_at || '')+(d.source_kind==='nport' ? d.id : '');
-            for(const d of snapshots) dates.set(d.vehicle_id, [dates.get(d.vehicle_id) || '',key(d)].sort().at(-1));
-            return {snapshots:snapshots.filter(d=>key(d)===dates.get(d.vehicle_id))};
-          }
           return {snapshots};
         }) : Promise.resolve({snapshots:[]});
         const results=await Promise.allSettled([booksPromise,disclosurePromise]);
@@ -151,5 +153,5 @@
     root.querySelector('[data-history-next]').addEventListener('click',()=>{page++;paint();});
     paint();
   }
-  window.InvestorHistory = {fill:()=>fill().catch(error=>{const root=document.getElementById('managers-page');if(root)root.textContent=error.message;}),directoryRows,positionsTable,sourceLink,availablePeriods};
+  window.InvestorHistory = {fill:()=>fill().catch(error=>{const root=document.getElementById('managers-page');if(root)root.textContent=error.message;}),directoryRows,positionsTable,sourceLink,availablePeriods,selectDisclosureSnapshots};
 })();
