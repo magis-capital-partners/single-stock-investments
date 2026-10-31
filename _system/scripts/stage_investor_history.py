@@ -9,6 +9,7 @@ from pathlib import Path
 
 import global_disclosures
 import investor_history as history
+from holdings_asset_bundles import pack_assets, unpack_assets, validate_site_budget
 from investor_history_checkpoint import restore
 from vault_paths import research_vault_root
 
@@ -80,6 +81,7 @@ def stage(site, *, vault=None, receipt=None, cache=None):
     universe = json.loads((cache / "universe.json").read_text(encoding="utf-8"))
     # The private universe retains non-filers and unresolved document identities.
     # Only the known SEC owners have public filings; identity labels never join books.
+    unpack_assets(site / "data/holdings")
     db = history.connect(cache / "archive.sqlite")
     try:
         history.sync_managers(db, universe["managers"])
@@ -100,19 +102,14 @@ def stage(site, *, vault=None, receipt=None, cache=None):
     )
     compact_history(site / "data/holdings")
     compact_disclosures(site / "data/holdings")
-    oversized = [
-        p
-        for p in (site / "data/holdings").rglob("*.json")
-        if p.stat().st_size >= 20 * 1024 * 1024
-    ]
-    if oversized:
-        raise RuntimeError(
-            f"{len(oversized)} holdings assets exceed the deployment size bound"
-        )
+    packaging = pack_assets(site / "data/holdings")
+    total_site_files = validate_site_budget(site)
     return {
         "configured": True,
         "identity": identity,
         "filings": coverage["filings"],
+        "total_site_files": total_site_files,
+        **packaging,
         **result,
     }
 

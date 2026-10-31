@@ -3,6 +3,35 @@ const assert = require('node:assert/strict');
 global.window=global;
 require('../../../dashboard/investor-history.js');
 const ui=global.InvestorHistory;
+test('logical books, manifests and positions share one physical fetch',async()=>{
+  const assets={
+    'history/a/2000.json':{quarters:{'2000Q1':{positions_parts:['history/a/p.json']}}},
+    'history/a/p.json':{positions:[{ticker:'A',value_usd:1}]},
+    'disclosures/fund name.json':{quarters:{'2000Q1':['disclosures/s.json']}},
+    'disclosures/s.json':{snapshots:[{currency:'CHF'}]},
+  };
+  const calls=[];
+  const read=ui.createReader({asset_bundles:Object.fromEntries(Object.keys(assets).map(key=>[key,'bundles/a.json']))},async path=>{calls.push(path);return path.includes('/bundles/') ? {assets} : {legacy:true};});
+  const values=await Promise.all(Object.keys(assets).map(path=>read(`data/holdings/${encodeURI(path)}`)));
+  assert.deepEqual(values,Object.values(assets));
+  assert.deepEqual(calls,['data/holdings/bundles/a.json']);
+  assert.deepEqual(await read('data/holdings/by_manager/a.json'),{legacy:true});
+});
+test('bundle failures retry and missing logical assets fail visibly',async()=>{
+  let calls=0;
+  const read=ui.createReader({asset_bundles:{'history/a.json':'bundles/a.json'}},async()=>{if(++calls===1)throw new Error('offline');return {assets:{}};});
+  await assert.rejects(read('data/holdings/history/a.json'),/offline/);
+  await assert.rejects(read('data/holdings/history/a.json'),/missing from its bundle/);
+  assert.equal(calls,2);
+});
+test('browsing many bundles bounds retained data',async()=>{
+  const paths=Array.from({length:5},(_,i)=>`history/${i}.json`);
+  let calls=0;
+  const read=ui.createReader({asset_bundles:Object.fromEntries(paths.map((path,i)=>[path,`bundles/${i}.json`]))},async()=>{calls++;return {assets:Object.fromEntries(paths.map(path=>[path,{}]))};});
+  for(const path of paths)await read(`data/holdings/${path}`);
+  await read(`data/holdings/${paths[0]}`);
+  assert.equal(calls,6);
+});
 const managers=[
   {manager_id:'a',name:'Alpha',history:[{quarter:'2001Q1',positions:2,ssi_overlap:0},{quarter:'2026Q2',positions:7,ssi_overlap:1}]},
   {manager_id:'b',name:'Beta',history:[],disclosure_count:2,disclosure_quarters:['2020Q1']},
