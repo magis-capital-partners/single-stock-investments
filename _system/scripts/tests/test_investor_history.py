@@ -25,6 +25,41 @@ from thirteenf_core import merge_filings
 from thirteenf_legacy import parse_legacy_document
 
 
+def test_historical_filer_alias_keeps_the_current_manager_identity(tmp_path, monkeypatch):
+    monkeypatch.setattr(universe, "ARCHIVE", tmp_path / "archive")
+    registry = tmp_path / "managers.json"
+    registry.write_text(json.dumps({"managers": [{
+        "manager_id": "pershing-square",
+        "display_name": "Pershing Square Capital Management",
+        "sec_name": "PERSHING SQUARE INC.",
+        "cik": "0002026053",
+        "cik_history": [{"cik": "0001336528"}],
+        "roles": ["active"],
+        "book": "full",
+    }]}), encoding="utf-8")
+    roster = tmp_path / "roster.json"
+    roster.write_text(json.dumps({"managers": [{
+        "firm": "Pershing Square Capital Management", "name": "Bill Ackman",
+    }]}), encoding="utf-8")
+    corpus = tmp_path / "insights.json"
+    corpus.write_text(json.dumps({"letters": [{
+        "fund_id": "pershing", "fund": "Pershing Square Capital Management",
+        "letter_eligible": True, "document_type": "investor_letter",
+    }]}), encoding="utf-8")
+    result = universe.compile_universe(
+        registry_path=registry, roster_path=roster, corpus_path=corpus,
+        aliases_path=tmp_path / "aliases.json",
+        catalog={"PERSHING SQUARE CAPITAL MANAGEMENT, L.P.": {"0001336528"}},
+    )
+    published = json.loads(registry.read_text())["managers"]
+    assert len(published) == len(result["managers"]) == 1
+    assert published[0]["cik"] == "0002026053"
+    assert archive.cik_map(published) == {
+        "1336528": "pershing-square", "2026053": "pershing-square",
+    }
+    assert result["source_ids"]["pershing"] == "pershing-square"
+
+
 def test_archived_publishers_survive_corpus_rotation_without_reviving_rejected_ciks():
     from refresh_investor_history import retain_archived_identities
 
