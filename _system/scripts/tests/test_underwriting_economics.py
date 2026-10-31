@@ -121,17 +121,26 @@ def test_review_binds_the_actual_diagnostics_and_structural_tests():
 
 @pytest.mark.parametrize('first_growth', [.06, -.06])
 @pytest.mark.parametrize('mature_growth', [.02, -.02])
-def test_compiler_derives_a_growth_runway_without_inventing_capital_release(first_growth, mature_growth):
+@pytest.mark.parametrize('derived_return', [False, True])
+def test_compiler_derives_a_growth_runway_without_inventing_capital_release(first_growth, mature_growth, derived_return):
     c = economic_contract()
     a = copy.deepcopy(c['assumptions'][0])
     c['assumptions'] = [x for x in c['assumptions'] if x['id'] != 'terminal_multiple']
-    for name, value in [('growth_next', first_growth), ('growth_later', .04), ('terminal_growth', mature_growth), ('new_equity_return', .2)]:
+    returns = [('organic_return',.2),('acquired_return',.1),('acquired_earnings_share',.4)] if derived_return else [('new_equity_return',.2)]
+    for name, value in [('growth_next', first_growth), ('growth_later', .04), ('terminal_growth', mature_growth)]+returns:
         c['assumptions'].append({**a, 'id': name, 'value': value, 'allowed_range': {'min': -.1, 'max': 1}})
     b = c['components'][0]
     b['drivers'] = [x for x in b['drivers'] if x['id'] != 'terminal_ps']
+    if derived_return:
+        b['drivers'] += [
+            {'id':'organic_weight','op':'subtract','args':[1,'acquired_earnings_share'],'unit':'ratio'},
+            {'id':'organic_funding','op':'divide','args':['organic_weight','organic_return'],'unit':'ratio'},
+            {'id':'acquired_funding','op':'divide','args':['acquired_earnings_share','acquired_return'],'unit':'ratio'},
+            {'id':'blended_funding','op':'add','args':['organic_funding','acquired_funding'],'unit':'ratio'},
+            {'id':'blended_return','op':'divide','args':[1,'blended_funding'],'unit':'ratio'}]
     b['terminal'] = {'type': 'reinvestment_fade', 'earnings_ref': 'normalized_cash', 'share_count_ref': 'shares',
                      'growth_refs': ['growth_next', 'growth_later'], 'terminal_growth_ref': 'terminal_growth',
-                     'return_on_new_equity_ref': 'new_equity_return', 'capitalization_rate_ref': 'discount_rate',
+                     'return_on_new_equity_ref': 'blended_return' if derived_return else 'new_equity_return', 'capitalization_rate_ref': 'discount_rate',
                      'return_basis': 'incremental_parent_equity', 'rationale': 'The competitive runway continues beyond the holding horizon.',
                      'evidence_ids': ['cash_obs']}
     c['economic_analysis']['structural_tests'][1]['assumption_overrides'] = {'terminal_growth': .01, 'normalization': .8}
@@ -139,11 +148,73 @@ def test_compiler_derives_a_growth_runway_without_inventing_capital_release(firs
     from calculation_proof import evaluate_calculation_proof
     t = {x['id']: x['value'] for x in evaluate_calculation_proof(m['component_valuation_results']['additive_components'][0]['calculation_proof'])['traces']['base']}
     e1, e2 = 1000*(1+first_growth), 1000*(1+first_growth)*1.04
-    expected = (e1*(1-max(0,first_growth)/.2)/1.1 + e2*(1-.04/.2)/1.1**2
-                + e2*(1+mature_growth)*(1-max(0,mature_growth)/.2)/(.1-mature_growth)/1.1**2)/100
+    roi=1/(.6/.2+.4/.1) if derived_return else .2
+    expected = (e1*(1-max(0,first_growth)/roi)/1.1 + e2*(1-.04/roi)/1.1**2
+                + e2*(1+mature_growth)*(1-max(0,mature_growth)/roi)/(.1-mature_growth)/1.1**2)/100
     assert t['terminal_generated_exit_ps'] == pytest.approx(expected)
     assert m['valuation_methodology']['horizon_years'] == 2
     assert b['terminal']['growth_refs'] == ['growth_next', 'growth_later']
+
+
+@pytest.mark.parametrize('bad_return,match',[('one_ratio','declared dimensionless judgments'),('normalized_cash','unit mismatch')])
+def test_a_future_return_needs_dimensionless_declared_judgment_not_just_a_reported_fact(bad_return,match):
+    c=economic_contract()
+    a=copy.deepcopy(c['assumptions'][0])
+    c['assumptions']=[x for x in c['assumptions'] if x['id']!='terminal_multiple']
+    c['assumptions'].append({**a,'id':'mature_growth','value':.02})
+    b=c['components'][0]
+    b['drivers']=[n for n in b['drivers'] if n['id']!='terminal_ps']
+    b['terminal']={'type':'reinvestment_fade','earnings_ref':'normalized_cash','share_count_ref':'shares',
+        'growth_refs':[],'terminal_growth_ref':'mature_growth','return_on_new_equity_ref':bad_return,
+        'capitalization_rate_ref':'discount_rate','return_basis':'incremental_parent_equity',
+        'rationale':'A continuing parent claim requires supported future investment returns.','evidence_ids':['cash_obs']}
+    c['economic_analysis']['structural_tests'][1]['assumption_overrides']={'normalization':.8,'discount_rate':.15}
+    with pytest.raises(ContractError,match=match):compile_contract(packet(),c)
+
+
+def test_an_explicitly_justified_immediate_mature_business_compiles_without_unused_nodes():
+    c=economic_contract()
+    a=copy.deepcopy(c['assumptions'][0])
+    c['assumptions']=[x for x in c['assumptions'] if x['id']!='terminal_multiple']
+    c['assumptions'] += [{**a,'id':'mature_growth','value':.02},{**a,'id':'incremental_return','value':.2}]
+    b=c['components'][0]
+    b['drivers']=[n for n in b['drivers'] if n['id']!='terminal_ps']
+    b['terminal']={'type':'reinvestment_fade','earnings_ref':'normalized_cash','share_count_ref':'shares',
+        'growth_refs':[],'terminal_growth_ref':'mature_growth','return_on_new_equity_ref':'incremental_return',
+        'capitalization_rate_ref':'discount_rate','return_basis':'incremental_parent_equity',
+        'rationale':'The observed mature franchise has no remaining exceptional-growth runway.','evidence_ids':['cash_obs']}
+    c['economic_analysis']['structural_tests'][1]['assumption_overrides']={'normalization':.8,'discount_rate':.15}
+    m=compile_contract(packet(),c)
+    from underwriting_economics import traces
+    assert traces(m)['business']['base']['terminal_generated_exit_ps']==pytest.approx(114.75)
+
+
+def test_discrete_financing_decisions_do_not_erase_fractional_ownership_and_keep_currency_units():
+    from underwriting_economics import traces
+    from valuation_forecast import _proof_rows
+    c=economic_contract()
+    a=copy.deepcopy(c['assumptions'][0])
+    c['assumptions'] += [{**a,'id':'funding_ratio','values':{'low':.4,'base':.8,'high':1}},
+                        {**a,'id':'claim_fraction','value':.5}]
+    c['assumptions'][-2].pop('value')
+    b=c['components'][0]
+    b['drivers']=[n for n in b['drivers'] if n['id'] not in ('cash_ps','terminal_ps')]+[
+        {'id':'funding_resources','op':'multiply','args':['reported_cash','funding_ratio'],'unit':'USD'},
+        {'id':'senior_due','op':'multiply','args':['reported_cash','claim_fraction'],'unit':'USD'},
+        {'id':'survival_flag','op':'greater_equal','args':['funding_resources','senior_due'],'unit':'ratio'},
+        {'id':'common_cash','op':'multiply','args':['normalized_cash','survival_flag'],'unit':'USD'},
+        {'id':'common_margin','op':'multiply','args':['normalization','survival_flag'],'unit':'ratio'},
+        {'id':'cash_ps','op':'divide','args':['common_cash','shares'],'unit':'USD per share'},
+        {'id':'terminal_ps','op':'multiply','args':['cash_ps','terminal_multiple'],'unit':'USD per share'}]
+    for bridge in c['economic_analysis']['bridges']:
+        bridge.update(cash_generation_ref='common_cash',distributions_ref='common_cash')
+        bridge['operating_bridge'].update(earnings_ref='common_cash',margin_ref='common_margin')
+    m=compile_contract(packet(),c);v=traces(m)['business']
+    assert [v[case]['survival_flag'] for case in ('low','base','high')]==[0,1,1]
+    assert v['base']['cash_ps']==v['high']['cash_ps']==10
+    assert _proof_rows(m['component_valuation_results']['additive_components'][0],'base')[1]==pytest.approx(100)
+    next(n for n in b['drivers'] if n['id']=='survival_flag')['args']=['funding_ratio','senior_due']
+    with pytest.raises(ContractError,match='matching units'):compile_contract(packet(),c)
 
 
 def test_historical_multiples_and_compounder_labels_do_not_set_a_floor():

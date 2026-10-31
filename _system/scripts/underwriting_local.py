@@ -9,8 +9,9 @@ import shutil
 import subprocess
 from contextlib import contextmanager
 from pathlib import Path
+from uuid import uuid4
 
-from underwriting_contract import require
+from underwriting_contract import digest, require
 from underwriting_pipeline import ROOT, read, run_batch, stage_model, write
 
 OPS = 'magis-capital-partners/single-stock-investments'
@@ -146,21 +147,46 @@ def publish_runtime(vault, home):
     for _ in range(3):
         git(vault, 'fetch', '-q', 'origin', 'main')
         base = git(vault, 'rev-parse', 'origin/main').decode().strip()
-        env = {**os.environ, 'GIT_INDEX_FILE': str(home/'private-publication.index')}
+        env = {**os.environ, 'GIT_INDEX_FILE': str(home/('private-publication-'+uuid4().hex+'.index'))}
         git(vault, 'read-tree', base, env=env)
-        changed = False
-        for path in files:
-            relative = path.relative_to(vault).as_posix()
-            blob = git(vault, 'hash-object', '-w', '--', relative).decode().strip()
-            current = subprocess.run(['git', 'rev-parse', base+':'+relative], cwd=vault, capture_output=True, text=True, check=False, timeout=30)
-            if current.returncode == 0 and current.stdout.strip() == blob:
+        entries = git(vault,'ls-tree','-rz',base,'--','valuation-underwriting/local-runtime','valuation-underwriting/handoffs')
+        current = {row.split(b'\t',1)[1].decode():row.split(b'\t',1)[0].split()[-1].decode()
+                   for row in entries.split(b'\0') if row}
+        def remote_json(relative):
+            return json.loads(git(vault,'show',base+':'+relative)) if relative in current else {}
+        # Concurrent workers share charges; an older local copy must not erase
+        # another session's ledger or newer issuer checkpoint.
+        ledger = vault/'valuation-underwriting/local-runtime/ledger.jsonl'
+        ledger_name = ledger.relative_to(vault).as_posix()
+        if ledger.is_file() and ledger_name in current:
+            rows = [json.loads(line) for line in git(vault,'show',base+':'+ledger_name).decode().splitlines() if line]
+            rows += [json.loads(line) for line in ledger.read_text(encoding='utf-8').splitlines() if line]
+            combined = {digest(row):row for row in rows}
+            ledger.write_text(''.join(json.dumps(row,sort_keys=True)+'\n' for row in combined.values()),encoding='utf-8')
+        names = [p.relative_to(vault).as_posix() for p in files]
+        require(all('\n' not in name for name in names), 'Unsafe private publication path')
+        blobs = git(vault,'hash-object','-w','--stdin-paths',data=('\n'.join(names)+'\n').encode()).decode().splitlines()
+        require(len(blobs)==len(names), 'Incomplete private object batch')
+        updates = []
+        for path,relative,blob in zip(files,names,blobs):
+            if current.get(relative) == blob:
+                continue
+            if '/states/' in relative or '/progress/' in relative:
+                state_name = relative.replace('/progress/','/states/')
+                old = remote_json(state_name)
+                incoming = read(vault/state_name)
+                if old.get('last_attempt','') > incoming.get('last_attempt',''):
+                    continue
+            if '/handoffs/latest/' in relative and remote_json(relative).get('approved_at','') > read(path).get('approved_at',''):
                 continue
             if relative.startswith('valuation-underwriting/handoffs/') and '/latest/' not in relative:
-                require(current.returncode != 0, 'An immutable local handoff changed')
-            git(vault, 'update-index', '--add', '--cacheinfo', '100644,'+blob+','+relative, env=env)
-            changed = True
-        if not changed:
+                require(relative not in current, 'An immutable local handoff changed')
+            updates.append('100644 '+blob+'\t'+relative+'\n')
+        if not updates:
             return False
+        # A full private index can be large. Rewriting it once per file made a
+        # modest audit upload take hours; one atomic batch preserves the tree.
+        git(vault,'update-index','--index-info',data=''.join(updates).encode(),env=env)
         tree = git(vault, 'write-tree', '--missing-ok', env=env).decode().strip()
         author = {**env, 'GIT_AUTHOR_NAME': 'Magis local underwriting', 'GIT_COMMITTER_NAME': 'Magis local underwriting',
                   'GIT_AUTHOR_EMAIL': 'underwriting@users.noreply.github.com', 'GIT_COMMITTER_EMAIL': 'underwriting@users.noreply.github.com'}

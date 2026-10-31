@@ -19,7 +19,7 @@ CHECKS = ('normalization', 'working_capital', 'maintenance_and_growth_capex',
           'financing_scope', 'dilution', 'terminal', 'method_selection', 'scenario_coherence')
 FRAMEWORKS = ('operating_dcf', 'financial_equity', 'inventory_runoff', 'sum_of_parts',
               'asset_nav', 'royalty_cashflow', 'event_cashflow')
-OPS = {'add', 'subtract', 'multiply', 'divide', 'sum', 'negative', 'minimum', 'maximum', 'power'}
+OPS = {'add', 'subtract', 'multiply', 'divide', 'sum', 'negative', 'minimum', 'maximum', 'power', 'greater_equal'}
 
 
 class ContractError(ValueError):
@@ -192,6 +192,9 @@ def compile_contract(packet, contract):
                 require(len(args) == 2, 'Multiplication/division needs two arguments')
                 sign = -1 if op == 'divide' else 1
                 result_dim = tuple(a+sign*b for a, b in zip(arg_dims[0], arg_dims[1]))
+            elif op == 'greater_equal':
+                require(len(args)==2 and arg_dims[0]==arg_dims[1], 'Comparison requires matching units')
+                result_dim=(0,0)
             elif op == 'power':
                 require(len(args) == 2 and all(d == (0, 0) for d in arg_dims), 'Power is limited to dimensionless growth factors')
             else:
