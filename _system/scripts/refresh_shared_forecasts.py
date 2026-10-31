@@ -156,10 +156,13 @@ def calculate(ticker, root, as_of, evaluated_at=None):
             forecast.update(status='economic_review_required', forward_irr_pct=dict.fromkeys(('low', 'base', 'high')),
                             buy_prices=[], next_action='automatic_economic_underwriting_refresh')
             forecast['gaps'].append({'code': 'economic_review_required'})
-    if (generated or legacy) and unresolved_underwriting(root, ticker):
+    reviewed = bool(forecast.get('economic_review_status') == 'passed' or (
+        valuation.get('underwriting') and market.get('underwriting_validation', {}).get('status') == 'verified'
+        and read(root/'_system/config/underwriting_policy.json').get('required_contract_schema', 'underwriting-contract/2') == 'underwriting-contract/1'))
+    if not reviewed and unresolved_underwriting(root, ticker):
         forecast['economic_review_status'] = 'revision_required'
         for name in ('forward_irr_pct', 'present_value_today_per_share', 'model_present_value_per_share'):
-            forecast['audit_only_'+name] = forecast.get(name)
+            forecast.setdefault('audit_only_'+name, forecast.get(name))
             forecast[name] = dict.fromkeys(('low', 'base', 'high'))
         forecast['buy_prices'] = []
         forecast['gaps'].append({'code': 'underwriting_revision_required'})
