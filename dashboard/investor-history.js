@@ -78,20 +78,38 @@
       return `<tr><td>${esc(row.ticker || row.issuer || row.isin || row.cusip)}${row.ticker && row.issuer && row.ticker!==row.issuer ? `<small>${esc(row.issuer)}</small>` : ''}${kind ? `<small>${esc(kind)}</small>` : ''}${row.country || row.currency ? `<small>${esc([row.country,row.currency].filter(Boolean).join(' · '))}</small>` : ''}</td><td>${weight}${weightBasis ? `<small>${esc(weightBasis)}</small>` : ''}</td><td>${money(row.value_usd)}</td></tr>`;
     }).join('')}</tbody></table></div>`;
   }
-  async function read(path) {
+  async function fetchJson(path) {
     const response = await fetch(url(path));
     if (!response.ok) throw new Error(`Holdings data unavailable (${response.status})`);
     const result = await response.json();
     if (result.private_snapshot) throw new Error('The authorized holdings snapshot has not been restored.');
     return result;
   }
+  function createReader(index, fetchAsset=fetchJson) {
+    const cache=new Map();
+    return async path=>{
+      const relative=decodeURIComponent(path.replace(/^data\/holdings\//,''));
+      const bundle=index.asset_bundles?.[relative];
+      if(!bundle) return fetchAsset(path);
+      if(!cache.has(bundle)) {
+        const pending=fetchAsset(`data/holdings/${bundle}`).catch(error=>{if(cache.get(bundle)===pending)cache.delete(bundle);throw error;});
+        cache.set(bundle,pending);
+        // Bound retained bundle memory when browsing many investors.
+        while(cache.size>4) cache.delete(cache.keys().next().value);
+      }
+      const value=await cache.get(bundle);
+      if(!Object.hasOwn(value.assets || {},relative)) throw new Error('The requested holdings asset is missing from its bundle.');
+      return value.assets[relative];
+    };
+  }
   async function fill() {
     const root = document.getElementById('managers-page');
     if (!root) return;
     let legacy = false, index;
-    try { index = await read('data/holdings/directory_index.json'); }
-    catch { index = await read('data/holdings/managers_index.json'); legacy = true; }
+    try { index = await fetchJson('data/holdings/directory_index.json'); }
+    catch { index = await fetchJson('data/holdings/managers_index.json'); legacy = true; }
     if (!root.isConnected) return;
+    const read=createReader(index);
     const managers = index.managers || [];
     const quarters = [...new Set(managers.flatMap(m => availablePeriods(m)))].filter(Boolean).sort().reverse();
     let quarter='latest',query='',overlap=false,source='all',page=0,ticket=0,selected=null,selectedVehicle=null;
@@ -192,5 +210,5 @@
     root.querySelector('[data-history-next]').addEventListener('click',()=>{page++;paint();});
     paint();
   }
-  window.InvestorHistory = {fill:()=>fill().catch(error=>{const root=document.getElementById('managers-page');if(root)root.textContent=error.message;}),directoryRows,positionsTable,sourceLink,availablePeriods,selectDisclosureSnapshots,disclosureVehicle,positionPage};
+  window.InvestorHistory = {fill:()=>fill().catch(error=>{const root=document.getElementById('managers-page');if(root)root.textContent=error.message;}),directoryRows,positionsTable,sourceLink,availablePeriods,selectDisclosureSnapshots,disclosureVehicle,positionPage,createReader};
 })();
