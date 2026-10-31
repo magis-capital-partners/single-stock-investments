@@ -13,7 +13,7 @@ from datetime import datetime, timezone
 from functools import lru_cache
 from pathlib import Path
 
-from atomic_io import semantic_json_sha256, write_json_if_changed
+from atomic_io import semantic_json_sha256, write_json_if_changed, write_text_if_changed
 from build_dashboard_shards import (
     shard_filename,
     slim_ticker_row,
@@ -156,10 +156,13 @@ def calculate(ticker, root, as_of, evaluated_at=None):
             forecast.update(status='economic_review_required', forward_irr_pct=dict.fromkeys(('low', 'base', 'high')),
                             buy_prices=[], next_action='automatic_economic_underwriting_refresh')
             forecast['gaps'].append({'code': 'economic_review_required'})
-    if (generated or legacy) and unresolved_underwriting(root, ticker):
+    reviewed = bool(forecast.get('economic_review_status') == 'passed' or (
+        valuation.get('underwriting') and market.get('underwriting_validation', {}).get('status') == 'verified'
+        and read(root/'_system/config/underwriting_policy.json').get('required_contract_schema', 'underwriting-contract/2') == 'underwriting-contract/1'))
+    if not reviewed and unresolved_underwriting(root, ticker):
         forecast['economic_review_status'] = 'revision_required'
         for name in ('forward_irr_pct', 'present_value_today_per_share', 'model_present_value_per_share'):
-            forecast['audit_only_'+name] = forecast.get(name)
+            forecast.setdefault('audit_only_'+name, forecast.get(name))
             forecast[name] = dict.fromkeys(('low', 'base', 'high'))
         forecast['buy_prices'] = []
         forecast['gaps'].append({'code': 'underwriting_revision_required'})
@@ -339,7 +342,9 @@ def publish(root, companies, as_of, evaluated_at=None):
         write_json_if_changed(path, detail, indent=None)
     core.setdefault('summary', {})['shared_valuation_forecasts'] = summary
     core['tickers'] = [slim_ticker_row(row) for row in core['tickers']]
-    write_json_if_changed(core_path, core, indent=None)
+    # This boot payload has a fixed byte budget. indent=None still inserts
+    # spaces; also repair formatting-only drift when the JSON data is equal.
+    write_text_if_changed(core_path, json.dumps(core, separators=(',', ':'), ensure_ascii=False))
     _universe.cache_clear()
     # Some build lanes still consume the monolithic bundle before sharding.
     bundle_path = root/'dashboard/data/dashboard_data.json'
