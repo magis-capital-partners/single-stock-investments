@@ -185,6 +185,17 @@ def store_filing(db, filing, rows=(), *, status="loaded", error=None):
         compresslevel=3,
         mtime=0,
     )
+    previous = db.execute(
+        "SELECT f.metadata,f.status,f.error,b.payload_gzip FROM filings f LEFT JOIN position_books b USING(accession) WHERE f.accession=?",
+        (accession,),
+    ).fetchone()
+    if previous and (
+        json.loads(previous["metadata"]) == filing
+        and previous["status"] == status
+        and previous["error"] == error
+        and previous["payload_gzip"] == payload
+    ):
+        return  # Re-reading an immutable source must not rewrite the large archive.
     with db:
         db.execute(
             """INSERT OR REPLACE INTO filings VALUES(?,?,?,?,?,?,?,?,?,?,?,?)""",
@@ -234,12 +245,19 @@ def store_raw_documents(db, accession, parsed):
         ]:
             value = parsed.get(key)
             if value:
+                digest = hashlib.sha256(value).hexdigest()
+                previous = db.execute(
+                    "SELECT sha256 FROM raw_documents WHERE accession=? AND role=?",
+                    (accession, role),
+                ).fetchone()
+                if previous and previous[0] == digest:
+                    continue
                 db.execute(
                     "INSERT OR REPLACE INTO raw_documents VALUES(?,?,?,?)",
                     (
                         accession,
                         role,
-                        hashlib.sha256(value).hexdigest(),
+                        digest,
                         gzip.compress(value, mtime=0),
                     ),
                 )
@@ -247,6 +265,10 @@ def store_raw_documents(db, accession, parsed):
 
 def store_parse_failure(db, meta, exc):
     meta.pop("normalized_rows_sha256", None)
+    from thirteenf_legacy import PARSER_VERSION, LegacyParseError
+
+    if isinstance(exc, LegacyParseError):
+        meta.update(parser="legacy-text", parser_version=PARSER_VERSION)
     if getattr(exc, "raw_documents", None):
         store_raw_documents(db, meta["accession"], exc.raw_documents)
     if getattr(exc, "raw_document", None):
@@ -577,7 +599,7 @@ def backfill_filings(
                 if deadline and time.monotonic() >= deadline:
                     break
                 existing = db.execute(
-                    "SELECT status FROM filings WHERE accession=?",
+                    "SELECT status,metadata FROM filings WHERE accession=?",
                     (filing["accession"],),
                 ).fetchone()
                 if existing and existing["status"] in {
@@ -587,6 +609,15 @@ def backfill_filings(
                     "confidential",
                 }:
                     continue
+                if existing and existing["status"] in {"review", "error"}:
+                    from thirteenf_legacy import PARSER_VERSION
+
+                    previous = json.loads(existing["metadata"])
+                    if (
+                        previous.get("parser") == "legacy-text"
+                        and previous.get("parser_version") == PARSER_VERSION
+                    ):
+                        continue  # The original remains reviewable until a parser upgrade.
                 meta = {
                     **filing,
                     "manager_id": manager["manager_id"],
@@ -624,9 +655,6 @@ def backfill_filings(
                     )
                     report = reconcile(parsed["raw_count"], parsed["rows"], primary)
                     meta["reconciliation"] = report
-                    meta["normalized_rows_sha256"] = hashlib.sha256(
-                        json.dumps(parsed["rows"], sort_keys=True).encode()
-                    ).hexdigest()
                     meta["authoritative_filing_parsed"] = True
                     status = (
                         "confidential"
@@ -676,8 +704,8 @@ def reparse_cached(db, cache=ARCHIVE / "filings"):
     from thirteenf_legacy import PARSER_VERSION
 
     records = db.execute(
-        "SELECT * FROM filings WHERE accession NOT LIKE 'discovery:%' AND (status IN ('error','review') OR (json_extract(metadata,'$.parser')='legacy-text' AND coalesce(json_extract(metadata,'$.parser_version'),'')!=?))",
-        (PARSER_VERSION,),
+        "SELECT * FROM filings WHERE accession NOT LIKE 'discovery:%' AND ((status IN ('error','review') AND (coalesce(json_extract(metadata,'$.parser'),'')!='legacy-text' OR coalesce(json_extract(metadata,'$.parser_version'),'')!=?)) OR (json_extract(metadata,'$.parser')='legacy-text' AND coalesce(json_extract(metadata,'$.parser_version'),'')!=?))",
+        (PARSER_VERSION, PARSER_VERSION),
     ).fetchall()
     for record in records:
         meta = json.loads(record["metadata"])

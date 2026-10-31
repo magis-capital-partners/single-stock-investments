@@ -25,6 +25,76 @@ from thirteenf_core import merge_filings
 from thirteenf_legacy import parse_legacy_document
 
 
+def test_unchanged_originals_and_books_do_not_rewrite_archive_pages(tmp_path):
+    db = archive.connect(tmp_path / "a.sqlite")
+    meta = {"accession": "a", "manager_id": "example", "cik": "1", "form": "13F-HR"}
+    rows = [{"cusip": "037833100", "value_usd": 100, "shares": 1}]
+    archive.store_filing(db, meta, rows)
+    archive.store_raw_documents(db, "a", {"raw_info_bytes": b"immutable original"})
+    changes = db.total_changes
+    archive.store_filing(db, dict(meta), list(rows))
+    archive.store_raw_documents(db, "a", {"raw_info_bytes": b"immutable original"})
+    assert db.total_changes == changes
+    archive.store_filing(db, meta, [{**rows[0], "shares": 2}])
+    assert archive.filing_rows(db, "a")[0]["shares"] == 2
+    assert db.total_changes > changes
+
+
+def test_zero_asset_registered_fund_report_is_explicitly_empty():
+    result = disclosures.parse_nport(
+        b"""<nport><genInfo>
+    <repPdDate>2021-06-30</repPdDate><seriesId>S1</seriesId><seriesName>Unfunded Fund</seriesName>
+    </genInfo><fundInfo><totAssets>0.0000</totAssets><netAssets>0.0000</netAssets></fundInfo></nport>""",
+        "example",
+        source_url="https://www.sec.gov/example.xml",
+    )
+    assert result["positions"] == []
+    assert not result["partial"]
+
+
+def test_letter_allocations_and_financial_abbreviations_are_not_stock_holdings():
+    rows = disclosures.extract_document_positions("""Top 10 holdings
+    United States 18%
+    United Kingdom 17%
+    Countries(a) 16%
+    Liabilities (Net)(b) 8%
+    Information Technology 7%
+    Foreign Company PLC 6%
+    We hold an investment whose net asset value (NAV) increased.
+    """)
+    assert len(rows) == 1
+    assert rows[0]["issuer"] == "Foreign Company PLC"
+    assert rows[0]["weight_pct"] == 6
+
+
+def test_letter_holdings_table_has_no_arbitrary_row_limit():
+    text = "Top 70 holdings\n" + "\n".join(f"Issuer {i} PLC 1%" for i in range(70))
+    assert len(disclosures.extract_document_positions(text)) == 70
+
+
+def test_sec_client_retries_a_temporary_internal_server_error(monkeypatch):
+    from urllib.error import HTTPError
+
+    import sec_client
+
+    attempts = []
+
+    def response(request, **kwargs):
+        attempts.append(request.full_url)
+        if len(attempts) == 1:
+            raise HTTPError(request.full_url, 500, "Temporary failure", {}, None)
+        return io.BytesIO(b"complete public document")
+
+    monkeypatch.setattr(sec_client.urllib.request, "urlopen", response)
+    monkeypatch.setattr(sec_client.time, "sleep", lambda _: None)
+    client = sec_client.SecClient(min_interval=0, max_attempts=2)
+    assert (
+        client.get_bytes("https://www.sec.gov/example.xml")
+        == b"complete public document"
+    )
+    assert len(attempts) == 2
+
+
 def test_legacy_preserves_classes_options_and_principal_amounts():
     raw = b"""CONFORMED PERIOD OF REPORT: 20001231
 Form 13F Information Table Entry Total: 3

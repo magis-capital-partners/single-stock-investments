@@ -10,9 +10,9 @@ import json
 import os
 import random
 import time
-from threading import Lock
 import urllib.error
 import urllib.request
+from threading import Lock
 
 DEFAULT_SEC_USER_AGENT = "Magis Capital Research drew@magiscapitalpartners.com"
 # 0.20s between requests is 5/s before the small jitter below.
@@ -56,7 +56,7 @@ class SecClient:
                     return resp.read()
             except urllib.error.HTTPError as exc:
                 last_error = exc
-                if exc.code in {403, 429, 503} and attempt + 1 < self.max_attempts:
+                if exc.code in {403, 429, 500, 502, 503, 504} and attempt + 1 < self.max_attempts:
                     time.sleep(min(30.0, 2.0 ** attempt) + random.uniform(0.0, 0.5))
                     continue
                 raise

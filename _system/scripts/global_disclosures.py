@@ -21,6 +21,7 @@ from collections import defaultdict
 from concurrent.futures import ThreadPoolExecutor
 from contextlib import closing, contextmanager
 from pathlib import Path
+from urllib.error import HTTPError
 from urllib.parse import urlencode, urlparse
 from xml.etree import ElementTree as ET
 
@@ -144,7 +145,18 @@ def parse_nport(raw, manager_id, *, source_url):
                 "source_kind": "nport",
             }
         )
-    if not positions and not any(local(node) == "invstOrSecs" for node in root.iter()):
+    explicit_zero_assets = (
+        child_text(root, "totAssets")
+        and child_text(root, "netAssets")
+        and number(child_text(root, "totAssets"))
+        == number(child_text(root, "netAssets"))
+        == 0
+    )
+    if (
+        not positions
+        and not explicit_zero_assets
+        and not any(local(node) == "invstOrSecs" for node in root.iter())
+    ):
         raise ValueError("N-PORT has no investment rows; retained for review")
     return {
         "manager_id": manager_id,
@@ -206,6 +218,241 @@ TABLE_HEADING = re.compile(
     r"(?:top\s+(?:\d+|ten|five)\s+(?:holdings|positions)|(?:holdings|positions)\s+as\s+(?:of|at)|portfolio\s+(?:holdings|composition)|schedule of investments)",
     re.IGNORECASE,
 )
+NON_SECURITY_LABELS = {
+    re.sub(r"[^a-z0-9]", "", name.lower())
+    for name in [
+        "United States",
+        "US",
+        "USA",
+        "United Kingdom",
+        "UK",
+        "Great Britain",
+        "England",
+        "Scotland",
+        "Ireland",
+        "Canada",
+        "Mexico",
+        "Brazil",
+        "Argentina",
+        "Chile",
+        "Colombia",
+        "Peru",
+        "Uruguay",
+        "Venezuela",
+        "Ecuador",
+        "France",
+        "Germany",
+        "Switzerland",
+        "Sweden",
+        "Norway",
+        "Finland",
+        "Denmark",
+        "Netherlands",
+        "Belgium",
+        "Luxembourg",
+        "Spain",
+        "Portugal",
+        "Italy",
+        "Austria",
+        "Greece",
+        "Poland",
+        "Czech Republic",
+        "Czechia",
+        "Hungary",
+        "Romania",
+        "Bulgaria",
+        "Croatia",
+        "Slovenia",
+        "Slovakia",
+        "Estonia",
+        "Latvia",
+        "Lithuania",
+        "Russia",
+        "Ukraine",
+        "Belarus",
+        "Serbia",
+        "Montenegro",
+        "Bosnia and Herzegovina",
+        "Albania",
+        "Malta",
+        "Cyprus",
+        "Iceland",
+        "Turkey",
+        "Türkiye",
+        "Israel",
+        "Saudi Arabia",
+        "United Arab Emirates",
+        "UAE",
+        "Qatar",
+        "Kuwait",
+        "Bahrain",
+        "Oman",
+        "Jordan",
+        "Lebanon",
+        "China",
+        "Hong Kong",
+        "Taiwan",
+        "Macao",
+        "Macau",
+        "Japan",
+        "South Korea",
+        "Korea",
+        "Singapore",
+        "Malaysia",
+        "Thailand",
+        "Indonesia",
+        "Philippines",
+        "Vietnam",
+        "India",
+        "Pakistan",
+        "Bangladesh",
+        "Sri Lanka",
+        "Australia",
+        "New Zealand",
+        "South Africa",
+        "Egypt",
+        "Morocco",
+        "Nigeria",
+        "Kenya",
+        "Ghana",
+        "Tunisia",
+        "Mauritius",
+        "Bermuda",
+        "Cayman Islands",
+        "British Virgin Islands",
+        "Puerto Rico",
+        "Panama",
+        "Costa Rica",
+        "Bahamas",
+        "Jersey",
+        "Guernsey",
+        "Isle of Man",
+        "North America",
+        "South America",
+        "Latin America",
+        "Europe",
+        "Europe ex UK",
+        "Asia",
+        "Asia Pacific",
+        "Africa",
+        "Middle East",
+        "Developed Markets",
+        "Emerging Markets",
+        "Frontier Markets",
+        "International",
+        "Domestic",
+        "Countries",
+        "Country",
+        "Other",
+        "Others",
+        "Other Countries",
+        "Other Assets",
+        "Other Investments",
+        "Cash",
+        "Cash and Cash Equivalents",
+        "Cash & Equivalents",
+        "Cash and Equivalents",
+        "Cash Equivalents",
+        "Liabilities",
+        "Liabilities Net",
+        "Net Assets",
+        "Total Net Assets",
+        "Assets",
+        "Equities",
+        "Bonds",
+        "Fixed Income",
+        "Corporate Bonds",
+        "Government Bonds",
+        "Convertible Bonds",
+        "Common Stock",
+        "Preferred Stock",
+        "Money Market",
+        "Short Term Investments",
+        "Bank Loans",
+        "Information Technology",
+        "Technology",
+        "Financials",
+        "Financial Services",
+        "Industrials",
+        "Consumer Discretionary",
+        "Consumer Staples",
+        "Consumer Cyclical",
+        "Consumer Defensive",
+        "Health Care",
+        "Healthcare",
+        "Utilities",
+        "Energy",
+        "Materials",
+        "Real Estate",
+        "Communication Services",
+        "Telecommunications",
+        "Net Long",
+        "Net Short",
+        "Gross Long",
+        "Gross Short",
+        "Long Exposure",
+        "Short Exposure",
+        "Gross Exposure",
+        "Net Exposure",
+        "USD",
+        "EUR",
+        "GBP",
+        "JPY",
+        "CHF",
+        "HKD",
+        "CNY",
+        "AUD",
+        "CAD",
+        "Euro",
+        "Euros",
+        "US Dollars",
+        "US Dollar",
+        "Total",
+        "Portfolio",
+        "Fund",
+        "Benchmark",
+        "Index",
+        "MSCI EAFE",
+        "MSCI ACWI",
+        "MSCI World",
+        "MSCI All Country World",
+        "S&P 500",
+        "SP500",
+        "Russell 1000",
+        "Russell 2000",
+        "Russell 3000",
+        "FTSE 100",
+        "FTSE All Share",
+        "NASDAQ Composite",
+        "Dow Jones Industrial Average",
+    ]
+}
+NON_SECURITY_SYMBOLS = {
+    "NAV",
+    "ROIC",
+    "ROE",
+    "AUM",
+    "EBITDA",
+    "IRR",
+    "YOY",
+    "YTD",
+    "QTD",
+    "CEO",
+    "CFO",
+    "GAAP",
+    "IFRS",
+    "GDP",
+    "EPS",
+    "USD",
+    "EUR",
+    "GBP",
+    "JPY",
+    "HKD",
+    "CNY",
+    "CHF",
+    "AUD",
+    "CAD",
+}
 
 
 def extract_document_positions(text, mentions=()):
@@ -219,6 +466,8 @@ def extract_document_positions(text, mentions=()):
             sentence,
         ):
             ticker = normalize_symbol(match[1], match[2] or "")
+            if ticker in NON_SECURITY_SYMBOLS:
+                continue
             positions[ticker] = {
                 "ticker": ticker,
                 "issuer": ticker,
@@ -243,14 +492,33 @@ def extract_document_positions(text, mentions=()):
             "source_kind": "fund_disclosure",
             "evidence_quote": commentary,
         }
-    remaining = 0
+    in_table = False
     for line in text.splitlines():
+        if re.match(
+            r"\s*(?:Performance(?: (?:Summary|History|Results|Comparison))?|(?:Average Annual|Annualized|Cumulative|Historical|Portfolio) Returns|Investment Performance|Fund Performance)\s*(?:\([^)]*\))?\s*$",
+            line,
+            re.IGNORECASE,
+        ):
+            in_table = False
+            continue
+        if re.search(
+            r"\b(?:country|geographic|sector|industry|regional|asset class)\s+(?:allocation|exposure|breakdown|diversification)|\b(?:performance attribution|portfolio returns)\b",
+            line,
+            re.IGNORECASE,
+        ):
+            in_table = False
+            continue
         if TABLE_HEADING.search(line):
-            remaining = 45
+            in_table = True
             continue
-        if not remaining:
+        if re.match(
+            r"\s*(?:We\b|Our\b|During\b|The (?:fund|portfolio)\b|This (?:fund|letter)\b)",
+            line,
+            re.IGNORECASE,
+        ):
+            in_table = False
+        if not in_table:
             continue
-        remaining -= 1
         if len(line) > 220 or EXCLUDED.search(line):
             continue
         match = re.match(
@@ -265,6 +533,12 @@ def extract_document_positions(text, mentions=()):
         if not match:
             continue
         name = match["name"].strip()
+        label = re.sub(r"\([a-z]\)\s*$", "", name, flags=re.IGNORECASE)
+        if (
+            label.upper() in NON_SECURITY_SYMBOLS
+            or re.sub(r"[^a-z0-9]", "", label.lower()) in NON_SECURITY_LABELS
+        ):
+            continue
         if re.search(
             r"\b(return|performance|index|net exposure|gross exposure|total|NAV)\b",
             name,
@@ -376,9 +650,22 @@ def nport_filings(cik, query=None, *, form="NPORT-P"):
                 "from": offset,
                 "size": 100,
             }
-            result = get_json(
-                "https://efts.sec.gov/LATEST/search-index?" + urlencode(params)
-            )
+            try:
+                result = get_json(
+                    "https://efts.sec.gov/LATEST/search-index?" + urlencode(params)
+                )
+            except HTTPError as exc:
+                if exc.code not in {500, 502, 503, 504} or len(terms) < 2:
+                    raise
+                middle = len(terms) // 2
+                divided = [
+                    *nport_filings(cik, terms[:middle], form=form),
+                    *nport_filings(cik, terms[middle:], form=form),
+                ]
+                return sorted(
+                    {f["accession"]: f for f in divided}.values(),
+                    key=lambda f: (f["filed_at"], f["accession"]),
+                )
             hits = result.get("hits", {}).get("hits", [])
             if not hits:
                 break
@@ -389,11 +676,14 @@ def nport_filings(cik, query=None, *, form="NPORT-P"):
                 if str(int(cik)) not in {str(int(x)) for x in source.get("ciks", [])}:
                     continue
                 accession = source["adsh"]
+                filename = hit.get("_id", "").partition(":")[2] or "primary_doc.xml"
+                if "/" in filename or "\\" in filename or filename in {".", ".."}:
+                    raise ValueError("Invalid SEC document filename")
                 found[accession] = {
                     "accession": accession,
                     "filed_at": source["file_date"],
                     "form": source["file_type"],
-                    "url": f"https://www.sec.gov/Archives/edgar/data/{int(cik)}/{accession.replace('-', '')}/primary_doc.xml",
+                    "url": f"https://www.sec.gov/Archives/edgar/data/{int(cik)}/{accession.replace('-', '')}/{filename}",
                 }
             offset += len(hits)
             total = result.get("hits", {}).get("total", {})
@@ -563,7 +853,13 @@ def public_disclosures(sources, *, deadline=None, workers=4):
                     f"Unsupported public disclosure source: {source['kind']}"
                 )
         except (OSError, ValueError, KeyError, ET.ParseError) as exc:
-            review.append({"manager_id": source["manager_id"], "reason": str(exc)})
+            review.append(
+                {
+                    "manager_id": source["manager_id"],
+                    "cik": source.get("cik"),
+                    "reason": str(exc),
+                }
+            )
     return output, review
 
 
@@ -681,9 +977,7 @@ def publish(
         row["fund_ids"] = sorted(source_ids.get(manager["manager_id"], []))
         documents = by_manager.get(manager["manager_id"], [])
         row["disclosure_count"] = len(documents)
-        row["disclosure_quarters"] = sorted(
-            {document_quarter(d) for d in documents} - {"undated"}
-        )
+        row["disclosure_quarters"] = sorted({document_quarter(d) for d in documents})
     index["managers"] = sorted(existing.values(), key=lambda r: r["manager_id"])
     index["disclosure_coverage"] = {
         "snapshots": len(disclosures),

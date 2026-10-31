@@ -8,6 +8,29 @@ const managers=[
   {manager_id:'b',name:'Beta',history:[],disclosure_count:2,disclosure_quarters:['2020Q1']},
   {manager_id:'c',name:'No filing',history:[]},
 ];
+
+test('large books remain fully searchable and paginated',()=>{
+  const rows=Array.from({length:405},(_,i)=>({ticker:`T${i}`,cusip:`CUSIP${i}`,value_usd:i}));
+  assert.equal(ui.positionPage(rows).rows.length,100);
+  assert.equal(ui.positionPage(rows).rows[0].ticker,'T404');
+  assert.equal(ui.positionPage(rows,{page:4}).rows.length,5);
+  assert.equal(ui.positionPage(rows,{query:'CUSIP404'}).rows[0].ticker,'T404');
+  assert.equal(ui.positionPage(rows,{query:'unmatched'}).total,0);
+});
+test('each fund vehicle remains selectable without combining their books',()=>{
+  const snapshots=[{vehicle_id:'b',vehicle_name:'Beta',positions:[2]},{vehicle_id:'a',vehicle_name:'Alpha',positions:[1]}];
+  const first=ui.disclosureVehicle(snapshots);
+  assert.equal(first.vehicles.length,2);
+  assert.equal(first.snapshots[0].vehicle_id,'a');
+  assert.deepEqual(ui.disclosureVehicle(snapshots,'b').snapshots[0].positions,[2]);
+});
+test('undated disclosures remain reachable alongside dated holdings',()=>{
+  const snapshots=[{vehicle_id:'a'},{vehicle_id:'a',period_end:'2020-03-31'}];
+  assert.equal(ui.selectDisclosureSnapshots(snapshots,'undated').length,1);
+  const manager={manager_id:'a',name:'Alpha',disclosure_count:2,disclosure_quarters:['2020Q1','undated']};
+  assert.equal(ui.directoryRows([manager],{quarter:'undated'}).length,1);
+  assert.ok(ui.availablePeriods(manager).includes('undated'));
+});
 test('all managers including non-filers appear by default',()=>{
   assert.equal(ui.directoryRows(managers).length,3);
   assert.equal(ui.directoryRows(managers,{overlap:true}).length,1);

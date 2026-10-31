@@ -2,6 +2,8 @@
 
 The Investors directory defaults to all investors and the latest available date for each source. Select a quarter to load that historical book. The source filter separates 13F filings, fund disclosures, and unresolved document identities. A missing disclosure is never interpreted as an empty portfolio or a sale.
 
+Choose a fund vehicle to inspect its international disclosures. Holdings are searchable by company, symbol or identifier and paginated without dropping positions. Undated disclosures remain accessible under Date unavailable. Country, sector and cash allocation tables are not stock holdings. Unchanged original documents and books are retained without rewriting the archive on each refresh.
+
 ## Sources and scope
 
 * The dated public DATAROMA roster supplies manager names, not holdings. SEC CIKs and legal names determine filing ownership; ambiguous names remain unlinked. Curated brand aliases are in `_system/reference/investors/manager_aliases.json`.
