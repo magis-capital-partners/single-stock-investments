@@ -198,12 +198,19 @@ def test_after_close_publication_has_an_event_trigger_and_lightweight_fallbacks(
 
 
 def test_production_underwriting_checkout_contains_the_approved_method_registry():
+    import subprocess
+
     import yaml
     root = Path(__file__).resolve().parents[3]
     doc = yaml.safe_load((root/'.github/workflows/valuation-underwriting.yml').read_text())
     checkout = next(s for s in doc['jobs']['underwrite']['steps'] if s.get('uses') == 'actions/checkout@v4')
     paths = checkout['with']['sparse-checkout']
     assert '/_system/reference/valuation_method_registry.json' in paths.splitlines()
+    related = '/_system/reference/market-data/valuation_related_evidence/'
+    assert related in paths.splitlines()
+    assert related in (root/'_system/scripts/underwriting_local.ps1').read_text()
+    marker = related.strip('/')+'/README.md'
+    assert subprocess.check_output(['git', 'ls-files', '--error-unmatch', '--', marker], cwd=root, text=True).strip() == marker
     assert '/.github/workflows/autonomous-compounders.yml' in paths.splitlines()
     assert '/.github/workflows/valuation-underwriting.yml' in paths.splitlines()
 
