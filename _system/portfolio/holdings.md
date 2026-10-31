@@ -261,12 +261,14 @@ Synced from `_system/portfolio/registry.json`. Last sync: 2026-10-29.
 | EBAY | EBAY/ | eBay Inc. | US | 2026-07-29 | 2026-10-29 | unknown | watch |
 | ECHO | ECHO/ | EchoStar Corporation | US | 2026-07-29 | 2026-10-29 | unknown | watch |
 | ECL | ECL/ | Ecolab | US | 2026-07-29 | 2026-10-29 | unknown | watch |
+| ECOR.L | ECOR.L/ | Ecora Royalties PLC | UK | — | 2026-10-27 | optionality | watch |
 | ED | ED/ | Consolidated Edison | US | 2026-07-29 | 2026-10-29 | unknown | watch |
 | EFOR | EFOR/ | Everforth, Inc. | US | 2026-07-29 | 2026-10-29 | unknown | watch |
 | EFX | EFX/ | Equifax | US | 2026-07-29 | 2026-10-29 | unknown | watch |
 | EG | EG/ | Everest Group | US | 2026-07-29 | 2026-10-29 | unknown | watch |
 | EIX | EIX/ | Edison International | US | 2026-07-29 | 2026-10-29 | unknown | watch |
 | EL | EL/ | Estée Lauder Companies (The) | US | 2026-07-29 | 2026-10-29 | unknown | watch |
+| ELE | ELE/ | Elemental Royalty Corp | US | — | 2026-10-27 | optionality | watch |
 | ELV | ELV/ | Elevance Health | US | 2026-07-29 | 2026-10-29 | unknown | watch |
 | EME | EME/ | Emcor | US | 2026-07-29 | 2026-10-29 | unknown | watch |
 | EMR | EMR/ | Emerson Electric | US | 2026-07-29 | 2026-10-29 | unknown | watch |
@@ -280,6 +282,7 @@ Synced from `_system/portfolio/registry.json`. Last sync: 2026-10-29.
 | EQR | EQR/ | Equity Residential | US | 2026-07-29 | 2026-10-29 | unknown | watch |
 | EQT | EQT/ | EQT Corporation | US | 2026-07-29 | 2026-10-29 | unknown | watch |
 | ERIE | ERIE/ | Erie Indemnity | US | 2026-07-29 | 2026-10-29 | unknown | watch |
+| EROK | EROK/ | EagleRock Land, LLC | US | — | 2026-10-27 | optionality | watch |
 | ES | ES/ | Eversource Energy | US | 2026-07-29 | 2026-10-29 | unknown | watch |
 | ESS | ESS/ | Essex Property Trust | US | 2026-07-29 | 2026-10-29 | unknown | watch |
 | ETHA | ETHA/ | ETHA | US | 2026-07-29 | 2026-10-29 | unknown | watch |
@@ -821,6 +824,7 @@ Synced from `_system/portfolio/registry.json`. Last sync: 2026-10-29.
 | VLO | VLO/ | Valero Energy | US | 2026-07-10 | 2026-10-29 | unknown | watch |
 | VLTO | VLTO/ | Veralto | US | 2026-07-10 | 2026-10-29 | unknown | watch |
 | VMC | VMC/ | Vulcan Materials Company | US | 2026-09-07 | 2026-10-29 | unknown | watch |
+| VMET | VMET/ | Versamet Royalties Corp | US | — | 2026-10-27 | optionality | watch |
 | VNOM | VNOM/ | Viper Energy, Inc. | US | — | 2026-10-29 | unknown | watch |
 | VOXR | VOXR/ | Vox Royalty Corp | US | 2026-07-09 | 2026-10-29 | unknown | watch |
 | VRSK | VRSK/ | Verisk Analytics | US | 2026-07-10 | 2026-10-29 | unknown | watch |
@@ -876,4 +880,4 @@ Synced from `_system/portfolio/registry.json`. Last sync: 2026-10-29.
 | ZETA | ZETA/ | ZETA | US | 2026-07-28 | 2026-10-29 | unknown | watch |
 | ZTS | ZTS/ | Zoetis | US | 2026-07-10 | 2026-10-29 | unknown | watch |
 
-**869 holdings total.** Registry: `_system/portfolio/registry.json`
+**873 holdings total.** Registry: `_system/portfolio/registry.json`

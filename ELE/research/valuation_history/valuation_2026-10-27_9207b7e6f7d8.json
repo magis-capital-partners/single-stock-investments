@@ -1,0 +1,1065 @@
+{
+  "ticker": "ELE",
+  "as_of": "2026-10-27",
+  "method": "full",
+  "lawrence_bucket": "other",
+  "classification_inputs": {
+    "archetype": "optionality",
+    "moat": "narrow",
+    "dhando": "partial",
+    "cycle": "mid",
+    "payoff_lens": "asset"
+  },
+  "inputs": {
+    "price": 15.6,
+    "price_as_of": "2026-10-27",
+    "price_source": "Yahoo Finance chart API regularMarketPrice for ELE, 15.60 USD, Nasdaq, 2026-10-27 14:20 UTC",
+    "fcf_per_share": 0.482704,
+    "fcf_source": "FY2025 cash flows from operating activities 30,811,000 USD divided by 63,829,995 shares outstanding at 2025-12-31. IFRS tags CashFlowsFromUsedInOperatingActivities and NumberOfSharesOutstanding, Form 40-F accession 0001628280-26-020856. This is reported 2025 operating cash, not a normalized post-merger run rate. Property, plant and equipment purchases were 4,000 USD. Cash used in investing activities was 56,325,000 USD and is not deducted here because it is portfolio investment, not sustaining plant.",
+    "shares_millions": 63.83,
+    "shares_outstanding": 63829995,
+    "shares_source": "IFRS NumberOfSharesOutstanding 63,829,995 at 2025-12-31, Form 40-F accession 0001628280-26-020856. Weighted average shares were 29,975,215. Ending shares are used so the per-share figure is not inflated by the pre-merger average."
+  },
+  "scenarios": {
+    "bear": {
+      "growth_y1_5": -0.05,
+      "growth_y6_10": 0.0,
+      "exit_pfcf_y10": 10,
+      "notes": "[Assumption] Operating cash declines and the selling multiple compresses. Not a filing forecast."
+    },
+    "base": {
+      "growth_y1_5": 0.0,
+      "growth_y6_10": 0.0,
+      "exit_pfcf_y10": 15,
+      "notes": "[Assumption] Flat operating cash and a 15 times selling multiple. The September 2026 Orion transaction is not in this cash number."
+    },
+    "bull": {
+      "growth_y1_5": 0.05,
+      "growth_y6_10": 0.0,
+      "exit_pfcf_y10": 18,
+      "notes": "[Assumption] Modest growth and a higher selling multiple. Not a filing forecast."
+    }
+  },
+  "evidence": "Form 40-F accession 0001628280-26-020856 via SEC companyfacts CIK 0002086771.",
+  "lawrence_horizon_years": 7,
+  "results_lawrence_legacy": {
+    "bear": {
+      "return_pct": -13.6
+    },
+    "base": {
+      "return_pct": -6.1
+    },
+    "bull": {
+      "return_pct": -0.5
+    }
+  },
+  "results": {
+    "bear": {
+      "return_pct": -13.6
+    },
+    "base": {
+      "return_pct": -6.1
+    },
+    "bull": {
+      "return_pct": -0.5
+    }
+  },
+  "implied_return": {
+    "base_pct": -4.55,
+    "label": "7yr IRR (total synthesis)",
+    "display": "-4.55% (total synthesis)",
+    "lawrence_stance_gate_pct": -6.1,
+    "falsifier_adjusted_pct": -6.1,
+    "synthesis_pct": -4.55
+  },
+  "stance_proposal": {
+    "suggested": "watch",
+    "irr_band": "<15%",
+    "gates": {
+      "moat_ok": true,
+      "dhando_ok": true
+    },
+    "override_reason": null
+  },
+  "overlay_results": [],
+  "component_valuation_results": {
+    "status": "inferred_minimal",
+    "decision_rule": "Operating-only fallback. Add an explicit component_valuation schedule before drawing asset-level conclusions.",
+    "all_material_components_identified": false,
+    "additive_components": [
+      {
+        "id": "operating_business_fallback",
+        "label": "Operating business (fallback)",
+        "category": "operating_business",
+        "treatment": "additive",
+        "method": "owner_cash_dcf",
+        "evidence_tier": "model_input",
+        "evidence": "inputs.fcf_per_share and scenarios.base",
+        "low_per_share": 5.48,
+        "base_per_share": 6.07,
+        "high_per_share": 6.74
+      }
+    ],
+    "embedded_components": [],
+    "total_equity_value_per_share": {
+      "low": 5.48,
+      "base": 6.07,
+      "high": 6.74
+    },
+    "material_component_count": 1,
+    "additive_component_count": 1,
+    "embedded_component_count": 0,
+    "market_price_per_share": 15.6,
+    "upside_downside_pct": {
+      "low": -64.9,
+      "base": -61.1,
+      "high": -56.8
+    }
+  },
+  "economic_value_analysis": {
+    "schema_version": "1.0",
+    "status": "recommended",
+    "trigger": {
+      "required": false,
+      "reasons": [],
+      "policy": "A complete economic-value analysis is required when any trigger fires; otherwise it is recommended."
+    },
+    "method": "economic_claim_to_risked_present_value",
+    "economic_claim": {},
+    "gaap_role": null,
+    "accounting_reference": null,
+    "comparable_hierarchy": [
+      "issuer_arm_length_transaction",
+      "same_asset_transaction",
+      "public_peer",
+      "replacement_cost",
+      "approved_external_analysis"
+    ],
+    "gross_comparable_nav_per_share": null,
+    "risked_present_value_per_share": {
+      "low": 5.48,
+      "base": 6.07,
+      "high": 6.74
+    },
+    "component_groups": [
+      {
+        "id": "operating_business_fallback",
+        "label": "Operating business (fallback)",
+        "component_ids": [
+          "operating_business_fallback"
+        ],
+        "economic_claim": "Operating business (fallback)",
+        "valuation_basis": "owner_cash_dcf",
+        "adjustments": "Risk and timing are reflected in the low/base/high range.",
+        "overlap_control": "Unique overlap key operating_business_fallback.",
+        "risked_present_value_per_share": {
+          "low": 5.48,
+          "base": 6.07,
+          "high": 6.74
+        }
+      }
+    ],
+    "valuation_proof": [
+      {
+        "component_id": "operating_business_fallback",
+        "economic_claim": "Operating business (fallback)",
+        "quantity": {
+          "value": 1,
+          "unit": "per-share economic claim"
+        },
+        "method": "owner_cash_dcf",
+        "evidence_tier": "model_input",
+        "evidence": "inputs.fcf_per_share and scenarios.base",
+        "comparable_role": "not_applicable",
+        "comparable_ids": [],
+        "adjustment": "Risk and timing are reflected in the low/base/high range.",
+        "range_per_share": {
+          "low": 5.48,
+          "base": 6.07,
+          "high": 6.74
+        },
+        "treatment": "additive",
+        "overlap_key": "operating_business_fallback",
+        "overlap_control": "Unique overlap key operating_business_fallback.",
+        "falsifier": "Owner cash, reinvestment economics, or competitive position remains below the low-case path for two reporting periods.",
+        "risk_and_timing": null
+      }
+    ],
+    "wisdom_applied": [],
+    "limitations": [],
+    "complete_component_coverage": true,
+    "validation_errors": [],
+    "registry_version": "1.0"
+  },
+  "valuation_method_route": {
+    "schema_version": "1.0",
+    "status": "routed",
+    "profile_id": "scarce_asset_optionality",
+    "label": "Scarce assets, royalties, and optionality",
+    "score": 6.0,
+    "reasons": [
+      "archetype=optionality"
+    ],
+    "primary_methods": [
+      "component_owner_cash_and_unit_nav"
+    ],
+    "corroborating_methods": [
+      "comparable_transactions",
+      "replacement_cost_or_reverse_nav"
+    ],
+    "primary_personas": [
+      "hk",
+      "stahl"
+    ],
+    "cross_check_personas": [
+      "klarman_asset_value",
+      "marks_credit_cycle"
+    ],
+    "silent_personas": [
+      "buffett_weschler",
+      "greenblatt",
+      "hohn",
+      "lawrence",
+      "marathon_capital_cycle",
+      "moi",
+      "munger",
+      "pabrai"
+    ],
+    "required_evidence": [
+      "legal economic claim",
+      "non-overlapping physical inventory",
+      "unit economics",
+      "realization timing",
+      "remaining owner capital"
+    ],
+    "failure_modes": [
+      "gross asset value mistaken for shareholder value",
+      "operating cash flow and NAV counted twice",
+      "remote options treated as contracted cash"
+    ],
+    "secondary_profiles": [
+      {
+        "profile_id": "quality_reinvestment",
+        "score": 3.0,
+        "reasons": [
+          "component categories=operating_business",
+          "existing methods=dcf, owner_cash"
+        ]
+      },
+      {
+        "profile_id": "predictable_cash_flow",
+        "score": 2.0,
+        "reasons": [
+          "component categories=operating_business",
+          "existing methods=owner_cash"
+        ]
+      }
+    ],
+    "scorecard": {
+      "scarce_asset_optionality": {
+        "score": 6.0,
+        "reasons": [
+          "archetype=optionality"
+        ]
+      },
+      "quality_reinvestment": {
+        "score": 3.0,
+        "reasons": [
+          "component categories=operating_business",
+          "existing methods=dcf, owner_cash"
+        ]
+      },
+      "capital_cycle": {
+        "score": 1.0,
+        "reasons": [
+          "component categories=operating_business"
+        ]
+      },
+      "credit_and_normalized_returns": {
+        "score": 0.0,
+        "reasons": []
+      },
+      "catalyst_asset_value": {
+        "score": 0.0,
+        "reasons": []
+      },
+      "predictable_cash_flow": {
+        "score": 2.0,
+        "reasons": [
+          "component categories=operating_business",
+          "existing methods=owner_cash"
+        ]
+      },
+      "binary_milestone": {
+        "score": 0.0,
+        "reasons": []
+      }
+    },
+    "decision_rule": "Use one primary method and no more than two corroborating methods; irrelevant methods and personas remain silent."
+  },
+  "universal_valuation_contract": {
+    "schema_version": "3.0",
+    "status": "evidence_blocked",
+    "proof_status": "evidence_blocked",
+    "model_level": "evidence_blocked",
+    "model_level_reason": "Required evidence, calculation, or component coverage remains open.",
+    "decision_eligibility": {
+      "committee_eligible": false,
+      "capital_actionable": false,
+      "capital_authority_required": "human_decision",
+      "reason": "Model must be stock-specific and evidence-clear before committee review."
+    },
+    "ticker": "ELE",
+    "as_of": "2026-10-27",
+    "dates": {
+      "model_as_of": "2026-10-27",
+      "latest_fact_as_of": null,
+      "oldest_fact_as_of": null,
+      "price_as_of": "2026-10-27"
+    },
+    "legacy_audit": {
+      "actionable": false,
+      "status": "audit_only",
+      "annualized_return_at_price_pct": {
+        "low": null,
+        "base": null,
+        "high": null
+      },
+      "formula": "((present_value_or_output + undated_distributions) / price) ** (1 / horizon_years) - 1",
+      "reason_non_actionable": "This legacy calculation treated a present value as a future payoff and cannot be used as a forward return, hurdle entry price, ranking signal, or capital decision."
+    },
+    "economic_ownership_map": [
+      {
+        "component_id": "operating_business_fallback",
+        "label": "Operating business (fallback)",
+        "category": "operating_business",
+        "treatment": "additive",
+        "included_in_component_id": null,
+        "ownership_claim": "Operating business (fallback)",
+        "ownership_percentage": 1.0,
+        "quantity": {
+          "value": 1,
+          "unit": "per-share economic claim"
+        },
+        "method": "owner_cash_dcf",
+        "method_version": null,
+        "method_provenance": null,
+        "comparable_ids": [],
+        "range_per_share": {
+          "low": null,
+          "base": null,
+          "high": null
+        },
+        "output_basis": "present_value_today",
+        "legacy_range_per_share": {
+          "low": 5.48,
+          "base": 6.07,
+          "high": 6.74
+        },
+        "valuation_status": "legacy_sensitivity",
+        "calculation_proof": null,
+        "evidence_tier": "model_input",
+        "evidence_level": "analyst_estimated",
+        "evidence": "inputs.fcf_per_share and scenarios.base",
+        "scenario_assumptions": null,
+        "probability_and_timing": null,
+        "tax_and_realization_adjustments": "Risk and timing are reflected in the low/base/high range.",
+        "falsifier": "Owner cash, reinvestment economics, or competitive position remains below the low-case path for two reporting periods.",
+        "overlap_key": "operating_business_fallback",
+        "assumption_type": "estimate"
+      }
+    ],
+    "component_coverage": {
+      "all_material_components_identified": false,
+      "material_component_count": 1,
+      "additive_component_count": 1,
+      "embedded_component_count": 0,
+      "unvalued_component_count": 1,
+      "double_counting_flags": []
+    },
+    "input_classification": {
+      "facts": [],
+      "estimates": [
+        {
+          "component_id": "operating_business_fallback",
+          "label": "Operating business (fallback)",
+          "kind": "estimate",
+          "evidence_tier": "model_input",
+          "evidence": "inputs.fcf_per_share and scenarios.base",
+          "method": "owner_cash_dcf",
+          "valuation_status": "legacy_sensitivity"
+        }
+      ],
+      "judgments": []
+    },
+    "method_route": {
+      "schema_version": "1.0",
+      "status": "routed",
+      "profile_id": "scarce_asset_optionality",
+      "label": "Scarce assets, royalties, and optionality",
+      "score": 6.0,
+      "reasons": [
+        "archetype=optionality"
+      ],
+      "primary_methods": [
+        "component_owner_cash_and_unit_nav"
+      ],
+      "corroborating_methods": [
+        "comparable_transactions",
+        "replacement_cost_or_reverse_nav"
+      ],
+      "primary_personas": [
+        "hk",
+        "stahl"
+      ],
+      "cross_check_personas": [
+        "klarman_asset_value",
+        "marks_credit_cycle"
+      ],
+      "silent_personas": [
+        "buffett_weschler",
+        "greenblatt",
+        "hohn",
+        "lawrence",
+        "marathon_capital_cycle",
+        "moi",
+        "munger",
+        "pabrai"
+      ],
+      "required_evidence": [
+        "legal economic claim",
+        "non-overlapping physical inventory",
+        "unit economics",
+        "realization timing",
+        "remaining owner capital"
+      ],
+      "failure_modes": [
+        "gross asset value mistaken for shareholder value",
+        "operating cash flow and NAV counted twice",
+        "remote options treated as contracted cash"
+      ],
+      "secondary_profiles": [
+        {
+          "profile_id": "quality_reinvestment",
+          "score": 3.0,
+          "reasons": [
+            "component categories=operating_business",
+            "existing methods=dcf, owner_cash"
+          ]
+        },
+        {
+          "profile_id": "predictable_cash_flow",
+          "score": 2.0,
+          "reasons": [
+            "component categories=operating_business",
+            "existing methods=owner_cash"
+          ]
+        }
+      ],
+      "scorecard": {
+        "scarce_asset_optionality": {
+          "score": 6.0,
+          "reasons": [
+            "archetype=optionality"
+          ]
+        },
+        "quality_reinvestment": {
+          "score": 3.0,
+          "reasons": [
+            "component categories=operating_business",
+            "existing methods=dcf, owner_cash"
+          ]
+        },
+        "capital_cycle": {
+          "score": 1.0,
+          "reasons": [
+            "component categories=operating_business"
+          ]
+        },
+        "credit_and_normalized_returns": {
+          "score": 0.0,
+          "reasons": []
+        },
+        "catalyst_asset_value": {
+          "score": 0.0,
+          "reasons": []
+        },
+        "predictable_cash_flow": {
+          "score": 2.0,
+          "reasons": [
+            "component categories=operating_business",
+            "existing methods=owner_cash"
+          ]
+        },
+        "binary_milestone": {
+          "score": 0.0,
+          "reasons": []
+        }
+      },
+      "decision_rule": "Use one primary method and no more than two corroborating methods; irrelevant methods and personas remain silent."
+    },
+    "market": {
+      "price_per_share": 15.6,
+      "fully_diluted_shares": 63829995,
+      "market_cap_m": 995.75,
+      "enterprise_value_m": null,
+      "price_source": "Yahoo Finance chart API regularMarketPrice for ELE, 15.60 USD, Nasdaq, 2026-10-27 14:20 UTC",
+      "price_as_of": "2026-10-27"
+    },
+    "valuation": {
+      "output_basis": "present_value_today",
+      "output_basis_status": "defaulted_for_legacy_safety",
+      "output_range_per_share": {
+        "low": null,
+        "base": null,
+        "high": null
+      },
+      "value_per_share": {
+        "low": null,
+        "base": null,
+        "high": null
+      },
+      "present_value_today_per_share": {
+        "low": null,
+        "base": null,
+        "high": null
+      },
+      "future_payoff_per_share": {
+        "low": null,
+        "base": null,
+        "high": null
+      },
+      "future_payoff_date": null,
+      "future_payoff_horizon_years": null,
+      "forward_cashflow_schedule": null,
+      "priced_components_per_share": {
+        "low": 0,
+        "base": 0,
+        "high": 0
+      },
+      "legacy_value_per_share": {
+        "low": 5.48,
+        "base": 6.07,
+        "high": 6.74
+      },
+      "probability_weighted_value_per_share": null,
+      "expected_distributions_per_share": 0.0,
+      "forward_return_at_price_pct": {
+        "low": null,
+        "base": null,
+        "high": null
+      },
+      "forward_return_status": "withheld",
+      "forward_return_reason": "present_value_today cannot be annualized as a future payoff",
+      "annualized_return_at_price_pct": {
+        "low": null,
+        "base": null,
+        "high": null
+      },
+      "annualized_return_field_status": "compatibility_alias_of_forward_return",
+      "required_return_pct": null,
+      "margin_of_safety_pct": {
+        "low": null,
+        "base": null,
+        "high": null
+      },
+      "margin_of_safety_definition": "(intrinsic_value_today - market_price) / intrinsic_value_today; positive means the quote is below intrinsic value",
+      "upside_to_value_pct": {
+        "low": null,
+        "base": null,
+        "high": null
+      },
+      "downside_to_low_pct": null,
+      "horizon_years": 7,
+      "equity_liability_floor": 0.0,
+      "interpretation": "output_basis states what the proof produced. value_per_share and present_value_today_per_share are intrinsic values today and are withheld while any material additive component is unpriced or dated future economics cannot be discounted at an explicit required return. priced_components_per_share is the raw proof-output sum. A present value is never annualized or discounted again."
+    },
+    "scenario_contract": {
+      "rule": "Cases must change cited causal operating, capital, probability, timing, or financing drivers—not only a terminal multiple.",
+      "top_value_drivers": [
+        {
+          "component_id": "operating_business_fallback",
+          "label": "Operating business (fallback)",
+          "valuation_status": "legacy_sensitivity",
+          "base_per_share": null,
+          "legacy_base_per_share": 6.07,
+          "range_width_per_share": null,
+          "scenario_assumptions": null
+        }
+      ],
+      "reverse_expectations": null
+    },
+    "calculation_proof_summary": {
+      "component_count": 1,
+      "priced_component_count": 0,
+      "proof_complete_pct": 0.0,
+      "status_counts": {
+        "bounded_estimate": 0,
+        "calculated": 0,
+        "legacy_sensitivity": 1,
+        "unpriced": 0
+      },
+      "all_material_components_priced": false,
+      "calculation_errors": [],
+      "aggregate_proof_hash": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945"
+    },
+    "source_lineage": [],
+    "model_checks": {
+      "calculation_graphs_valid": true,
+      "component_sum_reconciles": false,
+      "no_double_counting": true,
+      "all_material_components_priced": false,
+      "positive_base_or_explicit_zero_value": false,
+      "low_base_high_ordered": true,
+      "source_identity_and_freshness_valid": true,
+      "extreme_return_validated": true,
+      "output_basis_valid": true,
+      "dated_forward_economics_valid": true,
+      "present_value_is_not_treated_as_future_payoff": true
+    },
+    "evidence": {
+      "unresolved_count": 1,
+      "blockers": [
+        "operating_business_fallback: material component is legacy_sensitivity; a valid calculation proof is required"
+      ],
+      "validation_errors": []
+    },
+    "monitoring": {
+      "falsifiers": [
+        "Owner cash, reinvestment economics, or competitive position remains below the low-case path for two reporting periods."
+      ],
+      "required_refresh_triggers": [
+        "new filing or material operating update",
+        "capital-structure change",
+        "material price move",
+        "component milestone or falsifier"
+      ]
+    },
+    "change_control": {
+      "model_hash": "e34fb6f7493f4d4f669a8a75f57b9fa8d4c0a0957fb33eb96f28a43055a19477",
+      "method_versions": [],
+      "change_log": [],
+      "rule": "A source fact is locked. Every assumption change requires a reason, author, timestamp, and before/after value."
+    },
+    "decision_rule": "Proof status and investment readiness are separate. Every material claim must be valued exactly once by a valid calculation proof, every evidence blocker must be resolved, and the model must be stock-specific before committee review. Only a human decision can authorize capital.",
+    "shared_forecast": {
+      "schema_version": "1.0",
+      "method_version": "shared-valuation-forecast/1.1",
+      "ticker": "ELE",
+      "status": "model_gap",
+      "research_only": true,
+      "requires_human_review": false,
+      "capital_actionable": false,
+      "as_of": "2026-10-27",
+      "model_as_of": "2026-10-27",
+      "quote": {
+        "value": 15.6,
+        "as_of": "2026-10-27",
+        "source_url": "Yahoo Finance chart API regularMarketPrice for ELE, 15.60 USD, Nasdaq, 2026-10-27 14:20 UTC",
+        "currency": null
+      },
+      "forecast_hash": "edc050f823dbb9ea8423266ddb49c3a6aecd32d1fef8492911308d95dad47d30",
+      "forward_irr_pct": {
+        "low": null,
+        "base": null,
+        "high": null
+      },
+      "present_value_today_per_share": {
+        "low": null,
+        "base": null,
+        "high": null
+      },
+      "model_present_value_per_share": {
+        "low": null,
+        "base": null,
+        "high": null
+      },
+      "required_return_pct": {
+        "low": null,
+        "base": null,
+        "high": null
+      },
+      "forward_cashflow_schedule": {},
+      "buy_prices": [],
+      "components": [
+        {
+          "component_id": "operating_business_fallback",
+          "method": "owner_cash_dcf",
+          "status": "model_gap",
+          "present_value_per_share": {}
+        }
+      ],
+      "gaps": [
+        {
+          "code": "material_component_coverage_incomplete"
+        },
+        {
+          "component_id": "operating_business_fallback",
+          "case": "low",
+          "code": "invalid_calculation_proof"
+        },
+        {
+          "component_id": "operating_business_fallback",
+          "case": "base",
+          "code": "invalid_calculation_proof"
+        },
+        {
+          "component_id": "operating_business_fallback",
+          "case": "high",
+          "code": "invalid_calculation_proof"
+        }
+      ],
+      "warnings": [],
+      "source_refs": [],
+      "next_action": "automatic_model_refresh",
+      "reconciliation": {
+        "passed": false
+      },
+      "settlement_policy": "Explicit cash/debt additions in an operating DCF are time-zero acquisition adjustments; hypothetical settlement, not declared dividends.",
+      "calculation_id": "91a7f56dc3501dc701026766fd291ac7521f93d662239a223702a97320bc9f11"
+    }
+  },
+  "synthesis": {
+    "status": "complete",
+    "paths": [
+      {
+        "id": "scenario_bear",
+        "label": "Bear scenario (Lawrence)",
+        "source": "scenarios.bear",
+        "return_pct": -13.6,
+        "weight": 0.05,
+        "type": "numeric",
+        "epistemic_tier": "C (scenario envelope)",
+        "weight_why": "Downside stress; low weight because bear is a sensitivity, not a competing explanation of base mechanics.",
+        "weight_falsifiers": [
+          "Bear assumptions become base case in filings (e.g. sustained volume collapse)"
+        ],
+        "hard_to_vary": "yes: asymmetric low weight is structural"
+      },
+      {
+        "id": "scenario_bull",
+        "label": "Bull scenario (Lawrence)",
+        "source": "scenarios.bull",
+        "return_pct": -0.5,
+        "weight": 0.12,
+        "type": "numeric",
+        "epistemic_tier": "C (scenario envelope)",
+        "weight_why": "Upside stress probe; higher than bear because optionality archetype has skew, but still below primary paths.",
+        "weight_falsifiers": [
+          "Bull growth sustained in filings for 4+ quarters without falsifier trigger"
+        ],
+        "hard_to_vary": "yes"
+      }
+    ],
+    "qualitative_adjustments": [
+      {
+        "id": "no_predictive_attribute",
+        "factor": "No dated predictive attribute at spot",
+        "pp": -0.2,
+        "rationale": "Scarcity is descriptive; no timed mispricing catalyst in base",
+        "sources": "HK predictive attributes framework",
+        "falsifier": "Cross-check names dated catalyst with timeline"
+      }
+    ],
+    "qualitative_manual": false,
+    "qualitative_pp_cap_applied": false,
+    "numeric_weighted_pct": -4.35,
+    "qualitative_pp": -0.2,
+    "total_synthesis_pct": -4.55,
+    "human_approval": "pending",
+    "weight_audit": {
+      "flags": [],
+      "deutsch_checks": {
+        "hard_to_vary": true,
+        "falsifiable": true,
+        "not_instrumentalist": true,
+        "reach": "Weights encode evidence tier (A primary → D external), not fitted to hit a target IRR"
+      },
+      "qualitative_audit": {
+        "flags": [],
+        "deutsch_checks": {
+          "hard_to_vary": true,
+          "falsifiable": true,
+          "not_double_count": true,
+          "small_band": true
+        }
+      }
+    },
+    "notes": "Capstone IRR combining filings, segments, overlays, third-party, qualitative"
+  },
+  "tci_return_bridge": {
+    "schema_version": "1.0",
+    "unit": "percent_per_year",
+    "method": "dated_forward_cashflow_schedule_per_share@1.0",
+    "status": "diagnostic",
+    "research_only": true,
+    "capital_actionable": false,
+    "horizon_years": 7,
+    "persona_horizon_note": "Hohn's 4-year lens scores business fit; the contract uses the existing 7-year cash-flow horizon, with a separate 10-year sensitivity.",
+    "model_as_of": "2026-10-27",
+    "price": 15.6,
+    "price_as_of": "2026-10-27",
+    "sources": [
+      {
+        "ref": "ELE/research/valuation.json#inputs.price",
+        "locator": "Yahoo Finance chart API regularMarketPrice for ELE, 15.60 USD, Nasdaq, 2026-10-27 14:20 UTC",
+        "as_of": "2026-10-27",
+        "claim_type": "inference",
+        "status": "assumption"
+      },
+      {
+        "ref": "ELE/research/valuation.json#inputs.fcf_per_share",
+        "locator": "FY2025 cash flows from operating activities 30,811,000 USD divided by 63,829,995 shares outstanding at 2025-12-31. IFRS tags CashFlowsFromUsedInOperatingActivities and NumberOfSharesOutstanding, Form 40-F accession 0001628280-26-020856. This is reported 2025 operating cash, not a normalized post-merger run rate. Property, plant and equipment purchases were 4,000 USD. Cash used in investing activities was 56,325,000 USD and is not deducted here because it is portfolio investment, not sustaining plant.",
+        "as_of": "2026-10-27",
+        "claim_type": "inference",
+        "status": "assumption"
+      }
+    ],
+    "normalization_note": null,
+    "claim_type": "inference",
+    "scenarios": {
+      "bear": {
+        "fcf_yield_pct": 3.0942564102564103,
+        "per_share_fcf_growth_pct": -3.5975015734599824,
+        "multiple_change_pct": -15.428832026269657,
+        "approximate_return_pct": -15.93207718947323,
+        "exact_irr_pct": -13.630219121638735,
+        "reconciliation_gap_pp": 2.3018580678344946,
+        "reconciliation_reason": "Compounding, growing interim cash distributions and terminal timing.",
+        "growth_components": {
+          "organic_growth_pct": null,
+          "reinvestment_rate_pct": null,
+          "incremental_roic_pct": null,
+          "dilution_pct": null,
+          "buyback_accretion_pct": null
+        },
+        "growth_component_gap_pp": null,
+        "growth_components_status": "gap",
+        "mechanism": "[Assumption] Operating cash declines and the selling multiple compresses. Not a filing forecast.",
+        "claim_type": "inference",
+        "legacy_reported_return_pct": -13.6
+      },
+      "base": {
+        "fcf_yield_pct": 3.0942564102564103,
+        "per_share_fcf_growth_pct": 0.0,
+        "multiple_change_pct": -10.385513078345465,
+        "approximate_return_pct": -7.291256668089055,
+        "exact_irr_pct": -6.071265903191586,
+        "reconciliation_gap_pp": 1.219990764897469,
+        "reconciliation_reason": "Compounding, growing interim cash distributions and terminal timing.",
+        "growth_components": {
+          "organic_growth_pct": null,
+          "reinvestment_rate_pct": null,
+          "incremental_roic_pct": null,
+          "dilution_pct": null,
+          "buyback_accretion_pct": null
+        },
+        "growth_component_gap_pp": null,
+        "growth_components_status": "gap",
+        "mechanism": "[Assumption] Flat operating cash and a 15 times selling multiple. The September 2026 Orion transaction is not in this cash number.",
+        "claim_type": "inference",
+        "legacy_reported_return_pct": -6.1
+      },
+      "bull": {
+        "fcf_yield_pct": 3.0942564102564103,
+        "per_share_fcf_growth_pct": 3.5464498916020215,
+        "multiple_change_pct": -8.02075737143163,
+        "approximate_return_pct": -1.3800510695731987,
+        "exact_irr_pct": -0.49730971263893875,
+        "reconciliation_gap_pp": 0.8827413569342599,
+        "reconciliation_reason": "Compounding, growing interim cash distributions and terminal timing.",
+        "growth_components": {
+          "organic_growth_pct": null,
+          "reinvestment_rate_pct": null,
+          "incremental_roic_pct": null,
+          "dilution_pct": null,
+          "buyback_accretion_pct": null
+        },
+        "growth_component_gap_pp": null,
+        "growth_components_status": "gap",
+        "mechanism": "[Assumption] Modest growth and a higher selling multiple. Not a filing forecast.",
+        "claim_type": "inference",
+        "legacy_reported_return_pct": -0.5
+      }
+    },
+    "sensitivity_10yr": {
+      "bear": {
+        "fcf_yield_pct": 3.0942564102564103,
+        "per_share_fcf_growth_pct": -2.5320565519103666,
+        "multiple_change_pct": -11.068497471608252,
+        "approximate_return_pct": -10.506297613262209,
+        "exact_irr_pct": -8.488668696514992,
+        "reconciliation_gap_pp": 2.017628916747217,
+        "reconciliation_reason": "Compounding, growing interim cash distributions and terminal timing.",
+        "growth_components": {
+          "organic_growth_pct": null,
+          "reinvestment_rate_pct": null,
+          "incremental_roic_pct": null,
+          "dilution_pct": null,
+          "buyback_accretion_pct": null
+        },
+        "growth_component_gap_pp": null,
+        "growth_components_status": "gap",
+        "mechanism": "[Assumption] Operating cash declines and the selling multiple compresses. Not a filing forecast.",
+        "claim_type": "inference",
+        "legacy_reported_return_pct": -13.6
+      },
+      "base": {
+        "fcf_yield_pct": 3.0942564102564103,
+        "per_share_fcf_growth_pct": 0.0,
+        "multiple_change_pct": -7.3885346641229805,
+        "approximate_return_pct": -4.294278253866571,
+        "exact_irr_pct": -3.0384152467512893,
+        "reconciliation_gap_pp": 1.2558630071152814,
+        "reconciliation_reason": "Compounding, growing interim cash distributions and terminal timing.",
+        "growth_components": {
+          "organic_growth_pct": null,
+          "reinvestment_rate_pct": null,
+          "incremental_roic_pct": null,
+          "dilution_pct": null,
+          "buyback_accretion_pct": null
+        },
+        "growth_component_gap_pp": null,
+        "growth_components_status": "gap",
+        "mechanism": "[Assumption] Flat operating cash and a 15 times selling multiple. The September 2026 Orion transaction is not in this cash number.",
+        "claim_type": "inference",
+        "legacy_reported_return_pct": -6.1
+      },
+      "bull": {
+        "fcf_yield_pct": 3.0942564102564103,
+        "per_share_fcf_growth_pct": 2.469507659595993,
+        "multiple_change_pct": -5.684541477881089,
+        "approximate_return_pct": -0.12077740802868497,
+        "exact_irr_pct": 0.9997621415006982,
+        "reconciliation_gap_pp": 1.1205395495293833,
+        "reconciliation_reason": "Compounding, growing interim cash distributions and terminal timing.",
+        "growth_components": {
+          "organic_growth_pct": null,
+          "reinvestment_rate_pct": null,
+          "incremental_roic_pct": null,
+          "dilution_pct": null,
+          "buyback_accretion_pct": null
+        },
+        "growth_component_gap_pp": null,
+        "growth_components_status": "gap",
+        "mechanism": "[Assumption] Modest growth and a higher selling multiple. Not a filing forecast.",
+        "claim_type": "inference",
+        "legacy_reported_return_pct": -0.5
+      }
+    },
+    "forward_cashflow_schedule": {
+      "low": [
+        {
+          "year": 1,
+          "amount_per_share": 0.4585688
+        },
+        {
+          "year": 2,
+          "amount_per_share": 0.43564036
+        },
+        {
+          "year": 3,
+          "amount_per_share": 0.413858342
+        },
+        {
+          "year": 4,
+          "amount_per_share": 0.39316542489999995
+        },
+        {
+          "year": 5,
+          "amount_per_share": 0.3735071536549999
+        },
+        {
+          "year": 6,
+          "amount_per_share": 0.3735071536549999
+        },
+        {
+          "year": 7,
+          "amount_per_share": 4.108578690204999
+        }
+      ],
+      "base": [
+        {
+          "year": 1,
+          "amount_per_share": 0.482704
+        },
+        {
+          "year": 2,
+          "amount_per_share": 0.482704
+        },
+        {
+          "year": 3,
+          "amount_per_share": 0.482704
+        },
+        {
+          "year": 4,
+          "amount_per_share": 0.482704
+        },
+        {
+          "year": 5,
+          "amount_per_share": 0.482704
+        },
+        {
+          "year": 6,
+          "amount_per_share": 0.482704
+        },
+        {
+          "year": 7,
+          "amount_per_share": 7.723264
+        }
+      ],
+      "high": [
+        {
+          "year": 1,
+          "amount_per_share": 0.5068392
+        },
+        {
+          "year": 2,
+          "amount_per_share": 0.53218116
+        },
+        {
+          "year": 3,
+          "amount_per_share": 0.5587902180000001
+        },
+        {
+          "year": 4,
+          "amount_per_share": 0.5867297289000001
+        },
+        {
+          "year": 5,
+          "amount_per_share": 0.6160662153450001
+        },
+        {
+          "year": 6,
+          "amount_per_share": 0.6160662153450001
+        },
+        {
+          "year": 7,
+          "amount_per_share": 11.705258091555002
+        }
+      ]
+    },
+    "gaps": [
+      "GAP: the full-model sensitivity distributes all modeled FCF and adds terminal equity value; explicitly reconcile reinvestment, buybacks and net-asset timing before publishing it as shareholder IRR.",
+      "GAP: bear cited causal drivers require underwriting; scenario notes alone are insufficient.",
+      "GAP: bear growth attribution missing organic_growth_pct, reinvestment_rate_pct, incremental_roic_pct, dilution_pct, buyback_accretion_pct; do not add buybacks twice to per-share growth.",
+      "GAP: base cited causal drivers require underwriting; scenario notes alone are insufficient.",
+      "GAP: base growth attribution missing organic_growth_pct, reinvestment_rate_pct, incremental_roic_pct, dilution_pct, buyback_accretion_pct; do not add buybacks twice to per-share growth.",
+      "GAP: bull cited causal drivers require underwriting; scenario notes alone are insufficient.",
+      "GAP: bull growth attribution missing organic_growth_pct, reinvestment_rate_pct, incremental_roic_pct, dilution_pct, buyback_accretion_pct; do not add buybacks twice to per-share growth."
+    ],
+    "distribution_assumption": "Sensitivity assumes all modeled FCF is distributable after reinvestment and cash/debt are already reflected in terminal equity proceeds. Not established without an explicit reconciled policy."
+  },
+  "schema_version": "magis.valuation.v3",
+  "returns": {
+    "base_irr_pct": -4.55,
+    "unit": "percent_per_year",
+    "label": "7yr IRR (total synthesis)",
+    "display": "-4.55% (total synthesis)",
+    "scenarios_pct": {
+      "bear": -13.6,
+      "base": -6.1,
+      "bull": -0.5
+    }
+  }
+}
