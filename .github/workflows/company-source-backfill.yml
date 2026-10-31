@@ -1,5 +1,7 @@
 name: Complete company source backfill
 on:
+  repository_dispatch:
+    types: [refresh-company-source-publication]
   workflow_call:
     inputs:
       seconds:
@@ -27,6 +29,7 @@ jobs:
     env:
       RESEARCH_VAULT_CLONE_TOKEN: ${{ secrets.RESEARCH_VAULT_CLONE_TOKEN }}
       GOOGLE_APPLICATION_CREDENTIALS_JSON: ${{ secrets.GOOGLE_APPLICATION_CREDENTIALS_JSON }}
+      PUBLICATION_REPAIR: ${{ github.event_name == 'repository_dispatch' && github.event.action == 'refresh-company-source-publication' }}
     steps:
       - uses: actions/checkout@v4
         with:
@@ -52,6 +55,7 @@ jobs:
           hydrate: 'false'
       - run: pip install pymupdf pypdf xlrd google-api-python-client google-auth legacy-doc mobi
       - name: Install scan language data
+        if: env.PUBLICATION_REPAIR != 'true'
         run: |
           sudo apt-get update && sudo apt-get install -y tesseract-ocr-eng tesseract-ocr-jpn tesseract-ocr-chi-sim
           python - <<'PY'
@@ -65,6 +69,7 @@ jobs:
       - name: Restore private extraction results
         run: python _system/scripts/company_source_cache.py restore --cache _private/company-research/cache --archive "$RESEARCH_VAULT_ROOT/dashboard-private/company-source-backfill-v2"
       - name: Resume bounded extraction
+        if: env.PUBLICATION_REPAIR != 'true'
         env:
           BUDGET: ${{ inputs.seconds }}
           SCANS: ${{ inputs.recover_scans }}
@@ -74,10 +79,10 @@ jobs:
           if [ "$SCANS" = "true" ]; then args+=(--only-status needs_ocr --ocr); fi
           python _system/scripts/backfill_company_sources.py --discover-drive --audit-cache --seconds "$BUDGET" "${args[@]}"
       - name: Recover catalogued official filings
-        if: ${{ !inputs.recover_scans }}
+        if: ${{ !inputs.recover_scans && env.PUBLICATION_REPAIR != 'true' }}
         run: python _system/scripts/backfill_company_filings.py --seconds 1200
       - name: Check for transcripts to recover
-        if: ${{ !inputs.recover_scans }}
+        if: ${{ !inputs.recover_scans && env.PUBLICATION_REPAIR != 'true' }}
         id: media
         run: |
           python - <<'PY'
@@ -96,9 +101,16 @@ jobs:
           python _system/scripts/backfill_company_sources.py --skip-seed --only-status needs_transcript --transcribe --seconds 600
       - name: Refresh the complete publication snapshot
         run: |
-          python _system/scripts/build_company_research.py --drive --download \
-            --cache _private/company-research/cache \
-            --vault "$RESEARCH_VAULT_ROOT"
+          set -euo pipefail
+          if [ "$PUBLICATION_REPAIR" = "true" ]; then
+            # Re-evaluate identities using the verified recovery cache and current
+            # inventory. Keep the stale-publication guard; do not fetch new bodies.
+            python _system/scripts/build_company_research.py --drive --git-budget-seconds 0 \
+              --cache _private/company-research/cache --vault "$RESEARCH_VAULT_ROOT"
+          else
+            python _system/scripts/build_company_research.py --drive --download \
+              --cache _private/company-research/cache --vault "$RESEARCH_VAULT_ROOT"
+          fi
       - name: Save private checkpoint and results
         id: archive
         if: always()
