@@ -762,6 +762,10 @@ jobs:
           python-version: "3.12"
       - name: Restore authorized private dashboard inputs
         uses: ./.github/actions/checkout-vault
+        with:
+          # Validate the exact published dashboard and letter index. Loading
+          # unrelated extraction history can time out before checks begin.
+          publication-only: "true"
       - name: Validate dashboard artifacts and letter corpus
         env:
           # dashboard_data.json is gitignored. Sparse dashboard checkout
