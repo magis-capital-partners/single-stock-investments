@@ -68,7 +68,7 @@ runs:
       if: steps.private-snapshots.outputs.checkout == 'true'
       uses: ./.github/actions/checkout-vault
       with:
-        include-investor-history: 'true'
+        include-investor-history: 'false'
 
     - name: Install pinned Cloudflare tooling
       shell: bash
@@ -123,9 +123,12 @@ runs:
         python _system/scripts/build_cloudflare_pages_site.py
         python _system/scripts/stage_company_research.py --hardlink
         # Reuse an existing processing checkout without cleaning its new objects.
-        # Only deployment needs to materialize the complete holdings checkpoint.
-        if [ -f dashboard/data/holdings/archive_receipt.json ] && [ "$(git -C "$RESEARCH_VAULT_ROOT" config --bool core.sparseCheckout)" = "true" ]; then
-          git -C "$RESEARCH_VAULT_ROOT" sparse-checkout add /dashboard-private/investor-history/
+        # Only the receipt's checkpoint is needed, not every retained version.
+        if [ -f dashboard/data/holdings/archive_receipt.json ]; then
+          python _system/scripts/investor_history_checkpoint.py materialize \
+            --archive "$RESEARCH_VAULT_ROOT/dashboard-private/investor-history" \
+            --public-receipt dashboard/data/holdings/archive_receipt.json \
+            --historical-filers _system/reference/investors/historical_filers.json
         fi
         python _system/scripts/stage_investor_history.py
         python _system/scripts/validate_portfolio_private_boundary.py _cf_project/site

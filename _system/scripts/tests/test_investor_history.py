@@ -25,6 +25,98 @@ from thirteenf_core import merge_filings
 from thirteenf_legacy import parse_legacy_document
 
 
+@pytest.mark.parametrize("broad_checkout", [False, True])
+def test_pinned_materialization_fetches_one_checkpoint_and_preserves_other_inputs(
+    tmp_path, broad_checkout, monkeypatch
+):
+    if not shutil.which("git"):
+        pytest.skip("Git is required for sparse checkout integration")
+    vault = tmp_path / "vault"
+    parts = vault / "dashboard-private/investor-history"
+    cache = tmp_path / "cache"
+    db = archive.connect(cache / "archive.sqlite")
+    db.close()
+    archive.write_json(cache / "universe.json", {"revision": "first"})
+    first = checkpoint.pack(cache, parts)
+    archive.write_json(cache / "universe.json", {"revision": "second"})
+    second = checkpoint.pack(cache, parts)
+    letter = vault / "superinvestor-letters/letter.txt"
+    letter.parent.mkdir()
+    letter.write_text("A source document", encoding="utf-8")
+
+    def git(*args, **kwargs):
+        return subprocess.run(
+            ["git", "-C", str(vault), *args],
+            check=True,
+            capture_output=True,
+            text=True,
+            **kwargs,
+        )
+
+    git("init", "-q")
+    git("add", ".")
+    git(
+        "-c",
+        "user.name=Fixture",
+        "-c",
+        "user.email=fixture@example.invalid",
+        "commit",
+        "-qm",
+        "Two immutable checkpoints",
+    )
+    patterns = (
+        "/*\n" if broad_checkout else "/*\n!/dashboard-private/investor-history/\n"
+    )
+    git("sparse-checkout", "set", "--no-cone", "--stdin", input=patterns)
+    note = vault / "untracked-note.txt"
+    note.write_text("Keep regenerated inputs", encoding="utf-8")
+    for selected, obsolete, revision in (
+        (first, second, "first"),
+        (second, first, "second"),
+        (second, first, "second"),
+    ):
+        result = checkpoint.materialize(parts, identity=selected["identity"])
+        assert result["parts"] == len(selected["parts"])
+        assert (parts / selected["identity"] / "manifest.json").is_file()
+        assert not (parts / obsolete["identity"] / "manifest.json").exists()
+        expected = {p["name"] for p in selected["parts"]}
+        assert {
+            p.relative_to(parts).as_posix() for p in (parts / "objects").glob("*")
+        } == expected
+        assert letter.read_text() == "A source document"
+        assert note.read_text() == "Keep regenerated inputs"
+        destination = tmp_path / f"restored-{revision}"
+        assert checkpoint.restore(parts, destination, identity=selected["identity"])
+        assert (
+            json.loads((destination / "universe.json").read_text())["revision"]
+            == revision
+        )
+
+    real_run = subprocess.run
+    failures = []
+
+    def interrupted_once(args, **kwargs):
+        if "--show-toplevel" in args and not failures:
+            failures.append(True)
+            raise subprocess.CalledProcessError(128, args, stderr="fatal: early EOF")
+        return real_run(args, **kwargs)
+
+    with monkeypatch.context() as retry:
+        retry.setattr(checkpoint.subprocess, "run", interrupted_once)
+        retry.setattr(checkpoint.time, "sleep", lambda _seconds: None)
+        checkpoint.materialize(
+            parts,
+            identity=second["identity"],
+            additional_identities=[first["identity"]],
+        )
+    assert failures == [True]
+    assert (parts / first["identity"] / "manifest.json").is_file()
+    assert (parts / second["identity"] / "manifest.json").is_file()
+    assert {p.relative_to(parts).as_posix() for p in (parts / "objects").glob("*")} == {
+        p["name"] for m in (first, second) for p in m["parts"]
+    }
+
+
 @pytest.mark.parametrize("conflicting_filer", [False, True])
 def test_public_brand_links_short_letter_name_to_existing_legal_filer(
     tmp_path, monkeypatch, conflicting_filer
@@ -193,6 +285,9 @@ def test_archived_alias_is_reconciled_after_source_corpus_rotation():
 def test_pinned_old_identity_keeps_all_filing_quarters_and_separate_letter_vehicle(
     tmp_path, monkeypatch
 ):
+    # This fixture isolates brand reconciliation; historical supplements have
+    # their own cold-restore integration test.
+    monkeypatch.setattr(universe, "FILER_HISTORY", tmp_path / "fixture-histories.json")
     roster = tmp_path / "roster.json"
     archive.write_json(
         roster,

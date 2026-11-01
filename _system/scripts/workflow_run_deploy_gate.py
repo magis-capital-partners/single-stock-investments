@@ -67,6 +67,7 @@ DEPLOY_INPUTS = (
     "_system/scripts/letter_date_parser.py",
     "_system/reference/investors/public_roster.json",
     "_system/reference/investors/manager_aliases.json",
+    "_system/reference/investors/historical_filers.json",
     "_system/scripts/investor_history.py",
     "_system/scripts/investor_history_checkpoint.py",
     "_system/scripts/global_disclosures.py",

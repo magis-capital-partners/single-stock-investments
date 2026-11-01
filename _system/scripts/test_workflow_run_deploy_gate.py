@@ -303,6 +303,7 @@ class FingerprintTests(unittest.TestCase):
             "_system/scripts/investor_corpus.py",
             "_system/reference/investors/public_roster.json",
             "_system/reference/investors/manager_aliases.json",
+            "_system/reference/investors/historical_filers.json",
         ):
             before = gate.fingerprint(cwd=self.repo)
             (self.repo / path).parent.mkdir(parents=True, exist_ok=True)
@@ -330,6 +331,7 @@ class WorkflowWiringTests(unittest.TestCase):
             "_system/scripts/letter_date_parser.py",
             "_system/reference/investors/public_roster.json",
             "_system/reference/investors/manager_aliases.json",
+            "_system/reference/investors/historical_filers.json",
         ):
             self.assertIn(f'- "{path}"', push)
 

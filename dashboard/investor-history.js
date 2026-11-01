@@ -184,7 +184,7 @@
         const periods=availablePeriods(manager,source);
         const tables=[];
         const holdingsTable=(rows,options={})=>{const number=tables.push({rows,options})-1;return `<div data-position-group="${number}"></div>`;};
-        detail.innerHTML=`<h3>${esc(manager.name)}</h3>${manager.legal_name && manager.legal_name!==manager.name ? `<p>SEC filer: ${esc(manager.legal_name)}</p>` : ''}<div class="workspace-filter"><label>Reporting quarter<select data-detail-quarter><option value="latest">Latest available by source</option>${periods.map(q=>`<option value="${esc(q)}" ${q===requested?'selected':''}>${esc(quarterLabel(q))}</option>`).join('')}</select></label></div>
+        detail.innerHTML=`<h3>${esc(manager.name)}</h3>${manager.legal_name && manager.legal_name!==manager.name ? `<p>Current SEC filer: ${esc(manager.legal_name)}</p>` : ''}<div class="workspace-filter"><label>Reporting quarter<select data-detail-quarter><option value="latest">Latest available by source</option>${periods.map(q=>`<option value="${esc(q)}" ${q===requested?'selected':''}>${esc(quarterLabel(q))}</option>`).join('')}</select></label></div>
           ${manager.identity_status==='unverified_document_identity' ? '<p class="investor-context">Fund name from a document; manager identity needs review.</p>' : ''}
           <p class="investor-context">${history.length} 13F quarters${history.length ? ` · ${esc(history[0].quarter)}–${esc(history.at(-1).quarter)}` : ''} · ${manager.disclosure_count || 0} fund disclosures</p>
           ${(manager.fund_ids || []).map(fund=>sourceLink(`/fund-letters/?fund=${encodeURIComponent(fund)}`,'Read fund letters')).join(' · ')}

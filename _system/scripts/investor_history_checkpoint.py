@@ -9,12 +9,14 @@ import hashlib
 import json
 import shutil
 import sqlite3
+import subprocess
 import tarfile
 import tempfile
+import time
 from contextlib import closing
 from pathlib import Path
 
-from investor_history import ARCHIVE, now, write_json
+from investor_history import ARCHIVE, connect, now, quarter_from_period, write_json
 
 PART_BYTES = 80 * 1024 * 1024
 FILES = {
@@ -132,6 +134,207 @@ def part_path(source, manifest, part):
     if Path(part["name"]).name != part["name"] or not part["name"].startswith("part-"):
         raise ValueError("Unsafe checkpoint part path")
     return source / manifest["identity"] / part["name"]
+
+
+def materialize(source, *, identity, additional_identities=()):
+    """Select one immutable checkpoint in a sparse publication checkout."""
+    identities = list(dict.fromkeys([identity, *additional_identities]))
+    for selected_identity in identities:
+        if len(selected_identity) != 64 or any(
+            c not in "0123456789abcdef" for c in selected_identity
+        ):
+            raise ValueError("Unsafe checkpoint identity")
+    source = Path(source).resolve()
+    vault = source.parent.parent
+    if source != vault / "dashboard-private/investor-history":
+        raise ValueError("Expected a vault investor-history directory")
+
+    def git(*args, **kwargs):
+        for attempt in range(3):
+            try:
+                return subprocess.run(
+                    ["git", "-C", str(vault), *args],
+                    check=True,
+                    capture_output=True,
+                    text=True,
+                    **kwargs,
+                ).stdout.strip()
+            except subprocess.CalledProcessError as exc:
+                message = (exc.stderr or "").lower()
+                transient = any(
+                    term in message
+                    for term in (
+                        "early eof",
+                        "unexpected disconnect",
+                        "rpc failed",
+                        "timed out",
+                        "remote end hung up",
+                        "index-pack failed",
+                    )
+                )
+                if not transient or attempt == 2:
+                    raise
+                time.sleep(2**attempt)
+
+    if Path(git("rev-parse", "--show-toplevel")).resolve() != vault:
+        raise ValueError("Checkpoint is not in the vault checkout")
+    sparse = subprocess.run(
+        ["git", "-C", str(vault), "config", "--bool", "core.sparseCheckout"],
+        capture_output=True,
+        text=True,
+        check=False,
+    )
+    if sparse.stdout.strip() != "true":
+        return {"sparse": False}
+    prefix = "/dashboard-private/investor-history/"
+    previous = git("sparse-checkout", "list").splitlines()
+    # Replace history selection only. The processing checkout may contain new,
+    # unpublished company objects and other regenerated inputs we must retain.
+    keep = [
+        p
+        for p in previous
+        if not (
+            p.lstrip("!/") == prefix.strip("/")
+            or p.lstrip("!/").startswith(prefix.lstrip("/"))
+        )
+    ]
+    selected = [
+        prefix,
+        "!" + prefix + "*",
+        *[prefix + value + "/" for value in identities],
+    ]
+
+    def apply(patterns):
+        git(
+            "sparse-checkout",
+            "set",
+            "--no-cone",
+            "--stdin",
+            input="\n".join([*keep, *patterns]) + "\n",
+        )
+
+    # Fetch the small pinned manifest before selecting its immutable objects.
+    apply(selected)
+    manifests = [
+        json.loads((source / value / "manifest.json").read_text())
+        for value in identities
+    ]
+    if any(m.get("identity") != value for value, m in zip(identities, manifests)):
+        raise ValueError("Pinned checkpoint identity mismatch")
+    paths = []
+    objects = {}
+    for manifest in manifests:
+        for part in manifest["parts"]:
+            path = part_path(source, manifest, part).resolve()
+            if not path.is_relative_to(source):
+                raise ValueError("Unsafe checkpoint part path")
+            relative = path.relative_to(vault).as_posix()
+            if any(c in relative for c in "*?[]\\\r\n"):
+                raise ValueError("Unsafe checkpoint selection path")
+            paths.append("/" + relative)
+            objects[relative] = part
+    if any(m.get("schema_version") == 2 for m in manifests):
+        selected.extend([prefix + "objects/", "!" + prefix + "objects/*"])
+    apply([*selected, *paths])
+    return {
+        "sparse": True,
+        "identity": identity,
+        "parts": len(paths),
+        "compressed_bytes": sum(part["bytes"] for part in objects.values()),
+        "identities": identities,
+    }
+
+
+def merge_historical(
+    source, destination, *, identity, manager_id, cik, first_quarter, last_quarter
+):
+    """Fill missing historical accessions; never replace a newer primary book."""
+    with tempfile.TemporaryDirectory(
+        dir=destination, prefix="historical-"
+    ) as temporary:
+        temporary = Path(temporary)
+        if not restore(source, temporary, identity=identity):
+            raise RuntimeError("Required historical filings checkpoint is missing")
+        with closing(
+            sqlite3.connect(
+                (temporary / "archive.sqlite").resolve().as_uri() + "?mode=ro", uri=True
+            )
+        ) as original:
+            original.row_factory = sqlite3.Row
+            records = list(original.execute("SELECT * FROM filings"))
+            if not records:
+                raise ValueError("Historical checkpoint contains no filings")
+            for row in records:
+                quarter = quarter_from_period(row["period_end"])
+                if (
+                    str(int(row["cik"])) != str(int(cik))
+                    or not quarter
+                    or not first_quarter <= quarter <= last_quarter
+                    or row["form"] not in {"13F-HR", "13F-HR/A", "13F-NT", "13F-NT/A"}
+                ):
+                    raise ValueError(
+                        "Historical checkpoint exceeds its declared filer or dates"
+                    )
+            with closing(connect(Path(destination) / "archive.sqlite")) as db, db:
+                added = 0
+                columns = [
+                    "accession",
+                    "manager_id",
+                    "cik",
+                    "period_end",
+                    "filed_at",
+                    "form",
+                    "amendment_type",
+                    "status",
+                    "source_url",
+                    "metadata",
+                    "error",
+                    "updated_at",
+                ]
+                for source_row in records:
+                    row = dict(source_row)
+                    existing = db.execute(
+                        "SELECT cik FROM filings WHERE accession=?", (row["accession"],)
+                    ).fetchone()
+                    if existing:
+                        if str(int(existing["cik"])) != str(int(cik)):
+                            raise ValueError(
+                                "Historical accession belongs to another filer"
+                            )
+                        continue
+                    row["manager_id"] = manager_id
+                    row["metadata"] = json.dumps(
+                        {**json.loads(row["metadata"]), "manager_id": manager_id}
+                    )
+                    db.execute(
+                        "INSERT INTO filings ("
+                        + ",".join(columns)
+                        + ") VALUES ("
+                        + ",".join("?" for _ in columns)
+                        + ")",
+                        [row[c] for c in columns],
+                    )
+                    for table, fields in (
+                        ("positions", 3),
+                        ("position_books", 2),
+                        ("raw_documents", 4),
+                    ):
+                        values = original.execute(
+                            f"SELECT * FROM {table} WHERE accession=?",
+                            (row["accession"],),
+                        ).fetchall()
+                        db.executemany(
+                            f"INSERT INTO {table} VALUES ("
+                            + ",".join("?" for _ in range(fields))
+                            + ")",
+                            [tuple(v) for v in values],
+                        )
+                    added += 1
+                db.execute(
+                    "INSERT OR IGNORE INTO discovery VALUES(?,?,?,?,?,?)",
+                    (str(int(cik)), manager_id, "loaded", len(records), None, now()),
+                )
+                return added
 
 
 def pack(source, destination, *, part_bytes=PART_BYTES):
@@ -284,10 +487,11 @@ def restore(source, destination, *, identity=None):
 
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument("action", choices=["pack", "restore"])
+    parser.add_argument("action", choices=["pack", "restore", "materialize"])
     parser.add_argument("--archive", type=Path, required=True)
     parser.add_argument("--cache", type=Path, default=ARCHIVE)
     parser.add_argument("--public-receipt", type=Path)
+    parser.add_argument("--historical-filers", type=Path)
     args = parser.parse_args()
     if args.action == "pack":
         result = pack(args.cache, args.archive)
@@ -298,6 +502,25 @@ def main():
             )
         print(
             json.dumps({"identity": result["identity"], "parts": len(result["parts"])})
+        )
+    elif args.action == "materialize":
+        if not args.public_receipt:
+            parser.error("materialize requires --public-receipt")
+        receipt = json.loads(args.public_receipt.read_text())
+        extra = []
+        if args.historical_filers:
+            extra = [
+                r["checkpoint_identity"]
+                for r in json.loads(args.historical_filers.read_text())["filers"]
+            ]
+        print(
+            json.dumps(
+                materialize(
+                    args.archive,
+                    identity=receipt["identity"],
+                    additional_identities=extra,
+                )
+            )
         )
     else:
         print(
