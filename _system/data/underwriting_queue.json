@@ -9,13 +9,13 @@
     },
     "blocker_companies": {
       "new_financial_report_after_model": 351,
-      "new_earnings_disclosure_unresolved": 27,
       "holding_company_component_forecast_missing": 2,
+      "new_earnings_disclosure_unresolved": 27,
       "realization_timing_missing": 19,
       "issuer_forecast_missing": 131,
       "parent_cashflow_attribution_missing": 40,
-      "pre_listing_share_basis_unverified": 101,
       "positive_normalized_owner_cash_not_established": 110,
+      "pre_listing_share_basis_unverified": 101,
       "completed_session_quote_missing": 28,
       "annual_operating_cash_flow_missing": 44,
       "annual_diluted_share_count_missing": 50,
@@ -11645,34 +11645,6 @@
       "unresolved_findings": []
     },
     {
-      "ticker": "MA",
-      "company": "Mastercard",
-      "status": "economic_review_required",
-      "current_model_basis": "independent_underwriting",
-      "blockers": [
-        "economic_review_required",
-        "underwriting_revision_required"
-      ],
-      "last_attempt": "2026-10-31T04:01:31.797993+00:00",
-      "retry_after": "2026-11-01",
-      "underwriting_gaps": [
-        {
-          "code": "StageBlocked",
-          "detail": "author_or_challenger_unresolved: {\"severity\": \"major\", \"detail\": \"Unavailable note financing is executed only during the three holding years. note_market_access=0 disables new_notes_y1 through new_notes_y3, but the same closed-market alternatives retain a reinvestment_fade perpetuity with remaining notes, embedded interest and no subsequent principal funding. Note 9 in doc_71a50355bce001d0 identifies substantial maturities after October 2029, including 2030 and 2031 notes; the revolving facility expires in November 2030. Historical issuance supports conditional access, but does not establish that access returns immediately after the model stops checking it. Add an executable; {\"severity\": \"major\", \"detail\": \"organic_return and acquisition_return acknowledge identification problems but do not supply the required numerical estimate of incremental after-tax owner earnings relative to incremental equity capital, reconciled for investment lags. The graph instead assumes achieved earnings growth and infers contemporaneous investment from the chosen returns. doc_14480323856a489b reports USD 2,511 million of 2024 acquisitions; doc_71a50355bce001d0 reports USD 1,372 million of 2026 acquisition spending and substantial customer-capital deployment, but neither establishes the assumed acquisition payback. Provide a bounded nu"
-        }
-      ],
-      "unresolved_findings": [
-        {
-          "severity": "major",
-          "detail": "Unavailable note financing is executed only during the three holding years. note_market_access=0 disables new_notes_y1 through new_notes_y3, but the same closed-market alternatives retain a reinvestment_fade perpetuity with remaining notes, embedded interest and no subsequent principal funding. Note 9 in doc_71a50355bce001d0 identifies substantial maturities after October 2029, including 2030 and 2031 notes; the revolving facility expires in November 2030. Historical issuance supports conditional access, but does not establish that access returns immediately after the model stops checking it. Add an executable prolonged-closure alternative that funds subsequent maturities, or explicitly model and justify access restoration and its timing. Long-dated debt need not be repaid at the holding date."
-        },
-        {
-          "severity": "major",
-          "detail": "organic_return and acquisition_return acknowledge identification problems but do not supply the required numerical estimate of incremental after-tax owner earnings relative to incremental equity capital, reconciled for investment lags. The graph instead assumes achieved earnings growth and infers contemporaneous investment from the chosen returns. doc_14480323856a489b reports USD 2,511 million of 2024 acquisitions; doc_71a50355bce001d0 reports USD 1,372 million of 2026 acquisition spending and substantial customer-capital deployment, but neither establishes the assumed acquisition payback. Provide a bounded numerical calibration using these observations, distinguish installed-network earnings from purchased contributions, and execute a delayed or unsuccessful acquisition-payback alternative. This requires an underwriting estimate, not an exact undisclosed cohort fact."
-        }
-      ]
-    },
-    {
       "ticker": "MSFT",
       "company": "Microsoft",
       "status": "needs_underwriting",
@@ -11705,6 +11677,34 @@
         {
           "severity": "major",
           "detail": "The continuation transition is insufficiently tied to deployment economics. Base year 2 spends USD 108.517468 billion on organic growth plus acquisitions, while terminal owner cash of approximately USD 157.807588 billion is projected using independently selected growth and incremental-return assumptions. The stated historical approximately 17% diagnostic uses incremental adjusted accounting earnings over contemporaneous gross deployment, not incremental owner cash over incremental equity capital after maintenance and financing. Its acknowledged limitations do not establish the selected 13% return or investment lag. Reconcile explicit deployment to subsequent incremental earnings and cash, including leased capacity and supplier capital, and test delayed or unsuccessful commissioning with committed costs remaining payable."
+        }
+      ]
+    },
+    {
+      "ticker": "MA",
+      "company": "Mastercard",
+      "status": "economic_review_required",
+      "current_model_basis": "independent_underwriting",
+      "blockers": [
+        "economic_review_required",
+        "underwriting_revision_required"
+      ],
+      "last_attempt": "2026-11-01T02:41:28.282734+00:00",
+      "retry_after": "2026-11-01",
+      "underwriting_gaps": [
+        {
+          "code": "StageBlocked",
+          "detail": "author_or_challenger_unresolved: {\"severity\": \"critical\", \"detail\": \"The supplied diagnostics reject surviving_renewal_deterioration with alternative liquidity shortfalls in low and high cases, without an executed failure state. This test jointly challenges cash_recast, conversion_persistence, customer_intensity, maintenance and incremental organic returns—the main uncertainty around distributable cash. Positive headline scenarios and the separate early default test do not resolve these later shortfalls. Add an executable response at each affected payment date: reduce discretionary investment or payouts, draw eligible remaining committed credit with interest and repayment, o; {\"severity\": \"major\", \"detail\": \"The acquisition-return numerator needs revision. acquired_increment attributes USD 418.8 million in base and USD 691.02 million in high of the 2025 earnings increase to acquisitions. However, doc_14480323856a489b reports acquisitions contributing approximately three percentage points to value-added-services growth against 2024 revenue of USD 10,832 million—approximately USD 325 million of incremental revenue. The modeled incremental owner earnings exceed that revenue in base and high before acquisition operating costs and taxes. Parent-wide synergies could explain a difference, but no quantified reconciliation"
+        }
+      ],
+      "unresolved_findings": [
+        {
+          "severity": "critical",
+          "detail": "The supplied diagnostics reject surviving_renewal_deterioration with alternative liquidity shortfalls in low and high cases, without an executed failure state. This test jointly challenges cash_recast, conversion_persistence, customer_intensity, maintenance and incremental organic returns—the main uncertainty around distributable cash. Positive headline scenarios and the separate early default test do not resolve these later shortfalls. Add an executable response at each affected payment date: reduce discretionary investment or payouts, draw eligible remaining committed credit with interest and repayment, or execute a dated creditor waterfall. Reconcile cash, facility capacity and ownership throughout; rerun all alternatives successfully. Note 9 of doc_71a50355bce001d0 supports conditional credit access through November 2030, not unlimited funding."
+        },
+        {
+          "severity": "major",
+          "detail": "The acquisition-return numerator needs revision. acquired_increment attributes USD 418.8 million in base and USD 691.02 million in high of the 2025 earnings increase to acquisitions. However, doc_14480323856a489b reports acquisitions contributing approximately three percentage points to value-added-services growth against 2024 revenue of USD 10,832 million—approximately USD 325 million of incremental revenue. The modeled incremental owner earnings exceed that revenue in base and high before acquisition operating costs and taxes. Parent-wide synergies could explain a difference, but no quantified reconciliation supports it. Reconcile acquired revenue, after-tax margins, integration costs, investment lags and separately estimated synergies before calibrating acquisition_return. Then rerun vintage_cash, cumulative acquired growth and continuation_return. The zero-payoff test usefully preserves spending but does not substantiate the central payoff assumption."
         }
       ]
     }
