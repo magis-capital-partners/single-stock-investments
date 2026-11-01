@@ -246,6 +246,11 @@ def reconcile_public_identities(universe, *, roster=None, aliases=None):
 
 def current_disclosure_identity(document, universe):
     """Change the verified manager link while preserving fund/date/scope."""
+    if document.get("manager_link_basis") == "named_adviser" and any(
+        m["manager_id"] == document["manager_id"] and m.get("cik")
+        for m in universe["managers"]
+    ):
+        return document
     owner = None
     if document.get("source_kind") == "fund_disclosure":
         owner = universe.get("source_ids", {}).get(document.get("vehicle_id"))
@@ -456,6 +461,12 @@ def refresh_document_profiles(universe, corpus, records):
 
     known_headers = defaultdict(set)
     declared_aliases = json.loads(ALIASES.read_text(encoding="utf-8"))
+    declared_names = {
+        header_key(name)
+        for brand, names in declared_aliases.items()
+        for name in [brand, *names]
+    }
+    curated_names = defaultdict(set)
     for manager in managers.values():
         if not manager.get("cik"):
             continue
@@ -465,6 +476,8 @@ def refresh_document_profiles(universe, corpus, records):
             declared_aliases,
         ):
             key = header_key(name)
+            if key in declared_names:
+                curated_names[key].add(manager["manager_id"])
             if len(key) >= 8 and len(name.split()) >= 2:
                 known_headers[key].add(manager["manager_id"])
     observed = defaultdict(set)
@@ -477,6 +490,11 @@ def refresh_document_profiles(universe, corpus, records):
             or record.get("document_type") not in {"investor_letter", "fund_report"}
         ):
             continue
+        # These spellings are an operator-curated public identity declaration,
+        # not a fuzzy match or an inferred relationship between known filers.
+        observed[owner].update(
+            curated_names.get(header_key(record.get("fund") or ""), set())
+        )
         source = source_path(corpus, record.get("source_file"))
         if source is None:
             continue

@@ -14,6 +14,60 @@ import investor_universe as universe
 import investor_corpus as corpus_inputs
 
 
+def test_explicit_curated_brand_links_a_letter_without_firm_letterhead(tmp_path):
+    corpus = tmp_path / "insights.json"
+    (tmp_path / "letter.txt").write_text(
+        "Dear Partners,\nWe own Delta Equipment.", encoding="utf-8"
+    )
+    records = [
+        {
+            "fund_id": "baupost",
+            "fund": "Baupost",
+            "letter_eligible": True,
+            "document_type": "investor_letter",
+            "source_file": corpus_inputs.PREFIX + "letter.txt",
+        }
+    ]
+    current = {
+        "managers": [
+            {
+                "manager_id": "baupost-group",
+                "display_name": "Baupost Group",
+                "cik": "1061768",
+            },
+            {
+                "manager_id": "baupost",
+                "display_name": "Baupost",
+                "cik": None,
+                "identity_status": "unverified_document_identity",
+            },
+        ],
+        "source_ids": {"baupost": "baupost"},
+    }
+    result = universe.refresh_document_profiles(current, corpus, records)
+    assert result["source_ids"]["baupost"] == "baupost-group"
+
+
+def test_a_named_adviser_link_is_not_undone_by_a_similarly_named_publisher():
+    document = {
+        "manager_id": "ruane-cunniff",
+        "vehicle_id": "sequoia",
+        "source_kind": "fund_disclosure",
+        "manager_link_basis": "named_adviser",
+    }
+    current = {
+        "managers": [
+            {"manager_id": "ruane-cunniff", "cik": "1720792"},
+            {"manager_id": "sequoia", "cik": "1913045"},
+        ],
+        "source_ids": {"sequoia": "sequoia"},
+    }
+    assert (
+        universe.current_disclosure_identity(document, current)["manager_id"]
+        == "ruane-cunniff"
+    )
+
+
 def test_full_company_header_repairs_a_malformed_short_publisher_without_fuzzy_names(
     tmp_path,
 ):
