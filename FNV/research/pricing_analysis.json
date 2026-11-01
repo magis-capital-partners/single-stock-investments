@@ -1,10 +1,12 @@
 {
-  "schema_version": "3.0",
+  "schema_version": "3.1",
   "ticker": "FNV",
-  "as_of": "2026-10-16",
+  "as_of": "2026-10-27",
+  "model_as_of": "2026-07-23",
   "authority": "valuation_contract",
   "contract_source": "valuation_contract.json",
   "contract_status": "decision_grade",
+  "contract_model_hash": "8d668e6f21695d5202af09d9b9de6959ca30e8a84b04f788f869042c696bb4b4",
   "proof_status": "decision_grade",
   "model_level": "stock_specific",
   "price": 215.2,
@@ -45,21 +47,27 @@
   },
   "entry_prices_by_hurdle_and_case": {
     "low": {
+      "8pct": null,
       "10pct": null,
       "12pct": null,
       "15pct": null,
+      "18pct": null,
       "20pct": null
     },
     "base": {
+      "8pct": null,
       "10pct": null,
       "12pct": null,
       "15pct": null,
+      "18pct": null,
       "20pct": null
     },
     "high": {
+      "8pct": null,
       "10pct": null,
       "12pct": null,
       "15pct": null,
+      "18pct": null,
       "20pct": null
     }
   },
@@ -87,5 +95,37 @@
     "profile_id": "quality_reinvestment",
     "label": "High-return compounder",
     "input_hash": "63e037ae3749543978445633ea1daeb4016af96be18d7c0874aff10b565d5421"
+  },
+  "evidence_blockers": [],
+  "buy_zones": {
+    "schema_version": "1.0",
+    "config_version": "2026-10-26.1",
+    "status": "withheld",
+    "research_only": true,
+    "capital_actionable": false,
+    "model_level": "stock_specific",
+    "blockers": [
+      "A present value today has no dated future payoff or cash-flow schedule and cannot be discounted again."
+    ],
+    "zones": [],
+    "deepest_active_zone": null,
+    "royalty_corroboration": {
+      "status": "unavailable",
+      "signal": {
+        "active": true,
+        "rules": [
+          {
+            "ticker": "FNV",
+            "rule": "fundamental_jump_price_lagging",
+            "since": "2026-10-20T17:26:58-04:00",
+            "detail": "best per-share growth revenue_ttm_ps_yoy_pct=73.3%; price 3m 8.3%; P/OCF change 3m 5.1% (compression>=15%: False; price lag>=15pp and multiple 25.2x <= 5y median 28.0x: True)"
+          }
+        ],
+        "source": "C:\\Users\\drewg\\Downloads\\magis_box_mirror\\royalties\\state.json",
+        "as_of": "2026-10-23T08:22:37-04:00",
+        "claim_type": "inference"
+      },
+      "role": "corroborating_only"
+    }
   }
 }

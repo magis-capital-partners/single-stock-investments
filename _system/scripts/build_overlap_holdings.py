@@ -11,11 +11,12 @@ import argparse
 import csv
 import io
 import json
+import os
 import re
 import sys
 import time
 import zipfile
-from collections import defaultdict
+from collections import Counter, defaultdict
 from pathlib import Path
 from urllib.error import HTTPError, URLError
 from urllib.parse import quote
@@ -26,10 +27,13 @@ ROOT = Path(__file__).resolve().parents[2]
 sys.path.insert(0, str(ROOT / "_system" / "scripts"))
 
 from ownership_common import (  # noqa: E402
-    SEC_UA,
+    FORM_13F,
+    HOLDINGS_FORMS,
     SLEEP_SEC,
+    sec_user_agent,
     cik_padded,
     fetch_submissions,
+    filing_document_urls,
     filing_info_table_url,
     latest_13f_filings,
     load_cusip_map,
@@ -41,6 +45,13 @@ from ownership_common import (  # noqa: E402
     sec_fetch_bytes,
     sec_fetch_json,
 )
+from thirteenf_core import (  # noqa: E402
+    book_source_for_latest_period,
+    merge_filings,
+    other_managers_from_primary,
+    parse_primary_doc_xml,
+    quarter_from_period,
+)
 
 TIERS_PATH = ROOT / "_system" / "data" / "valuation_universe_tiers.json"
 FLOAT_PATH = ROOT / "_system" / "reference" / "market-data" / "fundamentals" / "index_float_adv.json"
@@ -51,9 +62,18 @@ SPECIALIST_DIR = ROOT / "_system" / "reference" / "market-data" / "ownership" / 
 TRACKED_CACHE = ROOT / "_system" / "reference" / "market-data" / "ownership" / "tracked_funds" / "cache"
 TRACKED_FUNDS = ROOT / "_system" / "reference" / "market-data" / "ownership" / "tracked_funds.json"
 CACHE_DIR = ROOT / "_system" / "reference" / "market-data" / "ownership" / "overlap_cache"
-ETF_HOLDINGS = Path.home() / "Projects" / "quant" / "etf-dashboard" / "data" / "etf_holdings_latest.json"
+def etf_holdings_path() -> Path | None:
+    """Optional local ETF book. There is no laptop path in CI."""
+    raw = (os.environ.get("ETF_HOLDINGS_PATH") or "").strip()
+    if raw:
+        return Path(raw)
+    candidate = Path.home() / "Projects" / "quant" / "etf-dashboard" / "data" / "etf_holdings_latest.json"
+    if candidate.exists():
+        return candidate
+    return None
 HUB_SHARE = 0.25
 HOLDER_CAP = 40
+DATASET_LISTING = "https://www.sec.gov/data-research/sec-markets-data/form-13f-data-sets"
 ZIP_URLS = [
     "https://www.sec.gov/files/datastandardsinnovation/data/form-13f-data-sets/01jun2026-31aug2026_form13f.zip",
     "https://www.sec.gov/files/structureddata/data/form-13f-data-sets/01mar2026-31may2026_form13f.zip",
@@ -185,8 +205,8 @@ def attach_row(book: Book, cusip: str, issuer: str, market_value: float, shares:
             book.exception(cusip, "ambiguous", issuer)
             return
         if len(matches) == 1:
+            # Name match is a display hint only. It is not written into the CUSIP map.
             ticker = matches[0]
-            cusip_map[cusip] = ticker
     if ticker is None:
         if reason == "not_common_stock":
             book.exception(cusip, "not_common_stock", mapped or "")
@@ -282,12 +302,14 @@ def confirm_adviser(adviser: dict) -> dict:
         return adviser
     adviser["sec_name"] = submissions.get("name") or ""
     adviser["sec_url_used"] = f"https://data.sec.gov/submissions/CIK{cik_padded(cik)}.json"
-    filings = latest_13f_filings(cik, limit=2)
+    filings = [row for row in latest_13f_filings(cik, limit=12) if row.get("form") in FORM_13F]
     adviser["confirmed"] = bool(filings) and adviser["sec_name"] != ""
-    adviser["latest_filing"] = filings[0]["filing_date"] if filings else None
-    if not filings:
+    if filings:
+        adviser["latest_filing"] = filings[0]["filing_date"]
+        adviser["latest_period"] = filings[0].get("report_date")
+    else:
         adviser["stale"] = True
-        adviser["confirm_error"] = "no 13F-HR on the submissions feed"
+        adviser["confirm_error"] = "no 13F filing on the submissions feed"
     time.sleep(SLEEP_SEC)
     return adviser
 
@@ -295,7 +317,7 @@ def confirm_adviser(adviser: dict) -> dict:
 def search_capital_world() -> str | None:
     url = "https://efts.sec.gov/LATEST/search-index?q=" + quote('"Capital World Investors"') + "&forms=13F-HR"
     try:
-        request = Request(url, headers={"User-Agent": SEC_UA, "Accept": "application/json"})
+        request = Request(url, headers={"User-Agent": sec_user_agent(), "Accept": "application/json"})
         with urlopen(request, timeout=60) as response:
             payload = json.load(response)
     except (HTTPError, URLError, TimeoutError, json.JSONDecodeError):
@@ -312,47 +334,210 @@ def search_capital_world() -> str | None:
     return None
 
 
-def fetch_adviser_table(adviser: dict, book: Book, cusip_map: dict[str, str], universe: set[str]) -> str:
-    if not adviser.get("confirmed"):
-        return "skipped"
-    filings = latest_13f_filings(adviser["cik"], limit=1)
-    if not filings:
-        adviser["stale"] = True
-        return "no filing"
-    filing = filings[0]
+def _cache_xml(adviser_id: str, filing: dict) -> Path | None:
+    """Info table on disk. Downloads only when the cache file is missing."""
+    accession = str(filing.get("accession") or "").replace("-", "")
+    if not accession:
+        return None
     CACHE_DIR.mkdir(parents=True, exist_ok=True)
-    cache_path = CACHE_DIR / f"{adviser['id']}_{filing['accession'].replace('-', '')}.xml"
-    if not cache_path.exists():
-        info_url = filing_info_table_url(filing)
-        time.sleep(SLEEP_SEC)
-        if not info_url:
-            adviser["stale"] = True
-            adviser["confirm_error"] = "info table URL missing"
-            return "no info table"
-        cache_path.write_bytes(sec_fetch_bytes(info_url))
-        time.sleep(SLEEP_SEC)
-    rows = parse_13f_info_table_xml(cache_path.read_bytes())
+    cache_path = CACHE_DIR / f"{adviser_id}_{accession}.xml"
+    if cache_path.exists() and cache_path.stat().st_size > 0:
+        return cache_path
+    info_url = filing_info_table_url(filing)
+    time.sleep(SLEEP_SEC)
+    if not info_url:
+        return None
+    cache_path.write_bytes(sec_fetch_bytes(info_url))
+    time.sleep(SLEEP_SEC)
+    return cache_path
+
+
+def _plain_rows(xml_bytes: bytes) -> list[dict]:
+    rows = []
+    for record in parse_13f_info_table_xml(xml_bytes):
+        rows.append(
+            {
+                "cusip": str(record.get("cusip") or "").upper(),
+                "issuer": record.get("nameOfIssuer") or "",
+                "value": parse_number(record.get("value")),
+                "shares": shares_from_row(record),
+                "put_call": record.get("putCall") or "",
+            }
+        )
+    return rows
+
+
+def _amendment_type(filing: dict) -> str | None:
+    if filing.get("form") != "13F-HR/A":
+        return None
+    urls = filing_document_urls(filing)
+    if not urls.get("primary"):
+        return None
+    time.sleep(SLEEP_SEC)
+    primary = parse_primary_doc_xml(sec_fetch_bytes(urls["primary"]))
+    time.sleep(SLEEP_SEC)
+    return primary.get("amendment_type")
+
+
+def _rows_from_filings(adviser_id: str, filings: list[dict]) -> list[dict] | None:
+    """One period's information tables. A restatement replaces; new holdings add."""
+    if not filings:
+        return []
+    if len(filings) == 1:
+        path = _cache_xml(adviser_id, filings[0])
+        if path is None:
+            return None
+        return _plain_rows(path.read_bytes())
+    packaged = []
+    for filing in filings:
+        path = _cache_xml(adviser_id, filing)
+        if path is None:
+            return None
+        plain = _plain_rows(path.read_bytes())
+        packaged.append(
+            {
+                "form": filing.get("form"),
+                "amendment_type": _amendment_type(filing),
+                "rows": [
+                    {
+                        "cusip": row["cusip"],
+                        "issuer": row["issuer"],
+                        "put_call": row["put_call"] or None,
+                        "sh_prn": "SH",
+                        "shares": None if row["shares"] is None else int(row["shares"]),
+                        "value_usd": None if row["value"] is None else int(row["value"]),
+                    }
+                    for row in plain
+                ],
+            }
+        )
+    merged = merge_filings(packaged)
+    return [
+        {
+            "cusip": row.get("cusip") or "",
+            "issuer": row.get("issuer") or "",
+            "value": row.get("value_usd"),
+            "shares": row.get("shares"),
+            "put_call": row.get("put_call") or "",
+        }
+        for row in merged
+    ]
+
+
+def _attach_plain_rows(adviser: dict, rows: list[dict], book: Book, cusip_map: dict[str, str], universe: set[str]) -> int:
     kept = 0
     for record in rows:
-        if record.get("putCall"):
+        if record.get("put_call"):
             continue
-        value = parse_number(record.get("value"))
+        value = record.get("value")
         cusip = str(record.get("cusip") or "").upper()
         if value is None or not cusip:
             continue
         attach_row(
-            book, cusip, record.get("nameOfIssuer") or "", value, shares_from_row(record),
+            book, cusip, record.get("issuer") or "", float(value), record.get("shares"),
             adviser["id"], adviser.get("sec_name") or adviser["name"], "large_13f", adviser["cik"],
             cusip_map, universe, {}, False,
         )
         kept += 1
+    return kept
+
+
+def _notice_members(notice: dict, period: str) -> list[dict]:
+    urls = filing_document_urls(notice)
+    if not urls.get("primary"):
+        return []
+    time.sleep(SLEEP_SEC)
+    managers = other_managers_from_primary(sec_fetch_bytes(urls["primary"]))
+    time.sleep(SLEEP_SEC)
+    members = []
+    for manager in managers:
+        filings = [
+            row for row in latest_13f_filings(manager["cik"], limit=8)
+            if row.get("report_date") == period
+        ]
+        decision = book_source_for_latest_period(filings)
+        if decision.get("mode") != "direct":
+            continue
+        members.append({**manager, "filings": decision["filings"]})
+    return members
+
+
+def _book_signature(notice: dict | None, groups: list[tuple[str, list[dict]]]) -> str:
+    parts = []
+    if notice and notice.get("accession"):
+        parts.append(f"nt:{notice['accession']}")
+    for label, filings in groups:
+        for filing in filings:
+            parts.append(f"{label}:{filing.get('accession')}")
+    return "|".join(parts)
+
+
+def fetch_adviser_table(adviser: dict, book: Book, cusip_map: dict[str, str], universe: set[str]) -> str:
+    if not adviser.get("confirmed"):
+        return "skipped"
+    filings = latest_13f_filings(adviser["cik"], limit=12)
+    decision = book_source_for_latest_period(filings)
+    if decision["mode"] == "none":
+        adviser["stale"] = True
+        adviser["confirm_error"] = "no 13F holdings filing or notice on the submissions feed"
+        return "no filing"
+    notice = decision.get("notice")
+    groups: list[tuple[str, list[dict]]] = []
+    if decision["mode"] == "direct":
+        groups.append((adviser["id"], decision["filings"]))
+        adviser.pop("member_filings", None)
+        adviser.pop("filing_note", None)
+    else:
+        members = _notice_members(notice, decision["period"])
+        if not members:
+            adviser["stale"] = True
+            adviser["confirm_error"] = "13F notice listed no holdings filings for this period"
+            return "no info table"
+        for member in members:
+            groups.append((f"{adviser['id']}_{member['cik']}", member["filings"]))
+        adviser["member_filings"] = [
+            {
+                "cik": member["cik"],
+                "name": member.get("name") or "",
+                "accession": member["filings"][-1].get("accession"),
+                "filing_date": member["filings"][-1].get("filing_date"),
+            }
+            for member in members
+        ]
+        adviser["filing_note"] = (
+            "Parent filed a 13F notice. Holdings are the sum of the other managers "
+            "named on that notice who filed a holdings report for the same period."
+        )
+    signature = _book_signature(notice, groups)
+    adviser["latest_period"] = decision["period"]
+    if notice:
+        adviser["latest_filing"] = notice.get("filing_date")
+        adviser["latest_accession"] = notice.get("accession")
+        adviser["filing_mode"] = "notice_aggregate"
+    else:
+        last = decision["filings"][-1]
+        adviser["latest_filing"] = last.get("filing_date")
+        adviser["latest_accession"] = last.get("accession")
+        adviser["filing_mode"] = "direct"
+    unchanged = adviser.get("book_signature") == signature and adviser.get("rows_kept")
+    kept = 0
+    for label, group in groups:
+        rows = _rows_from_filings(label, group)
+        if rows is None:
+            adviser["stale"] = True
+            adviser["confirm_error"] = "info table URL missing"
+            return "no info table"
+        kept += _attach_plain_rows(adviser, rows, book, cusip_map, universe)
     adviser["rows_kept"] = kept
-    adviser["quarter_filing_date"] = filing["filing_date"]
-    return "ok"
+    adviser["quarter_filing_date"] = adviser.get("latest_filing")
+    adviser["book_signature"] = signature
+    adviser.pop("stale", None)
+    adviser.pop("confirm_error", None)
+    return "unchanged" if unchanged else "ok"
 
 
 def download_zip(url: str, dest: Path) -> bool:
-    request = Request(url, headers={"User-Agent": SEC_UA})
+    request = Request(url, headers={"User-Agent": sec_user_agent()})
     try:
         with urlopen(request, timeout=300) as response, dest.open("wb") as handle:
             while True:
@@ -391,6 +576,19 @@ def quarter_is_mid_2026(value: str) -> bool:
     return "30-JUN-2026" in text or "2026-06-30" in text or "06/30/2026" in text
 
 
+def dataset_urls() -> list[str]:
+    from thirteenf_core import discover_dataset_urls
+
+    try:
+        page = sec_fetch_bytes(DATASET_LISTING).decode("utf-8", errors="replace")
+        found = discover_dataset_urls(page)
+    except (HTTPError, URLError, TimeoutError, OSError):
+        found = []
+    if found:
+        return found
+    return list(ZIP_URLS)
+
+
 def load_bulk_zip(book: Book, cusip_map: dict[str, str], universe: set[str], names_by_key: dict[str, list[str]], curated: dict[str, dict]) -> str:
     zip_path = CACHE_DIR / "form13f_q2.zip"
     CACHE_DIR.mkdir(parents=True, exist_ok=True)
@@ -398,7 +596,7 @@ def load_bulk_zip(book: Book, cusip_map: dict[str, str], universe: set[str], nam
     if zip_path.exists() and zip_path.stat().st_size > 1_000_000:
         used = "local cache form13f_q2.zip"
     else:
-        for url in ZIP_URLS:
+        for url in dataset_urls():
             print(f"trying {url}", flush=True)
             if download_zip(url, zip_path):
                 used = url
@@ -611,9 +809,10 @@ def parse_nport_series(xml: bytes, ticker: str, whole: bool = False) -> tuple[fl
 
 
 def load_etf_file(book: Book, holders: dict, cusip_map: dict[str, str], universe: set[str]) -> str:
-    if not ETF_HOLDINGS.exists():
-        return "holdings file not on this machine"
-    payload = json.loads(ETF_HOLDINGS.read_text(encoding="utf-8"))
+    path = etf_holdings_path()
+    if path is None or not path.exists():
+        return "etf holdings file not configured (set ETF_HOLDINGS_PATH); N-PORT still covers the plain ETFs"
+    payload = json.loads(path.read_text(encoding="utf-8"))
     multiples = {row["etf_ticker"]: row for row in holders.get("stated_multiples") or []}
     by_symbol = payload.get("by_symbol") or {}
     kept = 0
@@ -680,7 +879,7 @@ def full_stats(holders: list[dict]) -> dict:
     }
 
 
-def render(book: Book, universe: dict[str, dict], names: dict[str, str], mode: str, coverage: dict) -> dict:
+def render(book: Book, universe: dict[str, dict], names: dict[str, str], mode: str, coverage: dict, quarter: str | None = None, as_of: str | None = None) -> dict:
     by_ticker: dict[str, list[dict]] = defaultdict(list)
     fund_kind = {fund_id: meta["kind"] for fund_id, meta in book.funds.items()}
     for cell in book.cells.values():
@@ -762,8 +961,8 @@ def render(book: Book, universe: dict[str, dict], names: dict[str, str], mode: s
         "authority": "none",
         "built_at": now_iso(),
         "mode": mode,
-        "quarter": "2026Q2",
-        "as_of": "2026-10-07",
+        "quarter": quarter or "",
+        "as_of": as_of or now_iso()[:10],
         "holder_set_note": note,
         "coverage": coverage,
         "names": names_out,
@@ -773,6 +972,7 @@ def render(book: Book, universe: dict[str, dict], names: dict[str, str], mode: s
 def main() -> None:
     parser = argparse.ArgumentParser()
     parser.add_argument("--local-only", action="store_true")
+    parser.add_argument("--advisers-only", action="store_true", help="Refresh the fixed adviser list and skip the data-set zip")
     args = parser.parse_args()
     universe, universe_set = load_universe()
     names = load_names(universe_set)
@@ -805,13 +1005,16 @@ def main() -> None:
                 adviser["confirm_error"] = str(error)
                 errors.append(f"{adviser['id']}: {error}")
                 print(f"{adviser['id']}: FAILED {error}", flush=True)
-        try:
-            coverage["bulk_13f"] = load_bulk_zip(book, cusip_map, universe_set, names_by_key, {
-                cik_padded(row["cik"]): row for row in holders.get("advisers") or [] if row.get("cik")
-            })
-        except (HTTPError, URLError, TimeoutError, zipfile.BadZipFile, OSError) as error:
-            coverage["bulk_13f"] = f"failed: {error}"
-            errors.append(str(error))
+        if args.advisers_only:
+            coverage["bulk_13f"] = "skipped (--advisers-only)"
+        else:
+            try:
+                coverage["bulk_13f"] = load_bulk_zip(book, cusip_map, universe_set, names_by_key, {
+                    cik_padded(row["cik"]): row for row in holders.get("advisers") or [] if row.get("cik")
+                })
+            except (HTTPError, URLError, TimeoutError, zipfile.BadZipFile, OSError) as error:
+                coverage["bulk_13f"] = f"failed: {error}"
+                errors.append(str(error))
         try:
             coverage["nport"] = load_nport(book, holders, cusip_map, universe_set)
         except (HTTPError, URLError, TimeoutError, ET.ParseError) as error:
@@ -820,7 +1023,20 @@ def main() -> None:
         coverage["network_errors"] = errors
         coverage["holder_set_note"] = "Large advisers were fetched when the submissions feed confirmed a 13F. " + coverage.get("bulk_13f", "")
         HOLDERS_PATH.write_text(json.dumps(holders, indent=2) + "\n", encoding="utf-8")
-    payload = render(book, universe, names, mode, coverage)
+    quarter_counts: Counter[str] = Counter()
+    for adviser in holders.get("advisers") or []:
+        label = quarter_from_period(adviser.get("latest_period"))
+        if label:
+            quarter_counts[label] += 1
+    quarter = quarter_counts.most_common(1)[0][0] if quarter_counts else ""
+    outliers = [
+        f"{adviser.get('id')} {quarter_from_period(adviser.get('latest_period'))}"
+        for adviser in holders.get("advisers") or []
+        if quarter_from_period(adviser.get("latest_period")) not in {quarter, None}
+    ]
+    if outliers:
+        coverage["period_outliers"] = outliers
+    payload = render(book, universe, names, mode, coverage, quarter=quarter, as_of=now_iso()[:10])
     OUT_PATH.write_text(json.dumps(payload, separators=(",", ":")), encoding="utf-8")
     print(
         f"wrote {OUT_PATH} names={coverage['universe']} with_holders={coverage['with_holders']} "

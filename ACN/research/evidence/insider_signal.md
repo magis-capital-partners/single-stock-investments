@@ -1,4 +1,4 @@
-# ACN — Insider conviction (2026-10-17)
+# ACN — Insider conviction (2026-10-28)
 
 > Context only. Insider activity informs scenario confidence and stance discussion; it does not auto-inflate Lawrence base IRR. Promotion requires [HUMAN REVIEW].
 
@@ -12,17 +12,19 @@
 
 | Insider | Date | Shares | Price | Value | Contrib |
 |---------|------|--------|-------|-------|---------|
-| Sweet Julie Spellman | 2026-10-05 | 197 | $196.755 | $38760.74 | 2.63 |
-| Sweet Julie Spellman | 2026-09-05 | 205 | $189.095 | $38764.47 | 2.061 |
-| Park Angie Y | 2026-10-05 | 140 | $196.755 | $27545.7 | 1.915 |
-| Sharma Manish | 2026-10-05 | 93 | $196.755 | $18298.22 | 1.896 |
-| Unruch Joel | 2026-10-05 | 140 | $196.755 | $27545.7 | 1.856 |
+| Sweet Julie Spellman | 2026-10-26 | 10100 | $246.1701 | $2486318.01 | 5.512 |
+| Sweet Julie Spellman | 2026-10-26 | 2100 | $245.1063 | $514723.23 | 4.665 |
+| Price Paula A | 2026-10-26 | 800 | $249.8097 | $199847.76 | 4.068 |
 
 **Routine / planned sales (context):**
 
+- Sekido Ryoji: 4742 @ $244.7341 on 2026-10-22
+- Sekido Ryoji: 1102 @ $245.2789 on 2026-10-22
 - Clifford Katherine Lee: 68 @ $175.975 on 2026-08-14
-- Hogan Catherine Kiernan: 1 @ $210.8 on 2026-10-12 (10b5-1)
-- Hogan Catherine Kiernan: 219 @ $213.2052 on 2026-10-12 (10b5-1)
+
+**Narrative hooks:**
+
+- Multiple insiders bought within cluster window
 
 Source: `_system/reference/market-data/insider/ACN_transactions.csv`.
 Lawrence base IRR unchanged (`in_base_irr: False`).

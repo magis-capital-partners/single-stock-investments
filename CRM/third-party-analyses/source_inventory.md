@@ -1,7 +1,7 @@
 # CRM — Third-party source inventory
 
-**Date:** 2026-10-11
-**Sources:** 38 total (0 approved, 0 pending, 38 context)
+**Date:** 2026-10-25
+**Sources:** 39 total (0 approved, 0 pending, 39 context)
 
 | ID | Title | Path | Status | Use |
 |----|-------|------|--------|-----|
@@ -43,5 +43,6 @@
 | activist_long | acc0001108524 26 000187 | `CRM/third-party-analyses/activist_reports/long/8-K_20260826_acc0001108524_26_000187.htm` | context | activist/long — local |
 | activist_long | acc0001108524 26 000197 | `CRM/third-party-analyses/activist_reports/long/8-K_20260904_acc0001108524_26_000197.htm` | context | activist/long — local |
 | activist_long | acc0001108524 26 000210 | `CRM/third-party-analyses/activist_reports/long/8-K_20260917_acc0001108524_26_000210.htm` | context | activist/long — local |
+| activist_long | acc0001193125 26 425881 | `CRM/third-party-analyses/activist_reports/long/8-K_20261020_acc0001193125_26_425881.htm` | context | activist/long — local |
 
-Cross-check required: `CRM/research/cross_check_third_party_2026-10-11.md`
+Cross-check required: `CRM/research/cross_check_third_party_2026-10-25.md`

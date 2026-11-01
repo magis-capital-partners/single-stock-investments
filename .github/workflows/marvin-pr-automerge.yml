@@ -46,7 +46,7 @@ on:
   # completion re-invokes the gate instead of a runner sleeping until the
   # checks finish.
   workflow_run:
-    workflows: ["Research quality", "Python tests", "CI bootstrap smoke", "LLM Workflow Governance", "Energy model tests", "Filing Sentinel gold set", "Agent context"]
+    workflows: ["Research quality", "Python tests", "CI bootstrap smoke", "LLM Workflow Governance", "Energy model tests", "Filing Sentinel gold set", "Agent context", "Underwriting contract validation"]
     types: [completed]
 
 permissions:
@@ -162,9 +162,11 @@ jobs:
           # Two automerge lanes. A cursor/* diff that touches a ticker
           # research tree (a deep dive, a manifest, a committee packet) stays
           # on the provenance gate, including when the manifest is missing.
-          # A cursor/* diff that does not — workflow, script, and ledger
-          # fixes — is a code PR. codex/* and claude/* are always code.
-          # Both code lanes gate on every CI check being green.
+          # kpi_ledger.json and book_estimate.json are mechanical and stay on
+          # the code lane unless another research file is in the same diff.
+          # A cursor/* diff that does not touch ticker research (workflow,
+          # script, and ledger fixes) is a code PR. codex/* and claude/* are
+          # always code. Both code lanes gate on every CI check being green.
           gh api --paginate "repos/$REPO/pulls/$PR/files" --jq '.[].filename' > "$RUNNER_TEMP/pr-files.txt"
           # A workflow_run retry checks out the PR head. A branch cut before
           # this script existed will not have it; the default branch does.
@@ -529,14 +531,79 @@ jobs:
         run: |
           set -euo pipefail
           git fetch --depth=1 origin "$HEAD_SHA"
-          # Data files the validators read, taken from the PR head.
-          git -c core.sparseCheckout=false checkout "$HEAD_SHA" --             _system/data/desk_briefs _system/data/separations _system/research/short-alpha             _system/memory-hub _system/portfolio/registry.json SOURCES.md _system/sources.json 2>/dev/null || true
+          # git 2.55 does not write paths outside the sparse rules, and
+          # `core.sparseCheckout=false` did not override that. Discarding
+          # stderr hid it, so check_desk_briefs.py died on a missing
+          # schema.json (PR #1225). Add the data roots to the sparse
+          # checkout (that materializes them from main), then overlay the
+          # PR head, then materialize every inputs_read path the briefs name.
+          # dashboard/data/desk_briefs.json is overlaid too: the checker
+          # rejects a payload whose desk paths are not the latest brief.
+          git sparse-checkout add --skip-checks \
+            /_system/data/desk_briefs/ \
+            /_system/data/separations/ \
+            /_system/data/special_situations/ \
+            /_system/research/short-alpha/ \
+            /_system/memory-hub/ \
+            /_system/portfolio/registry.json \
+            /dashboard/data/desk_briefs.json \
+            /SOURCES.md \
+            /_system/sources.json
+          overlay() {
+            local rel="$1"
+            if git cat-file -e "$HEAD_SHA:$rel" 2>/dev/null; then
+              git checkout "$HEAD_SHA" -- "$rel"
+            fi
+          }
+          overlay _system/data/desk_briefs
+          overlay dashboard/data/desk_briefs.json
+          overlay _system/data/separations
+          overlay _system/data/special_situations
+          overlay _system/research/short-alpha
+          overlay _system/memory-hub
+          overlay _system/portfolio/registry.json
+          overlay SOURCES.md
+          overlay _system/sources.json
+          python3 - <<'PY' > "$RUNNER_TEMP/brief-inputs.txt"
+          import json
+          from pathlib import Path
+          root = Path("_system/data/desk_briefs")
+          paths = set()
+          if root.is_dir():
+              for path in root.rglob("*.json"):
+                  if path.name == "schema.json":
+                      continue
+                  try:
+                      payload = json.loads(path.read_text(encoding="utf-8"))
+                  except (OSError, json.JSONDecodeError):
+                      continue
+                  for entry in payload.get("inputs_read") or []:
+                      rel = entry.get("path") if isinstance(entry, dict) else None
+                      if isinstance(rel, str) and rel and not rel.startswith(("/", "\\")) and ".." not in Path(rel).parts:
+                          paths.add(rel.replace("\\", "/"))
+          for rel in sorted(paths):
+              print(rel)
+          PY
+          while IFS= read -r rel; do
+            [ -n "$rel" ] || continue
+            git sparse-checkout add --skip-checks "/$rel"
+            if git cat-file -e "$HEAD_SHA:$rel" 2>/dev/null; then
+              git checkout "$HEAD_SHA" -- "$rel"
+            elif git cat-file -e "HEAD:$rel" 2>/dev/null; then
+              git checkout HEAD -- "$rel"
+            else
+              echo "::error::desk brief cites a path on neither the PR head nor main: $rel"
+              exit 1
+            fi
+          done < "$RUNNER_TEMP/brief-inputs.txt"
+          test -f _system/data/desk_briefs/schema.json
       - name: Validate what the PR touched
         run: |
           set -euo pipefail
           FILES="$RUNNER_TEMP/pr-files.txt"
           if grep -q '^_system/data/desk_briefs/' "$FILES"; then python _system/scripts/check_desk_briefs.py; fi
           if grep -q '^_system/data/separations/' "$FILES"; then python _system/scripts/check_separation_universe.py --strict; fi
+          if grep -q '^_system/data/special_situations/situations.jsonl$' "$FILES"; then python _system/scripts/check_situation_rows.py; fi
           if grep -q '^_system/research/short-alpha/' "$FILES"; then python _system/scripts/build_short_alpha_dashboard.py --check; fi
           if grep -Eq '^(SOURCES.md|_system/sources.json)$' "$FILES"; then python _system/scripts/validate_sources.py; fi
           echo "data guard passed for PR #$PR at $HEAD_SHA"

@@ -515,6 +515,9 @@ def build_filing_facts(ticker: str, evidence_dir: Path, source_path: Path | None
     ix = {tag: [item.value for item in items] for tag, items in indexed.items()}
     metrics = canonical_metrics(ix, lines=lines, indexed=indexed)
     parser = "ix_facts"
+    if text.startswith('XBRL_CONTEXT_METRICS: '):
+        metrics = json.loads(text.splitlines()[0].split(': ', 1)[1])
+        parser = 'contextual_ix_facts'
     if not metrics:
         otc = parse_otc_prose_metrics(text)
         if otc:
@@ -542,6 +545,21 @@ def build_filing_facts(ticker: str, evidence_dir: Path, source_path: Path | None
         "parser": parser,
     }
     return out
+
+
+def revalidate_filing_document(doc: dict, ticker_dir: Path) -> dict:
+    """Repair legacy cached comparisons from local primary HTML, without a download."""
+    from xbrl_context import contextual_metrics
+    ref = doc.get('source_filing_ref') or source_filing_ref_from_text_path(ticker_dir.name, doc.get('source_text'))
+    source = ticker_dir.parent / ref if ref else None
+    if source and source.is_file() and source.suffix.lower() in {'.htm', '.html'}:
+        from security_profiles import security_profile
+        identity = security_profile(ticker_dir.name, ticker_dir.parent)
+        metrics = contextual_metrics(source.read_text(encoding='utf-8', errors='ignore'),
+            period_end=(doc.get('filing_meta') or {}).get('period_end'), expected_cik=identity.get('cik'))
+        if metrics:
+            return {**doc, 'metrics': metrics, 'parser': 'contextual_ix_facts', 'comparison_revalidated': True}
+    return doc
 
 
 def write_filing_facts_json(ticker_dir: Path, as_of: str) -> Path | None:

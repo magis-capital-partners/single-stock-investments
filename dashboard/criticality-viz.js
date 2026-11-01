@@ -259,26 +259,19 @@
     }[String(state || '').toLowerCase()] || [String(state || 'Unknown').replace(/_/g, ' '), 'is-unavailable'];
   }
 
-  function calendarAge(asOf, now = new Date()) {
-    if (!asOf) return null;
-    const start = new Date(asOf);
-    if (Number.isNaN(start.getTime())) return null;
-    const startDay = Date.UTC(start.getUTCFullYear(), start.getUTCMonth(), start.getUTCDate());
-    const endDay = Date.UTC(now.getUTCFullYear(), now.getUTCMonth(), now.getUTCDate());
-    return Math.round((endDay - startDay) / 86400000);
-  }
-
-  // quality_state is stamped at build time, so a frozen fallback snapshot
-  // carries 'ready' forever. Recompute staleness from as_of at render time:
-  // anything older than 2 calendar days renders as stale no matter what the
-  // build claimed. 'unavailable' is exempt — a feed that was never connected
-  // is missing, not old, and "stale" would imply data existed.
+  // Re-age frozen payloads using the producer's weekday/cadence thresholds.
+  // Weekends do not make a daily feed stale. Preserve explicit producer faults.
   function componentQuality(item, now = new Date()) {
     const state = String(item.quality_state || 'unknown').toLowerCase();
-    const age = calendarAge(item.as_of, now);
-    if (state !== 'unavailable' && age != null && age > 2) {
+    const age = global.MarketSessions?.age(item.as_of, now) ?? businessAge(item.as_of, now);
+    const [ready, delayed] = {intraday:[0,1],daily:[1,3],event:[2,5]}[item.cadence] || [1,2];
+    if (state !== 'unavailable' && age == null) {
+      return { state: 'unavailable', label: 'Observation date unavailable', cls: 'is-unavailable' };
+    }
+    if (state !== 'unavailable' && age != null && age > delayed) {
       return { state: 'stale', label: `Stale (as_of ${String(item.as_of).slice(0, 10)})`, cls: 'is-stale' };
     }
+    if (state === 'ready' && age > ready) return {state:'delayed',label:'Delayed',cls:'is-delayed'};
     const meta = qualityMeta(item.quality_state);
     return { state, label: meta[0], cls: meta[1] };
   }
@@ -383,15 +376,24 @@
     return `<p>${escapeHtml(item.description || 'This source is not connected.')}</p>`;
   }
 
-  // The intraday estimate and the close figure are two measurements of the SAME
-  // event -- today's leveraged-ETF close rebalance -- produced by different
-  // methods. On 2026-08-10 they read -$7.2B and +$218M: $7.4B apart and
-  // opposite in sign. They sat side by side as independent tiles with nothing
-  // saying they were even comparable, so a reader had no way to know that one
-  // of them was badly wrong, or which. Drawing the disagreement is the whole
-  // value: it is the only calibration signal either tile has.
+  // Compare market-scope estimates only for matching trading sessions.
+  // A later publication timestamp can still refer to the prior New York day.
+  // Neither method measures actual orders or establishes the other's accuracy.
+  function tradingDate(item) {
+    const explicit = item.session_date || item.trading_date;
+    if (/^\d{4}-\d{2}-\d{2}$/.test(String(explicit || ''))) return explicit;
+    const value = String(item.as_of || '');
+    if (/^\d{4}-\d{2}-\d{2}$/.test(value)) return value;
+    const stamp = new Date(value);
+    if (!value || !Number.isFinite(stamp.getTime())) return null;
+    const parts = new Intl.DateTimeFormat('en-US', {timeZone:'America/New_York',year:'numeric',month:'2-digit',day:'2-digit'}).formatToParts(stamp);
+    const get = key => parts.find(part => part.type === key)?.value;
+    return `${get('year')}-${get('month')}-${get('day')}`;
+  }
+
   function letfReconciliation(components, escapeHtml) {
-    const find = (name) => (components || []).find((item) => item.component === name);
+    const find = (name) => (components || []).filter((item) => item.component === name && item.scope === 'market')
+      .sort((a, b) => (Date.parse(b.as_of) || 0) - (Date.parse(a.as_of) || 0))[0];
     const intraday = find('letf_rebalance_intraday');
     const close = find('letf_rebalance_close');
     if (!intraday || !close) return '';
@@ -399,29 +401,32 @@
     const realized = finite(close.net_dollars ?? close.value);
     if (forecast == null || realized == null) return '';
 
-    const sameDay = String(intraday.as_of || '').slice(0, 10) === String(close.as_of || '').slice(0, 10);
+    const forecastDate = tradingDate(intraday), closeDate = tradingDate(close);
+    const sameDay = forecastDate && closeDate && forecastDate === closeDate;
+    const sameUniverse = intraday.universe_hash && close.universe_hash && intraday.universe_hash === close.universe_hash;
+    const usable = sameDay && sameUniverse && [intraday, close].every(item => ['ready','delayed'].includes(componentQuality(item).state));
     const gap = forecast - realized;
     const signFlip = (forecast < 0) !== (realized < 0);
     // Relative error against the LARGER magnitude: dividing by a near-zero
     // realized figure manufactures an infinite error out of a small miss.
     const scale = Math.max(Math.abs(forecast), Math.abs(realized));
     const relative = scale > 0 ? Math.abs(gap) / scale : null;
-    const severe = signFlip || (relative != null && relative > 0.5);
+    const severe = usable && (signFlip || (relative != null && relative > 0.5));
 
-    return `<div class="letf-recon ${severe ? 'is-severe' : 'is-agreeing'}">
-      <div class="letf-recon-head"><span class="criticality-kicker">Same event, two methods</span>
-        <b>${severe ? 'These two tiles disagree' : 'These two tiles agree'}</b></div>
+    return `<div class="letf-recon ${!usable ? 'is-unmatched' : severe ? 'is-severe' : 'is-agreeing'}">
+      <div class="letf-recon-head"><span class="criticality-kicker">Leveraged ETF flow estimates</span>
+        <b>${!sameDay ? 'Different trading dates · comparison unavailable' : !sameUniverse ? 'Coverage differs or is unverified · comparison withheld' : !usable ? 'Older estimates · comparison withheld' : severe ? 'Same-session estimates differ' : 'Same-session estimates are broadly aligned'}</b></div>
       <dl>
         <div><dt>Intraday estimate</dt><dd>${compactNumber(forecast, 'USD')}<small>${escapeHtml(String(intraday.as_of || '').replace('T', ' ').slice(0, 16))}</small></dd></div>
-        <div><dt>Close figure</dt><dd>${compactNumber(realized, 'USD')}<small>${escapeHtml(String(close.as_of || '').replace('T', ' ').slice(0, 16))}</small></dd></div>
-        <div><dt>Difference</dt><dd>${compactNumber(gap, 'USD')}${relative == null ? '' : `<small>${(relative * 100).toFixed(0)}% of the larger</small>`}</dd></div>
+        <div><dt>Closing estimate</dt><dd>${compactNumber(realized, 'USD')}<small>${escapeHtml(String(close.as_of || '').replace('T', ' ').slice(0, 16))}</small></dd></div>
+        ${usable ? `<div><dt>Difference</dt><dd>${compactNumber(gap, 'USD')}${relative == null ? '' : `<small>${(relative * 100).toFixed(0)}% of the larger</small>`}</dd></div>` : ''}
       </dl>
       <p>${sameDay
-        ? `Both describe the leveraged-ETF close rebalance for <b>${escapeHtml(String(close.as_of || '').slice(0, 10))}</b>.`
-        : '<b>Different dates</b> — these are not directly comparable today; the intraday tile has not yet been settled by a close figure.'}
-        ${signFlip ? ' They do not even agree on <b>direction</b>: one estimates net buying and the other net selling. At least one is wrong, and the page cannot tell you which.' : ''}
-        ${sameDay && !signFlip && relative != null && relative > 0.5 ? ' The gap exceeds half the larger figure.' : ''}
-        The intraday number is a forecast built from a blended return proxy; the close figure is computed from realised underlying returns. Until this comparison is tracked over many sessions, neither tile has an established accuracy.</p>
+        ? `Both describe the leveraged-ETF close rebalance for <b>${escapeHtml(closeDate)}</b>.`
+        : 'Wait for matching trading dates before comparing direction or magnitude.'}
+        ${usable && signFlip ? ' One estimates net buying and the other net selling. Return inputs, coverage and model assumptions need reconciliation.' : ''}
+        ${usable && !signFlip && relative != null && relative > 0.5 ? ' The gap exceeds half the larger figure.' : ''}
+        Both are modeled flows, not observed orders. The intraday estimate uses a return proxy; the closing estimate uses closing underlying returns. Neither has established accuracy.</p>
     </div>`;
   }
 
@@ -448,6 +453,7 @@
       <div class="risk-coverage"><strong>${counts.ready || 0} current</strong><span>${counts.delayed || 0} delayed · ${counts.lagging ? `${counts.lagging} lagging · ` : ''}${counts.stale || 0} stale · ${dead.length} not connected</span></div></header>
       ${deadNote}
       ${letfReconciliation(live, escapeHtml)}
+      ${payload?.reconciliation?.matched_sessions ? `<p class="risk-dead-note">Matched-session model history: ${whole(payload.reconciliation.matched_sessions)} paired sessions · mean error ${compactNumber(payload.reconciliation.mean_error_usd,'USD')} · mean absolute error ${compactNumber(payload.reconciliation.mean_absolute_error_usd,'USD')}. Matching date and underlying universe only; this compares two modeled estimates.</p>` : ''}
       <div class="risk-component-grid">${market.map((item) => { const q = componentQuality(item); return `<article class="risk-component-card">
         <div class="risk-component-head"><div><span>${escapeHtml(String(item.component).replace(/_/g, ' '))}</span><h4>${escapeHtml(item.label || item.symbol)}</h4></div><b class="${q.cls}">${escapeHtml(q.label)}</b></div>
         <div class="risk-component-value">${compactNumber(item.value, item.unit)}${finite(item.score) == null ? '' : `<small>stress ${whole(item.score)} / 100</small>`}</div>
@@ -888,11 +894,14 @@
   }
 
   function composeTrustLine(volLatest, resolved) {
+    if (!volLatest?.as_of) return 'The volatility snapshot is unavailable. A current volatility regime cannot be established.';
     const coverage = volLatest?.coverage || {};
     const lagging = coverage.metrics_lagging || {};
     const gaps = coverage.metrics_with_gaps || {};
     const asOf = String(volLatest?.as_of || '').slice(0, 10);
     const parts = [];
+    const behind = global.MarketSessions?.age(volLatest.as_of) ?? businessAge(volLatest.as_of);
+    parts.push(`volatility observations cover ${String(volLatest.as_of).slice(0,10)}${behind > 0 ? `, ${behind} completed session${behind===1?'':'s'} behind` : ''}`);
 
     // A DEAD feed outranks the worst merely-late one and belongs first in the
     // trust line: the vendor answers 200 the whole time it is dark, so nothing
@@ -948,7 +957,7 @@
     const trust = composeTrustLine(volLatest, resolved);
     return `<section class="regime-verdict stress-${verdict.stress <= 0 ? 'calm' : verdict.stress <= 2 ? 'mixed' : verdict.stress <= 4 ? 'elevated' : 'stressed'}">
       <span class="criticality-kicker">Regime verdict · composed from the data below, never stored</span>
-      <p class="regime-verdict-line">${escapeHtml(verdict.text)}</p>
+      <p class="regime-verdict-line">${escapeHtml((global.MarketSessions?.age(volLatest?.as_of) ?? businessAge(volLatest?.as_of)) > 1 ? 'Current regime withheld while volatility sources catch up. Last observation: '+String(volLatest?.as_of || 'unavailable').slice(0,10)+'.' : verdict.text)}</p>
       <p class="regime-trust-line"><b>Trust:</b> ${escapeHtml(trust)}</p>
     </section>`;
   }

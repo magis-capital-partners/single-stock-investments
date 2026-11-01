@@ -1,7 +1,7 @@
 # BMNR — Third-party source inventory
 
-**Date:** 2026-10-11
-**Sources:** 141 total (0 approved, 0 pending, 141 context)
+**Date:** 2026-10-27
+**Sources:** 144 total (0 approved, 0 pending, 144 context)
 
 | ID | Title | Path | Status | Use |
 |----|-------|------|--------|-----|
@@ -12,6 +12,7 @@
 | activist_long | Michael Stephen Maloney — SC 13D | `BMNR/third-party-analyses/activist_reports/long/SC-13D_20210901_acc0001065949_21_000169.htm` | context | activist/long — sec_edgar |
 | activist_long | BITMINE IMMERSION TECHNOLOGIES, INC — SC 13D | `BMNR/third-party-analyses/activist_reports/long/SC-13D_20260320_acc0001493152_26_012023.xml` | context | activist/long — sec_edgar |
 | activist_long | MOZAYYX UGP, LLC — SC 13D | `BMNR/third-party-analyses/activist_reports/long/SC-13D_20250715_acc0001641172_25_019744.xml` | context | activist/long — sec_edgar |
+| activist_long | acc0001493152 25 022449 | `BMNR/third-party-analyses/activist_reports/long/8-K_20251114_acc0001493152_25_022449.htm` | context | activist/long — local |
 | activist_long | acc0001065949 21 000117 | `BMNR/third-party-analyses/activist_reports/long/8-K_20210727_acc0001065949_21_000117.htm` | context | activist/long — local |
 | activist_long | acc0001683168 22 001323 | `BMNR/third-party-analyses/activist_reports/long/8-K_20220228_acc0001683168_22_001323.htm` | context | activist/long — local |
 | activist_long | acc0001683168 22 004038 | `BMNR/third-party-analyses/activist_reports/long/8-K_20220527_acc0001683168_22_004038.htm` | context | activist/long — local |
@@ -70,7 +71,6 @@
 | activist_long | acc0001493152 25 020211 | `BMNR/third-party-analyses/activist_reports/long/8-K_20251030_acc0001493152_25_020211.htm` | context | activist/long — local |
 | activist_long | acc0001493152 25 020545 | `BMNR/third-party-analyses/activist_reports/long/8-K_20251103_acc0001493152_25_020545.htm` | context | activist/long — local |
 | activist_long | acc0001493152 25 021429 | `BMNR/third-party-analyses/activist_reports/long/8-K_20251110_acc0001493152_25_021429.htm` | context | activist/long — local |
-| activist_long | acc0001493152 25 022449 | `BMNR/third-party-analyses/activist_reports/long/8-K_20251114_acc0001493152_25_022449.htm` | context | activist/long — local |
 | activist_long | acc0001493152 25 023780 | `BMNR/third-party-analyses/activist_reports/long/8-K_20251117_acc0001493152_25_023780.htm` | context | activist/long — local |
 | activist_long | acc0001493152 25 024172 | `BMNR/third-party-analyses/activist_reports/long/8-K_20251119_acc0001493152_25_024172.htm` | context | activist/long — local |
 | activist_long | acc0001493152 25 024555 | `BMNR/third-party-analyses/activist_reports/long/8-K_20251121_acc0001493152_25_024555.htm` | context | activist/long — local |
@@ -146,5 +146,8 @@
 | activist_long | acc0001493152 26 045035 | `BMNR/third-party-analyses/activist_reports/long/8-K_20260930_acc0001493152_26_045035.htm` | context | activist/long — local |
 | activist_long | acc0001493152 26 045699 | `BMNR/third-party-analyses/activist_reports/long/8-K_20261005_acc0001493152_26_045699.htm` | context | activist/long — local |
 | activist_long | acc0001493152 26 046088 | `BMNR/third-party-analyses/activist_reports/long/8-K_20261007_acc0001493152_26_046088.htm` | context | activist/long — local |
+| activist_long | acc0001493152 26 046744 | `BMNR/third-party-analyses/activist_reports/long/8-K_20261013_acc0001493152_26_046744.htm` | context | activist/long — local |
+| activist_long | acc0001493152 26 047517 | `BMNR/third-party-analyses/activist_reports/long/8-K_20261019_acc0001493152_26_047517.htm` | context | activist/long — local |
+| activist_long | acc0001493152 26 048429 | `BMNR/third-party-analyses/activist_reports/long/8-K_20261026_acc0001493152_26_048429.htm` | context | activist/long — local |
 
-Cross-check required: `BMNR/research/cross_check_third_party_2026-10-11.md`
+Cross-check required: `BMNR/research/cross_check_third_party_2026-10-27.md`

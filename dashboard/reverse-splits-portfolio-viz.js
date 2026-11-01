@@ -96,7 +96,7 @@
     const data=doc?.portfolio_research;
     if(!data?.cases?.length)return '';
     const primary=primaryCase(data),sample=data.full_sample_cost_outcomes;
-    return `<aside class="rsp-teaser" aria-label="Reverse-split backtest results"><div><p class="rsp-kicker">Reverse-split backtest · ${count(data.sample.events)} events</p><h2>See what survives trading costs.</h2><p>${esc(period(data))} · next-session open → same-day close · conditional research</p></div><dl><div><dt>All events · average net ROG</dt><dd class="${tone(sample.gross_returns.mean)}">${signedPct(sample.gross_returns.mean)}</dd></div><div><dt>Filtered account · CAGR</dt><dd>${signedPct(primary.portfolio.cagr)}</dd></div></dl><a class="rsp-action" href="#/ideas/short-alpha/backtest">Open backtest results <span aria-hidden="true">↗</span></a></aside>`;
+    return `<aside class="rsp-teaser" aria-label="Reverse-split backtest results"><div><p class="rsp-kicker">Reverse-split backtest · ${count(data.sample.events)} events</p><h2>See what survives trading costs.</h2><p>${esc(period(data))} · next-session open → same-day close · conditional research</p></div><dl><div><dt>All events · average net ROG</dt><dd class="${tone(sample.gross_returns.mean)}">${signedPct(sample.gross_returns.mean)}</dd></div><div><dt>Filtered account · CAGR</dt><dd>${signedPct(primary.portfolio.cagr)}</dd></div></dl><a class="rsp-action" href="#/strategies/systematic-shorts/backtest">Open backtest results <span aria-hidden="true">↗</span></a></aside>`;
   }
 
   function render(doc) {

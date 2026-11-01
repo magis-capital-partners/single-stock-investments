@@ -1,20 +1,17 @@
-# AFL — Insider conviction (2026-10-17)
+# AFL — Insider conviction (2026-10-19)
 
 > Context only. Insider activity informs scenario confidence and stance discussion; it does not auto-inflate Lawrence base IRR. Promotion requires [HUMAN REVIEW].
 
-**ICS:** 4.04 (moderate) · **Bull case support:** moderate
+**ICS:** 0.0 (negligible) · **Bull case support:** none
 
 | Scenario | Prior weight | Tilted weight |
 |----------|--------------|---------------|
-| Bear | 20% | 20% |
-| Base | 55% | 55% |
+| Bear | 20% | 28% |
+| Base | 55% | 47% |
 | Bull | 25% | 25% |
 
 | Insider | Date | Shares | Price | Value | Contrib |
 |---------|------|--------|-------|-------|---------|
-| MOSKOWITZ JOSEPH L | 2026-06-22 | 20303 | $44.59 | $905310.77 | 1.686 |
-| Koide Masatoshi | 2026-09-16 | 3201 | $35.52 | $113699.52 | 1.634 |
-| BEAVER STEVEN KENT | 2026-05-22 | 5508 | $35.52 | $195644.16 | 1.197 |
 
 **Routine / planned sales (context):**
 

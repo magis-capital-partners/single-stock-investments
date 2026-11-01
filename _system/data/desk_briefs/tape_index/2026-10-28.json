@@ -1,0 +1,318 @@
+{
+  "schema_version": "desk_briefs.v2",
+  "desk": "tape_index",
+  "as_of": "2026-10-28",
+  "author": "grok-drew-tape-index",
+  "owner": "drew",
+  "inputs_read": [
+    {
+      "path": "dashboard/data/technical_summary.json",
+      "generated_at": "2026-10-28T10:50:03Z"
+    },
+    {
+      "path": "dashboard/data/capitulation_daily.json",
+      "generated_at": "2026-10-28T10:52:11.696445+00:00"
+    },
+    {
+      "path": "dashboard/data/index_membership.json",
+      "generated_at": "2026-10-28T11:16:20Z"
+    },
+    {
+      "path": "dashboard/data/portfolio_news.json",
+      "generated_at": "2026-10-28T06:56:45.987598+00:00"
+    },
+    {
+      "path": "_system/portfolio/registry.json",
+      "generated_at": "2026-10-28T11:16:21Z"
+    },
+    {
+      "path": "_system/data/desk_briefs/schema.json",
+      "generated_at": null
+    },
+    {
+      "path": "dashboard/data/agent_shards/XYL.json",
+      "generated_at": "2026-10-16T20:26:21Z"
+    },
+    {
+      "path": "dashboard/data/agent_shards/HUBB.json",
+      "generated_at": "2026-10-16T20:26:21Z"
+    }
+  ],
+  "items": [
+    {
+      "ticker": "BA",
+      "headline": "Boeing jumped from stress_building to capitulation_candidate on 6.2x volume as it fell 10.7% after Q3; RSI 47.0 to 27.2.",
+      "one_number": "rvol 6.18 (capitulation_candidate; close 168.18 vs 188.31)",
+      "lane": "capitulation",
+      "evidence": [
+        {
+          "kind": "dashboard",
+          "ref": "dashboard/data/technical_summary.json BA cap=capitulation_candidate (prior stress_building); rsi_14=27.2 (prior 47.0); stretch_z=-1.791; trend_z=-1.62; cmf_20d=-0.163; rvol_20d=6.18; r5=-11.7",
+          "url": null,
+          "as_of": "2026-10-27",
+          "claim_type": "fact"
+        },
+        {
+          "kind": "news",
+          "ref": "dashboard/data/portfolio_news.json 2026-10-27: Seeking Alpha 'Boeing stock plunges to 18-mth low on production delays, cash flow outlook'",
+          "url": null,
+          "as_of": "2026-10-27",
+          "claim_type": "fact"
+        }
+      ],
+      "confidence": "provider",
+      "next": "Cause (production/cash-flow outlook) belongs to Fundamental; agent shard not built.",
+      "handoff": "fundamentals"
+    },
+    {
+      "ticker": "XYL",
+      "headline": "Xylem went from normal to capitulation_candidate in one print, falling 14.2% with stretch_z deepening from -0.33 to -2.12 on 4.6x volume.",
+      "one_number": "stretch_z -2.12 vs -2 (capitulation_candidate; rvol 4.61)",
+      "lane": "capitulation",
+      "evidence": [
+        {
+          "kind": "dashboard",
+          "ref": "dashboard/data/technical_summary.json XYL cap=capitulation_candidate (prior normal); rsi_14=32.2 (prior 64.6); stretch_z=-2.124 (prior -0.325); cmf=-0.137; rvol_20d=4.61; close 92.86 (prior 108.24)",
+          "url": null,
+          "as_of": "2026-10-27",
+          "claim_type": "fact"
+        },
+        {
+          "kind": "news",
+          "ref": "dashboard/data/portfolio_news.json 2026-10-26: Zacks 'Xylem Gears Up to Post Q3 Earnings'",
+          "url": null,
+          "as_of": "2026-10-26",
+          "claim_type": "fact"
+        }
+      ],
+      "confidence": "provider",
+      "next": "Shard as_of 2026-07-11 (stale); likely Q3 reaction, confirm via Fundamental.",
+      "handoff": "fundamentals"
+    },
+    {
+      "ticker": "HUBB",
+      "headline": "Hubbell moved from stress_building to capitulation_candidate on 3.4x volume with RSI 26.3.",
+      "one_number": "rvol 3.36 (capitulation_candidate; RSI 26.3)",
+      "lane": "capitulation",
+      "evidence": [
+        {
+          "kind": "dashboard",
+          "ref": "dashboard/data/technical_summary.json HUBB cap=capitulation_candidate (prior stress_building); rsi_14=26.3 (prior 31.8); stretch_z=-1.465; cmf_20d=0.057; rvol_20d=3.36; close 434.28 (prior 459.4)",
+          "url": null,
+          "as_of": "2026-10-27",
+          "claim_type": "fact"
+        }
+      ],
+      "confidence": "provider",
+      "next": "No HUBB item in portfolio_news this window; shard as_of 2026-07-29.",
+      "handoff": null
+    },
+    {
+      "ticker": "WELL",
+      "headline": "Welltower went from normal to capitulation_candidate on 2.5x volume after its Q3 EPS miss; Ventas made the same move.",
+      "one_number": "rvol 2.47 (capitulation_candidate; RSI 71.1 to 56.3)",
+      "lane": "capitulation",
+      "evidence": [
+        {
+          "kind": "dashboard",
+          "ref": "dashboard/data/technical_summary.json WELL cap=capitulation_candidate (prior normal); rsi_14=56.3 (prior 71.1); stretch_z=-1.621; cmf_20d=-0.197; rvol_20d=2.47; close 226.72 (prior 240.61)",
+          "url": null,
+          "as_of": "2026-10-27",
+          "claim_type": "fact"
+        },
+        {
+          "kind": "dashboard",
+          "ref": "dashboard/data/technical_summary.json by_ticker.VTR cap=capitulation_candidate (prior normal); rsi_14=59.8; stretch_z=-1.402; cmf_20d=-0.135; rvol_20d=1.51",
+          "url": null,
+          "as_of": "2026-10-27",
+          "claim_type": "fact"
+        },
+        {
+          "kind": "news",
+          "ref": "dashboard/data/portfolio_news.json 2026-10-26/27: StreetInsider 'Welltower Misses Q3 EPS by 11c; raises guidance'; 'Ventas Misses Q3 EPS by 3c; raises guidance'",
+          "url": null,
+          "as_of": "2026-10-27",
+          "claim_type": "fact"
+        }
+      ],
+      "confidence": "provider",
+      "next": "Healthcare REIT pair on earnings; capitulation state with RSI above 50 is a fast drop from overbought, not a washed-out read. Shard not built.",
+      "handoff": "fundamentals"
+    },
+    {
+      "ticker": "VLO",
+      "headline": "Valero went from normal to capitulation_candidate on a 9.2% one-day fall; MPC and PSX dropped to panic the same day.",
+      "one_number": "rvol 2.11 (capitulation_candidate; close 387.34 vs 426.76)",
+      "lane": "capitulation",
+      "evidence": [
+        {
+          "kind": "dashboard",
+          "ref": "dashboard/data/technical_summary.json VLO cap=capitulation_candidate (prior normal); rsi_14=37.9 (prior 53.2); stretch_z=0.125 (prior 1.134); cmf_20d=-0.001; rvol_20d=2.11; r5=-10.63",
+          "url": null,
+          "as_of": "2026-10-27",
+          "claim_type": "fact"
+        },
+        {
+          "kind": "dashboard",
+          "ref": "dashboard/data/technical_summary.json by_ticker.MPC cap=panic (prior normal) with breakout conditions (leading_uptrend, cmf 0.126, rvol 1.53); by_ticker.PSX cap=panic (prior normal) rsi_14=48.1",
+          "url": null,
+          "as_of": "2026-10-27",
+          "claim_type": "fact"
+        }
+      ],
+      "confidence": "provider",
+      "next": "Refiner cluster; MPC held (panic and breakout together). Shard not built.",
+      "handoff": null
+    },
+    {
+      "ticker": "CTVA",
+      "headline": "Corteva RSI fell from 26.3 to 14.0, the only fresh large-cap cross below 25 in this print.",
+      "one_number": "RSI 14.0 vs 25 (stress_building; 5d -9.8%)",
+      "lane": "oversold",
+      "evidence": [
+        {
+          "kind": "dashboard",
+          "ref": "dashboard/data/technical_summary.json by_ticker.CTVA cap=stress_building; rsi_14=14.0 (prior 26.3); stretch_z=-1.367; cmf_20d=-0.009; rvol_20d=0.43; r5=-9.84; close 11.63",
+          "url": null,
+          "as_of": "2026-10-27",
+          "claim_type": "fact"
+        }
+      ],
+      "confidence": "provider",
+      "next": "Low volume (rvol 0.43); no CTVA item in portfolio_news this window; shard not built.",
+      "handoff": null
+    },
+    {
+      "ticker": "GLW",
+      "headline": "Corning moved from stress_building to panic with RSI 20.2 on 2.0x volume.",
+      "one_number": "RSI 20.2 vs 25 (panic; trend_z -1.47)",
+      "lane": "oversold",
+      "evidence": [
+        {
+          "kind": "dashboard",
+          "ref": "dashboard/data/technical_summary.json by_ticker.GLW cap=panic (prior stress_building); rsi_14=20.2 (prior 18.9); stretch_z=-1.82; trend_z=-1.471; cmf_20d=0.064; rvol_20d=1.99; price_vs_50d=-15.49%",
+          "url": null,
+          "as_of": "2026-10-27",
+          "claim_type": "fact"
+        }
+      ],
+      "confidence": "provider",
+      "next": "No GLW item in portfolio_news this window; shard not opened.",
+      "handoff": null
+    },
+    {
+      "ticker": "TSLA",
+      "headline": "Tesla printed a new breakout as CMF crossed +0.10 to 0.149 with price 11.3% above its 50-day.",
+      "one_number": "CMF 0.149 vs 0.10 (breakout; rvol 1.22)",
+      "lane": "breakout",
+      "evidence": [
+        {
+          "kind": "dashboard",
+          "ref": "dashboard/data/technical_summary.json by_ticker.TSLA direction=leading_uptrend; price_vs_50d=+11.29%; rsi_14=62.4 (prior 55.1); cmf_20d=0.149 (prior 0.07); rvol_20d=1.22; r5=9.03",
+          "url": null,
+          "as_of": "2026-10-27",
+          "claim_type": "fact"
+        }
+      ],
+      "confidence": "provider",
+      "next": "Shard not opened.",
+      "handoff": null
+    },
+    {
+      "ticker": "TXN",
+      "headline": "Texas Instruments printed a new breakout as CMF crossed +0.10 to 0.149; RSI rose 50.7 to 64.6.",
+      "one_number": "rvol 1.28 (breakout; CMF 0.149)",
+      "lane": "breakout",
+      "evidence": [
+        {
+          "kind": "dashboard",
+          "ref": "dashboard/data/technical_summary.json by_ticker.TXN direction=leading_uptrend; price_vs_50d=+13.03%; rsi_14=64.6 (prior 50.7); stretch_z=1.017; cmf_20d=0.149 (prior 0.084); rvol_20d=1.28; r5=11.21",
+          "url": null,
+          "as_of": "2026-10-27",
+          "claim_type": "fact"
+        }
+      ],
+      "confidence": "provider",
+      "next": "NXPI also printed a breakout but reported mixed guidance after the close on 2026-10-27, so it is not posted.",
+      "handoff": null
+    },
+    {
+      "ticker": "EQT",
+      "headline": "EQT turned from mixed_repair to leading_uptrend and printed a breakout with CMF 0.456 on 2.1x volume.",
+      "one_number": "CMF 0.456 vs 0.10 (breakout; rvol 2.05)",
+      "lane": "breakout",
+      "evidence": [
+        {
+          "kind": "dashboard",
+          "ref": "dashboard/data/technical_summary.json by_ticker.EQT direction=leading_uptrend (prior mixed_repair); price_vs_50d=+6.0%; rsi_14=67.7; cmf_20d=0.456 (prior 0.371); rvol_20d=2.05",
+          "url": null,
+          "as_of": "2026-10-27",
+          "claim_type": "fact"
+        },
+        {
+          "kind": "dashboard",
+          "ref": "dashboard/data/technical_summary.json new breakouts also in XOM (cmf 0.241), WMB (0.194), TRGP (0.135), XOP (0.137); KMI continuing",
+          "url": null,
+          "as_of": "2026-10-27",
+          "claim_type": "fact"
+        }
+      ],
+      "confidence": "provider",
+      "next": "Energy/midstream rotation while refiners (VLO/MPC/PSX) sold off.",
+      "handoff": null
+    },
+    {
+      "ticker": "PNR",
+      "headline": "Pentair RSI jumped from 66.7 to 87.1 on 2.9x volume after its Q3 beat; 5-day gain 18.4%.",
+      "one_number": "RSI 87.1 vs 70 (rvol 2.91)",
+      "lane": "overbought",
+      "evidence": [
+        {
+          "kind": "dashboard",
+          "ref": "dashboard/data/technical_summary.json by_ticker.PNR rsi_14=87.1 (prior 66.7); stretch_z=0.251; cmf_20d=0.128; rvol_20d=2.91; r5=18.37; direction mixed_repair (prior lagging_downtrend)",
+          "url": null,
+          "as_of": "2026-10-27",
+          "claim_type": "fact"
+        },
+        {
+          "kind": "news",
+          "ref": "dashboard/data/portfolio_news.json 2026-10-27: StreetInsider 'Pentair Tops Q3 EPS by 10c, Beats on Revenue'",
+          "url": null,
+          "as_of": "2026-10-27",
+          "claim_type": "fact"
+        }
+      ],
+      "confidence": "provider",
+      "next": "Not a breakout (direction mixed_repair). Shard not opened.",
+      "handoff": null
+    },
+    {
+      "ticker": "RX.V",
+      "headline": "BioSyent entered the universe with a news-only S&P/TSX Venture Composite add that the feed maps to tsx_composite.",
+      "one_number": "index add announced 2026-10-18 (news_unconfirmed)",
+      "lane": "index_add",
+      "evidence": [
+        {
+          "kind": "dashboard",
+          "ref": "dashboard/data/index_membership.json by_ticker.RX.V confirmed_events: tsx_composite add, announced 2026-10-18, news_unconfirmed, quality_gated; title says S&P/TSX Venture Composite",
+          "url": null,
+          "as_of": "2026-10-28",
+          "claim_type": "fact"
+        }
+      ],
+      "confidence": "news",
+      "next": "Index id looks mislabeled (Venture Composite is not the TSX Composite); thin TSXV name, no tape read. Quality_gated_events 13 to 14 is this row only.",
+      "handoff": null
+    }
+  ],
+  "screens_empty": [
+    "index_deletes_new",
+    "index_migrations_new",
+    "confirmed_next_30d",
+    "index_distance_changes"
+  ],
+  "notes": "SPY normal (panic 50.6 to 45.0). Prior posts moved: CLS, VALE to panic; AMKR, FICO, NBIS, CRWV to stress_building. XP sp400 -0.91% still on $8.13B mcap (rank_day_snapshot:2026-10-31), not refreshed after the 48% drop. Held self-contradictory: XP, NU, B3SA3.SA, SHW (CMF > +0.10 with panic/stress), MPC (panic and breakout). Held thin/bad prints: HKHC, FRMO, WRLC, INV, STLR, FPS, XNDU. 30 partial non-US rows as_of 2026-10-28 not read. Unranked: HIG, HSY, ICE, PAYX normal to panic with RSI > 50. No _envelope on L0 feeds.",
+  "research_only": true,
+  "in_base_irr": false,
+  "authority": "none"
+}

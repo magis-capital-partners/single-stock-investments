@@ -132,7 +132,7 @@
 .rs-panel .rs-tile{border:1px solid rgba(127,127,127,.3);border-radius:8px;padding:8px 10px}
 .rs-panel .rs-tile strong{display:block;font-size:18px;line-height:1.2}
 .rs-panel .rs-tile small{display:block;opacity:.75;margin-top:2px}
-.rs-panel .rs-tile em{display:block;font-size:11px;opacity:.7;font-style:normal;margin-top:2px}
+.rs-panel .rs-tile em{display:block;font-size:var(--font-caption,12px);opacity:.7;font-style:normal;margin-top:2px}
 .rs-panel section{margin-top:14px}
 .rs-panel h3{margin:0 0 4px;font-size:13px;text-transform:uppercase;letter-spacing:.04em;opacity:.8}
 .rs-panel table.insights-table{width:100%}
@@ -232,7 +232,7 @@
       </tr>`).join('');
     return `<section><h3>Upcoming effective dates</h3>
       <table class="insights-table"><thead><tr><th>Ex date</th><th>Ticker</th><th>Company</th><th>Ratio</th><th>Exchange</th><th>Basis</th><th>Announced</th></tr></thead><tbody>${body}</tbody></table>
-      <p class="muted" style="margin-top:4px;font-size:11px">An announced schedule is filing text, not an analyst-confirmed corporate action. The ratio is new/old shares; a dash means no ratio was parsed.</p>
+      <p class="muted" style="margin-top:4px;font-size:var(--font-caption,12px)">An announced schedule is filing text, not an analyst-confirmed corporate action. The ratio is new/old shares; a dash means no ratio was parsed.</p>
     </section>`;
   }
 
@@ -286,7 +286,7 @@
       : '';
     return `<section><h3>Recent announcements <span class="muted" style="font-weight:normal;text-transform:none;letter-spacing:0">(${esc(scope)})</span></h3>
       <table class="insights-table">${head}<tbody>${shown}</tbody></table>${more}
-      <p class="muted" style="margin-top:4px;font-size:11px">Outcome comes from the parsed filing where text was read: <em>Mention</em> is reverse-split language without an action, <em>Cancelled</em> an abandonment, <em>Phrase hit</em> an announced-only row with no ratio and no ex date. An ex date before the as-of date reads as effective. Accept-clock rows have not been read.</p>
+      <p class="muted" style="margin-top:4px;font-size:var(--font-caption,12px)">Outcome comes from the parsed filing where text was read: <em>Mention</em> is reverse-split language without an action, <em>Cancelled</em> an abandonment, <em>Phrase hit</em> an announced-only row with no ratio and no ex date. An ex date before the as-of date reads as effective. Accept-clock rows have not been read.</p>
     </section>`;
   }
 
@@ -311,7 +311,7 @@
     }).join('');
     return `<section><h3>Repeat splitters</h3>
       <table class="insights-table"><thead><tr><th>Ticker</th><th>Company</th><th>Prior splits</th><th>Cohort</th><th>Last ex date</th><th>Last ratio</th><th>Exchange (current)</th></tr></thead><tbody>${body}</tbody></table>
-      <p class="muted" style="margin-top:4px;font-size:11px">Prior count is by CIK where known, else by ticker; a ticker reused by another issuer can inflate it. The same split recorded twice (same issuer, ratio within 10%, ex dates within ten days) counts once${merged ? `; ${fmtInt(merged)} such row${merged === 1 ? '' : 's'} merged here` : ''}. Exchange is today's SEC listing, not the listing on the ex date. <em>verify</em> marks a ratio worse than 1-for-500 or one that disagrees with the announcement. Most recent first, capped at ${rows.length}.</p>
+      <p class="muted" style="margin-top:4px;font-size:var(--font-caption,12px)">Prior count is by CIK where known, else by ticker; a ticker reused by another issuer can inflate it. The same split recorded twice (same issuer, ratio within 10%, ex dates within ten days) counts once${merged ? `; ${fmtInt(merged)} such row${merged === 1 ? '' : 's'} merged here` : ''}. Exchange is today's SEC listing, not the listing on the ex date. <em>verify</em> marks a ratio worse than 1-for-500 or one that disagrees with the announcement. Most recent first, capped at ${rows.length}.</p>
     </section>`;
   }
 
@@ -338,7 +338,7 @@
     const stamp = book.latest_run && book.latest_run.created_at ? String(book.latest_run.created_at) : '—';
     return `<section><h3>Book · latest persisted batch <span class="muted" style="font-weight:normal;text-transform:none;letter-spacing:0">(${esc(stamp)} · ${fmtInt(book.run_count)} runs on file)</span></h3>
       <table class="insights-table"><thead><tr><th>Scenario</th><th>Trades</th><th>Net P&amp;L</th><th>After fills</th><th>Borrow</th><th>Commission</th><th>Profit factor</th><th>Losses &gt;50%</th><th>Margin breach days</th></tr></thead><tbody>${body}</tbody></table>
-      <p class="muted" style="margin-top:4px;font-size:11px">${esc(book.note || '')} Scenarios are predeclared sensitivities on one $50k account with assumed fees; <em>strict</em> and <em>verified_strict</em> are empty because no historical locate exists.</p>
+      <p class="muted" style="margin-top:4px;font-size:var(--font-caption,12px)">${esc(book.note || '')} Scenarios are predeclared sensitivities on one $50k account with assumed fees; <em>strict</em> and <em>verified_strict</em> are empty because no historical locate exists.</p>
     </section>`;
   }
 
@@ -521,6 +521,18 @@
       <p class="muted">Each row is an action or candidate, not necessarily an independent company or a feasible short.</p></details>`;
   }
   function attach(container,doc) {
+    if(container.querySelector('[data-short-profit-program]')){
+      if(global.ShortProfitProgram)global.ShortProfitProgram.attach(container);
+      const legacy=container.querySelector('[data-spp-legacy]');
+      if(legacy&&!legacy.dataset.listener){
+        legacy.dataset.listener='true';
+        legacy.addEventListener('toggle',()=>{
+          if(legacy.open&&!legacy.dataset.mounted){legacy.dataset.mounted='true';attach(legacy,doc);}
+        });
+      }
+      return;
+    }
+    if(global.ShortSleeveViz)global.ShortSleeveViz.attach(container);
     const panel=container.querySelector('[data-rs-universe]');
     if (!panel) return;
     const rows=doc.expansion_catalogue || [];
@@ -596,6 +608,9 @@
       return `${STYLE}<div class="rs-panel"><p class="muted">Unexpected reverse-split schema ${esc(doc.schema_version)}; expected reverse_splits.v1.</p></div>`;
     }
     if(doc.portfolio_research && global.ReverseSplitsPortfolioViz){
+      if(global.ShortSleeveViz && !opts.legacyResearch){
+        return `${STYLE}<div class="rs-panel">${global.ShortProfitProgram?global.ShortProfitProgram.render():''}<details class="rsp-fold" data-spp-legacy><summary>Earlier reverse-split portfolio and execution studies<small>Preserved comparisons; different rules and cost assumptions</small></summary>${global.ShortSleeveViz.render()}<details class="rsp-fold"><summary>Strategy research and event registry<small>Original strategy versions, execution studies, forward evidence and source records</small></summary>${render(doc,{...opts,legacyResearch:true})}</details></details></div>`;
+      }
       const completed=doc.forward_status?.validation?.completed?.events;
       return `${STYLE}<div class="rs-panel" data-schema="${esc(doc.schema_version || '')}">
         ${doc.net_edge_research_v3 && global.ShortsEdgeV3Viz ? `${global.ShortsEdgeV3Viz.render({...doc.net_edge_research_v3,prospective:doc.net_edge_prospective_v3 || doc.net_edge_research_v3.prospective})}<details class="rsp-fold"><summary>RSI-2.0 · intraday edge study<small>Prior research version</small></summary>${global.ShortsNetEdgeViz ? global.ShortsNetEdgeViz.render(doc.net_edge_research) : ''}</details><details class="rsp-fold"><summary>RSI-1.0 · original shorts backtest<small>Existing account results and execution research</small></summary>${global.ReverseSplitsPortfolioViz.render(doc)}</details>` : doc.net_edge_research && global.ShortsNetEdgeViz ? `${global.ShortsNetEdgeViz.render(doc.net_edge_research)}<details class="rsp-fold"><summary>RSI-1.0 · original shorts backtest<small>Existing account results and execution research</small></summary>${global.ReverseSplitsPortfolioViz.render(doc)}</details>` : global.ReverseSplitsPortfolioViz.render(doc)}

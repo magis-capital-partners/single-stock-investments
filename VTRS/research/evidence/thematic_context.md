@@ -1,20 +1,20 @@
-# VTRS - Thematic context (2026-10-17)
+# VTRS - Thematic context (2026-10-29)
 
 > Context only. Tailwinds inform stance and overlay sizing; they do not auto-inflate Lawrence base IRR. Promotion to base case requires [HUMAN REVIEW].
 
 | Indicator | Latest | As of | YoY | Direction | In base IRR? |
 |-----------|--------|-------|-----|-----------|--------------|
-| High-yield OAS credit spread (%) | -0.69 | 2026-10-16 | +30.3% | up | no (context) |
-| US Treasury 10Y yield (%) | 5.0980000495910645 | 2026-10-16 | +28.2% | up | no (context) |
-| US Treasury 2Y yield (%) | 4.89900016784668 | 2026-10-16 | +38.0% | up | no (context) |
-| Trade-weighted USD index (broad) | 101.83999633789062 | 2026-10-16 | +3.5% | up | no (context) |
-| VIX index level | 19.989999771118164 | 2026-10-16 | -21.0% | down | no (context) |
-| HYG vs TLT 1-month return spread (%) | -0.25 | 2026-10-16 | +87.6% | up | no (context) |
-| SPY 20-day realized vol (annualized %) | 10.2 | 2026-10-16 | -19.6% | down | no (context) |
+| High-yield OAS credit spread (%) | -1.55 | 2026-10-29 | -52.0% | down | no (context) |
+| US Treasury 10Y yield (%) | 4.991000175476074 | 2026-10-29 | +23.0% | up | no (context) |
+| US Treasury 2Y yield (%) | 4.804999828338623 | 2026-10-29 | +30.0% | up | no (context) |
+| Trade-weighted USD index (broad) | 102.0250015258789 | 2026-10-29 | +2.8% | up | no (context) |
+| VIX index level | 17.059999465942383 | 2026-10-29 | +0.8% | flat | no (context) |
+| HYG vs TLT 1-month return spread (%) | -4.27 | 2026-10-29 | -92.3% | down | no (context) |
+| SPY 20-day realized vol (annualized %) | 10.02 | 2026-10-29 | -27.9% | down | no (context) |
 | AGI expert-horizon years ahead (public quotes) | 5.0 | 2026-06-01 | +0.0% | flat | no (context) |
 | Robotaxi expert-horizon years ahead (public quotes) | 2.0 | 2026-06-01 | +0.0% | flat | no (context) |
-| XLV health-care ETF (USD) | 176.7100067138672 | 2026-10-16 | +24.2% | up | no (context) |
-| XBI biotech ETF (USD) | 144.32000732421875 | 2026-10-16 | +33.7% | up | no (context) |
-| US Treasury 10Y yield (%) | 5.0980000495910645 | 2026-10-16 | +28.2% | up | no (context) |
+| XLV health-care ETF (USD) | 183.03500366210938 | 2026-10-29 | +27.1% | up | no (context) |
+| XBI biotech ETF (USD) | 157.00999450683594 | 2026-10-29 | +41.5% | up | no (context) |
+| US Treasury 10Y yield (%) | 4.988999843597412 | 2026-10-29 | +22.9% | up | no (context) |
 
 Source panels: `_system/reference/market-data/themes/manifest.json`.

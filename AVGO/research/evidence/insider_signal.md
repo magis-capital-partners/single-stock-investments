@@ -1,4 +1,4 @@
-# AVGO — Insider conviction (2026-10-15)
+# AVGO — Insider conviction (2026-09-25)
 
 > Context only. Insider activity informs scenario confidence and stance discussion; it does not auto-inflate Lawrence base IRR. Promotion requires [HUMAN REVIEW].
 
@@ -17,9 +17,9 @@
 
 **Routine / planned sales (context):**
 
-- O'Toole Amie Thuener: 1554 @ $339.27 on 2026-09-15
-- DELLY GAYLA J: 500 @ $0.0 on 2026-07-10
 - DELLY GAYLA J: 1890 @ $385.38 on 2026-07-08
+- PAGE JUSTINE: 1602 @ $373.855 on 2026-06-29
+- DELLY GAYLA J: 1000 @ $358.31 on 2026-04-09
 
 Source: `_system/reference/market-data/insider/AVGO_transactions.csv`.
 Lawrence base IRR unchanged (`in_base_irr: False`).

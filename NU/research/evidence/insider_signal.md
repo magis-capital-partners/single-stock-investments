@@ -1,8 +1,8 @@
-# NU — Insider conviction (2026-10-15)
+# NU — Insider conviction (2026-10-19)
 
 > Context only. Insider activity informs scenario confidence and stance discussion; it does not auto-inflate Lawrence base IRR. Promotion requires [HUMAN REVIEW].
 
-**ICS:** 2.37 (weak) · **Bull case support:** none
+**ICS:** 2.38 (weak) · **Bull case support:** none
 
 | Scenario | Prior weight | Tilted weight |
 |----------|--------------|---------------|

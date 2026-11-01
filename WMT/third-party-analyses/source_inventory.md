@@ -1,7 +1,7 @@
 # WMT — Third-party source inventory
 
-**Date:** 2026-10-11
-**Sources:** 54 total (0 approved, 0 pending, 54 context)
+**Date:** 2026-10-27
+**Sources:** 55 total (0 approved, 0 pending, 55 context)
 
 | ID | Title | Path | Status | Use |
 |----|-------|------|--------|-----|
@@ -59,5 +59,6 @@
 | activist_long | acc0000104169 26 000095 | `WMT/third-party-analyses/activist_reports/long/8-K_20260521_acc0000104169_26_000095.htm` | context | activist/long — local |
 | activist_long | acc0000104169 26 000111 | `WMT/third-party-analyses/activist_reports/long/8-K_20260605_acc0000104169_26_000111.htm` | context | activist/long — local |
 | activist_long | acc0000104169 26 000145 | `WMT/third-party-analyses/activist_reports/long/8-K_20260820_acc0000104169_26_000145.htm` | context | activist/long — local |
+| activist_long | acc0001193125 26 429539 | `WMT/third-party-analyses/activist_reports/long/8-K_20261023_acc0001193125_26_429539.htm` | context | activist/long — local |
 
-Cross-check required: `WMT/research/cross_check_third_party_2026-10-11.md`
+Cross-check required: `WMT/research/cross_check_third_party_2026-10-27.md`

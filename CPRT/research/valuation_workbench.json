@@ -1,7 +1,7 @@
 {
   "schema_version": "3.0",
   "ticker": "CPRT",
-  "as_of": "2026-10-16",
+  "as_of": "2026-10-27",
   "proof_status": "decision_grade",
   "model_level": "stock_specific",
   "model_level_reason": "Valuation methodology explicitly declares this reviewed maturity level.",
@@ -15,7 +15,9 @@
     "model_as_of": "2026-07-20",
     "latest_fact_as_of": "2026-05-27",
     "oldest_fact_as_of": "2024-07-31",
-    "price_as_of": "2026-08-31"
+    "price_as_of": "2026-08-31",
+    "forecast_as_of": "2026-07-20",
+    "calculation_as_of": "2026-08-31"
   },
   "legacy_audit": {
     "actionable": false,
@@ -38,50 +40,52 @@
     "market_cap_m": 30542.52,
     "enterprise_value_m": 27188.38,
     "value_per_share": {
-      "low": 24.2868,
-      "base": 42.4399,
-      "high": 73.2749
+      "low": 24.5578910471,
+      "base": 42.8676322669,
+      "high": 73.9685955084
     },
     "present_value_today_per_share": {
-      "low": 24.2868,
-      "base": 42.4399,
-      "high": 73.2749
+      "low": 24.5578910471,
+      "base": 42.8676322669,
+      "high": 73.9685955084
     },
     "output_basis": "present_value_today",
     "output_basis_status": "method_declared",
     "margin_of_safety_pct": {
-      "low": -35.84,
-      "base": 22.27,
-      "high": 54.98
+      "low": -34.34,
+      "base": 23.04,
+      "high": 55.4
     },
     "upside_to_value_pct": {
-      "low": -26.38,
-      "base": 28.64,
-      "high": 122.11
+      "low": -25.56,
+      "base": 29.94,
+      "high": 124.22
     },
     "forward_return_at_price_pct": {
-      "low": null,
-      "base": null,
-      "high": null
+      "low": 6.05270981,
+      "base": 15.03205192,
+      "high": 24.35303675
     },
     "annualized_return_at_price_pct": {
-      "low": null,
-      "base": null,
-      "high": null
+      "low": 6.05270981,
+      "base": 15.03205192,
+      "high": 24.35303675
     },
-    "forward_return_status": "withheld",
-    "forward_return_reason": "present_value_today cannot be annualized as a future payoff",
+    "forward_return_status": "available",
+    "forward_return_reason": "shared_valuation_forecast",
     "required_return_pct": 10.0,
     "downside_to_low_pct": -26.38,
     "unvalued_component_count": 0,
     "unresolved_evidence_count": 0,
     "proof_complete_pct": 100.0,
-    "model_hash": "f527674b71983c5e6cfacf2fcfffbdebe67ccf3854985c60436cecd73d7d8174",
+    "model_hash": "8c4acbd73e2a53890eccde771ec9d461e0badc72fd061ebe6561093a62bca4ef",
     "dates": {
       "model_as_of": "2026-07-20",
       "latest_fact_as_of": "2026-05-27",
       "oldest_fact_as_of": "2024-07-31",
-      "price_as_of": "2026-08-31"
+      "price_as_of": "2026-08-31",
+      "forecast_as_of": "2026-07-20",
+      "calculation_as_of": "2026-08-31"
     },
     "legacy_audit": {
       "actionable": false,
@@ -102,7 +106,12 @@
     },
     "primary_power_zone": "High-return compounder",
     "owner_decision": null,
-    "next_action": "Complete the next hash-bound isolated outputs: pre_mortem.json, round_1/buffett_weschler.json, round_1/hohn.json, round_1/marathon_capital_cycle.json."
+    "next_action": "Complete the next hash-bound isolated outputs: pre_mortem.json, round_1/buffett_weschler.json, round_1/hohn.json, round_1/marathon_capital_cycle.json.",
+    "forecast_id": "96d4b75ebd7ce088cd7070de9272ce63e579c9b29335981b5999cfedf83fab5c",
+    "calculation_status": "available",
+    "research_return_available": true,
+    "calculation_reason": "",
+    "horizon_years": 6.885010266940451
   },
   "business": {
     "status": "complete",
@@ -165,8 +174,8 @@
                   "ref": "CPRT/research/evidence/sec_companyfacts.json",
                   "locator": "us-gaap:NetCashProvidedByUsedInOperatingActivities; accession 0001628280-25-042946; form 10-K",
                   "as_of": "2025-07-31",
-                  "content_sha256": "0405d39c528ef0ccf8112e1e59a9323dec59b828b553bba91e528aa6fa8771dd",
-                  "source_id": "13cdfe1d4c87a79fa857c59f197b7d678ca873c11664fbe6335063af8611da6d"
+                  "content_sha256": "d8c1f5ac87b382d000a16a94a38f90e45df83a739f56328bf6310362b86ce06f",
+                  "source_id": "f33635e945878985cfd60db13b8e198aa4d570d70612302f08004c7117703f33"
                 },
                 "rationale": null
               },
@@ -180,8 +189,8 @@
                   "ref": "CPRT/research/evidence/sec_companyfacts.json",
                   "locator": "us-gaap:CashCashEquivalentsRestrictedCashAndRestrictedCashEquivalents; accession 0001193125-26-245578; form 10-Q",
                   "as_of": "2026-04-30",
-                  "content_sha256": "0405d39c528ef0ccf8112e1e59a9323dec59b828b553bba91e528aa6fa8771dd",
-                  "source_id": "aec14c0772befc19fbe419965b7b0f6ed4d41b56b78b907a20062fa25af79267"
+                  "content_sha256": "d8c1f5ac87b382d000a16a94a38f90e45df83a739f56328bf6310362b86ce06f",
+                  "source_id": "e1036ca80a92777014c2f3c15c6a26414afb1f3341e9dffb746541562fd42d63"
                 },
                 "rationale": null
               },
@@ -195,8 +204,8 @@
                   "ref": "CPRT/research/evidence/sec_companyfacts.json",
                   "locator": "us-gaap:LongTermDebtAndCapitalLeaseObligations; accession 0000900075-24-000024; form 10-K",
                   "as_of": "2024-07-31",
-                  "content_sha256": "0405d39c528ef0ccf8112e1e59a9323dec59b828b553bba91e528aa6fa8771dd",
-                  "source_id": "efdb0ef0298705e9182fd71f1ebe767aa61eebc1edf919391d4c8b38e8a5632a"
+                  "content_sha256": "d8c1f5ac87b382d000a16a94a38f90e45df83a739f56328bf6310362b86ce06f",
+                  "source_id": "10d8ff6b54c17fbce4528dc8face36164304bc0d834c01c35dc8c9099344fd57"
                 },
                 "rationale": null
               },
@@ -210,8 +219,8 @@
                   "ref": "CPRT/research/evidence/sec_companyfacts.json",
                   "locator": "dei:EntityCommonStockSharesOutstanding; accession 0001193125-26-245578; form 10-Q",
                   "as_of": "2026-05-27",
-                  "content_sha256": "0405d39c528ef0ccf8112e1e59a9323dec59b828b553bba91e528aa6fa8771dd",
-                  "source_id": "51e5467155212885386f95dba5c30c0a8093c753d4514b674309811f6c6d024e"
+                  "content_sha256": "d8c1f5ac87b382d000a16a94a38f90e45df83a739f56328bf6310362b86ce06f",
+                  "source_id": "9c7dcca246b1b252e07554a3abbe19a424008a834469f062b3018f44092e6726"
                 },
                 "rationale": null
               },
@@ -613,8 +622,8 @@
                   "ref": "CPRT/research/evidence/sec_companyfacts.json",
                   "locator": "us-gaap:NetCashProvidedByUsedInOperatingActivities; accession 0001628280-25-042946; form 10-K",
                   "as_of": "2025-07-31",
-                  "content_sha256": "0405d39c528ef0ccf8112e1e59a9323dec59b828b553bba91e528aa6fa8771dd",
-                  "source_id": "13cdfe1d4c87a79fa857c59f197b7d678ca873c11664fbe6335063af8611da6d"
+                  "content_sha256": "d8c1f5ac87b382d000a16a94a38f90e45df83a739f56328bf6310362b86ce06f",
+                  "source_id": "f33635e945878985cfd60db13b8e198aa4d570d70612302f08004c7117703f33"
                 },
                 "rationale": null
               },
@@ -628,8 +637,8 @@
                   "ref": "CPRT/research/evidence/sec_companyfacts.json",
                   "locator": "us-gaap:CashCashEquivalentsRestrictedCashAndRestrictedCashEquivalents; accession 0001193125-26-245578; form 10-Q",
                   "as_of": "2026-04-30",
-                  "content_sha256": "0405d39c528ef0ccf8112e1e59a9323dec59b828b553bba91e528aa6fa8771dd",
-                  "source_id": "aec14c0772befc19fbe419965b7b0f6ed4d41b56b78b907a20062fa25af79267"
+                  "content_sha256": "d8c1f5ac87b382d000a16a94a38f90e45df83a739f56328bf6310362b86ce06f",
+                  "source_id": "e1036ca80a92777014c2f3c15c6a26414afb1f3341e9dffb746541562fd42d63"
                 },
                 "rationale": null
               },
@@ -643,8 +652,8 @@
                   "ref": "CPRT/research/evidence/sec_companyfacts.json",
                   "locator": "us-gaap:LongTermDebtAndCapitalLeaseObligations; accession 0000900075-24-000024; form 10-K",
                   "as_of": "2024-07-31",
-                  "content_sha256": "0405d39c528ef0ccf8112e1e59a9323dec59b828b553bba91e528aa6fa8771dd",
-                  "source_id": "efdb0ef0298705e9182fd71f1ebe767aa61eebc1edf919391d4c8b38e8a5632a"
+                  "content_sha256": "d8c1f5ac87b382d000a16a94a38f90e45df83a739f56328bf6310362b86ce06f",
+                  "source_id": "10d8ff6b54c17fbce4528dc8face36164304bc0d834c01c35dc8c9099344fd57"
                 },
                 "rationale": null
               },
@@ -658,8 +667,8 @@
                   "ref": "CPRT/research/evidence/sec_companyfacts.json",
                   "locator": "dei:EntityCommonStockSharesOutstanding; accession 0001193125-26-245578; form 10-Q",
                   "as_of": "2026-05-27",
-                  "content_sha256": "0405d39c528ef0ccf8112e1e59a9323dec59b828b553bba91e528aa6fa8771dd",
-                  "source_id": "51e5467155212885386f95dba5c30c0a8093c753d4514b674309811f6c6d024e"
+                  "content_sha256": "d8c1f5ac87b382d000a16a94a38f90e45df83a739f56328bf6310362b86ce06f",
+                  "source_id": "9c7dcca246b1b252e07554a3abbe19a424008a834469f062b3018f44092e6726"
                 },
                 "rationale": null
               },
@@ -1061,8 +1070,8 @@
                   "ref": "CPRT/research/evidence/sec_companyfacts.json",
                   "locator": "us-gaap:NetCashProvidedByUsedInOperatingActivities; accession 0001628280-25-042946; form 10-K",
                   "as_of": "2025-07-31",
-                  "content_sha256": "0405d39c528ef0ccf8112e1e59a9323dec59b828b553bba91e528aa6fa8771dd",
-                  "source_id": "13cdfe1d4c87a79fa857c59f197b7d678ca873c11664fbe6335063af8611da6d"
+                  "content_sha256": "d8c1f5ac87b382d000a16a94a38f90e45df83a739f56328bf6310362b86ce06f",
+                  "source_id": "f33635e945878985cfd60db13b8e198aa4d570d70612302f08004c7117703f33"
                 },
                 "rationale": null
               },
@@ -1076,8 +1085,8 @@
                   "ref": "CPRT/research/evidence/sec_companyfacts.json",
                   "locator": "us-gaap:CashCashEquivalentsRestrictedCashAndRestrictedCashEquivalents; accession 0001193125-26-245578; form 10-Q",
                   "as_of": "2026-04-30",
-                  "content_sha256": "0405d39c528ef0ccf8112e1e59a9323dec59b828b553bba91e528aa6fa8771dd",
-                  "source_id": "aec14c0772befc19fbe419965b7b0f6ed4d41b56b78b907a20062fa25af79267"
+                  "content_sha256": "d8c1f5ac87b382d000a16a94a38f90e45df83a739f56328bf6310362b86ce06f",
+                  "source_id": "e1036ca80a92777014c2f3c15c6a26414afb1f3341e9dffb746541562fd42d63"
                 },
                 "rationale": null
               },
@@ -1091,8 +1100,8 @@
                   "ref": "CPRT/research/evidence/sec_companyfacts.json",
                   "locator": "us-gaap:LongTermDebtAndCapitalLeaseObligations; accession 0000900075-24-000024; form 10-K",
                   "as_of": "2024-07-31",
-                  "content_sha256": "0405d39c528ef0ccf8112e1e59a9323dec59b828b553bba91e528aa6fa8771dd",
-                  "source_id": "efdb0ef0298705e9182fd71f1ebe767aa61eebc1edf919391d4c8b38e8a5632a"
+                  "content_sha256": "d8c1f5ac87b382d000a16a94a38f90e45df83a739f56328bf6310362b86ce06f",
+                  "source_id": "10d8ff6b54c17fbce4528dc8face36164304bc0d834c01c35dc8c9099344fd57"
                 },
                 "rationale": null
               },
@@ -1106,8 +1115,8 @@
                   "ref": "CPRT/research/evidence/sec_companyfacts.json",
                   "locator": "dei:EntityCommonStockSharesOutstanding; accession 0001193125-26-245578; form 10-Q",
                   "as_of": "2026-05-27",
-                  "content_sha256": "0405d39c528ef0ccf8112e1e59a9323dec59b828b553bba91e528aa6fa8771dd",
-                  "source_id": "51e5467155212885386f95dba5c30c0a8093c753d4514b674309811f6c6d024e"
+                  "content_sha256": "d8c1f5ac87b382d000a16a94a38f90e45df83a739f56328bf6310362b86ce06f",
+                  "source_id": "9c7dcca246b1b252e07554a3abbe19a424008a834469f062b3018f44092e6726"
                 },
                 "rationale": null
               },
@@ -1505,39 +1514,39 @@
               "ref": "CPRT/research/evidence/sec_companyfacts.json",
               "locator": "us-gaap:NetCashProvidedByUsedInOperatingActivities; accession 0001628280-25-042946; form 10-K",
               "as_of": "2025-07-31",
-              "content_sha256": "0405d39c528ef0ccf8112e1e59a9323dec59b828b553bba91e528aa6fa8771dd",
-              "source_id": "13cdfe1d4c87a79fa857c59f197b7d678ca873c11664fbe6335063af8611da6d"
+              "content_sha256": "d8c1f5ac87b382d000a16a94a38f90e45df83a739f56328bf6310362b86ce06f",
+              "source_id": "f33635e945878985cfd60db13b8e198aa4d570d70612302f08004c7117703f33"
             },
             {
               "node_id": "cash",
               "ref": "CPRT/research/evidence/sec_companyfacts.json",
               "locator": "us-gaap:CashCashEquivalentsRestrictedCashAndRestrictedCashEquivalents; accession 0001193125-26-245578; form 10-Q",
               "as_of": "2026-04-30",
-              "content_sha256": "0405d39c528ef0ccf8112e1e59a9323dec59b828b553bba91e528aa6fa8771dd",
-              "source_id": "aec14c0772befc19fbe419965b7b0f6ed4d41b56b78b907a20062fa25af79267"
+              "content_sha256": "d8c1f5ac87b382d000a16a94a38f90e45df83a739f56328bf6310362b86ce06f",
+              "source_id": "e1036ca80a92777014c2f3c15c6a26414afb1f3341e9dffb746541562fd42d63"
             },
             {
               "node_id": "debt",
               "ref": "CPRT/research/evidence/sec_companyfacts.json",
               "locator": "us-gaap:LongTermDebtAndCapitalLeaseObligations; accession 0000900075-24-000024; form 10-K",
               "as_of": "2024-07-31",
-              "content_sha256": "0405d39c528ef0ccf8112e1e59a9323dec59b828b553bba91e528aa6fa8771dd",
-              "source_id": "efdb0ef0298705e9182fd71f1ebe767aa61eebc1edf919391d4c8b38e8a5632a"
+              "content_sha256": "d8c1f5ac87b382d000a16a94a38f90e45df83a739f56328bf6310362b86ce06f",
+              "source_id": "10d8ff6b54c17fbce4528dc8face36164304bc0d834c01c35dc8c9099344fd57"
             },
             {
               "node_id": "shares_m",
               "ref": "CPRT/research/evidence/sec_companyfacts.json",
               "locator": "dei:EntityCommonStockSharesOutstanding; accession 0001193125-26-245578; form 10-Q",
               "as_of": "2026-05-27",
-              "content_sha256": "0405d39c528ef0ccf8112e1e59a9323dec59b828b553bba91e528aa6fa8771dd",
-              "source_id": "51e5467155212885386f95dba5c30c0a8093c753d4514b674309811f6c6d024e"
+              "content_sha256": "d8c1f5ac87b382d000a16a94a38f90e45df83a739f56328bf6310362b86ce06f",
+              "source_id": "9c7dcca246b1b252e07554a3abbe19a424008a834469f062b3018f44092e6726"
             }
           ],
           "checks": {
             "passed": true,
             "errors": []
           },
-          "proof_hash": "823d469d17ed1e28af982ab253815b8a625d0420ec84604efbeed144abdf8590"
+          "proof_hash": "c078e2858ff21e9ac412034715bb9a1925a5ddb2c52e809e1ae2ee06c9e800aa"
         },
         "evidence_tier": "primary_derived",
         "evidence_level": "primary_derived",
@@ -1587,7 +1596,9 @@
       "model_as_of": "2026-07-20",
       "latest_fact_as_of": "2026-05-27",
       "oldest_fact_as_of": "2024-07-31",
-      "price_as_of": "2026-08-31"
+      "price_as_of": "2026-08-31",
+      "forecast_as_of": "2026-07-20",
+      "calculation_as_of": "2026-08-31"
     },
     "legacy_audit": {
       "actionable": false,
@@ -1735,8 +1746,8 @@
                   "ref": "CPRT/research/evidence/sec_companyfacts.json",
                   "locator": "us-gaap:NetCashProvidedByUsedInOperatingActivities; accession 0001628280-25-042946; form 10-K",
                   "as_of": "2025-07-31",
-                  "content_sha256": "0405d39c528ef0ccf8112e1e59a9323dec59b828b553bba91e528aa6fa8771dd",
-                  "source_id": "13cdfe1d4c87a79fa857c59f197b7d678ca873c11664fbe6335063af8611da6d"
+                  "content_sha256": "d8c1f5ac87b382d000a16a94a38f90e45df83a739f56328bf6310362b86ce06f",
+                  "source_id": "f33635e945878985cfd60db13b8e198aa4d570d70612302f08004c7117703f33"
                 },
                 "rationale": null
               },
@@ -1750,8 +1761,8 @@
                   "ref": "CPRT/research/evidence/sec_companyfacts.json",
                   "locator": "us-gaap:CashCashEquivalentsRestrictedCashAndRestrictedCashEquivalents; accession 0001193125-26-245578; form 10-Q",
                   "as_of": "2026-04-30",
-                  "content_sha256": "0405d39c528ef0ccf8112e1e59a9323dec59b828b553bba91e528aa6fa8771dd",
-                  "source_id": "aec14c0772befc19fbe419965b7b0f6ed4d41b56b78b907a20062fa25af79267"
+                  "content_sha256": "d8c1f5ac87b382d000a16a94a38f90e45df83a739f56328bf6310362b86ce06f",
+                  "source_id": "e1036ca80a92777014c2f3c15c6a26414afb1f3341e9dffb746541562fd42d63"
                 },
                 "rationale": null
               },
@@ -1765,8 +1776,8 @@
                   "ref": "CPRT/research/evidence/sec_companyfacts.json",
                   "locator": "us-gaap:LongTermDebtAndCapitalLeaseObligations; accession 0000900075-24-000024; form 10-K",
                   "as_of": "2024-07-31",
-                  "content_sha256": "0405d39c528ef0ccf8112e1e59a9323dec59b828b553bba91e528aa6fa8771dd",
-                  "source_id": "efdb0ef0298705e9182fd71f1ebe767aa61eebc1edf919391d4c8b38e8a5632a"
+                  "content_sha256": "d8c1f5ac87b382d000a16a94a38f90e45df83a739f56328bf6310362b86ce06f",
+                  "source_id": "10d8ff6b54c17fbce4528dc8face36164304bc0d834c01c35dc8c9099344fd57"
                 },
                 "rationale": null
               },
@@ -1780,8 +1791,8 @@
                   "ref": "CPRT/research/evidence/sec_companyfacts.json",
                   "locator": "dei:EntityCommonStockSharesOutstanding; accession 0001193125-26-245578; form 10-Q",
                   "as_of": "2026-05-27",
-                  "content_sha256": "0405d39c528ef0ccf8112e1e59a9323dec59b828b553bba91e528aa6fa8771dd",
-                  "source_id": "51e5467155212885386f95dba5c30c0a8093c753d4514b674309811f6c6d024e"
+                  "content_sha256": "d8c1f5ac87b382d000a16a94a38f90e45df83a739f56328bf6310362b86ce06f",
+                  "source_id": "9c7dcca246b1b252e07554a3abbe19a424008a834469f062b3018f44092e6726"
                 },
                 "rationale": null
               },
@@ -2183,8 +2194,8 @@
                   "ref": "CPRT/research/evidence/sec_companyfacts.json",
                   "locator": "us-gaap:NetCashProvidedByUsedInOperatingActivities; accession 0001628280-25-042946; form 10-K",
                   "as_of": "2025-07-31",
-                  "content_sha256": "0405d39c528ef0ccf8112e1e59a9323dec59b828b553bba91e528aa6fa8771dd",
-                  "source_id": "13cdfe1d4c87a79fa857c59f197b7d678ca873c11664fbe6335063af8611da6d"
+                  "content_sha256": "d8c1f5ac87b382d000a16a94a38f90e45df83a739f56328bf6310362b86ce06f",
+                  "source_id": "f33635e945878985cfd60db13b8e198aa4d570d70612302f08004c7117703f33"
                 },
                 "rationale": null
               },
@@ -2198,8 +2209,8 @@
                   "ref": "CPRT/research/evidence/sec_companyfacts.json",
                   "locator": "us-gaap:CashCashEquivalentsRestrictedCashAndRestrictedCashEquivalents; accession 0001193125-26-245578; form 10-Q",
                   "as_of": "2026-04-30",
-                  "content_sha256": "0405d39c528ef0ccf8112e1e59a9323dec59b828b553bba91e528aa6fa8771dd",
-                  "source_id": "aec14c0772befc19fbe419965b7b0f6ed4d41b56b78b907a20062fa25af79267"
+                  "content_sha256": "d8c1f5ac87b382d000a16a94a38f90e45df83a739f56328bf6310362b86ce06f",
+                  "source_id": "e1036ca80a92777014c2f3c15c6a26414afb1f3341e9dffb746541562fd42d63"
                 },
                 "rationale": null
               },
@@ -2213,8 +2224,8 @@
                   "ref": "CPRT/research/evidence/sec_companyfacts.json",
                   "locator": "us-gaap:LongTermDebtAndCapitalLeaseObligations; accession 0000900075-24-000024; form 10-K",
                   "as_of": "2024-07-31",
-                  "content_sha256": "0405d39c528ef0ccf8112e1e59a9323dec59b828b553bba91e528aa6fa8771dd",
-                  "source_id": "efdb0ef0298705e9182fd71f1ebe767aa61eebc1edf919391d4c8b38e8a5632a"
+                  "content_sha256": "d8c1f5ac87b382d000a16a94a38f90e45df83a739f56328bf6310362b86ce06f",
+                  "source_id": "10d8ff6b54c17fbce4528dc8face36164304bc0d834c01c35dc8c9099344fd57"
                 },
                 "rationale": null
               },
@@ -2228,8 +2239,8 @@
                   "ref": "CPRT/research/evidence/sec_companyfacts.json",
                   "locator": "dei:EntityCommonStockSharesOutstanding; accession 0001193125-26-245578; form 10-Q",
                   "as_of": "2026-05-27",
-                  "content_sha256": "0405d39c528ef0ccf8112e1e59a9323dec59b828b553bba91e528aa6fa8771dd",
-                  "source_id": "51e5467155212885386f95dba5c30c0a8093c753d4514b674309811f6c6d024e"
+                  "content_sha256": "d8c1f5ac87b382d000a16a94a38f90e45df83a739f56328bf6310362b86ce06f",
+                  "source_id": "9c7dcca246b1b252e07554a3abbe19a424008a834469f062b3018f44092e6726"
                 },
                 "rationale": null
               },
@@ -2631,8 +2642,8 @@
                   "ref": "CPRT/research/evidence/sec_companyfacts.json",
                   "locator": "us-gaap:NetCashProvidedByUsedInOperatingActivities; accession 0001628280-25-042946; form 10-K",
                   "as_of": "2025-07-31",
-                  "content_sha256": "0405d39c528ef0ccf8112e1e59a9323dec59b828b553bba91e528aa6fa8771dd",
-                  "source_id": "13cdfe1d4c87a79fa857c59f197b7d678ca873c11664fbe6335063af8611da6d"
+                  "content_sha256": "d8c1f5ac87b382d000a16a94a38f90e45df83a739f56328bf6310362b86ce06f",
+                  "source_id": "f33635e945878985cfd60db13b8e198aa4d570d70612302f08004c7117703f33"
                 },
                 "rationale": null
               },
@@ -2646,8 +2657,8 @@
                   "ref": "CPRT/research/evidence/sec_companyfacts.json",
                   "locator": "us-gaap:CashCashEquivalentsRestrictedCashAndRestrictedCashEquivalents; accession 0001193125-26-245578; form 10-Q",
                   "as_of": "2026-04-30",
-                  "content_sha256": "0405d39c528ef0ccf8112e1e59a9323dec59b828b553bba91e528aa6fa8771dd",
-                  "source_id": "aec14c0772befc19fbe419965b7b0f6ed4d41b56b78b907a20062fa25af79267"
+                  "content_sha256": "d8c1f5ac87b382d000a16a94a38f90e45df83a739f56328bf6310362b86ce06f",
+                  "source_id": "e1036ca80a92777014c2f3c15c6a26414afb1f3341e9dffb746541562fd42d63"
                 },
                 "rationale": null
               },
@@ -2661,8 +2672,8 @@
                   "ref": "CPRT/research/evidence/sec_companyfacts.json",
                   "locator": "us-gaap:LongTermDebtAndCapitalLeaseObligations; accession 0000900075-24-000024; form 10-K",
                   "as_of": "2024-07-31",
-                  "content_sha256": "0405d39c528ef0ccf8112e1e59a9323dec59b828b553bba91e528aa6fa8771dd",
-                  "source_id": "efdb0ef0298705e9182fd71f1ebe767aa61eebc1edf919391d4c8b38e8a5632a"
+                  "content_sha256": "d8c1f5ac87b382d000a16a94a38f90e45df83a739f56328bf6310362b86ce06f",
+                  "source_id": "10d8ff6b54c17fbce4528dc8face36164304bc0d834c01c35dc8c9099344fd57"
                 },
                 "rationale": null
               },
@@ -2676,8 +2687,8 @@
                   "ref": "CPRT/research/evidence/sec_companyfacts.json",
                   "locator": "dei:EntityCommonStockSharesOutstanding; accession 0001193125-26-245578; form 10-Q",
                   "as_of": "2026-05-27",
-                  "content_sha256": "0405d39c528ef0ccf8112e1e59a9323dec59b828b553bba91e528aa6fa8771dd",
-                  "source_id": "51e5467155212885386f95dba5c30c0a8093c753d4514b674309811f6c6d024e"
+                  "content_sha256": "d8c1f5ac87b382d000a16a94a38f90e45df83a739f56328bf6310362b86ce06f",
+                  "source_id": "9c7dcca246b1b252e07554a3abbe19a424008a834469f062b3018f44092e6726"
                 },
                 "rationale": null
               },
@@ -3075,39 +3086,39 @@
               "ref": "CPRT/research/evidence/sec_companyfacts.json",
               "locator": "us-gaap:NetCashProvidedByUsedInOperatingActivities; accession 0001628280-25-042946; form 10-K",
               "as_of": "2025-07-31",
-              "content_sha256": "0405d39c528ef0ccf8112e1e59a9323dec59b828b553bba91e528aa6fa8771dd",
-              "source_id": "13cdfe1d4c87a79fa857c59f197b7d678ca873c11664fbe6335063af8611da6d"
+              "content_sha256": "d8c1f5ac87b382d000a16a94a38f90e45df83a739f56328bf6310362b86ce06f",
+              "source_id": "f33635e945878985cfd60db13b8e198aa4d570d70612302f08004c7117703f33"
             },
             {
               "node_id": "cash",
               "ref": "CPRT/research/evidence/sec_companyfacts.json",
               "locator": "us-gaap:CashCashEquivalentsRestrictedCashAndRestrictedCashEquivalents; accession 0001193125-26-245578; form 10-Q",
               "as_of": "2026-04-30",
-              "content_sha256": "0405d39c528ef0ccf8112e1e59a9323dec59b828b553bba91e528aa6fa8771dd",
-              "source_id": "aec14c0772befc19fbe419965b7b0f6ed4d41b56b78b907a20062fa25af79267"
+              "content_sha256": "d8c1f5ac87b382d000a16a94a38f90e45df83a739f56328bf6310362b86ce06f",
+              "source_id": "e1036ca80a92777014c2f3c15c6a26414afb1f3341e9dffb746541562fd42d63"
             },
             {
               "node_id": "debt",
               "ref": "CPRT/research/evidence/sec_companyfacts.json",
               "locator": "us-gaap:LongTermDebtAndCapitalLeaseObligations; accession 0000900075-24-000024; form 10-K",
               "as_of": "2024-07-31",
-              "content_sha256": "0405d39c528ef0ccf8112e1e59a9323dec59b828b553bba91e528aa6fa8771dd",
-              "source_id": "efdb0ef0298705e9182fd71f1ebe767aa61eebc1edf919391d4c8b38e8a5632a"
+              "content_sha256": "d8c1f5ac87b382d000a16a94a38f90e45df83a739f56328bf6310362b86ce06f",
+              "source_id": "10d8ff6b54c17fbce4528dc8face36164304bc0d834c01c35dc8c9099344fd57"
             },
             {
               "node_id": "shares_m",
               "ref": "CPRT/research/evidence/sec_companyfacts.json",
               "locator": "dei:EntityCommonStockSharesOutstanding; accession 0001193125-26-245578; form 10-Q",
               "as_of": "2026-05-27",
-              "content_sha256": "0405d39c528ef0ccf8112e1e59a9323dec59b828b553bba91e528aa6fa8771dd",
-              "source_id": "51e5467155212885386f95dba5c30c0a8093c753d4514b674309811f6c6d024e"
+              "content_sha256": "d8c1f5ac87b382d000a16a94a38f90e45df83a739f56328bf6310362b86ce06f",
+              "source_id": "9c7dcca246b1b252e07554a3abbe19a424008a834469f062b3018f44092e6726"
             }
           ],
           "checks": {
             "passed": true,
             "errors": []
           },
-          "proof_hash": "823d469d17ed1e28af982ab253815b8a625d0420ec84604efbeed144abdf8590"
+          "proof_hash": "c078e2858ff21e9ac412034715bb9a1925a5ddb2c52e809e1ae2ee06c9e800aa"
         },
         "evidence_tier": "primary_derived",
         "evidence_level": "primary_derived",
@@ -3147,7 +3158,7 @@
       },
       "all_material_components_priced": true,
       "calculation_errors": [],
-      "aggregate_proof_hash": "168b261b657cadea546980d9e8a95ce10e57d70afd24390d00c1195e7940b994"
+      "aggregate_proof_hash": "49c77a42f8eed328105deecfd05084b2f40e90442ce0bc6a9f6e24e6a7a3d262"
     },
     "model_checks": {
       "calculation_graphs_valid": true,
@@ -3180,8 +3191,8 @@
         "ref": "CPRT/research/evidence/sec_companyfacts.json",
         "locator": "us-gaap:NetCashProvidedByUsedInOperatingActivities; accession 0001628280-25-042946; form 10-K",
         "as_of": "2025-07-31",
-        "content_sha256": "0405d39c528ef0ccf8112e1e59a9323dec59b828b553bba91e528aa6fa8771dd",
-        "source_id": "13cdfe1d4c87a79fa857c59f197b7d678ca873c11664fbe6335063af8611da6d"
+        "content_sha256": "d8c1f5ac87b382d000a16a94a38f90e45df83a739f56328bf6310362b86ce06f",
+        "source_id": "f33635e945878985cfd60db13b8e198aa4d570d70612302f08004c7117703f33"
       },
       {
         "component_id": "operating_business_and_net_assets",
@@ -3189,8 +3200,8 @@
         "ref": "CPRT/research/evidence/sec_companyfacts.json",
         "locator": "us-gaap:CashCashEquivalentsRestrictedCashAndRestrictedCashEquivalents; accession 0001193125-26-245578; form 10-Q",
         "as_of": "2026-04-30",
-        "content_sha256": "0405d39c528ef0ccf8112e1e59a9323dec59b828b553bba91e528aa6fa8771dd",
-        "source_id": "aec14c0772befc19fbe419965b7b0f6ed4d41b56b78b907a20062fa25af79267"
+        "content_sha256": "d8c1f5ac87b382d000a16a94a38f90e45df83a739f56328bf6310362b86ce06f",
+        "source_id": "e1036ca80a92777014c2f3c15c6a26414afb1f3341e9dffb746541562fd42d63"
       },
       {
         "component_id": "operating_business_and_net_assets",
@@ -3198,8 +3209,8 @@
         "ref": "CPRT/research/evidence/sec_companyfacts.json",
         "locator": "us-gaap:LongTermDebtAndCapitalLeaseObligations; accession 0000900075-24-000024; form 10-K",
         "as_of": "2024-07-31",
-        "content_sha256": "0405d39c528ef0ccf8112e1e59a9323dec59b828b553bba91e528aa6fa8771dd",
-        "source_id": "efdb0ef0298705e9182fd71f1ebe767aa61eebc1edf919391d4c8b38e8a5632a"
+        "content_sha256": "d8c1f5ac87b382d000a16a94a38f90e45df83a739f56328bf6310362b86ce06f",
+        "source_id": "10d8ff6b54c17fbce4528dc8face36164304bc0d834c01c35dc8c9099344fd57"
       },
       {
         "component_id": "operating_business_and_net_assets",
@@ -3207,12 +3218,12 @@
         "ref": "CPRT/research/evidence/sec_companyfacts.json",
         "locator": "dei:EntityCommonStockSharesOutstanding; accession 0001193125-26-245578; form 10-Q",
         "as_of": "2026-05-27",
-        "content_sha256": "0405d39c528ef0ccf8112e1e59a9323dec59b828b553bba91e528aa6fa8771dd",
-        "source_id": "51e5467155212885386f95dba5c30c0a8093c753d4514b674309811f6c6d024e"
+        "content_sha256": "d8c1f5ac87b382d000a16a94a38f90e45df83a739f56328bf6310362b86ce06f",
+        "source_id": "9c7dcca246b1b252e07554a3abbe19a424008a834469f062b3018f44092e6726"
       }
     ],
     "change_control": {
-      "model_hash": "f527674b71983c5e6cfacf2fcfffbdebe67ccf3854985c60436cecd73d7d8174",
+      "model_hash": "8c4acbd73e2a53890eccde771ec9d461e0badc72fd061ebe6561093a62bca4ef",
       "method_versions": [
         "owner_earnings_reinvestment_dcf@1.0"
       ],
@@ -3433,21 +3444,27 @@
     "drivers": [],
     "category_totals_per_share": {},
     "unexplained_per_share": null,
-    "explanation": "The current component schedule is the first decision-grade baseline; attribution begins with the next dated valuation snapshot."
+    "explanation": "The current component schedule is the first decision-grade baseline; attribution begins with the next dated valuation snapshot.",
+    "tci_irr": {
+      "status": "waiting_for_comparable_baseline",
+      "unit": "percentage_points_per_year"
+    }
   },
   "freshness": {
     "status": "stale",
-    "as_of": "2026-10-16",
+    "as_of": "2026-10-27",
     "dates": {
       "model_as_of": "2026-07-20",
       "latest_fact_as_of": "2026-05-27",
       "oldest_fact_as_of": "2024-07-31",
-      "price_as_of": "2026-08-31"
+      "price_as_of": "2026-08-31",
+      "forecast_as_of": "2026-07-20",
+      "calculation_as_of": "2026-08-31"
     },
     "age_days": {
-      "model_as_of": 88,
-      "latest_fact_as_of": 142,
-      "price_as_of": 46
+      "model_as_of": 99,
+      "latest_fact_as_of": 153,
+      "price_as_of": 57
     },
     "review_threshold_days": {
       "model_as_of": 365,
@@ -3455,7 +3472,7 @@
       "price_as_of": 7
     },
     "warnings": [
-      "price_as_of is 46 days old (review threshold 7)"
+      "price_as_of is 57 days old (review threshold 7)"
     ],
     "rule": "Freshness is disclosed separately from proof completeness; stale or undated inputs require review before a new capital decision."
   }

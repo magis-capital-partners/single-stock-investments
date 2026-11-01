@@ -489,6 +489,9 @@ class GraphBuilder:
         path = self.root / "_system" / "research" / "falsifier_outcomes.jsonl"
         if not path.is_file():
             return
+        from falsifier_specs import outcome_id as ledger_outcome_id
+        by_ledger_id: dict[str, str] = {}
+        supersedes: list[tuple[str, list]] = []
         for i, line in enumerate(path.read_text(encoding="utf-8").splitlines()):
             line = line.strip()
             if not line:
@@ -535,6 +538,14 @@ class GraphBuilder:
                 self.edge(outcome_id, bucket, "SCORES")
             if ticker:
                 self.edge(outcome_id, self.ticker_node(str(ticker)), "ABOUT")
+            by_ledger_id[ledger_outcome_id(rec)] = outcome_id
+            supersedes.append((outcome_id, rec.get("supersedes_outcome_ids") or []))
+        for node_id, refs in supersedes:
+            for ref in refs:
+                if str(ref) in by_ledger_id:
+                    self.edge(node_id, by_ledger_id[str(ref)], "SUPERSEDES")
+                else:
+                    self.warnings.append(f"outcome supersedes unknown outcome {ref}")
 
     def project_epistemic_state(self) -> None:
         path = self.root / "_system" / "data" / "epistemic_state.jsonl"

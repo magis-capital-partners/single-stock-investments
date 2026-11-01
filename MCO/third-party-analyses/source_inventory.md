@@ -1,7 +1,7 @@
 # MCO — Third-party source inventory
 
-**Date:** 2026-10-11
-**Sources:** 99 total (0 approved, 0 pending, 99 context)
+**Date:** 2026-10-25
+**Sources:** 100 total (0 approved, 0 pending, 100 context)
 
 | ID | Title | Path | Status | Use |
 |----|-------|------|--------|-----|
@@ -104,5 +104,6 @@
 | activist_long | acc0001628280 26 026383 | `MCO/third-party-analyses/activist_reports/long/8-K_20260422_acc0001628280_26_026383.htm` | context | activist/long — local |
 | activist_long | acc0001628280 26 049104 | `MCO/third-party-analyses/activist_reports/long/8-K_20260722_acc0001628280_26_049104.htm` | context | activist/long — local |
 | activist_long | acc0001059556 26 000038 | `MCO/third-party-analyses/activist_reports/long/8-K_20260812_acc0001059556_26_000038.htm` | context | activist/long — local |
+| activist_long | acc0001628280 26 066594 | `MCO/third-party-analyses/activist_reports/long/8-K_20261021_acc0001628280_26_066594.htm` | context | activist/long — local |
 
-Cross-check required: `MCO/research/cross_check_third_party_2026-10-11.md`
+Cross-check required: `MCO/research/cross_check_third_party_2026-10-25.md`

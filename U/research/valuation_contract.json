@@ -2,18 +2,18 @@
   "schema_version": "3.0",
   "status": "evidence_blocked",
   "proof_status": "evidence_blocked",
-  "model_level": "unmodeled",
-  "model_level_reason": "No completed economic ownership model exists.",
+  "model_level": "evidence_blocked",
+  "model_level_reason": "Curated primary-evidence follow-ups remain open.",
   "decision_eligibility": {
     "committee_eligible": false,
     "capital_actionable": false,
     "capital_authority_required": "human_decision",
-    "reason": "Model must be stock-specific and evidence-clear before committee review."
+    "reason": "Close curated evidence gaps before committee review."
   },
   "ticker": "U",
-  "as_of": "2026-10-16",
+  "as_of": "2026-10-19",
   "dates": {
-    "model_as_of": "2026-10-16",
+    "model_as_of": "2026-10-19",
     "latest_fact_as_of": null,
     "oldest_fact_as_of": null,
     "price_as_of": null
@@ -288,15 +288,68 @@
     ]
   },
   "change_control": {
-    "model_hash": "242afce01c980dfc543bd71da3ade7066bd2b680f0b293c3ea4329b0ee70e366",
+    "model_hash": "2163c1668f77ba3d1a70ae88bca74d86a95f8db3072a7a0a898f40c032af8378",
     "method_versions": [],
     "change_log": [],
     "rule": "A source fact is locked. Every assumption change requires a reason, author, timestamp, and before/after value."
   },
   "decision_rule": "Proof status and investment readiness are separate. Every material claim must be valued exactly once by a valid calculation proof, every evidence blocker must be resolved, and the model must be stock-specific before committee review. Only a human decision can authorize capital.",
+  "shared_forecast": {
+    "schema_version": "1.0",
+    "method_version": "shared-valuation-forecast/1.1",
+    "ticker": "U",
+    "status": "model_gap",
+    "research_only": true,
+    "requires_human_review": false,
+    "capital_actionable": false,
+    "as_of": "2026-10-19",
+    "model_as_of": "2026-10-19",
+    "quote": {
+      "value": null,
+      "as_of": null,
+      "source_url": null,
+      "currency": null
+    },
+    "forecast_hash": "e5165f445cbd1c0abd907b141433e42a058b045164a4a5d0c3340002ee2e70d2",
+    "forward_irr_pct": {
+      "low": null,
+      "base": null,
+      "high": null
+    },
+    "present_value_today_per_share": {
+      "low": null,
+      "base": null,
+      "high": null
+    },
+    "model_present_value_per_share": {
+      "low": null,
+      "base": null,
+      "high": null
+    },
+    "required_return_pct": {
+      "low": null,
+      "base": null,
+      "high": null
+    },
+    "forward_cashflow_schedule": {},
+    "buy_prices": [],
+    "components": [],
+    "gaps": [
+      {
+        "code": "issuer_forecast_missing"
+      }
+    ],
+    "warnings": [],
+    "source_refs": [],
+    "next_action": "automatic_model_refresh",
+    "reconciliation": {
+      "passed": false
+    },
+    "settlement_policy": "Explicit cash/debt additions in an operating DCF are time-zero acquisition adjustments; hypothetical settlement, not declared dividends.",
+    "calculation_id": "9490b602f5461a03891d6396fc7f407ddf95ee7b9906aa630cfd286c7b8d5809"
+  },
   "authority": "universal_valuation_contract",
-  "model_scaffold_ref": "U/research/valuation_model_scaffold.json",
-  "next_action": "Gather the listed primary evidence and compile the first proof-complete component model; never substitute an analyst plug.",
+  "legacy_reference_present": false,
   "falsifier_coverage": {
     "typed": 0,
     "prose_only": 0,

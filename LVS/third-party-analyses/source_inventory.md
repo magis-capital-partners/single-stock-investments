@@ -1,7 +1,7 @@
 # LVS — Third-party source inventory
 
-**Date:** 2026-10-11
-**Sources:** 143 total (0 approved, 0 pending, 143 context)
+**Date:** 2026-10-25
+**Sources:** 144 total (0 approved, 0 pending, 144 context)
 
 | ID | Title | Path | Status | Use |
 |----|-------|------|--------|-----|
@@ -148,5 +148,6 @@
 | activist_long | acc0001300514 26 000070 | `LVS/third-party-analyses/activist_reports/long/8-K_20260513_acc0001300514_26_000070.htm` | context | activist/long — local |
 | activist_long | acc0001300514 26 000073 | `LVS/third-party-analyses/activist_reports/long/8-K_20260518_acc0001300514_26_000073.htm` | context | activist/long — local |
 | activist_long | acc0001300514 26 000078 | `LVS/third-party-analyses/activist_reports/long/8-K_20260722_acc0001300514_26_000078.htm` | context | activist/long — local |
+| activist_long | acc0001300514 26 000099 | `LVS/third-party-analyses/activist_reports/long/8-K_20261021_acc0001300514_26_000099.htm` | context | activist/long — local |
 
-Cross-check required: `LVS/research/cross_check_third_party_2026-10-11.md`
+Cross-check required: `LVS/research/cross_check_third_party_2026-10-25.md`

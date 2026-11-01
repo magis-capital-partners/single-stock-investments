@@ -1,28 +1,23 @@
-# AEHR — Insider conviction (2026-10-17)
+# AEHR — Insider conviction (2026-08-18)
 
 > Context only. Insider activity informs scenario confidence and stance discussion; it does not auto-inflate Lawrence base IRR. Promotion requires [HUMAN REVIEW].
 
-**ICS:** 10.0 (exceptional) · **Bull case support:** moderate
+**ICS:** 0.0 (negligible) · **Bull case support:** none
 
 | Scenario | Prior weight | Tilted weight |
 |----------|--------------|---------------|
-| Bear | 20% | 20% |
-| Base | 55% | 40% |
-| Bull | 25% | 40% |
+| Bear | 20% | 28% |
+| Base | 55% | 47% |
+| Bull | 25% | 25% |
 
 | Insider | Date | Shares | Price | Value | Contrib |
 |---------|------|--------|-------|-------|---------|
-| Siu Chris | 2026-10-01 | 1089 | $6.6725 | $7266.35 | 1.701 |
-| SPORCK ALISTAIR N | 2026-10-01 | 1221 | $6.6725 | $8147.12 | 1.577 |
-| ENGINEER ADIL | 2026-08-12 | 15000 | $9.45 | $141750.0 | 1.451 |
-| WIMMERS DIDIER | 2026-10-01 | 1311 | $6.6725 | $8747.65 | 1.391 |
-| SALAMONE ALBERTO | 2026-10-01 | 1512 | $6.6725 | $10088.82 | 1.17 |
 
 **Routine / planned sales (context):**
 
-- Siu Chris: 987 @ $84.64 on 2026-10-12
-- Siu Chris: 1164 @ $107.21 on 2026-10-02
-- Siu Chris: 194 @ $101.6 on 2026-10-01
+- ROGERS VERNON: 3994 @ $143.77 on 2026-08-17
+- SLAYEN HOWARD T: 5700 @ $133.0288 on 2026-08-14
+- ROGERS VERNON: 1000 @ $134.0 on 2026-08-14
 
 Source: `_system/reference/market-data/insider/AEHR_transactions.csv`.
 Lawrence base IRR unchanged (`in_base_irr: False`).

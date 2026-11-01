@@ -1,15 +1,34 @@
 from __future__ import annotations
 
 import json
+import os
 from dataclasses import dataclass
+from datetime import date, datetime
 from decimal import Decimal
 from pathlib import Path
-from typing import Any, Iterable
+from typing import Any, Iterable, Mapping
 
-from _system.trading.sleeves.classify_positions import classify_position, norm_sym
+from _system.trading.sleeves.classify_positions import (
+    ETF_0DTE,
+    ETF_0DTE_DELIVERY,
+    ETF_0DTE_DELIVERY_UNATTRIBUTED,
+    classify_position,
+    etf_0dte_root,
+    norm_sym,
+)
+from _system.trading.sleeves.etf_0dte_delivery import DEFAULT_MAX_AGE_DAYS, read_expected_delivery
 
 
 POLICY_SOURCE_PREFIX = "policy:owner-custody:v1"
+
+# etf-0dte (spx-0dte's SPY / QQQ 0DTE executors) owns these lots. The owner is
+# always "unallocated": the hub never sizes, rebalances or tickets against them.
+ETF_0DTE_STRATEGY = "etf_0dte"
+ETF_0DTE_POLICY_REASONS = {
+    ETF_0DTE: "etf_0dte_option_exclusion",
+    ETF_0DTE_DELIVERY: "etf_0dte_expected_delivery",
+    ETF_0DTE_DELIVERY_UNATTRIBUTED: "etf_0dte_unattributed_shares",
+}
 
 
 @dataclass(frozen=True)
@@ -54,12 +73,79 @@ def load_drew_symbols(path: str | Path | None = None) -> set[str]:
     }
 
 
+def load_etf_0dte_expected_delivery(
+    account_alias: str, *, as_of: str | None = None,
+) -> dict[str, float] | None:
+    """spx-0dte's SPY / QQQ delivery forecast for this account, or None.
+
+    Read from ``ETF_0DTE_LIVE_DIR`` (spx-0dte's ``data/live`` on this host),
+    for the account in ``ETF_0DTE_ACCOUNT`` or else the alias (on NY4 the alias
+    is the account id). Unset means no forecast, and every SPY / QQQ share no
+    other book is known to hold is then unattributed.
+    """
+    live_dir = os.environ.get("ETF_0DTE_LIVE_DIR")
+    if not live_dir:
+        return None
+    account = os.environ.get("ETF_0DTE_ACCOUNT") or account_alias
+    max_age = os.environ.get("ETF_0DTE_FORECAST_MAX_AGE_DAYS")
+    return read_expected_delivery(
+        live_dir,
+        account,
+        today=_new_york_date(as_of),
+        max_age_days=int(max_age) if max_age else DEFAULT_MAX_AGE_DAYS,
+    )
+
+
+def _new_york_date(as_of: str | None) -> date | None:
+    if not as_of:
+        return None
+    try:
+        moment = datetime.fromisoformat(str(as_of).replace("Z", "+00:00"))
+    except ValueError:
+        return None
+    try:
+        from zoneinfo import ZoneInfo
+
+        return moment.astimezone(ZoneInfo("America/New_York")).date() if moment.tzinfo else moment.date()
+    except Exception:  # pragma: no cover - no tz database on this host
+        return moment.date()
+
+
+def etf_0dte_ticket_refusal(identity: Mapping[str, Any]) -> str | None:
+    """Why the hub must refuse a ticket on this broker-qualified contract, or None.
+
+    Any SPY / QQQ option or share is etf-0dte's: its executors trade the
+    options in this account, and an assignment delivers shares overnight for
+    its 09:30 unwind. The hub cannot tell a delivered share from any other on
+    a ticket -- the reduce-only check reads the account-wide position -- so a
+    hub SELL could sell the delivery out from under the unwind, and a BUY could
+    net against it. No hub ticket may name either root.
+    """
+    root = etf_0dte_root({
+        "symbol": identity.get("symbol"),
+        "localSymbol": identity.get("local_symbol"),
+        "secType": identity.get("sec_type"),
+        "tradingClass": identity.get("trading_class"),
+    })
+    if not root:
+        return None
+    return (
+        f"{root} belongs to etf-0dte (spx-0dte's SPY/QQQ 0DTE executors: their options and the "
+        "shares an assignment delivers into this account). The hub never tickets it."
+    )
+
+
 def classify_policy_position(
-    row: dict[str, Any], *, ls_symbols: Iterable[str], drew_symbols: Iterable[str] = (),
+    row: dict[str, Any],
+    *,
+    ls_symbols: Iterable[str],
+    drew_symbols: Iterable[str] = (),
+    etf_0dte_delivery: Mapping[str, Any] | None = None,
 ) -> PolicyAllocation:
     """Owner custody rule: Michael's book is everything EXCEPT
-    SPX option strategies, every ticker in ls-algo's universe (ETFs and
-    underlyings alike), and Drew's sleeve holdings."""
+    SPX option strategies, etf-0dte's SPY / QQQ options and delivered shares,
+    every ticker in ls-algo's universe (ETFs and underlyings alike), and Drew's
+    sleeve holdings."""
     symbol = norm_sym(row.get("symbol") or row.get("local_symbol") or "")
     if not symbol:
         return PolicyAllocation("unallocated", "other", "missing_symbol_quarantine")
@@ -69,16 +155,28 @@ def classify_policy_position(
             "localSymbol": row.get("local_symbol"),
             "secType": row.get("sec_type"),
             "underlying": row.get("underlying"),
+            "tradingClass": row.get("trading_class"),
             "orderRef": row.get("order_ref"),
+            "quantity": row.get("quantity_decimal", row.get("quantity")),
+            "openDateTime": row.get("openDateTime"),
         },
         blacklist_family=set(),
         etf_ls_symbols=set(ls_symbols),
         drew_symbols=set(drew_symbols),
+        etf_0dte_delivery=etf_0dte_delivery,
     )
+    if classification.bucket in ETF_0DTE_POLICY_REASONS:
+        return PolicyAllocation(
+            "unallocated", ETF_0DTE_STRATEGY, ETF_0DTE_POLICY_REASONS[classification.bucket], classification.bucket,
+        )
     if classification.bucket == "index_put_hedge":
         return PolicyAllocation("unallocated", "ls_algo", "index_put_hedge", "index_put_hedge")
     if classification.bucket == "spx_0dte":
         return PolicyAllocation("unallocated", "spx_0dte", "spx_option_strategy_exclusion")
+    if row.get("_ownership"):
+        evidence = row["_ownership"]
+        return PolicyAllocation("unallocated" if evidence["owner"] == "excluded" else evidence["owner"],
+                                evidence["strategy"], evidence["reason"])
     if classification.bucket == "etf_ls":
         return PolicyAllocation("unallocated", "letf", "ls_algo_universe_exclusion")
     if classification.bucket == "drew":

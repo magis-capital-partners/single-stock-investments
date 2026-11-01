@@ -974,6 +974,10 @@ def load_classification(ticker: str) -> dict:
 
 
 def compute_valuation(data: dict) -> dict:
+    if data.get('underwriting'):
+        # Sealed dated cash flows are priced by the shared PV/IRR engine.
+        # Legacy scenario recomputation must not inject a different model.
+        return data
     method = data.get("method", data.get("irr_method", "full"))
     inputs = data.get("inputs", {})
     price = inputs.get("price")
@@ -1070,7 +1074,9 @@ def compute_valuation(data: dict) -> dict:
         for _name, _row in _results.items()
         if isinstance(_row, dict) and isinstance(_row.get("return_pct"), (int, float))
     }
-    data["schema_version"] = "magis.valuation.v2"
+    from tci_return_bridge import build_bridge
+    data["tci_return_bridge"] = build_bridge(data)
+    data["schema_version"] = "magis.valuation.v3"
     data["returns"] = {
         "base_irr_pct": _implied.get("base_pct", (_results.get("base") or {}).get("return_pct") if isinstance(_results.get("base"), dict) else None),
         "unit": "percent_per_year",
@@ -1134,7 +1140,7 @@ def main() -> None:
         parser.error("Provide --ticker or --file")
 
     data = load_valuation(path)
-    if not data.get("classification_inputs"):
+    if not data.get("classification_inputs") and not data.get('underwriting'):
         ticker = data.get("ticker") or args.ticker
         if ticker:
             data["classification_inputs"] = {
@@ -1160,7 +1166,11 @@ def main() -> None:
     if args.write:
         path = path.resolve()
         path.parent.mkdir(parents=True, exist_ok=True)
-        path.write_text(json.dumps(computed, indent=2) + "\n", encoding="utf-8")
+        from marketdata.valuation_history import archive_valuation_on_write
+        from atomic_io import write_json_if_changed
+        if path.exists():
+            archive_valuation_on_write(path.parent.parent, json.loads(path.read_text(encoding="utf-8")))
+        write_json_if_changed(path, computed)
         print(f"Wrote {path.relative_to(ROOT)}")
         ticker_name = computed.get("ticker") or (path.parent.parent.name if path.parent.name == "research" else "")
         if ticker_name:

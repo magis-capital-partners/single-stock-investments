@@ -1,6 +1,6 @@
 # WBD — Third-party source inventory
 
-**Date:** 2026-10-11
+**Date:** 2026-10-25
 **Sources:** 194 total (0 approved, 0 pending, 194 context)
 
 | ID | Title | Path | Status | Use |
@@ -77,6 +77,9 @@
 | activist_long | Advance Publications, Inc. — SC 13D/A | `WBD/third-party-analyses/activist_reports/long/SC-13D/A_20210517_acc0000950142_21_001630.htm` | context | activist/long — sec_edgar |
 | activist_long | Advance Publications, Inc. — SC 13D/A | `WBD/third-party-analyses/activist_reports/long/SC-13D/A_20210224_acc0001387131_21_002798.htm` | context | activist/long — sec_edgar |
 | activist_long | Discovery, Inc. — SC 13D/A | `WBD/third-party-analyses/activist_reports/long/SC-13D/A_20200326_acc0001193125_20_087023.htm` | context | activist/long — sec_edgar |
+| activist_long | acc0001193125 26 415055 | `WBD/third-party-analyses/activist_reports/long/8-K_20261006_acc0001193125_26_415055.htm` | context | activist/long — local |
+| activist_long | acc0001193125 26 015949 | `WBD/third-party-analyses/activist_reports/long/8-K_20260120_acc0001193125_26_015949.htm` | context | activist/long — local |
+| activist_long | acc0001193125 25 309873 | `WBD/third-party-analyses/activist_reports/long/8-K_20251205_acc0001193125_25_309873.htm` | context | activist/long — local |
 | activist_long | acc0001437107 20 000051 | `WBD/third-party-analyses/activist_reports/long/8-K_20200619_acc0001437107_20_000051.htm` | context | activist/long — local |
 | activist_long | acc0001437107 20 000053 | `WBD/third-party-analyses/activist_reports/long/8-K_20200623_acc0001437107_20_000053.htm` | context | activist/long — local |
 | activist_long | acc0001437107 20 000056 | `WBD/third-party-analyses/activist_reports/long/8-K_20200625_acc0001437107_20_000056.htm` | context | activist/long — local |
@@ -183,9 +186,7 @@
 | activist_long | acc0001437107 25 000213 | `WBD/third-party-analyses/activist_reports/long/8-K_20251106_acc0001437107_25_000213.htm` | context | activist/long — local |
 | activist_long | acc0001437107 25 000219 | `WBD/third-party-analyses/activist_reports/long/8-K_20251113_acc0001437107_25_000219.htm` | context | activist/long — local |
 | activist_long | acc0001193125 25 308759 | `WBD/third-party-analyses/activist_reports/long/8-K_20251205_acc0001193125_25_308759.htm` | context | activist/long — local |
-| activist_long | acc0001193125 25 309873 | `WBD/third-party-analyses/activist_reports/long/8-K_20251205_acc0001193125_25_309873.htm` | context | activist/long — local |
 | activist_long | acc0001437107 26 000003 | `WBD/third-party-analyses/activist_reports/long/8-K_20260107_acc0001437107_26_000003.htm` | context | activist/long — local |
-| activist_long | acc0001193125 26 015949 | `WBD/third-party-analyses/activist_reports/long/8-K_20260120_acc0001193125_26_015949.htm` | context | activist/long — local |
 | activist_long | acc0001193125 26 057173 | `WBD/third-party-analyses/activist_reports/long/8-K_20260218_acc0001193125_26_057173.htm` | context | activist/long — local |
 | activist_long | acc0001437107 26 000011 | `WBD/third-party-analyses/activist_reports/long/8-K_20260226_acc0001437107_26_000011.htm` | context | activist/long — local |
 | activist_long | acc0001437107 26 000018 | `WBD/third-party-analyses/activist_reports/long/8-K_20260227_acc0001437107_26_000018.htm` | context | activist/long — local |
@@ -198,6 +199,5 @@
 | activist_long | acc0001193125 26 256559 | `WBD/third-party-analyses/activist_reports/long/8-K_20260604_acc0001193125_26_256559.htm` | context | activist/long — local |
 | activist_long | acc0001193125 26 268519 | `WBD/third-party-analyses/activist_reports/long/8-K_20260612_acc0001193125_26_268519.htm` | context | activist/long — local |
 | activist_long | acc0001437107 26 000072 | `WBD/third-party-analyses/activist_reports/long/8-K_20260806_acc0001437107_26_000072.htm` | context | activist/long — local |
-| activist_long | acc0001193125 26 415055 | `WBD/third-party-analyses/activist_reports/long/8-K_20261006_acc0001193125_26_415055.htm` | context | activist/long — local |
 
-Cross-check required: `WBD/research/cross_check_third_party_2026-10-11.md`
+Cross-check required: `WBD/research/cross_check_third_party_2026-10-25.md`

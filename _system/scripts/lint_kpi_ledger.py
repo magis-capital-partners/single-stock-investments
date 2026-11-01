@@ -45,6 +45,16 @@ def lint_ledger(ticker: str, ledger: dict) -> list[str]:
         if kid in seen:
             errors.append(f"{ticker}: duplicate kpi_id {kid}")
         seen.add(kid)
+        binding = kpi.get("tci_binding")
+        if binding is not None:
+            if not isinstance(binding, dict) or binding.get("version") != "1.0":
+                errors.append(f"{ticker}/{kid}: tci_binding requires version 1.0")
+            elif binding.get("maximum_age_days") is not None and (
+                isinstance(binding["maximum_age_days"], bool)
+                or not isinstance(binding["maximum_age_days"], (int, float))
+                or binding["maximum_age_days"] <= 0
+            ):
+                errors.append(f"{ticker}/{kid}: maximum_age_days must be positive")
 
         if kpi.get("status") not in wm.STATUS_VALUES:
             errors.append(f"{ticker}/{kid}: invalid status {kpi.get('status')!r}")
@@ -72,7 +82,7 @@ def lint_ledger(ticker: str, ledger: dict) -> list[str]:
                 errors.append(f"{ticker}/{kid}: valuation_path not found: {vpath}")
 
         last = wm.parse_as_of(kpi.get("last_checked"))
-        if last and (today - last).days > wm.STALE_DAYS:
+        if last and (today - last).days > wm.STALE_DAYS and not str(kpi.get("source") or "").startswith("operating:"):
             if kpi.get("status") != "stale":
                 errors.append(
                     f"{ticker}/{kid}: last_checked {kpi.get('last_checked')} "

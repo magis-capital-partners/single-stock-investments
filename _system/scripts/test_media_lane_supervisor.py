@@ -48,11 +48,23 @@ class MediaLaneSupervisorTests(unittest.TestCase):
         text = (SCRIPTS / "media_lane_supervisor.py").read_text(encoding="utf-8")
         whisper_at = text.index("phase=whisper")
         youtube_at = text.index("phase=youtube")
+        reader_at = text.index("phase=reader-summary")
         video_at = text.index("phase=video-analysis")
         podcast_at = text.index("phase=podcast-analysis")
         self.assertLess(whisper_at, youtube_at)
-        self.assertLess(youtube_at, video_at)
+        self.assertLess(youtube_at, reader_at)
+        self.assertLess(reader_at, video_at)
         self.assertLess(video_at, podcast_at)
+
+    def test_whisper_reconciles_and_rotates_with_analysis(self):
+        text = (SCRIPTS / "media_lane_supervisor.py").read_text(encoding="utf-8")
+        self.assertIn("--reconcile-whisper-orphans", text)
+        self.assertIn("whisper_turn", text)
+        # Reconcile runs before the pending check in the cycle.
+        self.assertLess(
+            text.index("reconcile_whisper_orphans()"),
+            text.index("pending = whisper_pending()"),
+        )
 
     def test_no_second_media_supervisor(self):
         names = {p.name for p in SCRIPTS.glob("*media*supervisor*")}
@@ -79,10 +91,12 @@ class MediaLaneSupervisorTests(unittest.TestCase):
         import media_lane_supervisor as mls
 
         with mock.patch.object(mls, "whisper_pending", return_value=3), \
+             mock.patch.object(mls, "reader_summary_remaining", return_value=4), \
              mock.patch.object(mls, "analysis_remaining", side_effect=[1, 2]), \
              mock.patch.object(mls, "available_mb", return_value=4096):
             snap = mls.status_snapshot()
         self.assertEqual(snap["whisper_pending"], 3)
+        self.assertEqual(snap["reader_summary_remaining"], 4)
         self.assertIn("defaults", snap)
         self.assertLessEqual(snap["defaults"]["whisper_threads"], 4)
 

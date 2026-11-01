@@ -1,28 +1,24 @@
-# APH — Insider conviction (2026-10-17)
+# APH — Insider conviction (2026-08-05)
 
 > Context only. Insider activity informs scenario confidence and stance discussion; it does not auto-inflate Lawrence base IRR. Promotion requires [HUMAN REVIEW].
 
-**ICS:** 10.0 (exceptional) · **Bull case support:** moderate
+**ICS:** 0.37 (negligible) · **Bull case support:** none
 
 | Scenario | Prior weight | Tilted weight |
 |----------|--------------|---------------|
-| Bear | 20% | 20% |
-| Base | 55% | 40% |
-| Bull | 25% | 40% |
+| Bear | 20% | 27% |
+| Base | 55% | 48% |
+| Bull | 25% | 25% |
 
 | Insider | Date | Shares | Price | Value | Contrib |
 |---------|------|--------|-------|-------|---------|
-| Silverman David M | 2026-08-05 | 120000 | $21.995 | $2639400.0 | 1.874 |
-| Lampo Craig A | 2026-08-04 | 193200 | $22.3725 | $4322367.0 | 1.858 |
-| D'AMICO LANCE E | 2026-08-03 | 50000 | $22.5525 | $1127625.0 | 1.821 |
-| NORWITT RICHARD ADAM | 2026-07-31 | 500000 | $22.3725 | $11186250.0 | 1.57 |
-| Lampo Craig A | 2025-11-11 | 300000 | $21.995 | $6598500.0 | 1.549 |
+| Livingston Robert | 2026-02-05 | 10000 | $128.508 | $1285080.0 | 1.32 |
 
 **Routine / planned sales (context):**
 
-- Lampo Craig A: 54547 @ $0.0 on 2026-08-06
 - Lampo Craig A: 193200 @ $167.3093 on 2026-08-04
-- LOEFFLER MARTIN H: 3228 @ $0.0 on 2025-12-10
+- Lampo Craig A: 100000 @ $149.9813 on 2026-02-18
+- Lampo Craig A: 258000 @ $143.2022 on 2025-11-11
 
 Source: `_system/reference/market-data/insider/APH_transactions.csv`.
 Lawrence base IRR unchanged (`in_base_irr: False`).

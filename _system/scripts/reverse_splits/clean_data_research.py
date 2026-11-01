@@ -403,12 +403,12 @@ def build_queue(original, events, rejected, snapshots, outcomes, results, source
     return rows
 
 
-def publish_parts(rows, folder, url_prefix, *, size=150):
+def publish_parts(rows, folder, url_prefix, *, size=150, schema="shorts_clean_queue_part.v1"):
     folder.mkdir(parents=True, exist_ok=True)
     parts = []
     for i in range(0, len(rows), size):
         path = folder/f"part-{i//size:03d}.json"
-        write_public_json(path, {"schema_version": "shorts_clean_queue_part.v1", "records": rows[i:i+size]})
+        write_public_json(path, {"schema_version": schema, "records": rows[i:i+size]})
         parts.append({"url": url_prefix+path.name, "sha256": digest(path), "records": min(size, len(rows)-i)})
     return parts
 

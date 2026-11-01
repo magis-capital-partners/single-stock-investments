@@ -1,6 +1,6 @@
 # GPGI — Third-party source inventory
 
-**Date:** 2026-10-11
+**Date:** 2026-10-25
 **Sources:** 116 total (0 approved, 0 pending, 116 context)
 
 | ID | Title | Path | Status | Use |
@@ -42,10 +42,13 @@
 | activist_long | Resolute Compo Holdings LLC — SC 13D/A | `GPGI/third-party-analyses/activist_reports/long/SC-13D/A_20250214_acc0000950142_25_000408.xml` | context | activist/long — sec_edgar |
 | activist_long | Third Point — DEFA14A | `GPGI/third-party-analyses/activist_reports/long/DEFA14A_20211217_acc0001104659_21_151181.htm` | context | activist/long — sec_edgar |
 | activist_long | ROMAN DBDR TECH ACQUISITION CORP — DEFA14A | `GPGI/third-party-analyses/activist_reports/long/DEFA14A_20211215_acc0001104659_21_149619.htm` | context | activist/long — sec_edgar |
+| activist_long | acc0000950142 26 000205 | `GPGI/third-party-analyses/activist_reports/long/8-K_20260121_acc0000950142_26_000205.htm` | context | activist/long — local |
+| activist_long | acc0001104659 26 003019 | `GPGI/third-party-analyses/activist_reports/long/8-K_20260113_acc0001104659_26_003019.htm` | context | activist/long — local |
+| activist_long | acc0001104659 24 100718 | `GPGI/third-party-analyses/activist_reports/long/8-K_20240917_acc0001104659_24_100718.htm` | context | activist/long — local |
+| activist_long | acc0001104659 20 132645 | `GPGI/third-party-analyses/activist_reports/long/8-K_20201207_acc0001104659_20_132645.htm` | context | activist/long — local |
 | activist_long | acc0001104659 20 123676 | `GPGI/third-party-analyses/activist_reports/long/8-K_20201110_acc0001104659_20_123676.htm` | context | activist/long — local |
 | activist_long | acc0001104659 20 126427 | `GPGI/third-party-analyses/activist_reports/long/8-K_20201117_acc0001104659_20_126427.htm` | context | activist/long — local |
 | activist_long | acc0001104659 20 127402 | `GPGI/third-party-analyses/activist_reports/long/8-K_20201119_acc0001104659_20_127402.htm` | context | activist/long — local |
-| activist_long | acc0001104659 20 132645 | `GPGI/third-party-analyses/activist_reports/long/8-K_20201207_acc0001104659_20_132645.htm` | context | activist/long — local |
 | activist_long | acc0001104659 21 051686 | `GPGI/third-party-analyses/activist_reports/long/8-K_20210419_acc0001104659_21_051686.htm` | context | activist/long — local |
 | activist_long | acc0001104659 21 065274 | `GPGI/third-party-analyses/activist_reports/long/8-K_20210513_acc0001104659_21_065274.htm` | context | activist/long — local |
 | activist_long | acc0001104659 21 070924 | `GPGI/third-party-analyses/activist_reports/long/8-K_20210524_acc0001104659_21_070924.htm` | context | activist/long — local |
@@ -80,7 +83,6 @@
 | activist_long | acc0001104659 24 067222 | `GPGI/third-party-analyses/activist_reports/long/8-K_20240531_acc0001104659_24_067222.htm` | context | activist/long — local |
 | activist_long | acc0001104659 24 086762 | `GPGI/third-party-analyses/activist_reports/long/8-K_20240807_acc0001104659_24_086762.htm` | context | activist/long — local |
 | activist_long | acc0001104659 24 087541 | `GPGI/third-party-analyses/activist_reports/long/8-K_20240809_acc0001104659_24_087541.htm` | context | activist/long — local |
-| activist_long | acc0001104659 24 100718 | `GPGI/third-party-analyses/activist_reports/long/8-K_20240917_acc0001104659_24_100718.htm` | context | activist/long — local |
 | activist_long | acc0001104659 24 105852 | `GPGI/third-party-analyses/activist_reports/long/8-K_20241003_acc0001104659_24_105852.htm` | context | activist/long — local |
 | activist_long | acc0001104659 24 110228 | `GPGI/third-party-analyses/activist_reports/long/8-K_20241021_acc0001104659_24_110228.htm` | context | activist/long — local |
 | activist_long | acc0001104659 24 115586 | `GPGI/third-party-analyses/activist_reports/long/8-K_20241108_acc0001104659_24_115586.htm` | context | activist/long — local |
@@ -109,10 +111,8 @@
 | activist_long | acc0001104659 25 106425 | `GPGI/third-party-analyses/activist_reports/long/8-K_20251104_acc0001104659_25_106425.htm` | context | activist/long — local |
 | activist_long | acc0001104659 25 120723 | `GPGI/third-party-analyses/activist_reports/long/8-K_20251212_acc0001104659_25_120723.htm` | context | activist/long — local |
 | activist_long | acc0001104659 25 124322 | `GPGI/third-party-analyses/activist_reports/long/8-K_20251229_acc0001104659_25_124322.htm` | context | activist/long — local |
-| activist_long | acc0001104659 26 003019 | `GPGI/third-party-analyses/activist_reports/long/8-K_20260113_acc0001104659_26_003019.htm` | context | activist/long — local |
 | activist_long | acc0000950142 26 000161 | `GPGI/third-party-analyses/activist_reports/long/8-K_20260114_acc0000950142_26_000161.htm` | context | activist/long — local |
 | activist_long | acc0001140361 26 001213 | `GPGI/third-party-analyses/activist_reports/long/8-K_20260114_acc0001140361_26_001213.htm` | context | activist/long — local |
-| activist_long | acc0000950142 26 000205 | `GPGI/third-party-analyses/activist_reports/long/8-K_20260121_acc0000950142_26_000205.htm` | context | activist/long — local |
 | activist_long | acc0000950142 26 000289 | `GPGI/third-party-analyses/activist_reports/long/8-K_20260203_acc0000950142_26_000289.htm` | context | activist/long — local |
 | activist_long | acc0001104659 26 026708 | `GPGI/third-party-analyses/activist_reports/long/8-K_20260312_acc0001104659_26_026708.htm` | context | activist/long — local |
 | activist_long | acc0001104659 26 028021 | `GPGI/third-party-analyses/activist_reports/long/8-K_20260316_acc0001104659_26_028021.htm` | context | activist/long — local |
@@ -122,4 +122,4 @@
 | activist_long | acc0001628280 26 042849 | `GPGI/third-party-analyses/activist_reports/long/8-K_20260612_acc0001628280_26_042849.htm` | context | activist/long — local |
 | activist_long | acc0001628280 26 053821 | `GPGI/third-party-analyses/activist_reports/long/8-K_20260806_acc0001628280_26_053821.htm` | context | activist/long — local |
 
-Cross-check required: `GPGI/research/cross_check_third_party_2026-10-11.md`
+Cross-check required: `GPGI/research/cross_check_third_party_2026-10-25.md`

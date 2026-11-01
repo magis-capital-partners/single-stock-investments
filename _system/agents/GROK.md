@@ -21,7 +21,7 @@ python _system/scripts/drive_intake_drop.py --kind VIC --ticker TICKER path/to/w
 
 The command is idempotent. Treat JSON status `uploaded` and `already_present` as success. Any JSON `error` is a failed drop and must be listed in the final response.
 
-That writes `Admin/Intake/VIC/{TICKER}/` on Shared Drive [Admin/Intake](https://drive.google.com/drive/folders/1OBaWt7SF-OME8hmXkl7tzdFLAfjBrp_C). The Data Pipeline scans Drive daily at 14:00 UTC, imports to `{TICKER}/third-party-analyses/vic/`, and stages `research-vault/vic-research/{TICKER}/` (PDF gitignored; `.txt` extract committed). GitHub Actions can start later than the nominal cron time.
+That writes `Admin/Intake/VIC/{TICKER}/` on Shared Drive [Admin/Intake](https://drive.google.com/drive/folders/1OBaWt7SF-OME8hmXkl7tzdFLAfjBrp_C). The Data Pipeline scans Drive daily at 14:41 UTC, imports to `{TICKER}/third-party-analyses/vic/`, and stages `research-vault/vic-research/{TICKER}/` (PDF gitignored; `.txt` extract committed). GitHub Actions can start later than the nominal cron time.
 
 4. **Text only:** write `{TICKER}/third-party-analyses/vic/vic_{date}_{slug}_{hash}.md`, then refresh the inventory:
 

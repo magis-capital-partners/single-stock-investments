@@ -1,7 +1,7 @@
 # DPZ — Third-party source inventory
 
-**Date:** 2026-10-11
-**Sources:** 114 total (0 approved, 0 pending, 114 context)
+**Date:** 2026-10-25
+**Sources:** 115 total (0 approved, 0 pending, 115 context)
 
 | ID | Title | Path | Status | Use |
 |----|-------|------|--------|-----|
@@ -119,5 +119,6 @@
 | activist_long | acc0001286681 26 000029 | `DPZ/third-party-analyses/activist_reports/long/8-K_20260714_acc0001286681_26_000029.htm` | context | activist/long — local |
 | activist_long | acc0001286681 26 000034 | `DPZ/third-party-analyses/activist_reports/long/8-K_20260720_acc0001286681_26_000034.htm` | context | activist/long — local |
 | activist_long | acc0001193125 26 417912 | `DPZ/third-party-analyses/activist_reports/long/8-K_20261008_acc0001193125_26_417912.htm` | context | activist/long — local |
+| activist_long | acc0001286681 26 000039 | `DPZ/third-party-analyses/activist_reports/long/8-K_20261013_acc0001286681_26_000039.htm` | context | activist/long — local |
 
-Cross-check required: `DPZ/research/cross_check_third_party_2026-10-11.md`
+Cross-check required: `DPZ/research/cross_check_third_party_2026-10-25.md`

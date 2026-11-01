@@ -3,6 +3,8 @@
 **Date:** 2026-07-09  
 **Status:** Implemented (2026-07-09)
 
+**Planning amendment 2026-10-29:** The next layout moves the entire Biotech Quant workspace into Strategies, immediately right of Darwin CC. Systematic Shorts moves immediately left of Darwin CC; fundamental Shorts stays under Ideas. See the [updated reorganization and biotech strategy plan](research_insights_strategy_reorganization_2026-10-29.md). This is a planned migration; the implementation history below remains unchanged.
+
 ## Problems
 
 1. **Broken evidence links** — ~1,324 claims store relative repo paths (`CPRT/research/deep_dive_*.md`) instead of GitHub blob URLs. On GitHub Pages, "Deep dive" links resolve to the dashboard origin and 404.

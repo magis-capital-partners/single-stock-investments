@@ -1,7 +1,7 @@
 # DELL — Third-party source inventory
 
-**Date:** 2026-10-11
-**Sources:** 54 total (0 approved, 0 pending, 54 context)
+**Date:** 2026-10-25
+**Sources:** 55 total (0 approved, 0 pending, 55 context)
 
 | ID | Title | Path | Status | Use |
 |----|-------|------|--------|-----|
@@ -59,5 +59,6 @@
 | activist_long | acc0001571996 26 000039 | `DELL/third-party-analyses/activist_reports/long/8-K_20260901_acc0001571996_26_000039.htm` | context | activist/long — local |
 | activist_long | acc0001193125 26 387958 | `DELL/third-party-analyses/activist_reports/long/8-K_20260910_acc0001193125_26_387958.htm` | context | activist/long — local |
 | activist_long | acc0001193125 26 391976 | `DELL/third-party-analyses/activist_reports/long/8-K_20260915_acc0001193125_26_391976.htm` | context | activist/long — local |
+| activist_long | acc0001193125 26 427920 | `DELL/third-party-analyses/activist_reports/long/8-K_20261021_acc0001193125_26_427920.htm` | context | activist/long — local |
 
-Cross-check required: `DELL/research/cross_check_third_party_2026-10-11.md`
+Cross-check required: `DELL/research/cross_check_third_party_2026-10-25.md`

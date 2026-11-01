@@ -1,4 +1,4 @@
-# ARM — Insider conviction (2026-10-17)
+# ARM — Insider conviction (2026-09-23)
 
 > Context only. Insider activity informs scenario confidence and stance discussion; it does not auto-inflate Lawrence base IRR. Promotion requires [HUMAN REVIEW].
 
@@ -12,13 +12,12 @@
 
 | Insider | Date | Shares | Price | Value | Contrib |
 |---------|------|--------|-------|-------|---------|
-| Haas Rene A. | 2026-08-31 | 64 | $108.33 | $6933.12 | 0.782 |
 
 **Routine / planned sales (context):**
 
-- Sine Jeffrey: 9572 @ $0.0 on 2026-08-07
-- Haas Rene A.: 143316 @ $209.16 on 2026-05-15
-- SOHN YOUNG: 429 @ $209.16 on 2026-05-15
+- Bartels Laura Kathleen: 11306 @ $392.7 on 2026-06-02
+- Abbey William: 2644 @ $383.73 on 2026-06-01
+- Abbey William: 3922 @ $415.52 on 2026-06-01
 
 Source: `_system/reference/market-data/insider/ARM_transactions.csv`.
 Lawrence base IRR unchanged (`in_base_irr: False`).

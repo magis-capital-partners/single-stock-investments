@@ -1,7 +1,7 @@
 # POST — Third-party source inventory
 
-**Date:** 2026-10-11
-**Sources:** 108 total (0 approved, 0 pending, 108 context)
+**Date:** 2026-10-25
+**Sources:** 109 total (0 approved, 0 pending, 109 context)
 
 | ID | Title | Path | Status | Use |
 |----|-------|------|--------|-----|
@@ -113,5 +113,6 @@
 | activist_long | acc0001530950 26 000041 | `POST/third-party-analyses/activist_reports/long/8-K_20260313_acc0001530950_26_000041.htm` | context | activist/long — local |
 | activist_long | acc0001530950 26 000056 | `POST/third-party-analyses/activist_reports/long/8-K_20260507_acc0001530950_26_000056.htm` | context | activist/long — local |
 | activist_long | acc0001530950 26 000076 | `POST/third-party-analyses/activist_reports/long/8-K_20260806_acc0001530950_26_000076.htm` | context | activist/long — local |
+| activist_long | acc0001530950 26 000089 | `POST/third-party-analyses/activist_reports/long/8-K_20261016_acc0001530950_26_000089.htm` | context | activist/long — local |
 
-Cross-check required: `POST/research/cross_check_third_party_2026-10-11.md`
+Cross-check required: `POST/research/cross_check_third_party_2026-10-25.md`

@@ -589,7 +589,7 @@ def collect(since: str | None) -> tuple[list[dict], int]:
 
 def build_learning_loop_summary(items: list[dict], ledger: dict,
                                 duplicate_sightings: int) -> dict:
-    from falsifier_specs import calibration_eligibility, spec_payload_hash
+    from falsifier_specs import calibration_eligibility, effective_outcomes, spec_payload_hash
     today = date.today()
     decisions = ledger.get("decisions") or {}
     undecided = [item for item in items if fingerprint(item) not in decisions]
@@ -619,7 +619,7 @@ def build_learning_loop_summary(items: list[dict], ledger: dict,
     resolved_hashes = {row.get("spec_hash") for row in outcomes if row.get("spec_hash")}
     forecast = {"specs": 0, "v2_specs": 0, "testable": 0, "matured": 0,
                 "calibration_eligible": 0, "diagnostic_only": 0,
-                "resolved": len(outcomes), "pending_evidence": 0, "overdue": 0}
+                "resolved": len(effective_outcomes(outcomes)), "pending_evidence": 0, "overdue": 0}
     for path in ROOT.glob("*/research/falsifier_specs.json"):
         try:
             specs = json.loads(path.read_text(encoding="utf-8")).get("specs") or []

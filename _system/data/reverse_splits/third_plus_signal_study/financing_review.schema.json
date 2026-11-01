@@ -1,0 +1,127 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Independent historical financing reviews",
+  "type": "array",
+  "items": {
+    "type": "object",
+    "required": [
+      "issuer",
+      "deal_id",
+      "accession",
+      "known_at",
+      "source_url",
+      "source_sha256",
+      "locator",
+      "reviewers",
+      "outcome_blinded",
+      "state",
+      "identity_reconciled",
+      "cash_reconciled",
+      "share_units_reconciled",
+      "saleability_reconciled",
+      "currency",
+      "net_cash_change"
+    ],
+    "properties": {
+      "issuer": {
+        "type": "string",
+        "pattern": "^cik/[0-9]+$"
+      },
+      "deal_id": {
+        "type": "string",
+        "minLength": 1
+      },
+      "accession": {
+        "type": "string",
+        "pattern": "^[0-9-]+$"
+      },
+      "known_at": {
+        "type": "string",
+        "format": "date-time"
+      },
+      "source_url": {
+        "type": "string",
+        "pattern": "^https://"
+      },
+      "source_sha256": {
+        "type": "string",
+        "pattern": "^[a-f0-9]{64}$"
+      },
+      "locator": {
+        "type": "string",
+        "minLength": 1
+      },
+      "reviewers": {
+        "type": "array",
+        "minItems": 2,
+        "uniqueItems": true,
+        "items": {
+          "type": "string",
+          "minLength": 1
+        }
+      },
+      "outcome_blinded": {
+        "const": true
+      },
+      "state": {
+        "enum": [
+          "completed",
+          "not_dilutive",
+          "terminated"
+        ]
+      },
+      "identity_reconciled": {
+        "const": true
+      },
+      "cash_reconciled": {
+        "const": true
+      },
+      "share_units_reconciled": {
+        "const": true
+      },
+      "saleability_reconciled": {
+        "const": true
+      },
+      "currency": {
+        "type": "string",
+        "pattern": "^[A-Z]{3}$"
+      },
+      "net_cash_change": {
+        "type": [
+          "number",
+          "null"
+        ]
+      },
+      "saleable_shares": {
+        "type": "number",
+        "minimum": 0
+      },
+      "closed_date": {
+        "type": "string",
+        "format": "date"
+      }
+    },
+    "allOf": [
+      {
+        "if": {
+          "properties": {
+            "state": {
+              "const": "completed"
+            }
+          }
+        },
+        "then": {
+          "required": [
+            "closed_date",
+            "saleable_shares"
+          ],
+          "properties": {
+            "saleable_shares": {
+              "exclusiveMinimum": 0
+            }
+          }
+        }
+      }
+    ]
+  }
+}

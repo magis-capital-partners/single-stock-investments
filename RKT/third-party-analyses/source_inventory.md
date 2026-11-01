@@ -1,6 +1,6 @@
 # RKT — Third-party source inventory
 
-**Date:** 2026-10-11
+**Date:** 2026-10-27
 **Sources:** 110 total (0 approved, 0 pending, 110 context)
 
 | ID | Title | Path | Status | Use |
@@ -14,7 +14,6 @@
 | activist_long | ValueAct Capital — SC 13D | `RKT/third-party-analyses/activist_reports/long/SC-13D_20250515_acc0001418812_25_000016.xml` | context | activist/long — sec_edgar |
 | activist_long | Mariner Research — DEFA14A | `RKT/third-party-analyses/activist_reports/long/DEFA14A_20240426_acc0001104659_24_053024.htm` | context | activist/long — sec_edgar |
 | activist_long | Mariner Research — DEFA14A | `RKT/third-party-analyses/activist_reports/long/DEFA14A_20210414_acc0001104659_21_050268.htm` | context | activist/long — sec_edgar |
-| activist_long | acc0001805284 20 000022 | `RKT/third-party-analyses/activist_reports/long/8-K_20201110_acc0001805284_20_000022.htm` | context | activist/long — local |
 | activist_long | acc0000950142 20 001994 | `RKT/third-party-analyses/activist_reports/long/8-K_20200812_acc0000950142_20_001994.htm` | context | activist/long — local |
 | activist_long | acc0000950142 20 002025 | `RKT/third-party-analyses/activist_reports/long/8-K_20200814_acc0000950142_20_002025.htm` | context | activist/long — local |
 | activist_long | acc0000950142 20 002147 | `RKT/third-party-analyses/activist_reports/long/8-K_20200902_acc0000950142_20_002147.htm` | context | activist/long — local |
@@ -22,6 +21,7 @@
 | activist_long | acc0000950142 20 002264 | `RKT/third-party-analyses/activist_reports/long/8-K_20200918_acc0000950142_20_002264.htm` | context | activist/long — local |
 | activist_long | acc0000950142 20 002327 | `RKT/third-party-analyses/activist_reports/long/8-K_20200930_acc0000950142_20_002327.htm` | context | activist/long — local |
 | activist_long | acc0001805284 20 000012 | `RKT/third-party-analyses/activist_reports/long/8-K_20201015_acc0001805284_20_000012.htm` | context | activist/long — local |
+| activist_long | acc0001805284 20 000022 | `RKT/third-party-analyses/activist_reports/long/8-K_20201110_acc0001805284_20_000022.htm` | context | activist/long — local |
 | activist_long | acc0001805284 20 000035 | `RKT/third-party-analyses/activist_reports/long/8-K_20201204_acc0001805284_20_000035.htm` | context | activist/long — local |
 | activist_long | acc0001805284 20 000038 | `RKT/third-party-analyses/activist_reports/long/8-K_20201223_acc0001805284_20_000038.htm` | context | activist/long — local |
 | activist_long | acc0000950142 20 002909 | `RKT/third-party-analyses/activist_reports/long/8-K_20201229_acc0000950142_20_002909.htm` | context | activist/long — local |
@@ -116,4 +116,4 @@
 | activist_long | acc0001805284 26 000082 | `RKT/third-party-analyses/activist_reports/long/8-K_20260806_acc0001805284_26_000082.htm` | context | activist/long — local |
 | activist_long | acc0001628280 26 057366 | `RKT/third-party-analyses/activist_reports/long/8-K_20260817_acc0001628280_26_057366.htm` | context | activist/long — local |
 
-Cross-check required: `RKT/research/cross_check_third_party_2026-10-11.md`
+Cross-check required: `RKT/research/cross_check_third_party_2026-10-27.md`

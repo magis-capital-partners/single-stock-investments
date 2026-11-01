@@ -80,10 +80,16 @@ def main() -> int:
         if rc != 0:
             return rc
 
+    # Episodes already in the catalog can have audio, no transcript, and no
+    # queue row even when this refresh's discovery pass never selected them.
+    rc = run([py, str(SCRIPTS / "fetch_podcast_transcript.py"), "--reconcile-whisper-orphans"])
+    if rc != 0:
+        return rc
+
     for script in (
         "build_officer_directory.py",
         "build_podcast_insights.py",
-        "summarize_podcast_episode.py",  # writes highlights/summary to *.meta.json only
+        "summarize_podcast_episode.py",  # universal reader_summary fallbacks to *.meta.json
         "build_podcast_insights.py",  # rebuild vault catalog + detail shards from meta
     ):
         rc = run([py, str(SCRIPTS / script)])
@@ -91,28 +97,20 @@ def main() -> int:
             return rc
 
     if not args.skip_dashboard:
-        rc = run([py, str(SCRIPTS / "build_insights.py")])
+        # Only the podcast shard, its episode detail shards, the manifest's
+        # podcast fields and feed_status belong to this lane. build_insights.py
+        # rebuilt every fund-letter shard too; on 2026-10-29 (run 40951848470)
+        # one of those private snapshots came out at 105.87 MB, GitHub refused
+        # the vault push that must precede the public commit, and the refreshed
+        # catalog never landed.
+        rc = run([py, str(SCRIPTS / "publish_podcast_dashboard.py")])
         if rc != 0:
             return rc
-        # Ensure podcasts shard + episode detail shards are current
         rc = run(
             [
                 py,
-                "-c",
-                (
-                    "from pathlib import Path; "
-                    "import sys; "
-                    f"sys.path.insert(0, r'{SCRIPTS}'); "
-                    "from build_dashboard_shards import write_insights_shards; "
-                    "from build_podcast_insights import emit_episode_detail_shards; "
-                    f"root = Path(r'{ROOT}'); "
-                    "ins = root / 'dashboard' / 'data' / 'insights.json'; "
-                    "import json; "
-                    "doc = json.loads(ins.read_text(encoding='utf-8')) if ins.exists() else {}; "
-                    "write_insights_shards(doc, root / 'dashboard' / 'data'); "
-                    "n = emit_episode_detail_shards(); "
-                    "print(f'shards ok detail={n}')"
-                ),
+                str(SCRIPTS / "check_podcast_summary_coverage.py"),
+                "--require-published",
             ]
         )
         if rc != 0:

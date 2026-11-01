@@ -1,0 +1,629 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns:p="http://www.sec.gov/edgar/schedule13D" xmlns:p1="http://www.sec.gov/edgar/common"><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8"><link rel="stylesheet" type="text/css" href="/css/SDR_print.css"><style type="text/css">
+					.fakeTextBox {
+					border-top: 2px solid #999;
+					border-right: 1px solid #ccc;
+					border-bottom: 1px solid #ccc;
+					border-left: 2px solid #999;
+					padding: 2px;
+					_width: 800px;
+					height: auto;
+					min-width: 200px;
+					min-height: 50px;
+					word-wrap: break-word;
+					font-size: 0.9em;
+					color: blue;
+					}
+					table.tableClass { border: solid black;
+					border-top-width: 1;
+					border-right-width: 1;
+					border-bottom-width: 1;
+					border-left-width: 1;
+					table-layout:fixed;
+					}
+					table.innerTableClass { border: solid black;
+					border-top-width: 0;
+					border-right-width: 0;
+					border-bottom-width: 0;
+					border-left-width: 0;
+					table-layout:fixed;
+					}
+					th.tableClassLeft { border: solid black;
+					border-top-width: 0px;
+					border-right-width: 0px;
+					border-bottom-width: 1px;
+					border-left-width: 1px;
+					padding: 2px;
+					}
+					th.tableClassRight { border: solid black;
+					border-top-width: 0px;
+					border-right-width: 1px;
+					border-bottom-width: 1px;
+					border-left-width: 0;
+					padding: 2px;
+					}
+					th.tableClass { border: solid black;
+					border-top-width: 0px;
+					border-right-width: 1px;
+					border-bottom-width: 1px;
+					border-left-width: 1px;
+					padding: 2px;
+					}
+					td.tableClassLeft { border: solid black;
+					border-top-width: 0px;
+					border-right-width: 0px;
+					border-bottom-width: 1px;
+					border-left-width: 1px;
+					font-size: 0.9em;
+					color: blue;
+					word-wrap: break-word;
+					}
+					td.tableClassRight { border: solid black;
+					border-top-width: 0px;
+					border-right-width: 1px;
+					border-bottom-width: 1px;
+					border-left-width: 0;
+					font-size: 0.9em;
+					color: blue;
+					word-wrap: break-word;
+					}
+					td.tableClass { border: solid black;
+					border-top-width: 0px;
+					border-right-width: 1px;
+					border-bottom-width: 1px;
+					border-left-width: 1px;
+					font-size: 0.9em;
+					font-weight:bold;
+					color: black;
+					word-wrap: break-word;
+					}
+					td.tableClassNoBorder { border: solid black;
+					border-top-width: 0px;
+					border-right-width: 0px;
+					border-bottom-width: 0px;
+					border-left-width: 0px;
+					font-size: 0.9em;
+					font-weight:bold;
+					color: black;
+					word-wrap: break-word;
+					}
+
+					td.tableClassNoBorderBlue { border: solid black;
+					border-top-width: 0px;
+					border-right-width: 0px;
+					border-bottom-width: 0px;
+					border-left-width: 0px;
+					font-size: 0.9em;
+					font-weight:bold;
+					color: blue;
+					word-wrap: break-word;
+					}
+
+					td.tableClassInnerNoBorderBlue { border: solid black;
+					border-top-width: 0px;
+					border-right-width: 0px;
+					border-bottom-width: 0px;
+					border-left-width: 0px;
+					font-size: 1.4em;
+					font-weight:bold;
+					color: blue;
+					word-wrap: break-word;
+					}
+
+					td.tableClassNoBorderAlignLeft { border: solid black;
+					border-top-width: 0px;
+					border-right-width: 0px;
+					border-bottom-width: 0px;
+					border-left-width: 0px;
+					font-size: 0.9em;
+					font-weight:bold;
+					text-align: left;
+					color: black;
+					word-wrap: break-word;
+					}
+
+					td.signature {
+					padding: 4px 8px;
+					}
+
+					td.tableClassInner { border: solid black;
+					border-top-width: 0px;
+					border-right-width: 1px;
+					border-bottom-width: 1px;
+					border-left-width: 1px;
+					font-size: 1em;
+					font-weight:bold;
+					color: black;
+					word-wrap: break-word;
+					}
+
+					td.tableClassValign { border: solid black;
+					border-top-width: 0px;
+					border-right-width: 1px;
+					border-bottom-width: 1px;
+					border-left-width: 1px;
+					font-size: 0.9em;
+					font-weight:bold;
+					color: black;
+					vertical-align: middle;
+					text-align: center;
+					word-wrap: break-word;
+					}
+
+					td.tableClassValignNoBorder { border: solid black;
+					border-top-width: 0px;
+					border-right-width: 0px;
+					border-bottom-width: 0px;
+					border-left-width: 0px;
+					font-size: 0.9em;
+					font-weight:bold;
+					color: black;
+					vertical-align: middle;
+					text-align: center;
+					word-wrap: break-word;
+					}
+
+					td.tableClassValignInner { border: solid black;
+					border-top-width: 0px;
+					border-right-width: 1px;
+					border-bottom-width: 1px;
+					border-left-width: 1px;
+					font-size: 1em;
+					font-weight:bold;
+					color: black;
+					vertical-align: middle;
+					text-align: center;
+					word-wrap: break-word;
+					}
+
+					td.innerTableClassRightValign { border: solid black;
+					border-top-width: 0px;
+					border-right-width: 1px;
+					border-bottom-width: 1px;
+					border-left-width: 0;
+					font-size: 1em;
+					font-weight:bold;
+					color: black;
+					vertical-align: middle;
+					text-align: center;
+					word-wrap: break-word;
+					}
+
+					td.innerTableClassRightValignBottomLess { border: solid black;
+					border-top-width: 0px;
+					border-right-width: 1px;
+					border-bottom-width: 0px;
+					border-left-width: 0;
+					font-size: 1em;
+					font-weight:bold;
+					color: black;
+					vertical-align: middle;
+					text-align: center;
+					word-wrap: break-word;
+					}
+
+					td.tableClassInnerLeft { border: solid black;
+					border-top-width: 0px;
+					border-right-width: 0px;
+					border-bottom-width: 1px;
+					border-left-width: 1px;
+					font-size: 1em;
+					font-weight:bold;
+					color: black;
+					word-wrap: break-word;
+					}
+
+					td.tableClassInnerLeftBottomLess { border: solid black;
+					border-top-width: 0px;
+					border-right-width: 0px;
+					border-bottom-width: 0px;
+					border-left-width: 1px;
+					font-size: 1em;
+					font-weight:bold;
+					color: black;
+					word-wrap: break-word;
+					}
+
+					td.tableClassNoBorderAlignCenter { border: solid black;
+					border-top-width: 0px;
+					border-right-width: 0px;
+					border-bottom-width: 0px;
+					border-left-width: 0px;
+					font-size: 0.9em;
+					font-weight:bold;
+					color: black;
+					text-align: center;
+					word-wrap: break-word;
+					}
+
+					tr.tableClass { border: solid black;
+					border-top-width: 1px;
+					border-right-width: 1px;
+					border-bottom-width: 1px;
+					border-left-width: 1px;
+					}
+					tr.tableClassWithBg { border: solid black;
+					border-top-width: 0;
+					border-right-width: 1;
+					border-bottom-width: 1;
+					border-left-width: 0;
+					background-color: #e0e0ff
+					}
+
+					tr.tableClassWithBgBlack { border: solid black;
+					border-top-width: 0;
+					border-right-width: 1;
+					border-bottom-width: 1;
+					border-left-width: 0;
+					background-color: #D3D3D3
+					}
+
+					hr.header {
+					position: relative;
+					top: 20px;
+					border: none;
+					height: 6px;
+					background: black;
+					margin-bottom: 10px;
+					}
+
+					hr.separatorThin {
+					position: relative;
+					top: 2px;
+					border: none;
+					height: 2px;
+					background: black;
+					margin-bottom: 2px;
+					}
+
+					hr.headerThin {
+					position: relative;
+					top: 10px;
+					border: none;
+					height: 2px;
+					background: black;
+					margin-bottom: 10px;
+					}
+
+					hr.separator {
+					position: relative;
+					top: 20px;
+					border: none;
+					height: 4px;
+					background: black;
+					margin-bottom: 5px;
+					}
+
+					div.text {
+					background-color: #ffffff;
+					color: blue;
+					font-size: 1em;
+					font-weight:normal;
+					text-align:justify;
+					}
+
+
+					div.information {
+					background-color: #ffffff;
+					color: black;
+					font-size: 1em;
+					font-weight:normal;
+					text-align:justify;
+					}
+
+					#scheader {
+					font-size: 0.9em;
+					border: 0px solid #404040;
+					border-spacing: 2px;
+					}
+
+					div.largetext {
+					background-color: #ffffff;
+					color: blue;
+					font-size: 1em;
+					font-weight:normal;
+					text-align:justify;
+					white-space: pre-wrap;
+					word-break: normal;
+					}
+
+				</style></head><body lang="en-US" text="#000000" bgcolor="#ffffff"><hr class="header"><br><hr class="headerThin"><div class="contentwrapper"><table role="presentation" id="scheader"><tr><td class="tableClassNoBorderAlignCenter" style="font-size:2em;">
+						SECURITIES AND EXCHANGE COMMISSION
+						<br>
+						Washington, D.C. 20549
+					</td></tr><tr><td class="tableClassNoBorderAlignCenter"><br><br><div style="font-size:1.5em;">
+									SCHEDULE 13D
+								</div><br><div style="font-size:1.2em;">
+							Under the Securities Exchange Act of 1934
+						</div><br><div class="information" style="text-align:center; font-weight:bold;">
+									(Amendment No. <span style="color:blue;">5</span>)
+								</div><br><br></td></tr><tr><td class="center"><div class="information" style="text-align:center; font-weight:bold; color:blue;">Ferrari N.V.</div><div class="information" style="text-align:center; font-weight:bold;"><hr class="separatorThin">(Name of Issuer)</div><br><br></td></tr><tr><td class="center"><div class="information" style="text-align:center; font-weight:bold; color:blue;">Common shares, par value Euro 0.01 per share</div><div class="information" style="text-align:center; font-weight:bold;"><hr class="separatorThin">(Title of Class of Securities)</div><br><br></td></tr><tr><td class="center"><div class="information" style="text-align:center; font-weight:bold; color:blue;">N3167Y103</div><div class="information" style="text-align:center; font-weight:bold;"><hr class="separatorThin">(CUSIP Number)</div><br><br></td></tr><tr><td class="center"><div class="information" style="text-align:center; font-weight:bold; color:blue;">Carlo Daneo<br>Via Abetone Inferiore n. 4,
+								<br>Maranello (MO),
+								L6,
+								I-41053<br>39 0536 949111</div><br><br><div class="information" style="text-align:center; font-weight:bold; color:blue;">With a copy to:Scott D. Miller<br>Sullivan &amp; Cromwell LLP,
+								125 Broad Street<br>New York,
+								NY,
+								10004-2498<br>1-212-558-4000</div><div class="information" style="text-align:center; font-weight:bold;"><hr class="separatorThin">(Name, Address and Telephone Number of Person Authorized to
+									Receive Notices and Communications)</div></td></tr><tr><td class="center"><div class="information" style="text-align:center; font-weight:bold; color:blue;">01/03/2026</div><div class="information" style="text-align:center; font-weight:bold;"><hr class="separatorThin">(Date of Event Which Requires Filing of This Statement)</div></td></tr></table><br><br><div class="information" style="text-align:justify">
+				If the filing person has previously filed a statement on Schedule 13G to report the acquisition that is the subject of this Schedule 13D, and is filing this schedule because of §§ 240.13d-1(e), 240.13d-1(f) or 240.13d-1(g), check the following box.
+				<img src="/Images/box-unchecked.jpg" alt="Checkbox not checked"></div><br><div class="information" style="text-align:justify">
+				The information required on the remainder of this cover page shall not be deemed to be “filed” for the purpose of Section 18 of the
+				Securities Exchange Act of 1934 (“Act”) or otherwise subject to the liabilities of that section of the Act but shall be subject to all other
+				provisions of the Act (however, see the Notes).
+			</div></div><hr class="headerThin"><hr class="header"><br><br>
+  <div class="content"><div class="form1"></div></div>
+  <div class="content"><div class="form1"><table><tr><td class="center"><br><br><p><div align="center" style="font-size:1.2em;">
+									SCHEDULE 13D
+								</div></p></td></tr></table><table role="presentation" class="tableClass" id="cusipNumber"><tr class="tableClass"><td width="25%" style="font-weight:bold;">CUSIP No.</td><td width="75%"><div style="font-size:.9em; color:#000000">N3167Y103</div></td></tr></table><br><br><table role="presentation" class="tableClass" id="reportingPersonDetails"><tr class="tableClass"><td width="8%" class="tableClassValign">1</td><td width="92%" class="tableClass">
+					Name of reporting person
+					<br><br><div class="text">Exor N.V.</div></td></tr><tr><td width="8%" class="tableClassValign">2</td><td width="92%" class="tableClass">Check the appropriate box if a member of a Group (See Instructions)
+					<br><br><div class="text"><img src="/Images/box-checked.jpg" alt="Checkbox checked">  (a)
+						<br><img src="/Images/box-unchecked.jpg" alt="Checkbox not checked">  (b)
+					</div></td></tr><tr class="tableClassWithBgBlack"><td width="8%" class="tableClassValign">3</td><td width="92%" class="tableClass">SEC use only</td></tr><tr><td width="8%" class="tableClassValign">4</td><td width="92%" class="tableClass">
+					Source of funds (See Instructions)
+					<br><br><div class="text">OO</div></td></tr><tr><td width="8%" class="tableClassValign">5</td><td width="92%" class="tableClass">
+					Check if disclosure of legal proceedings is required pursuant to Items 2(d) or 2(e)
+					<br><br><img src="/Images/box-unchecked.jpg" alt="Checkbox not checked"></td></tr><tr><td width="8%" class="tableClassValign">6</td><td width="92%" class="tableClass">Citizenship or place of organization
+					<br><br><div class="text">
+				NETHERLANDS
+			</div></td></tr><tr><td width="8%" class="tableClassValign">Number of Shares Beneficially Owned by Each Reporting Person With:</td><td width="92%" class="tableClass"><table class="innerTableClass"><tr><td width="8%" class="innerTableClassRightValign">7</td><td width="92%" class="tableClassInnerLeft">Sole Voting Power
+								<br><br><div class="text">37,768,613.00</div></td></tr><tr><td width="8%" class="innerTableClassRightValign">8</td><td width="92%" class="tableClassInnerLeft">Shared Voting Power
+								<br><br><div class="text">0.00</div></td></tr><tr><td width="8%" class="innerTableClassRightValign">9</td><td width="92%" class="tableClassInnerLeft">Sole Dispositive Power
+								<br><br><div class="text">37,768,613.00</div></td></tr><tr><td width="8%" class="innerTableClassRightValignBottomLess">10</td><td width="92%" class="tableClassInnerLeftBottomLess">Shared Dispositive Power
+								<br><br><div class="text">0.00</div></td></tr></table></td></tr><tr><td width="8%" class="tableClassValign">11</td><td width="92%" class="tableClass">Aggregate amount beneficially owned by each reporting person
+					<br><br><div class="text">37,768,613.00</div></td></tr><tr><td width="8%" class="tableClassValign">12</td><td width="92%" class="tableClass">Check if the aggregate amount in Row (11) excludes certain shares (See Instructions)
+					<br><br><img src="/Images/box-checked.jpg" alt="Checkbox checked"></td></tr><tr><td width="8%" class="tableClassValign">13</td><td width="92%" class="tableClass">Percent of class represented by amount in Row (11)
+					<br><br><div class="text">21.3 % </div></td></tr><tr><td width="8%" class="tableClassValign">14</td><td width="92%" class="tableClass">Type of Reporting Person (See Instructions)
+					<br><br><div class="text">HC, CO</div></td></tr></table><br><div style="display: flex;"><div style="font-size: 0.9em; font-weight: bold; margin-right: 5px;">
+					Comment for Type of Reporting Person:
+				</div><div class="largetext" style="text-align:justify">Note 1: With respect to item 7 above, each of Exor N.V. ("Exor") and Trust Piero Ferrari (the "Trust") participate in the loyalty voting program of Ferrari N.V. ("Ferrari" or the "Issuer"), which enables qualifying common shareholders to hold one special voting share for each common share they hold. Each special voting share is entitled to one vote, therefore attributing, in effect, double voting rights to the associated common share. The special voting shares have only de minimis economic entitlements, in compliance with Dutch law, and they are transferrable only in very limited circumstances together with the associated common share. As a consequence of participating in the loyalty voting program, Exor beneficially owns, in addition to the common shares indicated above, 37,768,613 special voting shares of Ferrari. As noted below, the Trust has the bare ownership of 18,892,160 special voting shares of Ferrari, of which Piero Ferrari has usufruct; such usufruct includes the voting rights of the special voting shares.
+Note 2: With respect to Items 11 and 12 above, Exor disclaims beneficial ownership of the shares reported in this Schedule 13D that are beneficially owned by Piero Ferrari and Trust Piero Ferrari. Exor, Piero Ferrari and the Trust are party to a Shareholders' Agreement the terms of which are described in Item 6.
+Note 3: With respect to item 13 above, this percentage does not take into account voting rights arising from the Issuer's loyalty voting program referred to in footnote 1. Taking into account Exor's ownership of special voting shares, Exor's voting power in the Issuer is approximately 32.3%, Piero Ferrari's voting power in the Issuer is approximately 16.2% and in aggregate their voting power in Ferrari is approximately 48.4%. These percentages are calculated as the ratio of (i) the aggregate number of common shares and special voting shares beneficially owned by the Reporting Persons to (ii) the total number of outstanding common shares and outstanding special voting shares of Ferrari.</div></div><table><tr><td class="center"><br><br><p><div align="center" style="font-size:1.2em;">
+									SCHEDULE 13D
+								</div></p></td></tr></table><table role="presentation" class="tableClass" id="cusipNumber"><tr class="tableClass"><td width="25%" style="font-weight:bold;">CUSIP No.</td><td width="75%"><div style="font-size:.9em; color:#000000">N3167Y103</div></td></tr></table><br><br><table role="presentation" class="tableClass" id="reportingPersonDetails"><tr class="tableClass"><td width="8%" class="tableClassValign">1</td><td width="92%" class="tableClass">
+					Name of reporting person
+					<br><br><div class="text">Piero Ferrari</div></td></tr><tr><td width="8%" class="tableClassValign">2</td><td width="92%" class="tableClass">Check the appropriate box if a member of a Group (See Instructions)
+					<br><br><div class="text"><img src="/Images/box-checked.jpg" alt="Checkbox checked">  (a)
+						<br><img src="/Images/box-unchecked.jpg" alt="Checkbox not checked">  (b)
+					</div></td></tr><tr class="tableClassWithBgBlack"><td width="8%" class="tableClassValign">3</td><td width="92%" class="tableClass">SEC use only</td></tr><tr><td width="8%" class="tableClassValign">4</td><td width="92%" class="tableClass">
+					Source of funds (See Instructions)
+					<br><br><div class="text">OO</div></td></tr><tr><td width="8%" class="tableClassValign">5</td><td width="92%" class="tableClass">
+					Check if disclosure of legal proceedings is required pursuant to Items 2(d) or 2(e)
+					<br><br><img src="/Images/box-unchecked.jpg" alt="Checkbox not checked"></td></tr><tr><td width="8%" class="tableClassValign">6</td><td width="92%" class="tableClass">Citizenship or place of organization
+					<br><br><div class="text">
+				ITALY
+			</div></td></tr><tr><td width="8%" class="tableClassValign">Number of Shares Beneficially Owned by Each Reporting Person With:</td><td width="92%" class="tableClass"><table class="innerTableClass"><tr><td width="8%" class="innerTableClassRightValign">7</td><td width="92%" class="tableClassInnerLeft">Sole Voting Power
+								<br><br><div class="text">18,894,295.00</div></td></tr><tr><td width="8%" class="innerTableClassRightValign">8</td><td width="92%" class="tableClassInnerLeft">Shared Voting Power
+								<br><br><div class="text">0.00</div></td></tr><tr><td width="8%" class="innerTableClassRightValign">9</td><td width="92%" class="tableClassInnerLeft">Sole Dispositive Power
+								<br><br><div class="text">0.00</div></td></tr><tr><td width="8%" class="innerTableClassRightValignBottomLess">10</td><td width="92%" class="tableClassInnerLeftBottomLess">Shared Dispositive Power
+								<br><br><div class="text">0.00</div></td></tr></table></td></tr><tr><td width="8%" class="tableClassValign">11</td><td width="92%" class="tableClass">Aggregate amount beneficially owned by each reporting person
+					<br><br><div class="text">18,894,295.00</div></td></tr><tr><td width="8%" class="tableClassValign">12</td><td width="92%" class="tableClass">Check if the aggregate amount in Row (11) excludes certain shares (See Instructions)
+					<br><br><img src="/Images/box-checked.jpg" alt="Checkbox checked"></td></tr><tr><td width="8%" class="tableClassValign">13</td><td width="92%" class="tableClass">Percent of class represented by amount in Row (11)
+					<br><br><div class="text">10.7 % </div></td></tr><tr><td width="8%" class="tableClassValign">14</td><td width="92%" class="tableClass">Type of Reporting Person (See Instructions)
+					<br><br><div class="text">IN</div></td></tr></table><br><div style="display: flex;"><div style="font-size: 0.9em; font-weight: bold; margin-right: 5px;">
+					Comment for Type of Reporting Person:
+				</div><div class="largetext" style="text-align:justify">Note 4: With respect to item 7 above, this includes 18,894,295 common shares of Ferrari of which Mr. Ferrari has usufruct. In addition to the common shares indicated above, Mr. Ferrari also has sole voting power over 18,892,160 special voting shares of Ferrari of which he has usufruct. As described below, the Trust has the bare ownership of such common shares and special voting shares; bare ownership of the shares does not include the voting rights of such shares.
+
+Note 5: With respect to Items 11 and 12 above, Piero Ferrari disclaims beneficial ownership of the shares reported in this Schedule 13D that are beneficially owned by Exor. Exor, Piero Ferrari and the Trust are party to a Shareholders' Agreement the terms of which are described in Item 6.
+
+Note 6: With respect to item 13 above, please also refer to "Note 3" above.
+
+</div></div><table><tr><td class="center"><br><br><p><div align="center" style="font-size:1.2em;">
+									SCHEDULE 13D
+								</div></p></td></tr></table><table role="presentation" class="tableClass" id="cusipNumber"><tr class="tableClass"><td width="25%" style="font-weight:bold;">CUSIP No.</td><td width="75%"><div style="font-size:.9em; color:#000000">N3167Y103</div></td></tr></table><br><br><table role="presentation" class="tableClass" id="reportingPersonDetails"><tr class="tableClass"><td width="8%" class="tableClassValign">1</td><td width="92%" class="tableClass">
+					Name of reporting person
+					<br><br><div class="text">Trust Piero Ferrari</div></td></tr><tr><td width="8%" class="tableClassValign">2</td><td width="92%" class="tableClass">Check the appropriate box if a member of a Group (See Instructions)
+					<br><br><div class="text"><img src="/Images/box-checked.jpg" alt="Checkbox checked">  (a)
+						<br><img src="/Images/box-unchecked.jpg" alt="Checkbox not checked">  (b)
+					</div></td></tr><tr class="tableClassWithBgBlack"><td width="8%" class="tableClassValign">3</td><td width="92%" class="tableClass">SEC use only</td></tr><tr><td width="8%" class="tableClassValign">4</td><td width="92%" class="tableClass">
+					Source of funds (See Instructions)
+					<br><br><div class="text">OO</div></td></tr><tr><td width="8%" class="tableClassValign">5</td><td width="92%" class="tableClass">
+					Check if disclosure of legal proceedings is required pursuant to Items 2(d) or 2(e)
+					<br><br><img src="/Images/box-unchecked.jpg" alt="Checkbox not checked"></td></tr><tr><td width="8%" class="tableClassValign">6</td><td width="92%" class="tableClass">Citizenship or place of organization
+					<br><br><div class="text">
+				JERSEY
+			</div></td></tr><tr><td width="8%" class="tableClassValign">Number of Shares Beneficially Owned by Each Reporting Person With:</td><td width="92%" class="tableClass"><table class="innerTableClass"><tr><td width="8%" class="innerTableClassRightValign">7</td><td width="92%" class="tableClassInnerLeft">Sole Voting Power
+								<br><br><div class="text">0.00</div></td></tr><tr><td width="8%" class="innerTableClassRightValign">8</td><td width="92%" class="tableClassInnerLeft">Shared Voting Power
+								<br><br><div class="text">0.00</div></td></tr><tr><td width="8%" class="innerTableClassRightValign">9</td><td width="92%" class="tableClassInnerLeft">Sole Dispositive Power
+								<br><br><div class="text">0.00</div></td></tr><tr><td width="8%" class="innerTableClassRightValignBottomLess">10</td><td width="92%" class="tableClassInnerLeftBottomLess">Shared Dispositive Power
+								<br><br><div class="text">18,894,295.00</div></td></tr></table></td></tr><tr><td width="8%" class="tableClassValign">11</td><td width="92%" class="tableClass">Aggregate amount beneficially owned by each reporting person
+					<br><br><div class="text">18,894,295.00</div></td></tr><tr><td width="8%" class="tableClassValign">12</td><td width="92%" class="tableClass">Check if the aggregate amount in Row (11) excludes certain shares (See Instructions)
+					<br><br><img src="/Images/box-checked.jpg" alt="Checkbox checked"></td></tr><tr><td width="8%" class="tableClassValign">13</td><td width="92%" class="tableClass">Percent of class represented by amount in Row (11)
+					<br><br><div class="text">10.7 % </div></td></tr><tr><td width="8%" class="tableClassValign">14</td><td width="92%" class="tableClass">Type of Reporting Person (See Instructions)
+					<br><br><div class="text">OO</div></td></tr></table><br><div style="display: flex;"><div style="font-size: 0.9em; font-weight: bold; margin-right: 5px;">
+					Comment for Type of Reporting Person:
+				</div><div class="largetext" style="text-align:justify">Note 7: With respect to item 10 above, this includes 18,894,295 common shares of Ferrari of which the Trust has bare ownership. In addition to the common shares indicated above, the Trust also has bare ownership of 18,892,160 special voting shares of Ferrari. As indicated above, Piero Ferrari has usufruct of such common shares and special voting shares. Enzo Mattioli Ferrari serves as trustee and Franco Ravanetti serves as guardian of the Trust, and therefore may be deemed to have shared dispositive power as trustee and guardian, respectively.
+
+Note 8: With respect to Items 11 and 12 above, Trust Piero Ferrari disclaims beneficial ownership of the shares reported in this Schedule 13D that are beneficially owned by Exor. Exor, Piero Ferrari and the Trust are party to a Shareholders' Agreement the terms of which are described in Item 6.
+
+Note 9: With respect to item 13 above, please also refer to "Note 3" above.
+</div></div><table><tr><td class="center"><br><br><p><div align="center" style="font-size:1.2em;">
+									SCHEDULE 13D
+								</div></p></td></tr></table><table role="presentation" class="tableClass" id="cusipNumber"><tr class="tableClass"><td width="25%" style="font-weight:bold;">CUSIP No.</td><td width="75%"><div style="font-size:.9em; color:#000000">N3167Y103</div></td></tr></table><br><br><table role="presentation" class="tableClass" id="reportingPersonDetails"><tr class="tableClass"><td width="8%" class="tableClassValign">1</td><td width="92%" class="tableClass">
+					Name of reporting person
+					<br><br><div class="text">Enzo Mattioli Ferrari, in his capacity as a trustee</div></td></tr><tr><td width="8%" class="tableClassValign">2</td><td width="92%" class="tableClass">Check the appropriate box if a member of a Group (See Instructions)
+					<br><br><div class="text"><img src="/Images/box-checked.jpg" alt="Checkbox checked">  (a)
+						<br><img src="/Images/box-unchecked.jpg" alt="Checkbox not checked">  (b)
+					</div></td></tr><tr class="tableClassWithBgBlack"><td width="8%" class="tableClassValign">3</td><td width="92%" class="tableClass">SEC use only</td></tr><tr><td width="8%" class="tableClassValign">4</td><td width="92%" class="tableClass">
+					Source of funds (See Instructions)
+					<br><br><div class="text">OO</div></td></tr><tr><td width="8%" class="tableClassValign">5</td><td width="92%" class="tableClass">
+					Check if disclosure of legal proceedings is required pursuant to Items 2(d) or 2(e)
+					<br><br><img src="/Images/box-unchecked.jpg" alt="Checkbox not checked"></td></tr><tr><td width="8%" class="tableClassValign">6</td><td width="92%" class="tableClass">Citizenship or place of organization
+					<br><br><div class="text">
+				ITALY
+			</div></td></tr><tr><td width="8%" class="tableClassValign">Number of Shares Beneficially Owned by Each Reporting Person With:</td><td width="92%" class="tableClass"><table class="innerTableClass"><tr><td width="8%" class="innerTableClassRightValign">7</td><td width="92%" class="tableClassInnerLeft">Sole Voting Power
+								<br><br><div class="text">0.00</div></td></tr><tr><td width="8%" class="innerTableClassRightValign">8</td><td width="92%" class="tableClassInnerLeft">Shared Voting Power
+								<br><br><div class="text">0.00</div></td></tr><tr><td width="8%" class="innerTableClassRightValign">9</td><td width="92%" class="tableClassInnerLeft">Sole Dispositive Power
+								<br><br><div class="text">0.00</div></td></tr><tr><td width="8%" class="innerTableClassRightValignBottomLess">10</td><td width="92%" class="tableClassInnerLeftBottomLess">Shared Dispositive Power
+								<br><br><div class="text">18,894,295.00</div></td></tr></table></td></tr><tr><td width="8%" class="tableClassValign">11</td><td width="92%" class="tableClass">Aggregate amount beneficially owned by each reporting person
+					<br><br><div class="text">18,894,295.00</div></td></tr><tr><td width="8%" class="tableClassValign">12</td><td width="92%" class="tableClass">Check if the aggregate amount in Row (11) excludes certain shares (See Instructions)
+					<br><br><img src="/Images/box-checked.jpg" alt="Checkbox checked"></td></tr><tr><td width="8%" class="tableClassValign">13</td><td width="92%" class="tableClass">Percent of class represented by amount in Row (11)
+					<br><br><div class="text">10.7 % </div></td></tr><tr><td width="8%" class="tableClassValign">14</td><td width="92%" class="tableClass">Type of Reporting Person (See Instructions)
+					<br><br><div class="text">IN</div></td></tr></table><br><div style="display: flex;"><div style="font-size: 0.9em; font-weight: bold; margin-right: 5px;">
+					Comment for Type of Reporting Person:
+				</div><div class="largetext" style="text-align:justify">Note 10: With respect to item 10 above, this includes 18,894,295 common shares held by the Trust, of which Mr. Mattioli Ferrari serves as trustee and may be deemed to have shared dispositive power. In addition to the common shares indicated above, the Trust also has bare ownership of 18,892,160 special voting shares of Ferrari.
+
+Note 11: With respect to Items 11 and 12 above, Enzo Mattiali Ferrari disclaims beneficial ownership of the shares reported in this Schedule 13D that are beneficially owned by Exor. Exor, Piero Ferrari and the Trust are party to a Shareholders' Agreement the terms of which are described in Item 6.
+
+Note 12: With respect to item 13 above, please also refer to "Note 3" above.
+</div></div><table><tr><td class="center"><br><br><p><div align="center" style="font-size:1.2em;">
+									SCHEDULE 13D
+								</div></p></td></tr></table><table role="presentation" class="tableClass" id="cusipNumber"><tr class="tableClass"><td width="25%" style="font-weight:bold;">CUSIP No.</td><td width="75%"><div style="font-size:.9em; color:#000000">N3167Y103</div></td></tr></table><br><br><table role="presentation" class="tableClass" id="reportingPersonDetails"><tr class="tableClass"><td width="8%" class="tableClassValign">1</td><td width="92%" class="tableClass">
+					Name of reporting person
+					<br><br><div class="text">Franco Ravanetti, in his capacity as a guardian</div></td></tr><tr><td width="8%" class="tableClassValign">2</td><td width="92%" class="tableClass">Check the appropriate box if a member of a Group (See Instructions)
+					<br><br><div class="text"><img src="/Images/box-checked.jpg" alt="Checkbox checked">  (a)
+						<br><img src="/Images/box-unchecked.jpg" alt="Checkbox not checked">  (b)
+					</div></td></tr><tr class="tableClassWithBgBlack"><td width="8%" class="tableClassValign">3</td><td width="92%" class="tableClass">SEC use only</td></tr><tr><td width="8%" class="tableClassValign">4</td><td width="92%" class="tableClass">
+					Source of funds (See Instructions)
+					<br><br><div class="text">OO</div></td></tr><tr><td width="8%" class="tableClassValign">5</td><td width="92%" class="tableClass">
+					Check if disclosure of legal proceedings is required pursuant to Items 2(d) or 2(e)
+					<br><br><img src="/Images/box-unchecked.jpg" alt="Checkbox not checked"></td></tr><tr><td width="8%" class="tableClassValign">6</td><td width="92%" class="tableClass">Citizenship or place of organization
+					<br><br><div class="text">
+				ITALY
+			</div></td></tr><tr><td width="8%" class="tableClassValign">Number of Shares Beneficially Owned by Each Reporting Person With:</td><td width="92%" class="tableClass"><table class="innerTableClass"><tr><td width="8%" class="innerTableClassRightValign">7</td><td width="92%" class="tableClassInnerLeft">Sole Voting Power
+								<br><br><div class="text">0.00</div></td></tr><tr><td width="8%" class="innerTableClassRightValign">8</td><td width="92%" class="tableClassInnerLeft">Shared Voting Power
+								<br><br><div class="text">0.00</div></td></tr><tr><td width="8%" class="innerTableClassRightValign">9</td><td width="92%" class="tableClassInnerLeft">Sole Dispositive Power
+								<br><br><div class="text">0.00</div></td></tr><tr><td width="8%" class="innerTableClassRightValignBottomLess">10</td><td width="92%" class="tableClassInnerLeftBottomLess">Shared Dispositive Power
+								<br><br><div class="text">18,894,295.00</div></td></tr></table></td></tr><tr><td width="8%" class="tableClassValign">11</td><td width="92%" class="tableClass">Aggregate amount beneficially owned by each reporting person
+					<br><br><div class="text">18,894,295.00</div></td></tr><tr><td width="8%" class="tableClassValign">12</td><td width="92%" class="tableClass">Check if the aggregate amount in Row (11) excludes certain shares (See Instructions)
+					<br><br><img src="/Images/box-checked.jpg" alt="Checkbox checked"></td></tr><tr><td width="8%" class="tableClassValign">13</td><td width="92%" class="tableClass">Percent of class represented by amount in Row (11)
+					<br><br><div class="text">10.7 % </div></td></tr><tr><td width="8%" class="tableClassValign">14</td><td width="92%" class="tableClass">Type of Reporting Person (See Instructions)
+					<br><br><div class="text">IN</div></td></tr></table><br><div style="display: flex;"><div style="font-size: 0.9em; font-weight: bold; margin-right: 5px;">
+					Comment for Type of Reporting Person:
+				</div><div class="largetext" style="text-align:justify">Note 13: With respect to item 10 above, this includes 18,894,295 common shares held by the Trust, of which Mr. Ravanetti serves as guardian and may be deemed to have shared dispositive power. In addition to the common shares indicated above, the Trust also has bare ownership of 18,892,160 special voting shares of Ferrari.
+
+Note 14: With respect to Items 11 and 12 above, Franco Ravanetti disclaims beneficial ownership of the shares reported in this Schedule 13D that are beneficially owned by Exor. Exor, Piero Ferrari and the Trust are party to a Shareholders' Agreement the terms of which are described in Item 6.
+
+Note 15: With respect to item 13 above, please also refer to "Note 3" above.
+</div></div></div><div class="form1"><table><tr><td class="center"><br><br><p><div align="center" style="font-size:1.2em;">
+									SCHEDULE 13D
+								</div></p></td></tr></table><table role="presentation" id="item1to7"><tr><td width="8%" class="tableClassValignNoBorder">Item 1.</td><td width="92%" class="tableClassNoBorder">Security and Issuer</td></tr><tr class="tableClass"><td width="8%" class="tableClassNoBorderAlignCenter">(a)</td><td width="92%" class="tableClassNoBorder">Title of Class of Securities:
+							<br><br><div class="text">Common shares, par value Euro 0.01 per share</div></td></tr><tr class="tableClass"><td width="8%" class="tableClassNoBorderAlignCenter">(b)</td><td width="92%" class="tableClassNoBorder">Name of Issuer:
+							<br><br><div class="text">Ferrari N.V.</div></td></tr><tr><td width="8%" class="tableClassNoBorderAlignCenter">(c)</td><td width="92%" class="tableClassNoBorder">Address of Issuer's Principal Executive Offices:
+							<br><br><div class="text">Via Abetone Inferiore n. 4, Maranello (MO), 
+				ITALY
+			, I-41053.</div></td></tr><tr><td colspan="3"><div style="display: flex;"><div style="font-size: 0.9em; font-weight: bold; margin-right: 5px;">
+									Item 1 Comment:
+								</div><div class="largetext" style="text-align:justify">This Amendment No. 5 to Schedule 13D (this "Amendment") is being filed jointly by each of the following persons (each, a "Reporting Person" and, collectively, the "Reporting Persons"): (i) Exor N.V. ("Exor"), (ii) Piero Ferrari, (iii) Trust Piero Ferrari (the "Trust"), (iv) Enzo Mattioli Ferrari (in his capacity as trustee of the Trust) and (v) Franco Ravanetti (in his capacity as guardian of the Trust), to amend the Schedule 13D filed by Exor S.p.A., a societa per azioni organized under the laws of the Republic of Italy, as predecessor in interest to Exor, and Piero Ferrari with the Securities and Exchange Commission ("SEC") on January 3, 2016, as amended by Amendment No. 1 to Schedule 13D filed by Exor S.p.A. and Piero Ferrari with the SEC on December 15, 2016, by Amendment No. 2 to Schedule 13D filed by the Reporting Persons with the SEC on December 19, 2022, by Amendment No. 3 to Schedule 13D filed by the Reporting Persons with the SEC on February 27, 2025 and by Amendment No. 4 to Schedule 13D filed by the Reporting Persons with the SEC on March 5, 2025 (as so amended, the "Schedule 13D") and relates to the common shares, par value Euro 0.01 per share, of Ferrari N.V., a Dutch public limited liability company (naamloze vennootschap) (the "Issuer" or "Ferrari"). Each capitalized term used and not defined herein shall have the meaning assigned to such term in the Schedule 13D. Each Item below amends and supplements the information disclosed under the corresponding Item of the Schedule 13D. Except as otherwise specifically provided herein, each Item of the Schedule 13D remains unchanged.</div></div></td></tr><tr><td width="8%" class="tableClassValignNoBorder">Item 2.</td><td width="92%" class="tableClassNoBorder">Identity and Background</td></tr><tr></tr><tr class="tableClass"><td width="8%" class="tableClassNoBorderAlignCenter">(a)</td><td width="92%" class="tableClassNoBorder"><div class="largetext">Item 2 is hereby amended and restated in its entirety as follows:
+
+This Schedule 13D is being filed jointly by each of the Reporting Persons. The filing of this Statement shall not be deemed an admission that any Reporting Person is the beneficial owner of the securities reported herein for purposes of Section 13 of the Securities Exchange Act of 1934, as amended, or otherwise.
+
+Exor N.V.
+
+(a)-(c) Exor is a Dutch public limited liability company (naamloze vennootschap) and successor to Exor S.p.A. by virtue of a cross-border merger of Exor S.p.A. with and into Exor. Exor is one of Europe's largest diversified holding companies. Most of its portfolio is made up of companies active in several sectors, such as the production and sale of industrial and commercial vehicles and of luxury motor vehicles, Italian football, healthcare, editorial and luxury lifestyle. The address of Exor's principal business and principal office is Gustav Mahlerplein 25, 1082 MS, Amsterdam, The Netherlands. The name, business address, present principal occupation or employment (and the name, principal business and address of any corporation or other organization in which such employment is conducted) and citizenship of each executive officer and director of Exor, each person controlling Exor and each executive officer and director of any corporation or other person in control of Exor are set forth in Exhibit 99.1 hereto (such exhibit, "Schedule A").
+
+Piero Ferrari
+
+(a)-(c) Mr. Ferrari's principal occupation is as Vice Chairman of Ferrari. He also serves as Chairman of HPE-COXA, is a board member and Vice President of Ferretti. His business address is Via Abetone Inferiore n. 4, I-41053 Maranello (MO), Italy.
+
+Trust Piero Ferrari
+
+(a)-(c) The Trust is a family trust established under Jersey law and having its principal business and principal office at the address of the trustee, being Largo G. Garibaldi, no. 13, Modena (MO), Italy. The Trust is principally engaged in the business of holding, managing and distributing the property of the Trust and proceeds therefrom. Mr. Mattioli Ferrari and Mr. Ravanetti are, respectively, the trustee and the guardian of the Trust. The trustee, with the consent of the guardian, can dispose of the shares of Ferrari held by the Trust to the extent consistent with the purposes of the Trust.
+
+Enzo Mattioli Ferrari
+
+(a)-(c) Mr. Mattioli Ferrari's principal occupation is as Sole Director of Ferrari Family Office. His business address is Largo G. Garibaldi n. 13, Modena (MO), Italy. He also serves as CEO of Bacchelli &amp; Villa and as member of the board of directors and executive vice-chairman of HPE-COXA.
+
+Franco Ravanetti
+
+(a)-(c) Mr. Ravanetti's principal occupation is as independent advisor mainly in the area of corporate finance. His business address is via Langhirano n. 266, Parma (PR), Italy. He also serves as CEO of Tecno-gaz, Chairman of Istituto Diocesano Sostentamento Clero of Parma, Chairman of the board of statutory auditors of HPE-COXA and standing statutory auditor of High Performance Engineering. </div></td></tr><tr><td width="8%" class="tableClassNoBorderAlignCenter">(b)</td><td width="92%" class="tableClassNoBorder"><div class="largetext">See answer to Item 1(a) above.</div></td></tr><tr><td width="8%" class="tableClassNoBorderAlignCenter">(c)</td><td width="92%" class="tableClassNoBorder"><div class="largetext">See answer to Item 1(a) above.</div></td></tr><tr><td width="8%" class="tableClassNoBorderAlignCenter">(d)</td><td width="92%" class="tableClassNoBorder"><div class="largetext">Exor N.V.
+
+(d)-(e) During the last five years, neither Exor nor, to the best knowledge of Exor, any of the persons listed in Schedule A, has been (1) convicted in a criminal proceeding (excluding traffic violations or similar misdemeanors) or (2) a party to a civil proceeding of a judicial or administrative body of competent jurisdiction and as a result of such proceeding was or is subject to a judgment, decree or final order enjoining future violations of, or prohibiting or mandating activities subject to, federal or state securities laws, or finding any violation with respect to such laws.
+
+Piero Ferrari
+
+(d)-(e) During the last five years, Mr. Ferrari has not been (1) convicted in a criminal proceeding (excluding traffic violations or similar misdemeanors) or (2) a party to a civil proceeding of a judicial or administrative body of competent jurisdiction and as a result of such proceeding was not or is not subject to a judgment, decree or final order enjoining future violations of, or prohibiting or mandating activities subject to, federal or state securities laws or finding any violation with respect to such laws.
+
+Trust Piero Ferrari
+
+(d)-(e) During the last five years, the Trust has not been (1) convicted in a criminal proceeding (excluding traffic violations or similar misdemeanors) or (2) a party to a civil proceeding of a judicial or administrative body of competent jurisdiction and as a result of such proceeding was not or is not subject to a judgment, decree or final order enjoining future violations of, or prohibiting or mandating activities subject to, federal or state securities laws or finding any violation with respect to such laws.
+
+Enzo Mattioli Ferrari
+
+(d)-(e) During the last five years, Mr. Mattioli Ferrari has not been (1) convicted in a criminal proceeding (excluding traffic violations or similar misdemeanors) or (2) a party to a civil proceeding of a judicial or administrative body of competent jurisdiction and as a result of such proceeding was not or is not subject to a judgment, decree or final order enjoining future violations of, or prohibiting or mandating activities subject to, federal or state securities laws or finding any violation with respect to such laws.
+
+Franco Ravanetti
+
+(d)-(e) During the last five years, Mr. Ravanetti has not been (1) convicted in a criminal proceeding (excluding traffic violations or similar misdemeanors) or (2) a party to a civil proceeding of a judicial or administrative body of competent jurisdiction and as a result of such proceeding was not or is not subject to a judgment, decree or final order enjoining future violations of, or prohibiting or mandating activities subject to, federal or state securities laws or finding any violation with respect to such laws.</div></td></tr><tr><td width="8%" class="tableClassNoBorderAlignCenter">(e)</td><td width="92%" class="tableClassNoBorder"><div class="largetext">See answer to Item 1(d) above.</div></td></tr><tr><td width="8%" class="tableClassNoBorderAlignCenter">(f)</td><td width="92%" class="tableClassNoBorder"><div class="largetext">Piero Ferrari
+
+(f) Mr. Ferrari is a citizen of the Republic of Italy.
+
+Enzo Mattioli Ferrari
+
+(f) Mr. Mattioli Ferrari is a citizen of the Republic of Italy.
+
+Franco Ravanetti
+
+(f) Mr. Ravanetti is a citizen of the Republic of Italy. </div></td></tr><tr><td width="8%" class="tableClassValignNoBorder">Item 4.</td><td width="92%" class="tableClassNoBorder">Purpose of Transaction</td></tr><tr><td width="8%" class="tableClassNoBorderAlignCenter"> </td><td width="92%" class="tableClassNoBorder"><div class="largetext">Item 4 is hereby amended and supplemented to include the following:
+
+The information set forth in Item 6 hereof is hereby incorporated by reference into this Item 4.</div></td></tr><tr><td width="8%" class="tableClassValignNoBorder">Item 5.</td><td width="92%" class="tableClassNoBorder">Interest in Securities of the Issuer</td></tr><tr><td width="8%" class="tableClassNoBorderAlignCenter">(a)</td><td width="92%" class="tableClassNoBorder"><div class="largetext">Item 5(a) of the Schedule 13D is hereby amended and restated as follows:
+
+Rows (11) and (13) of the cover pages to this Amendment, which are hereby incorporated by reference, state the aggregate number and percentage of Ferrari common shares beneficially owned by each Reporting Person. Each Reporting Person disclaims beneficial ownership in the shares reported herein except to the extent it exercises voting or dispositive power with respect to those shares. In the aggregate, the Reporting Persons beneficially own a total of 56,662,908  common shares of the Issuer, representing approximately 30.2% of the common shares outstanding. Taking into account the Reporting Persons' special voting shares, their aggregate voting power in Ferrari is approximately 48.4%.
+
+Furthermore, the following persons listed in Schedule A to the Schedule 13D beneficially own common shares of Ferrari. The holdings below do not include and are separate from common shares held by Exor.
+
+        Mr. Andrea Agnelli owns 1,122 common shares of record;
+        Mr. John Elkann owns 34,740 common shares of record; and
+        Mr. Alessandro Nasi owns 375 common shares of record.</div></td></tr><tr><td width="8%" class="tableClassNoBorderAlignCenter">(b)</td><td width="92%" class="tableClassNoBorder"><div class="largetext">Item 5(b) of the Schedule 13D is hereby amended and restated as follows:
+
+With respect to the Reporting Persons, rows (7) through (10) of the cover pages to this Amendment are hereby incorporated by reference.
+
+The persons listed in Schedule A to the Schedule 13D and named in Item 5 above have the sole voting power and sole dispositive power in respect of the entire number of shares indicated in this Item 5. There are no other persons known to have the right to receive or the power to direct the receipt of dividends from, or the proceeds from the sale of, such securities.
+</div></td></tr><tr><td width="8%" class="tableClassNoBorderAlignCenter">(c)</td><td width="92%" class="tableClassNoBorder"><div class="largetext">Except as described in this Schedule 13D, none of the Reporting Persons nor, to the knowledge of the Reporting Persons, any person identified on Schedule A to this Schedule 13D has effected any transaction in the common shares of Ferrari during the past 60 days.</div></td></tr><tr><td width="8%" class="tableClassNoBorderAlignCenter">(d)</td><td width="92%" class="tableClassNoBorder"><div class="largetext">There are no changes to the information set out in paragraph (d) of Item 5 of the Schedule 13D, and such information is incorporated by reference herein. </div></td></tr><tr><td width="8%" class="tableClassNoBorderAlignCenter">(e)</td><td width="92%" class="tableClassNoBorder"><div class="largetext">There are no changes to the information set out in paragraph (e) of Item 5 of the Schedule 13D, and such information is incorporated by reference herein.</div></td></tr><tr><td width="8%" class="tableClassValignNoBorder">Item 6.</td><td width="92%" class="tableClassNoBorder">Contracts, Arrangements, Understandings or Relationships With Respect to Securities of the Issuer</td></tr><tr><td width="8%" class="tableClassNoBorderAlignCenter"> </td><td width="92%" class="tableClassNoBorder"><div class="largetext">    Item 6 is hereby amended and supplemented to include the following:
+
+    On January 3, 2026, Exor, Piero Ferrari and the Trust entered into an amended and restated shareholders' agreement (the "Amended and Restated Shareholders Agreement"), which amended and restated the shareholders' agreement that was entered into by Exor and Piero Ferrari on January 3, 2016 (the "Original Shareholders Agreement") and subsequently amended on December 16, 2022 by an adherence and amendment agreement (the "Adherence and Amendment Agreement") among Exor, Piero Ferrari and the Trust. The Original Shareholders Agreement and the Adherence and Amendment Agreement are filed as Exhibits 3 and 7 to the Schedule 13D. The Amended and Restated Shareholders Agreement became effective on January 4, 2026. Ferrari N.V. is not a party to the Amended and Restated Shareholders Agreement and does not have any rights or obligations thereunder. Below is a summary of the principal provisions of the Amended and Restated Shareholders Agreement, which does not purport to be complete and is qualified in its entirety by reference to the Amended and Restated Shareholders Agreement, filed as Exhibit 10 to this Schedule 13D and incorporated herein by reference herein.
+
+    Consultation
+
+    The Amended and Restated Shareholders Agreement provides for consultation rights solely between Exor and Piero Ferrari, pursuant to which they will consult with each other in good faith prior to each general meeting of the shareholders of the Issuer, for the purposes of forming and exercising, to the extent possible, a common view as to matters on the agenda of any general meeting of shareholders of the Issuer (a "General Meeting"). For the purposes of this consultation right and duties, representatives of Exor and Piero Ferrari shall meet in order to discuss in good faith whether they have or can find a common view as to the matters on the agenda of the immediately following General Meeting. Such consultation rights do not require any party to vote in any particular manner and do not constitute a veto right in favor of Piero Ferrari. Exor and Piero Ferrari also agree to consult with each other for the purposes of forming and exercising a common view on any transaction or proposed resolution that requires the approval of a qualified majority at a General Meeting (under applicable law or the Issuer's articles of association) or qualifies as a significant change in the identity or character of the Issuer (within the meaning of the Dutch Civil Code).
+
+    In addition, the Amended and Restated Shareholders Agreement provides that, well in advance of the convocation of the board meeting scheduled to call any General Meeting at which candidates will be nominated for (re)appointment to the board of directors of the Issuer, Exor and Piero Ferrari shall consult in good faith with each other in relation to profiles of the candidates for the competent corporate bodies of the Issuer.
+
+    In the event of any consolidation of the usufruct and bare ownership of the shares held through the Trust, or any transfer of the usufruct to a permitted transferee, the parties to the Amended and Restated Shareholders Agreement shall use their best efforts to preserve such consultation rights and duties; provided, however, that unless an exemption from the Dutch mandatory offer requirements is available, such consultation rights and duties will be suspended in accordance with the terms of the Amended and Restated Shareholders Agreement.
+
+    FSA mandatory offer rules - acting in concert
+
+    The parties to the Amended and Restated Shareholders Agreement acknowledge and agree that the Dutch public offer rules, as laid down in the Dutch Act on Financial Supervision (the "FSA"), are applicable to Ferrari and its shareholders and that, as Exor individually, and Exor and Piero Ferrari combined, had a Voting Interest of more than 30% prior to the date on which listing and trading of Ferrari's common shares commenced on Euronext Milan and have continuously had a Voting Interest of more than 30% thereafter, Exor individually, and Exor and Piero Ferrari combined, are deemed to have a controlling influence over Ferrari within the meaning of the FSA. Accordingly, Exor individually and Exor and Piero Ferrari combined, as well as any ultimate controlling persons of either of them, benefit from an exemption from the Dutch mandatory offer requirements.
+
+    Rights of first offer
+
+    The Amended and Restated Shareholders Agreement provides for reciprocal rights of first offer in connection with transfers of the Issuer's common shares by Exor, on the one hand, and by Piero Ferrari and the Trust (together, the "Ferrari Family"), on the other hand.
+
+    In the event that either Exor or the Ferrari Family intends to transfer (in whole or in part) its common shares of the Issuer to a third party, whether such transfer is solicited or unsolicited, the proposed transfer is subject to a right of first offer in favor of the other party. In such circumstances, the proposed transferring party is required to deliver prior written notice to the non-transferring party specifying, among other things, the number of common shares proposed to be transferred.
+
+    Following receipt of such notice, the non-transferring party will have the right, within 30 business days, to make a binding, unconditional and irrevocable all-cash offer for the purchase of all (and not less than all) of the common shares proposed to be transferred, on the terms set forth in the Amended and Restated Shareholders Agreement. If the non-transferring party does not submit an offer within the applicable period, the transferring party is free to proceed with the proposed transfer within four months. If the right of first offer is exercised and the offer is accepted, the parties are required to consummate the transfer within five business days following acceptance of the offer, subject to any required regulatory approvals.
+
+    If the transferring party does not accept the offer, it may proceed to transfer the relevant common shares to a third party, subject to certain timing and pricing restrictions. In particular, the transfer to third parties may be completed only at a price per share higher than the price offered by the non-transferring party, except in case the transferring party wishes to sell the shares by way of a book-build offering, in which case such book-build offering shall be launched in the relevant time period only if the volume-weighted average price of the common shares on Euronext Milan during the five trading days prior to launch is not lower than 110% of the price per share offered by the non-transferring party.
+
+    The Amended and Restated Shareholders Agreement further provides that, in case the number of common shares subject to the Ferrari Family's right of first offer were to attribute to the Ferrari Family a voting interest exceeding 30%, then the Ferrari Family will be entitled to make the offer for less than all of the common shares proposed to be transferred so that such threshold is not exceeded. Any common shares acquired by the Ferrari Family pursuant to such right of first offer would be held through the Trust as bare owner, with Piero Ferrari retaining the usufruct, including the associated voting and economic rights.
+
+    Special voting shares
+
+    Except for transfers to permitted transferees (as defined under the Amended and Restated Shareholders Agreement, "Permitted Transferees"), the transfer of any common shares of Ferrari to a third party will result in the transfer of a corresponding number of special voting shares, in each case in accordance with the terms and conditions governing the special voting shares. The Amended and Restated Shareholders Agreement does not permit the transfer of special voting shares independently of the related common shares.
+
+    Permitted transfers
+
+    The rights of first offer described above do not apply in the case of transfers of common shares of the Issuer to a Permitted Transferee. Permitted Transferees include, among others, affiliates and successors of a shareholder of the Issuer and, with respect to Piero Ferrari, the Trust. Except as provided for in the Amended and Restated Shareholders Agreement and for the duration of the Amended and Restated Shareholders Agreement, the bare ownership and the usufruct of the common shares held through the Trust may not be transferred separately. Any Permitted Transferee is required to adhere to the Amended and Restated Shareholders Agreement and assume the rights and obligations of the transferring party thereunder.
+
+    Term and termination
+
+    The Amended and Restated Shareholders Agreement entered into force and became effective on January 4, 2026, replacing the Original Shareholders Agreement (as amended). The Amended and Restated Shareholders Agreement will remain in full force and effect for an initial term of three years (i.e., until January 4, 2029) and will be automatically renewed for a successive three-year period unless terminated by either party upon written notice given at least six months prior to the end of the initial term.
+
+    The Amended and Restated Shareholders Agreement will terminate earlier and cease to have any effect upon the transfer of all of the common shares held by either Exor or the Ferrari Family to a third party other than a Permitted Transferee, or upon the occurrence of certain other events specified in the Amended and Restated Shareholders Agreement, including upon 15 business days' prior notice by (i) Exor if the Ferrari Family's voting interests are less than 5% for 30 consecutive days or (ii) Piero Ferrari or the Trust if Exor's voting interests are less than the Ferrari Family's voting interests for 30 consecutive days. In addition, only Piero Ferrari has the right to terminate the Amended and Restated Shareholders Agreement by providing 30 business days' prior notice to Exor at his sole discretion.
+
+    Miscellaneous
+
+    The Amended and Restated Shareholders Agreement provides that the contents and timing of any press release, announcements and/or regulatory filings relating to the execution of such agreement will be agreed in advance by the parties.
+
+    The Amended and Restated Shareholders Agreement  is governed by and must be interpreted according to the laws of the Netherlands. Any disputes arising out of or in connection with the Amended and Restated Shareholders Agreement are subject to the exclusive jurisdiction of the competent court in Amsterdam, the Netherlands, without prejudice to the right of appeal and appeal to the Supreme Court.
+
+</div></td></tr><tr><td width="8%" class="tableClassValignNoBorder">Item 7.</td><td width="92%" class="tableClassNoBorder">Material to be Filed as Exhibits.</td></tr><tr><td width="8%" class="tableClassNoBorderAlignCenter"> </td><td width="92%" class="tableClassNoBorder"><div class="largetext">Item 7 is hereby amended and supplemented to include the following:
+
+Exhibit 10: Amended and Restated Shareholders' Agreement, dated January 3, 2026, by and among Exor N.V., Piero Ferrari and Trust Piero Ferrari
+
+Exhibit 99.1: Schedule A
+</div></td></tr></table><br></div><div class="form1"><table role="presentation" id="signatureInfo"><tr><td width="8%" class="tableClassValignNoBorder">    SIGNATURE</td><td width="92%" class="tableClassNoBorder"> </td></tr><tr><td width="8%" class="tableClassNoBorderAlignCenter"> </td><td width="92%" class="tableClassNoBorder"><div class="information" style="text-align:justify">
+						After reasonable inquiry and to the best of my knowledge and belief, I certify that the information set forth in this statement is true, complete and correct.
+						<br><br></div></td></tr></table><table><tr class="tableClass"><td width="50%" class="tableClassNoBorder"> </td><td width="50%" class="tableClassNoBorder"><table><tr class="tableClass"><td width="100%" class="tableClassInnerNoBorderBlue"><div class="text">Exor N.V.</div></td></tr></table></td></tr></table><table><tr class="tableClass"><td width="50%" class="tableClassNoBorder"> </td><td width="50%" class="tableClassNoBorder"><table><tr class="tableClass"><td width="8%" class="tableClassNoBorderAlignLeft signature">Signature:</td><td width="92%" class="tableClassNoBorderBlue signature">/s/ Guido De Boer</td></tr><tr class="tableClass"><td width="8%" class="tableClassNoBorderAlignLeft signature">Name/Title:</td><td width="92%" class="tableClassNoBorderBlue signature">Guido De Boer, Chief Financial Officer</td></tr><tr class="tableClass"><td width="8%" class="tableClassNoBorderAlignLeft signature">Date:</td><td width="92%" class="tableClassNoBorderBlue signature">01/06/2026</td></tr></table></td></tr></table><table><tr class="tableClass"><td width="50%" class="tableClassNoBorder"> </td><td width="50%" class="tableClassNoBorder"><table><tr class="tableClass"><td width="100%" class="tableClassInnerNoBorderBlue"><div class="text">Piero Ferrari</div></td></tr></table></td></tr></table><table><tr class="tableClass"><td width="50%" class="tableClassNoBorder"> </td><td width="50%" class="tableClassNoBorder"><table><tr class="tableClass"><td width="8%" class="tableClassNoBorderAlignLeft signature">Signature:</td><td width="92%" class="tableClassNoBorderBlue signature">/s/ Piero Ferrari</td></tr><tr class="tableClass"><td width="8%" class="tableClassNoBorderAlignLeft signature">Name/Title:</td><td width="92%" class="tableClassNoBorderBlue signature">Piero Ferrari</td></tr><tr class="tableClass"><td width="8%" class="tableClassNoBorderAlignLeft signature">Date:</td><td width="92%" class="tableClassNoBorderBlue signature">01/06/2026</td></tr></table></td></tr></table><table><tr class="tableClass"><td width="50%" class="tableClassNoBorder"> </td><td width="50%" class="tableClassNoBorder"><table><tr class="tableClass"><td width="100%" class="tableClassInnerNoBorderBlue"><div class="text">Trust Piero Ferrari</div></td></tr></table></td></tr></table><table><tr class="tableClass"><td width="50%" class="tableClassNoBorder"> </td><td width="50%" class="tableClassNoBorder"><table><tr class="tableClass"><td width="8%" class="tableClassNoBorderAlignLeft signature">Signature:</td><td width="92%" class="tableClassNoBorderBlue signature">/s/ Enzo Mattioli Ferrari</td></tr><tr class="tableClass"><td width="8%" class="tableClassNoBorderAlignLeft signature">Name/Title:</td><td width="92%" class="tableClassNoBorderBlue signature">Enzo Mattioli Ferrari, Trustee</td></tr><tr class="tableClass"><td width="8%" class="tableClassNoBorderAlignLeft signature">Date:</td><td width="92%" class="tableClassNoBorderBlue signature">01/06/2026</td></tr></table></td></tr></table><table><tr class="tableClass"><td width="50%" class="tableClassNoBorder"> </td><td width="50%" class="tableClassNoBorder"><table><tr class="tableClass"><td width="100%" class="tableClassInnerNoBorderBlue"><div class="text">Enzo Mattioli Ferrari, in his capacity as a trustee</div></td></tr></table></td></tr></table><table><tr class="tableClass"><td width="50%" class="tableClassNoBorder"> </td><td width="50%" class="tableClassNoBorder"><table><tr class="tableClass"><td width="8%" class="tableClassNoBorderAlignLeft signature">Signature:</td><td width="92%" class="tableClassNoBorderBlue signature">/s/ Enzo Mattioli Ferrari</td></tr><tr class="tableClass"><td width="8%" class="tableClassNoBorderAlignLeft signature">Name/Title:</td><td width="92%" class="tableClassNoBorderBlue signature">Enzo Mattioli Ferrari</td></tr><tr class="tableClass"><td width="8%" class="tableClassNoBorderAlignLeft signature">Date:</td><td width="92%" class="tableClassNoBorderBlue signature">01/06/2026</td></tr></table></td></tr></table><table><tr class="tableClass"><td width="50%" class="tableClassNoBorder"> </td><td width="50%" class="tableClassNoBorder"><table><tr class="tableClass"><td width="100%" class="tableClassInnerNoBorderBlue"><div class="text">Franco Ravanetti, in his capacity as a guardian</div></td></tr></table></td></tr></table><table><tr class="tableClass"><td width="50%" class="tableClassNoBorder"> </td><td width="50%" class="tableClassNoBorder"><table><tr class="tableClass"><td width="8%" class="tableClassNoBorderAlignLeft signature">Signature:</td><td width="92%" class="tableClassNoBorderBlue signature">/s/ Franco Ravanetti</td></tr><tr class="tableClass"><td width="8%" class="tableClassNoBorderAlignLeft signature">Name/Title:</td><td width="92%" class="tableClassNoBorderBlue signature">Franco Ravanetti</td></tr><tr class="tableClass"><td width="8%" class="tableClassNoBorderAlignLeft signature">Date:</td><td width="92%" class="tableClassNoBorderBlue signature">01/06/2026</td></tr></table></td></tr></table></div></div>
+
+<script type="text/javascript"  src="/-snhDb/14/VG/7x_s/OkFfzMOpKYC8M/ibki2mm4Gp8NcwYw/UhAMAQ/fSpIBV/ARRnI"></script></body></html>

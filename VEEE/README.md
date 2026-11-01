@@ -1,0 +1,11 @@
+# Twin Vee PowerCats, Co.  (VEEE)  (CIK 0001855509) contingent / CVR candidate (VEEE)
+
+**Ticker:** VEEE | **Market:** US  
+**Last updated:** 2026-10-19  
+**Stage:** pre-close stub (discovery)
+
+## Next actions
+
+1. Pull merger 8-K / DEFM14A / CVR agreement into `investor-documents/sec/`.
+2. Fill `research/cvr_terms.json` (set `stub=false`, `terms_complete=true`).
+3. Nightly sync will sleeve onto the CVRs filter.

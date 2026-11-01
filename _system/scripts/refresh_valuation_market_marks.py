@@ -131,7 +131,28 @@ def refresh(ticker: str, *, dry_run: bool = False) -> dict:
 
     changed = updated != reviewed
     if changed and not dry_run:
+        from marketdata.valuation_history import archive_valuation_on_write
+        previous = copy.deepcopy(valuation)
+        prior_market = reviewed.get("market") or {}
+        previous.setdefault("inputs", {}).update({
+            "price": prior_market.get("price_per_share"),
+            "price_source": prior_market.get("price_source"),
+            "price_as_of": (reviewed.get("dates") or {}).get("price_as_of"),
+        })
+        previous["universal_valuation_contract"] = reviewed
+        archive_valuation_on_write(research.parent, previous)
         write_json(contract_path, updated)
+        snapshot = copy.deepcopy(valuation)
+        snapshot["universal_valuation_contract"] = updated
+        archive_valuation_on_write(research.parent, snapshot)
+        config_path = ROOT / "_system/reference/core_compounders.json"
+        if config_path.exists():
+            from buy_zones import load_config
+            if ticker in load_config(config_path)["tickers"]:
+                from build_power_zone_pricing import build_contract_pricing
+                from refresh_core_compounders import refresh as refresh_core
+                build_contract_pricing(ticker)
+                refresh_core(root=ROOT, write=True, tickers=[ticker])
     return {
         "ticker": ticker,
         "status": "would_update" if changed and dry_run else ("updated" if changed else "unchanged"),

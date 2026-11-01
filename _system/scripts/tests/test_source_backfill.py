@@ -1,0 +1,264 @@
+import io
+import json
+from pathlib import Path
+import sys
+import zipfile
+
+import pytest
+
+sys.path.insert(0,str(Path(__file__).resolve().parents[1]))
+from company_source_queue import SourceQueue
+from company_source_cache import pack,restore
+from backfill_company_sources import extract_complete,transcript_for,audit_cache,preserve_outcome
+from company_sources import SourceIndex
+
+
+def test_access_failure_is_published_without_erasing_last_good_text(tmp_path):
+    from company_sources import digest
+    job={'kind':'drive','payload':{'id':'id','revision':'v1'}}
+    target=tmp_path/'drive'/(digest('idv1')+'.json')
+    preserve_outcome(tmp_path,job,'access_unavailable',{},'Publisher denied access')
+    assert json.loads(target.read_text())['status']=='access_unavailable'
+    preserve_outcome(tmp_path,job,'empty_source',{},'Original is empty')
+    assert json.loads(target.read_text())['status']=='empty_source'
+    target.write_text(json.dumps({'text':'existing original','status':'indexed'}))
+    preserve_outcome(tmp_path,job,'failed',{},'Temporary failure')
+    assert json.loads(target.read_text())['text']=='existing original'
+
+
+def test_model_source_is_read_as_text_without_execution():
+    source=b"raise RuntimeError('must never execute')\n# Bitcoin mining cost model"
+    text,status,details=extract_complete(source,'.py')
+    assert text==source.decode() and status=='indexed'
+    assert details['format']=='model_source_text'
+
+
+def test_discovered_revision_can_reuse_verified_cache_without_drive_connection(tmp_path):
+    from backfill_company_sources import Worker
+    from company_sources import digest
+    revision='a'*32
+    target=tmp_path/'drive'/(digest('id'+revision)+'.json');target.parent.mkdir()
+    target.write_text(json.dumps({'text':'research','status':'indexed','extraction':{'pages':3},'content_md5':revision}))
+    worker=Worker(tmp_path,tmp_path)
+    state,result,error=worker.run({'kind':'drive','payload':{'id':'id','revision':revision,'title':'research.pdf'}})
+    assert state=='indexed' and result['reused'] and worker.service is None
+
+
+def test_changed_drive_bytes_are_rejected_before_indexing(monkeypatch,tmp_path):
+    from types import SimpleNamespace
+    from backfill_company_sources import Worker
+    api=SimpleNamespace(_http=SimpleNamespace(timeout=0),files=lambda:SimpleNamespace(get_media=lambda **kwargs:b'new revision'))
+    monkeypatch.setitem(sys.modules,'drive_store_common',SimpleNamespace(drive_service=lambda **kwargs:api,execute_with_retry=lambda value:value))
+    revision='a'*32
+    (tmp_path/'drive-inventory.json').write_text(json.dumps({'items':[{'id':'id','name':'source.pdf','mimeType':'application/pdf','md5Checksum':revision}]}))
+    worker=Worker(tmp_path,tmp_path)
+    with pytest.raises(ValueError,match='revision changed'):
+        worker.run({'kind':'drive','payload':{'id':'id','revision':revision,'title':'source.pdf'}})
+    assert not list((tmp_path/'drive').glob('*.json'))
+
+
+def test_legacy_pdf_cache_is_reverified_but_complete_original_is_kept(tmp_path):
+    q=SourceQueue(tmp_path/'work.sqlite')
+    for name,detail in [('legacy',{}),('complete',{'pages':3,'missing_pages':[]})]:
+        q.enqueue([{'key':name,'kind':'git','payload':{'path':name+'.pdf'}}])
+        job=q.claim()
+        path=tmp_path/'git'/(name+'.json');path.parent.mkdir(exist_ok=True)
+        path.write_text(json.dumps({'text':'research','status':'indexed','extraction':detail}))
+        q.finish(job['key'],'indexed',result={'cache':str(path)})
+    assert audit_cache(q,tmp_path)==1
+    assert q.claim()['key']=='legacy'
+    q.close()
+
+
+def test_empty_scan_outcome_survives_metadata_union():
+    index=SourceIndex()
+    index.add({'id':'a','processing_status':'awaiting_extraction','text':''},['original'])
+    index.add({'id':'b','processing_status':'needs_ocr','text':''},['original'])
+    assert index.records['a']['processing_status']=='needs_ocr'
+
+
+def test_retry_status_is_scoped_to_selected_collection(tmp_path):
+    q=SourceQueue(tmp_path/'work.sqlite')
+    q.enqueue([{'key':kind,'kind':kind,'payload':{}} for kind in ['git','media']])
+    for kind in ['git','media']:
+        job=q.claim([kind]);q.finish(job['key'],'indexed')
+    q.reset(['indexed'],['media'])
+    assert q.report()['by_kind']['git']=={'indexed':1}
+    assert q.report()['by_kind']['media']=={'pending':1}
+    q.close()
+
+
+def test_queue_resume_revision_retry_and_private_checkpoint(tmp_path):
+    q=SourceQueue(tmp_path/'work.sqlite')
+    q.enqueue([{'key':'drive:a:1','kind':'drive','payload':{'id':'a'},'priority':50},
+               {'key':'drive:b:1','kind':'drive','payload':{'id':'b'}}])
+    first=q.claim();assert first['key']=='drive:a:1'
+    q.finish(first['key'],'indexed',result={'text':'private'})
+    q.enqueue([{'key':'drive:a:1','kind':'drive','payload':{'id':'a'}},
+               {'key':'drive:a:2','kind':'drive','payload':{'id':'a'},'priority':100}])
+    assert q.claim()['key']=='drive:a:2'
+    q.checkpoint(tmp_path/'queue-checkpoints');q.close()
+    restored=SourceQueue(tmp_path/'fresh.sqlite')
+    assert restored.report()['by_kind']['drive']=={'indexed':1,'pending':2}
+    other=restored.claim();assert other['key']=='drive:b:1'
+    restored.finish(other['key'],'indexed')
+    revision=restored.claim();assert revision['key']=='drive:a:2'
+    restored.finish(revision['key'],'retry',error='temporary')
+    assert restored.claim() is None
+    restored.close()
+
+
+def test_expired_lease_is_recoverable_and_active_lease_is_exclusive(tmp_path):
+    q=SourceQueue(tmp_path/'work.sqlite')
+    q.enqueue([{'key':'a','kind':'git','payload':{}}])
+    assert q.claim(lease_seconds=-1)['attempts']==1
+    assert q.claim()['attempts']==2
+    assert q.claim() is None
+    q.close()
+
+
+def test_partial_pdf_is_not_indexed():
+    fitz=pytest.importorskip('fitz')
+    pdf=fitz.open();pdf.new_page().insert_text((30,30),'A complete textual page with enough readable research. '*4)
+    page=pdf.new_page();image=fitz.Pixmap(fitz.csRGB,(0,0,20,20));image.clear_with(255)
+    page.insert_image(fitz.Rect(0,0,200,200),pixmap=image)
+    text,state,detail=extract_complete(pdf.tobytes(),'.pdf')
+    assert 'research' in text and state=='needs_ocr' and detail['missing_pages']==[2]
+
+
+def test_successful_ocr_of_short_cover_is_indexed_as_unreviewed(monkeypatch):
+    from types import SimpleNamespace
+    class Page:
+        def get_text(self,**kwargs):return 'Annual report' if kwargs else ''
+        def get_images(self):return [1]
+        def get_textpage_ocr(self,**kwargs):return object()
+    class PDF:
+        needs_pass=False
+        def __enter__(self):return self
+        def __iter__(self):return iter([Page()])
+        def __exit__(self,*args):pass
+    monkeypatch.setitem(sys.modules,'fitz',SimpleNamespace(open=lambda **kwargs:PDF()))
+    text,state,detail=extract_complete(b'fixture','.pdf',ocr=True)
+    assert text=='Annual report' and state=='indexed'
+    assert detail['missing_pages']==[] and detail['ocr_pages']==[1] and detail['ocr_review']=='unreviewed'
+
+
+def test_epub_reads_spine_order_and_preserves_scan_gap():
+    b=io.BytesIO()
+    with zipfile.ZipFile(b,'w') as z:
+        z.writestr('META-INF/container.xml','<container><rootfile full-path="book/package.opf"/></container>')
+        z.writestr('book/package.opf','<package xmlns="http://www.idpf.org/2007/opf"><manifest><item id="a" href="a.xhtml"/><item id="b" href="b.xhtml"/></manifest><spine><itemref idref="b"/><itemref idref="a"/></spine></package>')
+        z.writestr('book/b.xhtml','<html><body>Company discussion in chapter one.</body></html>')
+        z.writestr('book/a.xhtml','<html><body><img src="scan.png"/></body></html>')
+    text,state,details=extract_complete(b.getvalue(),'.epub')
+    assert text.startswith('Company discussion') and state=='needs_ocr'
+    assert details['missing_chapters']==['book/a.xhtml']
+
+
+def test_epub_recovers_image_chapter_without_fetching_external_content(monkeypatch):
+    import backfill_company_sources as module
+    original=module.extract_complete
+    def extract_image(data,suffix,**kwargs):
+        if suffix=='.png':return 'Scanned company discussion','indexed',{'ocr_pages':[1]}
+        return original(data,suffix,**kwargs)
+    monkeypatch.setattr(module,'extract_complete',extract_image)
+    def book(ref):
+        b=io.BytesIO()
+        with zipfile.ZipFile(b,'w') as z:
+            z.writestr('META-INF/container.xml','<container><rootfile full-path="book/package.opf"/></container>')
+            z.writestr('book/package.opf','<package xmlns="http://www.idpf.org/2007/opf"><manifest><item id="a" href="a.xhtml"/></manifest><spine><itemref idref="a"/></spine></package>')
+            z.writestr('book/a.xhtml','<html><body><img src="'+ref+'"/></body></html>')
+            z.writestr('book/scan.png',b'original image')
+        return b.getvalue()
+    text,state,details=original(book('scan.png'),'.epub',ocr=True)
+    assert text=='Scanned company discussion' and state=='indexed'
+    assert details['ocr_chapters']==['book/a.xhtml'] and details['ocr_review']=='unreviewed'
+    assert original(book('https://example.com/scan.png'),'.epub',ocr=True)[1]=='needs_ocr'
+
+
+def test_legacy_word_reader_does_not_execute_embedded_content(monkeypatch):
+    from types import SimpleNamespace
+    monkeypatch.setitem(sys.modules,'legacy_doc',SimpleNamespace(extract_text=lambda data:SimpleNamespace(text='Company earnings discussion',parser='piece-table',warnings=[])))
+    text,state,details=extract_complete(b'legacy-fixture','.doc')
+    assert text=='Company earnings discussion' and state=='indexed' and details['parser']=='piece-table'
+    def encrypted(data):raise ValueError('Encrypted document')
+    monkeypatch.setitem(sys.modules,'legacy_doc',SimpleNamespace(extract_text=encrypted))
+    assert extract_complete(b'private','.doc')[1]=='access_unavailable'
+
+
+def test_source_code_is_indexed_as_text_and_never_executed():
+    text,state,details=extract_complete(b'raise RuntimeError("do not run this research file")','.py')
+    assert text.startswith('raise RuntimeError') and state=='indexed'
+    assert details['format']=='model_source_text'
+
+
+def test_image_requires_ocr_before_indexing():
+    assert extract_complete(b'original','.jpeg')[1]=='needs_ocr'
+
+
+def test_transcript_companion_and_cache_archive_portability(tmp_path):
+    audio=tmp_path/'podcasts/audio-cache/episode.mp3';audio.parent.mkdir(parents=True);audio.write_bytes(b'audio')
+    transcript=tmp_path/'podcasts/episodes/show/episode.txt';transcript.parent.mkdir(parents=True);transcript.write_text('Transcript')
+    assert transcript_for(audio,tmp_path)==transcript
+    cache=tmp_path/'cache';(cache/'git').mkdir(parents=True);(cache/'git/a.json').write_text('{"text":"private"}')
+    (cache/'work.sqlite').write_bytes(b'not portable')
+    (cache/'index.json').write_text('{"record_parts":["records/a.json"]}')
+    (cache/'records').mkdir();(cache/'records/a.json').write_text('{"source":{"text_cache":"body"}}')
+    (cache/'published-text').mkdir();(cache/'published-text/body.json').write_text('{"text":"last good body"}')
+    (cache/'words').mkdir();(cache/'words/body.json').write_text('["complete","search","text"]')
+    archive=tmp_path/'archive';assert pack(cache,archive)['files']==5
+    target=tmp_path/'restored';restore(archive,target)
+    assert json.loads((target/'git/a.json').read_text())['text']=='private'
+    assert not (target/'work.sqlite').exists()
+    assert json.loads((target/'words/body.json').read_text())==['complete','search','text']
+    assert json.loads((target/'published-text/body.json').read_text())['text']=='last good body'
+    assert json.loads((target/'index.json').read_text())['record_parts']==['records/a.json']
+    part=next(archive.glob('*.zip'));part.write_bytes(b'corrupt')
+    with pytest.raises(ValueError,match='checksum'):restore(archive,tmp_path/'corrupt')
+
+
+def test_empty_original_is_not_a_parser_failure():
+    for suffix in ('.pdf','.epub','.doc','.txt'):
+        assert extract_complete(b'  \n',suffix)[1] == 'empty_source'
+
+
+def test_temporary_download_name_requires_an_intact_pdf():
+    import fitz
+    pdf=fitz.open();page=pdf.new_page();page.insert_text((72,72),'Company earnings and business research original.')
+    raw=pdf.tobytes();pdf.close()
+    text,status,details=extract_complete(raw,'.crdownload')
+    assert status=='indexed' and 'business research' in text
+    assert details['pages']==1 and details['integrity']=='Complete unrepaired PDF'
+    assert extract_complete(raw[:-40],'.crdownload')[1]=='failed'
+    assert extract_complete(b'not a PDF','.crdownload')[1]=='unsupported'
+
+
+def test_cache_inventory_changes_do_not_reupload_unrelated_originals(tmp_path):
+    cache=tmp_path/'cache';(cache/'git').mkdir(parents=True)
+    (cache/'git/aa01.json').write_text('{"text":"first original"}')
+    (cache/'git/bb01.json').write_text('{"text":"second original"}')
+    (cache/'index.json').write_text('{"generated_at":"before"}')
+    archive=tmp_path/'archive';pack(cache,archive)
+    before={p['file'] for p in json.loads((archive/'manifest.json').read_text())['parts']}
+    (cache/'index.json').write_text('{"generated_at":"a different metadata length"}')
+    pack(cache,archive)
+    after={p['file'] for p in json.loads((archive/'manifest.json').read_text())['parts']}
+    assert len(before & after)==2
+    restored=tmp_path/'restored';restore(archive,restored)
+    assert json.loads((restored/'index.json').read_text())['generated_at']=='a different metadata length'
+    assert (restored/'git/aa01.json').read_bytes()==(cache/'git/aa01.json').read_bytes()
+
+
+def test_unchanged_archive_reuses_verified_parts_and_repairs_corruption(tmp_path,monkeypatch):
+    import company_source_cache as module
+    cache=tmp_path/'cache';(cache/'git').mkdir(parents=True)
+    (cache/'git/aa.json').write_text('{"text":"complete original"}')
+    archive=tmp_path/'archive';pack(cache,archive)
+    original=module.zipfile.ZipFile
+    def should_not_compress(*args,**kwargs):raise AssertionError('Unchanged original was recompressed')
+    with monkeypatch.context() as patch:
+        patch.setattr(module.zipfile,'ZipFile',should_not_compress)
+        assert pack(cache,archive)['files']==1
+    part=next(archive.glob('*.zip'));part.write_bytes(b'corrupted archive')
+    pack(cache,archive);restore(archive,tmp_path/'restored')
+    assert (tmp_path/'restored/git/aa.json').read_bytes()==(cache/'git/aa.json').read_bytes()

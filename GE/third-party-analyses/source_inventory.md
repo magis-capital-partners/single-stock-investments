@@ -1,7 +1,7 @@
 # GE — Third-party source inventory
 
-**Date:** 2026-10-11
-**Sources:** 147 total (0 approved, 0 pending, 147 context)
+**Date:** 2026-10-25
+**Sources:** 148 total (0 approved, 0 pending, 148 context)
 
 | ID | Title | Path | Status | Use |
 |----|-------|------|--------|-----|
@@ -152,5 +152,6 @@
 | activist_long | acc0000040545 26 000047 | `GE/third-party-analyses/activist_reports/long/8-K_20260716_acc0000040545_26_000047.htm` | context | activist/long — local |
 | activist_long | acc0000950142 26 002501 | `GE/third-party-analyses/activist_reports/long/8-K_20260908_acc0000950142_26_002501.htm` | context | activist/long — local |
 | activist_long | acc0000040545 26 000059 | `GE/third-party-analyses/activist_reports/long/8-K_20260922_acc0000040545_26_000059.htm` | context | activist/long — local |
+| activist_long | acc0000040545 26 000063 | `GE/third-party-analyses/activist_reports/long/8-K_20261020_acc0000040545_26_000063.htm` | context | activist/long — local |
 
-Cross-check required: `GE/research/cross_check_third_party_2026-10-11.md`
+Cross-check required: `GE/research/cross_check_third_party_2026-10-25.md`

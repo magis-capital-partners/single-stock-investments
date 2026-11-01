@@ -1,6 +1,6 @@
 # TSN — Third-party source inventory
 
-**Date:** 2026-10-11
+**Date:** 2026-10-27
 **Sources:** 114 total (0 approved, 0 pending, 114 context)
 
 | ID | Title | Path | Status | Use |
@@ -120,4 +120,4 @@
 | activist_long | acc0001140361 26 034204 | `TSN/third-party-analyses/activist_reports/long/8-K_20260824_acc0001140361_26_034204.htm` | context | activist/long — local |
 | activist_long | acc0000100493 26 000067 | `TSN/third-party-analyses/activist_reports/long/8-K_20260903_acc0000100493_26_000067.htm` | context | activist/long — local |
 
-Cross-check required: `TSN/research/cross_check_third_party_2026-10-11.md`
+Cross-check required: `TSN/research/cross_check_third_party_2026-10-27.md`

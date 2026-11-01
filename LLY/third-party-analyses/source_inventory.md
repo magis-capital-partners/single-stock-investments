@@ -1,7 +1,7 @@
 # LLY — Third-party source inventory
 
-**Date:** 2026-10-11
-**Sources:** 54 total (0 approved, 0 pending, 54 context)
+**Date:** 2026-10-25
+**Sources:** 55 total (0 approved, 0 pending, 55 context)
 
 | ID | Title | Path | Status | Use |
 |----|-------|------|--------|-----|
@@ -14,6 +14,7 @@
 | activist_long | ELI LILLY & Co — SC 13D | `LLY/third-party-analyses/activist_reports/long/SC-13D_20260730_acc0000059478_26_000072.xml` | context | activist/long — sec_edgar |
 | activist_long | Eli Lilly and Company — SC 13D | `LLY/third-party-analyses/activist_reports/long/SC-13D_20260115_acc0001193125_26_013469.xml` | context | activist/long — sec_edgar |
 | activist_long | Bulldog Investors — SC TO-T | `LLY/third-party-analyses/activist_reports/long/SC-TO-T_20230713_acc0001193125_23_186293.htm` | context | activist/long — sec_edgar |
+| activist_long | ELI LILLY & Co — SC 13D | `LLY/third-party-analyses/activist_reports/long/SC-13D_20261016_acc0000059478_26_000095.xml` | context | activist/long — sec_edgar |
 | activist_long | acc0001193125 21 357380 | `LLY/third-party-analyses/activist_reports/long/8-K_20211215_acc0001193125_21_357380.htm` | context | activist/long — local |
 | activist_long | acc0001193125 21 359144 | `LLY/third-party-analyses/activist_reports/long/8-K_20211216_acc0001193125_21_359144.htm` | context | activist/long — local |
 | activist_long | acc0001193125 22 022446 | `LLY/third-party-analyses/activist_reports/long/8-K_20220131_acc0001193125_22_022446.htm` | context | activist/long — local |
@@ -60,4 +61,4 @@
 | activist_long | acc0001193125 26 232707 | `LLY/third-party-analyses/activist_reports/long/8-K_20260520_acc0001193125_26_232707.htm` | context | activist/long — local |
 | activist_long | acc0000059478 26 000077 | `LLY/third-party-analyses/activist_reports/long/8-K_20260805_acc0000059478_26_000077.htm` | context | activist/long — local |
 
-Cross-check required: `LLY/research/cross_check_third_party_2026-10-11.md`
+Cross-check required: `LLY/research/cross_check_third_party_2026-10-25.md`

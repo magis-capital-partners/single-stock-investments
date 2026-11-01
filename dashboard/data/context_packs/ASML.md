@@ -17,7 +17,7 @@ The market may be paying for a long EUV and High-NA upgrade cycle while underpri
 - Base return: pending
 
 ## Key assumptions (stable)
-- Price today: **$1565.9** (source: Yahoo ASML close 2026-10-30)
+- Price today: **$1804.96** (source: Yahoo ASML close 2026-10-07)
 - Normalized owner earnings: **$13,025M** (source: us-gaap:NetCashProvidedByUsedInOperatingActivities; accession 0001628280-26-011378; form 20-F)
 - Cash: **$15,176M** (source: us-gaap:CashCashEquivalentsRestrictedCashAndRestrictedCashEquivalents; accession 0001628280-26-011378; form 20-F)
 - Debt: **$3,183M** (source: us-gaap:LongTermDebtNoncurrent; accession 0001628280-26-011378; form 20-F)
@@ -178,12 +178,12 @@ Documents in folder: **9** (all listed below; Tier 1–3 extracted or keyword-sc
 - StockholdersEquit
 
 ## Canonical pointers (open only when needed)
-- deep_dive: ASML/research/deep_dive_2026-11-01.md (sha256 sha256:8d8db9461c9cd910...)
+- deep_dive: ASML/research/deep_dive_2026-09-29.md (sha256 sha256:61176f1b0e93da3b...)
 - filing_digest: ASML/research/evidence/filing_digest.md (sha256 sha256:6f3e02ae394539ec...)
-- adversarial: ASML/research/adversarial_2026-11-01.md (sha256 sha256:7aaebfdd2b355c6f...)
-- valuation: ASML/research/valuation.json (sha256 sha256:c38cc193bae61d38...)
-- thesis_card: ASML/research/thesis_card.json (sha256 sha256:3303532b707abc7c...)
-- cross_check: ASML/research/cross_check_third_party_2026-11-01.md (sha256 sha256:a4e0462a5409baba...)
+- adversarial: ASML/research/adversarial_2026-09-29.md (sha256 sha256:e42944dcde17ccb9...)
+- valuation: ASML/research/valuation.json (sha256 sha256:e012f62049258051...)
+- thesis_card: ASML/research/thesis_card.json (sha256 sha256:69339dec05100e8d...)
+- cross_check: ASML/research/cross_check_third_party_2026-09-29.md (sha256 sha256:e128b1027c34a4b6...)
 
 ## Excluded from this pack
 - ASML/research/valuation.json (full; returns block included, open only for assumption audit)

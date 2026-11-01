@@ -1,7 +1,7 @@
 # CART — Third-party source inventory
 
-**Date:** 2026-10-11
-**Sources:** 39 total (0 approved, 0 pending, 39 context)
+**Date:** 2026-10-27
+**Sources:** 40 total (0 approved, 0 pending, 40 context)
 
 | ID | Title | Path | Status | Use |
 |----|-------|------|--------|-----|
@@ -44,5 +44,6 @@
 | activist_long | acc0001628280 26 039143 | `CART/third-party-analyses/activist_reports/long/8-K_20260529_acc0001628280_26_039143.htm` | context | activist/long — local |
 | activist_long | acc0001579091 26 000040 | `CART/third-party-analyses/activist_reports/long/8-K_20260806_acc0001579091_26_000040.htm` | context | activist/long — local |
 | activist_long | acc0001579091 26 000047 | `CART/third-party-analyses/activist_reports/long/8-K_20260925_acc0001579091_26_000047.htm` | context | activist/long — local |
+| activist_long | acc0001579091 26 000050 | `CART/third-party-analyses/activist_reports/long/8-K_20261026_acc0001579091_26_000050.htm` | context | activist/long — local |
 
-Cross-check required: `CART/research/cross_check_third_party_2026-10-11.md`
+Cross-check required: `CART/research/cross_check_third_party_2026-10-27.md`

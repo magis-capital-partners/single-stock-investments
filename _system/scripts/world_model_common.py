@@ -181,6 +181,15 @@ def resolve_source_actual(source: str, ticker: str) -> tuple[Any, str | None]:
     """Return (value, as_of) for theme:/valuation:/derived: sources."""
     if not source:
         return None, None
+    if source.startswith("operating:"):
+        from operating_kpis.model import period_end, period_key
+        key = source.split(":", 1)[1]
+        store = load_json(ROOT / "_system/reference/market-data/operating_kpis" / f"{ticker}.json")
+        rows = [p for p in store.get("points") or [] if p.get("kpi") == key and period_end(p.get("period"))]
+        if not rows:
+            return None, None
+        latest = max(rows, key=lambda p: period_key(p["period"]))
+        return latest.get("value"), period_end(latest["period"]).isoformat()
     if source.startswith("theme:"):
         sid = source.split(":", 1)[1]
         row = theme_series_lookup(sid)

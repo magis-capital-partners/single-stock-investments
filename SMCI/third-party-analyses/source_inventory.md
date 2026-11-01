@@ -1,7 +1,7 @@
 # SMCI — Third-party source inventory
 
-**Date:** 2026-10-11
-**Sources:** 4 total (0 approved, 0 pending, 4 context)
+**Date:** 2026-10-25
+**Sources:** 5 total (0 approved, 0 pending, 5 context)
 
 | ID | Title | Path | Status | Use |
 |----|-------|------|--------|-----|
@@ -9,5 +9,6 @@
 | activist_long | Oaktree Value Equity Fund, L.P. — SC 13D/A | `SMCI/third-party-analyses/activist_reports/long/SC-13D/A_20210331_acc0000902664_21_002138.htm` | context | activist/long — sec_edgar |
 | activist_long | Oaktree Value Equity Fund, L.P. — SC 13D/A | `SMCI/third-party-analyses/activist_reports/long/SC-13D/A_20210617_acc0000902664_21_003183.htm` | context | activist/long — sec_edgar |
 | activist_long | Oaktree Value Equity Fund, L.P. — SC 13D | `SMCI/third-party-analyses/activist_reports/long/SC-13D_20200319_acc0000902664_20_001580.htm` | context | activist/long — sec_edgar |
+| activist_short | Super Micro Computer, Inc. | `_system/reference/activist-reports/spruce_point/spruce_point_2023-01-10_super-micro-computer-inc.html` | context | activist/short — publisher_site |
 
-Cross-check required: `SMCI/research/cross_check_third_party_2026-10-11.md`
+Cross-check required: `SMCI/research/cross_check_third_party_2026-10-25.md`

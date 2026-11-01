@@ -1,23 +1,330 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "$id": "magis.valuation.v2",
+  "$id": "magis.valuation.v3",
   "title": "Magis valuation.json",
   "type": "object",
-  "required": ["ticker", "schema_version", "returns"],
+  "required": [
+    "ticker",
+    "schema_version",
+    "returns"
+  ],
   "properties": {
-    "ticker": {"type": "string", "minLength": 1},
-    "schema_version": {"const": "magis.valuation.v2"},
-    "as_of": {"type": ["string", "null"]},
-    "method": {"type": ["string", "null"]},
+    "ticker": {
+      "type": "string",
+      "minLength": 1
+    },
+    "schema_version": {
+      "enum": [
+        "magis.valuation.v2",
+        "magis.valuation.v3"
+      ]
+    },
+    "as_of": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "method": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
     "returns": {
       "type": "object",
-      "required": ["base_irr_pct", "unit"],
+      "required": [
+        "base_irr_pct",
+        "unit"
+      ],
       "properties": {
-        "base_irr_pct": {"type": ["number", "null"]},
-        "unit": {"const": "percent_per_year"},
-        "label": {"type": ["string", "null"]},
-        "display": {"type": ["string", "null"]},
-        "scenarios_pct": {"type": "object"}
+        "base_irr_pct": {
+          "type": [
+            "number",
+            "null"
+          ]
+        },
+        "unit": {
+          "const": "percent_per_year"
+        },
+        "label": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "display": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "scenarios_pct": {
+          "type": "object"
+        }
+      }
+    },
+    "tci_return_bridge": {
+      "type": "object",
+      "required": [
+        "schema_version",
+        "unit",
+        "horizon_years",
+        "status",
+        "scenarios",
+        "sources"
+      ],
+      "properties": {
+        "schema_version": {
+          "const": "1.0"
+        },
+        "unit": {
+          "const": "percent_per_year"
+        },
+        "horizon_years": {
+          "const": 7
+        },
+        "status": {
+          "enum": [
+            "gap",
+            "diagnostic",
+            "reviewed"
+          ]
+        },
+        "scenarios": {
+          "type": "object",
+          "required": [],
+          "properties": {
+            "bear": {
+              "$ref": "#/$defs/tci_scenario"
+            },
+            "base": {
+              "$ref": "#/$defs/tci_scenario"
+            },
+            "bull": {
+              "$ref": "#/$defs/tci_scenario"
+            }
+          }
+        },
+        "sensitivity_10yr": {
+          "type": "object",
+          "required": [],
+          "properties": {
+            "bear": {
+              "$ref": "#/$defs/tci_scenario"
+            },
+            "base": {
+              "$ref": "#/$defs/tci_scenario"
+            },
+            "bull": {
+              "$ref": "#/$defs/tci_scenario"
+            }
+          }
+        },
+        "sources": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/tci_source"
+          }
+        },
+        "gaps": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "persona_horizon_note": {
+          "type": "string"
+        }
+      }
+    }
+  },
+  "allOf": [
+    {
+      "if": {
+        "properties": {
+          "schema_version": {
+            "const": "magis.valuation.v2"
+          }
+        }
+      },
+      "then": {
+        "not": {
+          "required": [
+            "tci_return_bridge"
+          ]
+        }
+      }
+    }
+  ],
+  "$defs": {
+    "tci_source": {
+      "type": "object",
+      "required": [
+        "ref",
+        "as_of",
+        "claim_type"
+      ],
+      "properties": {
+        "ref": {
+          "type": "string",
+          "minLength": 1
+        },
+        "locator": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "as_of": {
+          "type": "string",
+          "format": "date"
+        },
+        "claim_type": {
+          "enum": [
+            "fact",
+            "inference",
+            "opinion"
+          ]
+        },
+        "status": {
+          "enum": [
+            "locked",
+            "assumption",
+            "gap",
+            "pending_human_review"
+          ]
+        }
+      }
+    },
+    "tci_scenario": {
+      "type": "object",
+      "required": [
+        "fcf_yield_pct",
+        "per_share_fcf_growth_pct",
+        "multiple_change_pct",
+        "approximate_return_pct",
+        "exact_irr_pct",
+        "reconciliation_gap_pp"
+      ],
+      "properties": {
+        "fcf_yield_pct": {
+          "type": [
+            "number",
+            "null"
+          ]
+        },
+        "per_share_fcf_growth_pct": {
+          "type": [
+            "number",
+            "null"
+          ]
+        },
+        "multiple_change_pct": {
+          "type": [
+            "number",
+            "null"
+          ]
+        },
+        "approximate_return_pct": {
+          "type": [
+            "number",
+            "null"
+          ]
+        },
+        "exact_irr_pct": {
+          "type": [
+            "number",
+            "null"
+          ]
+        },
+        "reconciliation_gap_pp": {
+          "type": [
+            "number",
+            "null"
+          ]
+        },
+        "growth_components": {
+          "type": "object",
+          "required": [],
+          "properties": {
+            "organic_growth_pct": {
+              "type": [
+                "number",
+                "null"
+              ]
+            },
+            "reinvestment_rate_pct": {
+              "type": [
+                "number",
+                "null"
+              ]
+            },
+            "incremental_roic_pct": {
+              "type": [
+                "number",
+                "null"
+              ]
+            },
+            "dilution_pct": {
+              "type": [
+                "number",
+                "null"
+              ]
+            },
+            "buyback_accretion_pct": {
+              "type": [
+                "number",
+                "null"
+              ]
+            },
+            "unexplained_growth_pp": {
+              "type": [
+                "number",
+                "null"
+              ]
+            }
+          }
+        },
+        "causal_drivers": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "required": [
+              "kpi_id",
+              "mechanism",
+              "source",
+              "status"
+            ],
+            "properties": {
+              "kpi_id": {
+                "type": "string"
+              },
+              "value": {
+                "type": [
+                  "number",
+                  "null"
+                ]
+              },
+              "mechanism": {
+                "type": "string",
+                "minLength": 1
+              },
+              "source": {
+                "$ref": "#/$defs/tci_source"
+              },
+              "status": {
+                "const": "assumption"
+              }
+            }
+          }
+        },
+        "moat_impairment_spec_ids": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        }
       }
     }
   }

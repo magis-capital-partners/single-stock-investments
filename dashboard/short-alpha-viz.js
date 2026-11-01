@@ -309,7 +309,7 @@
         <td class="short-symbol">${esc(row.ticker)}</td>
         <td>${esc(row.security_name || '')}${row.summary ? `<small class="short-summary" title="${esc(row.summary)}">${esc(row.summary)}</small>` : ''}${entryMeta(row)}</td>
         <td><span class="short-stage" data-stage="${esc(row.stage || '')}">${esc(row.stage || '—')}</span>${lensStrip(row.lens_reviews)}</td>
-        <td class="num">${scoreBadge(row.quant)}</td>
+
         <td>${tags}</td>
         <td>${esc(sourceLabel(row, sourceTypes))}</td>
         <td>${esc(row.research?.next_step || '—')}</td>
@@ -318,7 +318,7 @@
       </tr>`;
     }).join('');
     return `<div class="short-names-wrap"><table class="short-names">
-      <thead><tr><th>Ticker</th><th>Name</th><th>Stage</th><th>Score</th><th>Frameworks</th><th>Source</th><th>Next gate</th><th>Borrow</th><th>Days to cover</th></tr></thead>
+      <thead><tr><th>Ticker</th><th>Name</th><th>Stage</th><th>Frameworks</th><th>Source</th><th>Next gate</th><th>Borrow</th><th>Days to cover</th></tr></thead>
       <tbody>${body}</tbody>
     </table></div>`;
   }
@@ -352,7 +352,7 @@
       </div>
       <div class="short-sources">${sources || '<span class="form-hint">No sources linked.</span>'}</div>
       ${lensTable(candidate.lens_reviews)}
-      ${quantCard(candidate.quant, payload, maps)}
+      ${candidate.quant ? `<p><a href="#/strategies/systematic-shorts/signals?ticker=${encodeURIComponent(candidate.ticker)}">Inspect quantitative evidence in Systematic Shorts →</a></p>` : ''}
       ${furnace ? `<div class="short-detail-card"><h4>Filing events</h4><ul>${furnace}</ul></div>` : ''}
     </section>`;
   }
@@ -427,9 +427,18 @@
       </div>
     </details>`;
   }
+  function renderIssuanceSignals(payload, filters) {
+    return global.BuybackViz ? global.BuybackViz.renderSignals(payload.buyback_issuance_signals || [], filters) : '';
+  }
+  let lastBuybackFocus = '';
   function render(payload) {
     const maps = { frameworks: frameworkMap(payload), payload };
     const saved = read(FILTER_KEY, { query: '', framework: 'all', stage: 'all' });
+    const buybackFocus = new URLSearchParams(global.location?.hash.split('?')[1] || '').get('buyback');
+    if (buybackFocus && buybackFocus !== lastBuybackFocus) {
+      saved.query = buybackFocus; saved.framework = 'dilution_financing'; saved.stage = 'all';
+      write(FILTER_KEY, saved); lastBuybackFocus = buybackFocus;
+    }
     const selected = read(SELECTED_KEY, '');
     const candidates = getCandidates(payload).filter(row => {
       const hay = `${row.ticker} ${row.security_name} ${row.hypothesis} ${row.origin || ''} ${row.category || ''} ${row.source || ''} ${(row.tags || []).join(' ')} ${row.summary || ''}`.toLowerCase();
@@ -458,7 +467,7 @@
       ? ` Days to cover: FINRA short interest settled ${cm.settlement}, ${cm.covered ?? 0} names. Context, not a reason to short.`
       : '';
     const stages = ['all', 'lead', 'researching', 'ic', 'live', 'closed', 'rejected'];
-    return `${navigation('ideas')}<div data-short-backtest-teaser class="short-backtest-teaser-slot"><a class="rsp-action" href="#/ideas/short-alpha/backtest">Open reverse-split backtest</a></div><div class="short-alpha-header">
+    return `${navigation('ideas')}<div class="short-alpha-header">
       <div><div class="short-alpha-kicker">Short Alpha</div><h2>Frameworks, names that fit, and the open book</h2><p>Every lens from the short library, every name that fits one, and the positions we have actually borrowed. A publisher hit is a lead. It is not a thesis.</p></div>
       <div class="short-alpha-rail"><span>Framework</span><i></i><span>Name</span><i></i><span>Position</span></div>
     </div>
@@ -466,7 +475,6 @@
       <div class="short-alpha-stat"><span>Names</span><strong>${summary.candidate_count ?? candidates.length}</strong><small>${summary.lead_count ?? 0} leads</small></div>
       <div class="short-alpha-stat"><span>Open book</span><strong>${summary.position_count ?? positions.length}</strong><small>borrowed shorts</small></div>
       <div class="short-alpha-stat"><span>Research complete</span><strong>${summary.research_complete_count ?? 0}/${summary.position_count ?? positions.length}</strong><small>open positions; artifact gate, not an IC decision</small></div>
-      <div class="short-alpha-stat"><span>Quant screen</span><strong>${payload.quant_screen ? (payload.quant_screen.scored_count ?? '—') : '—'}</strong><small>${payload.quant_screen ? `scored of ${payload.quant_screen.universe_count ?? '—'} names` : 'not built on this checkout'}</small></div>
     </div>
     <section class="short-section"><h3 class="short-section-title">Frameworks</h3>${renderFrameworkBoard(payload, saved.framework)}</section>
     <div class="short-alpha-toolbar">
@@ -481,31 +489,27 @@
       ${renderNames(candidates, payload, selected)}
       ${renderDetail(selectedRow && candidates.some(row => row.ticker === selectedRow.ticker) ? selectedRow : null, payload)}
     </section>
-    ${renderScreen(payload, selected)}
     <section class="short-section"><h3 class="short-section-title">Open book <span>${positions.length}</span></h3>
       <div class="short-alpha-book">${positions.length ? positions.map(row => renderPosition(row, maps)).join('') : '<div class="short-alpha-empty">No borrowed shorts in this partition.</div>'}</div>
       ${closedPositions.length ? `<h4 class="short-closed-title">Closed <span>${closedPositions.length}</span></h4><div class="short-alpha-book is-closed">${closedPositions.map(row => renderPosition(row, maps)).join('')}</div>` : ''}
     </section>
-    <section class="short-section short-reverse-splits" data-short-reverse-splits hidden>
-      <h3 class="short-section-title">Reverse splits</h3>
-      <div data-short-reverse-splits-body></div>
-    </section>
-    <p class="short-alpha-note">${['borrow', 'crowding', 'leads', 'reverse_splits', 'quant', 'excluded', 'desk_notes'].map(key => esc(payload.methodology?.[key] || '')).filter(Boolean).join(' ')}</p>`;
+    <p class="short-alpha-note">${['borrow', 'crowding', 'leads', 'excluded', 'desk_notes'].map(key => esc(payload.methodology?.[key] || '')).filter(Boolean).join(' ')}</p>`;
   }
   function navigation(section) {
-    return `<nav class="short-view-nav" aria-label="Shorts research"><a href="#/ideas/short-alpha"${section==='ideas' ? ' aria-current="page"' : ''}>Short ideas</a><a href="#/ideas/short-alpha/backtest"${section==='backtest' ? ' aria-current="page"' : ''}>Reverse-split backtest</a></nav>`;
+    return `<nav class="short-view-nav" aria-label="Shorts research"><a href="#/ideas/short-alpha"${section==='ideas' ? ' aria-current="page"' : ''}>Short ideas</a><a href="#/strategies/systematic-shorts/backtest"${section==='backtest' ? ' aria-current="page"' : ''}>Systematic Shorts →</a></nav>`;
   }
   function renderBacktest() {
-    return `${navigation('backtest')}<section class="short-section short-reverse-splits" data-short-reverse-splits><div class="rsp-feed-status" data-short-reverse-status role="status">Loading reverse-split results…</div><div data-short-reverse-splits-body></div></section>`;
+    return `${navigation('backtest')}<a class="tps-teaser" href="#/strategies/systematic-shorts/announcement"><span><strong>New: short from the announcement</strong><small>Full-size results by first, second and third-plus split, with announcement-time fundamentals</small></span><span aria-hidden="true">Compare →</span></a><a class="tps-teaser" href="#/strategies/systematic-shorts/forward"><span><strong>Follow the frozen 20-session policy</strong><small>New candidates, decisions recorded before entry, and observed paper results</small></span><span aria-hidden="true">Open →</span></a>${global.ThirdPlusStudyViz ? global.ThirdPlusStudyViz.render() : '<p class="short-alpha-note">Third-plus study is unavailable. Earlier backtests are preserved below.</p>'}<details class="tps-legacy" data-third-plus-legacy><summary>Earlier portfolio, execution and event studies<small>Separate research versions with different rules and assumptions</small></summary><section class="short-section short-reverse-splits" data-short-reverse-splits><div class="rsp-feed-status" data-short-reverse-status role="status">Open this section to load earlier results.</div><div data-short-reverse-splits-body></div></section></details>`;
   }
   // The Reverse splits sub-section is filled by index.html from data/reverse_splits.json
   // through window.ReverseSplitsViz.render(doc) (dashboard/reverse-splits-viz.js). The
   // section stays hidden when the file is absent or the renderer is not loaded.
   function mountReverseSplits(container, doc) {
     const teaser=container && container.querySelector('[data-short-backtest-teaser]');
+    if(teaser && global.ThirdPlusStudyViz){teaser.innerHTML=global.ThirdPlusStudyViz.teaser();return true;}
     if(teaser){
       const html=global.ShortsNetEdgeViz?.teaser(doc) || global.ReverseSplitsPortfolioViz?.teaser(doc);
-      teaser.innerHTML=html || '<p class="rsp-feed-status">Backtest summary unavailable. <a href="#/ideas/short-alpha/backtest">Open the backtest view</a> for its data status.</p>';
+      teaser.innerHTML=html || '<p class="rsp-feed-status">Backtest summary unavailable. <a href="#/strategies/systematic-shorts/backtest">Open the backtest view</a> for its data status.</p>';
       // Older ledgers without portfolio results retain their original mount.
       if(html || !doc)return Boolean(html);
     }
@@ -541,6 +545,7 @@
     return out;
   }
   function attach(container, payload, rerender) {
+    global.BuybackViz?.attachSignals(container, rerender);
     const search = container.querySelector('[data-short-search]');
     const framework = container.querySelector('[data-short-framework]');
     const stage = container.querySelector('[data-short-stage]');
@@ -682,5 +687,34 @@
       rerender();
     }));
   }
-  global.ShortAlphaViz = { render, renderBacktest, attach, getCandidates, getPositions, mountReverseSplits, lensStrip, noteRefHtml, entryMeta };
+
+  function systematicRows(payload) {
+    const rows = new Map((payload.quant_screen?.rows || []).map(r => [r.ticker, r]));
+    for (const candidate of getCandidates(payload)) {
+      if (candidate.quant) rows.set(candidate.ticker, {...candidate.quant, ticker:candidate.ticker, company:candidate.security_name});
+    }
+    return [...rows.values()].sort((a,b) => (Number(b.score)||0)-(Number(a.score)||0) || a.ticker.localeCompare(b.ticker));
+  }
+  function renderSystematicSignals(payload, page=0, query='', selected='') {
+    const q=query.trim().toLowerCase(), rows=systematicRows(payload).filter(r=>!q||`${r.ticker} ${r.company||''}`.toLowerCase().includes(q));
+    const pages=Math.max(1,Math.ceil(rows.length/40));page=Math.min(Math.max(0,page),pages-1);
+    const selectedRow=rows.find(r=>r.ticker===selected), maps=frameworkMap(payload);
+    return `<section class="strategy-section"><h2>Systematic candidate signals</h2><form class="strategy-toolbar" data-systematic-search><label class="strategy-search">Company<input type="search" name="query" value="${esc(query)}" placeholder="Ticker or company…" autocomplete="off"></label><button type="submit">Search</button></form><p role="status">${rows.length} matching companies · page ${page+1} of ${pages}</p><div class="strategy-table-scroll"><table class="strategy-table"><thead><tr><th>Company</th><th>Score</th><th>Decay</th><th>Tape</th><th>Risk</th><th>Evidence</th></tr></thead><tbody>${rows.slice(page*40,(page+1)*40).map(r=>`<tr><th scope="row"><button type="button" class="linkish" data-systematic-ticker="${esc(r.ticker)}">${esc(r.ticker)}</button><small>${esc(r.company||'')}</small></th><td>${Number.isFinite(Number(r.score))?Number(r.score).toFixed(0):'Unscored'}</td><td>${fmtShare(r.decay)}</td><td>${fmtShare(r.tape)}</td><td>${fmtShare(r.risk)}</td><td>${r.evidence_count||0} signals</td></tr>${selected===r.ticker?`<tr><td colspan="6">${quantCard(r,payload,maps)}<a href="#/research/coverage/${encodeURIComponent(r.ticker)}?section=evidence">Open shared company research →</a></td></tr>`:''}`).join('')||'<tr><td colspan="6">No candidates match this search.</td></tr>'}</tbody></table></div><nav class="strategy-pagination" aria-label="Systematic candidate pages"><button type="button" data-systematic-page="${page-1}"${page===0?' disabled':''}>Previous</button><button type="button" data-systematic-page="${page+1}"${page+1>=pages?' disabled':''}>Next</button></nav></section>${renderIssuanceSignals(payload,{})}`;
+  }
+  function attachSystematicSignals(container,payload) {
+    const params=new URLSearchParams(location.hash.split('?')[1]||'');
+    let page=Math.max(0,Number(params.get('page'))||0), query=params.get('q')||'', selected=params.get('ticker')||'';
+    const host=container.querySelector('[data-strategy-short-signals]')||container;
+    function paint(){
+      host.innerHTML=renderSystematicSignals(payload,page,query,selected);
+      const next=new URLSearchParams();if(query)next.set('q',query);if(page)next.set('page',page);if(selected)next.set('ticker',selected);
+      history.replaceState(null,'','#/strategies/systematic-shorts/signals'+(next.size?'?'+next:''));
+      host.querySelector('[data-systematic-search]')?.addEventListener('submit',event=>{event.preventDefault();query=event.currentTarget.elements.query.value;page=0;paint();});
+      host.querySelectorAll('[data-systematic-page]').forEach(button=>button.addEventListener('click',()=>{page=Math.max(0,Number(button.dataset.systematicPage));paint();}));
+      host.querySelectorAll('[data-systematic-ticker]').forEach(button=>button.addEventListener('click',()=>{selected=selected===button.dataset.systematicTicker?'':button.dataset.systematicTicker;paint();}));
+    }
+    paint();
+  }
+
+  global.ShortAlphaViz = { renderSystematicSignals, attachSystematicSignals, render, renderBacktest, attach, getCandidates, getPositions, mountReverseSplits, lensStrip, noteRefHtml, entryMeta };
 })(window);

@@ -19,7 +19,7 @@ import { readFileSync, readdirSync } from "node:fs";
 import { fileURLToPath } from "node:url";
 import { dirname, join } from "node:path";
 
-import { loadPortfolio, snapshotFreshness, storeAccountSnapshot, validateAccountSnapshot } from "../functions/_lib/portfolio.js";
+import { loadPortfolio, snapshotFreshness, storeAccountSnapshot, validateAccountSnapshot, validateSnapshotOwnership, storeAllocationProjection } from "../functions/_lib/portfolio.js";
 import { onRequestGet as performance } from "../functions/api/v2/portfolio/performance.js";
 
 const HERE = dirname(fileURLToPath(import.meta.url));
@@ -81,6 +81,60 @@ const positionsOnlyFlexRun = () => ({
 });
 
 const at = (iso) => ({ now: Date.parse(iso) });
+
+function sharedSnapshot() {
+  const payload = structuredClone(GOLDEN);
+  payload.source_run_id = "owned-shared";
+  payload.positions = [{ ...payload.positions[0], conid: 101, symbol: "SHARED", model_code: "", quantity: "10",
+    average_cost: "6.8", average_cost_native: "6.8", market_value: "100", market_value_native: "100", market_value_base: "100",
+    unrealized_pnl: "32", unrealized_pnl_base: "32", currency: "USD", native_currency: "USD" }];
+  const part = (owner, strategy, qty, cost, pnl) => ({ conid: 101, model_code: "", owner, strategy, quantity_decimal: qty,
+    confidence: "authoritative", position: { quantity_decimal: qty, average_cost_decimal: cost, average_cost_native_decimal: cost,
+      market_value_decimal: String(Number(qty) * 10), market_value_native_decimal: String(Number(qty) * 10),
+      market_value_base_decimal: String(Number(qty) * 10), unrealized_pnl_decimal: pnl, unrealized_pnl_base_decimal: pnl } });
+  payload.completeness.ownership_required = true;
+  payload.completeness.ownership = { version: "a".repeat(64), through: payload.completeness.session_date,
+    allocations: [part("unallocated", "ls_algo", "4", "5", "20"), part("michael", "single_stock", "6", "8", "12")] };
+  return payload;
+}
+
+test("broker snapshot atomically carries lot ownership and exact owner economics", async () => {
+  const { env, database } = freshEnv();
+  const payload = sharedSnapshot();
+  assert.equal(validateSnapshotOwnership(payload).allocations.length, 2);
+  await store(env, { ...GOLDEN, source_run_id: 'prior-day', as_of: '2026-09-23T22:00:00Z' });
+  await store(env, payload);
+  const all = await loadPortfolio(env, "all");
+  const mike = await loadPortfolio(env, "michael");
+  assert.equal(all.positions[0].quantity_decimal, "10");
+  assert.equal(mike.allocation_status, "complete");
+  assert.equal(mike.positions[0].quantity_decimal, "6");
+  assert.equal(mike.positions[0].average_cost_native_decimal, "8");
+  assert.equal(mike.positions[0].market_value_base_decimal, "60");
+  assert.equal(mike.positions[0].unrealized_pnl_base_decimal, "12");
+  assert.equal(mike.ownership_version, "a".repeat(64));
+  assert.equal((await loadPortfolio(env, "drew")).positions.length, 0);
+  await assert.rejects(storeAllocationProjection(env, { source_run_id: 'prior-day', projection_id: 'stale-projection',
+    account_alias: payload.account_alias, as_of: payload.as_of, allocations: [] }, Buffer.from('stale')), /Older allocation/);
+  await assert.rejects(store(env, { ...GOLDEN, source_run_id: 'legacy-after-cutover', as_of: '2026-10-27T12:00:00Z' }), /legacy snapshot/);
+  await storeAllocationProjection(env, { source_run_id: payload.source_run_id, projection_id: "old-publisher",
+    account_alias: payload.account_alias, as_of: payload.as_of, allocations: [] }, Buffer.from("old"));
+  assert.equal((await loadPortfolio(env, "michael")).positions[0].quantity_decimal, "6", "legacy publisher cannot overwrite canonical ownership");
+  database.exec("DELETE FROM portfolio_allocation_projections; DELETE FROM portfolio_allocations;");
+  assert.equal((await loadPortfolio(env, "michael")).positions.length, 0, "no residual fallback when canonical ownership is required");
+});
+
+test("invalid or missing lot ownership cannot replace the verified book", async () => {
+  const { env } = freshEnv();
+  await store(env, GOLDEN);
+  const payload = sharedSnapshot();
+  payload.completeness.ownership.allocations[1].quantity_decimal = "7";
+  await assert.rejects(store(env, payload), /lot allocation/i);
+  assert.equal((await loadPortfolio(env, "all")).snapshot.source_run_id, GOLDEN.source_run_id);
+  payload.completeness.ownership = null;
+  await assert.rejects(store(env, payload), /ownership registry/);
+  assert.equal((await loadPortfolio(env, "all")).snapshot.source_run_id, GOLDEN.source_run_id);
+});
 
 test("a complete Flex EOD run replaces the frozen collector run in the book", async () => {
   const { env } = freshEnv();

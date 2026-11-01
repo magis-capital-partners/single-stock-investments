@@ -1,4 +1,4 @@
-# TKO — Insider conviction (2026-10-15)
+# TKO — Insider conviction (2026-10-18)
 
 > Context only. Insider activity informs scenario confidence and stance discussion; it does not auto-inflate Lawrence base IRR. Promotion requires [HUMAN REVIEW].
 
@@ -21,8 +21,8 @@
 **Routine / planned sales (context):**
 
 - Emanuel Ariel: 39768 @ $203.41 on 2026-01-22
-- Khan Nick: 132 @ $181.09 on 2026-07-21
-- Khan Nick: 12866 @ $181.11 on 2026-07-21
+- Kapral Shane: 254 @ $199.15 on 2026-03-09
+- Kapral Shane: 616 @ $221.91 on 2026-03-03
 
 Source: `_system/reference/market-data/insider/TKO_transactions.csv`.
 Lawrence base IRR unchanged (`in_base_irr: False`).

@@ -1,9 +1,9 @@
 {
- "run_date": "2026-10-17",
- "git_head": "268ca5331f383a98d0a6a66b33f64dc72011a87d",
- "nodes": 8319,
- "edges": 7240,
- "exit_code": 0,
+ "run_date": "2026-11-01",
+ "git_head": "ab07f1bffbff75e75e42c37e75b62a898afda407",
+ "nodes": 8396,
+ "edges": 7396,
+ "exit_code": 1,
  "ratchet": {
   "armed": [
    "L1",
@@ -46,17 +46,16 @@
    "id": "P2",
    "severity": "report",
    "base_severity": "hard",
-   "count": 4,
+   "count": 3,
    "delta": "0",
    "status": "VIOLATIONS",
    "note": "demoted from hard -- 2026-08-10 TODO (count updated 2026-08-11: 6 of 14 after the two lens-plane guards, both wired via test_graph_invariants.py): 6 guards are enforced only by test suites (test_committee_livelock.py, tes",
    "violations": [
     "backfill-stall-breaker (enforcers: test_contract_backfill_lane.py)",
-    "ifrs-share-selector (enforcers: test_valuation_readiness_automation.py)",
     "onboard-default-discriminating-gate (enforcers: test_build_review_queue_rollup.py)",
     "park-on-any-landed-vote (enforcers: test_committee_livelock.py)"
    ],
-   "violations_total": 4,
+   "violations_total": 3,
    "waived": []
   },
   {
@@ -66,7 +65,7 @@
    "count": 0,
    "delta": "0",
    "status": "OK",
-   "note": "32 job-anchored lanes wired",
+   "note": "42 job-anchored lanes wired",
    "violations": [],
    "violations_total": 0,
    "waived": []
@@ -87,10 +86,10 @@
    "id": "P5",
    "severity": "report",
    "base_severity": "report",
-   "count": 23,
+   "count": 24,
    "delta": "0",
    "status": "VIOLATIONS",
-   "note": "33/56 validators referenced by CI",
+   "note": "37/61 validators referenced by CI",
    "violations": [
     "audit_dashboard_availability.py",
     "audit_document_registry.py",
@@ -99,33 +98,35 @@
     "audit_research_anomalies.py",
     "calibrate_letter_matching.py",
     "check_cross_checks.py",
-    "check_darwin_pit.py",
+    "check_desk_feed_age.py",
     "check_growth_falsifiers.py",
     "check_hk_cross_checks.py",
+    "check_holdings_confidentiality.py",
     "check_ib_gateway_registry.py",
     "check_kpi_ledger.py",
     "check_market_freshness.py",
     "check_podcast_no_audio.py",
+    "check_podcast_summary_coverage.py",
     "scan_hk_sources.py",
     "scan_third_party_sources.py",
     "test_build_review_queue_rollup.py",
-    "test_committee_livelock.py",
-    "test_contract_backfill_lane.py",
-    "test_persona_lens.py"
+    "test_committee_livelock.py"
    ],
-   "violations_total": 23,
+   "violations_total": 24,
    "waived": []
   },
   {
    "id": "P6",
    "severity": "hard",
    "base_severity": "hard",
-   "count": 0,
-   "delta": "0",
-   "status": "OK",
-   "note": "13/13 feeds fresh (capitulation_daily 13h, criticality_summary 30h, desk_briefs 5h, market_risk_components_committed 13h, podcast_catalog 2h, reverse_splits 5h, separations 5h, short_alpha 13h, special_situations 5h, spx_surface 30h, technical_summary 30h, vol_metrics 30h, warrant_monitor 5h)",
-   "violations": [],
-   "violations_total": 0,
+   "count": 1,
+   "delta": "+1",
+   "status": "VIOLATIONS",
+   "note": "13/14 feeds fresh (buyback_radar 110h, capitulation_daily 39h, criticality_summary 42h, desk_briefs 52h, market_risk_components_committed 39h, podcast_catalog 49h, reverse_splits 46h, separations 11h, short_alpha 88h, special_situations 11h, spx_surface 43h, technical_summary 42h, vol_metrics 43h, warrant_monitor 11h)",
+   "violations": [
+    "buyback_radar: stale (window 102h)"
+   ],
+   "violations_total": 1,
    "waived": []
   },
   {
@@ -144,24 +145,37 @@
    "id": "P8",
    "severity": "report",
    "base_severity": "report",
-   "count": 1,
-   "delta": "0",
+   "count": 14,
+   "delta": "+4",
    "status": "VIOLATIONS",
-   "note": "31 lanes fresh; stale lanes alert through the repository-health supervisor, never through this gate",
+   "note": "28 lanes fresh; stale lanes alert through the repository-health supervisor, never through this gate",
    "violations": [
-    "research-watchdog: last work-done receipt 187.8h old (window 54h)"
+    "committee: last work-done receipt 25.6h old (window 24h)",
+    "daily-sync: last work-done receipt 78.6h old (window 56h)",
+    "data-pipeline-activist: last work-done receipt 122.0h old (window 54h)",
+    "data-pipeline-buyback-radar: last work-done receipt 109.9h old (window 102h)",
+    "data-pipeline-downloads: last work-done receipt 68.6h old (window 56h)",
+    "data-pipeline-intake-full: last work-done receipt 125.9h old (window 54h)",
+    "data-pipeline-news: last work-done receipt 26.6h old (window 18h)",
+    "data-pipeline-world-model: last work-done receipt 499.8h old (window 342h)",
+    "licensed-research: no work-done receipt",
+    "ls-algo: last work-done receipt 78.7h old (window 54h)",
+    "research-quality-main: last work-done receipt 45.3h old (window 18h)",
+    "reverse-split-announcement-monitor: last work-done receipt 25.0h old (window 7h)",
+    "supervisor: last work-done receipt 26.8h old (window 12h)",
+    "valuation: last work-done receipt 123.1h old (window 56h)"
    ],
-   "violations_total": 1,
+   "violations_total": 14,
    "waived": []
   },
   {
    "id": "E1",
    "severity": "report",
    "base_severity": "report",
-   "count": 365,
+   "count": 366,
    "delta": "0",
    "status": "VIOLATIONS",
-   "note": "typed coverage 22/387 (5.7%) -- net_asset_value 3/93; owner_cash_or_dividend_discount 4/43; owner_earnings_reinvestment_dcf 14/122; reinvestment_return_dcf 1/1; 57 methods 0/128",
+   "note": "typed coverage 22/388 (5.7%) -- net_asset_value 3/93; owner_cash_or_dividend_discount 4/43; owner_earnings_reinvestment_dcf 14/123; reinvestment_return_dcf 1/1; 57 methods 0/128",
    "violations": [
     "0388.HK:core_engine [owner_cash_or_dividend_discount]",
     "0388.HK:downside_reserve [midcycle_capacity_value]",
@@ -184,7 +198,7 @@
     "9984.T:investment_portfolio_uplift [net_asset_value]",
     "AAL:aadvantage_co_brand_option [risk_adjusted_milestone_value]"
    ],
-   "violations_total": 365,
+   "violations_total": 366,
    "waived": []
   },
   {
@@ -194,7 +208,7 @@
    "count": 0,
    "delta": "0",
    "status": "OK",
-   "note": "40 typed, 9 matured",
+   "note": "43 typed, 13 matured",
    "violations": [],
    "violations_total": 0,
    "waived": []
@@ -206,7 +220,7 @@
    "count": 0,
    "delta": "0",
    "status": "OK",
-   "note": "13 outcomes",
+   "note": "18 outcomes",
    "violations": [],
    "violations_total": 0,
    "waived": []
@@ -218,7 +232,7 @@
    "count": 0,
    "delta": "0",
    "status": "OK",
-   "note": "83 beliefs at HEAD; history baseline faa2ef148603 spans 5 commits",
+   "note": "84 beliefs at HEAD; history baseline faa2ef148603 spans 6 commits",
    "violations": [],
    "violations_total": 0,
    "waived": []
@@ -241,7 +255,7 @@
    "id": "E6",
    "severity": "report",
    "base_severity": "report",
-   "count": 246,
+   "count": 248,
    "delta": "0",
    "status": "VIOLATIONS",
    "note": "",
@@ -267,7 +281,7 @@
     "2026-05-21 For exchanges, analyze **handled volume** alongside market share ? share loss an",
     "2026-05-21 Invest only in simple, understandable businesses with durable economics and hone"
    ],
-   "violations_total": 246,
+   "violations_total": 248,
    "waived": []
   },
   {
@@ -289,7 +303,7 @@
    "count": 0,
    "delta": "0",
    "status": "OK",
-   "note": "62 v3 forecasts, 7 derived eligible",
+   "note": "70 v3 forecasts, 7 derived eligible",
    "violations": [],
    "violations_total": 0,
    "waived": []
@@ -301,7 +315,7 @@
    "count": 0,
    "delta": "0",
    "status": "OK",
-   "note": "13 outcomes, 1 calibration eligible",
+   "note": "17 outcomes, 4 calibration eligible",
    "violations": [],
    "violations_total": 0,
    "waived": []
@@ -310,10 +324,10 @@
    "id": "L1",
    "severity": "report",
    "base_severity": "report",
-   "count": 541,
+   "count": 546,
    "delta": "0",
    "status": "VIOLATIONS",
-   "note": "189/730 tickers resolve (top-level 51, classification_inputs 136, registry 2)",
+   "note": "195/741 tickers resolve (top-level 54, classification_inputs 139, registry 2)",
    "violations": [
     "3905.T: no payoff_lens on any surface (top-level, classification_inputs, registry)",
     "8697.T: no payoff_lens on any surface (top-level, classification_inputs, registry)",
@@ -336,7 +350,7 @@
     "ARKK: no payoff_lens on any surface (top-level, classification_inputs, registry)",
     "ARM: no payoff_lens on any surface (top-level, classification_inputs, registry)"
    ],
-   "violations_total": 541,
+   "violations_total": 546,
    "waived": []
   },
   {
@@ -363,11 +377,13 @@
    "id": "L3",
    "severity": "report",
    "base_severity": "report",
-   "count": 30,
+   "count": 37,
    "delta": "0",
    "status": "VIOLATIONS",
-   "note": "30 stale, 0 missing where required, 0 undatable, over 730 tickers x 2 artifacts",
+   "note": "36 stale, 0 missing where required, 1 undatable, over 741 tickers x 2 artifacts",
    "violations": [
+    "BN: research/lenses.json behind research/valuation.json -- heal: python _system/scripts/persona_lens.py --all --skip-valuation (power-zone-universe lane; Makefile persona-lens for the f",
+    "MA: research/lenses.json behind research/valuation.json -- heal: python _system/scripts/persona_lens.py --all --skip-valuation (power-zone-universe lane; Makefile persona-lens for the f",
     "AAOI: research/valuation_route.json behind research/valuation.json -- heal: python _system/scripts/power_zone_router.py --scope valued (power-zone-universe cron 30 5 * * 1; ls-algo lane daily)",
     "ABX: research/valuation_route.json behind research/valuation.json -- heal: python _system/scripts/power_zone_router.py --scope valued (power-zone-universe cron 30 5 * * 1; ls-algo lane daily)",
     "ACMR: research/valuation_route.json behind research/valuation.json -- heal: python _system/scripts/power_zone_router.py --scope valued (power-zone-universe cron 30 5 * * 1; ls-algo lane daily)",
@@ -385,11 +401,9 @@
     "BBAI: research/valuation_route.json behind research/valuation.json -- heal: python _system/scripts/power_zone_router.py --scope valued (power-zone-universe cron 30 5 * * 1; ls-algo lane daily)",
     "BIIB: research/valuation_route.json behind research/valuation.json -- heal: python _system/scripts/power_zone_router.py --scope valued (power-zone-universe cron 30 5 * * 1; ls-algo lane daily)",
     "BTDR: research/valuation_route.json behind research/valuation.json -- heal: python _system/scripts/power_zone_router.py --scope valued (power-zone-universe cron 30 5 * * 1; ls-algo lane daily)",
-    "C: research/valuation_route.json behind research/valuation.json -- heal: python _system/scripts/power_zone_router.py --scope valued (power-zone-universe cron 30 5 * * 1; ls-algo lane daily)",
-    "CAMT: research/valuation_route.json behind research/valuation.json -- heal: python _system/scripts/power_zone_router.py --scope valued (power-zone-universe cron 30 5 * * 1; ls-algo lane daily)",
-    "CEG: research/valuation_route.json behind research/valuation.json -- heal: python _system/scripts/power_zone_router.py --scope valued (power-zone-universe cron 30 5 * * 1; ls-algo lane daily)"
+    "C: research/valuation_route.json behind research/valuation.json -- heal: python _system/scripts/power_zone_router.py --scope valued (power-zone-universe cron 30 5 * * 1; ls-algo lane daily)"
    ],
-   "violations_total": 30,
+   "violations_total": 37,
    "waived": []
   },
   {
@@ -399,7 +413,7 @@
    "count": 30,
    "delta": "0",
    "status": "VIOLATIONS",
-   "note": "18 non-canonical criteria values, 10 non-canonical data values (47 ticker-field hits), 2 lenses narrower than their zone",
+   "note": "18 non-canonical criteria values, 10 non-canonical data values (50 ticker-field hits), 2 lenses narrower than their zone",
    "violations": [
     "criteria: personas.json:marathon_capital_cycle:capacity_sensitive archetype 'commodity_cyclical' not canonical",
     "criteria: power_zones.json:zone:pabrai archetype 'commodity_cyclical' not canonical",
@@ -432,7 +446,7 @@
    "count": 0,
    "delta": "0",
    "status": "OK",
-   "note": "730 tickers with lenses.json",
+   "note": "735 tickers with lenses.json",
    "violations": [],
    "violations_total": 0,
    "waived": []
