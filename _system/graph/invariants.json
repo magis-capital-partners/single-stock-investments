@@ -1,9 +1,9 @@
 {
- "run_date": "2026-10-31",
- "git_head": "03eb51b14fe6ff5e6fdf4c14aa86283f0e84cd65",
- "nodes": 8404,
- "edges": 7392,
- "exit_code": 0,
+ "run_date": "2026-11-01",
+ "git_head": "ab07f1bffbff75e75e42c37e75b62a898afda407",
+ "nodes": 8396,
+ "edges": 7396,
+ "exit_code": 1,
  "ratchet": {
   "armed": [
    "L1",
@@ -119,12 +119,14 @@
    "id": "P6",
    "severity": "hard",
    "base_severity": "hard",
-   "count": 0,
-   "delta": "0",
-   "status": "OK",
-   "note": "14/14 feeds fresh (buyback_radar 85h, capitulation_daily 14h, criticality_summary 18h, desk_briefs 27h, market_risk_components_committed 14h, podcast_catalog 24h, reverse_splits 21h, separations 98h, short_alpha 64h, special_situations 98h, spx_surface 18h, technical_summary 18h, vol_metrics 18h, warrant_monitor 98h)",
-   "violations": [],
-   "violations_total": 0,
+   "count": 1,
+   "delta": "+1",
+   "status": "VIOLATIONS",
+   "note": "13/14 feeds fresh (buyback_radar 110h, capitulation_daily 39h, criticality_summary 42h, desk_briefs 52h, market_risk_components_committed 39h, podcast_catalog 49h, reverse_splits 46h, separations 11h, short_alpha 88h, special_situations 11h, spx_surface 43h, technical_summary 42h, vol_metrics 43h, warrant_monitor 11h)",
+   "violations": [
+    "buyback_radar: stale (window 102h)"
+   ],
+   "violations_total": 1,
    "waived": []
   },
   {
@@ -143,23 +145,27 @@
    "id": "P8",
    "severity": "report",
    "base_severity": "report",
-   "count": 10,
-   "delta": "+6",
+   "count": 14,
+   "delta": "+4",
    "status": "VIOLATIONS",
-   "note": "32 lanes fresh; stale lanes alert through the repository-health supervisor, never through this gate",
+   "note": "28 lanes fresh; stale lanes alert through the repository-health supervisor, never through this gate",
    "violations": [
-    "committee-outcomes: last work-done receipt 119.0h old (window 54h)",
-    "data-pipeline-activist: last work-done receipt 97.5h old (window 54h)",
-    "data-pipeline-intake-full: last work-done receipt 101.4h old (window 54h)",
-    "data-pipeline-world-model: last work-done receipt 475.3h old (window 342h)",
-    "falsifier: last work-done receipt 89.9h old (window 54h)",
+    "committee: last work-done receipt 25.6h old (window 24h)",
+    "daily-sync: last work-done receipt 78.6h old (window 56h)",
+    "data-pipeline-activist: last work-done receipt 122.0h old (window 54h)",
+    "data-pipeline-buyback-radar: last work-done receipt 109.9h old (window 102h)",
+    "data-pipeline-downloads: last work-done receipt 68.6h old (window 56h)",
+    "data-pipeline-intake-full: last work-done receipt 125.9h old (window 54h)",
+    "data-pipeline-news: last work-done receipt 26.6h old (window 18h)",
+    "data-pipeline-world-model: last work-done receipt 499.8h old (window 342h)",
     "licensed-research: no work-done receipt",
-    "ls-algo: last work-done receipt 54.2h old (window 54h)",
-    "memory-digest: last work-done receipt 89.3h old (window 54h)",
-    "research-quality-main: last work-done receipt 20.8h old (window 18h)",
-    "valuation: last work-done receipt 98.6h old (window 56h)"
+    "ls-algo: last work-done receipt 78.7h old (window 54h)",
+    "research-quality-main: last work-done receipt 45.3h old (window 18h)",
+    "reverse-split-announcement-monitor: last work-done receipt 25.0h old (window 7h)",
+    "supervisor: last work-done receipt 26.8h old (window 12h)",
+    "valuation: last work-done receipt 123.1h old (window 56h)"
    ],
-   "violations_total": 10,
+   "violations_total": 14,
    "waived": []
   },
   {
@@ -167,7 +173,7 @@
    "severity": "report",
    "base_severity": "report",
    "count": 366,
-   "delta": "+1",
+   "delta": "0",
    "status": "VIOLATIONS",
    "note": "typed coverage 22/388 (5.7%) -- net_asset_value 3/93; owner_cash_or_dividend_discount 4/43; owner_earnings_reinvestment_dcf 14/123; reinvestment_return_dcf 1/1; 57 methods 0/128",
    "violations": [
@@ -319,7 +325,7 @@
    "severity": "report",
    "base_severity": "report",
    "count": 546,
-   "delta": "+1",
+   "delta": "0",
    "status": "VIOLATIONS",
    "note": "195/741 tickers resolve (top-level 54, classification_inputs 139, registry 2)",
    "violations": [
@@ -372,7 +378,7 @@
    "severity": "report",
    "base_severity": "report",
    "count": 37,
-   "delta": "+3",
+   "delta": "0",
    "status": "VIOLATIONS",
    "note": "36 stale, 0 missing where required, 1 undatable, over 741 tickers x 2 artifacts",
    "violations": [
