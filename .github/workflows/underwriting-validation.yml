@@ -92,7 +92,19 @@ jobs:
         with:
           python-version: '3.12'
       - name: Restore immutable underwriting packets
-        uses: ./.github/actions/checkout-vault
+        # Saved-model replay reads self-contained, hash-bound packets only.
+        # Checking out the whole research archive can exhaust this job's limit
+        # before the independent financial validator even starts.
+        uses: actions/checkout@v4
+        with:
+          repository: magis-capital-partners/research-vault
+          ref: main
+          path: _external/research-vault
+          token: ${{ secrets.RESEARCH_VAULT_CLONE_TOKEN }}
+          fetch-depth: 1
+          filter: blob:none
+          sparse-checkout-cone-mode: false
+          sparse-checkout: /valuation-underwriting/packets/
       - name: Recompile every reviewed candidate from its exact frozen evidence
         run: python _system/scripts/underwriting_pipeline.py validate --root candidate
       - name: Complete the immutable-head check
