@@ -10,6 +10,7 @@ from pathlib import Path
 import global_disclosures
 import investor_history as history
 import investor_universe
+import investor_corpus
 from holdings_asset_bundles import pack_assets, unpack_assets, validate_site_budget
 from investor_history_checkpoint import restore
 from vault_paths import research_vault_root
@@ -83,13 +84,6 @@ def stage(site, *, vault=None, receipt=None, cache=None):
     universe = investor_universe.reconcile_public_identities(universe)
     # The private universe retains non-filers and unresolved document identities.
     # Only the known SEC owners have public filings; identity labels never join books.
-    unpack_assets(site / "data/holdings")
-    db = history.connect(cache / "archive.sqlite")
-    try:
-        history.sync_managers(db, universe["managers"])
-        coverage = history.export(db, universe["managers"], site / "data/holdings")
-    finally:
-        db.close()
     disclosures = json.loads((cache / "disclosures.json").read_text(encoding="utf-8"))
     disclosures["disclosures"] = [
         investor_universe.current_disclosure_identity(document, universe)
@@ -99,12 +93,27 @@ def stage(site, *, vault=None, receipt=None, cache=None):
     # documents that are no longer present in the current corpus.
     corpus = vault / "superinvestor-letters/insights.json"
     refreshed = corpus.is_file()
+    letter_count = 0
     if refreshed:
-        documents, review = global_disclosures.corpus_disclosures(corpus, universe)
+        records = investor_corpus.load_records(corpus)
+        universe, records = investor_corpus.reconcile_sources(
+            records, universe, disclosures["disclosures"]
+        )
+        documents, review = global_disclosures.corpus_disclosures(
+            corpus, universe, records=records
+        )
+        letter_count = len(documents)
         disclosures["disclosures"] = global_disclosures.merge_disclosure_snapshots(
             disclosures["disclosures"], documents
         )
         disclosures["review"] = [*disclosures.get("review", []), *review]
+    unpack_assets(site / "data/holdings")
+    db = history.connect(cache / "archive.sqlite")
+    try:
+        history.sync_managers(db, universe["managers"])
+        coverage = history.export(db, universe["managers"], site / "data/holdings")
+    finally:
+        db.close()
     global_disclosures.upgrade_nport_snapshots(
         disclosures["disclosures"], cache / "public-cache.sqlite"
     )
@@ -124,6 +133,7 @@ def stage(site, *, vault=None, receipt=None, cache=None):
         "configured": True,
         "identity": identity,
         "letter_corpus_refreshed": refreshed,
+        "letter_documents_reprocessed": letter_count,
         "filings": coverage["filings"],
         "total_site_files": total_site_files,
         **packaging,

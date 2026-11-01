@@ -866,13 +866,22 @@ def extract_document_positions(text, mentions=()):
     return list(positions.values())
 
 
-def corpus_disclosures(corpus, universe):
-    document = json.loads(corpus.read_text(encoding="utf-8-sig"))
+def corpus_disclosures(corpus, universe, *, records=None):
+    from investor_corpus import load_records
     from fund_letters import verified_date
 
     output = []
     review = []
-    for entry in document.get("letters", []):
+    for entry in load_records(corpus) if records is None else records:
+        if entry.get("_source_unavailable"):
+            review.append(
+                {
+                    "fund_id": entry.get("fund_id"),
+                    "reason": "Source text unavailable",
+                    "source_ref": entry.get("source_file"),
+                }
+            )
+            continue
         if not entry.get("letter_eligible") or entry.get("document_type") not in {
             "investor_letter",
             "fund_report",
@@ -936,24 +945,58 @@ def corpus_disclosures(corpus, universe):
 
 
 def merge_disclosure_snapshots(archived, current):
-    """Keep archived observations when a later text extraction finds none."""
+    """An incomplete re-extraction cannot erase the same document's observations."""
+
+    def position_key(row):
+        symbol = row.get("ticker")
+        identity = (
+            ("ticker", str(symbol).casefold())
+            if symbol
+            else (
+                "issuer",
+                re.sub(r"[^a-z0-9]", "", (row.get("issuer") or "").casefold()),
+            )
+        )
+        return (*identity, row.get("title_of_class") or "", row.get("put_call") or "")
+
     retained = {(d["manager_id"], d["id"]): d for d in archived}
     for document in current:
         key = (document["manager_id"], document["id"])
         previous = retained.get(key, {})
         if (
             document.get("source_kind") == "fund_disclosure"
-            and not document.get("positions")
+            and previous.get("source_kind") == "fund_disclosure"
             and previous.get("positions")
             and document.get("vehicle_id") == previous.get("vehicle_id")
             and document.get("quarter") == previous.get("quarter")
         ):
-            document = {
-                **document,
-                "positions": previous["positions"],
-                "scope": previous.get("scope", "explicitly_disclosed_positions"),
-                "source_review": "Previously disclosed positions retained; source review required.",
-            }
+            positions = [dict(row) for row in document.get("positions", [])]
+            by_key = {position_key(row): row for row in positions}
+            restored = False
+            for old in previous["positions"]:
+                row = by_key.get(position_key(old))
+                if row is None:
+                    positions.append(dict(old))
+                    restored = True
+                    continue
+                for field in (
+                    "weight_pct",
+                    "weight_basis",
+                    "value_usd",
+                    "shares",
+                    "currency",
+                    "isin",
+                    "cusip",
+                ):
+                    if row.get(field) is None and old.get(field) is not None:
+                        row[field] = old[field]
+                        restored = True
+            document = {**document, "positions": positions}
+            if restored:
+                document.update(
+                    scope="explicitly_disclosed_positions",
+                    source_review="Previously disclosed positions retained; source review required.",
+                )
         retained[key] = document
     return list(retained.values())
 
@@ -1202,7 +1245,11 @@ def publish(
     if data.resolve() == (ROOT / "dashboard/data/holdings").resolve():
         from private_dashboard_assets import restore_managed_input
 
-        restore_managed_input(ROOT / "dashboard", "data/holdings/directory_index.json", include_missing=True)
+        restore_managed_input(
+            ROOT / "dashboard",
+            "data/holdings/directory_index.json",
+            include_missing=True,
+        )
     disclosures = list(
         {
             (document["manager_id"], document["id"]): document

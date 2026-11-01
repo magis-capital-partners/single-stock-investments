@@ -312,8 +312,9 @@ def match_cik(aliases, catalog, token_index=None):
 
 
 def eligible_profiles(path):
-    document = json.loads(path.read_text(encoding="utf-8-sig"))
-    rows = document.get("letters", []) if isinstance(document, dict) else document
+    from investor_corpus import load_records
+
+    rows = load_records(path)
     profiles = {}
     for row in rows:
         if row.get("letter_eligible") is not True:
