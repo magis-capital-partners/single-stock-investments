@@ -3,6 +3,12 @@ const assert = require('node:assert/strict');
 global.window=global;
 require('../../../dashboard/investor-history.js');
 const ui=global.InvestorHistory;
+test('a letter without extracted positions keeps its quarter and never falls back to an older portfolio',()=>{
+  const snapshots=[{vehicle_id:'fund',quarter:'2020Q1',positions:[{issuer:'Example'}]},{vehicle_id:'fund',quarter:'2020Q2',positions:[],scope:'no_explicit_positions_identified'}];
+  assert.deepEqual(ui.selectDisclosureSnapshots(snapshots,'latest').map(d=>d.quarter),['2020Q2']);
+  assert.deepEqual(ui.selectDisclosureSnapshots(snapshots,'2020Q2')[0].positions,[]);
+  assert.deepEqual(ui.availablePeriods({disclosure_quarters:['2020Q1','2020Q2']},'disclosures'),['2020Q2','2020Q1']);
+});
 test('verified brand, manager and legal names find the same complete filing history',()=>{
   const manager={manager_id:'dalal-street',name:'Pabrai Investments',legal_name:'Dalal Street, LLC',aliases:['Pabrai Funds','Pabrai Investment Funds','Mohnish Pabrai - Pabrai Investments'],history:[{quarter:'2012Q1'},{quarter:'2026Q2'}],disclosure_count:1,disclosure_quarters:['2020Q2']};
   for(const query of ['Pabrai','Pabrai Funds','Mohnish Pabrai','Dalal Street']) {

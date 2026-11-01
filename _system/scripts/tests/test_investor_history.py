@@ -1543,6 +1543,24 @@ def test_pinned_deploy_restores_history_without_private_letter_evidence(
         },
     )
     vault = tmp_path / "vault"
+    corpus = vault / "superinvestor-letters/insights.json"
+    source = corpus.parent / "2018Q2/confirmed.txt"
+    source.parent.mkdir(parents=True)
+    source.write_text("We own shares in Delta Equipment.", encoding="utf-8")
+    no_positions = corpus.parent / "2017Q1/commentary.txt"
+    no_positions.parent.mkdir(parents=True)
+    no_positions.write_text("Dear investors, the market was volatile.", encoding="utf-8")
+    archive.write_json(corpus, {"letters": [{
+        "canonical_document_id": "new-letter", "fund_id": "private-fund",
+        "fund": "Private Fund", "quarter": "2018Q2", "letter_eligible": True,
+        "document_type": "investor_letter", "date_source": "content",
+        "source_file": "_system/reference/superinvestor-letters/2018Q2/confirmed.txt",
+    }, {
+        "canonical_document_id": "letter-without-positions", "fund_id": "private-fund",
+        "fund": "Private Fund", "quarter": "2017Q1", "letter_eligible": True,
+        "document_type": "investor_letter", "date_source": "content",
+        "source_file": "_system/reference/superinvestor-letters/2017Q1/commentary.txt",
+    }]})
     parts = vault / "dashboard-private/investor-history"
     manifest = checkpoint.pack(cache, parts)
     receipt = tmp_path / "receipt.json"
@@ -1563,6 +1581,10 @@ def test_pinned_deploy_restores_history_without_private_letter_evidence(
         for _, body in iter_packed_assets(tmp_path / "site/data/holdings")
     )
     assert "1999Q4" in generated and "1234.HK" in generated
+    assert "2018Q2" in generated and "Delta Equipment" in generated
+    assert "2020Q1" in generated  # Older documents absent from today's corpus survive.
+    assert "2017Q1" in generated and "no_explicit_positions_identified" in generated
+    assert "We own shares" not in generated and "confirmed.txt" not in generated
     assert (
         "private original quotation" not in generated and "private.txt" not in generated
     )
