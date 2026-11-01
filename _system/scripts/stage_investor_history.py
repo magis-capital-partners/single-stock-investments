@@ -124,6 +124,13 @@ def stage(site, *, vault=None, receipt=None, cache=None):
         universe, records = investor_corpus.reconcile_sources(
             records, universe, disclosures["disclosures"]
         )
+        universe = investor_universe.refresh_document_profiles(
+            universe, corpus, records
+        )
+        disclosures["disclosures"] = [
+            investor_universe.current_disclosure_identity(document, universe)
+            for document in disclosures["disclosures"]
+        ]
         documents, review = global_disclosures.corpus_disclosures(
             corpus, universe, records=records
         )

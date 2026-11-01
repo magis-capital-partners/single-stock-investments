@@ -349,10 +349,10 @@ def match_cik(aliases, catalog, token_index=None):
     return next(iter(found.items())) if len(found) == 1 else None
 
 
-def eligible_profiles(path):
+def eligible_profiles(path, *, records=None):
     from investor_corpus import load_records
 
-    rows = load_records(path)
+    rows = load_records(path) if records is None else records
     profiles = {}
     for row in rows:
         if row.get("letter_eligible") is not True:
@@ -432,6 +432,102 @@ def eligible_profiles(path):
             }
         )
     return profiles
+
+
+def refresh_document_profiles(universe, corpus, records):
+    """Recheck publisher headers when a pinned universe predates classification.
+
+    A confirmed letter publisher may be a non-filer. Exact publisher headers
+    and declared public aliases can link it to a unique filer. Known CIK owners
+    stay intact; conflicting headers retain an identity review.
+    """
+    from investor_corpus import source_path
+
+    managers = {m["manager_id"]: dict(m) for m in universe["managers"]}
+
+    def header_key(value):
+        value = re.sub(
+            r"\b(?:the|incorporated|inc|llc|llp|lp|ltd|plc|corp|corporation)\b",
+            "",
+            value,
+            flags=re.I,
+        )
+        return re.sub(r"[\W_]", "", value.casefold())
+
+    known_headers = defaultdict(set)
+    declared_aliases = json.loads(ALIASES.read_text(encoding="utf-8"))
+    for manager in managers.values():
+        if not manager.get("cik"):
+            continue
+        for name in public_name_variants(
+            manager.get("display_name") or "",
+            [manager.get("sec_name") or "", *manager.get("public_aliases", [])],
+            declared_aliases,
+        ):
+            key = header_key(name)
+            if len(key) >= 8 and len(name.split()) >= 2:
+                known_headers[key].add(manager["manager_id"])
+    observed = defaultdict(set)
+    for record in records:
+        owner = universe.get("source_ids", {}).get(record.get("fund_id"))
+        if (
+            owner not in managers
+            or managers[owner].get("cik")
+            or not record.get("letter_eligible")
+            or record.get("document_type") not in {"investor_letter", "fund_report"}
+        ):
+            continue
+        source = source_path(corpus, record.get("source_file"))
+        if source is None:
+            continue
+        with source.open(encoding="utf-8", errors="replace") as stream:
+            head = stream.read(5000)
+        greeting = re.search(
+            r"\b(?:dear\s+(?:(?:fellow|limited|valued)\s+)?(?:partners|investors|shareholders)|to\s+(?:(?:the|our)\s+)?shareholders)",
+            head,
+            re.I,
+        )
+        header = head[: greeting.start()] if greeting else head[:1200]
+        for line in header.splitlines():
+            observed[owner].update(known_headers.get(header_key(line), set()))
+    for profile in eligible_profiles(corpus, records=records).values():
+        if profile["identity_status"] != "document_header_confirmed":
+            continue
+        for source in profile["ids"]:
+            owner = universe.get("source_ids", {}).get(source)
+            manager = managers.get(owner)
+            if manager is None or manager.get("cik"):
+                continue
+            if len(observed[owner]) > 1:
+                manager["identity_status"] = "unverified_document_identity"
+                continue
+            manager["identity_status"] = "document_header_confirmed"
+            manager["display_name"] = profile["name"]
+            manager["public_aliases"] = sorted(
+                set(manager.get("public_aliases", [])) | profile["aliases"]
+            )
+    redirects = dict(universe.get("manager_redirects", {}))
+    for owner, candidates in observed.items():
+        if len(candidates) == 1:
+            redirects[owner] = next(iter(candidates))
+    result = reconcile_public_identities(
+        {
+            **universe,
+            "managers": list(managers.values()),
+            "manager_redirects": redirects,
+        }
+    )
+    confirmed = {
+        m["manager_id"]
+        for m in result["managers"]
+        if m.get("identity_status") == "document_header_confirmed"
+    }
+    result["identity_review"] = [
+        r
+        for r in result.get("identity_review", [])
+        if r.get("manager_id") not in confirmed
+    ]
+    return result
 
 
 def compile_universe(

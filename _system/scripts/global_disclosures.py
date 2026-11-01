@@ -1396,7 +1396,11 @@ def publish(
         if index_path.exists()
         else {"schema_version": 2, "managers": [], "quarters": {}}
     )
-    existing = {m["manager_id"]: m for m in index["managers"]}
+    existing = {
+        m["manager_id"]: m
+        for m in index["managers"]
+        if m["manager_id"] not in universe.get("manager_redirects", {})
+    }
     source_ids = defaultdict(list)
     for fund_id, manager_id in universe.get("source_ids", {}).items():
         source_ids[manager_id].append(fund_id)

@@ -36,6 +36,10 @@ Pershing Square's successor filer. Tests verify their SEC identities. The staged
 directory includes a per-manager source audit, all available filing quarters and
 disclosure counts. Sequoia Fund letters that name Ruane Cunniff as adviser belong
 to that manager; Sequoia Capital's separate filing history is never combined.
+Pinned publisher classifications are rechecked against the current letter
+headers. Exact public company headers and declared aliases can link a confirmed
+publisher to a unique filing manager. Ambiguous headers stay in review, and
+known filing managers are never combined by a name match.
 
 To refresh public sources locally, use an isolated research-vault checkout:
 

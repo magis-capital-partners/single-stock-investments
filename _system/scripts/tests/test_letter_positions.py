@@ -14,6 +14,94 @@ import investor_universe as universe
 import investor_corpus as corpus_inputs
 
 
+def test_full_company_header_repairs_a_malformed_short_publisher_without_fuzzy_names(
+    tmp_path,
+):
+    corpus = tmp_path / "insights.json"
+    (tmp_path / "letter.txt").write_text(
+        "BERKSHIRE HATHAWAY INC.\nTo the Shareholders:\nWe own Delta Equipment.",
+        encoding="utf-8",
+    )
+    records = [
+        {
+            "fund_id": "malformed-title",
+            "fund": "Unverified Title",
+            "letter_eligible": True,
+            "document_type": "investor_letter",
+            "source_file": corpus_inputs.PREFIX + "letter.txt",
+        }
+    ]
+    current = {
+        "managers": [
+            {
+                "manager_id": "berkshire-hathaway",
+                "display_name": "Berkshire Hathaway",
+                "cik": "1067983",
+            },
+            {
+                "manager_id": "malformed",
+                "display_name": "Unverified Title",
+                "cik": None,
+                "identity_status": "unverified_document_identity",
+            },
+        ],
+        "source_ids": {"malformed-title": "malformed"},
+    }
+    result = universe.refresh_document_profiles(current, corpus, records)
+    assert result["source_ids"]["malformed-title"] == "berkshire-hathaway"
+    assert result["managers"][0]["cik"] == "1067983"
+
+
+@pytest.mark.parametrize("ambiguous", [False, True])
+def test_pinned_unverified_publishers_recheck_source_headers_before_alias_linking(
+    tmp_path, ambiguous
+):
+    corpus = tmp_path / "insights.json"
+    (tmp_path / "letter.txt").write_text(
+        "Akre Focus Fund\nDear Shareholders,\nWe own Delta Equipment.", encoding="utf-8"
+    )
+    records = [
+        {
+            "fund_id": "akre-focus",
+            "fund": "Akre Focus",
+            "letter_eligible": True,
+            "document_type": "investor_letter",
+            "source_file": corpus_inputs.PREFIX + "letter.txt",
+        }
+    ]
+    existing = {
+        "managers": [
+            {
+                "manager_id": "akre-capital-management",
+                "display_name": "Akre Capital Management",
+                "cik": "1112520",
+            },
+            {
+                "manager_id": "akre-focus",
+                "display_name": "Akre Focus",
+                "cik": None,
+                "identity_status": "unverified_document_identity",
+            },
+        ],
+        "source_ids": {"akre-focus": "akre-focus"},
+        "identity_review": [{"manager_id": "akre-focus"}],
+    }
+    if ambiguous:
+        existing["managers"].append(
+            {"manager_id": "other", "display_name": "Akre Focus Fund", "cik": "2"}
+        )
+    result = universe.refresh_document_profiles(existing, corpus, records)
+    if ambiguous:
+        assert result["source_ids"]["akre-focus"] == "akre-focus"
+    else:
+        assert result["source_ids"]["akre-focus"] == "akre-capital-management"
+        assert not result["identity_review"]
+    assert {m["manager_id"]: m["cik"] for m in result["managers"] if m.get("cik")} == {
+        m["manager_id"]: m["cik"] for m in existing["managers"] if m.get("cik")
+    }
+    assert existing["managers"][1]["identity_status"] == "unverified_document_identity"
+
+
 @pytest.mark.parametrize("name", ["Nestlé", "Rémy Cointreau", "L’Oréal", "東京海上"])
 def test_international_issuer_names_are_not_truncated_to_ascii(name):
     rows = disclosures.extract_document_positions(f"We own {name}.")

@@ -442,6 +442,17 @@
         "37 4 * * *"
       ],
       "freshness_hours": 60
+    },
+    {
+      "name": "public-fund-holdings",
+      "workflow_file": "public-fund-holdings.yml",
+      "job": "refresh",
+      "work_step": "Fetch current public disclosures and retain dated history",
+      "cadence_cron": [
+        "15 14 * * 1-5",
+        "15 23 * * 1-5"
+      ],
+      "freshness_hours": 84
     }
   ],
   "unmonitored_workflows": {},
