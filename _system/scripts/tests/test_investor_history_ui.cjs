@@ -17,6 +17,12 @@ test('issuer ownership is labelled separately from unknown portfolio weight',()=
   assert.match(html,/portfolio weight unavailable/);
   assert.match(html,/TRY nominal/);
 });
+
+test('letter valuation weights use the reported fund assets denominator',()=>{
+  const html=ui.positionsTable([{issuer:'Delta Logistics',weight_pct:50,weight_basis:'reported_fund_assets'}]);
+  assert.match(html,/50.00%/);
+  assert.match(html,/Reported fund assets/);
+});
 test('a letter without extracted positions keeps its quarter and never falls back to an older portfolio',()=>{
   const snapshots=[{vehicle_id:'fund',quarter:'2020Q1',positions:[{issuer:'Example'}]},{vehicle_id:'fund',quarter:'2020Q2',positions:[],scope:'no_explicit_positions_identified'}];
   assert.deepEqual(ui.selectDisclosureSnapshots(snapshots,'latest').map(d=>d.quarter),['2020Q2']);

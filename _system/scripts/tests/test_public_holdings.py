@@ -29,6 +29,149 @@ SOURCE = {
     "url": "https://example.org/holdings.csv",
 }
 
+REPORT_SOURCE = {
+    "kind": "annual_report_pdf",
+    "manager_id": "example-manager",
+    "vehicle_id": "foreign-stakes",
+    "vehicle_name": "Disclosed foreign equity stakes",
+    "frequency": "annual",
+    "section_pattern": r"investments\s+in\s+Japan",
+    "country": "JP",
+    "minimum_positions": 2,
+    "url": "https://example.org/2025.pdf",
+}
+REPORT_TABLE = """Our investments in Japan are listed below.
+(Dollars in millions) December 31, 2025
+Company
+Percentage of
+Company Owned Cost Basis Market Value 2025 Dividends
+Delta Corporation 10.8% $ 400 $ 1,200 $ 12
+Continental & Co., Ltd. 9.7% 500 1,300 13
+Total $ 900 $ 2,500 $ 25
+Other narrative and unrelated figures follow.
+"""
+
+VALUATION_TABLE = """Portfolio Valuation
+Example Global Fund, L.P.
+June 30, 2023
+MARKET UNIT TOTAL % OF ANNUAL %
+UNITS SECURITY PRICE VALUE COST COST GAIN/LOSS ASSETS INCOME YIELD
+CASH AND EQUIVALENTS- usd
+Cash And Cash Equivalents 3,000 3,000 30.0 0 0.0
+COMMON STOCKS- usd
+100 Delta Logistics Class 3 50.00 5,000 20.00 2,000 3,000 50.0 10 0.2
+200 Étoile Industries SA 10.00 2,000 5.00 1,000 1,000 20.0 10 0.5
+7,000 3,000 4,000 70.0 20 0.3
+TOTAL ASSETS 10,000 6,000 4,000 100.0 20 0.2
+Performance Contribution by Security
+Delta Logistics 40.0 99.5 10.0
+"""
+
+
+def test_quantity_first_valuations_preserve_all_dates_and_exclude_attribution():
+    tables = extract_tables(VALUATION_TABLE + VALUATION_TABLE.replace("June 30", "July 31"))
+    assert [table["period_end"] for table in tables] == ["2023-06-30", "2023-07-31"]
+    assert all(table["vehicle_name"] == "Example Global Fund, L.P." for table in tables)
+    first, second = tables[0]["positions"]
+    assert first["issuer"] == "Delta Logistics Class 3"
+    assert first["shares"] == 100
+    assert first["value_usd"] == 5000
+    assert first["weight_pct"] == 50
+    assert first["weight_basis"] == "reported_fund_assets"
+    assert second["issuer"] == "Étoile Industries SA"
+    assert second["weight_pct"] == 20
+
+
+def test_valuations_do_not_guess_usd_values_or_inconsistent_weights():
+    assert not extract_tables(VALUATION_TABLE.replace("- usd", "- eur"))
+    assert not extract_tables(VALUATION_TABLE.replace("TOTAL ASSETS", "INCOMPLETE TABLE"))
+    (table,) = extract_tables(VALUATION_TABLE.replace("50.0 10", "9.0 10"))
+    assert table["positions"][0]["weight_pct"] is None
+    assert table["positions"][0]["shares"] == 100
+
+
+def test_non_usd_equity_sections_cannot_inherit_usd_from_a_previous_section():
+    text = VALUATION_TABLE.replace(
+        "7,000 3,000 4,000 70.0 20 0.3",
+        "PREFERRED STOCK (REG S)- eur\n300 Continental Limited 20.00 6,000 10.00 3,000 3,000 60.0 10 0.2"
+    )
+    (table,) = extract_tables(text)
+    assert len(table["positions"]) == 2
+    assert all(row["weight_pct"] is None for row in table["positions"])
+
+
+def test_damaged_later_valuation_columns_cannot_erase_verified_names_and_quantities():
+    text = VALUATION_TABLE.replace("20.00 2,000 3,000", "20.00 2,0 00 3, 000")
+    (table,) = extract_tables(text)
+    assert len(table["positions"]) == 2
+    row = table["positions"][0]
+    assert row["issuer"] == "Delta Logistics Class 3"
+    assert row["shares"] == 100 and row["value_usd"] == 5000
+    assert row["weight_pct"] is None
+
+
+def test_split_price_digits_are_repaired_only_when_market_value_confirms_them():
+    text = VALUATION_TABLE.replace("Delta Logistics Class 3 50.00", "Delta Logistics 5 0.00")
+    (table,) = extract_tables(text)
+    assert table["positions"][0]["issuer"] == "Delta Logistics"
+
+
+def test_annual_table_keeps_issuer_stakes_separate_from_unknown_fund_weights():
+    period, rows = holdings.parse_report_table(REPORT_TABLE, REPORT_SOURCE)
+    assert period == "2025-12-31"
+    assert [row["issuer"] for row in rows] == [
+        "Delta Corporation", "Continental & Co., Ltd."
+    ]
+    assert rows[0]["issuer_ownership_pct"] == 10.8
+    assert rows[0]["value_usd"] == 1_200_000_000
+    assert all(row["weight_pct"] is None and row["shares"] is None for row in rows)
+    assert holdings.parse_report_table(
+        REPORT_TABLE.replace("investments in Japan", "investments in America"), REPORT_SOURCE
+    ) is None
+
+
+@pytest.mark.parametrize("before,after", [
+    ("December 31, 2025", ""),
+    ("Dollars in millions", "Yen in millions"),
+    ("$ 2,500", "$ 9,500"),
+    ("10.8%", "110.8%"),
+    ("Total $ 900 $ 2,500 $ 25", ""),
+])
+def test_unverified_annual_tables_are_rejected(before, after):
+    with pytest.raises(ValueError):
+        holdings.parse_report_table(REPORT_TABLE.replace(before, after), REPORT_SOURCE)
+
+
+def test_html_error_page_is_not_treated_as_a_public_report():
+    pytest.importorskip("pypdf")
+    with pytest.raises(ValueError, match="could not be read as a PDF"):
+        holdings.parse_public_report(b"<html>Access denied</html>", REPORT_SOURCE, observed_at="2026-11-01T00:00:00Z")
+
+
+def test_annual_index_discovers_newest_report_without_using_a_future_quarter(tmp_path, monkeypatch):
+    source = {
+        **REPORT_SOURCE,
+        "kind": "annual_report_family",
+        "url": "https://example.org/reports.html",
+        "first_year": 2025,
+        "annual_link_pattern": r"(\d{4})ar/linksannual\d{2}\.html",
+        "report_url_template": "https://example.org/{year}ar/{year}ar.pdf",
+    }
+    calls = []
+    def fetch(item):
+        calls.append(item["url"])
+        if item["kind"] == "annual_report_family":
+            return b'<a href="2024ar/linksannual24.html">old</a><a href="2025ar/linksannual25.html">annual</a><a href="2026q2.pdf">interim</a>'
+        return b"pdf"
+    def parse(raw, item, *, observed_at):
+        assert item["report_year"] == 2025
+        period, rows = holdings.parse_report_table(REPORT_TABLE, item)
+        return [holdings.snapshot(item, period, rows, observed_at=observed_at, partial=True)]
+    monkeypatch.setitem(holdings.PARSERS, "annual_report_pdf", parse)
+    documents, review = holdings.collect([source], tmp_path, fetcher=fetch)
+    assert not review and len(documents) == 1
+    assert calls == ["https://example.org/reports.html", "https://example.org/2025ar/2025ar.pdf"]
+
 
 def test_archived_registered_fund_original_can_be_upgraded_without_primary_cache(
     tmp_path,
@@ -292,6 +435,8 @@ Total $58.3
     ]
     assert all(r["weight_pct"] is None for r in table["positions"])
     assert not extract_tables(text.replace("holdings", "performance attribution"))
+    unicode_table = extract_tables(text.replace("Delta Logistics", "Étoile Industries"))[0]
+    assert unicode_table["positions"][0]["issuer"] == "Étoile Industries"
 
 
 def test_every_pr1282_manager_and_required_daily_vehicle_is_configured():
