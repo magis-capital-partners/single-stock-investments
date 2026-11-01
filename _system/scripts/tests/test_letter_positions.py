@@ -9,6 +9,222 @@ import pytest
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 import global_disclosures as disclosures
+import investor_history as archive
+import investor_universe as universe
+import investor_corpus as corpus_inputs
+
+
+def test_renamed_publisher_uses_exact_archived_document_identity():
+    existing = {
+        "managers": [{"manager_id": "manager", "cik": "1"}],
+        "source_ids": {"canonical-fund": "manager"},
+    }
+    archived = [
+        {
+            "id": "letter-known",
+            "manager_id": "manager",
+            "vehicle_id": "canonical-fund",
+            "vehicle_name": "Canonical Fund",
+            "source_kind": "fund_disclosure",
+        }
+    ]
+    records = [
+        {
+            "fund_id": "raw-title",
+            "fund": "Raw Title",
+            "letter_eligible": True,
+            "document_type": "investor_letter",
+            "canonical_document_id": "letter-known",
+        },
+        {
+            "fund_id": "raw-title",
+            "fund": "Raw Title",
+            "letter_eligible": True,
+            "document_type": "investor_letter",
+            "canonical_document_id": "letter-new",
+        },
+    ]
+    result, current = corpus_inputs.reconcile_sources(records, existing, archived)
+    assert [r["fund_id"] for r in current] == ["canonical-fund", "canonical-fund"]
+    assert result["managers"] == existing["managers"]
+    assert records[0]["fund_id"] == "raw-title"
+
+
+def test_conflicting_document_owners_create_a_review_profile_without_joining_filers():
+    existing = {
+        "managers": [{"manager_id": "a", "cik": "1"}, {"manager_id": "b", "cik": "2"}],
+        "source_ids": {"fund-a": "a", "fund-b": "b"},
+    }
+    archived = [
+        {
+            "id": "one",
+            "manager_id": "a",
+            "vehicle_id": "fund-a",
+            "source_kind": "fund_disclosure",
+        },
+        {
+            "id": "two",
+            "manager_id": "b",
+            "vehicle_id": "fund-b",
+            "source_kind": "fund_disclosure",
+        },
+    ]
+    records = [
+        {
+            "fund_id": "unresolved",
+            "fund": "Unresolved",
+            "letter_eligible": True,
+            "document_type": "investor_letter",
+            "canonical_document_id": doc,
+        }
+        for doc in ("one", "two")
+    ]
+    result, current = corpus_inputs.reconcile_sources(records, existing, archived)
+    owner = result["source_ids"]["unresolved"]
+    assert owner not in {"a", "b"}
+    assert (
+        next(m for m in result["managers"] if m["manager_id"] == owner)["cik"] is None
+    )
+    assert {m["manager_id"]: m["cik"] for m in result["managers"] if m.get("cik")} == {
+        "a": "1",
+        "b": "2",
+    }
+    assert (
+        result["source_ids"]["fund-a"] == "a" and result["source_ids"]["fund-b"] == "b"
+    )
+    assert corpus_inputs.reconcile_sources(current, result, archived)[0] == result
+
+
+def test_partial_reextraction_preserves_other_positions_and_known_weights():
+    old = {
+        "manager_id": "manager",
+        "id": "letter",
+        "vehicle_id": "fund",
+        "quarter": "2020Q1",
+        "source_kind": "fund_disclosure",
+        "positions": [
+            {"ticker": "KEEP", "weight_pct": 4.2, "weight_basis": "disclosed"},
+            {"ticker": "OTHER", "weight_pct": None},
+        ],
+    }
+    current = {
+        **old,
+        "positions": [{"ticker": "KEEP", "weight_pct": None}, {"ticker": "NEW"}],
+    }
+    merged = disclosures.merge_disclosure_snapshots([old], [current])[0]
+    assert {r["ticker"] for r in merged["positions"]} == {"KEEP", "OTHER", "NEW"}
+    kept = next(r for r in merged["positions"] if r["ticker"] == "KEEP")
+    assert kept["weight_pct"] == 4.2 and kept["weight_basis"] == "disclosed"
+    assert current["positions"][0]["weight_pct"] is None
+
+
+def test_raw_release_catalog_is_classified_and_uses_its_own_fund_registry(tmp_path):
+    corpus = tmp_path / "insights.json"
+    source = tmp_path / "2019Q1/Example letter.txt"
+    source.parent.mkdir()
+    source.write_text(
+        "Example Capital\nMarch 31, 2019\nDear partners,\nOur Delta Equipment position remains attractive.",
+        encoding="utf-8",
+    )
+    transcript = source.with_name("Example transcript.txt")
+    transcript.write_text(source.read_text(), encoding="utf-8")
+    archive.write_json(
+        tmp_path / "funds.json",
+        {
+            "funds": [
+                {
+                    "fund_id": "example",
+                    "fund": "Example Capital",
+                    "filename_patterns": ["Example"],
+                }
+            ]
+        },
+    )
+    archive.write_json(
+        corpus,
+        {
+            "letters": [
+                {
+                    "fund_id": "example-2019q1-letter",
+                    "fund": "Filename-derived title",
+                    "quarter": "2019Q1",
+                    "source_file": "_system/reference/superinvestor-letters/2019Q1/Example letter.txt",
+                },
+                {
+                    "fund_id": "example-transcript",
+                    "fund": "Example transcript",
+                    "quarter": "2019Q1",
+                    "source_file": "_system/reference/superinvestor-letters/2019Q1/Example transcript.txt",
+                },
+            ]
+        },
+    )
+    original = corpus.read_bytes()
+    documents, review = disclosures.corpus_disclosures(
+        corpus, {"source_ids": {"example": "manager"}}
+    )
+    assert len(documents) == 1 and not review
+    assert documents[0]["manager_id"] == "manager"
+    assert documents[0]["positions"][0]["issuer"] == "Delta Equipment"
+    assert set(universe.eligible_profiles(corpus)) == {"example"}
+    assert (
+        corpus.read_bytes() == original
+    )  # Preparing inputs never overwrites the source.
+
+
+def test_raw_catalog_reports_missing_text_instead_of_silently_skipping_it(tmp_path):
+    corpus = tmp_path / "insights.json"
+    archive.write_json(
+        corpus,
+        {
+            "letters": [
+                {
+                    "fund_id": "example",
+                    "fund": "Example",
+                    "source_file": "_system/reference/superinvestor-letters/2019Q1/missing.txt",
+                }
+            ]
+        },
+    )
+    documents, review = disclosures.corpus_disclosures(
+        corpus, {"source_ids": {"example": "manager"}}
+    )
+    assert not documents
+    assert review and review[0]["reason"] == "Source text unavailable"
+
+
+def test_raw_catalog_discovers_an_unindexed_letter_and_honors_exclusions(tmp_path):
+    corpus = tmp_path / "insights.json"
+    source = tmp_path / "2019Q2/Example letter.txt"
+    source.parent.mkdir()
+    source.write_text(
+        "Dear partners,\nOur Delta Equipment position remains attractive.",
+        encoding="utf-8",
+    )
+    excluded = source.with_name("Example excluded letter.txt")
+    excluded.write_text(
+        "Dear investors,\nOur Northern Manufacturing position remains attractive.",
+        encoding="utf-8",
+    )
+    archive.write_json(
+        corpus,
+        {
+            "letters": [
+                {
+                    "fund_id": "example",
+                    "fund": "Example",
+                    "letter_eligible": False,
+                    "source_file": "_system/reference/superinvestor-letters/2019Q2/Example excluded letter.txt",
+                }
+            ]
+        },
+    )
+    documents, review = disclosures.corpus_disclosures(
+        corpus, {"source_ids": {"example": "manager"}}
+    )
+    assert not review and len(documents) == 1
+    assert documents[0]["quarter"] == "2019Q2"
+    assert [p["issuer"] for p in documents[0]["positions"]] == ["Delta Equipment"]
 
 
 def test_an_empty_text_extraction_cannot_erase_archived_disclosed_positions():

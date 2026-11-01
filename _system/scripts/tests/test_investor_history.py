@@ -290,29 +290,63 @@ def test_pinned_old_identity_keeps_all_filing_quarters_and_separate_letter_vehic
     assert snapshots[0]["positions"][0]["weight_pct"] == 5
 
 
-def test_historical_filer_alias_keeps_the_current_manager_identity(tmp_path, monkeypatch):
+def test_historical_filer_alias_keeps_the_current_manager_identity(
+    tmp_path, monkeypatch
+):
     monkeypatch.setattr(universe, "ARCHIVE", tmp_path / "archive")
     registry = tmp_path / "managers.json"
-    registry.write_text(json.dumps({"managers": [{
-        "manager_id": "pershing-square",
-        "display_name": "Pershing Square Capital Management",
-        "sec_name": "PERSHING SQUARE INC.",
-        "cik": "0002026053",
-        "cik_history": [{"cik": "0001336528"}],
-        "roles": ["active"],
-        "book": "full",
-    }]}), encoding="utf-8")
+    registry.write_text(
+        json.dumps(
+            {
+                "managers": [
+                    {
+                        "manager_id": "pershing-square",
+                        "display_name": "Pershing Square Capital Management",
+                        "sec_name": "PERSHING SQUARE INC.",
+                        "cik": "0002026053",
+                        "cik_history": [{"cik": "0001336528"}],
+                        "roles": ["active"],
+                        "book": "full",
+                    }
+                ]
+            }
+        ),
+        encoding="utf-8",
+    )
     roster = tmp_path / "roster.json"
-    roster.write_text(json.dumps({"managers": [{
-        "firm": "Pershing Square Capital Management", "name": "Bill Ackman",
-    }]}), encoding="utf-8")
+    roster.write_text(
+        json.dumps(
+            {
+                "managers": [
+                    {
+                        "firm": "Pershing Square Capital Management",
+                        "name": "Bill Ackman",
+                    }
+                ]
+            }
+        ),
+        encoding="utf-8",
+    )
     corpus = tmp_path / "insights.json"
-    corpus.write_text(json.dumps({"letters": [{
-        "fund_id": "pershing", "fund": "Pershing Square Capital Management",
-        "letter_eligible": True, "document_type": "investor_letter",
-    }]}), encoding="utf-8")
+    corpus.write_text(
+        json.dumps(
+            {
+                "letters": [
+                    {
+                        "fund_id": "pershing",
+                        "fund": "Pershing Square Capital Management",
+                        "letter_eligible": True,
+                        "document_type": "investor_letter",
+                    }
+                ]
+            }
+        ),
+        encoding="utf-8",
+    )
     result = universe.compile_universe(
-        registry_path=registry, roster_path=roster, corpus_path=corpus,
+        registry_path=registry,
+        roster_path=roster,
+        corpus_path=corpus,
         aliases_path=tmp_path / "aliases.json",
         catalog={"PERSHING SQUARE CAPITAL MANAGEMENT, L.P.": {"0001336528"}},
     )
@@ -320,7 +354,8 @@ def test_historical_filer_alias_keeps_the_current_manager_identity(tmp_path, mon
     assert len(published) == len(result["managers"]) == 1
     assert published[0]["cik"] == "0002026053"
     assert archive.cik_map(published) == {
-        "1336528": "pershing-square", "2026053": "pershing-square",
+        "1336528": "pershing-square",
+        "2026053": "pershing-square",
     }
     assert result["source_ids"]["pershing"] == "pershing-square"
 
@@ -525,9 +560,20 @@ ADV MICRO DEVICES INC    7903907    OPTIONS - CALL 148     7,422 SH CALL SOLE
     assert rows[1]["put_call"] == "CALL"
 
 
-@pytest.mark.parametrize("heading", ["Name of Issuer  Title of Class ID_CUSIP (x$1000) Shares", "ID_CUSIP VALUE SHARES"])
+@pytest.mark.parametrize(
+    "heading",
+    [
+        "Name of Issuer  Title of Class ID_CUSIP (x$1000) Shares",
+        "ID_CUSIP VALUE SHARES",
+    ],
+)
 def test_legacy_prefixed_cusip_header_is_a_table_heading(heading):
-    rows, _ = parse_legacy_document((heading + "\nAgrium Inc  Common Share  008916108  10,985  500000 YES None Sole\n").encode())
+    rows, _ = parse_legacy_document(
+        (
+            heading
+            + "\nAgrium Inc  Common Share  008916108  10,985  500000 YES None Sole\n"
+        ).encode()
+    )
     assert rows[0]["cusip"] == "008916108"
     assert rows[0]["value_usd"] == 10985000
     assert rows[0]["issuer"] == "Agrium Inc"
@@ -1495,8 +1541,9 @@ def test_public_fund_discovery_requires_principal_adviser_and_keeps_dates(tmp_pa
     assert rows[0]["appointment_end"] == ""
 
 
+@pytest.mark.parametrize("raw_catalog", [False, True])
 def test_pinned_deploy_restores_history_without_private_letter_evidence(
-    tmp_path, monkeypatch
+    tmp_path, monkeypatch, raw_catalog
 ):
     cache = tmp_path / "original"
     db = archive.connect(cache / "archive.sqlite")
@@ -1544,23 +1591,61 @@ def test_pinned_deploy_restores_history_without_private_letter_evidence(
     )
     vault = tmp_path / "vault"
     corpus = vault / "superinvestor-letters/insights.json"
-    source = corpus.parent / "2018Q2/confirmed.txt"
+    source = corpus.parent / "2018Q2/confirmed letter.txt"
     source.parent.mkdir(parents=True)
-    source.write_text("We own shares in Delta Equipment.", encoding="utf-8")
+    source.write_text(
+        "Dear partners,\nWe own shares in Delta Equipment.", encoding="utf-8"
+    )
     no_positions = corpus.parent / "2017Q1/commentary.txt"
     no_positions.parent.mkdir(parents=True)
-    no_positions.write_text("Dear investors, the market was volatile.", encoding="utf-8")
-    archive.write_json(corpus, {"letters": [{
-        "canonical_document_id": "new-letter", "fund_id": "private-fund",
-        "fund": "Private Fund", "quarter": "2018Q2", "letter_eligible": True,
-        "document_type": "investor_letter", "date_source": "content",
-        "source_file": "_system/reference/superinvestor-letters/2018Q2/confirmed.txt",
-    }, {
-        "canonical_document_id": "letter-without-positions", "fund_id": "private-fund",
-        "fund": "Private Fund", "quarter": "2017Q1", "letter_eligible": True,
-        "document_type": "investor_letter", "date_source": "content",
-        "source_file": "_system/reference/superinvestor-letters/2017Q1/commentary.txt",
-    }]})
+    no_positions.write_text(
+        "Dear investors, the market was volatile.", encoding="utf-8"
+    )
+    archive.write_json(
+        corpus,
+        {
+            "letters": [
+                {
+                    "canonical_document_id": "new-letter",
+                    "fund_id": "private-fund",
+                    "fund": "Private Fund",
+                    "quarter": "2018Q2",
+                    "letter_eligible": True,
+                    "document_type": "investor_letter",
+                    "date_source": "content",
+                    "source_file": "_system/reference/superinvestor-letters/2018Q2/confirmed letter.txt",
+                },
+                {
+                    "canonical_document_id": "letter-without-positions",
+                    "fund_id": "private-fund",
+                    "fund": "Private Fund",
+                    "quarter": "2017Q1",
+                    "letter_eligible": True,
+                    "document_type": "investor_letter",
+                    "date_source": "content",
+                    "source_file": "_system/reference/superinvestor-letters/2017Q1/commentary.txt",
+                },
+            ]
+        },
+    )
+    if raw_catalog:
+        rows = json.loads(corpus.read_text())["letters"]
+        for row in rows:
+            row.pop("letter_eligible")
+            row.pop("document_type")
+        archive.write_json(corpus, {"letters": rows})
+        archive.write_json(
+            corpus.parent / "funds.json",
+            {
+                "funds": [
+                    {
+                        "fund_id": "private-fund",
+                        "fund": "Private Fund",
+                        "filename_patterns": ["confirmed", "commentary"],
+                    }
+                ]
+            },
+        )
     parts = vault / "dashboard-private/investor-history"
     manifest = checkpoint.pack(cache, parts)
     receipt = tmp_path / "receipt.json"
@@ -1584,7 +1669,7 @@ def test_pinned_deploy_restores_history_without_private_letter_evidence(
     assert "2018Q2" in generated and "Delta Equipment" in generated
     assert "2020Q1" in generated  # Older documents absent from today's corpus survive.
     assert "2017Q1" in generated and "no_explicit_positions_identified" in generated
-    assert "We own shares" not in generated and "confirmed.txt" not in generated
+    assert "We own shares" not in generated and "confirmed letter.txt" not in generated
     assert (
         "private original quotation" not in generated and "private.txt" not in generated
     )

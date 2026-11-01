@@ -13,6 +13,7 @@ Resolution order for each letter file:
 Unresolved-to-curation files are still grouped deterministically by the
 normalized slug and recorded in ``funds_unresolved.json`` for one-time review.
 """
+
 from __future__ import annotations
 
 import json
@@ -32,10 +33,30 @@ OVERRIDES_PATH = LETTERS_ROOT / "letters_date_overrides.json"
 FALLBACK_OVERRIDES_PATH = ROOT / "_system" / "reference" / "letter_date_overrides.json"
 
 MONTHS = {
-    "jan": 1, "january": 1, "feb": 2, "february": 2, "mar": 3, "march": 3,
-    "apr": 4, "april": 4, "may": 5, "jun": 6, "june": 6, "jul": 7, "july": 7,
-    "aug": 8, "august": 8, "sep": 9, "sept": 9, "september": 9, "oct": 10,
-    "october": 10, "nov": 11, "november": 11, "dec": 12, "december": 12,
+    "jan": 1,
+    "january": 1,
+    "feb": 2,
+    "february": 2,
+    "mar": 3,
+    "march": 3,
+    "apr": 4,
+    "april": 4,
+    "may": 5,
+    "jun": 6,
+    "june": 6,
+    "jul": 7,
+    "july": 7,
+    "aug": 8,
+    "august": 8,
+    "sep": 9,
+    "sept": 9,
+    "september": 9,
+    "oct": 10,
+    "october": 10,
+    "nov": 11,
+    "november": 11,
+    "dec": 12,
+    "december": 12,
 }
 QUARTER_END = {1: (3, 31), 2: (6, 30), 3: (9, 30), 4: (12, 31)}
 MIN_SANE_YEAR = 1990
@@ -75,10 +96,10 @@ def slugify(name: str) -> str:
 def normalize_fund_key(stem: str) -> tuple[str, str]:
     """Return (fund_id, display_name) from a raw filename stem."""
     s = stem.replace("_", " ").replace("-", " ")
-    s = re.sub(r"\(.*?\)", " ", s)            # drop parentheticals like (1), (Prospect)
-    s = _DATE_TOKENS.sub(" ", s)              # drop dates / years / quarters
-    s = _BOILERPLATE.sub(" ", s)              # drop boilerplate words
-    s = re.sub(r"\b\d+\b", " ", s)            # drop stray numbers
+    s = re.sub(r"\(.*?\)", " ", s)  # drop parentheticals like (1), (Prospect)
+    s = _DATE_TOKENS.sub(" ", s)  # drop dates / years / quarters
+    s = _BOILERPLATE.sub(" ", s)  # drop boilerplate words
+    s = re.sub(r"\b\d+\b", " ", s)  # drop stray numbers
     s = re.sub(r"\s+", " ", s).strip()
     tokens = [t for t in s.split() if len(t) > 1]
     if not tokens:
@@ -95,7 +116,9 @@ _COMPACT_QUARTER_TOKEN = re.compile(
 )
 
 
-def canonicalize_fund_identity(fund_id: str | None, fund: str | None) -> tuple[str, str]:
+def canonicalize_fund_identity(
+    fund_id: str | None, fund: str | None
+) -> tuple[str, str]:
     """Collapse legacy quarter-stamped identities into one stable fund.
 
     Older letter imports allowed compact tokens such as ``2016q2`` and
@@ -105,7 +128,9 @@ def canonicalize_fund_identity(fund_id: str | None, fund: str | None) -> tuple[s
     """
     raw_id = str(fund_id or "").strip()
     raw_name = str(fund or "").strip()
-    if not (_COMPACT_QUARTER_TOKEN.search(raw_id) or _COMPACT_QUARTER_TOKEN.search(raw_name)):
+    if not (
+        _COMPACT_QUARTER_TOKEN.search(raw_id) or _COMPACT_QUARTER_TOKEN.search(raw_name)
+    ):
         stable_id = raw_id or slugify(raw_name)
         return stable_id, raw_name or stable_id
 
@@ -135,7 +160,9 @@ def letter_date_overrides() -> list[dict]:
     return load_date_overrides(date_overrides_path())
 
 
-def parse_letter_date(stem: str, text: str | None, quarter: str | None) -> tuple[str | None, str]:
+def parse_letter_date(
+    stem: str, text: str | None, quarter: str | None
+) -> tuple[str | None, str]:
     """Return (iso_date, source)."""
     iso, source, _conf = parse_letter_date_with_confidence(
         stem, text, quarter, overrides=letter_date_overrides()
@@ -221,8 +248,13 @@ def resolve_quarter(
 
 
 class FundResolver:
-    def __init__(self) -> None:
-        cfg = load_json(FUNDS_PATH) or {}
+    def __init__(
+        self, *, funds_path: Path | None = None, overrides_path: Path | None = None
+    ) -> None:
+        cfg = load_json(funds_path or FUNDS_PATH) or {}
+        self._date_overrides = (
+            load_date_overrides(overrides_path) if overrides_path is not None else None
+        )
         raw = cfg.get("funds") if isinstance(cfg, dict) else None
         self.funds: list[dict] = raw if isinstance(raw, list) else []
         self._compiled = [
@@ -235,7 +267,12 @@ class FundResolver:
         stem = path.stem
         quarter = quarter_from_path(path)
         iso_date, date_source, date_confidence = parse_letter_date_with_confidence(
-            stem, text, quarter, overrides=letter_date_overrides()
+            stem,
+            text,
+            quarter,
+            overrides=self._date_overrides
+            if self._date_overrides is not None
+            else letter_date_overrides(),
         )
 
         # 1. curated override
@@ -246,7 +283,9 @@ class FundResolver:
                     "fund": fund.get("fund") or fund["fund_id"],
                     "manager": fund.get("manager", ""),
                     "strategy": fund.get("strategy", ""),
-                    "maps_to_persona": fund.get("persona_map") or fund.get("maps_to_persona") or [],
+                    "maps_to_persona": fund.get("persona_map")
+                    or fund.get("maps_to_persona")
+                    or [],
                     "letter_date": iso_date,
                     "date_source": date_source,
                     "date_confidence": date_confidence,
@@ -283,4 +322,6 @@ class FundResolver:
             "count": len(self.unresolved),
             "funds": sorted(self.unresolved.values(), key=lambda x: x["fund_id"]),
         }
-        UNRESOLVED_PATH.write_text(json.dumps(payload, indent=2) + "\n", encoding="utf-8")
+        UNRESOLVED_PATH.write_text(
+            json.dumps(payload, indent=2) + "\n", encoding="utf-8"
+        )
