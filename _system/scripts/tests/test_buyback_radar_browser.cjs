@@ -9,6 +9,11 @@ const selected=c.companies.find(r=>r.rank_eligible && r.buyback_yield_pct!==null
 assert.ok(selected);
 const browser=await chromium.launch({headless:true});
 const page=await browser.newPage({viewport:{width:1400,height:1000}}),errors=[];
+// Exercise the stored snapshot at its own date; wall-clock aging is a
+// separate negative case below, not a reason for interaction tests to fail.
+const snapshotTime=Date.parse(m.generated_at || m.as_of+'T12:00:00Z');
+assert.ok(Number.isFinite(snapshotTime));
+await page.clock.setFixedTime(new Date(snapshotTime));
 page.on('pageerror',e=>errors.push(e.message));
 await page.route('https://buyback.test/**',async route=>{
  const url=new URL(route.request().url()),relative=decodeURIComponent(url.pathname.slice(1));
@@ -83,6 +88,10 @@ await page.locator('.bb-scenario summary').last().click();
 const form=page.locator('[data-bb-scenario="tender"]');
 for(const [k,v] of Object.entries({purchase:20,offer:23,acceptance:.5,unaccepted:18,fees:.1,days:30}))await form.locator('[name="'+k+'"]').fill(String(v));
 await form.locator('button').click();assert.match(await form.locator('output').innerText(),/2.0%/);
+await page.clock.setFixedTime(new Date(snapshotTime+103*3600000));
+await page.evaluate(()=>{localStorage.removeItem('ssi-buyback-coverage-v2');BuybackViz.mountScreen(document.getElementById('screen'));});
+assert.match(await page.locator('#screen').innerText(),/Snapshot overdue/);
+assert.equal(await page.locator('#screen table tbody tr').count(),0,'expired evidence withholds the focused rankings');
 assert.deepEqual(errors,[]);
 console.log(JSON.stringify({ticker:selected.ticker,snapshot:m.snapshot_id,desktop:true,mobile:true,dispositions:true,tender:true,pageErrors:errors.length}));
 await browser.close();
