@@ -17,6 +17,8 @@ Named ownership claims and explicitly introduced numbered holdings lists do not 
 
 Raw source indexes do not always contain document classifications or canonical fund identities. The holdings pipeline inventories available text files and prepares records in memory using the letter reader's existing classification, fund/date resolution and exact-text deduplication policies. It uses the corpus's own registry and date overrides, keeps explicit exclusions, reports unavailable extracts, and never overwrites the source index. Modern classified indexes pass through unchanged. Exact archived document identities reconnect renamed publishers only when their existing owner and fund are unambiguous. Other publishers remain accessible under Fund names to review, without joining known SEC owners. Partial re-extraction retains previously disclosed positions and known weights for the same fund, document and quarter, with a source-review label.
 
+Deployment selects only the public receipt's immutable checkpoint manifest and referenced objects in the private checkout. Older checkpoint versions remain stored in the vault. This bounds download and working disk usage without changing the published history; other processing inputs and regenerated private files remain in place. Restoration still verifies every checksum and the complete payload identity before export.
+
 13F weights describe reported holdings excluding options, N-PORT weights describe fund net assets, and letter weights retain their disclosed or unspecified basis. These denominators are never combined. Letters without a verified holdings date show the disclosure date and explicitly leave the holdings date unknown.
 
 ## Data integrity

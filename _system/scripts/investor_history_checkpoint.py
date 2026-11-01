@@ -9,6 +9,7 @@ import hashlib
 import json
 import shutil
 import sqlite3
+import subprocess
 import tarfile
 import tempfile
 from contextlib import closing
@@ -132,6 +133,82 @@ def part_path(source, manifest, part):
     if Path(part["name"]).name != part["name"] or not part["name"].startswith("part-"):
         raise ValueError("Unsafe checkpoint part path")
     return source / manifest["identity"] / part["name"]
+
+
+def materialize(source, *, identity):
+    """Select one immutable checkpoint in a sparse publication checkout."""
+    if len(identity) != 64 or any(c not in "0123456789abcdef" for c in identity):
+        raise ValueError("Unsafe checkpoint identity")
+    source = Path(source).resolve()
+    vault = source.parent.parent
+    if source != vault / "dashboard-private/investor-history":
+        raise ValueError("Expected a vault investor-history directory")
+
+    def git(*args, **kwargs):
+        return subprocess.run(
+            ["git", "-C", str(vault), *args],
+            check=True,
+            capture_output=True,
+            text=True,
+            **kwargs,
+        ).stdout.strip()
+
+    if Path(git("rev-parse", "--show-toplevel")).resolve() != vault:
+        raise ValueError("Checkpoint is not in the vault checkout")
+    sparse = subprocess.run(
+        ["git", "-C", str(vault), "config", "--bool", "core.sparseCheckout"],
+        capture_output=True,
+        text=True,
+        check=False,
+    )
+    if sparse.stdout.strip() != "true":
+        return {"sparse": False}
+    prefix = "/dashboard-private/investor-history/"
+    previous = git("sparse-checkout", "list").splitlines()
+    # Replace history selection only. The processing checkout may contain new,
+    # unpublished company objects and other regenerated inputs we must retain.
+    keep = [
+        p
+        for p in previous
+        if not (
+            p.lstrip("!/") == prefix.strip("/")
+            or p.lstrip("!/").startswith(prefix.lstrip("/"))
+        )
+    ]
+    selected = [prefix, "!" + prefix + "*", prefix + identity + "/"]
+
+    def apply(patterns):
+        git(
+            "sparse-checkout",
+            "set",
+            "--no-cone",
+            "--stdin",
+            input="\n".join([*keep, *patterns]) + "\n",
+        )
+
+    # Fetch the small pinned manifest before selecting its immutable objects.
+    apply(selected)
+    manifest = json.loads((source / identity / "manifest.json").read_text())
+    if manifest.get("identity") != identity:
+        raise ValueError("Pinned checkpoint identity mismatch")
+    paths = []
+    for part in manifest["parts"]:
+        path = part_path(source, manifest, part).resolve()
+        if not path.is_relative_to(source):
+            raise ValueError("Unsafe checkpoint part path")
+        relative = path.relative_to(vault).as_posix()
+        if any(c in relative for c in "*?[]\\\r\n"):
+            raise ValueError("Unsafe checkpoint selection path")
+        paths.append("/" + relative)
+    if manifest.get("schema_version") == 2:
+        selected.extend([prefix + "objects/", "!" + prefix + "objects/*"])
+    apply([*selected, *paths])
+    return {
+        "sparse": True,
+        "identity": identity,
+        "parts": len(paths),
+        "compressed_bytes": sum(part["bytes"] for part in manifest["parts"]),
+    }
 
 
 def pack(source, destination, *, part_bytes=PART_BYTES):
@@ -284,7 +361,7 @@ def restore(source, destination, *, identity=None):
 
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument("action", choices=["pack", "restore"])
+    parser.add_argument("action", choices=["pack", "restore", "materialize"])
     parser.add_argument("--archive", type=Path, required=True)
     parser.add_argument("--cache", type=Path, default=ARCHIVE)
     parser.add_argument("--public-receipt", type=Path)
@@ -299,6 +376,11 @@ def main():
         print(
             json.dumps({"identity": result["identity"], "parts": len(result["parts"])})
         )
+    elif args.action == "materialize":
+        if not args.public_receipt:
+            parser.error("materialize requires --public-receipt")
+        receipt = json.loads(args.public_receipt.read_text())
+        print(json.dumps(materialize(args.archive, identity=receipt["identity"])))
     else:
         print(
             "Restored checkpoint"

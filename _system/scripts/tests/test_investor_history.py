@@ -25,6 +25,74 @@ from thirteenf_core import merge_filings
 from thirteenf_legacy import parse_legacy_document
 
 
+@pytest.mark.parametrize("broad_checkout", [False, True])
+def test_pinned_materialization_fetches_one_checkpoint_and_preserves_other_inputs(
+    tmp_path, broad_checkout
+):
+    if not shutil.which("git"):
+        pytest.skip("Git is required for sparse checkout integration")
+    vault = tmp_path / "vault"
+    parts = vault / "dashboard-private/investor-history"
+    cache = tmp_path / "cache"
+    db = archive.connect(cache / "archive.sqlite")
+    db.close()
+    archive.write_json(cache / "universe.json", {"revision": "first"})
+    first = checkpoint.pack(cache, parts)
+    archive.write_json(cache / "universe.json", {"revision": "second"})
+    second = checkpoint.pack(cache, parts)
+    letter = vault / "superinvestor-letters/letter.txt"
+    letter.parent.mkdir()
+    letter.write_text("A source document", encoding="utf-8")
+
+    def git(*args, **kwargs):
+        return subprocess.run(
+            ["git", "-C", str(vault), *args],
+            check=True,
+            capture_output=True,
+            text=True,
+            **kwargs,
+        )
+
+    git("init", "-q")
+    git("add", ".")
+    git(
+        "-c",
+        "user.name=Fixture",
+        "-c",
+        "user.email=fixture@example.invalid",
+        "commit",
+        "-qm",
+        "Two immutable checkpoints",
+    )
+    patterns = (
+        "/*\n" if broad_checkout else "/*\n!/dashboard-private/investor-history/\n"
+    )
+    git("sparse-checkout", "set", "--no-cone", "--stdin", input=patterns)
+    note = vault / "untracked-note.txt"
+    note.write_text("Keep regenerated inputs", encoding="utf-8")
+    for selected, obsolete, revision in (
+        (first, second, "first"),
+        (second, first, "second"),
+        (second, first, "second"),
+    ):
+        result = checkpoint.materialize(parts, identity=selected["identity"])
+        assert result["parts"] == len(selected["parts"])
+        assert (parts / selected["identity"] / "manifest.json").is_file()
+        assert not (parts / obsolete["identity"] / "manifest.json").exists()
+        expected = {p["name"] for p in selected["parts"]}
+        assert {
+            p.relative_to(parts).as_posix() for p in (parts / "objects").glob("*")
+        } == expected
+        assert letter.read_text() == "A source document"
+        assert note.read_text() == "Keep regenerated inputs"
+        destination = tmp_path / f"restored-{revision}"
+        assert checkpoint.restore(parts, destination, identity=selected["identity"])
+        assert (
+            json.loads((destination / "universe.json").read_text())["revision"]
+            == revision
+        )
+
+
 @pytest.mark.parametrize("conflicting_filer", [False, True])
 def test_public_brand_links_short_letter_name_to_existing_legal_filer(
     tmp_path, monkeypatch, conflicting_filer
