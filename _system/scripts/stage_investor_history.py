@@ -95,6 +95,16 @@ def stage(site, *, vault=None, receipt=None, cache=None):
         investor_universe.current_disclosure_identity(document, universe)
         for document in disclosures["disclosures"]
     ]
+    # Re-read authorized source text when extraction improves. Keep archived
+    # documents that are no longer present in the current corpus.
+    corpus = vault / "superinvestor-letters/insights.json"
+    refreshed = corpus.is_file()
+    if refreshed:
+        documents, review = global_disclosures.corpus_disclosures(corpus, universe)
+        disclosures["disclosures"] = global_disclosures.merge_disclosure_snapshots(
+            disclosures["disclosures"], documents
+        )
+        disclosures["review"] = [*disclosures.get("review", []), *review]
     global_disclosures.upgrade_nport_snapshots(
         disclosures["disclosures"], cache / "public-cache.sqlite"
     )
@@ -113,6 +123,7 @@ def stage(site, *, vault=None, receipt=None, cache=None):
     return {
         "configured": True,
         "identity": identity,
+        "letter_corpus_refreshed": refreshed,
         "filings": coverage["filings"],
         "total_site_files": total_site_files,
         **packaging,

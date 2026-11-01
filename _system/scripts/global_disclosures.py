@@ -504,6 +504,222 @@ NON_SECURITY_SYMBOLS = {
 }
 
 
+def named_ownership_claims(text):
+    """Read explicit ownership without inferring symbols, values or allocations."""
+    # Preserve paragraphs/list boundaries while rejoining PDF soft line breaks.
+    paragraphs = [
+        re.sub(r"\s+", " ", p).strip()
+        for p in re.split(r"\n\s*\n", text.replace("\r\n", "\n"))
+        if p.strip()
+    ]
+    issuer = r"(?P<issuer>(?-i:[A-Z][A-Za-z0-9&’'/-]*(?:\.[A-Za-z0-9]+)*(?:\s+(?:[A-Z][A-Za-z0-9&’'/-]*(?:\.[A-Za-z0-9]+)*|of|the|&)){0,10}))"
+    excluded = re.compile(
+        r"\b(?:sold|selling|sales|unloading|unloaded|exited|exit|liquidated|divested|disposed|ceased|former|closed|short|shorted|shorting|previously|hypothetical|hypothetically|personal|benchmark|competitor|watchlist|no longer|fully out|used to|my family|our family|would have|had we (?:held|kept|owned|retained)|if we had (?:held|kept|owned|retained))\b",
+        re.I,
+    )
+    patterns = [
+        re.compile(
+            r"\bour\s+"
+            + issuer
+            + r"\s+(?:position|holding|stake|investment)\b(?!\s+(?-i:[A-Z]))",
+            re.I,
+        ),
+        re.compile(
+            r"\bour\s+(?:(?:largest|second largest|biggest|current|existing)\s+)?(?:position|holding|stake|investment)\s*(?:in\s+|is\s+|,\s*)"
+            + issuer,
+            re.I,
+        ),
+        re.compile(
+            r"\bwe\s+(?:currently\s+)?(?:own|hold)\s+(?:(?:shares|stock|a stake|an interest|a position|a holding|a small fraction|small fractions)\s+(?:in|of)\s+)?"
+            + issuer,
+            re.I,
+        ),
+    ]
+    # A fund abbreviation must be introduced as an investor addressee in this
+    # document; arbitrary companies owning other businesses are not the manager.
+    fund_names = re.findall(r"(?m)^\s*([A-Z][A-Z0-9-]{1,12})\s+Investors\s*:", text)
+    if fund_names:
+        subject = "(?:" + "|".join(re.escape(n) for n in fund_names) + ")"
+        patterns.append(
+            re.compile(
+                r"\b"
+                + subject
+                + r"\b[^.!?]{0,120}?\b(?:has|holds)\s+(?:a|the)\s+(?:largest\s+)?position\s+in\s+"
+                + issuer,
+                re.I,
+            )
+        )
+    claims = []
+
+    def add(name, evidence, suffix=""):
+        name = name.strip(" .,-")
+        key = re.sub(r"[^a-z0-9]", "", name.lower())
+        if (
+            not key
+            or key in NON_SECURITY_LABELS
+            or name.upper() in NON_SECURITY_SYMBOLS
+        ):
+            return
+        if re.fullmatch(r"Q[1-4]|FY\d{2,4}", name, re.I) or name.casefold() in {
+            "january",
+            "february",
+            "march",
+            "april",
+            "may",
+            "june",
+            "july",
+            "august",
+            "september",
+            "october",
+            "november",
+            "december",
+            "featured",
+            "illustrative",
+            "private",
+            "public",
+            "current",
+            "core",
+            "control",
+            "fund's",
+            "fund’s",
+            "initial",
+            "new",
+            "existing",
+            "remaining",
+            "largest",
+            "long",
+            "short",
+            "greek",
+            "american",
+            "european",
+            "japanese",
+            "chinese",
+            "indian",
+            "russian",
+            "turkish",
+            "korean",
+            "british",
+            "french",
+            "german",
+            "italian",
+            "swiss",
+            "canadian",
+            "australian",
+            "brazilian",
+            "global",
+            "international",
+            "jan",
+            "feb",
+            "mar",
+            "apr",
+            "jun",
+            "jul",
+            "aug",
+            "sep",
+            "sept",
+            "oct",
+            "nov",
+            "dec",
+        }:
+            return
+        if name.split()[-1].casefold() in {
+            "african",
+            "american",
+            "european",
+            "asian",
+        } or re.search(r"-[a-z]", name):
+            return
+        if re.match(
+            r"\s+(?:equities|stocks|bonds|assets|currencies|exposure|companies|businesses|securities)\b",
+            suffix,
+            re.I,
+        ):
+            return
+        if name in {"We", "Our", "The", "This", "I", "Fund", "Funds", "Portfolio"}:
+            return
+        # A second named business joined with 'and' is not one issuer name.
+        if re.match(r"\s+and\s+[A-Z]", suffix):
+            return
+        symbol = re.match(
+            r"\s*\(([A-Z0-9][A-Z0-9.-]{0,14})(?:\s+(HK|LN|JP|JT|FP|GY|NA|SS|CN|AU|SM|SW|KS|US))?\)",
+            suffix,
+        )
+        ticker = normalize_symbol(symbol[1], symbol[2] or "") if symbol else ""
+        if ticker in NON_SECURITY_SYMBOLS:
+            ticker = ""
+        claims.append(
+            {
+                "issuer": name,
+                "ticker": ticker,
+                "weight_pct": None,
+                "weight_basis": None,
+                "source_kind": "fund_disclosure",
+                "evidence_quote": evidence,
+            }
+        )
+
+    for paragraph in paragraphs:
+        if excluded.search(paragraph):
+            continue
+        for pattern in patterns:
+            for match in pattern.finditer(paragraph):
+                if re.match(
+                    r"\s*(?:\([^)]*\)\s*)?(?:theme|strategy|process|approach|idea|group|partners)\b",
+                    paragraph[match.end() :],
+                    re.I,
+                ):
+                    continue
+                add(match["issuer"], paragraph, paragraph[match.end() :])
+        for match in re.finditer(
+            r"\bbesides\s+([^.!?]+?),\s*we\s+own\b", paragraph, re.I
+        ):
+            names = re.split(r",\s*|\s+and\s+", match[1])
+            # Do not split single-word names such as 'Smith and Wesson'.
+            if all(
+                len(name.split()) >= 2 and re.fullmatch(issuer, name, re.I)
+                for name in names
+            ):
+                for name in names:
+                    add(name, paragraph)
+        # An acquisition requires an accompanying present ownership statement.
+        if re.search(r"\bwe (?:currently )?own\b", paragraph, re.I):
+            for match in re.finditer(
+                r"\bwe\s+(?:have\s+)?(?:also\s+)?(?:added|bought|purchased)\s+"
+                + issuer,
+                paragraph,
+                re.I,
+            ):
+                add(match["issuer"], paragraph, paragraph[match.end() :])
+
+    heading = re.compile(
+        r"\b(?:businesses|companies|holdings|positions)\s+in\s+our\s+portfolio\b[^:]*:|\bour (?:current )?(?:holdings|positions)\s+(?:are|include)\s*:",
+        re.I,
+    )
+    active = False
+    pending = ""
+    for line in text.splitlines():
+        stripped = line.strip()
+        if not stripped:
+            continue
+        numbered = re.match(r"^\d+[.)]\s+(.+)$", stripped)
+        if numbered and active:
+            label = numbered[1].strip()
+            if not excluded.search(label) and re.fullmatch(
+                r"[A-Z][A-Za-z0-9&’'(). /-]{1,150}", label
+            ):
+                add(label, pending + " " + stripped)
+            continue
+        if active:
+            pending = ""
+        active = False
+        pending = (pending + " " + stripped)[-500:]
+        if heading.search(pending) and not excluded.search(pending):
+            active = True
+        if stripped.endswith((".", "!", "?")):
+            pending = ""
+    return claims
+
+
 def extract_document_positions(text, mentions=()):
     """Only explicit held claims and holdings-table rows; unknown weights stay null."""
     positions = {}
@@ -608,6 +824,45 @@ def extract_document_positions(text, mentions=()):
             "source_kind": "fund_disclosure",
             "evidence_quote": line.strip(),
         }
+    claims = named_ownership_claims(text)
+    for claim in claims:
+        matching = [
+            row
+            for row in positions.values()
+            if (claim["ticker"] and claim["ticker"] == row.get("ticker"))
+            or claim["issuer"].casefold() == (row.get("issuer") or "").casefold()
+        ]
+        if not matching:
+            # A symbol already explicitly supplied by this document's metadata
+            # can name the one ownership claim in its evidence. No ticker lookup.
+            matching = [
+                row
+                for row in positions.values()
+                if row.get("ticker")
+                and re.search(
+                    r"(?<!\w)" + re.escape(claim["issuer"]) + r"(?!\w)",
+                    row.get("evidence_quote") or "",
+                    re.I,
+                )
+                and len(
+                    {
+                        c["issuer"].casefold()
+                        for c in claims
+                        if re.search(
+                            r"(?<!\w)" + re.escape(c["issuer"]) + r"(?!\w)",
+                            row.get("evidence_quote") or "",
+                            re.I,
+                        )
+                    }
+                )
+                == 1
+            ]
+        if len(matching) == 1:
+            if matching[0].get("issuer") == matching[0].get("ticker"):
+                matching[0]["issuer"] = claim["issuer"]
+            continue
+        key = claim["ticker"] or "issuer:" + claim["issuer"].casefold()
+        positions.setdefault(key, claim)
     return list(positions.values())
 
 
@@ -650,8 +905,6 @@ def corpus_disclosures(corpus, universe):
             continue
         text = path.read_text(encoding="utf-8", errors="replace")
         positions = extract_document_positions(text, entry.get("positions", []))
-        if not positions:
-            continue
         quarter = entry.get("quarter")
         date_source = entry.get("date_source") or ""
         dated = verified_date(entry)
@@ -673,11 +926,36 @@ def corpus_disclosures(corpus, universe):
                 "source_ref": ref,
                 "source_url": "/fund-letters/?" + urlencode({"fund": entry["fund_id"]}),
                 "partial": True,
-                "scope": "explicitly_disclosed_positions",
+                "scope": "explicitly_disclosed_positions"
+                if positions
+                else "no_explicit_positions_identified",
                 "positions": positions,
             }
         )
     return output, review
+
+
+def merge_disclosure_snapshots(archived, current):
+    """Keep archived observations when a later text extraction finds none."""
+    retained = {(d["manager_id"], d["id"]): d for d in archived}
+    for document in current:
+        key = (document["manager_id"], document["id"])
+        previous = retained.get(key, {})
+        if (
+            document.get("source_kind") == "fund_disclosure"
+            and not document.get("positions")
+            and previous.get("positions")
+            and document.get("vehicle_id") == previous.get("vehicle_id")
+            and document.get("quarter") == previous.get("quarter")
+        ):
+            document = {
+                **document,
+                "positions": previous["positions"],
+                "scope": previous.get("scope", "explicitly_disclosed_positions"),
+                "source_review": "Previously disclosed positions retained; source review required.",
+            }
+        retained[key] = document
+    return list(retained.values())
 
 
 def nport_filings(cik, query=None, *, form="NPORT-P"):

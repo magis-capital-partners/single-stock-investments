@@ -129,12 +129,12 @@ def refresh(*, seconds=14400, corpus=None, public=True):
             )
             for d in [current_disclosure_identity(raw, universe)]
         }
-    retained.update({(d["manager_id"], d["id"]): d for d in documents})
+    merged = global_disclosures.merge_disclosure_snapshots(list(retained.values()), documents)
     global_disclosures.upgrade_nport_snapshots(
-        list(retained.values()), history.ARCHIVE / "public-cache.sqlite"
+        merged, history.ARCHIVE / "public-cache.sqlite"
     )
     disclosure_coverage = global_disclosures.publish(
-        list(retained.values()), universe, review=review
+        merged, universe, review=review
     )
     result = {
         "filings": coverage["filings"],
