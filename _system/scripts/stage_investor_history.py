@@ -9,6 +9,7 @@ from pathlib import Path
 
 import global_disclosures
 import investor_history as history
+import investor_universe
 from holdings_asset_bundles import pack_assets, unpack_assets, validate_site_budget
 from investor_history_checkpoint import restore
 from vault_paths import research_vault_root
@@ -79,6 +80,7 @@ def stage(site, *, vault=None, receipt=None, cache=None):
             "Pinned investor archive is missing; refusing an incomplete deployment"
         )
     universe = json.loads((cache / "universe.json").read_text(encoding="utf-8"))
+    universe = investor_universe.reconcile_public_identities(universe)
     # The private universe retains non-filers and unresolved document identities.
     # Only the known SEC owners have public filings; identity labels never join books.
     unpack_assets(site / "data/holdings")
@@ -89,6 +91,10 @@ def stage(site, *, vault=None, receipt=None, cache=None):
     finally:
         db.close()
     disclosures = json.loads((cache / "disclosures.json").read_text(encoding="utf-8"))
+    disclosures["disclosures"] = [
+        investor_universe.current_disclosure_identity(document, universe)
+        for document in disclosures["disclosures"]
+    ]
     global_disclosures.upgrade_nport_snapshots(
         disclosures["disclosures"], cache / "public-cache.sqlite"
     )

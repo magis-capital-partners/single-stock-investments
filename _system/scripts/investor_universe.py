@@ -86,6 +86,137 @@ def strict_name_match(left, right):
     return bool(a) and (a == b or "".join(a) == "".join(b))
 
 
+def public_name_variants(name, variants, aliases):
+    """Expand declared aliases in either direction, without fuzzy matching."""
+    result = list(dict.fromkeys([name, *variants]))
+    keys = {re.sub(r"[^a-z0-9]", "", value.lower()) for value in result if value}
+    while True:
+        before = len(result)
+        for brand, names in aliases.items():
+            group = [brand, *names]
+            if not any(
+                re.sub(r"[^a-z0-9]", "", value.lower()) in keys
+                for value in group
+                if value
+            ):
+                continue
+            for value in group:
+                if value and value not in result:
+                    result.append(value)
+                    keys.add(re.sub(r"[^a-z0-9]", "", value.lower()))
+        if len(result) == before:
+            return result
+
+
+def reconcile_public_identities(universe, *, roster=None, aliases=None):
+    """Retain verified public brands and link confirmed archived publishers.
+
+    Only a unique existing SEC owner can receive an alias. Known filers are
+    never combined by name, and fund vehicles retain their own identities.
+    This also upgrades pinned snapshots created before aliases were retained.
+    """
+    if roster is None:
+        roster = json.loads(ROSTER.read_text(encoding="utf-8"))["managers"]
+    if aliases is None:
+        aliases = json.loads(ALIASES.read_text(encoding="utf-8"))
+    managers = {m["manager_id"]: dict(m) for m in universe["managers"]}
+    public_names = defaultdict(set)
+    preferred = {}
+    for candidate in roster:
+        variants = public_name_variants(candidate["firm"], [candidate["name"]], aliases)
+        owners = [
+            m
+            for m in managers.values()
+            if m.get("cik")
+            and any(
+                strict_name_match(variant, name)
+                for variant in variants
+                for name in [
+                    m.get("display_name") or "",
+                    m.get("sec_name") or "",
+                    *m.get("public_aliases", []),
+                ]
+            )
+        ]
+        if len(owners) != 1:
+            continue
+        owner = owners[0]
+        owner_id = owner["manager_id"]
+        public_names[owner_id].update(
+            name
+            for name in [
+                *variants,
+                owner.get("display_name"),
+                owner.get("sec_name"),
+                *owner.get("public_aliases", []),
+            ]
+            if name
+        )
+        preferred.setdefault(owner_id, candidate["firm"])
+    membership = universe.get("membership", {})
+    redirects = {
+        source: target
+        for source, target in universe.get("manager_redirects", {}).items()
+        if not managers.get(source, {}).get("cik")
+        and managers.get(target, {}).get("cik")
+    }
+    for manager_id, manager in managers.items():
+        if manager.get("cik"):
+            continue
+        if manager.get(
+            "identity_status"
+        ) != "document_header_confirmed" and "public_roster" not in membership.get(
+            manager_id, []
+        ):
+            continue
+        # A private publisher needs a declared public spelling, not a fuzzy
+        # family-name match after removing words such as Capital or Advisors.
+        key = re.sub(r"[^a-z0-9]", "", (manager.get("display_name") or "").lower())
+        owners = [
+            owner
+            for owner, names in public_names.items()
+            if key
+            and any(key == re.sub(r"[^a-z0-9]", "", name.lower()) for name in names)
+        ]
+        if len(owners) == 1:
+            redirects[manager_id] = owners[0]
+    for owner, names in public_names.items():
+        managers[owner]["public_aliases"] = sorted(names)
+        managers[owner]["display_name"] = preferred[owner]
+    members = defaultdict(set)
+    for owner, tags in membership.items():
+        target = redirects.get(owner, owner)
+        if target in managers:
+            members[target].update(tags)
+    result = {
+        **universe,
+        "managers": [m for key, m in sorted(managers.items()) if key not in redirects],
+        "source_ids": {
+            source: redirects.get(owner, owner)
+            for source, owner in universe.get("source_ids", {}).items()
+        },
+        "manager_redirects": redirects,
+        "membership": {owner: sorted(tags) for owner, tags in members.items()},
+        "identity_review": [
+            r
+            for r in universe.get("identity_review", [])
+            if r.get("manager_id") not in redirects
+        ],
+    }
+    return result
+
+
+def current_disclosure_identity(document, universe):
+    """Change the verified manager link while preserving fund/date/scope."""
+    owner = None
+    if document.get("source_kind") == "fund_disclosure":
+        owner = universe.get("source_ids", {}).get(document.get("vehicle_id"))
+    owner = owner or universe.get("manager_redirects", {}).get(
+        document.get("manager_id")
+    )
+    return {**document, "manager_id": owner} if owner else document
+
+
 class RosterParser(HTMLParser):
     def __init__(self):
         super().__init__()
@@ -295,7 +426,7 @@ def compile_universe(
         from sec_client import get_json
 
         for candidate in public_candidates:
-            variants = [candidate["firm"], *aliases.get(candidate["firm"], [])]
+            variants = public_name_variants(candidate["firm"], [], aliases)
             if match_cik(variants, catalog):
                 continue
             for variant in variants:
@@ -347,7 +478,7 @@ def compile_universe(
     members = defaultdict(set)
 
     def resolve(name, variants, membership, *, private=False):
-        variants = list(dict.fromkeys([name, *variants, *aliases.get(name, [])]))
+        variants = public_name_variants(name, variants, aliases)
         exact = [
             r
             for r in public
@@ -473,6 +604,9 @@ def compile_universe(
         "eligible_profile_count": len(profiles),
         "public_roster_count": len(public_candidates),
     }
+    result = reconcile_public_identities(
+        result, roster=public_candidates, aliases=aliases
+    )
     write_json(ARCHIVE / "universe.json", result)
     return result
 

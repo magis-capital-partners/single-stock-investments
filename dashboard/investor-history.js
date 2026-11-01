@@ -19,7 +19,7 @@
       if (source === '13f' && !record && !gap || source === 'disclosures' && !disclosed) return [];
       const row = {...manager,...record,...(quarter!=='latest' && !record ? {quarter,positions:null,ssi_overlap:null,period_end:null} : {})};
       if (overlap && !(row.ssi_overlap > 0)) return [];
-      if (!`${row.name} ${row.manager_id}`.toLowerCase().includes(query.toLowerCase())) return [];
+      if (![row.name,row.manager_id,row.legal_name,...(row.aliases || [])].join(' ').toLowerCase().includes(query.toLowerCase())) return [];
       return [row];
     }).sort((a,b) => Number(Boolean(historyFor(b).length || b.disclosure_count))-Number(Boolean(historyFor(a).length || a.disclosure_count)) || (b.ssi_overlap || 0)-(a.ssi_overlap || 0) || a.name.localeCompare(b.name));
   }
@@ -184,7 +184,7 @@
         const periods=availablePeriods(manager,source);
         const tables=[];
         const holdingsTable=(rows,options={})=>{const number=tables.push({rows,options})-1;return `<div data-position-group="${number}"></div>`;};
-        detail.innerHTML=`<h3>${esc(manager.name)}</h3><div class="workspace-filter"><label>Reporting quarter<select data-detail-quarter><option value="latest">Latest available by source</option>${periods.map(q=>`<option value="${esc(q)}" ${q===requested?'selected':''}>${esc(quarterLabel(q))}</option>`).join('')}</select></label></div>
+        detail.innerHTML=`<h3>${esc(manager.name)}</h3>${manager.legal_name && manager.legal_name!==manager.name ? `<p>SEC filer: ${esc(manager.legal_name)}</p>` : ''}<div class="workspace-filter"><label>Reporting quarter<select data-detail-quarter><option value="latest">Latest available by source</option>${periods.map(q=>`<option value="${esc(q)}" ${q===requested?'selected':''}>${esc(quarterLabel(q))}</option>`).join('')}</select></label></div>
           ${manager.identity_status==='unverified_document_identity' ? '<p class="investor-context">Fund name from a document; manager identity needs review.</p>' : ''}
           <p class="investor-context">${history.length} 13F quarters${history.length ? ` · ${esc(history[0].quarter)}–${esc(history.at(-1).quarter)}` : ''} · ${manager.disclosure_count || 0} fund disclosures</p>
           ${(manager.fund_ids || []).map(fund=>sourceLink(`/fund-letters/?fund=${encodeURIComponent(fund)}`,'Read fund letters')).join(' · ')}

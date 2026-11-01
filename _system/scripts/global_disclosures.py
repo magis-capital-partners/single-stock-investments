@@ -1026,6 +1026,9 @@ def publish(
                 "coverage_status": "no_public_13f_loaded",
             },
         )
+        row["name"] = manager["display_name"]
+        row["aliases"] = manager.get("public_aliases", [])
+        row["legal_name"] = manager.get("sec_name") if manager.get("cik") else None
         row["identity_status"] = manager.get("identity_status", "public_identity")
         row["fund_ids"] = sorted(source_ids.get(manager["manager_id"], []))
         documents = by_manager.get(manager["manager_id"], [])
