@@ -246,6 +246,29 @@ def reconcile_public_identities(universe, *, roster=None, aliases=None):
 
 def current_disclosure_identity(document, universe):
     """Change the verified manager link while preserving fund/date/scope."""
+    if document.get("manager_link_basis") in {
+        "named_adviser",
+        "publisher_header",
+        "curated_alias",
+    } and any(
+        m["manager_id"] == document["manager_id"] and m.get("cik")
+        for m in universe["managers"]
+    ):
+        return document
+    link = universe.get("document_manager_links", {}).get(document.get("source_ref"))
+    if (
+        document.get("source_kind") == "fund_disclosure"
+        and link
+        and any(
+            m["manager_id"] == link["manager_id"] and m.get("cik")
+            for m in universe["managers"]
+        )
+    ):
+        return {
+            **document,
+            "manager_id": link["manager_id"],
+            "manager_link_basis": link["basis"],
+        }
     owner = None
     if document.get("source_kind") == "fund_disclosure":
         owner = universe.get("source_ids", {}).get(document.get("vehicle_id"))
@@ -349,10 +372,10 @@ def match_cik(aliases, catalog, token_index=None):
     return next(iter(found.items())) if len(found) == 1 else None
 
 
-def eligible_profiles(path):
+def eligible_profiles(path, *, records=None):
     from investor_corpus import load_records
 
-    rows = load_records(path)
+    rows = load_records(path) if records is None else records
     profiles = {}
     for row in rows:
         if row.get("letter_eligible") is not True:
@@ -400,8 +423,10 @@ def eligible_profiles(path):
                         re.IGNORECASE,
                     )
                 ]
-                if len(set(publisher)) == 1 and (
-                    salutation or row.get("document_type") == "fund_report"
+                if (
+                    len(set(publisher)) == 1
+                    and (salutation or row.get("document_type") == "fund_report")
+                    and strict_name_match(name, publisher[0])
                 ):
                     profile["aliases"].add(publisher[0])
                     profile["name"] = publisher[0]
@@ -432,6 +457,144 @@ def eligible_profiles(path):
             }
         )
     return profiles
+
+
+def refresh_document_profiles(universe, corpus, records):
+    """Recheck publisher headers when a pinned universe predates classification.
+
+    A confirmed letter publisher may be a non-filer. Exact publisher headers
+    and declared public aliases can link it to a unique filer. Known CIK owners
+    stay intact; conflicting headers retain an identity review.
+    """
+    from investor_corpus import source_path
+
+    managers = {m["manager_id"]: dict(m) for m in universe["managers"]}
+
+    def header_key(value):
+        value = re.sub(
+            r"\b(?:the|incorporated|inc|llc|llp|lp|ltd|plc|corp|corporation)\b",
+            "",
+            value,
+            flags=re.I,
+        )
+        return re.sub(r"[\W_]", "", value.casefold())
+
+    known_headers = defaultdict(set)
+    declared_aliases = json.loads(ALIASES.read_text(encoding="utf-8"))
+    declared_names = {
+        header_key(name)
+        for brand, names in declared_aliases.items()
+        for name in [brand, *names]
+    }
+    declared_names.update(
+        header_key(name)
+        for m in managers.values()
+        if m.get("cik")
+        for name in [m.get("display_name") or "", m.get("sec_name") or ""]
+        if name
+    )
+    curated_names = defaultdict(set)
+    for manager in managers.values():
+        if not manager.get("cik"):
+            continue
+        for name in public_name_variants(
+            manager.get("display_name") or "",
+            [manager.get("sec_name") or "", *manager.get("public_aliases", [])],
+            declared_aliases,
+        ):
+            key = header_key(name)
+            if key in declared_names:
+                curated_names[key].add(manager["manager_id"])
+            if len(key) >= 8 and len(name.split()) >= 2:
+                known_headers[key].add(manager["manager_id"])
+    groups = defaultdict(list)
+    document_links = dict(universe.get("document_manager_links", {}))
+    for record in records:
+        owner = universe.get("source_ids", {}).get(record.get("fund_id"))
+        if (
+            owner not in managers
+            or managers[owner].get("cik")
+            or not record.get("letter_eligible")
+            or record.get("document_type") not in {"investor_letter", "fund_report"}
+        ):
+            continue
+        # These spellings are an operator-curated public identity declaration,
+        # not a fuzzy match or an inferred relationship between known filers.
+        aliases = set(curated_names.get(header_key(record.get("fund") or ""), set()))
+        headers = set()
+        source = source_path(corpus, record.get("source_file"))
+        if source is not None:
+            document_links.pop(record.get("source_file"), None)
+            with source.open(encoding="utf-8", errors="replace") as stream:
+                head = stream.read(5000)
+            greeting = re.search(
+                r"\b(?:dear\s+(?:[\w&'’ -]+\s+){0,4}?(?:partners?|investors?|shareholders?|co-investors?)|to\s+(?:(?:the|our)\s+)?shareholders?)\b",
+                head,
+                re.I,
+            )
+            # A company discussed in a portfolio or report is not the publisher.
+            # Only the first non-empty letterhead line before a salutation is
+            # evidence for this document. It never renames the whole source.
+            if greeting:
+                lines = [
+                    line.strip()
+                    for line in head[: greeting.start()].splitlines()
+                    if line.strip()
+                ]
+                if lines:
+                    headers.update(known_headers.get(header_key(lines[0]), set()))
+        candidates = aliases | headers
+        groups[owner].append((aliases, candidates))
+        if len(candidates) == 1:
+            document_links[record["source_file"]] = {
+                "manager_id": next(iter(candidates)),
+                "basis": "publisher_header" if headers else "curated_alias",
+            }
+    pending_confirmation = set()
+    for profile in eligible_profiles(corpus, records=records).values():
+        if profile["identity_status"] != "document_header_confirmed":
+            continue
+        for source in profile["ids"]:
+            owner = universe.get("source_ids", {}).get(source)
+            manager = managers.get(owner)
+            if manager is None or manager.get("cik"):
+                continue
+            if not strict_name_match(
+                manager.get("display_name") or "", profile["name"]
+            ):
+                continue
+            pending_confirmation.add(owner)
+    redirects = dict(universe.get("manager_redirects", {}))
+    for owner, rows in groups.items():
+        targets = set().union(*(candidates for _, candidates in rows))
+        # Only an explicitly declared brand shared by every eligible source
+        # record can join an entire publisher. Header evidence is document-only.
+        if len(targets) == 1 and all(
+            len(aliases) == 1 and aliases == candidates for aliases, candidates in rows
+        ):
+            redirects[owner] = next(iter(targets))
+    result = reconcile_public_identities(
+        {
+            **universe,
+            "managers": list(managers.values()),
+            "manager_redirects": redirects,
+            "document_manager_links": document_links,
+        }
+    )
+    for manager in result["managers"]:
+        if manager["manager_id"] in pending_confirmation and not manager.get("cik"):
+            manager["identity_status"] = "document_header_confirmed"
+    confirmed = {
+        m["manager_id"]
+        for m in result["managers"]
+        if m.get("identity_status") == "document_header_confirmed"
+    }
+    result["identity_review"] = [
+        r
+        for r in result.get("identity_review", [])
+        if r.get("manager_id") not in confirmed
+    ]
+    return result
 
 
 def compile_universe(

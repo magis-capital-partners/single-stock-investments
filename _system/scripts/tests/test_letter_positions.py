@@ -14,6 +14,293 @@ import investor_universe as universe
 import investor_corpus as corpus_inputs
 
 
+def test_explicit_corpus_cannot_read_a_different_vaults_copy(tmp_path, monkeypatch):
+    corpus = tmp_path / "selected/insights.json"
+    corpus.parent.mkdir()
+    (corpus.parent / "letter.txt").write_text(
+        "We own Delta Equipment.", encoding="utf-8"
+    )
+    other = tmp_path / "other-letter.txt"
+    other.write_text("We own Legacy Equipment.", encoding="utf-8")
+    monkeypatch.setattr(
+        disclosures, "resolve_ref_to_path", lambda ref: other, raising=False
+    )
+    records = [
+        {
+            "fund_id": "example",
+            "fund": "Example Fund",
+            "letter_eligible": True,
+            "document_type": "investor_letter",
+            "source_file": corpus_inputs.PREFIX + "letter.txt",
+        }
+    ]
+    current = {
+        "managers": [{"manager_id": "example", "cik": None}],
+        "source_ids": {"example": "example"},
+    }
+    documents, review = disclosures.corpus_disclosures(corpus, current, records=records)
+    assert not review
+    assert [p["issuer"] for p in documents[0]["positions"]] == ["Delta Equipment"]
+
+
+def test_one_letterhead_cannot_rename_a_generic_publisher_collection(tmp_path):
+    corpus = tmp_path / "insights.json"
+    (tmp_path / "letter.txt").write_text(
+        "Delta Capital\nDear Investors,\nWe own Example Company.", encoding="utf-8"
+    )
+    record = {
+        "fund_id": "generic",
+        "fund": "Generic Collection",
+        "letter_eligible": True,
+        "document_type": "investor_letter",
+        "source_file": corpus_inputs.PREFIX + "letter.txt",
+    }
+    profiles = universe.eligible_profiles(corpus, records=[record])
+    profile = next(iter(profiles.values()))
+    assert profile["name"] == "Generic Collection"
+    assert "Delta Capital" not in profile["aliases"]
+
+
+def test_explicit_curated_brand_links_a_letter_without_firm_letterhead(tmp_path):
+    corpus = tmp_path / "insights.json"
+    (tmp_path / "letter.txt").write_text(
+        "Dear Partners,\nWe own Delta Equipment.", encoding="utf-8"
+    )
+    records = [
+        {
+            "fund_id": "baupost",
+            "fund": "Baupost",
+            "letter_eligible": True,
+            "document_type": "investor_letter",
+            "source_file": corpus_inputs.PREFIX + "letter.txt",
+        }
+    ]
+    current = {
+        "managers": [
+            {
+                "manager_id": "baupost-group",
+                "display_name": "Baupost Group",
+                "cik": "1061768",
+            },
+            {
+                "manager_id": "baupost",
+                "display_name": "Baupost",
+                "cik": None,
+                "identity_status": "unverified_document_identity",
+            },
+        ],
+        "source_ids": {"baupost": "baupost"},
+    }
+    result = universe.refresh_document_profiles(current, corpus, records)
+    assert result["source_ids"]["baupost"] == "baupost-group"
+
+
+def test_a_named_adviser_link_is_not_undone_by_a_similarly_named_publisher():
+    document = {
+        "manager_id": "ruane-cunniff",
+        "vehicle_id": "sequoia",
+        "source_kind": "fund_disclosure",
+        "manager_link_basis": "named_adviser",
+    }
+    current = {
+        "managers": [
+            {"manager_id": "ruane-cunniff", "cik": "1720792"},
+            {"manager_id": "sequoia", "cik": "1913045"},
+        ],
+        "source_ids": {"sequoia": "sequoia"},
+    }
+    assert (
+        universe.current_disclosure_identity(document, current)["manager_id"]
+        == "ruane-cunniff"
+    )
+
+
+def test_full_company_header_repairs_a_malformed_short_publisher_without_fuzzy_names(
+    tmp_path,
+):
+    corpus = tmp_path / "insights.json"
+    (tmp_path / "letter.txt").write_text(
+        "BERKSHIRE HATHAWAY INC.\nTo the Shareholders:\nWe own Delta Equipment.",
+        encoding="utf-8",
+    )
+    (tmp_path / "other.txt").write_text(
+        "Cedar Value Fund\nDear Partner,\nBerkshire Hathaway Inc.\nWe own Delta Equipment.",
+        encoding="utf-8",
+    )
+    records = [
+        {
+            "fund_id": "malformed-title",
+            "fund": "Unverified Title",
+            "letter_eligible": True,
+            "document_type": "investor_letter",
+            "source_file": corpus_inputs.PREFIX + "letter.txt",
+        },
+        {
+            "fund_id": "malformed-title",
+            "fund": "Unverified Title",
+            "letter_eligible": True,
+            "document_type": "investor_letter",
+            "source_file": corpus_inputs.PREFIX + "other.txt",
+        },
+    ]
+    current = {
+        "managers": [
+            {
+                "manager_id": "berkshire-hathaway",
+                "display_name": "Berkshire Hathaway",
+                "cik": "1067983",
+            },
+            {
+                "manager_id": "malformed",
+                "display_name": "Unverified Title",
+                "cik": None,
+                "identity_status": "unverified_document_identity",
+            },
+        ],
+        "source_ids": {"malformed-title": "malformed"},
+    }
+    result = universe.refresh_document_profiles(current, corpus, records)
+    assert result["source_ids"]["malformed-title"] == "malformed"
+    assert (
+        result["document_manager_links"][corpus_inputs.PREFIX + "letter.txt"][
+            "manager_id"
+        ]
+        == "berkshire-hathaway"
+    )
+    assert result["managers"][0]["cik"] == "1067983"
+    documents, review = disclosures.corpus_disclosures(corpus, result, records=records)
+    assert not review
+    assert {d["source_ref"]: d["manager_id"] for d in documents} == {
+        corpus_inputs.PREFIX + "letter.txt": "berkshire-hathaway",
+        corpus_inputs.PREFIX + "other.txt": "malformed",
+    }
+
+
+@pytest.mark.parametrize("greeting", ["Dear Partner,", ""])
+def test_discussed_companies_never_identify_a_letter_or_report_publisher(
+    tmp_path, greeting
+):
+    corpus = tmp_path / "insights.json"
+    (tmp_path / "letter.txt").write_text(
+        "Cedar Value Fund\n"
+        + greeting
+        + "\nBerkshire Hathaway Inc.\nWe own Delta Equipment.",
+        encoding="utf-8",
+    )
+    record = {
+        "fund_id": "generic",
+        "fund": "Generic Title",
+        "letter_eligible": True,
+        "document_type": "fund_report",
+        "source_file": corpus_inputs.PREFIX + "letter.txt",
+    }
+    current = {
+        "managers": [
+            {
+                "manager_id": "berkshire-hathaway",
+                "display_name": "Berkshire Hathaway",
+                "cik": "1067983",
+            },
+            {
+                "manager_id": "generic",
+                "display_name": "Generic Title",
+                "cik": None,
+                "identity_status": "unverified_document_identity",
+            },
+        ],
+        "source_ids": {"generic": "generic"},
+    }
+    result = universe.refresh_document_profiles(current, corpus, [record])
+    assert result["source_ids"]["generic"] == "generic"
+    assert not result["document_manager_links"]
+
+
+@pytest.mark.parametrize("ambiguous", [False, True])
+def test_pinned_unverified_publishers_recheck_source_headers_before_alias_linking(
+    tmp_path, ambiguous
+):
+    corpus = tmp_path / "insights.json"
+    (tmp_path / "letter.txt").write_text(
+        "Akre Focus Fund\nDear Shareholders,\nWe own Delta Equipment.", encoding="utf-8"
+    )
+    records = [
+        {
+            "fund_id": "akre-focus",
+            "fund": "Akre Focus",
+            "letter_eligible": True,
+            "document_type": "investor_letter",
+            "source_file": corpus_inputs.PREFIX + "letter.txt",
+        }
+    ]
+    existing = {
+        "managers": [
+            {
+                "manager_id": "akre-capital-management",
+                "display_name": "Akre Capital Management",
+                "cik": "1112520",
+            },
+            {
+                "manager_id": "akre-focus",
+                "display_name": "Akre Focus",
+                "cik": None,
+                "identity_status": "unverified_document_identity",
+            },
+        ],
+        "source_ids": {"akre-focus": "akre-focus"},
+        "identity_review": [{"manager_id": "akre-focus"}],
+    }
+    if ambiguous:
+        existing["managers"].append(
+            {"manager_id": "other", "display_name": "Akre Focus Fund", "cik": "2"}
+        )
+    result = universe.refresh_document_profiles(existing, corpus, records)
+    if ambiguous:
+        assert result["source_ids"]["akre-focus"] == "akre-focus"
+    else:
+        assert result["source_ids"]["akre-focus"] == "akre-capital-management"
+        assert not result["identity_review"]
+    assert {m["manager_id"]: m["cik"] for m in result["managers"] if m.get("cik")} == {
+        m["manager_id"]: m["cik"] for m in existing["managers"] if m.get("cik")
+    }
+    assert existing["managers"][1]["identity_status"] == "unverified_document_identity"
+
+
+@pytest.mark.parametrize("name", ["Nestlé", "Rémy Cointreau", "L’Oréal", "東京海上"])
+def test_international_issuer_names_are_not_truncated_to_ascii(name):
+    rows = disclosures.extract_document_positions(f"We own {name}.")
+    assert [row["issuer"] for row in rows] == [name]
+    rows = disclosures.extract_document_positions(f"Top Holdings\n{name} 4.2%")
+    assert [row["issuer"] for row in rows] == [name]
+    assert rows[0]["weight_pct"] == 4.2
+
+
+def test_named_adviser_document_correction_keeps_unrelated_filer_history():
+    original = {
+        "id": "letter",
+        "manager_id": "venture",
+        "vehicle_id": "sequoia",
+        "source_kind": "fund_disclosure",
+        "positions": [],
+    }
+    corrected = {
+        **original,
+        "manager_id": "ruane-cunniff",
+        "manager_link_basis": "named_adviser",
+    }
+    filing = {
+        "id": "13f",
+        "manager_id": "venture",
+        "vehicle_id": "venture",
+        "source_kind": "13f",
+        "positions": [],
+    }
+    merged = disclosures.merge_disclosure_snapshots([original, filing], [corrected])
+    assert {(d["id"], d["manager_id"]) for d in merged} == {
+        ("letter", "ruane-cunniff"),
+        ("13f", "venture"),
+    }
+
+
 def test_renamed_publisher_uses_exact_archived_document_identity():
     existing = {
         "managers": [{"manager_id": "manager", "cik": "1"}],

@@ -1,0 +1,61 @@
+name: Public daily fund holdings
+on:
+  schedule:
+    - cron: '15 14 * * 1-5'
+    - cron: '15 23 * * 1-5'
+  repository_dispatch:
+    types: [refresh-public-fund-holdings]
+  push:
+    branches: [main]
+    paths:
+      - '_system/scripts/public_holdings.py'
+      - '_system/reference/investors/public_holdings_sources.json'
+      - '.github/workflows/public-fund-holdings.yml'
+permissions:
+  contents: write
+concurrency:
+  group: public-daily-fund-holdings
+  cancel-in-progress: false
+jobs:
+  refresh:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    env:
+      RESEARCH_VAULT_ROOT: _external/research-vault
+      RESEARCH_VAULT_CLONE_TOKEN: ${{ secrets.RESEARCH_VAULT_CLONE_TOKEN }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          filter: blob:none
+          sparse-checkout: |
+            _system/scripts
+            _system/reference/investors
+            dashboard/data/holdings
+            .github
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Read only the public disclosure archive
+        uses: actions/checkout@v4
+        with:
+          repository: magis-capital-partners/research-vault
+          path: _external/research-vault
+          token: ${{ secrets.RESEARCH_VAULT_CLONE_TOKEN }}
+          ref: main
+          filter: blob:none
+          sparse-checkout: dashboard-private/public-holdings
+      - name: Fetch current public disclosures and retain dated history
+        id: sources
+        continue-on-error: true
+        run: python _system/scripts/public_holdings.py --archive "$RESEARCH_VAULT_ROOT/dashboard-private/public-holdings"
+      - uses: ./.github/actions/commit-vault
+        with:
+          message: 'Preserve dated public fund portfolios and original sources'
+          git_add: dashboard-private/public-holdings
+      - name: Publish the verified public source receipt
+        run: |
+          git add dashboard/data/holdings/public_sources_receipt.json
+          bash _system/scripts/ci_push_main.sh 'chore: refresh public daily fund holdings'
+      - name: Report unavailable public sources after preserving coverage status
+        if: steps.sources.outcome == 'failure'
+        run: exit 1

@@ -11,6 +11,7 @@ import global_disclosures
 import investor_history as history
 import investor_universe
 import investor_corpus
+import public_holdings
 from holdings_asset_bundles import pack_assets, validate_site_budget
 from investor_history_checkpoint import merge_historical, restore
 from vault_paths import research_vault_root
@@ -105,6 +106,14 @@ def stage(site, *, vault=None, receipt=None, cache=None):
         investor_universe.current_disclosure_identity(document, universe)
         for document in disclosures["disclosures"]
     ]
+    public = public_holdings.load(
+        vault / "dashboard-private/public-holdings",
+        receipt.parent / "public_sources_receipt.json",
+    )
+    disclosures["disclosures"] = global_disclosures.merge_disclosure_snapshots(
+        disclosures["disclosures"], public["disclosures"]
+    )
+    disclosures["review"] = [*disclosures.get("review", []), *public["review"]]
     # Re-read authorized source text when extraction improves. Keep archived
     # documents that are no longer present in the current corpus.
     corpus = vault / "superinvestor-letters/insights.json"
@@ -115,6 +124,13 @@ def stage(site, *, vault=None, receipt=None, cache=None):
         universe, records = investor_corpus.reconcile_sources(
             records, universe, disclosures["disclosures"]
         )
+        universe = investor_universe.refresh_document_profiles(
+            universe, corpus, records
+        )
+        disclosures["disclosures"] = [
+            investor_universe.current_disclosure_identity(document, universe)
+            for document in disclosures["disclosures"]
+        ]
         documents, review = global_disclosures.corpus_disclosures(
             corpus, universe, records=records
         )
@@ -134,7 +150,9 @@ def stage(site, *, vault=None, receipt=None, cache=None):
     finally:
         db.close()
     global_disclosures.upgrade_nport_snapshots(
-        disclosures["disclosures"], cache / "public-cache.sqlite"
+        disclosures["disclosures"],
+        cache / "public-cache.sqlite",
+        public_archive=vault / "dashboard-private/public-holdings",
     )
     result = global_disclosures.publish(
         disclosures["disclosures"],
@@ -154,6 +172,7 @@ def stage(site, *, vault=None, receipt=None, cache=None):
         "letter_corpus_refreshed": refreshed,
         "letter_documents_reprocessed": letter_count,
         "historical_filings_added": historical_added,
+        "public_feed_snapshots": len(public["disclosures"]),
         "filings": coverage["filings"],
         "total_site_files": total_site_files,
         **packaging,
