@@ -21,7 +21,7 @@ LOOPS = {
     "falsifier-resolution.yml": "resolve-and-validate",
     "committee-outcomes.yml": "observe",
 }
-PUBLICATION_CALLERS = set(LOOPS) | {"vault-publication-checkout.yml"}
+PUBLICATION_CALLERS = set(LOOPS) | {"vault-publication-checkout.yml", "research-quality.yml"}
 
 
 def _git(repo: Path, *args: str, input_text: str | None = None) -> str:
@@ -115,6 +115,15 @@ def test_publication_only_is_opt_in_and_the_three_loops_use_it():
                     elif cache is not None:
                         raise AssertionError(f"{path.name}:{job_name} sets preserve-company-cache")
     assert opted == sorted(PUBLICATION_CALLERS)
+    quality = yaml.safe_load((WORKFLOWS / "research-quality.yml").read_text(encoding="utf-8"))
+    # Only validation of already published data may use the scoped snapshot.
+    # Keep research-producing jobs on their existing evidence boundary.
+    quality_readers = [
+        name for name, job in quality["jobs"].items()
+        for step in job.get("steps", [])
+        if str((step.get("with") or {}).get("publication-only")).lower() == "true"
+    ]
+    assert quality_readers == ["dashboard-integrity"]
     for name, job_name in LOOPS.items():
         document = yaml.safe_load((WORKFLOWS / name).read_text(encoding="utf-8"))
         step = next(step for step in document["jobs"][job_name]["steps"] if str(step.get("uses") or "").endswith("checkout-vault"))
