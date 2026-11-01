@@ -1,37 +1,84 @@
 {
-  "schema_version": "underwriting-review/1",
+  "schema_version": "underwriting-review/2",
   "ticker": "MA",
-  "packet_hash": "e3afdfe8c03733bca272a03bd802f34d6dbb5fdf81addf8bb73e256b0b09e5f7",
-  "contract_hash": "eaf6a621e0f0c9d416af4e5bb15bd03bb22711023e89952bff4dcf5f5a8576c4",
+  "packet_hash": "ac9bdd7ed73de0ab323ce993121e9f7b85fd5a090e23389af3e1a0d39a90f19f",
+  "contract_hash": "48bf233e26e74057443e18d32668eee9146ea11fa0239ebd742f43615ca0a485",
+  "diagnostics_hash": "307eda1870bae0b8d1a14c973102dd5ef1e29abc88772703e72712c99089a65f",
   "verdict": "approve",
   "framework_accepted": true,
   "assumption_coverage": [
-    "software_investment",
-    "sbc_cash_funding",
-    "customer_funding_exclusion",
-    "normalization",
-    "acquisition_budget",
-    "other_parent_claims",
-    "refinancing_drag",
-    "first_year_growth",
-    "second_year_growth",
-    "later_growth",
-    "residual_distribution",
+    "subsequent_consumption",
+    "g1",
+    "g2",
+    "g3",
+    "runway_growth",
+    "fade",
+    "mature_growth",
     "terminal_growth",
-    "discount_rate"
+    "prefinance_margin",
+    "trailing_interest",
+    "tax_rate",
+    "cash_recast",
+    "conversion_persistence",
+    "maintenance_ratio",
+    "sbc_factor",
+    "owner_translation",
+    "organic_attribution",
+    "organic_calibration_capital",
+    "acquisition_budget",
+    "acquisition_payoff",
+    "customer_intensity",
+    "bvnk_contingency",
+    "outside_claims",
+    "legal_cash",
+    "settlement_severity",
+    "facility_access",
+    "facility_cost",
+    "arrears_cost",
+    "liquidity_ratio",
+    "coupon_proxy",
+    "retirement_weight",
+    "euro_factor",
+    "november_principal",
+    "old_coupon_allowance",
+    "m1",
+    "m2_usd",
+    "m2_euro",
+    "m3_usd",
+    "m3_euro",
+    "m4",
+    "m5_usd",
+    "m5_euro",
+    "m6",
+    "m7",
+    "m8",
+    "m9",
+    "m10",
+    "m21",
+    "m22",
+    "m23",
+    "m24",
+    "m25",
+    "equity_hurdle",
+    "acquired_revenue_contribution",
+    "acquired_owner_margin",
+    "fiscal_first_weight",
+    "m2_pre_march_usd",
+    "m2_march_usd",
+    "march_net_receipts_fraction",
+    "june_net_receipts_fraction"
   ],
   "component_inventory_coverage": [
-    "payments_network_and_services",
-    "acquired_businesses_and_intangibles",
-    "customer_incentives_receivables_and_operating_working_capital",
-    "settlement_assets_obligations_and_guarantees",
-    "restricted_cash_and_customer_security_deposits",
-    "unrestricted_cash_and_liquid_investments",
-    "equity_investments_and_other_financial_assets",
-    "parent_debt_and_refinancing",
-    "other_liabilities_litigation_taxes_and_leases",
-    "noncontrolling_and_other_residual_claims",
-    "employee_equity_and_common_share_classes",
+    "network_and_services",
+    "acquisitions_and_intangibles",
+    "customer_and_operating_capital",
+    "unrestricted_cash_and_investments",
+    "restricted_resources_and_settlement",
+    "debt_and_committed_credit",
+    "legal_and_regulatory_claims",
+    "taxes_leases_minorities_and_residual_claims",
+    "prior_record_dividend",
+    "common_classes_and_compensation",
     "captive_finance_boundary"
   ],
   "checklist_coverage": [
@@ -44,11 +91,87 @@
     "method_selection",
     "scenario_coherence"
   ],
-  "independent_thesis": "Mastercard's principal claim is the residual cash of an integrated payments and services network. The annual report expressly excludes account-holder lending and describes network and services capabilities as interdependent. Consolidated operating DCF is appropriate; separate network and services valuations would require unsupported allocations of shared distribution, data and investment. Settlement guarantees nevertheless create liquidity exposure that the nonlending classification does not remove.\n\nThe selected financial facts match the frozen tables: full-year 2025 and comparable nine-month consolidated cash flows, in millions converted to whole USD, and third-quarter 2026 diluted weighted-average shares of 876 million. The trailing calculations reconcile to USD 16,861 million of operating cash flow, USD 779 million of physical investment and USD 637 million of SBC. Reported software capitalization reconciles to USD 652 million trailing, below the USD 750 million reserve. Trailing customer-deposit inflows are USD 193 million, below the USD 250 million exclusion. The denominator is newer than the annual baseline, has verified split basis, and requires no listing-unit conversion.\n\nCash conversion is the central operating vulnerability: nine-month net income increased while operating cash flow fell, prepaid outflows rose and accrued expenses supplied cash. The contract retains actual incentive funding, deducts customer-funding inflows and avoids adding back recurring litigation. Its normalization haircut is judgmental, but is supported by this divergence. Physical investment, software, compensation and acquisitions are charged before distributions. Forecast growth is explicitly growth of the residual after those requirements; maintaining that interpretation is essential because separate expenditure trajectories are not modeled.\n\nThe financing bridge is internally consistent. September 2026 debt totals USD 23,938 million, and existing interest remains inside operating cash flow. Additional financing costs are reserved, refinancing supplies no distributable net borrowing, and terminal proceeds capitalize levered equity cash. A separate debt deduction would therefore duplicate the financing claim. Unrestricted cash, investments, restricted cash and customer collateral receive no additional principal proceeds. Compensation funding supports the constant diluted denominator, although grant-date SBC remains an imperfect measure of dilution-offset cost.\n\nThe low scenario materially impairs cash earning power before applying a higher hurdle: its first annual residual is approximately USD 7,466 million and its fifth-year residual approximately USD 8,566 million. This constitutes a downturn with incomplete recovery. All modeled annual residuals remain positive, so no financing deficit is concealed by the terminal limited-liability floor. A refinancing shutdown or exceptional settlement loss would invalidate these going-concern scenarios.\n\nTerminal capitalization is the weakest and largest value driver. The supplied sensitivities identify the equity hurdle, terminal growth and normalization as the dominant judgments. Mature growth is below explicit growth, investment remains charged, and distributed cash is not accumulated again at exit. These assumptions are economically admissible, but approval does not establish their accuracy or cover insolvency and systemic settlement tails.",
+  "independent_thesis": "Mastercard's earning asset is interoperable acceptance and processing combined with shared services distribution. Consolidated parent-equity operating DCF fits better than separable franchise valuations: one reported segment and interdependent customers, data and distribution provide no reliable independent payout boundaries. Financial-equity valuation would misclassify settlement guarantees as an account-holder lending book. The strongest evidence against effortless compounding is nine-month income rising to USD 12.898 billion while OCF declined to USD 11.859 billion, alongside faster incentive growth. The contract addresses this through an identifiable cash recast, funded customer capital, maintenance, economic compensation and constrained expansion. I independently reconciled trailing revenue of USD 36.288 billion, income of USD 16.958 billion, OCF of USD 16.861 billion and the USD 1.241 billion recast. Selected supplemental amounts match their table columns, scales and issuer scope. Current unrestricted cash and debt use September 2026 balances; restricted resources are excluded. The verified 876 million denominator includes both common classes and existing dilution without an ADR conversion. Acquisition returns remain uncertain estimates, but disclosed acquired revenue bounds their earnings, full purchase spending is charged and failed payback is executed. Competitive fade is the largest uncertainty; the evidence supports testing both long persistence and rapid erosion, without proving either duration. Funding survival is separately modeled through immediate demands, conditional committed borrowing, repayment, dated maturity reserves and an executable common-equity failure. Seven-year sale proceeds transfer the remaining audited claim rather than erase its creditor obligations.",
+  "economic_assessments": {
+    "earning_power": {
+      "rating": "adequate",
+      "reason": "Annual and comparative nine-month observations reconcile the trailing baseline. The recast arithmetic is reproducible from frozen cash-flow tables; ordinary incentive expense, litigation expense, taxes and expensed development remain charged. Lower margins and conversion address deterioration rather than merely changing capitalization."
+    },
+    "reinvestment": {
+      "rating": "adequate",
+      "reason": "Maintenance and economic SBC are deducted inside owner cash, with zero additional bridge charges disclosed. Organic deployment uses matching historical and forward attribution, independent customer-capital floors and growing operating liquidity. Attribution cancels algebraically in the matched capital-intensity calculation, so the stated organic return is an attribution-dependent estimate rather than independent proof of returns. Acquisition earnings are bounded by disclosed revenue contribution, full consideration and a declared owner margin; failed purchases retain their cash cost."
+    },
+    "competitive_response": {
+      "rating": "adequate",
+      "reason": "Network and services growth, customer contracts and shared distribution support persistence. Faster incentives, slowing activity, competing networks, local routing and account-based substitutes support erosion. Distinct earlier-maturity, longer-persistence and renewal-deterioration tests change earnings and required investment together."
+    },
+    "customer_value": {
+      "rating": "adequate",
+      "reason": "The analysis distinguishes Mastercard fees from issuer interchange and recognizes both merchant acceptance costs and issuer incentives. Margin concessions and customer funding make bargaining pressure executable. Current margins alone do not establish stronger customer value."
+    },
+    "capital_allocation": {
+      "rating": "adequate",
+      "reason": "Acquisitions, organic deployment, compensation funding, outside claims, principal repayment and retained liquidity are allocated once. Existing-record dividends are excluded from prospective owner receipts. Constant shares and pro-rata cash payouts avoid assuming price-independent repurchase accretion. Growth is reduced when internal funding binds."
+    },
+    "financing_survival": {
+      "rating": "adequate",
+      "reason": "September unrestricted cash starts resources after subsequent-consumption allowance; restricted cash and customer deposits are unavailable. The USD 8 billion facility is conditional, shares capacity with commercial paper and is repaid before expiry. Immediate claims use timely resources, with an executed failure alternative. The intermediate squeeze has explicit December–June receipt assumptions and reserves rather than relying solely on annual profit. Those timing estimates remain reviewable judgments, supported imperfectly by billing terms and historical quarterly cash generation."
+    },
+    "inflation": {
+      "rating": "adequate",
+      "reason": "Revenue, margins, replacement spending, customer capital and liquidity are consistently nominal USD. Euro principal translation changes outstanding obligations and repayments together. No separate inflation uplift or automatic capital release during contraction is credited."
+    },
+    "realization": {
+      "rating": "adequate",
+      "reason": "The seven-year holding period is separated from the 25-year contractual projection. All existing maturities remain charged, interest declines with principal, and terminal earnings exclude financing costs only after retirement. Continuation investment uses incremental parent owner earnings and complete funded growth capital. Retained operating cash and financial assets receive no duplicate sale proceeds."
+    }
+  },
+  "largest_drivers": [
+    {
+      "assumption_id": "fade",
+      "rating": "adequate",
+      "reason": "The largest sensitivity is explicitly an uncertain competitive-duration judgment. Recent revenue and cash growth support persistence, while incentives, routing and substitution oppose extrapolation. Base maturity around projection year 18 is tested against immediate competitive maturity and materially longer distribution persistence; neither duration is inferred from the compounder label."
+    },
+    {
+      "assumption_id": "equity_hurdle",
+      "rating": "adequate",
+      "reason": "The 10.5% nominal USD hurdle is declared as an owner judgment with bounded sensitivity and company-specific financing, regulatory and customer risks. It remains constant across scenarios because adverse operations and funding failure are already represented in cash flows. Its precise level is not presented as an observed market fact."
+    },
+    {
+      "assumption_id": "prefinance_margin",
+      "rating": "adequate",
+      "reason": "Trailing income plus normalized after-tax interest implies approximately 48.5% of revenue before financing, close to the rationale's rounded 48.8%. The 46.3% base margin discounts recent benefits; 35.5% downside imposes lasting operating damage. Conversion, maintenance and compensation are separately reconciled before distributions, and the reverse driver and annual commitments make the judgment testable."
+    }
+  ],
+  "structural_test_coverage": [
+    "joint_operating_and_facility_failure",
+    "timely_committed_borrowing",
+    "intermediate_buffer_squeeze",
+    "prolonged_closure_through_final_maturity",
+    "failed_acquisition_payback",
+    "surviving_renewal_deterioration",
+    "earlier_competitive_maturity",
+    "longer_distribution_persistence",
+    "backloaded_receipts_without_credit"
+  ],
+  "diagnostic_resolutions": [
+    {
+      "id": "business:no_explicit_runway",
+      "reason": "Resolved by inspecting the full projection rather than the empty continuation growth_refs array. Growth does not become stable immediately after the seven-year holding date: explicit g8 through g25 retain competitive fade, with base approaching maturity around year 18 and high retaining approximately 4.6% desired growth in year 25. Frozen annual and quarterly reports support both adoption/services persistence and competitive pressure. Earlier_competitive_maturity and longer_distribution_persistence test materially different durations. Empty post-projection runway avoids appending another privileged period after the complete 25-year schedule."
+    },
+    {
+      "id": "business:terminal_dependence",
+      "reason": "The 75.16% holding-date realization share includes the remaining 18 explicitly modeled years and subsequent continuation; it is not entirely an unsupported perpetuity. The seven-year sale retains every later maturity, investment charge and financing consequence. Frozen reports support a continuing network claim but not liquidation recovery. Earlier competitive maturity, renewal deterioration, failed acquisition payback, prolonged financing closure and explicit facility failure test the principal alternative explanations. The exit concentration remains a material sensitivity, adequately disclosed and tested rather than removed through a longer holding period."
+    }
+  ],
   "findings": [
     {
       "severity": "minor",
-      "detail": "The USD 150 million other_parent_claims reserve uses other financing activities as a proxy, although those outflows are not established as minority distributions. The contract correctly labels this uncertainty and does not capitalize negative minority book equity as a shareholder asset. At the scheduled review, obtain the subsidiary/noncontrolling-interest disclosures and the explanation of other financing activities from the frozen primary reports; reconcile distributions and any redemption rights to this reserve. Search terms: 'noncontrolling interests', 'distributions', 'redeemable', and 'other financing activities'. The supplied evidence does not establish a material omitted claim requiring rejection."
+      "detail": "The prefinance_margin rationale says trailing income plus after-tax interest is about 48.8% of revenue. Its actual graph gives (USD 16.958 billion + USD 0.812 billion × 0.79)/USD 36.288 billion, approximately 48.5%. Correct the narrative rounding; the graph and scenario margins are unaffected."
+    },
+    {
+      "severity": "minor",
+      "detail": "The coupon_proxy rationale says a joint test removes the tax shield, but prolonged_closure_through_final_maturity overrides tax_rate to 0.18, retaining an 18% shield. Describe that test as a higher-coupon, reduced-shield stress. A literal zero-shield test would require an expanded assumption range. The small supplied interest sensitivity and full principal retirement limit the significance of this wording error."
     }
   ]
 }
