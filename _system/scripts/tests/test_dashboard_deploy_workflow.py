@@ -46,6 +46,11 @@ def test_deployment_materializes_only_the_pinned_checkpoint():
     assert "--public-receipt dashboard/data/holdings/archive_receipt.json" in script
     assert "--historical-filers _system/reference/investors/historical_filers.json" in script
     assert "sparse-checkout add /dashboard-private/investor-history/" not in script
+    assert (
+        script.index("stage_company_research.py --hardlink")
+        < script.index("release_deploy_workspace.py")
+        < script.index("investor_history_checkpoint.py materialize")
+    ), "Release reproducible inputs only after staging and before archive expansion"
 
 
 def shape(key: str) -> str:
