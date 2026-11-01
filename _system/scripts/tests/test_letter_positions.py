@@ -43,6 +43,24 @@ def test_explicit_corpus_cannot_read_a_different_vaults_copy(tmp_path, monkeypat
     assert [p["issuer"] for p in documents[0]["positions"]] == ["Delta Equipment"]
 
 
+def test_one_letterhead_cannot_rename_a_generic_publisher_collection(tmp_path):
+    corpus = tmp_path / "insights.json"
+    (tmp_path / "letter.txt").write_text(
+        "Delta Capital\nDear Investors,\nWe own Example Company.", encoding="utf-8"
+    )
+    record = {
+        "fund_id": "generic",
+        "fund": "Generic Collection",
+        "letter_eligible": True,
+        "document_type": "investor_letter",
+        "source_file": corpus_inputs.PREFIX + "letter.txt",
+    }
+    profiles = universe.eligible_profiles(corpus, records=[record])
+    profile = next(iter(profiles.values()))
+    assert profile["name"] == "Generic Collection"
+    assert "Delta Capital" not in profile["aliases"]
+
+
 def test_explicit_curated_brand_links_a_letter_without_firm_letterhead(tmp_path):
     corpus = tmp_path / "insights.json"
     (tmp_path / "letter.txt").write_text(

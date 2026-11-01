@@ -423,8 +423,10 @@ def eligible_profiles(path, *, records=None):
                         re.IGNORECASE,
                     )
                 ]
-                if len(set(publisher)) == 1 and (
-                    salutation or row.get("document_type") == "fund_report"
+                if (
+                    len(set(publisher)) == 1
+                    and (salutation or row.get("document_type") == "fund_report")
+                    and strict_name_match(name, publisher[0])
                 ):
                     profile["aliases"].add(publisher[0])
                     profile["name"] = publisher[0]
