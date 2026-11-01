@@ -73,7 +73,7 @@ def input_fingerprint(root, ticker):
 def processing_version(root):
     paths = [CALL_POLICY, POLICY, Path('_system/prompts/valuation_underwriting.md')]
     paths += [Path('_system/scripts')/name for name in ('underwriting_pipeline.py', 'underwriting_contract.py',
-                                                      'underwriting_evidence.py', 'underwriting_related_evidence.py', 'underwriting_economics.py', 'underwriting_transport.py', 'underwriting_updates.py', 'underwriting_codex.py',
+                                                      'underwriting_evidence.py', 'underwriting_related_evidence.py', 'underwriting_economics.py', 'underwriting_revisions.py', 'underwriting_transport.py', 'underwriting_updates.py', 'underwriting_codex.py',
                                                       'valuation_market_sync.py', 'valuation_earnings.py', 'autonomous_compounders.py',
                                                       'refresh_shared_forecasts.py', 'private_dashboard_assets.py')]
     return digest({str(p): (root/p).read_text(encoding='utf-8') if (root/p).is_file() else None for p in paths})
@@ -238,6 +238,16 @@ def call_stage(root, work, ticker, stage, payload, state, *, launch=True, execut
             raise StageBlocked('provider_run_incomplete: '+str(receipt.get('agent_id'))) from error
         raise ContractError('Provider stage failed to return valid JSON: '+str(error)) from error
     require(receipt.get('agent_id') and receipt.get('status') == 'finished', 'Model call has no complete provider receipt')
+    answer = read(output)
+    if stage == 'author' and answer.get('schema_version') == 'underwriting-contract-revision/1':
+        from underwriting_revisions import materialize
+        base = (payload.get('revision_feedback') or {}).get('previous_contract')
+        expanded = materialize(base, answer)
+        write(cache/'author_revision.json', answer)
+        receipt['contract_revision'] = {'base_contract': base, 'proposal': answer,
+                                       'provider_output_hash': digest(answer),
+                                       'materialized_contract_hash': digest(expanded)}
+        write(output, expanded)
     receipt.update(input_hash=base_hash, call_hash=call_hash, stage=stage, model=model, reasoning_effort=effort,
                    provider=stage_model(root, stage)['provider'], consumer=consumer,
                    prompt_characters=len(prompt), uncompressed_payload_characters=len(json.dumps(payload, ensure_ascii=False)))
@@ -344,6 +354,8 @@ def validate_saved(root, ticker, vault):
 
 
 def validate_stage_receipts(receipts, model, *, legacy=False):
+    from underwriting_revisions import validate_derivation
+    validate_derivation(receipts['author'], model.get('underwriting', {}).get('contract_hash'))
     agents = [receipts[s].get('agent_id') for s in ('author', 'challenger')]
     require(all(agents) and len(set(agents)) == 2, 'Author and challenger must have independent sessions')
     builder = receipts['builder']
@@ -423,8 +435,13 @@ def load_progress(root, work, ticker, packet):
         try:
             canonical = compile_contract(packet, author)
             expected = stage_hash(root, 'challenger', challenge_payload(packet, author, canonical))
-            if challenger_receipt['input_hash'] != expected:
-                continue
+        except ContractError:
+            # An old draft invalid under today's compiler cannot replace newer
+            # correction instructions while recovering paid-stage checkpoints.
+            continue
+        if challenger_receipt['input_hash'] != expected:
+            continue
+        try:
             validate_review(author, challenger, canonical)
         except ContractError as exc:
             result['feedback'] = revision_feedback(author, challenger, exc)
@@ -468,6 +485,8 @@ def validate_handoff(root, payload, identity):
     validate_review(author, review, canonical)
     receipts = payload['receipts']
     require(set(receipts) == {'author', 'challenger'}, 'Handoff needs both judgment receipts')
+    from underwriting_revisions import validate_derivation
+    validate_derivation(receipts['author'], digest(author))
     for stage, receipt in receipts.items():
         selected = stage_model(root, stage)
         require(receipt.get('agent_id') and receipt.get('status') == 'finished' and receipt.get('stage') == stage
@@ -536,6 +555,8 @@ def run_company(root, work, ticker, as_of, state, vault, *, prepare=prepare_pack
                 validate_review(author, challenger, canonical)
             else:
                 payload = {'packet': packet, 'revision_feedback': feedback}
+                if (feedback or {}).get('previous_contract'):
+                    payload['revision_base_hash'] = digest(feedback['previous_contract'])
                 if baseline:
                     payload['approved_baseline'] = baseline
                 author, author_receipt = call_stage(root, work, ticker, 'author', payload, state, execute=execute)
@@ -588,7 +609,10 @@ def run_company(root, work, ticker, as_of, state, vault, *, prepare=prepare_pack
             if progress.get('approved'):
                 # A provider/build/publication failure does not revoke a valid review.
                 raise StageBlocked('approved_model_build_or_publication: '+str(exc)) from exc
+            previous_feedback = progress.get('feedback') or {}
             feedback = revision_feedback(author, challenger, exc)
+            if not author:
+                feedback = {**previous_feedback, **feedback}
             progress['feedback'] = feedback
             progress['history'].append({'contract_hash': digest(author) if author else None,
                                         'required_correction': str(exc), 'findings': unresolved_findings(feedback)})
