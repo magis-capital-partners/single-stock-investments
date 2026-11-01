@@ -175,10 +175,30 @@ class FingerprintTests(unittest.TestCase):
         self.assertEqual(ids[".github/workflows/dashboard-pages.yml"], "absent")
         self.assertRegex(ids["dashboard"], r"^[0-9a-f]{40}$")
 
+    def test_pinned_history_identity_inputs_move_the_fingerprint(self) -> None:
+        for path in (
+            "_system/scripts/investor_universe.py",
+            "_system/reference/investors/public_roster.json",
+            "_system/reference/investors/manager_aliases.json",
+        ):
+            before = gate.fingerprint(cwd=self.repo)
+            (self.repo / path).parent.mkdir(parents=True, exist_ok=True)
+            self.commit(path, "verified identity change\n")
+            self.assertNotEqual(gate.fingerprint(cwd=self.repo), before, path)
+
 
 class WorkflowWiringTests(unittest.TestCase):
     def setUp(self) -> None:
         self.workflow = (ROOT / ".github" / "workflows" / "dashboard-pages.yml").read_text(encoding="utf-8")
+
+    def test_pinned_history_identity_changes_trigger_a_release(self) -> None:
+        push = self.workflow.split("  push:\n", 1)[1].split("  workflow_dispatch:\n", 1)[0]
+        for path in (
+            "_system/scripts/investor_universe.py",
+            "_system/reference/investors/public_roster.json",
+            "_system/reference/investors/manager_aliases.json",
+        ):
+            self.assertIn(f'- "{path}"', push)
 
     def job(self, name: str) -> str:
         match = re.search(rf"\n  {re.escape(name)}:\n(.*?)(?=\n  [a-z][a-z0-9-]*:\n|\Z)", self.workflow, re.S)

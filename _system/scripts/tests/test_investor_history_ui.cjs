@@ -3,6 +3,16 @@ const assert = require('node:assert/strict');
 global.window=global;
 require('../../../dashboard/investor-history.js');
 const ui=global.InvestorHistory;
+test('verified brand, manager and legal names find the same complete filing history',()=>{
+  const manager={manager_id:'dalal-street',name:'Pabrai Investments',legal_name:'Dalal Street, LLC',aliases:['Pabrai Funds','Pabrai Investment Funds','Mohnish Pabrai - Pabrai Investments'],history:[{quarter:'2012Q1'},{quarter:'2026Q2'}],disclosure_count:1,disclosure_quarters:['2020Q2']};
+  for(const query of ['Pabrai','Pabrai Funds','Mohnish Pabrai','Dalal Street']) {
+    const rows=ui.directoryRows([manager],{query});
+    assert.equal(rows.length,1,query);
+    assert.equal(rows[0].history.length,2,query);
+    assert.deepEqual(ui.availablePeriods(rows[0]),['2026Q2','2020Q2','2012Q1']);
+  }
+  assert.deepEqual(ui.availablePeriods(manager,'disclosures'),['2020Q2']);
+});
 test('compressed books and position parts independently decode from one binary fetch',async()=>{
   const {gzipSync}=require('node:zlib');
   const assets={'history/a.json':{quarters:{'2000Q1':{positions_parts:['history/p.json']}}},'history/p.json':{positions:[{ticker:'NESTLE',currency:'CHF',value_usd:1.25}]}};

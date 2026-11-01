@@ -25,6 +25,271 @@ from thirteenf_core import merge_filings
 from thirteenf_legacy import parse_legacy_document
 
 
+@pytest.mark.parametrize("conflicting_filer", [False, True])
+def test_public_brand_links_short_letter_name_to_existing_legal_filer(
+    tmp_path, monkeypatch, conflicting_filer
+):
+    monkeypatch.setattr(universe, "ARCHIVE", tmp_path / "archive")
+    registry = tmp_path / "managers.json"
+    archive.write_json(
+        registry,
+        {
+            "managers": [
+                {
+                    "manager_id": "dalal-street",
+                    "display_name": "Dalal Street LLC",
+                    "sec_name": "Dalal Street, LLC",
+                    "cik": "0001549575",
+                    "roles": ["active"],
+                    "book": "full",
+                }
+            ]
+        },
+    )
+    roster = tmp_path / "roster.json"
+    archive.write_json(
+        roster,
+        {
+            "managers": [
+                {
+                    "firm": "Pabrai Investments",
+                    "name": "Mohnish Pabrai - Pabrai Investments",
+                }
+            ]
+        },
+    )
+    corpus = tmp_path / "insights.json"
+    archive.write_json(
+        corpus,
+        {
+            "letters": [
+                {
+                    "fund_id": "pabrai",
+                    "fund": "Pabrai",
+                    "source_file": "pabrai.txt",
+                    "letter_eligible": True,
+                    "document_type": "investor_letter",
+                }
+            ]
+        },
+    )
+    (tmp_path / "pabrai.txt").write_text(
+        "Pabrai\nDear Partners,\nOur holdings.", encoding="utf-8"
+    )
+    catalog = {"Dalal Street, LLC": {"0001549575"}}
+    if conflicting_filer:
+        registry_data = json.loads(registry.read_text())
+        registry_data["managers"].append(
+            {
+                "manager_id": "pabrai-capital",
+                "display_name": "Pabrai Capital",
+                "sec_name": "Pabrai Capital",
+                "cik": "999",
+                "book": "full",
+            }
+        )
+        archive.write_json(registry, registry_data)
+        catalog["Pabrai Capital"] = {"999"}
+    result = universe.compile_universe(
+        registry_path=registry,
+        roster_path=roster,
+        corpus_path=corpus,
+        catalog=catalog,
+    )
+    if conflicting_filer:
+        assert result["source_ids"]["pabrai"] not in {"dalal-street", "pabrai-capital"}
+        assert {m["manager_id"] for m in result["managers"] if m.get("cik")} == {
+            "dalal-street",
+            "pabrai-capital",
+        }
+        return
+    assert result["source_ids"]["pabrai"] == "dalal-street"
+    assert len(result["managers"]) == 1
+    manager = result["managers"][0]
+    assert "Pabrai" in manager["display_name"]
+    assert "Dalal Street, LLC" == manager["sec_name"]
+    assert "Mohnish Pabrai - Pabrai Investments" in manager["public_aliases"]
+    assert (
+        universe.reconcile_public_identities(
+            result, roster=json.loads(roster.read_text())["managers"]
+        )
+        == result
+    )
+
+
+def test_public_alias_upgrade_does_not_guess_private_firms_or_merge_distinct_ciks():
+    legal = {
+        "manager_id": "dalal-street",
+        "display_name": "Dalal Street LLC",
+        "sec_name": "Dalal Street, LLC",
+        "cik": "1549575",
+    }
+    unrelated = {
+        "manager_id": "pabrai-capital",
+        "display_name": "Pabrai Capital",
+        "identity_status": "document_header_confirmed",
+        "cik": None,
+    }
+    pending = {
+        "manager_id": "pending",
+        "display_name": "Pabrai",
+        "identity_status": "unverified_document_identity",
+        "cik": None,
+    }
+    roster = [
+        {"firm": "Pabrai Investments", "name": "Mohnish Pabrai - Pabrai Investments"}
+    ]
+    result = universe.reconcile_public_identities(
+        {
+            "managers": [legal, unrelated, pending],
+            "source_ids": {"private": "pabrai-capital", "unknown": "pending"},
+        },
+        roster=roster,
+    )
+    assert result["source_ids"] == {"private": "pabrai-capital", "unknown": "pending"}
+    duplicate = {**legal, "manager_id": "different-filer", "cik": "999"}
+    confirmed = {**pending, "identity_status": "document_header_confirmed"}
+    result = universe.reconcile_public_identities(
+        {"managers": [legal, duplicate, confirmed], "source_ids": {"fund": "pending"}},
+        roster=roster,
+    )
+    assert len(result["managers"]) == 3 and result["source_ids"]["fund"] == "pending"
+
+
+def test_archived_alias_is_reconciled_after_source_corpus_rotation():
+    from refresh_investor_history import retain_archived_identities
+
+    legal = {
+        "manager_id": "dalal-street",
+        "display_name": "Dalal Street LLC",
+        "sec_name": "Dalal Street, LLC",
+        "cik": "1549575",
+    }
+    old = {
+        "manager_id": "pabrai",
+        "display_name": "Pabrai",
+        "cik": None,
+        "identity_status": "document_header_confirmed",
+    }
+    current = {"managers": [legal], "source_ids": {}}
+    previous = {"managers": [old], "source_ids": {"pabrai": "pabrai"}}
+    retained = retain_archived_identities(current, previous)
+    result = universe.reconcile_public_identities(
+        retained, roster=[{"firm": "Pabrai Investments", "name": "Mohnish Pabrai"}]
+    )
+    assert [m["manager_id"] for m in result["managers"]] == ["dalal-street"]
+    assert result["source_ids"]["pabrai"] == "dalal-street"
+    source = {
+        "source_kind": "fund_disclosure",
+        "manager_id": "pabrai",
+        "vehicle_id": "pabrai",
+        "vehicle_name": "Fund 3",
+        "quarter": "2020Q2",
+    }
+    corrected = universe.current_disclosure_identity(source, result)
+    assert corrected == {**source, "manager_id": "dalal-street"}
+
+
+def test_pinned_old_identity_keeps_all_filing_quarters_and_separate_letter_vehicle(
+    tmp_path, monkeypatch
+):
+    roster = tmp_path / "roster.json"
+    archive.write_json(
+        roster,
+        {
+            "managers": [
+                {
+                    "firm": "Pabrai Investments",
+                    "name": "Mohnish Pabrai - Pabrai Investments",
+                }
+            ]
+        },
+    )
+    monkeypatch.setattr(universe, "ROSTER", roster)
+    legal = {
+        "manager_id": "dalal-street",
+        "display_name": "Dalal Street LLC",
+        "sec_name": "Dalal Street, LLC",
+        "cik": "0001549575",
+    }
+    letter = {
+        "manager_id": "pabrai",
+        "display_name": "Pabrai",
+        "cik": None,
+        "identity_status": "document_header_confirmed",
+    }
+    original = tmp_path / "original"
+    db = archive.connect(original / "archive.sqlite")
+    for year in [2019, 2020]:
+        archive.store_filing(
+            db,
+            {
+                "accession": str(year),
+                "manager_id": "dalal-street",
+                "cik": "0001549575",
+                "form": "13F-HR",
+                "period_end": f"{year}-06-30",
+                "filed_at": f"{year}-08-15",
+            },
+            [{"cusip": "1", "value_usd": year, "shares": 1, "sh_prn": "SH"}],
+        )
+    db.close()
+    archive.write_json(
+        original / "universe.json",
+        {"managers": [legal, letter], "source_ids": {"pabrai": "pabrai"}},
+    )
+    archive.write_json(
+        original / "disclosures.json",
+        {
+            "disclosures": [
+                {
+                    "id": "letter",
+                    "manager_id": "pabrai",
+                    "vehicle_id": "pabrai",
+                    "vehicle_name": "Pabrai Fund 3",
+                    "source_kind": "fund_disclosure",
+                    "disclosed_at": "2020-06-30",
+                    "quarter": "2020Q2",
+                    "positions": [
+                        {
+                            "issuer": "Foreign holding",
+                            "currency": "INR",
+                            "weight_pct": 5,
+                        }
+                    ],
+                }
+            ]
+        },
+    )
+    vault = tmp_path / "vault"
+    manifest = checkpoint.pack(original, vault / "dashboard-private/investor-history")
+    receipt = tmp_path / "receipt.json"
+    archive.write_json(receipt, {"identity": manifest["identity"]})
+    monkeypatch.setattr(ownership, "load_cusip_map", dict)
+    monkeypatch.setattr(ownership, "portfolio_universe", lambda: (set(), {}))
+    site = tmp_path / "site"
+    staging.stage(site, vault=vault, receipt=receipt, cache=tmp_path / "restored")
+    index = json.loads(
+        (site / "data/holdings/directory_index.json").read_text(encoding="utf-8")
+    )
+    rows = [m for m in index["managers"] if "pabrai" in m["name"].lower()]
+    assert len(rows) == 1 and len(rows[0]["history"]) == 2
+    assert rows[0]["manager_id"] == "dalal-street"
+    assert rows[0]["disclosure_count"] == 1
+    assert rows[0]["legal_name"] == "Dalal Street, LLC"
+    from holdings_asset_bundles import iter_packed_assets
+
+    snapshots = [
+        d
+        for _, body in iter_packed_assets(site / "data/holdings")
+        for d in json.loads(body).get("snapshots", [])
+    ]
+    assert len(snapshots) == 1
+    assert snapshots[0]["manager_id"] == "dalal-street"
+    assert snapshots[0]["vehicle_id"] == "pabrai"
+    assert snapshots[0]["positions"][0]["weight_pct"] == 5
+
+
 def test_historical_filer_alias_keeps_the_current_manager_identity(tmp_path, monkeypatch):
     monkeypatch.setattr(universe, "ARCHIVE", tmp_path / "archive")
     registry = tmp_path / "managers.json"

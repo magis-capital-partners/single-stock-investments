@@ -50,6 +50,36 @@ def test_every_file_the_suites_read_triggers_the_workflow():
         assert not missing, f"{event} paths miss {missing}"
 
 
+def test_investor_identity_references_survive_the_reference_corpus_exclusion(tmp_path):
+    """The broad _system entry alone does not override the reference exclusion."""
+    import subprocess
+
+    required = (
+        "_system/reference/investors/public_roster.json",
+        "_system/reference/investors/manager_aliases.json",
+    )
+    excluded = "_system/reference/unrelated-corpus/large.json"
+    for relative in (*required, excluded):
+        path = tmp_path / relative
+        path.parent.mkdir(parents=True, exist_ok=True)
+        path.write_text("{}", encoding="utf-8")
+
+    def git(*args, **kwargs):
+        return subprocess.run(["git", "-C", str(tmp_path), *args], check=True,
+                              capture_output=True, **kwargs)
+
+    git("init")
+    git("add", ".")
+    git("-c", "user.name=Fixture", "-c", "user.email=fixture@example.invalid",
+        "commit", "-m", "fixture")
+    checkout = next(s for s in load()["jobs"]["unit-tests"]["steps"]
+                    if str(s.get("uses", "")).startswith("actions/checkout"))
+    git("sparse-checkout", "set", "--no-cone", "--stdin",
+        input=checkout["with"]["sparse-checkout"].encode())
+    assert all((tmp_path / relative).is_file() for relative in required)
+    assert not (tmp_path / excluded).exists()
+
+
 # test_unified_data_architecture.py reads these committed files. The unit-tests
 # job is a non-cone sparse checkout, so a path that is not listed is absent on
 # CI even when it exists on main. The FTS5 query is kind=ticker and is filled

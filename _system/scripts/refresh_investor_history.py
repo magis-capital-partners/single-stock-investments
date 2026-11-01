@@ -34,11 +34,7 @@ def retain_archived_identities(current, previous):
 
 
 def current_disclosure_identity(document, universe):
-    if document.get("source_kind") == "fund_disclosure":
-        owner = universe.get("source_ids", {}).get(document.get("vehicle_id"))
-        if owner:
-            return {**document, "manager_id": owner}
-    return document
+    return investor_universe.current_disclosure_identity(document, universe)
 
 
 def refresh(*, seconds=14400, corpus=None, public=True):
@@ -64,6 +60,7 @@ def refresh(*, seconds=14400, corpus=None, public=True):
         corpus_path=corpus, resolve_public=True
     )
     universe = retain_archived_identities(universe, previous_universe)
+    universe = investor_universe.reconcile_public_identities(universe)
     history.write_json(saved_universe, universe)
     managers = json.loads(
         (history.OWNERSHIP / "managers.json").read_text(encoding="utf-8")
