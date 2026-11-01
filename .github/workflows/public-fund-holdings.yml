@@ -44,6 +44,8 @@ jobs:
           filter: blob:none
           sparse-checkout: dashboard-private/public-holdings
       - name: Fetch current public disclosures and retain dated history
+        id: sources
+        continue-on-error: true
         run: python _system/scripts/public_holdings.py --archive "$RESEARCH_VAULT_ROOT/dashboard-private/public-holdings"
       - uses: ./.github/actions/commit-vault
         with:
@@ -53,3 +55,6 @@ jobs:
         run: |
           git add dashboard/data/holdings/public_sources_receipt.json
           bash _system/scripts/ci_push_main.sh 'chore: refresh public daily fund holdings'
+      - name: Report unavailable public sources after preserving coverage status
+        if: steps.sources.outcome == 'failure'
+        run: exit 1
