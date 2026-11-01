@@ -15,7 +15,7 @@ concurrency:
 jobs:
   triage:
     runs-on: ubuntu-latest
-    # Checkout of this tree takes 11 to 14 minutes and has still been running
+    # A full checkout of this tree took 11 to 14 minutes and was still running
     # when a 20-minute cap cancelled the job. ci_push_main.sh then retries a
     # rejected main push up to five times, and that retry is what 20 minutes
     # killed on 2026-10-27. The triage scripts themselves finish in under a minute.
@@ -28,6 +28,28 @@ jobs:
       - uses: actions/checkout@v4
         with:
           fetch-depth: 1
+          filter: blob:none
+          # CHECKOUT_PATTERNS in _system/scripts/loop_checkout_sparse.py; the
+          # contract test keeps the three loops and that list identical.
+          sparse-checkout: |
+            /*
+            !/*/
+            /.github/
+            /_eval/
+            /_system/
+            !/_system/reference/activist-reports/
+            !/_system/reference/investment-wisdom/
+            /*/research/
+            /dashboard/private-assets.json
+          sparse-checkout-cone-mode: false
+      - name: Materialize cited sources and registered feeds
+        # graph_invariants.py stats every belief citation (E5) and reads every
+        # registered data feed (P6); both can sit outside the patterns above.
+        run: |
+          set -euo pipefail
+          python3 _system/scripts/loop_checkout_sparse.py > "$RUNNER_TEMP/loop-inputs.txt"
+          git sparse-checkout add --skip-checks --stdin < "$RUNNER_TEMP/loop-inputs.txt"
+          echo "added $(wc -l < "$RUNNER_TEMP/loop-inputs.txt") patterns; $(git ls-files -t | grep -c '^H') files on disk"
       - name: Checkout research vault
         uses: ./.github/actions/checkout-vault
         with:
