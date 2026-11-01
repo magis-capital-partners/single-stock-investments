@@ -527,7 +527,8 @@ def pricing_diagnostics(model, quote):
         annual[horizon] -= exit_value
         actual = _irr(price, rows)
         summary = {'irr_pct': actual, 'present_value': pv, 'exit_value': exit_value,
-                   'annual_distributions': annual, 'attribution_method': 'sequential_IRR_counterfactuals'}
+                   'annual_distributions': {str(year): cash for year, cash in annual.items()},
+                   'attribution_method': 'sequential_IRR_counterfactuals'}
         first, last = annual[1], annual[horizon]
         if first > 0 and last > 0 and exit_value > 0:
             flat = [{'year': year, 'amount_per_share': first} for year in annual]

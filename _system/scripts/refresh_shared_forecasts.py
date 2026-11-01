@@ -422,7 +422,14 @@ def check(root=ROOT):
             for case, schedule in forecast['forward_cashflow_schedule'].items():
                 price = forecast['quote']['value']
                 rate = forecast['forward_irr_pct'][case]
-                if abs(_npv(schedule, rate / 100) - price) > max(abs(price), 1e-8) * 1e-6:
+                if rate is None:
+                    outcome = (forecast.get('return_outcomes') or {}).get(case) or {}
+                    if (outcome.get('outcome') != 'complete_loss' or outcome.get('irr_defined') is not False
+                            or outcome.get('total_return_pct') != -100
+                            or forecast['present_value_today_per_share'][case] != 0
+                            or any(row['amount_per_share'] != 0 for row in schedule)):
+                        raise ValueError(ticker+': '+case+' undefined IRR is not a documented complete loss')
+                elif abs(_npv(schedule, rate / 100) - price) > max(abs(price), 1e-8) * 1e-6:
                     raise ValueError(ticker+': '+case+' IRR does not reproduce the purchase price')
                 for zone in forecast['buy_prices']:
                     entry = zone['prices'][case]

@@ -104,7 +104,7 @@ def test_holding_exit_preserves_all_later_funding_and_present_value():
         assert sum(r['amount_per_share'] for r in rows) == pytest.approx(
             sum(r['amount_per_share']/(1+rate)**(r['year']-1) for r in old_rows))
     priced = pricing_diagnostics(model, {'value':100,'currency':'USD'})
-    assert set(priced['cases']['base']['annual_distributions']) == {1}
+    assert set(priced['cases']['base']['annual_distributions']) == {'1'}
     validate_review(c, economic_review(c, model), model)
 
 
@@ -139,7 +139,7 @@ def test_holding_exit_converts_listing_shares_once_and_includes_later_claims():
     rows,pv,rate,_ = _proof_rows(listed['component_valuation_results']['additive_components'][0],'base')
     priced = pricing_diagnostics(listed,{'value':100,'currency':'USD'})['cases']['base']
     assert priced['exit_value'] == pytest.approx(next(r['amount_per_share'] for r in rows if r['proof_node']=='compiled_holding_exit'))
-    assert priced['annual_distributions'][1] == pytest.approx(20)
+    assert priced['annual_distributions']['1'] == pytest.approx(20)
     # A later cash obligation changes the earlier sale value; shortening the
     # holding period cannot detach the owner from that future funding claim.
     changed = copy.deepcopy(c)
@@ -318,6 +318,7 @@ def test_forecast_feedback_distinguishes_annual_and_quarterly_measurements_and_r
 
 
 def test_price_is_added_after_underwriting_and_return_bridge_ties_out():
+    import json
     from underwriting_economics import pricing_diagnostics
     c = economic_contract()
     c['economic_analysis']['scenario_probabilities'] = {'low': .2, 'base': .6, 'high': .2}
@@ -325,6 +326,8 @@ def test_price_is_added_after_underwriting_and_return_bridge_ties_out():
     c['assumptions'][2]['values'] = {'low': 8, 'base': 10, 'high': 15}
     model = compile_contract(packet(), c)
     p = pricing_diagnostics(model, {'value': 100, 'currency': 'USD', 'as_of': '2026-10-26', 'source_url': 'https://issuer.test/quote'})
+    # The publication checker replays the complete diagnostic after JSON storage.
+    assert json.loads(json.dumps(p, allow_nan=False)) == p
     base = p['cases']['base']
     assert base['flat_cash_return_pct']+base['cash_growth_effect_pp']+base['valuation_change_effect_pp'] == pytest.approx(base['irr_pct'])
     assert p['probability_weighted_present_value'] == pytest.approx(sum(c['economic_analysis']['scenario_probabilities'][case]*p['cases'][case]['present_value'] for case in ('low','base','high')))
@@ -366,6 +369,9 @@ def test_v2_runs_the_complete_pipeline_and_preserves_its_economic_receipts(tmp_p
         assert forecast['forward_irr_pct']['low'] is None
         assert forecast['return_outcomes']['low']['total_return_pct']==-100
         assert forecast['forward_irr_pct']['base'] is not None
+    published = refresh.run(tmp_path, '2026-10-26')
+    assert published['summary']['available'] == 1
+    assert refresh.check(tmp_path)['companies'] == 1
 
 
 def test_old_arithmetic_receipt_is_queued_for_economic_review_under_current_policy(tmp_path, monkeypatch):
