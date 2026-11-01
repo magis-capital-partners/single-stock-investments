@@ -3,6 +3,20 @@ const assert = require('node:assert/strict');
 global.window=global;
 require('../../../dashboard/investor-history.js');
 const ui=global.InvestorHistory;
+test('daily ETF is the default vehicle and dates never combine different days',()=>{
+  const snapshots=[{vehicle_id:'old',vehicle_name:'A mutual fund',source_kind:'nport'},...['2026-10-29','2026-10-30'].map(period_end=>({vehicle_id:'daily',vehicle_name:'ETF',frequency:'daily',period_end,positions:[{ticker:'RYGYO.IS'}]}))];
+  const vehicle=ui.disclosureVehicle(snapshots);
+  assert.equal(vehicle.vehicle_id,'daily');
+  assert.equal(ui.disclosureDates(vehicle.snapshots).snapshots[0].period_end,'2026-10-30');
+  assert.equal(ui.disclosureDates(vehicle.snapshots,'2026-10-29').snapshots[0].period_end,'2026-10-29');
+});
+test('issuer ownership is labelled separately from unknown portfolio weight',()=>{
+  const html=ui.positionsTable([{ticker:'RYSAS.IS',issuer_ownership_pct:14.98,weight_pct:null,nominal_capital_try:299509209}]);
+  assert.match(html,/Ownership of issuer/);
+  assert.match(html,/14.98%/);
+  assert.match(html,/portfolio weight unavailable/);
+  assert.match(html,/TRY nominal/);
+});
 test('a letter without extracted positions keeps its quarter and never falls back to an older portfolio',()=>{
   const snapshots=[{vehicle_id:'fund',quarter:'2020Q1',positions:[{issuer:'Example'}]},{vehicle_id:'fund',quarter:'2020Q2',positions:[],scope:'no_explicit_positions_identified'}];
   assert.deepEqual(ui.selectDisclosureSnapshots(snapshots,'latest').map(d=>d.quarter),['2020Q2']);

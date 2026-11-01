@@ -14,6 +14,42 @@ import investor_universe as universe
 import investor_corpus as corpus_inputs
 
 
+@pytest.mark.parametrize("name", ["Nestlé", "Rémy Cointreau", "L’Oréal", "東京海上"])
+def test_international_issuer_names_are_not_truncated_to_ascii(name):
+    rows = disclosures.extract_document_positions(f"We own {name}.")
+    assert [row["issuer"] for row in rows] == [name]
+    rows = disclosures.extract_document_positions(f"Top Holdings\n{name} 4.2%")
+    assert [row["issuer"] for row in rows] == [name]
+    assert rows[0]["weight_pct"] == 4.2
+
+
+def test_named_adviser_document_correction_keeps_unrelated_filer_history():
+    original = {
+        "id": "letter",
+        "manager_id": "venture",
+        "vehicle_id": "sequoia",
+        "source_kind": "fund_disclosure",
+        "positions": [],
+    }
+    corrected = {
+        **original,
+        "manager_id": "ruane-cunniff",
+        "manager_link_basis": "named_adviser",
+    }
+    filing = {
+        "id": "13f",
+        "manager_id": "venture",
+        "vehicle_id": "venture",
+        "source_kind": "13f",
+        "positions": [],
+    }
+    merged = disclosures.merge_disclosure_snapshots([original, filing], [corrected])
+    assert {(d["id"], d["manager_id"]) for d in merged} == {
+        ("letter", "ruane-cunniff"),
+        ("13f", "venture"),
+    }
+
+
 def test_renamed_publisher_uses_exact_archived_document_identity():
     existing = {
         "managers": [{"manager_id": "manager", "cik": "1"}],

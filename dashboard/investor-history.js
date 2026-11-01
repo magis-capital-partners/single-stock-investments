@@ -35,9 +35,17 @@
     return snapshots.filter(d=>key(d)===dates.get(d.vehicle_id));
   }
   function disclosureVehicle(snapshots, preferred) {
-    const vehicles=[...new Map(snapshots.map(d=>[d.vehicle_id,{id:d.vehicle_id,name:d.vehicle_name || d.vehicle_id,kind:d.source_kind}])).values()].sort((a,b)=>Number(b.kind==='nport')-Number(a.kind==='nport') || a.name.localeCompare(b.name));
+    const vehicles=[...new Map(snapshots.map(d=>[d.vehicle_id,{id:d.vehicle_id,name:d.vehicle_name || d.vehicle_id,kind:d.source_kind,frequency:d.frequency}])).values()].sort((a,b)=>Number(b.frequency==='daily')-Number(a.frequency==='daily') || Number(b.kind==='nport')-Number(a.kind==='nport') || a.name.localeCompare(b.name));
     const selected=vehicles.some(v=>v.id===preferred) ? preferred : vehicles[0]?.id;
     return {vehicles,vehicle_id:selected,snapshots:snapshots.filter(d=>d.vehicle_id===selected)};
+  }
+  function disclosureDates(snapshots, preferred) {
+    const dated=snapshots.some(d=>d.frequency==='daily' || d.scope==='issuer_ownership_register');
+    if(!dated) return {snapshots,dates:[],date:null};
+    const key=d=>d.period_end || d.observed_at?.slice(0,10) || d.disclosed_at || '';
+    const dates=[...new Set(snapshots.map(key))].filter(Boolean).sort().reverse();
+    const date=dates.includes(preferred) ? preferred : dates[0];
+    return {snapshots:snapshots.filter(d=>key(d)===date),dates,date};
   }
   const rankPositions=(a,b)=>(b.value_usd || 0)-(a.value_usd || 0) || (b.weight_pct || 0)-(a.weight_pct || 0);
   function positionPage(rows,{query='',page=0,size=100}={}) {
@@ -71,11 +79,13 @@
   }
   function positionsTable(rows, {basis=''}={}) {
     if (!rows.length) return '<p>No disclosed positions for this snapshot.</p>';
-    return `<div class="workspace-scroll"><table class="workspace-table"><thead><tr><th>Position</th><th>Weight${basis ? `<small>${esc(basis)}</small>` : ''}</th><th>Value (USD)</th></tr></thead><tbody>${[...rows].sort((a,b)=>(b.value_usd || 0)-(a.value_usd || 0) || (b.weight_pct || 0)-(a.weight_pct || 0)).map(row => {
+    const ownership=rows.some(row=>row.issuer_ownership_pct!=null);
+    return `<div class="workspace-scroll"><table class="workspace-table"><thead><tr><th>Position</th><th>Shares / nominal capital</th><th>Weight${basis ? `<small>${esc(basis)}</small>` : ''}</th>${ownership?'<th>Ownership of issuer</th>':''}<th>Value (USD)</th></tr></thead><tbody>${[...rows].sort((a,b)=>(b.value_usd || 0)-(a.value_usd || 0) || (b.weight_pct || 0)-(a.weight_pct || 0)).map(row => {
       const kind = [row.title_of_class,row.put_call,(row.position_side==='Short' ? 'Short position' : ''),(row.sh_prn === 'PRN' ? 'Principal amount' : '')].filter(Boolean).join(' · ');
       const weight = row.weight_pct == null ? '—' : `${Number(row.weight_pct).toFixed(2)}%`;
       const weightBasis = {fund_net_assets:'Fund NAV',reported_13f_equities:'Reported 13F book',reported_13f_non_option_book:'Reported 13F book',unspecified_disclosed_weight:'As disclosed; basis unspecified'}[row.weight_basis] || '';
-      return `<tr><td>${esc(row.ticker || row.issuer || row.isin || row.cusip)}${row.ticker && row.issuer && row.ticker!==row.issuer ? `<small>${esc(row.issuer)}</small>` : ''}${kind ? `<small>${esc(kind)}</small>` : ''}${row.country || row.currency ? `<small>${esc([row.country,row.currency].filter(Boolean).join(' · '))}</small>` : ''}</td><td>${weight}${weightBasis ? `<small>${esc(weightBasis)}</small>` : ''}</td><td>${money(row.value_usd)}</td></tr>`;
+      const quantity=row.shares!=null ? Number(row.shares).toLocaleString() : row.nominal_capital_try!=null ? `${Number(row.nominal_capital_try).toLocaleString()} TRY nominal` : '—';
+      return `<tr><td>${esc(row.ticker || row.issuer || row.isin || row.cusip)}${row.ticker && row.issuer && row.ticker!==row.issuer ? `<small>${esc(row.issuer)}</small>` : ''}${kind ? `<small>${esc(kind)}</small>` : ''}${row.country || row.currency ? `<small>${esc([row.country,row.currency].filter(Boolean).join(' · '))}</small>` : ''}</td><td>${esc(quantity)}</td><td>${weight}${weightBasis ? `<small>${esc(weightBasis)}</small>` : ''}</td>${ownership?`<td>${row.issuer_ownership_pct==null?'—':`${Number(row.issuer_ownership_pct).toFixed(2)}%`}<small>Stake in company; portfolio weight unavailable</small></td>`:''}<td>${money(row.value_usd)}</td></tr>`;
     }).join('')}</tbody></table></div>`;
   }
   async function fetchJson(path) {
@@ -138,7 +148,7 @@
     const failures = (index.coverage?.unresolved_count || 0) + (index.disclosure_coverage?.unresolved_sources || 0);
     const credible=directoryRows(managers).length, pending=managers.filter(m=>m.identity_status==='unverified_document_identity').length;
     root.querySelector('[data-history-coverage]').textContent = `${credible} investors · ${quarters.filter(q=>q!=='undated').length} reporting quarters${pending ? ` · ${pending} source names await identity review` : ''}${failures ? ` · ${failures} source records need review` : ''}. ${index.coverage?.complete ? 'Discovered filings processed.' : index.coverage?.backfill_processed ? 'All discovered filings processed; source review remains.' : 'Historical backfill and source review are in progress.'}`;
-    async function select(id, requested=quarter, vehicle) {
+    async function select(id, requested=quarter, vehicle, requestedDate) {
       if(selected!==id) selectedVehicle=null;
       if(vehicle!==undefined) selectedVehicle=vehicle;
       const preferredVehicle=selectedVehicle;
@@ -164,20 +174,23 @@
           const paths=[...new Set(wanted.flatMap(q=>manifest.quarters[q] || []))];
           const parts=await Promise.all(paths.map(path=>read(`data/holdings/${path}`)));
           const selection=disclosureVehicle(selectDisclosureSnapshots(parts.flatMap(part=>part.snapshots || []),requested),preferredVehicle);
-          const snapshots=selection.snapshots;
+          const dated=disclosureDates(selection.snapshots,requestedDate);
+          const snapshots=dated.snapshots;
           await Promise.all(snapshots.map(async snapshot=>{
             if (snapshot.positions_parts) {
               const positions=await Promise.all(snapshot.positions_parts.map(path=>read(`data/holdings/${path}`)));
               snapshot.positions=positions.flatMap(part=>part.positions || []);
             }
           }));
-          return {...selection,snapshots};
+          return {...selection,...dated,snapshots};
         }) : Promise.resolve({snapshots:[]});
         const results=await Promise.allSettled([booksPromise,disclosurePromise]);
         if (current!==ticket || !root.isConnected) return;
         const book=results[0].status==='fulfilled' ? results[0].value : null;
         const disclosures=results[1].status==='fulfilled' ? results[1].value.snapshots || [] : [];
         const vehicles=results[1].status==='fulfilled' ? results[1].value.vehicles || [] : [];
+        const dates=results[1].status==='fulfilled' ? results[1].value.dates || [] : [];
+        const selectedDate=results[1].status==='fulfilled' ? results[1].value.date : null;
         selectedVehicle=results[1].status==='fulfilled' ? results[1].value.vehicle_id : null;
         const targetDisclosure=requested==='latest' ? disclosures.map(d=>d.quarter || quarterOf(d.period_end) || quarterOf(d.disclosed_at)).filter(Boolean).sort().at(-1) : requested;
         const visible=requested==='latest' ? disclosures : disclosures.filter(d=>(d.quarter || quarterOf(d.period_end) || quarterOf(d.disclosed_at) || 'undated')===targetDisclosure);
@@ -191,10 +204,11 @@
           ${results[0].status==='rejected' ? '<p>The selected historical filing could not be loaded. Try again.</p>' : ''}
           ${source==='disclosures' ? '' : book ? `<h4>13F holdings · ${esc(book.period_end || period)}</h4><p>Filed ${esc(book.filed_at || 'date unavailable')}${book.partial ? ' · Partial or awaiting reconciliation' : ''}${book.confidential_omitted ? ' · Confidential positions omitted' : ''}</p>${holdingsTable(book.positions || [],{basis:'Reported 13F book, excluding options'})}<details class="workspace-fold"><summary>Filing sources and amendments</summary>${(book.filings || []).map(f=>`<p>${esc(f.form)} · ${esc(f.filed_at)} · ${sourceLink(f.source_url,f.accession)}</p>`).join('')}</details>` : '<p>No 13F book is available for this selection. This does not mean the investor held no positions.</p>'}
           ${(manager.filing_gaps || []).length ? `<details class="workspace-fold"><summary>${manager.filing_gaps.length} historical filing records await review</summary>${manager.filing_gaps.map(f=>`<p>${esc(f.period_end || 'Reporting date unavailable')} · ${sourceLink(f.source_url,f.accession)} · ${esc(f.reason)}</p>`).join('')}</details>` : ''}
-          <h4>Fund disclosures</h4>${vehicles.length>1 ? `<div class="workspace-filter"><label>Fund vehicle<select data-disclosure-vehicle>${vehicles.map(v=>`<option value="${esc(v.id)}" ${v.id===selectedVehicle?'selected':''}>${esc(v.name)}</option>`).join('')}</select></label></div>` : ''}<p class="investor-context">Each fund and date is shown separately. Disclosed positions do not establish a complete manager portfolio.</p>
-          ${results[1].status==='rejected' ? '<p>Fund disclosures could not be loaded. Try again.</p>' : visible.map(d=>`<details class="workspace-fold" open><summary>${esc(d.vehicle_name || manager.name)} · ${esc(d.period_end || d.disclosed_at || d.quarter || 'date unavailable')}</summary><p>${d.partial ? 'Partial disclosure' : 'Registered fund portfolio'}${d.source_review ? ' · Source review pending' : ''}${!d.period_end ? ' · Holdings as-of date not established' : ''}${d.filed_at ? ` · Filed ${esc(d.filed_at)}` : ''} ${d.source_url ? sourceLink(d.source_url,'Source disclosure') : ''}</p>${d.adviser_relationship_observed_at ? `<p class="investor-context">Adviser link observed ${esc(d.adviser_relationship_observed_at)} · ${sourceLink(d.adviser_relationship_source,'Adviser disclosure')}</p>` : ''}${d.scope==='no_explicit_positions_identified' ? '<p>Letter available; no explicit holdings were identified. This does not mean the fund held no positions. Read the source disclosure for context.</p>' : holdingsTable(d.positions || [])}</details>`).join('') || '<p>No fund disclosure is available for this selection.</p>'}`;
+          <h4>Fund disclosures</h4>${vehicles.length>1 ? `<div class="workspace-filter"><label>Fund vehicle<select data-disclosure-vehicle>${vehicles.map(v=>`<option value="${esc(v.id)}" ${v.id===selectedVehicle?'selected':''}>${esc(v.name)}${v.frequency==='daily'?' · Daily holdings':''}</option>`).join('')}</select></label></div>` : ''}${dates.length>1?`<label>Holdings date<select data-disclosure-date>${dates.map(date=>`<option ${date===selectedDate?'selected':''}>${esc(date)}</option>`).join('')}</select></label>`:''}<p class="investor-context">Each fund and date is shown separately. Disclosed positions do not establish a complete manager portfolio.${manager.international_coverage?.source_errors ? ` ${manager.international_coverage.source_errors} source records need review; the last successful disclosures are retained.`:''}</p>
+          ${results[1].status==='rejected' ? '<p>Fund disclosures could not be loaded. Try again.</p>' : visible.map(d=>`<details class="workspace-fold" open><summary>${esc(d.vehicle_name || manager.name)} · ${esc(d.period_end || d.disclosed_at || d.quarter || 'date unavailable')}</summary><p>${d.scope==='issuer_ownership_register'?'Public issuer ownership register':d.frequency==='daily'?'Daily published fund portfolio':d.partial ? 'Partial disclosure' : 'Registered fund portfolio'}${d.source_review ? ' · Source review pending' : ''}${!d.period_end ? ' · Holdings as-of date not established' : ''}${d.filed_at ? ` · Filed ${esc(d.filed_at)}` : ''}${d.observed_at ? ` · Source checked ${esc(d.observed_at.slice(0,10))}`:''} ${d.source_url ? sourceLink(d.publisher_url || d.source_url,'Source disclosure') : ''}</p>${d.scope==='issuer_ownership_register'?'<p>The register identifies an ownership stake in this company. Its observation date is not a portfolio reporting date; it covers disclosed holders above the register’s threshold.</p>':''}${d.adviser_relationship_observed_at ? `<p class="investor-context">Adviser link observed ${esc(d.adviser_relationship_observed_at)} · ${sourceLink(d.adviser_relationship_source,'Adviser disclosure')}</p>` : ''}${d.scope==='no_explicit_positions_identified' ? '<p>Letter available; no explicit holdings were identified. This does not mean the fund held no positions. Read the source disclosure for context.</p>' : holdingsTable(d.positions || [])}</details>`).join('') || '<p>No fund disclosure is available for this selection.</p>'}`;
         tables.forEach((group,number)=>mountPositions(detail.querySelector(`[data-position-group="${number}"]`),group.rows,group.options));
         detail.querySelector('[data-disclosure-vehicle]')?.addEventListener('change',event=>select(id,requested,event.target.value));
+        detail.querySelector('[data-disclosure-date]')?.addEventListener('change',event=>select(id,requested,selectedVehicle,event.target.value));
         detail.querySelector('[data-detail-quarter]').addEventListener('change',event=>select(id,event.target.value));
         detail.focus({preventScroll:true});if(window.innerWidth<900)detail.scrollIntoView({block:'start'});
       } catch(error) { if(current===ticket) detail.textContent=error.message; }
@@ -222,5 +236,5 @@
     root.querySelector('[data-history-next]').addEventListener('click',()=>{page++;paint();});
     paint();
   }
-  window.InvestorHistory = {fill:()=>fill().catch(error=>{const root=document.getElementById('managers-page');if(root)root.textContent=error.message;}),directoryRows,positionsTable,sourceLink,availablePeriods,selectDisclosureSnapshots,disclosureVehicle,positionPage,createReader};
+  window.InvestorHistory = {fill:()=>fill().catch(error=>{const root=document.getElementById('managers-page');if(root)root.textContent=error.message;}),directoryRows,positionsTable,sourceLink,availablePeriods,selectDisclosureSnapshots,disclosureVehicle,disclosureDates,positionPage,createReader};
 })();
