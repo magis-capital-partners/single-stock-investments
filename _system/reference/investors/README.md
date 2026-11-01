@@ -27,6 +27,8 @@ portfolio allocations. They have an observation date unless the source supplies
 an explicit reporting date. Absence from a later register is not an inferred exit.
 
 Letters are reprocessed from the authorized corpus during deployment. Explicit
+corpus paths read that corpus's own text; a similarly named file in another
+vault cannot supply the holdings or identity evidence. Explicit
 dated valuation tables retain their named vehicle and table date. Missing tickers
 and weights remain unknown. Foreign publisher identifiers are preserved because
 Bloomberg symbols do not always match local exchange trading symbols.
@@ -37,9 +39,11 @@ directory includes a per-manager source audit, all available filing quarters and
 disclosure counts. Sequoia Fund letters that name Ruane Cunniff as adviser belong
 to that manager; Sequoia Capital's separate filing history is never combined.
 Pinned publisher classifications are rechecked against the current letter
-headers. Exact public company headers and declared aliases can link a confirmed
-publisher to a unique filing manager. Ambiguous headers stay in review, and
-known filing managers are never combined by a name match.
+headers. A company letterhead before a salutation can identify that document's
+manager; companies discussed in the body cannot. Only declared aliases shared
+by every eligible record can link an entire publisher to a filing manager.
+Ambiguous headers stay in review. Known filing managers are never combined by
+a name match.
 
 To refresh public sources locally, use an isolated research-vault checkout:
 

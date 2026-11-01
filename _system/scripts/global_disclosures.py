@@ -29,7 +29,7 @@ ROOT = Path(__file__).resolve().parents[2]
 sys.path.insert(0, str(ROOT / "_system/scripts"))
 from investor_history import ARCHIVE, iso, now, write_json
 from sec_client import get_bytes, get_json
-from vault_paths import letters_root, resolve_ref_to_path
+from vault_paths import letters_root
 
 SOURCES = ROOT / "_system/reference/investors/disclosure_sources.json"
 NPORT_PARSER_VERSION = "nport-2"
@@ -884,7 +884,7 @@ def extract_document_positions(text, mentions=()):
 
 
 def corpus_disclosures(corpus, universe, *, records=None):
-    from investor_corpus import load_records
+    from investor_corpus import load_records, source_path
     from fund_letters import verified_date
 
     output = []
@@ -914,12 +914,7 @@ def corpus_disclosures(corpus, universe, *, records=None):
             )
             continue
         ref = entry.get("source_file") or ""
-        path = resolve_ref_to_path(ref)
-        if not path or not path.is_file():
-            suffix = ref.removeprefix("_system/reference/superinvestor-letters/")
-            candidate = (corpus.parent / suffix).resolve()
-            if candidate.is_relative_to(corpus.parent.resolve()):
-                path = candidate
+        path = source_path(corpus, ref)
         if not path or not path.is_file():
             review.append(
                 {
@@ -930,6 +925,14 @@ def corpus_disclosures(corpus, universe, *, records=None):
             )
             continue
         text = path.read_text(encoding="utf-8", errors="replace")
+        publisher = universe.get("document_manager_links", {}).get(ref)
+        link_basis = None
+        if publisher and any(
+            m["manager_id"] == publisher["manager_id"] and m.get("cik")
+            for m in universe["managers"]
+        ):
+            manager_id = publisher["manager_id"]
+            link_basis = publisher["basis"]
         # Sequoia Fund's letters name Ruane Cunniff as adviser. The similarly
         # named venture-capital filer is a separate legal manager; reassign
         # only an evidenced document, never its 13F history or the whole brand.
@@ -944,6 +947,7 @@ def corpus_disclosures(corpus, universe, *, records=None):
         )
         if named_adviser:
             manager_id = "ruane-cunniff"
+            link_basis = "named_adviser"
         positions = extract_document_positions(text, entry.get("positions", []))
         quarter = entry.get("quarter")
         date_source = entry.get("date_source") or ""
@@ -970,7 +974,7 @@ def corpus_disclosures(corpus, universe, *, records=None):
                 if positions
                 else "no_explicit_positions_identified",
                 "positions": positions,
-                **({"manager_link_basis": "named_adviser"} if named_adviser else {}),
+                **({"manager_link_basis": link_basis} if link_basis else {}),
             }
         )
         # A letter can contain a table for a different date or named vehicle.
@@ -1010,7 +1014,8 @@ def merge_disclosure_snapshots(archived, current):
     corrected = {
         (d["id"], d.get("vehicle_id")): d["manager_id"]
         for d in current
-        if d.get("manager_link_basis") == "named_adviser"
+        if d.get("manager_link_basis")
+        in {"named_adviser", "publisher_header", "curated_alias"}
     }
     retained = {}
     for document in archived:

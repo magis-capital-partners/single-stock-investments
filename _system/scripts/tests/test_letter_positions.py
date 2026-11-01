@@ -14,6 +14,35 @@ import investor_universe as universe
 import investor_corpus as corpus_inputs
 
 
+def test_explicit_corpus_cannot_read_a_different_vaults_copy(tmp_path, monkeypatch):
+    corpus = tmp_path / "selected/insights.json"
+    corpus.parent.mkdir()
+    (corpus.parent / "letter.txt").write_text(
+        "We own Delta Equipment.", encoding="utf-8"
+    )
+    other = tmp_path / "other-letter.txt"
+    other.write_text("We own Legacy Equipment.", encoding="utf-8")
+    monkeypatch.setattr(
+        disclosures, "resolve_ref_to_path", lambda ref: other, raising=False
+    )
+    records = [
+        {
+            "fund_id": "example",
+            "fund": "Example Fund",
+            "letter_eligible": True,
+            "document_type": "investor_letter",
+            "source_file": corpus_inputs.PREFIX + "letter.txt",
+        }
+    ]
+    current = {
+        "managers": [{"manager_id": "example", "cik": None}],
+        "source_ids": {"example": "example"},
+    }
+    documents, review = disclosures.corpus_disclosures(corpus, current, records=records)
+    assert not review
+    assert [p["issuer"] for p in documents[0]["positions"]] == ["Delta Equipment"]
+
+
 def test_explicit_curated_brand_links_a_letter_without_firm_letterhead(tmp_path):
     corpus = tmp_path / "insights.json"
     (tmp_path / "letter.txt").write_text(
@@ -76,6 +105,10 @@ def test_full_company_header_repairs_a_malformed_short_publisher_without_fuzzy_n
         "BERKSHIRE HATHAWAY INC.\nTo the Shareholders:\nWe own Delta Equipment.",
         encoding="utf-8",
     )
+    (tmp_path / "other.txt").write_text(
+        "Cedar Value Fund\nDear Partner,\nBerkshire Hathaway Inc.\nWe own Delta Equipment.",
+        encoding="utf-8",
+    )
     records = [
         {
             "fund_id": "malformed-title",
@@ -83,7 +116,14 @@ def test_full_company_header_repairs_a_malformed_short_publisher_without_fuzzy_n
             "letter_eligible": True,
             "document_type": "investor_letter",
             "source_file": corpus_inputs.PREFIX + "letter.txt",
-        }
+        },
+        {
+            "fund_id": "malformed-title",
+            "fund": "Unverified Title",
+            "letter_eligible": True,
+            "document_type": "investor_letter",
+            "source_file": corpus_inputs.PREFIX + "other.txt",
+        },
     ]
     current = {
         "managers": [
@@ -102,8 +142,59 @@ def test_full_company_header_repairs_a_malformed_short_publisher_without_fuzzy_n
         "source_ids": {"malformed-title": "malformed"},
     }
     result = universe.refresh_document_profiles(current, corpus, records)
-    assert result["source_ids"]["malformed-title"] == "berkshire-hathaway"
+    assert result["source_ids"]["malformed-title"] == "malformed"
+    assert (
+        result["document_manager_links"][corpus_inputs.PREFIX + "letter.txt"][
+            "manager_id"
+        ]
+        == "berkshire-hathaway"
+    )
     assert result["managers"][0]["cik"] == "1067983"
+    documents, review = disclosures.corpus_disclosures(corpus, result, records=records)
+    assert not review
+    assert {d["source_ref"]: d["manager_id"] for d in documents} == {
+        corpus_inputs.PREFIX + "letter.txt": "berkshire-hathaway",
+        corpus_inputs.PREFIX + "other.txt": "malformed",
+    }
+
+
+@pytest.mark.parametrize("greeting", ["Dear Partner,", ""])
+def test_discussed_companies_never_identify_a_letter_or_report_publisher(
+    tmp_path, greeting
+):
+    corpus = tmp_path / "insights.json"
+    (tmp_path / "letter.txt").write_text(
+        "Cedar Value Fund\n"
+        + greeting
+        + "\nBerkshire Hathaway Inc.\nWe own Delta Equipment.",
+        encoding="utf-8",
+    )
+    record = {
+        "fund_id": "generic",
+        "fund": "Generic Title",
+        "letter_eligible": True,
+        "document_type": "fund_report",
+        "source_file": corpus_inputs.PREFIX + "letter.txt",
+    }
+    current = {
+        "managers": [
+            {
+                "manager_id": "berkshire-hathaway",
+                "display_name": "Berkshire Hathaway",
+                "cik": "1067983",
+            },
+            {
+                "manager_id": "generic",
+                "display_name": "Generic Title",
+                "cik": None,
+                "identity_status": "unverified_document_identity",
+            },
+        ],
+        "source_ids": {"generic": "generic"},
+    }
+    result = universe.refresh_document_profiles(current, corpus, [record])
+    assert result["source_ids"]["generic"] == "generic"
+    assert not result["document_manager_links"]
 
 
 @pytest.mark.parametrize("ambiguous", [False, True])
