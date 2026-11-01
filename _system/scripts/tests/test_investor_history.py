@@ -1652,8 +1652,28 @@ def test_pinned_deploy_restores_history_without_private_letter_evidence(
     archive.write_json(receipt, {"identity": manifest["identity"]})
     monkeypatch.setattr(ownership, "load_cusip_map", dict)
     monkeypatch.setattr(ownership, "portfolio_universe", lambda: (set(), {}))
-    result = staging.stage(
-        tmp_path / "site", vault=vault, receipt=receipt, cache=tmp_path / "restored"
+    import holdings_asset_bundles as bundles
+
+    data = tmp_path / "site/data/holdings"
+    archive.write_json(data / "directory_index.json", {"managers": []})
+    archive.write_json(data / "history/stale/2000.json", {"stale": True})
+    archive.write_json(data / "by_manager/legacy.json", {"legacy": True})
+    bundles.pack_assets(data)
+
+    def no_baseline_expansion(_member):
+        pytest.fail(
+            "A complete pinned rebuild must not inflate the previous site's books"
+        )
+
+    with monkeypatch.context() as rebuild:
+        rebuild.setattr(bundles, "_decompress", no_baseline_expansion)
+        result = staging.stage(
+            tmp_path / "site", vault=vault, receipt=receipt, cache=tmp_path / "restored"
+        )
+    assert (data / "by_manager/legacy.json").is_file()
+    assert (
+        "history/stale/2000.json"
+        not in json.loads((data / "directory_index.json").read_text())["asset_bundles"]
     )
     assert result["identity"] == manifest["identity"]
     generated = "".join(

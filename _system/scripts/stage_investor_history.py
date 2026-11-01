@@ -11,7 +11,7 @@ import global_disclosures
 import investor_history as history
 import investor_universe
 import investor_corpus
-from holdings_asset_bundles import pack_assets, unpack_assets, validate_site_budget
+from holdings_asset_bundles import pack_assets, validate_site_budget
 from investor_history_checkpoint import restore
 from vault_paths import research_vault_root
 
@@ -107,7 +107,10 @@ def stage(site, *, vault=None, receipt=None, cache=None):
             disclosures["disclosures"], documents
         )
         disclosures["review"] = [*disclosures.get("review", []), *review]
-    unpack_assets(site / "data/holdings")
+    # The verified checkpoint regenerates every historical book and disclosure.
+    # Inflating the old publication first duplicates gigabytes until export's
+    # stale-file cleanup, exhausting cold runners. Keep it compressed; export
+    # replaces its index and pack_assets removes the obsolete physical bundles.
     db = history.connect(cache / "archive.sqlite")
     try:
         history.sync_managers(db, universe["managers"])
