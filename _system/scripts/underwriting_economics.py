@@ -405,7 +405,9 @@ def economic_diagnostics(model):
         cid, proof = component['id'], component['calculation_proof']
         v = lookup[cid]['base']
         pv_args = proof['calculations'][-1]['args']
-        terminal_ref = PREFIX+'exit_ps' if a['terminal_specs'][cid]['type'] == 'reinvestment_fade' else a['terminal_specs'][cid].get('amount_ref')
+        terminal_ref = (a.get('holding_realization_refs') or {}).get(cid)
+        if not terminal_ref:
+            terminal_ref = PREFIX+'exit_ps' if a['terminal_specs'][cid]['type'] == 'reinvestment_fade' else a['terminal_specs'][cid].get('amount_ref')
         if terminal_ref:
             terminal_value = v[terminal_ref]
             total = v['compiled_value']
@@ -516,10 +518,11 @@ def pricing_diagnostics(model, quote):
             rows += local
             pv += value
             terminal = a['terminal_specs'][component['id']]
-            ref = PREFIX+'exit_ps' if terminal['type'] == 'reinvestment_fade' else terminal.get('amount_ref')
+            holding_ref = (a.get('holding_realization_refs') or {}).get(component['id'])
+            ref = holding_ref or (PREFIX+'exit_ps' if terminal['type'] == 'reinvestment_fade' else terminal.get('amount_ref'))
             if ref:
                 v = lookup[component['id']][case]
-                exit_value += v[ref]*v.get('compiled_listing_ratio', 1)
+                exit_value += v[ref]*(1 if holding_ref else v.get('compiled_listing_ratio', 1))
         annual = {year: sum(r['amount_per_share'] for r in rows if r['year'] == year) for year in range(1, horizon+1)}
         annual[horizon] -= exit_value
         actual = _irr(price, rows)

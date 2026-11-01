@@ -84,6 +84,71 @@ def test_full_economic_compiler_and_challenge_reconcile():
     assert m['underwriting']['economic_process_version'] == 'economic-underwriting/1'
 
 
+def test_holding_exit_preserves_all_later_funding_and_present_value():
+    from valuation_forecast import _proof_rows
+    from underwriting_economics import economic_diagnostics, pricing_diagnostics
+    c = economic_contract()
+    original = compile_contract(packet(), c)
+    c.update(holding_horizon_years=1,
+             holding_horizon_rationale='Review a one-year owner holding period while funding the full two-year business projection.')
+    model = compile_contract(packet(), c)
+    assert model['valuation_methodology']['horizon_years'] == 1
+    assert model['economic_analysis']['projection_horizon_years'] == 2
+    assert model['economic_analysis']['holding_horizon_years'] == 1
+    assert economic_diagnostics(model)['bridges_reconciled'] == 2
+    for case in ('low', 'base', 'high'):
+        old_rows, old_pv, rate, _ = _proof_rows(original['component_valuation_results']['additive_components'][0], case)
+        rows, pv, _, _ = _proof_rows(model['component_valuation_results']['additive_components'][0], case)
+        assert pv == pytest.approx(old_pv)
+        assert max(r['year'] for r in rows) == 1
+        assert sum(r['amount_per_share'] for r in rows) == pytest.approx(
+            sum(r['amount_per_share']/(1+rate)**(r['year']-1) for r in old_rows))
+    priced = pricing_diagnostics(model, {'value':100,'currency':'USD'})
+    assert set(priced['cases']['base']['annual_distributions']) == {1}
+    validate_review(c, economic_review(c, model), model)
+
+
+@pytest.mark.parametrize('holding', [0, 3, 1.5, True])
+def test_holding_horizon_must_fit_the_audited_projection(holding):
+    c = economic_contract()
+    c.update(holding_horizon_years=holding, holding_horizon_rationale='Explicit owner holding period independent of financing dates.')
+    with pytest.raises(ContractError, match='holding horizon'):
+        compile_contract(packet(), c)
+
+
+def test_shorter_holding_does_not_hide_a_later_liquidity_failure():
+    c = economic_contract()
+    c.update(holding_horizon_years=1, holding_horizon_rationale='Sell before the final projected obligation without ignoring it.')
+    c['economic_analysis']['bridges'][1]['minimum_liquidity_ref'] = 'terminal_cash'
+    with pytest.raises(ContractError, match='liquidity'):
+        compile_contract(packet(), c)
+
+
+def test_holding_exit_converts_listing_shares_once_and_includes_later_claims():
+    from underwriting_economics import pricing_diagnostics
+    from valuation_forecast import _proof_rows
+    p = packet()
+    p['listing_ratio'] = {'ordinary_shares_per_listing_share':2,
+                          'source_url':'https://issuer.test/depositary',
+                          'locator':'Two ordinary shares per receipt', 'source_as_of':p['as_of']}
+    p['packet_hash'] = digest({k:v for k,v in p.items() if k != 'packet_hash'})
+    c = economic_contract()
+    c['packet_hash'] = p['packet_hash']
+    c.update(holding_horizon_years=1, holding_horizon_rationale='The listing owner sells before the final contractual projection.')
+    listed = compile_contract(p,c)
+    rows,pv,rate,_ = _proof_rows(listed['component_valuation_results']['additive_components'][0],'base')
+    priced = pricing_diagnostics(listed,{'value':100,'currency':'USD'})['cases']['base']
+    assert priced['exit_value'] == pytest.approx(next(r['amount_per_share'] for r in rows if r['proof_node']=='compiled_holding_exit'))
+    assert priced['annual_distributions'][1] == pytest.approx(20)
+    # A later cash obligation changes the earlier sale value; shortening the
+    # holding period cannot detach the owner from that future funding claim.
+    changed = copy.deepcopy(c)
+    changed['assumptions'][2]['value'] = 8
+    lower = compile_contract(p,changed)
+    _,lower_pv,_,_ = _proof_rows(lower['component_valuation_results']['additive_components'][0],'base')
+    assert lower_pv < pv
+
+
 @pytest.mark.parametrize('change,match', [
     (lambda c: c['economic_analysis']['bridges'][0].update(retained_cash_ref='normalized_cash'), 'reconcile'),
     (lambda c: c['economic_analysis']['bridges'][0].update(liquidity_ref='zero_cash', minimum_liquidity_ref='normalized_cash'), 'liquidity'),

@@ -360,8 +360,18 @@ one. These weight values, never an arithmetic average of IRRs. Unsupported
 probabilities stay absent. reverse_driver_ref selects a meaningful uncertain
 driver; trusted code adds the price afterward and solves only within its bounds.
 
-Each component requires ONE `terminal` declaration. horizon_years is the holding
-or realization horizon, separate from the subsequent competitive runway:
+Each component requires ONE `terminal` declaration. Normally horizon_years is the
+holding or realization horizon, separate from the subsequent competitive runway.
+When contractual funding needs a longer projection, keep horizon_years as the
+complete audited projection and also declare holding_horizon_years (an integer
+from 1 through horizon_years) and holding_horizon_rationale. Choose the owner's
+holding period independently of debt maturities and competitive duration. Keep
+ALL annual bridges, payment obligations, interest changes and failure rules through
+the full projection. Trusted code values projected shareholder cash after the
+holding date at that date using the component's declared equity hurdle, then adds
+one holding-date sale. This preserves present value while reporting IRR over the
+declared holding period. No later creditor obligation disappears at the sale;
+do not supply a second exit or use a longer hold to make a return look attractive.
 Negative continuation growth reduces earnings but does not automatically release
 invested capital. The trusted continuation charges max(growth,0)/incremental
 equity return. Any actual recoverable working capital or asset proceeds require
@@ -382,8 +392,10 @@ their own supported cash-flow claim, counted once.
   before this boundary; do not combine enterprise returns with levered cash.
   Trusted code projects later earnings, deducts growth/return_on_new_equity as
   reinvestment, then capitalizes mature distributable cash at rate - growth. It
-  discounts all subsequent cash back to the HOLDING date and adds a single exit
-  realization per share. Do not add terminal nodes or an exit cash flow yourself.
+  discounts subsequent cash to the end of the explicit projection and adds one
+  realization per share. With a shorter holding_horizon_years, trusted code then
+  values the remaining projected claim at the holding date. Do not add terminal
+  nodes or an exit cash flow yourself.
   The growth investment is charged here; it must not also be deducted from the
   earnings_ref. Mature growth must be below capitalization rate, funded growth
   cannot exceed incremental return, and no chosen runway follows from a label.

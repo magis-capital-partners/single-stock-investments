@@ -82,6 +82,12 @@ def _bound_evidence(packet, contract):
     horizon = contract.get('horizon_years')
     require(isinstance(horizon, int) and not isinstance(horizon, bool) and 1 <= horizon <= 30, 'Explicit horizon required')
     require(len(contract.get('horizon_rationale') or '') >= 20, 'Explain horizon and realization timing')
+    if 'holding_horizon_years' in contract:
+        holding = contract['holding_horizon_years']
+        require(contract['schema_version'] == 'underwriting-contract/2' and type(holding) is int
+                and 1 <= holding <= horizon, 'Explicit holding horizon must fit the audited projection')
+        require(len(contract.get('holding_horizon_rationale') or '') >= 20,
+                'Explain the holding horizon independently of financing and competitive duration')
     try:
         age = (date.fromisoformat(contract['review_due'])-date.fromisoformat(contract['as_of'])).days
     except (KeyError, ValueError, TypeError) as exc:
@@ -106,6 +112,8 @@ def compile_contract(packet, contract):
     original = contract
     from underwriting_economics import expand_contract, validate_economics
     contract = expand_contract(contract)
+    holding = original.get('holding_horizon_years', horizon)
+    holding_exits = {}
     facts, dimensions, ids = [], {}, set()
     for row in contract.get('facts') or []:
         require(set(row) == {'id', 'observation_id'}, 'Facts may only bind an observation; values cannot be rewritten')
@@ -251,6 +259,22 @@ def compile_contract(packet, contract):
                 calculations.append({'id': node_id, 'op': 'multiply', 'args': [pairs[index], 'compiled_listing_ratio'], 'unit': currency+' per share'})
                 converted.extend((node_id, pairs[index+1]))
             pairs = converted
+        if holding < horizon:
+            # The operating/funding projection remains fully audited. An owner
+            # selling earlier receives the value of the remaining claim at that
+            # date, using this component's already-declared equity hurdle.
+            future, held = [], []
+            for amount, year in zip(pairs[::2], pairs[1::2]):
+                if year > holding:
+                    future.extend((amount, year-holding))
+                else:
+                    held.extend((amount, year))
+            if future:
+                exit_ref = 'compiled_holding_exit'
+                calculations.append({'id': exit_ref, 'op': 'present_value', 'args': future+[rate],
+                                     'unit': currency+' per share'})
+                pairs = held+[exit_ref, holding]
+                holding_exits[cid] = exit_ref
         calculations.append({'id': 'compiled_value', 'op': 'present_value', 'args': pairs+[rate], 'unit': currency+' per share'})
         proof = {'schema_version': '1.0', 'method_id': 'dated_forward_cashflow_schedule_per_share', 'method_version': '1.0',
                  'output_unit': currency+' per share', 'inputs': facts, 'assumptions': assumptions,
@@ -281,7 +305,7 @@ def compile_contract(packet, contract):
             'share_basis': copy.deepcopy(packet['share_basis']), 'method': 'dated_forward_cashflow_schedule_per_share',
             'classification': {'archetype': contract['archetype'], 'rationale': contract['archetype_rationale']},
             'valuation_methodology': {'model_level': 'stock_specific', 'automation': 'independent_underwriting',
-                                     'forecast_as_of': contract['as_of'], 'horizon_years': horizon,
+                                     'forecast_as_of': contract['as_of'], 'horizon_years': holding,
                                      'framework': contract['framework'], 'reviewed_as_of': contract['as_of'],
                                      'review_source': contract['ticker']+'/research/underwriting_review.json'},
             'underwriting': {'contract_hash': digest(original), 'evidence_hash': contract['evidence_hash'],
@@ -291,9 +315,12 @@ def compile_contract(packet, contract):
     if original.get('schema_version') == 'underwriting-contract/2':
         from underwriting_economics import VERSION
         model['economic_analysis'] = {**copy.deepcopy(original['economic_analysis']), 'currency': currency,
-                                      'holding_horizon_years': horizon,
+                                      'holding_horizon_years': holding,
                                       'cashflow_specs': {c['id']:copy.deepcopy(c['cashflows']) for c in contract['components']},
                                       'terminal_specs': {c['id']: copy.deepcopy(c['terminal']) for c in original['components']}}
+        if 'holding_horizon_years' in original:
+            model['valuation_methodology']['projection_horizon_years'] = horizon
+            model['economic_analysis'].update(projection_horizon_years=horizon, holding_realization_refs=holding_exits)
         model['underwriting']['economic_process_version'] = VERSION
         validate_economics(original, contract, model, evidence_ids)
     if packet.get('related_issuers'):
