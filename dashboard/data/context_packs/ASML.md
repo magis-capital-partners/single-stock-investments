@@ -178,12 +178,12 @@ Documents in folder: **9** (all listed below; Tier 1–3 extracted or keyword-sc
 - StockholdersEquit
 
 ## Canonical pointers (open only when needed)
-- deep_dive: ASML/research/deep_dive_2026-09-29.md (sha256 sha256:20c98ed96026be8b...)
+- deep_dive: ASML/research/deep_dive_2026-11-01.md (sha256 sha256:8d8db9461c9cd910...)
 - filing_digest: ASML/research/evidence/filing_digest.md (sha256 sha256:6f3e02ae394539ec...)
-- adversarial: ASML/research/adversarial_2026-09-29.md (sha256 sha256:e42944dcde17ccb9...)
-- valuation: ASML/research/valuation.json (sha256 sha256:cfbf652f62b358f6...)
-- thesis_card: ASML/research/thesis_card.json (sha256 sha256:57f9b71976dc855f...)
-- cross_check: ASML/research/cross_check_third_party_2026-09-29.md (sha256 sha256:e128b1027c34a4b6...)
+- adversarial: ASML/research/adversarial_2026-11-01.md (sha256 sha256:7aaebfdd2b355c6f...)
+- valuation: ASML/research/valuation.json (sha256 sha256:c38cc193bae61d38...)
+- thesis_card: ASML/research/thesis_card.json (sha256 sha256:3303532b707abc7c...)
+- cross_check: ASML/research/cross_check_third_party_2026-11-01.md (sha256 sha256:a4e0462a5409baba...)
 
 ## Excluded from this pack
 - ASML/research/valuation.json (full; returns block included, open only for assumption audit)
