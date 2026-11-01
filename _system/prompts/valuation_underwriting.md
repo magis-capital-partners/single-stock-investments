@@ -19,6 +19,23 @@ realization timing and a coherent downturn. A lower exit multiple on the same
 peak earnings is not a cyclical downside case. Inventory liquidation is not a
 reinvestment franchise. Cash/debt claims must match the scope of cash flows.
 
+AUTHOR REVISIONS: When revision_feedback.previous_contract and revision_base_hash
+are supplied, prefer exact edits instead of rewriting the complete contract:
+{"schema_version":"underwriting-contract-revision/1","base_contract_hash":"COPY revision_base_hash",
+ "edits":[{"path":["holding_horizon_years"],"value":7},
+          {"path":["components","business","drivers","existing_driver"],"value":{"id":"existing_driver","op":"add","args":["existing_a","existing_b"],"unit":"USD"}}]}
+This is syntax only; choose the actual economics. Paths select object keys or
+unique row IDs, never array positions. For rows without IDs, use a unique selector,
+e.g. ["economic_analysis","bridges",{"component_id":"business","year":1},"liquidity_ref"].
+Set replaces a field/row; a new row appends, or use "before":"existing_row_id"
+to insert it before a dependent driver. Use "op":"remove" with no value to remove
+an existing field/row. Preserve selected row identities. All edits apply to the
+exact base hash; untouched content is retained without reinterpretation. Trusted
+code reconstructs the full contract, compiles every equation, and sends that FULL
+result to the independent challenger. This option changes neither source binding
+nor the review requirements. Cold authors without a previous contract must return
+the complete underwriting-contract/2. Return every necessary edit in one object.
+
 Each assumption needs company-specific supporting observations, counterevidence,
 a falsifier and a review trigger. There are no default discount rates, growth
 rates, retention rates, multiples, horizons or dilution. Every economic number
